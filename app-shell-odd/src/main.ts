@@ -1,8 +1,9 @@
 // electron main entry point
 import { app, ipcMain } from 'electron'
+import dns from 'dns'
 import fse from 'fs-extra'
 import path from 'path'
-import { createUi } from './ui'
+import { createUi, waitForRobotServerAndShowMainWindow } from './ui'
 import { createLogger } from './log'
 import { registerDiscovery } from './discovery'
 import {
@@ -22,9 +23,21 @@ import {
 } from './config'
 import systemd from './systemd'
 import { watchForMassStorage } from './usb'
+import {
+  registerNotify,
+  establishBrokerConnection,
+  closeBrokerConnection,
+} from './notifications'
 
 import type { BrowserWindow } from 'electron'
 import type { Dispatch, Logger } from './types'
+
+/**
+ * node 17 introduced a change to default IP resolving to prefer IPv6 which causes localhost requests to fail
+ * setting the default to IPv4 fixes the issue
+ * https://github.com/node-fetch/node-fetch/issues/1624
+ */
+dns.setDefaultResultOrder('ipv4first')
 
 systemd.sendStatus('starting app')
 const config = getConfig()
@@ -49,7 +62,14 @@ if (config.devtools) app.once('ready', installDevtools)
 
 app.once('window-all-closed', () => {
   log.debug('all windows closed, quitting the app')
-  app.quit()
+  closeBrokerConnection()
+    .then(() => {
+      app.quit()
+    })
+    .catch(error => {
+      log.warn('Failed to properly close MQTT connections:', error)
+      app.quit()
+    })
 })
 
 function startUp(): void {
@@ -80,7 +100,7 @@ function startUp(): void {
 
   mainWindow = createUi(dispatch)
   rendererLogger = createRendererLogger()
-
+  void establishBrokerConnection()
   mainWindow.once('closed', () => (mainWindow = null))
 
   log.info('Fetching latest software version')
@@ -95,6 +115,7 @@ function startUp(): void {
     registerRobotSystemUpdate(dispatch),
     registerAppRestart(),
     registerUpdateBrightness(),
+    registerNotify(dispatch, mainWindow),
   ]
 
   ipcMain.on('dispatch', (_, action) => {
@@ -105,10 +126,18 @@ function startUp(): void {
   log.silly('Global references', { mainWindow, rendererLogger })
 
   ipcMain.once('dispatch', () => {
+    log.info('First dispatch, showing')
     systemd.sendStatus('started')
     systemd.ready()
     const stopWatching = watchForMassStorage(dispatch)
     ipcMain.once('quit', stopWatching)
+    // TODO: This is where we render the main window for the first time. See ui.ts
+    // in the createUI function for more.
+    if (!!!mainWindow) {
+      log.error('mainWindow went away before show')
+    } else {
+      waitForRobotServerAndShowMainWindow(dispatch, mainWindow)
+    }
   })
 }
 

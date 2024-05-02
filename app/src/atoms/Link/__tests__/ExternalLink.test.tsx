@@ -1,5 +1,9 @@
 import * as React from 'react'
-import { renderWithProviders, COLORS } from '@opentrons/components'
+import { describe, it, expect, beforeEach } from 'vitest'
+import { screen } from '@testing-library/react'
+import '@testing-library/jest-dom/vitest'
+import { COLORS } from '@opentrons/components'
+import { renderWithProviders } from '../../../__testing-utils__'
 import { ExternalLink } from '../ExternalLink'
 
 const TEST_URL = 'https://opentrons.com'
@@ -20,18 +24,18 @@ describe('ExternalLink', () => {
   })
 
   it('renders external link', () => {
-    const { getByText } = render(props)
+    render(props)
 
-    const link = getByText('Test Link')
+    const link = screen.getByText('Test Link')
     expect(link).toHaveAttribute('href', 'https://opentrons.com')
     expect(link).toHaveAttribute('target', '_blank')
-    expect(link).toHaveStyle(`color: ${String(COLORS.blueEnabled)}`)
+    expect(link).toHaveStyle(`color: ${COLORS.blue55}`)
   })
 
   it('renders open-in-new icon', () => {
-    const { getByLabelText } = render(props)
+    render(props)
 
-    const icon = getByLabelText('open_in_new_icon')
+    const icon = screen.getByLabelText('open_in_new_icon')
     expect(icon).toBeInTheDocument()
     expect(icon).toHaveStyle('width: 0.5rem; height: 0.5rem')
     expect(icon).toHaveStyle('margin-left: 0.4375rem')

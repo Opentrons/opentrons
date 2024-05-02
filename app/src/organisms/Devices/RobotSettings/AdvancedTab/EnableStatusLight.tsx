@@ -9,16 +9,18 @@ import {
   JUSTIFY_SPACE_BETWEEN,
   SPACING,
   TYPOGRAPHY,
+  StyledText,
 } from '@opentrons/components'
-import { StyledText } from '../../../../atoms/text'
 import { ToggleButton } from '../../../../atoms/buttons'
 import { useLEDLights } from '../../hooks'
 
 interface EnableStatusLightProps {
   robotName: string
+  isEstopNotDisengaged: boolean
 }
 export function EnableStatusLight({
   robotName,
+  isEstopNotDisengaged,
 }: EnableStatusLightProps): JSX.Element {
   const { t } = useTranslation('device_settings')
   const { lightsEnabled, toggleLights } = useLEDLights(robotName)
@@ -46,6 +48,7 @@ export function EnableStatusLight({
         toggledOn={lightsEnabled}
         onClick={toggleLights}
         id="RobotSettings_enableStatusLightToggleButton"
+        disabled={isEstopNotDisengaged}
       />
     </Flex>
   )

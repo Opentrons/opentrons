@@ -1,7 +1,7 @@
 import * as React from 'react'
+import { useTranslation } from 'react-i18next'
 import { css } from 'styled-components'
 import { useDispatch, useSelector } from 'react-redux'
-import { FormikProps } from 'formik'
 import {
   DIRECTION_COLUMN,
   Flex,
@@ -23,8 +23,7 @@ import {
   Btn,
   JUSTIFY_END,
 } from '@opentrons/components'
-import { getPipetteNameSpecs } from '@opentrons/shared-data'
-import { i18n } from '../../../localization'
+import { getPipetteSpecsV2 } from '@opentrons/shared-data'
 import { getLabwareDefsByURI } from '../../../labware-defs/selectors'
 import { createCustomTiprackDef } from '../../../labware-defs/actions'
 import { getAllowAllTipracks } from '../../../feature-flags/selectors'
@@ -35,6 +34,9 @@ import { HandleEnter } from './HandleEnter'
 
 import type { PipetteName } from '@opentrons/shared-data'
 import type { FormState, WizardTileProps } from './types'
+import type { ThunkDispatch } from 'redux-thunk'
+import type { BaseState } from '../../../types'
+import type { UseFormReturn } from 'react-hook-form'
 
 export function FirstPipetteTipsTile(props: WizardTileProps): JSX.Element {
   return <PipetteTipsTile {...props} mount="left" />
@@ -42,9 +44,10 @@ export function FirstPipetteTipsTile(props: WizardTileProps): JSX.Element {
 export function SecondPipetteTipsTile(
   props: WizardTileProps
 ): JSX.Element | null {
-  const { values, proceed } = props
-  const leftPipetteName = values.pipettesByMount.left.pipetteName
-  const rightPipetteName = values.pipettesByMount.right.pipetteName
+  const { proceed, watch } = props
+  const pipettesByMount = watch('pipettesByMount')
+  const leftPipetteName = pipettesByMount.left.pipetteName
+  const rightPipetteName = pipettesByMount.right.pipetteName
 
   const shouldProceed =
     leftPipetteName === 'p1000_96' || rightPipetteName === ''
@@ -61,19 +64,18 @@ interface PipetteTipsTileProps extends WizardTileProps {
   mount: Mount
 }
 export function PipetteTipsTile(props: PipetteTipsTileProps): JSX.Element {
-  const { proceed, goBack, mount, values } = props
+  const { proceed, goBack, mount, watch } = props
+  const { t } = useTranslation(['modal', 'application'])
+  const pipettesByMount = watch('pipettesByMount')
 
-  const firstPipetteName = values.pipettesByMount[mount].pipetteName
-  const tileHeader = i18n.t(
-    'modal.create_file_wizard.choose_tips_for_pipette',
-    {
-      pipetteName:
-        firstPipetteName != null
-          ? getPipetteNameSpecs(firstPipetteName as PipetteName)?.displayName ??
-            ''
-          : '',
-    }
-  )
+  const firstPipetteName = pipettesByMount[mount].pipetteName
+  const tileHeader = t('choose_tips_for_pipette', {
+    pipetteName:
+      firstPipetteName != null
+        ? getPipetteSpecsV2(firstPipetteName as PipetteName)?.displayName ?? ''
+        : '',
+  })
+
   return (
     <HandleEnter onEnter={proceed}>
       <Flex flexDirection={DIRECTION_COLUMN} padding={SPACING.spacing32}>
@@ -93,7 +95,7 @@ export function PipetteTipsTile(props: PipetteTipsTileProps): JSX.Element {
         >
           <GoBack onClick={() => goBack()} />
           <PrimaryButton onClick={() => proceed()}>
-            {i18n.t('application.next')}
+            {t('application:next')}
           </PrimaryButton>
         </Flex>
       </Flex>
@@ -102,10 +104,10 @@ export function PipetteTipsTile(props: PipetteTipsTileProps): JSX.Element {
 }
 
 const INPUT_STYLE = css`
-  background-color: ${COLORS.blueEnabled};
-  border-radius: ${BORDERS.radiusRoundEdge};
+  background-color: ${COLORS.blue50};
+  border-radius: ${BORDERS.borderRadius8};
   box-shadow: none;
-  color: ${COLORS.fundamentalsBackground};
+  color: ${COLORS.grey10};
   overflow: no-wrap;
   padding-left: ${SPACING.spacing16};
   padding-right: ${SPACING.spacing16};
@@ -122,41 +124,44 @@ const INPUT_STYLE = css`
   }
 
   &:hover {
-    background-color: ${COLORS.blueHover};
+    background-color: ${COLORS.blue55};
     box-shadow: none;
   }
 
   &:active {
-    background-color: ${COLORS.bluePressed};
+    background-color: ${COLORS.blue60};
   }
 `
 
 const ACCORDION_STYLE = css`
   border-radius: 50%;
   &:hover {
-    background: ${COLORS.lightGreyHover};
+    background: ${COLORS.grey30};
   }
   &:active {
-    background: ${COLORS.lightGreyPressed};
+    background: ${COLORS.grey35};
   }
 `
-interface PipetteTipsFieldProps extends FormikProps<FormState> {
+interface PipetteTipsFieldProps extends UseFormReturn<FormState> {
   mount: Mount
 }
 
 function PipetteTipsField(props: PipetteTipsFieldProps): JSX.Element | null {
-  const { mount, values, setFieldValue } = props
+  const { mount, watch, setValue, getValues } = props
+  const { t } = useTranslation('modal')
+  const { fields } = getValues()
+  const pipettesByMount = watch('pipettesByMount')
   const allowAllTipracks = useSelector(getAllowAllTipracks)
-  const dispatch = useDispatch()
+  const dispatch = useDispatch<ThunkDispatch<BaseState, any, any>>()
   const [showCustomTipracks, setShowCustomTipracks] = React.useState<boolean>(
     false
   )
   const allLabware = useSelector(getLabwareDefsByURI)
-  const selectedPipetteName = values.pipettesByMount[mount].pipetteName
+  const selectedPipetteName = pipettesByMount[mount].pipetteName
   const selectedPipetteDefaultTipracks =
     selectedPipetteName != null
-      ? getPipetteNameSpecs(selectedPipetteName as PipetteName)
-          ?.defaultTipracks ?? []
+      ? getPipetteSpecsV2(selectedPipetteName as PipetteName)?.liquids.default
+          .defaultTipracks ?? []
       : []
   const tiprackOptions = getTiprackOptions({
     allLabware: allLabware,
@@ -174,14 +179,15 @@ function PipetteTipsField(props: PipetteTipsFieldProps): JSX.Element | null {
     option.value.includes('custom_beta')
   )
 
-  const nameAccessor = `pipettesByMount.${mount}.tiprackDefURI`
-  const currentValue = values.pipettesByMount[mount].tiprackDefURI
+  const selectedValues = pipettesByMount[mount].tiprackDefURI ?? []
 
   React.useEffect(() => {
-    if (currentValue === undefined) {
-      setFieldValue(nameAccessor, tiprackOptions[0]?.value ?? '')
+    if (selectedValues.length === 0) {
+      setValue(`pipettesByMount.${mount}.tiprackDefURI`, [
+        tiprackOptions[0]?.value ?? '',
+      ])
     }
-  }, [currentValue, setFieldValue, nameAccessor, tiprackOptions])
+  }, [selectedValues, setValue, tiprackOptions])
 
   return (
     <Flex
@@ -192,14 +198,22 @@ function PipetteTipsField(props: PipetteTipsFieldProps): JSX.Element | null {
       <Flex flexWrap="wrap" gridGap={SPACING.spacing4} alignSelf={ALIGN_CENTER}>
         {defaultTiprackOptions.map(o => (
           <EquipmentOption
+            robotType={fields.robotType}
             key={o.name}
-            isSelected={currentValue === o.value}
+            isSelected={selectedValues.includes(o.value)}
             text={o.name}
             onClick={() => {
-              setFieldValue(nameAccessor, o.value)
+              const updatedValues = selectedValues?.includes(o.value)
+                ? selectedValues.filter(value => value !== o.value)
+                : [...(selectedValues ?? []), o.value]
+              setValue(
+                `pipettesByMount.${mount}.tiprackDefURI`,
+                updatedValues.slice(0, 3)
+              )
             }}
             width="21.75rem"
             minHeight="4rem"
+            showCheckbox
           />
         ))}
       </Flex>
@@ -222,9 +236,7 @@ function PipetteTipsField(props: PipetteTipsFieldProps): JSX.Element | null {
             alignItems={ALIGN_CENTER}
             justifyContent={JUSTIFY_SPACE_BETWEEN}
           >
-            <Text as="h4">
-              {i18n.t('modal.create_file_wizard.custom_tiprack')}
-            </Text>
+            <Text as="h4">{t('custom_tiprack')}</Text>
 
             <OutlineButton Component="label" css={INPUT_STYLE}>
               <Flex
@@ -233,7 +245,7 @@ function PipetteTipsField(props: PipetteTipsFieldProps): JSX.Element | null {
                 gridGap={SPACING.spacing2}
               >
                 <Icon name="plus" size="1rem" />
-                {i18n.t('modal.create_file_wizard.upload')}
+                {t('upload')}
               </Flex>
               <input
                 type="file"
@@ -251,14 +263,22 @@ function PipetteTipsField(props: PipetteTipsFieldProps): JSX.Element | null {
             >
               {customTiprackOptions.map(o => (
                 <EquipmentOption
+                  robotType={fields.robotType}
                   key={o.name}
-                  isSelected={currentValue === o.value}
+                  isSelected={selectedValues.includes(o.value)}
                   text={o.name}
                   onClick={() => {
-                    setFieldValue(nameAccessor, o.value)
+                    const updatedValues = selectedValues?.includes(o.value)
+                      ? selectedValues.filter(value => value !== o.value)
+                      : [...(selectedValues ?? []), o.value]
+                    setValue(
+                      `pipettesByMount.${mount}.tiprackDefURI`,
+                      updatedValues.slice(0, 3)
+                    )
                   }}
                   width="21.75rem"
                   minHeight="4rem"
+                  showCheckbox
                 />
               ))}
             </Flex>
@@ -268,17 +288,17 @@ function PipetteTipsField(props: PipetteTipsFieldProps): JSX.Element | null {
               alignItems={ALIGN_CENTER}
               width="100%"
               height="8.5rem"
-              backgroundColor={COLORS.darkBlack20}
+              backgroundColor={COLORS.grey35}
               padding={SPACING.spacing8}
               border={BORDERS.lineBorder}
-              borderRadius={BORDERS.borderRadiusSize2}
+              borderRadius={BORDERS.borderRadius16}
             >
               <Text
                 as="h4"
                 fontWeight={TYPOGRAPHY.fontWeightRegular}
-                color={COLORS.darkBlack70}
+                color={COLORS.grey60}
               >
-                {i18n.t('modal.create_file_wizard.upload_tiprack')}
+                {t('upload_tiprack')}
               </Text>
             </Flex>
           )}

@@ -5,21 +5,24 @@ import {
   Flex,
   JUSTIFY_SPACE_BETWEEN,
   SPACING,
+  VIEWPORT,
 } from '@opentrons/components'
-import fixture_12_trough from '@opentrons/shared-data/labware/fixtures/2/fixture_12_trough.json'
-import fixture_tiprack_10_ul from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_10_ul.json'
-import { LabwareDefinition2, getLabwareDefURI } from '@opentrons/shared-data'
+import {
+  fixture12Trough,
+  fixtureTiprack10ul,
+  getLabwareDefURI,
+} from '@opentrons/shared-data'
 
-import { touchScreenViewport } from '../../DesignTokens/constants'
 import { SmallButton } from '../../atoms/buttons'
 import { TerseOffsetTable } from './ResultsSummary'
 
 import type { Story, Meta } from '@storybook/react'
+import type { LabwareDefinition2 } from '@opentrons/shared-data'
 
 export default {
   title: 'ODD/Organisms/TerseOffsetTable',
   component: TerseOffsetTable,
-  parameters: touchScreenViewport,
+  parameters: VIEWPORT.touchScreenViewport,
 } as Meta
 
 // Note: 59rem(944px) is the size of ODD
@@ -55,50 +58,50 @@ export const Basic = Template.bind({})
 Basic.args = {
   offsets: [
     {
-      definitionUri: getLabwareDefURI(fixture_12_trough as LabwareDefinition2),
+      definitionUri: getLabwareDefURI(fixture12Trough as LabwareDefinition2),
       location: { slotName: 'A1' },
       vector: { x: 1, y: 2, z: 3 },
     },
     {
-      definitionUri: getLabwareDefURI(fixture_12_trough as LabwareDefinition2),
+      definitionUri: getLabwareDefURI(fixture12Trough as LabwareDefinition2),
       location: { slotName: 'A2' },
       vector: { x: 1, y: 2, z: 3 },
     },
     {
-      definitionUri: getLabwareDefURI(fixture_12_trough as LabwareDefinition2),
+      definitionUri: getLabwareDefURI(fixture12Trough as LabwareDefinition2),
       location: { slotName: 'A3' },
       vector: { x: 1, y: 2, z: 3 },
     },
     {
-      definitionUri: getLabwareDefURI(fixture_12_trough as LabwareDefinition2),
+      definitionUri: getLabwareDefURI(fixture12Trough as LabwareDefinition2),
       location: { slotName: 'B1' },
       vector: { x: 1, y: 2, z: 3 },
     },
     {
-      definitionUri: getLabwareDefURI(fixture_12_trough as LabwareDefinition2),
+      definitionUri: getLabwareDefURI(fixture12Trough as LabwareDefinition2),
       location: { slotName: 'B2' },
       vector: { x: 1, y: 2, z: 3 },
     },
     {
-      definitionUri: getLabwareDefURI(fixture_12_trough as LabwareDefinition2),
+      definitionUri: getLabwareDefURI(fixture12Trough as LabwareDefinition2),
       location: { slotName: 'B3' },
       vector: { x: 1, y: 2, z: 3 },
     },
     {
-      definitionUri: getLabwareDefURI(fixture_12_trough as LabwareDefinition2),
+      definitionUri: getLabwareDefURI(fixture12Trough as LabwareDefinition2),
       location: { slotName: 'C1' },
       vector: { x: 1, y: 2, z: 3 },
     },
     {
-      definitionUri: getLabwareDefURI(fixture_12_trough as LabwareDefinition2),
+      definitionUri: getLabwareDefURI(fixture12Trough as LabwareDefinition2),
       location: { slotName: 'C2' },
       vector: { x: 1, y: 2, z: 3 },
     },
     {
-      definitionUri: getLabwareDefURI(fixture_12_trough as LabwareDefinition2),
+      definitionUri: getLabwareDefURI(fixture12Trough as LabwareDefinition2),
       location: { slotName: 'C3' },
       vector: { x: 1, y: 2, z: 3 },
     },
   ],
-  labwareDefinitions: [fixture_12_trough, fixture_tiprack_10_ul],
+  labwareDefinitions: [fixture12Trough, fixtureTiprack10ul],
 }

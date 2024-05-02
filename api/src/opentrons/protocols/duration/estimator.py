@@ -7,7 +7,7 @@ import functools
 
 from dataclasses import dataclass
 
-from opentrons.commands import types
+from opentrons.legacy_commands import types
 from opentrons.protocols.api_support.deck_type import (
     guess_from_global_config as guess_deck_type_from_global_config,
 )

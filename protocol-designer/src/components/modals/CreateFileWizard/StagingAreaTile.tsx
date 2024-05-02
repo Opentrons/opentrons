@@ -1,6 +1,6 @@
 import * as React from 'react'
-import { useSelector } from 'react-redux'
 import without from 'lodash/without'
+import { useTranslation } from 'react-i18next'
 import {
   DIRECTION_COLUMN,
   Flex,
@@ -13,54 +13,56 @@ import {
 } from '@opentrons/components'
 import {
   OT2_ROBOT_TYPE,
-  STAGING_AREA_LOAD_NAME,
-  STANDARD_SLOT_LOAD_NAME,
+  SINGLE_RIGHT_SLOT_FIXTURE,
+  STAGING_AREA_CUTOUTS,
+  STAGING_AREA_RIGHT_SLOT_FIXTURE,
 } from '@opentrons/shared-data'
-import { i18n } from '../../../localization'
-import { getEnableDeckModification } from '../../../feature-flags/selectors'
 import { GoBack } from './GoBack'
 import { HandleEnter } from './HandleEnter'
+import { getUnoccupiedStagingAreaSlots } from './utils'
 
-import type { Cutout, DeckConfiguration } from '@opentrons/shared-data'
-import type { WizardTileProps } from './types'
+import type { DeckConfiguration, CutoutId } from '@opentrons/shared-data'
+import type { AdditionalEquipment, WizardTileProps } from './types'
 
-const STAGING_AREA_SLOTS: Cutout[] = ['A3', 'B3', 'C3', 'D3']
+export const STANDARD_EMPTY_SLOTS: DeckConfiguration = STAGING_AREA_CUTOUTS.map(
+  cutoutId => ({
+    cutoutId,
+    cutoutFixtureId: SINGLE_RIGHT_SLOT_FIXTURE,
+  })
+)
 
 export function StagingAreaTile(props: WizardTileProps): JSX.Element | null {
-  const { values, goBack, proceed, setFieldValue } = props
-  const isOt2 = values.fields.robotType === OT2_ROBOT_TYPE
-  const deckConfigurationFF = useSelector(getEnableDeckModification)
-  const stagingAreaItems = values.additionalEquipment.filter(equipment =>
-    equipment.includes(STAGING_AREA_LOAD_NAME)
+  const { getValues, goBack, proceed, setValue, watch } = props
+  const { t } = useTranslation(['modal', 'application'])
+  const { fields, pipettesByMount } = getValues()
+  const additionalEquipment = watch('additionalEquipment')
+  const modules = watch('modules')
+  const isOt2 = fields.robotType === OT2_ROBOT_TYPE
+  const stagingAreaItems = additionalEquipment.filter(equipment =>
+    // TODO(bc, 11/14/2023): refactor the additional items field to include a cutoutId
+    // and a cutoutFixtureId so that we don't have to string parse here to generate them
+    equipment.includes('stagingArea')
+  )
+  const unoccupiedStagingAreaSlots = getUnoccupiedStagingAreaSlots(modules)
+
+  const savedStagingAreaSlots: DeckConfiguration = stagingAreaItems.flatMap(
+    item => {
+      // TODO(bc, 11/14/2023): refactor the additional items field to include a cutoutId
+      // and a cutoutFixtureId so that we don't have to string parse here to generate them
+      const cutoutId = item.split('_')[1] as CutoutId
+      return [
+        {
+          cutoutFixtureId: STAGING_AREA_RIGHT_SLOT_FIXTURE,
+          cutoutId,
+        },
+      ]
+    }
   )
 
-  const savedStagingAreaSlots = stagingAreaItems.flatMap(item => {
-    const [loadName, fixtureLocation] = item.split('_')
-    const fixtureId = `id_${fixtureLocation}`
-    return [
-      {
-        fixtureId,
-        fixtureLocation,
-        loadName,
-      },
-    ] as DeckConfiguration
-  })
-
-  //  NOTE: fixtureId doesn't matter since we don't create
-  //  the entity until you complete the create file wizard via createDeckFixture action
-  //  fixtureId here is only needed to visually add to the deck configurator
-  const STANDARD_EMPTY_SLOTS: DeckConfiguration = STAGING_AREA_SLOTS.map(
-    fixtureLocation => ({
-      fixtureId: `id_${fixtureLocation}`,
-      fixtureLocation,
-      loadName: STANDARD_SLOT_LOAD_NAME,
-    })
-  )
-
-  STANDARD_EMPTY_SLOTS.forEach(emptySlot => {
+  unoccupiedStagingAreaSlots.forEach(emptySlot => {
     if (
       !savedStagingAreaSlots.some(
-        slot => slot.fixtureLocation === emptySlot.fixtureLocation
+        ({ cutoutId }) => cutoutId === emptySlot.cutoutId
       )
     ) {
       savedStagingAreaSlots.push(emptySlot)
@@ -68,50 +70,52 @@ export function StagingAreaTile(props: WizardTileProps): JSX.Element | null {
   })
 
   const initialSlots =
-    stagingAreaItems.length > 0 ? savedStagingAreaSlots : STANDARD_EMPTY_SLOTS
+    stagingAreaItems.length > 0
+      ? savedStagingAreaSlots
+      : unoccupiedStagingAreaSlots
 
   const [updatedSlots, setUpdatedSlots] = React.useState<DeckConfiguration>(
     initialSlots
   )
 
-  if (!deckConfigurationFF || isOt2) {
+  if (isOt2) {
     proceed()
     return null
   }
 
-  const handleClickAdd = (fixtureLocation: string): void => {
+  const handleClickAdd = (cutoutId: string): void => {
     const modifiedSlots: DeckConfiguration = updatedSlots.map(slot => {
-      if (slot.fixtureLocation === fixtureLocation) {
+      if (slot.cutoutId === cutoutId) {
         return {
           ...slot,
-          loadName: STAGING_AREA_LOAD_NAME,
+          cutoutFixtureId: STAGING_AREA_RIGHT_SLOT_FIXTURE,
         }
       }
       return slot
     })
     setUpdatedSlots(modifiedSlots)
-    setFieldValue('additionalEquipment', [
-      ...values.additionalEquipment,
-      `${STAGING_AREA_LOAD_NAME}_${fixtureLocation}`,
+    setValue('additionalEquipment', [
+      ...additionalEquipment,
+      `stagingArea_${cutoutId}` as AdditionalEquipment,
     ])
   }
 
-  const handleClickRemove = (fixtureLocation: string): void => {
+  const handleClickRemove = (cutoutId: string): void => {
     const modifiedSlots: DeckConfiguration = updatedSlots.map(slot => {
-      if (slot.fixtureLocation === fixtureLocation) {
+      if (slot.cutoutId === cutoutId) {
         return {
           ...slot,
-          loadName: STANDARD_SLOT_LOAD_NAME,
+          cutoutFixtureId: SINGLE_RIGHT_SLOT_FIXTURE,
         }
       }
       return slot
     })
     setUpdatedSlots(modifiedSlots)
-    setFieldValue(
+    setValue(
       'additionalEquipment',
       without(
-        values.additionalEquipment,
-        `${STAGING_AREA_LOAD_NAME}_${fixtureLocation}`
+        additionalEquipment,
+        `stagingArea_${cutoutId}` as AdditionalEquipment
       )
     )
   }
@@ -120,13 +124,12 @@ export function StagingAreaTile(props: WizardTileProps): JSX.Element | null {
     <HandleEnter onEnter={proceed}>
       <Flex flexDirection={DIRECTION_COLUMN} padding={SPACING.spacing32}>
         <Flex flexDirection={DIRECTION_COLUMN} height="26rem">
-          <Text as="h2">
-            {i18n.t('modal.create_file_wizard.staging_areas')}
-          </Text>
+          <Text as="h2">{t('staging_areas')}</Text>
           <DeckConfigurator
             deckConfig={updatedSlots}
             handleClickAdd={handleClickAdd}
             handleClickRemove={handleClickRemove}
+            showExpansion={false}
           />
         </Flex>
         <Flex
@@ -136,9 +139,9 @@ export function StagingAreaTile(props: WizardTileProps): JSX.Element | null {
         >
           <GoBack
             onClick={() => {
-              if (values.pipettesByMount.left.pipetteName === 'p1000_96') {
+              if (pipettesByMount.left.pipetteName === 'p1000_96') {
                 goBack(3)
-              } else if (values.pipettesByMount.right.pipetteName === '') {
+              } else if (pipettesByMount.right.pipetteName === '') {
                 goBack(2)
               } else {
                 goBack()
@@ -146,7 +149,7 @@ export function StagingAreaTile(props: WizardTileProps): JSX.Element | null {
             }}
           />
           <PrimaryButton onClick={() => proceed()}>
-            {i18n.t('application.next')}
+            {t('application:next')}
           </PrimaryButton>
         </Flex>
       </Flex>

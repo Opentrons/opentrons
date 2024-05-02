@@ -12,8 +12,8 @@ You will need the following tools installed to develop on the Opentrons platform
 - git
 - curl
 - ssh
-- Python v3.7
-- Node.js v16
+- Python v3.10
+- Node.js v18
 
 ### macOS
 
@@ -82,10 +82,10 @@ Close and re-open your terminal to confirm `nvs` is installed.
 nvs --version
 ```
 
-Now we can use nvs to install Node.js v16 and switch on `auto` mode, which will make sure Node.js v16 is used any time we're in the `opentrons` project directory.
+Now we can use `nvs` to install the currently required Node.js version set in `.nvmrc`. The `auto` command selects the correct version of Node.js any time we're in the `opentrons` project directory. Without `auto`, we would have to manually run `use` or `install` each time we work on the project.
 
 ```shell
-nvs add 16
+nvs add 18
 nvs auto on
 ```
 
@@ -124,10 +124,10 @@ Close and re-open your terminal to verify that `pyenv` is installed
 pyenv --version
 ```
 
-Now, install the required version of Python. Use the latest available version of `3.7.x`, which is `3.7.15` at the time of writing.
+Now, install the required version of Python. Use the latest available version of `3.10.x`, which is `3.10.13` at the time of writing.
 
 ```shell
-pyenv install 3.7.15
+pyenv install 3.10.13
 ```
 
 If your `pyenv` command isn't working, confirm that your shell is set up properly. If you print out the contents of `~/.zprofile` and `~/.zshrc`, you should see something similar to the following:
@@ -148,7 +148,7 @@ eval "$(pyenv init -)"
 # ...
 ```
 
-#### 3. Install `jpeg` if on ARM Mac (M1)
+#### 3. Install `jpeg` if on ARM Mac (M1/M2/M3)
 
 `/hardware` depends on the Python library Pillow. On ARM Macs, `pip` will build Pillow from source, which requires [jpeg](https://formulae.brew.sh/formula/jpeg) to be installed.
 
@@ -198,15 +198,15 @@ cd ./opentrons
 Once you are inside the repository for the first time, you should do two things:
 
 1. Confirm that `nvs` selected the proper version of Node.js to use
-2. Tell `pyenv` to use Python 3.7
-3. Run `python --version` to confirm your chosen version. If you get the incorrect version and you're using an Apple silicon Mac, try running `eval "$(pyenv init --path)"` and then `pyenv local 3.7.15`. Then check `python --version` again.
+2. Tell `pyenv` to use Python 3.10
+3. Run `python --version` to confirm your chosen version. If you get the incorrect version and you're using an Apple silicon Mac, try running `eval "$(pyenv init --path)"` and then `pyenv local 3.10.13`. Then check `python --version` again.
 
 ```shell
-# confirm Node v16
+# confirm Node v18
 node --version
 
 # set Python version, and confirm
-pyenv local 3.7.15
+pyenv local 3.10.13
 python --version
 ```
 
@@ -214,6 +214,12 @@ Once you've confirmed you're running the correct versions of Node.js and Python,
 
 ```shell
 npm install --global yarn@1
+```
+
+If you are using [Corepack][], you can install `yarn` via `corepack`.
+
+```shell
+corepack enable
 ```
 
 Finally, you need to download and install all of our various development dependencies. **This step will take several minutes** the first time you run it!
@@ -236,3 +242,4 @@ Once `make setup` completes, you're ready to start developing! Check out our gen
 [yarn]: https://classic.yarnpkg.com/
 [pipenv]: https://github.com/pypa/pipenv
 [contributing guide]: ./CONTRIBUTING.md
+[corepack]: https://github.com/nodejs/corepack

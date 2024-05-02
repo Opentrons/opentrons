@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { createPortal } from 'react-dom'
 import { useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
 
@@ -7,11 +8,11 @@ import {
   DIRECTION_COLUMN,
   Flex,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
-import { Portal } from '../../App/portal'
-import { StyledText } from '../../atoms/text'
+import { getTopPortalEl } from '../../App/portal'
 import { LegacyModal } from '../../molecules/LegacyModal'
 import { Modal } from '../../molecules/Modal'
 import { getIsOnDevice } from '../../redux/config'
@@ -37,22 +38,21 @@ export function EstopMissingModal({
 }: EstopMissingModalProps): JSX.Element {
   const isOnDevice = useSelector(getIsOnDevice)
 
-  return (
-    <Portal level="top">
-      {isOnDevice ? (
-        <TouchscreenModal robotName={robotName} closeModal={closeModal} />
-      ) : (
-        <>
-          {isDismissedModal === false ? (
-            <DesktopModal
-              robotName={robotName}
-              closeModal={closeModal}
-              setIsDismissedModal={setIsDismissedModal}
-            />
-          ) : null}
-        </>
-      )}
-    </Portal>
+  return createPortal(
+    isOnDevice ? (
+      <TouchscreenModal robotName={robotName} closeModal={closeModal} />
+    ) : (
+      <>
+        {isDismissedModal === false ? (
+          <DesktopModal
+            robotName={robotName}
+            closeModal={closeModal}
+            setIsDismissedModal={setIsDismissedModal}
+          />
+        ) : null}
+      </>
+    ),
+    getTopPortalEl()
   )
 }
 
@@ -69,7 +69,7 @@ function TouchscreenModal({
   const modalHeader: ModalHeaderBaseProps = {
     title: t('estop_missing'),
     iconName: 'ot-alert',
-    iconColor: COLORS.red2,
+    iconColor: COLORS.red50,
   }
   const modalProps = {
     header: { ...modalHeader },

@@ -2,7 +2,8 @@ import * as React from 'react'
 import { Provider } from 'react-redux'
 import { createStore } from 'redux'
 
-import { touchScreenViewport } from '../../DesignTokens/constants'
+import { VIEWPORT } from '@opentrons/components'
+
 import { configReducer } from '../../redux/config/reducer'
 import { EstopMissingModal } from '.'
 
@@ -12,7 +13,7 @@ import type { Story, Meta } from '@storybook/react'
 export default {
   title: 'ODD/Organisms/EstopMissingModal',
   component: EstopMissingModal,
-  parameters: touchScreenViewport,
+  parameters: VIEWPORT.touchScreenViewport,
 } as Meta
 
 const dummyConfig = {
@@ -34,4 +35,7 @@ const Template: Story<
 export const EstopMissing = Template.bind({})
 EstopMissing.args = {
   robotName: 'Flexy',
+  closeModal: () => {},
+  isDismissedModal: false,
+  setIsDismissedModal: () => {},
 }

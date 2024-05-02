@@ -15,27 +15,23 @@ import {
   LabwareRender,
 } from '@opentrons/components'
 import {
+  FLEX_ROBOT_TYPE,
   getDeckDefFromRobotType,
-  getRobotTypeFromLoadedLabware,
+  getSimplestDeckConfigForProtocol,
   THERMOCYCLER_MODULE_V1,
 } from '@opentrons/shared-data'
 
-import { useAttachedModules } from '../../hooks'
 import { LabwareInfoOverlay } from '../LabwareInfoOverlay'
 import { LiquidsLabwareDetailsModal } from './LiquidsLabwareDetailsModal'
 import { getWellFillFromLabwareId } from './utils'
 import { getLabwareRenderInfo } from '../utils/getLabwareRenderInfo'
-import { getDeckConfigFromProtocolCommands } from '../../../../resources/deck_configuration/utils'
 import { getStandardDeckViewLayerBlockList } from '../utils/getStandardDeckViewLayerBlockList'
-import { getAttachedProtocolModuleMatches } from '../../../ProtocolSetupModulesAndDeck/utils'
 import { getProtocolModulesInfo } from '../utils/getProtocolModulesInfo'
 
 import type {
   CompletedProtocolAnalysis,
   ProtocolAnalysisOutput,
 } from '@opentrons/shared-data'
-
-const ATTACHED_MODULE_POLL_MS = 5000
 
 interface SetupLiquidsMapProps {
   runId: string
@@ -50,10 +46,6 @@ export function SetupLiquidsMap(
   const [liquidDetailsLabwareId, setLiquidDetailsLabwareId] = React.useState<
     string | null
   >(null)
-  const attachedModules =
-    useAttachedModules({
-      refetchInterval: ATTACHED_MODULE_POLL_MS,
-    }) ?? []
 
   if (protocolAnalysis == null) return null
 
@@ -64,25 +56,18 @@ export function SetupLiquidsMap(
   const initialLoadedLabwareByAdapter = parseInitialLoadedLabwareByAdapter(
     protocolAnalysis.commands ?? []
   )
-  const robotType = getRobotTypeFromLoadedLabware(protocolAnalysis.labware)
+  const robotType = protocolAnalysis.robotType ?? FLEX_ROBOT_TYPE
   const deckDef = getDeckDefFromRobotType(robotType)
   const labwareRenderInfo = getLabwareRenderInfo(protocolAnalysis, deckDef)
   const labwareByLiquidId = parseLabwareInfoByLiquidId(
     protocolAnalysis.commands ?? []
   )
-  const deckConfig = getDeckConfigFromProtocolCommands(
-    protocolAnalysis.commands
-  )
+  const deckConfig = getSimplestDeckConfigForProtocol(protocolAnalysis)
   const deckLayerBlocklist = getStandardDeckViewLayerBlockList(robotType)
 
   const protocolModulesInfo = getProtocolModulesInfo(protocolAnalysis, deckDef)
 
-  const attachedProtocolModuleMatches = getAttachedProtocolModuleMatches(
-    attachedModules,
-    protocolModulesInfo
-  )
-
-  const moduleLocations = attachedProtocolModuleMatches.map(module => {
+  const modulesOnDeck = protocolModulesInfo.map(module => {
     const labwareInAdapterInMod =
       module.nestedLabwareId != null
         ? initialLoadedLabwareByAdapter[module.nestedLabwareId]
@@ -96,6 +81,12 @@ export function SetupLiquidsMap(
     const topLabwareDisplayName =
       labwareInAdapterInMod?.params.displayName ??
       module.nestedLabwareDisplayName
+    const nestedLabwareWellFill = getWellFillFromLabwareId(
+      module.nestedLabwareId ?? '',
+      liquids,
+      labwareByLiquidId
+    )
+    const labwareHasLiquid = !isEmpty(nestedLabwareWellFill)
 
     return {
       moduleModel: module.moduleDef.model,
@@ -106,21 +97,29 @@ export function SetupLiquidsMap(
           : {},
 
       nestedLabwareDef: topLabwareDefinition,
-      moduleChildren: (
-        <>
-          {topLabwareDefinition != null && topLabwareId != null ? (
+      nestedLabwareWellFill,
+      moduleChildren:
+        topLabwareDefinition != null && topLabwareId != null ? (
+          <g
+            onMouseEnter={() => setHoverLabwareId(topLabwareId)}
+            onMouseLeave={() => setHoverLabwareId('')}
+            onClick={() =>
+              labwareHasLiquid ? setLiquidDetailsLabwareId(topLabwareId) : null
+            }
+            cursor={labwareHasLiquid ? 'pointer' : ''}
+          >
             <LabwareInfoOverlay
               definition={topLabwareDefinition}
+              hover={topLabwareId === hoverLabwareId && labwareHasLiquid}
+              labwareHasLiquid={labwareHasLiquid}
               labwareId={topLabwareId}
               displayName={topLabwareDisplayName}
               runId={runId}
             />
-          ) : null}
-        </>
-      ),
+          </g>
+        ) : null,
     }
   })
-
   return (
     <Flex
       maxHeight="80vh"
@@ -132,8 +131,8 @@ export function SetupLiquidsMap(
         deckConfig={deckConfig}
         deckLayerBlocklist={deckLayerBlocklist}
         robotType={robotType}
-        labwareLocations={[]}
-        moduleLocations={moduleLocations}
+        labwareOnDeck={[]}
+        modulesOnDeck={modulesOnDeck}
       >
         {map(
           labwareRenderInfo,
@@ -171,7 +170,7 @@ export function SetupLiquidsMap(
                   <LabwareRender
                     definition={topLabwareDefinition}
                     wellFill={labwareHasLiquid ? wellFill : undefined}
-                    hover={labwareId === hoverLabwareId && labwareHasLiquid}
+                    highlight={labwareId === hoverLabwareId && labwareHasLiquid}
                   />
                   <LabwareInfoOverlay
                     definition={topLabwareDefinition}

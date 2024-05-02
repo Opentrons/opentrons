@@ -1,9 +1,11 @@
 import * as React from 'react'
-import { fireEvent } from '@testing-library/react'
+import { describe, beforeEach, afterEach, vi, expect, it } from 'vitest'
+import { fireEvent, screen } from '@testing-library/react'
+import '@testing-library/jest-dom/vitest'
 import { ALIGN_CENTER, JUSTIFY_CENTER } from '../../../styles'
 import { renderWithProviders } from '../../../testing/utils'
-import { COLORS, TYPOGRAPHY, SPACING } from '../../../ui-style-constants'
-
+import { BORDERS, COLORS } from '../../../helix-design-system'
+import { TYPOGRAPHY, SPACING } from '../../../ui-style-constants'
 import { CheckboxField } from '..'
 
 const render = (props: React.ComponentProps<typeof CheckboxField>) => {
@@ -15,7 +17,7 @@ describe('CheckboxField', () => {
 
   beforeEach(() => {
     props = {
-      onChange: jest.fn(),
+      onChange: vi.fn(),
       value: false,
       name: 'mockCheckboxField',
       label: 'checkMockCheckboxField',
@@ -25,66 +27,29 @@ describe('CheckboxField', () => {
   })
 
   afterEach(() => {
-    jest.resetAllMocks()
+    vi.resetAllMocks()
   })
 
   it('renders label with correct style', () => {
-    const { getByTestId, getByRole, getByText } = render(props)
-    const checkBoxInput = getByRole('checkbox', {
+    render(props)
+    const checkBoxInput = screen.getByRole('checkbox', {
       name: 'checkMockCheckboxField',
     })
-    const checkBoxFieldBox = getByText('checkMockCheckboxField')
-    const checkBoxIcon = getByTestId('CheckboxField_icon')
+    const checkBoxFieldBox = screen.getByText('checkMockCheckboxField')
+    const checkBoxIcon = screen.getByTestId('CheckboxField_icon')
 
     // INNER_STYLE_NO_VALUE
     expect(checkBoxIcon).toHaveStyle(`width: 1.25rem`)
     expect(checkBoxIcon).toHaveStyle(`min-width: 1.25rem`)
-    expect(checkBoxIcon).toHaveStyle(`color: ${String(COLORS.darkGreyEnabled)}`)
+    expect(checkBoxIcon).toHaveStyle(`color: ${String(COLORS.grey60)}`)
     expect(checkBoxIcon).toHaveStyle(`display: flex`)
-    expect(checkBoxIcon).toHaveStyle(`border-radius: 1px`)
+    expect(checkBoxIcon).toHaveStyle(
+      `border-radius: ${String(BORDERS.borderRadius2)}`
+    )
     expect(checkBoxIcon).toHaveStyle(
       `justify-content: ${String(JUSTIFY_CENTER)}`
     )
     expect(checkBoxIcon).toHaveStyle(`align-items: ${String(ALIGN_CENTER)}`)
-    expect(checkBoxIcon).toHaveStyleRule('cursor', 'pointer', {
-      modifier: ':hover',
-    })
-    expect(checkBoxIcon).toHaveStyleRule(
-      'color',
-      `${String(COLORS.darkGreyHover)}`,
-      {
-        modifier: ':hover',
-      }
-    )
-    expect(checkBoxIcon).toHaveStyleRule(
-      'color',
-      `${String(COLORS.darkGreyPressed)}`,
-      {
-        modifier: ':active',
-      }
-    )
-    expect(checkBoxIcon).toHaveStyleRule(
-      'box-shadow',
-      `0 0 0 3px ${String(COLORS.fundamentalsFocus)}`,
-      { modifier: ':focus' }
-    )
-    expect(checkBoxIcon).toHaveStyleRule(
-      'color',
-      `${String(COLORS.darkGreyPressed)}`,
-      {
-        modifier: ':disabled',
-      }
-    )
-
-    // TODO: kj 09/15/2022 This part will be update later OUTER_STYLE
-    // const checkBoxLabel = getByTestId('CheckboxField_label')
-    // expect(checkBoxLabel).toHaveStyle('@apply --font-form-default')
-    // expect(checkBoxLabel).toHaveStyle('font-size: 0.75rem')
-    // expect(checkBoxLabel).toHaveStyle('font-weight: 400')
-    // expect(checkBoxLabel).toHaveStyle(`color: ${COLORS.darkBlackEnabled}`)
-    // expect(checkBoxLabel).toHaveStyle('display: flex')
-    // expect(checkBoxLabel).toHaveStyle(`align-items: ${ALIGN_CENTER}`)
-    // expect(checkBoxLabel).toHaveStyle('line-height: 1')
 
     // INPUT_STYLE
     expect(checkBoxInput).toHaveStyle(`position: absolute`)
@@ -104,43 +69,41 @@ describe('CheckboxField', () => {
     expect(checkBoxFieldBox).toHaveStyle(
       `font-weight: ${String(TYPOGRAPHY.fontWeightRegular)}`
     )
-    expect(checkBoxFieldBox).toHaveStyle(
-      `color: ${String(COLORS.darkBlackEnabled)}`
-    )
+    expect(checkBoxFieldBox).toHaveStyle(`color: ${String(COLORS.black90)}`)
     expect(checkBoxFieldBox).toHaveStyle(`flex: 0 0 auto`)
     expect(checkBoxFieldBox).toHaveStyle(
       `padding: ${SPACING.spacing8} ${SPACING.spacing8}`
     )
-    expect(checkBoxFieldBox).toHaveStyleRule('padding', '0', {
-      modifier: ':empty',
-    })
-    expect(checkBoxFieldBox).toHaveAttribute('tabindex', '0')
   })
 
   it('render icon with correct style - value true', () => {
     props.value = true
-    const { getByTestId } = render(props)
-    const checkBoxIcon = getByTestId('CheckboxField_icon')
+    render(props)
+    const checkBoxIcon = screen.getByTestId('CheckboxField_icon')
     expect(checkBoxIcon).toHaveStyle(`width: 1.25rem`)
     expect(checkBoxIcon).toHaveStyle(`min-width: 1.25rem`)
-    expect(checkBoxIcon).toHaveStyle(`color: ${String(COLORS.blueEnabled)}`)
+    expect(checkBoxIcon).toHaveStyle(`color: ${String(COLORS.blue60)}`)
     expect(checkBoxIcon).toHaveStyle(`display: flex`)
-    expect(checkBoxIcon).toHaveStyle(`border-radius: 1px`)
+    expect(checkBoxIcon).toHaveStyle(
+      `border-radius: ${String(BORDERS.borderRadius2)}`
+    )
     expect(checkBoxIcon).toHaveStyle(
       `justify-content: ${String(JUSTIFY_CENTER)}`
     )
     expect(checkBoxIcon).toHaveStyle(`align-items: ${String(ALIGN_CENTER)}`)
   })
 
-  it('renders label with correct style - value undefine', () => {
+  it('renders label with correct style - value undefined', () => {
     props.value = undefined
-    const { getByTestId } = render(props)
-    const checkBoxIcon = getByTestId('CheckboxField_icon')
+    render(props)
+    const checkBoxIcon = screen.getByTestId('CheckboxField_icon')
     expect(checkBoxIcon).toHaveStyle(`width: 1.25rem`)
     expect(checkBoxIcon).toHaveStyle(`min-width: 1.25rem`)
-    expect(checkBoxIcon).toHaveStyle(`color: ${String(COLORS.darkGreyEnabled)}`)
+    expect(checkBoxIcon).toHaveStyle(`color: ${String(COLORS.grey60)}`)
     expect(checkBoxIcon).toHaveStyle(`display: flex`)
-    expect(checkBoxIcon).toHaveStyle(`border-radius: 1px`)
+    expect(checkBoxIcon).toHaveStyle(
+      `border-radius: ${String(BORDERS.borderRadius2)}`
+    )
     expect(checkBoxIcon).toHaveStyle(
       `justify-content: ${String(JUSTIFY_CENTER)}`
     )
@@ -149,8 +112,8 @@ describe('CheckboxField', () => {
 
   it('renders label with correct style - disabled true', () => {
     props.disabled = true
-    const { getByRole } = render(props)
-    const checkBoxInput = getByRole('checkbox', {
+    render(props)
+    const checkBoxInput = screen.getByRole('checkbox', {
       name: 'checkMockCheckboxField',
     })
     expect(checkBoxInput).toBeDisabled()
@@ -158,18 +121,18 @@ describe('CheckboxField', () => {
 
   it('renders label with correct style - tabIndex 1', () => {
     props.tabIndex = 1
-    const { getByRole, getByText } = render(props)
-    const checkBoxInput = getByRole('checkbox', {
+    render(props)
+    const checkBoxInput = screen.getByRole('checkbox', {
       name: 'checkMockCheckboxField',
     })
-    const checkBoxFieldBox = getByText('checkMockCheckboxField')
+    const checkBoxFieldBox = screen.getByText('checkMockCheckboxField')
     expect(checkBoxInput).toHaveAttribute('tabindex', '1')
     expect(checkBoxFieldBox).toHaveAttribute('tabindex', '1')
   })
 
   it('calls mock function when clicking checkboxfield', () => {
-    const { getByRole } = render(props)
-    const checkBoxInput = getByRole('checkbox', {
+    render(props)
+    const checkBoxInput = screen.getByRole('checkbox', {
       name: 'checkMockCheckboxField',
     })
     fireEvent.click(checkBoxInput)

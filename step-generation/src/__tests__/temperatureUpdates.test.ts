@@ -1,3 +1,4 @@
+import { beforeEach, describe, it, expect } from 'vitest'
 import {
   TEMPERATURE_DEACTIVATED,
   TEMPERATURE_APPROACHING_TARGET,

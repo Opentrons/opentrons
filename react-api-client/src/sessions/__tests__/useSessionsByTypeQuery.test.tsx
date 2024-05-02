@@ -1,18 +1,15 @@
 import * as React from 'react'
-import { when, resetAllWhenMocks } from 'jest-when'
+import { describe, it, expect, beforeEach, vi } from 'vitest'
 import { QueryClient, QueryClientProvider } from 'react-query'
-import { renderHook } from '@testing-library/react-hooks'
+import { renderHook, waitFor } from '@testing-library/react'
 import { getSessions } from '@opentrons/api-client'
 import { useHost } from '../../api'
 import { useSessionsByTypeQuery } from '..'
 
 import type { HostConfig, Response, Sessions } from '@opentrons/api-client'
 
-jest.mock('@opentrons/api-client')
-jest.mock('../../api/useHost')
-
-const mockGetSessions = getSessions as jest.MockedFunction<typeof getSessions>
-const mockUseHost = useHost as jest.MockedFunction<typeof useHost>
+vi.mock('@opentrons/api-client')
+vi.mock('../../api/useHost')
 
 const HOST_CONFIG: HostConfig = { hostname: 'localhost' }
 const SESSIONS_RESPONSE = {
@@ -23,22 +20,21 @@ const SESSIONS_RESPONSE = {
 } as Sessions
 
 describe('useSessionsByTypeQuery hook', () => {
-  let wrapper: React.FunctionComponent<{}>
+  let wrapper: React.FunctionComponent<{ children: React.ReactNode }>
 
   beforeEach(() => {
     const queryClient = new QueryClient()
-    const clientProvider: React.FunctionComponent<{}> = ({ children }) => (
+    const clientProvider: React.FunctionComponent<{
+      children: React.ReactNode
+    }> = ({ children }) => (
       <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
     )
 
     wrapper = clientProvider
   })
-  afterEach(() => {
-    resetAllWhenMocks()
-  })
 
   it('should return no data if no host', () => {
-    when(mockUseHost).calledWith().mockReturnValue(null)
+    vi.mocked(useHost).mockReturnValue(null)
 
     const { result } = renderHook(
       () => useSessionsByTypeQuery({ sessionType: 'tipLengthCalibration' }),
@@ -49,10 +45,8 @@ describe('useSessionsByTypeQuery hook', () => {
   })
 
   it('should return no data if the get sessions request fails', () => {
-    when(mockUseHost).calledWith().mockReturnValue(HOST_CONFIG)
-    when(mockGetSessions)
-      .calledWith(HOST_CONFIG, { session_type: 'tipLengthCalibration' })
-      .mockRejectedValue('oh no')
+    vi.mocked(useHost).mockReturnValue(HOST_CONFIG)
+    vi.mocked(getSessions).mockRejectedValue('oh no')
 
     const { result } = renderHook(
       () => useSessionsByTypeQuery({ sessionType: 'tipLengthCalibration' }),
@@ -69,18 +63,18 @@ describe('useSessionsByTypeQuery hook', () => {
       ),
     }
 
-    when(mockUseHost).calledWith().mockReturnValue(HOST_CONFIG)
-    when(mockGetSessions)
-      .calledWith(HOST_CONFIG, { session_type: 'tipLengthCalibration' })
-      .mockResolvedValue({ data: tipLengthCalSessions } as Response<Sessions>)
+    vi.mocked(useHost).mockReturnValue(HOST_CONFIG)
+    vi.mocked(getSessions).mockResolvedValue({
+      data: tipLengthCalSessions,
+    } as Response<Sessions>)
 
-    const { result, waitFor } = renderHook(
+    const { result } = renderHook(
       () => useSessionsByTypeQuery({ sessionType: 'tipLengthCalibration' }),
       { wrapper }
     )
 
-    await waitFor(() => result.current.data != null)
-
-    expect(result.current.data).toEqual(tipLengthCalSessions)
+    await waitFor(() => {
+      expect(result.current.data).toEqual(tipLengthCalSessions)
+    })
   })
 })

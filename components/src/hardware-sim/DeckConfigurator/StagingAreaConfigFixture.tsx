@@ -1,106 +1,89 @@
 import * as React from 'react'
-import { css } from 'styled-components'
-
-import {
-  getDeckDefFromRobotType,
-  FLEX_ROBOT_TYPE,
-} from '@opentrons/shared-data'
 
 import { Icon } from '../../icons'
-import { Btn, Flex, Text } from '../../primitives'
-import { ALIGN_CENTER, DISPLAY_FLEX, JUSTIFY_CENTER } from '../../styles'
-import { BORDERS, COLORS, SPACING, TYPOGRAPHY } from '../../ui-style-constants'
+import { Btn, Text } from '../../primitives'
+import { TYPOGRAPHY } from '../../ui-style-constants'
+import { COLORS } from '../../helix-design-system'
 import { RobotCoordsForeignObject } from '../Deck/RobotCoordsForeignObject'
+import {
+  COLUMN_3_X_ADJUSTMENT,
+  CONFIG_STYLE_EDITABLE,
+  CONFIG_STYLE_READ_ONLY,
+  CONFIG_STYLE_SELECTED,
+  FIXTURE_HEIGHT,
+  STAGING_AREA_DISPLAY_NAME,
+  STAGING_AREA_FIXTURE_WIDTH,
+  Y_ADJUSTMENT,
+} from './constants'
 
-import type { Cutout } from '@opentrons/shared-data'
-
-// TODO: replace stubs with JSON definitions when available
-const stagingAreaDef = {
-  schemaVersion: 1,
-  version: 1,
-  namespace: 'opentrons',
-  metadata: {
-    displayName: 'Staging area',
-  },
-  parameters: {
-    loadName: 'extension_slot',
-  },
-  boundingBox: {
-    xDimension: 318.5,
-    yDimension: 106.0,
-    zDimension: 0,
-  },
-}
+import type {
+  CutoutFixtureId,
+  CutoutId,
+  DeckDefinition,
+} from '@opentrons/shared-data'
 
 interface StagingAreaConfigFixtureProps {
-  fixtureLocation: Cutout
-  handleClickRemove?: (fixtureLocation: Cutout) => void
+  deckDefinition: DeckDefinition
+  fixtureLocation: CutoutId
+  cutoutFixtureId: CutoutFixtureId
+  handleClickRemove?: (
+    fixtureLocation: CutoutId,
+    cutoutFixtureId: CutoutFixtureId
+  ) => void
+  selected?: boolean
 }
 
 export function StagingAreaConfigFixture(
   props: StagingAreaConfigFixtureProps
 ): JSX.Element {
-  const { handleClickRemove, fixtureLocation } = props
-  const deckDef = getDeckDefFromRobotType(FLEX_ROBOT_TYPE)
+  const {
+    deckDefinition,
+    handleClickRemove,
+    fixtureLocation,
+    cutoutFixtureId,
+    selected = false,
+  } = props
 
-  // TODO: migrate to fixture location for v4
-  const stagingAreaSlot = deckDef.locations.orderedSlots.find(
-    slot => slot.id === fixtureLocation
+  const stagingAreaCutout = deckDefinition.locations.cutouts.find(
+    cutout => cutout.id === fixtureLocation
   )
-  const [xSlotPosition = 0, ySlotPosition = 0] = stagingAreaSlot?.position ?? []
-  // TODO: remove adjustment when reading from fixture position
-  const xAdjustment = -17
-  const x = xSlotPosition + xAdjustment
-  const yAdjustment = -10
-  const y = ySlotPosition + yAdjustment
 
-  const { xDimension, yDimension } = stagingAreaDef.boundingBox
+  /**
+   * deck definition cutout position is the position of the single slot located within that cutout
+   * so, to get the position of the cutout itself we must add an adjustment to the slot position
+   */
+  const [xSlotPosition = 0, ySlotPosition = 0] =
+    stagingAreaCutout?.position ?? []
 
+  const x = xSlotPosition + COLUMN_3_X_ADJUSTMENT
+  const y = ySlotPosition + Y_ADJUSTMENT
+
+  const editableStyle = selected ? CONFIG_STYLE_SELECTED : CONFIG_STYLE_EDITABLE
   return (
     <RobotCoordsForeignObject
-      width={xDimension}
-      height={yDimension}
+      width={STAGING_AREA_FIXTURE_WIDTH}
+      height={FIXTURE_HEIGHT}
       x={x}
       y={y}
       flexProps={{ flex: '1' }}
       foreignObjectProps={{ flex: '1' }}
     >
-      <Flex css={STAGING_AREA_CONFIG_STYLE}>
-        <Text css={TYPOGRAPHY.bodyTextSemiBold}>
-          {stagingAreaDef.metadata.displayName}
+      <Btn
+        css={handleClickRemove != null ? editableStyle : CONFIG_STYLE_READ_ONLY}
+        cursor={handleClickRemove != null ? 'pointer' : 'default'}
+        onClick={
+          handleClickRemove != null
+            ? () => handleClickRemove(fixtureLocation, cutoutFixtureId)
+            : () => {}
+        }
+      >
+        <Text css={TYPOGRAPHY.smallBodyTextSemiBold}>
+          {STAGING_AREA_DISPLAY_NAME}
         </Text>
         {handleClickRemove != null ? (
-          <Btn
-            display={DISPLAY_FLEX}
-            justifyContent={JUSTIFY_CENTER}
-            onClick={() => handleClickRemove(fixtureLocation)}
-          >
-            <Icon name="remove" color={COLORS.white} height="2.25rem" />
-          </Btn>
+          <Icon name="remove" color={COLORS.white} size="2rem" />
         ) : null}
-      </Flex>
+      </Btn>
     </RobotCoordsForeignObject>
   )
 }
-
-const STAGING_AREA_CONFIG_STYLE = css`
-  align-items: ${ALIGN_CENTER};
-  background-color: ${COLORS.grey2};
-  border-radius: ${BORDERS.borderRadiusSize1};
-  color: ${COLORS.white};
-  grid-gap: ${SPACING.spacing8};
-  justify-content: ${JUSTIFY_CENTER};
-  width: 100%;
-
-  &:active {
-    background-color: ${COLORS.darkBlack90};
-  }
-
-  &:hover {
-    background-color: ${COLORS.grey1};
-  }
-
-  &:focus-visible {
-    border: 3px solid ${COLORS.fundamentalsFocus};
-  }
-`

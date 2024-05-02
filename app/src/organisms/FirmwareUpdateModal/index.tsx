@@ -2,24 +2,22 @@ import * as React from 'react'
 import { css } from 'styled-components'
 import {
   ALIGN_CENTER,
+  COLORS,
   DIRECTION_COLUMN,
-  TYPOGRAPHY,
-  SPACING,
   Flex,
   Icon,
-  RESPONSIVENESS,
   JUSTIFY_CENTER,
-  BORDERS,
-  COLORS,
+  RESPONSIVENESS,
+  SPACING,
+  StyledText,
+  TYPOGRAPHY,
 } from '@opentrons/components'
 import {
   useInstrumentsQuery,
   useSubsystemUpdateQuery,
   useUpdateSubsystemMutation,
 } from '@opentrons/react-api-client'
-import { ProgressBar } from '../../atoms/ProgressBar'
-import { StyledText } from '../../atoms/text'
-import { BadGripper, BadPipette, Subsystem } from '@opentrons/api-client'
+import type { BadGripper, BadPipette, Subsystem } from '@opentrons/api-client'
 
 interface FirmwareUpdateModalProps {
   description: string
@@ -55,17 +53,12 @@ const MODAL_STYLE = css`
     height: 31.5625rem;
   }
 `
-const OUTER_STYLES = css`
-  border-radius: ${BORDERS.borderRadiusSize4};
-  background: ${COLORS.medGreyEnabled};
-  width: 13.374rem;
-`
 
 const SPINNER_STYLE = css`
-  color: ${COLORS.darkGreyEnabled};
+  color: ${COLORS.grey50};
   opacity: 100%;
   @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
-    color: ${COLORS.darkBlackEnabled};
+    color: ${COLORS.black90};
     opacity: 70%;
   }
 `
@@ -80,8 +73,8 @@ export const FirmwareUpdateModal = (
     description,
     isOnDevice,
   } = props
-  const [updateId, setUpdateId] = React.useState('')
-  const [firmwareText, setFirmwareText] = React.useState('')
+  const [updateId, setUpdateId] = React.useState<string | null>(null)
+  const [firmwareText, setFirmwareText] = React.useState<string | null>(null)
   const {
     data: attachedInstruments,
     refetch: refetchInstruments,
@@ -113,7 +106,6 @@ export const FirmwareUpdateModal = (
   }, [])
   const { data: updateData } = useSubsystemUpdateQuery(updateId)
   const status = updateData?.data.updateStatus
-  const percentComplete = updateData?.data.updateProgress ?? 0
 
   React.useEffect(() => {
     if ((status != null || updateNeeded) && firmwareText !== description) {
@@ -140,24 +132,27 @@ export const FirmwareUpdateModal = (
 
   return (
     <Flex css={MODAL_STYLE}>
-      <StyledText css={DESCRIPTION_STYLE}>
-        {firmwareText.length ? firmwareText : 'Checking for updates...'}
-      </StyledText>
-      {status != null || updateNeeded ? (
-        <ProgressBar
-          percentComplete={percentComplete}
-          outerStyles={OUTER_STYLES}
-        />
-      ) : null}
-      {firmwareText.length ? null : (
+      {status != null || updateNeeded || !firmwareText ? (
         <Icon
           name="ot-spinner"
           aria-label="spinner"
           size={isOnDevice ? '6.25rem' : '5.125rem'}
+          marginBottom={SPACING.spacing12}
           css={SPINNER_STYLE}
           spin
         />
+      ) : (
+        <Icon
+          name="ot-check"
+          aria-label="check"
+          size={isOnDevice ? '6.25rem' : '5.125rem'}
+          marginBottom={SPACING.spacing12}
+          color={COLORS.green60}
+        />
       )}
+      <StyledText css={DESCRIPTION_STYLE}>
+        {firmwareText ?? 'Checking for updates...'}
+      </StyledText>
     </Flex>
   )
 }

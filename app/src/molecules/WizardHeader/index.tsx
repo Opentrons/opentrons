@@ -2,19 +2,19 @@ import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { css } from 'styled-components'
 import {
+  ALIGN_CENTER,
+  BORDERS,
   Box,
   Btn,
+  COLORS,
   DIRECTION_ROW,
   Flex,
   JUSTIFY_SPACE_BETWEEN,
-  TYPOGRAPHY,
-  COLORS,
-  SPACING,
   RESPONSIVENESS,
-  BORDERS,
-  ALIGN_CENTER,
+  SPACING,
+  StyledText,
+  TYPOGRAPHY,
 } from '@opentrons/components'
-import { StyledText } from '../../atoms/text'
 import { StepMeter } from '../../atoms/StepMeter'
 
 interface WizardHeaderProps {
@@ -28,10 +28,10 @@ interface WizardHeaderProps {
 const EXIT_BUTTON_STYLE = css`
   ${TYPOGRAPHY.pSemiBold};
   text-transform: ${TYPOGRAPHY.textTransformCapitalize};
-  color: ${COLORS.darkGreyEnabled};
+  color: ${COLORS.grey60};
 
   &:hover {
-    opacity: 70%;
+    color: ${COLORS.grey50};
   }
   @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
     margin-right: 1.75rem;
@@ -41,14 +41,14 @@ const EXIT_BUTTON_STYLE = css`
       opacity: 100%;
     }
     &:active {
-      opacity: 70%;
+      color: ${COLORS.grey50};
     }
   }
 `
 const BOX_STYLE = css`
-  background-color: ${COLORS.white} @media
-    ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
-    border-radius: ${BORDERS.borderRadiusSize4};
+  background-color: ${COLORS.white};
+  @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
+    border-radius: ${BORDERS.borderRadius16};
   }
 `
 const HEADER_CONTAINER_STYLE = css`
@@ -57,7 +57,7 @@ const HEADER_CONTAINER_STYLE = css`
   padding: ${SPACING.spacing16} ${SPACING.spacing32};
   @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
     padding: 1.75rem ${SPACING.spacing32};
-    border-radius: ${BORDERS.borderRadiusSize4};
+    border-radius: ${BORDERS.borderRadius16};
   }
 `
 const HEADER_TEXT_STYLE = css`
@@ -70,6 +70,7 @@ const HEADER_TEXT_STYLE = css`
 `
 const STEP_TEXT_STYLE = css`
   ${TYPOGRAPHY.pSemiBold}
+  color: ${COLORS.grey60};
   @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
     font-size: 1.375rem;
     margin-left: ${SPACING.spacing16};
@@ -89,7 +90,7 @@ export const WizardHeader = (props: WizardHeaderProps): JSX.Element => {
           </StyledText>
 
           {currentStep != null && totalSteps != null && currentStep > 0 ? (
-            <StyledText css={STEP_TEXT_STYLE} color={COLORS.darkGreyEnabled}>
+            <StyledText css={STEP_TEXT_STYLE}>
               {t('step', { current: currentStep, max: totalSteps })}
             </StyledText>
           ) : null}

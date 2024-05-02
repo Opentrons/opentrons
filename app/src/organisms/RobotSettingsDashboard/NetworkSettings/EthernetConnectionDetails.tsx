@@ -4,17 +4,17 @@ import { useSelector } from 'react-redux'
 import { css } from 'styled-components'
 
 import {
-  Flex,
+  BORDERS,
+  COLORS,
   DIRECTION_COLUMN,
   DIRECTION_ROW,
+  Flex,
   JUSTIFY_SPACE_BETWEEN,
   SPACING,
-  COLORS,
+  StyledText,
   TYPOGRAPHY,
-  BORDERS,
 } from '@opentrons/components'
 
-import { StyledText } from '../../../atoms/text'
 import { ChildNavigation } from '../../../organisms/ChildNavigation'
 import { getNetworkInterfaces } from '../../../redux/networking'
 import { getLocalRobot } from '../../../redux/discovery'
@@ -24,8 +24,8 @@ import type { State } from '../../../redux/types'
 const STRETCH_LIST_STYLE = css`
   width: 100%;
   padding: ${SPACING.spacing16};
-  background-color: ${COLORS.light1};
-  border-radius: ${BORDERS.borderRadiusSize3};
+  background-color: ${COLORS.grey35};
+  border-radius: ${BORDERS.borderRadius8};
 `
 
 interface EthernetConnectionDetailsProps {
@@ -82,7 +82,7 @@ export function EthernetConnectionDetails(
         {ethernet?.ipAddress === null || ethernet?.macAddress === null ? (
           <Flex marginTop="9rem">
             <StyledText
-              color={COLORS.darkBlack70}
+              color={COLORS.grey60}
               fontSize={TYPOGRAPHY.fontSize28}
               lineHeight={TYPOGRAPHY.lineHeight36}
               fontWeight={TYPOGRAPHY.fontWeightRegular}
@@ -120,7 +120,7 @@ const EthernetDetailsRow = ({
         {title}
       </StyledText>
       <StyledText
-        color={COLORS.darkBlack70}
+        color={COLORS.grey60}
         fontSize={TYPOGRAPHY.fontSize22}
         lineHeight={TYPOGRAPHY.lineHeight28}
         fontWeight={TYPOGRAPHY.fontWeightRegular}

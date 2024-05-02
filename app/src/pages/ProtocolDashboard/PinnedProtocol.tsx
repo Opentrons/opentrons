@@ -12,14 +12,15 @@ import {
   DIRECTION_ROW,
   Flex,
   JUSTIFY_SPACE_BETWEEN,
+  OVERFLOW_WRAP_ANYWHERE,
   SPACING,
   TYPOGRAPHY,
   useLongPress,
+  StyledText,
 } from '@opentrons/components'
 
-import { StyledText } from '../../atoms/text'
 import { LongPressModal } from './LongPressModal'
-import { formatTimeWithUtcLabel } from '../../resources/runs/utils'
+import { formatTimeWithUtcLabel } from '../../resources/runs'
 
 import type { UseLongPressResult } from '@opentrons/components'
 import type { ProtocolResource } from '@opentrons/shared-data'
@@ -95,15 +96,15 @@ export function PinnedProtocol(props: {
 
   const PUSHED_STATE_STYLE = css`
     &:active {
-      background-color: ${longpress.isLongPressed ? '' : COLORS.darkBlack40};
+      background-color: ${longpress.isLongPressed ? '' : COLORS.grey50};
     }
   `
 
   return (
     <Flex
       alignItems={ALIGN_FLEX_START}
-      backgroundColor={COLORS.light1}
-      borderRadius={BORDERS.borderRadiusSize4}
+      backgroundColor={COLORS.grey35}
+      borderRadius={BORDERS.borderRadius16}
       css={PUSHED_STATE_STYLE}
       flexDirection={DIRECTION_COLUMN}
       gridGap={SPACING.spacing24}
@@ -112,7 +113,7 @@ export function PinnedProtocol(props: {
       maxWidth={cardStyleBySize[cardSize].width}
       minWidth={cardStyleBySize[cardSize].width}
       onClick={() => handleProtocolClick(longpress, protocol.id)}
-      overflowWrap="anywhere"
+      overflowWrap={OVERFLOW_WRAP_ANYWHERE}
       padding={SPACING.spacing24}
       ref={longpress.ref}
     >
@@ -129,7 +130,7 @@ export function PinnedProtocol(props: {
         gridGap={SPACING.spacing8}
         justifyContent={JUSTIFY_SPACE_BETWEEN}
         width="100%"
-        color={COLORS.darkBlack70}
+        color={COLORS.grey60}
       >
         <StyledText as="p">
           {lastRun !== undefined
@@ -160,7 +161,7 @@ const ProtocolNameText = styled(StyledText)`
   -webkit-line-clamp: ${(props: { cardSize: CardSizeType }) =>
     props.cardSize === 'full' ? 1 : 2};
   overflow: hidden;
-  overflow-wrap: anywhere;
+  overflow-wrap: ${OVERFLOW_WRAP_ANYWHERE};
   font-size: ${(props: { cardSize: CardSizeType }) =>
     cardStyleBySize[props.cardSize].fontSize};
   font-weight: ${(props: { cardSize: CardSizeType }) =>

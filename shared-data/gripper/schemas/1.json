@@ -109,6 +109,11 @@
           "additionalProperties": {
             "type": "number"
           }
+        },
+        "maxAllowedGripError": {
+          "title": "MaxAllowedGripError",
+          "minimum": 0.0,
+          "type": "number"
         }
       },
       "required": [

@@ -58,6 +58,8 @@ class ErrorCodes(Enum):
     UNMATCHED_TIP_PRESENCE_STATES = _code_from_dict_entry("2012")
     POSITION_UNKNOWN = _code_from_dict_entry("2013")
     EXECUTION_CANCELLED = _code_from_dict_entry("2014")
+    FAILED_GRIPPER_PICKUP_ERROR = _code_from_dict_entry("2015")
+    MOTOR_DRIVER_ERROR = _code_from_dict_entry("2016")
     ROBOTICS_INTERACTION_ERROR = _code_from_dict_entry("3000")
     LABWARE_DROPPED = _code_from_dict_entry("3001")
     LABWARE_NOT_PICKED_UP = _code_from_dict_entry("3002")
@@ -76,6 +78,7 @@ class ErrorCodes(Enum):
     INVALID_INSTRUMENT_DATA = _code_from_dict_entry("3016")
     INVALID_LIQUID_CLASS_NAME = _code_from_dict_entry("3017")
     TIP_DETECTOR_NOT_FOUND = _code_from_dict_entry("3018")
+    HEPA_UV_FAILED = _code_from_dict_entry("3019")
     GENERAL_ERROR = _code_from_dict_entry("4000")
     ROBOT_IN_USE = _code_from_dict_entry("4001")
     API_REMOVED = _code_from_dict_entry("4002")
@@ -84,6 +87,7 @@ class ErrorCodes(Enum):
     COMMAND_PARAMETER_LIMIT_VIOLATED = _code_from_dict_entry("4005")
     INVALID_PROTOCOL_DATA = _code_from_dict_entry("4006")
     API_MISCONFIGURATION = _code_from_dict_entry("4007")
+    INVALID_STORED_DATA = _code_from_dict_entry("4008")
 
     @classmethod
     @lru_cache(25)

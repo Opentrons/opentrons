@@ -6,7 +6,16 @@ from __future__ import annotations
 from abc import ABC, abstractmethod
 from datetime import datetime
 from enum import Enum
-from typing import TYPE_CHECKING, Generic, Optional, TypeVar, Tuple
+from typing import (
+    TYPE_CHECKING,
+    Generic,
+    Optional,
+    TypeVar,
+    Tuple,
+    List,
+    Type,
+    Union,
+)
 
 from pydantic import BaseModel, Field
 from pydantic.generics import GenericModel
@@ -14,6 +23,7 @@ from pydantic.generics import GenericModel
 from opentrons.hardware_control import HardwareControlAPI
 
 from ..errors import ErrorOccurrence
+from ..notes import CommandNote, CommandNoteAdder
 
 # Work around type-only circular dependencies.
 if TYPE_CHECKING:
@@ -21,11 +31,11 @@ if TYPE_CHECKING:
     from ..state import StateView
 
 
-CommandParamsT = TypeVar("CommandParamsT", bound=BaseModel)
-
-CommandResultT = TypeVar("CommandResultT", bound=BaseModel)
-
-CommandPrivateResultT = TypeVar("CommandPrivateResultT")
+_ParamsT = TypeVar("_ParamsT", bound=BaseModel)
+_ParamsT_contra = TypeVar("_ParamsT_contra", bound=BaseModel, contravariant=True)
+_ResultT = TypeVar("_ResultT", bound=BaseModel)
+_ResultT_co = TypeVar("_ResultT_co", bound=BaseModel, covariant=True)
+_PrivateResultT_co = TypeVar("_PrivateResultT_co", covariant=True)
 
 
 class CommandStatus(str, Enum):
@@ -47,9 +57,10 @@ class CommandIntent(str, Enum):
 
     PROTOCOL = "protocol"
     SETUP = "setup"
+    FIXIT = "fixit"
 
 
-class BaseCommandCreate(GenericModel, Generic[CommandParamsT]):
+class BaseCommandCreate(GenericModel, Generic[_ParamsT]):
     """Base class for command creation requests.
 
     You shouldn't use this class directly; instead, use or define
@@ -63,7 +74,7 @@ class BaseCommandCreate(GenericModel, Generic[CommandParamsT]):
             "execution behavior"
         ),
     )
-    params: CommandParamsT = Field(..., description="Command execution data payload")
+    params: _ParamsT = Field(..., description="Command execution data payload")
     intent: Optional[CommandIntent] = Field(
         None,
         description=(
@@ -88,7 +99,7 @@ class BaseCommandCreate(GenericModel, Generic[CommandParamsT]):
     )
 
 
-class BaseCommand(GenericModel, Generic[CommandParamsT, CommandResultT]):
+class BaseCommand(GenericModel, Generic[_ParamsT, _ResultT]):
     """Base command model.
 
     You shouldn't use this class directly; instead, use or define
@@ -118,8 +129,8 @@ class BaseCommand(GenericModel, Generic[CommandParamsT, CommandResultT]):
         ),
     )
     status: CommandStatus = Field(..., description="Command execution status")
-    params: CommandParamsT = Field(..., description="Command execution data payload")
-    result: Optional[CommandResultT] = Field(
+    params: _ParamsT = Field(..., description="Command execution data payload")
+    result: Optional[_ResultT] = Field(
         None,
         description="Command execution result data, if succeeded",
     )
@@ -144,11 +155,29 @@ class BaseCommand(GenericModel, Generic[CommandParamsT, CommandResultT]):
             " a command that is part of a calibration procedure."
         ),
     )
+    notes: Optional[List[CommandNote]] = Field(
+        None,
+        description=(
+            "Information not critical to the execution of the command derived from either"
+            " the command's execution or the command's generation."
+        ),
+    )
+    failedCommandId: Optional[str] = Field(
+        None,
+        description=(
+            "FIXIT command use only. Reference of the failed command id we are trying to fix."
+        ),
+    )
+
+    _ImplementationCls: Union[
+        Type[AbstractCommandImpl[_ParamsT, _ResultT]],
+        Type[AbstractCommandWithPrivateResultImpl[_ParamsT, _ResultT, object]],
+    ]
 
 
 class AbstractCommandImpl(
     ABC,
-    Generic[CommandParamsT, CommandResultT],
+    Generic[_ParamsT_contra, _ResultT_co],
 ):
     """Abstract command creation and execution implementation.
 
@@ -176,19 +205,20 @@ class AbstractCommandImpl(
         run_control: execution.RunControlHandler,
         rail_lights: execution.RailLightsHandler,
         status_bar: execution.StatusBarHandler,
+        command_note_adder: CommandNoteAdder,
     ) -> None:
         """Initialize the command implementation with execution handlers."""
         pass
 
     @abstractmethod
-    async def execute(self, params: CommandParamsT) -> CommandResultT:
+    async def execute(self, params: _ParamsT_contra) -> _ResultT_co:
         """Execute the command, mapping data from execution into a response model."""
         ...
 
 
 class AbstractCommandWithPrivateResultImpl(
     ABC,
-    Generic[CommandParamsT, CommandResultT, CommandPrivateResultT],
+    Generic[_ParamsT_contra, _ResultT_co, _PrivateResultT_co],
 ):
     """Abstract command creation and execution implementation if the command has private results.
 
@@ -217,13 +247,14 @@ class AbstractCommandWithPrivateResultImpl(
         run_control: execution.RunControlHandler,
         rail_lights: execution.RailLightsHandler,
         status_bar: execution.StatusBarHandler,
+        command_note_adder: CommandNoteAdder,
     ) -> None:
         """Initialize the command implementation with execution handlers."""
         pass
 
     @abstractmethod
     async def execute(
-        self, params: CommandParamsT
-    ) -> Tuple[CommandResultT, CommandPrivateResultT]:
+        self, params: _ParamsT_contra
+    ) -> Tuple[_ResultT_co, _PrivateResultT_co]:
         """Execute the command, mapping data from execution into a response model."""
         ...

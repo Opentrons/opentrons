@@ -29,9 +29,11 @@ import {
   minDisposalVolume,
   minAspirateAirGapVolume,
   minDispenseAirGapVolume,
+  mixTipPositionInTube,
+  tipPositionInTube,
 } from './warnings'
 
-import { StepType } from '../../form-types'
+import { HydratedFormdata, StepType } from '../../form-types'
 export { handleFormChange } from './handleFormChange'
 export { createBlankForm } from './createBlankForm'
 export { getDefaultsForStepType } from './getDefaultsForStepType'
@@ -46,13 +48,16 @@ export { getNextDefaultEngageHeight } from './getNextDefaultEngageHeight'
 export { stepFormToArgs } from './stepFormToArgs'
 export type { FormError, FormWarning, FormWarningType }
 interface FormHelpers {
-  getErrors?: (arg: unknown) => FormError[]
+  getErrors?: (arg: HydratedFormdata) => FormError[]
   getWarnings?: (arg: unknown) => FormWarning[]
 }
 const stepFormHelperMap: Partial<Record<StepType, FormHelpers>> = {
   mix: {
     getErrors: composeErrors(incompatibleLabware, volumeTooHigh),
-    getWarnings: composeWarnings(belowPipetteMinimumVolume),
+    getWarnings: composeWarnings(
+      belowPipetteMinimumVolume,
+      mixTipPositionInTube
+    ),
   },
   pause: {
     getErrors: composeErrors(pauseForTimeOrUntilTold),
@@ -68,7 +73,8 @@ const stepFormHelperMap: Partial<Record<StepType, FormHelpers>> = {
       maxDispenseWellVolume,
       minDisposalVolume,
       minAspirateAirGapVolume,
-      minDispenseAirGapVolume
+      minDispenseAirGapVolume,
+      tipPositionInTube
     ),
   },
   magnet: {
@@ -95,7 +101,7 @@ const stepFormHelperMap: Partial<Record<StepType, FormHelpers>> = {
 }
 export const getFormErrors = (
   stepType: StepType,
-  formData: unknown
+  formData: HydratedFormdata
 ): FormError[] => {
   const formErrorGetter =
     // @ts-expect-error(sa, 2021-6-20): not a valid type narrow

@@ -4,6 +4,7 @@ import {
   ALIGN_CENTER,
   Box,
   COLORS,
+  BORDERS,
   DIRECTION_COLUMN,
   Flex,
   SPACING,
@@ -49,8 +50,7 @@ export function DeviceDetailsComponent({
       <Flex
         alignItems={ALIGN_CENTER}
         backgroundColor={COLORS.white}
-        border={`1px solid ${String(COLORS.medGreyEnabled)}`}
-        borderRadius="3px"
+        borderRadius={BORDERS.borderRadius8}
         flexDirection={DIRECTION_COLUMN}
         marginBottom={SPACING.spacing16}
         paddingX={SPACING.spacing16}

@@ -1,26 +1,28 @@
 import * as React from 'react'
-import { when, resetAllWhenMocks } from 'jest-when'
+import { describe, it, vi, beforeEach, afterEach } from 'vitest'
+import { screen } from '@testing-library/react'
 
+import { BaseDeck } from '@opentrons/components'
 import {
-  renderWithProviders,
-  BaseDeck,
-  EXTENDED_DECK_CONFIG_FIXTURE,
-} from '@opentrons/components'
+  FLEX_SIMPLEST_DECK_CONFIG_PROTOCOL_SPEC,
+  getSimplestDeckConfigForProtocol,
+} from '@opentrons/shared-data'
 
+import { renderWithProviders } from '../../../__testing-utils__'
 import { i18n } from '../../../i18n'
-import { getDeckConfigFromProtocolCommands } from '../../../resources/deck_configuration/utils'
 import { ModulesAndDeckMapViewModal } from '../ModulesAndDeckMapViewModal'
 
-jest.mock('@opentrons/components/src/hardware-sim/BaseDeck')
-jest.mock('@opentrons/api-client')
-jest.mock('../../../redux/config')
-jest.mock('../../Devices/hooks')
-jest.mock('../../../resources/deck_configuration/utils')
-jest.mock('../../Devices/ModuleInfo')
-jest.mock('../../Devices/ProtocolRun/utils/getLabwareRenderInfo')
+vi.mock('@opentrons/components/src/hardware-sim/BaseDeck')
+vi.mock('@opentrons/api-client')
+vi.mock('@opentrons/shared-data/js/helpers/getSimplestFlexDeckConfig')
+vi.mock('../../../redux/config')
+vi.mock('../../Devices/hooks')
+vi.mock('../../../resources/deck_configuration/utils')
+vi.mock('../../Devices/ModuleInfo')
+vi.mock('../../Devices/ProtocolRun/utils/getLabwareRenderInfo')
 
 const mockRunId = 'mockRunId'
-const mockSetShowDeckMapModal = jest.fn()
+const mockSetShowDeckMapModal = vi.fn()
 const PROTOCOL_ANALYSIS = {
   id: 'fake analysis',
   status: 'completed',
@@ -83,6 +85,22 @@ const mockAttachedProtocolModuleMatches = [
   },
 ] as any
 
+vi.mock('@opentrons/shared-data', async importOriginal => {
+  const actual = await importOriginal<typeof getSimplestDeckConfigForProtocol>()
+  return {
+    ...actual,
+    getSimplestDeckConfigForProtocol: vi.fn(),
+  }
+})
+
+vi.mock('@opentrons/components', async importOriginal => {
+  const actual = await importOriginal<typeof BaseDeck>()
+  return {
+    ...actual,
+    BaseDeck: vi.fn(),
+  }
+})
+
 const render = (
   props: React.ComponentProps<typeof ModulesAndDeckMapViewModal>
 ) => {
@@ -90,11 +108,6 @@ const render = (
     i18nInstance: i18n,
   })[0]
 }
-
-const mockBaseDeck = BaseDeck as jest.MockedFunction<typeof BaseDeck>
-const mockGetDeckConfigFromProtocolCommands = getDeckConfigFromProtocolCommands as jest.MockedFunction<
-  typeof getDeckConfigFromProtocolCommands
->
 
 describe('ModulesAndDeckMapViewModal', () => {
   let props: React.ComponentProps<typeof ModulesAndDeckMapViewModal>
@@ -106,20 +119,19 @@ describe('ModulesAndDeckMapViewModal', () => {
       runId: mockRunId,
       protocolAnalysis: PROTOCOL_ANALYSIS,
     }
-    when(mockGetDeckConfigFromProtocolCommands).mockReturnValue(
-      EXTENDED_DECK_CONFIG_FIXTURE
+    vi.mocked(getSimplestDeckConfigForProtocol).mockReturnValue(
+      FLEX_SIMPLEST_DECK_CONFIG_PROTOCOL_SPEC
     )
-    mockBaseDeck.mockReturnValue(<div>mock BaseDeck</div>)
+    vi.mocked(BaseDeck).mockReturnValue(<div>mock BaseDeck</div>)
   })
 
   afterEach(() => {
-    jest.resetAllMocks()
-    resetAllWhenMocks()
+    vi.resetAllMocks()
   })
 
   it('should render BaseDeck map view', () => {
-    const { getByText } = render(props)
-    getByText('Map View')
-    getByText('mock BaseDeck')
+    render(props)
+    screen.getByText('Map View')
+    screen.getByText('mock BaseDeck')
   })
 })

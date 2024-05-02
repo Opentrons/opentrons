@@ -1,13 +1,10 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
-import { css } from 'styled-components'
 
 import {
   ALIGN_CENTER,
-  BORDERS,
   Box,
   Btn,
-  COLORS,
   DIRECTION_COLUMN,
   DIRECTION_ROW,
   Flex,
@@ -15,32 +12,13 @@ import {
   JUSTIFY_SPACE_BETWEEN,
   POSITION_FIXED,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
-import { StyledText } from '../../atoms/text'
 import { InputField } from '../../atoms/InputField'
-import { NormalKeyboard } from '../../atoms/SoftwareKeyboard'
+import { FullKeyboard } from '../../atoms/SoftwareKeyboard'
 import { useIsUnboxingFlowOngoing } from '../RobotSettingsDashboard/NetworkSettings/hooks'
-
-const SSID_INPUT_FIELD_STYLE = css`
-  padding-top: 2.125rem;
-  padding-bottom: 2.125rem;
-  height: 4.25rem;
-  font-size: ${TYPOGRAPHY.fontSize28};
-  line-height: ${TYPOGRAPHY.lineHeight36};
-  font-weight: ${TYPOGRAPHY.fontWeightRegular};
-  color: ${COLORS.darkBlack100};
-  padding-left: ${SPACING.spacing24};
-  box-sizing: border-box;
-  width: 42.625rem;
-
-  &:focus {
-    border: 3px solid ${COLORS.blueEnabled};
-    filter: drop-shadow(0px 0px 10px ${COLORS.blueEnabled});
-    border-radius: ${BORDERS.borderRadiusSize1};
-  }
-`
 
 interface SetWifiCredProps {
   password: string
@@ -74,10 +52,12 @@ export function SetWifiCred({
           <Box width="100%">
             <InputField
               aria-label="wifi_password"
+              id="wifiPassword"
               value={password}
               onChange={e => setPassword(e.target.value)}
               type={showPassword ? 'text' : 'password'}
-              css={SSID_INPUT_FIELD_STYLE}
+              onBlur={e => e.target.focus()}
+              autoFocus
             />
           </Box>
           <Btn
@@ -98,7 +78,7 @@ export function SetWifiCred({
         </Flex>
       </Flex>
       <Flex width="100%" position={POSITION_FIXED} left="0" bottom="0">
-        <NormalKeyboard
+        <FullKeyboard
           onChange={e => e != null && setPassword(String(e))}
           keyboardRef={keyboardRef}
         />

@@ -1,4 +1,4 @@
-import { APP_RESTART } from '@opentrons/app/src/redux/shell/actions'
+import { APP_RESTART } from './constants'
 import systemd from './systemd'
 import { createLogger } from './log'
 

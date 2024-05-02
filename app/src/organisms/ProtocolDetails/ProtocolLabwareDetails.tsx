@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
 import {
   ALIGN_CENTER,
@@ -7,17 +8,18 @@ import {
   DIRECTION_ROW,
   Flex,
   Icon,
+  InfoScreen,
   POSITION_ABSOLUTE,
   POSITION_RELATIVE,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { getLabwareDefURI } from '@opentrons/shared-data'
-import { StyledText } from '../../atoms/text'
 import { Divider } from '../../atoms/structure'
 import { OverflowBtn } from '../../atoms/MenuList/OverflowBtn'
 import { MenuItem } from '../../atoms/MenuList/MenuItem'
-import { Portal } from '../../App/portal'
+import { getTopPortalEl } from '../../App/portal'
 import { LabwareDetails } from '../LabwareDetails'
 import { useMenuHandleClickOutside } from '../../atoms/MenuList/hooks'
 
@@ -54,40 +56,42 @@ export const ProtocolLabwareDetails = (
       : []
 
   return (
-    <Flex
-      flexDirection={DIRECTION_COLUMN}
-      width="100%"
-      marginBottom={SPACING.spacing8}
-    >
-      <Flex flexDirection={DIRECTION_ROW}>
-        <StyledText
-          as="label"
-          fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-          marginBottom={SPACING.spacing8}
-          data-testid="ProtocolLabwareDetails_labware_name"
-          width="66%"
-        >
-          {t('labware_name')}
-        </StyledText>
-        <StyledText
-          as="label"
-          fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-          data-testid="ProtocolLabwareDetails_quantity"
-        >
-          {t('quantity')}
-        </StyledText>
-      </Flex>
-      {labwareDetails?.map((labware, index) => (
-        <ProtocolLabwareDetailItem
-          key={index}
-          namespace={labware.params.namespace}
-          displayName={labware.result?.definition?.metadata?.displayName}
-          quantity={labware.quantity}
-          labware={{ definition: labware.result?.definition }}
-          data-testid={`ProtocolLabwareDetails_item_${index}`}
-        />
-      ))}
-    </Flex>
+    <>
+      {labwareDetails.length > 0 ? (
+        <Flex flexDirection={DIRECTION_COLUMN} width="100%">
+          <Flex flexDirection={DIRECTION_ROW}>
+            <StyledText
+              as="label"
+              fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+              marginBottom={SPACING.spacing8}
+              data-testid="ProtocolLabwareDetails_labware_name"
+              width="66%"
+            >
+              {t('labware_name')}
+            </StyledText>
+            <StyledText
+              as="label"
+              fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+              data-testid="ProtocolLabwareDetails_quantity"
+            >
+              {t('quantity')}
+            </StyledText>
+          </Flex>
+          {labwareDetails?.map((labware, index) => (
+            <ProtocolLabwareDetailItem
+              key={index}
+              namespace={labware.params.namespace}
+              displayName={labware.result?.definition?.metadata?.displayName}
+              quantity={labware.quantity}
+              labware={{ definition: labware.result?.definition }}
+              data-testid={`ProtocolLabwareDetails_item_${index}`}
+            />
+          ))}
+        </Flex>
+      ) : (
+        <InfoScreen contentType="labware" />
+      )}
+    </>
   )
 }
 
@@ -118,7 +122,7 @@ export const ProtocolLabwareDetailItem = (
         >
           {namespace === 'opentrons' ? (
             <Icon
-              color={COLORS.blueEnabled}
+              color={COLORS.blue50}
               name="check-decagram"
               height="0.75rem"
               minHeight="0.75rem"
@@ -191,15 +195,18 @@ export const LabwareDetailOverflowMenu = (
           </MenuItem>
         </Flex>
       ) : null}
-      <Portal level="top">
-        {menuOverlay}
-        {showLabwareDetailSlideout ? (
-          <LabwareDetails
-            labware={labware}
-            onClose={() => setShowLabwareDetailSlideout(false)}
-          />
-        ) : null}
-      </Portal>
+      {createPortal(
+        <>
+          {menuOverlay}
+          {showLabwareDetailSlideout ? (
+            <LabwareDetails
+              labware={labware}
+              onClose={() => setShowLabwareDetailSlideout(false)}
+            />
+          ) : null}
+        </>,
+        getTopPortalEl()
+      )}
     </Flex>
   )
 }

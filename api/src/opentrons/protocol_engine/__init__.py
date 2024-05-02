@@ -13,6 +13,7 @@ from .create_protocol_engine import (
 )
 from .protocol_engine import ProtocolEngine
 from .errors import ProtocolEngineError, ErrorOccurrence
+from .notes import CommandNote
 from .commands import (
     Command,
     CommandParams,
@@ -30,11 +31,13 @@ from .types import (
     LabwareOffsetVector,
     LabwareOffsetLocation,
     LabwareMovementStrategy,
+    AddressableOffsetVector,
     DeckPoint,
     DeckType,
     DeckSlotLocation,
     ModuleLocation,
     OnLabwareLocation,
+    AddressableAreaLocation,
     OFF_DECK_LOCATION,
     Dimensions,
     EngineStatus,
@@ -52,7 +55,7 @@ from .types import (
     ModuleModel,
     ModuleDefinition,
     Liquid,
-    EmptyNozzleLayoutConfiguration,
+    AllNozzleLayoutConfiguration,
     SingleNozzleLayoutConfiguration,
     RowNozzleLayoutConfiguration,
     ColumnNozzleLayoutConfiguration,
@@ -77,6 +80,7 @@ __all__ = [
     "CommandStatus",
     "CommandType",
     "CommandIntent",
+    "CommandNote",
     # state interfaces and models
     "State",
     "StateView",
@@ -88,11 +92,13 @@ __all__ = [
     "LabwareOffsetVector",
     "LabwareOffsetLocation",
     "LabwareMovementStrategy",
+    "AddressableOffsetVector",
     "DeckSlotLocation",
     "DeckPoint",
     "DeckType",
     "ModuleLocation",
     "OnLabwareLocation",
+    "AddressableAreaLocation",
     "OFF_DECK_LOCATION",
     "Dimensions",
     "EngineStatus",
@@ -110,7 +116,7 @@ __all__ = [
     "ModuleModel",
     "ModuleDefinition",
     "Liquid",
-    "EmptyNozzleLayoutConfiguration",
+    "AllNozzleLayoutConfiguration",
     "SingleNozzleLayoutConfiguration",
     "RowNozzleLayoutConfiguration",
     "ColumnNozzleLayoutConfiguration",

@@ -27,6 +27,7 @@ from opentrons.hardware_control.emulation.module_server.helpers import (
 )
 from opentrons.hardware_control.emulation.scripts import run_app, run_smoothie
 from opentrons.hardware_control import API, ThreadManager
+from opentrons.hardware_control.types import HardwareFeatureFlags
 from g_code_parsing.g_code_program.g_code_program import (
     GCodeProgram,
 )
@@ -98,6 +99,7 @@ class GCodeEngine:
             API.build_hardware_controller,
             conf,
             GCodeEngine.URI_TEMPLATE % self._config.smoothie.port,
+            feature_flags=HardwareFeatureFlags.build_from_ff(),
         )
         # Wait for modules to be present
         while len(emulator.attached_modules) != len(modules):
@@ -170,13 +172,16 @@ class GCodeEngine:
                             deck_type=DeckType(
                                 deck_type.for_simulation(robot_type=robot_type)
                             ),
+                            use_simulated_deck_config=True,
                         ),
                         load_fixed_trash=deck_type.should_load_fixed_trash(config),
                     ),
                     hardware_api=hardware,  # type: ignore
                 )
                 with GCodeWatcher(emulator_settings=self._config) as watcher:
-                    await protocol_runner.run(protocol_source=protocol_source)
+                    await protocol_runner.run(
+                        deck_configuration=[], protocol_source=protocol_source
+                    )
                     yield GCodeProgram.from_g_code_watcher(watcher)
             elif isinstance(version, APIVersion) and version < APIVersion(2, 14):
                 protocol = self._get_protocol(file_path)

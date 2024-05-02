@@ -1,7 +1,7 @@
 import * as React from 'react'
-import { when, resetAllWhenMocks } from 'jest-when'
-
-import { renderWithProviders } from '@opentrons/components'
+import { when } from 'vitest-when'
+import { describe, it, vi, beforeEach } from 'vitest'
+import { screen } from '@testing-library/react'
 
 import { i18n } from '../../../i18n'
 import {
@@ -14,6 +14,7 @@ import {
   usePipetteOffsetCalibrations,
   useAttachedPipettesFromInstrumentsQuery,
 } from '../../../organisms/Devices/hooks'
+import { renderWithProviders } from '../../../__testing-utils__'
 import { mockAttachedPipetteInformation } from '../../../redux/pipettes/__fixtures__'
 
 import { RobotSettingsPipetteOffsetCalibration } from '../RobotSettingsPipetteOffsetCalibration'
@@ -21,21 +22,11 @@ import { PipetteOffsetCalibrationItems } from '../CalibrationDetails/PipetteOffs
 
 import type { FormattedPipetteOffsetCalibration } from '..'
 
-jest.mock('../../../organisms/Devices/hooks')
-jest.mock('../CalibrationDetails/PipetteOffsetCalibrationItems')
+vi.mock('../../../organisms/Devices/hooks')
+vi.mock('../CalibrationDetails/PipetteOffsetCalibrationItems')
 
-const mockUseIsFlex = useIsFlex as jest.MockedFunction<typeof useIsFlex>
-const mockUsePipetteOffsetCalibrations = usePipetteOffsetCalibrations as jest.MockedFunction<
-  typeof usePipetteOffsetCalibrations
->
-const mockPipetteOffsetCalibrationItems = PipetteOffsetCalibrationItems as jest.MockedFunction<
-  typeof PipetteOffsetCalibrationItems
->
-const mockUseAttachedPipettesFromInstrumentsQuery = useAttachedPipettesFromInstrumentsQuery as jest.MockedFunction<
-  typeof useAttachedPipettesFromInstrumentsQuery
->
 const mockFormattedPipetteOffsetCalibrations: FormattedPipetteOffsetCalibration[] = []
-const mockUpdateRobotStatus = jest.fn()
+const mockUpdateRobotStatus = vi.fn()
 
 const render = (
   props?: Partial<
@@ -59,48 +50,43 @@ const render = (
 
 describe('RobotSettingsPipetteOffsetCalibration', () => {
   beforeEach(() => {
-    when(mockUseIsFlex).calledWith('otie').mockReturnValue(false)
-    mockUsePipetteOffsetCalibrations.mockReturnValue([
+    when(useIsFlex).calledWith('otie').thenReturn(false)
+    vi.mocked(usePipetteOffsetCalibrations).mockReturnValue([
       mockPipetteOffsetCalibration1,
       mockPipetteOffsetCalibration2,
       mockPipetteOffsetCalibration3,
     ])
-    mockUseAttachedPipettesFromInstrumentsQuery.mockReturnValue({
+    vi.mocked(useAttachedPipettesFromInstrumentsQuery).mockReturnValue({
       left: null,
       right: null,
     })
-    mockPipetteOffsetCalibrationItems.mockReturnValue(
+    vi.mocked(PipetteOffsetCalibrationItems).mockReturnValue(
       <div>PipetteOffsetCalibrationItems</div>
     )
   })
 
-  afterEach(() => {
-    jest.resetAllMocks()
-    resetAllWhenMocks()
-  })
-
   it('renders a title - Pipette Offset Calibrations', () => {
-    const [{ getByText }] = render()
-    getByText('Pipette Offset Calibrations')
-    getByText('PipetteOffsetCalibrationItems')
+    render()
+    screen.getByText('Pipette Offset Calibrations')
+    screen.getByText('PipetteOffsetCalibrationItems')
   })
 
-  it('renders an OT-3 title and description - Pipette Calibrations', () => {
-    when(mockUseIsFlex).calledWith('otie').mockReturnValue(true)
-    mockUseAttachedPipettesFromInstrumentsQuery.mockReturnValue({
+  it('renders a Flex title and description - Pipette Calibrations', () => {
+    when(useIsFlex).calledWith('otie').thenReturn(true)
+    vi.mocked(useAttachedPipettesFromInstrumentsQuery).mockReturnValue({
       left: mockAttachedPipetteInformation,
       right: null,
     })
-    const [{ getByText }] = render()
-    getByText('Pipette Calibrations')
-    getByText(
+    render()
+    screen.getByText('Pipette Calibrations')
+    screen.getByText(
       `Pipette calibration uses a metal probe to determine the pipette's exact position relative to precision-cut squares on deck slots.`
     )
-    getByText('PipetteOffsetCalibrationItems')
+    screen.getByText('PipetteOffsetCalibrationItems')
   })
 
   it('renders Not calibrated yet when no pipette offset calibrations data', () => {
-    mockUsePipetteOffsetCalibrations.mockReturnValue(null)
+    vi.mocked(usePipetteOffsetCalibrations).mockReturnValue(null)
     const [{ getByText }] = render()
     getByText('No pipette attached')
   })

@@ -35,10 +35,7 @@ async def test_save_position_implementation(
     subject = SavePositionImplementation(
         model_utils=mock_model_utils, gantry_mover=mock_gantry_mover
     )
-    params = SavePositionParams(
-        pipetteId="abc",
-        positionId="123",
-    )
+    params = SavePositionParams(pipetteId="abc", positionId="123", failOnNotHomed=True)
 
     decoy.when(mock_model_utils.ensure_id("123")).then_return("456")
 

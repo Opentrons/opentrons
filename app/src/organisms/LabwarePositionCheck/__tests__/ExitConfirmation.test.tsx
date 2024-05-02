@@ -1,7 +1,8 @@
 import * as React from 'react'
-import { resetAllWhenMocks } from 'jest-when'
-import { renderWithProviders } from '@opentrons/components'
+import { fireEvent, screen } from '@testing-library/react'
+import { describe, it, beforeEach, afterEach, expect, vi } from 'vitest'
 import { ExitConfirmation } from '../ExitConfirmation'
+import { renderWithProviders } from '../../../__testing-utils__'
 import { i18n } from '../../../i18n'
 
 const render = (props: React.ComponentProps<typeof ExitConfirmation>) => {
@@ -15,41 +16,40 @@ describe('ExitConfirmation', () => {
 
   beforeEach(() => {
     props = {
-      onGoBack: jest.fn(),
-      onConfirmExit: jest.fn(),
+      onGoBack: vi.fn(),
+      onConfirmExit: vi.fn(),
       shouldUseMetalProbe: false,
     }
   })
   afterEach(() => {
-    resetAllWhenMocks()
-    jest.restoreAllMocks()
+    vi.restoreAllMocks()
   })
   it('should render correct copy', () => {
-    const { getByText, getByRole } = render(props)
-    getByText('Exit before completing Labware Position Check?')
-    getByText(
+    render(props)
+    screen.getByText('Exit before completing Labware Position Check?')
+    screen.getByText(
       'If you exit now, all labware offsets will be discarded. This cannot be undone.'
     )
-    getByRole('button', { name: 'Exit' })
-    getByRole('button', { name: 'Go back' })
+    screen.getByRole('button', { name: 'Exit' })
+    screen.getByRole('button', { name: 'Go back' })
   })
   it('should invoke callback props when ctas are clicked', () => {
-    const { getByRole } = render(props)
-    getByRole('button', { name: 'Go back' }).click()
+    render(props)
+    fireEvent.click(screen.getByRole('button', { name: 'Go back' }))
     expect(props.onGoBack).toHaveBeenCalled()
-    getByRole('button', { name: 'Exit' }).click()
+    fireEvent.click(screen.getByRole('button', { name: 'Exit' }))
     expect(props.onConfirmExit).toHaveBeenCalled()
   })
   it('should render correct copy for golden tip LPC', () => {
-    const { getByText, getByRole } = render({
+    render({
       ...props,
       shouldUseMetalProbe: true,
     })
-    getByText('Remove the calibration probe before exiting')
-    getByText(
+    screen.getByText('Remove the calibration probe before exiting')
+    screen.getByText(
       'If you exit now, all labware offsets will be discarded. This cannot be undone.'
     )
-    getByRole('button', { name: 'Remove calibration probe' })
-    getByRole('button', { name: 'Go back' })
+    screen.getByRole('button', { name: 'Remove calibration probe' })
+    screen.getByRole('button', { name: 'Go back' })
   })
 })

@@ -1,0 +1,105 @@
+/* stylelint-disable */
+
+/* Full Keyboard has 4 layouts
+ 1. lower letter keys: hg-layout-default
+ 2. upper letter keys: hg-layout-shift
+ 3. number keys: hg-layout-numbers
+ 4. symbol keys: hg-layout-symbols
+ 1, 2 are using the same style but 3 & 4 have their own styles.
+ */
+
+.simple-keyboard.oddTheme1.hg-theme-default {
+  width: 100%;
+  height: 100%;
+  background-color: #cbcccc; /* grey35 */
+  font-family: 'Public Sans', sans-serif;
+  padding: 8px;
+}
+
+.hg-layout-default .hg-row,
+.hg-layout-shift .hg-row,
+.hg-layout-symbols .hg-row,
+.hg-layout-numbers .hg-row {
+  /* adding 3px because package's css add margin-right:5px */
+  grid-gap: 3px;
+}
+
+.simple-keyboard.simple-keyboard.oddTheme1 .hg-button:not(:last-child) {
+  margin-bottom: 3px;
+}
+
+.simple-keyboard .hg-button:active {
+  color: #16212d;
+  background-color: #dedede;
+}
+
+.hg-layout-default .hg-row .hg-button,
+.hg-layout-shift .hg-row .hg-button,
+.hg-layout-symbols .hg-row .hg-button,
+.hg-layout-numbers .hg-row .hg-button {
+  color: #16212d;
+  font-size: 20px;
+  font-style: normal;
+  font-weight: 600;
+  line-height: 24px;
+  background-color: #ffffff;
+  padding: 10px 22px;
+}
+
+.hg-layout-default .hg-row:nth-child(1) .hg-button,
+.hg-layout-default .hg-row:nth-child(2) .hg-button,
+.hg-layout-shift .hg-row:nth-child(1) .hg-button,
+.hg-layout-shift .hg-row:nth-child(2) .hg-button,
+.hg-layout-numbers .hg-row:nth-child(1) .hg-button {
+  width: 93.6px;
+}
+
+.hg-layout-numbers .hg-row:nth-child(2) .hg-button {
+  width: 83.4px;
+}
+
+.hg-layout-symbols .hg-row:nth-child(2) .hg-button {
+  width: 122.5px;
+}
+
+.hg-layout-numbers .hg-row:nth-child(2) .hg-button:nth-child(10) {
+  /* This is needed to override the package style */
+  max-width: 83.4px !important;
+}
+
+.hg-layout-numbers .hg-row:nth-child(2) .hg-button:first-child,
+.hg-layout-symbols .hg-row:nth-child(2) .hg-button:first-child {
+  width: 94px;
+}
+
+.hg-layout-default .hg-row:nth-child(3) .hg-button,
+.hg-layout-shift .hg-row:nth-child(3) .hg-button,
+.hg-layout-numbers .hg-row:nth-child(3) .hg-button,
+.hg-layout-symbols .hg-row:nth-child(3) .hg-button {
+  width: 97px;
+}
+
+/* .hg-layout-default .hg-row:nth-child(3) .hg-button,
+.hg-layout-shift .hg-row:nth-child(3) .hg-button {
+  width: 97px;
+} */
+
+.hg-layout-default .hg-row:nth-child(3) .hg-button:first-child,
+.hg-layout-default .hg-row:nth-child(3) .hg-button:last-child,
+.hg-layout-shift .hg-row:nth-child(3) .hg-button:first-child,
+.hg-layout-shift .hg-row:nth-child(3) .hg-button:last-child,
+.hg-layout-numbers .hg-row:nth-child(3) .hg-button:first-child,
+.hg-layout-numbers .hg-row:nth-child(3) .hg-button:last-child,
+.hg-layout-symbols .hg-row:nth-child(3) .hg-button:first-child,
+.hg-layout-symbols .hg-row:nth-child(3) .hg-button:last-child {
+  width: 132px;
+}
+
+.hg-layout-symbols .hg-row:nth-child(1) .hg-button {
+  width: 137.1px;
+}
+
+.simple-keyboard .hg-button:active {
+  color: #16212d;
+  background-color: #e3e3e3; /* grey30 */
+}

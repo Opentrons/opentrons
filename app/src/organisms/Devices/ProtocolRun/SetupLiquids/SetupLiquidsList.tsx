@@ -7,20 +7,21 @@ import {
 } from '@opentrons/api-client'
 
 import {
-  Flex,
-  SPACING,
-  Icon,
-  COLORS,
-  DIRECTION_ROW,
-  DIRECTION_COLUMN,
-  TYPOGRAPHY,
-  JUSTIFY_CENTER,
-  SIZE_1,
-  BORDERS,
   ALIGN_CENTER,
-  SIZE_AUTO,
+  BORDERS,
   Box,
+  COLORS,
+  DIRECTION_COLUMN,
+  DIRECTION_ROW,
+  Flex,
+  Icon,
+  JUSTIFY_CENTER,
   JUSTIFY_FLEX_START,
+  SIZE_1,
+  SIZE_AUTO,
+  SPACING,
+  StyledText,
+  TYPOGRAPHY,
 } from '@opentrons/components'
 import { getModuleDisplayName, MICRO_LITERS } from '@opentrons/shared-data'
 import {
@@ -29,7 +30,6 @@ import {
   ANALYTICS_OPEN_LIQUID_LABWARE_DETAIL_MODAL,
 } from '../../../../redux/analytics'
 import { useMostRecentCompletedAnalysis } from '../../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
-import { StyledText } from '../../../../atoms/text'
 import { getLocationInfoNames } from '../utils/getLocationInfoNames'
 import { LiquidsLabwareDetailsModal } from './LiquidsLabwareDetailsModal'
 import {
@@ -52,8 +52,18 @@ const HIDE_SCROLLBAR = css`
 const LIQUID_BORDER_STYLE = css`
   border-style: ${BORDERS.styleSolid};
   border-width: 1px;
-  border-color: ${COLORS.medGreyEnabled};
-  border-radius: ${BORDERS.radiusSoftCorners};
+  border-color: ${COLORS.grey30};
+  border-radius: ${BORDERS.borderRadius8};
+`
+
+export const CARD_OUTLINE_BORDER_STYLE = css`
+  border-style: ${BORDERS.styleSolid};
+  border-width: 1px;
+  border-color: ${COLORS.grey30};
+  border-radius: ${BORDERS.borderRadius8};
+  &:hover {
+    border-color: ${COLORS.grey55};
+  }
 `
 
 export function SetupLiquidsList(props: SetupLiquidsListProps): JSX.Element {
@@ -109,18 +119,18 @@ export function LiquidsListItem(props: LiquidsListItemProps): JSX.Element {
   const trackEvent = useTrackEvent()
 
   const LIQUID_CARD_STYLE = css`
-    ${BORDERS.cardOutlineBorder}
+    ${CARD_OUTLINE_BORDER_STYLE}
 
     &:hover {
       cursor: pointer;
-      border: 1px solid ${COLORS.medGreyHover};
+      border: 1px solid ${COLORS.grey35};
     }
   `
   const LIQUID_CARD_ITEM_STYLE = css`
     border: 1px solid ${COLORS.white};
     &:hover {
       cursor: pointer;
-      ${BORDERS.cardOutlineBorder}
+      border: 1px solid ${COLORS.grey30};
     }
   `
   const handleSetOpenItem = (): void => {
@@ -132,7 +142,7 @@ export function LiquidsListItem(props: LiquidsListItemProps): JSX.Element {
       css={LIQUID_CARD_STYLE}
       padding={SPACING.spacing16}
       onClick={handleSetOpenItem}
-      backgroundColor={openItem ? COLORS.fundamentalsBackground : COLORS.white}
+      backgroundColor={openItem ? COLORS.grey10 : COLORS.white}
       data-testid="LiquidsListItem_Row"
     >
       <LiquidsListItemDetails
@@ -235,7 +245,7 @@ export function LiquidsListItem(props: LiquidsListItemProps): JSX.Element {
                       <StyledText
                         as="p"
                         fontWeight={TYPOGRAPHY.fontWeightRegular}
-                        color={COLORS.darkGreyEnabled}
+                        color={COLORS.grey50}
                       >
                         {moduleModel != null
                           ? t('on_adapter_in_mod', {
@@ -259,7 +269,7 @@ export function LiquidsListItem(props: LiquidsListItemProps): JSX.Element {
                       liquidId,
                       labware.labwareId,
                       labwareByLiquidId
-                    )}{' '}
+                    ).toFixed(1)}{' '}
                     {MICRO_LITERS}
                   </StyledText>
                 </Flex>
@@ -311,15 +321,15 @@ export const LiquidsListItemDetails = (
         <StyledText
           as="p"
           fontWeight={TYPOGRAPHY.fontWeightRegular}
-          color={COLORS.darkGreyEnabled}
+          color={COLORS.grey60}
           marginX={SPACING.spacing16}
         >
           {description != null ? description : null}
         </StyledText>
       </Flex>
       <Flex
-        backgroundColor={COLORS.darkBlackEnabled + '1A'}
-        borderRadius={BORDERS.radiusSoftCorners}
+        backgroundColor={COLORS.black90 + '1A'}
+        borderRadius={BORDERS.borderRadius8}
         height="max-content"
         paddingY={SPACING.spacing4}
         paddingX={SPACING.spacing8}
@@ -327,7 +337,7 @@ export const LiquidsListItemDetails = (
         marginLeft={SIZE_AUTO}
       >
         <StyledText as="p" fontWeight={TYPOGRAPHY.fontWeightRegular}>
-          {getTotalVolumePerLiquidId(liquidId, labwareByLiquidId)}{' '}
+          {getTotalVolumePerLiquidId(liquidId, labwareByLiquidId).toFixed(1)}{' '}
           {MICRO_LITERS}
         </StyledText>
       </Flex>

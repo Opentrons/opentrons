@@ -3,7 +3,7 @@
 from typing import BinaryIO, Iterator, Tuple, Set
 import argparse
 
-import matplotlib.pyplot as pp  # type: ignore
+import matplotlib.pyplot as pp
 
 from opentrons_hardware.firmware_bindings.constants import NodeId
 

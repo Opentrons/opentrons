@@ -4,7 +4,7 @@ import { ensureDir } from 'fs-extra'
 import { readFile } from 'fs/promises'
 import StreamZip from 'node-stream-zip'
 import Semver from 'semver'
-import { UI_INITIALIZED } from '@opentrons/app/src/redux/shell/actions'
+import { UI_INITIALIZED } from '../constants'
 import { createLogger } from '../log'
 import {
   getLatestSystemUpdateUrls,
@@ -212,7 +212,9 @@ const getVersionFromZipIfValid = (path: string): Promise<FileDetails> =>
 const fakeReleaseNotesForMassStorage = (version: string): string => `
 # Opentrons Robot Software Version ${version}
 
-This update is from a USB mass storage device connected to your flex, and release notes cannot be shown.
+This update is from a USB mass storage device connected to your Flex, and release notes cannot be shown.
+
+Don't remove the USB mass storage device while the update is in progress.
 `
 
 export const getLatestMassStorageUpdateFiles = (

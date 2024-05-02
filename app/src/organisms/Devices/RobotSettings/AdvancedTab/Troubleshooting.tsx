@@ -6,17 +6,17 @@ import last from 'lodash/last'
 
 import { GET, request } from '@opentrons/api-client'
 import {
-  Flex,
   ALIGN_CENTER,
-  JUSTIFY_SPACE_BETWEEN,
   Box,
-  SPACING,
+  Flex,
+  JUSTIFY_SPACE_BETWEEN,
   SPACING_AUTO,
+  SPACING,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { useHost } from '@opentrons/react-api-client'
 
-import { StyledText } from '../../../../atoms/text'
 import { TertiaryButton } from '../../../../atoms/buttons'
 import { ERROR_TOAST, INFO_TOAST } from '../../../../atoms/Toast'
 import { useToaster } from '../../../../organisms/ToasterOven'
@@ -27,10 +27,12 @@ import type { IconProps } from '@opentrons/components'
 
 interface TroubleshootingProps {
   robotName: string
+  isEstopNotDisengaged: boolean
 }
 
 export function Troubleshooting({
   robotName,
+  isEstopNotDisengaged,
 }: TroubleshootingProps): JSX.Element {
   const { t } = useTranslation('device_settings')
   const robot = useRobot(robotName)
@@ -125,7 +127,10 @@ export function Troubleshooting({
       </Box>
       <TertiaryButton
         disabled={
-          controlDisabled || logsAvailable == null || isDownloadingRobotLogs
+          controlDisabled ||
+          logsAvailable == null ||
+          isDownloadingRobotLogs ||
+          isEstopNotDisengaged
         }
         marginLeft={SPACING_AUTO}
         onClick={handleClick}

@@ -68,7 +68,7 @@ pipette attached to the gantry, in relation to the deck
 """
 
 # TODO: BC 2020-07-08: type all command logic here with actual Model type
-COMMAND_HANDLER = Callable[..., Awaitable]
+COMMAND_HANDLER = Callable[..., Awaitable[None]]
 
 COMMAND_MAP = Dict[str, COMMAND_HANDLER]
 PipetteOffsetStateMachine = Union[
@@ -119,7 +119,7 @@ class PipetteOffsetCalibrationUserFlow:
 
         if perform_tip_length and has_calibration_block:
             self._load_calibration_block()
-            self._has_calibration_block = has_calibration_block
+            self._has_calibration_block: bool = has_calibration_block
         else:
             self._has_calibration_block = False
 
@@ -199,7 +199,7 @@ class PipetteOffsetCalibrationUserFlow:
             name=self._hw_pipette.name,
             tipLength=self._hw_pipette.active_tip_settings.default_tip_length,
             mount=str(self._mount),
-            serial=self._hw_pipette.pipette_id,  # type: ignore[arg-type]
+            serial=self._hw_pipette.pipette_id,
             defaultTipracks=self._default_tipracks,  # type: ignore[arg-type]
         )
 

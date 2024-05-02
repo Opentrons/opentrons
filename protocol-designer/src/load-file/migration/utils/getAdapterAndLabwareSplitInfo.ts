@@ -54,8 +54,8 @@ export const getAdapterAndLabwareSplitInfo = (
     labwareId.includes('opentrons_96_aluminumblock_biorad_wellplate_200ul')
   ) {
     return {
-      labwareUri: 'opentrons/opentrons_96_well_aluminum_block/1',
-      adapterUri: 'opentrons/biorad_96_wellplate_200ul_pcr/2',
+      adapterUri: 'opentrons/opentrons_96_well_aluminum_block/1',
+      labwareUri: 'opentrons/biorad_96_wellplate_200ul_pcr/2',
       labwareDisplayName: 'Bio-Rad 96 Well Plate 200 µL PCR',
       adapterDisplayName: 'Opentrons 96 Well Aluminum Block',
     }

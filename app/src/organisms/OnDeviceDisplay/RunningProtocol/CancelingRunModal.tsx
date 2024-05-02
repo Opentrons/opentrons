@@ -10,10 +10,10 @@ import {
   Icon,
   JUSTIFY_CENTER,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { Modal } from '../../../molecules/Modal'
-import { StyledText } from '../../../atoms/text'
 
 export function CancelingRunModal(): JSX.Element {
   const { t, i18n } = useTranslation('run_details')
@@ -24,8 +24,8 @@ export function CancelingRunModal(): JSX.Element {
         flexDirection={DIRECTION_COLUMN}
         justifyContent={JUSTIFY_CENTER}
         alignItems={ALIGN_CENTER}
-        backgroundColor={COLORS.darkBlack20}
-        borderRadius={BORDERS.borderRadiusSize3}
+        backgroundColor={COLORS.grey35}
+        borderRadius={BORDERS.borderRadius12}
         width="41.625rem"
         height="17.25rem"
         gridGap={SPACING.spacing24}
@@ -34,7 +34,7 @@ export function CancelingRunModal(): JSX.Element {
           name="ot-spinner"
           spin
           size="3.75rem"
-          color={COLORS.darkBlack70}
+          color={COLORS.grey60}
           aria-label="CancelingRunModal_icon"
         />
         <StyledText as="h4" fontWeight={TYPOGRAPHY.fontWeightBold}>

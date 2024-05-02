@@ -4,24 +4,25 @@ import { format } from 'date-fns'
 import { css } from 'styled-components'
 
 import {
-  Box,
-  Link,
-  Icon,
-  Flex,
-  SPACING,
-  COLORS,
-  TYPOGRAPHY,
+  ALIGN_CENTER,
   BORDERS,
+  Box,
+  COLORS,
   DIRECTION_COLUMN,
   DIRECTION_ROW,
+  Flex,
+  Icon,
   JUSTIFY_SPACE_BETWEEN,
-  ALIGN_CENTER,
+  Link,
+  OVERFLOW_WRAP_ANYWHERE,
   SIZE_1,
-  useHoverTooltip,
+  SPACING,
+  StyledText,
   TOOLTIP_TOP_START,
+  TYPOGRAPHY,
+  useHoverTooltip,
 } from '@opentrons/components'
 import { getUniqueWellProperties } from '@opentrons/shared-data'
-import { StyledText } from '../../atoms/text'
 import { Slideout } from '../../atoms/Slideout'
 import { Tooltip } from '../../atoms/Tooltip'
 import { getWellLabel } from './helpers/labels'
@@ -40,21 +41,21 @@ const CLOSE_ICON_STYLE = css`
   border-radius: 50%;
 
   &:hover {
-    background: ${COLORS.lightGreyHover};
+    background: ${COLORS.grey30};
   }
   &:active {
-    background: ${COLORS.lightGreyPressed};
+    background: ${COLORS.grey35};
   }
 `
 
 const COPY_ICON_STYLE = css`
   transform: translateY(${SPACING.spacing4});
   &:hover {
-    color: ${COLORS.blueEnabled};
+    color: ${COLORS.blue50};
   }
   &:active,
   &:focus {
-    color: ${COLORS.darkBlackEnabled};
+    color: ${COLORS.black90};
   }
 `
 
@@ -64,7 +65,7 @@ export interface LabwareDetailsProps {
 }
 
 export function LabwareDetails(props: LabwareDetailsProps): JSX.Element {
-  const { t } = useTranslation('labware_landing')
+  const { t } = useTranslation(['labware_landing', 'branded'])
   const { definition, modified, filename } = props.labware
   const { metadata, parameters, brand, wells, ordering } = definition
   const apiName = definition.parameters.loadName
@@ -122,17 +123,13 @@ export function LabwareDetails(props: LabwareDetailsProps): JSX.Element {
       </Flex>
       {!isCustomDefinition && (
         <Flex flexDirection={DIRECTION_ROW} alignItems={ALIGN_CENTER}>
-          <Icon
-            color={COLORS.blueEnabled}
-            name="check-decagram"
-            height=".7rem"
-          />{' '}
+          <Icon color={COLORS.blue50} name="check-decagram" height=".7rem" />{' '}
           <StyledText
             as="label"
             id="LabwareDetails_opentronsDef"
             marginLeft={SPACING.spacing4}
           >
-            {t('opentrons_def')}
+            {t('branded:opentrons_def')}
           </StyledText>
         </Flex>
       )}
@@ -145,7 +142,7 @@ export function LabwareDetails(props: LabwareDetailsProps): JSX.Element {
         >
           <StyledText
             as="label"
-            color={COLORS.darkGreyEnabled}
+            color={COLORS.grey50}
             id="LabwareDetails_dateAdded"
           >
             {t('last_updated')} {format(new Date(modified), 'MM/dd/yyyy')}
@@ -163,14 +160,20 @@ export function LabwareDetails(props: LabwareDetailsProps): JSX.Element {
     <Slideout onCloseClick={props.onClose} title={slideoutHeader} isExpanded>
       <Gallery definition={definition} />
       <Box
-        backgroundColor={COLORS.fundamentalsBackground}
+        backgroundColor={COLORS.grey20}
         padding={SPACING.spacing16}
         marginBottom={SPACING.spacing24}
+        borderRadius={BORDERS.borderRadius4}
       >
         <StyledText as="h6">{t('api_name')}</StyledText>
-        <Link css={TYPOGRAPHY.pRegular} onClick={handleCopy} role="button">
-          <Flex overflowWrap="anywhere">
-            <Box fontSize={TYPOGRAPHY.fontSizeP} color={COLORS.black}>
+        <Link
+          css={TYPOGRAPHY.pRegular}
+          onClick={handleCopy}
+          role="button"
+          aria-label="copy"
+        >
+          <Flex overflowWrap={OVERFLOW_WRAP_ANYWHERE}>
+            <Box fontSize={TYPOGRAPHY.fontSizeP} color={COLORS.black90}>
               {apiName}
               <span {...targetProps}>
                 <Icon size={SIZE_1} name="copy-text" css={COPY_ICON_STYLE} />
@@ -184,7 +187,7 @@ export function LabwareDetails(props: LabwareDetailsProps): JSX.Element {
           )}
         </Link>
       </Box>
-      <Box border={BORDERS.lineBorder}>
+      <Box border={BORDERS.lineBorder} borderRadius={BORDERS.borderRadius4}>
         <Box padding={SPACING.spacing16}>
           <WellCount
             wellLabel={getWellLabel(definition)}

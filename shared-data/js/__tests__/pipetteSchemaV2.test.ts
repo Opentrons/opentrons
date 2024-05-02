@@ -1,6 +1,7 @@
 import Ajv from 'ajv'
 import glob from 'glob'
 import path from 'path'
+import { describe, expect, it } from 'vitest'
 
 import liquidSpecsSchema from '../../pipette/schemas/2/pipetteLiquidPropertiesSchema.json'
 import geometrySpecsSchema from '../../pipette/schemas/2/pipetteGeometrySchema.json'
@@ -13,12 +14,12 @@ const allGeometryDefinitions = path.join(
 
 const allGeneralDefinitions = path.join(
   __dirname,
-  '../../labware/definitions/2/general/**/**/*.json'
+  '../../pipette/definitions/2/general/**/**/*.json'
 )
 
 const allLiquidDefinitions = path.join(
   __dirname,
-  '../../labware/definitions/2/liquid/**/**/*.json'
+  '../../pipette/definitions/2/liquid/**/**/*.json'
 )
 
 const ajv = new Ajv({ allErrors: true, jsonPointers: true })
@@ -29,11 +30,8 @@ const validateGeneralSpecs = ajv.compile(generalSpecsSchema)
 
 describe('test schema against all liquid specs definitions', () => {
   const liquidPaths = glob.sync(allLiquidDefinitions)
-
-  beforeAll(() => {
-    // Make sure definitions path didn't break, which would give you false positives
-    expect(liquidPaths.length).toBeGreaterThan(0)
-  })
+  // Make sure definitions path didn't break, which would give you false positives
+  expect(liquidPaths.length).toBeGreaterThan(0)
 
   liquidPaths.forEach(liquidPath => {
     const liquidDef = require(liquidPath)
@@ -45,9 +43,15 @@ describe('test schema against all liquid specs definitions', () => {
       expect(valid).toBe(true)
     })
 
-    it(`parent dir matches pipette model: ${liquidPath}`, () => {
-      expect(['p10', 'p20', 'p50', 'p300', 'p1000']).toContain(
+    it(`parent dir matches a liquid class: ${liquidPath}`, () => {
+      expect(['default', 'lowVolumeDefault']).toContain(
         path.basename(path.dirname(liquidPath))
+      )
+    })
+
+    it(`second parent dir matches pipette model: ${liquidPath}`, () => {
+      expect(['p10', 'p20', 'p50', 'p300', 'p1000']).toContain(
+        path.basename(path.dirname(path.dirname(liquidPath)))
       )
     })
   })
@@ -55,12 +59,8 @@ describe('test schema against all liquid specs definitions', () => {
 
 describe('test schema against all geometry specs definitions', () => {
   const geometryPaths = glob.sync(allGeometryDefinitions)
-
-  beforeAll(() => {
-    // Make sure definitions path didn't break, which would give you false positives
-    expect(geometryPaths.length).toBeGreaterThan(0)
-  })
-
+  // Make sure definitions path didn't break, which would give you false positives
+  expect(geometryPaths.length).toBeGreaterThan(0)
   geometryPaths.forEach(geometryPath => {
     const geometryDef = require(geometryPath)
     const geometryParentDir = path.dirname(geometryPath)
@@ -88,16 +88,11 @@ describe('test schema against all geometry specs definitions', () => {
 
 describe('test schema against all general specs definitions', () => {
   const generalPaths = glob.sync(allGeneralDefinitions)
-
-  beforeAll(() => {
-    // Make sure definitions path didn't break, which would give you false positives
-    expect(generalPaths.length).toBeGreaterThan(0)
-  })
+  expect(generalPaths.length).toBeGreaterThan(0)
 
   generalPaths.forEach(generalPath => {
-    const generalDef = require(generalPath)
-
     it(`${generalPath} validates against schema`, () => {
+      const generalDef = require(generalPath)
       const valid = validateGeneralSpecs(generalDef)
       const validationErrors = validateGeneralSpecs.errors
       expect(validationErrors).toBe(null)

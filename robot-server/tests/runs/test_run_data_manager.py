@@ -1,5 +1,5 @@
 """Tests for RunDataManager."""
-from typing import Optional
+from typing import Optional, List
 
 import pytest
 from datetime import datetime
@@ -21,20 +21,32 @@ from opentrons.protocol_engine import (
     LabwareOffset,
 )
 
-from robot_server.protocols import ProtocolResource
+from robot_server.protocols.protocol_store import ProtocolResource
 from robot_server.runs.engine_store import EngineStore, EngineConflictError
-from robot_server.runs.run_data_manager import RunDataManager, RunNotCurrentError
-from robot_server.runs.run_models import Run, RunNotFoundError
+from robot_server.runs.run_data_manager import (
+    RunDataManager,
+    RunNotCurrentError,
+    PreSerializedCommandsNotAvailableError,
+)
+from robot_server.runs.run_models import Run, BadRun, RunNotFoundError, RunDataError
 from robot_server.runs.run_store import (
     RunStore,
     RunResource,
     CommandNotFoundError,
+    BadStateSummary,
 )
 from robot_server.service.task_runner import TaskRunner
+from robot_server.service.notifications import RunsPublisher
 
 from opentrons.protocol_engine import Liquid
 
 from opentrons_shared_data.labware.labware_definition import LabwareDefinition
+from opentrons_shared_data.errors.exceptions import InvalidStoredData
+
+
+def mock_notify_publishers() -> None:
+    """A mock notify_publishers."""
+    return None
 
 
 @pytest.fixture
@@ -57,6 +69,12 @@ def mock_task_runner(decoy: Decoy) -> TaskRunner:
     return decoy.mock(cls=TaskRunner)
 
 
+@pytest.fixture()
+def mock_runs_publisher(decoy: Decoy) -> RunsPublisher:
+    """Get a mock RunsPublisher."""
+    return decoy.mock(cls=RunsPublisher)
+
+
 @pytest.fixture
 def engine_state_summary() -> StateSummary:
     """Get a StateSummary value object."""
@@ -71,10 +89,24 @@ def engine_state_summary() -> StateSummary:
     )
 
 
+@pytest.fixture()
+def run_time_parameters() -> List[pe_types.RunTimeParameter]:
+    """Get a RunTimeParameter list."""
+    return [
+        pe_types.BooleanParameter(
+            displayName="Display Name",
+            variableName="variable_name",
+            value=False,
+            default=True,
+        )
+    ]
+
+
 @pytest.fixture
 def run_resource() -> RunResource:
     """Get a StateSummary value object."""
     return RunResource(
+        ok=True,
         run_id="hello from the other side",
         protocol_id=None,
         created_at=datetime(year=2022, month=2, day=2),
@@ -99,12 +131,14 @@ def subject(
     mock_engine_store: EngineStore,
     mock_run_store: RunStore,
     mock_task_runner: TaskRunner,
+    mock_runs_publisher: RunsPublisher,
 ) -> RunDataManager:
     """Get a RunDataManager test subject."""
     return RunDataManager(
         engine_store=mock_engine_store,
         run_store=mock_run_store,
         task_runner=mock_task_runner,
+        runs_publisher=mock_runs_publisher,
     )
 
 
@@ -121,7 +155,14 @@ async def test_create(
     created_at = datetime(year=2021, month=1, day=1)
 
     decoy.when(
-        await mock_engine_store.create(run_id=run_id, labware_offsets=[], protocol=None)
+        await mock_engine_store.create(
+            run_id=run_id,
+            labware_offsets=[],
+            protocol=None,
+            deck_configuration=[],
+            run_time_param_values=None,
+            notify_publishers=mock_notify_publishers,
+        )
     ).then_return(engine_state_summary)
     decoy.when(
         mock_run_store.insert(
@@ -136,6 +177,9 @@ async def test_create(
         created_at=created_at,
         labware_offsets=[],
         protocol=None,
+        deck_configuration=[],
+        run_time_param_values=None,
+        notify_publishers=mock_notify_publishers,
     )
 
     assert result == Run(
@@ -162,7 +206,7 @@ async def test_create_with_options(
     engine_state_summary: StateSummary,
     run_resource: RunResource,
 ) -> None:
-    """It should handle creation with a protocol and labware offsets."""
+    """It should handle creation with a protocol, labware offsets and parameters."""
     run_id = "hello world"
     created_at = datetime(year=2021, month=1, day=1)
 
@@ -184,6 +228,9 @@ async def test_create_with_options(
             run_id=run_id,
             labware_offsets=[labware_offset],
             protocol=protocol,
+            deck_configuration=[],
+            run_time_param_values={"foo": "bar"},
+            notify_publishers=mock_notify_publishers,
         )
     ).then_return(engine_state_summary)
 
@@ -200,6 +247,9 @@ async def test_create_with_options(
         created_at=created_at,
         labware_offsets=[labware_offset],
         protocol=protocol,
+        deck_configuration=[],
+        run_time_param_values={"foo": "bar"},
+        notify_publishers=mock_notify_publishers,
     )
 
     assert result == Run(
@@ -229,7 +279,14 @@ async def test_create_engine_error(
     created_at = datetime(year=2021, month=1, day=1)
 
     decoy.when(
-        await mock_engine_store.create(run_id, labware_offsets=[], protocol=None)
+        await mock_engine_store.create(
+            run_id,
+            labware_offsets=[],
+            protocol=None,
+            deck_configuration=[],
+            run_time_param_values=None,
+            notify_publishers=mock_notify_publishers,
+        )
     ).then_raise(EngineConflictError("oh no"))
 
     with pytest.raises(EngineConflictError):
@@ -238,6 +295,9 @@ async def test_create_engine_error(
             created_at=created_at,
             labware_offsets=[],
             protocol=None,
+            deck_configuration=[],
+            run_time_param_values=None,
+            notify_publishers=mock_notify_publishers,
         )
 
     decoy.verify(
@@ -256,6 +316,7 @@ async def test_get_current_run(
     mock_run_store: RunStore,
     subject: RunDataManager,
     engine_state_summary: StateSummary,
+    run_time_parameters: List[pe_types.RunTimeParameter],
     run_resource: RunResource,
 ) -> None:
     """It should get the current run from the engine."""
@@ -265,6 +326,9 @@ async def test_get_current_run(
     decoy.when(mock_engine_store.current_run_id).then_return(run_id)
     decoy.when(mock_engine_store.engine.state_view.get_summary()).then_return(
         engine_state_summary
+    )
+    decoy.when(mock_engine_store.runner.run_time_parameters).then_return(
+        run_time_parameters
     )
 
     result = subject.get(run_id=run_id)
@@ -282,6 +346,7 @@ async def test_get_current_run(
         pipettes=engine_state_summary.pipettes,
         modules=engine_state_summary.modules,
         liquids=engine_state_summary.liquids,
+        runTimeParameters=run_time_parameters,
     )
     assert subject.current_run_id == run_id
 
@@ -292,6 +357,7 @@ async def test_get_historical_run(
     mock_run_store: RunStore,
     subject: RunDataManager,
     engine_state_summary: StateSummary,
+    run_time_parameters: List[pe_types.RunTimeParameter],
     run_resource: RunResource,
 ) -> None:
     """It should get a historical run from the store."""
@@ -300,6 +366,9 @@ async def test_get_historical_run(
     decoy.when(mock_run_store.get(run_id=run_id)).then_return(run_resource)
     decoy.when(mock_run_store.get_state_summary(run_id=run_id)).then_return(
         engine_state_summary
+    )
+    decoy.when(mock_run_store.get_run_time_parameters(run_id=run_id)).then_return(
+        run_time_parameters
     )
     decoy.when(mock_engine_store.current_run_id).then_return("some other id")
 
@@ -318,6 +387,7 @@ async def test_get_historical_run(
         pipettes=engine_state_summary.pipettes,
         modules=engine_state_summary.modules,
         liquids=engine_state_summary.liquids,
+        runTimeParameters=run_time_parameters,
     )
 
 
@@ -327,17 +397,26 @@ async def test_get_historical_run_no_data(
     mock_run_store: RunStore,
     subject: RunDataManager,
     run_resource: RunResource,
+    run_time_parameters: List[pe_types.RunTimeParameter],
 ) -> None:
     """It should get a historical run from the store."""
     run_id = "hello world"
 
+    state_exc = InvalidStoredData("Oh no!")
+    run_error = RunDataError.from_exc(state_exc)
     decoy.when(mock_run_store.get(run_id=run_id)).then_return(run_resource)
-    decoy.when(mock_run_store.get_state_summary(run_id=run_id)).then_return(None)
+    decoy.when(mock_run_store.get_state_summary(run_id=run_id)).then_return(
+        BadStateSummary(dataError=state_exc)
+    )
+    decoy.when(mock_run_store.get_run_time_parameters(run_id=run_id)).then_return(
+        run_time_parameters
+    )
     decoy.when(mock_engine_store.current_run_id).then_return("some other id")
 
     result = subject.get(run_id=run_id)
 
-    assert result == Run(
+    assert result == BadRun(
+        dataError=run_error,
         current=False,
         id=run_resource.run_id,
         protocolId=run_resource.protocol_id,
@@ -350,6 +429,7 @@ async def test_get_historical_run_no_data(
         pipettes=[],
         modules=[],
         liquids=[],
+        runTimeParameters=run_time_parameters,
     )
 
 
@@ -369,6 +449,14 @@ async def test_get_all_runs(
         modules=[LoadedModule.construct(id="current-module-id")],  # type: ignore[call-arg]
         liquids=[Liquid(id="some-liquid-id", displayName="liquid", description="desc")],
     )
+    current_run_time_parameters: List[pe_types.RunTimeParameter] = [
+        pe_types.BooleanParameter(
+            displayName="Current Bool",
+            variableName="current bool",
+            value=False,
+            default=True,
+        )
+    ]
 
     historical_run_data = StateSummary(
         status=EngineStatus.STOPPED,
@@ -379,8 +467,17 @@ async def test_get_all_runs(
         modules=[LoadedModule.construct(id="old-module-id")],  # type: ignore[call-arg]
         liquids=[],
     )
+    historical_run_time_parameters: List[pe_types.RunTimeParameter] = [
+        pe_types.BooleanParameter(
+            displayName="Old Bool",
+            variableName="Old bool",
+            value=True,
+            default=False,
+        )
+    ]
 
     current_run_resource = RunResource(
+        ok=True,
         run_id="current-run",
         protocol_id=None,
         created_at=datetime(year=2022, month=2, day=2),
@@ -388,6 +485,7 @@ async def test_get_all_runs(
     )
 
     historical_run_resource = RunResource(
+        ok=True,
         run_id="historical-run",
         protocol_id=None,
         created_at=datetime(year=2023, month=3, day=3),
@@ -398,8 +496,14 @@ async def test_get_all_runs(
     decoy.when(mock_engine_store.engine.state_view.get_summary()).then_return(
         current_run_data
     )
+    decoy.when(mock_engine_store.runner.run_time_parameters).then_return(
+        current_run_time_parameters
+    )
     decoy.when(mock_run_store.get_state_summary("historical-run")).then_return(
         historical_run_data
+    )
+    decoy.when(mock_run_store.get_run_time_parameters("historical-run")).then_return(
+        historical_run_time_parameters
     )
     decoy.when(mock_run_store.get_all(length=20)).then_return(
         [historical_run_resource, current_run_resource]
@@ -421,6 +525,7 @@ async def test_get_all_runs(
             pipettes=historical_run_data.pipettes,
             modules=historical_run_data.modules,
             liquids=historical_run_data.liquids,
+            runTimeParameters=historical_run_time_parameters,
         ),
         Run(
             current=True,
@@ -435,6 +540,7 @@ async def test_get_all_runs(
             pipettes=current_run_data.pipettes,
             modules=current_run_data.modules,
             liquids=current_run_data.liquids,
+            runTimeParameters=current_run_time_parameters,
         ),
     ]
 
@@ -476,17 +582,23 @@ async def test_delete_historical_run(
 async def test_update_current(
     decoy: Decoy,
     engine_state_summary: StateSummary,
+    run_time_parameters: List[pe_types.RunTimeParameter],
     run_resource: RunResource,
     run_command: commands.Command,
     mock_engine_store: EngineStore,
     mock_run_store: RunStore,
+    mock_runs_publisher: RunsPublisher,
     subject: RunDataManager,
 ) -> None:
     """It should persist the current run and clear the engine on current=false."""
     run_id = "hello world"
     decoy.when(mock_engine_store.current_run_id).then_return(run_id)
     decoy.when(await mock_engine_store.clear()).then_return(
-        RunResult(commands=[run_command], state_summary=engine_state_summary)
+        RunResult(
+            commands=[run_command],
+            state_summary=engine_state_summary,
+            parameters=run_time_parameters,
+        )
     )
 
     decoy.when(
@@ -494,11 +606,16 @@ async def test_update_current(
             run_id=run_id,
             summary=engine_state_summary,
             commands=[run_command],
+            run_time_parameters=run_time_parameters,
         )
     ).then_return(run_resource)
 
     result = await subject.update(run_id=run_id, current=False)
 
+    decoy.verify(
+        await mock_runs_publisher.publish_pre_serialized_commands_notification(run_id),
+        times=1,
+    )
     assert result == Run(
         current=False,
         id=run_resource.run_id,
@@ -512,6 +629,7 @@ async def test_update_current(
         pipettes=engine_state_summary.pipettes,
         modules=engine_state_summary.modules,
         liquids=engine_state_summary.liquids,
+        runTimeParameters=run_time_parameters,
     )
 
 
@@ -519,10 +637,12 @@ async def test_update_current(
 async def test_update_current_noop(
     decoy: Decoy,
     engine_state_summary: StateSummary,
+    run_time_parameters: List[pe_types.RunTimeParameter],
     run_resource: RunResource,
     run_command: commands.Command,
     mock_engine_store: EngineStore,
     mock_run_store: RunStore,
+    mock_runs_publisher: RunsPublisher,
     subject: RunDataManager,
     current: Optional[bool],
 ) -> None:
@@ -531,6 +651,9 @@ async def test_update_current_noop(
     decoy.when(mock_engine_store.current_run_id).then_return(run_id)
     decoy.when(mock_engine_store.engine.state_view.get_summary()).then_return(
         engine_state_summary
+    )
+    decoy.when(mock_engine_store.runner.run_time_parameters).then_return(
+        run_time_parameters
     )
     decoy.when(mock_run_store.get(run_id=run_id)).then_return(run_resource)
 
@@ -542,7 +665,9 @@ async def test_update_current_noop(
             run_id=run_id,
             summary=matchers.Anything(),
             commands=matchers.Anything(),
+            run_time_parameters=matchers.Anything(),
         ),
+        await mock_runs_publisher.publish_pre_serialized_commands_notification(run_id),
         times=0,
     )
 
@@ -559,6 +684,7 @@ async def test_update_current_noop(
         pipettes=engine_state_summary.pipettes,
         modules=engine_state_summary.modules,
         liquids=engine_state_summary.liquids,
+        runTimeParameters=run_time_parameters,
     )
 
 
@@ -582,6 +708,7 @@ async def test_update_current_not_allowed(
 async def test_create_archives_existing(
     decoy: Decoy,
     engine_state_summary: StateSummary,
+    run_time_parameters: List[pe_types.RunTimeParameter],
     run_resource: RunResource,
     run_command: commands.Command,
     mock_engine_store: EngineStore,
@@ -594,7 +721,11 @@ async def test_create_archives_existing(
 
     decoy.when(mock_engine_store.current_run_id).then_return(run_id_old)
     decoy.when(await mock_engine_store.clear()).then_return(
-        RunResult(commands=[run_command], state_summary=engine_state_summary)
+        RunResult(
+            commands=[run_command],
+            state_summary=engine_state_summary,
+            parameters=run_time_parameters,
+        )
     )
 
     decoy.when(
@@ -602,6 +733,9 @@ async def test_create_archives_existing(
             run_id=run_id_new,
             labware_offsets=[],
             protocol=None,
+            deck_configuration=[],
+            run_time_param_values=None,
+            notify_publishers=mock_notify_publishers,
         )
     ).then_return(engine_state_summary)
 
@@ -618,6 +752,9 @@ async def test_create_archives_existing(
         created_at=datetime(year=2021, month=1, day=1),
         labware_offsets=[],
         protocol=None,
+        deck_configuration=[],
+        run_time_param_values=None,
+        notify_publishers=mock_notify_publishers,
     )
 
     decoy.verify(
@@ -625,6 +762,7 @@ async def test_create_archives_existing(
             run_id=run_id_old,
             summary=engine_state_summary,
             commands=[run_command],
+            run_time_parameters=run_time_parameters,
         )
     )
 
@@ -803,6 +941,38 @@ def test_get_command_from_db_command_not_found(
 
     with pytest.raises(CommandNotFoundError):
         subject.get_command("run-id", "command-id")
+
+
+def test_get_all_commands_as_preserialized_list(
+    decoy: Decoy,
+    subject: RunDataManager,
+    mock_run_store: RunStore,
+    mock_engine_store: EngineStore,
+) -> None:
+    """It should return the pre-serialized commands list."""
+    decoy.when(mock_engine_store.current_run_id).then_return(None)
+    decoy.when(
+        mock_run_store.get_all_commands_as_preserialized_list("run-id")
+    ).then_return(['{"id": command-1}', '{"id": command-2}'])
+    assert subject.get_all_commands_as_preserialized_list("run-id") == [
+        '{"id": command-1}',
+        '{"id": command-2}',
+    ]
+
+
+def test_get_all_commands_as_preserialized_list_errors_for_active_runs(
+    decoy: Decoy,
+    subject: RunDataManager,
+    mock_run_store: RunStore,
+    mock_engine_store: EngineStore,
+) -> None:
+    """It should raise an error when fetching pre-serialized commands list while run is active."""
+    decoy.when(mock_engine_store.current_run_id).then_return("current-run-id")
+    decoy.when(
+        mock_engine_store.engine.state_view.commands.get_is_terminal()
+    ).then_return(False)
+    with pytest.raises(PreSerializedCommandsNotAvailableError):
+        subject.get_all_commands_as_preserialized_list("current-run-id")
 
 
 async def test_get_current_run_labware_definition(

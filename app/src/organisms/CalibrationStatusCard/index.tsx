@@ -3,22 +3,22 @@ import { useTranslation } from 'react-i18next'
 import { Link as RouterLink } from 'react-router-dom'
 
 import {
-  Flex,
-  Link,
-  SPACING,
-  TYPOGRAPHY,
+  ALIGN_CENTER,
+  ALIGN_FLEX_START,
   BORDERS,
   COLORS,
-  JUSTIFY_SPACE_BETWEEN,
   DIRECTION_COLUMN,
-  ALIGN_CENTER,
+  Flex,
   JUSTIFY_CENTER,
-  ALIGN_FLEX_START,
+  JUSTIFY_SPACE_BETWEEN,
+  Link,
+  SPACING,
+  StyledText,
+  TYPOGRAPHY,
 } from '@opentrons/components'
 
 import { TertiaryButton } from '../../atoms/buttons'
 import { StatusLabel } from '../../atoms/StatusLabel'
-import { StyledText } from '../../atoms/text'
 
 import { useCalibrationTaskList } from '../Devices/hooks'
 
@@ -37,21 +37,24 @@ export function CalibrationStatusCard({
   const { taskListStatus } = useCalibrationTaskList()
 
   // start off assuming we are missing calibrations
-  let statusLabelBackgroundColor: string = COLORS.errorEnabled
-  let statusLabelIconColor: string = COLORS.errorEnabled
+  let statusLabelBackgroundColor: string = COLORS.red30
+  let statusLabelIconColor: string = COLORS.red60
   let statusLabelText = t('missing_calibration_data')
+  let statusLabelTextColor = COLORS.red60
 
   // if the tasklist is empty, though, all calibrations are good
   if (taskListStatus === 'complete') {
-    statusLabelBackgroundColor = COLORS.successEnabled
-    statusLabelIconColor = COLORS.successEnabled
+    statusLabelBackgroundColor = COLORS.green30
+    statusLabelIconColor = COLORS.green60
     statusLabelText = t('calibration_complete')
+    statusLabelTextColor = COLORS.green60
     // if we have tasks and they are all marked bad, then we should
     // strongly suggest they re-do those calibrations
   } else if (taskListStatus === 'bad') {
-    statusLabelBackgroundColor = COLORS.warningEnabled
-    statusLabelIconColor = COLORS.warningEnabled
+    statusLabelBackgroundColor = COLORS.yellow30
+    statusLabelIconColor = COLORS.yellow60
     statusLabelText = t('calibration_recommended')
+    statusLabelTextColor = COLORS.yellow60
   }
 
   return (
@@ -59,7 +62,7 @@ export function CalibrationStatusCard({
       alignItems={ALIGN_CENTER}
       justifyContent={JUSTIFY_SPACE_BETWEEN}
       border={BORDERS.lineBorder}
-      borderRadius={BORDERS.radiusSoftCorners}
+      borderRadius={BORDERS.borderRadius4}
       padding={SPACING.spacing16}
     >
       <Flex
@@ -75,11 +78,9 @@ export function CalibrationStatusCard({
           </StyledText>
           <StatusLabel
             status={statusLabelText}
-            backgroundColor={`${String(statusLabelBackgroundColor)}${String(
-              COLORS.opacity12HexCode
-            )}`}
+            backgroundColor={statusLabelBackgroundColor}
             iconColor={statusLabelIconColor}
-            textColor={COLORS.darkBlackEnabled}
+            textColor={statusLabelTextColor}
             fontWeight={TYPOGRAPHY.fontWeightSemiBold}
             iconSize="0.313rem"
           />

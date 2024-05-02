@@ -1,27 +1,25 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
+import { useAllProtocolsQuery } from '@opentrons/react-api-client'
 import {
-  useAllRunsQuery,
-  useAllProtocolsQuery,
-} from '@opentrons/react-api-client'
-import {
-  Flex,
   ALIGN_CENTER,
   ALIGN_FLEX_START,
   BORDERS,
   COLORS,
   DIRECTION_COLUMN,
+  DISPLAY_FLEX,
+  Flex,
   JUSTIFY_SPACE_AROUND,
   SIZE_4,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
-  DISPLAY_FLEX,
 } from '@opentrons/components'
 
-import { StyledText } from '../../atoms/text'
 import { useCurrentRunId } from '../ProtocolUpload/hooks'
 import { HistoricalProtocolRun } from './HistoricalProtocolRun'
 import { useIsRobotViewable, useRunStatuses } from './hooks'
+import { useNotifyAllRunsQuery } from '../../resources/runs'
 
 interface RecentProtocolRunsProps {
   robotName: string
@@ -32,7 +30,7 @@ export function RecentProtocolRuns({
 }: RecentProtocolRunsProps): JSX.Element | null {
   const { t } = useTranslation(['device_details', 'shared'])
   const isRobotViewable = useIsRobotViewable(robotName)
-  const runsQueryResponse = useAllRunsQuery()
+  const runsQueryResponse = useNotifyAllRunsQuery()
   const runs = runsQueryResponse?.data?.data
   const protocols = useAllProtocolsQuery()
   const currentRunId = useCurrentRunId()
@@ -43,8 +41,7 @@ export function RecentProtocolRuns({
     <Flex
       alignItems={ALIGN_FLEX_START}
       backgroundColor={COLORS.white}
-      border={BORDERS.lineBorder}
-      borderRadius={BORDERS.radiusSoftCorners}
+      borderRadius={BORDERS.borderRadius8}
       flexDirection={DIRECTION_COLUMN}
       gridGap={SPACING.spacing16}
       padding={`0 0 ${SPACING.spacing8}`}
@@ -146,7 +143,7 @@ export function RecentProtocolRuns({
           <StyledText
             as="p"
             alignItems={ALIGN_CENTER}
-            color={COLORS.errorDisabled}
+            color={COLORS.grey50}
             display={DISPLAY_FLEX}
             flex="1 0"
             id="RecentProtocolRuns_offline"

@@ -1,50 +1,54 @@
 import * as React from 'react'
 import styled, { css } from 'styled-components'
 import { useTranslation } from 'react-i18next'
+
 import {
-  Flex,
-  SPACING,
-  DIRECTION_COLUMN,
-  TYPOGRAPHY,
-  DIRECTION_ROW,
-  COLORS,
-  BORDERS,
-  JUSTIFY_CENTER,
   ALIGN_CENTER,
-  RESPONSIVENESS,
-  JUSTIFY_FLEX_START,
+  BORDERS,
+  COLORS,
+  DIRECTION_COLUMN,
+  DIRECTION_ROW,
   DISPLAY_INLINE_BLOCK,
+  Flex,
+  JUSTIFY_CENTER,
+  JUSTIFY_FLEX_END,
+  JUSTIFY_FLEX_START,
+  JUSTIFY_SPACE_AROUND,
   JUSTIFY_SPACE_BETWEEN,
   PrimaryButton,
-  JUSTIFY_FLEX_END,
-  POSITION_ABSOLUTE,
+  RESPONSIVENESS,
+  SPACING,
+  StyledText,
+  TYPOGRAPHY,
 } from '@opentrons/components'
-import { StyledText } from '../../atoms/text'
+
 import { SmallButton, MediumButton } from '../../atoms/buttons'
-// import { NeedHelpLink } from '../CalibrationPanels'
+import { InProgressModal } from '../../molecules/InProgressModal/InProgressModal'
 
 import blowoutVideo from '../../assets/videos/droptip-wizard/Blowout-Liquid.webm'
 import droptipVideo from '../../assets/videos/droptip-wizard/Drop-tip.webm'
 
-// TODO: get help link article URL
-// const NEED_HELP_URL = ''
-
 interface BeforeBeginningProps {
-  handleCreateAndSetup: (shouldDispenseLiquid: boolean) => void
-  isCreateLoading: boolean
+  setShouldDispenseLiquid: (shouldDispenseLiquid: boolean) => void
+  createdMaintenanceRunId: string | null
   isOnDevice: boolean
 }
 
 export const BeforeBeginning = (
   props: BeforeBeginningProps
 ): JSX.Element | null => {
-  const { handleCreateAndSetup, isCreateLoading, isOnDevice } = props
+  const { setShouldDispenseLiquid, createdMaintenanceRunId, isOnDevice } = props
   const { i18n, t } = useTranslation(['drop_tip_wizard', 'shared'])
   const [flowType, setFlowType] = React.useState<
     'liquid_and_tips' | 'only_tips' | null
   >(null)
+
   const handleProceed = (): void => {
-    handleCreateAndSetup(flowType === 'liquid_and_tips')
+    setShouldDispenseLiquid(flowType === 'liquid_and_tips')
+  }
+
+  if (createdMaintenanceRunId == null) {
+    return <InProgressModal description={t('getting_ready')} />
   }
 
   if (isOnDevice) {
@@ -91,7 +95,7 @@ export const BeforeBeginning = (
           <SmallButton
             buttonText={i18n.format(t('shared:continue'), 'capitalize')}
             onClick={handleProceed}
-            disabled={isCreateLoading || flowType == null}
+            disabled={flowType == null}
           />
         </Flex>
       </Flex>
@@ -100,9 +104,13 @@ export const BeforeBeginning = (
     return (
       <Flex css={TILE_CONTAINER_STYLE}>
         <Title>{t('before_you_begin_do_you_want_to_blowout')}</Title>
-        <Flex flexDirection={DIRECTION_ROW} gridGap={SPACING.spacing24}>
+        <Flex
+          justifyContent={JUSTIFY_SPACE_AROUND}
+          alignItems={ALIGN_CENTER}
+          marginTop={SPACING.spacing16}
+          marginBottom={SPACING.spacing32}
+        >
           <Flex
-            flex="1 0 auto"
             onClick={() => {
               setFlowType('liquid_and_tips')
             }}
@@ -112,15 +120,9 @@ export const BeforeBeginning = (
                 : UNSELECTED_OPTIONS_STYLE
             }
           >
-            <Flex
-              height="100%"
-              width="100%"
-              position={POSITION_ABSOLUTE}
-              flex="1"
-            />
             <video
               css={css`
-                max-width: 11rem;
+                max-width: 8.96rem;
               `}
               autoPlay={true}
               loop={true}
@@ -132,7 +134,6 @@ export const BeforeBeginning = (
             <StyledText as="h3">{t('yes_blow_out_liquid')}</StyledText>
           </Flex>
           <Flex
-            flex="1 0 auto"
             onClick={() => setFlowType('only_tips')}
             css={
               flowType === 'only_tips'
@@ -142,7 +143,7 @@ export const BeforeBeginning = (
           >
             <video
               css={css`
-                max-width: 11rem;
+                max-width: 8.96rem;
               `}
               autoPlay={true}
               loop={true}
@@ -156,10 +157,7 @@ export const BeforeBeginning = (
         </Flex>
         <Flex flexDirection={DIRECTION_ROW} justifyContent={JUSTIFY_FLEX_END}>
           {/* <NeedHelpLink href={NEED_HELP_URL} /> */}
-          <PrimaryButton
-            disabled={isCreateLoading || flowType == null}
-            onClick={handleProceed}
-          >
+          <PrimaryButton disabled={flowType == null} onClick={handleProceed}>
             {i18n.format(t('shared:continue'), 'capitalize')}
           </PrimaryButton>
         </Flex>
@@ -170,26 +168,26 @@ export const BeforeBeginning = (
 
 const UNSELECTED_OPTIONS_STYLE = css`
   background-color: ${COLORS.white};
-  border: 1px solid ${COLORS.medGreyEnabled};
-  border-radius: ${BORDERS.radiusSoftCorners};
-  height: 14.5625rem;
+  border: 1px solid ${COLORS.grey30};
+  border-radius: ${BORDERS.borderRadius8};
+  height: 12.5625rem;
   width: 14.5625rem;
   cursor: pointer;
   flex-direction: ${DIRECTION_COLUMN};
   justify-content: ${JUSTIFY_CENTER};
   align-items: ${ALIGN_CENTER};
-  grid-gap: ${SPACING.spacing8}
+  grid-gap: ${SPACING.spacing8};
 
   &:hover {
-    border: 1px solid ${COLORS.medGreyHover};
+    border: 1px solid ${COLORS.grey35};
   }
 
   @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
     flex-direction: ${DIRECTION_ROW};
     justify-content: ${JUSTIFY_FLEX_START};
-    background-color: ${COLORS.mediumBlueEnabled};
-    border-width: 0; 
-    border-radius: ${BORDERS.borderRadiusSize4};
+    background-color: ${COLORS.blue35};
+    border-width: 0;
+    border-radius: ${BORDERS.borderRadius16};
     padding: ${SPACING.spacing24};
     height: 5.25rem;
     width: 57.8125rem;
@@ -201,22 +199,17 @@ const UNSELECTED_OPTIONS_STYLE = css`
 `
 const SELECTED_OPTIONS_STYLE = css`
   ${UNSELECTED_OPTIONS_STYLE}
-  border: 1px solid ${COLORS.blueEnabled};
-  background-color: ${COLORS.lightBlue};
-
-  &:hover {
-    border: 1px solid ${COLORS.blueEnabled};
-    background-color: ${COLORS.lightBlue};
-  }
+  border: 1px solid ${COLORS.blue50};
+  background-color: ${COLORS.blue30};
 
   @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
     border-width: 0px;
-    background-color: ${COLORS.blueEnabled};
+    background-color: ${COLORS.blue50};
     color: ${COLORS.white};
 
     &:hover {
       border-width: 0px;
-      background-color: ${COLORS.blueEnabled};
+      background-color: ${COLORS.blue50};
     }
   }
 `
@@ -241,7 +234,6 @@ const TILE_CONTAINER_STYLE = css`
   flex-direction: ${DIRECTION_COLUMN};
   justify-content: ${JUSTIFY_SPACE_BETWEEN};
   padding: ${SPACING.spacing32};
-  height: 24.625rem;
   @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
     height: 29.5rem;
   }

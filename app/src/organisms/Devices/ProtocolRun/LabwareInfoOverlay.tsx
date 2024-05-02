@@ -3,21 +3,21 @@ import { css } from 'styled-components'
 import { useTranslation } from 'react-i18next'
 import { getLabwareDisplayName } from '@opentrons/shared-data'
 import {
+  ALIGN_FLEX_START,
   Box,
+  COLORS,
+  DIRECTION_COLUMN,
+  DIRECTION_ROW,
+  DISPLAY_FLEX,
   Flex,
+  Icon,
+  JUSTIFY_FLEX_END,
+  JUSTIFY_SPACE_BETWEEN,
   RobotCoordsForeignDiv,
   SPACING,
-  COLORS,
+  StyledText,
   TYPOGRAPHY,
-  DISPLAY_FLEX,
-  DIRECTION_COLUMN,
-  JUSTIFY_FLEX_END,
-  Icon,
-  DIRECTION_ROW,
-  ALIGN_FLEX_START,
-  JUSTIFY_SPACE_BETWEEN,
 } from '@opentrons/components'
-import { StyledText } from '../../../atoms/text'
 import { OffsetVector } from '../../../molecules/OffsetVector'
 
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
@@ -47,7 +47,7 @@ const LabwareInfo = (props: LabwareInfoProps): JSX.Element | null => {
 
   return (
     <Box
-      backgroundColor={hover ? COLORS.blueEnabled : '#000000B3'}
+      backgroundColor={hover ? COLORS.blue50 : '#000000B3'}
       borderRadius="0 0 0.4rem 0.4rem"
       fontSize={TYPOGRAPHY.fontSizeCaption}
       padding={SPACING.spacing4}

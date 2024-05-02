@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { useTranslation } from 'react-i18next'
 import startCase from 'lodash/startCase'
 import { css } from 'styled-components'
 import {
@@ -24,7 +25,6 @@ import {
   SPACING_3,
   TYPOGRAPHY,
 } from '@opentrons/components'
-import { i18n } from '../../localization'
 import { CountPerStepType, StepType } from '../../form-types'
 
 interface StepPillProps {
@@ -49,10 +49,9 @@ const stepPillStyles = css`
 `
 
 const StepPill = (props: StepPillProps): JSX.Element => {
+  const { t } = useTranslation('application')
   const { count, stepType } = props
-  const label = `${startCase(
-    i18n.t(`application.stepType.${stepType}`)
-  )} (${count})`
+  const label = `${startCase(t(`stepType.${stepType}`))} (${count})`
   return (
     <Flex css={stepPillStyles} key={stepType}>
       <Text fontSize={FONT_SIZE_BODY_1}>{label}</Text>
@@ -62,18 +61,20 @@ const StepPill = (props: StepPillProps): JSX.Element => {
 
 export const ExitBatchEditButton = (props: {
   handleExitBatchEdit: StepSelectionBannerProps['handleExitBatchEdit']
-}): JSX.Element => (
-  <Box flex="0 1 auto">
-    <SecondaryBtn
-      color={C_WHITE}
-      backgroundColor={C_SELECTED_DARK}
-      onClick={props.handleExitBatchEdit}
-    >
-      {i18n.t('application.exit_batch_edit')}
-    </SecondaryBtn>
-  </Box>
-)
-
+}): JSX.Element => {
+  const { t } = useTranslation('application')
+  return (
+    <Box flex="0 1 auto">
+      <SecondaryBtn
+        color={C_WHITE}
+        backgroundColor={C_SELECTED_DARK}
+        onClick={props.handleExitBatchEdit}
+      >
+        {t('exit_batch_edit')}
+      </SecondaryBtn>
+    </Box>
+  )
+}
 export interface StepSelectionBannerProps {
   countPerStepType: CountPerStepType
   handleExitBatchEdit: () => unknown
@@ -82,6 +83,7 @@ export interface StepSelectionBannerProps {
 export const StepSelectionBannerComponent = (
   props: StepSelectionBannerProps
 ): JSX.Element => {
+  const { t } = useTranslation('application')
   const { countPerStepType, handleExitBatchEdit } = props
   const numSteps = Object.keys(countPerStepType).reduce<number>(
     // @ts-expect-error(sa, 2021-6-23): refactor to use Object.entries to preserve type safety
@@ -112,7 +114,7 @@ export const StepSelectionBannerComponent = (
                 textTransform={TYPOGRAPHY.textTransformUppercase}
                 id="StepSelectionBannerComponent_numberStepsSelected"
               >
-                {i18n.t('application.n_steps_selected', { n: numSteps })}
+                {t('n_steps_selected', { n: numSteps })}
               </Text>
             </Flex>
           </Box>

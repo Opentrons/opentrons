@@ -1,33 +1,121 @@
+import { vi, it, describe, expect, beforeEach, afterEach } from 'vitest'
 import { UseQueryResult } from 'react-query'
-import { renderHook } from '@testing-library/react-hooks'
-import { when, resetAllWhenMocks } from 'jest-when'
+import { renderHook } from '@testing-library/react'
+import { when } from 'vitest-when'
+import omitBy from 'lodash/omitBy'
 
 import {
   useProtocolQuery,
   useProtocolAnalysisAsDocumentQuery,
+  useInstrumentsQuery,
+  useModulesQuery,
 } from '@opentrons/react-api-client'
 import {
   CompletedProtocolAnalysis,
+  DeckConfiguration,
+  FLEX_SIMPLEST_DECK_CONFIG,
   LabwareDefinition2,
+  WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE,
+  fixtureTiprack300ul,
 } from '@opentrons/shared-data'
-import fixture_tiprack_300_ul from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_300_ul.json'
-import { useRequiredProtocolLabware } from '..'
+import {
+  useMissingProtocolHardware,
+  useRequiredProtocolLabware,
+  useRunTimeParameters,
+} from '../index'
+import { useNotifyDeckConfigurationQuery } from '../../../../resources/deck_configuration/useNotifyDeckConfigurationQuery'
 
 import type { Protocol } from '@opentrons/api-client'
+import { mockHeaterShaker } from '../../../../redux/modules/__fixtures__'
 
-jest.mock('@opentrons/react-api-client')
-jest.mock('../../../../organisms/Devices/hooks')
-jest.mock('../../../../redux/config')
+vi.mock('@opentrons/react-api-client')
+vi.mock('../../../../organisms/Devices/hooks')
+vi.mock('../../../../redux/config')
+vi.mock(
+  '../../../../resources/deck_configuration/useNotifyDeckConfigurationQuery'
+)
 
 const PROTOCOL_ID = 'fake_protocol_id'
-
-const mockUseProtocolQuery = useProtocolQuery as jest.MockedFunction<
-  typeof useProtocolQuery
->
-const mockUseProtocolAnalysisAsDocumentQuery = useProtocolAnalysisAsDocumentQuery as jest.MockedFunction<
-  typeof useProtocolAnalysisAsDocumentQuery
->
-const mockLabwareDef = fixture_tiprack_300_ul as LabwareDefinition2
+const mockRTPData = [
+  {
+    displayName: 'Dry Run',
+    variableName: 'DRYRUN',
+    description: 'a dry run description',
+    type: 'bool',
+    default: false,
+  },
+  {
+    displayName: 'Use Gripper',
+    variableName: 'USE_GRIPPER',
+    description: '',
+    type: 'bool',
+    default: true,
+  },
+  {
+    displayName: 'Trash Tips',
+    variableName: 'TIP_TRASH',
+    description: 'throw tip in trash',
+    type: 'bool',
+    default: true,
+  },
+  {
+    displayName: 'Deactivate Temperatures',
+    variableName: 'DEACTIVATE_TEMP',
+    description: 'deactivate temperature?',
+    type: 'bool',
+    default: true,
+  },
+  {
+    displayName: 'Columns of Samples',
+    variableName: 'COLUMNS',
+    description: '',
+    suffix: 'mL',
+    type: 'int',
+    min: 1,
+    max: 14,
+    default: 4,
+  },
+  {
+    displayName: 'PCR Cycles',
+    variableName: 'PCR_CYCLES',
+    description: '',
+    type: 'int',
+    min: 1,
+    max: 10,
+    default: 6,
+  },
+  {
+    displayName: 'EtoH Volume',
+    variableName: 'ETOH_VOLUME',
+    description: '',
+    type: 'float',
+    min: 1.5,
+    max: 10.0,
+    default: 6.5,
+  },
+  {
+    displayName: 'Default Module Offsets',
+    variableName: 'DEFAULT_OFFSETS',
+    description: '',
+    type: 'str',
+    choices: [
+      {
+        displayName: 'no offsets',
+        value: 'none',
+      },
+      {
+        displayName: 'temp offset',
+        value: '1',
+      },
+      {
+        displayName: 'heater-shaker offset',
+        value: '2',
+      },
+    ],
+    default: 'none',
+  },
+]
+const mockLabwareDef = fixtureTiprack300ul as LabwareDefinition2
 const PROTOCOL_ANALYSIS = {
   id: 'fake analysis',
   status: 'completed',
@@ -44,16 +132,13 @@ const PROTOCOL_ANALYSIS = {
   commands: [
     {
       key: 'CommandKey0',
-      commandType: 'loadLabware',
+      commandType: 'loadModule',
       params: {
-        labwareId: 'firstLabwareId',
+        model: 'heaterShakerModuleV1',
         location: { slotName: 'D3' },
-        displayName: 'first labware nickname',
       },
       result: {
-        labwareId: 'firstLabwareId',
-        definition: mockLabwareDef,
-        offset: { x: 0, y: 0, z: 0 },
+        moduleId: 'modId',
       },
       id: 'CommandId0',
       status: 'succeeded',
@@ -62,7 +147,28 @@ const PROTOCOL_ANALYSIS = {
       startedAt: 'fakeStartedAtTimestamp',
       completedAt: 'fakeCompletedAtTimestamp',
     },
+    {
+      key: 'CommandKey1',
+      commandType: 'loadLabware',
+      params: {
+        labwareId: 'firstLabwareId',
+        location: { moduleId: 'modId' },
+        displayName: 'first labware nickname',
+      },
+      result: {
+        labwareId: 'firstLabwareId',
+        definition: mockLabwareDef,
+        offset: { x: 0, y: 0, z: 0 },
+      },
+      id: 'CommandId1',
+      status: 'succeeded',
+      error: null,
+      createdAt: 'fakeCreatedAtTimestamp',
+      startedAt: 'fakeStartedAtTimestamp',
+      completedAt: 'fakeCompletedAtTimestamp',
+    },
   ],
+  runTimeParameters: mockRTPData,
 } as any
 
 const NULL_COMMAND = {
@@ -88,29 +194,49 @@ const NULL_PROTOCOL_ANALYSIS = {
   commands: [NULL_COMMAND],
 } as any
 
-describe('useRequiredProtocolLabware', () => {
+describe('useRunTimeParameters', () => {
   beforeEach(() => {
-    when(mockUseProtocolQuery)
+    when(vi.mocked(useProtocolQuery))
       .calledWith(PROTOCOL_ID)
-      .mockReturnValue({
+      .thenReturn({
         data: {
           data: { analysisSummaries: [{ id: PROTOCOL_ANALYSIS.id } as any] },
         },
       } as UseQueryResult<Protocol>)
-    when(mockUseProtocolAnalysisAsDocumentQuery)
+    when(vi.mocked(useProtocolAnalysisAsDocumentQuery))
       .calledWith(PROTOCOL_ID, PROTOCOL_ANALYSIS.id, { enabled: true })
-      .mockReturnValue({
+      .thenReturn({
         data: PROTOCOL_ANALYSIS,
       } as UseQueryResult<CompletedProtocolAnalysis>)
-    when(mockUseProtocolAnalysisAsDocumentQuery)
+  })
+  it('return RTP', () => {
+    const { result } = renderHook(() => useRunTimeParameters(PROTOCOL_ID))
+    expect(result.current).toBe(mockRTPData)
+  })
+})
+describe('useRequiredProtocolLabware', () => {
+  beforeEach(() => {
+    when(vi.mocked(useProtocolQuery))
+      .calledWith(PROTOCOL_ID)
+      .thenReturn({
+        data: {
+          data: { analysisSummaries: [{ id: PROTOCOL_ANALYSIS.id } as any] },
+        },
+      } as UseQueryResult<Protocol>)
+    when(vi.mocked(useProtocolAnalysisAsDocumentQuery))
+      .calledWith(PROTOCOL_ID, PROTOCOL_ANALYSIS.id, { enabled: true })
+      .thenReturn({
+        data: PROTOCOL_ANALYSIS,
+      } as UseQueryResult<CompletedProtocolAnalysis>)
+    when(vi.mocked(useProtocolAnalysisAsDocumentQuery))
       .calledWith(PROTOCOL_ID, NULL_PROTOCOL_ANALYSIS.id, { enabled: true })
-      .mockReturnValue({
+      .thenReturn({
         data: NULL_PROTOCOL_ANALYSIS,
       } as UseQueryResult<CompletedProtocolAnalysis>)
   })
 
   afterEach(() => {
-    resetAllWhenMocks()
+    vi.resetAllMocks()
   })
 
   it('should return LabwareSetupItem array', () => {
@@ -124,9 +250,9 @@ describe('useRequiredProtocolLabware', () => {
   })
 
   it('should return empty array when there is no match with protocol id', () => {
-    when(mockUseProtocolQuery)
+    when(vi.mocked(useProtocolQuery))
       .calledWith(PROTOCOL_ID)
-      .mockReturnValue({
+      .thenReturn({
         data: {
           data: {
             analysisSummaries: [{ id: NULL_PROTOCOL_ANALYSIS.id } as any],
@@ -138,125 +264,186 @@ describe('useRequiredProtocolLabware', () => {
   })
 })
 
-// TODO: ND+BH 2023/11/1— uncomment tests when fixture stubs are removed
+describe.only('useMissingProtocolHardware', () => {
+  let wrapper: React.FunctionComponent<{ children: React.ReactNode }>
+  beforeEach(() => {
+    vi.mocked(useInstrumentsQuery).mockReturnValue({
+      data: { data: [] },
+      isLoading: false,
+    } as any)
+    vi.mocked(useModulesQuery).mockReturnValue({
+      data: { data: [] },
+      isLoading: false,
+    } as any)
+    vi.mocked(useProtocolQuery).mockReturnValue({
+      data: {
+        data: { analysisSummaries: [{ id: PROTOCOL_ANALYSIS.id } as any] },
+      },
+    } as UseQueryResult<Protocol>)
+    vi.mocked(useProtocolAnalysisAsDocumentQuery).mockReturnValue({
+      data: PROTOCOL_ANALYSIS,
+    } as UseQueryResult<CompletedProtocolAnalysis>)
+    vi.mocked(useNotifyDeckConfigurationQuery).mockReturnValue({
+      data: [{}],
+    } as UseQueryResult<DeckConfiguration>)
+  })
 
-// describe('useMissingProtocolHardware', () => {
-//   let wrapper: React.FunctionComponent<{}>
-//   beforeEach(() => {
-//     mockUseInstrumentsQuery.mockReturnValue({
-//       data: { data: [] },
-//       isLoading: false,
-//     } as any)
-//     mockUseModulesQuery.mockReturnValue({
-//       data: { data: [] },
-//       isLoading: false,
-//     } as any)
-//     mockUseProtocolQuery.mockReturnValue({
-//       data: {
-//         data: { analysisSummaries: [{ id: PROTOCOL_ANALYSIS.id } as any] },
-//       },
-//     } as UseQueryResult<Protocol>)
-//     mockUseProtocolAnalysisAsDocumentQuery.mockReturnValue({
-//       data: PROTOCOL_ANALYSIS,
-//     } as UseQueryResult<CompletedProtocolAnalysis>)
-//     mockUseDeckConfigurationQuery.mockReturnValue({
-//       data: [{}],
-//     } as UseQueryResult<DeckConfiguration>)
-//   })
+  afterEach(() => {
+    vi.resetAllMocks()
+  })
+  it('should return 1 pipette and 1 module', () => {
+    const { result } = renderHook(
+      () => useMissingProtocolHardware(PROTOCOL_ANALYSIS.id),
+      { wrapper }
+    )
+    expect(result.current).toEqual({
+      isLoading: false,
+      missingProtocolHardware: [
+        {
+          hardwareType: 'pipette',
+          pipetteName: 'p1000_multi_flex',
+          mount: 'left',
+          connected: false,
+        },
+        {
+          hardwareType: 'module',
+          moduleModel: 'heaterShakerModuleV1',
+          slot: 'D3',
+          connected: false,
+          hasSlotConflict: false,
+        },
+      ],
+      conflictedSlots: [],
+    })
+  })
+  it('should return 1 conflicted slot', () => {
+    vi.mocked(useNotifyDeckConfigurationQuery).mockReturnValue(({
+      data: [
+        {
+          cutoutId: 'cutoutD3',
+          cutoutFixtureId: WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE,
+        },
+      ],
+    } as any) as UseQueryResult<DeckConfiguration>)
 
-//   afterEach(() => {
-//     jest.resetAllMocks()
-//   })
-//   it.todo('should return 1 pipette and 1 module', () => {
-//     const { result } = renderHook(
-//       () => useMissingProtocolHardware(PROTOCOL_ANALYSIS.id),
-//       { wrapper }
-//     )
-//     expect(result.current).toEqual({
-//       isLoading: false,
-//       missingProtocolHardware: [
-//         {
-//           hardwareType: 'pipette',
-//           pipetteName: 'p1000_multi_flex',
-//           mount: 'left',
-//           connected: false,
-//         },
-//         {
-//           hardwareType: 'module',
-//           moduleModel: 'heaterShakerModuleV1',
-//           slot: 'D3',
-//           connected: false,
-//           hasSlotConflict: false,
-//         },
-//       ],
-//       conflictedSlots: [],
-//     })
-//   })
-//   it.todo('should return 1 conflicted slot', () => {
-//     mockUseDeckConfigurationQuery.mockReturnValue(({
-//       data: [
-//         {
-//           fixtureId: 'mockFixtureId',
-//           fixtureLocation: WASTE_CHUTE_SLOT,
-//           loadName: WASTE_CHUTE_LOAD_NAME,
-//         },
-//       ],
-//     } as any) as UseQueryResult<DeckConfiguration>)
+    const { result } = renderHook(
+      () => useMissingProtocolHardware(PROTOCOL_ANALYSIS.id),
+      { wrapper }
+    )
+    expect(result.current).toEqual({
+      isLoading: false,
+      missingProtocolHardware: [
+        {
+          hardwareType: 'pipette',
+          pipetteName: 'p1000_multi_flex',
+          mount: 'left',
+          connected: false,
+        },
+        {
+          hardwareType: 'module',
+          moduleModel: 'heaterShakerModuleV1',
+          slot: 'D3',
+          connected: false,
+          hasSlotConflict: true,
+        },
+      ],
+      conflictedSlots: ['D3'],
+    })
+  })
+  it('should return empty array when the correct modules and pipettes are attached', () => {
+    vi.mocked(useInstrumentsQuery).mockReturnValue({
+      data: {
+        data: [
+          {
+            mount: 'left',
+            instrumentType: 'pipette',
+            instrumentName: 'p1000_multi_flex',
+            ok: true,
+          },
+        ],
+      },
+      isLoading: false,
+    } as any)
 
-//     const { result } = renderHook(
-//       () => useMissingProtocolHardware(PROTOCOL_ANALYSIS.id),
-//       { wrapper }
-//     )
-//     expect(result.current).toEqual({
-//       isLoading: false,
-//       missingProtocolHardware: [
-//         {
-//           hardwareType: 'pipette',
-//           pipetteName: 'p1000_multi_flex',
-//           mount: 'left',
-//           connected: false,
-//         },
-//         {
-//           hardwareType: 'module',
-//           moduleModel: 'heaterShakerModuleV1',
-//           slot: 'D3',
-//           connected: false,
-//           hasSlotConflict: true,
-//         },
-//       ],
-//       conflictedSlots: ['D3'],
-//     })
-//   })
-//   it.todo(
-//     'should return empty array when the correct modules and pipettes are attached',
-//     () => {
-//       mockUseInstrumentsQuery.mockReturnValue({
-//         data: {
-//           data: [
-//             {
-//               mount: 'left',
-//               instrumentType: 'pipette',
-//               instrumentName: 'p1000_multi_flex',
-//               ok: true,
-//             },
-//           ],
-//         },
-//         isLoading: false,
-//       } as any)
+    vi.mocked(useModulesQuery).mockReturnValue({
+      data: { data: [mockHeaterShaker] },
+      isLoading: false,
+    } as any)
+    vi.mocked(useNotifyDeckConfigurationQuery).mockReturnValue({
+      data: [
+        omitBy(
+          FLEX_SIMPLEST_DECK_CONFIG,
+          ({ cutoutId }) => cutoutId === 'cutoutD3'
+        ),
+        {
+          cutoutId: 'cutoutD3',
+          cutoutFixtureId: 'heaterShakerModuleV1',
+          opentronsModuleSerialNumber: mockHeaterShaker.serialNumber,
+        },
+      ],
+      isLoading: false,
+    } as any)
 
-//       mockUseModulesQuery.mockReturnValue({
-//         data: { data: [mockHeaterShaker] },
-//         isLoading: false,
-//       } as any)
-//       const { result } = renderHook(
-//         () => useMissingProtocolHardware(PROTOCOL_ANALYSIS.id),
-//         { wrapper }
-//       )
-//       expect(result.current).toEqual({
-//         missingProtocolHardware: [],
-//         isLoading: false,
-//         conflictedSlots: [],
-//       })
-//     }
-//   )
-// })
+    const { result } = renderHook(
+      () => useMissingProtocolHardware(PROTOCOL_ANALYSIS.id),
+      { wrapper }
+    )
+    expect(result.current).toEqual({
+      missingProtocolHardware: [],
+      isLoading: false,
+      conflictedSlots: [],
+    })
+  })
+  it('should return conflicting slot when module location is configured with something other than module fixture', () => {
+    vi.mocked(useInstrumentsQuery).mockReturnValue({
+      data: {
+        data: [
+          {
+            mount: 'left',
+            instrumentType: 'pipette',
+            instrumentName: 'p1000_multi_flex',
+            ok: true,
+          },
+        ],
+      },
+      isLoading: false,
+    } as any)
+
+    vi.mocked(useModulesQuery).mockReturnValue({
+      data: { data: [mockHeaterShaker] },
+      isLoading: false,
+    } as any)
+
+    vi.mocked(useNotifyDeckConfigurationQuery).mockReturnValue({
+      data: [
+        omitBy(
+          FLEX_SIMPLEST_DECK_CONFIG,
+          ({ cutoutId }) => cutoutId === 'cutoutD3'
+        ),
+        {
+          cutoutId: 'cutoutD3',
+          cutoutFixtureId: WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE,
+        },
+      ],
+      isLoading: false,
+    } as any)
+
+    const { result } = renderHook(
+      () => useMissingProtocolHardware(PROTOCOL_ANALYSIS.id),
+      { wrapper }
+    )
+    expect(result.current).toEqual({
+      missingProtocolHardware: [
+        {
+          hardwareType: 'module',
+          moduleModel: 'heaterShakerModuleV1',
+          slot: 'D3',
+          connected: false,
+          hasSlotConflict: true,
+        },
+      ],
+      isLoading: false,
+      conflictedSlots: ['D3'],
+    })
+  })
+})

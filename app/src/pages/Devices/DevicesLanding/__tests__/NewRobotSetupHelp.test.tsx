@@ -1,7 +1,8 @@
 import * as React from 'react'
+import { it, describe, expect } from 'vitest'
 import { fireEvent } from '@testing-library/react'
-import { renderWithProviders } from '@opentrons/components'
 
+import { renderWithProviders } from '../../../../__testing-utils__'
 import { i18n } from '../../../../i18n'
 import { NewRobotSetupHelp } from '../NewRobotSetupHelp'
 
@@ -15,7 +16,7 @@ describe('NewRobotSetupHelp', () => {
   it('renders link and collapsed modal by default', () => {
     const [{ getByText, queryByText }] = render()
 
-    expect(getByText('See how to set up a new robot')).toBeInTheDocument()
+    getByText('See how to set up a new robot')
     expect(queryByText('How to setup a new robot')).toBeFalsy()
   })
   it('when link is clicked, modal is opened, and closes via Close button', () => {
@@ -23,7 +24,7 @@ describe('NewRobotSetupHelp', () => {
 
     const link = getByText('See how to set up a new robot')
     fireEvent.click(link)
-    expect(getByText('How to setup a new robot')).toBeInTheDocument()
+    getByText('How to setup a new robot')
 
     const closeButton = getByRole('button', { name: 'close' })
     fireEvent.click(closeButton)

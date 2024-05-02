@@ -1,19 +1,19 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import {
-  Icon,
-  Flex,
-  SPACING,
-  JUSTIFY_CENTER,
-  ALIGN_CENTER,
-  DIRECTION_COLUMN,
-  JUSTIFY_SPACE_BETWEEN,
-  TYPOGRAPHY,
-  COLORS,
   AlertPrimaryButton,
+  ALIGN_CENTER,
+  COLORS,
+  DIRECTION_COLUMN,
+  Flex,
+  Icon,
+  JUSTIFY_CENTER,
+  JUSTIFY_SPACE_BETWEEN,
   SecondaryButton,
+  SPACING,
+  StyledText,
+  TYPOGRAPHY,
 } from '@opentrons/components'
-import { StyledText } from '../../atoms/text'
 
 import { NeedHelpLink } from './NeedHelpLink'
 
@@ -43,7 +43,7 @@ export function ConfirmExit(props: ConfirmExitProps): JSX.Element {
         <Icon
           name="ot-alert"
           size="2.5rem"
-          color={COLORS.warningEnabled}
+          color={COLORS.yellow50}
           marginBottom={SPACING.spacing24}
         />
         {heading != null ? (

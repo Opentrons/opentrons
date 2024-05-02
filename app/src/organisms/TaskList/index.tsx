@@ -1,9 +1,6 @@
 import * as React from 'react'
 
 import {
-  Flex,
-  Icon,
-  Link,
   ALIGN_CENTER,
   ALIGN_FLEX_START,
   BORDERS,
@@ -11,18 +8,23 @@ import {
   DIRECTION_COLUMN,
   DIRECTION_ROW,
   FLEX_NONE,
+  Flex,
+  Icon,
   JUSTIFY_CENTER,
   JUSTIFY_SPACE_BETWEEN,
+  Link,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
   useHoverTooltip,
 } from '@opentrons/components'
 
 import { TertiaryButton } from '../../atoms/buttons'
-import { StyledText } from '../../atoms/text'
 import { Tooltip } from '../../atoms/Tooltip'
 
 import type { SubTaskProps, TaskListProps, TaskProps } from './types'
+
+const TASK_CONNECTOR_STYLE = `1px solid ${COLORS.grey40}`
 
 interface ProgressTrackerItemProps {
   activeIndex: [number, number] | null
@@ -52,10 +54,10 @@ function ProgressTrackerItem({
   const taskConnector = (
     <Flex
       flex="1"
-      borderLeft={BORDERS.lineBorder}
+      borderLeft={TASK_CONNECTOR_STYLE}
       borderColor={
         isTaskListComplete || isPastTask || isActiveTaskWithSubtasks
-          ? COLORS.blueEnabled
+          ? COLORS.blue50
           : ''
       }
       marginTop={`-${SPACING.spacing12}`}
@@ -77,9 +79,7 @@ function ProgressTrackerItem({
           margin={SPACING.spacing16}
           name="ot-check"
           color={
-            isTaskListComplete || isPastTask
-              ? COLORS.blueEnabled
-              : COLORS.medGreyHover
+            isTaskListComplete || isPastTask ? COLORS.blue50 : COLORS.grey40
           }
         />
       ) : (
@@ -87,9 +87,7 @@ function ProgressTrackerItem({
           flex={FLEX_NONE}
           alignItems={ALIGN_CENTER}
           justifyContent={JUSTIFY_CENTER}
-          backgroundColor={
-            isFutureTask ? COLORS.medGreyHover : COLORS.blueEnabled
-          }
+          backgroundColor={isFutureTask ? COLORS.grey40 : COLORS.blue50}
           color={COLORS.white}
           margin={SPACING.spacing16}
           height="1.25rem"
@@ -144,15 +142,13 @@ function ProgressTrackerItem({
                   backgroundColor={
                     // is in the past or list is complete
                     isTaskListComplete || isPastSubTask
-                      ? COLORS.blueEnabled
+                      ? COLORS.blue50
                       : subTask.isComplete === true
-                      ? COLORS.medGreyHover
+                      ? COLORS.grey40
                       : 'initial'
                   }
-                  border={BORDERS.lineBorder}
-                  borderColor={
-                    isFutureSubTask ? COLORS.medGreyHover : COLORS.blueEnabled
-                  }
+                  border={TASK_CONNECTOR_STYLE}
+                  borderColor={isFutureSubTask ? COLORS.grey40 : COLORS.blue50}
                   borderWidth={SPACING.spacing2}
                   color={COLORS.white}
                   margin={SPACING.spacing16}
@@ -163,14 +159,14 @@ function ProgressTrackerItem({
                 {/* subtask connector component */}
                 <Flex
                   flex="1"
-                  borderLeft={BORDERS.lineBorder}
+                  borderLeft={TASK_CONNECTOR_STYLE}
                   borderColor={
                     // do not show the subtask connector if it's the final subtask of the task list
                     isFinalSubTaskOfTaskList
                       ? COLORS.transparent
                       : isTaskListComplete || isPastSubTask
-                      ? COLORS.blueEnabled
-                      : COLORS.medGreyEnabled
+                      ? COLORS.blue50
+                      : COLORS.grey40
                   }
                   marginTop={`-${SPACING.spacing8}`}
                   marginBottom={
@@ -219,11 +215,15 @@ function SubTask({
   return (
     <Flex
       alignItems={ALIGN_CENTER}
-      backgroundColor={isActiveSubTask ? COLORS.lightBlue : COLORS.white}
+      backgroundColor={isActiveSubTask ? COLORS.blue10 : COLORS.white}
       justifyContent={JUSTIFY_SPACE_BETWEEN}
       padding={SPACING.spacing16}
-      border={isActiveSubTask ? BORDERS.activeLineBorder : BORDERS.lineBorder}
-      borderRadius={BORDERS.radiusSoftCorners}
+      border={
+        isActiveSubTask
+          ? BORDERS.activeLineBorder
+          : `1px solid ${COLORS.grey30}`
+      }
+      borderRadius={BORDERS.borderRadius8}
       gridGap={SPACING.spacing24}
       width="100%"
     >
@@ -243,7 +243,7 @@ function SubTask({
         </StyledText>
         <StyledText as="p">{description}</StyledText>
         {footer != null ? (
-          <StyledText as="p" color={COLORS.darkGreyEnabled}>
+          <StyledText as="p" color={COLORS.grey60}>
             <Flex
               alignItems={ALIGN_CENTER}
               flexDirection={DIRECTION_ROW}
@@ -252,8 +252,8 @@ function SubTask({
               {markedBad === true && (
                 <Icon
                   name="alert-circle"
-                  backgroundColor={COLORS.warningBackgroundLight}
-                  color={COLORS.warningEnabled}
+                  backgroundColor={COLORS.yellow20}
+                  color={COLORS.yellow50}
                   height="1rem"
                   aria-label={`icon_warning`}
                 />
@@ -361,14 +361,12 @@ function Task({
         flexDirection={DIRECTION_COLUMN}
         padding={SPACING.spacing16}
         backgroundColor={
-          isActiveTask && !isTaskOpen ? COLORS.lightBlue : COLORS.white
+          isActiveTask && !isTaskOpen ? COLORS.blue10 : COLORS.white
         }
         border={
-          isActiveTask && !isTaskOpen
-            ? BORDERS.activeLineBorder
-            : BORDERS.lineBorder
+          isActiveTask && !isTaskOpen ? BORDERS.activeLineBorder : undefined
         }
-        borderRadius={BORDERS.radiusSoftCorners}
+        borderRadius={BORDERS.borderRadius8}
         width="100%"
       >
         <Flex
@@ -393,8 +391,8 @@ function Task({
                 {markedBad === true && (
                   <Icon
                     name="alert-circle"
-                    backgroundColor={COLORS.warningBackgroundLight}
-                    color={COLORS.warningEnabled}
+                    backgroundColor={COLORS.yellow20}
+                    color={COLORS.yellow50}
                     height="1rem"
                     aria-label={`icon_warning`}
                   />
@@ -404,7 +402,7 @@ function Task({
             </StyledText>
             <StyledText as="p">{description}</StyledText>
             {footer != null ? (
-              <StyledText as="p" color={COLORS.darkGreyEnabled}>
+              <StyledText as="p" color={COLORS.grey50}>
                 <Flex
                   alignItems={ALIGN_CENTER}
                   flexDirection={DIRECTION_ROW}

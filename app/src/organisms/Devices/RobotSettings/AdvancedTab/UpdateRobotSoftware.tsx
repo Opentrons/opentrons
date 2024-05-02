@@ -4,17 +4,17 @@ import { useSelector } from 'react-redux'
 import { css } from 'styled-components'
 
 import {
-  Flex,
   ALIGN_CENTER,
-  JUSTIFY_SPACE_BETWEEN,
-  SPACING,
-  SPACING_AUTO,
   Box,
-  useHoverTooltip,
+  Flex,
+  JUSTIFY_SPACE_BETWEEN,
+  SPACING_AUTO,
+  SPACING,
+  StyledText,
   TYPOGRAPHY,
+  useHoverTooltip,
 } from '@opentrons/components'
 
-import { StyledText } from '../../../../atoms/text'
 import { ExternalLink } from '../../../../atoms/Link/ExternalLink'
 import { TertiaryButton } from '../../../../atoms/buttons'
 import { Tooltip } from '../../../../atoms/Tooltip'
@@ -40,7 +40,7 @@ export function UpdateRobotSoftware({
   onUpdateStart,
   isRobotBusy,
 }: UpdateRobotSoftwareProps): JSX.Element {
-  const { t } = useTranslation('device_settings')
+  const { t } = useTranslation(['device_settings', 'branded'])
   const { updateFromFileDisabledReason } = useSelector((state: State) => {
     return getRobotUpdateDisplayInfo(state, robotName)
   })
@@ -77,10 +77,10 @@ export function UpdateRobotSoftware({
           {t('update_robot_software')}
         </StyledText>
         <StyledText as="p" marginBottom={SPACING.spacing8}>
-          {t('update_robot_software_description')}
+          {t('branded:update_robot_software_description')}
         </StyledText>
         <ExternalLink href={OT_APP_UPDATE_PAGE_LINK}>
-          {t('update_robot_software_link')}
+          {t('branded:update_robot_software_link')}
         </ExternalLink>
       </Box>
       <TertiaryButton

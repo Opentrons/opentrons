@@ -3,7 +3,7 @@ from functools import partial
 from typing import cast, Callable, Optional, List, Set
 from typing_extensions import TypedDict, Literal
 
-from opentrons.hardware_control.types import TipStateType, OT3Mount
+from opentrons.hardware_control.types import TipStateType, OT3Mount, InstrumentProbeType
 
 from opentrons_hardware.drivers.can_bus import CanMessenger
 from opentrons_hardware.firmware_bindings.constants import NodeId
@@ -14,7 +14,10 @@ from opentrons_hardware.hardware_control.tip_presence import (
 from opentrons_shared_data.errors.exceptions import (
     TipDetectorNotFound,
     UnmatchedTipPresenceStates,
+    GeneralError,
 )
+
+from .ot3utils import sensor_id_for_instrument
 
 log = logging.getLogger(__name__)
 
@@ -108,12 +111,27 @@ class TipPresenceManager:
 
     def current_tip_state(self, mount: OT3Mount) -> Optional[bool]:
         state = self._last_state[self._get_key(mount)]
-        if state is None:
-            log.warning(f"Tip state for {mount} is unknown")
         return state
 
     @staticmethod
-    def _get_tip_presence(results: List[tip_types.TipNotification]) -> TipStateType:
+    def _get_tip_presence(
+        results: List[tip_types.TipNotification],
+        follow_singular_sensor: Optional[InstrumentProbeType] = None,
+    ) -> TipStateType:
+        """
+        We can use follow_singular_sensor used to specify that we only care
+        about the status of one tip presence sensor on a high throughput
+        pipette, and the other is allowed to be different.
+        """
+        if follow_singular_sensor:
+            target_sensor_id = sensor_id_for_instrument(follow_singular_sensor)
+            for r in results:
+                if r.sensor == target_sensor_id:
+                    return TipStateType(r.presence)
+            # raise an error if requested sensor response isn't found
+            raise GeneralError(
+                message=f"Requested status for sensor {follow_singular_sensor} not found."
+            )
         # more than one sensor reported, we have to check if their states match
         if len(set(r.presence for r in results)) > 1:
             raise UnmatchedTipPresenceStates(
@@ -121,9 +139,15 @@ class TipPresenceManager:
             )
         return TipStateType(results[0].presence)
 
-    async def get_tip_status(self, mount: OT3Mount) -> TipStateType:
+    async def get_tip_status(
+        self,
+        mount: OT3Mount,
+        follow_singular_sensor: Optional[InstrumentProbeType] = None,
+    ) -> TipStateType:
         detector = self.get_detector(mount)
-        return self._get_tip_presence(await detector.request_tip_status())
+        return self._get_tip_presence(
+            await detector.request_tip_status(), follow_singular_sensor
+        )
 
     def get_detector(self, mount: OT3Mount) -> TipDetector:
         detector = self._detectors[self._get_key(mount)]

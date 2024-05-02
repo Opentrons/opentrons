@@ -11,48 +11,58 @@ import {
   DIRECTION_COLUMN,
   DIRECTION_ROW,
   Flex,
-  Icon,
   JUSTIFY_CENTER,
   JUSTIFY_SPACE_BETWEEN,
   SPACING,
+  StyledText,
+  TOOLTIP_LEFT,
   TYPOGRAPHY,
   useHoverTooltip,
-  TOOLTIP_LEFT,
 } from '@opentrons/components'
 import {
+  FLEX_ROBOT_TYPE,
+  getCutoutIdForSlotName,
+  getDeckDefFromRobotType,
   getModuleType,
   HEATERSHAKER_MODULE_TYPE,
   HEATERSHAKER_MODULE_V1,
+  MAGNETIC_BLOCK_TYPE,
   MAGNETIC_BLOCK_V1,
+  OT2_ROBOT_TYPE,
   TC_MODULE_LOCATION_OT2,
   TC_MODULE_LOCATION_OT3,
 } from '@opentrons/shared-data'
 
-import { Banner } from '../../../../atoms/Banner'
 import { TertiaryButton } from '../../../../atoms/buttons'
 import { StatusLabel } from '../../../../atoms/StatusLabel'
-import { StyledText } from '../../../../atoms/text'
 import { Tooltip } from '../../../../atoms/Tooltip'
-import { useChainLiveCommands } from '../../../../resources/runs/hooks'
+import { useChainLiveCommands } from '../../../../resources/runs'
 import { ModuleSetupModal } from '../../../ModuleCard/ModuleSetupModal'
 import { ModuleWizardFlows } from '../../../ModuleWizardFlows'
 import { getModulePrepCommands } from '../../getModulePrepCommands'
 import { getModuleTooHot } from '../../getModuleTooHot'
 import {
-  ModuleRenderInfoForProtocol,
   useIsFlex,
   useModuleRenderInfoForProtocolById,
+  useRobot,
   useUnmatchedModulesForProtocol,
   useRunCalibrationStatus,
 } from '../../hooks'
 import { LocationConflictModal } from './LocationConflictModal'
-import { MultipleModulesModal } from './MultipleModulesModal'
+import { OT2MultipleModulesHelp } from './OT2MultipleModulesHelp'
 import { UnMatchedModuleWarning } from './UnMatchedModuleWarning'
 import { getModuleImage } from './utils'
 
-import type { Cutout, ModuleModel, Fixture } from '@opentrons/shared-data'
+import type {
+  CutoutConfig,
+  DeckDefinition,
+  ModuleModel,
+} from '@opentrons/shared-data'
 import type { AttachedModule } from '../../../../redux/modules/types'
-import type { ProtocolCalibrationStatus } from '../../hooks'
+import type {
+  ModuleRenderInfoForProtocol,
+  ProtocolCalibrationStatus,
+} from '../../hooks'
 
 interface SetupModulesListProps {
   robotName: string
@@ -61,9 +71,7 @@ interface SetupModulesListProps {
 
 export const SetupModulesList = (props: SetupModulesListProps): JSX.Element => {
   const { robotName, runId } = props
-  const { t } = useTranslation('protocol_setup')
   const moduleRenderInfoForProtocolById = useModuleRenderInfoForProtocolById(
-    robotName,
     runId
   )
   const {
@@ -72,127 +80,61 @@ export const SetupModulesList = (props: SetupModulesListProps): JSX.Element => {
   } = useUnmatchedModulesForProtocol(robotName, runId)
 
   const isFlex = useIsFlex(robotName)
+  const { robotModel } = useRobot(robotName) ?? {}
+  const deckDef = getDeckDefFromRobotType(robotModel ?? FLEX_ROBOT_TYPE)
 
   const calibrationStatus = useRunCalibrationStatus(robotName, runId)
-
-  const [
-    showMultipleModulesModal,
-    setShowMultipleModulesModal,
-  ] = React.useState<boolean>(false)
 
   const moduleModels = map(
     moduleRenderInfoForProtocolById,
     ({ moduleDef }) => moduleDef.model
   )
-
-  const hasADuplicateModule = new Set(moduleModels).size !== moduleModels.length
-
+  const showOT2MoamHelp =
+    robotModel === OT2_ROBOT_TYPE &&
+    new Set(moduleModels).size !== moduleModels.length
   return (
     <>
-      {showMultipleModulesModal ? (
-        <MultipleModulesModal
-          onCloseClick={() => setShowMultipleModulesModal(false)}
-        />
-      ) : null}
-      {hasADuplicateModule ? (
-        <Box marginTop={SPACING.spacing8}>
-          <Banner
-            iconMarginRight={SPACING.spacing16}
-            iconMarginLeft={SPACING.spacing8}
-            size={SPACING.spacing20}
-            type="informing"
-            onCloseClick={() => setShowMultipleModulesModal(true)}
-            closeButton={
-              <StyledText
-                as="p"
-                textDecoration={TYPOGRAPHY.textDecorationUnderline}
-                marginRight={SPACING.spacing8}
-              >
-                {t('learn_more')}
-              </StyledText>
-            }
-          >
-            <Flex flexDirection={DIRECTION_COLUMN}>
-              <StyledText css={TYPOGRAPHY.pSemiBold}>
-                {t('multiple_modules')}
-              </StyledText>
-              <StyledText as="p">{t('view_moam')}</StyledText>
-            </Flex>
-          </Banner>
-        </Box>
-      ) : null}
+      {showOT2MoamHelp ? <OT2MultipleModulesHelp /> : null}
       {remainingAttachedModules.length !== 0 &&
       missingModuleIds.length !== 0 ? (
         <UnMatchedModuleWarning />
       ) : null}
-      <Flex
-        flexDirection={DIRECTION_ROW}
-        justifyContent={JUSTIFY_SPACE_BETWEEN}
-        marginTop={SPACING.spacing16}
-        marginLeft={SPACING.spacing20}
-        marginBottom={SPACING.spacing4}
-      >
-        <StyledText
-          css={TYPOGRAPHY.labelSemiBold}
-          marginBottom={SPACING.spacing8}
-          width="45%"
-        >
-          {t('module_name')}
-        </StyledText>
-        <StyledText
-          css={TYPOGRAPHY.labelSemiBold}
-          marginRight={SPACING.spacing16}
-          width="15%"
-        >
-          {t('location')}
-        </StyledText>
-        <StyledText
-          css={TYPOGRAPHY.labelSemiBold}
-          marginRight={SPACING.spacing16}
-          width="15%"
-        >
-          {t('status')}
-        </StyledText>
-      </Flex>
-      <Flex
-        flexDirection={DIRECTION_COLUMN}
-        width="100%"
-        overflowY="auto"
-        gridGap={SPACING.spacing4}
-        marginBottom={SPACING.spacing24}
-      >
-        {map(
-          moduleRenderInfoForProtocolById,
-          ({
-            moduleDef,
-            attachedModuleMatch,
-            slotName,
-            moduleId,
-            conflictedFixture,
-          }) => {
-            return (
-              <ModulesListItem
-                key={`SetupModulesList_${String(
-                  moduleDef.model
-                )}_slot_${slotName}`}
-                moduleModel={moduleDef.model}
-                displayName={moduleDef.displayName}
-                slotName={slotName}
-                attachedModuleMatch={attachedModuleMatch}
-                heaterShakerModuleFromProtocol={
-                  moduleRenderInfoForProtocolById[moduleId].moduleDef
-                    .moduleType === HEATERSHAKER_MODULE_TYPE
-                    ? moduleRenderInfoForProtocolById[moduleId]
-                    : null
-                }
-                isFlex={isFlex}
-                calibrationStatus={calibrationStatus}
-                conflictedFixture={conflictedFixture}
-              />
-            )
-          }
-        )}
-      </Flex>
+
+      {map(
+        moduleRenderInfoForProtocolById,
+        ({
+          moduleDef,
+          attachedModuleMatch,
+          slotName,
+          moduleId,
+          conflictedFixture,
+        }) => {
+          // filter out the magnetic block here, because it is handled by the SetupFixturesList
+          if (moduleDef.moduleType === MAGNETIC_BLOCK_TYPE) return null
+          return (
+            <ModulesListItem
+              key={`SetupModulesList_${String(
+                moduleDef.model
+              )}_slot_${slotName}`}
+              moduleModel={moduleDef.model}
+              displayName={moduleDef.displayName}
+              slotName={slotName}
+              attachedModuleMatch={attachedModuleMatch}
+              heaterShakerModuleFromProtocol={
+                moduleRenderInfoForProtocolById[moduleId].moduleDef
+                  .moduleType === HEATERSHAKER_MODULE_TYPE
+                  ? moduleRenderInfoForProtocolById[moduleId]
+                  : null
+              }
+              isFlex={isFlex}
+              calibrationStatus={calibrationStatus}
+              conflictedFixture={conflictedFixture}
+              deckDef={deckDef}
+              robotName={robotName}
+            />
+          )
+        }
+      )}
     </>
   )
 }
@@ -205,7 +147,9 @@ interface ModulesListItemProps {
   heaterShakerModuleFromProtocol: ModuleRenderInfoForProtocol | null
   isFlex: boolean
   calibrationStatus: ProtocolCalibrationStatus
-  conflictedFixture?: Fixture
+  deckDef: DeckDefinition
+  conflictedFixture: CutoutConfig | null
+  robotName: string
 }
 
 export function ModulesListItem({
@@ -217,6 +161,8 @@ export function ModulesListItem({
   isFlex,
   calibrationStatus,
   conflictedFixture,
+  deckDef,
+  robotName,
 }: ModulesListItemProps): JSX.Element {
   const { t } = useTranslation(['protocol_setup', 'module_wizard_flows'])
   const moduleConnectionStatus =
@@ -261,34 +207,23 @@ export function ModulesListItem({
       <Btn
         marginLeft={SPACING.spacing20}
         css={css`
-          color: ${COLORS.blueEnabled};
+          color: ${COLORS.blue50};
 
           &:hover {
-            color: ${COLORS.blueHover};
+            color: ${COLORS.blue55};
           }
         `}
         marginTop={SPACING.spacing4}
         onClick={() => setShowModuleSetupModal(true)}
       >
         <Flex flexDirection={DIRECTION_ROW}>
-          <Icon
-            name="information"
-            size="0.75rem"
-            marginTop={SPACING.spacing4}
-          />
-          <StyledText marginLeft={SPACING.spacing4} as="p">
-            {t('view_setup_instructions')}
-          </StyledText>
+          <StyledText as="p">{t('view_setup_instructions')}</StyledText>
         </Flex>
       </Btn>
     )
   } else if (moduleModel === MAGNETIC_BLOCK_V1) {
     subText = (
-      <StyledText
-        as="p"
-        marginLeft={SPACING.spacing20}
-        color={COLORS.darkGreyEnabled}
-      >
+      <StyledText as="p" marginLeft={SPACING.spacing20} color={COLORS.grey50}>
         {t('no_usb_connection_required')}
       </StyledText>
     )
@@ -307,9 +242,9 @@ export function ModulesListItem({
   let renderModuleStatus: JSX.Element = (
     <StatusLabel
       status={moduleConnectionStatus}
-      backgroundColor={COLORS.successBackgroundLight}
-      iconColor={COLORS.successEnabled}
-      textColor={COLORS.successText}
+      backgroundColor={COLORS.green30}
+      iconColor={COLORS.green60}
+      textColor={COLORS.green60}
     />
   )
 
@@ -339,28 +274,31 @@ export function ModulesListItem({
     renderModuleStatus = (
       <StatusLabel
         status={moduleConnectionStatus}
-        backgroundColor={COLORS.warningBackgroundLight}
-        iconColor={COLORS.warningEnabled}
-        textColor={COLORS.warningText}
+        backgroundColor={COLORS.yellow30}
+        iconColor={COLORS.yellow60}
+        textColor={COLORS.yellow60}
       />
     )
   }
 
+  // convert slot name to cutout id
+  const cutoutIdForSlotName = getCutoutIdForSlotName(slotName, deckDef)
+
   return (
     <>
-      {showLocationConflictModal ? (
+      {showLocationConflictModal && cutoutIdForSlotName != null ? (
         <LocationConflictModal
           onCloseClick={() => setShowLocationConflictModal(false)}
-          // TODO(bh, 2023-10-10): when module caddies are fixtures, narrow slotName to Cutout and remove type assertion
-          cutout={slotName as Cutout}
+          cutoutId={cutoutIdForSlotName}
           requiredModule={moduleModel}
+          deckDef={deckDef}
+          robotName={robotName}
         />
       ) : null}
       {showModuleWizard && attachedModuleMatch != null ? (
         <ModuleWizardFlows
           attachedModule={attachedModuleMatch}
           closeFlow={() => setShowModuleWizard(false)}
-          initialSlotName={slotName}
           isPrepCommandLoading={isCommandMutationLoading}
           prepCommandErrorMessage={
             prepCommandErrorMessage === '' ? undefined : prepCommandErrorMessage
@@ -369,9 +307,9 @@ export function ModulesListItem({
       ) : null}
       <Box
         border={BORDERS.styleSolid}
-        borderColor={COLORS.medGreyEnabled}
+        borderColor={COLORS.grey30}
         borderWidth="1px"
-        borderRadius={BORDERS.radiusSoftCorners}
+        borderRadius={BORDERS.borderRadius4}
         padding={SPACING.spacing16}
         backgroundColor={COLORS.white}
       >
@@ -400,13 +338,26 @@ export function ModulesListItem({
               {subText}
             </Flex>
           </Flex>
-          <StyledText as="p" width="15%">
-            {getModuleType(moduleModel) === 'thermocyclerModuleType'
-              ? isFlex
-                ? TC_MODULE_LOCATION_OT3
-                : TC_MODULE_LOCATION_OT2
-              : slotName}
-          </StyledText>
+          <Flex
+            width="15%"
+            flexDirection={DIRECTION_COLUMN}
+            justifyContent={JUSTIFY_CENTER}
+          >
+            <StyledText as="p">
+              {getModuleType(moduleModel) === 'thermocyclerModuleType'
+                ? isFlex
+                  ? TC_MODULE_LOCATION_OT3
+                  : TC_MODULE_LOCATION_OT2
+                : slotName}
+            </StyledText>
+            {attachedModuleMatch?.usbPort.port != null ? (
+              <StyledText as="p">
+                {t('usb_port_number', {
+                  port: attachedModuleMatch.usbPort.port,
+                })}
+              </StyledText>
+            ) : null}
+          </Flex>
           <Flex
             width="15%"
             flexDirection={DIRECTION_COLUMN}
@@ -419,21 +370,27 @@ export function ModulesListItem({
               >
                 <StatusLabel
                   status={t('location_conflict')}
-                  backgroundColor={COLORS.warningBackgroundLight}
-                  iconColor={COLORS.warningEnabled}
-                  textColor={COLORS.warningText}
+                  backgroundColor={COLORS.yellow30}
+                  iconColor={COLORS.yellow60}
+                  textColor={COLORS.yellow60}
                 />
                 <TertiaryButton
                   width="max-content"
                   onClick={() => setShowLocationConflictModal(true)}
                 >
                   <StyledText as="label" cursor="pointer">
-                    {t('update_deck')}
+                    {t('resolve')}
                   </StyledText>
                 </TertiaryButton>
               </Flex>
             ) : moduleModel === MAGNETIC_BLOCK_V1 ? (
-              <StyledText as="p"> {t('n_a')}</StyledText>
+              <StatusLabel
+                status={t('n_a')}
+                backgroundColor={COLORS.grey30}
+                textColor={COLORS.grey60}
+                showIcon={false}
+                capitalizeStatus={false}
+              />
             ) : (
               renderModuleStatus
             )}

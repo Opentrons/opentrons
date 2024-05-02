@@ -1,9 +1,12 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
 // application menu
-import { Menu } from 'electron'
+import { Menu, shell } from 'electron'
 import type { MenuItemConstructorOptions } from 'electron'
 
 import { LOG_DIR } from './log'
+
+const PRODUCT_NAME: string = _PKG_PRODUCT_NAME_
+const BUGS_URL: string = _PKG_BUGS_URL_
 
 // file or application menu
 const firstMenu: MenuItemConstructorOptions = {
@@ -23,20 +26,20 @@ const helpMenu: MenuItemConstructorOptions = {
       label: 'Learn More',
       click: () => {
         // eslint-disable-next-line @typescript-eslint/no-floating-promises
-        require('electron').shell.openExternal('https://opentrons.com/')
+        shell.openExternal('https://opentrons.com/')
       },
     },
     {
-      label: `View ${_PKG_PRODUCT_NAME_} App Logs`,
+      label: `View ${PRODUCT_NAME} App Logs`,
       click: () => {
-        require('electron').shell.openPath(LOG_DIR)
+        shell.openPath(LOG_DIR)
       },
     },
     {
       label: 'Report an Issue',
       click: () => {
         // eslint-disable-next-line @typescript-eslint/no-floating-promises
-        require('electron').shell.openExternal(_PKG_BUGS_URL_)
+        shell.openExternal(BUGS_URL)
       },
     },
   ],

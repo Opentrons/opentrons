@@ -4,6 +4,7 @@ from decoy import Decoy
 
 from opentrons.protocol_engine.state.labware import LabwareView
 from opentrons.protocol_engine.state.pipettes import PipetteView
+from opentrons.protocol_engine.state.addressable_areas import AddressableAreaView
 from opentrons.protocol_engine.state.geometry import GeometryView
 
 
@@ -17,6 +18,12 @@ def labware_view(decoy: Decoy) -> LabwareView:
 def pipette_view(decoy: Decoy) -> PipetteView:
     """Get a mock in the shape of a PipetteView."""
     return decoy.mock(cls=PipetteView)
+
+
+@pytest.fixture
+def addressable_area_view(decoy: Decoy) -> AddressableAreaView:
+    """Get a mock in the shape of a AddressableAreaView."""
+    return decoy.mock(cls=AddressableAreaView)
 
 
 @pytest.fixture

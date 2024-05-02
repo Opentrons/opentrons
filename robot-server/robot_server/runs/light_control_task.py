@@ -1,4 +1,4 @@
-"""Background task to drive the status bar."""
+"""Background task to drive the Flex's status bar."""
 from typing import Optional, List
 from logging import getLogger
 import asyncio
@@ -32,22 +32,21 @@ def _engine_status_to_status_bar(
     initialization_done: bool,
 ) -> StatusBarState:
     """Convert an engine status into a status bar status."""
-    if status is None:
-        return StatusBarState.IDLE if initialization_done else StatusBarState.OFF
-
-    return {
-        EngineStatus.IDLE: StatusBarState.IDLE
-        if initialization_done
-        else StatusBarState.OFF,
-        EngineStatus.RUNNING: StatusBarState.RUNNING,
-        EngineStatus.PAUSED: StatusBarState.PAUSED,
-        EngineStatus.BLOCKED_BY_OPEN_DOOR: StatusBarState.PAUSED,
-        EngineStatus.STOP_REQUESTED: StatusBarState.UPDATING,
-        EngineStatus.STOPPED: StatusBarState.IDLE,
-        EngineStatus.FINISHING: StatusBarState.UPDATING,
-        EngineStatus.FAILED: StatusBarState.HARDWARE_ERROR,
-        EngineStatus.SUCCEEDED: StatusBarState.RUN_COMPLETED,
-    }[status]
+    match status:
+        case None | EngineStatus.IDLE:
+            return StatusBarState.IDLE if initialization_done else StatusBarState.OFF
+        case EngineStatus.RUNNING:
+            return StatusBarState.RUNNING
+        case EngineStatus.PAUSED | EngineStatus.AWAITING_RECOVERY | EngineStatus.BLOCKED_BY_OPEN_DOOR:
+            return StatusBarState.PAUSED
+        case EngineStatus.STOP_REQUESTED | EngineStatus.FINISHING:
+            return StatusBarState.UPDATING
+        case EngineStatus.STOPPED:
+            return StatusBarState.IDLE
+        case EngineStatus.FAILED:
+            return StatusBarState.HARDWARE_ERROR
+        case EngineStatus.SUCCEEDED:
+            return StatusBarState.RUN_COMPLETED
 
 
 def _active_updates_to_status_bar(
@@ -81,7 +80,7 @@ def _active_updates_to_status_bar(
 
 
 class LightController:
-    """LightController sets the status bar to match the protocol status."""
+    """LightController sets the Flex's status bar to match the protocol status."""
 
     def __init__(
         self, api: HardwareControlAPI, engine_store: Optional[EngineStore]

@@ -38,6 +38,7 @@ export type DispatchRequestsType = (...actions: Action[]) => void
  * }
  */
 export function useDispatchApiRequest(): [DispatchApiRequestType, string[]] {
+  //  @ts-expect-error(BC, 2023-12-06): replace void with T
   const dispatch = useDispatch<(a: Action) => void>()
 
   // TODO(mc, 2019-11-06): evaluate whether or not this can be a ref

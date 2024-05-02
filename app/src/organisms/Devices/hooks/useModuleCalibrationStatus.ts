@@ -11,7 +11,7 @@ export function useModuleCalibrationStatus(
   const isFlex = useIsFlex(robotName)
   // TODO: can probably use getProtocolModulesInfo but in a rush to get out 7.0.1
   const moduleRenderInfoForProtocolById = omitBy(
-    useModuleRenderInfoForProtocolById(robotName, runId),
+    useModuleRenderInfoForProtocolById(runId),
     moduleRenderInfo =>
       moduleRenderInfo.moduleDef.moduleType === MAGNETIC_BLOCK_TYPE
   )

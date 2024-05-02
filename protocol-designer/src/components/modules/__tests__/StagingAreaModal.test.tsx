@@ -1,24 +1,24 @@
 import * as React from 'react'
-import i18n from 'i18next'
-import { DeckConfigurator, renderWithProviders } from '@opentrons/components'
+import { vi, describe, it, expect, beforeEach, afterEach } from 'vitest'
+import { fireEvent, screen, cleanup } from '@testing-library/react'
+import { renderWithProviders } from '../../../__testing-utils__'
+import { i18n } from '../../../localization'
 import { getInitialDeckSetup } from '../../../step-forms/selectors'
 import { getSlotIsEmpty } from '../../../step-forms'
 import { StagingAreasModal } from '../StagingAreasModal'
+import type * as Components from '@opentrons/components'
 
-jest.mock('../../../step-forms')
-jest.mock('../../../step-forms/selectors')
-jest.mock('../../../step-forms/actions/additionalItems')
-jest.mock('@opentrons/components/src/hardware-sim/DeckConfigurator/index')
+vi.mock('../../../step-forms')
+vi.mock('../../../step-forms/selectors')
+vi.mock('../../../step-forms/actions/additionalItems')
+vi.mock('@opentrons/components', async importOriginal => {
+  const actual = await importOriginal<typeof Components>()
+  return {
+    ...actual,
+    DeckConfigurator: vi.fn(() => <div>mock deck config</div>),
+  }
+})
 
-const mockGetInitialDeckSetup = getInitialDeckSetup as jest.MockedFunction<
-  typeof getInitialDeckSetup
->
-const mockGetSlotIsEmpty = getSlotIsEmpty as jest.MockedFunction<
-  typeof getSlotIsEmpty
->
-const mockDeckConfigurator = DeckConfigurator as jest.MockedFunction<
-  typeof DeckConfigurator
->
 const render = (props: React.ComponentProps<typeof StagingAreasModal>) => {
   return renderWithProviders(<StagingAreasModal {...props} />, {
     i18nInstance: i18n,
@@ -29,23 +29,25 @@ describe('StagingAreasModal', () => {
   let props: React.ComponentProps<typeof StagingAreasModal>
   beforeEach(() => {
     props = {
-      onCloseClick: jest.fn(),
+      onCloseClick: vi.fn(),
       stagingAreas: [],
     }
-    mockGetInitialDeckSetup.mockReturnValue({
+    vi.mocked(getInitialDeckSetup).mockReturnValue({
       pipettes: {},
       additionalEquipmentOnDeck: {},
       labware: {},
       modules: {},
     })
-    mockGetSlotIsEmpty.mockReturnValue(true)
-    mockDeckConfigurator.mockReturnValue(<div>mock deck config</div>)
+    vi.mocked(getSlotIsEmpty).mockReturnValue(true)
+  })
+  afterEach(() => {
+    cleanup()
   })
   it('renders the deck, header, and buttons work as expected', () => {
-    const { getByText, getByRole } = render(props)
-    getByText('mock deck config')
-    getByText('Staging Area Slots')
-    getByRole('button', { name: 'cancel' }).click()
+    render(props)
+    screen.getByText('mock deck config')
+    screen.getByText('Staging Area Slots')
+    fireEvent.click(screen.getByRole('button', { name: 'cancel' }))
     expect(props.onCloseClick).toHaveBeenCalled()
   })
 })

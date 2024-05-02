@@ -4,7 +4,7 @@ import os
 from pathlib import Path
 from subprocess import check_output
 from time import time
-from typing import Tuple, Union
+from typing import Tuple, Union, List, Any
 
 from opentrons.config import infer_config_base_dir, IS_ROBOT
 
@@ -134,3 +134,8 @@ def insert_data_to_file(
     contents.insert(line, data)
     with open(data_path, "w") as f:
         f.write("".join(contents))
+
+
+def convert_list_to_csv_line(elements: List[Any]) -> str:
+    """Convert list of something into CSV line."""
+    return ",".join(str(elements))

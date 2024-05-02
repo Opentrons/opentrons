@@ -128,7 +128,6 @@ class GetStatusResponsePayload(EmptyPayload):
     """Get status response."""
 
     status: utils.UInt8Field
-    data: utils.UInt32Field
 
 
 @dataclass(eq=False)
@@ -261,6 +260,14 @@ class MotorDriverRegisterDataPayload(MotorDriverRegisterPayload):
 @dataclass(eq=False)
 class ReadMotorDriverRegisterResponsePayload(EmptyPayload):
     """Read motor driver register response payload."""
+
+    reg_addr: utils.UInt8Field
+    data: utils.UInt32Field
+
+
+@dataclass(eq=False)
+class ReadMotorDriverErrorStatusResponsePayload(EmptyPayload):
+    """Read motor driver error status response payload."""
 
     reg_addr: utils.UInt8Field
     data: utils.UInt32Field
@@ -482,6 +489,13 @@ class BindSensorOutputResponsePayload(SensorPayload):
 
 
 @dataclass(eq=False)
+class AddSensorLinearMoveBasePayload(AddLinearMoveRequestPayload):
+    """A request to add a linear move that also requires sensor reading for its duration."""
+
+    sensor_id: SensorIdField
+
+
+@dataclass(eq=False)
 class PipetteInfoResponsePayload(EmptyPayload):
     """A response carrying data about an attached pipette."""
 
@@ -525,6 +539,13 @@ class GripperJawStatePayload(EmptyPayload):
     """A respones carrying info about the jaw state of a gripper."""
 
     state: utils.UInt8Field
+
+
+@dataclass(eq=False)
+class GripperJawHoldoffPayload(EmptyPayload):
+    """A respones carrying info about the jaw holdoff value of a gripper."""
+
+    holdoff_ms: utils.UInt32Field
 
 
 @dataclass(eq=False)
@@ -620,3 +641,53 @@ class GetMotorUsageResponsePayload(_GetMotorUsageResponsePayloadBase):
         return inst
 
     usage_elements: List[MotorUsageTypeField]
+
+
+@dataclass(eq=False)
+class HepaUVInfoResponsePayload(EmptyPayload):
+    """A response carrying data about an attached hepa uv."""
+
+    model: utils.UInt16Field
+    serial: SerialDataCodeField
+
+
+@dataclass(eq=False)
+class SetHepaFanStateRequestPayload(EmptyPayload):
+    """A request to set the state and pwm of a the hepa fan."""
+
+    duty_cycle: utils.UInt32Field
+    fan_on: utils.UInt8Field
+
+
+@dataclass(eq=False)
+class GetHepaFanStatePayloadResponse(EmptyPayload):
+    """A response with the state and pwm of the fan."""
+
+    duty_cycle: utils.UInt32Field
+    fan_on: utils.UInt8Field
+    fan_rpm: utils.UInt16Field
+
+
+@dataclass(eq=False)
+class SetHepaUVStateRequestPayload(EmptyPayload):
+    """A request to set the state and timeout in seconds of the hepa uv light."""
+
+    uv_duration_s: utils.UInt32Field
+    uv_light_on: utils.UInt8Field
+
+
+@dataclass(eq=False)
+class GetHepaUVStatePayloadResponse(EmptyPayload):
+    """A response with the state and timeout in seconds of the hepa uv light."""
+
+    uv_duration_s: utils.UInt32Field
+    uv_light_on: utils.UInt8Field
+    remaining_time_s: utils.UInt32Field
+    uv_current_ma: utils.UInt16Field
+
+
+@dataclass(eq=False)
+class SendAccumulatedPressureDataPayload(EmptyPayload):
+    """Send queued readings from a sensor."""
+
+    sensor_id: SensorIdField

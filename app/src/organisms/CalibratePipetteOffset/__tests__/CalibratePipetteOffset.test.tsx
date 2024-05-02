@@ -1,8 +1,9 @@
 import * as React from 'react'
-import { when, resetAllWhenMocks } from 'jest-when'
+import { vi, it, describe, expect, beforeEach } from 'vitest'
+import { when } from 'vitest-when'
 
-import { renderWithProviders } from '@opentrons/components'
-import { getDeckDefinitions } from '@opentrons/components/src/hardware-sim/Deck/getDeckDefinitions'
+import { renderWithProviders } from '../../../__testing-utils__'
+import { getDeckDefinitions } from '@opentrons/shared-data'
 
 import { i18n } from '../../../i18n'
 import * as Sessions from '../../../redux/sessions'
@@ -11,26 +12,47 @@ import { mockPipetteOffsetCalibrationSessionAttributes } from '../../../redux/se
 import { CalibratePipetteOffset } from '../index'
 import type { PipetteOffsetCalibrationStep } from '../../../redux/sessions/types'
 import { DispatchRequestsType } from '../../../redux/robot-api'
+import { fireEvent, screen } from '@testing-library/react'
 
-jest.mock('@opentrons/components/src/hardware-sim/Deck/getDeckDefinitions')
-jest.mock('../../../redux/sessions/selectors')
-jest.mock('../../../redux/robot-api/selectors')
-jest.mock('../../../redux/config')
+vi.mock('@opentrons/shared-data', async importOriginal => {
+  const actual = await importOriginal<typeof getDeckDefinitions>()
+  return {
+    ...actual,
+    getDeckDefinitions: vi.fn(),
+  }
+})
+vi.mock('../../../redux/sessions/selectors')
+vi.mock('../../../redux/robot-api/selectors')
+vi.mock('../../../redux/config')
 
 interface CalibratePipetteOffsetSpec {
   heading: string
   currentStep: PipetteOffsetCalibrationStep
 }
 
-const mockGetDeckDefinitions = getDeckDefinitions as jest.MockedFunction<
-  typeof getDeckDefinitions
->
-
 describe('CalibratePipetteOffset', () => {
   let dispatchRequests: DispatchRequestsType
-  let render: (
-    props?: Partial<React.ComponentProps<typeof CalibratePipetteOffset>>
-  ) => ReturnType<typeof renderWithProviders>
+  const render = (
+    props: Partial<React.ComponentProps<typeof CalibratePipetteOffset>> = {}
+  ) => {
+    const {
+      showSpinner = false,
+      isJogging = false,
+      session = mockPipOffsetCalSession,
+    } = props
+    return renderWithProviders<
+      React.ComponentType<typeof CalibratePipetteOffset>
+    >(
+      <CalibratePipetteOffset
+        robotName="robot-name"
+        session={session}
+        dispatchRequests={dispatchRequests}
+        showSpinner={showSpinner}
+        isJogging={isJogging}
+      />,
+      { i18nInstance: i18n }
+    )
+  }
   let mockPipOffsetCalSession: Sessions.PipetteOffsetCalibrationSession
   const SPECS: CalibratePipetteOffsetSpec[] = [
     { heading: 'Before you begin', currentStep: 'sessionStarted' },
@@ -52,42 +74,18 @@ describe('CalibratePipetteOffset', () => {
   ]
 
   beforeEach(() => {
-    dispatchRequests = jest.fn()
-    when(mockGetDeckDefinitions).calledWith().mockReturnValue({})
+    dispatchRequests = vi.fn()
+    when(vi.mocked(getDeckDefinitions)).calledWith().thenReturn({})
 
     mockPipOffsetCalSession = {
       id: 'fake_session_id',
       ...mockPipetteOffsetCalibrationSessionAttributes,
     }
-
-    render = (props = {}) => {
-      const {
-        showSpinner = false,
-        isJogging = false,
-        session = mockPipOffsetCalSession,
-      } = props
-      return renderWithProviders<
-        React.ComponentType<typeof CalibratePipetteOffset>
-      >(
-        <CalibratePipetteOffset
-          robotName="robot-name"
-          session={session}
-          dispatchRequests={dispatchRequests}
-          showSpinner={showSpinner}
-          isJogging={isJogging}
-        />,
-        { i18nInstance: i18n }
-      )
-    }
-  })
-
-  afterEach(() => {
-    resetAllWhenMocks()
   })
 
   SPECS.forEach(spec => {
     it(`renders correct contents when currentStep is ${spec.currentStep}`, () => {
-      const { getByRole, queryByRole } = render({
+      render({
         session: {
           ...mockPipOffsetCalSession,
           details: {
@@ -95,38 +93,38 @@ describe('CalibratePipetteOffset', () => {
             currentStep: spec.currentStep,
           },
         },
-      })[0]
+      })
 
       SPECS.forEach(({ currentStep, heading }) => {
         if (currentStep === spec.currentStep) {
           expect(
-            getByRole('heading', { name: spec.heading })
+            screen.getByRole('heading', { name: spec.heading })
           ).toBeInTheDocument()
         } else {
-          expect(queryByRole('heading', { name: heading })).toBeNull()
+          expect(screen.queryByRole('heading', { name: heading })).toBeNull()
         }
       })
     })
   })
 
   it('renders confirm exit on exit click', () => {
-    const { getByRole, queryByRole } = render()[0]
-
+    render()
     expect(
-      queryByRole('heading', {
+      screen.queryByRole('heading', {
         name: 'Pipette Offset Calibration progress will be lost',
       })
     ).toBeNull()
-    getByRole('button', { name: 'Exit' }).click()
+    const exitButton = screen.getByRole('button', { name: 'Exit' })
+    fireEvent.click(exitButton)
     expect(
-      getByRole('heading', {
+      screen.getByRole('heading', {
         name: 'Pipette Offset Calibration progress will be lost',
       })
     ).toBeInTheDocument()
   })
 
   it('does not render contents when showSpinner is true', () => {
-    const { queryByRole } = render({
+    render({
       showSpinner: true,
       session: {
         ...mockPipOffsetCalSession,
@@ -135,8 +133,10 @@ describe('CalibratePipetteOffset', () => {
           currentStep: 'sessionStarted',
         },
       },
-    })[0]
-    expect(queryByRole('heading', { name: 'Before you begin' })).toBeNull()
+    })
+    expect(
+      screen.queryByRole('heading', { name: 'Before you begin' })
+    ).toBeNull()
   })
 
   it('does dispatch jog requests when not isJogging', () => {
@@ -148,8 +148,9 @@ describe('CalibratePipetteOffset', () => {
         currentStep: Sessions.PIP_OFFSET_STEP_PREPARING_PIPETTE,
       },
     }
-    const { getByRole } = render({ isJogging: false, session })[0]
-    getByRole('button', { name: 'forward' }).click()
+    render({ isJogging: false, session })
+    const forwardButton = screen.getByRole('button', { name: 'forward' })
+    fireEvent.click(forwardButton)
     expect(dispatchRequests).toHaveBeenCalledWith(
       Sessions.createSessionCommand('robot-name', session.id, {
         command: Sessions.sharedCalCommands.JOG,
@@ -167,8 +168,9 @@ describe('CalibratePipetteOffset', () => {
         currentStep: Sessions.PIP_OFFSET_STEP_PREPARING_PIPETTE,
       },
     }
-    const { getByRole } = render({ isJogging: true, session })[0]
-    getByRole('button', { name: 'forward' }).click()
+    render({ isJogging: true, session })
+    const forwardButton = screen.getByRole('button', { name: 'forward' })
+    fireEvent.click(forwardButton)
     expect(dispatchRequests).not.toHaveBeenCalledWith(
       Sessions.createSessionCommand('robot-name', session.id, {
         command: Sessions.sharedCalCommands.JOG,

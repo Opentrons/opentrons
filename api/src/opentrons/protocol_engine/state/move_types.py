@@ -6,7 +6,7 @@ from typing import List, Optional
 from opentrons.types import Point
 from opentrons.motion_planning.types import MoveType
 
-from ..types import CurrentWell
+from ..types import CurrentWell, CurrentPipetteLocation
 
 
 @dataclass
@@ -32,14 +32,14 @@ def get_move_type_to_well(
     pipette_id: str,
     labware_id: str,
     well_name: str,
-    location: Optional[CurrentWell],
+    location: Optional[CurrentPipetteLocation],
     force_direct: bool,
 ) -> MoveType:
     """Get the move type for a move to well command."""
     if force_direct:
         return MoveType.DIRECT
     if (
-        location is not None
+        isinstance(location, CurrentWell)
         and pipette_id == location.pipette_id
         and labware_id == location.labware_id
     ):

@@ -27,6 +27,7 @@ _DEFAULT_PCBA_REVS: Final[Dict[FirmwareTarget, str]] = {
     NodeId.gantry_x: "c1",
     NodeId.gantry_y: "c1",
     NodeId.gripper: "c1",
+    NodeId.hepa_uv: "b1",
     USBTarget.rear_panel: "b1",
 }
 
@@ -50,6 +51,7 @@ class FirmwareUpdateType(Enum):
     pipettes_multi = 5
     pipettes_96 = 6
     rear_panel = 7
+    hepa_uv = 8
     unknown = -1
     unknown_no_subtype = -2
     unknown_no_revision = -3
@@ -89,6 +91,7 @@ class FirmwareUpdateType(Enum):
             NodeId.gantry_x: cls.gantry_x,
             NodeId.gantry_y: cls.gantry_y,
             NodeId.gripper: cls.gripper,
+            NodeId.hepa_uv: cls.hepa_uv,
         }
         return lookup[node.application_for()]
 

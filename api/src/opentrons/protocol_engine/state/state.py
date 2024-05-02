@@ -2,10 +2,10 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from functools import partial
-from typing import Any, Callable, Dict, List, Optional, Sequence, TypeVar
+from typing import Callable, Dict, List, Optional, Sequence, TypeVar
+from typing_extensions import ParamSpec
 
-from opentrons_shared_data.deck.dev_types import DeckDefinitionV4
+from opentrons_shared_data.deck.dev_types import DeckDefinitionV5
 
 from opentrons.protocol_engine.types import ModuleOffsetData
 
@@ -14,6 +14,11 @@ from ..actions import Action, ActionHandler
 from .abstract_store import HasState, HandlesActions
 from .change_notifier import ChangeNotifier
 from .commands import CommandState, CommandStore, CommandView
+from .addressable_areas import (
+    AddressableAreaState,
+    AddressableAreaStore,
+    AddressableAreaView,
+)
 from .labware import LabwareState, LabwareStore, LabwareView
 from .pipettes import PipetteState, PipetteStore, PipetteView
 from .modules import ModuleState, ModuleStore, ModuleView
@@ -23,8 +28,11 @@ from .geometry import GeometryView
 from .motion import MotionView
 from .config import Config
 from .state_summary import StateSummary
+from ..types import DeckConfigurationType
 
-ReturnT = TypeVar("ReturnT")
+
+_ParamsT = ParamSpec("_ParamsT")
+_ReturnT = TypeVar("_ReturnT")
 
 
 @dataclass(frozen=True)
@@ -32,6 +40,7 @@ class State:
     """Underlying engine state."""
 
     commands: CommandState
+    addressable_areas: AddressableAreaState
     labware: LabwareState
     pipettes: PipetteState
     modules: ModuleState
@@ -44,6 +53,7 @@ class StateView(HasState[State]):
 
     _state: State
     _commands: CommandView
+    _addressable_areas: AddressableAreaView
     _labware: LabwareView
     _pipettes: PipetteView
     _modules: ModuleView
@@ -57,6 +67,11 @@ class StateView(HasState[State]):
     def commands(self) -> CommandView:
         """Get state view selectors for commands state."""
         return self._commands
+
+    @property
+    def addressable_areas(self) -> AddressableAreaView:
+        """Get state view selectors for addressable area state."""
+        return self._addressable_areas
 
     @property
     def labware(self) -> LabwareView:
@@ -101,6 +116,7 @@ class StateView(HasState[State]):
     def get_summary(self) -> StateSummary:
         """Get protocol run data."""
         error = self._commands.get_error()
+        # TODO maybe add summary here for AA
         return StateSummary.construct(
             status=self._commands.get_status(),
             errors=[] if error is None else [error],
@@ -126,11 +142,13 @@ class StateStore(StateView, ActionHandler):
         self,
         *,
         config: Config,
-        deck_definition: DeckDefinitionV4,
+        deck_definition: DeckDefinitionV5,
         deck_fixed_labware: Sequence[DeckFixedLabware],
         is_door_open: bool,
         change_notifier: Optional[ChangeNotifier] = None,
         module_calibration_offsets: Optional[Dict[str, ModuleOffsetData]] = None,
+        deck_configuration: Optional[DeckConfigurationType] = None,
+        notify_publishers: Optional[Callable[[], None]] = None,
     ) -> None:
         """Initialize a StateStore and its substores.
 
@@ -143,15 +161,25 @@ class StateStore(StateView, ActionHandler):
             is_door_open: Whether the robot's door is currently open.
             change_notifier: Internal state change notifier.
             module_calibration_offsets: Module offsets to preload.
+            deck_configuration: The initial deck configuration the addressable area store will be instantiated with.
+            notify_publishers: Notifies robot server publishers of internal state change.
         """
         self._command_store = CommandStore(config=config, is_door_open=is_door_open)
         self._pipette_store = PipetteStore()
+        if deck_configuration is None:
+            deck_configuration = []
+        self._addressable_area_store = AddressableAreaStore(
+            deck_configuration=deck_configuration,
+            config=config,
+            deck_definition=deck_definition,
+        )
         self._labware_store = LabwareStore(
             deck_fixed_labware=deck_fixed_labware,
             deck_definition=deck_definition,
         )
         self._module_store = ModuleStore(
-            module_calibration_offsets=module_calibration_offsets
+            config=config,
+            module_calibration_offsets=module_calibration_offsets,
         )
         self._liquid_store = LiquidStore()
         self._tip_store = TipStore()
@@ -159,6 +187,7 @@ class StateStore(StateView, ActionHandler):
         self._substores: List[HandlesActions] = [
             self._command_store,
             self._pipette_store,
+            self._addressable_area_store,
             self._labware_store,
             self._module_store,
             self._liquid_store,
@@ -166,6 +195,7 @@ class StateStore(StateView, ActionHandler):
         ]
         self._config = config
         self._change_notifier = change_notifier or ChangeNotifier()
+        self._notify_robot_server = notify_publishers
         self._initialize_state()
 
     def handle_action(self, action: Action) -> None:
@@ -182,10 +212,10 @@ class StateStore(StateView, ActionHandler):
 
     async def wait_for(
         self,
-        condition: Callable[..., Optional[ReturnT]],
-        *args: Any,
-        **kwargs: Any,
-    ) -> ReturnT:
+        condition: Callable[_ParamsT, _ReturnT],
+        *args: _ParamsT.args,
+        **kwargs: _ParamsT.kwargs,
+    ) -> _ReturnT:
         """Wait for a condition to become true, checking whenever state changes.
 
         If the condition is already true, return immediately.
@@ -230,19 +260,49 @@ class StateStore(StateView, ActionHandler):
         Raises:
             The exception raised by the `condition` function, if any.
         """
-        predicate = partial(condition, *args, **kwargs)
-        is_done = predicate()
 
-        while not is_done:
+        def predicate() -> _ReturnT:
+            return condition(*args, **kwargs)
+
+        return await self._wait_for(condition=predicate, truthiness_to_wait_for=True)
+
+    async def wait_for_not(
+        self,
+        condition: Callable[_ParamsT, _ReturnT],
+        *args: _ParamsT.args,
+        **kwargs: _ParamsT.kwargs,
+    ) -> _ReturnT:
+        """Like `wait_for()`, except wait for the condition to become false.
+
+        See the documentation in `wait_for()`, especially the warning about condition
+        design.
+
+        The advantage of having this separate method over just passing a wrapper lambda
+        as the condition to `wait_for()` yourself is that wrapper lambdas are hard to
+        test in the mock-heavy Decoy + Protocol Engine style.
+        """
+
+        def predicate() -> _ReturnT:
+            return condition(*args, **kwargs)
+
+        return await self._wait_for(condition=predicate, truthiness_to_wait_for=False)
+
+    async def _wait_for(
+        self, condition: Callable[[], _ReturnT], truthiness_to_wait_for: bool
+    ) -> _ReturnT:
+        current_value = condition()
+
+        while bool(current_value) != truthiness_to_wait_for:
             await self._change_notifier.wait()
-            is_done = predicate()
+            current_value = condition()
 
-        return is_done
+        return current_value
 
     def _get_next_state(self) -> State:
         """Get a new instance of the state value object."""
         return State(
             commands=self._command_store.state,
+            addressable_areas=self._addressable_area_store.state,
             labware=self._labware_store.state,
             pipettes=self._pipette_store.state,
             modules=self._module_store.state,
@@ -257,6 +317,7 @@ class StateStore(StateView, ActionHandler):
         # Base states
         self._state = state
         self._commands = CommandView(state.commands)
+        self._addressable_areas = AddressableAreaView(state.addressable_areas)
         self._labware = LabwareView(state.labware)
         self._pipettes = PipetteView(state.pipettes)
         self._modules = ModuleView(state.modules)
@@ -269,11 +330,13 @@ class StateStore(StateView, ActionHandler):
             labware_view=self._labware,
             module_view=self._modules,
             pipette_view=self._pipettes,
+            addressable_area_view=self._addressable_areas,
         )
         self._motion = MotionView(
             config=self._config,
             labware_view=self._labware,
             pipette_view=self._pipettes,
+            addressable_area_view=self._addressable_areas,
             geometry_view=self._geometry,
             module_view=self._modules,
         )
@@ -283,9 +346,12 @@ class StateStore(StateView, ActionHandler):
         next_state = self._get_next_state()
         self._state = next_state
         self._commands._state = next_state.commands
+        self._addressable_areas._state = next_state.addressable_areas
         self._labware._state = next_state.labware
         self._pipettes._state = next_state.pipettes
         self._modules._state = next_state.modules
         self._liquid._state = next_state.liquids
         self._tips._state = next_state.tips
         self._change_notifier.notify()
+        if self._notify_robot_server is not None:
+            self._notify_robot_server()

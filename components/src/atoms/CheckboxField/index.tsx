@@ -1,6 +1,7 @@
 import * as React from 'react'
 import { css } from 'styled-components'
-import { COLORS, SPACING, TYPOGRAPHY } from '../../ui-style-constants'
+import { SPACING, TYPOGRAPHY } from '../../ui-style-constants'
+import { COLORS, BORDERS } from '../../helix-design-system'
 import { Flex, Box } from '../../primitives'
 import { Icon } from '../../icons'
 import { ALIGN_CENTER, JUSTIFY_CENTER, SIZE_1 } from '../../styles'
@@ -35,7 +36,9 @@ const INPUT_STYLE = css`
   border: 0;
 `
 const OUTER_STYLE = css`
-  @apply --font-form-default;
+  font-size: var(--fs-body-1); /* from legacy --font-form-default */
+  font-weight: var(--fw-regular); /* from legacy --font-form-default */
+  color: var(--c-font-dark); /* from legacy --font-form-default */
 
   display: flex;
   align-items: ${ALIGN_CENTER};
@@ -45,60 +48,60 @@ const OUTER_STYLE = css`
 const INNER_STYLE_VALUE = css`
   width: ${SPACING.spacing20};
   min-width: ${SPACING.spacing20};
-  color: ${COLORS.blueEnabled};
+  color: ${COLORS.blue50};
   display: flex;
-  border-radius: 1px;
+  border-radius: ${BORDERS.borderRadius2};
   justify-content: ${JUSTIFY_CENTER};
   align-items: ${ALIGN_CENTER};
 
   &:hover {
     cursor: pointer;
-    color: ${COLORS.blueHover};
+    color: ${COLORS.blue55};
   }
 
   &:active {
-    color: ${COLORS.bluePressed};
+    color: ${COLORS.blue60};
   }
 
   &:focus {
-    box-shadow: 0 0 0 3px ${COLORS.fundamentalsFocus};
+    box-shadow: 0 0 0 3px ${COLORS.blue50};
   }
   &:disabled {
-    color: ${COLORS.bluePressed};
+    color: ${COLORS.blue60};
   }
 `
 
 const INNER_STYLE_NO_VALUE = css`
   width: ${SPACING.spacing20};
   min-width: ${SPACING.spacing20};
-  color: ${COLORS.darkGreyEnabled};
+  color: ${COLORS.grey50};
   display: flex;
-  border-radius: 1px;
+  border-radius: ${BORDERS.borderRadius2};
   justify-content: ${JUSTIFY_CENTER};
   align-items: ${ALIGN_CENTER};
 
   &:hover {
     cursor: pointer;
-    color: ${COLORS.darkGreyHover};
+    color: ${COLORS.grey60};
   }
 
   &:active {
-    color: ${COLORS.darkGreyPressed};
+    color: ${COLORS.grey60};
   }
 
   &:focus {
-    box-shadow: 0 0 0 3px ${COLORS.fundamentalsFocus};
+    box-shadow: 0 0 0 3px ${COLORS.blue50};
   }
 
   &:disabled {
-    color: ${COLORS.darkGreyPressed};
+    color: ${COLORS.grey60};
   }
 `
 
 const LABEL_TEXT_STYLE = css`
   font-size: ${TYPOGRAPHY.fontSizeP};
   font-weight: ${TYPOGRAPHY.fontWeightRegular};
-  color: ${COLORS.darkBlackEnabled};
+  color: ${COLORS.black90};
   flex: 0 0 auto;
   padding: ${SPACING.spacing8} ${SPACING.spacing8};
 
@@ -125,14 +128,14 @@ export function CheckboxField(props: CheckboxFieldProps): JSX.Element {
         <Flex
           alignItems={ALIGN_CENTER}
           justifyContent={JUSTIFY_CENTER}
-          borderRadius="2px"
-          backgroundColor={COLORS.darkGreyDisabled}
+          borderRadius={BORDERS.borderRadius2}
+          backgroundColor={COLORS.grey30}
           size={SIZE_1}
         >
           <Box
             height="1.5px"
             width="0.375rem"
-            backgroundColor={COLORS.darkGreyEnabled}
+            backgroundColor={COLORS.grey50}
           />
         </Flex>
       ) : (

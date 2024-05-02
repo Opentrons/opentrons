@@ -1,19 +1,18 @@
 import * as React from 'react'
 import { MemoryRouter } from 'react-router-dom'
-import { renderWithProviders } from '@opentrons/components'
+import { fireEvent, screen } from '@testing-library/react'
+import { describe, it, expect, vi, beforeEach } from 'vitest'
+import '@testing-library/jest-dom/vitest'
 
 import { i18n } from '../../../i18n'
+import { renderWithProviders } from '../../../__testing-utils__'
 import { RobotSystemVersion } from '../RobotSystemVersion'
 import { RobotSystemVersionModal } from '../RobotSystemVersionModal'
 
-jest.mock('../../../redux/shell')
-jest.mock('../RobotSystemVersionModal')
+vi.mock('../../../redux/shell')
+vi.mock('../RobotSystemVersionModal')
 
-const mockBack = jest.fn()
-
-const mockRobotSystemVersionModal = RobotSystemVersionModal as jest.MockedFunction<
-  typeof RobotSystemVersionModal
->
+const mockBack = vi.fn()
 
 const render = (props: React.ComponentProps<typeof RobotSystemVersion>) => {
   return renderWithProviders(
@@ -36,23 +35,19 @@ describe('RobotSystemVersion', () => {
       setCurrentOption: mockBack,
       robotUpdateInfo: null,
     }
-    mockRobotSystemVersionModal.mockReturnValue(
+    vi.mocked(RobotSystemVersionModal).mockReturnValue(
       <div>mock RobotSystemVersionModal</div>
     )
   })
 
-  afterEach(() => {
-    jest.clearAllMocks()
-  })
-
   it('should render text when there is no available update', () => {
-    const [{ getByText }] = render(props)
-    getByText('Robot System Version')
-    getByText(
+    render(props)
+    screen.getByText('Robot System Version')
+    screen.getByText(
       'View latest release notes at https://github.com/Opentrons/opentrons/releases'
     )
-    getByText('Current Version')
-    getByText('mock7.0.0')
+    screen.getByText('Current Version')
+    screen.getByText('mock7.0.0')
   })
 
   it('should render text when there is available update', () => {
@@ -65,9 +60,9 @@ describe('RobotSystemVersion', () => {
         releaseNotes: null,
       },
     }
-    const [{ getByText }] = render(props)
-    getByText('Update available')
-    getByText('View update')
+    render(props)
+    screen.getByText('Update available')
+    screen.getByText('View update')
   })
 
   it('should render mock robot system version modal when tapping view update', () => {
@@ -75,14 +70,14 @@ describe('RobotSystemVersion', () => {
       ...props,
       isUpdateAvailable: true,
     }
-    const [{ getByText }] = render(props)
-    getByText('View update').click()
-    getByText('mock RobotSystemVersionModal')
+    render(props)
+    fireEvent.click(screen.getByText('View update'))
+    screen.getByText('mock RobotSystemVersionModal')
   })
 
   it('should call a mock function when tapping Back button', () => {
-    const [{ getByRole }] = render(props)
-    getByRole('button').click()
+    render(props)
+    fireEvent.click(screen.getByRole('button'))
     expect(mockBack).toHaveBeenCalled()
   })
 })

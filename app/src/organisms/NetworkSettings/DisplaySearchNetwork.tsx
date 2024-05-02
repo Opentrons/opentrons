@@ -2,17 +2,16 @@ import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 
 import {
-  Flex,
-  DIRECTION_COLUMN,
   ALIGN_CENTER,
+  BORDERS,
+  COLORS,
+  DIRECTION_COLUMN,
+  Flex,
   JUSTIFY_CENTER,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
-  COLORS,
-  BORDERS,
 } from '@opentrons/components'
-
-import { StyledText } from '../../atoms/text'
 
 export function DisplaySearchNetwork(): JSX.Element {
   const { t } = useTranslation(['device_settings', 'shared'])
@@ -21,7 +20,7 @@ export function DisplaySearchNetwork(): JSX.Element {
       height="17.5rem"
       backgroundColor={COLORS.white}
       justifyContent={JUSTIFY_CENTER}
-      borderRadius={BORDERS.borderRadiusSize3}
+      borderRadius={BORDERS.borderRadius12}
       width="100%"
       data-testid="Display-Search-Network-text"
     >
@@ -32,7 +31,7 @@ export function DisplaySearchNetwork(): JSX.Element {
       >
         <StyledText
           as="h3"
-          color={COLORS.darkBlack70}
+          color={COLORS.grey60}
           fontWeight={TYPOGRAPHY.fontWeightSemiBold}
           marginTop={SPACING.spacing40}
         >

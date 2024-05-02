@@ -1,8 +1,9 @@
 import * as React from 'react'
-import { when, resetAllWhenMocks } from 'jest-when'
+import { vi, it, expect, describe, beforeEach, afterEach } from 'vitest'
+import { when } from 'vitest-when'
 import { Provider } from 'react-redux'
 import { createStore, Store } from 'redux'
-import { renderHook } from '@testing-library/react-hooks'
+import { renderHook } from '@testing-library/react'
 import { QueryClient, QueryClientProvider } from 'react-query'
 import { useCalibrationStatusQuery } from '@opentrons/react-api-client'
 
@@ -12,21 +13,14 @@ import { getDiscoverableRobotByName } from '../../../../redux/discovery'
 import { useDeckCalibrationStatus } from '..'
 import { mockConnectableRobot } from '../../../../redux/discovery/__fixtures__'
 
-jest.mock('@opentrons/react-api-client')
-jest.mock('../../../../redux/calibration')
-jest.mock('../../../../redux/discovery')
+vi.mock('@opentrons/react-api-client')
+vi.mock('../../../../redux/calibration')
+vi.mock('../../../../redux/discovery')
 
-const mockGetDiscoverableRobotByName = getDiscoverableRobotByName as jest.MockedFunction<
-  typeof getDiscoverableRobotByName
->
-const mockUseCalibrationStatusQuery = useCalibrationStatusQuery as jest.MockedFunction<
-  typeof useCalibrationStatusQuery
->
-
-const store: Store<any> = createStore(jest.fn(), {})
+const store: Store<any> = createStore(vi.fn(), {})
 
 describe('useDeckCalibrationStatus hook', () => {
-  let wrapper: React.FunctionComponent<{}>
+  let wrapper: React.FunctionComponent<{ children: React.ReactNode }>
   beforeEach(() => {
     const queryClient = new QueryClient()
     wrapper = ({ children }) => (
@@ -38,17 +32,16 @@ describe('useDeckCalibrationStatus hook', () => {
     )
   })
   afterEach(() => {
-    resetAllWhenMocks()
-    jest.resetAllMocks()
+    vi.resetAllMocks()
   })
 
   it('returns no deck calibration status when no robot provided', () => {
-    when(mockGetDiscoverableRobotByName)
+    when(vi.mocked(getDiscoverableRobotByName))
       .calledWith(undefined as any, 'null')
-      .mockReturnValue(null)
-    when(mockUseCalibrationStatusQuery)
+      .thenReturn(null)
+    when(vi.mocked(useCalibrationStatusQuery))
       .calledWith({}, null)
-      .mockReturnValue({ data: null } as any)
+      .thenReturn({ data: null } as any)
 
     const { result } = renderHook(() => useDeckCalibrationStatus(null), {
       wrapper,
@@ -58,12 +51,12 @@ describe('useDeckCalibrationStatus hook', () => {
   })
 
   it('returns deck calibration status when given a robot name', () => {
-    when(mockGetDiscoverableRobotByName)
+    when(vi.mocked(getDiscoverableRobotByName))
       .calledWith(undefined as any, 'otie')
-      .mockReturnValue(mockConnectableRobot)
-    when(mockUseCalibrationStatusQuery)
+      .thenReturn(mockConnectableRobot)
+    when(vi.mocked(useCalibrationStatusQuery))
       .calledWith({}, { hostname: mockConnectableRobot.ip })
-      .mockReturnValue({
+      .thenReturn({
         data: { deckCalibration: { status: DECK_CAL_STATUS_OK } },
       } as any)
 

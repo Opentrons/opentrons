@@ -1,27 +1,26 @@
 import * as React from 'react'
+import { Trans, useTranslation } from 'react-i18next'
 import { UseMutateFunction } from 'react-query'
 import {
   COLORS,
   DIRECTION_COLUMN,
   Flex,
-  SIZE_1,
   SPACING,
+  StyledText,
 } from '@opentrons/components'
 import {
   NINETY_SIX_CHANNEL,
   RIGHT,
   SINGLE_MOUNT_PIPETTES,
   WEIGHT_OF_96_CHANNEL,
-  LoadedPipette,
-  getPipetteNameSpecs,
+  WASTE_CHUTE_CUTOUT,
 } from '@opentrons/shared-data'
-import { Trans, useTranslation } from 'react-i18next'
-import { StyledText } from '../../atoms/text'
 import { Banner } from '../../atoms/Banner'
 import { SimpleWizardBody } from '../../molecules/SimpleWizardBody'
 import { GenericWizardTile } from '../../molecules/GenericWizardTile'
 import { InProgressModal } from '../../molecules/InProgressModal/InProgressModal'
 import { WizardRequiredEquipmentList } from '../../molecules/WizardRequiredEquipmentList'
+import { usePipetteNameSpecs } from '../../resources/instruments/hooks'
 import {
   CALIBRATION_PROBE,
   FLOWS,
@@ -32,8 +31,14 @@ import {
   BODY_STYLE,
 } from './constants'
 import { getIsGantryEmpty } from './utils'
+import { useNotifyDeckConfigurationQuery } from '../../resources/deck_configuration'
+
 import type { AxiosError } from 'axios'
-import type { CreateCommand } from '@opentrons/shared-data'
+import type {
+  CreateCommand,
+  LoadedPipette,
+  PipetteName,
+} from '@opentrons/shared-data'
 import type {
   CreateMaintenanceRunData,
   MaintenanceRun,
@@ -83,6 +88,14 @@ export const BeforeBeginning = (
     isGantryEmpty &&
     selectedPipette === NINETY_SIX_CHANNEL &&
     flowType === FLOWS.ATTACH
+  const deckConfig = useNotifyDeckConfigurationQuery().data
+  const isWasteChuteOnDeck =
+    deckConfig?.find(fixture => fixture.cutoutId === WASTE_CHUTE_CUTOUT) ??
+    false
+
+  const pipetteDisplayName = usePipetteNameSpecs(
+    requiredPipette?.pipetteName as PipetteName
+  )?.displayName
 
   if (
     pipetteId == null &&
@@ -103,9 +116,7 @@ export const BeforeBeginning = (
       bodyTranslationKey = 'remove_labware'
       let displayName: string | undefined
       if (requiredPipette != null) {
-        displayName =
-          getPipetteNameSpecs(requiredPipette.pipetteName)?.displayName ??
-          requiredPipette.pipetteName
+        displayName = pipetteDisplayName ?? requiredPipette.pipetteName
       }
       if (selectedPipette === SINGLE_MOUNT_PIPETTES) {
         equipmentList = [
@@ -128,9 +139,7 @@ export const BeforeBeginning = (
     }
     case FLOWS.DETACH: {
       if (requiredPipette != null) {
-        const displayName =
-          getPipetteNameSpecs(requiredPipette.pipetteName)?.displayName ??
-          requiredPipette.pipetteName
+        const displayName = pipetteDisplayName ?? requiredPipette.pipetteName
         bodyTranslationKey = 'remove_labware'
 
         if (requiredPipette.pipetteName === 'p1000_96') {
@@ -227,28 +236,16 @@ export const BeforeBeginning = (
   return errorMessage != null ? (
     <SimpleWizardBody
       isSuccess={false}
-      iconColor={COLORS.errorEnabled}
+      iconColor={COLORS.red50}
       header={t('shared:error_encountered')}
       subHeader={errorMessage}
     />
   ) : (
     <GenericWizardTile
       header={t('before_you_begin')}
-      //  TODO(jr, 11/3/22): wire up this URL and unhide the link!
-      // getHelp={BEFORE_YOU_BEGIN_URL}
       rightHandBody={rightHandBody}
       bodyText={
         <>
-          {selectedPipette === NINETY_SIX_CHANNEL &&
-          (flowType === FLOWS.DETACH || flowType === FLOWS.ATTACH) ? (
-            <Banner
-              type="warning"
-              size={isOnDevice ? '1.5rem' : SIZE_1}
-              marginY={SPACING.spacing4}
-            >
-              {t('pipette_heavy', { weight: WEIGHT_OF_96_CHANNEL })}
-            </Banner>
-          ) : null}
           <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing6}>
             <Trans
               t={t}
@@ -257,7 +254,34 @@ export const BeforeBeginning = (
                 block: <StyledText css={BODY_STYLE} />,
               }}
             />
+            {selectedPipette === NINETY_SIX_CHANNEL &&
+              flowType === FLOWS.ATTACH &&
+              !isOnDevice && (
+                <StyledText css={BODY_STYLE}>
+                  {t('pipette_heavy', { weight: WEIGHT_OF_96_CHANNEL })}
+                </StyledText>
+              )}
           </Flex>
+          {selectedPipette === NINETY_SIX_CHANNEL &&
+            (flowType === FLOWS.CALIBRATE || flowType === FLOWS.ATTACH ? (
+              <Banner
+                type={isWasteChuteOnDeck ? 'error' : 'warning'}
+                size={isOnDevice ? '1.5rem' : '1rem'}
+                marginTop={isOnDevice ? SPACING.spacing24 : SPACING.spacing16}
+              >
+                {isWasteChuteOnDeck
+                  ? t('waste_chute_error')
+                  : t('waste_chute_warning')}
+              </Banner>
+            ) : (
+              <Banner
+                type="warning"
+                size={isOnDevice ? '1.5rem' : '1rem'}
+                marginTop={isOnDevice ? SPACING.spacing24 : SPACING.spacing16}
+              >
+                {t('pipette_heavy', { weight: WEIGHT_OF_96_CHANNEL })}
+              </Banner>
+            ))}
         </>
       }
       proceedButtonText={proceedButtonText}

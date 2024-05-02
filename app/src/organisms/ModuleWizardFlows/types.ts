@@ -5,7 +5,6 @@ import type { PipetteInformation } from '../Devices/hooks'
 
 export type ModuleCalibrationWizardStep =
   | BeforeBeginningStep
-  | FirmwareUpdateStep
   | SelectLocationStep
   | PlaceAdapterStep
   | AttachProbeStep
@@ -25,7 +24,6 @@ export interface ModuleCalibrationWizardStepProps {
   attachedPipette: PipetteInformation
   errorMessage: string | null
   setErrorMessage: (message: string | null) => void
-  slotName: string
   isOnDevice: boolean | null
 }
 
@@ -33,9 +31,6 @@ export type ModuleWizardFlow = typeof FLOWS.CALIBRATE
 
 export interface BeforeBeginningStep {
   section: typeof SECTIONS.BEFORE_BEGINNING
-}
-export interface FirmwareUpdateStep {
-  section: typeof SECTIONS.FIRMWARE_UPDATE
 }
 export interface SelectLocationStep {
   section: typeof SECTIONS.SELECT_LOCATION

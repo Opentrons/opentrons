@@ -24,6 +24,25 @@ TIP_VOLUME = 50
 ASPIRATE_VOLUME = 2
 PRESSURE_READINGS = ["open-pa", "sealed-pa", "aspirate-pa", "dispense-pa"]
 
+THRESHOLDS = {
+    "open-pa": (
+        -10,
+        10,
+    ),
+    "sealed-pa": (
+        -30,
+        30,
+    ),
+    "aspirate-pa": (
+        -600,
+        -400,
+    ),
+    "dispense-pa": (
+        2500,
+        3500,
+    ),
+}
+
 
 def _get_test_tag(probe: InstrumentProbeType, reading: str) -> str:
     assert reading in PRESSURE_READINGS, f"{reading} not in PRESSURE_READINGS"
@@ -64,6 +83,17 @@ async def _read_from_sensor(
     return sum(readings) / num_readings
 
 
+def check_value(test_value: float, test_name: str) -> CSVResult:
+    """Determine if value is within pass limits."""
+    low_limit = THRESHOLDS[test_name][0]
+    high_limit = THRESHOLDS[test_name][1]
+
+    if low_limit < test_value and test_value < high_limit:
+        return CSVResult.PASS
+    else:
+        return CSVResult.FAIL
+
+
 async def run(api: OT3API, report: CSVReport, section: str) -> None:
     """Run."""
     await api.home_z(OT3Mount.LEFT)
@@ -84,8 +114,8 @@ async def run(api: OT3API, report: CSVReport, section: str) -> None:
                 ui.print_error(f"{probe} pressure sensor not working, skipping")
                 continue
         print(f"open-pa: {open_pa}")
-        # FIXME: create stricter pass/fail criteria
-        report(section, _get_test_tag(probe, "open-pa"), [open_pa, CSVResult.PASS])
+        open_result = check_value(open_pa, "open-pa")
+        report(section, _get_test_tag(probe, "open-pa"), [open_pa, open_result])
 
         # SEALED-Pa
         sealed_pa = 0.0
@@ -102,8 +132,8 @@ async def run(api: OT3API, report: CSVReport, section: str) -> None:
                 ui.print_error(f"{probe} pressure sensor not working, skipping")
                 break
         print(f"sealed-pa: {sealed_pa}")
-        # FIXME: create stricter pass/fail criteria
-        report(section, _get_test_tag(probe, "sealed-pa"), [sealed_pa, CSVResult.PASS])
+        sealed_result = check_value(sealed_pa, "sealed-pa")
+        report(section, _get_test_tag(probe, "sealed-pa"), [sealed_pa, sealed_result])
 
         # ASPIRATE-Pa
         aspirate_pa = 0.0
@@ -117,9 +147,9 @@ async def run(api: OT3API, report: CSVReport, section: str) -> None:
                 ui.print_error(f"{probe} pressure sensor not working, skipping")
                 break
         print(f"aspirate-pa: {aspirate_pa}")
-        # FIXME: create stricter pass/fail criteria
+        aspirate_result = check_value(aspirate_pa, "aspirate-pa")
         report(
-            section, _get_test_tag(probe, "aspirate-pa"), [aspirate_pa, CSVResult.PASS]
+            section, _get_test_tag(probe, "aspirate-pa"), [aspirate_pa, aspirate_result]
         )
 
         # DISPENSE-Pa
@@ -134,9 +164,9 @@ async def run(api: OT3API, report: CSVReport, section: str) -> None:
                 ui.print_error(f"{probe} pressure sensor not working, skipping")
                 break
         print(f"dispense-pa: {dispense_pa}")
-        # FIXME: create stricter pass/fail criteria
+        dispense_result = check_value(dispense_pa, "dispense-pa")
         report(
-            section, _get_test_tag(probe, "dispense-pa"), [dispense_pa, CSVResult.PASS]
+            section, _get_test_tag(probe, "dispense-pa"), [dispense_pa, dispense_result]
         )
 
         if not api.is_simulator:

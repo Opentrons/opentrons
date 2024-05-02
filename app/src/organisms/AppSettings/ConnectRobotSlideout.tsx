@@ -3,16 +3,17 @@ import { useSelector, useDispatch } from 'react-redux'
 import { useTranslation } from 'react-i18next'
 
 import {
-  Flex,
   ALIGN_FLEX_END,
+  COLORS,
   DIRECTION_COLUMN,
   DIRECTION_ROW,
-  SPACING,
-  TYPOGRAPHY,
-  COLORS,
+  Flex,
   Icon,
   Link,
   PrimaryButton,
+  SPACING,
+  StyledText,
+  TYPOGRAPHY,
 } from '@opentrons/components'
 
 import { ManualIpHostnameForm } from './ManualIpHostnameForm'
@@ -20,7 +21,6 @@ import { ManualIpHostnameList } from './ManualIpHostnameList'
 import { Slideout } from '../../atoms/Slideout'
 import { ExternalLink } from '../../atoms/Link/ExternalLink'
 import { Divider } from '../../atoms/structure'
-import { StyledText } from '../../atoms/text'
 import { getScanning, startDiscovery } from '../../redux/discovery'
 
 import type { Dispatch, State } from '../../redux/types'
@@ -43,7 +43,7 @@ export function ConnectRobotSlideout({
   const [mostRecentDiscovered, setMostRecentDiscovered] = React.useState<
     boolean | null
   >(null)
-  const { t } = useTranslation(['app_settings', 'shared'])
+  const { t } = useTranslation(['app_settings', 'shared', 'branded'])
   const dispatch = useDispatch<Dispatch>()
   const refreshDiscovery = (): unknown => dispatch(startDiscovery())
   const isScanning = useSelector<State>(getScanning)
@@ -81,7 +81,7 @@ export function ConnectRobotSlideout({
         <StyledText as="p" marginBottom={SPACING.spacing8}>
           {t('ip_description_first')}
         </StyledText>
-        <StyledText as="p">{t('ip_description_second')}</StyledText>
+        <StyledText as="p">{t('branded:ip_description_second')}</StyledText>
         <ExternalLink
           href={SUPPORT_PAGE_LINK}
           css={TYPOGRAPHY.pSemiBold}
@@ -105,7 +105,7 @@ export function ConnectRobotSlideout({
             <Flex flexDirection={DIRECTION_ROW}>
               <StyledText
                 as="p"
-                color={COLORS.darkGreyEnabled}
+                color={COLORS.grey50}
                 marginRight={SPACING.spacing8}
               >
                 {t('searching')}
@@ -118,7 +118,7 @@ export function ConnectRobotSlideout({
                 <>
                   <StyledText
                     as="p"
-                    color={COLORS.darkGreyEnabled}
+                    color={COLORS.grey50}
                     marginX={SPACING.spacing4}
                   >
                     {t('discovery_timeout')}

@@ -1,24 +1,21 @@
 import * as React from 'react'
-import { when, resetAllWhenMocks } from 'jest-when'
+import { vi, it, expect, describe, beforeEach, afterEach } from 'vitest'
+import { when } from 'vitest-when'
 import { Provider } from 'react-redux'
 import { createStore, Store } from 'redux'
-import { renderHook } from '@testing-library/react-hooks'
+import { renderHook } from '@testing-library/react'
 import { QueryClient, QueryClientProvider } from 'react-query'
 
 import { getRobotModelByName } from '../../../../redux/discovery'
 
 import { useIsFlex } from '..'
 
-jest.mock('../../../../redux/discovery/selectors')
+vi.mock('../../../../redux/discovery/selectors')
 
-const mockGetRobotModelByName = getRobotModelByName as jest.MockedFunction<
-  typeof getRobotModelByName
->
-
-const store: Store<any> = createStore(jest.fn(), {})
+const store: Store<any> = createStore(vi.fn(), {})
 
 describe('useIsFlex hook', () => {
-  let wrapper: React.FunctionComponent<{}>
+  let wrapper: React.FunctionComponent<{ children: React.ReactNode }>
   beforeEach(() => {
     const queryClient = new QueryClient()
     wrapper = ({ children }) => (
@@ -30,14 +27,13 @@ describe('useIsFlex hook', () => {
     )
   })
   afterEach(() => {
-    resetAllWhenMocks()
-    jest.resetAllMocks()
+    vi.resetAllMocks()
   })
 
   it('returns false when given a robot name that does not have a discoverable model', () => {
-    when(mockGetRobotModelByName)
+    when(vi.mocked(getRobotModelByName))
       .calledWith(undefined as any, 'otie')
-      .mockReturnValue(null)
+      .thenReturn(null)
 
     const { result } = renderHook(() => useIsFlex('otie'), { wrapper })
 
@@ -45,9 +41,9 @@ describe('useIsFlex hook', () => {
   })
 
   it('returns true when given a discoverable OT-3 robot name with a model', () => {
-    when(mockGetRobotModelByName)
+    when(vi.mocked(getRobotModelByName))
       .calledWith(undefined as any, 'otie')
-      .mockReturnValue('OT-3 Classic')
+      .thenReturn('OT-3 Classic')
 
     const { result } = renderHook(() => useIsFlex('otie'), {
       wrapper,
@@ -56,9 +52,9 @@ describe('useIsFlex hook', () => {
     expect(result.current).toEqual(true)
   })
   it('returns true when given a discoverable OT-3 robot name with an Opentrons Flex model', () => {
-    when(mockGetRobotModelByName)
+    when(vi.mocked(getRobotModelByName))
       .calledWith(undefined as any, 'otie')
-      .mockReturnValue('Opentrons Flex')
+      .thenReturn('Opentrons Flex')
 
     const { result } = renderHook(() => useIsFlex('otie'), {
       wrapper,

@@ -3,30 +3,30 @@ import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
 
 import {
-  Box,
-  Flex,
-  COLORS,
-  SPACING,
-  POSITION_FIXED,
-  POSITION_ABSOLUTE,
   ALIGN_CENTER,
-  JUSTIFY_CENTER,
-  POSITION_RELATIVE,
-  OVERFLOW_AUTO,
-  POSITION_STICKY,
-  BORDERS,
-  DISPLAY_FLEX,
-  DIRECTION_COLUMN,
   ALIGN_FLEX_START,
+  BORDERS,
+  Box,
+  COLORS,
+  DIRECTION_COLUMN,
+  DISPLAY_FLEX,
+  Flex,
   Icon,
-  PrimaryButton,
+  JUSTIFY_CENTER,
   JUSTIFY_SPACE_BETWEEN,
-  TYPOGRAPHY,
   Link,
+  OVERFLOW_AUTO,
+  POSITION_ABSOLUTE,
+  POSITION_FIXED,
+  POSITION_RELATIVE,
+  POSITION_STICKY,
+  PrimaryButton,
+  SPACING,
+  TYPOGRAPHY,
+  StyledText,
 } from '@opentrons/components'
 
 import { SmallButton } from '../../atoms/buttons'
-import { StyledText } from '../../atoms/text'
 import { Modal } from '../../molecules/Modal'
 import { getIsOnDevice } from '../../redux/config'
 import { PauseInterventionContent } from './PauseInterventionContent'
@@ -35,6 +35,7 @@ import { MoveLabwareInterventionContent } from './MoveLabwareInterventionContent
 import type { RunCommandSummary, RunData } from '@opentrons/api-client'
 import type { IconName } from '@opentrons/components'
 import type { CompletedProtocolAnalysis } from '@opentrons/shared-data'
+import { useRobotType } from '../Devices/hooks'
 
 const LEARN_ABOUT_MANUAL_STEPS_URL =
   'https://support.opentrons.com/s/article/Manual-protocol-steps'
@@ -57,8 +58,8 @@ const MODAL_STYLE = {
   overflowY: OVERFLOW_AUTO,
   maxHeight: '100%',
   width: '47rem',
-  border: `6px ${BORDERS.styleSolid} ${COLORS.blueEnabled}`,
-  borderRadius: BORDERS.radiusSoftCorners,
+  border: `6px ${BORDERS.styleSolid} ${COLORS.blue50}`,
+  borderRadius: BORDERS.borderRadius8,
   boxShadow: BORDERS.smallDropShadow,
 } as const
 
@@ -67,7 +68,7 @@ const HEADER_STYLE = {
   gridGap: SPACING.spacing12,
   padding: `${SPACING.spacing20} ${SPACING.spacing32}`,
   color: COLORS.white,
-  backgroundColor: COLORS.blueEnabled,
+  backgroundColor: COLORS.blue50,
   position: POSITION_STICKY,
   top: 0,
 } as const
@@ -77,10 +78,8 @@ const CONTENT_STYLE = {
   flexDirection: DIRECTION_COLUMN,
   alignItems: ALIGN_FLEX_START,
   gridGap: SPACING.spacing24,
-  padding: `${SPACING.spacing32}`,
-  borderRadius: `0px 0px ${String(BORDERS.radiusSoftCorners)} ${String(
-    BORDERS.radiusSoftCorners
-  )}`,
+  padding: SPACING.spacing32,
+  borderRadius: BORDERS.borderRadius8,
 } as const
 
 const FOOTER_STYLE = {
@@ -108,6 +107,7 @@ export function InterventionModal({
   const { t } = useTranslation(['protocol_command_text', 'protocol_info'])
   const isOnDevice = useSelector(getIsOnDevice)
 
+  const robotType = useRobotType(robotName)
   const childContent = React.useMemo(() => {
     if (
       command.commandType === 'waitForResume' ||
@@ -122,7 +122,7 @@ export function InterventionModal({
     } else if (command.commandType === 'moveLabware') {
       return (
         <MoveLabwareInterventionContent
-          {...{ command, run, analysis }}
+          {...{ command, run, analysis, robotType }}
           isOnDevice={isOnDevice}
         />
       )
@@ -156,10 +156,10 @@ export function InterventionModal({
   // reimplement when design system shares a modal component between desktop/ODD
   return isOnDevice ? (
     <Modal
-      border={`8px ${BORDERS.styleSolid} ${COLORS.blueEnabled}`}
+      border={`${BORDERS.borderRadius8} ${BORDERS.styleSolid} ${COLORS.blue50}`}
       modalSize="large"
       header={{
-        backgroundColor: COLORS.blueEnabled,
+        backgroundColor: COLORS.blue50,
         color: COLORS.white,
         iconColor: COLORS.white,
         iconName: iconName ?? undefined,
@@ -188,13 +188,13 @@ export function InterventionModal({
       top="0"
       bottom="0"
       zIndex="1"
-      backgroundColor={COLORS.backgroundOverlay}
+      backgroundColor={`${COLORS.black90}${COLORS.opacity40HexCode}`}
       cursor="default"
     >
       <Flex {...BASE_STYLE} zIndex={10}>
         <Box
           {...MODAL_STYLE}
-          onClick={e => {
+          onClick={(e: React.MouseEvent) => {
             e.stopPropagation()
           }}
         >

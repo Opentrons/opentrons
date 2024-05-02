@@ -1,8 +1,6 @@
 import path from 'path'
 import { app } from 'electron'
 import uuid from 'uuid/v4'
-import { CONFIG_VERSION_LATEST } from '@opentrons/app/src/redux/config'
-
 import type {
   Config,
   ConfigV0,
@@ -26,11 +24,14 @@ import type {
   ConfigV18,
   ConfigV19,
   ConfigV20,
+  ConfigV21,
 } from '@opentrons/app/src/redux/config/types'
 // format
 // base config v0 defaults
 // any default values for later config versions are specified in the migration
 // functions for those version below
+
+const CONFIG_VERSION_LATEST = 21
 
 export const DEFAULTS_V0: ConfigV0 = {
   version: 0,
@@ -39,7 +40,8 @@ export const DEFAULTS_V0: ConfigV0 = {
 
   // app update config
   update: {
-    channel: _PKG_VERSION_.includes('beta') ? 'beta' : 'latest',
+    // @ts-expect-error can't get TS to recognize global.d.ts
+    channel: [].includes('beta') ? 'beta' : 'latest',
   },
 
   buildroot: {
@@ -373,6 +375,20 @@ const toVersion20 = (prevConfig: ConfigV19): ConfigV20 => {
   }
   return nextConfig
 }
+const toVersion21 = (prevConfig: ConfigV20): ConfigV21 => {
+  return {
+    ...prevConfig,
+    version: 21 as const,
+    onDeviceDisplaySettings: {
+      ...prevConfig.onDeviceDisplaySettings,
+      unfinishedUnboxingFlowRoute:
+        prevConfig.onDeviceDisplaySettings.unfinishedUnboxingFlowRoute ===
+        '/dashboard'
+          ? null
+          : prevConfig.onDeviceDisplaySettings.unfinishedUnboxingFlowRoute,
+    },
+  }
+}
 
 const MIGRATIONS: [
   (prevConfig: ConfigV0) => ConfigV1,
@@ -394,7 +410,8 @@ const MIGRATIONS: [
   (prevConfig: ConfigV16) => ConfigV17,
   (prevConfig: ConfigV17) => ConfigV18,
   (prevConfig: ConfigV18) => ConfigV19,
-  (prevConfig: ConfigV19) => ConfigV20
+  (prevConfig: ConfigV19) => ConfigV20,
+  (prevConfig: ConfigV20) => ConfigV21
 ] = [
   toVersion1,
   toVersion2,
@@ -416,6 +433,7 @@ const MIGRATIONS: [
   toVersion18,
   toVersion19,
   toVersion20,
+  toVersion21,
 ]
 
 export const DEFAULTS: Config = migrate(DEFAULTS_V0)
@@ -443,6 +461,7 @@ export function migrate(
     | ConfigV18
     | ConfigV19
     | ConfigV20
+    | ConfigV21
 ): Config {
   const prevVersion = prevConfig.version
   let result = prevConfig

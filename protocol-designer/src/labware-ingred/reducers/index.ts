@@ -167,10 +167,15 @@ export const containers: Reducer<ContainersState, any> = handleActions(
 
       return loadLabwareCommands.reduce(
         (acc: ContainersState, command, key): ContainersState => {
-          const { loadName, displayName } = command.params
+          const { labwareId, displayName } = command.params
+
+          if (labwareId == null) {
+            console.error('expected to find a labwareId but could not')
+          }
+
           return {
             ...acc,
-            [loadName]: {
+            [labwareId ?? '']: {
               nickname: displayName,
               disambiguationNumber: key,
             },

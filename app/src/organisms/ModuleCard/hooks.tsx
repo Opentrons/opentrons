@@ -3,14 +3,11 @@ import { useCreateLiveCommandMutation } from '@opentrons/react-api-client'
 import { useTranslation } from 'react-i18next'
 import { useHoverTooltip } from '@opentrons/components'
 import {
-  getDeckDefFromRobotType,
-  getRobotTypeFromLoadedLabware,
   HEATERSHAKER_MODULE_TYPE,
   MAGNETIC_MODULE_TYPE,
   TEMPERATURE_MODULE_TYPE,
   THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
-import { getProtocolModulesInfo } from '../Devices/ProtocolRun/utils/getProtocolModulesInfo'
 import { useMostRecentCompletedAnalysis } from '../LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import { MenuItem } from '../../atoms/MenuList/MenuItem'
 import { Tooltip } from '../../atoms/Tooltip'
@@ -35,15 +32,9 @@ export function useIsHeaterShakerInProtocol(): boolean {
   const currentRunId = useCurrentRunId()
   const robotProtocolAnalysis = useMostRecentCompletedAnalysis(currentRunId)
   if (robotProtocolAnalysis == null) return false
-  const robotType = getRobotTypeFromLoadedLabware(robotProtocolAnalysis.labware)
 
-  const deckDef = getDeckDefFromRobotType(robotType)
-  const protocolModulesInfo = getProtocolModulesInfo(
-    robotProtocolAnalysis,
-    deckDef
-  )
-  return protocolModulesInfo.some(
-    module => module.moduleDef.model === 'heaterShakerModuleV1'
+  return robotProtocolAnalysis.modules.some(
+    module => module.model === 'heaterShakerModuleV1'
   )
 }
 interface LatchControls {

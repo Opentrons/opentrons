@@ -10,7 +10,7 @@ import {
 import { useTrackEvent } from '../../redux/analytics'
 
 const BUTTON_GROUP_STYLES = css`
-  border-radius: ${BORDERS.radiusSoftCorners};
+  border-radius: ${BORDERS.borderRadius8};
   margin-top: -1px;
   width: fit-content;
 
@@ -26,32 +26,33 @@ const BUTTON_GROUP_STYLES = css`
     &:focus {
       box-shadow: none;
       color: ${COLORS.white};
+      background-color: ${COLORS.blue50};
     }
 
     &:hover {
-      background-color: ${COLORS.fundamentalsBackground};
-      color: ${COLORS.black};
+      background-color: ${COLORS.grey10};
+      color: ${COLORS.black90};
       box-shadow: 0 0 0;
     }
 
     &.active {
-      background-color: ${COLORS.blueEnabled};
+      background-color: ${COLORS.blue50};
       color: ${COLORS.white};
     }
 
     &:disabled {
       background-color: inherit;
-      color: ${COLORS.errorDisabled};
+      color: ${COLORS.grey40};
     }
   }
 
   button:first-child {
-    border-radius: ${BORDERS.radiusSoftCorners} 0 0 ${BORDERS.radiusSoftCorners};
+    border-radius: ${BORDERS.borderRadius8} 0 0 ${BORDERS.borderRadius8};
     border-right: none;
   }
 
   button:last-child {
-    border-radius: 0 ${BORDERS.radiusSoftCorners} ${BORDERS.radiusSoftCorners} 0;
+    border-radius: 0 ${BORDERS.borderRadius8} ${BORDERS.borderRadius8} 0;
     border-left: none;
   }
 `
@@ -59,7 +60,7 @@ const BUTTON_GROUP_STYLES = css`
 const ACTIVE_STYLE = css`
   padding-left: ${SPACING.spacing8};
   padding-right: ${SPACING.spacing8};
-  background-color: ${COLORS.blueEnabled};
+  background-color: ${COLORS.blue50};
   color: ${COLORS.white};
   pointer-events: none;
 `
@@ -68,8 +69,8 @@ const DEFAULT_STYLE = css`
   padding-left: ${SPACING.spacing8};
   padding-right: ${SPACING.spacing8};
   background-color: ${COLORS.white};
-  color: ${COLORS.black};
-  border: 1px ${COLORS.medGreyEnabled} solid;
+  color: ${COLORS.black90};
+  border: 1px ${COLORS.grey30} solid;
 `
 
 export const useToggleGroup = (

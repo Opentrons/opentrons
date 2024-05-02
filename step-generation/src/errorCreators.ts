@@ -19,6 +19,13 @@ export function missingAdapter(): CommandCreatorError {
   }
 }
 
+export function removeAdapter(): CommandCreatorError {
+  return {
+    type: 'REMOVE_96_CHANNEL_TIPRACK_ADAPTER',
+    message: 'A 96-channel cannot pick up tips partially with an adapter',
+  }
+}
+
 export function noTipOnPipette(args: {
   actionName: string
   pipette: string
@@ -29,6 +36,13 @@ export function noTipOnPipette(args: {
   return {
     message: `Attempted to ${actionName} with no tip on pipette: ${pipette} from ${labware}'s well ${well}`,
     type: 'NO_TIP_ON_PIPETTE',
+  }
+}
+
+export function pipetteHasTip(): CommandCreatorError {
+  return {
+    message: 'One or more of the pipettes has a tip',
+    type: 'PIPETTE_HAS_TIP',
   }
 }
 
@@ -161,6 +175,14 @@ export const tallLabwareEastWestOfHeaterShaker = (
   }
 }
 
+export const possiblePipetteCollision = (): CommandCreatorError => {
+  return {
+    type: 'POSSIBLE_PIPETTE_COLLISION',
+    message:
+      'There is a possibility that the Pipette will collide with the a labware or module on the deck',
+  }
+}
+
 export const heaterShakerEastWestWithLatchOpen = (): CommandCreatorError => {
   return {
     type: 'HEATER_SHAKER_EAST_WEST_LATCH_OPEN',
@@ -203,11 +225,39 @@ export const dropTipLocationDoesNotExist = (): CommandCreatorError => {
   }
 }
 
-export const additionalEquipmentDoesNotExist = (args: {
-  additionalEquipment: string
+export const equipmentDoesNotExist = (): CommandCreatorError => {
+  return {
+    type: 'EQUIPMENT_DOES_NOT_EXIST',
+    message: `The equipment does not exist`,
+  }
+}
+
+export const gripperRequired = (): CommandCreatorError => {
+  return {
+    type: 'GRIPPER_REQUIRED',
+    message: 'The gripper is required to fulfill this action',
+  }
+}
+
+export const pipettingIntoColumn4 = (args: {
+  typeOfStep: string
 }): CommandCreatorError => {
   return {
-    type: 'ADDITIONAL_EQUIPMENT_DOES_NOT_EXIST',
-    message: `The ${args.additionalEquipment} does not exist`,
+    type: 'PIPETTING_INTO_COLUMN_4',
+    message: `Cannot ${args.typeOfStep} into a column 4 slot.`,
+  }
+}
+
+export const cannotMoveWithGripper = (): CommandCreatorError => {
+  return {
+    type: 'CANNOT_MOVE_WITH_GRIPPER',
+    message: 'The gripper cannot move aluminum blocks',
+  }
+}
+
+export const noTipSelected = (): CommandCreatorError => {
+  return {
+    type: 'NO_TIP_SELECTED',
+    message: 'No tips were selected for this step',
   }
 }

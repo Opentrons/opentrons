@@ -1,18 +1,15 @@
 import * as React from 'react'
-import { when, resetAllWhenMocks } from 'jest-when'
-import { QueryClient, QueryClientProvider } from 'react-query'
-import { renderHook } from '@testing-library/react-hooks'
+import { describe, it, expect, beforeEach, vi } from 'vitest'
+import { QueryClient, QueryClientProvider, UseQueryOptions } from 'react-query'
+import { renderHook, waitFor } from '@testing-library/react'
 import { getSessions } from '@opentrons/api-client'
 import { useHost } from '../../api'
 import { useAllSessionsQuery } from '..'
 
 import type { HostConfig, Response, Sessions } from '@opentrons/api-client'
 
-jest.mock('@opentrons/api-client')
-jest.mock('../../api/useHost')
-
-const mockGetSessions = getSessions as jest.MockedFunction<typeof getSessions>
-const mockUseHost = useHost as jest.MockedFunction<typeof useHost>
+vi.mock('@opentrons/api-client')
+vi.mock('../../api/useHost')
 
 const HOST_CONFIG: HostConfig = { hostname: 'localhost' }
 const SESSIONS_RESPONSE = {
@@ -23,22 +20,23 @@ const SESSIONS_RESPONSE = {
 } as Sessions
 
 describe('useAllSessionsQuery hook', () => {
-  let wrapper: React.FunctionComponent<{}>
+  let wrapper: React.FunctionComponent<
+    { children: React.ReactNode } & UseQueryOptions<Sessions, Error>
+  >
 
   beforeEach(() => {
     const queryClient = new QueryClient()
-    const clientProvider: React.FunctionComponent<{}> = ({ children }) => (
+    const clientProvider: React.FunctionComponent<
+      { children: React.ReactNode } & UseQueryOptions<Sessions, Error>
+    > = ({ children }) => (
       <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
     )
 
     wrapper = clientProvider
   })
-  afterEach(() => {
-    resetAllWhenMocks()
-  })
 
   it('should return no data if no host', () => {
-    when(mockUseHost).calledWith().mockReturnValue(null)
+    vi.mocked(useHost).mockReturnValue(null)
 
     const { result } = renderHook(useAllSessionsQuery, { wrapper })
 
@@ -46,23 +44,23 @@ describe('useAllSessionsQuery hook', () => {
   })
 
   it('should return no data if the get sessions request fails', () => {
-    when(mockUseHost).calledWith().mockReturnValue(HOST_CONFIG)
-    when(mockGetSessions).calledWith(HOST_CONFIG).mockRejectedValue('oh no')
+    vi.mocked(useHost).mockReturnValue(HOST_CONFIG)
+    vi.mocked(getSessions).mockRejectedValue('oh no')
 
     const { result } = renderHook(useAllSessionsQuery, { wrapper })
     expect(result.current.data).toBeUndefined()
   })
 
   it('should return all current robot sessions', async () => {
-    when(mockUseHost).calledWith().mockReturnValue(HOST_CONFIG)
-    when(mockGetSessions)
-      .calledWith(HOST_CONFIG)
-      .mockResolvedValue({ data: SESSIONS_RESPONSE } as Response<Sessions>)
+    vi.mocked(useHost).mockReturnValue(HOST_CONFIG)
+    vi.mocked(getSessions).mockResolvedValue({
+      data: SESSIONS_RESPONSE,
+    } as Response<Sessions>)
 
-    const { result, waitFor } = renderHook(useAllSessionsQuery, { wrapper })
+    const { result } = renderHook(useAllSessionsQuery, { wrapper })
 
-    await waitFor(() => result.current.data != null)
-
-    expect(result.current.data).toEqual(SESSIONS_RESPONSE)
+    await waitFor(() => {
+      expect(result.current.data).toEqual(SESSIONS_RESPONSE)
+    })
   })
 })

@@ -1,6 +1,5 @@
 'use strict'
 const path = require('path')
-const { versionForProject } = require('../scripts/git-version')
 
 const {
   OT_APP_DEPLOY_BUCKET,
@@ -25,7 +24,7 @@ const publishConfig =
 module.exports = async () => ({
   appId:
     project === 'robot-stack' ? 'com.opentrons.app' : 'com.opentrons.appot3',
-  electronVersion: '21.3.1',
+  electronVersion: '27.0.0',
   npmRebuild: false,
   releaseInfo: {
     releaseNotesFile:
@@ -45,7 +44,9 @@ module.exports = async () => ({
     },
   ],
   extraMetadata: {
-    version: await versionForProject(project),
+    version: await (
+      await import('../scripts/git-version.mjs')
+    ).versionForProject(project),
     productName: project === 'robot-stack' ? 'Opentrons' : 'Opentrons-OT3',
   },
   extraResources: USE_PYTHON ? ['python'] : [],

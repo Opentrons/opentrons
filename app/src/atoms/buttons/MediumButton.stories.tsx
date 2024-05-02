@@ -1,74 +1,74 @@
-import * as React from 'react'
-import { ICON_DATA_BY_NAME } from '@opentrons/components/src/icons/icon-data'
-import { touchScreenViewport } from '../../DesignTokens/constants'
+import { ICON_DATA_BY_NAME, VIEWPORT } from '@opentrons/components'
 import { MediumButton } from './'
-import type { Story, Meta } from '@storybook/react'
+import type { Meta, StoryObj } from '@storybook/react'
 
-export default {
+const meta: Meta<typeof MediumButton> = {
   title: 'ODD/Atoms/Buttons/MediumButton',
+  component: MediumButton,
   argTypes: {
     iconName: {
       control: {
         type: 'select',
-        options: Object.keys(ICON_DATA_BY_NAME),
       },
-      defaultValue: undefined,
+      options: Object.keys(ICON_DATA_BY_NAME),
     },
     buttonCategory: {
       control: {
         type: 'select',
-        options: ['default', 'rounded'],
       },
-      defaultValue: undefined,
+      options: ['default', 'rounded'],
     },
     onClick: { action: 'clicked' },
-    width: {
-      control: {
-        type: 'text',
-      },
-      defaultValue: undefined,
-    },
   },
-  parameters: touchScreenViewport,
-} as Meta
+  parameters: VIEWPORT.touchScreenViewport,
+}
 
-const MediumButtonTemplate: Story<
-  React.ComponentProps<typeof MediumButton>
-> = args => <MediumButton {...args} />
+export default meta
+type Story = StoryObj<typeof MediumButton>
 
-export const PrimaryMediumButton = MediumButtonTemplate.bind({})
-PrimaryMediumButton.args = {
-  buttonText: 'Button text',
-  buttonType: 'primary',
-  disabled: false,
+export const PrimaryMediumButton: Story = {
+  args: {
+    buttonText: 'Button text',
+    buttonType: 'primary',
+    disabled: false,
+  },
 }
-export const SecondaryMediumButton = MediumButtonTemplate.bind({})
-SecondaryMediumButton.args = {
-  buttonText: 'Button text',
-  buttonType: 'secondary',
-  disabled: false,
+
+export const SecondaryMediumButton: Story = {
+  args: {
+    buttonText: 'Button text',
+    buttonType: 'secondary',
+    disabled: false,
+  },
 }
-export const AlertMediumButton = MediumButtonTemplate.bind({})
-AlertMediumButton.args = {
-  buttonText: 'Button text',
-  buttonType: 'alert',
-  disabled: false,
+
+export const AlertMediumButton: Story = {
+  args: {
+    buttonText: 'Button text',
+    buttonType: 'alert',
+    disabled: false,
+  },
 }
-export const AlertSecondaryMediumButton = MediumButtonTemplate.bind({})
-AlertSecondaryMediumButton.args = {
-  buttonText: 'Button text',
-  buttonType: 'alertSecondary',
-  disabled: false,
+export const AlertSecondaryMediumButton: Story = {
+  args: {
+    buttonText: 'Button text',
+    buttonType: 'alertSecondary',
+    disabled: false,
+  },
 }
-export const TertiaryHighMediumButton = MediumButtonTemplate.bind({})
-TertiaryHighMediumButton.args = {
-  buttonText: 'Button text',
-  buttonType: 'tertiaryHigh',
-  disabled: false,
+
+export const TertiaryHighMediumButton: Story = {
+  args: {
+    buttonText: 'Button text',
+    buttonType: 'tertiaryHigh',
+    disabled: false,
+  },
 }
-export const TertiaryLowLightMediumButton = MediumButtonTemplate.bind({})
-TertiaryLowLightMediumButton.args = {
-  buttonText: 'Button text',
-  buttonType: 'tertiaryLowLight',
-  disabled: false,
+
+export const TertiaryLowLightMediumButton: Story = {
+  args: {
+    buttonText: 'Button text',
+    buttonType: 'tertiaryLowLight',
+    disabled: false,
+  },
 }

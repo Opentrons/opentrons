@@ -81,6 +81,7 @@ class Location(BaseModel):
     slotName: Optional[str]
     moduleId: Optional[str]
     labwareId: Optional[str]
+    addressableAreaName: Optional[str]
 
 
 class ProfileStep(BaseModel):
@@ -102,3 +103,9 @@ class Liquid(BaseModel):
 class Labware(BaseModel):
     displayName: Optional[str]
     definitionId: str
+
+
+class NozzleConfigurationParams(BaseModel):
+    style: str
+    primaryNozzle: Optional[str]
+    frontRightNozzle: Optional[str]

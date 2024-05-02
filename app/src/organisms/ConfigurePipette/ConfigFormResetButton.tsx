@@ -3,12 +3,12 @@ import { Trans, useTranslation } from 'react-i18next'
 import {
   DIRECTION_COLUMN,
   Flex,
-  SPACING,
-  TYPOGRAPHY,
   SecondaryButton,
+  SPACING,
+  StyledText,
+  TYPOGRAPHY,
 } from '@opentrons/components'
 import { Divider } from '../../atoms/structure'
-import { StyledText } from '../../atoms/text'
 
 export interface ButtonProps {
   onClick?: () => unknown
@@ -17,13 +17,13 @@ export interface ButtonProps {
 
 export function ConfigFormResetButton(props: ButtonProps): JSX.Element {
   const { onClick, disabled } = props
-  const { t } = useTranslation(['shared', 'device_details'])
+  const { t } = useTranslation(['shared', 'branded'])
 
   return (
     <Flex flexDirection={DIRECTION_COLUMN}>
       <Trans
         t={t}
-        i18nKey="device_details:these_are_advanced_settings"
+        i18nKey="branded:these_are_advanced_settings"
         components={{
           block: (
             <StyledText

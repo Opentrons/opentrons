@@ -31,7 +31,7 @@ async def _main(cfg: TestConfig) -> None:
     await api.home()
     home_pos = await api.gantry_position(mount)
     attach_pos = helpers_ot3.get_slot_calibration_square_position_ot3(5)
-    attach_pos = attach_pos._replace(z=home_pos.z)
+    attach_pos = attach_pos._replace(z=home_pos.z - 100)
     if not api.hardware_pipettes[mount.to_mount()]:
         # FIXME: Do not home the plunger using the normal home method.
         #        See section below where we use OT3Controller to home it.

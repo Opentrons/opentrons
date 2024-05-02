@@ -2,18 +2,18 @@ import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 
 import {
-  Flex,
-  DIRECTION_COLUMN,
-  SPACING,
-  COLORS,
   ALIGN_CENTER,
-  JUSTIFY_CENTER,
-  Box,
   BORDERS,
+  Box,
+  COLORS,
+  DIRECTION_COLUMN,
+  Flex,
+  JUSTIFY_CENTER,
+  SPACING,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
-import { StyledText } from '../../atoms/text'
 import { ProgressBar } from '../../atoms/ProgressBar'
 
 interface CompleteUpdateSoftwareProps {
@@ -28,17 +28,17 @@ export function CompleteUpdateSoftware({
     <Flex flexDirection={DIRECTION_COLUMN} width="100%">
       <Flex
         flexDirection={DIRECTION_COLUMN}
-        backgroundColor={COLORS.darkBlack20}
+        backgroundColor={COLORS.grey35}
         height="33rem"
         gridGap={SPACING.spacing40}
         alignItems={ALIGN_CENTER}
         justifyContent={JUSTIFY_CENTER}
-        borderRadius={BORDERS.borderRadiusSize3}
+        borderRadius={BORDERS.borderRadius12}
       >
         <StyledText
           as="h2"
           fontWeight={TYPOGRAPHY.fontWeightBold}
-          color={COLORS.black}
+          color={COLORS.black90}
         >
           {t('update_complete')}
         </StyledText>

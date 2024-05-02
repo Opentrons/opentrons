@@ -6,22 +6,20 @@ import { NavLink, Redirect, useParams } from 'react-router-dom'
 import styled, { css } from 'styled-components'
 
 import {
-  Box,
-  Flex,
-  useHoverTooltip,
-  DIRECTION_COLUMN,
-  DISPLAY_BLOCK,
-  POSITION_ABSOLUTE,
-  POSITION_RELATIVE,
-  OVERFLOW_SCROLL,
-  SIZE_6,
   BORDERS,
+  Box,
   COLORS,
+  DIRECTION_COLUMN,
+  Flex,
+  OVERFLOW_SCROLL,
+  POSITION_RELATIVE,
+  SIZE_6,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
+  useHoverTooltip,
 } from '@opentrons/components'
 import { ApiHostProvider } from '@opentrons/react-api-client'
-import { StyledText } from '../../../atoms/text'
 import { Tooltip } from '../../../atoms/Tooltip'
 import {
   useModuleRenderInfoForProtocolById,
@@ -34,6 +32,7 @@ import { ProtocolRunHeader } from '../../../organisms/Devices/ProtocolRun/Protoc
 import { RunPreview } from '../../../organisms/RunPreview'
 import { ProtocolRunSetup } from '../../../organisms/Devices/ProtocolRun/ProtocolRunSetup'
 import { ProtocolRunModuleControls } from '../../../organisms/Devices/ProtocolRun/ProtocolRunModuleControls'
+import { ProtocolRunRuntimeParameters } from '../../../organisms/Devices/ProtocolRun/ProtocolRunRunTimeParameters'
 import { useCurrentRunId } from '../../../organisms/ProtocolUpload/hooks'
 import { OPENTRONS_USB } from '../../../redux/discovery'
 import { fetchProtocols } from '../../../redux/protocol-storage'
@@ -49,46 +48,50 @@ import { ViewportListRef } from 'react-viewport-list'
 
 const baseRoundTabStyling = css`
   ${TYPOGRAPHY.pSemiBold}
-  border-radius: ${BORDERS.radiusSoftCorners} ${BORDERS.radiusSoftCorners} 0 0;
-  border-top: ${BORDERS.transparentLineBorder};
-  border-left: ${BORDERS.transparentLineBorder};
-  border-right: ${BORDERS.transparentLineBorder};
+  color: ${COLORS.black90};
+  background-color: ${COLORS.purple30};
+  border: 0px ${BORDERS.styleSolid} ${COLORS.purple30};
+  border-radius: ${BORDERS.borderRadius8};
   padding: ${SPACING.spacing8} ${SPACING.spacing16};
   position: ${POSITION_RELATIVE};
+
+  &:hover {
+    background-color: ${COLORS.purple35};
+  }
+
+  &:focus-visible {
+    outline: 2px ${BORDERS.styleSolid} ${COLORS.yellow50};
+  }
+`
+
+const disabledRoundTabStyling = css`
+  ${baseRoundTabStyling}
+  color: ${COLORS.grey40};
+  background-color: ${COLORS.grey30};
+
+  &:hover {
+    background-color: ${COLORS.grey30};
+  }
 `
 
 const RoundNavLink = styled(NavLink)`
   ${baseRoundTabStyling}
-  color: ${COLORS.darkGreyEnabled};
+  color: ${COLORS.black90};
 
   &:hover {
-    background-color: ${COLORS.fundamentalsBackgroundShade};
+    background-color: ${COLORS.purple35};
   }
 
   &.active {
-    background-color: ${COLORS.white};
-    border-top: ${BORDERS.lineBorder};
-    border-left: ${BORDERS.lineBorder};
-    border-right: ${BORDERS.lineBorder};
-    color: ${COLORS.blueEnabled};
+    background-color: ${COLORS.purple50};
+    color: ${COLORS.white};
 
     &:hover {
-      color: ${COLORS.blueHover};
-    }
-
-    /* extend below the tab when active to flow into the content */
-    &:after {
-      position: ${POSITION_ABSOLUTE};
-      display: ${DISPLAY_BLOCK};
-      content: '';
-      background-color: ${COLORS.white};
-      bottom: -1px;
-      left: 0;
-      height: 1px;
-      width: 100%;
+      background-color: ${COLORS.purple55};
     }
   }
 `
+
 const JUMP_OFFSET_FROM_TOP_PX = 20
 
 interface RoundTabProps {
@@ -107,11 +110,7 @@ function RoundTab({
   const [targetProps, tooltipProps] = useHoverTooltip()
   return disabled ? (
     <>
-      <StyledText
-        color={COLORS.successDisabled}
-        css={baseRoundTabStyling}
-        {...targetProps}
-      >
+      <StyledText css={disabledRoundTabStyling} {...targetProps}>
         {tabName}
       </StyledText>
       {tabDisabledReason != null ? (
@@ -180,6 +179,7 @@ function PageContents(props: PageContentsProps): JSX.Element {
   const protocolRunHeaderRef = React.useRef<HTMLDivElement>(null)
   const listRef = React.useRef<ViewportListRef | null>(null)
   const [jumpedIndex, setJumpedIndex] = React.useState<number | null>(null)
+
   React.useEffect(() => {
     if (jumpedIndex != null) {
       setTimeout(() => setJumpedIndex(null), JUMPED_STEP_HIGHLIGHT_DELAY_MS)
@@ -203,6 +203,7 @@ function PageContents(props: PageContentsProps): JSX.Element {
         runId={runId}
       />
     ),
+    'runtime-parameters': <ProtocolRunRuntimeParameters runId={runId} />,
     'module-controls': (
       <ProtocolRunModuleControls robotName={robotName} runId={runId} />
     ),
@@ -232,22 +233,16 @@ function PageContents(props: PageContentsProps): JSX.Element {
         runId={runId}
         makeHandleJumpToStep={makeHandleJumpToStep}
       />
-      <Flex>
+      <Flex gridGap={SPACING.spacing8} marginBottom={SPACING.spacing12}>
         <SetupTab robotName={robotName} runId={runId} />
+        <ParametersTab robotName={robotName} runId={runId} />
         <ModuleControlsTab robotName={robotName} runId={runId} />
         <RunPreviewTab robotName={robotName} runId={runId} />
       </Flex>
       <Box
         backgroundColor={COLORS.white}
-        border={`1px ${BORDERS.styleSolid} ${COLORS.medGreyEnabled}`}
         // remove left upper corner border radius when first tab is active
-        borderRadius={`${
-          protocolRunDetailsTab === 'setup'
-            ? '0'
-            : String(BORDERS.radiusSoftCorners)
-        } ${String(BORDERS.radiusSoftCorners)} ${String(
-          BORDERS.radiusSoftCorners
-        )} ${String(BORDERS.radiusSoftCorners)}`}
+        borderRadius={BORDERS.borderRadius8}
       >
         {protocolRunDetailsContent}
       </Box>
@@ -288,6 +283,34 @@ const SetupTab = (props: SetupTabProps): JSX.Element | null => {
   )
 }
 
+interface ParametersTabProps {
+  robotName: string
+  runId: string
+}
+
+const ParametersTab = (props: ParametersTabProps): JSX.Element | null => {
+  const { robotName, runId } = props
+  const { t } = useTranslation('run_details')
+  const disabled = false
+  const tabDisabledReason = ''
+
+  return (
+    <>
+      <RoundTab
+        disabled={disabled}
+        tabDisabledReason={tabDisabledReason}
+        to={`/devices/${robotName}/protocol-runs/${runId}/runtime-parameters`}
+        tabName={t('parameters')}
+      />
+      {disabled ? (
+        <Redirect
+          to={`/devices/${robotName}/protocol-runs/${runId}/run-preview`}
+        />
+      ) : null}
+    </>
+  )
+}
+
 interface ModuleControlsTabProps {
   robotName: string
   runId: string
@@ -300,7 +323,6 @@ const ModuleControlsTab = (
   const { t } = useTranslation('run_details')
   const currentRunId = useCurrentRunId()
   const moduleRenderInfoForProtocolById = useModuleRenderInfoForProtocolById(
-    robotName,
     runId
   )
   const { isRunStill } = useRunStatuses()

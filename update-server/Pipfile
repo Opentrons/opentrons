@@ -4,28 +4,27 @@ verify_ssl = true
 name = "pypi"
 
 [packages]
-aiohttp = "==3.4.4"
-typing-extensions = "==3.10.0.0"
+typing-extensions = ">=4.0.0,<5"
+otupdate = {path = ".", editable = true}
 
 [dev-packages]
-otupdate = {path = ".", editable = true}
-flake8 = "~=3.9.0"
-flake8-annotations = "~=2.6.2"
-flake8-docstrings = "~=1.6.0"
-flake8-noqa = "~=1.1.0"
-pytest = "==6.1.0"
+flake8 = "~=7.0.0"
+flake8-annotations = "~=3.0.1"
+flake8-docstrings = "~=1.7.0"
+flake8-noqa = "~=1.4.0"
+pytest = "==7.4.4."
 pytest-watch = "~=4.2.0"
-pytest-cov = "==2.10.1"
-pytest-aiohttp = "==0.3.0"
-coverage = "==5.1"
+pytest-cov = "==4.1.0"
+pytest-aiohttp = "==1.0.5"
+coverage = "==7.4.1"
 # atomicwrites and colorama are pytest dependencies on windows,
 # spec'd here to force lockfile inclusion
 # https://github.com/pypa/pipenv/issues/4408#issuecomment-668324177
-atomicwrites = {version="==1.4.0", sys_platform="== 'win32'"}
-colorama = {version="==0.4.4", sys_platform="== 'win32'"}
-mypy = "==0.940"
+atomicwrites = {version="==1.4.0", markers="sys_platform=='win32'"}
+colorama = {version="==0.4.4", markers="sys_platform=='win32'"}
+mypy = "==1.8.0"
 black = "==22.3.0"
-decoy = "~=1.10"
+decoy = "~=2.1.1"
 
 [requires]
-python_version = "3.7"
+python_version = "3.10"

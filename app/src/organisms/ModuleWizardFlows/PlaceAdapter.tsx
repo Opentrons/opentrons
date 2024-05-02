@@ -2,39 +2,55 @@ import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { css } from 'styled-components'
 import { v4 as uuidv4 } from 'uuid'
-import HeaterShaker_PlaceAdapter_L from '@opentrons/app/src/assets/videos/module_wizard_flows/HeaterShaker_PlaceAdapter_L.webm'
-import HeaterShaker_PlaceAdapter_R from '@opentrons/app/src/assets/videos/module_wizard_flows/HeaterShaker_PlaceAdapter_R.webm'
-import TempModule_PlaceAdapter_L from '@opentrons/app/src/assets/videos/module_wizard_flows/TempModule_PlaceAdapter_L.webm'
-import TempModule_PlaceAdapter_R from '@opentrons/app/src/assets/videos/module_wizard_flows/TempModule_PlaceAdapter_R.webm'
-import Thermocycler_PlaceAdapter from '@opentrons/app/src/assets/videos/module_wizard_flows/Thermocycler_PlaceAdapter.webm'
+import HeaterShaker_PlaceAdapter_L from '../../assets/videos/module_wizard_flows/HeaterShaker_PlaceAdapter_L.webm'
+import HeaterShaker_PlaceAdapter_R from '../../assets/videos/module_wizard_flows/HeaterShaker_PlaceAdapter_R.webm'
+import TempModule_PlaceAdapter_L from '../../assets/videos/module_wizard_flows/TempModule_PlaceAdapter_L.webm'
+import TempModule_PlaceAdapter_R from '../../assets/videos/module_wizard_flows/TempModule_PlaceAdapter_R.webm'
+import Thermocycler_PlaceAdapter from '../../assets/videos/module_wizard_flows/Thermocycler_PlaceAdapter.webm'
 
 import {
   Flex,
-  TYPOGRAPHY,
-  SPACING,
   RESPONSIVENESS,
+  SPACING,
+  StyledText,
+  TYPOGRAPHY,
 } from '@opentrons/components'
 import {
-  CreateCommand,
   getCalibrationAdapterLoadName,
   getModuleDisplayName,
-} from '@opentrons/shared-data'
-
-import { StyledText } from '../../atoms/text'
-import { GenericWizardTile } from '../../molecules/GenericWizardTile'
-import {
+  HEATERSHAKER_MODULE_TYPE,
+  THERMOCYCLER_MODULE_TYPE,
   HEATERSHAKER_MODULE_MODELS,
   TEMPERATURE_MODULE_MODELS,
   THERMOCYCLER_MODULE_MODELS,
-} from '@opentrons/shared-data/js/constants'
+  FLEX_SINGLE_SLOT_BY_CUTOUT_ID,
+  THERMOCYCLER_V2_FRONT_FIXTURE,
+} from '@opentrons/shared-data'
+
+import { InProgressModal } from '../../molecules/InProgressModal/InProgressModal'
+import { GenericWizardTile } from '../../molecules/GenericWizardTile'
 import { LEFT_SLOTS } from './constants'
 
+import type { DeckConfiguration, CreateCommand } from '@opentrons/shared-data'
 import type { ModuleCalibrationWizardStepProps } from './types'
-import { InProgressModal } from '../../molecules/InProgressModal/InProgressModal'
+import type { AxiosError } from 'axios'
+import type { UseMutateFunction } from 'react-query'
+import type {
+  CreateMaintenanceRunData,
+  MaintenanceRun,
+} from '@opentrons/api-client'
 
 interface PlaceAdapterProps extends ModuleCalibrationWizardStepProps {
-  slotName: string
+  deckConfig: DeckConfiguration
   setCreatedAdapterId: (adapterId: string) => void
+  createMaintenanceRun: UseMutateFunction<
+    MaintenanceRun,
+    AxiosError<any>,
+    CreateMaintenanceRunData,
+    unknown
+  >
+  isCreateLoading: boolean
+  createdMaintenanceRunId: string | null
 }
 
 export const BODY_STYLE = css`
@@ -50,17 +66,33 @@ export const PlaceAdapter = (props: PlaceAdapterProps): JSX.Element | null => {
   const {
     proceed,
     goBack,
+    deckConfig,
     attachedModule,
-    slotName,
     chainRunCommands,
     setErrorMessage,
     setCreatedAdapterId,
     attachedPipette,
     isRobotMoving,
+    maintenanceRunId,
+    createMaintenanceRun,
+    isCreateLoading,
+    createdMaintenanceRunId,
   } = props
   const { t } = useTranslation('module_wizard_flows')
-  const moduleName = getModuleDisplayName(attachedModule.moduleModel)
+  React.useEffect(() => {
+    if (createdMaintenanceRunId == null) {
+      createMaintenanceRun({})
+    }
+  }, [])
   const mount = attachedPipette.mount
+  const cutoutId = deckConfig.find(
+    cc =>
+      cc.opentronsModuleSerialNumber === attachedModule.serialNumber &&
+      (attachedModule.moduleType !== THERMOCYCLER_MODULE_TYPE ||
+        cc.cutoutFixtureId === THERMOCYCLER_V2_FRONT_FIXTURE)
+  )?.cutoutId
+  const slotName =
+    cutoutId != null ? FLEX_SINGLE_SLOT_BY_CUTOUT_ID[cutoutId] : null
   const handleOnClick = (): void => {
     const calibrationAdapterLoadName = getCalibrationAdapterLoadName(
       attachedModule.moduleModel
@@ -71,15 +103,19 @@ export const PlaceAdapter = (props: PlaceAdapterProps): JSX.Element | null => {
       )
       return
     }
+    if (slotName == null) {
+      console.error(
+        `could not load module ${attachedModule.moduleModel} into location ${slotName}`
+      )
+      return
+    }
 
     const calibrationAdapterId = uuidv4()
     const commands: CreateCommand[] = [
       {
         commandType: 'loadModule',
         params: {
-          location: {
-            slotName: slotName,
-          },
+          location: { slotName },
           model: attachedModule.moduleModel,
           moduleId: attachedModule.id,
         },
@@ -98,20 +134,35 @@ export const PlaceAdapter = (props: PlaceAdapterProps): JSX.Element | null => {
       {
         commandType: 'calibration/moveToMaintenancePosition',
         params: {
-          mount: mount,
+          mount,
           maintenancePosition: 'attachInstrument',
         },
       },
     ]
     chainRunCommands?.(commands, false)
-      .then(() => setCreatedAdapterId(calibrationAdapterId))
-      .then(() => proceed())
-      .catch((e: Error) => setErrorMessage(e.message))
+      .then(() => {
+        setCreatedAdapterId(calibrationAdapterId)
+      })
+      .then(() => {
+        proceed()
+      })
+      .catch((e: Error) => {
+        setErrorMessage(e.message)
+      })
   }
 
-  const bodyText = (
-    <StyledText css={BODY_STYLE}>{t('place_flush', { moduleName })}</StyledText>
-  )
+  const moduleType = attachedModule.moduleType
+  let bodyText = <StyledText css={BODY_STYLE}>{t('place_flush')}</StyledText>
+  if (moduleType === HEATERSHAKER_MODULE_TYPE) {
+    bodyText = (
+      <StyledText css={BODY_STYLE}>{t('place_flush_heater_shaker')}</StyledText>
+    )
+  }
+  if (moduleType === THERMOCYCLER_MODULE_TYPE) {
+    bodyText = (
+      <StyledText css={BODY_STYLE}>{t('place_flush_thermocycler')}</StyledText>
+    )
+  }
 
   const moduleDisplayName = getModuleDisplayName(attachedModule.moduleModel)
   const isInLeftSlot = LEFT_SLOTS.some(slot => slot === slotName)
@@ -171,11 +222,16 @@ export const PlaceAdapter = (props: PlaceAdapterProps): JSX.Element | null => {
     )
   return (
     <GenericWizardTile
-      header={t('install_adapter', { module: moduleDisplayName })}
+      header={
+        moduleType === HEATERSHAKER_MODULE_TYPE
+          ? t('install_calibration_adapter')
+          : t('install_adapter', { module: moduleDisplayName })
+      }
       rightHandBody={placeAdapterVid}
       bodyText={bodyText}
       proceedButtonText={t('confirm_placement')}
       proceed={handleOnClick}
+      proceedIsDisabled={isCreateLoading || maintenanceRunId == null}
       back={goBack}
     />
   )

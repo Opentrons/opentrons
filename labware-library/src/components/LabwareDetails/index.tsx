@@ -4,7 +4,7 @@ import { isNewLabware } from '../../definitions'
 import { Gallery, Tags, LoadName, NewLabwareAlert } from '../labware-ui'
 import { LabwareTitle } from './LabwareTitle'
 import { LabwareDetailsBox } from './LabwareDetailsBox'
-import styles from './styles.css'
+import styles from './styles.module.css'
 
 import type { LabwareDefinition } from '../../types'
 

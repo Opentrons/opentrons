@@ -1,20 +1,22 @@
 import * as React from 'react'
+import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
 import { css } from 'styled-components'
 import {
-  COLORS,
-  BORDERS,
-  Flex,
-  DIRECTION_COLUMN,
-  JUSTIFY_SPACE_BETWEEN,
-  TYPOGRAPHY,
-  SPACING,
-  Icon,
-  SIZE_1,
-  Link,
   ALIGN_CENTER,
-  useHoverTooltip,
+  BORDERS,
+  COLORS,
+  DIRECTION_COLUMN,
+  Flex,
+  Icon,
+  JUSTIFY_SPACE_BETWEEN,
+  Link,
+  SIZE_1,
+  SPACING,
+  StyledText,
   TOOLTIP_LEFT,
+  TYPOGRAPHY,
+  useHoverTooltip,
 } from '@opentrons/components'
 import {
   RUN_STATUS_IDLE,
@@ -28,12 +30,10 @@ import {
 import {
   useAllCommandsQuery,
   useCommandQuery,
-  useRunQuery,
 } from '@opentrons/react-api-client'
 
 import { useMostRecentCompletedAnalysis } from '../LabwarePositionCheck/useMostRecentCompletedAnalysis'
-import { Portal } from '../../App/portal'
-import { StyledText } from '../../atoms/text'
+import { getTopPortalEl } from '../../App/portal'
 import { Tooltip } from '../../atoms/Tooltip'
 import { CommandText } from '../CommandText'
 import { useRunStatus } from '../RunTimeControl/hooks'
@@ -42,6 +42,7 @@ import { ProgressBar } from '../../atoms/ProgressBar'
 import { useDownloadRunLog, useRobotType } from '../Devices/hooks'
 import { InterventionTicks } from './InterventionTicks'
 import { isInterventionCommand } from '../InterventionModal/utils'
+import { useNotifyRunQuery } from '../../resources/runs'
 
 import type { RunStatus } from '@opentrons/api-client'
 
@@ -70,7 +71,7 @@ export function RunProgressMeter(props: RunProgressMeterProps): JSX.Element {
   const [targetProps, tooltipProps] = useHoverTooltip({
     placement: TOOLTIP_LEFT,
   })
-  const { data: runRecord } = useRunQuery(runId)
+  const { data: runRecord } = useNotifyRunQuery(runId)
   const runData = runRecord?.data ?? null
   const analysis = useMostRecentCompletedAnalysis(runId)
   const { data: allCommandsQueryData } = useAllCommandsQuery(runId, {
@@ -188,17 +189,18 @@ export function RunProgressMeter(props: RunProgressMeterProps): JSX.Element {
       analysisCommands != null &&
       runStatus != null &&
       runData != null &&
-      !TERMINAL_RUN_STATUSES.includes(runStatus) ? (
-        <Portal level="top">
-          <InterventionModal
-            robotName={robotName}
-            command={lastRunCommand}
-            onResume={resumeRunHandler}
-            run={runData}
-            analysis={analysis}
-          />
-        </Portal>
-      ) : null}
+      !TERMINAL_RUN_STATUSES.includes(runStatus)
+        ? createPortal(
+            <InterventionModal
+              robotName={robotName}
+              command={lastRunCommand}
+              onResume={resumeRunHandler}
+              run={runData}
+              analysis={analysis}
+            />,
+            getTopPortalEl()
+          )
+        : null}
       <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
         <Flex justifyContent={JUSTIFY_SPACE_BETWEEN}>
           <Flex gridGap={SPACING.spacing8}>
@@ -220,21 +222,20 @@ export function RunProgressMeter(props: RunProgressMeterProps): JSX.Element {
             {...targetProps}
             role="button"
             css={css`
-            ${TYPOGRAPHY.darkLinkH4SemiBold}
-            &:hover {
-              color: ${
-                downloadIsDisabled
-                  ? COLORS.darkGreyEnabled
-                  : COLORS.darkBlackEnabled
-              };
-            }
-            cursor: ${downloadIsDisabled ? 'default' : 'pointer'};
-          }
-          `}
+              ${TYPOGRAPHY.darkLinkH4SemiBold}
+              &:hover {
+                color: ${downloadIsDisabled ? COLORS.grey40 : COLORS.black90};
+              }
+              cursor: ${downloadIsDisabled ? 'default' : 'pointer'};
+            `}
             textTransform={TYPOGRAPHY.textTransformCapitalize}
             onClick={onDownloadClick}
           >
-            <Flex gridGap={SPACING.spacing2} alignItems={ALIGN_CENTER}>
+            <Flex
+              gridGap={SPACING.spacing2}
+              alignItems={ALIGN_CENTER}
+              color={COLORS.grey60}
+            >
               <Icon name="download" size={SIZE_1} />
               {t('download_run_log')}
             </Flex>
@@ -256,15 +257,15 @@ export function RunProgressMeter(props: RunProgressMeterProps): JSX.Element {
             }
             outerStyles={css`
               height: 0.375rem;
-              background-color: ${COLORS.medGreyEnabled};
-              border-radius: ${BORDERS.radiusSoftCorners};
+              background-color: ${COLORS.grey30};
+              border-radius: ${BORDERS.borderRadius4};
               position: relative;
               overflow: initial;
             `}
             innerStyles={css`
               height: 0.375rem;
-              background-color: ${COLORS.darkGreyEnabled};
-              border-radius: ${BORDERS.radiusSoftCorners};
+              background-color: ${COLORS.grey60};
+              border-radius: ${BORDERS.borderRadius4};
             `}
           >
             <InterventionTicks

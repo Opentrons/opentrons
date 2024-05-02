@@ -275,18 +275,49 @@ def test_get_gripper_labware_movement_waypoints() -> None:
             pickUpOffset=LabwareOffsetVector(x=-1, y=-2, z=-3),
             dropOffset=LabwareOffsetVector(x=1, y=2, z=3),
         ),
+        post_drop_slide_offset=None,
     )
     assert result == [
         # move to above "from" slot
-        GripperMovementWaypointsWithJawStatus(Point(100, 100, 999), False),
+        GripperMovementWaypointsWithJawStatus(Point(100, 100, 999), False, False),
         # with jaw open, move to labware on "from" slot
-        GripperMovementWaypointsWithJawStatus(Point(100, 100, 116.5), True),
+        GripperMovementWaypointsWithJawStatus(Point(100, 100, 116.5), True, False),
         # grip labware and retract in place
-        GripperMovementWaypointsWithJawStatus(Point(100, 100, 999), False),
+        GripperMovementWaypointsWithJawStatus(Point(100, 100, 999), False, False),
         # with labware gripped, move to above "to" slot
-        GripperMovementWaypointsWithJawStatus(Point(202.0, 204.0, 999), False),
+        GripperMovementWaypointsWithJawStatus(Point(202.0, 204.0, 999), False, False),
         # with labware gripped, move down to labware drop height on "to" slot
-        GripperMovementWaypointsWithJawStatus(Point(202.0, 204.0, 222.5), False),
+        GripperMovementWaypointsWithJawStatus(Point(202.0, 204.0, 222.5), False, False),
         # ungrip labware and retract in place
-        GripperMovementWaypointsWithJawStatus(Point(202.0, 204.0, 999), True),
+        GripperMovementWaypointsWithJawStatus(Point(202.0, 204.0, 999), True, True),
+    ]
+
+
+def test_get_gripper_labware_movement_waypoint_with_slide() -> None:
+    """It should get the correct waypoints for gripper movement."""
+    result = get_gripper_labware_movement_waypoints(
+        from_labware_center=Point(101, 102, 119.5),
+        to_labware_center=Point(201, 202, 219.5),
+        gripper_home_z=999,
+        offset_data=LabwareMovementOffsetData(
+            pickUpOffset=LabwareOffsetVector(x=-1, y=-2, z=-3),
+            dropOffset=LabwareOffsetVector(x=1, y=2, z=3),
+        ),
+        post_drop_slide_offset=Point(x=10, y=10, z=1),
+    )
+    assert result == [
+        # move to above "from" slot
+        GripperMovementWaypointsWithJawStatus(Point(100, 100, 999), False, False),
+        # with jaw open, move to labware on "from" slot
+        GripperMovementWaypointsWithJawStatus(Point(100, 100, 116.5), True, False),
+        # grip labware and retract in place
+        GripperMovementWaypointsWithJawStatus(Point(100, 100, 999), False, False),
+        # with labware gripped, move to above "to" slot
+        GripperMovementWaypointsWithJawStatus(Point(202.0, 204.0, 999), False, False),
+        # with labware gripped, move down to labware drop height on "to" slot
+        GripperMovementWaypointsWithJawStatus(Point(202.0, 204.0, 222.5), False, False),
+        # ungrip labware and retract in place
+        GripperMovementWaypointsWithJawStatus(Point(202.0, 204.0, 999), True, True),
+        # slide after ungripping
+        GripperMovementWaypointsWithJawStatus(Point(212.0, 214.0, 1000), True, False),
     ]

@@ -1,27 +1,26 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import {
-  Flex,
-  Icon,
-  RobotCoordsForeignObject,
   ALIGN_CENTER,
   COLORS,
   DIRECTION_COLUMN,
   DIRECTION_ROW,
+  Flex,
+  Icon,
   JUSTIFY_CENTER,
+  RobotCoordsForeignObject,
   SPACING,
   TYPOGRAPHY,
+  StyledText,
 } from '@opentrons/components'
 import {
-  ModuleModel,
   getModuleDisplayName,
   getModuleDef2,
   MAGNETIC_BLOCK_V1,
-  THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
 
-import { StyledText } from '../../atoms/text'
 import { useRunHasStarted } from './hooks'
+import type { ModuleModel } from '@opentrons/shared-data'
 import type { PhysicalPort } from '../../redux/modules/api-types'
 
 export interface ModuleInfoProps {
@@ -61,10 +60,7 @@ export const ModuleInfo = (props: ModuleInfoProps): JSX.Element => {
       width={labwareInterfaceXDimension ?? xDimension}
       flexProps={{
         padding: SPACING.spacing16,
-        backgroundColor:
-          moduleDef.moduleType === THERMOCYCLER_MODULE_TYPE
-            ? COLORS.white
-            : COLORS.transparent,
+        backgroundColor: `${COLORS.white}${COLORS.opacity90HexCode}`,
       }}
     >
       <Flex
@@ -76,14 +72,14 @@ export const ModuleInfo = (props: ModuleInfoProps): JSX.Element => {
           <Flex flexDirection={DIRECTION_ROW} alignItems={ALIGN_CENTER}>
             <Icon
               name={isAttached ? 'ot-check' : 'alert-circle'}
-              color={isAttached ? COLORS.successEnabled : COLORS.warningEnabled}
+              color={isAttached ? COLORS.green50 : COLORS.yellow50}
               key="icon"
               size="10px"
               marginRight={SPACING.spacing4}
             />
 
             <StyledText
-              color={COLORS.darkGreyEnabled}
+              color={COLORS.grey50}
               fontSize={TYPOGRAPHY.fontSizeCaption}
             >
               {!isAttached ? t('module_not_connected') : t('module_connected')}
@@ -92,13 +88,13 @@ export const ModuleInfo = (props: ModuleInfoProps): JSX.Element => {
         ) : null}
         <StyledText
           fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-          color={COLORS.darkGreyEnabled}
+          color={COLORS.grey50}
           fontSize={TYPOGRAPHY.fontSizeLabel}
         >
           {getModuleDisplayName(moduleModel)}
         </StyledText>
         <StyledText
-          color={COLORS.darkGreyEnabled}
+          color={COLORS.grey50}
           fontSize={TYPOGRAPHY.fontSizeH6}
           fontStyle={
             runHasStarted

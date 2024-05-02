@@ -386,6 +386,7 @@ class CanNetworkInfo:
         finally:
             self._can_messenger.remove_listener(listener)
             self._device_info_cache = nodes
+            self._can_messenger.update_known_nodes(self.nodes)
         return nodes
 
     async def probe_specific(
@@ -440,6 +441,7 @@ class CanNetworkInfo:
                     self._device_info_cache[target] = nodes[target]
                 else:
                     self._device_info_cache.pop(target, None)
+            self._can_messenger.update_known_nodes(self.nodes)
         return nodes
 
     def mark_absent(self, devices: Set[NodeId]) -> Dict[NodeId, DeviceInfoCache]:

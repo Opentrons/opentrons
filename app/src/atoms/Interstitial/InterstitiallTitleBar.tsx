@@ -2,17 +2,18 @@ import * as React from 'react'
 import { css } from 'styled-components'
 import {
   Btn,
-  ButtonProps,
-  Icon,
-  POSITION_ABSOLUTE,
-  SPACING,
-  TYPOGRAPHY,
-  Flex,
   COLORS,
   DIRECTION_ROW,
+  Flex,
+  Icon,
   JUSTIFY_SPACE_BETWEEN,
+  POSITION_ABSOLUTE,
+  SPACING,
+  StyledText,
+  TYPOGRAPHY,
 } from '@opentrons/components'
-import { StyledText } from '../text'
+
+import type { ButtonProps } from '@opentrons/components'
 
 export interface InterstitialTitleBarProps {
   title: React.ReactNode
@@ -36,7 +37,7 @@ export function InterstitialTitleBar(
   return (
     <Flex
       width="100%"
-      backgroundColor={COLORS.darkBlackEnabled}
+      backgroundColor={COLORS.black90}
       color={COLORS.white}
       flexDirection={DIRECTION_ROW}
       justifyContent={JUSTIFY_SPACE_BETWEEN}

@@ -69,7 +69,7 @@ stages:
           analysisSummaries:
             - id: '{analysis_id}'
               status: completed
-        links: 
+        links:
           referencingRuns: []
   - name: Get protocol analysis by ID
     request:
@@ -85,6 +85,8 @@ stages:
           - id: '{analysis_id}'
             status: completed
             result: ok
+            robotType: OT-3 Standard
+            runTimeParameters: []
             pipettes:
               - id: pipetteId
                 pipetteName: p1000_96
@@ -101,7 +103,7 @@ stages:
                 definitionUri: opentrons/armadillo_96_wellplate_200ul_pcr_full_skirt/1
                 displayName: Sample Collection Plate
                 location:
-                  moduleId: magneticModuleId
+                  moduleId: magneticBlockId
               - id: tipRackId
                 loadName: opentrons_96_tiprack_1000ul
                 definitionUri: opentrons/opentrons_96_tiprack_1000ul/1
@@ -115,9 +117,8 @@ stages:
                 location:
                   slotName: 'A3'
             modules:
-              - id: magneticModuleId
-                serialNumber: !anystr
-                model: magneticModuleV2
+              - id: magneticBlockId
+                model: magneticBlockV1
                 location:
                   slotName: 'D3'
               - id: temperatureModuleId
@@ -132,8 +133,9 @@ stages:
                 commandType: home
                 key: !anystr
                 status: succeeded
-                params: { }
-                result: { }
+                params: {}
+                result: {}
+                notes: []
                 startedAt: !anystr
                 completedAt: !anystr
               - id: !anystr
@@ -147,6 +149,7 @@ stages:
                   pipetteId: pipetteId
                 result:
                   pipetteId: pipetteId
+                notes: []
                 startedAt: !anystr
                 completedAt: !anystr
               - id: !anystr
@@ -155,15 +158,15 @@ stages:
                 key: !anystr
                 status: succeeded
                 params:
-                  model: magneticModuleV2
+                  model: magneticBlockV1
                   location:
                     slotName: 'D3'
-                  moduleId: magneticModuleId
+                  moduleId: magneticBlockId
                 result:
-                  moduleId: magneticModuleId
+                  moduleId: magneticBlockId
                   definition: !anydict
-                  model: magneticModuleV2
-                  serialNumber: !anystr
+                  model: magneticBlockV1
+                notes: []
                 startedAt: !anystr
                 completedAt: !anystr
               - id: !anystr
@@ -181,6 +184,7 @@ stages:
                   definition: !anydict
                   model: temperatureModuleV2
                   serialNumber: !anystr
+                notes: []
                 startedAt: !anystr
                 completedAt: !anystr
               - id: !anystr
@@ -199,6 +203,7 @@ stages:
                 result:
                   labwareId: sourcePlateId
                   definition: !anydict
+                notes: []
                 startedAt: !anystr
                 completedAt: !anystr
               - id: !anystr
@@ -208,7 +213,7 @@ stages:
                 status: succeeded
                 params:
                   location:
-                    moduleId: magneticModuleId
+                    moduleId: magneticBlockId
                   loadName: armadillo_96_wellplate_200ul_pcr_full_skirt
                   namespace: opentrons
                   version: 1
@@ -217,6 +222,7 @@ stages:
                 result:
                   labwareId: destPlateId
                   definition: !anydict
+                notes: []
                 startedAt: !anystr
                 completedAt: !anystr
               - id: !anystr
@@ -235,6 +241,7 @@ stages:
                 result:
                   labwareId: tipRackId
                   definition: !anydict
+                notes: []
                 startedAt: !anystr
                 completedAt: !anystr
               - id: !anystr
@@ -253,6 +260,7 @@ stages:
                 result:
                   labwareId: fixedTrash
                   definition: !anydict
+                notes: []
                 startedAt: !anystr
                 completedAt: !anystr
               - id: !anystr
@@ -267,6 +275,7 @@ stages:
                     A1: 100.0
                     B1: 100.0
                 result: {}
+                notes: []
                 startedAt: !anystr
                 completedAt: !anystr
               - id: !anystr
@@ -276,6 +285,7 @@ stages:
                 status: succeeded
                 params: {}
                 result: {}
+                notes: []
                 startedAt: !anystr
                 completedAt: !anystr
               - id: !anystr
@@ -298,6 +308,7 @@ stages:
                   tipVolume: 1000.0
                   tipLength: 77.5
                   tipDiameter: 7.23
+                notes: []
                 startedAt: !anystr
                 completedAt: !anystr
               - id: !anystr
@@ -320,6 +331,7 @@ stages:
                 result:
                   position: { 'x': 14.38, 'y': 74.24, 'z': 12.05 }
                   volume: 5.0
+                notes: []
                 startedAt: !anystr
                 completedAt: !anystr
               - id: !anystr
@@ -330,6 +342,7 @@ stages:
                 params:
                   seconds: 42.0
                 result: {}
+                notes: []
                 startedAt: !anystr
                 completedAt: !anystr
               - id: !anystr
@@ -350,8 +363,9 @@ stages:
                   volume: 4.5
                   flowRate: 2.5
                 result:
-                  position: { 'x': 341.205, 'y': 65.115, 'z': 84.3 }
+                  position: { 'x': 342.38, 'y': 65.24, 'z': 40.05 }
                   volume: 4.5
+                notes: []
                 startedAt: !anystr
                 completedAt: !anystr
               - id: !anystr
@@ -372,7 +386,8 @@ stages:
                   radius: 1.0
                   speed: 42.0
                 result:
-                  position: { 'x': 341.205, 'y': 65.115, 'z': 94.3 }
+                  position: { 'x': 342.38, 'y': 65.24, 'z': 50.05 }
+                notes: []
                 startedAt: !anystr
                 completedAt: !anystr
               - id: !anystr
@@ -392,7 +407,8 @@ stages:
                       z: 12.0
                   flowRate: 2.0
                 result:
-                  position: { 'x': 341.205, 'y': 65.115, 'z': 95.3 }
+                  position: { 'x': 342.38, 'y': 65.24, 'z': 51.05 }
+                notes: []
                 startedAt: !anystr
                 completedAt: !anystr
               - id: !anystr
@@ -409,6 +425,7 @@ stages:
                   forceDirect: false
                 result:
                   position: { 'x': 100.0, 'y': 100.0, 'z': 100.0 }
+                notes: []
                 startedAt: !anystr
                 completedAt: !anystr
               - id: !anystr
@@ -430,7 +447,8 @@ stages:
                   speed: 12.3
                 result:
                   position:
-                    { 'x': 350.205, 'y': 65.115, 'z': 98.25 }
+                    { 'x': 351.38, 'y': 65.24, 'z': 54.0 }
+                notes: []
                 startedAt: !anystr
                 completedAt: !anystr
               - id: !anystr
@@ -452,7 +470,8 @@ stages:
                   forceDirect: true
                 result:
                   position:
-                    { 'x': 352.205, 'y': 68.115, 'z': 93.3 }
+                    { 'x': 353.38, 'y': 68.24, 'z': 49.05 }
+                notes: []
                 startedAt: !anystr
                 completedAt: !anystr
               - id: !anystr
@@ -473,6 +492,7 @@ stages:
                   alternateDropLocation: false
                 result:
                   position: { 'x': 410.84000000000003, 'y': 374.56, 'z': 82.0 }
+                notes: []
                 startedAt: !anystr
                 completedAt: !anystr
               - id: !anystr
@@ -483,6 +503,7 @@ stages:
                 params:
                   message: pause command
                 result: {}
+                notes: []
                 startedAt: !anystr
                 completedAt: !anystr
               - id: !anystr
@@ -500,6 +521,7 @@ stages:
                   forceDirect: true
                 result:
                   position: { 'x': 0.0, 'y': 0.0, 'z': 0.0 }
+                notes: []
                 startedAt: !anystr
                 completedAt: !anystr
               - id: !anystr
@@ -516,6 +538,7 @@ stages:
                     x: !anyfloat
                     y: !anyfloat
                     z: !anyfloat
+                notes: []
                 startedAt: !anystr
                 completedAt: !anystr
               - id: !anystr
@@ -532,6 +555,7 @@ stages:
                     x: !anyfloat
                     y: !anyfloat
                     z: !anyfloat
+                notes: []
                 startedAt: !anystr
                 completedAt: !anystr
               - id: !anystr
@@ -541,12 +565,14 @@ stages:
                 status: succeeded
                 params:
                   pipetteId: pipetteId
+                  failOnNotHomed: true
                 result:
                   positionId: !anystr
                   position:
                     x: !anyfloat
                     y: !anyfloat
                     z: !anyfloat
+                notes: []
                 startedAt: !anystr
                 completedAt: !anystr
               - id: !anystr
@@ -563,6 +589,7 @@ stages:
                     x: !anyfloat
                     y: !anyfloat
                     z: !anyfloat
+                notes: []
                 startedAt: !anystr
                 completedAt: !anystr
               - id: !anystr
@@ -573,12 +600,14 @@ stages:
                 params:
                   pipetteId: pipetteId
                   positionId: positionId
+                  failOnNotHomed: true
                 result:
                   positionId: positionId
                   position:
                     x: !anyfloat
                     y: !anyfloat
                     z: !anyfloat
+                notes: []
                 startedAt: !anystr
                 completedAt: !anystr
             errors: []

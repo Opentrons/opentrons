@@ -1,16 +1,14 @@
 import * as React from 'react'
-
-import { renderWithProviders } from '@opentrons/components'
+import { fireEvent, screen } from '@testing-library/react'
+import '@testing-library/jest-dom/vitest'
+import { describe, it, vi, beforeEach, expect } from 'vitest'
+import { renderWithProviders } from '../../../__testing-utils__'
 
 import { i18n } from '../../../i18n'
 import { getIsOnDevice } from '../../../redux/config'
 import { EstopMissingModal } from '../EstopMissingModal'
 
-jest.mock('../../../redux/config')
-
-const mockGetIsOnDevice = getIsOnDevice as jest.MockedFunction<
-  typeof getIsOnDevice
->
+vi.mock('../../../redux/config')
 
 const render = (props: React.ComponentProps<typeof EstopMissingModal>) => {
   return renderWithProviders(<EstopMissingModal {...props} />, {
@@ -24,18 +22,18 @@ describe('EstopMissingModal - Touchscreen', () => {
   beforeEach(() => {
     props = {
       robotName: 'mockFlex',
-      closeModal: jest.fn(),
+      closeModal: vi.fn(),
       isDismissedModal: false,
-      setIsDismissedModal: jest.fn(),
+      setIsDismissedModal: vi.fn(),
     }
-    mockGetIsOnDevice.mockReturnValue(true)
+    vi.mocked(getIsOnDevice).mockReturnValue(true)
   })
 
   it('should render text', () => {
-    const [{ getByText }] = render(props)
-    getByText('E-stop missing')
-    getByText('Connect the E-stop to continue')
-    getByText(
+    render(props)
+    screen.getByText('E-stop missing')
+    screen.getByText('Connect the E-stop to continue')
+    screen.getByText(
       'Your E-stop could be damaged or detached. mockFlex lost its connection to the E-stop, so it canceled the protocol. Connect a functioning E-stop to continue.'
     )
   })
@@ -47,25 +45,25 @@ describe('EstopMissingModal - Desktop', () => {
   beforeEach(() => {
     props = {
       robotName: 'mockFlex',
-      closeModal: jest.fn(),
+      closeModal: vi.fn(),
       isDismissedModal: false,
-      setIsDismissedModal: jest.fn(),
+      setIsDismissedModal: vi.fn(),
     }
-    mockGetIsOnDevice.mockReturnValue(false)
+    vi.mocked(getIsOnDevice).mockReturnValue(false)
   })
 
   it('should render text', () => {
-    const [{ getByText }] = render(props)
-    getByText('E-stop missing')
-    getByText('Connect the E-stop to continue')
-    getByText(
+    render(props)
+    screen.getByText('E-stop missing')
+    screen.getByText('Connect the E-stop to continue')
+    screen.getByText(
       'Your E-stop could be damaged or detached. mockFlex lost its connection to the E-stop, so it canceled the protocol. Connect a functioning E-stop to continue.'
     )
   })
 
   it('should call a mock function when clicking close icon', () => {
-    const [{ getByTestId }] = render(props)
-    getByTestId('ModalHeader_icon_close_E-stop missing').click()
+    render(props)
+    fireEvent.click(screen.getByTestId('ModalHeader_icon_close_E-stop missing'))
     expect(props.setIsDismissedModal).toHaveBeenCalled()
     expect(props.closeModal).toHaveBeenCalled()
   })

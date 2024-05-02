@@ -72,7 +72,7 @@ export function createHealthPoller(options: HealthPollerOptions): HealthPoller {
           onPollResult(result)
           lastCompletedPollTimeByIp[ip] = pollTime
         } else {
-          log('debug', 'Stale poll result ignored', { ip, port, result })
+          // log('debug', 'Stale poll result ignored', { ip, port, result })
         }
       })
       .catch((e: Error) => {

@@ -15,7 +15,7 @@ import uniq from 'lodash/uniq'
 
 import { getWellNamePerMultiTip } from './getWellNamePerMultiTip'
 import { get96Channel384WellPlateWells, getLabwareDefURI, orderWells } from '.'
-import type { LabwareDefinition2, PipetteNameSpecs } from '../types'
+import type { LabwareDefinition2, PipetteV2Specs } from '../types'
 
 type WellSetByPrimaryWell = string[][]
 
@@ -51,8 +51,9 @@ export interface WellSetHelpers {
   ) => string[] | null | undefined
 
   canPipetteUseLabware: (
-    pipetteSpec: PipetteNameSpecs,
-    labwareDef: LabwareDefinition2
+    pipetteSpec: PipetteV2Specs,
+    labwareDef?: LabwareDefinition2,
+    trashName?: string
   ) => boolean
 }
 
@@ -122,25 +123,29 @@ export const makeWellSetHelpers = (): WellSetHelpers => {
   }
 
   const canPipetteUseLabware = (
-    pipetteSpec: PipetteNameSpecs,
-    labwareDef: LabwareDefinition2
+    pipetteSpec: PipetteV2Specs,
+    labwareDef?: LabwareDefinition2,
+    trashName?: string
   ): boolean => {
-    if (pipetteSpec.channels === 1) {
+    if (pipetteSpec.channels === 1 || trashName != null) {
       // assume all labware can be used by single-channel
       return true
     }
-
-    const allWellSets = getAllWellSetsForLabware(labwareDef)
-    return allWellSets.some(wellSet => {
-      const uniqueWells = uniq(wellSet)
-      // if all wells are non-null, and there are either 1 (reservoir-like)
-      // or 8 (well plate-like) unique wells in the set,
-      // then assume both 8 and 96 channel pipettes will work
-      return (
-        uniqueWells.every(well => well != null) &&
-        [1, 8].includes(uniqueWells.length)
-      )
-    })
+    if (labwareDef != null) {
+      const allWellSets = getAllWellSetsForLabware(labwareDef)
+      return allWellSets.some(wellSet => {
+        const uniqueWells = uniq(wellSet)
+        // if all wells are non-null, and there are either 1 (reservoir-like)
+        // or 8 (well plate-like) unique wells in the set,
+        // then assume both 8 and 96 channel pipettes will work
+        return (
+          uniqueWells.every(well => well != null) &&
+          [1, 8].includes(uniqueWells.length)
+        )
+      })
+    } else {
+      return false
+    }
   }
   return {
     getAllWellSetsForLabware,

@@ -12,9 +12,9 @@ import {
   SPACING,
   TYPOGRAPHY,
   useInterval,
+  StyledText,
 } from '@opentrons/components'
 
-import { StyledText } from '../../atoms/text'
 import { EMPTY_TIMESTAMP } from '../Devices/constants'
 import { formatInterval } from '../RunTimeControl/utils'
 import { InterventionCommandMessage } from './InterventionCommandMessage'
@@ -47,14 +47,14 @@ export function PauseInterventionContent({
 
 const PAUSE_HEADER_STYLE = css`
   align-items: ${ALIGN_CENTER};
-  background-color: ${COLORS.fundamentalsBackground};
-  border-radius: ${BORDERS.radiusSoftCorners};
+  background-color: ${COLORS.grey10};
+  border-radius: ${BORDERS.borderRadius4};
   grid-gap: ${SPACING.spacing6};
   padding: ${SPACING.spacing16};
   @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
     align-self: ${ALIGN_CENTER};
-    background-color: ${COLORS.light1};
-    border-radius: ${BORDERS.borderRadiusSize3};
+    background-color: ${COLORS.grey35};
+    border-radius: ${BORDERS.borderRadius8};
     grid-gap: ${SPACING.spacing32};
     padding: ${SPACING.spacing24};
     min-width: 36.5rem;

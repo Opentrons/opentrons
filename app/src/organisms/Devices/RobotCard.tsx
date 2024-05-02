@@ -4,23 +4,23 @@ import { useTranslation } from 'react-i18next'
 import { useHistory } from 'react-router-dom'
 
 import {
-  Box,
-  Flex,
   ALIGN_START,
   BORDERS,
+  Box,
   COLORS,
   DIRECTION_COLUMN,
   DIRECTION_ROW,
+  Flex,
   JUSTIFY_FLEX_START,
   JUSTIFY_SPACE_BETWEEN,
   POSITION_ABSOLUTE,
   POSITION_RELATIVE,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
   WRAP,
 } from '@opentrons/components'
 import {
-  GripperModel,
   getGripperDisplayName,
   getModuleDisplayName,
   getPipetteModelSpecs,
@@ -34,7 +34,6 @@ import {
 import OT2_PNG from '../../assets/images/OT2-R_HERO.png'
 import FLEX_PNG from '../../assets/images/FLEX.png'
 import { InstrumentContainer } from '../../atoms/InstrumentContainer'
-import { StyledText } from '../../atoms/text'
 import { CONNECTABLE, getRobotModelByName } from '../../redux/discovery'
 import { ModuleIcon } from '../../molecules/ModuleIcon'
 import { UpdateRobotBanner } from '../UpdateRobotBanner'
@@ -43,9 +42,10 @@ import { ReachableBanner } from './ReachableBanner'
 import { RobotOverflowMenu } from './RobotOverflowMenu'
 import { RobotStatusHeader } from './RobotStatusHeader'
 
+import type { GripperData } from '@opentrons/api-client'
+import type { GripperModel } from '@opentrons/shared-data'
 import type { DiscoveredRobot } from '../../redux/discovery/types'
 import type { State } from '../../redux/types'
-import { GripperData } from '@opentrons/api-client'
 
 interface RobotCardProps {
   robot: DiscoveredRobot
@@ -63,6 +63,7 @@ export function RobotCard(props: RobotCardProps): JSX.Element | null {
     <Flex
       alignItems={ALIGN_START}
       backgroundColor={COLORS.white}
+      borderRadius={BORDERS.borderRadius8}
       cursor="pointer"
       flexDirection={DIRECTION_ROW}
       gridGap={SPACING.spacing16}
@@ -70,7 +71,6 @@ export function RobotCard(props: RobotCardProps): JSX.Element | null {
       padding={SPACING.spacing16}
       position={POSITION_RELATIVE}
       onClick={() => history.push(`/devices/${robotName}`)}
-      css={BORDERS.cardOutlineBorder}
     >
       <img
         src={robotModel === 'OT-2' ? OT2_PNG : FLEX_PNG}
@@ -132,7 +132,7 @@ function AttachedModules(props: { robotName: string }): JSX.Element | null {
       <StyledText
         as="h6"
         textTransform={TYPOGRAPHY.textTransformUppercase}
-        color={COLORS.darkGreyEnabled}
+        color={COLORS.grey60}
       >
         {t('modules')}
       </StyledText>
@@ -185,7 +185,7 @@ function AttachedInstruments(props: { robotName: string }): JSX.Element {
       gridGap={SPACING.spacing4}
       minWidth="24rem"
     >
-      <StyledText as="h6" color={COLORS.darkGreyEnabled}>
+      <StyledText as="h6" color={COLORS.grey60}>
         {t('shared:instruments')}
       </StyledText>
 

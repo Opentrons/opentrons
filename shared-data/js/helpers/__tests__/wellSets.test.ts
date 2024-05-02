@@ -1,18 +1,20 @@
-import pipetteNameSpecsFixtures from '../../../pipette/fixtures/name/pipetteNameSpecFixtures.json'
+import { describe, it, expect, beforeEach } from 'vitest'
 import fixture_12_trough from '../../../labware/fixtures/2/fixture_12_trough.json'
 import fixture_96_plate from '../../../labware/fixtures/2/fixture_96_plate.json'
 import fixture_384_plate from '../../../labware/fixtures/2/fixture_384_plate.json'
 import fixture_overlappy_wellplate from '../../../labware/fixtures/2/fixture_overlappy_wellplate.json'
+import {
+  fixtureP100096V2Specs,
+  fixtureP10MultiV2Specs,
+  fixtureP10SingleV2Specs,
+} from '../../pipettes'
 import { makeWellSetHelpers } from '../wellSets'
 import { findWellAt } from '../getWellNamePerMultiTip'
 import { get96Channel384WellPlateWells, orderWells } from '..'
 
-import type { LabwareDefinition2, PipetteNameSpecs } from '../../types'
+import type { LabwareDefinition2 } from '../../types'
 import type { WellSetHelpers } from '../wellSets'
 
-const fixtureP10Single = pipetteNameSpecsFixtures.p10_single as PipetteNameSpecs
-const fixtureP10Multi = pipetteNameSpecsFixtures.p10_multi as PipetteNameSpecs
-const fixtureP100096 = (pipetteNameSpecsFixtures.p1000_96 as any) as PipetteNameSpecs
 const fixture12Trough = fixture_12_trough as LabwareDefinition2
 const fixture96Plate = fixture_96_plate as LabwareDefinition2
 const fixture384Plate = fixture_384_plate as LabwareDefinition2
@@ -198,8 +200,8 @@ describe('canPipetteUseLabware', () => {
 
   it('returns false when wells are too close together for multi channel pipettes', () => {
     const labwareDef = fixtureOverlappyWellplate
-    const pipette = fixtureP10Multi
-    const pipette96 = fixtureP100096
+    const pipette = fixtureP10MultiV2Specs
+    const pipette96 = fixtureP100096V2Specs
 
     expect(canPipetteUseLabware(pipette, labwareDef)).toBe(false)
     expect(canPipetteUseLabware(pipette96, labwareDef)).toBe(false)
@@ -207,7 +209,7 @@ describe('canPipetteUseLabware', () => {
 
   it('returns true when pipette is single channel', () => {
     const labwareDef = fixtureOverlappyWellplate
-    const pipette = fixtureP10Single
+    const pipette = fixtureP10SingleV2Specs
 
     expect(canPipetteUseLabware(pipette, labwareDef)).toBe(true)
   })

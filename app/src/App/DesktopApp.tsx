@@ -1,5 +1,7 @@
 import * as React from 'react'
 import { Redirect, Route, Switch, useRouteMatch } from 'react-router-dom'
+import { ErrorBoundary } from 'react-error-boundary'
+import { I18nextProvider } from 'react-i18next'
 
 import {
   Box,
@@ -10,6 +12,7 @@ import {
 import { ApiHostProvider } from '@opentrons/react-api-client'
 import NiceModal from '@ebay/nice-modal-react'
 
+import { i18n } from '../i18n'
 import { Alerts } from '../organisms/Alerts'
 import { Breadcrumbs } from '../organisms/Breadcrumbs'
 import { ToasterOven } from '../organisms/ToasterOven'
@@ -30,6 +33,7 @@ import { appShellRequestor } from '../redux/shell/remote'
 import { useRobot, useIsFlex } from '../organisms/Devices/hooks'
 import { ProtocolTimeline } from '../pages/Protocols/ProtocolDetails/ProtocolTimeline'
 import { PortalRoot as ModalPortalRoot } from './portal'
+import { DesktopAppFallback } from './DesktopAppFallback'
 
 import type { RouteProps, DesktopRouteParams  } from './types'
 
@@ -106,41 +110,47 @@ export const DesktopApp = (): JSX.Element => {
 
   return (
     <NiceModal.Provider>
-      <Navbar routes={desktopRoutes} />
-      <ToasterOven>
-        <EmergencyStopContext.Provider
-          value={{
-            isEmergencyStopModalDismissed,
-            setIsEmergencyStopModalDismissed,
-          }}
-        >
-          <Box width="100%">
-            <Alerts>
-              <Switch>
-                {desktopRoutes.map(({ Component, exact, path }: RouteProps) => {
-                  return (
-                    <Route key={path} exact={exact} path={path}>
-                      <Breadcrumbs />
-                      <Box
-                        position={POSITION_RELATIVE}
-                        width="100%"
-                        height="100%"
-                        backgroundColor={COLORS.fundamentalsBackground}
-                        overflow={OVERFLOW_AUTO}
-                      >
-                        <ModalPortalRoot />
-                        <Component />
-                      </Box>
-                    </Route>
-                  )
-                })}
-                <Redirect exact from="/" to="/protocols" />
-              </Switch>
-              <RobotControlTakeover />
-            </Alerts>
-          </Box>
-        </EmergencyStopContext.Provider>
-      </ToasterOven>
+      <I18nextProvider i18n={i18n}>
+        <ErrorBoundary FallbackComponent={DesktopAppFallback}>
+          <Navbar routes={desktopRoutes} />
+          <ToasterOven>
+            <EmergencyStopContext.Provider
+              value={{
+                isEmergencyStopModalDismissed,
+                setIsEmergencyStopModalDismissed,
+              }}
+            >
+              <Box width="100%">
+                <Alerts>
+                  <Switch>
+                    {desktopRoutes.map(
+                      ({ Component, exact, path }: RouteProps) => {
+                        return (
+                          <Route key={path} exact={exact} path={path}>
+                            <Breadcrumbs />
+                            <Box
+                              position={POSITION_RELATIVE}
+                              width="100%"
+                              height="100%"
+                              backgroundColor={COLORS.grey10}
+                              overflow={OVERFLOW_AUTO}
+                            >
+                              <ModalPortalRoot />
+                              <Component />
+                            </Box>
+                          </Route>
+                        )
+                      }
+                    )}
+                    <Redirect exact from="/" to="/protocols" />
+                  </Switch>
+                  <RobotControlTakeover />
+                </Alerts>
+              </Box>
+            </EmergencyStopContext.Provider>
+          </ToasterOven>
+        </ErrorBoundary>
+      </I18nextProvider>
     </NiceModal.Provider>
   )
 }

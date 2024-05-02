@@ -1,36 +1,34 @@
 import * as React from 'react'
-import remark from 'remark'
-import reactRenderer from 'remark-react'
-import styles from './styles.css'
-import { StyledText } from '../../atoms/text'
+import Markdown from 'react-markdown'
+
+import { StyledText } from '@opentrons/components'
+
+import styles from './styles.module.css'
+
 export interface ReleaseNotesProps {
   source?: string | null
 }
-
-// ToDo (kk:09/22/2023) This component should be updated in the future
-// since the package we use hasn't been updated more than 2 years.
-// Also the creator recommends users to replace remark-react with rehype-react.
-const renderer = remark().use(reactRenderer, {
-  remarkReactComponents: {
-    div: React.Fragment,
-    h2: HeaderText,
-    ul: React.Fragment,
-    li: ParagraphText,
-    p: ParagraphText,
-    a: ExternalLink,
-  },
-})
 
 const DEFAULT_RELEASE_NOTES = 'We recommend upgrading to the latest version.'
 
 export function ReleaseNotes(props: ReleaseNotesProps): JSX.Element {
   const { source } = props
 
-  console.log(DEFAULT_RELEASE_NOTES)
   return (
     <div className={styles.release_notes}>
       {source != null ? (
-        renderer.processSync(source).contents
+        <Markdown
+          components={{
+            div: undefined,
+            ul: UnnumberedListText,
+            h2: HeaderText,
+            li: ListItemText,
+            p: ParagraphText,
+            a: ExternalLink,
+          }}
+        >
+          {source}
+        </Markdown>
       ) : (
         <p>{DEFAULT_RELEASE_NOTES}</p>
       )}
@@ -48,4 +46,12 @@ function ParagraphText(props: JSX.IntrinsicAttributes): JSX.Element {
 
 function HeaderText(props: JSX.IntrinsicAttributes): JSX.Element {
   return <StyledText {...props} as="h3" />
+}
+
+function ListItemText(props: JSX.IntrinsicAttributes): JSX.Element {
+  return <StyledText {...props} as="li" />
+}
+
+function UnnumberedListText(props: JSX.IntrinsicAttributes): JSX.Element {
+  return <StyledText {...props} as="ul" />
 }

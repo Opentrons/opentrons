@@ -1,26 +1,28 @@
 import * as React from 'react'
+import { createPortal } from 'react-dom'
 import { useSelector } from 'react-redux'
-import { useTranslation } from 'react-i18next'
+import { Trans, useTranslation } from 'react-i18next'
+import { useDeleteMaintenanceRunMutation } from '@opentrons/react-api-client'
+import { COLORS, StyledText } from '@opentrons/components'
 import {
-  useDeleteMaintenanceRunMutation,
-  useCurrentMaintenanceRun,
-} from '@opentrons/react-api-client'
-import { COLORS } from '@opentrons/components'
-import {
-  CreateCommand,
   getModuleType,
   getModuleDisplayName,
-  LEFT,
+  FLEX_CUTOUT_BY_SLOT_ID,
+  SINGLE_SLOT_FIXTURES,
+  getFixtureIdByCutoutIdFromModuleSlotName,
+  getCutoutFixturesForModuleModel,
+  getDeckDefFromRobotType,
+  FLEX_ROBOT_TYPE,
 } from '@opentrons/shared-data'
 import { LegacyModalShell } from '../../molecules/LegacyModal'
-import { Portal } from '../../App/portal'
+import { getTopPortalEl } from '../../App/portal'
 import { InProgressModal } from '../../molecules/InProgressModal/InProgressModal'
 import { WizardHeader } from '../../molecules/WizardHeader'
 import { useAttachedPipettesFromInstrumentsQuery } from '../../organisms/Devices/hooks'
 import {
   useChainMaintenanceCommands,
   useCreateTargetedMaintenanceRunMutation,
-} from '../../resources/runs/hooks'
+} from '../../resources/runs'
 import { getIsOnDevice } from '../../redux/config'
 import { SimpleWizardBody } from '../../molecules/SimpleWizardBody'
 import { getModuleCalibrationSteps } from './getModuleCalibrationSteps'
@@ -31,15 +33,20 @@ import { PlaceAdapter } from './PlaceAdapter'
 import { SelectLocation } from './SelectLocation'
 import { Success } from './Success'
 import { DetachProbe } from './DetachProbe'
-import { FirmwareUpdateModal } from '../FirmwareUpdateModal'
+import { useNotifyDeckConfigurationQuery } from '../../resources/deck_configuration'
+import { useNotifyCurrentMaintenanceRun } from '../../resources/maintenance_runs'
 
 import type { AttachedModule, CommandData } from '@opentrons/api-client'
+import type {
+  CreateCommand,
+  CutoutConfig,
+  SingleSlotCutoutFixtureId,
+} from '@opentrons/shared-data'
 
 interface ModuleWizardFlowsProps {
   attachedModule: AttachedModule
   closeFlow: () => void
   isPrepCommandLoading: boolean
-  initialSlotName?: string
   onComplete?: () => void
   prepCommandErrorMessage?: string
 }
@@ -51,7 +58,6 @@ export const ModuleWizardFlows = (
 ): JSX.Element | null => {
   const {
     attachedModule,
-    initialSlotName,
     isPrepCommandLoading,
     closeFlow,
     onComplete,
@@ -66,11 +72,37 @@ export const ModuleWizardFlows = (
       : attachedPipettes.right
 
   const moduleCalibrationSteps = getModuleCalibrationSteps()
-  const availableSlotNames =
-    FLEX_SLOT_NAMES_BY_MOD_TYPE[getModuleType(attachedModule.moduleModel)] ?? []
-  const [slotName, setSlotName] = React.useState(
-    initialSlotName != null ? initialSlotName : availableSlotNames?.[0] ?? 'D1'
+  const deckDef = getDeckDefFromRobotType(FLEX_ROBOT_TYPE)
+  const deckConfig = useNotifyDeckConfigurationQuery().data ?? []
+  const moduleCutoutConfig = deckConfig.find(
+    cc => cc.opentronsModuleSerialNumber === attachedModule.serialNumber
   )
+  // mapping of cutoutId's occupied by the target module and their cutoutFixtureId's per cutout
+  const fixtureIdByCutoutId =
+    moduleCutoutConfig != null
+      ? getFixtureIdByCutoutIdFromModuleSlotName(
+          moduleCutoutConfig.cutoutId.replace('cutout', ''),
+          getCutoutFixturesForModuleModel(attachedModule.moduleModel, deckDef),
+          deckDef
+        )
+      : {}
+  const occupiedCutouts = deckConfig.filter(
+    (cutoutConfig: CutoutConfig) =>
+      !SINGLE_SLOT_FIXTURES.includes(
+        cutoutConfig.cutoutFixtureId as SingleSlotCutoutFixtureId
+      ) && !Object.keys(fixtureIdByCutoutId).includes(cutoutConfig.cutoutId)
+  )
+  const availableSlotNames =
+    FLEX_SLOT_NAMES_BY_MOD_TYPE[
+      getModuleType(attachedModule.moduleModel)
+    ]?.filter(
+      slot =>
+        !occupiedCutouts.some(
+          (occCutout: CutoutConfig) =>
+            occCutout.cutoutId === FLEX_CUTOUT_BY_SLOT_ID[slot]
+        )
+    ) ?? []
+
   const [currentStepIndex, setCurrentStepIndex] = React.useState<number>(0)
   const totalStepCount = moduleCalibrationSteps.length - 1
   const currentStep = moduleCalibrationSteps?.[currentStepIndex]
@@ -93,7 +125,7 @@ export const ModuleWizardFlows = (
     setMonitorMaintenanceRunForDeletion,
   ] = React.useState<boolean>(false)
 
-  const { data: maintenanceRunData } = useCurrentMaintenanceRun({
+  const { data: maintenanceRunData } = useNotifyCurrentMaintenanceRun({
     refetchInterval: RUN_REFETCH_INTERVAL,
     enabled: createdMaintenanceRunId != null,
   })
@@ -106,7 +138,9 @@ export const ModuleWizardFlows = (
     createTargetedMaintenanceRun,
     isLoading: isCreateLoading,
   } = useCreateTargetedMaintenanceRunMutation({
-    onSuccess: response => {
+    onSuccess: (response: {
+      data: { id: React.SetStateAction<string | null> }
+    }) => {
       setCreatedMaintenanceRunId(response.data.id)
     },
   })
@@ -151,8 +185,12 @@ export const ModuleWizardFlows = (
   }
 
   const { deleteMaintenanceRun } = useDeleteMaintenanceRunMutation({
-    onSuccess: () => handleClose(),
-    onError: () => handleClose(),
+    onSuccess: () => {
+      handleClose()
+    },
+    onError: () => {
+      handleClose()
+    },
   })
 
   const handleCleanUpAndClose = (): void => {
@@ -160,7 +198,7 @@ export const ModuleWizardFlows = (
     if (maintenanceRunData?.data.id == null) handleClose()
     else {
       chainRunCommands(
-        maintenanceRunData?.data.id,
+        maintenanceRunData?.data.id as string,
         [{ commandType: 'home' as const, params: {} }],
         false
       )
@@ -192,7 +230,7 @@ export const ModuleWizardFlows = (
       continuePastCommandFailure: boolean
     ): Promise<CommandData[]> =>
       chainRunCommands(
-        maintenanceRunData?.data.id,
+        maintenanceRunData?.data.id as string,
         commands,
         continuePastCommandFailure
       )
@@ -219,7 +257,6 @@ export const ModuleWizardFlows = (
     errorMessage,
     isOnDevice,
     attachedModule,
-    slotName,
     isExiting,
   }
 
@@ -236,7 +273,7 @@ export const ModuleWizardFlows = (
     modalContent = (
       <SimpleWizardBody
         isSuccess={false}
-        iconColor={COLORS.errorEnabled}
+        iconColor={COLORS.red50}
         header={t(
           prepCommandErrorMessage != null
             ? 'error_prepping_module'
@@ -246,10 +283,14 @@ export const ModuleWizardFlows = (
           prepCommandErrorMessage != null ? (
             prepCommandErrorMessage
           ) : (
-            <>
-              {t('module_calibration_failed')}
-              {errorMessage}
-            </>
+            <Trans
+              t={t}
+              i18nKey={'branded:module_calibration_failed'}
+              values={{ error: errorMessage }}
+              components={{
+                block: <StyledText as="p" />,
+              }}
+            />
           )
         }
       />
@@ -257,36 +298,16 @@ export const ModuleWizardFlows = (
   } else if (isExiting) {
     modalContent = <InProgressModal description={t('stand_back_exiting')} />
   } else if (currentStep.section === SECTIONS.BEFORE_BEGINNING) {
-    modalContent = (
-      <BeforeBeginning
-        {...currentStep}
-        {...calibrateBaseProps}
-        createMaintenanceRun={createTargetedMaintenanceRun}
-        isCreateLoading={isCreateLoading}
-        createdMaintenanceRunId={createdMaintenanceRunId}
-      />
-    )
-  } else if (currentStep.section === SECTIONS.FIRMWARE_UPDATE) {
-    modalContent = (
-      <FirmwareUpdateModal
-        proceed={proceed}
-        subsystem={
-          attachedPipette.mount === LEFT ? 'pipette_left' : 'pipette_right'
-        }
-        description={t('firmware_update')}
-        proceedDescription={t('firmware_up_to_date', {
-          module: getModuleDisplayName(attachedModule.moduleModel),
-        })}
-        isOnDevice={isOnDevice}
-      />
-    )
+    modalContent = <BeforeBeginning {...currentStep} {...calibrateBaseProps} />
   } else if (currentStep.section === SECTIONS.SELECT_LOCATION) {
     modalContent = (
       <SelectLocation
         {...currentStep}
         {...calibrateBaseProps}
         availableSlotNames={availableSlotNames}
-        setSlotName={setSlotName}
+        deckConfig={deckConfig}
+        occupiedCutouts={occupiedCutouts}
+        configuredFixtureIdByCutoutId={fixtureIdByCutoutId}
       />
     )
   } else if (currentStep.section === SECTIONS.PLACE_ADAPTER) {
@@ -294,7 +315,11 @@ export const ModuleWizardFlows = (
       <PlaceAdapter
         {...currentStep}
         {...calibrateBaseProps}
+        deckConfig={deckConfig}
         setCreatedAdapterId={setCreatedAdapterId}
+        createMaintenanceRun={createTargetedMaintenanceRun}
+        isCreateLoading={isCreateLoading}
+        createdMaintenanceRunId={createdMaintenanceRunId}
       />
     )
   } else if (currentStep.section === SECTIONS.ATTACH_PROBE) {
@@ -302,7 +327,9 @@ export const ModuleWizardFlows = (
       <AttachProbe
         {...currentStep}
         {...calibrateBaseProps}
+        deckConfig={deckConfig}
         adapterId={createdAdapterId}
+        fixtureIdByCutoutId={fixtureIdByCutoutId}
       />
     )
   } else if (currentStep.section === SECTIONS.DETACH_PROBE) {
@@ -328,18 +355,17 @@ export const ModuleWizardFlows = (
     />
   )
 
-  return (
-    <Portal level="top">
-      {isOnDevice ? (
-        <LegacyModalShell>
-          {wizardHeader}
-          {modalContent}
-        </LegacyModalShell>
-      ) : (
-        <LegacyModalShell width="47rem" height="auto" header={wizardHeader}>
-          {modalContent}
-        </LegacyModalShell>
-      )}
-    </Portal>
+  return createPortal(
+    isOnDevice ? (
+      <LegacyModalShell>
+        {wizardHeader}
+        {modalContent}
+      </LegacyModalShell>
+    ) : (
+      <LegacyModalShell width="47rem" height="auto" header={wizardHeader}>
+        {modalContent}
+      </LegacyModalShell>
+    ),
+    getTopPortalEl()
   )
 }

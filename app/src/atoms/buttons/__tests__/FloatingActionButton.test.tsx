@@ -1,14 +1,12 @@
 import * as React from 'react'
-import {
-  renderWithProviders,
-  BORDERS,
-  COLORS,
-  SPACING,
-  TYPOGRAPHY,
-} from '@opentrons/components'
+import { describe, it, expect, vi, beforeEach } from 'vitest'
+import '@testing-library/jest-dom/vitest'
+import { fireEvent, screen } from '@testing-library/react'
+import { BORDERS, COLORS, SPACING, TYPOGRAPHY } from '@opentrons/components'
 
-import { FloatingActionButton } from '..'
 import { i18n } from '../../../i18n'
+import { renderWithProviders } from '../../../__testing-utils__'
+import { FloatingActionButton } from '..'
 
 const render = (props: React.ComponentProps<typeof FloatingActionButton>) => {
   return renderWithProviders(<FloatingActionButton {...props} />, {
@@ -22,21 +20,21 @@ describe('FloatingActionButton', () => {
   beforeEach(() => {
     props = {
       buttonText: 'floating action',
-      onClick: jest.fn(),
+      onClick: vi.fn(),
     }
   })
 
-  it('renders floating action button with text', () => {
+  it('renders floating action button with text - active', () => {
     const { getByRole } = render(props)
     const button = getByRole('button')
     expect(button).toHaveStyle(
       `padding: ${SPACING.spacing12} ${SPACING.spacing24}`
     )
-    expect(button).toHaveStyle(`background-color: ${COLORS.highlightPurple1}`)
+    expect(button).toHaveStyle(`background-color: ${COLORS.purple55}`)
     expect(button).toHaveStyle(`font-size: ${TYPOGRAPHY.fontSize28}`)
     expect(button).toHaveStyle(`font-weight: ${TYPOGRAPHY.fontWeightSemiBold}`)
     expect(button).toHaveStyle(`line-height: ${TYPOGRAPHY.lineHeight36}`)
-    expect(button).toHaveStyle(`border-radius: ${BORDERS.borderRadiusSize5}`)
+    expect(button).toHaveStyle(`border-radius: ${BORDERS.borderRadius40}`)
     expect(button).toHaveStyle(
       `text-transform: ${TYPOGRAPHY.textTransformNone}`
     )
@@ -46,34 +44,17 @@ describe('FloatingActionButton', () => {
 
   it('renders unselected floating action button with text and disabled', () => {
     props.disabled = true
-    const { getByRole } = render(props)
-    const button = getByRole('button')
+    render(props)
+    const button = screen.getByRole('button')
     expect(button).toBeDisabled()
-    expect(button).toHaveStyle(`background-color: #16212d33`)
-    expect(button).toHaveStyle(`color: #16212d99`)
+    expect(button).toHaveStyle(`background-color: ${COLORS.grey35}`)
+    expect(button).toHaveStyle(`color: ${COLORS.grey50}`)
   })
 
   it('applies the correct states to the unselected floating action button - active', () => {
-    const { getByRole } = render(props)
-    const button = getByRole('button')
-    expect(button).toHaveStyleRule(
-      'background-color',
-      `${COLORS.highlightPurple1Pressed}`,
-      {
-        modifier: ':active',
-      }
-    )
-  })
-
-  it('applies the correct states to the unselected floating action button - focus-visible', () => {
-    const { getByRole } = render(props)
-    const button = getByRole('button')
-    expect(button).toHaveStyleRule(
-      'border-color',
-      `${COLORS.fundamentalsFocus}`,
-      {
-        modifier: ':focus-visible',
-      }
-    )
+    render(props)
+    const button = screen.getByRole('button')
+    fireEvent.mouseLeave(button)
+    expect(button).toHaveStyle(`background-color : ${COLORS.purple55}`)
   })
 })

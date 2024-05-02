@@ -1,5 +1,4 @@
 import * as React from 'react'
-import path from 'path'
 import first from 'lodash/first'
 import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
@@ -9,8 +8,10 @@ import {
   Icon,
   Flex,
   DIRECTION_COLUMN,
-  SIZE_1,
   PrimaryButton,
+  DIRECTION_ROW,
+  SecondaryButton,
+  SPACING,
 } from '@opentrons/components'
 
 import { getRobotUpdateDisplayInfo } from '../../redux/robot-update'
@@ -21,12 +22,15 @@ import { ApplyHistoricOffsets } from '../ApplyHistoricOffsets'
 import { useOffsetCandidatesForAnalysis } from '../ApplyHistoricOffsets/hooks/useOffsetCandidatesForAnalysis'
 import { ChooseRobotSlideout } from '../ChooseRobotSlideout'
 import { useCreateRunFromProtocol } from './useCreateRunFromProtocol'
-
 import type { StyleProps } from '@opentrons/components'
 import type { State } from '../../redux/types'
 import type { Robot } from '../../redux/discovery/types'
 import type { StoredProtocolData } from '../../redux/protocol-storage'
+import type { RunTimeParameter } from '@opentrons/shared-data'
 
+const _getFileBaseName = (filePath: string): string => {
+  return filePath.split('/').reverse()[0]
+}
 interface ChooseRobotToRunProtocolSlideoutProps extends StyleProps {
   storedProtocolData: StoredProtocolData
   onCloseClick: () => void
@@ -48,12 +52,20 @@ export function ChooseRobotToRunProtocolSlideoutComponent(
     srcFiles,
     mostRecentAnalysis,
   } = storedProtocolData
-
-  const { trackCreateProtocolRunEvent } = useTrackCreateProtocolRunEvent(
-    storedProtocolData
-  )
-
+  const [currentPage, setCurrentPage] = React.useState<number>(1)
   const [selectedRobot, setSelectedRobot] = React.useState<Robot | null>(null)
+  const { trackCreateProtocolRunEvent } = useTrackCreateProtocolRunEvent(
+    storedProtocolData,
+    selectedRobot?.name ?? ''
+  )
+  const runTimeParameters =
+    storedProtocolData.mostRecentAnalysis?.runTimeParameters ?? []
+  const [
+    runTimeParametersOverrides,
+    setRunTimeParametersOverrides,
+  ] = React.useState<RunTimeParameter[]>(runTimeParameters)
+  const [hasParamError, setHasParamError] = React.useState<boolean>(false)
+
   const offsetCandidates = useOffsetCandidatesForAnalysis(
     mostRecentAnalysis,
     selectedRobot?.ip ?? null
@@ -97,25 +109,30 @@ export function ChooseRobotToRunProtocolSlideoutComponent(
           location,
           definitionUri,
         }))
-      : []
+      : [],
+    runTimeParametersOverrides.reduce(
+      (acc, param) =>
+        param.value !== param.default
+          ? { ...acc, [param.variableName]: param.value }
+          : acc,
+      {}
+    )
   )
   const handleProceed: React.MouseEventHandler<HTMLButtonElement> = () => {
     trackCreateProtocolRunEvent({ name: 'createProtocolRecordRequest' })
     createRunFromProtocolSource({ files: srcFileObjects, protocolKey })
   }
 
-  const isSelectedRobotOnWrongVersionOfSoftware = [
+  const { autoUpdateAction } = useSelector((state: State) =>
+    getRobotUpdateDisplayInfo(state, selectedRobot?.name ?? '')
+  )
+
+  const isSelectedRobotOnDifferentSoftwareVersion = [
     'upgrade',
     'downgrade',
-  ].includes(
-    useSelector((state: State) => {
-      const value =
-        selectedRobot != null
-          ? getRobotUpdateDisplayInfo(state, selectedRobot.name)
-          : { autoUpdateAction: '' }
-      return value
-    })?.autoUpdateAction
-  )
+  ].includes(autoUpdateAction)
+
+  const hasRunTimeParameters = runTimeParameters.length > 0
 
   if (
     protocolKey == null ||
@@ -128,53 +145,135 @@ export function ChooseRobotToRunProtocolSlideoutComponent(
   }
   const srcFileObjects = srcFiles.map((srcFileBuffer, index) => {
     const srcFilePath = srcFileNames[index]
-    return new File([srcFileBuffer], path.basename(srcFilePath))
+    return new File([srcFileBuffer], _getFileBaseName(srcFilePath))
   })
   const protocolDisplayName =
     mostRecentAnalysis?.metadata?.protocolName ??
     first(srcFileNames) ??
     protocolKey
 
+  // intentionally show both robot types if analysis has any error
+  const robotType =
+    mostRecentAnalysis != null && mostRecentAnalysis.errors.length === 0
+      ? mostRecentAnalysis?.robotType ?? null
+      : null
+
+  const singlePageButton = (
+    <PrimaryButton
+      disabled={
+        isCreatingRun ||
+        selectedRobot == null ||
+        isSelectedRobotOnDifferentSoftwareVersion
+      }
+      width="100%"
+      onClick={handleProceed}
+    >
+      {isCreatingRun ? (
+        <Icon name="ot-spinner" spin size="1rem" />
+      ) : (
+        t('shared:proceed_to_setup')
+      )}
+    </PrimaryButton>
+  )
+
+  const offsetsComponent = (
+    <ApplyHistoricOffsets
+      offsetCandidates={offsetCandidates}
+      shouldApplyOffsets={shouldApplyOffsets}
+      setShouldApplyOffsets={setShouldApplyOffsets}
+      commands={mostRecentAnalysis?.commands ?? []}
+      labware={mostRecentAnalysis?.labware ?? []}
+      modules={mostRecentAnalysis?.modules ?? []}
+    />
+  )
+
+  const resetRunTimeParameters = (): void => {
+    setRunTimeParametersOverrides(
+      runTimeParametersOverrides?.map(parameter => ({
+        ...parameter,
+        value: parameter.default,
+      }))
+    )
+  }
+
   return (
     <ChooseRobotSlideout
+      multiSlideout={hasRunTimeParameters ? { currentPage } : null}
       isExpanded={showSlideout}
-      onCloseClick={onCloseClick}
-      title={t('choose_robot_to_run', {
-        protocol_name: protocolDisplayName,
-      })}
+      isSelectedRobotOnDifferentSoftwareVersion={
+        isSelectedRobotOnDifferentSoftwareVersion
+      }
+      onCloseClick={() => {
+        onCloseClick()
+        resetRunTimeParameters()
+        setCurrentPage(1)
+        setSelectedRobot(null)
+      }}
+      title={
+        hasRunTimeParameters && currentPage === 2
+          ? t('select_parameters_for_robot', {
+              robot_name: selectedRobot?.name,
+            })
+          : t('choose_robot_to_run', {
+              protocol_name: protocolDisplayName,
+            })
+      }
+      runTimeParametersOverrides={runTimeParametersOverrides}
+      setRunTimeParametersOverrides={setRunTimeParametersOverrides}
       footer={
         <Flex flexDirection={DIRECTION_COLUMN}>
-          <ApplyHistoricOffsets
-            offsetCandidates={offsetCandidates}
-            shouldApplyOffsets={shouldApplyOffsets}
-            setShouldApplyOffsets={setShouldApplyOffsets}
-            commands={mostRecentAnalysis?.commands ?? []}
-            labware={mostRecentAnalysis?.labware ?? []}
-            modules={mostRecentAnalysis?.modules ?? []}
-          />
-          <PrimaryButton
-            onClick={handleProceed}
-            width="100%"
-            disabled={
-              isCreatingRun ||
-              selectedRobot == null ||
-              isSelectedRobotOnWrongVersionOfSoftware
-            }
-          >
-            {isCreatingRun ? (
-              <Icon name="ot-spinner" spin size={SIZE_1} />
+          {hasRunTimeParameters ? (
+            currentPage === 1 ? (
+              <>
+                {offsetsComponent}
+                <PrimaryButton
+                  onClick={() => setCurrentPage(2)}
+                  width="100%"
+                  disabled={
+                    isCreatingRun ||
+                    selectedRobot == null ||
+                    isSelectedRobotOnDifferentSoftwareVersion
+                  }
+                >
+                  {t('shared:continue_to_param')}
+                </PrimaryButton>
+              </>
             ) : (
-              t('shared:proceed_to_setup')
-            )}
-          </PrimaryButton>
+              <Flex gridGap={SPACING.spacing8} flexDirection={DIRECTION_ROW}>
+                <SecondaryButton onClick={() => setCurrentPage(1)} width="50%">
+                  {t('shared:change_robot')}
+                </SecondaryButton>
+                <PrimaryButton
+                  width="50%"
+                  onClick={handleProceed}
+                  disabled={hasParamError}
+                >
+                  {isCreatingRun ? (
+                    <Icon name="ot-spinner" spin size="1rem" />
+                  ) : (
+                    t('shared:confirm_values')
+                  )}
+                </PrimaryButton>
+              </Flex>
+            )
+          ) : (
+            <>
+              {offsetsComponent}
+              {singlePageButton}
+            </>
+          )}
         </Flex>
       }
       selectedRobot={selectedRobot}
       setSelectedRobot={setSelectedRobot}
+      robotType={robotType}
       isCreatingRun={isCreatingRun}
       reset={resetCreateRun}
       runCreationError={runCreationError}
       runCreationErrorCode={runCreationErrorCode}
+      showIdleOnly
+      setHasParamError={setHasParamError}
+      resetRunTimeParameters={resetRunTimeParameters}
     />
   )
 }

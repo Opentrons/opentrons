@@ -1,8 +1,8 @@
-import { uuid } from '../../utils'
+import { uuid, getLabwareSlot } from '../../utils'
+import { COLUMN_4_SLOTS } from '../../constants'
 import * as errorCreators from '../../errorCreators'
-import type { BlowoutParams } from '@opentrons/shared-data/protocol/types/schemaV3'
+import type { CreateCommand, BlowoutParams } from '@opentrons/shared-data'
 import type { CommandCreatorError, CommandCreator } from '../../types'
-import { CreateCommand } from '@opentrons/shared-data'
 
 export const blowout: CommandCreator<BlowoutParams> = (
   args,
@@ -10,11 +10,16 @@ export const blowout: CommandCreator<BlowoutParams> = (
   prevRobotState
 ) => {
   /** Blowout with given args. Requires tip. */
-  const { pipette, labware, well, offsetFromBottomMm, flowRate } = args
+  const { pipetteId, labwareId, wellName, wellLocation, flowRate } = args
+
   const actionName = 'blowout'
   const errors: CommandCreatorError[] = []
-  const pipetteData = prevRobotState.pipettes[pipette]
-
+  const pipetteData = prevRobotState.pipettes[pipetteId]
+  const slotName = getLabwareSlot(
+    labwareId,
+    prevRobotState.labware,
+    prevRobotState.modules
+  )
   // TODO Ian 2018-04-30 this logic using command creator args + robotstate to push errors
   // is duplicated across several command creators (eg aspirate & blowout overlap).
   // You can probably make higher-level error creator util fns to be more DRY
@@ -22,31 +27,35 @@ export const blowout: CommandCreator<BlowoutParams> = (
     errors.push(
       errorCreators.pipetteDoesNotExist({
         actionName,
-        pipette,
+        pipette: pipetteId,
       })
     )
   }
 
-  if (!prevRobotState.tipState.pipettes[pipette]) {
+  if (!prevRobotState.tipState.pipettes[pipetteId]) {
     errors.push(
       errorCreators.noTipOnPipette({
         actionName,
-        pipette,
-        labware,
-        well,
+        pipette: pipetteId,
+        labware: labwareId,
+        well: wellName,
       })
     )
   }
 
-  if (!labware || !prevRobotState.labware[labware]) {
+  if (!labwareId || !prevRobotState.labware[labwareId]) {
     errors.push(
       errorCreators.labwareDoesNotExist({
         actionName,
-        labware,
+        labware: labwareId,
       })
     )
-  } else if (prevRobotState.labware[labware].slot === 'offDeck') {
+  } else if (prevRobotState.labware[labwareId]?.slot === 'offDeck') {
     errors.push(errorCreators.labwareOffDeck())
+  }
+
+  if (COLUMN_4_SLOTS.includes(slotName)) {
+    errors.push(errorCreators.pipettingIntoColumn4({ typeOfStep: actionName }))
   }
 
   if (errors.length > 0) {
@@ -60,14 +69,14 @@ export const blowout: CommandCreator<BlowoutParams> = (
       commandType: 'blowout',
       key: uuid(),
       params: {
-        pipetteId: pipette,
-        labwareId: labware,
-        wellName: well,
+        pipetteId,
+        labwareId,
+        wellName,
         flowRate,
         wellLocation: {
-          origin: 'bottom',
+          origin: 'top',
           offset: {
-            z: offsetFromBottomMm,
+            z: wellLocation?.offset?.z,
           },
         },
       },

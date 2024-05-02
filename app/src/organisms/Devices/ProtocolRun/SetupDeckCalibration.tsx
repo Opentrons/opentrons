@@ -3,18 +3,18 @@ import { useTranslation } from 'react-i18next'
 import { Link } from 'react-router-dom'
 
 import {
-  Flex,
   ALIGN_CENTER,
+  COLORS,
   DIRECTION_COLUMN,
   DIRECTION_ROW,
+  Flex,
   JUSTIFY_SPACE_BETWEEN,
-  COLORS,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
 import { TertiaryButton } from '../../../atoms/buttons'
-import { StyledText } from '../../../atoms/text'
 import { useDeckCalibrationData } from '../hooks'
 import { SetupCalibrationItem } from './SetupCalibrationItem'
 
@@ -47,7 +47,7 @@ export function SetupDeckCalibration({
         justifyContent={JUSTIFY_SPACE_BETWEEN}
       >
         <StyledText
-          color={COLORS.black}
+          color={COLORS.black90}
           css={TYPOGRAPHY.pSemiBold}
           id="DeckCalibration_deckCalibrationTitle"
         >

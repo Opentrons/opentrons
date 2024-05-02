@@ -169,6 +169,8 @@ stages:
             author: engineer@opentrons.com
           key: duplicate_key
   - name: Upload basic_transfer_standalone protocol with same key
+    # add a delay before starting to let previous analysis complete
+    delay_before: 2
     request:
       url: '{ot2_server_base_url}/protocols'
       method: POST

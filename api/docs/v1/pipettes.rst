@@ -36,12 +36,12 @@ They are as follows:
 
 For every pipette type you are using in a protocol, you must use one of the
 model names specified above and call it out as ``instruments.(Model Name)``.
-You must also specify a mount. The mount can be either ``'left'`` or ``'right'``.
+You must also specify a mount. The mount can be either ``"left"`` or ``"right"``.
 In this example, we are using a Single-Channel 300uL pipette.
 
 .. code-block:: python
 
-    pipette = instruments.P300_Single(mount='left')
+    pipette = instruments.P300_Single(mount="left")
 
 Pipette GEN2 Backwards Compatibility
 ====================================
@@ -72,7 +72,7 @@ The speeds at which the pipette will aspirate and dispense can be set through ``
 .. code-block:: python
 
     pipette = instruments.P300_Single(
-        mount='right',
+        mount="right",
         aspirate_flow_rate=200,
         dispense_flow_rate=600,
         blow_out_flow_rate=600)
@@ -89,7 +89,7 @@ varying defaults depending on the model.
 .. code-block:: python
 
     pipette = instruments.P10_Single(
-        mount='right',
+        mount="right",
         min_volume=2,
         max_volume=8)
 

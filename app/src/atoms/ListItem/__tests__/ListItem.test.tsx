@@ -1,11 +1,9 @@
 import * as React from 'react'
-
-import {
-  BORDERS,
-  COLORS,
-  renderWithProviders,
-  SPACING,
-} from '@opentrons/components'
+import { describe, it, expect, beforeEach } from 'vitest'
+import '@testing-library/jest-dom/vitest'
+import { screen } from '@testing-library/react'
+import { BORDERS, COLORS, SPACING } from '@opentrons/components'
+import { renderWithProviders } from '../../../__testing-utils__'
 
 import { ListItem } from '..'
 
@@ -23,46 +21,46 @@ describe('ListItem', () => {
   })
 
   it('should render correct style - error', () => {
-    const [{ getByText, getByTestId }] = render(props)
-    getByText('mock listitem content')
-    const listItem = getByTestId('ListItem_error')
-    expect(listItem).toHaveStyle(`backgroundColor: ${COLORS.red3}`)
+    render(props)
+    screen.getByText('mock listitem content')
+    const listItem = screen.getByTestId('ListItem_error')
+    expect(listItem).toHaveStyle(`backgroundColor: ${COLORS.red35}`)
     expect(listItem).toHaveStyle(
       `padding: ${SPACING.spacing16} ${SPACING.spacing24}`
     )
-    expect(listItem).toHaveStyle(`borderRadius: ${BORDERS.borderRadiusSize3}`)
+    expect(listItem).toHaveStyle(`borderRadius: ${BORDERS.borderRadius12}`)
   })
   it('should render correct style - noActive', () => {
     props.type = 'noActive'
-    const [{ getByText, getByTestId }] = render(props)
-    getByText('mock listitem content')
-    const listItem = getByTestId('ListItem_noActive')
-    expect(listItem).toHaveStyle(`backgroundColor: ${COLORS.light1}`)
+    render(props)
+    screen.getByText('mock listitem content')
+    const listItem = screen.getByTestId('ListItem_noActive')
+    expect(listItem).toHaveStyle(`backgroundColor: ${COLORS.grey35}`)
     expect(listItem).toHaveStyle(
       `padding: ${SPACING.spacing16} ${SPACING.spacing24}`
     )
-    expect(listItem).toHaveStyle(`borderRadius: ${BORDERS.borderRadiusSize3}`)
+    expect(listItem).toHaveStyle(`borderRadius: ${BORDERS.borderRadius12}`)
   })
   it('should render correct style - success', () => {
     props.type = 'success'
-    const [{ getByText, getByTestId }] = render(props)
-    getByText('mock listitem content')
-    const listItem = getByTestId('ListItem_success')
-    expect(listItem).toHaveStyle(`backgroundColor: ${COLORS.green3}`)
+    render(props)
+    screen.getByText('mock listitem content')
+    const listItem = screen.getByTestId('ListItem_success')
+    expect(listItem).toHaveStyle(`backgroundColor: ${COLORS.green35}`)
     expect(listItem).toHaveStyle(
       `padding: ${SPACING.spacing16} ${SPACING.spacing24}`
     )
-    expect(listItem).toHaveStyle(`borderRadius: ${BORDERS.borderRadiusSize3}`)
+    expect(listItem).toHaveStyle(`borderRadius: ${BORDERS.borderRadius12}`)
   })
   it('should render correct style - warning', () => {
     props.type = 'warning'
-    const [{ getByText, getByTestId }] = render(props)
-    getByText('mock listitem content')
-    const listItem = getByTestId('ListItem_warning')
-    expect(listItem).toHaveStyle(`backgroundColor: ${COLORS.yellow3}`)
+    render(props)
+    screen.getByText('mock listitem content')
+    const listItem = screen.getByTestId('ListItem_warning')
+    expect(listItem).toHaveStyle(`backgroundColor: ${COLORS.yellow35}`)
     expect(listItem).toHaveStyle(
       `padding: ${SPACING.spacing16} ${SPACING.spacing24}`
     )
-    expect(listItem).toHaveStyle(`borderRadius: ${BORDERS.borderRadiusSize3}`)
+    expect(listItem).toHaveStyle(`borderRadius: ${BORDERS.borderRadius12}`)
   })
 })

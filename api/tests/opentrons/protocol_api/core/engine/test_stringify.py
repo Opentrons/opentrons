@@ -33,9 +33,9 @@ def _make_dummy_module_definition(decoy: Decoy, display_name: str) -> ModuleDefi
 def test_well_on_labware_without_user_display_name(decoy: Decoy) -> None:
     """Test stringifying a well on a labware that doesn't have a user-defined label."""
     mock_client = decoy.mock(cls=SyncClient)
-    decoy.when(mock_client.state.labware.get_display_name("labware-id")).then_return(
-        None
-    )
+    decoy.when(
+        mock_client.state.labware.get_user_specified_display_name("labware-id")
+    ).then_return(None)
     decoy.when(mock_client.state.labware.get_definition("labware-id")).then_return(
         _make_dummy_labware_definition(decoy, "definition-display-name")
     )
@@ -52,9 +52,9 @@ def test_well_on_labware_without_user_display_name(decoy: Decoy) -> None:
 def test_well_on_labware_with_user_display_name(decoy: Decoy) -> None:
     """Test stringifying a well on a labware that does have a user-defined label."""
     mock_client = decoy.mock(cls=SyncClient)
-    decoy.when(mock_client.state.labware.get_display_name("labware-id")).then_return(
-        "user-display-name"
-    )
+    decoy.when(
+        mock_client.state.labware.get_user_specified_display_name("labware-id")
+    ).then_return("user-display-name")
     decoy.when(mock_client.state.labware.get_definition("labware-id")).then_return(
         _make_dummy_labware_definition(decoy, "definition-display-name")
     )
@@ -72,9 +72,9 @@ def test_well_on_labware_with_complicated_location(decoy: Decoy) -> None:
     """Test stringifying a well on a labware with a deeply-nested location."""
     mock_client = decoy.mock(cls=SyncClient)
 
-    decoy.when(mock_client.state.labware.get_display_name("labware-id-1")).then_return(
-        None
-    )
+    decoy.when(
+        mock_client.state.labware.get_user_specified_display_name("labware-id-1")
+    ).then_return(None)
     decoy.when(mock_client.state.labware.get_definition("labware-id-1")).then_return(
         _make_dummy_labware_definition(decoy, "lw-1-display-name")
     )
@@ -82,9 +82,9 @@ def test_well_on_labware_with_complicated_location(decoy: Decoy) -> None:
         OnLabwareLocation(labwareId="labware-id-2")
     )
 
-    decoy.when(mock_client.state.labware.get_display_name("labware-id-2")).then_return(
-        None
-    )
+    decoy.when(
+        mock_client.state.labware.get_user_specified_display_name("labware-id-2")
+    ).then_return(None)
     decoy.when(mock_client.state.labware.get_definition("labware-id-2")).then_return(
         _make_dummy_labware_definition(decoy, "lw-2-display-name")
     )

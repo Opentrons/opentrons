@@ -10,6 +10,10 @@ from pydantic import BaseModel
 from opentrons.hardware_control import HardwareControlAPI, OT2HardwareControlAPI
 
 from opentrons.protocol_engine import errors
+from opentrons.protocol_engine.error_recovery_policy import (
+    ErrorRecoveryPolicy,
+    ErrorRecoveryType,
+)
 from opentrons.protocol_engine.errors.exceptions import (
     EStopActivatedError as PE_EStopActivatedError,
 )
@@ -17,7 +21,8 @@ from opentrons.protocol_engine.resources import ModelUtils
 from opentrons.protocol_engine.state import StateStore
 from opentrons.protocol_engine.actions import (
     ActionDispatcher,
-    UpdateCommandAction,
+    RunCommandAction,
+    SucceedCommandAction,
     FailCommandAction,
 )
 
@@ -40,8 +45,12 @@ from opentrons.protocol_engine.execution import (
     RailLightsHandler,
     StatusBarHandler,
 )
+from opentrons.protocol_engine.execution.command_executor import (
+    CommandNoteTrackerProvider,
+)
 
 from opentrons_shared_data.errors.exceptions import EStopActivatedError, PythonException
+from opentrons.protocol_engine.notes import CommandNoteTracker, CommandNote
 
 
 @pytest.fixture
@@ -123,6 +132,39 @@ def status_bar(decoy: Decoy) -> StatusBarHandler:
 
 
 @pytest.fixture
+def command_note_tracker_provider(decoy: Decoy) -> CommandNoteTrackerProvider:
+    """Get a mock tracker provider."""
+    return decoy.mock(cls=CommandNoteTrackerProvider)
+
+
+@pytest.fixture
+def error_recovery_policy(decoy: Decoy) -> ErrorRecoveryPolicy:
+    """Get a mock error recovery policy."""
+    return decoy.mock(cls=ErrorRecoveryPolicy)
+
+
+def get_next_tracker(
+    decoy: Decoy, provider: CommandNoteTrackerProvider
+) -> CommandNoteTracker:
+    """Get the next tracker provided by a provider, in code without being a fixture.
+
+    This is useful for testing the execution of multiple commands, each of which will get
+    a different tracker instance.
+    """
+    new_tracker = decoy.mock(cls=CommandNoteTracker)
+    decoy.when(provider()).then_return(new_tracker)
+    return new_tracker
+
+
+@pytest.fixture
+def command_note_tracker(
+    decoy: Decoy, command_note_tracker_provider: CommandNoteTrackerProvider
+) -> CommandNoteTracker:
+    """Get the tracker that the provider will provide."""
+    return get_next_tracker(decoy, command_note_tracker_provider)
+
+
+@pytest.fixture
 def subject(
     hardware_api: HardwareControlAPI,
     state_store: StateStore,
@@ -137,6 +179,8 @@ def subject(
     rail_lights: RailLightsHandler,
     status_bar: StatusBarHandler,
     model_utils: ModelUtils,
+    command_note_tracker_provider: CommandNoteTrackerProvider,
+    error_recovery_policy: ErrorRecoveryPolicy,
 ) -> CommandExecutor:
     """Get a CommandExecutor test subject with its dependencies mocked out."""
     return CommandExecutor(
@@ -153,6 +197,8 @@ def subject(
         model_utils=model_utils,
         rail_lights=rail_lights,
         status_bar=status_bar,
+        command_note_tracker_provider=command_note_tracker_provider,
+        error_recovery_policy=error_recovery_policy,
     )
 
 
@@ -184,6 +230,7 @@ async def test_execute(
     rail_lights: RailLightsHandler,
     status_bar: StatusBarHandler,
     model_utils: ModelUtils,
+    command_note_tracker: CommandNoteTracker,
     subject: CommandExecutor,
 ) -> None:
     """It should be able to execute a command."""
@@ -195,9 +242,7 @@ async def test_execute(
         params: _TestCommandParams
         result: Optional[_TestCommandResult]
 
-        @property
-        def _ImplementationCls(self) -> Type[_TestCommandImpl]:
-            return TestCommandImplCls
+        _ImplementationCls: Type[_TestCommandImpl] = TestCommandImplCls
 
     command_params = _TestCommandParams()
     command_result = _TestCommandResult()
@@ -225,7 +270,16 @@ async def test_execute(
         ),
     )
 
-    completed_command = cast(
+    command_notes = [
+        CommandNote(
+            noteKind="warning",
+            shortMessage="hello",
+            longMessage="test command note",
+            source="test",
+        )
+    ]
+
+    expected_completed_command = cast(
         Command,
         _TestCommand(
             id="command-id",
@@ -236,11 +290,24 @@ async def test_execute(
             status=CommandStatus.SUCCEEDED,
             params=command_params,
             result=command_result,
+            notes=command_notes,
         ),
     )
 
     decoy.when(state_store.commands.get(command_id="command-id")).then_return(
         queued_command
+    )
+
+    decoy.when(
+        action_dispatcher.dispatch(
+            RunCommandAction(
+                command_id="command-id", started_at=datetime(year=2022, month=2, day=2)
+            )
+        )
+    ).then_do(
+        lambda _: decoy.when(
+            state_store.commands.get(command_id="command-id")
+        ).then_return(running_command)
     )
 
     decoy.when(
@@ -256,10 +323,13 @@ async def test_execute(
             run_control=run_control,
             rail_lights=rail_lights,
             status_bar=status_bar,
+            command_note_adder=command_note_tracker,
         )
     ).then_return(
         command_impl  # type: ignore[arg-type]
     )
+
+    decoy.when(command_note_tracker.get_notes()).then_return(command_notes)
 
     decoy.when(await command_impl.execute(command_params)).then_return(command_result)
 
@@ -272,10 +342,9 @@ async def test_execute(
 
     decoy.verify(
         action_dispatcher.dispatch(
-            UpdateCommandAction(private_result=None, command=running_command)
-        ),
-        action_dispatcher.dispatch(
-            UpdateCommandAction(private_result=None, command=completed_command)
+            SucceedCommandAction(
+                private_result=None, command=expected_completed_command
+            )
         ),
     )
 
@@ -289,8 +358,8 @@ async def test_execute(
             False,
         ),
         (
-            EStopActivatedError("oh no"),
-            matchers.ErrorMatching(PE_EStopActivatedError, match="oh no"),
+            EStopActivatedError(),
+            matchers.ErrorMatching(PE_EStopActivatedError),
             True,
         ),
         (
@@ -321,6 +390,8 @@ async def test_execute_raises_protocol_engine_error(
     status_bar: StatusBarHandler,
     model_utils: ModelUtils,
     subject: CommandExecutor,
+    command_note_tracker: CommandNoteTracker,
+    error_recovery_policy: ErrorRecoveryPolicy,
     command_error: Exception,
     expected_error: Any,
     unexpected_error: bool,
@@ -334,9 +405,7 @@ async def test_execute_raises_protocol_engine_error(
         params: _TestCommandParams
         result: Optional[_TestCommandResult]
 
-        @property
-        def _ImplementationCls(self) -> Type[_TestCommandImpl]:
-            return TestCommandImplCls
+        _ImplementationCls: Type[_TestCommandImpl] = TestCommandImplCls
 
     command_params = _TestCommandParams()
 
@@ -363,8 +432,29 @@ async def test_execute_raises_protocol_engine_error(
         ),
     )
 
+    command_notes = [
+        CommandNote(
+            noteKind="warning",
+            shortMessage="hello",
+            longMessage="test command note",
+            source="test",
+        )
+    ]
+
     decoy.when(state_store.commands.get(command_id="command-id")).then_return(
         queued_command
+    )
+
+    decoy.when(
+        action_dispatcher.dispatch(
+            RunCommandAction(
+                command_id="command-id", started_at=datetime(year=2022, month=2, day=2)
+            )
+        )
+    ).then_do(
+        lambda _: decoy.when(
+            state_store.commands.get(command_id="command-id")
+        ).then_return(running_command)
     )
 
     decoy.when(
@@ -380,6 +470,7 @@ async def test_execute_raises_protocol_engine_error(
             run_control=run_control,
             rail_lights=rail_lights,
             status_bar=status_bar,
+            command_note_adder=command_note_tracker,
         )
     ).then_return(
         command_impl  # type: ignore[arg-type]
@@ -393,18 +484,24 @@ async def test_execute_raises_protocol_engine_error(
         datetime(year=2023, month=3, day=3),
     )
 
+    decoy.when(error_recovery_policy(matchers.Anything(), expected_error)).then_return(
+        ErrorRecoveryType.WAIT_FOR_RECOVERY
+    )
+
+    decoy.when(command_note_tracker.get_notes()).then_return(command_notes)
+
     await subject.execute("command-id")
 
     decoy.verify(
         action_dispatcher.dispatch(
-            UpdateCommandAction(private_result=None, command=running_command)
-        ),
-        action_dispatcher.dispatch(
             FailCommandAction(
                 command_id="command-id",
+                running_command=running_command,
                 error_id="error-id",
                 failed_at=datetime(year=2023, month=3, day=3),
                 error=expected_error,
+                type=ErrorRecoveryType.WAIT_FOR_RECOVERY,
+                notes=command_notes,
             )
         ),
     )

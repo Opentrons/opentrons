@@ -1,21 +1,25 @@
 import * as React from 'react'
-import { renderHook } from '@testing-library/react-hooks'
+import { vi, it, expect, describe, beforeEach } from 'vitest'
+import { renderHook } from '@testing-library/react'
 import { useInstrumentsQuery } from '@opentrons/react-api-client'
 import {
   instrumentsResponseLeftPipetteFixture,
   instrumentsResponseRightPipetteFixture,
 } from '@opentrons/api-client'
+import { useIsOEMMode } from '../../../../resources/robot-settings/hooks'
 import { useAttachedPipettesFromInstrumentsQuery } from '..'
 
-jest.mock('@opentrons/react-api-client')
+vi.mock('@opentrons/react-api-client')
+vi.mock('../../../../resources/robot-settings/hooks')
 
-const mockUseInstrumentsQuery = useInstrumentsQuery as jest.MockedFunction<
-  typeof useInstrumentsQuery
->
 describe('useAttachedPipettesFromInstrumentsQuery hook', () => {
-  let wrapper: React.FunctionComponent<{}>
+  beforeEach(() => {
+    vi.mocked(useIsOEMMode).mockReturnValue(false)
+  })
+
+  let wrapper: React.FunctionComponent<{ children: React.ReactNode }>
   it('returns attached pipettes', () => {
-    mockUseInstrumentsQuery.mockReturnValue({
+    vi.mocked(useInstrumentsQuery).mockReturnValue({
       data: {
         data: [
           instrumentsResponseLeftPipetteFixture,

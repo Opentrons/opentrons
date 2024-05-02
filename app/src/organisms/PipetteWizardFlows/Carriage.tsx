@@ -1,8 +1,12 @@
 import * as React from 'react'
 import { Trans, useTranslation } from 'react-i18next'
 import capitalize from 'lodash/capitalize'
-import { COLORS, SPACING, PrimaryButton } from '@opentrons/components'
-import { StyledText } from '../../atoms/text'
+import {
+  COLORS,
+  PrimaryButton,
+  SPACING,
+  StyledText,
+} from '@opentrons/components'
 import { SmallButton } from '../../atoms/buttons'
 import { GenericWizardTile } from '../../molecules/GenericWizardTile'
 import { SimpleWizardBody } from '../../molecules/SimpleWizardBody'
@@ -46,7 +50,7 @@ export const Carriage = (props: PipetteWizardStepProps): JSX.Element | null => {
   return errorMessage != null ? (
     <SimpleWizardBody
       isSuccess={false}
-      iconColor={COLORS.errorEnabled}
+      iconColor={COLORS.red50}
       header={t('shared:error_encountered')}
       subHeader={errorMessage}
     />

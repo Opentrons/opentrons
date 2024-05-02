@@ -1,30 +1,36 @@
+import { describe, it, beforeEach, expect } from 'vitest'
+import { fixtureP300SingleV2Specs } from '@opentrons/shared-data'
 import {
   volumeInCapacityForMulti,
   volumeInCapacityForMultiAspirate,
   volumeInCapacityForMultiDispense,
 } from '../utils'
-import { fixtureP300Single } from '@opentrons/shared-data/pipette/fixtures/name'
-import _fixture_tiprack_300_ul from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_300_ul.json'
-import { LabwareDefinition2 } from '@opentrons/shared-data'
-import { PipetteEntities } from '@opentrons/step-generation'
-import { FormData } from '../../../../form-types'
+import { fixture_tiprack_300_ul } from '@opentrons/shared-data/labware/fixtures/2'
+import type { LabwareDefinition2 } from '@opentrons/shared-data'
+import type {
+  PipetteEntities,
+  LabwareEntities,
+} from '@opentrons/step-generation'
+import type { FormData } from '../../../../form-types'
 
-const fixtureTiprack300ul = _fixture_tiprack_300_ul as LabwareDefinition2
+const fixtureTiprack300ul = fixture_tiprack_300_ul as LabwareDefinition2
 
 describe('utils', () => {
   describe('volumeInCapacityForMulti', () => {
     let sharedForm: FormData
     let pipetteEntities: PipetteEntities
+    let labwareEntities: LabwareEntities
     beforeEach(() => {
       sharedForm = {
         pipette: 'p300_single',
       } as any
       pipetteEntities = {
         p300_single: {
-          spec: fixtureP300Single,
-          tiprackLabwareDef: fixtureTiprack300ul,
+          spec: fixtureP300SingleV2Specs,
+          tiprackLabwareDef: [fixtureTiprack300ul],
         },
       } as any
+      labwareEntities = {}
     })
     describe('multi dispense path', () => {
       const testCases = [
@@ -86,7 +92,8 @@ describe('utils', () => {
             expect(
               volumeInCapacityForMulti(
                 { ...sharedForm, ...form },
-                pipetteEntities
+                pipetteEntities,
+                labwareEntities
               )
             ).toBe(expected)
           })
@@ -143,7 +150,8 @@ describe('utils', () => {
             expect(
               volumeInCapacityForMulti(
                 { ...sharedForm, ...form },
-                pipetteEntities
+                pipetteEntities,
+                labwareEntities
               )
             ).toBe(expected)
           })

@@ -1,21 +1,22 @@
 import * as React from 'react'
+import { createPortal } from 'react-dom'
 import { useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
 
 import {
-  Flex,
   ALIGN_CENTER,
+  DIRECTION_COLUMN,
+  Flex,
   JUSTIFY_SPACE_BETWEEN,
   SPACING,
+  StyledText,
+  TOOLTIP_LEFT,
   TYPOGRAPHY,
   useHoverTooltip,
-  TOOLTIP_LEFT,
-  DIRECTION_COLUMN,
 } from '@opentrons/components'
 
-import { Portal } from '../../App/portal'
+import { getTopPortalEl } from '../../App/portal'
 import { TertiaryButton } from '../../atoms/buttons'
-import { StyledText } from '../../atoms/text'
 import { Tooltip } from '../../atoms/Tooltip'
 import { AskForCalibrationBlockModal } from '../../organisms/CalibrateTipLength/AskForCalibrationBlockModal'
 import {
@@ -160,15 +161,16 @@ export function CalibrationHealthCheck({
           {t('fully_calibrate_before_checking_health')}
         </Tooltip>
       )}
-      <Portal level="top">
-        {showCalBlockModal ? (
-          <AskForCalibrationBlockModal
-            onResponse={handleHealthCheck}
-            titleBarTitle={t('robot_calibration:health_check_title')}
-            closePrompt={() => setShowCalBlockModal(false)}
-          />
-        ) : null}
-      </Portal>
+      {showCalBlockModal
+        ? createPortal(
+            <AskForCalibrationBlockModal
+              onResponse={handleHealthCheck}
+              titleBarTitle={t('robot_calibration:health_check_title')}
+              closePrompt={() => setShowCalBlockModal(false)}
+            />,
+            getTopPortalEl()
+          )
+        : null}
     </Flex>
   )
 }

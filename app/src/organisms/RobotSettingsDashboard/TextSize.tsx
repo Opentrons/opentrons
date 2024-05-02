@@ -3,23 +3,22 @@ import { useTranslation } from 'react-i18next'
 import styled from 'styled-components'
 
 import {
-  Flex,
+  ALIGN_CENTER,
+  BORDERS,
+  Box,
   Btn,
+  COLORS,
   DIRECTION_COLUMN,
   DIRECTION_ROW,
-  JUSTIFY_FLEX_START,
-  ALIGN_CENTER,
-  JUSTIFY_CENTER,
+  Flex,
   Icon,
-  Box,
+  JUSTIFY_CENTER,
+  JUSTIFY_FLEX_START,
+  StyledText,
   TYPOGRAPHY,
-  COLORS,
-  BORDERS,
 } from '@opentrons/components'
 
-import { StyledText } from '../../atoms/text'
-
-import type { SetSettingOption } from '../../pages/OnDeviceDisplay/RobotSettingsDashboard'
+import type { SetSettingOption } from '../../pages/RobotSettingsDashboard'
 
 interface RectProps {
   isActive: boolean
@@ -28,9 +27,9 @@ interface RectProps {
 const TextSizeTile = styled(Box)`
   width: 10.5625rem;
   height: 6.25rem;
-  border-radius: ${BORDERS.borderRadiusSize2};
+  border-radius: ${BORDERS.borderRadius8};
   background: ${(props: RectProps) =>
-    props.isActive ? COLORS.highlightPurple1 : COLORS.highlightPurple2};
+    props.isActive ? COLORS.purple50 : COLORS.purple35};
 `
 
 interface TextSizeProps {
@@ -62,7 +61,7 @@ export function TextSize({ setCurrentOption }: TextSizeProps): JSX.Element {
           textSize="1.375rem"
           lineHeight="1.75rem"
           fontWeight={TYPOGRAPHY.fontWeightRegular}
-          color={COLORS.darkBlack70}
+          color={COLORS.grey60}
           textAlign={TYPOGRAPHY.textAlignCenter}
         >
           {t('text_size_description')}

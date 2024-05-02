@@ -1,16 +1,44 @@
-import { RobotType, getDeckDefFromRobotType } from '@opentrons/shared-data'
+import {
+  FIXED_TRASH_ID,
+  getDeckDefFromRobotType,
+  MOVABLE_TRASH_ADDRESSABLE_AREAS,
+  WASTE_CHUTE_ADDRESSABLE_AREAS,
+} from '@opentrons/shared-data'
+import { COLUMN_4_SLOTS } from '@opentrons/step-generation'
 import { getSlotIsEmpty } from '../step-forms/utils'
-import { InitialDeckSetup } from '../step-forms/types'
-import { DeckSlot } from '../types'
+import { getStagingAreaAddressableAreas } from '../utils'
+import type { RobotType, CutoutId } from '@opentrons/shared-data'
+import type { InitialDeckSetup } from '../step-forms/types'
+import type { DeckSlot } from '../types'
 
 export function getNextAvailableDeckSlot(
   initialDeckSetup: InitialDeckSetup,
   robotType: RobotType
 ): DeckSlot | null | undefined {
   const deckDef = getDeckDefFromRobotType(robotType)
-  return deckDef.locations.orderedSlots.find(slot =>
-    getSlotIsEmpty(initialDeckSetup, slot.id)
-  )?.id
+
+  return deckDef.locations.addressableAreas.find(slot => {
+    const cutoutIds = Object.values(initialDeckSetup.additionalEquipmentOnDeck)
+      .filter(ae => ae.name === 'stagingArea')
+      .map(ae => ae.location as CutoutId)
+    const stagingAreaAddressableAreaNames = getStagingAreaAddressableAreas(
+      cutoutIds
+    )
+    const addressableAreaName = stagingAreaAddressableAreaNames.find(
+      aa => aa === slot.id
+    )
+    let isSlotEmpty: boolean = getSlotIsEmpty(initialDeckSetup, slot.id)
+    if (addressableAreaName == null && COLUMN_4_SLOTS.includes(slot.id)) {
+      isSlotEmpty = false
+    } else if (
+      MOVABLE_TRASH_ADDRESSABLE_AREAS.includes(slot.id) ||
+      WASTE_CHUTE_ADDRESSABLE_AREAS.includes(slot.id) ||
+      slot.id === FIXED_TRASH_ID
+    ) {
+      isSlotEmpty = false
+    }
+    return isSlotEmpty
+  })?.id
 }
 
 const getMatchOrNull = (

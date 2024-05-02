@@ -1,17 +1,16 @@
 import * as React from 'react'
 import {
-  Flex,
+  ALIGN_FLEX_START,
+  Box,
   COLORS,
   DIRECTION_COLUMN,
+  Flex,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
-  Box,
-  ALIGN_FLEX_START,
 } from '@opentrons/components'
 
 import type { Story, Meta } from '@storybook/react'
-
-import { StyledText } from '../../atoms/text'
 
 export default {
   title: 'Design Tokens/Spacing',
@@ -51,7 +50,7 @@ const Template: Story<SpacingsStorybookProps> = args => {
           <Box
             width={spacing[1]}
             height="2rem"
-            backgroundColor={COLORS.blueEnabled}
+            backgroundColor={COLORS.blue50}
           />
         </Flex>
       ))}

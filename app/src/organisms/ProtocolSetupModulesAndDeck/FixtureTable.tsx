@@ -4,191 +4,227 @@ import {
   ALIGN_CENTER,
   BORDERS,
   COLORS,
-  DIRECTION_COLUMN,
+  Chip,
   DIRECTION_ROW,
   Flex,
-  Icon,
   JUSTIFY_SPACE_BETWEEN,
   LocationIcon,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import {
+  FLEX_USB_MODULE_ADDRESSABLE_AREAS,
+  getCutoutDisplayName,
+  getDeckDefFromRobotType,
   getFixtureDisplayName,
-  WASTE_CHUTE_LOAD_NAME,
+  getSimplestDeckConfigForProtocol,
+  SINGLE_SLOT_FIXTURES,
 } from '@opentrons/shared-data'
-// import { parseInitialLoadedFixturesByCutout } from '@opentrons/api-client'
-import {
-  CONFIGURED,
-  CONFLICTING,
-  NOT_CONFIGURED,
-  useLoadedFixturesConfigStatus,
-} from '../../resources/deck_configuration/hooks'
+
+import { SmallButton } from '../../atoms/buttons'
+import { useDeckConfigurationCompatibility } from '../../resources/deck_configuration/hooks'
+import { getRequiredDeckConfig } from '../../resources/deck_configuration/utils'
 import { LocationConflictModal } from '../Devices/ProtocolRun/SetupModuleAndDeck/LocationConflictModal'
-import { StyledText } from '../../atoms/text'
-import { Chip } from '../../atoms/Chip'
 
 import type {
   CompletedProtocolAnalysis,
-  Cutout,
-  FixtureLoadName,
-  LoadFixtureRunTimeCommand,
+  CutoutFixtureId,
+  CutoutId,
+  DeckDefinition,
+  RobotType,
 } from '@opentrons/shared-data'
-import type { SetupScreens } from '../../pages/OnDeviceDisplay/ProtocolSetup'
+import type { SetupScreens } from '../../pages/ProtocolSetup'
+import type { CutoutConfigAndCompatibility } from '../../resources/deck_configuration/hooks'
+import { useSelector } from 'react-redux'
+import { getLocalRobot } from '../../redux/discovery'
 
 interface FixtureTableProps {
+  robotType: RobotType
   mostRecentAnalysis: CompletedProtocolAnalysis | null
   setSetupScreen: React.Dispatch<React.SetStateAction<SetupScreens>>
-  setFixtureLocation: (fixtureLocation: Cutout) => void
-  setProvidedFixtureOptions: (providedFixtureOptions: FixtureLoadName[]) => void
+  setCutoutId: (cutoutId: CutoutId) => void
+  setProvidedFixtureOptions: (providedFixtureOptions: CutoutFixtureId[]) => void
 }
 
+/**
+ * Table of all "non-module" fixtures e.g. staging slot, waste chute, trash bin...
+ * @param props
+ * @returns JSX.Element
+ */
 export function FixtureTable({
+  robotType,
   mostRecentAnalysis,
   setSetupScreen,
-  setFixtureLocation,
+  setCutoutId,
   setProvidedFixtureOptions,
-}: FixtureTableProps): JSX.Element {
+}: FixtureTableProps): JSX.Element | null {
+  const requiredFixtureDetails = getSimplestDeckConfigForProtocol(
+    mostRecentAnalysis
+  )
+  const deckConfigCompatibility = useDeckConfigurationCompatibility(
+    robotType,
+    mostRecentAnalysis
+  )
+  const deckDef = getDeckDefFromRobotType(robotType)
+  const localRobot = useSelector(getLocalRobot)
+  const robotName = localRobot?.name != null ? localRobot.name : ''
+
+  const requiredDeckConfigCompatibility = getRequiredDeckConfig(
+    deckConfigCompatibility
+  )
+
+  // list not configured/conflicted fixtures first
+  const sortedDeckConfigCompatibility = requiredDeckConfigCompatibility.sort(
+    a =>
+      a.cutoutFixtureId != null &&
+      a.compatibleCutoutFixtureIds.includes(a.cutoutFixtureId)
+        ? 1
+        : -1
+  )
+
+  return sortedDeckConfigCompatibility.length > 0 ? (
+    <>
+      {sortedDeckConfigCompatibility.map((fixtureCompatibility, index) => {
+        // filter out all fixtures that only provide module addressable areas (e.g. everything but StagingAreaWithMagBlockV1)
+        // as they're handled in the Modules Table
+        return fixtureCompatibility.requiredAddressableAreas.every(raa =>
+          FLEX_USB_MODULE_ADDRESSABLE_AREAS.includes(raa)
+        ) ? null : (
+          <FixtureTableItem
+            key={`FixtureTableItem_${index}`}
+            {...fixtureCompatibility}
+            lastItem={index === requiredFixtureDetails.length - 1}
+            setSetupScreen={setSetupScreen}
+            setCutoutId={setCutoutId}
+            setProvidedFixtureOptions={setProvidedFixtureOptions}
+            deckDef={deckDef}
+            robotName={robotName}
+          />
+        )
+      })}
+    </>
+  ) : null
+}
+
+interface FixtureTableItemProps extends CutoutConfigAndCompatibility {
+  lastItem: boolean
+  setSetupScreen: React.Dispatch<React.SetStateAction<SetupScreens>>
+  setCutoutId: (cutoutId: CutoutId) => void
+  setProvidedFixtureOptions: (providedFixtureOptions: CutoutFixtureId[]) => void
+  deckDef: DeckDefinition
+  robotName: string
+}
+
+function FixtureTableItem({
+  cutoutId,
+  cutoutFixtureId,
+  compatibleCutoutFixtureIds,
+  missingLabwareDisplayName,
+  lastItem,
+  setSetupScreen,
+  setCutoutId,
+  setProvidedFixtureOptions,
+  deckDef,
+  robotName,
+}: FixtureTableItemProps): JSX.Element {
   const { t, i18n } = useTranslation('protocol_setup')
-  const STUBBED_LOAD_FIXTURE: LoadFixtureRunTimeCommand = {
-    id: 'stubbed_load_fixture',
-    commandType: 'loadFixture',
-    params: {
-      fixtureId: 'stubbedFixtureId',
-      loadName: WASTE_CHUTE_LOAD_NAME,
-      location: { cutout: 'D3' },
-    },
-    createdAt: 'fakeTimestamp',
-    startedAt: 'fakeTimestamp',
-    completedAt: 'fakeTimestamp',
-    status: 'succeeded',
-  }
 
   const [
     showLocationConflictModal,
     setShowLocationConflictModal,
   ] = React.useState<boolean>(false)
 
-  const requiredFixtureDetails =
-    mostRecentAnalysis?.commands != null
-      ? [
-          // parseInitialLoadedFixturesByCutout(mostRecentAnalysis.commands),
-          STUBBED_LOAD_FIXTURE,
-        ]
-      : []
-
-  const configurations = useLoadedFixturesConfigStatus(requiredFixtureDetails)
-
-  return (
-    <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing8}>
-      <Flex
-        color={COLORS.darkBlack70}
-        fontSize={TYPOGRAPHY.fontSize22}
-        fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-        gridGap={SPACING.spacing24}
-        lineHeight={TYPOGRAPHY.lineHeight28}
-        paddingX={SPACING.spacing24}
-      >
-        <StyledText flex="4 0 0">{t('fixture')}</StyledText>
-        <StyledText flex="2 0 0">{t('location')}</StyledText>
-        <StyledText flex="3 0 0"> {t('status')}</StyledText>
-      </Flex>
-      {requiredFixtureDetails.map((fixture, index) => {
-        const configurationStatus = configurations.find(
-          configuration => configuration.id === fixture.id
-        )?.configurationStatus
-
-        const statusNotReady =
-          configurationStatus === CONFLICTING ||
-          configurationStatus === NOT_CONFIGURED
-
-        let chipLabel: JSX.Element
-        let handleClick
-        if (statusNotReady) {
-          chipLabel = (
-            <>
-              <Chip
-                text={
-                  configurationStatus === CONFLICTING
-                    ? i18n.format(t('location_conflict'), 'capitalize')
-                    : i18n.format(t('not_configured'), 'capitalize')
-                }
-                type="warning"
-                background={false}
-                iconName="connection-status"
-              />
-              <Icon name="more" size="3rem" />
-            </>
-          )
-          handleClick =
-            configurationStatus === CONFLICTING
+  const isCurrentFixtureCompatible =
+    cutoutFixtureId != null &&
+    compatibleCutoutFixtureIds.includes(cutoutFixtureId)
+  const isRequiredSingleSlotMissing = missingLabwareDisplayName != null
+  let chipLabel: JSX.Element
+  if (!isCurrentFixtureCompatible) {
+    const isConflictingFixtureConfigured =
+      cutoutFixtureId != null && !SINGLE_SLOT_FIXTURES.includes(cutoutFixtureId)
+    chipLabel = (
+      <>
+        <Chip
+          text={
+            isConflictingFixtureConfigured
+              ? i18n.format(t('location_conflict'), 'capitalize')
+              : i18n.format(t('not_configured'), 'capitalize')
+          }
+          type="warning"
+          background={false}
+          iconName="connection-status"
+        />
+        <SmallButton
+          buttonCategory="rounded"
+          buttonText={
+            isConflictingFixtureConfigured ? t('resolve') : t('configure')
+          }
+          onClick={
+            isConflictingFixtureConfigured
               ? () => setShowLocationConflictModal(true)
               : () => {
-                  setFixtureLocation(fixture.params.location.cutout)
-                  setProvidedFixtureOptions([fixture.params.loadName])
+                  setCutoutId(cutoutId)
+                  setProvidedFixtureOptions(compatibleCutoutFixtureIds)
                   setSetupScreen('deck configuration')
                 }
-        } else if (configurationStatus === CONFIGURED) {
-          chipLabel = (
-            <Chip
-              text={i18n.format(t('configured'), 'capitalize')}
-              type="success"
-              background={false}
-              iconName="connection-status"
-            />
-          )
-          // TODO(jr, 10/17/23): wire this up
-          // handleClick = () => setShowNotConfiguredModal(true)
-
-          //  shouldn't run into this case
-        } else {
-          chipLabel = <div>status label unknown</div>
+          }
+        />
+      </>
+    )
+  } else {
+    chipLabel = (
+      <Chip
+        text={i18n.format(t('configured'), 'capitalize')}
+        type="success"
+        background={false}
+        iconName="connection-status"
+      />
+    )
+  }
+  return (
+    <React.Fragment key={cutoutId}>
+      {showLocationConflictModal ? (
+        <LocationConflictModal
+          onCloseClick={() => setShowLocationConflictModal(false)}
+          cutoutId={cutoutId}
+          requiredFixtureId={compatibleCutoutFixtureIds[0]}
+          isOnDevice={true}
+          missingLabwareDisplayName={missingLabwareDisplayName}
+          deckDef={deckDef}
+          robotName={robotName}
+        />
+      ) : null}
+      <Flex
+        flexDirection={DIRECTION_ROW}
+        alignItems={ALIGN_CENTER}
+        backgroundColor={
+          isCurrentFixtureCompatible ? COLORS.green35 : COLORS.yellow35
         }
-
-        return (
-          <React.Fragment key={fixture.id}>
-            {showLocationConflictModal ? (
-              <LocationConflictModal
-                onCloseClick={() => setShowLocationConflictModal(false)}
-                cutout={fixture.params.location.cutout}
-                requiredFixture={fixture.params.loadName}
-                isOnDevice={true}
-              />
-            ) : null}
-            <Flex
-              flexDirection={DIRECTION_ROW}
-              key={fixture.params.fixtureId}
-              alignItems={ALIGN_CENTER}
-              backgroundColor={statusNotReady ? COLORS.yellow3 : COLORS.green3}
-              borderRadius={BORDERS.borderRadiusSize3}
-              gridGap={SPACING.spacing24}
-              padding={`${SPACING.spacing16} ${SPACING.spacing24}`}
-              onClick={handleClick}
-              marginBottom={
-                index === requiredFixtureDetails.length - 1
-                  ? SPACING.spacing68
-                  : 'none'
-              }
-            >
-              <Flex flex="4 0 0" alignItems={ALIGN_CENTER}>
-                <StyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
-                  {getFixtureDisplayName(fixture.params.loadName)}
-                </StyledText>
-              </Flex>
-              <Flex flex="2 0 0" alignItems={ALIGN_CENTER}>
-                <LocationIcon slotName={fixture.params.location.cutout} />
-              </Flex>
-              <Flex
-                flex="3 0 0"
-                alignItems={ALIGN_CENTER}
-                justifyContent={JUSTIFY_SPACE_BETWEEN}
-              >
-                {chipLabel}
-              </Flex>
-            </Flex>
-          </React.Fragment>
-        )
-      })}
-    </Flex>
+        borderRadius={BORDERS.borderRadius8}
+        gridGap={SPACING.spacing24}
+        padding={`${SPACING.spacing16} ${SPACING.spacing24}`}
+        marginBottom={lastItem ? SPACING.spacing68 : 'none'}
+      >
+        <Flex flex="3.5 0 0" alignItems={ALIGN_CENTER}>
+          <StyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
+            {cutoutFixtureId != null &&
+            (isCurrentFixtureCompatible || isRequiredSingleSlotMissing)
+              ? getFixtureDisplayName(cutoutFixtureId)
+              : getFixtureDisplayName(compatibleCutoutFixtureIds?.[0])}
+          </StyledText>
+        </Flex>
+        <Flex flex="2 0 0" alignItems={ALIGN_CENTER}>
+          <LocationIcon slotName={getCutoutDisplayName(cutoutId)} />
+        </Flex>
+        <Flex
+          flex="4 0 0"
+          alignItems={ALIGN_CENTER}
+          justifyContent={JUSTIFY_SPACE_BETWEEN}
+        >
+          {chipLabel}
+        </Flex>
+      </Flex>
+    </React.Fragment>
   )
 }

@@ -2,17 +2,17 @@ import * as React from 'react'
 import { useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
 import {
-  Flex,
   ALIGN_CENTER,
-  JUSTIFY_SPACE_BETWEEN,
   Box,
-  SPACING,
-  TYPOGRAPHY,
   COLORS,
-  Link,
+  Flex,
   JUSTIFY_FLEX_END,
+  JUSTIFY_SPACE_BETWEEN,
+  Link,
+  SPACING,
+  StyledText,
+  TYPOGRAPHY,
 } from '@opentrons/components'
-import { StyledText } from '../../../../atoms/text'
 import { TertiaryButton } from '../../../../atoms/buttons'
 import { getRobotApiVersion } from '../../../../redux/discovery'
 import { getRobotUpdateDisplayInfo } from '../../../../redux/robot-update'
@@ -32,7 +32,7 @@ const GITHUB_LINK =
 export function RobotServerVersion({
   robotName,
 }: RobotServerVersionProps): JSX.Element {
-  const { t } = useTranslation(['device_settings', 'shared'])
+  const { t } = useTranslation(['device_settings', 'shared', 'branded'])
   const robot = useRobot(robotName)
   const isFlex = useIsFlex(robotName)
   const { autoUpdateAction } = useSelector((state: State) => {
@@ -65,7 +65,7 @@ export function RobotServerVersion({
           </StyledText>
           {isFlex ? (
             <StyledText as="p" paddingBottom={SPACING.spacing4}>
-              {t('robot_server_version_ot3_description')}
+              {t('branded:robot_server_version_ot3_description')}
             </StyledText>
           ) : null}
           <StyledText as="p">
@@ -82,7 +82,7 @@ export function RobotServerVersion({
           <Flex justifyContent={JUSTIFY_FLEX_END} alignItems={ALIGN_CENTER}>
             <StyledText
               as="label"
-              color={COLORS.darkGreyEnabled}
+              color={COLORS.grey50}
               paddingRight={SPACING.spacing16}
             >
               {t('up_to_date')}

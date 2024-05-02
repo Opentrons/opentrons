@@ -1,8 +1,8 @@
-from typing import Any, Dict, cast, List, Iterable, Tuple
+from typing import Any, Dict, cast, List, Iterable, Tuple, Optional
 from typing_extensions import Final
 from dataclasses import asdict
 
-from opentrons.hardware_control.types import OT3AxisKind
+from opentrons.hardware_control.types import OT3AxisKind, InstrumentProbeType
 from .types import (
     OT3Config,
     ByGantryLoad,
@@ -15,7 +15,9 @@ from .types import (
     LiquidProbeSettings,
     ZSenseSettings,
     EdgeSenseSettings,
+    OutputOptions,
 )
+
 
 DEFAULT_PIPETTE_OFFSET = [0.0, 0.0, 0.0]
 DEFAULT_MODULE_OFFSET = [0.0, 0.0, 0.0]
@@ -28,11 +30,11 @@ DEFAULT_LIQUID_PROBE_SETTINGS: Final[LiquidProbeSettings] = LiquidProbeSettings(
     plunger_speed=5,
     sensor_threshold_pascals=40,
     expected_liquid_height=110,
-    log_pressure=True,
+    output_option=OutputOptions.stream_to_csv,
     aspirate_while_sensing=False,
     auto_zero_sensor=True,
     num_baseline_reads=10,
-    data_file="/var/pressure_sensor_data.csv",
+    data_files={InstrumentProbeType.PRIMARY: "/data/pressure_sensor_data.csv"},
 )
 
 DEFAULT_CALIBRATION_SETTINGS: Final[OT3CalibrationSettings] = OT3CalibrationSettings(
@@ -75,7 +77,6 @@ DEFAULT_CARRIAGE_OFFSET: Final[Offset] = (477.20, 493.8, 253.475)
 DEFAULT_LEFT_MOUNT_OFFSET: Final[Offset] = (-13.5, -60.5, 255.675)
 DEFAULT_RIGHT_MOUNT_OFFSET: Final[Offset] = (40.5, -60.5, 255.675)
 DEFAULT_GRIPPER_MOUNT_OFFSET: Final[Offset] = (84.55, -12.75, 93.85)
-DEFAULT_Z_RETRACT_DISTANCE: Final = 2
 DEFAULT_SAFE_HOME_DISTANCE: Final = 5
 DEFAULT_CALIBRATION_AXIS_MAX_SPEED: Final = 30
 
@@ -193,6 +194,49 @@ DEFAULT_RUN_CURRENT: Final[ByGantryLoad[Dict[OT3AxisKind, float]]] = ByGantryLoa
 )
 
 
+def _build_output_option_with_default(
+    from_conf: Any, default: OutputOptions
+) -> OutputOptions:
+    if from_conf is None:
+        return default
+    else:
+        if isinstance(from_conf, OutputOptions):
+            return from_conf
+        else:
+            try:
+                enumval = OutputOptions[from_conf]
+            except KeyError:  # not an enum entry
+                return default
+            else:
+                return enumval
+
+
+def _build_log_files_with_default(
+    from_conf: Any,
+    default: Optional[Dict[InstrumentProbeType, str]],
+) -> Optional[Dict[InstrumentProbeType, str]]:
+    print(f"from_conf {from_conf} default {default}")
+    if not isinstance(from_conf, dict):
+        if default is None:
+            return None
+        else:
+            return {k: v for k, v in default.items()}
+    else:
+        validated: Dict[InstrumentProbeType, str] = {}
+        for k, v in from_conf.items():
+            if isinstance(k, InstrumentProbeType):
+                validated[k] = v
+            else:
+                try:
+                    enumval = InstrumentProbeType[k]
+                except KeyError:  # not an enum entry
+                    pass
+                else:
+                    validated[enumval] = v
+        print(f"result {validated}")
+        return validated
+
+
 def _build_dict_with_default(
     from_conf: Any,
     default: Dict[OT3AxisKind, float],
@@ -277,6 +321,17 @@ def _build_default_cap_pass(
 def _build_default_liquid_probe(
     from_conf: Any, default: LiquidProbeSettings
 ) -> LiquidProbeSettings:
+    output_option = _build_output_option_with_default(
+        from_conf.get("output_option", None), default.output_option
+    )
+    data_files: Optional[Dict[InstrumentProbeType, str]] = None
+    if (
+        output_option is OutputOptions.sync_buffer_to_csv
+        or output_option is OutputOptions.stream_to_csv
+    ):
+        data_files = _build_log_files_with_default(
+            from_conf.get("data_files", {}), default.data_files
+        )
     return LiquidProbeSettings(
         starting_mount_height=from_conf.get(
             "starting_mount_height", default.starting_mount_height
@@ -291,7 +346,7 @@ def _build_default_liquid_probe(
         expected_liquid_height=from_conf.get(
             "expected_liquid_height", default.expected_liquid_height
         ),
-        log_pressure=from_conf.get("log_pressure", default.log_pressure),
+        output_option=from_conf.get("output_option", default.output_option),
         aspirate_while_sensing=from_conf.get(
             "aspirate_while_sensing", default.aspirate_while_sensing
         ),
@@ -301,7 +356,7 @@ def _build_default_liquid_probe(
         num_baseline_reads=from_conf.get(
             "num_baseline_reads", default.num_baseline_reads
         ),
-        data_file=from_conf.get("data_file", default.data_file),
+        data_files=data_files,
     )
 
 
@@ -381,9 +436,6 @@ def build_with_defaults(robot_settings: Dict[str, Any]) -> OT3Config:
                 DEFAULT_RUN_CURRENT,
             ),
         ),
-        z_retract_distance=robot_settings.get(
-            "z_retract_distance", DEFAULT_Z_RETRACT_DISTANCE
-        ),
         safe_home_distance=robot_settings.get(
             "safe_home_distance", DEFAULT_SAFE_HOME_DISTANCE
         ),
@@ -414,7 +466,7 @@ def build_with_defaults(robot_settings: Dict[str, Any]) -> OT3Config:
 def serialize(config: OT3Config) -> Dict[str, Any]:
     def _build_dict(pairs: Iterable[Tuple[Any, Any]]) -> Dict[str, Any]:
         def _normalize_key(key: Any) -> Any:
-            if isinstance(key, OT3AxisKind):
+            if isinstance(key, OT3AxisKind) or isinstance(key, InstrumentProbeType):
                 return key.name
             return key
 

@@ -11,9 +11,9 @@ except (OSError, ModuleNotFoundError):
     aionotify = None  # type: ignore
 
 
-from opentrons import types, config
+from opentrons import types
 from opentrons.hardware_control import API
-from opentrons.hardware_control.types import Axis, OT3Mount
+from opentrons.hardware_control.types import Axis, OT3Mount, HardwareFeatureFlags
 from opentrons_shared_data.errors.exceptions import CommandPreconditionViolated
 
 
@@ -191,7 +191,10 @@ async def test_cache_instruments_hc(
     is_robot,
     cntrlr_mock_connect,
 ):
-    hw_api_cntrlr = await API.build_hardware_controller(loop=asyncio.get_running_loop())
+    hw_api_cntrlr = await API.build_hardware_controller(
+        loop=asyncio.get_running_loop(),
+        feature_flags=HardwareFeatureFlags.build_from_ff(),
+    )
 
     async def mock_driver_model(mount):
         attached_pipette = {"left": LEFT_PIPETTE_MODEL, "right": None}
@@ -260,7 +263,7 @@ async def test_cache_instruments_sim(sim_and_instr):
         {types.Mount.LEFT: "p10_single", types.Mount.RIGHT: "p300_single_gen2"}
     )
     attached = sim.attached_instruments
-    assert attached[types.Mount.LEFT]["model"] == "p10_single_v1"
+    assert attached[types.Mount.LEFT]["model"] == "p10_single_v1.5"
     assert attached[types.Mount.LEFT]["name"] == "p10_single"
 
     steps_mm_calls = [mock.call({"B": 768}), mock.call({"C": 3200})]
@@ -288,7 +291,7 @@ async def test_cache_instruments_sim(sim_and_instr):
     # If we use prefixes, that should work too
     await sim.cache_instruments({types.Mount.RIGHT: "p300_single"})
     attached = sim.attached_instruments
-    assert attached[types.Mount.RIGHT]["model"] == "p300_single_v1"
+    assert attached[types.Mount.RIGHT]["model"] == "p300_single_v1.5"
     assert attached[types.Mount.RIGHT]["name"] == "p300_single"
     # If we specify instruments at init time, we should get them without
     # passing an expectation
@@ -350,7 +353,9 @@ async def test_prep_aspirate(sim_and_instr):
 
 async def test_aspirate_new(dummy_instruments):
     hw_api = await API.build_hardware_simulator(
-        attached_instruments=dummy_instruments[0], loop=asyncio.get_running_loop()
+        attached_instruments=dummy_instruments[0],
+        loop=asyncio.get_running_loop(),
+        feature_flags=HardwareFeatureFlags(use_old_aspiration_functions=False),
     )
     await hw_api.home()
     await hw_api.cache_instruments()
@@ -367,11 +372,12 @@ async def test_aspirate_new(dummy_instruments):
     assert pos[Axis.B] == pytest.approx(new_plunger_pos)
 
 
-async def test_aspirate_old(decoy: Decoy, mock_feature_flags: None, dummy_instruments):
-    decoy.when(config.feature_flags.use_old_aspiration_functions()).then_return(True)
+async def test_aspirate_old(decoy: Decoy, dummy_instruments):
 
     hw_api = await API.build_hardware_simulator(
-        attached_instruments=dummy_instruments[0], loop=asyncio.get_running_loop()
+        attached_instruments=dummy_instruments[0],
+        loop=asyncio.get_running_loop(),
+        feature_flags=HardwareFeatureFlags(use_old_aspiration_functions=True),
     )
     await hw_api.home()
     await hw_api.cache_instruments()

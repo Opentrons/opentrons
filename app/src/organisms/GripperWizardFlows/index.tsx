@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
 import { UseMutateFunction } from 'react-query'
@@ -13,17 +14,18 @@ import {
 import {
   useCreateMaintenanceCommandMutation,
   useDeleteMaintenanceRunMutation,
-  useCurrentMaintenanceRun,
 } from '@opentrons/react-api-client'
+import { useNotifyCurrentMaintenanceRun } from '../../resources/maintenance_runs'
 import { LegacyModalShell } from '../../molecules/LegacyModal'
-import { Portal } from '../../App/portal'
+import { getTopPortalEl } from '../../App/portal'
 import { WizardHeader } from '../../molecules/WizardHeader'
+import { SimpleWizardBody } from '../../molecules/SimpleWizardBody'
 import { FirmwareUpdateModal } from '../FirmwareUpdateModal'
 import { getIsOnDevice } from '../../redux/config'
 import {
   useChainMaintenanceCommands,
   useCreateTargetedMaintenanceRunMutation,
-} from '../../resources/runs/hooks'
+} from '../../resources/runs'
 import { getGripperWizardSteps } from './getGripperWizardSteps'
 import { GRIPPER_FLOW_TYPES, SECTIONS } from './constants'
 import { BeforeBeginning } from './BeforeBeginning'
@@ -84,7 +86,7 @@ export function GripperWizardFlows(
     },
   })
 
-  const { data: maintenanceRunData } = useCurrentMaintenanceRun({
+  const { data: maintenanceRunData } = useNotifyCurrentMaintenanceRun({
     refetchInterval: RUN_REFETCH_INTERVAL,
     enabled: createdMaintenanceRunId != null,
   })
@@ -114,31 +116,30 @@ export function GripperWizardFlows(
   const [isExiting, setIsExiting] = React.useState<boolean>(false)
   const [errorMessage, setErrorMessage] = React.useState<null | string>(null)
 
-  const { deleteMaintenanceRun } = useDeleteMaintenanceRunMutation({
-    onSuccess: () => closeFlow(),
-    onError: () => closeFlow(),
-  })
+  const handleClose = (): void => {
+    if (props?.onComplete != null) props.onComplete()
+    if (maintenanceRunData != null) {
+      deleteMaintenanceRun(maintenanceRunData?.data.id)
+    }
+    closeFlow()
+  }
+
+  const { deleteMaintenanceRun } = useDeleteMaintenanceRunMutation({})
 
   const handleCleanUpAndClose = (): void => {
-    setIsExiting(true)
-    if (maintenanceRunData?.data.id == null) {
-      closeFlow()
-    } else {
+    if (maintenanceRunData?.data.id == null) handleClose()
+    else {
       chainRunCommands(
         maintenanceRunData?.data.id,
         [{ commandType: 'home' as const, params: {} }],
-        true
+        false
       )
         .then(() => {
-          deleteMaintenanceRun(maintenanceRunData?.data.id)
-          setIsExiting(false)
-          props.onComplete?.()
+          handleClose()
         })
         .catch(error => {
-          console.error(error.message)
-          deleteMaintenanceRun(maintenanceRunData?.data.id)
-          setIsExiting(false)
-          props.onComplete?.()
+          setIsExiting(true)
+          setErrorMessage(error.message)
         })
     }
   }
@@ -155,6 +156,7 @@ export function GripperWizardFlows(
         isChainCommandMutationLoading || isCommandLoading || isExiting
       }
       handleCleanUpAndClose={handleCleanUpAndClose}
+      handleClose={handleClose}
       chainRunCommands={chainRunCommands}
       createRunCommand={createMaintenanceCommand}
       errorMessage={errorMessage}
@@ -181,6 +183,7 @@ interface GripperWizardProps {
   setErrorMessage: (message: string | null) => void
   errorMessage: string | null
   handleCleanUpAndClose: () => void
+  handleClose: () => void
   chainRunCommands: ReturnType<
     typeof useChainMaintenanceCommands
   >['chainRunCommands']
@@ -197,6 +200,7 @@ export const GripperWizard = (
     maintenanceRunId,
     createMaintenanceRun,
     handleCleanUpAndClose,
+    handleClose,
     chainRunCommands,
     attachedGripper,
     isCreateLoading,
@@ -274,6 +278,16 @@ export const GripperWizard = (
         isRobotMoving={isRobotMoving}
       />
     )
+  } else if (isExiting && errorMessage != null) {
+    onExit = handleClose
+    modalContent = (
+      <SimpleWizardBody
+        isSuccess={false}
+        iconColor={COLORS.red50}
+        header={t('shared:error_encountered')}
+        subHeader={errorMessage}
+      />
+    )
   } else if (currentStep.section === SECTIONS.BEFORE_BEGINNING) {
     onExit = handleCleanUpAndClose
     modalContent = (
@@ -346,29 +360,28 @@ export const GripperWizard = (
     />
   )
 
-  return (
-    <Portal level="top">
-      {isOnDevice ? (
-        <Flex
-          flexDirection={DIRECTION_COLUMN}
-          width="992px"
-          height="568px"
-          left="14.5px"
-          top="16px"
-          border={BORDERS.lineBorder}
-          boxShadow={BORDERS.shadowSmall}
-          borderRadius={BORDERS.borderRadiusSize4}
-          position={POSITION_ABSOLUTE}
-          backgroundColor={COLORS.white}
-        >
-          {wizardHeader}
-          {modalContent}
-        </Flex>
-      ) : (
-        <LegacyModalShell width="48rem" header={wizardHeader}>
-          {modalContent}
-        </LegacyModalShell>
-      )}
-    </Portal>
+  return createPortal(
+    isOnDevice ? (
+      <Flex
+        flexDirection={DIRECTION_COLUMN}
+        width="992px"
+        height="568px"
+        left="14.5px"
+        top="16px"
+        border={BORDERS.lineBorder}
+        boxShadow={BORDERS.shadowSmall}
+        borderRadius={BORDERS.borderRadius8}
+        position={POSITION_ABSOLUTE}
+        backgroundColor={COLORS.white}
+      >
+        {wizardHeader}
+        {modalContent}
+      </Flex>
+    ) : (
+      <LegacyModalShell width="48rem" header={wizardHeader}>
+        {modalContent}
+      </LegacyModalShell>
+    ),
+    getTopPortalEl()
   )
 }

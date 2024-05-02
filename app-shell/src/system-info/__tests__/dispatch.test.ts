@@ -1,68 +1,63 @@
 import noop from 'lodash/noop'
+import { vi, it, expect, describe, beforeEach, afterEach } from 'vitest'
 import { app } from 'electron'
 import * as Fixtures from '@opentrons/app/src/redux/system-info/__fixtures__'
 import * as SystemInfo from '@opentrons/app/src/redux/system-info'
 import { uiInitialized } from '@opentrons/app/src/redux/shell/actions'
 import * as OS from '../../os'
-import * as UsbDevices from '../usb-devices'
-import * as NetworkInterfaces from '../network-interfaces'
+import { createLogger } from '../../log'
+import { createUsbDeviceMonitor, getWindowsDriverVersion } from '../usb-devices'
+import {
+  getActiveInterfaces,
+  createNetworkInterfaceMonitor,
+} from '../network-interfaces'
 import { registerSystemInfo } from '..'
 
 import type { Dispatch } from '../../types'
 import type { UsbDeviceMonitor } from '../usb-devices'
 import type { NetworkInterfaceMonitor } from '../network-interfaces'
 
-jest.mock('../../os')
-jest.mock('../usb-devices')
-jest.mock('../network-interfaces')
-
-const createUsbDeviceMonitor = UsbDevices.createUsbDeviceMonitor as jest.MockedFunction<
-  typeof UsbDevices.createUsbDeviceMonitor
->
-
-const getWindowsDriverVersion = UsbDevices.getWindowsDriverVersion as jest.MockedFunction<
-  typeof UsbDevices.getWindowsDriverVersion
->
-
-const getActiveInterfaces = NetworkInterfaces.getActiveInterfaces as jest.MockedFunction<
-  typeof NetworkInterfaces.getActiveInterfaces
->
-
-const createNetworkInterfaceMonitor = NetworkInterfaces.createNetworkInterfaceMonitor as jest.MockedFunction<
-  typeof NetworkInterfaces.createNetworkInterfaceMonitor
->
-
-const isWindows = OS.isWindows as jest.MockedFunction<typeof OS.isWindows>
-
-const appOnce = app.once as jest.MockedFunction<typeof app.once>
-
+vi.mock('../../os')
+vi.mock('../usb-devices')
+vi.mock('../network-interfaces')
+vi.mock('electron-store')
+vi.mock('../../log', async importOriginal => {
+  const actual = await importOriginal<typeof createLogger>()
+  return {
+    ...actual,
+    createLogger: () => ({
+      debug: vi.fn(),
+      error: vi.fn(),
+    }),
+  }
+})
 const flush = (): Promise<void> =>
   new Promise(resolve => setTimeout(resolve, 0))
 
 describe('app-shell::system-info module action tests', () => {
-  const dispatch = jest.fn()
-  const getAllDevices = jest.fn()
-  const usbMonitor: UsbDeviceMonitor = { getAllDevices, stop: jest.fn() }
-  const ifaceMonitor: NetworkInterfaceMonitor = { stop: jest.fn() }
+  const dispatch = vi.fn()
+  const getAllDevices = vi.fn()
+  const usbMonitor: UsbDeviceMonitor = { getAllDevices, stop: vi.fn() }
+  const ifaceMonitor: NetworkInterfaceMonitor = { stop: vi.fn() }
   const { windowsDriverVersion: _, ...notRealtek } = Fixtures.mockUsbDevice
-  const realtek0 = { ...notRealtek, manufacturer: 'Realtek' }
-  const realtek1 = { ...notRealtek, manufacturer: 'realtek' }
+  const realtek0 = { ...notRealtek, manufacturerName: 'Realtek' }
+  const realtek1 = { ...notRealtek, manufacturerName: 'realtek' }
   let handler: Dispatch
 
   beforeEach(() => {
     handler = registerSystemInfo(dispatch)
-    isWindows.mockReturnValue(false)
-    createUsbDeviceMonitor.mockReturnValue(usbMonitor)
-    createNetworkInterfaceMonitor.mockReturnValue(ifaceMonitor)
+    vi.mocked(OS.isWindows).mockReturnValue(false)
+    vi.mocked(createUsbDeviceMonitor).mockReturnValue(usbMonitor)
+    vi.mocked(createNetworkInterfaceMonitor).mockReturnValue(ifaceMonitor)
     getAllDevices.mockResolvedValue([realtek0])
-    getActiveInterfaces.mockReturnValue([
+    vi.mocked(getActiveInterfaces).mockReturnValue([
       Fixtures.mockNetworkInterface,
       Fixtures.mockNetworkInterfaceV6,
     ])
   })
 
   afterEach(() => {
-    jest.resetAllMocks()
+    vi.resetAllMocks()
   })
 
   it('sends initial USB device and network list on shell:UI_INITIALIZED', () => {
@@ -75,7 +70,7 @@ describe('app-shell::system-info module action tests', () => {
           [Fixtures.mockNetworkInterface, Fixtures.mockNetworkInterfaceV6]
         )
       )
-      expect(getWindowsDriverVersion).toHaveBeenCalledTimes(0)
+      expect(vi.mocked(getWindowsDriverVersion)).toHaveBeenCalledTimes(0)
     })
   })
 
@@ -85,14 +80,14 @@ describe('app-shell::system-info module action tests', () => {
 
     return flush().then(() => {
       expect(createUsbDeviceMonitor).toHaveBeenCalledTimes(1)
-      expect(createNetworkInterfaceMonitor).toHaveBeenCalledTimes(1)
+      expect(vi.mocked(createNetworkInterfaceMonitor)).toHaveBeenCalledTimes(1)
       expect(dispatch).toHaveBeenCalledTimes(2)
     })
   })
 
   it('sends systemInfo:USB_DEVICE_ADDED when device added', () => {
     handler(uiInitialized())
-    const usbMonitorOptions = createUsbDeviceMonitor.mock.calls[0][0]
+    const usbMonitorOptions = vi.mocked(createUsbDeviceMonitor).mock.calls[0][0]
 
     expect(usbMonitorOptions?.onDeviceAdd).toEqual(expect.any(Function))
     const onDeviceAdd = usbMonitorOptions?.onDeviceAdd ?? noop
@@ -106,7 +101,7 @@ describe('app-shell::system-info module action tests', () => {
 
   it('sends systemInfo:USB_DEVICE_REMOVED when device removed', () => {
     handler(uiInitialized())
-    const usbMonitorOptions = createUsbDeviceMonitor.mock.calls[0][0]
+    const usbMonitorOptions = vi.mocked(createUsbDeviceMonitor).mock.calls[0][0]
 
     expect(usbMonitorOptions?.onDeviceRemove).toEqual(expect.any(Function))
     const onDeviceRemove = usbMonitorOptions?.onDeviceRemove ?? noop
@@ -121,7 +116,8 @@ describe('app-shell::system-info module action tests', () => {
 
   it('sends systemInfo:NETWORK_INTERFACES_CHANGED when ifaces change', () => {
     handler(uiInitialized())
-    const ifaceMonitorOpts = createNetworkInterfaceMonitor.mock.calls[0][0]
+    const ifaceMonitorOpts = vi.mocked(createNetworkInterfaceMonitor).mock
+      .calls[0][0]
 
     expect(ifaceMonitorOpts.onInterfaceChange).toEqual(expect.any(Function))
     const { onInterfaceChange } = ifaceMonitorOpts
@@ -144,7 +140,7 @@ describe('app-shell::system-info module action tests', () => {
   it('stops monitoring on app quit', () => {
     handler(uiInitialized())
 
-    const appQuitHandler = appOnce.mock.calls.find(
+    const appQuitHandler = vi.mocked(app.once).mock.calls.find(
       // @ts-expect-error(mc, 2021-02-17): event strings don't match, investigate
       ([event, handler]) => event === 'will-quit'
     )?.[1]
@@ -157,8 +153,8 @@ describe('app-shell::system-info module action tests', () => {
 
   describe('on windows', () => {
     beforeEach(() => {
-      isWindows.mockReturnValue(true)
-      getWindowsDriverVersion.mockResolvedValue('1.2.3')
+      vi.mocked(OS.isWindows).mockReturnValue(true)
+      vi.mocked(getWindowsDriverVersion).mockResolvedValue('1.2.3')
     })
 
     it('should add Windows driver versions to Realtek devices on initialization', () => {
@@ -166,8 +162,12 @@ describe('app-shell::system-info module action tests', () => {
       handler(uiInitialized())
 
       return flush().then(() => {
-        expect(getWindowsDriverVersion).toHaveBeenCalledWith(realtek0)
-        expect(getWindowsDriverVersion).toHaveBeenCalledWith(realtek1)
+        expect(vi.mocked(getWindowsDriverVersion)).toHaveBeenCalledWith(
+          realtek0
+        )
+        expect(vi.mocked(getWindowsDriverVersion)).toHaveBeenCalledWith(
+          realtek1
+        )
 
         expect(dispatch).toHaveBeenCalledWith(
           SystemInfo.initialized(
@@ -185,12 +185,15 @@ describe('app-shell::system-info module action tests', () => {
     it('should add Windows driver versions to Realtek devices on add', () => {
       getAllDevices.mockResolvedValue([])
       handler(uiInitialized())
-      const usbMonitorOptions = createUsbDeviceMonitor.mock.calls[0][0]
+      const usbMonitorOptions = vi.mocked(createUsbDeviceMonitor).mock
+        .calls[0][0]
       const onDeviceAdd = usbMonitorOptions?.onDeviceAdd ?? noop
       onDeviceAdd(realtek0)
 
       return flush().then(() => {
-        expect(getWindowsDriverVersion).toHaveBeenCalledWith(realtek0)
+        expect(vi.mocked(getWindowsDriverVersion)).toHaveBeenCalledWith(
+          realtek0
+        )
 
         expect(dispatch).toHaveBeenCalledWith(
           SystemInfo.usbDeviceAdded({

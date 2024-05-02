@@ -1,8 +1,12 @@
 import * as React from 'react'
 
-import { Flex, BORDERS, COLORS, SPACING } from '@opentrons/components'
-
-import { StyledText } from '../text'
+import {
+  BORDERS,
+  COLORS,
+  Flex,
+  SPACING,
+  StyledText,
+} from '@opentrons/components'
 
 interface InstrumentContainerProps {
   displayName: string
@@ -16,8 +20,8 @@ export const InstrumentContainer = (
 
   return (
     <Flex
-      backgroundColor={COLORS.fundamentalsBackgroundShade}
-      borderRadius={BORDERS.radiusSoftCorners}
+      backgroundColor={`${COLORS.black90}${COLORS.opacity20HexCode}`}
+      borderRadius={BORDERS.borderRadius4}
       paddingX={SPACING.spacing8}
       paddingY={SPACING.spacing2}
       width="max-content"

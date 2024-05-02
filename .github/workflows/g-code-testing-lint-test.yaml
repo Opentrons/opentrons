@@ -1,5 +1,5 @@
 # This workflow runs test and lint on branch pushes that touch the
-# notify-server project or its dependencies
+# g-code-testing project or its dependencies
 
 name: 'G-Code Testing Lint & Test'
 
@@ -46,10 +46,13 @@ jobs:
         with:
           fetch-depth: 0
       - name: 'install udev'
-        run: sudo apt-get update && sudo apt-get install libudev-dev
+        run: |
+          # WORKAROUND: Remove microsoft debian repo due to https://github.com/microsoft/linux-package-repositories/issues/130. Remove line below after it is resolved
+          sudo rm -f /etc/apt/sources.list.d/microsoft-prod.list
+          sudo apt-get update && sudo apt-get install libudev-dev
       - uses: 'actions/setup-node@v3'
         with:
-          node-version: '16'
+          node-version: '18.19.0'
       - name: 'set complex environment variables'
         id: 'set-vars'
         uses: actions/github-script@v6
@@ -59,7 +62,7 @@ jobs:
             buildComplexEnvVars(core, context)
       - uses: 'actions/setup-python@v4'
         with:
-          python-version: '3.7'
+          python-version: '3.10'
       - uses: './.github/actions/python/setup'
         with:
           project: 'g-code-testing'

@@ -1,3 +1,5 @@
+from opentrons.config.types import OutputOptions
+
 ot3_dummy_settings = {
     "name": "Marie Curie",
     "model": "OT-3 Standard",
@@ -109,7 +111,6 @@ ot3_dummy_settings = {
         },
     },
     "log_level": "NADA",
-    "z_retract_distance": 10,
     "safe_home_distance": 5,
     "deck_transform": [[-0.5, 0, 1], [0.1, -2, 4], [0, 0, -1]],
     "carriage_offset": (1, 2, 3),
@@ -124,11 +125,11 @@ ot3_dummy_settings = {
         "plunger_speed": 10,
         "sensor_threshold_pascals": 17,
         "expected_liquid_height": 90,
-        "log_pressure": True,
+        "output_option": OutputOptions.stream_to_csv,
         "aspirate_while_sensing": False,
         "auto_zero_sensor": True,
         "num_baseline_reads": 10,
-        "data_file": "/var/pressure_sensor_data.csv",
+        "data_files": {"PRIMARY": "/data/pressure_sensor_data.csv"},
     },
     "calibration": {
         "z_offset": {

@@ -1,0 +1,53 @@
+@import '@opentrons/components/styles';
+
+.upload_group {
+  width: 75%;
+}
+
+.upload {
+  width: 18rem;
+  margin: 1rem 0;
+  padding: 0 0.25rem;
+}
+
+.file_input {
+  position: fixed;
+  clip: rect(1px 1px 1px 1px);
+}
+
+.upload_button {
+  display: block;
+  width: 17.5rem;
+}
+
+.file_drop {
+  font-size: var(--fs-body-1);
+
+  /* from legacy --font-body-1-dark */
+  font-weight: var(--fw-regular);
+
+  /* from legacy --font-body-1-dark */
+  display: flex;
+
+  /* from legacy --center-children */
+  justify-content: center;
+
+  /* from legacy --center-children */
+  align-items: center;
+
+  /* from legacy --center-children */
+
+  width: 100%;
+  padding: 1rem 2rem;
+  margin: 0 auto;
+  border: 2px dashed silver;
+  border-radius: 6px;
+  color: var(--c-med-gray);
+  text-align: center;
+}
+
+.file_drop_icon {
+  display: block;
+  margin: 1rem;
+  width: 3rem;
+}

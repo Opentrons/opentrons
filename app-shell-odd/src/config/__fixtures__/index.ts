@@ -8,13 +8,16 @@ import type {
   ConfigV18,
   ConfigV19,
   ConfigV20,
+  ConfigV21,
 } from '@opentrons/app/src/redux/config/types'
+
+const PKG_VERSION: string = _PKG_VERSION_
 
 export const MOCK_CONFIG_V12: ConfigV12 = {
   version: 12,
   devtools: false,
   reinstallDevtools: false,
-  update: { channel: _PKG_VERSION_.includes('beta') ? 'beta' : 'latest' },
+  update: { channel: PKG_VERSION.includes('beta') ? 'beta' : 'latest' },
   log: { level: { file: 'debug', console: 'info' } },
   ui: {
     width: 1024,
@@ -128,4 +131,9 @@ export const MOCK_CONFIG_V20: ConfigV20 = {
       OT2: 'not-used-on-ODD',
     },
   },
+}
+
+export const MOCK_CONFIG_V21: ConfigV21 = {
+  ...MOCK_CONFIG_V20,
+  version: 21,
 }

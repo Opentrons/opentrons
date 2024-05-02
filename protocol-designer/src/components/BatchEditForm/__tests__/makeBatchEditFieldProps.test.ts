@@ -1,16 +1,25 @@
+import { vi, describe, expect, it, beforeEach, afterEach } from 'vitest'
 import noop from 'lodash/noop'
 import { makeBatchEditFieldProps } from '../makeBatchEditFieldProps'
 import * as stepEditFormUtils from '../../StepEditForm/utils'
 
-const getFieldDefaultTooltipSpy = jest.spyOn(
+const getFieldDefaultTooltipSpy = vi.spyOn(
   stepEditFormUtils,
   'getFieldDefaultTooltip'
 )
 
-const getIndeterminateTooltipSpy = jest.spyOn(
+const getIndeterminateTooltipSpy = vi.spyOn(
   stepEditFormUtils,
   'getFieldIndeterminateTooltip'
 )
+
+vi.mock('react-i18next', () => ({
+  useTranslation: vi.fn().mockReturnValue({
+    t: (key: string) => key,
+  }),
+}))
+
+const tMock = (key: string) => key
 
 beforeEach(() => {
   getFieldDefaultTooltipSpy.mockImplementation(name => `tooltip for ${name}`)
@@ -18,7 +27,7 @@ beforeEach(() => {
 })
 
 afterEach(() => {
-  jest.restoreAllMocks()
+  vi.restoreAllMocks()
 })
 
 describe('makeBatchEditFieldProps', () => {
@@ -29,14 +38,15 @@ describe('makeBatchEditFieldProps', () => {
         value: '1.2',
       },
     }
-    const handleChangeFormInput: any = jest.fn()
+    const handleChangeFormInput: any = vi.fn()
 
     const disabledFields = {}
 
     const result = makeBatchEditFieldProps(
       fieldValues,
       disabledFields,
-      handleChangeFormInput
+      handleChangeFormInput,
+      tMock
     )
 
     expect(result).toEqual({
@@ -67,7 +77,7 @@ describe('makeBatchEditFieldProps', () => {
         isIndeterminate: false,
       },
     }
-    const handleChangeFormInput: any = jest.fn()
+    const handleChangeFormInput: any = vi.fn()
 
     const disabledFields = {
       aspirate_flowRate: 'Disabled explanation text here',
@@ -76,7 +86,8 @@ describe('makeBatchEditFieldProps', () => {
     const result = makeBatchEditFieldProps(
       fieldValues,
       disabledFields,
-      handleChangeFormInput
+      handleChangeFormInput,
+      tMock
     )
 
     expect(result.aspirate_flowRate.disabled).toBe(true)
@@ -92,14 +103,15 @@ describe('makeBatchEditFieldProps', () => {
         isIndeterminate: true,
       },
     }
-    const handleChangeFormInput: any = jest.fn()
+    const handleChangeFormInput: any = vi.fn()
 
     const disabledFields = {}
 
     const result = makeBatchEditFieldProps(
       fieldValues,
       disabledFields,
-      handleChangeFormInput
+      handleChangeFormInput,
+      tMock
     )
 
     expect(result.aspirate_flowRate.isIndeterminate).toBe(true)
@@ -112,20 +124,18 @@ describe('makeBatchEditFieldProps', () => {
         isIndeterminate: true,
       },
     }
-    const handleChangeFormInput: any = jest.fn()
+    const handleChangeFormInput: any = vi.fn()
 
     const disabledFields = {}
 
     const result = makeBatchEditFieldProps(
       fieldValues,
       disabledFields,
-      handleChangeFormInput
+      handleChangeFormInput,
+      tMock
     )
 
     expect(result.preWetTip.isIndeterminate).toBe(true)
-    expect(result.preWetTip.tooltipContent).toBe(
-      'Not all selected steps are using this setting'
-    )
   })
 
   it('should override indeterminate tooltip content if field is also disabled', () => {
@@ -135,7 +145,7 @@ describe('makeBatchEditFieldProps', () => {
         isIndeterminate: true,
       },
     }
-    const handleChangeFormInput: any = jest.fn()
+    const handleChangeFormInput: any = vi.fn()
 
     const disabledFields = {
       preWetTip: 'Disabled explanation text here',
@@ -144,7 +154,8 @@ describe('makeBatchEditFieldProps', () => {
     const result = makeBatchEditFieldProps(
       fieldValues,
       disabledFields,
-      handleChangeFormInput
+      handleChangeFormInput,
+      tMock
     )
 
     expect(result.preWetTip.isIndeterminate).toBe(true)

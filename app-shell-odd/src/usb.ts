@@ -7,7 +7,7 @@ import {
   robotMassStorageDeviceAdded,
   robotMassStorageDeviceEnumerated,
   robotMassStorageDeviceRemoved,
-} from '@opentrons/app/src/redux/shell/actions'
+} from './actions'
 const FLEX_USB_MOUNT_DIR = '/media/'
 const FLEX_USB_DEVICE_DIR = '/dev/'
 const FLEX_USB_MOUNT_FILTER = /sd[a-z]+[0-9]+$/

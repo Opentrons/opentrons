@@ -4,8 +4,6 @@ const fs = require('fs/promises')
 
 // Updates a releases historical manifest with a release's version.
 
-const versionFinder = require('./git-version')
-
 const parseArgs = require('./deploy/lib/parseArgs')
 const USAGE =
   '\nUsage:\n node ./scripts/update-releases-json <releases-json-path> <project> <artifact-dir> <url-base>'
@@ -63,6 +61,7 @@ async function main() {
   }
   console.log(`Updating ${releasesPath} with artifacts from ${artifactDirPath}`)
   const releasesData = await readOrDefaultReleases(releasesPath)
+  const versionFinder = await import('./git-version.mjs')
   const version = await versionFinder.versionForProject(project)
   console.log(`Adding data for ${version}`)
   releasesData.production[version] = {

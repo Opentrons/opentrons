@@ -16,6 +16,7 @@ import {
   Link,
   SIZE_2,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
@@ -23,25 +24,25 @@ import logoSvg from '../assets/images/logo_nav.svg'
 import logoSvgThree from '../assets/images/logo_nav_three.svg'
 
 import { NAV_BAR_WIDTH } from './constants'
-import { StyledText } from '../atoms/text'
 
 import type { RouteProps } from './types'
 
 const SALESFORCE_HELP_LINK = 'https://support.opentrons.com/s/'
+const PROJECT: string = _OPENTRONS_PROJECT_
 
 const NavbarLink = styled(NavLink)`
   color: ${COLORS.white};
   align-self: ${ALIGN_STRETCH};
-  background-color: ${COLORS.darkBlackEnabled};
+  background-color: ${COLORS.black90};
 
   &:hover {
-    background-color: ${COLORS.darkBlackHover};
+    background-color: ${COLORS.black80};
   }
 
   &:focus-visible {
-    box-shadow: inset 0 0 0 3px ${COLORS.fundamentalsFocus};
+    box-shadow: inset 0 0 0 3px ${COLORS.blue50};
     outline: none;
-    background-color: ${COLORS.darkGreyHover};
+    background-color: ${COLORS.grey60};
   }
 
   &:focus-visible.active {
@@ -50,26 +51,26 @@ const NavbarLink = styled(NavLink)`
   }
 
   &:active {
-    background-color: ${COLORS.darkBlackEnabled};
+    background-color: ${COLORS.black90};
   }
 
   &.active {
-    background-color: ${COLORS.darkBlackSelected};
+    background-color: ${COLORS.black70};
   }
   &.active:has(svg) {
-    background-color: ${COLORS.darkBlackEnabled};
+    background-color: ${COLORS.black90};
   }
 `
 const NavIconLink = styled(NavLink)`
   &.active > svg {
-    color: ${COLORS.medGreyEnabled};
-    background-color: ${COLORS.darkBlackSelected};
+    color: ${COLORS.grey30};
+    background-color: ${COLORS.black70};
   }
 `
 const IconLink = styled(Link)`
   &.active > svg {
-    color: ${COLORS.medGreyEnabled};
-    background-color: ${COLORS.darkBlackSelected};
+    color: ${COLORS.grey30};
+    background-color: ${COLORS.black70};
   }
 `
 
@@ -78,27 +79,27 @@ const NavbarIcon = styled(Icon)`
   height: ${SIZE_2};
   padding: ${SPACING.spacing6};
   border-radius: 50%;
-  color: ${COLORS.medGreyEnabled};
+  color: ${COLORS.grey30};
   background-color: ${COLORS.transparent};
 
   &:hover {
-    background-color: ${COLORS.darkBlackHover};
+    background-color: ${COLORS.black80};
   }
 
   &:focus-visible {
-    box-shadow: inset 0 0 0 3px ${COLORS.fundamentalsFocus};
+    box-shadow: inset 0 0 0 3px ${COLORS.blue50};
     outline: none;
-    background-color: ${COLORS.darkGreyHover};
+    background-color: ${COLORS.grey60};
   }
 
   &:active {
-    color: ${COLORS.medGreyEnabled};
-    background-color: ${COLORS.darkBlackEnabled};
+    color: ${COLORS.grey30};
+    background-color: ${COLORS.black90};
   }
 
   &.active {
-    color: ${COLORS.medGreyEnabled};
-    background-color: ${COLORS.darkBlackSelected};
+    color: ${COLORS.grey30};
+    background-color: ${COLORS.black70};
   }
 `
 
@@ -113,7 +114,7 @@ export function Navbar({ routes }: { routes: RouteProps[] }): JSX.Element {
   )
   return (
     <Flex
-      backgroundColor={COLORS.darkBlackEnabled}
+      backgroundColor={COLORS.black90}
       css={TYPOGRAPHY.h3Regular}
       flexDirection={DIRECTION_COLUMN}
       flex={FLEX_NONE}
@@ -128,7 +129,7 @@ export function Navbar({ routes }: { routes: RouteProps[] }): JSX.Element {
         alignSelf={ALIGN_STRETCH}
       >
         <LogoImg
-          src={_OPENTRONS_PROJECT_ === 'ot3' ? logoSvgThree : logoSvg}
+          src={PROJECT === 'ot3' ? logoSvgThree : logoSvg}
           alt="opentrons logo"
         />
         {navRoutes.map(({ name, navLinkTo }: RouteProps) => (

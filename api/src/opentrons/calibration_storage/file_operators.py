@@ -5,13 +5,18 @@ These methods should only be imported inside the calibration_storage
 module, except in the special case of v2 labware support in
 the v1 API.
 """
-import json
 import datetime
+import json
+import logging
 import typing
-from pydantic import BaseModel
 from pathlib import Path
 
+import pydantic
+
 from .encoder_decoder import DateTimeEncoder, DateTimeDecoder
+
+
+_log = logging.getLogger(__name__)
 
 
 DecoderType = typing.Type[json.JSONDecoder]
@@ -27,8 +32,9 @@ def delete_file(path: Path) -> None:
         pass
 
 
+# TODO: This is private but used by other files.
 def _remove_json_files_in_directories(p: Path) -> None:
-    """Delete json file by the path"""
+    """Delete .json files in the given directory and its subdirectories."""
     for item in p.iterdir():
         if item.is_dir():
             _remove_json_files_in_directories(item)
@@ -47,12 +53,12 @@ def _assert_last_modified_value(calibration_dict: typing.Dict[str, typing.Any]) 
 
 
 def read_cal_file(
-    filepath: Path, decoder: DecoderType = DateTimeDecoder
+    file_path: Path, decoder: DecoderType = DateTimeDecoder
 ) -> typing.Dict[str, typing.Any]:
     """
     Function used to read data from a file
 
-    :param filepath: path to look for data at
+    :param file_path: path to look for data at
     :param decoder: if there is any specialized decoder needed.
     The default decoder is the date time decoder.
     :return: Data from the file
@@ -63,7 +69,7 @@ def read_cal_file(
     # This can be done when the labware endpoints
     # are refactored to grab tip length calibration
     # from the correct locations.
-    with open(filepath, "r") as f:
+    with open(file_path, "r", encoding="utf-8") as f:
         calibration_data = typing.cast(
             typing.Dict[str, typing.Any],
             json.load(f, cls=decoder),
@@ -76,22 +82,61 @@ def read_cal_file(
 
 
 def save_to_file(
-    directorypath: Path,
+    directory_path: Path,
+    # todo(mm, 2023-11-15): This file_name argument does not include the file
+    # extension, which is inconsistent with read_cal_file(). The two should match.
     file_name: str,
-    data: typing.Union[BaseModel, typing.Dict[str, typing.Any], typing.Any],
+    data: typing.Union[pydantic.BaseModel, typing.Dict[str, typing.Any], typing.Any],
     encoder: EncoderType = DateTimeEncoder,
 ) -> None:
     """
     Function used to save data to a file
 
-    :param filepath: path to save data at
-    :param data: data to save
+    :param directory_path: path to the directory in which to save the data
+    :param file_name: name of the file within the directory, *without the extension*.
+    :param data: The data to save. Either a Pydantic model, or a JSON-like dict to pass to
+        `json.dumps()`. If you're storing a Pydantic model, prefer `save_pydantic_model_to_file()`
+        and `read_pydantic_model_from_file()` for new code.
     :param encoder: if there is any specialized encoder needed.
     The default encoder is the date time encoder.
     """
-    directorypath.mkdir(parents=True, exist_ok=True)
-    filepath = directorypath / f"{file_name}.json"
+    directory_path.mkdir(parents=True, exist_ok=True)
+    file_path = directory_path / f"{file_name}.json"
     json_data = (
-        data.json() if isinstance(data, BaseModel) else json.dumps(data, cls=encoder)
+        data.json()
+        if isinstance(data, pydantic.BaseModel)
+        else json.dumps(data, cls=encoder)
     )
-    filepath.write_text(json_data, encoding="utf-8")
+    file_path.write_text(json_data, encoding="utf-8")
+
+
+def serialize_pydantic_model(data: pydantic.BaseModel) -> bytes:
+    """Safely serialize data from a Pydantic model into a form suitable for storing on disk."""
+    return data.json(by_alias=True).encode("utf-8")
+
+
+_ModelT = typing.TypeVar("_ModelT", bound=pydantic.BaseModel)
+
+
+# TODO(mm, 2023-11-20): We probably want to distinguish "missing file" from "corrupt file."
+# The caller needs to deal with those cases separately because the appropriate action depends on
+# context. For example, when running protocols through robot-server, if the file is corrupt, it's
+# safe-ish to fall back to a default because the Opentrons App will let the user confirm everything
+# before starting the run. But when running protocols through the non-interactive
+# `opentrons_execute`, we don't want it to silently use default data if the file is corrupt.
+def deserialize_pydantic_model(
+    serialized: bytes,
+    model: typing.Type[_ModelT],
+) -> typing.Optional[_ModelT]:
+    """Safely read bytes from `serialize_pydantic_model()` back into a Pydantic model.
+
+    Returns `None` if the file is missing or corrupt.
+    """
+    try:
+        return model.parse_raw(serialized)
+    except json.JSONDecodeError:
+        _log.warning("Data is not valid JSON.", exc_info=True)
+        return None
+    except pydantic.ValidationError:
+        _log.warning(f"Data is malformed as a {model}.", exc_info=True)
+        return None

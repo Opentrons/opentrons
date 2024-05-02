@@ -60,6 +60,7 @@ export function fetchRobotApi(
           headers: options.headers,
           method,
           url,
+          data: options.body,
         })
       ).pipe(
         map(response => ({

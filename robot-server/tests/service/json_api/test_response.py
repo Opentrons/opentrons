@@ -12,6 +12,8 @@ from robot_server.service.json_api.response import (
     SimpleMultiBody,
     MultiBody,
     MultiBodyMeta,
+    NotifyRefetchBody,
+    NotifyUnsubscribeBody,
     DeprecatedResponseModel,
     DeprecatedMultiResponseModel,
 )
@@ -23,7 +25,6 @@ class _Resource(ResourceModel):
 
 
 class _Links(BaseModel):
-
     sibling: ResourceLink
 
 
@@ -114,6 +115,11 @@ RESPONSE_SPECS = [
             "data": [{"id": "hello", "val": None}, {"id": "goodbye", "val": None}],
             "links": {"sibling": {"href": "/bar", "meta": None}},
         },
+    ),
+    ResponseSpec(subject=NotifyRefetchBody(), expected={"refetch": True}),
+    ResponseSpec(
+        subject=NotifyUnsubscribeBody(),
+        expected={"unsubscribe": True},
     ),
 ]
 

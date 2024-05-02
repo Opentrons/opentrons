@@ -1,4 +1,5 @@
-import { WASTE_CHUTE_SLOT } from '@opentrons/shared-data'
+import { describe, it, expect } from 'vitest'
+import { WASTE_CHUTE_CUTOUT } from '@opentrons/shared-data'
 import { getHasWasteChute } from '..'
 import type { AdditionalEquipmentEntities } from '@opentrons/step-generation'
 
@@ -25,7 +26,7 @@ describe('getHasWasteChute', () => {
       mockId2: {
         id: mockId2,
         name: 'wasteChute',
-        location: WASTE_CHUTE_SLOT,
+        location: WASTE_CHUTE_CUTOUT,
       },
     } as AdditionalEquipmentEntities
     const result = getHasWasteChute(mockAdditionalEquipmentEntities)

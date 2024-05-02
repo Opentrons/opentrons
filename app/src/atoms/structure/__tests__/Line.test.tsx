@@ -1,6 +1,10 @@
 import * as React from 'react'
-import { renderWithProviders, SPACING, COLORS } from '@opentrons/components'
+import { describe, it, expect, beforeEach } from 'vitest'
+import '@testing-library/jest-dom/vitest'
+import { screen } from '@testing-library/react'
+import { SPACING, COLORS } from '@opentrons/components'
 import { Line } from '../index'
+import { renderWithProviders } from '../../../__testing-utils__'
 
 const render = (props: React.ComponentProps<typeof Line>) => {
   return renderWithProviders(<Line {...props} />)[0]
@@ -16,25 +20,23 @@ describe('Line', () => {
   })
 
   it('renders line', () => {
-    const { getByTestId } = render(props)
-    const line = getByTestId('line')
+    render(props)
+    const line = screen.getByTestId('line')
     expect(line).toHaveStyle('width: 100%')
-    expect(line).toHaveStyle(
-      `borderBottom: 1px solid ${String(COLORS.medGreyEnabled)}`
-    )
+    expect(line).toHaveStyle(`borderBottom: 1px solid ${COLORS.grey30}`)
   })
 
   it('renders line with additional props', () => {
     props = {
       ...props,
       width: '80%',
-      color: COLORS.blueEnabled,
+      color: COLORS.blue50,
       marginY: 0,
       paddingX: SPACING.spacing4,
     }
-    const { getByTestId } = render(props)
-    const line = getByTestId('line')
-    expect(line).toHaveStyle(`color: ${String(COLORS.blueEnabled)}`)
+    render(props)
+    const line = screen.getByTestId('line')
+    expect(line).toHaveStyle(`color: ${COLORS.blue50}`)
     expect(line).toHaveStyle('width: 80%')
     expect(line).toHaveStyle('margin-top: 0')
     expect(line).toHaveStyle('margin-bottom: 0')

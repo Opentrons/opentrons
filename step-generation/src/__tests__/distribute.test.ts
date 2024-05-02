@@ -1,3 +1,4 @@
+import { beforeEach, describe, it, expect } from 'vitest'
 import { FIXED_TRASH_ID } from '../constants'
 import {
   ASPIRATE_OFFSET_FROM_BOTTOM_MM,
@@ -20,6 +21,7 @@ import {
   makeTouchTipHelper,
   pickUpTipHelper,
   SOURCE_LABWARE,
+  blowoutInPlaceHelper,
 } from '../fixtures'
 import { distribute } from '../commandCreators/compound/distribute'
 import type { CreateCommand } from '@opentrons/shared-data'
@@ -34,6 +36,8 @@ const airGapHelper = makeAirGapHelper({
   wellLocation: {
     origin: 'bottom',
     offset: {
+      x: 0,
+      y: 0,
       z: 11.54,
     },
   },
@@ -42,6 +46,8 @@ const dispenseAirGapHelper = makeDispenseAirGapHelper({
   wellLocation: {
     origin: 'bottom',
     offset: {
+      x: 0,
+      y: 0,
       z: 11.54,
     },
   },
@@ -56,7 +62,7 @@ let mixinArgs: Partial<DistributeArgs>
 let invariantContext: InvariantContext
 let robotStateWithTip: RobotState
 let robotInitialStateNoTipsRemain: RobotState
-let blowoutSingleToTrash: CreateCommand
+let blowoutSingleToTrash: CreateCommand[]
 let blowoutSingleToSourceA1: CreateCommand
 let blowoutSingleToDestA4: CreateCommand
 let blowoutSingleToDestA3: CreateCommand
@@ -67,7 +73,7 @@ beforeEach(() => {
     commandCreatorFnName: 'distribute',
     name: 'distribute test',
     description: 'test blah blah',
-
+    tipRack: 'tiprack1Id',
     pipette: DEFAULT_PIPETTE,
     sourceLabware: SOURCE_LABWARE,
     destLabware: DEST_LABWARE,
@@ -82,19 +88,15 @@ beforeEach(() => {
     aspirateAirGapVolume: null,
     touchTipAfterDispense: false,
     dropTipLocation: FIXED_TRASH_ID,
+    aspirateXOffset: 0,
+    dispenseXOffset: 0,
+    aspirateYOffset: 0,
+    dispenseYOffset: 0,
   }
-
-  blowoutSingleToTrash = blowoutHelper(FIXED_TRASH_ID, {
-    wellLocation: {
-      origin: 'bottom',
-      offset: {
-        z: BLOWOUT_OFFSET_ANY,
-      },
-    },
-  })
+  blowoutSingleToTrash = blowoutInPlaceHelper()
   blowoutSingleToSourceA1 = blowoutHelper(SOURCE_LABWARE, {
     wellLocation: {
-      origin: 'bottom',
+      origin: 'top',
       offset: {
         z: BLOWOUT_OFFSET_ANY,
       },
@@ -102,7 +104,7 @@ beforeEach(() => {
   })
   blowoutSingleToDestA4 = blowoutHelper(DEST_LABWARE, {
     wellLocation: {
-      origin: 'bottom',
+      origin: 'top',
       offset: {
         z: BLOWOUT_OFFSET_ANY,
       },
@@ -111,7 +113,7 @@ beforeEach(() => {
   })
   blowoutSingleToDestA3 = blowoutHelper(DEST_LABWARE, {
     wellLocation: {
-      origin: 'bottom',
+      origin: 'top',
       offset: {
         z: BLOWOUT_OFFSET_ANY,
       },
@@ -145,7 +147,7 @@ describe('distribute: minimal example', () => {
       aspirateHelper('A1', 180),
       dispenseHelper('A2', 60),
       dispenseHelper('A3', 60),
-      blowoutSingleToTrash,
+      ...blowoutSingleToTrash,
     ])
   })
 })
@@ -168,18 +170,18 @@ describe('tip handling for multiple distribute chunks', () => {
     const res = getSuccessResult(result)
 
     expect(res.commands).toEqual([
-      dropTipHelper('A1'),
+      ...dropTipHelper(),
       pickUpTipHelper('A1'),
       aspirateHelper('A1', 240),
       dispenseHelper('A2', 90),
       dispenseHelper('A3', 90),
-      blowoutSingleToTrash,
+      ...blowoutSingleToTrash,
 
       aspirateHelper('A1', 240),
       dispenseHelper('A4', 90),
       dispenseHelper('A5', 90),
 
-      blowoutSingleToTrash,
+      ...blowoutSingleToTrash,
     ])
   })
 
@@ -200,20 +202,20 @@ describe('tip handling for multiple distribute chunks', () => {
     const res = getSuccessResult(result)
 
     expect(res.commands).toEqual([
-      dropTipHelper('A1'),
+      ...dropTipHelper(),
       pickUpTipHelper('A1'),
       aspirateHelper('A1', 240),
       dispenseHelper('A2', 90),
       dispenseHelper('A3', 90),
-      blowoutSingleToTrash,
+      ...blowoutSingleToTrash,
 
       // next chunk, change tip
-      dropTipHelper('A1'),
+      ...dropTipHelper(),
       pickUpTipHelper('B1'),
       aspirateHelper('A1', 240),
       dispenseHelper('A4', 90),
       dispenseHelper('A5', 90),
-      blowoutSingleToTrash,
+      ...blowoutSingleToTrash,
     ])
   })
 
@@ -237,11 +239,11 @@ describe('tip handling for multiple distribute chunks', () => {
       aspirateHelper('A1', 240),
       dispenseHelper('A2', 90),
       dispenseHelper('A3', 90),
-      blowoutSingleToTrash,
+      ...blowoutSingleToTrash,
       aspirateHelper('A1', 240),
       dispenseHelper('A4', 90),
       dispenseHelper('A5', 90),
-      blowoutSingleToTrash,
+      ...blowoutSingleToTrash,
     ])
   })
 
@@ -252,6 +254,7 @@ describe('tip handling for multiple distribute chunks', () => {
       destWells: ['A2', 'A3', 'A4', 'A5'],
       changeTip: 'always',
       volume: 150,
+      tipRack: 'tiprack1Id',
     } as DistributeArgs
 
     const result = distribute(
@@ -279,6 +282,8 @@ describe('advanced settings: volume, mix, pre-wet tip, tip touch, tip position',
         wellLocation: {
           origin: 'bottom',
           offset: {
+            x: 0,
+            y: 0,
             z: ASPIRATE_OFFSET_FROM_BOTTOM_MM,
           },
         },
@@ -314,6 +319,8 @@ describe('advanced settings: volume, mix, pre-wet tip, tip touch, tip position',
         wellLocation: {
           origin: 'bottom',
           offset: {
+            x: 0,
+            y: 0,
             z: ASPIRATE_OFFSET_FROM_BOTTOM_MM,
           },
         },
@@ -325,6 +332,8 @@ describe('advanced settings: volume, mix, pre-wet tip, tip touch, tip position',
         wellLocation: {
           origin: 'bottom',
           offset: {
+            x: 0,
+            y: 0,
             z: ASPIRATE_OFFSET_FROM_BOTTOM_MM,
           },
         },
@@ -558,6 +567,8 @@ describe('advanced settings: volume, mix, pre-wet tip, tip touch, tip position',
         wellLocation: {
           origin: 'bottom',
           offset: {
+            x: 0,
+            y: 0,
             z: ASPIRATE_OFFSET_FROM_BOTTOM_MM,
           },
         },
@@ -570,6 +581,8 @@ describe('advanced settings: volume, mix, pre-wet tip, tip touch, tip position',
         wellLocation: {
           origin: 'bottom',
           offset: {
+            x: 0,
+            y: 0,
             z: ASPIRATE_OFFSET_FROM_BOTTOM_MM,
           },
         },
@@ -619,13 +632,13 @@ describe('advanced settings: volume, mix, pre-wet tip, tip touch, tip position',
       touchTipHelper('A1'),
       dispenseHelper('A2', 90),
       dispenseHelper('A3', 90),
-      blowoutSingleToTrash,
+      ...blowoutSingleToTrash,
 
       aspirateHelper('A1', 240),
       touchTipHelper('A1'),
       dispenseHelper('A4', 90),
       dispenseHelper('A5', 90),
-      blowoutSingleToTrash,
+      ...blowoutSingleToTrash,
     ])
   })
 
@@ -651,14 +664,14 @@ describe('advanced settings: volume, mix, pre-wet tip, tip touch, tip position',
       touchTipHelper('A2', { labwareId: DEST_LABWARE }),
       dispenseHelper('A3', 90),
       touchTipHelper('A3', { labwareId: DEST_LABWARE }),
-      blowoutSingleToTrash,
+      ...blowoutSingleToTrash,
 
       aspirateHelper('A1', 240),
       dispenseHelper('A4', 90),
       touchTipHelper('A4', { labwareId: DEST_LABWARE }),
       dispenseHelper('A5', 90),
       touchTipHelper('A5', { labwareId: DEST_LABWARE }),
-      blowoutSingleToTrash,
+      ...blowoutSingleToTrash,
     ])
   })
 
@@ -695,6 +708,8 @@ describe('advanced settings: volume, mix, pre-wet tip, tip touch, tip position',
         wellLocation: {
           origin: 'bottom',
           offset: {
+            x: 0,
+            y: 0,
             z: ASPIRATE_OFFSET_FROM_BOTTOM_MM,
           },
         },
@@ -706,6 +721,8 @@ describe('advanced settings: volume, mix, pre-wet tip, tip touch, tip position',
         wellLocation: {
           origin: 'bottom',
           offset: {
+            x: 0,
+            y: 0,
             z: ASPIRATE_OFFSET_FROM_BOTTOM_MM,
           },
         },
@@ -786,6 +803,8 @@ describe('advanced settings: volume, mix, pre-wet tip, tip touch, tip position',
         wellLocation: {
           origin: 'bottom',
           offset: {
+            x: 0,
+            y: 0,
             z: ASPIRATE_OFFSET_FROM_BOTTOM_MM,
           },
         },
@@ -798,6 +817,8 @@ describe('advanced settings: volume, mix, pre-wet tip, tip touch, tip position',
         wellLocation: {
           origin: 'bottom',
           offset: {
+            x: 0,
+            y: 0,
             z: ASPIRATE_OFFSET_FROM_BOTTOM_MM,
           },
         },
@@ -884,6 +905,8 @@ describe('advanced settings: volume, mix, pre-wet tip, tip touch, tip position',
           wellLocation: {
             origin: 'bottom',
             offset: {
+              x: 0,
+              y: 0,
               z: ASPIRATE_OFFSET_FROM_BOTTOM_MM,
             },
           },
@@ -917,7 +940,7 @@ describe('advanced settings: volume, mix, pre-wet tip, tip touch, tip position',
         // touch tip (disp #2)
         touchTipHelper('B2', { labwareId: DEST_LABWARE }),
         // blowout
-        blowoutSingleToTrash,
+        ...blowoutSingleToTrash,
       ])
     })
     it('should create commands in the expected order with expected params (blowout in trash, reuse tip)', () => {
@@ -964,7 +987,7 @@ describe('advanced settings: volume, mix, pre-wet tip, tip touch, tip position',
         // touch tip (disp #2)
         touchTipHelper('A3', { labwareId: DEST_LABWARE }),
         // blowout into trash since we are not changing tip
-        blowoutSingleToTrash,
+        ...blowoutSingleToTrash,
         // next chunk from A1: remaining volume
         // mix (asp)
         ...mixCommandsWithDelay,
@@ -990,12 +1013,12 @@ describe('advanced settings: volume, mix, pre-wet tip, tip touch, tip position',
         ...delayWithOffset('A4', DEST_LABWARE),
         // touch tip (disp #3)
         touchTipHelper('A4', { labwareId: DEST_LABWARE }),
-        blowoutSingleToTrash,
+        ...blowoutSingleToTrash,
         // use the dispense > air gap here before moving to trash
         airGapHelper('A4', 3, { labwareId: DEST_LABWARE }),
         delayCommand(11),
         // since we used dispense > air gap, drop the tip
-        dropTipHelper('A1'),
+        ...dropTipHelper(),
       ])
     })
     it('should create commands in the expected order with expected params (blowout in trash, change tip each aspirate)', () => {
@@ -1012,7 +1035,7 @@ describe('advanced settings: volume, mix, pre-wet tip, tip touch, tip position',
       const res = getSuccessResult(result)
       expect(res.commands).toEqual([
         // replace tip since change tip is always
-        dropTipHelper('A1'),
+        ...dropTipHelper(),
         pickUpTipHelper('A1'),
         // mix (asp)
         ...mixCommandsWithDelay,
@@ -1043,12 +1066,12 @@ describe('advanced settings: volume, mix, pre-wet tip, tip touch, tip position',
         ...delayWithOffset('A3', DEST_LABWARE),
         // touch tip (disp #2)
         touchTipHelper('A3', { labwareId: DEST_LABWARE }),
-        blowoutSingleToTrash,
+        ...blowoutSingleToTrash,
         // dispense > air gap since we are about to change the tip
         airGapHelper('A3', 3, { labwareId: DEST_LABWARE }), // need to air gap here
         delayCommand(11),
         // since we used dispense > air gap, drop the tip
-        dropTipHelper('A1'),
+        ...dropTipHelper(),
         // next chunk from A1: remaining volume
         pickUpTipHelper('B1'),
         // mix (asp)
@@ -1075,13 +1098,13 @@ describe('advanced settings: volume, mix, pre-wet tip, tip touch, tip position',
         ...delayWithOffset('A4', DEST_LABWARE),
         // touch tip (disp #3)
         touchTipHelper('A4', { labwareId: DEST_LABWARE }),
-        blowoutSingleToTrash,
+        ...blowoutSingleToTrash,
         // use the dispense > air gap here before moving to trash
         airGapHelper('A4', 3, { labwareId: DEST_LABWARE }),
         delayCommand(11),
         // since we used dispense > air gap, drop the tip
         // skip blowout into trash b/c we're about to drop tip anyway
-        dropTipHelper('A1'),
+        ...dropTipHelper(),
       ])
     })
     it('should create commands in the expected order with expected params (blowout in trash, change tip once)', () => {
@@ -1098,7 +1121,7 @@ describe('advanced settings: volume, mix, pre-wet tip, tip touch, tip position',
       const res = getSuccessResult(result)
       expect(res.commands).toEqual([
         // replace tip at the beginning of the step
-        dropTipHelper('A1'),
+        ...dropTipHelper(),
         pickUpTipHelper('A1'),
         // mix (asp)
         ...mixCommandsWithDelay,
@@ -1129,7 +1152,7 @@ describe('advanced settings: volume, mix, pre-wet tip, tip touch, tip position',
         ...delayWithOffset('A3', DEST_LABWARE),
         // touch tip (disp #2)
         touchTipHelper('A3', { labwareId: DEST_LABWARE }),
-        blowoutSingleToTrash,
+        ...blowoutSingleToTrash,
         // skip dispense > air gap since we are reusing the tip
         // mix (asp)
         ...mixCommandsWithDelay,
@@ -1155,12 +1178,12 @@ describe('advanced settings: volume, mix, pre-wet tip, tip touch, tip position',
         ...delayWithOffset('A4', DEST_LABWARE),
         // touch tip (disp #3)
         touchTipHelper('A4', { labwareId: DEST_LABWARE }),
-        blowoutSingleToTrash,
+        ...blowoutSingleToTrash,
         // use the dispense > air gap here before moving to trash
         airGapHelper('A4', 3, { labwareId: DEST_LABWARE }),
         delayCommand(11),
         // since we used dispense > air gap, drop the tip
-        dropTipHelper('A1'),
+        ...dropTipHelper(),
       ])
     })
     it('should create commands in the expected order with expected params (blowout in source, reuse tip)', () => {
@@ -1240,7 +1263,7 @@ describe('advanced settings: volume, mix, pre-wet tip, tip touch, tip position',
         airGapHelper('A1', 3),
         delayCommand(11),
         // since we used dispense > air gap, drop the tip
-        dropTipHelper('A1'),
+        ...dropTipHelper(),
       ])
     })
     it('should create commands in the expected order with expected params (blowout in source, change tip each aspirate)', () => {
@@ -1257,7 +1280,7 @@ describe('advanced settings: volume, mix, pre-wet tip, tip touch, tip position',
       const res = getSuccessResult(result)
       expect(res.commands).toEqual([
         // replace tip
-        dropTipHelper('A1'),
+        ...dropTipHelper(),
         pickUpTipHelper('A1'),
         // mix (asp)
         ...mixCommandsWithDelay,
@@ -1295,7 +1318,7 @@ describe('advanced settings: volume, mix, pre-wet tip, tip touch, tip position',
         // delay after aspirating air
         delayCommand(11),
         // just drop the tip in the trash
-        dropTipHelper('A1'),
+        ...dropTipHelper(),
         // next chunk from A1: remaining volume
         pickUpTipHelper('B1'),
         // mix (asp)
@@ -1328,7 +1351,7 @@ describe('advanced settings: volume, mix, pre-wet tip, tip touch, tip position',
         airGapHelper('A1', 3),
         delayCommand(11),
         // since we used dispense > air gap, drop the tip
-        dropTipHelper('A1'),
+        ...dropTipHelper(),
       ])
     })
     it('should create commands in the expected order with expected params (blowout in source, change tip once)', () => {
@@ -1345,7 +1368,7 @@ describe('advanced settings: volume, mix, pre-wet tip, tip touch, tip position',
       const res = getSuccessResult(result)
       expect(res.commands).toEqual([
         // replace tip
-        dropTipHelper('A1'),
+        ...dropTipHelper(),
         pickUpTipHelper('A1'),
         // mix (asp)
         ...mixCommandsWithDelay,
@@ -1409,7 +1432,7 @@ describe('advanced settings: volume, mix, pre-wet tip, tip touch, tip position',
         airGapHelper('A1', 3),
         delayCommand(11),
         // since we used dispense > air gap, drop the tip
-        dropTipHelper('A1'),
+        ...dropTipHelper(),
       ])
     })
     it('should create commands in the expected order with expected params (blowout in dest, reuse tip)', () => {
@@ -1489,7 +1512,7 @@ describe('advanced settings: volume, mix, pre-wet tip, tip touch, tip position',
         airGapHelper('A4', 3, { labwareId: DEST_LABWARE }),
         delayCommand(11),
         // since we used dispense > air gap, drop the tip
-        dropTipHelper('A1'),
+        ...dropTipHelper(),
       ])
     })
     it('should create commands in the expected order with expected params (blowout in dest, change tip each aspirate)', () => {
@@ -1506,7 +1529,7 @@ describe('advanced settings: volume, mix, pre-wet tip, tip touch, tip position',
       const res = getSuccessResult(result)
       expect(res.commands).toEqual([
         // replace tip
-        dropTipHelper('A1'),
+        ...dropTipHelper(),
         pickUpTipHelper('A1'),
         // mix (asp)
         ...mixCommandsWithDelay,
@@ -1544,7 +1567,7 @@ describe('advanced settings: volume, mix, pre-wet tip, tip touch, tip position',
         // dispense delay
         delayCommand(11),
         // just drop the tip in the trash
-        dropTipHelper('A1'),
+        ...dropTipHelper(),
         // next chunk from A1: remaining volume
         pickUpTipHelper('B1'),
         // mix (asp)
@@ -1577,7 +1600,7 @@ describe('advanced settings: volume, mix, pre-wet tip, tip touch, tip position',
         airGapHelper('A4', 3, { labwareId: DEST_LABWARE }),
         delayCommand(11),
         // since we used dispense > air gap, drop the tip
-        dropTipHelper('A1'),
+        ...dropTipHelper(),
       ])
     })
     it('should create commands in the expected order with expected params (blowout in dest, change tip once)', () => {
@@ -1594,7 +1617,7 @@ describe('advanced settings: volume, mix, pre-wet tip, tip touch, tip position',
       const res = getSuccessResult(result)
       expect(res.commands).toEqual([
         // replace tip
-        dropTipHelper('A1'),
+        ...dropTipHelper(),
         pickUpTipHelper('A1'),
         // mix (asp)
         ...mixCommandsWithDelay,
@@ -1659,7 +1682,7 @@ describe('advanced settings: volume, mix, pre-wet tip, tip touch, tip position',
         airGapHelper('A4', 3, { labwareId: DEST_LABWARE }),
         delayCommand(11),
         // since we used dispense > air gap, drop the tip
-        dropTipHelper('A1'),
+        ...dropTipHelper(),
       ])
     })
   })

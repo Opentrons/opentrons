@@ -24,15 +24,10 @@ import {
   GRIPPER_V1_2,
   EXTENSION,
   MAGNETIC_BLOCK_V1,
-  STAGING_AREA_LOAD_NAME,
-  STANDARD_SLOT_LOAD_NAME,
-  TRASH_BIN_LOAD_NAME,
-  WASTE_CHUTE_LOAD_NAME,
 } from './constants'
-import type { INode } from 'svgson'
 import type { RunTimeCommand, LabwareLocation } from '../command/types'
-import type { PipetteName } from './pipettes'
 import type { AddressableAreaName, CutoutFixtureId, CutoutId } from '../deck'
+import type { PipetteName } from './pipettes'
 
 export type RobotType = 'OT-2 Standard' | 'OT-3 Standard'
 
@@ -133,16 +128,19 @@ export interface LabwareBrand {
   links?: string[]
 }
 
+export interface CircularWellShapeProperties {
+  shape: 'circular'
+  diameter: number
+}
+export interface RectangularWellShapeProperties {
+  shape: 'rectangular'
+  xDimension: number
+  yDimension: number
+}
+
 export type LabwareWellShapeProperties =
-  | {
-      shape: 'circular'
-      diameter: number
-    }
-  | {
-      shape: 'rectangular'
-      xDimension: number
-      yDimension: number
-    }
+  | CircularWellShapeProperties
+  | RectangularWellShapeProperties
 
 // well without x,y,z
 export type LabwareWellProperties = LabwareWellShapeProperties & {
@@ -190,6 +188,13 @@ export interface LabwareDefinition2 {
   allowedRoles?: LabwareRoles[]
 }
 
+export interface LabwareDefByDefURI {
+  [defUri: string]: LabwareDefinition2
+}
+export interface LegacyLabwareDefByName {
+  [name: string]: LabwareDefinition1
+}
+
 export type ModuleType =
   | typeof MAGNETIC_MODULE_TYPE
   | typeof TEMPERATURE_MODULE_TYPE
@@ -232,18 +237,6 @@ export type ModuleModelWithLegacy =
   | typeof MAGDECK
   | typeof TEMPDECK
 
-export type FixtureLoadName =
-  | typeof STAGING_AREA_LOAD_NAME
-  | typeof STANDARD_SLOT_LOAD_NAME
-  | typeof TRASH_BIN_LOAD_NAME
-  | typeof WASTE_CHUTE_LOAD_NAME
-
-export interface DeckOffset {
-  x: number
-  y: number
-  z: number
-}
-
 export interface Dimensions {
   xDimension: number
   yDimension: number
@@ -252,13 +245,6 @@ export interface Dimensions {
 
 export interface DeckRobot {
   model: RobotType
-}
-
-export interface DeckFixture {
-  id: string
-  slot: string
-  labware: string
-  displayName: string
 }
 
 export type CoordinateTuple = [number, number, number]
@@ -284,28 +270,37 @@ export interface DeckCalibrationPoint {
   displayName: string
 }
 
+export type CutoutFixtureGroup = {
+  [cutoutId in CutoutId]?: Array<{ [cutoutId in CutoutId]?: CutoutFixtureId }>
+}
+
 export interface CutoutFixture {
   id: CutoutFixtureId
   mayMountTo: CutoutId[]
   displayName: string
   providesAddressableAreas: Record<CutoutId, AddressableAreaName[]>
+  expectOpentronsModuleSerialNumber: boolean
+  fixtureGroup: CutoutFixtureGroup
+  height: number
 }
+
+type AreaType =
+  | 'slot'
+  | 'movableTrash'
+  | 'wasteChute'
+  | 'fixedTrash'
+  | 'stagingSlot'
 
 export interface AddressableArea {
   id: AddressableAreaName
-  areaType: 'slot' | 'movableTrash' | 'fixedTrash' | 'wasteChute'
-  matingSurfaceUnitVector: UnitVectorTuple
-  offsetFromCutoutFixture: UnitVectorTuple
+  areaType: AreaType
+  offsetFromCutoutFixture: CoordinateTuple
   boundingBox: Dimensions
   displayName: string
   compatibleModuleTypes: ModuleType[]
-}
-
-export interface DeckLocations {
-  orderedSlots: DeckSlot[]
-  calibrationPoints: DeckCalibrationPoint[]
-  fixtures: DeckFixture[]
-  addressableAreas: AddressableArea[]
+  ableToDropLabware?: boolean
+  ableToDropTips?: boolean
+  matingSurfaceUnitVector?: UnitVectorTuple
 }
 
 export interface DeckMetadata {
@@ -313,15 +308,34 @@ export interface DeckMetadata {
   tags: string[]
 }
 
+export interface DeckCutout {
+  id: CutoutId
+  position: CoordinateTuple
+  displayName: string
+}
+
+export interface LegacyFixture {
+  id: string
+  slot: string
+  labware: string
+  displayName: string
+}
+
+export interface DeckLocations {
+  addressableAreas: AddressableArea[]
+  calibrationPoints: DeckCalibrationPoint[]
+  cutouts: DeckCutout[]
+  legacyFixtures: LegacyFixture[]
+}
+
 export interface DeckDefinition {
   otId: string
   cornerOffsetFromOrigin: CoordinateTuple
   dimensions: CoordinateTuple
   robot: DeckRobot
-  cutoutFixtures: CutoutFixture[]
   locations: DeckLocations
   metadata: DeckMetadata
-  layers: INode[]
+  cutoutFixtures: CutoutFixture[]
 }
 
 export interface ModuleDimensions {
@@ -359,7 +373,7 @@ export interface ModuleDefinition {
   quirks: string[]
   slotTransforms: SlotTransforms
   compatibleWith: ModuleModel[]
-  twoDimensionalRendering: INode
+  twoDimensionalRendering: any // deprecated SVGson INode use Module SVG Components instead
 }
 
 export type AffineTransformMatrix = number[][]
@@ -384,6 +398,122 @@ export interface FlowRateSpec {
   value: number
   min: number
   max: number
+}
+
+export interface PipetteV2GeneralSpecs {
+  displayName: string
+  model: string
+  displayCategory: PipetteDisplayCategory
+  pickUpTipConfigurations: {
+    pressFit: {
+      speedByTipCount: Record<string, number>
+      presses: number
+      increment: number
+      distanceByTipCount: Record<string, number>
+      currentByTipCount: Record<string, number>
+    }
+  }
+  dropTipConfigurations: {
+    plungerEject: {
+      current: number
+      speed: number
+    }
+  }
+  plungerMotorConfigurations: {
+    idle: number
+    run: number
+  }
+  plungerPositionsConfigurations: {
+    default: {
+      top: number
+      bottom: number
+      blowout: number
+      drop: number
+    }
+  }
+  availableSensors: {
+    sensors: string[]
+    capacitive?: { count: number }
+    environment?: { count: number }
+    pressure?: { count: number }
+  }
+  partialTipConfigurations: {
+    partialTipSupported: boolean
+    availableConfigurations: number[] | null
+  }
+  channels: PipetteChannels
+  shaftDiameter: number
+  shaftULperMM: number
+  backCompatNames: string[]
+  backlashDistance: number
+  quirks: string[]
+  plungerHomingConfigurations: {
+    current: number
+    speed: number
+  }
+}
+
+interface NozzleInfo {
+  key: string
+  orderedNozzles: string[]
+}
+export interface PipetteV2GeometrySpecs {
+  nozzleOffset: number[]
+  pipetteBoundingBoxOffsets: {
+    backLeftCorner: number[]
+    frontRightCorner: number[]
+  }
+  pathTo3D: string
+  orderedRows: Record<number, NozzleInfo>
+  orderedColumns: Record<number, NozzleInfo>
+  nozzleMap: Record<string, number[]>
+}
+
+export interface SupportedTip {
+  aspirate: {
+    default: Record<string, number[][]>
+  }
+  defaultAspirateFlowRate: {
+    default: number
+    valuesByApiLevel: Record<string, number>
+  }
+  defaultBlowOutFlowRate: {
+    default: number
+    valuesByApiLevel: Record<string, number>
+  }
+  defaultDispenseFlowRate: {
+    default: number
+    valuesByApiLevel: Record<string, number>
+  }
+  defaultPushOutVolume: number
+  defaultTipLength: number
+  dispense: {
+    default: Record<string, number[][]>
+  }
+  defaultReturnTipHeight?: number
+  defaultFlowAcceleration?: number
+  uiMaxFlowRate?: number
+}
+
+export interface SupportedTips {
+  [tipType: string]: SupportedTip
+}
+
+export interface PipetteV2LiquidSpecs {
+  $otSharedSchema: string
+  supportedTips: SupportedTips
+  defaultTipOverlapDictionary: Record<string, number>
+  maxVolume: number
+  minVolume: number
+  defaultTipracks: string[]
+}
+
+export type GenericAndGeometrySpecs = PipetteV2GeneralSpecs &
+  PipetteV2GeometrySpecs
+
+export interface PipetteV2Specs extends GenericAndGeometrySpecs {
+  $otSharedSchema: string
+  liquids: Record<string, PipetteV2LiquidSpecs>
 }
 
 export interface PipetteNameSpecs {
@@ -467,6 +597,50 @@ export interface AnalysisError {
   createdAt: string
 }
 
+export interface NumberParameter extends BaseRunTimeParameter {
+  type: NumberParameterType
+  min: number
+  max: number
+  default: number
+}
+
+export interface Choice {
+  displayName: string
+  value: number | boolean | string
+}
+
+interface ChoiceParameter extends BaseRunTimeParameter {
+  type: RunTimeParameterType
+  choices: Choice[]
+  default: number | boolean | string
+}
+
+interface BooleanParameter extends BaseRunTimeParameter {
+  type: BooleanParameterType
+  default: boolean
+}
+
+type NumberParameterType = 'int' | 'float'
+type BooleanParameterType = 'bool'
+type StringParameterType = 'str'
+type RunTimeParameterType =
+  | NumberParameter
+  | BooleanParameterType
+  | StringParameterType
+
+interface BaseRunTimeParameter {
+  displayName: string
+  variableName: string
+  description: string
+  value: number | boolean | string
+  suffix?: string
+}
+
+export type RunTimeParameter =
+  | BooleanParameter
+  | ChoiceParameter
+  | NumberParameter
+
 // TODO(BC, 10/25/2023): this type (and others in this file) probably belong in api-client, not here
 export interface CompletedProtocolAnalysis {
   id: string
@@ -478,6 +652,8 @@ export interface CompletedProtocolAnalysis {
   liquids: Liquid[]
   commands: RunTimeCommand[]
   errors: AnalysisError[]
+  robotType?: RobotType | null
+  runTimeParameters?: RunTimeParameter[]
 }
 
 export interface ResourceFile {
@@ -538,6 +714,7 @@ export interface GripperDefinition {
     pinOneOffsetFromBase: [number, number, number]
     pinTwoOffsetFromBase: [number, number, number]
     jawWidth: { min: number; max: number }
+    maxAllowedGripError: number
   }
 }
 
@@ -550,25 +727,10 @@ export type StatusBarAnimation =
 
 export type StatusBarAnimations = StatusBarAnimation[]
 
-// TODO(bh, 2023-09-28): refine types when settled
-export type Cutout =
-  | 'A1'
-  | 'B1'
-  | 'C1'
-  | 'D1'
-  | 'A2'
-  | 'B2'
-  | 'C2'
-  | 'D2'
-  | 'A3'
-  | 'B3'
-  | 'C3'
-  | 'D3'
-
-export interface Fixture {
-  fixtureId: string
-  fixtureLocation: Cutout
-  loadName: FixtureLoadName
+export interface CutoutConfig {
+  cutoutId: CutoutId
+  cutoutFixtureId: CutoutFixtureId
+  opentronsModuleSerialNumber?: string
 }
 
-export type DeckConfiguration = Fixture[]
+export type DeckConfiguration = CutoutConfig[]

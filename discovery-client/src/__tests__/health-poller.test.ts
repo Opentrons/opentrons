@@ -1,16 +1,15 @@
 import nodeFetch from 'node-fetch'
 import isError from 'lodash/isError'
+import { describe, it, vi, expect, beforeEach, afterEach } from 'vitest'
 
-import * as Fixtures from '../__fixtures__'
+import * as Fixtures from '../fixtures'
 import { createHealthPoller } from '../health-poller'
 
 import type { RequestInit, Response } from 'node-fetch'
 import type { HealthPoller } from '../types'
 
 // TODO(mc, 2020-07-13): remove __mocks__/node-fetch
-jest.mock('node-fetch', () => ({ __esModule: true, default: jest.fn() }))
-
-const fetch = nodeFetch as jest.MockedFunction<typeof nodeFetch>
+vi.mock('node-fetch')
 
 const EXPECTED_FETCH_OPTS = {
   timeout: 10000,
@@ -21,7 +20,7 @@ const stubFetchOnce = (
   stubUrl: string,
   stubOptions: RequestInit = EXPECTED_FETCH_OPTS
 ) => (response: Partial<Response> | Error) => {
-  fetch.mockImplementationOnce((url, options) => {
+  vi.mocked(nodeFetch).mockImplementationOnce((url, options) => {
     expect(url).toBe(stubUrl)
     expect(options).toEqual(stubOptions)
 
@@ -52,21 +51,21 @@ const ISE_RESPONSE: Response = {
 const flush = (): Promise<void> => new Promise(resolve => setImmediate(resolve))
 
 describe('health poller', () => {
-  const onPollResult = jest.fn()
+  const onPollResult = vi.fn()
   let poller: HealthPoller
 
   beforeEach(() => {
-    jest.useFakeTimers()
-    fetch.mockResolvedValue(ISE_RESPONSE)
+    vi.useFakeTimers({ shouldAdvanceTime: true })
+    vi.mocked(nodeFetch).mockResolvedValue(ISE_RESPONSE)
 
     poller = createHealthPoller({ onPollResult })
   })
 
   afterEach(() => {
     return flush().then(() => {
-      jest.clearAllTimers()
-      jest.useRealTimers()
-      jest.resetAllMocks()
+      vi.clearAllTimers()
+      vi.useRealTimers()
+      vi.resetAllMocks()
     })
   })
 
@@ -87,25 +86,29 @@ describe('health poller', () => {
     ]
 
     poller.start({ list: [HOST_1, HOST_2, HOST_3], interval: 1000 })
-    jest.advanceTimersByTime(2000)
-    expect(fetch).toHaveBeenCalledTimes(expectedFetches.length)
+    vi.advanceTimersByTime(2000)
+    expect(nodeFetch).toHaveBeenCalledTimes(expectedFetches.length)
     expectedFetches.forEach((url, idx) => {
-      expect(fetch).toHaveBeenNthCalledWith(idx + 1, url, EXPECTED_FETCH_OPTS)
+      expect(nodeFetch).toHaveBeenNthCalledWith(
+        idx + 1,
+        url,
+        EXPECTED_FETCH_OPTS
+      )
     })
   })
 
   it('should be able to stop polling', () => {
     poller.start({ list: [HOST_1, HOST_2, HOST_3], interval: 1000 })
     poller.stop()
-    jest.advanceTimersByTime(2000)
-    expect(fetch).toHaveBeenCalledTimes(0)
+    vi.advanceTimersByTime(2000)
+    expect(nodeFetch).toHaveBeenCalledTimes(0)
   })
 
   it('should be able to restart with a new list', () => {
     poller.start({ list: [HOST_1, HOST_2], interval: 1000 })
-    jest.advanceTimersByTime(1000)
+    vi.advanceTimersByTime(1000)
     poller.start({ list: [HOST_1, HOST_3] })
-    jest.advanceTimersByTime(1000)
+    vi.advanceTimersByTime(1000)
 
     const expectedFetches = [
       // round 1: poll HOST_1 and HOST_2
@@ -120,9 +123,13 @@ describe('health poller', () => {
       'http://127.0.0.3:31950/server/update/health',
     ]
 
-    expect(fetch).toHaveBeenCalledTimes(expectedFetches.length)
+    expect(nodeFetch).toHaveBeenCalledTimes(expectedFetches.length)
     expectedFetches.forEach((url, idx) => {
-      expect(fetch).toHaveBeenNthCalledWith(idx + 1, url, EXPECTED_FETCH_OPTS)
+      expect(nodeFetch).toHaveBeenNthCalledWith(
+        idx + 1,
+        url,
+        EXPECTED_FETCH_OPTS
+      )
     })
   })
 
@@ -142,33 +149,41 @@ describe('health poller', () => {
 
     // round 1
     poller.start({ list: [HOST_1, HOST_2], interval: 1000 })
-    jest.advanceTimersByTime(1000)
-    expect(fetch).toHaveBeenCalledTimes(4)
+    vi.advanceTimersByTime(1000)
+    expect(nodeFetch).toHaveBeenCalledTimes(4)
     expectedFetches.slice(0, 4).forEach((url, idx) => {
-      expect(fetch).toHaveBeenNthCalledWith(idx + 1, url, EXPECTED_FETCH_OPTS)
+      expect(nodeFetch).toHaveBeenNthCalledWith(
+        idx + 1,
+        url,
+        EXPECTED_FETCH_OPTS
+      )
     })
 
     // round 2
-    fetch.mockClear()
+    vi.mocked(nodeFetch).mockClear()
     poller.start({ list: [HOST_1, HOST_3], interval: 4000 })
     // advance timer by old interval, ensure no fetches went out
     // 4000 should be high enough to avoid any requests going out from the
     // poller spreading requests out over the interval
-    jest.advanceTimersByTime(1000)
-    expect(fetch).toHaveBeenCalledTimes(0)
+    vi.advanceTimersByTime(1000)
+    expect(nodeFetch).toHaveBeenCalledTimes(0)
     // then advance timer enough to hit 4000 total time elapsed
-    jest.advanceTimersByTime(3000)
-    expect(fetch).toHaveBeenCalledTimes(4)
+    vi.advanceTimersByTime(3000)
+    expect(nodeFetch).toHaveBeenCalledTimes(4)
     expectedFetches.slice(4, 8).forEach((url, idx) => {
-      expect(fetch).toHaveBeenNthCalledWith(idx + 1, url, EXPECTED_FETCH_OPTS)
+      expect(nodeFetch).toHaveBeenNthCalledWith(
+        idx + 1,
+        url,
+        EXPECTED_FETCH_OPTS
+      )
     })
   })
 
   it('should not lose queue order on restart with same list contents', () => {
     poller.start({ list: [HOST_1, HOST_2], interval: 1000 })
-    jest.advanceTimersByTime(500)
+    vi.advanceTimersByTime(500)
     poller.start({ list: [HOST_1, HOST_2] })
-    jest.advanceTimersByTime(500)
+    vi.advanceTimersByTime(500)
 
     const expectedFetches = [
       // round 1: poll HOST_1
@@ -179,9 +194,13 @@ describe('health poller', () => {
       'http://127.0.0.2:31950/server/update/health',
     ]
 
-    expect(fetch).toHaveBeenCalledTimes(expectedFetches.length)
+    expect(nodeFetch).toHaveBeenCalledTimes(expectedFetches.length)
     expectedFetches.forEach((url, idx) => {
-      expect(fetch).toHaveBeenNthCalledWith(idx + 1, url, EXPECTED_FETCH_OPTS)
+      expect(nodeFetch).toHaveBeenNthCalledWith(
+        idx + 1,
+        url,
+        EXPECTED_FETCH_OPTS
+      )
     })
   })
 
@@ -195,7 +214,7 @@ describe('health poller', () => {
 
     poller.start({ list: [HOST_1], interval: 1000 })
 
-    jest.advanceTimersByTime(1000)
+    vi.advanceTimersByTime(1000)
 
     return flush().then(() => {
       expect(onPollResult).toHaveBeenCalledWith({
@@ -218,7 +237,7 @@ describe('health poller', () => {
     )
 
     poller.start({ list: [HOST_1], interval: 1000 })
-    jest.advanceTimersByTime(1000)
+    vi.advanceTimersByTime(1000)
 
     return flush().then(() => {
       expect(onPollResult).toHaveBeenCalledWith({
@@ -245,7 +264,7 @@ describe('health poller', () => {
     })
 
     poller.start({ list: [HOST_1], interval: 1000 })
-    jest.advanceTimersByTime(1000)
+    vi.advanceTimersByTime(1000)
 
     return flush().then(() => {
       expect(onPollResult).toHaveBeenCalledWith({
@@ -266,7 +285,7 @@ describe('health poller', () => {
     )
 
     poller.start({ list: [HOST_1], interval: 1000 })
-    jest.advanceTimersByTime(1000)
+    vi.advanceTimersByTime(1000)
 
     return flush().then(() => {
       expect(onPollResult).toHaveBeenCalledWith({
@@ -293,31 +312,47 @@ describe('health poller', () => {
     ]
 
     poller.start({ list: [HOST_1, HOST_2, HOST_3], interval: 300 })
-    jest.advanceTimersByTime(100)
-    expect(fetch).toHaveBeenCalledTimes(2)
+    vi.advanceTimersByTime(100)
+    expect(nodeFetch).toHaveBeenCalledTimes(2)
     expectedFetches.slice(0, 2).forEach((url, idx) => {
-      expect(fetch).toHaveBeenNthCalledWith(idx + 1, url, EXPECTED_FETCH_OPTS)
+      expect(nodeFetch).toHaveBeenNthCalledWith(
+        idx + 1,
+        url,
+        EXPECTED_FETCH_OPTS
+      )
     })
 
-    fetch.mockClear()
-    jest.advanceTimersByTime(100)
-    expect(fetch).toHaveBeenCalledTimes(2)
+    vi.mocked(nodeFetch).mockClear()
+    vi.advanceTimersByTime(100)
+    expect(nodeFetch).toHaveBeenCalledTimes(2)
     expectedFetches.slice(2, 4).forEach((url, idx) => {
-      expect(fetch).toHaveBeenNthCalledWith(idx + 1, url, EXPECTED_FETCH_OPTS)
+      expect(nodeFetch).toHaveBeenNthCalledWith(
+        idx + 1,
+        url,
+        EXPECTED_FETCH_OPTS
+      )
     })
 
-    fetch.mockClear()
-    jest.advanceTimersByTime(100)
-    expect(fetch).toHaveBeenCalledTimes(2)
+    vi.mocked(nodeFetch).mockClear()
+    vi.advanceTimersByTime(100)
+    expect(nodeFetch).toHaveBeenCalledTimes(2)
     expectedFetches.slice(4, 6).forEach((url, idx) => {
-      expect(fetch).toHaveBeenNthCalledWith(idx + 1, url, EXPECTED_FETCH_OPTS)
+      expect(nodeFetch).toHaveBeenNthCalledWith(
+        idx + 1,
+        url,
+        EXPECTED_FETCH_OPTS
+      )
     })
 
-    fetch.mockClear()
-    jest.advanceTimersByTime(100)
-    expect(fetch).toHaveBeenCalledTimes(2)
+    vi.mocked(nodeFetch).mockClear()
+    vi.advanceTimersByTime(100)
+    expect(nodeFetch).toHaveBeenCalledTimes(2)
     expectedFetches.slice(6, 8).forEach((url, idx) => {
-      expect(fetch).toHaveBeenNthCalledWith(idx + 1, url, EXPECTED_FETCH_OPTS)
+      expect(nodeFetch).toHaveBeenNthCalledWith(
+        idx + 1,
+        url,
+        EXPECTED_FETCH_OPTS
+      )
     })
   })
 
@@ -372,13 +407,13 @@ describe('health poller', () => {
       })
     }
 
-    fetch.mockImplementationOnce(mockErrorImpl)
-    fetch.mockImplementationOnce(mockErrorImpl)
+    vi.mocked(nodeFetch).mockImplementationOnce(mockErrorImpl)
+    vi.mocked(nodeFetch).mockImplementationOnce(mockErrorImpl)
 
     poller.start({ list: [HOST_1], interval: 50 })
-    jest.advanceTimersByTime(50)
+    vi.advanceTimersByTime(50)
     poller.stop()
-    jest.advanceTimersByTime(50)
+    vi.advanceTimersByTime(50)
 
     return flush().then(() => {
       expect(onPollResult).toHaveBeenCalledTimes(0)
@@ -396,9 +431,13 @@ describe('health poller', () => {
       interval: 1000,
     })
 
-    jest.advanceTimersByTime(1000)
+    vi.advanceTimersByTime(1000)
     expectedFetches.forEach((url, idx) => {
-      expect(fetch).toHaveBeenNthCalledWith(idx + 1, url, EXPECTED_FETCH_OPTS)
+      expect(nodeFetch).toHaveBeenNthCalledWith(
+        idx + 1,
+        url,
+        EXPECTED_FETCH_OPTS
+      )
     })
   })
 })

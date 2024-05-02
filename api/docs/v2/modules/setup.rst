@@ -22,16 +22,16 @@ Use :py:meth:`.ProtocolContext.load_module` to load a module.
 
             from opentrons import protocol_api
 
-            requirements = {'robotType': 'Flex', 'apiLevel': '|apiLevel|'}
+            requirements = {"robotType": "Flex", "apiLevel": "|apiLevel|"}
 
             def run(protocol: protocol_api.ProtocolContext): 
                 # Load a Heater-Shaker Module GEN1 in deck slot D1.
                 heater_shaker = protocol.load_module(
-                  module_name='heaterShakerModuleV1', location='D1')
+                  module_name="heaterShakerModuleV1", location="D1")
          
                 # Load a Temperature Module GEN2 in deck slot D3.
                 temperature_module = protocol.load_module(
-                  module_name='temperature module gen2', location='D3')
+                  module_name="temperature module gen2", location="D3")
 
         After the ``load_module()`` method loads the modules into your protocol, it returns the :py:class:`~opentrons.protocol_api.HeaterShakerContext` and :py:class:`~opentrons.protocol_api.TemperatureModuleContext` objects.
         
@@ -42,16 +42,16 @@ Use :py:meth:`.ProtocolContext.load_module` to load a module.
 
             from opentrons import protocol_api
             
-            metadata = {'apiLevel': '2.14'}
+            metadata = {"apiLevel": "|apiLevel|"}
             
             def run(protocol: protocol_api.ProtocolContext): 
                 # Load a Magnetic Module GEN2 in deck slot 1.
                 magnetic_module = protocol.load_module(
-                  module_name='magnetic module gen2', location=1)
+                  module_name="magnetic module gen2", location=1)
          
                 # Load a Temperature Module GEN1 in deck slot 3.
                 temperature_module = protocol.load_module(
-                  module_name='temperature module', location=3)
+                  module_name="temperature module", location=3)
 
         After the ``load_module()`` method loads the modules into your protocol, it returns the :py:class:`~opentrons.protocol_api.MagneticModuleContext` and :py:class:`~opentrons.protocol_api.TemperatureModuleContext` objects.
 

@@ -1,7 +1,8 @@
 import * as React from 'react'
 import { Provider } from 'react-redux'
 import { createStore } from 'redux'
-import { renderHook } from '@testing-library/react-hooks'
+import { vi, it, describe, expect, beforeEach, afterEach } from 'vitest'
+import { renderHook } from '@testing-library/react'
 import { i18n } from '../../../i18n'
 import { I18nextProvider } from 'react-i18next'
 import { getAllDefs } from '../helpers/getAllDefs'
@@ -22,35 +23,24 @@ import type { Store } from 'redux'
 import type { State } from '../../../redux/types'
 import { FailedLabwareFile } from '../../../redux/custom-labware/types'
 
-jest.mock('../../../redux/custom-labware')
-jest.mock('../helpers/getAllDefs')
-
-const mockGetValidCustomLabware = getValidCustomLabware as jest.MockedFunction<
-  typeof getValidCustomLabware
->
-const mockGetAllAllDefs = getAllDefs as jest.MockedFunction<typeof getAllDefs>
-const mockGetAddLabwareFailure = getAddLabwareFailure as jest.MockedFunction<
-  typeof getAddLabwareFailure
->
-const mockGetAddNewLabwareName = getAddNewLabwareName as jest.MockedFunction<
-  typeof getAddNewLabwareName
->
+vi.mock('../../../redux/custom-labware')
+vi.mock('../helpers/getAllDefs')
 
 describe('useAllLabware hook', () => {
-  const store: Store<State> = createStore(jest.fn(), {})
+  const store: Store<State> = createStore(vi.fn(), {})
   beforeEach(() => {
-    mockGetAllAllDefs.mockReturnValue([mockDefinition])
-    mockGetValidCustomLabware.mockReturnValue([mockValidLabware])
-    store.dispatch = jest.fn()
+    vi.mocked(getAllDefs).mockReturnValue([mockDefinition])
+    vi.mocked(getValidCustomLabware).mockReturnValue([mockValidLabware])
+    store.dispatch = vi.fn()
   })
   afterEach(() => {
-    jest.restoreAllMocks()
+    vi.restoreAllMocks()
   })
 
   it('should return object with only definition and modified date', () => {
-    const wrapper: React.FunctionComponent<{}> = ({ children }) => (
-      <Provider store={store}>{children}</Provider>
-    )
+    const wrapper: React.FunctionComponent<{ children: React.ReactNode }> = ({
+      children,
+    }) => <Provider store={store}>{children}</Provider>
     const { result } = renderHook(() => useAllLabware('reverse', 'all'), {
       wrapper,
     })
@@ -62,9 +52,9 @@ describe('useAllLabware hook', () => {
     expect(labware2.definition).toBe(mockValidLabware.definition)
   })
   it('should return alphabetically sorted list', () => {
-    const wrapper: React.FunctionComponent<{}> = ({ children }) => (
-      <Provider store={store}>{children}</Provider>
-    )
+    const wrapper: React.FunctionComponent<{ children: React.ReactNode }> = ({
+      children,
+    }) => <Provider store={store}>{children}</Provider>
     const { result } = renderHook(() => useAllLabware('alphabetical', 'all'), {
       wrapper,
     })
@@ -76,9 +66,9 @@ describe('useAllLabware hook', () => {
     expect(labware1.definition).toBe(mockValidLabware.definition)
   })
   it('should return no labware if not the right filter', () => {
-    const wrapper: React.FunctionComponent<{}> = ({ children }) => (
-      <Provider store={store}>{children}</Provider>
-    )
+    const wrapper: React.FunctionComponent<{ children: React.ReactNode }> = ({
+      children,
+    }) => <Provider store={store}>{children}</Provider>
     const { result } = renderHook(() => useAllLabware('reverse', 'reservoir'), {
       wrapper,
     })
@@ -89,9 +79,9 @@ describe('useAllLabware hook', () => {
     expect(labware2).toBe(undefined)
   })
   it('should return labware with wellPlate filter', () => {
-    const wrapper: React.FunctionComponent<{}> = ({ children }) => (
-      <Provider store={store}>{children}</Provider>
-    )
+    const wrapper: React.FunctionComponent<{ children: React.ReactNode }> = ({
+      children,
+    }) => <Provider store={store}>{children}</Provider>
     const { result } = renderHook(() => useAllLabware('reverse', 'wellPlate'), {
       wrapper,
     })
@@ -103,9 +93,9 @@ describe('useAllLabware hook', () => {
     expect(labware2.definition).toBe(mockValidLabware.definition)
   })
   it('should return custom labware with customLabware filter', () => {
-    const wrapper: React.FunctionComponent<{}> = ({ children }) => (
-      <Provider store={store}>{children}</Provider>
-    )
+    const wrapper: React.FunctionComponent<{ children: React.ReactNode }> = ({
+      children,
+    }) => <Provider store={store}>{children}</Provider>
     const { result } = renderHook(
       () => useAllLabware('alphabetical', 'customLabware'),
       {
@@ -121,22 +111,24 @@ describe('useAllLabware hook', () => {
 })
 
 describe('useLabwareFailure hook', () => {
-  const store: Store<State> = createStore(jest.fn(), {})
+  const store: Store<State> = createStore(vi.fn(), {})
   beforeEach(() => {
-    mockGetAddLabwareFailure.mockReturnValue({
+    vi.mocked(getAddLabwareFailure).mockReturnValue({
       file: {
         type: 'INVALID_LABWARE_FILE',
         filename: '123',
       } as FailedLabwareFile,
       errorMessage: null,
     })
-    store.dispatch = jest.fn()
+    store.dispatch = vi.fn()
   })
   afterEach(() => {
-    jest.restoreAllMocks()
+    vi.restoreAllMocks()
   })
   it('should return invalid labware definition', () => {
-    const wrapper: React.FunctionComponent<{}> = ({ children }) => (
+    const wrapper: React.FunctionComponent<{ children: React.ReactNode }> = ({
+      children,
+    }) => (
       <Provider store={store}>
         <I18nextProvider i18n={i18n}>{children}</I18nextProvider>
       </Provider>
@@ -146,7 +138,7 @@ describe('useLabwareFailure hook', () => {
     expect(errorMessage).toBe('Error importing 123. Invalid labware definition')
   })
   it('should return duplicate labware definition', () => {
-    mockGetAddLabwareFailure.mockReturnValue({
+    vi.mocked(getAddLabwareFailure).mockReturnValue({
       file: {
         type: 'DUPLICATE_LABWARE_FILE',
         filename: '123',
@@ -154,7 +146,9 @@ describe('useLabwareFailure hook', () => {
       errorMessage: null,
     })
 
-    const wrapper: React.FunctionComponent<{}> = ({ children }) => (
+    const wrapper: React.FunctionComponent<{ children: React.ReactNode }> = ({
+      children,
+    }) => (
       <Provider store={store}>
         <I18nextProvider i18n={i18n}>{children}</I18nextProvider>
       </Provider>
@@ -167,7 +161,7 @@ describe('useLabwareFailure hook', () => {
     )
   })
   it('should return opentrons labware definition', () => {
-    mockGetAddLabwareFailure.mockReturnValue({
+    vi.mocked(getAddLabwareFailure).mockReturnValue({
       file: {
         type: 'OPENTRONS_LABWARE_FILE',
         filename: '123',
@@ -175,7 +169,9 @@ describe('useLabwareFailure hook', () => {
       errorMessage: null,
     })
 
-    const wrapper: React.FunctionComponent<{}> = ({ children }) => (
+    const wrapper: React.FunctionComponent<{ children: React.ReactNode }> = ({
+      children,
+    }) => (
       <Provider store={store}>
         <I18nextProvider i18n={i18n}>{children}</I18nextProvider>
       </Provider>
@@ -188,12 +184,14 @@ describe('useLabwareFailure hook', () => {
     )
   })
   it('should return unable to upload labware definition', () => {
-    mockGetAddLabwareFailure.mockReturnValue({
+    vi.mocked(getAddLabwareFailure).mockReturnValue({
       file: null,
       errorMessage: 'error',
     })
 
-    const wrapper: React.FunctionComponent<{}> = ({ children }) => (
+    const wrapper: React.FunctionComponent<{ children: React.ReactNode }> = ({
+      children,
+    }) => (
       <Provider store={store}>
         <I18nextProvider i18n={i18n}>{children}</I18nextProvider>
       </Provider>
@@ -206,19 +204,21 @@ describe('useLabwareFailure hook', () => {
 })
 
 describe('useNewLabwareName hook', () => {
-  const store: Store<State> = createStore(jest.fn(), {})
+  const store: Store<State> = createStore(vi.fn(), {})
   beforeEach(() => {
-    mockGetAddNewLabwareName.mockReturnValue({ filename: 'mock_filename' })
-    store.dispatch = jest.fn()
+    vi.mocked(getAddNewLabwareName).mockReturnValue({
+      filename: 'mock_filename',
+    })
+    store.dispatch = vi.fn()
   })
   afterEach(() => {
-    jest.restoreAllMocks()
+    vi.restoreAllMocks()
   })
 
   it('should return filename as a string', () => {
-    const wrapper: React.FunctionComponent<{}> = ({ children }) => (
-      <Provider store={store}>{children}</Provider>
-    )
+    const wrapper: React.FunctionComponent<{ children: React.ReactNode }> = ({
+      children,
+    }) => <Provider store={store}>{children}</Provider>
     const { result } = renderHook(useNewLabwareName, { wrapper })
     const filename = result.current.newLabwareName
     expect(filename).toBe('mock_filename')

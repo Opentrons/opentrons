@@ -1,6 +1,6 @@
 import * as React from 'react'
-
-import { render } from '@testing-library/react'
+import { render, screen } from '@testing-library/react'
+import { describe, expect, it } from 'vitest'
 
 import {
   ProtocolSetupTitleSkeleton,
@@ -9,8 +9,8 @@ import {
 
 describe('ProtocolSetupSkeleton', () => {
   it('renders Skeletons to replace the title section', () => {
-    const { getAllByTestId } = render(<ProtocolSetupTitleSkeleton />)
-    const titleSkeletons = getAllByTestId('Skeleton')
+    render(<ProtocolSetupTitleSkeleton />)
+    const titleSkeletons = screen.getAllByTestId('Skeleton')
     expect(titleSkeletons.length).toBe(2)
 
     titleSkeletons.forEach(titleSkeleton => {
@@ -19,8 +19,8 @@ describe('ProtocolSetupSkeleton', () => {
   })
 
   it('renders Skeletons to replace the SetupStep components', () => {
-    const { getAllByTestId } = render(<ProtocolSetupStepSkeleton />)
-    const titleSkeletons = getAllByTestId('Skeleton')
+    render(<ProtocolSetupStepSkeleton />)
+    const titleSkeletons = screen.getAllByTestId('Skeleton')
     expect(titleSkeletons.length).toBe(5)
 
     titleSkeletons.forEach(titleSkeleton => {

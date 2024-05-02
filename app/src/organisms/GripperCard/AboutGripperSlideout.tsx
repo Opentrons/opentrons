@@ -1,14 +1,14 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import {
-  Flex,
-  DIRECTION_COLUMN,
-  SPACING,
-  PrimaryButton,
-  TYPOGRAPHY,
   COLORS,
+  DIRECTION_COLUMN,
+  Flex,
+  PrimaryButton,
+  SPACING,
+  StyledText,
+  TYPOGRAPHY,
 } from '@opentrons/components'
-import { StyledText } from '../../atoms/text'
 import { Slideout } from '../../atoms/Slideout'
 
 interface AboutGripperSlideoutProps {
@@ -22,11 +22,11 @@ export const AboutGripperSlideout = (
   props: AboutGripperSlideoutProps
 ): JSX.Element | null => {
   const { serialNumber, firmwareVersion, isExpanded, onCloseClick } = props
-  const { i18n, t } = useTranslation(['device_details', 'shared'])
+  const { i18n, t } = useTranslation(['device_details', 'shared', 'branded'])
 
   return (
     <Slideout
-      title={t('about_flex_gripper')}
+      title={t('branded:about_flex_gripper')}
       onCloseClick={onCloseClick}
       isExpanded={isExpanded}
       footer={
@@ -45,7 +45,7 @@ export const AboutGripperSlideout = (
             <StyledText
               as="h6"
               fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-              color={COLORS.darkGreyEnabled}
+              color={COLORS.grey60}
             >
               {i18n.format(t('current_version'), 'upperCase')}
             </StyledText>
@@ -61,7 +61,7 @@ export const AboutGripperSlideout = (
         <StyledText
           as="h6"
           fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-          color={COLORS.darkGreyEnabled}
+          color={COLORS.grey60}
         >
           {i18n.format(t('serial_number'), 'upperCase')}
         </StyledText>

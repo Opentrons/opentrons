@@ -1,3 +1,4 @@
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest'
 import { migrateFile } from '../6_0_0'
 import { getLoadLiquidCommands } from '../utils/getLoadLiquidCommands'
 import _oldDoItAllProtocol from '../../../../fixtures/protocol/5/doItAllV5.json'
@@ -7,18 +8,14 @@ import type { ProtocolFileV5 } from '@opentrons/shared-data'
 const oldDoItAllProtocol = (_oldDoItAllProtocol as unknown) as ProtocolFileV5<any>
 const oldMultipleLiquidsProtocol = (_oldMultipleLiquidsProtocol as unknown) as ProtocolFileV5<any>
 
-jest.mock('../utils/getLoadLiquidCommands')
-
-const mockGetLoadLiquidCommands = getLoadLiquidCommands as jest.MockedFunction<
-  typeof getLoadLiquidCommands
->
+vi.mock('../utils/getLoadLiquidCommands')
 
 describe('v6 migration', () => {
   beforeEach(() => {
-    mockGetLoadLiquidCommands.mockReturnValue([])
+    vi.mocked(getLoadLiquidCommands).mockReturnValue([])
   })
   afterEach(() => {
-    jest.restoreAllMocks()
+    vi.restoreAllMocks()
   })
   it('removes slot from modules and labware', () => {
     const migratedFile = migrateFile(oldDoItAllProtocol)
@@ -161,7 +158,7 @@ describe('v6 migration', () => {
   })
   it('creates loadLiquid commands', () => {
     migrateFile(oldDoItAllProtocol)
-    expect(mockGetLoadLiquidCommands).toHaveBeenCalledWith(
+    expect(vi.mocked(getLoadLiquidCommands)).toHaveBeenCalledWith(
       _oldDoItAllProtocol.designerApplication.data.ingredients,
       _oldDoItAllProtocol.designerApplication.data.ingredLocations
     )

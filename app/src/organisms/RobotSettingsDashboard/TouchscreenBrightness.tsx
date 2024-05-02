@@ -26,7 +26,7 @@ import {
 } from '../../redux/config'
 
 import type { Dispatch } from '../../redux/types'
-import type { SetSettingOption } from '../../pages/OnDeviceDisplay/RobotSettingsDashboard'
+import type { SetSettingOption } from '../../pages/RobotSettingsDashboard'
 
 interface BrightnessTileProps {
   isActive: boolean
@@ -35,9 +35,9 @@ interface BrightnessTileProps {
 const BrightnessTile = styled(Box)`
   width: 100%;
   height: 8.75rem;
-  border-radius: ${BORDERS.borderRadiusSize2};
+  border-radius: ${BORDERS.borderRadius8};
   background: ${(props: BrightnessTileProps) =>
-    props.isActive ? COLORS.blueEnabled : COLORS.mediumBlueEnabled};
+    props.isActive ? COLORS.blue50 : COLORS.blue35};
 `
 
 // Note The actual brightness is Bright 1 <---> 6 Dark which is opposite to the UI
@@ -125,11 +125,11 @@ const IconButton = styled('button')`
   background-color: ${COLORS.white};
 
   &:active {
-    background-color: ${COLORS.darkBlack20};
+    background-color: ${COLORS.grey35};
   }
   &:focus-visible {
     box-shadow: ${ODD_FOCUS_VISIBLE};
-    background-color: ${COLORS.darkBlack20};
+    background-color: ${COLORS.grey35};
   }
   &:disabled {
     background-color: transparent;

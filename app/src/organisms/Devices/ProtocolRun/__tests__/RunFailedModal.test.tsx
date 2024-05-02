@@ -1,18 +1,15 @@
 import * as React from 'react'
+import { describe, it, beforeEach, vi, expect, afterEach } from 'vitest'
 
-import { renderWithProviders } from '@opentrons/components'
-
+import { renderWithProviders } from '../../../../__testing-utils__'
 import { i18n } from '../../../../i18n'
 import { useDownloadRunLog } from '../../hooks'
 import { RunFailedModal } from '../RunFailedModal'
 
 import type { RunError } from '@opentrons/api-client'
+import { fireEvent, screen } from '@testing-library/react'
 
-jest.mock('../../hooks')
-
-const mockUseDownloadRunLog = useDownloadRunLog as jest.MockedFunction<
-  typeof useDownloadRunLog
->
+vi.mock('../../hooks')
 
 const RUN_ID = '1'
 const ROBOT_NAME = 'mockRobotName'
@@ -39,46 +36,46 @@ describe('RunFailedModal - DesktopApp', () => {
     props = {
       robotName: ROBOT_NAME,
       runId: RUN_ID,
-      setShowRunFailedModal: jest.fn(),
+      setShowRunFailedModal: vi.fn(),
       highestPriorityError: mockError,
     }
-    mockUseDownloadRunLog.mockReturnValue({
-      downloadRunLog: jest.fn(),
+    vi.mocked(useDownloadRunLog).mockReturnValue({
+      downloadRunLog: vi.fn(),
       isRunLogLoading: false,
     })
   })
 
   afterEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   it('should render text, link and button', () => {
-    const [{ getByText, getByRole }] = render(props)
-    getByText('Run failed')
-    getByText('Error 4000: ModuleNotAttachedError')
-    getByText('No available thermocyclerModuleV2 found.')
-    getByText(
+    render(props)
+    screen.getByText('Run failed')
+    screen.getByText('Error 4000: ModuleNotAttachedError')
+    screen.getByText('No available thermocyclerModuleV2 found.')
+    screen.getByText(
       'Download the run log and send it to support@opentrons.com for assistance.'
     )
-    getByText('Download Run Log')
-    getByRole('button', { name: 'Close' })
+    screen.getByText('Download Run Log')
+    screen.getByRole('button', { name: 'Close' })
   })
 
   it('should call a mock function when clicking close button', () => {
-    const [{ getByRole }] = render(props)
-    getByRole('button', { name: 'Close' }).click()
+    render(props)
+    fireEvent.click(screen.getByRole('button', { name: 'Close' }))
     expect(props.setShowRunFailedModal).toHaveBeenCalled()
   })
 
   it('should close the modal when clicking close icon', () => {
-    const [{ getByRole }] = render(props)
-    getByRole('button', { name: '' }).click()
+    render(props)
+    fireEvent.click(screen.getByRole('button', { name: '' }))
     expect(props.setShowRunFailedModal).toHaveBeenCalled()
   })
 
   it('should call a mock function when clicking download run log button', () => {
-    const [{ getByText }] = render(props)
-    getByText('Download Run Log').click()
-    expect(mockUseDownloadRunLog).toHaveBeenCalled()
+    render(props)
+    fireEvent.click(screen.getByText('Download Run Log'))
+    expect(vi.mocked(useDownloadRunLog)).toHaveBeenCalled()
   })
 })

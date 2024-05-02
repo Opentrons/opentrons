@@ -1,3 +1,4 @@
+import { beforeEach, describe, it, expect } from 'vitest'
 import { expectTimelineError } from '../__utils__/testMatchers'
 import { blowout } from '../commandCreators/atomic/blowout'
 import {
@@ -10,7 +11,7 @@ import {
   DEFAULT_PIPETTE,
   SOURCE_LABWARE,
 } from '../fixtures'
-import { BlowoutParams } from '@opentrons/shared-data/protocol/types/schemaV3'
+import type { BlowoutParams } from '@opentrons/shared-data'
 import type { RobotState, InvariantContext } from '../types'
 
 describe('blowout', () => {
@@ -23,11 +24,15 @@ describe('blowout', () => {
     initialRobotState = getInitialRobotStateStandard(invariantContext)
     robotStateWithTip = getRobotStateWithTipStandard(invariantContext)
     params = {
-      pipette: DEFAULT_PIPETTE,
-      labware: SOURCE_LABWARE,
-      well: 'A1',
+      pipetteId: DEFAULT_PIPETTE,
+      labwareId: SOURCE_LABWARE,
+      wellName: 'A1',
       flowRate: 21.1,
-      offsetFromBottomMm: 1.3,
+      wellLocation: {
+        offset: {
+          z: -1.3,
+        },
+      },
     }
   })
   it('blowout with tip', () => {
@@ -43,9 +48,9 @@ describe('blowout', () => {
           wellName: 'A1',
           flowRate: 21.1,
           wellLocation: {
-            origin: 'bottom',
+            origin: 'top',
             offset: {
-              z: 1.3,
+              z: -1.3,
             },
           },
         },
@@ -54,7 +59,7 @@ describe('blowout', () => {
   })
   it('blowout with invalid pipette ID should throw error', () => {
     const result = blowout(
-      { ...params, pipette: 'badPipette' },
+      { ...params, pipetteId: 'badPipette' },
       invariantContext,
       robotStateWithTip
     )
@@ -62,7 +67,7 @@ describe('blowout', () => {
   })
   it('blowout with invalid labware ID should throw error', () => {
     const result = blowout(
-      { ...params, labware: 'badLabware' },
+      { ...params, labwareId: 'badLabware' },
       invariantContext,
       robotStateWithTip
     )
@@ -87,11 +92,15 @@ describe('blowout', () => {
     const result = blowout(
       {
         flowRate: 10,
-        offsetFromBottomMm: 5,
-        pipette: DEFAULT_PIPETTE,
+        wellLocation: {
+          offset: {
+            z: -3,
+          },
+        },
+        pipetteId: DEFAULT_PIPETTE,
         volume: 50,
-        labware: SOURCE_LABWARE,
-        well: 'A1',
+        labwareId: SOURCE_LABWARE,
+        wellName: 'A1',
       } as BlowoutParams,
       invariantContext,
       initialRobotState

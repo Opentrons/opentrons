@@ -1,5 +1,7 @@
 import * as React from 'react'
 import { useDispatch, useSelector } from 'react-redux'
+import { createPortal } from 'react-dom'
+import { useTranslation } from 'react-i18next'
 import {
   Tooltip,
   DeprecatedPrimaryButton,
@@ -14,7 +16,6 @@ import {
   TEMPERATURE_MODULE_TYPE,
   THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
-import { i18n } from '../localization'
 import { actions as stepsActions, getIsMultiSelectMode } from '../ui/steps'
 import {
   selectors as stepFormSelectors,
@@ -24,15 +25,18 @@ import {
   ConfirmDeleteModal,
   CLOSE_UNSAVED_STEP_FORM,
 } from './modals/ConfirmDeleteModal'
-import { Portal } from './portals/MainPageModalPortal'
-import { stepIconsByType, StepType } from '../form-types'
-import styles from './listButtons.css'
+import { getMainPagePortalEl } from './portals/MainPageModalPortal'
+import { stepIconsByType } from '../form-types'
+import styles from './listButtons.module.css'
+import type { ThunkDispatch } from 'redux-thunk'
+import type { BaseState } from '../types'
+import type { StepType } from '../form-types'
 
 interface StepButtonComponentProps {
   children: React.ReactNode
   expanded: boolean
   disabled: boolean
-  setExpanded: (expanded: boolean) => unknown
+  setExpanded: (expanded: boolean) => void
 }
 
 // TODO: Ian 2019-01-17 move out to centralized step info file - see #2926
@@ -40,6 +44,7 @@ interface StepButtonComponentProps {
 export const StepCreationButtonComponent = (
   props: StepButtonComponentProps
 ): JSX.Element => {
+  const { t } = useTranslation(['tooltip', 'button'])
   const { children, expanded, setExpanded, disabled } = props
   const [targetProps, tooltipProps] = useHoverTooltip({
     placement: TOOLTIP_TOP,
@@ -52,16 +57,14 @@ export const StepCreationButtonComponent = (
       {...targetProps}
     >
       {disabled && (
-        <Tooltip {...tooltipProps}>
-          {i18n.t(`tooltip.disabled_step_creation`)}
-        </Tooltip>
+        <Tooltip {...tooltipProps}>{t(`disabled_step_creation`)}</Tooltip>
       )}
       <DeprecatedPrimaryButton
         id="StepCreationButton"
         onClick={() => setExpanded(!expanded)}
         disabled={disabled}
       >
-        {i18n.t('button.add_step')}
+        {t('button:add_step')}
       </DeprecatedPrimaryButton>
 
       <div className={styles.buttons_popover}>{expanded && children}</div>
@@ -70,17 +73,18 @@ export const StepCreationButtonComponent = (
 }
 
 export interface StepButtonItemProps {
-  onClick: () => unknown
+  onClick: () => void
   stepType: StepType
 }
 
 export function StepButtonItem(props: StepButtonItemProps): JSX.Element {
   const { onClick, stepType } = props
+  const { t } = useTranslation(['tooltip', 'application'])
   const [targetProps, tooltipProps] = useHoverTooltip({
     placement: TOOLTIP_RIGHT,
     strategy: TOOLTIP_FIXED,
   })
-  const tooltipMessage = i18n.t(`tooltip.step_description.${stepType}`)
+  const tooltipMessage = t(`step_description.${stepType}`)
   return (
     <>
       <div {...targetProps}>
@@ -88,7 +92,7 @@ export function StepButtonItem(props: StepButtonItemProps): JSX.Element {
           onClick={onClick}
           iconName={stepIconsByType[stepType]}
         >
-          {i18n.t(`application.stepType.${stepType}`, stepType)}
+          {t(`application:stepType.${stepType}`, stepType)}
         </DeprecatedPrimaryButton>
       </div>
       <Tooltip {...tooltipProps}>{tooltipMessage}</Tooltip>
@@ -131,13 +135,12 @@ export const StepCreationButton = (): JSX.Element => {
     thermocycler: getIsModuleOnDeck(modules, THERMOCYCLER_MODULE_TYPE),
     heaterShaker: getIsModuleOnDeck(modules, HEATERSHAKER_MODULE_TYPE),
   }
-
   const [expanded, setExpanded] = React.useState<boolean>(false)
   const [
     enqueuedStepType,
     setEnqueuedStepType,
   ] = React.useState<StepType | null>(null)
-  const dispatch = useDispatch()
+  const dispatch = useDispatch<ThunkDispatch<BaseState, any, any>>()
 
   const addStep = (
     stepType: StepType
@@ -164,8 +167,8 @@ export const StepCreationButton = (): JSX.Element => {
 
   return (
     <>
-      {enqueuedStepType !== null && (
-        <Portal>
+      {enqueuedStepType !== null &&
+        createPortal(
           <ConfirmDeleteModal
             modalType={CLOSE_UNSAVED_STEP_FORM}
             onCancelClick={() => setEnqueuedStepType(null)}
@@ -175,9 +178,9 @@ export const StepCreationButton = (): JSX.Element => {
                 setEnqueuedStepType(null)
               }
             }}
-          ></ConfirmDeleteModal>
-        </Portal>
-      )}
+          />,
+          getMainPagePortalEl()
+        )}
       <StepCreationButtonComponent
         expanded={expanded}
         setExpanded={setExpanded}

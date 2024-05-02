@@ -3,28 +3,28 @@ import styled from 'styled-components'
 import { useTranslation } from 'react-i18next'
 import { POSITION_AND_BLOWOUT } from './constants'
 import {
-  Flex,
-  DIRECTION_COLUMN,
   ALIGN_CENTER,
-  RESPONSIVENESS,
-  JUSTIFY_SPACE_BETWEEN,
+  ALIGN_FLEX_END,
+  ALIGN_FLEX_START,
+  COLORS,
+  DIRECTION_COLUMN,
+  Flex,
+  Icon,
   JUSTIFY_CENTER,
+  JUSTIFY_FLEX_END,
+  JUSTIFY_SPACE_BETWEEN,
   PrimaryButton,
+  RESPONSIVENESS,
   SecondaryButton,
   SPACING,
-  ALIGN_FLEX_START,
-  JUSTIFY_FLEX_END,
-  TYPOGRAPHY,
-  COLORS,
+  StyledText,
   TEXT_ALIGN_CENTER,
-  Icon,
-  ALIGN_FLEX_END,
+  TYPOGRAPHY,
 } from '@opentrons/components'
 // import { NeedHelpLink } from '../CalibrationPanels'
 import { SmallButton } from '../../atoms/buttons'
 import { Jog, JogControls } from '../../molecules/JogControls'
 import { InProgressModal } from '../../molecules/InProgressModal/InProgressModal'
-import { StyledText } from '../../atoms/text'
 import { SimpleWizardBody } from '../../molecules/SimpleWizardBody'
 
 // TODO: get help link article URL
@@ -71,7 +71,7 @@ const ConfirmPosition = (props: ConfirmPositionProps): JSX.Element | null => {
             <Icon
               name="ot-alert"
               size="3.75rem"
-              color={COLORS.warningEnabled}
+              color={COLORS.yellow50}
               aria-label="ot-alert"
             />
           </Flex>
@@ -108,7 +108,7 @@ const ConfirmPosition = (props: ConfirmPositionProps): JSX.Element | null => {
   } else {
     return (
       <SimpleWizardBody
-        iconColor={COLORS.warningEnabled}
+        iconColor={COLORS.yellow50}
         header={
           currentStep === POSITION_AND_BLOWOUT
             ? t('confirm_blowout_location', { flow: flowTitle })
@@ -148,7 +148,6 @@ interface JogToPositionProps {
   handleJog: Jog
   handleProceed: () => void
   body: string
-  isRobotMoving: boolean
   currentStep: string
   isOnDevice: boolean
 }
@@ -161,7 +160,6 @@ export const JogToPosition = (
     handleJog,
     handleProceed,
     body,
-    isRobotMoving,
     currentStep,
     isOnDevice,
   } = props
@@ -170,9 +168,16 @@ export const JogToPosition = (
     showPositionConfirmation,
     setShowPositionConfirmation,
   ] = React.useState(false)
+  // Includes special case homing only present in this step.
+  const [isRobotInMotion, setIsRobotInMotion] = React.useState(false)
+
+  const onGoBack = (): void => {
+    setIsRobotInMotion(true)
+    handleGoBack()
+  }
 
   if (showPositionConfirmation) {
-    return isRobotMoving ? (
+    return isRobotInMotion ? (
       <InProgressModal
         alternativeSpinner={null}
         description={
@@ -183,7 +188,10 @@ export const JogToPosition = (
       />
     ) : (
       <ConfirmPosition
-        handlePipetteAction={handleProceed}
+        handlePipetteAction={() => {
+          setIsRobotInMotion(true)
+          handleProceed()
+        }}
         handleGoBack={() => setShowPositionConfirmation(false)}
         isOnDevice={isOnDevice}
         currentStep={currentStep}
@@ -206,7 +214,7 @@ export const JogToPosition = (
             <SmallButton
               buttonType="tertiaryLowLight"
               buttonText={t('shared:go_back')}
-              onClick={handleGoBack}
+              onClick={onGoBack}
             />
           </Flex>
           <Flex justifyContent={JUSTIFY_FLEX_END} width="100%">
@@ -254,7 +262,7 @@ export const JogToPosition = (
           >
             {/* <NeedHelpLink href={NEED_HELP_URL} /> */}
             <Flex gridGap={SPACING.spacing8}>
-              <SecondaryButton onClick={handleGoBack}>
+              <SecondaryButton onClick={onGoBack}>
                 {t('shared:go_back')}
               </SecondaryButton>
               <PrimaryButton onClick={() => setShowPositionConfirmation(true)}>

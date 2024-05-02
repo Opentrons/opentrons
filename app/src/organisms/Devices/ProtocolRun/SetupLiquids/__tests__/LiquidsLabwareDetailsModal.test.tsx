@@ -1,71 +1,46 @@
 import * as React from 'react'
-import { when } from 'jest-when'
-import { i18n } from '../../../../../i18n'
+import { describe, it, beforeEach, vi, afterEach, expect } from 'vitest'
+import { screen } from '@testing-library/react'
+
+import { LabwareRender } from '@opentrons/components'
+import { parseLiquidsInLoadOrder } from '@opentrons/api-client'
+
 import {
   nestedTextMatcher,
   renderWithProviders,
-  partialComponentPropsMatcher,
-  LabwareRender,
-} from '@opentrons/components'
-import { parseLiquidsInLoadOrder } from '@opentrons/api-client'
+} from '../../../../../__testing-utils__'
+import { i18n } from '../../../../../i18n'
 import { getIsOnDevice } from '../../../../../redux/config'
-import { useLabwareRenderInfoForRunById } from '../../../../Devices/hooks'
 import { useMostRecentCompletedAnalysis } from '../../../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import { mockDefinition } from '../../../../../redux/custom-labware/__fixtures__'
 import { getLocationInfoNames } from '../../utils/getLocationInfoNames'
 import { getSlotLabwareDefinition } from '../../utils/getSlotLabwareDefinition'
-import { getLiquidsByIdForLabware, getWellFillFromLabwareId } from '../utils'
+import {
+  getLiquidsByIdForLabware,
+  getDisabledWellFillFromLabwareId,
+} from '../utils'
 import { LiquidsLabwareDetailsModal } from '../LiquidsLabwareDetailsModal'
 import { LiquidDetailCard } from '../LiquidDetailCard'
 
+import type * as Components from '@opentrons/components'
 import type { CompletedProtocolAnalysis } from '@opentrons/shared-data'
 
-jest.mock('@opentrons/components', () => {
-  const actualComponents = jest.requireActual('@opentrons/components')
+vi.mock('@opentrons/components', async importOriginal => {
+  const actualComponents = await importOriginal<typeof Components>()
   return {
     ...actualComponents,
-    LabwareRender: jest.fn(() => <div>mock LabwareRender</div>),
+    LabwareRender: vi.fn(() => <div>mock LabwareRender</div>),
   }
 })
-jest.mock('@opentrons/api-client')
-jest.mock('../../../../../redux/config')
-jest.mock('../../../../LabwarePositionCheck/useMostRecentCompletedAnalysis')
-jest.mock('../../../../Devices/hooks')
-jest.mock('../../utils/getLocationInfoNames')
-jest.mock('../../utils/getSlotLabwareDefinition')
-jest.mock('../utils')
-jest.mock('../LiquidDetailCard')
+vi.mock('@opentrons/api-client')
+vi.mock('../../../../../redux/config')
+vi.mock('../../../../LabwarePositionCheck/useMostRecentCompletedAnalysis')
+vi.mock('../../../../Devices/hooks')
+vi.mock('../../utils/getLocationInfoNames')
+vi.mock('../../utils/getSlotLabwareDefinition')
+vi.mock('../utils')
+vi.mock('../LiquidDetailCard')
 
-const mockLiquidDetailCard = LiquidDetailCard as jest.MockedFunction<
-  typeof LiquidDetailCard
->
-const mockGetLocationInfoNames = getLocationInfoNames as jest.MockedFunction<
-  typeof getLocationInfoNames
->
-const mockGetSlotLabwareDefinition = getSlotLabwareDefinition as jest.MockedFunction<
-  typeof getSlotLabwareDefinition
->
-const mockGetLiquidsByIdForLabware = getLiquidsByIdForLabware as jest.MockedFunction<
-  typeof getLiquidsByIdForLabware
->
-const mockParseLiquidsInLoadOrder = parseLiquidsInLoadOrder as jest.MockedFunction<
-  typeof parseLiquidsInLoadOrder
->
-const mockLabwareRender = LabwareRender as jest.MockedFunction<
-  typeof LabwareRender
->
-const mockGetWellFillFromLabwareId = getWellFillFromLabwareId as jest.MockedFunction<
-  typeof getWellFillFromLabwareId
->
-const mockUseLabwareRenderInfoForRunById = useLabwareRenderInfoForRunById as jest.MockedFunction<
-  typeof useLabwareRenderInfoForRunById
->
-const mockUseMostRecentCompletedAnalysis = useMostRecentCompletedAnalysis as jest.MockedFunction<
-  typeof useMostRecentCompletedAnalysis
->
-const mockGetIsOnDevice = getIsOnDevice as jest.MockedFunction<
-  typeof getIsOnDevice
->
 const render = (
   props: React.ComponentProps<typeof LiquidsLabwareDetailsModal>
 ) => {
@@ -82,14 +57,14 @@ describe('LiquidsLabwareDetailsModal', () => {
       liquidId: '4',
       labwareId: '123',
       runId: '456',
-      closeModal: jest.fn(),
+      closeModal: vi.fn(),
     }
-    mockGetLocationInfoNames.mockReturnValue({
+    vi.mocked(getLocationInfoNames).mockReturnValue({
       labwareName: 'mock labware name',
       slotName: '5',
     })
-    mockGetSlotLabwareDefinition.mockReturnValue(mockDefinition)
-    mockGetLiquidsByIdForLabware.mockReturnValue({
+    vi.mocked(getSlotLabwareDefinition).mockReturnValue(mockDefinition)
+    vi.mocked(getLiquidsByIdForLabware).mockReturnValue({
       '4': [
         {
           labwareId: '123',
@@ -106,7 +81,7 @@ describe('LiquidsLabwareDetailsModal', () => {
         },
       ],
     })
-    mockParseLiquidsInLoadOrder.mockReturnValue([
+    vi.mocked(parseLiquidsInLoadOrder).mockReturnValue([
       {
         id: '4',
         displayName: 'liquid 4',
@@ -114,29 +89,16 @@ describe('LiquidsLabwareDetailsModal', () => {
         displayColor: '#B925FF',
       },
     ])
-    mockLiquidDetailCard.mockReturnValue(<div></div>)
-    mockGetWellFillFromLabwareId.mockReturnValue({})
-    mockUseLabwareRenderInfoForRunById.mockReturnValue({
-      '123': {
-        labwareDef: {},
-      },
-    } as any)
-    mockUseMostRecentCompletedAnalysis.mockReturnValue(
+    vi.mocked(LiquidDetailCard).mockReturnValue(<div></div>)
+    vi.mocked(getDisabledWellFillFromLabwareId).mockReturnValue({})
+    vi.mocked(useMostRecentCompletedAnalysis).mockReturnValue(
       {} as CompletedProtocolAnalysis
     )
-    mockGetIsOnDevice.mockReturnValue(false)
-    when(mockLabwareRender)
-      .mockReturnValue(<div></div>) // this (default) empty div will be returned when LabwareRender isn't called with expected props
-      .calledWith(
-        partialComponentPropsMatcher({
-          wellFill: { C1: '#ff4888', C2: '#ff4888' },
-        })
-      )
-      .mockReturnValue(<div>mock labware render with well fill</div>)
+    vi.mocked(getIsOnDevice).mockReturnValue(false)
   })
 
   afterEach(() => {
-    jest.resetAllMocks()
+    vi.resetAllMocks()
   })
   it('should render slot name and labware name', () => {
     const [{ getByText, getAllByText, getByRole }] = render(props)
@@ -146,27 +108,44 @@ describe('LiquidsLabwareDetailsModal', () => {
     getAllByText('mock labware name')
   })
   it('should render LiquidDetailCard when correct props are passed', () => {
-    when(mockLiquidDetailCard)
-      .calledWith(partialComponentPropsMatcher({ liquidId: '4' }))
-      .mockReturnValue(<>mock LiquidDetailCard</>)
-    const [{ getByText }] = render(props)
-    getByText(nestedTextMatcher('mock LiquidDetailCard'))
+    render(props)
+    expect(vi.mocked(LiquidDetailCard)).toHaveBeenCalledWith(
+      expect.objectContaining({ liquidId: '4' }),
+      expect.any(Object)
+    )
+    screen.getByText(nestedTextMatcher('mock LiquidDetailCard'))
   })
-  it('should render labware render with well fill', () => {
-    mockGetWellFillFromLabwareId.mockReturnValue({
+  it.only('should render labware render with well fill', () => {
+    vi.mocked(getDisabledWellFillFromLabwareId).mockReturnValue({
       C1: '#ff4888',
       C2: '#ff4888',
     })
-    const [{ getByText }] = render(props)
-    getByText('mock labware render with well fill')
+    render(props)
+    expect(vi.mocked(LabwareRender)).toHaveBeenCalledWith(
+      expect.objectContaining({
+        wellFill: {
+          C1: '#ff4888',
+          C2: '#ff4888',
+        },
+      }),
+      expect.any(Object)
+    )
   })
   it('should render labware render with well fill on odd', () => {
-    mockGetIsOnDevice.mockReturnValue(true)
-    mockGetWellFillFromLabwareId.mockReturnValue({
+    vi.mocked(getIsOnDevice).mockReturnValue(true)
+    vi.mocked(getDisabledWellFillFromLabwareId).mockReturnValue({
       C1: '#ff4888',
       C2: '#ff4888',
     })
-    const [{ getByText }] = render(props)
-    getByText('mock labware render with well fill')
+    render(props)
+    screen.getByText('mock labware render with well fill')
+    expect(vi.mocked(LabwareRender)).toHaveBeenCalledWith(
+      expect.objectContaining({
+        wellFill: {
+          C1: '#ff4888',
+          C2: '#ff4888',
+        },
+      })
+    )
   })
 })

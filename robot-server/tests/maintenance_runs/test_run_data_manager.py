@@ -28,8 +28,16 @@ from robot_server.maintenance_runs.maintenance_run_models import (
     MaintenanceRun,
     MaintenanceRunNotFoundError,
 )
+from robot_server.service.notifications import (
+    MaintenanceRunsPublisher,
+)
 
 from opentrons.protocol_engine import Liquid
+
+
+def mock_notify_publishers() -> None:
+    """A mock notify_publishers."""
+    return None
 
 
 @pytest.fixture
@@ -37,6 +45,13 @@ def mock_maintenance_engine_store(decoy: Decoy) -> MaintenanceEngineStore:
     """Get a mock MaintenanceEngineStore."""
     mock = decoy.mock(cls=MaintenanceEngineStore)
     decoy.when(mock.current_run_id).then_return(None)
+    return mock
+
+
+@pytest.fixture
+def mock_maintenance_runs_publisher(decoy: Decoy) -> MaintenanceRunsPublisher:
+    """Get a mock MaintenanceRunsPublisher."""
+    mock = decoy.mock(cls=MaintenanceRunsPublisher)
     return mock
 
 
@@ -69,10 +84,12 @@ def run_command() -> commands.Command:
 @pytest.fixture
 def subject(
     mock_maintenance_engine_store: MaintenanceEngineStore,
+    mock_maintenance_runs_publisher: MaintenanceRunsPublisher,
 ) -> MaintenanceRunDataManager:
     """Get a MaintenanceRunDataManager test subject."""
     return MaintenanceRunDataManager(
         engine_store=mock_maintenance_engine_store,
+        maintenance_runs_publisher=mock_maintenance_runs_publisher,
     )
 
 
@@ -91,6 +108,8 @@ async def test_create(
             run_id=run_id,
             labware_offsets=[],
             created_at=created_at,
+            deck_configuration=[],
+            notify_publishers=mock_notify_publishers,
         )
     ).then_return(engine_state_summary)
     decoy.when(mock_maintenance_engine_store.current_run_created_at).then_return(
@@ -100,6 +119,8 @@ async def test_create(
         run_id=run_id,
         created_at=created_at,
         labware_offsets=[],
+        deck_configuration=[],
+        notify_publishers=mock_notify_publishers,
     )
 
     assert result == MaintenanceRun(
@@ -138,6 +159,8 @@ async def test_create_with_options(
             run_id=run_id,
             labware_offsets=[labware_offset],
             created_at=created_at,
+            deck_configuration=[],
+            notify_publishers=mock_notify_publishers,
         )
     ).then_return(engine_state_summary)
     decoy.when(mock_maintenance_engine_store.current_run_created_at).then_return(
@@ -148,6 +171,8 @@ async def test_create_with_options(
         run_id=run_id,
         created_at=created_at,
         labware_offsets=[labware_offset],
+        deck_configuration=[],
+        notify_publishers=mock_notify_publishers,
     )
 
     assert result == MaintenanceRun(
@@ -179,6 +204,8 @@ async def test_create_engine_error(
             run_id,
             labware_offsets=[],
             created_at=created_at,
+            deck_configuration=[],
+            notify_publishers=mock_notify_publishers,
         )
     ).then_raise(EngineConflictError("oh no"))
     decoy.when(mock_maintenance_engine_store.current_run_created_at).then_return(
@@ -190,6 +217,8 @@ async def test_create_engine_error(
             run_id=run_id,
             created_at=created_at,
             labware_offsets=[],
+            deck_configuration=[],
+            notify_publishers=mock_notify_publishers,
         )
 
 

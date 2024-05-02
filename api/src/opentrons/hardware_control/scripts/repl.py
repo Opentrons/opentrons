@@ -11,6 +11,7 @@ import logging
 from logging.config import dictConfig
 from opentrons.hardware_control.api import API
 from opentrons.hardware_control.ot3api import OT3API
+from opentrons.hardware_control.types import HardwareFeatureFlags
 
 update_firmware = True
 has_robot_server = True
@@ -94,6 +95,7 @@ if ff.enable_ot3_hardware_controller():
             OT3API.build_hardware_controller,
             use_usb_bus=ff.rear_panel_integration(),
             update_firmware=update_firmware,
+            feature_flags=HardwareFeatureFlags.build_from_ff(),
         )
 
     def wrap_async_util_fn(fn: Any, *bind_args: Any, **bind_kwargs: Any) -> Any:
@@ -114,6 +116,7 @@ else:
             API.build_hardware_controller,
             use_usb_bus=ff.rear_panel_integration(),
             update_firmware=update_firmware,
+            feature_flags=HardwareFeatureFlags.build_from_ff(),
         )
 
 

@@ -1,4 +1,3 @@
-import assert from 'assert'
 import { getIsTiprack } from '@opentrons/shared-data'
 import { uuid } from '../../utils'
 import { selectors as labwareDefSelectors } from '../../labware-defs'
@@ -116,7 +115,7 @@ export const duplicateLabware: (
   const templateLabwareDefURI = stepFormSelectors.getLabwareEntities(state)[
     templateLabwareId
   ].labwareDefURI
-  assert(
+  console.assert(
     templateLabwareDefURI,
     `no labwareDefURI for labware ${templateLabwareId}, cannot run duplicateLabware thunk`
   )
@@ -124,8 +123,9 @@ export const duplicateLabware: (
   const templateLabwareIdIsOffDeck =
     initialDeckSetup.labware[templateLabwareId].slot === 'offDeck'
   const duplicateSlot = getNextAvailableDeckSlot(initialDeckSetup, robotType)
-  if (!duplicateSlot)
-    console.warn('no slots available, cannot duplicate labware')
+  if (duplicateSlot == null) {
+    console.error('no slots available, cannot duplicate labware')
+  }
   const allNicknamesById = uiLabwareSelectors.getLabwareNicknamesById(state)
   const templateNickname = allNicknamesById[templateLabwareId]
   const duplicateLabwareNickname = getNextNickname(
@@ -133,7 +133,7 @@ export const duplicateLabware: (
     templateNickname
   )
 
-  if (templateLabwareDefURI && duplicateSlot) {
+  if (templateLabwareDefURI && duplicateSlot != null) {
     dispatch({
       type: 'DUPLICATE_LABWARE',
       payload: {

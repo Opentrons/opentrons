@@ -23,6 +23,7 @@ import {
   LabwareEntities,
   RobotState,
   Timeline,
+  AdditionalEquipmentEntities,
 } from '@opentrons/step-generation'
 import { FormData, StepType, StepIdType } from '../../form-types'
 import { InitialDeckSetup } from '../types'
@@ -37,6 +38,7 @@ export interface CreatePresavedStepFormArgs {
   orderedStepIds: OrderedStepIdsState
   initialDeckSetup: InitialDeckSetup
   robotStateTimeline: Timeline
+  additionalEquipmentEntities: AdditionalEquipmentEntities
 }
 type FormUpdater = (arg0: FormData) => FormPatch | null
 
@@ -70,6 +72,88 @@ const _patchDefaultPipette = (args: {
     const updatedFields = handleFormChange(
       {
         pipette: defaultPipetteId,
+      },
+      formData,
+      pipetteEntities,
+      labwareEntities
+    )
+    return updatedFields
+  }
+
+  return null
+}
+
+const _patchDefaultDropTipLocation = (args: {
+  additionalEquipmentEntities: AdditionalEquipmentEntities
+  labwareEntities: LabwareEntities
+  pipetteEntities: PipetteEntities
+}): FormUpdater => formData => {
+  const { additionalEquipmentEntities, labwareEntities, pipetteEntities } = args
+  const trashBin = Object.values(additionalEquipmentEntities).find(
+    aE => aE.name === 'trashBin'
+  )
+  const wasteChute = Object.values(additionalEquipmentEntities).find(
+    aE => aE.name === 'wasteChute'
+  )
+  let defaultDropTipId = null
+  if (wasteChute != null) {
+    defaultDropTipId = wasteChute.id
+  } else if (trashBin != null) {
+    defaultDropTipId = trashBin.id
+  }
+  const formHasDropTipField = formData && 'dropTip_location' in formData
+
+  if (formHasDropTipField && defaultDropTipId !== null) {
+    const updatedFields = handleFormChange(
+      {
+        dropTip_location: defaultDropTipId,
+      },
+      formData,
+      pipetteEntities,
+      labwareEntities
+    )
+    return updatedFields
+  }
+
+  return null
+}
+
+const _patchDefaultTiprack = (args: {
+  initialDeckSetup: InitialDeckSetup
+  labwareEntities: LabwareEntities
+  pipetteEntities: PipetteEntities
+  savedStepForms: SavedStepFormState
+  orderedStepIds: OrderedStepIdsState
+}): FormUpdater => formData => {
+  const {
+    initialDeckSetup,
+    labwareEntities,
+    pipetteEntities,
+    savedStepForms,
+    orderedStepIds,
+  } = args
+  const labware = initialDeckSetup.labware
+  const tipRackIds = Object.values(labware)
+    .filter(lw => lw.def.parameters.isTiprack)
+    .map(lw => lw.id)
+
+  const defaultPipetteId = getNextDefaultPipetteId(
+    savedStepForms,
+    orderedStepIds,
+    initialDeckSetup.pipettes
+  )
+
+  const pipetteFirstTiprackDefUri =
+    pipetteEntities[defaultPipetteId].tiprackDefURI[0]
+  const defaultTiprackId = tipRackIds.find(id =>
+    id.includes(pipetteFirstTiprackDefUri)
+  )
+  const formHasTipRackField = formData && 'tipRack' in formData
+
+  if (formHasTipRackField && defaultTiprackId != null) {
+    const updatedFields = handleFormChange(
+      {
+        tipRack: defaultTiprackId,
       },
       formData,
       pipetteEntities,
@@ -223,10 +307,25 @@ export const createPresavedStepForm = ({
   stepId,
   stepType,
   robotStateTimeline,
+  additionalEquipmentEntities,
 }: CreatePresavedStepFormArgs): FormData => {
   const formData = createBlankForm({
     stepId,
     stepType,
+  })
+
+  const updateDefaultDropTip = _patchDefaultDropTipLocation({
+    labwareEntities,
+    pipetteEntities,
+    additionalEquipmentEntities,
+  })
+
+  const updateDefaultTipRack = _patchDefaultTiprack({
+    initialDeckSetup,
+    labwareEntities,
+    orderedStepIds,
+    pipetteEntities,
+    savedStepForms,
   })
 
   const updateDefaultPipette = _patchDefaultPipette({
@@ -268,6 +367,8 @@ export const createPresavedStepForm = ({
   // passing the applied result from one updater as the input of the next
   return [
     updateDefaultPipette,
+    updateDefaultDropTip,
+    updateDefaultTipRack,
     updateTemperatureModuleId,
     updateThermocyclerFields,
     updateHeaterShakerModuleId,

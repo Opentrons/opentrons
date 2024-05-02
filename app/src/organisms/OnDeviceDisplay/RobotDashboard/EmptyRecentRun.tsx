@@ -2,17 +2,16 @@ import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 
 import {
-  Flex,
-  DIRECTION_COLUMN,
   ALIGN_CENTER,
+  BORDERS,
   COLORS,
+  DIRECTION_COLUMN,
+  Flex,
   JUSTIFY_CENTER,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
-  BORDERS,
 } from '@opentrons/components'
-
-import { StyledText } from '../../../atoms/text'
 
 import abstractImage from '../../../assets/images/on-device-display/empty_protocol_dashboard.png'
 
@@ -21,11 +20,11 @@ export function EmptyRecentRun(): JSX.Element {
   return (
     <Flex
       alignItems={ALIGN_CENTER}
-      backgroundColor={COLORS.darkBlack20}
+      backgroundColor={COLORS.grey35}
       flexDirection={DIRECTION_COLUMN}
       height="27.25rem"
       justifyContent={JUSTIFY_CENTER}
-      borderRadius={BORDERS.borderRadiusSize3}
+      borderRadius={BORDERS.borderRadius12}
     >
       <img
         src={abstractImage}
@@ -44,7 +43,7 @@ export function EmptyRecentRun(): JSX.Element {
       <StyledText
         as="h4"
         fontWeight={TYPOGRAPHY.fontWeightRegular}
-        color={COLORS.darkBlack70}
+        color={COLORS.grey60}
       >
         {t('no_recent_runs_description')}
       </StyledText>

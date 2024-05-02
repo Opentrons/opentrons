@@ -1,35 +1,36 @@
 import * as React from 'react'
+import { useHistory } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
+
 import {
   ALIGN_CENTER,
+  Box,
   COLORS,
   DIRECTION_COLUMN,
   DIRECTION_ROW,
   Flex,
-  SPACING,
-  POSITION_STICKY,
   POSITION_STATIC,
-  Box,
+  POSITION_STICKY,
+  SPACING,
+  StyledText,
 } from '@opentrons/components'
-import {
-  useAllProtocolsQuery,
-  useAllRunsQuery,
-} from '@opentrons/react-api-client'
-import { SmallButton } from '../../atoms/buttons'
-import { StyledText } from '../../atoms/text'
+import { useAllProtocolsQuery } from '@opentrons/react-api-client'
+
+import { SmallButton, FloatingActionButton } from '../../atoms/buttons'
 import { Navigation } from '../../organisms/Navigation'
-import { onDeviceDisplayRoutes } from '../../App/OnDeviceDisplayApp'
 import {
   getPinnedProtocolIds,
   getProtocolsOnDeviceSortKey,
   updateConfigValue,
+  useFeatureFlag,
 } from '../../redux/config'
 import { PinnedProtocolCarousel } from './PinnedProtocolCarousel'
 import { sortProtocols } from './utils'
 import { ProtocolCard } from './ProtocolCard'
 import { NoProtocols } from './NoProtocols'
 import { DeleteProtocolConfirmationModal } from './DeleteProtocolConfirmationModal'
+import { useNotifyAllRunsQuery } from '../../resources/runs'
 
 import type { Dispatch } from '../../redux/types'
 import type { ProtocolsOnDeviceSortKey } from '../../redux/config/types'
@@ -37,7 +38,8 @@ import type { ProtocolResource } from '@opentrons/shared-data'
 
 export function ProtocolDashboard(): JSX.Element {
   const protocols = useAllProtocolsQuery()
-  const runs = useAllRunsQuery()
+  const runs = useNotifyAllRunsQuery()
+  const history = useHistory()
   const { t } = useTranslation('protocol_info')
   const dispatch = useDispatch<Dispatch>()
   const [navMenuIsOpened, setNavMenuIsOpened] = React.useState<boolean>(false)
@@ -57,6 +59,11 @@ export function ProtocolDashboard(): JSX.Element {
   // The pinned protocols are stored as an array of IDs in config
   const pinnedProtocolIds = useSelector(getPinnedProtocolIds) ?? []
   const pinnedProtocols: ProtocolResource[] = []
+
+  // TODO(sb, 4/15/24): The quick transfer button is going to be moved to a new quick transfer
+  // tab before the feature is released. Because of this, we're not adding test cov
+  // for this button in ProtocolDashboard
+  const enableQuickTransferFF = useFeatureFlag('enableQuickTransfer')
 
   // We only need to grab out the pinned protocol data once all the protocols load
   // and if we have pinned ids stored in config.
@@ -148,7 +155,6 @@ export function ProtocolDashboard(): JSX.Element {
         paddingBottom={SPACING.spacing40}
       >
         <Navigation
-          routes={onDeviceDisplayRoutes}
           setNavMenuIsOpened={setNavMenuIsOpened}
           longPressModalIsOpened={longPressModalIsOpened}
         />
@@ -161,7 +167,7 @@ export function ProtocolDashboard(): JSX.Element {
               <StyledText
                 as="p"
                 marginBottom={SPACING.spacing8}
-                color={COLORS.darkBlack70}
+                color={COLORS.grey60}
               >
                 {t('pinned_protocols')}
               </StyledText>
@@ -180,7 +186,6 @@ export function ProtocolDashboard(): JSX.Element {
                 backgroundColor={COLORS.white}
                 flexDirection={DIRECTION_ROW}
                 paddingBottom={SPACING.spacing16}
-                paddingTop={SPACING.spacing16}
                 position={
                   navMenuIsOpened || longPressModalIsOpened
                     ? POSITION_STATIC
@@ -274,6 +279,15 @@ export function ProtocolDashboard(): JSX.Element {
           ) : null}
         </Box>
       </Flex>
+      {enableQuickTransferFF && (
+        <FloatingActionButton
+          buttonText={t('quick_transfer')}
+          iconName="plus"
+          onClick={() => {
+            history.push('/quick-transfer')
+          }}
+        />
+      )}
     </>
   )
 }

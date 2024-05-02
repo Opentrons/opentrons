@@ -2,13 +2,12 @@
 """
 import asyncio
 import functools
-from typing import Generic, TypeVar, Callable, Any, cast
+from typing import Generic, TypeVar, Callable, Any, cast, Awaitable
 from .protocols import AsyncioConfigurable
 
 
 WrappedObj = TypeVar("WrappedObj", bound=AsyncioConfigurable, covariant=True)
 WrappedReturn = TypeVar("WrappedReturn")
-WrappedFunc = TypeVar("WrappedFunc", bound=Callable[..., WrappedReturn])
 
 
 # TODO: BC 2020-02-25 instead of overwriting __get_attribute__ in this class
@@ -54,7 +53,7 @@ class SynchronousAdapter(Generic[WrappedObj]):
     @staticmethod
     def call_coroutine_sync(
         loop: asyncio.AbstractEventLoop,
-        to_call: WrappedFunc,
+        to_call: Callable[..., Awaitable[WrappedReturn]],
         *args: Any,
         **kwargs: Any,
     ) -> WrappedReturn:

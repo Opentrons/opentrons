@@ -57,6 +57,7 @@ from .types import (
     EstopState,
     SubSystem,
     SubSystemState,
+    HardwareFeatureFlags,
 )
 from . import modules
 from .robot_calibration import (
@@ -87,7 +88,7 @@ class API(
     # of methods that are present in the protocol will call the (empty,
     # do-nothing) methods in the protocol. This will happily make all the
     # tests fail.
-    HardwareControlInterface[RobotCalibration],
+    HardwareControlInterface[RobotCalibration, top_types.Mount, RobotConfig],
 ):
     """This API is the primary interface to the hardware controller.
 
@@ -111,6 +112,7 @@ class API(
         backend: Union[Controller, Simulator],
         loop: asyncio.AbstractEventLoop,
         config: RobotConfig,
+        feature_flags: Optional[HardwareFeatureFlags] = None,
     ) -> None:
         """Initialize an API instance.
 
@@ -122,6 +124,8 @@ class API(
         self._config = config
         self._backend = backend
         self._loop = loop
+        # If no feature flag set is defined, we will use the default values
+        self._feature_flags = feature_flags or HardwareFeatureFlags()
 
         self._callbacks: Set[HardwareEventHandler] = set()
         # {'X': 0.0, 'Y': 0.0, 'Z': 0.0, 'A': 0.0, 'B': 0.0, 'C': 0.0}
@@ -163,13 +167,14 @@ class API(
     def _reset_last_mount(self) -> None:
         self._last_moved_mount = None
 
-    @classmethod  # noqa: C901
-    async def build_hardware_controller(
+    @classmethod
+    async def build_hardware_controller(  # noqa: C901
         cls,
         config: Union[RobotConfig, OT3Config, None] = None,
         port: Optional[str] = None,
         loop: Optional[asyncio.AbstractEventLoop] = None,
         firmware: Optional[Tuple[pathlib.Path, str]] = None,
+        feature_flags: Optional[HardwareFeatureFlags] = None,
     ) -> "API":
         """Build a hardware controller that will actually talk to hardware.
 
@@ -221,7 +226,12 @@ class API(
                 mod_log.error(msg)
                 raise RuntimeError(msg)
 
-            api_instance = cls(backend, loop=checked_loop, config=checked_config)
+            api_instance = cls(
+                backend,
+                loop=checked_loop,
+                config=checked_config,
+                feature_flags=feature_flags,
+            )
             await api_instance.cache_instruments()
             module_controls = await AttachedModulesControl.build(
                 api_instance, board_revision=backend.board_revision
@@ -245,10 +255,11 @@ class API(
         attached_instruments: Optional[
             Dict[top_types.Mount, Dict[str, Optional[str]]]
         ] = None,
-        attached_modules: Optional[List[str]] = None,
+        attached_modules: Optional[Dict[str, List[str]]] = None,
         config: Optional[Union[RobotConfig, OT3Config]] = None,
         loop: Optional[asyncio.AbstractEventLoop] = None,
         strict_attached_instruments: bool = True,
+        feature_flags: Optional[HardwareFeatureFlags] = None,
     ) -> "API":
         """Build a simulating hardware controller.
 
@@ -260,7 +271,7 @@ class API(
             attached_instruments = {}
 
         if None is attached_modules:
-            attached_modules = []
+            attached_modules = {}
 
         checked_loop = use_or_initialize_loop(loop)
         if isinstance(config, RobotConfig):
@@ -274,7 +285,12 @@ class API(
             checked_loop,
             strict_attached_instruments,
         )
-        api_instance = cls(backend, loop=checked_loop, config=checked_config)
+        api_instance = cls(
+            backend,
+            loop=checked_loop,
+            config=checked_config,
+            feature_flags=feature_flags,
+        )
         await api_instance.cache_instruments()
         module_controls = await AttachedModulesControl.build(
             api_instance, board_revision=backend.board_revision
@@ -331,6 +347,7 @@ class API(
     def board_revision(self) -> str:
         return str(self._backend.board_revision)
 
+    @property
     def attached_subsystems(self) -> Dict[SubSystem, SubSystemState]:
         return {}
 
@@ -410,8 +427,13 @@ class API(
             firmware_file, checked_loop, explicit_modeset
         )
 
+    def has_gripper(self) -> bool:
+        return False
+
     async def cache_instruments(
-        self, require: Optional[Dict[top_types.Mount, PipetteName]] = None
+        self,
+        require: Optional[Dict[top_types.Mount, PipetteName]] = None,
+        skip_if_would_block: bool = False,
     ) -> None:
         """
         Scan the attached instruments, take necessary configuration actions,
@@ -435,6 +457,7 @@ class API(
                 req_instr,
                 pip_id,
                 pip_offset_cal,
+                self._feature_flags.use_old_aspiration_functions,
             )
             self._attached_instruments[mount] = p
             if req_instr and p:
@@ -598,6 +621,7 @@ class API(
                     home_flagged_axes=False,
                 )
 
+    @ExecutionManagerProvider.wait_for_running
     async def home_plunger(self, mount: top_types.Mount) -> None:
         """
         Home the plunger motor for a mount, and then return it to the 'bottom'
@@ -740,7 +764,7 @@ class API(
             top_types.Point(0, 0, 0),
         )
 
-        await self._cache_and_maybe_retract_mount(mount)
+        await self.prepare_for_mount_movement(mount)
         await self._move(target_position, speed=speed, max_speeds=max_speeds)
 
     async def move_axes(
@@ -800,7 +824,7 @@ class API(
                 detail={"mount": str(mount), "unhomed_axes": str(unhomed)},
             )
 
-        await self._cache_and_maybe_retract_mount(mount)
+        await self.prepare_for_mount_movement(mount)
         await self._move(
             target_position,
             speed=speed,
@@ -819,6 +843,9 @@ class API(
         if mount != self._last_moved_mount and self._last_moved_mount:
             await self.retract(self._last_moved_mount, 10)
         self._last_moved_mount = mount
+
+    async def prepare_for_mount_movement(self, mount: top_types.Mount) -> None:
+        await self._cache_and_maybe_retract_mount(mount)
 
     @ExecutionManagerProvider.wait_for_running
     async def _move(
@@ -888,11 +915,11 @@ class API(
     async def disengage_axes(self, which: List[Axis]) -> None:
         await self._backend.disengage_axes([ot2_axis_to_string(ax) for ax in which])
 
+    @ExecutionManagerProvider.wait_for_running
     async def _fast_home(self, axes: Sequence[str], margin: float) -> Dict[str, float]:
         converted_axes = "".join(axes)
         return await self._backend.fast_home(converted_axes, margin)
 
-    @ExecutionManagerProvider.wait_for_running
     async def retract(self, mount: top_types.Mount, margin: float = 10) -> None:
         """Pull the specified mount up to its home position.
 
@@ -900,7 +927,6 @@ class API(
         """
         await self.retract_axis(Axis.by_mount(mount), margin)
 
-    @ExecutionManagerProvider.wait_for_running
     async def retract_axis(self, axis: Axis, margin: float = 10) -> None:
         """Pull the specified axis up to its home position.
 
@@ -960,6 +986,14 @@ class API(
         :py:class:`.RobotConfig`.
         """
         self._config = replace(self._config, **kwargs)
+
+    @property
+    def hardware_feature_flags(self) -> HardwareFeatureFlags:
+        return self._feature_flags
+
+    @hardware_feature_flags.setter
+    def hardware_feature_flags(self, feature_flags: HardwareFeatureFlags) -> None:
+        self._feature_flags = feature_flags
 
     async def update_deck_calibration(self, new_transform: RobotCalibration) -> None:
         pass
@@ -1178,9 +1212,9 @@ class API(
                 home_flagged_axes=False,
             )
             if move.home_after:
-                smoothie_pos = await self._backend.fast_home(
-                    [ot2_axis_to_string(ax) for ax in move.home_axes],
-                    move.home_after_safety_margin,
+                smoothie_pos = await self._fast_home(
+                    axes=[ot2_axis_to_string(ax) for ax in move.home_axes],
+                    margin=move.home_after_safety_margin,
                 )
                 self._current_position = deck_from_machine(
                     machine_pos=self._axis_map_from_string_map(smoothie_pos),

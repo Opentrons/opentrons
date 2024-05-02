@@ -1,5 +1,9 @@
 import * as React from 'react'
-import { renderWithProviders, COLORS, BORDERS } from '@opentrons/components'
+import '@testing-library/jest-dom/vitest'
+import { describe, it, expect, vi, beforeEach } from 'vitest'
+import { fireEvent, screen } from '@testing-library/react'
+import { COLORS, BORDERS } from '@opentrons/components'
+import { renderWithProviders } from '../../../__testing-utils__'
 
 import { MediumButton } from '../MediumButton'
 
@@ -11,85 +15,85 @@ describe('MediumButton', () => {
   let props: React.ComponentProps<typeof MediumButton>
   beforeEach(() => {
     props = {
-      onClick: jest.fn(),
+      onClick: vi.fn(),
       buttonType: 'primary',
       buttonText: 'Medium button',
     }
   })
   it('renders the default button and it works as expected', () => {
-    const { getByText, getByRole } = render(props)
-    getByText('Medium button').click()
+    render(props)
+    fireEvent.click(screen.getByText('Medium button'))
     expect(props.onClick).toHaveBeenCalled()
-    expect(getByRole('button')).toHaveStyle(
-      `background-color: ${COLORS.blueEnabled}`
-    )
+    expect(screen.getByRole('button')).toHaveStyle('background-color: #045dd0')
   })
   it('renders the alert button', () => {
     props = {
       ...props,
       buttonType: 'alert',
     }
-    const { getByRole } = render(props)
-    expect(getByRole('button')).toHaveStyle(`background-color: ${COLORS.red2}`)
+    render(props)
+    expect(screen.getByRole('button')).toHaveStyle('background-color: #b91f20')
   })
   it('renders the secondary button', () => {
     props = {
       ...props,
       buttonType: 'secondary',
     }
-    const { getByRole } = render(props)
-    expect(getByRole('button')).toHaveStyle(
-      `background-color: ${COLORS.mediumBlueEnabled}`
-    )
+    render(props)
+    expect(screen.getByRole('button')).toHaveStyle('background-color: #94afd4')
   })
   it('renders the secondary alert button', () => {
     props = {
       ...props,
       buttonType: 'alertSecondary',
     }
-    const { getByRole } = render(props)
-    expect(getByRole('button')).toHaveStyle(`background-color: ${COLORS.red3}`)
+    render(props)
+    expect(screen.getByRole('button')).toHaveStyle('background-color: #ccabac')
   })
   it('renders the tertiary high button', () => {
     props = {
       ...props,
       buttonType: 'tertiaryHigh',
     }
-    const { getByRole } = render(props)
-    expect(getByRole('button')).toHaveStyle(`background-color: ${COLORS.white}`)
+    render(props)
+    expect(screen.getByRole('button')).toHaveStyle(
+      `background-color: ${COLORS.grey35}`
+    )
   })
   it('renders the tertiary low light button', () => {
     props = {
       ...props,
       buttonType: 'tertiaryLowLight',
     }
-    const { getByRole } = render(props)
-    expect(getByRole('button')).toHaveStyle(`background-color: ${COLORS.white}`)
+    render(props)
+    expect(screen.getByRole('button')).toHaveStyle(
+      `background-color: ${COLORS.grey35}`
+    )
   })
   it('renders the button as disabled', () => {
     props = {
       ...props,
       disabled: true,
     }
-    const { getByRole } = render(props)
-    expect(getByRole('button')).toBeDisabled()
+    render(props)
+    expect(screen.getByRole('button')).toBeDisabled()
   })
   it('renders custom icon in the button', () => {
     props = {
       ...props,
       iconName: 'restart',
     }
-    const { getByLabelText } = render(props)
-    getByLabelText('MediumButton_restart')
+    render(props)
+    screen.getByLabelText('restart icon')
   })
   it('renders the rounded button category', () => {
     props = {
       ...props,
       buttonCategory: 'rounded',
     }
-    const { getByRole } = render(props)
-    expect(getByRole('button')).toHaveStyle(
-      `border-radius: ${BORDERS.borderRadiusSize5}`
+    render(props)
+    expect(screen.getByRole('button')).toHaveStyle(
+      `border-radius: ${BORDERS.borderRadius40}`
     )
   })
 })

@@ -1,21 +1,23 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { css } from 'styled-components'
-import { RIGHT } from '@opentrons/shared-data'
+import { RIGHT, WEIGHT_OF_96_CHANNEL } from '@opentrons/shared-data'
 import { useInstrumentsQuery } from '@opentrons/react-api-client'
 import {
-  Btn,
-  PrimaryButton,
-  Flex,
-  TYPOGRAPHY,
-  COLORS,
-  JUSTIFY_SPACE_BETWEEN,
-  ALIGN_FLEX_END,
   ALIGN_CENTER,
-  SPACING,
+  ALIGN_FLEX_END,
+  Btn,
+  COLORS,
+  Flex,
+  JUSTIFY_SPACE_BETWEEN,
+  PrimaryButton,
   RESPONSIVENESS,
+  SIZE_1,
+  SPACING,
+  StyledText,
+  TYPOGRAPHY,
 } from '@opentrons/components'
-import { StyledText } from '../../atoms/text'
+import { Banner } from '../../atoms/Banner'
 import { GenericWizardTile } from '../../molecules/GenericWizardTile'
 import { SimpleWizardBody } from '../../molecules/SimpleWizardBody'
 import { Skeleton } from '../../atoms/Skeleton'
@@ -34,7 +36,7 @@ const BACKGROUND_SIZE = '47rem'
 
 const GO_BACK_BUTTON_TEXT_STYLE = css`
   ${TYPOGRAPHY.pSemiBold};
-  color: ${COLORS.darkGreyEnabled};
+  color: ${COLORS.grey50};
 
   &:hover {
     opacity: 70%;
@@ -82,7 +84,9 @@ export const DetachPipette = (props: DetachPipetteProps): JSX.Element => {
   const is96ChannelPipette =
     memoizedAttachedPipettes[mount]?.instrumentName === 'p1000_96'
   const pipetteName =
-    attachedPipettes[mount] != null ? attachedPipettes[mount]?.displayName : ''
+    attachedPipettes[mount] != null
+      ? attachedPipettes[mount]?.displayName
+      : 'Pipette'
   const isPipetteStillAttached = (attachedInstrumentsData?.data ?? []).some(
     (i): i is PipetteData =>
       i.instrumentType === 'pipette' && i.ok && i.mount === mount
@@ -153,14 +157,27 @@ export const DetachPipette = (props: DetachPipetteProps): JSX.Element => {
       </>
     )
   } else {
-    bodyText = <StyledText css={BODY_STYLE}>{t('hold_and_loosen')}</StyledText>
+    bodyText = (
+      <>
+        <StyledText css={BODY_STYLE}>{t('hold_and_loosen')}</StyledText>
+        {is96ChannelPipette && (
+          <Banner
+            type="warning"
+            size={isOnDevice ? '1.5rem' : SIZE_1}
+            marginY={SPACING.spacing4}
+          >
+            {t('pipette_heavy', { weight: WEIGHT_OF_96_CHANNEL })}
+          </Banner>
+        )}
+      </>
+    )
   }
 
   if (isRobotMoving) return <InProgressModal description={t('stand_back')} />
   if (showPipetteStillAttached) {
     return (
       <SimpleWizardBody
-        iconColor={COLORS.errorEnabled}
+        iconColor={COLORS.red50}
         header={t('pipette_failed_to_detach', { pipetteName: pipetteName })}
         isSuccess={false}
       >
@@ -196,7 +213,7 @@ export const DetachPipette = (props: DetachPipetteProps): JSX.Element => {
   return errorMessage != null ? (
     <SimpleWizardBody
       isSuccess={false}
-      iconColor={COLORS.errorEnabled}
+      iconColor={COLORS.red50}
       header={t('shared:error_encountered')}
       subHeader={errorMessage}
     />

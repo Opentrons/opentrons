@@ -27,6 +27,7 @@ from opentrons.calibration_storage import helpers
 from opentrons.protocol_engine.errors.error_occurrence import (
     ErrorOccurrence as ProtocolEngineErrorOccurrence,
 )
+from opentrons.protocol_engine.types import DeckConfigurationType
 from opentrons.protocol_reader import ProtocolReader, ProtocolSource
 from opentrons.protocols.types import JsonProtocol, Protocol, PythonProtocol
 
@@ -123,6 +124,15 @@ def datafiles_from_paths(paths: Sequence[Union[str, pathlib.Path]]) -> Dict[str,
     return datafiles
 
 
+def get_deck_configuration() -> DeckConfigurationType:
+    """Return the host robot's current deck configuration."""
+    # TODO: Search for the file where robot-server stores it.
+    # Flex: /var/lib/opentrons-robot-server/deck_configuration.json
+    # OT-2: /data/opentrons_robot_server/deck_configuration.json
+    # https://opentrons.atlassian.net/browse/RSS-400
+    return []
+
+
 @contextlib.contextmanager
 def adapt_protocol_source(protocol: Protocol) -> Generator[ProtocolSource, None, None]:
     """Convert a `Protocol` to a `ProtocolSource`.
@@ -156,7 +166,10 @@ def adapt_protocol_source(protocol: Protocol) -> Generator[ProtocolSource, None,
         # through the filesystem. https://opentrons.atlassian.net/browse/RSS-281
 
         main_file = pathlib.Path(temporary_directory) / main_file_name
-        main_file.write_text(protocol.text, encoding="utf-8")
+        if isinstance(protocol.text, str):
+            main_file.write_text(protocol.text, encoding="utf-8")
+        else:
+            main_file.write_bytes(protocol.text)
 
         labware_files: List[pathlib.Path] = []
         if isinstance(protocol, PythonProtocol) and protocol.extra_labware is not None:

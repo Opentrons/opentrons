@@ -1,5 +1,9 @@
 import * as React from 'react'
-import { renderWithProviders, SPACING, COLORS } from '@opentrons/components'
+import { describe, it, expect, beforeEach } from 'vitest'
+import '@testing-library/jest-dom/vitest'
+import { screen } from '@testing-library/react'
+import { SPACING, COLORS } from '@opentrons/components'
+import { renderWithProviders } from '../../../__testing-utils__'
 import { Divider } from '../index'
 
 const render = (props: React.ComponentProps<typeof Divider>) => {
@@ -16,11 +20,9 @@ describe('Divider', () => {
   })
 
   it('renders divider', () => {
-    const { getByTestId } = render(props)
-    const divider = getByTestId('divider')
-    expect(divider).toHaveStyle(
-      `borderBottom: 1px solid ${String(COLORS.medGreyEnabled)}`
-    )
+    render(props)
+    const divider = screen.getByTestId('divider')
+    expect(divider).toHaveStyle(`borderBottom: 1px solid ${COLORS.grey30}`)
     expect(divider).toHaveStyle('width: 80%')
     expect(divider).toHaveStyle(`margin-top: ${SPACING.spacing4}`)
     expect(divider).toHaveStyle(`margin-bottom: ${SPACING.spacing4}`)
@@ -30,13 +32,13 @@ describe('Divider', () => {
     props = {
       ...props,
       width: '100%',
-      color: COLORS.blueEnabled,
+      color: COLORS.blue50,
       marginY: 0,
       paddingX: SPACING.spacing4,
     }
-    const { getByTestId } = render(props)
-    const divider = getByTestId('divider')
-    expect(divider).toHaveStyle(`color: ${String(COLORS.blueEnabled)}`)
+    render(props)
+    const divider = screen.getByTestId('divider')
+    expect(divider).toHaveStyle(`color: ${COLORS.blue50}`)
     expect(divider).toHaveStyle('width: 100%')
     expect(divider).toHaveStyle('margin-top: 0')
     expect(divider).toHaveStyle('margin-bottom: 0')

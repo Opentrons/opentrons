@@ -19,6 +19,9 @@ export interface LegacyModalProps extends StyleProps {
   footer?: React.ReactNode
 }
 
+/**
+ * For Desktop app use only.
+ */
 export const LegacyModal = (props: LegacyModalProps): JSX.Element => {
   const {
     type = 'info',
@@ -35,10 +38,10 @@ export const LegacyModal = (props: LegacyModalProps): JSX.Element => {
     let iconColor: string = ''
     switch (type) {
       case 'warning':
-        iconColor = COLORS.warningEnabled
+        iconColor = COLORS.yellow50
         break
       case 'error':
-        iconColor = COLORS.errorEnabled
+        iconColor = COLORS.red50
         break
     }
     return iconColor
@@ -56,7 +59,7 @@ export const LegacyModal = (props: LegacyModalProps): JSX.Element => {
       onClose={onClose}
       title={title}
       icon={['error', 'warning'].includes(type) ? modalIcon : undefined}
-      color={COLORS.darkBlackEnabled}
+      color={COLORS.black90}
       backgroundColor={COLORS.white}
     />
   )
@@ -67,8 +70,8 @@ export const LegacyModal = (props: LegacyModalProps): JSX.Element => {
       header={modalHeader}
       onOutsideClick={closeOnOutsideClick ?? false ? onClose : undefined}
       // center within viewport aside from nav
-      marginLeft="7.125rem"
-      {...props}
+      marginLeft={styleProps.marginLeft ?? '5.656rem'}
+      {...styleProps}
       footer={footer}
     >
       <Box padding={childrenPadding}>{children}</Box>

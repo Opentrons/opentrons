@@ -3,30 +3,41 @@ import { css } from 'styled-components'
 import { useTranslation } from 'react-i18next'
 import { ViewportList, ViewportListRef } from 'react-viewport-list'
 
+import { RUN_STATUSES_TERMINAL } from '@opentrons/api-client'
 import {
-  Flex,
   ALIGN_CENTER,
+  BORDERS,
+  COLORS,
   DIRECTION_COLUMN,
   DISPLAY_FLEX,
   DISPLAY_NONE,
-  SPACING,
-  PrimaryButton,
-  TYPOGRAPHY,
-  BORDERS,
-  COLORS,
+  Flex,
   POSITION_FIXED,
+  PrimaryButton,
+  SPACING,
+  StyledText,
+  TYPOGRAPHY,
 } from '@opentrons/components'
 
-import { StyledText } from '../../atoms/text'
 import { useMostRecentCompletedAnalysis } from '../LabwarePositionCheck/useMostRecentCompletedAnalysis'
+import {
+  useNotifyAllCommandsAsPreSerializedList,
+  useNotifyLastRunCommandKey,
+} from '../../resources/runs'
 import { CommandText } from '../CommandText'
 import { Divider } from '../../atoms/structure'
 import { NAV_BAR_WIDTH } from '../../App/constants'
-import { useLastRunCommandKey } from '../Devices/hooks/useLastRunCommandKey'
 import { CommandIcon } from './CommandIcon'
+import { useRunStatus } from '../RunTimeControl/hooks'
+
+import type { RunStatus } from '@opentrons/api-client'
 import type { RobotType } from '@opentrons/shared-data'
 
 const COLOR_FADE_MS = 500
+const LIVE_RUN_COMMANDS_POLL_MS = 3000
+// arbitrary large number of commands
+const MAX_COMMANDS = 100000
+
 interface RunPreviewProps {
   runId: string
   robotType: RobotType
@@ -39,14 +50,37 @@ export const RunPreviewComponent = (
 ): JSX.Element | null => {
   const { t } = useTranslation('run_details')
   const robotSideAnalysis = useMostRecentCompletedAnalysis(runId)
+  const runStatus = useRunStatus(runId)
+  const isRunTerminal =
+    runStatus != null
+      ? (RUN_STATUSES_TERMINAL as RunStatus[]).includes(runStatus)
+      : false
+  // we only ever want one request done for terminal runs because this is a heavy request
+  const commandsFromQuery = useNotifyAllCommandsAsPreSerializedList(
+    runId,
+    { cursor: 0, pageLength: MAX_COMMANDS },
+    {
+      staleTime: Infinity,
+      cacheTime: Infinity,
+      enabled: isRunTerminal,
+    }
+  ).data?.data
+  const nullCheckedCommandsFromQuery =
+    commandsFromQuery == null ? robotSideAnalysis?.commands : commandsFromQuery
   const viewPortRef = React.useRef<HTMLDivElement | null>(null)
-  const currentRunCommandKey = useLastRunCommandKey(runId)
+  const currentRunCommandKey = useNotifyLastRunCommandKey(runId, {
+    refetchInterval: LIVE_RUN_COMMANDS_POLL_MS,
+  })
   const [
     isCurrentCommandVisible,
     setIsCurrentCommandVisible,
   ] = React.useState<boolean>(true)
   if (robotSideAnalysis == null) return null
-  const currentRunCommandIndex = robotSideAnalysis.commands.findIndex(
+  const commands =
+    (isRunTerminal
+      ? nullCheckedCommandsFromQuery
+      : robotSideAnalysis.commands) ?? []
+  const currentRunCommandIndex = commands.findIndex(
     c => c.key === currentRunCommandKey
   )
 
@@ -64,8 +98,8 @@ export const RunPreviewComponent = (
         <StyledText as="h3" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
           {t('run_preview')}
         </StyledText>
-        <StyledText as="label" color={COLORS.darkGreyEnabled}>
-          {t('steps_total', { count: robotSideAnalysis.commands.length })}
+        <StyledText as="label" color={COLORS.grey50}>
+          {t('steps_total', { count: commands.length })}
         </StyledText>
       </Flex>
       <StyledText as="p" marginBottom={SPACING.spacing8}>
@@ -75,7 +109,7 @@ export const RunPreviewComponent = (
       <ViewportList
         viewportRef={viewPortRef}
         ref={ref}
-        items={robotSideAnalysis.commands}
+        items={commands}
         onViewportIndexesChange={([
           lowestVisibleIndex,
           highestVisibleIndex,
@@ -91,15 +125,8 @@ export const RunPreviewComponent = (
       >
         {(command, index) => {
           const isCurrent = index === currentRunCommandIndex
-          const borderColor = isCurrent
-            ? COLORS.blueEnabled
-            : COLORS.transparent
-          const backgroundColor = isCurrent
-            ? COLORS.lightBlue
-            : COLORS.fundamentalsBackground
-          const contentColor = isCurrent
-            ? COLORS.darkBlackEnabled
-            : COLORS.darkGreyEnabled
+          const backgroundColor = isCurrent ? COLORS.blue30 : COLORS.grey20
+          const iconColor = isCurrent ? COLORS.blue60 : COLORS.grey50
           return (
             <Flex
               key={command.id}
@@ -116,14 +143,11 @@ export const RunPreviewComponent = (
                 flexDirection={DIRECTION_COLUMN}
                 gridGap={SPACING.spacing4}
                 width="100%"
-                border={`solid 1px ${
-                  index === jumpedIndex ? COLORS.electricPurple : borderColor
-                }`}
                 backgroundColor={
                   index === jumpedIndex ? '#F5E3FF' : backgroundColor
                 }
-                color={COLORS.darkBlackEnabled}
-                borderRadius={BORDERS.radiusSoftCorners}
+                color={COLORS.black90}
+                borderRadius={BORDERS.borderRadius4}
                 padding={SPACING.spacing8}
                 css={css`
                   transition: background-color ${COLOR_FADE_MS}ms ease-out,
@@ -131,12 +155,12 @@ export const RunPreviewComponent = (
                 `}
               >
                 <Flex alignItems={ALIGN_CENTER} gridGap={SPACING.spacing8}>
-                  <CommandIcon command={command} color={contentColor} />
+                  <CommandIcon command={command} color={iconColor} />
                   <CommandText
                     command={command}
                     robotSideAnalysis={robotSideAnalysis}
                     robotType={robotType}
-                    color={contentColor}
+                    color={COLORS.black90}
                   />
                 </Flex>
               </Flex>
@@ -157,6 +181,11 @@ export const RunPreviewComponent = (
         >
           {t('view_current_step')}
         </PrimaryButton>
+      ) : null}
+      {currentRunCommandIndex === commands.length - 1 ? (
+        <StyledText as="h6" color={COLORS.grey60}>
+          {t('end_of_protocol')}
+        </StyledText>
       ) : null}
     </Flex>
   )

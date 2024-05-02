@@ -14,6 +14,8 @@ runs:
     - shell: bash
       run: |
         if [[ "${OSTYPE}" =~ "linux" ]]; then
+          # WORKAROUND: Remove microsoft debian repo due to https://github.com/microsoft/linux-package-repositories/issues/130. Remove line below after it is resolved
+          sudo rm -f /etc/apt/sources.list.d/microsoft-prod.list
           sudo apt-get update
           sudo apt-get install -y --no-install-recommends libsystemd-dev
         fi
@@ -25,8 +27,10 @@ runs:
       if: ${{ inputs.python-version != 'false' }}
       run: echo "OT_VIRTUALENV_VERSION=${{ inputs.python-version }}" >> $GITHUB_ENV
     - shell: bash
-      run: |
-        npm install --global shx@0.3.3
-        $OT_PYTHON -m pip install pipenv==2021.5.29
+      run: npm install --global shx@0.3.3
     - shell: bash
-      run: 'make -C ${{ inputs.project }} setup'
+      run: $OT_PYTHON -m pip install --upgrade pip
+    - shell: bash
+      run: $OT_PYTHON -m pip install --user pipenv==2023.12.1
+    - shell: bash
+      run: 'make -C ${{ inputs.project }} setup || make -C ${{ inputs.project }} setup'

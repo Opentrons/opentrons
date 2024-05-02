@@ -16,7 +16,7 @@ from .configuring_common import (
     PipetteNozzleLayoutResultMixin,
 )
 from ..types import (
-    EmptyNozzleLayoutConfiguration,
+    AllNozzleLayoutConfiguration,
     SingleNozzleLayoutConfiguration,
     RowNozzleLayoutConfiguration,
     ColumnNozzleLayoutConfiguration,
@@ -33,8 +33,8 @@ ConfigureNozzleLayoutCommandType = Literal["configureNozzleLayout"]
 class ConfigureNozzleLayoutParams(PipetteIdMixin):
     """Parameters required to configure the nozzle layout for a specific pipette."""
 
-    configuration_params: Union[
-        EmptyNozzleLayoutConfiguration,
+    configurationParams: Union[
+        AllNozzleLayoutConfiguration,
         SingleNozzleLayoutConfiguration,
         RowNozzleLayoutConfiguration,
         ColumnNozzleLayoutConfiguration,
@@ -73,8 +73,13 @@ class ConfigureNozzleLayoutImplementation(
         self, params: ConfigureNozzleLayoutParams
     ) -> Tuple[ConfigureNozzleLayoutResult, ConfigureNozzleLayoutPrivateResult]:
         """Check that requested pipette can support the requested nozzle layout."""
+        primary_nozzle = params.configurationParams.dict().get("primaryNozzle")
+        front_right_nozzle = params.configurationParams.dict().get("frontRightNozzle")
         nozzle_params = await self._tip_handler.available_for_nozzle_layout(
-            pipette_id=params.pipetteId, **params.configuration_params.dict()
+            pipette_id=params.pipetteId,
+            style=params.configurationParams.style,
+            primary_nozzle=primary_nozzle,
+            front_right_nozzle=front_right_nozzle,
         )
 
         nozzle_map = await self._equipment.configure_nozzle_layout(

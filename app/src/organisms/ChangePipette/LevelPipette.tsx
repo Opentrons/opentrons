@@ -8,11 +8,11 @@ import {
   Flex,
   JUSTIFY_FLEX_END,
   JUSTIFY_SPACE_BETWEEN,
-  SPACING,
-  TYPOGRAPHY,
   PrimaryButton,
+  SPACING,
+  StyledText,
+  TYPOGRAPHY,
 } from '@opentrons/components'
-import { StyledText } from '../../atoms/text'
 
 import type { Mount } from '../../redux/pipettes/types'
 
@@ -22,7 +22,7 @@ interface LevelPipetteProps {
   confirm: () => void
 }
 
-function LevelingVideo(props: {
+export function LevelingVideo(props: {
   pipetteName: string
   mount: Mount
 }): JSX.Element {
@@ -40,7 +40,12 @@ function LevelingVideo(props: {
       controls={true}
     >
       <source
-        src={require(`../../assets/videos/pip-leveling/${pipetteName}-${mount}.webm`)}
+        src={
+          new URL(
+            `../../assets/videos/pip-leveling/${pipetteName}-${mount}.webm`,
+            import.meta.url
+          ).href
+        }
       />
     </video>
   )

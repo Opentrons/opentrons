@@ -21,6 +21,9 @@ from opentrons_hardware.firmware_bindings.messages.message_definitions import (
     BrushedMotorConfResponse,
     GripperJawStateRequest,
     GripperJawStateResponse,
+    SetGripperJawHoldoffRequest,
+    GripperJawHoldoffRequest,
+    GripperJawHoldoffResponse,
 )
 from opentrons_hardware.firmware_bindings.utils import (
     UInt8Field,
@@ -98,6 +101,51 @@ async def set_error_tolerance(
     )
     if error != ErrorCode.ok:
         log.error(f"recieved error trying to set gripper error tolerance {str(error)}")
+
+
+async def set_jaw_holdoff(
+    can_messenger: CanMessenger,
+    holdoff_ms: float,
+) -> None:
+    """Set the idle holdoff value for gripper jaw."""
+    error = await can_messenger.ensure_send(
+        node_id=NodeId.gripper_g,
+        message=SetGripperJawHoldoffRequest(
+            payload=payloads.GripperJawHoldoffPayload(
+                holdoff_ms=UInt32Field(int(holdoff_ms * (2**16)))
+            )
+        ),
+        expected_nodes=[NodeId.gripper_g],
+    )
+    if error != ErrorCode.ok:
+        log.error(
+            f"recieved error trying to set gripper jaw holdoff value {str(error)}"
+        )
+
+
+async def get_jaw_holdoff_ms(can_messenger: CanMessenger) -> float:
+    """Get the idle holdoff value for gripper jaw."""
+
+    def _filter(arbitration_id: ArbitrationId) -> bool:
+        return NodeId(arbitration_id.parts.originating_node_id) == NodeId.gripper_g
+
+    async def _wait_for_response(reader: WaitableCallback) -> float:
+        """Listener for receiving messages back."""
+        async for response, _ in reader:
+            if isinstance(response, GripperJawHoldoffResponse):
+                return float(response.payload.holdoff_ms.value / (2**16))
+        raise StopAsyncIteration
+
+    with WaitableCallback(can_messenger, _filter) as reader:
+        await can_messenger.send(
+            node_id=NodeId.gripper_g,
+            message=GripperJawHoldoffRequest(),
+        )
+        try:
+            return await asyncio.wait_for(_wait_for_response(reader), 1.0)
+        except asyncio.TimeoutError:
+            log.warning("Read gripper jaw idle holdoff value timed out")
+            raise StopAsyncIteration
 
 
 async def get_gripper_jaw_motor_param(

@@ -1,13 +1,17 @@
 """Tests for opentrons.hardware_control.module_control."""
 import pytest
 from decoy import Decoy, matchers
-from typing import Awaitable, Callable, cast
+from typing import Awaitable, Callable, cast, Union, List
 
 from opentrons.drivers.rpi_drivers.types import USBPort
 from opentrons.drivers.rpi_drivers.interfaces import USBDriverInterface
 from opentrons.hardware_control import API as HardwareAPI
 from opentrons.hardware_control.modules import AbstractModule
-from opentrons.hardware_control.modules.types import ModuleAtPort, ModuleType
+from opentrons.hardware_control.modules.types import (
+    ModuleAtPort,
+    ModuleType,
+    SimulatingModuleAtPort,
+)
 from opentrons.hardware_control.module_control import AttachedModulesControl
 
 
@@ -34,7 +38,10 @@ def build_module(decoy: Decoy) -> Callable[..., Awaitable[AbstractModule]]:
         `AttachedModulesControl` is doing too much work _and_ these tests
         are too brittle and of questionable value.
     """
-    return cast(Callable[..., Awaitable[AbstractModule]], decoy.mock(is_async=True))
+    return cast(
+        Callable[..., Awaitable[AbstractModule]],
+        decoy.mock(name="build_module", is_async=True),
+    )
 
 
 @pytest.fixture()
@@ -52,15 +59,28 @@ def subject(
     return modules_control
 
 
+@pytest.mark.parametrize(
+    "module_at_port_input",
+    [
+        ([ModuleAtPort(port="/dev/foo", name="bar")]),
+        (
+            [
+                SimulatingModuleAtPort(
+                    port="/dev/foo", name="bar", serial_number="test-123"
+                )
+            ]
+        ),
+    ],
+)
 async def test_register_modules(
     decoy: Decoy,
     usb_bus: USBDriverInterface,
     build_module: Callable[..., Awaitable[AbstractModule]],
     hardware_api: HardwareAPI,
     subject: AttachedModulesControl,
+    module_at_port_input: Union[List[ModuleAtPort], List[SimulatingModuleAtPort]],
 ) -> None:
     """It should register attached modules."""
-    new_mods_at_ports = [ModuleAtPort(port="/dev/foo", name="bar")]
     actual_ports = [
         ModuleAtPort(
             port="/dev/foo",
@@ -72,16 +92,19 @@ async def test_register_modules(
     module = decoy.mock(cls=AbstractModule)
     decoy.when(module.usb_port).then_return(USBPort(name="baz", port_number=0))
 
-    decoy.when(usb_bus.match_virtual_ports(new_mods_at_ports)).then_return(actual_ports)
+    decoy.when(usb_bus.match_virtual_ports(module_at_port_input)).then_return(
+        actual_ports
+    )
     decoy.when(
         await build_module(
             port="/dev/foo",
             usb_port=USBPort(name="baz", port_number=0),
             type=ModuleType.TEMPERATURE,
+            sim_serial_number=None,
         )
     ).then_return(module)
 
-    await subject.register_modules(new_mods_at_ports=new_mods_at_ports)
+    await subject.register_modules(new_mods_at_ports=module_at_port_input)
     result = subject.available_modules
 
     assert result == [module]
@@ -127,6 +150,7 @@ async def test_register_modules_sort(
                 usb_port=mod.usb_port,
                 port=matchers.Anything(),
                 type=matchers.Anything(),
+                sim_serial_number=None,
             )
         ).then_return(mod)
 

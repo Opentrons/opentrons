@@ -6,22 +6,26 @@ import { useTranslation } from 'react-i18next'
 
 import {
   ALIGN_CENTER,
+  BORDERS,
   COLORS,
   DIRECTION_COLUMN,
-  JUSTIFY_FLEX_END,
-  SPACING,
   Flex,
+  JUSTIFY_SPACE_AROUND,
+  JUSTIFY_SPACE_BETWEEN,
   NewPrimaryBtn,
   NewSecondaryBtn,
-  BORDERS,
+  SPACING,
+  StyledText,
 } from '@opentrons/components'
 
 import {
   getShellUpdateState,
+  getAvailableShellUpdate,
   downloadShellUpdate,
   applyShellUpdate,
 } from '../../redux/shell'
 
+import { ExternalLink } from '../../atoms/Link/ExternalLink'
 import { ReleaseNotes } from '../../molecules/ReleaseNotes'
 import { LegacyModal } from '../../molecules/LegacyModal'
 import { Banner } from '../../atoms/Banner'
@@ -29,7 +33,6 @@ import { ProgressBar } from '../../atoms/ProgressBar'
 import { useRemoveActiveAppUpdateToast } from '../Alerts'
 
 import type { Dispatch } from '../../redux/types'
-import { StyledText } from '../../atoms/text'
 
 interface PlaceHolderErrorProps {
   errorMessage?: string
@@ -56,13 +59,14 @@ const PlaceholderError = ({
     </>
   )
 }
-
+export const RELEASE_NOTES_URL_BASE =
+  'https://github.com/Opentrons/opentrons/releases/tag/v'
 const UPDATE_ERROR = 'Update Error'
 const FOOTER_BUTTON_STYLE = css`
   text-transform: lowercase;
   padding-left: ${SPACING.spacing16};
   padding-right: ${SPACING.spacing16};
-  border-radius: ${BORDERS.borderRadiusSize1};
+  border-radius: ${BORDERS.borderRadius8};
   margin-top: ${SPACING.spacing16};
   margin-bottom: ${SPACING.spacing16};
 
@@ -75,13 +79,13 @@ const UpdateAppBanner = styled(Banner)`
 `
 const UPDATE_PROGRESS_BAR_STYLE = css`
   margin-top: ${SPACING.spacing24};
-  border-radius: ${BORDERS.borderRadiusSize3};
-  background: ${COLORS.medGreyEnabled};
+  border-radius: ${BORDERS.borderRadius8};
+  background: ${COLORS.grey30};
   width: 17.12rem;
 `
 const LEGACY_MODAL_STYLE = css`
   width: 40rem;
-  textalign: center;
+  margin-left: 5.336rem;
 `
 
 const RESTART_APP_AFTER_TIME = 5000
@@ -102,9 +106,10 @@ export function UpdateAppModal(props: UpdateAppModalProps): JSX.Element {
     info: updateInfo,
   } = updateState
   const releaseNotes = updateInfo?.releaseNotes
-  const { t } = useTranslation('app_settings')
+  const { t } = useTranslation(['app_settings', 'branded'])
   const history = useHistory()
   const { removeActiveAppUpdateToast } = useRemoveActiveAppUpdateToast()
+  const availableAppUpdateVersion = useSelector(getAvailableShellUpdate) ?? ''
 
   if (downloaded)
     setTimeout(() => dispatch(applyShellUpdate()), RESTART_APP_AFTER_TIME)
@@ -117,21 +122,33 @@ export function UpdateAppModal(props: UpdateAppModalProps): JSX.Element {
   removeActiveAppUpdateToast()
 
   const appUpdateFooter = (
-    <Flex alignItems={ALIGN_CENTER} justifyContent={JUSTIFY_FLEX_END}>
-      <NewSecondaryBtn
-        onClick={handleRemindMeLaterClick}
-        marginRight={SPACING.spacing8}
-        css={FOOTER_BUTTON_STYLE}
+    <Flex alignItems={ALIGN_CENTER} justifyContent={JUSTIFY_SPACE_BETWEEN}>
+      <ExternalLink
+        href={`${RELEASE_NOTES_URL_BASE}${availableAppUpdateVersion}`}
+        css={css`
+          font-size: 0.875rem;
+        `}
+        id="SoftwareUpdateReleaseNotesLink"
+        marginLeft={SPACING.spacing32}
       >
-        {t('remind_later')}
-      </NewSecondaryBtn>
-      <NewPrimaryBtn
-        onClick={() => dispatch(downloadShellUpdate())}
-        marginRight={SPACING.spacing12}
-        css={FOOTER_BUTTON_STYLE}
-      >
-        {t('update_app_now')}
-      </NewPrimaryBtn>
+        {t('release_notes')}
+      </ExternalLink>
+      <Flex alignItems={ALIGN_CENTER} justifyContent={JUSTIFY_SPACE_AROUND}>
+        <NewSecondaryBtn
+          onClick={handleRemindMeLaterClick}
+          marginRight={SPACING.spacing8}
+          css={FOOTER_BUTTON_STYLE}
+        >
+          {t('remind_later')}
+        </NewSecondaryBtn>
+        <NewPrimaryBtn
+          onClick={() => dispatch(downloadShellUpdate())}
+          marginRight={SPACING.spacing12}
+          css={FOOTER_BUTTON_STYLE}
+        >
+          {t('update_app_now')}
+        </NewPrimaryBtn>
+      </Flex>
     </Flex>
   )
 
@@ -147,7 +164,10 @@ export function UpdateAppModal(props: UpdateAppModalProps): JSX.Element {
         </LegacyModal>
       ) : null}
       {(downloading || downloaded) && error == null ? (
-        <LegacyModal title={t('opentrons_app_update')} css={LEGACY_MODAL_STYLE}>
+        <LegacyModal
+          title={t('branded:opentrons_app_update')}
+          css={LEGACY_MODAL_STYLE}
+        >
           <Flex
             flexDirection={DIRECTION_COLUMN}
             alignItems={ALIGN_CENTER}
@@ -157,7 +177,7 @@ export function UpdateAppModal(props: UpdateAppModalProps): JSX.Element {
               {downloading ? t('download_update') : t('restarting_app')}
             </StyledText>
             <ProgressBar
-              percentComplete={downloadPercentage}
+              percentComplete={downloaded ? 100 : downloadPercentage}
               outerStyles={UPDATE_PROGRESS_BAR_STYLE}
             />
           </Flex>
@@ -165,7 +185,7 @@ export function UpdateAppModal(props: UpdateAppModalProps): JSX.Element {
       ) : null}
       {!downloading && !downloaded && error == null ? (
         <LegacyModal
-          title={t('opentrons_app_update_available')}
+          title={t('branded:opentrons_app_update_available')}
           onClose={() => closeModal(true)}
           closeOnOutsideClick={true}
           footer={appUpdateFooter}
@@ -174,7 +194,7 @@ export function UpdateAppModal(props: UpdateAppModalProps): JSX.Element {
         >
           <Flex flexDirection={DIRECTION_COLUMN}>
             <UpdateAppBanner type="informing" marginBottom={SPACING.spacing8}>
-              {t('update_requires_restarting')}
+              {t('branded:update_requires_restarting_app')}
             </UpdateAppBanner>
             <ReleaseNotes source={releaseNotes} />
           </Flex>

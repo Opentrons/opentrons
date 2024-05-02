@@ -11,15 +11,17 @@ import {
   POSITION_ABSOLUTE,
   POSITION_RELATIVE,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
   useOnClickOutside,
 } from '@opentrons/components'
 import { useMenuHandleClickOutside } from '../../atoms/MenuList/hooks'
 import { OverflowBtn } from '../../atoms/MenuList/OverflowBtn'
 import { MenuItem } from '../../atoms/MenuList/MenuItem'
-import { StyledText } from '../../atoms/text'
 import { GripperWizardFlows } from '../../organisms/GripperWizardFlows'
 import { formatLastCalibrated } from './CalibrationDetails/utils'
+import { useIsEstopNotDisengaged } from '../../resources/devices/hooks/useIsEstopNotDisengaged'
+
 import type { GripperData } from '@opentrons/api-client'
 
 const StyledTable = styled.table`
@@ -41,19 +43,20 @@ const StyledTableCell = styled.td`
 `
 
 const BODY_STYLE = css`
-  box-shadow: 0 0 0 1px ${COLORS.medGreyEnabled};
+  box-shadow: 0 0 0 1px ${COLORS.grey30};
   border-radius: 3px;
 `
 
-export interface RobotSettingsGripperCalibrationProps {
+interface RobotSettingsGripperCalibrationProps {
   gripper: GripperData | null
+  robotName: string
 }
 
 export function RobotSettingsGripperCalibration(
   props: RobotSettingsGripperCalibrationProps
 ): JSX.Element {
   const { t } = useTranslation('device_settings')
-  const { gripper } = props
+  const { gripper, robotName } = props
   const {
     menuOverlay,
     handleOverflowClick,
@@ -64,6 +67,8 @@ export function RobotSettingsGripperCalibration(
     onClickOutside: () => setShowOverflowMenu(false),
   })
   const [showWizardFlow, setShowWizardFlow] = React.useState<boolean>(false)
+  const isEstopNotDisengaged = useIsEstopNotDisengaged(robotName)
+
   const gripperCalibrationLastModified =
     gripper?.data.calibratedOffset?.last_modified
 
@@ -121,6 +126,7 @@ export function RobotSettingsGripperCalibration(
                     alignSelf={ALIGN_FLEX_END}
                     aria-label="CalibrationOverflowMenu_button_gripperCalibration"
                     onClick={handleOverflowClick}
+                    disabled={isEstopNotDisengaged}
                   />
                   {showWizardFlow ? (
                     <GripperWizardFlows

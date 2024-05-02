@@ -9,23 +9,22 @@ import {
   Flex,
   JUSTIFY_CENTER,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
-
-import { StyledText } from '../../atoms/text'
 
 import imgSrc from '../../assets/images/on-device-display/empty_protocol_dashboard.png'
 
 export function NoProtocols(): JSX.Element {
-  const { t } = useTranslation('protocol_info')
+  const { t } = useTranslation(['protocol_info', 'branded'])
   return (
     <Flex
       alignItems={ALIGN_CENTER}
-      backgroundColor={COLORS.darkBlack20}
+      backgroundColor={COLORS.grey35}
       flexDirection={DIRECTION_COLUMN}
       height="27.25rem"
       justifyContent={JUSTIFY_CENTER}
-      borderRadius={BORDERS.borderRadiusSize3}
+      borderRadius={BORDERS.borderRadius12}
     >
       <img
         alt={t('nothing_here_yet')}
@@ -41,8 +40,8 @@ export function NoProtocols(): JSX.Element {
       >
         {t('nothing_here_yet')}
       </StyledText>
-      <StyledText as="h4" color={COLORS.darkBlack70}>
-        {t('send_a_protocol_to_store')}
+      <StyledText as="h4" color={COLORS.grey60}>
+        {t('branded:send_a_protocol_to_store')}
       </StyledText>
     </Flex>
   )

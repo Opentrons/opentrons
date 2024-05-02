@@ -15,6 +15,8 @@ from .gantry_mover import HardwareGantryMover
 from .tip_handler import TipHandler, HardwareTipHandler
 from ...hardware_control.types import OT3Mount
 
+from opentrons.protocol_engine.types import AddressableOffsetVector
+
 log = logging.getLogger(__name__)
 
 # TODO(mc, 2022-03-07): this constant dup'd from opentrons.protocols.geometry.deck
@@ -48,44 +50,68 @@ class HardwareStopper:
             state_view=state_store,
         )
 
+    async def _home_everything_except_plungers(self) -> None:
+        # TODO: Update this once gripper MotorAxis is available in engine.
+        try:
+            ot3api = ensure_ot3_hardware(hardware_api=self._hardware_api)
+            if (
+                not self._state_store.config.use_virtual_gripper
+                and ot3api.has_gripper()
+            ):
+                await ot3api.home_z(mount=OT3Mount.GRIPPER)
+        except HardwareNotSupportedError:
+            pass
+        await self._movement_handler.home(
+            axes=[MotorAxis.X, MotorAxis.Y, MotorAxis.LEFT_Z, MotorAxis.RIGHT_Z]
+        )
+
     async def _drop_tip(self) -> None:
         """Drop currently attached tip, if any, into trash after a run cancel."""
         attached_tips = self._state_store.pipettes.get_all_attached_tips()
 
         if attached_tips:
             await self._hardware_api.stop(home_after=False)
-            # TODO: Update this once gripper MotorAxis is available in engine.
-            try:
-                ot3api = ensure_ot3_hardware(hardware_api=self._hardware_api)
-                if (
-                    not self._state_store.config.use_virtual_gripper
-                    and ot3api.has_gripper()
-                ):
-                    await ot3api.home_z(mount=OT3Mount.GRIPPER)
-            except HardwareNotSupportedError:
-                pass
-            await self._movement_handler.home(
-                axes=[MotorAxis.X, MotorAxis.Y, MotorAxis.LEFT_Z, MotorAxis.RIGHT_Z]
-            )
 
-        for pipette_id, tip in attached_tips:
-            try:
-                await self._tip_handler.add_tip(pipette_id=pipette_id, tip=tip)
-                # TODO: Add ability to drop tip onto custom trash as well.
-                await self._movement_handler.move_to_well(
-                    pipette_id=pipette_id,
-                    labware_id=FIXED_TRASH_ID,
-                    well_name="A1",
-                )
-                await self._tip_handler.drop_tip(
-                    pipette_id=pipette_id,
-                    home_after=False,
-                )
+            await self._home_everything_except_plungers()
 
-            except HwPipetteNotAttachedError:
-                # this will happen normally during protocol analysis, but
-                # should not happen during an actual run
-                log.debug(f"Pipette ID {pipette_id} no longer attached.")
+            for pipette_id, tip in attached_tips:
+                try:
+                    if self._state_store.labware.get_fixed_trash_id() == FIXED_TRASH_ID:
+                        # OT-2 and Flex 2.15 protocols will default to the Fixed Trash Labware
+                        await self._tip_handler.add_tip(pipette_id=pipette_id, tip=tip)
+                        await self._movement_handler.move_to_well(
+                            pipette_id=pipette_id,
+                            labware_id=FIXED_TRASH_ID,
+                            well_name="A1",
+                        )
+                        await self._tip_handler.drop_tip(
+                            pipette_id=pipette_id,
+                            home_after=False,
+                        )
+                    elif self._state_store.config.robot_type == "OT-2 Standard":
+                        # API 2.16 and above OT2 protocols use addressable areas
+                        await self._tip_handler.add_tip(pipette_id=pipette_id, tip=tip)
+                        await self._movement_handler.move_to_addressable_area(
+                            pipette_id=pipette_id,
+                            addressable_area_name="fixedTrash",
+                            offset=AddressableOffsetVector(x=0, y=0, z=0),
+                            force_direct=False,
+                            speed=None,
+                            minimum_z_height=None,
+                        )
+                        await self._tip_handler.drop_tip(
+                            pipette_id=pipette_id,
+                            home_after=False,
+                        )
+                    else:
+                        log.debug(
+                            "Flex Protocols API Version 2.16 and beyond do not support automatic tip dropping at this time."
+                        )
+
+                except HwPipetteNotAttachedError:
+                    # this will happen normally during protocol analysis, but
+                    # should not happen during an actual run
+                    log.debug(f"Pipette ID {pipette_id} no longer attached.")
 
     async def do_halt(self, disengage_before_stopping: bool = False) -> None:
         """Issue a halt signal to the hardware API.
@@ -102,12 +128,15 @@ class HardwareStopper:
         post_run_hardware_state: PostRunHardwareState,
         drop_tips_after_run: bool = False,
     ) -> None:
-        """Stop and reset the HardwareAPI, optionally dropping tips and homing."""
-        if drop_tips_after_run:
-            await self._drop_tip()
-
+        """Stop and reset the HardwareAPI, homing and dropping tips independently if specified."""
         home_after_stop = post_run_hardware_state in (
             PostRunHardwareState.HOME_AND_STAY_ENGAGED,
             PostRunHardwareState.HOME_THEN_DISENGAGE,
         )
-        await self._hardware_api.stop(home_after=home_after_stop)
+        if drop_tips_after_run:
+            await self._drop_tip()
+            await self._hardware_api.stop(home_after=home_after_stop)
+        else:
+            await self._hardware_api.stop(home_after=False)
+            if home_after_stop:
+                await self._home_everything_except_plungers()

@@ -3,9 +3,13 @@ import {
   PAUSE_UNTIL_TIME,
   PAUSE_UNTIL_TEMP,
 } from './constants'
-import { IconName } from '@opentrons/components'
-import { LabwareLocation } from '@opentrons/shared-data'
-import {
+import type { IconName } from '@opentrons/components'
+import type {
+  LabwareLocation,
+  NozzleConfigurationStyle,
+} from '@opentrons/shared-data'
+import type {
+  AdditionalEquipmentEntity,
   ChangeTipOptions,
   LabwareEntity,
   PipetteEntity,
@@ -74,6 +78,12 @@ export type StepFieldName = string
 // | 'dispense_touchTip'
 // | 'aspirate_disposalVol_checkbox'
 // | 'aspirate_disposalVol_volume'
+// | 'aspirate_x_position
+// | 'aspirate_y_position
+// | 'dispense_x_position
+// | 'dispense_y_position
+// | 'mix_x_position
+// | 'mix_y_position
 // TODO Ian 2019-01-16 factor out to some constants.js ? See #2926
 export type StepType =
   | 'moveLabware'
@@ -172,6 +182,7 @@ export interface HydratedMoveLiquidFormData {
   stepName: string
   description: string | null | undefined
   fields: {
+    tipRack: string
     pipette: PipetteEntity
     volume: number
     path: PathOption
@@ -200,7 +211,7 @@ export interface HydratedMoveLiquidFormData {
     dispense_delay_checkbox: boolean
     dispense_delay_seconds: number | null | undefined
     dispense_delay_mmFromBottom: number | null | undefined
-    dispense_labware: LabwareEntity
+    dispense_labware: LabwareEntity | AdditionalEquipmentEntity
     dispense_wells: string[]
     dispense_wellOrder_first: WellOrderOption
     dispense_wellOrder_second: WellOrderOption
@@ -216,6 +227,12 @@ export interface HydratedMoveLiquidFormData {
     blowout_checkbox: boolean
     blowout_location: string | null | undefined // labwareId or 'SOURCE_WELL' or 'DEST_WELL'
     dropTip_location: string
+    nozzles: NozzleConfigurationStyle | null
+    aspirate_x_position?: number | null
+    aspirate_y_position?: number | null
+    dispense_x_position?: number | null
+    dispense_y_position?: number | null
+    blowout_z_offset?: number | null
   }
 }
 
@@ -234,6 +251,7 @@ export interface HydratedMixFormDataLegacy {
   id: string
   stepType: 'mix'
   stepName: string
+  tipRack: string
   stepDetails: string | null | undefined
   pipette: PipetteEntity
   volume: number
@@ -255,6 +273,10 @@ export interface HydratedMixFormDataLegacy {
   dispense_delay_checkbox: boolean
   dispense_delay_seconds: number | null | undefined
   dropTip_location: string
+  nozzles: NozzleConfigurationStyle | null
+  mix_x_position?: number | null
+  mix_y_position?: number | null
+  blowout_z_offset?: number | null
 }
 export type MagnetAction = 'engage' | 'disengage'
 export type HydratedMagnetFormData = AnnotationFields & {
@@ -295,7 +317,7 @@ export type HydratedMoveLiquidFormDataLegacy = AnnotationFields &
     stepType: 'moveLiquid'
   }
 // fields used in TipPositionInput
-export type TipOffsetFields =
+export type TipZOffsetFields =
   | 'aspirate_mmFromBottom'
   | 'dispense_mmFromBottom'
   | 'mix_mmFromBottom'
@@ -304,6 +326,17 @@ export type TipOffsetFields =
   | 'aspirate_delay_mmFromBottom'
   | 'dispense_delay_mmFromBottom'
   | 'mix_touchTip_mmFromBottom'
+
+export type TipYOffsetFields =
+  | 'aspirate_y_position'
+  | 'dispense_y_position'
+  | 'mix_y_position'
+
+export type TipXOffsetFields =
+  | 'aspirate_x_position'
+  | 'dispense_x_position'
+  | 'mix_x_position'
+
 export type DelayCheckboxFields =
   | 'aspirate_delay_checkbox'
   | 'dispense_delay_checkbox'
@@ -326,3 +359,8 @@ export function getIsDelayPositionField(fieldName: string): boolean {
   return delayPositionFields.includes(fieldName)
 }
 export type CountPerStepType = Partial<Record<StepType, number>>
+
+//  TODO: get real HydratedFormData type
+export interface HydratedFormdata {
+  [key: string]: any
+}

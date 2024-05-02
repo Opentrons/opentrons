@@ -1,7 +1,11 @@
 import * as React from 'react'
-import { renderWithProviders, COLORS, BORDERS } from '@opentrons/components'
+import { describe, it, expect, vi, beforeEach } from 'vitest'
+import '@testing-library/jest-dom/vitest'
+import { fireEvent, screen } from '@testing-library/react'
+import { COLORS, BORDERS } from '@opentrons/components'
 
 import { SmallButton } from '../SmallButton'
+import { renderWithProviders } from '../../../__testing-utils__'
 
 const render = (props: React.ComponentProps<typeof SmallButton>) => {
   return renderWithProviders(<SmallButton {...props} />)[0]
@@ -12,19 +16,19 @@ describe('SmallButton', () => {
 
   beforeEach(() => {
     props = {
-      onClick: jest.fn(),
+      onClick: vi.fn(),
       buttonText: 'small button',
     }
   })
   it('renders the primary button and it works as expected', () => {
-    const { getByText, getByRole } = render(props)
-    getByText('small button').click()
+    render(props)
+    fireEvent.click(screen.getByText('small button'))
     expect(props.onClick).toHaveBeenCalled()
-    expect(getByRole('button')).toHaveStyle(
-      `background-color: ${COLORS.blueEnabled}`
+    expect(screen.getByRole('button')).toHaveStyle(
+      `background-color: ${COLORS.blue60}`
     )
-    expect(getByRole('button')).toHaveStyle(
-      `border-radius: ${BORDERS.borderRadiusSize4}`
+    expect(screen.getByRole('button')).toHaveStyle(
+      `border-radius: ${BORDERS.borderRadius16}`
     )
   })
   it('renders the alert button', () => {
@@ -32,17 +36,19 @@ describe('SmallButton', () => {
       ...props,
       buttonType: 'alert',
     }
-    const { getByRole } = render(props)
-    expect(getByRole('button')).toHaveStyle(`background-color: ${COLORS.red2}`)
+    render(props)
+    expect(screen.getByRole('button')).toHaveStyle(
+      `background-color: ${COLORS.red55}`
+    )
   })
   it('renders the secondary button', () => {
     props = {
       ...props,
       buttonType: 'secondary',
     }
-    const { getByRole } = render(props)
-    expect(getByRole('button')).toHaveStyle(
-      `background-color: ${COLORS.mediumBlueEnabled}`
+    render(props)
+    expect(screen.getByRole('button')).toHaveStyle(
+      `background-color: ${COLORS.blue40}`
     )
   })
   it('renders the tertiary high light button', () => {
@@ -50,35 +56,33 @@ describe('SmallButton', () => {
       ...props,
       buttonType: 'tertiaryHighLight',
     }
-    const { getByRole } = render(props)
-    expect(getByRole('button')).toHaveStyle(`color: ${COLORS.darkBlackEnabled}`)
+    render(props)
+    expect(screen.getByRole('button')).toHaveStyle(`color: ${COLORS.black90}`)
   })
   it('renders the tertiary low light', () => {
     props = {
       ...props,
       buttonType: 'tertiaryLowLight',
     }
-    const { getByRole } = render(props)
-    expect(getByRole('button')).toHaveStyle(
-      `color: ${COLORS.darkBlackEnabled}${COLORS.opacity70HexCode}`
-    )
+    render(props)
+    expect(screen.getByRole('button')).toHaveStyle(`color: ${COLORS.grey60}`)
   })
   it('renders the button as disabled', () => {
     props = {
       ...props,
       disabled: true,
     }
-    const { getByRole } = render(props)
-    expect(getByRole('button')).toBeDisabled()
+    render(props)
+    expect(screen.getByRole('button')).toBeDisabled()
   })
   it('renders the rounded button category', () => {
     props = {
       ...props,
       buttonCategory: 'rounded',
     }
-    const { getByRole } = render(props)
-    expect(getByRole('button')).toHaveStyle(
-      `border-radius: ${BORDERS.borderRadiusSize5}`
+    render(props)
+    expect(screen.getByRole('button')).toHaveStyle(
+      `border-radius: ${BORDERS.borderRadius40}`
     )
   })
   it('renders an icon with start placement', () => {
@@ -87,8 +91,8 @@ describe('SmallButton', () => {
       iconName: 'alert',
       iconPlacement: 'startIcon',
     }
-    const { getByLabelText } = render(props)
-    getByLabelText('SmallButton_alert_positionStart')
+    render(props)
+    screen.getByLabelText('alert')
   })
   it('renders an icon with end placement', () => {
     props = {
@@ -96,7 +100,7 @@ describe('SmallButton', () => {
       iconName: 'alert',
       iconPlacement: 'endIcon',
     }
-    const { getByLabelText } = render(props)
-    getByLabelText('SmallButton_alert_positionEnd')
+    render(props)
+    screen.getByLabelText('alert')
   })
 })

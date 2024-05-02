@@ -1,23 +1,28 @@
 import * as React from 'react'
 
+import { WASTE_CHUTE_CUTOUT } from '@opentrons/shared-data'
+
 import { Icon } from '../../icons'
 import { Flex, Text } from '../../primitives'
-import { ALIGN_CENTER, DIRECTION_COLUMN, JUSTIFY_CENTER } from '../../styles'
-import { BORDERS, COLORS, TYPOGRAPHY } from '../../ui-style-constants'
+import {
+  ALIGN_CENTER,
+  DIRECTION_COLUMN,
+  JUSTIFY_CENTER,
+  TEXT_ALIGN_CENTER,
+} from '../../styles'
+import { SPACING, TYPOGRAPHY } from '../../ui-style-constants'
+import { COLORS } from '../../helix-design-system'
 import { RobotCoordsForeignObject } from '../Deck/RobotCoordsForeignObject'
 import { SlotBase } from './SlotBase'
 
 import type { DeckDefinition, ModuleType } from '@opentrons/shared-data'
 
-// waste chute only in cutout location D3
-export type WasteChuteLocation = 'D3'
-
 interface WasteChuteFixtureProps extends React.SVGProps<SVGGElement> {
-  cutoutLocation: WasteChuteLocation
+  cutoutId: typeof WASTE_CHUTE_CUTOUT
   deckDefinition: DeckDefinition
   moduleType?: ModuleType
   fixtureBaseColor?: React.SVGProps<SVGPathElement>['fill']
-  slotClipColor?: React.SVGProps<SVGPathElement>['stroke']
+  wasteChuteColor?: string
   showExtensions?: boolean
 }
 
@@ -25,23 +30,22 @@ export function WasteChuteFixture(
   props: WasteChuteFixtureProps
 ): JSX.Element | null {
   const {
-    cutoutLocation,
+    cutoutId,
     deckDefinition,
-    fixtureBaseColor = COLORS.light1,
-    slotClipColor = COLORS.darkGreyEnabled,
+    fixtureBaseColor = COLORS.grey35,
+    wasteChuteColor = COLORS.grey50,
     ...restProps
   } = props
 
-  if (cutoutLocation !== 'D3') {
+  if (cutoutId !== 'cutoutD3') {
     console.warn(
-      `cannot render WasteChuteFixture in given cutout location ${cutoutLocation}`
+      `cannot render WasteChuteFixture in given cutout location ${cutoutId}`
     )
     return null
   }
 
-  // TODO(bh, 2023-10-09): migrate from "orderedSlots" to v4 "cutouts" key
-  const cutoutDef = deckDefinition?.locations.orderedSlots.find(
-    s => s.id === cutoutLocation
+  const cutoutDef = deckDefinition?.locations.cutouts.find(
+    s => s.id === cutoutId
   )
   if (cutoutDef == null) {
     console.warn(
@@ -50,7 +54,6 @@ export function WasteChuteFixture(
     return null
   }
 
-  // TODO(bh, 2023-10-10): adjust base and clip d values if needed to fit v4 deck definition
   return (
     <g {...restProps}>
       <SlotBase
@@ -58,7 +61,7 @@ export function WasteChuteFixture(
         fill={fixtureBaseColor}
       />
       <WasteChute
-        backgroundColor={slotClipColor}
+        backgroundColor={wasteChuteColor}
         wasteIconColor={fixtureBaseColor}
       />
     </g>
@@ -72,32 +75,38 @@ interface WasteChuteProps {
 
 /**
  * a deck map foreign object representing the physical location of the waste chute connected to the deck
- * based on preliminary designs
- * TODO(bh, 2023-10-11): when designs and definitions settled, resolve position details etc
  */
 export function WasteChute(props: WasteChuteProps): JSX.Element {
   const { wasteIconColor, backgroundColor } = props
 
   return (
     <RobotCoordsForeignObject
-      width={145}
-      height={104}
+      width={130}
+      height={138}
       x={322}
-      y={-13}
+      y={-51}
       flexProps={{ flex: '1' }}
       foreignObjectProps={{ flex: '1' }}
     >
       <Flex
         alignItems={ALIGN_CENTER}
         backgroundColor={backgroundColor}
-        borderRadius={BORDERS.radiusSoftCorners}
+        borderRadius="6px"
         color={wasteIconColor}
         flexDirection={DIRECTION_COLUMN}
+        gridGap={SPACING.spacing4}
         justifyContent={JUSTIFY_CENTER}
+        padding={SPACING.spacing8}
         width="100%"
       >
-        <Icon name="trash" color={wasteIconColor} height="3.5rem" />
-        <Text css={TYPOGRAPHY.bodyTextSemiBold}>Waste chute</Text>
+        <Icon name="trash" color={wasteIconColor} height="2rem" />
+        <Text
+          color={COLORS.white}
+          textAlign={TEXT_ALIGN_CENTER}
+          css={TYPOGRAPHY.bodyTextSemiBold}
+        >
+          Waste chute
+        </Text>
       </Flex>
     </RobotCoordsForeignObject>
   )

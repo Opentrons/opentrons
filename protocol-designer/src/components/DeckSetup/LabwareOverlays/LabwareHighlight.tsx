@@ -3,11 +3,14 @@ import cx from 'classnames'
 import { useSelector } from 'react-redux'
 import { Icon } from '@opentrons/components'
 import { getHoveredStepLabware, getHoveredStepId } from '../../../ui/steps'
-import { getSavedStepForms } from '../../../step-forms/selectors'
+import {
+  getLabwareEntities,
+  getSavedStepForms,
+} from '../../../step-forms/selectors'
 import { THERMOCYCLER_PROFILE } from '../../../constants'
 
-import styles from './LabwareOverlays.css'
-import { LabwareOnDeck } from '../../../step-forms'
+import styles from './LabwareOverlays.module.css'
+import type { LabwareOnDeck } from '../../../step-forms'
 
 interface LabwareHighlightProps {
   labwareOnDeck: LabwareOnDeck
@@ -17,8 +20,14 @@ export const LabwareHighlight = (
   props: LabwareHighlightProps
 ): JSX.Element | null => {
   const { labwareOnDeck } = props
+  const labwareEntities = useSelector(getLabwareEntities)
+  const adapterId =
+    labwareEntities[labwareOnDeck.slot] != null
+      ? labwareEntities[labwareOnDeck.slot].id
+      : null
+
   const highlighted = useSelector(getHoveredStepLabware).includes(
-    labwareOnDeck.id
+    adapterId ?? labwareOnDeck.id
   )
 
   let isTcProfile = false

@@ -5,13 +5,13 @@ Contains routes dealing primarily with `Maintenance Run` models.
 import logging
 from datetime import datetime
 from textwrap import dedent
-from typing import Optional
+from typing import Optional, Callable
 from typing_extensions import Literal
 
 from fastapi import APIRouter, Depends, status
 from pydantic import BaseModel, Field
 
-from robot_server.errors import ErrorDetails, ErrorBody
+from robot_server.errors.error_responses import ErrorDetails, ErrorBody
 from robot_server.service.dependencies import get_current_time, get_unique_id
 from robot_server.robot.control.dependencies import require_estop_in_good_state
 
@@ -35,6 +35,11 @@ from ..maintenance_engine_store import EngineConflictError
 from ..maintenance_run_data_manager import MaintenanceRunDataManager
 from ..dependencies import get_maintenance_run_data_manager
 
+from robot_server.deck_configuration.fastapi_dependencies import (
+    get_deck_configuration_store,
+)
+from robot_server.deck_configuration.store import DeckConfigurationStore
+from robot_server.service.notifications import get_notify_publishers
 
 log = logging.getLogger(__name__)
 base_router = APIRouter()
@@ -117,7 +122,8 @@ async def get_run_data_from_url(
     return run_data
 
 
-@base_router.post(
+@PydanticResponse.wrap_route(
+    base_router.post,
     path="/maintenance_runs",
     summary="Create a maintenance run",
     description=dedent(
@@ -147,6 +153,10 @@ async def create_run(
         get_is_okay_to_create_maintenance_run
     ),
     check_estop: bool = Depends(require_estop_in_good_state),
+    deck_configuration_store: DeckConfigurationStore = Depends(
+        get_deck_configuration_store
+    ),
+    notify_publishers: Callable[[], None] = Depends(get_notify_publishers),
 ) -> PydanticResponse[SimpleBody[MaintenanceRun]]:
     """Create a new maintenance run.
 
@@ -157,6 +167,8 @@ async def create_run(
         created_at: Timestamp to attach to created run.
         is_ok_to_create_maintenance_run: Verify if a maintenance run may be created if a protocol run exists.
         check_estop: Dependency to verify the estop is in a valid state.
+        deck_configuration_store: Dependency to fetch the deck configuration.
+        notify_publishers: Utilized by the engine to notify publishers of state changes.
     """
     if not is_ok_to_create_maintenance_run:
         raise ProtocolRunIsActive(
@@ -164,10 +176,14 @@ async def create_run(
         ).as_error(status.HTTP_409_CONFLICT)
 
     offsets = request_body.data.labwareOffsets if request_body is not None else []
+    deck_configuration = await deck_configuration_store.get_deck_configuration()
+
     run_data = await run_data_manager.create(
         run_id=run_id,
         created_at=created_at,
         labware_offsets=offsets,
+        deck_configuration=deck_configuration,
+        notify_publishers=notify_publishers,
     )
 
     log.info(f'Created an empty run "{run_id}"".')
@@ -177,7 +193,8 @@ async def create_run(
     )
 
 
-@base_router.get(
+@PydanticResponse.wrap_route(
+    base_router.get,
     path="/maintenance_runs/current_run",
     summary="Get the current maintenance run",
     description="Get the currently active maintenance run, if any",
@@ -213,7 +230,8 @@ async def get_current_run(
     )
 
 
-@base_router.get(
+@PydanticResponse.wrap_route(
+    base_router.get,
     path="/maintenance_runs/{runId}",
     summary="Get a maintenance run",
     description="Get a specific run by its unique identifier.",
@@ -236,7 +254,8 @@ async def get_run(
     )
 
 
-@base_router.delete(
+@PydanticResponse.wrap_route(
+    base_router.delete,
     path="/maintenance_runs/{runId}",
     summary="Delete a run",
     description="Delete a specific run by its unique identifier.",

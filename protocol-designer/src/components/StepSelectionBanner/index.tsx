@@ -9,6 +9,8 @@ import {
   CLOSE_BATCH_EDIT_FORM,
 } from '../modals/ConfirmDeleteModal'
 import { StepSelectionBannerComponent } from './StepSelectionBannerComponent'
+import { ThunkDispatch } from 'redux-thunk'
+import { BaseState } from '../../types'
 
 const MemoizedStepSelectionBannerComponent = React.memo(
   StepSelectionBannerComponent
@@ -19,7 +21,7 @@ export const StepSelectionBanner = (): JSX.Element => {
   const batchEditFormHasUnsavedChanges = useSelector(
     stepFormSelectors.getBatchEditFormHasUnsavedChanges
   )
-  const dispatch = useDispatch()
+  const dispatch = useDispatch<ThunkDispatch<BaseState, any, any>>()
 
   const { confirm, showConfirmation, cancel } = useConditionalConfirm(
     () =>

@@ -35,6 +35,7 @@ import {
 } from './heaterShakerUpdates'
 import { forMoveLabware } from './forMoveLabware'
 import {
+  forAspirateInPlace,
   forBlowOutInPlace,
   forDispenseInPlace,
   forDropTipInPlace,
@@ -45,6 +46,7 @@ import type {
   RobotState,
   RobotStateAndWarnings,
 } from '../types'
+import { forConfigureNozzleLayout } from './forConfigureNozzleLayout'
 
 // WARNING this will mutate the prevRobotState
 function _getNextRobotStateAndWarningsSingleCommand(
@@ -107,6 +109,7 @@ function _getNextRobotStateAndWarningsSingleCommand(
     case 'home': // gantry VVV
     case 'moveRelative':
     case 'moveToAddressableArea':
+    case 'moveToAddressableAreaForDropTip':
     case 'moveToSlot':
     case 'moveToCoordinates':
     case 'moveToWell':
@@ -120,6 +123,13 @@ function _getNextRobotStateAndWarningsSingleCommand(
 
     case 'loadLiquid':
       forLoadLiquid(command.params, invariantContext, robotStateAndWarnings)
+
+    case 'aspirateInPlace':
+      forAspirateInPlace(
+        command.params,
+        invariantContext,
+        robotStateAndWarnings
+      )
       break
 
     case 'dropTipInPlace':
@@ -132,6 +142,14 @@ function _getNextRobotStateAndWarningsSingleCommand(
 
     case 'dispenseInPlace':
       forDispenseInPlace(
+        command.params,
+        invariantContext,
+        robotStateAndWarnings
+      )
+      break
+
+    case 'configureNozzleLayout':
+      forConfigureNozzleLayout(
         command.params,
         invariantContext,
         robotStateAndWarnings

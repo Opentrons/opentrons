@@ -3,8 +3,9 @@ from dataclasses import dataclass
 from typing import List, Dict, Tuple
 from typing_extensions import Final
 from enum import Enum
-from opentrons.config.types import LiquidProbeSettings
+from opentrons.config.types import LiquidProbeSettings, OutputOptions
 from opentrons.protocol_api.labware import Well
+from opentrons.hardware_control.types import InstrumentProbeType
 
 
 class ConfigType(Enum):
@@ -24,7 +25,6 @@ class VolumetricConfig:
     pipette_mount: str
     tip_volume: int
     trials: int
-    labware_offsets: List[dict]
     slots_tiprack: List[int]
     increment: bool
     return_tip: bool
@@ -194,11 +194,11 @@ def _get_liquid_probe_settings(
         plunger_speed=lqid_cfg["plunger_speed"],
         sensor_threshold_pascals=lqid_cfg["sensor_threshold_pascals"],
         expected_liquid_height=110,
-        log_pressure=True,
+        output_option=OutputOptions.sync_only,
         aspirate_while_sensing=False,
         auto_zero_sensor=True,
         num_baseline_reads=10,
-        data_file="/var/pressure_sensor_data.csv",
+        data_files={InstrumentProbeType.PRIMARY: "/data/testing_data/pressure.csv"},
     )
 
 
@@ -301,6 +301,7 @@ QC_DEFAULT_TRIALS: Dict[ConfigType, Dict[int, int]] = {
     },
     ConfigType.photometric: {
         1: 8,
+        8: 12,
         96: 5,
     },
 }
@@ -366,6 +367,9 @@ QC_TEST_MIN_REQUIREMENTS: Dict[
     96: {
         1000: {  # P1000
             50: {  # T50
+                1.0: (2.5, 2.0),
+                2.0: (2.5, 2.0),
+                3.0: (2.5, 2.0),
                 5.0: (2.5, 2.0),
                 10.0: (3.1, 1.7),
                 50.0: (1.5, 0.75),

@@ -1,4 +1,3 @@
-import assert from 'assert'
 import { getWellsDepth } from '@opentrons/shared-data'
 import {
   DEFAULT_CHANGE_TIP_OPTION,
@@ -11,11 +10,25 @@ import { getOrderedWells } from '../../utils'
 import { getMixDelayData } from './getDelayData'
 import { HydratedMixFormDataLegacy } from '../../../form-types'
 import { MixArgs } from '@opentrons/step-generation'
+import { getMatchingTipLiquidSpecs } from '../../../utils'
 type MixStepArgs = MixArgs
 export const mixFormToArgs = (
   hydratedFormData: HydratedMixFormDataLegacy
 ): MixStepArgs => {
-  const { labware, pipette, dropTip_location } = hydratedFormData
+  const {
+    labware,
+    pipette,
+    dropTip_location,
+    nozzles,
+    mix_x_position,
+    mix_y_position,
+    blowout_z_offset,
+  } = hydratedFormData
+  const matchingTipLiquidSpecs = getMatchingTipLiquidSpecs(
+    pipette,
+    hydratedFormData.volume,
+    hydratedFormData.tipRack
+  )
   const unorderedWells = hydratedFormData.wells || []
   const orderFirst = hydratedFormData.mix_wellOrder_first
   const orderSecond = hydratedFormData.mix_wellOrder_second
@@ -34,10 +47,11 @@ export const mixFormToArgs = (
   const times = hydratedFormData.times || 0
   const aspirateFlowRateUlSec =
     hydratedFormData.aspirate_flowRate ||
-    pipette.spec.defaultAspirateFlowRate.value
+    matchingTipLiquidSpecs?.defaultAspirateFlowRate.default
   const dispenseFlowRateUlSec =
     hydratedFormData.dispense_flowRate ||
-    pipette.spec.defaultDispenseFlowRate.value
+    matchingTipLiquidSpecs?.defaultDispenseFlowRate.default
+
   // NOTE: for mix, there is only one tip offset field,
   // and it applies to both aspirate and dispense
   const aspirateOffsetFromBottomMm =
@@ -46,7 +60,7 @@ export const mixFormToArgs = (
     hydratedFormData.mix_mmFromBottom || DEFAULT_MM_FROM_BOTTOM_DISPENSE
   // It's radiobutton, so one should always be selected.
   // One changeTip option should always be selected.
-  assert(
+  console.assert(
     hydratedFormData.changeTip,
     'mixFormToArgs expected non-falsey changeTip option'
   )
@@ -55,9 +69,12 @@ export const mixFormToArgs = (
     ? hydratedFormData.blowout_location
     : null
   // Blowout settings
-  const blowoutFlowRateUlSec = dispenseFlowRateUlSec
+  const blowoutFlowRateUlSec =
+    hydratedFormData.dispense_flowRate ??
+    matchingTipLiquidSpecs?.defaultBlowOutFlowRate.default
+
   const blowoutOffsetFromTopMm = blowoutLocation
-    ? DEFAULT_MM_BLOWOUT_OFFSET_FROM_TOP
+    ? blowout_z_offset ?? DEFAULT_MM_BLOWOUT_OFFSET_FROM_TOP
     : 0
   // Delay settings
   const aspirateDelaySeconds = getMixDelayData(
@@ -85,14 +102,20 @@ export const mixFormToArgs = (
     changeTip,
     blowoutLocation,
     pipette: pipette.id,
-    aspirateFlowRateUlSec,
-    dispenseFlowRateUlSec,
-    blowoutFlowRateUlSec,
+    aspirateFlowRateUlSec: aspirateFlowRateUlSec ?? 0,
+    dispenseFlowRateUlSec: dispenseFlowRateUlSec ?? 0,
+    blowoutFlowRateUlSec: blowoutFlowRateUlSec ?? 0,
     aspirateOffsetFromBottomMm,
     dispenseOffsetFromBottomMm,
     blowoutOffsetFromTopMm,
     aspirateDelaySeconds,
+    tipRack: hydratedFormData.tipRack,
     dispenseDelaySeconds,
     dropTipLocation: dropTip_location,
+    nozzles,
+    aspirateXOffset: mix_x_position ?? 0,
+    dispenseXOffset: mix_x_position ?? 0,
+    aspirateYOffset: mix_y_position ?? 0,
+    dispenseYOffset: mix_y_position ?? 0,
   }
 }

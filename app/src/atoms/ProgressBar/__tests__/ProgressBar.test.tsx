@@ -1,6 +1,10 @@
 import * as React from 'react'
+import { describe, it, expect, beforeEach } from 'vitest'
+import '@testing-library/jest-dom/vitest'
+import { screen } from '@testing-library/react'
 import { css } from 'styled-components'
-import { renderWithProviders, COLORS } from '@opentrons/components'
+import { COLORS } from '@opentrons/components'
+import { renderWithProviders } from '../../../__testing-utils__'
 import { ProgressBar } from '..'
 
 const render = (props: React.ComponentProps<typeof ProgressBar>) => {
@@ -16,43 +20,39 @@ describe('ProgressBar', () => {
     }
   })
 
-  afterEach(() => {
-    jest.resetAllMocks()
-  })
-
   it('renders LinerProgress Bar at 0% width', () => {
-    const [{ getByTestId }] = render(props)
-    const container = getByTestId('ProgressBar_Container')
-    const bar = getByTestId('ProgressBar_Bar')
+    render(props)
+    const container = screen.getByTestId('ProgressBar_Container')
+    const bar = screen.getByTestId('ProgressBar_Bar')
     expect(container).toHaveStyle(`background: ${COLORS.white}`)
     expect(bar).toHaveStyle('width: 0%')
   })
 
   it('renders LinerProgress Bar at 50% width', () => {
     props.percentComplete = 50
-    const [{ getByTestId }] = render(props)
-    const bar = getByTestId('ProgressBar_Bar')
-    expect(bar).toHaveStyle(`background: ${COLORS.blueEnabled}`)
+    render(props)
+    const bar = screen.getByTestId('ProgressBar_Bar')
+    expect(bar).toHaveStyle(`background: ${COLORS.blue50}`)
     expect(bar).toHaveStyle('width: 50%')
   })
 
   it('renders LinerProgress Bar at 100% width', () => {
     props.percentComplete = 100
-    const [{ getByTestId }] = render(props)
-    const bar = getByTestId('ProgressBar_Bar')
-    expect(bar).toHaveStyle(`background: ${COLORS.blueEnabled}`)
+    render(props)
+    const bar = screen.getByTestId('ProgressBar_Bar')
+    expect(bar).toHaveStyle(`background: ${COLORS.blue50}`)
     expect(bar).toHaveStyle('width: 100%')
   })
 
   it('renders LinerProgress Bar at 50% + red width', () => {
     props.percentComplete = 50
     props.innerStyles = css`
-      background: ${COLORS.errorEnabled};
+      background: ${COLORS.red50};
     `
-    const [{ getByTestId }] = render(props)
-    const bar = getByTestId('ProgressBar_Bar')
-    expect(bar).not.toHaveStyle(`background: ${COLORS.blueEnabled}`)
-    expect(bar).toHaveStyle(`background: ${COLORS.errorEnabled}`)
+    render(props)
+    const bar = screen.getByTestId('ProgressBar_Bar')
+    expect(bar).not.toHaveStyle(`background: ${COLORS.blue50}`)
+    expect(bar).toHaveStyle(`background: ${COLORS.red50}`)
     expect(bar).toHaveStyle('width: 50%')
   })
 })

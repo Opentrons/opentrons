@@ -2,14 +2,14 @@ import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 
 import {
-  Flex,
-  DIRECTION_COLUMN,
   COLORS,
+  DIRECTION_COLUMN,
+  Flex,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
-import { StyledText } from '../../../atoms/text'
 import * as PipetteConstants from '../../../redux/pipettes/constants'
 import { useRunPipetteInfoByMount } from '../hooks'
 import { SetupCalibrationItem } from './SetupCalibrationItem'
@@ -29,7 +29,7 @@ export function SetupTipLengthCalibration({
   return (
     <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing8}>
       <StyledText
-        color={COLORS.black}
+        color={COLORS.black90}
         css={TYPOGRAPHY.pSemiBold}
         id="TipRackCalibration_requiredTipLengthTitle"
       >

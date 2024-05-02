@@ -1,82 +1,135 @@
 import * as React from 'react'
 import { UseQueryResult } from 'react-query'
-import { renderWithProviders } from '@opentrons/components'
+import { MemoryRouter } from 'react-router-dom'
+import { screen, fireEvent } from '@testing-library/react'
+import '@testing-library/jest-dom/vitest'
+import { describe, it, beforeEach, vi, afterEach, expect } from 'vitest'
+import { renderWithProviders } from '../../../../../__testing-utils__'
 import {
-  DeckConfiguration,
-  STAGING_AREA_LOAD_NAME,
-  Fixture,
-  TRASH_BIN_LOAD_NAME,
+  SINGLE_RIGHT_SLOT_FIXTURE,
+  STAGING_AREA_RIGHT_SLOT_FIXTURE,
+  TRASH_BIN_ADAPTER_FIXTURE,
+  ot3StandardDeckV5,
 } from '@opentrons/shared-data'
 import {
-  useDeckConfigurationQuery,
+  useModulesQuery,
   useUpdateDeckConfigurationMutation,
-} from '@opentrons/react-api-client/src/deck_configuration'
+} from '@opentrons/react-api-client'
+
 import { i18n } from '../../../../../i18n'
+import { mockHeaterShaker } from '../../../../../redux/modules/__fixtures__'
+import { useCloseCurrentRun } from '../../../../ProtocolUpload/hooks'
 import { LocationConflictModal } from '../LocationConflictModal'
+import { useNotifyDeckConfigurationQuery } from '../../../../../resources/deck_configuration'
 
-jest.mock('@opentrons/react-api-client/src/deck_configuration')
+import type { DeckConfiguration } from '@opentrons/shared-data'
 
-const mockUseDeckConfigurationQuery = useDeckConfigurationQuery as jest.MockedFunction<
-  typeof useDeckConfigurationQuery
->
-const mockUseUpdateDeckConfigurationMutation = useUpdateDeckConfigurationMutation as jest.MockedFunction<
-  typeof useUpdateDeckConfigurationMutation
->
+vi.mock('@opentrons/react-api-client')
+vi.mock('../../../../../resources/deck_configuration')
+vi.mock('../../../../ProtocolUpload/hooks')
 
 const mockFixture = {
-  fixtureId: 'mockId',
-  fixtureLocation: 'B3',
-  loadName: STAGING_AREA_LOAD_NAME,
-} as Fixture
+  cutoutId: 'cutoutB3',
+  cutoutFixtureId: STAGING_AREA_RIGHT_SLOT_FIXTURE,
+}
 
 const render = (props: React.ComponentProps<typeof LocationConflictModal>) => {
-  return renderWithProviders(<LocationConflictModal {...props} />, {
-    i18nInstance: i18n,
-  })[0]
+  return renderWithProviders(
+    <MemoryRouter>
+      <LocationConflictModal {...props} />
+    </MemoryRouter>,
+    {
+      i18nInstance: i18n,
+    }
+  )[0]
 }
 
 describe('LocationConflictModal', () => {
   let props: React.ComponentProps<typeof LocationConflictModal>
-  const mockUpdate = jest.fn()
+  const mockUpdate = vi.fn()
   beforeEach(() => {
     props = {
-      onCloseClick: jest.fn(),
-      cutout: 'B3',
-      requiredFixture: TRASH_BIN_LOAD_NAME,
+      onCloseClick: vi.fn(),
+      cutoutId: 'cutoutB3',
+      requiredFixtureId: TRASH_BIN_ADAPTER_FIXTURE,
+      deckDef: ot3StandardDeckV5 as any,
+      robotName: 'otie',
     }
-    mockUseDeckConfigurationQuery.mockReturnValue({
+    vi.mocked(useCloseCurrentRun).mockReturnValue({
+      closeCurrentRun: vi.fn(),
+    } as any)
+    vi.mocked(useModulesQuery).mockReturnValue({ data: { data: [] } } as any)
+    vi.mocked(useNotifyDeckConfigurationQuery).mockReturnValue({
       data: [mockFixture],
     } as UseQueryResult<DeckConfiguration>)
-    mockUseUpdateDeckConfigurationMutation.mockReturnValue({
+    vi.mocked(useUpdateDeckConfigurationMutation).mockReturnValue({
       updateDeckConfiguration: mockUpdate,
     } as any)
   })
+  afterEach(() => {
+    vi.resetAllMocks()
+  })
   it('should render the modal information for a fixture conflict', () => {
-    const { getByText, getAllByText, getByRole } = render(props)
-    getByText('Deck location conflict')
-    getByText('Slot B3')
-    getByText('Protocol specifies')
-    getByText('Currently configured')
-    getAllByText('Staging Area Slot')
-    getByText('Trash Bin')
-    getByRole('button', { name: 'Cancel' }).click()
+    render(props)
+    screen.getByText('Deck location conflict')
+    screen.getByText('Slot B3')
+    screen.getByText('Protocol specifies')
+    screen.getByText('Currently configured')
+    screen.getAllByText('Staging area slot')
+    screen.getByText('Trash bin')
+    fireEvent.click(screen.getByRole('button', { name: 'Cancel' }))
     expect(props.onCloseClick).toHaveBeenCalled()
-    getByRole('button', { name: 'Update deck' }).click()
+    fireEvent.click(screen.getByRole('button', { name: 'Update deck' }))
     expect(mockUpdate).toHaveBeenCalled()
   })
   it('should render the modal information for a module fixture conflict', () => {
+    vi.mocked(useModulesQuery).mockReturnValue({
+      data: { data: [mockHeaterShaker] },
+    } as any)
     props = {
-      onCloseClick: jest.fn(),
-      cutout: 'B3',
+      onCloseClick: vi.fn(),
+      cutoutId: 'cutoutB3',
       requiredModule: 'heaterShakerModuleV1',
+      deckDef: ot3StandardDeckV5 as any,
+      robotName: 'otie',
     }
-    const { getByText, getByRole } = render(props)
-    getByText('Protocol specifies')
-    getByText('Currently configured')
-    getByText('Heater-Shaker Module GEN1')
-    getByRole('button', { name: 'Cancel' }).click()
+    render(props)
+    screen.getByText('Protocol specifies')
+    screen.getByText('Currently configured')
+    fireEvent.click(screen.getByRole('button', { name: 'Cancel' }))
     expect(props.onCloseClick).toHaveBeenCalled()
-    getByRole('button', { name: 'Update deck' }).click()
+    fireEvent.click(screen.getByRole('button', { name: 'Update deck' }))
+    screen.getByText('Heater-Shaker Module GEN1 in USB-1')
+    fireEvent.click(screen.getByRole('button', { name: 'add' }))
+    expect(mockUpdate).toHaveBeenCalled()
+  })
+  it('should render the modal information for a single slot fixture conflict', () => {
+    vi.mocked(useNotifyDeckConfigurationQuery).mockReturnValue({
+      data: [
+        {
+          cutoutId: 'cutoutB1',
+          cutoutFixtureId: TRASH_BIN_ADAPTER_FIXTURE,
+        },
+      ],
+    } as UseQueryResult<DeckConfiguration>)
+    props = {
+      onCloseClick: vi.fn(),
+      cutoutId: 'cutoutB1',
+      requiredFixtureId: SINGLE_RIGHT_SLOT_FIXTURE,
+      missingLabwareDisplayName: 'a tiprack',
+      deckDef: ot3StandardDeckV5 as any,
+      robotName: 'otie',
+    }
+    render(props)
+    screen.getByText('Deck location conflict')
+    screen.getByText('Slot B1')
+    screen.getByText('Protocol specifies')
+    screen.getByText('Currently configured')
+    screen.getAllByText('Trash bin')
+    screen.getByText('a tiprack')
+    fireEvent.click(screen.getByRole('button', { name: 'Cancel' }))
+    expect(props.onCloseClick).toHaveBeenCalled()
+    fireEvent.click(screen.getByRole('button', { name: 'Update deck' }))
     expect(mockUpdate).toHaveBeenCalled()
   })
   it('should render correct info for a odd', () => {
@@ -84,16 +137,16 @@ describe('LocationConflictModal', () => {
       ...props,
       isOnDevice: true,
     }
-    const { getByText, getAllByText } = render(props)
-    getByText('Deck location conflict')
-    getByText('Slot B3')
-    getByText('Protocol specifies')
-    getByText('Currently configured')
-    getAllByText('Staging Area Slot')
-    getByText('Trash Bin')
-    getByText('Cancel').click()
+    render(props)
+    screen.getByText('Deck location conflict')
+    screen.getByText('Slot B3')
+    screen.getByText('Protocol specifies')
+    screen.getByText('Currently configured')
+    screen.getAllByText('Staging area slot')
+    screen.getByText('Trash bin')
+    fireEvent.click(screen.getByText('Cancel'))
     expect(props.onCloseClick).toHaveBeenCalled()
-    getByText('Confirm removal').click()
+    fireEvent.click(screen.getByText('Update deck'))
     expect(mockUpdate).toHaveBeenCalled()
   })
 })

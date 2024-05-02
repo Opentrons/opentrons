@@ -4,20 +4,21 @@ import { useTranslation } from 'react-i18next'
 import { css } from 'styled-components'
 
 import {
-  Box,
-  Flex,
   ALIGN_CENTER,
-  JUSTIFY_SPACE_BETWEEN,
-  SPACING,
-  DIRECTION_ROW,
-  Icon,
-  TYPOGRAPHY,
   BORDERS,
-  POSITION_ABSOLUTE,
+  Box,
   COLORS,
-  SecondaryButton,
   DIRECTION_COLUMN,
+  DIRECTION_ROW,
+  Flex,
+  Icon,
+  JUSTIFY_SPACE_BETWEEN,
   Overlay,
+  POSITION_ABSOLUTE,
+  SecondaryButton,
+  SPACING,
+  StyledText,
+  TYPOGRAPHY,
 } from '@opentrons/components'
 
 import {
@@ -25,10 +26,9 @@ import {
   updateConfigValue,
 } from '../../redux/config'
 import { useSortedProtocols } from './hooks'
-import { StyledText } from '../../atoms/text'
 import { Slideout } from '../../atoms/Slideout'
 import { ChooseRobotToRunProtocolSlideout } from '../ChooseRobotToRunProtocolSlideout'
-import { SendProtocolToOT3Slideout } from '../SendProtocolToOT3Slideout'
+import { SendProtocolToFlexSlideout } from '../SendProtocolToFlexSlideout'
 import { ProtocolUploadInput } from './ProtocolUploadInput'
 import { ProtocolCard } from './ProtocolCard'
 import { EmptyStateLinks } from './EmptyStateLinks'
@@ -42,11 +42,11 @@ const SORT_BY_BUTTON_STYLE = css`
   background-color: ${COLORS.transparent};
   cursor: pointer;
   &:hover {
-    background-color: ${COLORS.medGreyHover};
+    background-color: ${COLORS.grey30};
   }
   &:active,
   &:focus {
-    background-color: ${COLORS.medGreyEnabled};
+    background-color: ${COLORS.grey40};
   }
 `
 const FLEX = 'Flex'
@@ -64,8 +64,8 @@ export function ProtocolList(props: ProtocolListProps): JSX.Element | null {
     setShowChooseRobotToRunProtocolSlideout,
   ] = React.useState<boolean>(false)
   const [
-    showSendProtocolToOT3Slideout,
-    setShowSendProtocolToOT3Slideout,
+    showSendProtocolToFlexSlideout,
+    setShowSendProtocolToFlexSlideout,
   ] = React.useState<boolean>(false)
   const sortBy = useSelector(getProtocolsDesktopSortKey) ?? 'alphabetical'
   const [showSortByMenu, setShowSortByMenu] = React.useState<boolean>(false)
@@ -121,11 +121,11 @@ export function ProtocolList(props: ProtocolListProps): JSX.Element | null {
     setShowChooseRobotToRunProtocolSlideout(true)
   }
 
-  const handleSendProtocolToOT3 = (
+  const handleSendProtocolToFlex = (
     storedProtocol: StoredProtocolData
   ): void => {
     setSelectedProtocol(storedProtocol)
-    setShowSendProtocolToOT3Slideout(true)
+    setShowSendProtocolToFlexSlideout(true)
   }
 
   return (
@@ -133,15 +133,15 @@ export function ProtocolList(props: ProtocolListProps): JSX.Element | null {
       {selectedProtocol != null ? (
         <>
           <ChooseRobotToRunProtocolSlideout
-            key={selectedProtocol.protocolKey}
+            key={`ChooseRobotToRunProtocolSlideout_${selectedProtocol.protocolKey}`}
             onCloseClick={() => setShowChooseRobotToRunProtocolSlideout(false)}
             showSlideout={showChooseRobotToRunProtocolSlideout}
             storedProtocolData={selectedProtocol}
           />
-          <SendProtocolToOT3Slideout
-            key={selectedProtocol.protocolKey}
-            isExpanded={showSendProtocolToOT3Slideout}
-            onCloseClick={() => setShowSendProtocolToOT3Slideout(false)}
+          <SendProtocolToFlexSlideout
+            key={`SendProtocolToFlexSlideout_${selectedProtocol.protocolKey}`}
+            isExpanded={showSendProtocolToFlexSlideout}
+            onCloseClick={() => setShowSendProtocolToFlexSlideout(false)}
             storedProtocolData={selectedProtocol}
           />
         </>
@@ -161,14 +161,14 @@ export function ProtocolList(props: ProtocolListProps): JSX.Element | null {
             <StyledText
               as="p"
               fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-              color={COLORS.darkGreyEnabled}
+              color={COLORS.grey60}
             >
               {t('shared:sort_by')}
             </StyledText>
             <Flex
               flexDirection={DIRECTION_ROW}
               alignItems={ALIGN_CENTER}
-              borderRadius={BORDERS.radiusSoftCorners}
+              borderRadius={BORDERS.borderRadius8}
               marginLeft={SPACING.spacing8}
               css={SORT_BY_BUTTON_STYLE}
               onClick={toggleSetShowSortByMenu}
@@ -186,6 +186,7 @@ export function ProtocolList(props: ProtocolListProps): JSX.Element | null {
               </StyledText>
               <Icon
                 paddingRight={SPACING.spacing8}
+                color={COLORS.black90}
                 height={TYPOGRAPHY.lineHeight16}
                 name={showSortByMenu ? 'chevron-up' : 'chevron-down'}
               />
@@ -194,7 +195,7 @@ export function ProtocolList(props: ProtocolListProps): JSX.Element | null {
           {showSortByMenu && (
             <Flex
               zIndex={2}
-              borderRadius={BORDERS.radiusSoftCorners}
+              borderRadius={BORDERS.borderRadius4}
               boxShadow="0px 1px 3px rgba(0, 0, 0, 0.2)"
               position={POSITION_ABSOLUTE}
               backgroundColor={COLORS.white}
@@ -238,14 +239,15 @@ export function ProtocolList(props: ProtocolListProps): JSX.Element | null {
         gridGap={SPACING.spacing8}
         marginBottom={SPACING.spacing40}
       >
-        {sortedStoredProtocols.map(storedProtocol => (
-          <ProtocolCard
-            key={storedProtocol.protocolKey}
-            handleRunProtocol={handleRunProtocol}
-            handleSendProtocolToOT3={handleSendProtocolToOT3}
-            storedProtocolData={storedProtocol}
-          />
-        ))}
+        {sortedStoredProtocols != null &&
+          sortedStoredProtocols.map(storedProtocol => (
+            <ProtocolCard
+              key={storedProtocol.protocolKey}
+              handleRunProtocol={handleRunProtocol}
+              handleSendProtocolToFlex={handleSendProtocolToFlex}
+              storedProtocolData={storedProtocol}
+            />
+          ))}
       </Flex>
       <EmptyStateLinks title={t('create_or_download')} />
       <Slideout

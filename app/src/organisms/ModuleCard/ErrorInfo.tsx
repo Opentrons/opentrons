@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
 import {
   getModuleDisplayName,
@@ -6,19 +7,19 @@ import {
   THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
 import {
-  Flex,
-  SPACING,
-  Btn,
-  JUSTIFY_FLEX_END,
-  TYPOGRAPHY,
   ALIGN_START,
-  PrimaryButton,
+  Btn,
   DIRECTION_COLUMN,
   DIRECTION_ROW,
+  Flex,
+  JUSTIFY_FLEX_END,
+  PrimaryButton,
+  SPACING,
+  StyledText,
+  TYPOGRAPHY,
 } from '@opentrons/components'
-import { StyledText } from '../../atoms/text'
 import { Banner } from '../../atoms/Banner'
-import { Portal } from '../../App/portal'
+import { getTopPortalEl } from '../../App/portal'
 import { LegacyModal } from '../../molecules/LegacyModal'
 
 import type { AttachedModule } from '../../redux/modules/types'
@@ -28,7 +29,7 @@ interface ErrorInfoProps {
 }
 export function ErrorInfo(props: ErrorInfoProps): JSX.Element | null {
   const { attachedModule } = props
-  const { t } = useTranslation(['device_details', 'shared'])
+  const { t } = useTranslation(['device_details', 'shared', 'branded'])
   const [showErrorDetails, setShowErrorDetails] = React.useState(false)
 
   let isError: boolean = false
@@ -77,35 +78,36 @@ export function ErrorInfo(props: ErrorInfoProps): JSX.Element | null {
           </Btn>
         </Flex>
       </Flex>
-      {showErrorDetails ? (
-        <Portal level="top">
-          <LegacyModal
-            type="error"
-            title={t('module_name_error', {
-              moduleName: getModuleDisplayName(attachedModule.moduleModel),
-            })}
-            onClose={() => setShowErrorDetails(false)}
-          >
-            <Flex flexDirection={DIRECTION_COLUMN}>
-              {errorDetails != null ? (
-                <StyledText as="p">{errorDetails}</StyledText>
-              ) : null}
-              <StyledText as="p" marginBottom={SPACING.spacing16}>
-                {t('module_error_contact_support')}
-              </StyledText>
-            </Flex>
-            <Flex justifyContent={JUSTIFY_FLEX_END}>
-              <PrimaryButton
-                onClick={() => setShowErrorDetails(false)}
-                textTransform={TYPOGRAPHY.textTransformCapitalize}
-                marginTop={SPACING.spacing16}
-              >
-                {t('shared:close')}
-              </PrimaryButton>
-            </Flex>
-          </LegacyModal>
-        </Portal>
-      ) : null}
+      {showErrorDetails
+        ? createPortal(
+            <LegacyModal
+              type="error"
+              title={t('module_name_error', {
+                moduleName: getModuleDisplayName(attachedModule.moduleModel),
+              })}
+              onClose={() => setShowErrorDetails(false)}
+            >
+              <Flex flexDirection={DIRECTION_COLUMN}>
+                {errorDetails != null ? (
+                  <StyledText as="p">{errorDetails}</StyledText>
+                ) : null}
+                <StyledText as="p" marginBottom={SPACING.spacing16}>
+                  {t('branded:module_error_contact_support')}
+                </StyledText>
+              </Flex>
+              <Flex justifyContent={JUSTIFY_FLEX_END}>
+                <PrimaryButton
+                  onClick={() => setShowErrorDetails(false)}
+                  textTransform={TYPOGRAPHY.textTransformCapitalize}
+                  marginTop={SPACING.spacing16}
+                >
+                  {t('shared:close')}
+                </PrimaryButton>
+              </Flex>
+            </LegacyModal>,
+            getTopPortalEl()
+          )
+        : null}
     </Banner>
   )
 }

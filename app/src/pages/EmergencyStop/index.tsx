@@ -3,19 +3,19 @@ import { useTranslation } from 'react-i18next'
 import { useHistory } from 'react-router-dom'
 
 import {
-  Icon,
-  Flex,
-  SPACING,
-  COLORS,
-  BORDERS,
-  DIRECTION_COLUMN,
-  JUSTIFY_CENTER,
   ALIGN_CENTER,
+  BORDERS,
+  COLORS,
+  DIRECTION_COLUMN,
+  Flex,
+  Icon,
+  JUSTIFY_CENTER,
+  SPACING,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { useEstopQuery } from '@opentrons/react-api-client'
 
-import { StyledText } from '../../atoms/text'
 import { MediumButton } from '../../atoms/buttons'
 import { StepMeter } from '../../atoms/StepMeter'
 
@@ -56,10 +56,8 @@ export function EmergencyStop(): JSX.Element {
         <Flex
           flexDirection={DIRECTION_COLUMN}
           padding={`${SPACING.spacing40} ${SPACING.spacing80}`}
-          backgroundColor={
-            isEstopConnected ? COLORS.green3 : COLORS.darkBlack20
-          }
-          borderRadius={BORDERS.borderRadiusSize3}
+          backgroundColor={isEstopConnected ? COLORS.green35 : COLORS.grey35}
+          borderRadius={BORDERS.borderRadius8}
           alignItems={ALIGN_CENTER}
         >
           <Flex
@@ -74,7 +72,7 @@ export function EmergencyStop(): JSX.Element {
                 <Icon
                   name="ot-check"
                   size="3rem"
-                  color={COLORS.green2}
+                  color={COLORS.green50}
                   data-testid="EmergencyStop_connected_icon"
                 />
                 <StyledText as="h3" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
@@ -87,7 +85,7 @@ export function EmergencyStop(): JSX.Element {
                 <StyledText
                   as="h3"
                   fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-                  color={COLORS.darkBlack70}
+                  color={COLORS.grey60}
                   textAlign={TYPOGRAPHY.textAlignCenter}
                 >
                   {t('e_stop_not_connected')}

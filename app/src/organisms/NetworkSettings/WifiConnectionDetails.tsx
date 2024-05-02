@@ -4,19 +4,19 @@ import { useDispatch, useSelector } from 'react-redux'
 import { useHistory } from 'react-router-dom'
 
 import {
-  Flex,
+  ALIGN_CENTER,
+  BORDERS,
+  COLORS,
   DIRECTION_COLUMN,
   DIRECTION_ROW,
-  SPACING,
+  Flex,
   Icon,
-  COLORS,
-  TYPOGRAPHY,
-  ALIGN_CENTER,
   JUSTIFY_CENTER,
-  BORDERS,
+  SPACING,
+  StyledText,
+  TYPOGRAPHY,
 } from '@opentrons/components'
 
-import { StyledText } from '../../atoms/text'
 import { MediumButton } from '../../atoms/buttons'
 import { RobotSetupHeader } from '../../organisms/RobotSetupHeader'
 import { getLocalRobot } from '../../redux/discovery'
@@ -116,12 +116,12 @@ const DisplayConnectionStatus = ({
       flex="1"
       flexDirection={DIRECTION_COLUMN}
       gridGap={SPACING.spacing32}
-      backgroundColor={COLORS.green3}
-      borderRadius={BORDERS.borderRadiusSize3}
+      backgroundColor={COLORS.green35}
+      borderRadius={BORDERS.borderRadius12}
       alignItems={ALIGN_CENTER}
       justifyContent={JUSTIFY_CENTER}
     >
-      <Icon size="3rem" name="ot-check" color={COLORS.green2} />
+      <Icon size="3rem" name="ot-check" color={COLORS.green50} />
       <StyledText as="h3" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
         {t('successfully_connected_to_network', { ssid })}
       </StyledText>

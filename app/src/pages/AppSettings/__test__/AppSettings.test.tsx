@@ -1,8 +1,9 @@
 import * as React from 'react'
+import { vi, describe, beforeEach, it, expect, afterEach } from 'vitest'
 import { Route } from 'react-router'
 import { MemoryRouter } from 'react-router-dom'
 
-import { renderWithProviders } from '@opentrons/components'
+import { renderWithProviders } from '../../../__testing-utils__'
 
 import { i18n } from '../../../i18n'
 import * as Config from '../../../redux/config'
@@ -12,27 +13,11 @@ import { AdvancedSettings } from '../AdvancedSettings'
 import { FeatureFlags } from '../../../organisms/AppSettings/FeatureFlags'
 import { AppSettings } from '..'
 
-jest.mock('../../../redux/config')
-jest.mock('../GeneralSettings')
-jest.mock('../PrivacySettings')
-jest.mock('../AdvancedSettings')
-jest.mock('../../../organisms/AppSettings/FeatureFlags')
-
-const getDevtoolsEnabled = Config.getDevtoolsEnabled as jest.MockedFunction<
-  typeof Config.getDevtoolsEnabled
->
-const mockGeneralSettings = GeneralSettings as jest.MockedFunction<
-  typeof GeneralSettings
->
-const mockPrivacySettings = PrivacySettings as jest.MockedFunction<
-  typeof PrivacySettings
->
-const mockAdvancedSettings = AdvancedSettings as jest.MockedFunction<
-  typeof AdvancedSettings
->
-const mockFeatureFlags = FeatureFlags as jest.MockedFunction<
-  typeof FeatureFlags
->
+vi.mock('../../../redux/config')
+vi.mock('../GeneralSettings')
+vi.mock('../PrivacySettings')
+vi.mock('../AdvancedSettings')
+vi.mock('../../../organisms/AppSettings/FeatureFlags')
 
 const render = (path = '/'): ReturnType<typeof renderWithProviders> => {
   return renderWithProviders(
@@ -48,14 +33,16 @@ const render = (path = '/'): ReturnType<typeof renderWithProviders> => {
 }
 describe('AppSettingsHeader', () => {
   beforeEach(() => {
-    getDevtoolsEnabled.mockReturnValue(false)
-    mockGeneralSettings.mockReturnValue(<div>Mock General Settings</div>)
-    mockPrivacySettings.mockReturnValue(<div>Mock Privacy Settings</div>)
-    mockAdvancedSettings.mockReturnValue(<div>Mock Advanced Settings</div>)
-    mockFeatureFlags.mockReturnValue(<div>Mock Feature Flags</div>)
+    vi.mocked(Config.getDevtoolsEnabled).mockReturnValue(false)
+    vi.mocked(GeneralSettings).mockReturnValue(<div>Mock General Settings</div>)
+    vi.mocked(AdvancedSettings).mockReturnValue(
+      <div>Mock Advanced Settings</div>
+    )
+    vi.mocked(FeatureFlags).mockReturnValue(<div>Mock Feature Flags</div>)
+    vi.mocked(PrivacySettings).mockReturnValue(<div>Mock Privacy Settings</div>)
   })
   afterEach(() => {
-    jest.resetAllMocks()
+    vi.resetAllMocks()
   })
 
   it('renders correct title and navigation tabs', () => {
@@ -70,7 +57,7 @@ describe('AppSettingsHeader', () => {
     expect(queryByText('Feature Flags')).toBeFalsy()
   })
   it('renders feature flags link if dev tools enabled', () => {
-    getDevtoolsEnabled.mockReturnValue(true)
+    vi.mocked(Config.getDevtoolsEnabled).mockReturnValue(true)
     const [{ getByText }] = render('/app-settings/general')
     getByText('Feature Flags')
   })

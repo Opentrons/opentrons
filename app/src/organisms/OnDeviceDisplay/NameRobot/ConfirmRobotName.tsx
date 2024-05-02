@@ -3,16 +3,16 @@ import { useHistory } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 
 import {
-  Flex,
-  DIRECTION_COLUMN,
-  JUSTIFY_CENTER,
   ALIGN_CENTER,
-  SPACING,
-  TYPOGRAPHY,
   COLORS,
+  DIRECTION_COLUMN,
+  Flex,
+  JUSTIFY_CENTER,
+  SPACING,
+  StyledText,
+  TYPOGRAPHY,
 } from '@opentrons/components'
 
-import { StyledText } from '../../../atoms/text'
 import { StepMeter } from '../../../atoms/StepMeter'
 import { MediumButton } from '../../../atoms/buttons'
 import screenImage from '../../../assets/images/on-device-display/odd_abstract@x2.png'
@@ -61,7 +61,7 @@ export function ConfirmRobotName({
               fontWeight={TYPOGRAPHY.fontWeightRegular}
               marginTop={SPACING.spacing12}
               marginBottom={SPACING.spacing40}
-              color={COLORS.darkBlack70}
+              color={COLORS.grey60}
             >
               {t('your_robot_is_ready_to_go')}
             </StyledText>

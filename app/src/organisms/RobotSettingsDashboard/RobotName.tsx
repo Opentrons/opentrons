@@ -2,16 +2,15 @@ import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 
 import {
-  Flex,
   Btn,
   DIRECTION_COLUMN,
-  JUSTIFY_FLEX_START,
+  Flex,
   Icon,
+  JUSTIFY_FLEX_START,
+  StyledText,
 } from '@opentrons/components'
 
-import { StyledText } from '../../atoms/text'
-
-import type { SetSettingOption } from '../../pages/OnDeviceDisplay/RobotSettingsDashboard'
+import type { SetSettingOption } from '../../pages/RobotSettingsDashboard'
 
 interface RobotNameProps {
   setCurrentOption: SetSettingOption

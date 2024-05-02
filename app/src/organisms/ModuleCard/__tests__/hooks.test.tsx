@@ -1,23 +1,15 @@
 import * as React from 'react'
-import { act } from 'react-test-renderer'
 import { Provider } from 'react-redux'
-import { when } from 'jest-when'
+import { when } from 'vitest-when'
 import { createStore } from 'redux'
 import { I18nextProvider } from 'react-i18next'
-import { renderHook } from '@testing-library/react-hooks'
-import { i18n } from '../../../i18n'
-import { useCreateLiveCommandMutation } from '@opentrons/react-api-client'
-import { ModuleModel, ModuleType } from '@opentrons/shared-data'
-import heaterShakerCommandsWithResultsKey from '@opentrons/shared-data/protocol/fixtures/6/heaterShakerCommandsWithResultsKey.json'
-import { getProtocolModulesInfo } from '../../Devices/ProtocolRun/utils/getProtocolModulesInfo'
-import { useCurrentRunId } from '../../ProtocolUpload/hooks'
-import { useIsRobotBusy, useRunStatuses } from '../../Devices/hooks'
-import {
-  useLatchControls,
-  useModuleOverflowMenu,
-  useIsHeaterShakerInProtocol,
-} from '../hooks'
+import { act, renderHook } from '@testing-library/react'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
+import { useCreateLiveCommandMutation } from '@opentrons/react-api-client'
+import { heater_shaker_commands_with_results_key } from '@opentrons/shared-data'
+
+import { i18n } from '../../../i18n'
 import {
   mockHeaterShaker,
   mockMagneticModuleGen2,
@@ -25,36 +17,22 @@ import {
   mockThermocycler,
   mockThermocyclerGen2,
 } from '../../../redux/modules/__fixtures__'
+import { useIsRobotBusy, useRunStatuses } from '../../Devices/hooks'
 import { useMostRecentCompletedAnalysis } from '../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
+import { useCurrentRunId } from '../../ProtocolUpload/hooks'
+import {
+  useLatchControls,
+  useModuleOverflowMenu,
+  useIsHeaterShakerInProtocol,
+} from '../hooks'
 
 import type { Store } from 'redux'
 import type { State } from '../../../redux/types'
 
-jest.mock('@opentrons/react-api-client')
-jest.mock('../../Devices/ProtocolRun/utils/getProtocolModulesInfo')
-jest.mock('../../LabwarePositionCheck/useMostRecentCompletedAnalysis')
-jest.mock('../../ProtocolUpload/hooks')
-jest.mock('../../Devices/hooks')
-
-const mockUseMostRecentCompletedAnalysis = useMostRecentCompletedAnalysis as jest.MockedFunction<
-  typeof useMostRecentCompletedAnalysis
->
-const mockGetProtocolModulesInfo = getProtocolModulesInfo as jest.MockedFunction<
-  typeof getProtocolModulesInfo
->
-
-const mockUseLiveCommandMutation = useCreateLiveCommandMutation as jest.MockedFunction<
-  typeof useCreateLiveCommandMutation
->
-const mockUseCurrentRunId = useCurrentRunId as jest.MockedFunction<
-  typeof useCurrentRunId
->
-const mockUseIsRobotBusy = useIsRobotBusy as jest.MockedFunction<
-  typeof useIsRobotBusy
->
-const mockUseRunStatuses = useRunStatuses as jest.MockedFunction<
-  typeof useRunStatuses
->
+vi.mock('@opentrons/react-api-client')
+vi.mock('../../LabwarePositionCheck/useMostRecentCompletedAnalysis')
+vi.mock('../../ProtocolUpload/hooks')
+vi.mock('../../Devices/hooks')
 
 const mockCloseLatchHeaterShaker = {
   id: 'heatershaker_id',
@@ -183,31 +161,33 @@ const mockTCLidHeating = {
 } as any
 
 describe('useLatchControls', () => {
-  const store: Store<any> = createStore(jest.fn(), {})
-  let mockCreateLiveCommand = jest.fn()
+  const store: Store<any> = createStore(vi.fn(), {})
+  let mockCreateLiveCommand = vi.fn()
 
   beforeEach(() => {
-    store.dispatch = jest.fn()
-    mockCreateLiveCommand = jest.fn()
+    store.dispatch = vi.fn()
+    mockCreateLiveCommand = vi.fn()
     mockCreateLiveCommand.mockResolvedValue(null)
-    mockUseRunStatuses.mockReturnValue({
+    vi.mocked(useRunStatuses).mockReturnValue({
       isRunRunning: false,
       isRunStill: false,
       isRunIdle: false,
       isRunTerminal: false,
     })
-    mockUseLiveCommandMutation.mockReturnValue({
+    vi.mocked(useCreateLiveCommandMutation).mockReturnValue({
       createLiveCommand: mockCreateLiveCommand,
     } as any)
-    mockUseIsRobotBusy.mockReturnValue(false)
+    vi.mocked(useIsRobotBusy).mockReturnValue(false)
   })
 
   afterEach(() => {
-    jest.restoreAllMocks()
+    vi.restoreAllMocks()
   })
 
   it('should return latch is open and handle latch function and command to close latch', () => {
-    const wrapper: React.FunctionComponent<{}> = ({ children }) => (
+    const wrapper: React.FunctionComponent<{ children: React.ReactNode }> = ({
+      children,
+    }) => (
       <I18nextProvider i18n={i18n}>
         <Provider store={store}>{children}</Provider>
       </I18nextProvider>
@@ -229,7 +209,9 @@ describe('useLatchControls', () => {
     })
   })
   it('should return if latch is closed and handle latch function opens latch', () => {
-    const wrapper: React.FunctionComponent<{}> = ({ children }) => (
+    const wrapper: React.FunctionComponent<{ children: React.ReactNode }> = ({
+      children,
+    }) => (
       <I18nextProvider i18n={i18n}>
         <Provider store={store}>{children}</Provider>
       </I18nextProvider>
@@ -256,29 +238,31 @@ describe('useLatchControls', () => {
 })
 
 describe('useModuleOverflowMenu', () => {
-  const store: Store<any> = createStore(jest.fn(), {})
-  let mockCreateLiveCommand = jest.fn()
+  const store: Store<any> = createStore(vi.fn(), {})
+  let mockCreateLiveCommand = vi.fn()
 
   beforeEach(() => {
-    store.dispatch = jest.fn()
-    mockCreateLiveCommand = jest.fn()
+    store.dispatch = vi.fn()
+    mockCreateLiveCommand = vi.fn()
     mockCreateLiveCommand.mockResolvedValue(null)
-    mockUseRunStatuses.mockReturnValue({
+    vi.mocked(useRunStatuses).mockReturnValue({
       isRunRunning: false,
       isRunStill: true,
       isRunTerminal: false,
       isRunIdle: false,
     })
-    mockUseLiveCommandMutation.mockReturnValue({
+    vi.mocked(useCreateLiveCommandMutation).mockReturnValue({
       createLiveCommand: mockCreateLiveCommand,
     } as any)
   })
 
   afterEach(() => {
-    jest.restoreAllMocks()
+    vi.restoreAllMocks()
   })
   it('should return everything for menuItemsByModuleType and create deactive heater command', () => {
-    const wrapper: React.FunctionComponent<{}> = ({ children }) => (
+    const wrapper: React.FunctionComponent<{ children: React.ReactNode }> = ({
+      children,
+    }) => (
       <I18nextProvider i18n={i18n}>
         <Provider store={store}>{children}</Provider>
       </I18nextProvider>
@@ -287,10 +271,10 @@ describe('useModuleOverflowMenu', () => {
       () =>
         useModuleOverflowMenu(
           mockHeatHeaterShaker,
-          jest.fn(),
-          jest.fn(),
-          jest.fn(),
-          jest.fn(),
+          vi.fn(),
+          vi.fn(),
+          vi.fn(),
+          vi.fn(),
           false,
           false
         ),
@@ -313,11 +297,13 @@ describe('useModuleOverflowMenu', () => {
     })
   })
   it('should render heater shaker module and calls handleClick when module is idle and calls other handles when button is selected', () => {
-    const mockHandleSlideoutClick = jest.fn()
-    const mockAboutClick = jest.fn()
-    const mockTestShakeClick = jest.fn()
-    const mockHandleWizard = jest.fn()
-    const wrapper: React.FunctionComponent<{}> = ({ children }) => (
+    const mockHandleSlideoutClick = vi.fn()
+    const mockAboutClick = vi.fn()
+    const mockTestShakeClick = vi.fn()
+    const mockHandleWizard = vi.fn()
+    const wrapper: React.FunctionComponent<{ children: React.ReactNode }> = ({
+      children,
+    }) => (
       <I18nextProvider i18n={i18n}>
         <Provider store={store}>{children}</Provider>
       </I18nextProvider>
@@ -346,8 +332,10 @@ describe('useModuleOverflowMenu', () => {
   })
 
   it('should return only 1 menu button when module is a magnetic module and calls handleClick when module is disengaged', () => {
-    const mockHandleClick = jest.fn()
-    const wrapper: React.FunctionComponent<{}> = ({ children }) => (
+    const mockHandleClick = vi.fn()
+    const wrapper: React.FunctionComponent<{ children: React.ReactNode }> = ({
+      children,
+    }) => (
       <I18nextProvider i18n={i18n}>
         <Provider store={store}>{children}</Provider>
       </I18nextProvider>
@@ -356,9 +344,9 @@ describe('useModuleOverflowMenu', () => {
       () =>
         useModuleOverflowMenu(
           mockMagneticModuleGen2,
-          jest.fn(),
-          jest.fn(),
-          jest.fn(),
+          vi.fn(),
+          vi.fn(),
+          vi.fn(),
           mockHandleClick,
           false,
           false
@@ -375,7 +363,9 @@ describe('useModuleOverflowMenu', () => {
   })
 
   it('should render magnetic module and create disengage command', () => {
-    const wrapper: React.FunctionComponent<{}> = ({ children }) => (
+    const wrapper: React.FunctionComponent<{ children: React.ReactNode }> = ({
+      children,
+    }) => (
       <I18nextProvider i18n={i18n}>
         <Provider store={store}>{children}</Provider>
       </I18nextProvider>
@@ -384,10 +374,10 @@ describe('useModuleOverflowMenu', () => {
       () =>
         useModuleOverflowMenu(
           mockMagDeckEngaged,
-          jest.fn(),
-          jest.fn(),
-          jest.fn(),
-          jest.fn(),
+          vi.fn(),
+          vi.fn(),
+          vi.fn(),
+          vi.fn(),
           false,
           false
         ),
@@ -410,8 +400,10 @@ describe('useModuleOverflowMenu', () => {
   })
 
   it('should render temperature module and call handleClick when module is idle', () => {
-    const mockHandleClick = jest.fn()
-    const wrapper: React.FunctionComponent<{}> = ({ children }) => (
+    const mockHandleClick = vi.fn()
+    const wrapper: React.FunctionComponent<{ children: React.ReactNode }> = ({
+      children,
+    }) => (
       <I18nextProvider i18n={i18n}>
         <Provider store={store}>{children}</Provider>
       </I18nextProvider>
@@ -420,9 +412,9 @@ describe('useModuleOverflowMenu', () => {
       () =>
         useModuleOverflowMenu(
           mockTemperatureModuleGen2,
-          jest.fn(),
-          jest.fn(),
-          jest.fn(),
+          vi.fn(),
+          vi.fn(),
+          vi.fn(),
           mockHandleClick,
           false,
           false
@@ -438,7 +430,9 @@ describe('useModuleOverflowMenu', () => {
   })
 
   it('should render temp module and create deactivate temp command', () => {
-    const wrapper: React.FunctionComponent<{}> = ({ children }) => (
+    const wrapper: React.FunctionComponent<{ children: React.ReactNode }> = ({
+      children,
+    }) => (
       <I18nextProvider i18n={i18n}>
         <Provider store={store}>{children}</Provider>
       </I18nextProvider>
@@ -447,10 +441,10 @@ describe('useModuleOverflowMenu', () => {
       () =>
         useModuleOverflowMenu(
           mockTemperatureModuleHeating,
-          jest.fn(),
-          jest.fn(),
-          jest.fn(),
-          jest.fn(),
+          vi.fn(),
+          vi.fn(),
+          vi.fn(),
+          vi.fn(),
           false,
           false
         ),
@@ -472,8 +466,10 @@ describe('useModuleOverflowMenu', () => {
   })
 
   it('should render TC module and call handleClick when module is idle', () => {
-    const mockHandleClick = jest.fn()
-    const wrapper: React.FunctionComponent<{}> = ({ children }) => (
+    const mockHandleClick = vi.fn()
+    const wrapper: React.FunctionComponent<{ children: React.ReactNode }> = ({
+      children,
+    }) => (
       <I18nextProvider i18n={i18n}>
         <Provider store={store}>{children}</Provider>
       </I18nextProvider>
@@ -482,9 +478,9 @@ describe('useModuleOverflowMenu', () => {
       () =>
         useModuleOverflowMenu(
           mockThermocycler,
-          jest.fn(),
-          jest.fn(),
-          jest.fn(),
+          vi.fn(),
+          vi.fn(),
+          vi.fn(),
           mockHandleClick,
           false,
           false
@@ -500,7 +496,9 @@ describe('useModuleOverflowMenu', () => {
   })
 
   it('should render TC module and create open lid command', () => {
-    const wrapper: React.FunctionComponent<{}> = ({ children }) => (
+    const wrapper: React.FunctionComponent<{ children: React.ReactNode }> = ({
+      children,
+    }) => (
       <I18nextProvider i18n={i18n}>
         <Provider store={store}>{children}</Provider>
       </I18nextProvider>
@@ -509,10 +507,10 @@ describe('useModuleOverflowMenu', () => {
       () =>
         useModuleOverflowMenu(
           mockTCBlockHeating,
-          jest.fn(),
-          jest.fn(),
-          jest.fn(),
-          jest.fn(),
+          vi.fn(),
+          vi.fn(),
+          vi.fn(),
+          vi.fn(),
           false,
           false
         ),
@@ -536,7 +534,9 @@ describe('useModuleOverflowMenu', () => {
   })
 
   it('should render TC module and create deactivate lid command', () => {
-    const wrapper: React.FunctionComponent<{}> = ({ children }) => (
+    const wrapper: React.FunctionComponent<{ children: React.ReactNode }> = ({
+      children,
+    }) => (
       <I18nextProvider i18n={i18n}>
         <Provider store={store}>{children}</Provider>
       </I18nextProvider>
@@ -545,10 +545,10 @@ describe('useModuleOverflowMenu', () => {
       () =>
         useModuleOverflowMenu(
           mockTCLidHeating,
-          jest.fn(),
-          jest.fn(),
-          jest.fn(),
-          jest.fn(),
+          vi.fn(),
+          vi.fn(),
+          vi.fn(),
+          vi.fn(),
           false,
           false
         ),
@@ -572,7 +572,9 @@ describe('useModuleOverflowMenu', () => {
   })
 
   it('should render TC module gen 2 and create a close lid command', () => {
-    const wrapper: React.FunctionComponent<{}> = ({ children }) => (
+    const wrapper: React.FunctionComponent<{ children: React.ReactNode }> = ({
+      children,
+    }) => (
       <I18nextProvider i18n={i18n}>
         <Provider store={store}>{children}</Provider>
       </I18nextProvider>
@@ -581,10 +583,10 @@ describe('useModuleOverflowMenu', () => {
       () =>
         useModuleOverflowMenu(
           mockThermocyclerGen2,
-          jest.fn(),
-          jest.fn(),
-          jest.fn(),
-          jest.fn(),
+          vi.fn(),
+          vi.fn(),
+          vi.fn(),
+          vi.fn(),
           false,
           false
         ),
@@ -608,68 +610,46 @@ describe('useModuleOverflowMenu', () => {
   })
 })
 
-const mockHeaterShakerDefinition = {
-  moduleId: 'someHeaterShakerModule',
-  model: 'heaterShakerModuleV1' as ModuleModel,
-  type: 'heaterShakerModuleType' as ModuleType,
-  displayName: 'Heater Shaker Module',
-  labwareOffset: { x: 5, y: 5, z: 5 },
-  cornerOffsetFromSlot: { x: 1, y: 1, z: 1 },
-  dimensions: {
-    xDimension: 100,
-    yDimension: 100,
-    footprintXDimension: 50,
-    footprintYDimension: 50,
-    labwareInterfaceXDimension: 80,
-    labwareInterfaceYDimension: 120,
-  },
-  twoDimensionalRendering: { children: [] },
-}
-
-const HEATER_SHAKER_MODULE_INFO = {
-  moduleId: 'heaterShakerModuleId',
-  x: 0,
-  y: 0,
-  z: 0,
-  moduleDef: mockHeaterShakerDefinition as any,
-  nestedLabwareDef: null,
-  nestedLabwareId: null,
-  nestedLabwareDisplayName: null,
-  protocolLoadOrder: 0,
-  slotName: '1',
-}
-
 describe('useIsHeaterShakerInProtocol', () => {
-  const store: Store<State> = createStore(jest.fn(), {})
+  const store: Store<State> = createStore(vi.fn(), {})
 
   beforeEach(() => {
-    when(mockUseCurrentRunId).calledWith().mockReturnValue('1')
-    store.dispatch = jest.fn()
-    mockGetProtocolModulesInfo.mockReturnValue([HEATER_SHAKER_MODULE_INFO])
+    when(useCurrentRunId).calledWith().thenReturn('1')
+    store.dispatch = vi.fn()
 
-    when(mockUseMostRecentCompletedAnalysis)
+    when(useMostRecentCompletedAnalysis)
       .calledWith('1')
-      .mockReturnValue({
-        ...heaterShakerCommandsWithResultsKey,
-        labware: Object.keys(heaterShakerCommandsWithResultsKey.labware).map(
-          id => ({
-            location: 'offDeck',
-            loadName: id,
-            definitionUrui: id,
-            id,
-          })
-        ),
+      .thenReturn({
+        ...heater_shaker_commands_with_results_key,
+        modules: [
+          {
+            id: 'fake_module_id',
+            model: 'heaterShakerModuleV1',
+            location: {
+              slotName: '1',
+            },
+            serialNumber: 'fake_serial',
+          },
+        ],
+        labware: Object.keys(
+          heater_shaker_commands_with_results_key.labware
+        ).map(id => ({
+          location: 'offDeck',
+          loadName: id,
+          definitionUrui: id,
+          id,
+        })),
       } as any)
   })
 
   afterEach(() => {
-    jest.restoreAllMocks()
+    vi.restoreAllMocks()
   })
 
   it('should return true when a heater shaker is in the protocol', () => {
-    const wrapper: React.FunctionComponent<{}> = ({ children }) => (
-      <Provider store={store}>{children}</Provider>
-    )
+    const wrapper: React.FunctionComponent<{ children: React.ReactNode }> = ({
+      children,
+    }) => <Provider store={store}>{children}</Provider>
     const { result } = renderHook(useIsHeaterShakerInProtocol, { wrapper })
     const isHeaterShakerInProtocol = result.current
 
@@ -677,11 +657,23 @@ describe('useIsHeaterShakerInProtocol', () => {
   })
 
   it('should return false when a heater shaker is NOT in the protocol', () => {
-    mockGetProtocolModulesInfo.mockReturnValue([])
-
-    const wrapper: React.FunctionComponent<{}> = ({ children }) => (
-      <Provider store={store}>{children}</Provider>
-    )
+    when(useMostRecentCompletedAnalysis)
+      .calledWith('1')
+      .thenReturn({
+        ...heater_shaker_commands_with_results_key,
+        modules: [],
+        labware: Object.keys(
+          heater_shaker_commands_with_results_key.labware
+        ).map(id => ({
+          location: 'offDeck',
+          loadName: id,
+          definitionUrui: id,
+          id,
+        })),
+      } as any)
+    const wrapper: React.FunctionComponent<{ children: React.ReactNode }> = ({
+      children,
+    }) => <Provider store={store}>{children}</Provider>
     const { result } = renderHook(useIsHeaterShakerInProtocol, { wrapper })
     const isHeaterShakerInProtocol = result.current
 

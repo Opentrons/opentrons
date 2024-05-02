@@ -3,7 +3,7 @@ import { POST, request } from '../request'
 import type { ResponsePromise } from '../request'
 import type { HostConfig } from '../types'
 import type { LabwareDefinitionSummary } from './types'
-import { LabwareDefinition2 } from '@opentrons/shared-data'
+import type { LabwareDefinition2 } from '@opentrons/shared-data'
 
 export function createMaintenanceRunLabwareDefinition(
   config: HostConfig,

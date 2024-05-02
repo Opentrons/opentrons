@@ -85,6 +85,7 @@ def test_update_pipette_configuration(
     base_configurations = load_data.load_definition(
         model_name.pipette_type, model_name.pipette_channels, model_name.pipette_version
     )
+
     updated_configurations = load_data.update_pipette_configuration(
         base_configurations, v1_configuration_changes, liquid_class
     )

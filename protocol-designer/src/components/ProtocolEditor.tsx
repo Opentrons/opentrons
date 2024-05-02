@@ -1,21 +1,21 @@
 import * as React from 'react'
 import cx from 'classnames'
-import { DragDropContext } from 'react-dnd'
-import MouseBackEnd from 'react-dnd-mouse-backend'
+import { DndProvider } from 'react-dnd'
+import { HTML5Backend } from 'react-dnd-html5-backend'
 import { ComputingSpinner } from '../components/ComputingSpinner'
 import { ConnectedNav } from '../containers/ConnectedNav'
-import { ConnectedSidebar } from '../containers/ConnectedSidebar'
+import { Sidebar } from '../containers/ConnectedSidebar'
 import { ConnectedTitleBar } from '../containers/ConnectedTitleBar'
-import { ConnectedMainPanel } from '../containers/ConnectedMainPanel'
+import { MainPanel } from '../containers/ConnectedMainPanel'
 import { PortalRoot as MainPageModalPortalRoot } from '../components/portals/MainPageModalPortal'
 import { MAIN_CONTENT_FORCED_SCROLL_CLASSNAME } from '../ui/steps/utils'
 import { PrereleaseModeIndicator } from './PrereleaseModeIndicator'
 import { PortalRoot as TopPortalRoot } from './portals/TopPortal'
-import { FileUploadMessageModal } from './modals/FileUploadMessageModal'
-import { LabwareUploadMessageModal } from './modals/LabwareUploadMessageModal'
+import { FileUploadMessageModal } from './modals/FileUploadMessageModal/FileUploadMessageModal'
+import { LabwareUploadMessageModal } from './modals/LabwareUploadMessageModal/LabwareUploadMessageModal'
 import { GateModal } from './modals/GateModal'
 import { AnnouncementModal } from './modals/AnnouncementModal'
-import styles from './ProtocolEditor.css'
+import styles from './ProtocolEditor.module.css'
 import { CreateFileWizard } from './modals/CreateFileWizard'
 
 const showGateModal =
@@ -23,14 +23,14 @@ const showGateModal =
 
 function ProtocolEditorComponent(): JSX.Element {
   return (
-    <div>
+    <div id="protocol-editor">
       <ComputingSpinner />
       <TopPortalRoot />
       {showGateModal ? <GateModal /> : null}
       <PrereleaseModeIndicator />
       <div className={styles.wrapper}>
         <ConnectedNav />
-        <ConnectedSidebar />
+        <Sidebar />
         <div className={styles.main_page_wrapper}>
           <ConnectedTitleBar />
 
@@ -47,7 +47,7 @@ function ProtocolEditorComponent(): JSX.Element {
 
             <MainPageModalPortalRoot />
             <LabwareUploadMessageModal />
-            <ConnectedMainPanel />
+            <MainPanel />
           </div>
         </div>
       </div>
@@ -55,6 +55,8 @@ function ProtocolEditorComponent(): JSX.Element {
   )
 }
 
-export const ProtocolEditor = DragDropContext(MouseBackEnd)(
-  ProtocolEditorComponent
+export const ProtocolEditor = (): JSX.Element => (
+  <DndProvider backend={HTML5Backend}>
+    <ProtocolEditorComponent />
+  </DndProvider>
 )

@@ -1,8 +1,9 @@
 """Test instrument context simulation."""
-from typing import Callable
+from typing import Callable, cast
 
 import pytest
-from pytest_lazyfixture import lazy_fixture  # type: ignore[import]
+from _pytest.fixtures import SubRequest
+from pytest_lazyfixture import lazy_fixture  # type: ignore[import-untyped]
 
 from opentrons.protocol_api.core.common import InstrumentCore, LabwareCore
 from opentrons.types import Location, Point
@@ -23,8 +24,8 @@ pytestmark = pytest.mark.ot2_only
         lazy_fixture("simulating_instrument_context"),
     ]
 )
-def subject(request: pytest.FixtureRequest) -> InstrumentCore:
-    return request.param  # type: ignore[attr-defined, no-any-return]
+def subject(request: SubRequest) -> InstrumentCore:
+    return cast(InstrumentCore, request.param)
 
 
 def test_same_pipette(
@@ -269,7 +270,7 @@ def _aspirate_blowout(i: InstrumentCore, labware: LabwareCore) -> None:
 @pytest.mark.parametrize(
     argnames=["side_effector"],
     argvalues=[
-        [lambda i, l: None],
+        [lambda i, l: None],  # noqa: E741
         [_aspirate],
         [_aspirate_dispense],
         [_aspirate_blowout],

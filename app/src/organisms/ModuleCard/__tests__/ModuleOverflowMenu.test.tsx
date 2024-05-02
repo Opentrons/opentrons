@@ -1,6 +1,8 @@
 import * as React from 'react'
-import { renderWithProviders } from '@opentrons/components'
-import { fireEvent } from '@testing-library/react'
+import { fireEvent, screen } from '@testing-library/react'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+
+import { renderWithProviders } from '../../../__testing-utils__'
 import { i18n } from '../../../i18n'
 import {
   mockMagneticModule,
@@ -17,20 +19,10 @@ import {
 import { useCurrentRunId } from '../../ProtocolUpload/hooks'
 import { ModuleOverflowMenu } from '../ModuleOverflowMenu'
 
-jest.mock('../../Devices/hooks')
-jest.mock('../../RunTimeControl/hooks')
-jest.mock('../../ProtocolUpload/hooks')
+vi.mock('../../Devices/hooks')
+vi.mock('../../RunTimeControl/hooks')
+vi.mock('../../ProtocolUpload/hooks')
 
-const mockUseRunStatuses = useRunStatuses as jest.MockedFunction<
-  typeof useRunStatuses
->
-const mockUseCurrentRunId = useCurrentRunId as jest.MockedFunction<
-  typeof useCurrentRunId
->
-const mockUseIsLegacySessionsInProgress = useIsLegacySessionInProgress as jest.MockedFunction<
-  typeof useIsLegacySessionInProgress
->
-const mockUseIsFlex = useIsFlex as jest.MockedFunction<typeof useIsFlex>
 const render = (props: React.ComponentProps<typeof ModuleOverflowMenu>) => {
   return renderWithProviders(<ModuleOverflowMenu {...props} />, {
     i18nInstance: i18n,
@@ -172,23 +164,23 @@ const mockThermocyclerGen2LidClosed = {
 describe('ModuleOverflowMenu', () => {
   let props: React.ComponentProps<typeof ModuleOverflowMenu>
   beforeEach(() => {
-    mockUseIsLegacySessionsInProgress.mockReturnValue(false)
-    mockUseRunStatuses.mockReturnValue({
+    vi.mocked(useIsLegacySessionInProgress).mockReturnValue(false)
+    vi.mocked(useRunStatuses).mockReturnValue({
       isRunRunning: false,
       isRunStill: true,
       isRunTerminal: false,
       isRunIdle: false,
     })
-    mockUseCurrentRunId.mockReturnValue(null)
-    mockUseIsFlex.mockReturnValue(false)
+    vi.mocked(useCurrentRunId).mockReturnValue(null)
+    vi.mocked(useIsFlex).mockReturnValue(false)
     props = {
       robotName: 'otie',
       module: mockMagneticModule,
-      handleSlideoutClick: jest.fn(),
-      handleAboutClick: jest.fn(),
-      handleTestShakeClick: jest.fn(),
-      handleInstructionsClick: jest.fn(),
-      handleCalibrateClick: jest.fn(),
+      handleSlideoutClick: vi.fn(),
+      handleAboutClick: vi.fn(),
+      handleTestShakeClick: vi.fn(),
+      handleInstructionsClick: vi.fn(),
+      handleCalibrateClick: vi.fn(),
       isLoadedInRun: false,
       isPipetteReady: true,
       isTooHot: false,
@@ -196,13 +188,13 @@ describe('ModuleOverflowMenu', () => {
   })
 
   afterEach(() => {
-    jest.resetAllMocks()
+    vi.resetAllMocks()
   })
 
   it('renders the correct magnetic module menu', () => {
-    const { getByText } = render(props)
-    getByText('Set engage height')
-    getByText('About module')
+    render(props)
+    screen.getByText('Set engage height')
+    screen.getByText('About module')
   })
 
   it('renders the correct temperature module menu', () => {
@@ -210,13 +202,13 @@ describe('ModuleOverflowMenu', () => {
       ...props,
       module: mockTemperatureModuleGen2,
     }
-    const { getByRole } = render(props)
-    const buttonSetting = getByRole('button', {
+    render(props)
+    const buttonSetting = screen.getByRole('button', {
       name: 'Set module temperature',
     })
     fireEvent.click(buttonSetting)
     expect(props.handleSlideoutClick).toHaveBeenCalled()
-    const buttonAbout = getByRole('button', { name: 'About module' })
+    const buttonAbout = screen.getByRole('button', { name: 'About module' })
     fireEvent.click(buttonAbout)
     expect(props.handleAboutClick).toHaveBeenCalled()
   })
@@ -225,37 +217,37 @@ describe('ModuleOverflowMenu', () => {
       ...props,
       module: mockThermocycler,
     }
-    const { getByRole } = render(props)
-    const buttonSettingLid = getByRole('button', {
+    render(props)
+    const buttonSettingLid = screen.getByRole('button', {
       name: 'Set lid temperature',
     })
     fireEvent.click(buttonSettingLid)
     expect(props.handleSlideoutClick).toHaveBeenCalled()
-    const buttonAbout = getByRole('button', { name: 'About module' })
+    const buttonAbout = screen.getByRole('button', { name: 'About module' })
     fireEvent.click(buttonAbout)
     expect(props.handleAboutClick).toHaveBeenCalled()
-    const buttonSettingBlock = getByRole('button', {
+    const buttonSettingBlock = screen.getByRole('button', {
       name: 'Set block temperature',
     })
     fireEvent.click(buttonSettingBlock)
     expect(props.handleSlideoutClick).toHaveBeenCalled()
-    getByRole('button', { name: 'Close lid' })
+    screen.getByRole('button', { name: 'Close lid' })
   })
   it('renders the correct Heater Shaker module menu', () => {
     props = {
       ...props,
       module: mockHeaterShaker,
     }
-    const { getByRole } = render(props)
-    getByRole('button', {
+    render(props)
+    screen.getByRole('button', {
       name: 'Set module temperature',
     })
-    getByRole('button', {
+    screen.getByRole('button', {
       name: 'Close labware latch',
     })
-    const aboutButton = getByRole('button', { name: 'About module' })
-    getByRole('button', { name: 'Show attachment instructions' })
-    const testButton = getByRole('button', { name: 'Test shake' })
+    const aboutButton = screen.getByRole('button', { name: 'About module' })
+    screen.getByRole('button', { name: 'Show attachment instructions' })
+    const testButton = screen.getByRole('button', { name: 'Test shake' })
     fireEvent.click(testButton)
     expect(props.handleTestShakeClick).toHaveBeenCalled()
     fireEvent.click(aboutButton)
@@ -266,8 +258,10 @@ describe('ModuleOverflowMenu', () => {
       ...props,
       module: mockHeaterShaker,
     }
-    const { getByRole } = render(props)
-    const btn = getByRole('button', { name: 'Show attachment instructions' })
+    render(props)
+    const btn = screen.getByRole('button', {
+      name: 'Show attachment instructions',
+    })
     fireEvent.click(btn)
     expect(props.handleInstructionsClick).toHaveBeenCalled()
   })
@@ -277,9 +271,9 @@ describe('ModuleOverflowMenu', () => {
       ...props,
       module: mockMovingHeaterShaker,
     }
-    const { getByRole } = render(props)
+    render(props)
     expect(
-      getByRole('button', {
+      screen.getByRole('button', {
         name: 'Open labware latch',
       })
     ).toBeDisabled()
@@ -291,9 +285,9 @@ describe('ModuleOverflowMenu', () => {
       module: mockCloseLatchHeaterShaker,
     }
 
-    const { getByRole } = render(props)
+    render(props)
 
-    const btn = getByRole('button', {
+    const btn = screen.getByRole('button', {
       name: 'Open labware latch',
     })
     expect(btn).not.toBeDisabled()
@@ -305,9 +299,9 @@ describe('ModuleOverflowMenu', () => {
       ...props,
       module: mockHeaterShaker,
     }
-    const { getByRole } = render(props)
+    render(props)
 
-    const btn = getByRole('button', {
+    const btn = screen.getByRole('button', {
       name: 'Close labware latch',
     })
 
@@ -320,9 +314,9 @@ describe('ModuleOverflowMenu', () => {
       module: mockDeactivateHeatHeaterShaker,
     }
 
-    const { getByRole } = render(props)
+    render(props)
 
-    const btn = getByRole('button', {
+    const btn = screen.getByRole('button', {
       name: 'Deactivate heater',
     })
     expect(btn).not.toBeDisabled()
@@ -335,9 +329,9 @@ describe('ModuleOverflowMenu', () => {
       module: mockTemperatureModuleHeating,
     }
 
-    const { getByRole } = render(props)
+    render(props)
 
-    const btn = getByRole('button', {
+    const btn = screen.getByRole('button', {
       name: 'Deactivate module',
     })
     expect(btn).not.toBeDisabled()
@@ -350,9 +344,9 @@ describe('ModuleOverflowMenu', () => {
       module: mockMagDeckEngaged,
     }
 
-    const { getByRole } = render(props)
+    render(props)
 
-    const btn = getByRole('button', {
+    const btn = screen.getByRole('button', {
       name: 'Disengage module',
     })
     expect(btn).not.toBeDisabled()
@@ -365,9 +359,9 @@ describe('ModuleOverflowMenu', () => {
       module: mockTCBlockHeating,
     }
 
-    const { getByRole } = render(props)
+    render(props)
 
-    const btn = getByRole('button', {
+    const btn = screen.getByRole('button', {
       name: 'Deactivate block',
     })
     expect(btn).not.toBeDisabled()
@@ -375,8 +369,8 @@ describe('ModuleOverflowMenu', () => {
   })
 
   it('should disable module control buttons when the robot is busy and run status not null', () => {
-    mockUseIsLegacySessionsInProgress.mockReturnValue(true)
-    mockUseRunStatuses.mockReturnValue({
+    vi.mocked(useIsLegacySessionInProgress).mockReturnValue(true)
+    vi.mocked(useRunStatuses).mockReturnValue({
       isRunRunning: false,
       isRunStill: false,
       isRunTerminal: false,
@@ -389,42 +383,42 @@ describe('ModuleOverflowMenu', () => {
       runId: 'id',
     }
 
-    const { getByRole } = render(props)
+    render(props)
 
-    const btn = getByRole('button', {
+    const btn = screen.getByRole('button', {
       name: 'Deactivate block',
     })
     expect(btn).toBeDisabled()
     fireEvent.click(btn)
   })
 
-  it('should disable overflow menu buttons for thermocycler gen 1 when the robot is an OT-3', () => {
+  it('should disable overflow menu buttons for thermocycler gen 1 when the robot is a Flex', () => {
     props = {
       ...props,
       module: mockTCBlockHeating,
       isLoadedInRun: true,
       runId: 'id',
     }
-    mockUseIsFlex.mockReturnValue(true)
-    const { getByRole } = render(props)
+    vi.mocked(useIsFlex).mockReturnValue(true)
+    render(props)
 
     expect(
-      getByRole('button', {
+      screen.getByRole('button', {
         name: 'Set lid temperature',
       })
     ).toBeDisabled()
     expect(
-      getByRole('button', {
+      screen.getByRole('button', {
         name: 'Close lid',
       })
     ).toBeDisabled()
     expect(
-      getByRole('button', {
+      screen.getByRole('button', {
         name: 'Deactivate block',
       })
     ).toBeDisabled()
     expect(
-      getByRole('button', {
+      screen.getByRole('button', {
         name: 'About module',
       })
     ).toBeDisabled()
@@ -435,15 +429,17 @@ describe('ModuleOverflowMenu', () => {
       ...props,
       module: mockThermocyclerGen2,
     }
-    const { getByRole } = render(props)
-    const setLid = getByRole('button', {
+    render(props)
+    const setLid = screen.getByRole('button', {
       name: 'Set lid temperature',
     })
-    getByRole('button', {
+    screen.getByRole('button', {
       name: 'Close lid',
     })
-    const setBlock = getByRole('button', { name: 'Set block temperature' })
-    const about = getByRole('button', { name: 'About module' })
+    const setBlock = screen.getByRole('button', {
+      name: 'Set block temperature',
+    })
+    const about = screen.getByRole('button', { name: 'About module' })
     fireEvent.click(setLid)
     expect(props.handleSlideoutClick).toHaveBeenCalled()
     fireEvent.click(setBlock)
@@ -457,15 +453,15 @@ describe('ModuleOverflowMenu', () => {
       ...props,
       module: mockThermocyclerGen2LidClosed,
     }
-    const { getByRole } = render(props)
-    const setLid = getByRole('button', {
+    render(props)
+    const setLid = screen.getByRole('button', {
       name: 'Set lid temperature',
     })
-    getByRole('button', {
+    screen.getByRole('button', {
       name: 'Open lid',
     })
-    const setBlock = getByRole('button', { name: 'Deactivate block' })
-    const about = getByRole('button', { name: 'About module' })
+    const setBlock = screen.getByRole('button', { name: 'Deactivate block' })
+    const about = screen.getByRole('button', { name: 'About module' })
     fireEvent.click(setLid)
     expect(props.handleSlideoutClick).toHaveBeenCalled()
     fireEvent.click(setBlock)
@@ -475,8 +471,8 @@ describe('ModuleOverflowMenu', () => {
   })
 
   it('renders the correct Thermocycler gen 2 menu with disabled buttons when run status is running', () => {
-    mockUseCurrentRunId.mockReturnValue('123')
-    mockUseRunStatuses.mockReturnValue({
+    vi.mocked(useCurrentRunId).mockReturnValue('123')
+    vi.mocked(useRunStatuses).mockReturnValue({
       isRunRunning: true,
       isRunStill: false,
       isRunTerminal: false,
@@ -487,15 +483,15 @@ describe('ModuleOverflowMenu', () => {
       ...props,
       module: mockThermocyclerGen2LidClosed,
     }
-    const { getByRole } = render(props)
-    const setLid = getByRole('button', {
+    render(props)
+    const setLid = screen.getByRole('button', {
       name: 'Set lid temperature',
     })
-    const changeLid = getByRole('button', {
+    const changeLid = screen.getByRole('button', {
       name: 'Open lid',
     })
-    const setBlock = getByRole('button', { name: 'Deactivate block' })
-    const about = getByRole('button', { name: 'About module' })
+    const setBlock = screen.getByRole('button', { name: 'Deactivate block' })
+    const about = screen.getByRole('button', { name: 'About module' })
     expect(setLid).toBeDisabled()
     expect(changeLid).toBeDisabled()
     expect(setBlock).toBeDisabled()
@@ -507,45 +503,48 @@ describe('ModuleOverflowMenu', () => {
       ...props,
       isPipetteReady: false,
     }
-    const { queryByRole } = render(props)
+    render(props)
 
-    const calibrate = queryByRole('button', { name: 'Calibrate' })
+    const calibrate = screen.queryByRole('button', { name: 'Calibrate' })
     expect(calibrate).not.toBeInTheDocument()
   })
 
   it('renders a disabled calibrate button if the pipettes are not attached or need a firmware update', () => {
-    mockUseIsFlex.mockReturnValue(true)
+    vi.mocked(useIsFlex).mockReturnValue(true)
     props = {
       ...props,
+      module: mockHeaterShaker,
       isPipetteReady: false,
     }
-    const { getByRole } = render(props)
+    render(props)
 
-    const calibrate = getByRole('button', { name: 'Calibrate' })
+    const calibrate = screen.getByRole('button', { name: 'Calibrate' })
     expect(calibrate).toBeDisabled()
   })
 
   it('renders a disabled calibrate button if module is too hot', () => {
-    mockUseIsFlex.mockReturnValue(true)
+    vi.mocked(useIsFlex).mockReturnValue(true)
     props = {
       ...props,
+      module: mockHeaterShaker,
       isTooHot: true,
     }
-    const { getByRole } = render(props)
+    render(props)
 
-    const calibrate = getByRole('button', { name: 'Calibrate' })
+    const calibrate = screen.getByRole('button', { name: 'Calibrate' })
     expect(calibrate).toBeDisabled()
   })
 
   it('a mock function should be called when clicking Calibrate if pipette is ready', () => {
-    mockUseIsFlex.mockReturnValue(true)
+    vi.mocked(useIsFlex).mockReturnValue(true)
     props = {
       ...props,
+      module: mockHeaterShaker,
       isPipetteReady: true,
     }
-    const { getByRole } = render(props)
+    render(props)
 
-    getByRole('button', { name: 'Calibrate' }).click()
+    fireEvent.click(screen.getByRole('button', { name: 'Calibrate' }))
     expect(props.handleCalibrateClick).toHaveBeenCalled()
   })
 })

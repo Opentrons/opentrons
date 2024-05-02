@@ -53,7 +53,10 @@ class ProtocolReader:
         self._file_hasher = file_hasher or FileHasher()
 
     async def save(
-        self, files: Sequence[BufferedFile], directory: Path, content_hash: str
+        self,
+        files: Sequence[BufferedFile],
+        directory: Path,
+        content_hash: str,
     ) -> ProtocolSource:
         """Compute a `ProtocolSource` from buffered files and save them as files.
 

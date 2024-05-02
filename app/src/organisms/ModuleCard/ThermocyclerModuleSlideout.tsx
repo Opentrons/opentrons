@@ -14,11 +14,11 @@ import {
   DIRECTION_COLUMN,
   Flex,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { Slideout } from '../../atoms/Slideout'
 import { InputField } from '../../atoms/InputField'
-import { StyledText } from '../../atoms/text'
 import { SubmitPrimaryButton } from '../../atoms/buttons'
 
 import type { ThermocyclerModule } from '../../redux/modules/types'
@@ -130,7 +130,7 @@ export const ThermocyclerModuleSlideout = (
         <StyledText
           fontWeight={TYPOGRAPHY.fontWeightSemiBold}
           fontSize={TYPOGRAPHY.fontSizeH6}
-          color={COLORS.darkGreyEnabled}
+          color={COLORS.grey50}
           paddingBottom={SPACING.spacing8}
         >
           {t(isSecondaryTemp ? 'set_lid_temperature' : 'set_block_temperature')}

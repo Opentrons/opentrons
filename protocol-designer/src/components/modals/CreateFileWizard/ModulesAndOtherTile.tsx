@@ -2,6 +2,7 @@ import * as React from 'react'
 import styled from 'styled-components'
 import { useSelector } from 'react-redux'
 import without from 'lodash/without'
+import { useTranslation } from 'react-i18next'
 import {
   DIRECTION_COLUMN,
   Flex,
@@ -18,7 +19,7 @@ import {
   HEATERSHAKER_MODULE_TYPE,
   MAGNETIC_MODULE_TYPE,
   TEMPERATURE_MODULE_TYPE,
-  getPipetteNameSpecs,
+  getPipetteSpecsV2,
   PipetteName,
   OT2_ROBOT_TYPE,
   THERMOCYCLER_MODULE_V2,
@@ -29,25 +30,30 @@ import {
   getModuleDisplayName,
   getModuleType,
   FLEX_ROBOT_TYPE,
+  MAGNETIC_BLOCK_TYPE,
+  THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
 import { getIsCrashablePipetteSelected } from '../../../step-forms'
 import gripperImage from '../../../images/flex_gripper.png'
 import wasteChuteImage from '../../../images/waste_chute.png'
 import trashBinImage from '../../../images/flex_trash_bin.png'
-import { i18n } from '../../../localization'
+import { getEnableMoam } from '../../../feature-flags/selectors'
+import { uuid } from '../../../utils'
 import { selectors as featureFlagSelectors } from '../../../feature-flags'
 import { CrashInfoBox, ModuleDiagram } from '../../modules'
 import { ModuleFields } from '../FilePipettesModal/ModuleFields'
 import { GoBack } from './GoBack'
 import {
   getCrashableModuleSelected,
-  getLastCheckedEquipment,
-  getTrashBinOptionDisabled,
+  getNumSlotsAvailable,
+  getTrashOptionDisabled,
 } from './utils'
 import { EquipmentOption } from './EquipmentOption'
 import { HandleEnter } from './HandleEnter'
 
 import type { AdditionalEquipment, WizardTileProps } from './types'
+
+const MAX_TEMPERATURE_MODULES = 7
 
 export const DEFAULT_SLOT_MAP: { [moduleModel in ModuleModel]?: string } = {
   [THERMOCYCLER_MODULE_V2]: 'B1',
@@ -63,54 +69,55 @@ export const FLEX_SUPPORTED_MODULE_MODELS: ModuleModel[] = [
 ]
 
 export function ModulesAndOtherTile(props: WizardTileProps): JSX.Element {
-  const {
-    handleChange,
-    handleBlur,
-    values,
-    setFieldValue,
-    errors,
-    touched,
-    setFieldTouched,
-    goBack,
-    proceed,
-  } = props
-  const robotType = values.fields.robotType
+  const { getValues, goBack, proceed, watch } = props
+  const { t } = useTranslation(['modal', 'tooltip'])
+  const { fields, pipettesByMount, additionalEquipment } = getValues()
+  const modules = watch('modules')
+  const robotType = fields.robotType
   const moduleRestrictionsDisabled = useSelector(
     featureFlagSelectors.getDisableModuleRestrictions
   )
   const [targetProps, tooltipProps] = useHoverTooltip()
-  const enableDeckModification = useSelector(
-    featureFlagSelectors.getEnableDeckModification
-  )
   const hasATrash =
-    robotType === FLEX_ROBOT_TYPE && enableDeckModification
-      ? values.additionalEquipment.includes('wasteChute') ||
-        values.additionalEquipment.includes('trashBin')
+    robotType === FLEX_ROBOT_TYPE
+      ? additionalEquipment.includes('wasteChute') ||
+        additionalEquipment.includes('trashBin')
       : true
 
-  const { left, right } = values.pipettesByMount
+  const { left, right } = pipettesByMount
 
   const hasCrashableMagnetModuleSelected = getCrashableModuleSelected(
-    values.modulesByType,
+    modules,
     MAGNETIC_MODULE_TYPE
   )
   const hasCrashableTemperatureModuleSelected = getCrashableModuleSelected(
-    values.modulesByType,
+    modules,
     TEMPERATURE_MODULE_TYPE
   )
-  const hasHeaterShakerSelected = Boolean(
-    values.modulesByType[HEATERSHAKER_MODULE_TYPE].onDeck
-  )
+  const hasHeaterShakerSelected =
+    modules != null
+      ? Object.values(modules).some(
+          module => module.type === HEATERSHAKER_MODULE_TYPE
+        )
+      : false
+
+  const leftPipetteSpecs =
+    left.pipetteName != null && left.pipetteName !== ''
+      ? getPipetteSpecsV2(left.pipetteName as PipetteName)
+      : null
+  const rightPipetteSpecs =
+    right.pipetteName != null && right.pipetteName !== ''
+      ? getPipetteSpecsV2(right.pipetteName as PipetteName)
+      : null
 
   const showHeaterShakerPipetteCollisions =
     hasHeaterShakerSelected &&
-    [
-      getPipetteNameSpecs(left.pipetteName as PipetteName),
-      getPipetteNameSpecs(right.pipetteName as PipetteName),
-    ].some(pipetteSpecs => pipetteSpecs && pipetteSpecs.channels !== 1)
+    [leftPipetteSpecs, rightPipetteSpecs].some(
+      pipetteSpecs => pipetteSpecs && pipetteSpecs.channels !== 1
+    )
 
   const crashablePipetteSelected = getIsCrashablePipetteSelected(
-    values.pipettesByMount
+    pipettesByMount
   )
   const modCrashWarning = (
     <CrashInfoBox
@@ -135,26 +142,11 @@ export function ModulesAndOtherTile(props: WizardTileProps): JSX.Element {
           minHeight="26rem"
           gridGap={SPACING.spacing32}
         >
-          <Text as="h2">
-            {i18n.t('modal.create_file_wizard.choose_additional_items')}
-          </Text>
+          <Text as="h2">{t('choose_additional_items')}</Text>
           {robotType === OT2_ROBOT_TYPE ? (
-            <ModuleFields
-              //  @ts-expect-error
-              errors={errors.modulesByType ?? null}
-              values={values.modulesByType}
-              onFieldChange={handleChange}
-              onSetFieldValue={setFieldValue}
-              onBlur={handleBlur}
-              //  @ts-expect-error
-              touched={touched.modulesByType ?? null}
-              onSetFieldTouched={setFieldTouched}
-            />
+            <ModuleFields {...props} />
           ) : (
-            <FlexModuleFields
-              {...props}
-              enableDeckModification={enableDeckModification}
-            />
+            <FlexModuleFields {...props} />
           )}
           {robotType === OT2_ROBOT_TYPE && moduleRestrictionsDisabled !== true
             ? modCrashWarning
@@ -168,26 +160,11 @@ export function ModulesAndOtherTile(props: WizardTileProps): JSX.Element {
         >
           <GoBack
             onClick={() => {
-              if (!enableDeckModification || robotType === OT2_ROBOT_TYPE) {
-                if (values.pipettesByMount.left.pipetteName === 'p1000_96') {
-                  goBack(4)
-                } else if (
-                  values.pipettesByMount.right.pipetteName === '' &&
-                  robotType === FLEX_ROBOT_TYPE
-                ) {
-                  goBack(3)
-                } else if (
-                  values.pipettesByMount.right.pipetteName === '' &&
-                  robotType === OT2_ROBOT_TYPE
-                ) {
-                  goBack(2)
-                } else if (
-                  values.pipettesByMount.right.pipetteName !== '' &&
-                  robotType === FLEX_ROBOT_TYPE
-                ) {
+              if (robotType === OT2_ROBOT_TYPE) {
+                if (pipettesByMount.right.pipetteName === '') {
                   goBack(2)
                 } else {
-                  goBack()
+                  goBack(1)
                 }
               } else {
                 goBack()
@@ -199,11 +176,11 @@ export function ModulesAndOtherTile(props: WizardTileProps): JSX.Element {
             disabled={!hasATrash}
             {...targetProps}
           >
-            {i18n.t('modal.create_file_wizard.review_file_details')}
+            {t('review_file_details')}
           </PrimaryButton>
           {!hasATrash ? (
             <Tooltip {...tooltipProps}>
-              {i18n.t(`tooltip.disabled_no_trash`)}
+              {t(`tooltip:disabled_no_trash`)}
             </Tooltip>
           ) : null}
         </Flex>
@@ -211,70 +188,144 @@ export function ModulesAndOtherTile(props: WizardTileProps): JSX.Element {
     </HandleEnter>
   )
 }
-interface FlexModuleFieldsProps extends WizardTileProps {
-  enableDeckModification: boolean
-}
-function FlexModuleFields(props: FlexModuleFieldsProps): JSX.Element {
-  const { values, setFieldValue, enableDeckModification } = props
 
-  const isFlex = values.fields.robotType === FLEX_ROBOT_TYPE
-  const trashBinDisabled = getTrashBinOptionDisabled(values)
+function FlexModuleFields(props: WizardTileProps): JSX.Element {
+  const { watch, setValue } = props
+  const enableMoamFf = useSelector(getEnableMoam)
+  const modules = watch('modules')
+  const additionalEquipment = watch('additionalEquipment')
+  const moduleTypesOnDeck =
+    modules != null ? Object.values(modules).map(module => module.type) : []
 
   const handleSetEquipmentOption = (equipment: AdditionalEquipment): void => {
-    if (values.additionalEquipment.includes(equipment)) {
-      setFieldValue(
-        'additionalEquipment',
-        without(values.additionalEquipment, equipment)
-      )
+    if (additionalEquipment.includes(equipment)) {
+      setValue('additionalEquipment', without(additionalEquipment, equipment))
     } else {
-      setFieldValue('additionalEquipment', [
-        ...values.additionalEquipment,
-        equipment,
-      ])
+      setValue('additionalEquipment', [...additionalEquipment, equipment])
     }
   }
+  const trashBinDisabled = getTrashOptionDisabled({
+    additionalEquipment,
+    modules,
+    trashType: 'trashBin',
+  })
 
   React.useEffect(() => {
     if (trashBinDisabled) {
-      setFieldValue(
-        'additionalEquipment',
-        without(values.additionalEquipment, 'trashBin')
-      )
+      setValue('additionalEquipment', without(additionalEquipment, 'trashBin'))
     }
-  }, [trashBinDisabled, setFieldValue])
+  }, [trashBinDisabled, setValue])
 
   return (
     <Flex flexWrap={WRAP} gridGap={SPACING.spacing4} alignSelf={ALIGN_CENTER}>
       {FLEX_SUPPORTED_MODULE_MODELS.map(moduleModel => {
         const moduleType = getModuleType(moduleModel)
+        const isModuleOnDeck = moduleTypesOnDeck.includes(moduleType)
+
+        let isDisabled =
+          getNumSlotsAvailable(modules, additionalEquipment) === 0
+        //  special-casing TC since it takes up 2 slots
+        if (moduleType === THERMOCYCLER_MODULE_TYPE) {
+          isDisabled = getNumSlotsAvailable(modules, additionalEquipment) === 1
+        }
+
+        const handleMultiplesClick = (num: number): void => {
+          const temperatureModules =
+            modules != null
+              ? Object.entries(modules).filter(
+                  ([key, module]) => module.type === TEMPERATURE_MODULE_TYPE
+                )
+              : []
+
+          if (num > temperatureModules.length) {
+            for (let i = 0; i < num - temperatureModules.length; i++) {
+              setValue('modules', {
+                ...modules,
+                [uuid()]: {
+                  model: moduleModel,
+                  type: moduleType,
+                  slot: null,
+                },
+              })
+            }
+          } else if (num < temperatureModules.length) {
+            const modulesToRemove = temperatureModules.length - num
+            for (let i = 0; i < modulesToRemove; i++) {
+              const lastTempKey =
+                temperatureModules[temperatureModules.length - 1 - i][0]
+              //  @ts-expect-error: TS can't determine modules's type correctly
+              const { [lastTempKey]: omit, ...rest } = modules
+              setValue('modules', rest)
+            }
+          }
+        }
+
+        const handleOnClick = (): void => {
+          if (
+            (moduleType !== TEMPERATURE_MODULE_TYPE && enableMoamFf) ||
+            !enableMoamFf
+          ) {
+            if (isModuleOnDeck) {
+              const updatedModules =
+                modules != null
+                  ? Object.fromEntries(
+                      Object.entries(modules).filter(
+                        ([key, value]) => value.type !== moduleType
+                      )
+                    )
+                  : {}
+              setValue('modules', updatedModules)
+            } else {
+              setValue('modules', {
+                ...modules,
+                [uuid()]: {
+                  model: moduleModel,
+                  type: moduleType,
+                  slot: DEFAULT_SLOT_MAP[moduleModel],
+                },
+              })
+            }
+          }
+        }
+
         return (
           <EquipmentOption
+            robotType={FLEX_ROBOT_TYPE}
             key={moduleModel}
-            isSelected={values.modulesByType[moduleType].onDeck}
+            isSelected={isModuleOnDeck}
             image={<ModuleDiagram type={moduleType} model={moduleModel} />}
             text={getModuleDisplayName(moduleModel)}
-            disabled={getLastCheckedEquipment(values) === moduleType}
-            onClick={() => {
-              if (values.modulesByType[moduleType].onDeck) {
-                setFieldValue(`modulesByType.${moduleType}.onDeck`, false)
-                setFieldValue(`modulesByType.${moduleType}.model`, null)
-                setFieldValue(`modulesByType.${moduleType}.slot`, null)
-              } else {
-                setFieldValue(`modulesByType.${moduleType}.onDeck`, true)
-                setFieldValue(`modulesByType.${moduleType}.model`, moduleModel)
-                setFieldValue(
-                  `modulesByType.${moduleType}.slot`,
-                  DEFAULT_SLOT_MAP[moduleModel]
-                )
-              }
-            }}
-            showCheckbox
+            disabled={
+              moduleType === MAGNETIC_BLOCK_TYPE
+                ? false
+                : isDisabled && !isModuleOnDeck
+            }
+            onClick={handleOnClick}
+            multiples={
+              moduleType === TEMPERATURE_MODULE_TYPE && enableMoamFf
+                ? {
+                    maxItems: MAX_TEMPERATURE_MODULES,
+                    setValue: handleMultiplesClick,
+                    numItems:
+                      modules != null
+                        ? Object.values(modules).filter(
+                            module => module.type === TEMPERATURE_MODULE_TYPE
+                          ).length
+                        : 0,
+                    isDisabled: isDisabled ?? false,
+                  }
+                : undefined
+            }
+            showCheckbox={
+              enableMoamFf ? moduleType !== TEMPERATURE_MODULE_TYPE : true
+            }
           />
         )
       })}
       <EquipmentOption
+        robotType={FLEX_ROBOT_TYPE}
         onClick={() => handleSetEquipmentOption('gripper')}
-        isSelected={values.additionalEquipment.includes('gripper')}
+        isSelected={additionalEquipment.includes('gripper')}
         image={
           <AdditionalItemImage
             src={gripperImage}
@@ -284,35 +335,36 @@ function FlexModuleFields(props: FlexModuleFieldsProps): JSX.Element {
         text="Gripper"
         showCheckbox
       />
-      {enableDeckModification && isFlex ? (
-        <>
-          <EquipmentOption
-            onClick={() => handleSetEquipmentOption('wasteChute')}
-            isSelected={values.additionalEquipment.includes('wasteChute')}
-            image={
-              <AdditionalItemImage
-                src={wasteChuteImage}
-                alt="Opentrons Waste Chute"
-              />
-            }
-            text="Waste Chute"
-            showCheckbox
+
+      <EquipmentOption
+        robotType={FLEX_ROBOT_TYPE}
+        onClick={() => handleSetEquipmentOption('wasteChute')}
+        isSelected={additionalEquipment.includes('wasteChute')}
+        disabled={getTrashOptionDisabled({
+          additionalEquipment,
+          modules,
+          trashType: 'wasteChute',
+        })}
+        image={
+          <AdditionalItemImage
+            src={wasteChuteImage}
+            alt="Opentrons Waste Chute"
           />
-          <EquipmentOption
-            onClick={() => handleSetEquipmentOption('trashBin')}
-            isSelected={values.additionalEquipment.includes('trashBin')}
-            image={
-              <AdditionalItemImage
-                src={trashBinImage}
-                alt="Opentrons Trash Bin"
-              />
-            }
-            text="Trash Bin"
-            showCheckbox
-            disabled={trashBinDisabled}
-          />
-        </>
-      ) : null}
+        }
+        text="Waste Chute"
+        showCheckbox
+      />
+      <EquipmentOption
+        robotType={FLEX_ROBOT_TYPE}
+        onClick={() => handleSetEquipmentOption('trashBin')}
+        isSelected={additionalEquipment.includes('trashBin')}
+        image={
+          <AdditionalItemImage src={trashBinImage} alt="Opentrons Trash Bin" />
+        }
+        text="Trash Bin"
+        showCheckbox
+        disabled={trashBinDisabled}
+      />
     </Flex>
   )
 }

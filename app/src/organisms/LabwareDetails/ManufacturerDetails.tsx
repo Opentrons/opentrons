@@ -1,17 +1,17 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import {
-  Flex,
   Box,
-  Icon,
-  Link,
   COLORS,
-  SPACING,
   DIRECTION_COLUMN,
   DIRECTION_ROW,
+  Flex,
+  Icon,
   JUSTIFY_SPACE_BETWEEN,
+  Link,
+  SPACING,
+  StyledText,
 } from '@opentrons/components'
-import { StyledText } from '../../atoms/text'
 import type { LabwareBrand } from '../../pages/Labware/types'
 
 export interface ManufacturerDetailsProps {
@@ -28,10 +28,7 @@ export function ManufacturerDetails(
     brandName === 'all' || brandName === 'generic' ? t(brandName) : brandName
 
   return (
-    <Box
-      backgroundColor={COLORS.fundamentalsBackground}
-      padding={SPACING.spacing16}
-    >
+    <Box backgroundColor={COLORS.grey20} padding={SPACING.spacing16}>
       <Flex
         flexDirection={DIRECTION_ROW}
         justifyContent={JUSTIFY_SPACE_BETWEEN}

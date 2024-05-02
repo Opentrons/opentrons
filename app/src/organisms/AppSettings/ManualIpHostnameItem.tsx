@@ -4,17 +4,17 @@ import styled, { css } from 'styled-components'
 
 import {
   Btn,
-  Icon,
   COLORS,
-  TYPOGRAPHY,
   Flex,
-  JUSTIFY_FLEX_START,
+  Icon,
   JUSTIFY_CENTER,
+  JUSTIFY_FLEX_START,
   SPACING,
+  StyledText,
+  TYPOGRAPHY,
 } from '@opentrons/components'
 
 import { Divider } from '../../atoms/structure'
-import { StyledText } from '../../atoms/text'
 
 const IpItem = styled.div`
   flex: 1 1 auto;
@@ -28,10 +28,10 @@ const CLOSE_ICON_STYLE = css`
   border-radius: 50%;
 
   &:hover {
-    background: ${COLORS.lightGreyHover};
+    background: ${COLORS.grey30};
   }
   &:active {
-    background: ${COLORS.lightGreyPressed};
+    background: ${COLORS.grey35};
   }
 `
 interface IpHostnameItemProps {
@@ -83,16 +83,14 @@ export function ManualIpHostnameItem({
           <StyledText
             as="p"
             data-testid="ip-hostname"
-            color={
-              discovered ? COLORS.darkBlackEnabled : COLORS.successDisabled
-            }
+            color={discovered ? COLORS.black90 : COLORS.grey40}
           >
             {candidate}
           </StyledText>
         </IpItem>
         <StyledText
           as="label"
-          color={COLORS.darkGreyEnabled}
+          color={COLORS.grey50}
           css={{
             'white-space': 'nowrap',
           }}
@@ -101,7 +99,7 @@ export function ManualIpHostnameItem({
         </StyledText>
         <Btn
           size={TYPOGRAPHY.lineHeight20}
-          color={COLORS.darkBlackEnabled}
+          color={COLORS.black90}
           onClick={remove}
           marginLeft={SPACING.spacing16}
           data-testid="close-button"

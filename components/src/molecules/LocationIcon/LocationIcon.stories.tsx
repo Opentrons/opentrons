@@ -1,13 +1,11 @@
 import * as React from 'react'
-
-import { Flex, SPACING } from '@opentrons/components'
-import { ICON_DATA_BY_NAME } from '@opentrons/components/src/icons/icon-data'
-
+import { Flex } from '../../primitives'
+import { SPACING } from '../../ui-style-constants'
 import { GlobalStyle } from '../../../../app/src/atoms/GlobalStyle'
 import { customViewports } from '../../../../.storybook/preview'
+import { ICON_DATA_BY_NAME } from '../../icons'
 import { LocationIcon } from '.'
-
-import type { Story, Meta } from '@storybook/react'
+import type { Meta, StoryObj } from '@storybook/react'
 
 const slots = [
   'A1',
@@ -28,26 +26,23 @@ const slots = [
   'D4',
 ]
 
-export default {
-  title: 'ODD/Molecules/LocationIcon',
+const meta: Meta<typeof LocationIcon> = {
+  title: 'Library/Molecules/LocationIcon',
   argTypes: {
     iconName: {
       control: {
         type: 'select',
-        options: Object.keys(ICON_DATA_BY_NAME),
       },
-      defaultValue: undefined,
+      options: Object.keys(ICON_DATA_BY_NAME),
     },
     slotName: {
       control: {
         type: 'select',
-        options: slots,
       },
-      defaultValue: undefined,
+      options: slots,
     },
   },
   component: LocationIcon,
-  // Note (kk:08/29/2023) this component is located in components so avoid importing const from app
   parameters: {
     viewport: {
       viewports: customViewports,
@@ -56,26 +51,25 @@ export default {
   },
   decorators: [
     Story => (
-      <>
+      <Flex padding={SPACING.spacing16} width="15rem" height="5rem">
         <GlobalStyle isOnDevice />
         <Story />
-      </>
+      </Flex>
     ),
   ],
-} as Meta
+}
+export default meta
+type Story = StoryObj<typeof LocationIcon>
 
-const Template: Story<React.ComponentProps<typeof LocationIcon>> = args => (
-  <Flex marginTop={SPACING.spacing16} width="15rem" height="5rem">
-    <LocationIcon {...args} />
-  </Flex>
-)
-
-export const DisplaySlot = Template.bind({})
-DisplaySlot.args = {
-  slotName: 'A1',
+export const DisplaySlot: Story = {
+  args: {
+    slotName: 'A1',
+    iconName: undefined,
+  },
 }
 
-export const DisplayIcon = Template.bind({})
-DisplayIcon.args = {
-  iconName: 'ot-temperature-v2',
+export const DisplayIcon: Story = {
+  args: {
+    iconName: 'ot-temperature-v2',
+  },
 }

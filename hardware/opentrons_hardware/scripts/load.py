@@ -189,7 +189,7 @@ class BusLoader:
         )
         try:
             self._messenger.add_listener(self)
-            asyncio.wait([self._load_bus()], timeout=run_for)
+            await asyncio.wait([self._load_bus()], timeout=run_for)
         except asyncio.TimeoutError:
             pass
         except KeyboardInterrupt:

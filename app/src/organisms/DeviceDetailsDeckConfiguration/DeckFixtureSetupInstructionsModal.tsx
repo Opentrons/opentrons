@@ -8,8 +8,8 @@ import {
   Flex,
   PrimaryButton,
   SPACING,
+  StyledText,
 } from '@opentrons/components'
-import { StyledText } from '../../atoms/text'
 import { ExternalLink } from '../../atoms/Link/ExternalLink'
 import { Modal } from '../../molecules/Modal'
 import { LegacyModal } from '../../molecules/LegacyModal'
@@ -32,11 +32,11 @@ export function DeckFixtureSetupInstructionsModal({
   setShowSetupInstructionsModal,
   isOnDevice = false,
 }: DeckFixtureSetupInstructionsModalProps): JSX.Element {
-  const { i18n, t } = useTranslation(['device_details', 'shared'])
+  const { i18n, t } = useTranslation(['device_details', 'shared', 'branded'])
   const modalHeader: ModalHeaderBaseProps = {
     title: t('deck_fixture_setup_instructions'),
     iconName: 'information',
-    iconColor: COLORS.darkBlack100,
+    iconColor: COLORS.black90,
     hasExitIcon: true,
     onClick: () => setShowSetupInstructionsModal(false),
   }
@@ -62,7 +62,7 @@ export function DeckFixtureSetupInstructionsModal({
                 {t('deck_fixture_setup_modal_top_description')}
               </StyledText>
               <StyledText as="p">
-                {t('deck_fixture_setup_modal_bottom_description')}
+                {t('branded:deck_fixture_setup_modal_bottom_description')}
               </StyledText>
             </Flex>
 

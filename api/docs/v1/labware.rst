@@ -65,7 +65,7 @@ To tell the robot what labware will be on the deck for your protocol, use
 
     # ...
 
-    tiprack = labware.load('opentrons_96_tiprack_300ul', slot='1')
+    tiprack = labware.load("opentrons_96_tiprack_300ul", slot="1")
 
 
 **********************
@@ -89,16 +89,16 @@ labware in a certain slot.
 
 .. code-block:: python
 
-    my_labware = labware.load('usascientific_12_reservoir_22ml', slot='1')
+    my_labware = labware.load("usascientific_12_reservoir_22ml", slot="1")
 
 A third optional argument can be used to give a labware a nickname for display
 in the Opentrons App.
 
 .. code-block:: python
 
-    my_labware = labware.load('usascientific_12_reservoir_22ml',
-                     slot='2',
-                     label='any-name-you-want')
+    my_labware = labware.load("usascientific_12_reservoir_22ml",
+                     slot="2",
+                     label="any-name-you-want")
 
 
 Sometimes, you may need to place a labware on top of something else on the
@@ -108,9 +108,9 @@ deck, like modules. For this, you should use the ``share`` parameter.
 
     from opentrons import labware, modules
 
-    td = modules.load('tempdeck', slot='1')
-    plate = labware.load('opentrons_96_aluminumblock_biorad_wellplate_200ul',
-                         slot='1',
+    td = modules.load("tempdeck", slot="1")
+    plate = labware.load("opentrons_96_aluminumblock_biorad_wellplate_200ul",
+                         slot="1",
                          share=True)
 
 To specify the version of the labware definition to use, you can use the ``version``
@@ -120,16 +120,16 @@ parameter:
 
    from opentrons import labware
    block1 = labware.load(
-                'opentrons_96_aluminumblock_biorad_wellplate_200ul',
-                slot='1',
+                "opentrons_96_aluminumblock_biorad_wellplate_200ul",
+                slot="1",
                 version=2)  # version 2 of the aluminum block definition
    block2 = labware.load(
-                'opentrons_96_aluminumblock_biorad_wellplate_200ul',
-                 slot='2',
+                "opentrons_96_aluminumblock_biorad_wellplate_200ul",
+                 slot="2",
                  version=1)  # version 1 of the aluminum block definition
    block3 = labware.load(
-                'opentrons_96_aluminumblock_biorad_wellplate_200ul',
-                slot='2')  # if you don't specify version, version 1 is used
+                "opentrons_96_aluminumblock_biorad_wellplate_200ul",
+                slot="2")  # if you don't specify version, version 1 is used
 
 
 Create
@@ -147,7 +147,7 @@ regularly-spaced columns and rows.
 
 .. code-block:: python
 
-    custom_plate_name = 'custom_18_wellplate_200ul'
+    custom_plate_name = "custom_18_wellplate_200ul"
 
     if plate_name not in labware.list():
         labware.create(
@@ -158,7 +158,7 @@ regularly-spaced columns and rows.
             depth=10,           # depth (mm) of each well
             volume=200)         # volume (µL) of each well
 
-    custom_plate = labware.load(custom_plate_name, slot='3')
+    custom_plate = labware.load(custom_plate_name, slot="3")
 
     for well in custom_plate.wells():
         print(well)
@@ -202,7 +202,7 @@ If you would like to delete a labware you have already added to the database
 
     from opentrons.data_storage import database
 
-    database.delete_container('custom_18_wellplate_200ul')
+    database.delete_container("custom_18_wellplate_200ul")
 
 .. Note::
     There is some specialty labware that will require you to specify the
@@ -239,8 +239,8 @@ transfer liquids to and from.
 
 The OT-2 deck and labware are all set up with the same coordinate system
 
-- Lettered rows ``['A']-['END']``
-- Numbered columns ``['1']-['END']``.
+- Lettered rows ``["A"]-["END"]``
+- Numbered columns ``["1"]-["END"]``.
 
 .. image:: ../img/well_iteration/Well_Iteration.png
 
@@ -251,7 +251,7 @@ The OT-2 deck and labware are all set up with the same coordinate system
     '''
     from opentrons import labware
 
-    plate = labware.load('corning_24_wellplate_3.4ml_flat', slot='1')
+    plate = labware.load("corning_24_wellplate_3.4ml_flat", slot="1")
 
 Wells by Name
 -------------
@@ -262,8 +262,8 @@ well as an argument, and will return the well at that location.
 
 .. code-block:: python
 
-    a1 = plate.wells('A1')
-    d6 = plate.wells('D6')
+    a1 = plate.wells("A1")
+    d6 = plate.wells("D6")
 
 Wells by Index
 --------------
@@ -289,8 +289,8 @@ Columns and Rows
 
 A labware's wells are organized within a series of columns and rows, which are
 also labelled on standard labware. In the API, rows are given letter names
-(``'A'`` through ``'D'`` for example) and go left to right, while columns are
-given numbered names (``'1'`` through ``'6'`` for example) and go from front to
+(``"A"`` through ``"D"`` for example) and go left to right, while columns are
+given numbered names (``"1"`` through ``"6"`` for example) and go from front to
 back.
 
 You can access a specific row or column by using the ``rows()`` and
@@ -299,8 +299,8 @@ or column.
 
 .. code-block:: python
 
-    row = plate.rows('A')
-    column = plate.columns('1')
+    row = plate.rows("A")
+    column = plate.columns("1")
 
     print('Column "1" has', len(column), 'wells')
     print('Row "A" has', len(row), 'wells')
@@ -314,16 +314,16 @@ will print out...
 
 The ``rows()`` or ``cols()`` methods can be used in combination with the
 ``wells()`` method to access wells within that row or column. In the example
-below, both lines refer to well ``'A1'``.
+below, both lines refer to well ``"A1"``.
 
 .. code-block:: python
 
-    plate.cols('1').wells('A')
-    plate.rows('A').wells('1')
+    plate.cols("1").wells("A")
+    plate.rows("A").wells("1")
 
 .. Tip::
     The example above works but is a little convoluted. If you can, always get
-    individual wells like A1 with ``wells('A1')`` or ``wells(0)``
+    individual wells like A1 with ``wells("A1")`` or ``wells(0)``
 
 
 Multiple Wells
@@ -344,7 +344,7 @@ liquid's source and/or destination. Or, we can get a group of wells and loop
     '''
     from opentrons import labware
 
-    plate = labware.load('corning_24_wellplate_3.4ml_flat', slot='1')
+    plate = labware.load("corning_24_wellplate_3.4ml_flat", slot="1")
 
 Wells
 -----
@@ -356,7 +356,7 @@ Here is an example or accessing a list of wells, each specified by name:
 
 .. code-block:: python
 
-    w = plate.wells('A1', 'B2', 'C3', 'D4')
+    w = plate.wells("A1", "B2", "C3", "D4")
 
     print(w)
 
@@ -371,7 +371,7 @@ iterated through:
 
 .. code-block:: python
 
-    for w in plate.wells('A1', 'B2', 'C3', 'D4'):
+    for w in plate.wells("A1", "B2", "C3", "D4"):
         print(w)
 
 will print out...
@@ -392,7 +392,7 @@ the ``to=`` argument is the last well.
 
 .. code-block:: python
 
-    for w in plate.wells('A1', to='D1'):
+    for w in plate.wells("A1", to="D1"):
         print(w)
 
 will print out...
@@ -410,7 +410,7 @@ starting position is allowed:
 
 .. code-block:: python
 
-    for w in plate.wells('D1', to='A1'):
+    for w in plate.wells("D1", to="A1"):
         print(w)
 
 will print out...
@@ -427,11 +427,11 @@ Wells Length
 
 Another way you can create a list of wells is by specifying the length of the
 well list you need, including the starting well. The example below will
-return 4 wells, starting at well ``'A1'``:
+return 4 wells, starting at well ``"A1"``:
 
 .. code-block:: python
 
-    for w in plate.wells('A1', length=4):
+    for w in plate.wells("A1", length=4):
         print(w)
 
 will print out...
@@ -453,7 +453,7 @@ Here is an example of iterating through rows:
 
 .. code-block:: python
 
-    for r in plate.rows('A', length=3):
+    for r in plate.rows("A", length=3):
         print(r)
 
 will print out...
@@ -468,7 +468,7 @@ And here is an example of iterating through columns:
 
 .. code-block:: python
 
-    for c in plate.cols('1', to='6'):
+    for c in plate.cols("1", to="6"):
         print(c)
 
 will print out...
@@ -511,7 +511,7 @@ The API's labware are also prepared to take string values for the slice's
 
 .. code-block:: python
 
-    for w in plate['A1':'A2':2]:
+    for w in plate["A1":"A2":2]:
         print(w)
 
 will print out...
@@ -523,7 +523,7 @@ will print out...
 
 .. code-block:: python
 
-    for w in plate.rows['B']['1'::2]:
+    for w in plate.rows["B"]["1"::2]:
         print(w)
 
 will print out...

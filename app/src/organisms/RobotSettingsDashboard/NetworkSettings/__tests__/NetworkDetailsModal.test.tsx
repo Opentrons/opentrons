@@ -1,11 +1,13 @@
 import * as React from 'react'
-
-import { renderWithProviders } from '@opentrons/components'
+import { fireEvent, screen } from '@testing-library/react'
+import { describe, it, expect, vi, beforeEach } from 'vitest'
+import '@testing-library/jest-dom/vitest'
 
 import { i18n } from '../../../../i18n'
+import { renderWithProviders } from '../../../../__testing-utils__'
 import { NetworkDetailsModal } from '../NetworkDetailsModal'
 
-const mockFn = jest.fn()
+const mockFn = vi.fn()
 
 const render = (props: React.ComponentProps<typeof NetworkDetailsModal>) => {
   return renderWithProviders(<NetworkDetailsModal {...props} />, {
@@ -27,22 +29,18 @@ describe('NetworkDetailsModal', () => {
     }
   })
 
-  afterEach(() => {
-    jest.clearAllMocks()
-  })
-
   it('should render text and icon - wifi', () => {
-    const [{ getByText, getByLabelText }] = render(props)
-    getByText('mock Wifi ssid')
-    getByText('IP Address')
-    getByText('192.168.1.100')
-    getByText('Security Type')
-    getByText('WPA-2')
-    getByText('Subnet Mask')
-    getByText('255.255.255.0')
-    getByText('MAC Address')
-    getByText('00:14:2D:69:45:9F')
-    getByLabelText('icon_wifi')
+    render(props)
+    screen.getByText('mock Wifi ssid')
+    screen.getByText('IP Address')
+    screen.getByText('192.168.1.100')
+    screen.getByText('Security Type')
+    screen.getByText('WPA-2')
+    screen.getByText('Subnet Mask')
+    screen.getByText('255.255.255.0')
+    screen.getByText('MAC Address')
+    screen.getByText('00:14:2D:69:45:9F')
+    screen.getByLabelText('icon_wifi')
   })
 
   it('should render text and icon - ethernet', () => {
@@ -53,27 +51,27 @@ describe('NetworkDetailsModal', () => {
       macAddress: '00:14:2D:69:45:9A',
     }
     props = ethernetSettings
-    const [{ getByText, queryByText, getByLabelText }] = render(props)
-    getByText('Ethernet')
-    getByText('IP Address')
-    getByText('192.168.0.100')
-    expect(queryByText('Security Type')).not.toBeInTheDocument()
-    getByText('Subnet Mask')
-    getByText('255.255.255.0')
-    getByText('MAC Address')
-    getByText('00:14:2D:69:45:9A')
-    getByLabelText('icon_ethernet')
+    render(props)
+    screen.getByText('Ethernet')
+    screen.getByText('IP Address')
+    screen.getByText('192.168.0.100')
+    expect(screen.queryByText('Security Type')).not.toBeInTheDocument()
+    screen.getByText('Subnet Mask')
+    screen.getByText('255.255.255.0')
+    screen.getByText('MAC Address')
+    screen.getByText('00:14:2D:69:45:9A')
+    screen.getByLabelText('icon_ethernet')
   })
 
   it('should call the mock function when tapping the close icon', () => {
-    const [{ getByLabelText }] = render(props)
-    getByLabelText('closeIcon').click()
+    render(props)
+    fireEvent.click(screen.getByLabelText('closeIcon'))
     expect(mockFn).toHaveBeenCalled()
   })
 
   it('should call the mock function when tapping outside of the modal', () => {
-    const [{ getByLabelText }] = render(props)
-    getByLabelText('BackgroundOverlay').click()
+    render(props)
+    fireEvent.click(screen.getByLabelText('BackgroundOverlay'))
     expect(mockFn).toHaveBeenCalled()
   })
 })

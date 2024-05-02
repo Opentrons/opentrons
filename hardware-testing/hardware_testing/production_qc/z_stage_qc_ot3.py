@@ -223,9 +223,9 @@ async def _force_gauge(
     await api.home([z_ax])
     home_pos = await api.gantry_position(mount)
     LOG.info(f"Home Position: {home_pos}")
-    pre_test_pos = home_pos._replace(z=home_pos.z - 110)
+    pre_test_pos = home_pos._replace(z=home_pos.z - 15)
     LOG.info(f"Pre-Test Position: {pre_test_pos}")
-    press_pos = home_pos._replace(z=pre_test_pos.z - 113)
+    press_pos = home_pos._replace(z=pre_test_pos.z - 30)
     LOG.info(f"Press Position: {press_pos}")
 
     qc_pass = True

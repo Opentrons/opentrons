@@ -1,19 +1,23 @@
 import * as React from 'react'
 import { Trans, useTranslation } from 'react-i18next'
-import { RESPONSIVENESS, SPACING, TYPOGRAPHY } from '@opentrons/components'
-import { useInstrumentsQuery } from '@opentrons/react-api-client'
+import {
+  RESPONSIVENESS,
+  SPACING,
+  StyledText,
+  TYPOGRAPHY,
+} from '@opentrons/components'
 import {
   CompletedProtocolAnalysis,
   getPipetteNameSpecs,
+  CreateCommand,
 } from '@opentrons/shared-data'
 import { css } from 'styled-components'
-import { StyledText } from '../../atoms/text'
 import { ProbeNotAttached } from '../PipetteWizardFlows/ProbeNotAttached'
 import { RobotMotionLoader } from './RobotMotionLoader'
 import attachProbe1 from '../../assets/videos/pipette-wizard-flows/Pipette_Attach_Probe_1.webm'
 import attachProbe8 from '../../assets/videos/pipette-wizard-flows/Pipette_Attach_Probe_8.webm'
 import attachProbe96 from '../../assets/videos/pipette-wizard-flows/Pipette_Attach_Probe_96.webm'
-import { useChainRunCommands } from '../../resources/runs/hooks'
+import { useChainRunCommands } from '../../resources/runs'
 import { GenericWizardTile } from '../../molecules/GenericWizardTile'
 
 import type { Jog } from '../../molecules/JogControls/types'
@@ -22,7 +26,7 @@ import type {
   RegisterPositionAction,
   WorkingOffset,
 } from './types'
-import type { LabwareOffset, PipetteData } from '@opentrons/api-client'
+import type { LabwareOffset } from '@opentrons/api-client'
 
 interface AttachProbeProps extends AttachProbeStep {
   protocolData: CompletedProtocolAnalysis
@@ -48,7 +52,6 @@ export const AttachProbe = (props: AttachProbeProps): JSX.Element | null => {
     setFatalError,
     isOnDevice,
   } = props
-  const [isPending, setIsPending] = React.useState<boolean>(false)
   const [showUnableToDetect, setShowUnableToDetect] = React.useState<boolean>(
     false
   )
@@ -68,16 +71,6 @@ export const AttachProbe = (props: AttachProbeProps): JSX.Element | null => {
   }
 
   const pipetteMount = pipette?.mount
-  const { refetch, data: attachedInstrumentsData } = useInstrumentsQuery({
-    enabled: false,
-    onSettled: () => {
-      setIsPending(false)
-    },
-  })
-  const attachedPipette = attachedInstrumentsData?.data.find(
-    (instrument): instrument is PipetteData =>
-      instrument.ok && instrument.mount === pipetteMount
-  )
 
   React.useEffect(() => {
     // move into correct position for probe attach on mount
@@ -100,42 +93,45 @@ export const AttachProbe = (props: AttachProbeProps): JSX.Element | null => {
     pipetteMount === 'left' ? 'leftZ' : 'rightZ'
 
   const handleProbeAttached = (): void => {
-    setIsPending(true)
-    refetch()
+    const verifyCommands: CreateCommand[] = [
+      {
+        commandType: 'verifyTipPresence',
+        params: {
+          pipetteId: pipetteId,
+          expectedState: 'present',
+          followSingularSensor: 'primary',
+        },
+      },
+    ]
+    const homeCommands: CreateCommand[] = [
+      { commandType: 'home', params: { axes: [pipetteZMotorAxis] } },
+      {
+        commandType: 'retractAxis' as const,
+        params: {
+          axis: pipetteZMotorAxis,
+        },
+      },
+      {
+        commandType: 'retractAxis' as const,
+        params: { axis: 'x' },
+      },
+      {
+        commandType: 'retractAxis' as const,
+        params: { axis: 'y' },
+      },
+    ]
+    chainRunCommands(verifyCommands, false)
       .then(() => {
-        if (attachedPipette?.state?.tipDetected) {
-          chainRunCommands(
-            [
-              { commandType: 'home', params: { axes: [pipetteZMotorAxis] } },
-              {
-                commandType: 'retractAxis' as const,
-                params: {
-                  axis: pipetteZMotorAxis,
-                },
-              },
-              {
-                commandType: 'retractAxis' as const,
-                params: { axis: 'x' },
-              },
-              {
-                commandType: 'retractAxis' as const,
-                params: { axis: 'y' },
-              },
-            ],
-            false
-          )
-            .then(() => proceed())
-            .catch((e: Error) => {
-              setFatalError(
-                `AttachProbe failed to move to safe location after probe attach with message: ${e.message}`
-              )
-            })
-        } else {
-          setShowUnableToDetect(true)
-        }
+        chainRunCommands(homeCommands, false)
+          .then(() => proceed())
+          .catch((e: Error) => {
+            setFatalError(
+              `AttachProbe failed to move to safe location after probe attach with message: ${e.message}`
+            )
+          })
       })
-      .catch(error => {
-        setFatalError(error.message)
+      .catch((e: Error) => {
+        setShowUnableToDetect(true)
       })
   }
 
@@ -149,7 +145,6 @@ export const AttachProbe = (props: AttachProbeProps): JSX.Element | null => {
         handleOnClick={handleProbeAttached}
         setShowUnableToDetect={setShowUnableToDetect}
         isOnDevice={isOnDevice}
-        isPending={isPending}
       />
     )
 

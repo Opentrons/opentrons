@@ -1,0 +1,103 @@
+@import '../index.module.css';
+
+:root {
+  --mw-labeled-toggle: 25rem;
+}
+
+/* Toggle Button */
+.toggled_on {
+  fill: #0ec9eb;
+  color: #0ec9eb;
+}
+
+.toggled_off {
+  fill: var(--c-dark-gray);
+}
+
+.labeled_control_wrapper {
+  width: 100%;
+  padding: 1rem;
+  display: block;
+
+  &:not(:last-child) {
+    border-bottom: 1px solid var(--c-light-gray);
+  }
+}
+
+.labeled_control {
+  display: block;
+}
+
+.stacked_labeled_control {
+  display: block;
+  margin-left: 1rem;
+  margin-top: 0.5rem;
+}
+
+.stacked_labeled_control_label {
+  font-size: var(--fs-body-1); /* from legacy --font-body-1-dark */
+  color: var(--c-font-dark); /* from legacy --font-body-1-dark */
+  display: inline-block;
+  font-weight: var(--fw-semibold);
+}
+
+.labeled_control_label {
+  font-size: var(--fs-body-1); /* from legacy --font-body-1-dark */
+  color: var(--c-font-dark); /* from legacy --font-body-1-dark */
+  max-width: var(--mw-labeled-toggle);
+  display: inline-block;
+  font-weight: var(--fw-semibold);
+}
+
+.labeled_toggle_button {
+  float: right;
+  width: 2rem;
+  margin-right: 1rem;
+  padding: 0;
+
+  &:hover {
+    background-color: transparent;
+  }
+}
+
+.labeled_button,
+.labeled_select {
+  float: right;
+  width: 9rem;
+  margin-top: 0.5rem;
+}
+
+.labeled_select {
+  font-size: var(--fs-body-2); /* from legacy --font-body-2-dark */
+  font-weight: var(--fw-regular); /* from legacy --font-body-2-dark */
+  color: var(--c-font-dark); /* from legacy --font-body-2-dark */
+}
+
+.labeled_checkbox {
+  float: right;
+}
+
+.stacked_control_info {
+  font-size: var(--fs-body-1); /* from legacy --font-body-1-dark */
+  font-weight: var(--fw-regular); /* from legacy --font-body-1-dark */
+  color: var(--c-font-dark); /* from legacy --font-body-1-dark */
+
+  & > p {
+    margin-top: 0.5rem;
+    margin-bottom: 0;
+    line-height: 1.5;
+  }
+}
+
+.control_info {
+  font-size: var(--fs-body-1); /* from legacy --font-body-1-dark */
+  font-weight: var(--fw-regular); /* from legacy --font-body-1-dark */
+  color: var(--c-font-dark); /* from legacy --font-body-1-dark */
+  max-width: var(--mw-labeled-toggle);
+
+  & > p {
+    margin-top: 0.5rem;
+    margin-bottom: 0;
+    line-height: 1.5;
+  }
+}

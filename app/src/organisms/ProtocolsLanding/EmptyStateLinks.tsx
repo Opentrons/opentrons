@@ -1,20 +1,20 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import {
-  TYPOGRAPHY,
-  Icon,
-  Flex,
-  SPACING,
-  Link,
-  DIRECTION_ROW,
-  DIRECTION_COLUMN,
   ALIGN_CENTER,
+  DIRECTION_COLUMN,
+  DIRECTION_ROW,
+  Flex,
+  Icon,
   JUSTIFY_CENTER,
+  Link,
+  SPACING,
+  StyledText,
+  TYPOGRAPHY,
   WRAP,
 } from '@opentrons/components'
-import { StyledText } from '../../atoms/text'
 
-const PROTOCOL_LIBRARY_URL = 'https://protocols.opentrons.com'
+const PROTOCOL_LIBRARY_URL = 'https://library.opentrons.com'
 const PROTOCOL_DESIGNER_URL = 'https://designer.opentrons.com'
 const API_DOCS_URL = 'https://docs.opentrons.com/v2/'
 

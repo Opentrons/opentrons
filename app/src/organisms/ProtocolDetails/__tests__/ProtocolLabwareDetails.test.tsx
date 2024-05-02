@@ -1,9 +1,20 @@
 import * as React from 'react'
-import { renderWithProviders } from '@opentrons/components'
+import { screen } from '@testing-library/react'
+import { describe, it, beforeEach, vi } from 'vitest'
+import { InfoScreen } from '@opentrons/components'
+import { renderWithProviders } from '../../../__testing-utils__'
 import { i18n } from '../../../i18n'
 import { ProtocolLabwareDetails } from '../ProtocolLabwareDetails'
 
 import type { LoadLabwareRunTimeCommand } from '@opentrons/shared-data'
+
+vi.mock('@opentrons/components', async importOriginal => {
+  const actual = await importOriginal<typeof InfoScreen>()
+  return {
+    ...actual,
+    InfoScreen: vi.fn(),
+  }
+})
 
 const mockRequiredLabwareDetails = [
   {
@@ -68,6 +79,7 @@ describe('ProtocolLabwareDetails', () => {
     props = {
       requiredLabwareDetails: mockRequiredLabwareDetails,
     }
+    vi.mocked(InfoScreen).mockReturnValue(<div>mock InfoScreen</div>)
   })
 
   it('should render an opentrons labware', () => {
@@ -128,10 +140,18 @@ describe('ProtocolLabwareDetails', () => {
       completedAt: '2022-04-18T19:16:57.403198+00:00',
     } as LoadLabwareRunTimeCommand)
 
-    const { getByText } = render(props)
-    getByText('Labware name')
-    getByText('NEST 96 Well Plate 100 µL PCR Full Skirt')
-    getByText('Quantity')
-    getByText('2')
+    render(props)
+    screen.getByText('Labware name')
+    screen.getByText('NEST 96 Well Plate 100 µL PCR Full Skirt')
+    screen.getByText('Quantity')
+    screen.getByText('2')
+  })
+
+  it('should render mock infoscreen when no labware', () => {
+    props = {
+      requiredLabwareDetails: [],
+    }
+    render(props)
+    screen.getByText('mock InfoScreen')
   })
 })

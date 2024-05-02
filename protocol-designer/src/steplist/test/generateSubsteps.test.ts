@@ -1,20 +1,21 @@
+import { it, describe, expect, beforeEach } from 'vitest'
 import {
   makeInitialRobotState,
   makeContext,
-  InvariantContext,
-  RobotState,
-  EngageMagnetArgs,
-  DisengageMagnetArgs,
   FIXED_TRASH_ID,
 } from '@opentrons/step-generation'
-import {
-  SetTemperatureArgs,
-  DeactivateTemperatureArgs,
-} from '../../../../step-generation/lib/types.d'
 import { THERMOCYCLER_STATE } from '../../constants'
 import { generateSubstepItem } from '../generateSubstepItem'
 
-import type { ThermocyclerStateStepArgs } from '../../../../step-generation/src/types'
+import type {
+  RobotState,
+  InvariantContext,
+  SetTemperatureArgs,
+  EngageMagnetArgs,
+  DisengageMagnetArgs,
+  DeactivateTemperatureArgs,
+  ThermocyclerStateStepArgs,
+} from '../../../../step-generation/src/types'
 import type { StepArgsAndErrors, LabwareNamesByModuleId } from '../types'
 
 describe('generateSubstepItem', () => {
@@ -160,6 +161,7 @@ describe('generateSubstepItem', () => {
       dispenseFlowRateUlSec: number
       dispenseOffsetFromBottomMm: number
       dropTipLocation: string
+      tipRack: string
     }
     beforeEach(() => {
       sharedArgs = {
@@ -179,6 +181,7 @@ describe('generateSubstepItem', () => {
         dispenseFlowRateUlSec: 5,
         dispenseOffsetFromBottomMm: 10,
         dropTipLocation: FIXED_TRASH_ID,
+        tipRack: 'tiprack1Id',
       }
     })
     ;[
@@ -397,6 +400,7 @@ describe('generateSubstepItem', () => {
         aspirateFlowRateUlSec: 5,
         dispenseFlowRateUlSec: 5,
         dropTipLocation: FIXED_TRASH_ID,
+        tipRack: 'tiprack1Id',
       },
       // @ts-expect-error(sa, 2021-6-15): errors should be boolean typed
       errors: {},
@@ -618,6 +622,7 @@ describe('generateSubstepItem', () => {
       temperature: 45,
       labwareNickname: 'temp nickname',
       message: null,
+      moduleId: 'tempId',
     })
   })
 
@@ -648,6 +653,7 @@ describe('generateSubstepItem', () => {
       temperature: 0,
       labwareNickname: 'temp nickname',
       message: null,
+      moduleId: 'tempId',
     })
   })
 
@@ -676,6 +682,7 @@ describe('generateSubstepItem', () => {
       temperature: null,
       labwareNickname: 'temp nickname',
       message: null,
+      moduleId: 'tempId',
     })
   })
 

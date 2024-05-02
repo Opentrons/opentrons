@@ -1,22 +1,23 @@
 import * as React from 'react'
 import { useHistory } from 'react-router-dom'
 
+import { SINGLE_MOUNT_PIPETTES } from '@opentrons/shared-data'
+
 import {
-  getGripperDisplayName,
-  getPipetteModelSpecs,
-  GripperModel,
-  PipetteModel,
-  SINGLE_MOUNT_PIPETTES,
-} from '@opentrons/shared-data'
+  useGripperDisplayName,
+  usePipetteModelSpecs,
+} from '../../resources/instruments/hooks'
 import { ChoosePipette } from '../PipetteWizardFlows/ChoosePipette'
 import { FLOWS } from '../PipetteWizardFlows/constants'
-import { PipetteWizardFlows } from '../PipetteWizardFlows'
-import { GripperWizardFlows } from '../GripperWizardFlows'
 import { GRIPPER_FLOW_TYPES } from '../GripperWizardFlows/constants'
 import { LabeledMount } from './LabeledMount'
+
 import type { InstrumentData } from '@opentrons/api-client'
+import type { GripperModel, PipetteModel } from '@opentrons/shared-data'
 import type { Mount } from '../../redux/pipettes/types'
 import type { SelectablePipettes } from '../PipetteWizardFlows/types'
+import type { GripperWizardFlows } from '../GripperWizardFlows'
+import type { PipetteWizardFlows } from '../PipetteWizardFlows'
 
 interface AttachedInstrumentMountItemProps {
   mount: Mount | 'extension'
@@ -33,6 +34,7 @@ export function AttachedInstrumentMountItem(
   props: AttachedInstrumentMountItemProps
 ): JSX.Element {
   const history = useHistory()
+  console.log(history)
   const { mount, attachedInstrument, setWizardProps } = props
 
   const [showChoosePipetteModal, setShowChoosePipetteModal] = React.useState(
@@ -61,22 +63,27 @@ export function AttachedInstrumentMountItem(
       history.push(`/instruments/${mount}`)
     }
   }
-  let displayName
-  if (attachedInstrument != null && attachedInstrument.ok) {
-    displayName =
-      attachedInstrument?.mount !== 'extension'
-        ? getPipetteModelSpecs(
-            attachedInstrument?.instrumentModel as PipetteModel
-          )?.displayName
-        : getGripperDisplayName(
-            attachedInstrument?.instrumentModel as GripperModel
-          )
-  }
+
+  const instrumentModel = attachedInstrument?.ok
+    ? attachedInstrument.instrumentModel
+    : null
+
+  const pipetteDisplayName =
+    usePipetteModelSpecs(instrumentModel as PipetteModel)?.displayName ?? null
+  const gripperDisplayName = useGripperDisplayName(
+    instrumentModel as GripperModel
+  )
+
+  const displayName =
+    attachedInstrument?.ok && attachedInstrument?.mount === 'extension'
+      ? gripperDisplayName
+      : pipetteDisplayName
+
   return (
     <>
       <LabeledMount
         mount={mount}
-        instrumentName={displayName ?? null}
+        instrumentName={displayName}
         handleClick={handleClick}
       />
       {showChoosePipetteModal ? (

@@ -16,7 +16,7 @@ context('Tubes and Block', () => {
           .children()
           .first()
           .trigger('mousedown')
-        cy.get('*[class^="Dropdown__option_label"]')
+        cy.get('*[class^="_option_label"]')
           .contains('Tubes / Plates + Opentrons Aluminum Block')
           .click()
 
@@ -26,7 +26,7 @@ context('Tubes and Block', () => {
           .children()
           .first()
           .trigger('mousedown')
-        cy.get('*[class^="Dropdown__option_label"]').contains('96 well').click()
+        cy.get('*[class^="_option_label"]').contains('96 well').click()
 
         // TODO(IL, 2021-05-15): give Dropdown component semantic selectors for E2E
         cy.get('label')
@@ -34,17 +34,11 @@ context('Tubes and Block', () => {
           .children()
           .first()
           .trigger('mousedown')
-        cy.get('*[class^="Dropdown__option_label"]')
+        cy.get('*[class^="_option_label"]')
           .contains(/^Tubes$/)
           .click()
 
         cy.contains('start creating labware').click({ force: true })
-      })
-
-      it('contains a button to the testing guide', () => {
-        cy.contains('labware test guide')
-          .should('have.prop', 'href')
-          .and('to.have.string', 'labwareDefinition_testGuide')
       })
 
       it('does not have a preview image', () => {
@@ -170,19 +164,6 @@ context('Tubes and Block', () => {
           cy.get("input[placeholder='testpro_96_aluminumblock_10ul']").should(
             'exist'
           )
-
-          // Test pipette
-          cy.contains('Test Pipette is a required field').should('exist')
-          // TODO(IL, 2021-05-15): give Dropdown component semantic selectors for E2E
-          cy.get('label')
-            .contains('Test Pipette')
-            .children()
-            .first()
-            .trigger('mousedown')
-          cy.get('*[class^="Dropdown__option_label"]')
-            .contains(/P10.*Single-Channel.*GEN1/)
-            .click()
-          cy.contains('Test Pipette is a required field').should('not.exist')
 
           // All fields present
           cy.get('button[class*="_export_button_"]').click({ force: true })
@@ -205,7 +186,7 @@ context('Tubes and Block', () => {
           .children()
           .first()
           .trigger('mousedown')
-        cy.get('*[class^="Dropdown__option_label"]')
+        cy.get('*[class^="_option_label"]')
           .contains('Tubes / Plates + Opentrons Aluminum Block')
           .click()
 
@@ -215,7 +196,7 @@ context('Tubes and Block', () => {
           .children()
           .first()
           .trigger('mousedown')
-        cy.get('*[class^="Dropdown__option_label"]').contains('96 well').click()
+        cy.get('*[class^="_option_label"]').contains('96 well').click()
 
         // TODO(IL, 2021-05-15): give Dropdown component semantic selectors for E2E
         cy.get('label')
@@ -223,17 +204,9 @@ context('Tubes and Block', () => {
           .children()
           .first()
           .trigger('mousedown')
-        cy.get('*[class^="Dropdown__option_label"]')
-          .contains('PCR Tube Strip')
-          .click()
+        cy.get('*[class^="_option_label"]').contains('PCR Tube Strip').click()
 
         cy.contains('start creating labware').click({ force: true })
-      })
-
-      it('contains a button to the testing guide', () => {
-        cy.contains('labware test guide')
-          .should('have.prop', 'href')
-          .and('to.have.string', 'labwareDefinition_testGuide')
       })
 
       it('does not have a preview image', () => {
@@ -360,19 +333,6 @@ context('Tubes and Block', () => {
             'exist'
           )
 
-          // Test pipette
-          cy.contains('Test Pipette is a required field').should('exist')
-          // TODO(IL, 2021-05-15): give Dropdown component semantic selectors for E2E
-          cy.get('label')
-            .contains('Test Pipette')
-            .children()
-            .first()
-            .trigger('mousedown')
-          cy.get('*[class^="Dropdown__option_label"]')
-            .contains(/P10.*Single-Channel.*GEN1/)
-            .click()
-          cy.contains('Test Pipette is a required field').should('not.exist')
-
           // All fields present
           cy.get('button[class*="_export_button_"]').click({ force: true })
           cy.contains(
@@ -394,7 +354,7 @@ context('Tubes and Block', () => {
           .children()
           .first()
           .trigger('mousedown')
-        cy.get('*[class^="Dropdown__option_label"]')
+        cy.get('*[class^="_option_label"]')
           .contains('Tubes / Plates + Opentrons Aluminum Block')
           .click()
 
@@ -404,7 +364,7 @@ context('Tubes and Block', () => {
           .children()
           .first()
           .trigger('mousedown')
-        cy.get('*[class^="Dropdown__option_label"]').contains('96 well').click()
+        cy.get('*[class^="_option_label"]').contains('96 well').click()
 
         // TODO(IL, 2021-05-15): give Dropdown component semantic selectors for E2E
         cy.get('label')
@@ -412,17 +372,9 @@ context('Tubes and Block', () => {
           .children()
           .first()
           .trigger('mousedown')
-        cy.get('*[class^="Dropdown__option_label"]')
-          .contains('PCR Plate')
-          .click()
+        cy.get('*[class^="_option_label"]').contains('PCR Plate').click()
 
         cy.contains('start creating labware').click({ force: true })
-      })
-
-      it('contains a button to the testing guide', () => {
-        cy.contains('labware test guide')
-          .should('have.prop', 'href')
-          .and('to.have.string', 'labwareDefinition_testGuide')
       })
 
       it('does not have a preview image', () => {
@@ -549,19 +501,6 @@ context('Tubes and Block', () => {
             'exist'
           )
 
-          // Test pipette
-          cy.contains('Test Pipette is a required field').should('exist')
-          // TODO(IL, 2021-05-15): give Dropdown component semantic selectors for E2E
-          cy.get('label')
-            .contains('Test Pipette')
-            .children()
-            .first()
-            .trigger('mousedown')
-          cy.get('*[class^="Dropdown__option_label"]')
-            .contains(/P10.*Single-Channel.*GEN1/)
-            .click()
-          cy.contains('Test Pipette is a required field').should('not.exist')
-
           // All fields present
           cy.get('button[class*="_export_button_"]').click({ force: true })
           cy.contains(
@@ -585,7 +524,7 @@ context('Tubes and Block', () => {
           .children()
           .first()
           .trigger('mousedown')
-        cy.get('*[class^="Dropdown__option_label"]')
+        cy.get('*[class^="_option_label"]')
           .contains('Tubes / Plates + Opentrons Aluminum Block')
           .click()
 
@@ -595,19 +534,13 @@ context('Tubes and Block', () => {
           .children()
           .first()
           .trigger('mousedown')
-        cy.get('*[class^="Dropdown__option_label"]').contains('24 well').click()
+        cy.get('*[class^="_option_label"]').contains('24 well').click()
 
         cy.get('label')
           .contains('What labware is on top of your aluminum block?')
           .should('not.exist')
 
         cy.contains('start creating labware').click({ force: true })
-      })
-
-      it('contains a button to the testing guide', () => {
-        cy.contains('labware test guide')
-          .should('have.prop', 'href')
-          .and('to.have.string', 'labwareDefinition_testGuide')
       })
 
       it('does not have a preview image', () => {
@@ -733,19 +666,6 @@ context('Tubes and Block', () => {
           cy.get("input[placeholder='testpro_24_aluminumblock_10ul']").should(
             'exist'
           )
-
-          // Test pipette
-          cy.contains('Test Pipette is a required field').should('exist')
-          // TODO(IL, 2021-05-15): give Dropdown component semantic selectors for E2E
-          cy.get('label')
-            .contains('Test Pipette')
-            .children()
-            .first()
-            .trigger('mousedown')
-          cy.get('*[class^="Dropdown__option_label"]')
-            .contains(/P10.*Single-Channel.*GEN1/)
-            .click()
-          cy.contains('Test Pipette is a required field').should('not.exist')
 
           // All fields present
           cy.get('button[class*="_export_button_"]').click({ force: true })

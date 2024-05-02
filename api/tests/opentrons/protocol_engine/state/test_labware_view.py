@@ -5,8 +5,9 @@ from typing import Dict, Optional, cast, ContextManager, Any, Union, NamedTuple,
 from contextlib import nullcontext as does_not_raise
 
 from opentrons_shared_data.deck import load as load_deck
-from opentrons_shared_data.deck.dev_types import DeckDefinitionV4
+from opentrons_shared_data.deck.dev_types import DeckDefinitionV5
 from opentrons_shared_data.pipette.dev_types import LabwareUri
+from opentrons_shared_data.labware import load_definition
 from opentrons_shared_data.labware.labware_definition import (
     Parameters,
     LabwareRole,
@@ -20,7 +21,7 @@ from opentrons.protocols.api_support.deck_type import (
     STANDARD_OT3_DECK,
 )
 from opentrons.protocols.models import LabwareDefinition
-from opentrons.types import DeckSlotName, Point, MountType
+from opentrons.types import DeckSlotName, MountType
 
 from opentrons.protocol_engine import errors
 from opentrons.protocol_engine.types import (
@@ -34,6 +35,7 @@ from opentrons.protocol_engine.types import (
     ModuleLocation,
     OnLabwareLocation,
     LabwareLocation,
+    AddressableAreaLocation,
     OFF_DECK_LOCATION,
     OverlapOffset,
     LabwareMovementOffsetData,
@@ -108,14 +110,14 @@ def get_labware_view(
     labware_by_id: Optional[Dict[str, LoadedLabware]] = None,
     labware_offsets_by_id: Optional[Dict[str, LabwareOffset]] = None,
     definitions_by_uri: Optional[Dict[str, LabwareDefinition]] = None,
-    deck_definition: Optional[DeckDefinitionV4] = None,
+    deck_definition: Optional[DeckDefinitionV5] = None,
 ) -> LabwareView:
     """Get a labware view test subject."""
     state = LabwareState(
         labware_by_id=labware_by_id or {},
         labware_offsets_by_id=labware_offsets_by_id or {},
         definitions_by_uri=definitions_by_uri or {},
-        deck_definition=deck_definition or cast(DeckDefinitionV4, {"fake": True}),
+        deck_definition=deck_definition or cast(DeckDefinitionV5, {"fake": True}),
     )
 
     return LabwareView(state=state)
@@ -694,7 +696,7 @@ def test_get_labware_overlap_offsets() -> None:
 class ModuleOverlapSpec(NamedTuple):
     """Spec data to test LabwareView.get_module_overlap_offsets."""
 
-    spec_deck_definition: DeckDefinitionV4
+    spec_deck_definition: DeckDefinitionV5
     module_model: ModuleModel
     stacking_offset_with_module: Dict[str, SharedDataOverlapOffset]
     expected_offset: OverlapOffset
@@ -703,7 +705,7 @@ class ModuleOverlapSpec(NamedTuple):
 module_overlap_specs: List[ModuleOverlapSpec] = [
     ModuleOverlapSpec(
         # Labware on temp module on OT2, with stacking overlap for temp module
-        spec_deck_definition=load_deck(STANDARD_OT2_DECK, 4),
+        spec_deck_definition=load_deck(STANDARD_OT2_DECK, 5),
         module_model=ModuleModel.TEMPERATURE_MODULE_V2,
         stacking_offset_with_module={
             str(ModuleModel.TEMPERATURE_MODULE_V2.value): SharedDataOverlapOffset(
@@ -714,7 +716,7 @@ module_overlap_specs: List[ModuleOverlapSpec] = [
     ),
     ModuleOverlapSpec(
         # Labware on TC Gen1 on OT2, with stacking overlap for TC Gen1
-        spec_deck_definition=load_deck(STANDARD_OT2_DECK, 4),
+        spec_deck_definition=load_deck(STANDARD_OT2_DECK, 5),
         module_model=ModuleModel.THERMOCYCLER_MODULE_V1,
         stacking_offset_with_module={
             str(ModuleModel.THERMOCYCLER_MODULE_V1.value): SharedDataOverlapOffset(
@@ -725,21 +727,21 @@ module_overlap_specs: List[ModuleOverlapSpec] = [
     ),
     ModuleOverlapSpec(
         # Labware on TC Gen2 on OT2, with no stacking overlap
-        spec_deck_definition=load_deck(STANDARD_OT2_DECK, 4),
+        spec_deck_definition=load_deck(STANDARD_OT2_DECK, 5),
         module_model=ModuleModel.THERMOCYCLER_MODULE_V2,
         stacking_offset_with_module={},
         expected_offset=OverlapOffset(x=0, y=0, z=10.7),
     ),
     ModuleOverlapSpec(
         # Labware on TC Gen2 on Flex, with no stacking overlap
-        spec_deck_definition=load_deck(STANDARD_OT3_DECK, 4),
+        spec_deck_definition=load_deck(STANDARD_OT3_DECK, 5),
         module_model=ModuleModel.THERMOCYCLER_MODULE_V2,
         stacking_offset_with_module={},
         expected_offset=OverlapOffset(x=0, y=0, z=0),
     ),
     ModuleOverlapSpec(
         # Labware on TC Gen2 on Flex, with stacking overlap for TC Gen2
-        spec_deck_definition=load_deck(STANDARD_OT3_DECK, 4),
+        spec_deck_definition=load_deck(STANDARD_OT3_DECK, 5),
         module_model=ModuleModel.THERMOCYCLER_MODULE_V2,
         stacking_offset_with_module={
             str(ModuleModel.THERMOCYCLER_MODULE_V2.value): SharedDataOverlapOffset(
@@ -756,7 +758,7 @@ module_overlap_specs: List[ModuleOverlapSpec] = [
     argvalues=module_overlap_specs,
 )
 def test_get_module_overlap_offsets(
-    spec_deck_definition: DeckDefinitionV4,
+    spec_deck_definition: DeckDefinitionV5,
     module_model: ModuleModel,
     stacking_offset_with_module: Dict[str, SharedDataOverlapOffset],
     expected_offset: OverlapOffset,
@@ -798,50 +800,11 @@ def test_get_default_magnet_height(
     assert subject.get_default_magnet_height(module_id="module-id", offset=2) == 12.0
 
 
-def test_get_deck_definition(ot2_standard_deck_def: DeckDefinitionV4) -> None:
+def test_get_deck_definition(ot2_standard_deck_def: DeckDefinitionV5) -> None:
     """It should get the deck definition from the state."""
     subject = get_labware_view(deck_definition=ot2_standard_deck_def)
 
     assert subject.get_deck_definition() == ot2_standard_deck_def
-
-
-def test_get_slot_definition(ot2_standard_deck_def: DeckDefinitionV4) -> None:
-    """It should return a deck slot's definition."""
-    subject = get_labware_view(deck_definition=ot2_standard_deck_def)
-
-    result = subject.get_slot_definition(DeckSlotName.SLOT_6)
-
-    assert result["id"] == "6"
-    assert result["displayName"] == "Slot 6"
-
-
-def test_get_slot_definition_raises_with_bad_slot_name(
-    ot2_standard_deck_def: DeckDefinitionV4,
-) -> None:
-    """It should raise a SlotDoesNotExistError if a bad slot name is given."""
-    subject = get_labware_view(deck_definition=ot2_standard_deck_def)
-
-    with pytest.raises(errors.SlotDoesNotExistError):
-        subject.get_slot_definition(DeckSlotName.SLOT_A1)
-
-
-def test_get_slot_position(ot2_standard_deck_def: DeckDefinitionV4) -> None:
-    """It should get the absolute location of a deck slot's origin."""
-    subject = get_labware_view(deck_definition=ot2_standard_deck_def)
-
-    expected_position = Point(x=132.5, y=90.5, z=0.0)
-    result = subject.get_slot_position(DeckSlotName.SLOT_5)
-
-    assert result == expected_position
-
-
-def test_get_slot_center_position(ot2_standard_deck_def: DeckDefinitionV4) -> None:
-    """It should get the absolute location of a deck slot's center."""
-    subject = get_labware_view(deck_definition=ot2_standard_deck_def)
-
-    expected_center = Point(x=196.5, y=43.0, z=0.0)
-    result = subject.get_slot_center_position(DeckSlotName.SLOT_2)
-    assert result == expected_center
 
 
 def test_get_labware_offset_vector() -> None:
@@ -1023,7 +986,7 @@ def test_find_applicable_labware_offset() -> None:
     )
 
 
-def test_get_display_name() -> None:
+def test_get_user_specified_display_name() -> None:
     """It should get a labware's user-specified display name."""
     subject = get_labware_view(
         labware_by_id={
@@ -1032,8 +995,38 @@ def test_get_display_name() -> None:
         },
     )
 
-    assert subject.get_display_name("plate_with_display_name") == "Fancy Plate Name"
-    assert subject.get_display_name("reservoir_without_display_name") is None
+    assert (
+        subject.get_user_specified_display_name("plate_with_display_name")
+        == "Fancy Plate Name"
+    )
+    assert (
+        subject.get_user_specified_display_name("reservoir_without_display_name")
+        is None
+    )
+
+
+def test_get_display_name(
+    well_plate_def: LabwareDefinition,
+    reservoir_def: LabwareDefinition,
+) -> None:
+    """It should get the labware's display name."""
+    subject = get_labware_view(
+        labware_by_id={
+            "plate_with_custom_display_name": plate,
+            "reservoir_with_default_display_name": reservoir,
+        },
+        definitions_by_uri={
+            "some-plate-uri": well_plate_def,
+            "some-reservoir-uri": reservoir_def,
+        },
+    )
+    assert (
+        subject.get_display_name("plate_with_custom_display_name") == "Fancy Plate Name"
+    )
+    assert (
+        subject.get_display_name("reservoir_with_default_display_name")
+        == "NEST 12 Well Reservoir 15 mL"
+    )
 
 
 def test_get_fixed_trash_id() -> None:
@@ -1144,41 +1137,9 @@ def test_get_by_slot() -> None:
         labware_by_id={"1": labware_1, "2": labware_2, "3": labware_3}
     )
 
-    assert subject.get_by_slot(DeckSlotName.SLOT_1, {"1", "2"}) == labware_1
-    assert subject.get_by_slot(DeckSlotName.SLOT_2, {"1", "2"}) == labware_2
-    assert subject.get_by_slot(DeckSlotName.SLOT_3, {"1", "2"}) is None
-
-
-def test_get_by_slot_prefers_later() -> None:
-    """It should get the labware in a slot, preferring later items if locations match."""
-    labware_1 = LoadedLabware.construct(  # type: ignore[call-arg]
-        id="1", location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1)
-    )
-    labware_1_again = LoadedLabware.construct(  # type: ignore[call-arg]
-        id="1-again", location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1)
-    )
-
-    subject = get_labware_view(
-        labware_by_id={"1": labware_1, "1-again": labware_1_again}
-    )
-
-    assert subject.get_by_slot(DeckSlotName.SLOT_1, {"1", "1-again"}) == labware_1_again
-
-
-def test_get_by_slot_filter_ids() -> None:
-    """It should filter labwares in the same slot using IDs."""
-    labware_1 = LoadedLabware.construct(  # type: ignore[call-arg]
-        id="1", location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1)
-    )
-    labware_1_again = LoadedLabware.construct(  # type: ignore[call-arg]
-        id="1-again", location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1)
-    )
-
-    subject = get_labware_view(
-        labware_by_id={"1": labware_1, "1-again": labware_1_again}
-    )
-
-    assert subject.get_by_slot(DeckSlotName.SLOT_1, {"1"}) == labware_1
+    assert subject.get_by_slot(DeckSlotName.SLOT_1) == labware_1
+    assert subject.get_by_slot(DeckSlotName.SLOT_2) == labware_2
+    assert subject.get_by_slot(DeckSlotName.SLOT_3) is None
 
 
 @pytest.mark.parametrize(
@@ -1265,6 +1226,67 @@ def test_get_all_labware_definition_empty() -> None:
     result = subject.get_loaded_labware_definitions()
 
     assert result == []
+
+
+def test_raise_if_labware_inaccessible_by_pipette_staging_area() -> None:
+    """It should raise if the labware is on a staging slot."""
+    subject = get_labware_view(
+        labware_by_id={
+            "labware-id": LoadedLabware(
+                id="labware-id",
+                loadName="test",
+                definitionUri="def-uri",
+                location=AddressableAreaLocation(addressableAreaName="B4"),
+            )
+        },
+    )
+
+    with pytest.raises(
+        errors.LocationNotAccessibleByPipetteError, match="on staging slot"
+    ):
+        subject.raise_if_labware_inaccessible_by_pipette("labware-id")
+
+
+def test_raise_if_labware_inaccessible_by_pipette_off_deck() -> None:
+    """It should raise if the labware is off-deck."""
+    subject = get_labware_view(
+        labware_by_id={
+            "labware-id": LoadedLabware(
+                id="labware-id",
+                loadName="test",
+                definitionUri="def-uri",
+                location=OFF_DECK_LOCATION,
+            )
+        },
+    )
+
+    with pytest.raises(errors.LocationNotAccessibleByPipetteError, match="off-deck"):
+        subject.raise_if_labware_inaccessible_by_pipette("labware-id")
+
+
+def test_raise_if_labware_inaccessible_by_pipette_stacked_labware_on_staging_area() -> None:
+    """It should raise if the labware is stacked on a staging slot."""
+    subject = get_labware_view(
+        labware_by_id={
+            "labware-id": LoadedLabware(
+                id="labware-id",
+                loadName="test",
+                definitionUri="def-uri",
+                location=OnLabwareLocation(labwareId="lower-labware-id"),
+            ),
+            "lower-labware-id": LoadedLabware(
+                id="lower-labware-id",
+                loadName="test",
+                definitionUri="def-uri",
+                location=AddressableAreaLocation(addressableAreaName="B4"),
+            ),
+        },
+    )
+
+    with pytest.raises(
+        errors.LocationNotAccessibleByPipetteError, match="on staging slot"
+    ):
+        subject.raise_if_labware_inaccessible_by_pipette("labware-id")
 
 
 def test_raise_if_labware_cannot_be_stacked_is_adapter() -> None:
@@ -1382,13 +1404,13 @@ def test_raise_if_labware_cannot_be_stacked_on_labware_on_adapter() -> None:
         )
 
 
-def test_get_deck_gripper_offsets(ot3_standard_deck_def: DeckDefinitionV4) -> None:
+def test_get_deck_gripper_offsets(ot3_standard_deck_def: DeckDefinitionV5) -> None:
     """It should get the deck's gripper offsets."""
     subject = get_labware_view(deck_definition=ot3_standard_deck_def)
 
     assert subject.get_deck_default_gripper_offsets() == LabwareMovementOffsetData(
         pickUpOffset=LabwareOffsetVector(x=0, y=0, z=0),
-        dropOffset=LabwareOffsetVector(x=0, y=0, z=-0.25),
+        dropOffset=LabwareOffsetVector(x=0, y=0, z=-0.75),
     )
 
 
@@ -1496,3 +1518,36 @@ def test_get_grip_height_from_labware_bottom(
     assert (
         subject.get_grip_height_from_labware_bottom("reservoir-id") == 15.7
     )  # default
+
+
+@pytest.mark.parametrize(
+    "labware_to_check,well_bbox",
+    [
+        ("opentrons_universal_flat_adapter", Dimensions(0, 0, 0)),
+        (
+            "corning_96_wellplate_360ul_flat",
+            Dimensions(116.81 - 10.95, 77.67 - 7.81, 14.22),
+        ),
+        ("nest_12_reservoir_15ml", Dimensions(117.48 - 10.28, 78.38 - 7.18, 31.4)),
+    ],
+)
+def test_calculates_well_bounding_box(
+    labware_to_check: str, well_bbox: Dimensions
+) -> None:
+    """It should be able to calculate well bounding boxes."""
+    definition = LabwareDefinition.parse_obj(load_definition(labware_to_check, 1))
+    labware = LoadedLabware(
+        id="test-labware-id",
+        loadName=labware_to_check,
+        location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
+        definitionUri="test-labware-uri",
+        offsetId=None,
+        displayName="Fancy Plate Name",
+    )
+    subject = get_labware_view(
+        labware_by_id={"test-labware-id": labware},
+        definitions_by_uri={"test-labware-uri": definition},
+    )
+    assert subject.get_well_bbox("test-labware-id").x == pytest.approx(well_bbox.x)
+    assert subject.get_well_bbox("test-labware-id").y == pytest.approx(well_bbox.y)
+    assert subject.get_well_bbox("test-labware-id").z == pytest.approx(well_bbox.z)

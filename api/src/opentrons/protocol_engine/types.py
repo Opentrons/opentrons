@@ -5,11 +5,15 @@ from datetime import datetime
 from enum import Enum
 from dataclasses import dataclass
 from pydantic import BaseModel, Field, validator
-from typing import Optional, Union, List, Dict, Any, NamedTuple
+from typing import Optional, Union, List, Dict, Any, NamedTuple, Tuple, FrozenSet
 from typing_extensions import Literal, TypeGuard
 
 from opentrons_shared_data.pipette.dev_types import PipetteNameType
-from opentrons.types import MountType, DeckSlotName
+from opentrons.types import MountType, DeckSlotName, StagingSlotName
+from opentrons.hardware_control.types import (
+    TipStateType as HwTipStateType,
+    InstrumentProbeType,
+)
 from opentrons.hardware_control.modules import (
     ModuleType as ModuleType,
 )
@@ -18,6 +22,7 @@ from opentrons_shared_data.pipette.dev_types import (  # noqa: F401
     # convenience re-export of LabwareUri type
     LabwareUri as LabwareUri,
 )
+from opentrons_shared_data.module.dev_types import ModuleType as SharedDataModuleType
 
 
 class EngineStatus(str, Enum):
@@ -32,6 +37,14 @@ class EngineStatus(str, Enum):
     FINISHING = "finishing"
     FAILED = "failed"
     SUCCEEDED = "succeeded"
+
+    AWAITING_RECOVERY = "awaiting-recovery"
+    """The engine is waiting for external input to recover from a nonfatal error.
+
+    New fixup commands may be enqueued, which will run immediately.
+    The run can't be paused in this state, but it can be canceled, or resumed from the
+    next protocol command if recovery is complete.
+    """
 
 
 class DeckSlotLocation(BaseModel):
@@ -50,6 +63,33 @@ class DeckSlotLocation(BaseModel):
             " It will automatically be converted to match the robot."
             "\n\n"
             "When one of these values is returned, it will always match the robot."
+        ),
+    )
+
+
+class StagingSlotLocation(BaseModel):
+    """The location of something placed in a single staging slot."""
+
+    slotName: StagingSlotName = Field(
+        ...,
+        description=(
+            # This description should be kept in sync with LabwareOffsetLocation.slotName.
+            "A slot on the robot's staging area."
+            "\n\n"
+            "These apply only to the Flex. The OT-2 has no staging slots."
+        ),
+    )
+
+
+class AddressableAreaLocation(BaseModel):
+    """The location of something place in an addressable area. This is a superset of deck slots."""
+
+    addressableAreaName: str = Field(
+        ...,
+        description=(
+            "The name of the addressable area that you want to use."
+            " Valid values are the `id`s of `addressableArea`s in the"
+            " [deck definition](https://github.com/Opentrons/opentrons/tree/edge/shared-data/deck)."
         ),
     )
 
@@ -76,13 +116,21 @@ _OffDeckLocationType = Literal["offDeck"]
 OFF_DECK_LOCATION: _OffDeckLocationType = "offDeck"
 
 LabwareLocation = Union[
-    DeckSlotLocation, ModuleLocation, OnLabwareLocation, _OffDeckLocationType
+    DeckSlotLocation,
+    ModuleLocation,
+    OnLabwareLocation,
+    _OffDeckLocationType,
+    AddressableAreaLocation,
 ]
 """Union of all locations where it's legal to keep a labware."""
 
-OnDeckLabwareLocation = Union[DeckSlotLocation, ModuleLocation, OnLabwareLocation]
+OnDeckLabwareLocation = Union[
+    DeckSlotLocation, ModuleLocation, OnLabwareLocation, AddressableAreaLocation
+]
 
-NonStackedLocation = Union[DeckSlotLocation, ModuleLocation, _OffDeckLocationType]
+NonStackedLocation = Union[
+    DeckSlotLocation, AddressableAreaLocation, ModuleLocation, _OffDeckLocationType
+]
 """Union of all locations where it's legal to keep a labware that can't be stacked on another labware"""
 
 
@@ -197,6 +245,17 @@ class CurrentWell:
     pipette_id: str
     labware_id: str
     well_name: str
+
+
+@dataclass(frozen=True)
+class CurrentAddressableArea:
+    """The latest addressable area the robot has accessed."""
+
+    pipette_id: str
+    addressable_area_name: str
+
+
+CurrentPipetteLocation = Union[CurrentWell, CurrentAddressableArea]
 
 
 @dataclass(frozen=True)
@@ -388,6 +447,10 @@ class ModuleOffsetData:
 
 class OverlapOffset(Vec3f):
     """Offset representing overlap space of one labware on top of another labware or module."""
+
+
+class AddressableOffsetVector(Vec3f):
+    """Offset, in deck coordinates, from nominal to actual position of an addressable area."""
 
 
 class LabwareMovementOffsetData(BaseModel):
@@ -637,6 +700,42 @@ class LabwareMovementStrategy(str, Enum):
     MANUAL_MOVE_WITHOUT_PAUSE = "manualMoveWithoutPause"
 
 
+@dataclass(frozen=True)
+class PotentialCutoutFixture:
+    """Cutout and cutout fixture id associated with a potential cutout fixture that can be on the deck."""
+
+    cutout_id: str
+    cutout_fixture_id: str
+    provided_addressable_areas: FrozenSet[str]
+
+
+class AreaType(Enum):
+    """The type of addressable area."""
+
+    SLOT = "slot"
+    STAGING_SLOT = "stagingSlot"
+    MOVABLE_TRASH = "movableTrash"
+    FIXED_TRASH = "fixedTrash"
+    WASTE_CHUTE = "wasteChute"
+    THERMOCYCLER = "thermocycler"
+    HEATER_SHAKER = "heaterShaker"
+    TEMPERATURE = "temperatureModule"
+    MAGNETICBLOCK = "magneticBlock"
+
+
+@dataclass(frozen=True)
+class AddressableArea:
+    """Addressable area that has been loaded."""
+
+    area_name: str
+    area_type: AreaType
+    base_slot: DeckSlotName
+    display_name: str
+    bounding_box: Dimensions
+    position: AddressableOffsetVector
+    compatible_module_types: List[SharedDataModuleType]
+
+
 class PostRunHardwareState(Enum):
     """State of robot gantry & motors after a stop is performed and the hardware API is reset.
 
@@ -664,21 +763,21 @@ class PostRunHardwareState(Enum):
     DISENGAGE_IN_PLACE = "disengageInPlace"
 
 
-NOZZLE_NAME_REGEX = "[A-Z][0-100]"
+NOZZLE_NAME_REGEX = r"[A-Z]\d{1,2}"
 PRIMARY_NOZZLE_LITERAL = Literal["A1", "H1", "A12", "H12"]
 
 
-class EmptyNozzleLayoutConfiguration(BaseModel):
-    """Empty basemodel to represent a reset to the nozzle configuration. Sending no parameters resets to default."""
+class AllNozzleLayoutConfiguration(BaseModel):
+    """All basemodel to represent a reset to the nozzle configuration. Sending no parameters resets to default."""
 
-    style: Literal["EMPTY"] = "EMPTY"
+    style: Literal["ALL"] = "ALL"
 
 
 class SingleNozzleLayoutConfiguration(BaseModel):
     """Minimum information required for a new nozzle configuration."""
 
     style: Literal["SINGLE"] = "SINGLE"
-    primary_nozzle: PRIMARY_NOZZLE_LITERAL = Field(
+    primaryNozzle: PRIMARY_NOZZLE_LITERAL = Field(
         ...,
         description="The primary nozzle to use in the layout configuration. This nozzle will update the critical point of the current pipette. For now, this is also the back left corner of your rectangle.",
     )
@@ -688,7 +787,7 @@ class RowNozzleLayoutConfiguration(BaseModel):
     """Minimum information required for a new nozzle configuration."""
 
     style: Literal["ROW"] = "ROW"
-    primary_nozzle: PRIMARY_NOZZLE_LITERAL = Field(
+    primaryNozzle: PRIMARY_NOZZLE_LITERAL = Field(
         ...,
         description="The primary nozzle to use in the layout configuration. This nozzle will update the critical point of the current pipette. For now, this is also the back left corner of your rectangle.",
     )
@@ -698,7 +797,7 @@ class ColumnNozzleLayoutConfiguration(BaseModel):
     """Information required for nozzle configurations of type ROW and COLUMN."""
 
     style: Literal["COLUMN"] = "COLUMN"
-    primary_nozzle: PRIMARY_NOZZLE_LITERAL = Field(
+    primaryNozzle: PRIMARY_NOZZLE_LITERAL = Field(
         ...,
         description="The primary nozzle to use in the layout configuration. This nozzle will update the critical point of the current pipette. For now, this is also the back left corner of your rectangle.",
     )
@@ -708,11 +807,11 @@ class QuadrantNozzleLayoutConfiguration(BaseModel):
     """Information required for nozzle configurations of type QUADRANT."""
 
     style: Literal["QUADRANT"] = "QUADRANT"
-    primary_nozzle: PRIMARY_NOZZLE_LITERAL = Field(
+    primaryNozzle: PRIMARY_NOZZLE_LITERAL = Field(
         ...,
         description="The primary nozzle to use in the layout configuration. This nozzle will update the critical point of the current pipette. For now, this is also the back left corner of your rectangle.",
     )
-    front_right_nozzle: str = Field(
+    frontRightNozzle: str = Field(
         ...,
         regex=NOZZLE_NAME_REGEX,
         description="The front right nozzle in your configuration.",
@@ -720,9 +819,144 @@ class QuadrantNozzleLayoutConfiguration(BaseModel):
 
 
 NozzleLayoutConfigurationType = Union[
-    EmptyNozzleLayoutConfiguration,
+    AllNozzleLayoutConfiguration,
     SingleNozzleLayoutConfiguration,
     ColumnNozzleLayoutConfiguration,
     RowNozzleLayoutConfiguration,
     QuadrantNozzleLayoutConfiguration,
 ]
+
+# TODO make the below some sort of better type
+# TODO This should instead contain a proper cutout fixture type
+DeckConfigurationType = List[
+    Tuple[str, str, Optional[str]]
+]  # cutout_id, cutout_fixture_id, opentrons_module_serial_number
+
+
+class InstrumentSensorId(str, Enum):
+    """Primary and secondary sensor ids."""
+
+    PRIMARY = "primary"
+    SECONDARY = "secondary"
+    BOTH = "both"
+
+    def to_instrument_probe_type(self) -> InstrumentProbeType:
+        """Convert to InstrumentProbeType."""
+        return {
+            InstrumentSensorId.PRIMARY: InstrumentProbeType.PRIMARY,
+            InstrumentSensorId.SECONDARY: InstrumentProbeType.SECONDARY,
+            InstrumentSensorId.BOTH: InstrumentProbeType.BOTH,
+        }[self]
+
+
+class TipPresenceStatus(str, Enum):
+    """Tip presence status reported by a pipette."""
+
+    PRESENT = "present"
+    ABSENT = "absent"
+    UNKNOWN = "unknown"
+
+    def to_hw_state(self) -> HwTipStateType:
+        """Convert to hardware tip state."""
+        assert self != TipPresenceStatus.UNKNOWN
+        return {
+            TipPresenceStatus.PRESENT: HwTipStateType.PRESENT,
+            TipPresenceStatus.ABSENT: HwTipStateType.ABSENT,
+        }[self]
+
+    @classmethod
+    def from_hw_state(cls, state: HwTipStateType) -> "TipPresenceStatus":
+        """Convert from hardware tip state."""
+        return {
+            HwTipStateType.PRESENT: TipPresenceStatus.PRESENT,
+            HwTipStateType.ABSENT: TipPresenceStatus.ABSENT,
+        }[state]
+
+
+# TODO (spp, 2024-04-02): move all RTP types to runner
+class RTPBase(BaseModel):
+    """Parameters defined in a protocol."""
+
+    displayName: str = Field(..., description="Display string for the parameter.")
+    variableName: str = Field(..., description="Python variable name of the parameter.")
+    description: Optional[str] = Field(
+        None, description="Detailed description of the parameter."
+    )
+    suffix: Optional[str] = Field(
+        None,
+        description="Units (like mL, mm/sec, etc) or a custom suffix for the parameter.",
+    )
+
+
+class NumberParameter(RTPBase):
+    """An integer parameter defined in a protocol."""
+
+    type: Literal["int", "float"] = Field(
+        ..., description="String specifying whether the number is an int or float type."
+    )
+    min: float = Field(
+        ..., description="Minimum value that the number param is allowed to have."
+    )
+    max: float = Field(
+        ..., description="Maximum value that the number param is allowed to have."
+    )
+    value: float = Field(
+        ...,
+        description="The value assigned to the parameter; if not supplied by the client, will be assigned the default value.",
+    )
+    default: float = Field(
+        ...,
+        description="Default value of the parameter, to be used when there is no client-specified value.",
+    )
+
+
+class BooleanParameter(RTPBase):
+    """A boolean parameter defined in a protocol."""
+
+    type: Literal["bool"] = Field(
+        default="bool", description="String specifying the type of this parameter"
+    )
+    value: bool = Field(
+        ...,
+        description="The value assigned to the parameter; if not supplied by the client, will be assigned the default value.",
+    )
+    default: bool = Field(
+        ...,
+        description="Default value of the parameter, to be used when there is no client-specified value.",
+    )
+
+
+class EnumChoice(BaseModel):
+    """Components of choices used in RTP Enum Parameters."""
+
+    displayName: str = Field(..., description="Display string for the param's choice.")
+    value: Union[float, str] = Field(
+        ..., description="Enum value of the param's choice."
+    )
+
+
+class EnumParameter(RTPBase):
+    """A string enum defined in a protocol."""
+
+    type: Literal["int", "float", "str"] = Field(
+        ...,
+        description="String specifying whether the parameter is an int or float or string type.",
+    )
+    choices: List[EnumChoice] = Field(
+        ..., description="List of valid choices for this parameter."
+    )
+    value: Union[float, str] = Field(
+        ...,
+        description="The value assigned to the parameter; if not supplied by the client, will be assigned the default value.",
+    )
+    default: Union[float, str] = Field(
+        ...,
+        description="Default value of the parameter, to be used when there is no client-specified value.",
+    )
+
+
+RunTimeParameter = Union[NumberParameter, EnumParameter, BooleanParameter]
+
+RunTimeParamValuesType = Dict[
+    str, Union[float, bool, str]
+]  # update value types as more RTP types are added

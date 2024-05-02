@@ -7,7 +7,7 @@ from pydantic import Field
 
 from .pipetting_common import (
     PipetteIdMixin,
-    VolumeMixin,
+    DispenseVolumeMixin,
     FlowRateMixin,
     BaseLiquidHandlingResult,
 )
@@ -20,7 +20,7 @@ if TYPE_CHECKING:
 DispenseInPlaceCommandType = Literal["dispenseInPlace"]
 
 
-class DispenseInPlaceParams(PipetteIdMixin, VolumeMixin, FlowRateMixin):
+class DispenseInPlaceParams(PipetteIdMixin, DispenseVolumeMixin, FlowRateMixin):
     """Payload required to dispense in place."""
 
     pushOut: Optional[float] = Field(

@@ -16,7 +16,6 @@ import {
   MAGNETIC_BLOCK_TYPE,
   MAGNETIC_BLOCK_V1,
 } from '@opentrons/shared-data'
-import { i18n } from './localization'
 import type { DeckSlot, WellVolumes } from './types'
 import type { ModuleType, ModuleModel } from '@opentrons/shared-data'
 
@@ -66,10 +65,10 @@ export const DEFAULT_MM_BLOWOUT_OFFSET_FROM_TOP = 0
 export const DEFAULT_DELAY_SECONDS = 1
 export const DEFAULT_WELL_ORDER_FIRST_OPTION: 't2b' = 't2b'
 export const DEFAULT_WELL_ORDER_SECOND_OPTION: 'l2r' = 'l2r'
-export const MIN_ENGAGE_HEIGHT_V1 = -5
-export const MAX_ENGAGE_HEIGHT_V1 = 40
-export const MIN_ENGAGE_HEIGHT_V2 = -4
-export const MAX_ENGAGE_HEIGHT_V2 = 19
+export const MIN_ENGAGE_HEIGHT_V1 = 0
+export const MAX_ENGAGE_HEIGHT_V1 = 45
+export const MIN_ENGAGE_HEIGHT_V2 = -2.5
+export const MAX_ENGAGE_HEIGHT_V2 = 25
 export const MIN_TEMP_MODULE_TEMP = 4
 export const MAX_TEMP_MODULE_TEMP = 95
 export const MIN_HEATER_SHAKER_MODULE_TEMP = 37
@@ -96,43 +95,43 @@ export const MODELS_FOR_MODULE_TYPE: Record<
 > = {
   [MAGNETIC_MODULE_TYPE]: [
     {
-      name: i18n.t(`modules.model_display_name.${MAGNETIC_MODULE_V1}`),
+      name: 'GEN1',
       value: MAGNETIC_MODULE_V1,
     },
     {
-      name: i18n.t(`modules.model_display_name.${MAGNETIC_MODULE_V2}`),
+      name: 'GEN2',
       value: MAGNETIC_MODULE_V2,
     },
   ],
   [TEMPERATURE_MODULE_TYPE]: [
     {
-      name: i18n.t(`modules.model_display_name.${TEMPERATURE_MODULE_V1}`),
+      name: 'GEN1',
       value: TEMPERATURE_MODULE_V1,
     },
     {
-      name: i18n.t(`modules.model_display_name.${TEMPERATURE_MODULE_V2}`),
+      name: 'GEN2',
       value: TEMPERATURE_MODULE_V2,
     },
   ],
   [THERMOCYCLER_MODULE_TYPE]: [
     {
-      name: i18n.t(`modules.model_display_name.${THERMOCYCLER_MODULE_V1}`),
+      name: 'GEN1',
       value: THERMOCYCLER_MODULE_V1,
     },
     {
-      name: i18n.t(`modules.model_display_name.${THERMOCYCLER_MODULE_V2}`),
+      name: 'GEN2',
       value: THERMOCYCLER_MODULE_V2,
     },
   ],
   [HEATERSHAKER_MODULE_TYPE]: [
     {
-      name: i18n.t(`modules.model_display_name.${HEATERSHAKER_MODULE_V1}`),
+      name: 'GEN1',
       value: HEATERSHAKER_MODULE_V1,
     },
   ],
   [MAGNETIC_BLOCK_TYPE]: [
     {
-      name: i18n.t(`modules.model_display_name.${MAGNETIC_BLOCK_V1}`),
+      name: 'GEN1',
       value: MAGNETIC_BLOCK_V1,
     },
   ],
@@ -156,6 +155,3 @@ export const DND_TYPES = {
 // Values for TC fields
 export const THERMOCYCLER_STATE: 'thermocyclerState' = 'thermocyclerState'
 export const THERMOCYCLER_PROFILE: 'thermocyclerProfile' = 'thermocyclerProfile'
-
-export const OT_2_TRASH_DEF_URI = 'opentrons/opentrons_1_trash_1100ml_fixed/1'
-export const FLEX_TRASH_DEF_URI = 'opentrons/opentrons_1_trash_3200ml_fixed/1'

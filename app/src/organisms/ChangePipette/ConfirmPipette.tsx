@@ -125,8 +125,8 @@ export function ConfirmPipette(props: ConfirmPipetteProps): JSX.Element {
     <SimpleWizardBody
       iconColor={
         success || wrongWantedPipette || confirmPipetteLevel
-          ? COLORS.successEnabled
-          : COLORS.errorEnabled
+          ? COLORS.green50
+          : COLORS.red50
       }
       header={header}
       subHeader={subHeader}

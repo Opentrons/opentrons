@@ -15,6 +15,9 @@ from hardware_testing.drivers.radwag.commands import (
     RadwagAmbiant,
 )
 
+from hardware_testing.data import ui
+from serial.tools.list_ports import comports  # type: ignore[import]
+
 
 @dataclass
 class ScaleConfig:
@@ -67,6 +70,21 @@ class Scale:
     @classmethod
     def find_port(cls) -> str:
         """Find port."""
+        ports = comports()
+        assert ports
+        for port in ports:
+            try:
+                ui.print_info(f"Checking port {port.device} for scale")
+                radwag = Scale(scale=RadwagScale.create(port.device))
+                radwag.connect()
+                radwag.initialize()
+                scale_serial = radwag.read_serial_number()
+                radwag.disconnect()
+                ui.print_info(f"found scale {scale_serial} on port {port.device}")
+                return port.device
+            except:  # noqa: E722
+                pass
+        ui.print_info("Unable to find the scale: please connect")
         return list_ports_and_select(device_name="scale")
 
     @property

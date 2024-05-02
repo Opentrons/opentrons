@@ -1,11 +1,14 @@
 import * as React from 'react'
-import { fireEvent } from '@testing-library/react'
-import { renderWithProviders } from '@opentrons/components'
+import { fireEvent, screen } from '@testing-library/react'
+import { describe, it, beforeEach, vi, expect } from 'vitest'
+
 import {
   LEFT,
   NINETY_SIX_CHANNEL,
   SINGLE_MOUNT_PIPETTES,
 } from '@opentrons/shared-data'
+
+import { renderWithProviders } from '../../../__testing-utils__'
 import { i18n } from '../../../i18n'
 import {
   mock96ChannelAttachedPipetteInformation,
@@ -16,12 +19,9 @@ import { RUN_ID_1 } from '../../RunTimeControl/__fixtures__'
 import { FLOWS } from '../constants'
 import { DetachPipette } from '../DetachPipette'
 
-jest.mock('../CheckPipetteButton')
-jest.mock('../../../molecules/InProgressModal/InProgressModal')
+vi.mock('../CheckPipetteButton')
+vi.mock('../../../molecules/InProgressModal/InProgressModal')
 
-const mockInProgressModal = InProgressModal as jest.MockedFunction<
-  typeof InProgressModal
->
 const render = (props: React.ComponentProps<typeof DetachPipette>) => {
   return renderWithProviders(<DetachPipette {...props} />, {
     i18nInstance: i18n,
@@ -34,20 +34,20 @@ describe('DetachPipette', () => {
     props = {
       selectedPipette: SINGLE_MOUNT_PIPETTES,
       mount: LEFT,
-      goBack: jest.fn(),
-      proceed: jest.fn(),
-      chainRunCommands: jest.fn(),
+      goBack: vi.fn(),
+      proceed: vi.fn(),
+      chainRunCommands: vi.fn(),
       maintenanceRunId: RUN_ID_1,
       attachedPipettes: { left: mockAttachedPipetteInformation, right: null },
       flowType: FLOWS.DETACH,
       errorMessage: null,
-      setShowErrorMessage: jest.fn(),
+      setShowErrorMessage: vi.fn(),
       isRobotMoving: false,
       isFetching: false,
-      setFetching: jest.fn(),
+      setFetching: vi.fn(),
       isOnDevice: false,
     }
-    mockInProgressModal.mockReturnValue(<div>mock in progress</div>)
+    vi.mocked(InProgressModal).mockReturnValue(<div>mock in progress</div>)
   })
   it('returns the correct information, buttons work as expected for single mount pipettes', () => {
     const { getByText, getByTestId, getByLabelText } = render(props)
@@ -55,7 +55,9 @@ describe('DetachPipette', () => {
     getByText(
       'Hold the pipette in place and loosen the pipette screws. (The screws are captive and will not come apart from the pipette.) Then carefully remove the pipette.'
     )
-    getByTestId('Pipette_Detach_1_L.webm')
+    getByTestId(
+      '/app/src/assets/videos/pipette-wizard-flows/Pipette_Detach_1_L.webm'
+    )
     getByText('Continue')
     const backBtn = getByLabelText('back')
     fireEvent.click(backBtn)
@@ -66,8 +68,8 @@ describe('DetachPipette', () => {
       ...props,
       isRobotMoving: true,
     }
-    const { getByText } = render(props)
-    getByText('mock in progress')
+    render(props)
+    screen.getByText('mock in progress')
   })
   it('returns the correct information, buttons work as expected for 96 channel pipettes', () => {
     props = {
@@ -79,14 +81,16 @@ describe('DetachPipette', () => {
         right: null,
       },
     }
-    const { getByText, getByTestId, getByLabelText } = render(props)
-    getByText('Loosen screws and detach Flex 96-Channel 1000 μL')
-    getByText(
+    render(props)
+    screen.getByText('Loosen screws and detach Flex 96-Channel 1000 μL')
+    screen.getByText(
       'Hold the pipette in place and loosen the pipette screws. (The screws are captive and will not come apart from the pipette.) Then carefully remove the pipette.'
     )
-    getByTestId('Pipette_Detach_96.webm')
-    getByText('Continue')
-    const backBtn = getByLabelText('back')
+    screen.getByTestId(
+      '/app/src/assets/videos/pipette-wizard-flows/Pipette_Detach_96.webm'
+    )
+    screen.getByText('Continue')
+    const backBtn = screen.getByLabelText('back')
     fireEvent.click(backBtn)
     expect(props.goBack).toHaveBeenCalled()
   })
@@ -96,9 +100,9 @@ describe('DetachPipette', () => {
       selectedPipette: NINETY_SIX_CHANNEL,
       isFetching: true,
     }
-    const { getAllByTestId, getByLabelText } = render(props)
-    getAllByTestId('Skeleton')
-    const backBtn = getByLabelText('back')
+    render(props)
+    screen.getAllByTestId('Skeleton')
+    const backBtn = screen.getByLabelText('back')
     expect(backBtn).toBeDisabled()
   })
   it('returns the correct information, buttons work as expected for 96 channel pipette flow when single mount is attached', () => {
@@ -107,14 +111,16 @@ describe('DetachPipette', () => {
       flowType: FLOWS.ATTACH,
       selectedPipette: NINETY_SIX_CHANNEL,
     }
-    const { getByText, getByTestId, getByLabelText } = render(props)
-    getByText('Loosen screws and detach Flex 1-Channel 1000 μL')
-    getByText(
+    render(props)
+    screen.getByText('Loosen screws and detach Flex 1-Channel 1000 μL')
+    screen.getByText(
       'Hold the pipette in place and loosen the pipette screws. (The screws are captive and will not come apart from the pipette.) Then carefully remove the pipette.'
     )
-    getByTestId('Pipette_Detach_1_L.webm')
-    getByText('Continue')
-    getByLabelText('back').click()
+    screen.getByTestId(
+      '/app/src/assets/videos/pipette-wizard-flows/Pipette_Detach_1_L.webm'
+    )
+    screen.getByText('Continue')
+    fireEvent.click(screen.getByLabelText('back'))
     expect(props.goBack).toHaveBeenCalled()
   })
 })

@@ -1,15 +1,19 @@
 import * as React from 'react'
-import { renderWithProviders } from '@opentrons/components'
-import { TRASH_BIN_LOAD_NAME } from '@opentrons/shared-data'
-import { useUpdateDeckConfigurationMutation } from '@opentrons/react-api-client/src/deck_configuration'
+import { fireEvent } from '@testing-library/react'
+import { describe, it, beforeEach, vi, expect } from 'vitest'
+import { renderWithProviders } from '../../../../../__testing-utils__'
+import { TRASH_BIN_ADAPTER_FIXTURE } from '@opentrons/shared-data'
+import { useUpdateDeckConfigurationMutation } from '@opentrons/react-api-client'
+
 import { i18n } from '../../../../../i18n'
 import { NotConfiguredModal } from '../NotConfiguredModal'
+import { useNotifyDeckConfigurationQuery } from '../../../../../resources/deck_configuration'
 
-jest.mock('@opentrons/react-api-client/src/deck_configuration')
+import type { UseQueryResult } from 'react-query'
+import type { DeckConfiguration } from '@opentrons/shared-data'
 
-const mockUseUpdateDeckConfigurationMutation = useUpdateDeckConfigurationMutation as jest.MockedFunction<
-  typeof useUpdateDeckConfigurationMutation
->
+vi.mock('@opentrons/react-api-client')
+vi.mock('../../../../../resources/deck_configuration')
 
 const render = (props: React.ComponentProps<typeof NotConfiguredModal>) => {
   return renderWithProviders(<NotConfiguredModal {...props} />, {
@@ -19,25 +23,28 @@ const render = (props: React.ComponentProps<typeof NotConfiguredModal>) => {
 
 describe('NotConfiguredModal', () => {
   let props: React.ComponentProps<typeof NotConfiguredModal>
-  const mockUpdate = jest.fn()
+  const mockUpdate = vi.fn()
   beforeEach(() => {
     props = {
-      onCloseClick: jest.fn(),
-      cutout: 'B3',
-      requiredFixture: TRASH_BIN_LOAD_NAME,
+      onCloseClick: vi.fn(),
+      cutoutId: 'cutoutB3',
+      requiredFixtureId: TRASH_BIN_ADAPTER_FIXTURE,
     }
-    mockUseUpdateDeckConfigurationMutation.mockReturnValue({
+    vi.mocked(useUpdateDeckConfigurationMutation).mockReturnValue({
       updateDeckConfiguration: mockUpdate,
     } as any)
+    vi.mocked(useNotifyDeckConfigurationQuery).mockReturnValue(({
+      data: [],
+    } as unknown) as UseQueryResult<DeckConfiguration>)
   })
   it('renders the correct text and button works as expected', () => {
     const { getByText, getByRole } = render(props)
-    getByText('Add Trash Bin to deck configuration')
+    getByText('Add Trash bin to deck configuration')
     getByText(
-      'Add this fixture to your deck configuration. It will be referenced during protocol analysis.'
+      'Add this deck hardware to your deck configuration. It will be referenced during protocol analysis.'
     )
-    getByText('Trash Bin')
-    getByRole('button', { name: 'Add' }).click()
+    getByText('Trash bin')
+    fireEvent.click(getByRole('button', { name: 'Add' }))
     expect(mockUpdate).toHaveBeenCalled()
   })
 })

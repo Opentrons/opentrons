@@ -1,47 +1,55 @@
 import * as React from 'react'
+import { createPortal } from 'react-dom'
 import { Trans, useTranslation } from 'react-i18next'
+import { useUpdateDeckConfigurationMutation } from '@opentrons/react-api-client'
 import {
-  useDeckConfigurationQuery,
-  useUpdateDeckConfigurationMutation,
-} from '@opentrons/react-api-client/src/deck_configuration'
-import {
-  Flex,
+  ALIGN_CENTER,
+  BORDERS,
+  COLORS,
   DIRECTION_COLUMN,
-  TYPOGRAPHY,
-  SPACING,
+  DIRECTION_ROW,
+  Flex,
+  Icon,
+  JUSTIFY_END,
+  JUSTIFY_SPACE_BETWEEN,
   PrimaryButton,
   SecondaryButton,
-  Icon,
-  DIRECTION_ROW,
-  COLORS,
-  JUSTIFY_END,
-  ALIGN_CENTER,
-  Box,
-  JUSTIFY_SPACE_BETWEEN,
-  BORDERS,
+  SPACING,
+  StyledText,
+  TYPOGRAPHY,
 } from '@opentrons/components'
 import {
+  getCutoutDisplayName,
   getFixtureDisplayName,
   getModuleDisplayName,
-  STANDARD_SLOT_LOAD_NAME,
+  THERMOCYCLER_MODULE_V1,
+  THERMOCYCLER_MODULE_V2,
+  getCutoutFixturesForModuleModel,
+  getFixtureIdByCutoutIdFromModuleSlotName,
 } from '@opentrons/shared-data'
-import { Portal } from '../../../../App/portal'
+
+import { getTopPortalEl } from '../../../../App/portal'
 import { LegacyModal } from '../../../../molecules/LegacyModal'
-import { StyledText } from '../../../../atoms/text'
 import { Modal } from '../../../../molecules/Modal'
 import { SmallButton } from '../../../../atoms/buttons/SmallButton'
+import { useNotifyDeckConfigurationQuery } from '../../../../resources/deck_configuration'
 
 import type {
-  Cutout,
-  Fixture,
-  FixtureLoadName,
+  CutoutConfig,
+  CutoutId,
+  CutoutFixtureId,
   ModuleModel,
+  DeckDefinition,
 } from '@opentrons/shared-data'
+import { ChooseModuleToConfigureModal } from './ChooseModuleToConfigureModal'
 
 interface LocationConflictModalProps {
   onCloseClick: () => void
-  cutout: Cutout
-  requiredFixture?: FixtureLoadName
+  cutoutId: CutoutId
+  deckDef: DeckDefinition
+  robotName: string
+  missingLabwareDisplayName?: string | null
+  requiredFixtureId?: CutoutFixtureId
   requiredModule?: ModuleModel
   isOnDevice?: boolean
 }
@@ -51,225 +59,311 @@ export const LocationConflictModal = (
 ): JSX.Element => {
   const {
     onCloseClick,
-    cutout,
-    requiredFixture,
+    cutoutId,
+    robotName,
+    missingLabwareDisplayName,
+    requiredFixtureId,
     requiredModule,
+    deckDef,
     isOnDevice = false,
   } = props
   const { t, i18n } = useTranslation(['protocol_setup', 'shared'])
-  const deckConfig = useDeckConfigurationQuery().data ?? []
+
+  const [showModuleSelect, setShowModuleSelect] = React.useState(false)
+  const deckConfig = useNotifyDeckConfigurationQuery().data ?? []
   const { updateDeckConfiguration } = useUpdateDeckConfigurationMutation()
-  const deckConfigurationAtLocationLoadName = deckConfig.find(
-    (deckFixture: Fixture) => deckFixture.fixtureLocation === cutout
-  )?.loadName
+  const deckConfigurationAtLocationFixtureId = deckConfig.find(
+    (deckFixture: CutoutConfig) => deckFixture.cutoutId === cutoutId
+  )?.cutoutFixtureId
+
+  const isThermocycler =
+    requiredModule === THERMOCYCLER_MODULE_V1 ||
+    requiredModule === THERMOCYCLER_MODULE_V2
+
   const currentFixtureDisplayName =
-    deckConfigurationAtLocationLoadName != null
-      ? getFixtureDisplayName(deckConfigurationAtLocationLoadName)
+    deckConfigurationAtLocationFixtureId != null
+      ? getFixtureDisplayName(deckConfigurationAtLocationFixtureId)
       : ''
 
-  const handleUpdateDeck = (): void => {
-    if (requiredFixture != null) {
-      updateDeckConfiguration({
-        fixtureLocation: cutout,
-        loadName: requiredFixture,
+  // get fixture display name at A1 for themocycler if B1 is slot
+  const deckConfigurationAtA1 = deckConfig.find(
+    (deckFixture: CutoutConfig) => deckFixture.cutoutId === 'cutoutA1'
+  )?.cutoutFixtureId
+
+  const currentThermocyclerFixtureDisplayName =
+    currentFixtureDisplayName === 'Slot' && deckConfigurationAtA1 != null
+      ? getFixtureDisplayName(deckConfigurationAtA1)
+      : currentFixtureDisplayName
+
+  const handleConfigureModule = (moduleSerialNumber?: string): void => {
+    if (requiredModule != null) {
+      const slotName = cutoutId.replace('cutout', '')
+      const moduleFixtures = getCutoutFixturesForModuleModel(
+        requiredModule,
+        deckDef
+      )
+      const moduleFixtureIdByCutoutId = getFixtureIdByCutoutIdFromModuleSlotName(
+        slotName,
+        moduleFixtures,
+        deckDef
+      )
+
+      const newDeckConfig = deckConfig.map(existingCutoutConfig => {
+        const replacementCutoutFixtureId =
+          moduleFixtureIdByCutoutId[existingCutoutConfig.cutoutId]
+        return existingCutoutConfig.cutoutId in moduleFixtureIdByCutoutId &&
+          replacementCutoutFixtureId != null
+          ? {
+              ...existingCutoutConfig,
+              cutoutFixtureId: replacementCutoutFixtureId,
+              opentronsModuleSerialNumber: moduleSerialNumber,
+            }
+          : existingCutoutConfig
       })
-    } else {
-      updateDeckConfiguration({
-        fixtureLocation: cutout,
-        loadName: STANDARD_SLOT_LOAD_NAME,
-      })
+      updateDeckConfiguration(newDeckConfig)
     }
     onCloseClick()
   }
 
-  return (
-    <Portal level="top">
-      {isOnDevice ? (
-        <Modal
-          onOutsideClick={onCloseClick}
-          header={{
-            title: t('deck_conflict'),
-            hasExitIcon: true,
-            onClick: onCloseClick,
-            iconName: 'ot-alert',
-            iconColor: COLORS.warningEnabled,
-          }}
-        >
-          <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing32}>
-            <Trans
-              t={t}
-              i18nKey="deck_conflict_info"
-              values={{
-                currentFixture: currentFixtureDisplayName,
-                cutout,
-              }}
-              components={{
-                block: <StyledText as="p" />,
-                strong: <strong />,
-              }}
-            />
-            <Flex flexDirection={DIRECTION_COLUMN}>
-              <StyledText
-                as="p"
-                fontWeight={TYPOGRAPHY.fontWeightBold}
-                paddingBottom={SPACING.spacing8}
-              >
-                {t('slot_location', { slotName: cutout })}
-              </StyledText>
-              <Flex
-                flexDirection={DIRECTION_COLUMN}
-                paddingTop={SPACING.spacing8}
-                gridGap={SPACING.spacing8}
-              >
-                <Flex
-                  padding={SPACING.spacing24}
-                  backgroundColor={COLORS.light1}
-                  flexDirection={DIRECTION_ROW}
-                  alignItems={ALIGN_CENTER}
-                  justifyContent={JUSTIFY_SPACE_BETWEEN}
-                  borderRadius={BORDERS.borderRadiusSize3}
-                >
-                  <StyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
-                    {t('protocol_specifies')}
-                  </StyledText>
+  const handleUpdateDeck = (): void => {
+    if (requiredModule != null) {
+      setShowModuleSelect(true)
+    } else if (requiredFixtureId != null) {
+      const newRequiredFixtureDeckConfig = deckConfig.map(fixture =>
+        fixture.cutoutId === cutoutId
+          ? {
+              ...fixture,
+              cutoutFixtureId: requiredFixtureId,
+              opentronsModuleSerialNumber: undefined,
+            }
+          : fixture
+      )
+      updateDeckConfiguration(newRequiredFixtureDeckConfig)
+      onCloseClick()
+    } else {
+      onCloseClick()
+    }
+  }
 
-                  <StyledText as="p">
-                    {requiredFixture != null &&
-                      getFixtureDisplayName(requiredFixture)}
-                    {requiredModule != null &&
-                      getModuleDisplayName(requiredModule)}
-                  </StyledText>
-                </Flex>
-                <Flex
-                  padding={SPACING.spacing24}
-                  backgroundColor={COLORS.light1}
-                  flexDirection={DIRECTION_ROW}
-                  justifyContent={JUSTIFY_SPACE_BETWEEN}
-                  alignItems={ALIGN_CENTER}
-                  borderRadius={BORDERS.borderRadiusSize3}
-                >
-                  <StyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
-                    {t('currently_configured')}
-                  </StyledText>
+  let protocolSpecifiesDisplayName = ''
+  if (missingLabwareDisplayName != null) {
+    protocolSpecifiesDisplayName = missingLabwareDisplayName
+  } else if (requiredFixtureId != null) {
+    protocolSpecifiesDisplayName = getFixtureDisplayName(requiredFixtureId)
+  } else if (requiredModule != null) {
+    protocolSpecifiesDisplayName = getModuleDisplayName(requiredModule)
+  }
 
-                  <StyledText as="p">{currentFixtureDisplayName}</StyledText>
-                </Flex>
-              </Flex>
-            </Flex>
-            <Flex
-              flexDirection={DIRECTION_ROW}
-              justifyContent={JUSTIFY_SPACE_BETWEEN}
-              gridGap={SPACING.spacing8}
-            >
-              <SmallButton
-                buttonType="secondary"
-                onClick={onCloseClick}
-                buttonText={i18n.format(t('shared:cancel'), 'capitalize')}
-                width="100%"
-              />
-              <SmallButton
-                onClick={handleUpdateDeck}
-                buttonText={i18n.format(t('confirm_removal'), 'capitalize')}
-                width="100%"
-              />
-            </Flex>
-          </Flex>
-        </Modal>
-      ) : (
-        <LegacyModal
-          title={
-            <Flex
-              flexDirection={DIRECTION_ROW}
-              gridGap={SPACING.spacing10}
-              alignItems={ALIGN_CENTER}
-            >
-              <Icon name="ot-alert" size="1rem" color={COLORS.warningEnabled} />
-              <StyledText as="h3" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
-                {t('deck_conflict')}
-              </StyledText>
-            </Flex>
-          }
-          onClose={onCloseClick}
-          width="27.75rem"
-        >
+  const displaySlotName = isThermocycler
+    ? 'A1 + B1'
+    : getCutoutDisplayName(cutoutId)
+
+  if (showModuleSelect && requiredModule != null) {
+    return createPortal(
+      <ChooseModuleToConfigureModal
+        handleConfigureModule={handleConfigureModule}
+        requiredModuleModel={requiredModule}
+        onCloseClick={onCloseClick}
+        isOnDevice={isOnDevice}
+        deckDef={deckDef}
+        robotName={robotName}
+        displaySlotName={displaySlotName}
+      />,
+      getTopPortalEl()
+    )
+  }
+
+  return createPortal(
+    isOnDevice ? (
+      <Modal
+        onOutsideClick={onCloseClick}
+        header={{
+          title: t('deck_conflict'),
+          hasExitIcon: true,
+          onClick: onCloseClick,
+          iconName: 'ot-alert',
+          iconColor: COLORS.yellow50,
+        }}
+      >
+        <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing32}>
+          <Trans
+            t={t}
+            i18nKey={
+              isThermocycler
+                ? 'deck_conflict_info_thermocycler'
+                : 'deck_conflict_info'
+            }
+            values={{
+              currentFixture: currentFixtureDisplayName,
+              cutout: getCutoutDisplayName(cutoutId),
+            }}
+            components={{
+              block: <StyledText as="p" />,
+              strong: <strong />,
+            }}
+          />
           <Flex flexDirection={DIRECTION_COLUMN}>
-            <Trans
-              t={t}
-              i18nKey="deck_conflict_info"
-              values={{
-                currentFixture: currentFixtureDisplayName,
-                cutout,
-              }}
-              components={{
-                block: <StyledText fontSize={TYPOGRAPHY.fontSizeH4} />,
-                strong: <strong />,
-              }}
-            />
-            <Flex paddingY={SPACING.spacing16} flexDirection={DIRECTION_COLUMN}>
-              <StyledText
-                fontSize={TYPOGRAPHY.fontSizeH4}
-                fontWeight={TYPOGRAPHY.fontWeightBold}
-              >
-                {t('slot_location', { slotName: cutout })}
-              </StyledText>
+            <StyledText
+              as="p"
+              fontWeight={TYPOGRAPHY.fontWeightBold}
+              paddingBottom={SPACING.spacing8}
+            >
+              {t('slot_location', { slotName: displaySlotName })}
+            </StyledText>
+            <Flex
+              flexDirection={DIRECTION_COLUMN}
+              paddingTop={SPACING.spacing8}
+              gridGap={SPACING.spacing8}
+            >
               <Flex
-                flexDirection={DIRECTION_COLUMN}
-                paddingTop={SPACING.spacing8}
-                gridGap={SPACING.spacing8}
+                padding={SPACING.spacing24}
+                backgroundColor={COLORS.grey35}
+                flexDirection={DIRECTION_ROW}
+                alignItems={ALIGN_CENTER}
+                justifyContent={JUSTIFY_SPACE_BETWEEN}
+                borderRadius={BORDERS.borderRadius4}
               >
-                <Flex
-                  padding={SPACING.spacing8}
-                  backgroundColor={COLORS.fundamentalsBackground}
-                  flexDirection={DIRECTION_ROW}
-                  gridGap={SPACING.spacing20}
-                  alignItems={ALIGN_CENTER}
-                >
-                  <Box width="107px">
-                    <StyledText as="label">
-                      {t('protocol_specifies')}
-                    </StyledText>
-                  </Box>
-                  <StyledText as="label">
-                    {requiredFixture != null &&
-                      getFixtureDisplayName(requiredFixture)}
-                    {requiredModule != null &&
-                      getModuleDisplayName(requiredModule)}
-                  </StyledText>
-                </Flex>
-                <Flex
-                  padding={SPACING.spacing8}
-                  backgroundColor={COLORS.fundamentalsBackground}
-                  flexDirection={DIRECTION_ROW}
-                  gridGap={SPACING.spacing20}
-                  alignItems={ALIGN_CENTER}
-                >
-                  <Box width="max-content">
-                    <StyledText as="label">
-                      {t('currently_configured')}
-                    </StyledText>
-                  </Box>
-                  <StyledText as="label">
-                    {currentFixtureDisplayName}
-                  </StyledText>
-                </Flex>
+                <StyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
+                  {t('protocol_specifies')}
+                </StyledText>
+
+                <StyledText as="p" color={COLORS.grey60}>
+                  {protocolSpecifiesDisplayName}
+                </StyledText>
+              </Flex>
+              <Flex
+                padding={SPACING.spacing24}
+                backgroundColor={COLORS.grey35}
+                flexDirection={DIRECTION_ROW}
+                justifyContent={JUSTIFY_SPACE_BETWEEN}
+                alignItems={ALIGN_CENTER}
+                borderRadius={BORDERS.borderRadius4}
+              >
+                <StyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
+                  {t('currently_configured')}
+                </StyledText>
+
+                <StyledText as="p" color={COLORS.grey60}>
+                  {currentFixtureDisplayName}
+                </StyledText>
               </Flex>
             </Flex>
-
-            <Flex
-              flexDirection={DIRECTION_ROW}
-              gridGap={SPACING.spacing8}
-              justifyContent={JUSTIFY_END}
+          </Flex>
+          <Flex
+            flexDirection={DIRECTION_ROW}
+            justifyContent={JUSTIFY_SPACE_BETWEEN}
+            gridGap={SPACING.spacing8}
+          >
+            <SmallButton
+              buttonType="secondary"
+              onClick={onCloseClick}
+              buttonText={i18n.format(t('shared:cancel'), 'capitalize')}
+              width="100%"
+            />
+            <SmallButton
+              onClick={handleUpdateDeck}
+              buttonText={i18n.format(t('update_deck'), 'capitalize')}
+              width="100%"
+            />
+          </Flex>
+        </Flex>
+      </Modal>
+    ) : (
+      <LegacyModal
+        title={
+          <Flex
+            flexDirection={DIRECTION_ROW}
+            gridGap={SPACING.spacing10}
+            alignItems={ALIGN_CENTER}
+          >
+            <Icon name="ot-alert" size="1rem" color={COLORS.yellow50} />
+            <StyledText as="h3" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
+              {t('deck_conflict')}
+            </StyledText>
+          </Flex>
+        }
+        onClose={onCloseClick}
+        width="27.75rem"
+      >
+        <Flex flexDirection={DIRECTION_COLUMN}>
+          <Trans
+            t={t}
+            i18nKey={
+              isThermocycler
+                ? 'deck_conflict_info_thermocycler'
+                : 'deck_conflict_info'
+            }
+            values={{
+              currentFixture: currentFixtureDisplayName,
+              cutout: getCutoutDisplayName(cutoutId),
+            }}
+            components={{
+              block: <StyledText fontSize={TYPOGRAPHY.fontSizeH4} />,
+              strong: <strong />,
+            }}
+          />
+          <Flex paddingY={SPACING.spacing16} flexDirection={DIRECTION_COLUMN}>
+            <StyledText
+              fontSize={TYPOGRAPHY.fontSizeH4}
+              fontWeight={TYPOGRAPHY.fontWeightBold}
             >
-              <SecondaryButton onClick={onCloseClick}>
-                {i18n.format(t('shared:cancel'), 'capitalize')}
-              </SecondaryButton>
-              <PrimaryButton onClick={handleUpdateDeck}>
-                {t('update_deck')}
-              </PrimaryButton>
+              {t('slot_location', { slotName: displaySlotName })}
+            </StyledText>
+            <Flex
+              flexDirection={DIRECTION_COLUMN}
+              paddingTop={SPACING.spacing8}
+              gridGap={SPACING.spacing8}
+            >
+              <Flex
+                padding={SPACING.spacing8}
+                backgroundColor={COLORS.grey20}
+                flexDirection={DIRECTION_ROW}
+                gridGap={SPACING.spacing20}
+                alignItems={ALIGN_CENTER}
+                borderRadius={BORDERS.borderRadius4}
+              >
+                <StyledText as="label" width={SPACING.spacing120}>
+                  {t('protocol_specifies')}
+                </StyledText>
+                <StyledText as="label" flex="1">
+                  {protocolSpecifiesDisplayName}
+                </StyledText>
+              </Flex>
+              <Flex
+                padding={SPACING.spacing8}
+                backgroundColor={COLORS.grey20}
+                flexDirection={DIRECTION_ROW}
+                gridGap={SPACING.spacing20}
+                alignItems={ALIGN_CENTER}
+                borderRadius={BORDERS.borderRadius4}
+              >
+                <StyledText as="label" width={SPACING.spacing120}>
+                  {t('currently_configured')}
+                </StyledText>
+                <StyledText as="label" flex="1">
+                  {isThermocycler
+                    ? currentThermocyclerFixtureDisplayName
+                    : currentFixtureDisplayName}
+                </StyledText>
+              </Flex>
             </Flex>
           </Flex>
-        </LegacyModal>
-      )}
-    </Portal>
+
+          <Flex
+            flexDirection={DIRECTION_ROW}
+            gridGap={SPACING.spacing8}
+            justifyContent={JUSTIFY_END}
+          >
+            <SecondaryButton onClick={onCloseClick}>
+              {i18n.format(t('shared:cancel'), 'capitalize')}
+            </SecondaryButton>
+            <PrimaryButton onClick={handleUpdateDeck}>
+              {t('update_deck')}
+            </PrimaryButton>
+          </Flex>
+        </Flex>
+      </LegacyModal>
+    ),
+    getTopPortalEl()
   )
 }

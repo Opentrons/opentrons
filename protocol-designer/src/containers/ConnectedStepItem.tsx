@@ -24,7 +24,6 @@ import {
   SelectMultipleStepsAction,
 } from '../ui/steps'
 import { selectors as fileDataSelectors } from '../file-data'
-
 import {
   StepItem,
   StepItemContents,
@@ -38,12 +37,17 @@ import {
   ConfirmDeleteModal,
   DeleteModalType,
 } from '../components/modals/ConfirmDeleteModal'
+import {
+  getAdditionalEquipmentEntities,
+  getInitialDeckSetup,
+} from '../step-forms/selectors'
 
-import { SubstepIdentifier } from '../steplist/types'
-import { StepIdType } from '../form-types'
-import { ThunkAction } from '../types'
+import type { ThunkDispatch } from 'redux-thunk'
+import type { SubstepIdentifier } from '../steplist/types'
+import type { StepIdType } from '../form-types'
+import type { BaseState, ThunkAction } from '../types'
 
-interface Props {
+export interface ConnectedStepItemProps {
   stepId: StepIdType
   stepNumber: number
   onStepContextMenu?: () => void
@@ -64,7 +68,9 @@ const getMouseClickKeyInfo = (
   return { isShiftKeyPressed, isMetaKeyPressed }
 }
 
-export const ConnectedStepItem = (props: Props): JSX.Element => {
+export const ConnectedStepItem = (
+  props: ConnectedStepItemProps
+): JSX.Element => {
   const { stepId, stepNumber } = props
 
   const step = useSelector(stepFormSelectors.getSavedStepForms)[stepId]
@@ -82,7 +88,7 @@ export const ConnectedStepItem = (props: Props): JSX.Element => {
 
   const hasWarnings =
     hasTimelineWarningsPerStep[stepId] || hasFormLevelWarningsPerStep[stepId]
-
+  const initialDeckSetup = useSelector(getInitialDeckSetup)
   const collapsed = useSelector(getCollapsedSteps)[stepId]
   const hoveredSubstep = useSelector(getHoveredSubstep)
   const hoveredStep = useSelector(getHoveredStepId)
@@ -101,6 +107,9 @@ export const ConnectedStepItem = (props: Props): JSX.Element => {
   const labwareNicknamesById = useSelector(
     uiLabwareSelectors.getLabwareNicknamesById
   )
+  const additionalEquipmentEntities = useSelector(
+    getAdditionalEquipmentEntities
+  )
   const currentFormIsPresaved = useSelector(
     stepFormSelectors.getCurrentFormIsPresaved
   )
@@ -112,7 +121,7 @@ export const ConnectedStepItem = (props: Props): JSX.Element => {
   )
 
   // Actions
-  const dispatch = useDispatch()
+  const dispatch = useDispatch<ThunkDispatch<BaseState, any, any>>()
 
   const highlightSubstep = (payload: SubstepIdentifier): HoverOnSubstepAction =>
     dispatch(stepsActions.hoverOnSubstep(payload))
@@ -210,11 +219,13 @@ export const ConnectedStepItem = (props: Props): JSX.Element => {
   }
 
   const stepItemContentsProps: StepItemContentsProps = {
+    modules: initialDeckSetup.modules,
     rawForm: step,
     stepType: step.stepType,
     substeps,
     ingredNames,
     labwareNicknamesById,
+    additionalEquipmentEntities,
     highlightSubstep,
     hoveredSubstep,
   }
@@ -228,7 +239,6 @@ export const ConnectedStepItem = (props: Props): JSX.Element => {
       return CLOSE_STEP_FORM_WITH_CHANGES
     }
   }
-
   return (
     <>
       {showConfirmation && (
@@ -239,7 +249,6 @@ export const ConnectedStepItem = (props: Props): JSX.Element => {
         />
       )}
       <StepItem {...stepItemProps} onStepContextMenu={props.onStepContextMenu}>
-        {/* @ts-expect-error(sa, 2021-6-21): StepItemContents might return a list of JSX elements */}
         <StepItemContents {...stepItemContentsProps} />
       </StepItem>
     </>

@@ -6,7 +6,7 @@ reactions in objects that subscribe to the pipeline, like the StateStore.
 from dataclasses import dataclass
 from datetime import datetime
 from enum import Enum
-from typing import Optional, Union
+from typing import List, Optional, Union
 
 from opentrons.protocols.models import LabwareDefinition
 from opentrons.hardware_control.types import DoorState
@@ -15,7 +15,15 @@ from opentrons.hardware_control.modules import LiveData
 from opentrons_shared_data.errors import EnumeratedError
 
 from ..commands import Command, CommandCreate, CommandPrivateResult
-from ..types import LabwareOffsetCreate, ModuleDefinition, Liquid
+from ..error_recovery_policy import ErrorRecoveryType
+from ..notes.notes import CommandNote
+from ..types import (
+    LabwareOffsetCreate,
+    ModuleDefinition,
+    Liquid,
+    DeckConfigurationType,
+    AddressableAreaLocation,
+)
 
 
 @dataclass(frozen=True)
@@ -23,6 +31,7 @@ class PlayAction:
     """Start or resume processing commands in the engine."""
 
     requested_at: datetime
+    deck_configuration: Optional[DeckConfigurationType]
 
 
 class PauseSource(str, Enum):
@@ -46,12 +55,16 @@ class PauseAction:
 
 @dataclass(frozen=True)
 class StopAction:
-    """Stop the current engine execution.
-
-    After a StopAction, the engine status will be marked as stopped.
-    """
+    """Request engine execution to stop soon."""
 
     from_estop: bool = False
+
+
+@dataclass(frozen=True)
+class ResumeFromRecoveryAction:
+    """See `ProtocolEngine.resume_from_recovery()`."""
+
+    pass
 
 
 @dataclass(frozen=True)
@@ -103,13 +116,31 @@ class QueueCommandAction:
     created_at: datetime
     request: CommandCreate
     request_hash: Optional[str]
+    failed_command_id: Optional[str] = None
 
 
 @dataclass(frozen=True)
-class UpdateCommandAction:
-    """Update a given command."""
+class RunCommandAction:
+    """Mark a given command as running.
+
+    At the time of dispatching this action, the command must be queued,
+    and no other command may be running.
+    """
+
+    command_id: str
+    started_at: datetime
+
+
+@dataclass(frozen=True)
+class SucceedCommandAction:
+    """Mark a given command as succeeded.
+
+    At the time of dispatching this action, the command must be running.
+    """
 
     command: Command
+    """The command in its new succeeded state."""
+
     private_result: CommandPrivateResult
 
 
@@ -117,16 +148,36 @@ class UpdateCommandAction:
 class FailCommandAction:
     """Mark a given command as failed.
 
-    The given command and all currently queued commands will be marked
-    as failed due to the given error.
+    At the time of dispatching this action, the command must be running.
     """
 
-    # TODO(mc, 2021-11-12): we'll likely need to add the command params
-    # to this payload for state reaction purposes
     command_id: str
+    """The command to fail."""
+
     error_id: str
+    """An ID to assign to the command's error.
+
+    Must be unique to this occurrence of the error.
+    """
+
     failed_at: datetime
+    """When the command failed."""
+
     error: EnumeratedError
+    """The underlying exception that caused this command to fail."""
+
+    notes: List[CommandNote]
+    """Overwrite the command's `.notes` with these."""
+
+    type: ErrorRecoveryType
+    """How this error should be handled in the context of the overall run."""
+
+    # This is a quick hack so FailCommandAction handlers can get the params of the
+    # command that failed. We probably want this to be a new "failure details"
+    # object instead, similar to how succeeded commands can send a "private result"
+    # to Protocol Engine internals.
+    running_command: Command
+    """The command to fail, in its prior `running` state."""
 
 
 @dataclass(frozen=True)
@@ -150,6 +201,18 @@ class AddLiquidAction:
     """Add a liquid, to apply to subsequent `LoadLiquid`s."""
 
     liquid: Liquid
+
+
+@dataclass(frozen=True)
+class AddAddressableAreaAction:
+    """Add a single addressable area to state.
+
+    This differs from the deck configuration in PlayAction which sends over a mapping of cutout fixtures.
+    This action will only load one addressable area and that should be pre-validated before being sent via
+    the action.
+    """
+
+    addressable_area: AddressableAreaLocation
 
 
 @dataclass(frozen=True)
@@ -184,15 +247,18 @@ Action = Union[
     PlayAction,
     PauseAction,
     StopAction,
+    ResumeFromRecoveryAction,
     FinishAction,
     HardwareStoppedAction,
     DoorChangeAction,
     QueueCommandAction,
-    UpdateCommandAction,
+    RunCommandAction,
+    SucceedCommandAction,
     FailCommandAction,
     AddLabwareOffsetAction,
     AddLabwareDefinitionAction,
     AddModuleAction,
+    AddAddressableAreaAction,
     AddLiquidAction,
     ResetTipsAction,
     SetPipetteMovementSpeedAction,

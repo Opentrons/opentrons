@@ -1,7 +1,9 @@
 import * as React from 'react'
-import { renderWithProviders } from '@opentrons/components'
-import { RobotMotionLoader } from '../RobotMotionLoader'
+import { screen } from '@testing-library/react'
+import { describe, it } from 'vitest'
+import { renderWithProviders } from '../../../__testing-utils__'
 import { i18n } from '../../../i18n'
+import { RobotMotionLoader } from '../RobotMotionLoader'
 
 const mockHeader = 'Stand back, robot needs some space right now'
 
@@ -13,7 +15,7 @@ const render = () => {
 
 describe('Robot in Motion Modal', () => {
   it('should render robot in motion loader with header', () => {
-    const { getByRole } = render()
-    getByRole('heading', { name: mockHeader })
+    render()
+    screen.getByRole('heading', { name: mockHeader })
   })
 })

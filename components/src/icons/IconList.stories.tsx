@@ -74,15 +74,15 @@ const Template: Story<React.ComponentProps<typeof IconComponent>> = args => {
           width="8.75rem"
           flexDirection={DIRECTION_COLUMN}
           alignItems={ALIGN_CENTER}
-          borderRadius={BORDERS.borderRadiusSize3}
+          borderRadius={BORDERS.borderRadius12}
           marginRight={SPACING.spacing8}
           marginBottom={SPACING.spacing8}
           padding={SPACING.spacing16}
           onClick={() => handleCopy(name, index)}
           border={
             selectedIcon === name
-              ? `2px solid ${COLORS.blueEnabled}`
-              : `2px solid ${COLORS.darkBlackEnabled}`
+              ? `2px solid ${COLORS.blue50}`
+              : `2px solid ${COLORS.black90}`
           }
         >
           <IconComponent name={name as IconName} size="4rem" />
@@ -94,9 +94,7 @@ const Template: Story<React.ComponentProps<typeof IconComponent>> = args => {
             {name}
           </Text>
           <Flex height="1.5rem">
-            {showText ? (
-              <Text color={COLORS.blueEnabled}> {'copied'}</Text>
-            ) : null}
+            {showText ? <Text color={COLORS.blue50}> {'copied'}</Text> : null}
           </Flex>
         </Flex>
       ))}
@@ -105,5 +103,5 @@ const Template: Story<React.ComponentProps<typeof IconComponent>> = args => {
 }
 export const IconList = Template.bind({})
 IconList.args = {
-  backgroundColor: COLORS.blueEnabled,
+  backgroundColor: COLORS.blue50,
 }

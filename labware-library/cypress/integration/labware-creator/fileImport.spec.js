@@ -1,8 +1,6 @@
-import jszip from 'jszip'
 import { expectDeepEqual } from '@opentrons/shared-data/js/cypressUtils'
 
 const importedLabwareFile = 'TestLabwareDefinition.json'
-const pythonFileFixture = 'TestLabwareProtocol.py'
 
 context('File Import', () => {
   before(() => {
@@ -14,7 +12,7 @@ context('File Import', () => {
   it('drags in a file', () => {
     cy.fixture(importedLabwareFile, 'utf8').then(fileJson => {
       const fileContent = JSON.stringify(fileJson)
-      cy.get('[class*="_file_drop__"]').upload(
+      cy.get('[class*="file_drop"]').first().upload(
         {
           fileContent,
           fileName: importedLabwareFile,
@@ -24,12 +22,6 @@ context('File Import', () => {
         { subjectType: 'drag-n-drop', force: true }
       )
     })
-  })
-
-  it('contains a button to the testing guide', () => {
-    cy.contains('labware test guide')
-      .should('have.prop', 'href')
-      .and('to.have.string', 'labwareDefinition_testGuide')
   })
 
   it('does has a preview image', () => {
@@ -103,50 +95,26 @@ context('File Import', () => {
     cy.get("input[placeholder='TestPro 15 Well Plate 5 µL']").should('exist')
     cy.get("input[placeholder='testpro_15_wellplate_5ul']").should('exist')
 
-    // Test pipette
-    // TODO(IL, 2021-05-15): give Dropdown component semantic selectors for E2E
-    cy.get('label')
-      .contains('Test Pipette')
-      .children()
-      .first()
-      .trigger('mousedown')
-    cy.get('*[class^="Dropdown__option_label"]')
-      .contains(/P10.*Single-Channel.*GEN1/)
-      .click()
-
     // All fields present
     cy.get('button[class*="_export_button_"]').click({ force: true })
     cy.contains(
       'Please resolve all invalid fields in order to export the labware definition'
     ).should('not.exist')
 
-    cy.window()
-      .its('__lastSavedBlobZip__')
-      .should('be.a', 'blob') // wait until we get the blob
-      .then(blob => jszip.loadAsync(blob)) // load blob into ZipObject
-      .then(zipObject => {
-        const jsonFiles = zipObject.file(/.*\.json$/)
-        expect(jsonFiles).to.have.lengthOf(1)
-        cy.wrap(jsonFiles[0])
-          .invoke('async', 'string')
-          .then(jsonFile => {
-            cy.fixture(importedLabwareFile).then(expected => {
-              // TODO(IL, 2020/04/13): use deep equal util from PD cypress tests
-              expectDeepEqual(assert, JSON.parse(jsonFile), expected)
-            })
-          })
+    cy.fixture(importedLabwareFile).then(expected => {
+      cy.window()
+        .its('__lastSavedFileBlob__')
+        .should('be.a', 'blob') // wait until we get the blob
+        .should(async blob => {
+          const labwareDefText = await blob.text()
+          const savedDef = JSON.parse(labwareDefText)
 
-        const pythonFiles = zipObject.file(/.*\.py$/)
-        expect(pythonFiles).to.have.lengthOf(1)
-        cy.wrap(pythonFiles[0].async('string')).then(contents => {
-          cy.fixture(pythonFileFixture).then(expected => {
-            expect(contents).to.equal(expected)
-          })
+          expectDeepEqual(assert, savedDef, expected)
         })
-      })
+    })
 
     cy.window()
       .its('__lastSavedFileName__')
-      .should('equal', 'testpro_15_wellplate_5ul.zip')
+      .should('equal', 'testpro_15_wellplate_5ul.json')
   })
 })

@@ -7,47 +7,71 @@ import {
   SPACING,
   useHoverTooltip,
   PrimaryButton,
+  DIRECTION_ROW,
+  JUSTIFY_SPACE_BETWEEN,
+  StyledText,
+  TYPOGRAPHY,
 } from '@opentrons/components'
+
 import { useToggleGroup } from '../../../../molecules/ToggleGroup/useToggleGroup'
+import { useDeckConfigurationCompatibility } from '../../../../resources/deck_configuration/hooks'
+import {
+  getIsFixtureMismatch,
+  getRequiredDeckConfig,
+} from '../../../../resources/deck_configuration/utils'
 import { Tooltip } from '../../../../atoms/Tooltip'
 import {
-  useIsFlex,
   useRunHasStarted,
   useUnmatchedModulesForProtocol,
   useModuleCalibrationStatus,
+  useRobotType,
 } from '../../hooks'
 import { SetupModulesMap } from './SetupModulesMap'
 import { SetupModulesList } from './SetupModulesList'
 import { SetupFixtureList } from './SetupFixtureList'
-import type { LoadedFixturesBySlot } from '@opentrons/api-client'
+
+import type {
+  CompletedProtocolAnalysis,
+  ProtocolAnalysisOutput,
+} from '@opentrons/shared-data'
 
 interface SetupModuleAndDeckProps {
   expandLabwarePositionCheckStep: () => void
   robotName: string
   runId: string
-  loadedFixturesBySlot: LoadedFixturesBySlot
   hasModules: boolean
+  protocolAnalysis: CompletedProtocolAnalysis | ProtocolAnalysisOutput | null
 }
 
 export const SetupModuleAndDeck = ({
   expandLabwarePositionCheckStep,
   robotName,
   runId,
-  loadedFixturesBySlot,
   hasModules,
+  protocolAnalysis,
 }: SetupModuleAndDeckProps): JSX.Element => {
-  const { t } = useTranslation('protocol_setup')
+  const { t, i18n } = useTranslation('protocol_setup')
   const [selectedValue, toggleGroup] = useToggleGroup(
     t('list_view'),
     t('map_view')
   )
 
-  const isFlex = useIsFlex(robotName)
+  const robotType = useRobotType(robotName)
   const { missingModuleIds } = useUnmatchedModulesForProtocol(robotName, runId)
   const runHasStarted = useRunHasStarted(runId)
   const [targetProps, tooltipProps] = useHoverTooltip()
 
   const moduleCalibrationStatus = useModuleCalibrationStatus(robotName, runId)
+  const deckConfigCompatibility = useDeckConfigurationCompatibility(
+    robotType,
+    protocolAnalysis
+  )
+
+  const isFixtureMismatch = getIsFixtureMismatch(deckConfigCompatibility)
+
+  const requiredDeckConfigCompatibility = getRequiredDeckConfig(
+    deckConfigCompatibility
+  )
 
   return (
     <>
@@ -55,12 +79,52 @@ export const SetupModuleAndDeck = ({
         {toggleGroup}
         {selectedValue === t('list_view') ? (
           <>
-            {hasModules ? (
-              <SetupModulesList robotName={robotName} runId={runId} />
-            ) : null}
-            {Object.keys(loadedFixturesBySlot).length > 0 && isFlex ? (
-              <SetupFixtureList loadedFixturesBySlot={loadedFixturesBySlot} />
-            ) : null}
+            <Flex
+              flexDirection={DIRECTION_ROW}
+              justifyContent={JUSTIFY_SPACE_BETWEEN}
+              marginTop={SPACING.spacing16}
+              marginLeft={SPACING.spacing20}
+              marginBottom={SPACING.spacing4}
+            >
+              <StyledText
+                css={TYPOGRAPHY.labelSemiBold}
+                marginBottom={SPACING.spacing8}
+                width="45%"
+              >
+                {i18n.format(t('deck_hardware'), 'capitalize')}
+              </StyledText>
+              <StyledText
+                css={TYPOGRAPHY.labelSemiBold}
+                marginRight={SPACING.spacing16}
+                width="15%"
+              >
+                {t('location')}
+              </StyledText>
+              <StyledText
+                css={TYPOGRAPHY.labelSemiBold}
+                marginRight={SPACING.spacing16}
+                width="15%"
+              >
+                {t('status')}
+              </StyledText>
+            </Flex>
+            <Flex
+              flexDirection={DIRECTION_COLUMN}
+              width="100%"
+              overflowY="auto"
+              gridGap={SPACING.spacing4}
+              marginBottom={SPACING.spacing24}
+            >
+              {hasModules ? (
+                <SetupModulesList robotName={robotName} runId={runId} />
+              ) : null}
+              {requiredDeckConfigCompatibility.length > 0 ? (
+                <SetupFixtureList
+                  deckConfigCompatibility={requiredDeckConfigCompatibility}
+                  robotName={robotName}
+                />
+              ) : null}
+            </Flex>
           </>
         ) : (
           <SetupModulesMap runId={runId} />
@@ -70,6 +134,7 @@ export const SetupModuleAndDeck = ({
         <PrimaryButton
           disabled={
             missingModuleIds.length > 0 ||
+            isFixtureMismatch ||
             runHasStarted ||
             !moduleCalibrationStatus.complete
           }

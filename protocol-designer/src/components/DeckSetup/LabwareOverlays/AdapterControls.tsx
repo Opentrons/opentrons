@@ -1,11 +1,9 @@
-import assert from 'assert'
 import * as React from 'react'
-import { DropTarget, DropTargetConnector, DropTargetMonitor } from 'react-dnd'
+import { useDispatch, useSelector } from 'react-redux'
+import { DropTargetMonitor, useDrop } from 'react-dnd'
 import cx from 'classnames'
-import { connect } from 'react-redux'
 import noop from 'lodash/noop'
 import { Icon, RobotCoordsForeignDiv } from '@opentrons/components'
-import { i18n } from '../../../localization'
 import { DND_TYPES } from '../../../constants'
 import {
   getAdapterLabwareIsAMatch,
@@ -16,64 +14,98 @@ import {
   moveDeckItem,
   openAddLabwareModal,
 } from '../../../labware-ingred/actions'
-import {
-  LabwareDefByDefURI,
-  selectors as labwareDefSelectors,
-} from '../../../labware-defs'
+import { selectors as labwareDefSelectors } from '../../../labware-defs'
 import { START_TERMINAL_ITEM_ID, TerminalItemId } from '../../../steplist'
 import { BlockedSlot } from './BlockedSlot'
 
-import type { DeckSlot as DeckSlotDefinition } from '@opentrons/shared-data'
-import type { BaseState, DeckSlot, ThunkDispatch } from '../../../types'
+import type { CoordinateTuple, Dimensions } from '@opentrons/shared-data'
 import type { LabwareOnDeck } from '../../../step-forms'
 
-import styles from './LabwareOverlays.css'
+import styles from './LabwareOverlays.module.css'
 
-interface DNDP {
-  isOver: boolean
-  connectDropTarget: (val: React.ReactNode) => JSX.Element
-  draggedItem: { labwareOnDeck: LabwareOnDeck } | null
-  itemType: string
-}
-
-interface OP {
-  slot: DeckSlotDefinition & { id: DeckSlot }
+interface AdapterControlsProps {
+  slotPosition: CoordinateTuple
+  slotBoundingBox: Dimensions
   //    labwareId is the adapter's labwareId
   labwareId: string
   allLabware: LabwareOnDeck[]
   onDeck: boolean
   selectedTerminalItemId?: TerminalItemId | null
-  handleDragHover?: () => unknown
-}
-interface DP {
-  addLabware: (e: React.MouseEvent<any>) => unknown
-  moveDeckItem: (item1: DeckSlot, item2: DeckSlot) => unknown
-  deleteLabware: () => void
+  handleDragHover?: () => void
 }
 
-interface SP {
-  customLabwareDefs: LabwareDefByDefURI
+interface DroppedItem {
+  labwareOnDeck: LabwareOnDeck
 }
 
-export type SlotControlsProps = OP & DP & DNDP & SP
-
-export const AdapterControlsComponents = (
-  props: SlotControlsProps
+export const AdapterControls = (
+  props: AdapterControlsProps
 ): JSX.Element | null => {
   const {
-    slot,
-    addLabware,
+    slotPosition,
+    slotBoundingBox,
     selectedTerminalItemId,
-    isOver,
-    connectDropTarget,
-    draggedItem,
-    itemType,
-    deleteLabware,
     labwareId,
-    customLabwareDefs,
     onDeck,
+    handleDragHover,
     allLabware,
   } = props
+  const customLabwareDefs = useSelector(
+    labwareDefSelectors.getCustomLabwareDefsByURI
+  )
+  const ref = React.useRef(null)
+  const dispatch = useDispatch()
+
+  const adapterName =
+    allLabware.find(labware => labware.id === labwareId)?.def.metadata
+      .displayName ?? ''
+
+  const [{ itemType, draggedItem, isOver }, drop] = useDrop(
+    () => ({
+      accept: DND_TYPES.LABWARE,
+      canDrop: (item: DroppedItem) => {
+        const draggedDef = item.labwareOnDeck?.def
+        console.assert(
+          draggedDef,
+          'no labware def of dragged item, expected it on drop'
+        )
+
+        if (draggedDef != null) {
+          const isCustomLabware = getLabwareIsCustom(
+            customLabwareDefs,
+            item.labwareOnDeck
+          )
+          return (
+            getAdapterLabwareIsAMatch(
+              labwareId,
+              allLabware,
+              draggedDef.parameters.loadName
+            ) || isCustomLabware
+          )
+        }
+        return true
+      },
+      drop: (item: DroppedItem) => {
+        const droppedLabware = item
+        if (droppedLabware.labwareOnDeck != null) {
+          const droppedSlot = droppedLabware.labwareOnDeck.slot
+          dispatch(moveDeckItem(droppedSlot, labwareId))
+        }
+      },
+      hover: () => {
+        if (handleDragHover != null) {
+          handleDragHover()
+        }
+      },
+      collect: (monitor: DropTargetMonitor) => ({
+        itemType: monitor.getItemType(),
+        isOver: !!monitor.isOver(),
+        draggedItem: monitor.getItem() as DroppedItem,
+      }),
+    }),
+    []
+  )
+
   if (
     selectedTerminalItemId !== START_TERMINAL_ITEM_ID ||
     (itemType !== DND_TYPES.LABWARE && itemType !== null)
@@ -100,22 +132,24 @@ export const AdapterControlsComponents = (
     slotBlocked = 'Labware incompatible with this adapter'
   }
 
-  return connectDropTarget(
-    <g>
+  drop(ref)
+
+  return (
+    <g ref={ref}>
       {slotBlocked ? (
         <BlockedSlot
-          x={slot.position[0]}
-          y={slot.position[1]}
-          width={slot.boundingBox.xDimension}
-          height={slot.boundingBox.yDimension}
+          x={slotPosition[0]}
+          y={slotPosition[1]}
+          width={slotBoundingBox.xDimension}
+          height={slotBoundingBox.yDimension}
           message="LABWARE_INCOMPATIBLE_WITH_ADAPTER"
         />
       ) : (
         <RobotCoordsForeignDiv
-          x={onDeck ? slot.position[0] : 0}
-          y={onDeck ? slot.position[1] : 0}
-          width={slot.boundingBox.xDimension}
-          height={slot.boundingBox.yDimension}
+          x={onDeck ? slotPosition[0] : 0}
+          y={onDeck ? slotPosition[1] : 0}
+          width={slotBoundingBox.xDimension}
+          height={slotBoundingBox.yDimension}
           innerDivProps={{
             className: cx(styles.slot_overlay, styles.appear_on_mouseover, {
               [styles.appear]: isOver,
@@ -123,96 +157,26 @@ export const AdapterControlsComponents = (
             onClick: isOver ? noop : undefined,
           }}
         >
-          <a className={styles.overlay_button} onClick={addLabware}>
+          <a
+            className={styles.overlay_button}
+            onClick={() => dispatch(openAddLabwareModal({ slot: labwareId }))}
+          >
             {!isOver && <Icon className={styles.overlay_icon} name="plus" />}
-            {i18n.t(
-              `deck.overlay.slot.${isOver ? 'place_here' : 'add_labware'}`
-            )}
+            {isOver ? 'Place Here' : 'Add Labware'}
           </a>
-          <a className={styles.overlay_button} onClick={deleteLabware}>
+          <a
+            className={styles.overlay_button}
+            onClick={() => {
+              window.confirm(
+                `"Are you sure you want to remove this ${adapterName}?`
+              ) && dispatch(deleteContainer({ labwareId: labwareId }))
+            }}
+          >
             {!isOver && <Icon className={styles.overlay_icon} name="close" />}
-            {i18n.t('deck.overlay.edit.delete')}
+            {'Delete'}
           </a>
         </RobotCoordsForeignDiv>
       )}
     </g>
   )
 }
-
-const mapStateToProps = (state: BaseState): SP => {
-  return {
-    customLabwareDefs: labwareDefSelectors.getCustomLabwareDefsByURI(state),
-  }
-}
-
-const mapDispatchToProps = (dispatch: ThunkDispatch<any>, ownProps: OP): DP => {
-  const adapterName =
-    ownProps.allLabware.find(labware => labware.id === ownProps.labwareId)?.def
-      .metadata.displayName ?? ''
-
-  return {
-    addLabware: () =>
-      dispatch(openAddLabwareModal({ slot: ownProps.labwareId })),
-    moveDeckItem: (sourceSlot, destSlot) =>
-      dispatch(moveDeckItem(sourceSlot, destSlot)),
-    deleteLabware: () => {
-      window.confirm(
-        i18n.t('deck.warning.cancelForSure', { adapterName: adapterName })
-      ) && dispatch(deleteContainer({ labwareId: ownProps.labwareId }))
-    },
-  }
-}
-
-const slotTarget = {
-  drop: (props: SlotControlsProps, monitor: DropTargetMonitor) => {
-    const draggedItem = monitor.getItem()
-    if (draggedItem) {
-      props.moveDeckItem(draggedItem.labwareOnDeck.slot, props.labwareId)
-    }
-  },
-  hover: (props: SlotControlsProps) => {
-    if (props.handleDragHover) {
-      props.handleDragHover()
-    }
-  },
-  canDrop: (props: SlotControlsProps, monitor: DropTargetMonitor) => {
-    const draggedItem = monitor.getItem()
-    const draggedDef = draggedItem?.labwareOnDeck?.def
-    assert(draggedDef, 'no labware def of dragged item, expected it on drop')
-
-    if (draggedDef != null) {
-      const isCustomLabware = getLabwareIsCustom(
-        props.customLabwareDefs,
-        draggedItem.labwareOnDeck
-      )
-      return (
-        getAdapterLabwareIsAMatch(
-          props.labwareId,
-          props.allLabware,
-          draggedDef.parameters.loadName
-        ) || isCustomLabware
-      )
-    }
-    return true
-  },
-}
-const collectSlotTarget = (
-  connect: DropTargetConnector,
-  monitor: DropTargetMonitor
-): React.ReactNode => ({
-  connectDropTarget: connect.dropTarget(),
-  isOver: monitor.isOver(),
-  draggedItem: monitor.getItem(),
-  itemType: monitor.getItemType(),
-})
-
-export const AdapterControls = connect(
-  mapStateToProps,
-  mapDispatchToProps
-)(
-  DropTarget(
-    DND_TYPES.LABWARE,
-    slotTarget,
-    collectSlotTarget
-  )(AdapterControlsComponents)
-)

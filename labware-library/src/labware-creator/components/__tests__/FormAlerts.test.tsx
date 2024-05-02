@@ -1,5 +1,7 @@
 import * as React from 'react'
-import { render } from '@testing-library/react'
+import { vi, describe, it, expect, afterEach } from 'vitest'
+import { when } from 'vitest-when'
+import { render, screen } from '@testing-library/react'
 import { getIsHidden } from '../../formSelectors'
 import {
   IRREGULAR_LABWARE_ERROR,
@@ -8,25 +10,21 @@ import {
   LABWARE_TOO_LARGE_ERROR,
 } from '../../fields'
 import { FormAlerts, Props as FormAlertProps } from '../alerts/FormAlerts'
-import { when, resetAllWhenMocks } from 'jest-when'
 
-jest.mock('../../formSelectors')
-
-const getIsHiddenMock = getIsHidden as jest.MockedFunction<typeof getIsHidden>
+vi.mock('../../formSelectors')
 
 describe('FormAlerts', () => {
   afterEach(() => {
-    jest.restoreAllMocks()
-    resetAllWhenMocks()
+    vi.restoreAllMocks()
   })
   it('should render a warning when an input is not valid', () => {
-    when(getIsHiddenMock)
+    when(vi.mocked(getIsHidden))
       .calledWith('labwareType', {} as any)
-      .mockReturnValue(false)
+      .thenReturn(false)
 
-    when(getIsHiddenMock)
+    when(vi.mocked(getIsHidden))
       .calledWith('tubeRackInsertLoadName', {} as any)
-      .mockReturnValue(false)
+      .thenReturn(false)
 
     const props: FormAlertProps = {
       values: { labwareType: 'wellPlate', tubeRackInsertLoadName: null } as any,
@@ -37,18 +35,18 @@ describe('FormAlerts', () => {
       },
     }
 
-    const { container } = render(<FormAlerts {...props} />)
-    const warning = container.querySelector('[class="alert warning"]')
-    expect(warning?.textContent).toBe('some warning')
+    render(<FormAlerts {...props} />)
+    const alertItem = screen.getByTestId('alert_item_title')
+    expect(alertItem).toHaveTextContent('some warning')
   })
   it('should render an incompatible labware error when the labware is not compatible with labware creator', () => {
-    when(getIsHiddenMock)
+    when(vi.mocked(getIsHidden))
       .calledWith('labwareType', {} as any)
-      .mockReturnValue(false)
+      .thenReturn(false)
 
-    when(getIsHiddenMock)
+    when(vi.mocked(getIsHidden))
       .calledWith('tubeRackInsertLoadName', {} as any)
-      .mockReturnValue(false)
+      .thenReturn(false)
 
     const props: FormAlertProps = {
       values: { labwareType: 'wellPlate', tubeRackInsertLoadName: null } as any,
@@ -59,20 +57,20 @@ describe('FormAlerts', () => {
       },
     }
 
-    const { container } = render(<FormAlerts {...props} />)
-    const error = container.querySelector('[class="alert error"]')
-    expect(error?.textContent).toBe(
+    render(<FormAlerts {...props} />)
+    const alertItem = screen.getByTestId('alert_item_title')
+    expect(alertItem).toHaveTextContent(
       'Your labware is not compatible with the Labware Creator. Please fill out this form to request a custom labware definition.'
     )
   })
 
   it('should render a loose tip fit error when hand placed fit is loose', () => {
-    when(getIsHiddenMock)
+    when(vi.mocked(getIsHidden))
       .calledWith('labwareType', {} as any)
-      .mockReturnValue(false)
-    when(getIsHiddenMock)
+      .thenReturn(false)
+    when(vi.mocked(getIsHidden))
       .calledWith('tubeRackInsertLoadName', {} as any)
-      .mockReturnValue(false)
+      .thenReturn(false)
 
     const props: FormAlertProps = {
       values: { labwareType: 'wellPlate', tubeRackInsertLoadName: null } as any,
@@ -83,20 +81,20 @@ describe('FormAlerts', () => {
       },
     }
 
-    const { container } = render(<FormAlerts {...props} />)
-    const error = container.querySelector('[class="alert error"]')
-    expect(error?.textContent).toBe(
+    render(<FormAlerts {...props} />)
+    const alertItem = screen.getByTestId('alert_item_title')
+    expect(alertItem).toHaveTextContent(
       'If your tip does not fit when placed by hand then it is not a good candidate for this pipette on the OT-2.'
     )
   })
 
   it('should render labware too small error when labware footprint is too small', () => {
-    when(getIsHiddenMock)
+    when(vi.mocked(getIsHidden))
       .calledWith('labwareType', {} as any)
-      .mockReturnValue(false)
-    when(getIsHiddenMock)
+      .thenReturn(false)
+    when(vi.mocked(getIsHidden))
       .calledWith('tubeRackInsertLoadName', {} as any)
-      .mockReturnValue(false)
+      .thenReturn(false)
 
     const props: FormAlertProps = {
       values: { labwareType: 'wellPlate', tubeRackInsertLoadName: null } as any,
@@ -107,20 +105,20 @@ describe('FormAlerts', () => {
       },
     }
 
-    const { container } = render(<FormAlerts {...props} />)
-    const error = container.querySelector('[class="alert error"]')
-    expect(error?.textContent).toBe(
+    render(<FormAlerts {...props} />)
+    const alertItem = screen.getByTestId('alert_item_title')
+    expect(alertItem).toHaveTextContent(
       'Your labware is too small to fit in a slot properly. Please fill out this form to request an adapter.'
     )
   })
 
   it('should render labware too large error when labware footprint is too large', () => {
-    when(getIsHiddenMock)
+    when(vi.mocked(getIsHidden))
       .calledWith('labwareType', {} as any)
-      .mockReturnValue(false)
-    when(getIsHiddenMock)
+      .thenReturn(false)
+    when(vi.mocked(getIsHidden))
       .calledWith('tubeRackInsertLoadName', {} as any)
-      .mockReturnValue(false)
+      .thenReturn(false)
 
     const props: FormAlertProps = {
       values: { labwareType: 'wellPlate', tubeRackInsertLoadName: null } as any,
@@ -131,9 +129,9 @@ describe('FormAlerts', () => {
       },
     }
 
-    const { container } = render(<FormAlerts {...props} />)
-    const error = container.querySelector('[class="alert error"]')
-    expect(error?.textContent).toBe(
+    render(<FormAlerts {...props} />)
+    const alertItem = screen.getByTestId('alert_item_title')
+    expect(alertItem).toHaveTextContent(
       'Your labware is too large to fit in a single slot properly. Please fill out this form to request a custom labware definition.'
     )
   })

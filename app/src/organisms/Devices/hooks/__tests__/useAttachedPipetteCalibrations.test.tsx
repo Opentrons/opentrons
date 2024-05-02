@@ -1,8 +1,9 @@
 import * as React from 'react'
-import { when, resetAllWhenMocks } from 'jest-when'
+import { when } from 'vitest-when'
+import { vi, it, expect, describe, beforeEach } from 'vitest'
 import { Provider } from 'react-redux'
 import { createStore, Store } from 'redux'
-import { renderHook } from '@testing-library/react-hooks'
+import { renderHook } from '@testing-library/react'
 import { QueryClient, QueryClientProvider } from 'react-query'
 import {
   useAllPipetteOffsetCalibrationsQuery,
@@ -20,23 +21,14 @@ import {
 } from '../../../../redux/calibration/tip-length/__fixtures__'
 
 import { useAttachedPipetteCalibrations } from '..'
+import type { State } from '../../../../redux/types'
 
-jest.mock('@opentrons/react-api-client')
-jest.mock('../../../../redux/calibration')
-jest.mock('../../../../redux/pipettes')
-jest.mock('../../../../redux/robot-api')
+vi.mock('@opentrons/react-api-client')
+vi.mock('../../../../redux/calibration')
+vi.mock('../../../../redux/pipettes')
+vi.mock('../../../../redux/robot-api')
 
-const mockUsePipettesQuery = usePipettesQuery as jest.MockedFunction<
-  typeof usePipettesQuery
->
-const mockUseAllPipetteOffsetCalibrationsQuery = useAllPipetteOffsetCalibrationsQuery as jest.MockedFunction<
-  typeof useAllPipetteOffsetCalibrationsQuery
->
-const mockUseAllTipLengthCalibrationsQuery = useAllTipLengthCalibrationsQuery as jest.MockedFunction<
-  typeof useAllTipLengthCalibrationsQuery
->
-
-const store: Store<any> = createStore(jest.fn(), {})
+const store: Store<State> = createStore(state => state, {})
 
 const PIPETTE_CALIBRATIONS = {
   left: {
@@ -50,7 +42,7 @@ const PIPETTE_CALIBRATIONS = {
 }
 
 describe('useAttachedPipetteCalibrations hook', () => {
-  let wrapper: React.FunctionComponent<{}>
+  let wrapper: React.FunctionComponent<{ children: React.ReactNode }>
   beforeEach(() => {
     const queryClient = new QueryClient()
     wrapper = ({ children }) => (
@@ -61,15 +53,11 @@ describe('useAttachedPipetteCalibrations hook', () => {
       </Provider>
     )
   })
-  afterEach(() => {
-    resetAllWhenMocks()
-    jest.resetAllMocks()
-  })
 
   it('returns attached pipette calibrations when given a robot name', () => {
-    when(mockUsePipettesQuery)
+    when(vi.mocked(usePipettesQuery))
       .calledWith({}, {})
-      .mockReturnValue({
+      .thenReturn({
         data: {
           left: {
             id: mockPipetteOffsetCalibration1.pipette,
@@ -89,16 +77,16 @@ describe('useAttachedPipetteCalibrations hook', () => {
           },
         },
       } as any)
-    when(mockUseAllPipetteOffsetCalibrationsQuery)
+    when(vi.mocked(useAllPipetteOffsetCalibrationsQuery))
       .calledWith()
-      .mockReturnValue({
+      .thenReturn({
         data: {
           data: [mockPipetteOffsetCalibration1, mockPipetteOffsetCalibration2],
         },
       } as any)
-    when(mockUseAllTipLengthCalibrationsQuery)
+    when(vi.mocked(useAllTipLengthCalibrationsQuery))
       .calledWith()
-      .mockReturnValue({
+      .thenReturn({
         data: {
           data: [mockTipLengthCalibration1, mockTipLengthCalibration2],
         },

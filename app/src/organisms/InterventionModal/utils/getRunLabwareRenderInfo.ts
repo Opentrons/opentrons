@@ -1,4 +1,7 @@
-import { getSlotHasMatingSurfaceUnitVector } from '@opentrons/shared-data'
+import {
+  getPositionFromSlotId,
+  getSlotHasMatingSurfaceUnitVector,
+} from '@opentrons/shared-data'
 
 import type { RunData } from '@opentrons/api-client'
 import type {
@@ -40,19 +43,18 @@ export function getRunLabwareRenderInfo(
           'addressableAreaName' in location
             ? location.addressableAreaName
             : location.slotName
-        const slotPosition =
-          deckDef.locations.orderedSlots.find(slot => slot.id === slotName)
-            ?.position ?? []
+        const slotPosition = getPositionFromSlotId(slotName, deckDef)
         const slotHasMatingSurfaceVector = getSlotHasMatingSurfaceUnitVector(
           deckDef,
           slotName
         )
+
         return slotHasMatingSurfaceVector
           ? [
               ...acc,
               {
-                x: slotPosition[0] ?? 0,
-                y: slotPosition[1] ?? 0,
+                x: slotPosition?.[0] ?? 0,
+                y: slotPosition?.[1] ?? 0,
                 labwareId: labware.id,
                 labwareDef,
               },

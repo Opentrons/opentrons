@@ -1,6 +1,7 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { useHistory } from 'react-router-dom'
+import { useSelector } from 'react-redux'
 
 import { RUN_STATUS_STOPPED } from '@opentrons/api-client'
 import {
@@ -9,18 +10,19 @@ import {
   DIRECTION_ROW,
   Flex,
   SPACING,
+  StyledText,
 } from '@opentrons/components'
 import {
   useStopRunMutation,
   useDismissCurrentRunMutation,
 } from '@opentrons/react-api-client'
 
-import { StyledText } from '../../../atoms/text'
 import { SmallButton } from '../../../atoms/buttons'
 import { Modal } from '../../../molecules/Modal'
 import { useTrackProtocolRunEvent } from '../../../organisms/Devices/hooks'
 import { useRunStatus } from '../../../organisms/RunTimeControl/hooks'
-import { ANALYTICS_PROTOCOL_RUN_CANCEL } from '../../../redux/analytics'
+import { ANALYTICS_PROTOCOL_RUN_ACTION } from '../../../redux/analytics'
+import { getLocalRobot } from '../../../redux/discovery'
 import { CancelingRunModal } from './CancelingRunModal'
 
 import type { ModalHeaderBaseProps } from '../../../molecules/Modal/types'
@@ -45,7 +47,9 @@ export function ConfirmCancelRunModal({
     isLoading: isDismissing,
   } = useDismissCurrentRunMutation()
   const runStatus = useRunStatus(runId)
-  const { trackProtocolRunEvent } = useTrackProtocolRunEvent(runId)
+  const localRobot = useSelector(getLocalRobot)
+  const robotName = localRobot?.name ?? ''
+  const { trackProtocolRunEvent } = useTrackProtocolRunEvent(runId, robotName)
   const history = useHistory()
   const [isCanceling, setIsCanceling] = React.useState(false)
 
@@ -53,7 +57,7 @@ export function ConfirmCancelRunModal({
     title: t('cancel_run_modal_heading'),
     hasExitIcon: false,
     iconName: 'ot-alert',
-    iconColor: COLORS.yellow2,
+    iconColor: COLORS.yellow50,
   }
 
   const handleCancelRun = (): void => {
@@ -67,7 +71,7 @@ export function ConfirmCancelRunModal({
 
   React.useEffect(() => {
     if (runStatus === RUN_STATUS_STOPPED) {
-      trackProtocolRunEvent({ name: ANALYTICS_PROTOCOL_RUN_CANCEL })
+      trackProtocolRunEvent({ name: ANALYTICS_PROTOCOL_RUN_ACTION.CANCEL })
       dismissCurrentRun(runId)
       if (!isActiveRun) {
         if (protocolId != null) {
@@ -94,7 +98,7 @@ export function ConfirmCancelRunModal({
           paddingBottom={SPACING.spacing32}
           paddingTop={`${isActiveRun ? SPACING.spacing32 : '0'}`}
         >
-          <StyledText as="p">{t('cancel_run_alert_info')}</StyledText>
+          <StyledText as="p">{t('cancel_run_alert_info_flex')}</StyledText>
           <StyledText as="p">{t('cancel_run_module_info')}</StyledText>
         </Flex>
         <Flex

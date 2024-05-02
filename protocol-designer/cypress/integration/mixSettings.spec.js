@@ -10,7 +10,6 @@ function importProtocol() {
       mimeType: 'application/json',
       encoding: 'utf8',
     })
-    cy.get('[data-test="ComputingSpinner"]').should('exist')
     cy.get('div')
       .contains(
         'Your protocol will be automatically updated to the latest version.'
@@ -60,7 +59,7 @@ describe('Advanced Settings for Mix Form', () => {
     cy.get('input[name="aspirate_flowRate"]').should('be.disabled')
 
     // TipPosition Aspirate should be disabled
-    cy.get('[id=TipPositionField_mix_mmFromBottom]').should('be.disabled')
+    cy.get('[id=TipPositionIcon_mix_mmFromBottom]').should('not.be.enabled')
 
     // Dispense Flowrate disbled
     cy.get('input[name="dispense_flowRate"]').should('be.disabled')
@@ -92,7 +91,7 @@ describe('Advanced Settings for Mix Form', () => {
     cy.get('input[name="dispense_flowRate"]').should('be.enabled')
 
     // TipPosition Aspirate should be enabled
-    cy.get('[id=TipPositionField_mix_mmFromBottom]').should('be.enabled')
+    cy.get('[id=TipPositionIcon_mix_mmFromBottom]').should('not.be.disabled')
 
     // Delay in aspirate and Dispense settings is enabled
     cy.get('input[name="aspirate_delay_checkbox"]').should('be.enabled')
@@ -125,8 +124,8 @@ describe('Advanced Settings for Mix Form', () => {
     cy.get('[data-test="StepItem_2"]').click(batchEditClickOptions)
     cy.get('input[name="aspirate_flowRate"]').click({ force: true })
 
-    cy.get('div[class*=FlowRateInput__description]').contains(
-      'Our default aspirate speed is optimal for a P1000 Single-Channel GEN2 aspirating liquids with a viscosity similar to water'
+    cy.contains(
+      'The default P1000 Single-Channel GEN2 flow rate is optimal for handling aqueous liquids'
     )
     cy.get('input[name="aspirate_flowRate_customFlowRate"]').type('100')
     cy.get('button').contains('Done').click()
@@ -144,8 +143,8 @@ describe('Advanced Settings for Mix Form', () => {
   it('verify functionality of flowrate in batch edit mix form', () => {
     // Batch editing the Flowrate value
     cy.get('input[name="aspirate_flowRate"]').click({ force: true })
-    cy.get('div[class*=FlowRateInput__description]').contains(
-      'Our default aspirate speed is optimal for a P1000 Single-Channel GEN2 aspirating liquids with a viscosity similar to water'
+    cy.contains(
+      'The default P1000 Single-Channel GEN2 flow rate is optimal for handling aqueous liquids'
     )
     cy.get('input[name="aspirate_flowRate_customFlowRate"]').type('100')
     cy.get('button').contains('Done').click()
@@ -310,24 +309,24 @@ describe('Advanced Settings for Mix Form', () => {
     // Exit batch edit mode
     cy.get('button').contains('exit batch edit').click()
 
-    // Click on step 2 to verify that blowout has trash selected
+    // Click on step 2 to verify that blowout has dest well selected
     cy.get('[data-test="StepItem_2"]').click()
     cy.get('button[id="AspDispSection_settings_button_aspirate"]').click()
 
-    // Verify trash is selected
+    // Verify dest well is selected
     cy.get('[id=BlowoutLocationField_dropdown]').should($input => {
       const value = $input.val()
-      const expectedSubstring = 'opentrons/opentrons_1_trash_1100ml_fixed/1'
+      const expectedSubstring = 'trashBin'
       expect(value).to.include(expectedSubstring)
     })
     // Click on step 3 to verify the batch editing
     cy.get('[data-test="StepItem_3"]').click()
     cy.get('button[id="AspDispSection_settings_button_aspirate"]').click()
 
-    // Verify that trash is selected for the blowout option
+    // Verify that dest well is selected for the blowout option
     cy.get('[id=BlowoutLocationField_dropdown]').should($input => {
       const value = $input.val()
-      const expectedSubstring = 'opentrons/opentrons_1_trash_1100ml_fixed/1'
+      const expectedSubstring = 'trashBin'
       expect(value).to.include(expectedSubstring)
     })
   })

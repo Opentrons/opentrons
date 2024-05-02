@@ -1,13 +1,13 @@
 import * as React from 'react'
 import {
   ALIGN_CENTER,
+  COLORS,
   DIRECTION_ROW,
   Flex,
   JUSTIFY_SPACE_BETWEEN,
-  COLORS,
   SPACING,
+  StyledText,
 } from '@opentrons/components'
-import { StyledText } from '../../../atoms/text'
 
 export interface LabeledValueProps {
   label: string
@@ -22,7 +22,7 @@ export function LabeledValue({ label, value }: LabeledValueProps): JSX.Element {
       alignItems={ALIGN_CENTER}
       paddingY={SPACING.spacing8}
     >
-      <StyledText as="h6" color={COLORS.darkGreyEnabled}>
+      <StyledText as="h6" color={COLORS.grey60}>
         {label}
       </StyledText>
       <StyledText as="p">{value}</StyledText>

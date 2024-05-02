@@ -1,31 +1,25 @@
 import * as React from 'react'
-import { connect } from 'react-redux'
-import { selectors, Page } from '../navigation'
+import { useSelector } from 'react-redux'
+import { selectors } from '../navigation'
 import { selectors as labwareIngredSelectors } from '../labware-ingred/selectors'
 
-import { ConnectedStepList } from './ConnectedStepList'
-import { IngredientsList } from './IngredientsList'
-import { FileSidebar } from '../components/FileSidebar'
+import { StepList } from '../components/steplist'
+import { FileSidebar } from '../components/FileSidebar/FileSidebar'
 import { LiquidsSidebar } from '../components/LiquidsSidebar'
 import { SettingsSidebar } from '../components/SettingsPage'
+import { IngredientsList } from '../components/IngredientsList'
 
-import { BaseState } from '../types'
-
-interface Props {
-  page: Page
-  liquidPlacementMode: boolean
-}
-
-function Sidebar(props: Props): JSX.Element | null {
-  switch (props.page) {
+export function Sidebar(): JSX.Element | null {
+  const page = useSelector(selectors.getCurrentPage)
+  const selectedLabware = useSelector(
+    labwareIngredSelectors.getSelectedLabwareId
+  )
+  const liquidPlacementMode = selectedLabware != null
+  switch (page) {
     case 'liquids':
       return <LiquidsSidebar />
     case 'steplist':
-      return props.liquidPlacementMode ? (
-        <IngredientsList />
-      ) : (
-        <ConnectedStepList />
-      )
+      return liquidPlacementMode ? <IngredientsList /> : <StepList />
     case 'file-splash':
     case 'file-detail':
       return <FileSidebar />
@@ -35,16 +29,3 @@ function Sidebar(props: Props): JSX.Element | null {
   }
   return null
 }
-
-function mapStateToProps(state: BaseState): Props {
-  const page = selectors.getCurrentPage(state)
-  const liquidPlacementMode =
-    labwareIngredSelectors.getSelectedLabwareId(state) != null
-
-  return {
-    page,
-    liquidPlacementMode,
-  }
-}
-
-export const ConnectedSidebar = connect(mapStateToProps)(Sidebar)

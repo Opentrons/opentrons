@@ -36,6 +36,7 @@ from opentrons.hardware_control import (
     ThreadManager,
     ThreadManagedHardware,
 )
+from opentrons.hardware_control.types import HardwareFeatureFlags
 
 from opentrons.hardware_control.simulator_setup import load_simulator
 from opentrons.protocol_api.core.engine import ENGINE_CORE_API_VERSION
@@ -53,7 +54,7 @@ from opentrons.protocols.execution import execute
 from opentrons.legacy_broker import LegacyBroker
 from opentrons.config import IS_ROBOT
 from opentrons import protocol_api
-from opentrons.commands import types as command_types
+from opentrons.legacy_commands import types as command_types
 
 from opentrons.protocols import parse, bundle
 from opentrons.protocols.types import (
@@ -65,7 +66,7 @@ from opentrons.protocols.types import (
 from opentrons.protocols.api_support.deck_type import (
     for_simulation as deck_type_for_simulation,
     should_load_fixed_trash,
-    should_load_fixed_trash_for_python_protocol,
+    should_load_fixed_trash_labware_for_python_protocol,
 )
 from opentrons.protocols.api_support.types import APIVersion
 from opentrons_shared_data.labware.labware_definition import LabwareDefinition
@@ -113,7 +114,7 @@ This should match what `opentrons.protocols.parse()` accepts in a protocol's `re
 
 
 # TODO(mm, 2023-10-05): Type _SimulateResultRunLog more precisely by using TypedDicts from
-# opentrons.commands.
+# opentrons.legacy_commands.
 _SimulateResultRunLog = List[Mapping[str, Any]]
 _SimulateResult = Tuple[_SimulateResultRunLog, Optional[BundleContents]]
 
@@ -189,12 +190,12 @@ class _CommandScraper:
             #
             # TODO(mm, 2023-10-03): This is a bit too intrusive for something whose job is just to
             # "scrape." The entry point function should be responsible for setting the underlying
-            # logger's level.
+            # logger's level. Also, we should probably restore the original level when we're done.
             level = getattr(logging, self._level.upper(), logging.WARNING)
             self._logger.setLevel(level)
 
             log_handler: Optional[_AccumulatingHandler] = _AccumulatingHandler(
-                level, log_queue
+                self._level.upper(), log_queue
             )
         else:
             log_handler = None
@@ -222,6 +223,7 @@ def get_protocol_api(
     # type checking, like Jupyter Notebook.
     *,
     robot_type: Optional[_UserSpecifiedRobotType] = None,
+    use_virtual_hardware: bool = True,
 ) -> protocol_api.ProtocolContext:
     """
     Build and return a ``protocol_api.ProtocolContext``
@@ -259,6 +261,7 @@ def get_protocol_api(
     :param robot_type: The type of robot to simulate: either ``"Flex"`` or ``"OT-2"``.
                        If you're running this function on a robot, the default is the type of that
                        robot. Otherwise, the default is ``"OT-2"``, for backwards compatibility.
+    :param use_virtual_hardware: If true, use the protocol engines virtual hardware, if false use the lower level hardware simulator.
     :return: The protocol context.
     """
     if isinstance(version, str):
@@ -316,6 +319,7 @@ def get_protocol_api(
             hardware_api=checked_hardware,
             bundled_data=bundled_data,
             extra_labware=extra_labware,
+            use_virtual_hardware=use_virtual_hardware,
         )
 
     # Intentional difference from execute.get_protocol_api():
@@ -335,9 +339,15 @@ def _make_hardware_simulator(
         # Local import because this isn't available on OT-2s.
         from opentrons.hardware_control.ot3api import OT3API
 
-        return ThreadManager(OT3API.build_hardware_simulator)
+        return ThreadManager(
+            OT3API.build_hardware_simulator,
+            feature_flags=HardwareFeatureFlags.build_from_ff(),
+        )
     elif robot_type == "OT-2 Standard":
-        return ThreadManager(OT2API.build_hardware_simulator)
+        return ThreadManager(
+            OT2API.build_hardware_simulator,
+            feature_flags=HardwareFeatureFlags.build_from_ff(),
+        )
 
 
 @contextmanager
@@ -446,7 +456,7 @@ def simulate(
 
         - ``payload``: The command. The human-readable run log text is available at
           ``payload["text"]``. The other keys of ``payload`` are command-dependent;
-          see ``opentrons.commands``.
+          see ``opentrons.legacy_commands``.
 
           .. note::
             In older software versions, ``payload["text"]`` was a
@@ -783,6 +793,7 @@ def _create_live_context_pe(
     deck_type: str,
     extra_labware: Dict[str, "LabwareDefinitionDict"],
     bundled_data: Optional[Dict[str, bytes]],
+    use_virtual_hardware: bool = True,
 ) -> ProtocolContext:
     """Return a live ProtocolContext that controls the robot through ProtocolEngine."""
     assert api_version >= ENGINE_CORE_API_VERSION
@@ -791,10 +802,14 @@ def _create_live_context_pe(
     pe, loop = _LIVE_PROTOCOL_ENGINE_CONTEXTS.enter_context(
         create_protocol_engine_in_thread(
             hardware_api=hardware_api.wrapped(),
-            config=_get_protocol_engine_config(robot_type),
+            config=_get_protocol_engine_config(
+                robot_type, virtual=use_virtual_hardware
+            ),
             drop_tips_after_run=False,
             post_run_hardware_state=PostRunHardwareState.STAY_ENGAGED_IN_PLACE,
-            load_fixed_trash=should_load_fixed_trash_for_python_protocol(api_version),
+            load_fixed_trash=should_load_fixed_trash_labware_for_python_protocol(
+                api_version
+            ),
         )
     )
 
@@ -857,7 +872,9 @@ def _run_file_non_pe(
     context.home()
     with scraper.scrape():
         try:
-            execute.run_protocol(protocol, context)
+            # TODO (spp, 2024-03-18): use true run-time param overrides once enabled
+            #  for cli protocol simulation/ execution
+            execute.run_protocol(protocol, context, run_time_param_overrides=None)
             if (
                 isinstance(protocol, PythonProtocol)
                 and protocol.api_level >= APIVersion(2, 0)
@@ -888,7 +905,7 @@ def _run_file_pe(
     async def run(protocol_source: ProtocolSource) -> _SimulateResult:
         protocol_engine = await create_protocol_engine(
             hardware_api=hardware_api.wrapped(),
-            config=_get_protocol_engine_config(robot_type),
+            config=_get_protocol_engine_config(robot_type, virtual=True),
             load_fixed_trash=should_load_fixed_trash(protocol_source.config),
         )
 
@@ -900,7 +917,12 @@ def _run_file_pe(
 
         scraper = _CommandScraper(stack_logger, log_level, protocol_runner.broker)
         with scraper.scrape():
-            result = await protocol_runner.run(protocol_source)
+            result = await protocol_runner.run(
+                # deck_configuration=[] is a placeholder value, ignored because
+                # the Protocol Engine config specifies use_simulated_deck_config=True.
+                deck_configuration=[],
+                protocol_source=protocol_source,
+            )
 
         if result.state_summary.status != EngineStatus.SUCCEEDED:
             raise entrypoint_util.ProtocolEngineExecuteError(
@@ -918,15 +940,16 @@ def _run_file_pe(
         return asyncio.run(run(protocol_source))
 
 
-def _get_protocol_engine_config(robot_type: RobotType) -> Config:
+def _get_protocol_engine_config(robot_type: RobotType, virtual: bool) -> Config:
     """Return a Protocol Engine config to execute protocols on this device."""
     return Config(
         robot_type=robot_type,
         deck_type=DeckType(deck_type_for_simulation(robot_type)),
         ignore_pause=True,
-        use_virtual_pipettes=True,
-        use_virtual_modules=True,
-        use_virtual_gripper=True,
+        use_virtual_pipettes=virtual,
+        use_virtual_modules=virtual,
+        use_virtual_gripper=virtual,
+        use_simulated_deck_config=True,
     )
 
 

@@ -3,12 +3,12 @@ import { useSelector } from 'react-redux'
 import { DropdownField, Options } from '@opentrons/components'
 import cx from 'classnames'
 import { selectors as uiLabwareSelectors } from '../../../ui/labware'
-import styles from '../StepEditForm.css'
+import styles from '../StepEditForm.module.css'
 import { FieldProps } from '../types'
 
 type BlowoutLocationDropdownProps = FieldProps & {
-  className?: string
   options: Options
+  className?: string
 }
 
 export const BlowoutLocationField = (
@@ -23,14 +23,12 @@ export const BlowoutLocationField = (
     value,
   } = props
 
-  const disposalLabwareOptions = useSelector(
-    uiLabwareSelectors.getDisposalLabwareOptions
-  )
-  const options = [...disposalLabwareOptions, ...props.options]
+  const disposalOptions = useSelector(uiLabwareSelectors.getDisposalOptions)
+  const options = [...disposalOptions, ...props.options]
 
   return (
     <DropdownField
-      className={cx(styles.large_field, className)}
+      className={cx(styles.small_field, className)}
       options={options}
       disabled={disabled}
       id={'BlowoutLocationField_dropdown'}

@@ -2,12 +2,15 @@
 import pytest
 from decoy import Decoy
 
-from robot_server.protocols import ProtocolStore
+from robot_server.protocols.protocol_store import ProtocolStore
 from robot_server.runs.run_auto_deleter import RunAutoDeleter
 from robot_server.runs.run_store import RunStore
 from robot_server.runs.engine_store import EngineStore
 from robot_server.runs.run_data_manager import RunDataManager
-from robot_server.maintenance_runs import MaintenanceEngineStore
+from robot_server.maintenance_runs.maintenance_engine_store import (
+    MaintenanceEngineStore,
+)
+from robot_server.deck_configuration.store import DeckConfigurationStore
 
 from opentrons.protocol_engine import ProtocolEngine
 
@@ -52,3 +55,9 @@ def mock_run_auto_deleter(decoy: Decoy) -> RunAutoDeleter:
 def mock_maintenance_engine_store(decoy: Decoy) -> MaintenanceEngineStore:
     """Get a mock MaintenanceEngineStore interface."""
     return decoy.mock(cls=MaintenanceEngineStore)
+
+
+@pytest.fixture
+def mock_deck_configuration_store(decoy: Decoy) -> DeckConfigurationStore:
+    """Get a mock DeckConfigurationStore."""
+    return decoy.mock(cls=DeckConfigurationStore)

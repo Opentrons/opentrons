@@ -460,27 +460,30 @@
     "displayName": "Flex 1-Channel 50 μL",
     "displayCategory": "FLEX",
     "defaultAspirateFlowRate": {
-      "value": 7.85,
+      "value": 35,
       "min": 3,
       "max": 812,
       "valuesByApiLevel": {
-        "2.0": 7.85
+        "2.0": 7.85,
+        "2.14": 35
       }
     },
     "defaultDispenseFlowRate": {
-      "value": 7.85,
+      "value": 57,
       "min": 3,
       "max": 812,
       "valuesByApiLevel": {
-        "2.0": 7.85
+        "2.0": 7.85,
+        "2.14": 57
       }
     },
     "defaultBlowOutFlowRate": {
-      "value": 7.85,
+      "value": 57,
       "min": 3,
       "max": 812,
       "valuesByApiLevel": {
-        "2.0": 7.85
+        "2.0": 7.85,
+        "2.14": 57
       }
     },
     "channels": 1,
@@ -502,30 +505,33 @@
     "displayName": "Flex 1-Channel 1000 μL",
     "displayCategory": "FLEX",
     "defaultAspirateFlowRate": {
-      "value": 137.35,
+      "value": 478,
       "min": 3,
       "max": 812,
       "valuesByApiLevel": {
         "2.0": 137.35,
-        "2.6": 274.7
+        "2.6": 274.7,
+        "2.14": 478
       }
     },
     "defaultDispenseFlowRate": {
-      "value": 137.35,
+      "value": 478,
       "min": 3,
       "max": 812,
       "valuesByApiLevel": {
         "2.0": 137.35,
-        "2.6": 274.7
+        "2.6": 274.7,
+        "2.14": 478
       }
     },
     "defaultBlowOutFlowRate": {
-      "value": 137.35,
+      "value": 478,
       "min": 3,
       "max": 812,
       "valuesByApiLevel": {
         "2.0": 137.35,
-        "2.6": 274.7
+        "2.6": 274.7,
+        "2.14": 478
       }
     },
     "channels": 1,
@@ -549,28 +555,31 @@
     "displayName": "Flex 8-Channel 1000 μL",
     "displayCategory": "FLEX",
     "defaultAspirateFlowRate": {
-      "value": 159.04,
+      "value": 478,
       "min": 3,
       "max": 812,
       "valuesByApiLevel": {
         "2.0": 159.04,
-        "2.6": 159.04
+        "2.6": 159.04,
+        "2.14": 478
       }
     },
     "defaultDispenseFlowRate": {
-      "value": 159.04,
+      "value": 478,
       "min": 3,
       "max": 812,
       "valuesByApiLevel": {
-        "2.0": 159.04
+        "2.0": 159.04,
+        "2.14": 478
       }
     },
     "defaultBlowOutFlowRate": {
-      "value": 78.52,
+      "value": 478,
       "min": 3,
       "max": 812,
       "valuesByApiLevel": {
-        "2.0": 78.52
+        "2.0": 78.52,
+        "2.14": 478
       }
     },
     "channels": 8,
@@ -594,27 +603,30 @@
     "displayName": "Flex 8-Channel 50 μL",
     "displayCategory": "FLEX",
     "defaultAspirateFlowRate": {
-      "value": 7.85,
+      "value": 35,
       "min": 3,
       "max": 812,
       "valuesByApiLevel": {
-        "2.0": 7.85
+        "2.0": 7.85,
+        "2.14": 35
       }
     },
     "defaultDispenseFlowRate": {
-      "value": 7.85,
+      "value": 57,
       "min": 3,
       "max": 812,
       "valuesByApiLevel": {
-        "2.0": 7.85
+        "2.0": 7.85,
+        "2.14": 57
       }
     },
     "defaultBlowOutFlowRate": {
-      "value": 7.85,
+      "value": 57,
       "min": 3,
       "max": 812,
       "valuesByApiLevel": {
-        "2.0": 7.85
+        "2.0": 7.85,
+        "2.14": 57
       }
     },
     "channels": 8,
@@ -636,27 +648,30 @@
     "displayName": "Flex 96-Channel 1000 μL",
     "displayCategory": "GEN1",
     "defaultAspirateFlowRate": {
-      "value": 7.85,
+      "value": 6,
       "min": 3,
       "max": 812,
       "valuesByApiLevel": {
-        "2.0": 7.85
+        "2.0": 7.85,
+        "2.14": 6
       }
     },
     "defaultDispenseFlowRate": {
-      "value": 7.85,
+      "value": 6,
       "min": 3,
       "max": 812,
       "valuesByApiLevel": {
-        "2.0": 7.85
+        "2.0": 7.85,
+        "2.14": 6
       }
     },
     "defaultBlowOutFlowRate": {
-      "value": 7.85,
+      "value": 80,
       "min": 3,
       "max": 812,
       "valuesByApiLevel": {
-        "2.0": 7.85
+        "2.0": 7.85,
+        "2.14": 80
       }
     },
     "channels": 96,

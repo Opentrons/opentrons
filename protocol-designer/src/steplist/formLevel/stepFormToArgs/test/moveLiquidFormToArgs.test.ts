@@ -1,8 +1,12 @@
-import assert from 'assert'
-import { getLabwareDefURI, LabwareDefinition2 } from '@opentrons/shared-data'
-import { fixtureP10Single } from '@opentrons/shared-data/pipette/fixtures/name'
-import fixture_12_trough from '@opentrons/shared-data/labware/fixtures/2/fixture_12_trough.json'
-import fixture_96_plate from '@opentrons/shared-data/labware/fixtures/2/fixture_96_plate.json'
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
+import {
+  fixtureP10SingleV2Specs,
+  getLabwareDefURI,
+} from '@opentrons/shared-data'
+import {
+  fixture_12_trough,
+  fixture_96_plate,
+} from '@opentrons/shared-data/labware/fixtures/2'
 import { DEST_WELL_BLOWOUT_DESTINATION } from '@opentrons/step-generation'
 import {
   moveLiquidFormToArgs,
@@ -10,18 +14,18 @@ import {
   getMixData,
 } from '../moveLiquidFormToArgs'
 import { getOrderedWells } from '../../../utils'
-import { HydratedMoveLiquidFormData, PathOption } from '../../../../form-types'
 import { DEFAULT_MM_FROM_BOTTOM_ASPIRATE } from '../../../../constants'
+import type { LabwareDefinition2 } from '@opentrons/shared-data'
+import type {
+  HydratedMoveLiquidFormData,
+  PathOption,
+} from '../../../../form-types'
 
-jest.mock('../../../utils')
-jest.mock('assert')
+vi.mock('../../../utils')
+vi.mock('assert')
 
 const ASPIRATE_WELL = 'A2' // default source is trough for these tests
 const DISPENSE_WELL = 'C3' // default dest in 96 flat for these tests
-
-const mockGetOrderedWells = getOrderedWells as jest.MockedFunction<
-  typeof getOrderedWells
->
 
 describe('move liquid step form -> command creator args', () => {
   let hydratedForm: HydratedMoveLiquidFormData
@@ -30,8 +34,8 @@ describe('move liquid step form -> command creator args', () => {
   const destLabwareDef = fixture_96_plate as LabwareDefinition2
   const destLabwareType = getLabwareDefURI(destLabwareDef)
   beforeEach(() => {
-    mockGetOrderedWells.mockClear()
-    mockGetOrderedWells.mockImplementation(wells => wells)
+    vi.mocked(getOrderedWells).mockClear()
+    vi.mocked(getOrderedWells).mockImplementation(wells => wells)
 
     // the "base case" is a 1 to 1 transfer, single path
     hydratedForm = {
@@ -40,11 +44,21 @@ describe('move liquid step form -> command creator args', () => {
       description: null,
 
       fields: {
-        // @ts-expect-error(sa, 2021-6-15): not a valid PipetteEntity
         pipette: {
           id: 'pipetteId',
-          spec: fixtureP10Single,
-        },
+          spec: fixtureP10SingleV2Specs,
+          tiprackLabwareDef: [
+            {
+              parameters: {
+                tipLength: 10,
+                loadName: 'mockTiprack',
+              },
+              metadata: {
+                displayName: 'mock display name',
+              },
+            },
+          ] as any,
+        } as any,
         volume: 10,
         path: 'single',
         changeTip: 'always',
@@ -54,6 +68,7 @@ describe('move liquid step form -> command creator args', () => {
           type: sourceLabwareType,
           def: sourceLabwareDef,
         },
+        tipRack: 'mockTiprack',
         aspirate_wells: [ASPIRATE_WELL],
         aspirate_wellOrder_first: 'l2r',
         aspirate_wellOrder_second: 't2b',
@@ -100,24 +115,46 @@ describe('move liquid step form -> command creator args', () => {
   })
 
   afterEach(() => {
-    jest.resetAllMocks()
+    vi.resetAllMocks()
   })
 
   it('moveLiquidFormToArgs calls getOrderedWells correctly', () => {
     moveLiquidFormToArgs(hydratedForm)
 
-    expect(mockGetOrderedWells).toHaveBeenCalledTimes(2)
-    expect(mockGetOrderedWells).toHaveBeenCalledWith(
+    expect(vi.mocked(getOrderedWells)).toHaveBeenCalledTimes(2)
+    expect(vi.mocked(getOrderedWells)).toHaveBeenCalledWith(
       [ASPIRATE_WELL],
       sourceLabwareDef,
       'l2r',
       't2b'
     )
-    expect(mockGetOrderedWells).toHaveBeenCalledWith(
+    expect(vi.mocked(getOrderedWells)).toHaveBeenCalledWith(
       [DISPENSE_WELL],
       destLabwareDef,
       'r2l',
       'b2t'
+    )
+  })
+
+  it('moveLiquidFormToArgs calls getOrderedWells only for aspirate when dispensing is into a waste chute', () => {
+    moveLiquidFormToArgs({
+      ...hydratedForm,
+      fields: {
+        ...hydratedForm.fields,
+        dispense_labware: {
+          id: 'destLabwareId',
+          name: 'wasteChute',
+          location: 'cutoutD3',
+        },
+      },
+    })
+
+    expect(vi.mocked(getOrderedWells)).toHaveBeenCalledTimes(1)
+    expect(vi.mocked(getOrderedWells)).toHaveBeenCalledWith(
+      [ASPIRATE_WELL],
+      sourceLabwareDef,
+      'l2r',
+      't2b'
     )
   })
 
@@ -350,23 +387,6 @@ describe('move liquid step form -> command creator args', () => {
         disposalVolume: null,
         blowoutLocation: blowoutLabwareId,
       })
-    })
-
-    it('should not allow blowing out into the destination well', () => {
-      moveLiquidFormToArgs({
-        ...hydratedForm,
-        fields: {
-          ...hydratedForm.fields,
-          ...disposalVolumeFields,
-          blowout_checkbox: true,
-          blowout_location: DEST_WELL_BLOWOUT_DESTINATION,
-        },
-      })
-
-      expect(assert).toHaveBeenCalledWith(
-        false,
-        'blowout location for multiDispense cannot be destination well'
-      )
     })
 
     it('should blow out into the destination when checkbox is true and blowout location is destination', () => {

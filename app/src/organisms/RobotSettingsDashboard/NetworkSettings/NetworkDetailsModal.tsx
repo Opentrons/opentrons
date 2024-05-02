@@ -2,18 +2,18 @@ import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 
 import {
-  Flex,
-  SPACING,
-  TYPOGRAPHY,
+  ALIGN_CENTER,
+  BORDERS,
   COLORS,
   DIRECTION_COLUMN,
   DIRECTION_ROW,
-  ALIGN_CENTER,
+  Flex,
   JUSTIFY_SPACE_BETWEEN,
-  BORDERS,
+  SPACING,
+  StyledText,
+  TYPOGRAPHY,
 } from '@opentrons/components'
 
-import { StyledText } from '../../../atoms/text'
 import { Modal } from '../../../molecules/Modal'
 
 import type { ModalHeaderBaseProps } from '../../../molecules/Modal/types'
@@ -41,7 +41,7 @@ export function NetworkDetailsModal({
     title: securityType != null ? networkName : t('ethernet'),
     hasExitIcon: true,
     iconName: securityType != null ? 'wifi' : 'ethernet',
-    iconColor: COLORS.darkBlackEnabled,
+    iconColor: COLORS.black90,
   }
 
   return (
@@ -76,9 +76,9 @@ function ListItem({ itemName, itemValue }: ListItemProps): JSX.Element {
       flexDirection={DIRECTION_ROW}
       alignItems={ALIGN_CENTER}
       padding={`${SPACING.spacing16} ${SPACING.spacing24}`}
-      backgroundColor={COLORS.grey3}
+      backgroundColor={COLORS.grey40}
       justifyContent={JUSTIFY_SPACE_BETWEEN}
-      borderRadius={BORDERS.borderRadiusSize3}
+      borderRadius={BORDERS.borderRadius8}
     >
       <StyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
         {itemName}

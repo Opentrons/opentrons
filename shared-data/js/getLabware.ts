@@ -1,7 +1,4 @@
-import assert from 'assert'
 import mapValues from 'lodash/mapValues'
-// TODO: Ian 2019-06-04 remove the shared-data build process for labware v1
-import definitions from '../build/labware.json'
 
 import {
   FIXED_TRASH_RENDER_HEIGHT,
@@ -14,11 +11,6 @@ import type {
   LabwareDefinition2,
   WellDefinition,
 } from './types'
-
-assert(
-  definitions && Object.keys(definitions).length > 0,
-  'Expected v1 labware defs. Something went wrong with shared-data/build/labware.json'
-)
 
 // do not list in any "available labware" UI.
 // TODO(mc, 2019-12-3): how should this correspond to RETIRED_LABWARE?
@@ -61,15 +53,6 @@ export const PD_DO_NOT_LIST = [
   'opentrons_96_aluminumblock_biorad_wellplate_200ul',
   'opentrons_96_aluminumblock_nest_wellplate_100ul',
 ]
-
-export function getLabwareV1Def(
-  labwareName: string
-): LabwareDefinition1 | null | undefined {
-  const labware: LabwareDefinition1 | null | undefined =
-    // @ts-expect-error(mc, 2021-04-27): make lookup more strict or remove v1 defs entirely
-    definitions[labwareName]
-  return labware
-}
 
 export function getIsLabwareV1Tiprack(def: LabwareDefinition1): boolean {
   return Boolean(def?.metadata?.isTiprack)

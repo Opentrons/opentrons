@@ -17,12 +17,11 @@ import {
   Link,
   PrimaryButton,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
-import { useAllRunsQuery } from '@opentrons/react-api-client'
 
 import { Slideout } from '../../../../../atoms/Slideout'
-import { StyledText } from '../../../../../atoms/text'
 import { Divider } from '../../../../../atoms/structure'
 import { UNREACHABLE } from '../../../../../redux/discovery'
 import {
@@ -40,6 +39,7 @@ import {
   useTipLengthCalibrations,
   useRobot,
 } from '../../../hooks'
+import { useNotifyAllRunsQuery } from '../../../../../resources/runs'
 
 import type { State, Dispatch } from '../../../../../redux/types'
 import type { ResetConfigRequest } from '../../../../../redux/robot-admin/types'
@@ -63,7 +63,7 @@ export function DeviceResetSlideout({
   const robot = useRobot(robotName)
   const dispatch = useDispatch<Dispatch>()
   const [resetOptions, setResetOptions] = React.useState<ResetConfigRequest>({})
-  const runsQueryResponse = useAllRunsQuery()
+  const runsQueryResponse = useNotifyAllRunsQuery()
   const isFlex = useIsFlex(robotName)
 
   // Calibration data
@@ -168,17 +168,16 @@ export function DeviceResetSlideout({
         <Flex
           flexDirection={DIRECTION_ROW}
           alignItems={ALIGN_CENTER}
-          backgroundColor={COLORS.warningBackgroundLight}
-          borderRadius={BORDERS.borderRadiusSize1}
+          backgroundColor={COLORS.yellow30}
+          borderRadius={BORDERS.borderRadius4}
           padding={SPACING.spacing8}
-          border={`1px solid ${COLORS.warningEnabled}`}
           marginBottom={SPACING.spacing24}
         >
           <Icon
             name="alert-circle"
             size="1rem"
             marginRight={SPACING.spacing8}
-            color={COLORS.warningEnabled}
+            color={COLORS.yellow60}
           />
           <StyledText as="p">{t('resets_cannot_be_undone')}</StyledText>
         </Flex>

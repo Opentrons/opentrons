@@ -2,20 +2,20 @@ import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 
 import {
-  Flex,
-  Icon,
   ALIGN_CENTER,
-  DIRECTION_COLUMN,
-  DIRECTION_ROW,
-  JUSTIFY_SPACE_BETWEEN,
-  SIZE_1,
   BORDERS,
   COLORS,
+  DIRECTION_COLUMN,
+  DIRECTION_ROW,
+  Flex,
+  Icon,
+  JUSTIFY_SPACE_BETWEEN,
+  SIZE_1,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
-import { StyledText } from '../../../atoms/text'
 import { useRunHasStarted } from '../hooks'
 import { formatTimestamp } from '../utils'
 
@@ -54,8 +54,8 @@ export function SetupCalibrationItem({
   ) : null
   return (
     <Flex
-      backgroundColor={COLORS.fundamentalsBackground}
-      borderRadius={BORDERS.radiusSoftCorners}
+      backgroundColor={COLORS.grey10}
+      borderRadius={BORDERS.borderRadius4}
       flexDirection={DIRECTION_ROW}
       justifyContent={JUSTIFY_SPACE_BETWEEN}
       minHeight="2.5rem" // 40px
@@ -66,11 +66,7 @@ export function SetupCalibrationItem({
           {!runHasStarted ? (
             <Icon
               size={SIZE_1}
-              color={
-                calibratedDate != null
-                  ? COLORS.successEnabled
-                  : COLORS.warningEnabled
-              }
+              color={calibratedDate != null ? COLORS.green50 : COLORS.yellow50}
               marginRight={SPACING.spacing16}
               name={calibratedDate != null ? 'ot-check' : 'alert-circle'}
             />
@@ -78,7 +74,7 @@ export function SetupCalibrationItem({
           <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
             {label != null && (
               <StyledText
-                color={COLORS.darkGreyEnabled}
+                color={COLORS.grey60}
                 css={TYPOGRAPHY.h6SemiBold}
                 textTransform={TYPOGRAPHY.textTransformUppercase}
                 id={id}
@@ -87,11 +83,11 @@ export function SetupCalibrationItem({
               </StyledText>
             )}
             {title != null && (
-              <StyledText as="p" color={COLORS.darkBlackEnabled} id={id}>
+              <StyledText as="p" color={COLORS.black90} id={id}>
                 {title}
               </StyledText>
             )}
-            <StyledText as="label" color={COLORS.darkGreyEnabled}>
+            <StyledText as="label" color={COLORS.grey60}>
               {calibrationDataNotAvailableText ?? subText ?? calibratedText}
             </StyledText>
           </Flex>

@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { createPortal } from 'react-dom'
 import { useSelector } from 'react-redux'
 
 import {
@@ -9,13 +10,13 @@ import {
   getRobotUpdateAvailable,
 } from '../../../../redux/robot-update'
 import { getAvailableShellUpdate } from '../../../../redux/shell'
-import { Portal } from '../../../../App/portal'
+import { getModalPortalEl } from '../../../../App/portal'
 import { UpdateAppModal } from '../../../../organisms/UpdateAppModal'
 import { MigrationWarningModal } from './MigrationWarningModal'
 import { UpdateRobotModal } from './UpdateRobotModal'
 
 import type { State } from '../../../../redux/types'
-import { ReachableRobot, Robot } from '../../../../redux/discovery/types'
+import type { ReachableRobot, Robot } from '../../../../redux/discovery/types'
 
 export interface ViewUpdateModalProps {
   robotName: string
@@ -27,6 +28,7 @@ export function ViewUpdateModal(
   props: ViewUpdateModalProps
 ): JSX.Element | null {
   const { robotName, robot, closeModal } = props
+  const [showAppUpdateModal, setShowAppUpdateModal] = React.useState(true)
 
   const updateInfo = useSelector((state: State) =>
     getRobotUpdateInfo(state, robotName)
@@ -38,7 +40,9 @@ export function ViewUpdateModal(
     getRobotUpdateAvailable(state, robot)
   )
   const robotSystemType = getRobotSystemType(robot)
-  const availableAppUpdateVersion = useSelector(getAvailableShellUpdate)
+  const availableAppUpdateVersion = Boolean(
+    useSelector(getAvailableShellUpdate)
+  )
 
   const [
     showMigrationWarning,
@@ -51,13 +55,12 @@ export function ViewUpdateModal(
   }
 
   let releaseNotes = ''
-  if (updateInfo?.releaseNotes) releaseNotes = updateInfo.releaseNotes
+  if (updateInfo?.releaseNotes != null) releaseNotes = updateInfo.releaseNotes
 
-  if (availableAppUpdateVersion)
-    return (
-      <Portal>
-        <UpdateAppModal closeModal={close} />
-      </Portal>
+  if (availableAppUpdateVersion && showAppUpdateModal)
+    return createPortal(
+      <UpdateAppModal closeModal={() => setShowAppUpdateModal(false)} />,
+      getModalPortalEl()
     )
 
   if (showMigrationWarning) {

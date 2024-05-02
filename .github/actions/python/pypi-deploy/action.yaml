@@ -28,7 +28,7 @@ runs:
           fi
         fi
         status=0
-        QUIET=1 BUILD_NUMBER=${OT_BUILD} make -C ${{ inputs.project }} clean deploy twine_repository_url=${{ inputs.repository_url }} pypi_username=opentrons pypi_password=${{ inputs.password }} || status=$?
+        CI=1 QUIET=1 BUILD_NUMBER=${OT_BUILD} make -C ${{ inputs.project }} clean deploy twine_repository_url=${{ inputs.repository_url }} pypi_username=__token__ pypi_password=${{ inputs.password }} || status=$?
         if [[ ${status} != 0 ]] && [[ ${{ inputs.repository_url }} =~ "test.pypi.org" ]]; then
           echo "upload failures allowed to test pypi"
           exit 0

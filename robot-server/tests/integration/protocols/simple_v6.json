@@ -1285,15 +1285,6 @@
       }
     },
     {
-      "commandType": "loadLabware",
-      "params": {
-        "labwareId": "fixedTrash",
-        "location": {
-          "slotName": "12"
-        }
-      }
-    },
-    {
       "commandType": "loadLiquid",
       "params": {
         "liquidId": "waterId",

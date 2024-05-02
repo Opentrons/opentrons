@@ -8,15 +8,15 @@ import {
   DIRECTION_ROW,
   Flex,
   SPACING,
+  StyledText,
 } from '@opentrons/components'
 
-import { StyledText } from '../../atoms/text'
 import { SmallButton } from '../../atoms/buttons'
 import { Modal } from '../../molecules/Modal'
 import { restartRobot } from '../../redux/robot-admin'
 
-import { Dispatch } from '../../redux/types'
-import { ModalHeaderBaseProps } from '../../molecules/Modal/types'
+import type { Dispatch } from '../../redux/types'
+import type { ModalHeaderBaseProps } from '../../molecules/Modal/types'
 
 interface RestartRobotConfirmationModalProps {
   robotName: string
@@ -32,7 +32,7 @@ export function RestartRobotConfirmationModal({
   const modalHeader: ModalHeaderBaseProps = {
     title: t('restart_now'),
     iconName: 'ot-alert',
-    iconColor: COLORS.yellow2,
+    iconColor: COLORS.yellow50,
   }
   const dispatch = useDispatch<Dispatch>()
 

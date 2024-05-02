@@ -1,22 +1,22 @@
 import { useSelector } from 'react-redux'
 import {
-  Flex,
-  Btn,
-  TYPOGRAPHY,
-  JUSTIFY_SPACE_BETWEEN,
-  SPACING,
-  COLORS,
-  RESPONSIVENESS,
-  PrimaryButton,
-  ALIGN_FLEX_END,
   ALIGN_CENTER,
+  ALIGN_FLEX_END,
+  Btn,
+  COLORS,
+  Flex,
+  JUSTIFY_SPACE_BETWEEN,
+  PrimaryButton,
+  RESPONSIVENESS,
+  SPACING,
+  StyledText,
+  TYPOGRAPHY,
 } from '@opentrons/components'
 import { useInstrumentsQuery } from '@opentrons/react-api-client'
 import { css } from 'styled-components'
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { getIsOnDevice } from '../../redux/config'
-import { StyledText } from '../../atoms/text'
 import { SmallButton } from '../../atoms/buttons'
 import { GenericWizardTile } from '../../molecules/GenericWizardTile'
 import { InProgressModal } from '../../molecules/InProgressModal/InProgressModal'
@@ -28,7 +28,7 @@ import type { BadGripper, GripperData } from '@opentrons/api-client'
 
 const GO_BACK_BUTTON_STYLE = css`
   ${TYPOGRAPHY.pSemiBold};
-  color: ${COLORS.darkGreyEnabled};
+  color: ${COLORS.grey50};
   padding-left: ${SPACING.spacing32};
 
   &:hover {
@@ -58,7 +58,7 @@ export const MountGripper = (
   props: GripperWizardStepProps
 ): JSX.Element | null => {
   const { proceed, isRobotMoving } = props
-  const { t } = useTranslation(['gripper_wizard_flows', 'shared'])
+  const { t } = useTranslation(['gripper_wizard_flows', 'shared', 'branded'])
   const isOnDevice = useSelector(getIsOnDevice)
   const [showUnableToDetect, setShowUnableToDetect] = React.useState(false)
   const [isPending, setIsPending] = React.useState(false)
@@ -90,7 +90,7 @@ export const MountGripper = (
   return showUnableToDetect ? (
     <SimpleWizardBody
       header={t('unable_to_detect_gripper')}
-      iconColor={COLORS.errorEnabled}
+      iconColor={COLORS.red50}
       isSuccess={false}
     >
       <Flex
@@ -119,7 +119,7 @@ export const MountGripper = (
     </SimpleWizardBody>
   ) : (
     <GenericWizardTile
-      header={t('connect_and_screw_in_gripper')}
+      header={t('branded:connect_and_screw_in_gripper')}
       rightHandBody={
         <video
           css={css`

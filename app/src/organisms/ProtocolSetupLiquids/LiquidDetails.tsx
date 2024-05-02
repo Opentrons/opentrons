@@ -2,18 +2,18 @@ import * as React from 'react'
 import styled from 'styled-components'
 import { useTranslation } from 'react-i18next'
 import {
-  COLORS,
-  Flex,
-  SPACING,
-  TYPOGRAPHY,
   BORDERS,
-  WRAP,
-  Icon,
+  COLORS,
   DIRECTION_ROW,
+  Flex,
+  Icon,
   LocationIcon,
+  SPACING,
+  StyledText,
+  TYPOGRAPHY,
+  WRAP,
 } from '@opentrons/components'
 import { MICRO_LITERS } from '@opentrons/shared-data'
-import { StyledText } from '../../atoms/text'
 import { LiquidsLabwareDetailsModal } from '../Devices/ProtocolRun/SetupLiquids/LiquidsLabwareDetailsModal'
 import { getLocationInfoNames } from '../Devices/ProtocolRun/utils/getLocationInfoNames'
 import { getTotalVolumePerLiquidId } from '../Devices/ProtocolRun/SetupLiquids/utils'
@@ -23,9 +23,9 @@ import type { LabwareByLiquidId, ParsedLiquid } from '@opentrons/api-client'
 const Table = styled('table')`
   table-layout: ${SPACING.spacingAuto};
   width: 100%;
-  border-spacing: 0 ${BORDERS.borderRadiusSize2};
+  border-spacing: 0 ${BORDERS.borderRadius8};
   text-align: ${TYPOGRAPHY.textAlignLeft};
-  color: ${COLORS.darkBlack90};
+  color: ${COLORS.grey60};
 `
 const TableHeader = styled('th')`
   text-transform: ${TYPOGRAPHY.textTransformCapitalize};
@@ -41,18 +41,18 @@ const TableRow = styled('tr')`
 const TableDatum = styled('td')`
   z-index: 2;
   padding: ${SPACING.spacing8} ${SPACING.spacing20};
-  background-color: ${COLORS.light2};
+  background-color: ${COLORS.grey30};
   font-size: ${TYPOGRAPHY.fontSize22};
   white-space: break-spaces;
   text-overflow: ${WRAP};
   &:first-child {
-    border-top-left-radius: ${BORDERS.borderRadiusSize3};
-    border-bottom-left-radius: ${BORDERS.borderRadiusSize3};
+    border-top-left-radius: ${BORDERS.borderRadius12};
+    border-bottom-left-radius: ${BORDERS.borderRadius12};
     width: 20%;
   }
   &:last-child {
-    border-top-right-radius: ${BORDERS.borderRadiusSize3};
-    border-bottom-right-radius: ${BORDERS.borderRadiusSize3};
+    border-top-right-radius: ${BORDERS.borderRadius12};
+    border-bottom-right-radius: ${BORDERS.borderRadius12};
   }
 `
 

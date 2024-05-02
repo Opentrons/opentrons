@@ -32,7 +32,7 @@ Rather than writing a  ``run`` function and embedding commands within it, start 
     :substitutions:
 
     import opentrons.execute
-    protocol = opentrons.execute.get_protocol_api('|apiLevel|')
+    protocol = opentrons.execute.get_protocol_api("|apiLevel|")
     protocol.home()
 
 The first command you execute should always be :py:meth:`~opentrons.protocol_api.ProtocolContext.home`. If you try to execute other commands first, you will get a ``MustHomeError``. (When running protocols through the Opentrons App, the robot homes automatically.)
@@ -57,7 +57,7 @@ Since a typical protocol only `defines` the ``run`` function but doesn't `call` 
 .. code-block:: python
     :substitutions:
 
-    protocol = opentrons.execute.get_protocol_api('|apiLevel|')
+    protocol = opentrons.execute.get_protocol_api("|apiLevel|")
     run(protocol)  # your protocol will now run
 
 .. _using_lpc:
@@ -145,6 +145,7 @@ Command Line
 ------------
 
 .. TODO update with separate links to OT-2 and Flex setup, when new Flex process is in manual or on help site
+
 The robot's command line is accessible either by going to **New > Terminal** in Jupyter or `via SSH <https://support.opentrons.com/s/article/Connecting-to-your-OT-2-with-SSH>`_.
 
 To execute a protocol from the robot's command line, copy the protocol file to the robot with ``scp`` and then run the protocol with ``opentrons_execute``:

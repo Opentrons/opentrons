@@ -1,15 +1,11 @@
-import assert from 'assert'
 import uniq from 'lodash/uniq'
 
 import { OPENTRONS_LABWARE_NAMESPACE } from '../constants'
-import standardOt2DeckDefv3 from '../../deck/definitions/3/ot2_standard.json'
-import standardFlexDeckDefv3 from '../../deck/definitions/3/ot3_standard.json'
-import standardOt2DeckDef from '../../deck/definitions/4/ot2_standard.json'
-import standardFlexDeckDef from '../../deck/definitions/4/ot3_standard.json'
+import standardOt2DeckDef from '../../deck/definitions/5/ot2_standard.json'
+import standardFlexDeckDef from '../../deck/definitions/5/ot3_standard.json'
 import type {
   DeckDefinition,
   LabwareDefinition2,
-  LoadedLabware,
   ModuleModel,
   RobotType,
   ThermalAdapterName,
@@ -30,6 +26,13 @@ export * from './getVectorSum'
 export * from './getLoadedLabwareDefinitionsByUri'
 export * from './getOccludedSlotCountForModule'
 export * from './labwareInference'
+export * from './getAddressableAreasInProtocol'
+export * from './getFlexSurroundingSlots'
+export * from './getSimplestFlexDeckConfig'
+export * from './formatRunTimeParameterDefaultValue'
+export * from './formatRunTimeParameterValue'
+export * from './formatRunTimeParameterMinMax'
+export * from './orderRuntimeParameterRangeOptions'
 
 export const getLabwareDefIsStandard = (def: LabwareDefinition2): boolean =>
   def?.namespace === OPENTRONS_LABWARE_NAMESPACE
@@ -83,7 +86,7 @@ export const getLabwareDisplayName = (
 }
 
 export const getTiprackVolume = (labwareDef: LabwareDefinition2): number => {
-  assert(
+  console.assert(
     labwareDef.parameters.isTiprack,
     `getTiprackVolume expected a tiprack labware ${getLabwareDefURI(
       labwareDef
@@ -91,7 +94,7 @@ export const getTiprackVolume = (labwareDef: LabwareDefinition2): number => {
   )
   // NOTE: Ian 2019-04-16 assuming all tips are the same volume across the rack
   const volume = labwareDef.wells.A1.totalLiquidVolume
-  assert(
+  console.assert(
     volume >= 0,
     `getTiprackVolume expected tip volume to be at least 0, got ${volume}`
   )
@@ -202,12 +205,29 @@ export const getWellsDepth = (
   return offsets[0]
 }
 
+export const getWellDimension = (
+  labwareDef: LabwareDefinition2,
+  wells: string[],
+  position: 'x' | 'y'
+): number => {
+  const offsets = wells.map(well => {
+    const labwareWell = labwareDef.wells[well]
+    const shape = labwareWell.shape
+    if (shape === 'circular') {
+      return labwareWell.diameter
+    } else {
+      return position === 'x' ? labwareWell.xDimension : labwareWell.yDimension
+    }
+  })
+  return offsets[0]
+}
+
 export const getSlotHasMatingSurfaceUnitVector = (
   deckDef: DeckDefinition,
-  slotNumber: string
+  addressableAreaName: string
 ): boolean => {
-  const matingSurfaceUnitVector = deckDef.locations.orderedSlots.find(
-    orderedSlot => orderedSlot.id === slotNumber
+  const matingSurfaceUnitVector = deckDef.locations.addressableAreas.find(
+    aa => aa.id === addressableAreaName
   )?.matingSurfaceUnitVector
 
   return Boolean(matingSurfaceUnitVector)
@@ -222,14 +242,12 @@ export const getAreSlotsHorizontallyAdjacent = (
   }
   const slotANumber = parseInt(slotNameA)
   const slotBNumber = parseInt(slotNameB)
-
   if (isNaN(slotBNumber) || isNaN(slotANumber)) {
     return false
   }
-  const orderedSlots = standardOt2DeckDefv3.locations.orderedSlots
+  const orderedSlots = standardOt2DeckDef.locations.cutouts
   // intentionally not substracting by 1 because trash (slot 12) should not count
   const numSlots = orderedSlots.length
-
   if (slotBNumber > numSlots || slotANumber > numSlots) {
     return false
   }
@@ -262,7 +280,7 @@ export const getAreSlotsVerticallyAdjacent = (
   if (isNaN(slotBNumber) || isNaN(slotANumber)) {
     return false
   }
-  const orderedSlots = standardOt2DeckDefv3.locations.orderedSlots
+  const orderedSlots = standardOt2DeckDef.locations.cutouts
   // intentionally not substracting by 1 because trash (slot 12) should not count
   const numSlots = orderedSlots.length
 
@@ -286,6 +304,9 @@ export const getAreSlotsVerticallyAdjacent = (
 
   return areSlotsVerticallyAdjacent
 }
+//  TODO(jr, 11/12/23): rename this utility to mention that it
+//  is only used in the OT-2, same with getAreSlotsHorizontallyAdjacent
+//  and getAreSlotsVerticallyAdjacent
 export const getAreSlotsAdjacent = (
   slotNameA?: string | null,
   slotNameB?: string | null
@@ -338,25 +359,7 @@ export const getCalibrationAdapterLoadName = (
   }
 }
 
-export const getRobotTypeFromLoadedLabware = (
-  labware: LoadedLabware[]
-): RobotType => {
-  const isProtocolForOT3 = labware.some(
-    l => l.loadName === 'opentrons_1_trash_3200ml_fixed'
-  )
-  return isProtocolForOT3 ? 'OT-3 Standard' : 'OT-2 Standard'
-}
-
 export const getDeckDefFromRobotType = (
-  robotType: RobotType
-): DeckDefinition => {
-  // @ts-expect-error imported JSON not playing nice with TS. see https://github.com/microsoft/TypeScript/issues/32063
-  return robotType === 'OT-3 Standard'
-    ? standardFlexDeckDefv3
-    : standardOt2DeckDefv3
-}
-
-export const getDeckDefFromRobotTypeV4 = (
   robotType: RobotType
 ): DeckDefinition => {
   // @ts-expect-error imported JSON not playing nice with TS. see https://github.com/microsoft/TypeScript/issues/32063

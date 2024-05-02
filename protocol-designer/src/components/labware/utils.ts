@@ -1,7 +1,7 @@
 import reduce from 'lodash/reduce'
 import { AdditionalEquipmentEntities, AIR } from '@opentrons/step-generation'
 import { WellFill } from '@opentrons/components'
-import { WASTE_CHUTE_SLOT } from '@opentrons/shared-data'
+import { WASTE_CHUTE_CUTOUT } from '@opentrons/shared-data'
 import { swatchColors, MIXED_WELL_COLOR } from '../swatchColors'
 import { ContentsByWell, WellContents } from '../../labware-ingred/types'
 
@@ -40,7 +40,7 @@ export const getHasWasteChute = (
 ): boolean => {
   return Object.values(additionalEquipmentEntities).some(
     additionalEquipmentEntity =>
-      additionalEquipmentEntity.location === WASTE_CHUTE_SLOT &&
+      additionalEquipmentEntity.location === WASTE_CHUTE_CUTOUT &&
       additionalEquipmentEntity.name === 'wasteChute'
   )
 }

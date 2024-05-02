@@ -1,6 +1,6 @@
 """Manage current maintenance run data."""
 from datetime import datetime
-from typing import List, Optional
+from typing import List, Optional, Callable
 
 from opentrons.protocol_engine import (
     EngineStatus,
@@ -13,6 +13,10 @@ from opentrons.protocol_engine import (
 
 from .maintenance_engine_store import MaintenanceEngineStore
 from .maintenance_run_models import MaintenanceRun, MaintenanceRunNotFoundError
+
+from opentrons.protocol_engine.types import DeckConfigurationType
+
+from robot_server.service.notifications import MaintenanceRunsPublisher
 
 
 def _build_run(
@@ -60,8 +64,13 @@ class MaintenanceRunDataManager:
         engine_store: In-memory store of the current run's ProtocolEngine.
     """
 
-    def __init__(self, engine_store: MaintenanceEngineStore) -> None:
+    def __init__(
+        self,
+        engine_store: MaintenanceEngineStore,
+        maintenance_runs_publisher: MaintenanceRunsPublisher,
+    ) -> None:
         self._engine_store = engine_store
+        self._maintenance_runs_publisher = maintenance_runs_publisher
 
     @property
     def current_run_id(self) -> Optional[str]:
@@ -73,6 +82,8 @@ class MaintenanceRunDataManager:
         run_id: str,
         created_at: datetime,
         labware_offsets: List[LabwareOffsetCreate],
+        deck_configuration: DeckConfigurationType,
+        notify_publishers: Callable[[], None],
     ) -> MaintenanceRun:
         """Create a new, current maintenance run.
 
@@ -80,6 +91,7 @@ class MaintenanceRunDataManager:
             run_id: Identifier to assign the new run.
             created_at: Creation datetime.
             labware_offsets: Labware offsets to initialize the engine with.
+            notify_publishers: Utilized by the engine to notify publishers of state changes.
 
         Returns:
             The run resource.
@@ -91,13 +103,19 @@ class MaintenanceRunDataManager:
             run_id=run_id,
             created_at=created_at,
             labware_offsets=labware_offsets,
+            deck_configuration=deck_configuration,
+            notify_publishers=notify_publishers,
         )
 
-        return _build_run(
+        maintenance_run_data = _build_run(
             run_id=run_id,
             created_at=created_at,
             state_summary=state_summary,
         )
+
+        await self._maintenance_runs_publisher.publish_current_maintenance_run()
+
+        return maintenance_run_data
 
     def get(self, run_id: str) -> MaintenanceRun:
         """Get a maintenance run resource.
@@ -136,6 +154,9 @@ class MaintenanceRunDataManager:
         """
         if run_id == self._engine_store.current_run_id:
             await self._engine_store.clear()
+
+            await self._maintenance_runs_publisher.publish_current_maintenance_run()
+
         else:
             raise MaintenanceRunNotFoundError(run_id=run_id)
 
@@ -188,5 +209,4 @@ class MaintenanceRunDataManager:
         return self._engine_store.engine.state_view.commands.get(command_id=command_id)
 
     def _get_state_summary(self, run_id: str) -> Optional[StateSummary]:
-
         return self._engine_store.engine.state_view.get_summary()

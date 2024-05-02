@@ -2,6 +2,7 @@ import { useSelector } from 'react-redux'
 
 import { hash } from '../../../redux/analytics/hash'
 import { getStoredProtocol } from '../../../redux/protocol-storage'
+import { getRobotSerialNumber } from '../../../redux/discovery'
 import { useStoredProtocolAnalysis, useProtocolDetailsForRun } from './'
 import { useProtocolMetadata } from './useProtocolMetadata'
 import { useRunTimestamps } from '../../RunTimeControl/hooks'
@@ -12,16 +13,21 @@ import type { ProtocolAnalyticsData } from '../../../redux/analytics/types'
 import type { StoredProtocolData } from '../../../redux/protocol-storage/types'
 import type { ProtocolAnalysisOutput } from '@opentrons/shared-data'
 import type { State } from '../../../redux/types'
+import { DiscoveredRobot } from '../../../redux/discovery/types'
 
 export const parseProtocolRunAnalyticsData = (
   protocolAnalysis: ProtocolAnalysisOutput | null,
   storedProtocol: StoredProtocolData | null,
-  startedAt: string | null
+  startedAt: string | null,
+  robot: DiscoveredRobot | null
 ) => () => {
   const hashTasks = [
     hash(protocolAnalysis?.metadata?.author) ?? '',
     hash(storedProtocol?.srcFiles?.toString() ?? '') ?? '',
   ]
+
+  const serialNumber =
+    robot?.status != null ? getRobotSerialNumber(robot) : null
 
   return Promise.all(hashTasks).then(([protocolAuthor, protocolText]) => ({
     protocolRunAnalyticsData: {
@@ -45,8 +51,19 @@ export const parseProtocolRunAnalyticsData = (
         .join(','),
       protocolAuthor: protocolAuthor !== '' ? protocolAuthor : '',
       protocolText: protocolText !== '' ? protocolText : '',
+      protocolHasRunTimeParameters:
+        protocolAnalysis?.runTimeParameters != null
+          ? protocolAnalysis?.runTimeParameters?.length > 0
+          : false,
+      protocolHasRunTimeParameterCustomValues:
+        protocolAnalysis?.runTimeParameters?.some(
+          param => param.value !== param.default
+        ) ?? false,
       robotType:
-        protocolAnalysis?.robotType != null ? protocolAnalysis?.robotType : '',
+        protocolAnalysis?.robotType != null
+          ? protocolAnalysis?.robotType
+          : storedProtocol?.mostRecentAnalysis?.robotType,
+      robotSerialNumber: serialNumber ?? '',
     },
     runTime:
       startedAt != null ? formatInterval(startedAt, Date()) : EMPTY_TIMESTAMP,
@@ -66,7 +83,8 @@ type GetProtocolRunAnalyticsData = () => Promise<{
  *          data properties for use in event trackEvent
  */
 export function useProtocolRunAnalyticsData(
-  runId: string | null
+  runId: string | null,
+  robot: DiscoveredRobot | null
 ): {
   getProtocolRunAnalyticsData: GetProtocolRunAnalyticsData
 } {
@@ -94,7 +112,8 @@ export function useProtocolRunAnalyticsData(
   const getProtocolRunAnalyticsData = parseProtocolRunAnalyticsData(
     protocolAnalysis as ProtocolAnalysisOutput | null,
     storedProtocol,
-    startedAt
+    startedAt,
+    robot
   )
 
   return { getProtocolRunAnalyticsData }

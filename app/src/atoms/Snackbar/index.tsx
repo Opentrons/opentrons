@@ -2,15 +2,14 @@ import * as React from 'react'
 import { css } from 'styled-components'
 
 import {
-  Flex,
   ALIGN_CENTER,
   BORDERS,
   COLORS,
+  Flex,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
-
-import { StyledText } from '../text'
 
 import type { StyleProps } from '@opentrons/components'
 
@@ -77,9 +76,9 @@ export function Snackbar(props: SnackbarProps): JSX.Element {
     <Flex
       css={animationStyle}
       alignItems={ALIGN_CENTER}
-      borderRadius={BORDERS.borderRadiusSize3}
+      borderRadius={BORDERS.borderRadius8}
       boxShadow={BORDERS.shadowSmall}
-      backgroundColor={COLORS.darkBlack100}
+      backgroundColor={COLORS.black90}
       maxWidth="max-content"
       padding={`${SPACING.spacing20} ${SPACING.spacing24}`}
       data-testid="Snackbar"

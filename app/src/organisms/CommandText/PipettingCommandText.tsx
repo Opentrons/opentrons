@@ -1,33 +1,27 @@
 import { useTranslation } from 'react-i18next'
+
 import {
   CompletedProtocolAnalysis,
-  AspirateRunTimeCommand,
-  DispenseRunTimeCommand,
-  BlowoutRunTimeCommand,
-  MoveToWellRunTimeCommand,
-  DropTipRunTimeCommand,
-  PickUpTipRunTimeCommand,
   getLabwareDefURI,
   RobotType,
   ProtocolAnalysisOutput,
 } from '@opentrons/shared-data'
+
 import { getLabwareDefinitionsFromCommands } from '../LabwarePositionCheck/utils/labware'
 import { getLoadedLabware } from './utils/accessors'
 import {
   getLabwareName,
   getLabwareDisplayLocation,
   getFinalLabwareLocation,
+  getWellRange,
 } from './utils'
+import type {
+  PipetteName,
+  PipettingRunTimeCommand,
+} from '@opentrons/shared-data'
 
-type PipettingRunTimeCommmand =
-  | AspirateRunTimeCommand
-  | DispenseRunTimeCommand
-  | BlowoutRunTimeCommand
-  | MoveToWellRunTimeCommand
-  | DropTipRunTimeCommand
-  | PickUpTipRunTimeCommand
 interface PipettingCommandTextProps {
-  command: PipettingRunTimeCommmand
+  command: PipettingRunTimeCommand
   analysis: CompletedProtocolAnalysis | ProtocolAnalysisOutput
   robotType: RobotType
 }
@@ -39,7 +33,10 @@ export const PipettingCommandText = ({
 }: PipettingCommandTextProps): JSX.Element | null => {
   const { t } = useTranslation('protocol_command_text')
 
-  const { labwareId, wellName } = command.params
+  const labwareId =
+    'labwareId' in command.params ? command.params.labwareId : ''
+  const wellName = 'wellName' in command.params ? command.params.wellName : ''
+
   const allPreviousCommands = analysis.commands.slice(
     0,
     analysis.commands.findIndex(c => c.id === command.id)
@@ -123,11 +120,38 @@ export const PipettingCommandText = ({
           })
     }
     case 'pickUpTip': {
+      const pipetteId = command.params.pipetteId
+      const pipetteName:
+        | PipetteName
+        | undefined = analysis.pipettes.find(
+        pip => pip.id === pipetteId
+      )?.pipetteName
+
       return t('pickup_tip', {
-        well_name: wellName,
+        well_range: getWellRange(
+          pipetteId,
+          allPreviousCommands,
+          wellName,
+          pipetteName
+        ),
         labware: getLabwareName(analysis, labwareId),
         labware_location: displayLocation,
       })
+    }
+    case 'dropTipInPlace': {
+      return t('drop_tip_in_place')
+    }
+    case 'dispenseInPlace': {
+      const { volume, flowRate } = command.params
+      return t('dispense_in_place', { volume: volume, flow_rate: flowRate })
+    }
+    case 'blowOutInPlace': {
+      const { flowRate } = command.params
+      return t('blowout_in_place', { flow_rate: flowRate })
+    }
+    case 'aspirateInPlace': {
+      const { flowRate, volume } = command.params
+      return t('aspirate_in_place', { volume, flow_rate: flowRate })
     }
     default: {
       console.warn(

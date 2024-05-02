@@ -3,14 +3,14 @@ import { useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
 
 import {
-  Flex,
   COLORS,
-  SPACING,
   DIRECTION_COLUMN,
+  Flex,
+  SPACING,
   TYPOGRAPHY,
+  StyledText,
 } from '@opentrons/components'
 
-import { StyledText } from '../../atoms/text'
 import { formatLastModified } from '../../organisms/CalibrationPanels/utils'
 import { useDeckCalibrationData, useRobot } from '../../organisms/Devices/hooks'
 import * as RobotApi from '../../redux/robot-api'
@@ -62,7 +62,7 @@ export function RobotSettingsDeckCalibration({
         {t('deck_calibration_title')}
       </StyledText>
       <StyledText as="p">{t('deck_calibration_description')}</StyledText>
-      <StyledText as="label" color={COLORS.darkGreyEnabled}>
+      <StyledText as="label" color={COLORS.grey60}>
         {deckLastModified}
       </StyledText>
     </Flex>

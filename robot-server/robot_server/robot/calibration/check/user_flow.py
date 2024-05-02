@@ -90,7 +90,7 @@ of the current calibration saved on a robot.
 """
 
 # TODO: BC 2020-07-08: type all command logic here with actual Model type
-COMMAND_HANDLER = Callable[..., Awaitable]
+COMMAND_HANDLER = Callable[..., Awaitable[None]]
 
 COMMAND_MAP = Dict[str, COMMAND_HANDLER]
 
@@ -552,7 +552,7 @@ class CheckCalibrationUserFlow:
                 tipRackUri=info_pip.tip_rack.uri,
                 rank=info_pip.rank.value,
                 mount=str(info_pip.mount),
-                serial=hw_pip.pipette_id,  # type: ignore[arg-type]
+                serial=hw_pip.pipette_id,
                 defaultTipracks=info_pip.default_tipracks,  # type: ignore[arg-type]
             )
             for hw_pip, info_pip in zip(hw_pips, info_pips)
@@ -575,7 +575,7 @@ class CheckCalibrationUserFlow:
             tipRackUri=self.active_pipette.tip_rack.uri,
             rank=self.active_pipette.rank.value,
             mount=str(self.mount),
-            serial=self.hw_pipette.pipette_id,  # type: ignore[arg-type]
+            serial=self.hw_pipette.pipette_id,
             defaultTipracks=(
                 self.active_pipette.default_tipracks  # type: ignore[arg-type]
             ),

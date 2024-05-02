@@ -51,6 +51,7 @@ class GripperHandler:
             og_gripper.config,
             load_gripper_calibration_offset(og_gripper.gripper_id),
             og_gripper.gripper_id,
+            og_gripper._jaw_max_offset,
         )
         self._gripper = new_gripper
 

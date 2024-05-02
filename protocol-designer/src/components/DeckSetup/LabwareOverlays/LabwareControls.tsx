@@ -1,7 +1,6 @@
 import * as React from 'react'
 import cx from 'classnames'
 import { RobotCoordsForeignDiv } from '@opentrons/components'
-import { DeckSlot } from '@opentrons/shared-data'
 
 import { START_TERMINAL_ITEM_ID, TerminalItemId } from '../../../steplist'
 import { LabwareOnDeck } from '../../../step-forms'
@@ -10,13 +9,15 @@ import { BrowseLabware } from './BrowseLabware'
 import { EditLabware } from './EditLabware'
 import { LabwareName } from './LabwareName'
 import { LabwareHighlight } from './LabwareHighlight'
-import styles from './LabwareOverlays.css'
+import styles from './LabwareOverlays.module.css'
+
+import type { CoordinateTuple } from '@opentrons/shared-data'
 
 interface LabwareControlsProps {
   labwareOnDeck: LabwareOnDeck
-  slot: DeckSlot
-  setHoveredLabware: (labware?: LabwareOnDeck | null) => unknown
-  setDraggedLabware: (labware?: LabwareOnDeck | null) => unknown
+  slotPosition: CoordinateTuple
+  setHoveredLabware: (labware?: LabwareOnDeck | null) => void
+  setDraggedLabware: (labware?: LabwareOnDeck | null) => void
   swapBlocked: boolean
   selectedTerminalItemId?: TerminalItemId | null
 }
@@ -24,7 +25,7 @@ interface LabwareControlsProps {
 export const LabwareControls = (props: LabwareControlsProps): JSX.Element => {
   const {
     labwareOnDeck,
-    slot,
+    slotPosition,
     selectedTerminalItemId,
     setHoveredLabware,
     setDraggedLabware,
@@ -32,7 +33,7 @@ export const LabwareControls = (props: LabwareControlsProps): JSX.Element => {
   } = props
 
   const canEdit = selectedTerminalItemId === START_TERMINAL_ITEM_ID
-  const [x, y] = slot.position
+  const [x, y] = slotPosition
   const width = labwareOnDeck.def.dimensions.xDimension
   const height = labwareOnDeck.def.dimensions.yDimension
   return (
@@ -47,7 +48,6 @@ export const LabwareControls = (props: LabwareControlsProps): JSX.Element => {
       >
         <LabwareHighlight labwareOnDeck={labwareOnDeck} />
         {canEdit ? (
-          // @ts-expect-error(sa, 2021-6-21): react dnd type mismatch
           <EditLabware
             labwareOnDeck={labwareOnDeck}
             setHoveredLabware={setHoveredLabware}
