@@ -83,10 +83,8 @@ export const RunPreviewComponent = (
       ? nullCheckedCommandsFromQuery
       : robotSideAnalysis.commands) ?? []
   // pass relevant data from run rather than analysis so that CommandText utilities can properly hash the entities' IDs
-  // TODO (nd:05/02/2024): update name and types for CommandText (and children/utilities) use of analysis. These children
-  // and utilities need only a subset of data provided by analysis, and there should be an overlap of these required data
-  // between a completed analysis and a run record, so we shouldn't pass down a franken-analysis, but rather a new interface
-  // with just the required data coming from the analysis OR the run.
+  // TODO (nd:05/02/2024, AUTH-380): update name and types for CommandText (and children/utilities) use of analysis.
+  // We should ideally pass only subset of analysis/run data required by these children and utilities
   const protocolDataFromAnalysisOrRun =
     isRunTerminal && runRecord?.data != null
       ? {
