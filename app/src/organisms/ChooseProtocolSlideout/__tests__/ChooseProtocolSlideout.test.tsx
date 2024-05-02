@@ -150,7 +150,7 @@ describe('ChooseProtocolSlideout', () => {
     screen.getByText('Restore default values')
   })
 
-  it.only('shows tooltip when disabled Restore default values link is clicked', () => {
+  it('shows tooltip when disabled Restore default values link is clicked', () => {
     const protocolDataWithoutRunTimeParameter = {
       ...storedProtocolDataFixture,
     }
