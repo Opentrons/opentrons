@@ -18,6 +18,7 @@ import {
   StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
+import { useRunQuery } from '@opentrons/react-api-client'
 
 import { useMostRecentCompletedAnalysis } from '../LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import {
@@ -51,6 +52,7 @@ export const RunPreviewComponent = (
   const { t } = useTranslation('run_details')
   const robotSideAnalysis = useMostRecentCompletedAnalysis(runId)
   const runStatus = useRunStatus(runId)
+  const { data: runRecord } = useRunQuery(runId)
   const isRunTerminal =
     runStatus != null
       ? (RUN_STATUSES_TERMINAL as RunStatus[]).includes(runStatus)
@@ -80,6 +82,17 @@ export const RunPreviewComponent = (
     (isRunTerminal
       ? nullCheckedCommandsFromQuery
       : robotSideAnalysis.commands) ?? []
+  // pass relevant data from run rather than analysis so that CommandText utilities can properly hash the entities' IDs
+  const analysis =
+    isRunTerminal && runRecord?.data != null
+      ? {
+          ...robotSideAnalysis,
+          labware: runRecord.data.labware ?? [],
+          modules: runRecord.data.modules ?? [],
+          pipettes: runRecord.data.pipettes ?? [],
+          commands: commands,
+        }
+      : robotSideAnalysis
   const currentRunCommandIndex = commands.findIndex(
     c => c.key === currentRunCommandKey
   )
@@ -158,7 +171,7 @@ export const RunPreviewComponent = (
                   <CommandIcon command={command} color={iconColor} />
                   <CommandText
                     command={command}
-                    robotSideAnalysis={robotSideAnalysis}
+                    robotSideAnalysis={analysis}
                     robotType={robotType}
                     color={COLORS.black90}
                   />
