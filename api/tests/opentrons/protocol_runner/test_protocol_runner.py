@@ -133,7 +133,7 @@ def json_runner_subject(
 
 
 @pytest.fixture
-def legacy_python_runner_subject(
+def python_runner_subject(
     protocol_engine: ProtocolEngine,
     hardware_api: HardwareAPI,
     task_queue: TaskQueue,
@@ -207,7 +207,7 @@ def test_create_protocol_runner(
     "subject",
     [
         (lazy_fixture("json_runner_subject")),
-        (lazy_fixture("legacy_python_runner_subject")),
+        (lazy_fixture("python_runner_subject")),
         (lazy_fixture("live_runner_subject")),
     ],
 )
@@ -227,7 +227,7 @@ def test_play_starts_run(
     "subject",
     [
         (lazy_fixture("json_runner_subject")),
-        (lazy_fixture("legacy_python_runner_subject")),
+        (lazy_fixture("python_runner_subject")),
         (lazy_fixture("live_runner_subject")),
     ],
 )
@@ -246,7 +246,7 @@ def test_pause(
     "subject",
     [
         (lazy_fixture("json_runner_subject")),
-        (lazy_fixture("legacy_python_runner_subject")),
+        (lazy_fixture("python_runner_subject")),
         (lazy_fixture("live_runner_subject")),
     ],
 )
@@ -269,7 +269,7 @@ async def test_stop(
     "subject",
     [
         (lazy_fixture("json_runner_subject")),
-        (lazy_fixture("legacy_python_runner_subject")),
+        (lazy_fixture("python_runner_subject")),
         (lazy_fixture("live_runner_subject")),
     ],
 )
@@ -298,7 +298,7 @@ async def test_stop_when_run_never_started(
     "subject",
     [
         (lazy_fixture("json_runner_subject")),
-        (lazy_fixture("legacy_python_runner_subject")),
+        (lazy_fixture("python_runner_subject")),
         (lazy_fixture("live_runner_subject")),
     ],
 )
@@ -527,7 +527,7 @@ async def test_load_legacy_python(
     python_protocol_executor: PythonProtocolExecutor,
     task_queue: TaskQueue,
     protocol_engine: ProtocolEngine,
-    legacy_python_runner_subject: PythonAndLegacyRunner,
+    python_runner_subject: PythonAndLegacyRunner,
 ) -> None:
     """It should load a legacy context-based Python protocol."""
     labware_definition = LabwareDefinition.construct()  # type: ignore[call-arg]
@@ -578,7 +578,7 @@ async def test_load_legacy_python(
         )
     ).then_return(protocol_context)
 
-    await legacy_python_runner_subject.load(
+    await python_runner_subject.load(
         legacy_protocol_source,
         python_parse_mode=PythonParseMode.ALLOW_LEGACY_METADATA_AND_REQUIREMENTS,
         run_time_param_values=None,
@@ -592,7 +592,7 @@ async def test_load_legacy_python(
         task_queue.set_run_func(run_func_captor),
     )
 
-    assert broker_captor.value is legacy_python_runner_subject.broker
+    assert broker_captor.value is python_runner_subject.broker
 
     # Verify that the run func calls the right things:
     run_func = run_func_captor.value
@@ -604,7 +604,7 @@ async def test_load_legacy_python(
         await python_protocol_executor.execute(
             protocol=legacy_protocol,
             context=protocol_context,
-            parameter_context=legacy_python_runner_subject._parameter_context,
+            parameter_context=python_runner_subject._parameter_context,
             run_time_param_values=None,
         ),
     )
@@ -615,7 +615,7 @@ async def test_load_python_with_pe_papi_core(
     python_protocol_file_reader: PythonProtocolFileReader,
     protocol_context_creator: ProtocolContextCreator,
     protocol_engine: ProtocolEngine,
-    legacy_python_runner_subject: PythonAndLegacyRunner,
+    python_runner_subject: PythonAndLegacyRunner,
 ) -> None:
     """It should load a legacy context-based Python protocol."""
     protocol_source = ProtocolSource(
@@ -660,14 +660,14 @@ async def test_load_python_with_pe_papi_core(
         )
     ).then_return(protocol_context)
 
-    await legacy_python_runner_subject.load(
+    await python_runner_subject.load(
         protocol_source,
         python_parse_mode=PythonParseMode.ALLOW_LEGACY_METADATA_AND_REQUIREMENTS,
         run_time_param_values=None,
     )
 
     decoy.verify(protocol_engine.add_plugin(matchers.IsA(LegacyContextPlugin)), times=0)
-    assert broker_captor.value is legacy_python_runner_subject.broker
+    assert broker_captor.value is python_runner_subject.broker
 
 
 async def test_load_legacy_json(
@@ -677,7 +677,7 @@ async def test_load_legacy_json(
     python_protocol_executor: PythonProtocolExecutor,
     task_queue: TaskQueue,
     protocol_engine: ProtocolEngine,
-    legacy_python_runner_subject: PythonAndLegacyRunner,
+    python_runner_subject: PythonAndLegacyRunner,
 ) -> None:
     """It should load a legacy context-based JSON protocol."""
     labware_definition = LabwareDefinition.construct()  # type: ignore[call-arg]
@@ -722,7 +722,7 @@ async def test_load_legacy_json(
         )
     ).then_return(protocol_context)
 
-    await legacy_python_runner_subject.load(
+    await python_runner_subject.load(
         legacy_protocol_source,
         python_parse_mode=PythonParseMode.ALLOW_LEGACY_METADATA_AND_REQUIREMENTS,
         run_time_param_values=None,
@@ -746,7 +746,7 @@ async def test_load_legacy_json(
         await python_protocol_executor.execute(
             protocol=legacy_protocol,
             context=protocol_context,
-            parameter_context=legacy_python_runner_subject._parameter_context,
+            parameter_context=python_runner_subject._parameter_context,
             run_time_param_values=None,
         ),
     )
@@ -757,16 +757,16 @@ async def test_run_python_runner(
     hardware_api: HardwareAPI,
     protocol_engine: ProtocolEngine,
     task_queue: TaskQueue,
-    legacy_python_runner_subject: PythonAndLegacyRunner,
+    python_runner_subject: PythonAndLegacyRunner,
 ) -> None:
     """It should run a protocol to completion."""
     decoy.when(protocol_engine.state_view.commands.has_been_played()).then_return(
         False, True
     )
 
-    assert legacy_python_runner_subject.was_started() is False
-    await legacy_python_runner_subject.run(deck_configuration=[])
-    assert legacy_python_runner_subject.was_started() is True
+    assert python_runner_subject.was_started() is False
+    await python_runner_subject.run(deck_configuration=[])
+    assert python_runner_subject.was_started() is True
 
     decoy.verify(
         protocol_engine.play(deck_configuration=[]),
