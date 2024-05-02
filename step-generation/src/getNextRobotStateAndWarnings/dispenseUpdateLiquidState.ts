@@ -1,4 +1,3 @@
-import assert from 'assert'
 import mapValues from 'lodash/mapValues'
 import reduce from 'lodash/reduce'
 import {
@@ -12,7 +11,9 @@ import type {
   InvariantContext,
   LocationLiquidState,
   SourceAndDest,
+  RobotStateAndWarnings,
 } from '../types'
+import { COLUMN } from '@opentrons/shared-data'
 type LiquidState = RobotState['liquidState']
 export interface DispenseUpdateLiquidStateArgs {
   invariantContext: InvariantContext
@@ -20,6 +21,7 @@ export interface DispenseUpdateLiquidStateArgs {
   pipetteId: string
   // volume value is required when useFullVolume is false
   useFullVolume: boolean
+  robotStateAndWarnings: RobotStateAndWarnings
   wellName?: string
   labwareId?: string
   volume?: number
@@ -30,6 +32,7 @@ export function dispenseUpdateLiquidState(
   args: DispenseUpdateLiquidStateArgs
 ): void {
   const {
+    robotStateAndWarnings,
     invariantContext,
     labwareId,
     pipetteId,
@@ -39,6 +42,8 @@ export function dispenseUpdateLiquidState(
     wellName,
   } = args
   const pipetteSpec = invariantContext.pipetteEntities[pipetteId].spec
+  const nozzles = robotStateAndWarnings.robotState.pipettes[pipetteId].nozzles
+  const channels = nozzles === COLUMN ? 8 : pipetteSpec.channels
   const trashId = Object.values(
     invariantContext.additionalEquipmentEntities
   ).find(aE => aE.name === 'wasteChute' || aE.name === 'trashBin')?.id
@@ -59,17 +64,17 @@ export function dispenseUpdateLiquidState(
   const labwareDef =
     labwareId != null ? invariantContext.labwareEntities[labwareId].def : null
 
-  assert(
+  console.assert(
     !(useFullVolume && typeof volume === 'number'),
     'dispenseUpdateLiquidState takes either `volume` or `useFullVolume`, but got both'
   )
-  assert(
+  console.assert(
     typeof volume === 'number' || useFullVolume,
     'in dispenseUpdateLiquidState, either volume or useFullVolume are required'
   )
   const { wellsForTips, allWellsShared } =
     labwareDef != null && wellName != null
-      ? getWellsForTips(pipetteSpec.channels, labwareDef, wellName)
+      ? getWellsForTips(channels, labwareDef, wellName)
       : { wellsForTips: null, allWellsShared: true }
 
   const liquidLabware =

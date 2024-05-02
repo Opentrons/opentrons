@@ -27,6 +27,7 @@ export const forDispenseInPlace = (
     prevLiquidState: robotState.liquidState,
     useFullVolume: false,
     volume,
+    robotStateAndWarnings,
   })
 }
 
@@ -42,6 +43,7 @@ export const forBlowOutInPlace = (
     pipetteId,
     prevLiquidState: robotState.liquidState,
     useFullVolume: true,
+    robotStateAndWarnings,
   })
 }
 
@@ -59,5 +61,6 @@ export const forDropTipInPlace = (
     prevLiquidState: robotState.liquidState,
     pipetteId,
     useFullVolume: true,
+    robotStateAndWarnings,
   })
 }
