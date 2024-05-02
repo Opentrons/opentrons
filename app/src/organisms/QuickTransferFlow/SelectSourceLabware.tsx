@@ -34,27 +34,28 @@ export function SelectSourceLabware(
 ): JSX.Element | null {
   const { onNext, onBack, exitButtonProps, state, dispatch } = props
   const { i18n, t } = useTranslation(['quick_transfer', 'shared'])
-  if (state.pipette == null) return null
   const labwareDisplayCategoryFilters: LabwareFilter[] = [
     'all',
     'wellPlate',
     'reservoir',
   ]
-  if (state.pipette.channels === 1) {
+  if (state.pipette?.channels === 1) {
     labwareDisplayCategoryFilters.push('tubeRack')
   }
   const [selectedCategory, setSelectedCategory] = React.useState<LabwareFilter>(
     'all'
   )
 
+  const [selectedLabware, setSelectedLabware] = React.useState<
+    LabwareDefinition2 | undefined
+  >(state.source)
+
+  if (state.pipette == null) return null
+
   const compatibleLabwareDefinitions = getCompatibleLabwareByCategory(
     state.pipette.channels,
     selectedCategory
   )
-
-  const [selectedLabware, setSelectedLabware] = React.useState<
-    LabwareDefinition2 | undefined
-  >(state.source)
 
   const handleClickNext = (): void => {
     // the button will be disabled if this values is null

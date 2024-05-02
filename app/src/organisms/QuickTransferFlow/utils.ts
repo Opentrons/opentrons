@@ -158,12 +158,10 @@ export function getVolumeLimits(
 
   const destLabwareVolume = Math.min(
     ...state.destinationWells.map(well => {
-      {
-        if (state.source == null || state.destination == null) return 0
-        return state.destination === 'source'
-          ? state.source.wells[well].totalLiquidVolume
-          : state.destination.wells[well].totalLiquidVolume
-      }
+      if (state.source == null || state.destination == null) return 0
+      return state.destination === 'source'
+        ? state.source.wells[well].totalLiquidVolume
+        : state.destination.wells[well].totalLiquidVolume
     })
   )
   let maxVolume = maxPipetteVolume

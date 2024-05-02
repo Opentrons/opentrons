@@ -34,7 +34,6 @@ export function SelectDestLabware(
 ): JSX.Element | null {
   const { onNext, onBack, exitButtonProps, state, dispatch } = props
   const { i18n, t } = useTranslation(['quick_transfer', 'shared'])
-  if (state.pipette == null) return null
   const labwareDisplayCategoryFilters: LabwareFilter[] = [
     'all',
     'wellPlate',
@@ -46,14 +45,16 @@ export function SelectDestLabware(
   const [selectedCategory, setSelectedCategory] = React.useState<LabwareFilter>(
     'all'
   )
+  const [selectedLabware, setSelectedLabware] = React.useState<
+    LabwareDefinition2 | 'source' | undefined
+  >(state.destination)
+
+  if (state.pipette == null) return null
+
   const compatibleLabwareDefinitions = getCompatibleLabwareByCategory(
     state.pipette.channels,
     selectedCategory
   )
-
-  const [selectedLabware, setSelectedLabware] = React.useState<
-    LabwareDefinition2 | 'source' | undefined
-  >(state.destination)
 
   const handleClickNext = (): void => {
     // the button will be disabled if this values is null

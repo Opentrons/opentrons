@@ -1,8 +1,13 @@
 import * as React from 'react'
 import { useHistory } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import { StepMeter, POSITION_STICKY } from '@opentrons/components'
+import {
+  useConditionalConfirm,
+  StepMeter,
+  POSITION_STICKY,
+} from '@opentrons/components'
 import { SmallButton } from '../../atoms/buttons'
+import { ConfirmExitModal } from './ConfirmExitModal'
 import { CreateNewTransfer } from './CreateNewTransfer'
 import { SelectPipette } from './SelectPipette'
 import { SelectTipRack } from './SelectTipRack'
@@ -27,12 +32,16 @@ export const QuickTransferFlow = (): JSX.Element => {
   )
   const [currentStep, setCurrentStep] = React.useState(1)
 
+  const {
+    confirm: confirmExit,
+    showConfirmation: showConfirmExit,
+    cancel: cancelExit,
+  } = useConditionalConfirm(() => history.push('protocols'), true)
+
   const exitButtonProps: React.ComponentProps<typeof SmallButton> = {
     buttonType: 'tertiaryLowLight',
     buttonText: i18n.format(t('shared:exit'), 'capitalize'),
-    onClick: () => {
-      history.push('protocols')
-    },
+    onClick: confirmExit,
   }
 
   React.useEffect(() => {
@@ -128,13 +137,19 @@ export const QuickTransferFlow = (): JSX.Element => {
 
   return (
     <>
-      <StepMeter
-        totalSteps={QUICK_TRANSFER_WIZARD_STEPS}
-        currentStep={currentStep}
-        position={POSITION_STICKY}
-        top="0"
-      />
-      {modalContent}
+      {showConfirmExit ? (
+        <ConfirmExitModal confirmExit={confirmExit} cancelExit={cancelExit} />
+      ) : (
+        <>
+          <StepMeter
+            totalSteps={QUICK_TRANSFER_WIZARD_STEPS}
+            currentStep={currentStep}
+            position={POSITION_STICKY}
+            top="0"
+          />
+          {modalContent}
+        </>
+      )}
     </>
   )
 }
