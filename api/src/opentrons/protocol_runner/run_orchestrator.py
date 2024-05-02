@@ -62,6 +62,7 @@ class RunOrchestrator:
         Arguments:
             request: The command type and payload data used to construct
                 the command in state.
+            failed_command_id: the failed command id this command is trying to fix.
 
         Returns:
             The full, newly queued command.
@@ -85,5 +86,4 @@ class RunOrchestrator:
         elif request.intent == CommandIntent.FIXIT:
             self._fixit_runner.set_command_queued(request)
         else:
-            # dont really need this bc we are looping in the runner
             self._protocol_runner.set_command_queued(request)
