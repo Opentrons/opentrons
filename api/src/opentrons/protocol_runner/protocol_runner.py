@@ -83,13 +83,13 @@ class AbstractRunner(ABC):
     you will need a new Runner to do another run.
     """
 
-    _queued_command_ids: OrderedSet[str]
+    _queued_command_ids: OrderedSet[CommandCreate]
     """The IDs of queued commands, in FIFO order"""
 
-    _queued_setup_command_ids: OrderedSet[str]
+    _queued_setup_command_ids: OrderedSet[CommandCreate]
     """The IDs of queued setup commands, in FIFO order"""
 
-    _queued_fixit_command_ids: OrderedSet[str]
+    _queued_fixit_command_ids: OrderedSet[CommandCreate]
     """The IDs of queued fixit commands, in FIFO order"""
 
     def __init__(self, protocol_engine: ProtocolEngine) -> None:
@@ -157,42 +157,8 @@ class AbstractRunner(ABC):
     ) -> RunResult:
         """Run a given protocol to completion."""
 
-    def set_command_queued(self, command: Command) -> None:
-        """Validate and mark a command as queued in the command history."""
-        assert command.status == CommandStatus.QUEUED
-        assert command.id not in self._commands_by_id
-
-        next_index = len(self._commands_by_id)
-        updated_command = CommandEntry(
-            index=next_index,
-            command=command,
-        )
-        self._add(command.id, updated_command)
-
-        if command.intent == CommandIntent.SETUP:
-            self._add_to_setup_queue(command.id)
-        elif command.intent == CommandIntent.FIXIT:
-            self._add_to_fixit_queue(command.id)
-        else:
-            self._add_to_queue(command.id)
-
-    def _add(self, command_id: str, command_entry: CommandEntry) -> None:
-        """Create or update a command entry."""
-        if command_id not in self._commands_by_id:
-            self._all_command_ids.append(command_id)
-        self._commands_by_id[command_id] = command_entry
-
-    def _add_to_queue(self, command_id: str) -> None:
-        """Add new ID to the queued."""
-        self._queued_command_ids.add(command_id)
-
-    def _add_to_setup_queue(self, command_id: str) -> None:
-        """Add a new ID to the queued setup."""
-        self._queued_setup_command_ids.add(command_id)
-
-    def _add_to_fixit_queue(self, command_id: str) -> None:
-        """Add a new ID to the queued fixit."""
-        self._queued_fixit_command_ids.add(command_id)
+    def set_command_queued(self, command: CommandCreate) -> None:
+        """add command to queue."""
 
 
 class PythonAndLegacyRunner(AbstractRunner):
@@ -423,36 +389,6 @@ class JsonRunner(AbstractRunner):
         commands = self._protocol_engine.state_view.commands.get_all()
         return RunResult(commands=commands, state_summary=run_data, parameters=[])
 
-    # todo(tamar): change to QueueCommand, should this be async
-    def _create_and_add_command_queue(
-        self, queue_command: QueueCommandAction
-    ) -> QueueCommandAction:
-        # TODO(mc, 2021-06-22): mypy has trouble with this automatic
-        # request > command mapping, figure out how to type precisely
-        # (or wait for a future mypy version that can figure it out).
-        # For now, unit tests cover mapping every request type
-        queued_command = queue_command.request._CommandCls.construct(
-            id=queue_command.command_id,
-            key=(
-                queue_command.request.key
-                if queue_command.request.key is not None
-                else (queue_command.request_hash or queue_command.command_id)
-            ),
-            createdAt=queue_command.created_at,
-            params=queue_command.request.params,  # type: ignore[arg-type]
-            intent=queue_command.request.intent,
-            status=CommandStatus.QUEUED,
-        )
-
-        self.set_command_queued(queued_command)
-
-        if queue_command.request_hash is not None:
-            self._protocol_engine._state_store.commands.state.latest_protocol_command_hash = (
-                queue_command.request.key
-            )
-
-        return queue_command
-
     async def _add_command_and_execute(self) -> None:
         for command in self._queued_commands:
             command_queue = self._create_and_add_command_queue(command)
@@ -467,6 +403,14 @@ class JsonRunner(AbstractRunner):
                 )
             elif result and result.error is None:
                 self.set_command_queued(result)
+
+    def set_command_queued(self, command: CommandCreate) -> None:
+        """add command to queue."""
+        self._add_to_queue(command)
+
+    def _add_to_queue(self, command: CommandCreate) -> None:
+        """Add new ID to the queued."""
+        self._queued_command_ids.add(command)
 
 
 class LiveRunner(AbstractRunner):
@@ -508,6 +452,21 @@ class LiveRunner(AbstractRunner):
         run_data = self._protocol_engine.state_view.get_summary()
         commands = self._protocol_engine.state_view.commands.get_all()
         return RunResult(commands=commands, state_summary=run_data, parameters=[])
+
+    def set_command_queued(self, command: CommandCreate) -> None:
+        """add command to queue."""
+        if command.intent == CommandIntent.SETUP:
+            self._add_to_setup_queue(command)
+        elif command.intent == CommandIntent.FIXIT:
+            self._add_to_fixit_queue(command)
+
+    def _add_to_setup_queue(self, command: CommandCreate) -> None:
+        """Add a new ID to the queued setup."""
+        self._queued_setup_command_ids.add(command)
+
+    def _add_to_fixit_queue(self, command: CommandCreate) -> None:
+        """Add a new ID to the queued fixit."""
+        self._queued_fixit_command_ids.add(command)
 
 
 AnyRunner = Union[PythonAndLegacyRunner, JsonRunner, LiveRunner]
