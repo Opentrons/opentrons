@@ -34,18 +34,18 @@ export function SelectDestLabware(
 ): JSX.Element | null {
   const { onNext, onBack, exitButtonProps, state, dispatch } = props
   const { i18n, t } = useTranslation(['quick_transfer', 'shared'])
+  if (state.pipette == null) return null
   const labwareDisplayCategoryFilters: LabwareFilter[] = [
     'all',
     'wellPlate',
     'reservoir',
   ]
-  if (state.pipette?.channels === 1) {
+  if (state.pipette.channels === 1) {
     labwareDisplayCategoryFilters.push('tubeRack')
   }
   const [selectedCategory, setSelectedCategory] = React.useState<LabwareFilter>(
     'all'
   )
-  if (state.pipette == null) return null
   const compatibleLabwareDefinitions = getCompatibleLabwareByCategory(
     state.pipette.channels,
     selectedCategory

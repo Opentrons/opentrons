@@ -29,7 +29,7 @@ export function SelectDestWells(props: SelectDestWellsProps): JSX.Element {
         type: 'SET_DEST_WELLS',
         wells: Object.keys(state.source.wells),
       })
-    } else if (state.destination != 'source' && state.destination != null) {
+    } else if (state.destination !== 'source' && state.destination != null) {
       dispatch({
         type: 'SET_DEST_WELLS',
         wells: Object.keys(state.destination.wells),

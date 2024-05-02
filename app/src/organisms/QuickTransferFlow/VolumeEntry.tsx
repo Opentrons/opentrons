@@ -65,7 +65,7 @@ export function VolumeEntry(props: VolumeEntryProps): JSX.Element {
   }
 
   const error =
-    volume != '' &&
+    volume !== '' &&
     (volumeAsNumber < volumeRange.min || volumeAsNumber > volumeRange.max)
       ? t(`value_out_of_range`, {
           min: volumeRange.min,
@@ -82,7 +82,7 @@ export function VolumeEntry(props: VolumeEntryProps): JSX.Element {
         onClickButton={handleClickNext}
         secondaryButtonProps={exitButtonProps}
         top={SPACING.spacing8}
-        buttonIsDisabled={error != null || volume == ''}
+        buttonIsDisabled={error != null || volume === ''}
       />
       <Flex
         alignSelf={ALIGN_CENTER}

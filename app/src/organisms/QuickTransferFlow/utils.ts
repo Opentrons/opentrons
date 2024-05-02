@@ -151,15 +151,20 @@ export function getVolumeLimits(
   const maxPipetteVolume = Object.values(state.pipette.liquids)[0].maxVolume
   const tipRackVolume = Object.values(state.tipRack.wells)[0].totalLiquidVolume
   const sourceLabwareVolume = Math.min(
-    ...state.sourceWells.map(well => state.source.wells[well].totalLiquidVolume)
+    ...state.sourceWells.map(well =>
+      state.source ? state.source.wells[well].totalLiquidVolume : 0
+    )
   )
 
   const destLabwareVolume = Math.min(
-    ...state.destinationWells.map(well =>
-      state.destination === 'source'
-        ? state.source.wells[well].totalLiquidVolume
-        : state.destination.wells[well].totalLiquidVolume
-    )
+    ...state.destinationWells.map(well => {
+      {
+        if (state.source == null || state.destination == null) return 0
+        return state.destination === 'source'
+          ? state.source.wells[well].totalLiquidVolume
+          : state.destination.wells[well].totalLiquidVolume
+      }
+    })
   )
   let maxVolume = maxPipetteVolume
   if (state.sourceWells.length === state.destinationWells.length) {
@@ -210,7 +215,7 @@ export function generateCompatibleLabwareForPipette(
 
   const compatibleDefUriList = allLabwareDefinitions.reduce<string[]>(
     (acc, definition) => {
-      if (pipetteSpecs.channels == 1) {
+      if (pipetteSpecs.channels === 1) {
         return [...acc, getLabwareDefURI(definition)]
       } else {
         const isCompatible = canPipetteUseLabware(pipetteSpecs, definition)

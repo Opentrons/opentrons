@@ -9,7 +9,7 @@ import {
 import type { QuickTransferSetupState } from '../types'
 
 describe('getVolumeLimits', () => {
-  let state: QuickTransferSetupState = {
+  const state: QuickTransferSetupState = {
     pipette: {
       liquids: [
         {
