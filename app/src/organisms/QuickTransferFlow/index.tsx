@@ -56,10 +56,7 @@ export const QuickTransferFlow = (): JSX.Element => {
     state,
     dispatch,
     onBack: () => setCurrentStep(prevStep => prevStep - 1),
-    onNext: () => {
-      console.log('next step')
-      setCurrentStep(prevStep => prevStep + 1)
-    },
+    onNext: () => setCurrentStep(prevStep => prevStep + 1),
     exitButtonProps,
   }
 
