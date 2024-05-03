@@ -17,7 +17,7 @@ Build on a Task
 
 Consider what scientific task is at the heart of your protocol, and build parameters that contribute to, rather than diverge from it.
 
-For example, it makes sense to add a parameter for number of samples to a protocol that uses a particular DNA prep reagent kit. But it wouldn't make sense to add a parameter for *which reagent kit* to use for DNA prep. That kind of parameter would affect so many aspects of the protocol that it would make more sense to maintain two protocols, one for each kit.
+For example, it makes sense to add a parameter for number of samples to a protocol that uses a particular DNA prep reagent kit. But it wouldn't make sense to add a parameter for *which reagent kit* to use for DNA prep. That kind of parameter would affect so many aspects of the protocol that it would make more sense to maintain a separate protocol for each kit.
 
 Also consider how a small number of parameters can combine to produce many useful outputs. Take the serial dilution task from the :ref:`tutorial` as an example. We could add just three parameters to it: number of dilutions, dilution factor, and number of rows. Now that single protocol can produce a whole plate that gradually dilutes, a 2×4 grid that rapidly dilutes, and *thousands* of other combinations.
 
@@ -28,7 +28,7 @@ Consider Contradictions
 
 Here's a common time-saving use of parameters: your protocol requires a 1-channel pipette and an 8-channel pipette, but it doesn't matter which mount they're attached to. Without parameters, you would have to assign the mounts in your protocol. Then if the robot is set up in the reverse configuration, you'd have to either physically swap the pipettes or modify your protocol.
 
-One way to get this information is to ask which mount the 1-channel pipette is on, and which pipette the 8-channel pipette is on. But if a user answers "left" to both questions — even by accident — the API will raise an error, because you can't load two pipettes on a single mount. It's no better to flip things around by asking which pipette is on the left mount, and which pipette is on the right mount. Now the user can say that both mounts have a 1-channel pipette. This is even more dangerous, because it *might not* raise any errors in analysis. The protocol could run "successfully" on a robot with two 1-channel pipettes, but produce completely unintended results.
+One way to get this information is to ask which mount the 1-channel pipette is on, and which mount the 8-channel pipette is on. But if a user answers "left" to both questions — even by accident — the API will raise an error, because you can't load two pipettes on a single mount. It's no better to flip things around by asking which pipette is on the left mount, and which pipette is on the right mount. Now the user can say that both mounts have a 1-channel pipette. This is even more dangerous, because it *might not* raise any errors in analysis. The protocol could run "successfully" on a robot with two 1-channel pipettes, but produce completely unintended results.
 
 The best way to avoid these contradictions is to collapse the two questions into one, with limited choices. Where are the pipettes mounted? Either the 1-channel is on the left and the 8-channel on the right, or the 8-channel is on the left and the 1-channel is on the right. This approach is best for several reasons:
 
