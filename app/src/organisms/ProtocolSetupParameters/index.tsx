@@ -168,7 +168,7 @@ export function ProtocolSetupParameters({
             <React.Fragment key={`${parameter.displayName}_${index}`}>
               <ProtocolSetupStep
                 hasIcon={!(parameter.type === 'bool')}
-                status="general"
+                status="inform"
                 title={parameter.displayName}
                 onClickSetupStep={() => handleSetParameter(parameter)}
                 detail={formatRunTimeParameterValue(parameter, t)}
