@@ -6,34 +6,45 @@ The Opentrons AI application's server.
 
 ## Developing
 
-To get started: clone the `Opentrons/opentrons` repository, set up your computer for development as specified in the [contributing guide][contributing-guide-setup], and then:
+- This folder is **not** plugged into the global Make ecosystem. This is intentional, this is a serverless application not tied to the Robot Stack dependencies.
 
-```shell
-# change into the cloned directory
-cd opentrons
-# prerequisite: install dependencies as specified in project setup
-make setup
-# launch the dev server
-make -C opentrons-ai-server dev
-```
+### Setup
+
+1. clone the repository `gh repo clone Opentrons/opentrons`
+1. `cd opentrons/opentrons-ai-server`
+1. Have pyenv installed per [DEV_SETUP.md](../DEV_SETUP.md)
+1. Use pyenv to install python `pyenv install 3.12.3` or latest 3.12.\*
+1. Have nodejs and yarn installed per [DEV_SETUP.md](../DEV_SETUP.md)
+   1. This allows formatting of of `.md` and `.json` files
+1. select the python version `pyenv local 3.12.3`
+   1. This will create a `.python-version` file in this directory
+1. select the node version `nvs` currently 18.\*
+1. Install pipenv and python dependencies `make setup`
+
+## Install a dev dependency
+
+`python -m pipenv install pytest==8.2.0 --dev`
+
+## Install a production dependency
+
+`python -m pipenv install openai==1.25.1`
 
 ## Stack and structure
 
-The UI stack is built using:
+### Lambda Pattern
 
-- [OpenAI Python API library][]
+- [powertools](https://powertools.aws.dev/)
+- [reinvent talk for the pattern](https://www.youtube.com/watch?v=52W3Qyg242Y)
+- [for creating docs](https://www.ranthebuilder.cloud/post/serverless-open-api-documentation-with-aws-powertools)
 
-Some important directories:
+### Lambda Code Organizations and Separation of Concerns
 
-- `opentrons-ai-client` — Opentrons AI application's client-side
-
-## Testing
-
-TBD
-
-## Building
-
-TBD
+- handler
+  - the lambda handler
+- domain
+  - the business logic
+- integration
+  - the integration with other services
 
 [pytest]: https://docs.pytest.org/en/
 [openai python api library]: https://pypi.org/project/openai/
