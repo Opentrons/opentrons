@@ -23,7 +23,7 @@ Then ``params`` will gain three attributes: ``params.dry_run``, ``params.sample_
 
 .. code-block::
 
-    if protocol.params.dry_run == False:
+    if protocol.params.dry_run is False:
         pipette.mix(repetitions=10, volume=protocol.params.volume)
 
 You can also save parameter values to variables with names of your choosing.

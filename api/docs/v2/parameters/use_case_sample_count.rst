@@ -29,7 +29,7 @@ We want to limit the number of samples to 8, 16, 24, or 32, so we'll use an inte
         parameters.add_int(
             variable_name="sample_count",
             display_name="Sample count",
-            description="Number of input DNA samples"
+            description="Number of input DNA samples",
             default=24,
             choices=[
                 {"display_name": "8", "value": 8},
@@ -267,7 +267,7 @@ This will replace the first 200 µL tip rack (in slot A2) with the last 200 µL 
 
 However, in the full protocol, sample count is not the only parameter that affects the rate of tip use. It would be unwieldy to calculate in advance all the permutations of when tip replenishment is necessary. Instead, before each stage of the protocol, we could use :py:obj:`.Well.has_tip()` to check whether the first tip rack is empty. If the *last well* of the rack is empty, we can assume that the entire rack is empty and needs to be replaced::
 
-    if tip_racks_200[0].wells()[-1].has_tip == False:
+    if tip_racks_200[0].wells()[-1].has_tip is False:
         # same move_labware() steps as above
 
 For a protocol that uses tips at a faster rate than this one — such that it might exhaust a tip rack in a single ``for`` loop of pipetting steps — you may have to perform such checks even more frequently. You can even define a function that counts tips or performs ``has_tip`` checks in combination with picking up a tip, and use that instead of :py:meth:`.pick_up_tip` every time you pipette. The built-in capabilities of Python and the methods of the Python Protocol API give you the flexibility to add this kind of smart behavior to your protocols.

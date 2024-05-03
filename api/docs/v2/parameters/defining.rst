@@ -46,7 +46,7 @@ Depending on the :ref:`type of parameter <rtp-types>`, you'll need to specify so
        - Optional, for numeric parameters only.
        - Displays after the number during run setup.
        - Does not affect the parameter's value or protocol execution.
-       - Maximum [10/TK] characters.
+       - Maximum 10 characters.
 
 
 
@@ -93,19 +93,20 @@ During run setup, users can toggle between the two values. In the Opentrons App,
 Integer Parameters
 ------------------
 
-Integer parameters either accept a range of numbers or a list of numbers. You must specify one or the other; you can't prompt for any integer.
+Integer parameters either accept a range of numbers or a list of numbers. You must specify one or the other; you can't create an open-ended prompt that accepts any integer.
 
 To specify a range, include ``minimum`` and ``maximum``.
 
 .. code-block::
 
     parameters.add_int(
-        variable_name="sample_count",
-        display_name="Sample count",
-        description="How many samples to process.",
-        default=24,
-        minimum=8,
-        maximum=48
+        variable_name="volume",
+        display_name="Aspirate volume",
+        description="How much to aspirate from each sample.",
+        default=20,
+        minimum=10,
+        maximum=100,
+        unit="µL"
     )
 
 During run setup, the user can enter any integer value from the minimum up to the maximum. Entering a value outside of the range will show an error. At that point, they can correct their custom value or restore the default value.
@@ -123,8 +124,7 @@ To specify a list of numbers, include ``choices``. Each choice is a dictionary w
             {"display_name": "Low (10 µL)", "value": 10},
             {"display_name": "Medium (20 µL)", "value": 20},
             {"display_name": "High (50 µL)", "value": 50},
-        ],
-        unit="µL"
+        ]
     )
 
 During run setup, the user can choose from a menu of the provided choices.
@@ -134,7 +134,7 @@ During run setup, the user can choose from a menu of the provided choices.
 Float Parameters
 ----------------
 
-Float parameters either accept a range of numbers or a list of numbers. You must specify one or the other; you can't prompt for any floating point number.
+Float parameters either accept a range of numbers or a list of numbers. You must specify one or the other; you can't create an open-ended prompt that accepts any floating point number.
 
 Specifying a range or list is done exactly the same as in the integer examples above. The only difference is that all values must be floating point numbers.
 
@@ -149,11 +149,8 @@ Specifying a range or list is done exactly the same as in the integer examples a
             {"display_name": "Low (2.5 µL)", "value": 2.5},
             {"display_name": "Medium (5 µL)", "value": 5.0},
             {"display_name": "High (10 µL)", "value": 10.0},
-        ],
-        unit="µL"
+        ]
     )
-
-Remember, you can't mix types in a parameter. So values of ``2.5``, ``5.0``, and ``10.0`` are valid, but ``2.5``, ``5``, and ``10`` will raise an error.
 
 .. versionadded:: 2.18
 
@@ -162,7 +159,9 @@ String Parameters
 
 String parameters only accept a list of values. You can't currently prompt for free text entry of a string value.
 
-To specify a list of strings, include ``choices``. Each choice is a dictionary with entries for display name and value. In most cases, the display name and value *will not* match. A common use for string display names is to provide an easy-to-read version of an API load name. You can also use them to briefly explain the effect each choice will have.
+To specify a list of strings, include ``choices``. Each choice is a dictionary with entries for display name and value. Only the display name will appear during run setup.
+
+A common use for string display names is to provide an easy-to-read version of an API load name. You can also use them to briefly explain the effect each choice will have.
 
 .. code-block::
 

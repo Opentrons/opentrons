@@ -45,13 +45,13 @@ Many protocols have built-in delays, either for a module to work or to let a rea
 
 To start, let's consider a simple :py:meth:`.delay` command. We can wrap it in an ``if`` statement such that the delay will only execute when the run is *not* a dry run::
 
-    if protocol.params.dry_run == False:
+    if protocol.params.dry_run is False:
         protocol.delay(minutes=5)
 
 You can extend this approach to more complex situations, like module interactions. For example, in a protocol that moves a plate to the Thermocycler for an incubation, you'll want to perform all the movement steps — opening and closing the module lid, and moving the plate to and from the block — but skip the heating and cooling time. The simplest way to do this is, like in the delay example above, to wrap each skippable command::
 
     protocol.move_labware(labware=plate, new_location=tc_mod, use_gripper=True)
-    if protocol.params.dry_run == False:
+    if protocol.params.dry_run is False:
         tc_mod.set_block_temperature(4)
         tc_mod.set_lid_temperature(100)
     tc_mod.close_lid()
@@ -59,7 +59,7 @@ You can extend this approach to more complex situations, like module interaction
         {"temperature": 68, "hold_time_seconds": 180},
         {"temperature": 98, "hold_time_seconds": 180},
     ]
-    if protocol.params.dry_run == False:
+    if protocol.params.dry_run is False:
         tc_mod.execute_profile(
             steps=pcr_profile, repetitions=1, block_max_volume=50
         )
@@ -70,7 +70,7 @@ Shortening Mix Steps
 
 Similar to delays, mix steps can take a long time because they are inherently repetitive actions. Mixing ten times takes ten times as long as mixing once! To save time, set a mix repetitions variable based on the value of ``protocol.params.dry_run`` and pass that to :py:meth:`.mix`::
 
-    if protocol.params.dry_run == True:
+    if protocol.params.dry_run is True:
         mix_reps = 1
     else:
         mix_reps = 10
@@ -78,7 +78,7 @@ Similar to delays, mix steps can take a long time because they are inherently re
 
 Note that this checks whether the dry run parameter is ``True``. If you prefer to set up all your ``if`` statements to check whether it's ``False``, you can reverse the logic::
 
-    if protocol.params.dry_run == False:
+    if protocol.params.dry_run is False:
         mix_reps = 10
     else:
         mix_reps = 1
@@ -88,7 +88,7 @@ Returning Tips
 
 Tips used in a dry run should be reusable — for another dry run, if nothing else. It doesn't make sense to dispose of them in a trash container, unless you specifically need to test movement to the trash. You can choose whether to use :py:meth:`.drop_tip` or :py:meth:`.return_tip` based on the value of ``protocol.params.dry_run``. If the protocol doesn't have too many tip drop actions, you can use an ``if`` statement each time::
 
-    if protocol.params.dry_run == True:
+    if protocol.params.dry_run is True:
         pipette.return_tip()
     else:
         pipette.drop_tip()
@@ -96,7 +96,7 @@ Tips used in a dry run should be reusable — for another dry run, if nothing el
 However, repeating this block every time you handle tips could significantly clutter your code. Instead, you could define it as a function::
 
     def return_or_drop(pipette):
-        if protocol.params.dry_run == True:
+        if protocol.params.dry_run is True:
             pipette.return_tip()
         else:
             pipette.drop_tip()
@@ -114,7 +114,7 @@ Additionally, if your protocol uses enough tips that you have to replenish tip r
 
 The API has methods to handle both of these situations. To continue using the same tip rack without physically replace it, call :py:meth:`.reset_tipracks`. In the live run, move the empty tip rack off the deck and move a full one into place::
 
-    if protocol.params.dry_run == True:
+    if protocol.params.dry_run is True:
         pipette.reset_tipracks()
     else:
         protocol.move_labware(

@@ -6,9 +6,9 @@
 Parameter Style Guide
 *********************
 
-Defining parameters creates an important part of the user experience for the technicians who run your protocols. They rely on your parameter names and descriptions being clear, consistent, and ultimately easy to use.
+It's important to write clear names and descriptions when you :ref:`define parameters <defining-rtp>` in your protocols. Clarity improves the user experience for the technicians who run your protocols. They rely on your parameter names and descriptions to understand how the robot will function when running your protocol. 
 
-Adopting the advice of this guide also makes your protocols more consistent with those in the `Opentrons Protocol Library <https://library.opentrons.com>`_, which can help others access and replicate your science. 
+Adopting the advice of this guide will help make your protocols clear, consistent, and ultimately easy to use. It also aligns them with protocols in the `Opentrons Protocol Library <https://library.opentrons.com>`_, which can help others access and replicate your science.
 
 General Guidance
 ================
@@ -129,7 +129,7 @@ Number Choices
 Strings
 -------
 
-**Don't use string choices when a Boolean will work.** Use a Boolean when your string choices could be rephrased in terms of "true/false" or "on/off". Note that this does not apply to all two-choice situations.
+**Avoid strings that are synonymous with "yes" and "no".** When presenting exactly two string choices, consider their meaning. Can they be rephrased in terms of "yes/no", "true/false", or "on/off"? If no, then a string parameter is appropriate. If yes, it's better to use a Boolean, which appears in run setup as a toggle rather than a dropdown menu.
 
     - ✅ Blue, Red
     - ✅ Left-to-right, Right-to-left
