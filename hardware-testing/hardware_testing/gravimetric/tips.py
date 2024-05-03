@@ -8,6 +8,8 @@ from opentrons.protocol_api import (
     InstrumentContext,
 )
 
+_PROBES = 2
+
 # Rows by Channel:
 #  - Rear Racks (slot-row=C)
 #     - 7
@@ -116,7 +118,7 @@ def _unused_tips_for_racks(
     rows = "ABCDEFGH"
     rack_max: int = 96
     if cavity:
-        rack_max = trials_per_rack + 1
+        rack_max = trials_per_rack + _PROBES
         # 31 for the first rack so we can grab a tip for the blanks
     for rack in racks:
         rack_wells: List[Well] = []
