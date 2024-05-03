@@ -54,6 +54,7 @@ import glob
 from opentrons.hardware_control.types import StatusBarState
 from hardware_testing.gravimetric.workarounds import get_sync_hw_api
 
+from .tips import _PROBES
 
 _MEASUREMENTS: List[Tuple[str, MeasurementData]] = list()
 
@@ -428,7 +429,13 @@ def build_gm_report(
     """Build a CSVReport formated for gravimetric tests."""
     ui.print_header("CREATE TEST-REPORT")
     test_report = report.create_csv_test_report(
-        test_volumes, pipette_channels, increment, trials, name, run_id=run_id, cavity_racks=cavity_racks
+        test_volumes,
+        pipette_channels,
+        increment,
+        trials,
+        name,
+        run_id=run_id,
+        cavity_racks=cavity_racks,
     )
     test_report.set_tag(pipette_tag)
     test_report.set_operator(operator_name)
@@ -567,6 +574,26 @@ def _get_liquid_height(
     return _liquid_height
 
 
+def _multi_sense(
+    resources: TestResources, cfg: config.GravimetricConfig, total_tips: int, well: Well
+):
+    height_sum: float = 0
+    for h in range(_PROBES):
+        tip = _next_tip_for_channel(cfg, resources, 0, total_tips)
+        tip_location = tip.top()
+        _pick_up_tip(resources.ctx, resources.pipette, cfg, location=tip_location)
+        height_sum += _get_liquid_height(resources, cfg, well)
+        if h != (_PROBES - 1):
+            _drop_tip(
+                resources.pipette,
+                return_tip=False,
+                minimum_z_height=_minimum_z_height(cfg),
+                offset=_get_channel_offset(cfg, 0),
+            )  # always trash calibration tips
+    return height_sum / _PROBES
+    return
+
+
 def run(
     cfg: config.GravimetricConfig, resources: TestResources, number_of_racks: int
 ) -> None:  # noqa: C901
@@ -610,13 +637,9 @@ def run(
         _MEASUREMENTS = list()
     try:
         ui.print_title("FIND LIQUID HEIGHT")
-        first_tip = _next_tip_for_channel(cfg, resources, 0, total_tips)
-        setup_channel_offset = _get_channel_offset(cfg, channel=0)
-        first_tip_location = first_tip.top().move(setup_channel_offset)
-        _pick_up_tip(resources.ctx, resources.pipette, cfg, location=first_tip_location)
-        ui.print_info("moving to scale")
         well = labware_on_scale["A1"]
-        _liquid_height = _get_liquid_height(resources, cfg, well)
+        ui.print_info("moving to scale")
+        _liquid_height = _multi_sense(resources, cfg, total_tips, well)
         height_below_top = well.depth - _liquid_height
         ui.print_info(f"liquid is {height_below_top} mm below top of vial")
         liquid_tracker.set_start_volume_from_liquid_height(
@@ -759,19 +782,10 @@ def run(
                         and trial_count < cfg.trials
                         and (trial_count) % (cfg.trials / number_of_racks) == 0
                     ):
-                        next_tip = _next_tip_for_channel(
-                            cfg, resources, channel, total_tips
-                        )
-                        next_tip_location = next_tip.top().move(channel_offset)
-                        if not cfg.same_tip:
-                            _pick_up_tip(
-                                resources.ctx,
-                                resources.pipette,
-                                cfg,
-                                location=next_tip_location,
-                            )
                         if not cfg.jog:
-                            _liquid_height = _get_liquid_height(resources, cfg, well)
+                            _liquid_height = _multi_sense(
+                                resources, cfg, total_tips, well
+                            )
                             liquid_tracker.set_start_volume_from_liquid_height(
                                 well, _liquid_height, name="Water"
                             )
@@ -786,7 +800,9 @@ def run(
                             liquid_tracker,
                             resources.test_report,
                             labware_on_scale,
-                            cavity_num=int((trial_count) / (cfg.trials / number_of_racks)),
+                            cavity_num=int(
+                                (trial_count) / (cfg.trials / number_of_racks)
+                            ),
                         )
                         ui.print_info("dropping tip")
                         if not cfg.same_tip:
