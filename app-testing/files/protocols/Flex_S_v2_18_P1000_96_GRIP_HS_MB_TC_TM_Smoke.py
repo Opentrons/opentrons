@@ -447,7 +447,6 @@ def run(ctx: protocol_api.ProtocolContext) -> None:
     test_gripper_moves()
     test_module_usage()
     test_manual_moves()
-    
 
     ###################################################################################################
     ### THE ORDER OF THESE FUNCTION CALLS MATTER. CHANGING THEM WILL CAUSE THE PROTOCOL NOT TO WORK ###

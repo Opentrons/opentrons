@@ -29,7 +29,7 @@ requirements = {"robotType": "OT-2", "apiLevel": "2.16"}
 # ----
 
 # - move_labware added - Manual Deck State Modification
-# - ProtocolContext.load_adapter added 
+# - ProtocolContext.load_adapter added
 # - OFF_DECK location added
 
 # ----

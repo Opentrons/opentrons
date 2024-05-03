@@ -21,7 +21,7 @@ requirements = {"robotType": "OT-2", "apiLevel": "2.15"}
 # ----
 
 # - move_labware added - Manual Deck State Modification
-# - ProtocolContext.load_adapter added 
+# - ProtocolContext.load_adapter added
 # - OFF_DECK location added
 
 # ----
@@ -150,7 +150,7 @@ def run(ctx: protocol_api.ProtocolContext) -> None:
     # -------------------------- #
     # Added in API version: 2.14 #
     # -------------------------- #
-    
+
     water = ctx.define_liquid(
         name="water", description="H₂O", display_color="#42AB2D"
     )  # subscript 2 https://www.compart.com/en/unicode/U+2082
