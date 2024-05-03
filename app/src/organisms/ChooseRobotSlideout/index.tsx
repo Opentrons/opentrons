@@ -24,7 +24,7 @@ import {
   SPACING,
   StyledText,
   TYPOGRAPHY,
-  useHoverTooltip,
+  useTooltip,
 } from '@opentrons/components'
 
 import { FLEX_ROBOT_TYPE, OT2_ROBOT_TYPE } from '@opentrons/shared-data'
@@ -62,6 +62,8 @@ export const CARD_OUTLINE_BORDER_STYLE = css`
     border-color: ${COLORS.grey55};
   }
 `
+
+const TOOLTIP_DELAY_MS = 2000
 
 interface RobotIsBusyAction {
   type: 'robotIsBusy'
@@ -145,7 +147,11 @@ export function ChooseRobotSlideout(
 
   const dispatch = useDispatch<Dispatch>()
   const isScanning = useSelector((state: State) => getScanning(state))
-  const [targetProps, tooltipProps] = useHoverTooltip()
+  const [targetProps, tooltipProps] = useTooltip()
+  const [
+    showRestoreValuesTooltip,
+    setShowRestoreValuesTooltip,
+  ] = React.useState<boolean>(false)
   const [isInputFocused, setIsInputFocused] = React.useState<boolean>(false)
 
   const unhealthyReachableRobots = useSelector((state: State) =>
@@ -512,16 +518,35 @@ export function ChooseRobotSlideout(
                 ? ENABLED_LINK_CSS
                 : DISABLED_LINK_CSS
             }
-            onClick={() => resetRunTimeParameters?.()}
+            onClick={() => {
+              if (isRestoreDefaultsLinkEnabled) {
+                resetRunTimeParameters?.()
+              } else {
+                setShowRestoreValuesTooltip(true)
+                setTimeout(
+                  () => setShowRestoreValuesTooltip(false),
+                  TOOLTIP_DELAY_MS
+                )
+              }
+            }}
+            paddingBottom={SPACING.spacing10}
             {...targetProps}
           >
             {t('restore_defaults')}
           </Link>
-          {!isRestoreDefaultsLinkEnabled && (
-            <Tooltip tooltipProps={tooltipProps}>
-              {t('no_custom_values')}
-            </Tooltip>
-          )}
+          <Tooltip
+            tooltipProps={{
+              ...tooltipProps,
+              visible: showRestoreValuesTooltip,
+            }}
+            css={css`
+              &:hover {
+                cursor: auto;
+              }
+            `}
+          >
+            {t('no_custom_values')}
+          </Tooltip>
         </Flex>
         <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing16}>
           {runTimeParameters}
