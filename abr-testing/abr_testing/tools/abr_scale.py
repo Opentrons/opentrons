@@ -25,25 +25,7 @@ if __name__ == "__main__":
         nargs=1,
         help="Name of google sheet and local csv to save data to.",
     )
-    parser.add_argument("robot", metavar="ROBOT", type=str, nargs=1, help="Robot name.")
-    parser.add_argument(
-        "labware_name",
-        metavar="LABWARE_NAME",
-        type=str,
-        nargs=1,
-        help="Name of labware.",
-    )
-    parser.add_argument(
-        "protocol_step",
-        metavar="PROTOCOL_STEP",
-        type=str,
-        nargs=1,
-        help="1 for empty plate, 2 for filled plate, 3 for end of protocol.",
-    )
     args = parser.parse_args()
-    robot = args.robot[0]
-    labware = args.labware_name[0]
-    protocol_step = args.protocol_step[0]
     storage_directory = args.storage_directory[0]
     file_name = args.file_name[0]
     file_name_csv = file_name + ".csv"
@@ -71,7 +53,9 @@ if __name__ == "__main__":
         print("Connected to google sheet.")
     except FileNotFoundError:
         print("No google sheets credentials. Add credentials to storage notebook.")
-
+    robot = input("Robot: ")
+    labware = input("Labware: ")
+    protocol_step = input("Measurement Step (1,2,3): ")
     # Scale Loop
     grams, is_stable = scale.read_mass()
     grams, is_stable = scale.read_mass()
