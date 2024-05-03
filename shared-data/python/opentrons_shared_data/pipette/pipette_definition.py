@@ -158,6 +158,31 @@ class PlungerHomingConfigurations(BaseModel):
         description="The speed to move the plunger axis for homing.",
     )
 
+class ValidNozzleMaps(BaseModel):
+    maps: Dict[str, List[str]] = Field(
+        ...,
+        description="Dictionary of predetermined nozzle maps for partial tip configurations.",
+    )
+
+class PressAndCamConfigurationValues(BaseModel):
+    speed: float = Field(
+        ...,
+        description="The speed to move the Z axis for each force pickup of a given partial tip configuration for a given tip type.",
+    )
+    distance: float = Field(
+        ...,
+        description="The starting distance to begin a pick up tip from, based on partial tip configuration and tip type.",
+    )
+    current: float = Field(
+        ...,
+        description="The current used by a given partial tip configuration by tip type.",
+    )
+    tip_overlap: float = Field(
+        ...,
+        description="The tip overlap of a given partial tip configuration.",
+        alias="tipOverlap",
+    )
+
 
 class PressFitPickUpTipConfiguration(BaseModel):
     presses: int = Field(
@@ -168,40 +193,27 @@ class PressFitPickUpTipConfiguration(BaseModel):
         ...,
         description="The increment to move the pipette down on each force tip pickup press",
     )
-    distance_by_tip_count: Dict[int, float] = Field(
+    configuration_by_nozzle_map: Dict[str, Dict[str, PressAndCamConfigurationValues]]= Field(
         ...,
-        description="The starting distance to begin a pick up tip from, based on number of tips being picked up",
-        alias="distanceByTipCount",
+        description="The speed, distance, current and overlap configurations for a given partial tip configuration by tip type.",
+        alias="configurationByNozzleMap",
     )
-    speed_by_tip_count: Dict[int, float] = Field(
-        ...,
-        description="The speed to move the Z axis for each force pickup, based on number of tips being picked up",
-        alias="speedByTipCount",
-    )
-    current_by_tip_count: Dict[int, float] = Field(
-        ...,
-        description="A current dictionary look-up by partial tip configuration.",
-        alias="currentByTipCount",
-    )
-
 
 class CamActionPickUpTipConfiguration(BaseModel):
-    distance: float = Field(..., description="How far to move the cams once engaged")
-    speed: float = Field(..., description="How fast to move the cams when engaged")
     prep_move_distance: float = Field(
         ..., description="How far to move the cams to engage the rack"
     )
     prep_move_speed: float = Field(
         ..., description="How fast to move the cams when moving to the rack"
     )
-    current_by_tip_count: Dict[int, float] = Field(
-        ...,
-        description="A current dictionary look-up by partial tip configuration.",
-        alias="currentByTipCount",
-    )
     connect_tiprack_distance_mm: float = Field(
         description="The distance to move the head down to connect with the tiprack before clamping.",
         alias="connectTiprackDistanceMM",
+    )
+    configuration_by_nozzle_map: Dict[str, Dict[str, PressAndCamConfigurationValues]]= Field(
+        ...,
+        description="The speed, distance, current and overlap configurations for a given partial tip configuration by tip type.",
+        alias="configurationByNozzleMap",
     )
 
 
