@@ -36,7 +36,7 @@ export function InputPrompt(): JSX.Element {
   })
   const [preparedPrompt] = useAtom(preparedPromptAtom)
   const [, setChatData] = useAtom(chatDataAtom)
-  const [submitted, setSubmitted] = React.useState(false)
+  const [submitted, setSubmitted] = React.useState<boolean>(false)
 
   const [data, setData] = React.useState<any>(null)
   const [loading, setLoading] = React.useState<boolean>(false)
@@ -59,7 +59,6 @@ export function InputPrompt(): JSX.Element {
           },
           query: prompt,
         })
-        console.log('response', response)
         setData(response.data)
       } catch (err) {
         setError('Error fetching data from the API.')
