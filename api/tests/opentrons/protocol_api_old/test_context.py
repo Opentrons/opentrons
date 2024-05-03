@@ -85,7 +85,7 @@ async def test_motion(ctx, hardware):
     old_pos[Axis.X] = 0.0
     old_pos[Axis.Y] = 0.0
     old_pos[Axis.A] = 0.0
-    old_pos[Axis.C] = 2.0
+    old_pos[Axis.C] = 2.5
     assert await hardware.current_position(instr._core.get_mount()) == pytest.approx(
         old_pos
     )

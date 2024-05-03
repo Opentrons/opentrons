@@ -1,5 +1,6 @@
 import * as React from 'react'
 import { useTranslation, Trans } from 'react-i18next'
+
 import {
   Flex,
   SPACING,
@@ -8,9 +9,10 @@ import {
   TYPOGRAPHY,
   DIRECTION_COLUMN,
 } from '@opentrons/components'
+
 import { SmallButton } from '../../atoms/buttons'
-import { useDeckConfigurationQuery } from '@opentrons/react-api-client'
 import { ChildNavigation } from '../ChildNavigation'
+import { useNotifyDeckConfigurationQuery } from '../../resources/deck_configuration'
 
 interface CreateNewTransferProps {
   onNext: () => void
@@ -19,7 +21,7 @@ interface CreateNewTransferProps {
 
 export function CreateNewTransfer(props: CreateNewTransferProps): JSX.Element {
   const { i18n, t } = useTranslation(['quick_transfer', 'shared'])
-  const deckConfig = useDeckConfigurationQuery().data ?? []
+  const deckConfig = useNotifyDeckConfigurationQuery().data ?? []
   return (
     <Flex>
       <ChildNavigation
@@ -57,7 +59,7 @@ export function CreateNewTransfer(props: CreateNewTransferProps): JSX.Element {
           <Flex width="50%">
             <DeckConfigurator
               deckConfig={deckConfig}
-              readOnly
+              editableCutoutIds={[]}
               handleClickAdd={() => {}}
               handleClickRemove={() => {}}
               additionalStaticFixtures={[

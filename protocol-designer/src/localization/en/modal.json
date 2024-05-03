@@ -70,7 +70,7 @@
   "tip_position": {
     "title": "Tip Positioning",
     "caption": "between {{min}} and {{max}}",
-    "warning": "The X and/or Y position value is close to edge of the well and might collide with it",
+    "warning": "One or more position offset values are close to the edge of the well and might collide with it",
     "radio_button": {
       "default": "{{defaultMmFromBottom}} mm from the bottom center (default)",
       "blowout": "0 mm from the top center (default)",
@@ -270,6 +270,11 @@
     "noBehaviorChange": {
       "body1": "Your protocol will be automatically updated to the latest version.",
       "body2": "We have added new features since the last time this protocol was updated, but have not made any changes to existing protocol behavior. Because of this we do not expect any changes in how the robot will execute this protocol. To be safe we will still recommend keeping a separate copy of the file you just imported.",
+      "body3": "As always, please contact us with any questions or feedback."
+    },
+    "toV8_1Migration": {
+      "body1": "Your protocol will be automatically updated to the latest version.",
+      "body2": "The default dispense height is now 1mm from the bottom of the well. If your protocol contains any dispense commands without a custom height, it will be automatically updated.",
       "body3": "As always, please contact us with any questions or feedback."
     },
     "toV8Migration": {

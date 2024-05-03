@@ -9,7 +9,6 @@ import {
   useProtocolAnalysisAsDocumentQuery,
   useInstrumentsQuery,
   useModulesQuery,
-  useDeckConfigurationQuery,
 } from '@opentrons/react-api-client'
 import {
   CompletedProtocolAnalysis,
@@ -24,6 +23,7 @@ import {
   useRequiredProtocolLabware,
   useRunTimeParameters,
 } from '../index'
+import { useNotifyDeckConfigurationQuery } from '../../../../resources/deck_configuration/useNotifyDeckConfigurationQuery'
 
 import type { Protocol } from '@opentrons/api-client'
 import { mockHeaterShaker } from '../../../../redux/modules/__fixtures__'
@@ -31,6 +31,9 @@ import { mockHeaterShaker } from '../../../../redux/modules/__fixtures__'
 vi.mock('@opentrons/react-api-client')
 vi.mock('../../../../organisms/Devices/hooks')
 vi.mock('../../../../redux/config')
+vi.mock(
+  '../../../../resources/deck_configuration/useNotifyDeckConfigurationQuery'
+)
 
 const PROTOCOL_ID = 'fake_protocol_id'
 const mockRTPData = [
@@ -280,7 +283,7 @@ describe.only('useMissingProtocolHardware', () => {
     vi.mocked(useProtocolAnalysisAsDocumentQuery).mockReturnValue({
       data: PROTOCOL_ANALYSIS,
     } as UseQueryResult<CompletedProtocolAnalysis>)
-    vi.mocked(useDeckConfigurationQuery).mockReturnValue({
+    vi.mocked(useNotifyDeckConfigurationQuery).mockReturnValue({
       data: [{}],
     } as UseQueryResult<DeckConfiguration>)
   })
@@ -314,7 +317,7 @@ describe.only('useMissingProtocolHardware', () => {
     })
   })
   it('should return 1 conflicted slot', () => {
-    vi.mocked(useDeckConfigurationQuery).mockReturnValue(({
+    vi.mocked(useNotifyDeckConfigurationQuery).mockReturnValue(({
       data: [
         {
           cutoutId: 'cutoutD3',
@@ -366,7 +369,7 @@ describe.only('useMissingProtocolHardware', () => {
       data: { data: [mockHeaterShaker] },
       isLoading: false,
     } as any)
-    vi.mocked(useDeckConfigurationQuery).mockReturnValue({
+    vi.mocked(useNotifyDeckConfigurationQuery).mockReturnValue({
       data: [
         omitBy(
           FLEX_SIMPLEST_DECK_CONFIG,
@@ -411,7 +414,7 @@ describe.only('useMissingProtocolHardware', () => {
       isLoading: false,
     } as any)
 
-    vi.mocked(useDeckConfigurationQuery).mockReturnValue({
+    vi.mocked(useNotifyDeckConfigurationQuery).mockReturnValue({
       data: [
         omitBy(
           FLEX_SIMPLEST_DECK_CONFIG,

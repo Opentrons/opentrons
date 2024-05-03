@@ -60,6 +60,8 @@ _PARTIAL_NOZZLE_CONFIGURATION_ADDED_IN = APIVersion(2, 16)
 """The version after which a partial nozzle configuration became available for the 96 Channel Pipette."""
 _PARTIAL_NOZZLE_CONFIGURATION_AUTOMATIC_TIP_TRACKING_IN = APIVersion(2, 18)
 """The version after which automatic tip tracking supported partially configured nozzle layouts."""
+_DISPOSAL_LOCATION_OFFSET_ADDED_IN = APIVersion(2, 18)
+"""The version after which offsets for deck configured trash containers and changes to alternating tip drop behavior were introduced."""
 
 
 class InstrumentContext(publisher.CommandPublisher):
@@ -1086,16 +1088,22 @@ class InstrumentContext(publisher.CommandPublisher):
             well = maybe_well
 
         elif isinstance(location, (TrashBin, WasteChute)):
+            # In 2.16 and 2.17, we would always automatically use automatic alternate tip drop locations regardless
+            # of whether you explicitly passed the disposal location as a location or if none was provided. Now, in
+            # 2.18 and moving forward, passing it in will bypass the automatic behavior and instead go to the set
+            # offset or the XY center if none is provided.
+            if self.api_version < _DISPOSAL_LOCATION_OFFSET_ADDED_IN:
+                alternate_drop_location = True
             with publisher.publish_context(
                 broker=self.broker,
                 command=cmds.drop_tip_in_disposal_location(
                     instrument=self, location=location
                 ),
             ):
-                # TODO(jbl 2024-02-28) when adding 2.18 api version checks, set alternate_tip_drop
-                #   if below that version for compatability
                 self._core.drop_tip_in_disposal_location(
-                    location, home_after=home_after
+                    location,
+                    home_after=home_after,
+                    alternate_tip_drop=alternate_drop_location,
                 )
             self._last_tip_picked_up_from = None
             return self
@@ -1928,13 +1936,6 @@ class InstrumentContext(publisher.CommandPublisher):
             should be of the same format used when identifying wells by name.
             Required unless setting ``style=ALL``.
 
-            .. note::
-                When using the ``COLUMN`` layout, the only fully supported value is
-                ``start="A12"``. You can use ``start="A1"``, but this will disable tip
-                tracking and you will have to specify the ``location`` every time you
-                call :py:meth:`.pick_up_tip`, such that the pipette picks up columns of
-                tips *from right to left* on the tip rack.
-
         :type start: str or ``None``
         :param tip_racks: Behaves the same as setting the ``tip_racks`` parameter of
             :py:meth:`.load_instrument`. If not specified, the new configuration resets
@@ -1947,6 +1948,20 @@ class InstrumentContext(publisher.CommandPublisher):
         #       :param front_right: The nozzle at the front left of the layout. Only used for
         #           NozzleLayout.QUADRANT configurations.
         #       :type front_right: str or ``None``
+        #
+        #       NOTE: Disabled layouts error case can be removed once desired map configurations
+        #       have appropriate data regarding tip-type to map current values added to the
+        #       pipette definitions.
+        disabled_layouts = [
+            NozzleLayout.ROW,
+            NozzleLayout.SINGLE,
+            NozzleLayout.QUADRANT,
+        ]
+        if style in disabled_layouts:
+            raise ValueError(
+                f"Nozzle layout configuration of style {style.value} is currently unsupported."
+            )
+
         if style != NozzleLayout.ALL:
             if start is None:
                 raise ValueError(

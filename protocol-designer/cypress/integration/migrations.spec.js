@@ -26,7 +26,7 @@ describe('Protocol fixtures migrate and match snapshots', () => {
       expectedExportFixture:
         '../../fixtures/protocol/8/doItAllV3MigratedToV8.json',
       unusedPipettes: false,
-      migrationModal: 'v8',
+      migrationModal: 'v8.1',
     },
     {
       title: 'doItAllV4 (schema 4, PD version 4.0.0) -> PD 8.1.x, schema 8',
@@ -34,7 +34,7 @@ describe('Protocol fixtures migrate and match snapshots', () => {
       expectedExportFixture:
         '../../fixtures/protocol/8/doItAllV4MigratedToV8.json',
       unusedPipettes: false,
-      migrationModal: 'v8',
+      migrationModal: 'v8.1',
     },
     {
       title:
@@ -43,7 +43,7 @@ describe('Protocol fixtures migrate and match snapshots', () => {
       expectedExportFixture:
         '../../fixtures/protocol/8/doItAllV7MigratedToV8.json',
       unusedPipettes: false,
-      migrationModal: 'v8',
+      migrationModal: 'v8.1',
     },
     {
       title:
@@ -60,6 +60,16 @@ describe('Protocol fixtures migrate and match snapshots', () => {
         'doItAllV8 flex robot -> reimported, should migrate to 8.1.x, schema 8',
       importFixture: '../../fixtures/protocol/8/doItAllV8.json',
       expectedExportFixture: '../../fixtures/protocol/8/doItAllV8.json',
+      migrationModal: null,
+      unusedPipettes: false,
+    },
+    {
+      title:
+        'new advanced settings with multi temp => reimported, should not migrate and stay at 8.1.x, schema 8',
+      importFixture:
+        '../../fixtures/protocol/8/newAdvancedSettingsAndMultiTemp.json',
+      expectedExportFixture:
+        '../../fixtures/protocol/8/newAdvancedSettingsAndMultiTemp.json',
       migrationModal: null,
       unusedPipettes: false,
     },
@@ -93,9 +103,11 @@ describe('Protocol fixtures migrate and match snapshots', () => {
         })
 
         if (migrationModal) {
-          if (migrationModal === 'v8') {
+          if (migrationModal === 'v8.1') {
             cy.get('div')
-              .contains('Protocol Designer no longer supports aspirate or mix')
+              .contains(
+                'The default dispense height is now 1mm from the bottom of the well'
+              )
               .should('exist')
             cy.get('button').contains('ok', { matchCase: false }).click()
           } else if (migrationModal === 'newLabwareDefs') {

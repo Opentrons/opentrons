@@ -20,8 +20,7 @@ export function renderWithProviders<State>(
   Component: React.ReactElement,
   options?: RenderWithProvidersOptions<State>
 ): [RenderResult, Store<State>] {
-  // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
-  const { initialState = {}, i18nInstance = null } = options || {}
+  const { initialState = {}, i18nInstance = null } = options ?? {}
 
   const store: Store<State> = createStore(
     vi.fn(),
@@ -32,9 +31,9 @@ export function renderWithProviders<State>(
 
   const queryClient = new QueryClient()
 
-  const ProviderWrapper: React.ComponentType<React.PropsWithChildren<{}>> = ({
-    children,
-  }) => {
+  const ProviderWrapper: React.ComponentType<
+    React.PropsWithChildren<Record<string, unknown>>
+  > = ({ children }) => {
     const BaseWrapper = (
       <QueryClientProvider client={queryClient}>
         <Provider store={store}>{children}</Provider>

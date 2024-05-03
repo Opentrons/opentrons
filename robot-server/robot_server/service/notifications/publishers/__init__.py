@@ -9,15 +9,21 @@ from .maintenance_runs_publisher import (
 )
 from .runs_publisher import RunsPublisher, get_runs_publisher
 from .robot_publisher import initialize_robot_publisher, get_robot_publisher
+from .deck_configuration_publisher import (
+    DeckConfigurationPublisher,
+    get_deck_configuration_publisher,
+)
 
 __all__ = [
     # publish "route" equivalents
     "MaintenanceRunsPublisher",
     "RunsPublisher",
+    "DeckConfigurationPublisher",
     # for use by FastAPI
     "get_maintenance_runs_publisher",
     "get_runs_publisher",
     "get_robot_publisher",
     # used during app setup
     "initialize_robot_publisher",
+    "get_deck_configuration_publisher",
 ]

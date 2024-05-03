@@ -15,7 +15,6 @@ import {
   WASTE_CHUTE_CUTOUT,
   CreateCommand,
 } from '@opentrons/shared-data'
-import { useDeckConfigurationQuery } from '@opentrons/react-api-client'
 import { Banner } from '../../atoms/Banner'
 import { GenericWizardTile } from '../../molecules/GenericWizardTile'
 import { SimpleWizardBody } from '../../molecules/SimpleWizardBody'
@@ -26,6 +25,8 @@ import probing96 from '../../assets/videos/pipette-wizard-flows/Pipette_Probing_
 import { BODY_STYLE, SECTIONS, FLOWS } from './constants'
 import { getPipetteAnimations } from './utils'
 import { ProbeNotAttached } from './ProbeNotAttached'
+import { useNotifyDeckConfigurationQuery } from '../../resources/deck_configuration'
+
 import type { PipetteWizardStepProps } from './types'
 
 interface AttachProbeProps extends PipetteWizardStepProps {
@@ -69,7 +70,7 @@ export const AttachProbe = (props: AttachProbeProps): JSX.Element | null => {
   const is96Channel = attachedPipettes[mount]?.data.channels === 96
   const calSlotNum = 'C2'
   const axes: MotorAxes = mount === LEFT ? ['leftZ'] : ['rightZ']
-  const deckConfig = useDeckConfigurationQuery().data
+  const deckConfig = useNotifyDeckConfigurationQuery().data
   const isWasteChuteOnDeck =
     deckConfig?.find(fixture => fixture.cutoutId === WASTE_CHUTE_CUTOUT) ??
     false
@@ -79,7 +80,11 @@ export const AttachProbe = (props: AttachProbeProps): JSX.Element | null => {
     const verifyCommands: CreateCommand[] = [
       {
         commandType: 'verifyTipPresence',
-        params: { pipetteId: pipetteId, expectedState: 'present' },
+        params: {
+          pipetteId: pipetteId,
+          expectedState: 'present',
+          followSingularSensor: 'primary',
+        },
       },
     ]
     const homeCommands: CreateCommand[] = [

@@ -14,6 +14,7 @@ import {
   COLUMN_3_SINGLE_SLOT_FIXTURE_WIDTH,
   TRASH_BIN_DISPLAY_NAME,
   Y_ADJUSTMENT,
+  CONFIG_STYLE_SELECTED,
 } from './constants'
 
 import type {
@@ -30,6 +31,7 @@ interface TrashBinConfigFixtureProps {
     fixtureLocation: CutoutId,
     cutoutFixtureId: CutoutFixtureId
   ) => void
+  selected?: boolean
 }
 
 export function TrashBinConfigFixture(
@@ -40,6 +42,7 @@ export function TrashBinConfigFixture(
     handleClickRemove,
     fixtureLocation,
     cutoutFixtureId,
+    selected = false,
   } = props
 
   const trashBinCutout = deckDefinition.locations.cutouts.find(
@@ -65,6 +68,7 @@ export function TrashBinConfigFixture(
 
   const y = ySlotPosition + Y_ADJUSTMENT
 
+  const editableStyle = selected ? CONFIG_STYLE_SELECTED : CONFIG_STYLE_EDITABLE
   return (
     <RobotCoordsForeignObject
       width={COLUMN_3_SINGLE_SLOT_FIXTURE_WIDTH}
@@ -75,11 +79,7 @@ export function TrashBinConfigFixture(
       foreignObjectProps={{ flex: '1' }}
     >
       <Btn
-        css={
-          handleClickRemove != null
-            ? CONFIG_STYLE_EDITABLE
-            : CONFIG_STYLE_READ_ONLY
-        }
+        css={handleClickRemove != null ? editableStyle : CONFIG_STYLE_READ_ONLY}
         cursor={handleClickRemove != null ? 'pointer' : 'default'}
         onClick={
           handleClickRemove != null

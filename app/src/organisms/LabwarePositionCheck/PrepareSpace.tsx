@@ -27,9 +27,9 @@ import {
 import { getIsOnDevice } from '../../redux/config'
 import { SmallButton } from '../../atoms/buttons'
 import { NeedHelpLink } from '../CalibrationPanels'
+import { useNotifyDeckConfigurationQuery } from '../../resources/deck_configuration'
 
 import type { CheckLabwareStep } from './types'
-import { useDeckConfigurationQuery } from '@opentrons/react-api-client'
 
 const LPC_HELP_LINK_URL =
   'https://support.opentrons.com/s/article/How-Labware-Offsets-work-on-the-OT-2'
@@ -71,7 +71,7 @@ export const PrepareSpace = (props: PrepareSpaceProps): JSX.Element | null => {
   const { location, labwareDef, protocolData, header, body, robotType } = props
 
   const isOnDevice = useSelector(getIsOnDevice)
-  const deckConfig = useDeckConfigurationQuery().data ?? []
+  const deckConfig = useNotifyDeckConfigurationQuery().data ?? []
 
   if (protocolData == null || robotType == null) return null
 

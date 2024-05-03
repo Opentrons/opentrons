@@ -1,33 +1,40 @@
 import * as React from 'react'
 import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
-import {
-  useDeckConfigurationQuery,
-  useModulesQuery,
-} from '@opentrons/react-api-client'
+import { useHistory } from 'react-router-dom'
+import { useModulesQuery } from '@opentrons/react-api-client'
 import {
   ALIGN_CENTER,
+  BORDERS,
   COLORS,
   DIRECTION_COLUMN,
   DIRECTION_ROW,
   Flex,
   Icon,
   SPACING,
+  SecondaryButton,
   StyledText,
+  TEXT_ALIGN_CENTER,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import {
   getFixtureDisplayName,
   getCutoutFixturesForModuleModel,
   MAGNETIC_BLOCK_V1,
+  getModuleDisplayName,
 } from '@opentrons/shared-data'
 import { getTopPortalEl } from '../../../../App/portal'
 import { LegacyModal } from '../../../../molecules/LegacyModal'
 import { Modal } from '../../../../molecules/Modal'
+import { FixtureOption } from '../../../DeviceDetailsDeckConfiguration/AddFixtureModal'
+import { useNotifyDeckConfigurationQuery } from '../../../../resources/deck_configuration'
+import { SmallButton } from '../../../../atoms/buttons'
+import { useCloseCurrentRun } from '../../../ProtocolUpload/hooks'
 
 import type { ModuleModel, DeckDefinition } from '@opentrons/shared-data'
-import { FixtureOption } from '../../../DeviceDetailsDeckConfiguration/AddFixtureModal'
+import type { AttachedModule } from '@opentrons/api-client'
 
+const EQUIPMENT_POLL_MS = 5000
 interface ModuleFixtureOption {
   moduleModel: ModuleModel
   usbPort?: number
@@ -39,6 +46,8 @@ interface ChooseModuleToConfigureModalProps {
   deckDef: DeckDefinition
   isOnDevice: boolean
   requiredModuleModel: ModuleModel
+  robotName: string
+  displaySlotName: string
 }
 
 export const ChooseModuleToConfigureModal = (
@@ -50,18 +59,27 @@ export const ChooseModuleToConfigureModal = (
     deckDef,
     requiredModuleModel,
     isOnDevice,
+    robotName,
+    displaySlotName,
   } = props
   const { t } = useTranslation(['protocol_setup', 'shared'])
-  const attachedModules = useModulesQuery().data?.data ?? []
-  const deckConfig = useDeckConfigurationQuery()?.data ?? []
-  const unconfiguredModuleMatches =
-    attachedModules.filter(
-      attachedMod =>
-        attachedMod.moduleModel === requiredModuleModel &&
-        !deckConfig.some(
-          ({ opentronsModuleSerialNumber }) =>
-            attachedMod.serialNumber === opentronsModuleSerialNumber
-        )
+  const attachedModules =
+    useModulesQuery({ refetchInterval: EQUIPMENT_POLL_MS })?.data?.data ?? []
+  const deckConfig = useNotifyDeckConfigurationQuery()?.data ?? []
+  const [configuredModuleMatches, unconfiguredModuleMatches] =
+    attachedModules.reduce<[AttachedModule[], AttachedModule[]]>(
+      (acc, attachedMod) => {
+        if (attachedMod.moduleModel === requiredModuleModel) {
+          return deckConfig.some(
+            ({ opentronsModuleSerialNumber }) =>
+              attachedMod.serialNumber === opentronsModuleSerialNumber
+          )
+            ? [[...acc[0], attachedMod], acc[1]]
+            : [acc[0], [...acc[1], attachedMod]]
+        }
+        return acc
+      },
+      [[], []]
     ) ?? []
 
   const connectedOptions: ModuleFixtureOption[] = unconfiguredModuleMatches.map(
@@ -95,26 +113,42 @@ export const ChooseModuleToConfigureModal = (
     }
   )
 
+  const moduleDisplayName = getModuleDisplayName(requiredModuleModel)
+
+  const contents =
+    fixtureOptions.length > 0 ? (
+      <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing16}>
+        <StyledText as="p">{t('add_this_deck_hardware')}</StyledText>
+        <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing8}>
+          {fixtureOptions}
+        </Flex>
+      </Flex>
+    ) : (
+      <NoUnconfiguredModules
+        {...{
+          isOnDevice,
+          configuredModuleMatches,
+          moduleDisplayName,
+          displaySlotName,
+          robotName,
+        }}
+      />
+    )
+
   return createPortal(
     isOnDevice ? (
       <Modal
         onOutsideClick={onCloseClick}
         header={{
-          title: t('deck_conflict'),
+          title: t('add_to_slot', { slotName: displaySlotName }),
           hasExitIcon: true,
           onClick: onCloseClick,
-          iconName: 'ot-alert',
-          iconColor: COLORS.yellow50,
         }}
       >
         <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing32}>
           <Flex flexDirection={DIRECTION_COLUMN}>
-            <Flex
-              flexDirection={DIRECTION_COLUMN}
-              paddingTop={SPACING.spacing8}
-              gridGap={SPACING.spacing8}
-            >
-              {fixtureOptions}
+            <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing8}>
+              {contents}
             </Flex>
           </Flex>
         </Flex>
@@ -127,9 +161,8 @@ export const ChooseModuleToConfigureModal = (
             gridGap={SPACING.spacing10}
             alignItems={ALIGN_CENTER}
           >
-            <Icon name="ot-alert" size="1rem" color={COLORS.yellow50} />
             <StyledText as="h3" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
-              {t('deck_conflict')}
+              {t('add_to_slot', { slotName: displaySlotName })}
             </StyledText>
           </Flex>
         }
@@ -143,12 +176,100 @@ export const ChooseModuleToConfigureModal = (
               paddingTop={SPACING.spacing8}
               gridGap={SPACING.spacing8}
             >
-              {fixtureOptions}
+              {contents}
             </Flex>
           </Flex>
         </Flex>
       </LegacyModal>
     ),
     getTopPortalEl()
+  )
+}
+
+interface NoUnconfiguredModulesProps {
+  moduleDisplayName: string
+  displaySlotName: string
+  configuredModuleMatches: AttachedModule[]
+  isOnDevice: boolean
+  robotName: string
+}
+function NoUnconfiguredModules(props: NoUnconfiguredModulesProps): JSX.Element {
+  const {
+    moduleDisplayName,
+    configuredModuleMatches,
+    displaySlotName,
+    isOnDevice,
+    robotName,
+  } = props
+  const { t } = useTranslation('protocol_setup')
+  const history = useHistory()
+  const { closeCurrentRun } = useCloseCurrentRun()
+  const handleCancelRun = (): void => {
+    closeCurrentRun()
+  }
+  const handleNavigateToDeviceDetails = (): void => {
+    history.push(`/devices/${robotName}`)
+  }
+  const exitButton = isOnDevice ? (
+    <SmallButton
+      onClick={handleCancelRun}
+      buttonType="secondary"
+      buttonText={t('exit_to_deck_configuration')}
+    />
+  ) : (
+    <SecondaryButton onClick={handleNavigateToDeviceDetails}>
+      {t('exit_to_deck_configuration')}
+    </SecondaryButton>
+  )
+
+  const loadingBlock = (
+    <Flex
+      paddingX={SPACING.spacing80}
+      paddingY={SPACING.spacing40}
+      gridGap={isOnDevice ? SPACING.spacing40 : SPACING.spacing10}
+      borderRadius={isOnDevice ? BORDERS.borderRadius12 : BORDERS.borderRadius8}
+      backgroundColor={COLORS.grey35}
+      flexDirection={DIRECTION_COLUMN}
+      alignItems={ALIGN_CENTER}
+    >
+      <Icon
+        size={isOnDevice ? '2rem' : '1.25rem'}
+        marginLeft={SPACING.spacing8}
+        name="ot-spinner"
+        spin
+      />
+      <StyledText
+        as={isOnDevice ? 'h4' : 'p'}
+        color={COLORS.grey60}
+        textAlign={TEXT_ALIGN_CENTER}
+      >
+        {t('plug_in_module_to_configure', { module: moduleDisplayName })}
+      </StyledText>
+    </Flex>
+  )
+  return (
+    <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing32}>
+      {configuredModuleMatches.length > 0 ? (
+        <>
+          <StyledText as="p">
+            {t('there_are_other_configured_modules', {
+              module: moduleDisplayName,
+            })}
+          </StyledText>
+          {loadingBlock}
+          {exitButton}
+        </>
+      ) : (
+        <>
+          <StyledText as="p">
+            {t('there_are_no_unconfigured_modules', {
+              module: moduleDisplayName,
+              slot: displaySlotName,
+            })}
+          </StyledText>
+          {loadingBlock}
+        </>
+      )}
+    </Flex>
   )
 }

@@ -23,7 +23,11 @@ from opentrons.protocol_engine import (
 
 from robot_server.protocols.protocol_store import ProtocolResource
 from robot_server.runs.engine_store import EngineStore, EngineConflictError
-from robot_server.runs.run_data_manager import RunDataManager, RunNotCurrentError
+from robot_server.runs.run_data_manager import (
+    RunDataManager,
+    RunNotCurrentError,
+    PreSerializedCommandsNotAvailableError,
+)
 from robot_server.runs.run_models import Run, BadRun, RunNotFoundError, RunDataError
 from robot_server.runs.run_store import (
     RunStore,
@@ -583,6 +587,7 @@ async def test_update_current(
     run_command: commands.Command,
     mock_engine_store: EngineStore,
     mock_run_store: RunStore,
+    mock_runs_publisher: RunsPublisher,
     subject: RunDataManager,
 ) -> None:
     """It should persist the current run and clear the engine on current=false."""
@@ -607,6 +612,10 @@ async def test_update_current(
 
     result = await subject.update(run_id=run_id, current=False)
 
+    decoy.verify(
+        await mock_runs_publisher.publish_pre_serialized_commands_notification(run_id),
+        times=1,
+    )
     assert result == Run(
         current=False,
         id=run_resource.run_id,
@@ -633,6 +642,7 @@ async def test_update_current_noop(
     run_command: commands.Command,
     mock_engine_store: EngineStore,
     mock_run_store: RunStore,
+    mock_runs_publisher: RunsPublisher,
     subject: RunDataManager,
     current: Optional[bool],
 ) -> None:
@@ -657,6 +667,7 @@ async def test_update_current_noop(
             commands=matchers.Anything(),
             run_time_parameters=matchers.Anything(),
         ),
+        await mock_runs_publisher.publish_pre_serialized_commands_notification(run_id),
         times=0,
     )
 
@@ -930,6 +941,38 @@ def test_get_command_from_db_command_not_found(
 
     with pytest.raises(CommandNotFoundError):
         subject.get_command("run-id", "command-id")
+
+
+def test_get_all_commands_as_preserialized_list(
+    decoy: Decoy,
+    subject: RunDataManager,
+    mock_run_store: RunStore,
+    mock_engine_store: EngineStore,
+) -> None:
+    """It should return the pre-serialized commands list."""
+    decoy.when(mock_engine_store.current_run_id).then_return(None)
+    decoy.when(
+        mock_run_store.get_all_commands_as_preserialized_list("run-id")
+    ).then_return(['{"id": command-1}', '{"id": command-2}'])
+    assert subject.get_all_commands_as_preserialized_list("run-id") == [
+        '{"id": command-1}',
+        '{"id": command-2}',
+    ]
+
+
+def test_get_all_commands_as_preserialized_list_errors_for_active_runs(
+    decoy: Decoy,
+    subject: RunDataManager,
+    mock_run_store: RunStore,
+    mock_engine_store: EngineStore,
+) -> None:
+    """It should raise an error when fetching pre-serialized commands list while run is active."""
+    decoy.when(mock_engine_store.current_run_id).then_return("current-run-id")
+    decoy.when(
+        mock_engine_store.engine.state_view.commands.get_is_terminal()
+    ).then_return(False)
+    with pytest.raises(PreSerializedCommandsNotAvailableError):
+        subject.get_all_commands_as_preserialized_list("current-run-id")
 
 
 async def test_get_current_run_labware_definition(

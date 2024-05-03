@@ -93,12 +93,12 @@ export const TipPositionModal = (
   } => {
     if (getIsTouchTipField(zSpec?.name ?? '')) {
       return {
-        maxMmFromBottom: utils.roundValue(wellDepthMm),
-        minMmFromBottom: utils.roundValue(wellDepthMm / 2),
+        maxMmFromBottom: utils.roundValue(wellDepthMm, 'up'),
+        minMmFromBottom: utils.roundValue(wellDepthMm / 2, 'up'),
       }
     }
     return {
-      maxMmFromBottom: utils.roundValue(wellDepthMm * 2),
+      maxMmFromBottom: utils.roundValue(wellDepthMm * 2, 'up'),
       minMmFromBottom: 0,
     }
   }
@@ -138,10 +138,10 @@ export const TipPositionModal = (
     return utils.getErrorText({ errors, minMm: min, maxMm: max, isPristine, t })
   }
 
-  const roundedXMin = utils.roundValue(xMinWidth)
-  const roundedYMin = utils.roundValue(yMinWidth)
-  const roundedXMax = utils.roundValue(xMaxWidth)
-  const roundedYMax = utils.roundValue(yMaxWidth)
+  const roundedXMin = utils.roundValue(xMinWidth, 'up')
+  const roundedYMin = utils.roundValue(yMinWidth, 'up')
+  const roundedXMax = utils.roundValue(xMaxWidth, 'down')
+  const roundedYMax = utils.roundValue(yMaxWidth, 'down')
 
   const zErrorText = createErrorText(zErrors, minMmFromBottom, maxMmFromBottom)
   const xErrorText = createErrorText(xErrors, roundedXMin, roundedXMax)
@@ -234,6 +234,7 @@ export const TipPositionModal = (
     yValue != null &&
     (parseInt(yValue) > PERCENT_RANGE_TO_SHOW_WARNING * yMaxWidth ||
       parseInt(yValue) < PERCENT_RANGE_TO_SHOW_WARNING * yMinWidth)
+  const isZValueAtBottom = zValue != null && zValue === '0'
 
   const TipPositionInputField = !isDefault ? (
     <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing8}>
@@ -315,7 +316,8 @@ export const TipPositionModal = (
         <p>{t(`tip_position.body.${zSpec?.name}`)}</p>
       </div>
 
-      {(isXValueNearEdge || isYValueNearEdge) && !isDefault ? (
+      {(isXValueNearEdge || isYValueNearEdge || isZValueAtBottom) &&
+      !isDefault ? (
         <Flex marginTop={SPACING.spacing8}>
           <PDAlert
             alertType="warning"

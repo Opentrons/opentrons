@@ -17,8 +17,10 @@ from .publisher_notifier import (
 from .publishers import (
     MaintenanceRunsPublisher,
     RunsPublisher,
+    DeckConfigurationPublisher,
     get_maintenance_runs_publisher,
     get_runs_publisher,
+    get_deck_configuration_publisher,
 )
 from .topics import Topics
 
@@ -28,6 +30,7 @@ __all__ = [
     # notification "route" equivalents
     "MaintenanceRunsPublisher",
     "RunsPublisher",
+    "DeckConfigurationPublisher",
     # initialization and teardown
     "initialize_publisher_notifiers",
     "init_hardware_publishers",
@@ -38,6 +41,7 @@ __all__ = [
     "get_hardware_notify_publishers",
     "get_maintenance_runs_publisher",
     "get_runs_publisher",
+    "get_deck_configuration_publisher",
     # for testing
     "PublisherNotifier",
     "ChangeNotifier",

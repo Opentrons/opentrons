@@ -8,19 +8,18 @@ import { useNotifyService } from '../useNotifyService'
 import { appShellListener } from '../../redux/shell/remote'
 import { useTrackEvent } from '../../redux/analytics'
 import { notifySubscribeAction } from '../../redux/shell'
-import { useIsFlex } from '../../organisms/Devices/hooks/useIsFlex'
 
 import type { Mock } from 'vitest'
 import type { HostConfig } from '@opentrons/api-client'
 import type { QueryOptionsWithPolling } from '../useNotifyService'
 
+vi.unmock('../useNotifyService')
 vi.mock('react-redux')
 vi.mock('@opentrons/react-api-client')
 vi.mock('../../redux/analytics')
 vi.mock('../../redux/shell/remote', () => ({
   appShellListener: vi.fn(),
 }))
-vi.mock('../../organisms/Devices/hooks/useIsFlex')
 
 const MOCK_HOST_CONFIG: HostConfig = { hostname: 'MOCK_HOST' }
 const MOCK_TOPIC = '/test/topic' as any
@@ -40,7 +39,6 @@ describe('useNotifyService', () => {
     vi.mocked(useTrackEvent).mockReturnValue(mockTrackEvent)
     vi.mocked(useDispatch).mockReturnValue(mockDispatch)
     vi.mocked(useHost).mockReturnValue(MOCK_HOST_CONFIG)
-    vi.mocked(useIsFlex).mockReturnValue(true)
     vi.mocked(appShellListener).mockClear()
   })
 

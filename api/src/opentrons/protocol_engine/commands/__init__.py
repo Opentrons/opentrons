@@ -19,7 +19,7 @@ from . import temperature_module
 from . import thermocycler
 from . import calibration
 
-from .hash_command_params import hash_command_params
+from .hash_command_params import hash_protocol_command_params
 from .generate_command_schema import generate_command_schema
 
 from .command import (
@@ -118,6 +118,14 @@ from .load_labware import (
     LoadLabwareCreate,
     LoadLabwareResult,
     LoadLabwareCommandType,
+)
+
+from .reload_labware import (
+    ReloadLabware,
+    ReloadLabwareParams,
+    ReloadLabwareCreate,
+    ReloadLabwareResult,
+    ReloadLabwareCommandType,
 )
 
 from .load_liquid import (
@@ -333,7 +341,7 @@ __all__ = [
     "CommandStatus",
     "CommandIntent",
     # command parameter hashing
-    "hash_command_params",
+    "hash_protocol_command_params",
     # command schema generation
     "generate_command_schema",
     # aspirate command models
@@ -402,6 +410,12 @@ __all__ = [
     "LoadLabwareParams",
     "LoadLabwareResult",
     "LoadLabwareCommandType",
+    # reload labware command models
+    "ReloadLabware",
+    "ReloadLabwareCreate",
+    "ReloadLabwareParams",
+    "ReloadLabwareResult",
+    "ReloadLabwareCommandType",
     # load module command models
     "LoadModule",
     "LoadModuleCreate",

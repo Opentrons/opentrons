@@ -26,6 +26,7 @@ import {
   getModuleType,
   HEATERSHAKER_MODULE_TYPE,
   HEATERSHAKER_MODULE_V1,
+  MAGNETIC_BLOCK_TYPE,
   MAGNETIC_BLOCK_V1,
   OT2_ROBOT_TYPE,
   TC_MODULE_LOCATION_OT2,
@@ -108,6 +109,8 @@ export const SetupModulesList = (props: SetupModulesListProps): JSX.Element => {
           moduleId,
           conflictedFixture,
         }) => {
+          // filter out the magnetic block here, because it is handled by the SetupFixturesList
+          if (moduleDef.moduleType === MAGNETIC_BLOCK_TYPE) return null
           return (
             <ModulesListItem
               key={`SetupModulesList_${String(
@@ -127,6 +130,7 @@ export const SetupModulesList = (props: SetupModulesListProps): JSX.Element => {
               calibrationStatus={calibrationStatus}
               conflictedFixture={conflictedFixture}
               deckDef={deckDef}
+              robotName={robotName}
             />
           )
         }
@@ -145,6 +149,7 @@ interface ModulesListItemProps {
   calibrationStatus: ProtocolCalibrationStatus
   deckDef: DeckDefinition
   conflictedFixture: CutoutConfig | null
+  robotName: string
 }
 
 export function ModulesListItem({
@@ -157,6 +162,7 @@ export function ModulesListItem({
   calibrationStatus,
   conflictedFixture,
   deckDef,
+  robotName,
 }: ModulesListItemProps): JSX.Element {
   const { t } = useTranslation(['protocol_setup', 'module_wizard_flows'])
   const moduleConnectionStatus =
@@ -286,6 +292,7 @@ export function ModulesListItem({
           cutoutId={cutoutIdForSlotName}
           requiredModule={moduleModel}
           deckDef={deckDef}
+          robotName={robotName}
         />
       ) : null}
       {showModuleWizard && attachedModuleMatch != null ? (

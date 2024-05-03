@@ -2,6 +2,8 @@
 import gspread  # type: ignore[import]
 import socket
 import httplib2
+import time as t
+import sys
 from datetime import datetime
 from oauth2client.service_account import ServiceAccountCredentials  # type: ignore[import]
 from typing import Dict, List, Any, Set, Tuple
@@ -18,19 +20,24 @@ class google_sheet:
 
     def __init__(self, credentials: Any, file_name: str, tab_number: int) -> None:
         """Connects to google sheet via credentials file."""
-        self.scope = [
-            "https://spreadsheets.google.com/feeds",
-            "https://www.googleapis.com/auth/drive",
-        ]
-        self.credentials = ServiceAccountCredentials.from_json_keyfile_name(
-            credentials, self.scope
-        )
-        self.gc = gspread.authorize(self.credentials)
-        self.file_name = file_name
-        self.tab_number = tab_number
-        self.spread_sheet = self.open_google_sheet()
-        self.worksheet = self.open_worksheet(self.tab_number)
-        self.row_index = 1
+        try:
+            self.scope = [
+                "https://spreadsheets.google.com/feeds",
+                "https://www.googleapis.com/auth/drive",
+            ]
+            self.credentials = ServiceAccountCredentials.from_json_keyfile_name(
+                credentials, self.scope
+            )
+            self.gc = gspread.authorize(self.credentials)
+            self.file_name = file_name
+            self.tab_number = tab_number
+            self.spread_sheet = self.open_google_sheet()
+            self.worksheet = self.open_worksheet(self.tab_number)
+            self.row_index = 1
+            print(f"Connected to google sheet: {self.file_name}")
+        except gspread.exceptions.APIError:
+            print("ERROR: Check google sheet name. Check credentials file.")
+            sys.exit()
 
     def open_google_sheet(self) -> Any:
         """Open Google Spread Sheet."""
@@ -71,10 +78,14 @@ class google_sheet:
             print("UNABLE TO CONNECT TO SERVER!!, CHECK CONNECTION")
         except Exception as error:
             print(error.__traceback__)
+        except gspread.exceptions.APIError:
+            print("Write quotes exceeded. Waiting 30 sec before writing.")
+            t.sleep(30)
+            self.worksheet.insert_row(data, index=self.row_index)
 
     def delete_row(self, row_index: int) -> None:
         """Delete Row from google sheet."""
-        self.worksheet.delete_row(row_index)
+        self.worksheet.delete_rows(row_index)
 
     def update_cell(
         self, row: int, column: int, single_data: Any
@@ -94,7 +105,7 @@ class google_sheet:
     def get_index_row(self) -> int:
         """Check for the next available row to write too."""
         row_index = len(self.get_column(1))
-        print("Row Index: ", row_index)
+        print(f"Row Index: {row_index} recorded on google sheet.")
         return row_index
 
     def update_row_index(self) -> None:
@@ -120,3 +131,13 @@ class google_sheet:
         """Check if still credentials are still logged in."""
         if self.credentials.access_token_expired:
             self.gc.login()
+
+    def get_row_index_with_value(self, some_string: str, col_num: int) -> Any:
+        """Find row index of string by looking in specific column."""
+        cell = self.worksheet.find(some_string, in_column=col_num)
+        try:
+            row_index = int(cell.row)
+        except AttributeError:
+            print("Row not found.")
+            return None
+        return row_index

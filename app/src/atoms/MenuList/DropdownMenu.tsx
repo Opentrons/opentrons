@@ -15,7 +15,9 @@ import {
   TYPOGRAPHY,
   useOnClickOutside,
   POSITION_RELATIVE,
+  useHoverTooltip,
 } from '@opentrons/components'
+import { Tooltip } from '../Tooltip'
 import { MenuItem } from './MenuItem'
 
 export interface DropdownOption {
@@ -26,13 +28,24 @@ export interface DropdownOption {
 export type DropdownBorder = 'rounded' | 'neutral'
 
 export interface DropdownMenuProps {
+  /** dropdown options */
   filterOptions: DropdownOption[]
+  /** click handler */
   onClick: (value: string) => void
+  /** current selected option */
   currentOption: DropdownOption
+  /** dropdown */
   width?: string
+  /** dropdown style type  */
   dropdownType?: DropdownBorder
+  /** dropdown title */
   title?: string
+  /** dropdown item caption */
   caption?: string | null
+  /** text for tooltip */
+  tooltipText?: string
+  /** html tabindex property */
+  tabIndex?: number
 }
 
 // TODO: (smb: 4/15/22) refactor this to use html select for accessibility
@@ -46,7 +59,10 @@ export function DropdownMenu(props: DropdownMenuProps): JSX.Element {
     dropdownType = 'rounded',
     title,
     caption,
+    tooltipText,
+    tabIndex = 0,
   } = props
+  const [targetProps, tooltipProps] = useHoverTooltip()
   const [showDropdownMenu, setShowDropdownMenu] = React.useState<boolean>(false)
   const toggleSetShowDropdownMenu = (): void => {
     setShowDropdownMenu(!showDropdownMenu)
@@ -96,13 +112,27 @@ export function DropdownMenu(props: DropdownMenuProps): JSX.Element {
   return (
     <Flex flexDirection={DIRECTION_COLUMN} ref={dropDownMenuWrapperRef}>
       {title !== null ? (
-        <StyledText
-          as="label"
-          fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-          paddingBottom={SPACING.spacing8}
-        >
-          {title}
-        </StyledText>
+        <Flex gridGap={SPACING.spacing8}>
+          <StyledText
+            as="label"
+            fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+            paddingBottom={SPACING.spacing8}
+          >
+            {title}
+          </StyledText>
+          {tooltipText != null ? (
+            <>
+              <Flex {...targetProps}>
+                <Icon
+                  name="information"
+                  size={SPACING.spacing12}
+                  color={COLORS.grey60}
+                />
+              </Flex>
+              <Tooltip tooltipProps={tooltipProps}>{tooltipText}</Tooltip>
+            </>
+          ) : null}
+        </Flex>
       ) : null}
       <Flex flexDirection={DIRECTION_COLUMN} position={POSITION_RELATIVE}>
         <Flex
@@ -111,6 +141,7 @@ export function DropdownMenu(props: DropdownMenuProps): JSX.Element {
             toggleSetShowDropdownMenu()
           }}
           css={DROPDOWN_STYLE}
+          tabIndex={tabIndex}
         >
           <StyledText
             css={css`

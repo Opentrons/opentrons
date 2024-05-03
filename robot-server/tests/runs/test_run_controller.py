@@ -14,6 +14,7 @@ from opentrons.protocol_engine import (
 from opentrons.protocol_engine.types import RunTimeParameter, BooleanParameter
 from opentrons.protocol_runner import RunResult, JsonRunner, PythonAndLegacyRunner
 
+from robot_server.service.notifications import RunsPublisher
 from robot_server.service.task_runner import TaskRunner
 from robot_server.runs.action_models import RunAction, RunActionType
 from robot_server.runs.engine_store import EngineStore
@@ -39,6 +40,12 @@ def mock_run_store(decoy: Decoy) -> RunStore:
 def mock_task_runner(decoy: Decoy) -> TaskRunner:
     """Get a mock background TaskRunner."""
     return decoy.mock(cls=TaskRunner)
+
+
+@pytest.fixture()
+def mock_runs_publisher(decoy: Decoy) -> RunsPublisher:
+    """Get a mock RunsPublisher."""
+    return decoy.mock(cls=RunsPublisher)
 
 
 @pytest.fixture
@@ -90,6 +97,7 @@ def subject(
     mock_engine_store: EngineStore,
     mock_run_store: RunStore,
     mock_task_runner: TaskRunner,
+    mock_runs_publisher: RunsPublisher,
 ) -> RunController:
     """Get a RunController test subject."""
     return RunController(
@@ -97,6 +105,7 @@ def subject(
         engine_store=mock_engine_store,
         run_store=mock_run_store,
         task_runner=mock_task_runner,
+        runs_publisher=mock_runs_publisher,
     )
 
 
@@ -135,6 +144,7 @@ async def test_create_play_action_to_start(
     mock_engine_store: EngineStore,
     mock_run_store: RunStore,
     mock_task_runner: TaskRunner,
+    mock_runs_publisher: RunsPublisher,
     engine_state_summary: StateSummary,
     run_time_parameters: List[RunTimeParameter],
     protocol_commands: List[pe_commands.Command],
@@ -181,6 +191,7 @@ async def test_create_play_action_to_start(
             commands=protocol_commands,
             run_time_parameters=run_time_parameters,
         ),
+        await mock_runs_publisher.publish_pre_serialized_commands_notification(run_id),
         times=1,
     )
 

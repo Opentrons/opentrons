@@ -108,7 +108,7 @@ def test_load_labware(
     decoy.when(mock_labware_core.get_well_columns()).then_return([])
 
     result = subject.load_labware(
-        name="infinite tip rack",
+        name="Infinite Tip Rack",
         label="it doesn't run out",
         namespace="ideal",
         version=101,

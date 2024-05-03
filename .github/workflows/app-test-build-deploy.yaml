@@ -61,7 +61,10 @@ jobs:
         with:
           node-version: '18.19.0'
       - name: 'install udev'
-        run: sudo apt-get update && sudo apt-get install libudev-dev
+        run: |
+          # WORKAROUND: Remove microsoft debian repo due to https://github.com/microsoft/linux-package-repositories/issues/130. Remove line below after it is resolved
+          sudo rm -f /etc/apt/sources.list.d/microsoft-prod.list
+          sudo apt-get update && sudo apt-get install libudev-dev
       - name: 'set complex environment variables'
         id: 'set-vars'
         uses: actions/github-script@v6
@@ -112,13 +115,14 @@ jobs:
       - uses: actions/setup-python@v4
         with:
           python-version: '3.10'
-      - name: 'downgrade npm version'
-        run: npm install -g npm@6
       - name: check make version
         run: make --version
       - name: 'install libudev and libsystemd'
         if: startsWith(matrix.os, 'ubuntu')
-        run: sudo apt-get update && sudo apt-get install libudev-dev
+        run: |
+          # WORKAROUND: Remove microsoft debian repo due to https://github.com/microsoft/linux-package-repositories/issues/130. Remove line below after it is resolved
+          sudo rm -f /etc/apt/sources.list.d/microsoft-prod.list
+          sudo apt-get update && sudo apt-get install libudev-dev
       - name: 'set complex environment variables'
         id: 'set-vars'
         uses: actions/github-script@v6
@@ -245,13 +249,14 @@ jobs:
       - uses: actions/setup-python@v4
         with:
           python-version: '3.10'
-      - name: 'downgrade npm version'
-        run: npm install -g npm@6
       - name: check make version
         run: make --version
       - name: 'install libudev and libsystemd'
         if: startsWith(matrix.os, 'ubuntu')
-        run: sudo apt-get update && sudo apt-get install libudev-dev
+        run: |
+          # WORKAROUND: Remove microsoft debian repo due to https://github.com/microsoft/linux-package-repositories/issues/130. Remove line below after it is resolved
+          sudo rm -f /etc/apt/sources.list.d/microsoft-prod.list
+          sudo apt-get update && sudo apt-get install libudev-dev
       - name: 'set complex environment variables'
         id: 'set-vars'
         uses: actions/github-script@v6
@@ -427,7 +432,10 @@ jobs:
         with:
           node-version: '18.19.0'
       - name: 'install udev'
-        run: sudo apt-get update && sudo apt-get install libudev-dev
+        run: |
+          # WORKAROUND: Remove microsoft debian repo due to https://github.com/microsoft/linux-package-repositories/issues/130. Remove line below after it is resolved
+          sudo rm -f /etc/apt/sources.list.d/microsoft-prod.list
+          sudo apt-get update && sudo apt-get install libudev-dev
       - name: 'set complex environment variables'
         id: 'set-vars'
         uses: actions/github-script@v6

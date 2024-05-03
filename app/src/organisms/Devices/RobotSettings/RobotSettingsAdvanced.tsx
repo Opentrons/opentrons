@@ -30,7 +30,6 @@ import {
   UpdateRobotSoftware,
   UsageSettings,
   UseOlderAspirateBehavior,
-  UseOlderProtocol,
 } from './AdvancedTab'
 import {
   updateSetting,
@@ -42,7 +41,7 @@ import { DeviceResetSlideout } from './AdvancedTab/AdvancedTabSlideouts/DeviceRe
 import { DeviceResetModal } from './AdvancedTab/AdvancedTabSlideouts/DeviceResetModal'
 import { FactoryModeSlideout } from './AdvancedTab/AdvancedTabSlideouts/FactoryModeSlideout'
 import { handleUpdateBuildroot } from './UpdateBuildroot'
-import { UNREACHABLE } from '../../../redux/discovery'
+import { getRobotSerialNumber, UNREACHABLE } from '../../../redux/discovery'
 import { getTopPortalEl } from '../../../App/portal'
 import { useIsEstopNotDisengaged } from '../../../resources/devices/hooks/useIsEstopNotDisengaged'
 
@@ -89,6 +88,7 @@ export function RobotSettingsAdvanced({
     getRobotSettings(state, robotName)
   )
   const reachable = robot?.status !== UNREACHABLE
+  const sn = robot?.status != null ? getRobotSerialNumber(robot) : null
 
   const [isRobotReachable, setIsRobotReachable] = React.useState<boolean>(
     reachable
@@ -140,8 +140,10 @@ export function RobotSettingsAdvanced({
         {showFactoryModeSlideout && (
           <FactoryModeSlideout
             isExpanded={showFactoryModeSlideout}
+            isRobotBusy={isRobotBusy || isEstopNotDisengaged}
             onCloseClick={() => setShowFactoryModeSlideout(false)}
             robotName={robotName}
+            sn={sn}
           />
         )}
         {showDeviceResetSlideout && (
@@ -214,6 +216,7 @@ export function RobotSettingsAdvanced({
             <FactoryMode
               isRobotBusy={isRobotBusy || isEstopNotDisengaged}
               setShowFactoryModeSlideout={setShowFactoryModeSlideout}
+              sn={sn}
             />
           </>
         ) : null}
@@ -228,12 +231,6 @@ export function RobotSettingsAdvanced({
         />
         {isFlex ? null : (
           <>
-            <Divider marginY={SPACING.spacing16} />
-            <UseOlderProtocol
-              settings={findSettings('disableFastProtocolUpload')}
-              robotName={robotName}
-              isRobotBusy={isRobotBusy || isEstopNotDisengaged}
-            />
             <Divider marginY={SPACING.spacing16} />
             <LegacySettings
               settings={findSettings('deckCalibrationDots')}

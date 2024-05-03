@@ -3,7 +3,6 @@ import { fireEvent, screen } from '@testing-library/react'
 import { describe, it, beforeEach, vi, expect, afterEach } from 'vitest'
 
 import {
-  useDeckConfigurationQuery,
   useModulesQuery,
   useUpdateDeckConfigurationMutation,
 } from '@opentrons/react-api-client'
@@ -15,12 +14,15 @@ import {
 import { renderWithProviders } from '../../../__testing-utils__'
 import { i18n } from '../../../i18n'
 import { AddFixtureModal } from '../AddFixtureModal'
+import { useNotifyDeckConfigurationQuery } from '../../../resources/deck_configuration'
 
 import type { UseQueryResult } from 'react-query'
 import type { DeckConfiguration } from '@opentrons/shared-data'
 import type { Modules } from '@opentrons/api-client'
 
 vi.mock('@opentrons/react-api-client')
+vi.mock('../../../resources/deck_configuration')
+
 const mockSetShowAddFixtureModal = vi.fn()
 const mockUpdateDeckConfiguration = vi.fn()
 const mockSetCurrentDeckConfig = vi.fn()
@@ -44,7 +46,7 @@ describe('Touchscreen AddFixtureModal', () => {
     vi.mocked(useUpdateDeckConfigurationMutation).mockReturnValue({
       updateDeckConfiguration: mockUpdateDeckConfiguration,
     } as any)
-    vi.mocked(useDeckConfigurationQuery).mockReturnValue(({
+    vi.mocked(useNotifyDeckConfigurationQuery).mockReturnValue(({
       data: [],
     } as unknown) as UseQueryResult<DeckConfiguration>)
     vi.mocked(useModulesQuery).mockReturnValue(({

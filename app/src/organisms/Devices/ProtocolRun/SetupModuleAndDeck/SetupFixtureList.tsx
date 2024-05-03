@@ -2,6 +2,7 @@ import * as React from 'react'
 import { css } from 'styled-components'
 import { useTranslation } from 'react-i18next'
 import {
+  ALIGN_FLEX_START,
   BORDERS,
   Box,
   Btn,
@@ -16,8 +17,8 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 import {
-  FLEX_MODULE_ADDRESSABLE_AREAS,
   FLEX_ROBOT_TYPE,
+  FLEX_USB_MODULE_ADDRESSABLE_AREAS,
   SINGLE_SLOT_FIXTURES,
   getCutoutDisplayName,
   getDeckDefFromRobotType,
@@ -35,24 +36,30 @@ import type { CutoutConfigAndCompatibility } from '../../../../resources/deck_co
 
 interface SetupFixtureListProps {
   deckConfigCompatibility: CutoutConfigAndCompatibility[]
+  robotName: string
 }
+
 /**
  * List items of all "non-module" fixtures e.g. staging slot, waste chute, trash bin...
  * @param props
  * @returns JSX.Element
  */
 export const SetupFixtureList = (props: SetupFixtureListProps): JSX.Element => {
-  const { deckConfigCompatibility } = props
+  const { deckConfigCompatibility, robotName } = props
   const deckDef = getDeckDefFromRobotType(FLEX_ROBOT_TYPE)
   return (
     <>
       {deckConfigCompatibility.map(cutoutConfigAndCompatibility => {
-        return cutoutConfigAndCompatibility.requiredAddressableAreas.some(raa =>
-          FLEX_MODULE_ADDRESSABLE_AREAS.includes(raa)
-        ) ? null : ( // don't list modules here, they're covered by SetupModuleList
+        // filter out all fixtures that only provide usb module addressable areas
+        // (i.e. everything but MagBlockV1 and StagingAreaWithMagBlockV1)
+        // as they're handled in the Modules Table
+        return cutoutConfigAndCompatibility.requiredAddressableAreas.every(
+          raa => FLEX_USB_MODULE_ADDRESSABLE_AREAS.includes(raa)
+        ) ? null : (
           <FixtureListItem
             key={cutoutConfigAndCompatibility.cutoutId}
             deckDef={deckDef}
+            robotName={robotName}
             {...cutoutConfigAndCompatibility}
           />
         )
@@ -63,6 +70,7 @@ export const SetupFixtureList = (props: SetupFixtureListProps): JSX.Element => {
 
 interface FixtureListItemProps extends CutoutConfigAndCompatibility {
   deckDef: DeckDefinition
+  robotName: string
 }
 
 export function FixtureListItem({
@@ -71,6 +79,7 @@ export function FixtureListItem({
   compatibleCutoutFixtureIds,
   missingLabwareDisplayName,
   deckDef,
+  robotName,
 }: FixtureListItemProps): JSX.Element {
   const { t } = useTranslation('protocol_setup')
 
@@ -135,6 +144,7 @@ export function FixtureListItem({
           deckDef={deckDef}
           missingLabwareDisplayName={missingLabwareDisplayName}
           requiredFixtureId={compatibleCutoutFixtureIds[0]}
+          robotName={robotName}
         />
       ) : null}
       {showSetupInstructionsModal ? (
@@ -168,7 +178,10 @@ export function FixtureListItem({
                 }
               />
             ) : null}
-            <Flex flexDirection={DIRECTION_COLUMN}>
+            <Flex
+              flexDirection={DIRECTION_COLUMN}
+              alignItems={ALIGN_FLEX_START}
+            >
               <StyledText
                 css={TYPOGRAPHY.pSemiBold}
                 marginLeft={SPACING.spacing20}

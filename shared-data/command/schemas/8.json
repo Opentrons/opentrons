@@ -19,6 +19,7 @@
       "home": "#/definitions/HomeCreate",
       "retractAxis": "#/definitions/RetractAxisCreate",
       "loadLabware": "#/definitions/LoadLabwareCreate",
+      "reloadLabware": "#/definitions/ReloadLabwareCreate",
       "loadLiquid": "#/definitions/LoadLiquidCreate",
       "loadModule": "#/definitions/LoadModuleCreate",
       "loadPipette": "#/definitions/LoadPipetteCreate",
@@ -111,6 +112,9 @@
     },
     {
       "$ref": "#/definitions/LoadLabwareCreate"
+    },
+    {
+      "$ref": "#/definitions/ReloadLabwareCreate"
     },
     {
       "$ref": "#/definitions/LoadLiquidCreate"
@@ -339,7 +343,7 @@
     "CommandIntent": {
       "title": "CommandIntent",
       "description": "Run intent for a given command.\n\nProps:\n    PROTOCOL: the command is part of the protocol run itself.\n    SETUP: the command is part of the setup phase of a run.",
-      "enum": ["protocol", "setup"],
+      "enum": ["protocol", "setup", "fixit"],
       "type": "string"
     },
     "AspirateCreate": {
@@ -1390,6 +1394,49 @@
         },
         "params": {
           "$ref": "#/definitions/LoadLabwareParams"
+        },
+        "intent": {
+          "description": "The reason the command was added. If not specified or `protocol`, the command will be treated as part of the protocol run itself, and added to the end of the existing command queue.\n\nIf `setup`, the command will be treated as part of run setup. A setup command may only be enqueued if the run has not started.\n\nUse setup commands for activities like pre-run calibration checks and module setup, like pre-heating.",
+          "allOf": [
+            {
+              "$ref": "#/definitions/CommandIntent"
+            }
+          ]
+        },
+        "key": {
+          "title": "Key",
+          "description": "A key value, unique in this run, that can be used to track the same logical command across multiple runs of the same protocol. If a value is not provided, one will be generated.",
+          "type": "string"
+        }
+      },
+      "required": ["params"]
+    },
+    "ReloadLabwareParams": {
+      "title": "ReloadLabwareParams",
+      "description": "Payload required to load a labware into a slot.",
+      "type": "object",
+      "properties": {
+        "labwareId": {
+          "title": "Labwareid",
+          "description": "The already-loaded labware instance to update.",
+          "type": "string"
+        }
+      },
+      "required": ["labwareId"]
+    },
+    "ReloadLabwareCreate": {
+      "title": "ReloadLabwareCreate",
+      "description": "Reload labware command creation request.",
+      "type": "object",
+      "properties": {
+        "commandType": {
+          "title": "Commandtype",
+          "default": "reloadLabware",
+          "enum": ["reloadLabware"],
+          "type": "string"
+        },
+        "params": {
+          "$ref": "#/definitions/ReloadLabwareParams"
         },
         "intent": {
           "description": "The reason the command was added. If not specified or `protocol`, the command will be treated as part of the protocol run itself, and added to the end of the existing command queue.\n\nIf `setup`, the command will be treated as part of run setup. A setup command may only be enqueued if the run has not started.\n\nUse setup commands for activities like pre-run calibration checks and module setup, like pre-heating.",
@@ -2582,6 +2629,12 @@
       "enum": ["present", "absent", "unknown"],
       "type": "string"
     },
+    "InstrumentSensorId": {
+      "title": "InstrumentSensorId",
+      "description": "Primary and secondary sensor ids.",
+      "enum": ["primary", "secondary", "both"],
+      "type": "string"
+    },
     "VerifyTipPresenceParams": {
       "title": "VerifyTipPresenceParams",
       "description": "Payload required for a VerifyTipPresence command.",
@@ -2597,6 +2650,14 @@
           "allOf": [
             {
               "$ref": "#/definitions/TipPresenceStatus"
+            }
+          ]
+        },
+        "followSingularSensor": {
+          "description": "The sensor id to follow if the other can be ignored.",
+          "allOf": [
+            {
+              "$ref": "#/definitions/InstrumentSensorId"
             }
           ]
         }

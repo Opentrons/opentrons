@@ -5,7 +5,6 @@ import {
   BORDERS,
   COLORS,
   Chip,
-  DIRECTION_COLUMN,
   DIRECTION_ROW,
   Flex,
   JUSTIFY_SPACE_BETWEEN,
@@ -15,6 +14,7 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 import {
+  FLEX_USB_MODULE_ADDRESSABLE_AREAS,
   getCutoutDisplayName,
   getDeckDefFromRobotType,
   getFixtureDisplayName,
@@ -36,6 +36,8 @@ import type {
 } from '@opentrons/shared-data'
 import type { SetupScreens } from '../../pages/ProtocolSetup'
 import type { CutoutConfigAndCompatibility } from '../../resources/deck_configuration/hooks'
+import { useSelector } from 'react-redux'
+import { getLocalRobot } from '../../redux/discovery'
 
 interface FixtureTableProps {
   robotType: RobotType
@@ -45,6 +47,11 @@ interface FixtureTableProps {
   setProvidedFixtureOptions: (providedFixtureOptions: CutoutFixtureId[]) => void
 }
 
+/**
+ * Table of all "non-module" fixtures e.g. staging slot, waste chute, trash bin...
+ * @param props
+ * @returns JSX.Element
+ */
 export function FixtureTable({
   robotType,
   mostRecentAnalysis,
@@ -52,8 +59,6 @@ export function FixtureTable({
   setCutoutId,
   setProvidedFixtureOptions,
 }: FixtureTableProps): JSX.Element | null {
-  const { t } = useTranslation('protocol_setup')
-
   const requiredFixtureDetails = getSimplestDeckConfigForProtocol(
     mostRecentAnalysis
   )
@@ -62,6 +67,8 @@ export function FixtureTable({
     mostRecentAnalysis
   )
   const deckDef = getDeckDefFromRobotType(robotType)
+  const localRobot = useSelector(getLocalRobot)
+  const robotName = localRobot?.name != null ? localRobot.name : ''
 
   const requiredDeckConfigCompatibility = getRequiredDeckConfig(
     deckConfigCompatibility
@@ -77,21 +84,13 @@ export function FixtureTable({
   )
 
   return sortedDeckConfigCompatibility.length > 0 ? (
-    <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing8}>
-      <Flex
-        color={COLORS.grey60}
-        fontSize={TYPOGRAPHY.fontSize22}
-        fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-        gridGap={SPACING.spacing24}
-        lineHeight={TYPOGRAPHY.lineHeight28}
-        paddingX={SPACING.spacing24}
-      >
-        <StyledText flex="3.5 0 0">{t('fixture')}</StyledText>
-        <StyledText flex="2 0 0">{t('location')}</StyledText>
-        <StyledText flex="4 0 0"> {t('status')}</StyledText>
-      </Flex>
+    <>
       {sortedDeckConfigCompatibility.map((fixtureCompatibility, index) => {
-        return (
+        // filter out all fixtures that only provide module addressable areas (e.g. everything but StagingAreaWithMagBlockV1)
+        // as they're handled in the Modules Table
+        return fixtureCompatibility.requiredAddressableAreas.every(raa =>
+          FLEX_USB_MODULE_ADDRESSABLE_AREAS.includes(raa)
+        ) ? null : (
           <FixtureTableItem
             key={`FixtureTableItem_${index}`}
             {...fixtureCompatibility}
@@ -100,10 +99,11 @@ export function FixtureTable({
             setCutoutId={setCutoutId}
             setProvidedFixtureOptions={setProvidedFixtureOptions}
             deckDef={deckDef}
+            robotName={robotName}
           />
         )
       })}
-    </Flex>
+    </>
   ) : null
 }
 
@@ -113,6 +113,7 @@ interface FixtureTableItemProps extends CutoutConfigAndCompatibility {
   setCutoutId: (cutoutId: CutoutId) => void
   setProvidedFixtureOptions: (providedFixtureOptions: CutoutFixtureId[]) => void
   deckDef: DeckDefinition
+  robotName: string
 }
 
 function FixtureTableItem({
@@ -125,6 +126,7 @@ function FixtureTableItem({
   setCutoutId,
   setProvidedFixtureOptions,
   deckDef,
+  robotName,
 }: FixtureTableItemProps): JSX.Element {
   const { t, i18n } = useTranslation('protocol_setup')
 
@@ -190,6 +192,7 @@ function FixtureTableItem({
           isOnDevice={true}
           missingLabwareDisplayName={missingLabwareDisplayName}
           deckDef={deckDef}
+          robotName={robotName}
         />
       ) : null}
       <Flex

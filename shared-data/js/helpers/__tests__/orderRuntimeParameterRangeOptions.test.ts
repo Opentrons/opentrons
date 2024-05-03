@@ -29,13 +29,13 @@ describe('orderRuntimeParameterRangeOptions', () => {
     expect(result).toEqual('16, 20')
   })
 
-  it('should return alphabetical order when choices are number', () => {
+  it('should return the original order when range is not numerical range', () => {
     const mockChoices: Choice[] = [
       { displayName: 'Single channel 50µL', value: 'flex_1channel_50' },
       { displayName: 'Eight Channel 50µL', value: 'flex_8channel_50' },
     ]
     const result = orderRuntimeParameterRangeOptions(mockChoices)
-    expect(result).toEqual('Eight Channel 50µL, Single channel 50µL')
+    expect(result).toEqual('Single channel 50µL, Eight Channel 50µL')
   })
 
   it('should return empty string choices > 3', () => {

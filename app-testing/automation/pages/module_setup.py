@@ -1,6 +1,5 @@
 """Model for the screen of module setup."""
 
-
 from rich.console import Console
 from selenium.webdriver.chrome.webdriver import WebDriver
 from selenium.webdriver.common.action_chains import ActionChains

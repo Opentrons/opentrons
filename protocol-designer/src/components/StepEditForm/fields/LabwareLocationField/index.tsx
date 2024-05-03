@@ -1,12 +1,8 @@
 import * as React from 'react'
 import { useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
+import { getModuleDisplayName } from '@opentrons/shared-data'
 import {
-  getModuleDisplayName,
-  WASTE_CHUTE_CUTOUT,
-} from '@opentrons/shared-data'
-import {
-  getAdditionalEquipmentEntities,
   getLabwareEntities,
   getModuleEntities,
 } from '../../../../step-forms/selectors'
@@ -14,7 +10,6 @@ import {
   getRobotStateAtActiveItem,
   getUnoccupiedLabwareLocationOptions,
 } from '../../../../top-selectors/labware-locations'
-import { getHasWasteChute } from '../../../labware'
 import { StepFormDropdown } from '../StepFormDropdownField'
 
 export function LabwareLocationField(
@@ -27,32 +22,18 @@ export function LabwareLocationField(
   const labwareEntities = useSelector(getLabwareEntities)
   const robotState = useSelector(getRobotStateAtActiveItem)
   const moduleEntities = useSelector(getModuleEntities)
-  const additionalEquipmentEntities = useSelector(
-    getAdditionalEquipmentEntities
-  )
-  const hasWasteChute = getHasWasteChute(additionalEquipmentEntities)
   const isLabwareOffDeck =
     labware != null ? robotState?.labware[labware]?.slot === 'offDeck' : false
-  const displayWasteChuteValue =
-    useGripper && hasWasteChute && !isLabwareOffDeck
 
   let unoccupiedLabwareLocationsOptions =
     useSelector(getUnoccupiedLabwareLocationOptions) ?? []
 
-  if (isLabwareOffDeck && hasWasteChute) {
-    unoccupiedLabwareLocationsOptions = unoccupiedLabwareLocationsOptions.filter(
-      option =>
-        option.value !== 'offDeck' && option.value !== WASTE_CHUTE_CUTOUT
-    )
-  } else if (useGripper || isLabwareOffDeck) {
+  if (useGripper || isLabwareOffDeck) {
     unoccupiedLabwareLocationsOptions = unoccupiedLabwareLocationsOptions.filter(
       option => option.value !== 'offDeck'
     )
-  } else if (!displayWasteChuteValue) {
-    unoccupiedLabwareLocationsOptions = unoccupiedLabwareLocationsOptions.filter(
-      option => option.name !== 'Waste Chute in D3'
-    )
   }
+
   const location: string = value as string
 
   const bothFieldsSelected = labware != null && value != null

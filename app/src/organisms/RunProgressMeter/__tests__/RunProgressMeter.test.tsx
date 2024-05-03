@@ -11,6 +11,7 @@ import {
   RUN_STATUS_IDLE,
   RUN_STATUS_RUNNING,
   RUN_STATUS_SUCCEEDED,
+  RunCommandSummary,
 } from '@opentrons/api-client'
 
 import { i18n } from '../../../i18n'
@@ -19,7 +20,7 @@ import { ProgressBar } from '../../../atoms/ProgressBar'
 import { useRunStatus } from '../../RunTimeControl/hooks'
 import { useMostRecentCompletedAnalysis } from '../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import {
-  useNotifyLastRunCommandKey,
+  useNotifyLastRunCommand,
   useNotifyRunQuery,
 } from '../../../resources/runs'
 import { useDownloadRunLog } from '../../Devices/hooks'
@@ -82,9 +83,9 @@ describe('RunProgressMeter', () => {
       downloadRunLog: vi.fn(),
       isRunLogLoading: false,
     })
-    when(useNotifyLastRunCommandKey)
+    when(useNotifyLastRunCommand)
       .calledWith(NON_DETERMINISTIC_RUN_ID, { refetchInterval: 1000 })
-      .thenReturn(NON_DETERMINISTIC_COMMAND_KEY)
+      .thenReturn({ key: NON_DETERMINISTIC_COMMAND_KEY } as RunCommandSummary)
 
     vi.mocked(useNotifyRunQuery).mockReturnValue({ data: null } as any)
 

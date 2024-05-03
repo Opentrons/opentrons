@@ -9,7 +9,6 @@ import {
   heater_shaker_commands_with_results_key,
 } from '@opentrons/shared-data'
 import { useMostRecentCompletedAnalysis } from '../../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
-import { useDeckConfigurationQuery } from '@opentrons/react-api-client'
 
 import { getProtocolModulesInfo } from '../../ProtocolRun/utils/getProtocolModulesInfo'
 
@@ -22,6 +21,7 @@ import {
   useModuleRenderInfoForProtocolById,
   useStoredProtocolAnalysis,
 } from '..'
+import { useNotifyDeckConfigurationQuery } from '../../../../resources/deck_configuration'
 
 import type {
   CutoutConfig,
@@ -33,11 +33,11 @@ import type {
 import type { UseQueryResult } from 'react-query'
 import type { AttachedModule } from '../../../../redux/modules/types'
 
-vi.mock('@opentrons/react-api-client')
 vi.mock('../../ProtocolRun/utils/getProtocolModulesInfo')
 vi.mock('../useAttachedModules')
 vi.mock('../useStoredProtocolAnalysis')
 vi.mock('../../../LabwarePositionCheck/useMostRecentCompletedAnalysis')
+vi.mock('../../../../resources/deck_configuration')
 
 const heaterShakerCommandsWithResultsKey = (heater_shaker_commands_with_results_key as unknown) as ProtocolAnalysisOutput
 
@@ -113,7 +113,7 @@ const mockCutoutConfig: CutoutConfig = {
 
 describe('useModuleRenderInfoForProtocolById hook', () => {
   beforeEach(() => {
-    vi.mocked(useDeckConfigurationQuery).mockReturnValue({
+    vi.mocked(useNotifyDeckConfigurationQuery).mockReturnValue({
       data: [mockCutoutConfig],
     } as UseQueryResult<DeckConfiguration>)
     vi.mocked(useAttachedModules).mockReturnValue([mockAttachedTempMod])

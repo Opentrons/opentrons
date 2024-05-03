@@ -11,10 +11,7 @@ import {
   JUSTIFY_CENTER,
   JUSTIFY_SPACE_AROUND,
 } from '@opentrons/components'
-import {
-  useDeckConfigurationQuery,
-  useUpdateDeckConfigurationMutation,
-} from '@opentrons/react-api-client'
+import { useUpdateDeckConfigurationMutation } from '@opentrons/react-api-client'
 import {
   SINGLE_RIGHT_CUTOUTS,
   SINGLE_LEFT_SLOT_FIXTURE,
@@ -31,6 +28,7 @@ import { AddFixtureModal } from '../../organisms/DeviceDetailsDeckConfiguration/
 import { DeckFixtureSetupInstructionsModal } from '../../organisms/DeviceDetailsDeckConfiguration/DeckFixtureSetupInstructionsModal'
 import { DeckConfigurationDiscardChangesModal } from '../../organisms/DeviceDetailsDeckConfiguration/DeckConfigurationDiscardChangesModal'
 import { getTopPortalEl } from '../../App/portal'
+import { useNotifyDeckConfigurationQuery } from '../../resources/deck_configuration'
 
 import type {
   CutoutFixtureId,
@@ -62,7 +60,7 @@ export function DeckConfigurationEditor(): JSX.Element {
   ] = React.useState<boolean>(false)
 
   const deckDef = getDeckDefFromRobotType(FLEX_ROBOT_TYPE)
-  const deckConfig = useDeckConfigurationQuery().data ?? []
+  const deckConfig = useNotifyDeckConfigurationQuery().data ?? []
   const { updateDeckConfiguration } = useUpdateDeckConfigurationMutation()
 
   const [
@@ -90,18 +88,18 @@ export function DeckConfigurationEditor(): JSX.Element {
       deckDef.cutoutFixtures.find(cf => cf.id === cutoutFixtureId)
         ?.fixtureGroup ?? {}
 
-    let newDeckConfig = deckConfig
+    let newDeckConfig = currentDeckConfig
     if (cutoutId in fixtureGroup) {
       const groupMap =
         fixtureGroup[cutoutId]?.find(group =>
           Object.entries(group).every(([cId, cfId]) =>
-            deckConfig.find(
+            currentDeckConfig.find(
               config =>
                 config.cutoutId === cId && config.cutoutFixtureId === cfId
             )
           )
         ) ?? {}
-      newDeckConfig = deckConfig.map(cutoutConfig =>
+      newDeckConfig = currentDeckConfig.map(cutoutConfig =>
         cutoutConfig.cutoutId in groupMap
           ? {
               ...cutoutConfig,
@@ -111,7 +109,7 @@ export function DeckConfigurationEditor(): JSX.Element {
           : cutoutConfig
       )
     } else {
-      newDeckConfig = deckConfig.map(cutoutConfig =>
+      newDeckConfig = currentDeckConfig.map(cutoutConfig =>
         cutoutConfig.cutoutId === cutoutId
           ? {
               ...cutoutConfig,
@@ -121,7 +119,7 @@ export function DeckConfigurationEditor(): JSX.Element {
           : cutoutConfig
       )
     }
-    updateDeckConfiguration(newDeckConfig)
+    setCurrentDeckConfig(newDeckConfig)
   }
 
   const handleClickConfirm = (): void => {

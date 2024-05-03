@@ -1,10 +1,7 @@
 import * as React from 'react'
 import { createPortal } from 'react-dom'
 import { Trans, useTranslation } from 'react-i18next'
-import {
-  useDeckConfigurationQuery,
-  useUpdateDeckConfigurationMutation,
-} from '@opentrons/react-api-client'
+import { useUpdateDeckConfigurationMutation } from '@opentrons/react-api-client'
 import {
   ALIGN_CENTER,
   BORDERS,
@@ -30,10 +27,12 @@ import {
   getCutoutFixturesForModuleModel,
   getFixtureIdByCutoutIdFromModuleSlotName,
 } from '@opentrons/shared-data'
+
 import { getTopPortalEl } from '../../../../App/portal'
 import { LegacyModal } from '../../../../molecules/LegacyModal'
 import { Modal } from '../../../../molecules/Modal'
 import { SmallButton } from '../../../../atoms/buttons/SmallButton'
+import { useNotifyDeckConfigurationQuery } from '../../../../resources/deck_configuration'
 
 import type {
   CutoutConfig,
@@ -48,6 +47,7 @@ interface LocationConflictModalProps {
   onCloseClick: () => void
   cutoutId: CutoutId
   deckDef: DeckDefinition
+  robotName: string
   missingLabwareDisplayName?: string | null
   requiredFixtureId?: CutoutFixtureId
   requiredModule?: ModuleModel
@@ -60,6 +60,7 @@ export const LocationConflictModal = (
   const {
     onCloseClick,
     cutoutId,
+    robotName,
     missingLabwareDisplayName,
     requiredFixtureId,
     requiredModule,
@@ -69,7 +70,7 @@ export const LocationConflictModal = (
   const { t, i18n } = useTranslation(['protocol_setup', 'shared'])
 
   const [showModuleSelect, setShowModuleSelect] = React.useState(false)
-  const deckConfig = useDeckConfigurationQuery().data ?? []
+  const deckConfig = useNotifyDeckConfigurationQuery().data ?? []
   const { updateDeckConfiguration } = useUpdateDeckConfigurationMutation()
   const deckConfigurationAtLocationFixtureId = deckConfig.find(
     (deckFixture: CutoutConfig) => deckFixture.cutoutId === cutoutId
@@ -153,7 +154,11 @@ export const LocationConflictModal = (
     protocolSpecifiesDisplayName = getModuleDisplayName(requiredModule)
   }
 
-  if (showModuleSelect && requiredModule) {
+  const displaySlotName = isThermocycler
+    ? 'A1 + B1'
+    : getCutoutDisplayName(cutoutId)
+
+  if (showModuleSelect && requiredModule != null) {
     return createPortal(
       <ChooseModuleToConfigureModal
         handleConfigureModule={handleConfigureModule}
@@ -161,10 +166,13 @@ export const LocationConflictModal = (
         onCloseClick={onCloseClick}
         isOnDevice={isOnDevice}
         deckDef={deckDef}
+        robotName={robotName}
+        displaySlotName={displaySlotName}
       />,
       getTopPortalEl()
     )
   }
+
   return createPortal(
     isOnDevice ? (
       <Modal
@@ -200,11 +208,7 @@ export const LocationConflictModal = (
               fontWeight={TYPOGRAPHY.fontWeightBold}
               paddingBottom={SPACING.spacing8}
             >
-              {t('slot_location', {
-                slotName: isThermocycler
-                  ? 'A1 + B1'
-                  : getCutoutDisplayName(cutoutId),
-              })}
+              {t('slot_location', { slotName: displaySlotName })}
             </StyledText>
             <Flex
               flexDirection={DIRECTION_COLUMN}
@@ -303,11 +307,7 @@ export const LocationConflictModal = (
               fontSize={TYPOGRAPHY.fontSizeH4}
               fontWeight={TYPOGRAPHY.fontWeightBold}
             >
-              {t('slot_location', {
-                slotName: isThermocycler
-                  ? 'A1 + B1'
-                  : getCutoutDisplayName(cutoutId),
-              })}
+              {t('slot_location', { slotName: displaySlotName })}
             </StyledText>
             <Flex
               flexDirection={DIRECTION_COLUMN}

@@ -25,14 +25,12 @@ import { PipetteRecalibrationWarning } from './PipetteCard/PipetteRecalibrationW
 import { useCurrentRunId } from '../ProtocolUpload/hooks'
 import { ModuleCard } from '../ModuleCard'
 import { useIsFlex, useIsRobotViewable, useRunStatuses } from './hooks'
-import {
-  getIs96ChannelPipetteAttached,
-  getShowPipetteCalibrationWarning,
-} from './utils'
+import { getShowPipetteCalibrationWarning } from './utils'
 import { PipetteCard } from './PipetteCard'
 import { FlexPipetteCard } from './PipetteCard/FlexPipetteCard'
 import { GripperCard } from '../GripperCard'
 import { useIsEstopNotDisengaged } from '../../resources/devices/hooks/useIsEstopNotDisengaged'
+import { useModuleApiRequests } from '../ModuleCard/utils'
 
 import type {
   BadGripper,
@@ -62,6 +60,7 @@ export function InstrumentsAndModules({
   const currentRunId = useCurrentRunId()
   const { isRunTerminal, isRunRunning } = useRunStatuses()
   const isEstopNotDisengaged = useIsEstopNotDisengaged(robotName)
+  const [getLatestRequestId, handleModuleApiRequests] = useModuleApiRequests()
 
   const { data: attachedInstruments } = useInstrumentsQuery({
     refetchInterval: EQUIPMENT_POLL_MS,
@@ -97,9 +96,8 @@ export function InstrumentsAndModules({
         !i.ok &&
         i.subsystem === 'pipette_right'
     ) ?? null
-  const is96ChannelAttached = getIs96ChannelPipetteAttached(
-    attachedPipettes?.left ?? null
-  )
+  const is96ChannelAttached = attachedLeftPipette?.data.channels === 96
+
   const attachPipetteRequired =
     attachedLeftPipette == null && attachedRightPipette == null
   const calibratePipetteRequired =
@@ -218,6 +216,8 @@ export function InstrumentsAndModules({
                   attachPipetteRequired={attachPipetteRequired}
                   calibratePipetteRequired={calibratePipetteRequired}
                   updatePipetteFWRequired={updatePipetteFWRequired}
+                  latestRequestId={getLatestRequestId(module.serialNumber)}
+                  handleModuleApiRequests={handleModuleApiRequests}
                 />
               ))}
             </Flex>
@@ -267,6 +267,8 @@ export function InstrumentsAndModules({
                   attachPipetteRequired={attachPipetteRequired}
                   calibratePipetteRequired={calibratePipetteRequired}
                   updatePipetteFWRequired={updatePipetteFWRequired}
+                  latestRequestId={getLatestRequestId(module.serialNumber)}
+                  handleModuleApiRequests={handleModuleApiRequests}
                 />
               ))}
             </Flex>
