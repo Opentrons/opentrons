@@ -6,7 +6,7 @@ from .notification_client import (
     get_notification_client,
     clean_up_notification_client,
 )
-from .publisher_notifier import PublisherNotifier, get_notify_publishers
+from .publisher_notifier import PublisherNotifier, get_pe_notify_publishers
 from .publishers import (
     MaintenanceRunsPublisher,
     RunsPublisher,
@@ -15,7 +15,6 @@ from .publishers import (
     get_runs_publisher,
     get_deck_configuration_publisher,
 )
-from .change_notifier import ChangeNotifier
 from .topics import Topics
 
 __all__ = [
@@ -30,12 +29,11 @@ __all__ = [
     "clean_up_notification_client",
     # for use by FastAPI
     "get_notification_client",
-    "get_notify_publishers",
+    "get_pe_notify_publishers",
     "get_maintenance_runs_publisher",
     "get_runs_publisher",
     "get_deck_configuration_publisher",
     # for testing
     "PublisherNotifier",
-    "ChangeNotifier",
     "Topics",
 ]
