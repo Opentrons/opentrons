@@ -86,7 +86,7 @@ async def on_startup() -> None:
     initialize_logging()
     initialize_task_runner(app_state=app.state)
     fbl_init(app_state=app.state)
-    initialize_publisher_notifiers(
+    await initialize_publisher_notifiers(
         app_state=app.state,
     )
     start_initializing_hardware(

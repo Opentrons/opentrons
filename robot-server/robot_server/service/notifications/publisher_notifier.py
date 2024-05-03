@@ -1,4 +1,5 @@
 """Provides an interface for alerting notification publishers to events and related lifecycle utilities."""
+import asyncio
 from fastapi import Depends
 from typing import Optional, Callable, List, Awaitable
 
@@ -11,6 +12,7 @@ from server_utils.fastapi_utils.app_state import (
 from opentrons.util.event_notifier import EventNotifier
 
 
+# TOME: In the final version, pass either the thread safe or not thread safe version in the init.
 class PublisherNotifier:
     """An interface that invokes notification callbacks whenever a generic notify event occurs."""
 
@@ -22,20 +24,29 @@ class PublisherNotifier:
         # conditional check. A max_queue_size=1 ensures that all callbacks perform their conditional check without
         # being "over"-invoked.
         self._event_notifier = event_notifier or EventNotifier()
-
-    def register_publish_callback(self, callback: Callable[[], Awaitable[None]]):
-        """Register a single callback."""
-        self._event_notifier.subscribe(callback)
+        self._pe_notifier: Optional[asyncio.Task[None]] = None
+        self._callbacks: List[Callable[[], Awaitable[None]]] = []
 
     def register_publish_callbacks(
         self, callbacks: List[Callable[[], Awaitable[None]]]
     ):
-        """Register a list of callbacks."""
-        self._event_notifier.subscribe_many(callbacks)
+        """Extend the list of callbacks with a given list of callbacks."""
+        self._callbacks.extend(callbacks)
+
+    async def _initialize(self) -> None:
+        """Initializes an instance of PublisherNotifier. This method should only be called once."""
+        self._pe_notifier = asyncio.create_task(self._wait_for_event())
 
     def _notify_publishers(self) -> None:
         """A generic notifier, alerting all `waiters` of a change."""
         self._event_notifier.notify()
+
+    async def _wait_for_event(self) -> None:
+        """Indefinitely wait for an event to occur, then invoke each callback."""
+        while True:
+            await self._event_notifier.wait()
+            for callback in self._callbacks:
+                await callback()
 
 
 _pe_publisher_notifier_accessor: AppStateAccessor[PublisherNotifier] = AppStateAccessor[
@@ -87,19 +98,21 @@ def get_hardware_publisher_notifier(
     return publisher_notifier
 
 
-def initialize_pe_publisher_notifier(app_state: AppState) -> None:
+async def initialize_pe_publisher_notifier(app_state: AppState) -> None:
     """Create a new `NotificationClient` and store it on `app_state` intended for protocol engine.
 
     Intended to be called just once, when the server starts up.
     """
     publisher_notifier: PublisherNotifier = PublisherNotifier()
     _pe_publisher_notifier_accessor.set_on(app_state, publisher_notifier)
+    await publisher_notifier._initialize()
 
 
-def initialize_hardware_publisher_notifier(app_state: AppState) -> None:
+async def initialize_hardware_publisher_notifier(app_state: AppState) -> None:
     """Create a new `NotificationClient` and store it on `app_state` intended for hardware.
 
     Intended to be called just once, when the server starts up.
     """
     publisher_notifier: PublisherNotifier = PublisherNotifier()
     _hardware_publisher_notifier_accessor.set_on(app_state, publisher_notifier)
+    await publisher_notifier._initialize()

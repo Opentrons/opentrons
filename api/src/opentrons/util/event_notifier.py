@@ -2,7 +2,7 @@
 import asyncio
 
 
-class Event_Threadsafe(asyncio.Event):
+class Event_ts(asyncio.Event):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         if self._loop is None:
@@ -17,7 +17,7 @@ class EventNotifier:
 
     def __init__(self) -> None:
         """Initialize the ChangeNotifier with an internal Event."""
-        self._event = Event_Threadsafe()
+        self._event = Event_ts()
 
     def notify(self) -> None:
         """Notify all `waiters` of a change."""
