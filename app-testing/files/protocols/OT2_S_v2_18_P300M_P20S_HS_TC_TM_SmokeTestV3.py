@@ -19,7 +19,7 @@ requirements = {"robotType": "OT-2", "apiLevel": "2.18"}
 # 2.18
 # ----
 
-# labware.set_offset 
+# labware.set_offset
 # ^^^ Needs to be implemented in the protocol once dev is finished with the feature^^^
 
 # ----
@@ -45,7 +45,7 @@ requirements = {"robotType": "OT-2", "apiLevel": "2.18"}
 # ----
 
 # - move_labware added - Manual Deck State Modification
-# - ProtocolContext.load_adapter added 
+# - ProtocolContext.load_adapter added
 # - OFF_DECK location added
 
 # ----
@@ -427,3 +427,57 @@ def run(ctx: protocol_api.ProtocolContext) -> None:
     pipette_left.aspirate(volume=75, location=dye_source)
     pipette_left.dispense(volume=60, location=tc_plate.wells_by_name()["A6"])
     pipette_left.drop_tip()
+
+    ######################
+    # labware.set_offset #
+    ######################
+
+    # -------------------------- #
+    # Added in API version: 2.18 #
+    # -------------------------- #
+
+    SET_OFFSET_AMOUNT = 10.0
+
+    pipette_right.pick_up_tip()
+
+    ctx.move_labware(labware=logo_destination_plate, new_location=protocol_api.OFF_DECK)
+    pipette_right.move_to(dye_container.wells_by_name()["A1"].top())
+
+    ctx.pause("Is the pipette tip in the middle of reservoir A1 in slot 3? It should be at the LPC calibrated height.")
+
+    dye_container.set_offset(
+        x=0.0,
+        y=0.0,
+        z=SET_OFFSET_AMOUNT,
+    )
+
+    pipette_right.move_to(dye_container.wells_by_name()["A1"].top())
+    ctx.pause("Is the pipette tip in the middle of reservoir A1 in slot 3? It should be 10mm higher than the LPC calibrated height.")
+
+    ctx.move_labware(labware=dye_container, new_location="2")
+    pipette_right.move_to(dye_container.wells_by_name()["A1"].top())
+
+    ctx.pause("Is the pipette tip in the middle of reservoir A1 in slot 2? It should be at the LPC calibrated height.")
+
+    dye_container.set_offset(
+        x=0.0,
+        y=0.0,
+        z=SET_OFFSET_AMOUNT,
+    )
+
+    pipette_right.move_to(dye_container.wells_by_name()["A1"].top())
+    ctx.pause("Is the pipette tip in the middle of reservoir A1 in slot 2? It should be 10mm higher than the LPC calibrated height.")
+
+    ctx.move_labware(labware=dye_container, new_location="3")
+    pipette_right.move_to(dye_container.wells_by_name()["A1"].top())
+
+    ctx.pause("Is the pipette tip in the middle of reservoir A1 in slot 3? It should be 10mm higher than the LPC calibrated height.")
+
+    ctx.move_labware(labware=logo_destination_plate, new_location="2")
+    pipette_right.move_to(logo_destination_plate.wells_by_name()["A1"].top())
+
+    ctx.pause("Is the pipette tip in the middle of well A1 in slot 2? It should be at the LPC calibrated height.")
+
+    ctx.pause("!!!!!!!!!!YOU NEED TO REDO LPC!!!!!!!!!!")
+
+    pipette_right.return_tip()
