@@ -38,7 +38,7 @@ export function UpdateRobotBanner(
       onClick={(e: React.MouseEvent) => e.stopPropagation()}
       flexDirection={DIRECTION_COLUMN}
     >
-      <Banner type="error" {...styleProps}>
+      <Banner type="error" {...styleProps} iconMarginLeft={SPACING.spacing4}>
         <StyledText as="p" marginRight={SPACING.spacing4}>
           {t('branded:robot_software_update_required')}
         </StyledText>
