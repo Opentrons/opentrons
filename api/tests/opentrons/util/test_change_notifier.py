@@ -1,7 +1,7 @@
 """Tests for the ChangeNotifier interface."""
 import asyncio
 import pytest
-from opentrons.protocol_engine.state.change_notifier import ChangeNotifier
+from opentrons.util.change_notifier import ChangeNotifier
 
 
 async def test_single_subscriber() -> None:
@@ -24,12 +24,12 @@ async def test_multiple_subscribers(_test_repetition: int) -> None:
     """Test that multiple subscribers can wait for a notification.
 
     This test checks that the subscribers are awoken in the order they
-    subscribed. This may or may not be guarenteed according to the
+    subscribed. This may or may not be guaranteed according to the
     implementations of both ChangeNotifier and the event loop.
-    This test functions as a canary, given that our code may relies
+    This test functions as a canary, given that our code may rely
     on this ordering for determinism.
 
-    This test runs multiple times to check for flakyness.
+    This test runs multiple times to check for flakiness.
     """
     subject = ChangeNotifier()
     results = []
