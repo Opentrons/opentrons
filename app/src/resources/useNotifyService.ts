@@ -51,8 +51,6 @@ export function useNotifyService<TData, TError = Error>({
 
   React.useEffect(() => {
     if (shouldUseNotifications) {
-      // Always fetch on initial mount.
-      setRefetch('once')
       appShellListener({
         hostname,
         topic,
