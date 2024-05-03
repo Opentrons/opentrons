@@ -272,6 +272,16 @@ async def calibrate_tiprack(api, home_position, mount):
     press_dist = await api.pick_up_tip(
         mount, tip_length=(tip_length[args.tip_size]-tip_overlap))
     print(f'Press Position:{press_dist[Axis.by_mount(mount)]}')
+    tip_offset = 1.0
+    enc_tipoverlap = initial_press_dist[Axis.by_mount(mount)] - press_dist[Axis.by_mount(mount)] - tip_offset
+    print(f'Enc TipOverlap: {enc_tipoverlap}')
+    instr = api._pipette_handler.get_pipette(mount)
+    print(f'current_tipL: {instr.current_tip_length}')
+    instr.remove_tip()
+    current_position = await api.current_position_ot3(mount)
+    print(current_position)
+    instr.add_tip((tip_length[args.tip_size]-enc_tipoverlap))
+    print(f'new_current_tipL: {instr.current_tip_length}')
     await api.home([Axis.Z_L])
     cp = CriticalPoint.TIP
     await asyncio.sleep(1)
@@ -667,11 +677,20 @@ async def _main() -> None:
                                     presses = 1,
                                     increment = 0)
             print(f'Press Position: {press_dist[Axis.by_mount(mount)]}')
-            # await hw_api.home_z(mount.LEFT)
+            tip_offset = 1.0
+            enc_tipoverlap = initial_press_dist[Axis.by_mount(mount)] - press_dist[Axis.by_mount(mount)] - tip_offset
+            print(f'Enc TipOverlap: {enc_tipoverlap}')
+            instr = hw_api._pipette_handler.get_pipette(mount)
+            print(f'current_tipL: {instr.current_tip_length}')
+            instr.remove_tip()
+            current_position = await hw_api.current_position_ot3(mount)
+            print(current_position)
+            instr.add_tip((tip_length[args.tip_size]-enc_tipoverlap))
+            print(f'new_current_tipL: {instr.current_tip_length}')
             cp = CriticalPoint.TIP
             current_position = await hw_api.current_position_ot3(mount, cp)
-            # this_position = await jog(hw_api, current_position, cp)
-            # input("Press Enter to continue")
+            print(current_position)
+
 
 
     except KeyboardInterrupt:
