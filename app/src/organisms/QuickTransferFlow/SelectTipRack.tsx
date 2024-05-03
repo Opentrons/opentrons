@@ -64,6 +64,7 @@ export function SelectTipRack(props: SelectTipRackProps): JSX.Element {
 
           return tipRackDef != null ? (
             <LargeButton
+              key={tipRack}
               buttonType={
                 selectedTipRack === tipRackDef ? 'primary' : 'secondary'
               }

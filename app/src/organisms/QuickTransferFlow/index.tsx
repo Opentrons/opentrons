@@ -2,16 +2,20 @@ import * as React from 'react'
 import { useHistory } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import {
-  Flex,
+  useConditionalConfirm,
   StepMeter,
-  SPACING,
   POSITION_STICKY,
 } from '@opentrons/components'
 import { SmallButton } from '../../atoms/buttons'
-import { ChildNavigation } from '../ChildNavigation'
+import { ConfirmExitModal } from './ConfirmExitModal'
 import { CreateNewTransfer } from './CreateNewTransfer'
 import { SelectPipette } from './SelectPipette'
 import { SelectTipRack } from './SelectTipRack'
+import { SelectSourceLabware } from './SelectSourceLabware'
+import { SelectSourceWells } from './SelectSourceWells'
+import { SelectDestLabware } from './SelectDestLabware'
+import { SelectDestWells } from './SelectDestWells'
+import { VolumeEntry } from './VolumeEntry'
 import { quickTransferReducer } from './utils'
 
 import type { QuickTransferSetupState } from './types'
@@ -27,107 +31,64 @@ export const QuickTransferFlow = (): JSX.Element => {
     initialQuickTransferState
   )
   const [currentStep, setCurrentStep] = React.useState(1)
-  const [continueIsDisabled] = React.useState<boolean>(false)
 
-  // every child component will take state as a prop, an anonymous
-  // dispatch function related to that step (except create new),
-  // and a function to disable the continue button
+  const {
+    confirm: confirmExit,
+    showConfirmation: showConfirmExit,
+    cancel: cancelExit,
+  } = useConditionalConfirm(() => history.push('protocols'), true)
+
+  React.useEffect(() => {
+    if (state.volume != null) {
+      // until summary screen is implemented, log the final state and close flow
+      // once volume is set
+      console.log('final quick transfer flow state:', state)
+      history.push('protocols')
+    }
+  }, [state.volume])
 
   const exitButtonProps: React.ComponentProps<typeof SmallButton> = {
     buttonType: 'tertiaryLowLight',
     buttonText: i18n.format(t('shared:exit'), 'capitalize'),
-    onClick: () => {
-      history.push('protocols')
-    },
+    onClick: confirmExit,
+  }
+  const sharedMiddleStepProps = {
+    state,
+    dispatch,
+    onBack: () => setCurrentStep(prevStep => prevStep - 1),
+    onNext: () => setCurrentStep(prevStep => prevStep + 1),
+    exitButtonProps,
   }
 
-  // these will be moved to the child components once they all exist
-  const ORDERED_STEP_HEADERS: string[] = [
-    t('create_new_transfer'),
-    t('select_attached_pipette'),
-    t('select_tip_rack'),
-    t('select_source_labware'),
-    t('select_source_wells'),
-    t('select_dest_labware'),
-    t('select_dest_wells'),
-    t('set_transfer_volume'),
+  const modalContentInOrder: JSX.Element[] = [
+    <CreateNewTransfer
+      key={1}
+      onNext={() => setCurrentStep(prevStep => prevStep + 1)}
+      exitButtonProps={exitButtonProps}
+    />,
+    <SelectPipette key={2} {...sharedMiddleStepProps} />,
+    <SelectTipRack key={3} {...sharedMiddleStepProps} />,
+    <SelectSourceLabware key={4} {...sharedMiddleStepProps} />,
+    <SelectSourceWells key={5} {...sharedMiddleStepProps} />,
+    <SelectDestLabware key={6} {...sharedMiddleStepProps} />,
+    <SelectDestWells key={7} {...sharedMiddleStepProps} />,
+    <VolumeEntry key={8} {...sharedMiddleStepProps} onNext={() => {}} />,
   ]
 
-  const header = ORDERED_STEP_HEADERS[currentStep - 1]
-  let modalContent: JSX.Element | null = null
-  if (currentStep === 1) {
-    modalContent = (
-      <CreateNewTransfer
-        onNext={() => setCurrentStep(prevStep => prevStep + 1)}
-        exitButtonProps={exitButtonProps}
-      />
-    )
-  } else if (currentStep === 2) {
-    modalContent = (
-      <SelectPipette
-        state={state}
-        dispatch={dispatch}
-        onBack={() => setCurrentStep(prevStep => prevStep - 1)}
-        onNext={() => setCurrentStep(prevStep => prevStep + 1)}
-        exitButtonProps={exitButtonProps}
-      />
-    )
-  } else if (currentStep === 3) {
-    modalContent = (
-      <SelectTipRack
-        state={state}
-        dispatch={dispatch}
-        onBack={() => setCurrentStep(prevStep => prevStep - 1)}
-        onNext={() => setCurrentStep(prevStep => prevStep + 1)}
-        exitButtonProps={exitButtonProps}
-      />
-    )
-  } else {
-    modalContent = null
-  }
-
-  // until each page is wired up, show header title with empty screen
   return (
     <>
-      <StepMeter
-        totalSteps={QUICK_TRANSFER_WIZARD_STEPS}
-        currentStep={currentStep}
-        position={POSITION_STICKY}
-        top="0"
-      />
-      {modalContent == null ? (
-        <Flex>
-          <ChildNavigation
-            header={header}
-            onClickBack={
-              currentStep === 1
-                ? undefined
-                : () => {
-                    setCurrentStep(prevStep => prevStep - 1)
-                  }
-            }
-            buttonText={i18n.format(t('shared:continue'), 'capitalize')}
-            onClickButton={() => {
-              if (currentStep === 8) {
-                history.push('protocols')
-              } else {
-                setCurrentStep(prevStep => prevStep + 1)
-              }
-            }}
-            buttonIsDisabled={continueIsDisabled}
-            secondaryButtonProps={{
-              buttonType: 'tertiaryLowLight',
-              buttonText: i18n.format(t('shared:exit'), 'capitalize'),
-              onClick: () => {
-                history.push('protocols')
-              },
-            }}
-            top={SPACING.spacing8}
-          />
-          <Flex marginTop={SPACING.spacing80}>{modalContent}</Flex>
-        </Flex>
+      {showConfirmExit ? (
+        <ConfirmExitModal confirmExit={confirmExit} cancelExit={cancelExit} />
       ) : (
-        modalContent
+        <>
+          <StepMeter
+            totalSteps={QUICK_TRANSFER_WIZARD_STEPS}
+            currentStep={currentStep}
+            position={POSITION_STICKY}
+            top="0"
+          />
+          {modalContentInOrder[currentStep]}
+        </>
       )}
     </>
   )

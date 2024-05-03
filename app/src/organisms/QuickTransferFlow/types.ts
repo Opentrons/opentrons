@@ -8,7 +8,7 @@ export interface QuickTransferSetupState {
   tipRack?: LabwareDefinition2
   source?: LabwareDefinition2
   sourceWells?: string[]
-  destination?: LabwareDefinition2
+  destination?: LabwareDefinition2 | 'source'
   destinationWells?: string[]
   volume?: number
 }
@@ -41,7 +41,7 @@ interface SetSourceWellsAction {
 }
 interface SetDestLabwareAction {
   type: typeof ACTIONS.SET_DEST_LABWARE
-  labware: LabwareDefinition2
+  labware: LabwareDefinition2 | 'source'
 }
 interface SetDestWellsAction {
   type: typeof ACTIONS.SET_DEST_WELLS
