@@ -1,20 +1,15 @@
 import React from 'react'
-import { fireEvent, screen } from '@testing-library/react'
-import { describe, it, vi, beforeEach, expect } from 'vitest'
+import { useAtom } from 'jotai'
+import { fireEvent, screen, renderHook } from '@testing-library/react'
+import { describe, it, beforeEach, expect } from 'vitest'
 
 import { renderWithProviders } from '../../../__testing-utils__'
-import { setPromptContext } from '../PromptProvider'
 import { reagentTransfer } from '../../../assets/prompts'
+import { preparedPromptAtom } from '../../../resources/atoms'
 import { PromptButton } from '../index'
 
-const mockSetPrompt = vi.fn()
-
 const render = (props: React.ComponentProps<typeof PromptButton>) => {
-  return renderWithProviders(
-    <setPromptContext.Provider value={mockSetPrompt}>
-      <PromptButton {...props} />s
-    </setPromptContext.Provider>
-  )
+  return renderWithProviders(<PromptButton {...props} />)
 }
 
 describe('PromptButton', () => {
@@ -34,6 +29,8 @@ describe('PromptButton', () => {
     render(props)
     const button = screen.getByRole('button', { name: 'Reagent Transfer' })
     fireEvent.click(button)
-    expect(mockSetPrompt).toHaveBeenCalledWith(reagentTransfer)
+    const { result } = renderHook(() => useAtom(preparedPromptAtom))
+    fireEvent.click(button)
+    expect(result.current[0]).toBe(reagentTransfer)
   })
 })
