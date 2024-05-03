@@ -155,18 +155,10 @@ if __name__ == "__main__":
     parser.add_argument(
         "email", metavar="EMAIL", type=str, nargs=1, help="opentrons gmail."
     )
-    parser.add_argument(
-        "ip_or_all",
-        metavar="IP_OR_ALL",
-        type=str,
-        nargs=1,
-        help="Enter 'ALL' to read IPs.json or type full IP address of 1 robot.",
-    )
     args = parser.parse_args()
     storage_directory = args.storage_directory[0]
     folder_name = args.folder_name[0]
     google_sheet_name = args.google_sheet_name[0]
-    ip_or_all = args.ip_or_all[0]
     email = args.email[0]
     # Connect to google drive.
     try:
@@ -191,6 +183,7 @@ if __name__ == "__main__":
     except FileNotFoundError:
         print(f"Add .json file with robot IPs to: {storage_directory}.")
         sys.exit()
+    ip_or_all = input("IP Address or ALL: ")
 
     if ip_or_all == "ALL":
         ip_address_list = ip_file["ip_address_list"]
