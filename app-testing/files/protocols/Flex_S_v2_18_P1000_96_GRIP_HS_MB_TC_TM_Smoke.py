@@ -80,11 +80,7 @@ def run(ctx: protocol_api.ProtocolContext) -> None:
     tip_rack_2 = ctx.load_labware(TIPRACK_96_NAME, "C3")
     tip_rack_3 = ctx.load_labware(TIPRACK_96_NAME, "C4")
 
-    tip_racks = [
-        tip_rack_1,
-        tip_rack_2,
-        tip_rack_3,
-    ]
+    tip_racks = [tip_rack_1, tip_rack_2, tip_rack_3]
 
     ##########################
     ### PIPETTE DEFINITION ###
@@ -279,6 +275,8 @@ def run(ctx: protocol_api.ProtocolContext) -> None:
         module_locations = [thermocycler, magnetic_block] + adapters
         module_moves(dest_pcr_plate, module_locations)
 
+        ctx.move_labware(dest_pcr_plate, DECK_MOVE_RESET_LOCATION, use_gripper=USING_GRIPPER)
+
     def test_manual_moves():
         # In C4 currently
         ctx.move_labware(source_reservoir, "D4", use_gripper=not USING_GRIPPER)
@@ -340,8 +338,6 @@ def run(ctx: protocol_api.ProtocolContext) -> None:
             )
             pipette_96_channel.return_tip()
 
-            ctx.move_labware(tip_rack_3, get_disposal_preference()[0], use_gripper=get_disposal_preference()[1])
-
         test_partial_tip_pickup_usage()
         test_full_tip_rack_usage()
 
@@ -388,10 +384,8 @@ def run(ctx: protocol_api.ProtocolContext) -> None:
         # -------------------------- #
 
         SET_OFFSET_AMOUNT = 10.0
-
-        pipette_96_channel.pick_up_tip()
-
         ctx.move_labware(labware=source_reservoir, new_location=protocol_api.OFF_DECK, use_gripper=False)
+        pipette_96_channel.pick_up_tip(tip_rack_3["A1"])
         pipette_96_channel.move_to(dest_pcr_plate.wells_by_name()["A1"].top())
 
         ctx.pause("Is the pipette tip in the middle of the PCR Plate, well A1, in slot C2? It should be at the LPC calibrated height.")
@@ -435,18 +429,19 @@ def run(ctx: protocol_api.ProtocolContext) -> None:
 
         ctx.pause("Is the pipette tip in the middle of the reservoir , well A1, in slot D2? It should be at the LPC calibrated height.")
 
-        ctx.pause("!!!!!!!!!!YOU NEED TO REDO LPC!!!!!!!!!!")
-
         pipette_96_channel.return_tip()
+        ctx.move_labware(tip_rack_3, get_disposal_preference()[0], use_gripper=get_disposal_preference()[1])
+
+        ctx.pause("!!!!!!!!!!YOU NEED TO REDO LPC!!!!!!!!!!")
 
     ###################################################################################################
     ### THE ORDER OF THESE FUNCTION CALLS MATTER. CHANGING THEM WILL CAUSE THE PROTOCOL NOT TO WORK ###
     ###################################################################################################
-    test_labware_set_offset()
     test_pipetting()
     test_gripper_moves()
     test_module_usage()
     test_manual_moves()
+    test_labware_set_offset()
 
     ###################################################################################################
     ### THE ORDER OF THESE FUNCTION CALLS MATTER. CHANGING THEM WILL CAUSE THE PROTOCOL NOT TO WORK ###
