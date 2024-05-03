@@ -8,11 +8,11 @@ from typing_extensions import ParamSpec
 from opentrons_shared_data.deck.dev_types import DeckDefinitionV5
 
 from opentrons.protocol_engine.types import ModuleOffsetData
+from opentrons.util.change_notifier import ChangeNotifier
 
 from ..resources import DeckFixedLabware
 from ..actions import Action, ActionHandler
 from .abstract_store import HasState, HandlesActions
-from .change_notifier import ChangeNotifier
 from .commands import CommandState, CommandStore, CommandView
 from .addressable_areas import (
     AddressableAreaState,

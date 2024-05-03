@@ -1,15 +1,16 @@
 import asyncio
 from unittest.mock import Mock, MagicMock
 
+from opentrons.util.change_notifier import ChangeNotifier
+
 from robot_server.service.notifications import (
     PublisherNotifier,
-    ChangeNotifier,
 )
 
 
 async def test_initialize() -> None:
     """It should create a new task."""
-    publisher_notifier = PublisherNotifier()
+    publisher_notifier = PublisherNotifier(ChangeNotifier())
 
     await publisher_notifier._initialize()
 
@@ -28,7 +29,7 @@ def test_notify_publishers() -> None:
 
 def test_register_publish_callbacks() -> None:
     """It should extend the list of callbacks within a given list of callbacks."""
-    publisher_notifier = PublisherNotifier()
+    publisher_notifier = PublisherNotifier(ChangeNotifier())
     callback1 = Mock()
     callback2 = Mock()
 
