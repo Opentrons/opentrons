@@ -1,4 +1,3 @@
-import assert from 'assert'
 // TODO: Ian 2019-04-18 move orderWells somewhere more general -- shared-data util?
 import min from 'lodash/min'
 import {
@@ -77,7 +76,7 @@ export function _getNextTip(args: {
     return allWellsHaveTip ? orderedWells[0] : null
   }
 
-  assert(false, `Pipette ${pipetteId} has no channels/spec, cannot _getNextTip`)
+  console.assert(false, `Pipette ${pipetteId} has no channels/spec, cannot _getNextTip`)
   return null
 }
 interface NextTiprackInfo {
@@ -110,7 +109,7 @@ export function getNextTiprack(
   // filter out unmounted or non-compatible tiprack models
   const sortedTipracksIds = sortLabwareBySlot(robotState.labware).filter(
     labwareId => {
-      assert(
+      console.assert(
         invariantContext.labwareEntities[labwareId]?.labwareDefURI,
         `cannot getNextTiprack, no labware entity for "${labwareId}"`
       )
@@ -202,7 +201,7 @@ export function getPipetteWithTipMaxVol(
   const tiprackTipVol = getTiprackVolume(chosenTipRack ?? tiprackDef[0])
 
   if (!pipetteMaxVol || !tiprackTipVol) {
-    assert(
+    console.assert(
       false,
       `getPipetteEffectiveMaxVol expected tiprackMaxVol and pipette maxVolume to be > 0, got',
       ${pipetteMaxVol}, ${tiprackTipVol}`
