@@ -172,7 +172,6 @@ function Input(props: InputFieldProps): JSX.Element {
 
     @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
       height: ${size === 'small' ? '4.25rem' : '5rem'};
-      box-shadow: ${hasError ? BORDERS.shadowBig : 'none'};
       font-size: ${TYPOGRAPHY.fontSize28};
       padding: ${SPACING.spacing16} ${SPACING.spacing24};
       border: 2px ${BORDERS.styleSolid}
