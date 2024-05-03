@@ -31,7 +31,9 @@ export function VolumeEntry(props: VolumeEntryProps): JSX.Element {
   const { i18n, t } = useTranslation(['quick_transfer', 'shared'])
   const keyboardRef = React.useRef(null)
 
-  const [volume, setVolume] = React.useState<string>('')
+  const [volume, setVolume] = React.useState<string>(
+    state.volume ? state.volume.toString() : ''
+  )
   const volumeRange = getVolumeLimits(state)
   let headerCopy = t('set_transfer_volume')
   let textEntryCopy = t('volume_per_well')

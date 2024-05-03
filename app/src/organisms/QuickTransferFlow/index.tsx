@@ -38,12 +38,6 @@ export const QuickTransferFlow = (): JSX.Element => {
     cancel: cancelExit,
   } = useConditionalConfirm(() => history.push('protocols'), true)
 
-  const exitButtonProps: React.ComponentProps<typeof SmallButton> = {
-    buttonType: 'tertiaryLowLight',
-    buttonText: i18n.format(t('shared:exit'), 'capitalize'),
-    onClick: confirmExit,
-  }
-
   React.useEffect(() => {
     if (state.volume != null) {
       // until summary screen is implemented, log the final state and close flow
@@ -53,87 +47,35 @@ export const QuickTransferFlow = (): JSX.Element => {
     }
   }, [state.volume])
 
-  let modalContent: JSX.Element | null = null
-  if (currentStep === 1) {
-    modalContent = (
-      <CreateNewTransfer
-        onNext={() => setCurrentStep(prevStep => prevStep + 1)}
-        exitButtonProps={exitButtonProps}
-      />
-    )
-  } else if (currentStep === 2) {
-    modalContent = (
-      <SelectPipette
-        state={state}
-        dispatch={dispatch}
-        onBack={() => setCurrentStep(prevStep => prevStep - 1)}
-        onNext={() => setCurrentStep(prevStep => prevStep + 1)}
-        exitButtonProps={exitButtonProps}
-      />
-    )
-  } else if (currentStep === 3) {
-    modalContent = (
-      <SelectTipRack
-        state={state}
-        dispatch={dispatch}
-        onBack={() => setCurrentStep(prevStep => prevStep - 1)}
-        onNext={() => setCurrentStep(prevStep => prevStep + 1)}
-        exitButtonProps={exitButtonProps}
-      />
-    )
-  } else if (currentStep === 4) {
-    modalContent = (
-      <SelectSourceLabware
-        state={state}
-        dispatch={dispatch}
-        onBack={() => setCurrentStep(prevStep => prevStep - 1)}
-        onNext={() => setCurrentStep(prevStep => prevStep + 1)}
-        exitButtonProps={exitButtonProps}
-      />
-    )
-  } else if (currentStep === 5) {
-    modalContent = (
-      <SelectSourceWells
-        state={state}
-        dispatch={dispatch}
-        onBack={() => setCurrentStep(prevStep => prevStep - 1)}
-        onNext={() => setCurrentStep(prevStep => prevStep + 1)}
-        exitButtonProps={exitButtonProps}
-      />
-    )
-  } else if (currentStep === 6) {
-    modalContent = (
-      <SelectDestLabware
-        state={state}
-        dispatch={dispatch}
-        onBack={() => setCurrentStep(prevStep => prevStep - 1)}
-        onNext={() => setCurrentStep(prevStep => prevStep + 1)}
-        exitButtonProps={exitButtonProps}
-      />
-    )
-  } else if (currentStep === 7) {
-    modalContent = (
-      <SelectDestWells
-        state={state}
-        dispatch={dispatch}
-        onBack={() => setCurrentStep(prevStep => prevStep - 1)}
-        onNext={() => setCurrentStep(prevStep => prevStep + 1)}
-        exitButtonProps={exitButtonProps}
-      />
-    )
-  } else if (currentStep === 8) {
-    modalContent = (
-      <VolumeEntry
-        state={state}
-        dispatch={dispatch}
-        onBack={() => setCurrentStep(prevStep => prevStep - 1)}
-        onNext={() => {}}
-        exitButtonProps={exitButtonProps}
-      />
-    )
-  } else {
-    modalContent = null
+  const exitButtonProps: React.ComponentProps<typeof SmallButton> = {
+    buttonType: 'tertiaryLowLight',
+    buttonText: i18n.format(t('shared:exit'), 'capitalize'),
+    onClick: confirmExit,
   }
+  const sharedMiddleStepProps = {
+    state,
+    dispatch,
+    onBack: () => setCurrentStep(prevStep => prevStep - 1),
+    onNext: () => {
+      console.log('next step')
+      setCurrentStep(prevStep => prevStep + 1)
+    },
+    exitButtonProps,
+  }
+
+  const modalContentInOrder: JSX.Element[] = [
+    <CreateNewTransfer
+      onNext={() => setCurrentStep(prevStep => prevStep + 1)}
+      exitButtonProps={exitButtonProps}
+    />,
+    <SelectPipette {...sharedMiddleStepProps} />,
+    <SelectTipRack {...sharedMiddleStepProps} />,
+    <SelectSourceLabware {...sharedMiddleStepProps} />,
+    <SelectSourceWells {...sharedMiddleStepProps} />,
+    <SelectDestLabware {...sharedMiddleStepProps} />,
+    <SelectDestWells {...sharedMiddleStepProps} />,
+    <VolumeEntry {...sharedMiddleStepProps} onNext={() => {}} />,
+  ]
 
   return (
     <>
@@ -147,7 +89,7 @@ export const QuickTransferFlow = (): JSX.Element => {
             position={POSITION_STICKY}
             top="0"
           />
-          {modalContent}
+          {modalContentInOrder[currentStep]}
         </>
       )}
     </>

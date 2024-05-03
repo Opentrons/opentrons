@@ -6,10 +6,12 @@ import { renderWithProviders } from '../../../__testing-utils__'
 import { i18n } from '../../../i18n'
 import { InputField } from '../../../atoms/InputField'
 import { NumericalKeyboard } from '../../../atoms/SoftwareKeyboard'
+import { getVolumeLimits } from '../utils'
 import { VolumeEntry } from '../VolumeEntry'
 
 vi.mock('../../../atoms/InputField')
 vi.mock('../../../atoms/SoftwareKeyboard')
+vi.mock('../utils')
 
 const render = (props: React.ComponentProps<typeof VolumeEntry>) => {
   return renderWithProviders(<VolumeEntry {...props} />, {
@@ -39,6 +41,7 @@ describe('VolumeEntry', () => {
       },
       dispatch: vi.fn(),
     }
+    vi.mocked(getVolumeLimits).mockReturnValue({ min: 5, max: 50 })
   })
   afterEach(() => {
     vi.resetAllMocks()
@@ -109,6 +112,45 @@ describe('VolumeEntry', () => {
         readOnly: true,
         type: 'text',
         value: '',
+      },
+      {}
+    )
+  })
+
+  it('calls on next and dispatch if you press continue when volume is non-null and within range', () => {
+    render({
+      ...props,
+      state: {
+        sourceWells: ['A1', 'A2'],
+        destinationWells: ['A1'],
+        volume: 20,
+      },
+    })
+    const continueBtn = screen.getByTestId('ChildNavigation_Primary_Button')
+    expect(continueBtn).toBeEnabled()
+    fireEvent.click(continueBtn)
+    expect(vi.mocked(props.onNext)).toHaveBeenCalled()
+    expect(vi.mocked(props.dispatch)).toHaveBeenCalled()
+  })
+
+  it('displays an error and disables continue when volume is outside of range', () => {
+    render({
+      ...props,
+      state: {
+        sourceWells: ['A1', 'A2'],
+        destinationWells: ['A1'],
+        volume: 90,
+      },
+    })
+    const continueBtn = screen.getByTestId('ChildNavigation_Primary_Button')
+    expect(continueBtn).toBeDisabled()
+    expect(vi.mocked(InputField)).toHaveBeenCalledWith(
+      {
+        title: 'Aspirate volume per well (µL)',
+        error: 'Value must be between 5-50',
+        readOnly: true,
+        type: 'text',
+        value: '90',
       },
       {}
     )

@@ -86,4 +86,16 @@ describe('SelectSourceLabware', () => {
     render({ ...props, state: { pipette: { channels: 8 } as any } })
     screen.getByText('Tube racks')
   })
+
+  it('enables continue button if you select a labware', () => {
+    render(props)
+    const continueBtn = screen.getByTestId('ChildNavigation_Primary_Button')
+    expect(continueBtn).toBeDisabled()
+    const labwareOption = screen.getByText('Bio-Rad 384 Well Plate 50 µL')
+    fireEvent.click(labwareOption)
+    expect(continueBtn).toBeEnabled()
+    fireEvent.click(continueBtn)
+    expect(props.onNext).toHaveBeenCalled()
+    expect(props.dispatch).toHaveBeenCalled()
+  })
 })
