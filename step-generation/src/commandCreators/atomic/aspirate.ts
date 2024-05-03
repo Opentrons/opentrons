@@ -41,6 +41,7 @@ export const aspirate: CommandCreator<ExtendedAspirateParams> = (
     yOffset,
   } = args
   const actionName = 'aspirate'
+  const labwareState = prevRobotState.labware
   const errors: CommandCreatorError[] = []
   const pipetteSpec = invariantContext.pipetteEntities[pipette]?.spec
   const isFlexPipette =
@@ -75,6 +76,13 @@ export const aspirate: CommandCreator<ExtendedAspirateParams> = (
 
   if (COLUMN_4_SLOTS.includes(slotName)) {
     errors.push(errorCreators.pipettingIntoColumn4({ typeOfStep: actionName }))
+  } else if (labwareState[slotName] != null) {
+    const adapterSlot = labwareState[slotName].slot
+    if (COLUMN_4_SLOTS.includes(adapterSlot)) {
+      errors.push(
+        errorCreators.pipettingIntoColumn4({ typeOfStep: actionName })
+      )
+    }
   }
 
   if (
