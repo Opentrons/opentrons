@@ -38,6 +38,8 @@
 
   & li {
     margin: 0.25rem 0;
+    font-size: var(--fs-body-2);
+    color: var(--c-font-dark); /* from legacy --font-body-2-dark */
   }
 
   & code {
