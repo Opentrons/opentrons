@@ -76,7 +76,10 @@ export function _getNextTip(args: {
     return allWellsHaveTip ? orderedWells[0] : null
   }
 
-  console.assert(false, `Pipette ${pipetteId} has no channels/spec, cannot _getNextTip`)
+  console.assert(
+    false,
+    `Pipette ${pipetteId} has no channels/spec, cannot _getNextTip`
+  )
   return null
 }
 interface NextTiprackInfo {
