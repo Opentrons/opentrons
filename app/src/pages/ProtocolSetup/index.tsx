@@ -101,7 +101,7 @@ import type { ProtocolModuleInfo } from '../../organisms/Devices/ProtocolRun/uti
 const FETCH_DURATION_MS = 5000
 interface ProtocolSetupStepProps {
   onClickSetupStep: () => void
-  status: 'ready' | 'not ready' | 'general'
+  status: 'ready' | 'not ready' | 'general' | 'inform'
   title: string
   // first line of detail text
   detail?: string | null
@@ -135,6 +135,7 @@ export function ProtocolSetupStep({
     ready: COLORS.green35,
     'not ready': COLORS.yellow35,
     general: COLORS.grey35,
+    inform: COLORS.grey35,
   }
   const { makeSnackbar } = useToaster()
 
@@ -152,6 +153,9 @@ export function ProtocolSetupStep({
         break
       case 'ready':
         backgroundColor = COLORS.green40
+        break
+      case 'inform':
+        backgroundColor = COLORS.grey50
         break
       default:
         backgroundColor = COLORS.yellow40
@@ -183,7 +187,10 @@ export function ProtocolSetupStep({
         padding={`${SPACING.spacing20} ${SPACING.spacing24}`}
         css={PUSHED_STATE_STYLE}
       >
-        {status !== 'general' && !disabled ? (
+        {status !== 'general' &&
+        !disabled &&
+        status !== 'inform' &&
+        !disabled ? (
           <Icon
             color={status === 'ready' ? COLORS.green50 : COLORS.yellow50}
             size="2rem"
@@ -201,7 +208,7 @@ export function ProtocolSetupStep({
           >
             {title}
           </StyledText>
-          <StyledText as="h4" color={COLORS.grey50} maxWidth="35rem">
+          <StyledText as="h4" color={COLORS.grey60} maxWidth="35rem">
             {description}
           </StyledText>
         </Flex>
