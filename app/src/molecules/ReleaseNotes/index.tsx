@@ -2,6 +2,7 @@ import * as React from 'react'
 import Markdown from 'react-markdown'
 
 import { StyledText } from '@opentrons/components'
+import { useIsOEMMode } from '../../resources/robot-settings/hooks'
 
 import styles from './styles.module.css'
 
@@ -14,9 +15,11 @@ const DEFAULT_RELEASE_NOTES = 'We recommend upgrading to the latest version.'
 export function ReleaseNotes(props: ReleaseNotesProps): JSX.Element {
   const { source } = props
 
+  const isOEMMode = useIsOEMMode()
+
   return (
     <div className={styles.release_notes}>
-      {source != null ? (
+      {source != null && !isOEMMode ? (
         <Markdown
           components={{
             div: undefined,

@@ -80,46 +80,25 @@ class MoveToMaintenancePositionImplementation(
         ot3_api = ensure_ot3_hardware(
             self._hardware_api,
         )
-        # the 96-channel mount is disengaged during gripper calibration and
-        #  must be homed before the gantry position can be called
-        await ot3_api.prepare_for_mount_movement(Mount.LEFT)
-        current_position_mount = await ot3_api.gantry_position(
-            Mount.LEFT, critical_point=CriticalPoint.MOUNT
-        )
-        max_height_z_mount = ot3_api.get_instrument_max_height(
-            Mount.LEFT, critical_point=CriticalPoint.MOUNT
-        )
         max_height_z_tip = ot3_api.get_instrument_max_height(Mount.LEFT)
-        # avoid using motion planning waypoints because we do not need to move the z at this moment
-        movement_points = [
-            # move the z to the highest position
-            Point(
-                x=current_position_mount.x,
-                y=current_position_mount.y,
-                z=max_height_z_mount,
-            ),
-            # move in x,y without going down the z
-            Point(x=_ATTACH_POINT.x, y=_ATTACH_POINT.y, z=max_height_z_mount),
-        ]
-
+        # disengage the gripper z mount if present and enabled
         await ot3_api.prepare_for_mount_movement(Mount.LEFT)
-        for movement in movement_points:
-            await ot3_api.move_to(
-                mount=Mount.LEFT,
-                abs_position=movement,
-                critical_point=CriticalPoint.MOUNT,
-            )
+
+        await ot3_api.retract(Mount.LEFT)
+        current_pos = await ot3_api.gantry_position(
+            Mount.LEFT, critical_point=CriticalPoint.MOUNT
+        )
+        await ot3_api.move_to(
+            mount=Mount.LEFT,
+            abs_position=Point(x=_ATTACH_POINT.x, y=_ATTACH_POINT.y, z=current_pos.z),
+            critical_point=CriticalPoint.MOUNT,
+        )
 
         if params.mount != MountType.EXTENSION:
-
-            # disengage the gripper z to enable the e-brake, this prevents the gripper
-            # z from dropping when the right mount carriage gets released from the
-            # mount during 96-channel detach flow
-            if ot3_api.has_gripper():
-                await ot3_api.disengage_axes([Axis.Z_G])
-
             if params.maintenancePosition == MaintenancePosition.ATTACH_INSTRUMENT:
-                mount_to_axis = Axis.by_mount(params.mount.to_hw_mount())
+                mount = params.mount.to_hw_mount()
+                mount_to_axis = Axis.by_mount(mount)
+                await ot3_api.prepare_for_mount_movement(mount)
                 await ot3_api.move_axes(
                     {
                         mount_to_axis: _INSTRUMENT_ATTACH_Z_POINT,
@@ -134,6 +113,7 @@ class MoveToMaintenancePositionImplementation(
                         Axis.Z_R: max_motion_range + _RIGHT_MOUNT_Z_MARGIN,
                     }
                 )
+                await ot3_api.disengage_axes([Axis.Z_L, Axis.Z_R])
 
         return MoveToMaintenancePositionResult()
 

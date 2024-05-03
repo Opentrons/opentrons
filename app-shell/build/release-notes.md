@@ -6,6 +6,42 @@ log][]. For a list of currently known issues, please see the [Opentrons issue tr
 
 ---
 
+## Opentrons App Changes in 7.3.0
+
+Welcome to the v7.3.0 release of the Opentrons App! This release adds support for Python protocols with runtime parameters, letting you change the behavior of a protocol each time you run it.
+
+Note: After updating, the app will prompt you to reanalyze all previously imported protocols. This is a one-time step and should not affect protocol behavior.
+
+### New Features
+
+Runtime Parameters
+
+- Available runtime parameters are shown on the protocol details screen.
+- Both the Opentrons App and touchscreen let you enter new parameter values during run setup.
+- The app highlights changed parameter values so you can confirm them before starting the run.
+- The run preview (before the run) and run log (after the run) reflect changes to steps based on your chosen parameter values.
+
+Modules in Deck Configuration
+
+- You can now specify what slots modules occupy on Flex in deck configuration.
+- When moving, Flex will avoid modules specified in deck configuration but not loaded in the protocol.
+- Deck configuration must be compatible with the protocol's requirements before you start a run.
+
+### Improved Features
+
+- Lists of robots are now sorted alphabetically.
+
+### Removals
+
+- Removed the "Use older protocol analysis method" advanced setting for OT-2. If you need this type of analysis, use `opentrons_simulate` on the command line.
+
+### Bug Fixes
+
+- All run log steps now appear in the same font size.
+- The app now properly sends custom labware definitions, along with the corresponding Python protocol, to Flex robots connected via USB.
+
+---
+
 ## Opentrons App Changes in 7.2.2
 
 Welcome to the v7.2.2 release of the Opentrons App!

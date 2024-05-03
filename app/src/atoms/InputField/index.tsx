@@ -99,6 +99,7 @@ function Input(props: InputFieldProps): JSX.Element {
     size = 'small',
     title,
     tooltipText,
+    tabIndex = 0,
     ...inputProps
   } = props
   const hasError = props.error != null
@@ -149,7 +150,7 @@ function Input(props: InputFieldProps): JSX.Element {
         ${hasError ? COLORS.red50 : COLORS.grey60};
     }
 
-    &&:focus-visible {
+    &:focus-visible {
       border: 1px ${BORDERS.styleSolid} ${COLORS.grey55};
       outline: 2px ${BORDERS.styleSolid} ${COLORS.blue50};
       outline-offset: 2px;
@@ -171,7 +172,6 @@ function Input(props: InputFieldProps): JSX.Element {
 
     @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
       height: ${size === 'small' ? '4.25rem' : '5rem'};
-      box-shadow: ${hasError ? BORDERS.shadowBig : 'none'};
       font-size: ${TYPOGRAPHY.fontSize28};
       padding: ${SPACING.spacing16} ${SPACING.spacing24};
       border: 2px ${BORDERS.styleSolid}
@@ -267,6 +267,7 @@ function Input(props: InputFieldProps): JSX.Element {
       ) : null}
       <Flex width="100%" flexDirection={DIRECTION_COLUMN} css={OUTER_CSS}>
         <Flex
+          tabIndex={tabIndex}
           css={INPUT_FIELD}
           alignItems={ALIGN_CENTER}
           onClick={() => {

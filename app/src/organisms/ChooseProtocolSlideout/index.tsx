@@ -344,7 +344,7 @@ export function ChooseProtocolSlideoutComponent(
   }
 
   const pageTwoBody = (
-    <Flex flexDirection={DIRECTION_COLUMN}>
+    <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing10}>
       <Flex justifyContent={JUSTIFY_END}>
         <LinkComponent
           textAlign={TYPOGRAPHY.textAlignRight}
@@ -352,7 +352,6 @@ export function ChooseProtocolSlideoutComponent(
             isRestoreDefaultsLinkEnabled ? ENABLED_LINK_CSS : DISABLED_LINK_CSS
           }
           onClick={resetRunTimeParameters}
-          paddingBottom={SPACING.spacing10}
           {...targetProps}
         >
           {t('protocol_details:restore_defaults')}
@@ -529,19 +528,27 @@ function StoredProtocolList(props: StoredProtocolListProps): JSX.Element {
                 onClick={() => handleSelectProtocol(storedProtocol)}
               >
                 <Box display="grid" gridTemplateColumns="1fr 3fr">
-                  <Box
-                    marginY={SPACING.spacingAuto}
-                    backgroundColor={isSelected ? COLORS.white : 'inherit'}
-                    marginRight={SPACING.spacing16}
-                    height="4.25rem"
-                    width="4.75rem"
-                  >
-                    {!missingAnalysisData ? (
+                  {!missingAnalysisData ? (
+                    <Box
+                      marginY={SPACING.spacingAuto}
+                      backgroundColor={isSelected ? COLORS.white : 'inherit'}
+                      marginRight={SPACING.spacing16}
+                      height="4.25rem"
+                      width="4.75rem"
+                    >
                       <ProtocolDeck
                         protocolAnalysis={storedProtocol.mostRecentAnalysis}
                       />
-                    ) : null}
-                  </Box>
+                    </Box>
+                  ) : (
+                    <Box
+                      height="4.25rem"
+                      width="4.75rem"
+                      marginRight={SPACING.spacing16}
+                      backgroundColor={COLORS.grey30}
+                      borderRadius={SPACING.spacing8}
+                    />
+                  )}
                   <StyledText
                     as="p"
                     fontWeight={TYPOGRAPHY.fontWeightSemiBold}

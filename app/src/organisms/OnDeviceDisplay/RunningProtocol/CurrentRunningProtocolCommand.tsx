@@ -30,7 +30,7 @@ import type {
   RobotType,
   RunTimeCommand,
 } from '@opentrons/shared-data'
-import type { RunStatus } from '@opentrons/api-client'
+import type { RunCommandSummary, RunStatus } from '@opentrons/api-client'
 import type { TrackProtocolRunEvent } from '../../Devices/hooks'
 import type { RobotAnalyticsData } from '../../../redux/analytics/types'
 
@@ -117,6 +117,7 @@ interface CurrentRunningProtocolCommandProps {
   trackProtocolRunEvent: TrackProtocolRunEvent
   robotAnalyticsData: RobotAnalyticsData | null
   lastAnimatedCommand: string | null
+  lastRunCommand: RunCommandSummary | null
   updateLastAnimatedCommand: (newCommandKey: string) => void
   protocolName?: string
   currentRunCommandIndex?: number
@@ -134,13 +135,15 @@ export function CurrentRunningProtocolCommand({
   robotType,
   protocolName,
   currentRunCommandIndex,
+  lastRunCommand,
   lastAnimatedCommand,
   updateLastAnimatedCommand,
 }: CurrentRunningProtocolCommandProps): JSX.Element | null {
   const { t } = useTranslation('run_details')
-  const currentCommand = robotSideAnalysis?.commands.find(
-    (c: RunTimeCommand, index: number) => index === currentRunCommandIndex
-  )
+  const currentCommand =
+    robotSideAnalysis?.commands.find(
+      (c: RunTimeCommand, index: number) => index === currentRunCommandIndex
+    ) ?? lastRunCommand
 
   let shouldAnimate = true
   if (currentCommand?.key != null) {
