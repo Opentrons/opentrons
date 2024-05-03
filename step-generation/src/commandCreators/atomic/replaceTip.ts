@@ -39,6 +39,13 @@ const _pickUpTip: CommandCreator<PickUpTipArgs> = (
     errors.push(
       errorCreators.pipettingIntoColumn4({ typeOfStep: 'pick up tip' })
     )
+  } else if (prevRobotState.labware[tiprackSlot] != null) {
+    const adapterSlot = prevRobotState.labware[tiprackSlot].slot
+    if (COLUMN_4_SLOTS.includes(adapterSlot)) {
+      errors.push(
+        errorCreators.pipettingIntoColumn4({ typeOfStep: 'pick up tip' })
+      )
+    }
   }
 
   if (errors.length > 0) {

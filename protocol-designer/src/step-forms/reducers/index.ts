@@ -1381,11 +1381,13 @@ export const additionalEquipmentInvariantProperties = handleActions<NormalizedAd
         ]),
       ]
 
-      const unoccupiedSlotForMovableTrash = getUnoccupiedSlotForMoveableTrash(
-        file,
-        hasWasteChuteCommands,
-        stagingAreaSlotNames
-      )
+      const unoccupiedSlotForMovableTrash = hasWasteChuteCommands
+        ? ''
+        : getUnoccupiedSlotForMoveableTrash(
+            file,
+            hasWasteChuteCommands,
+            stagingAreaSlotNames
+          )
 
       const stagingAreas = stagingAreaSlotNames.reduce((acc, slot) => {
         const stagingAreaId = `${uuid()}:stagingArea`
@@ -1460,7 +1462,6 @@ export const additionalEquipmentInvariantProperties = handleActions<NormalizedAd
       } else if (mixStepTrashBin != null) {
         trashBinId = mixStepTrashBin.dropTip_location
       }
-
       const trashCutoutId =
         trashAddressableAreaName != null
           ? getCutoutIdByAddressableArea(
@@ -1557,14 +1558,15 @@ export const additionalEquipmentInvariantProperties = handleActions<NormalizedAd
         [hardcodedTrashBinIdFlex]: {
           name: 'trashBin' as const,
           id: hardcodedTrashBinIdFlex,
-          location: getCutoutIdByAddressableArea(
-            hardcodedTrashAddressableAreaName as AddressableAreaName,
-            'trashBinAdapter',
-            FLEX_ROBOT_TYPE
-          ),
+          location: hasWasteChuteCommands
+            ? ''
+            : getCutoutIdByAddressableArea(
+                hardcodedTrashAddressableAreaName as AddressableAreaName,
+                'trashBinAdapter',
+                FLEX_ROBOT_TYPE
+              ),
         },
       }
-
       if (isFlex) {
         if (trashBin != null) {
           return {

@@ -89,10 +89,9 @@ export const migrateFile = (
       const matchingTiprackCommand = tiprackLoadCommands.find(
         command => command.params.labwareId === item.tipRack
       )
-
       if (matchingTiprackCommand == null) {
         console.error(
-          `expected to find a tiprack loadname from tiprack ${item.tiprack} but could not `
+          `expected to find a tiprack loadname from tiprack ${item.tipRack} but could not `
         )
       }
       const matchingTiprackURI =

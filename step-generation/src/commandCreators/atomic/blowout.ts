@@ -15,6 +15,7 @@ export const blowout: CommandCreator<BlowoutParams> = (
   const actionName = 'blowout'
   const errors: CommandCreatorError[] = []
   const pipetteData = prevRobotState.pipettes[pipetteId]
+  const labwareState = prevRobotState.labware
   const slotName = getLabwareSlot(
     labwareId,
     prevRobotState.labware,
@@ -56,6 +57,13 @@ export const blowout: CommandCreator<BlowoutParams> = (
 
   if (COLUMN_4_SLOTS.includes(slotName)) {
     errors.push(errorCreators.pipettingIntoColumn4({ typeOfStep: actionName }))
+  } else if (labwareState[slotName] != null) {
+    const adapterSlot = labwareState[slotName].slot
+    if (COLUMN_4_SLOTS.includes(adapterSlot)) {
+      errors.push(
+        errorCreators.pipettingIntoColumn4({ typeOfStep: actionName })
+      )
+    }
   }
 
   if (errors.length > 0) {

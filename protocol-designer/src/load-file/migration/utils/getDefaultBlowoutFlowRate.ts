@@ -31,6 +31,6 @@ export function getDefaultBlowoutFlowRate(
     matchingTipLiquidSpecs,
     `expected to find the tip liquid specs but could not with pipetteName ${pipetteName}`
   )
-  console.log(pipetteName, volume, tipLength)
+
   return matchingTipLiquidSpecs.defaultBlowOutFlowRate.default
 }

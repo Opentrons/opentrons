@@ -38,6 +38,7 @@ export const dispense: CommandCreator<ExtendedDispenseParams> = (
     yOffset,
   } = args
   const actionName = 'dispense'
+  const labwareState = prevRobotState.labware
   const errors: CommandCreatorError[] = []
   const pipetteSpec = invariantContext.pipetteEntities[pipette]?.spec
   const isFlexPipette =
@@ -93,6 +94,13 @@ export const dispense: CommandCreator<ExtendedDispenseParams> = (
 
   if (COLUMN_4_SLOTS.includes(slotName)) {
     errors.push(errorCreators.pipettingIntoColumn4({ typeOfStep: actionName }))
+  } else if (labwareState[slotName] != null) {
+    const adapterSlot = labwareState[slotName].slot
+    if (COLUMN_4_SLOTS.includes(adapterSlot)) {
+      errors.push(
+        errorCreators.pipettingIntoColumn4({ typeOfStep: actionName })
+      )
+    }
   }
 
   if (
