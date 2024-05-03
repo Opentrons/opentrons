@@ -21,7 +21,7 @@ class PublisherNotifier:
         # Because ChangeNotifier is a generic event interface, all callbacks themselves perform a specific
         # conditional check. A max_queue_size=1 ensures that all callbacks perform their conditional check without
         # being "over"-invoked.
-        self._event_notifier = event_notifier or EventNotifier(max_queue_size=1)
+        self._event_notifier = event_notifier or EventNotifier()
 
     def register_publish_callback(self, callback: Callable[[], Awaitable[None]]):
         """Register a single callback."""
