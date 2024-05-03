@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { css } from 'styled-components'
+import styled, { css } from 'styled-components'
 
 import {
   ALIGN_CENTER,
@@ -276,7 +276,7 @@ function Input(props: InputFieldProps): JSX.Element {
             }
           }}
         >
-          <input
+          <StyledInput
             {...inputProps}
             data-testid={props.id}
             value={value}
@@ -314,3 +314,9 @@ function Input(props: InputFieldProps): JSX.Element {
     </Flex>
   )
 }
+
+const StyledInput = styled.input`
+  &::placeholder {
+    color: ${COLORS.grey40};
+  }
+`
