@@ -1,4 +1,4 @@
-# This workflow runs lint on pull requests that touch anything in the app-testing directory
+# This workflow runs lint on pull requests that touch anything in the opentrons-ai-server directory
 
 name: 'ai-server lint'
 
