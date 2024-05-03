@@ -62,16 +62,17 @@ export const QuickTransferFlow = (): JSX.Element => {
 
   const modalContentInOrder: JSX.Element[] = [
     <CreateNewTransfer
+      key={1}
       onNext={() => setCurrentStep(prevStep => prevStep + 1)}
       exitButtonProps={exitButtonProps}
     />,
-    <SelectPipette {...sharedMiddleStepProps} />,
-    <SelectTipRack {...sharedMiddleStepProps} />,
-    <SelectSourceLabware {...sharedMiddleStepProps} />,
-    <SelectSourceWells {...sharedMiddleStepProps} />,
-    <SelectDestLabware {...sharedMiddleStepProps} />,
-    <SelectDestWells {...sharedMiddleStepProps} />,
-    <VolumeEntry {...sharedMiddleStepProps} onNext={() => {}} />,
+    <SelectPipette key={2} {...sharedMiddleStepProps} />,
+    <SelectTipRack key={3} {...sharedMiddleStepProps} />,
+    <SelectSourceLabware key={4} {...sharedMiddleStepProps} />,
+    <SelectSourceWells key={5} {...sharedMiddleStepProps} />,
+    <SelectDestLabware key={6} {...sharedMiddleStepProps} />,
+    <SelectDestWells key={7} {...sharedMiddleStepProps} />,
+    <VolumeEntry key={8} {...sharedMiddleStepProps} onNext={() => {}} />,
   ]
 
   return (
