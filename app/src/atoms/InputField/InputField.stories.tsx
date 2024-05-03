@@ -1,4 +1,5 @@
-import { VIEWPORT } from '@opentrons/components'
+import * as React from 'react'
+import { Flex, SPACING, VIEWPORT } from '@opentrons/components'
 import { InputField as InputFieldComponent } from './index'
 import type { Meta, StoryObj } from '@storybook/react'
 
@@ -11,27 +12,54 @@ const meta: Meta<typeof InputFieldComponent> = {
 }
 
 export default meta
-
 type Story = StoryObj<typeof InputFieldComponent>
 
-export const InputField: Story = {
-  args: {
-    value: 200,
-    units: 'rpm',
-    type: 'number',
-    caption: 'example caption',
-    max: 200,
-    min: 200,
-  },
+export const InputField: Story = args => {
+  const [value, setValue] = React.useState(args.value)
+  return (
+    <Flex padding={SPACING.spacing16} width="100%">
+      <InputFieldComponent
+        {...args}
+        value={value}
+        onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+          setValue(e.target.value)
+        }}
+        units={args.type !== 'number' ? undefined : args.units}
+      />
+    </Flex>
+  )
 }
 
-export const InputFieldWithError: Story = {
-  args: {
-    units: 'C',
-    type: 'number',
-    caption: 'example caption',
-    max: 10,
-    min: 10,
-    error: 'input does not equal 10',
-  },
+InputField.args = {
+  value: 200,
+  units: 'rpm',
+  type: 'number',
+  caption: 'example caption',
+  max: 200,
+  min: 10,
+}
+
+export const InputFieldWithError: Story = args => {
+  const [value, setValue] = React.useState(args.value)
+  return (
+    <Flex padding={SPACING.spacing16} width="100%">
+      <InputFieldComponent
+        {...args}
+        value={value}
+        onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+          setValue(e.target.value)
+        }}
+        units={args.type !== 'number' ? undefined : args.units}
+      />
+    </Flex>
+  )
+}
+
+InputFieldWithError.args = {
+  units: 'C',
+  type: 'number',
+  caption: 'example caption',
+  max: 10,
+  min: 10,
+  error: 'input does not equal 10',
 }
