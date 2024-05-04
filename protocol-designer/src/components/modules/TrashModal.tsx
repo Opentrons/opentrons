@@ -87,11 +87,14 @@ const TrashModalComponent = (props: TrashModalComponentProps): JSX.Element => {
     name: 'selectedSlot',
     defaultValue: defaultValue,
   })
-  const isSlotEmpty = getSlotIsEmpty(
-    initialDeckSetup,
-    selectedSlot,
-    trashName === 'trashBin'
-  )
+  const hasTrashAlreadyInSlot = Object.values(
+    initialDeckSetup.additionalEquipmentOnDeck
+  ).find(aE => aE.name === 'trashBin' && aE.location === selectedSlot)
+
+  const isSlotEmpty =
+    getSlotIsEmpty(initialDeckSetup, selectedSlot, trashName === 'trashBin') ||
+    hasTrashAlreadyInSlot
+
   const slotFromCutout = selectedSlot.replace('cutout', '')
   const flexDeck = getDeckDefFromRobotType(FLEX_ROBOT_TYPE)
 

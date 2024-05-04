@@ -131,7 +131,9 @@ export const LoadCommandText = ({
           return null
         }
       } else {
-        const labware = command.result?.definition.metadata.displayName
+        const labware =
+          command.result?.definition.metadata.displayName ??
+          command.params.displayName
         return command.params.location === 'offDeck'
           ? t('load_labware_info_protocol_setup_off_deck', { labware })
           : t('load_labware_info_protocol_setup_no_module', {

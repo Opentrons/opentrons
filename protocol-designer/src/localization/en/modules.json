@@ -1,4 +1,6 @@
 {
+  "adapter_compatible_labware": "Adapter Compatible Labware",
+  "custom_labware": "Custom Labware",
   "additional_equipment_display_names": {
     "gripper": "Flex Gripper",
     "stagingAreas": "Staging Area Slots",

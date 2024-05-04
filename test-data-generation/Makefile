@@ -29,4 +29,9 @@ wheel:
 
 .PHONY: test
 test:
-	$(pytest) tests -vvv
+	$(pytest) tests \
+	-s \
+	--hypothesis-show-statistics \
+	--hypothesis-verbosity=normal \
+	--hypothesis-explain \
+	-vvv

@@ -2,6 +2,7 @@ import * as React from 'react'
 import { css } from 'styled-components'
 import { useTranslation } from 'react-i18next'
 import {
+  ALIGN_FLEX_START,
   BORDERS,
   Box,
   Btn,
@@ -16,8 +17,8 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 import {
-  FLEX_MODULE_ADDRESSABLE_AREAS,
   FLEX_ROBOT_TYPE,
+  FLEX_USB_MODULE_ADDRESSABLE_AREAS,
   SINGLE_SLOT_FIXTURES,
   getCutoutDisplayName,
   getDeckDefFromRobotType,
@@ -49,9 +50,12 @@ export const SetupFixtureList = (props: SetupFixtureListProps): JSX.Element => {
   return (
     <>
       {deckConfigCompatibility.map(cutoutConfigAndCompatibility => {
-        return cutoutConfigAndCompatibility.requiredAddressableAreas.some(raa =>
-          FLEX_MODULE_ADDRESSABLE_AREAS.includes(raa)
-        ) ? null : ( // don't list modules here, they're covered by SetupModuleList
+        // filter out all fixtures that only provide usb module addressable areas
+        // (i.e. everything but MagBlockV1 and StagingAreaWithMagBlockV1)
+        // as they're handled in the Modules Table
+        return cutoutConfigAndCompatibility.requiredAddressableAreas.every(
+          raa => FLEX_USB_MODULE_ADDRESSABLE_AREAS.includes(raa)
+        ) ? null : (
           <FixtureListItem
             key={cutoutConfigAndCompatibility.cutoutId}
             deckDef={deckDef}
@@ -174,7 +178,10 @@ export function FixtureListItem({
                 }
               />
             ) : null}
-            <Flex flexDirection={DIRECTION_COLUMN}>
+            <Flex
+              flexDirection={DIRECTION_COLUMN}
+              alignItems={ALIGN_FLEX_START}
+            >
               <StyledText
                 css={TYPOGRAPHY.pSemiBold}
                 marginLeft={SPACING.spacing20}

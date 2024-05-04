@@ -231,6 +231,7 @@ describe('generateSubstepItem', () => {
                 preIngreds: {},
                 well: 'C1',
               },
+              isAirGap: false,
             },
           ],
         },
@@ -269,6 +270,7 @@ describe('generateSubstepItem', () => {
                 preIngreds: {},
                 well: 'A1',
               },
+              isAirGap: false,
               source: {
                 postIngreds: {},
                 preIngreds: {},
@@ -323,6 +325,7 @@ describe('generateSubstepItem', () => {
                 labwareId: tiprackId,
                 wellName: 'A1',
               },
+              isAirGap: false,
               source: { well: 'A1', preIngreds: {}, postIngreds: {} },
               dest: {
                 well: 'A1',
@@ -343,6 +346,7 @@ describe('generateSubstepItem', () => {
                 labwareId: tiprackId,
                 wellName: 'A1',
               },
+              isAirGap: false,
               dest: {
                 postIngreds: {
                   __air__: {
@@ -434,6 +438,7 @@ describe('generateSubstepItem', () => {
             preIngreds: {},
             well: 'A1',
           },
+          isAirGap: false,
           source: {
             postIngreds: {},
             preIngreds: {},
@@ -460,6 +465,7 @@ describe('generateSubstepItem', () => {
             },
             well: 'A1',
           },
+          isAirGap: false,
           source: {
             postIngreds: {
               __air__: {
@@ -490,6 +496,7 @@ describe('generateSubstepItem', () => {
             preIngreds: {},
             well: 'A2',
           },
+          isAirGap: false,
           source: {
             postIngreds: {},
             preIngreds: {},
@@ -516,6 +523,7 @@ describe('generateSubstepItem', () => {
             },
             well: 'A2',
           },
+          isAirGap: false,
           source: {
             postIngreds: {
               __air__: {

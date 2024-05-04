@@ -2,65 +2,115 @@ import React from 'react'
 import { useTranslation } from 'react-i18next'
 import styled, { css } from 'styled-components'
 import { useForm } from 'react-hook-form'
+import { useAtom } from 'jotai'
+import axios from 'axios'
 
 import {
   ALIGN_CENTER,
   BORDERS,
-  Btn,
   COLORS,
   DIRECTION_ROW,
-  DISPLAY_FLEX,
   Flex,
-  Icon,
   JUSTIFY_CENTER,
   SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
-import { promptContext } from '../../organisms/PromptButton/PromptProvider'
-import type { SubmitHandler } from 'react-hook-form'
+import { SendButton } from '../../atoms/SendButton'
+import { preparedPromptAtom, chatDataAtom } from '../../resources/atoms'
 
-// ToDo (kk:04/19/2024) Note this interface will be used by prompt buttons in SidePanel
-// interface InputPromptProps {}
+import type { ChatData } from '../../resources/types'
+
+// ToDo (kk:05/02/2024) This url is temporary
+const url = 'http://localhost:8000/streaming/ask'
 
 interface InputType {
   userPrompt: string
 }
 
-export function InputPrompt(/* props: InputPromptProps */): JSX.Element {
+export function InputPrompt(): JSX.Element {
   const { t } = useTranslation('protocol_generator')
-  const { register, handleSubmit, watch, setValue } = useForm<InputType>({
+  const { register, watch, setValue, reset } = useForm<InputType>({
     defaultValues: {
       userPrompt: '',
     },
   })
-  const usePromptValue = (): string => React.useContext(promptContext)
-  const promptFromButton = usePromptValue()
-  const userPrompt = watch('userPrompt') ?? ''
+  const [preparedPrompt] = useAtom(preparedPromptAtom)
+  const [, setChatData] = useAtom(chatDataAtom)
+  const [submitted, setSubmitted] = React.useState<boolean>(false)
 
-  const onSubmit: SubmitHandler<InputType> = async data => {
-    // ToDo (kk: 04/19/2024) call api
-    const { userPrompt } = data
-    console.log('user prompt', userPrompt)
-  }
+  const [data, setData] = React.useState<any>(null)
+  const [loading, setLoading] = React.useState<boolean>(false)
+  const [error, setError] = React.useState<string>('')
+
+  const userPrompt = watch('userPrompt') ?? ''
 
   const calcTextAreaHeight = (): number => {
     const rowsNum = userPrompt.split('\n').length
     return rowsNum
   }
 
+  const fetchData = async (prompt: string): Promise<void> => {
+    if (prompt !== '') {
+      setLoading(true)
+      try {
+        const response = await axios.post(url, {
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          query: prompt,
+        })
+        setData(response.data)
+      } catch (err) {
+        setError('Error fetching data from the API.')
+      } finally {
+        setLoading(false)
+      }
+    }
+  }
+
+  const handleClick = (): void => {
+    const userInput: ChatData = {
+      role: 'user',
+      content: userPrompt,
+    }
+    setChatData(chatData => [...chatData, userInput])
+    void fetchData(userPrompt)
+    setSubmitted(true)
+    reset()
+  }
+
   React.useEffect(() => {
-    if (promptFromButton !== '') setValue('userPrompt', promptFromButton)
-  }, [promptFromButton, setValue])
+    if (preparedPrompt !== '') setValue('userPrompt', preparedPrompt as string)
+  }, [preparedPrompt, setValue])
+
+  React.useEffect(() => {
+    if (submitted && data && !loading) {
+      const { role, content } = data.data
+      const assistantResponse: ChatData = {
+        role,
+        content,
+      }
+      setChatData(chatData => [...chatData, assistantResponse])
+      setSubmitted(false)
+    }
+  }, [data, loading, submitted])
+
+  // ToDo (kk:05/02/2024) This is also temp. Asking the design about error.
+  console.error('error', error)
 
   return (
-    <StyledForm id="User_Prompt" onSubmit={() => handleSubmit(onSubmit)}>
+    <StyledForm id="User_Prompt">
       <Flex css={CONTAINER_STYLE}>
         <StyledTextarea
           rows={calcTextAreaHeight()}
           placeholder={t('type_your_prompt')}
           {...register('userPrompt')}
         />
-        <PlayButton disabled={userPrompt.length === 0} />
+        <SendButton
+          disabled={userPrompt.length === 0}
+          isLoading={loading}
+          handleClick={handleClick}
+        />
       </Flex>
     </StyledForm>
   )
@@ -106,65 +156,3 @@ const StyledTextarea = styled.textarea`
     transform: translateY(-50%);
   }
 `
-
-interface PlayButtonProps {
-  onPlay?: () => void
-  disabled?: boolean
-  isLoading?: boolean
-}
-
-function PlayButton({
-  onPlay,
-  disabled = false,
-  isLoading = false,
-}: PlayButtonProps): JSX.Element {
-  const playButtonStyle = css`
-    -webkit-tap-highlight-color: transparent;
-    &:focus {
-      background-color: ${COLORS.blue60};
-      color: ${COLORS.white};
-    }
-
-    &:hover {
-      background-color: ${COLORS.blue50};
-      color: ${COLORS.white};
-    }
-
-    &:focus-visible {
-      background-color: ${COLORS.blue50};
-    }
-
-    &:active {
-      background-color: ${COLORS.blue60};
-      color: ${COLORS.white};
-    }
-
-    &:disabled {
-      background-color: ${COLORS.grey35};
-      color: ${COLORS.grey50};
-    }
-  `
-  return (
-    <Btn
-      alignItems={ALIGN_CENTER}
-      backgroundColor={disabled ? COLORS.grey35 : COLORS.blue50}
-      borderRadius={BORDERS.borderRadiusFull}
-      display={DISPLAY_FLEX}
-      justifyContent={JUSTIFY_CENTER}
-      width="4.25rem"
-      height="3.75rem"
-      disabled={disabled || isLoading}
-      onClick={onPlay}
-      aria-label="play"
-      css={playButtonStyle}
-      type="submit"
-    >
-      <Icon
-        color={disabled ? COLORS.grey50 : COLORS.white}
-        name={isLoading ? 'ot-spinner' : 'send'}
-        spin={isLoading}
-        size="2rem"
-      />
-    </Btn>
-  )
-}

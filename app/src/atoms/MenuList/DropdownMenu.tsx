@@ -28,14 +28,24 @@ export interface DropdownOption {
 export type DropdownBorder = 'rounded' | 'neutral'
 
 export interface DropdownMenuProps {
+  /** dropdown options */
   filterOptions: DropdownOption[]
+  /** click handler */
   onClick: (value: string) => void
+  /** current selected option */
   currentOption: DropdownOption
+  /** dropdown */
   width?: string
+  /** dropdown style type  */
   dropdownType?: DropdownBorder
+  /** dropdown title */
   title?: string
+  /** dropdown item caption */
   caption?: string | null
+  /** text for tooltip */
   tooltipText?: string
+  /** html tabindex property */
+  tabIndex?: number
 }
 
 // TODO: (smb: 4/15/22) refactor this to use html select for accessibility
@@ -50,6 +60,7 @@ export function DropdownMenu(props: DropdownMenuProps): JSX.Element {
     title,
     caption,
     tooltipText,
+    tabIndex = 0,
   } = props
   const [targetProps, tooltipProps] = useHoverTooltip()
   const [showDropdownMenu, setShowDropdownMenu] = React.useState<boolean>(false)
@@ -130,6 +141,7 @@ export function DropdownMenu(props: DropdownMenuProps): JSX.Element {
             toggleSetShowDropdownMenu()
           }}
           css={DROPDOWN_STYLE}
+          tabIndex={tabIndex}
         >
           <StyledText
             css={css`

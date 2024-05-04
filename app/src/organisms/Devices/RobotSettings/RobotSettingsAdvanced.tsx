@@ -30,7 +30,6 @@ import {
   UpdateRobotSoftware,
   UsageSettings,
   UseOlderAspirateBehavior,
-  UseOlderProtocol,
 } from './AdvancedTab'
 import {
   updateSetting,
@@ -232,12 +231,6 @@ export function RobotSettingsAdvanced({
         />
         {isFlex ? null : (
           <>
-            <Divider marginY={SPACING.spacing16} />
-            <UseOlderProtocol
-              settings={findSettings('disableFastProtocolUpload')}
-              robotName={robotName}
-              isRobotBusy={isRobotBusy || isEstopNotDisengaged}
-            />
             <Divider marginY={SPACING.spacing16} />
             <LegacySettings
               settings={findSettings('deckCalibrationDots')}
