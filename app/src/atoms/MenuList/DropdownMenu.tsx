@@ -64,6 +64,46 @@ export function DropdownMenu(props: DropdownMenuProps): JSX.Element {
   } = props
   const [targetProps, tooltipProps] = useHoverTooltip()
   const [showDropdownMenu, setShowDropdownMenu] = React.useState<boolean>(false)
+
+  const [dropdownPosition, setDropdownPosition] = React.useState<
+    'top' | 'bottom'
+  >('bottom')
+
+  React.useEffect(() => {
+    const handlePositionCalculation = () => {
+      const dropdownRect = dropDownMenuWrapperRef.current?.getBoundingClientRect()
+      if (dropdownRect) {
+        const parentElement = dropDownMenuWrapperRef.current.parentElement
+        const grandParentElement = parentElement?.parentElement
+        let availableHeight = window.innerHeight
+        let scrollOffset = 0
+
+        if (grandParentElement) {
+          const grandParentRect = grandParentElement.getBoundingClientRect()
+          availableHeight = grandParentRect.bottom - grandParentRect.top
+          scrollOffset = grandParentRect.top
+        } else if (parentElement) {
+          const parentRect = parentElement.getBoundingClientRect()
+          availableHeight = parentRect.bottom - parentRect.top
+          scrollOffset = parentRect.top
+        }
+
+        const dropdownBottom =
+          dropdownRect.bottom + (filterOptions.length + 1) * 34 - scrollOffset
+        setDropdownPosition(dropdownBottom > availableHeight ? 'top' : 'bottom')
+      }
+    }
+
+    window.addEventListener('resize', handlePositionCalculation)
+    window.addEventListener('scroll', handlePositionCalculation)
+    handlePositionCalculation()
+
+    return () => {
+      window.removeEventListener('resize', handlePositionCalculation)
+      window.removeEventListener('scroll', handlePositionCalculation)
+    }
+  }, [filterOptions.length])
+
   const toggleSetShowDropdownMenu = (): void => {
     setShowDropdownMenu(!showDropdownMenu)
   }
@@ -170,7 +210,8 @@ export function DropdownMenu(props: DropdownMenuProps): JSX.Element {
             backgroundColor={COLORS.white}
             flexDirection={DIRECTION_COLUMN}
             width={width}
-            top="2.5rem"
+            top={dropdownPosition === 'bottom' ? '2.5rem' : undefined}
+            bottom={dropdownPosition === 'top' ? '2.5rem' : undefined}
           >
             {filterOptions.map((option, index) => (
               <MenuItem
