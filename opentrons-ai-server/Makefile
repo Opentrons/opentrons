@@ -51,7 +51,7 @@ format:
 fixup: format lint
 
 .PHONY: pre-commit
-pre-commit: fixup unit-test install-deps
+pre-commit: fixup unit-test gen-requirements
 	@echo "pre-commit checks passed"
 
 .PHONY: gen-env
