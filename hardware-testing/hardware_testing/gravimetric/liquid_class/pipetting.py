@@ -124,6 +124,19 @@ def _submerge(
     )
 
 
+def _set_96ch_plunger_discontinuity(
+    ctx: ProtocolContext, disc: Optional[float] = None
+) -> None:
+    if not disc:
+        disc = DEFAULT_MAX_SPEED_DISCONTINUITY.high_throughput[OT3AxisKind.P]
+    hw_api = ctx._core.get_hardware()
+    hw_api.config.motion_settings.max_speed_discontinuity.high_throughput[
+        OT3AxisKind.P
+    ] = disc
+    # NOTE: re-setting the gantry-load will reset the move-manager's per-axis constraints
+    hw_api.set_gantry_load(hw_api.gantry_load)
+
+
 def _retract(
     ctx: ProtocolContext,
     pipette: InstrumentContext,
@@ -133,31 +146,33 @@ def _retract(
     speed: float,
     z_discontinuity: float,
 ) -> None:
-    # change discontinuity per the liquid-class settings
-    hw_api = ctx._core.get_hardware()
-    if pipette.channels == 96:
-        hw_api.config.motion_settings.max_speed_discontinuity.high_throughput[
-            OT3AxisKind.Z
-        ] = z_discontinuity
-    else:
-        hw_api.config.motion_settings.max_speed_discontinuity.low_throughput[
-            OT3AxisKind.Z
-        ] = z_discontinuity
-    # NOTE: re-setting the gantry-load will reset the move-manager's per-axis constraints
-    hw_api.set_gantry_load(hw_api.gantry_load)
+    # # change discontinuity per the liquid-class settings
+    # hw_api = ctx._core.get_hardware()
+    # if pipette.channels == 96:
+    #     hw_api.config.motion_settings.max_speed_discontinuity.high_throughput[
+    #         OT3AxisKind.Z
+    #     ] = z_discontinuity
+    # else:
+    #     hw_api.config.motion_settings.max_speed_discontinuity.low_throughput[
+    #         OT3AxisKind.Z
+    #     ] = z_discontinuity
+    # # NOTE: re-setting the gantry-load will reset the move-manager's per-axis constraints
+    # hw_api.set_gantry_load(hw_api.gantry_load)
+
     # retract out of the liquid (not out of the well)
     pipette.move_to(well.bottom(mm_above_well_bottom).move(channel_offset), speed=speed)
-    # reset discontinuity back to default
-    if pipette.channels == 96:
-        hw_api.config.motion_settings.max_speed_discontinuity.high_throughput[
-            OT3AxisKind.Z
-        ] = DEFAULT_MAX_SPEED_DISCONTINUITY.high_throughput[OT3AxisKind.Z]
-    else:
-        hw_api.config.motion_settings.max_speed_discontinuity.low_throughput[
-            OT3AxisKind.Z
-        ] = DEFAULT_MAX_SPEED_DISCONTINUITY.low_throughput[OT3AxisKind.Z]
-    # NOTE: re-setting the gantry-load will reset the move-manager's per-axis constraints
-    hw_api.set_gantry_load(hw_api.gantry_load)
+
+    # # reset discontinuity back to default
+    # if pipette.channels == 96:
+    #     hw_api.config.motion_settings.max_speed_discontinuity.high_throughput[
+    #         OT3AxisKind.Z
+    #     ] = DEFAULT_MAX_SPEED_DISCONTINUITY.high_throughput[OT3AxisKind.Z]
+    # else:
+    #     hw_api.config.motion_settings.max_speed_discontinuity.low_throughput[
+    #         OT3AxisKind.Z
+    #     ] = DEFAULT_MAX_SPEED_DISCONTINUITY.low_throughput[OT3AxisKind.Z]
+    # # NOTE: re-setting the gantry-load will reset the move-manager's per-axis constraints
+    # hw_api.set_gantry_load(hw_api.gantry_load)
 
 
 def _pipette_with_liquid_settings(  # noqa: C901
@@ -272,8 +287,13 @@ def _pipette_with_liquid_settings(  # noqa: C901
             clear_pipette_ul_per_mm(hw_api, hw_mount)  # type: ignore[arg-type]
         if pipette.channels == 96:
             _set_96ch_plunger_max_speeds()
+            _set_96ch_plunger_discontinuity(
+                ctx, config.DISCONTINUITY_DURING_BACKLASH_96CH
+            )
         hw_api.prepare_for_aspirate(hw_mount)
-        _reset_flow_rates()
+        if pipette.channels == 96:
+            _set_96ch_plunger_discontinuity(ctx, None)  # back to default
+            _reset_flow_rates()
         if pipette.channels == 96 and (clear_accuracy_function or aspirate <= 5.0):
             ctx.delay(seconds=config.DELAY_AFTER_BACKLASH_96CH_LOW_VOLUMES)
         if liquid_class.aspirate.leading_air_gap > 0:
