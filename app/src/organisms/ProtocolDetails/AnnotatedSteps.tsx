@@ -1,10 +1,9 @@
 import * as React from 'react'
 import { css } from 'styled-components'
-import { ALIGN_CENTER, ALIGN_FLEX_START, BORDERS, COLORS, DIRECTION_COLUMN, Flex, Icon, SPACING, TYPOGRAPHY } from '@opentrons/components'
+import { ALIGN_CENTER, ALIGN_FLEX_START, BORDERS, COLORS, DIRECTION_COLUMN, Flex, Icon, SPACING, StyledText, TYPOGRAPHY } from '@opentrons/components'
 import { CompletedProtocolAnalysis, ProtocolAnalysisOutput, RunTimeCommand } from '@opentrons/shared-data'
 import { CommandText } from '../CommandText'
 import { CommandIcon } from '../RunPreview/CommandIcon'
-import { StyledText } from '../../atoms/text'
 
 interface AnnotatedStepsProps {
   analysis: CompletedProtocolAnalysis | ProtocolAnalysisOutput

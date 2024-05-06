@@ -7,7 +7,7 @@ import { app, shell } from 'electron'
 import type { StoredProtocolDir } from '@opentrons/app/src/redux/protocol-storage'
 import type { Dirent } from 'fs'
 import { analyzeProtocolSource } from '../protocol-analysis'
-import { createProtocolEditorUi } from '../ui'
+import { createProtocolEditorUi } from '../protocol-editor-ui'
 
 /**
  * Module for managing local protocol files on the host filesystem
@@ -105,6 +105,10 @@ export function parseProtocolDirs(
   return Promise.all(tasks)
 }
 
+export function getProtocolSourceJSON(protocolSrcFilePath: string): Promise<any> {
+  return fs.readJSON(protocolSrcFilePath)
+}
+
 export function addProtocolFile(
   mainFileSourcePath: string,
   protocolsDirPath: string
@@ -175,9 +179,10 @@ export function viewProtocolSourceFolder(
 export function editProtocol(
   protocolKey: string,
   protocolsDirPath: string
-): void {
+): Promise<string[]> {
   const protocolDirPath = path.join(protocolsDirPath, protocolKey)
   const srcDirPath = path.join(protocolDirPath, PROTOCOL_SRC_DIRECTORY_NAME)
-  createProtocolEditorUi()
+  const srcFilePathsPromise = readFilesWithinDirectory(srcDirPath)
+  return srcFilePathsPromise
 }
 

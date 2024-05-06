@@ -12,6 +12,7 @@ import {
   POLL,
   PROTOCOL_ADDITION,
   REMOVE_PROTOCOL,
+  SET_EDITING_PROTOCOL_SOURCE,
   UI_INITIALIZED,
   VIEW_PROTOCOL_SOURCE_FOLDER,
 } from '../constants'
@@ -19,6 +20,7 @@ import {
   analyzeProtocol,
   analyzeProtocolFailure,
   analyzeProtocolSuccess,
+  setEditingProtocolSource,
   updateProtocolList,
   updateProtocolListFailure,
 } from '../config/actions'
@@ -27,6 +29,7 @@ import { createFailedAnalysis } from '../protocol-analysis/writeFailedAnalysis'
 import type { ProtocolAnalysisOutput } from '@opentrons/shared-data'
 import type { ProtocolListActionSource as ListSource } from '@opentrons/app/src/redux/protocol-storage/types'
 import type { Action, Dispatch } from '../types'
+import { createProtocolEditorUi } from '../protocol-editor-ui'
 
 const ensureDir: (dir: string) => Promise<void> = fse.ensureDir
 
@@ -219,7 +222,9 @@ export function registerProtocolStorage(dispatch: Dispatch): Dispatch {
         FileSystem.editProtocol(
           action.payload.protocolKey,
           FileSystem.PROTOCOLS_DIRECTORY_PATH
-        )
+        ).then((srcFiles) => {
+          createProtocolEditorUi(srcFiles[0])
+        }).catch(e => { console.error(e) })
         break
       }
 

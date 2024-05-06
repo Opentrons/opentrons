@@ -5,15 +5,18 @@ import {
   getPipetteNameSpecs,
   FIXED_TRASH_ID,
   LabwareDefinition2,
+  getAllDefinitions,
 } from '@opentrons/shared-data'
-import fixedTrash from '@opentrons/shared-data/labware/definitions/2/opentrons_1_trash_3200ml_fixed/1.json'
 import { PickUpTipRunTimeCommand } from '@opentrons/shared-data/protocol/types/schemaV6/command/pipetting'
 import { LoadLabwareRunTimeCommand } from '@opentrons/shared-data/protocol/types/schemaV6/command/setup'
 import { InvariantContext } from '../types'
 
+const FIXED_TRASH_LOADNAME = 'opentrons_1_trash_3200ml_fixed'
+
 export function constructInvariantContextFromRunCommands(
   commands: RunTimeCommand[]
 ): InvariantContext {
+  const fixedTrashDef = getLatestLabwareDef(FIXED_TRASH_LOADNAME)
   return commands.reduce(
     (acc, command) => {
       if (command.commandType === 'loadLabware') {
@@ -88,14 +91,26 @@ export function constructInvariantContextFromRunCommands(
       labwareEntities: {
         [FIXED_TRASH_ID]: {
           id: FIXED_TRASH_ID,
-          labwareDefURI: getLabwareDefURI(fixedTrash as LabwareDefinition2),
-          def: fixedTrash as LabwareDefinition2,
+          labwareDefURI: getLabwareDefURI(fixedTrashDef) ?? '',
+          def: fixedTrashDef,
         },
       },
       moduleEntities: {},
       pipetteEntities: {},
       liquidEntities: {},
+      additionalEquipmentEntities: {},
       config: { OT_PD_DISABLE_MODULE_RESTRICTIONS: true },
     }
   )
 }
+
+// taken from app/src/assets/labware/getLabware
+export function getLatestLabwareDef(
+  loadName: string | null | undefined
+): LabwareDefinition2 | null {
+  const def = Object.values(getAllDefinitions()).find(
+    d => d.parameters.loadName === loadName
+  )
+  return def || null
+}
+

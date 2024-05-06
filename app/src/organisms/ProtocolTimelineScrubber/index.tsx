@@ -4,9 +4,6 @@ import reduce from 'lodash/reduce'
 import isEmpty from 'lodash/isEmpty'
 
 import {
-  RobotWorkSpace,
-  Module,
-  LabwareRender,
   Flex,
   Box,
   Text,
@@ -19,13 +16,14 @@ import {
   JUSTIFY_SPACE_BETWEEN,
   ALIGN_STRETCH,
   TYPOGRAPHY,
-  BORDERS,
+  StyledText,
+  BaseDeck,
+  getLabwareInfoByLiquidId 
 } from '@opentrons/components'
 import { getResultingTimelineFrameFromRunCommands } from '@opentrons/step-generation'
 import {
-  inferModuleOrientationFromXCoordinate,
-  getModuleDef2,
-  getDeckDefFromRobotType,
+  FLEX_ROBOT_TYPE,
+  getSimplestDeckConfigForProtocol,
 } from '@opentrons/shared-data'
 
 import type { CompletedProtocolAnalysis, ProtocolAnalysisOutput, RobotType, RunTimeCommand } from '@opentrons/shared-data'
@@ -35,18 +33,19 @@ import type {
   PipetteEntity,
   TimelineFrame,
 } from '@opentrons/step-generation'
-import { StyledText } from '../../atoms/text'
 import ViewportList, { ViewportListRef } from 'react-viewport-list'
 import { CommandText } from '../CommandText'
 import { AnnotatedSteps } from '../ProtocolDetails/AnnotatedSteps'
-import { spacing } from 'react-select/dist/declarations/src/theme'
 
-const COMMAND_WIDTH_PX = 160
+import type {LabwareOnDeck } from '@opentrons/components'
+import { getWellFillFromLabwareId } from '../Devices/ProtocolRun/SetupLiquids/utils'
+
+const COMMAND_WIDTH_PX = 240
 
 interface ProtocolTimelineScrubberProps {
   commands: RunTimeCommand[]
   analysis: CompletedProtocolAnalysis | ProtocolAnalysisOutput
-  robotType: RobotType
+  robotType?: RobotType
 }
 
 export const DECK_LAYER_BLOCKLIST = [
@@ -66,17 +65,15 @@ export const VIEWBOX_HEIGHT = 460
 export function ProtocolTimelineScrubber(
   props: ProtocolTimelineScrubberProps
 ): JSX.Element {
-  const deckDef = React.useMemo(() => getDeckDefFromRobotType(props.robotType), [])
-  const { commands, analysis } = props
+  const { commands, analysis, robotType = FLEX_ROBOT_TYPE } = props
   const wrapperRef = React.useRef<HTMLDivElement>(null)
   const commandListRef = React.useRef<ViewportListRef>(null)
   const [currentCommandIndex, setCurrentCommandIndex] = React.useState<number>(
     0
   )
 
-  const { frame, invariantContext } = getResultingTimelineFrameFromRunCommands(
-    commands.slice(0, currentCommandIndex + 1)
-  )
+  const currentCommandsSlice = commands.slice(0, currentCommandIndex + 1)
+  const { frame, invariantContext } = getResultingTimelineFrameFromRunCommands( currentCommandsSlice)
   const { robotState, command } = frame
 
   const [leftPipetteId] = Object.entries(robotState.pipettes).find(
@@ -99,107 +96,52 @@ export function ProtocolTimelineScrubber(
     <Flex width="100%" height="95vh" flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing8}>
       <Flex gridGap={SPACING.spacing8} flex="1 1 0">
         <Flex flex="1 1 0">
-          <RobotWorkSpace
-            deckLayerBlocklist={DECK_LAYER_BLOCKLIST}
-            deckDef={deckDef}
-            viewBox={`${VIEWBOX_MIN_X} ${VIEWBOX_MIN_Y} ${VIEWBOX_WIDTH} ${VIEWBOX_HEIGHT}`}
-          >
-            {({ deckSlotsById }) => (
-              <>
-                {map(robotState.modules, (module, moduleId) => {
-                  const slot = deckSlotsById[module.slot]
-                  const labwareInModuleId =
-                    Object.entries(robotState.labware).find(
-                      ([labwareId, labware]) => labware.slot === moduleId
-                    )?.[0] ?? null
-                  const wellFill = reduce(
-                    robotState.liquidState.labware[labwareInModuleId] ?? {},
-                    (acc, liquidLocation, wellName) => {
-                      if (!isEmpty(liquidLocation)) {
-                        return {
-                          ...acc,
-                          [wellName]:
-                            command.params.displayColor ?? 'rebeccapurple',
-                        }
-                      }
+          <BaseDeck
+            robotType={robotType}
+            deckConfig={getSimplestDeckConfigForProtocol(analysis)}
+            modulesOnDeck={map(robotState.modules, (module, moduleId) => {
+              const labwareInModuleId =
+                Object.entries(robotState.labware).find(
+                  ([labwareId, labware]) => labware.slot === moduleId
+                )?.[0] ?? null
+              
+              return {
+                moduleModel: invariantContext.moduleEntities[moduleId].model,
+                moduleLocation: { slotName: module.slot },
+                nestedLabwareDef: invariantContext.labwareEntities[labwareInModuleId]?.def,
+                nestedLabwareWellFill: labwareInModuleId != null ? getWellFillFromLabwareId(labwareInModuleId, analysis.liquids, getLabwareInfoByLiquidId(currentCommandsSlice)): undefined,
+                innerProps: {} // TODO: wire up module state
+              }
+            })}
+            labwareOnDeck={
+              map(robotState.labware, (labware, labwareId) => {
+                if (
+                  labware.slot in robotState.modules ||
+                  labwareId === 'fixedTrash'
+                )
+                  return null
+                const definition =
+                  invariantContext.labwareEntities[labwareId].def
+
+                const missingTips = definition.parameters.isTiprack
+                  ? reduce(
+                    robotState.tipState.tipracks[labwareId],
+                    (acc, hasTip, wellName) => {
+                      if (!hasTip) return { ...acc, [wellName]: null }
                       return acc
                     },
                     {}
                   )
-                  return (
-                    <Module
-                      x={slot?.position[0] ?? 0}
-                      y={slot?.position[1] ?? 0}
-                      orientation={inferModuleOrientationFromXCoordinate(
-                        slot?.position[0] ?? 0
-                      )}
-                      def={getModuleDef2(
-                        invariantContext.moduleEntities[moduleId].model
-                      )}
-                      innerProps={{}} // TODO: wire up module state
-                    >
-                      {labwareInModuleId != null ? (
-                        <LabwareRender
-                          definition={
-                            invariantContext.labwareEntities[labwareInModuleId]
-                              .def
-                          }
-                          wellFill={wellFill}
-                        />
-                      ) : null}
-                    </Module>
-                  )
-                })}
-                {map(robotState.labware, (labware, labwareId) => {
-                  if (
-                    labware.slot in robotState.modules ||
-                    labwareId === 'fixedTrash'
-                  )
-                    return null
-                  const slot = deckSlotsById[labware.slot]
-                  const definition =
-                    invariantContext.labwareEntities[labwareId].def
-
-                  const missingTips = definition.parameters.isTiprack
-                    ? reduce(
-                      robotState.tipState.tipracks[labwareId],
-                      (acc, hasTip, wellName) => {
-                        if (!hasTip) return { ...acc, [wellName]: null }
-                        return acc
-                      },
-                      {}
-                    )
-                    : {}
-
-                  const wellFill = reduce(
-                    robotState.liquidState.labware[labwareId],
-                    (acc, liquidLocation, wellName) => {
-                      if (!isEmpty(liquidLocation)) {
-                        return {
-                          ...acc,
-                          [wellName]:
-                            command.params.displayColor ?? 'rebeccapurple',
-                        }
-                      }
-                      return acc
-                    },
-                    {}
-                  )
-                  return (
-                    <g
-                      transform={`translate(${slot?.position[0] ?? 0},${slot?.position[1] ?? 0})`}
-                    >
-                      <LabwareRender
-                        definition={definition}
-                        wellFill={wellFill}
-                        missingTips={missingTips}
-                      />
-                    </g>
-                  )
-                })}
-              </>
-            )}
-          </RobotWorkSpace>
+                  : {}
+                
+                return {
+                  labwareLocation: { slotName: labware.slot } ,
+                  definition,
+                  wellFill: getWellFillFromLabwareId(labwareId, analysis.liquids, getLabwareInfoByLiquidId(currentCommandsSlice)),
+                  missingTips,
+                }
+              }).filter((i): i is LabwareOnDeck => i != null)}
+          />
         </Flex>
         <PipetteMountViz
           mount="left"
@@ -207,6 +149,7 @@ export function ProtocolTimelineScrubber(
           pipetteEntity={leftPipetteEntity}
           timelineFrame={frame}
           invariantContext={invariantContext}
+          analysis={analysis}
         />
         <PipetteMountViz
           mount="right"
@@ -214,8 +157,9 @@ export function ProtocolTimelineScrubber(
           pipetteEntity={rightPipetteEntity}
           timelineFrame={frame}
           invariantContext={invariantContext}
+          analysis={analysis}
         />
-        <Flex
+        {/* <Flex
           backgroundColor={COLORS.white}
           paddingX={SPACING.spacing4}
           flex="1 1 0"
@@ -223,7 +167,7 @@ export function ProtocolTimelineScrubber(
           <AnnotatedSteps
             analysis={analysis}
             currentCommandIndex={currentCommandIndex} />
-        </Flex>
+        </Flex> */}
       </Flex>
       <Flex
         ref={wrapperRef}
@@ -242,8 +186,8 @@ export function ProtocolTimelineScrubber(
               command={command}
               currentCommandIndex={currentCommandIndex}
               setCurrentCommandIndex={setCurrentCommandIndex}
-              analysis={props.analysis}
-              robotType={props.robotType}
+              analysis={analysis}
+              robotType={robotType}
             />
           )}
         </ViewportList>
@@ -270,21 +214,23 @@ export function ProtocolTimelineScrubber(
           {commands.length}
         </Text>
       </Flex>
-      {currentCommandIndex !== 0 &&
-        currentCommandIndex !== commands.length - 1 ? (
-        <Text
-          as="p"
-          fontSize="0.5rem"
-          marginLeft={
-            (currentCommandIndex / (commands.length - 1)) *
-            886
-            // (wrapperRef.current?.getBoundingClientRect()?.width - 6 ?? 0)
-          }
-        >
-          {currentCommandIndex + 1}
-        </Text>
-      ) : null}
-    </Flex>
+      {
+        currentCommandIndex !== 0 &&
+          currentCommandIndex !== commands.length - 1 ? (
+          <Text
+            as="p"
+            fontSize="0.5rem"
+            marginLeft={
+              (currentCommandIndex / (commands.length - 1)) *
+              886
+              // (wrapperRef.current?.getBoundingClientRect()?.width - 6 ?? 0)
+            }
+          >
+            {currentCommandIndex + 1}
+          </Text>
+        ) : null
+      }
+    </Flex >
   )
 }
 interface PipetteMountVizProps {
@@ -293,6 +239,7 @@ interface PipetteMountVizProps {
   mount: string
   timelineFrame: TimelineFrame
   invariantContext: InvariantContext
+  analysis: CompletedProtocolAnalysis | ProtocolAnalysisOutput
 }
 function PipetteMountViz(props: PipetteMountVizProps): JSX.Element | null {
   const {
@@ -301,6 +248,7 @@ function PipetteMountViz(props: PipetteMountVizProps): JSX.Element | null {
     pipetteId,
     timelineFrame,
     invariantContext,
+    analysis
   } = props
   const { robotState } = timelineFrame
   const [showPipetteDetails, setShowPipetteDetails] = React.useState(false)
@@ -333,6 +281,7 @@ function PipetteMountViz(props: PipetteMountVizProps): JSX.Element | null {
           allNozzleTipContents={robotState.liquidState.pipettes[pipetteId]}
           liquidEntities={invariantContext.liquidEntities}
           maxVolume={maxVolume}
+          analysis={analysis}
         />
       ) : (
         <Box size="4rem" />
@@ -346,12 +295,14 @@ interface SideViewProps {
   liquidEntities: InvariantContext['liquidEntities']
   maxVolume: number
   allNozzlesHaveTips: boolean
+  analysis: CompletedProtocolAnalysis | ProtocolAnalysisOutput
 }
 function PipetteSideView({
   allNozzleTipContents,
   liquidEntities,
   maxVolume,
   allNozzlesHaveTips,
+  analysis
 }: SideViewProps): JSX.Element {
   const channelCount = Math.min(Object.keys(allNozzleTipContents).length, 8)
   return (
@@ -391,6 +342,7 @@ function PipetteSideView({
                 tipContents={tipContents}
                 liquidEntities={liquidEntities}
                 maxVolume={maxVolume}
+                analysis={analysis}
               />
             ) : (
               <path
@@ -413,6 +365,7 @@ interface TipSideViewProps {
   maxVolume: number
   x: number
   y: number
+  analysis: CompletedProtocolAnalysis | ProtocolAnalysisOutput
 }
 function TipSideView({
   tipContents,
@@ -420,6 +373,7 @@ function TipSideView({
   maxVolume,
   x,
   y,
+  analysis
 }: TipSideViewProps): JSX.Element {
   const emptyVolumeLeft =
     maxVolume -
@@ -434,6 +388,7 @@ function TipSideView({
       <rect x={x} y={y} height={yOfFirstLiquid} width="10" fill="#FFF" />
       {Object.entries(tipContents).map(([liquidId, { volume }]) => {
         if (liquidId === '__air__') return null
+        const displayColor = analysis.liquids.find(l => l.id === liquidId)?.displayColor
         return (
           <rect
             key={liquidId}
@@ -441,7 +396,7 @@ function TipSideView({
             y={y + yOfFirstLiquid}
             height={(volume / maxVolume) * 50}
             width="10"
-            fill={liquidEntities[liquidId]?.displayColor ?? 'rebeccapurple'}
+            fill={displayColor ?? 'rebeccapurple'}
           />
         )
       })}
@@ -477,21 +432,21 @@ function CommandItem(props: CommandItemProps): JSX.Element {
       key={index}
       backgroundColor={
         index === currentCommandIndex
-          ? COLORS.blueEnabled
+          ? COLORS.blue35
           : index < currentCommandIndex
             ? '#00002222'
             : '#fff'
       }
       border={
         index === currentCommandIndex
-          ? `3px solid ${COLORS.blueEnabled}`
+          ? `1px solid ${COLORS.blue35}`
           : '1px solid #000'
       }
       padding={SPACING.spacing4}
       flexDirection={DIRECTION_COLUMN}
       minWidth={`${COMMAND_WIDTH_PX}px`}
       width={`${COMMAND_WIDTH_PX}px`}
-      height="10rem"
+      height="6rem"
       overflowX="hidden"
       overflowY="scroll"
       cursor="pointer"

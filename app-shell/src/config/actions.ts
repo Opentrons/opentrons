@@ -35,6 +35,7 @@ import type {
   UpdateProtocolListAction,
   UpdateProtocolListFailureAction,
   ViewProtocolSourceFolder,
+  SetEditingProtocolSource,
 } from '@opentrons/app/src/redux/protocol-storage'
 import {
   ADD_CUSTOM_LABWARE,
@@ -65,6 +66,7 @@ import {
   REMOVE_PROTOCOL,
   RESET_VALUE,
   SEND_LOG,
+  SET_EDITING_PROTOCOL_SOURCE,
   SYSTEM_INFO_INITIALIZED,
   UPDATE_PROTOCOL_LIST,
   UPDATE_PROTOCOL_LIST_FAILURE,

@@ -242,4 +242,20 @@ export type ConfigV21 = Omit<ConfigV20, 'version'> & {
   version: 21
 }
 
-export type Config = ConfigV21
+export type ConfigV22 = Omit<ConfigV20, 'version'> & {
+  version: 22
+  protocolEditorUi: {
+    width: number
+    height: number
+    minWidth: number
+    url: {
+      protocol: UrlProtocol
+      path: string
+    }
+    webPreferences: {
+      webSecurity: boolean
+    }
+  }
+}
+
+export type Config = ConfigV22

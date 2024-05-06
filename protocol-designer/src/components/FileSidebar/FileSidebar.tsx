@@ -191,7 +191,7 @@ function getWarningContent({
     return {
       content:
         (fixtureWithoutStep.trashBin && !fixtureWithoutStep.wasteChute) ||
-        (!fixtureWithoutStep.trashBin && fixtureWithoutStep.wasteChute) ? (
+          (!fixtureWithoutStep.trashBin && fixtureWithoutStep.wasteChute) ? (
           <p>
             {t('export_warnings.unused_trash.body', {
               name: fixtureWithoutStep.trashBin ? 'trash bin' : 'waste chute',
@@ -264,6 +264,18 @@ export function FileSidebar(): JSX.Element {
     setShowExportWarningModal,
   ] = React.useState<boolean>(false)
   const { t } = useTranslation(['alert', 'modules'])
+  const urlSearchParams = new URLSearchParams(window.location.search)
+  let protocolFileSrcPath: string | null = null
+  for (const [paramName, paramValue] of urlSearchParams.entries()) {
+    if (paramName === 'protocolSrcPath') {
+      protocolFileSrcPath = paramValue
+    }
+  }
+  React.useEffect(() => {
+    if (protocolFileSrcPath != null) {
+      dispatch(loadFileActions.loadProtocolFile({ currentTarget: { files: [FileSystemDirectoryEntry.getFile(protocolFileSrcPath)] } }))
+    }
+  }, [protocolFileSrcPath])
   const isGripperAttached = Object.values(additionalEquipment).some(
     equipment => equipment?.name === 'gripper'
   )

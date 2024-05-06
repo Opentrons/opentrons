@@ -6,8 +6,10 @@ SHELL := bash
 # add node_modules/.bin to PATH
 PATH := $(shell cd .. && yarn bin):$(PATH)
 
-# dev server port
+# app dev server port
 PORT ?= 5173
+# protocol editor dev server port
+PD_PORT ?= 5174
 
 # Path of source package
 SRC_PATH = app
@@ -54,6 +56,7 @@ dist:
 .PHONY: dev
 dev: export NODE_ENV := development
 dev: export PORT := $(PORT)
+dev: export PD_PORT := $(PD_PORT)
 dev:
 	concurrently --no-color --kill-others --names "server,shell" \
 		"$(MAKE) dev-server OPENTRONS_PROJECT=$(OPENTRONS_PROJECT)" \

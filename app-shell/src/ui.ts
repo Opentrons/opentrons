@@ -8,23 +8,23 @@ import { createLogger } from './log'
 
 import type { Action } from './types'
 
-const config = getConfig('ui')
+const uiConfig = getConfig('ui')
 const log = createLogger('ui')
 
 const urlPath =
-  config.url.protocol === 'file:'
-    ? path.join(app.getAppPath(), config.url.path)
-    : config.url.path
+  uiConfig.url.protocol === 'file:'
+    ? path.join(app.getAppPath(), uiConfig.url.path)
+    : uiConfig.url.path
 
-const url = `${config.url.protocol}//${urlPath}`
+const url = `${uiConfig.url.protocol}//${urlPath}`
 
 const WINDOW_OPTS = {
   show: false,
   useContentSize: true,
-  width: config.width,
-  minWidth: config.minWidth,
-  height: config.height,
-  // allow webPreferences to be set at launchtime from config
+  width: uiConfig.width,
+  minWidth: uiConfig.minWidth,
+  height: uiConfig.height,
+  // allow webPreferences to be set at launchtime from uiConfig
   webPreferences: Object.assign(
     {
       // NOTE: __dirname refers to output directory
@@ -36,7 +36,7 @@ const WINDOW_OPTS = {
       // as of electron 12, contextIsolation defaults to true.
       contextIsolation: false,
     },
-    config.webPreferences
+    uiConfig.webPreferences
   ),
 }
 
@@ -65,52 +65,6 @@ export function createUi(): BrowserWindow {
   return mainWindow
 }
 
-const PROTOCOL_EDITOR_URL = 'http://localhost:8080'
-export function createProtocolEditorUi(): BrowserWindow {
-  log.debug('Creating protocol editor window', { options: WINDOW_OPTS })
-
-  const subWindow = new BrowserWindow({
-    show: false,
-    useContentSize: true,
-    width: config.width,
-    minWidth: config.minWidth,
-    height: config.height,
-    // allow webPreferences to be set at launchtime from config
-    webPreferences: Object.assign(
-      {
-        preload: path.join(__dirname, './preload.js'),
-        nodeIntegration: false,
-        // TODO: remove this by using electron contextBridge to specify
-        // exact, argument-sanitation-involved methods instead of just
-        // binding the entire ipcRenderer in. This is necessary because
-        // as of electron 12, contextIsolation defaults to true.
-        contextIsolation: false,
-      },
-      config.webPreferences
-    ),
-  }).once(
-    'ready-to-show',
-    () => {
-      log.debug('Protocol Editor window ready to show')
-      subWindow.show()
-    }
-  )
-
-  log.info(`Loading ${PROTOCOL_EDITOR_URL}`)
-  // eslint-disable-next-line @typescript-eslint/no-floating-promises
-  subWindow.loadURL(PROTOCOL_EDITOR_URL)
-
-  // open new windows (<a target="_blank" ...) in browser windows
-  subWindow.webContents.setWindowOpenHandler(({ url }) => {
-    log.debug('Opening external link', { url })
-    // event.preventDefault()
-    // eslint-disable-next-line @typescript-eslint/no-floating-promises
-    shell.openExternal(url)
-    return { action: 'deny' }
-  })
-
-  return subWindow
-}
 export function registerReloadUi(
   browserWindow: BrowserWindow
 ): (action: Action) => unknown {
