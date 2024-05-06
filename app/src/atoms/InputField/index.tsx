@@ -172,7 +172,9 @@ function Input(props: InputFieldProps): JSX.Element {
 
     @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
       height: ${size === 'small' ? '4.25rem' : '5rem'};
-      font-size: ${TYPOGRAPHY.fontSize28};
+      font-size: ${size === 'small'
+        ? TYPOGRAPHY.fontSize28
+        : TYPOGRAPHY.fontSize38};
       padding: ${SPACING.spacing16} ${SPACING.spacing24};
       border: 2px ${BORDERS.styleSolid}
         ${hasError ? COLORS.red50 : COLORS.grey50};
@@ -188,8 +190,12 @@ function Input(props: InputFieldProps): JSX.Element {
         flex: 1 1 auto;
         width: 100%;
         height: 100%;
-        font-size: ${TYPOGRAPHY.fontSize28};
-        line-height: ${TYPOGRAPHY.lineHeight36};
+        font-size: ${size === 'small'
+          ? TYPOGRAPHY.fontSize28
+          : TYPOGRAPHY.fontSize38};
+        line-height: ${size === 'small'
+          ? TYPOGRAPHY.lineHeight36
+          : TYPOGRAPHY.lineHeight48};
       }
     }
   `
