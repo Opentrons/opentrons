@@ -178,6 +178,7 @@ def _retract(
 def _pipette_with_liquid_settings(  # noqa: C901
     ctx: ProtocolContext,
     pipette: InstrumentContext,
+    tip_volume: int,
     liquid_class: LiquidClassSettings,
     well: Well,
     channel_offset: Point,
@@ -304,10 +305,11 @@ def _pipette_with_liquid_settings(  # noqa: C901
                 _reset_flow_rates()
         if (
             pipette.channels == 96
+            and tip_volume == 50
             and aspirate
             and (clear_accuracy_function or aspirate <= 5.0)
         ):
-            # NOTE: this should only be happening when 96ch is either:
+            # NOTE: this should only be happening when 96ch + 50uL tip is either:
             #       a) running increment test
             #       b) aspirating <5ul
             ctx.delay(seconds=config.DELAY_AFTER_BACKLASH_96CH_LOW_VOLUMES)
@@ -430,6 +432,7 @@ def mix_with_liquid_class(
     _pipette_with_liquid_settings(
         ctx,
         pipette,
+        tip_volume,
         liquid_class,
         well,
         channel_offset,
@@ -467,6 +470,7 @@ def aspirate_with_liquid_class(
     _pipette_with_liquid_settings(
         ctx,
         pipette,
+        tip_volume,
         liquid_class,
         well,
         channel_offset,
@@ -505,6 +509,7 @@ def dispense_with_liquid_class(
     _pipette_with_liquid_settings(
         ctx,
         pipette,
+        tip_volume,
         liquid_class,
         well,
         channel_offset,
