@@ -1,5 +1,3 @@
-# Run tests, build the app, and deploy it cross platform
-
 name: 'OpentronsAI edge continuous deployment to dev'
 
 on:
