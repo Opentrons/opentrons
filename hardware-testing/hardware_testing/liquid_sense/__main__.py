@@ -94,7 +94,7 @@ class RunArgs:
     start_height_offset: float
     aspirate: bool
     dial_indicator: Optional[mitutoyo_digimatic_indicator.Mitutoyo_Digimatic_Indicator]
-    plunger_speed: bool
+    plunger_speed: float
     trials_before_jog: int
 
     @classmethod
