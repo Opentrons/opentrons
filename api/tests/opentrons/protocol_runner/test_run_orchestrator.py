@@ -1,10 +1,10 @@
 import pytest
 from pytest_lazyfixture import lazy_fixture  # type: ignore[import-untyped]
 from decoy import Decoy
-from typing import Union
+from typing import Union, Optional
 
 from opentrons.protocols.api_support.types import APIVersion
-from opentrons.protocol_engine import ProtocolEngine, commands as pe_commands
+from opentrons.protocol_engine import ProtocolEngine, commands as pe_commands, CommandIntent
 from opentrons.hardware_control import API as HardwareAPI
 from opentrons.protocol_reader import JsonProtocolConfig, PythonProtocolConfig
 from opentrons.protocol_runner.run_orchestrator import RunOrchestrator
@@ -58,10 +58,11 @@ def config() -> JsonProtocolConfig:
     [
         (JsonProtocolConfig(schema_version=7)),
         (PythonProtocolConfig(api_version=APIVersion(2, 14))),
+        (None)
     ],
 )
 def subject(
-    config: Union[PythonProtocolConfig, JsonProtocolConfig],
+    config: Optional[Union[PythonProtocolConfig, JsonProtocolConfig]],
     mock_hardware_api: HardwareAPI,
     mock_protocol_engine: ProtocolEngine,
 ) -> RunOrchestrator:
@@ -69,7 +70,7 @@ def subject(
     return RunOrchestrator(
         protocol_engine=mock_protocol_engine,
         hardware_api=mock_hardware_api,
-        protocol_config=config,
+        protocol_config=JsonProtocolConfig(schema_version=7)    #config,
     )
 
 
@@ -107,3 +108,17 @@ def test_add_command(
     subject.add_command(command_to_queue)
 
     decoy.verify(runner.set_command_queued(command_to_queue))
+
+
+def test_add_json_command(
+    subject: RunOrchestrator,
+    decoy: Decoy,
+    mock_protocol_json_runner: AnyRunner,
+) -> None:
+    """Should verify calls to set_command_queued."""
+    command_to_queue = pe_commands.HomeCreate.construct(
+        intent=CommandIntent.PROTOCOL, params=pe_commands.HomeParams.construct()
+    )
+    subject.add_command(command_to_queue)
+
+    decoy.verify(mock_protocol_json_runner.set_command_queued(command_to_queue))
