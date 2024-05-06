@@ -47,7 +47,7 @@ describe('useNotifyService', () => {
     vi.clearAllMocks()
   })
 
-  it('should trigger a subscribe action on a successful initial mount', () => {
+  it('should trigger an HTTP refetch and subscribe action on a successful initial mount', () => {
     renderHook(() =>
       useNotifyService({
         topic: MOCK_TOPIC,
@@ -55,6 +55,7 @@ describe('useNotifyService', () => {
         options: MOCK_OPTIONS,
       } as any)
     )
+    expect(mockHTTPRefetch).toHaveBeenCalledWith('once')
     expect(mockDispatch).toHaveBeenCalledWith(
       notifySubscribeAction(MOCK_HOST_CONFIG.hostname, MOCK_TOPIC)
     )

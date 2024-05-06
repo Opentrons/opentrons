@@ -51,6 +51,8 @@ export function useNotifyService<TData, TError = Error>({
 
   React.useEffect(() => {
     if (shouldUseNotifications) {
+      // Always fetch on initial mount to keep latency as low as possible.
+      setRefetch('once')
       appShellListener({
         hostname,
         topic,
