@@ -6,7 +6,7 @@ import { useHistory, useParams } from 'react-router-dom'
 import first from 'lodash/first'
 import { css } from 'styled-components'
 
-import { RUN_STATUS_IDLE, RUN_STATUS_STOPPED } from '@opentrons/api-client'
+import { RUN_STATUS_IDLE, RUN_STATUS_STOPPED, Run } from '@opentrons/api-client'
 import {
   ALIGN_CENTER,
   BORDERS,
@@ -47,6 +47,7 @@ import {
   useAttachedModules,
   useLPCDisabledReason,
   useModuleCalibrationStatus,
+  useProtocolAnalysisErrors,
   useRobotAnalyticsData,
   useRobotType,
   useTrackProtocolRunEvent,
@@ -64,6 +65,7 @@ import { ProtocolSetupDeckConfiguration } from '../../organisms/ProtocolSetupDec
 import { useLaunchLPC } from '../../organisms/LabwarePositionCheck/useLaunchLPC'
 import { getUnmatchedModulesForProtocol } from '../../organisms/ProtocolSetupModulesAndDeck/utils'
 import { ConfirmCancelRunModal } from '../../organisms/OnDeviceDisplay/RunningProtocol'
+import { AnalysisFailedModal } from '../../organisms/ProtocolSetupParameters/AnalysisFailedModal'
 import {
   getIncompleteInstrumentCount,
   getProtocolUsesGripper,
@@ -251,6 +253,7 @@ interface PrepareToRunProps {
   confirmAttachment: () => void
   play: () => void
   robotName: string
+  runRecord: Run | null
 }
 
 function PrepareToRun({
@@ -259,6 +262,7 @@ function PrepareToRun({
   confirmAttachment,
   play,
   robotName,
+  runRecord,
 }: PrepareToRunProps): JSX.Element {
   const { t, i18n } = useTranslation(['protocol_setup', 'shared'])
   const history = useHistory()
@@ -272,7 +276,6 @@ function PrepareToRun({
     observer.observe(scrollRef.current)
   }
 
-  const { data: runRecord } = useNotifyRunQuery(runId, { staleTime: Infinity })
   const protocolId = runRecord?.data?.protocolId ?? null
   const { data: protocolRecord } = useProtocolQuery(protocolId, {
     staleTime: Infinity,
@@ -797,11 +800,18 @@ export type SetupScreens =
 
 export function ProtocolSetup(): JSX.Element {
   const { runId } = useParams<OnDeviceRouteParams>()
+  console.log(runId)
+  const { data: runRecord } = useNotifyRunQuery(runId, { staleTime: Infinity })
+  const { analysisErrors } = useProtocolAnalysisErrors(runId)
   const localRobot = useSelector(getLocalRobot)
   const robotSerialNumber =
     localRobot?.status != null ? getRobotSerialNumber(localRobot) : null
   const trackEvent = useTrackEvent()
   const { play } = useRunControls(runId)
+  const [
+    showAnalysisFailedModal,
+    setShowAnalysisFailedModal,
+  ] = React.useState<boolean>(true)
 
   const handleProceedToRunClick = (): void => {
     trackEvent({
@@ -838,6 +848,7 @@ export function ProtocolSetup(): JSX.Element {
         confirmAttachment={confirmAttachment}
         play={play}
         robotName={localRobot?.name != null ? localRobot.name : 'no name'}
+        runRecord={runRecord ?? null}
       />
     ),
     instruments: (
@@ -872,6 +883,15 @@ export function ProtocolSetup(): JSX.Element {
 
   return (
     <>
+      {showAnalysisFailedModal &&
+        analysisErrors != null &&
+        analysisErrors?.length > 0 && (
+          <AnalysisFailedModal
+            setShowAnalysisFailedModal={setShowAnalysisFailedModal}
+            protocolId={runRecord?.data.protocolId ?? null}
+            errors={analysisErrors.map(error => error.detail)}
+          />
+        )}
       {showConfirmationModal ? (
         <ConfirmAttachedModal
           onCloseClick={cancelExit}
