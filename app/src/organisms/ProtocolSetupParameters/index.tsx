@@ -174,6 +174,7 @@ export function ProtocolSetupParameters({
                 detail={formatRunTimeParameterValue(parameter, t)}
                 description={parameter.description}
                 fontSize="h4"
+                disabled={startSetup}
               />
             </React.Fragment>
           )
