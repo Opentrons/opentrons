@@ -59,7 +59,7 @@ export interface InputFieldProps {
   /** blur handler */
   onBlur?: (event: React.FocusEvent<HTMLInputElement>) => unknown
   /** makes input field read-only */
-  readOnly?: boolean | undefined
+  readOnly?: boolean
   /** html tabindex property */
   tabIndex?: number
   /** automatically focus field on renders */
@@ -196,6 +196,11 @@ function Input(props: InputFieldProps): JSX.Element {
         line-height: ${size === 'small'
           ? TYPOGRAPHY.lineHeight36
           : TYPOGRAPHY.lineHeight48};
+      }
+
+      /* the size of dot for password is handled by font-size */
+      input[type='password'] {
+        font-size: ${size === 'small' ? '56px' : '62px'};
       }
     }
   `
