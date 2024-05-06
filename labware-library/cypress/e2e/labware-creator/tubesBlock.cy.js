@@ -8,7 +8,6 @@ context('Tubes and Block', () => {
     cy.viewport('macbook-15')
     cy.contains('NO').click({ force: true })
 
-    // TODO(IL, 2021-05-15): give Dropdown component semantic selectors for E2E
     cy.get('label')
       .contains('What type of labware are you creating?')
       .children()
@@ -18,7 +17,6 @@ context('Tubes and Block', () => {
       .contains('Tubes / Plates + Opentrons Aluminum Block')
       .click()
 
-    // TODO(IL, 2021-05-15): give Dropdown component semantic selectors for E2E
     cy.get('label')
       .contains('Which aluminum block?')
       .children()
@@ -26,7 +24,6 @@ context('Tubes and Block', () => {
       .trigger('mousedown')
     cy.get('*[class^="_option_label"]').contains('96 well').click()
 
-    // TODO(IL, 2021-05-15): give Dropdown component semantic selectors for E2E
     cy.get('label')
       .contains('What labware is on top of your aluminum block?')
       .children()
@@ -291,7 +288,6 @@ context('Tubes and Block', () => {
 
     describe('PCR Plate', () => {
       beforeEach(() => {
-        // TODO(IL, 2021-05-15): give Dropdown component semantic selectors for E2E
         cy.get('label')
           .contains('What type of labware are you creating?')
           .children()
@@ -301,7 +297,6 @@ context('Tubes and Block', () => {
           .contains('Tubes / Plates + Opentrons Aluminum Block')
           .click()
 
-        // TODO(IL, 2021-05-15): give Dropdown component semantic selectors for E2E
         cy.get('label')
           .contains('Which aluminum block?')
           .children()
@@ -309,7 +304,6 @@ context('Tubes and Block', () => {
           .trigger('mousedown')
         cy.get('*[class^="_option_label"]').contains('96 well').click()
 
-        // TODO(IL, 2021-05-15): give Dropdown component semantic selectors for E2E
         cy.get('label')
           .contains('What labware is on top of your aluminum block?')
           .children()
@@ -454,7 +448,6 @@ context('Tubes and Block', () => {
       it('tests the whole form and file export', () => {
         cy.visit('/create')
         cy.viewport('macbook-15')
-        // TODO(IL, 2021-05-15): give Dropdown component semantic selectors for E2E
         cy.get('label')
           .contains('What type of labware are you creating?')
           .children()
@@ -464,7 +457,6 @@ context('Tubes and Block', () => {
           .contains('Tubes / Plates + Opentrons Aluminum Block')
           .click()
 
-        // TODO(IL, 2021-05-15): give Dropdown component semantic selectors for E2E
         cy.get('label')
           .contains('Which aluminum block?')
           .children()

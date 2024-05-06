@@ -11,7 +11,6 @@ context('Reservoirs', () => {
 
   describe('Reservoir', () => {
     before(() => {
-      // TODO(IL, 2021-05-15): give Dropdown component semantic selectors for E2E
       cy.contains('What type of labware are you creating?')
         .children()
         .first()

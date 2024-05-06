@@ -15,7 +15,6 @@ context('Well Plates', () => {
 
   describe('Create a well plate', () => {
     before(() => {
-      // TODO(IL, 2021-05-15): give Dropdown component semantic selectors for E2E
       cy.get('label')
         .contains('What type of labware are you creating?')
         .children()

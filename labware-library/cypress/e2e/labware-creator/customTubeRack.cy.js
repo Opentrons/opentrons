@@ -15,8 +15,6 @@ context('Tubes and Rack', () => {
       cy.contains('Share sessions with the Opentrons Product Team?')
       cy.contains('NO').click({ force: true })
 
-      // allow user to select custom tube rack
-      // TODO(IL, 2021-05-15): give Dropdown component semantic selectors for E2E
       cy.get('label')
         .contains('What type of labware are you creating?')
         .children()
@@ -24,7 +22,6 @@ context('Tubes and Rack', () => {
         .trigger('mousedown')
       cy.get('*[class^="_option_label"]').contains('Tubes + Tube Rack').click()
 
-      // TODO(IL, 2021-05-15): give Dropdown component semantic selectors for E2E
       cy.get('label')
         .contains('Which tube rack?')
         .children()
