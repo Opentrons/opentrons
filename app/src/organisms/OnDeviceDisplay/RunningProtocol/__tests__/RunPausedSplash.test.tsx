@@ -28,7 +28,7 @@ describe('ConfirmCancelRunModal', () => {
 
   beforeEach(() => {
     props = {
-      onClose: mockOnClose,
+      onClick: mockOnClose,
       protocolName: MOCK_PROTOCOL_NAME,
       errorType: '',
     }
