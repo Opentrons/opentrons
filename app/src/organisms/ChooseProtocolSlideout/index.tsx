@@ -552,7 +552,11 @@ function StoredProtocolList(props: StoredProtocolListProps): JSX.Element {
                 isWarning={missingAnalysisData}
                 onClick={() => handleSelectProtocol(storedProtocol)}
               >
-                <Box display="grid" gridTemplateColumns="1fr 3fr">
+                <Box
+                  display="grid"
+                  gridTemplateColumns="1fr 3fr"
+                  marginRight={SPACING.spacing16}
+                >
                   {!missingAnalysisData ? (
                     <Box
                       marginY={SPACING.spacingAuto}
