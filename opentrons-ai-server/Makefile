@@ -87,9 +87,9 @@ package-lambda:
 .PHONY: package
 package: clean-package install-deps package-lambda
 
-ALLOWED_ENVS := sandbox-opentrons-ai-api dev-opentrons-ai-api
+ALLOWED_ENVS := sandbox dev
 
-DEPLOY_ENV ?= sandbox-opentrons-ai-api
+DEPLOY_ENV ?= sandbox
 
 .PHONY: validate-env
 validate-env:
@@ -99,7 +99,7 @@ validate-env:
 		echo "Allowed values are: $(ALLOWED_ENVS)"; \
 		exit 1; \
 	fi
-	@echo "Environment setting is valid."
+	@echo "Environment setting is valid: $(DEPLOY_ENV)"
 
 .PHONY: deploy
 deploy: validate-env

@@ -5,6 +5,8 @@ name = "pypi"
 
 [packages]
 openai = "==1.25.1"
+python-dotenv = "==1.0.1"
+httpx = "==0.27.0"
 
 [dev-packages]
 pytest = "==8.2.0"

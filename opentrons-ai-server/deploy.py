@@ -96,12 +96,19 @@ class Deployment:
             self.wait_for_deployment(version)
 
 
+def check_env(env: str) -> None:
+    if env not in ["sandbox", "dev"]:
+        raise ValueError(f"Invalid environment specified. Must be 'sandbox' or 'dev'. Not {env}")
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description="Process the deployment environment.")
     parser.add_argument("deploy_env", type=str, help="Deployment environment name")
     args = parser.parse_args()
-    print(f"Deployment environment set to: {args.deploy_env}")
-    # deployment = Deployment(args.deploy_env)
+    env = args.deploy_env
+    check_env(env)
+    print(f"Deployment environment set to: {env}")
+    # deployment = Deployment(env)
     # deployment.deploy()
 
 
