@@ -6,7 +6,7 @@ import { useHistory, useParams } from 'react-router-dom'
 import first from 'lodash/first'
 import { css } from 'styled-components'
 
-import { RUN_STATUS_IDLE, RUN_STATUS_STOPPED, Run } from '@opentrons/api-client'
+import { RUN_STATUS_IDLE, RUN_STATUS_STOPPED } from '@opentrons/api-client'
 import {
   ALIGN_CENTER,
   BORDERS,
@@ -92,6 +92,7 @@ import { getRequiredDeckConfig } from '../../resources/deck_configuration/utils'
 import { useNotifyRunQuery } from '../../resources/runs'
 import { ViewOnlyParameters } from '../../organisms/ProtocolSetupParameters/ViewOnlyParameters'
 
+import type { Run } from '@opentrons/api-client'
 import type { CutoutFixtureId, CutoutId } from '@opentrons/shared-data'
 import type { OnDeviceRouteParams } from '../../App/types'
 import type {
