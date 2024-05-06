@@ -302,6 +302,12 @@ push-ot3-gravimetric:
 	cd ../ && $(MAKE) -C shared-data push-ot3
 	$(MAKE) remove-patches-gravimetric
 
+.PHONY: push-ot3-cavity
+push-ot3-cavity:
+	$(MAKE) apply-patches-gravimetric
+	cd ../ && $(MAKE) -C api push-ot3
+	cd ../ && $(MAKE) -C hardware push-ot3
+
 .PHONY: apply-patches-gravimetric
 apply-patches-gravimetric:
 	cd ../ && git apply ./hardware-testing/hardware_testing/gravimetric/overrides/*.patch --allow-empty || true
