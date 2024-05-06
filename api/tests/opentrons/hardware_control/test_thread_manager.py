@@ -28,7 +28,7 @@ def test_build_fail_raises_exception():
 def test_module_cache_add_entry():
     """Test that _cached_modules updates correctly."""
 
-    mod_names = {"tempdeck": ["111"]}
+    mod_names = {"tempdeck": [("111", "temperatureModuleV2")]}
     thread_manager = ThreadManager(
         API.build_hardware_simulator, attached_modules=mod_names
     )
@@ -49,7 +49,10 @@ def test_module_cache_add_entry():
 
 async def test_module_cache_remove_entry():
     """Test that module entry gets removed from cache when module detaches."""
-    mod_names = {"tempdeck": ["111"], "magdeck": ["222"]}
+    mod_names = {
+        "tempdeck": [("111", "temperatureModuleV2")],
+        "magdeck": [("222", "magneticModuleV1")],
+    }
     thread_manager = ThreadManager(
         API.build_hardware_simulator, attached_modules=mod_names
     )

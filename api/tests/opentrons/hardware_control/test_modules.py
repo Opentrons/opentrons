@@ -31,10 +31,10 @@ async def test_get_modules_simulating():
     import opentrons.hardware_control as hardware_control
 
     mods = {
-        "tempdeck": ["111"],
-        "magdeck": ["222"],
-        "thermocycler": ["333"],
-        "heatershaker": ["444"],
+        "tempdeck": [("111", "temperatureModuleV1")],
+        "magdeck": [("222", "magneticModuleV2")],
+        "thermocycler": [("333", "thermocyclerModuleV1")],
+        "heatershaker": [("444", "heaterShakerModuleV1")],
     }
     api = await hardware_control.API.build_hardware_simulator(attached_modules=mods)
     await asyncio.sleep(0.05)
@@ -47,7 +47,7 @@ async def test_get_modules_simulating():
 async def test_module_caching():
     import opentrons.hardware_control as hardware_control
 
-    mod_names = {"tempdeck": ["111"]}
+    mod_names = {"tempdeck": [("111", "temperatureModuleV1")]}
     api = await hardware_control.API.build_hardware_simulator(
         attached_modules=mod_names
     )
@@ -349,10 +349,10 @@ async def test_get_bundled_fw(monkeypatch, tmpdir):
     from opentrons.hardware_control import API
 
     mods = {
-        "tempdeck": ["111"],
-        "magdeck": ["222"],
-        "thermocycler": ["333"],
-        "heatershaker": ["444"],
+        "tempdeck": [("111", "temperatureModuleV1")],
+        "magdeck": [("222", "magneticModuleV2")],
+        "thermocycler": [("333", "thermocyclerModuleV1")],
+        "heatershaker": [("444", "heaterShakerModuleV1")],
     }
 
     api = await API.build_hardware_simulator(attached_modules=mods)

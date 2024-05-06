@@ -959,7 +959,10 @@ def test_order_of_module_load():
     import opentrons.hardware_control as hardware_control
     import opentrons.protocol_api as protocol_api
 
-    mods = {"tempdeck": ["111", "333"], "thermocycler": ["222"]}
+    mods = {
+        "tempdeck": [("111", "temperatureModuleV1"), ("333", "temperatureModuleV2")],
+        "thermocycler": [("222", "thermocyclerModuleV2")],
+    }
     thread_manager = hardware_control.ThreadManager(
         hardware_control.API.build_hardware_simulator, attached_modules=mods
     )

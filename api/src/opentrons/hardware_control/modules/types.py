@@ -9,6 +9,7 @@ from typing import (
     Tuple,
     Awaitable,
     Union,
+    Optional,
     cast,
     TYPE_CHECKING,
 )
@@ -129,6 +130,7 @@ class ModuleAtPort:
 @dataclass(kw_only=True)
 class SimulatingModuleAtPort(ModuleAtPort):
     serial_number: str
+    model: Optional[str]
 
 
 class BundledFirmware(NamedTuple):

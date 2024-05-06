@@ -24,6 +24,7 @@ class ModuleCall:
 @dataclass(frozen=True)
 class ModuleItem:
     serial_number: str
+    model: str
     calls: List[ModuleCall] = field(default_factory=list)
 
 
@@ -59,7 +60,7 @@ async def _simulator_for_setup(
         return await API.build_hardware_simulator(
             attached_instruments=setup.attached_instruments,
             attached_modules={
-                k: [m.serial_number for m in v]
+                k: [(m.serial_number, m.model) for m in v]
                 for k, v in setup.attached_modules.items()
             },
             config=setup.config,
@@ -73,7 +74,7 @@ async def _simulator_for_setup(
         return await OT3API.build_hardware_simulator(
             attached_instruments=setup.attached_instruments,
             attached_modules={
-                k: [m.serial_number for m in v]
+                k: [(m.serial_number, m.model) for m in v]
                 for k, v in setup.attached_modules.items()
             },
             config=setup.config,
@@ -114,7 +115,7 @@ def _thread_manager_for_setup(
             API.build_hardware_simulator,
             attached_instruments=setup.attached_instruments,
             attached_modules={
-                k: [m.serial_number for m in v]
+                k: [(m.serial_number, m.model) for m in v]
                 for k, v in setup.attached_modules.items()
             },
             config=setup.config,
@@ -128,7 +129,7 @@ def _thread_manager_for_setup(
             OT3API.build_hardware_simulator,
             attached_instruments=setup.attached_instruments,
             attached_modules={
-                k: [m.serial_number for m in v]
+                k: [(m.serial_number, m.model) for m in v]
                 for k, v in setup.attached_modules.items()
             },
             config=setup.config,
@@ -215,6 +216,7 @@ def _prepare_for_simulator_setup(key: str, value: Dict[str, Any]) -> Any:
                 attached_modules.setdefault(key, []).append(
                     ModuleItem(
                         serial_number=obj["serial_number"],
+                        model=obj["model"],
                         calls=[ModuleCall(**data) for data in obj["calls"]],
                     )
                 )
@@ -236,6 +238,7 @@ def _prepare_for_ot3_simulator_setup(key: str, value: Dict[str, Any]) -> Any:
                 attached_modules.setdefault(key, []).append(
                     ModuleItem(
                         serial_number=obj["serial_number"],
+                        model=obj["model"],
                         calls=[ModuleCall(**data) for data in obj["calls"]],
                     )
                 )
