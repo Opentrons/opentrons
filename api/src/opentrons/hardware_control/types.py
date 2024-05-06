@@ -697,14 +697,10 @@ class EarlyLiquidSenseTrigger(RuntimeError):
 class LiquidNotFound(RuntimeError):
     """Error raised if liquid sensing move completes without detecting liquid."""
 
-    def __init__(
-        self, position: Dict[Axis, float], max_z_pos: Dict[Axis, float]
-    ) -> None:
+    def __init__(self, position: Dict[Axis, float]) -> None:
         """Initialize LiquidNotFound error."""
-        super().__init__(
-            f"Liquid threshold not found, current_position = {position}"
-            f"position at max travel allowed = {max_z_pos}"
-        )
+        super().__init__(f"Liquid threshold not found, current_position = {position}")
+        self.position = position
 
 
 class FailedTipStateCheck(RuntimeError):
