@@ -286,18 +286,25 @@ def _pipette_with_liquid_settings(  # noqa: C901
         if clear_accuracy_function:
             clear_pipette_ul_per_mm(hw_api, hw_mount)  # type: ignore[arg-type]
         if pipette.channels == 96:
+            # NOTE: (sigler) 96ch backlash comp must always run at the same speed (eg: max)
+            #       and use a low discontinuity (eg: <1.0mm/sec)
             _set_96ch_plunger_max_speeds()
             _set_96ch_plunger_discontinuity(
-                ctx, config.DISCONTINUITY_DURING_BACKLASH_96CH
+                ctx, config.DISCONTINUITY_DURING_96CH_ASPIRATE
             )
-        hw_api.prepare_for_aspirate(hw_mount)
-        if pipette.channels == 96:
-            _set_96ch_plunger_discontinuity(ctx, None)  # back to default
-            _reset_flow_rates()
+        try:
+            hw_api.prepare_for_aspirate(hw_mount)
+            if liquid_class.aspirate.leading_air_gap > 0:
+                pipette.aspirate(liquid_class.aspirate.leading_air_gap)
+        finally:
+            if pipette.channels == 96:
+                _set_96ch_plunger_discontinuity(ctx, None)  # back to default
+                _reset_flow_rates()
         if pipette.channels == 96 and (clear_accuracy_function or aspirate <= 5.0):
+            # NOTE: this should only be happening when 96ch is either:
+            #       a) running increment test
+            #       b) aspirating <5ul
             ctx.delay(seconds=config.DELAY_AFTER_BACKLASH_96CH_LOW_VOLUMES)
-        if liquid_class.aspirate.leading_air_gap > 0:
-            pipette.aspirate(liquid_class.aspirate.leading_air_gap)
 
     def _aspirate_on_mix() -> None:
         callbacks.on_mixing()
@@ -322,7 +329,15 @@ def _pipette_with_liquid_settings(  # noqa: C901
     def _aspirate_on_submerge() -> None:
         # aspirate specified volume
         callbacks.on_aspirating()
-        pipette.aspirate(aspirate)
+        if pipette.channels == 96:
+            _set_96ch_plunger_discontinuity(
+                ctx, config.DISCONTINUITY_DURING_96CH_ASPIRATE
+            )
+        try:
+            pipette.aspirate(aspirate)
+        finally:
+            if pipette.channels == 96:
+                _set_96ch_plunger_discontinuity(ctx, None)  # back to default
         # update liquid-height tracker
         liquid_tracker.update_affected_wells(
             well, aspirate=aspirate, channels=channel_count
