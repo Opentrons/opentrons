@@ -179,8 +179,8 @@ class RunArgs:
         )
         return _ctx
 
-    @classmethod  # noqa
-    def build_run_args(cls, args: argparse.Namespace) -> "RunArgs":  # noqa
+    @classmethod  # noqa: C901
+    def build_run_args(cls, args: argparse.Namespace) -> "RunArgs":
         """Build."""
         _ctx = RunArgs._get_protocol_context(args)
         operator_name = helpers._get_operator_name(_ctx.is_simulating())
