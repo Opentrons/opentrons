@@ -40,14 +40,12 @@ describe('TiprackField', () => {
     })
     vi.mocked(getTiprackOptions).mockReturnValue([
       {
-        value: 'mockValue',
+        value: 'mockDefURI1',
         name: 'tiprack1',
-        defURI: 'mockDefURI1',
       },
       {
-        value: 'mockValue',
+        value: 'mockDefURI2',
         name: 'tiprack2',
-        defURI: 'mockDefURI2',
       },
     ])
   })
