@@ -175,6 +175,7 @@ class RunArgs:
             is_simulating=args.simulate,
             deck_version="2",
             extra_labware=custom_defs,
+            pipette_left="p1000_96_v3.7" if args.channels == 96 else None
         )
         return _ctx
 
