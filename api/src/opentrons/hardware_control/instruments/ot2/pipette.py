@@ -17,6 +17,7 @@ from opentrons_shared_data.pipette.pipette_definition import (
     PipetteModelVersionType,
     PipetteNameType,
     PipetteLiquidPropertiesDefinition,
+    PressFitPickUpTipConfiguration,
 )
 from opentrons_shared_data.pipette import (
     load_data as load_pipette_data,
@@ -111,6 +112,11 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
             pipette_type=config.pipette_type,
             pipette_channels=config.channels,
             pipette_version=config.version,
+        )
+        self._valid_nozzle_maps = load_pipette_data.load_valid_nozzle_maps(
+            self._pipette_model.pipette_type,
+            self._pipette_model.pipette_channels,
+            self._pipette_model.pipette_version,
         )
         self._nozzle_offset = self._config.nozzle_offset
         self._nozzle_manager = (
@@ -519,6 +525,66 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
     @property
     def has_tip(self) -> bool:
         return self._has_tip
+
+    def get_pick_up_speed_by_configuration(
+        self,
+        config: PressFitPickUpTipConfiguration,
+    ) -> float:
+        approved_map = None
+        for map_key in self._valid_nozzle_maps.maps.keys():
+            if (
+                self._valid_nozzle_maps.maps[map_key]
+                == list(self._nozzle_manager.current_configuration.map_store.keys())
+            ):
+                approved_map = map_key
+        if approved_map is None:
+            raise ValueError(
+                "Pick up tip speed request error. Nozzle Configuration does not match any approved map layout for the current pipette."
+            )
+
+        return config.configuration_by_nozzle_map[approved_map][
+            pip_types.PipetteTipType(self._liquid_class.max_volume).name
+        ].speed
+
+    def get_pick_up_distance_by_configuration(
+        self,
+        config: PressFitPickUpTipConfiguration,
+    ) -> float:
+        approved_map = None
+        for map_key in self._valid_nozzle_maps.maps.keys():
+            if (
+                self._valid_nozzle_maps.maps[map_key]
+                == list(self._nozzle_manager.current_configuration.map_store.keys())
+            ):
+                approved_map = map_key
+        if approved_map is None:
+            raise ValueError(
+                "Pick up tip distance request error. Nozzle Configuration does not match any approved map layout for the current pipette."
+            )
+
+        return config.configuration_by_nozzle_map[approved_map][
+            pip_types.PipetteTipType(self._liquid_class.max_volume).name
+        ].distance
+
+    def get_pick_up_current_by_configuration(
+        self,
+        config: PressFitPickUpTipConfiguration,
+    ) -> float:
+        approved_map = None
+        for map_key in self._valid_nozzle_maps.maps.keys():
+            if (
+                self._valid_nozzle_maps.maps[map_key]
+                == list(self._nozzle_manager.current_configuration.map_store.keys())
+            ):
+                approved_map = map_key
+        if approved_map is None:
+            raise ValueError(
+                "Pick up tip current request error. Nozzle Configuration does not match any approved map layout for the current pipette."
+            )
+
+        return config.configuration_by_nozzle_map[approved_map][
+            pip_types.PipetteTipType(self._liquid_class.max_volume).name
+        ].current
 
     # Cache max is chosen somewhat arbitrarily. With a float is input we don't
     # want this to unbounded.

@@ -272,5 +272,6 @@ def load_valid_nozzle_maps(
     ):
         raise KeyError("Pipette version not found.")
     
-    #TODO: Parse in data from the calid nozzle maps section of the pipette definition
-    return Dict["test", ["test1", "test2"]]
+    physical_dict = _physical(channels, model, version)
+    
+    return ValidNozzleMaps.parse_obj(physical_dict["validNozzleMaps"])

@@ -167,19 +167,19 @@ class ValidNozzleMaps(BaseModel):
 class PressAndCamConfigurationValues(BaseModel):
     speed: float = Field(
         ...,
-        description="The speed to move the Z axis for each force pickup of a given partial tip configuration for a given tip type.",
+        description="The speed to move the Z axis for each force pickup of a given tip configuration for a given tip type.",
     )
     distance: float = Field(
         ...,
-        description="The starting distance to begin a pick up tip from, based on partial tip configuration and tip type.",
+        description="The starting distance to begin a pick up tip from, based on tip configuration and tip type.",
     )
     current: float = Field(
         ...,
-        description="The current used by a given partial tip configuration by tip type.",
+        description="The current used by a given tip configuration by tip type.",
     )
     tip_overlap: float = Field(
         ...,
-        description="The tip overlap of a given partial tip configuration.",
+        description="The tip overlap of a given tip configuration.",
         alias="tipOverlap",
     )
 
@@ -196,7 +196,7 @@ class PressFitPickUpTipConfiguration(BaseModel):
     configuration_by_nozzle_map: Dict[str, Dict[str, PressAndCamConfigurationValues]]= Field(
         ...,
         description="The speed, distance, current and overlap configurations for a given partial tip configuration by tip type.",
-        alias="configurationByNozzleMap",
+        alias="configurationsByNozzleMap",
     )
 
 class CamActionPickUpTipConfiguration(BaseModel):
@@ -213,7 +213,7 @@ class CamActionPickUpTipConfiguration(BaseModel):
     configuration_by_nozzle_map: Dict[str, Dict[str, PressAndCamConfigurationValues]]= Field(
         ...,
         description="The speed, distance, current and overlap configurations for a given partial tip configuration by tip type.",
-        alias="configurationByNozzleMap",
+        alias="configurationsByNozzleMap",
     )
 
 

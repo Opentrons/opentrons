@@ -100,7 +100,7 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
             self._pipette_model.pipette_type,
             self._pipette_model.pipette_channels,
             self._pipette_model.pipette_version,
-            )
+        )
         self._nozzle_offset = self._config.nozzle_offset
         self._nozzle_manager = (
             nozzle_manager.NozzleConfigurationManager.build_from_config(self._config)
@@ -672,69 +672,106 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
         ):
             if not config:
                 continue
-            
+
             approved_map = None
             for map_key in self._valid_nozzle_maps.maps.keys():
-                if self._valid_nozzle_maps.maps[map_key] == self._nozzle_manager.current_configuration.map_store.keys():
+                if (
+                    self._valid_nozzle_maps.maps[map_key]
+                    == list(self._nozzle_manager.current_configuration.map_store.keys())
+                ):
                     approved_map = map_key
-            if approved_map is None:
-                raise ValueError("Nozzle Configuration does not match any approved map layout for the current pipette.")
             
+            if approved_map is None:
+                raise ValueError(
+                    "Nozzle Configuration does not match any approved map layout for the current pipette."
+                )
+
             if isinstance(config, PressFitPickUpTipConfiguration) and all(
                 [
-                    config.configuration_by_nozzle_map[approved_map][self._active_tip_setting_name.name].speed,
-                    config.configuration_by_nozzle_map[approved_map][self._active_tip_setting_name.name].distance,
-                    config.configuration_by_nozzle_map[approved_map][self._active_tip_setting_name.name].current,
+                    config.configuration_by_nozzle_map[approved_map][
+                        self._active_tip_setting_name.name
+                    ].speed,
+                    config.configuration_by_nozzle_map[approved_map][
+                        self._active_tip_setting_name.name
+                    ].distance,
+                    config.configuration_by_nozzle_map[approved_map][
+                        self._active_tip_setting_name.name
+                    ].current,
                 ]
             ):
                 return config
-            elif config.configuration_by_nozzle_map[approved_map][self._active_tip_setting_name.name].current is not None:
+            elif (
+                config.configuration_by_nozzle_map[approved_map][
+                    self._active_tip_setting_name.name
+                ].current
+                is not None
+            ):
                 return config
 
         raise CommandPreconditionViolated(
             message=f"No pick up tip configuration for {count} tips",
         )
 
-    #TODO: Link up current speed and distance references from the pipette handler to these new functions that return relevant data
-    
     def get_pick_up_speed_by_configuration(
-        self, config: Union[CamActionPickUpTipConfiguration, PressFitPickUpTipConfiguration]
+        self,
+        config: Union[CamActionPickUpTipConfiguration, PressFitPickUpTipConfiguration],
     ) -> float:
         approved_map = None
         for map_key in self._valid_nozzle_maps.maps.keys():
-            if self._valid_nozzle_maps.maps[map_key] == self._nozzle_manager.current_configuration.map_store.keys():
+            if (
+                self._valid_nozzle_maps.maps[map_key]
+                == list(self._nozzle_manager.current_configuration.map_store.keys())
+            ):
                 approved_map = map_key
         if approved_map is None:
-            raise ValueError("Nozzle Configuration does not match any approved map layout for the current pipette.")
-        
-        return config.configuration_by_nozzle_map[approved_map][self._active_tip_setting_name.name].speed
-    
+            raise ValueError(
+                "Pick up tip speed request error. Nozzle Configuration does not match any approved map layout for the current pipette."
+            )
+
+        return config.configuration_by_nozzle_map[approved_map][
+            self._active_tip_setting_name.name
+        ].speed
+
     def get_pick_up_distance_by_configuration(
-        self, config: Union[CamActionPickUpTipConfiguration, PressFitPickUpTipConfiguration]
+        self,
+        config: Union[CamActionPickUpTipConfiguration, PressFitPickUpTipConfiguration],
     ) -> float:
         approved_map = None
         for map_key in self._valid_nozzle_maps.maps.keys():
-            if self._valid_nozzle_maps.maps[map_key] == self._nozzle_manager.current_configuration.map_store.keys():
+            if (
+                self._valid_nozzle_maps.maps[map_key]
+                == list(self._nozzle_manager.current_configuration.map_store.keys())
+            ):
                 approved_map = map_key
         if approved_map is None:
-            raise ValueError("Nozzle Configuration does not match any approved map layout for the current pipette.")
-        
-        return config.configuration_by_nozzle_map[approved_map][self._active_tip_setting_name.name].distance
-    
+            raise ValueError(
+                "Pick up tip distance request error. Nozzle Configuration does not match any approved map layout for the current pipette."
+            )
+
+        return config.configuration_by_nozzle_map[approved_map][
+            self._active_tip_setting_name.name
+        ].distance
+
     def get_pick_up_current_by_configuration(
-        self, config: Union[CamActionPickUpTipConfiguration, PressFitPickUpTipConfiguration]
+        self,
+        config: Union[CamActionPickUpTipConfiguration, PressFitPickUpTipConfiguration],
     ) -> float:
         approved_map = None
         for map_key in self._valid_nozzle_maps.maps.keys():
-            if self._valid_nozzle_maps.maps[map_key] == self._nozzle_manager.current_configuration.map_store.keys():
+            if (
+                self._valid_nozzle_maps.maps[map_key]
+                == list(self._nozzle_manager.current_configuration.map_store.keys())
+            ):
                 approved_map = map_key
         if approved_map is None:
-            raise ValueError("Nozzle Configuration does not match any approved map layout for the current pipette.")
-        
-        return config.configuration_by_nozzle_map[approved_map][self._active_tip_setting_name.name].current
+            raise ValueError(
+                "Pick up tip current request error. Nozzle Configuration does not match any approved map layout for the current pipette."
+            )
 
+        return config.configuration_by_nozzle_map[approved_map][
+            self._active_tip_setting_name.name
+        ].current
 
-        
 
 def _reload_and_check_skip(
     new_config: PipetteConfigurations,
