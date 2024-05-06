@@ -23,7 +23,7 @@ describe('PrimaryFloatingButton', () => {
     const button = screen.getByRole('button', {
       name: 'primary floating button',
     })
-    expect(button).toHaveStyle(`background-color: ${COLORS.blue50}`)
+    expect(button).toHaveStyle(`background-color: ${COLORS.blue60}`)
     expect(button).toHaveStyle(
       `padding: ${SPACING.spacing8} ${SPACING.spacing16}`
     )
@@ -66,6 +66,6 @@ describe('PrimaryFloatingButton', () => {
       name: 'primary floating button',
     })
     fireEvent.mouseOver(button)
-    expect(button).toHaveStyle(`background-color: ${COLORS.blue50}`)
+    expect(button).toHaveStyle(`background-color: ${COLORS.blue60}`)
   })
 })
