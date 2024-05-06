@@ -1,6 +1,4 @@
 import React from 'react'
-import { Flex, SPACING } from '@opentrons/components'
-import { PromptProvider, promptContext } from './PromptProvider'
 import { PromptButton as PromptButtonComponent } from '.'
 
 import type { Meta, StoryObj } from '@storybook/react'
@@ -27,21 +25,14 @@ const meta: Meta<typeof PromptButtonComponent> = {
   decorators: [
     Story => {
       return (
-        <PromptProvider>
+        <>
           <Story />
-          <PromptDisplay />
-        </PromptProvider>
+        </>
       )
     },
   ],
 }
 export default meta
-
-const PromptDisplay = (): JSX.Element => {
-  const usePromptValue = (): string => React.useContext(promptContext)
-  const promptFromButton = usePromptValue()
-  return <Flex padding={SPACING.spacing16}>{promptFromButton}</Flex>
-}
 
 type Story = StoryObj<typeof PromptButtonComponent>
 
