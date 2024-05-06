@@ -116,7 +116,7 @@ def build_gravimetric_trials(
                     liquid_tracker=liquid_tracker,
                     blank=blank,
                     mix=cfg.mix,
-                    stable=False,  # NOTE: evaporation rate may be faster than scale's internal stability tracking
+                    stable=False,  # NOTE: evaporation may be faster than scale's "stable" flag
                     scale_delay=cfg.scale_delay,
                     acceptable_cv=None,
                     acceptable_d=None,

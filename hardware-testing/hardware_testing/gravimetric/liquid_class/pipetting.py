@@ -300,7 +300,11 @@ def _pipette_with_liquid_settings(  # noqa: C901
             if pipette.channels == 96:
                 _set_96ch_plunger_discontinuity(ctx, None)  # back to default
                 _reset_flow_rates()
-        if pipette.channels == 96 and (clear_accuracy_function or aspirate <= 5.0):
+        if (
+            pipette.channels == 96
+            and aspirate
+            and (clear_accuracy_function or aspirate <= 5.0)
+        ):
             # NOTE: this should only be happening when 96ch is either:
             #       a) running increment test
             #       b) aspirating <5ul

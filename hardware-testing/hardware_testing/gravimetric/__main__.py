@@ -175,12 +175,12 @@ class RunArgs:
             is_simulating=args.simulate,
             deck_version="2",
             extra_labware=custom_defs,
-            pipette_left="p1000_96_v3.7" if args.channels == 96 else None
+            pipette_left="p1000_96_v3.7" if args.channels == 96 else None,
         )
         return _ctx
 
-    @classmethod  # noqa: C901
-    def build_run_args(cls, args: argparse.Namespace) -> "RunArgs":
+    @classmethod  # noqa
+    def build_run_args(cls, args: argparse.Namespace) -> "RunArgs":  # noqa
         """Build."""
         _ctx = RunArgs._get_protocol_context(args)
         operator_name = helpers._get_operator_name(_ctx.is_simulating())
