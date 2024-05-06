@@ -5,7 +5,6 @@ import { Flex } from '../../primitives'
 import { PrimaryButton } from './PrimaryButton'
 import { SecondaryButton } from './SecondaryButton'
 import { AlertPrimaryButton } from './AlertPrimaryButton'
-import { PrimaryFloatingButton } from './PrimaryFloatingButton'
 
 import type { Story, Meta } from '@storybook/react'
 
@@ -59,21 +58,4 @@ const AlertPrimaryButtonTemplate: Story<
 export const AlertPrimary = AlertPrimaryButtonTemplate.bind({})
 AlertPrimary.args = {
   children: 'alert tertiary button',
-}
-
-const PrimaryFloatingButtonTemplate: Story<
-  React.ComponentProps<typeof PrimaryFloatingButton>
-> = args => {
-  const { children } = args
-  return (
-    <Flex>
-      <PrimaryFloatingButton>{children}</PrimaryFloatingButton>
-    </Flex>
-  )
-}
-
-export const PrimaryFloating = PrimaryFloatingButton.bind({})
-PrimaryFloating.args = {
-  buttonText: 'primary floating button',
-  iconName: 'arrow-down',
 }

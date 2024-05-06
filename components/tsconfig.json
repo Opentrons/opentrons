@@ -8,8 +8,13 @@
   "compilerOptions": {
     "composite": true,
     "rootDir": "src",
-    "outDir": "lib",
+    "outDir": "lib"
   },
-  "include": ["typings", "src"],
+  "include": [
+    "typings",
+    "src",
+    "../opentrons-ai-client/src/molecules/PrimaryFloatingButton/index.tsx",
+    "../opentrons-ai-client/src/molecules/PrimaryFloatingButton/__tests__/PrimaryFloatingButton.test.tsx"
+  ],
   "exclude": ["**/*.stories.tsx"]
 }

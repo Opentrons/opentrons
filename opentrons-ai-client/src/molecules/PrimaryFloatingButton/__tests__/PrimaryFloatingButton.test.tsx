@@ -1,11 +1,10 @@
 import * as React from 'react'
 import { describe, it, beforeEach, expect } from 'vitest'
 import { fireEvent, screen } from '@testing-library/react'
-import '@testing-library/jest-dom/vitest'
-import { renderWithProviders } from '../../../testing/utils'
-import { BORDERS, COLORS } from '../../../helix-design-system'
-import { TYPOGRAPHY, SPACING } from '../../../ui-style-constants'
-import { PrimaryFloatingButton } from '../PrimaryFloatingButton'
+// import '@testing-library/jest-dom/vitest'
+import { BORDERS, COLORS, TYPOGRAPHY, SPACING } from '@opentrons/components'
+import { renderWithProviders } from '../../../__testing-utils__'
+import { PrimaryFloatingButton } from '../index'
 
 const render = (props: React.ComponentProps<typeof PrimaryFloatingButton>) => {
   return renderWithProviders(<PrimaryFloatingButton {...props} />)

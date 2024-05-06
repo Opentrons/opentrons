@@ -1,18 +1,20 @@
 import * as React from 'react'
 import { css } from 'styled-components'
-import { TYPOGRAPHY, SPACING } from '../../ui-style-constants'
-import { BORDERS, COLORS } from '../../helix-design-system'
-import { Icon } from '../../icons'
-import { Btn } from '../../primitives'
 import {
   ALIGN_CENTER,
+  BORDERS,
+  Btn,
+  COLORS,
   DIRECTION_ROW,
   DISPLAY_FLEX,
+  Icon,
   JUSTIFY_CENTER,
-} from '../../styles'
-import { StyledText } from '../StyledText'
+  SPACING,
+  StyledText,
+  TYPOGRAPHY,
+} from '@opentrons/components'
 
-import type { IconName } from '../../icons'
+import type { IconName } from '@opentrons/components/src/icons'
 
 interface PrimaryFloatingButtonProps {
   buttonText: string
