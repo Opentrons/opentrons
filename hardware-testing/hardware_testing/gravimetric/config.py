@@ -95,9 +95,9 @@ LIQUID_PROBE_SETTINGS: Dict[int, Dict[int, Dict[int, Dict[str, int]]]] = {
             50: {
                 "max_z_distance": 16,
                 "min_z_distance": 5,
-                "mount_speed": 5,
+                "mount_speed": 4,
                 "plunger_speed": 21,
-                "sensor_threshold_pascals": 150,
+                "sensor_threshold_pascals": 75,
             },
         },
         8: {
