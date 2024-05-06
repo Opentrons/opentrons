@@ -37,7 +37,6 @@ export function TiprackField(props: TiprackFieldProps): JSX.Element {
   )
 
   const hasMissingTiprack = defaultTiprackUris.length > tiprackOptions.length
-  console.log('tiprackOptions', tiprackOptions)
   return (
     <Box {...targetProps}>
       <FormGroup
