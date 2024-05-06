@@ -7,10 +7,10 @@ from typing import List, Optional
 
 from opentrons.legacy_commands.types import CommandMessage as LegacyCommand
 from opentrons.legacy_broker import LegacyBroker
+from opentrons.protocol_api.core.legacy.load_info import LoadInfo
 from opentrons.protocol_engine import AbstractPlugin, actions as pe_actions
 from opentrons.util.broker import ReadOnlyBroker
 
-from .legacy_wrappers import LegacyLoadInfo
 from .legacy_command_mapper import LegacyCommandMapper
 from .thread_async_queue import ThreadAsyncQueue
 
@@ -37,7 +37,7 @@ class LegacyContextPlugin(AbstractPlugin):
     def __init__(
         self,
         broker: LegacyBroker,
-        equipment_broker: ReadOnlyBroker[LegacyLoadInfo],
+        equipment_broker: ReadOnlyBroker[LoadInfo],
         legacy_command_mapper: Optional[LegacyCommandMapper] = None,
     ) -> None:
         """Initialize the plugin with its dependencies."""
@@ -122,15 +122,15 @@ class LegacyContextPlugin(AbstractPlugin):
         pass
 
     def _handle_legacy_command(self, command: LegacyCommand) -> None:
-        """Handle a command reported by the APIv2 protocol.
+        """Handle a command reported by the legacy APIv2 protocol.
 
         Used as a broker callback, so this will run in the APIv2 protocol's thread.
         """
         pe_actions = self._legacy_command_mapper.map_command(command=command)
         self._actions_to_dispatch.put(pe_actions)
 
-    def _handle_equipment_loaded(self, load_info: LegacyLoadInfo) -> None:
-        """Handle an equipment load reported by the APIv2 protocol.
+    def _handle_equipment_loaded(self, load_info: LoadInfo) -> None:
+        """Handle an equipment load reported by the legacy APIv2 protocol.
 
         Used as a broker callback, so this will run in the APIv2 protocol's thread.
         """
