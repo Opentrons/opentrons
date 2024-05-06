@@ -18,7 +18,7 @@ The Opentrons AI application's server.
    1. This allows formatting of of `.md` and `.json` files
 1. select the python version `pyenv local 3.12.3`
    1. This will create a `.python-version` file in this directory
-1. select the node version `nvs` currently 18.\*
+1. select the node version `nvs` currently 18.19\*
 1. Install pipenv and python dependencies `make setup`
 
 ## Install a dev dependency
