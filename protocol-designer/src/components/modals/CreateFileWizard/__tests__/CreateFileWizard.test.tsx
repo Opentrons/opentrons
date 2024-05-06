@@ -90,7 +90,8 @@ describe('CreateFileWizard', () => {
     next = screen.getByRole('button', { name: 'Next' })
     fireEvent.click(next)
     screen.getByText('Step 3 / 6')
-    //  select 10uL tipracks
+    //  un-select default 10uL tiprack then select again
+    fireEvent.click(screen.getByLabelText('EquipmentOption_flex_10uL tipracks'))
     fireEvent.click(screen.getByLabelText('EquipmentOption_flex_10uL tipracks'))
     next = screen.getByRole('button', { name: 'Next' })
     fireEvent.click(next)

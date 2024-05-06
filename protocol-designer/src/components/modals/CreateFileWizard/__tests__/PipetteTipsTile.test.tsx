@@ -52,8 +52,12 @@ const mockWizardTileProps: Partial<WizardTileProps> = {
   watch: vi.fn((name: keyof typeof values) => values[name]) as any,
 <<<<<<< HEAD
   getValues: vi.fn(() => values) as any,
+<<<<<<< HEAD
 =======
 >>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
+=======
+  setValue: vi.fn(),
+>>>>>>> 20540c5997 (fix(protocol-designer): default tiprack selection refreshing (#15100))
 }
 
 const fixtureTipRack10ul = {
