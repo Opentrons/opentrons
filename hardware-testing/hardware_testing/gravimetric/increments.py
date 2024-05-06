@@ -269,19 +269,24 @@ INCREMENTS = {
         1000: {  # FIXME: need to update based on DVT data
             50: {
                 "default": [
-                    2.000,
-                    3.000,
-                    4.000,
-                    5.000,
-                    6.000,
-                    7.000,
-                    8.000,
-                    9.000,
-                    10.000,
-                    15.000,
-                    25.000,
-                    40.000,
-                    60.000,
+                    1.00,
+                    1.66,  # 1.66ul nominal is close to 1.0uL measured
+                    2.33,  # "bump" seems to flatten BELOW here
+                    2.50,  # 2.5ul nominal is close to 2.0uL measured
+                    3.00,
+                    3.33,
+                    3.66,
+                    4.00,  # "bump" seems to peak around here (~3.1ul measured)
+                    4.33,
+                    4.66,
+                    5.00,
+                    5.33,  # "bump" seems to flatten ABOVE here
+                    5.66,  # 5.66ul nominal is close to 5.0uL measured
+                    6.66,
+                    10.70,  # 10.7ul nominal is close to 10.0uL measured
+                    25.00,
+                    55.00,  # 55ul nominal is close to 50uL measured
+                    60.00,
                 ],
             },
             200: {
