@@ -277,7 +277,7 @@ _dispense_defaults: Dict[int, Dict[int, Dict[int, Dict[int, DispenseSettings]]]]
                     delay=_default_dispense_delay_seconds,
                     z_retract_discontinuity=_default_retract_discontinuity,
                     z_retract_height=_default_retract_mm,
-                    blow_out_submerged=5,
+                    blow_out_submerged=7,
                 ),
                 10: DispenseSettings(  # 10uL
                     z_submerge_depth=_default_submerge_dispense_mm,
