@@ -17,16 +17,7 @@ from opentrons.hardware_control.modules.types import (
 from opentrons.hardware_control.types import BoardRevision
 
 from .interfaces import USBDriverInterface
-from .types import USBPort
-
-
-# Example usb path might look like:
-# '/sys/bus/usb/devices/usb1/1-1/1-1.3/1-1.3:1.0/tty/ttyACM1/dev'.
-# There is only 1 bus that supports USB on the raspberry pi.
-BUS_PATH = "/sys/bus/usb/devices/usb1/"
-PORT_PATTERN = r"(/\d-\d(\.?\d)+)+:"
-DEVICE_PATH = r"\d.\d/tty/tty(\w{4})/dev"
-USB_PORT_INFO = re.compile(PORT_PATTERN + DEVICE_PATH)
+from .types import BUS_PATH, USB_PORT_INFO, USBPort
 
 
 class USBBus(USBDriverInterface):
@@ -73,11 +64,9 @@ class USBBus(USBDriverInterface):
         active_ports = self._read_bus()
         port_matches = []
         for port in active_ports:
-            match = USB_PORT_INFO.search(port)
-            if match:
-                port_matches.append(
-                    USBPort.build(match.group(0).strip("/"), self._board_revision)
-                )
+            usb_port = USBPort.build(port.strip("/"), self._board_revision)
+            if usb_port:
+                port_matches.append(usb_port)
         return port_matches
 
     def match_virtual_ports(
@@ -110,5 +99,5 @@ class USBBus(USBDriverInterface):
                     vp.usb_port = p
                     sorted_virtual_ports.append(vp)
                     break
-
+                        
         return sorted_virtual_ports or virtual_ports
