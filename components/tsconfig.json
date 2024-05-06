@@ -10,11 +10,6 @@
     "rootDir": "src",
     "outDir": "lib"
   },
-  "include": [
-    "typings",
-    "src",
-    "../opentrons-ai-client/src/molecules/PrimaryFloatingButton/index.tsx",
-    "../opentrons-ai-client/src/molecules/PrimaryFloatingButton/__tests__/PrimaryFloatingButton.test.tsx"
-  ],
+  "include": ["typings", "src"],
   "exclude": ["**/*.stories.tsx"]
 }
