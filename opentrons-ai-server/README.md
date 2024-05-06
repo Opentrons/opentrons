@@ -48,3 +48,8 @@ The Opentrons AI application's server.
 
 [pytest]: https://docs.pytest.org/en/
 [openai python api library]: https://pypi.org/project/openai/
+
+## Deploy
+
+1. build the package `make build`
+1. deploy the package `make deploy ENV=sandbox AWS_PROFILE=robotics_ai_sandbox`

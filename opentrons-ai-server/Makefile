@@ -29,11 +29,11 @@ ruff-check:
 
 .PHONY: mypy
 mypy:
-	python -m pipenv run python -m mypy api
+	python -m pipenv run python -m mypy deploy.py api
 
 .PHONY: format-readme
 format-readme:
-	yarn prettier --ignore-path .eslintignore --write opentrons-ai-server/**/*.md
+	yarn prettier --ignore-path .eslintignore --write opentrons-ai-server/**/*.md opentrons-ai-server/**/*.json
 
 .PHONY: lint
 lint: black-check ruff-check mypy
@@ -51,7 +51,7 @@ format:
 fixup: format lint
 
 .PHONY: pre-commit
-pre-commit: fixup unit-test
+pre-commit: fixup unit-test install-deps
 	@echo "pre-commit checks passed"
 
 .PHONY: gen-env
@@ -67,41 +67,46 @@ clean-package:
 	rm -rf package
 	rm -f function.zip
 
-.PHONY: install-deps
-install-deps:
+.PHONY: gen-requirements
+gen-requirements:
 	@echo "Generating requirements.txt from Pipfile.lock..."
 	python -m pipenv requirements --hash > requirements.txt
+
+.PHONY: install-deps
+install-deps:
 	@echo "Installing dependencies to package/ directory..."
 	mkdir -p package
-	python -m pipenv run pip install -r requirements.txt --target ./package
+	python -m pipenv run pip install -r requirements.txt --target ./package --upgrade
 
 .PHONY: package-lambda
 package-lambda:
 	@echo "Copying source code to package/ directory..."
 	mkdir -p package
-	cp -r api/. package/
+	cp -r api/. package/api
 	@echo "Creating the deployment zip file..."
 	cd package && zip -r ../function.zip . && cd ..
 	@echo "Package created successfully."
 
-.PHONY: package
-package: clean-package install-deps package-lambda
+.PHONY: build
+build: clean-package install-deps package-lambda
 
 ALLOWED_ENVS := sandbox dev
 
-DEPLOY_ENV ?= sandbox
+ENV ?= sandbox
 
 .PHONY: validate-env
 validate-env:
-	@echo "Validating environment setting: $(DEPLOY_ENV)"
-	@if ! echo $(ALLOWED_ENVS) | grep -w $(DEPLOY_ENV) > /dev/null; then \
-		echo "ERROR: Invalid ENV setting '$(DEPLOY_ENV)'"; \
+	@echo "Validating environment setting: $(ENV)"
+	@if ! echo $(ALLOWED_ENVS) | grep -w $(ENV) > /dev/null; then \
+		echo "ERROR: Invalid ENV setting '$(ENV)'"; \
 		echo "Allowed values are: $(ALLOWED_ENVS)"; \
 		exit 1; \
 	fi
-	@echo "Environment setting is valid: $(DEPLOY_ENV)"
+	@echo "Environment setting is valid: $(ENV)"
+
+AWS_PROFILE = "must be set"
 
 .PHONY: deploy
 deploy: validate-env
-	@echo "Deploying to environment: $(DEPLOY_ENV)"
-	python -m pipenv run python deploy.py $(DEPLOY_ENV)
+	@echo "Deploying to environment: $(ENV)"
+	python -m pipenv run python deploy.py $(ENV)

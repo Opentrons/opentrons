@@ -41,9 +41,11 @@ class HTTPClient:
             response = self.client.request(method, url, **kwargs)
             return response
         except httpx.RequestError as e:
-            logger.info(f"An error occurred while requesting {e.request.url!r}.")
+            logger.error(f"An error occurred while requesting {e.request.url!r}.")
+            logger.exception(e)
         except httpx.HTTPStatusError as e:
-            logger.info(f"Non-success status code received: {e.response.status_code} for URL: {e.request.url!r}")
+            logger.error(f"Non-success status code received: {e.response.status_code} for URL: {e.request.url!r}")
+            logger.exception(e)
         finally:
             self.client.close()
         return response
@@ -62,9 +64,11 @@ class HTTPClient:
                 response = await client.request(method, endpoint, **kwargs)
                 return response
             except httpx.RequestError as e:
-                logger.info(f"An error occurred while requesting {e.request.url!r}.")
+                logger.error(f"An error occurred while requesting {e.request.url!r}.")
+                logger.exception(e)
             except httpx.HTTPStatusError as e:
-                logger.info(f"Non-success status code received: {e.response.status_code} for URL: {e.request.url!r}")
+                logger.error(f"Non-success status code received: {e.response.status_code} for URL: {e.request.url!r}")
+                logger.exception(e)
             finally:
                 self.client.close()
             return response

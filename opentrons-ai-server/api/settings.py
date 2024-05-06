@@ -1,7 +1,7 @@
 import os
 from pathlib import Path
 
-from aws_lambda_powertools.utilities import parameters
+import boto3
 from dotenv import load_dotenv
 from pydantic import (
     SecretStr,
@@ -13,16 +13,18 @@ ENV_PATH: Path = Path(Path(__file__).parent.parent, ".env")
 class Settings:
     def __init__(self) -> None:
         # Load environment variables from .env file if it exists
+        # These map to the the environment variables defined and set in teh
         load_dotenv(ENV_PATH)
         self.typicode_base_url: str = os.getenv("TYPICODE_BASE_URL", "https://jsonplaceholder.typicode.com")
         self.openai_base_url: str = os.getenv("OPENAI_BASE_URL", "https://api.openai.com")
         self.huggingface_base_url: str = os.getenv("HUGGINGFACE_BASE_URL", "https://api-inference.huggingface.co")
-        self.logging_level: str = os.getenv("LOGGING_LEVEL", "INFO")
+        self.log_level: str = os.getenv("LOG_LEVEL", "debug")
         self.service_name: str = os.getenv("SERVICE_NAME", "local-ai-api")
+        self.environment: str = os.getenv("ENVIRONMENT", "local")
         if is_running_on_lambda():
             # Fetch secrets from AWS Secrets manager using AWS Lambda Powertools
-            self.openai_api_key: SecretStr = self.fetch_secret("openai_api_key")
-            self.huggingface_api_key: SecretStr = self.fetch_secret("huggingface_api_key")
+            self.openai_api_key: SecretStr = self.fetch_secret(f"{self.environment}-openai-api-key")
+            self.huggingface_api_key: SecretStr = self.fetch_secret(f"{self.environment}-huggingface-api-key")
         else:
             # Use values from .env or defaults if not set
             self.openai_api_key = SecretStr(os.getenv("OPENAI_API_KEY", "default-openai-secret"))  # can change to throw
@@ -30,9 +32,10 @@ class Settings:
 
     @staticmethod
     def fetch_secret(secret_name: str) -> SecretStr:
-        """Fetch a secret using AWS Lambda Powertools Parameters utility."""
-        secret_value = parameters.get_secret(secret_name)
-        return SecretStr(secret_value)
+        """Fetch a secret using Boto3."""
+        client = boto3.client("secretsmanager")
+        response = client.get_secret_value(SecretId=secret_name)
+        return SecretStr(response["SecretString"])
 
 
 def generate_env_file(settings: Settings) -> None:

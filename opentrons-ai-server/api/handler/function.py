@@ -26,11 +26,12 @@ def get_todos() -> Response[Todos] | Response[dict[str, str]]:
         if len(todos) == 0:
             return Response(status_code=HTTPStatus.NOT_FOUND, content_type=content_types.APPLICATION_JSON, body=todos)
         return Response(status_code=HTTPStatus.FOUND, content_type=content_types.APPLICATION_JSON, body=todos)
-    except Exception:
+    except Exception as e:
+        logger.exception(e)
         return Response(
             status_code=HTTPStatus.INTERNAL_SERVER_ERROR,
             content_type=content_types.APPLICATION_JSON,
-            body={"error": "Internal server error"},
+            body={"error": str(e), "message": "An error occurred while retrieving todos"},
         )
 
 
