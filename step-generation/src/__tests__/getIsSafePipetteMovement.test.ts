@@ -14,6 +14,7 @@ import { InvariantContext, RobotState } from '../types'
 const mockLabwareId = 'labwareId'
 const mockPipId = 'pip'
 const mockTiprackId = 'tiprackId'
+const mockTipUri = 'mockTipUri'
 const mockModule = 'moduleId'
 const mockLabware2 = 'labwareId2'
 const mockAdapter = 'adapterId'
@@ -35,7 +36,7 @@ const mockInvariantProperties: InvariantContext = {
     },
     [mockTiprackId]: {
       id: mockTiprackId,
-      labwareDefURI: 'mockTipUri',
+      labwareDefURI: mockTipUri,
       def: fixtureTiprack1000ul as LabwareDefinition2,
     },
     [mockAdapter]: {
@@ -84,7 +85,7 @@ describe('getIsSafePipetteMovement', () => {
       },
       'mockId',
       'mockTrashBin',
-      'mockTiprackId',
+      mockTipUri,
       { x: 0, y: 0, z: 0 }
     )
     expect(result).toEqual(true)
@@ -95,7 +96,7 @@ describe('getIsSafePipetteMovement', () => {
       mockInvariantProperties,
       mockPipId,
       mockLabwareId,
-      mockTiprackId,
+      mockTipUri,
       { x: -12, y: -100, z: 20 }
     )
     expect(result).toEqual(false)
@@ -116,7 +117,7 @@ describe('getIsSafePipetteMovement', () => {
       mockInvariantProperties,
       mockPipId,
       mockLabwareId,
-      mockTiprackId,
+      mockTipUri,
       { x: -1, y: 5, z: 20 }
     )
     expect(result).toEqual(true)
@@ -128,7 +129,7 @@ describe('getIsSafePipetteMovement', () => {
       mockInvariantProperties,
       mockPipId,
       mockLabwareId,
-      mockTiprackId,
+      mockTipUri,
       { x: -1, y: 5, z: 0 }
     )
     expect(result).toEqual(false)
@@ -158,7 +159,7 @@ describe('getIsSafePipetteMovement', () => {
       mockInvariantProperties,
       mockPipId,
       mockLabwareId,
-      mockTiprackId,
+      mockTipUri,
       { x: 0, y: 0, z: 0 }
     )
     expect(result).toEqual(false)

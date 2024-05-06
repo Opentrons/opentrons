@@ -50,7 +50,7 @@
         "83a095fa-b649-4105-99d4-177f1a3f363a": {
           "pipette": "de7da440-95ec-43e8-8723-851321fbd6f9",
           "volume": "10",
-          "tipRack": "75aa666f-98d8-4af9-908e-963ced428580:opentrons/opentrons_flex_96_tiprack_50ul/1",
+          "tipRack": "opentrons/opentrons_flex_96_tiprack_50ul/1",
           "changeTip": "always",
           "path": "single",
           "aspirate_wells_grouped": false,
@@ -107,7 +107,7 @@
         "f5ea3139-1585-4848-9d5f-832eb88c99ca": {
           "pipette": "de7da440-95ec-43e8-8723-851321fbd6f9",
           "volume": "10",
-          "tipRack": "75aa666f-98d8-4af9-908e-963ced428580:opentrons/opentrons_flex_96_tiprack_50ul/1",
+          "tipRack": "opentrons/opentrons_flex_96_tiprack_50ul/1",
           "changeTip": "always",
           "path": "single",
           "aspirate_wells_grouped": false,

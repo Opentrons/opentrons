@@ -74,7 +74,7 @@
           "mix_touchTip_mmFromBottom": null,
           "dropTip_location": "5ba7047d-d3e2-4845-9eaa-1974af796ead:trashBin",
           "nozzles": null,
-          "tipRack": "f1c677c0-fc3a-11ea-8809-e959e7d61d96:opentrons/opentrons_96_tiprack_10ul/1",
+          "tipRack": "opentrons/opentrons_96_tiprack_10ul/1",
           "mix_x_position": 0,
           "mix_y_position": 0,
           "blowout_z_offset": 0,

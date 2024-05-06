@@ -107,7 +107,7 @@
         "3961e4c0-75c7-11ea-b42f-4b64e50f43e5": {
           "pipette": "0b3f2210-75c7-11ea-b42f-4b64e50f43e5",
           "volume": "30",
-          "tipRack": "0b44c760-75c7-11ea-b42f-4b64e50f43e5:opentrons/opentrons_96_tiprack_300ul/1",
+          "tipRack": "opentrons/opentrons_96_tiprack_300ul/1",
           "changeTip": "always",
           "path": "single",
           "aspirate_wells_grouped": false,

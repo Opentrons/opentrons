@@ -55,7 +55,7 @@
           "stepDetails": "",
           "pipette": "21087f15-4c03-4587-8a2b-1ba0b5a501a0",
           "volume": "10",
-          "tipRack": "0d39213c-49c2-4170-bf19-4c09e1b72aca:opentrons/opentrons_flex_96_tiprack_50ul/1",
+          "tipRack": "opentrons/opentrons_flex_96_tiprack_50ul/1",
           "changeTip": "always",
           "path": "single",
           "aspirate_wells_grouped": false,

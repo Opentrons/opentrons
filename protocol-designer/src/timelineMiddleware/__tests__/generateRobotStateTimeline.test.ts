@@ -10,6 +10,11 @@ import {
 } from '@opentrons/step-generation'
 import { generateRobotStateTimeline } from '../generateRobotStateTimeline'
 import type { StepArgsAndErrorsById } from '../../steplist'
+import {
+  LabwareDefinition2,
+  fixtureTiprack300ul,
+  getLabwareDefURI,
+} from '@opentrons/shared-data'
 
 vi.mock('../../labware-defs/utils')
 
@@ -49,7 +54,7 @@ describe('generateRobotStateTimeline', () => {
           mixBeforeAspirate: null,
           description: null,
           nozzles: null,
-          tipRack: 'tiprack1Id',
+          tipRack: getLabwareDefURI(fixtureTiprack300ul as LabwareDefinition2),
           aspirateXOffset: 0,
           aspirateYOffset: 0,
           dispenseXOffset: 0,
@@ -89,7 +94,7 @@ describe('generateRobotStateTimeline', () => {
           mixBeforeAspirate: null,
           description: null,
           nozzles: null,
-          tipRack: 'tiprack1Id',
+          tipRack: getLabwareDefURI(fixtureTiprack300ul as LabwareDefinition2),
           aspirateXOffset: 0,
           aspirateYOffset: 0,
           dispenseXOffset: 0,
@@ -121,7 +126,7 @@ describe('generateRobotStateTimeline', () => {
           aspirateDelaySeconds: null,
           dispenseDelaySeconds: null,
           nozzles: null,
-          tipRack: 'tiprack1Id',
+          tipRack: getLabwareDefURI(fixtureTiprack300ul as LabwareDefinition2),
           aspirateXOffset: 0,
           aspirateYOffset: 0,
           dispenseXOffset: 0,

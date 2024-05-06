@@ -73,7 +73,7 @@
         "3961e4c0-75c7-11ea-b42f-4b64e50f43e5": {
           "pipette": "0b3f2210-75c7-11ea-b42f-4b64e50f43e5",
           "volume": "40",
-          "tipRack": "0b44c760-75c7-11ea-b42f-4b64e50f43e5:opentrons/opentrons_96_tiprack_300ul/1",
+          "tipRack": "opentrons/opentrons_96_tiprack_300ul/1",
           "changeTip": "always",
           "path": "multiDispense",
           "aspirate_wells_grouped": false,
@@ -175,7 +175,7 @@
           "mix_touchTip_mmFromBottom": 11.8,
           "dropTip_location": "8053a205-f2dc-4b1d-8d05-bf8233949e2e:trashBin",
           "nozzles": null,
-          "tipRack": "0b44c760-75c7-11ea-b42f-4b64e50f43e5:opentrons/opentrons_96_tiprack_300ul/1",
+          "tipRack": "opentrons/opentrons_96_tiprack_300ul/1",
           "mix_x_position": 0,
           "mix_y_position": 0,
           "blowout_z_offset": 0,
