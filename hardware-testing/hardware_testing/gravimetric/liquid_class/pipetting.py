@@ -202,6 +202,7 @@ def _pipette_with_liquid_settings(  # noqa: C901
 
     def _reset_flow_rates() -> None:
         hw_api.set_flow_rate(
+            mount=hw_mount,
             aspirate=liquid_class.aspirate.plunger_flow_rate,
             dispense=liquid_class.dispense.plunger_flow_rate,
             blow_out=liquid_class.dispense.plunger_flow_rate,
@@ -213,6 +214,7 @@ def _pipette_with_liquid_settings(  # noqa: C901
     def _set_96ch_plunger_max_speeds() -> None:
         max_plunger_speed = DEFAULT_MAX_SPEEDS.high_throughput[OT3AxisKind.P]
         hw_api.set_pipette_speed(
+            mount=hw_mount,
             aspirate=max_plunger_speed,
             dispense=max_plunger_speed,
             blow_out=max_plunger_speed,
