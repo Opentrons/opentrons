@@ -174,6 +174,7 @@ def _pipette_with_liquid_settings(  # noqa: C901
     touch_tip: bool = False,
     mode: str = "",
     clear_accuracy_function: bool = False,
+    delay_after_backlash: float = 0,
 ) -> None:
     """Run a pipette given some Pipetting Liquid Settings."""
     # FIXME: stop using hwapi, and get those functions into core software
@@ -249,6 +250,10 @@ def _pipette_with_liquid_settings(  # noqa: C901
         hw_api.prepare_for_aspirate(hw_mount)
         if liquid_class.aspirate.leading_air_gap > 0:
             pipette.aspirate(liquid_class.aspirate.leading_air_gap)
+        if delay_after_backlash:
+            ctx.delay(
+                seconds=delay_after_backlash
+            )  # NOTE: (sigler) only needed for P1000 96ch low volumes
 
     def _aspirate_on_mix() -> None:
         callbacks.on_mixing()
@@ -396,6 +401,9 @@ def aspirate_with_liquid_class(
     liquid_class = get_liquid_class(
         pip_size, pipette.channels, tip_volume, int(aspirate_volume)
     )
+    delay_after_backlash = (
+        0 if pipette.channels < 96 else config.DELAY_AFTER_BACKLASH_96CH
+    )
     _pipette_with_liquid_settings(
         ctx,
         pipette,
@@ -410,6 +418,7 @@ def aspirate_with_liquid_class(
         touch_tip=touch_tip,
         mode=mode,
         clear_accuracy_function=clear_accuracy_function,
+        delay_after_backlash=delay_after_backlash,
     )
 
 

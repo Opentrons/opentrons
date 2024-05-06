@@ -75,6 +75,8 @@ SCALE_SECONDS_TO_TRUE_STABILIZE = 30
 
 LOW_VOLUME_UPPER_LIMIT_UL: Final = 2.0
 
+DELAY_AFTER_BACKLASH_96CH = 3.0  # NOTE: %D shifts downwards about 20% during first few seconds after backlash comp
+
 TOUCH_TIP_SPEED = 30
 
 GANTRY_MAX_SPEED = 40
