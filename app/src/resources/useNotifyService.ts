@@ -24,17 +24,20 @@ export interface QueryOptionsWithPolling<TData, TError = Error>
 
 interface UseNotifyServiceProps<TData, TError = Error> {
   topic: NotifyTopic
-  setRefetch: (refetch: HTTPRefetchFrequency) => void
   options: QueryOptionsWithPolling<TData, TError>
   hostOverride?: HostConfig | null
 }
 
+interface UseNotifyServiceResults {
+  notifyOnSettled: () => void
+  isNotifyEnabled: boolean
+}
+
 export function useNotifyService<TData, TError = Error>({
   topic,
-  setRefetch,
   options,
   hostOverride,
-}: UseNotifyServiceProps<TData, TError>): void {
+}: UseNotifyServiceProps<TData, TError>): UseNotifyServiceResults {
   const dispatch = useDispatch()
   const hostFromProvider = useHost()
   const host = hostOverride ?? hostFromProvider
@@ -46,6 +49,8 @@ export function useNotifyService<TData, TError = Error>({
   const hasUsedNotifyService = React.useRef(false)
 >>>>>>> 61be566d31 (fix(app): fix excessive /runs network requests (#14783))
   const seenHostname = React.useRef<string | null>(null)
+  const [refetch, setRefetch] = React.useState<HTTPRefetchFrequency>(null)
+
   const { enabled, staleTime, forceHttpPolling } = options
 
   const shouldUseNotifications =
@@ -96,7 +101,7 @@ export function useNotifyService<TData, TError = Error>({
     }
   }, [topic, hostname, shouldUseNotifications])
 
-  function onDataEvent(data: NotifyResponseData): void {
+  const onDataEvent = React.useCallback((data: NotifyResponseData): void => {
     if (data === 'ECONNFAILED' || data === 'ECONNREFUSED') {
       setRefetch('always')
 <<<<<<< HEAD
@@ -123,5 +128,13 @@ export function useNotifyService<TData, TError = Error>({
       setRefetch('once')
 >>>>>>> ef8db92660 (refactor(app, robot-server): Rename refetchUsingHTTP -> refetch (#14800))
     }
-  }
+  }, [])
+
+  const notifyOnSettled = React.useCallback(() => {
+    if (refetch === 'once') {
+      setRefetch(null)
+    }
+  }, [refetch])
+
+  return { notifyOnSettled, isNotifyEnabled: refetch != null }
 }

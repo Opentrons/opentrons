@@ -11,20 +11,28 @@ import { LEFT } from '@opentrons/shared-data'
 import { mockPipetteInfo } from '../../../redux/pipettes/__fixtures__'
 import { ROBOT_MODEL_OT3 } from '../../../redux/discovery'
 <<<<<<< HEAD
+<<<<<<< HEAD
 import { useNotifyCurrentMaintenanceRun } from '../../../resources/maintenance_runs'
 =======
 import { useNotifyCurrentMaintenanceRun } from '../../../resources/maintenance_runs/useNotifyCurrentMaintenanceRun'
 >>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
+=======
+import { useCloseCurrentRun } from '../../ProtocolUpload/hooks'
+>>>>>>> 123b2a5632 (refactor(app): refine useNotifyService (#15093))
 
 import type { PipetteModelSpecs } from '@opentrons/shared-data'
 import type { HostConfig } from '@opentrons/api-client'
 
+<<<<<<< HEAD
 <<<<<<< HEAD
 vi.mock('../../../resources/maintenance_runs')
 =======
 vi.mock('../../../resources/maintenance_runs/useNotifyCurrentMaintenanceRun')
 >>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
 vi.mock('../../../resources/useNotifyService')
+=======
+vi.mock('../../ProtocolUpload/hooks')
+>>>>>>> 123b2a5632 (refactor(app): refine useNotifyService (#15093))
 
 const MOCK_ACTUAL_PIPETTE = {
   ...mockPipetteInfo.pipetteSpecs,
@@ -61,12 +69,8 @@ const render = (pipetteSpecs: PipetteModelSpecs) => {
 
 describe('TipsAttachedModal', () => {
   beforeEach(() => {
-    vi.mocked(useNotifyCurrentMaintenanceRun).mockReturnValue({
-      data: {
-        data: {
-          id: 'test',
-        },
-      },
+    vi.mocked(useCloseCurrentRun).mockReturnValue({
+      closeCurrentRun: vi.fn(),
     } as any)
   })
 
