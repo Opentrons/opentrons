@@ -48,7 +48,7 @@
   "shaftDiameter": 4.5,
   "shaftULperMM": 15.904,
   "backlashDistance": 3.0,
-  "quirks": ["prepareForAspirateDelay"],
+  "quirks": [],
   "plungerHomingConfigurations": {
     "current": 0.8,
     "speed": 5
