@@ -3,7 +3,10 @@ import { fireEvent, screen } from '@testing-library/react'
 import { describe, it, beforeEach, vi } from 'vitest'
 import { renderWithProviders } from '../../../../../__testing-utils__'
 import {
+  MAGNETIC_BLOCK_D3_ADDRESSABLE_AREA,
+  MAGNETIC_BLOCK_V1_FIXTURE,
   SINGLE_RIGHT_SLOT_FIXTURE,
+  STAGING_AREA_SLOT_WITH_MAGNETIC_BLOCK_V1_FIXTURE,
   STAGING_AREA_SLOT_WITH_WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE,
   TRASH_BIN_ADAPTER_FIXTURE,
 } from '@opentrons/shared-data'
@@ -118,5 +121,26 @@ describe('SetupFixtureList', () => {
     screen.getByText('Not configured')
     fireEvent.click(screen.getByRole('button', { name: 'Resolve' }))
     screen.getByText('mock not configured modal')
+  })
+  it('should render a magnetic block with a conflicted fixture', () => {
+    props = {
+      deckConfigCompatibility: [
+        {
+          cutoutId: 'cutoutD3',
+          cutoutFixtureId: MAGNETIC_BLOCK_V1_FIXTURE,
+          requiredAddressableAreas: [MAGNETIC_BLOCK_D3_ADDRESSABLE_AREA, 'D4'],
+          compatibleCutoutFixtureIds: [
+            STAGING_AREA_SLOT_WITH_MAGNETIC_BLOCK_V1_FIXTURE,
+          ],
+          missingLabwareDisplayName: null,
+        },
+      ],
+      robotName: 'otie',
+    }
+    render(props)
+    screen.getByText('Location conflict')
+    screen.getByText('Magnetic Block GEN1 with staging area slot')
+    fireEvent.click(screen.getByRole('button', { name: 'Resolve' }))
+    screen.getByText('mock location conflict modal')
   })
 })

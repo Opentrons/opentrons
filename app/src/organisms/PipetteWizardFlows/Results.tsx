@@ -12,19 +12,19 @@ import {
   StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
-import {
-  getPipetteNameSpecs,
-  LEFT,
-  RIGHT,
-  LoadedPipette,
-  MotorAxes,
-  NINETY_SIX_CHANNEL,
-} from '@opentrons/shared-data'
+import { LEFT, RIGHT, NINETY_SIX_CHANNEL } from '@opentrons/shared-data'
+import { SmallButton } from '../../atoms/buttons'
 import { InProgressModal } from '../../molecules/InProgressModal/InProgressModal'
 import { SimpleWizardBody } from '../../molecules/SimpleWizardBody'
-import { SmallButton } from '../../atoms/buttons'
+import { usePipetteNameSpecs } from '../../resources/instruments/hooks'
 import { CheckPipetteButton } from './CheckPipetteButton'
 import { FLOWS } from './constants'
+
+import type {
+  LoadedPipette,
+  MotorAxes,
+  PipetteName,
+} from '@opentrons/shared-data'
 import type { PipetteWizardStepProps } from './types'
 
 interface ResultsProps extends PipetteWizardStepProps {
@@ -71,10 +71,11 @@ export const Results = (props: ResultsProps): JSX.Element => {
   const isCorrectPipette =
     requiredPipette != null &&
     requiredPipette.pipetteName === attachedPipettes[mount]?.instrumentName
+
   const requiredPipDisplayName =
-    requiredPipette != null
-      ? getPipetteNameSpecs(requiredPipette.pipetteName)?.displayName
-      : null
+    usePipetteNameSpecs(requiredPipette?.pipetteName as PipetteName)
+      ?.displayName ?? null
+
   const [numberOfTryAgains, setNumberOfTryAgains] = React.useState<number>(0)
   let header: string = 'unknown results screen'
   let iconColor: string = COLORS.green50

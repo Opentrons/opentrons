@@ -178,8 +178,6 @@ export const mix: CommandCreator<MixArgs> = (
     return { errors: [errorCreators.dropTipLocationDoesNotExist()] }
   }
 
-  console.log(invariantContext.pipetteEntities[pipette])
-
   if (is96Channel && data.nozzles === COLUMN) {
     const isAspirateSafePipetteMovement = getIsSafePipetteMovement(
       prevRobotState,

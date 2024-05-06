@@ -7,9 +7,12 @@ import pytest
 from automation.data.protocol import Protocol
 from automation.data.protocol_registry import ProtocolRegistry
 from citools.generate_analyses import ANALYSIS_SUFFIX, generate_analyses_from_test
+from rich.console import Console
 from syrupy.extensions.json import JSONSnapshotExtension
 from syrupy.filters import props
 from syrupy.types import SerializableData
+
+console = Console()
 
 # not included in the snapshot
 exclude = props(
@@ -99,6 +102,7 @@ def test_analysis_snapshot(analyze_protocols: None, snapshot_json: SerializableD
         "analysis_results",
         f"{protocol.file_stem}_{target}_{ANALYSIS_SUFFIX}",
     )
+    console.print(f"Analysis file: {analysis}")
     if analysis.exists():
         with open(analysis, "r") as f:
             data = json.load(f)

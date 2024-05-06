@@ -35,13 +35,13 @@ import { RunPausedSplash } from '../../../organisms/OnDeviceDisplay/RunningProto
 import { OpenDoorAlertModal } from '../../../organisms/OpenDoorAlertModal'
 import { RunningProtocol } from '..'
 import {
-  useNotifyLastRunCommandKey,
+  useNotifyLastRunCommand,
   useNotifyRunQuery,
 } from '../../../resources/runs'
 import { useFeatureFlag } from '../../../redux/config'
 
 import type { UseQueryResult } from 'react-query'
-import type { ProtocolAnalyses } from '@opentrons/api-client'
+import type { ProtocolAnalyses, RunCommandSummary } from '@opentrons/api-client'
 
 vi.mock('@opentrons/react-api-client')
 vi.mock('../../../organisms/Devices/hooks')
@@ -137,9 +137,9 @@ describe('RunningProtocol', () => {
     when(vi.mocked(useAllCommandsQuery))
       .calledWith(RUN_ID, { cursor: null, pageLength: 1 })
       .thenReturn(mockUseAllCommandsResponseNonDeterministic)
-    vi.mocked(useNotifyLastRunCommandKey).mockReturnValue({
-      data: {},
-    } as any)
+    vi.mocked(useNotifyLastRunCommand).mockReturnValue({
+      key: 'FAKE_COMMAND_KEY',
+    } as RunCommandSummary)
     when(vi.mocked(useFeatureFlag))
       .calledWith('enableRunNotes')
       .thenReturn(true)

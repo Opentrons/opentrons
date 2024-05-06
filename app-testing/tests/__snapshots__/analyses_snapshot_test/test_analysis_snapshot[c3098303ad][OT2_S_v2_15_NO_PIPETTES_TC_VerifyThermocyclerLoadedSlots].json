@@ -1,0 +1,176 @@
+{
+  "commands": [
+    {
+      "commandType": "home",
+      "notes": [],
+      "params": {},
+      "result": {},
+      "status": "succeeded"
+    },
+    {
+      "commandType": "loadModule",
+      "notes": [],
+      "params": {
+        "location": {
+          "slotName": "7"
+        },
+        "model": "thermocyclerModuleV2"
+      },
+      "result": {
+        "definition": {
+          "calibrationPoint": {
+            "x": 14.4,
+            "y": 64.93,
+            "z": 97.8
+          },
+          "compatibleWith": [],
+          "dimensions": {
+            "bareOverallHeight": 108.96,
+            "lidHeight": 61.7,
+            "overLabwareHeight": 0.0
+          },
+          "displayName": "Thermocycler Module GEN2",
+          "gripperOffsets": {
+            "default": {
+              "dropOffset": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 5.6
+              },
+              "pickUpOffset": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 4.6
+              }
+            }
+          },
+          "labwareOffset": {
+            "x": 0.0,
+            "y": 68.8,
+            "z": 108.96
+          },
+          "model": "thermocyclerModuleV2",
+          "moduleType": "thermocyclerModuleType",
+          "otSharedSchema": "module/schemas/2",
+          "quirks": [],
+          "slotTransforms": {
+            "ot3_standard": {
+              "B1": {
+                "cornerOffsetFromSlot": [
+                  [
+                    -98,
+                    0,
+                    0,
+                    1
+                  ],
+                  [
+                    -20.005,
+                    0,
+                    0,
+                    1
+                  ],
+                  [
+                    -0.84,
+                    0,
+                    0,
+                    1
+                  ],
+                  [
+                    0,
+                    0,
+                    0,
+                    1
+                  ]
+                ],
+                "labwareOffset": [
+                  [
+                    -98,
+                    0,
+                    0,
+                    1
+                  ],
+                  [
+                    -20.005,
+                    0,
+                    0,
+                    1
+                  ],
+                  [
+                    -0.84,
+                    0,
+                    0,
+                    1
+                  ],
+                  [
+                    0,
+                    0,
+                    0,
+                    1
+                  ]
+                ]
+              }
+            }
+          }
+        },
+        "model": "thermocyclerModuleV2"
+      },
+      "status": "succeeded"
+    }
+  ],
+  "config": {
+    "apiVersion": [
+      2,
+      15
+    ],
+    "protocolType": "python"
+  },
+  "errors": [],
+  "files": [
+    {
+      "name": "OT2_S_v2_15_NO_PIPETTES_TC_VerifyThermocyclerLoadedSlots.py",
+      "role": "main"
+    },
+    {
+      "name": "cpx_4_tuberack_100ul.json",
+      "role": "labware"
+    },
+    {
+      "name": "opentrons_ot3_96_tiprack_1000ul_rss.json",
+      "role": "labware"
+    },
+    {
+      "name": "opentrons_ot3_96_tiprack_200ul_rss.json",
+      "role": "labware"
+    },
+    {
+      "name": "opentrons_ot3_96_tiprack_50ul_rss.json",
+      "role": "labware"
+    },
+    {
+      "name": "sample_labware.json",
+      "role": "labware"
+    }
+  ],
+  "labware": [
+    {
+      "definitionUri": "opentrons/opentrons_1_trash_1100ml_fixed/1",
+      "loadName": "opentrons_1_trash_1100ml_fixed",
+      "location": {
+        "slotName": "12"
+      }
+    }
+  ],
+  "liquids": [],
+  "metadata": {},
+  "modules": [
+    {
+      "location": {
+        "slotName": "7"
+      },
+      "model": "thermocyclerModuleV2"
+    }
+  ],
+  "pipettes": [],
+  "robotType": "OT-2 Standard",
+  "runTimeParameters": []
+}

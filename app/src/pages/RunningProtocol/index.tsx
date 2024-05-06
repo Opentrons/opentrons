@@ -18,7 +18,6 @@ import {
   useSwipe,
 } from '@opentrons/components'
 import {
-  useAllCommandsQuery,
   useProtocolQuery,
   useRunActionMutations,
 } from '@opentrons/react-api-client'
@@ -32,7 +31,7 @@ import { useFeatureFlag } from '../../redux/config'
 import { StepMeter } from '../../atoms/StepMeter'
 import { useMostRecentCompletedAnalysis } from '../../organisms/LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import {
-  useNotifyLastRunCommandKey,
+  useNotifyLastRunCommand,
   useNotifyRunQuery,
 } from '../../resources/runs'
 import { InterventionModal } from '../../organisms/InterventionModal'
@@ -56,6 +55,7 @@ import { ConfirmCancelRunModal } from '../../organisms/OnDeviceDisplay/RunningPr
 import { RunPausedSplash } from '../../organisms/OnDeviceDisplay/RunningProtocol/RunPausedSplash'
 import { getLocalRobot } from '../../redux/discovery'
 import { OpenDoorAlertModal } from '../../organisms/OpenDoorAlertModal'
+import { ErrorRecoveryFlows } from '../../organisms/ErrorRecoveryFlows'
 
 import type { OnDeviceRouteParams } from '../../App/types'
 
@@ -95,17 +95,19 @@ export function RunningProtocol(): JSX.Element {
   const lastAnimatedCommand = React.useRef<string | null>(null)
   const swipe = useSwipe()
   const robotSideAnalysis = useMostRecentCompletedAnalysis(runId)
-  const currentRunCommandKey = useNotifyLastRunCommandKey(runId, {
+  const lastRunCommand = useNotifyLastRunCommand(runId, {
     refetchInterval: LIVE_RUN_COMMANDS_POLL_MS,
   })
+
   const totalIndex = robotSideAnalysis?.commands.length
   const currentRunCommandIndex = robotSideAnalysis?.commands.findIndex(
-    c => c.key === currentRunCommandKey
+    c => c.key === lastRunCommand?.key
   )
   const runStatus = useRunStatus(runId, {
     refetchInterval: RUN_STATUS_REFETCH_INTERVAL,
   })
   const [enableSplash, setEnableSplash] = React.useState(true)
+  const [showErrorRecovery, setShowErrorRecovery] = React.useState(false)
   const { startedAt, stoppedAt, completedAt } = useRunTimestamps(runId)
   const { data: runRecord } = useNotifyRunQuery(runId, { staleTime: Infinity })
   const protocolId = runRecord?.data.protocolId ?? null
@@ -143,12 +145,6 @@ export function RunningProtocol(): JSX.Element {
     }
   }, [currentOption, swipe, swipe.setSwipeType])
 
-  const { data: allCommandsQueryData } = useAllCommandsQuery(runId, {
-    cursor: null,
-    pageLength: 1,
-  })
-  const lastRunCommand = allCommandsQueryData?.data[0] ?? null
-
   React.useEffect(() => {
     if (
       lastRunCommand != null &&
@@ -166,13 +162,21 @@ export function RunningProtocol(): JSX.Element {
     }
   }, [lastRunCommand, interventionModalCommandKey])
 
+  const handleCompleteRecovery = (): void => {
+    setShowErrorRecovery(false)
+    setEnableSplash(false)
+  }
+
   return (
     <>
+      {showErrorRecovery ? (
+        <ErrorRecoveryFlows onComplete={handleCompleteRecovery} />
+      ) : null}
       {enableSplash &&
       runStatus === RUN_STATUS_AWAITING_RECOVERY &&
       enableRunNotes ? (
         <RunPausedSplash
-          onClose={() => setEnableSplash(false)}
+          onClick={() => setShowErrorRecovery(true)}
           errorType={errorType}
           protocolName={protocolName}
         />
@@ -242,6 +246,7 @@ export function RunningProtocol(): JSX.Element {
                       stoppedAt,
                       completedAt,
                     }}
+                    lastRunCommand={lastRunCommand}
                     lastAnimatedCommand={lastAnimatedCommand.current}
                     updateLastAnimatedCommand={(newCommandKey: string) =>
                       (lastAnimatedCommand.current = newCommandKey)

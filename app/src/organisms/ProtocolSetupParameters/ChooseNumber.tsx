@@ -152,7 +152,7 @@ export function ChooseNumber({
           <NumericalKeyboard
             keyboardRef={keyboardRef}
             isDecimal={parameter.type === 'float'}
-            hasHyphen
+            hasHyphen={min < 0 || max < min}
             onChange={e => {
               handleKeyboardInput(e)
             }}

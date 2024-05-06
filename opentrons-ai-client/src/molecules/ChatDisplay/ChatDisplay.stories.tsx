@@ -24,7 +24,9 @@ type Story = StoryObj<typeof ChatDisplay>
 
 export const OpentronsAI: Story = {
   args: {
-    content: `
+    chat: {
+      role: 'assistant',
+      content: `
 ## sample output from OpentronsAI
 
 \`\`\`py
@@ -50,13 +52,15 @@ def run(protocol: protocol_api.ProtocolContext):
     TEMP_DECK_WAIT_TIME = 50  # seconds
 \`\`\`
 `,
-    isUserInput: false,
+    },
   },
 }
 
 export const User: Story = {
   args: {
-    content: `
+    chat: {
+      role: 'user',
+      content: `
     - Application: Reagent transfer
     - Robot: OT-2
     - API: 2.13
@@ -76,6 +80,6 @@ export const User: Story = {
     to first well in the destination labware.
     Use  new tip for each transfer.
     `,
-    isUserInput: true,
+    },
   },
 }

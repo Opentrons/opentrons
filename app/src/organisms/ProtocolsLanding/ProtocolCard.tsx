@@ -184,8 +184,20 @@ function AnalysisInfo(props: AnalysisInfoProps): JSX.Element {
                 size={SIZE_3}
               />
             ),
-            error: <Box size="6rem" backgroundColor={COLORS.grey30} />,
-            stale: <Box size="6rem" backgroundColor={COLORS.grey30} />,
+            error: (
+              <Box
+                size="6rem"
+                backgroundColor={COLORS.grey30}
+                borderRadius={SPACING.spacing8}
+              />
+            ),
+            stale: (
+              <Box
+                size="6rem"
+                backgroundColor={COLORS.grey30}
+                borderRadius={SPACING.spacing8}
+              />
+            ),
             complete:
               mostRecentAnalysis != null ? (
                 <ProtocolDeck protocolAnalysis={mostRecentAnalysis} />

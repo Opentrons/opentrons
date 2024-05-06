@@ -1,3 +1,4 @@
+import json
 from copy import deepcopy
 from datetime import datetime
 from typing import Any, AsyncGenerator, Dict, NamedTuple, cast
@@ -250,6 +251,9 @@ async def test_run_commands_persist(client_and_server: ClientServerFixture) -> N
     get_persisted_command_response = await client.get_run_command(
         run_id=run_id, command_id=command_id
     )
+    get_preserialized_commands_response = await client.get_preserialized_commands(
+        run_id=run_id
+    )
 
     # ensure the persisted commands still match the original ones
     assert get_all_persisted_commands_response.json()["data"] == [
@@ -258,6 +262,11 @@ async def test_run_commands_persist(client_and_server: ClientServerFixture) -> N
         {k: v for k, v in expected_command.items() if k != "result"}
     ]
     assert get_persisted_command_response.json()["data"] == expected_command
+
+    json_converted_command = json.loads(
+        get_preserialized_commands_response.json()["data"][0]
+    )
+    assert json_converted_command == expected_command
 
 
 async def test_runs_completed_started_at_persist_via_actions_router(
