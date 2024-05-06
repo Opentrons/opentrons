@@ -883,14 +883,14 @@ export function ProtocolSetup(): JSX.Element {
   return (
     <>
       {showAnalysisFailedModal &&
-        analysisErrors != null &&
-        analysisErrors?.length > 0 && (
-          <AnalysisFailedModal
-            setShowAnalysisFailedModal={setShowAnalysisFailedModal}
-            protocolId={runRecord?.data.protocolId ?? null}
-            errors={analysisErrors.map(error => error.detail)}
-          />
-        )}
+      analysisErrors != null &&
+      analysisErrors?.length > 0 ? (
+        <AnalysisFailedModal
+          setShowAnalysisFailedModal={setShowAnalysisFailedModal}
+          protocolId={runRecord?.data.protocolId ?? null}
+          errors={analysisErrors.map(error => error.detail)}
+        />
+      ) : null}
       {showConfirmationModal ? (
         <ConfirmAttachedModal
           onCloseClick={cancelExit}
