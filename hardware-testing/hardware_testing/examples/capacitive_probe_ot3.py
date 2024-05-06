@@ -44,7 +44,7 @@ PROBE_SETTINGS_Z_AXIS = CapacitivePassSettings(
     max_overrun_distance_mm=3,
     speed_mm_per_s=1,
     sensor_threshold_pf=STABLE_CAP_PF,
-    output_option=OutputOptions.can_bus_only,
+    output_option=OutputOptions.sync_only,
     data_file="fake_file_name",
 )
 PROBE_SETTINGS_XY_AXIS = CapacitivePassSettings(
@@ -52,7 +52,7 @@ PROBE_SETTINGS_XY_AXIS = CapacitivePassSettings(
     max_overrun_distance_mm=3,
     speed_mm_per_s=1,
     sensor_threshold_pf=STABLE_CAP_PF,
-    output_option=OutputOptions.can_bus_only,
+    output_option=OutputOptions.sync_only,
     data_file="fake_file_name",
 )
 

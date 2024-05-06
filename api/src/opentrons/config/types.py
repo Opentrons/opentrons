@@ -103,7 +103,6 @@ class OT3CurrentSettings:
         )
 
 
-# str enum so it can be json serializable
 class OutputOptions(int, Enum):
     """Specifies where we should report sensor data to during a sensor pass."""
 

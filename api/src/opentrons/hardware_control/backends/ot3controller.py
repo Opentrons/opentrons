@@ -1401,7 +1401,7 @@ class OT3Controller(FlexBackend):
         speed_mm_per_s: float,
         sensor_threshold_pf: float,
         probe: InstrumentProbeType,
-        output_option: OutputOptions = OutputOptions.can_bus_only,
+        output_option: OutputOptions = OutputOptions.sync_only,
         data_file: Optional[str] = None,
     ) -> bool:
         if output_option == OutputOptions.sync_buffer_to_csv:

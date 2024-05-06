@@ -107,7 +107,7 @@ def fake_settings() -> CapacitivePassSettings:
         max_overrun_distance_mm=2,
         speed_mm_per_s=4,
         sensor_threshold_pf=1.0,
-        output_option=OutputOptions.can_bus_only,
+        output_option=OutputOptions.sync_only,
         data_file="fake_file_name",
     )
 
@@ -488,7 +488,7 @@ def mock_backend_capacitive_probe(
             speed_mm_per_s: float,
             threshold_pf: float,
             probe: InstrumentProbeType,
-            output_option: OutputOptions = OutputOptions.can_bus_only,
+            output_option: OutputOptions = OutputOptions.sync_only,
             data_file: Optional[str] = None,
         ) -> None:
             hardware_backend._position[moving] += distance_mm / 2

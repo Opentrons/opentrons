@@ -420,8 +420,7 @@ class MoveStopCondition(int, Enum):
     stall = 0x10
     ignore_stalls = 0x20
     limit_switch_backoff = 0x40
-    pressure_sensor_report = 0x80
-    capacitive_sensor_report = 0x81  # make sure this format works with firmware!!!
+    sensor_report = 0x80
 
 
 @unique

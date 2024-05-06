@@ -308,10 +308,10 @@ class MoveGroupRunner:
                 ),
             )
             return HomeRequest(payload=home_payload)
-        elif step.move_type == MoveType.pressure_sensor:
+        elif step.move_type == MoveType.sensor:
             # stop_condition = step.stop_condition.value
             stop_condition = MoveStopCondition.sync_line
-            sensor_move_payload = AddSensorLinearMoveBasePayload(
+            sensor_move_payload = AddSensorLinearMoveBasePayload( # need to create unique pressure and capacitive moves. S0 and S1 too? Check Ryan's work
                 request_stop_condition=MoveStopConditionField(stop_condition),
                 group_id=UInt8Field(group),
                 seq_id=UInt8Field(seq),
@@ -330,34 +330,8 @@ class MoveGroupRunner:
                 velocity_mm=Int32Field(
                     int((step.velocity_mm_sec / interrupts_per_sec) * (2**31))
                 ),
-                sensor_id=SensorIdField(SensorId.S0),
-                sensor_type=SensorTypeField(SensorType.pressure),
-            )
-            return AddSensorLinearMoveRequest(payload=sensor_move_payload)
-        elif step.move_type == MoveType.capacitive_sensor:
-            # stop_condition = step.stop_condition.value
-            stop_condition = MoveStopCondition.sync_line
-            sensor_move_payload = AddSensorLinearMoveBasePayload(
-                request_stop_condition=MoveStopConditionField(stop_condition),
-                group_id=UInt8Field(group),
-                seq_id=UInt8Field(seq),
-                duration=UInt32Field(int(step.duration_sec * interrupts_per_sec)),
-                acceleration_um=Int32Field(
-                    int(
-                        (
-                            step.acceleration_mm_sec_sq
-                            * 1000.0
-                            / interrupts_per_sec
-                            / interrupts_per_sec
-                        )
-                        * (2**31)
-                    )
-                ),
-                velocity_mm=Int32Field(
-                    int((step.velocity_mm_sec / interrupts_per_sec) * (2**31))
-                ),
-                sensor_id=SensorIdField(SensorId.S0),
-                sensor_type=SensorTypeField(SensorType.capacitive),
+                sensor_type=SensorTypeField(step.sensor_type),
+                sensor_id=SensorIdField(step.sensor_id),
             )
             return AddSensorLinearMoveRequest(payload=sensor_move_payload)
         else:

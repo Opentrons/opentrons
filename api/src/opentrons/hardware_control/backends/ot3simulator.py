@@ -749,7 +749,7 @@ class OT3Simulator(FlexBackend):
         speed_mm_per_s: float,
         sensor_threshold_pf: float,
         probe: InstrumentProbeType,
-        output_format: OutputOptions = OutputOptions.can_bus_only,
+        output_format: OutputOptions = OutputOptions.sync_only,
         data_file: Optional[str] = None,
     ) -> bool:
         self._position[moving] += distance_mm

@@ -73,7 +73,7 @@ ALUMINUM_SEAL_SETTINGS = CapacitivePassSettings(
     max_overrun_distance_mm=1,
     speed_mm_per_s=1,
     sensor_threshold_pf=0.5,
-    output_option=OutputOptions.can_bus_only,
+    output_option=OutputOptions.sync_only,
     data_file="fake_file_name",
 )
 LABWARE_PROBE_CORNER_TOP_LEFT_XY = {
