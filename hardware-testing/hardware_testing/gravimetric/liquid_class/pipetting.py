@@ -2,7 +2,10 @@
 from dataclasses import dataclass
 from typing import Optional, Callable, Tuple
 
-from opentrons.config.defaults_ot3 import DEFAULT_MAX_SPEED_DISCONTINUITY
+from opentrons.config.defaults_ot3 import (
+    DEFAULT_MAX_SPEED_DISCONTINUITY,
+    DEFAULT_MAX_SPEEDS,
+)
 from opentrons.protocol_api import InstrumentContext, ProtocolContext
 from opentrons.protocol_api.labware import Well
 
@@ -174,7 +177,6 @@ def _pipette_with_liquid_settings(  # noqa: C901
     touch_tip: bool = False,
     mode: str = "",
     clear_accuracy_function: bool = False,
-    delay_after_backlash: float = 0,
 ) -> None:
     """Run a pipette given some Pipetting Liquid Settings."""
     # FIXME: stop using hwapi, and get those functions into core software
@@ -182,6 +184,27 @@ def _pipette_with_liquid_settings(  # noqa: C901
     hw_mount = OT3Mount.LEFT if pipette.mount == "left" else OT3Mount.RIGHT
     hw_pipette = hw_api.hardware_pipettes[hw_mount.to_mount()]
     _check_aspirate_dispense_args(mix, aspirate, dispense)
+
+    def _reset_flow_rates() -> None:
+        hw_api.set_flow_rate(
+            aspirate=liquid_class.aspirate.plunger_flow_rate,
+            dispense=liquid_class.dispense.plunger_flow_rate,
+            blow_out=liquid_class.dispense.plunger_flow_rate,
+        )
+        pipette.flow_rate.aspirate = liquid_class.aspirate.plunger_flow_rate
+        pipette.flow_rate.dispense = liquid_class.dispense.plunger_flow_rate
+        pipette.flow_rate.blow_out = liquid_class.dispense.plunger_flow_rate
+
+    def _set_96ch_plunger_max_speeds() -> None:
+        max_plunger_speed = DEFAULT_MAX_SPEEDS.high_throughput[OT3AxisKind.P]
+        hw_api.set_pipette_speed(
+            aspirate=max_plunger_speed,
+            dispense=max_plunger_speed,
+            blow_out=max_plunger_speed,
+        )
+        pipette.speed.aspirate = max_plunger_speed
+        pipette.speed.dispense = max_plunger_speed
+        pipette.speed.blow_out = max_plunger_speed
 
     def _get_max_blow_out_ul() -> float:
         # NOTE: calculated using blow-out distance (mm) and the nominal ul-per-mm
@@ -247,13 +270,14 @@ def _pipette_with_liquid_settings(  # noqa: C901
             hw_api.configure_for_volume(hw_mount, aspirate if aspirate else dispense)
         if clear_accuracy_function:
             clear_pipette_ul_per_mm(hw_api, hw_mount)  # type: ignore[arg-type]
+        if pipette.channels == 96:
+            _set_96ch_plunger_max_speeds()
         hw_api.prepare_for_aspirate(hw_mount)
+        _reset_flow_rates()
+        if pipette.channels == 96 and (clear_accuracy_function or aspirate <= 5.0):
+            ctx.delay(seconds=config.DELAY_AFTER_BACKLASH_96CH_LOW_VOLUMES)
         if liquid_class.aspirate.leading_air_gap > 0:
             pipette.aspirate(liquid_class.aspirate.leading_air_gap)
-        if delay_after_backlash:
-            ctx.delay(
-                seconds=delay_after_backlash
-            )  # NOTE: (sigler) only needed for P1000 96ch low volumes
 
     def _aspirate_on_mix() -> None:
         callbacks.on_mixing()
@@ -320,9 +344,7 @@ def _pipette_with_liquid_settings(  # noqa: C901
         pipette.aspirate(liquid_class.aspirate.trailing_air_gap)
 
     # PHASE 1: APPROACH
-    pipette.flow_rate.aspirate = liquid_class.aspirate.plunger_flow_rate
-    pipette.flow_rate.dispense = liquid_class.dispense.plunger_flow_rate
-    pipette.flow_rate.blow_out = liquid_class.dispense.plunger_flow_rate
+    _reset_flow_rates()
     pipette.move_to(well.bottom(approach_mm).move(channel_offset))
     _aspirate_on_approach() if aspirate or mix else _dispense_on_approach()
 
@@ -401,9 +423,6 @@ def aspirate_with_liquid_class(
     liquid_class = get_liquid_class(
         pip_size, pipette.channels, tip_volume, int(aspirate_volume)
     )
-    delay_after_backlash = (
-        0 if pipette.channels < 96 else config.DELAY_AFTER_BACKLASH_96CH
-    )
     _pipette_with_liquid_settings(
         ctx,
         pipette,
@@ -418,7 +437,6 @@ def aspirate_with_liquid_class(
         touch_tip=touch_tip,
         mode=mode,
         clear_accuracy_function=clear_accuracy_function,
-        delay_after_backlash=delay_after_backlash,
     )
 
 
