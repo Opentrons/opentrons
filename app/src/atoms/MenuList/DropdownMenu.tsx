@@ -70,19 +70,19 @@ export function DropdownMenu(props: DropdownMenuProps): JSX.Element {
   >('bottom')
 
   React.useEffect(() => {
-    const handlePositionCalculation = () => {
+    const handlePositionCalculation = (): void => {
       const dropdownRect = dropDownMenuWrapperRef.current?.getBoundingClientRect()
-      if (dropdownRect) {
-        const parentElement = dropDownMenuWrapperRef.current.parentElement
+      if (dropdownRect != null) {
+        const parentElement = dropDownMenuWrapperRef?.current?.parentElement
         const grandParentElement = parentElement?.parentElement
         let availableHeight = window.innerHeight
         let scrollOffset = 0
 
-        if (grandParentElement) {
+        if (grandParentElement != null) {
           const grandParentRect = grandParentElement.getBoundingClientRect()
           availableHeight = grandParentRect.bottom - grandParentRect.top
           scrollOffset = grandParentRect.top
-        } else if (parentElement) {
+        } else if (parentElement != null) {
           const parentRect = parentElement.getBoundingClientRect()
           availableHeight = parentRect.bottom - parentRect.top
           scrollOffset = parentRect.top
