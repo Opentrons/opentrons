@@ -4,9 +4,11 @@ import {
   makeContext,
   FIXED_TRASH_ID,
 } from '@opentrons/step-generation'
+import { fixtureTiprack300ul, getLabwareDefURI } from '@opentrons/shared-data'
 import { THERMOCYCLER_STATE } from '../../constants'
 import { generateSubstepItem } from '../generateSubstepItem'
 
+import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import type {
   RobotState,
   InvariantContext,
@@ -181,7 +183,7 @@ describe('generateSubstepItem', () => {
         dispenseFlowRateUlSec: 5,
         dispenseOffsetFromBottomMm: 10,
         dropTipLocation: FIXED_TRASH_ID,
-        tipRack: 'tiprack1Id',
+        tipRack: getLabwareDefURI(fixtureTiprack300ul as LabwareDefinition2),
       }
     })
     ;[
@@ -404,7 +406,7 @@ describe('generateSubstepItem', () => {
         aspirateFlowRateUlSec: 5,
         dispenseFlowRateUlSec: 5,
         dropTipLocation: FIXED_TRASH_ID,
-        tipRack: 'tiprack1Id',
+        tipRack: getLabwareDefURI(fixtureTiprack300ul as LabwareDefinition2),
       },
       // @ts-expect-error(sa, 2021-6-15): errors should be boolean typed
       errors: {},
