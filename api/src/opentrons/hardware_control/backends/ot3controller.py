@@ -140,6 +140,7 @@ from opentrons.hardware_control.types import (
     EstopState,
     HardwareEventHandler,
     HardwareEventUnsubscriber,
+    LiquidNotFound,
 )
 from opentrons.hardware_control.errors import (
     InvalidPipetteName,
@@ -1399,6 +1400,13 @@ class OT3Controller(FlexBackend):
         for node, point in positions.items():
             self._position.update({node: point.motor_position})
             self._encoder_position.update({node: point.encoder_position})
+        if positions[head_node].move_ack == MoveCompleteAck.complete_without_condition:
+            raise LiquidNotFound(
+                {
+                    node_to_axis(node): point.motor_position
+                    for node, point in positions.items()
+                }
+            )
         return self._position[axis_to_node(Axis.by_mount(mount))]
 
     async def capacitive_probe(
