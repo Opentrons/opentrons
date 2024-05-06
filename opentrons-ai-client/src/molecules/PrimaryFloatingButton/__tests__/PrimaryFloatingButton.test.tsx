@@ -66,6 +66,6 @@ describe('PrimaryFloatingButton', () => {
       name: 'primary floating button',
     })
     fireEvent.mouseOver(button)
-    expect(button).toHaveStyle(`background-color: ${COLORS.blue60}`)
+    expect(button).toHaveStyle(`background-color: ${COLORS.blue50}`)
   })
 })
