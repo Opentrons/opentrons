@@ -547,7 +547,7 @@ if __name__ == "__main__":
     parser.add_argument("--mix", action="store_true")
     parser.add_argument("--user-volumes", action="store_true")
     parser.add_argument("--gantry-speed", type=int, default=GANTRY_MAX_SPEED)
-    parser.add_argument("--scale-delay", type=int, default=DELAY_FOR_MEASUREMENT)
+    parser.add_argument("--scale-delay", type=int, default=None)
     parser.add_argument("--allow-unstable", action="store_true")
     parser.add_argument("--photometric", action="store_true")
     parser.add_argument("--touch-tip", action="store_true")
@@ -564,6 +564,13 @@ if __name__ == "__main__":
         "--mode", type=str, choices=["", "default", "lowVolumeDefault"], default=""
     )
     args = parser.parse_args()
+    # NOTE: (sigler) 96ch and reservoir on scale need at least 20 seconds
+    #       for per-trial average to stabilize, because the reservoir is so unstable on the scale
+    if args.scale_delay is None:
+        if args.channels == 96:
+            args.scale_delay = max(20, DELAY_FOR_MEASUREMENT)
+        else:
+            args.scale_delay = DELAY_FOR_MEASUREMENT
     run_args = RunArgs.build_run_args(args)
     if not run_args.ctx.is_simulating():
         serial_logger = subprocess.Popen(
