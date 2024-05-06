@@ -3,7 +3,7 @@ from typing import Optional, Dict
 from typing_extensions import Protocol as TypingProtocol
 
 from opentrons.hardware_control import HardwareControlAPI
-from opentrons.hardware_control.types import FailedTipStateCheck
+from opentrons.hardware_control.types import FailedTipStateCheck, InstrumentProbeType
 from opentrons_shared_data.errors.exceptions import (
     CommandPreconditionViolated,
     CommandParameterLimitViolated,
@@ -74,7 +74,10 @@ class TipHandler(TypingProtocol):
         """Get tip presence status on the pipette."""
 
     async def verify_tip_presence(
-        self, pipette_id: str, expected: TipPresenceStatus
+        self,
+        pipette_id: str,
+        expected: TipPresenceStatus,
+        follow_singular_sensor: Optional[InstrumentProbeType] = None,
     ) -> None:
         """Verify the expected tip presence status."""
 
@@ -237,7 +240,10 @@ class HardwareTipHandler(TipHandler):
             return TipPresenceStatus.UNKNOWN
 
     async def verify_tip_presence(
-        self, pipette_id: str, expected: TipPresenceStatus
+        self,
+        pipette_id: str,
+        expected: TipPresenceStatus,
+        follow_singular_sensor: Optional[InstrumentProbeType] = None,
     ) -> None:
         """Verify the expecterd tip presence status of the pipette.
 
@@ -247,7 +253,9 @@ class HardwareTipHandler(TipHandler):
         try:
             ot3api = ensure_ot3_hardware(hardware_api=self._hardware_api)
             hw_mount = self._state_view.pipettes.get_mount(pipette_id).to_hw_mount()
-            await ot3api.verify_tip_presence(hw_mount, expected.to_hw_state())
+            await ot3api.verify_tip_presence(
+                hw_mount, expected.to_hw_state(), follow_singular_sensor
+            )
         except HardwareNotSupportedError:
             # Tip presence sensing is not supported on the OT2
             pass
@@ -332,7 +340,10 @@ class VirtualTipHandler(TipHandler):
         assert False, "TipHandler.add_tip should not be used with virtual pipettes"
 
     async def verify_tip_presence(
-        self, pipette_id: str, expected: TipPresenceStatus
+        self,
+        pipette_id: str,
+        expected: TipPresenceStatus,
+        follow_singular_sensor: Optional[InstrumentProbeType] = None,
     ) -> None:
         """Verify tip presence.
 

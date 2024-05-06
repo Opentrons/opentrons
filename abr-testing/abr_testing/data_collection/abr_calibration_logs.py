@@ -3,8 +3,8 @@ from typing import Dict, Any, List, Union
 import argparse
 import os
 import json
-import gspread  # type: ignore[import]
 import sys
+import time as t
 from abr_testing.data_collection import read_robot_logs
 from abr_testing.automation import google_drive_tool, google_sheets_tool
 
@@ -18,16 +18,20 @@ def check_for_duplicates(
     headers: List[str],
 ) -> Union[List[str], None]:
     """Check google sheet for duplicates."""
+    t.sleep(5)
     serials = google_sheet.get_column(col_1)
     modify_dates = google_sheet.get_column(col_2)
-    # check for complete calibration.
-    if len(row[-1]) > 0:
-        for serial, modify_date in zip(serials, modify_dates):
-            if row[col_1 - 1] == serial and row[col_2 - 1] == modify_date:
-                print(f"Skipped row for instrument {serial}. Already on Google Sheet.")
-                return None
-        read_robot_logs.write_to_sheets(sheet_location, google_sheet, row, headers)
-        print(f"Writing calibration for: {serial}")
+    # Check for calibration time stamp.
+    if row[-1] is not None:
+        if len(row[-1]) > 0:
+            for serial, modify_date in zip(serials, modify_dates):
+                if row[col_1 - 1] == serial and row[col_2 - 1] == modify_date:
+                    print(
+                        f"Skipped row for instrument {serial}. Already on Google Sheet."
+                    )
+                    return None
+            read_robot_logs.write_to_sheets(sheet_location, google_sheet, row, headers)
+            print(f"Writing calibration for: {row[7]}")
     return row
 
 
@@ -151,18 +155,10 @@ if __name__ == "__main__":
     parser.add_argument(
         "email", metavar="EMAIL", type=str, nargs=1, help="opentrons gmail."
     )
-    parser.add_argument(
-        "ip_or_all",
-        metavar="IP_OR_ALL",
-        type=str,
-        nargs=1,
-        help="Enter 'ALL' to read IPs.json or type full IP address of 1 robot.",
-    )
     args = parser.parse_args()
     storage_directory = args.storage_directory[0]
     folder_name = args.folder_name[0]
     google_sheet_name = args.google_sheet_name[0]
-    ip_or_all = args.ip_or_all[0]
     email = args.email[0]
     # Connect to google drive.
     try:
@@ -170,51 +166,32 @@ if __name__ == "__main__":
     except FileNotFoundError:
         print(f"Add credentials.json file to: {storage_directory}.")
         sys.exit()
-    try:
-        google_drive = google_drive_tool.google_drive(
-            credentials_path, folder_name, email
-        )
-        # Upload calibration logs to google drive.
-        print("Connected to google drive.")
-    except json.decoder.JSONDecodeError:
-        print(
-            "Credential file is damaged. Get from https://console.cloud.google.com/apis/credentials"
-        )
-        sys.exit()
+    google_drive = google_drive_tool.google_drive(credentials_path, folder_name, email)
     # Connect to google sheet
-    try:
-        google_sheet_instruments = google_sheets_tool.google_sheet(
-            credentials_path, google_sheet_name, 0
-        )
-        google_sheet_modules = google_sheets_tool.google_sheet(
-            credentials_path, google_sheet_name, 1
-        )
-        google_sheet_deck = google_sheets_tool.google_sheet(
-            credentials_path, google_sheet_name, 2
-        )
-        print(f"Connected to google sheet: {google_sheet_name}")
-    except gspread.exceptions.APIError:
-        print("ERROR: Check google sheet name. Check credentials file.")
-        sys.exit()
+    google_sheet_instruments = google_sheets_tool.google_sheet(
+        credentials_path, google_sheet_name, 0
+    )
+    google_sheet_modules = google_sheets_tool.google_sheet(
+        credentials_path, google_sheet_name, 1
+    )
+    google_sheet_deck = google_sheets_tool.google_sheet(
+        credentials_path, google_sheet_name, 2
+    )
     ip_json_file = os.path.join(storage_directory, "IPs.json")
     try:
         ip_file = json.load(open(ip_json_file))
     except FileNotFoundError:
         print(f"Add .json file with robot IPs to: {storage_directory}.")
         sys.exit()
+    ip_or_all = input("IP Address or ALL: ")
 
     if ip_or_all == "ALL":
         ip_address_list = ip_file["ip_address_list"]
         for ip in ip_address_list:
-            print(ip)
-            try:
-                saved_file_path, calibration = read_robot_logs.get_calibration_offsets(
-                    ip, storage_directory
-                )
-                upload_calibration_offsets(calibration, storage_directory)
-            except Exception:
-                print(f"ERROR: Failed to read IP address: {ip}")
-                continue
+            saved_file_path, calibration = read_robot_logs.get_calibration_offsets(
+                ip, storage_directory
+            )
+            upload_calibration_offsets(calibration, storage_directory)
     else:
         saved_file_path, calibration = read_robot_logs.get_calibration_offsets(
             ip_or_all, storage_directory

@@ -2,6 +2,7 @@ import * as React from 'react'
 import { css } from 'styled-components'
 import { useTranslation } from 'react-i18next'
 import {
+  ALIGN_FLEX_START,
   BORDERS,
   Box,
   Btn,
@@ -16,8 +17,11 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 import {
+  FLEX_ROBOT_TYPE,
+  FLEX_USB_MODULE_ADDRESSABLE_AREAS,
   SINGLE_SLOT_FIXTURES,
   getCutoutDisplayName,
+  getDeckDefFromRobotType,
   getFixtureDisplayName,
 } from '@opentrons/shared-data'
 import { StatusLabel } from '../../../../atoms/StatusLabel'
@@ -27,73 +31,55 @@ import { NotConfiguredModal } from './NotConfiguredModal'
 import { getFixtureImage } from './utils'
 import { DeckFixtureSetupInstructionsModal } from '../../../DeviceDetailsDeckConfiguration/DeckFixtureSetupInstructionsModal'
 
+import type { DeckDefinition } from '@opentrons/shared-data'
 import type { CutoutConfigAndCompatibility } from '../../../../resources/deck_configuration/hooks'
 
 interface SetupFixtureListProps {
   deckConfigCompatibility: CutoutConfigAndCompatibility[]
+  robotName: string
 }
 
+/**
+ * List items of all "non-module" fixtures e.g. staging slot, waste chute, trash bin...
+ * @param props
+ * @returns JSX.Element
+ */
 export const SetupFixtureList = (props: SetupFixtureListProps): JSX.Element => {
-  const { deckConfigCompatibility } = props
-  const { t, i18n } = useTranslation('protocol_setup')
+  const { deckConfigCompatibility, robotName } = props
+  const deckDef = getDeckDefFromRobotType(FLEX_ROBOT_TYPE)
   return (
     <>
-      <Flex
-        flexDirection={DIRECTION_ROW}
-        justifyContent={JUSTIFY_SPACE_BETWEEN}
-        marginTop={SPACING.spacing16}
-        marginLeft={SPACING.spacing20}
-        marginBottom={SPACING.spacing4}
-      >
-        <StyledText
-          css={TYPOGRAPHY.labelSemiBold}
-          marginBottom={SPACING.spacing8}
-          width="45%"
-        >
-          {i18n.format(t('fixture_name'), 'capitalize')}
-        </StyledText>
-        <StyledText
-          css={TYPOGRAPHY.labelSemiBold}
-          marginRight={SPACING.spacing16}
-          width="15%"
-        >
-          {t('location')}
-        </StyledText>
-        <StyledText
-          css={TYPOGRAPHY.labelSemiBold}
-          marginRight={SPACING.spacing16}
-          width="15%"
-        >
-          {t('status')}
-        </StyledText>
-      </Flex>
-      <Flex
-        flexDirection={DIRECTION_COLUMN}
-        width="100%"
-        overflowY="auto"
-        gridGap={SPACING.spacing4}
-        marginBottom={SPACING.spacing24}
-      >
-        {deckConfigCompatibility.map(cutoutConfigAndCompatibility => {
-          return (
-            <FixtureListItem
-              key={cutoutConfigAndCompatibility.cutoutId}
-              {...cutoutConfigAndCompatibility}
-            />
-          )
-        })}
-      </Flex>
+      {deckConfigCompatibility.map(cutoutConfigAndCompatibility => {
+        // filter out all fixtures that only provide usb module addressable areas
+        // (i.e. everything but MagBlockV1 and StagingAreaWithMagBlockV1)
+        // as they're handled in the Modules Table
+        return cutoutConfigAndCompatibility.requiredAddressableAreas.every(
+          raa => FLEX_USB_MODULE_ADDRESSABLE_AREAS.includes(raa)
+        ) ? null : (
+          <FixtureListItem
+            key={cutoutConfigAndCompatibility.cutoutId}
+            deckDef={deckDef}
+            robotName={robotName}
+            {...cutoutConfigAndCompatibility}
+          />
+        )
+      })}
     </>
   )
 }
 
-interface FixtureListItemProps extends CutoutConfigAndCompatibility {}
+interface FixtureListItemProps extends CutoutConfigAndCompatibility {
+  deckDef: DeckDefinition
+  robotName: string
+}
 
 export function FixtureListItem({
   cutoutId,
   cutoutFixtureId,
   compatibleCutoutFixtureIds,
   missingLabwareDisplayName,
+  deckDef,
+  robotName,
 }: FixtureListItemProps): JSX.Element {
   const { t } = useTranslation('protocol_setup')
 
@@ -155,8 +141,10 @@ export function FixtureListItem({
         <LocationConflictModal
           onCloseClick={() => setShowLocationConflictModal(false)}
           cutoutId={cutoutId}
+          deckDef={deckDef}
           missingLabwareDisplayName={missingLabwareDisplayName}
           requiredFixtureId={compatibleCutoutFixtureIds[0]}
+          robotName={robotName}
         />
       ) : null}
       {showSetupInstructionsModal ? (
@@ -190,7 +178,10 @@ export function FixtureListItem({
                 }
               />
             ) : null}
-            <Flex flexDirection={DIRECTION_COLUMN}>
+            <Flex
+              flexDirection={DIRECTION_COLUMN}
+              alignItems={ALIGN_FLEX_START}
+            >
               <StyledText
                 css={TYPOGRAPHY.pSemiBold}
                 marginLeft={SPACING.spacing20}

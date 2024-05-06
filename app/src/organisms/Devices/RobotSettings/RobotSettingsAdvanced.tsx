@@ -19,6 +19,7 @@ import {
   DeviceReset,
   DisplayRobotName,
   EnableStatusLight,
+  FactoryMode,
   GantryHoming,
   LegacySettings,
   OpenJupyterControl,
@@ -29,7 +30,6 @@ import {
   UpdateRobotSoftware,
   UsageSettings,
   UseOlderAspirateBehavior,
-  UseOlderProtocol,
 } from './AdvancedTab'
 import {
   updateSetting,
@@ -39,8 +39,9 @@ import {
 import { RenameRobotSlideout } from './AdvancedTab/AdvancedTabSlideouts/RenameRobotSlideout'
 import { DeviceResetSlideout } from './AdvancedTab/AdvancedTabSlideouts/DeviceResetSlideout'
 import { DeviceResetModal } from './AdvancedTab/AdvancedTabSlideouts/DeviceResetModal'
+import { FactoryModeSlideout } from './AdvancedTab/AdvancedTabSlideouts/FactoryModeSlideout'
 import { handleUpdateBuildroot } from './UpdateBuildroot'
-import { UNREACHABLE } from '../../../redux/discovery'
+import { getRobotSerialNumber, UNREACHABLE } from '../../../redux/discovery'
 import { getTopPortalEl } from '../../../App/portal'
 import { useIsEstopNotDisengaged } from '../../../resources/devices/hooks/useIsEstopNotDisengaged'
 
@@ -72,6 +73,10 @@ export function RobotSettingsAdvanced({
     showDeviceResetModal,
     setShowDeviceResetModal,
   ] = React.useState<boolean>(false)
+  const [
+    showFactoryModeSlideout,
+    setShowFactoryModeSlideout,
+  ] = React.useState<boolean>(false)
 
   const isRobotBusy = useIsRobotBusy({ poll: true })
   const isEstopNotDisengaged = useIsEstopNotDisengaged(robotName)
@@ -83,6 +88,7 @@ export function RobotSettingsAdvanced({
     getRobotSettings(state, robotName)
   )
   const reachable = robot?.status !== UNREACHABLE
+  const sn = robot?.status != null ? getRobotSerialNumber(robot) : null
 
   const [isRobotReachable, setIsRobotReachable] = React.useState<boolean>(
     reachable
@@ -129,6 +135,15 @@ export function RobotSettingsAdvanced({
             isExpanded={showRenameRobotSlideout}
             onCloseClick={() => setShowRenameRobotSlideout(false)}
             robotName={robotName}
+          />
+        )}
+        {showFactoryModeSlideout && (
+          <FactoryModeSlideout
+            isExpanded={showFactoryModeSlideout}
+            isRobotBusy={isRobotBusy || isEstopNotDisengaged}
+            onCloseClick={() => setShowFactoryModeSlideout(false)}
+            robotName={robotName}
+            sn={sn}
           />
         )}
         {showDeviceResetSlideout && (
@@ -195,6 +210,16 @@ export function RobotSettingsAdvanced({
           isRobotBusy={isRobotBusy || isEstopNotDisengaged}
           onUpdateStart={() => handleUpdateBuildroot(robot)}
         />
+        {isFlex ? (
+          <>
+            <Divider marginY={SPACING.spacing16} />
+            <FactoryMode
+              isRobotBusy={isRobotBusy || isEstopNotDisengaged}
+              setShowFactoryModeSlideout={setShowFactoryModeSlideout}
+              sn={sn}
+            />
+          </>
+        ) : null}
         <Troubleshooting
           robotName={robotName}
           isEstopNotDisengaged={isEstopNotDisengaged}
@@ -206,12 +231,6 @@ export function RobotSettingsAdvanced({
         />
         {isFlex ? null : (
           <>
-            <Divider marginY={SPACING.spacing16} />
-            <UseOlderProtocol
-              settings={findSettings('disableFastProtocolUpload')}
-              robotName={robotName}
-              isRobotBusy={isRobotBusy || isEstopNotDisengaged}
-            />
             <Divider marginY={SPACING.spacing16} />
             <LegacySettings
               settings={findSettings('deckCalibrationDots')}

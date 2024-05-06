@@ -132,6 +132,8 @@ export function ChooseRobotToRunProtocolSlideoutComponent(
     'downgrade',
   ].includes(autoUpdateAction)
 
+  const hasRunTimeParameters = runTimeParameters.length > 0
+
   if (
     protocolKey == null ||
     srcFileNames == null ||
@@ -156,7 +158,7 @@ export function ChooseRobotToRunProtocolSlideoutComponent(
       ? mostRecentAnalysis?.robotType ?? null
       : null
 
-  const SinglePageButtonWithoutFF = (
+  const singlePageButton = (
     <PrimaryButton
       disabled={
         isCreatingRun ||
@@ -174,7 +176,25 @@ export function ChooseRobotToRunProtocolSlideoutComponent(
     </PrimaryButton>
   )
 
-  const hasRunTimeParameters = runTimeParameters.length > 0
+  const offsetsComponent = (
+    <ApplyHistoricOffsets
+      offsetCandidates={offsetCandidates}
+      shouldApplyOffsets={shouldApplyOffsets}
+      setShouldApplyOffsets={setShouldApplyOffsets}
+      commands={mostRecentAnalysis?.commands ?? []}
+      labware={mostRecentAnalysis?.labware ?? []}
+      modules={mostRecentAnalysis?.modules ?? []}
+    />
+  )
+
+  const resetRunTimeParameters = (): void => {
+    setRunTimeParametersOverrides(
+      runTimeParametersOverrides?.map(parameter => ({
+        ...parameter,
+        value: parameter.default,
+      }))
+    )
+  }
 
   return (
     <ChooseRobotSlideout
@@ -183,7 +203,12 @@ export function ChooseRobotToRunProtocolSlideoutComponent(
       isSelectedRobotOnDifferentSoftwareVersion={
         isSelectedRobotOnDifferentSoftwareVersion
       }
-      onCloseClick={onCloseClick}
+      onCloseClick={() => {
+        onCloseClick()
+        resetRunTimeParameters()
+        setCurrentPage(1)
+        setSelectedRobot(null)
+      }}
       title={
         hasRunTimeParameters && currentPage === 2
           ? t('select_parameters_for_robot', {
@@ -200,14 +225,7 @@ export function ChooseRobotToRunProtocolSlideoutComponent(
           {hasRunTimeParameters ? (
             currentPage === 1 ? (
               <>
-                <ApplyHistoricOffsets
-                  offsetCandidates={offsetCandidates}
-                  shouldApplyOffsets={shouldApplyOffsets}
-                  setShouldApplyOffsets={setShouldApplyOffsets}
-                  commands={mostRecentAnalysis?.commands ?? []}
-                  labware={mostRecentAnalysis?.labware ?? []}
-                  modules={mostRecentAnalysis?.modules ?? []}
-                />
+                {offsetsComponent}
                 <PrimaryButton
                   onClick={() => setCurrentPage(2)}
                   width="100%"
@@ -239,7 +257,10 @@ export function ChooseRobotToRunProtocolSlideoutComponent(
               </Flex>
             )
           ) : (
-            SinglePageButtonWithoutFF
+            <>
+              {offsetsComponent}
+              {singlePageButton}
+            </>
           )}
         </Flex>
       }
@@ -250,8 +271,9 @@ export function ChooseRobotToRunProtocolSlideoutComponent(
       reset={resetCreateRun}
       runCreationError={runCreationError}
       runCreationErrorCode={runCreationErrorCode}
-      showIdleOnly={true}
+      showIdleOnly
       setHasParamError={setHasParamError}
+      resetRunTimeParameters={resetRunTimeParameters}
     />
   )
 }

@@ -55,10 +55,7 @@ class PauseAction:
 
 @dataclass(frozen=True)
 class StopAction:
-    """Stop the current engine execution.
-
-    After a StopAction, the engine status will be marked as stopped.
-    """
+    """Request engine execution to stop soon."""
 
     from_estop: bool = False
 
@@ -119,6 +116,7 @@ class QueueCommandAction:
     created_at: datetime
     request: CommandCreate
     request_hash: Optional[str]
+    failed_command_id: Optional[str] = None
 
 
 @dataclass(frozen=True)

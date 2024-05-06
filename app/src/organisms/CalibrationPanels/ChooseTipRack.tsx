@@ -75,7 +75,7 @@ export function ChooseTipRack(props: ChooseTipRackProps): JSX.Element {
     robotName,
     defaultTipracks,
   } = props
-  const { t } = useTranslation(['robot_calibration', 'shared'])
+  const { t } = useTranslation(['robot_calibration', 'shared', 'branded'])
   const pipSerial = usePipettesQuery(
     {},
     {
@@ -143,7 +143,7 @@ export function ChooseTipRack(props: ChooseTipRackProps): JSX.Element {
     customTipRacks.length > 0
       ? [
           {
-            label: t('opentrons'),
+            label: t('branded:opentrons_tip_rack_name'),
             options: opentronsTipRacksOptions,
           },
           {
@@ -233,14 +233,14 @@ export function ChooseTipRack(props: ChooseTipRackProps): JSX.Element {
         <Flex flex="1" flexDirection={DIRECTION_COLUMN}>
           <Banner type="warning">
             <StyledText as="p" marginRight={SPACING.spacing16}>
-              {t('opentrons_tip_racks_recommended')}
+              {t('branded:opentrons_tip_racks_recommended')}
             </StyledText>
           </Banner>
           <Divider marginY={SPACING.spacing8} width="100%" />
           <ChosenTipRackRender selectedValue={selectedValue as SelectOption} />
           <Divider marginY={SPACING.spacing8} width="100%" />
           <StyledText as="label" color={COLORS.grey50}>
-            {t('calibration_on_opentrons_tips_is_important')}
+            {t('branded:calibration_on_opentrons_tips_is_important')}
           </StyledText>
         </Flex>
       </Flex>

@@ -5,7 +5,15 @@ from typing_extensions import Literal
 from pydantic import BaseModel, Field
 
 from .command import AbstractCommandImpl, BaseCommand, BaseCommandCreate
-from ..types import DeckSlotLocation, ModuleModel, ModuleDefinition
+from ..types import (
+    DeckSlotLocation,
+    ModuleType,
+    ModuleModel,
+    ModuleDefinition,
+)
+from opentrons.types import DeckSlotName
+
+from opentrons.protocol_engine.resources import deck_configuration_provider
 
 if TYPE_CHECKING:
     from ..state import StateView
@@ -104,9 +112,22 @@ class LoadModuleImplementation(AbstractCommandImpl[LoadModuleParams, LoadModuleR
 
     async def execute(self, params: LoadModuleParams) -> LoadModuleResult:
         """Check that the requested module is attached and assign its identifier."""
-        self._state_view.addressable_areas.raise_if_area_not_in_deck_configuration(
-            params.location.slotName.id
-        )
+        module_type = params.model.as_type()
+        self._ensure_module_location(params.location.slotName, module_type)
+
+        if self._state_view.config.robot_type == "OT-2 Standard":
+            self._state_view.addressable_areas.raise_if_area_not_in_deck_configuration(
+                params.location.slotName.id
+            )
+        else:
+            addressable_area = self._state_view.geometry._modules.ensure_and_convert_module_fixture_location(
+                deck_slot=params.location.slotName,
+                deck_type=self._state_view.config.deck_type,
+                model=params.model,
+            )
+            self._state_view.addressable_areas.raise_if_area_not_in_deck_configuration(
+                addressable_area
+            )
 
         verified_location = self._state_view.geometry.ensure_location_not_occupied(
             params.location
@@ -131,6 +152,30 @@ class LoadModuleImplementation(AbstractCommandImpl[LoadModuleParams, LoadModuleR
             model=loaded_module.definition.model,
             definition=loaded_module.definition,
         )
+
+    def _ensure_module_location(
+        self, slot: DeckSlotName, module_type: ModuleType
+    ) -> None:
+        if self._state_view.config.robot_type == "OT-2 Standard":
+            slot_def = self._state_view.addressable_areas.get_slot_definition(slot.id)
+            compatible_modules = slot_def["compatibleModuleTypes"]
+            if module_type.value not in compatible_modules:
+                raise ValueError(
+                    f"A {module_type.value} cannot be loaded into slot {slot}"
+                )
+        else:
+            cutout_fixture_id = ModuleType.to_module_fixture_id(module_type)
+            module_fixture = deck_configuration_provider.get_cutout_fixture(
+                cutout_fixture_id,
+                self._state_view.addressable_areas.state.deck_definition,
+            )
+            cutout_id = (
+                self._state_view.addressable_areas.get_cutout_id_by_deck_slot_name(slot)
+            )
+            if cutout_id not in module_fixture["mayMountTo"]:
+                raise ValueError(
+                    f"A {module_type.value} cannot be loaded into slot {slot}"
+                )
 
 
 class LoadModule(BaseCommand[LoadModuleParams, LoadModuleResult]):

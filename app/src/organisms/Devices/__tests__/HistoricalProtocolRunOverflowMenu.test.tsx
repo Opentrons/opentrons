@@ -5,23 +5,24 @@ import '@testing-library/jest-dom/vitest'
 import { renderWithProviders } from '../../../__testing-utils__'
 import { when } from 'vitest-when'
 import { MemoryRouter } from 'react-router-dom'
-import { UseQueryResult } from 'react-query'
 import {
   useAllCommandsQuery,
   useDeleteRunMutation,
 } from '@opentrons/react-api-client'
 import { i18n } from '../../../i18n'
 import runRecord from '../../../organisms/RunDetails/__fixtures__/runRecord.json'
-import { useDownloadRunLog, useTrackProtocolRunEvent } from '../hooks'
+import { useDownloadRunLog, useTrackProtocolRunEvent, useRobot } from '../hooks'
 import { useRunControls } from '../../RunTimeControl/hooks'
 import {
   useTrackEvent,
   ANALYTICS_PROTOCOL_PROCEED_TO_RUN,
 } from '../../../redux/analytics'
+import { mockConnectableRobot } from '../../../redux/discovery/__fixtures__'
 import { getRobotUpdateDisplayInfo } from '../../../redux/robot-update'
 import { useIsEstopNotDisengaged } from '../../../resources/devices/hooks/useIsEstopNotDisengaged'
 import { HistoricalProtocolRunOverflowMenu } from '../HistoricalProtocolRunOverflowMenu'
 
+import type { UseQueryResult } from 'react-query'
 import type { CommandsData } from '@opentrons/api-client'
 
 vi.mock('../../../redux/analytics')
@@ -104,6 +105,9 @@ describe('HistoricalProtocolRunOverflowMenu', () => {
       robotName: ROBOT_NAME,
       robotIsBusy: false,
     }
+    when(vi.mocked(useRobot))
+      .calledWith(ROBOT_NAME)
+      .thenReturn(mockConnectableRobot)
   })
 
   it('renders the correct menu when a runId is present', () => {
@@ -122,7 +126,10 @@ describe('HistoricalProtocolRunOverflowMenu', () => {
     fireEvent.click(rerunBtn)
     expect(mockTrackEvent).toHaveBeenCalledWith({
       name: ANALYTICS_PROTOCOL_PROCEED_TO_RUN,
-      properties: { sourceLocation: 'HistoricalProtocolRun' },
+      properties: {
+        robotSerialNumber: 'mock-serial',
+        sourceLocation: 'HistoricalProtocolRun',
+      },
     })
     expect(useRunControls).toHaveBeenCalled()
     expect(mockTrackProtocolRunEvent).toHaveBeenCalled()

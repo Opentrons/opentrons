@@ -1,0 +1,16 @@
+{
+  "extends": "../tsconfig-base.json",
+  "references": [
+    {
+      "path": "./tsconfig-data.json"
+    },
+    {
+      "path": "../components"
+    }
+  ],
+  "compilerOptions": {
+    "rootDir": "src",
+    "outDir": "lib"
+  },
+  "include": ["typings", "src"]
+}

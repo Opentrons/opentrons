@@ -43,6 +43,7 @@ import {
   createDeckFixture,
   toggleIsGripperRequired,
 } from '../../../step-forms/actions/additionalItems'
+import { createModuleWithNoSlot } from '../../../modules'
 import { RobotTypeTile } from './RobotTypeTile'
 import { MetadataTile } from './MetadataTile'
 import { FirstPipetteTypeTile, SecondPipetteTypeTile } from './PipetteTypeTile'
@@ -229,9 +230,29 @@ export function CreateFileWizard(): JSX.Element | null {
       }
 
       // create modules
-      modules.forEach(moduleArgs =>
-        dispatch(stepFormActions.createModule(moduleArgs))
-      )
+      // sort so modules with slot are created first
+      // then modules without a slot are generated in remaining available slots
+      modules.sort((a, b) => {
+        if (a.slot == null && b.slot != null) {
+          return 1
+        }
+        if (b.slot == null && a.slot != null) {
+          return -1
+        }
+        return 0
+      })
+
+      modules.forEach(moduleArgs => {
+        return moduleArgs.slot != null
+          ? dispatch(stepFormActions.createModule(moduleArgs))
+          : dispatch(
+              createModuleWithNoSlot({
+                model: moduleArgs.model,
+                type: moduleArgs.type,
+              })
+            )
+      })
+
       // add gripper
       if (values.additionalEquipment.includes('gripper')) {
         dispatch(toggleIsGripperRequired())
@@ -240,15 +261,18 @@ export function CreateFileWizard(): JSX.Element | null {
       const newTiprackModels: string[] = uniq(
         pipettes.flatMap(pipette => pipette.tiprackDefURI)
       )
+      const FLEX_MIDDLE_SLOTS = ['C2', 'B2', 'A2']
+      const hasOt2TC = modules.find(
+        module => module.type === THERMOCYCLER_MODULE_TYPE
+      )
+      const OT2_MIDDLE_SLOTS = hasOt2TC ? ['2', '5'] : ['2', '5', '8', '11']
       newTiprackModels.forEach((tiprackDefURI, index) => {
-        const ot2Slots = index === 0 ? '2' : '5'
-        const flexSlots = index === 0 ? 'C2' : 'B2'
         dispatch(
           labwareIngredActions.createContainer({
             slot:
               values.fields.robotType === FLEX_ROBOT_TYPE
-                ? flexSlots
-                : ot2Slots,
+                ? FLEX_MIDDLE_SLOTS[index]
+                : OT2_MIDDLE_SLOTS[index],
             labwareDefURI: tiprackDefURI,
             adapterUnderLabwareDefURI:
               values.pipettesByMount.left.pipetteName === 'p1000_96'

@@ -8,9 +8,7 @@ import pytest
 from decoy import Decoy
 
 from opentrons_shared_data.robot.dev_types import RobotType
-from opentrons.ordered_set import OrderedSet
 from opentrons.protocol_engine.actions.actions import ResumeFromRecoveryAction
-from opentrons.protocol_engine.error_recovery_policy import ErrorRecoveryType
 
 from opentrons.types import DeckSlotName
 from opentrons.hardware_control import HardwareControlAPI, OT2HardwareControlAPI
@@ -19,7 +17,9 @@ from opentrons.hardware_control.types import PauseType as HardwarePauseType
 from opentrons.protocols.models import LabwareDefinition
 
 from opentrons.protocol_engine import ProtocolEngine, commands, slot_standardization
-from opentrons.protocol_engine.errors.exceptions import EStopActivatedError
+from opentrons.protocol_engine.errors.exceptions import (
+    CommandNotAllowedError,
+)
 from opentrons.protocol_engine.types import (
     DeckType,
     LabwareOffset,
@@ -59,7 +59,6 @@ from opentrons.protocol_engine.actions import (
     QueueCommandAction,
     HardwareStoppedAction,
     ResetTipsAction,
-    FailCommandAction,
 )
 
 
@@ -130,9 +129,9 @@ def _mock_slot_standardization_module(
 def _mock_hash_command_params_module(
     decoy: Decoy, monkeypatch: pytest.MonkeyPatch
 ) -> None:
-    hash_command_params = commands.hash_command_params
+    hash_command_params = commands.hash_protocol_command_params
     monkeypatch.setattr(
-        commands, "hash_command_params", decoy.mock(func=hash_command_params)
+        commands, "hash_protocol_command_params", decoy.mock(func=hash_command_params)
     )
 
 
@@ -184,7 +183,9 @@ def test_add_command(
     original_request = commands.WaitForResumeCreate(
         params=commands.WaitForResumeParams()
     )
-    standardized_request = commands.HomeCreate(params=commands.HomeParams())
+    standardized_request = commands.HomeCreate(
+        params=commands.HomeParams(), intent=commands.CommandIntent.PROTOCOL
+    )
     queued = commands.Home(
         id="command-id",
         key="command-key",
@@ -204,9 +205,13 @@ def test_add_command(
 
     decoy.when(model_utils.generate_id()).then_return("command-id")
     decoy.when(model_utils.get_timestamp()).then_return(created_at)
-    decoy.when(state_store.commands.get_latest_command_hash()).then_return("abc")
+    decoy.when(state_store.commands.get_latest_protocol_command_hash()).then_return(
+        "abc"
+    )
     decoy.when(
-        commands.hash_command_params(create=standardized_request, last_hash="abc")
+        commands.hash_protocol_command_params(
+            create=standardized_request, last_hash="abc"
+        )
     ).then_return("123")
 
     def _stub_queued(*_a: object, **_k: object) -> None:
@@ -244,6 +249,105 @@ def test_add_command(
     result = subject.add_command(original_request)
 
     assert result == queued
+
+
+def test_add_fixit_command(
+    decoy: Decoy,
+    state_store: StateStore,
+    action_dispatcher: ActionDispatcher,
+    model_utils: ModelUtils,
+    subject: ProtocolEngine,
+) -> None:
+    """It should add a fixit command to the state from a request."""
+    created_at = datetime(year=2021, month=1, day=1)
+    original_request = commands.WaitForResumeCreate(
+        params=commands.WaitForResumeParams()
+    )
+    standardized_request = commands.HomeCreate(
+        params=commands.HomeParams(), intent=commands.CommandIntent.FIXIT
+    )
+    queued = commands.Home(
+        id="command-id",
+        key="command-key",
+        status=commands.CommandStatus.QUEUED,
+        createdAt=created_at,
+        params=commands.HomeParams(),
+    )
+
+    robot_type: RobotType = "OT-3 Standard"
+    decoy.when(state_store.config).then_return(
+        Config(robot_type=robot_type, deck_type=DeckType.OT3_STANDARD)
+    )
+
+    decoy.when(
+        slot_standardization.standardize_command(original_request, robot_type)
+    ).then_return(standardized_request)
+
+    decoy.when(model_utils.generate_id()).then_return("command-id")
+    decoy.when(model_utils.get_timestamp()).then_return(created_at)
+
+    def _stub_queued(*_a: object, **_k: object) -> None:
+        decoy.when(state_store.commands.get("command-id")).then_return(queued)
+
+    decoy.when(
+        state_store.commands.validate_action_allowed(
+            QueueCommandAction(
+                command_id="command-id",
+                created_at=created_at,
+                request=standardized_request,
+                request_hash=None,
+            )
+        )
+    ).then_return(
+        QueueCommandAction(
+            command_id="command-id-validated",
+            created_at=created_at,
+            request=standardized_request,
+            request_hash=None,
+        )
+    )
+
+    decoy.when(
+        action_dispatcher.dispatch(
+            QueueCommandAction(
+                command_id="command-id-validated",
+                created_at=created_at,
+                request=standardized_request,
+                request_hash=None,
+            )
+        ),
+    ).then_do(_stub_queued)
+
+    result = subject.add_command(original_request)
+    assert result == queued
+
+
+def test_add_fixit_command_raises(
+    decoy: Decoy,
+    state_store: StateStore,
+    action_dispatcher: ActionDispatcher,
+    model_utils: ModelUtils,
+    subject: ProtocolEngine,
+) -> None:
+    """It should raise if a failedCommandId is supplied without a  fixit command."""
+    original_request = commands.WaitForResumeCreate(
+        params=commands.WaitForResumeParams()
+    )
+    standardized_request = commands.HomeCreate(
+        params=commands.HomeParams(), intent=commands.CommandIntent.PROTOCOL
+    )
+
+    robot_type: RobotType = "OT-3 Standard"
+    decoy.when(state_store.config).then_return(
+        Config(robot_type=robot_type, deck_type=DeckType.OT3_STANDARD)
+    )
+
+    decoy.when(
+        slot_standardization.standardize_command(original_request, robot_type)
+    ).then_return(standardized_request)
+
+    with pytest.raises(CommandNotAllowedError):
+        subject.add_command(original_request, "id-123")
 
 
 async def test_add_and_execute_command(
@@ -515,7 +619,7 @@ def test_pause(
         state_store.commands.validate_action_allowed(expected_action),
     ).then_return(expected_action)
 
-    subject.pause()
+    subject.request_pause()
 
     decoy.verify(
         action_dispatcher.dispatch(expected_action),
@@ -570,8 +674,8 @@ async def test_finish(
     """It should be able to gracefully tell the engine it's done."""
     completed_at = datetime(2021, 1, 1, 0, 0)
 
-    decoy.when(model_utils.get_timestamp()).then_return(completed_at)
     decoy.when(state_store.commands.state.stopped_by_estop).then_return(False)
+    decoy.when(model_utils.get_timestamp()).then_return(completed_at)
 
     await subject.finish(
         drop_tips_after_run=drop_tips_after_run,
@@ -810,7 +914,7 @@ async def test_stop(
         state_store.commands.validate_action_allowed(expected_action),
     ).then_return(expected_action)
 
-    await subject.stop()
+    await subject.request_stop()
 
     decoy.verify(
         action_dispatcher.dispatch(expected_action),
@@ -836,7 +940,7 @@ async def test_stop_for_legacy_core_protocols(
 
     decoy.when(hardware_api.is_movement_execution_taskified()).then_return(True)
 
-    await subject.stop()
+    await subject.request_stop()
 
     decoy.verify(
         action_dispatcher.dispatch(expected_action),
@@ -845,106 +949,53 @@ async def test_stop_for_legacy_core_protocols(
     )
 
 
-@pytest.mark.parametrize("maintenance_run", [True, False])
-async def test_estop_during_command(
+async def test_estop(
     decoy: Decoy,
     action_dispatcher: ActionDispatcher,
     queue_worker: QueueWorker,
     state_store: StateStore,
     subject: ProtocolEngine,
-    model_utils: ModelUtils,
-    maintenance_run: bool,
 ) -> None:
     """It should be able to stop the engine."""
-    timestamp = datetime(2021, 1, 1, 0, 0)
-    command_id = "command_fake_id"
-    running_command = sentinel.running_command
-    queued_command = sentinel.queued_command
-    error_id = "fake_error_id"
-    fake_command_set = OrderedSet(["fake-id-1", "fake-id-1"])
+    expected_action = StopAction(from_estop=True)
+    validated_action = sentinel.validated_action
+    decoy.when(
+        state_store.commands.validate_action_allowed(expected_action),
+    ).then_return(validated_action)
 
-    decoy.when(model_utils.get_timestamp()).then_return(timestamp)
-    decoy.when(model_utils.generate_id()).then_return(error_id)
-    decoy.when(state_store.commands.get_is_stopped()).then_return(False)
-    decoy.when(state_store.commands.get_running_command_id()).then_return(command_id)
-    decoy.when(state_store.commands.get(command_id)).then_return(running_command)
-    decoy.when(state_store.commands.get_queue_ids()).then_return(fake_command_set)
-    decoy.when(state_store.commands.get(fake_command_set.head())).then_return(
-        queued_command
-    )
-
-    expected_action = FailCommandAction(
-        command_id=command_id,
-        running_command=running_command,
-        error_id=error_id,
-        failed_at=timestamp,
-        error=EStopActivatedError(message="Estop Activated"),
-        notes=[],
-        type=ErrorRecoveryType.FAIL_RUN,
-    )
-    expected_action_2 = FailCommandAction(
-        command_id=fake_command_set.head(),
-        running_command=queued_command,
-        error_id=error_id,
-        failed_at=timestamp,
-        error=EStopActivatedError(message="Estop Activated"),
-        notes=[],
-        type=ErrorRecoveryType.FAIL_RUN,
-    )
-
-    subject.estop(maintenance_run=maintenance_run)
+    subject.estop()
 
     decoy.verify(
-        action_dispatcher.dispatch(action=expected_action),
-        action_dispatcher.dispatch(action=expected_action_2),
+        action_dispatcher.dispatch(action=validated_action),
         queue_worker.cancel(),
     )
 
 
-@pytest.mark.parametrize("maintenance_run", [True, False])
-async def test_estop_without_command(
+async def test_estop_noops_if_invalid(
     decoy: Decoy,
     action_dispatcher: ActionDispatcher,
     queue_worker: QueueWorker,
     state_store: StateStore,
     subject: ProtocolEngine,
-    model_utils: ModelUtils,
-    maintenance_run: bool,
 ) -> None:
-    """It should be able to stop the engine."""
-    timestamp = datetime(2021, 1, 1, 0, 0)
-    error_id = "fake_error_id"
-
-    decoy.when(model_utils.get_timestamp()).then_return(timestamp)
-    decoy.when(model_utils.generate_id()).then_return(error_id)
-    decoy.when(state_store.commands.get_is_stopped()).then_return(False)
-    decoy.when(state_store.commands.get_running_command_id()).then_return(None)
-    decoy.when(state_store.commands.get_queue_ids()).then_return(OrderedSet())
-
-    expected_stop = StopAction(from_estop=True)
-    expected_hardware_stop = HardwareStoppedAction(
-        completed_at=timestamp,
-        finish_error_details=FinishErrorDetails(
-            error=EStopActivatedError(message="Estop Activated"),
-            error_id=error_id,
-            created_at=timestamp,
-        ),
-    )
-
+    """It should no-op if a stop is invalid right now.."""
+    expected_action = StopAction(from_estop=True)
     decoy.when(
-        state_store.commands.validate_action_allowed(expected_stop),
-    ).then_return(expected_stop)
+        state_store.commands.validate_action_allowed(expected_action),
+    ).then_raise(RuntimeError("unable to stop; this machine craves flesh"))
 
-    subject.estop(maintenance_run=maintenance_run)
+    subject.estop()  # Should not raise.
 
     decoy.verify(
-        action_dispatcher.dispatch(expected_stop), times=1 if maintenance_run else 0
+        action_dispatcher.dispatch(),  # type: ignore
+        ignore_extra_args=True,
+        times=0,
     )
     decoy.verify(
-        action_dispatcher.dispatch(expected_hardware_stop),
-        times=1 if maintenance_run else 0,
+        queue_worker.cancel(),
+        ignore_extra_args=True,
+        times=0,
     )
-    decoy.verify(queue_worker.cancel(), times=1 if maintenance_run else 0)
 
 
 def test_add_plugin(

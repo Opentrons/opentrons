@@ -3,7 +3,6 @@ import argparse
 import os
 import sys
 import json
-import gspread  # type: ignore[import]
 from datetime import datetime, timedelta
 from abr_testing.data_collection import read_robot_logs
 from typing import Set, Dict, Any, Tuple, List, Union
@@ -42,6 +41,8 @@ def create_data_dictionary(
             with open(file_path) as file:
                 file_results = json.load(file)
         else:
+            continue
+        if not isinstance(file_results, dict):
             continue
         run_id = file_results.get("run_id", "NaN")
         if run_id in runs_to_save:
@@ -107,13 +108,18 @@ def create_data_dictionary(
                 hs_dict = read_robot_logs.hs_commands(file_results)
                 tm_dict = read_robot_logs.temperature_module_commands(file_results)
                 notes = {"Note1": "", "Jira Link": issue_url}
-                row_2 = {**row, **all_modules, **notes, **hs_dict, **tm_dict, **tc_dict}
+                row_2 = {
+                    **row,
+                    **all_modules,
+                    **notes,
+                    **hs_dict,
+                    **tm_dict,
+                    **tc_dict,
+                }
                 headers = list(row_2.keys())
                 runs_and_robots[run_id] = row_2
             else:
                 continue
-                # os.remove(file_path)
-                # print(f"Run ID: {run_id} has a run time of 0 minutes. Run removed.")
     return runs_and_robots, headers
 
 
@@ -153,33 +159,13 @@ if __name__ == "__main__":
     except FileNotFoundError:
         print(f"Add credentials.json file to: {storage_directory}.")
         sys.exit()
-    try:
-        google_drive = google_drive_tool.google_drive(
-            credentials_path, folder_name, email
-        )
-        print("Connected to google drive.")
-    except json.decoder.JSONDecodeError:
-        print(
-            "Credential file is damaged. Get from https://console.cloud.google.com/apis/credentials"
-        )
-        sys.exit()
+    google_drive = google_drive_tool.google_drive(credentials_path, folder_name, email)
     # Get run ids on google sheet
-    try:
-        google_sheet = google_sheets_tool.google_sheet(
-            credentials_path, google_sheet_name, 0
-        )
-        print(f"Connected to google sheet: {google_sheet_name}")
-    except gspread.exceptions.APIError:
-        print("ERROR: Check google sheet name. Check credentials file.")
-        sys.exit()
-    try:
-        google_sheet_lpc = google_sheets_tool.google_sheet(
-            credentials_path, "ABR-LPC", 0
-        )
-        print("Connected to google sheet ABR-LPC")
-    except gspread.exceptions.APIError:
-        print("ERROR: Check google sheet name. Check credentials file.")
-        sys.exit()
+    google_sheet = google_sheets_tool.google_sheet(
+        credentials_path, google_sheet_name, 0
+    )
+    google_sheet_lpc = google_sheets_tool.google_sheet(credentials_path, "ABR-LPC", 0)
+
     run_ids_on_gs = google_sheet.get_column(2)
     run_ids_on_gs = set(run_ids_on_gs)
 

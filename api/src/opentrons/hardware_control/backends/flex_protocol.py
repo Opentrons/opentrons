@@ -147,7 +147,7 @@ class FlexBackend(Protocol):
         plunger_speed: float,
         threshold_pascals: float,
         output_format: OutputOptions = OutputOptions.can_bus_only,
-        data_file: Optional[str] = None,
+        data_files: Optional[Dict[InstrumentProbeType, str]] = None,
         auto_zero_sensor: bool = True,
         num_baseline_reads: int = 10,
         probe: InstrumentProbeType = InstrumentProbeType.PRIMARY,
@@ -385,7 +385,9 @@ class FlexBackend(Protocol):
     def subsystems(self) -> Dict[SubSystem, SubSystemState]:
         ...
 
-    async def get_tip_status(self, mount: OT3Mount) -> TipStateType:
+    async def get_tip_status(
+        self, mount: OT3Mount, ht_operation_sensor: Optional[InstrumentProbeType] = None
+    ) -> TipStateType:
         ...
 
     def current_tip_state(self, mount: OT3Mount) -> Optional[bool]:

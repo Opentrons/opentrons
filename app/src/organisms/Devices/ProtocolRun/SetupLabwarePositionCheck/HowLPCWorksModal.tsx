@@ -22,7 +22,7 @@ interface HowLPCWorksModalProps {
 }
 
 export const HowLPCWorksModal = (props: HowLPCWorksModalProps): JSX.Element => {
-  const { t } = useTranslation(['protocol_setup', 'shared'])
+  const { t } = useTranslation(['protocol_setup', 'shared', 'branded'])
   return createPortal(
     <LegacyModal
       title={t('how_offset_data_works')}
@@ -48,7 +48,7 @@ export const HowLPCWorksModal = (props: HowLPCWorksModalProps): JSX.Element => {
           />
         </Link>
         <StyledText as="p" marginBottom={SPACING.spacing16}>
-          {t('why_use_lpc')}
+          {t('branded:why_use_lpc')}
         </StyledText>
         <PrimaryButton
           onClick={props.onCloseClick}

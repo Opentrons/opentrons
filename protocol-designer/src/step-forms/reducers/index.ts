@@ -67,8 +67,10 @@ import {
   createPresavedStepForm,
   getDeckItemIdInSlot,
   getIdsInRange,
+  getUnoccupiedSlotForMoveableTrash,
 } from '../utils'
-import {
+
+import type {
   CreateModuleAction,
   CreatePipettesAction,
   DeleteModuleAction,
@@ -1379,6 +1381,14 @@ export const additionalEquipmentInvariantProperties = handleActions<NormalizedAd
         ]),
       ]
 
+      const unoccupiedSlotForMovableTrash = hasWasteChuteCommands
+        ? ''
+        : getUnoccupiedSlotForMoveableTrash(
+            file,
+            hasWasteChuteCommands,
+            stagingAreaSlotNames
+          )
+
       const stagingAreas = stagingAreaSlotNames.reduce((acc, slot) => {
         const stagingAreaId = `${uuid()}:stagingArea`
         const cutoutId = getCutoutIdByAddressableArea(
@@ -1452,7 +1462,6 @@ export const additionalEquipmentInvariantProperties = handleActions<NormalizedAd
       } else if (mixStepTrashBin != null) {
         trashBinId = mixStepTrashBin.dropTip_location
       }
-
       const trashCutoutId =
         trashAddressableAreaName != null
           ? getCutoutIdByAddressableArea(
@@ -1531,11 +1540,11 @@ export const additionalEquipmentInvariantProperties = handleActions<NormalizedAd
           }
         : {}
 
-      const hardcodedTrashBinId = `${uuid()}:fixedTrash`
-      const hardcodedTrashBin = {
-        [hardcodedTrashBinId]: {
+      const hardcodedTrashBinIdOt2 = `${uuid()}:fixedTrash`
+      const hardcodedTrashBinOt2 = {
+        [hardcodedTrashBinIdOt2]: {
           name: 'trashBin' as const,
-          id: hardcodedTrashBinId,
+          id: hardcodedTrashBinIdOt2,
           location: getCutoutIdByAddressableArea(
             'fixedTrash' as AddressableAreaName,
             'fixedTrashSlot',
@@ -1543,23 +1552,55 @@ export const additionalEquipmentInvariantProperties = handleActions<NormalizedAd
           ),
         },
       }
-
+      const hardcodedTrashAddressableAreaName = `movableTrash${unoccupiedSlotForMovableTrash}`
+      const hardcodedTrashBinIdFlex = `${uuid()}:${hardcodedTrashAddressableAreaName}`
+      const hardcodedTrashBinFlex = {
+        [hardcodedTrashBinIdFlex]: {
+          name: 'trashBin' as const,
+          id: hardcodedTrashBinIdFlex,
+          location: hasWasteChuteCommands
+            ? ''
+            : getCutoutIdByAddressableArea(
+                hardcodedTrashAddressableAreaName as AddressableAreaName,
+                'trashBinAdapter',
+                FLEX_ROBOT_TYPE
+              ),
+        },
+      }
       if (isFlex) {
-        return {
-          ...state,
-          ...gripper,
-          ...trashBin,
-          ...wasteChute,
-          ...stagingAreas,
+        if (trashBin != null) {
+          return {
+            ...state,
+            ...gripper,
+            ...trashBin,
+            ...wasteChute,
+            ...stagingAreas,
+          }
+        } else if (trashBin == null && !hasWasteChuteCommands) {
+          //  always hardcode a trash bin when no pipetting command is provided since return tip
+          //  is not supported
+          return {
+            ...state,
+            ...gripper,
+            ...hardcodedTrashBinFlex,
+            ...wasteChute,
+            ...stagingAreas,
+          }
+        } else {
+          return {
+            ...state,
+            ...gripper,
+            ...wasteChute,
+            ...stagingAreas,
+          }
         }
       } else {
         if (trashBin != null) {
           return { ...state, ...trashBin }
         } else {
-          //  when importing an OT-2 protocol, ensure that there is always a trashBin
-          //  entity created even when the protocol does not have a command that involves
-          //  the trash. Since no trash for OT-2 is not supported
-          return { ...state, ...hardcodedTrashBin }
+          //  always hardcode a trash bin when no pipetting command is provided since no trash for
+          //  OT-2 is not supported
+          return { ...state, ...hardcodedTrashBinOt2 }
         }
       }
     },

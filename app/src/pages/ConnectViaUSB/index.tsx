@@ -22,7 +22,7 @@ import { StepMeter } from '../../atoms/StepMeter'
 import { MediumButton } from '../../atoms/buttons'
 
 export function ConnectViaUSB(): JSX.Element {
-  const { i18n, t } = useTranslation(['device_settings', 'shared'])
+  const { i18n, t } = useTranslation(['device_settings', 'shared', 'branded'])
   const history = useHistory()
   // TODO(bh, 2023-5-31): active connections from /system/connected isn't exactly the right way to monitor for a usb connection -
   // the system-server tracks active connections by authorization token, which is valid for 2 hours
@@ -92,7 +92,7 @@ export function ConnectViaUSB(): JSX.Element {
                   color={COLORS.grey60}
                   textAlign={TYPOGRAPHY.textAlignCenter}
                 >
-                  {t('find_your_robot')}
+                  {t('branded:find_your_robot')}
                 </StyledText>
               </Flex>
             </Flex>
@@ -134,7 +134,7 @@ export function ConnectViaUSB(): JSX.Element {
                   {t('connect_via_usb_description_2')}
                 </StyledText>
                 <StyledText as="h4" color={COLORS.grey60}>
-                  {t('connect_via_usb_description_3')}
+                  {t('branded:connect_via_usb_description_3')}
                 </StyledText>
               </Flex>
             </Flex>

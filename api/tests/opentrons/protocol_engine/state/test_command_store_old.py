@@ -84,7 +84,7 @@ def test_initial_state(
         failed_command=None,
         command_error_recovery_types={},
         recovery_target_command_id=None,
-        latest_command_hash=None,
+        latest_protocol_command_hash=None,
         stopped_by_estop=False,
     )
 
@@ -254,7 +254,7 @@ def test_command_queue_with_hash() -> None:
     )
 
     assert subject.state.command_history.get("command-id-1").command.key == "abc123"
-    assert subject.state.latest_command_hash == "abc123"
+    assert subject.state.latest_protocol_command_hash == "abc123"
 
     subject.handle_action(
         QueueCommandAction(
@@ -265,7 +265,7 @@ def test_command_queue_with_hash() -> None:
         )
     )
 
-    assert subject.state.latest_command_hash == "def456"
+    assert subject.state.latest_protocol_command_hash == "def456"
 
 
 def test_command_queue_and_unqueue() -> None:
@@ -518,7 +518,7 @@ def test_command_store_handles_pause_action(pause_source: PauseSource) -> None:
         failed_command=None,
         command_error_recovery_types={},
         recovery_target_command_id=None,
-        latest_command_hash=None,
+        latest_protocol_command_hash=None,
         stopped_by_estop=False,
     )
 
@@ -545,7 +545,7 @@ def test_command_store_handles_play_action(pause_source: PauseSource) -> None:
         command_error_recovery_types={},
         recovery_target_command_id=None,
         run_started_at=datetime(year=2021, month=1, day=1),
-        latest_command_hash=None,
+        latest_protocol_command_hash=None,
         stopped_by_estop=False,
     )
     assert subject.state.command_history.get_running_command() is None
@@ -577,7 +577,7 @@ def test_command_store_handles_finish_action() -> None:
         command_error_recovery_types={},
         recovery_target_command_id=None,
         run_started_at=datetime(year=2021, month=1, day=1),
-        latest_command_hash=None,
+        latest_protocol_command_hash=None,
         stopped_by_estop=False,
     )
     assert subject.state.command_history.get_running_command() is None
@@ -600,8 +600,13 @@ def test_command_store_handles_finish_action_with_stopped() -> None:
     assert subject.state.run_result == RunResult.STOPPED
 
 
-@pytest.mark.parametrize("from_estop", [True, False])
-def test_command_store_handles_stop_action(from_estop: bool) -> None:
+@pytest.mark.parametrize(
+    ["from_estop", "expected_run_result"],
+    [(True, RunResult.FAILED), (False, RunResult.STOPPED)],
+)
+def test_command_store_handles_stop_action(
+    from_estop: bool, expected_run_result: RunResult
+) -> None:
     """It should mark the engine as non-gracefully stopped on StopAction."""
     subject = CommandStore(is_door_open=False, config=_make_config())
 
@@ -615,6 +620,41 @@ def test_command_store_handles_stop_action(from_estop: bool) -> None:
     assert subject.state == CommandState(
         command_history=CommandHistory(),
         queue_status=QueueStatus.PAUSED,
+        run_result=expected_run_result,
+        run_completed_at=None,
+        is_door_blocking=False,
+        run_error=None,
+        finish_error=None,
+        failed_command=None,
+        command_error_recovery_types={},
+        recovery_target_command_id=None,
+        run_started_at=datetime(year=2021, month=1, day=1),
+        latest_protocol_command_hash=None,
+        stopped_by_estop=from_estop,
+    )
+    assert subject.state.command_history.get_running_command() is None
+    assert subject.state.command_history.get_all_ids() == []
+    assert subject.state.command_history.get_queue_ids() == OrderedSet()
+    assert subject.state.command_history.get_setup_queue_ids() == OrderedSet()
+
+
+def test_command_store_handles_stop_action_when_awaiting_recovery() -> None:
+    """It should mark the engine as non-gracefully stopped on StopAction."""
+    subject = CommandStore(is_door_open=False, config=_make_config())
+
+    subject.handle_action(
+        PlayAction(
+            requested_at=datetime(year=2021, month=1, day=1), deck_configuration=[]
+        )
+    )
+
+    subject.state.queue_status = QueueStatus.AWAITING_RECOVERY
+
+    subject.handle_action(StopAction())
+
+    assert subject.state == CommandState(
+        command_history=CommandHistory(),
+        queue_status=QueueStatus.PAUSED,
         run_result=RunResult.STOPPED,
         run_completed_at=None,
         is_door_blocking=False,
@@ -624,8 +664,8 @@ def test_command_store_handles_stop_action(from_estop: bool) -> None:
         command_error_recovery_types={},
         recovery_target_command_id=None,
         run_started_at=datetime(year=2021, month=1, day=1),
-        latest_command_hash=None,
-        stopped_by_estop=from_estop,
+        latest_protocol_command_hash=None,
+        stopped_by_estop=False,
     )
     assert subject.state.command_history.get_running_command() is None
     assert subject.state.command_history.get_all_ids() == []
@@ -655,7 +695,7 @@ def test_command_store_cannot_restart_after_should_stop() -> None:
         command_error_recovery_types={},
         recovery_target_command_id=None,
         run_started_at=None,
-        latest_command_hash=None,
+        latest_protocol_command_hash=None,
         stopped_by_estop=False,
     )
     assert subject.state.command_history.get_running_command() is None
@@ -787,7 +827,7 @@ def test_command_store_wraps_unknown_errors() -> None:
         failed_command=None,
         command_error_recovery_types={},
         recovery_target_command_id=None,
-        latest_command_hash=None,
+        latest_protocol_command_hash=None,
         stopped_by_estop=False,
     )
     assert subject.state.command_history.get_running_command() is None
@@ -850,7 +890,7 @@ def test_command_store_preserves_enumerated_errors() -> None:
         command_error_recovery_types={},
         recovery_target_command_id=None,
         run_started_at=None,
-        latest_command_hash=None,
+        latest_protocol_command_hash=None,
         stopped_by_estop=False,
     )
     assert subject.state.command_history.get_running_command() is None
@@ -883,7 +923,7 @@ def test_command_store_ignores_stop_after_graceful_finish() -> None:
         command_error_recovery_types={},
         recovery_target_command_id=None,
         run_started_at=datetime(year=2021, month=1, day=1),
-        latest_command_hash=None,
+        latest_protocol_command_hash=None,
         stopped_by_estop=False,
     )
     assert subject.state.command_history.get_running_command() is None
@@ -916,7 +956,7 @@ def test_command_store_ignores_finish_after_non_graceful_stop() -> None:
         command_error_recovery_types={},
         recovery_target_command_id=None,
         run_started_at=datetime(year=2021, month=1, day=1),
-        latest_command_hash=None,
+        latest_protocol_command_hash=None,
         stopped_by_estop=False,
     )
     assert subject.state.command_history.get_running_command() is None
@@ -945,7 +985,7 @@ def test_handles_hardware_stopped() -> None:
         command_error_recovery_types={},
         recovery_target_command_id=None,
         run_started_at=None,
-        latest_command_hash=None,
+        latest_protocol_command_hash=None,
         stopped_by_estop=False,
     )
     assert subject.state.command_history.get_running_command() is None

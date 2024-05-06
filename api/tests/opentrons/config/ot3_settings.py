@@ -129,7 +129,7 @@ ot3_dummy_settings = {
         "aspirate_while_sensing": False,
         "auto_zero_sensor": True,
         "num_baseline_reads": 10,
-        "data_file": "/var/pressure_sensor_data.csv",
+        "data_files": {"PRIMARY": "/data/pressure_sensor_data.csv"},
     },
     "calibration": {
         "z_offset": {

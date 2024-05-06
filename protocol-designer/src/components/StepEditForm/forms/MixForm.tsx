@@ -52,7 +52,10 @@ export const MixForm = (props: StepFormProps): JSX.Element => {
       </div>
       <div className={styles.form_row}>
         <PipetteField {...propsForFields.pipette} />
-        <TiprackField {...propsForFields.tipRack} />
+        <TiprackField
+          {...propsForFields.tipRack}
+          pipetteId={propsForFields.pipette.value}
+        />
         {is96Channel ? (
           <Configure96ChannelField {...propsForFields.nozzles} />
         ) : null}
@@ -209,6 +212,13 @@ export const MixForm = (props: StepFormProps): JSX.Element => {
                   options={getBlowoutLocationOptionsForForm({
                     stepType: formData.stepType,
                   })}
+                />
+                <FlowRateField
+                  {...propsForFields.blowout_flowRate}
+                  pipetteId={formData.pipette}
+                  flowRateType="blowout"
+                  volume={propsForFields.volume?.value ?? 0}
+                  tiprack={propsForFields.tipRack.value}
                 />
                 <BlowoutZOffsetField
                   {...propsForFields.blowout_z_offset}

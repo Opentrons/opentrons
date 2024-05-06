@@ -94,6 +94,7 @@ stages:
           labware: []
           labwareOffsets: []
           liquids: []
+          runTimeParameters: []
           modules: []
           pipettes: []
           status: 'idle'
@@ -197,3 +198,19 @@ stages:
             createdAt: !re_search "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+\\+\\d{2}:\\d{2}$"
             startedAt: !re_search "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+\\+\\d{2}:\\d{2}$"
             completedAt: !re_search "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+\\+\\d{2}:\\d{2}$"
+
+  - name: Get all the commands in the run as a pre-serialized list
+    request:
+      url: '{ot2_server_base_url}/runs/{run_id}/commandsAsPreSerializedList'
+      method: GET
+    response:
+      status_code: 200
+      json:
+        data:
+          - !anystr
+          - !anystr
+          - !anystr
+          - !anystr
+        meta:
+          cursor: 0
+          totalLength: 4

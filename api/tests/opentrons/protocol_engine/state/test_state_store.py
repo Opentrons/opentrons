@@ -5,11 +5,11 @@ from datetime import datetime
 import pytest
 from decoy import Decoy
 
-from opentrons_shared_data.deck.dev_types import DeckDefinitionV4
+from opentrons_shared_data.deck.dev_types import DeckDefinitionV5
+from opentrons.util.change_notifier import ChangeNotifier
 
 from opentrons.protocol_engine.actions import PlayAction
 from opentrons.protocol_engine.state import State, StateStore, Config
-from opentrons.protocol_engine.state.change_notifier import ChangeNotifier
 from opentrons.protocol_engine.types import DeckType
 
 
@@ -32,7 +32,7 @@ def engine_config() -> Config:
 @pytest.fixture
 def subject(
     change_notifier: ChangeNotifier,
-    ot2_standard_deck_def: DeckDefinitionV4,
+    ot2_standard_deck_def: DeckDefinitionV5,
     engine_config: Config,
 ) -> StateStore:
     """Get a StateStore test subject."""

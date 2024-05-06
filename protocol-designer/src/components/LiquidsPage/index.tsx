@@ -44,12 +44,6 @@ export function LiquidsPage(): JSX.Element {
       })
     )
   }
-  console.assert(
-    !(liquidGroupId && !selectedIngredFields),
-    `Expected selected liquid group "${String(
-      liquidGroupId
-    )}" to have fields in allIngredientGroupFields`
-  )
 
   return showForm ? (
     <LiquidEditForm
@@ -59,7 +53,7 @@ export function LiquidsPage(): JSX.Element {
       canDelete={liquidGroupId != null}
       name={selectedIngredFields?.name ?? ''}
       serialize={selectedIngredFields?.serialize ?? false}
-      displayColor={selectedIngredFields?.displayColor ?? '#B925FF'}
+      displayColor={selectedIngredFields?.displayColor}
       description={selectedIngredFields?.description ?? ''}
       key={formKey}
     />

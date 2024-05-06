@@ -1,0 +1,19 @@
+{
+  "are_you_sure_you_want_to_resume": "Are you sure you want to resume?",
+  "before_you_begin": "Before you begin",
+  "cancel_run": "Cancel run",
+  "confirm": "Confirm",
+  "continue": "Continue",
+  "general_error": "General error",
+  "general_error_message": "<Placeholder>",
+  "go_back": "Go back",
+  "how_do_you_want_to_proceed": "How do you want to proceed?",
+  "recovery_mode": "Recovery Mode",
+  "recovery_mode_explanation": "<block>Recovery Mode provides you with guided and manual controls for handling errors at runtime.</block><br/><block>You can make changes to ensure the step in progress when the error occurred can be completed or choose to cancel the protocol. When changes are made and no subsequent errors are detected, the method completes. Depending on the conditions that caused the error, you will only be provided with appropriate options.</block>",
+  "resume": "Resume",
+  "run_paused": "Run paused",
+  "run_will_resume": "The run will resume from the point at which the error occurred. Take any necessary actions to correct the problem first. If the step is completed successfully, the protocol continues.",
+  "stand_back": "Stand back, robot is in motion",
+  "stand_back_resuming": "Stand back, resuming current step",
+  "view_recovery_options": "View recovery options"
+}

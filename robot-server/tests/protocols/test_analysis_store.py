@@ -319,7 +319,7 @@ async def test_update_adds_rtp_values_and_defaults_to_completed_store(
         liquids=[],
     )
     decoy.verify(
-        await mock_completed_store.add(
+        await mock_completed_store.make_room_and_add(
             completed_analysis_resource=expected_completed_analysis_resource
         )
     )

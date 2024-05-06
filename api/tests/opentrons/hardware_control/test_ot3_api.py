@@ -126,7 +126,7 @@ def fake_liquid_settings() -> LiquidProbeSettings:
         aspirate_while_sensing=False,
         auto_zero_sensor=False,
         num_baseline_reads=10,
-        data_file="fake_file_name",
+        data_files={InstrumentProbeType.PRIMARY: "fake_file_name"},
     )
 
 
@@ -813,7 +813,7 @@ async def test_liquid_probe(
             aspirate_while_sensing=True,
             auto_zero_sensor=False,
             num_baseline_reads=10,
-            data_file="fake_file_name",
+            data_files={InstrumentProbeType.PRIMARY: "fake_file_name"},
         )
         await ot3_hardware.liquid_probe(mount, fake_settings_aspirate)
         mock_move_to_plunger_bottom.assert_called_once()
@@ -824,7 +824,7 @@ async def test_liquid_probe(
             (fake_settings_aspirate.plunger_speed * -1),
             fake_settings_aspirate.sensor_threshold_pascals,
             fake_settings_aspirate.output_option,
-            fake_settings_aspirate.data_file,
+            fake_settings_aspirate.data_files,
             fake_settings_aspirate.auto_zero_sensor,
             fake_settings_aspirate.num_baseline_reads,
             probe=InstrumentProbeType.PRIMARY,

@@ -24,7 +24,6 @@ import {
   getRequestById,
   PENDING,
   SUCCESS,
-  useDispatchApiRequest,
 } from '../../../redux/robot-api'
 import { useCurrentRunStatus } from '../../RunTimeControl/hooks'
 import { useToaster } from '../../ToasterOven'
@@ -43,7 +42,7 @@ import type {
   MagneticModule,
   ThermocyclerModule,
 } from '../../../redux/modules/types'
-import type { DispatchApiRequestType } from '../../../redux/robot-api'
+import type { Mock } from 'vitest'
 
 vi.mock('../ErrorInfo')
 vi.mock('../MagneticModuleData')
@@ -182,6 +181,8 @@ const mockMakeSnackbar = vi.fn()
 const mockMakeToast = vi.fn()
 const mockEatToast = vi.fn()
 
+const MOCK_LATEST_REQUEST_ID = '1234'
+
 const render = (props: React.ComponentProps<typeof ModuleCard>) => {
   return renderWithProviders(<ModuleCard {...props} />, {
     i18nInstance: i18n,
@@ -189,10 +190,12 @@ const render = (props: React.ComponentProps<typeof ModuleCard>) => {
 }
 
 describe('ModuleCard', () => {
-  let dispatchApiRequest: DispatchApiRequestType
   let props: React.ComponentProps<typeof ModuleCard>
+  let mockHandleModuleApiRequests: Mock
 
   beforeEach(() => {
+    mockHandleModuleApiRequests = vi.fn()
+
     props = {
       module: mockMagneticModule,
       robotName: mockRobot.name,
@@ -200,14 +203,11 @@ describe('ModuleCard', () => {
       attachPipetteRequired: false,
       calibratePipetteRequired: false,
       updatePipetteFWRequired: false,
+      handleModuleApiRequests: mockHandleModuleApiRequests,
+      latestRequestId: MOCK_LATEST_REQUEST_ID,
     }
 
-    dispatchApiRequest = vi.fn()
     vi.mocked(ErrorInfo).mockReturnValue(null)
-    vi.mocked(useDispatchApiRequest).mockReturnValue([
-      dispatchApiRequest,
-      ['id'],
-    ])
     vi.mocked(MagneticModuleData).mockReturnValue(
       <div>Mock Magnetic Module Data</div>
     )

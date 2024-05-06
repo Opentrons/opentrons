@@ -9,19 +9,14 @@ export const isNumeric = (str: string): boolean => {
  * @param {Choice[]} - The array of Choice
  * Choice is an object like {displayName: 'Single channel 50µL', value: 'flex_1channel_50' }
  * @returns {string} The ordered string with ","
- * 
- * examples
- * [
-      { displayName: '20', value: 20 },
-      { displayName: '16', value: 16 },
-    ]
-    return 16, 20
-
-    [
-      { displayName: 'Single channel 50µL', value: 'flex_1channel_50' },
-      { displayName: 'Eight Channel 50µL', value: 'flex_8channel_50' },
-    ]
-    return Eight Channel 50µL, Single channel 50µL
+ *
+ * @example
+ * const numChoices = [
+ *    { displayName: '20', value: 20 },
+ *    { displayName: '16', value: 16 },
+ * ]
+ * console.log(orderRuntimeParameterRangeOptions(numChoices) // 16,20
+ *
  */
 export const orderRuntimeParameterRangeOptions = (
   choices: Choice[]
@@ -41,6 +36,6 @@ export const orderRuntimeParameterRangeOptions = (
       })
       .join(', ')
   } else {
-    return displayNames.sort().join(', ')
+    return displayNames.join(', ')
   }
 }

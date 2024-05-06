@@ -44,7 +44,10 @@ jobs:
         with:
           node-version: '18.19.0'
       - name: 'install udev for usb-detection'
-        run: sudo apt-get update && sudo apt-get install libudev-dev
+        run: |
+          # WORKAROUND: Remove microsoft debian repo due to https://github.com/microsoft/linux-package-repositories/issues/130. Remove line below after it is resolved
+          sudo rm -f /etc/apt/sources.list.d/microsoft-prod.list
+          sudo apt-get update && sudo apt-get install libudev-dev
       - name: 'cache yarn cache'
         uses: actions/cache@v3
         with:
@@ -77,7 +80,10 @@ jobs:
         with:
           node-version: '18.19.0'
       - name: 'install udev for usb-detection'
-        run: sudo apt-get update && sudo apt-get install libudev-dev
+        run: |
+          # WORKAROUND: Remove microsoft debian repo due to https://github.com/microsoft/linux-package-repositories/issues/130. Remove line below after it is resolved
+          sudo rm -f /etc/apt/sources.list.d/microsoft-prod.list
+          sudo apt-get update && sudo apt-get install libudev-dev
       - name: 'cache yarn cache'
         uses: actions/cache@v3
         with:
@@ -174,10 +180,16 @@ jobs:
         with:
           node-version: '18.19.0'
           registry-url: 'https://registry.npmjs.org'
+      - name: 'install udev for usb-detection'
+        run: |
+          # WORKAROUND: Remove microsoft debian repo due to https://github.com/microsoft/linux-package-repositories/issues/130. Remove line below after it is resolved
+          sudo rm -f /etc/apt/sources.list.d/microsoft-prod.list
+          sudo apt-get update && sudo apt-get install libudev-dev
       - name: 'setup-js'
         run: |
           npm config set cache ./.npm-cache
           yarn config set cache-folder ./.yarn-cache
+          make setup-js
       - name: 'build typescript'
         run: make build-ts
       - name: 'build library'

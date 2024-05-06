@@ -11,6 +11,17 @@ export const storedProtocolData: StoredProtocolData = {
   modified: 123456789,
 }
 
+export const storedProtocolDataWithoutRunTimeParameters: StoredProtocolData = {
+  protocolKey: 'protocolKeyStub',
+  mostRecentAnalysis: ({
+    ...simpleAnalysisFileFixture,
+    runTimeParameters: [],
+  } as any) as ProtocolAnalysisOutput,
+  srcFileNames: ['fakeSrcFileName'],
+  srcFiles: ['fakeSrcFile' as any],
+  modified: 123456789,
+}
+
 export const storedProtocolDir: StoredProtocolDir = {
   dirPath: 'path/to/protocol/dir',
   modified: 1234556789,

@@ -132,11 +132,6 @@ const _patchDefaultTiprack = (args: {
     savedStepForms,
     orderedStepIds,
   } = args
-  const labware = initialDeckSetup.labware
-  const tipRackIds = Object.values(labware)
-    .filter(lw => lw.def.parameters.isTiprack)
-    .map(lw => lw.id)
-
   const defaultPipetteId = getNextDefaultPipetteId(
     savedStepForms,
     orderedStepIds,
@@ -145,15 +140,12 @@ const _patchDefaultTiprack = (args: {
 
   const pipetteFirstTiprackDefUri =
     pipetteEntities[defaultPipetteId].tiprackDefURI[0]
-  const defaultTiprackId = tipRackIds.find(id =>
-    id.includes(pipetteFirstTiprackDefUri)
-  )
   const formHasTipRackField = formData && 'tipRack' in formData
 
-  if (formHasTipRackField && defaultTiprackId != null) {
+  if (formHasTipRackField) {
     const updatedFields = handleFormChange(
       {
-        tipRack: defaultTiprackId,
+        tipRack: pipetteFirstTiprackDefUri,
       },
       formData,
       pipetteEntities,

@@ -10,7 +10,6 @@ import {
   useTrackEvent,
   ANALYTICS_NOTIFICATION_PORT_BLOCK_ERROR,
 } from '../redux/analytics'
-import { useIsFlex } from '../organisms/Devices/hooks/useIsFlex'
 
 import type { UseQueryOptions } from 'react-query'
 import type { HostConfig } from '@opentrons/api-client'
@@ -25,24 +24,28 @@ export interface QueryOptionsWithPolling<TData, TError = Error>
 
 interface UseNotifyServiceProps<TData, TError = Error> {
   topic: NotifyTopic
-  setRefetch: (refetch: HTTPRefetchFrequency) => void
   options: QueryOptionsWithPolling<TData, TError>
   hostOverride?: HostConfig | null
 }
 
+interface UseNotifyServiceResults {
+  notifyOnSettled: () => void
+  isNotifyEnabled: boolean
+}
+
 export function useNotifyService<TData, TError = Error>({
   topic,
-  setRefetch,
   options,
   hostOverride,
-}: UseNotifyServiceProps<TData, TError>): void {
+}: UseNotifyServiceProps<TData, TError>): UseNotifyServiceResults {
   const dispatch = useDispatch()
   const hostFromProvider = useHost()
   const host = hostOverride ?? hostFromProvider
   const hostname = host?.hostname ?? null
   const doTrackEvent = useTrackEvent()
-  const isFlex = useIsFlex(host?.robotName ?? '')
   const seenHostname = React.useRef<string | null>(null)
+  const [refetch, setRefetch] = React.useState<HTTPRefetchFrequency>(null)
+
   const { enabled, staleTime, forceHttpPolling } = options
 
   const shouldUseNotifications =
@@ -78,11 +81,10 @@ export function useNotifyService<TData, TError = Error>({
     }
   }, [topic, hostname, shouldUseNotifications])
 
-  function onDataEvent(data: NotifyResponseData): void {
+  const onDataEvent = React.useCallback((data: NotifyResponseData): void => {
     if (data === 'ECONNFAILED' || data === 'ECONNREFUSED') {
       setRefetch('always')
-      // TODO(jh 2023-02-23): remove the robot type check once OT-2s support MQTT.
-      if (data === 'ECONNREFUSED' && isFlex) {
+      if (data === 'ECONNREFUSED') {
         doTrackEvent({
           name: ANALYTICS_NOTIFICATION_PORT_BLOCK_ERROR,
           properties: {},
@@ -91,5 +93,13 @@ export function useNotifyService<TData, TError = Error>({
     } else if ('refetch' in data || 'unsubscribe' in data) {
       setRefetch('once')
     }
-  }
+  }, [])
+
+  const notifyOnSettled = React.useCallback(() => {
+    if (refetch === 'once') {
+      setRefetch(null)
+    }
+  }, [refetch])
+
+  return { notifyOnSettled, isNotifyEnabled: refetch != null }
 }

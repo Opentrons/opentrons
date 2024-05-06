@@ -11,7 +11,7 @@ from server_utils.fastapi_utils.app_state import (
     get_app_state,
 )
 from ..notification_client import NotificationClient, get_notification_client
-from ..publisher_notifier import PublisherNotifier, get_publisher_notifier
+from ..publisher_notifier import PublisherNotifier, get_pe_publisher_notifier
 from ..topics import Topics
 
 
@@ -71,12 +71,12 @@ class RunsPublisher:
         )
         self._engine_state_slice = EngineStateSlice()
 
-        await self._publish_runs_advise_refetch_async()
+        await self._publish_runs_advise_refetch_async(run_id=run_id)
 
-    async def clean_up_current_run(self) -> None:
-        """Publish final refetch and unsubscribe flags."""
-        await self._publish_runs_advise_refetch_async()
-        await self._publish_runs_advise_unsubscribe_async()
+    async def clean_up_run(self, run_id: str) -> None:
+        """Publish final refetch and unsubscribe flags for the given run."""
+        await self._publish_runs_advise_refetch_async(run_id=run_id)
+        await self._publish_runs_advise_unsubscribe_async(run_id=run_id)
 
     async def _publish_current_command(self) -> None:
         """Publishes the equivalent of GET /runs/:runId/commands?cursor=null&pageLength=1."""
@@ -84,19 +84,33 @@ class RunsPublisher:
             topic=Topics.RUNS_CURRENT_COMMAND
         )
 
-    async def _publish_runs_advise_refetch_async(self) -> None:
+    async def _publish_runs_advise_refetch_async(self, run_id: str) -> None:
         """Publish a refetch flag for relevant runs topics."""
+        await self._client.publish_advise_refetch_async(topic=Topics.RUNS)
+
         if self._run_hooks is not None:
-            await self._client.publish_advise_refetch_async(topic=Topics.RUNS)
             await self._client.publish_advise_refetch_async(
-                topic=f"{Topics.RUNS}/{self._run_hooks.run_id}"
+                topic=f"{Topics.RUNS}/{run_id}"
             )
 
-    async def _publish_runs_advise_unsubscribe_async(self) -> None:
+    async def _publish_runs_advise_unsubscribe_async(self, run_id: str) -> None:
         """Publish an unsubscribe flag for relevant runs topics."""
         if self._run_hooks is not None:
             await self._client.publish_advise_unsubscribe_async(
-                topic=f"{Topics.RUNS}/{self._run_hooks.run_id}"
+                topic=f"{Topics.RUNS}/{run_id}"
+            )
+            await self._client.publish_advise_unsubscribe_async(
+                topic=Topics.RUNS_CURRENT_COMMAND
+            )
+            await self._client.publish_advise_unsubscribe_async(
+                topic=f"{Topics.RUNS_PRE_SERIALIZED_COMMANDS}/{run_id}"
+            )
+
+    async def publish_pre_serialized_commands_notification(self, run_id: str) -> None:
+        """Publishes notification for GET /runs/:runId/commandsAsPreSerializedList."""
+        if self._run_hooks is not None:
+            await self._client.publish_advise_refetch_async(
+                topic=f"{Topics.RUNS_PRE_SERIALIZED_COMMANDS}/{run_id}"
             )
 
     async def _handle_current_command_change(self) -> None:
@@ -121,7 +135,9 @@ class RunsPublisher:
                 and self._engine_state_slice.state_summary_status
                 != current_state_summary.status
             ):
-                await self._publish_runs_advise_refetch_async()
+                await self._publish_runs_advise_refetch_async(
+                    run_id=self._run_hooks.run_id
+                )
                 self._engine_state_slice.state_summary_status = (
                     current_state_summary.status
                 )
@@ -135,7 +151,7 @@ _runs_publisher_accessor: AppStateAccessor[RunsPublisher] = AppStateAccessor[
 async def get_runs_publisher(
     app_state: AppState = Depends(get_app_state),
     notification_client: NotificationClient = Depends(get_notification_client),
-    publisher_notifier: PublisherNotifier = Depends(get_publisher_notifier),
+    publisher_notifier: PublisherNotifier = Depends(get_pe_publisher_notifier),
 ) -> RunsPublisher:
     """Get a singleton RunsPublisher to publish runs topics."""
     runs_publisher = _runs_publisher_accessor.get_from(app_state)

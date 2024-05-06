@@ -414,7 +414,7 @@ def test_96_config_identification(
         )
         == nozzle_manager.NozzleConfigurationType.SUBRECT
     )
-    subject.update_nozzle_configuration("A1", "D12")
+    subject.update_nozzle_configuration("A1", "B12")
     assert (
         cast(
             nozzle_manager.NozzleConfigurationType,
@@ -422,7 +422,7 @@ def test_96_config_identification(
         )
         == nozzle_manager.NozzleConfigurationType.SUBRECT
     )
-    subject.update_nozzle_configuration("E1", "H12")
+    subject.update_nozzle_configuration("G1", "H12")
     assert (
         cast(
             nozzle_manager.NozzleConfigurationType,
@@ -430,7 +430,7 @@ def test_96_config_identification(
         )
         == nozzle_manager.NozzleConfigurationType.SUBRECT
     )
-    subject.update_nozzle_configuration("A1", "H6")
+    subject.update_nozzle_configuration("A1", "H3")
     assert (
         cast(
             nozzle_manager.NozzleConfigurationType,
@@ -438,7 +438,7 @@ def test_96_config_identification(
         )
         == nozzle_manager.NozzleConfigurationType.SUBRECT
     )
-    subject.update_nozzle_configuration("A7", "H12")
+    subject.update_nozzle_configuration("A10", "H12")
     assert (
         cast(
             nozzle_manager.NozzleConfigurationType,

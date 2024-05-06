@@ -25,7 +25,7 @@ class _ABRAsairSensor:
         test_name = "ABR-Environment-Monitoring"
         run_id = data.create_run_id()
         file_name = data.create_file_name(test_name, run_id, robot)
-        sensor = asair_sensor.BuildAsairSensor(False, True)
+        sensor = asair_sensor.BuildAsairSensor(False, False)
         print(sensor)
         env_data = sensor.get_reading()
         header = [

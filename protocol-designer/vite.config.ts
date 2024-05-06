@@ -1,12 +1,13 @@
 import path from 'path'
-import { UserConfig, defineConfig } from 'vite'
+import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import postCssImport from 'postcss-import'
 import postCssApply from 'postcss-apply'
 import postColorModFunction from 'postcss-color-mod-function'
 import postCssPresetEnv from 'postcss-preset-env'
 import lostCss from 'lost'
-import { versionForProject } from '../scripts/git-version'
+import { versionForProject } from '../scripts/git-version.mjs'
+import type { UserConfig } from 'vite'
 
 const testAliases: {} | { 'file-saver': string } =
   process.env.CYPRESS === '1'
@@ -69,6 +70,9 @@ export default defineConfig(
           ...testAliases,
         },
       },
+      server: {
+        port: 5178
+      }
     }
   }
 )

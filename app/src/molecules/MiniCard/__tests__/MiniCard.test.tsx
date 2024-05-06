@@ -25,8 +25,8 @@ describe('MiniCard', () => {
   it('renders the correct style unselectedOptionStyles', () => {
     render(props)
     const miniCard = screen.getByText('mock mini card')
-    expect(miniCard).toHaveStyle(`background-color: ${COLORS.grey10}`)
-    expect(miniCard).toHaveStyle(`border: 1px solid ${COLORS.grey35}`)
+    expect(miniCard).toHaveStyle(`background-color: ${COLORS.white}`)
+    expect(miniCard).toHaveStyle(`border: 1px solid ${COLORS.grey30}`)
     expect(miniCard).toHaveStyle(`border-radius: ${BORDERS.borderRadius8}`)
     expect(miniCard).toHaveStyle(`padding: ${SPACING.spacing8}`)
     expect(miniCard).toHaveStyle(`width: 100%`)

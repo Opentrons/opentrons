@@ -69,7 +69,6 @@ import {
   getProtocolUsesGripper,
 } from '../../organisms/ProtocolSetupInstruments/utils'
 import {
-  useProtocolHasRunTimeParameters,
   useRunControls,
   useRunStatus,
 } from '../../organisms/RunTimeControl/hooks'
@@ -79,7 +78,7 @@ import { getLabwareSetupItemGroups } from '../Protocols/utils'
 import { getLocalRobot, getRobotSerialNumber } from '../../redux/discovery'
 import {
   ANALYTICS_PROTOCOL_PROCEED_TO_RUN,
-  ANALYTICS_PROTOCOL_RUN_START,
+  ANALYTICS_PROTOCOL_RUN_ACTION,
   useTrackEvent,
 } from '../../redux/analytics'
 import { getIsHeaterShakerAttached } from '../../redux/config'
@@ -257,8 +256,6 @@ function PrepareToRun({
   const { t, i18n } = useTranslation(['protocol_setup', 'shared'])
   const history = useHistory()
   const { makeSnackbar } = useToaster()
-  const hasRunTimeParameters = useProtocolHasRunTimeParameters(runId)
-  // Watch for scrolling to toggle dropshadow
   const scrollRef = React.useRef<HTMLDivElement>(null)
   const [isScrolled, setIsScrolled] = React.useState<boolean>(false)
   const observer = new IntersectionObserver(([entry]) => {
@@ -364,6 +361,12 @@ function PrepareToRun({
       incompleteInstrumentCount != null && incompleteInstrumentCount > 0,
   })
   const moduleCalibrationStatus = useModuleCalibrationStatus(robotName, runId)
+
+  const runTimeParameters = mostRecentAnalysis?.runTimeParameters ?? []
+  const hasRunTimeParameters = runTimeParameters.length > 0
+  const hasCustomRunTimeParameters = runTimeParameters.some(
+    parameter => parameter.value !== parameter.default
+  )
 
   const [
     showConfirmCancelModal,
@@ -489,7 +492,7 @@ function PrepareToRun({
         if (isReadyToRun) {
           play()
           trackProtocolRunEvent({
-            name: ANALYTICS_PROTOCOL_RUN_START,
+            name: ANALYTICS_PROTOCOL_RUN_ACTION.START,
             properties: robotAnalyticsData != null ? robotAnalyticsData : {},
           })
         } else {
@@ -622,11 +625,11 @@ function PrepareToRun({
     doorStatus?.data.status === 'open' &&
     doorStatus?.data.doorRequiredClosedForProtocol
 
-  //  TODO(Jr, 3/20/24): wire up custom values
-  const hasCustomValues = false
-  const parametersDetail = hasCustomValues
-    ? t('custom_values')
-    : t('default_values')
+  const parametersDetail = hasRunTimeParameters
+    ? hasCustomRunTimeParameters
+      ? t('custom_values')
+      : t('default_values')
+    : t('no_parameters_specified')
 
   return (
     <>
@@ -702,7 +705,7 @@ function PrepareToRun({
             />
             <ProtocolSetupStep
               onClickSetupStep={() => setSetupScreen('modules')}
-              title={t('modules_and_deck')}
+              title={t('deck_hardware')}
               detail={modulesDetail}
               subDetail={modulesSubDetail}
               status={modulesStatus}
@@ -732,11 +735,7 @@ function PrepareToRun({
             <ProtocolSetupStep
               onClickSetupStep={() => setSetupScreen('view only parameters')}
               title={t('parameters')}
-              detail={t(
-                hasRunTimeParameters
-                  ? parametersDetail
-                  : t('no_parameters_specified')
-              )}
+              detail={parametersDetail}
               subDetail={null}
               status="general"
               disabled={!hasRunTimeParameters}

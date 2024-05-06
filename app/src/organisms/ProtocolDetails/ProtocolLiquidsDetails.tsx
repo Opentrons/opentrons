@@ -76,7 +76,7 @@ export const ProtocolLiquidsDetails = (
           borderRadius={BORDERS.borderRadius8}
         >
           <Icon
-            color={COLORS.grey50}
+            color={COLORS.grey60}
             size="1.25rem"
             name="ot-alert"
             aria-label="ProtocolLIquidsDetails_noLiquidsIcon"

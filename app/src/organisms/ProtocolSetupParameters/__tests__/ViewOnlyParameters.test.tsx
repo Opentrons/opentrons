@@ -60,6 +60,8 @@ describe('ViewOnlyParameters', () => {
     fireEvent.click(screen.getAllByRole('button')[0])
     expect(props.setSetupScreen).toHaveBeenCalled()
   })
-  //    TODO(jr, 3/20/24):test the update chip when
-  //    custom value boolean is wired up
+  it('renders chip for updated values', () => {
+    render(props)
+    screen.getByTestId('Chip_USE_GRIPPER')
+  })
 })

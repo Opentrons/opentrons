@@ -64,11 +64,23 @@ const _createNextTimelineFrame = (args: {
     volume: args.volume,
     activeTips: _getNewActiveTips(args.nextFrame.commands.slice(0, args.index)),
   }
+  const command = args.command
+  const isAirGapCommand =
+    'meta' in command && command.meta != null && 'isAirGap' in command.meta
+
   const newTimelineFrame =
     args.command.commandType === 'aspirate' ||
     args.command.commandType === 'aspirateInPlace'
-      ? { ..._newTimelineFrameKeys, source: args.wellInfo }
-      : { ..._newTimelineFrameKeys, dest: args.wellInfo }
+      ? {
+          ..._newTimelineFrameKeys,
+          source: args.wellInfo,
+          isAirGap: isAirGapCommand,
+        }
+      : {
+          ..._newTimelineFrameKeys,
+          dest: args.wellInfo,
+          isAirGap: isAirGapCommand,
+        }
   return newTimelineFrame
 }
 
