@@ -28,8 +28,12 @@ describe('SubmitPrimaryButton', () => {
   it('renders submit primary button with text - active', () => {
     render(props)
     const button = screen.getByText('submit primary button')
+<<<<<<< HEAD
     expect(button).toHaveStyle(`background-color: ${COLORS.blue60}`)
 <<<<<<< HEAD
+=======
+    expect(button).toHaveStyle(`background-color: ${COLORS.blue50}`)
+>>>>>>> 518e4577da (test(protocol-designer, labware-library): update cypress (#14971))
     expect(button).toHaveStyle(`border-radius: ${BORDERS.borderRadius8}`)
 =======
     expect(button).toHaveStyle(`border-radius: ${BORDERS.radiusSoftCorners}`)

@@ -9,7 +9,8 @@ describe('Create a Tip Rack', () => {
     cy.viewport('macbook-15')
     cy.contains('NO').click({ force: true })
   })
-  it('Tip Rack Selection from drop down', () => {
+  it('Should create a tip rack', () => {
+    // Tip Rack Selection from drop down
     cy.get('label')
       .contains('What type of labware are you creating?')
       .children()
@@ -17,9 +18,8 @@ describe('Create a Tip Rack', () => {
       .trigger('mousedown')
     cy.get('*[class^="_option_label"]').contains('Tip Rack').click()
     cy.get('button').contains('start creating labware').click({ force: true })
-  })
 
-  it('Custom Tip Racks Are Not Recommended', () => {
+    // Custom Tip Racks Are Not Recommended
     cy.get('#CustomTiprackWarning p')
       .first()
       .contains(
@@ -32,9 +32,8 @@ describe('Create a Tip Rack', () => {
         'Third party tips can fit, but not necessarily with a tight seal. You risk tips falling off mid-run as well as pipetting inaccuracy. They may also be more likely to bend or break.'
       )
       .should('exist')
-  })
 
-  it('Verify Hand-Placed Tip Fit section', () => {
+    // Verify Hand-Placed Tip Fit section
     cy.get('#HandPlacedTipFit h2')
       .contains('Hand-Placed Tip Fit')
       .should('exist')
@@ -84,9 +83,8 @@ describe('Create a Tip Rack', () => {
         'If your tip seems to fit when placed by hand it may work on the OT-2. Proceed through the form to generate a definition. Once you have a definition you can check performance on the robot.'
       )
       .should('exist')
-  })
 
-  it('Verify Total Footprint section', () => {
+    // Verify Total Footprint section
     cy.get('#Footprint h2').contains('Total Footprint').should('exist')
 
     // verify the copy changes in the Total Footprint section
@@ -110,9 +108,7 @@ describe('Create a Tip Rack', () => {
     // Enter the length and width for the Footprint
     cy.get('input[name="footprintXDimension"]').clear().type('127')
     cy.get('input[name="footprintYDimension"]').clear().type('85')
-  })
 
-  it('Verify errors in Total Footprint section', () => {
     // verify that length displays error for smaller value
     cy.get('input[name="footprintXDimension"]').clear().type('20')
     cy.get('#Footprint span')
@@ -148,9 +144,8 @@ describe('Create a Tip Rack', () => {
     // entering the valid values for footprint
     cy.get('input[name="footprintXDimension"]').clear().type('127')
     cy.get('input[name="footprintYDimension"]').clear().type('85')
-  })
 
-  it('Verify copy error in Total Height section', () => {
+    // Verify copy error in Total Height section
     cy.get('#Height h2').contains('Total Height').should('exist')
     cy.get('#Height p')
       .first()
@@ -166,18 +161,16 @@ describe('Create a Tip Rack', () => {
       .should('exist')
     cy.get('img[alt="plate or reservoir height"]').should('exist')
     cy.get('input[name="labwareZDimension"]').clear().type('24')
-  })
 
-  it('verify the Tip Length section', () => {
+    // Verify the Tip Length section
     cy.get('#WellBottomAndDepth h2').contains('Tip Length').should('exist')
     cy.get('#WellBottomAndDepth p')
       .contains('Reference the top of the tip to the bottom of the tip.')
       .should('exist')
     cy.get('img[alt="tip length"]').should('exist')
     cy.get('input[name="wellDepth"]').clear().type('12')
-  })
 
-  it('verify the Grid section', () => {
+    // Verify the Grid section
     cy.get('#Grid h2').contains('Grid').should('exist')
     cy.get('#Grid p')
       .contains(
@@ -189,26 +182,23 @@ describe('Create a Tip Rack', () => {
     cy.get('input[name="regularRowSpacing"]').first().click({ force: true })
     cy.get('input[name="gridColumns"]').clear().type('5')
     cy.get('input[name="regularColumnSpacing"]').first().click({ force: true })
-  })
 
-  it('Verify copy change for volume', () => {
+    // Verify copy change for volume
     cy.get('#Volume h2').contains('Volume').should('exist')
     cy.get('#Volume p')
       .contains('Total maximum volume of each tip.')
       .should('exist')
     cy.get('input[name="wellVolume"]').clear().type('20')
-  })
 
-  it('Verify the tip diameter of the tip', () => {
+    // Verify the tip diameter of the tip
     cy.get('#TipDiameter h2').contains('Tip Diameter').should('exist')
     cy.get('#TipDiameter p')
       .contains('Reference the inside of the tip.')
       .should('exist')
     cy.get('img[alt="circular well diameter"]').should('exist')
     cy.get('input[name="wellDiameter"]').clear().type('10')
-  })
 
-  it('Verify the Tip Spacing section', () => {
+    // Verify the Tip Spacing section
     cy.get('#WellSpacing h2').contains('Tip Spacing').should('exist')
     cy.get('#WellSpacing p')
       .contains('Spacing is between the center of tips.')
@@ -222,9 +212,8 @@ describe('Create a Tip Rack', () => {
     cy.get('img[alt="circular well spacing"]').should('exist')
     cy.get('input[name="gridSpacingX"]').clear().type('15')
     cy.get('input[name="gridSpacingY"]').clear().type('15')
-  })
 
-  it('Verify the Grid Offset section', () => {
+    // Verify the Grid Offset section
     cy.get('#GridOffset h2').contains('Grid Offset').should('exist')
     cy.get('#GridOffset p')
       .contains(
@@ -241,25 +230,22 @@ describe('Create a Tip Rack', () => {
     cy.get('img[alt="circular well offset"]').should('exist')
     cy.get('input[name="gridOffsetX"]').clear().type('10')
     cy.get('input[name="gridOffsetY"]').clear().type('10')
-  })
 
-  it('Verify the Description section', () => {
+    // Verify the Description section
     cy.get('#Description h2').contains('Description').should('exist')
     cy.get('input[name="brand"]').clear().type('Brand Chalu')
     cy.get('input[name="brandId"]')
       .clear()
       .type('abcd12345!@#$%,efghij6789^&*()')
-  })
 
-  it('Verify the File section and enter the file name', () => {
+    // Verify the File section and enter the file name
     cy.get('#File h2').contains('File').should('exist')
     cy.get('input[name="displayName"]')
       .clear()
       .type('Brand Chalu 1 Tip Rack 20ul')
     cy.get('input[name="loadName"]').clear().type('generic_1_tiprack_20ul')
-  })
 
-  it('Verify the exported file to the fixture', () => {
+    // Verify the exported file to the fixture
     cy.get('button').contains('EXPORT FILE').click()
 
     cy.fixture(expectedExportFixture).then(expectedExportLabwareDef => {
@@ -277,8 +263,7 @@ describe('Create a Tip Rack', () => {
     cy.window()
       .its('__lastSavedFileName__')
       .should('equal', `generic_1_tiprack_20ul.json`)
-  })
-  it('verify the too big, too small error', () => {
+    // 'verify the too big, too small error
     cy.get('input[name="gridOffsetY"]').clear().type('24')
     cy.get('#CheckYourWork span')
       .contains(

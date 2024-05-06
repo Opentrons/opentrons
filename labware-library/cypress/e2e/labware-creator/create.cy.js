@@ -3,7 +3,7 @@
 // { force: true }
 
 context('The Labware Creator Landing Page', () => {
-  before(() => {
+  beforeEach(() => {
     cy.visit('/create')
     cy.viewport('macbook-15')
     cy.contains('NO').click({ force: true })

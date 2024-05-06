@@ -46,7 +46,8 @@ describe('Advanced Settings for Mix Form', () => {
     importProtocol()
     openDesignTab()
   })
-  it('Verify functionality of mix settings with different labware', () => {
+  it('should verify the batch edit form works as expected', () => {
+    // Verify functionality of mix settings with different labware
     enterBatchEdit()
 
     // Different labware disbales aspirate and dispense Flowrate , tipPosition, delay and touchTip
@@ -75,8 +76,8 @@ describe('Advanced Settings for Mix Form', () => {
 
     // Exit batch edit mode
     cy.get('button').contains('exit batch edit').click()
-  })
-  it('Verify functionality of mix settings with same labware', () => {
+
+    // Verify functionality of mix settings with same labware
     enterBatchEdit()
 
     // Same labware enables aspirate and dispense Flowrate ,tipPosition ,delay and touchTip
@@ -103,8 +104,8 @@ describe('Advanced Settings for Mix Form', () => {
 
     // Exit batch edit mode
     cy.get('button').contains('exit batch edit').click()
-  })
-  it('verify invalid input in delay field', () => {
+
+    // Verify invalid input in delay field
     // click on step 2 in batch edit mode
     cy.get('[data-test="StepItem_2"]').click(batchEditClickOptions)
 
@@ -118,9 +119,8 @@ describe('Advanced Settings for Mix Form', () => {
 
     // Exit batch edit mode
     cy.get('button').contains('exit batch edit').click()
-  })
 
-  it('verify indeterminate state of flowrate', () => {
+    // Verify indeterminate state of flowrate
     // click on step 2 in batch edit mode
     cy.get('[data-test="StepItem_2"]').click(batchEditClickOptions)
     cy.get('input[name="aspirate_flowRate"]').click({ force: true })
@@ -139,9 +139,8 @@ describe('Advanced Settings for Mix Form', () => {
 
     // indeterminate state in flowrate is empty
     cy.get('input[name="aspirate_flowRate"]').should('have.value', '')
-  })
 
-  it('verify functionality of flowrate in batch edit mix form', () => {
+    // Verify functionality of flowrate in batch edit mix form
     // Batch editing the Flowrate value
     cy.get('input[name="aspirate_flowRate"]').click({ force: true })
     cy.contains(
@@ -169,9 +168,8 @@ describe('Advanced Settings for Mix Form', () => {
 
     // Verify that flowrate value
     cy.get('input[name="aspirate_flowRate"]').should('have.value', 100)
-  })
 
-  it('verify delay settings indeterminate value', () => {
+    // Verify delay settings indeterminate value
     // Click on step 2, to enter batch edit mode
     cy.get('[data-test="StepItem_2"]').click(batchEditClickOptions)
     // Select delay settings
@@ -191,9 +189,8 @@ describe('Advanced Settings for Mix Form', () => {
     )
     // Exit batch edit mode
     cy.get('button').contains('exit batch edit').click()
-  })
 
-  it('verify delay settings batch editing in mix form', () => {
+    // Verify delay settings batch editing in mix form
     // Click on step 1, to enter batch edit mode
     cy.get('[data-test="StepItem_1"]').click(batchEditClickOptions)
     // Click on step 2 to batch edit mix settings
@@ -220,9 +217,8 @@ describe('Advanced Settings for Mix Form', () => {
 
     // Verify that volume is set to 2
     cy.get('input[name="aspirate_delay_seconds"]').should('have.value', 2)
-  })
 
-  it('verify touchTip settings indeterminate value', () => {
+    // Verify touchTip settings indeterminate value
     cy.get('[data-test="StepItem_2"]').click()
     // Click on step 2, to enter batch edit mode
     cy.get('[data-test="StepItem_2"]').click(batchEditClickOptions)
@@ -242,9 +238,8 @@ describe('Advanced Settings for Mix Form', () => {
     )
     // Exit batch edit mode
     cy.get('button').contains('exit batch edit').click()
-  })
 
-  it('verify touchTip settings batch editing in mix form', () => {
+    // Verify touchTip settings batch editing in mix form
     cy.get('[data-test="StepItem_2"]').click()
     // Click on step 2, to enter batch edit mode
     cy.get('[data-test="StepItem_2"]').click(batchEditClickOptions)
@@ -276,9 +271,8 @@ describe('Advanced Settings for Mix Form', () => {
       'have.value',
       16.4
     )
-  })
 
-  it('verify blowout settings indeterminate value', () => {
+    // Verify blowout settings indeterminate value
     // Click on step 2, to enter batch edit mode
     cy.get('[data-test="StepItem_2"]').click(batchEditClickOptions)
     // Select blowout settings
@@ -296,9 +290,8 @@ describe('Advanced Settings for Mix Form', () => {
     )
     // Exit batch edit mode
     cy.get('button').contains('exit batch edit').click()
-  })
 
-  it('verify blowout settings batch editing in mix form', () => {
+    // Verify blowout settings batch editing in mix form
     // Click on step 2, to enter batch edit mode
     cy.get('[data-test="StepItem_2"]').click(batchEditClickOptions)
     // Click on step 3 to batch edit mix settings
@@ -330,9 +323,8 @@ describe('Advanced Settings for Mix Form', () => {
       const expectedSubstring = 'trashBin'
       expect(value).to.include(expectedSubstring)
     })
-  })
 
-  it('verify well-order indeterminate state', () => {
+    // verify well-order indeterminate state
     // Click on step 2, to enter batch edit and click on well order to change the order
     cy.get('[data-test="StepItem_2"]').click(batchEditClickOptions)
     // click on well-order and change the order

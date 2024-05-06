@@ -25,9 +25,14 @@ describe('MiniCard', () => {
   it('renders the correct style unselectedOptionStyles', () => {
     render(props)
     const miniCard = screen.getByText('mock mini card')
+<<<<<<< HEAD
     expect(miniCard).toHaveStyle(`background-color: ${COLORS.grey10}`)
     expect(miniCard).toHaveStyle(`border: 1px solid ${COLORS.grey35}`)
 <<<<<<< HEAD
+=======
+    expect(miniCard).toHaveStyle(`background-color: ${COLORS.white}`)
+    expect(miniCard).toHaveStyle(`border: 1px solid ${COLORS.grey30}`)
+>>>>>>> 518e4577da (test(protocol-designer, labware-library): update cypress (#14971))
     expect(miniCard).toHaveStyle(`border-radius: ${BORDERS.borderRadius8}`)
 =======
     expect(miniCard).toHaveStyle(`border-radius: ${BORDERS.radiusSoftCorners}`)

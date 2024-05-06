@@ -45,10 +45,14 @@ describe('EquipmentOption', () => {
     render(props)
     expect(screen.getByLabelText('EquipmentOption_flex_mockText')).toHaveStyle(
 <<<<<<< HEAD
+<<<<<<< HEAD
       `background-color: ${COLORS.grey10}`
 =======
       `background-color: ${COLORS.white}`
 >>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
+=======
+      `background-color: ${COLORS.white}`
+>>>>>>> 518e4577da (test(protocol-designer, labware-library): update cypress (#14971))
     )
   })
   it('renders the equipment option without check not selected and image', () => {
@@ -64,7 +68,7 @@ describe('EquipmentOption', () => {
       screen.getByLabelText('EquipmentOption_checkbox-blank-outline')
     ).toHaveStyle(`color: ${COLORS.grey50}`)
     expect(screen.getByLabelText('EquipmentOption_flex_mockText')).toHaveStyle(
-      `border: 1px ${BORDERS.styleSolid} ${COLORS.grey35}`
+      `border: 1px ${BORDERS.styleSolid} ${COLORS.grey30}`
     )
   })
   it('renders the equipment option without check selected', () => {
