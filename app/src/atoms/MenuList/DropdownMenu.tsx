@@ -90,7 +90,13 @@ export function DropdownMenu(props: DropdownMenuProps): JSX.Element {
 
         const dropdownBottom =
           dropdownRect.bottom + (filterOptions.length + 1) * 34 - scrollOffset
-        setDropdownPosition(dropdownBottom > availableHeight ? 'top' : 'bottom')
+
+        setDropdownPosition(
+          dropdownBottom > availableHeight &&
+            window.innerHeight < availableHeight
+            ? 'top'
+            : 'bottom'
+        )
       }
     }
 
