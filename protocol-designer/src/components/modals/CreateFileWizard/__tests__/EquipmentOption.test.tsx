@@ -40,7 +40,7 @@ describe('EquipmentOption', () => {
     }
     render(props)
     expect(screen.getByLabelText('EquipmentOption_flex_mockText')).toHaveStyle(
-      `background-color: ${COLORS.grey10}`
+      `background-color: ${COLORS.white}`
     )
   })
   it('renders the equipment option without check not selected and image', () => {
@@ -56,7 +56,7 @@ describe('EquipmentOption', () => {
       screen.getByLabelText('EquipmentOption_checkbox-blank-outline')
     ).toHaveStyle(`color: ${COLORS.grey50}`)
     expect(screen.getByLabelText('EquipmentOption_flex_mockText')).toHaveStyle(
-      `border: 1px ${BORDERS.styleSolid} ${COLORS.grey35}`
+      `border: 1px ${BORDERS.styleSolid} ${COLORS.grey30}`
     )
   })
   it('renders the equipment option without check selected', () => {
