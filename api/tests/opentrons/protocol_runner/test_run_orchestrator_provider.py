@@ -91,5 +91,5 @@ def test_build_run_orchestrator_provider(
     assert result == RunOrchestrator(
         setup_runner=mock_live_runner,
         fixit_runner=mock_live_runner,
-        protocol_runner=mock_protocol_runner,
+        json_or_python_runner=mock_protocol_runner,
     )

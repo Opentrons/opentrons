@@ -1,44 +1,36 @@
 from dataclasses import dataclass
 from typing import Optional, Union
 
-from urllib3 import request
-
-from .protocol_runner import (
-    create_protocol_runner,
-    AnyRunner,
-    LiveRunner,
-    PythonAndLegacyRunner,
-    JsonRunner,
-)
+from . import protocol_runner
 from ..hardware_control import HardwareControlAPI
 from ..protocol_engine import (
     ProtocolEngine,
     Command,
     CommandCreate,
     CommandIntent,
-    slot_standardization,
 )
-from ..protocol_engine.commands import hash_command_params
 from ..protocol_engine.errors import CommandNotAllowedError
 from ..protocol_engine.types import PostRunHardwareState
 from ..protocol_reader import JsonProtocolConfig, PythonProtocolConfig
 
 
 class RunOrchestrator:
-    _protocol_runner: Optional[Union[PythonAndLegacyRunner, JsonRunner]]
-    _setup_runner: AnyRunner
-    _fixit_runner: AnyRunner
+    _json_or_python_runner: Optional[
+        protocol_runner.AnyRunner
+    ]  # I want to use type, should I just add a type ignore?
+    _setup_runner: protocol_runner.AnyRunner
+    _fixit_runner: protocol_runner.AnyRunner
 
     def __init__(
         self,
-        setup_runner: AnyRunner,
-        fixit_runner: AnyRunner,
-        protocol_runner: Optional[AnyRunner] = None,
+        setup_runner: protocol_runner.AnyRunner,
+        fixit_runner: protocol_runner.AnyRunner,
+        json_or_python_runner: Optional[protocol_runner.AnyRunner] = None,
     ) -> None:
         # todo(tamar, 5-7-24): assert that the type matches expected type
         self._setup_runner = setup_runner
         self._fixit_runner = fixit_runner
-        self._protocol_runner = protocol_runner
+        self._json_or_python_runner = json_or_python_runner
 
     def add_command(
         self, request: CommandCreate, failed_command_id: Optional[str] = None
@@ -73,9 +65,9 @@ class RunOrchestrator:
             self._fixit_runner.set_command_queued(request)
         elif (
             request.intent == CommandIntent.PROTOCOL
-            and self._protocol_runner is not None
+            and self._json_or_python_runner is not None
         ):
-            self._protocol_runner.set_command_queued(request)
+            self._json_or_python_runner.set_command_queued(request)
 
 
 @dataclass
@@ -88,27 +80,29 @@ class RunOrchestratorProvider:
         post_run_hardware_state: PostRunHardwareState = PostRunHardwareState.HOME_AND_STAY_ENGAGED,
         drop_tips_after_run: bool = True,
     ):
-        setup_runner = create_protocol_runner(
+        setup_runner = protocol_runner.create_protocol_runner(
             protocol_engine=protocol_engine,
             hardware_api=hardware_api,
             post_run_hardware_state=post_run_hardware_state,
             drop_tips_after_run=drop_tips_after_run,
         )
-        fixit_runner = create_protocol_runner(
+        fixit_runner = protocol_runner.create_protocol_runner(
             protocol_engine=protocol_engine,
             hardware_api=hardware_api,
             post_run_hardware_state=post_run_hardware_state,
             drop_tips_after_run=drop_tips_after_run,
         )
-        protocol_runner = create_protocol_runner(
-            protocol_config=protocol_config,
-            protocol_engine=protocol_engine,
-            hardware_api=hardware_api,
-            post_run_hardware_state=post_run_hardware_state,
-            drop_tips_after_run=drop_tips_after_run,
-        )
+        json_or_python_runner = None
+        if protocol_config:
+            json_or_python_runner = protocol_runner.create_protocol_runner(
+                protocol_config=protocol_config,
+                protocol_engine=protocol_engine,
+                hardware_api=hardware_api,
+                post_run_hardware_state=post_run_hardware_state,
+                drop_tips_after_run=drop_tips_after_run,
+            )
         return RunOrchestrator(
             setup_runner=setup_runner,
             fixit_runner=fixit_runner,
-            protocol_runner=protocol_runner,
+            json_or_python_runner=json_or_python_runner,
         )
