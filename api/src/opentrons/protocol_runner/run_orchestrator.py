@@ -1,6 +1,8 @@
 from dataclasses import dataclass
 from typing import Optional, Union
 
+from urllib3 import request
+
 from .protocol_runner import (
     create_protocol_runner,
     AnyRunner,
@@ -23,16 +25,17 @@ from ..protocol_reader import JsonProtocolConfig, PythonProtocolConfig
 
 
 class RunOrchestrator:
-    _protocol_runner: AnyRunner
+    _protocol_runner: Optional[Union[PythonAndLegacyRunner, JsonRunner]]
     _setup_runner: AnyRunner
     _fixit_runner: AnyRunner
 
     def __init__(
         self,
-        setup_runner: LiveRunner,
-        fixit_runner: LiveRunner,
-        protocol_runner: Optional[Union[PythonAndLegacyRunner, JsonRunner]] = None,
+        setup_runner: AnyRunner,
+        fixit_runner: AnyRunner,
+        protocol_runner: Optional[AnyRunner] = None,
     ) -> None:
+        # todo(tamar, 5-7-24): assert that the type matches expected type
         self._setup_runner = setup_runner
         self._fixit_runner = fixit_runner
         self._protocol_runner = protocol_runner
@@ -68,7 +71,10 @@ class RunOrchestrator:
             self._setup_runner.set_command_queued(request)
         elif request.intent == CommandIntent.FIXIT:
             self._fixit_runner.set_command_queued(request)
-        else:
+        elif (
+            request.intent == CommandIntent.PROTOCOL
+            and self._protocol_runner is not None
+        ):
             self._protocol_runner.set_command_queued(request)
 
 
