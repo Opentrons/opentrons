@@ -62,6 +62,7 @@ from opentrons.hardware_control.types import (
     EstopState,
     CurrentConfig,
     InstrumentProbeType,
+    LiquidNotFound,
 )
 from opentrons.hardware_control.errors import (
     InvalidPipetteName,
@@ -715,14 +716,19 @@ async def test_liquid_probe(
     mock_move_group_run: mock.AsyncMock,
     mock_send_stop_threshold: mock.AsyncMock,
 ) -> None:
-    await controller.liquid_probe(
-        mount=mount,
-        max_z_distance=fake_liquid_settings.max_z_distance,
-        mount_speed=fake_liquid_settings.mount_speed,
-        plunger_speed=fake_liquid_settings.plunger_speed,
-        threshold_pascals=fake_liquid_settings.sensor_threshold_pascals,
-        output_option=fake_liquid_settings.output_option,
-    )
+    try:
+        await controller.liquid_probe(
+            mount=mount,
+            max_z_distance=fake_liquid_settings.max_z_distance,
+            mount_speed=fake_liquid_settings.mount_speed,
+            plunger_speed=fake_liquid_settings.plunger_speed,
+            threshold_pascals=fake_liquid_settings.sensor_threshold_pascals,
+            output_option=fake_liquid_settings.output_option,
+        )
+    except LiquidNotFound:
+        # the move raises a liquid not found now since we don't call the move group and it doesn't
+        # get any positions back
+        pass
     move_groups = (mock_move_group_run.call_args_list[0][0][0]._move_groups)[0][0]
     head_node = axis_to_node(Axis.by_mount(mount))
     tool_node = sensor_node_for_mount(mount)
