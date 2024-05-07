@@ -120,3 +120,46 @@ def test_build_run_orchestrator_provider(
     #     fixit_runner=mock_fixit_runner,
     #     json_or_python_runner=mock_protocol_runner,
     # )
+
+
+@pytest.mark.parametrize(
+    "runner, command_intent, input_protocol_config",
+    [
+        (
+            lazy_fixture("mock_setup_runner"),
+            pe_commands.CommandIntent.SETUP,
+            None
+        ),
+        (
+            lazy_fixture("mock_fixit_runner"),
+            pe_commands.CommandIntent.FIXIT,
+            None
+        ),
+        (
+            lazy_fixture("mock_json_runner"),
+            pe_commands.CommandIntent.PROTOCOL,
+            JsonProtocolConfig(schema_version=7)
+        ),
+        (
+            lazy_fixture("mock_python_runner"),
+            pe_commands.CommandIntent.PROTOCOL,
+            PythonProtocolConfig(api_version=2.14)
+        ),
+    ],
+)
+def test_add_command(
+    subject: RunOrchestrator,
+    decoy: Decoy,
+    runner: AnyRunner,
+    command_intent: pe_commands.CommandIntent,
+    input_protocol_config: Optional[Union[PythonProtocolConfig, JsonProtocolConfig]]
+) -> None:
+    """Should verify calls to set_command_queued."""
+    command_to_queue = pe_commands.HomeCreate.construct(
+        intent=command_intent, params=pe_commands.HomeParams.construct()
+    )
+    subject.build_orchestrator(protocol_config=input_protocol_config)
+    subject.add_command(command_to_queue)
+
+    decoy.verify(runner.set_command_queued(command_to_queue))
+
