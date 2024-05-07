@@ -486,11 +486,10 @@ def get_logs(storage_directory: str, ip: str) -> List[str]:
             )
             response.raise_for_status()
             log_data = response.text
-            log_name = ip + "_" + log_type.split(".")[0] + ".json"
+            log_name = ip + "_" + log_type.split(".")[0] + ".log"
             file_path = os.path.join(storage_directory, log_name)
             with open(file_path, mode="w", encoding="utf-8") as file:
-                file.write(response.text)
-            json.dump(log_data, open(file_path, mode="w"))
+                file.write(log_data)
         except RuntimeError:
             print(f"Request exception. Did not save {log_type}")
             continue

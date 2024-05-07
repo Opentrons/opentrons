@@ -130,6 +130,7 @@ if __name__ == "__main__":
     board_id = args.board_id[0]
     reporter_id = args.reporter_id[0]
     ticket = jira_tool.JiraTicket(url, api_token, email)
+    ticket.issues_on_board(board_id)
     try:
         error_runs = get_error_runs_from_robot(ip)
     except requests.exceptions.InvalidURL:

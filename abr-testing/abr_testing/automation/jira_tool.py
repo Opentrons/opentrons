@@ -86,7 +86,7 @@ class JiraTicket:
         }
         try:
             response = requests.post(
-                f"{self.url}/rest/api/3/issue/",
+                f"{self.url}/rest/api/3/issue",
                 headers=self.headers,
                 auth=self.auth,
                 json=data,
