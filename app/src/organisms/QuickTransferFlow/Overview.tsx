@@ -58,7 +58,7 @@ export function Overview(props: OverviewProps): JSX.Element | null {
       marginTop="192px"
     >
       {displayItems.map(displayItem => (
-        <ListItem type="noActive">
+        <ListItem type="noActive" key={displayItem.option}>
           <Flex justifyContent={JUSTIFY_SPACE_BETWEEN} width="100%">
             <StyledText css={TYPOGRAPHY.level4HeaderSemiBold} width="30rem">
               {displayItem.option}
