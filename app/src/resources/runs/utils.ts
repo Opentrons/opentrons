@@ -13,9 +13,11 @@ export const chainRunCommandsRecursive = (
   continuePastCommandFailure: boolean = true,
   setIsLoading: React.Dispatch<React.SetStateAction<boolean>>
 ): Promise<CommandData[]> => {
-  if (commands.length < 1)
+  if (commands.length < 1) {
     return Promise.reject(new Error('no commands to execute'))
+  }
   setIsLoading(true)
+
   return createRunCommand({
     command: commands[0],
     waitUntilComplete: true,
@@ -57,9 +59,11 @@ export const chainLiveCommandsRecursive = (
   continuePastCommandFailure: boolean = true,
   setIsLoading: React.Dispatch<React.SetStateAction<boolean>>
 ): Promise<CommandData[]> => {
-  if (commands.length < 1)
+  if (commands.length < 1) {
     return Promise.reject(new Error('no commands to execute'))
+  }
   setIsLoading(true)
+
   return createLiveCommand({
     command: commands[0],
     waitUntilComplete: true,
@@ -98,9 +102,11 @@ export const chainMaintenanceCommandsRecursive = (
   continuePastCommandFailure: boolean = true,
   setIsLoading: React.Dispatch<React.SetStateAction<boolean>>
 ): Promise<CommandData[]> => {
-  if (commands.length < 1)
+  if (commands.length < 1) {
     return Promise.reject(new Error('no commands to execute'))
+  }
   setIsLoading(true)
+
   return createMaintenanceCommand({
     maintenanceRunId: maintenanceRunId,
     command: commands[0],
