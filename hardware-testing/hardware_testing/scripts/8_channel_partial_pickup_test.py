@@ -58,6 +58,7 @@ class Eight_Channel_Partial_Pickup_Test:
         self.calibrate = calibrate
         self.concentricity = concentricity
         self.cycles = cycles
+        self.channels = channels
         self.pipette = pipette
         self.tip_num = tip_num
         self.tip_size = tip_size
@@ -126,8 +127,10 @@ class Eight_Channel_Partial_Pickup_Test:
             "T200":58.35,
             "T50":57.9,
         }
-        # self.nozzles = [i+"1" for i in reversed(list(string.ascii_uppercase))][-8:]
-        self.nozzles = ["H1"]
+        if self.channels == "8CH":
+            self.nozzles = [i+"1" for i in reversed(list(string.ascii_uppercase))][-8:]
+        else:
+            self.nozzles = ["H1"]
         self.nozzle_file = "_nozzle_offsets.csv"
         self.nozzle_offset = False
         self.nozzle_offsets = {nozzle:"None" for nozzle in self.nozzles}
@@ -185,7 +188,8 @@ class Eight_Channel_Partial_Pickup_Test:
         await self._update_pick_up_current(self.api, self.mount, self.tip_num, self.motor_current)
         await self._update_pick_up_distance(self.api, self.mount, self.tip_num, self.pick_up_distance)
         await self._update_pick_up_speed(self.api, self.mount, self.tip_num, self.pick_up_speed)
-        # await self._update_nozzle_manager(self.api, self.mount, self.tip_num)
+        if self.channels == "8CH":
+            await self._update_nozzle_manager(self.api, self.mount, self.tip_num)
         pipette = _get_pipette_from_mount(self.api, self.mount)
         print(f"Pipette Settings: {pipette.get_pick_up_configuration_for_tip_count(self.tip_num)}")
 
@@ -205,6 +209,7 @@ class Eight_Channel_Partial_Pickup_Test:
             self.test_data[f"{key} Gauge Nozzle"] = "None"
             self.test_data[f"{key} Delta"] = "None"
             self.test_data[f"{key} Overlap"] = "None"
+            self.test_data[f"{key} Overlap 2"] = "None"
             self.test_data[f"{key} Encoder Tip"] = "None"
             self.test_data[f"{key} Encoder Nozzle"] = "None"
 
@@ -540,16 +545,17 @@ class Eight_Channel_Partial_Pickup_Test:
                 nozzle_encoder = float(self.nozzle_encoders[self.nozzles[i]])
                 delta = gauge - nozzle_offset
                 true_overlap = self.tip_overlap - delta
-                new_method = self.tip_overlap_ref - (delta + self.tip_diff)
+                true_overlap_two = self.tip_overlap_ref - (delta + self.tip_diff)
                 self.test_data[f"Z Gauge"] = str(gauge)
                 self.test_data[f"Z Gauge Nozzle"] = str(nozzle_offset)
                 self.test_data[f"Z Delta"] = str(delta)
                 self.test_data[f"Z Overlap"] = str(true_overlap)
+                self.test_data[f"Z Overlap 2"] = str(true_overlap_two)
                 self.test_data[f"Z Encoder Tip"] = str(encoder_z)
                 self.test_data[f"Z Encoder Nozzle"] = str(nozzle_encoder)
                 print(f"Z Encoder Tip = {encoder_z}mm")
                 print(f"True Overlap = {true_overlap}mm")
-                print(f"Method 2 = {new_method}mm")
+                print(f"True Overlap 2 = {true_overlap_two}mm")
             await self._record_data(cycle)
 
     async def _select_tip(
@@ -727,10 +733,10 @@ class Eight_Channel_Partial_Pickup_Test:
                     self._load_config(self.tip_num)
                 if self.nozzle_offset:
                     await self._get_nozzles_offset(self.api, self.mount)
+                await self._home(self.api, self.mount)
                 for i in range(self.cycles):
                     cycle = i + 1
                     print(f"\n-> Starting Test Cycle {cycle}/{self.cycles}")
-                    await self._home(self.api, self.mount)
                     if self.calibrate and cycle > 1:
                         await self._pick_up_tips(self.api, self.mount, cycle)
                     if not self.calibrate:
@@ -739,8 +745,8 @@ class Eight_Channel_Partial_Pickup_Test:
                     await self._leak_test(self.api, self.mount)
                     await self._feel_test(self.api, self.mount)
                     await self._record_data(cycle)
-                    await self._reset(self.api, self.mount)
                     self._reset_data()
+                await self._reset(self.api, self.mount)
         except Exception as e:
             await self.exit()
             raise e
