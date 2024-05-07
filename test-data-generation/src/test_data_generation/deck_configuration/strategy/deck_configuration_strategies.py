@@ -1,4 +1,5 @@
 """Test data generation for deck configuration tests."""
+from typing import Callable, List
 from hypothesis import assume, strategies as st
 from test_data_generation.deck_configuration.datashapes import (
     Column,
@@ -8,6 +9,8 @@ from test_data_generation.deck_configuration.datashapes import (
 )
 
 from test_data_generation.deck_configuration.strategy.helper_strategies import a_column
+
+DeckConfigurationStrategy = Callable[..., st.SearchStrategy[DeckConfiguration]]
 
 
 def _above_or_below_is_module_or_trash(col: Column, slot: Slot) -> bool:
@@ -79,3 +82,9 @@ def a_deck_configuration_with_invalid_fixture_in_col_2(
     )
 
     return deck
+
+
+DECK_CONFIGURATION_STRATEGIES: List[DeckConfigurationStrategy] = [
+    a_deck_configuration_with_a_module_or_trash_slot_above_or_below_a_heater_shaker,
+    a_deck_configuration_with_invalid_fixture_in_col_2,
+]
