@@ -4,7 +4,11 @@ from decoy import Decoy
 from typing import Union, Optional
 
 from opentrons.protocols.api_support.types import APIVersion
-from opentrons.protocol_engine import ProtocolEngine, commands as pe_commands, CommandIntent
+from opentrons.protocol_engine import (
+    ProtocolEngine,
+    commands as pe_commands,
+    CommandIntent,
+)
 from opentrons.hardware_control import API as HardwareAPI
 from opentrons.protocol_reader import JsonProtocolConfig, PythonProtocolConfig
 from opentrons.protocol_runner.run_orchestrator import RunOrchestrator
@@ -58,7 +62,7 @@ def config() -> JsonProtocolConfig:
     [
         (JsonProtocolConfig(schema_version=7)),
         (PythonProtocolConfig(api_version=APIVersion(2, 14))),
-        (None)
+        (None),
     ],
 )
 def subject(
@@ -70,7 +74,7 @@ def subject(
     return RunOrchestrator(
         protocol_engine=mock_protocol_engine,
         hardware_api=mock_hardware_api,
-        protocol_config=JsonProtocolConfig(schema_version=7)    #config,
+        protocol_config=JsonProtocolConfig(schema_version=7),  # config,
     )
 
 
@@ -107,7 +111,7 @@ def test_add_command(
     )
     subject.add_command(command_to_queue)
 
-    decoy.verify(runner.set_command_queued(command_to_queue))
+    decoy.verify(subject._protocol_runner.set_command_queued(command_to_queue))
 
 
 def test_add_json_command(
@@ -121,4 +125,5 @@ def test_add_json_command(
     )
     subject.add_command(command_to_queue)
 
-    decoy.verify(mock_protocol_json_runner.set_command_queued(command_to_queue))
+    # change this to a get method
+    assert subject._protocol_runner._queued_protocol_commands == [command_to_queue]
