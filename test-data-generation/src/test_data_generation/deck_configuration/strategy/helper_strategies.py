@@ -6,14 +6,16 @@ from test_data_generation.deck_configuration.datashapes import (
     Row,
     Slot,
     PossibleSlotContents as PSC,
+    RowName,
+    ColumnName,
 )
 
 
 @st.composite
 def a_slot(
     draw: st.DrawFn,
-    row: str,
-    col: str,
+    row: RowName,
+    col: ColumnName,
     content_options: List[PSC] = PSC.all(),
 ) -> Slot:
     """Generate a slot with a random content.
@@ -39,7 +41,7 @@ def a_slot(
         if not content.is_a_staging_area()
     ]
 
-    if col == "1" and (row == "A" or row == "B"):
+    if col == "1" and (row == "a" or row == "b"):
         return draw(
             st.builds(
                 Slot,
@@ -49,7 +51,7 @@ def a_slot(
             )
         )
     elif col == "3":
-        if row == "D":
+        if row == "d":
             return draw(
                 st.builds(
                     Slot,
@@ -83,7 +85,7 @@ def a_slot(
 @st.composite
 def a_row(
     draw: st.DrawFn,
-    row: str,
+    row: RowName,
     content_options: List[PSC] = PSC.all(),
 ) -> Row:
     """Generate a row with random slots."""
@@ -101,7 +103,7 @@ def a_row(
 @st.composite
 def a_column(
     draw: st.DrawFn,
-    col: str,
+    col: ColumnName,
     content_options: List[PSC] = PSC.all(),
 ) -> Column:
     """Generate a column with random slots."""
