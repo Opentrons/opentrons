@@ -41,6 +41,7 @@ const unsavedChanges = (
       return action.payload.didMigrate // no unsaved changes unless migration happened
     }
 
+    case 'SAVE_TO_FILE_SYSTEM':
     case 'SAVE_PROTOCOL_FILE':
       return false
 
@@ -76,13 +77,31 @@ const unsavedChanges = (
   }
 }
 
+const hasNativeFileSystemAccess = (
+  state: boolean = false,
+  action: {
+    type: string
+    payload: any
+  }
+): boolean => {
+  switch (action.type) {
+    case 'LOAD_FILE': {
+      return action.payload.hasFileSystemAccess
+    }
+    default:
+      return state
+  }
+}
+
 export const _allReducers = {
   fileUploadMessage,
   unsavedChanges,
+  hasNativeFileSystemAccess,
 }
 export interface RootState {
   fileUploadMessage: FileUploadMessageState
   unsavedChanges: boolean
+  hasNativeFileSystemAccess: boolean
 }
 export const rootReducer: Reducer<RootState, Action> = combineReducers(
   _allReducers

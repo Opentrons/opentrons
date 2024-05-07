@@ -8,3 +8,6 @@ export const getFileUploadMessages: Selector<
 export const getHasUnsavedChanges: Selector<
   RootState['unsavedChanges']
 > = createSelector(rootSelector, s => s.unsavedChanges)
+export const getHasNativeFileSystemAccess: Selector<
+  RootState['hasNativeFileSystemAccess']
+> = createSelector(rootSelector, s => s.hasNativeFileSystemAccess)

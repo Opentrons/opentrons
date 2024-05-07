@@ -7,7 +7,6 @@ import { app, shell } from 'electron'
 import type { StoredProtocolDir } from '@opentrons/app/src/redux/protocol-storage'
 import type { Dirent } from 'fs'
 import { analyzeProtocolSource } from '../protocol-analysis'
-import { createProtocolEditorUi } from '../protocol-editor-ui'
 
 /**
  * Module for managing local protocol files on the host filesystem
@@ -185,4 +184,16 @@ export function editProtocol(
   const srcFilePathsPromise = readFilesWithinDirectory(srcDirPath)
   return srcFilePathsPromise
 }
+
+export function overwriteProtocol(
+  protocolSrcPath: string,
+  newFileName: string,
+  protocolData: string
+): Promise<void> {
+  const newSrcFilePath = path.join(path.dirname(protocolSrcPath), newFileName)
+  return fs.remove(protocolSrcPath).then(() => {
+    return fs.writeFile(newSrcFilePath, JSON.stringify(protocolData))
+  }).catch(e => { console.error(e) })
+}
+
 

@@ -55,6 +55,7 @@ export const migration = (
   didMigrate: boolean
   migrationsRan: string[]
 } => {
+  console.log('IN MIgrATION', file)
   const designerApplication =
     file.designerApplication || file['designer-application']
   // NOTE: default exists because any protocol that doesn't include the application version

@@ -1,34 +1,34 @@
 // sets up the main window ui
-import { app, shell, BrowserWindow } from 'electron'
+import { app, shell, BrowserWindow, ipcMain } from 'electron'
 import path from 'path'
 
 import { getConfig } from './config'
 import { createLogger } from './log'
-import { getProtocolSourceJSON } from './protocol-storage/file-system'
+import { PROTOCOLS_DIRECTORY_PATH, analyzeProtocolByKey, getProtocolSourceJSON, overwriteProtocol } from './protocol-storage/file-system'
 
 const protocolEditorUiConfig = getConfig('protocolEditorUi')
 const log = createLogger('protocolEditorUi')
 
 const WINDOW_OPTS = {
-    show: false,
-    useContentSize: true,
-    width: protocolEditorUiConfig.width,
-    minWidth: protocolEditorUiConfig.minWidth,
-    height: protocolEditorUiConfig.height,
-    // allow webPreferences to be set at launchtime from config
-    webPreferences: Object.assign(
-      {
-        preload: path.join(__dirname, './preload.js'),
-        nodeIntegration: false,
-        // TODO: remove this by using electron contextBridge to specify
-        // exact, argument-sanitation-involved methods instead of just
-        // binding the entire ipcRenderer in. This is necessary because
-        // as of electron 12, contextIsolation defaults to true.
-        contextIsolation: false,
-      },
-      protocolEditorUiConfig.webPreferences
-    ),
-  }
+  show: false,
+  useContentSize: true,
+  width: protocolEditorUiConfig.width,
+  minWidth: protocolEditorUiConfig.minWidth,
+  height: protocolEditorUiConfig.height,
+  // allow webPreferences to be set at launchtime from config
+  webPreferences: Object.assign(
+    {
+      preload: path.join(__dirname, './preload.js'),
+      nodeIntegration: false,
+      // TODO: remove this by using electron contextBridge to specify
+      // exact, argument-sanitation-involved methods instead of just
+      // binding the entire ipcRenderer in. This is necessary because
+      // as of electron 12, contextIsolation defaults to true.
+      contextIsolation: false,
+    },
+    protocolEditorUiConfig.webPreferences
+  ),
+}
 
 
 const protocolEditorPath =
@@ -64,7 +64,16 @@ export function createProtocolEditorUi(srcFilePath: string): BrowserWindow {
   subWindow.webContents.once('dom-ready', () => {
     const protocolSourceJSON = getProtocolSourceJSON(srcFilePath)
     protocolSourceJSON.then(json => {
-      subWindow.webContents.send('set-protocol-source-file', json)
+      subWindow.webContents.send('open-protocol-in-designer', json)
+      ipcMain.once('save-protocol-file-to-filesystem', (_event, fileName, fileData) => {
+        overwriteProtocol(srcFilePath, fileName, fileData).then(() => {
+          const { protocolKey } = /.*\/(?<protocolKey>.*)\/src.*/.exec(srcFilePath)?.groups ?? {}
+          return analyzeProtocolByKey(
+            protocolKey,
+            PROTOCOLS_DIRECTORY_PATH
+          )
+        })
+      })
     })
   });
 

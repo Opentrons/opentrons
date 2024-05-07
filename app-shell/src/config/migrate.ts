@@ -395,7 +395,7 @@ const toVersion22 = (prevConfig: ConfigV21): ConfigV22 => {
     ...prevConfig,
     version: 22 as const,
     protocolEditorUi: {
-      width: 1024,
+      width: 1300,
       minWidth: 600,
       height: 768,
       url: {

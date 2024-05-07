@@ -256,6 +256,7 @@ export function FileSidebar(): JSX.Element {
   const savedStepForms = useSelector(stepFormSelectors.getSavedStepForms)
   const newProtocolModal = useSelector(selectors.getNewProtocolModal)
   const hasUnsavedChanges = useSelector(loadFileSelectors.getHasUnsavedChanges)
+  const hasNativeFileSystemAccess = useSelector(loadFileSelectors.getHasNativeFileSystemAccess)
   const canCreateNew = !newProtocolModal
   const dispatch: ThunkDispatch<any> = useDispatch()
 
@@ -264,18 +265,6 @@ export function FileSidebar(): JSX.Element {
     setShowExportWarningModal,
   ] = React.useState<boolean>(false)
   const { t } = useTranslation(['alert', 'modules'])
-  const urlSearchParams = new URLSearchParams(window.location.search)
-  let protocolFileSrcPath: string | null = null
-  for (const [paramName, paramValue] of urlSearchParams.entries()) {
-    if (paramName === 'protocolSrcPath') {
-      protocolFileSrcPath = paramValue
-    }
-  }
-  React.useEffect(() => {
-    if (protocolFileSrcPath != null) {
-      dispatch(loadFileActions.loadProtocolFile({ currentTarget: { files: [FileSystemDirectoryEntry.getFile(protocolFileSrcPath)] } }))
-    }
-  }, [protocolFileSrcPath])
   const isGripperAttached = Object.values(additionalEquipment).some(
     equipment => equipment?.name === 'gripper'
   )
@@ -379,6 +368,49 @@ export function FileSidebar(): JSX.Element {
       dispatch(loadFileActions.saveProtocolFile())
     },
   })
+
+
+  const sidebarContents = hasNativeFileSystemAccess ? (
+    <div className={styles.button}>
+      <DeprecatedPrimaryButton
+        onClick={() => {
+          dispatch(loadFileActions.saveToFileSystem())
+        }}
+        disabled={!canDownload}
+      >
+        {t('save')}
+      </DeprecatedPrimaryButton>
+    </div>
+  ) : (
+    <>
+      <OutlineButton onClick={createNewFile} className={styles.button}>
+        {t('create_new')}
+      </OutlineButton>
+
+      <OutlineButton Component="label" className={cx(styles.upload_button)}>
+        {t('import')}
+        <input type="file" onChange={loadFile} />
+      </OutlineButton>
+
+      <div className={styles.button}>
+        <DeprecatedPrimaryButton
+          onClick={() => {
+            if (hasWarning) {
+              resetScrollElements()
+              setShowExportWarningModal(true)
+            } else {
+              resetScrollElements()
+              setShowBlockingHint(true)
+            }
+          }}
+          disabled={!canDownload}
+        >
+          {t('export')}
+        </DeprecatedPrimaryButton>
+      </div>
+    </>
+  )
+
   return (
     <>
       {blockingExportHint}
@@ -410,31 +442,7 @@ export function FileSidebar(): JSX.Element {
         )}
       <SidePanel title="Protocol File">
         <div className={styles.file_sidebar}>
-          <OutlineButton onClick={createNewFile} className={styles.button}>
-            {t('create_new')}
-          </OutlineButton>
-
-          <OutlineButton Component="label" className={cx(styles.upload_button)}>
-            {t('import')}
-            <input type="file" onChange={loadFile} />
-          </OutlineButton>
-
-          <div className={styles.button}>
-            <DeprecatedPrimaryButton
-              onClick={() => {
-                if (hasWarning) {
-                  resetScrollElements()
-                  setShowExportWarningModal(true)
-                } else {
-                  resetScrollElements()
-                  setShowBlockingHint(true)
-                }
-              }}
-              disabled={!canDownload}
-            >
-              {t('export')}
-            </DeprecatedPrimaryButton>
-          </div>
+          {sidebarContents}
         </div>
       </SidePanel>
     </>

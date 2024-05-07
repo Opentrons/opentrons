@@ -107,12 +107,3 @@ remote.ipcRenderer.on(
     callbackStore[shellHostname]?.[shellTopic]?.forEach(cb => cb(shellMessage))
   }
 )
-
-// Instantiate the notify listener at runtime.
-remote.ipcRenderer.on(
-  'set-protocol-source-file',
-  (...params) => {
-    console.log('GOT IPC MESSAGE', params)
-  }
-)
-

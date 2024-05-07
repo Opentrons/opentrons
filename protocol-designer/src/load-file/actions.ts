@@ -8,7 +8,9 @@ import {
   FileUploadMessage,
   LoadFileAction,
   NewProtocolFields,
+  OpenFileAction,
 } from './types'
+import { remote } from '../shell/remote'
 export interface FileUploadMessageAction {
   type: 'FILE_UPLOAD_MESSAGE'
   payload: FileUploadMessage
@@ -26,9 +28,12 @@ export const dismissFileUploadMessage = (): DismissFileUploadMessageAction => ({
   type: 'DISMISS_FILE_UPLOAD_MESSAGE',
 })
 // expects valid, parsed JSON protocol.
-export const loadFileAction = (payload: PDProtocolFile): LoadFileAction => ({
+export const loadFileAction = (protocolFile: PDProtocolFile, hasFileSystemAccess: boolean = false): LoadFileAction => ({
   type: 'LOAD_FILE',
-  payload: migration(payload),
+  payload: {
+    ...migration(protocolFile),
+    hasFileSystemAccess
+  },
 })
 // load file thunk, handles file loading errors
 export const loadProtocolFile = (
@@ -110,3 +115,23 @@ export const saveProtocolFile: () => ThunkAction<SaveProtocolFileAction> = () =>
   const fileName = `${protocolName}.json`
   saveFile(fileData, fileName)
 }
+
+export interface SaveToFileSystemAction {
+  type: 'SAVE_TO_FILE_SYSTEM'
+}
+export const saveToFileSystem: () => ThunkAction<SaveToFileSystemAction> = () => (
+  dispatch,
+  getState
+) => {
+  // dispatching this should update the state, eg lastModified timestamp
+  dispatch({
+    type: 'SAVE_TO_FILE_SYSTEM',
+  })
+  const state = getState()
+  const fileData = fileDataSelectors.createFile(state)
+  const protocolName =
+    fileDataSelectors.getFileMetadata(state).protocolName || 'untitled'
+  const fileName = `${protocolName}.json`
+  remote.ipcRenderer.send('save-protocol-file-to-filesystem', fileName, fileData)
+}
+

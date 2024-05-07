@@ -92,6 +92,10 @@ const fileMetadata = handleActions(
       // NOTE: 'last-modified' is updated "on-demand", in response to user clicking "save/export"
       return { ...state, lastModified: Date.now() }
     },
+    SAVE_TO_FILE_SYSTEM: (state: FileMetadataFields): FileMetadataFields => {
+      // NOTE: 'last-modified' is updated "on-demand", in response to user clicking "save"
+      return { ...state, lastModified: Date.now() }
+    },
   },
   defaultFields
 )

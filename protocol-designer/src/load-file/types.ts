@@ -26,5 +26,6 @@ export interface LoadFileAction {
     file: PDProtocolFile
     didMigrate: boolean
     migrationsRan: string[]
+    hasFileSystemAccess: boolean
   }
 }
