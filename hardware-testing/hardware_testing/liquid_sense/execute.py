@@ -15,7 +15,6 @@ from opentrons.hardware_control.types import (
     OT3Mount,
     Axis,
     top_types,
-    LiquidNotFound,
 )
 
 from hardware_testing.gravimetric.measurement.scale import Scale
@@ -26,6 +25,9 @@ from hardware_testing.gravimetric.measurement.record import (
 from opentrons.protocol_api._types import OffDeckType
 
 from opentrons.protocol_api import ProtocolContext, Well, Labware
+
+from opentrons_shared_data.errors.exceptions import LiquidNotFoundError
+
 
 PROBE_MAX_TIME: Dict[int, float] = {
     1: 2.75,
@@ -370,8 +372,8 @@ def _run_trial(run_args: RunArgs, tip: int, well: Well, trial: int) -> float:
         # TODO add in stuff for secondary probe
         try:
             height = hw_api.liquid_probe(hw_mount, lps, probe_target)
-        except LiquidNotFound as lnf:
-            ui.print_info(f"Liquid not found current position {lnf.position}")
+        except LiquidNotFoundError as lnf:
+            ui.print_info(f"Liquid not found current position {lnf.detail}")
             start_height -= z_dist
         else:
             break

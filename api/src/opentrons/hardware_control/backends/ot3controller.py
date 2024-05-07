@@ -140,7 +140,6 @@ from opentrons.hardware_control.types import (
     EstopState,
     HardwareEventHandler,
     HardwareEventUnsubscriber,
-    LiquidNotFound,
 )
 from opentrons.hardware_control.errors import (
     InvalidPipetteName,
@@ -192,6 +191,7 @@ from opentrons_shared_data.errors.exceptions import (
     PipetteOverpressureError,
     FirmwareUpdateRequiredError,
     FailedGripperPickupError,
+    LiquidNotFoundError,
 )
 
 from .subsystem_manager import SubsystemManager
@@ -1406,11 +1406,12 @@ class OT3Controller(FlexBackend):
             or positions[head_node].move_ack
             == MoveCompleteAck.complete_without_condition
         ):
-            raise LiquidNotFound(
+            raise LiquidNotFoundError(
+                "Liquid not found during probe.",
                 {
-                    node_to_axis(node): point.motor_position
+                    str(node_to_axis(node)): str(point.motor_position)
                     for node, point in positions.items()
-                }
+                },
             )
         return self._position[axis_to_node(Axis.by_mount(mount))]
 
