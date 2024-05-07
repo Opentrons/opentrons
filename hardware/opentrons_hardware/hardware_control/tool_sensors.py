@@ -144,7 +144,7 @@ async def run_sync_buffer_to_csv(
                     )
                 ),
             )
-            await asyncio.sleep(10)
+            await sensor_capturer.wait_for_complete()
             messenger.remove_listener(sensor_capturer)
         await messenger.send(
             node_id=tool,
