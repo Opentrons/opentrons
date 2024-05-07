@@ -268,7 +268,7 @@ async def _force_gauge(
         max_results = []
         avg_results = []
         test_current = test["CURRENT"]
-        if arguments.user_current is None:
+        if arguments.user_current == "None":
             pass
         else:
             if test_current != float(arguments.user_current):
@@ -449,7 +449,7 @@ if __name__ == "__main__":
     arg_parser.add_argument("--simulate", action="store_true")
     arg_parser.add_argument("--skip_left", action="store_true")
     arg_parser.add_argument("--skip_right", action="store_true")
-    arg_parser.add_argument("--user_current", default=None)
+    arg_parser.add_argument("--user_current", type=str, default="None")
     old_stall_setting = get_adv_setting("disableStallDetection", RobotTypeEnum.FLEX)
     try:
         asyncio.run(set_adv_setting("disableStallDetection", True))
