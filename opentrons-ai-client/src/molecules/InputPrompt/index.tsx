@@ -17,11 +17,13 @@ import {
 } from '@opentrons/components'
 import { SendButton } from '../../atoms/SendButton'
 import { preparedPromptAtom, chatDataAtom } from '../../resources/atoms'
+import { detectSimulate } from '../../resources/utils'
 
 import type { ChatData } from '../../resources/types'
 
 // ToDo (kk:05/02/2024) This url is temporary
-const url = 'http://localhost:8000/streaming/ask'
+const CHAT_ENDPOINT = 'http://localhost:8000/streaming/ask'
+const SIMULATOR_ENDPOINT = ''
 
 interface InputType {
   userPrompt: string
@@ -49,11 +51,11 @@ export function InputPrompt(): JSX.Element {
     return rowsNum
   }
 
-  const fetchData = async (prompt: string): Promise<void> => {
+  const fetchChatData = async (prompt: string): Promise<void> => {
     if (prompt !== '') {
       setLoading(true)
       try {
-        const response = await axios.post(url, {
+        const response = await axios.post(CHAT_ENDPOINT, {
           headers: {
             'Content-Type': 'application/json',
           },
@@ -68,13 +70,24 @@ export function InputPrompt(): JSX.Element {
     }
   }
 
+  const fetchSimulatorResult = async (): Promise<void> => {
+    // code to call opentrons simulator
+  }
+
   const handleClick = (): void => {
-    const userInput: ChatData = {
-      role: 'user',
-      content: userPrompt,
+    // Note (kk:05/07/2024) if user prompt is to simulate a protocol
+    // call fetchSimulateResult
+    if (detectSimulate(userPrompt)) {
+      void fetchSimulatorResult()
+    } else {
+      const userInput: ChatData = {
+        role: 'user',
+        content: userPrompt,
+      }
+      setChatData(chatData => [...chatData, userInput])
+      void fetchChatData(userPrompt)
     }
-    setChatData(chatData => [...chatData, userInput])
-    void fetchData(userPrompt)
+
     setSubmitted(true)
     reset()
   }
