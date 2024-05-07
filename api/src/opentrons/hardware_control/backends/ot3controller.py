@@ -1400,7 +1400,6 @@ class OT3Controller(FlexBackend):
         for node, point in positions.items():
             self._position.update({node: point.motor_position})
             self._encoder_position.update({node: point.encoder_position})
-        print(f"positions {positions}")
         if (
             head_node not in positions
             or positions[head_node].move_ack
