@@ -232,7 +232,7 @@ def check_force(
 
 
 async def _force_gauge(
-    api: OT3API, mount: OT3Mount, report: CSVReport, simulate: bool
+    api: OT3API, mount: OT3Mount, report: CSVReport, simulate: bool, arguments: argparse.Namespace
 ) -> bool:
     """Apply force to the gague and log."""
     global thread_sensor
@@ -268,6 +268,32 @@ async def _force_gauge(
         max_results = []
         avg_results = []
         test_current = test["CURRENT"]
+        if arguments.user_current is None:
+            pass
+        else:
+            if test_current != float(arguments.user_current):
+                continue
+            else:
+                for i in range(100):
+                    await api.move_to(mount=mount, abs_position=pre_test_pos)
+                    ui.print_header(f"Cycle {i+1}: Testing Current = {test_current}")
+                    try:
+                        async with api._backend.restore_current():
+                            await api._backend.set_active_current({z_ax: test_current})
+                            await api.move_to(
+                                mount=mount,
+                                abs_position=press_pos,
+                                speed=FORCE_SPEED,
+                                _expect_stalls=True,
+                            )
+                    finally:
+                        pass
+                    await api._update_position_estimation([Axis.by_mount(mount)])
+                    await api.refresh_positions()
+
+                    await api.move_to(mount=mount, abs_position=pre_test_pos)
+                    
+                    
         for i in range(CYCLES_CURRENT):
             # Move to just above force gauge
             await api.move_to(mount=mount, abs_position=pre_test_pos)
@@ -340,11 +366,11 @@ async def _run(api: OT3API, arguments: argparse.Namespace, report: CSVReport) ->
     qc_pass = True
 
     if not arguments.skip_left:
-        res = await _force_gauge(api, OT3Mount.LEFT, report, arguments.simulate)
+        res = await _force_gauge(api, OT3Mount.LEFT, report, arguments.simulate, arguments)
         qc_pass = res and qc_pass
 
     if not arguments.skip_right:
-        res = await _force_gauge(api, OT3Mount.RIGHT, report, arguments.simulate)
+        res = await _force_gauge(api, OT3Mount.RIGHT, report, arguments.simulate, arguments)
         qc_pass = res and qc_pass
 
     return qc_pass
@@ -423,6 +449,7 @@ if __name__ == "__main__":
     arg_parser.add_argument("--simulate", action="store_true")
     arg_parser.add_argument("--skip_left", action="store_true")
     arg_parser.add_argument("--skip_right", action="store_true")
+    arg_parser.add_argument("--user_current", default=None)
     old_stall_setting = get_adv_setting("disableStallDetection", RobotTypeEnum.FLEX)
     try:
         asyncio.run(set_adv_setting("disableStallDetection", True))
