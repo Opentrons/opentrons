@@ -46,7 +46,7 @@ USB_PORT_INFO = re.compile(
     re.VERBOSE
 )
 
-HUB_PATTERN = re.compile(r"(\d-\d.[\d.]+\d?)[/:]")
+HUB_PATTERN = re.compile(r"(\d-[\d.]+\d?)[\/:]")
 
 @dataclass(frozen=True)
 class USBPort:
@@ -116,43 +116,52 @@ class USBPort:
         :param port_nodes: A list of unique port id(s)
         :returns: Tuple of the hub, port number, hub_port and name
         """
-        if len(port_nodes) > 2:
-            port_info = port_nodes[2].split(".")
-            hub: Optional[int] = int(port_info[1])
-            port = int(port_info[2])
-            hub_port: Optional[int] = int(port_info[3])
-            name = port_nodes[2]
-        elif len(port_nodes) > 1:
-            if board_revision == BoardRevision.OG:
-                port_info = port_nodes[1].split(".")
-                hub = int(port_info[1])
-                port = int(port_info[1])
-                hub_port = int(port_info[2])
-                name = port_nodes[1]
-            else:
-                port_info = port_nodes[1].split(".")
-                hub = int(port_info[1])
-                name = port_nodes[1]
-                if (board_revision == BoardRevision.FLEX_B2) and (
-                    hub == FLEX_B2_USB_PORT_GROUP_FRONT
-                ):
-                    port = 9
-                    hub_port = int(port_info[2])
-                else:
-                    port = int(port_info[2])
-                    hub_port = None
+        if len(port_nodes) == 1 and "." not in port_nodes[0]:
+            # if no hub is attached, such as on a dev kit, the port
+            # nodes available will be 1-1
+            port = int(port_nodes[0].split("-")[1])
+            hub = None
+            hub_port = None
+            name = port_nodes[0]
         else:
-            if board_revision == BoardRevision.FLEX_B2:
-                port_info = port_nodes[0].split(".")
-                hub = int(port_info[1])
-                port = 9
-                hub_port = None
-                name = port_nodes[0]
+            port_nodes = [node for node in port_nodes if "." in node]
+            if len(port_nodes) > 2:
+                port_info = port_nodes[2].split(".")
+                hub: Optional[int] = int(port_info[1])
+                port = int(port_info[2])
+                hub_port: Optional[int] = int(port_info[3])
+                name = port_nodes[2]
+            elif len(port_nodes) > 1:
+                if board_revision == BoardRevision.OG:
+                    port_info = port_nodes[1].split(".")
+                    hub = int(port_info[1])
+                    port = int(port_info[1])
+                    hub_port = int(port_info[2])
+                    name = port_nodes[1]
+                else:
+                    port_info = port_nodes[1].split(".")
+                    hub = int(port_info[1])
+                    name = port_nodes[1]
+                    if (board_revision == BoardRevision.FLEX_B2) and (
+                        hub == FLEX_B2_USB_PORT_GROUP_FRONT
+                    ):
+                        port = 9
+                        hub_port = int(port_info[2])
+                    else:
+                        port = int(port_info[2])
+                        hub_port = None
             else:
-                port = int(port_nodes[0].split(".")[1])
-                hub = None
-                hub_port = None
-                name = port_nodes[0]
+                if board_revision == BoardRevision.FLEX_B2:
+                    port_info = port_nodes[0].split(".")
+                    hub = int(port_info[1])
+                    port = 9
+                    hub_port = None
+                    name = port_nodes[0]
+                else:
+                    port = int(port_nodes[0].split(".")[1])
+                    hub = None
+                    hub_port = None
+                    name = port_nodes[0]
         return hub, port, hub_port, name
 
     @staticmethod
