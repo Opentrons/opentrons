@@ -169,8 +169,12 @@ export function RunningProtocol(): JSX.Element {
 
   return (
     <>
-      {showErrorRecovery ? (
-        <ErrorRecoveryFlows onComplete={handleCompleteRecovery} />
+      {showErrorRecovery && lastRunCommand != null ? (
+        <ErrorRecoveryFlows
+          runId={runId}
+          failedCommand={lastRunCommand}
+          onComplete={handleCompleteRecovery}
+        />
       ) : null}
       {enableSplash &&
       runStatus === RUN_STATUS_AWAITING_RECOVERY &&

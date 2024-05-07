@@ -19,9 +19,22 @@ export function ResumeRun({
   isOnDevice,
   onComplete,
   routeUpdateActions,
+  chainRunCommands,
 }: RecoveryContentProps): JSX.Element | null {
   const { t } = useTranslation('error_recovery')
   const { goBackPrevStep } = routeUpdateActions
+
+  React.useEffect(() => {
+    chainRunCommands(
+      [
+        {
+          commandType: 'home' as const,
+          params: {},
+        },
+      ],
+      false
+    )
+  }, [])
 
   if (isOnDevice) {
     return (

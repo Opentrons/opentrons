@@ -12,6 +12,7 @@ import {
 
 import { getIsOnDevice } from '../../redux/config'
 import { getTopPortalEl } from '../../App/portal'
+import { useChainRunCommands } from '../../resources/runs'
 import { BeforeBeginning } from './BeforeBeginning'
 import { SelectRecoveryOption, ResumeRun } from './RecoveryOptions'
 import { ErrorRecoveryHeader } from './ErrorRecoveryHeader'
@@ -19,13 +20,25 @@ import { RecoveryInProgress } from './RecoveryInProgress'
 import { getErrorKind, useRouteUpdateActions } from './utils'
 import { RECOVERY_MAP } from './constants'
 
-import type { IRecoveryMap, RecoveryContentProps } from './types'
+import type { FailedCommand, IRecoveryMap, RecoveryContentProps } from './types'
 
 interface ErrorRecoveryProps {
+  runId: string
+  failedCommand: FailedCommand
   onComplete: () => void
   errorType?: string
 }
+
+// TOME: I don't think you need to pass errorType externally now, since you have to pass
+// in the failedCommand anyway. We can probably derive it here.
+
+//TOME: It probably wouldn't hurt to have a custom, encapsulated useChainRun that you use
+// that does things like always doesn't return continue past failure and shows errors.
+
+//TOME: Make sure the "motion" stuff is working as expected.
 export function ErrorRecoveryFlows({
+  runId,
+  failedCommand,
   onComplete,
   errorType,
 }: ErrorRecoveryProps): JSX.Element {
@@ -40,6 +53,7 @@ export function ErrorRecoveryFlows({
 
   const errorKind = getErrorKind(errorType)
   const isOnDevice = useSelector(getIsOnDevice)
+  const chainRunCommandsUtils = useChainRunCommands(runId, failedCommand.id)
 
   const routeUpdateActions = useRouteUpdateActions({
     recoveryMap,
@@ -48,11 +62,13 @@ export function ErrorRecoveryFlows({
 
   return (
     <ErrorRecoveryComponent
+      failedCommand={failedCommand}
       errorKind={errorKind}
       onComplete={onComplete}
       isOnDevice={isOnDevice}
       recoveryMap={recoveryMap}
       routeUpdateActions={routeUpdateActions}
+      {...chainRunCommandsUtils}
     />
   )
 }

@@ -1,6 +1,10 @@
+import type { RunCommandSummary } from '@opentrons/api-client'
+import type { useChainRunCommands } from '../../resources/runs'
 import type { ERROR_KINDS, RECOVERY_MAP, INVALID } from './constants'
 import type { UseRouteUpdateActionsResult } from './utils'
+import { Return } from 'aws-sdk/clients/cloudsearchdomain'
 
+export type FailedCommand = RunCommandSummary
 export type InvalidStep = typeof INVALID
 export type RecoveryRoute = typeof RECOVERY_MAP[keyof typeof RECOVERY_MAP]['ROUTE']
 export type RobotMovingRoute =
@@ -50,9 +54,14 @@ export interface IRecoveryMap {
 }
 
 export interface RecoveryContentProps {
+  failedCommand: FailedCommand
   errorKind: ErrorKind
   isOnDevice: boolean
   recoveryMap: IRecoveryMap
   routeUpdateActions: UseRouteUpdateActionsResult
+  chainRunCommands: ReturnType<typeof useChainRunCommands>['chainRunCommands']
+  isCommandMutationLoading: ReturnType<
+    typeof useChainRunCommands
+  >['isCommandMutationLoading']
   onComplete: () => void
 }
