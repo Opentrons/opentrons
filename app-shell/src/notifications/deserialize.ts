@@ -33,6 +33,14 @@ export function sendDeserialized({
   } catch {} // Prevents shell erroring during app shutdown event.
 }
 
+export function sendDeserializedRefetch(ip: string, topic: NotifyTopic): void {
+  sendDeserialized({
+    ip,
+    topic,
+    message: { refetch: true },
+  })
+}
+
 export function sendDeserializedGenericError(
   ip: string,
   topic: NotifyTopic

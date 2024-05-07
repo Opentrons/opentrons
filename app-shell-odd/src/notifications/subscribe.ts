@@ -1,7 +1,11 @@
 import mqtt from 'mqtt'
 
 import { connectionStore } from './store'
-import { sendDeserialized, sendDeserializedGenericError } from './deserialize'
+import {
+  sendDeserialized,
+  sendDeserializedGenericError,
+  sendDeserializedRefetch,
+} from './deserialize'
 import { notifyLog } from './notifyLog'
 
 import type { NotifyTopic } from '@opentrons/app/src/redux/shell/types'
@@ -30,8 +34,8 @@ export function subscribe(topic: NotifyTopic): Promise<void> {
         if (client == null) {
           return Promise.reject(new Error('Expected hostData, received null.'))
         }
-
-        if (
+        // The first time the client wants to subscribe on a robot to a particular topic.
+        else if (
           !connectionStore.isActiveSub(topic) &&
           !connectionStore.isPendingSub(topic)
         ) {
@@ -44,13 +48,15 @@ export function subscribe(topic: NotifyTopic): Promise<void> {
                 })
             )
             .catch((error: Error) => notifyLog.debug(error.message))
-        } else {
-          void waitUntilActiveOrErrored('subscription', topic).catch(
-            (error: Error) => {
+        }
+        // The client is either already subscribed or the subscription is currently pending.
+        else {
+          void waitUntilActiveOrErrored('subscription', topic)
+            .then(() => sendDeserializedRefetch(topic))
+            .catch((error: Error) => {
               notifyLog.debug(error.message)
               sendDeserializedGenericError(topic)
-            }
-          )
+            })
         }
       })
       .catch((error: Error) => {
@@ -74,6 +80,8 @@ export function subscribe(topic: NotifyTopic): Promise<void> {
       connectionStore
         .setSubStatus(topic, 'subscribed')
         .catch((error: Error) => notifyLog.debug(error.message))
+
+      sendDeserializedRefetch(topic)
     }
   }
 }
