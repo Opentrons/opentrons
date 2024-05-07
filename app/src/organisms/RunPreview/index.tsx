@@ -23,6 +23,7 @@ import { useMostRecentCompletedAnalysis } from '../LabwarePositionCheck/useMostR
 import {
   useNotifyLastRunCommand,
   useNotifyAllCommandsAsPreSerializedList,
+  useNotifyRunQuery,
 } from '../../resources/runs'
 import { CommandText } from '../CommandText'
 import { Divider } from '../../atoms/structure'
@@ -51,6 +52,7 @@ export const RunPreviewComponent = (
   const { t } = useTranslation('run_details')
   const robotSideAnalysis = useMostRecentCompletedAnalysis(runId)
   const runStatus = useRunStatus(runId)
+  const { data: runRecord } = useNotifyRunQuery(runId)
   const isRunTerminal =
     runStatus != null
       ? (RUN_STATUSES_TERMINAL as RunStatus[]).includes(runStatus)
@@ -80,6 +82,19 @@ export const RunPreviewComponent = (
     (isRunTerminal
       ? nullCheckedCommandsFromQuery
       : robotSideAnalysis.commands) ?? []
+  // pass relevant data from run rather than analysis so that CommandText utilities can properly hash the entities' IDs
+  // TODO (nd:05/02/2024, AUTH-380): update name and types for CommandText (and children/utilities) use of analysis.
+  // We should ideally pass only subset of analysis/run data required by these children and utilities
+  const protocolDataFromAnalysisOrRun =
+    isRunTerminal && runRecord?.data != null
+      ? {
+          ...robotSideAnalysis,
+          labware: runRecord.data.labware ?? [],
+          modules: runRecord.data.modules ?? [],
+          pipettes: runRecord.data.pipettes ?? [],
+          commands: commands,
+        }
+      : robotSideAnalysis
   const currentRunCommandIndex = commands.findIndex(
     c => c.key === currentRunCommandKey
   )
@@ -158,7 +173,7 @@ export const RunPreviewComponent = (
                   <CommandIcon command={command} color={iconColor} />
                   <CommandText
                     command={command}
-                    robotSideAnalysis={robotSideAnalysis}
+                    robotSideAnalysis={protocolDataFromAnalysisOrRun}
                     robotType={robotType}
                     color={COLORS.black90}
                   />

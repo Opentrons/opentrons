@@ -156,9 +156,9 @@ export function DropdownMenu(props: DropdownMenuProps): JSX.Element {
             {currentOption.name}
           </StyledText>
           {showDropdownMenu ? (
-            <Icon size="1.2rem" name="menu-down" transform="rotate(180deg)" />
+            <Icon size="0.75rem" name="menu-down" transform="rotate(180deg)" />
           ) : (
-            <Icon size="1.2rem" name="menu-down" />
+            <Icon size="0.75rem" name="menu-down" />
           )}
         </Flex>
         {showDropdownMenu && (

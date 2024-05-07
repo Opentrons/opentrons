@@ -17,7 +17,7 @@ import type { ModalHeaderBaseProps } from '../../molecules/Modal/types'
 
 interface AnalysisFailedModalProps {
   errors: string[]
-  protocolId: string
+  protocolId: string | null
   setShowAnalysisFailedModal: (showAnalysisFailedModal: boolean) => void
 }
 
@@ -36,7 +36,7 @@ export function AnalysisFailedModal({
   }
 
   const handleRestartSetup = (): void => {
-    history.push(`/protocols/${protocolId}`)
+    history.push(protocolId != null ? `/protocols/${protocolId}` : '/protocols')
   }
 
   return (

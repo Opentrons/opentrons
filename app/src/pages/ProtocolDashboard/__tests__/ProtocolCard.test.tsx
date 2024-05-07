@@ -3,7 +3,10 @@ import { vi, it, describe, expect, beforeEach } from 'vitest'
 import { act, fireEvent, screen } from '@testing-library/react'
 import { MemoryRouter } from 'react-router-dom'
 import { UseQueryResult } from 'react-query'
-import { useProtocolAnalysisAsDocumentQuery } from '@opentrons/react-api-client'
+import {
+  useMostRecentSuccessfulAnalysisAsDocumentQuery,
+  useProtocolAnalysisAsDocumentQuery,
+} from '@opentrons/react-api-client'
 
 import { renderWithProviders } from '../../../__testing-utils__'
 import { i18n } from '../../../i18n'
@@ -69,6 +72,9 @@ describe('ProtocolCard', () => {
     vi.mocked(useProtocolAnalysisAsDocumentQuery).mockReturnValue({
       data: { result: 'ok' } as any,
     } as UseQueryResult<CompletedProtocolAnalysis>)
+    vi.mocked(useMostRecentSuccessfulAnalysisAsDocumentQuery).mockReturnValue({
+      data: { result: 'ok' } as any,
+    } as UseQueryResult<CompletedProtocolAnalysis>)
   })
   it('should redirect to protocol details after short click', () => {
     render()
@@ -80,6 +86,9 @@ describe('ProtocolCard', () => {
   it('should display the analysis failed error modal when clicking on the protocol', () => {
     vi.mocked(useProtocolAnalysisAsDocumentQuery).mockReturnValue({
       data: { result: 'error' } as any,
+    } as UseQueryResult<CompletedProtocolAnalysis>)
+    vi.mocked(useMostRecentSuccessfulAnalysisAsDocumentQuery).mockReturnValue({
+      data: { result: 'not-ok', errors: ['some analysis error'] } as any,
     } as UseQueryResult<CompletedProtocolAnalysis>)
     render()
     screen.getByLabelText('failedAnalysis_icon')
@@ -115,6 +124,9 @@ describe('ProtocolCard', () => {
     vi.mocked(useProtocolAnalysisAsDocumentQuery).mockReturnValue({
       data: { result: 'error' } as any,
     } as UseQueryResult<CompletedProtocolAnalysis>)
+    vi.mocked(useMostRecentSuccessfulAnalysisAsDocumentQuery).mockReturnValue({
+      data: { result: 'not-ok', errors: ['some analysis error'] } as any,
+    } as UseQueryResult<CompletedProtocolAnalysis>)
     render()
     const name = screen.getByText('yay mock protocol')
     fireEvent.mouseDown(name)
@@ -134,6 +146,9 @@ describe('ProtocolCard', () => {
 
   it('should display a loading spinner when analysis is pending', async () => {
     vi.mocked(useProtocolAnalysisAsDocumentQuery).mockReturnValue({
+      data: null as any,
+    } as UseQueryResult<CompletedProtocolAnalysis>)
+    vi.mocked(useMostRecentSuccessfulAnalysisAsDocumentQuery).mockReturnValue({
       data: null as any,
     } as UseQueryResult<CompletedProtocolAnalysis>)
     render()
