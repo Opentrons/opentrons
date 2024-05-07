@@ -1,5 +1,6 @@
 from serial import Serial
 import asyncio
+import subprocess
 
 _READ_ALL = "readall"
 _READ_LINE = "read"
@@ -70,7 +71,13 @@ async def comms_loop(dev):
 
 
 async def _main():
-    dev = Serial('/dev/ot_module_thermocycler1', 9600, timeout=2)
+    tc_name = subprocess.check_output(
+        ["find", "/dev/", "-name", "*thermocycler*"]
+    ).decode().strip()
+    if not tc_name:
+        print("Thermocycler not found. Exiting.")
+        return
+    dev = Serial(f'{tc_name}', 9600, timeout=2)
     _exit = False
     while not _exit:
         _exit = await comms_loop(dev)
