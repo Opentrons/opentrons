@@ -211,7 +211,11 @@ export function ProtocolSetupStep({
           >
             {title}
           </StyledText>
-          <StyledText as="h4" color={COLORS.grey60} maxWidth="35rem">
+          <StyledText
+            as="h4"
+            color={disabled ? COLORS.grey50 : COLORS.grey60}
+            maxWidth="35rem"
+          >
             {description}
           </StyledText>
         </Flex>
