@@ -25,6 +25,7 @@ if TYPE_CHECKING:
         TemperatureModuleType,
         HeaterShakerModuleType,
         MagneticBlockType,
+        AbsorbanceReaderType,
     )
 
 
@@ -51,6 +52,7 @@ class ModuleType(str, Enum):
     MAGNETIC: MagneticModuleType = "magneticModuleType"
     HEATER_SHAKER: HeaterShakerModuleType = "heaterShakerModuleType"
     MAGNETIC_BLOCK: MagneticBlockType = "magneticBlockType"
+    ABSORBANCE_READER:  AbsorbanceReaderType = "absorbanceReaderType"
 
     @classmethod
     def from_model(cls, model: ModuleModel) -> ModuleType:
@@ -64,6 +66,8 @@ class ModuleType(str, Enum):
             return cls.HEATER_SHAKER
         if isinstance(model, MagneticBlockModel):
             return cls.MAGNETIC_BLOCK
+        if isinstance(model, AbsorbanceReaderModel):
+            return cls.ABSORBANCE_READER
 
     @classmethod
     def to_module_fixture_id(cls, module_type: ModuleType) -> str:
@@ -105,6 +109,10 @@ class MagneticBlockModel(str, Enum):
     MAGNETIC_BLOCK_V1: str = "magneticBlockV1"
 
 
+class AbsorbanceReaderModel(str, Enum):
+    ABSORBANCE_READER_V1: str = "absorbanceReaderV1"
+
+
 def module_model_from_string(model_string: str) -> ModuleModel:
     for model_enum in {
         MagneticModuleModel,
@@ -112,6 +120,7 @@ def module_model_from_string(model_string: str) -> ModuleModel:
         ThermocyclerModuleModel,
         HeaterShakerModuleModel,
         MagneticBlockModel,
+        AbsorbanceReaderModel,
     }:
         try:
             return cast(ModuleModel, model_enum(model_string))
@@ -166,6 +175,7 @@ ModuleModel = Union[
     ThermocyclerModuleModel,
     HeaterShakerModuleModel,
     MagneticBlockModel,
+    AbsorbanceReaderModel,
 ]
 
 
@@ -193,4 +203,10 @@ class SpeedStatus(str, Enum):
 class HeaterShakerStatus(str, Enum):
     IDLE = "idle"
     RUNNING = "running"
+    ERROR = "error"
+
+
+class AbsorbanceReaderStatus(str, Enum):
+    IDLE = "idle"
+    MEASURING = "measuring"
     ERROR = "error"
