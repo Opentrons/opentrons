@@ -218,7 +218,6 @@ async def run_sync_buffer_to_csv(
 
 async def run_stream_output_to_csv(
     messenger: CanMessenger,
-    sensor_driver: SensorDriver,
     sensors: Dict[SensorId, BaseSensorType],
     mount_speed: float,
     plunger_speed: float,
@@ -308,15 +307,46 @@ async def _setup_pressure_sensors(
     return result
 
 
+async def _setup_capacitive_sensors(
+    messenger: CanMessenger,
+    sensor_id: SensorId,
+    tool: InstrumentProbeTarget,
+    threshold: float,
+    sensor_driver: SensorDriver,
+) -> Dict[SensorId, CapacitiveSensor]:
+    sensors: List[SensorId] = []
+    result: Dict[SensorId, CapacitiveSensor] = {}
+    if sensor_id == SensorId.BOTH:
+        sensors.append(SensorId.S0)
+        sensors.append(SensorId.S1)
+    else:
+        sensors.append(sensor_id)
+
+    for sensor in sensors:
+        capacitive_sensor = CapacitiveSensor.build(
+            sensor_id=sensor,
+            node_id=tool,
+            stop_threshold=threshold,
+        )
+        threshold = await sensor_driver.send_stop_threshold(
+            messenger, capacitive_sensor, SensorThresholdMode.auto_baseline
+        )
+        LOG.info(
+            f"starting capacitive probe with threshold {threshold.to_float() if threshold is not None else None}"
+        )
+        result[sensor] = capacitive_sensor
+    return result
+
+
 async def _run_with_binding(
     messenger: CanMessenger,
-    pressure_sensors: Dict[SensorId, PressureSensor],
+    sensors: Dict[SensorId, BaseSensorType],
     sensor_runner: MoveGroupRunner,
     binding: List[SensorOutputBinding],
 ) -> Dict[NodeId, MotorPositionStatus]:
     binding_field = SensorOutputBindingField.from_flags(binding)
-    for sensor_id in pressure_sensors.keys():
-        sensor_info = pressure_sensors[sensor_id].sensor
+    for sensor_id in sensors.keys():
+        sensor_info = sensors[sensor_id].sensor
         await messenger.send(
             node_id=sensor_info.node_id,
             message=BindSensorOutputRequest(
@@ -329,8 +359,8 @@ async def _run_with_binding(
         )
 
     result = await sensor_runner.run(can_messenger=messenger)
-    for sensor_id in pressure_sensors.keys():
-        sensor_info = pressure_sensors[sensor_id].sensor
+    for sensor_id in sensors.keys():
+        sensor_info = sensors[sensor_id].sensor
         await messenger.send(
             node_id=sensor_info.node_id,
             message=BindSensorOutputRequest(
@@ -374,8 +404,6 @@ async def liquid_probe(
         auto_zero_sensor,
     )
 
-    sensor_driver.send_stop_threshold(messenger, pressure_sensor)
-
     sensor_group = _build_pass_step_pressure(
         movers=[head_node, tool],
         distance={head_node: max_z_distance, tool: max_z_distance},
@@ -388,7 +416,6 @@ async def liquid_probe(
     if csv_output:
         return await run_stream_output_to_csv(
             messenger,
-            sensor_driver,
             pressure_sensors,
             mount_speed,
             plunger_speed,
@@ -453,7 +480,7 @@ async def capacitive_probe(
     csv_output: bool = False,
     sync_buffer_output: bool = False,
     can_bus_only_output: bool = False,
-    data_file: Optional[str] = None,
+    data_files: Optional[Dict[SensorId, str]] = None,
 ) -> MotorPositionStatus:
     """Move the specified tool down until its capacitive sensor triggers.
 
@@ -463,76 +490,61 @@ async def capacitive_probe(
     The direction is sgn(distance)*sgn(speed), so you can set the direction
     either by negating speed or negating distance.
     """
+    log_files: Dict[SensorId, str] = {} if not data_files else data_files
     sensor_driver = SensorDriver()
-    capacitive_sensor = CapacitiveSensor.build(
-        sensor_id=sensor_id,
-        node_id=tool,
-        stop_threshold=relative_threshold_pf,
+    capacitive_sensors = await _setup_capacitive_sensors(
+        messenger,
+        sensor_id,
+        tool,
+        relative_threshold_pf,
+        sensor_driver,
     )
-    threshold = await sensor_driver.send_stop_threshold(
-        messenger, capacitive_sensor, SensorThresholdMode.auto_baseline
-    )
-    LOG.info(
-        f"starting capacitive probe with threshold {threshold.to_float() if threshold is not None else None}"
-    )
+
     pass_group = _build_pass_step_capacitive(
         [mover, tool],
         {mover: distance, tool: distance},
         {mover: speed, tool: speed},
         MoveStopCondition.sync_line,
     )
+
     runner = MoveGroupRunner(move_groups=[[pass_group]])
-    log_file: str = "/var/capacitive_sensor_data.csv" if not data_file else data_file
     if csv_output:
-        position = await run_stream_output_to_csv(
+        positions = await run_stream_output_to_csv(
             messenger,
-            sensor_driver,
-            capacitive_sensor,
+            capacitive_sensors,
             speed,
             0.0,
             relative_threshold_pf,
             mover,
             runner,
-            log_file,
+            log_files,
             capacitive_output_file_heading,
         )
-        return position[mover]
     elif sync_buffer_output:
-        position = await run_sync_buffer_to_csv(
+        positions = await run_sync_buffer_to_csv(
             messenger,
             speed,
             0.0,
             relative_threshold_pf,
             mover,
             runner,
-            log_file,
+            log_files,
             tool=tool,
             sensor_id=sensor_id,
             sensor_type=SensorType.capacitive,
             output_file_heading=capacitive_output_file_heading,
         )
-        return position[mover]
     elif can_bus_only_output:
-        async with sensor_driver.bind_output(
-            messenger,
-            capacitive_sensor,
-            [
-                SensorOutputBinding.sync,
-                SensorOutputBinding.report,
-            ],
-        ):
-            position = await runner.run(can_messenger=messenger)
-            return position[mover]
+        binding = [SensorOutputBinding.sync, SensorOutputBinding.report]
+        positions = await _run_with_binding(
+            messenger, capacitive_sensors, runner, binding
+        )
     else:
-        async with sensor_driver.bind_output(
-            messenger,
-            capacitive_sensor,
-            [
-                SensorOutputBinding.sync,
-            ],
-        ):
-            position = await runner.run(can_messenger=messenger)
-            return position[mover]
+        binding = [SensorOutputBinding.sync]
+        positions = await _run_with_binding(
+            messenger, capacitive_sensors, runner, binding
+        )
+    return positions[mover]
 
 
 async def capacitive_pass(

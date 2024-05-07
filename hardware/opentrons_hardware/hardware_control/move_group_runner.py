@@ -312,7 +312,7 @@ class MoveGroupRunner:
             # stop_condition = step.stop_condition.value
             assert step.sensor_id is not None
             stop_condition = MoveStopCondition.sync_line
-            sensor_move_payload = AddSensorLinearMoveBasePayload( # need to create unique pressure and capacitive moves. S0 and S1 too? Check Ryan's work
+            sensor_move_payload = AddSensorLinearMoveBasePayload(
                 request_stop_condition=MoveStopConditionField(stop_condition),
                 group_id=UInt8Field(group),
                 seq_id=UInt8Field(seq),
