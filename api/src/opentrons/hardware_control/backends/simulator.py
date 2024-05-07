@@ -72,8 +72,8 @@ class Simulator:
                                      empty dicts or to dicts containing
                                      'model' and 'id' keys.
         :param attached_modules: A map of module type names (e.g.
-                                 `'tempdeck'` or `'magdeck'`) to lists of (serial, model)
-                                 tuples representing
+                                 `'tempdeck'` or `'magdeck'`) to lists of SimulatingModel
+                                 dataclasses representing
                                  modules the simulator should assume are
                                  attached. Like `attached_instruments`, used
                                  to make the simulator match the setup of the
