@@ -15,12 +15,22 @@ from opentrons.protocol_runner.run_orchestrator import (
     RunOrchestrator,
     RunOrchestratorProvider,
 )
+from opentrons import protocol_runner
 from opentrons.protocol_runner.protocol_runner import (
     JsonRunner,
     PythonAndLegacyRunner,
     LiveRunner,
     AnyRunner,
 )
+
+
+@pytest.fixture(autouse=True)
+def patch_mock_create_protocol_runner(
+    decoy: Decoy, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """Replace deck_conflict.check() with a mock."""
+    mock = decoy.mock(func=protocol_runner.create_protocol_runner)
+    monkeypatch.setattr(protocol_runner, "create_protocol_runner", mock)
 
 
 @pytest.fixture
@@ -87,7 +97,11 @@ def test_build_run_orchestrator_provider(
         hardware_api=mock_hardware_api,
     )
 
-    # monkey patch create_runner and stub returned value
+    decoy.when(
+        protocol_runner.create_protocol_runner(
+            protocol_engine=mock_protocol_engine, hardware_api=mock_hardware_api
+        )
+    ).then_return(mock_live_runner)
     assert result == RunOrchestrator(
         setup_runner=mock_live_runner,
         fixit_runner=mock_live_runner,
