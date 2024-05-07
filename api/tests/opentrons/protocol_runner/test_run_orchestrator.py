@@ -1,3 +1,9 @@
+@pytest.fixture
+def mock_protocol_json_runner(decoy: Decoy) -> JsonRunner:
+    """Get a mocked out JsonRunner dependency."""
+    return decoy.mock(cls=JsonRunner)
+
+
 import pytest
 from pytest_lazyfixture import lazy_fixture  # type: ignore[import-untyped]
 from decoy import Decoy
@@ -11,19 +17,16 @@ from opentrons.protocol_engine import (
 )
 from opentrons.hardware_control import API as HardwareAPI
 from opentrons.protocol_reader import JsonProtocolConfig, PythonProtocolConfig
-from opentrons.protocol_runner.run_orchestrator import RunOrchestrator
+from opentrons.protocol_runner.run_orchestrator import (
+    RunOrchestrator,
+    RunOrchestratorProvider,
+)
 from opentrons.protocol_runner.protocol_runner import (
     JsonRunner,
     PythonAndLegacyRunner,
     LiveRunner,
     AnyRunner,
 )
-
-
-@pytest.fixture
-def mock_protocol_json_runner(decoy: Decoy) -> JsonRunner:
-    """Get a mocked out JsonRunner dependency."""
-    return decoy.mock(cls=JsonRunner)
 
 
 @pytest.fixture
