@@ -253,15 +253,10 @@ class LogListener:
         """Wait for the data to stop, only use this with a send_accumulated_data_request."""
         self.event = asyncio.Event()
         recieving = True
-        print(f"is set {self.event.is_set()} receiving {recieving}")
         while recieving:
-            print(f"waiting {time.time()}")
             await asyncio.sleep(wait_time)
             recieving = self.event.is_set()
             self.event.clear()
-            print(f"done waiting {time.time()}")
-            if not recieving:
-                print(f"Timed out waiting for more messages {self.response_queue.qsize()}")
         self.event = None
 
     def __call__(
