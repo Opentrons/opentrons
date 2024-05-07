@@ -34,6 +34,7 @@ import type {
 import type { RunStatus } from '@opentrons/api-client'
 import type { TrackProtocolRunEvent } from '../../Devices/hooks'
 import type { RobotAnalyticsData } from '../../../redux/analytics/types'
+import type { CommandTextData } from '../../CommandText/types'
 
 const TITLE_TEXT_STYLE = css`
   color: ${COLORS.grey60};
@@ -234,7 +235,7 @@ export function RunningProtocolCommandList({
                     <CommandIcon command={command} size="2rem" />
                     <CommandText
                       command={command}
-                      robotSideAnalysis={robotSideAnalysis}
+                      protocolData={robotSideAnalysis as CommandTextData}
                       robotType={robotType}
                       css={COMMAND_ROW_STYLE}
                       isOnDevice={true}

@@ -31,6 +31,7 @@ import type {
   RunTimeCommand,
 } from '@opentrons/shared-data'
 import type { RunCommandSummary, RunStatus } from '@opentrons/api-client'
+import type { CommandTextData } from '../../CommandText/types'
 import type { TrackProtocolRunEvent } from '../../Devices/hooks'
 import type { RobotAnalyticsData } from '../../../redux/analytics/types'
 
@@ -233,7 +234,7 @@ export function CurrentRunningProtocolCommand({
         {robotSideAnalysis != null && currentCommand != null ? (
           <CommandText
             command={currentCommand}
-            robotSideAnalysis={robotSideAnalysis}
+            protocolData={robotSideAnalysis as CommandTextData}
             robotType={robotType}
             isOnDevice={true}
           />

@@ -8,6 +8,7 @@ import {
 import type { RunData } from '@opentrons/api-client'
 import type {
   LabwareDefinitionsByUri,
+  Liquid,
   LoadedLabware,
   LoadedModule,
 } from '@opentrons/shared-data'
@@ -176,6 +177,12 @@ export const mockThermocyclerModule: LoadedModule = {
   serialNumber: 'dummySerialTC',
 }
 
+export const mockLiquid: Liquid = {
+  id: 'mockLiquid',
+  displayName: 'mock liquid',
+  description: 'this is my mock liquid',
+}
+
 export const mockRunData: RunData = {
   id: 'mockRunData',
   createdAt: '',
@@ -188,6 +195,7 @@ export const mockRunData: RunData = {
   pipettes: [],
   labware: [mockLabwareOnModule, mockLabwareOnSlot, mockLabwareOffDeck],
   modules: [mockModule],
+  liquids: [mockLiquid],
   runTimeParameters: [],
 }
 

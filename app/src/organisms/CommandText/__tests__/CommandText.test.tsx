@@ -30,6 +30,7 @@ import type {
   PrepareToAspirateRunTimeCommand,
   RunTimeCommand,
 } from '@opentrons/shared-data'
+import type { CommandTextData } from '../types'
 
 describe('CommandText', () => {
   it('renders correct text for aspirate', () => {
@@ -40,7 +41,7 @@ describe('CommandText', () => {
     if (command != null) {
       const { getByText } = renderWithProviders(
         <CommandText
-          robotSideAnalysis={mockRobotSideAnalysis}
+          protocolData={mockRobotSideAnalysis as CommandTextData}
           robotType={FLEX_ROBOT_TYPE}
           command={command}
         />,
@@ -59,7 +60,7 @@ describe('CommandText', () => {
     if (command != null) {
       const { getByText } = renderWithProviders(
         <CommandText
-          robotSideAnalysis={mockRobotSideAnalysis}
+          protocolData={mockRobotSideAnalysis as CommandTextData}
           robotType={FLEX_ROBOT_TYPE}
           command={command}
         />,
@@ -85,7 +86,7 @@ describe('CommandText', () => {
     if (pushOutDispenseCommand != null) {
       const { getByText } = renderWithProviders(
         <CommandText
-          robotSideAnalysis={mockRobotSideAnalysis}
+          protocolData={mockRobotSideAnalysis as CommandTextData}
           robotType={FLEX_ROBOT_TYPE}
           command={pushOutDispenseCommand}
         />,
@@ -99,7 +100,7 @@ describe('CommandText', () => {
   it('renders correct text for dispenseInPlace', () => {
     const { getByText } = renderWithProviders(
       <CommandText
-        robotSideAnalysis={mockRobotSideAnalysis}
+        protocolData={mockRobotSideAnalysis as CommandTextData}
         robotType={FLEX_ROBOT_TYPE}
         command={
           {
@@ -128,7 +129,7 @@ describe('CommandText', () => {
     if (blowoutCommand != null) {
       const { getByText } = renderWithProviders(
         <CommandText
-          robotSideAnalysis={mockRobotSideAnalysis}
+          protocolData={mockRobotSideAnalysis as CommandTextData}
           robotType={FLEX_ROBOT_TYPE}
           command={blowoutCommand}
         />,
@@ -142,7 +143,7 @@ describe('CommandText', () => {
   it('renders correct text for blowOutInPlace', () => {
     const { getByText } = renderWithProviders(
       <CommandText
-        robotSideAnalysis={mockRobotSideAnalysis}
+        protocolData={mockRobotSideAnalysis as CommandTextData}
         robotType={FLEX_ROBOT_TYPE}
         command={
           {
@@ -161,7 +162,7 @@ describe('CommandText', () => {
   it('renders correct text for aspirateInPlace', () => {
     const { getByText } = renderWithProviders(
       <CommandText
-        robotSideAnalysis={mockRobotSideAnalysis}
+        protocolData={mockRobotSideAnalysis as CommandTextData}
         robotType={FLEX_ROBOT_TYPE}
         command={
           {
@@ -190,7 +191,7 @@ describe('CommandText', () => {
     if (moveToWellCommand != null) {
       const { getByText } = renderWithProviders(
         <CommandText
-          robotSideAnalysis={mockRobotSideAnalysis}
+          protocolData={mockRobotSideAnalysis as CommandTextData}
           robotType={FLEX_ROBOT_TYPE}
           command={moveToWellCommand}
         />,
@@ -217,7 +218,7 @@ describe('CommandText', () => {
           startedAt: null,
           completedAt: null,
         }}
-        robotSideAnalysis={mockRobotSideAnalysis}
+        protocolData={mockRobotSideAnalysis as CommandTextData}
         robotType={FLEX_ROBOT_TYPE}
       />,
       {
@@ -231,7 +232,7 @@ describe('CommandText', () => {
   it('renders correct text for moveToAddressableArea for Waste Chutes', () => {
     const { getByText } = renderWithProviders(
       <CommandText
-        robotSideAnalysis={mockRobotSideAnalysis}
+        protocolData={mockRobotSideAnalysis as CommandTextData}
         robotType={FLEX_ROBOT_TYPE}
         command={
           {
@@ -251,7 +252,7 @@ describe('CommandText', () => {
   it('renders correct text for moveToAddressableArea for Fixed Trash', () => {
     const { getByText } = renderWithProviders(
       <CommandText
-        robotSideAnalysis={mockRobotSideAnalysis}
+        protocolData={mockRobotSideAnalysis as CommandTextData}
         robotType={OT2_ROBOT_TYPE}
         command={
           {
@@ -271,7 +272,7 @@ describe('CommandText', () => {
   it('renders correct text for moveToAddressableArea for Trash Bins', () => {
     const { getByText } = renderWithProviders(
       <CommandText
-        robotSideAnalysis={mockRobotSideAnalysis}
+        protocolData={mockRobotSideAnalysis as CommandTextData}
         robotType={OT2_ROBOT_TYPE}
         command={
           {
@@ -291,7 +292,7 @@ describe('CommandText', () => {
   it('renders correct text for moveToAddressableAreaForDropTip for Trash Bin', () => {
     const { getByText } = renderWithProviders(
       <CommandText
-        robotSideAnalysis={mockRobotSideAnalysis}
+        protocolData={mockRobotSideAnalysis as CommandTextData}
         robotType={OT2_ROBOT_TYPE}
         command={
           {
@@ -312,7 +313,7 @@ describe('CommandText', () => {
   it('renders correct text for moveToAddressableArea for slots', () => {
     const { getByText } = renderWithProviders(
       <CommandText
-        robotSideAnalysis={mockRobotSideAnalysis}
+        protocolData={mockRobotSideAnalysis as CommandTextData}
         robotType={OT2_ROBOT_TYPE}
         command={
           {
@@ -340,7 +341,7 @@ describe('CommandText', () => {
 
     const { getByText } = renderWithProviders(
       <CommandText
-        robotSideAnalysis={mockRobotSideAnalysis}
+        protocolData={mockRobotSideAnalysis as CommandTextData}
         robotType={FLEX_ROBOT_TYPE}
         command={command}
       />,
@@ -358,7 +359,7 @@ describe('CommandText', () => {
 
     const { getByText } = renderWithProviders(
       <CommandText
-        robotSideAnalysis={mockRobotSideAnalysis}
+        protocolData={mockRobotSideAnalysis as CommandTextData}
         robotType={FLEX_ROBOT_TYPE}
         command={command}
       />,
@@ -374,7 +375,7 @@ describe('CommandText', () => {
     if (command != null) {
       const { getByText } = renderWithProviders(
         <CommandText
-          robotSideAnalysis={mockRobotSideAnalysis}
+          protocolData={mockRobotSideAnalysis as CommandTextData}
           robotType={FLEX_ROBOT_TYPE}
           command={command}
         />,
@@ -386,7 +387,7 @@ describe('CommandText', () => {
   it('renders correct text for dropTip into a labware', () => {
     const { getByText } = renderWithProviders(
       <CommandText
-        robotSideAnalysis={mockRobotSideAnalysis}
+        protocolData={mockRobotSideAnalysis as CommandTextData}
         robotType={FLEX_ROBOT_TYPE}
         command={
           {
@@ -407,7 +408,7 @@ describe('CommandText', () => {
   it('renders correct text for dropTipInPlace', () => {
     const { getByText } = renderWithProviders(
       <CommandText
-        robotSideAnalysis={mockRobotSideAnalysis}
+        protocolData={mockRobotSideAnalysis as CommandTextData}
         robotType={FLEX_ROBOT_TYPE}
         command={
           {
@@ -430,7 +431,7 @@ describe('CommandText', () => {
     if (command != null) {
       const { getByText } = renderWithProviders(
         <CommandText
-          robotSideAnalysis={mockRobotSideAnalysis}
+          protocolData={mockRobotSideAnalysis as CommandTextData}
           robotType={FLEX_ROBOT_TYPE}
           command={command}
         />,
@@ -449,7 +450,7 @@ describe('CommandText', () => {
     if (command != null) {
       const { getByText } = renderWithProviders(
         <CommandText
-          robotSideAnalysis={mockRobotSideAnalysis}
+          protocolData={mockRobotSideAnalysis as CommandTextData}
           robotType={FLEX_ROBOT_TYPE}
           command={command}
         />,
@@ -466,7 +467,7 @@ describe('CommandText', () => {
     if (command != null) {
       const { getByText } = renderWithProviders(
         <CommandText
-          robotSideAnalysis={mockRobotSideAnalysis}
+          protocolData={mockRobotSideAnalysis as CommandTextData}
           robotType={FLEX_ROBOT_TYPE}
           command={command}
         />,
@@ -482,7 +483,7 @@ describe('CommandText', () => {
     const loadLabwareCommand = loadLabwareCommands[0]
     const { getByText } = renderWithProviders(
       <CommandText
-        robotSideAnalysis={mockRobotSideAnalysis}
+        protocolData={mockRobotSideAnalysis as CommandTextData}
         robotType={FLEX_ROBOT_TYPE}
         command={loadLabwareCommand}
       />,
@@ -497,7 +498,7 @@ describe('CommandText', () => {
     const loadTipRackCommand = loadLabwareCommands[2]
     const { getByText } = renderWithProviders(
       <CommandText
-        robotSideAnalysis={mockRobotSideAnalysis}
+        protocolData={mockRobotSideAnalysis as CommandTextData}
         robotType={FLEX_ROBOT_TYPE}
         command={loadTipRackCommand}
       />,
@@ -512,7 +513,7 @@ describe('CommandText', () => {
     const loadOnModuleCommand = loadLabwareCommands[3]
     const { getByText } = renderWithProviders(
       <CommandText
-        robotSideAnalysis={mockRobotSideAnalysis}
+        protocolData={mockRobotSideAnalysis as CommandTextData}
         robotType={FLEX_ROBOT_TYPE}
         command={loadOnModuleCommand}
       />,
@@ -550,7 +551,7 @@ describe('CommandText', () => {
           startedAt: null,
           completedAt: null,
         }}
-        robotSideAnalysis={mockRobotSideAnalysis}
+        protocolData={mockRobotSideAnalysis as CommandTextData}
         robotType={FLEX_ROBOT_TYPE}
       />,
       {
@@ -574,7 +575,7 @@ describe('CommandText', () => {
     } as LoadLabwareRunTimeCommand
     const { getByText } = renderWithProviders(
       <CommandText
-        robotSideAnalysis={mockRobotSideAnalysis}
+        protocolData={mockRobotSideAnalysis as CommandTextData}
         robotType={FLEX_ROBOT_TYPE}
         command={loadOffDeckCommand}
       />,
@@ -615,7 +616,7 @@ describe('CommandText', () => {
     }
     const { getByText } = renderWithProviders(
       <CommandText
-        robotSideAnalysis={analysisWithLiquids}
+        protocolData={analysisWithLiquids as CommandTextData}
         robotType={FLEX_ROBOT_TYPE}
         command={loadLiquidCommand}
       />,
@@ -638,7 +639,7 @@ describe('CommandText', () => {
           startedAt: null,
           completedAt: null,
         }}
-        robotSideAnalysis={mockRobotSideAnalysis}
+        protocolData={mockRobotSideAnalysis as CommandTextData}
         robotType={FLEX_ROBOT_TYPE}
       />,
       {
@@ -662,7 +663,7 @@ describe('CommandText', () => {
           startedAt: null,
           completedAt: null,
         }}
-        robotSideAnalysis={mockRobotSideAnalysis}
+        protocolData={mockRobotSideAnalysis as CommandTextData}
         robotType={FLEX_ROBOT_TYPE}
       />,
       {
@@ -685,7 +686,7 @@ describe('CommandText', () => {
           startedAt: null,
           completedAt: null,
         }}
-        robotSideAnalysis={mockRobotSideAnalysis}
+        protocolData={mockRobotSideAnalysis as CommandTextData}
         robotType={FLEX_ROBOT_TYPE}
       />,
       {
@@ -709,7 +710,7 @@ describe('CommandText', () => {
           startedAt: null,
           completedAt: null,
         }}
-        robotSideAnalysis={mockRobotSideAnalysis}
+        protocolData={mockRobotSideAnalysis as CommandTextData}
         robotType={FLEX_ROBOT_TYPE}
       />,
       {
@@ -735,7 +736,7 @@ describe('CommandText', () => {
           startedAt: null,
           completedAt: null,
         }}
-        robotSideAnalysis={mockRobotSideAnalysis}
+        protocolData={mockRobotSideAnalysis as CommandTextData}
         robotType={FLEX_ROBOT_TYPE}
       />,
       {
@@ -759,7 +760,7 @@ describe('CommandText', () => {
           startedAt: null,
           completedAt: null,
         }}
-        robotSideAnalysis={mockRobotSideAnalysis}
+        protocolData={mockRobotSideAnalysis as CommandTextData}
         robotType={FLEX_ROBOT_TYPE}
       />,
       {
@@ -786,7 +787,7 @@ describe('CommandText', () => {
           startedAt: null,
           completedAt: null,
         }}
-        robotSideAnalysis={mockRobotSideAnalysis}
+        protocolData={mockRobotSideAnalysis as CommandTextData}
         robotType={FLEX_ROBOT_TYPE}
       />,
       {
@@ -817,7 +818,7 @@ describe('CommandText', () => {
           startedAt: null,
           completedAt: null,
         }}
-        robotSideAnalysis={mockRobotSideAnalysis}
+        protocolData={mockRobotSideAnalysis as CommandTextData}
         robotType={FLEX_ROBOT_TYPE}
         isOnDevice={true}
       />,
@@ -847,7 +848,7 @@ describe('CommandText', () => {
           startedAt: null,
           completedAt: null,
         }}
-        robotSideAnalysis={mockRobotSideAnalysis}
+        protocolData={mockRobotSideAnalysis as CommandTextData}
         robotType={FLEX_ROBOT_TYPE}
       />,
       {
@@ -872,7 +873,7 @@ describe('CommandText', () => {
           startedAt: null,
           completedAt: null,
         }}
-        robotSideAnalysis={mockRobotSideAnalysis}
+        protocolData={mockRobotSideAnalysis as CommandTextData}
         robotType={FLEX_ROBOT_TYPE}
       />,
       {
@@ -895,7 +896,7 @@ describe('CommandText', () => {
           startedAt: null,
           completedAt: null,
         }}
-        robotSideAnalysis={mockRobotSideAnalysis}
+        protocolData={mockRobotSideAnalysis as CommandTextData}
         robotType={FLEX_ROBOT_TYPE}
       />,
       {
@@ -918,7 +919,7 @@ describe('CommandText', () => {
           startedAt: null,
           completedAt: null,
         }}
-        robotSideAnalysis={mockRobotSideAnalysis}
+        protocolData={mockRobotSideAnalysis as CommandTextData}
         robotType={FLEX_ROBOT_TYPE}
       />,
       {
@@ -971,7 +972,7 @@ describe('CommandText', () => {
                 completedAt: null,
               } as RunTimeCommand
             }
-            robotSideAnalysis={mockRobotSideAnalysis}
+            protocolData={mockRobotSideAnalysis as CommandTextData}
             robotType={FLEX_ROBOT_TYPE}
           />,
           {
@@ -997,7 +998,7 @@ describe('CommandText', () => {
           startedAt: null,
           completedAt: null,
         }}
-        robotSideAnalysis={mockRobotSideAnalysis}
+        protocolData={mockRobotSideAnalysis as CommandTextData}
         robotType={FLEX_ROBOT_TYPE}
       />,
       {
@@ -1020,7 +1021,7 @@ describe('CommandText', () => {
           startedAt: null,
           completedAt: null,
         }}
-        robotSideAnalysis={mockRobotSideAnalysis}
+        protocolData={mockRobotSideAnalysis as CommandTextData}
         robotType={FLEX_ROBOT_TYPE}
       />,
       {
@@ -1043,7 +1044,7 @@ describe('CommandText', () => {
           startedAt: null,
           completedAt: null,
         }}
-        robotSideAnalysis={mockRobotSideAnalysis}
+        protocolData={mockRobotSideAnalysis as CommandTextData}
         robotType={FLEX_ROBOT_TYPE}
       />,
       {
@@ -1066,7 +1067,7 @@ describe('CommandText', () => {
           startedAt: null,
           completedAt: null,
         }}
-        robotSideAnalysis={mockRobotSideAnalysis}
+        protocolData={mockRobotSideAnalysis as CommandTextData}
         robotType={FLEX_ROBOT_TYPE}
       />,
       {
@@ -1089,7 +1090,7 @@ describe('CommandText', () => {
           startedAt: null,
           completedAt: null,
         }}
-        robotSideAnalysis={mockRobotSideAnalysis}
+        protocolData={mockRobotSideAnalysis as CommandTextData}
         robotType={FLEX_ROBOT_TYPE}
       />,
       {
@@ -1112,7 +1113,7 @@ describe('CommandText', () => {
           startedAt: null,
           completedAt: null,
         }}
-        robotSideAnalysis={mockRobotSideAnalysis}
+        protocolData={mockRobotSideAnalysis as CommandTextData}
         robotType={FLEX_ROBOT_TYPE}
       />,
       {
@@ -1135,7 +1136,7 @@ describe('CommandText', () => {
           startedAt: null,
           completedAt: null,
         }}
-        robotSideAnalysis={mockRobotSideAnalysis}
+        protocolData={mockRobotSideAnalysis as CommandTextData}
         robotType={FLEX_ROBOT_TYPE}
       />,
       {
@@ -1158,7 +1159,7 @@ describe('CommandText', () => {
           startedAt: null,
           completedAt: null,
         }}
-        robotSideAnalysis={mockRobotSideAnalysis}
+        protocolData={mockRobotSideAnalysis as CommandTextData}
         robotType={FLEX_ROBOT_TYPE}
       />,
       {
@@ -1181,7 +1182,7 @@ describe('CommandText', () => {
           startedAt: null,
           completedAt: null,
         }}
-        robotSideAnalysis={mockRobotSideAnalysis}
+        protocolData={mockRobotSideAnalysis as CommandTextData}
         robotType={FLEX_ROBOT_TYPE}
       />,
       {
@@ -1208,7 +1209,7 @@ describe('CommandText', () => {
           startedAt: null,
           completedAt: null,
         }}
-        robotSideAnalysis={mockRobotSideAnalysis}
+        protocolData={mockRobotSideAnalysis as CommandTextData}
         robotType={FLEX_ROBOT_TYPE}
       />,
       {
@@ -1237,7 +1238,7 @@ describe('CommandText', () => {
           startedAt: null,
           completedAt: null,
         }}
-        robotSideAnalysis={mockRobotSideAnalysis}
+        protocolData={mockRobotSideAnalysis as CommandTextData}
         robotType={FLEX_ROBOT_TYPE}
       />,
       {
@@ -1266,7 +1267,7 @@ describe('CommandText', () => {
           startedAt: null,
           completedAt: null,
         }}
-        robotSideAnalysis={mockRobotSideAnalysis}
+        protocolData={mockRobotSideAnalysis as CommandTextData}
         robotType={FLEX_ROBOT_TYPE}
       />,
       {
@@ -1295,7 +1296,7 @@ describe('CommandText', () => {
           startedAt: null,
           completedAt: null,
         }}
-        robotSideAnalysis={mockRobotSideAnalysis}
+        protocolData={mockRobotSideAnalysis as CommandTextData}
         robotType={FLEX_ROBOT_TYPE}
       />,
       {
@@ -1326,7 +1327,7 @@ describe('CommandText', () => {
           startedAt: null,
           completedAt: null,
         }}
-        robotSideAnalysis={mockRobotSideAnalysis}
+        protocolData={mockRobotSideAnalysis as CommandTextData}
         robotType={FLEX_ROBOT_TYPE}
       />,
       {
@@ -1355,7 +1356,7 @@ describe('CommandText', () => {
           startedAt: null,
           completedAt: null,
         }}
-        robotSideAnalysis={mockRobotSideAnalysis}
+        protocolData={mockRobotSideAnalysis as CommandTextData}
         robotType={FLEX_ROBOT_TYPE}
       />,
       {

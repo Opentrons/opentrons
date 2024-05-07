@@ -5,9 +5,10 @@ import type {
   LoadedModule,
   LoadedPipette,
 } from '@opentrons/shared-data'
+import type { CommandTextData } from '../types'
 
 export function getLoadedLabware(
-  protocolData: CompletedProtocolAnalysis | RunData,
+  protocolData: CompletedProtocolAnalysis | RunData | CommandTextData,
   labwareId: string
 ): LoadedLabware | undefined {
   // NOTE: old analysis contains a object dictionary of labware entities by id, this case is supported for backwards compatibility purposes
@@ -16,16 +17,16 @@ export function getLoadedLabware(
     : protocolData.labware[labwareId]
 }
 export function getLoadedPipette(
-  analysis: CompletedProtocolAnalysis,
+  protocolData: CommandTextData,
   mount: string
 ): LoadedPipette | undefined {
   // NOTE: old analysis contains a object dictionary of pipette entities by id, this case is supported for backwards compatibility purposes
-  return Array.isArray(analysis.pipettes)
-    ? analysis.pipettes.find(l => l.mount === mount)
-    : analysis.pipettes[mount]
+  return Array.isArray(protocolData.pipettes)
+    ? protocolData.pipettes.find(l => l.mount === mount)
+    : protocolData.pipettes[mount]
 }
 export function getLoadedModule(
-  protocolData: CompletedProtocolAnalysis | RunData,
+  protocolData: CompletedProtocolAnalysis | RunData | CommandTextData,
   moduleId: string
 ): LoadedModule | undefined {
   // NOTE: old analysis contains a object dictionary of module entities by id, this case is supported for backwards compatibility purposes

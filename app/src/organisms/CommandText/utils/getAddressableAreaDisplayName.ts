@@ -1,16 +1,16 @@
 import type {
   AddressableAreaName,
-  CompletedProtocolAnalysis,
   MoveToAddressableAreaParams,
 } from '@opentrons/shared-data'
 import type { TFunction } from 'i18next'
+import type { CommandTextData } from '../types'
 
 export function getAddressableAreaDisplayName(
-  analysis: CompletedProtocolAnalysis,
+  protocolData: CommandTextData,
   commandId: string,
   t: TFunction
 ): string {
-  const addressableAreaCommand = (analysis?.commands ?? []).find(
+  const addressableAreaCommand = (protocolData?.commands ?? []).find(
     command => command.id === commandId
   )
 

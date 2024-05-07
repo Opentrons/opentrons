@@ -20,12 +20,9 @@ import { PipettingCommandText } from './PipettingCommandText'
 import { TemperatureCommandText } from './TemperatureCommandText'
 import { MoveLabwareCommandText } from './MoveLabwareCommandText'
 
-import type {
-  CompletedProtocolAnalysis,
-  RobotType,
-  RunTimeCommand,
-} from '@opentrons/shared-data'
+import type { RobotType, RunTimeCommand } from '@opentrons/shared-data'
 import type { StyleProps } from '@opentrons/components'
+import type { CommandTextData } from './types'
 
 const SIMPLE_TRANSLATION_KEY_BY_COMMAND_TYPE: {
   [commandType in RunTimeCommand['commandType']]?: string
@@ -52,14 +49,14 @@ const SIMPLE_TRANSLATION_KEY_BY_COMMAND_TYPE: {
 
 interface Props extends StyleProps {
   command: RunTimeCommand
-  robotSideAnalysis: CompletedProtocolAnalysis
+  protocolData: CommandTextData
   robotType: RobotType
   isOnDevice?: boolean
 }
 export function CommandText(props: Props): JSX.Element | null {
   const {
     command,
-    robotSideAnalysis,
+    protocolData,
     robotType,
     isOnDevice = false,
     ...styleProps
@@ -78,9 +75,7 @@ export function CommandText(props: Props): JSX.Element | null {
     case 'pickUpTip': {
       return (
         <StyledText as="p" {...styleProps}>
-          <PipettingCommandText
-            {...{ command, robotSideAnalysis, robotType }}
-          />
+          <PipettingCommandText {...{ command, protocolData, robotType }} />
         </StyledText>
       )
     }
@@ -90,7 +85,7 @@ export function CommandText(props: Props): JSX.Element | null {
     case 'loadLiquid': {
       return (
         <StyledText as="p" {...styleProps}>
-          <LoadCommandText {...{ command, robotSideAnalysis, robotType }} />
+          <LoadCommandText {...{ command, protocolData, robotType }} />
         </StyledText>
       )
     }
@@ -173,9 +168,9 @@ export function CommandText(props: Props): JSX.Element | null {
     }
     case 'moveToWell': {
       const { wellName, labwareId } = command.params
-      const allPreviousCommands = robotSideAnalysis.commands.slice(
+      const allPreviousCommands = protocolData.commands.slice(
         0,
-        robotSideAnalysis.commands.findIndex(c => c.id === command.id)
+        protocolData.commands.findIndex(c => c.id === command.id)
       )
       const labwareLocation = getFinalLabwareLocation(
         labwareId,
@@ -184,7 +179,7 @@ export function CommandText(props: Props): JSX.Element | null {
       const displayLocation =
         labwareLocation != null
           ? getLabwareDisplayLocation(
-              robotSideAnalysis,
+              protocolData,
               labwareLocation,
               t,
               robotType
@@ -194,7 +189,7 @@ export function CommandText(props: Props): JSX.Element | null {
         <StyledText as="p" {...styleProps}>
           {t('move_to_well', {
             well_name: wellName,
-            labware: getLabwareName(robotSideAnalysis, labwareId),
+            labware: getLabwareName(protocolData, labwareId),
             labware_location: displayLocation,
           })}
         </StyledText>
@@ -203,15 +198,13 @@ export function CommandText(props: Props): JSX.Element | null {
     case 'moveLabware': {
       return (
         <StyledText as="p" {...styleProps}>
-          <MoveLabwareCommandText
-            {...{ command, robotSideAnalysis, robotType }}
-          />
+          <MoveLabwareCommandText {...{ command, protocolData, robotType }} />
         </StyledText>
       )
     }
     case 'configureForVolume': {
       const { volume, pipetteId } = command.params
-      const pipetteName = robotSideAnalysis.pipettes.find(
+      const pipetteName = protocolData.pipettes.find(
         pip => pip.id === pipetteId
       )?.pipetteName
 
@@ -229,7 +222,7 @@ export function CommandText(props: Props): JSX.Element | null {
     }
     case 'configureNozzleLayout': {
       const { configurationParams, pipetteId } = command.params
-      const pipetteName = robotSideAnalysis.pipettes.find(
+      const pipetteName = protocolData.pipettes.find(
         pip => pip.id === pipetteId
       )?.pipetteName
 
@@ -248,7 +241,7 @@ export function CommandText(props: Props): JSX.Element | null {
     }
     case 'prepareToAspirate': {
       const { pipetteId } = command.params
-      const pipetteName = robotSideAnalysis.pipettes.find(
+      const pipetteName = protocolData.pipettes.find(
         pip => pip.id === pipetteId
       )?.pipetteName
 
@@ -265,7 +258,7 @@ export function CommandText(props: Props): JSX.Element | null {
     }
     case 'moveToAddressableArea': {
       const addressableAreaDisplayName = getAddressableAreaDisplayName(
-        robotSideAnalysis,
+        protocolData,
         command.id,
         t
       )
@@ -280,7 +273,7 @@ export function CommandText(props: Props): JSX.Element | null {
     }
     case 'moveToAddressableAreaForDropTip': {
       const addressableAreaDisplayName = getAddressableAreaDisplayName(
-        robotSideAnalysis,
+        protocolData,
         command.id,
         t
       )
