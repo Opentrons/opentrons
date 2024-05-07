@@ -117,7 +117,6 @@ export function LiquidEditForm(props: LiquidEditFormProps): JSX.Element {
       serialize: values.serialize || false,
     })
   }
-  console.log('errors', errors)
   return (
     <Card className={styles.form_card}>
       <form onSubmit={handleSubmit(handleLiquidEdits)}>
