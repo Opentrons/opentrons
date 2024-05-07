@@ -1,11 +1,7 @@
 import { useMutation, useQueryClient } from 'react-query'
 import { createCommand } from '@opentrons/api-client'
 import { useHost } from '../api'
-import type {
-  UseMutationResult,
-  UseMutationOptions,
-  UseMutateAsyncFunction,
-} from 'react-query'
+import type { UseMutationResult, UseMutateAsyncFunction } from 'react-query'
 import type {
   CommandData,
   HostConfig,
@@ -32,21 +28,16 @@ export type UseCreateCommandMutationResult = UseMutationResult<
   >
 }
 
-export type UseCreateCommandMutationOptions = UseMutationOptions<
-  CommandData,
-  unknown,
-  CreateCommandMutateParams
->
-
 export function useCreateCommandMutation(): UseCreateCommandMutationResult {
   const host = useHost()
   const queryClient = useQueryClient()
 
   const mutation = useMutation<CommandData, unknown, CreateCommandMutateParams>(
-    ({ runId, command, waitUntilComplete, timeout }) =>
-      createCommand(host as HostConfig, runId, command, {
-        waitUntilComplete,
-        timeout,
+    params => {
+      const { runId, command, ...rest } = params
+
+      return createCommand(host as HostConfig, runId, command, {
+        ...rest,
       }).then(response => {
         queryClient
           .invalidateQueries([host, 'runs'])
@@ -55,6 +46,7 @@ export function useCreateCommandMutation(): UseCreateCommandMutationResult {
           )
         return response.data
       })
+    }
   )
 
   return {
