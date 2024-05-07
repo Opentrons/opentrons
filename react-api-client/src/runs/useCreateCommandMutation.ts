@@ -32,21 +32,16 @@ export type UseCreateCommandMutationResult = UseMutationResult<
   >
 }
 
-export type UseCreateCommandMutationOptions = UseMutationOptions<
-  CommandData,
-  unknown,
-  CreateCommandMutateParams
->
-
 export function useCreateCommandMutation(): UseCreateCommandMutationResult {
   const host = useHost()
   const queryClient = useQueryClient()
 
   const mutation = useMutation<CommandData, unknown, CreateCommandMutateParams>(
-    ({ runId, command, waitUntilComplete, timeout }) =>
-      createCommand(host as HostConfig, runId, command, {
-        waitUntilComplete,
-        timeout,
+    params => {
+      const { runId, command, ...rest } = params
+
+      return createCommand(host as HostConfig, runId, command, {
+        ...rest,
       }).then(response => {
         queryClient
           .invalidateQueries([host, 'runs'])
@@ -55,6 +50,7 @@ export function useCreateCommandMutation(): UseCreateCommandMutationResult {
           )
         return response.data
       })
+    }
   )
 
   return {
