@@ -54,3 +54,30 @@ async def test_multiple_subscribers(_test_repetition: int) -> None:
     await asyncio.gather(task_1, task_2, task_3)
 
     assert results == [1, 2, 3]
+
+
+async def test_notify_while_busy() -> None:
+    """Test that waiters process a new notify() after they are done being busy."""
+    subject = ChangeNotifier()
+    results = []
+
+    async def _do_task() -> None:
+        results.append("TEST")
+        await asyncio.sleep(0.2)  # Simulate being busy
+
+    async def do_task() -> None:
+        while True:
+            await subject.wait()
+            await _do_task()
+
+    task = asyncio.create_task(do_task())
+
+    subject.notify()
+    await asyncio.sleep(0.0)
+
+    subject.notify()
+    await asyncio.sleep(0.5)
+
+    assert results == ["TEST", "TEST"]
+
+    task.cancel()
