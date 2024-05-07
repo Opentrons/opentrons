@@ -23,14 +23,11 @@ class RunOrchestrator:
 
     def __init__(
         self,
-        setup_runner: protocol_runner.AnyRunner,
-        fixit_runner: protocol_runner.AnyRunner,
-        json_or_python_runner: Optional[protocol_runner.AnyRunner] = None,
+        protocol_engine: ProtocolEngine,
+        hardware_api: HardwareControlAPI,
     ) -> None:
-        # todo(tamar, 5-7-24): assert that the type matches expected type
-        self._setup_runner = setup_runner
-        self._fixit_runner = fixit_runner
-        self._json_or_python_runner = json_or_python_runner
+        self._protocol_engine = protocol_engine
+        self._hardware_api = hardware_api
 
     def add_command(
         self, request: CommandCreate, failed_command_id: Optional[str] = None
@@ -69,40 +66,30 @@ class RunOrchestrator:
         ):
             self._json_or_python_runner.set_command_queued(request)
 
-
-@dataclass
-class RunOrchestratorProvider:
-    @staticmethod
     def build_orchestrator(
+        self,
         protocol_config: Optional[Union[JsonProtocolConfig, PythonProtocolConfig]],
-        protocol_engine: ProtocolEngine,
-        hardware_api: HardwareControlAPI,
         post_run_hardware_state: PostRunHardwareState = PostRunHardwareState.HOME_AND_STAY_ENGAGED,
         drop_tips_after_run: bool = True,
     ):
-        setup_runner = protocol_runner.create_protocol_runner(
-            protocol_engine=protocol_engine,
-            hardware_api=hardware_api,
+        self._setup_runner = protocol_runner.create_protocol_runner(
+            protocol_engine=self._protocol_engine,
+            hardware_api=self._hardware_api,
             post_run_hardware_state=post_run_hardware_state,
             drop_tips_after_run=drop_tips_after_run,
         )
-        fixit_runner = protocol_runner.create_protocol_runner(
-            protocol_engine=protocol_engine,
-            hardware_api=hardware_api,
+        self._fixit_runner = protocol_runner.create_protocol_runner(
+            protocol_engine=self._protocol_engine,
+            hardware_api=self._hardware_api,
             post_run_hardware_state=post_run_hardware_state,
             drop_tips_after_run=drop_tips_after_run,
         )
-        json_or_python_runner = None
+
         if protocol_config:
-            json_or_python_runner = protocol_runner.create_protocol_runner(
+            self._json_or_python_runner = protocol_runner.create_protocol_runner(
                 protocol_config=protocol_config,
-                protocol_engine=protocol_engine,
-                hardware_api=hardware_api,
+                protocol_engine=self._protocol_engine,
+                hardware_api=self._hardware_api,
                 post_run_hardware_state=post_run_hardware_state,
                 drop_tips_after_run=drop_tips_after_run,
             )
-        return RunOrchestrator(
-            setup_runner=setup_runner,
-            fixit_runner=fixit_runner,
-            json_or_python_runner=json_or_python_runner,
-        )

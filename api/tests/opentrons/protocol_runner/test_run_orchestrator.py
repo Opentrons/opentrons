@@ -17,10 +17,7 @@ from opentrons.protocol_engine import (
 )
 from opentrons.hardware_control import API as HardwareAPI
 from opentrons.protocol_reader import JsonProtocolConfig, PythonProtocolConfig
-from opentrons.protocol_runner.run_orchestrator import (
-    RunOrchestrator,
-    RunOrchestratorProvider,
-)
+from opentrons.protocol_runner.run_orchestrator import RunOrchestrator
 from opentrons.protocol_runner.protocol_runner import (
     JsonRunner,
     PythonAndLegacyRunner,
