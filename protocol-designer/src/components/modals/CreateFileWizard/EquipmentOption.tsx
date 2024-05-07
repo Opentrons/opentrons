@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { css } from 'styled-components'
-import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
+import { FLEX_ROBOT_TYPE, OT2_ROBOT_TYPE } from '@opentrons/shared-data'
 
 import {
   Flex,
@@ -60,6 +60,7 @@ interface EquipmentOptionProps extends StyleProps {
   showCheckbox?: boolean
   disabled?: boolean
   multiples?: MultiplesProps
+  type?: 'module' | 'pipetteTip'
 }
 export function EquipmentOption(props: EquipmentOptionProps): JSX.Element {
   const {
@@ -69,6 +70,7 @@ export function EquipmentOption(props: EquipmentOptionProps): JSX.Element {
     image = null,
     showCheckbox = false,
     disabled = false,
+    type = 'module',
     robotType,
     multiples,
     ...styleProps
@@ -200,6 +202,14 @@ export function EquipmentOption(props: EquipmentOptionProps): JSX.Element {
     )
   }
 
+  let optionTooltip
+  if (robotType === FLEX_ROBOT_TYPE && type === 'module') {
+    optionTooltip = t('disabled_no_space_additional_items')
+  } else if (robotType === OT2_ROBOT_TYPE && type === 'module') {
+    optionTooltip = t('disabled_you_can_add_one_type')
+  } else if (type === 'pipetteTip') {
+    optionTooltip = t('disabled_no_space_pipette')
+  }
   return (
     <>
       <Flex
@@ -258,13 +268,7 @@ export function EquipmentOption(props: EquipmentOptionProps): JSX.Element {
         </Flex>
       </Flex>
       {disabled ? (
-        <Tooltip {...equipmentTooltipProps}>
-          {t(
-            robotType === FLEX_ROBOT_TYPE
-              ? 'disabled_no_space_additional_items'
-              : 'disabled_you_can_add_one_type'
-          )}
-        </Tooltip>
+        <Tooltip {...equipmentTooltipProps}>{optionTooltip}</Tooltip>
       ) : null}
     </>
   )

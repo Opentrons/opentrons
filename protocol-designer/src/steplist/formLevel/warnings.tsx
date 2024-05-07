@@ -62,14 +62,14 @@ const belowMinDisposalVolumeWarning = (min: number): FormWarning => ({
 const tipPositionedLowInTube = (): FormWarning => ({
   type: 'TIP_POSITIONED_LOW_IN_TUBE',
   title:
-    'A tuberack has an aspirate and dispense default height at 1mm and 0.5mm from the bottom of the well, which could cause liquid overflow or pipette damage. Edit tip position in advanced settings.',
+    'A tuberack has an aspirate and dispense default height at 1mm from the bottom of the well, which could cause liquid overflow or pipette damage. Edit tip position in advanced settings.',
   dependentFields: ['aspirate_labware', 'dispense_labware'],
 })
 
 const mixTipPositionedLowInTube = (): FormWarning => ({
   type: 'MIX_TIP_POSITIONED_LOW_IN_TUBE',
   title:
-    'The default mix height is 0.5mm from the bottom of the well, which could cause liquid overflow or pipette damage. Edit tip position in advanced settings.',
+    'The default mix height is 1mm from the bottom of the well, which could cause liquid overflow or pipette damage. Edit tip position in advanced settings.',
   dependentFields: ['labware'],
 })
 
