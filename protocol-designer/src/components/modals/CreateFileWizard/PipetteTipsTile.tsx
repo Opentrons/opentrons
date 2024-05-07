@@ -210,7 +210,11 @@ function PipetteTipsField(props: PipetteTipsFieldProps): JSX.Element | null {
               )
             }}
             width="21.75rem"
+            disabled={
+              selectedValues.length === 3 && !selectedValues.includes(o.value)
+            }
             minHeight="4rem"
+            type="pipetteTip"
             showCheckbox
           />
         ))}
@@ -276,6 +280,11 @@ function PipetteTipsField(props: PipetteTipsFieldProps): JSX.Element | null {
                   }}
                   width="21.75rem"
                   minHeight="4rem"
+                  type="pipetteTip"
+                  disabled={
+                    selectedValues.length === 3 &&
+                    !selectedValues.includes(o.value)
+                  }
                   showCheckbox
                 />
               ))}

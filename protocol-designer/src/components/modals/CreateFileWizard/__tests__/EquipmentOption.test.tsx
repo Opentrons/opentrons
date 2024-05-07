@@ -23,6 +23,7 @@ describe('EquipmentOption', () => {
       isSelected: false,
       text: 'mockText',
       robotType: FLEX_ROBOT_TYPE,
+      type: 'module',
     }
   })
   afterEach(() => {
