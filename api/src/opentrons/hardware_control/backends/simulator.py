@@ -49,7 +49,7 @@ class Simulator:
     async def build(
         cls,
         attached_instruments: Dict[types.Mount, Dict[str, Optional[str]]],
-        attached_modules: Dict[str, List[Tuple[str, Optional[str]]]],
+        attached_modules: Dict[str, List[modules.SimulatingModule]],
         config: RobotConfig,
         loop: asyncio.AbstractEventLoop,
         strict_attached_instruments: bool = True,
@@ -106,7 +106,7 @@ class Simulator:
     def __init__(
         self,
         attached_instruments: Dict[types.Mount, Dict[str, Optional[str]]],
-        attached_modules: Dict[str, List[Tuple[str, Optional[str]]]],
+        attached_modules: Dict[str, List[modules.SimulatingModule]],
         config: RobotConfig,
         loop: asyncio.AbstractEventLoop,
         gpio_chardev: GPIODriverLike,
@@ -334,14 +334,14 @@ class Simulator:
     @ensure_yield
     async def watch(self) -> None:
         new_mods_at_ports = []
-        for mod, detail_pairs in self._stubbed_attached_modules.items():
-            for (serial, maybe_model) in detail_pairs:
+        for mod_name, list_of_modules in self._stubbed_attached_modules.items():
+            for module_details in list_of_modules:
                 new_mods_at_ports.append(
                     modules.SimulatingModuleAtPort(
-                        port=f"/dev/ot_module_sim_{mod}{str(serial)}",
-                        name=mod,
-                        serial_number=serial,
-                        model=maybe_model,
+                        port=f"/dev/ot_module_sim_{mod_name}{str(module_details.serial_number)}",
+                        name=mod_name,
+                        serial_number=module_details.serial_number,
+                        model=module_details.model,
                     )
                 )
         await self.module_controls.register_modules(new_mods_at_ports=new_mods_at_ports)

@@ -413,7 +413,7 @@ class OT3API(
             Dict[OT3Mount, Dict[str, Optional[str]]],
             Dict[top_types.Mount, Dict[str, Optional[str]]],
         ] = None,
-        attached_modules: Optional[Dict[str, List[Tuple[str, Optional[str]]]]] = None,
+        attached_modules: Optional[Dict[str, List[modules.SimulatingModule]]] = None,
         config: Union[RobotConfig, OT3Config, None] = None,
         loop: Optional[asyncio.AbstractEventLoop] = None,
         strict_attached_instruments: bool = True,

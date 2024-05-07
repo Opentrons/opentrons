@@ -21,6 +21,7 @@ from opentrons.types import Mount, Point, Location, TransferTipPolicy
 from opentrons.hardware_control import API, ThreadManagedHardware
 from opentrons.hardware_control.instruments.ot2.pipette import Pipette
 from opentrons.hardware_control.types import Axis
+from opentrons.hardware_control.modules import SimulatingModule
 from opentrons.protocols.advanced_control import transfers as tf
 from opentrons.protocols.api_support import instrument as instrument_support
 from opentrons.protocols.api_support.types import APIVersion
@@ -960,8 +961,13 @@ def test_order_of_module_load():
     import opentrons.protocol_api as protocol_api
 
     mods = {
-        "tempdeck": [("111", "temperatureModuleV1"), ("333", "temperatureModuleV2")],
-        "thermocycler": [("222", "thermocyclerModuleV2")],
+        "tempdeck": [
+            SimulatingModule(serial_number="111", model="temperatureModuleV1"),
+            SimulatingModule(serial_number="333", model="temperatureModuleV2"),
+        ],
+        "thermocycler": [
+            SimulatingModule(serial_number="222", model="thermocyclerModuleV2")
+        ],
     }
     thread_manager = hardware_control.ThreadManager(
         hardware_control.API.build_hardware_simulator, attached_modules=mods

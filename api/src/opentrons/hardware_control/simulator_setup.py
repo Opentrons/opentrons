@@ -11,6 +11,7 @@ from opentrons.config.types import RobotConfig, OT3Config
 from opentrons.types import Mount
 from opentrons.hardware_control import API, HardwareControlAPI, ThreadManager
 from opentrons.hardware_control.types import OT3Mount, HardwareFeatureFlags
+from opentrons.hardware_control.modules import SimulatingModule
 
 
 # Name and kwargs for a module function
@@ -60,7 +61,10 @@ async def _simulator_for_setup(
         return await API.build_hardware_simulator(
             attached_instruments=setup.attached_instruments,
             attached_modules={
-                k: [(m.serial_number, m.model) for m in v]
+                k: [
+                    SimulatingModule(serial_number=m.serial_number, model=m.model)
+                    for m in v
+                ]
                 for k, v in setup.attached_modules.items()
             },
             config=setup.config,
@@ -74,7 +78,10 @@ async def _simulator_for_setup(
         return await OT3API.build_hardware_simulator(
             attached_instruments=setup.attached_instruments,
             attached_modules={
-                k: [(m.serial_number, m.model) for m in v]
+                k: [
+                    SimulatingModule(serial_number=m.serial_number, model=m.model)
+                    for m in v
+                ]
                 for k, v in setup.attached_modules.items()
             },
             config=setup.config,
@@ -115,7 +122,10 @@ def _thread_manager_for_setup(
             API.build_hardware_simulator,
             attached_instruments=setup.attached_instruments,
             attached_modules={
-                k: [(m.serial_number, m.model) for m in v]
+                k: [
+                    SimulatingModule(serial_number=m.serial_number, model=m.model)
+                    for m in v
+                ]
                 for k, v in setup.attached_modules.items()
             },
             config=setup.config,
@@ -129,7 +139,10 @@ def _thread_manager_for_setup(
             OT3API.build_hardware_simulator,
             attached_instruments=setup.attached_instruments,
             attached_modules={
-                k: [(m.serial_number, m.model) for m in v]
+                k: [
+                    SimulatingModule(serial_number=m.serial_number, model=m.model)
+                    for m in v
+                ]
                 for k, v in setup.attached_modules.items()
             },
             config=setup.config,
