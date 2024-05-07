@@ -262,7 +262,10 @@ export function CreateFileWizard(): JSX.Element | null {
         pipettes.flatMap(pipette => pipette.tiprackDefURI)
       )
       const FLEX_MIDDLE_SLOTS = ['C2', 'B2', 'A2']
-      const OT2_MIDDLE_SLOTS = ['2', '5', '8', '11']
+      const hasOt2TC = modules.find(
+        module => module.type === THERMOCYCLER_MODULE_TYPE
+      )
+      const OT2_MIDDLE_SLOTS = hasOt2TC ? ['2', '5'] : ['2', '5', '8', '11']
       newTiprackModels.forEach((tiprackDefURI, index) => {
         dispatch(
           labwareIngredActions.createContainer({

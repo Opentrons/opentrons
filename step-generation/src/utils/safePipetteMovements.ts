@@ -301,7 +301,7 @@ export const getIsSafePipetteMovement = (
   invariantContext: InvariantContext,
   pipetteId: string,
   labwareId: string,
-  tipRackId: string,
+  tipRackDefURI: string,
   wellLocationOffset: Point
 ): boolean => {
   const deckDefinition = getDeckDefFromRobotType(FLEX_ROBOT_TYPE)
@@ -317,15 +317,16 @@ export const getIsSafePipetteMovement = (
   if (labwareEntities[labwareId] == null) {
     return true
   }
+  const tiprackTipLength = Object.values(labwareEntities).find(
+    labwareEntity => labwareEntity.labwareDefURI === tipRackDefURI
+  )?.def.parameters.tipLength
 
   const stagingAreaSlots = Object.values(additionalEquipmentEntities)
     .filter(ae => ae.name === 'stagingArea')
     .map(stagingArea => stagingArea.location as string)
   const pipetteEntity = pipetteEntities[pipetteId]
   const pipetteHasTip = tipState.pipettes[pipetteId]
-  const tipLength = pipetteHasTip
-    ? labwareEntities[tipRackId].def.parameters.tipLength ?? 0
-    : 0
+  const tipLength = pipetteHasTip ? tiprackTipLength ?? 0 : 0
   const wellLocationPoint = getWellPosition(
     labwareEntities[labwareId],
     wellLocationOffset

@@ -23,7 +23,7 @@ describe('PrimaryButton', () => {
   it('renders primary button with text', () => {
     render(props)
     const button = screen.getByText('primary button')
-    expect(button).toHaveStyle(`background-color: ${COLORS.blue60}`)
+    expect(button).toHaveStyle(`background-color: ${COLORS.blue50}`)
     expect(button).toHaveStyle(
       `padding: ${SPACING.spacing8} ${SPACING.spacing16} ${SPACING.spacing8} ${SPACING.spacing16}`
     )
@@ -51,14 +51,14 @@ describe('PrimaryButton', () => {
     render(props)
     const button = screen.getByText('primary button')
     fireEvent.mouseOver(button)
-    expect(button).toHaveStyle(`background-color: ${COLORS.blue60}`)
+    expect(button).toHaveStyle(`background-color: ${COLORS.blue50}`)
   })
 
   it('renders primary button with text and different background color', () => {
     props.backgroundColor = COLORS.red50
     render(props)
     const button = screen.getByText('primary button')
-    expect(button).toHaveStyle(`background-color: ${COLORS.blue60}`)
+    expect(button).toHaveStyle(`background-color: ${COLORS.red50}`)
     expect(button).toHaveStyle(`color: ${COLORS.white}`)
   })
 })
