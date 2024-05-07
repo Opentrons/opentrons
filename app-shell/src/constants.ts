@@ -63,7 +63,6 @@ import type {
   RELOAD_UI_TYPE,
   SEND_LOG_TYPE,
   EDIT_PROTOCOL_TYPE,
-  SET_EDITING_PROTOCOL_SOURCE_TYPE,
 } from './types'
 
 // these constants are all copied over from the app
@@ -183,9 +182,6 @@ export const EDIT_PROTOCOL: EDIT_PROTOCOL_TYPE =
 
 export const VIEW_PROTOCOL_SOURCE_FOLDER: VIEW_PROTOCOL_SOURCE_FOLDER_TYPE =
   'protocolStorage:VIEW_PROTOCOL_SOURCE_FOLDER'
-
-export const SET_EDITING_PROTOCOL_SOURCE: SET_EDITING_PROTOCOL_SOURCE_TYPE =
-  'protocolStorage:SET_EDITING_PROTOCOL_SOURCE'
 
 export const PROTOCOL_ADDITION: PROTOCOL_ADDITION_TYPE = 'protocolAddition'
 

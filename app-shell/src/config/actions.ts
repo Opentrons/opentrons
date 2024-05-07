@@ -34,8 +34,7 @@ import type {
   StoredProtocolDir,
   UpdateProtocolListAction,
   UpdateProtocolListFailureAction,
-  ViewProtocolSourceFolder,
-  SetEditingProtocolSource,
+  ViewProtocolSourceFolderAction,
 } from '@opentrons/app/src/redux/protocol-storage'
 import {
   ADD_CUSTOM_LABWARE,
@@ -66,7 +65,6 @@ import {
   REMOVE_PROTOCOL,
   RESET_VALUE,
   SEND_LOG,
-  SET_EDITING_PROTOCOL_SOURCE,
   SYSTEM_INFO_INITIALIZED,
   UPDATE_PROTOCOL_LIST,
   UPDATE_PROTOCOL_LIST_FAILURE,
@@ -300,7 +298,7 @@ export const analyzeProtocolFailure = (
 
 export const viewProtocolSourceFolder = (
   protocolKey: string
-): ViewProtocolSourceFolder => ({
+): ViewProtocolSourceFolderAction => ({
   type: VIEW_PROTOCOL_SOURCE_FOLDER,
   payload: { protocolKey },
   meta: { shell: true },

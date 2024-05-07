@@ -175,7 +175,7 @@ export function viewProtocolSourceFolder(
   shell.openPath(srcDirPath)
 }
 
-export function editProtocol(
+export function getProtocolSourceFiles(
   protocolKey: string,
   protocolsDirPath: string
 ): Promise<string[]> {

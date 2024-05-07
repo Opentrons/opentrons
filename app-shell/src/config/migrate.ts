@@ -408,11 +408,6 @@ const toVersion22 = (prevConfig: ConfigV21): ConfigV22 => {
     },
   }
 }
-
-
-
-
-
 const MIGRATIONS: [
   (prevConfig: ConfigV0) => ConfigV1,
   (prevConfig: ConfigV1) => ConfigV2,

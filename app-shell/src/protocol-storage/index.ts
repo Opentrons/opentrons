@@ -12,7 +12,6 @@ import {
   POLL,
   PROTOCOL_ADDITION,
   REMOVE_PROTOCOL,
-  SET_EDITING_PROTOCOL_SOURCE,
   UI_INITIALIZED,
   VIEW_PROTOCOL_SOURCE_FOLDER,
 } from '../constants'
@@ -20,7 +19,6 @@ import {
   analyzeProtocol,
   analyzeProtocolFailure,
   analyzeProtocolSuccess,
-  setEditingProtocolSource,
   updateProtocolList,
   updateProtocolListFailure,
 } from '../config/actions'
@@ -219,7 +217,7 @@ export function registerProtocolStorage(dispatch: Dispatch): Dispatch {
       }
 
       case EDIT_PROTOCOL: {
-        FileSystem.editProtocol(
+        FileSystem.getProtocolSourceFiles(
           action.payload.protocolKey,
           FileSystem.PROTOCOLS_DIRECTORY_PATH
         ).then((srcFiles) => {
