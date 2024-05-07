@@ -31,6 +31,10 @@ export function sendDeserialized(
   } catch {} // Prevents shell erroring during app shutdown event.
 }
 
+export function sendDeserializedRefetch(topic: NotifyTopic): void {
+  sendDeserialized(topic, { refetch: true })
+}
+
 export function sendDeserializedGenericError(topic: NotifyTopic): void {
   sendDeserialized(topic, FAILURE_STATUSES.ECONNFAILED)
 }
