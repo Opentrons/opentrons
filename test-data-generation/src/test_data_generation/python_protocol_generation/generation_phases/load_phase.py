@@ -11,6 +11,12 @@ from test_data_generation.deck_configuration.datashapes import (
     RowName,
 )
 from test_data_generation.python_protocol_generation import ast_helpers as ast_h
+from test_data_generation.python_protocol_generation.util import PipetteConfiguration
+from test_data_generation.python_protocol_generation.util import (
+    ModuleNames,
+    ProtocolContextMethods,
+    PROTOCOL_CONTEXT_VAR_NAME,
+)
 
 
 def _staging_area(row: RowName) -> ast_h.AssignStatement:
@@ -24,16 +30,14 @@ def _staging_area(row: RowName) -> ast_h.AssignStatement:
     return ast_h.AssignStatement(
         var_name=f"well_plate_{row}4",
         value=ast_h.CallFunction(
-            call_on="protocol_context",
-            method_name="load_labware",
+            call_on=PROTOCOL_CONTEXT_VAR_NAME,
+            what_to_call=ProtocolContextMethods.LOAD_LABWARE,
             args=[labware_name, labware_location],
         ),
     )
 
 
-def _waste_chute(
-    has_staging_area: bool, has_cover: bool
-) -> typing.List[ast_h.AssignStatement]:
+def _waste_chute(has_staging_area: bool) -> typing.List[ast_h.AssignStatement]:
     """Create a waste chute.
 
     If has_staging_area is True, a staging area is created in row D.
@@ -42,14 +46,12 @@ def _waste_chute(
         ast_h.AssignStatement(
             var_name="waste_chute",
             value=ast_h.CallFunction(
-                call_on="protocol_context",
-                method_name="load_waste_chute",
+                call_on=PROTOCOL_CONTEXT_VAR_NAME,
+                what_to_call=ProtocolContextMethods.LOAD_WASTE_CHUTE,
                 args=[],
             ),
         )
     ]
-
-    # TODO: If has_cover, set USE_96_CHANNEL_PIPETTE to False
 
     if has_staging_area:
         entries.append(_staging_area("d"))
@@ -59,18 +61,9 @@ def _waste_chute(
 
 def _magnetic_block_on_staging_area(row: RowName) -> typing.List[ast_h.AssignStatement]:
     """Create a magnetic block on a staging area in a specified row."""
-    module_name = "magneticBlockV1"
-    module_location = f"{row.upper()}3"
-
+    slot = typing.cast(SlotName, f"{row}3")
     entries = [
-        ast_h.AssignStatement(
-            var_name=f"mag_block_{row}3",
-            value=ast_h.CallFunction(
-                call_on="protocol_context",
-                method_name="load_module",
-                args=[module_name, module_location],
-            ),
-        ),
+        _magnetic_block(slot),
         _staging_area(row),
     ]
     return entries
@@ -85,8 +78,8 @@ def _trash_bin(slot: SlotName) -> ast_h.AssignStatement:
     return ast_h.AssignStatement(
         var_name=f"trash_bin_{slot}",
         value=ast_h.CallFunction(
-            call_on="protocol_context",
-            method_name="load_trash_bin",
+            call_on=PROTOCOL_CONTEXT_VAR_NAME,
+            what_to_call=ProtocolContextMethods.LOAD_TRASH_BIN,
             args=[location],
         ),
     )
@@ -96,14 +89,12 @@ def _trash_bin(slot: SlotName) -> ast_h.AssignStatement:
 
 def _thermocycler_module() -> ast_h.AssignStatement:
     """Create a thermocycler module."""
-    module_name = "thermocyclerModuleV2"
-
     return ast_h.AssignStatement(
         var_name="thermocycler_module",
         value=ast_h.CallFunction(
-            call_on="protocol_context",
-            method_name="load_module",
-            args=[module_name],
+            call_on=PROTOCOL_CONTEXT_VAR_NAME,
+            what_to_call=ProtocolContextMethods.LOAD_MODULE,
+            args=[ModuleNames.THERMOCYCLER_MODULE.value],
         ),
     )
 
@@ -112,14 +103,13 @@ def _thermocycler_module() -> ast_h.AssignStatement:
 
 def _temperature_module(slot: SlotName) -> ast_h.AssignStatement:
     """Create a temperature module in a specified slot."""
-    module_name = "temperatureModuleV2"
     module_location = slot.upper()
     return ast_h.AssignStatement(
         var_name=f"temperature_module_{slot}",
         value=ast_h.CallFunction(
-            call_on="protocol_context",
-            method_name="load_module",
-            args=[module_name, module_location],
+            call_on=PROTOCOL_CONTEXT_VAR_NAME,
+            what_to_call=ProtocolContextMethods.LOAD_MODULE,
+            args=[ModuleNames.TEMPERATURE_MODULE.value, module_location],
         ),
     )
 
@@ -128,14 +118,13 @@ def _temperature_module(slot: SlotName) -> ast_h.AssignStatement:
 
 def _magnetic_block(slot_name: SlotName) -> ast_h.AssignStatement:
     """Create a magnetic block in a specified slot."""
-    module_name = "magneticBlockV1"
     module_location = slot_name.upper()
     return ast_h.AssignStatement(
         var_name=f"mag_block_{slot_name}",
         value=ast_h.CallFunction(
-            call_on="protocol_context",
-            method_name="load_module",
-            args=[module_name, module_location],
+            call_on=PROTOCOL_CONTEXT_VAR_NAME,
+            what_to_call=ProtocolContextMethods.LOAD_MODULE,
+            args=[ModuleNames.MAGNETIC_BLOCK_MODULE.value, module_location],
         ),
     )
     # Call module.labware to make sure it is included as part of the analysis
@@ -143,15 +132,14 @@ def _magnetic_block(slot_name: SlotName) -> ast_h.AssignStatement:
 
 def _heater_shaker_module(slot_name: SlotName) -> ast_h.AssignStatement:
     """Create a heater shaker module in a specified slot."""
-    module_name = "heaterShakerModuleV1"
     module_location = slot_name.upper()
 
     return ast_h.AssignStatement(
         var_name=f"heater_shaker_{slot_name}",
         value=ast_h.CallFunction(
-            call_on="protocol_context",
-            method_name="load_module",
-            args=[module_name, module_location],
+            call_on=PROTOCOL_CONTEXT_VAR_NAME,
+            what_to_call=ProtocolContextMethods.LOAD_MODULE,
+            args=[ModuleNames.HEATER_SHAKER_MODULE.value, module_location],
         ),
     )
     # Call module.labware to make sure it is included as part of the analysis
@@ -165,30 +153,24 @@ def _labware_slot(slot_name: SlotName) -> ast_h.AssignStatement:
     return ast_h.AssignStatement(
         var_name=f"well_plate_{slot_name}",
         value=ast_h.CallFunction(
-            call_on="protocol_context",
-            method_name="load_labware",
+            call_on=PROTOCOL_CONTEXT_VAR_NAME,
+            what_to_call=ProtocolContextMethods.LOAD_LABWARE,
             args=[labware_name, labware_location],
         ),
     )
     # well_plate_{slot}.is_tiprack
 
 
-def create_load_statement(
+def create_deck_slot_load_statement(
     slot: Slot,
 ) -> ast_h.AssignStatement | typing.List[ast_h.AssignStatement]:
     """Maps the contents of a slot to the correct assign statement."""
     match slot.contents:
-        case PSC.WASTE_CHUTE:
-            return _waste_chute(False, True)
+        case PSC.WASTE_CHUTE | PSC.WASTE_CHUTE_NO_COVER:
+            return _waste_chute(False)
 
-        case PSC.WASTE_CHUTE_NO_COVER:
-            return _waste_chute(False, False)
-
-        case PSC.STAGING_AREA_WITH_WASTE_CHUTE:
-            return _waste_chute(True, True)
-
-        case PSC.STAGING_AREA_WITH_WASTE_CHUTE_NO_COVER:
-            return _waste_chute(True, False)
+        case PSC.STAGING_AREA_WITH_WASTE_CHUTE | PSC.STAGING_AREA_WITH_WASTE_CHUTE_NO_COVER:
+            return _waste_chute(True)
 
         case PSC.STAGING_AREA_WITH_MAGNETIC_BLOCK:
             return _magnetic_block_on_staging_area(slot.row)
@@ -218,15 +200,46 @@ def create_load_statement(
             raise (ValueError(f"Unknown slot contents: {slot.contents}"))
 
 
-def create_load_statements(
+def create_deck_slot_load_statements(
     slots: typing.List[Slot],
 ) -> typing.List[ast_h.AssignStatement]:
     """Iterates over a list of slots and creates the corresponding load statements."""
     entries: typing.List[ast_h.AssignStatement] = []
     for slot in slots:
-        load_statement = create_load_statement(slot)
+        load_statement = create_deck_slot_load_statement(slot)
         if isinstance(load_statement, typing.List):
             entries.extend(load_statement)
         else:
             entries.append(load_statement)
+    return entries
+
+
+def create_pipette_load_statements(
+    pipette_config: PipetteConfiguration,
+) -> typing.List[ast_h.AssignStatement]:
+    """Create the load statements for a pipette configuration."""
+    entries: typing.List[ast_h.AssignStatement] = []
+    if pipette_config.left is not None:
+        entries.append(
+            ast_h.AssignStatement(
+                var_name="left_pipette",
+                value=ast_h.CallFunction(
+                    call_on=PROTOCOL_CONTEXT_VAR_NAME,
+                    what_to_call=ProtocolContextMethods.LOAD_INSTRUMENT,
+                    args=[pipette_config.left.value],
+                ),
+            )
+        )
+    if pipette_config.right is not None:
+        entries.append(
+            ast_h.AssignStatement(
+                var_name="right_pipette",
+                value=ast_h.CallFunction(
+                    call_on=PROTOCOL_CONTEXT_VAR_NAME,
+                    what_to_call=ProtocolContextMethods.LOAD_INSTRUMENT,
+                    args=[pipette_config.right.value],
+                ),
+            )
+        )
+
     return entries

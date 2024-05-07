@@ -6,6 +6,7 @@ Provide primitive data structures that can be used to generate AST nodes.
 import typing
 import ast
 from dataclasses import dataclass
+from test_data_generation.python_protocol_generation.util import ProtocolContextMethods
 
 
 class CanGenerateAST(typing.Protocol):
@@ -33,11 +34,41 @@ class ImportStatement:
 
 
 @dataclass
-class CallFunction:
+class BaseCall:
     """Class to represent a method or function call."""
 
     call_on: str
-    method_name: str
+    what_to_call: ProtocolContextMethods | str
+
+    def _evaluate_what_to_call(self) -> str:
+        """Evaluate the value of what_to_call."""
+        if isinstance(self.what_to_call, ProtocolContextMethods):
+            return self.what_to_call.value
+        else:
+            return self.what_to_call
+
+    def generate_ast(self) -> ast.Call:
+        """Generate an AST node for the call."""
+        what_to_call = (
+            self.what_to_call.value
+            if isinstance(self.what_to_call, ProtocolContextMethods)
+            else self.what_to_call
+        )
+        return ast.Call(
+            func=ast.Attribute(
+                value=ast.Name(id=self.call_on, ctx=ast.Load()),
+                attr=what_to_call,
+                ctx=ast.Load(),
+            ),
+            args=[ast.Constant(str_arg) for str_arg in self.args],
+            keywords=[],
+        )
+
+
+@dataclass
+class CallFunction(BaseCall):
+    """Class to represent a method or function call."""
+
     args: typing.List[str]
 
     def generate_ast(self) -> ast.Call:
@@ -45,11 +76,26 @@ class CallFunction:
         return ast.Call(
             func=ast.Attribute(
                 value=ast.Name(id=self.call_on, ctx=ast.Load()),
-                attr=self.method_name,
+                attr=self._evaluate_what_to_call(),
                 ctx=ast.Load(),
             ),
             args=[ast.Constant(str_arg) for str_arg in self.args],
             keywords=[],
+        )
+
+
+@dataclass
+class CallAttribute(BaseCall):
+    """Class to represent a method or function call."""
+
+    def generate_ast(self) -> ast.Call:
+        """Generate an AST node for the call."""
+        return ast.Expr(
+            value=ast.Attribute(
+                value=ast.Name(id=self.call_on, ctx=ast.Load()),
+                attr=self._evaluate_what_to_call(),
+                ctx=ast.Load(),
+            )
         )
 
 

@@ -2,6 +2,9 @@
 import ast
 import typing
 from test_data_generation.python_protocol_generation import ast_helpers as ast_h
+from test_data_generation.python_protocol_generation.util import (
+    PROTOCOL_CONTEXT_VAR_NAME,
+)
 
 
 def create_requirements_dict(
@@ -30,5 +33,5 @@ def create_protocol_context_run_function() -> ast_h.FunctionDefinition:
     """Create a function definition for the run function of a protocol."""
     return ast_h.FunctionDefinition(
         name="run",
-        args=["protocol_context"],
+        args=[PROTOCOL_CONTEXT_VAR_NAME],
     )
