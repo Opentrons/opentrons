@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from typing import Dict
+from typing import Dict, List
 from opentrons.drivers.types import AbsorbanceReaderLidStatus
 
 
@@ -24,11 +24,11 @@ class AbstractAbsorbanceReaderDriver(ABC):
         ...
 
     @abstractmethod
-    async def get_available_wavelengths(self) -> Dict[int, bool]:
+    async def get_available_wavelengths(self) -> List[int]:
         ...
 
     @abstractmethod
-    async def get_single_measurement(self, wavelength: int) -> float:
+    async def get_single_measurement(self, wavelength: int) -> List[float]:
         ...
     
     @abstractmethod
