@@ -8,7 +8,6 @@ from .abstract import AbstractAbsorbanceReaderDriver
 
 
 class SimulatingDriver(AbstractAbsorbanceReaderDriver):
-
     def __init__(self, serial_number: Optional[str] = None) -> None:
         self._serial_number = serial_number
 
@@ -45,13 +44,13 @@ class SimulatingDriver(AbstractAbsorbanceReaderDriver):
         return [450, 570, 600, 650]
 
     @ensure_yield
-    async def get_single_measurement(self, wavelength: int) -> None:
-        pass
-    
+    async def get_single_measurement(self, wavelength: int) -> List[float]:
+        return [0.0]
+
     @ensure_yield
     async def set_sample_wavelength(self, wavelength: int) -> None:
         pass
-    
+
     @ensure_yield
     async def get_status(self) -> None:
         pass

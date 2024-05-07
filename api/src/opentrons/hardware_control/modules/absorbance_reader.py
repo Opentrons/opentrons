@@ -1,28 +1,40 @@
-
 import asyncio
 import logging
-from typing import Optional, Mapping, List
+from typing import Optional, Mapping, List, Dict, Any, Tuple
 
 from opentrons.drivers.rpi_drivers.types import USBPort
-from opentrons.drivers.absorbance_reader import AbstractAbsorbanceReaderDriver, AbsorbanceReaderDriver, SimulatingDriver
+from opentrons.drivers.absorbance_reader import (
+    AbstractAbsorbanceReaderDriver,
+    AbsorbanceReaderDriver,
+    SimulatingDriver,
+)
 from opentrons.hardware_control.execution_manager import ExecutionManager
 from opentrons.hardware_control.modules import mod_abc
-from opentrons.hardware_control.poller import Reader, Poller
-from opentrons.hardware_control.modules.types import AbsorbanceReaderStatus, LiveData
+from opentrons.hardware_control.modules.types import (
+    ModuleType,
+    AbsorbanceReaderStatus,
+    LiveData,
+    UploadFunction,
+)
 
+
+async def upload_func_placeholder(
+    dfu_serial: str, firmware_file_path: str, kwargs: Dict[str, Any]
+) -> Tuple[bool, str]:
+    return False, "Not implemented"
 
 
 class AbsorbanceReader(mod_abc.AbstractModule):
     """Hardware control interface for an attached Absorbance Reader module."""
 
-    MODULE_TYPE = mod_abc.ModuleType.ABSORBANCE_READER
+    MODULE_TYPE = ModuleType.ABSORBANCE_READER
 
     @classmethod
     async def build(
         cls,
         port: str,
         usb_port: USBPort,
-        execution_manager: mod_abc.ExecutionManager,
+        execution_manager: ExecutionManager,
         hw_control_loop: asyncio.AbstractEventLoop,
         poll_interval_seconds: Optional[float] = None,
         simulating: bool = False,
@@ -33,10 +45,10 @@ class AbsorbanceReader(mod_abc.AbstractModule):
         driver: AbstractAbsorbanceReaderDriver
         if not simulating:
             driver = await AbsorbanceReaderDriver.create(
-                port,
-                usb_port,
-                hw_control_loop
+                port, usb_port, hw_control_loop
             )
+        else:
+            driver = SimulatingDriver(serial_number=sim_serial_number)
         module = cls(
             port=port,
             usb_port=usb_port,
@@ -48,13 +60,13 @@ class AbsorbanceReader(mod_abc.AbstractModule):
         return module
 
     def __init__(
-            self,
-            port: str,
-            usb_port: USBPort,
-            driver: AbstractAbsorbanceReaderDriver,
-            device_info: Mapping[str, str],
-            execution_manager: ExecutionManager,
-            hw_control_loop: asyncio.AbstractEventLoop
+        self,
+        port: str,
+        usb_port: USBPort,
+        driver: AbstractAbsorbanceReaderDriver,
+        device_info: Mapping[str, str],
+        execution_manager: ExecutionManager,
+        hw_control_loop: asyncio.AbstractEventLoop,
     ) -> None:
         super().__init__(port, usb_port, execution_manager, hw_control_loop)
         self._driver = driver
@@ -84,7 +96,7 @@ class AbsorbanceReader(mod_abc.AbstractModule):
             "status": "idle",
             "data": {
                 "sampleWavelength": 400,
-            }
+            },
         }
 
     @property
@@ -101,13 +113,12 @@ class AbsorbanceReader(mod_abc.AbstractModule):
     def usb_port(self) -> USBPort:
         """The physical port where the module is connected."""
         return self._usb_port
-    
+
     async def wait_for_is_running(self) -> None:
         if not self.is_simulated:
             await self._execution_manager.wait_for_is_running()
 
-
-    async def prep_for_update(self) -> None:
+    async def prep_for_update(self) -> str:
         """Prepare for an update.
 
         By the time this coroutine completes, the hardware should be ready
@@ -117,7 +128,7 @@ class AbsorbanceReader(mod_abc.AbstractModule):
 
         :returns str: The port we're running on.
         """
-        pass
+        return ""
 
     def model(self) -> str:
         """A name for this specific module, matching module defs"""
@@ -132,6 +143,10 @@ class AbsorbanceReader(mod_abc.AbstractModule):
         """The prefix used for looking up firmware"""
         # TODO: (AA) This is a placeholder
         return ""
+
+    def bootloader(self) -> UploadFunction:
+        """Bootloader mode"""
+        return upload_func_placeholder
 
     async def cleanup(self) -> None:
         """Clean up the module instance.

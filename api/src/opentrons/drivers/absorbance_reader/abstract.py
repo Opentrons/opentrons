@@ -30,11 +30,11 @@ class AbstractAbsorbanceReaderDriver(ABC):
     @abstractmethod
     async def get_single_measurement(self, wavelength: int) -> List[float]:
         ...
-    
+
     @abstractmethod
     async def set_sample_wavelength(self, wavelength: int) -> None:
         ...
-    
+
     @abstractmethod
     async def get_status(self) -> None:
         ...

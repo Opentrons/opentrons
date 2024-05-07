@@ -6,6 +6,7 @@ from glob import glob
 from typing import Any, AsyncGenerator, Dict, Tuple, Union
 from .types import UpdateError
 from .mod_abc import AbstractModule
+from .absorbance_reader import AbsorbanceReader
 from opentrons.hardware_control.threaded_async_lock import ThreadedAsyncLock
 from contextlib import asynccontextmanager
 

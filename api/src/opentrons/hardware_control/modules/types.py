@@ -52,7 +52,7 @@ class ModuleType(str, Enum):
     MAGNETIC: MagneticModuleType = "magneticModuleType"
     HEATER_SHAKER: HeaterShakerModuleType = "heaterShakerModuleType"
     MAGNETIC_BLOCK: MagneticBlockType = "magneticBlockType"
-    ABSORBANCE_READER:  AbsorbanceReaderType = "absorbanceReaderType"
+    ABSORBANCE_READER: AbsorbanceReaderType = "absorbanceReaderType"
 
     @classmethod
     def from_model(cls, model: ModuleModel) -> ModuleType:

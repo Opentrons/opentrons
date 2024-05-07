@@ -54,14 +54,17 @@ from ..commands import (
     heater_shaker,
     temperature_module,
     thermocycler,
+    absorbance_reader,
 )
 from ..actions import Action, SucceedCommandAction, AddModuleAction
 from .abstract_store import HasState, HandlesActions
 from .module_substates import (
+    AbsorbanceReaderSubState,
     MagneticModuleSubState,
     HeaterShakerModuleSubState,
     TemperatureModuleSubState,
     ThermocyclerModuleSubState,
+    AbsorbanceReaderId,
     MagneticModuleId,
     HeaterShakerModuleId,
     TemperatureModuleId,
@@ -321,6 +324,18 @@ class ModuleStore(HasState[ModuleState], HandlesActions):
             self._state.substate_by_module_id[module_id] = MagneticBlockSubState(
                 module_id=MagneticBlockId(module_id)
             )
+        elif ModuleModel.is_absorbance_reader_model(actual_model):
+            self._state.substate_by_module_id[module_id] = AbsorbanceReaderSubState(
+                module_id=AbsorbanceReaderId(module_id),
+                # TODO: fix live data
+                initialized=live_data is not None,
+                is_lid_open=live_data is not None,
+                is_loaded=live_data is not None,
+                is_measuring=live_data is not None,
+                temperature=live_data["temperature"] if live_data else None,  # type: ignore[arg-type]
+                sample_wavelength=live_data["wavelength"] if live_data else None,  # type: ignore[arg-type]
+                supported_wavelengths=live_data["supportedWavelengths"] if live_data else None,  # type: ignore[arg-type]
+            )
 
     def _update_additional_slots_occupied_by_thermocycler(
         self,
@@ -418,6 +433,29 @@ class ModuleStore(HasState[ModuleState], HandlesActions):
                 labware_latch_status=HeaterShakerLatchStatus.CLOSED,
                 is_plate_shaking=prev_state.is_plate_shaking,
                 plate_target_temperature=prev_state.plate_target_temperature,
+            )
+
+    def _handle_absorbance_reader_commands(
+        self, command: absorbance_reader.AbsorbanceMeasure
+    ) -> None:
+        module_id = command.params.moduleId
+        abs_state = self._state.substate_by_module_id[module_id]
+        assert isinstance(
+            abs_state, AbsorbanceReaderSubState
+        ), f"{module_id} is not a absorbance reader."
+
+        prev_state: AbsorbanceReaderSubState = abs_state
+
+        if isinstance(command.result, absorbance_reader.AbsorbanceMeasureResult):
+            self._state.substate_by_module_id[module_id] = AbsorbanceReaderSubState(
+                module_id=AbsorbanceReaderId(module_id),
+                initialized=prev_state.initialized,
+                is_lid_open=prev_state.is_lid_open,
+                is_loaded=prev_state.is_loaded,
+                is_measuring=False,
+                temperature=prev_state.temperature,
+                sample_wavelength=None,
+                supported_wavelengths=[],
             )
 
     def _handle_temperature_module_commands(
@@ -642,6 +680,22 @@ class ModuleView(HasState[ModuleState]):
             module_id=module_id,
             expected_type=ThermocyclerModuleSubState,
             expected_name="Thermocycler Module",
+        )
+
+    def get_absorbance_reader_substate(
+        self, module_id: str
+    ) -> AbsorbanceReaderSubState:
+        """Return a `AbsorbanceReaderSubState` for the given Absorbance Reader.
+
+        Raises:
+            ModuleNotLoadedError: If module_id has not been loaded.
+            WrongModuleTypeError: If module_id has been loaded,
+                but it's not a Absorbance Reader.
+        """
+        return self._get_module_substate(
+            module_id=module_id,
+            expected_type=AbsorbanceReaderSubState,
+            expected_name="Absorbance Reader",
         )
 
     def get_location(self, module_id: str) -> DeckSlotLocation:

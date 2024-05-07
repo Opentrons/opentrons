@@ -99,5 +99,5 @@ class USBBus(USBDriverInterface):
                     vp.usb_port = p
                     sorted_virtual_ports.append(vp)
                     break
-                        
+
         return sorted_virtual_ports or virtual_ports

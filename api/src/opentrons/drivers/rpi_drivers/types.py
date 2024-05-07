@@ -43,10 +43,11 @@ USB_PORT_INFO = re.compile(
         (tty/tty(\w{4})/dev | [\w:\.]+?/hidraw/hidraw\d/dev)
     )
     """,
-    re.VERBOSE
+    re.VERBOSE,
 )
 
 HUB_PATTERN = re.compile(r"(\d-[\d.]+\d?)[\/:]")
+
 
 @dataclass(frozen=True)
 class USBPort:
@@ -58,7 +59,9 @@ class USBPort:
     device_path: str = ""
 
     @classmethod
-    def build(cls, full_path: str, board_revision: BoardRevision) -> Optional["USBPort"]:
+    def build(
+        cls, full_path: str, board_revision: BoardRevision
+    ) -> Optional["USBPort"]:
         """
         Build a USBPort dataclass.
 
@@ -127,9 +130,9 @@ class USBPort:
             port_nodes = [node for node in port_nodes if "." in node]
             if len(port_nodes) > 2:
                 port_info = port_nodes[2].split(".")
-                hub: Optional[int] = int(port_info[1])
+                hub = int(port_info[1])
                 port = int(port_info[2])
-                hub_port: Optional[int] = int(port_info[3])
+                hub_port = int(port_info[3])
                 name = port_nodes[2]
             elif len(port_nodes) > 1:
                 if board_revision == BoardRevision.OG:
@@ -201,7 +204,6 @@ class USBPort:
             if match not in match_set:
                 match_set.append(match)
         return match_set
-
 
     @staticmethod
     def map_to_revision(

@@ -18,7 +18,7 @@ TemperatureModuleType = Literal["temperatureModuleType"]
 ThermocyclerModuleType = Literal["thermocyclerModuleType"]
 HeaterShakerModuleType = Literal["heaterShakerModuleType"]
 MagneticBlockType = Literal["magneticBlockType"]
-AbsorbanceReaderType = Literal["AbsorbanceReaderType"]
+AbsorbanceReaderType = Literal["absorbanceReaderType"]
 
 ModuleType = Union[
     MagneticModuleType,

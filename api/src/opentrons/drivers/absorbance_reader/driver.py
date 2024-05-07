@@ -19,10 +19,9 @@ class AbsorbanceReaderDriver(AbstractAbsorbanceReaderDriver):
         loop: Optional[asyncio.AbstractEventLoop],
     ) -> AbsorbanceReaderDriver:
         """Create an absorbance reader driver."""
-        connection = await AsyncByonoy.create(
-            port=port, usb_port=usb_port, loop=loop)
+        connection = await AsyncByonoy.create(port=port, usb_port=usb_port, loop=loop)
         return cls(connection=connection)
-    
+
     def __init__(self, connection: AsyncByonoy) -> None:
         self._connection = connection
 
@@ -51,9 +50,9 @@ class AbsorbanceReaderDriver(AbstractAbsorbanceReaderDriver):
 
     async def get_single_measurement(self, wavelength: int) -> List[float]:
         return await self._connection.get_single_measurement(wavelength)
-    
+
     async def set_sample_wavelength(self, wavelength: int) -> None:
         await self._connection.initialize(wavelength)
-    
+
     async def get_status(self) -> None:
         pass

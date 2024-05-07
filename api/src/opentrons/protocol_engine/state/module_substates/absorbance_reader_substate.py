@@ -1,12 +1,7 @@
 """Heater-Shaker Module sub-state."""
 from dataclasses import dataclass
-from typing import NewType, List
+from typing import List, NewType, Optional
 
-from opentrons.protocol_engine.types import (
-    TemperatureRange,
-    SpeedRange,
-    HeaterShakerLatchStatus,
-)
 
 AbsorbanceReaderId = NewType("AbsorbanceReaderId", str)
 
@@ -16,7 +11,10 @@ class AbsorbanceReaderSubState:
     """Absorbance-Plate-Reader-specific state."""
 
     module_id: AbsorbanceReaderId
+    initialized: bool
     is_lid_open: bool
     is_loaded: bool
-    sample_wavelength: int
-    supported_wavelengths: List[int]
+    is_measuring: bool
+    temperature: float
+    sample_wavelength: Optional[int]
+    supported_wavelengths: Optional[List[int]]
