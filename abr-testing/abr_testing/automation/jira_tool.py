@@ -84,7 +84,6 @@ class JiraTicket:
                 # Include other required fields as needed
             }
         }
-        print(data)
         try:
             response = requests.post(
                 f"{self.url}/rest/api/3/issue",
