@@ -102,7 +102,7 @@ export function DropdownMenu(props: DropdownMenuProps): JSX.Element {
       window.removeEventListener('resize', handlePositionCalculation)
       window.removeEventListener('scroll', handlePositionCalculation)
     }
-  }, [filterOptions.length])
+  }, [filterOptions.length, window.innerHeight])
 
   const toggleSetShowDropdownMenu = (): void => {
     setShowDropdownMenu(!showDropdownMenu)
