@@ -67,6 +67,18 @@ export function quickTransferReducer(
       }
     }
     case 'SET_DEST_WELLS': {
+      let transferType = 'transfer'
+      if (
+        state.sourceWells != null &&
+        state.sourceWells.length > action.wells.length
+      ) {
+        transferType = 'distribue'
+      } else if (
+        state.sourceWells != null &&
+        state.sourceWells.length < action.wells.length
+      ) {
+        transferType = 'consolidate'
+      }
       return {
         pipette: state.pipette,
         mount: state.mount,
@@ -75,6 +87,7 @@ export function quickTransferReducer(
         sourceWells: state.sourceWells,
         destination: state.destination,
         destinationWells: action.wells,
+        transferType: transferType,
       }
     }
     case 'SET_VOLUME': {
@@ -86,6 +99,7 @@ export function quickTransferReducer(
         sourceWells: state.sourceWells,
         destination: state.destination,
         destinationWells: state.destinationWells,
+        transferType: state.transferType,
         volume: action.volume,
       }
     }

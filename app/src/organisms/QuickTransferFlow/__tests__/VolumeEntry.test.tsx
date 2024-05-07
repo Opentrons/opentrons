@@ -38,6 +38,7 @@ describe('VolumeEntry', () => {
         } as any,
         sourceWells: ['A1'],
         destinationWells: ['A1'],
+        transferType: 'transfer',
       },
       dispatch: vi.fn(),
     }
@@ -79,6 +80,7 @@ describe('VolumeEntry', () => {
       state: {
         sourceWells: ['A1'],
         destinationWells: ['A1', 'A2'],
+        transferType: 'distribute',
       },
     })
     render(props)
@@ -101,6 +103,7 @@ describe('VolumeEntry', () => {
       state: {
         sourceWells: ['A1', 'A2'],
         destinationWells: ['A1'],
+        transferType: 'consolidate',
       },
     })
     render(props)
@@ -123,6 +126,7 @@ describe('VolumeEntry', () => {
       state: {
         sourceWells: ['A1', 'A2'],
         destinationWells: ['A1'],
+        transferType: 'consolidate',
         volume: 20,
       },
     })
@@ -139,6 +143,7 @@ describe('VolumeEntry', () => {
       state: {
         sourceWells: ['A1', 'A2'],
         destinationWells: ['A1'],
+        transferType: 'consolidate',
         volume: 90,
       },
     })

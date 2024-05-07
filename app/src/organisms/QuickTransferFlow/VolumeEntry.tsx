@@ -36,21 +36,13 @@ export function VolumeEntry(props: VolumeEntryProps): JSX.Element {
   )
   const volumeRange = getVolumeLimits(state)
   let headerCopy = t('set_transfer_volume')
-  let textEntryCopy = t('volume_per_well')
-  if (
-    state.sourceWells != null &&
-    state.destinationWells != null &&
-    state.sourceWells.length > state.destinationWells?.length
-  ) {
+  let textEntryCopy = t('volume_per_well_µL')
+  if (state.transferType === 'consolidate') {
     headerCopy = t('set_aspirate_volume')
-    textEntryCopy = t('aspirate_volume')
-  } else if (
-    state.sourceWells != null &&
-    state.destinationWells != null &&
-    state.sourceWells.length < state.destinationWells.length
-  ) {
+    textEntryCopy = t('aspirate_volume_µL')
+  } else if (state.transferType === 'distribute') {
     headerCopy = t('set_dispense_volume')
-    textEntryCopy = t('dispense_volume')
+    textEntryCopy = t('dispense_volume_µL')
   }
 
   const volumeAsNumber = Number(volume)

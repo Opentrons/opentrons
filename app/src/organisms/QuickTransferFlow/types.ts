@@ -10,6 +10,7 @@ export interface QuickTransferSetupState {
   sourceWells?: string[]
   destination?: LabwareDefinition2 | 'source'
   destinationWells?: string[]
+  transferType?: string
   volume?: number
 }
 
