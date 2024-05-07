@@ -90,6 +90,8 @@ def load_serial_lookup_table() -> Dict[str, str]:
     for channel_dir in os.listdir(config_path):
         for model_dir in os.listdir(config_path / channel_dir):
             for version_file in os.listdir(config_path / channel_dir / model_dir):
+                if "default" in version_file:
+                    continue
                 version_list = version_file.split(".json")[0].split("_")
                 built_model = f"{model_dir}_{_channel_model_str[channel_dir]}_v{version_list[0]}.{version_list[1]}"
 
