@@ -33,19 +33,29 @@
     margin-left: 1.25rem;
     margin-bottom: 0.25rem;
 <<<<<<< HEAD
-    font-size: var(--fs-body-2);
-    color: var(--c-font-dark); /* from legacy --font-body-2-dark */
-=======
->>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
-  }
-
-  & li {
-    margin: 0.25rem 0;
 <<<<<<< HEAD
     font-size: var(--fs-body-2);
     color: var(--c-font-dark); /* from legacy --font-body-2-dark */
 =======
 >>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
+=======
+    font-size: var(--fs-body-2);
+    color: var(--c-font-dark); /* from legacy --font-body-2-dark */
+>>>>>>> 3e3f52ebc4 (chore: Merge chore_release-7.3.0 into edge (#15117))
+  }
+
+  & li {
+    margin: 0.25rem 0;
+<<<<<<< HEAD
+<<<<<<< HEAD
+    font-size: var(--fs-body-2);
+    color: var(--c-font-dark); /* from legacy --font-body-2-dark */
+=======
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
+=======
+    font-size: var(--fs-body-2);
+    color: var(--c-font-dark); /* from legacy --font-body-2-dark */
+>>>>>>> 3e3f52ebc4 (chore: Merge chore_release-7.3.0 into edge (#15117))
   }
 
   & code {

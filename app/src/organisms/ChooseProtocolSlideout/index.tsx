@@ -66,8 +66,11 @@ export const CARD_OUTLINE_BORDER_STYLE = css`
 
 const TOOLTIP_DELAY_MS = 2000
 
+<<<<<<< HEAD
 =======
 >>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
+=======
+>>>>>>> 3e3f52ebc4 (chore: Merge chore_release-7.3.0 into edge (#15117))
 const _getFileBaseName = (filePath: string): string => {
   return filePath.split('/').reverse()[0]
 }
@@ -84,6 +87,9 @@ export function ChooseProtocolSlideoutComponent(
   const history = useHistory()
   const logger = useLogger(new URL('', import.meta.url).pathname)
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 3e3f52ebc4 (chore: Merge chore_release-7.3.0 into edge (#15117))
   const [targetProps, tooltipProps] = useTooltip()
   const [
     showRestoreValuesTooltip,

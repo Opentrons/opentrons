@@ -15,8 +15,8 @@ class ChangeNotifier:
 
     async def wait(self) -> None:
         """Wait until the next state change notification."""
-        self._event.clear()
         await self._event.wait()
+        self._event.clear()
 
 
 class ChangeNotifier_ts(ChangeNotifier):

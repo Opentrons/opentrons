@@ -78,6 +78,9 @@ describe('ProtocolCard', () => {
 >>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
       data: { result: 'ok' } as any,
     } as UseQueryResult<CompletedProtocolAnalysis>)
+    vi.mocked(useMostRecentSuccessfulAnalysisAsDocumentQuery).mockReturnValue({
+      data: { result: 'ok' } as any,
+    } as UseQueryResult<CompletedProtocolAnalysis>)
   })
   it('should redirect to protocol details after short click', () => {
     render()
@@ -155,6 +158,9 @@ describe('ProtocolCard', () => {
     vi.mocked(useMostRecentSuccessfulAnalysisAsDocumentQuery).mockReturnValue({
 =======
 >>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
+      data: null as any,
+    } as UseQueryResult<CompletedProtocolAnalysis>)
+    vi.mocked(useMostRecentSuccessfulAnalysisAsDocumentQuery).mockReturnValue({
       data: null as any,
     } as UseQueryResult<CompletedProtocolAnalysis>)
     render()

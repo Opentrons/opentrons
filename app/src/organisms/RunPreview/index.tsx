@@ -81,9 +81,16 @@ export const RunPreviewComponent = (
     setIsCurrentCommandVisible,
   ] = React.useState<boolean>(true)
   if (robotSideAnalysis == null) return null
+<<<<<<< HEAD
   const commands = isRunTerminal
     ? commandsFromQuery
     : robotSideAnalysis.commands
+=======
+  const commands =
+    (isRunTerminal
+      ? nullCheckedCommandsFromQuery
+      : robotSideAnalysis.commands) ?? []
+>>>>>>> 3e3f52ebc4 (chore: Merge chore_release-7.3.0 into edge (#15117))
   // pass relevant data from run rather than analysis so that CommandText utilities can properly hash the entities' IDs
   // TODO (nd:05/02/2024, AUTH-380): update name and types for CommandText (and children/utilities) use of analysis.
   // We should ideally pass only subset of analysis/run data required by these children and utilities
@@ -94,6 +101,7 @@ export const RunPreviewComponent = (
           labware: runRecord.data.labware ?? [],
           modules: runRecord.data.modules ?? [],
           pipettes: runRecord.data.pipettes ?? [],
+<<<<<<< HEAD
           liquids: runRecord.data.liquids ?? [],
           commands: commands ?? [],
         }
@@ -102,6 +110,14 @@ export const RunPreviewComponent = (
     commands != null
       ? commands.findIndex(c => c.key === currentRunCommandKey)
       : 0
+=======
+          commands: commands,
+        }
+      : robotSideAnalysis
+  const currentRunCommandIndex = commands.findIndex(
+    c => c.key === currentRunCommandKey
+  )
+>>>>>>> 3e3f52ebc4 (chore: Merge chore_release-7.3.0 into edge (#15117))
 
   if (isRunCommandDataLoading || commands == null) {
     return (
@@ -166,6 +182,7 @@ export const RunPreviewComponent = (
                 alignItems={ALIGN_CENTER}
                 gridGap={SPACING.spacing8}
               >
+<<<<<<< HEAD
                 <StyledText
                   minWidth={SPACING.spacing16}
                   fontSize={TYPOGRAPHY.fontSizeCaption}
@@ -196,6 +213,16 @@ export const RunPreviewComponent = (
                       color={COLORS.black90}
                     />
                   </Flex>
+=======
+                <Flex alignItems={ALIGN_CENTER} gridGap={SPACING.spacing8}>
+                  <CommandIcon command={command} color={iconColor} />
+                  <CommandText
+                    command={command}
+                    robotSideAnalysis={protocolDataFromAnalysisOrRun}
+                    robotType={robotType}
+                    color={COLORS.black90}
+                  />
+>>>>>>> 3e3f52ebc4 (chore: Merge chore_release-7.3.0 into edge (#15117))
                 </Flex>
               </Flex>
             )

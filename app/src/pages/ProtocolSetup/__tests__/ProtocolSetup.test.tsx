@@ -272,11 +272,17 @@ describe('ProtocolSetup', () => {
         },
       } as any)
 <<<<<<< HEAD
+<<<<<<< HEAD
     when(vi.mocked(useProtocolAnalysisErrors))
       .calledWith(RUN_ID)
       .thenReturn({ analysisErrors: null })
 =======
 >>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
+=======
+    when(vi.mocked(useProtocolAnalysisErrors))
+      .calledWith(RUN_ID)
+      .thenReturn({ analysisErrors: null })
+>>>>>>> 3e3f52ebc4 (chore: Merge chore_release-7.3.0 into edge (#15117))
     when(vi.mocked(useProtocolQuery))
       .calledWith(PROTOCOL_ID, { staleTime: Infinity })
       .thenReturn({

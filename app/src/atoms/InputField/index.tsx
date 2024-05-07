@@ -110,6 +110,37 @@ export const InputField = React.forwardRef<HTMLInputElement, InputFieldProps>(
       border-radius: ${BORDERS.borderRadius4};
       padding: ${SPACING.spacing8};
       border: 1px ${BORDERS.styleSolid}
+<<<<<<< HEAD
+=======
+        ${hasError ? COLORS.red50 : COLORS.grey60};
+    }
+
+    &:focus-visible {
+      border: 1px ${BORDERS.styleSolid} ${COLORS.grey55};
+      outline: 2px ${BORDERS.styleSolid} ${COLORS.blue50};
+      outline-offset: 2px;
+    }
+
+    &:focus-within {
+      border: 1px ${BORDERS.styleSolid}
+        ${hasError ? COLORS.red50 : COLORS.blue50};
+    }
+
+    &:disabled {
+      border: 1px ${BORDERS.styleSolid} ${COLORS.grey30};
+    }
+    input[type='number']::-webkit-inner-spin-button,
+    input[type='number']::-webkit-outer-spin-button {
+      -webkit-appearance: none;
+      margin: 0;
+    }
+
+    @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
+      height: ${size === 'small' ? '4.25rem' : '5rem'};
+      font-size: ${TYPOGRAPHY.fontSize28};
+      padding: ${SPACING.spacing16} ${SPACING.spacing24};
+      border: 2px ${BORDERS.styleSolid}
+>>>>>>> 3e3f52ebc4 (chore: Merge chore_release-7.3.0 into edge (#15117))
         ${hasError ? COLORS.red50 : COLORS.grey50};
       font-size: ${TYPOGRAPHY.fontSizeP};
       width: 100%;
@@ -271,6 +302,7 @@ export const InputField = React.forwardRef<HTMLInputElement, InputFieldProps>(
               ) : null}
             </Flex>
           ) : null}
+<<<<<<< HEAD
           <Flex width="100%" flexDirection={DIRECTION_COLUMN} css={OUTER_CSS}>
             <Flex
               tabIndex={tabIndex}
@@ -315,6 +347,59 @@ export const InputField = React.forwardRef<HTMLInputElement, InputFieldProps>(
     )
   }
 )
+=======
+        </Flex>
+      ) : null}
+      <Flex width="100%" flexDirection={DIRECTION_COLUMN} css={OUTER_CSS}>
+        <Flex
+          tabIndex={tabIndex}
+          css={INPUT_FIELD}
+          alignItems={ALIGN_CENTER}
+          onClick={() => {
+            if (props.id != null) {
+              document.getElementById(props.id)?.focus()
+            }
+          }}
+        >
+          <StyledInput
+            {...inputProps}
+            data-testid={props.id}
+            value={value}
+            placeholder={placeHolder}
+            onWheel={event => event.currentTarget.blur()} // prevent value change with scrolling
+          />
+          {props.units != null ? (
+            <Flex css={UNITS_STYLE}>{props.units}</Flex>
+          ) : null}
+        </Flex>
+      </Flex>
+      {props.caption != null ? (
+        <StyledText
+          as="label"
+          css={FORM_BOTTOM_SPACE_STYLE}
+          color={COLORS.grey60}
+        >
+          {props.caption}
+        </StyledText>
+      ) : null}
+      {props.secondaryCaption != null ? (
+        <StyledText
+          as="label"
+          css={FORM_BOTTOM_SPACE_STYLE}
+          color={COLORS.grey60}
+        >
+          {props.secondaryCaption}
+        </StyledText>
+      ) : null}
+      {hasError ? (
+        <StyledText as="label" css={ERROR_TEXT_STYLE}>
+          {props.error}
+        </StyledText>
+      ) : null}
+    </Flex>
+  )
+}
+>>>>>>> 3e3f52ebc4 (chore: Merge chore_release-7.3.0 into edge (#15117))
 
 const StyledInput = styled.input`
   &::placeholder {
