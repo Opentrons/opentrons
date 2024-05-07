@@ -24,7 +24,7 @@ import {
   SPACING,
   StyledText,
   TYPOGRAPHY,
-  useHoverTooltip,
+  useTooltip,
 } from '@opentrons/components'
 
 import { FLEX_ROBOT_TYPE, OT2_ROBOT_TYPE } from '@opentrons/shared-data'
@@ -62,6 +62,8 @@ export const CARD_OUTLINE_BORDER_STYLE = css`
     border-color: ${COLORS.grey55};
   }
 `
+
+const TOOLTIP_DELAY_MS = 2000
 
 interface RobotIsBusyAction {
   type: 'robotIsBusy'
@@ -145,7 +147,12 @@ export function ChooseRobotSlideout(
 
   const dispatch = useDispatch<Dispatch>()
   const isScanning = useSelector((state: State) => getScanning(state))
-  const [targetProps, tooltipProps] = useHoverTooltip()
+  const [targetProps, tooltipProps] = useTooltip()
+  const [
+    showRestoreValuesTooltip,
+    setShowRestoreValuesTooltip,
+  ] = React.useState<boolean>(false)
+  const [isInputFocused, setIsInputFocused] = React.useState<boolean>(false)
 
   const unhealthyReachableRobots = useSelector((state: State) =>
     getReachableRobots(state)
@@ -383,7 +390,7 @@ export function ChooseRobotSlideout(
         const value = runtimeParam.value as number
         const id = `InputField_${runtimeParam.variableName}_${index.toString()}`
         const error =
-          Number.isNaN(value) ||
+          (Number.isNaN(value) && !isInputFocused) ||
           value < runtimeParam.min ||
           value > runtimeParam.max
             ? t(`value_out_of_range`, {
@@ -418,6 +425,8 @@ export function ChooseRobotSlideout(
             }
             id={id}
             error={error}
+            onBlur={() => setIsInputFocused(false)}
+            onFocus={() => setIsInputFocused(true)}
             onChange={e => {
               const clone = runTimeParametersOverrides.map((parameter, i) => {
                 if (i === index) {
@@ -500,7 +509,7 @@ export function ChooseRobotSlideout(
 
   const pageTwoBody =
     runTimeParametersOverrides != null ? (
-      <Flex flexDirection={DIRECTION_COLUMN}>
+      <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing10}>
         <Flex justifyContent={JUSTIFY_END}>
           <Link
             textAlign={TYPOGRAPHY.textAlignRight}
@@ -509,17 +518,35 @@ export function ChooseRobotSlideout(
                 ? ENABLED_LINK_CSS
                 : DISABLED_LINK_CSS
             }
-            onClick={() => resetRunTimeParameters?.()}
+            onClick={() => {
+              if (isRestoreDefaultsLinkEnabled) {
+                resetRunTimeParameters?.()
+              } else {
+                setShowRestoreValuesTooltip(true)
+                setTimeout(
+                  () => setShowRestoreValuesTooltip(false),
+                  TOOLTIP_DELAY_MS
+                )
+              }
+            }}
             paddingBottom={SPACING.spacing10}
             {...targetProps}
           >
             {t('restore_defaults')}
           </Link>
-          {!isRestoreDefaultsLinkEnabled && (
-            <Tooltip tooltipProps={tooltipProps}>
-              {t('no_custom_values')}
-            </Tooltip>
-          )}
+          <Tooltip
+            tooltipProps={{
+              ...tooltipProps,
+              visible: showRestoreValuesTooltip,
+            }}
+            css={css`
+              &:hover {
+                cursor: auto;
+              }
+            `}
+          >
+            {t('no_custom_values')}
+          </Tooltip>
         </Flex>
         <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing16}>
           {runTimeParameters}
