@@ -799,7 +799,7 @@ async def _test_diagnostics_environment(
     )
     print(f"celsius: {celsius} C")
     if celsius < TEMP_THRESH[0] or celsius > TEMP_THRESH[1]:
-        print(f"FAIL: celsius {celsius} is out of range")
+        print(f"FAIL: celsius {celsius} is out of range(01:温度值 {humidity} 超出阈值 {TEMP_THRESH})")
         celsius_pass = False
     write_cb(["celsius", room_celsius, celsius, _bool_to_pass_fail(celsius_pass)])
 
@@ -809,7 +809,7 @@ async def _test_diagnostics_environment(
     )
     print(f"humidity: {humidity} C")
     if humidity < HUMIDITY_THRESH[0] or humidity > HUMIDITY_THRESH[1]:
-        print(f"FAIL: humidity {humidity} is out of range")
+        print(f"FAIL: humidity {humidity} is out of range(02:湿度值 {humidity} 超出阈值 {HUMIDITY_THRESH})")
         humidity_pass = False
     write_cb(["humidity", room_humidity, humidity, _bool_to_pass_fail(humidity_pass)])
 
@@ -837,7 +837,7 @@ async def _test_diagnostics_encoder(
     # NOTE: homing has tighter spec (0.005mm)
     if abs(pip_pos - pip_enc) > ENCODER_ALIGNMENT_THRESHOLD_HOME_MM:
         print(
-            f"FAIL: plunger ({pip_pos}) or encoder ({pip_enc}) is not near 0.0 after homing"
+            f"FAIL: plunger ({pip_pos}) or encoder ({pip_enc}) is not near 0.0 after homing(03:移液器home状态plunger与encoder位置差:{abs(pip_pos - pip_enc)}大于:{ENCODER_ALIGNMENT_THRESHOLD_HOME_MM})"
         )
         encoder_home_pass = False
     write_cb(["encoder-home", pip_pos, pip_enc, _bool_to_pass_fail(encoder_home_pass)])
@@ -846,7 +846,7 @@ async def _test_diagnostics_encoder(
     await helpers_ot3.move_plunger_absolute_ot3(api, mount, drop_tip)
     pip_pos, pip_enc = await _get_plunger_pos_and_encoder()
     if abs(pip_pos - pip_enc) > ENCODER_ALIGNMENT_THRESHOLD_MM:
-        print(f"FAIL: plunger ({pip_pos}) and encoder ({pip_enc}) are too different")
+        print(f"FAIL: plunger ({pip_pos}) and encoder ({pip_enc}) are too different(04:移液器plunger状态plunger与encoder位置差:{abs(pip_pos - pip_enc)}大于:{ENCODER_ALIGNMENT_THRESHOLD_HOME_MM})")
         encoder_move_pass = False
     write_cb(["encoder-move", pip_pos, pip_enc, _bool_to_pass_fail(encoder_move_pass)])
 
