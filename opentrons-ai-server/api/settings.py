@@ -13,7 +13,8 @@ ENV_PATH: Path = Path(Path(__file__).parent.parent, ".env")
 class Settings:
     def __init__(self) -> None:
         # Load environment variables from .env file if it exists
-        # These map to the the environment variables defined and set in teh
+        # These map to the the environment variables defined and set in terraform
+        # These may also be set with some future need during lambda version creation
         load_dotenv(ENV_PATH)
         self.typicode_base_url: str = os.getenv("TYPICODE_BASE_URL", "https://jsonplaceholder.typicode.com")
         self.openai_base_url: str = os.getenv("OPENAI_BASE_URL", "https://api.openai.com")

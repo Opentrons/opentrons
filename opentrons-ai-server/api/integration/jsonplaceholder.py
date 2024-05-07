@@ -1,14 +1,12 @@
-from httpx import Response
+from httpx import Client, Response, Timeout
 
-from api.integration.http_client import HTTPClient
 from api.settings import Settings
-
-settings: Settings = Settings()
 
 
 class JSONPlaceholder:
     def __init__(self) -> None:
-        self.client = HTTPClient(settings.typicode_base_url)
+        self.settings: Settings = Settings()
+        self.client = Client(base_url=self.settings.typicode_base_url, timeout=Timeout(connect=5.0, read=10.0, write=10.0, pool=5.0))
 
     def get_todos(self) -> Response:
-        return self.client.sync_request("GET", "/todos")
+        return self.client.get("/todos")

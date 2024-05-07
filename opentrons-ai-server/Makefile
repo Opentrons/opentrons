@@ -29,7 +29,7 @@ ruff-check:
 
 .PHONY: mypy
 mypy:
-	python -m pipenv run python -m mypy deploy.py api
+	python -m pipenv run python -m mypy aws_actions.py api
 
 .PHONY: format-readme
 format-readme:
@@ -51,7 +51,7 @@ format:
 fixup: format lint
 
 .PHONY: pre-commit
-pre-commit: fixup unit-test gen-requirements
+pre-commit: fixup unit-test
 	@echo "pre-commit checks passed"
 
 .PHONY: gen-env
@@ -64,8 +64,9 @@ unit-test:
 
 .PHONY: clean-package
 clean-package:
-	rm -rf package
+	rm -f requirements.txt
 	rm -f function.zip
+	rm -rf package
 
 .PHONY: gen-requirements
 gen-requirements:
@@ -88,25 +89,16 @@ package-lambda:
 	@echo "Package created successfully."
 
 .PHONY: build
-build: clean-package install-deps package-lambda
-
-ALLOWED_ENVS := sandbox dev
+build: clean-package gen-requirements install-deps package-lambda
 
 ENV ?= sandbox
 
-.PHONY: validate-env
-validate-env:
-	@echo "Validating environment setting: $(ENV)"
-	@if ! echo $(ALLOWED_ENVS) | grep -w $(ENV) > /dev/null; then \
-		echo "ERROR: Invalid ENV setting '$(ENV)'"; \
-		echo "Allowed values are: $(ALLOWED_ENVS)"; \
-		exit 1; \
-	fi
-	@echo "Environment setting is valid: $(ENV)"
-
-AWS_PROFILE = "must be set"
-
 .PHONY: deploy
-deploy: validate-env
+deploy:
 	@echo "Deploying to environment: $(ENV)"
-	python -m pipenv run python deploy.py $(ENV)
+	python -m pipenv run python aws_actions.py --env $(ENV) --action deploy
+
+.PHONY: test-lambda
+test-lambda:
+	@echo "Invoking the latest version of the lambda: $(ENV)"
+	python -m pipenv run python aws_actions.py --env $(ENV) --action test
