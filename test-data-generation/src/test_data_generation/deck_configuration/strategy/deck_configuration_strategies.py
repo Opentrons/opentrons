@@ -8,7 +8,10 @@ from test_data_generation.deck_configuration.datashapes import (
     PossibleSlotContents as PSC,
 )
 
-from test_data_generation.deck_configuration.strategy.helper_strategies import a_column
+from test_data_generation.deck_configuration.strategy.helper_strategies import (
+    a_column,
+    a_deck_by_columns,
+)
 
 DeckConfigurationStrategy = Callable[..., st.SearchStrategy[DeckConfiguration]]
 
@@ -29,14 +32,7 @@ def a_deck_configuration_with_a_module_or_trash_slot_above_or_below_a_heater_sha
 ) -> DeckConfiguration:
     """Generate a deck with a module or trash bin fixture above or below a heater shaker."""
     deck = draw(
-        st.builds(
-            DeckConfiguration.from_cols,
-            col1=a_column("1"),
-            col2=a_column(
-                "2", content_options=[PSC.LABWARE_SLOT, PSC.MAGNETIC_BLOCK_MODULE]
-            ),
-            col3=a_column("3"),
-        )
+        a_deck_by_columns(col_2_contents=[PSC.LABWARE_SLOT, PSC.MAGNETIC_BLOCK_MODULE])
     )
     column = deck.column_by_number(draw(st.sampled_from(["1", "3"])))
 
@@ -66,20 +62,17 @@ def a_deck_configuration_with_invalid_fixture_in_col_2(
         PSC.TRASH_BIN,
         PSC.TEMPERATURE_MODULE,
     ]
-    column2 = draw(a_column("2", content_options=POSSIBLE_FIXTURES))
+
+    deck = draw(a_deck_by_columns(col_2_contents=POSSIBLE_FIXTURES))
+
     num_invalid_fixtures = len(
-        [True for slot in column2.slots if slot.contents.is_one_of(INVALID_FIXTURES)]
+        [
+            True
+            for slot in deck.column_by_number("2").slots
+            if slot.contents.is_one_of(INVALID_FIXTURES)
+        ]
     )
     assume(num_invalid_fixtures > 0)
-
-    deck = draw(
-        st.builds(
-            DeckConfiguration.from_cols,
-            col1=a_column("1"),
-            col2=st.just(column2),
-            col3=a_column("3"),
-        )
-    )
 
     return deck
 
