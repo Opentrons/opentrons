@@ -30,6 +30,7 @@ import { Divider } from '../../atoms/structure'
 import { NAV_BAR_WIDTH } from '../../App/constants'
 import { CommandIcon } from './CommandIcon'
 import { useRunStatus } from '../RunTimeControl/hooks'
+import { getCommandTextData } from '../CommandText/utils/getCommandTextData'
 
 import type { RunStatus } from '@opentrons/api-client'
 import type { RobotType } from '@opentrons/shared-data'
@@ -82,19 +83,10 @@ export const RunPreviewComponent = (
     (isRunTerminal
       ? nullCheckedCommandsFromQuery
       : robotSideAnalysis.commands) ?? []
-  // pass relevant data from run rather than analysis so that CommandText utilities can properly hash the entities' IDs
-  // TODO (nd:05/02/2024, AUTH-380): update name and types for CommandText (and children/utilities) use of analysis.
-  // We should ideally pass only subset of analysis/run data required by these children and utilities
-  const protocolDataFromAnalysisOrRun =
+  const commandTextData =
     isRunTerminal && runRecord?.data != null
-      ? {
-          ...robotSideAnalysis,
-          labware: runRecord.data.labware ?? [],
-          modules: runRecord.data.modules ?? [],
-          pipettes: runRecord.data.pipettes ?? [],
-          commands: commands,
-        }
-      : robotSideAnalysis
+      ? getCommandTextData(runRecord.data, nullCheckedCommandsFromQuery)
+      : getCommandTextData(robotSideAnalysis)
   const currentRunCommandIndex = commands.findIndex(
     c => c.key === currentRunCommandKey
   )
@@ -173,7 +165,7 @@ export const RunPreviewComponent = (
                   <CommandIcon command={command} color={iconColor} />
                   <CommandText
                     command={command}
-                    robotSideAnalysis={protocolDataFromAnalysisOrRun}
+                    commandTextData={commandTextData}
                     robotType={robotType}
                     color={COLORS.black90}
                   />

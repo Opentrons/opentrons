@@ -43,6 +43,7 @@ import { useDownloadRunLog, useRobotType } from '../Devices/hooks'
 import { InterventionTicks } from './InterventionTicks'
 import { isInterventionCommand } from '../InterventionModal/utils'
 import { useNotifyRunQuery } from '../../resources/runs'
+import { getCommandTextData } from '../CommandText/utils/getCommandTextData'
 
 import type { RunStatus } from '@opentrons/api-client'
 
@@ -138,7 +139,7 @@ export function RunProgressMeter(props: RunProgressMeterProps): JSX.Element {
   ) {
     currentStepContents = (
       <CommandText
-        robotSideAnalysis={analysis}
+        commandTextData={getCommandTextData(analysis)}
         command={analysisCommands[lastRunAnalysisCommandIndex]}
         robotType={robotType}
       />
@@ -150,7 +151,7 @@ export function RunProgressMeter(props: RunProgressMeterProps): JSX.Element {
   ) {
     currentStepContents = (
       <CommandText
-        robotSideAnalysis={analysis}
+        commandTextData={getCommandTextData(analysis)}
         command={runCommandDetails.data}
         robotType={robotType}
       />
