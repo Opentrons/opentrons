@@ -1,5 +1,5 @@
 """Test data generation for deck configuration tests."""
-from typing import Callable, List
+from typing import Callable, Dict, List
 from hypothesis import assume, strategies as st
 from test_data_generation.deck_configuration.datashapes import (
     Column,
@@ -84,7 +84,10 @@ def a_deck_configuration_with_invalid_fixture_in_col_2(
     return deck
 
 
-DECK_CONFIGURATION_STRATEGIES: List[DeckConfigurationStrategy] = [
-    a_deck_configuration_with_a_module_or_trash_slot_above_or_below_a_heater_shaker,
-    a_deck_configuration_with_invalid_fixture_in_col_2,
-]
+DECK_CONFIGURATION_STRATEGIES: Dict[str, DeckConfigurationStrategy] = {
+    f.__name__: f
+    for f in [
+        a_deck_configuration_with_a_module_or_trash_slot_above_or_below_a_heater_shaker,
+        a_deck_configuration_with_invalid_fixture_in_col_2,
+    ]
+}
