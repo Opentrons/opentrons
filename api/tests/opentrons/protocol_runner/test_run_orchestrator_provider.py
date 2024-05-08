@@ -70,9 +70,8 @@ def mock_hardware_api(decoy: Decoy) -> HardwareAPI:
 def subject(
     mock_protocol_engine: ProtocolEngine, mock_hardware_api: HardwareAPI
 ) -> RunOrchestrator:
-    return RunOrchestrator(
-        protocol_engine=mock_protocol_engine,
-        hardware_api=mock_hardware_api,
+    return RunOrchestrator.build_orchestrator(
+        protocol_engine=mock_protocol_engine, hardware_api=mock_hardware_api
     )
 
 
@@ -101,8 +100,12 @@ def test_build_run_orchestrator_provider(
     mock_protocol_runner: Optional[Union[PythonAndLegacyRunner, JsonRunner]],
 ) -> None:
     result = subject.build_orchestrator(
+        protocol_engine=mock_protocol_engine,
+        hardware_api=mock_hardware_api,
         protocol_config=input_protocol_config,
     )
+
+    print(result)
     # decoy.when(
     #     protocol_runner.create_protocol_runner(
     #         protocol_engine=mock_protocol_engine, hardware_api=mock_hardware_api
@@ -125,25 +128,17 @@ def test_build_run_orchestrator_provider(
 @pytest.mark.parametrize(
     "runner, command_intent, input_protocol_config",
     [
-        (
-            lazy_fixture("mock_setup_runner"),
-            pe_commands.CommandIntent.SETUP,
-            None
-        ),
-        (
-            lazy_fixture("mock_fixit_runner"),
-            pe_commands.CommandIntent.FIXIT,
-            None
-        ),
+        (lazy_fixture("mock_setup_runner"), pe_commands.CommandIntent.SETUP, None),
+        (lazy_fixture("mock_fixit_runner"), pe_commands.CommandIntent.FIXIT, None),
         (
             lazy_fixture("mock_json_runner"),
             pe_commands.CommandIntent.PROTOCOL,
-            JsonProtocolConfig(schema_version=7)
+            JsonProtocolConfig(schema_version=7),
         ),
         (
             lazy_fixture("mock_python_runner"),
             pe_commands.CommandIntent.PROTOCOL,
-            PythonProtocolConfig(api_version=2.14)
+            PythonProtocolConfig(APIVersion.from_string("2.14")),
         ),
     ],
 )
@@ -152,14 +147,12 @@ def test_add_command(
     decoy: Decoy,
     runner: AnyRunner,
     command_intent: pe_commands.CommandIntent,
-    input_protocol_config: Optional[Union[PythonProtocolConfig, JsonProtocolConfig]]
+    input_protocol_config: Optional[Union[PythonProtocolConfig, JsonProtocolConfig]],
 ) -> None:
     """Should verify calls to set_command_queued."""
     command_to_queue = pe_commands.HomeCreate.construct(
         intent=command_intent, params=pe_commands.HomeParams.construct()
     )
-    subject.build_orchestrator(protocol_config=input_protocol_config)
     subject.add_command(command_to_queue)
 
     decoy.verify(runner.set_command_queued(command_to_queue))
-
