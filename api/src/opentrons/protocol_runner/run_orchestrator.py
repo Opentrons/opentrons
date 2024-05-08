@@ -1,5 +1,5 @@
-from dataclasses import dataclass
-from typing import Optional, Union, NamedTuple
+from __future__ import annotations
+from typing import Optional, Union
 
 from . import protocol_runner
 from ..hardware_control import HardwareControlAPI
@@ -37,6 +37,46 @@ class RunOrchestrator:
         self._setup_runner = setup_runner
         self._fixit_runner = fixit_runner
 
+    @classmethod
+    def build_orchestrator(
+        cls,
+        protocol_engine: ProtocolEngine,
+        hardware_api: HardwareControlAPI,
+        protocol_config: Optional[
+            Union[JsonProtocolConfig, PythonProtocolConfig]
+        ] = None,
+        post_run_hardware_state: PostRunHardwareState = PostRunHardwareState.HOME_AND_STAY_ENGAGED,
+        drop_tips_after_run: bool = True,
+    ) -> "RunOrchestrator":
+        setup_runner = protocol_runner.create_protocol_runner(
+            protocol_engine=protocol_engine,
+            hardware_api=hardware_api,
+            post_run_hardware_state=post_run_hardware_state,
+            drop_tips_after_run=drop_tips_after_run,
+        )
+        fixit_runner = protocol_runner.create_protocol_runner(
+            protocol_engine=protocol_engine,
+            hardware_api=hardware_api,
+            post_run_hardware_state=post_run_hardware_state,
+            drop_tips_after_run=drop_tips_after_run,
+        )
+        json_or_python_runner = None
+        if protocol_config:
+            json_or_python_runner = protocol_runner.create_protocol_runner(
+                protocol_config=protocol_config,
+                protocol_engine=protocol_engine,
+                hardware_api=hardware_api,
+                post_run_hardware_state=post_run_hardware_state,
+                drop_tips_after_run=drop_tips_after_run,
+            )
+        return cls(
+            json_or_python_protocol_runner=json_or_python_runner,
+            setup_runner=setup_runner,
+            fixit_runner=fixit_runner,
+            hardware_api=hardware_api,
+            protocol_engine=protocol_engine,
+        )
+
     def add_command(
         self, request: CommandCreate, failed_command_id: Optional[str] = None
     ) -> Command:
@@ -73,43 +113,3 @@ class RunOrchestrator:
             and self._json_or_python_runner is not None
         ):
             self._json_or_python_runner.set_command_queued(request)
-
-    @classmethod
-    def build_orchestrator(
-        cls,
-        protocol_engine: ProtocolEngine,
-        hardware_api: HardwareControlAPI,
-        protocol_config: Optional[
-            Union[JsonProtocolConfig, PythonProtocolConfig]
-        ] = None,
-        post_run_hardware_state: PostRunHardwareState = PostRunHardwareState.HOME_AND_STAY_ENGAGED,
-        drop_tips_after_run: bool = True,
-    ) -> RunOrchestrator:
-        setup_runner = protocol_runner.create_protocol_runner(
-            protocol_engine=protocol_engine,
-            hardware_api=hardware_api,
-            post_run_hardware_state=post_run_hardware_state,
-            drop_tips_after_run=drop_tips_after_run,
-        )
-        fixit_runner = protocol_runner.create_protocol_runner(
-            protocol_engine=protocol_engine,
-            hardware_api=hardware_api,
-            post_run_hardware_state=post_run_hardware_state,
-            drop_tips_after_run=drop_tips_after_run,
-        )
-        json_or_python_runner = None
-        if protocol_config:
-            json_or_python_runner = protocol_runner.create_protocol_runner(
-                protocol_config=protocol_config,
-                protocol_engine=protocol_engine,
-                hardware_api=hardware_api,
-                post_run_hardware_state=post_run_hardware_state,
-                drop_tips_after_run=drop_tips_after_run,
-            )
-        return cls(
-            json_or_python_protocol_runner=json_or_python_runner,
-            setup_runner=setup_runner,
-            fixit_runner=fixit_runner,
-            hardware_api=hardware_api,
-            protocol_engine=protocol_engine,
-        )
