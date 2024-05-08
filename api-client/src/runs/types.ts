@@ -1,4 +1,5 @@
 import type {
+  Liquid,
   LoadedLabware,
   LoadedModule,
   LoadedPipette,
@@ -46,6 +47,7 @@ export interface LegacyGoodRunData {
   pipettes: LoadedPipette[]
   labware: LoadedLabware[]
   modules: LoadedModule[]
+  liquids: Liquid[]
   protocolId?: string
   labwareOffsets?: LabwareOffset[]
   runTimeParameters: RunTimeParameter[]
