@@ -1,6 +1,7 @@
 import React from 'react'
 import styled from 'styled-components'
 import { useTranslation } from 'react-i18next'
+import { v4 as uuidv4 } from 'uuid'
 import Markdown from 'react-markdown'
 import {
   ALIGN_CENTER,
@@ -20,6 +21,8 @@ import {
 
 import type { ChatData } from '../../resources/types'
 
+const id = uuidv4()
+
 interface ChatDisplayProps {
   chat: ChatData
 }
@@ -31,8 +34,8 @@ export function ChatDisplay({ chat }: ChatDisplayProps): JSX.Element {
   const isUser = role === 'user'
 
   const handleClickCopy = async (): Promise<void> => {
-    const lastCodeBlock = document.querySelectorAll('pre')[0]
-    const code = (lastCodeBlock.innerText || lastCodeBlock.textContent) ?? ''
+    const lastCodeBlock = document.querySelector(`#${id}`)
+    const code = lastCodeBlock?.textContent ?? ''
     await navigator.clipboard.writeText(code)
     setIsCopied(true)
   }
@@ -125,7 +128,7 @@ function UnnumberedListText(props: JSX.IntrinsicAttributes): JSX.Element {
   return <StyledText {...props} as="ul" />
 }
 
-const CodeText = styled.code`
+const CodeText = styled.pre`
   font-family: monospace;
   color: ${COLORS.white};
   background-color: ${COLORS.black90};
@@ -139,7 +142,7 @@ function Code(props: JSX.IntrinsicAttributes): JSX.Element {
       borderRadius={BORDERS.borderRadius8}
       marginBottom={SPACING.spacing32}
     >
-      <CodeText {...props} />
+      <CodeText {...props} id={id} />
     </Flex>
   )
 }
