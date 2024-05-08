@@ -10,10 +10,10 @@ const FIXED_TRASH_DEF_URIS = [
   'opentrons/opentrons_1_trash_3200ml_fixed/1',
 ]
 export function getLabwareName(
-  protocolData: CommandTextData,
+  commandTextData: CommandTextData,
   labwareId: string
 ): string {
-  const loadedLabware = getLoadedLabware(protocolData, labwareId)
+  const loadedLabware = getLoadedLabware(commandTextData, labwareId)
   if (loadedLabware == null) {
     return ''
   } else if (FIXED_TRASH_DEF_URIS.includes(loadedLabware.definitionUri)) {
@@ -22,7 +22,7 @@ export function getLabwareName(
     return loadedLabware.displayName
   } else {
     const labwareDef = getLabwareDefinitionsFromCommands(
-      protocolData.commands
+      commandTextData.commands
     ).find(def => getLabwareDefURI(def) === loadedLabware.definitionUri)
     return labwareDef != null ? getLabwareDisplayName(labwareDef) : ''
   }

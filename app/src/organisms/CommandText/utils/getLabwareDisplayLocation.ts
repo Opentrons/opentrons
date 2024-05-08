@@ -14,7 +14,7 @@ import type { TFunction } from 'i18next'
 import type { CommandTextData } from '../types'
 
 export function getLabwareDisplayLocation(
-  protocolData: CommandTextData,
+  commandTextData: CommandTextData,
   location: LabwareLocation,
   t: TFunction,
   robotType: RobotType,
@@ -31,12 +31,15 @@ export function getLabwareDisplayLocation(
       ? location.addressableAreaName
       : t('slot', { slot_name: location.addressableAreaName })
   } else if ('moduleId' in location) {
-    const moduleModel = getModuleModel(protocolData, location.moduleId)
+    const moduleModel = getModuleModel(commandTextData, location.moduleId)
     if (moduleModel == null) {
       console.warn('labware is located on an unknown module model')
       return ''
     } else {
-      const slotName = getModuleDisplayLocation(protocolData, location.moduleId)
+      const slotName = getModuleDisplayLocation(
+        commandTextData,
+        location.moduleId
+      )
       return isOnDevice
         ? `${getModuleDisplayName(moduleModel)}, ${slotName}`
         : t('module_in_slot', {
@@ -49,10 +52,10 @@ export function getLabwareDisplayLocation(
           })
     }
   } else if ('labwareId' in location) {
-    const adapter = protocolData.labware.find(
+    const adapter = commandTextData.labware.find(
       lw => lw.id === location.labwareId
     )
-    const allDefs = getLabwareDefinitionsFromCommands(protocolData.commands)
+    const allDefs = getLabwareDefinitionsFromCommands(commandTextData.commands)
     const adapterDef = allDefs.find(
       def => getLabwareDefURI(def) === adapter?.definitionUri
     )
@@ -76,7 +79,7 @@ export function getLabwareDisplayLocation(
       })
     } else if ('moduleId' in adapter.location) {
       const moduleIdUnderAdapter = adapter.location.moduleId
-      const moduleModel = protocolData.modules.find(
+      const moduleModel = commandTextData.modules.find(
         module => module.id === moduleIdUnderAdapter
       )?.model
       if (moduleModel == null) {
@@ -84,7 +87,7 @@ export function getLabwareDisplayLocation(
         return ''
       }
       const slotName = getModuleDisplayLocation(
-        protocolData,
+        commandTextData,
         adapter.location.moduleId
       )
       return t('adapter_in_mod_in_slot', {

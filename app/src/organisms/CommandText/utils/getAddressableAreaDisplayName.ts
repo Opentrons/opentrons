@@ -6,11 +6,11 @@ import type { TFunction } from 'i18next'
 import type { CommandTextData } from '../types'
 
 export function getAddressableAreaDisplayName(
-  protocolData: CommandTextData,
+  commandTextData: CommandTextData,
   commandId: string,
   t: TFunction
 ): string {
-  const addressableAreaCommand = (protocolData?.commands ?? []).find(
+  const addressableAreaCommand = (commandTextData?.commands ?? []).find(
     command => command.id === commandId
   )
 

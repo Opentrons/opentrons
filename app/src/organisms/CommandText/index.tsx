@@ -49,14 +49,14 @@ const SIMPLE_TRANSLATION_KEY_BY_COMMAND_TYPE: {
 
 interface Props extends StyleProps {
   command: RunTimeCommand
-  protocolData: CommandTextData
+  commandTextData: CommandTextData
   robotType: RobotType
   isOnDevice?: boolean
 }
 export function CommandText(props: Props): JSX.Element | null {
   const {
     command,
-    protocolData,
+    commandTextData,
     robotType,
     isOnDevice = false,
     ...styleProps
@@ -75,7 +75,7 @@ export function CommandText(props: Props): JSX.Element | null {
     case 'pickUpTip': {
       return (
         <StyledText as="p" {...styleProps}>
-          <PipettingCommandText {...{ command, protocolData, robotType }} />
+          <PipettingCommandText {...{ command, commandTextData, robotType }} />
         </StyledText>
       )
     }
@@ -85,7 +85,7 @@ export function CommandText(props: Props): JSX.Element | null {
     case 'loadLiquid': {
       return (
         <StyledText as="p" {...styleProps}>
-          <LoadCommandText {...{ command, protocolData, robotType }} />
+          <LoadCommandText {...{ command, commandTextData, robotType }} />
         </StyledText>
       )
     }
@@ -168,9 +168,9 @@ export function CommandText(props: Props): JSX.Element | null {
     }
     case 'moveToWell': {
       const { wellName, labwareId } = command.params
-      const allPreviousCommands = protocolData.commands.slice(
+      const allPreviousCommands = commandTextData.commands.slice(
         0,
-        protocolData.commands.findIndex(c => c.id === command.id)
+        commandTextData.commands.findIndex(c => c.id === command.id)
       )
       const labwareLocation = getFinalLabwareLocation(
         labwareId,
@@ -179,7 +179,7 @@ export function CommandText(props: Props): JSX.Element | null {
       const displayLocation =
         labwareLocation != null
           ? getLabwareDisplayLocation(
-              protocolData,
+              commandTextData,
               labwareLocation,
               t,
               robotType
@@ -189,7 +189,7 @@ export function CommandText(props: Props): JSX.Element | null {
         <StyledText as="p" {...styleProps}>
           {t('move_to_well', {
             well_name: wellName,
-            labware: getLabwareName(protocolData, labwareId),
+            labware: getLabwareName(commandTextData, labwareId),
             labware_location: displayLocation,
           })}
         </StyledText>
@@ -198,13 +198,15 @@ export function CommandText(props: Props): JSX.Element | null {
     case 'moveLabware': {
       return (
         <StyledText as="p" {...styleProps}>
-          <MoveLabwareCommandText {...{ command, protocolData, robotType }} />
+          <MoveLabwareCommandText
+            {...{ command, commandTextData, robotType }}
+          />
         </StyledText>
       )
     }
     case 'configureForVolume': {
       const { volume, pipetteId } = command.params
-      const pipetteName = protocolData.pipettes.find(
+      const pipetteName = commandTextData.pipettes.find(
         pip => pip.id === pipetteId
       )?.pipetteName
 
@@ -222,7 +224,7 @@ export function CommandText(props: Props): JSX.Element | null {
     }
     case 'configureNozzleLayout': {
       const { configurationParams, pipetteId } = command.params
-      const pipetteName = protocolData.pipettes.find(
+      const pipetteName = commandTextData.pipettes.find(
         pip => pip.id === pipetteId
       )?.pipetteName
 
@@ -241,7 +243,7 @@ export function CommandText(props: Props): JSX.Element | null {
     }
     case 'prepareToAspirate': {
       const { pipetteId } = command.params
-      const pipetteName = protocolData.pipettes.find(
+      const pipetteName = commandTextData.pipettes.find(
         pip => pip.id === pipetteId
       )?.pipetteName
 
@@ -258,7 +260,7 @@ export function CommandText(props: Props): JSX.Element | null {
     }
     case 'moveToAddressableArea': {
       const addressableAreaDisplayName = getAddressableAreaDisplayName(
-        protocolData,
+        commandTextData,
         command.id,
         t
       )
@@ -273,7 +275,7 @@ export function CommandText(props: Props): JSX.Element | null {
     }
     case 'moveToAddressableAreaForDropTip': {
       const addressableAreaDisplayName = getAddressableAreaDisplayName(
-        protocolData,
+        commandTextData,
         command.id,
         t
       )

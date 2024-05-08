@@ -30,10 +30,10 @@ import { Divider } from '../../atoms/structure'
 import { NAV_BAR_WIDTH } from '../../App/constants'
 import { CommandIcon } from './CommandIcon'
 import { useRunStatus } from '../RunTimeControl/hooks'
+import { getCommandTextData } from '../CommandText/utils/getCommandTextData'
 
 import type { RunStatus } from '@opentrons/api-client'
 import type { RobotType } from '@opentrons/shared-data'
-import type { CommandTextData } from '../CommandText/types'
 
 const COLOR_FADE_MS = 500
 const LIVE_RUN_COMMANDS_POLL_MS = 3000
@@ -83,16 +83,10 @@ export const RunPreviewComponent = (
     (isRunTerminal
       ? nullCheckedCommandsFromQuery
       : robotSideAnalysis.commands) ?? []
-  const protocolDataFromAnalysisOrRun =
+  const commandTextData =
     isRunTerminal && runRecord?.data != null
-      ? {
-          labware: runRecord.data.labware ?? [],
-          modules: runRecord.data.modules ?? [],
-          pipettes: runRecord.data.pipettes ?? [],
-          liquids: runRecord.data.liquids ?? [],
-          commands: commands,
-        }
-      : robotSideAnalysis
+      ? getCommandTextData(runRecord.data, nullCheckedCommandsFromQuery)
+      : getCommandTextData(robotSideAnalysis)
   const currentRunCommandIndex = commands.findIndex(
     c => c.key === currentRunCommandKey
   )
@@ -171,9 +165,7 @@ export const RunPreviewComponent = (
                   <CommandIcon command={command} color={iconColor} />
                   <CommandText
                     command={command}
-                    protocolData={
-                      protocolDataFromAnalysisOrRun as CommandTextData
-                    }
+                    commandTextData={commandTextData}
                     robotType={robotType}
                     color={COLORS.black90}
                   />

@@ -1,10 +1,10 @@
 import type { CommandTextData } from '../types'
 
 export function getLiquidDisplayName(
-  protocolData: CommandTextData,
+  commandTextData: CommandTextData,
   liquidId: string
 ): CommandTextData['liquids'][number]['displayName'] {
-  const liquidDisplayName = (protocolData?.liquids ?? []).find(
+  const liquidDisplayName = (commandTextData?.liquids ?? []).find(
     liquid => liquid.id === liquidId
   )?.displayName
   return liquidDisplayName ?? ''

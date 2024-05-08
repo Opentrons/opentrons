@@ -19,13 +19,13 @@ import type { CommandTextData } from './types'
 
 interface LoadCommandTextProps {
   command: RunTimeCommand
-  protocolData: CommandTextData
+  commandTextData: CommandTextData
   robotType: RobotType
 }
 
 export const LoadCommandText = ({
   command,
-  protocolData,
+  commandTextData,
   robotType,
 }: LoadCommandTextProps): JSX.Element | null => {
   const { t } = useTranslation('run_details')
@@ -33,7 +33,7 @@ export const LoadCommandText = ({
   switch (command.commandType) {
     case 'loadPipette': {
       const pipetteModel = getPipetteNameOnMount(
-        protocolData,
+        commandTextData,
         command.params.mount
       )
       return t('load_pipette_protocol_setup', {
@@ -61,7 +61,7 @@ export const LoadCommandText = ({
         'moduleId' in command.params.location
       ) {
         const moduleModel = getModuleModel(
-          protocolData,
+          commandTextData,
           command.params.location.moduleId
         )
         const moduleName =
@@ -77,7 +77,7 @@ export const LoadCommandText = ({
               : 1,
           labware: command.result?.definition.metadata.displayName,
           slot_name: getModuleDisplayLocation(
-            protocolData,
+            commandTextData,
             command.params.location.moduleId
           ),
           module_name: moduleName,
@@ -88,7 +88,7 @@ export const LoadCommandText = ({
       ) {
         const labwareId = command.params.location.labwareId
         const labwareName = command.result?.definition.metadata.displayName
-        const matchingAdapter = protocolData.commands.find(
+        const matchingAdapter = commandTextData.commands.find(
           (command): command is LoadLabwareRunTimeCommand =>
             command.commandType === 'loadLabware' &&
             command.result?.labwareId === labwareId
@@ -109,7 +109,7 @@ export const LoadCommandText = ({
           })
         } else if (adapterLoc != null && 'moduleId' in adapterLoc) {
           const moduleModel = getModuleModel(
-            protocolData,
+            commandTextData,
             adapterLoc?.moduleId ?? ''
           )
           const moduleName =
@@ -119,7 +119,7 @@ export const LoadCommandText = ({
             adapter_name: adapterName,
             module_name: moduleName,
             slot_name: getModuleDisplayLocation(
-              protocolData,
+              commandTextData,
               adapterLoc?.moduleId ?? ''
             ),
           })
@@ -145,8 +145,8 @@ export const LoadCommandText = ({
     case 'loadLiquid': {
       const { liquidId, labwareId } = command.params
       return t('load_liquids_info_protocol_setup', {
-        liquid: getLiquidDisplayName(protocolData, liquidId),
-        labware: getLabwareName(protocolData, labwareId),
+        liquid: getLiquidDisplayName(commandTextData, liquidId),
+        labware: getLabwareName(commandTextData, labwareId),
       })
     }
     default: {

@@ -4,9 +4,9 @@ import type { PipetteName } from '@opentrons/shared-data'
 import type { CommandTextData } from '../types'
 
 export function getPipetteNameOnMount(
-  protocolData: CommandTextData,
+  commandTextData: CommandTextData,
   mount: string
 ): PipetteName | null {
-  const loadedPipette = getLoadedPipette(protocolData, mount)
+  const loadedPipette = getLoadedPipette(commandTextData, mount)
   return loadedPipette != null ? loadedPipette.pipetteName : null
 }

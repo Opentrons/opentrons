@@ -11,23 +11,23 @@ import type { CommandTextData } from './types'
 
 interface MoveLabwareCommandTextProps {
   command: MoveLabwareRunTimeCommand
-  protocolData: CommandTextData
+  commandTextData: CommandTextData
   robotType: RobotType
 }
 export function MoveLabwareCommandText(
   props: MoveLabwareCommandTextProps
 ): JSX.Element {
   const { t } = useTranslation('protocol_command_text')
-  const { command, protocolData, robotType } = props
+  const { command, commandTextData, robotType } = props
   const { labwareId, newLocation, strategy } = command.params
 
-  const allPreviousCommands = protocolData.commands.slice(
+  const allPreviousCommands = commandTextData.commands.slice(
     0,
-    protocolData.commands.findIndex(c => c.id === command.id)
+    commandTextData.commands.findIndex(c => c.id === command.id)
   )
   const oldLocation = getFinalLabwareLocation(labwareId, allPreviousCommands)
   const newDisplayLocation = getLabwareDisplayLocation(
-    protocolData,
+    commandTextData,
     newLocation,
     t,
     robotType
@@ -41,18 +41,28 @@ export function MoveLabwareCommandText(
 
   return strategy === 'usingGripper'
     ? t('move_labware_using_gripper', {
-        labware: getLabwareName(protocolData, labwareId),
+        labware: getLabwareName(commandTextData, labwareId),
         old_location:
           oldLocation != null
-            ? getLabwareDisplayLocation(protocolData, oldLocation, t, robotType)
+            ? getLabwareDisplayLocation(
+                commandTextData,
+                oldLocation,
+                t,
+                robotType
+              )
             : '',
         new_location: location,
       })
     : t('move_labware_manually', {
-        labware: getLabwareName(protocolData, labwareId),
+        labware: getLabwareName(commandTextData, labwareId),
         old_location:
           oldLocation != null
-            ? getLabwareDisplayLocation(protocolData, oldLocation, t, robotType)
+            ? getLabwareDisplayLocation(
+                commandTextData,
+                oldLocation,
+                t,
+                robotType
+              )
             : '',
         new_location: location,
       })
