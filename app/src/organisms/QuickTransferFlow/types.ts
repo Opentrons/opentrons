@@ -1,4 +1,4 @@
-import { ACTIONS } from './constants'
+import { ACTIONS, CONSOLIDATE, DISTRIBUTE, TRANSFER } from './constants'
 import type { Mount } from '@opentrons/api-client'
 import type { LabwareDefinition2, PipetteV2Specs } from '@opentrons/shared-data'
 
@@ -10,9 +10,14 @@ export interface QuickTransferSetupState {
   sourceWells?: string[]
   destination?: LabwareDefinition2 | 'source'
   destinationWells?: string[]
-  transferType?: string
+  transferType?: TransferType
   volume?: number
 }
+
+export type TransferType =
+  | typeof CONSOLIDATE
+  | typeof DISTRIBUTE
+  | typeof TRANSFER
 
 export type QuickTransferWizardAction =
   | SelectPipetteAction

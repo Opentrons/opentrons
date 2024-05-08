@@ -12,6 +12,7 @@ import { ChildNavigation } from '../ChildNavigation'
 import { InputField } from '../../atoms/InputField'
 import { NumericalKeyboard } from '../../atoms/SoftwareKeyboard'
 import { getVolumeLimits } from './utils'
+import { CONSOLIDATE, DISTRIBUTE } from './constants'
 
 import type {
   QuickTransferSetupState,
@@ -37,10 +38,10 @@ export function VolumeEntry(props: VolumeEntryProps): JSX.Element {
   const volumeRange = getVolumeLimits(state)
   let headerCopy = t('set_transfer_volume')
   let textEntryCopy = t('volume_per_well_µL')
-  if (state.transferType === 'consolidate') {
+  if (state.transferType === CONSOLIDATE) {
     headerCopy = t('set_aspirate_volume')
     textEntryCopy = t('aspirate_volume_µL')
-  } else if (state.transferType === 'distribute') {
+  } else if (state.transferType === DISTRIBUTE) {
     headerCopy = t('set_dispense_volume')
     textEntryCopy = t('dispense_volume_µL')
   }

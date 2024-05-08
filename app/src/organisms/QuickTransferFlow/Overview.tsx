@@ -10,9 +10,10 @@ import {
   COLORS,
   TEXT_ALIGN_RIGHT,
 } from '@opentrons/components'
+import { CONSOLIDATE, DISTRIBUTE } from './constants'
 
 import type { QuickTransferSetupState } from './types'
-import { ListItem } from '../../atoms/ListItem'
+import type { ListItem } from '../../atoms/ListItem'
 
 interface OverviewProps {
   state: QuickTransferSetupState
@@ -23,9 +24,9 @@ export function Overview(props: OverviewProps): JSX.Element | null {
   const { t } = useTranslation(['quick_transfer', 'shared'])
 
   let transferCopy = t('volume_per_well')
-  if (state.transferType === 'consolidate') {
+  if (state.transferType === CONSOLIDATE) {
     transferCopy = t('aspirate_volume')
-  } else if (state.transferType === 'distribute') {
+  } else if (state.transferType === DISTRIBUTE) {
     transferCopy = t('dispense_volume')
   }
 

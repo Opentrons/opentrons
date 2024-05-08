@@ -8,6 +8,9 @@ import {
   SINGLE_CHANNEL_COMPATIBLE_LABWARE,
   EIGHT_CHANNEL_COMPATIBLE_LABWARE,
   NINETY_SIX_CHANNEL_COMPATIBLE_LABWARE,
+  CONSOLIDATE,
+  DISTRIBUTE,
+  TRANSFER,
 } from './constants'
 
 import type {
@@ -67,17 +70,17 @@ export function quickTransferReducer(
       }
     }
     case 'SET_DEST_WELLS': {
-      let transferType = 'transfer'
+      let transferType = TRANSFER
       if (
         state.sourceWells != null &&
         state.sourceWells.length > action.wells.length
       ) {
-        transferType = 'distribue'
+        transferType = DISTRIBUTE
       } else if (
         state.sourceWells != null &&
         state.sourceWells.length < action.wells.length
       ) {
-        transferType = 'consolidate'
+        transferType = CONSOLIDATE
       }
       return {
         pipette: state.pipette,
