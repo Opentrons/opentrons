@@ -349,7 +349,7 @@ def _run_trial(run_args: RunArgs, tip: int, well: Well, trial: int) -> float:
     )
 
     z_distances: List[float] = find_max_z_distances(run_args, tip, well, plunger_speed)
-
+    z_distances = z_distances[: run_args.multi_passes]
     start_height = well.top().point.z + run_args.start_height_offset
     for z_dist in z_distances:
         lps = LiquidProbeSettings(
