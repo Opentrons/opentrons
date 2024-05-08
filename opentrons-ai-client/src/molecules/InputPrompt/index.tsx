@@ -70,15 +70,11 @@ export function InputPrompt(): JSX.Element {
     }
   }
 
-  const fetchSimulatorResult = async (): Promise<void> => {
-    // code to call opentrons simulator
-  }
-
   const handleClick = (): void => {
     // Note (kk:05/07/2024) if user prompt is to simulate a protocol
     // call fetchSimulateResult
     if (detectSimulate(userPrompt)) {
-      void fetchSimulatorResult()
+      console.log('call simulator api')
     } else {
       const userInput: ChatData = {
         role: 'user',
