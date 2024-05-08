@@ -29,9 +29,11 @@ if TYPE_CHECKING:
 log = logging.getLogger(__name__)
 
 MODULE_PORT_REGEX = re.compile(
+    # add a negative lookbehind to suppress matches on OT-2 tempfiles udev creates
+    r"(?<!\.#ot_module_)"
     # capture all modules by name using alternation
-    "(" + "|".join(modules.MODULE_TYPE_BY_NAME.keys()) + ")"
-    # add a negative lookahead to suppress matches on tempfiles udev creates
+    + "(" + "|".join(modules.MODULE_TYPE_BY_NAME.keys()) + ")"
+    # add a negative lookahead to suppress matches on Flex tempfiles udev creates
     + r"\d+(?!\.tmp-c\d+:\d+)",
     re.I,
 )
