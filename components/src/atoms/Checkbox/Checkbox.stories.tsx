@@ -1,4 +1,3 @@
-import * as React from 'react'
 import { Checkbox } from './index'
 
 import type { StoryObj, Meta } from '@storybook/react'
@@ -12,8 +11,14 @@ type Story = StoryObj<typeof Checkbox>
 
 export const Basic: Story = {
   args: {
-    isChecked: true
-  }
+    isChecked: true,
+    labelText: 'Button Text',
+    onClick: () => {
+      console.log('clicked')
+    },
+    tabIndex: 1,
+    disabled: false,
+  },
 }
 
 export default meta
