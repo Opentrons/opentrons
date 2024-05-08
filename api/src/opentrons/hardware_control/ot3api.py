@@ -2664,7 +2664,7 @@ class OT3API(
             pass_settings.sensor_threshold_pf,
             probe,
             pass_settings.output_option,
-            pass_settings.data_file,
+            pass_settings.data_files,
         )
         end_pos = await self.gantry_position(mount, refresh=True)
         if retract_after:

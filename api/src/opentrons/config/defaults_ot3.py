@@ -45,7 +45,9 @@ DEFAULT_CALIBRATION_SETTINGS: Final[OT3CalibrationSettings] = OT3CalibrationSett
             speed_mm_per_s=1.0,
             sensor_threshold_pf=3.0,
             output_option=OutputOptions.sync_only,
-            data_file="/var/capacitive_sensor_data.csv",
+            data_files={
+                InstrumentProbeType.PRIMARY: "/data/capacitive_sensor_data.csv"
+            },
         ),
     ),
     edge_sense=EdgeSenseSettings(
@@ -57,7 +59,9 @@ DEFAULT_CALIBRATION_SETTINGS: Final[OT3CalibrationSettings] = OT3CalibrationSett
             speed_mm_per_s=1,
             sensor_threshold_pf=3.0,
             output_option=OutputOptions.sync_only,
-            data_file="/var/capacitive_sensor_data.csv",
+            data_files={
+                InstrumentProbeType.PRIMARY: "/data/capacitive_sensor_data.csv"
+            },
         ),
         search_initial_tolerance_mm=12.0,
         search_iteration_limit=8,
@@ -310,6 +314,17 @@ def _build_default_transform(
 def _build_default_cap_pass(
     from_conf: Any, default: CapacitivePassSettings
 ) -> CapacitivePassSettings:
+    output_option = _build_output_option_with_default(
+        from_conf.get("output_option", None), default.output_option
+    )
+    data_files: Optional[Dict[InstrumentProbeType, str]] = None
+    if (
+        output_option is OutputOptions.sync_buffer_to_csv
+        or output_option is OutputOptions.stream_to_csv
+    ):
+        data_files = _build_log_files_with_default(
+            from_conf.get("data_files", {}), default.data_files
+        )
     return CapacitivePassSettings(
         prep_distance_mm=from_conf.get("prep_distance_mm", default.prep_distance_mm),
         max_overrun_distance_mm=from_conf.get(
@@ -320,7 +335,7 @@ def _build_default_cap_pass(
             "sensor_threshold_pf", default.sensor_threshold_pf
         ),
         output_option=from_conf.get("output_option", default.output_option),
-        data_file=from_conf.get("data_file", default.data_file),
+        data_files=data_files,
     )
 
 

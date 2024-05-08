@@ -119,7 +119,7 @@ class CapacitivePassSettings:
     speed_mm_per_s: float
     sensor_threshold_pf: float
     output_option: OutputOptions
-    data_file: Optional[str]
+    data_files: Optional[Dict[InstrumentProbeType, str]]
 
 
 @dataclass(frozen=True)

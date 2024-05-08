@@ -365,9 +365,9 @@ class FlexBackend(Protocol):
         distance_mm: float,
         speed_mm_per_s: float,
         sensor_threshold_pf: float,
-        probe: InstrumentProbeType,
+        probe: InstrumentProbeType = InstrumentProbeType.PRIMARY,
         output_format: OutputOptions = OutputOptions.sync_only,
-        data_file: Optional[str] = None,
+        data_files: Optional[Dict[InstrumentProbeType, str]] = None,
     ) -> bool:
         ...
 

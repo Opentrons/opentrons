@@ -194,8 +194,8 @@ async def run_sync_buffer_to_csv(
             messenger.add_listener(sensor_capturer, None)
             await messenger.send(
                 node_id=tool,
-                message=SendAccumulatedPressureDataRequest(
-                    payload=SendAccumulatedPressureDataPayload(
+                message=SendAccumulatedSensorDataRequest(
+                    payload=SendAccumulatedSensorDataPayload(
                         sensor_id=SensorIdField(sensor_id),
                         sensor_type=SensorTypeField(sensor_type),
                     )

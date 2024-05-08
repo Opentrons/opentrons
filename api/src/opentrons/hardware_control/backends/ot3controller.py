@@ -1408,9 +1408,9 @@ class OT3Controller(FlexBackend):
         distance_mm: float,
         speed_mm_per_s: float,
         sensor_threshold_pf: float,
-        probe: InstrumentProbeType,
+        probe: InstrumentProbeType = InstrumentProbeType.PRIMARY,
         output_option: OutputOptions = OutputOptions.sync_only,
-        data_file: Optional[str] = None,
+        data_files: Optional[Dict[InstrumentProbeType, str]] = None,
     ) -> bool:
         if output_option == OutputOptions.sync_buffer_to_csv:
             assert (
@@ -1426,6 +1426,14 @@ class OT3Controller(FlexBackend):
         can_bus_only_output = bool(
             output_option.value & OutputOptions.can_bus_only.value
         )
+        data_files_transposed = (
+            None
+            if data_files is None
+            else {
+                sensor_id_for_instrument(probe): data_files[probe]
+                for probe in data_files.keys()
+            }
+        )
         status = await capacitive_probe(
             messenger=self._messenger,
             tool=sensor_node_for_mount(mount),
@@ -1435,7 +1443,7 @@ class OT3Controller(FlexBackend):
             csv_output=csv_output,
             sync_buffer_output=sync_buffer_output,
             can_bus_only_output=can_bus_only_output,
-            data_file=data_file,
+            data_files=data_files_transposed,
             sensor_id=sensor_id_for_instrument(probe),
             relative_threshold_pf=sensor_threshold_pf,
         )

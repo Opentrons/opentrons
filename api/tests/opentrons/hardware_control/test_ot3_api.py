@@ -108,7 +108,7 @@ def fake_settings() -> CapacitivePassSettings:
         speed_mm_per_s=4,
         sensor_threshold_pf=1.0,
         output_option=OutputOptions.sync_only,
-        data_file="fake_file_name",
+        data_files={InstrumentProbeType.PRIMARY: "fake_file_name"},
     )
 
 
@@ -876,7 +876,7 @@ async def test_capacitive_probe(
         1.0,
         InstrumentProbeType.PRIMARY,
         fake_settings.output_option,
-        fake_settings.data_file,
+        fake_settings.data_files,
     )
 
     original = moving.set_in_point(here, 0)
