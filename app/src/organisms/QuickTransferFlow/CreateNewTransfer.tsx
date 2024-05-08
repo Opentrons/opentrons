@@ -64,8 +64,8 @@ export function CreateNewTransfer(props: CreateNewTransferProps): JSX.Element {
               handleClickRemove={() => {}}
               additionalStaticFixtures={[
                 { location: 'cutoutB2', label: t('tip_rack') },
-                { location: 'cutoutC2', label: t('labware') },
-                { location: 'cutoutD2', label: t('labware') },
+                { location: 'cutoutC2', label: t('source') },
+                { location: 'cutoutD2', label: t('destination') },
               ]}
             />
           </Flex>

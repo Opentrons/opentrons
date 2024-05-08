@@ -118,7 +118,7 @@ export function SelectDestLabware(
               onClick={() => {
                 setSelectedLabware('source')
               }}
-              buttonText={t('source_labware')}
+              buttonText={t('source_labware_d2')}
               subtext={state.source.metadata.displayName}
             />
           ) : null}
