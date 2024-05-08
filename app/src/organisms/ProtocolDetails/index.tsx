@@ -202,10 +202,11 @@ export function ProtocolDetails(
   const { protocolKey, srcFileNames, mostRecentAnalysis, modified } = props
   const { t, i18n } = useTranslation(['protocol_details', 'shared'])
   const enableProtocolStats = useFeatureFlag('protocolStats')
+  const enableProtocolTimeline = useFeatureFlag('protocolTimeline')
   const runTimeParameters = mostRecentAnalysis?.runTimeParameters ?? []
   const hasRunTimeParameters = runTimeParameters.length > 0
   const [currentTab, setCurrentTab] = React.useState<
-    'robot_config' | 'labware' | 'liquids' | 'stats' | 'parameters'
+    'robot_config' | 'labware' | 'liquids' | 'stats' | 'parameters' | 'timeline'
   >(hasRunTimeParameters ? 'parameters' : 'robot_config')
   const [
     showChooseRobotToRunProtocolSlideout,
@@ -338,6 +339,9 @@ export function ProtocolDetails(
       />
     ),
     stats: enableProtocolStats ? (
+      <ProtocolStats analysis={mostRecentAnalysis} />
+    ) : null,
+    timeline: enableProtocolTimeline ? (
       <AnnotatedSteps analysis={mostRecentAnalysis} />
     ) : null,
     parameters: <ProtocolParameters runTimeParameters={runTimeParameters} />,
@@ -659,6 +663,19 @@ export function ProtocolDetails(
                   >
                     <StyledText>
                       {i18n.format(t('stats'), 'capitalize')}
+                    </StyledText>
+                  </RoundTab>
+                )}
+                {enableProtocolTimeline && mostRecentAnalysis != null && (
+                  <RoundTab
+                    data-testid="ProtocolDetails_stats"
+                    isCurrent={currentTab === 'timeline'}
+                    onClick={() => {
+                      setCurrentTab('timeline')
+                    }}
+                  >
+                    <StyledText>
+                      {i18n.format(t('timeline'), 'capitalize')}
                     </StyledText>
                   </RoundTab>
                 )}

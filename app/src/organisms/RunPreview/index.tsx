@@ -158,7 +158,7 @@ export const RunPreviewComponent = (
                   <CommandIcon command={command} color={iconColor} />
                   <CommandText
                     command={command}
-                    robotSideAnalysis={robotSideAnalysis}
+                    analysis={robotSideAnalysis}
                     robotType={robotType}
                     color={COLORS.black90}
                   />

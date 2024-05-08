@@ -139,6 +139,7 @@ export interface ProtocolAnalysisOutput {
   errors: AnalysisError[]
   runTimeParameters: RunTimeParameter[]
   robotType?: RobotType
+  commandAnnotations?: CommandAnnotation[]
 }
 
 interface AnalysisSourceFile {

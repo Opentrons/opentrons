@@ -18,7 +18,8 @@ import {
   TYPOGRAPHY,
   StyledText,
   BaseDeck,
-  getLabwareInfoByLiquidId 
+  getLabwareInfoByLiquidId, 
+  BORDERS
 } from '@opentrons/components'
 import { getResultingTimelineFrameFromRunCommands } from '@opentrons/step-generation'
 import {
@@ -143,7 +144,7 @@ export function ProtocolTimelineScrubber(
               }).filter((i): i is LabwareOnDeck => i != null)}
           />
         </Flex>
-        <PipetteMountViz
+        {/* <PipetteMountViz
           mount="left"
           pipetteId={leftPipetteId}
           pipetteEntity={leftPipetteEntity}
@@ -158,18 +159,18 @@ export function ProtocolTimelineScrubber(
           timelineFrame={frame}
           invariantContext={invariantContext}
           analysis={analysis}
-        />
-        {/* <Flex
+        /> */}
+        <Flex
           backgroundColor={COLORS.white}
           paddingX={SPACING.spacing4}
           flex="1 1 0"
-          css={BORDERS.cardOutlineBorder}>
+          css={BORDERS.lineBorder}>
           <AnnotatedSteps
             analysis={analysis}
             currentCommandIndex={currentCommandIndex} />
-        </Flex> */}
+        </Flex>
       </Flex>
-      <Flex
+      {/* <Flex
         ref={wrapperRef}
         alignSelf={ALIGN_STRETCH}
         overflowY="scroll"
@@ -191,7 +192,7 @@ export function ProtocolTimelineScrubber(
             />
           )}
         </ViewportList>
-      </Flex>
+      </Flex> */}
       <StyledText as="label" marginY={SPACING.spacing8}>
         Jump to command
       </StyledText>
