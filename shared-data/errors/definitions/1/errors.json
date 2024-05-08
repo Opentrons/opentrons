@@ -123,8 +123,8 @@
       "category": "roboticsControlError"
     },
     "2017": {
-        "detail": "Liquid Not Found",
-        "category": "roboticsControlError"
+      "detail": "Liquid Not Found",
+      "category": "roboticsControlError"
     },
     "3000": {
       "detail": "A robotics interaction error occurred.",
