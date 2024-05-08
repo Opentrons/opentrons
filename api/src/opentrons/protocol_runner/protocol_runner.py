@@ -142,7 +142,8 @@ class AbstractRunner(ABC):
     ) -> RunResult:
         """Run a given protocol to completion."""
 
-    def set_command_queued(self, command: CommandCreate) -> None:
+    @abstractmethod
+    def set_command_queued(self, command: CommandCreate) -> CommandCreate:
         """add command to queue."""
 
 
@@ -185,6 +186,10 @@ class PythonAndLegacyRunner(AbstractRunner):
         if self._parameter_context is not None:
             return self._parameter_context.export_parameters_for_analysis()
         return []
+
+    def set_command_queued(self, command: CommandCreate) -> CommandCreate:
+        """add command to queue."""
+        return command
 
     async def load(
         self,
@@ -384,13 +389,15 @@ class JsonRunner(AbstractRunner):
                     message=f"{result.error.errorType}: {result.error.detail}",
                 )
 
-    def set_command_queued(self, command: CommandCreate) -> None:
+    def set_command_queued(self, command: CommandCreate) -> CommandCreate:
         """add command to queue."""
         self._add_to_queue(command)
+        return command
 
-    def _add_to_queue(self, command: CommandCreate) -> None:
+    def _add_to_queue(self, command: CommandCreate) -> CommandCreate:
         """Add new ID to the queued."""
         self._queued_protocol_commands.append(command)
+        return command
 
 
 class LiveRunner(AbstractRunner):
@@ -433,12 +440,14 @@ class LiveRunner(AbstractRunner):
         commands = self._protocol_engine.state_view.commands.get_all()
         return RunResult(commands=commands, state_summary=run_data, parameters=[])
 
-    def set_command_queued(self, command: CommandCreate) -> None:
+    def set_command_queued(self, command: CommandCreate) -> CommandCreate:
         """add command to queue."""
         if command.intent == CommandIntent.SETUP:
             self._add_to_setup_queue(command)
         elif command.intent == CommandIntent.FIXIT:
             self._add_to_fixit_queue(command)
+
+        return command
 
     def _add_to_setup_queue(self, command: CommandCreate) -> None:
         """Add a new ID to the queued setup."""

@@ -79,7 +79,7 @@ class RunOrchestrator:
 
     def add_command(
         self, request: CommandCreate, failed_command_id: Optional[str] = None
-    ) -> Command:
+    ) -> CommandCreate:
         """Add a command to the queue.
 
         Arguments:
@@ -105,11 +105,11 @@ class RunOrchestrator:
 
         # pass the failed_command_id somewhere
         if request.intent == CommandIntent.SETUP:
-            self._setup_runner.set_command_queued(request)
+            return self._setup_runner.set_command_queued(request)
         elif request.intent == CommandIntent.FIXIT:
-            self._fixit_runner.set_command_queued(request)
+            return self._fixit_runner.set_command_queued(request)
         elif (
             request.intent == CommandIntent.PROTOCOL
             and self._json_or_python_runner is not None
         ):
-            self._json_or_python_runner.set_command_queued(request)
+            return self._json_or_python_runner.set_command_queued(request)

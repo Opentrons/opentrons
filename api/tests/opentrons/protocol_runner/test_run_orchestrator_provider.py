@@ -153,6 +153,7 @@ def test_add_command(
     command_to_queue = pe_commands.HomeCreate.construct(
         intent=command_intent, params=pe_commands.HomeParams.construct()
     )
-    subject.add_command(command_to_queue)
+    result = subject.add_command(command_to_queue)
+    assert result == command_to_queue
 
     decoy.verify(runner.set_command_queued(command_to_queue))
