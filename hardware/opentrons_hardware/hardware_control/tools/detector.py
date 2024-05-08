@@ -44,7 +44,7 @@ async def _await_one_result(callback: WaitableCallback) -> ToolDetectionResult:
         if isinstance(response, message_definitions.PushToolsDetectedNotification):
             return _handle_detection_result(response)
         if isinstance(response, message_definitions.ErrorMessage):
-            log.error(f"Recieved error message {str(response)}")
+            log.error(f"Received error message {str(response)}")
     raise CanbusCommunicationError(message="Messenger closed before a tool was found")
 
 
@@ -78,7 +78,7 @@ async def _await_responses(
                 seen.add(node)
                 break
             elif isinstance(response, message_definitions.ErrorMessage):
-                log.error(f"Recieved error message {str(response)}")
+                log.error(f"Received error message {str(response)}")
 
 
 async def _handle_gripper_info(

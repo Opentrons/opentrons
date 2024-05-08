@@ -38,7 +38,7 @@ async def set_enable_motor(
             expected_nodes=[node],
         )
         if error != ErrorCode.ok:
-            log.error(f"recieved error {str(error)} trying to enable {str(node)} ")
+            log.error(f"received error {str(error)} trying to enable {str(node)} ")
 
 
 async def set_disable_motor(
@@ -53,7 +53,7 @@ async def set_disable_motor(
             expected_nodes=[node],
         )
         if error != ErrorCode.ok:
-            log.error(f"recieved error {str(error)} trying to disable {str(node)} ")
+            log.error(f"received error {str(error)} trying to disable {str(node)} ")
 
 
 async def set_enable_tip_motor(
@@ -68,7 +68,7 @@ async def set_enable_tip_motor(
             expected_nodes=[node],
         )
         if error != ErrorCode.ok:
-            log.error(f"recieved error {str(error)} trying to enable {str(node)} ")
+            log.error(f"received error {str(error)} trying to enable {str(node)} ")
 
 
 async def set_disable_tip_motor(
@@ -83,7 +83,7 @@ async def set_disable_tip_motor(
             expected_nodes=[node],
         )
         if error != ErrorCode.ok:
-            log.error(f"recieved error {str(error)} trying to disable {str(node)} ")
+            log.error(f"received error {str(error)} trying to disable {str(node)} ")
 
 
 async def get_motor_enabled(
