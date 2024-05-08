@@ -12,6 +12,7 @@
   "attached_modules": {
     "thermocycler": [
       {
+        "model": "thermocyclerModuleV1",
         "serial_number": "therm-123",
         "calls": [
           {
@@ -35,12 +36,14 @@
     ],
     "heatershaker": [
       {
+        "model": "heaterShakerModuleV1",
         "serial_number": "hs-123",
         "calls": []
       }
     ],
     "tempdeck": [
       {
+        "model": "temperatureModuleV1",
         "serial_number": "temp-123",
         "calls": [
           {
@@ -60,6 +63,7 @@
     ],
     "magdeck": [
       {
+        "model": "magneticModuleV2",
         "serial_number": "mag-123",
         "calls": [
           {
@@ -71,6 +75,7 @@
         ]
       },
       {
+        "model": "magneticModuleV1",
         "serial_number": "mag-1234",
         "calls": [
           {

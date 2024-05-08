@@ -163,9 +163,14 @@ class AttachedModulesControl:
                 port=mod.port,
                 usb_port=mod.usb_port,
                 type=modules.MODULE_TYPE_BY_NAME[mod.name],
-                sim_serial_number=mod.serial_number
-                if isinstance(mod, SimulatingModuleAtPort)
-                else None,
+                sim_serial_number=(
+                    mod.serial_number
+                    if isinstance(mod, SimulatingModuleAtPort)
+                    else None
+                ),
+                sim_model=(
+                    mod.model if isinstance(mod, SimulatingModuleAtPort) else None
+                ),
             )
             self._available_modules.append(new_instance)
             log.info(

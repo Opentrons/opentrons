@@ -66,7 +66,10 @@ def subject(
         (
             [
                 SimulatingModuleAtPort(
-                    port="/dev/foo", name="bar", serial_number="test-123"
+                    port="/dev/foo",
+                    name="bar",
+                    serial_number="test-123",
+                    model="mymodel",
                 )
             ]
         ),
@@ -101,6 +104,7 @@ async def test_register_modules(
             usb_port=USBPort(name="baz", port_number=0),
             type=ModuleType.TEMPERATURE,
             sim_serial_number=None,
+            sim_model=None,
         )
     ).then_return(module)
 
@@ -151,6 +155,7 @@ async def test_register_modules_sort(
                 port=matchers.Anything(),
                 type=matchers.Anything(),
                 sim_serial_number=None,
+                sim_model=None,
             )
         ).then_return(mod)
 

@@ -19,7 +19,7 @@ stages:
             moduleModel: thermocyclerModuleV1
             port: !anystr
             usbPort: !anydict
-            serial: !anystr
+            serial: therm-123
             model: !anystr
             revision: !anystr
             fwVersion: !anystr
@@ -42,7 +42,7 @@ stages:
             moduleModel: heaterShakerModuleV1
             port: !anystr
             usbPort: !anydict
-            serial: !anystr
+            serial: hs-123
             model: !anystr
             revision: !anystr
             fwVersion: !anystr
@@ -62,7 +62,7 @@ stages:
             moduleModel: temperatureModuleV1
             port: !anystr
             usbPort: !anydict
-            serial: !anystr
+            serial: temp-123
             model: !anystr
             revision: !anystr
             fwVersion: !anystr
@@ -73,10 +73,10 @@ stages:
               targetTemp: !anyfloat
           - name: magdeck
             displayName: magdeck
-            moduleModel: magneticModuleV1
+            moduleModel: magneticModuleV2
             port: !anystr
             usbPort: !anydict
-            serial: !anystr
+            serial: mag-123
             model: !anystr
             revision: !anystr
             fwVersion: !anystr
@@ -90,7 +90,7 @@ stages:
             moduleModel: magneticModuleV1
             port: !anystr
             usbPort: !anydict
-            serial: !anystr
+            serial: mag-1234
             model: !anystr
             revision: !anystr
             fwVersion: !anystr
@@ -109,7 +109,7 @@ stages:
         meta: !anydict
         data:
           - id: !anystr
-            serialNumber: !anystr
+            serialNumber: therm-123
             firmwareVersion: !anystr
             hardwareRevision: !anystr
             hasAvailableUpdate: !anybool
@@ -130,7 +130,7 @@ stages:
               targetTemperature: !anyfloat
               holdTime: !anyfloat
           - id: !anystr
-            serialNumber: !anystr
+            serialNumber: hs-123
             firmwareVersion: !anystr
             hardwareRevision: !anystr
             hasAvailableUpdate: !anybool
@@ -149,7 +149,7 @@ stages:
               currentSpeed: !anyint
               currentTemperature: !anyfloat
           - id: !anystr
-            serialNumber: !anystr
+            serialNumber: temp-123
             firmwareVersion: !anystr
             hardwareRevision: !anystr
             hasAvailableUpdate: !anybool
@@ -165,12 +165,12 @@ stages:
               currentTemperature: !anyfloat
               targetTemperature: !anyfloat
           - id: !anystr
-            serialNumber: !anystr
+            serialNumber: mag-123
             firmwareVersion: !anystr
             hardwareRevision: !anystr
             hasAvailableUpdate: !anybool
             moduleType: magneticModuleType
-            moduleModel: magneticModuleV1
+            moduleModel: magneticModuleV2
             usbPort:
               port: !anyint
               hub: !anybool
@@ -181,7 +181,7 @@ stages:
               height: !anyfloat
               engaged: !anybool
           - id: !anystr
-            serialNumber: !anystr
+            serialNumber: mag-1234
             firmwareVersion: !anystr
             hardwareRevision: !anystr
             hasAvailableUpdate: !anybool
