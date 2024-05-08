@@ -229,7 +229,7 @@ def create_pipette_load_statements(
                 value=ast_h.CallFunction(
                     call_on=PROTOCOL_CONTEXT_VAR_NAME,
                     what_to_call=ProtocolContextMethods.LOAD_INSTRUMENT,
-                    args=[pipette_config.left.value],
+                    args=[pipette_config.left.value, "left"],
                 ),
             )
         )
@@ -240,7 +240,7 @@ def create_pipette_load_statements(
                 value=ast_h.CallFunction(
                     call_on=PROTOCOL_CONTEXT_VAR_NAME,
                     what_to_call=ProtocolContextMethods.LOAD_INSTRUMENT,
-                    args=[pipette_config.right.value],
+                    args=[pipette_config.right.value, "right"],
                 ),
             )
         )
