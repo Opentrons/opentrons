@@ -46,6 +46,7 @@ export interface LegacyGoodRunData {
   errors: RunError[]
   pipettes: LoadedPipette[]
   labware: LoadedLabware[]
+  liquids: Liquid[]
   modules: LoadedModule[]
   liquids: Liquid[]
   protocolId?: string

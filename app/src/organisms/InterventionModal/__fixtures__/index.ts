@@ -180,7 +180,11 @@ export const mockThermocyclerModule: LoadedModule = {
 export const mockLiquid: Liquid = {
   id: 'mockLiquid',
   displayName: 'mock liquid',
+<<<<<<< HEAD
   description: 'this is my mock liquid description',
+=======
+  description: 'this is my mock liquid',
+>>>>>>> d7161f2753 (refactor(app, api-client, react-api-client): unify analysis and run record for CommandText use (#15125))
 }
 
 export const mockRunData: RunData = {
