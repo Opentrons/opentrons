@@ -36,7 +36,7 @@ class LoadedStaticPipetteData:
     tip_configuration_lookup_table: Dict[
         float, pipette_definition.SupportedTipsDefinition
     ]
-    nominal_tip_overlap: Dict[str, float]
+    nominal_tip_overlap: float
     nozzle_map: NozzleMap
     back_left_corner_offset: Point
     front_right_corner_offset: Point
@@ -150,8 +150,48 @@ class VirtualPipetteDataProvider:
         tip_configuration = config.liquid_properties[liquid_class].supported_tips[
             tip_type
         ]
+        valid_nozzle_maps = load_pipette_data.load_valid_nozzle_maps(
+            pipette_model.pipette_type,
+            pipette_model.pipette_channels,
+            pipette_model.pipette_version,
+        )
 
         nozzle_manager = NozzleConfigurationManager.build_from_config(config)
+
+        tip_overlap_for_tip_type = None
+        for configuration in (
+            config.pick_up_tip_configurations.press_fit,
+            config.pick_up_tip_configurations.cam_action,
+        ):
+            if not config:
+                continue
+
+            approved_map = None
+            for map_key in valid_nozzle_maps.maps.keys():
+                if (
+                    valid_nozzle_maps.maps[map_key]
+                    == list(nozzle_manager.current_configuration.map_store.keys())
+                ):
+                    approved_map = map_key
+            if approved_map is None:
+                raise ValueError(
+                    "Virtual Static Nozzle Configuration does not match any approved map layout for the current pipette."
+                )
+            try:
+                tip_overlap_for_tip_type = configuration.configuration_by_nozzle_map[approved_map][
+                    tip_type.name
+                ].tip_overlap
+                break
+            except:
+                default = configuration.configuration_by_nozzle_map[approved_map].get("default")
+                if default is not None:
+                    tip_overlap_for_tip_type = default.tip_overlap
+                    break
+        if tip_overlap_for_tip_type is None:
+            raise ValueError(
+                "Virtual Static Nozzle Configuration does not have a valid pick up tip configuration."
+            )
+
         pip_back_left = config.pipette_bounding_box_offsets.back_left_corner
         pip_front_right = config.pipette_bounding_box_offsets.front_right_corner
         return LoadedStaticPipetteData(
@@ -173,9 +213,7 @@ class VirtualPipetteDataProvider:
                 default_aspirate=tip_configuration.default_aspirate_flowrate.values_by_api_level,
                 default_dispense=tip_configuration.default_dispense_flowrate.values_by_api_level,
             ),
-            nominal_tip_overlap=config.liquid_properties[
-                liquid_class
-            ].tip_overlap_dictionary,
+            nominal_tip_overlap=tip_overlap_for_tip_type,
             nozzle_map=nozzle_manager.current_configuration,
             back_left_corner_offset=Point(
                 pip_back_left[0], pip_back_left[1], pip_back_left[2]
@@ -214,6 +252,7 @@ def get_pipette_static_config(pipette_dict: PipetteDict) -> LoadedStaticPipetteD
             k.value: v for k, v in pipette_dict["supported_tips"].items()
         },
         nominal_tip_overlap=pipette_dict["tip_overlap"],
+
         # TODO(mc, 2023-02-28): these two values are not present in PipetteDict
         # https://opentrons.atlassian.net/browse/RCORE-655
         home_position=0,

@@ -585,6 +585,26 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
         return config.configuration_by_nozzle_map[approved_map][
             pip_types.PipetteTipType(self._liquid_class.max_volume).name
         ].current
+    
+    def get_nominal_tip_overlap_by_configuration(
+        self,
+        config: PressFitPickUpTipConfiguration,
+    ) -> float:
+        approved_map = None
+        for map_key in self._valid_nozzle_maps.maps.keys():
+            if (
+                self._valid_nozzle_maps.maps[map_key]
+                == list(self._nozzle_manager.current_configuration.map_store.keys())
+            ):
+                approved_map = map_key
+        if approved_map is None:
+            raise ValueError(
+                "Nominal tip overlap request error. Nozzle Configuration does not match any approved map layout for the current pipette."
+            )
+
+        return config.configuration_by_nozzle_map[approved_map][
+            pip_types.PipetteTipType(self._liquid_class.max_volume).name
+        ].tip_overlap
 
     # Cache max is chosen somewhat arbitrarily. With a float is input we don't
     # want this to unbounded.
