@@ -23,7 +23,7 @@ import type { ChatData } from '../../resources/types'
 
 // ToDo (kk:05/02/2024) This url is temporary
 const CHAT_ENDPOINT = 'http://localhost:8000/streaming/ask'
-const SIMULATOR_ENDPOINT = ''
+// const SIMULATOR_ENDPOINT = ''
 
 interface InputType {
   userPrompt: string
