@@ -312,7 +312,9 @@ class TipView(HasState[TipState]):
                 if critical_row + active_rows < len(columns[0]):
                     critical_row = critical_row + active_rows
                 else:
-                    critical_column = critical_column + 1
+                    critical_column += 1
+                    if critical_column >= len(columns):
+                        return None
                     critical_row = active_rows - 1
             return None
 
@@ -336,7 +338,9 @@ class TipView(HasState[TipState]):
                 if critical_row + active_rows < len(columns[0]):
                     critical_row = critical_row + active_rows
                 else:
-                    critical_column = critical_column - 1
+                    critical_column -= 1
+                    if critical_column < 0:
+                        return None
                     critical_row = active_rows - 1
             return None
 
@@ -360,7 +364,9 @@ class TipView(HasState[TipState]):
                 if critical_row - active_rows >= 0:
                     critical_row = critical_row - active_rows
                 else:
-                    critical_column = critical_column + 1
+                    critical_column += 1
+                    if critical_column >= len(columns):
+                        return None
                     critical_row = len(columns[critical_column]) - active_rows
             return None
 
@@ -384,7 +390,9 @@ class TipView(HasState[TipState]):
                 if critical_row - active_rows >= 0:
                     critical_row = critical_row - active_rows
                 else:
-                    critical_column = critical_column - 1
+                    critical_column -= 1
+                    if critical_column < 0:
+                        return None
                     critical_row = len(columns[critical_column]) - active_rows
             return None
 
