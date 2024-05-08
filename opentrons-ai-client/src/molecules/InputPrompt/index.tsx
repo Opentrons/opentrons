@@ -79,12 +79,6 @@ export function InputPrompt(): JSX.Element {
     reset()
   }
 
-  const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>): void => {
-    if (e.key === 'Enter') {
-      handleClick()
-    }
-  }
-
   React.useEffect(() => {
     if (preparedPrompt !== '') setValue('userPrompt', preparedPrompt as string)
   }, [preparedPrompt, setValue])
@@ -111,7 +105,6 @@ export function InputPrompt(): JSX.Element {
           rows={calcTextAreaHeight()}
           placeholder={t('type_your_prompt')}
           {...register('userPrompt')}
-          onKeyDown={handleKeyPress}
         />
         <SendButton
           disabled={userPrompt.length === 0}
