@@ -19,8 +19,6 @@ import type {
   CommandCreatorWarning,
 } from '../../types'
 
-const TIPRACK_ADAPTER_LOADNAME = 'opentrons_flex_96_tiprack_adapter'
-
 /** Move labware from one location to another, manually or via a gripper. */
 export const moveLabware: CommandCreator<MoveLabwareArgs> = (
   args,
@@ -58,12 +56,15 @@ export const moveLabware: CommandCreator<MoveLabwareArgs> = (
     newLocation !== 'offDeck' && 'slotName' in newLocation
       ? newLocation.slotName
       : null
-  const hasMultipleObjectsInSameSlot =
+
+  const multipleObjectsInSameSlotLabware =
     Object.values(prevRobotState.labware).find(
       labware => labware.slot === newLocationSlot
-    ) != null || Object.values(prevRobotState.modules).find(
-      module => module.slot === newLocationSlot
     ) != null
+
+  const multipleObjectsInSameSlotModule = Object.values(
+    prevRobotState.modules
+  ).find(module => module.slot === newLocationSlot)
 
   if (!labware || !prevRobotState.labware[labware]) {
     errors.push(
@@ -74,8 +75,11 @@ export const moveLabware: CommandCreator<MoveLabwareArgs> = (
     )
   } else if (prevRobotState.labware[labware].slot === 'offDeck' && useGripper) {
     errors.push(errorCreators.labwareOffDeck())
-  } else if (hasMultipleObjectsInSameSlot) {
-    errors.push(errorCreators.labwareOnTiprackAdapter())
+  } else if (
+    multipleObjectsInSameSlotLabware ||
+    multipleObjectsInSameSlotModule
+  ) {
+    errors.push(errorCreators.multipleEntitiesOnSameSlotName())
   }
 
   const isAluminumBlock =

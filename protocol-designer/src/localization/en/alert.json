@@ -96,9 +96,9 @@
   },
   "timeline": {
     "error": {
-      "LABWARE_ON_TIPRACK_ADAPTER": {
-        "title": "Attempting to move a labware on top of a tiprack adapter",
-        "body": "The tiprack adapter is only compatible with tipracks"
+      "LABWARE_ON_ANOTHER_ENTITY": {
+        "title": "Attempting to move a labware on top of another entity",
+        "body": "Please reselect which slot your labware should move to."
       },
       "INSUFFICIENT_TIPS": {
         "title": "Not enough tips to complete action",

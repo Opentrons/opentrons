@@ -218,10 +218,11 @@ export const labwareOffDeck = (): CommandCreatorError => {
   }
 }
 
-export const labwareOnTiprackAdapter = (): CommandCreatorError => {
+export const multipleEntitiesOnSameSlotName = (): CommandCreatorError => {
   return {
-    type: 'LABWARE_ON_TIPRACK_ADAPTER',
-    message: 'Attempted to move labware onto a tiprack adapter',
+    type: 'LABWARE_ON_ANOTHER_ENTITY',
+    message:
+      'Attempted to move labware onto another entity with the same slotName',
   }
 }
 
