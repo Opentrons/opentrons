@@ -43,6 +43,7 @@ export interface CommandsAsPreSerializedListData {
 export interface CreateCommandParams {
   waitUntilComplete?: boolean
   timeout?: number
+  failedCommandId?: string
 }
 
 export interface RunCommandError {
