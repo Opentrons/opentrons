@@ -1,7 +1,6 @@
 import React from 'react'
 import styled from 'styled-components'
 import { useTranslation } from 'react-i18next'
-import { v4 as uuidv4 } from 'uuid'
 import Markdown from 'react-markdown'
 import {
   ALIGN_CENTER,
@@ -16,28 +15,30 @@ import {
   PrimaryButton,
   SPACING,
   StyledText,
-  TYPOGRAPHY,
 } from '@opentrons/components'
 
 import type { ChatData } from '../../resources/types'
 
-const id = uuidv4()
-
 interface ChatDisplayProps {
   chat: ChatData
+  chatId: string
 }
 
-export function ChatDisplay({ chat }: ChatDisplayProps): JSX.Element {
+export function ChatDisplay({ chat, chatId }: ChatDisplayProps): JSX.Element {
   const { t } = useTranslation('protocol_generator')
   const [isCopied, setIsCopied] = React.useState<boolean>(false)
   const { role, content } = chat
   const isUser = role === 'user'
 
   const handleClickCopy = async (): Promise<void> => {
-    const lastCodeBlock = document.querySelector(`#${id}`)
+    const lastCodeBlock = document.querySelector(`#${chatId}`)
     const code = lastCodeBlock?.textContent ?? ''
     await navigator.clipboard.writeText(code)
     setIsCopied(true)
+  }
+
+  function CodeText(props: JSX.IntrinsicAttributes): JSX.Element {
+    return <CodeWrapper {...props} id={chatId} />
   }
 
   return (
@@ -59,7 +60,6 @@ export function ChatDisplay({ chat }: ChatDisplayProps): JSX.Element {
         gridGap={SPACING.spacing16}
         position={POSITION_RELATIVE}
       >
-        {/* ToDo (kk:05/02/2024) This part is waiting for Mel's design */}
         <Markdown
           components={{
             div: undefined,
@@ -68,7 +68,7 @@ export function ChatDisplay({ chat }: ChatDisplayProps): JSX.Element {
             li: ListItemText,
             p: ParagraphText,
             a: ExternalLink,
-            code: Code,
+            code: CodeText,
           }}
         >
           {content}
@@ -76,29 +76,17 @@ export function ChatDisplay({ chat }: ChatDisplayProps): JSX.Element {
         {role === 'assistant' ? (
           <PrimaryButton
             position={POSITION_ABSOLUTE}
-            right="2rem"
-            bottom="2rem"
+            right={SPACING.spacing16}
+            bottom={`-${SPACING.spacing16}`}
             borderRadius={BORDERS.borderRadiusFull}
             onClick={handleClickCopy}
           >
-            <Flex
-              padding={`${SPACING.spacing16} ${SPACING.spacing24}`}
-              gridGap={SPACING.spacing8}
-              alignItems={ALIGN_CENTER}
-              justifyContent={JUSTIFY_CENTER}
-            >
+            <Flex alignItems={ALIGN_CENTER} justifyContent={JUSTIFY_CENTER}>
               <Icon
                 size="2rem"
                 name={isCopied ? 'check' : 'copy-text'}
                 color={COLORS.white}
               />
-              <StyledText
-                fontSize={TYPOGRAPHY.fontSize22}
-                lineHeight={TYPOGRAPHY.lineHeight28}
-                fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-              >
-                {t('copy_code')}
-              </StyledText>
             </Flex>
           </PrimaryButton>
         ) : null}
@@ -107,7 +95,7 @@ export function ChatDisplay({ chat }: ChatDisplayProps): JSX.Element {
   )
 }
 
-// ToDo (kk:05/02/2024) This part is waiting for Mel's design
+// Note (05/08/2024) the following styles are temp
 function ExternalLink(props: JSX.IntrinsicAttributes): JSX.Element {
   return <a {...props} target="_blank" rel="noopener noreferrer" />
 }
@@ -128,21 +116,11 @@ function UnnumberedListText(props: JSX.IntrinsicAttributes): JSX.Element {
   return <StyledText {...props} as="ul" />
 }
 
-const CodeText = styled.pre`
+const CodeWrapper = styled(Flex)`
   font-family: monospace;
+  padding: ${SPACING.spacing16};
   color: ${COLORS.white};
   background-color: ${COLORS.black90};
+  border-radius: ${BORDERS.borderRadius8};
+  overflow: auto;
 `
-
-function Code(props: JSX.IntrinsicAttributes): JSX.Element {
-  return (
-    <Flex
-      backgroundColor={COLORS.black90}
-      padding={SPACING.spacing16}
-      borderRadius={BORDERS.borderRadius8}
-      marginBottom={SPACING.spacing32}
-    >
-      <CodeText {...props} id={id} />
-    </Flex>
-  )
-}
