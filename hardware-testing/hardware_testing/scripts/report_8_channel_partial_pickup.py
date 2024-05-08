@@ -6,7 +6,7 @@ from plotly.subplots import make_subplots
 
 class Eight_Channel_Partial_Report:
     def __init__(self):
-        self.DATA_PATH = "data"
+        self.DATA_PATH = "data6"
         self.REPORT_PATH = "report"
         self.cycles = None
         self.df_data = None
@@ -40,13 +40,20 @@ class Eight_Channel_Partial_Report:
     def import_file(self, file):
         df = pd.read_csv(file)
         df.name = file
-        pipette_type = df.name.split("_")[-6]
-        tip_size = df.name.split("_")[-5]
-        volume = df.name.split("_")[-4]
-        motor_current = int(df.name.split("_")[-2].replace("C",""))
+        df_tags = [x.replace(".csv","") for x in df.name.split("_")]
+        pipette_type = df_tags[-8]
+        tip_size = df_tags[-7]
+        volume = df_tags[-6]
+        motor_current = int(df_tags[-4].replace("C",""))
+        slot = df_tags[-2]
+        sample = int(df_tags[-1].replace("S",""))
         df["Pipette Type"] = pipette_type
         df["Tip Size"] = tip_size
         df["Current"] = motor_current
+        df["Sample"] = sample
+        df["Slot"] = slot
+        # df["Delta"] = df["Z Gauge"] - df["Offset"]
+        # df["True Overlap"] = df["Overlap"] - df["Delta"]
         max_cycle = df["Cycle"].max()
         for i in range(max_cycle):
             cycle = i + 1
@@ -81,7 +88,7 @@ class Eight_Channel_Partial_Report:
     def create_report(self, df):
         report = df.copy()
         drop_columns = ["Time","Gauge Slot","Tiprack Slot","Pipette","Speed"]
-        sort_columns = ["Pipette Type","Tip Size","Nozzles","Current","Cycle","Tip"]
+        sort_columns = ["Pipette Type","Tip Size","Nozzles","Current","Slot","Sample","Cycle","Tip"]
         report.drop(columns=drop_columns, inplace=True)
         pipette_type = report.pop("Pipette Type")
         tip_size = report.pop("Tip Size")
@@ -101,6 +108,19 @@ class Eight_Channel_Partial_Report:
             report[test] = report[test].replace(2, "Fail")
         report["Leak"] = report.pop("Leak")
         report["Feel"] = report.pop("Feel")
+        report["Slot"] = report.pop("Slot")
+        report["Sample"] = report.pop("Sample")
+        # report["Offset"] = report.pop("Offset")
+        report["Z Gauge Nozzle"] = report.pop("Z Gauge Nozzle")
+        # report["Delta"] = report.pop("Delta")
+        # report["True Overlap"] = report.pop("True Overlap")
+        report["Z Delta"] = report.pop("Z Delta")
+        report["Z Overlap"] = report.pop("Z Overlap")
+        report["Z Overlap 2"] = report.pop("Z Overlap 2")
+        report["Z Encoder Tip"] = report.pop("Z Encoder Tip")
+        report["Z Encoder Nozzle"] = report.pop("Z Encoder Nozzle")
+        report["Distance"] = report.pop("Distance")
+        report["Concentricity"] = report.pop("Concentricity")
         report.drop_duplicates(inplace=True)
         report.sort_values(by=sort_columns, inplace=True)
         report.reset_index(drop=True, inplace=True)
