@@ -1,9 +1,11 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
-import { Flex, SPACING } from '@opentrons/components'
+import { Flex, JUSTIFY_CENTER, SPACING } from '@opentrons/components'
 
-import { SmallButton } from '../../atoms/buttons'
-import { ChildNavigation } from '../ChildNavigation'
+import { ChildNavigation } from '../../organisms/ChildNavigation'
+import { WellSelection } from '../../organisms/WellSelection'
+
+import type { SmallButton } from '../../atoms/buttons'
 
 import type {
   QuickTransferSetupState,
@@ -22,6 +24,8 @@ export function SelectSourceWells(props: SelectSourceWellsProps): JSX.Element {
   const { onNext, onBack, exitButtonProps, state, dispatch } = props
   const { i18n, t } = useTranslation(['quick_transfer', 'shared'])
 
+  const [selectedWells, setSelectedWells] = React.useState({})
+
   const handleClickNext = (): void => {
     // until well selection is implemented, select all wells and proceed to the next step
     if (state.source?.wells != null) {
@@ -32,8 +36,9 @@ export function SelectSourceWells(props: SelectSourceWellsProps): JSX.Element {
       onNext()
     }
   }
+
   return (
-    <Flex>
+    <>
       <ChildNavigation
         header={t('select_source_wells')}
         onClickBack={onBack}
@@ -44,11 +49,28 @@ export function SelectSourceWells(props: SelectSourceWellsProps): JSX.Element {
         top={SPACING.spacing8}
       />
       <Flex
+        justifyContent={JUSTIFY_CENTER}
         marginTop={SPACING.spacing120}
         padding={`${SPACING.spacing16} ${SPACING.spacing60} ${SPACING.spacing40} ${SPACING.spacing60}`}
       >
-        TODO: Add source well selection deck map
+        {state.source != null ? (
+          <WellSelection
+            labwareProps={{ definition: state.source }}
+            selectedPrimaryWells={selectedWells}
+            selectWells={wellGroup => {
+              setSelectedWells(prevWells => ({ ...prevWells, ...wellGroup }))
+            }}
+            deselectWells={wellGroup => {
+              setSelectedWells(wellGroup)
+            }}
+            updateHighlightedWells={wellGroup => {
+              console.log(wellGroup)
+            }}
+            nozzleType={null}
+            wellContents={{}}
+          />
+        ) : null}
       </Flex>
-    </Flex>
+    </>
   )
 }
