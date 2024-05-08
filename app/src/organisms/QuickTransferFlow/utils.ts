@@ -21,6 +21,7 @@ import type {
 import type {
   QuickTransferSetupState,
   QuickTransferWizardAction,
+  TransferType,
 } from './types'
 import type { LabwareFilter } from '../../pages/Labware/types'
 
@@ -70,7 +71,7 @@ export function quickTransferReducer(
       }
     }
     case 'SET_DEST_WELLS': {
-      let transferType = TRANSFER
+      let transferType: TransferType = TRANSFER
       if (
         state.sourceWells != null &&
         state.sourceWells.length > action.wells.length

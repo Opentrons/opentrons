@@ -10,10 +10,10 @@ import {
   COLORS,
   TEXT_ALIGN_RIGHT,
 } from '@opentrons/components'
+import { ListItem } from '../../atoms/ListItem'
 import { CONSOLIDATE, DISTRIBUTE } from './constants'
 
 import type { QuickTransferSetupState } from './types'
-import type { ListItem } from '../../atoms/ListItem'
 
 interface OverviewProps {
   state: QuickTransferSetupState
