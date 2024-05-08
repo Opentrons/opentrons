@@ -218,6 +218,14 @@ export const labwareOffDeck = (): CommandCreatorError => {
   }
 }
 
+export const multipleEntitiesOnSameSlotName = (): CommandCreatorError => {
+  return {
+    type: 'LABWARE_ON_ANOTHER_ENTITY',
+    message:
+      'Attempted to move labware onto another entity with the same slotName',
+  }
+}
+
 export const dropTipLocationDoesNotExist = (): CommandCreatorError => {
   return {
     type: 'DROP_TIP_LOCATION_DOES_NOT_EXIST',

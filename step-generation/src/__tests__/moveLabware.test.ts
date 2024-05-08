@@ -114,6 +114,20 @@ describe('moveLabware', () => {
       type: 'LABWARE_OFF_DECK',
     })
   })
+  it('should return an error for trying to move the labware to an occupied slot', () => {
+    const params = {
+      commandCreatorFnName: 'moveLabware',
+      labware: SOURCE_LABWARE,
+      useGripper: true,
+      newLocation: { slotName: '1' },
+    } as MoveLabwareArgs
+
+    const result = moveLabware(params, invariantContext, robotState)
+    expect(getErrorResult(result).errors).toHaveLength(1)
+    expect(getErrorResult(result).errors[0]).toMatchObject({
+      type: 'LABWARE_ON_ANOTHER_ENTITY',
+    })
+  })
   it('should return an error for trying to move the labware off deck with a gripper', () => {
     const params = {
       commandCreatorFnName: 'moveLabware',
