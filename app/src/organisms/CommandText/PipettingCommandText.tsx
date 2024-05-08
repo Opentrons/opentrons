@@ -113,8 +113,9 @@ export const PipettingCommandText = ({
       const pipetteId = command.params.pipetteId
       const pipetteName:
         | PipetteName
-        | undefined = commandTextData.pipettes.find(pip => pip.id === pipetteId)
-        ?.pipetteName
+        | undefined = commandTextData.pipettes.find(
+        pipette => pipette.id === pipetteId
+      )?.pipetteName
 
       return t('pickup_tip', {
         well_range: getWellRange(
