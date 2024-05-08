@@ -206,6 +206,9 @@ def create_deck_slot_load_statements(
     """Iterates over a list of slots and creates the corresponding load statements."""
     entries: typing.List[ast_h.AssignStatement] = []
     for slot in slots:
+        if slot.contents == PSC.THERMOCYCLER_MODULE and slot.label == "b1":
+            continue
+
         load_statement = create_deck_slot_load_statement(slot)
         if isinstance(load_statement, typing.List):
             entries.extend(load_statement)
