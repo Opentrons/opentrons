@@ -40,7 +40,10 @@ import {
   getLabwareCompatibleWithAdapter,
   ADAPTER_96_CHANNEL,
 } from '../../utils/labwareModuleCompatibility'
-import { getPipetteEntities } from '../../step-forms/selectors'
+import {
+  getPipetteEntities,
+  getSavedStepForms,
+} from '../../step-forms/selectors'
 import { getHas96Channel } from '../../utils'
 import { getOnlyLatestDefs } from '../../labware-defs/utils'
 import { getTopPortalEl } from '../portals/TopPortal'
@@ -150,6 +153,10 @@ export function LabwareSelectionModal(): JSX.Element | null {
   const dispatch = useDispatch<ThunkDispatch<any>>()
   const selectedLabwareSlot = useSelector(
     labwareIngredSelectors.selectedAddLabwareSlot
+  )
+  const savedStepForms = useSelector(getSavedStepForms)
+  const moveLabwareSteps = Object.values(savedStepForms).filter(
+    stepForm => stepForm.stepType === 'moveLabware'
   )
   const pipetteEntities = useSelector(getPipetteEntities)
   const permittedTipracks = useSelector(stepFormSelectors.getPermittedTipracks)

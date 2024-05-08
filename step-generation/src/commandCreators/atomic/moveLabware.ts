@@ -19,6 +19,8 @@ import type {
   CommandCreatorWarning,
 } from '../../types'
 
+const TIPRACK_ADAPTER_LOADNAME = 'opentrons_flex_96_tiprack_adapter'
+
 /** Move labware from one location to another, manually or via a gripper. */
 export const moveLabware: CommandCreator<MoveLabwareArgs> = (
   args,
@@ -52,6 +54,17 @@ export const moveLabware: CommandCreator<MoveLabwareArgs> = (
     aE => aE.name === 'gripper'
   )
 
+  const newLocationSlot =
+    newLocation !== 'offDeck' && 'slotName' in newLocation
+      ? newLocation.slotName
+      : null
+  const hasMultipleObjectsInSameSlot =
+    Object.values(prevRobotState.labware).find(
+      labware => labware.slot === newLocationSlot
+    ) != null || Object.values(prevRobotState.modules).find(
+      module => module.slot === newLocationSlot
+    ) != null
+
   if (!labware || !prevRobotState.labware[labware]) {
     errors.push(
       errorCreators.labwareDoesNotExist({
@@ -61,6 +74,8 @@ export const moveLabware: CommandCreator<MoveLabwareArgs> = (
     )
   } else if (prevRobotState.labware[labware].slot === 'offDeck' && useGripper) {
     errors.push(errorCreators.labwareOffDeck())
+  } else if (hasMultipleObjectsInSameSlot) {
+    errors.push(errorCreators.labwareOnTiprackAdapter())
   }
 
   const isAluminumBlock =

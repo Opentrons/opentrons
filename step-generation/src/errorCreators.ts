@@ -218,6 +218,13 @@ export const labwareOffDeck = (): CommandCreatorError => {
   }
 }
 
+export const labwareOnTiprackAdapter = (): CommandCreatorError => {
+  return {
+    type: 'LABWARE_ON_TIPRACK_ADAPTER',
+    message: 'Attempted to move labware onto a tiprack adapter',
+  }
+}
+
 export const dropTipLocationDoesNotExist = (): CommandCreatorError => {
   return {
     type: 'DROP_TIP_LOCATION_DOES_NOT_EXIST',

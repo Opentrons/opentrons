@@ -96,6 +96,10 @@
   },
   "timeline": {
     "error": {
+      "LABWARE_ON_TIPRACK_ADAPTER": {
+        "title": "Attempting to move a labware on top of a tiprack adapter",
+        "body": "The tiprack adapter is only compatible with tipracks"
+      },
       "INSUFFICIENT_TIPS": {
         "title": "Not enough tips to complete action",
         "body": "Add another tip rack to an empty slot in "
