@@ -96,6 +96,10 @@
   },
   "timeline": {
     "error": {
+      "LABWARE_ON_ANOTHER_ENTITY": {
+        "title": "Attempting to move a labware on top of another entity",
+        "body": "Please reselect which slot your labware should move to."
+      },
       "INSUFFICIENT_TIPS": {
         "title": "Not enough tips to complete action",
         "body": "Add another tip rack to an empty slot in "
