@@ -279,9 +279,11 @@ function Input(props: InputFieldProps): JSX.Element {
           <StyledInput
             {...inputProps}
             data-testid={props.id}
+            id={props.id}
             value={value}
             placeholder={placeHolder}
             onWheel={event => event.currentTarget.blur()} // prevent value change with scrolling
+            type={props.type}
           />
           {props.units != null ? (
             <Flex css={UNITS_STYLE}>{props.units}</Flex>
