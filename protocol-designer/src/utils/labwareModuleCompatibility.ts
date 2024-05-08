@@ -156,8 +156,7 @@ export const getAdapterLabwareIsAMatch = (
 ): boolean => {
   const loadName = Object.values(allLabware).find(lab => lab.id === labwareId)
     ?.def.parameters.loadName
-  console.log('loadname', loadName)
-  console.log('draggedLabwareLoadname', draggedLabwareLoadname)
+
   const flatBottomLabwares = [
     'corning_384_wellplate_112ul_flat',
     'corning_96_wellplate_360ul_flat',
