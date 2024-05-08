@@ -15,9 +15,5 @@ class ChangeNotifier:
 
     async def wait(self) -> None:
         """Wait until the next change notification."""
-        self._event.clear()
         await self._event.wait()
-
-    def clear(self) -> None:
-        """Reset the internal event flag."""
         self._event.clear()

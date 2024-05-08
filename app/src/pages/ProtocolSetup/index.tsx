@@ -47,6 +47,7 @@ import {
   useAttachedModules,
   useLPCDisabledReason,
   useModuleCalibrationStatus,
+  useProtocolAnalysisErrors,
   useRobotAnalyticsData,
   useRobotType,
   useTrackProtocolRunEvent,
@@ -64,6 +65,7 @@ import { ProtocolSetupDeckConfiguration } from '../../organisms/ProtocolSetupDec
 import { useLaunchLPC } from '../../organisms/LabwarePositionCheck/useLaunchLPC'
 import { getUnmatchedModulesForProtocol } from '../../organisms/ProtocolSetupModulesAndDeck/utils'
 import { ConfirmCancelRunModal } from '../../organisms/OnDeviceDisplay/RunningProtocol'
+import { AnalysisFailedModal } from '../../organisms/ProtocolSetupParameters/AnalysisFailedModal'
 import {
   getIncompleteInstrumentCount,
   getProtocolUsesGripper,
@@ -90,6 +92,7 @@ import { getRequiredDeckConfig } from '../../resources/deck_configuration/utils'
 import { useNotifyRunQuery } from '../../resources/runs'
 import { ViewOnlyParameters } from '../../organisms/ProtocolSetupParameters/ViewOnlyParameters'
 
+import type { Run } from '@opentrons/api-client'
 import type { CutoutFixtureId, CutoutId } from '@opentrons/shared-data'
 import type { OnDeviceRouteParams } from '../../App/types'
 import type {
@@ -208,7 +211,11 @@ export function ProtocolSetupStep({
           >
             {title}
           </StyledText>
-          <StyledText as="h4" color={COLORS.grey60} maxWidth="35rem">
+          <StyledText
+            as="h4"
+            color={disabled ? COLORS.grey50 : COLORS.grey60}
+            maxWidth="35rem"
+          >
             {description}
           </StyledText>
         </Flex>
@@ -251,6 +258,7 @@ interface PrepareToRunProps {
   confirmAttachment: () => void
   play: () => void
   robotName: string
+  runRecord: Run | null
 }
 
 function PrepareToRun({
@@ -259,6 +267,7 @@ function PrepareToRun({
   confirmAttachment,
   play,
   robotName,
+  runRecord,
 }: PrepareToRunProps): JSX.Element {
   const { t, i18n } = useTranslation(['protocol_setup', 'shared'])
   const history = useHistory()
@@ -272,7 +281,6 @@ function PrepareToRun({
     observer.observe(scrollRef.current)
   }
 
-  const { data: runRecord } = useNotifyRunQuery(runId, { staleTime: Infinity })
   const protocolId = runRecord?.data?.protocolId ?? null
   const { data: protocolRecord } = useProtocolQuery(protocolId, {
     staleTime: Infinity,
@@ -797,11 +805,17 @@ export type SetupScreens =
 
 export function ProtocolSetup(): JSX.Element {
   const { runId } = useParams<OnDeviceRouteParams>()
+  const { data: runRecord } = useNotifyRunQuery(runId, { staleTime: Infinity })
+  const { analysisErrors } = useProtocolAnalysisErrors(runId)
   const localRobot = useSelector(getLocalRobot)
   const robotSerialNumber =
     localRobot?.status != null ? getRobotSerialNumber(localRobot) : null
   const trackEvent = useTrackEvent()
   const { play } = useRunControls(runId)
+  const [
+    showAnalysisFailedModal,
+    setShowAnalysisFailedModal,
+  ] = React.useState<boolean>(true)
 
   const handleProceedToRunClick = (): void => {
     trackEvent({
@@ -838,6 +852,7 @@ export function ProtocolSetup(): JSX.Element {
         confirmAttachment={confirmAttachment}
         play={play}
         robotName={localRobot?.name != null ? localRobot.name : 'no name'}
+        runRecord={runRecord ?? null}
       />
     ),
     instruments: (
@@ -872,6 +887,15 @@ export function ProtocolSetup(): JSX.Element {
 
   return (
     <>
+      {showAnalysisFailedModal &&
+      analysisErrors != null &&
+      analysisErrors?.length > 0 ? (
+        <AnalysisFailedModal
+          setShowAnalysisFailedModal={setShowAnalysisFailedModal}
+          protocolId={runRecord?.data.protocolId ?? null}
+          errors={analysisErrors.map(error => error.detail)}
+        />
+      ) : null}
       {showConfirmationModal ? (
         <ConfirmAttachedModal
           onCloseClick={cancelExit}

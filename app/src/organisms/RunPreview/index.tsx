@@ -92,6 +92,7 @@ export const RunPreviewComponent = (
           labware: runRecord.data.labware ?? [],
           modules: runRecord.data.modules ?? [],
           pipettes: runRecord.data.pipettes ?? [],
+          liquids: runRecord.data.liquids ?? [],
           commands: commands,
         }
       : robotSideAnalysis
