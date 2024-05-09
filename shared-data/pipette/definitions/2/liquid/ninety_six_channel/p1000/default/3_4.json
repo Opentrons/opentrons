@@ -182,7 +182,7 @@
     "opentrons/opentrons_flex_96_tiprack_200ul/1": 9.74,
     "opentrons/opentrons_flex_96_filtertiprack_1000ul/1": 10.21,
     "opentrons/opentrons_flex_96_filtertiprack_200ul/1": 9.74,
-    "opentrons/opentrons_flex_96_filtertiprack_50ul/1":  10.16
+    "opentrons/opentrons_flex_96_filtertiprack_50ul/1": 10.16
   },
   "maxVolume": 1000,
   "minVolume": 5,
