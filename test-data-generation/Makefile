@@ -31,14 +31,26 @@ wheel:
 debug-test:
 	$(pytest) ./tests \
 	-vvv \
+	--numprocesses=auto \
 	-s \
 	--hypothesis-show-statistics \
 	--hypothesis-explain \
 	--hypothesis-profile=dev
 
+.PHONY: exploratory-test
+exploratory-test:
+	$(pytest) ./tests \
+	--numprocesses=auto \
+	-s \
+	--hypothesis-show-statistics \
+	--hypothesis-explain \
+	--hypothesis-profile=exploratory
 
 .PHONY: test
 test:
 	$(pytest) ./tests \
-	--hypothesis-explain \
+	--hypothesis-show-statistics \
+	--numprocesses=auto \
+	--tb=short \
+	--show-capture=stderr \
 	--hypothesis-profile=ci
