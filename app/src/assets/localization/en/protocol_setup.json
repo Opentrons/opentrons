@@ -252,7 +252,7 @@
   "slot_number": "Slot Number",
   "status": "Status",
   "step": "STEP {{index}}",
-  "there_are_no_unconfigured_modules": "No {{module}} is connected. Attach one and place it in {{slot}}",
+  "there_are_no_unconfigured_modules": "No {{module}} is connected. Attach one and place it in {{slot}}.",
   "there_are_other_configured_modules": "A {{module}} is already configured in a different slot. Exit run setup and update your deck configuration to move to an already connected module. Or attach another {{module}} to continue setup.",
   "tip_length_cal_description_bullet": "Perform Tip Length Calibration for each new tip type used on a pipette.",
   "tip_length_cal_description": "This measures the Z distance between the bottom of the tip and the pipette’s nozzle. If you redo the tip length calibration for the tip you used to calibrate a pipette, you will also have to redo that Pipette Offset Calibration.",
