@@ -13,7 +13,7 @@ import {
   StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
-import { getFixtureDisplayName } from '@opentrons/shared-data'
+import { getCutoutDisplayName, getFixtureDisplayName } from '@opentrons/shared-data'
 import { TertiaryButton } from '../../../../atoms/buttons/TertiaryButton'
 import { getTopPortalEl } from '../../../../App/portal'
 import { LegacyModal } from '../../../../molecules/LegacyModal'
@@ -45,11 +45,12 @@ export const NotConfiguredModal = (
     updateDeckConfiguration(newDeckConfig)
     onCloseClick()
   }
-
+  const cutoutDisplayName = getCutoutDisplayName(cutoutId)
   return createPortal(
     <LegacyModal
       title={t('add_fixture', {
         fixtureName: getFixtureDisplayName(requiredFixtureId),
+        locationName: cutoutDisplayName
       })}
       onClose={onCloseClick}
       width="27.75rem"

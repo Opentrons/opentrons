@@ -41,7 +41,7 @@ describe('NotConfiguredModal', () => {
     const { getByText, getByRole } = render(props)
     getByText('Add Trash bin to deck configuration')
     getByText(
-      'Add this deck hardware to your deck configuration. It will be referenced during protocol analysis.'
+      'Add this hardware to your deck configuration. It will be referenced during protocol analysis.'
     )
     getByText('Trash bin')
     fireEvent.click(getByRole('button', { name: 'Add' }))

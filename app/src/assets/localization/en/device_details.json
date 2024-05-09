@@ -3,7 +3,7 @@
   "about_module": "About {{name}}",
   "about_pipette_name": "About {{name}} Pipette",
   "about_pipette": "About pipette",
-  "add_fixture_description": "Add this item to your deck configuration. It will be referenced during protocol analysis.",
+  "add_fixture_description": "Add this hardware to your deck configuration. It will be referenced during protocol analysis.",
   "add_to_slot_description": "Choose an item below to add to your deck configuration. It will be referenced during protocol analysis.",
   "add_to_slot": "Add to slot {{slotName}}",
   "add": "Add",
