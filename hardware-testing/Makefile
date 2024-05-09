@@ -304,7 +304,7 @@ push-ot3-gravimetric:
 
 .PHONY: push-ot3-cavity
 push-ot3-cavity:
-	$(MAKE) apply-patches-gravimetric
+	$(MAKE) push-ot3-gravimetric
 	cd ../ && $(MAKE) -C api push-ot3
 	cd ../ && $(MAKE) -C hardware push-ot3
 
