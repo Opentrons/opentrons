@@ -44,9 +44,6 @@ from opentrons.protocol_engine import (
 from opentrons.protocol_api.core.engine import deck_conflict as DeckConflit
 
 
-from .config import CAVITY_1uL_COMMAND_VOL
-
-
 def _add_fake_simulate(
     ctx: protocol_api.ProtocolContext, is_simulating: bool
 ) -> protocol_api.ProtocolContext:
@@ -394,7 +391,13 @@ def _get_volumes(
             pipette_channels, pipette_volume, tip_volume, mode=mode
         )
     elif cavity:
-        test_volumes = [CAVITY_1uL_COMMAND_VOL]
+        if user_volumes:
+            _inp = input(
+                f"Enter desired volumes for tip{tip_volume}, do not enter more than one volume:"
+            )
+            test_volumes = [float(_inp)]
+        else:
+            test_volumes = [1]
     elif user_volumes:
         if ctx.is_simulating():
             rand_vols = [round(random() * tip_volume, 1) for _ in range(randint(1, 3))]
