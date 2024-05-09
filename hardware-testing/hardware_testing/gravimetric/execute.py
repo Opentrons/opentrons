@@ -579,7 +579,7 @@ def _get_liquid_height(
 
 def _multi_sense(
     resources: TestResources, cfg: config.GravimetricConfig, total_tips: int, well: Well
-):
+) -> float:
     height_sum: float = 0
     for h in range(_PROBES):
         tip = _next_tip_for_channel(cfg, resources, 0, total_tips)
@@ -594,12 +594,11 @@ def _multi_sense(
                 offset=_get_channel_offset(cfg, 0),
             )  # always trash calibration tips
     return height_sum / _PROBES
-    return
 
 
-def run(
+def run(  # noqa: C901
     cfg: config.GravimetricConfig, resources: TestResources, number_of_racks: int
-) -> None:  # noqa: C901
+) -> None:
     """Run."""
     global _PREV_TRIAL_GRAMS
     global _MEASUREMENTS
