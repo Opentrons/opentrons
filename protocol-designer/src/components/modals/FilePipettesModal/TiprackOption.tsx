@@ -1,41 +1,106 @@
 import * as React from 'react'
+import { useTranslation } from 'react-i18next'
+import { css } from 'styled-components'
 import {
   Flex,
-  Text,
-  Icon,
   DIRECTION_ROW,
   COLORS,
   SPACING,
   ALIGN_CENTER,
+  StyledText,
+  BORDERS,
+  useHoverTooltip,
+  Tooltip,
 } from '@opentrons/components'
 
 interface TiprackOptionProps {
   onClick: React.MouseEventHandler
   isSelected: boolean
+  isDisabled: boolean
   text: React.ReactNode
 }
 export function TiprackOption(props: TiprackOptionProps): JSX.Element {
-  const { text, onClick, isSelected } = props
+  const { text, onClick, isSelected, isDisabled } = props
+  const { t } = useTranslation('tooltip')
+  const [targetProps, tooltipProps] = useHoverTooltip()
+
+  const OPTION_STYLE = css`
+    background-color: ${COLORS.white};
+    border-radius: ${BORDERS.borderRadius8};
+    border: 1px ${BORDERS.styleSolid} ${COLORS.grey30};
+
+    &:hover {
+      background-color: ${COLORS.grey10};
+      border: 1px ${BORDERS.styleSolid} ${COLORS.grey35};
+    }
+
+    &:focus {
+      outline: 2px ${BORDERS.styleSolid} ${COLORS.blue50};
+      outline-offset: 3px;
+    }
+  `
+
+  const OPTION_SELECTED_STYLE = css`
+    ${OPTION_STYLE}
+    background-color: ${COLORS.blue10};
+    border: 1px ${BORDERS.styleSolid} ${COLORS.blue50};
+
+    &:hover {
+      border: 1px ${BORDERS.styleSolid} ${COLORS.blue50};
+      box-shadow: 0px 1px 3px 0px rgba(0, 0, 0, 0.2);
+    }
+  `
+
+  const OPTION_DISABLED_STYLE = css`
+    ${OPTION_STYLE}
+    background-color: ${COLORS.white};
+    border: 1px ${BORDERS.styleSolid} ${COLORS.grey30};
+    &:hover {
+      border: 1px ${BORDERS.styleSolid} ${COLORS.grey30};
+      background-color: ${COLORS.white};
+    }
+  `
+
+  let optionStyle
+  if (isDisabled) {
+    optionStyle = OPTION_DISABLED_STYLE
+  } else if (isSelected) {
+    optionStyle = OPTION_SELECTED_STYLE
+  } else {
+    optionStyle = OPTION_STYLE
+  }
+
   return (
-    <Flex
-      aria-label={`TiprackOption_flex_${text}`}
-      cursor="pointer"
-      onClick={onClick}
-      flexDirection={DIRECTION_ROW}
-      padding={SPACING.spacing6}
-      width="15rem"
-      alignItems={ALIGN_CENTER}
-      gridGap={SPACING.spacing4}
-    >
-      <Icon
-        aria-label={`TiprackOption_${
-          isSelected ? 'checkbox-marked' : 'checkbox-blank-outline'
-        }`}
-        color={isSelected ? COLORS.blue50 : COLORS.grey50}
-        size="1.25rem"
-        name={isSelected ? 'checkbox-marked' : 'checkbox-blank-outline'}
-      />
-      <Text fontSize="0.75rem">{text}</Text>
-    </Flex>
+    <>
+      <Flex
+        aria-label={`TiprackOption_flex_${text}`}
+        cursor="pointer"
+        onClick={isDisabled ? undefined : onClick}
+        flexDirection={DIRECTION_ROW}
+        alignItems={ALIGN_CENTER}
+        {...targetProps}
+      >
+        <StyledText
+          as="label"
+          width="13.5rem"
+          css={optionStyle}
+          alignItems={ALIGN_CENTER}
+          padding={SPACING.spacing8}
+          border={
+            isSelected && !isDisabled
+              ? BORDERS.activeLineBorder
+              : BORDERS.lineBorder
+          }
+          borderRadius={BORDERS.borderRadius8}
+          cursor={isDisabled ? 'auto' : 'pointer'}
+          backgroundColor={COLORS.transparent}
+        >
+          {text}
+        </StyledText>
+      </Flex>
+      {isDisabled ? (
+        <Tooltip {...tooltipProps}>{t('disabled_no_space_pipette')}</Tooltip>
+      ) : null}
+    </>
   )
 }

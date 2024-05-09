@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { Flex, DIRECTION_COLUMN } from '@opentrons/components'
+import { Flex, DIRECTION_COLUMN, SPACING } from '@opentrons/components'
 import { TiprackOption } from './TiprackOption'
 import type { Mount } from '@opentrons/components'
 import type { FormPipettesByMount } from '../../../step-forms'
@@ -30,21 +30,31 @@ export const TiprackSelect = (
 
   return (
     <Flex height="15rem" overflowY="scroll" flexDirection={DIRECTION_COLUMN}>
-      {tiprackOptions.map(option => (
-        <TiprackOption
-          isSelected={selectedValues.includes(option.value)}
-          key={option.name}
-          text={option.name}
-          onClick={() => {
-            const updatedValues = selectedValues?.includes(option.value)
-              ? selectedValues.filter(value => value !== option.value)
-              : [...(selectedValues ?? []), option.value]
-            onSetFieldValue(
-              `pipettesByMount.${mount}.tiprackDefURI`,
-              updatedValues.slice(0, 3)
-            )
-          }}
-        />
+      {tiprackOptions.map((option, index) => (
+        <Flex
+          marginBottom={SPACING.spacing4}
+          width="max-width"
+          key={`${option.name}_${index}`}
+        >
+          <TiprackOption
+            isDisabled={
+              selectedValues?.length === 3 &&
+              !selectedValues.includes(option.value)
+            }
+            isSelected={selectedValues.includes(option.value)}
+            key={option.name}
+            text={option.name}
+            onClick={() => {
+              const updatedValues = selectedValues?.includes(option.value)
+                ? selectedValues.filter(value => value !== option.value)
+                : [...(selectedValues ?? []), option.value]
+              onSetFieldValue(
+                `pipettesByMount.${mount}.tiprackDefURI`,
+                updatedValues.slice(0, 3)
+              )
+            }}
+          />
+        </Flex>
       ))}
     </Flex>
   )
