@@ -2,6 +2,7 @@ import * as React from 'react'
 import Markdown from 'react-markdown'
 
 import { StyledText } from '@opentrons/components'
+import { HorizontalRule } from './HorizontalRule'
 import { useIsOEMMode } from '../../resources/robot-settings/hooks'
 
 import styles from './styles.module.css'
@@ -28,6 +29,7 @@ export function ReleaseNotes(props: ReleaseNotesProps): JSX.Element {
             li: ListItemText,
             p: ParagraphText,
             a: ExternalLink,
+            hr: HorizontalRule,
           }}
         >
           {source}
