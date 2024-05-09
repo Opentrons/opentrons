@@ -7,7 +7,7 @@ from dataclasses import asdict
 from opentrons.drivers.types import AbsorbanceReaderLidStatus
 from opentrons.drivers.rpi_drivers.types import USBPort
 from opentrons.drivers.absorbance_reader.abstract import AbstractAbsorbanceReaderDriver
-from opentrons.drivers.absorbance_reader.async_byonoy import AsyncByonoy
+from .hid_protocol import HidInterface
 
 
 class AbsorbanceReaderDriver(AbstractAbsorbanceReaderDriver):
@@ -19,16 +19,18 @@ class AbsorbanceReaderDriver(AbstractAbsorbanceReaderDriver):
         loop: Optional[asyncio.AbstractEventLoop],
     ) -> AbsorbanceReaderDriver:
         """Create an absorbance reader driver."""
+        from .async_byonoy import AsyncByonoy
+
         connection = await AsyncByonoy.create(port=port, usb_port=usb_port, loop=loop)
         return cls(connection=connection)
 
-    def __init__(self, connection: AsyncByonoy) -> None:
+    def __init__(self, connection: HidInterface) -> None:
         self._connection = connection
 
     async def get_device_info(self) -> Dict[str, str]:
         """Get device info"""
         info = await self._connection.get_device_information()
-        return asdict(info)
+        return info
 
     async def connect(self) -> None:
         """Connect to absorbance reader"""

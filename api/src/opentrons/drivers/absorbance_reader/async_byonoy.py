@@ -1,35 +1,28 @@
 from __future__ import annotations
 
 import asyncio
-import contextlib
+import re
+import subprocess
 from dataclasses import dataclass
 from concurrent.futures.thread import ThreadPoolExecutor
 from functools import partial
-from typing import Optional, AsyncGenerator, Union, Tuple, List
-from typing_extensions import Literal
-from opentrons.drivers.types import AbsorbanceReaderLidStatus
+from typing import Optional, Union, List, Dict, Literal
 
+
+from .hid_protocol import HidInterface
+from opentrons.drivers.types import (
+    AbsorbanceReaderLidStatus,
+    AbsorbanceReaderPlatePresence,
+)
 from opentrons.drivers.rpi_drivers.types import USBPort
 
-import hid  # type: ignore[import-not-found]
 import pybyonoy_device_library as byonoy  # type: ignore[import-not-found]
+
 
 TimeoutProperties = Union[Literal["write_timeout"], Literal["timeout"]]
 
 
-def get_byonoy_device_from_sn(sn: str) -> byonoy.ByonoyDevice:
-    found = byonoy.byonoy_available_devices()
-    for device in found:
-        if device.sn == sn:
-            return device
-
-
-def get_device_number_at_port(usb_port: USBPort) -> str:
-    full_path = usb_port.name + ":" + usb_port.device_path.split("/")[0]
-    hid_port = [i for i in hid.enumerate() if full_path in i["path"].decode()]
-    assert len(hid_port) == 1, f"Expected 1 device, found {len(hid_port)}"
-    sn = hid_port[0]["serial_number"]
-    return str(sn)
+SN_PARSER = re.compile(r'ATTRS{serial}=="(?P<serial>.+?)"')
 
 
 @dataclass
@@ -41,8 +34,31 @@ class DeviceInfo:
     version: str
 
 
-class AsyncByonoy:
+class AsyncByonoy(HidInterface):
     """Async wrapper around Byonoy Device Library."""
+
+    @staticmethod
+    def get_byonoy_device_from_sn(sn: str) -> byonoy.ByonoyDevice:
+        found = byonoy.byonoy_available_devices()
+        for device in found:
+            if device.sn == sn:
+                return device
+
+    @staticmethod
+    def serial_number_from_port(port: str) -> str:
+        """
+        Get the serial number from a port using udevadm.
+
+        We need to walk up the chain of parent devices to look for the first
+        serial number value because the hid interface doesn't provide it.
+        """
+        output = subprocess.check_output(
+            f"udevadm info --name {port} --attribute-walk | grep serial -m1", shell=True
+        ).decode()
+        m = SN_PARSER.search(output)
+        if m:
+            return m.group("serial")
+        raise RuntimeError(f"Could not find serial number for port: {port}")
 
     @classmethod
     async def create(
@@ -69,9 +85,9 @@ class AsyncByonoy:
         """
         loop = loop or asyncio.get_running_loop()
         executor = ThreadPoolExecutor(max_workers=1)
-        device_sn = get_device_number_at_port(usb_port)
+        device_sn = cls.serial_number_from_port(port)
         device = await loop.run_in_executor(
-            executor=executor, func=partial(get_byonoy_device_from_sn, device_sn)
+            executor=executor, func=partial(cls.get_byonoy_device_from_sn, device_sn)
         )
         return cls(
             device=device,
@@ -118,7 +134,7 @@ class AsyncByonoy:
             self._cleanup()
 
     def verify_device_handle(self) -> None:
-        assert self._device_handle, RuntimeError("Device handle not initialized")
+        assert self._device_handle, RuntimeError("Device handle not set up.")
 
     def _get_device_information(self) -> byonoy.ByonoyDeviceInfo:
         self.verify_device_handle()
@@ -232,15 +248,15 @@ class AsyncByonoy:
         """
         return self._device_handle is not None
 
-    async def get_device_information(self) -> DeviceInfo:
+    async def get_device_information(self) -> Dict[str, str]:
         device_info = await self._loop.run_in_executor(
             executor=self._executor, func=self._get_device_information
         )
-        return DeviceInfo(
-            serial_number=device_info.sn,
-            reference_number=device_info.ref_no,
-            version=device_info.version,
-        )
+        return {
+            "serial_number": device_info.sn,
+            "reference_number": device_info.ref_no,
+            "version": device_info.version,
+        }
 
     async def get_lid_status(self) -> AbsorbanceReaderLidStatus:
         lid_info = await self._loop.run_in_executor(
@@ -265,3 +281,6 @@ class AsyncByonoy:
             executor=self._executor,
             func=partial(self._get_single_measurement, wavelength),
         )
+
+    async def get_plate_presence(self) -> AbsorbanceReaderPlatePresence:
+        return AbsorbanceReaderPlatePresence.UNKNOWN
