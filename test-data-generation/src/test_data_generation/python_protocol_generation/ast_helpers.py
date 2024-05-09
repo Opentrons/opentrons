@@ -47,22 +47,9 @@ class BaseCall:
         else:
             return self.what_to_call
 
-    def generate_ast(self) -> ast.Call:
+    def generate_ast(self) -> ast.AST:
         """Generate an AST node for the call."""
-        what_to_call = (
-            self.what_to_call.value
-            if isinstance(self.what_to_call, ProtocolContextMethods)
-            else self.what_to_call
-        )
-        return ast.Call(
-            func=ast.Attribute(
-                value=ast.Name(id=self.call_on, ctx=ast.Load()),
-                attr=what_to_call,
-                ctx=ast.Load(),
-            ),
-            args=[ast.Constant(str_arg) for str_arg in self.args],
-            keywords=[],
-        )
+        raise NotImplementedError
 
 
 @dataclass
@@ -88,7 +75,7 @@ class CallFunction(BaseCall):
 class CallAttribute(BaseCall):
     """Class to represent a method or function call."""
 
-    def generate_ast(self) -> ast.Call:
+    def generate_ast(self) -> ast.Expr:
         """Generate an AST node for the call."""
         return ast.Expr(
             value=ast.Attribute(

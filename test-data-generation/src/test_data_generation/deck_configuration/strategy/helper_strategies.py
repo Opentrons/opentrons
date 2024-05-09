@@ -156,12 +156,11 @@ def a_column(
 def a_deck_by_columns(
     draw: st.DrawFn,
     thermocycler_on_deck: bool | None = None,
-    col_1_contents=PSC.all(),
-    col_2_contents=PSC.all(),
-    col_3_contents=PSC.all(),
+    col_1_contents: typing.List[PSC] = PSC.all(),
+    col_2_contents: typing.List[PSC] = PSC.all(),
+    col_3_contents: typing.List[PSC] = PSC.all(),
 ) -> DeckConfiguration:
     """Generate a deck by columns."""
-
     if thermocycler_on_deck is None:
         thermocycler_on_deck = draw(st.booleans())
 

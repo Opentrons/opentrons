@@ -11,7 +11,7 @@ from test_data_generation.python_protocol_generation.util import ProtocolContext
 
 def create_call_to_attribute_on_loaded_entity(
     load_statement: ast_h.AssignStatement,
-) -> ast_h.CallFunction:
+) -> ast_h.CallAttribute:
     """Create a call statement from a load statement."""
     assert isinstance(load_statement.value, ast_h.CallFunction)
 
@@ -31,7 +31,7 @@ def create_call_to_attribute_on_loaded_entity(
 
 def create_calls_to_loaded_entities(
     load_statements: typing.List[ast_h.AssignStatement],
-) -> typing.List[ast_h.CallFunction]:
+) -> typing.List[ast_h.CallAttribute]:
     """Create calls to loaded entity from ."""
     return [
         create_call_to_attribute_on_loaded_entity(entity) for entity in load_statements
