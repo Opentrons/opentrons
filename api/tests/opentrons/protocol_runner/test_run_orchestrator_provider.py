@@ -21,7 +21,6 @@ from opentrons.protocol_runner.protocol_runner import (
     LiveRunner,
     AnyRunner,
 )
-from robot_server.runs.run_models import Run
 
 
 @pytest.fixture
@@ -66,7 +65,7 @@ def json_protocol_subject(
     mock_hardware_api: HardwareAPI,
     mock_protocol_json_runner: JsonRunner,
     mock_fixit_runner: LiveRunner,
-    mock_setup_runner: LiveRunner
+    mock_setup_runner: LiveRunner,
 ) -> RunOrchestrator:
     return RunOrchestrator(
         protocol_engine=mock_protocol_engine,
@@ -76,13 +75,14 @@ def json_protocol_subject(
         json_or_python_protocol_runner=mock_protocol_json_runner,
     )
 
+
 @pytest.fixture
 def python_protocol_subject(
     mock_protocol_engine: ProtocolEngine,
     mock_hardware_api: HardwareAPI,
     mock_protocol_python_runner: PythonAndLegacyRunner,
     mock_fixit_runner: LiveRunner,
-    mock_setup_runner: LiveRunner
+    mock_setup_runner: LiveRunner,
 ) -> RunOrchestrator:
     return RunOrchestrator(
         protocol_engine=mock_protocol_engine,
@@ -99,12 +99,12 @@ def python_protocol_subject(
         (
             JsonProtocolConfig(schema_version=7),
             lazy_fixture("mock_protocol_json_runner"),
-            lazy_fixture("json_protocol_subject")
+            lazy_fixture("json_protocol_subject"),
         ),
         (
             PythonProtocolConfig(api_version=APIVersion(2, 14)),
             lazy_fixture("mock_protocol_python_runner"),
-            lazy_fixture("python_protocol_subject")
+            lazy_fixture("python_protocol_subject"),
         ),
         (None, None, lazy_fixture("python_protocol_subject")),
         (None, None, lazy_fixture("json_protocol_subject")),
@@ -122,7 +122,9 @@ def test_build_run_orchestrator_provider(
     mock_protocol_runner: Optional[Union[PythonAndLegacyRunner, JsonRunner]],
 ) -> None:
     mock_create_runner_func = decoy.mock(func=protocol_runner.create_protocol_runner)
-    monkeypatch.setattr(protocol_runner, "create_protocol_runner", mock_create_runner_func)
+    monkeypatch.setattr(
+        protocol_runner, "create_protocol_runner", mock_create_runner_func
+    )
 
     decoy.when(
         mock_create_runner_func(
@@ -164,10 +166,26 @@ def test_build_run_orchestrator_provider(
 @pytest.mark.parametrize(
     "runner, command_intent, subject",
     [
-        (lazy_fixture("mock_setup_runner"), pe_commands.CommandIntent.SETUP, lazy_fixture("python_protocol_subject")),
-        (lazy_fixture("mock_fixit_runner"), pe_commands.CommandIntent.FIXIT, lazy_fixture("python_protocol_subject")),
-        (lazy_fixture("mock_setup_runner"), pe_commands.CommandIntent.SETUP, lazy_fixture("json_protocol_subject")),
-        (lazy_fixture("mock_fixit_runner"), pe_commands.CommandIntent.FIXIT, lazy_fixture("json_protocol_subject")),
+        (
+            lazy_fixture("mock_setup_runner"),
+            pe_commands.CommandIntent.SETUP,
+            lazy_fixture("python_protocol_subject"),
+        ),
+        (
+            lazy_fixture("mock_fixit_runner"),
+            pe_commands.CommandIntent.FIXIT,
+            lazy_fixture("python_protocol_subject"),
+        ),
+        (
+            lazy_fixture("mock_setup_runner"),
+            pe_commands.CommandIntent.SETUP,
+            lazy_fixture("json_protocol_subject"),
+        ),
+        (
+            lazy_fixture("mock_fixit_runner"),
+            pe_commands.CommandIntent.FIXIT,
+            lazy_fixture("json_protocol_subject"),
+        ),
         (
             lazy_fixture("mock_protocol_json_runner"),
             pe_commands.CommandIntent.PROTOCOL,
@@ -190,7 +208,9 @@ def test_add_command(
     command_to_queue = pe_commands.HomeCreate.construct(
         intent=command_intent, params=pe_commands.HomeParams.construct()
     )
-    decoy.when(runner.set_command_queued(command_to_queue)).then_return(command_to_queue)
+    decoy.when(runner.set_command_queued(command_to_queue)).then_return(
+        command_to_queue
+    )
     result = subject.add_command(command_to_queue)
 
     assert result == command_to_queue

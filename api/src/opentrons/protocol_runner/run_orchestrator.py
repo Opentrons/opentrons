@@ -113,3 +113,10 @@ class RunOrchestrator:
             and self._json_or_python_runner is not None
         ):
             return self._json_or_python_runner.set_command_queued(request)
+
+    def get_protocol_runner(self) -> Optional[Union[protocol_runner.JsonRunner, protocol_runner.PythonAndLegacyRunner]]:
+        return self._json_or_python_runner
+
+    def get_protocol_engine(self) -> Optional[Union[protocol_runner.JsonRunner, protocol_runner.PythonAndLegacyRunner]]:
+        return self._protocol_engine
+

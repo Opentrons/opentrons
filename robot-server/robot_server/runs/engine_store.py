@@ -25,6 +25,7 @@ from opentrons.protocol_runner import (
     RunResult,
     create_protocol_runner,
 )
+from opentrons.run_orchestrator import RunOrchestrator
 from opentrons.protocol_engine import (
     Config as ProtocolEngineConfig,
     DeckType,
@@ -56,12 +57,12 @@ class NoRunnerEnginePairError(RuntimeError):
     """Raised if you try to get the current engine or runner while there is none."""
 
 
-class RunnerEnginePair(NamedTuple):
-    """A stored Runner/ProtocolEngine pair."""
-
-    run_id: str
-    runner: AnyRunner
-    engine: ProtocolEngine
+# class RunnerEnginePair(NamedTuple):
+#     """A stored Runner/ProtocolEngine pair."""
+#
+#     run_id: str
+#     runner: AnyRunner
+#     engine: ProtocolEngine
 
 
 async def handle_estop_event(engine_store: "EngineStore", event: HardwareEvent) -> None:
@@ -125,30 +126,31 @@ class EngineStore:
         self._hardware_api = hardware_api
         self._robot_type = robot_type
         self._deck_type = deck_type
-        self._default_engine: Optional[ProtocolEngine] = None
-        self._runner_engine_pair: Optional[RunnerEnginePair] = None
+        # self._default_engine: Optional[ProtocolEngine] = None
+        self._run_orchestrator: Optional[RunOrchestrator] = None
+        # self._runner_engine_pair: Optional[RunnerEnginePair] = None
         hardware_api.register_callback(_get_estop_listener(self))
 
     @property
     def engine(self) -> ProtocolEngine:
         """Get the "current" persisted ProtocolEngine."""
-        if self._runner_engine_pair is None:
+        if self._run_orchestrator is None:
             raise NoRunnerEnginePairError()
-        return self._runner_engine_pair.engine
+        return self._run_orchestrator.get_protocol_engine()
 
     @property
     def runner(self) -> AnyRunner:
         """Get the "current" persisted ProtocolRunner."""
-        if self._runner_engine_pair is None:
+        if self._run_orchestrator is None:
             raise NoRunnerEnginePairError()
-        return self._runner_engine_pair.runner
+        return self._run_orchestrator.get_protocol_runner()
 
     @property
     def current_run_id(self) -> Optional[str]:
         """Get the run identifier associated with the current engine/runner pair."""
         return (
-            self._runner_engine_pair.run_id
-            if self._runner_engine_pair is not None
+            self._run_orchestrator.run_id
+            if self._run_orchestrator is not None
             else None
         )
 
@@ -231,7 +233,8 @@ class EngineStore:
         post_run_hardware_state = PostRunHardwareState.HOME_AND_STAY_ENGAGED
         drop_tips_after_run = True
 
-        runner = create_protocol_runner(
+        self._run_orchestrator = RunOrchestrator.build_orchestrator(
+            run_id=run_id,
             protocol_engine=engine,
             hardware_api=self._hardware_api,
             protocol_config=protocol.source.config if protocol else None,
@@ -246,11 +249,13 @@ class EngineStore:
         # concurrency hazard. If two requests simultaneously call this method,
         # they will both "succeed" (with undefined results) instead of one
         # raising EngineConflictError.
-        if isinstance(runner, PythonAndLegacyRunner):
+        if isinstance(
+            self._run_orchestrator.get_protocol_runner(), PythonAndLegacyRunner
+        ):
             assert (
                 protocol is not None
             ), "A Python protocol should have a protocol source file."
-            await runner.load(
+            await self._run_orchestrator.load(
                 protocol.source,
                 # Conservatively assume that we're re-running a protocol that
                 # was uploaded before we added stricter validation, and that
@@ -258,22 +263,22 @@ class EngineStore:
                 python_parse_mode=PythonParseMode.ALLOW_LEGACY_METADATA_AND_REQUIREMENTS,
                 run_time_param_values=run_time_param_values,
             )
-        elif isinstance(runner, JsonRunner):
+        elif isinstance(self._run_orchestrator.get_protocol_runner(), JsonRunner):
             assert (
                 protocol is not None
             ), "A JSON protocol should have a protocol source file."
-            await runner.load(protocol.source)
+            await self._run_orchestrator.load(protocol.source)
         else:
-            runner.prepare()
+            self._run_orchestrator.prepare()
 
         for offset in labware_offsets:
             engine.add_labware_offset(offset)
 
-        self._runner_engine_pair = RunnerEnginePair(
-            run_id=run_id,
-            runner=runner,
-            engine=engine,
-        )
+        # self._runner_engine_pair = RunnerEnginePair(
+        #     run_id=run_id,
+        #     runner=runner,
+        #     engine=engine,
+        # )
 
         return engine.state_view.get_summary()
 
