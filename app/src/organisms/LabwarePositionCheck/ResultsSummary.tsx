@@ -360,7 +360,12 @@ export const TerseOffsetTable = (props: OffsetTableProps): JSX.Element => {
                 ) : null}
               </TerseTableDatum>
               <TerseTableDatum>
-                <StyledText as="p">{labwareDisplayName}</StyledText>
+                <StyledText
+                  fontSize={TYPOGRAPHY.fontSize20}
+                  lineHeight={TYPOGRAPHY.lineHeight24}
+                >
+                  {labwareDisplayName}
+                </StyledText>
               </TerseTableDatum>
               <TerseTableDatum>
                 {isEqual(vector, IDENTITY_VECTOR) ? (
@@ -370,14 +375,20 @@ export const TerseOffsetTable = (props: OffsetTableProps): JSX.Element => {
                     {[vector.x, vector.y, vector.z].map((axis, index) => (
                       <React.Fragment key={index}>
                         <StyledText
-                          as="p"
+                          fontSize={TYPOGRAPHY.fontSize20}
+                          lineHeight={TYPOGRAPHY.lineHeight24}
                           marginLeft={index > 0 ? SPACING.spacing8 : 0}
                           marginRight={SPACING.spacing4}
                           fontWeight={TYPOGRAPHY.fontWeightSemiBold}
                         >
                           {['X', 'Y', 'Z'][index]}
                         </StyledText>
-                        <StyledText as="p">{axis.toFixed(1)}</StyledText>
+                        <StyledText
+                          fontSize={TYPOGRAPHY.fontSize20}
+                          lineHeight={TYPOGRAPHY.lineHeight24}
+                        >
+                          {axis.toFixed(1)}
+                        </StyledText>
                       </React.Fragment>
                     ))}
                   </Flex>
