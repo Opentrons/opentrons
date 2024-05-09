@@ -2153,11 +2153,16 @@ class OT3API(
         realmount = OT3Mount.from_mount(mount)
         instrument = self._pipette_handler.get_pipette(realmount)
 
-        def add_tip_to_instr() -> None:
-            instrument.add_tip(tip_length=tip_length)
-            instrument.set_current_volume(0)
+        async def add_tip_to_instr() -> None:
             if isinstance(self._backend, OT3Simulator):
+                instrument.add_tip(tip_length=tip_length)
+                instrument.set_current_volume(0)
                 self._backend._update_tip_state(realmount, True)
+            else:
+                status = await self.get_tip_presence_status(mount, InstrumentProbeType.PRIMARY)
+                if status == TipStateType.PRESENT:
+                    instrument.add_tip(tip_length=tip_length)
+                    instrument.set_current_volume(0)
 
         await self._move_to_plunger_bottom(realmount, rate=1.0)
         if (
@@ -2195,7 +2200,7 @@ class OT3API(
                 realmount, top_types.Point(z=spec.ending_z_retract_distance)
             )
 
-        add_tip_to_instr()
+        await add_tip_to_instr()
 
         if prep_after:
             await self.prepare_for_aspirate(realmount)
