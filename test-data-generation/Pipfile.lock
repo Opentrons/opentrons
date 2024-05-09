@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "4874d951f3ae3a91e542cd14c9dca14eeb31d1caa77e39de028d17d6a21840bd"
+            "sha256": "149f388d38898e580ae235ebf800a3959e1018e27ceef1d12612efc5f6bad328"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -88,14 +88,6 @@
             ],
             "markers": "python_version < '3.11'",
             "version": "==1.2.1"
-        },
-        "execnet": {
-            "hashes": [
-                "sha256:26dee51f1b80cebd6d0ca8e74dd8745419761d3bef34163928cbebbdc4749fdc",
-                "sha256:5189b52c6121c24feae288166ab41b32549c7e2348652736540b9e6e7d4e72e3"
-            ],
-            "markers": "python_version >= '3.8'",
-            "version": "==2.1.1"
         },
         "flake8": {
             "hashes": [
@@ -428,15 +420,6 @@
             "index": "pypi",
             "markers": "python_version >= '3.8'",
             "version": "==0.23.6"
-        },
-        "pytest-xdist": {
-            "hashes": [
-                "sha256:9ed4adfb68a016610848639bb7e02c9352d5d9f03d04809919e2dafc3be4cca7",
-                "sha256:ead156a4db231eec769737f57668ef58a2084a34b2e55c4a8fa20d861107300d"
-            ],
-            "index": "pypi",
-            "markers": "python_version >= '3.8'",
-            "version": "==3.6.1"
         },
         "sniffio": {
             "hashes": [
