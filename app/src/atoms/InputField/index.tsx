@@ -214,7 +214,7 @@ function Input(props: InputFieldProps): JSX.Element {
   `
 
   const TITLE_STYLE = css`
-    color: ${hasError ? COLORS.red50 : COLORS.black90};
+    color: ${COLORS.black90};
     padding-bottom: ${SPACING.spacing8};
     text-align: ${textAlign};
     @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
