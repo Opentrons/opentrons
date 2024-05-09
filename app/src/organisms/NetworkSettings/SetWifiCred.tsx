@@ -34,15 +34,13 @@ export function SetWifiCred({
   const [showPassword, setShowPassword] = React.useState<boolean>(false)
   const inputRef = React.useRef<HTMLInputElement>(null)
   const isUnboxingFlowOngoing = useIsUnboxingFlowOngoing()
-
+  const MemoizedInput = React.memo(InputField)
   const handleBlur = (): void => {
     if (inputRef.current != null) inputRef.current?.focus()
   }
 
   React.useEffect(() => {
-    if (inputRef.current != null || password.length > 0) {
-      console.log('hello')
-      console.log(inputRef?.current)
+    if (inputRef.current != null) {
       inputRef?.current?.focus()
     }
   }, [password])
@@ -63,7 +61,7 @@ export function SetWifiCred({
           justifyContent={JUSTIFY_SPACE_BETWEEN}
         >
           <Box width="100%">
-            <InputField
+            <MemoizedInput
               aria-label="wifi_password"
               id="wifiPassword"
               value={password}
@@ -77,11 +75,7 @@ export function SetWifiCred({
             marginLeft={SPACING.spacing24}
             onClick={() => {
               setShowPassword(currentState => !currentState)
-              const input = document.querySelector('input')
-              console.log('onclick')
-              console.log(input)
               inputRef?.current?.focus()
-              input?.setSelectionRange(input.value.length, input.value.length)
             }}
           >
             <Flex
