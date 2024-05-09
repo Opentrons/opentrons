@@ -80,7 +80,7 @@ export const ICON_DATA_BY_NAME = {
   'checkbox-blank-outline': {
     path:
       'M19 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2m0 2v14H5V5h14z',
-    viewBox: '0 0 24 24',
+    viewBox: '3 3 18 18',
   },
   'checkbox-marked': {
     path:
@@ -362,7 +362,7 @@ export const ICON_DATA_BY_NAME = {
   'ot-checkbox': {
     path:
       'M 10.3839,4.5 5.5,9.38388 2.61612,6.5 3.5,5.61612 l 2,2 4,-4 z M 1.5,0 C 0.671573,0 0,0.671573 0,1.5 v 10 C 0,12.3284 0.671573,13 1.5,13 h 10 C 12.3284,13 13,12.3284 13,11.5 V 1.5 C 13,0.671573 12.3284,0 11.5,0 Z',
-    viewBox: '-1 -1 16 16',
+    viewBox: '0 0 13 13',
   },
   'ot-click-and-drag': {
     path:
