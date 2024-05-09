@@ -137,13 +137,6 @@ export const aspirate: CommandCreator<ExtendedAspirateParams> = (
   ) {
     errors.push(errorCreators.heaterShakerIsShaking())
   }
-  console.log(
-    pipetteAdjacentHeaterShakerWhileShaking(
-      prevRobotState.modules,
-      slotName,
-      isFlexPipette ? FLEX_ROBOT_TYPE : OT2_ROBOT_TYPE
-    )
-  )
   if (
     pipetteAdjacentHeaterShakerWhileShaking(
       prevRobotState.modules,
