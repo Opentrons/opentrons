@@ -2159,7 +2159,9 @@ class OT3API(
                 instrument.set_current_volume(0)
                 self._backend._update_tip_state(realmount, True)
             else:
-                status = await self.get_tip_presence_status(mount, InstrumentProbeType.PRIMARY)
+                status = await self.get_tip_presence_status(
+                    mount, InstrumentProbeType.PRIMARY
+                )
                 if status == TipStateType.PRESENT:
                     instrument.add_tip(tip_length=tip_length)
                     instrument.set_current_volume(0)
