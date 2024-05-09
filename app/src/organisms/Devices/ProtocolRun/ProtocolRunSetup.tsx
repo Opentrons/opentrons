@@ -162,6 +162,9 @@ export function ProtocolRunSetup({
   )
   const hasFixtures = requiredDeckConfigCompatibility.length > 0
 
+  const flexDeckHardwareDescription = hasModules || hasFixtures ? t('install_modules_and_fixtures') : t('no_deck_hardware_specified')
+  const ot2DeckHardwareDescription = hasModules ? t('install_modules', {count: modules.length}) : t('no_deck_hardware_specified')
+
   const StepDetailMap: Record<
     StepKey,
     { stepInternals: JSX.Element; description: string }
@@ -197,7 +200,7 @@ export function ProtocolRunSetup({
           protocolAnalysis={protocolAnalysis}
         />
       ),
-      description: hasModules || hasFixtures ? t('install_modules_and_fixtures') : t('no_deck_hardware_specified'),
+      description: isFlex ? flexDeckHardwareDescription : ot2DeckHardwareDescription 
     },
     [LPC_KEY]: {
       stepInternals: (
