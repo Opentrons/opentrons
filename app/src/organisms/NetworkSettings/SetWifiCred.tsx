@@ -7,6 +7,7 @@ import {
   Btn,
   DIRECTION_COLUMN,
   DIRECTION_ROW,
+  DISPLAY_FLEX,
   Flex,
   Icon,
   JUSTIFY_SPACE_BETWEEN,
@@ -53,42 +54,41 @@ export function SetWifiCred({
         padding={`0 6.25rem ${SPACING.spacing40}`}
         marginTop={isUnboxingFlowOngoing ? undefined : '7.75rem'}
       >
-        <StyledText as="p" marginBottom={SPACING.spacing12}>
-          {t('enter_password')}
-        </StyledText>
-        <Flex
-          flexDirection={DIRECTION_ROW}
-          justifyContent={JUSTIFY_SPACE_BETWEEN}
-        >
-          <Box width="100%">
-            <MemoizedInput
-              aria-label="wifi_password"
-              id="wifiPassword"
-              value={password}
-              type={showPassword ? 'text' : 'password'}
-              onBlur={handleBlur}
-              ref={inputRef}
-              autoFocus
-            />
-          </Box>
-          <Btn
-            marginLeft={SPACING.spacing24}
-            onClick={() => {
-              setShowPassword(currentState => !currentState)
-              inputRef?.current?.focus()
-            }}
+        <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing8}>
+          <StyledText as="p">{t('enter_password')}</StyledText>
+          <Flex
+            flexDirection={DIRECTION_ROW}
+            justifyContent={JUSTIFY_SPACE_BETWEEN}
+            gridGap={SPACING.spacing24}
           >
-            <Flex
+            <Box width="42.625rem">
+              <MemoizedInput
+                aria-label="wifi_password"
+                id="wifiPassword"
+                value={password}
+                type={showPassword ? 'text' : 'password'}
+                onBlur={handleBlur}
+                ref={inputRef}
+                autoFocus
+              />
+            </Box>
+            <Btn
+              onClick={() => {
+                setShowPassword(currentState => !currentState)
+                inputRef?.current?.focus()
+              }}
+              display={DISPLAY_FLEX}
               flexDirection={DIRECTION_ROW}
               alignItems={ALIGN_CENTER}
-              gridGap={SPACING.spacing16}
+              gridGap={SPACING.spacing12}
+              width="7.375rem"
             >
               <Icon name={showPassword ? 'eye-slash' : 'eye'} size="3rem" />
               <StyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
                 {showPassword ? t('hide') : t('show')}
               </StyledText>
-            </Flex>
-          </Btn>
+            </Btn>
+          </Flex>
         </Flex>
       </Flex>
       <Flex width="100%" position={POSITION_FIXED} left="0" bottom="0">

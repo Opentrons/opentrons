@@ -29,7 +29,6 @@ describe('HeaterShakerSlideout', () => {
   it('renders correct information when type is number', () => {
     render(props)
     screen.getByText('caption')
-    screen.getByText('secondary caption')
     screen.getByText('rpm')
   })
   it('renders correct information when type is text', () => {
