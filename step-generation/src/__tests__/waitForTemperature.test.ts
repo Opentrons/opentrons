@@ -9,7 +9,7 @@ import {
   getStateAndContextTempTCModules,
   robotWithStatusAndTemp,
 } from '../fixtures'
-import { WaitForTemperatureArgs, InvariantContext, RobotState } from '../types'
+import type { WaitForTemperatureArgs, InvariantContext, RobotState } from '../types'
 
 describe('waitForTemperature', () => {
   const temperatureModuleId = 'temperatureModuleId'

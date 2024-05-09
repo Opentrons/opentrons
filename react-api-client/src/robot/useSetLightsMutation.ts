@@ -1,17 +1,13 @@
-import {
+import { setLights } from '@opentrons/api-client'
+import { useMutation } from 'react-query'
+import { useHost } from '../api'
+import type { UseMutationResult, UseMutateFunction, UseMutationOptions } from 'react-query'
+import type { AxiosError } from 'axios'
+import type {
   HostConfig,
   Lights,
-  setLights,
   SetLightsData,
 } from '@opentrons/api-client'
-import {
-  UseMutationResult,
-  useMutation,
-  UseMutateFunction,
-  UseMutationOptions,
-} from 'react-query'
-import { useHost } from '../api'
-import type { AxiosError } from 'axios'
 
 export type UseSetLightsMutationResult = UseMutationResult<
   Lights,

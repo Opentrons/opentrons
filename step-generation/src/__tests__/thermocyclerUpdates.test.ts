@@ -23,7 +23,8 @@ import type {
   TemperatureParams,
   ThermocyclerSetTargetBlockTemperatureParams,
 } from '@opentrons/shared-data/protocol/types/schemaV6/command/module'
-import { InvariantContext, RobotState, ThermocyclerModuleState } from '../types'
+import type { InvariantContext, RobotState, ThermocyclerModuleState } from '../types'
+
 const forThermocyclerSetTargetBlockTemperature = makeImmutableStateUpdater(
   _forThermocyclerSetTargetBlockTemperature
 )

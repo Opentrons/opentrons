@@ -14,12 +14,14 @@ import {
   SOURCE_LABWARE,
   getInitialRobotStateStandard,
 } from '../fixtures'
-
 import {
   dispenseUpdateLiquidState,
+} from '../getNextRobotStateAndWarnings/dispenseUpdateLiquidState'
+
+import type { LabwareDefinition2 } from '@opentrons/shared-data'
+import type {
   DispenseUpdateLiquidStateArgs,
 } from '../getNextRobotStateAndWarnings/dispenseUpdateLiquidState'
-import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import type { InvariantContext, RobotState } from '../types'
 
 const fixture96Plate = _fixture96Plate as LabwareDefinition2

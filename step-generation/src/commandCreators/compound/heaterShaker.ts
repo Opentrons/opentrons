@@ -1,10 +1,5 @@
 import { curryCommandCreator, reduceCommandCreators } from '../../utils'
 import * as errorCreators from '../../errorCreators'
-import {
-  CommandCreator,
-  CurriedCommandCreator,
-  HeaterShakerArgs,
-} from '../../types'
 import { getModuleState } from '../../robotStateSelectors'
 import { delay } from '../atomic/delay'
 import { heaterShakerOpenLatch } from '../atomic/heaterShakerOpenLatch'
@@ -13,6 +8,12 @@ import { heaterShakerDeactivateHeater } from '../atomic/heaterShakerDeactivateHe
 import { setTemperature } from '../atomic/setTemperature'
 import { heaterShakerStopShake } from '../atomic/heaterShakerStopShake'
 import { heaterShakerSetTargetShakeSpeed } from '../atomic/heaterShakerSetTargetShakeSpeed'
+
+import type {
+  CommandCreator,
+  CurriedCommandCreator,
+  HeaterShakerArgs,
+} from '../../types'
 
 export const heaterShaker: CommandCreator<HeaterShakerArgs> = (
   args,

@@ -1,4 +1,4 @@
-import {
+import type {
   RunAction,
   RUN_ACTION_TYPE_PLAY,
   RUN_ACTION_TYPE_PAUSE,

@@ -8,11 +8,14 @@ import {
   DEST_LABWARE,
 } from './data'
 import {
+  ONE_CHANNEL_WASTE_CHUTE_ADDRESSABLE_AREA,
+} from '@opentrons/shared-data'
+
+import type {
   AddressableAreaName,
   AspDispAirgapParams,
   BlowoutParams,
   CreateCommand,
-  ONE_CHANNEL_WASTE_CHUTE_ADDRESSABLE_AREA,
   TouchTipParams,
 } from '@opentrons/shared-data'
 import type { CommandsAndWarnings, CommandCreatorErrorResponse } from '../types'
