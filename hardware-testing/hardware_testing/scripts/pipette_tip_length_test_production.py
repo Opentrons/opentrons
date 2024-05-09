@@ -313,7 +313,7 @@ async def _main() -> None:
         tip_attached = nozzle_measurement - tip_measurement
         measured_tip_overlap = tip_attached + measured_tip_overlap
         print(f"Tip_Overlap: {measured_tip_overlap}")
-        d_str = f"{pipette_id}, {noz_loc},{tip_loc}, {measured_tip_overlap}, {nozzle_measurement}, {tip_measurement}, {tip_attached}, {tip_count}, {tip_length[args.tip_size] + tip_overlap}, Nozzle \n"
+        d_str = f"{pipette_id}, {noz_loc},{tip_loc}, {measured_tip_overlap}, {nozzle_measurement}, {tip_measurement}, {tip_attached}, {tip_count}, {tip_length[args.tip_size] + tip_overlap}, {args.nozzle} \n"
         data.append_data_to_file(test_n, "", test_f, d_str)
 
     # Move to trash slot
@@ -326,45 +326,52 @@ async def _main() -> None:
     y_offset = 0
     try:
         for tip in range(2, args.tips_to_use + 1):
-            y_offset -= 9
+            if args.channel == 1:
+                y_offset -= 9
+            else:
+                y_offset = -9
             print("tip_count: ", tip_count)
             print("y_offset: ",y_offset)
-            if tip_count % 8 == 0:
-                y_offset = 0
-            if tip_count % 8 == 0:
+            if args.channel == 1:
+                if tip_count % 8 == 0:
+                    y_offset = 0
+                if tip_count % 8 == 0:
+                    x_offset += 9
+            else:
                 x_offset += 9
             cp = CriticalPoint.NOZZLE
-            await move_to_point(hw_api, mount, nozzle_dial_point, cp)
-            noz_loc = await hw_api.encoder_current_position_ot3(mount, cp)
-            noz_loc = noz_loc[Axis.by_mount(mount)]
-            await asyncio.sleep(3)
-            nozzle_measurement = gauge.read()
-            await asyncio.sleep(1)
-            tip_location = Point(tiprack_loc.x + x_offset,
-                                tiprack_loc.y + y_offset,
-                                tiprack_loc.z)
-            await move_to_point(hw_api, mount, tip_location, cp)
-            location = "Tiprack"
-            await hw_api.pick_up_tip(
-                mount, tip_length=tip_length[args.tip_size]
-            )
-            cp = CriticalPoint.TIP
-            await move_to_point(hw_api,
-                                mount,
-                                nozzle_dial_point,
-                                cp)
-            await asyncio.sleep(3)
-            tip_measurement = gauge.read()
-            await asyncio.sleep(1)
-            tip_loc = await hw_api.encoder_current_position_ot3(mount = mount,
-                                            critical_point = CriticalPoint.NOZZLE)
-            tip_loc = tip_loc[Axis.by_mount(mount)]
-            measured_tip_overlap = (tip_length[args.tip_size]+tip_overlap) - (tip_loc - noz_loc) # tiplength - tip overlap.
-            tip_attached = (nozzle_measurement - tip_measurement)
-            measured_tip_overlap = tip_attached + measured_tip_overlap
-            print(f"Tip_Overlap: {measured_tip_overlap}")
-            d_str = f"{pipette_id}, {noz_loc},{tip_loc}, {measured_tip_overlap}, {nozzle_measurement}, {tip_measurement}, {tip_attached}, {tip_count}, {tip_length[args.tip_size] + tip_overlap}, Nozzle \n"
-            data.append_data_to_file(test_n, "", test_f, d_str)
+            for nozzle in args.channel:
+                await move_to_point(hw_api, mount, nozzle_dial_point + Point(y=9*nozzle), cp)
+                noz_loc = await hw_api.encoder_current_position_ot3(mount, cp)
+                noz_loc = noz_loc[Axis.by_mount(mount)]
+                await asyncio.sleep(3)
+                nozzle_measurement = gauge.read()
+                await asyncio.sleep(1)
+                tip_location = Point(tiprack_loc.x + x_offset,
+                                    tiprack_loc.y + y_offset,
+                                    tiprack_loc.z)
+                await move_to_point(hw_api, mount, tip_location, cp)
+                location = "Tiprack"
+                await hw_api.pick_up_tip(
+                    mount, tip_length=tip_length[args.tip_size]
+                )
+                cp = CriticalPoint.TIP
+                await move_to_point(hw_api,
+                                    mount,
+                                    nozzle_dial_point + Point(y=9*nozzle),
+                                    cp)
+                await asyncio.sleep(3)
+                tip_measurement = gauge.read()
+                await asyncio.sleep(1)
+                tip_loc = await hw_api.encoder_current_position_ot3(mount = mount,
+                                                critical_point = CriticalPoint.NOZZLE)
+                tip_loc = tip_loc[Axis.by_mount(mount)]
+                measured_tip_overlap = (tip_length[args.tip_size]+tip_overlap) - (tip_loc - noz_loc) # tiplength - tip overlap.
+                tip_attached = (nozzle_measurement - tip_measurement)
+                measured_tip_overlap = tip_attached + measured_tip_overlap
+                print(f"Tip_Overlap: {measured_tip_overlap}")
+                d_str = f"{pipette_id}, {noz_loc},{tip_loc}, {measured_tip_overlap}, {nozzle_measurement}, {tip_measurement}, {tip_attached}, {tip_count}, {tip_length[args.tip_size] + tip_overlap}, Nozzle_{nozzle+1} \n"
+                data.append_data_to_file(test_n, "", test_f, d_str)
             # --------------------Drop Tip--------------------------------------
             current_position = await hw_api.current_position_ot3(
                 mount, critical_point=CriticalPoint.TIP
@@ -404,6 +411,7 @@ if __name__ == "__main__":
     parser.add_argument("--dial_indicator", action="store_true")
     parser.add_argument("--tip_size", type=str, default="T200", help="Tip Size")
     parser.add_argument("--tips_to_use", type=int, default=96)
+    parser.add_argument("--channel", type=int, default=1)
     args = parser.parse_args()
     if args.mount == "left":
         mount = OT3Mount.LEFT
