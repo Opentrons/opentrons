@@ -87,7 +87,6 @@ export function TiprackOption(props: TiprackOptionProps): JSX.Element {
         }
         borderRadius={BORDERS.borderRadius8}
         cursor={isDisabled ? 'auto' : 'pointer'}
-        backgroundColor={COLORS.transparent}
         {...targetProps}
       >
         <StyledText as="label">{text}</StyledText>

@@ -21,7 +21,8 @@ describe('TiprackOption', () => {
   })
   it('renders a selected tiprack option', () => {
     render(props)
-    expect(screen.getByText('mockText')).toHaveStyle(
+    screen.getByText('mockText')
+    expect(screen.getByLabelText('TiprackOption_flex_mockText')).toHaveStyle(
       `background-color: ${COLORS.blue10}`
     )
     fireEvent.click(screen.getByText('mockText'))
@@ -30,7 +31,8 @@ describe('TiprackOption', () => {
   it('renders an unselected tiprack option', () => {
     props.isSelected = false
     render(props)
-    expect(screen.getByText('mockText')).toHaveStyle(
+    screen.getByText('mockText')
+    expect(screen.getByLabelText('TiprackOption_flex_mockText')).toHaveStyle(
       `background-color: ${COLORS.white}`
     )
     fireEvent.click(screen.getByText('mockText'))
@@ -40,8 +42,8 @@ describe('TiprackOption', () => {
     props.isSelected = false
     props.isDisabled = true
     render(props)
-    expect(screen.getByText('mockText')).toHaveStyle(
-      `border:  1px ${BORDERS.styleSolid} ${COLORS.grey30}`
+    expect(screen.getByLabelText('TiprackOption_flex_mockText')).toHaveStyle(
+      `border: 1px ${BORDERS.styleSolid} ${COLORS.grey30}`
     )
   })
 })
