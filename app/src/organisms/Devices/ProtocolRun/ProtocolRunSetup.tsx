@@ -150,33 +150,17 @@ export function ProtocolRunSetup({
   if (robot == null) return null
 
   const liquids = protocolAnalysis?.liquids ?? []
-
   const liquidsInLoadOrder =
     protocolAnalysis != null
       ? parseLiquidsInLoadOrder(liquids, protocolAnalysis.commands)
       : []
-
   const hasLiquids = liquidsInLoadOrder.length > 0
-
   const hasModules = protocolAnalysis != null && modules.length > 0
-
   // need config compatibility (including check for single slot conflicts)
   const requiredDeckConfigCompatibility = getRequiredDeckConfig(
     deckConfigCompatibility
   )
-
   const hasFixtures = requiredDeckConfigCompatibility.length > 0
-
-  let moduleDescription: string = t(`${MODULE_SETUP_KEY}_description`, {
-    count: modules.length,
-  })
-  if (!hasModules && !isFlex) {
-    moduleDescription = i18n.format(t('no_modules_specified'), 'capitalize')
-  } else if (isFlex && (hasModules || hasFixtures)) {
-    moduleDescription = t('install_modules_and_fixtures')
-  } else if (isFlex && !hasModules && !hasFixtures) {
-    moduleDescription = t('no_modules_or_fixtures')
-  }
 
   const StepDetailMap: Record<
     StepKey,
@@ -213,7 +197,7 @@ export function ProtocolRunSetup({
           protocolAnalysis={protocolAnalysis}
         />
       ),
-      description: moduleDescription,
+      description: hasModules || hasFixtures ? t('install_modules_and_fixtures') : t('no_deck_hardware_specified'),
     },
     [LPC_KEY]: {
       stepInternals: (
@@ -273,11 +257,7 @@ export function ProtocolRunSetup({
             </StyledText>
           ) : (
             stepsKeysInOrder.map((stepKey, index) => {
-              const setupStepTitle = t(
-                isFlex && stepKey === MODULE_SETUP_KEY
-                  ? `module_and_deck_setup`
-                  : `${stepKey}_title`
-              )
+              const setupStepTitle = t(`${stepKey}_title`)
               const showEmptySetupStep =
                 (stepKey === 'liquid_setup_step' && !hasLiquids) ||
                 (stepKey === 'module_setup_step' &&
