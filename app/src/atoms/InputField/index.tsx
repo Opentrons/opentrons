@@ -200,7 +200,7 @@ function Input(props: InputFieldProps): JSX.Element {
 
       /* the size of dot for password is handled by font-size */
       input[type='password'] {
-        font-size: ${size === 'small' ? '56px' : '62px'};
+        font-size: ${size === 'small' ? '71px' : '77px'};
       }
     }
   `
