@@ -130,7 +130,7 @@ export function CheckboxField(props: CheckboxFieldProps): JSX.Element {
           justifyContent={JUSTIFY_CENTER}
           borderRadius={BORDERS.borderRadius2}
           backgroundColor={COLORS.grey30}
-          size={SIZE_1}
+          size="1.25rem"
         >
           <Box
             height="1.5px"

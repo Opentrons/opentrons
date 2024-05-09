@@ -80,7 +80,7 @@ export const ICON_DATA_BY_NAME = {
   'checkbox-blank-outline': {
     path:
       'M19 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2m0 2v14H5V5h14z',
-    viewBox: '0 0 24 24',
+    viewBox: '3 3 18 18',
   },
   'checkbox-marked': {
     path:
