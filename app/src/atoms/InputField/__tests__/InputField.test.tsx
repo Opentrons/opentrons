@@ -14,7 +14,6 @@ describe('HeaterShakerSlideout', () => {
     props = {
       type: 'number',
       caption: 'caption',
-      secondaryCaption: 'secondary caption',
       max: 10,
       min: 1,
       units: 'rpm',
