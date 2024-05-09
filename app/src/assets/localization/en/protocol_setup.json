@@ -134,7 +134,6 @@
   "missing_pipettes": "Missing {{count}} pipette",
   "missing": "Missing",
   "modal_instructions_title": "{{moduleName}} Setup Instructions",
-  "module_and_deck_setup": "Modules & deck",
   "module_connected": "Connected",
   "module_disconnected": "Disconnected",
   "module_instructions_link": "{{moduleName}} setup instructions",

@@ -161,7 +161,6 @@ export function ProtocolRunSetup({
     deckConfigCompatibility
   )
   const hasFixtures = requiredDeckConfigCompatibility.length > 0
-
   const flexDeckHardwareDescription =
     hasModules || hasFixtures
       ? t('install_modules_and_fixtures')
