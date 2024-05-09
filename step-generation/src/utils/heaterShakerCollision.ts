@@ -1,18 +1,24 @@
 import some from 'lodash/some'
 import {
+  getAreFlexSlotsAdjacent,
   getAreSlotsAdjacent,
   getAreSlotsHorizontallyAdjacent,
   getAreSlotsVerticallyAdjacent,
   getIsLabwareAboveHeight,
   HEATERSHAKER_MODULE_TYPE,
   MAX_LABWARE_HEIGHT_EAST_WEST_HEATER_SHAKER_MM,
+  OT2_ROBOT_TYPE,
 } from '@opentrons/shared-data'
 
+<<<<<<< HEAD
 <<<<<<< HEAD
 import type { PipetteV2Specs } from '@opentrons/shared-data'
 =======
 import type { PipetteNameSpecs } from '@opentrons/shared-data'
 >>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
+=======
+import type { PipetteV2Specs, RobotType } from '@opentrons/shared-data'
+>>>>>>> 7e2409c972 (fix(step-generation): h-S collision warning for Flex protocols (#15144))
 
 import type {
   LabwareEntities,
@@ -104,16 +110,20 @@ export const pipetteIntoHeaterShakerLatchOpen = (
 
 export const pipetteAdjacentHeaterShakerWhileShaking = (
   hwModules: RobotState['modules'],
-  slot: DeckSlot
-): boolean =>
-  some(
+  slot: DeckSlot,
+  robotType: RobotType
+): boolean => {
+  return some(
     hwModules,
     hwModule =>
       hwModule.moduleState.type === HEATERSHAKER_MODULE_TYPE &&
       hwModule.moduleState.targetSpeed != null &&
       hwModule.moduleState.targetSpeed > 0 &&
-      getAreSlotsAdjacent(hwModule.slot, slot)
+      (robotType === OT2_ROBOT_TYPE
+        ? getAreSlotsAdjacent(hwModule.slot, slot)
+        : getAreFlexSlotsAdjacent(hwModule.slot, slot))
   )
+}
 
 export const pipetteIntoHeaterShakerWhileShaking = (
   modules: RobotState['modules'],

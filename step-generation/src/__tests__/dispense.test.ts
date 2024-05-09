@@ -1,10 +1,14 @@
 import { when } from 'vitest-when'
 import { beforeEach, describe, it, expect, vi, afterEach } from 'vitest'
 <<<<<<< HEAD
+<<<<<<< HEAD
 import { getPipetteSpecsV2 } from '@opentrons/shared-data'
 =======
 import { getPipetteNameSpecs } from '@opentrons/shared-data'
 >>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
+=======
+import { OT2_ROBOT_TYPE, getPipetteSpecsV2 } from '@opentrons/shared-data'
+>>>>>>> 7e2409c972 (fix(step-generation): h-S collision warning for Flex protocols (#15144))
 import {
   thermocyclerPipetteCollision,
   pipetteIntoHeaterShakerLatchOpen,
@@ -287,7 +291,8 @@ describe('dispense', () => {
       when(pipetteAdjacentHeaterShakerWhileShaking)
         .calledWith(
           robotStateWithTip.modules,
-          robotStateWithTip.labware[SOURCE_LABWARE].slot
+          robotStateWithTip.labware[SOURCE_LABWARE].slot,
+          OT2_ROBOT_TYPE
         )
         .thenReturn(true)
 

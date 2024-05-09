@@ -20,11 +20,15 @@ import {
 <<<<<<< HEAD
   fixtureP10SingleV2Specs,
   fixtureP300MultiV2Specs,
+<<<<<<< HEAD
 =======
   fixtureP10Single,
   fixtureP300Multi,
   pipetteNameSpecFixtures,
 >>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
+=======
+  OT2_ROBOT_TYPE,
+>>>>>>> 7e2409c972 (fix(step-generation): h-S collision warning for Flex protocols (#15144))
 } from '@opentrons/shared-data'
 import { FIXED_TRASH_ID, TEMPERATURE_DEACTIVATED } from '../constants'
 import {
@@ -1033,36 +1037,50 @@ describe('pipetteAdjacentHeaterShakerWhileShaking', () => {
 
   it('should return false when there are no modules', () => {
     modules = {}
-    expect(pipetteAdjacentHeaterShakerWhileShaking(modules, slot)).toBe(false)
+    expect(
+      pipetteAdjacentHeaterShakerWhileShaking(modules, slot, OT2_ROBOT_TYPE)
+    ).toBe(false)
   })
   it('should return false when there is no heater shaker ajacent to labware', () => {
     slot = '9'
-    expect(pipetteAdjacentHeaterShakerWhileShaking(modules, slot)).toBe(false)
+    expect(
+      pipetteAdjacentHeaterShakerWhileShaking(modules, slot, OT2_ROBOT_TYPE)
+    ).toBe(false)
   })
   it('should return false when the heater shaker is not shaking', () => {
-    expect(pipetteAdjacentHeaterShakerWhileShaking(modules, slot)).toBe(false)
+    expect(
+      pipetteAdjacentHeaterShakerWhileShaking(modules, slot, OT2_ROBOT_TYPE)
+    ).toBe(false)
   })
   it('should return true when there is a heater shaker north of labware shaking', () => {
     modules.heaterShakerId.slot = '5'
     ;(modules.heaterShakerId.moduleState as any).targetSpeed = 300
-    expect(pipetteAdjacentHeaterShakerWhileShaking(modules, slot)).toBe(true)
+    expect(
+      pipetteAdjacentHeaterShakerWhileShaking(modules, slot, OT2_ROBOT_TYPE)
+    ).toBe(true)
   })
   it('should return true when there is a heater shaker south of labware shaking', () => {
     slot = '9'
     modules.heaterShakerId.slot = '6'
     ;(modules.heaterShakerId.moduleState as any).targetSpeed = 300
-    expect(pipetteAdjacentHeaterShakerWhileShaking(modules, slot)).toBe(true)
+    expect(
+      pipetteAdjacentHeaterShakerWhileShaking(modules, slot, OT2_ROBOT_TYPE)
+    ).toBe(true)
   })
   it('should return true when there is a heater shaker east of labware shaking', () => {
     slot = '5'
     modules.heaterShakerId.slot = '6'
     ;(modules.heaterShakerId.moduleState as any).targetSpeed = 300
-    expect(pipetteAdjacentHeaterShakerWhileShaking(modules, slot)).toBe(true)
+    expect(
+      pipetteAdjacentHeaterShakerWhileShaking(modules, slot, OT2_ROBOT_TYPE)
+    ).toBe(true)
   })
   it('should return true when there is a heater shaker west of labware shaking', () => {
     slot = '5'
     modules.heaterShakerId.slot = '4'
     ;(modules.heaterShakerId.moduleState as any).targetSpeed = 300
-    expect(pipetteAdjacentHeaterShakerWhileShaking(modules, slot)).toBe(true)
+    expect(
+      pipetteAdjacentHeaterShakerWhileShaking(modules, slot, OT2_ROBOT_TYPE)
+    ).toBe(true)
   })
 })
