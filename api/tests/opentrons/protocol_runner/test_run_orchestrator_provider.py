@@ -61,53 +61,53 @@ def mock_hardware_api(decoy: Decoy) -> HardwareAPI:
 
 
 @pytest.fixture
-def mock_runner(decoy: Decoy, mock_protocol_json_runner: JsonRunner) -> JsonRunner:
-    """Get a mocked out HardwareAPI dependency."""
-    return mock_protocol_json_runner
-
-
-@pytest.mark.parametrize(
-    # "config",
-    # [
-    #     (PythonProtocolConfig(api_version=APIVersion.from_string("2.14"))),
-    #     JsonProtocolConfig(schema_version=7),
-    # ],
-    "mock_runner",
-    [
-        (lazy_fixture("mock_protocol_json_runner")),
-        (lazy_fixture("mock_protocol_python_runner")),
-    ],
-)
-@pytest.fixture
-def subject(
+def json_protocol_subject(
     mock_protocol_engine: ProtocolEngine,
     mock_hardware_api: HardwareAPI,
-    mock_runner: Union[JsonRunner, PythonAndLegacyRunner],
+    mock_protocol_json_runner: JsonRunner,
     mock_fixit_runner: LiveRunner,
     mock_setup_runner: LiveRunner
-    # config: Union[JsonProtocolConfig, PythonProtocolConfig],
 ) -> RunOrchestrator:
     return RunOrchestrator(
         protocol_engine=mock_protocol_engine,
         hardware_api=mock_hardware_api,
         fixit_runner=mock_fixit_runner,
         setup_runner=mock_setup_runner,
-        json_or_python_protocol_runner=mock_runner,
+        json_or_python_protocol_runner=mock_protocol_json_runner,
+    )
+
+@pytest.fixture
+def python_protocol_subject(
+    mock_protocol_engine: ProtocolEngine,
+    mock_hardware_api: HardwareAPI,
+    mock_protocol_python_runner: PythonAndLegacyRunner,
+    mock_fixit_runner: LiveRunner,
+    mock_setup_runner: LiveRunner
+) -> RunOrchestrator:
+    return RunOrchestrator(
+        protocol_engine=mock_protocol_engine,
+        hardware_api=mock_hardware_api,
+        fixit_runner=mock_fixit_runner,
+        setup_runner=mock_setup_runner,
+        json_or_python_protocol_runner=mock_protocol_python_runner,
     )
 
 
 @pytest.mark.parametrize(
-    "input_protocol_config, mock_protocol_runner",
+    "input_protocol_config, mock_protocol_runner, subject",
     [
         (
             JsonProtocolConfig(schema_version=7),
             lazy_fixture("mock_protocol_json_runner"),
+            lazy_fixture("json_protocol_subject")
         ),
         (
             PythonProtocolConfig(api_version=APIVersion(2, 14)),
             lazy_fixture("mock_protocol_python_runner"),
+            lazy_fixture("python_protocol_subject")
         ),
-        (None, None),
+        (None, None, lazy_fixture("python_protocol_subject")),
+        (None, None, lazy_fixture("json_protocol_subject")),
     ],
 )
 def test_build_run_orchestrator_provider(
@@ -160,27 +160,23 @@ def test_build_run_orchestrator_provider(
 
     assert isinstance(result, RunOrchestrator)
 
-    # not working! create a different instance
-    # assert result == RunOrchestrator(
-    #     protocol_engine=mock_protocol_engine,
-    #     hardware_api=mock_hardware_api,
-    #     setup_runner=mock_setup_runner,
-    #     fixit_runner=mock_fixit_runner
-    # )
-
 
 @pytest.mark.parametrize(
-    "runner, command_intent",
+    "runner, command_intent, subject",
     [
-        (lazy_fixture("mock_setup_runner"), pe_commands.CommandIntent.SETUP),
-        (lazy_fixture("mock_fixit_runner"), pe_commands.CommandIntent.FIXIT),
+        (lazy_fixture("mock_setup_runner"), pe_commands.CommandIntent.SETUP, lazy_fixture("python_protocol_subject")),
+        (lazy_fixture("mock_fixit_runner"), pe_commands.CommandIntent.FIXIT, lazy_fixture("python_protocol_subject")),
+        (lazy_fixture("mock_setup_runner"), pe_commands.CommandIntent.SETUP, lazy_fixture("json_protocol_subject")),
+        (lazy_fixture("mock_fixit_runner"), pe_commands.CommandIntent.FIXIT, lazy_fixture("json_protocol_subject")),
         (
             lazy_fixture("mock_protocol_json_runner"),
             pe_commands.CommandIntent.PROTOCOL,
+            lazy_fixture("json_protocol_subject"),
         ),
         (
             lazy_fixture("mock_protocol_python_runner"),
             pe_commands.CommandIntent.PROTOCOL,
+            lazy_fixture("python_protocol_subject"),
         ),
     ],
 )
