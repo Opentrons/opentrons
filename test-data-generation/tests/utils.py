@@ -1,7 +1,8 @@
+"""Utility functions for the tests."""
+
 import subprocess
 import pathlib
 from opentrons.cli.analyze import AnalyzeResults
-
 
 
 async def run_analysis(protocol_content: str, tmp_path: pathlib.Path) -> AnalyzeResults:
@@ -28,6 +29,7 @@ async def run_analysis(protocol_content: str, tmp_path: pathlib.Path) -> Analyze
         raise Exception(f"Analysis failed: {result.stderr}\n{protocol_content}\n")
 
     return AnalyzeResults.parse_file(analysis_json_path)
+
 
 def make_the_failed_protocol_pretty(protocol_content: str) -> str:
     """Pretty print the protocol."""

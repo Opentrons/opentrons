@@ -4,18 +4,15 @@ from pathlib import Path
 
 import pytest
 from hypothesis import HealthCheck, given, note, settings
-from tests.utils import has_errors, make_the_failed_protocol_pretty, run_analysis
+from tests.utils import has_errors, run_analysis
 
-from test_data_generation.datashapes import DeckConfiguration
+from test_data_generation.deck_configuration.datashapes import DeckConfiguration
+
 from test_data_generation.deck_configuration.strategy.deck_configuration_strategies import (
     a_deck_configuration_with_invalid_fixture_in_col_2,
 )
 from test_data_generation.python_protocol_generation.python_protocol_generator import (
     PythonProtocolGenerator,
-)
-from test_data_generation.python_protocol_generation.strategy.python_protocol_generation_strategies import (
-    a_protocol_that_loads_invalid_stuff_into_a_staging_area_col_3,
-    a_protocol_that_loads_invalid_stuff_into_a_staging_area_col_4,
 )
 
 
