@@ -1,4 +1,3 @@
-import mqtt from 'mqtt'
 
 import { connectionStore } from './store'
 import {
@@ -8,6 +7,7 @@ import {
 } from './deserialize'
 import { notifyLog } from './notifyLog'
 
+import type mqtt from 'mqtt'
 import type { NotifyTopic } from '@opentrons/app/src/redux/shell/types'
 
 /**

@@ -1,6 +1,4 @@
-import { ModuleType } from '@opentrons/shared-data'
-
-import type { Coordinates, ModuleModel } from '@opentrons/shared-data'
+import type { ModuleType, Coordinates, ModuleModel } from '@opentrons/shared-data'
 
 type PortGroup = 'main' | 'left' | 'right' | 'front' | 'unknown'
 interface PhysicalPort {
