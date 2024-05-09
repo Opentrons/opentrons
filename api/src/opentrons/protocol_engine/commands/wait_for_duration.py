@@ -2,9 +2,9 @@
 from __future__ import annotations
 from pydantic import BaseModel, Field
 from typing import TYPE_CHECKING, Optional, Type
-from typing_extensions import Literal
+from typing_extensions import Literal, Never
 
-from .command import AbstractCommandImpl, BaseCommand, BaseCommandCreate
+from .command import AbstractCommandImpl, BaseCommand, BaseCommandCreate, SuccessData
 
 if TYPE_CHECKING:
     from ..execution import RunControlHandler
@@ -28,20 +28,22 @@ class WaitForDurationResult(BaseModel):
 
 
 class WaitForDurationImplementation(
-    AbstractCommandImpl[WaitForDurationParams, WaitForDurationResult]
+    AbstractCommandImpl[WaitForDurationParams, SuccessData[WaitForDurationResult, None]]
 ):
     """Wait for duration command implementation."""
 
     def __init__(self, run_control: RunControlHandler, **kwargs: object) -> None:
         self._run_control = run_control
 
-    async def execute(self, params: WaitForDurationParams) -> WaitForDurationResult:
+    async def execute(
+        self, params: WaitForDurationParams
+    ) -> SuccessData[WaitForDurationResult, None]:
         """Wait for a duration of time."""
         await self._run_control.wait_for_duration(params.seconds)
-        return WaitForDurationResult()
+        return SuccessData(public=WaitForDurationResult(), private=None)
 
 
-class WaitForDuration(BaseCommand[WaitForDurationParams, WaitForDurationResult]):
+class WaitForDuration(BaseCommand[WaitForDurationParams, WaitForDurationResult, Never]):
     """Wait for duration command model."""
 
     commandType: WaitForDurationCommandType = "waitForDuration"

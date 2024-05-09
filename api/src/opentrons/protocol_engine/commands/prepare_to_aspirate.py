@@ -3,16 +3,12 @@
 from __future__ import annotations
 from pydantic import BaseModel
 from typing import TYPE_CHECKING, Optional, Type
-from typing_extensions import Literal
+from typing_extensions import Literal, Never
 
 from .pipetting_common import (
     PipetteIdMixin,
 )
-from .command import (
-    AbstractCommandImpl,
-    BaseCommand,
-    BaseCommandCreate,
-)
+from .command import AbstractCommandImpl, BaseCommand, BaseCommandCreate, SuccessData
 
 if TYPE_CHECKING:
     from ..execution.pipetting import PipettingHandler
@@ -34,8 +30,7 @@ class PrepareToAspirateResult(BaseModel):
 
 class PrepareToAspirateImplementation(
     AbstractCommandImpl[
-        PrepareToAspirateParams,
-        PrepareToAspirateResult,
+        PrepareToAspirateParams, SuccessData[PrepareToAspirateResult, None]
     ]
 ):
     """Prepare for aspirate command implementation."""
@@ -43,16 +38,20 @@ class PrepareToAspirateImplementation(
     def __init__(self, pipetting: PipettingHandler, **kwargs: object) -> None:
         self._pipetting_handler = pipetting
 
-    async def execute(self, params: PrepareToAspirateParams) -> PrepareToAspirateResult:
+    async def execute(
+        self, params: PrepareToAspirateParams
+    ) -> SuccessData[PrepareToAspirateResult, None]:
         """Prepare the pipette to aspirate."""
         await self._pipetting_handler.prepare_for_aspirate(
             pipette_id=params.pipetteId,
         )
 
-        return PrepareToAspirateResult()
+        return SuccessData(public=PrepareToAspirateResult(), private=None)
 
 
-class PrepareToAspirate(BaseCommand[PrepareToAspirateParams, PrepareToAspirateResult]):
+class PrepareToAspirate(
+    BaseCommand[PrepareToAspirateParams, PrepareToAspirateResult, Never]
+):
     """Prepare for aspirate command model."""
 
     commandType: PrepareToAspirateCommandType = "prepareToAspirate"

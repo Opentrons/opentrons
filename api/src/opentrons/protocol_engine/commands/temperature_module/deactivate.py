@@ -1,11 +1,11 @@
 """Command models to deactivate a Temperature Module."""
 from __future__ import annotations
 from typing import Optional, TYPE_CHECKING
-from typing_extensions import Literal, Type
+from typing_extensions import Literal, Never, Type
 
 from pydantic import BaseModel, Field
 
-from ..command import AbstractCommandImpl, BaseCommand, BaseCommandCreate
+from ..command import AbstractCommandImpl, BaseCommand, BaseCommandCreate, SuccessData
 
 if TYPE_CHECKING:
     from opentrons.protocol_engine.state import StateView
@@ -25,7 +25,9 @@ class DeactivateTemperatureResult(BaseModel):
 
 
 class DeactivateTemperatureImpl(
-    AbstractCommandImpl[DeactivateTemperatureParams, DeactivateTemperatureResult]
+    AbstractCommandImpl[
+        DeactivateTemperatureParams, SuccessData[DeactivateTemperatureResult, None]
+    ]
 ):
     """Execution implementation of a Temperature Module's deactivate command."""
 
@@ -40,7 +42,7 @@ class DeactivateTemperatureImpl(
 
     async def execute(
         self, params: DeactivateTemperatureParams
-    ) -> DeactivateTemperatureResult:
+    ) -> SuccessData[DeactivateTemperatureResult, None]:
         """Deactivate a Temperature Module."""
         # Allow propagation of ModuleNotLoadedError and WrongModuleTypeError.
         module_substate = self._state_view.modules.get_temperature_module_substate(
@@ -54,11 +56,11 @@ class DeactivateTemperatureImpl(
 
         if temp_hardware_module is not None:
             await temp_hardware_module.deactivate()
-        return DeactivateTemperatureResult()
+        return SuccessData(public=DeactivateTemperatureResult(), private=None)
 
 
 class DeactivateTemperature(
-    BaseCommand[DeactivateTemperatureParams, DeactivateTemperatureResult]
+    BaseCommand[DeactivateTemperatureParams, DeactivateTemperatureResult, Never]
 ):
     """A command to deactivate a Temperature Module."""
 

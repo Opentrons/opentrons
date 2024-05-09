@@ -1,11 +1,11 @@
 """Command models to wait for target temperature of a Temperature Module."""
 from __future__ import annotations
 from typing import Optional, TYPE_CHECKING
-from typing_extensions import Literal, Type
+from typing_extensions import Literal, Never, Type
 
 from pydantic import BaseModel, Field
 
-from ..command import AbstractCommandImpl, BaseCommand, BaseCommandCreate
+from ..command import AbstractCommandImpl, BaseCommand, BaseCommandCreate, SuccessData
 
 if TYPE_CHECKING:
     from opentrons.protocol_engine.state import StateView
@@ -34,7 +34,9 @@ class WaitForTemperatureResult(BaseModel):
 
 
 class WaitForTemperatureImpl(
-    AbstractCommandImpl[WaitForTemperatureParams, WaitForTemperatureResult]
+    AbstractCommandImpl[
+        WaitForTemperatureParams, SuccessData[WaitForTemperatureResult, None]
+    ]
 ):
     """Execution implementation of Temperature Module's wait for temperature command."""
 
@@ -49,7 +51,7 @@ class WaitForTemperatureImpl(
 
     async def execute(
         self, params: WaitForTemperatureParams
-    ) -> WaitForTemperatureResult:
+    ) -> SuccessData[WaitForTemperatureResult, None]:
         """Wait for a Temperature Module's target temperature."""
         # Allow propagation of ModuleNotLoadedError and WrongModuleTypeError.
         module_substate = self._state_view.modules.get_temperature_module_substate(
@@ -71,11 +73,11 @@ class WaitForTemperatureImpl(
             await temp_hardware_module.await_temperature(
                 awaiting_temperature=target_temp
             )
-        return WaitForTemperatureResult()
+        return SuccessData(public=WaitForTemperatureResult(), private=None)
 
 
 class WaitForTemperature(
-    BaseCommand[WaitForTemperatureParams, WaitForTemperatureResult]
+    BaseCommand[WaitForTemperatureParams, WaitForTemperatureResult, Never]
 ):
     """A command to wait for a Temperature Module's target temperature."""
 

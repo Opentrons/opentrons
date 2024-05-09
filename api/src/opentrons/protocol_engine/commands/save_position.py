@@ -3,11 +3,11 @@
 from __future__ import annotations
 from pydantic import BaseModel, Field
 from typing import TYPE_CHECKING, Optional, Type
-from typing_extensions import Literal
+from typing_extensions import Literal, Never
 
 from ..types import DeckPoint
 from ..resources import ModelUtils
-from .command import AbstractCommandImpl, BaseCommand, BaseCommandCreate
+from .command import AbstractCommandImpl, BaseCommand, BaseCommandCreate, SuccessData
 
 if TYPE_CHECKING:
     from ..execution import GantryMover
@@ -45,7 +45,7 @@ class SavePositionResult(BaseModel):
 
 
 class SavePositionImplementation(
-    AbstractCommandImpl[SavePositionParams, SavePositionResult]
+    AbstractCommandImpl[SavePositionParams, SuccessData[SavePositionResult, None]]
 ):
     """Save position command implementation."""
 
@@ -58,7 +58,9 @@ class SavePositionImplementation(
         self._gantry_mover = gantry_mover
         self._model_utils = model_utils or ModelUtils()
 
-    async def execute(self, params: SavePositionParams) -> SavePositionResult:
+    async def execute(
+        self, params: SavePositionParams
+    ) -> SuccessData[SavePositionResult, None]:
         """Check the requested pipette's current position."""
         position_id = self._model_utils.ensure_id(params.positionId)
         fail_on_not_homed = (
@@ -68,13 +70,16 @@ class SavePositionImplementation(
             pipette_id=params.pipetteId, fail_on_not_homed=fail_on_not_homed
         )
 
-        return SavePositionResult(
-            positionId=position_id,
-            position=DeckPoint(x=x, y=y, z=z),
+        return SuccessData(
+            public=SavePositionResult(
+                positionId=position_id,
+                position=DeckPoint(x=x, y=y, z=z),
+            ),
+            private=None,
         )
 
 
-class SavePosition(BaseCommand[SavePositionParams, SavePositionResult]):
+class SavePosition(BaseCommand[SavePositionParams, SavePositionResult, Never]):
     """Save Position command model."""
 
     commandType: SavePositionCommandType = "savePosition"

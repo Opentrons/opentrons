@@ -1,11 +1,11 @@
 """Command models to start heating a Heater-Shaker Module."""
 from __future__ import annotations
 from typing import Optional, TYPE_CHECKING
-from typing_extensions import Literal, Type
+from typing_extensions import Literal, Never, Type
 
 from pydantic import BaseModel, Field
 
-from ..command import AbstractCommandImpl, BaseCommand, BaseCommandCreate
+from ..command import AbstractCommandImpl, BaseCommand, BaseCommandCreate, SuccessData
 
 if TYPE_CHECKING:
     from opentrons.protocol_engine.state import StateView
@@ -27,7 +27,9 @@ class SetTargetTemperatureResult(BaseModel):
 
 
 class SetTargetTemperatureImpl(
-    AbstractCommandImpl[SetTargetTemperatureParams, SetTargetTemperatureResult]
+    AbstractCommandImpl[
+        SetTargetTemperatureParams, SuccessData[SetTargetTemperatureResult, None]
+    ]
 ):
     """Execution implementation of a Heater-Shaker's set temperature command."""
 
@@ -43,7 +45,7 @@ class SetTargetTemperatureImpl(
     async def execute(
         self,
         params: SetTargetTemperatureParams,
-    ) -> SetTargetTemperatureResult:
+    ) -> SuccessData[SetTargetTemperatureResult, None]:
         """Set a Heater-Shaker's target temperature."""
         # Allow propagation of ModuleNotLoadedError and WrongModuleTypeError.
         hs_module_substate = self._state_view.modules.get_heater_shaker_module_substate(
@@ -61,11 +63,11 @@ class SetTargetTemperatureImpl(
         if hs_hardware_module is not None:
             await hs_hardware_module.start_set_temperature(validated_temp)
 
-        return SetTargetTemperatureResult()
+        return SuccessData(public=SetTargetTemperatureResult(), private=None)
 
 
 class SetTargetTemperature(
-    BaseCommand[SetTargetTemperatureParams, SetTargetTemperatureResult]
+    BaseCommand[SetTargetTemperatureParams, SetTargetTemperatureResult, Never]
 ):
     """A command to set a Heater-Shaker's target temperature."""
 

@@ -2,10 +2,10 @@
 from __future__ import annotations
 from pydantic import BaseModel, Field
 from typing import TYPE_CHECKING, Optional, Type
-from typing_extensions import Literal
+from typing_extensions import Literal, Never
 
 from ..types import MotorAxis
-from .command import AbstractCommandImpl, BaseCommand, BaseCommandCreate
+from .command import AbstractCommandImpl, BaseCommand, BaseCommandCreate, SuccessData
 
 if TYPE_CHECKING:
     from ..execution import MovementHandler
@@ -37,20 +37,22 @@ class RetractAxisResult(BaseModel):
 
 
 class RetractAxisImplementation(
-    AbstractCommandImpl[RetractAxisParams, RetractAxisResult]
+    AbstractCommandImpl[RetractAxisParams, SuccessData[RetractAxisResult, None]]
 ):
     """Retract Axis command implementation."""
 
     def __init__(self, movement: MovementHandler, **kwargs: object) -> None:
         self._movement = movement
 
-    async def execute(self, params: RetractAxisParams) -> RetractAxisResult:
+    async def execute(
+        self, params: RetractAxisParams
+    ) -> SuccessData[RetractAxisResult, None]:
         """Retract the specified axis."""
         await self._movement.retract_axis(axis=params.axis)
-        return RetractAxisResult()
+        return SuccessData(public=RetractAxisResult(), private=None)
 
 
-class RetractAxis(BaseCommand[RetractAxisParams, RetractAxisResult]):
+class RetractAxis(BaseCommand[RetractAxisParams, RetractAxisResult, Never]):
     """Command to retract the specified axis to its home position."""
 
     commandType: RetractAxisCommandType = "retractAxis"

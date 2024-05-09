@@ -3,11 +3,11 @@ from __future__ import annotations
 
 from pydantic import Field
 from typing import Optional, Type, TYPE_CHECKING
-from typing_extensions import Literal
+from typing_extensions import Literal, Never
 
 from ..types import DeckPoint
 from .pipetting_common import PipetteIdMixin, MovementMixin, DestinationPositionResult
-from .command import AbstractCommandImpl, BaseCommand, BaseCommandCreate
+from .command import AbstractCommandImpl, BaseCommand, BaseCommandCreate, SuccessData
 
 if TYPE_CHECKING:
     from ..execution import MovementHandler
@@ -32,7 +32,9 @@ class MoveToCoordinatesResult(DestinationPositionResult):
 
 
 class MoveToCoordinatesImplementation(
-    AbstractCommandImpl[MoveToCoordinatesParams, MoveToCoordinatesResult]
+    AbstractCommandImpl[
+        MoveToCoordinatesParams, SuccessData[MoveToCoordinatesResult, None]
+    ]
 ):
     """Move to coordinates command implementation."""
 
@@ -43,7 +45,9 @@ class MoveToCoordinatesImplementation(
     ) -> None:
         self._movement = movement
 
-    async def execute(self, params: MoveToCoordinatesParams) -> MoveToCoordinatesResult:
+    async def execute(
+        self, params: MoveToCoordinatesParams
+    ) -> SuccessData[MoveToCoordinatesResult, None]:
         """Move the requested pipette to the requested coordinates."""
         x, y, z = await self._movement.move_to_coordinates(
             pipette_id=params.pipetteId,
@@ -53,10 +57,15 @@ class MoveToCoordinatesImplementation(
             speed=params.speed,
         )
 
-        return MoveToCoordinatesResult(position=DeckPoint(x=x, y=y, z=z))
+        return SuccessData(
+            public=MoveToCoordinatesResult(position=DeckPoint(x=x, y=y, z=z)),
+            private=None,
+        )
 
 
-class MoveToCoordinates(BaseCommand[MoveToCoordinatesParams, MoveToCoordinatesResult]):
+class MoveToCoordinates(
+    BaseCommand[MoveToCoordinatesParams, MoveToCoordinatesResult, Never]
+):
     """Move to well command model."""
 
     commandType: MoveToCoordinatesCommandType = "moveToCoordinates"

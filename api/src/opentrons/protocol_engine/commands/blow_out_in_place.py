@@ -2,14 +2,14 @@
 
 from __future__ import annotations
 from typing import TYPE_CHECKING, Optional, Type
-from typing_extensions import Literal
+from typing_extensions import Literal, Never
 from pydantic import BaseModel
 
 from .pipetting_common import (
     PipetteIdMixin,
     FlowRateMixin,
 )
-from .command import AbstractCommandImpl, BaseCommand, BaseCommandCreate
+from .command import AbstractCommandImpl, BaseCommand, BaseCommandCreate, SuccessData
 
 from opentrons.hardware_control import HardwareControlAPI
 
@@ -35,7 +35,7 @@ class BlowOutInPlaceResult(BaseModel):
 
 
 class BlowOutInPlaceImplementation(
-    AbstractCommandImpl[BlowOutInPlaceParams, BlowOutInPlaceResult]
+    AbstractCommandImpl[BlowOutInPlaceParams, SuccessData[BlowOutInPlaceResult, None]]
 ):
     """BlowOutInPlace command implementation."""
 
@@ -50,16 +50,18 @@ class BlowOutInPlaceImplementation(
         self._state_view = state_view
         self._hardware_api = hardware_api
 
-    async def execute(self, params: BlowOutInPlaceParams) -> BlowOutInPlaceResult:
+    async def execute(
+        self, params: BlowOutInPlaceParams
+    ) -> SuccessData[BlowOutInPlaceResult, None]:
         """Blow-out without moving the pipette."""
         await self._pipetting.blow_out_in_place(
             pipette_id=params.pipetteId, flow_rate=params.flowRate
         )
 
-        return BlowOutInPlaceResult()
+        return SuccessData(public=BlowOutInPlaceResult(), private=None)
 
 
-class BlowOutInPlace(BaseCommand[BlowOutInPlaceParams, BlowOutInPlaceResult]):
+class BlowOutInPlace(BaseCommand[BlowOutInPlaceParams, BlowOutInPlaceResult, Never]):
     """BlowOutInPlace command model."""
 
     commandType: BlowOutInPlaceCommandType = "blowOutInPlace"

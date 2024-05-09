@@ -1,15 +1,11 @@
 """Configure for volume command request, result, and implementation models."""
 from __future__ import annotations
 from pydantic import BaseModel, Field
-from typing import TYPE_CHECKING, Optional, Type, Tuple
-from typing_extensions import Literal
+from typing import TYPE_CHECKING, Optional, Type
+from typing_extensions import Literal, Never
 
 from .pipetting_common import PipetteIdMixin
-from .command import (
-    AbstractCommandWithPrivateResultImpl,
-    BaseCommand,
-    BaseCommandCreate,
-)
+from .command import AbstractCommandImpl, BaseCommand, BaseCommandCreate, SuccessData
 from .configuring_common import PipetteConfigUpdateResultMixin
 
 if TYPE_CHECKING:
@@ -43,10 +39,9 @@ class ConfigureForVolumeResult(BaseModel):
 
 
 class ConfigureForVolumeImplementation(
-    AbstractCommandWithPrivateResultImpl[
+    AbstractCommandImpl[
         ConfigureForVolumeParams,
-        ConfigureForVolumeResult,
-        ConfigureForVolumePrivateResult,
+        SuccessData[ConfigureForVolumeResult, ConfigureForVolumePrivateResult],
     ]
 ):
     """Configure for volume command implementation."""
@@ -56,22 +51,25 @@ class ConfigureForVolumeImplementation(
 
     async def execute(
         self, params: ConfigureForVolumeParams
-    ) -> Tuple[ConfigureForVolumeResult, ConfigureForVolumePrivateResult]:
+    ) -> SuccessData[ConfigureForVolumeResult, ConfigureForVolumePrivateResult]:
         """Check that requested pipette can be configured for the given volume."""
         pipette_result = await self._equipment.configure_for_volume(
             pipette_id=params.pipetteId,
             volume=params.volume,
         )
 
-        return ConfigureForVolumeResult(), ConfigureForVolumePrivateResult(
-            pipette_id=pipette_result.pipette_id,
-            serial_number=pipette_result.serial_number,
-            config=pipette_result.static_config,
+        return SuccessData(
+            public=ConfigureForVolumeResult(),
+            private=ConfigureForVolumePrivateResult(
+                pipette_id=pipette_result.pipette_id,
+                serial_number=pipette_result.serial_number,
+                config=pipette_result.static_config,
+            ),
         )
 
 
 class ConfigureForVolume(
-    BaseCommand[ConfigureForVolumeParams, ConfigureForVolumeResult]
+    BaseCommand[ConfigureForVolumeParams, ConfigureForVolumeResult, Never]
 ):
     """Configure for volume command model."""
 

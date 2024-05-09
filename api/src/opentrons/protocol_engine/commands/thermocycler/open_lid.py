@@ -1,11 +1,11 @@
 """Command models to open a Thermocycler's lid."""
 from __future__ import annotations
 from typing import Optional, TYPE_CHECKING
-from typing_extensions import Literal, Type
+from typing_extensions import Literal, Never, Type
 
 from pydantic import BaseModel, Field
 
-from ..command import AbstractCommandImpl, BaseCommand, BaseCommandCreate
+from ..command import AbstractCommandImpl, BaseCommand, BaseCommandCreate, SuccessData
 from opentrons.protocol_engine.types import MotorAxis
 
 if TYPE_CHECKING:
@@ -26,7 +26,7 @@ class OpenLidResult(BaseModel):
     """Result data from opening a Thermocycler's lid."""
 
 
-class OpenLidImpl(AbstractCommandImpl[OpenLidParams, OpenLidResult]):
+class OpenLidImpl(AbstractCommandImpl[OpenLidParams, SuccessData[OpenLidResult, None]]):
     """Execution implementation of a Thermocycler's open lid command."""
 
     def __init__(
@@ -40,7 +40,7 @@ class OpenLidImpl(AbstractCommandImpl[OpenLidParams, OpenLidResult]):
         self._equipment = equipment
         self._movement = movement
 
-    async def execute(self, params: OpenLidParams) -> OpenLidResult:
+    async def execute(self, params: OpenLidParams) -> SuccessData[OpenLidResult, None]:
         """Open a Thermocycler's lid."""
         thermocycler_state = self._state_view.modules.get_thermocycler_module_substate(
             params.moduleId
@@ -60,10 +60,10 @@ class OpenLidImpl(AbstractCommandImpl[OpenLidParams, OpenLidResult]):
         if thermocycler_hardware is not None:
             await thermocycler_hardware.open()
 
-        return OpenLidResult()
+        return SuccessData(public=OpenLidResult(), private=None)
 
 
-class OpenLid(BaseCommand[OpenLidParams, OpenLidResult]):
+class OpenLid(BaseCommand[OpenLidParams, OpenLidResult, Never]):
     """A command to open a Thermocycler's lid."""
 
     commandType: OpenLidCommandType = "thermocycler/openLid"

@@ -3,17 +3,13 @@ from __future__ import annotations
 
 import enum
 from typing import TYPE_CHECKING, Type, Optional
-from typing_extensions import Literal
+from typing_extensions import Literal, Never
 
 from pydantic import BaseModel, Field
 
 from opentrons.types import MountType, Point, Mount
 from opentrons.hardware_control.types import Axis, CriticalPoint
-from opentrons.protocol_engine.commands.command import (
-    AbstractCommandImpl,
-    BaseCommand,
-    BaseCommandCreate,
-)
+from ..command import AbstractCommandImpl, BaseCommand, BaseCommandCreate, SuccessData
 from opentrons.protocol_engine.resources.ot3_validation import ensure_ot3_hardware
 
 if TYPE_CHECKING:
@@ -59,7 +55,8 @@ class MoveToMaintenancePositionResult(BaseModel):
 
 class MoveToMaintenancePositionImplementation(
     AbstractCommandImpl[
-        MoveToMaintenancePositionParams, MoveToMaintenancePositionResult
+        MoveToMaintenancePositionParams,
+        SuccessData[MoveToMaintenancePositionResult, None],
     ]
 ):
     """Calibration set up position command implementation."""
@@ -75,7 +72,7 @@ class MoveToMaintenancePositionImplementation(
 
     async def execute(
         self, params: MoveToMaintenancePositionParams
-    ) -> MoveToMaintenancePositionResult:
+    ) -> SuccessData[MoveToMaintenancePositionResult, None]:
         """Move the requested mount to a maintenance deck slot."""
         ot3_api = ensure_ot3_hardware(
             self._hardware_api,
@@ -115,11 +112,11 @@ class MoveToMaintenancePositionImplementation(
                 )
                 await ot3_api.disengage_axes([Axis.Z_L, Axis.Z_R])
 
-        return MoveToMaintenancePositionResult()
+        return SuccessData(public=MoveToMaintenancePositionResult(), private=None)
 
 
 class MoveToMaintenancePosition(
-    BaseCommand[MoveToMaintenancePositionParams, MoveToMaintenancePositionResult]
+    BaseCommand[MoveToMaintenancePositionParams, MoveToMaintenancePositionResult, Never]
 ):
     """Calibration set up position command model."""
 

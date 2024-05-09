@@ -1,11 +1,11 @@
 """Command models to close the Heater-Shaker Module's labware latch."""
 from __future__ import annotations
 from typing import Optional, TYPE_CHECKING
-from typing_extensions import Literal, Type
+from typing_extensions import Literal, Never, Type
 
 from pydantic import BaseModel, Field
 
-from ..command import AbstractCommandImpl, BaseCommand, BaseCommandCreate
+from ..command import AbstractCommandImpl, BaseCommand, BaseCommandCreate, SuccessData
 
 if TYPE_CHECKING:
     from opentrons.protocol_engine.state import StateView
@@ -26,7 +26,9 @@ class CloseLabwareLatchResult(BaseModel):
 
 
 class CloseLabwareLatchImpl(
-    AbstractCommandImpl[CloseLabwareLatchParams, CloseLabwareLatchResult]
+    AbstractCommandImpl[
+        CloseLabwareLatchParams, SuccessData[CloseLabwareLatchResult, None]
+    ]
 ):
     """Execution implementation of a Heater-Shaker's close labware latch command."""
 
@@ -39,7 +41,9 @@ class CloseLabwareLatchImpl(
         self._state_view = state_view
         self._equipment = equipment
 
-    async def execute(self, params: CloseLabwareLatchParams) -> CloseLabwareLatchResult:
+    async def execute(
+        self, params: CloseLabwareLatchParams
+    ) -> SuccessData[CloseLabwareLatchResult, None]:
         """Close a Heater-Shaker's labware latch."""
         # Allow propagation of ModuleNotLoadedError and WrongModuleTypeError.
         hs_module_substate = self._state_view.modules.get_heater_shaker_module_substate(
@@ -54,10 +58,12 @@ class CloseLabwareLatchImpl(
         if hs_hardware_module is not None:
             await hs_hardware_module.close_labware_latch()
 
-        return CloseLabwareLatchResult()
+        return SuccessData(public=CloseLabwareLatchResult(), private=None)
 
 
-class CloseLabwareLatch(BaseCommand[CloseLabwareLatchParams, CloseLabwareLatchResult]):
+class CloseLabwareLatch(
+    BaseCommand[CloseLabwareLatchParams, CloseLabwareLatchResult, Never]
+):
     """A command to close a Heater-Shaker's latch."""
 
     commandType: CloseLabwareLatchCommandType = "heaterShaker/closeLabwareLatch"

@@ -1,7 +1,7 @@
 """Blow-out command request, result, and implementation models."""
 from __future__ import annotations
 from typing import TYPE_CHECKING, Optional, Type
-from typing_extensions import Literal
+from typing_extensions import Literal, Never
 
 from ..types import DeckPoint
 from .pipetting_common import (
@@ -10,7 +10,7 @@ from .pipetting_common import (
     WellLocationMixin,
     DestinationPositionResult,
 )
-from .command import AbstractCommandImpl, BaseCommand, BaseCommandCreate
+from .command import AbstractCommandImpl, BaseCommand, BaseCommandCreate, SuccessData
 
 from opentrons.hardware_control import HardwareControlAPI
 
@@ -34,7 +34,9 @@ class BlowOutResult(DestinationPositionResult):
     pass
 
 
-class BlowOutImplementation(AbstractCommandImpl[BlowOutParams, BlowOutResult]):
+class BlowOutImplementation(
+    AbstractCommandImpl[BlowOutParams, SuccessData[BlowOutResult, None]]
+):
     """BlowOut command implementation."""
 
     def __init__(
@@ -50,7 +52,7 @@ class BlowOutImplementation(AbstractCommandImpl[BlowOutParams, BlowOutResult]):
         self._state_view = state_view
         self._hardware_api = hardware_api
 
-    async def execute(self, params: BlowOutParams) -> BlowOutResult:
+    async def execute(self, params: BlowOutParams) -> SuccessData[BlowOutResult, None]:
         """Move to and blow-out the requested well."""
         x, y, z = await self._movement.move_to_well(
             pipette_id=params.pipetteId,
@@ -63,10 +65,12 @@ class BlowOutImplementation(AbstractCommandImpl[BlowOutParams, BlowOutResult]):
             pipette_id=params.pipetteId, flow_rate=params.flowRate
         )
 
-        return BlowOutResult(position=DeckPoint(x=x, y=y, z=z))
+        return SuccessData(
+            public=BlowOutResult(position=DeckPoint(x=x, y=y, z=z)), private=None
+        )
 
 
-class BlowOut(BaseCommand[BlowOutParams, BlowOutResult]):
+class BlowOut(BaseCommand[BlowOutParams, BlowOutResult, Never]):
     """Blow-out command model."""
 
     commandType: BlowOutCommandType = "blowout"

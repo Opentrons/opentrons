@@ -2,9 +2,9 @@
 from __future__ import annotations
 from pydantic import BaseModel, Field
 from typing import Optional, Type, Dict, TYPE_CHECKING
-from typing_extensions import Literal
+from typing_extensions import Literal, Never
 
-from .command import AbstractCommandImpl, BaseCommand, BaseCommandCreate
+from .command import AbstractCommandImpl, BaseCommand, BaseCommandCreate, SuccessData
 
 if TYPE_CHECKING:
     from ..state import StateView
@@ -35,13 +35,17 @@ class LoadLiquidResult(BaseModel):
     pass
 
 
-class LoadLiquidImplementation(AbstractCommandImpl[LoadLiquidParams, LoadLiquidResult]):
+class LoadLiquidImplementation(
+    AbstractCommandImpl[LoadLiquidParams, SuccessData[LoadLiquidResult, None]]
+):
     """Load liquid command implementation."""
 
     def __init__(self, state_view: StateView, **kwargs: object) -> None:
         self._state_view = state_view
 
-    async def execute(self, params: LoadLiquidParams) -> LoadLiquidResult:
+    async def execute(
+        self, params: LoadLiquidParams
+    ) -> SuccessData[LoadLiquidResult, None]:
         """Load data necessary for a liquid."""
         self._state_view.liquid.validate_liquid_id(params.liquidId)
 
@@ -49,10 +53,10 @@ class LoadLiquidImplementation(AbstractCommandImpl[LoadLiquidParams, LoadLiquidR
             labware_id=params.labwareId, wells=params.volumeByWell
         )
 
-        return LoadLiquidResult()
+        return SuccessData(public=LoadLiquidResult(), private=None)
 
 
-class LoadLiquid(BaseCommand[LoadLiquidParams, LoadLiquidResult]):
+class LoadLiquid(BaseCommand[LoadLiquidParams, LoadLiquidResult, Never]):
     """Load liquid command resource model."""
 
     commandType: LoadLiquidCommandType = "loadLiquid"

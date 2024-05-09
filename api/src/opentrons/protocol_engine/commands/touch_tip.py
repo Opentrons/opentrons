@@ -2,11 +2,11 @@
 from __future__ import annotations
 from pydantic import Field
 from typing import TYPE_CHECKING, Optional, Type
-from typing_extensions import Literal
+from typing_extensions import Literal, Never
 
 from ..errors import TouchTipDisabledError, LabwareIsTipRackError
 from ..types import DeckPoint
-from .command import AbstractCommandImpl, BaseCommand, BaseCommandCreate
+from .command import AbstractCommandImpl, BaseCommand, BaseCommandCreate, SuccessData
 from .pipetting_common import (
     PipetteIdMixin,
     WellLocationMixin,
@@ -46,7 +46,9 @@ class TouchTipResult(DestinationPositionResult):
     pass
 
 
-class TouchTipImplementation(AbstractCommandImpl[TouchTipParams, TouchTipResult]):
+class TouchTipImplementation(
+    AbstractCommandImpl[TouchTipParams, SuccessData[TouchTipResult, None]]
+):
     """Touch tip command implementation."""
 
     def __init__(
@@ -60,7 +62,9 @@ class TouchTipImplementation(AbstractCommandImpl[TouchTipParams, TouchTipResult]
         self._movement = movement
         self._gantry_mover = gantry_mover
 
-    async def execute(self, params: TouchTipParams) -> TouchTipResult:
+    async def execute(
+        self, params: TouchTipParams
+    ) -> SuccessData[TouchTipResult, None]:
         """Touch tip to sides of a well using the requested pipette."""
         pipette_id = params.pipetteId
         labware_id = params.labwareId
@@ -99,10 +103,12 @@ class TouchTipImplementation(AbstractCommandImpl[TouchTipParams, TouchTipResult]
             speed=touch_speed,
         )
 
-        return TouchTipResult(position=DeckPoint(x=x, y=y, z=z))
+        return SuccessData(
+            public=TouchTipResult(position=DeckPoint(x=x, y=y, z=z)), private=None
+        )
 
 
-class TouchTip(BaseCommand[TouchTipParams, TouchTipResult]):
+class TouchTip(BaseCommand[TouchTipParams, TouchTipResult, Never]):
     """Touch up tip command model."""
 
     commandType: TouchTipCommandType = "touchTip"

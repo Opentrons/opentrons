@@ -1,13 +1,13 @@
 """Command models to execute a Thermocycler profile."""
 from __future__ import annotations
 from typing import List, Optional, TYPE_CHECKING
-from typing_extensions import Literal, Type
+from typing_extensions import Literal, Never, Type
 
 from pydantic import BaseModel, Field
 
 from opentrons.hardware_control.modules.types import ThermocyclerStep
 
-from ..command import AbstractCommandImpl, BaseCommand, BaseCommandCreate
+from ..command import AbstractCommandImpl, BaseCommand, BaseCommandCreate, SuccessData
 
 if TYPE_CHECKING:
     from opentrons.protocol_engine.state import StateView
@@ -45,7 +45,9 @@ class RunProfileResult(BaseModel):
     """Result data from running a Thermocycler profile."""
 
 
-class RunProfileImpl(AbstractCommandImpl[RunProfileParams, RunProfileResult]):
+class RunProfileImpl(
+    AbstractCommandImpl[RunProfileParams, SuccessData[RunProfileResult, None]]
+):
     """Execution implementation of a Thermocycler's run profile command."""
 
     def __init__(
@@ -57,7 +59,9 @@ class RunProfileImpl(AbstractCommandImpl[RunProfileParams, RunProfileResult]):
         self._state_view = state_view
         self._equipment = equipment
 
-    async def execute(self, params: RunProfileParams) -> RunProfileResult:
+    async def execute(
+        self, params: RunProfileParams
+    ) -> SuccessData[RunProfileResult, None]:
         """Run a Thermocycler profile."""
         thermocycler_state = self._state_view.modules.get_thermocycler_module_substate(
             params.moduleId
@@ -91,10 +95,10 @@ class RunProfileImpl(AbstractCommandImpl[RunProfileParams, RunProfileResult]):
                 steps=steps, repetitions=1, volume=target_volume
             )
 
-        return RunProfileResult()
+        return SuccessData(public=RunProfileResult(), private=None)
 
 
-class RunProfile(BaseCommand[RunProfileParams, RunProfileResult]):
+class RunProfile(BaseCommand[RunProfileParams, RunProfileResult, Never]):
     """A command to execute a Thermocycler profile run."""
 
     commandType: RunProfileCommandType = "thermocycler/runProfile"

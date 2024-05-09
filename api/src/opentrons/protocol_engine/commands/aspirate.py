@@ -1,7 +1,7 @@
 """Aspirate command request, result, and implementation models."""
 from __future__ import annotations
 from typing import TYPE_CHECKING, Optional, Type
-from typing_extensions import Literal
+from typing_extensions import Literal, Never
 
 from .pipetting_common import (
     PipetteIdMixin,
@@ -11,7 +11,7 @@ from .pipetting_common import (
     BaseLiquidHandlingResult,
     DestinationPositionResult,
 )
-from .command import AbstractCommandImpl, BaseCommand, BaseCommandCreate
+from .command import AbstractCommandImpl, BaseCommand, BaseCommandCreate, SuccessData
 
 from opentrons.hardware_control import HardwareControlAPI
 
@@ -40,7 +40,9 @@ class AspirateResult(BaseLiquidHandlingResult, DestinationPositionResult):
     pass
 
 
-class AspirateImplementation(AbstractCommandImpl[AspirateParams, AspirateResult]):
+class AspirateImplementation(
+    AbstractCommandImpl[AspirateParams, SuccessData[AspirateResult, None]]
+):
     """Aspirate command implementation."""
 
     def __init__(
@@ -58,7 +60,9 @@ class AspirateImplementation(AbstractCommandImpl[AspirateParams, AspirateResult]
         self._movement = movement
         self._command_note_adder = command_note_adder
 
-    async def execute(self, params: AspirateParams) -> AspirateResult:
+    async def execute(
+        self, params: AspirateParams
+    ) -> SuccessData[AspirateResult, None]:
         """Move to and aspirate from the requested well.
 
         Raises:
@@ -107,12 +111,16 @@ class AspirateImplementation(AbstractCommandImpl[AspirateParams, AspirateResult]
             command_note_adder=self._command_note_adder,
         )
 
-        return AspirateResult(
-            volume=volume, position=DeckPoint(x=position.x, y=position.y, z=position.z)
+        return SuccessData(
+            public=AspirateResult(
+                volume=volume,
+                position=DeckPoint(x=position.x, y=position.y, z=position.z),
+            ),
+            private=None,
         )
 
 
-class Aspirate(BaseCommand[AspirateParams, AspirateResult]):
+class Aspirate(BaseCommand[AspirateParams, AspirateResult, Never]):
     """Aspirate command model."""
 
     commandType: AspirateCommandType = "aspirate"

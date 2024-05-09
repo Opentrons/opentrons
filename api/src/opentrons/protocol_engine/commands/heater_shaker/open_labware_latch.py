@@ -1,10 +1,10 @@
 """Command models to open the Heater-Shaker Module's labware latch."""
 from __future__ import annotations
 from typing import Optional, TYPE_CHECKING
-from typing_extensions import Literal, Type
+from typing_extensions import Literal, Never, Type
 from pydantic import BaseModel, Field
 
-from ..command import AbstractCommandImpl, BaseCommand, BaseCommandCreate
+from ..command import AbstractCommandImpl, BaseCommand, BaseCommandCreate, SuccessData
 
 if TYPE_CHECKING:
     from opentrons.protocol_engine.state import StateView
@@ -32,7 +32,9 @@ class OpenLabwareLatchResult(BaseModel):
 
 
 class OpenLabwareLatchImpl(
-    AbstractCommandImpl[OpenLabwareLatchParams, OpenLabwareLatchResult]
+    AbstractCommandImpl[
+        OpenLabwareLatchParams, SuccessData[OpenLabwareLatchResult, None]
+    ]
 ):
     """Execution implementation of a Heater-Shaker's open latch labware command."""
 
@@ -47,7 +49,9 @@ class OpenLabwareLatchImpl(
         self._equipment = equipment
         self._movement = movement
 
-    async def execute(self, params: OpenLabwareLatchParams) -> OpenLabwareLatchResult:
+    async def execute(
+        self, params: OpenLabwareLatchParams
+    ) -> SuccessData[OpenLabwareLatchResult, None]:
         """Open a Heater-Shaker's labware latch."""
         # Allow propagation of ModuleNotLoadedError and WrongModuleTypeError.
         hs_module_substate = self._state_view.modules.get_heater_shaker_module_substate(
@@ -76,10 +80,15 @@ class OpenLabwareLatchImpl(
         if hs_hardware_module is not None:
             await hs_hardware_module.open_labware_latch()
 
-        return OpenLabwareLatchResult(pipetteRetracted=pipette_should_retract)
+        return SuccessData(
+            public=OpenLabwareLatchResult(pipetteRetracted=pipette_should_retract),
+            private=None,
+        )
 
 
-class OpenLabwareLatch(BaseCommand[OpenLabwareLatchParams, OpenLabwareLatchResult]):
+class OpenLabwareLatch(
+    BaseCommand[OpenLabwareLatchParams, OpenLabwareLatchResult, Never]
+):
     """A command to open a Heater-Shaker's labware latch."""
 
     commandType: OpenLabwareLatchCommandType = "heaterShaker/openLabwareLatch"

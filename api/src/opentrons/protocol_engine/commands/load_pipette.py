@@ -8,17 +8,13 @@ from opentrons_shared_data.pipette.types import PipetteGenerationType
 from opentrons_shared_data.robot import user_facing_robot_type
 from opentrons_shared_data.robot.dev_types import RobotTypeEnum
 from pydantic import BaseModel, Field
-from typing import TYPE_CHECKING, Optional, Type, Tuple
-from typing_extensions import Literal
+from typing import TYPE_CHECKING, Optional, Type
+from typing_extensions import Literal, Never
 
 from opentrons_shared_data.pipette.dev_types import PipetteNameType
 from opentrons.types import MountType
 
-from .command import (
-    AbstractCommandWithPrivateResultImpl,
-    BaseCommand,
-    BaseCommandCreate,
-)
+from .command import AbstractCommandImpl, BaseCommand, BaseCommandCreate, SuccessData
 from .configuring_common import PipetteConfigUpdateResultMixin
 from ..errors import InvalidSpecificationForRobotTypeError, InvalidLoadPipetteSpecsError
 
@@ -64,8 +60,8 @@ class LoadPipetteResult(BaseModel):
 
 
 class LoadPipetteImplementation(
-    AbstractCommandWithPrivateResultImpl[
-        LoadPipetteParams, LoadPipetteResult, LoadPipettePrivateResult
+    AbstractCommandImpl[
+        LoadPipetteParams, SuccessData[LoadPipetteResult, LoadPipettePrivateResult]
     ]
 ):
     """Load pipette command implementation."""
@@ -78,7 +74,7 @@ class LoadPipetteImplementation(
 
     async def execute(
         self, params: LoadPipetteParams
-    ) -> Tuple[LoadPipetteResult, LoadPipettePrivateResult]:
+    ) -> SuccessData[LoadPipetteResult, LoadPipettePrivateResult]:
         """Check that requested pipette is attached and assign its identifier."""
         pipette_generation = convert_to_pipette_name_type(
             params.pipetteName.value
@@ -114,16 +110,17 @@ class LoadPipetteImplementation(
             pipette_id=params.pipetteId,
         )
 
-        return LoadPipetteResult(
-            pipetteId=loaded_pipette.pipette_id
-        ), LoadPipettePrivateResult(
-            pipette_id=loaded_pipette.pipette_id,
-            serial_number=loaded_pipette.serial_number,
-            config=loaded_pipette.static_config,
+        return SuccessData(
+            public=LoadPipetteResult(pipetteId=loaded_pipette.pipette_id),
+            private=LoadPipettePrivateResult(
+                pipette_id=loaded_pipette.pipette_id,
+                serial_number=loaded_pipette.serial_number,
+                config=loaded_pipette.static_config,
+            ),
         )
 
 
-class LoadPipette(BaseCommand[LoadPipetteParams, LoadPipetteResult]):
+class LoadPipette(BaseCommand[LoadPipetteParams, LoadPipetteResult, Never]):
     """Load pipette command model."""
 
     commandType: LoadPipetteCommandType = "loadPipette"

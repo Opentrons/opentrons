@@ -2,7 +2,7 @@
 from __future__ import annotations
 from pydantic import Field
 from typing import TYPE_CHECKING, Optional, Type
-from typing_extensions import Literal
+from typing_extensions import Literal, Never
 
 from ..errors import LocationNotAccessibleByPipetteError
 from ..types import DeckPoint, AddressableOffsetVector
@@ -12,7 +12,7 @@ from .pipetting_common import (
     MovementMixin,
     DestinationPositionResult,
 )
-from .command import AbstractCommandImpl, BaseCommand, BaseCommandCreate
+from .command import AbstractCommandImpl, BaseCommand, BaseCommandCreate, SuccessData
 
 if TYPE_CHECKING:
     from ..execution import MovementHandler
@@ -83,7 +83,8 @@ class MoveToAddressableAreaForDropTipResult(DestinationPositionResult):
 
 class MoveToAddressableAreaForDropTipImplementation(
     AbstractCommandImpl[
-        MoveToAddressableAreaForDropTipParams, MoveToAddressableAreaForDropTipResult
+        MoveToAddressableAreaForDropTipParams,
+        SuccessData[MoveToAddressableAreaForDropTipResult, None],
     ]
 ):
     """Move to addressable area for drop tip command implementation."""
@@ -96,7 +97,7 @@ class MoveToAddressableAreaForDropTipImplementation(
 
     async def execute(
         self, params: MoveToAddressableAreaForDropTipParams
-    ) -> MoveToAddressableAreaForDropTipResult:
+    ) -> SuccessData[MoveToAddressableAreaForDropTipResult, None]:
         """Move the requested pipette to the requested addressable area in preperation of a drop tip."""
         self._state_view.addressable_areas.raise_if_area_not_in_deck_configuration(
             params.addressableAreaName
@@ -125,12 +126,19 @@ class MoveToAddressableAreaForDropTipImplementation(
             ignore_tip_configuration=params.ignoreTipConfiguration,
         )
 
-        return MoveToAddressableAreaForDropTipResult(position=DeckPoint(x=x, y=y, z=z))
+        return SuccessData(
+            public=MoveToAddressableAreaForDropTipResult(
+                position=DeckPoint(x=x, y=y, z=z)
+            ),
+            private=None,
+        )
 
 
 class MoveToAddressableAreaForDropTip(
     BaseCommand[
-        MoveToAddressableAreaForDropTipParams, MoveToAddressableAreaForDropTipResult
+        MoveToAddressableAreaForDropTipParams,
+        MoveToAddressableAreaForDropTipResult,
+        Never,
     ]
 ):
     """Move to addressable area for drop tip command model."""

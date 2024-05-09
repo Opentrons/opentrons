@@ -1,11 +1,11 @@
 """Command models to start heating a Thermocycler's block."""
 from __future__ import annotations
 from typing import Optional, TYPE_CHECKING
-from typing_extensions import Literal, Type
+from typing_extensions import Literal, Never, Type
 
 from pydantic import BaseModel, Field
 
-from ..command import AbstractCommandImpl, BaseCommand, BaseCommandCreate
+from ..command import AbstractCommandImpl, BaseCommand, BaseCommandCreate, SuccessData
 
 if TYPE_CHECKING:
     from opentrons.protocol_engine.state import StateView
@@ -45,7 +45,7 @@ class SetTargetBlockTemperatureResult(BaseModel):
 class SetTargetBlockTemperatureImpl(
     AbstractCommandImpl[
         SetTargetBlockTemperatureParams,
-        SetTargetBlockTemperatureResult,
+        SuccessData[SetTargetBlockTemperatureResult, None],
     ]
 ):
     """Execution implementation of a Thermocycler's set block temperature command."""
@@ -62,7 +62,7 @@ class SetTargetBlockTemperatureImpl(
     async def execute(
         self,
         params: SetTargetBlockTemperatureParams,
-    ) -> SetTargetBlockTemperatureResult:
+    ) -> SuccessData[SetTargetBlockTemperatureResult, None]:
         """Set a Thermocycler's target block temperature."""
         thermocycler_state = self._state_view.modules.get_thermocycler_module_substate(
             params.moduleId
@@ -92,13 +92,16 @@ class SetTargetBlockTemperatureImpl(
                 target_temperature, volume=target_volume, hold_time_seconds=hold_time
             )
 
-        return SetTargetBlockTemperatureResult(
-            targetBlockTemperature=target_temperature
+        return SuccessData(
+            public=SetTargetBlockTemperatureResult(
+                targetBlockTemperature=target_temperature
+            ),
+            private=None,
         )
 
 
 class SetTargetBlockTemperature(
-    BaseCommand[SetTargetBlockTemperatureParams, SetTargetBlockTemperatureResult]
+    BaseCommand[SetTargetBlockTemperatureParams, SetTargetBlockTemperatureResult, Never]
 ):
     """A command to set a Thermocycler's target block temperature."""
 

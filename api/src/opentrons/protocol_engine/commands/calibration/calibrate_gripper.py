@@ -2,7 +2,7 @@
 
 from enum import Enum
 from typing import Optional, Type
-from typing_extensions import Literal
+from typing_extensions import Literal, Never
 
 from pydantic import BaseModel, Field
 
@@ -13,11 +13,7 @@ from opentrons.hardware_control.types import OT3Mount, GripperProbe as HWAPIGrip
 from opentrons.hardware_control.instruments.ot3.instrument_calibration import (
     GripperCalibrationOffset,
 )
-from opentrons.protocol_engine.commands.command import (
-    AbstractCommandImpl,
-    BaseCommand,
-    BaseCommandCreate,
-)
+from ..command import AbstractCommandImpl, BaseCommand, BaseCommandCreate, SuccessData
 from opentrons.protocol_engine.types import Vec3f
 from opentrons.protocol_engine.resources import ensure_ot3_hardware
 
@@ -74,7 +70,9 @@ class CalibrateGripperResult(BaseModel):
 
 
 class CalibrateGripperImplementation(
-    AbstractCommandImpl[CalibrateGripperParams, CalibrateGripperResult]
+    AbstractCommandImpl[
+        CalibrateGripperParams, SuccessData[CalibrateGripperResult, None]
+    ]
 ):
     """The implementation of a `calibrateGripper` command."""
 
@@ -86,7 +84,9 @@ class CalibrateGripperImplementation(
     ) -> None:
         self._hardware_api = hardware_api
 
-    async def execute(self, params: CalibrateGripperParams) -> CalibrateGripperResult:
+    async def execute(
+        self, params: CalibrateGripperParams
+    ) -> SuccessData[CalibrateGripperResult, None]:
         """Execute a `calibrateGripper` command.
 
         1. Move from the current location to the calibration area on the deck.
@@ -118,11 +118,14 @@ class CalibrateGripperImplementation(
             )
             calibration_data = result
 
-        return CalibrateGripperResult.construct(
-            jawOffset=Vec3f.construct(
-                x=probe_offset.x, y=probe_offset.y, z=probe_offset.z
+        return SuccessData(
+            public=CalibrateGripperResult.construct(
+                jawOffset=Vec3f.construct(
+                    x=probe_offset.x, y=probe_offset.y, z=probe_offset.z
+                ),
+                savedCalibration=calibration_data,
             ),
-            savedCalibration=calibration_data,
+            private=None,
         )
 
     @staticmethod
@@ -135,7 +138,9 @@ class CalibrateGripperImplementation(
             return HWAPIGripperProbe.REAR
 
 
-class CalibrateGripper(BaseCommand[CalibrateGripperParams, CalibrateGripperResult]):
+class CalibrateGripper(
+    BaseCommand[CalibrateGripperParams, CalibrateGripperResult, Never]
+):
     """A `calibrateGripper` command."""
 
     commandType: CalibrateGripperCommandType = "calibration/calibrateGripper"

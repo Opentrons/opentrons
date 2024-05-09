@@ -3,10 +3,10 @@ from __future__ import annotations
 
 from pydantic import Field, BaseModel
 from typing import TYPE_CHECKING, Optional, Type
-from typing_extensions import Literal
+from typing_extensions import Literal, Never
 
 from .pipetting_common import PipetteIdMixin
-from .command import AbstractCommandImpl, BaseCommand, BaseCommandCreate
+from .command import AbstractCommandImpl, BaseCommand, BaseCommandCreate, SuccessData
 
 from ..types import TipPresenceStatus, InstrumentSensorId
 
@@ -35,7 +35,9 @@ class VerifyTipPresenceResult(BaseModel):
 
 
 class VerifyTipPresenceImplementation(
-    AbstractCommandImpl[VerifyTipPresenceParams, VerifyTipPresenceResult]
+    AbstractCommandImpl[
+        VerifyTipPresenceParams, SuccessData[VerifyTipPresenceResult, None]
+    ]
 ):
     """VerifyTipPresence command implementation."""
 
@@ -46,7 +48,9 @@ class VerifyTipPresenceImplementation(
     ) -> None:
         self._tip_handler = tip_handler
 
-    async def execute(self, params: VerifyTipPresenceParams) -> VerifyTipPresenceResult:
+    async def execute(
+        self, params: VerifyTipPresenceParams
+    ) -> SuccessData[VerifyTipPresenceResult, None]:
         """Verify if tip presence is as expected for the requested pipette."""
         pipette_id = params.pipetteId
         expected_state = params.expectedState
@@ -62,10 +66,12 @@ class VerifyTipPresenceImplementation(
             follow_singular_sensor=follow_singular_sensor,
         )
 
-        return VerifyTipPresenceResult()
+        return SuccessData(public=VerifyTipPresenceResult(), private=None)
 
 
-class VerifyTipPresence(BaseCommand[VerifyTipPresenceParams, VerifyTipPresenceResult]):
+class VerifyTipPresence(
+    BaseCommand[VerifyTipPresenceParams, VerifyTipPresenceResult, Never]
+):
     """VerifyTipPresence command model."""
 
     commandType: VerifyTipPresenceCommandType = "verifyTipPresence"

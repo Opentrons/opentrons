@@ -1,11 +1,11 @@
 """Command models to deactivate shaker for the Heater-Shaker Module."""
 from __future__ import annotations
 from typing import Optional, TYPE_CHECKING
-from typing_extensions import Literal, Type
+from typing_extensions import Literal, Never, Type
 
 from pydantic import BaseModel, Field
 
-from ..command import AbstractCommandImpl, BaseCommand, BaseCommandCreate
+from ..command import AbstractCommandImpl, BaseCommand, BaseCommandCreate, SuccessData
 
 if TYPE_CHECKING:
     from opentrons.protocol_engine.state import StateView
@@ -25,7 +25,9 @@ class DeactivateShakerResult(BaseModel):
 
 
 class DeactivateShakerImpl(
-    AbstractCommandImpl[DeactivateShakerParams, DeactivateShakerResult]
+    AbstractCommandImpl[
+        DeactivateShakerParams, SuccessData[DeactivateShakerResult, None]
+    ]
 ):
     """Execution implementation of a Heater-Shaker's deactivate shaker command."""
 
@@ -38,7 +40,9 @@ class DeactivateShakerImpl(
         self._state_view = state_view
         self._equipment = equipment
 
-    async def execute(self, params: DeactivateShakerParams) -> DeactivateShakerResult:
+    async def execute(
+        self, params: DeactivateShakerParams
+    ) -> SuccessData[DeactivateShakerResult, None]:
         """Deactivate shaker for a Heater-Shaker."""
         # Allow propagation of ModuleNotLoadedError and WrongModuleTypeError.
         hs_module_substate = self._state_view.modules.get_heater_shaker_module_substate(
@@ -55,10 +59,12 @@ class DeactivateShakerImpl(
         if hs_hardware_module is not None:
             await hs_hardware_module.deactivate_shaker()
 
-        return DeactivateShakerResult()
+        return SuccessData(public=DeactivateShakerResult(), private=None)
 
 
-class DeactivateShaker(BaseCommand[DeactivateShakerParams, DeactivateShakerResult]):
+class DeactivateShaker(
+    BaseCommand[DeactivateShakerParams, DeactivateShakerResult, Never]
+):
     """A command to deactivate shaker for a Heater-Shaker."""
 
     commandType: DeactivateShakerCommandType = "heaterShaker/deactivateShaker"

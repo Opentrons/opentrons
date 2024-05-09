@@ -1,11 +1,11 @@
 """Command models to wait for heating a Thermocycler's lid."""
 from __future__ import annotations
 from typing import Optional, TYPE_CHECKING
-from typing_extensions import Literal, Type
+from typing_extensions import Literal, Never, Type
 
 from pydantic import BaseModel, Field
 
-from ..command import AbstractCommandImpl, BaseCommand, BaseCommandCreate
+from ..command import AbstractCommandImpl, BaseCommand, BaseCommandCreate, SuccessData
 
 if TYPE_CHECKING:
     from opentrons.protocol_engine.state import StateView
@@ -27,8 +27,7 @@ class WaitForLidTemperatureResult(BaseModel):
 
 class WaitForLidTemperatureImpl(
     AbstractCommandImpl[
-        WaitForLidTemperatureParams,
-        WaitForLidTemperatureResult,
+        WaitForLidTemperatureParams, SuccessData[WaitForLidTemperatureResult, None]
     ]
 ):
     """Execution implementation of Thermocycler's wait for lid temperature command."""
@@ -45,7 +44,7 @@ class WaitForLidTemperatureImpl(
     async def execute(
         self,
         params: WaitForLidTemperatureParams,
-    ) -> WaitForLidTemperatureResult:
+    ) -> SuccessData[WaitForLidTemperatureResult, None]:
         """Wait for a Thermocycler's lid temperature."""
         thermocycler_state = self._state_view.modules.get_thermocycler_module_substate(
             params.moduleId
@@ -61,11 +60,11 @@ class WaitForLidTemperatureImpl(
         if thermocycler_hardware is not None:
             await thermocycler_hardware.wait_for_lid_target()
 
-        return WaitForLidTemperatureResult()
+        return SuccessData(public=WaitForLidTemperatureResult(), private=None)
 
 
 class WaitForLidTemperature(
-    BaseCommand[WaitForLidTemperatureParams, WaitForLidTemperatureResult]
+    BaseCommand[WaitForLidTemperatureParams, WaitForLidTemperatureResult, Never]
 ):
     """A command to wait for a Thermocycler's lid temperature."""
 
