@@ -32,7 +32,20 @@ export function SetWifiCred({
   const { t } = useTranslation(['device_settings', 'shared'])
   const keyboardRef = React.useRef(null)
   const [showPassword, setShowPassword] = React.useState<boolean>(false)
+  const inputRef = React.useRef<HTMLInputElement>(null)
   const isUnboxingFlowOngoing = useIsUnboxingFlowOngoing()
+
+  const handleBlur = (): void => {
+    if (inputRef.current != null) inputRef.current?.focus()
+  }
+
+  React.useEffect(() => {
+    if (inputRef.current != null || password.length > 0) {
+      console.log('hello')
+      console.log(inputRef?.current)
+      inputRef?.current?.focus()
+    }
+  }, [password])
 
   return (
     <>
@@ -54,15 +67,22 @@ export function SetWifiCred({
               aria-label="wifi_password"
               id="wifiPassword"
               value={password}
-              onChange={e => setPassword(e.target.value)}
               type={showPassword ? 'text' : 'password'}
-              onBlur={e => e.target.focus()}
+              onBlur={handleBlur}
+              ref={inputRef}
               autoFocus
             />
           </Box>
           <Btn
             marginLeft={SPACING.spacing24}
-            onClick={() => setShowPassword(currentState => !currentState)}
+            onClick={() => {
+              setShowPassword(currentState => !currentState)
+              const input = document.querySelector('input')
+              console.log('onclick')
+              console.log(input)
+              inputRef?.current?.focus()
+              input?.setSelectionRange(input.value.length, input.value.length)
+            }}
           >
             <Flex
               flexDirection={DIRECTION_ROW}
@@ -79,7 +99,10 @@ export function SetWifiCred({
       </Flex>
       <Flex width="100%" position={POSITION_FIXED} left="0" bottom="0">
         <FullKeyboard
-          onChange={e => e != null && setPassword(String(e))}
+          onChange={e => {
+            e != null && setPassword(String(e))
+            inputRef?.current?.focus()
+          }}
           keyboardRef={keyboardRef}
         />
       </Flex>
