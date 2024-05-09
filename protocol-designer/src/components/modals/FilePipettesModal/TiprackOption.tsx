@@ -74,29 +74,23 @@ export function TiprackOption(props: TiprackOptionProps): JSX.Element {
     <>
       <Flex
         aria-label={`TiprackOption_flex_${text}`}
-        cursor="pointer"
         onClick={isDisabled ? undefined : onClick}
         flexDirection={DIRECTION_ROW}
         alignItems={ALIGN_CENTER}
+        width="13.5rem"
+        css={optionStyle}
+        padding={SPACING.spacing8}
+        border={
+          isSelected && !isDisabled
+            ? BORDERS.activeLineBorder
+            : BORDERS.lineBorder
+        }
+        borderRadius={BORDERS.borderRadius8}
+        cursor={isDisabled ? 'auto' : 'pointer'}
+        backgroundColor={COLORS.transparent}
         {...targetProps}
       >
-        <StyledText
-          as="label"
-          width="13.5rem"
-          css={optionStyle}
-          alignItems={ALIGN_CENTER}
-          padding={SPACING.spacing8}
-          border={
-            isSelected && !isDisabled
-              ? BORDERS.activeLineBorder
-              : BORDERS.lineBorder
-          }
-          borderRadius={BORDERS.borderRadius8}
-          cursor={isDisabled ? 'auto' : 'pointer'}
-          backgroundColor={COLORS.transparent}
-        >
-          {text}
-        </StyledText>
+        <StyledText as="label">{text}</StyledText>
       </Flex>
       {isDisabled ? (
         <Tooltip {...tooltipProps}>{t('disabled_no_space_pipette')}</Tooltip>

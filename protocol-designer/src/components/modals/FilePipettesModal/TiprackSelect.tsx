@@ -35,6 +35,7 @@ export const TiprackSelect = (
           marginBottom={SPACING.spacing4}
           width="max-width"
           key={`${option.name}_${index}`}
+          overflow="hidden"
         >
           <TiprackOption
             isDisabled={
