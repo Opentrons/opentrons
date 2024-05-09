@@ -118,7 +118,10 @@ function DropdownIndicator(
           [styles.flipped]: props.selectProps.menuIsOpen,
         })}
       >
-        <Icon name="menu-down" className={cx(styles.dropdown_indicator_icon)} />
+        <Icon
+          name="menu-down-pd"
+          className={cx(styles.dropdown_indicator_icon)}
+        />
       </div>
     </reactSelectComponents.DropdownIndicator>
   )
