@@ -83,7 +83,11 @@ export function SetWifiCred({
               gridGap={SPACING.spacing12}
               width="7.375rem"
             >
-              <Icon name={showPassword ? 'eye-slash' : 'eye'} size="3rem" />
+              <Icon
+                name={showPassword ? 'eye-slash' : 'eye'}
+                size="3rem"
+                data-testid={showPassword ? 'icon_eye-slash' : 'icon_eye'}
+              />
               <StyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
                 {showPassword ? t('hide') : t('show')}
               </StyledText>
