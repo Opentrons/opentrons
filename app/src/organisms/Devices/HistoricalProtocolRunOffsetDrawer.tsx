@@ -98,9 +98,15 @@ export function HistoricalProtocolRunOffsetDrawer(
           </Flex>
         </Banner>
       ) : null}
-      <Flex justifyContent={JUSTIFY_FLEX_START}>
+      <Flex
+        justifyContent={JUSTIFY_FLEX_START}
+        marginBottom={SPACING.spacing6}
+        gridGap={SPACING.spacing8}
+      >
         <StyledText
-          width="24%"
+          paddingLeft={SPACING.spacing4}
+          paddingRight={SPACING.spacing8}
+          width="22%"
           as="label"
           fontWeight={TYPOGRAPHY.fontWeightSemiBold}
           textTransform={TYPOGRAPHY.textTransformCapitalize}
@@ -109,8 +115,9 @@ export function HistoricalProtocolRunOffsetDrawer(
           {t('location')}
         </StyledText>
         <StyledText
+          paddingX={SPACING.spacing8}
           as="label"
-          width="33%"
+          width="41.5%"
           fontWeight={TYPOGRAPHY.fontWeightSemiBold}
           textTransform={TYPOGRAPHY.textTransformCapitalize}
           datatest-id="RecentProtocolRun_OffsetDrawer_labwareTitle"
@@ -118,8 +125,9 @@ export function HistoricalProtocolRunOffsetDrawer(
           {t('labware')}
         </StyledText>
         <StyledText
+          paddingX={SPACING.spacing8}
           as="label"
-          width="40%"
+          width="34%"
           fontWeight={TYPOGRAPHY.fontWeightSemiBold}
           textTransform={TYPOGRAPHY.textTransformCapitalize}
           datatest-id="RecentProtocolRun_OffsetDrawer_labwareOffsetDataTitle"
@@ -146,19 +154,18 @@ export function HistoricalProtocolRunOffsetDrawer(
             justifyContent={JUSTIFY_FLEX_START}
             padding={SPACING.spacing8}
             backgroundColor={COLORS.white}
-            marginY={SPACING.spacing8}
+            marginY={SPACING.spacing4}
             borderRadius={BORDERS.borderRadius4}
+            gridGap={SPACING.spacing8}
           >
-            <StyledText width="23.5%" as="label">
+            <StyledText width="23%" as="label">
               {t('slot', { slotName: offset.location.slotName })}
               {offset.location.moduleModel != null &&
-                ` - ${String(
-                  getModuleDisplayName(offset.location.moduleModel)
-                )}`}
+                ` - ${getModuleDisplayName(offset.location.moduleModel)}`}
             </StyledText>
             <StyledText
               as="label"
-              width="34%"
+              width="43%"
               overflow="hidden"
               textOverflow="ellipsis"
               title={labwareName}
@@ -167,7 +174,7 @@ export function HistoricalProtocolRunOffsetDrawer(
             </StyledText>
             <OffsetVector
               {...offset.vector}
-              width="40%"
+              width="34%"
               fontSize={TYPOGRAPHY.fontSizeLabel}
               as="label"
             />
