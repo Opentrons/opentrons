@@ -3,10 +3,15 @@
 Provide primitive data structures that can be used to generate AST nodes.
 """
 
-import typing
 import ast
+import typing
 from dataclasses import dataclass
-from test_data_generation.python_protocol_generation.util import ProtocolContextMethods
+
+from test_data_generation.constants import (
+    PROTOCOL_CONTEXT_VAR_NAME,
+    ModuleInfo,
+    ProtocolContextMethods,
+)
 
 
 class CanGenerateAST(typing.Protocol):
@@ -70,6 +75,59 @@ class CallFunction(BaseCall):
             keywords=[],
         )
 
+    @classmethod
+    def load_labware(cls, labware_name: str, labware_location: str) -> "CallFunction":
+        """Create a CallFunction for loading labware."""
+        return cls(
+            call_on=PROTOCOL_CONTEXT_VAR_NAME,
+            what_to_call=ProtocolContextMethods.LOAD_LABWARE,
+            args=[labware_name, labware_location],
+        )
+
+    @classmethod
+    def load_waste_chute(cls) -> "CallFunction":
+        """Create a CallFunction for loading a waste chute."""
+        return cls(
+            call_on=PROTOCOL_CONTEXT_VAR_NAME,
+            what_to_call=ProtocolContextMethods.LOAD_WASTE_CHUTE,
+            args=[],
+        )
+
+    @classmethod
+    def load_trash_bin(cls, location: str) -> "CallFunction":
+        """Create a CallFunction for loading a trash bin."""
+        return cls(
+            call_on=PROTOCOL_CONTEXT_VAR_NAME,
+            what_to_call=ProtocolContextMethods.LOAD_TRASH_BIN,
+            args=[location],
+        )
+
+    @classmethod
+    def load_module(
+        cls, module_info: ModuleInfo, module_location: str | None
+    ) -> "CallFunction":
+        """Create a CallFunction for loading a module."""
+        module_args = [module_info.load_name]
+        if module_location:
+            module_args.append(module_location)
+
+        return cls(
+            call_on=PROTOCOL_CONTEXT_VAR_NAME,
+            what_to_call=ProtocolContextMethods.LOAD_MODULE,
+            args=module_args,
+        )
+
+    @classmethod
+    def load_instrument(
+        cls, instrument_name: str, mount: typing.Literal["left", "right"]
+    ) -> "CallFunction":
+        """Create a CallFunction for loading an instrument."""
+        return cls(
+            call_on=PROTOCOL_CONTEXT_VAR_NAME,
+            what_to_call=ProtocolContextMethods.LOAD_INSTRUMENT,
+            args=[instrument_name, mount],
+        )
+
 
 @dataclass
 class CallAttribute(BaseCall):
@@ -105,6 +163,44 @@ class AssignStatement:
                 targets=[ast.Name(id=self.var_name, ctx=ast.Store())],
                 value=self.value,
             )
+
+    @classmethod
+    def load_labware(
+        cls, var_name: str, labware_name: str, labware_location: str
+    ) -> "AssignStatement":
+        """Create an AssignStatement for loading labware."""
+        return cls(
+            var_name=var_name,
+            value=CallFunction.load_labware(labware_name, labware_location),
+        )
+
+    @classmethod
+    def load_waste_chute(cls) -> "AssignStatement":
+        """Create an AssignStatement for loading a waste chute."""
+        return cls(
+            var_name="waste_chute",
+            value=CallFunction.load_waste_chute(),
+        )
+
+    @classmethod
+    def load_trash_bin(cls, location: str) -> "AssignStatement":
+        """Create an AssignStatement for loading a trash bin."""
+        return cls(
+            var_name=f"trash_bin_{location}",
+            value=CallFunction.load_trash_bin(location.upper()),
+        )
+
+    @classmethod
+    def load_module(
+        cls, module_info: ModuleInfo, module_location: str | None
+    ) -> "AssignStatement":
+        """Create an AssignStatement for loading a module."""
+        if module_location is None:
+            module_location = ""
+        return cls(
+            var_name=module_info.variable_name(module_location),
+            value=CallFunction.load_module(module_info, module_location),
+        )
 
 
 @dataclass
