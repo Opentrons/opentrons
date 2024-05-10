@@ -3,11 +3,12 @@
 from __future__ import annotations
 from pydantic import BaseModel, Field
 from typing import TYPE_CHECKING, Optional, Type
-from typing_extensions import Literal, Never
+from typing_extensions import Literal
 
 from ..types import DeckPoint
 from ..resources import ModelUtils
 from .command import AbstractCommandImpl, BaseCommand, BaseCommandCreate, SuccessData
+from ..errors.error_occurrence import ErrorOccurrence
 
 if TYPE_CHECKING:
     from ..execution import GantryMover
@@ -79,7 +80,9 @@ class SavePositionImplementation(
         )
 
 
-class SavePosition(BaseCommand[SavePositionParams, SavePositionResult, Never]):
+class SavePosition(
+    BaseCommand[SavePositionParams, SavePositionResult, ErrorOccurrence]
+):
     """Save Position command model."""
 
     commandType: SavePositionCommandType = "savePosition"

@@ -3,13 +3,14 @@ from __future__ import annotations
 
 import enum
 from typing import TYPE_CHECKING, Type, Optional
-from typing_extensions import Literal, Never
+from typing_extensions import Literal
 
 from pydantic import BaseModel, Field
 
 from opentrons.types import MountType, Point, Mount
 from opentrons.hardware_control.types import Axis, CriticalPoint
 from ..command import AbstractCommandImpl, BaseCommand, BaseCommandCreate, SuccessData
+from ...errors.error_occurrence import ErrorOccurrence
 from opentrons.protocol_engine.resources.ot3_validation import ensure_ot3_hardware
 
 if TYPE_CHECKING:
@@ -116,7 +117,11 @@ class MoveToMaintenancePositionImplementation(
 
 
 class MoveToMaintenancePosition(
-    BaseCommand[MoveToMaintenancePositionParams, MoveToMaintenancePositionResult, Never]
+    BaseCommand[
+        MoveToMaintenancePositionParams,
+        MoveToMaintenancePositionResult,
+        ErrorOccurrence,
+    ]
 ):
     """Calibration set up position command model."""
 

@@ -1,11 +1,12 @@
 """Command models to open a Thermocycler's lid."""
 from __future__ import annotations
 from typing import Optional, TYPE_CHECKING
-from typing_extensions import Literal, Never, Type
+from typing_extensions import Literal, Type
 
 from pydantic import BaseModel, Field
 
 from ..command import AbstractCommandImpl, BaseCommand, BaseCommandCreate, SuccessData
+from ...errors.error_occurrence import ErrorOccurrence
 from opentrons.protocol_engine.types import MotorAxis
 
 if TYPE_CHECKING:
@@ -63,7 +64,7 @@ class OpenLidImpl(AbstractCommandImpl[OpenLidParams, SuccessData[OpenLidResult, 
         return SuccessData(public=OpenLidResult(), private=None)
 
 
-class OpenLid(BaseCommand[OpenLidParams, OpenLidResult, Never]):
+class OpenLid(BaseCommand[OpenLidParams, OpenLidResult, ErrorOccurrence]):
     """A command to open a Thermocycler's lid."""
 
     commandType: OpenLidCommandType = "thermocycler/openLid"

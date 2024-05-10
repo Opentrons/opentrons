@@ -1,7 +1,7 @@
 """Aspirate command request, result, and implementation models."""
 from __future__ import annotations
 from typing import TYPE_CHECKING, Optional, Type
-from typing_extensions import Literal, Never
+from typing_extensions import Literal
 
 from .pipetting_common import (
     PipetteIdMixin,
@@ -12,6 +12,7 @@ from .pipetting_common import (
     DestinationPositionResult,
 )
 from .command import AbstractCommandImpl, BaseCommand, BaseCommandCreate, SuccessData
+from ..errors.error_occurrence import ErrorOccurrence
 
 from opentrons.hardware_control import HardwareControlAPI
 
@@ -120,7 +121,7 @@ class AspirateImplementation(
         )
 
 
-class Aspirate(BaseCommand[AspirateParams, AspirateResult, Never]):
+class Aspirate(BaseCommand[AspirateParams, AspirateResult, ErrorOccurrence]):
     """Aspirate command model."""
 
     commandType: AspirateCommandType = "aspirate"

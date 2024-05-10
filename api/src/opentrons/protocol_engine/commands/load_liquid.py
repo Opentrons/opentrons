@@ -2,9 +2,10 @@
 from __future__ import annotations
 from pydantic import BaseModel, Field
 from typing import Optional, Type, Dict, TYPE_CHECKING
-from typing_extensions import Literal, Never
+from typing_extensions import Literal
 
 from .command import AbstractCommandImpl, BaseCommand, BaseCommandCreate, SuccessData
+from ..errors.error_occurrence import ErrorOccurrence
 
 if TYPE_CHECKING:
     from ..state import StateView
@@ -56,7 +57,7 @@ class LoadLiquidImplementation(
         return SuccessData(public=LoadLiquidResult(), private=None)
 
 
-class LoadLiquid(BaseCommand[LoadLiquidParams, LoadLiquidResult, Never]):
+class LoadLiquid(BaseCommand[LoadLiquidParams, LoadLiquidResult, ErrorOccurrence]):
     """Load liquid command resource model."""
 
     commandType: LoadLiquidCommandType = "loadLiquid"

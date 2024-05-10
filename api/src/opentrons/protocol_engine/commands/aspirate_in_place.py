@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 from typing import TYPE_CHECKING, Optional, Type
-from typing_extensions import Literal, Never
+from typing_extensions import Literal
 
 from opentrons.hardware_control import HardwareControlAPI
 
@@ -13,6 +13,7 @@ from .pipetting_common import (
     BaseLiquidHandlingResult,
 )
 from .command import AbstractCommandImpl, BaseCommand, BaseCommandCreate, SuccessData
+from ..errors.error_occurrence import ErrorOccurrence
 from ..errors.exceptions import PipetteNotReadyToAspirateError
 
 if TYPE_CHECKING:
@@ -82,7 +83,9 @@ class AspirateInPlaceImplementation(
         return SuccessData(public=AspirateInPlaceResult(volume=volume), private=None)
 
 
-class AspirateInPlace(BaseCommand[AspirateInPlaceParams, AspirateInPlaceResult, Never]):
+class AspirateInPlace(
+    BaseCommand[AspirateInPlaceParams, AspirateInPlaceResult, ErrorOccurrence]
+):
     """AspirateInPlace command model."""
 
     commandType: AspirateInPlaceCommandType = "aspirateInPlace"

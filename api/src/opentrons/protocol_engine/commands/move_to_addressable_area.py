@@ -2,7 +2,7 @@
 from __future__ import annotations
 from pydantic import Field
 from typing import TYPE_CHECKING, Optional, Type
-from typing_extensions import Literal, Never
+from typing_extensions import Literal
 
 from ..errors import LocationNotAccessibleByPipetteError
 from ..types import DeckPoint, AddressableOffsetVector
@@ -13,6 +13,7 @@ from .pipetting_common import (
     DestinationPositionResult,
 )
 from .command import AbstractCommandImpl, BaseCommand, BaseCommandCreate, SuccessData
+from ..errors.error_occurrence import ErrorOccurrence
 
 if TYPE_CHECKING:
     from ..execution import MovementHandler
@@ -113,7 +114,9 @@ class MoveToAddressableAreaImplementation(
 
 
 class MoveToAddressableArea(
-    BaseCommand[MoveToAddressableAreaParams, MoveToAddressableAreaResult, Never]
+    BaseCommand[
+        MoveToAddressableAreaParams, MoveToAddressableAreaResult, ErrorOccurrence
+    ]
 ):
     """Move to addressable area command model."""
 

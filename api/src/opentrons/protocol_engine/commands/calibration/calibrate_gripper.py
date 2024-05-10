@@ -2,7 +2,7 @@
 
 from enum import Enum
 from typing import Optional, Type
-from typing_extensions import Literal, Never
+from typing_extensions import Literal
 
 from pydantic import BaseModel, Field
 
@@ -14,6 +14,7 @@ from opentrons.hardware_control.instruments.ot3.instrument_calibration import (
     GripperCalibrationOffset,
 )
 from ..command import AbstractCommandImpl, BaseCommand, BaseCommandCreate, SuccessData
+from ...errors.error_occurrence import ErrorOccurrence
 from opentrons.protocol_engine.types import Vec3f
 from opentrons.protocol_engine.resources import ensure_ot3_hardware
 
@@ -139,7 +140,7 @@ class CalibrateGripperImplementation(
 
 
 class CalibrateGripper(
-    BaseCommand[CalibrateGripperParams, CalibrateGripperResult, Never]
+    BaseCommand[CalibrateGripperParams, CalibrateGripperResult, ErrorOccurrence]
 ):
     """A `calibrateGripper` command."""
 

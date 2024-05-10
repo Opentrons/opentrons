@@ -1,10 +1,11 @@
 """Implementation, request models, and response models for the load module command."""
 from __future__ import annotations
 from typing import TYPE_CHECKING, Optional, Type
-from typing_extensions import Literal, Never
+from typing_extensions import Literal
 from pydantic import BaseModel, Field
 
 from .command import AbstractCommandImpl, BaseCommand, BaseCommandCreate, SuccessData
+from ..errors.error_occurrence import ErrorOccurrence
 from ..types import (
     DeckSlotLocation,
     ModuleType,
@@ -185,7 +186,7 @@ class LoadModuleImplementation(
                 )
 
 
-class LoadModule(BaseCommand[LoadModuleParams, LoadModuleResult, Never]):
+class LoadModule(BaseCommand[LoadModuleParams, LoadModuleResult, ErrorOccurrence]):
     """The model for a load module command."""
 
     commandType: LoadModuleCommandType = "loadModule"

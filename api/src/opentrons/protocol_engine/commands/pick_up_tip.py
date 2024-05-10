@@ -2,7 +2,7 @@
 from __future__ import annotations
 from pydantic import Field
 from typing import TYPE_CHECKING, Optional, Type
-from typing_extensions import Literal, Never
+from typing_extensions import Literal
 
 from ..types import DeckPoint
 from .pipetting_common import (
@@ -11,6 +11,7 @@ from .pipetting_common import (
     DestinationPositionResult,
 )
 from .command import AbstractCommandImpl, BaseCommand, BaseCommandCreate, SuccessData
+from ..errors.error_occurrence import ErrorOccurrence
 
 if TYPE_CHECKING:
     from ..state import StateView
@@ -98,7 +99,7 @@ class PickUpTipImplementation(
         )
 
 
-class PickUpTip(BaseCommand[PickUpTipParams, PickUpTipResult, Never]):
+class PickUpTip(BaseCommand[PickUpTipParams, PickUpTipResult, ErrorOccurrence]):
     """Pick up tip command model."""
 
     commandType: PickUpTipCommandType = "pickUpTip"

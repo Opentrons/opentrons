@@ -1,10 +1,11 @@
 """Command models to open the Heater-Shaker Module's labware latch."""
 from __future__ import annotations
 from typing import Optional, TYPE_CHECKING
-from typing_extensions import Literal, Never, Type
+from typing_extensions import Literal, Type
 from pydantic import BaseModel, Field
 
 from ..command import AbstractCommandImpl, BaseCommand, BaseCommandCreate, SuccessData
+from ...errors.error_occurrence import ErrorOccurrence
 
 if TYPE_CHECKING:
     from opentrons.protocol_engine.state import StateView
@@ -87,7 +88,7 @@ class OpenLabwareLatchImpl(
 
 
 class OpenLabwareLatch(
-    BaseCommand[OpenLabwareLatchParams, OpenLabwareLatchResult, Never]
+    BaseCommand[OpenLabwareLatchParams, OpenLabwareLatchResult, ErrorOccurrence]
 ):
     """A command to open a Heater-Shaker's labware latch."""
 

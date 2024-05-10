@@ -3,7 +3,7 @@
 from __future__ import annotations
 from pydantic import BaseModel, Field
 from typing import TYPE_CHECKING, Optional, Type
-from typing_extensions import Literal, Never
+from typing_extensions import Literal
 
 from opentrons.types import Point
 from ..types import (
@@ -18,6 +18,7 @@ from ..types import (
 from ..errors import LabwareMovementNotAllowedError, NotSupportedOnRobotType
 from ..resources import labware_validation, fixture_validation
 from .command import AbstractCommandImpl, BaseCommand, BaseCommandCreate, SuccessData
+from ..errors.error_occurrence import ErrorOccurrence
 from opentrons_shared_data.gripper.constants import GRIPPER_PADDLE_WIDTH
 
 if TYPE_CHECKING:
@@ -217,7 +218,7 @@ class MoveLabwareImplementation(
         )
 
 
-class MoveLabware(BaseCommand[MoveLabwareParams, MoveLabwareResult, Never]):
+class MoveLabware(BaseCommand[MoveLabwareParams, MoveLabwareResult, ErrorOccurrence]):
     """A ``moveLabware`` command."""
 
     commandType: MoveLabwareCommandType = "moveLabware"

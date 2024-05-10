@@ -2,11 +2,12 @@
 from __future__ import annotations
 from pydantic import BaseModel, Field
 from typing import TYPE_CHECKING, Optional, List, Type
-from typing_extensions import Literal, Never
+from typing_extensions import Literal
 
 from opentrons.types import MountType
 from ..types import MotorAxis
 from .command import AbstractCommandImpl, BaseCommand, BaseCommandCreate, SuccessData
+from ..errors.error_occurrence import ErrorOccurrence
 
 if TYPE_CHECKING:
     from ..execution import MovementHandler
@@ -60,7 +61,7 @@ class HomeImplementation(
         return SuccessData(public=HomeResult(), private=None)
 
 
-class Home(BaseCommand[HomeParams, HomeResult, Never]):
+class Home(BaseCommand[HomeParams, HomeResult, ErrorOccurrence]):
     """Command to send some (or all) motors to their home positions.
 
     Homing a motor re-establishes positional accuracy the first time a motor

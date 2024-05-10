@@ -1,7 +1,7 @@
 """Blow-out command request, result, and implementation models."""
 from __future__ import annotations
 from typing import TYPE_CHECKING, Optional, Type
-from typing_extensions import Literal, Never
+from typing_extensions import Literal
 
 from ..types import DeckPoint
 from .pipetting_common import (
@@ -11,6 +11,7 @@ from .pipetting_common import (
     DestinationPositionResult,
 )
 from .command import AbstractCommandImpl, BaseCommand, BaseCommandCreate, SuccessData
+from ..errors.error_occurrence import ErrorOccurrence
 
 from opentrons.hardware_control import HardwareControlAPI
 
@@ -70,7 +71,7 @@ class BlowOutImplementation(
         )
 
 
-class BlowOut(BaseCommand[BlowOutParams, BlowOutResult, Never]):
+class BlowOut(BaseCommand[BlowOutParams, BlowOutResult, ErrorOccurrence]):
     """Blow-out command model."""
 
     commandType: BlowOutCommandType = "blowout"

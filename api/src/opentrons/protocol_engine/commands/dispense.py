@@ -1,7 +1,7 @@
 """Dispense command request, result, and implementation models."""
 from __future__ import annotations
 from typing import TYPE_CHECKING, Optional, Type
-from typing_extensions import Literal, Never
+from typing_extensions import Literal
 
 from pydantic import Field
 
@@ -15,6 +15,7 @@ from .pipetting_common import (
     DestinationPositionResult,
 )
 from .command import AbstractCommandImpl, BaseCommand, BaseCommandCreate, SuccessData
+from ..errors.error_occurrence import ErrorOccurrence
 
 if TYPE_CHECKING:
     from ..execution import MovementHandler, PipettingHandler
@@ -77,7 +78,7 @@ class DispenseImplementation(
         )
 
 
-class Dispense(BaseCommand[DispenseParams, DispenseResult, Never]):
+class Dispense(BaseCommand[DispenseParams, DispenseResult, ErrorOccurrence]):
     """Dispense command model."""
 
     commandType: DispenseCommandType = "dispense"

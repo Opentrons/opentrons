@@ -4,11 +4,12 @@
 from __future__ import annotations
 
 from typing import Optional, TYPE_CHECKING
-from typing_extensions import Literal, Never, Type
+from typing_extensions import Literal, Type
 
 from pydantic import BaseModel, Field
 
 from ..command import AbstractCommandImpl, BaseCommand, BaseCommandCreate, SuccessData
+from ...errors.error_occurrence import ErrorOccurrence
 
 if TYPE_CHECKING:
     from opentrons.protocol_engine.execution import EquipmentHandler
@@ -77,7 +78,7 @@ class DisengageImplementation(
         return SuccessData(public=DisengageResult(), private=None)
 
 
-class Disengage(BaseCommand[DisengageParams, DisengageResult, Never]):
+class Disengage(BaseCommand[DisengageParams, DisengageResult, ErrorOccurrence]):
     """A command to disengage a Magnetic Module's magnets."""
 
     commandType: DisengageCommandType = "magneticModule/disengage"

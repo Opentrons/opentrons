@@ -12,9 +12,10 @@ put your own disambiguation identifier in the payload.
 """
 from pydantic import BaseModel, Extra
 from typing import Optional, Type
-from typing_extensions import Literal, Never
+from typing_extensions import Literal
 
 from .command import AbstractCommandImpl, BaseCommand, BaseCommandCreate, SuccessData
+from ..errors.error_occurrence import ErrorOccurrence
 
 
 CustomCommandType = Literal["custom"]
@@ -51,7 +52,7 @@ class CustomImplementation(
         return SuccessData(public=CustomResult.construct(), private=None)
 
 
-class Custom(BaseCommand[CustomParams, CustomResult, Never]):
+class Custom(BaseCommand[CustomParams, CustomResult, ErrorOccurrence]):
     """Custom command model."""
 
     commandType: CustomCommandType = "custom"

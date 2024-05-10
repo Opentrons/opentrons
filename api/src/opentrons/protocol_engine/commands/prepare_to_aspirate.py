@@ -3,12 +3,13 @@
 from __future__ import annotations
 from pydantic import BaseModel
 from typing import TYPE_CHECKING, Optional, Type
-from typing_extensions import Literal, Never
+from typing_extensions import Literal
 
 from .pipetting_common import (
     PipetteIdMixin,
 )
 from .command import AbstractCommandImpl, BaseCommand, BaseCommandCreate, SuccessData
+from ..errors.error_occurrence import ErrorOccurrence
 
 if TYPE_CHECKING:
     from ..execution.pipetting import PipettingHandler
@@ -50,7 +51,7 @@ class PrepareToAspirateImplementation(
 
 
 class PrepareToAspirate(
-    BaseCommand[PrepareToAspirateParams, PrepareToAspirateResult, Never]
+    BaseCommand[PrepareToAspirateParams, PrepareToAspirateResult, ErrorOccurrence]
 ):
     """Prepare for aspirate command model."""
 

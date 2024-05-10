@@ -1,7 +1,7 @@
 """Dispense-in-place command request, result, and implementation models."""
 from __future__ import annotations
 from typing import TYPE_CHECKING, Optional, Type
-from typing_extensions import Literal, Never
+from typing_extensions import Literal
 
 from pydantic import Field
 
@@ -12,6 +12,7 @@ from .pipetting_common import (
     BaseLiquidHandlingResult,
 )
 from .command import AbstractCommandImpl, BaseCommand, BaseCommandCreate, SuccessData
+from ..errors.error_occurrence import ErrorOccurrence
 
 if TYPE_CHECKING:
     from ..execution import PipettingHandler
@@ -56,7 +57,9 @@ class DispenseInPlaceImplementation(
         return SuccessData(public=DispenseInPlaceResult(volume=volume), private=None)
 
 
-class DispenseInPlace(BaseCommand[DispenseInPlaceParams, DispenseInPlaceResult, Never]):
+class DispenseInPlace(
+    BaseCommand[DispenseInPlaceParams, DispenseInPlaceResult, ErrorOccurrence]
+):
     """DispenseInPlace command model."""
 
     commandType: DispenseInPlaceCommandType = "dispenseInPlace"

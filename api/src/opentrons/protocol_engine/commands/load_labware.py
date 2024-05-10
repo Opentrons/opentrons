@@ -2,7 +2,7 @@
 from __future__ import annotations
 from pydantic import BaseModel, Field
 from typing import TYPE_CHECKING, Optional, Type
-from typing_extensions import Literal, Never
+from typing_extensions import Literal
 
 from opentrons_shared_data.labware.labware_definition import LabwareDefinition
 
@@ -16,6 +16,7 @@ from ..types import (
 )
 
 from .command import AbstractCommandImpl, BaseCommand, BaseCommandCreate, SuccessData
+from ..errors.error_occurrence import ErrorOccurrence
 
 if TYPE_CHECKING:
     from ..state import StateView
@@ -156,7 +157,7 @@ class LoadLabwareImplementation(
         )
 
 
-class LoadLabware(BaseCommand[LoadLabwareParams, LoadLabwareResult, Never]):
+class LoadLabware(BaseCommand[LoadLabwareParams, LoadLabwareResult, ErrorOccurrence]):
     """Load labware command resource model."""
 
     commandType: LoadLabwareCommandType = "loadLabware"

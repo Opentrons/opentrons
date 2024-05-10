@@ -2,10 +2,11 @@
 from __future__ import annotations
 from pydantic import BaseModel, Field
 from typing import TYPE_CHECKING, Optional, Type
-from typing_extensions import Literal, Never
+from typing_extensions import Literal
 
 from .pipetting_common import PipetteIdMixin
 from .command import AbstractCommandImpl, BaseCommand, BaseCommandCreate, SuccessData
+from ..errors.error_occurrence import ErrorOccurrence
 from .configuring_common import PipetteConfigUpdateResultMixin
 
 if TYPE_CHECKING:
@@ -69,7 +70,7 @@ class ConfigureForVolumeImplementation(
 
 
 class ConfigureForVolume(
-    BaseCommand[ConfigureForVolumeParams, ConfigureForVolumeResult, Never]
+    BaseCommand[ConfigureForVolumeParams, ConfigureForVolumeResult, ErrorOccurrence]
 ):
     """Configure for volume command model."""
 

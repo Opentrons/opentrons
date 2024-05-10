@@ -3,11 +3,12 @@ from __future__ import annotations
 
 from pydantic import Field
 from typing import Optional, Type, TYPE_CHECKING
-from typing_extensions import Literal, Never
+from typing_extensions import Literal
 
 from ..types import DeckPoint
 from .pipetting_common import PipetteIdMixin, MovementMixin, DestinationPositionResult
 from .command import AbstractCommandImpl, BaseCommand, BaseCommandCreate, SuccessData
+from ..errors.error_occurrence import ErrorOccurrence
 
 if TYPE_CHECKING:
     from ..execution import MovementHandler
@@ -64,7 +65,7 @@ class MoveToCoordinatesImplementation(
 
 
 class MoveToCoordinates(
-    BaseCommand[MoveToCoordinatesParams, MoveToCoordinatesResult, Never]
+    BaseCommand[MoveToCoordinatesParams, MoveToCoordinatesResult, ErrorOccurrence]
 ):
     """Move to well command model."""
 

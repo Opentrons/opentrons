@@ -2,9 +2,10 @@
 from __future__ import annotations
 from pydantic import BaseModel, Field
 from typing import TYPE_CHECKING, Optional, Type
-from typing_extensions import Literal, Never
+from typing_extensions import Literal
 
 from .command import AbstractCommandImpl, BaseCommand, BaseCommandCreate, SuccessData
+from ..errors.error_occurrence import ErrorOccurrence
 
 if TYPE_CHECKING:
     from ..execution import RailLightsHandler
@@ -43,7 +44,9 @@ class SetRailLightsImplementation(
         return SuccessData(public=SetRailLightsResult(), private=None)
 
 
-class SetRailLights(BaseCommand[SetRailLightsParams, SetRailLightsResult, Never]):
+class SetRailLights(
+    BaseCommand[SetRailLightsParams, SetRailLightsResult, ErrorOccurrence]
+):
     """setRailLights command model."""
 
     commandType: SetRailLightsCommandType = "setRailLights"

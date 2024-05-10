@@ -1,11 +1,12 @@
 """Command models to wait for heating a Thermocycler's block."""
 from __future__ import annotations
 from typing import Optional, TYPE_CHECKING
-from typing_extensions import Literal, Never, Type
+from typing_extensions import Literal, Type
 
 from pydantic import BaseModel, Field
 
 from ..command import AbstractCommandImpl, BaseCommand, BaseCommandCreate, SuccessData
+from ...errors.error_occurrence import ErrorOccurrence
 
 if TYPE_CHECKING:
     from opentrons.protocol_engine.state import StateView
@@ -64,7 +65,9 @@ class WaitForBlockTemperatureImpl(
 
 
 class WaitForBlockTemperature(
-    BaseCommand[WaitForBlockTemperatureParams, WaitForBlockTemperatureResult, Never]
+    BaseCommand[
+        WaitForBlockTemperatureParams, WaitForBlockTemperatureResult, ErrorOccurrence
+    ]
 ):
     """A command to wait for a Thermocycler's target block temperature."""
 

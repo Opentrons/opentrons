@@ -1,13 +1,14 @@
 """Command models to execute a Thermocycler profile."""
 from __future__ import annotations
 from typing import List, Optional, TYPE_CHECKING
-from typing_extensions import Literal, Never, Type
+from typing_extensions import Literal, Type
 
 from pydantic import BaseModel, Field
 
 from opentrons.hardware_control.modules.types import ThermocyclerStep
 
 from ..command import AbstractCommandImpl, BaseCommand, BaseCommandCreate, SuccessData
+from ...errors.error_occurrence import ErrorOccurrence
 
 if TYPE_CHECKING:
     from opentrons.protocol_engine.state import StateView
@@ -98,7 +99,7 @@ class RunProfileImpl(
         return SuccessData(public=RunProfileResult(), private=None)
 
 
-class RunProfile(BaseCommand[RunProfileParams, RunProfileResult, Never]):
+class RunProfile(BaseCommand[RunProfileParams, RunProfileResult, ErrorOccurrence]):
     """A command to execute a Thermocycler profile run."""
 
     commandType: RunProfileCommandType = "thermocycler/runProfile"

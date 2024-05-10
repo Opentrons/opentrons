@@ -2,11 +2,12 @@
 from __future__ import annotations
 from pydantic import Field
 from typing import TYPE_CHECKING, Optional, Type
-from typing_extensions import Literal, Never
+from typing_extensions import Literal
 
 from ..errors import TouchTipDisabledError, LabwareIsTipRackError
 from ..types import DeckPoint
 from .command import AbstractCommandImpl, BaseCommand, BaseCommandCreate, SuccessData
+from ..errors.error_occurrence import ErrorOccurrence
 from .pipetting_common import (
     PipetteIdMixin,
     WellLocationMixin,
@@ -108,7 +109,7 @@ class TouchTipImplementation(
         )
 
 
-class TouchTip(BaseCommand[TouchTipParams, TouchTipResult, Never]):
+class TouchTip(BaseCommand[TouchTipParams, TouchTipResult, ErrorOccurrence]):
     """Touch up tip command model."""
 
     commandType: TouchTipCommandType = "touchTip"

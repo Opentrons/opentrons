@@ -1,11 +1,12 @@
 """Command models to deactivate shaker for the Heater-Shaker Module."""
 from __future__ import annotations
 from typing import Optional, TYPE_CHECKING
-from typing_extensions import Literal, Never, Type
+from typing_extensions import Literal, Type
 
 from pydantic import BaseModel, Field
 
 from ..command import AbstractCommandImpl, BaseCommand, BaseCommandCreate, SuccessData
+from ...errors.error_occurrence import ErrorOccurrence
 
 if TYPE_CHECKING:
     from opentrons.protocol_engine.state import StateView
@@ -63,7 +64,7 @@ class DeactivateShakerImpl(
 
 
 class DeactivateShaker(
-    BaseCommand[DeactivateShakerParams, DeactivateShakerResult, Never]
+    BaseCommand[DeactivateShakerParams, DeactivateShakerResult, ErrorOccurrence]
 ):
     """A command to deactivate shaker for a Heater-Shaker."""
 

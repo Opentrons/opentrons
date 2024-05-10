@@ -3,11 +3,12 @@ from __future__ import annotations
 
 from pydantic import Field
 from typing import TYPE_CHECKING, Optional, Type
-from typing_extensions import Literal, Never
+from typing_extensions import Literal
 
 from ..types import DropTipWellLocation, DeckPoint
 from .pipetting_common import PipetteIdMixin, DestinationPositionResult
 from .command import AbstractCommandImpl, BaseCommand, BaseCommandCreate, SuccessData
+from ..errors.error_occurrence import ErrorOccurrence
 
 if TYPE_CHECKING:
     from ..state import StateView
@@ -111,7 +112,7 @@ class DropTipImplementation(
         )
 
 
-class DropTip(BaseCommand[DropTipParams, DropTipResult, Never]):
+class DropTip(BaseCommand[DropTipParams, DropTipResult, ErrorOccurrence]):
     """Drop tip command model."""
 
     commandType: DropTipCommandType = "dropTip"

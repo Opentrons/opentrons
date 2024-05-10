@@ -9,12 +9,13 @@ from opentrons_shared_data.robot import user_facing_robot_type
 from opentrons_shared_data.robot.dev_types import RobotTypeEnum
 from pydantic import BaseModel, Field
 from typing import TYPE_CHECKING, Optional, Type
-from typing_extensions import Literal, Never
+from typing_extensions import Literal
 
 from opentrons_shared_data.pipette.dev_types import PipetteNameType
 from opentrons.types import MountType
 
 from .command import AbstractCommandImpl, BaseCommand, BaseCommandCreate, SuccessData
+from ..errors.error_occurrence import ErrorOccurrence
 from .configuring_common import PipetteConfigUpdateResultMixin
 from ..errors import InvalidSpecificationForRobotTypeError, InvalidLoadPipetteSpecsError
 
@@ -120,7 +121,7 @@ class LoadPipetteImplementation(
         )
 
 
-class LoadPipette(BaseCommand[LoadPipetteParams, LoadPipetteResult, Never]):
+class LoadPipette(BaseCommand[LoadPipetteParams, LoadPipetteResult, ErrorOccurrence]):
     """Load pipette command model."""
 
     commandType: LoadPipetteCommandType = "loadPipette"

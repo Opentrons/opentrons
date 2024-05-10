@@ -2,10 +2,11 @@
 from __future__ import annotations
 from pydantic import Field, BaseModel
 from typing import TYPE_CHECKING, Optional, Type
-from typing_extensions import Literal, Never
+from typing_extensions import Literal
 
 from .pipetting_common import PipetteIdMixin
 from .command import AbstractCommandImpl, BaseCommand, BaseCommandCreate, SuccessData
+from ..errors.error_occurrence import ErrorOccurrence
 
 if TYPE_CHECKING:
     from ..execution import TipHandler
@@ -56,7 +57,9 @@ class DropTipInPlaceImplementation(
         return SuccessData(public=DropTipInPlaceResult(), private=None)
 
 
-class DropTipInPlace(BaseCommand[DropTipInPlaceParams, DropTipInPlaceResult, Never]):
+class DropTipInPlace(
+    BaseCommand[DropTipInPlaceParams, DropTipInPlaceResult, ErrorOccurrence]
+):
     """Drop tip in place command model."""
 
     commandType: DropTipInPlaceCommandType = "dropTipInPlace"

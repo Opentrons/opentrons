@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 from typing import TYPE_CHECKING, Optional, Type
-from typing_extensions import Literal, Never
+from typing_extensions import Literal
 from pydantic import BaseModel
 
 from .pipetting_common import (
@@ -10,6 +10,7 @@ from .pipetting_common import (
     FlowRateMixin,
 )
 from .command import AbstractCommandImpl, BaseCommand, BaseCommandCreate, SuccessData
+from ..errors.error_occurrence import ErrorOccurrence
 
 from opentrons.hardware_control import HardwareControlAPI
 
@@ -61,7 +62,9 @@ class BlowOutInPlaceImplementation(
         return SuccessData(public=BlowOutInPlaceResult(), private=None)
 
 
-class BlowOutInPlace(BaseCommand[BlowOutInPlaceParams, BlowOutInPlaceResult, Never]):
+class BlowOutInPlace(
+    BaseCommand[BlowOutInPlaceParams, BlowOutInPlaceResult, ErrorOccurrence]
+):
     """BlowOutInPlace command model."""
 
     commandType: BlowOutInPlaceCommandType = "blowOutInPlace"

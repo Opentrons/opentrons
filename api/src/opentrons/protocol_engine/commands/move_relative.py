@@ -2,10 +2,11 @@
 from __future__ import annotations
 from pydantic import BaseModel, Field
 from typing import TYPE_CHECKING, Optional, Type
-from typing_extensions import Literal, Never
+from typing_extensions import Literal
 
 from ..types import MovementAxis, DeckPoint
 from .command import AbstractCommandImpl, BaseCommand, BaseCommandCreate, SuccessData
+from ..errors.error_occurrence import ErrorOccurrence
 from .pipetting_common import DestinationPositionResult
 
 if TYPE_CHECKING:
@@ -58,7 +59,9 @@ class MoveRelativeImplementation(
         )
 
 
-class MoveRelative(BaseCommand[MoveRelativeParams, MoveRelativeResult, Never]):
+class MoveRelative(
+    BaseCommand[MoveRelativeParams, MoveRelativeResult, ErrorOccurrence]
+):
     """Command to move (jog) a given pipette a relative distance."""
 
     commandType: MoveRelativeCommandType = "moveRelative"

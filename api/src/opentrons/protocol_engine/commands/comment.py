@@ -2,9 +2,10 @@
 from __future__ import annotations
 from pydantic import BaseModel, Field
 from typing import Optional, Type
-from typing_extensions import Literal, Never
+from typing_extensions import Literal
 
 from .command import AbstractCommandImpl, BaseCommand, BaseCommandCreate, SuccessData
+from ..errors.error_occurrence import ErrorOccurrence
 
 CommentCommandType = Literal["comment"]
 
@@ -35,7 +36,7 @@ class CommentImplementation(
         return SuccessData(public=CommentResult(), private=None)
 
 
-class Comment(BaseCommand[CommentParams, CommentResult, Never]):
+class Comment(BaseCommand[CommentParams, CommentResult, ErrorOccurrence]):
     """Comment command model."""
 
     commandType: CommentCommandType = "comment"

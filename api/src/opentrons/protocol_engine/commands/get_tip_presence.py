@@ -3,10 +3,11 @@ from __future__ import annotations
 
 from pydantic import Field, BaseModel
 from typing import TYPE_CHECKING, Optional, Type
-from typing_extensions import Literal, Never
+from typing_extensions import Literal
 
 from .pipetting_common import PipetteIdMixin
 from .command import AbstractCommandImpl, BaseCommand, BaseCommandCreate, SuccessData
+from ..errors.error_occurrence import ErrorOccurrence
 
 from ..types import TipPresenceStatus
 
@@ -61,7 +62,9 @@ class GetTipPresenceImplementation(
         return SuccessData(public=GetTipPresenceResult(status=result), private=None)
 
 
-class GetTipPresence(BaseCommand[GetTipPresenceParams, GetTipPresenceResult, Never]):
+class GetTipPresence(
+    BaseCommand[GetTipPresenceParams, GetTipPresenceResult, ErrorOccurrence]
+):
     """GetTipPresence command model."""
 
     commandType: GetTipPresenceCommandType = "getTipPresence"

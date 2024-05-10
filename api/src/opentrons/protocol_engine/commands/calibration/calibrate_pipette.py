@@ -1,9 +1,10 @@
 """Calibrate-pipette command for OT3 hardware. request, result, and implementation models."""
 from typing import Optional, Type
-from typing_extensions import Literal, Never
+from typing_extensions import Literal
 from pydantic import BaseModel, Field
 
 from ..command import AbstractCommandImpl, BaseCommand, BaseCommandCreate, SuccessData
+from ...errors.error_occurrence import ErrorOccurrence
 from ...types import InstrumentOffsetVector
 
 from opentrons.protocol_engine.resources.ot3_validation import ensure_ot3_hardware
@@ -76,7 +77,7 @@ class CalibratePipetteImplementation(
 
 
 class CalibratePipette(
-    BaseCommand[CalibratePipetteParams, CalibratePipetteResult, Never]
+    BaseCommand[CalibratePipetteParams, CalibratePipetteResult, ErrorOccurrence]
 ):
     """Calibrate-pipette command model."""
 
