@@ -24,13 +24,12 @@ const Table = styled('table')`
   font-size: ${TYPOGRAPHY.fontSize22};
   width: 100%;
   border-spacing: 0 ${SPACING.spacing8};
-  margin: ${SPACING.spacing16} 0;
   text-align: ${TYPOGRAPHY.textAlignLeft};
 `
 const TableHeader = styled('th')`
   font-size: ${TYPOGRAPHY.fontSize20};
   font-weight: ${TYPOGRAPHY.fontWeightSemiBold};
-  padding: ${SPACING.spacing4};
+  padding: 0 ${SPACING.spacing4} 0 ${SPACING.spacing4};
   color: ${COLORS.grey60};
 `
 

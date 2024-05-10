@@ -4,29 +4,30 @@ import { getLabwareName } from './utils'
 import { getLabwareDisplayLocation } from './utils/getLabwareDisplayLocation'
 import { getFinalLabwareLocation } from './utils/getFinalLabwareLocation'
 import type {
-  CompletedProtocolAnalysis,
   MoveLabwareRunTimeCommand,
   RobotType,
 } from '@opentrons/shared-data'
+import type { CommandTextData } from './types'
+
 interface MoveLabwareCommandTextProps {
   command: MoveLabwareRunTimeCommand
-  robotSideAnalysis: CompletedProtocolAnalysis
+  commandTextData: CommandTextData
   robotType: RobotType
 }
 export function MoveLabwareCommandText(
   props: MoveLabwareCommandTextProps
 ): JSX.Element {
   const { t } = useTranslation('protocol_command_text')
-  const { command, robotSideAnalysis, robotType } = props
+  const { command, commandTextData, robotType } = props
   const { labwareId, newLocation, strategy } = command.params
 
-  const allPreviousCommands = robotSideAnalysis.commands.slice(
+  const allPreviousCommands = commandTextData.commands.slice(
     0,
-    robotSideAnalysis.commands.findIndex(c => c.id === command.id)
+    commandTextData.commands.findIndex(c => c.id === command.id)
   )
   const oldLocation = getFinalLabwareLocation(labwareId, allPreviousCommands)
   const newDisplayLocation = getLabwareDisplayLocation(
-    robotSideAnalysis,
+    commandTextData,
     newLocation,
     t,
     robotType
@@ -40,11 +41,11 @@ export function MoveLabwareCommandText(
 
   return strategy === 'usingGripper'
     ? t('move_labware_using_gripper', {
-        labware: getLabwareName(robotSideAnalysis, labwareId),
+        labware: getLabwareName(commandTextData, labwareId),
         old_location:
           oldLocation != null
             ? getLabwareDisplayLocation(
-                robotSideAnalysis,
+                commandTextData,
                 oldLocation,
                 t,
                 robotType
@@ -53,11 +54,11 @@ export function MoveLabwareCommandText(
         new_location: location,
       })
     : t('move_labware_manually', {
-        labware: getLabwareName(robotSideAnalysis, labwareId),
+        labware: getLabwareName(commandTextData, labwareId),
         old_location:
           oldLocation != null
             ? getLabwareDisplayLocation(
-                robotSideAnalysis,
+                commandTextData,
                 oldLocation,
                 t,
                 robotType
