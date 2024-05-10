@@ -24,8 +24,8 @@ from opentrons.protocol_runner import (
     PythonAndLegacyRunner,
     RunResult,
     create_protocol_runner,
+    RunOrchestrator,
 )
-from opentrons.run_orchestrator import RunOrchestrator
 from opentrons.protocol_engine import (
     Config as ProtocolEngineConfig,
     DeckType,
