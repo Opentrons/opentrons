@@ -23,6 +23,8 @@ import type { ChatData } from '../../resources/types'
 
 // ToDo (kk:05/02/2024) This url is temporary
 const CHAT_ENDPOINT = 'http://localhost:8000/streaming/ask'
+// ToDo (kk:05/10/2024) Add the endpoint when the be is ready
+// This will be after external beta. The main purpose will be the benchmarking.
 // const SIMULATOR_ENDPOINT = ''
 
 interface InputType {
