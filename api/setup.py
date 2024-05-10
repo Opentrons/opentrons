@@ -5,12 +5,12 @@ import codecs
 import os
 import os.path
 
-from setuptools import setup, find_packages
+from setuptools import find_packages, setup  # type: ignore[import-untyped]
 
 HERE = os.path.abspath(os.path.dirname(__file__))
 sys.path.append(os.path.join(HERE, "..", "scripts"))
 
-from python_build_utils import normalize_version  # noqa: E402
+from python_build_utils import normalize_version  # type: ignore[import-not-found] # noqa: E402
 
 # make stdout blocking since Travis sets it to nonblocking
 if os.name == "posix":
@@ -20,7 +20,7 @@ if os.name == "posix":
     fcntl.fcntl(sys.stdout, fcntl.F_SETFL, flags & ~os.O_NONBLOCK)
 
 
-def get_version():
+def get_version() -> str:
     buildno = os.getenv("BUILD_NUMBER")
     project = os.getenv("OPENTRONS_PROJECT", "robot-stack")
     git_dir = os.getenv("OPENTRONS_GIT_DIR", None)
@@ -28,7 +28,7 @@ def get_version():
         normalize_opts = {"extra_tag": buildno}
     else:
         normalize_opts = {}
-    return normalize_version("api", project, git_dir=git_dir, **normalize_opts)
+    return normalize_version("api", project, git_dir=git_dir, **normalize_opts)  # type: ignore[no-any-return]
 
 
 VERSION = get_version()
@@ -74,7 +74,7 @@ EXTRAS = {
 }
 
 
-def read(*parts):
+def read(*parts: str) -> str:
     """
     Build an absolute path from *parts* and and return the contents of the
     resulting file.  Assume UTF-8 encoding.
