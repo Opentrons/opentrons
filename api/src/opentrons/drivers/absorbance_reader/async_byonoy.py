@@ -232,6 +232,12 @@ class AsyncByonoy:
         """
         return self._device_handle is not None
 
+    async def get_device_static_info(self) -> Dict[str, str]:
+        return {
+            "serial": self._device.sn,
+            "model": "ABS96",
+        }
+
     async def get_device_information(self) -> Dict[str, str]:
         device_info = await self._loop.run_in_executor(
             executor=self._executor, func=self._get_device_information

@@ -156,7 +156,7 @@ class AbsorbanceReader(mod_abc.AbstractModule):
 
     async def set_sample_wavelength(self, wavelength: int) -> None:
         """Set the Absorbance Reader's active wavelength."""
-        await self._driver.set_sample_wavelength(wavelength)
+        await self._driver.initialize_measurement(wavelength)
 
     async def start_measure(self, wavelength: int) -> None:
         """Initiate a single measurement."""

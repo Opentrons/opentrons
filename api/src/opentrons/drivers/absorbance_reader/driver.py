@@ -28,7 +28,11 @@ class AbsorbanceReaderDriver(AbstractAbsorbanceReaderDriver):
 
     async def get_device_info(self) -> Dict[str, str]:
         """Get device info"""
-        info = await self._connection.get_device_information()
+        connected = await self.is_connected()
+        if not connected:
+            info = await self._connection.get_device_static_info()
+        else:
+            info = await self._connection.get_device_information()
         return info
 
     async def connect(self) -> None:

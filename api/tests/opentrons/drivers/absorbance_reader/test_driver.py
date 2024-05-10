@@ -42,7 +42,7 @@ async def driver(mock_async_byonoy: AsyncByonoy) -> AbsorbanceReaderDriver:
 
 
 @pytest.fixture
-async def connected_driver(driver) -> AbsorbanceReaderDriver:
+async def connected_driver(driver: AbsorbanceReaderDriver) -> AbsorbanceReaderDriver:
     driver._connection._device_handle = 1
     return driver
 
