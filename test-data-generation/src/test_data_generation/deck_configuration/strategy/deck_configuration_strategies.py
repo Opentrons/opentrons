@@ -1,11 +1,16 @@
 """Test data generation for deck configuration tests."""
-import typing
-from hypothesis import assume, strategies as st
-from test_data_generation.deck_configuration.datashapes import (
-    DeckConfiguration,
-    PossibleSlotContents as PSC,
-)
 
+import typing
+
+from hypothesis import assume
+from hypothesis import strategies as st
+
+from test_data_generation.datashapes import (
+    DeckConfiguration,
+)
+from test_data_generation.datashapes import (
+    DeckConfigurationFixtures as DCF,
+)
 from test_data_generation.deck_configuration.strategy.helper_strategies import (
     a_deck_by_columns,
 )
@@ -19,16 +24,16 @@ def a_deck_configuration_with_invalid_fixture_in_col_2(
 ) -> DeckConfiguration:
     """Generate a deck with an invalid fixture in column 2."""
     POSSIBLE_FIXTURES = [
-        PSC.LABWARE_SLOT,
-        PSC.TEMPERATURE_MODULE,
-        PSC.HEATER_SHAKER_MODULE,
-        PSC.TRASH_BIN,
-        PSC.MAGNETIC_BLOCK_MODULE,
+        DCF.LABWARE_SLOT,
+        DCF.TEMPERATURE_MODULE,
+        DCF.HEATER_SHAKER_MODULE,
+        DCF.TRASH_BIN,
+        DCF.MAGNETIC_BLOCK_MODULE,
     ]
     INVALID_FIXTURES = [
-        PSC.HEATER_SHAKER_MODULE,
-        PSC.TRASH_BIN,
-        PSC.TEMPERATURE_MODULE,
+        DCF.HEATER_SHAKER_MODULE,
+        DCF.TRASH_BIN,
+        DCF.TEMPERATURE_MODULE,
     ]
 
     deck = draw(a_deck_by_columns(col_2_contents=POSSIBLE_FIXTURES))

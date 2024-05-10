@@ -2,6 +2,7 @@
 
 import enum
 import typing
+import dataclasses
 
 ColumnName = typing.Literal["1", "2", "3"]
 RowName = typing.Literal["a", "b", "c", "d"]
@@ -38,6 +39,13 @@ AllSlotName = typing.Literal[
     "d4",
 ]
 
+ProtocolContextMethod = typing.Literal[
+    "load_module",
+    "load_labware",
+    "load_instrument",
+    "load_waste_chute",
+    "load_trash_bin",
+]
 
 PROTOCOL_CONTEXT_VAR_NAME: typing.Final[str] = "protocol_context"
 
@@ -50,38 +58,49 @@ class PipetteNames(str, enum.Enum):
     NINETY_SIX_CHANNEL = "flex_96channel_1000"
 
 
-class ModuleInfo(enum.Enum):
-    """Names of the modules used in the protocol."""
+@dataclasses.dataclass
+class ModuleInfo:
+    """Information about a module."""
 
-    MAGNETIC_BLOCK_MODULE = ("magneticBlockV1", lambda x: f"mag_block_module_{x}")
-    THERMOCYCLER_MODULE = ("thermocyclerModuleV2", lambda x: "thermocycler_module")
-    TEMPERATURE_MODULE = ("temperatureModuleV2", lambda x: f"temperature_module_{x}")
-    HEATER_SHAKER_MODULE = (
-        "heaterShakerModuleV1",
-        lambda x: f"heater_shaker_module_{x}",
-    )
-
-    def __init__(
-        self, load_name: str, name_creation_function: typing.Callable[[str], str]
-    ) -> None:
-        """Initialize the ModuleNames enum."""
-        self.load_name = load_name
-        self.name_creation_function = name_creation_function
+    load_name: str
+    name_creation_function: typing.Callable[[str], str]
 
     def variable_name(self, location: str) -> str:
         """Return the variable name for the module."""
         return self.name_creation_function(location)
 
 
-class ProtocolContextMethods(str, enum.Enum):
-    """Methods available on the protocol context."""
+class Modules:
+    """Module names used in the protocol."""
 
-    LOAD_MODULE = "load_module"
-    LOAD_LABWARE = "load_labware"
-    LOAD_INSTRUMENT = "load_instrument"
-    LOAD_WASTE_CHUTE = "load_waste_chute"
-    LOAD_TRASH_BIN = "load_trash_bin"
+    MAGNETIC_BLOCK_MODULE = ModuleInfo(
+        load_name="magneticBlockV1",
+        name_creation_function=lambda x: f"mag_block_module_{x}",
+    )
+    THERMOCYCLER_MODULE = ModuleInfo(
+        load_name="thermocyclerModuleV2",
+        name_creation_function=lambda x: "thermocycler_module",
+    )
+    TEMPERATURE_MODULE = ModuleInfo(
+        load_name="temperatureModuleV2",
+        name_creation_function=lambda x: f"temperature_module_{x}",
+    )
+    HEATER_SHAKER_MODULE = ModuleInfo(
+        load_name="heaterShakerModuleV1",
+        name_creation_function=lambda x: f"heater_shaker_module_{x}",
+    )
 
+    @classmethod
+    def modules(cls) -> typing.List[ModuleInfo]:
+        """Get all the module info."""
+        return [
+            cls.MAGNETIC_BLOCK_MODULE,
+            cls.THERMOCYCLER_MODULE,
+            cls.TEMPERATURE_MODULE,
+            cls.HEATER_SHAKER_MODULE,
+        ]
 
-if __name__ == "__main__":
-    print(list(ModuleInfo.__members__.keys()))
+    @classmethod
+    def get_module_info(cls, module_name: str) -> ModuleInfo:
+        """Get the ModuleInfo for the given module name."""
+        return getattr(cls, module_name.upper())  # type: ignore

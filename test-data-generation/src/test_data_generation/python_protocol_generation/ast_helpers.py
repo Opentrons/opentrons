@@ -10,7 +10,7 @@ from dataclasses import dataclass
 from test_data_generation.constants import (
     PROTOCOL_CONTEXT_VAR_NAME,
     ModuleInfo,
-    ProtocolContextMethods,
+    ProtocolContextMethod,
 )
 
 
@@ -19,6 +19,14 @@ class CanGenerateAST(typing.Protocol):
 
     def generate_ast(self) -> ast.AST:
         """Generate an AST node."""
+        ...
+
+
+class CanGenerateASTStatement(CanGenerateAST, typing.Protocol):
+    """Protocol for objects that can generate an AST statement."""
+
+    def generate_ast(self) -> ast.stmt:
+        """Generate an AST statement."""
         ...
 
 
@@ -43,14 +51,7 @@ class BaseCall:
     """Class to represent a method or function call."""
 
     call_on: str
-    what_to_call: ProtocolContextMethods | str
-
-    def _evaluate_what_to_call(self) -> str:
-        """Evaluate the value of what_to_call."""
-        if isinstance(self.what_to_call, ProtocolContextMethods):
-            return self.what_to_call.value
-        else:
-            return self.what_to_call
+    what_to_call: ProtocolContextMethod | str
 
     def generate_ast(self) -> ast.AST:
         """Generate an AST node for the call."""
@@ -68,7 +69,7 @@ class CallFunction(BaseCall):
         return ast.Call(
             func=ast.Attribute(
                 value=ast.Name(id=self.call_on, ctx=ast.Load()),
-                attr=self._evaluate_what_to_call(),
+                attr=self.what_to_call,
                 ctx=ast.Load(),
             ),
             args=[ast.Constant(str_arg) for str_arg in self.args],
@@ -80,7 +81,7 @@ class CallFunction(BaseCall):
         """Create a CallFunction for loading labware."""
         return cls(
             call_on=PROTOCOL_CONTEXT_VAR_NAME,
-            what_to_call=ProtocolContextMethods.LOAD_LABWARE,
+            what_to_call="load_labware",
             args=[labware_name, labware_location],
         )
 
@@ -89,7 +90,7 @@ class CallFunction(BaseCall):
         """Create a CallFunction for loading a waste chute."""
         return cls(
             call_on=PROTOCOL_CONTEXT_VAR_NAME,
-            what_to_call=ProtocolContextMethods.LOAD_WASTE_CHUTE,
+            what_to_call="load_waste_chute",
             args=[],
         )
 
@@ -98,7 +99,7 @@ class CallFunction(BaseCall):
         """Create a CallFunction for loading a trash bin."""
         return cls(
             call_on=PROTOCOL_CONTEXT_VAR_NAME,
-            what_to_call=ProtocolContextMethods.LOAD_TRASH_BIN,
+            what_to_call="load_trash_bin",
             args=[location],
         )
 
@@ -113,7 +114,7 @@ class CallFunction(BaseCall):
 
         return cls(
             call_on=PROTOCOL_CONTEXT_VAR_NAME,
-            what_to_call=ProtocolContextMethods.LOAD_MODULE,
+            what_to_call="load_module",
             args=module_args,
         )
 
@@ -124,7 +125,7 @@ class CallFunction(BaseCall):
         """Create a CallFunction for loading an instrument."""
         return cls(
             call_on=PROTOCOL_CONTEXT_VAR_NAME,
-            what_to_call=ProtocolContextMethods.LOAD_INSTRUMENT,
+            what_to_call="load_instrument",
             args=[instrument_name, mount],
         )
 
@@ -138,7 +139,7 @@ class CallAttribute(BaseCall):
         return ast.Expr(
             value=ast.Attribute(
                 value=ast.Name(id=self.call_on, ctx=ast.Load()),
-                attr=self._evaluate_what_to_call(),
+                attr=self.what_to_call,
                 ctx=ast.Load(),
             )
         )

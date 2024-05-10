@@ -12,7 +12,7 @@ from test_data_generation.constants import (
 )
 
 
-class PossibleSlotContents(enum.Enum):
+class DeckConfigurationFixtures(enum.Enum):
     """Possible contents of a slot on a Flex."""
 
     # Implicitly defined fixtures
@@ -36,7 +36,7 @@ class PossibleSlotContents(enum.Enum):
     @classmethod
     def longest_string(cls) -> int:
         """Return the longest string representation of the slot content."""
-        length = max([len(e.name) for e in PossibleSlotContents])
+        length = max([len(e.name) for e in DeckConfigurationFixtures])
         return length if length % 2 == 0 else length + 1
 
     def __str__(self) -> str:
@@ -44,12 +44,12 @@ class PossibleSlotContents(enum.Enum):
         return f"{self.name.replace('_', ' ')}"
 
     @classmethod
-    def all(cls) -> typing.List["PossibleSlotContents"]:
+    def all(cls) -> typing.List["DeckConfigurationFixtures"]:
         """Return all possible slot contents."""
         return list(cls)
 
     @classmethod
-    def modules(cls) -> typing.List["PossibleSlotContents"]:
+    def modules(cls) -> typing.List["DeckConfigurationFixtures"]:
         """Return the modules."""
         return [
             cls.THERMOCYCLER_MODULE,
@@ -59,7 +59,7 @@ class PossibleSlotContents(enum.Enum):
         ]
 
     @classmethod
-    def staging_areas(cls) -> typing.List["PossibleSlotContents"]:
+    def staging_areas(cls) -> typing.List["DeckConfigurationFixtures"]:
         """Return the staging areas."""
         return [
             cls.STAGING_AREA,
@@ -69,7 +69,7 @@ class PossibleSlotContents(enum.Enum):
         ]
 
     @classmethod
-    def waste_chutes(cls) -> typing.List["PossibleSlotContents"]:
+    def waste_chutes(cls) -> typing.List["DeckConfigurationFixtures"]:
         """Return the waste chutes."""
         return [
             cls.WASTE_CHUTE,
@@ -78,7 +78,7 @@ class PossibleSlotContents(enum.Enum):
             cls.STAGING_AREA_WITH_WASTE_CHUTE_NO_COVER,
         ]
 
-    def is_one_of(self, contents: typing.List["PossibleSlotContents"]) -> bool:
+    def is_one_of(self, contents: typing.List["DeckConfigurationFixtures"]) -> bool:
         """Return True if the slot contains one of the contents."""
         return any(self is content for content in contents)
 
@@ -88,7 +88,7 @@ class PossibleSlotContents(enum.Enum):
 
     def is_module_or_trash_bin(self) -> bool:
         """Return True if the slot contains a module or trash bin."""
-        return self.is_one_of(self.modules() + [PossibleSlotContents.TRASH_BIN])
+        return self.is_one_of(self.modules() + [DeckConfigurationFixtures.TRASH_BIN])
 
     def is_a_staging_area(self) -> bool:
         """Return True if the slot contains a staging area."""
@@ -105,7 +105,7 @@ class Slot:
 
     row: RowName
     col: ColumnName
-    contents: "PossibleSlotContents"
+    contents: "DeckConfigurationFixtures"
 
     def __str__(self) -> str:
         """Return a string representation of the slot."""
@@ -183,7 +183,7 @@ class Column:
         """Return the slot by name."""
         return getattr(self, f"{name}")  # type: ignore
 
-    def number_of(self, contents: PossibleSlotContents) -> int:
+    def number_of(self, contents: DeckConfigurationFixtures) -> int:
         """Return the number of slots with the contents."""
         return len([True for slot in self.slots if slot.contents is contents])
 
@@ -214,8 +214,8 @@ class DeckConfiguration:
     def __str__(self) -> str:
         """Return a string representation of the deck."""
         string_list = []
-        dashed_line = "-" * (PossibleSlotContents.longest_string() * 3)
-        equal_line = "=" * (PossibleSlotContents.longest_string() * 3)
+        dashed_line = "-" * (DeckConfigurationFixtures.longest_string() * 3)
+        equal_line = "=" * (DeckConfigurationFixtures.longest_string() * 3)
         for row in self.rows:
             string_list.append(
                 " | ".join([slot.slot_label_string for slot in row.slots])
@@ -283,7 +283,7 @@ class DeckConfiguration:
             return None
         return self.rows[row_index + 1].slot_by_col_number(slot.col)
 
-    def number_of(self, contents: PossibleSlotContents) -> int:
+    def number_of(self, contents: DeckConfigurationFixtures) -> int:
         """Return the number of slots with the contents."""
         return len([True for slot in self.slots if slot.contents is contents])
 

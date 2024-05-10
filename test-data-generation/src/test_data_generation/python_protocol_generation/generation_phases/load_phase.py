@@ -7,7 +7,7 @@ import typing
 
 from test_data_generation.constants import (
     DeckConfigurationSlotName,
-    ModuleInfo,
+    Modules,
     RowName,
 )
 from test_data_generation.datashapes import (
@@ -15,15 +15,9 @@ from test_data_generation.datashapes import (
     Slot,
 )
 from test_data_generation.datashapes import (
-    PossibleSlotContents as PSC,
+    DeckConfigurationFixtures as DCF,
 )
 from test_data_generation.python_protocol_generation import ast_helpers as ast_h
-
-
-if typing.TYPE_CHECKING:
-    from test_data_generation.python_protocol_generation.protocol_configuration import (
-        ProtocolConfiguration,
-    )
 
 
 def _staging_area(row: RowName) -> typing.List[ast_h.AssignStatement]:
@@ -70,7 +64,7 @@ def _thermocycler_module() -> typing.List[ast_h.AssignStatement]:
     """Create a thermocycler module."""
     return [
         ast_h.AssignStatement.load_module(
-            module_info=ModuleInfo.THERMOCYCLER_MODULE,
+            module_info=Modules.THERMOCYCLER_MODULE,
             module_location=None,
         )
     ]
@@ -82,7 +76,7 @@ def _temperature_module(
     """Create a temperature module in a specified slot."""
     return [
         ast_h.AssignStatement.load_module(
-            module_info=ModuleInfo.TEMPERATURE_MODULE,
+            module_info=Modules.TEMPERATURE_MODULE,
             module_location=slot,
         )
     ]
@@ -94,7 +88,7 @@ def _magnetic_block(
     """Create a magnetic block in a specified slot."""
     return [
         ast_h.AssignStatement.load_module(
-            module_info=ModuleInfo.MAGNETIC_BLOCK_MODULE, module_location=slot
+            module_info=Modules.MAGNETIC_BLOCK_MODULE, module_location=slot
         )
     ]
 
@@ -105,7 +99,7 @@ def _heater_shaker_module(
     """Create a heater shaker module in a specified slot."""
     return [
         ast_h.AssignStatement.load_module(
-            module_info=ModuleInfo.HEATER_SHAKER_MODULE, module_location=slot
+            module_info=Modules.HEATER_SHAKER_MODULE, module_location=slot
         )
     ]
 
@@ -123,39 +117,45 @@ def _labware_slot(
     ]
 
 
-def create_deck_slot_load_statement(
+def create_deck_configuration_satisfying_load_statement(
     slot: Slot,
-) -> ast_h.AssignStatement | typing.List[ast_h.AssignStatement]:
+) -> typing.List[ast_h.AssignStatement]:
     """Maps the contents of a slot to the correct assign statement."""
+    if slot.contents == DCF.THERMOCYCLER_MODULE and slot.label == "b1":
+        return []
+
     match slot.contents:
-        case PSC.WASTE_CHUTE | PSC.WASTE_CHUTE_NO_COVER:
+        case DCF.WASTE_CHUTE | DCF.WASTE_CHUTE_NO_COVER:
             return _waste_chute(False)
 
-        case PSC.STAGING_AREA_WITH_WASTE_CHUTE | PSC.STAGING_AREA_WITH_WASTE_CHUTE_NO_COVER:
+        case (
+            DCF.STAGING_AREA_WITH_WASTE_CHUTE
+            | DCF.STAGING_AREA_WITH_WASTE_CHUTE_NO_COVER
+        ):
             return _waste_chute(True)
 
-        case PSC.STAGING_AREA_WITH_MAGNETIC_BLOCK:
+        case DCF.STAGING_AREA_WITH_MAGNETIC_BLOCK:
             return _magnetic_block_on_staging_area(slot.row)
 
-        case PSC.TRASH_BIN:
+        case DCF.TRASH_BIN:
             return _trash_bin(slot.label)
 
-        case PSC.THERMOCYCLER_MODULE:
+        case DCF.THERMOCYCLER_MODULE:
             return _thermocycler_module()
 
-        case PSC.TEMPERATURE_MODULE:
+        case DCF.TEMPERATURE_MODULE:
             return _temperature_module(slot.label)
 
-        case PSC.MAGNETIC_BLOCK_MODULE:
+        case DCF.MAGNETIC_BLOCK_MODULE:
             return _magnetic_block(slot.label)
 
-        case PSC.HEATER_SHAKER_MODULE:
+        case DCF.HEATER_SHAKER_MODULE:
             return _heater_shaker_module(slot.label)
 
-        case PSC.STAGING_AREA:
+        case DCF.STAGING_AREA:
             return _staging_area(slot.row)
 
-        case PSC.LABWARE_SLOT:
+        case DCF.LABWARE_SLOT:
             return _labware_slot(slot.label)
 
         case _:
