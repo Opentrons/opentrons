@@ -1,7 +1,7 @@
 """Tests for the ChangeNotifier interface."""
 import asyncio
 import pytest
-from opentrons.protocol_engine.state.change_notifier import ChangeNotifier
+from robot_server.service.notifications.change_notifier import ChangeNotifier
 
 
 async def test_single_subscriber() -> None:

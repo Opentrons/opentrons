@@ -347,7 +347,7 @@ export function AddFixtureModal({
           }
         >
           <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing32}>
-            <StyledText as="p">{t('add_to_slot_description')}</StyledText>
+            <StyledText as="p">{t('add_fixture_description')}</StyledText>
             <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing8}>
               {fixtureOptions}
               {nextStageOptions}

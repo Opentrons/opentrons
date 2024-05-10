@@ -58,7 +58,7 @@ describe('Touchscreen AddFixtureModal', () => {
     render(props)
     screen.getByText('Add to slot D3')
     screen.getByText(
-      'Choose an item below to add to your deck configuration. It will be referenced during protocol analysis.'
+      'Add this hardware to your deck configuration. It will be referenced during protocol analysis.'
     )
     screen.getByText('Fixtures')
     screen.getByText('Modules')
@@ -80,7 +80,7 @@ describe('Touchscreen AddFixtureModal', () => {
     render(props)
     screen.getByText('Add to slot D3')
     screen.getByText(
-      'Choose an item below to add to your deck configuration. It will be referenced during protocol analysis.'
+      'Add this hardware to your deck configuration. It will be referenced during protocol analysis.'
     )
     expect(screen.queryByText('Staging area slot')).toBeNull()
     screen.getByText('Trash bin')
@@ -111,7 +111,7 @@ describe('Desktop AddFixtureModal', () => {
     render(props)
     screen.getByText('Add to slot D3')
     screen.getByText(
-      'Add this item to your deck configuration. It will be referenced during protocol analysis.'
+      'Add this hardware to your deck configuration. It will be referenced during protocol analysis.'
     )
 
     screen.getByText('Fixtures')
@@ -131,7 +131,7 @@ describe('Desktop AddFixtureModal', () => {
     render(props)
     screen.getByText('Add to slot A1')
     screen.getByText(
-      'Add this item to your deck configuration. It will be referenced during protocol analysis.'
+      'Add this hardware to your deck configuration. It will be referenced during protocol analysis.'
     )
     screen.getByText('Fixtures')
     screen.getByText('Modules')
@@ -145,7 +145,7 @@ describe('Desktop AddFixtureModal', () => {
     render(props)
     screen.getByText('Add to slot B3')
     screen.getByText(
-      'Add this item to your deck configuration. It will be referenced during protocol analysis.'
+      'Add this hardware to your deck configuration. It will be referenced during protocol analysis.'
     )
     screen.getByText('Fixtures')
     screen.getByText('Modules')
@@ -160,7 +160,7 @@ describe('Desktop AddFixtureModal', () => {
     render(props)
     screen.getByText('Add to slot B2')
     screen.getByText(
-      'Add this item to your deck configuration. It will be referenced during protocol analysis.'
+      'Add this hardware to your deck configuration. It will be referenced during protocol analysis.'
     )
     screen.getByText('Magnetic Block GEN1')
     expect(screen.getByRole('button', { name: 'Add' })).toBeInTheDocument()

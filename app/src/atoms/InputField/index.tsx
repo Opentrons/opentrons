@@ -57,7 +57,7 @@ export interface InputFieldProps {
   /** blur handler */
   onBlur?: (event: React.FocusEvent<HTMLInputElement>) => unknown
   /** makes input field read-only */
-  readOnly?: boolean | undefined
+  readOnly?: boolean
   /** html tabindex property */
   tabIndex?: number
   /** automatically focus field on renders */
