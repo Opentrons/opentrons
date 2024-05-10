@@ -96,6 +96,10 @@
   },
   "timeline": {
     "error": {
+      "LABWARE_DISCARDED_IN_WASTE_CHUTE": {
+        "title": "The labware has been previously discarded into the waste chute",
+        "body": "Please select a different labware to move."
+      },
       "LABWARE_ON_ANOTHER_ENTITY": {
         "title": "Attempting to move a labware on top of another entity",
         "body": "Please reselect which slot your labware should move to."

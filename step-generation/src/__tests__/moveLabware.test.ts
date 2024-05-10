@@ -128,6 +128,35 @@ describe('moveLabware', () => {
       type: 'LABWARE_ON_ANOTHER_ENTITY',
     })
   })
+  it('should return an error for the labware already being discarded in previous step', () => {
+    const wasteChuteInvariantContext = {
+      ...invariantContext,
+      additionalEquipmentEntities: {
+        ...invariantContext.additionalEquipmentEntities,
+        mockWasteChuteId: {
+          name: 'wasteChute',
+          id: mockWasteChuteId,
+          location: WASTE_CHUTE_CUTOUT,
+        },
+      },
+    } as InvariantContext
+
+    robotState.labware = {
+      [SOURCE_LABWARE]: { slot: 'gripperWasteChute' },
+    }
+    const params = {
+      commandCreatorFnName: 'moveLabware',
+      labware: SOURCE_LABWARE,
+      useGripper: true,
+      newLocation: { slotName: 'A1' },
+    } as MoveLabwareArgs
+
+    const result = moveLabware(params, wasteChuteInvariantContext, robotState)
+    expect(getErrorResult(result).errors).toHaveLength(1)
+    expect(getErrorResult(result).errors[0]).toMatchObject({
+      type: 'LABWARE_DISCARDED_IN_WASTE_CHUTE',
+    })
+  })
   it('should return an error for trying to move the labware off deck with a gripper', () => {
     const params = {
       commandCreatorFnName: 'moveLabware',
