@@ -13,33 +13,42 @@ import {
 
 import { SidePanel } from './molecules/SidePanel'
 import { ChatContainer } from './organisms/ChatContainer'
+import { Loading } from './molecules/Loading'
 
 const LOGIN_PAGE_URL = 'https://auth-dev.opentrons.com/'
 
 export function App(): JSX.Element {
   const { t } = useTranslation('protocol_generator')
-  const { isAuthenticated, logout } = useAuth0()
+  const { isAuthenticated, logout, isLoading } = useAuth0()
 
   // if not authenticated redirect to login page
   if (!isAuthenticated) {
     window.location.href = LOGIN_PAGE_URL
   }
+  console.log('isAuthenticated', isAuthenticated)
+  console.log('isLoading', isLoading)
 
   return (
-    <Flex flexDirection={DIRECTION_ROW} position={POSITION_RELATIVE}>
-      {isAuthenticated ? (
-        // Note: this logout button is temporary
-        <Flex position={POSITION_ABSOLUTE} top="1rem" right="1rem">
-          <LinkButton
-            onClick={() => logout()}
-            textDecoration={TYPOGRAPHY.textDecorationUnderline}
-          >
-            {t('logout')}
-          </LinkButton>
+    <>
+      {isLoading ? (
+        <Loading />
+      ) : (
+        <Flex flexDirection={DIRECTION_ROW} position={POSITION_RELATIVE}>
+          {isAuthenticated ? (
+            // Note: this logout button is temporary
+            <Flex position={POSITION_ABSOLUTE} top="1rem" right="1rem">
+              <LinkButton
+                onClick={() => logout()}
+                textDecoration={TYPOGRAPHY.textDecorationUnderline}
+              >
+                {t('logout')}
+              </LinkButton>
+            </Flex>
+          ) : null}
+          <SidePanel />
+          <ChatContainer />
         </Flex>
-      ) : null}
-      <SidePanel />
-      <ChatContainer />
-    </Flex>
+      )}
+    </>
   )
 }

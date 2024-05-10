@@ -5,6 +5,7 @@
   "copy_code": "Copy code",
   "disclaimer": "OpentronsAI can make mistakes. Review your protocol before running it on an Opentrons robot.",
   "got_feedback": "Got feedback? We love to hear it.",
+  "loading": "Loading...",
   "logout": "Logout",
   "make_sure_your_prompt": "Make sure your prompt includes the following:",
   "metadata": "Metadata: Three pieces of information.",
