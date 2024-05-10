@@ -2556,9 +2556,7 @@ class OT3API(
         reading from the pressure sensor.
 
         If the move is completed without the specified threshold being triggered, a
-        LiquidNotFound error will be thrown.
-        If the threshold is triggered before the minimum z distance has been traveled,
-        a EarlyLiquidSenseTrigger error will be thrown.
+        LiquidNotFoundError error will be thrown.
 
         Otherwise, the function will stop moving once the threshold is triggered,
         and return the position of the
