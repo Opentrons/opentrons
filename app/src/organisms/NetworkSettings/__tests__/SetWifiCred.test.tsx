@@ -55,11 +55,14 @@ describe('SetWifiCred', () => {
   it('should switch the input type and button text when tapping the icon next to the input', () => {
     render(props)
     const button = screen.getByRole('button', { name: 'Show' })
-    // ToDo: 11/08/2022 kj switch to screen.getByRole once understand the issue on this input
     const inputBox = screen.getByLabelText('wifi_password')
     expect(inputBox).toHaveAttribute('type', 'password')
     fireEvent.click(button)
     screen.getByRole('button', { name: 'Hide' })
-    expect(inputBox).toHaveAttribute('type', 'text')
+    screen.getByTestId('icon_eye-slash')
+    expect(screen.getByLabelText('wifi_password')).toHaveAttribute(
+      'type',
+      'text'
+    )
   })
 })
