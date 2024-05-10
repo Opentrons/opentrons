@@ -42,8 +42,9 @@ export function ChatContainer(): JSX.Element {
           {chatData.length > 0
             ? chatData.map((chat, index) => (
                 <ChatDisplay
-                  key={`response-from_${chat.role}_${index}`}
+                  key={`prompt-from_${chat.role}_${index}`}
                   chat={chat}
+                  chatId={`${chat.role}_${index}`}
                 />
               ))
             : null}
