@@ -14,6 +14,7 @@ vi.mock('./molecules/SidePanel')
 vi.mock('./organisms/ChatContainer')
 
 const mockLogout = vi.fn()
+const mockUser = {}
 
 const render = (): ReturnType<typeof renderWithProviders> => {
   return renderWithProviders(<App />)
@@ -24,6 +25,13 @@ describe('App', () => {
     vi.mocked(useAuth0).mockReturnValue({
       isAuthenticated: true,
       logout: mockLogout,
+      getAccessTokenSilently: vi.fn(),
+      getAccessTokenWithPopup: vi.fn(),
+      getIdTokenClaims: vi.fn(),
+      loginWithRedirect: vi.fn(),
+      loginWithPopup: vi.fn(),
+      handleRedirectCallback: vi.fn(),
+      user: mockUser,
     })
     vi.mocked(SidePanel).mockReturnValue(<div>mock SidePanel</div>)
     vi.mocked(ChatContainer).mockReturnValue(<div>mock ChatContainer</div>)
