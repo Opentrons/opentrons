@@ -7,12 +7,9 @@ import {
   LabeledValue,
   RobotWorkSpace,
 } from '@opentrons/components'
-import {
-  getLabwareDisplayName,
-  getLabwareDefIsStandard,
-  LabwareDefinition2,
-} from '@opentrons/shared-data'
+import { getLabwareDisplayName, getLabwareDefIsStandard } from '@opentrons/shared-data'
 import styles from './styles.module.css'
+import type { LabwareDefinition2 } from '@opentrons/shared-data'
 
 interface Props {
   labwareDef?: LabwareDefinition2 | null

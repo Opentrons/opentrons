@@ -7,14 +7,11 @@ import { selectors as stepFormSelectors } from '../../../../step-forms'
 import SINGLE_IMAGE from '../../../../images/path_single_transfers.svg'
 import MULTI_DISPENSE_IMAGE from '../../../../images/path_multi_dispense.svg'
 import MULTI_ASPIRATE_IMAGE from '../../../../images/path_multi_aspirate.svg'
-import { PathOption } from '../../../../form-types'
-import { FieldProps } from '../../types'
+import { getDisabledPathMap } from './getDisabledPathMap'
 import styles from '../../StepEditForm.module.css'
-import {
-  DisabledPathMap,
-  getDisabledPathMap,
-  ValuesForPath,
-} from './getDisabledPathMap'
+import type { PathOption } from '../../../../form-types'
+import type { FieldProps } from '../../types'
+import type { DisabledPathMap, ValuesForPath } from './getDisabledPathMap'
 
 const PATH_ANIMATION_IMAGES = {
   single: new URL('../../../../images/path_single.gif', import.meta.url).href,

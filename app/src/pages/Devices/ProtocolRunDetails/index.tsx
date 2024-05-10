@@ -37,14 +37,11 @@ import { useCurrentRunId } from '../../../organisms/ProtocolUpload/hooks'
 import { OPENTRONS_USB } from '../../../redux/discovery'
 import { fetchProtocols } from '../../../redux/protocol-storage'
 import { appShellRequestor } from '../../../redux/shell/remote'
-
-import type {
-  DesktopRouteParams,
-  ProtocolRunDetailsTab,
-} from '../../../App/types'
-import type { Dispatch } from '../../../redux/types'
 import { useMostRecentCompletedAnalysis } from '../../../organisms/LabwarePositionCheck/useMostRecentCompletedAnalysis'
-import { ViewportListRef } from 'react-viewport-list'
+
+import type { ViewportListRef } from 'react-viewport-list'
+import type { DesktopRouteParams, ProtocolRunDetailsTab, } from '../../../App/types'
+import type { Dispatch } from '../../../redux/types'
 
 const baseRoundTabStyling = css`
   ${TYPOGRAPHY.pSemiBold}

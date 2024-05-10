@@ -9,40 +9,39 @@ import {
   TEMPERATURE_MODULE_TYPE,
   THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
-import { AtomicProfileStep } from '@opentrons/shared-data/protocol/types/schemaV4'
 import { THERMOCYCLER_PROFILE, THERMOCYCLER_STATE } from '../../constants'
-import {
-  stepIconsByType,
-  PROFILE_CYCLE,
-  FormData,
-  StepType,
-  ProfileCycleItem,
-  ProfileStepItem,
-} from '../../form-types'
+import { stepIconsByType, PROFILE_CYCLE, } from '../../form-types'
 import {
   makeLidLabelText,
   makeSpeedText,
   makeTemperatureText,
   makeTimerText,
 } from '../../utils'
-import { InitialDeckSetup } from '../../step-forms'
 import { PDListItem, TitledStepList } from '../lists'
 import { TitledListNotes } from '../TitledListNotes'
 import { AspirateDispenseHeader } from './AspirateDispenseHeader'
 import { MixHeader } from './MixHeader'
 import { ModuleStepItems, ModuleStepItemRow } from './ModuleStepItems'
 import { PauseStepItems } from './PauseStepItems'
+import { MoveLabwareHeader } from './MoveLabwareHeader'
 import { SourceDestSubstep } from './SourceDestSubstep'
 import styles from './StepItem.module.css'
 
-import {
+import type { AdditionalEquipmentEntities } from '@opentrons/step-generation'
+import type { AtomicProfileStep } from '@opentrons/shared-data/protocol/types/schemaV4'
+import type {
+  FormData,
+  StepType,
+  ProfileCycleItem,
+  ProfileStepItem,
+} from '../../form-types'
+import type {
   SubstepIdentifier,
   SubstepItemData,
   ThermocyclerProfileSubstepItem,
   WellIngredientNames,
 } from '../../steplist/types'
-import { MoveLabwareHeader } from './MoveLabwareHeader'
-import type { AdditionalEquipmentEntities } from '@opentrons/step-generation'
+import type { InitialDeckSetup } from '../../step-forms'
 
 export interface StepItemProps {
   description?: string | null

@@ -3,8 +3,8 @@ import { useDispatch, useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
 import { KNOWLEDGEBASE_ROOT_URL } from '../components/KnowledgeBaseLink'
 import { NavTab, TabbedNavBar, OutsideLinkTab } from '@opentrons/components'
-import { Page, actions, selectors } from '../navigation'
 import { selectors as fileSelectors } from '../file-data'
+import type { Page, actions, selectors } from '../navigation'
 
 export function ConnectedNav(): JSX.Element {
   const { t } = useTranslation('nav')

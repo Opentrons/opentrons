@@ -1,6 +1,8 @@
 import {
   PROFILE_CYCLE,
   PROFILE_STEP,
+} from '../../form-types'
+import type {
   ProfileStepItem,
   ProfileCycleItem,
 } from '../../form-types'

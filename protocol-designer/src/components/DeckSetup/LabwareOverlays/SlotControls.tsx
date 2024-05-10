@@ -2,7 +2,7 @@ import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { useSelector, useDispatch } from 'react-redux'
 import noop from 'lodash/noop'
-import { useDrop, DropTargetMonitor, useDrag } from 'react-dnd'
+import { useDrop, useDrag } from 'react-dnd'
 import cx from 'classnames'
 import { Icon, RobotCoordsForeignDiv } from '@opentrons/components'
 import { DND_TYPES } from '../../../constants'
@@ -15,16 +15,18 @@ import {
   openAddLabwareModal,
 } from '../../../labware-ingred/actions'
 import { selectors as labwareDefSelectors } from '../../../labware-defs'
-import { START_TERMINAL_ITEM_ID, TerminalItemId } from '../../../steplist'
+import { START_TERMINAL_ITEM_ID} from '../../../steplist'
 import { BlockedSlot } from './BlockedSlot'
 import styles from './LabwareOverlays.module.css'
 
+import type { DropTargetMonitor } from 'react-dnd'
 import type {
   CoordinateTuple,
   Dimensions,
   ModuleType,
 } from '@opentrons/shared-data'
 import type { LabwareOnDeck } from '../../../step-forms'
+import type { TerminalItemId } from '../../../steplist'
 
 interface SlotControlsProps {
   slotPosition: CoordinateTuple | null

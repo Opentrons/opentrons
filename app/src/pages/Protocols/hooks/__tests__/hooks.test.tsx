@@ -1,5 +1,4 @@
 import { vi, it, describe, expect, beforeEach, afterEach } from 'vitest'
-import { UseQueryResult } from 'react-query'
 import { renderHook } from '@testing-library/react'
 import { when } from 'vitest-when'
 import omitBy from 'lodash/omitBy'
@@ -11,10 +10,7 @@ import {
   useModulesQuery,
 } from '@opentrons/react-api-client'
 import {
-  CompletedProtocolAnalysis,
-  DeckConfiguration,
   FLEX_SIMPLEST_DECK_CONFIG,
-  LabwareDefinition2,
   WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE,
   fixtureTiprack300ul,
 } from '@opentrons/shared-data'
@@ -24,9 +20,11 @@ import {
   useRunTimeParameters,
 } from '../index'
 import { useNotifyDeckConfigurationQuery } from '../../../../resources/deck_configuration/useNotifyDeckConfigurationQuery'
-
-import type { Protocol } from '@opentrons/api-client'
 import { mockHeaterShaker } from '../../../../redux/modules/__fixtures__'
+
+import type { UseQueryResult } from 'react-query'
+import type { CompletedProtocolAnalysis, DeckConfiguration, LabwareDefinition2 } from '@opentrons/shared-data'
+import type { Protocol } from '@opentrons/api-client'
 
 vi.mock('@opentrons/react-api-client')
 vi.mock('../../../../organisms/Devices/hooks')

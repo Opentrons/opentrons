@@ -1,4 +1,4 @@
-import {
+import type {
   PAUSE_UNTIL_RESUME,
   PAUSE_UNTIL_TIME,
   PAUSE_UNTIL_TEMP,

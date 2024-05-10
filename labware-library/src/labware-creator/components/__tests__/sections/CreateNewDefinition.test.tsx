@@ -1,11 +1,12 @@
 import React from 'react'
 import { vi, describe, it, expect } from 'vitest'
-import { FormikConfig } from 'formik'
 import { render, fireEvent } from '@testing-library/react'
 import '@testing-library/jest-dom/vitest'
-import { getDefaultFormState, LabwareFields } from '../../../fields'
+import { getDefaultFormState } from '../../../fields'
 import { wrapInFormik } from '../../utils/wrapInFormik'
 import { CreateNewDefinition } from '../../sections/CreateNewDefinition'
+import type { FormikConfig } from 'formik'
+import type { LabwareFields } from '../../../fields'
 
 const formikConfig: FormikConfig<LabwareFields> = {
   initialValues: getDefaultFormState(),
@@ -19,7 +20,7 @@ describe('CreateNewDefinition', () => {
       showDropDownOptions: true,
       disabled: false,
       labwareTypeChildFields: fakeLabwareTypeChildFields,
-      onClick: () => {},
+      onClick: () => { },
     }
     const { getByRole, getByText, getByTestId } = render(
       wrapInFormik(<CreateNewDefinition {...props} />, formikConfig)
@@ -44,7 +45,7 @@ describe('CreateNewDefinition', () => {
       showDropDownOptions: true,
       disabled: true,
       labwareTypeChildFields: null,
-      onClick: () => {},
+      onClick: () => { },
     }
     const { getByRole } = render(
       wrapInFormik(<CreateNewDefinition {...props} />, formikConfig)
@@ -59,7 +60,7 @@ describe('CreateNewDefinition', () => {
       showDropDownOptions: false,
       disabled: true,
       labwareTypeChildFields: null,
-      onClick: () => {},
+      onClick: () => { },
     }
     const { queryByRole } = render(
       wrapInFormik(<CreateNewDefinition {...props} />, formikConfig)

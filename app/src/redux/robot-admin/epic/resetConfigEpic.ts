@@ -11,7 +11,7 @@ import type {
   ActionToRequestMapper,
   ResponseToActionMapper,
 } from '../../robot-api/operators'
-import {
+import type {
   ResetConfigAction,
   ResetConfigSuccessAction,
   RestartRobotAction,

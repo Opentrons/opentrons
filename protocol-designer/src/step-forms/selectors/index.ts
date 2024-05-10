@@ -2,7 +2,7 @@ import isEqual from 'lodash/isEqual'
 import mapValues from 'lodash/mapValues'
 import reduce from 'lodash/reduce'
 import isEmpty from 'lodash/isEmpty'
-import { createSelector, Selector } from 'reselect'
+import { createSelector } from 'reselect'
 import {
   getLabwareDisplayName,
   getLabwareDefURI,
@@ -10,53 +10,48 @@ import {
   TEMPERATURE_MODULE_TYPE,
   THERMOCYCLER_MODULE_TYPE,
   HEATERSHAKER_MODULE_TYPE,
-  PipetteName,
   MAGNETIC_BLOCK_TYPE,
   getPipetteSpecsV2,
-  LabwareDefinition2,
 } from '@opentrons/shared-data'
-import {
-  AdditionalEquipmentEntities,
-  NormalizedAdditionalEquipmentById,
-  TEMPERATURE_DEACTIVATED,
-} from '@opentrons/step-generation'
+import { TEMPERATURE_DEACTIVATED } from '@opentrons/step-generation'
+
 import { INITIAL_DECK_SETUP_STEP_ID } from '../../constants'
 import {
   getFormWarnings,
   getFormErrors,
   stepFormToArgs,
 } from '../../steplist/formLevel'
-import {
-  ProfileFormError,
-  getProfileFormErrors,
-} from '../../steplist/formLevel/profileErrors'
+import { getProfileFormErrors } from '../../steplist/formLevel/profileErrors'
 import { getMoveLabwareFormErrors } from '../../steplist/formLevel/moveLabwareFormErrors'
 import { getFieldErrors } from '../../steplist/fieldLevel'
 import { getProfileItemsHaveErrors } from '../utils/getProfileItemsHaveErrors'
 import * as featureFlagSelectors from '../../feature-flags/selectors'
 import { denormalizePipetteEntities, getHydratedForm } from '../utils'
-import {
-  selectors as labwareDefSelectors,
-  LabwareDefByDefURI,
-} from '../../labware-defs'
-import { InstrumentGroup } from '@opentrons/components'
+import { selectors as labwareDefSelectors } from '../../labware-defs'
+import type { Selector } from 'reselect'
 import type {
-  DropdownOption,
-  Mount,
-  InstrumentInfoProps,
-} from '@opentrons/components'
-import type {
+  AdditionalEquipmentEntities,
+  NormalizedAdditionalEquipmentById,
   InvariantContext,
   LabwareEntity,
   LabwareEntities,
   ModuleEntities,
-  PipetteEntities,
+  PipetteEntities
 } from '@opentrons/step-generation'
+import type { PipetteName, LabwareDefinition2, } from '@opentrons/shared-data'
+import type { 
+  InstrumentGroup,
+  DropdownOption,
+  Mount,
+  InstrumentInfoProps,
+} from '@opentrons/components'
+import type { ProfileFormError } from '../../steplist/formLevel/profileErrors'
+import type { LabwareDefByDefURI } from '../../labware-defs'
 import type { FormWarning } from '../../steplist/formLevel'
-import { BaseState, DeckSlot } from '../../types'
-import { FormData, StepIdType } from '../../form-types'
-import { StepArgsAndErrorsById, StepFormErrors } from '../../steplist/types'
-import {
+import type { BaseState, DeckSlot } from '../../types'
+import type { FormData, StepIdType } from '../../form-types'
+import type { StepArgsAndErrorsById, StepFormErrors } from '../../steplist/types'
+import type {
   InitialDeckSetup,
   NormalizedLabwareById,
   NormalizedLabware,
@@ -71,12 +66,13 @@ import {
   HeaterShakerModuleState,
   MagneticBlockState,
 } from '../types'
-import {
+import type {
   PresavedStepFormState,
   RootState,
   SavedStepFormState,
   BatchEditFormChangesState,
 } from '../reducers'
+
 
 const rootSelector = (state: BaseState): RootState => state.stepForms
 

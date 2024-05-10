@@ -3,13 +3,14 @@ import { useDispatch, useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
 
 import cx from 'classnames'
-import { AlertModal, OutlineButton, ButtonProps } from '@opentrons/components'
+import { AlertModal, OutlineButton} from '@opentrons/components'
 import modalStyles from '../modal.module.css'
 import {
   selectors as labwareDefSelectors,
   actions as labwareDefActions,
-  LabwareUploadMessage,
 } from '../../../labware-defs'
+import type { ButtonProps } from '@opentrons/components'
+import type { LabwareUploadMessage } from '../../../labware-defs'
 
 const MessageBody = (props: {
   message: LabwareUploadMessage

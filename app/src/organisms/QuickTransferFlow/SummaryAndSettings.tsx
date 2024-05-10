@@ -10,10 +10,11 @@ import {
   ALIGN_CENTER,
 } from '@opentrons/components'
 
-import { SmallButton, TabbedButton } from '../../atoms/buttons'
+import { TabbedButton } from '../../atoms/buttons'
 import { ChildNavigation } from '../ChildNavigation'
 import { Overview } from './Overview'
 
+import type { SmallButton } from '../../atoms/buttons'
 import type { QuickTransferSetupState } from './types'
 
 interface SummaryAndSettingsProps {

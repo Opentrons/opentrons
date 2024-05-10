@@ -5,12 +5,12 @@ import cx from 'classnames'
 import {
   FLEX_ROBOT_TYPE,
   getPipetteSpecsV2,
-  PipetteName,
 } from '@opentrons/shared-data'
 import { InstrumentDiagram } from '@opentrons/components'
-import { FormPipette } from '../../../step-forms/types'
 import { getRobotType } from '../../../file-data/selectors'
 import styles from './FilePipettesModal.module.css'
+import type { PipetteName } from '@opentrons/shared-data'
+import type { FormPipette } from '../../../step-forms/types'
 
 interface Props {
   leftPipette?: FormPipette['pipetteName']

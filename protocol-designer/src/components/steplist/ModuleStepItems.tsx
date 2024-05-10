@@ -5,13 +5,13 @@ import {
   Tooltip,
   useHoverTooltip,
   TOOLTIP_FIXED,
-  UseHoverTooltipTargetProps,
 } from '@opentrons/components'
 import { PDListItem } from '../lists'
 import { LabwareTooltipContents } from './LabwareTooltipContents'
+import styles from './StepItem.module.css'
+import type { UseHoverTooltipTargetProps } from '@opentrons/components'
 import type { ModuleType } from '@opentrons/shared-data'
 
-import styles from './StepItem.module.css'
 
 export interface ModuleStepItemRowProps {
   label?: string | null

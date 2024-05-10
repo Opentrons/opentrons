@@ -1,17 +1,15 @@
-import {
+import type {
   TEMPDECK,
   MAGDECK,
   THERMOCYCLER,
   ModuleType,
-} from '@opentrons/shared-data'
-
-import type {
   MagneticModuleModel,
   TemperatureModuleModel,
   ThermocyclerModuleModel,
   HeaterShakerModuleModel,
-  ModuleModel,
+  ModuleModel
 } from '@opentrons/shared-data'
+
 
 type PortGroup = 'main' | 'left' | 'right' | 'front' | 'unknown'
 export interface PhysicalPort {

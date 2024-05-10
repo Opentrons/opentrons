@@ -6,11 +6,9 @@ import {
   StrokedWells,
   StaticLabware,
 } from './labwareInternals'
-import {
-  LabwareAdapter,
-  LabwareAdapterLoadName,
-  labwareAdapterLoadNames,
-} from './LabwareAdapter'
+import { LabwareAdapter, labwareAdapterLoadNames } from './LabwareAdapter'
+
+import type { CSSProperties } from 'styled-components'
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import type {
   HighlightedWellLabels,
@@ -19,7 +17,8 @@ import type {
   WellStroke,
   WellGroup,
 } from './labwareInternals/types'
-import type { CSSProperties } from 'styled-components'
+import type { LabwareAdapterLoadName } from './LabwareAdapter'
+
 export const WELL_LABEL_OPTIONS = {
   SHOW_LABEL_INSIDE: 'SHOW_LABEL_INSIDE',
   SHOW_LABEL_OUTSIDE: 'SHOW_LABEL_OUTSIDE',
@@ -116,13 +115,13 @@ export const LabwareRender = (props: LabwareRenderProps): JSX.Element => {
       ) : null}
       {props.disabledWells != null
         ? props.disabledWells.map((well, index) => (
-            <StyledWells
-              key={index}
-              wellContents="disabledWell"
-              definition={props.definition}
-              wells={well}
-            />
-          ))
+          <StyledWells
+            key={index}
+            wellContents="disabledWell"
+            definition={props.definition}
+            wells={well}
+          />
+        ))
         : null}
       {props.highlightedWells != null ? (
         <StyledWells
@@ -146,7 +145,7 @@ export const LabwareRender = (props: LabwareRenderProps): JSX.Element => {
         />
       ) : null}
       {props.wellLabelOption != null &&
-      props.definition.metadata.displayCategory !== 'adapter' ? (
+        props.definition.metadata.displayCategory !== 'adapter' ? (
         <WellLabels
           definition={props.definition}
           wellLabelOption={props.wellLabelOption}

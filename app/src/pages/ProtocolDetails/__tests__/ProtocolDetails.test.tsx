@@ -9,7 +9,6 @@ import {
   deleteProtocol,
   deleteRun,
   getProtocol,
-  HostConfig,
 } from '@opentrons/api-client'
 import {
   useCreateRunMutation,
@@ -33,6 +32,7 @@ import { Hardware } from '../Hardware'
 import { Labware } from '../Labware'
 import { Parameters } from '../Parameters'
 import { mockRunTimeParameterData } from '../fixtures'
+import type { HostConfig } from '@opentrons/api-client'
 
 // Mock IntersectionObserver
 class IntersectionObserver {

@@ -4,11 +4,9 @@ import {
   HEATERSHAKER_MODULE_TYPE,
   MAGNETIC_BLOCK_TYPE,
   MAGNETIC_MODULE_TYPE,
-  ModuleDefinition,
   OT2_STANDARD_DECKID,
   TEMPERATURE_MODULE_TYPE,
   THERMOCYCLER_MODULE_TYPE,
-  ThermocyclerModuleModel,
 } from '@opentrons/shared-data'
 import {
   C_DARK_GRAY,
@@ -27,6 +25,8 @@ import { HeaterShaker } from './HeaterShaker'
 import { Temperature } from './Temperature'
 import { MagneticBlock } from './MagneticBlock'
 import { MagneticModule } from './MagneticModule'
+
+import type { ModuleDefinition, ThermocyclerModuleModel } from '@opentrons/shared-data'
 
 export * from './Thermocycler'
 

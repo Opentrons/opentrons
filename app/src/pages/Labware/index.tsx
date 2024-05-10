@@ -34,15 +34,11 @@ import { LabwareCard } from '../../organisms/LabwareCard'
 import { AddCustomLabwareSlideout } from '../../organisms/AddCustomLabwareSlideout'
 import { LabwareDetails } from '../../organisms/LabwareDetails'
 import { useToaster } from '../../organisms/ToasterOven'
-import {
-  LabwareDefAndDate,
-  useAllLabware,
-  useLabwareFailure,
-  useNewLabwareName,
-} from './hooks'
+import { useAllLabware, useLabwareFailure, useNewLabwareName } from './hooks'
 
 import type { DropdownOption } from '../../atoms/MenuList/DropdownMenu'
 import type { LabwareFilter, LabwareSort } from './types'
+import type { LabwareDefAndDate, } from './hooks'
 
 const LABWARE_CREATOR_HREF = 'https://labware.opentrons.com/create/'
 const labwareDisplayCategoryFilters: LabwareFilter[] = [

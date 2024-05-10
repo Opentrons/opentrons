@@ -6,7 +6,6 @@ import {
   StepMeter,
   POSITION_STICKY,
 } from '@opentrons/components'
-import { SmallButton } from '../../atoms/buttons'
 import { ConfirmExitModal } from './ConfirmExitModal'
 import { CreateNewTransfer } from './CreateNewTransfer'
 import { SelectPipette } from './SelectPipette'
@@ -19,6 +18,7 @@ import { VolumeEntry } from './VolumeEntry'
 import { SummaryAndSettings } from './SummaryAndSettings'
 import { quickTransferReducer } from './utils'
 
+import type { SmallButton } from '../../atoms/buttons'
 import type { QuickTransferSetupState } from './types'
 
 const QUICK_TRANSFER_WIZARD_STEPS = 8

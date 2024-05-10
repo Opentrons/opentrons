@@ -16,8 +16,6 @@ import {
   defaultTo,
   composeMaskers,
   trimDecimals,
-  ValueMasker,
-  ValueCaster,
 } from './processing'
 import {
   MIN_TEMP_MODULE_TEMP,
@@ -37,7 +35,8 @@ import {
   MIN_TC_PROFILE_VOLUME,
   MAX_TC_PROFILE_VOLUME,
 } from '../../constants'
-import {
+import { getStagingAreaAddressableAreas } from '../../utils'
+import type  {
   LabwareEntity,
   PipetteEntity,
   InvariantContext,
@@ -45,7 +44,7 @@ import {
   AdditionalEquipmentEntities,
   AdditionalEquipmentEntity,
 } from '@opentrons/step-generation'
-import { getStagingAreaAddressableAreas } from '../../utils'
+import type { ValueMasker, ValueCaster } from './processing'
 import type { StepFieldName } from '../../form-types'
 import type {
   AddressableAreaName,

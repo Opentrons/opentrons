@@ -1,8 +1,8 @@
-import { combineReducers, Reducer } from 'redux'
+import { combineReducers, type Reducer } from 'redux'
 import { handleActions } from 'redux-actions'
-import { Action } from '../types'
-import { SetOptIn } from './actions'
-import { RehydratePersistedAction } from '../persist'
+import type { Action } from '../types'
+import type { SetOptIn } from './actions'
+import type { RehydratePersistedAction } from '../persist'
 type OptInState = boolean | null
 const optInInitialState = null
 // @ts-expect-error(sb, 2021-6-17): cannot use string literals as action type

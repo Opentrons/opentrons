@@ -18,24 +18,14 @@ import {
   getMultiSelectItemIds,
   getMultiSelectLastSelected,
   getSelectedStepId,
-  HoverOnStepAction,
-  HoverOnSubstepAction,
-  ToggleStepCollapsedAction,
-  SelectMultipleStepsAction,
 } from '../ui/steps'
 import { selectors as fileDataSelectors } from '../file-data'
-import {
-  StepItem,
-  StepItemContents,
-  StepItemContentsProps,
-  StepItemProps,
-} from '../components/steplist/StepItem'
+import { StepItem, StepItemContents } from '../components/steplist/StepItem'
 import {
   CLOSE_BATCH_EDIT_FORM,
   CLOSE_STEP_FORM_WITH_CHANGES,
   CLOSE_UNSAVED_STEP_FORM,
   ConfirmDeleteModal,
-  DeleteModalType,
 } from '../components/modals/ConfirmDeleteModal'
 import {
   getAdditionalEquipmentEntities,
@@ -43,6 +33,14 @@ import {
 } from '../step-forms/selectors'
 
 import type { ThunkDispatch } from 'redux-thunk'
+import type {
+  HoverOnStepAction,
+  HoverOnSubstepAction,
+  ToggleStepCollapsedAction,
+  SelectMultipleStepsAction,
+} from '../ui/steps'
+import type { StepItemContentsProps, StepItemProps } from '../components/steplist/StepItem'
+import type { DeleteModalType } from '../components/modals/ConfirmDeleteModal'
 import type { SubstepIdentifier } from '../steplist/types'
 import type { StepIdType } from '../form-types'
 import type { BaseState, ThunkAction } from '../types'

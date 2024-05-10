@@ -6,7 +6,7 @@ import { long2ip } from 'netmask'
 import { INTERFACE_WIFI, INTERFACE_ETHERNET } from './constants'
 
 import type { State } from '../types'
-import * as Types from './types'
+import type * as Types from './types'
 import type { Dictionary } from 'lodash'
 
 export function getInternetStatus(

@@ -13,12 +13,7 @@ import {
   TOOLTIP_TOP_END,
 } from '@opentrons/components'
 import * as steplistActions from '../../../steplist/actions'
-import {
-  PROFILE_CYCLE,
-  ProfileStepItem,
-  ProfileItem,
-  ProfileCycleItem,
-} from '../../../form-types'
+import { PROFILE_CYCLE } from '../../../form-types'
 import {
   getProfileFieldErrors,
   maskProfileField,
@@ -30,7 +25,8 @@ import {
 import { getDynamicFieldFocusHandlerId } from '../utils'
 import styles from '../StepEditForm.module.css'
 
-import { FocusHandlers } from '../types'
+import type { ProfileStepItem, ProfileItem, ProfileCycleItem } from '../../../form-types'
+import type { FocusHandlers } from '../types'
 
 export const showProfileFieldErrors = ({
   fieldId,

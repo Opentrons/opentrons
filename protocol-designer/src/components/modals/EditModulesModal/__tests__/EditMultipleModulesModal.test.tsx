@@ -8,10 +8,10 @@ import { getLabwareIsCompatible } from '../../../../utils/labwareModuleCompatibi
 import {
   getLabwareOnSlot,
   getSlotIsEmpty,
-  ModuleOnDeck,
 } from '../../../../step-forms'
 import { EditMultipleModulesModal } from '../EditMultipleModulesModal'
 import type * as Components from '@opentrons/components'
+import type { ModuleOnDeck } from '../../../../step-forms'
 
 vi.mock('../../../../step-forms/selectors')
 vi.mock('../../../../utils/labwareModuleCompatibility')
