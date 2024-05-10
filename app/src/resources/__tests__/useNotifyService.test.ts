@@ -34,7 +34,6 @@ describe('useNotifyService', () => {
 
   beforeEach(() => {
     mockDispatch = vi.fn()
-    mockHTTPRefetch = vi.fn()
     mockTrackEvent = vi.fn()
     vi.mocked(useTrackEvent).mockReturnValue(mockTrackEvent)
     vi.mocked(useDispatch).mockReturnValue(mockDispatch)
@@ -48,14 +47,13 @@ describe('useNotifyService', () => {
   })
 
   it('should trigger an HTTP refetch and subscribe action on a successful initial mount', () => {
-    renderHook(() =>
+    const { result } = renderHook(() =>
       useNotifyService({
         topic: MOCK_TOPIC,
-        setRefetch: mockHTTPRefetch,
         options: MOCK_OPTIONS,
       } as any)
     )
-    expect(mockHTTPRefetch).toHaveBeenCalledWith('once')
+    expect(result.current.isNotifyEnabled).toEqual(true)
     expect(mockDispatch).toHaveBeenCalledWith(
       notifySubscribeAction(MOCK_HOST_CONFIG.hostname, MOCK_TOPIC)
     )
@@ -63,40 +61,37 @@ describe('useNotifyService', () => {
   })
 
   it('should not subscribe to notifications if forceHttpPolling is true', () => {
-    renderHook(() =>
+    const { result } = renderHook(() =>
       useNotifyService({
         topic: MOCK_TOPIC,
-        setRefetch: mockHTTPRefetch,
         options: { ...MOCK_OPTIONS, forceHttpPolling: true },
       } as any)
     )
-    expect(mockHTTPRefetch).toHaveBeenCalled()
+    expect(result.current.isNotifyEnabled).toEqual(true)
     expect(appShellListener).not.toHaveBeenCalled()
     expect(mockDispatch).not.toHaveBeenCalled()
   })
 
   it('should not subscribe to notifications if enabled is false', () => {
-    renderHook(() =>
+    const { result } = renderHook(() =>
       useNotifyService({
         topic: MOCK_TOPIC,
-        setRefetch: mockHTTPRefetch,
         options: { ...MOCK_OPTIONS, enabled: false },
       } as any)
     )
-    expect(mockHTTPRefetch).toHaveBeenCalled()
+    expect(result.current.isNotifyEnabled).toEqual(true)
     expect(appShellListener).not.toHaveBeenCalled()
     expect(mockDispatch).not.toHaveBeenCalled()
   })
 
   it('should not subscribe to notifications if staleTime is Infinity', () => {
-    renderHook(() =>
+    const { result } = renderHook(() =>
       useNotifyService({
         topic: MOCK_TOPIC,
-        setRefetch: mockHTTPRefetch,
         options: { ...MOCK_OPTIONS, staleTime: Infinity },
       } as any)
     )
-    expect(mockHTTPRefetch).toHaveBeenCalled()
+    expect(result.current.isNotifyEnabled).toEqual(true)
     expect(appShellListener).not.toHaveBeenCalled()
     expect(mockDispatch).not.toHaveBeenCalled()
   })
@@ -106,14 +101,15 @@ describe('useNotifyService', () => {
     const errorSpy = vi.spyOn(console, 'error')
     errorSpy.mockImplementation(() => {})
 
-    renderHook(() =>
+    const { result } = renderHook(() =>
       useNotifyService({
         topic: MOCK_TOPIC,
         setRefetch: mockHTTPRefetch,
         options: MOCK_OPTIONS,
       } as any)
     )
-    expect(mockHTTPRefetch).toHaveBeenCalledWith('always')
+
+    expect(result.current.isNotifyEnabled).toEqual(true)
   })
 
   it('should return set HTTP refetch to always and fire an analytics reporting event if the connection was refused', () => {
@@ -123,7 +119,7 @@ describe('useNotifyService', () => {
       // eslint-disable-next-line n/no-callback-literal
       callback('ECONNREFUSED')
     })
-    const { rerender } = renderHook(() =>
+    const { rerender, result } = renderHook(() =>
       useNotifyService({
         topic: MOCK_TOPIC,
         setRefetch: mockHTTPRefetch,
@@ -132,7 +128,7 @@ describe('useNotifyService', () => {
     )
     expect(mockTrackEvent).toHaveBeenCalled()
     rerender()
-    expect(mockHTTPRefetch).toHaveBeenCalledWith('always')
+    expect(result.current.isNotifyEnabled).toEqual(true)
   })
 
   it('should trigger a single HTTP refetch if the refetch flag was returned', () => {
@@ -142,7 +138,7 @@ describe('useNotifyService', () => {
       // eslint-disable-next-line n/no-callback-literal
       callback({ refetch: true })
     })
-    const { rerender } = renderHook(() =>
+    const { rerender, result } = renderHook(() =>
       useNotifyService({
         topic: MOCK_TOPIC,
         setRefetch: mockHTTPRefetch,
@@ -150,7 +146,7 @@ describe('useNotifyService', () => {
       } as any)
     )
     rerender()
-    expect(mockHTTPRefetch).toHaveBeenCalledWith('once')
+    expect(result.current.isNotifyEnabled).toEqual(true)
   })
 
   it('should trigger a single HTTP refetch if the unsubscribe flag was returned', () => {
@@ -160,22 +156,20 @@ describe('useNotifyService', () => {
       // eslint-disable-next-line n/no-callback-literal
       callback({ unsubscribe: true })
     })
-    const { rerender } = renderHook(() =>
+    const { rerender, result } = renderHook(() =>
       useNotifyService({
         topic: MOCK_TOPIC,
-        setRefetch: mockHTTPRefetch,
         options: MOCK_OPTIONS,
       } as any)
     )
     rerender()
-    expect(mockHTTPRefetch).toHaveBeenCalledWith('once')
+    expect(result.current.isNotifyEnabled).toEqual(true)
   })
 
   it('should clean up the listener on dismount', () => {
     const { unmount } = renderHook(() =>
       useNotifyService({
         topic: MOCK_TOPIC,
-        setRefetch: mockHTTPRefetch,
         options: MOCK_OPTIONS,
       })
     )
@@ -188,7 +182,6 @@ describe('useNotifyService', () => {
       useNotifyService({
         hostOverride: MOCK_HOST_CONFIG,
         topic: MOCK_TOPIC,
-        setRefetch: mockHTTPRefetch,
         options: MOCK_OPTIONS,
       })
     )

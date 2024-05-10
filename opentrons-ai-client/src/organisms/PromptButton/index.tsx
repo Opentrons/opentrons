@@ -1,13 +1,14 @@
-import React, { useCallback } from 'react'
+import React from 'react'
 import styled from 'styled-components'
+import { useAtom } from 'jotai'
 import { BORDERS, PrimaryButton } from '@opentrons/components'
-import { setPromptContext } from './PromptProvider'
 import {
   reagentTransfer,
   flexReagentTransfer,
   pcr,
   flexPcr,
 } from '../../assets/prompts'
+import { preparedPromptAtom } from '../../resources/atoms'
 
 interface PromptButtonProps {
   buttonText: string
@@ -30,18 +31,11 @@ const PROMPT_BY_NAME: Record<string, { prompt: string }> = {
 }
 
 export function PromptButton({ buttonText }: PromptButtonProps): JSX.Element {
-  const usePromptSetValue = (): React.Dispatch<React.SetStateAction<string>> =>
-    React.useContext(setPromptContext)
-  const setPrompt = usePromptSetValue()
-
-  const handleClick = useCallback(
-    (event: React.MouseEvent<HTMLButtonElement>) => {
-      const { prompt } = PROMPT_BY_NAME[buttonText]
-      setPrompt(prompt)
-      event.currentTarget.blur()
-    },
-    [setPrompt, buttonText]
-  )
+  const [, setPreparedPrompt] = useAtom(preparedPromptAtom)
+  const handleClick = (): void => {
+    const { prompt } = PROMPT_BY_NAME[buttonText]
+    setPreparedPrompt(prompt)
+  }
 
   return <PromptBtn onClick={handleClick}>{buttonText}</PromptBtn>
 }

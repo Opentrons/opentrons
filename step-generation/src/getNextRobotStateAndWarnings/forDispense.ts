@@ -16,5 +16,6 @@ export function forDispense(
     useFullVolume: false,
     volume,
     wellName,
+    robotStateAndWarnings,
   })
 }

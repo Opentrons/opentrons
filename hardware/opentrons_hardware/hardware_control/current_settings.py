@@ -73,7 +73,7 @@ async def set_run_current(
         )
         if error != ErrorCode.ok:
             log.error(
-                f"recieved error {str(error)} trying to set run current for {str(node)}"
+                f"received error {str(error)} trying to set run current for {str(node)}"
             )
 
 
@@ -97,5 +97,5 @@ async def set_hold_current(
         )
         if error != ErrorCode.ok:
             log.error(
-                f"recieved error {str(error)} trying to set run current for {str(node)}"
+                f"received error {str(error)} trying to set run current for {str(node)}"
             )

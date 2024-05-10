@@ -1,6 +1,8 @@
 import { beforeEach, describe, it, expect, test } from 'vitest'
 import {
   ONE_CHANNEL_WASTE_CHUTE_ADDRESSABLE_AREA,
+  fixtureTiprack300ul,
+  getLabwareDefURI,
   WASTE_CHUTE_CUTOUT,
 } from '@opentrons/shared-data'
 import {
@@ -31,6 +33,7 @@ import {
   SOURCE_WELL_BLOWOUT_DESTINATION,
 } from '../utils/misc'
 import { transfer } from '../commandCreators/compound/transfer'
+import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import type { InvariantContext, RobotState, TransferArgs } from '../types'
 
 const airGapHelper = makeAirGapHelper({
@@ -68,7 +71,7 @@ beforeEach(() => {
     name: 'Transfer Test',
     description: 'test blah blah',
     pipette: DEFAULT_PIPETTE,
-    tipRack: 'tiprack1Id',
+    tipRack: getLabwareDefURI(fixtureTiprack300ul as LabwareDefinition2),
     sourceLabware: SOURCE_LABWARE,
     destLabware: DEST_LABWARE,
 

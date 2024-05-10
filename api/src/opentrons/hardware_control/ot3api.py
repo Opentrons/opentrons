@@ -413,7 +413,7 @@ class OT3API(
             Dict[OT3Mount, Dict[str, Optional[str]]],
             Dict[top_types.Mount, Dict[str, Optional[str]]],
         ] = None,
-        attached_modules: Optional[Dict[str, List[str]]] = None,
+        attached_modules: Optional[Dict[str, List[modules.SimulatingModule]]] = None,
         config: Union[RobotConfig, OT3Config, None] = None,
         loop: Optional[asyncio.AbstractEventLoop] = None,
         strict_attached_instruments: bool = True,
@@ -2556,9 +2556,7 @@ class OT3API(
         reading from the pressure sensor.
 
         If the move is completed without the specified threshold being triggered, a
-        LiquidNotFound error will be thrown.
-        If the threshold is triggered before the minimum z distance has been traveled,
-        a EarlyLiquidSenseTrigger error will be thrown.
+        LiquidNotFoundError error will be thrown.
 
         Otherwise, the function will stop moving once the threshold is triggered,
         and return the position of the

@@ -58,7 +58,7 @@ describe('ModuleIcon', () => {
   it('renders SharedIcon with correct style', () => {
     render(props)
     const module = screen.getByTestId('ModuleIcon_ot-temperature-v2')
-    expect(module).toHaveStyle(`color: ${COLORS.black90}`)
+    expect(module).toHaveStyle(`color: ${COLORS.grey60}`)
     expect(module).toHaveStyle(`height: ${SPACING.spacing16}`)
     expect(module).toHaveStyle(`width: ${SPACING.spacing16}`)
     expect(module).toHaveStyle(`margin-left: ${SPACING.spacing2}`)

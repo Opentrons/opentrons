@@ -26,7 +26,7 @@ import {
   SecondaryButton,
   StyledText,
   TYPOGRAPHY,
-  useHoverTooltip,
+  useTooltip,
 } from '@opentrons/components'
 import { ApiHostProvider } from '@opentrons/react-api-client'
 
@@ -63,6 +63,8 @@ export const CARD_OUTLINE_BORDER_STYLE = css`
   }
 `
 
+const TOOLTIP_DELAY_MS = 2000
+
 const _getFileBaseName = (filePath: string): string => {
   return filePath.split('/').reverse()[0]
 }
@@ -78,7 +80,11 @@ export function ChooseProtocolSlideoutComponent(
   const { t } = useTranslation(['device_details', 'shared'])
   const history = useHistory()
   const logger = useLogger(new URL('', import.meta.url).pathname)
-  const [targetProps, tooltipProps] = useHoverTooltip()
+  const [targetProps, tooltipProps] = useTooltip()
+  const [
+    showRestoreValuesTooltip,
+    setShowRestoreValuesTooltip,
+  ] = React.useState<boolean>(false)
 
   const { robot, showSlideout, onCloseClick } = props
   const { name } = robot
@@ -93,6 +99,7 @@ export function ChooseProtocolSlideoutComponent(
   ] = React.useState<RunTimeParameter[]>([])
   const [currentPage, setCurrentPage] = React.useState<number>(1)
   const [hasParamError, setHasParamError] = React.useState<boolean>(false)
+  const [isInputFocused, setIsInputFocused] = React.useState<boolean>(false)
 
   React.useEffect(() => {
     setRunTimeParametersOverrides(
@@ -229,7 +236,7 @@ export function ChooseProtocolSlideoutComponent(
         const value = runtimeParam.value as number
         const id = `InputField_${runtimeParam.variableName}_${index.toString()}`
         const error =
-          Number.isNaN(value) ||
+          (Number.isNaN(value) && !isInputFocused) ||
           value < runtimeParam.min ||
           value > runtimeParam.max
             ? t(`protocol_details:value_out_of_range`, {
@@ -258,6 +265,8 @@ export function ChooseProtocolSlideoutComponent(
             caption={`${runtimeParam.min}-${runtimeParam.max}`}
             id={id}
             error={error}
+            onBlur={() => setIsInputFocused(false)}
+            onFocus={() => setIsInputFocused(true)}
             onChange={e => {
               const clone = runTimeParametersOverrides.map((parameter, i) => {
                 if (i === index) {
@@ -341,24 +350,42 @@ export function ChooseProtocolSlideoutComponent(
   }
 
   const pageTwoBody = (
-    <Flex flexDirection={DIRECTION_COLUMN}>
+    <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing10}>
       <Flex justifyContent={JUSTIFY_END}>
         <LinkComponent
           textAlign={TYPOGRAPHY.textAlignRight}
           css={
             isRestoreDefaultsLinkEnabled ? ENABLED_LINK_CSS : DISABLED_LINK_CSS
           }
-          onClick={resetRunTimeParameters}
+          onClick={() => {
+            if (isRestoreDefaultsLinkEnabled) {
+              resetRunTimeParameters?.()
+            } else {
+              setShowRestoreValuesTooltip(true)
+              setTimeout(
+                () => setShowRestoreValuesTooltip(false),
+                TOOLTIP_DELAY_MS
+              )
+            }
+          }}
           paddingBottom={SPACING.spacing10}
           {...targetProps}
         >
           {t('protocol_details:restore_defaults')}
         </LinkComponent>
-        {!isRestoreDefaultsLinkEnabled && (
-          <Tooltip tooltipProps={tooltipProps}>
-            {t('protocol_details:no_custom_values')}
-          </Tooltip>
-        )}
+        <Tooltip
+          tooltipProps={{
+            ...tooltipProps,
+            visible: showRestoreValuesTooltip,
+          }}
+          css={css`
+            &:hover {
+              cursor: auto;
+            }
+          `}
+        >
+          {t('protocol_details:no_custom_values')}
+        </Tooltip>{' '}
       </Flex>
       <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing16}>
         {runTimeParametersInputs}
@@ -525,7 +552,11 @@ function StoredProtocolList(props: StoredProtocolListProps): JSX.Element {
                 isWarning={missingAnalysisData}
                 onClick={() => handleSelectProtocol(storedProtocol)}
               >
-                <Box display="grid" gridTemplateColumns="1fr 3fr">
+                <Box
+                  display="grid"
+                  gridTemplateColumns="1fr 3fr"
+                  marginRight={SPACING.spacing16}
+                >
                   {!missingAnalysisData ? (
                     <Box
                       marginY={SPACING.spacingAuto}

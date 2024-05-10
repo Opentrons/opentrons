@@ -151,7 +151,7 @@
         "f9a294f1-f42b-4cae-893a-592405349d56": {
           "pipette": "2e7c6344-58ab-465c-b542-489883cb63fe",
           "volume": "100",
-          "tipRack": "23ed35de-5bfd-4bb0-8f54-da99a2804ed9:opentrons/opentrons_flex_96_filtertiprack_50ul/1",
+          "tipRack": "opentrons/opentrons_flex_96_filtertiprack_50ul/1",
           "changeTip": "always",
           "path": "single",
           "aspirate_wells_grouped": false,
@@ -227,7 +227,7 @@
           "mix_touchTip_mmFromBottom": null,
           "dropTip_location": "134504e1-b212-41cf-966d-2560deb5b693:trashBin",
           "nozzles": null,
-          "tipRack": "23ed35de-5bfd-4bb0-8f54-da99a2804ed9:opentrons/opentrons_flex_96_filtertiprack_50ul/1",
+          "tipRack": "opentrons/opentrons_flex_96_filtertiprack_50ul/1",
           "mix_x_position": 0,
           "mix_y_position": 0,
           "blowout_z_offset": 0,

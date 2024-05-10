@@ -24,23 +24,28 @@ export interface QueryOptionsWithPolling<TData, TError = Error>
 
 interface UseNotifyServiceProps<TData, TError = Error> {
   topic: NotifyTopic
-  setRefetch: (refetch: HTTPRefetchFrequency) => void
   options: QueryOptionsWithPolling<TData, TError>
   hostOverride?: HostConfig | null
 }
 
+interface UseNotifyServiceResults {
+  notifyOnSettled: () => void
+  isNotifyEnabled: boolean
+}
+
 export function useNotifyService<TData, TError = Error>({
   topic,
-  setRefetch,
   options,
   hostOverride,
-}: UseNotifyServiceProps<TData, TError>): void {
+}: UseNotifyServiceProps<TData, TError>): UseNotifyServiceResults {
   const dispatch = useDispatch()
   const hostFromProvider = useHost()
   const host = hostOverride ?? hostFromProvider
   const hostname = host?.hostname ?? null
   const doTrackEvent = useTrackEvent()
   const seenHostname = React.useRef<string | null>(null)
+  const [refetch, setRefetch] = React.useState<HTTPRefetchFrequency>(null)
+
   const { enabled, staleTime, forceHttpPolling } = options
 
   const shouldUseNotifications =
@@ -51,7 +56,7 @@ export function useNotifyService<TData, TError = Error>({
 
   React.useEffect(() => {
     if (shouldUseNotifications) {
-      // Always fetch on initial mount.
+      // Always fetch on initial mount to keep latency as low as possible.
       setRefetch('once')
       appShellListener({
         hostname,
@@ -76,7 +81,7 @@ export function useNotifyService<TData, TError = Error>({
     }
   }, [topic, hostname, shouldUseNotifications])
 
-  function onDataEvent(data: NotifyResponseData): void {
+  const onDataEvent = React.useCallback((data: NotifyResponseData): void => {
     if (data === 'ECONNFAILED' || data === 'ECONNREFUSED') {
       setRefetch('always')
       if (data === 'ECONNREFUSED') {
@@ -88,5 +93,13 @@ export function useNotifyService<TData, TError = Error>({
     } else if ('refetch' in data || 'unsubscribe' in data) {
       setRefetch('once')
     }
-  }
+  }, [])
+
+  const notifyOnSettled = React.useCallback(() => {
+    if (refetch === 'once') {
+      setRefetch(null)
+    }
+  }, [refetch])
+
+  return { notifyOnSettled, isNotifyEnabled: refetch != null }
 }

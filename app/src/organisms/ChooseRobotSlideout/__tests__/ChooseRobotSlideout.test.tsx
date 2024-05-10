@@ -310,4 +310,22 @@ describe('ChooseRobotSlideout', () => {
     })
     expect(mockSetSelectedRobot).toBeCalledWith(null)
   })
+
+  it('shows tooltip when disabled Restore default values link is clicked', () => {
+    render({
+      onCloseClick: vi.fn(),
+      isExpanded: true,
+      isSelectedRobotOnDifferentSoftwareVersion: false,
+      selectedRobot: null,
+      setSelectedRobot: mockSetSelectedRobot,
+      title: 'choose robot slideout title',
+      robotType: OT2_ROBOT_TYPE,
+      multiSlideout: { currentPage: 2 },
+      runTimeParametersOverrides: mockRunTimeParameters,
+    })
+
+    const restoreValuesLink = screen.getByText('Restore default values')
+    fireEvent.click(restoreValuesLink)
+    screen.getByText('No custom values specified')
+  })
 })

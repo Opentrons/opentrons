@@ -23,6 +23,7 @@ describe('EquipmentOption', () => {
       isSelected: false,
       text: 'mockText',
       robotType: FLEX_ROBOT_TYPE,
+      type: 'module',
     }
   })
   afterEach(() => {
@@ -39,7 +40,7 @@ describe('EquipmentOption', () => {
     }
     render(props)
     expect(screen.getByLabelText('EquipmentOption_flex_mockText')).toHaveStyle(
-      `background-color: ${COLORS.grey10}`
+      `background-color: ${COLORS.white}`
     )
   })
   it('renders the equipment option without check not selected and image', () => {
@@ -55,7 +56,7 @@ describe('EquipmentOption', () => {
       screen.getByLabelText('EquipmentOption_checkbox-blank-outline')
     ).toHaveStyle(`color: ${COLORS.grey50}`)
     expect(screen.getByLabelText('EquipmentOption_flex_mockText')).toHaveStyle(
-      `border: 1px ${BORDERS.styleSolid} ${COLORS.grey35}`
+      `border: 1px ${BORDERS.styleSolid} ${COLORS.grey30}`
     )
   })
   it('renders the equipment option without check selected', () => {
@@ -89,5 +90,36 @@ describe('EquipmentOption', () => {
     fireEvent.click(screen.getByTestId('EquipmentOption_upArrow'))
     expect(props.multiples?.setValue).toHaveBeenCalled()
     screen.getByTestId('EquipmentOption_downArrow')
+  })
+  it('renders the equipment option with multiples allowed cta disabled from isDisabled', () => {
+    props = {
+      ...props,
+      multiples: {
+        numItems: 1,
+        maxItems: 4,
+        setValue: vi.fn(),
+        isDisabled: true,
+      },
+    }
+    render(props)
+    fireEvent.click(screen.getByTestId('EquipmentOption_upArrow'))
+    expect(props.multiples?.setValue).not.toHaveBeenCalled()
+  })
+  it('renders the equipment option with multiples allowed cta disabled from hitting max number', () => {
+    props = {
+      ...props,
+      multiples: {
+        numItems: 1,
+        maxItems: 7,
+        setValue: vi.fn(),
+        isDisabled: false,
+      },
+    }
+    render(props)
+    screen.getByText('1')
+    for (let i = 1; i < 7; i++) {
+      fireEvent.click(screen.getByTestId('EquipmentOption_upArrow'))
+    }
+    expect(props.multiples?.setValue).toHaveBeenCalledTimes(6)
   })
 })

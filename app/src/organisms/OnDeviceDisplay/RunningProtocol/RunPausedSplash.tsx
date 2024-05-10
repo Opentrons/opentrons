@@ -18,13 +18,13 @@ import {
 } from '@opentrons/components'
 
 interface RunPausedSplashProps {
-  onClose: () => void
+  onClick: () => void
   errorType?: string
   protocolName?: string
 }
 
 export function RunPausedSplash({
-  onClose,
+  onClick,
   errorType,
   protocolName,
 }: RunPausedSplashProps): JSX.Element {
@@ -48,7 +48,7 @@ export function RunPausedSplash({
       gridGap={SPACING.spacing40}
       padding={SPACING.spacing120}
       backgroundColor={COLORS.grey50}
-      onClick={onClose}
+      onClick={onClick}
     >
       <SplashFrame>
         <Flex gridGap={SPACING.spacing32} alignItems={ALIGN_CENTER}>
