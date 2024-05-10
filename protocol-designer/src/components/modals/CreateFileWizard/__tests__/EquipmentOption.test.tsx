@@ -91,4 +91,35 @@ describe('EquipmentOption', () => {
     expect(props.multiples?.setValue).toHaveBeenCalled()
     screen.getByTestId('EquipmentOption_downArrow')
   })
+  it('renders the equipment option with multiples allowed cta disabled from isDisabled', () => {
+    props = {
+      ...props,
+      multiples: {
+        numItems: 1,
+        maxItems: 4,
+        setValue: vi.fn(),
+        isDisabled: true,
+      },
+    }
+    render(props)
+    fireEvent.click(screen.getByTestId('EquipmentOption_upArrow'))
+    expect(props.multiples?.setValue).not.toHaveBeenCalled()
+  })
+  it('renders the equipment option with multiples allowed cta disabled from hitting max number', () => {
+    props = {
+      ...props,
+      multiples: {
+        numItems: 1,
+        maxItems: 7,
+        setValue: vi.fn(),
+        isDisabled: false,
+      },
+    }
+    render(props)
+    screen.getByText('1')
+    for (let i = 1; i < 7; i++) {
+      fireEvent.click(screen.getByTestId('EquipmentOption_upArrow'))
+    }
+    expect(props.multiples?.setValue).toHaveBeenCalledTimes(6)
+  })
 })
