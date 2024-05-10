@@ -85,13 +85,24 @@ export const getMoveLabwareOptions: Selector<Options> = createSelector(
   stepFormSelectors.getInitialDeckSetup,
   stepFormSelectors.getSavedStepForms,
   stepFormSelectors.getAdditionalEquipmentEntities,
+  stepFormSelectors.getUnsavedForm,
   (
     labwareEntities,
     nicknamesById,
     initialDeckSetup,
     savedStepForms,
-    additionalEquipmentEntities
+    additionalEquipmentEntities,
+    unsavedForm
   ) => {
+    const savedFormKeys = Object.keys(savedStepForms)
+    const previouslySavedFormDataIndex = unsavedForm
+      ? savedFormKeys.indexOf(unsavedForm.id)
+      : -1
+    const filteredSavedStepFormIds =
+      previouslySavedFormDataIndex !== -1
+        ? savedFormKeys.slice(0, previouslySavedFormDataIndex)
+        : savedFormKeys
+
     const wasteChuteLocation = Object.values(additionalEquipmentEntities).find(
       aE => aE.name === 'wasteChute'
     )?.location
@@ -102,12 +113,13 @@ export const getMoveLabwareOptions: Selector<Options> = createSelector(
         labwareEntity: LabwareEntity,
         labwareId: string
       ): Options => {
-        const isLabwareInWasteChute = Object.values(savedStepForms).find(
-          form =>
-            form.stepType === 'moveLabware' &&
-            form.labware === labwareId &&
-            form.newLocation === wasteChuteLocation
-        )
+        const isLabwareInWasteChute =
+          filteredSavedStepFormIds.find(
+            id =>
+              savedStepForms[id].stepType === 'moveLabware' &&
+              savedStepForms[id].labware === labwareId &&
+              savedStepForms[id].newLocation === wasteChuteLocation
+          ) != null
 
         const isAdapter =
           labwareEntity.def.allowedRoles?.includes('adapter') ?? false
