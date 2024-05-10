@@ -21,7 +21,6 @@ from opentrons.protocol_engine.state.module_substates import (
     HeaterShakerModuleId,
     TemperatureModuleId,
     ThermocyclerModuleId,
-    AbsorbanceReaderId,
 )
 from ..errors import (
     FailedToLoadPipetteError,
@@ -486,13 +485,6 @@ class EquipmentHandler:
     def get_module_hardware_api(
         self,
         module_id: ThermocyclerModuleId,
-    ) -> Optional[Thermocycler]:
-        ...
-
-    @overload
-    def get_module_hardware_api(
-        self,
-        module_id: AbsorbanceReaderId,
     ) -> Optional[Thermocycler]:
         ...
 

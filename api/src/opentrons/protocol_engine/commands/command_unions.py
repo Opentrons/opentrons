@@ -9,7 +9,6 @@ from . import heater_shaker
 from . import magnetic_module
 from . import temperature_module
 from . import thermocycler
-from . import absorbance_reader
 
 from . import calibration
 
@@ -354,7 +353,6 @@ Command = Annotated[
         thermocycler.OpenLid,
         thermocycler.CloseLid,
         thermocycler.RunProfile,
-        absorbance_reader.AbsorbanceMeasure,
         calibration.CalibrateGripper,
         calibration.CalibratePipette,
         calibration.CalibrateModule,
@@ -421,7 +419,6 @@ CommandParams = Union[
     thermocycler.CloseLidParams,
     thermocycler.RunProfileParams,
     thermocycler.RunProfileStepParams,
-    absorbance_reader.AbsorbanceMeasureParams,
     calibration.CalibrateGripperParams,
     calibration.CalibratePipetteParams,
     calibration.CalibrateModuleParams,
@@ -485,7 +482,6 @@ CommandType = Union[
     thermocycler.OpenLidCommandType,
     thermocycler.CloseLidCommandType,
     thermocycler.RunProfileCommandType,
-    absorbance_reader.AbsorbanceMeasureCommandType,
     calibration.CalibrateGripperCommandType,
     calibration.CalibratePipetteCommandType,
     calibration.CalibrateModuleCommandType,
@@ -550,7 +546,6 @@ CommandCreate = Annotated[
         thermocycler.OpenLidCreate,
         thermocycler.CloseLidCreate,
         thermocycler.RunProfileCreate,
-        absorbance_reader.AbsorbanceMeasureCreate,
         calibration.CalibrateGripperCreate,
         calibration.CalibratePipetteCreate,
         calibration.CalibrateModuleCreate,
@@ -616,7 +611,6 @@ CommandResult = Union[
     thermocycler.OpenLidResult,
     thermocycler.CloseLidResult,
     thermocycler.RunProfileResult,
-    absorbance_reader.AbsorbanceMeasureResult,
     calibration.CalibrateGripperResult,
     calibration.CalibratePipetteResult,
     calibration.CalibrateModuleResult,
