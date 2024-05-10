@@ -159,7 +159,7 @@ export const MultiSelectToolbar = (props: Props): JSX.Element => {
   } = useConditionalConfirm(onDeleteClickAction, true)
 
   const selectProps: ClickableIconProps = {
-    iconName: isAllStepsSelected ? 'checkbox-marked' : 'minus-box',
+    iconName: isAllStepsSelected ? 'ot-checkbox' : 'minus-box',
     tooltipText: isAllStepsSelected ? 'Deselect All' : 'Select All',
     onClick: confirmSelect,
   }
