@@ -17,15 +17,11 @@ import {
 } from '@opentrons/components'
 import { SendButton } from '../../atoms/SendButton'
 import { preparedPromptAtom, chatDataAtom } from '../../resources/atoms'
-import { detectSimulate } from '../../resources/utils'
 
 import type { ChatData } from '../../resources/types'
 
 // ToDo (kk:05/02/2024) This url is temporary
 const CHAT_ENDPOINT = 'http://localhost:8000/streaming/ask'
-// ToDo (kk:05/10/2024) Add the endpoint when the be is ready
-// This will be after external beta. The main purpose will be the benchmarking.
-// const SIMULATOR_ENDPOINT = ''
 
 interface InputType {
   userPrompt: string
@@ -73,18 +69,12 @@ export function InputPrompt(): JSX.Element {
   }
 
   const handleClick = (): void => {
-    // Note (kk:05/07/2024) if user prompt is to simulate a protocol
-    // call fetchSimulateResult
-    if (detectSimulate(userPrompt)) {
-      console.log('call simulator api')
-    } else {
-      const userInput: ChatData = {
-        role: 'user',
-        content: userPrompt,
-      }
-      setChatData(chatData => [...chatData, userInput])
-      void fetchChatData(userPrompt)
+    const userInput: ChatData = {
+      role: 'user',
+      content: userPrompt,
     }
+    setChatData(chatData => [...chatData, userInput])
+    void fetchChatData(userPrompt)
 
     setSubmitted(true)
     reset()
