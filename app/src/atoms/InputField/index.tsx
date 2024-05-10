@@ -159,7 +159,9 @@ export const InputField = React.forwardRef<HTMLInputElement, InputFieldProps>(
 
       @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
         height: ${size === 'small' ? '4.25rem' : '5rem'};
-        font-size: ${TYPOGRAPHY.fontSize28};
+        font-size: ${size === 'small'
+          ? TYPOGRAPHY.fontSize28
+          : TYPOGRAPHY.fontSize38};
         padding: ${SPACING.spacing16} ${SPACING.spacing24};
         border: 2px ${BORDERS.styleSolid}
           ${hasError ? COLORS.red50 : COLORS.grey50};
