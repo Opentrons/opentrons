@@ -37,7 +37,18 @@ def a_slot(
         if not content.is_a_staging_area()
     ]
 
-    if thermocycler_on_deck and col == "1" and (row == "a" or row == "b"):
+    # If the deck is configured a with a thermocycler, we must ensure that no other fixture
+    # occupies slot a1 or b1.
+    # This is for 2 reasons:
+    # 1) The way Deck Configuration works under the hood, is that the thermocycler fixture spans the 2 slots.
+    # 2) When go to generate a protocol, we don't want to have to be doing a ton of checks to make sure that
+    #   the thermocycler exists, and that there is no other fixture in the same slot. The logic is simpler just to filter
+    #   out loading a thermocycler twice.
+
+    in_one_of_the_slots_the_thermocycler_occupies: bool = col == "1" and (
+        row == "a" or row == "b"
+    )
+    if thermocycler_on_deck and in_one_of_the_slots_the_thermocycler_occupies:
         return draw(
             st.builds(
                 Slot,
@@ -161,6 +172,8 @@ def a_deck_by_columns(
     col_3_contents: typing.List[PSC] = PSC.all(),
 ) -> DeckConfiguration:
     """Generate a deck by columns."""
+    # Let the thermocycler existence be another generated value if
+    # not specified.
     if thermocycler_on_deck is None:
         thermocycler_on_deck = draw(st.booleans())
 
