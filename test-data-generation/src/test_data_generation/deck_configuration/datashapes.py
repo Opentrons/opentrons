@@ -111,14 +111,14 @@ class Slot:
         return f"{(self.row + self.col).center(self.contents.longest_string())}{self.contents}"
 
     @property
-    def __label(self) -> SlotName:
+    def label(self) -> SlotName:
         """Return the slot label."""
         return typing.cast(SlotName, f"{self.row}{self.col}")
 
     @property
     def slot_label_string(self) -> str:
         """Return the slot label."""
-        return f"{self.__label.center(self.contents.longest_string())}"
+        return f"{self.label.center(self.contents.longest_string())}"
 
     @property
     def contents_string(self) -> str:
