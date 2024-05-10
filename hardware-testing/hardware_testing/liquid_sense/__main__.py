@@ -94,8 +94,9 @@ class RunArgs:
     start_height_offset: float
     aspirate: bool
     dial_indicator: Optional[mitutoyo_digimatic_indicator.Mitutoyo_Digimatic_Indicator]
-    plunger_speed: bool
+    plunger_speed: float
     trials_before_jog: int
+    multi_passes: int
 
     @classmethod
     def _get_protocol_context(cls, args: argparse.Namespace) -> ProtocolContext:
@@ -236,6 +237,7 @@ class RunArgs:
             dial_indicator=dial,
             plunger_speed=args.plunger_speed,
             trials_before_jog=args.trials_before_jog,
+            multi_passes=args.multi_passes,
         )
 
 
@@ -266,6 +268,7 @@ if __name__ == "__main__":
     parser.add_argument("--ignore-env", action="store_true")
     parser.add_argument("--ignore-dial", action="store_true")
     parser.add_argument("--trials-before-jog", type=int, default=10)
+    parser.add_argument("--multi-passes", type=int, default=1)
 
     args = parser.parse_args()
     run_args = RunArgs.build_run_args(args)
