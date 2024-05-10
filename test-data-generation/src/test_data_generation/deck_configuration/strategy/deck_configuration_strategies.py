@@ -50,6 +50,33 @@ def a_deck_configuration_with_invalid_fixture_in_col_2(
     return deck
 
 
+@st.composite
+def a_deck_configuration_with_staging_areas(draw: st.DrawFn) -> DeckConfiguration:
+    """Generate a deck with staging areas."""
+    deck = draw(a_deck_by_columns())
+    assume(deck.number_of(DCF.STAGING_AREA) > 0)
+    return deck
+
+
+@st.composite
+def a_deck_with_a_thermocycler(draw: st.DrawFn) -> DeckConfiguration:
+    """Generate a deck with a thermocycler."""
+    deck = draw(a_deck_by_columns(thermocycler_on_deck=True))
+
+    # Thermoycler spans a1 and b1 so 2 slots
+    assume(deck.number_of(DCF.THERMOCYCLER_MODULE) == 2)
+    return deck
+
+
+@st.composite
+def a_deck_with_a_waste_chute(draw: st.DrawFn) -> DeckConfiguration:
+    """Generate a deck with a waste chute."""
+    deck = draw(a_deck_by_columns())
+    num_waste_chutes = sum([deck.number_of(content) for content in DCF.waste_chutes()])
+    assume(num_waste_chutes == 1)
+    return deck
+
+
 DECK_CONFIGURATION_STRATEGIES: typing.Dict[str, DeckConfigurationStrategy] = {
     f.__name__: f
     for f in [
