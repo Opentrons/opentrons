@@ -73,7 +73,7 @@ export interface InputFieldProps {
     | typeof TYPOGRAPHY.textAlignCenter
   /** small or medium input field height, relevant only */
   size?: 'medium' | 'small'
-  /** react useRef for controlling focus on ODD */
+  /** react useRef to control input field instead of react event */
   ref?: React.MutableRefObject<HTMLInputElement | null>
 }
 
@@ -175,8 +175,17 @@ export const InputField = React.forwardRef<HTMLInputElement, InputFieldProps>(
           flex: 1 1 auto;
           width: 100%;
           height: 100%;
-          font-size: ${TYPOGRAPHY.fontSize28};
-          line-height: ${TYPOGRAPHY.lineHeight36};
+          font-size: ${size === 'small'
+            ? TYPOGRAPHY.fontSize28
+            : TYPOGRAPHY.fontSize38};
+          line-height: ${size === 'small'
+            ? TYPOGRAPHY.lineHeight36
+            : TYPOGRAPHY.lineHeight48};
+        }
+
+        /* the size of dot for password is handled by font-size */
+        input[type='password'] {
+          font-size: ${size === 'small' ? '71px' : '77px'};
         }
       }
     `
