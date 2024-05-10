@@ -106,7 +106,7 @@ export function HistoricalProtocolRunOffsetDrawer(
         <StyledText
           paddingLeft={SPACING.spacing4}
           paddingRight={SPACING.spacing8}
-          width="22%"
+          width="23%"
           as="label"
           fontWeight={TYPOGRAPHY.fontWeightSemiBold}
           textTransform={TYPOGRAPHY.textTransformCapitalize}
@@ -117,7 +117,7 @@ export function HistoricalProtocolRunOffsetDrawer(
         <StyledText
           paddingX={SPACING.spacing8}
           as="label"
-          width="41.5%"
+          width="42.5%"
           fontWeight={TYPOGRAPHY.fontWeightSemiBold}
           textTransform={TYPOGRAPHY.textTransformCapitalize}
           datatest-id="RecentProtocolRun_OffsetDrawer_labwareTitle"
@@ -174,7 +174,7 @@ export function HistoricalProtocolRunOffsetDrawer(
             </StyledText>
             <OffsetVector
               {...offset.vector}
-              width="27%"
+              width="17%"
               fontSize={TYPOGRAPHY.fontSizeLabel}
               as="label"
             />
