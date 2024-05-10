@@ -166,7 +166,7 @@ export function EquipmentOption(props: EquipmentOptionProps): JSX.Element {
           {...tempTargetProps}
           data-testid="EquipmentOption_upArrow"
           onClick={
-            numMultiples === 7
+            isDisabled || numMultiples === 7
               ? undefined
               : () => {
                   multiples.setValue(numMultiples + 1)
@@ -179,7 +179,7 @@ export function EquipmentOption(props: EquipmentOptionProps): JSX.Element {
         <Flex
           data-testid="EquipmentOption_downArrow"
           onClick={
-            numMultiples === 0
+            isDisabled || numMultiples === 0
               ? undefined
               : () => {
                   multiples.setValue(numMultiples - 1)
