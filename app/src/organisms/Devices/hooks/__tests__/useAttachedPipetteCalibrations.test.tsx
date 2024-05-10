@@ -2,7 +2,7 @@ import * as React from 'react'
 import { when } from 'vitest-when'
 import { vi, it, expect, describe, beforeEach } from 'vitest'
 import { Provider } from 'react-redux'
-import { createStore, Store } from 'redux'
+import { createStore } from 'redux'
 import { renderHook } from '@testing-library/react'
 import { QueryClient, QueryClientProvider } from 'react-query'
 import {
@@ -21,6 +21,7 @@ import {
 } from '../../../../redux/calibration/tip-length/__fixtures__'
 
 import { useAttachedPipetteCalibrations } from '..'
+import type { Store } from 'redux'
 import type { State } from '../../../../redux/types'
 
 vi.mock('@opentrons/react-api-client')

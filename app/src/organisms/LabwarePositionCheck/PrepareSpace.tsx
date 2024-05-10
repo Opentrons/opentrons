@@ -16,19 +16,14 @@ import {
   BaseDeck,
   ALIGN_FLEX_START,
 } from '@opentrons/components'
-import {
-  CompletedProtocolAnalysis,
-  LabwareDefinition2,
-  THERMOCYCLER_MODULE_TYPE,
-  getModuleType,
-  RobotType,
-} from '@opentrons/shared-data'
+import { THERMOCYCLER_MODULE_TYPE, getModuleType } from '@opentrons/shared-data'
 
 import { getIsOnDevice } from '../../redux/config'
 import { SmallButton } from '../../atoms/buttons'
 import { NeedHelpLink } from '../CalibrationPanels'
 import { useNotifyDeckConfigurationQuery } from '../../resources/deck_configuration'
 
+import type { CompletedProtocolAnalysis, LabwareDefinition2, RobotType } from '@opentrons/shared-data'
 import type { CheckLabwareStep } from './types'
 
 const LPC_HELP_LINK_URL =

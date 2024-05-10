@@ -4,10 +4,11 @@ import { remove } from 'fs-extra'
 import pump from 'pump'
 import _fetch from 'node-fetch'
 import FormData from 'form-data'
+import { Transform } from 'stream'
 
 import { HTTP_API_VERSION } from './constants'
 
-import type { Transform, Readable } from 'stream'
+import type { Readable } from 'stream'
 import type { Request, RequestInit, Response } from 'node-fetch'
 
 type RequestInput = Request | string

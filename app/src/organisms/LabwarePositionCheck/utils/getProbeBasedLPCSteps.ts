@@ -1,16 +1,12 @@
 import { isEqual } from 'lodash'
 import { SECTIONS } from '../constants'
-import {
-  CompletedProtocolAnalysis,
-  LoadedPipette,
-  getLabwareDefURI,
-  getPipetteNameSpecs,
-} from '@opentrons/shared-data'
+import { getLabwareDefURI, getPipetteNameSpecs } from '@opentrons/shared-data'
 import { getLabwareLocationCombos } from '../../ApplyHistoricOffsets/hooks/getLabwareLocationCombos'
+import { getLabwareDefinitionsFromCommands } from './labware'
 
+import type { CompletedProtocolAnalysis, LoadedPipette } from '@opentrons/shared-data'
 import type { LabwarePositionCheckStep, CheckPositionsStep } from '../types'
 import type { LabwareLocationCombo } from '../../ApplyHistoricOffsets/hooks/getLabwareLocationCombos'
-import { getLabwareDefinitionsFromCommands } from './labware'
 
 function getPrimaryPipetteId(pipettes: LoadedPipette[]): string {
   if (pipettes.length < 1) {

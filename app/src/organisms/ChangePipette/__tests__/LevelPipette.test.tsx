@@ -2,14 +2,14 @@ import * as React from 'react'
 import { vi, it, describe, expect, beforeEach } from 'vitest'
 import { fireEvent } from '@testing-library/react'
 
-import { LEFT, PipetteNameSpecs } from '@opentrons/shared-data'
-
+import { LEFT} from '@opentrons/shared-data'
 import {
   nestedTextMatcher,
   renderWithProviders,
 } from '../../../__testing-utils__'
 import { i18n } from '../../../i18n'
 import { LevelPipette } from '../LevelPipette'
+import type { PipetteNameSpecs } from '@opentrons/shared-data'
 
 const render = (props: React.ComponentProps<typeof LevelPipette>) => {
   return renderWithProviders(<LevelPipette {...props} />, {

@@ -6,17 +6,9 @@ import {
   StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
-import {
-  CompletedProtocolAnalysis,
-  CreateCommand,
-  getLabwareDisplayName,
-  getModuleType,
-  HEATERSHAKER_MODULE_TYPE,
-  MoveLabwareCreateCommand,
-  RobotType,
-} from '@opentrons/shared-data'
+
+import { getLabwareDisplayName, getModuleType, HEATERSHAKER_MODULE_TYPE } from '@opentrons/shared-data'
 import { UnorderedList } from '../../molecules/UnorderedList'
-import { useChainRunCommands } from '../../resources/runs'
 import {
   getLabwareDef,
   getLabwareDefinitionsFromCommands,
@@ -27,7 +19,14 @@ import { PrepareSpace } from './PrepareSpace'
 import { useSelector } from 'react-redux'
 import { getIsOnDevice } from '../../redux/config'
 
+import type {
+  CompletedProtocolAnalysis,
+  CreateCommand,
+  RobotType,
+  MoveLabwareCreateCommand,
+} from '@opentrons/shared-data'
 import type { VectorOffset } from '@opentrons/api-client'
+import type { useChainRunCommands } from '../../resources/runs'
 import type { ReturnTipStep } from './types'
 
 interface ReturnTipProps extends ReturnTipStep {

@@ -5,12 +5,7 @@ import { fireEvent, screen } from '@testing-library/react'
 import { describe, it, vi, beforeEach, afterEach, expect } from 'vitest'
 
 import { BaseDeck, EXTENDED_DECK_CONFIG_FIXTURE } from '@opentrons/components'
-import {
-  FLEX_ROBOT_TYPE,
-  getSimplestDeckConfigForProtocol,
-  deckExample as deckDefFixture,
-  fixtureTiprack300ul,
-} from '@opentrons/shared-data'
+import { FLEX_ROBOT_TYPE, deckExample as deckDefFixture, fixtureTiprack300ul } from '@opentrons/shared-data'
 
 import { renderWithProviders } from '../../../__testing-utils__'
 import { i18n } from '../../../i18n'
@@ -20,6 +15,7 @@ import { mockProtocolModuleInfo } from '../__fixtures__'
 import { LabwareMapViewModal } from '../LabwareMapViewModal'
 
 import type {
+  getSimplestDeckConfigForProtocol,
   CompletedProtocolAnalysis,
   DeckDefinition,
   LabwareDefinition2,

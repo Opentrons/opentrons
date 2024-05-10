@@ -1,23 +1,15 @@
 import { vi, it, expect, describe, beforeEach } from 'vitest'
 import { when } from 'vitest-when'
-import { UseQueryResult } from 'react-query'
 import { renderHook } from '@testing-library/react'
-
-import {
-  useProtocolAnalysisAsDocumentQuery,
-  useProtocolQuery,
-} from '@opentrons/react-api-client'
-
+import { OT2_ROBOT_TYPE } from '@opentrons/shared-data'
+import { useProtocolAnalysisAsDocumentQuery, useProtocolQuery } from '@opentrons/react-api-client'
 import { useProtocolDetailsForRun } from '..'
 import { useNotifyRunQuery } from '../../../../resources/runs'
-
 import { RUN_ID_2 } from '../../../RunTimeControl/__fixtures__'
 
 import type { Protocol, Run } from '@opentrons/api-client'
-import {
-  CompletedProtocolAnalysis,
-  OT2_ROBOT_TYPE,
-} from '@opentrons/shared-data'
+import type { UseQueryResult } from 'react-query'
+import type { CompletedProtocolAnalysis } from '@opentrons/shared-data'
 
 vi.mock('@opentrons/react-api-client')
 vi.mock('../../../../resources/runs')

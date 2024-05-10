@@ -3,11 +3,8 @@ import { useLogger } from '../../logger'
 import { LabwarePositionCheckComponent } from './LabwarePositionCheckComponent'
 import { FatalErrorModal } from './FatalErrorModal'
 
-import {
-  CompletedProtocolAnalysis,
-  FLEX_ROBOT_TYPE,
-  RobotType,
-} from '@opentrons/shared-data'
+import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
+import type { CompletedProtocolAnalysis, RobotType } from '@opentrons/shared-data'
 import type { LabwareOffset } from '@opentrons/api-client'
 
 interface LabwarePositionCheckModalProps {

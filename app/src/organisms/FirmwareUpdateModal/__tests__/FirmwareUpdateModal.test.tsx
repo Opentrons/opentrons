@@ -10,11 +10,7 @@ import {
 } from '@opentrons/react-api-client'
 import { i18n } from '../../../i18n'
 import { FirmwareUpdateModal } from '..'
-import {
-  BadPipette,
-  PipetteData,
-  SubsystemUpdateProgressData,
-} from '@opentrons/api-client'
+import type { BadPipette, PipetteData, SubsystemUpdateProgressData } from '@opentrons/api-client'
 
 vi.mock('@opentrons/react-api-client')
 

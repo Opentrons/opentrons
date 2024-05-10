@@ -5,13 +5,7 @@ import { useTranslation } from 'react-i18next'
 import NiceModal, { useModal } from '@ebay/nice-modal-react'
 
 import { useConditionalConfirm, COLORS } from '@opentrons/components'
-import {
-  LEFT,
-  NINETY_SIX_CHANNEL,
-  RIGHT,
-  LoadedPipette,
-  CreateCommand,
-} from '@opentrons/shared-data'
+import { LEFT, NINETY_SIX_CHANNEL, RIGHT } from '@opentrons/shared-data'
 import {
   useHost,
   useDeleteMaintenanceRunMutation,
@@ -28,6 +22,7 @@ import { getTopPortalEl } from '../../App/portal'
 import { WizardHeader } from '../../molecules/WizardHeader'
 import { FirmwareUpdateModal } from '../FirmwareUpdateModal'
 import { getIsOnDevice } from '../../redux/config'
+import { SimpleWizardBody } from '../../molecules/SimpleWizardBody'
 import { useAttachedPipettesFromInstrumentsQuery } from '../Devices/hooks'
 import { usePipetteFlowWizardHeaderText } from './hooks'
 import { getPipetteWizardSteps } from './getPipetteWizardSteps'
@@ -44,10 +39,9 @@ import { Carriage } from './Carriage'
 import { MountingPlate } from './MountingPlate'
 import { UnskippableModal } from './UnskippableModal'
 
-import type { PipetteMount } from '@opentrons/shared-data'
+import type { LoadedPipette, CreateCommand, PipetteMount } from '@opentrons/shared-data'
 import type { CommandData, HostConfig } from '@opentrons/api-client'
 import type { PipetteWizardFlow, SelectablePipettes } from './types'
-import { SimpleWizardBody } from '../../molecules/SimpleWizardBody'
 
 const RUN_REFETCH_INTERVAL = 5000
 

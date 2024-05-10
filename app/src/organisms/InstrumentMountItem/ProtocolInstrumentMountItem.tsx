@@ -13,12 +13,7 @@ import {
   BORDERS,
   JUSTIFY_FLEX_START,
 } from '@opentrons/components'
-import {
-  NINETY_SIX_CHANNEL,
-  PipetteName,
-  SINGLE_MOUNT_PIPETTES,
-  LoadedPipette,
-} from '@opentrons/shared-data'
+import { NINETY_SIX_CHANNEL, SINGLE_MOUNT_PIPETTES } from '@opentrons/shared-data'
 
 import { SmallButton } from '../../atoms/buttons'
 import {
@@ -30,7 +25,7 @@ import { PipetteWizardFlows } from '../PipetteWizardFlows'
 import { GripperWizardFlows } from '../GripperWizardFlows'
 
 import type { InstrumentData } from '@opentrons/api-client'
-import type { GripperModel } from '@opentrons/shared-data'
+import type { GripperModel, PipetteName, LoadedPipette } from '@opentrons/shared-data'
 import type { Mount } from '../../redux/pipettes/types'
 
 export const MountItem = styled.div<{ isReady: boolean }>`

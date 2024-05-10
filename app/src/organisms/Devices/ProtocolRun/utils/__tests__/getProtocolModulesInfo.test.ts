@@ -1,14 +1,7 @@
 import { describe, it, expect } from 'vitest'
-import {
-  transfer_settings,
-  multiple_temp_modules,
-  ot2DeckDefV5,
-  getModuleDef2,
-  ProtocolAnalysisOutput,
-  LoadedLabware,
-  LoadedModule,
-} from '@opentrons/shared-data'
+import { transfer_settings, multiple_temp_modules, ot2DeckDefV5, getModuleDef2 } from '@opentrons/shared-data'
 import { getProtocolModulesInfo } from '../getProtocolModulesInfo'
+import type { ProtocolAnalysisOutput, LoadedLabware, LoadedModule } from '@opentrons/shared-data'
 
 const protocolWithMagTempTC = ({
   ...transfer_settings,
