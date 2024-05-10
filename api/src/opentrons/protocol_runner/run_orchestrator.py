@@ -25,12 +25,14 @@ class RunOrchestrator:
 
     def __init__(
         self,
+        run_id: Optional[str],
         protocol_engine: ProtocolEngine,
         hardware_api: HardwareControlAPI,
         fixit_runner: protocol_runner.AnyRunner,
         setup_runner: protocol_runner.AnyRunner,
         json_or_python_protocol_runner: Optional[protocol_runner.AnyRunner] = None,
     ):
+        self.run_id: str
         self._protocol_engine = protocol_engine
         self._hardware_api = hardware_api
         self._json_or_python_runner = json_or_python_protocol_runner
@@ -40,6 +42,7 @@ class RunOrchestrator:
     @classmethod
     def build_orchestrator(
         cls,
+        run_id:Optional[str],
         protocol_engine: ProtocolEngine,
         hardware_api: HardwareControlAPI,
         protocol_config: Optional[
@@ -70,6 +73,7 @@ class RunOrchestrator:
                 drop_tips_after_run=drop_tips_after_run,
             )
         return cls(
+            run_id=run_id,
             json_or_python_protocol_runner=json_or_python_runner,
             setup_runner=setup_runner,
             fixit_runner=fixit_runner,
@@ -117,6 +121,6 @@ class RunOrchestrator:
     def get_protocol_runner(self) -> Optional[Union[protocol_runner.JsonRunner, protocol_runner.PythonAndLegacyRunner]]:
         return self._json_or_python_runner
 
-    def get_protocol_engine(self) -> Optional[Union[protocol_runner.JsonRunner, protocol_runner.PythonAndLegacyRunner]]:
+    def get_protocol_engine(self) -> ProtocolEngine:
         return self._protocol_engine
 

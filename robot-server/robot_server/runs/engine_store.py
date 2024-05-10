@@ -57,14 +57,6 @@ class NoRunnerEnginePairError(RuntimeError):
     """Raised if you try to get the current engine or runner while there is none."""
 
 
-# class RunnerEnginePair(NamedTuple):
-#     """A stored Runner/ProtocolEngine pair."""
-#
-#     run_id: str
-#     runner: AnyRunner
-#     engine: ProtocolEngine
-
-
 async def handle_estop_event(engine_store: "EngineStore", event: HardwareEvent) -> None:
     """Handle an E-stop event from the hardware API.
 
@@ -109,6 +101,8 @@ def _get_estop_listener(engine_store: "EngineStore") -> HardwareEventHandler:
 class EngineStore:
     """Factory and in-memory storage for ProtocolEngine."""
 
+    _run_orchestrator: Optional[RunOrchestrator] = None
+
     def __init__(
         self,
         hardware_api: HardwareControlAPI,
@@ -127,7 +121,6 @@ class EngineStore:
         self._robot_type = robot_type
         self._deck_type = deck_type
         # self._default_engine: Optional[ProtocolEngine] = None
-        self._run_orchestrator: Optional[RunOrchestrator] = None
         # self._runner_engine_pair: Optional[RunnerEnginePair] = None
         hardware_api.register_callback(_get_estop_listener(self))
 
@@ -139,7 +132,7 @@ class EngineStore:
         return self._run_orchestrator.get_protocol_engine()
 
     @property
-    def runner(self) -> AnyRunner:
+    def runner(self) -> Optional[AnyRunner]:
         """Get the "current" persisted ProtocolRunner."""
         if self._run_orchestrator is None:
             raise NoRunnerEnginePairError()
@@ -154,6 +147,7 @@ class EngineStore:
             else None
         )
 
+    # TODO(tz, probably dont need this once its all redirected via orchestrator
     # TODO(mc, 2022-03-21): this resource locking is insufficient;
     # come up with something more sophisticated without race condition holes.
     async def get_default_engine(self) -> ProtocolEngine:
@@ -162,16 +156,22 @@ class EngineStore:
         Raises:
             EngineConflictError: if a run-specific engine is active.
         """
-        if (
-            self._runner_engine_pair is not None
-            and self.engine.state_view.commands.has_been_played()
-            and not self.engine.state_view.commands.get_is_stopped()
-        ):
-            raise EngineConflictError("An engine for a run is currently active")
+        # simplify this via orchestrator
+        if self._run_orchestrator:
+            engine = self._run_orchestrator.get_protocol_engine()
+            if (
+                self._run_orchestrator is not None
+                and engine.state_view.commands.has_been_played()
+                and not engine.state_view.commands.get_is_stopped()
+            ):
+                raise EngineConflictError("An engine for a run is currently active")
 
-        engine = self._default_engine
+            engine = self._run_orchestrator.get_protocol_engine()
 
-        if engine is None:
+            return engine
+        else:
+            # TODO(tz, 2024-5-9): should we just return None? dosent this mean there is no active run?
+            # remove this after we redirect every thing through the orchestrator
             # TODO(mc, 2022-03-21): potential race condition
             engine = await create_protocol_engine(
                 hardware_api=self._hardware_api,
@@ -181,9 +181,11 @@ class EngineStore:
                     block_on_door_open=False,
                 ),
             )
-            self._default_engine = engine
-
-        return engine
+            # if we are doing this we probably need a lock on _run_orchestrator
+            self._run_orchestrator = RunOrchestrator.build_orchestrator(
+                protocol_engine=engine, hardware_api=self._hardware_api
+            )
+            return self._run_orchestrator.get_protocol_engine()
 
     async def create(
         self,
@@ -216,6 +218,7 @@ class EngineStore:
         else:
             load_fixed_trash = False
 
+        # move this to the orchestrator
         engine = await create_protocol_engine(
             hardware_api=self._hardware_api,
             config=ProtocolEngineConfig(
@@ -242,7 +245,7 @@ class EngineStore:
             drop_tips_after_run=drop_tips_after_run,
         )
 
-        if self._runner_engine_pair is not None:
+        if self._run_orchestrator is not None:
             raise EngineConflictError("Another run is currently active.")
 
         # FIXME(mm, 2022-12-21): These `await runner.load()`s introduce a
@@ -289,11 +292,9 @@ class EngineStore:
             EngineConflictError: The current runner/engine pair is not idle, so
             they cannot be cleared.
         """
-        engine = self.engine
-        state_view = engine.state_view
-        runner = self.runner
-
-        if state_view.commands.get_is_okay_to_clear():
+        engine = self._run_orchestrator.get_protocol_engine()
+        runner = self._run_orchestrator.get_protocol_runner()
+        if engine.state_view.commands.get_is_okay_to_clear():
             await engine.finish(
                 drop_tips_after_run=False,
                 set_run_status=False,
@@ -302,11 +303,11 @@ class EngineStore:
         else:
             raise EngineConflictError("Current run is not idle or stopped.")
 
-        run_data = state_view.get_summary()
-        commands = state_view.commands.get_all()
-        run_time_parameters = runner.run_time_parameters
+        run_data = engine.state_view.get_summary()
+        commands = engine.state_view.commands.get_all()
+        run_time_parameters = runner.run_time_parameters if runner else []
 
-        self._runner_engine_pair = None
+        self._run_orchestrator = None
 
         return RunResult(
             state_summary=run_data, commands=commands, parameters=run_time_parameters
