@@ -95,7 +95,7 @@ export function DropdownField(props: DropdownFieldProps): JSX.Element {
         </select>
 
         <div className={styles.dropdown_icon}>
-          <Icon name="menu-down" width="100%" />
+          <Icon name="menu-down-pd" width="100%" />
         </div>
       </div>
       <div className={styles.input_caption}>

@@ -8,6 +8,9 @@ import {
   SINGLE_CHANNEL_COMPATIBLE_LABWARE,
   EIGHT_CHANNEL_COMPATIBLE_LABWARE,
   NINETY_SIX_CHANNEL_COMPATIBLE_LABWARE,
+  CONSOLIDATE,
+  DISTRIBUTE,
+  TRANSFER,
 } from './constants'
 
 import type {
@@ -18,6 +21,7 @@ import type {
 import type {
   QuickTransferSetupState,
   QuickTransferWizardAction,
+  TransferType,
 } from './types'
 import type { LabwareFilter } from '../../pages/Labware/types'
 
@@ -67,6 +71,18 @@ export function quickTransferReducer(
       }
     }
     case 'SET_DEST_WELLS': {
+      let transferType: TransferType = TRANSFER
+      if (
+        state.sourceWells != null &&
+        state.sourceWells.length > action.wells.length
+      ) {
+        transferType = DISTRIBUTE
+      } else if (
+        state.sourceWells != null &&
+        state.sourceWells.length < action.wells.length
+      ) {
+        transferType = CONSOLIDATE
+      }
       return {
         pipette: state.pipette,
         mount: state.mount,
@@ -75,6 +91,7 @@ export function quickTransferReducer(
         sourceWells: state.sourceWells,
         destination: state.destination,
         destinationWells: action.wells,
+        transferType: transferType,
       }
     }
     case 'SET_VOLUME': {
@@ -86,6 +103,7 @@ export function quickTransferReducer(
         sourceWells: state.sourceWells,
         destination: state.destination,
         destinationWells: state.destinationWells,
+        transferType: state.transferType,
         volume: action.volume,
       }
     }

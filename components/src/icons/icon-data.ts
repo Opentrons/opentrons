@@ -80,7 +80,7 @@ export const ICON_DATA_BY_NAME = {
   'checkbox-blank-outline': {
     path:
       'M19 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2m0 2v14H5V5h14z',
-    viewBox: '0 0 24 24',
+    viewBox: '3 3 18 18',
   },
   'checkbox-marked': {
     path:
@@ -287,6 +287,11 @@ export const ICON_DATA_BY_NAME = {
     viewBox: '0 0 24 24',
   },
   'menu-down': {
+    path:
+      'M2.0672 4.46744C1.9125 4.28307 2.04206 4 2.28116 4L9.71887 4.00001C9.95795 4.00001 10.0875 4.28307 9.93281 4.46744L6.21412 8.89982C6.10205 9.03339 5.89826 9.0334 5.78619 8.89983L2.0672 4.46744Z',
+    viewBox: '0 0 12 12',
+  },
+  'menu-down-pd': {
     path: 'M7,10L12,15L17,10H7Z',
     viewBox: '0 0 24 24',
   },
@@ -357,7 +362,7 @@ export const ICON_DATA_BY_NAME = {
   'ot-checkbox': {
     path:
       'M 10.3839,4.5 5.5,9.38388 2.61612,6.5 3.5,5.61612 l 2,2 4,-4 z M 1.5,0 C 0.671573,0 0,0.671573 0,1.5 v 10 C 0,12.3284 0.671573,13 1.5,13 h 10 C 12.3284,13 13,12.3284 13,11.5 V 1.5 C 13,0.671573 12.3284,0 11.5,0 Z',
-    viewBox: '-1 -1 16 16',
+    viewBox: '0 0 13 13',
   },
   'ot-click-and-drag': {
     path:

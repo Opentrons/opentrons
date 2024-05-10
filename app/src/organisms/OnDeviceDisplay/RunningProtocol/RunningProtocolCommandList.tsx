@@ -23,6 +23,7 @@ import { RUN_STATUS_RUNNING, RUN_STATUS_IDLE } from '@opentrons/api-client'
 
 import { CommandText } from '../../CommandText'
 import { CommandIcon } from '../../RunPreview/CommandIcon'
+import { getCommandTextData } from '../../CommandText/utils/getCommandTextData'
 import { PlayPauseButton } from './PlayPauseButton'
 import { StopButton } from './StopButton'
 import { ANALYTICS_PROTOCOL_RUN_ACTION } from '../../../redux/analytics'
@@ -234,7 +235,7 @@ export function RunningProtocolCommandList({
                     <CommandIcon command={command} size="2rem" />
                     <CommandText
                       command={command}
-                      robotSideAnalysis={robotSideAnalysis}
+                      commandTextData={getCommandTextData(robotSideAnalysis)}
                       robotType={robotType}
                       css={COMMAND_ROW_STYLE}
                       isOnDevice={true}

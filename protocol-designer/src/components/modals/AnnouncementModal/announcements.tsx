@@ -9,7 +9,7 @@ import {
 } from '@opentrons/components'
 
 import magTempCombined from '../../../images/modules/magdeck_tempdeck_combined.png'
-import thermocycler from '../../../images/modules/thermocycler.jpg'
+import thermocycler from '../../../images/modules/thermocycler.png'
 import multiSelect from '../../../images/announcements/multi_select.gif'
 import batchEdit from '../../../images/announcements/batch_edit.gif'
 import heaterShaker from '../../../images/modules/heatershaker.png'

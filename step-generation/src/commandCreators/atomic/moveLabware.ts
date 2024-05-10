@@ -52,6 +52,20 @@ export const moveLabware: CommandCreator<MoveLabwareArgs> = (
     aE => aE.name === 'gripper'
   )
 
+  const newLocationSlot =
+    newLocation !== 'offDeck' && 'slotName' in newLocation
+      ? newLocation.slotName
+      : null
+
+  const multipleObjectsInSameSlotLabware =
+    Object.values(prevRobotState.labware).find(
+      labware => labware.slot === newLocationSlot
+    ) != null
+
+  const multipleObjectsInSameSlotModule = Object.values(
+    prevRobotState.modules
+  ).find(module => module.slot === newLocationSlot)
+
   if (!labware || !prevRobotState.labware[labware]) {
     errors.push(
       errorCreators.labwareDoesNotExist({
@@ -61,6 +75,11 @@ export const moveLabware: CommandCreator<MoveLabwareArgs> = (
     )
   } else if (prevRobotState.labware[labware].slot === 'offDeck' && useGripper) {
     errors.push(errorCreators.labwareOffDeck())
+  } else if (
+    multipleObjectsInSameSlotLabware ||
+    multipleObjectsInSameSlotModule
+  ) {
+    errors.push(errorCreators.multipleEntitiesOnSameSlotName())
   }
 
   const isAluminumBlock =
@@ -82,6 +101,10 @@ export const moveLabware: CommandCreator<MoveLabwareArgs> = (
   }
 
   const initialLabwareSlot = prevRobotState.labware[labware]?.slot
+
+  if (hasWasteChute && initialLabwareSlot === 'gripperWasteChute') {
+    errors.push(errorCreators.labwareDiscarded())
+  }
   const initialAdapterSlot = prevRobotState.labware[initialLabwareSlot]?.slot
   const initialSlot =
     initialAdapterSlot != null ? initialAdapterSlot : initialLabwareSlot

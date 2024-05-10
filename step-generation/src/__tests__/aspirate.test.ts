@@ -3,6 +3,7 @@ import { beforeEach, describe, vi, it, expect, afterEach } from 'vitest'
 import { expectTimelineError } from '../__utils__/testMatchers'
 import { aspirate } from '../commandCreators/atomic/aspirate'
 import {
+  OT2_ROBOT_TYPE,
   getLabwareDefURI,
   getPipetteSpecsV2,
   fixtureTiprack10ul as tip10,
@@ -480,11 +481,12 @@ describe('aspirate', () => {
       type: 'HEATER_SHAKER_EAST_WEST_LATCH_OPEN',
     })
   })
-  it('should return an error when aspirating north/south/east/west of a heater shaker while it is shaking', () => {
+  it('should return an error when aspirating north/south/east/west of a heater shaker while it is shaking for ot-2', () => {
     when(pipetteAdjacentHeaterShakerWhileShaking)
       .calledWith(
         robotStateWithTip.modules,
-        robotStateWithTip.labware[SOURCE_LABWARE].slot
+        robotStateWithTip.labware[SOURCE_LABWARE].slot,
+        OT2_ROBOT_TYPE
       )
       .thenReturn(true)
 
