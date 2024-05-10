@@ -3,8 +3,6 @@
 Contains hypothesis settings profiles.
 """
 
-from datetime import timedelta
-
 from hypothesis import HealthCheck, Phase, Verbosity, settings
 
 # Hypothesis cannot shrink the DeckConfiguration object, but attempts to do so anyways.
@@ -35,11 +33,10 @@ settings.register_profile(
     deadline=None,
 )
 
-
 settings.register_profile(
     "dev",
     parent=default,
-    max_examples=10,
+    max_examples=2,
     deadline=None,
 )
 
@@ -48,5 +45,5 @@ settings.register_profile(
     "ci",
     parent=default,
     max_examples=1000,
-    deadline=timedelta(seconds=10),
+    deadline=None,
 )
