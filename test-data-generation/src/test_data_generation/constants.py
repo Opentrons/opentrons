@@ -4,6 +4,8 @@ import enum
 import typing
 import dataclasses
 
+ECHO_ANALYSIS_RESULTS_ENV_VAR_NAME: typing.Final[str] = "ECHO_ANALYSIS_RESULTS"
+
 ColumnName = typing.Literal["1", "2", "3"]
 RowName = typing.Literal["a", "b", "c", "d"]
 DeckConfigurationSlotName = typing.Literal[
