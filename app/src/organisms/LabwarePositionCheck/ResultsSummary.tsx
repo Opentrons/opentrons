@@ -1,5 +1,5 @@
 import * as React from 'react'
-import styled from 'styled-components'
+import styled, { css } from 'styled-components'
 import { useSelector } from 'react-redux'
 import isEqual from 'lodash/isEqual'
 import { useTranslation } from 'react-i18next'
@@ -25,6 +25,7 @@ import {
   JUSTIFY_SPACE_BETWEEN,
   LocationIcon,
   MODULE_ICON_NAME_BY_TYPE,
+  OVERFLOW_AUTO,
   PrimaryButton,
   RESPONSIVENESS,
   SPACING,
@@ -155,7 +156,17 @@ export const ResultsSummary = (
       <Flex
         flexDirection={DIRECTION_COLUMN}
         maxHeight="20rem"
-        overflowY="scroll"
+        css={css`
+          overflow-y: ${OVERFLOW_AUTO};
+          &::-webkit-scrollbar {
+            width: 0.75rem;
+            background-color: transparent;
+          }
+          &::-webkit-scrollbar-thumb {
+            background: ${COLORS.grey50};
+            border-radius: 11px;
+          }
+        `}
       >
         <Header>{t('new_labware_offset_data')}</Header>
         {isLabwareOffsetCodeSnippetsOn ? (
