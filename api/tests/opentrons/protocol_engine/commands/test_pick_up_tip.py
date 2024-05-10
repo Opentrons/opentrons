@@ -9,6 +9,7 @@ from opentrons.protocol_engine.types import TipGeometry
 from opentrons.protocol_engine.state import StateView
 from opentrons.protocol_engine.execution import MovementHandler, TipHandler
 
+from opentrons.protocol_engine.commands.command import SuccessData
 from opentrons.protocol_engine.commands.pick_up_tip import (
     PickUpTipParams,
     PickUpTipResult,
@@ -77,9 +78,12 @@ async def test_pick_up_tip_implementation(
         )
     )
 
-    assert result == PickUpTipResult(
-        tipLength=42,
-        tipVolume=300,
-        tipDiameter=5,
-        position=DeckPoint(x=111, y=222, z=333),
+    assert result == SuccessData(
+        public=PickUpTipResult(
+            tipLength=42,
+            tipVolume=300,
+            tipDiameter=5,
+            position=DeckPoint(x=111, y=222, z=333),
+        ),
+        private=None,
     )
