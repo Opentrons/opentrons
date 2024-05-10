@@ -7,7 +7,7 @@ from dataclasses import asdict
 from opentrons.drivers.types import AbsorbanceReaderLidStatus
 from opentrons.drivers.rpi_drivers.types import USBPort
 from opentrons.drivers.absorbance_reader.abstract import AbstractAbsorbanceReaderDriver
-from .hid_protocol import HidInterface
+from .async_byonoy import AsyncByonoy
 
 
 class AbsorbanceReaderDriver(AbstractAbsorbanceReaderDriver):
@@ -15,16 +15,15 @@ class AbsorbanceReaderDriver(AbstractAbsorbanceReaderDriver):
     async def create(
         cls,
         port: str,
-        usb_port: USBPort,
         loop: Optional[asyncio.AbstractEventLoop],
     ) -> AbsorbanceReaderDriver:
         """Create an absorbance reader driver."""
         from .async_byonoy import AsyncByonoy
 
-        connection = await AsyncByonoy.create(port=port, usb_port=usb_port, loop=loop)
+        connection = await AsyncByonoy.create(port=port, loop=loop)
         return cls(connection=connection)
 
-    def __init__(self, connection: HidInterface) -> None:
+    def __init__(self, connection: AsyncByonoy) -> None:
         self._connection = connection
 
     async def get_device_info(self) -> Dict[str, str]:
@@ -53,7 +52,7 @@ class AbsorbanceReaderDriver(AbstractAbsorbanceReaderDriver):
     async def get_single_measurement(self, wavelength: int) -> List[float]:
         return await self._connection.get_single_measurement(wavelength)
 
-    async def set_sample_wavelength(self, wavelength: int) -> None:
+    async def initialize_measurement(self, wavelength: int) -> None:
         await self._connection.initialize(wavelength)
 
     async def get_status(self) -> None:

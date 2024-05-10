@@ -48,7 +48,7 @@ class SimulatingDriver(AbstractAbsorbanceReaderDriver):
         return [0.0]
 
     @ensure_yield
-    async def set_sample_wavelength(self, wavelength: int) -> None:
+    async def initialize_measurement(self, wavelength: int) -> None:
         pass
 
     @ensure_yield

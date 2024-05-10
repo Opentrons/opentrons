@@ -9,40 +9,28 @@ from functools import partial
 from typing import Optional, Union, List, Dict, Literal
 
 
-from .hid_protocol import HidInterface
+from .hid_protocol import AbsorbanceHidInterface as AbsProtocol
 from opentrons.drivers.types import (
     AbsorbanceReaderLidStatus,
     AbsorbanceReaderPlatePresence,
 )
 from opentrons.drivers.rpi_drivers.types import USBPort
 
-import pybyonoy_device_library as byonoy  # type: ignore[import-not-found]
-
-
-TimeoutProperties = Union[Literal["write_timeout"], Literal["timeout"]]
-
 
 SN_PARSER = re.compile(r'ATTRS{serial}=="(?P<serial>.+?)"')
 
 
-@dataclass
-class DeviceInfo:
-    """Dataclass for device information."""
-
-    serial_number: str
-    reference_number: str
-    version: str
-
-
-class AsyncByonoy(HidInterface):
+class AsyncByonoy:
     """Async wrapper around Byonoy Device Library."""
 
     @staticmethod
-    def get_byonoy_device_from_sn(sn: str) -> byonoy.ByonoyDevice:
-        found = byonoy.byonoy_available_devices()
-        for device in found:
+    def match_device_with_sn(
+        sn: str, devices: List[AbsProtocol.Device]
+    ) -> AbsProtocol.Device:
+        for device in devices:
             if device.sn == sn:
                 return device
+        raise RuntimeError(f"Unavailble module with serial number: {sn}")
 
     @staticmethod
     def serial_number_from_port(port: str) -> str:
@@ -64,12 +52,7 @@ class AsyncByonoy(HidInterface):
     async def create(
         cls,
         port: str,
-        usb_port: USBPort,
-        baud_rate: Optional[int] = None,
-        timeout: Optional[float] = None,
-        write_timeout: Optional[float] = None,
         loop: Optional[asyncio.AbstractEventLoop] = None,
-        reset_buffer_before_write: bool = False,
     ) -> AsyncByonoy:
         """
         Create an AsyncByonoy instance.
@@ -85,23 +68,30 @@ class AsyncByonoy(HidInterface):
         """
         loop = loop or asyncio.get_running_loop()
         executor = ThreadPoolExecutor(max_workers=1)
+
+        import pybyonoy_device_library as byonoy  # type: ignore[import-not-found]
+
+        interface: AbsProtocol = byonoy
+
         device_sn = cls.serial_number_from_port(port)
-        device = await loop.run_in_executor(
-            executor=executor, func=partial(cls.get_byonoy_device_from_sn, device_sn)
+        found: List[AbsProtocol.Device] = await loop.run_in_executor(
+            executor=executor, func=byonoy.byonoy_available_devices
         )
+        device = cls.match_device_with_sn(device_sn, found)
+
         return cls(
+            interface=interface,
             device=device,
             executor=executor,
             loop=loop,
-            reset_buffer_before_write=reset_buffer_before_write,
         )
 
     def __init__(
         self,
-        device: byonoy.ByonoyDevice,
+        interface: AbsProtocol,
+        device: AbsProtocol.Device,
         executor: ThreadPoolExecutor,
         loop: asyncio.AbstractEventLoop,
-        reset_buffer_before_write: bool,
     ) -> None:
         """
         Constructor
@@ -111,102 +101,95 @@ class AsyncByonoy(HidInterface):
             executor: a thread pool executor
             loop: event loop
         """
+        self._interface = interface
         self._device = device
-        self._device_handle: Optional[int] = None
         self._executor = executor
         self._loop = loop
-        self._reset_buffer_before_write = reset_buffer_before_write
-        self._measurement_conf = byonoy.ByonoyAbs96SingleMeasurementConfig()
         self._supported_wavelengths: Optional[list[int]] = None
+        self._device_handle: Optional[int] = None
+        self._current_config: Optional[AbsProtocol.MeasurementConfig] = None
 
     def _cleanup(self) -> None:
         self._device_handle = None
 
     def _open(self) -> None:
-        err, device_handle = byonoy.byonoy_open_device(self._device)
-        if err != byonoy.ByonoyErrorCode.BYONOY_ERROR_NO_ERROR:
+        err, device_handle = self._interface.byonoy_open_device(self._device)
+        if err.name != "BYONOY_ERROR_NO_ERROR":
             raise RuntimeError(f"Error opening device: {err}")
         self._device_handle = device_handle
 
     def _free(self) -> None:
         if self._device_handle:
-            byonoy.byonoy_free_device(self._device_handle)
+            self._interface.byonoy_free_device(self._device_handle)
             self._cleanup()
 
-    def verify_device_handle(self) -> None:
-        assert self._device_handle, RuntimeError("Device handle not set up.")
+    def verify_device_handle(self) -> int:
+        assert self._device_handle is not None, RuntimeError(
+            "Device handle not set up."
+        )
+        return self._device_handle
 
-    def _get_device_information(self) -> byonoy.ByonoyDeviceInfo:
-        self.verify_device_handle()
-        err, device_info = byonoy.byonoy_get_device_information(self._device_handle)
-        if err != byonoy.ByonoyErrorCode.BYONOY_ERROR_NO_ERROR:
+    def _get_device_information(self) -> AbsProtocol.DeviceInfo:
+        handle = self.verify_device_handle()
+        err, device_info = self._interface.byonoy_get_device_information(handle)
+        if err.name != "BYONOY_ERROR_NO_ERROR":
             raise RuntimeError(f"Error getting device information: {err}")
         return device_info
 
-    def _get_device_status(self) -> byonoy.ByonoyDeviceStatus:
-        self.verify_device_handle()
-        err, status = byonoy.byonoy_get_device_status(self._device_handle)
-        if err != byonoy.ByonoyErrorCode.BYONOY_ERROR_NO_ERROR:
+    def _get_device_status(self) -> AbsProtocol.DeviceState:
+        handle = self.verify_device_handle()
+        err, status = self._interface.byonoy_get_device_status(handle)
+        if err.name != "BYONOY_ERROR_NO_ERROR":
             raise RuntimeError(f"Error getting device status: {err}")
         return status
 
-    def _get_slot_status(self) -> byonoy.ByonoyDeviceSlotStatus:
-        self.verify_device_handle()
-        err, slot_status = byonoy.byonoy_get_device_slot_status(self._device_handle)
-        if err != byonoy.ByonoyErrorCode.BYONOY_ERROR_NO_ERROR:
+    def _get_slot_status(self) -> AbsProtocol.SlotState:
+        handle = self.verify_device_handle()
+        err, slot_status = self._interface.byonoy_get_device_slot_status(handle)
+        if err.name != "BYONOY_ERROR_NO_ERROR":
             raise RuntimeError(f"Error getting slot status: {err}")
         return slot_status
 
     def _get_lid_status(self) -> bool:
-        self.verify_device_handle()
+        handle = self.verify_device_handle()
         lid_on: bool
-        err, lid_on = byonoy.byonoy_get_device_parts_aligned(self._device_handle)
-        if err != byonoy.ByonoyErrorCode.BYONOY_ERROR_NO_ERROR:
+        err, lid_on = self._interface.byonoy_get_device_parts_aligned(handle)
+        if err.name != "BYONOY_ERROR_NO_ERROR":
             raise RuntimeError(f"Error getting slot status: {err}")
         return lid_on
 
     def _get_supported_wavelengths(self) -> List[int]:
-        self.verify_device_handle()
+        handle = self.verify_device_handle()
         wavelengths: List[int]
-        err, wavelengths = byonoy.byonoy_abs96_get_available_wavelengths(
-            self._device_handle
+        err, wavelengths = self._interface.byonoy_abs96_get_available_wavelengths(
+            handle
         )
-        if err != byonoy.ByonoyErrorCode.BYONOY_ERROR_NO_ERROR:
+        if err.name != "BYONOY_ERROR_NO_ERROR":
             raise RuntimeError(f"Error getting supported wavelengths: {err}")
         self._supported_wavelengths = wavelengths
         return wavelengths
 
-    def _initialize_measurement(
-        self, conf: byonoy.ByonoyAbs96SingleMeasurementConfig
-    ) -> None:
-        self.verify_device_handle()
-        err = byonoy.byonoy_abs96_initialize_single_measurement(
-            self._device_handle, conf
-        )
-        if err != byonoy.ByonoyErrorCode.BYONOY_ERROR_NO_ERROR:
+    def _initialize_measurement(self, conf: AbsProtocol.MeasurementConfig) -> None:
+        handle = self.verify_device_handle()
+        err = self._interface.byonoy_abs96_initialize_single_measurement(handle, conf)
+        if err.name != "BYONOY_ERROR_NO_ERROR":
             raise RuntimeError(f"Error initializing measurement: {err}")
+        self._current_config = conf
 
-    def _single_measurement(
-        self, conf: byonoy.ByonoyAbs96SingleMeasurementConfig
-    ) -> List[float]:
-        self.verify_device_handle()
+    def _single_measurement(self, conf: AbsProtocol.MeasurementConfig) -> List[float]:
+        handle = self.verify_device_handle()
         measurements: List[float]
-        err, measurements = byonoy.byonoy_abs96_single_measure(
-            self._device_handle, conf
-        )
-        if err != byonoy.ByonoyErrorCode.BYONOY_ERROR_NO_ERROR:
+        err, measurements = self._interface.byonoy_abs96_single_measure(handle, conf)
+        if err.name != "BYONOY_ERROR_NO_ERROR":
             raise RuntimeError(f"Error getting single measurement: {err}")
         return measurements
 
-    def _set_sample_wavelength(
-        self, wavelength: int
-    ) -> byonoy.ByonoyAbs96SingleMeasurementConfig:
-        self.verify_device_handle()
+    def _set_sample_wavelength(self, wavelength: int) -> AbsProtocol.MeasurementConfig:
         if not self._supported_wavelengths:
             self._get_supported_wavelengths()
         assert self._supported_wavelengths
         if wavelength in self._supported_wavelengths:
-            conf = byonoy.ByonoyAbs96SingleMeasurementConfig()
+            conf = self._interface.ByonoyAbs96SingleMeasurementConfig()
             conf.sample_wavelength = wavelength
             return conf
         else:
@@ -219,8 +202,9 @@ class AsyncByonoy(HidInterface):
         self._initialize_measurement(conf)
 
     def _get_single_measurement(self, wavelength: int) -> List[float]:
-        conf = self._set_sample_wavelength(wavelength)
-        return self._single_measurement(conf)
+        initialized = self._current_config
+        assert initialized and initialized.sample_wavelength == wavelength
+        return self._single_measurement(initialized)
 
     async def open(self) -> None:
         """
