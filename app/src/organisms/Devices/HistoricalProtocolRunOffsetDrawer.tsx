@@ -174,7 +174,7 @@ export function HistoricalProtocolRunOffsetDrawer(
             </StyledText>
             <OffsetVector
               {...offset.vector}
-              width="34%"
+              width="27%"
               fontSize={TYPOGRAPHY.fontSizeLabel}
               as="label"
             />
