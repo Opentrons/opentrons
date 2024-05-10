@@ -61,8 +61,8 @@ class PythonProtocolGenerator:
         )
         deck_slot_load_statements = load_phase.create_deck_slot_load_statements(
             self._protocol_configuration.deck_configuration.slots,
-            self._protocol_configuration.explicit_calls,
-            self._protocol_configuration.allow_overlapping_calls,
+            self._protocol_configuration.explicit_loads,
+            self._protocol_configuration.allow_overlapping_loads,
         )
         calls_to_loaded_entities = call_phase.create_calls_to_loaded_entities(
             pipette_load_statements + deck_slot_load_statements

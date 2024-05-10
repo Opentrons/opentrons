@@ -4,7 +4,7 @@ import typing
 from hypothesis import assume
 from hypothesis import strategies as st
 
-from test_data_generation.constants import Modules, RowName
+from test_data_generation.constants import Modules, RowName, AllSlotName
 from test_data_generation.datashapes import (
     DeckConfigurationFixtures as DCF,
 )
@@ -64,21 +64,22 @@ def a_protocol_that_loads_invalid_stuff_into_a_staging_area(
 
     assume(len(rows_to_load_on) > 0)
 
-    explicit_load_calls: typing.Dict[str, ast_h.AssignStatement] = {}
+    explicit_load_storage: ast_h.ExplicitLoadStorage = {}
 
     for row_name in rows_to_load_on:
-        slot = f"{row_name}{col_to_add_to}"
-        possible_calls = [
+        slot = typing.cast(AllSlotName, f"{row_name}{col_to_add_to}")
+        possible_loads = [
             ast_h.AssignStatement.load_module(
                 draw(st.sampled_from(modules_to_choose_from)), slot
             ),
             ast_h.AssignStatement.load_trash_bin(slot),
         ]
 
-        explicit_load_calls[slot] = draw(st.sampled_from(possible_calls))
+        explicit_load_storage[slot] = draw(st.sampled_from(possible_loads))
 
         if col_to_add_to == "3":
-            explicit_load_calls[f"{row_name}4"] = ast_h.AssignStatement.load_labware(
+            col_4_slot = typing.cast(AllSlotName, f"{row_name}4")
+            explicit_load_storage[col_4_slot] = ast_h.AssignStatement.load_labware(
                 var_name=f"well_plate_{row_name}4",
                 labware_name="nest_96_wellplate_100ul_pcr_full_skirt",
                 labware_location=f"{row_name.upper()}4",
@@ -87,7 +88,7 @@ def a_protocol_that_loads_invalid_stuff_into_a_staging_area(
     return ProtocolConfiguration(
         api_version="2.18",
         deck_configuration=deck_config,
-        explicit_calls=explicit_load_calls,
+        explicit_loads=explicit_load_storage,
     )
 
 
@@ -112,7 +113,7 @@ def a_protocol_that_tries_to_load_something_on_top_of_thermocycler(
     draw: st.DrawFn,
 ) -> ProtocolConfiguration:
     """Generate a protocol that tries to load something on top of a thermocycler."""
-    thermocycler_slot = draw(st.sampled_from(["a1", "b1"]))
+    thermocycler_slot: AllSlotName = draw(st.sampled_from(["a1", "b1"]))
 
     module_load = ast_h.AssignStatement.load_module(
         module_info=draw(st.sampled_from(Modules.modules())),
@@ -125,7 +126,7 @@ def a_protocol_that_tries_to_load_something_on_top_of_thermocycler(
     )
     trash_bin_load = ast_h.AssignStatement.load_trash_bin(thermocycler_slot)
 
-    explicit_load_calls = {
+    explicit_load_storage: ast_h.ExplicitLoadStorage = {
         thermocycler_slot: draw(
             st.sampled_from([module_load, trash_bin_load, labware_load])
         )
@@ -133,8 +134,8 @@ def a_protocol_that_tries_to_load_something_on_top_of_thermocycler(
     return ProtocolConfiguration(
         api_version="2.18",
         deck_configuration=draw(a_deck_with_a_thermocycler()),
-        explicit_calls=explicit_load_calls,
-        allow_overlapping_calls=True,
+        explicit_loads=explicit_load_storage,
+        allow_overlapping_loads=True,
     )
 
 
@@ -148,7 +149,7 @@ def a_protocol_that_tries_to_load_something_on_top_of_a_waste_chute(
         Modules.TEMPERATURE_MODULE,
         Modules.MAGNETIC_BLOCK_MODULE,
     ]
-    waste_chute_slot = "D3"
+    waste_chute_slot: AllSlotName = "d3"
     module_load = ast_h.AssignStatement.load_module(
         module_info=draw(st.sampled_from(MODULES_NOT_ALLOWED_ON_WASTE_CHUTE)),
         module_location=waste_chute_slot,
@@ -160,7 +161,7 @@ def a_protocol_that_tries_to_load_something_on_top_of_a_waste_chute(
     )
     trash_bin_load = ast_h.AssignStatement.load_trash_bin(waste_chute_slot)
 
-    explicit_load_calls = {
+    explicit_load_storage: ast_h.ExplicitLoadStorage = {
         waste_chute_slot: draw(
             st.sampled_from([module_load, trash_bin_load, labware_load])
         )
@@ -168,6 +169,6 @@ def a_protocol_that_tries_to_load_something_on_top_of_a_waste_chute(
     return ProtocolConfiguration(
         api_version="2.18",
         deck_configuration=draw(a_deck_with_a_waste_chute()),
-        explicit_calls=explicit_load_calls,
-        allow_overlapping_calls=True,
+        explicit_loads=explicit_load_storage,
+        allow_overlapping_loads=True,
     )

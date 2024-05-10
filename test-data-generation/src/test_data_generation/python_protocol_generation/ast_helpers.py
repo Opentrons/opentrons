@@ -11,7 +11,10 @@ from test_data_generation.constants import (
     PROTOCOL_CONTEXT_VAR_NAME,
     ModuleInfo,
     ProtocolContextMethod,
+    AllSlotName,
 )
+
+ExplicitLoadStorage = typing.Dict[AllSlotName, "AssignStatement"]
 
 
 class CanGenerateAST(typing.Protocol):

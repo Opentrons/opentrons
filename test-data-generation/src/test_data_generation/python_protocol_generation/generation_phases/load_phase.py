@@ -164,7 +164,7 @@ def create_deck_configuration_satisfying_load_statement(
 
 def determine_load_statements_for_slot(
     slot: Slot,
-    explicit_calls: typing.Dict[str, ast_h.AssignStatement],
+    explicit_calls: ast_h.ExplicitLoadStorage,
     allow_overlapping_calls: bool,
 ) -> typing.List[ast_h.AssignStatement]:
     """Evaluates an explicit call for a slot and returns the corresponding assign statement."""
@@ -194,13 +194,13 @@ def determine_load_statements_for_slot(
 
 def create_deck_slot_load_statements(
     slots: typing.List[Slot],
-    explicit_calls: typing.Dict[str, ast_h.AssignStatement],
+    explicit_calls: ast_h.ExplicitLoadStorage,
     allow_overlapping_calls: bool,
 ) -> typing.List[ast_h.AssignStatement]:
     """Iterates over a list of slots and creates the corresponding load statements."""
     entries: typing.List[ast_h.AssignStatement] = []
     for slot in slots:
-        # determine_load_statements_for_slot can remove 
+        # determine_load_statements_for_slot can remove
         # explicit calls from the explicit_calls dictionary
         entries.extend(
             determine_load_statements_for_slot(
