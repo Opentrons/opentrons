@@ -1,11 +1,15 @@
+import type { RunCommandSummary } from '@opentrons/api-client'
 import type { ERROR_KINDS, RECOVERY_MAP, INVALID } from './constants'
 import type { UseRouteUpdateActionsResult } from './utils'
+import type { UseRecoveryCommandsResult } from './useRecoveryCommands'
 
+export type FailedCommand = RunCommandSummary
 export type InvalidStep = typeof INVALID
 export type RecoveryRoute = typeof RECOVERY_MAP[keyof typeof RECOVERY_MAP]['ROUTE']
 export type RobotMovingRoute =
   | typeof RECOVERY_MAP['ROBOT_IN_MOTION']['ROUTE']
   | typeof RECOVERY_MAP['ROBOT_RESUMING']['ROUTE']
+  | typeof RECOVERY_MAP['ROBOT_RETRYING_COMMAND']['ROUTE']
 export type ErrorKind = keyof typeof ERROR_KINDS
 
 interface RecoveryMapDetails {
@@ -25,6 +29,7 @@ type RecoveryStep<
 
 type RobotInMotionStep = RecoveryStep<'ROBOT_IN_MOTION'>
 type RobotResumingStep = RecoveryStep<'ROBOT_RESUMING'>
+type RobotRetryingCommandStep = RecoveryStep<'ROBOT_RETRYING_COMMAND'>
 type BeforeBeginningStep = RecoveryStep<'BEFORE_BEGINNING'>
 type CancelRunStep = RecoveryStep<'CANCEL_RUN'>
 type DropTipStep = RecoveryStep<'DROP_TIP'>
@@ -36,6 +41,7 @@ type OptionSelectionStep = RecoveryStep<'OPTION_SELECTION'>
 export type RouteStep =
   | RobotInMotionStep
   | RobotResumingStep
+  | RobotRetryingCommandStep
   | BeforeBeginningStep
   | CancelRunStep
   | DropTipStep
@@ -50,9 +56,10 @@ export interface IRecoveryMap {
 }
 
 export interface RecoveryContentProps {
+  failedCommand: FailedCommand | null
   errorKind: ErrorKind
   isOnDevice: boolean
   recoveryMap: IRecoveryMap
   routeUpdateActions: UseRouteUpdateActionsResult
-  onComplete: () => void
+  recoveryCommands: UseRecoveryCommandsResult
 }

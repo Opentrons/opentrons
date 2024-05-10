@@ -1,114 +1,109 @@
 import * as React from 'react'
-import { vi, describe, it, beforeEach } from 'vitest'
-import { screen } from '@testing-library/react'
+import { vi, describe, expect, it, beforeEach } from 'vitest'
+import { screen, renderHook, act } from '@testing-library/react'
+
+import {
+  RUN_STATUS_AWAITING_RECOVERY,
+  RUN_STATUS_RUNNING,
+} from '@opentrons/api-client'
 
 import { renderWithProviders } from '../../../__testing-utils__'
 import { i18n } from '../../../i18n'
-import { ErrorRecoveryContent } from '..'
-import { ERROR_KINDS, RECOVERY_MAP } from '../constants'
-import { BeforeBeginning } from '../BeforeBeginning'
-import { SelectRecoveryOption, ResumeRun } from '../RecoveryOptions'
-import { RecoveryInProgress } from '../RecoveryInProgress'
+import { ErrorRecoveryFlows, useErrorRecoveryFlows } from '..'
+import { ErrorRecoveryWizard } from '../ErrorRecoveryWizard'
+import { useCurrentlyFailedRunCommand } from '../utils'
 
-import type { IRecoveryMap } from '../types'
+import type { RunStatus } from '@opentrons/api-client'
 
-vi.mock('../BeforeBeginning')
-vi.mock('../RecoveryOptions')
-vi.mock('../RecoveryInProgress')
+vi.mock('../ErrorRecoveryWizard')
+vi.mock('../utils')
 
-const render = (props: React.ComponentProps<typeof ErrorRecoveryContent>) => {
-  return renderWithProviders(<ErrorRecoveryContent {...props} />, {
+describe('useErrorRecovery', () => {
+  beforeEach(() => {
+    vi.mocked(useCurrentlyFailedRunCommand).mockReturnValue(
+      'mockCommand' as any
+    )
+  })
+
+  it('should have initial state of isEREnabled as false', () => {
+    const { result } = renderHook(() =>
+      useErrorRecoveryFlows('MOCK_ID', RUN_STATUS_RUNNING)
+    )
+
+    expect(result.current.isEREnabled).toBe(false)
+  })
+
+  it('should toggle the value of isEREnabled properly', () => {
+    const { result } = renderHook(() =>
+      useErrorRecoveryFlows('MOCK_ID', RUN_STATUS_AWAITING_RECOVERY)
+    )
+    act(() => {
+      result.current.toggleER()
+    })
+
+    expect(result.current.isEREnabled).toBe(true)
+
+    act(() => {
+      result.current.toggleER()
+    })
+
+    expect(result.current.isEREnabled).toBe(false)
+  })
+
+  it('should disable error recovery when runStatus is not "awaiting-recovery"', () => {
+    const { result, rerender } = renderHook(
+      (runStatus: RunStatus) => useErrorRecoveryFlows('MOCK_ID', runStatus),
+      {
+        initialProps: RUN_STATUS_AWAITING_RECOVERY,
+      }
+    )
+
+    act(() => {
+      result.current.toggleER()
+    })
+
+    // @ts-expect-error "running" is a valid status here
+    rerender(RUN_STATUS_RUNNING)
+
+    expect(result.current.isEREnabled).toBe(false)
+
+    act(() => {
+      result.current.toggleER()
+    })
+
+    rerender(RUN_STATUS_AWAITING_RECOVERY)
+
+    expect(result.current.isEREnabled).toBe(false)
+  })
+
+  it('should return the failed run command', () => {
+    const { result } = renderHook(() =>
+      useErrorRecoveryFlows('MOCK_ID', RUN_STATUS_RUNNING)
+    )
+
+    expect(result.current.failedCommand).toEqual('mockCommand')
+  })
+})
+
+const render = (props: React.ComponentProps<typeof ErrorRecoveryFlows>) => {
+  return renderWithProviders(<ErrorRecoveryFlows {...props} />, {
     i18nInstance: i18n,
   })[0]
 }
 
-describe('ErrorRecoveryContent', () => {
-  const {
-    OPTION_SELECTION,
-    BEFORE_BEGINNING,
-    RESUME,
-    ROBOT_RESUMING,
-    ROBOT_IN_MOTION,
-  } = RECOVERY_MAP
-
-  let props: React.ComponentProps<typeof ErrorRecoveryContent>
-  const mockRecoveryMap: IRecoveryMap = {
-    route: OPTION_SELECTION.ROUTE,
-    step: OPTION_SELECTION.STEPS.SELECT,
-  }
+describe('ErrorRecovery', () => {
+  let props: React.ComponentProps<typeof ErrorRecoveryFlows>
 
   beforeEach(() => {
     props = {
-      errorKind: ERROR_KINDS.GENERAL_ERROR,
-      routeUpdateActions: {} as any,
-      recoveryMap: mockRecoveryMap,
-      onComplete: vi.fn(),
-      isOnDevice: true,
+      failedCommand: {} as any,
+      runId: 'MOCK_RUN_ID',
     }
-
-    vi.mocked(SelectRecoveryOption).mockReturnValue(
-      <div>MOCK_SELECT_RECOVERY_OPTION</div>
-    )
-    vi.mocked(BeforeBeginning).mockReturnValue(<div>MOCK_BEFORE_BEGINNING</div>)
-    vi.mocked(ResumeRun).mockReturnValue(<div>MOCK_RESUME_RUN</div>)
-    vi.mocked(RecoveryInProgress).mockReturnValue(<div>MOCK_IN_PROGRESS</div>)
+    vi.mocked(ErrorRecoveryWizard).mockReturnValue(<div>MOCK WIZARD</div>)
   })
 
-  it(`returns SelectRecoveryOption when the route is ${OPTION_SELECTION.ROUTE}`, () => {
+  it(`renders the wizard`, () => {
     render(props)
-
-    screen.getByText('MOCK_SELECT_RECOVERY_OPTION')
-  })
-
-  it(`returns BeforeBeginning when the route is ${BEFORE_BEGINNING.ROUTE}`, () => {
-    props = {
-      ...props,
-      recoveryMap: {
-        ...props.recoveryMap,
-        route: BEFORE_BEGINNING.ROUTE,
-      },
-    }
-    render(props)
-
-    screen.getByText('MOCK_BEFORE_BEGINNING')
-  })
-
-  it(`returns ResumeRun when the route is ${RESUME.ROUTE}`, () => {
-    props = {
-      ...props,
-      recoveryMap: {
-        ...props.recoveryMap,
-        route: RESUME.ROUTE,
-      },
-    }
-    render(props)
-
-    screen.getByText('MOCK_RESUME_RUN')
-  })
-
-  it(`returns RecoveryInProgressModal when the route is ${ROBOT_IN_MOTION.ROUTE}`, () => {
-    props = {
-      ...props,
-      recoveryMap: {
-        ...props.recoveryMap,
-        route: ROBOT_IN_MOTION.ROUTE,
-      },
-    }
-    render(props)
-
-    screen.getByText('MOCK_IN_PROGRESS')
-  })
-
-  it(`returns RecoveryInProgressModal when the route is ${ROBOT_RESUMING.ROUTE}`, () => {
-    props = {
-      ...props,
-      recoveryMap: {
-        ...props.recoveryMap,
-        route: ROBOT_IN_MOTION.ROUTE,
-      },
-    }
-    render(props)
-
-    screen.getByText('MOCK_IN_PROGRESS')
+    screen.getByText('MOCK WIZARD')
   })
 })

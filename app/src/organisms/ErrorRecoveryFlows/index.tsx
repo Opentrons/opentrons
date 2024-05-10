@@ -1,109 +1,51 @@
 import * as React from 'react'
-import { createPortal } from 'react-dom'
-import { useSelector } from 'react-redux'
 
-import {
-  BORDERS,
-  COLORS,
-  DIRECTION_COLUMN,
-  Flex,
-  POSITION_ABSOLUTE,
-} from '@opentrons/components'
+import { RUN_STATUS_AWAITING_RECOVERY } from '@opentrons/api-client'
 
-import { getIsOnDevice } from '../../redux/config'
-import { getTopPortalEl } from '../../App/portal'
-import { BeforeBeginning } from './BeforeBeginning'
-import { SelectRecoveryOption, ResumeRun } from './RecoveryOptions'
-import { ErrorRecoveryHeader } from './ErrorRecoveryHeader'
-import { RecoveryInProgress } from './RecoveryInProgress'
-import { getErrorKind, useRouteUpdateActions } from './utils'
-import { RECOVERY_MAP } from './constants'
+import { ErrorRecoveryWizard } from './ErrorRecoveryWizard'
+import { useCurrentlyFailedRunCommand } from './utils'
 
-import type { IRecoveryMap, RecoveryContentProps } from './types'
+import type { RunStatus } from '@opentrons/api-client'
+import type { FailedCommand } from './types'
 
-interface ErrorRecoveryProps {
-  onComplete: () => void
-  errorType?: string
+interface UseErrorRecoveryResult {
+  isEREnabled: boolean
+  failedCommand: FailedCommand | null
+  toggleER: () => void
+}
+
+export function useErrorRecoveryFlows(
+  runId: string,
+  runStatus: RunStatus | null
+): UseErrorRecoveryResult {
+  const [isEREnabled, setIsEREnabled] = React.useState(false)
+  const failedCommand = useCurrentlyFailedRunCommand(runId, runStatus)
+
+  const toggleER = (): void => {
+    setIsEREnabled(!isEREnabled)
+  }
+
+  // Because multiple ER flows may occur per run, disable ER when the status is not "awaiting-recovery."
+  React.useEffect(() => {
+    if (isEREnabled && runStatus !== RUN_STATUS_AWAITING_RECOVERY) {
+      setIsEREnabled(false)
+    }
+  }, [isEREnabled, runStatus])
+
+  return {
+    isEREnabled,
+    failedCommand,
+    toggleER,
+  }
+}
+
+interface ErrorRecoveryFlowsProps {
+  runId: string
+  failedCommand: FailedCommand | null
 }
 export function ErrorRecoveryFlows({
-  onComplete,
-  errorType,
-}: ErrorRecoveryProps): JSX.Element {
-  /**
-   * Recovery Route: A logically-related collection of recovery steps or a single step if unrelated to any existing recovery route.
-   * Recovery Step: Analogous to a "step" in other wizard flows.
-   */
-  const [recoveryMap, setRecoveryMap] = React.useState<IRecoveryMap>({
-    route: RECOVERY_MAP.BEFORE_BEGINNING.ROUTE,
-    step: RECOVERY_MAP.BEFORE_BEGINNING.STEPS.RECOVERY_DESCRIPTION,
-  })
-
-  const errorKind = getErrorKind(errorType)
-  const isOnDevice = useSelector(getIsOnDevice)
-
-  const routeUpdateActions = useRouteUpdateActions({
-    recoveryMap,
-    setRecoveryMap,
-  })
-
-  return (
-    <ErrorRecoveryComponent
-      errorKind={errorKind}
-      onComplete={onComplete}
-      isOnDevice={isOnDevice}
-      recoveryMap={recoveryMap}
-      routeUpdateActions={routeUpdateActions}
-    />
-  )
-}
-
-function ErrorRecoveryComponent(props: RecoveryContentProps): JSX.Element {
-  return createPortal(
-    <Flex
-      flexDirection={DIRECTION_COLUMN}
-      width="992px"
-      height="568px"
-      left="14.5px"
-      top="16px"
-      borderRadius={BORDERS.borderRadius12}
-      position={POSITION_ABSOLUTE}
-      backgroundColor={COLORS.white}
-    >
-      <ErrorRecoveryHeader errorKind={props.errorKind} />
-      <ErrorRecoveryContent {...props} />
-    </Flex>,
-    getTopPortalEl()
-  )
-}
-
-export function ErrorRecoveryContent(props: RecoveryContentProps): JSX.Element {
-  const buildBeforeBeginning = (): JSX.Element => {
-    return <BeforeBeginning {...props} />
-  }
-
-  const buildSelectRecoveryOption = (): JSX.Element => {
-    return <SelectRecoveryOption {...props} />
-  }
-
-  const buildRecoveryInProgress = (): JSX.Element => {
-    return <RecoveryInProgress {...props} />
-  }
-
-  const buildResumeRun = (): JSX.Element => {
-    return <ResumeRun {...props} />
-  }
-
-  switch (props.recoveryMap.route) {
-    case RECOVERY_MAP.BEFORE_BEGINNING.ROUTE:
-      return buildBeforeBeginning()
-    case RECOVERY_MAP.OPTION_SELECTION.ROUTE:
-      return buildSelectRecoveryOption()
-    case RECOVERY_MAP.RESUME.ROUTE:
-      return buildResumeRun()
-    case RECOVERY_MAP.ROBOT_IN_MOTION.ROUTE:
-    case RECOVERY_MAP.ROBOT_RESUMING.ROUTE:
-      return buildRecoveryInProgress()
-    default:
-      return buildSelectRecoveryOption()
-  }
+  runId,
+  failedCommand,
+}: ErrorRecoveryFlowsProps): JSX.Element | null {
+  return <ErrorRecoveryWizard runId={runId} failedCommand={failedCommand} />
 }
