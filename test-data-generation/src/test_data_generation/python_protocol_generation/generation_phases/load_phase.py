@@ -162,20 +162,54 @@ def create_deck_configuration_satisfying_load_statement(
             raise (ValueError(f"Unknown slot contents: {slot.contents}"))
 
 
+def determine_load_statements_for_slot(
+    slot: Slot,
+    explicit_calls: typing.Dict[str, ast_h.AssignStatement],
+    allow_overlapping_calls: bool,
+) -> typing.List[ast_h.AssignStatement]:
+    """Evaluates an explicit call for a slot and returns the corresponding assign statement."""
+    load_statements = create_deck_configuration_satisfying_load_statement(slot)
+    what_to_load: typing.List[ast_h.AssignStatement] = []
+
+    # If we do allow overlapping calls, we want to generate load statements
+    # that satisfy the deck configuration.
+    # We also want these to be called first.
+    # This way we can make protocols invalid with passed later explicit calls.
+    if allow_overlapping_calls:
+        if load_statements is not None:
+            what_to_load = load_statements
+        if slot.label in explicit_calls:
+            what_to_load.append(explicit_calls.pop(slot.label))
+        return what_to_load
+    else:
+        # If we don't allow overlapping calls, we want to always load only the explicit call
+        # This is so we can override the implicit Deck Configuration load statements.
+        # We want to do this when we want to override the default load functionality.
+        if slot.label in explicit_calls:
+            return [explicit_calls.pop(slot.label)]
+
+        # But if we don't have an explicit call, we want to load the default deck configuration
+        return load_statements
+
+
 def create_deck_slot_load_statements(
     slots: typing.List[Slot],
+    explicit_calls: typing.Dict[str, ast_h.AssignStatement],
+    allow_overlapping_calls: bool,
 ) -> typing.List[ast_h.AssignStatement]:
     """Iterates over a list of slots and creates the corresponding load statements."""
     entries: typing.List[ast_h.AssignStatement] = []
     for slot in slots:
-        if slot.contents == PSC.THERMOCYCLER_MODULE and slot.label == "b1":
-            continue
+        # determine_load_statements_for_slot can remove 
+        # explicit calls from the explicit_calls dictionary
+        entries.extend(
+            determine_load_statements_for_slot(
+                slot, explicit_calls, allow_overlapping_calls
+            )
+        )
 
-        load_statement = create_deck_slot_load_statement(slot)
-        if isinstance(load_statement, typing.List):
-            entries.extend(load_statement)
-        else:
-            entries.append(load_statement)
+    # If we have any explicit calls left, we want to add them to the entries
+    entries.extend(explicit_calls.values())
     return entries
 
 
@@ -188,10 +222,8 @@ def create_pipette_load_statements(
         entries.append(
             ast_h.AssignStatement(
                 var_name="left_pipette",
-                value=ast_h.CallFunction(
-                    call_on=PROTOCOL_CONTEXT_VAR_NAME,
-                    what_to_call=ProtocolContextMethods.LOAD_INSTRUMENT,
-                    args=[pipette_config.left.value, "left"],
+                value=ast_h.CallFunction.load_instrument(
+                    pipette_config.left.value, "left"
                 ),
             )
         )
@@ -199,10 +231,8 @@ def create_pipette_load_statements(
         entries.append(
             ast_h.AssignStatement(
                 var_name="right_pipette",
-                value=ast_h.CallFunction(
-                    call_on=PROTOCOL_CONTEXT_VAR_NAME,
-                    what_to_call=ProtocolContextMethods.LOAD_INSTRUMENT,
-                    args=[pipette_config.right.value, "right"],
+                value=ast_h.CallFunction.load_instrument(
+                    pipette_config.right.value, "right"
                 ),
             )
         )
