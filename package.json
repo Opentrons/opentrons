@@ -10,6 +10,7 @@
       "discovery-client",
       "labware-designer",
       "labware-library",
+      "opentrons-ai-client",
       "protocol-designer",
       "shared-data",
       "step-generation",

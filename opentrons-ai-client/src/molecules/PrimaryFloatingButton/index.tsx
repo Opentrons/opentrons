@@ -14,9 +14,9 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 
-import type { IconName } from '@opentrons/components/src/icons'
+import type { IconName, StyleProps } from '@opentrons/components'
 
-interface PrimaryFloatingButtonProps {
+interface PrimaryFloatingButtonProps extends StyleProps {
   buttonText: string
   iconName: IconName
   disabled?: boolean
@@ -26,9 +26,10 @@ export function PrimaryFloatingButton({
   buttonText,
   iconName,
   disabled = false,
+  ...buttonProps
 }: PrimaryFloatingButtonProps): JSX.Element {
   return (
-    <Btn css={PRIMARY_FLOATING_STYLE} disabled={disabled}>
+    <Btn css={PRIMARY_FLOATING_STYLE} disabled={disabled} {...buttonProps}>
       <Icon
         size="0.75rem"
         name={iconName}
