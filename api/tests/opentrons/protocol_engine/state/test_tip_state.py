@@ -1135,3 +1135,122 @@ def test_next_tip_automatic_tip_tracking_with_partial_configurations(
     _assert_and_pickup("H1", map)
     map = _reconfigure_nozzle_layout("A1", "A1", "A1")
     _assert_and_pickup("B9", map)
+
+
+def test_next_tip_automatic_tip_tracking_tiprack_limits(
+    subject: TipStore,
+    supported_tip_fixture: pipette_definition.SupportedTipsDefinition,
+    load_labware_command: commands.LoadLabware,
+    pick_up_tip_command: commands.PickUpTip,
+) -> None:
+    """Test tip tracking logic to ensure once a tiprack is consumed it returns None when consuming tips using multiple pipette configurations."""
+    # Load labware
+    subject.handle_action(
+        actions.SucceedCommandAction(private_result=None, command=load_labware_command)
+    )
+
+    # Load pipette
+    load_pipette_command = commands.LoadPipette.construct(  # type: ignore[call-arg]
+        result=commands.LoadPipetteResult(pipetteId="pipette-id")
+    )
+    load_pipette_private_result = commands.LoadPipettePrivateResult(
+        pipette_id="pipette-id",
+        serial_number="pipette-serial",
+        config=LoadedStaticPipetteData(
+            channels=96,
+            max_volume=15,
+            min_volume=3,
+            model="gen a",
+            display_name="display name",
+            flow_rates=FlowRates(
+                default_aspirate={},
+                default_dispense={},
+                default_blow_out={},
+            ),
+            tip_configuration_lookup_table={15: supported_tip_fixture},
+            nominal_tip_overlap={},
+            nozzle_offset_z=1.23,
+            home_position=4.56,
+            nozzle_map=get_default_nozzle_map(PipetteNameType.P1000_96),
+            back_left_corner_offset=Point(x=1, y=2, z=3),
+            front_right_corner_offset=Point(x=4, y=5, z=6),
+        ),
+    )
+    subject.handle_action(
+        actions.SucceedCommandAction(
+            private_result=load_pipette_private_result, command=load_pipette_command
+        )
+    )
+
+    def _get_next_and_pickup(nozzle_map: NozzleMap) -> str | None:
+        result = TipView(subject.state).get_next_tip(
+            labware_id="cool-labware",
+            num_tips=0,
+            starting_tip_name=None,
+            nozzle_map=nozzle_map,
+        )
+        if result is not None:
+            pick_up_tip = commands.PickUpTip.construct(  # type: ignore[call-arg]
+                params=commands.PickUpTipParams.construct(
+                    pipetteId="pipette-id",
+                    labwareId="cool-labware",
+                    wellName=result,
+                ),
+                result=commands.PickUpTipResult.construct(
+                    position=DeckPoint(x=0, y=0, z=0), tipLength=1.23
+                ),
+            )
+
+            subject.handle_action(
+                actions.SucceedCommandAction(private_result=None, command=pick_up_tip)
+            )
+
+        return result
+
+    # Configure nozzle for partial configurations
+    configure_nozzle_layout_cmd = commands.ConfigureNozzleLayout.construct(  # type: ignore[call-arg]
+        result=commands.ConfigureNozzleLayoutResult()
+    )
+
+    def _reconfigure_nozzle_layout(start: str, back_l: str, front_r: str) -> NozzleMap:
+        configure_nozzle_private_result = commands.ConfigureNozzleLayoutPrivateResult(
+            pipette_id="pipette-id",
+            nozzle_map=NozzleMap.build(
+                physical_nozzles=NINETY_SIX_MAP,
+                physical_rows=NINETY_SIX_ROWS,
+                physical_columns=NINETY_SIX_COLS,
+                starting_nozzle=start,
+                back_left_nozzle=back_l,
+                front_right_nozzle=front_r,
+            ),
+        )
+        subject.handle_action(
+            actions.SucceedCommandAction(
+                private_result=configure_nozzle_private_result,
+                command=configure_nozzle_layout_cmd,
+            )
+        )
+        return configure_nozzle_private_result.nozzle_map
+
+    map = _reconfigure_nozzle_layout("A1", "A1", "A1")
+    for x in range(96):
+        _get_next_and_pickup(map)
+    assert _get_next_and_pickup(map) is None
+
+    subject.handle_action(actions.ResetTipsAction(labware_id="cool-labware"))
+    map = _reconfigure_nozzle_layout("A12", "A12", "A12")
+    for x in range(96):
+        _get_next_and_pickup(map)
+    assert _get_next_and_pickup(map) is None
+
+    subject.handle_action(actions.ResetTipsAction(labware_id="cool-labware"))
+    map = _reconfigure_nozzle_layout("H1", "H1", "H1")
+    for x in range(96):
+        _get_next_and_pickup(map)
+    assert _get_next_and_pickup(map) is None
+
+    subject.handle_action(actions.ResetTipsAction(labware_id="cool-labware"))
+    map = _reconfigure_nozzle_layout("H12", "H12", "H12")
+    for x in range(96):
+        _get_next_and_pickup(map)
+    assert _get_next_and_pickup(map) is None

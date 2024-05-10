@@ -297,7 +297,7 @@ class TipView(HasState[TipState]):
             critical_column = active_columns - 1
             critical_row = active_rows - 1
 
-            while critical_column <= len(columns):
+            while critical_column < len(columns):
                 tip_cluster = _identify_tip_cluster(
                     active_columns, active_rows, critical_column, critical_row, "A1"
                 )
@@ -313,8 +313,6 @@ class TipView(HasState[TipState]):
                     critical_row = critical_row + active_rows
                 else:
                     critical_column += 1
-                    if critical_column >= len(columns):
-                        return None
                     critical_row = active_rows - 1
             return None
 
@@ -339,8 +337,6 @@ class TipView(HasState[TipState]):
                     critical_row = critical_row + active_rows
                 else:
                     critical_column -= 1
-                    if critical_column < 0:
-                        return None
                     critical_row = active_rows - 1
             return None
 
