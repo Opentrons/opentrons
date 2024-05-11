@@ -26,9 +26,11 @@ TEST_ACCELERATION = 1500  # used during gravimetric tests
 
 DEFAULT_ACCELERATION = DEFAULT_ACCELERATIONS.low_throughput[types.OT3AxisKind.P]
 DEFAULT_CURRENT = DEFAULT_RUN_CURRENT.low_throughput[types.OT3AxisKind.P]
+print(f"DEFAULT_CURRENT: {DEFAULT_CURRENT}")
 DEFAULT_SPEED = DEFAULT_MAX_SPEEDS.low_throughput[types.OT3AxisKind.P]
 
 MUST_PASS_CURRENT = round(DEFAULT_CURRENT * 0.75, 2)  # the target spec (must pass here)
+print(f"MUST_PASS_CURRENT: {MUST_PASS_CURRENT}")
 assert (
     MUST_PASS_CURRENT < DEFAULT_CURRENT
 ), "must-pass current must be less than default current"
@@ -45,6 +47,9 @@ PLUNGER_CURRENTS_SPEED = {
     MUST_PASS_CURRENT: TEST_SPEEDS,
     DEFAULT_CURRENT: TEST_SPEEDS,
 }
+print(f"PLUNGER_CURRENTS_SPEED: {PLUNGER_CURRENTS_SPEED}")
+
+MUST_PASS_CURRENT_TURE = 0.4
 
 MAX_SPEED = max(TEST_SPEEDS)
 MAX_CURRENT = max(max(list(PLUNGER_CURRENTS_SPEED.keys())), 1.0)
@@ -65,7 +70,7 @@ def _get_section_tag(current: float) -> str:
 
 
 def _includes_result(current: float, speed: float) -> bool:
-    return current >= MUST_PASS_CURRENT
+    return current >= MUST_PASS_CURRENT_TURE
 
 
 def _build_csv_report(trials: int) -> CSVReport:
@@ -285,6 +290,17 @@ async def _main(is_simulating: bool, trials: int, continue_after_stall: bool) ->
     )
     # home and move to a safe position
     await _reset_gantry(api)
+    pipptype = api.get_all_attached_instr()
+    print(f"pipette type: {pipptype[types.OT3Mount.LEFT]['name']}")
+    global MUST_PASS_CURRENT_TURE
+    if "single" in pipptype[types.OT3Mount.LEFT]['name']:
+        
+        MUST_PASS_CURRENT_TURE = 0.3
+    elif "multi" in pipptype[types.OT3Mount.LEFT]['name']:
+        MUST_PASS_CURRENT_TURE = 0.5
+    else:
+        raise Exception("pipette type not found(没有找到移液器,请检查是否烧录条码)")
+   
 
     # test each attached pipette
     while True:
