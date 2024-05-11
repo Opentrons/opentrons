@@ -18,7 +18,7 @@ The Opentrons AI application's server.
    1. This allows formatting of of `.md` and `.json` files
 1. select the python version `pyenv local 3.12.3`
    1. This will create a `.python-version` file in this directory
-1. select the node version `nvs` currently 18.19\*
+1. select the node version with `nvs` or `nvm` currently 18.19\*
 1. Install pipenv and python dependencies `make setup`
 
 ## Install a dev dependency
@@ -31,11 +31,11 @@ The Opentrons AI application's server.
 
 ## Stack and structure
 
-### Lambda Pattern
+### Tools
 
 - [powertools](https://powertools.aws.dev/)
-- [reinvent talk for the pattern](https://www.youtube.com/watch?v=52W3Qyg242Y)
-- [for creating docs](https://www.ranthebuilder.cloud/post/serverless-open-api-documentation-with-aws-powertools)
+- [pytest]: https://docs.pytest.org/en/
+- [openai python api library]: https://pypi.org/project/openai/
 
 ### Lambda Code Organizations and Separation of Concerns
 
@@ -46,10 +46,13 @@ The Opentrons AI application's server.
 - integration
   - the integration with other services
 
-[pytest]: https://docs.pytest.org/en/
-[openai python api library]: https://pypi.org/project/openai/
+## Dev process
 
-## Deploy
+1. Make your changes
+1. Fix what can be automatically then lent and unit test like CI will `make pre-commit`
+1. `make pre-commit` passes
+1. deploy to sandbox `make build deploy test-live ENV=sandbox AWS_PROFILE=the-profile`
 
-1. build the package `make build`
-1. deploy the package `make deploy ENV=sandbox AWS_PROFILE=robotics_ai_sandbox`
+## TODO
+
+- llama-index is gigantic. Have to figure out how to get it in the lambda
