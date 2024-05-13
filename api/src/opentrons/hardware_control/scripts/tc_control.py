@@ -1,4 +1,4 @@
-from serial import Serial
+from serial import Serial  # type: ignore[import-untyped]
 import asyncio
 import subprocess
 from typing import Any
