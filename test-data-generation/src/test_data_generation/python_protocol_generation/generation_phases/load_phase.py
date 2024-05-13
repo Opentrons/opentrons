@@ -162,34 +162,32 @@ def create_deck_configuration_satisfying_load_statement(
             raise (ValueError(f"Unknown slot contents: {slot.contents}"))
 
 
-def determine_load_statements_for_slot(
+def evaluate_explicit_load_statements_for_slot(
     slot: Slot,
     explicit_calls: ast_h.ExplicitLoadStorage,
     allow_overlapping_calls: bool,
 ) -> typing.List[ast_h.AssignStatement]:
     """Evaluates an explicit call for a slot and returns the corresponding assign statement."""
-    load_statements = create_deck_configuration_satisfying_load_statement(slot)
-    what_to_load: typing.List[ast_h.AssignStatement] = []
+    what_to_load: typing.List[ast_h.AssignStatement] = create_deck_configuration_satisfying_load_statement(slot)
 
-    # If we do allow overlapping calls, we want to generate load statements
-    # that satisfy the deck configuration.
-    # We also want these to be called first.
-    # This way we can make protocols invalid with passed later explicit calls.
-    if allow_overlapping_calls:
-        if load_statements is not None:
-            what_to_load = load_statements
-        if slot.label in explicit_calls:
-            what_to_load.append(explicit_calls.pop(slot.label))
+    # If there is no explicit call for the slot, then we don't need to do anything 
+    if slot.label not in explicit_calls:
         return what_to_load
+    
+    # If there is an explicit call for the slot, we need to decide whether to override or append to what to load
     else:
-        # If we don't allow overlapping calls, we want to always load only the explicit call
-        # This is so we can override the implicit Deck Configuration load statements.
-        # We want to do this when we want to override the default load functionality.
-        if slot.label in explicit_calls:
-            return [explicit_calls.pop(slot.label)]
+        # Regardless of allow_overlapping_calls value, we want to remove the explicit call from the dictionary
+        explicit_call = explicit_calls.pop(slot.label)
 
-        # But if we don't have an explicit call, we want to load the default deck configuration
-        return load_statements
+        # If we do allow overlapping calls, we want to append the explicit call to the list of what to load
+        if allow_overlapping_calls:
+            what_to_load.append(explicit_call)
+
+        else:
+            # If we don't allow overlapping calls, we want to override the list of what to load
+            what_to_load = [explicit_call]     
+            
+    return what_to_load
 
 
 def create_deck_slot_load_statements(
@@ -203,7 +201,7 @@ def create_deck_slot_load_statements(
         # determine_load_statements_for_slot can remove
         # explicit calls from the explicit_calls dictionary
         entries.extend(
-            determine_load_statements_for_slot(
+            evaluate_explicit_load_statements_for_slot(
                 slot, explicit_calls, allow_overlapping_calls
             )
         )
