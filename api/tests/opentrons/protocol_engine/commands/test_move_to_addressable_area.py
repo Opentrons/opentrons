@@ -6,6 +6,7 @@ from opentrons.protocol_engine.execution import MovementHandler
 from opentrons.protocol_engine.state import StateView
 from opentrons.types import Point
 
+from opentrons.protocol_engine.commands.command import SuccessData
 from opentrons.protocol_engine.commands.move_to_addressable_area import (
     MoveToAddressableAreaParams,
     MoveToAddressableAreaResult,
@@ -47,4 +48,7 @@ async def test_move_to_addressable_area_implementation(
 
     result = await subject.execute(data)
 
-    assert result == MoveToAddressableAreaResult(position=DeckPoint(x=9, y=8, z=7))
+    assert result == SuccessData(
+        public=MoveToAddressableAreaResult(position=DeckPoint(x=9, y=8, z=7)),
+        private=None,
+    )

@@ -10,6 +10,7 @@ from opentrons.protocol_engine.state.module_substates import (
 )
 from opentrons.protocol_engine.execution import EquipmentHandler
 from opentrons.protocol_engine.commands import temperature_module
+from opentrons.protocol_engine.commands.command import SuccessData
 from opentrons.protocol_engine.commands.temperature_module.deactivate import (
     DeactivateTemperatureImpl,
 )
@@ -43,5 +44,6 @@ async def test_await_temperature(
 
     result = await subject.execute(data)
     decoy.verify(await tempdeck_hardware.deactivate(), times=1)
-    assert result == temperature_module.DeactivateTemperatureResult()
-    assert isinstance(result, temperature_module.DeactivateTemperatureResult)
+    assert result == SuccessData(
+        public=temperature_module.DeactivateTemperatureResult(), private=None
+    )

@@ -4,6 +4,7 @@ from decoy import Decoy
 from opentrons.protocol_engine.execution import TipHandler
 from opentrons.protocol_engine.types import TipPresenceStatus
 
+from opentrons.protocol_engine.commands.command import SuccessData
 from opentrons.protocol_engine.commands.verify_tip_presence import (
     VerifyTipPresenceParams,
     VerifyTipPresenceResult,
@@ -31,4 +32,4 @@ async def test_verify_tip_presence_implementation(
 
     result = await subject.execute(data)
 
-    assert isinstance(result, VerifyTipPresenceResult)
+    assert result == SuccessData(public=VerifyTipPresenceResult(), private=None)

@@ -13,6 +13,7 @@ from opentrons.protocol_engine.state import StateView
 from opentrons.protocol_engine.execution import MovementHandler, TipHandler
 from opentrons.types import Point
 
+from opentrons.protocol_engine.commands.command import SuccessData
 from opentrons.protocol_engine.commands.drop_tip import (
     DropTipParams,
     DropTipResult,
@@ -110,7 +111,9 @@ async def test_drop_tip_implementation(
 
     result = await subject.execute(params)
 
-    assert result == DropTipResult(position=DeckPoint(x=111, y=222, z=333))
+    assert result == SuccessData(
+        public=DropTipResult(position=DeckPoint(x=111, y=222, z=333)), private=None
+    )
 
     decoy.verify(
         await mock_tip_handler.drop_tip(pipette_id="abc", home_after=True),
@@ -170,4 +173,6 @@ async def test_drop_tip_with_alternating_locations(
     ).then_return(Point(x=111, y=222, z=333))
 
     result = await subject.execute(params)
-    assert result == DropTipResult(position=DeckPoint(x=111, y=222, z=333))
+    assert result == SuccessData(
+        public=DropTipResult(position=DeckPoint(x=111, y=222, z=333)), private=None
+    )

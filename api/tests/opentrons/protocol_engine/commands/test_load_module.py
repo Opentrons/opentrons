@@ -16,6 +16,7 @@ from opentrons.protocol_engine.execution import EquipmentHandler, LoadedModuleDa
 from opentrons.protocol_engine import ModuleModel as EngineModuleModel
 from opentrons.hardware_control.modules import ModuleType
 
+from opentrons.protocol_engine.commands.command import SuccessData
 from opentrons.protocol_engine.commands.load_module import (
     LoadModuleParams,
     LoadModuleResult,
@@ -84,11 +85,14 @@ async def test_load_module_implementation(
     )
 
     result = await subject.execute(data)
-    assert result == LoadModuleResult(
-        moduleId="module-id",
-        serialNumber="mod-serial",
-        model=ModuleModel.TEMPERATURE_MODULE_V2,
-        definition=tempdeck_v2_def,
+    assert result == SuccessData(
+        public=LoadModuleResult(
+            moduleId="module-id",
+            serialNumber="mod-serial",
+            model=ModuleModel.TEMPERATURE_MODULE_V2,
+            definition=tempdeck_v2_def,
+        ),
+        private=None,
     )
 
 
@@ -137,11 +141,14 @@ async def test_load_module_implementation_mag_block(
     )
 
     result = await subject.execute(data)
-    assert result == LoadModuleResult(
-        moduleId="module-id",
-        serialNumber=None,
-        model=ModuleModel.MAGNETIC_BLOCK_V1,
-        definition=mag_block_v1_def,
+    assert result == SuccessData(
+        public=LoadModuleResult(
+            moduleId="module-id",
+            serialNumber=None,
+            model=ModuleModel.MAGNETIC_BLOCK_V1,
+            definition=mag_block_v1_def,
+        ),
+        private=None,
     )
 
 

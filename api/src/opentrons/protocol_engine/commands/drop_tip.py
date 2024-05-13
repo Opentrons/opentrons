@@ -7,7 +7,8 @@ from typing_extensions import Literal
 
 from ..types import DropTipWellLocation, DeckPoint
 from .pipetting_common import PipetteIdMixin, DestinationPositionResult
-from .command import AbstractCommandImpl, BaseCommand, BaseCommandCreate
+from .command import AbstractCommandImpl, BaseCommand, BaseCommandCreate, SuccessData
+from ..errors.error_occurrence import ErrorOccurrence
 
 if TYPE_CHECKING:
     from ..state import StateView
@@ -52,7 +53,9 @@ class DropTipResult(DestinationPositionResult):
     pass
 
 
-class DropTipImplementation(AbstractCommandImpl[DropTipParams, DropTipResult]):
+class DropTipImplementation(
+    AbstractCommandImpl[DropTipParams, SuccessData[DropTipResult, None]]
+):
     """Drop tip command implementation."""
 
     def __init__(
@@ -66,7 +69,7 @@ class DropTipImplementation(AbstractCommandImpl[DropTipParams, DropTipResult]):
         self._tip_handler = tip_handler
         self._movement_handler = movement
 
-    async def execute(self, params: DropTipParams) -> DropTipResult:
+    async def execute(self, params: DropTipParams) -> SuccessData[DropTipResult, None]:
         """Move to and drop a tip using the requested pipette."""
         pipette_id = params.pipetteId
         labware_id = params.labwareId
@@ -101,12 +104,15 @@ class DropTipImplementation(AbstractCommandImpl[DropTipParams, DropTipResult]):
 
         await self._tip_handler.drop_tip(pipette_id=pipette_id, home_after=home_after)
 
-        return DropTipResult(
-            position=DeckPoint(x=position.x, y=position.y, z=position.z)
+        return SuccessData(
+            public=DropTipResult(
+                position=DeckPoint(x=position.x, y=position.y, z=position.z)
+            ),
+            private=None,
         )
 
 
-class DropTip(BaseCommand[DropTipParams, DropTipResult]):
+class DropTip(BaseCommand[DropTipParams, DropTipResult, ErrorOccurrence]):
     """Drop tip command model."""
 
     commandType: DropTipCommandType = "dropTip"

@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
+from dataclasses import dataclass
 from datetime import datetime
 from enum import Enum
 from typing import (
@@ -11,7 +12,6 @@ from typing import (
     Generic,
     Optional,
     TypeVar,
-    Tuple,
     List,
     Type,
     Union,
@@ -35,6 +35,8 @@ _ParamsT = TypeVar("_ParamsT", bound=BaseModel)
 _ParamsT_contra = TypeVar("_ParamsT_contra", bound=BaseModel, contravariant=True)
 _ResultT = TypeVar("_ResultT", bound=BaseModel)
 _ResultT_co = TypeVar("_ResultT_co", bound=BaseModel, covariant=True)
+_ErrorT = TypeVar("_ErrorT", bound=ErrorOccurrence)
+_ErrorT_co = TypeVar("_ErrorT_co", bound=ErrorOccurrence, covariant=True)
 _PrivateResultT_co = TypeVar("_PrivateResultT_co", covariant=True)
 
 
@@ -60,7 +62,11 @@ class CommandIntent(str, Enum):
     FIXIT = "fixit"
 
 
-class BaseCommandCreate(GenericModel, Generic[_ParamsT]):
+class BaseCommandCreate(
+    GenericModel,
+    # These type parameters need to be invariant because our fields are mutable.
+    Generic[_ParamsT],
+):
     """Base class for command creation requests.
 
     You shouldn't use this class directly; instead, use or define
@@ -99,7 +105,37 @@ class BaseCommandCreate(GenericModel, Generic[_ParamsT]):
     )
 
 
-class BaseCommand(GenericModel, Generic[_ParamsT, _ResultT]):
+@dataclass(frozen=True)
+class SuccessData(Generic[_ResultT_co, _PrivateResultT_co]):
+    """Data from the successful completion of a command."""
+
+    public: _ResultT_co
+    """Public result data. Exposed over HTTP and stored in databases."""
+
+    private: _PrivateResultT_co
+    """Additional result data, only given to `opentrons.protocol_engine` internals."""
+
+
+@dataclass(frozen=True)
+class DefinedErrorData(Generic[_ErrorT_co, _PrivateResultT_co]):
+    """Data from a command that failed with a defined error.
+
+    This should only be used for "defined" errors, not any error.
+    See `AbstractCommandImpl.execute()`.
+    """
+
+    public: _ErrorT_co
+    """Public error data. Exposed over HTTP and stored in databases."""
+
+    private: _PrivateResultT_co
+    """Additional error data, only given to `opentrons.protocol_engine` internals."""
+
+
+class BaseCommand(
+    GenericModel,
+    # These type parameters need to be invariant because our fields are mutable.
+    Generic[_ParamsT, _ResultT, _ErrorT],
+):
     """Base command model.
 
     You shouldn't use this class directly; instead, use or define
@@ -134,7 +170,12 @@ class BaseCommand(GenericModel, Generic[_ParamsT, _ResultT]):
         None,
         description="Command execution result data, if succeeded",
     )
-    error: Optional[ErrorOccurrence] = Field(
+    error: Union[
+        _ErrorT,
+        # ErrorOccurrence here is for undefined errors not captured by _ErrorT.
+        ErrorOccurrence,
+        None,
+    ] = Field(
         None,
         description="Reference to error occurrence, if execution failed",
     )
@@ -169,27 +210,46 @@ class BaseCommand(GenericModel, Generic[_ParamsT, _ResultT]):
         ),
     )
 
-    _ImplementationCls: Union[
-        Type[AbstractCommandImpl[_ParamsT, _ResultT]],
-        Type[AbstractCommandWithPrivateResultImpl[_ParamsT, _ResultT, object]],
+    _ImplementationCls: Type[
+        AbstractCommandImpl[
+            _ParamsT,
+            Union[
+                SuccessData[
+                    # Our _ImplementationCls must return public result data that can fit
+                    # in our `result` field:
+                    _ResultT,
+                    # But we don't care (here) what kind of private result data it returns:
+                    object,
+                ],
+                DefinedErrorData[
+                    # Likewise, for our `error` field:
+                    _ErrorT,
+                    object,
+                ],
+            ],
+        ]
     ]
+
+
+_ExecuteReturnT_co = TypeVar(
+    "_ExecuteReturnT_co",
+    bound=Union[
+        SuccessData[BaseModel, object],
+        DefinedErrorData[ErrorOccurrence, object],
+    ],
+    covariant=True,
+)
 
 
 class AbstractCommandImpl(
     ABC,
-    Generic[_ParamsT_contra, _ResultT_co],
+    Generic[_ParamsT_contra, _ExecuteReturnT_co],
 ):
     """Abstract command creation and execution implementation.
 
     A given command request should map to a specific command implementation,
-    which defines how to:
-
-    - Create a command resource from the request model
-    - Execute the command, mapping data from execution into the result model
-
-    This class should be used as the base class for new commands by default. You should only
-    use AbstractCommandWithPrivateResultImpl if you actually need private results to send to
-    the rest of the engine wihtout being published outside of it.
+    which defines how to execute the command and map data from execution into the
+    result model.
     """
 
     def __init__(
@@ -211,50 +271,16 @@ class AbstractCommandImpl(
         pass
 
     @abstractmethod
-    async def execute(self, params: _ParamsT_contra) -> _ResultT_co:
-        """Execute the command, mapping data from execution into a response model."""
-        ...
+    async def execute(self, params: _ParamsT_contra) -> _ExecuteReturnT_co:
+        """Execute the command, mapping data from execution into a response model.
 
+        This should either:
 
-class AbstractCommandWithPrivateResultImpl(
-    ABC,
-    Generic[_ParamsT_contra, _ResultT_co, _PrivateResultT_co],
-):
-    """Abstract command creation and execution implementation if the command has private results.
-
-    A given command request should map to a specific command implementation,
-    which defines how to:
-
-    - Create a command resource from the request model
-    - Execute the command, mapping data from execution into the result model
-
-    This class should be used instead of AbstractCommandImpl as a base class if your command needs
-    to send data to result handlers that should not be published outside of the engine.
-
-    Note that this class needs an extra type-parameter for the private result.
-    """
-
-    def __init__(
-        self,
-        state_view: StateView,
-        hardware_api: HardwareControlAPI,
-        equipment: execution.EquipmentHandler,
-        movement: execution.MovementHandler,
-        gantry_mover: execution.GantryMover,
-        labware_movement: execution.LabwareMovementHandler,
-        pipetting: execution.PipettingHandler,
-        tip_handler: execution.TipHandler,
-        run_control: execution.RunControlHandler,
-        rail_lights: execution.RailLightsHandler,
-        status_bar: execution.StatusBarHandler,
-        command_note_adder: CommandNoteAdder,
-    ) -> None:
-        """Initialize the command implementation with execution handlers."""
-        pass
-
-    @abstractmethod
-    async def execute(
-        self, params: _ParamsT_contra
-    ) -> Tuple[_ResultT_co, _PrivateResultT_co]:
-        """Execute the command, mapping data from execution into a response model."""
+        - Return a `SuccessData`, if the command completed normally.
+        - Return a `DefinedErrorData`, if the command failed with a "defined error."
+          Defined errors are errors that are documented as part of the robot's public
+          API.
+        - Raise an exception, if the command failed with any other error
+          (in other words, an undefined error).
+        """
         ...

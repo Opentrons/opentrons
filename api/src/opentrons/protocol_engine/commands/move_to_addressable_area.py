@@ -12,7 +12,8 @@ from .pipetting_common import (
     MovementMixin,
     DestinationPositionResult,
 )
-from .command import AbstractCommandImpl, BaseCommand, BaseCommandCreate
+from .command import AbstractCommandImpl, BaseCommand, BaseCommandCreate, SuccessData
+from ..errors.error_occurrence import ErrorOccurrence
 
 if TYPE_CHECKING:
     from ..execution import MovementHandler
@@ -71,7 +72,9 @@ class MoveToAddressableAreaResult(DestinationPositionResult):
 
 
 class MoveToAddressableAreaImplementation(
-    AbstractCommandImpl[MoveToAddressableAreaParams, MoveToAddressableAreaResult]
+    AbstractCommandImpl[
+        MoveToAddressableAreaParams, SuccessData[MoveToAddressableAreaResult, None]
+    ]
 ):
     """Move to addressable area command implementation."""
 
@@ -83,7 +86,7 @@ class MoveToAddressableAreaImplementation(
 
     async def execute(
         self, params: MoveToAddressableAreaParams
-    ) -> MoveToAddressableAreaResult:
+    ) -> SuccessData[MoveToAddressableAreaResult, None]:
         """Move the requested pipette to the requested addressable area."""
         self._state_view.addressable_areas.raise_if_area_not_in_deck_configuration(
             params.addressableAreaName
@@ -104,11 +107,16 @@ class MoveToAddressableAreaImplementation(
             stay_at_highest_possible_z=params.stayAtHighestPossibleZ,
         )
 
-        return MoveToAddressableAreaResult(position=DeckPoint(x=x, y=y, z=z))
+        return SuccessData(
+            public=MoveToAddressableAreaResult(position=DeckPoint(x=x, y=y, z=z)),
+            private=None,
+        )
 
 
 class MoveToAddressableArea(
-    BaseCommand[MoveToAddressableAreaParams, MoveToAddressableAreaResult]
+    BaseCommand[
+        MoveToAddressableAreaParams, MoveToAddressableAreaResult, ErrorOccurrence
+    ]
 ):
     """Move to addressable area command model."""
 

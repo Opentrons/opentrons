@@ -10,6 +10,7 @@ from opentrons.protocol_engine.state.module_substates import (
 )
 from opentrons.protocol_engine.execution import EquipmentHandler
 from opentrons.protocol_engine.commands import heater_shaker
+from opentrons.protocol_engine.commands.command import SuccessData
 from opentrons.protocol_engine.commands.heater_shaker.set_target_temperature import (
     SetTargetTemperatureImpl,
 )
@@ -53,4 +54,6 @@ async def test_set_target_temperature(
 
     result = await subject.execute(data)
     decoy.verify(await hs_hardware.start_set_temperature(celsius=45.6), times=1)
-    assert result == heater_shaker.SetTargetTemperatureResult()
+    assert result == SuccessData(
+        public=heater_shaker.SetTargetTemperatureResult(), private=None
+    )

@@ -5,7 +5,8 @@ from typing import TYPE_CHECKING, Optional, Type
 from typing_extensions import Literal
 
 from ..types import MovementAxis, DeckPoint
-from .command import AbstractCommandImpl, BaseCommand, BaseCommandCreate
+from .command import AbstractCommandImpl, BaseCommand, BaseCommandCreate, SuccessData
+from ..errors.error_occurrence import ErrorOccurrence
 from .pipetting_common import DestinationPositionResult
 
 if TYPE_CHECKING:
@@ -36,14 +37,16 @@ class MoveRelativeResult(DestinationPositionResult):
 
 
 class MoveRelativeImplementation(
-    AbstractCommandImpl[MoveRelativeParams, MoveRelativeResult]
+    AbstractCommandImpl[MoveRelativeParams, SuccessData[MoveRelativeResult, None]]
 ):
     """Move relative command implementation."""
 
     def __init__(self, movement: MovementHandler, **kwargs: object) -> None:
         self._movement = movement
 
-    async def execute(self, params: MoveRelativeParams) -> MoveRelativeResult:
+    async def execute(
+        self, params: MoveRelativeParams
+    ) -> SuccessData[MoveRelativeResult, None]:
         """Move (jog) a given pipette a relative distance."""
         x, y, z = await self._movement.move_relative(
             pipette_id=params.pipetteId,
@@ -51,10 +54,14 @@ class MoveRelativeImplementation(
             distance=params.distance,
         )
 
-        return MoveRelativeResult(position=DeckPoint(x=x, y=y, z=z))
+        return SuccessData(
+            public=MoveRelativeResult(position=DeckPoint(x=x, y=y, z=z)), private=None
+        )
 
 
-class MoveRelative(BaseCommand[MoveRelativeParams, MoveRelativeResult]):
+class MoveRelative(
+    BaseCommand[MoveRelativeParams, MoveRelativeResult, ErrorOccurrence]
+):
     """Command to move (jog) a given pipette a relative distance."""
 
     commandType: MoveRelativeCommandType = "moveRelative"

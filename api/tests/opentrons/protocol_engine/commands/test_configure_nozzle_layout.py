@@ -11,7 +11,7 @@ from opentrons.protocol_engine.execution import (
 from opentrons.types import Point
 from opentrons.hardware_control.nozzle_manager import NozzleMap
 
-
+from opentrons.protocol_engine.commands.command import SuccessData
 from opentrons.protocol_engine.commands.configure_nozzle_layout import (
     ConfigureNozzleLayoutParams,
     ConfigureNozzleLayoutResult,
@@ -124,10 +124,12 @@ async def test_configure_nozzle_layout_implementation(
         )
     ).then_return(expected_nozzlemap)
 
-    result, private_result = await subject.execute(requested_nozzle_layout)
+    result = await subject.execute(requested_nozzle_layout)
 
-    assert result == ConfigureNozzleLayoutResult()
-    assert private_result == ConfigureNozzleLayoutPrivateResult(
-        pipette_id="pipette-id",
-        nozzle_map=expected_nozzlemap,
+    assert result == SuccessData(
+        public=ConfigureNozzleLayoutResult(),
+        private=ConfigureNozzleLayoutPrivateResult(
+            pipette_id="pipette-id",
+            nozzle_map=expected_nozzlemap,
+        ),
     )

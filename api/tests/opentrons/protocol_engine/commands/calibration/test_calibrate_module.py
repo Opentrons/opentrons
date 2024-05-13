@@ -12,6 +12,7 @@ from opentrons.protocol_engine.commands.calibration.calibrate_module import (
     CalibrateModuleImplementation,
     CalibrateModuleParams,
 )
+from opentrons.protocol_engine.commands.command import SuccessData
 from opentrons.protocol_engine.errors.exceptions import HardwareNotSupportedError
 from opentrons.protocol_engine.state.state import StateView
 from opentrons.protocol_engine.types import (
@@ -85,13 +86,16 @@ async def test_calibrate_module_implementation(
 
     result = await subject.execute(params)
 
-    assert result == CalibrateModuleResult(
-        moduleOffset=ModuleOffsetVector(
-            x=3,
-            y=4,
-            z=6,
+    assert result == SuccessData(
+        public=CalibrateModuleResult(
+            moduleOffset=ModuleOffsetVector(
+                x=3,
+                y=4,
+                z=6,
+            ),
+            location=location,
         ),
-        location=location,
+        private=None,
     )
 
 
