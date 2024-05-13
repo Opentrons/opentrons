@@ -101,9 +101,8 @@ export function HistoricalProtocolRunOffsetDrawer(
       ) : null}
       <Flex justifyContent={JUSTIFY_FLEX_START}>
         <Box
-          width="25.5%"
-          paddingX={`${SPACING.spacing4} ${SPACING.spacing8}`}
-          paddingY={SPACING.spacing4}
+          width="25.25%"
+          padding={`${SPACING.spacing8} ${SPACING.spacing4} ${SPACING.spacing8} ${SPACING.spacing4}`}
         >
           <StyledText
             as="label"
@@ -114,7 +113,7 @@ export function HistoricalProtocolRunOffsetDrawer(
             {t('location')}
           </StyledText>
         </Box>
-        <Box width="34%" padding={`${SPACING.spacing4} ${SPACING.spacing8}`}>
+        <Box width="39.75%" padding={`${SPACING.spacing4} ${SPACING.spacing8}`}>
           <StyledText
             as="label"
             fontWeight={TYPOGRAPHY.fontWeightSemiBold}
@@ -124,10 +123,9 @@ export function HistoricalProtocolRunOffsetDrawer(
             {t('labware')}
           </StyledText>
         </Box>
-        <Box width="40%" padding={`${SPACING.spacing4} ${SPACING.spacing8}`}>
+        <Box width="34%" padding={`${SPACING.spacing4} ${SPACING.spacing8}`}>
           <StyledText
             as="label"
-            width="40%"
             fontWeight={TYPOGRAPHY.fontWeightSemiBold}
             textTransform={TYPOGRAPHY.textTransformCapitalize}
             datatest-id="RecentProtocolRun_OffsetDrawer_labwareOffsetDataTitle"
@@ -160,22 +158,21 @@ export function HistoricalProtocolRunOffsetDrawer(
             borderRadius={BORDERS.borderRadius4}
             gridGap={SPACING.spacing24}
           >
-            <Box width="24%">
-              <StyledText width="24%" as="label">
+            <Box width="23.5%">
+              <StyledText as="label">
                 {t('slot', { slotName: offset.location.slotName })}
                 {offset.location.moduleModel != null &&
                   ` - ${getModuleDisplayName(offset.location.moduleModel)}`}
               </StyledText>
             </Box>
-            <Box width="33%">
-              <StyledText as="label" width="33%" title={labwareName}>
+            <Box width="38.5%">
+              <StyledText as="label" title={labwareName}>
                 {labwareName}
               </StyledText>
             </Box>
-            <Box width="40%">
+            <Box width="33%">
               <OffsetVector
                 {...offset.vector}
-                width="40%"
                 fontSize={TYPOGRAPHY.fontSizeLabel}
                 as="label"
               />
