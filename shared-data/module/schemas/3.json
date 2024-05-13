@@ -82,7 +82,7 @@
         "thermocyclerModuleType",
         "heaterShakerModuleType",
         "magneticBlockType",
-        "plateReaderModuleType"
+        "absorbanceReaderType"
       ],
       "type": "string"
     },

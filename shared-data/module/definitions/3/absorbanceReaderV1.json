@@ -1,6 +1,6 @@
 {
   "$otSharedSchema": "module/schemas/3",
-  "moduleType": "plateReaderModuleType",
+  "moduleType": "absorbanceReaderType",
   "model": "absorbanceReaderV1",
   "labwareOffset": {
     "x": 0.0,
