@@ -1,7 +1,12 @@
 import * as React from 'react'
 import reduce from 'lodash/reduce'
 
-import { LabwareRender, RobotCoordinateSpace } from '@opentrons/components'
+import {
+  COLORS,
+  LabwareRender,
+  RobotCoordinateSpace,
+  WELL_LABEL_OPTIONS,
+} from '@opentrons/components'
 import { COLUMN } from '@opentrons/shared-data'
 import {
   arrayToWellGroup,
@@ -10,7 +15,7 @@ import {
 } from './utils'
 import { SelectionRect } from './SelectionRect'
 
-import type { WellMouseEvent, WellGroup } from '@opentrons/components'
+import type { WellMouseEvent, WellFill, WellGroup } from '@opentrons/components'
 import type { ContentsByWell, GenericRect, NozzleType } from './types'
 
 interface WellSelectionProps {
@@ -156,6 +161,14 @@ export function WellSelection(props: WellSelectionProps): JSX.Element {
         )
       : selectedPrimaryWells
 
+  const wellFill: WellFill = {}
+  Object.keys(labwareProps.definition.wells).forEach(wellName => {
+    wellFill[wellName] = COLORS.blue35
+  })
+  Object.keys(allSelectedWells).forEach(wellName => {
+    wellFill[wellName] = COLORS.blue50
+  })
+
   return (
     <SelectionRect
       onSelectionMove={handleSelectionMove}
@@ -173,6 +186,9 @@ export function WellSelection(props: WellSelectionProps): JSX.Element {
               handleMouseEnterWell({ wellName, event })
             }
           }}
+          hideOutline
+          wellLabelOption={WELL_LABEL_OPTIONS.SHOW_LABEL_INSIDE}
+          wellFill={wellFill}
         />
       </RobotCoordinateSpace>
     </SelectionRect>

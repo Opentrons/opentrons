@@ -21,20 +21,25 @@ interface SelectSourceWellsProps {
 }
 
 export function SelectSourceWells(props: SelectSourceWellsProps): JSX.Element {
-  const { onNext, onBack, exitButtonProps, state, dispatch } = props
+  const { onNext, onBack, state, dispatch } = props
   const { i18n, t } = useTranslation(['quick_transfer', 'shared'])
 
   const [selectedWells, setSelectedWells] = React.useState({})
 
   const handleClickNext = (): void => {
-    // until well selection is implemented, select all wells and proceed to the next step
-    if (state.source?.wells != null) {
-      dispatch({
-        type: 'SET_SOURCE_WELLS',
-        wells: Object.keys(state.source.wells),
-      })
-      onNext()
-    }
+    dispatch({
+      type: 'SET_SOURCE_WELLS',
+      wells: Object.keys(selectedWells),
+    })
+    onNext()
+  }
+
+  const resetButtonProps: React.ComponentProps<typeof SmallButton> = {
+    buttonType: 'tertiaryLowLight',
+    buttonText: t('shared:reset'),
+    onClick: () => {
+      setSelectedWells({})
+    },
   }
 
   return (
@@ -45,7 +50,7 @@ export function SelectSourceWells(props: SelectSourceWellsProps): JSX.Element {
         buttonText={i18n.format(t('shared:continue'), 'capitalize')}
         onClickButton={handleClickNext}
         buttonIsDisabled={false}
-        secondaryButtonProps={exitButtonProps}
+        secondaryButtonProps={resetButtonProps}
         top={SPACING.spacing8}
       />
       <Flex

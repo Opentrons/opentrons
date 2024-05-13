@@ -58,10 +58,12 @@ export interface LabwareRenderProps {
   onMouseLeaveWell?: (e: WellMouseEvent) => unknown
   gRef?: React.RefObject<SVGGElement>
   onLabwareClick?: () => void
+  /** Hide labware outline */
+  hideOutline?: boolean
 }
 
 export const LabwareRender = (props: LabwareRenderProps): JSX.Element => {
-  const { gRef, definition } = props
+  const { gRef, definition, hideOutline } = props
 
   const cornerOffsetFromSlot = definition.cornerOffsetFromSlot
   const labwareLoadName = definition.parameters.loadName
@@ -101,6 +103,7 @@ export const LabwareRender = (props: LabwareRenderProps): JSX.Element => {
         onMouseLeaveWell={props.onMouseLeaveWell}
         onLabwareClick={props.onLabwareClick}
         highlight={props.highlight}
+        hideOutline={hideOutline}
       />
       {props.wellStroke != null ? (
         <StrokedWells
