@@ -25,8 +25,6 @@ export function App(): JSX.Element {
   if (!isAuthenticated) {
     window.location.href = LOGIN_PAGE_URL
   }
-  console.log('isAuthenticated', isAuthenticated)
-  console.log('isLoading', isLoading)
 
   return (
     <>

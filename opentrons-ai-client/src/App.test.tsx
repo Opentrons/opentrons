@@ -1,9 +1,10 @@
 import React from 'react'
-import { screen } from '@testing-library/react'
-import { describe, it, vi, beforeEach } from 'vitest'
+import { fireEvent, screen } from '@testing-library/react'
+import { describe, it, vi, beforeEach, expect } from 'vitest'
 import * as auth0 from '@auth0/auth0-react'
 
 import { renderWithProviders } from './__testing-utils__'
+import { i18n } from './i18n'
 import { SidePanel } from './molecules/SidePanel'
 import { ChatContainer } from './organisms/ChatContainer'
 import { Loading } from './molecules/Loading'
@@ -19,7 +20,9 @@ vi.mock('./organisms/ChatContainer')
 vi.mock('./molecules/Loading')
 
 const render = (): ReturnType<typeof renderWithProviders> => {
-  return renderWithProviders(<App />)
+  return renderWithProviders(<App />, {
+    i18nInstance: i18n,
+  })
 }
 
 describe('App', () => {
@@ -46,5 +49,18 @@ describe('App', () => {
     render()
     screen.getByText('mock SidePanel')
     screen.getByText('mock ChatContainer')
+    screen.getByText('Logout')
+  })
+
+  it('should call a mock function when clicking logout button', () => {
+    ;(auth0 as any).useAuth0 = vi.fn().mockReturnValue({
+      isAuthenticated: true,
+      isLoading: false,
+      logout: mockLogout,
+    })
+    render()
+    const logoutButton = screen.getByText('Logout')
+    fireEvent.click(logoutButton)
+    expect(mockLogout).toHaveBeenCalled()
   })
 })
