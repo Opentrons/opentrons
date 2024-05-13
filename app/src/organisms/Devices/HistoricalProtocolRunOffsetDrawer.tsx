@@ -165,7 +165,7 @@ export function HistoricalProtocolRunOffsetDrawer(
                   ` - ${getModuleDisplayName(offset.location.moduleModel)}`}
               </StyledText>
             </Box>
-            <Box width="38.5%">
+            <Box width="38%">
               <StyledText as="label" title={labwareName}>
                 {labwareName}
               </StyledText>
