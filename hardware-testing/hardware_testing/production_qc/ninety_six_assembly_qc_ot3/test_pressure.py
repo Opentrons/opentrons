@@ -20,11 +20,12 @@ from hardware_testing.data.csv_report import (
     CSVLineRepeating,
 )
 
-PRIMARY_SEALED_PRESSURE_FIXTURE_POS = Point(362.68, 148.83, 44.4)  # attached tip
-SECOND_SEALED_PRESSURE_FIXTURE_POS = Point(264.71, 212.81, 44.4)   # attached tip
+USE_SEALED_FIXTURE = False
+USE_SEALED_BLOCK = True
+PRIMARY_SEALED_PRESSURE_FIXTURE_POS = Point(362.68, 148.83, 49.4) if USE_SEALED_BLOCK else Point(362.68, 148.83, 44.4) # attached tip
+SECOND_SEALED_PRESSURE_FIXTURE_POS = Point(264.71, 212.81, 49.4) if USE_SEALED_BLOCK else Point(264.71, 212.81, 44.4) # attached tip
 SET_PRESSURE_TARGET = 100 # read air pressure when the force pressure value is over 100
 REACHED_PRESSURE = 0
-USE_SEALED_FIXTURE = False
 
 SECONDS_BETWEEN_READINGS = 0.25
 NUM_PRESSURE_READINGS = 10
@@ -160,7 +161,7 @@ async def run(api: OT3API, report: CSVReport, section: str) -> None:
         await api.prepare_for_aspirate(OT3Mount.LEFT)
         if not api.is_simulator:
             ui.get_user_ready(f"attach {TIP_VOLUME} uL TIP to {probe.name} sensor")
-            if not USE_SEALED_FIXTURE:
+            if not (USE_SEALED_FIXTURE or USE_SEALED_BLOCK):
                  ui.get_user_ready("SEAL tip using your FINGER")
             else:
                 if probe == InstrumentProbeType.PRIMARY:
@@ -171,9 +172,11 @@ async def run(api: OT3API, report: CSVReport, section: str) -> None:
                     raise KeyError("Couldn't find key for InstrumentProbeTybe")
 
                 await helpers_ot3.move_to_arched_ot3(api, OT3Mount.LEFT, fixture_pos._replace(z=fixture_pos.z + 50))
-                ui.get_user_ready("Ready for moving to sensor")
-                
-                await calibrate_to_pressue_fixture(api, pressure_sensor, fixture_pos)
+                ui.get_user_ready("Ready for moving to sealed fixture")
+                if USE_SEALED_FIXTURE:
+                    await calibrate_to_pressue_fixture(api, pressure_sensor, fixture_pos)
+                else:
+                    await helpers_ot3.move_to_arched_ot3(api, OT3Mount.LEFT, fixture_pos)
 
             try:
                 sealed_pa = await _read_from_sensor(
@@ -219,7 +222,7 @@ async def run(api: OT3API, report: CSVReport, section: str) -> None:
         report(
             section, _get_test_tag(probe, "dispense-pa"), [dispense_pa, dispense_result]
         )
-        if USE_SEALED_FIXTURE:
+        if USE_SEALED_FIXTURE or USE_SEALED_BLOCK:
             await helpers_ot3.move_to_arched_ot3(api, OT3Mount.LEFT, fixture_pos._replace(z=fixture_pos.z + 50))
         if not api.is_simulator:
             ui.get_user_ready("REMOVE tip")
