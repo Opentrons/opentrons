@@ -6,6 +6,7 @@ import { renderWithProviders } from '../../../__testing-utils__'
 import { when } from 'vitest-when'
 import { MemoryRouter } from 'react-router-dom'
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 import { UseQueryResult } from 'react-query'
 >>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
@@ -13,6 +14,9 @@ import {
   useAllCommandsQuery,
   useDeleteRunMutation,
 } from '@opentrons/react-api-client'
+=======
+import { useDeleteRunMutation } from '@opentrons/react-api-client'
+>>>>>>> 35c581fe07 (refactor(app): migrate /runs/:runId/commands to notifications (#15139))
 import { i18n } from '../../../i18n'
 import runRecord from '../../../organisms/RunDetails/__fixtures__/runRecord.json'
 import { useDownloadRunLog, useTrackProtocolRunEvent, useRobot } from '../hooks'
@@ -25,6 +29,7 @@ import { mockConnectableRobot } from '../../../redux/discovery/__fixtures__'
 import { getRobotUpdateDisplayInfo } from '../../../redux/robot-update'
 import { useIsEstopNotDisengaged } from '../../../resources/devices/hooks/useIsEstopNotDisengaged'
 import { HistoricalProtocolRunOverflowMenu } from '../HistoricalProtocolRunOverflowMenu'
+import { useNotifyAllCommandsQuery } from '../../../resources/runs'
 
 import type { UseQueryResult } from 'react-query'
 import type { CommandsData } from '@opentrons/api-client'
@@ -36,6 +41,7 @@ vi.mock('../../RunTimeControl/hooks')
 vi.mock('../../../redux/analytics')
 vi.mock('../../../redux/config')
 vi.mock('../../../resources/devices/hooks/useIsEstopNotDisengaged')
+vi.mock('../../../resources/runs')
 vi.mock('@opentrons/react-api-client')
 
 const render = (
@@ -91,7 +97,7 @@ describe('HistoricalProtocolRunOverflowMenu', () => {
         isStopRunActionLoading: false,
         isResetRunLoading: false,
       })
-    when(useAllCommandsQuery)
+    when(useNotifyAllCommandsQuery)
       .calledWith(
         RUN_ID,
         {

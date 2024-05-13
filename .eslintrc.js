@@ -49,13 +49,13 @@ module.exports = {
             importNames: [
               'useAllRunsQuery',
               'useRunQuery',
-              'useLastRunCommandKey',
+              'useAllCommandsQuery',
               'useCurrentMaintenanceRun',
               'useDeckConfigurationQuery',
               'useAllCommandsAsPreSerializedList',
             ],
             message:
-              'The HTTP hook is deprecated. Utilize the equivalent notification wrapper (useNotifyX) instead.',
+              'HTTP hook deprecated. Use the equivalent notification wrapper (useNotifyXYZ).',
           },
         ],
       },

@@ -22,7 +22,6 @@ import {
 
 import { useMostRecentCompletedAnalysis } from '../LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import {
-  useNotifyLastRunCommand,
   useNotifyAllCommandsAsPreSerializedList,
   useNotifyRunQuery,
 } from '../../resources/runs'
@@ -32,6 +31,7 @@ import { NAV_BAR_WIDTH } from '../../App/constants'
 import { CommandIcon } from './CommandIcon'
 import { useRunStatus } from '../RunTimeControl/hooks'
 import { getCommandTextData } from '../CommandText/utils/getCommandTextData'
+import { useLastRunCommand } from '../Devices/hooks/useLastRunCommand'
 
 import type { RunStatus } from '@opentrons/api-client'
 import type { RobotType } from '@opentrons/shared-data'
@@ -74,7 +74,7 @@ export const RunPreviewComponent = (
   )
   const commandsFromQuery = commandsFromQueryResponse?.data
   const viewPortRef = React.useRef<HTMLDivElement | null>(null)
-  const currentRunCommandKey = useNotifyLastRunCommand(runId, {
+  const currentRunCommandKey = useLastRunCommand(runId, {
     refetchInterval: LIVE_RUN_COMMANDS_POLL_MS,
   })?.key
   const [

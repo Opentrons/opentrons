@@ -3,10 +3,8 @@ import { when } from 'vitest-when'
 import { screen } from '@testing-library/react'
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import '@testing-library/jest-dom/vitest'
-import {
-  useAllCommandsQuery,
-  useCommandQuery,
-} from '@opentrons/react-api-client'
+
+import { useCommandQuery } from '@opentrons/react-api-client'
 import {
   RUN_STATUS_IDLE,
   RUN_STATUS_RUNNING,
@@ -20,8 +18,8 @@ import { ProgressBar } from '../../../atoms/ProgressBar'
 import { useRunStatus } from '../../RunTimeControl/hooks'
 import { useMostRecentCompletedAnalysis } from '../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import {
-  useNotifyLastRunCommand,
   useNotifyRunQuery,
+  useNotifyAllCommandsQuery,
 } from '../../../resources/runs'
 import { useDownloadRunLog } from '../../Devices/hooks'
 import {
@@ -40,13 +38,14 @@ import { RunProgressMeter } from '..'
 import { useNotifyRunQuery } from '../../../resources/runs/useNotifyRunQuery'
 >>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
 import { renderWithProviders } from '../../../__testing-utils__'
+import { useLastRunCommand } from '../../Devices/hooks/useLastRunCommand'
+
 import type * as ApiClient from '@opentrons/react-api-client'
 
 vi.mock('@opentrons/react-api-client', async importOriginal => {
   const actual = await importOriginal<typeof ApiClient>()
   return {
     ...actual,
-    useAllCommandsQuery: vi.fn(),
     useCommandQuery: vi.fn(),
   }
 })
@@ -57,6 +56,7 @@ vi.mock('../../../resources/runs')
 vi.mock('../../Devices/hooks')
 vi.mock('../../../atoms/ProgressBar')
 vi.mock('../../InterventionModal')
+<<<<<<< HEAD
 =======
 vi.mock('../../../resources/runs/useNotifyLastRunCommandKey')
 vi.mock('../../Devices/hooks')
@@ -64,6 +64,9 @@ vi.mock('../../../atoms/ProgressBar')
 vi.mock('../../InterventionModal')
 vi.mock('../../../resources/runs/useNotifyRunQuery')
 >>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
+=======
+vi.mock('../../Devices/hooks/useLastRunCommand')
+>>>>>>> 35c581fe07 (refactor(app): migrate /runs/:runId/commands to notifications (#15139))
 
 const render = (props: React.ComponentProps<typeof RunProgressMeter>) => {
   return renderWithProviders(<RunProgressMeter {...props} />, {
@@ -85,7 +88,7 @@ describe('RunProgressMeter', () => {
     when(useMostRecentCompletedAnalysis)
       .calledWith(NON_DETERMINISTIC_RUN_ID)
       .thenReturn(null)
-    when(useAllCommandsQuery)
+    when(useNotifyAllCommandsQuery)
       .calledWith(NON_DETERMINISTIC_RUN_ID, { cursor: null, pageLength: 1 })
       .thenReturn(mockUseAllCommandsResponseNonDeterministic)
     when(useCommandQuery)
@@ -96,7 +99,11 @@ describe('RunProgressMeter', () => {
       isRunLogLoading: false,
     })
 <<<<<<< HEAD
+<<<<<<< HEAD
     when(useNotifyLastRunCommand)
+=======
+    when(useLastRunCommand)
+>>>>>>> 35c581fe07 (refactor(app): migrate /runs/:runId/commands to notifications (#15139))
       .calledWith(NON_DETERMINISTIC_RUN_ID, { refetchInterval: 1000 })
       .thenReturn({ key: NON_DETERMINISTIC_COMMAND_KEY } as RunCommandSummary)
 =======
@@ -130,7 +137,7 @@ describe('RunProgressMeter', () => {
     screen.getByText('Download run log')
   })
   it('should render an intervention modal when lastRunCommand is a pause command', () => {
-    vi.mocked(useAllCommandsQuery).mockReturnValue({
+    vi.mocked(useNotifyAllCommandsQuery).mockReturnValue({
       data: { data: [mockPauseCommandWithStartTime], meta: { totalLength: 1 } },
     } as any)
     vi.mocked(useNotifyRunQuery).mockReturnValue({
@@ -142,7 +149,7 @@ describe('RunProgressMeter', () => {
   })
 
   it('should render an intervention modal when lastRunCommand is a move labware command', () => {
-    vi.mocked(useAllCommandsQuery).mockReturnValue({
+    vi.mocked(useNotifyAllCommandsQuery).mockReturnValue({
       data: {
         data: [mockMoveLabwareCommandFromSlot],
         meta: { totalLength: 1 },
