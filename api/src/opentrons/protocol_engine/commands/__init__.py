@@ -333,7 +333,6 @@ __all__ = [
     "CommandPrivateResult",
     # base interfaces
     "AbstractCommandImpl",
-    "AbstractCommandWithPrivateResultImpl",
     "BaseCommand",
     "BaseCommandCreate",
     "CommandStatus",
