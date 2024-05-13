@@ -39,7 +39,7 @@ def create_chat_completion() -> Response[ChatResponse] | Response[InternalServer
                 content_type=content_types.APPLICATION_JSON,
                 body=ChatResponse(reply="Fake response", fake=body.fake),
             )
-        settings: Settings = Settings()
+        settings: Settings = Settings.build()
         openai: OpenAIPredict = OpenAIPredict(settings=settings)
         response = openai.predict(prompt=body.message)
         if response is None or response == "":

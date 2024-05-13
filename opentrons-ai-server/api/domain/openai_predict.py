@@ -6,12 +6,6 @@ from openai.types.chat import ChatCompletion, ChatCompletionMessage, ChatComplet
 from api.domain.prompts import system_notes
 from api.settings import Settings, is_running_on_lambda
 
-if not is_running_on_lambda():
-    # we are on the local machine and want to use a development package
-    # rich to pretty print the output
-    from rich import print
-    from rich.prompt import Prompt
-
 
 class OpenAIPredict:
     def __init__(self, settings: Settings) -> None:
@@ -44,7 +38,13 @@ class OpenAIPredict:
 
 
 def main() -> None:
-    settings = Settings()
+    """Intended for testing this class locally."""
+    if is_running_on_lambda():
+        return
+    from rich import print
+    from rich.prompt import Prompt
+
+    settings = Settings.build()
     openai = OpenAIPredict(settings)
     prompt = Prompt.ask("Type a prompt to send to the OpenAI API:")
     completion = openai.predict(prompt)

@@ -43,6 +43,14 @@ class Client:
         headers = self.standard_headers if not bad_auth else self.invalid_auth_headers
         return self.httpx.post("/chat/completion", headers=headers, json=request.model_dump())
 
+    def get_bad_endpoint(self, bad_auth: bool = False) -> Response:
+        """Call nonexistent endpoint and return the response."""
+        headers = self.standard_headers if not bad_auth else self.invalid_auth_headers
+        return self.httpx.get(
+            "/chat/idontexist",
+            headers=headers,
+        )
+
 
 def print_response(response: Response) -> None:
     """Prints the HTTP response using rich."""
