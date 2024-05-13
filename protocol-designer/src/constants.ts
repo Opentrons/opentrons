@@ -14,7 +14,12 @@ import {
   MAGNETIC_BLOCK_TYPE,
   MAGNETIC_BLOCK_V1,
 } from '@opentrons/shared-data'
-import type { LabwareDefinition2, DeckSlot as DeckDefSlot, ModuleType, ModuleModel } from '@opentrons/shared-data'
+import type {
+  LabwareDefinition2,
+  DeckSlot as DeckDefSlot,
+  ModuleType,
+  ModuleModel,
+} from '@opentrons/shared-data'
 import type { DeckSlot, WellVolumes } from './types'
 
 export const getMaxVolumes = (def: LabwareDefinition2): WellVolumes =>

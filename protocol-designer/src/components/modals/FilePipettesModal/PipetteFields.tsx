@@ -2,11 +2,7 @@ import * as React from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
 import isEmpty from 'lodash/isEmpty'
-import {
-  FormGroup,
-  PipetteSelect,
-  OutlineButton,
-} from '@opentrons/components'
+import { FormGroup, PipetteSelect, OutlineButton } from '@opentrons/components'
 import {
   getIncompatiblePipetteNames,
   OT2_PIPETTES,

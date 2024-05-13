@@ -39,7 +39,10 @@ import type {
   ToggleStepCollapsedAction,
   SelectMultipleStepsAction,
 } from '../ui/steps'
-import type { StepItemContentsProps, StepItemProps } from '../components/steplist/StepItem'
+import type {
+  StepItemContentsProps,
+  StepItemProps,
+} from '../components/steplist/StepItem'
 import type { DeleteModalType } from '../components/modals/ConfirmDeleteModal'
 import type { SubstepIdentifier } from '../steplist/types'
 import type { StepIdType } from '../form-types'

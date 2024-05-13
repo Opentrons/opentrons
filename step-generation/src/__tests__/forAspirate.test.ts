@@ -10,7 +10,11 @@ import { AIR, createTipLiquidState } from '../utils/misc'
 import { makeImmutableStateUpdater } from '../__utils__'
 import { forAspirate as _forAspirate } from '../getNextRobotStateAndWarnings/forAspirate'
 import * as warningCreators from '../warningCreators'
-import type { CommandCreatorWarning, InvariantContext, RobotState } from '../types'
+import type {
+  CommandCreatorWarning,
+  InvariantContext,
+  RobotState,
+} from '../types'
 import type { AspDispAirgapParams } from '@opentrons/shared-data/lib/protocol/types/schemaV6/command/pipetting'
 
 const forAspirate = makeImmutableStateUpdater(_forAspirate)

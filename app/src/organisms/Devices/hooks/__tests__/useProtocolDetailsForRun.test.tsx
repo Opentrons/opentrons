@@ -2,7 +2,10 @@ import { vi, it, expect, describe, beforeEach } from 'vitest'
 import { when } from 'vitest-when'
 import { renderHook } from '@testing-library/react'
 import { OT2_ROBOT_TYPE } from '@opentrons/shared-data'
-import { useProtocolAnalysisAsDocumentQuery, useProtocolQuery } from '@opentrons/react-api-client'
+import {
+  useProtocolAnalysisAsDocumentQuery,
+  useProtocolQuery,
+} from '@opentrons/react-api-client'
 import { useProtocolDetailsForRun } from '..'
 import { useNotifyRunQuery } from '../../../../resources/runs'
 import { RUN_ID_2 } from '../../../RunTimeControl/__fixtures__'

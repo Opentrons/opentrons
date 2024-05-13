@@ -5,7 +5,12 @@ import { act, renderHook, waitFor } from '@testing-library/react'
 import { deleteCalibration } from '@opentrons/api-client'
 import { useHost } from '../../api'
 import { useDeleteCalibrationMutation } from '..'
-import type { DeleteCalRequestParams, HostConfig, Response, EmptyResponse } from '@opentrons/api-client'
+import type {
+  DeleteCalRequestParams,
+  HostConfig,
+  Response,
+  EmptyResponse,
+} from '@opentrons/api-client'
 
 vi.mock('@opentrons/api-client')
 vi.mock('../../api/useHost')

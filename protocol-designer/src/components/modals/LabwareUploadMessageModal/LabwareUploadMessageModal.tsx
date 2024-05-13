@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
 
 import cx from 'classnames'
-import { AlertModal, OutlineButton} from '@opentrons/components'
+import { AlertModal, OutlineButton } from '@opentrons/components'
 import modalStyles from '../modal.module.css'
 import {
   selectors as labwareDefSelectors,

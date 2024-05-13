@@ -29,7 +29,11 @@ import { getLabwareOnSlot, getSlotIsEmpty } from '../../../step-forms'
 import { getInitialDeckSetup } from '../../../step-forms/selectors'
 import { getLabwareIsCompatible } from '../../../utils/labwareModuleCompatibility'
 import { PDAlert } from '../../alerts/PDAlert'
-import type { DeckConfiguration, CutoutId, ModuleType } from '@opentrons/shared-data'
+import type {
+  DeckConfiguration,
+  CutoutId,
+  ModuleType,
+} from '@opentrons/shared-data'
 import type { Control, ControllerRenderProps } from 'react-hook-form'
 import type { ModuleOnDeck } from '../../../step-forms'
 
@@ -84,13 +88,13 @@ const EditMultipleModulesModalComponent = (
   const mappedModules: DeckConfiguration =
     moduleLocations != null
       ? moduleLocations.flatMap(location => {
-        return [
-          {
-            cutoutId: location as CutoutId,
-            cutoutFixtureId: TEMPERATURE_MODULE_V2_FIXTURE,
-          },
-        ]
-      })
+          return [
+            {
+              cutoutId: location as CutoutId,
+              cutoutFixtureId: TEMPERATURE_MODULE_V2_FIXTURE,
+            },
+          ]
+        })
       : []
   const STANDARD_EMPTY_SLOTS: DeckConfiguration = TEMPERATURE_MODULE_CUTOUTS.map(
     cutoutId => ({
@@ -154,7 +158,8 @@ const EditMultipleModulesModalComponent = (
     occupiedCutout => occupiedCutout.slot.split('cutout')[1]
   )
   const alertDescription = t(
-    `alert:module_placement.SLOTS_OCCUPIED.${occupiedSlots.length === 1 ? 'single' : 'multi'
+    `alert:module_placement.SLOTS_OCCUPIED.${
+      occupiedSlots.length === 1 ? 'single' : 'multi'
     }`,
     {
       slotName: occupiedSlots,

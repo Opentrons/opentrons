@@ -36,10 +36,10 @@ import type {
   LabwareEntity,
   LabwareEntities,
   ModuleEntities,
-  PipetteEntities
+  PipetteEntities,
 } from '@opentrons/step-generation'
-import type { PipetteName, LabwareDefinition2, } from '@opentrons/shared-data'
-import type { 
+import type { PipetteName, LabwareDefinition2 } from '@opentrons/shared-data'
+import type {
   InstrumentGroup,
   DropdownOption,
   Mount,
@@ -50,7 +50,10 @@ import type { LabwareDefByDefURI } from '../../labware-defs'
 import type { FormWarning } from '../../steplist/formLevel'
 import type { BaseState, DeckSlot } from '../../types'
 import type { FormData, StepIdType } from '../../form-types'
-import type { StepArgsAndErrorsById, StepFormErrors } from '../../steplist/types'
+import type {
+  StepArgsAndErrorsById,
+  StepFormErrors,
+} from '../../steplist/types'
 import type {
   InitialDeckSetup,
   NormalizedLabwareById,
@@ -72,7 +75,6 @@ import type {
   SavedStepFormState,
   BatchEditFormChangesState,
 } from '../reducers'
-
 
 const rootSelector = (state: BaseState): RootState => state.stepForms
 

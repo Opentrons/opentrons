@@ -7,11 +7,7 @@ import type {
   UseMutateFunction,
   UseMutationOptions,
 } from 'react-query'
-import type {
-  HostConfig,
-  CreateRunData,
-  Run,
-} from '@opentrons/api-client'
+import type { HostConfig, CreateRunData, Run } from '@opentrons/api-client'
 
 export type UseCreateRunMutationResult = UseMutationResult<
   Run,

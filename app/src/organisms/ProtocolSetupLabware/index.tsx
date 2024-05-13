@@ -54,8 +54,8 @@ import type {
   HeaterShakerOpenLatchCreateCommand,
   LabwareDefinition2,
   LabwareLocation,
-  LoadLabwareRunTimeCommand, 
-  RunTimeCommand
+  LoadLabwareRunTimeCommand,
+  RunTimeCommand,
 } from '@opentrons/shared-data'
 import type { HeaterShakerModule, Modules } from '@opentrons/api-client'
 import type { LabwareSetupItem } from '../../pages/Protocols/utils'

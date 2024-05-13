@@ -74,7 +74,9 @@ export function OverflowMenu({
   } = useMenuHandleClickOutside()
 
   const calsOverflowWrapperRef = useOnClickOutside<HTMLDivElement>({
-    onClickOutside: () => { setShowOverflowMenu(false) },
+    onClickOutside: () => {
+      setShowOverflowMenu(false)
+    },
   })
   const pipetteOffsetCalibrations = useAllPipetteOffsetCalibrationsQuery().data
     ?.data
@@ -184,7 +186,9 @@ export function OverflowMenu({
         <PipetteWizardFlows
           flowType={FLOWS.CALIBRATE}
           mount={mount}
-          closeFlow={() => { setShowPipetteWizardFlows(false) }}
+          closeFlow={() => {
+            setShowPipetteWizardFlows(false)
+          }}
           selectedPipette={selectedPipette}
           onComplete={() => {
             setSelectedPipette(SINGLE_MOUNT_PIPETTES)

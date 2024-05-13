@@ -27,10 +27,7 @@ import {
   TROUGH_LABWARE,
   tiprackWellNamesFlat,
 } from './data'
-import {
-  TEMPERATURE_DEACTIVATED,
-  FIXED_TRASH_ID,
-} from '../constants'
+import { TEMPERATURE_DEACTIVATED, FIXED_TRASH_ID } from '../constants'
 
 import type {
   TEMPERATURE_APPROACHING_TARGET,

@@ -40,7 +40,7 @@ import { ModuleSetupModal } from './ModuleSetupModal'
 
 import type { HeaterShakerModule, LatchStatus } from '../../redux/modules/types'
 import type {
-  CreateCommand, 
+  CreateCommand,
   HeaterShakerCloseLatchCreateCommand,
   HeaterShakerDeactivateShakerCreateCommand,
   HeaterShakerSetAndWaitForShakeSpeedCreateCommand,

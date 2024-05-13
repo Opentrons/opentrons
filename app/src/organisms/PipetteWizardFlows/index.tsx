@@ -39,7 +39,11 @@ import { Carriage } from './Carriage'
 import { MountingPlate } from './MountingPlate'
 import { UnskippableModal } from './UnskippableModal'
 
-import type { LoadedPipette, CreateCommand, PipetteMount } from '@opentrons/shared-data'
+import type {
+  LoadedPipette,
+  CreateCommand,
+  PipetteMount,
+} from '@opentrons/shared-data'
 import type { CommandData, HostConfig } from '@opentrons/api-client'
 import type { PipetteWizardFlow, SelectablePipettes } from './types'
 

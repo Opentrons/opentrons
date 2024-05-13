@@ -13,7 +13,7 @@ import {
 import { Box, Flex, Text } from '../../primitives'
 import { TYPOGRAPHY, SPACING } from '../../ui-style-constants'
 import { COLORS } from '../../helix-design-system'
-import type {LabwareDefinition2 } from '@opentrons/shared-data'
+import type { LabwareDefinition2 } from '@opentrons/shared-data'
 
 const labwareDisplayNameStyle = css`
   ${TYPOGRAPHY.labelSemiBold}

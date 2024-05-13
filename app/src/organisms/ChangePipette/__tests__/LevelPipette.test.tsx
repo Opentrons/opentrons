@@ -2,7 +2,7 @@ import * as React from 'react'
 import { vi, it, describe, expect, beforeEach } from 'vitest'
 import { fireEvent } from '@testing-library/react'
 
-import { LEFT} from '@opentrons/shared-data'
+import { LEFT } from '@opentrons/shared-data'
 import {
   nestedTextMatcher,
   renderWithProviders,

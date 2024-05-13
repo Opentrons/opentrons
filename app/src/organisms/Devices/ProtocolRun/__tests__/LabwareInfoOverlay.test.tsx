@@ -1,7 +1,10 @@
 import * as React from 'react'
 import { when } from 'vitest-when'
 import { describe, it, beforeEach, vi, afterEach, expect } from 'vitest'
-import { getLabwareDisplayName, fixtureTiprack300ul } from '@opentrons/shared-data'
+import {
+  getLabwareDisplayName,
+  fixtureTiprack300ul,
+} from '@opentrons/shared-data'
 import {
   nestedTextMatcher,
   renderWithProviders,
@@ -12,7 +15,11 @@ import { getLabwareLocation } from '../utils/getLabwareLocation'
 import { LabwareInfoOverlay } from '../LabwareInfoOverlay'
 import { getLabwareDefinitionUri } from '../utils/getLabwareDefinitionUri'
 import { useLabwareOffsetForLabware } from '../useLabwareOffsetForLabware'
-import type { LabwareDefinition2, ProtocolFile, LoadedLabware } from '@opentrons/shared-data'
+import type {
+  LabwareDefinition2,
+  ProtocolFile,
+  LoadedLabware,
+} from '@opentrons/shared-data'
 
 vi.mock('../../../ProtocolUpload/hooks')
 vi.mock('../utils/getLabwareLocation')

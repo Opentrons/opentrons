@@ -13,7 +13,11 @@ import {
   getLiquidDisplayName,
 } from './utils'
 
-import type { RunTimeCommand, RobotType, LoadLabwareRunTimeCommand  } from '@opentrons/shared-data'
+import type {
+  RunTimeCommand,
+  RobotType,
+  LoadLabwareRunTimeCommand,
+} from '@opentrons/shared-data'
 import type { CommandTextData } from './types'
 
 interface LoadCommandTextProps {

@@ -8,9 +8,9 @@ import {
 } from '../../../constants'
 import { getOrderedWells } from '../../utils'
 import { getMixDelayData } from './getDelayData'
-import { type HydratedMixFormDataLegacy } from '../../../form-types'
-import { type MixArgs } from '@opentrons/step-generation'
 import { getMatchingTipLiquidSpecs } from '../../../utils'
+import type { HydratedMixFormDataLegacy } from '../../../form-types'
+import type { MixArgs } from '@opentrons/step-generation'
 type MixStepArgs = MixArgs
 export const mixFormToArgs = (
   hydratedFormData: HydratedMixFormDataLegacy

@@ -15,7 +15,11 @@ import { getAllWellsForLabware, getMaxVolumes } from '../../constants'
 import { getWellContentsAllLabware } from './getWellContentsAllLabware'
 import type * as StepGeneration from '@opentrons/step-generation'
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
-import type { WellContents, WellContentsByLabware, ContentsByWell, } from '../../labware-ingred/types'
+import type {
+  WellContents,
+  WellContentsByLabware,
+  ContentsByWell,
+} from '../../labware-ingred/types'
 import type { Selector } from '../../types'
 
 export { getWellContentsAllLabware }

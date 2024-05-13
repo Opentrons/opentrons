@@ -21,7 +21,7 @@ import {
   SOURCE_LABWARE,
 } from '../fixtures'
 import { dispense } from '../commandCreators/atomic/dispense'
-import type { ExtendedDispenseParams, } from '../commandCreators/atomic/dispense'
+import type { ExtendedDispenseParams } from '../commandCreators/atomic/dispense'
 import type { InvariantContext, RobotState } from '../types'
 
 vi.mock('../utils/thermocyclerPipetteCollision')

@@ -20,9 +20,7 @@ import {
 import { makeAutofillOnChange } from './utils/makeAutofillOnChange'
 import { labwareDefToFields } from './labwareDefToFields'
 import { labwareFormSchema } from './labwareFormSchema'
-import {
-  formLevelValidation,
-} from './formLevelValidation'
+import { formLevelValidation } from './formLevelValidation'
 import { fieldsToLabware } from './fieldsToLabware'
 import { LabwareCreator as LabwareCreatorComponent } from './components/LabwareCreator'
 import { Dropdown } from './components/Dropdown'
@@ -54,7 +52,12 @@ import styles from './styles.module.css'
 
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import type { LabwareCreatorErrors } from './formLevelValidation'
-import type { FormStatus, ImportError, LabwareFields, ProcessedLabwareFields } from './fields'
+import type {
+  FormStatus,
+  ImportError,
+  LabwareFields,
+  ProcessedLabwareFields,
+} from './fields'
 
 const ajv = new Ajv()
 const validateLabwareSchema = ajv.compile(labwareSchema)

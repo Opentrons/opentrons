@@ -7,7 +7,11 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 
-import { getLabwareDisplayName, getModuleType, HEATERSHAKER_MODULE_TYPE } from '@opentrons/shared-data'
+import {
+  getLabwareDisplayName,
+  getModuleType,
+  HEATERSHAKER_MODULE_TYPE,
+} from '@opentrons/shared-data'
 import { UnorderedList } from '../../molecules/UnorderedList'
 import {
   getLabwareDef,

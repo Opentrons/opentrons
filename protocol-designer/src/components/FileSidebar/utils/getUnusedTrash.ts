@@ -1,4 +1,8 @@
-import { FIXED_TRASH_ID, MOVABLE_TRASH_ADDRESSABLE_AREAS, WASTE_CHUTE_ADDRESSABLE_AREAS } from '@opentrons/shared-data'
+import {
+  FIXED_TRASH_ID,
+  MOVABLE_TRASH_ADDRESSABLE_AREAS,
+  WASTE_CHUTE_ADDRESSABLE_AREAS,
+} from '@opentrons/shared-data'
 import type { AddressableAreaName, CreateCommand } from '@opentrons/shared-data'
 import type { InitialDeckSetup } from '../../../step-forms'
 

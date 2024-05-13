@@ -1,5 +1,8 @@
 import values from 'lodash/values'
-import { MAGNETIC_MODULE_V1, getLabwareDefaultEngageHeight } from '@opentrons/shared-data'
+import {
+  MAGNETIC_MODULE_V1,
+  getLabwareDefaultEngageHeight,
+} from '@opentrons/shared-data'
 import type { Options } from '@opentrons/components'
 import type { ModuleType } from '@opentrons/shared-data'
 import type {

@@ -9,9 +9,7 @@ import {
   LabeledValue,
   WELL_LABEL_OPTIONS,
 } from '@opentrons/components'
-import {
-  sortWells,
-} from '@opentrons/shared-data'
+import { sortWells } from '@opentrons/shared-data'
 
 import { arrayToWellGroup } from '../../../../utils'
 import * as wellContentsSelectors from '../../../../top-selectors/well-contents'

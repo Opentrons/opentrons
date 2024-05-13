@@ -4,7 +4,10 @@ import { LabwarePositionCheckComponent } from './LabwarePositionCheckComponent'
 import { FatalErrorModal } from './FatalErrorModal'
 
 import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
-import type { CompletedProtocolAnalysis, RobotType } from '@opentrons/shared-data'
+import type {
+  CompletedProtocolAnalysis,
+  RobotType,
+} from '@opentrons/shared-data'
 import type { LabwareOffset } from '@opentrons/api-client'
 
 interface LabwarePositionCheckModalProps {

@@ -1,17 +1,12 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import cx from 'classnames'
-import {
-  Tooltip,
-  useHoverTooltip,
-  TOOLTIP_FIXED,
-} from '@opentrons/components'
+import { Tooltip, useHoverTooltip, TOOLTIP_FIXED } from '@opentrons/components'
 import { PDListItem } from '../lists'
 import { LabwareTooltipContents } from './LabwareTooltipContents'
 import styles from './StepItem.module.css'
 import type { UseHoverTooltipTargetProps } from '@opentrons/components'
 import type { ModuleType } from '@opentrons/shared-data'
-
 
 export interface ModuleStepItemRowProps {
   label?: string | null

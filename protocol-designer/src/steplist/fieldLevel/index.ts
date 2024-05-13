@@ -36,7 +36,7 @@ import {
   MAX_TC_PROFILE_VOLUME,
 } from '../../constants'
 import { getStagingAreaAddressableAreas } from '../../utils'
-import type  {
+import type {
   LabwareEntity,
   PipetteEntity,
   InvariantContext,

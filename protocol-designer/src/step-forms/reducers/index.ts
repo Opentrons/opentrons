@@ -49,7 +49,10 @@ import {
 } from '../utils'
 
 import type { Reducer } from 'redux'
-import type { NormalizedAdditionalEquipmentById, NormalizedPipetteById } from '@opentrons/step-generation'
+import type {
+  NormalizedAdditionalEquipmentById,
+  NormalizedPipetteById,
+} from '@opentrons/step-generation'
 import type {
   LoadLabwareCreateCommand,
   LoadModuleCreateCommand,

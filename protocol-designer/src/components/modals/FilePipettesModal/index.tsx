@@ -42,8 +42,15 @@ import { adapter96ChannelDefUri } from '../CreateFileWizard'
 import { StepChangesConfirmModal } from '../EditPipettesModal/StepChangesConfirmModal'
 import { PipetteFields } from './PipetteFields'
 
-import type { ModuleType, ModuleModel, PipetteName } from '@opentrons/shared-data'
-import type { LabwareEntities, NormalizedPipette } from '@opentrons/step-generation'
+import type {
+  ModuleType,
+  ModuleModel,
+  PipetteName,
+} from '@opentrons/shared-data'
+import type {
+  LabwareEntities,
+  NormalizedPipette,
+} from '@opentrons/step-generation'
 import type { NewProtocolFields } from '../../../load-file'
 import type {
   PipetteOnDeck,

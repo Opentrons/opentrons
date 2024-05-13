@@ -15,7 +15,10 @@ import attachProbe8 from '../../assets/videos/pipette-wizard-flows/Pipette_Attac
 import attachProbe96 from '../../assets/videos/pipette-wizard-flows/Pipette_Attach_Probe_96.webm'
 import { GenericWizardTile } from '../../molecules/GenericWizardTile'
 
-import type  { CompletedProtocolAnalysis, CreateCommand } from '@opentrons/shared-data'
+import type {
+  CompletedProtocolAnalysis,
+  CreateCommand,
+} from '@opentrons/shared-data'
 import type { LabwareOffset } from '@opentrons/api-client'
 import type { Jog } from '../../molecules/JogControls/types'
 import type { useChainRunCommands } from '../../resources/runs'

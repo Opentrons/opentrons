@@ -5,7 +5,10 @@ import {
   getAllDefinitions as _getAllDefinitions,
   getAllLegacyDefinitions,
 } from '@opentrons/shared-data'
-import type { LabwareDefinition1, LabwareDefinition2 } from '@opentrons/shared-data'
+import type {
+  LabwareDefinition1,
+  LabwareDefinition2,
+} from '@opentrons/shared-data'
 import type { LabwareDefByDefURI } from './types'
 
 export function getLegacyLabwareDef(

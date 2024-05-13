@@ -1,4 +1,8 @@
-import { SPAN7_8_10_11_SLOT, THERMOCYCLER_MODULE_V1, getModuleDef2 } from '@opentrons/shared-data'
+import {
+  SPAN7_8_10_11_SLOT,
+  THERMOCYCLER_MODULE_V1,
+  getModuleDef2,
+} from '@opentrons/shared-data'
 
 import type { RunData } from '@opentrons/api-client'
 import type {

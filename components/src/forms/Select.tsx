@@ -10,10 +10,9 @@ import type {
   Props as ReactSelectProps,
   MenuProps,
   StylesConfig,
-  CSSObjectWithLabel
+  CSSObjectWithLabel,
 } from 'react-select'
 import type { POSITION_ABSOLUTE, POSITION_FIXED } from '../styles'
-
 
 export { reactSelectComponents }
 

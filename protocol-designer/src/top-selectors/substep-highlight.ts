@@ -7,7 +7,10 @@ import { selectors as fileDataSelectors } from '../file-data'
 import { getHoveredStepId, getHoveredSubstep } from '../ui/steps'
 import { getWellSetForMultichannel } from '../utils'
 import type { WellGroup } from '@opentrons/components'
-import type { NozzleConfigurationStyle, CreateCommand } from '@opentrons/shared-data'
+import type {
+  NozzleConfigurationStyle,
+  CreateCommand,
+} from '@opentrons/shared-data'
 import type { PipetteEntity, LabwareEntity } from '@opentrons/step-generation'
 import type { Selector } from '../types'
 import type { SubstepItemData } from '../steplist/types'

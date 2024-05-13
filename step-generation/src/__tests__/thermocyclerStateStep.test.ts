@@ -1,7 +1,5 @@
 import { describe, it, expect, vi, afterEach } from 'vitest'
-import {
-  thermocyclerStateDiff as actualThermocyclerStateDiff,
-} from '../utils/thermocyclerStateDiff'
+import { thermocyclerStateDiff as actualThermocyclerStateDiff } from '../utils/thermocyclerStateDiff'
 import { thermocyclerStateStep } from '../commandCreators/compound/thermocyclerStateStep'
 import { getStateAndContextTempTCModules, getSuccessResult } from '../fixtures'
 

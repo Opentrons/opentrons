@@ -1,8 +1,4 @@
-import {
-  useState,
-  useEffect,
-  useRef,
-} from 'react'
+import { useState, useEffect, useRef } from 'react'
 import interact from 'interactjs'
 import type PointerEvent from 'interactjs'
 import type { CSSProperties, MutableRefObject } from 'react'

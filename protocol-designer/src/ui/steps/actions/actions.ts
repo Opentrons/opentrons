@@ -8,7 +8,7 @@ import type { Timeline } from '@opentrons/step-generation'
 import type { StepIdType, StepType } from '../../../form-types'
 import type { GetState, ThunkAction, ThunkDispatch } from '../../../types'
 import type { AnalyticsEvent } from '../../../analytics/mixpanel'
-import type { AnalyticsEventAction, } from '../../../analytics/actions'
+import type { AnalyticsEventAction } from '../../../analytics/actions'
 import type { TerminalItemId, SubstepIdentifier } from '../../../steplist/types'
 import type {
   AddStepAction,

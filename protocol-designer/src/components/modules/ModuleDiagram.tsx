@@ -24,10 +24,7 @@ import thermocycler from '../../images/modules/thermocycler.png'
 import thermocycler_gen2 from '../../images/modules/thermocycler_gen2.png'
 import heater_shaker_module_transparent from '../../images/modules/heater_shaker_module_transparent.png'
 import mag_block from '../../images/modules/mag_block.png'
-import type {
-  ModuleType,
-  ModuleModel,
-} from '@opentrons/shared-data'
+import type { ModuleType, ModuleModel } from '@opentrons/shared-data'
 
 interface Props {
   type: ModuleType

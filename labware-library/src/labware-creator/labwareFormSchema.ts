@@ -19,10 +19,7 @@ import {
   REQUIRED_FIELD_ERROR,
   MUST_BE_A_NUMBER_ERROR,
 } from './fields'
-import type {
-  LabwareFields,
-  ProcessedLabwareFields
-} from './fields'
+import type { LabwareFields, ProcessedLabwareFields } from './fields'
 
 // global overrides for Yup's default error messages.
 Yup.setLocale({

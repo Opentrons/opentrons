@@ -1,4 +1,8 @@
-import { RUN_ACTION_TYPE_PLAY, RUN_ACTION_TYPE_PAUSE, RUN_ACTION_TYPE_STOP } from '@opentrons/api-client'
+import {
+  RUN_ACTION_TYPE_PLAY,
+  RUN_ACTION_TYPE_PAUSE,
+  RUN_ACTION_TYPE_STOP,
+} from '@opentrons/api-client'
 import type { RunAction } from '@opentrons/api-client'
 
 export const mockPlayRunAction: RunAction = {

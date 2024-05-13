@@ -3,10 +3,7 @@ import { vi, describe, it, beforeEach, afterEach } from 'vitest'
 import { when } from 'vitest-when'
 import { render, screen } from '@testing-library/react'
 import '@testing-library/jest-dom/vitest'
-import {
-  getDefaultFormState,
-  getInitialStatus,
-} from '../../../fields'
+import { getDefaultFormState, getInitialStatus } from '../../../fields'
 import { isEveryFieldHidden } from '../../../utils'
 import { Export } from '../../sections/Export'
 import { wrapInFormik } from '../../utils/wrapInFormik'

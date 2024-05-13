@@ -13,7 +13,11 @@ import { DECK_CAL_STATUS_OK } from '../../../redux/calibration/constants'
 import { formatTimestamp } from '../utils'
 
 import type { PipetteName } from '@opentrons/shared-data'
-import type { SubTaskProps, TaskListProps, TaskProps } from '../../TaskList/types'
+import type {
+  SubTaskProps,
+  TaskListProps,
+  TaskProps,
+} from '../../TaskList/types'
 import type { AttachedPipette } from '../../../redux/pipettes/types'
 import type { DashboardCalOffsetInvoker } from '../../../pages/Devices/CalibrationDashboard/hooks/useDashboardCalibratePipOffset'
 import type { DashboardCalTipLengthInvoker } from '../../../pages/Devices/CalibrationDashboard/hooks/useDashboardCalibrateTipLength'

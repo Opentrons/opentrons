@@ -3,10 +3,7 @@ import { vi, describe, it, expect, beforeEach, afterEach } from 'vitest'
 import isEqual from 'lodash/isEqual'
 import { when } from 'vitest-when'
 import { render, screen } from '@testing-library/react'
-import {
-  getDefaultFormState,
-  yesNoOptions,
-} from '../../../fields'
+import { getDefaultFormState, yesNoOptions } from '../../../fields'
 import { isEveryFieldHidden, getLabwareName } from '../../../utils'
 import { Grid } from '../../sections/Grid'
 import { FormAlerts } from '../../alerts/FormAlerts'

@@ -34,9 +34,8 @@ import type {
   CutoutFixtureId,
   DeckDefinition,
   ModuleLocation,
-  RobotType
+  RobotType,
 } from '@opentrons/shared-data'
-
 
 export type DeckLocationSelectThemes = 'default' | 'grey'
 

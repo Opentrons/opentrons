@@ -23,7 +23,11 @@ import { useNotifyDeckConfigurationQuery } from '../../../../resources/deck_conf
 import { mockHeaterShaker } from '../../../../redux/modules/__fixtures__'
 
 import type { UseQueryResult } from 'react-query'
-import type { CompletedProtocolAnalysis, DeckConfiguration, LabwareDefinition2 } from '@opentrons/shared-data'
+import type {
+  CompletedProtocolAnalysis,
+  DeckConfiguration,
+  LabwareDefinition2,
+} from '@opentrons/shared-data'
 import type { Protocol } from '@opentrons/api-client'
 
 vi.mock('@opentrons/react-api-client')

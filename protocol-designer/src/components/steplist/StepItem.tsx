@@ -10,7 +10,7 @@ import {
   THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
 import { THERMOCYCLER_PROFILE, THERMOCYCLER_STATE } from '../../constants'
-import { stepIconsByType, PROFILE_CYCLE, } from '../../form-types'
+import { stepIconsByType, PROFILE_CYCLE } from '../../form-types'
 import {
   makeLidLabelText,
   makeSpeedText,

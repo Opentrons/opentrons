@@ -1,11 +1,7 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { useSelector, useDispatch } from 'react-redux'
-import {
-  Controller,
-  useForm,
-  useWatch,
-} from 'react-hook-form'
+import { Controller, useForm, useWatch } from 'react-hook-form'
 import {
   BUTTON_TYPE_SUBMIT,
   OutlineButton,

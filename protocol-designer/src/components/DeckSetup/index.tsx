@@ -14,9 +14,7 @@ import {
   WasteChuteFixture,
   WasteChuteStagingAreaFixture,
 } from '@opentrons/components'
-import {
-  MODULES_WITH_COLLISION_ISSUES,
-} from '@opentrons/step-generation'
+import { MODULES_WITH_COLLISION_ISSUES } from '@opentrons/step-generation'
 import {
   FLEX_ROBOT_TYPE,
   getAddressableAreaFromSlotId,
@@ -39,10 +37,7 @@ import { selectors as labwareDefSelectors } from '../../labware-defs'
 
 import { selectors as featureFlagSelectors } from '../../feature-flags'
 import { getStagingAreaAddressableAreas } from '../../utils'
-import {
-  getSlotIdsBlockedBySpanning,
-  getSlotIsEmpty,
-} from '../../step-forms'
+import { getSlotIdsBlockedBySpanning, getSlotIsEmpty } from '../../step-forms'
 import * as labwareIngredActions from '../../labware-ingred/actions'
 import { getDeckSetupForActiveItem } from '../../top-selectors/labware-locations'
 import { selectors as labwareIngredSelectors } from '../../labware-ingred/selectors'
@@ -61,7 +56,10 @@ import { Ot2ModuleTag } from './Ot2ModuleTag'
 import { SlotLabels } from './SlotLabels'
 import { getHasGen1MultiChannelPipette, getSwapBlocked } from './utils'
 
-import type { AdditionalEquipmentEntity, ModuleTemporalProperties } from '@opentrons/step-generation'
+import type {
+  AdditionalEquipmentEntity,
+  ModuleTemporalProperties,
+} from '@opentrons/step-generation'
 import type { StagingAreaLocation, TrashCutoutId } from '@opentrons/components'
 import type {
   AddressableAreaName,

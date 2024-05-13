@@ -5,7 +5,11 @@ import { getSelectedStepId } from '../ui/steps/selectors'
 import { PRESAVED_STEP_ID } from '../steplist/types'
 import type { FormWarning } from '../steplist'
 import type { BaseState, Selector } from '../types'
-import type { RootState, DismissedWarningsAllSteps, WarningType } from './reducers'
+import type {
+  RootState,
+  DismissedWarningsAllSteps,
+  WarningType,
+} from './reducers'
 export const rootSelector = (state: BaseState): RootState => state.dismiss
 export const getAllDismissedWarnings: Selector<any> = createSelector(
   rootSelector,

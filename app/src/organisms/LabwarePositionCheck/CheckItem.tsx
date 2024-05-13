@@ -32,7 +32,7 @@ import { getIsOnDevice } from '../../redux/config'
 import { getDisplayLocation } from './utils/getDisplayLocation'
 
 import type { LabwareOffset } from '@opentrons/api-client'
-import type { 
+import type {
   CompletedProtocolAnalysis,
   CreateCommand,
   LabwareLocation,

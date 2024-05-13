@@ -9,7 +9,7 @@ import type {
   //   createIrregularLabware,
   LabwareDefinition2,
   LabwareDisplayCategory,
-  LabwareWellProperties
+  LabwareWellProperties,
 } from '@opentrons/shared-data'
 
 // TODO Ian 2019-07-29: move this constant to shared-data?
@@ -48,16 +48,16 @@ export function fieldsToLabware(
     const wellProperties: LabwareWellProperties =
       fields.wellShape === 'circular'
         ? {
-          ...commonWellProperties,
-          shape: 'circular',
-          diameter: fields.wellDiameter,
-        }
+            ...commonWellProperties,
+            shape: 'circular',
+            diameter: fields.wellDiameter,
+          }
         : {
-          ...commonWellProperties,
-          shape: 'rectangular',
-          xDimension: fields.wellXDimension,
-          yDimension: fields.wellYDimension,
-        }
+            ...commonWellProperties,
+            shape: 'rectangular',
+            xDimension: fields.wellXDimension,
+            yDimension: fields.wellYDimension,
+          }
 
     // NOTE Ian 2019-07-29: Cannot use fields.labwareType, must be "96Standard", "384Standard", "trough", "irregular", or "trash".
     // Also note that 'irregular' in `format` just means "not 96/384 standard, not trough, and not trash",

@@ -12,7 +12,11 @@ import {
 } from '@opentrons/shared-data'
 import { getCutoutIdByAddressableArea } from '../utils'
 import type { Channels } from '@opentrons/components'
-import type { AddressableAreaName, CreateCommand, NozzleConfigurationStyle } from '@opentrons/shared-data'
+import type {
+  AddressableAreaName,
+  CreateCommand,
+  NozzleConfigurationStyle,
+} from '@opentrons/shared-data'
 import type {
   CommandCreatorError,
   CommandsAndWarnings,

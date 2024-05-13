@@ -7,7 +7,6 @@ import { move, readdir, remove, readFile } from 'fs-extra'
 import StreamZip from 'node-stream-zip'
 import getStream from 'get-stream'
 
-
 import { createLogger } from '../log'
 import { fetchToFile } from '../http'
 import { CURRENT_VERSION } from '../update'
@@ -151,7 +150,9 @@ export function readUpdateFileInfo(systemFile: string): Promise<UserFileInfo> {
         versionInfo,
       }))
 
-    result.finally(() => { zip.close() })
+    result.finally(() => {
+      zip.close()
+    })
 
     return result
   })

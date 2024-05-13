@@ -1,7 +1,11 @@
 import { when } from 'vitest-when'
 import { describe, it, beforeEach, vi, expect, afterEach } from 'vitest'
 
-import { getLabwareDefURI, multiple_tipacks_with_tc, opentrons96PcrAdapterV1 } from '@opentrons/shared-data'
+import {
+  getLabwareDefURI,
+  multiple_tipacks_with_tc,
+  opentrons96PcrAdapterV1,
+} from '@opentrons/shared-data'
 import { getLabwareOffsetLocation } from '../getLabwareOffsetLocation'
 import { getLabwareLocation } from '../getLabwareLocation'
 import { getModuleInitialLoadInfo } from '../getModuleInitialLoadInfo'
@@ -9,7 +13,7 @@ import type {
   LoadedLabware,
   LoadedModule,
   LabwareDefinition2,
-  CompletedProtocolAnalysis
+  CompletedProtocolAnalysis,
 } from '@opentrons/shared-data'
 
 vi.mock('../getLabwareLocation')

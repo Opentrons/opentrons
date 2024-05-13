@@ -8,9 +8,9 @@ import {
   DEST_LABWARE,
   FIXED_TRASH_ID,
 } from '@opentrons/step-generation'
-import { fixtureTiprack300ul, getLabwareDefURI, } from '@opentrons/shared-data'
+import { fixtureTiprack300ul, getLabwareDefURI } from '@opentrons/shared-data'
 import { generateRobotStateTimeline } from '../generateRobotStateTimeline'
-import type { LabwareDefinition2, } from '@opentrons/shared-data'
+import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import type { StepArgsAndErrorsById } from '../../steplist'
 
 vi.mock('../../labware-defs/utils')

@@ -7,7 +7,7 @@ import {
   getAnalyticsOptedIn,
 } from '../../redux/analytics'
 
-import type {  MapStateToProps, MapDispatchToProps } from 'react-redux'
+import type { MapStateToProps, MapDispatchToProps } from 'react-redux'
 import type { State } from '../../redux/types'
 
 interface SP {

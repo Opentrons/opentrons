@@ -24,11 +24,11 @@ export function withRobotHost<A>(
   getRobotName: (action: A) => string
 ): UnaryFunction<Observable<A>, Observable<[A, State, Types.RobotHost]>> {
   return pipe(
-    withLatestFrom(state$, (a: A, s: State): [A, State, Types.RobotHost | null] => [
-      a,
-      s,
-      getRobotByName(s, getRobotName(a)) as Types.RobotHost | null,
-    ]),
+    withLatestFrom(state$, (a: A, s: State): [
+      A,
+      State,
+      Types.RobotHost | null
+    ] => [a, s, getRobotByName(s, getRobotName(a)) as Types.RobotHost | null]),
     filter((args): args is [A, State, Types.RobotHost] => {
       const [, , maybeRobot] = args
       return maybeRobot !== null

@@ -29,7 +29,11 @@ import { DeckConfigurationDiscardChangesModal } from '../../organisms/DeviceDeta
 import { getTopPortalEl } from '../../App/portal'
 import { useNotifyDeckConfigurationQuery } from '../../resources/deck_configuration'
 
-import type { CutoutFixtureId, CutoutId, DeckConfiguration } from '@opentrons/shared-data'
+import type {
+  CutoutFixtureId,
+  CutoutId,
+  DeckConfiguration,
+} from '@opentrons/shared-data'
 import type { SmallButton } from '../../atoms/buttons'
 
 export function DeckConfigurationEditor(): JSX.Element {

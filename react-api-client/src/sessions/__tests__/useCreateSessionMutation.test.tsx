@@ -9,7 +9,12 @@ import {
 import { useHost } from '../../api'
 import { useCreateSessionMutation } from '..'
 
-import type { HostConfig, Response, Session, CreateSessionData } from '@opentrons/api-client'
+import type {
+  HostConfig,
+  Response,
+  Session,
+  CreateSessionData,
+} from '@opentrons/api-client'
 
 vi.mock('@opentrons/api-client')
 vi.mock('../../api/useHost')

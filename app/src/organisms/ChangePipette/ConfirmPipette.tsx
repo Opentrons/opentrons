@@ -13,7 +13,11 @@ import { CheckPipettesButton } from './CheckPipettesButton'
 import { SimpleWizardBody } from '../../molecules/SimpleWizardBody'
 import { LevelPipette } from './LevelPipette'
 
-import type { PipetteNameSpecs, PipetteModelSpecs, PipetteDisplayCategory, } from '@opentrons/shared-data'
+import type {
+  PipetteNameSpecs,
+  PipetteModelSpecs,
+  PipetteDisplayCategory,
+} from '@opentrons/shared-data'
 import type { PipetteOffsetCalibration } from '../../redux/calibration/types'
 import type { Mount } from '../../redux/pipettes/types'
 

@@ -33,7 +33,10 @@ import { TerseOffsetTable } from '../ResultsSummary'
 import { getLabwareDefinitionsFromCommands } from '../utils/labware'
 
 import type { LabwareOffset } from '@opentrons/api-client'
-import type { CompletedProtocolAnalysis, LabwareDefinition2 } from '@opentrons/shared-data'
+import type {
+  CompletedProtocolAnalysis,
+  LabwareDefinition2,
+} from '@opentrons/shared-data'
 import type { useChainRunCommands } from '../../../resources/runs'
 import type { RegisterPositionAction } from '../types'
 import type { Jog } from '../../../molecules/JogControls'

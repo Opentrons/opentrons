@@ -6,7 +6,10 @@ import { AIR } from '@opentrons/step-generation'
 import { swatchColors, MIXED_WELL_COLOR } from '../swatchColors'
 import styles from './StepItem.module.css'
 import type { UseHoverTooltipTargetProps } from '@opentrons/components'
-import type { WellIngredientVolumeData, WellIngredientNames } from '../../steplist'
+import type {
+  WellIngredientVolumeData,
+  WellIngredientNames,
+} from '../../steplist'
 
 interface Props {
   ingreds: WellIngredientVolumeData

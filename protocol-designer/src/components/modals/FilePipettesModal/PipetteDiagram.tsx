@@ -2,10 +2,7 @@ import * as React from 'react'
 import { useSelector } from 'react-redux'
 import { css } from 'styled-components'
 import cx from 'classnames'
-import {
-  FLEX_ROBOT_TYPE,
-  getPipetteSpecsV2,
-} from '@opentrons/shared-data'
+import { FLEX_ROBOT_TYPE, getPipetteSpecsV2 } from '@opentrons/shared-data'
 import { InstrumentDiagram } from '@opentrons/components'
 import { getRobotType } from '../../../file-data/selectors'
 import styles from './FilePipettesModal.module.css'

@@ -2,7 +2,10 @@ import { combineReducers } from 'redux'
 import { handleActions } from 'redux-actions'
 import type { Reducer } from 'redux'
 import type { BaseState, Action } from '../../types'
-import type { NavigateToPageAction, ToggleNewProtocolModalAction } from '../actions'
+import type {
+  NavigateToPageAction,
+  ToggleNewProtocolModalAction,
+} from '../actions'
 import type { Page } from '../types'
 const page: Reducer<Page, any> = handleActions(
   {

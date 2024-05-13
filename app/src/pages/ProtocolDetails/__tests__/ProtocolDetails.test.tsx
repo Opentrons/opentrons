@@ -5,11 +5,7 @@ import { when } from 'vitest-when'
 import { Route, MemoryRouter } from 'react-router-dom'
 import '@testing-library/jest-dom/vitest'
 import { renderWithProviders } from '../../../__testing-utils__'
-import {
-  deleteProtocol,
-  deleteRun,
-  getProtocol,
-} from '@opentrons/api-client'
+import { deleteProtocol, deleteRun, getProtocol } from '@opentrons/api-client'
 import {
   useCreateRunMutation,
   useHost,

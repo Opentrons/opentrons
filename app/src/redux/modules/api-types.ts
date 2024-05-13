@@ -7,9 +7,8 @@ import type {
   TemperatureModuleModel,
   ThermocyclerModuleModel,
   HeaterShakerModuleModel,
-  ModuleModel
+  ModuleModel,
 } from '@opentrons/shared-data'
-
 
 type PortGroup = 'main' | 'left' | 'right' | 'front' | 'unknown'
 export interface PhysicalPort {

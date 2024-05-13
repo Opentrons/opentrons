@@ -2,11 +2,7 @@ import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { useSelector, useDispatch } from 'react-redux'
 import some from 'lodash/some'
-import {
-  Controller,
-  useController,
-  useForm,
-} from 'react-hook-form'
+import { Controller, useController, useForm } from 'react-hook-form'
 
 import {
   FormGroup,

@@ -7,9 +7,7 @@ import {
   DEFAULT_BLOWOUT_WELL,
   DEST_LABWARE,
 } from './data'
-import {
-  ONE_CHANNEL_WASTE_CHUTE_ADDRESSABLE_AREA,
-} from '@opentrons/shared-data'
+import { ONE_CHANNEL_WASTE_CHUTE_ADDRESSABLE_AREA } from '@opentrons/shared-data'
 
 import type {
   AddressableAreaName,

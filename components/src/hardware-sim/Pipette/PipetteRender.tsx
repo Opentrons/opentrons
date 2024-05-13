@@ -14,7 +14,7 @@ import {
 } from './constants'
 import { EmanatingNozzle } from './EmanatingNozzle'
 import { EightEmanatingNozzles } from './EightEmanatingNozzles'
-import type { LabwareDefinition2, PipetteName, } from '@opentrons/shared-data'
+import type { LabwareDefinition2, PipetteName } from '@opentrons/shared-data'
 
 interface PipetteRenderProps {
   labwareDef: LabwareDefinition2

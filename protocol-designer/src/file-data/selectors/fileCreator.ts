@@ -20,9 +20,7 @@ import { uuid } from '../../utils'
 import { selectors as ingredSelectors } from '../../labware-ingred/selectors'
 import { selectors as stepFormSelectors } from '../../step-forms'
 import { selectors as uiLabwareSelectors } from '../../ui/labware'
-import {
-  getLoadLiquidCommands,
-} from '../../load-file/migration/utils/getLoadLiquidCommands'
+import { getLoadLiquidCommands } from '../../load-file/migration/utils/getLoadLiquidCommands'
 import { swatchColors } from '../../components/swatchColors'
 import {
   DEFAULT_MM_FROM_BOTTOM_ASPIRATE,
@@ -54,7 +52,7 @@ import type {
   OT3RobotMixin,
   PipetteName,
   ProtocolBase,
-  ProtocolFile
+  ProtocolFile,
 } from '@opentrons/shared-data'
 import type { LabwareDefByDefURI } from '../../labware-defs'
 import type { Selector } from '../../types'

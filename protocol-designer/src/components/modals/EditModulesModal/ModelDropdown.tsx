@@ -1,6 +1,9 @@
 import * as React from 'react'
 import { DropdownField } from '@opentrons/components'
-import type { ControllerFieldState, ControllerRenderProps } from 'react-hook-form'
+import type {
+  ControllerFieldState,
+  ControllerRenderProps,
+} from 'react-hook-form'
 import type { EditModulesFormValues } from './index'
 
 export interface ModelDropdownProps {

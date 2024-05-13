@@ -1,10 +1,7 @@
 import React from 'react'
 import { vi, describe, it, expect, beforeEach, afterEach } from 'vitest'
 import { render, screen } from '@testing-library/react'
-import {
-  getDefaultFormState,
-  getInitialStatus,
-} from '../../../fields'
+import { getDefaultFormState, getInitialStatus } from '../../../fields'
 import { CustomTiprackWarning } from '../../sections/CustomTiprackWarning'
 import { wrapInFormik } from '../../utils/wrapInFormik'
 import type { FormikConfig } from 'formik'

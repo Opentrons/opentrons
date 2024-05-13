@@ -5,7 +5,10 @@ import { getPDMetadata } from '../../file-types'
 import { START_TERMINAL_ITEM_ID, PRESAVED_STEP_ID } from '../../steplist/types'
 import type { Reducer } from 'redux'
 import type { SubstepIdentifier, TerminalItemId } from '../../steplist/types'
-import type { DeleteStepAction, DeleteMultipleStepsAction } from '../../steplist/actions'
+import type {
+  DeleteStepAction,
+  DeleteMultipleStepsAction,
+} from '../../steplist/actions'
 import type { Action } from '../../types'
 import type { LoadFileAction } from '../../load-file'
 import type { StepIdType } from '../../form-types'

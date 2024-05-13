@@ -7,7 +7,10 @@ import { selectors as labwareIngredSelectors } from '../../labware-ingred/select
 import { getModuleShortNames, getModuleUnderLabware } from '../modules/utils'
 import { getLabwareOffDeck, getLabwareInColumn4 } from './utils'
 
-import type { LabwareEntity, AdditionalEquipmentEntity  } from '@opentrons/step-generation'
+import type {
+  LabwareEntity,
+  AdditionalEquipmentEntity,
+} from '@opentrons/step-generation'
 import type { DropdownOption, Options } from '@opentrons/components'
 import type { Selector } from '../../types'
 import type {

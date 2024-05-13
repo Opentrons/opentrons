@@ -30,7 +30,7 @@ import {
   ConfirmDeleteModal,
   DELETE_MULTIPLE_STEP_FORMS,
 } from '../../modals/ConfirmDeleteModal'
-import type {IconName } from '@opentrons/components'
+import type { IconName } from '@opentrons/components'
 import type { ThunkDispatch } from 'redux-thunk'
 import type { BaseState } from '../../../types'
 

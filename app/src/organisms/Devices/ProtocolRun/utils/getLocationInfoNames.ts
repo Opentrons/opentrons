@@ -1,7 +1,10 @@
-import {
-  getLabwareDisplayName,
+import { getLabwareDisplayName } from '@opentrons/shared-data'
+import type {
+  LoadLabwareRunTimeCommand,
+  RunTimeCommand,
+  LoadModuleRunTimeCommand,
+  ModuleModel,
 } from '@opentrons/shared-data'
-import type { LoadLabwareRunTimeCommand, RunTimeCommand, LoadModuleRunTimeCommand, ModuleModel } from '@opentrons/shared-data'
 
 export interface LocationInfoNames {
   slotName: string

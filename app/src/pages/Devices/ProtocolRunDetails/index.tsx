@@ -40,7 +40,10 @@ import { appShellRequestor } from '../../../redux/shell/remote'
 import { useMostRecentCompletedAnalysis } from '../../../organisms/LabwarePositionCheck/useMostRecentCompletedAnalysis'
 
 import type { ViewportListRef } from 'react-viewport-list'
-import type { DesktopRouteParams, ProtocolRunDetailsTab, } from '../../../App/types'
+import type {
+  DesktopRouteParams,
+  ProtocolRunDetailsTab,
+} from '../../../App/types'
 import type { Dispatch } from '../../../redux/types'
 
 const baseRoundTabStyling = css`

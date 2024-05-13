@@ -3,10 +3,7 @@ import { vi, it, expect, describe, beforeEach, afterEach } from 'vitest'
 import { render, screen } from '@testing-library/react'
 import '@testing-library/jest-dom/vitest'
 import { when } from 'vitest-when'
-import {
-  getDefaultFormState,
-  getInitialStatus,
-} from '../../../fields'
+import { getDefaultFormState, getInitialStatus } from '../../../fields'
 import { getLabwareName } from '../../../utils'
 import { WellBottomAndDepth } from '../../sections/WellBottomAndDepth'
 import { wrapInFormik } from '../../utils/wrapInFormik'

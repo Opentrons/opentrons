@@ -9,7 +9,7 @@ import {
   ALIGN_CENTER,
   PrimaryButton,
   JUSTIFY_SPACE_BETWEEN,
-  InstrumentDiagram
+  InstrumentDiagram,
 } from '@opentrons/components'
 import {
   OT2_PIPETTES,

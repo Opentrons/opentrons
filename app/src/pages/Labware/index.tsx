@@ -38,7 +38,7 @@ import { useAllLabware, useLabwareFailure, useNewLabwareName } from './hooks'
 
 import type { DropdownOption } from '../../atoms/MenuList/DropdownMenu'
 import type { LabwareFilter, LabwareSort } from './types'
-import type { LabwareDefAndDate, } from './hooks'
+import type { LabwareDefAndDate } from './hooks'
 
 const LABWARE_CREATOR_HREF = 'https://labware.opentrons.com/create/'
 const labwareDisplayCategoryFilters: LabwareFilter[] = [

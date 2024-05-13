@@ -25,7 +25,11 @@ import {
 import { getDynamicFieldFocusHandlerId } from '../utils'
 import styles from '../StepEditForm.module.css'
 
-import type { ProfileStepItem, ProfileItem, ProfileCycleItem } from '../../../form-types'
+import type {
+  ProfileStepItem,
+  ProfileItem,
+  ProfileCycleItem,
+} from '../../../form-types'
 import type { FocusHandlers } from '../types'
 
 export const showProfileFieldErrors = ({

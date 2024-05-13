@@ -148,12 +148,12 @@ export const replaceTip: CommandCreator<ReplaceTipArgs> = (
   const isWasteChute =
     invariantContext.additionalEquipmentEntities[dropTipLocation] != null &&
     invariantContext.additionalEquipmentEntities[dropTipLocation].name ===
-    'wasteChute'
+      'wasteChute'
 
   const isTrashBin =
     invariantContext.additionalEquipmentEntities[dropTipLocation] != null &&
     invariantContext.additionalEquipmentEntities[dropTipLocation].name ===
-    'trashBin'
+      'trashBin'
 
   if (!labwareDef) {
     return {

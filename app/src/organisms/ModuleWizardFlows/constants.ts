@@ -1,4 +1,8 @@
-import { HEATERSHAKER_MODULE_TYPE, TEMPERATURE_MODULE_TYPE, THERMOCYCLER_MODULE_TYPE } from '@opentrons/shared-data'
+import {
+  HEATERSHAKER_MODULE_TYPE,
+  TEMPERATURE_MODULE_TYPE,
+  THERMOCYCLER_MODULE_TYPE,
+} from '@opentrons/shared-data'
 import type { ModuleType } from '@opentrons/shared-data'
 
 export const SECTIONS = {

@@ -15,7 +15,7 @@ import {
   openAddLabwareModal,
 } from '../../../labware-ingred/actions'
 import { selectors as labwareDefSelectors } from '../../../labware-defs'
-import { START_TERMINAL_ITEM_ID} from '../../../steplist'
+import { START_TERMINAL_ITEM_ID } from '../../../steplist'
 import { BlockedSlot } from './BlockedSlot'
 import styles from './LabwareOverlays.module.css'
 

@@ -26,7 +26,10 @@ import { Temperature } from './Temperature'
 import { MagneticBlock } from './MagneticBlock'
 import { MagneticModule } from './MagneticModule'
 
-import type { ModuleDefinition, ThermocyclerModuleModel } from '@opentrons/shared-data'
+import type {
+  ModuleDefinition,
+  ThermocyclerModuleModel,
+} from '@opentrons/shared-data'
 
 export * from './Thermocycler'
 

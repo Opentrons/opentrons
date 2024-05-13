@@ -1,7 +1,11 @@
 import * as React from 'react'
 import { it, expect, describe } from 'vitest'
 
-import { FLEX_ROBOT_TYPE, OT2_ROBOT_TYPE, GRIPPER_WASTE_CHUTE_ADDRESSABLE_AREA } from '@opentrons/shared-data'
+import {
+  FLEX_ROBOT_TYPE,
+  OT2_ROBOT_TYPE,
+  GRIPPER_WASTE_CHUTE_ADDRESSABLE_AREA,
+} from '@opentrons/shared-data'
 import { renderWithProviders } from '../../../__testing-utils__'
 import { i18n } from '../../../i18n'
 import { CommandText } from '../'
@@ -25,7 +29,7 @@ import type {
   MoveToWellRunTimeCommand,
   PrepareToAspirateRunTimeCommand,
   RunTimeCommand,
-  MoveToAddressableAreaForDropTipRunTimeCommand
+  MoveToAddressableAreaForDropTipRunTimeCommand,
 } from '@opentrons/shared-data'
 
 describe('CommandText', () => {
