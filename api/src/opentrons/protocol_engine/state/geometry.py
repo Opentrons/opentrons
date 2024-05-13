@@ -457,10 +457,7 @@ class GeometryView:
         tip overlaps with the pipette nozzle. This does not take calibrated
         tip lengths into account.
         """
-        labware_uri = self._labware.get_definition_uri(labware_id)
-        nominal_overlap = self._pipettes.get_nominal_tip_overlap(
-            pipette_id=pipette_id, labware_uri=labware_uri
-        )
+        nominal_overlap = self._pipettes.get_nominal_tip_overlap(pipette_id=pipette_id)
 
         return self._labware.get_tip_length(
             labware_id=labware_id, overlap=nominal_overlap

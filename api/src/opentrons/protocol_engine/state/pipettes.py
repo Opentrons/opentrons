@@ -649,37 +649,10 @@ class PipetteView(HasState[PipetteState]):
                 f"Pipette {pipette_id} not found; unable to get pipette flow rates."
             ) from e
 
-    def get_nominal_tip_overlap(self, pipette_id: str, labware_uri: str) -> float:
+    def get_nominal_tip_overlap(self, pipette_id: str) -> float:
         """Get the nominal tip overlap for a given labware from config."""
         nominal_tip_overlap = self.get_config(pipette_id).nominal_tip_overlap
         return nominal_tip_overlap
-
-        #OKAY LOTS OF NOTES:
-        # first we will be calling self.get_nominal_tip_overlap_by_configuration(tip_type_uri???) from here
-        #in that we will resolve to a float
-        #the float will return there
-        #IF the active tip does not match the one resolved from the labware uri then we will return "default"
-        #if nothing matches at all (keyerror) we will return the default
-
-        #translate the uri here into a tip type
-
-        #look up labware definitions_by_uri
-        #then use that to find tip volume
-        #then look up the tip types and find a type that matches that volume
-
-        #new notes:
-        #maybe instead since this is only used in the geometry view we can just remove the labware uri references
-        #instead we can pass down tip type from here
-        #or we can infer it at the bottom like we do the others
-
-        #near as I can tell there would be minimal harm in that plan then removing references to labware uri ^
-        
-        #get_definition_by_uri()
-
-        # try:
-        #     return tip_overlaps_by_uri[labware_uri]
-        # except KeyError:
-        #     return tip_overlaps_by_uri.get("default", 0)
 
     def get_z_axis(self, pipette_id: str) -> MotorAxis:
         """Get the MotorAxis representing this pipette's Z stage."""
