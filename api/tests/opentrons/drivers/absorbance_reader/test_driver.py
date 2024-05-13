@@ -1,5 +1,4 @@
-from mock import MagicMock, Mock
-from typing import Tuple
+from mock import MagicMock
 import pytest
 import asyncio
 from enum import Enum

@@ -3,10 +3,9 @@ from __future__ import annotations
 import asyncio
 import re
 import subprocess
-from dataclasses import dataclass
 from concurrent.futures.thread import ThreadPoolExecutor
 from functools import partial
-from typing import Optional, Union, List, Dict, Literal
+from typing import Optional, List, Dict
 
 
 from .hid_protocol import AbsorbanceHidInterface as AbsProtocol
@@ -14,7 +13,6 @@ from opentrons.drivers.types import (
     AbsorbanceReaderLidStatus,
     AbsorbanceReaderPlatePresence,
 )
-from opentrons.drivers.rpi_drivers.types import USBPort
 
 
 SN_PARSER = re.compile(r'ATTRS{serial}=="(?P<serial>.+?)"')

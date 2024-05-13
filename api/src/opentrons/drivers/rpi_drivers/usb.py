@@ -6,7 +6,6 @@ more readable format.
 """
 
 import subprocess
-import re
 import os
 from typing import List, Union
 
@@ -17,7 +16,7 @@ from opentrons.hardware_control.modules.types import (
 from opentrons.hardware_control.types import BoardRevision
 
 from .interfaces import USBDriverInterface
-from .types import BUS_PATH, USB_PORT_INFO, USBPort
+from .types import BUS_PATH, USBPort
 
 
 class USBBus(USBDriverInterface):

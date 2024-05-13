@@ -1,5 +1,4 @@
 import asyncio
-import logging
 from typing import Optional, Mapping, List, Dict, Any, Tuple
 
 from opentrons.drivers.rpi_drivers.types import USBPort

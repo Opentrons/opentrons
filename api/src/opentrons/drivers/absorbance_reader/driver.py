@@ -2,10 +2,8 @@ from __future__ import annotations
 
 import asyncio
 from typing import Dict, Optional, List
-from dataclasses import asdict
 
 from opentrons.drivers.types import AbsorbanceReaderLidStatus
-from opentrons.drivers.rpi_drivers.types import USBPort
 from opentrons.drivers.absorbance_reader.abstract import AbstractAbsorbanceReaderDriver
 from .async_byonoy import AsyncByonoy
 

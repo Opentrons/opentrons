@@ -1,4 +1,3 @@
-import asyncio
 from typing import Dict, List, Optional
 from opentrons.util.async_helpers import ensure_yield
 

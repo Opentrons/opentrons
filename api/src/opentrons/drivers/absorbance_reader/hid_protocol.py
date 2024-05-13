@@ -4,16 +4,9 @@ from typing import (
     List,
     Tuple,
     ClassVar,
-    Literal,
     runtime_checkable,
     TypeVar,
-    Generic,
 )
-from opentrons.drivers.types import (
-    AbsorbanceReaderLidStatus,
-    AbsorbanceReaderPlatePresence,
-)
-from enum import Enum
 
 Response = TypeVar("Response")
 
