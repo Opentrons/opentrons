@@ -30,10 +30,7 @@ import {
 import { useFeatureFlag } from '../../redux/config'
 import { StepMeter } from '../../atoms/StepMeter'
 import { useMostRecentCompletedAnalysis } from '../../organisms/LabwarePositionCheck/useMostRecentCompletedAnalysis'
-import {
-  useNotifyLastRunCommand,
-  useNotifyRunQuery,
-} from '../../resources/runs'
+import { useNotifyRunQuery } from '../../resources/runs'
 import { InterventionModal } from '../../organisms/InterventionModal'
 import { isInterventionCommand } from '../../organisms/InterventionModal/utils'
 import {
@@ -56,6 +53,7 @@ import { RunPausedSplash } from '../../organisms/OnDeviceDisplay/RunningProtocol
 import { getLocalRobot } from '../../redux/discovery'
 import { OpenDoorAlertModal } from '../../organisms/OpenDoorAlertModal'
 import { ErrorRecoveryFlows } from '../../organisms/ErrorRecoveryFlows'
+import { useLastRunCommand } from '../../organisms/Devices/hooks/useLastRunCommand'
 
 import type { OnDeviceRouteParams } from '../../App/types'
 
@@ -95,7 +93,7 @@ export function RunningProtocol(): JSX.Element {
   const lastAnimatedCommand = React.useRef<string | null>(null)
   const swipe = useSwipe()
   const robotSideAnalysis = useMostRecentCompletedAnalysis(runId)
-  const lastRunCommand = useNotifyLastRunCommand(runId, {
+  const lastRunCommand = useLastRunCommand(runId, {
     refetchInterval: LIVE_RUN_COMMANDS_POLL_MS,
   })
 
