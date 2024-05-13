@@ -1,6 +1,6 @@
 """Union types of concrete command definitions."""
 
-from typing import Union, TypeVar
+from typing import Union
 from typing_extensions import Annotated
 
 from pydantic import Field
@@ -623,5 +623,3 @@ CommandPrivateResult = Union[
     ConfigureForVolumePrivateResult,
     ConfigureNozzleLayoutPrivateResult,
 ]
-
-CommandT = TypeVar("CommandT", bound=Command)
