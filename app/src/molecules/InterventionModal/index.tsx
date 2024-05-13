@@ -82,13 +82,9 @@ export interface InterventionModalProps {
 export function InterventionModal(props: InterventionModalProps): JSX.Element {
   const modalType = props.type ?? 'intervention-required'
   const headerColor =
-    modalType === 'intervention-required'
-      ? INTERVENTION_REQUIRED_COLOR
-      : ERROR_COLOR
+    modalType === 'error' ? ERROR_COLOR : INTERVENTION_REQUIRED_COLOR
   const border = `${BORDER_STYLE_BASE} ${
-    props.type === 'intervention-required'
-      ? INTERVENTION_REQUIRED_COLOR
-      : ERROR_COLOR
+    modalType === 'error' ? ERROR_COLOR : INTERVENTION_REQUIRED_COLOR
   }`
   return (
     <Flex {...WRAPPER_STYLE}>

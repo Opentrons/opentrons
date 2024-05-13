@@ -32,6 +32,15 @@ describe('InterventionModal', () => {
       expect(modal).toHaveStyle(`border: 6px ${BORDERS.styleSolid} ${color}`)
     })
   })
+  it('uses intervention-required if prop is not passed', () => {
+    render({ ...props, type: undefined })
+    const header = screen.getByTestId('__otInterventionModalHeader')
+    expect(header).toHaveStyle(`background-color: ${COLORS.blue50}`)
+    const modal = screen.getByTestId('__otInterventionModal')
+    expect(modal).toHaveStyle(
+      `border: 6px ${BORDERS.styleSolid} ${COLORS.blue50}`
+    )
+  })
   it('renders passed elements', () => {
     render(props)
     screen.getByText('mock intervention children')
