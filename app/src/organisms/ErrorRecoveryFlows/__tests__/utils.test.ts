@@ -1,6 +1,11 @@
 import { vi, describe, it, expect, beforeEach } from 'vitest'
 import { renderHook, act } from '@testing-library/react'
 
+import {
+  RUN_STATUS_AWAITING_RECOVERY,
+  RUN_STATUS_RUNNING,
+} from '@opentrons/api-client'
+
 import { ERROR_KINDS, INVALID, RECOVERY_MAP } from '../constants'
 import {
   getErrorKind,
@@ -8,16 +13,12 @@ import {
   useRouteUpdateActions,
   useCurrentlyFailedRunCommand,
 } from '../utils'
-import { useAllCommandsQuery } from '@opentrons/react-api-client'
-import {
-  RUN_STATUS_AWAITING_RECOVERY,
-  RUN_STATUS_RUNNING,
-} from '@opentrons/api-client'
+import { useNotifyAllCommandsQuery } from '../../../resources/runs'
 
 import type { Mock } from 'vitest'
 import type { GetRouteUpdateActionsParams } from '../utils'
 
-vi.mock('@opentrons/react-api-client')
+vi.mock('../../../resources/runs')
 
 describe('getErrorKind', () => {
   it(`returns ${ERROR_KINDS.GENERAL_ERROR} if the errorType isn't handled explicitly`, () => {
@@ -159,7 +160,7 @@ const MOCK_RUN_ID = 'runId'
 
 describe('useCurrentlyFailedRunCommand', () => {
   beforeEach(() => {
-    vi.mocked(useAllCommandsQuery).mockReturnValue(MOCK_COMMANDS_QUERY)
+    vi.mocked(useNotifyAllCommandsQuery).mockReturnValue(MOCK_COMMANDS_QUERY)
   })
 
   it('returns null on initial render when the run status is not "awaiting-recovery"', () => {
@@ -199,7 +200,7 @@ describe('useCurrentlyFailedRunCommand', () => {
       }
     )
 
-    vi.mocked(useAllCommandsQuery).mockReturnValue({
+    vi.mocked(useNotifyAllCommandsQuery).mockReturnValue({
       ...MOCK_COMMANDS_QUERY,
       ...{ status: 'failed', intent: 'protocol', id: '124' },
     })

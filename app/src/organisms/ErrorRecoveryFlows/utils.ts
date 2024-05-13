@@ -4,9 +4,9 @@ import head from 'lodash/head'
 import last from 'lodash/last'
 import findLast from 'lodash/findLast'
 
-import { useAllCommandsQuery } from '@opentrons/react-api-client'
 import { RUN_STATUS_AWAITING_RECOVERY } from '@opentrons/api-client'
 
+import { useNotifyAllCommandsQuery } from '../../resources/runs'
 import { RECOVERY_MAP, ERROR_KINDS, INVALID, STEP_ORDER } from './constants'
 
 import type { RunStatus } from '@opentrons/api-client'
@@ -40,10 +40,14 @@ export function useCurrentlyFailedRunCommand(
   // for a newly failed command when the run first enters "awaiting-recovery."
   const isRunStatusAwaitingRecovery = runStatus === RUN_STATUS_AWAITING_RECOVERY
 
-  const { data: allCommandsQueryData } = useAllCommandsQuery(runId, null, {
-    enabled: isRunStatusAwaitingRecovery && recentFailedCommand == null,
-    refetchInterval: ALL_COMMANDS_POLL_MS,
-  })
+  const { data: allCommandsQueryData } = useNotifyAllCommandsQuery(
+    runId,
+    null,
+    {
+      enabled: isRunStatusAwaitingRecovery && recentFailedCommand == null,
+      refetchInterval: ALL_COMMANDS_POLL_MS,
+    }
+  )
 
   React.useEffect(() => {
     if (isRunStatusAwaitingRecovery && recentFailedCommand == null) {

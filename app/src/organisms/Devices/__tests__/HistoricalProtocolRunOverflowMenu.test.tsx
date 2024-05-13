@@ -5,10 +5,7 @@ import '@testing-library/jest-dom/vitest'
 import { renderWithProviders } from '../../../__testing-utils__'
 import { when } from 'vitest-when'
 import { MemoryRouter } from 'react-router-dom'
-import {
-  useAllCommandsQuery,
-  useDeleteRunMutation,
-} from '@opentrons/react-api-client'
+import { useDeleteRunMutation } from '@opentrons/react-api-client'
 import { i18n } from '../../../i18n'
 import runRecord from '../../../organisms/RunDetails/__fixtures__/runRecord.json'
 import { useDownloadRunLog, useTrackProtocolRunEvent, useRobot } from '../hooks'
@@ -21,6 +18,7 @@ import { mockConnectableRobot } from '../../../redux/discovery/__fixtures__'
 import { getRobotUpdateDisplayInfo } from '../../../redux/robot-update'
 import { useIsEstopNotDisengaged } from '../../../resources/devices/hooks/useIsEstopNotDisengaged'
 import { HistoricalProtocolRunOverflowMenu } from '../HistoricalProtocolRunOverflowMenu'
+import { useNotifyAllCommandsQuery } from '../../../resources/runs'
 
 import type { UseQueryResult } from 'react-query'
 import type { CommandsData } from '@opentrons/api-client'
@@ -32,6 +30,7 @@ vi.mock('../../RunTimeControl/hooks')
 vi.mock('../../../redux/analytics')
 vi.mock('../../../redux/config')
 vi.mock('../../../resources/devices/hooks/useIsEstopNotDisengaged')
+vi.mock('../../../resources/runs')
 vi.mock('@opentrons/react-api-client')
 
 const render = (
@@ -89,7 +88,7 @@ describe('HistoricalProtocolRunOverflowMenu', () => {
         isResetRunLoading: false,
         isResumeRunFromRecoveryActionLoading: false,
       })
-    when(useAllCommandsQuery)
+    when(useNotifyAllCommandsQuery)
       .calledWith(
         RUN_ID,
         {
