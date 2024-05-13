@@ -10,22 +10,14 @@ import { Loading } from './molecules/Loading'
 
 import { App } from './App'
 
-vi.mock('@auth0/auth0-react', async importOriginal => {
-  const actualComponents = await importOriginal<typeof useAuth0>()
-  return {
-    ...actualComponents,
-    isAuthenticated: true,
-    isLoading: false,
-    logout: vi.fn(),
-  }
-})
+vi.mock('@auth0/auth0-react')
+const mockedUseAuth0 = vi.mocked(useAuth0, true)
+
+const mockLogout = vi.fn()
 
 vi.mock('./molecules/SidePanel')
 vi.mock('./organisms/ChatContainer')
 vi.mock('./molecules/Loading')
-
-// const mockLogout = vi.fn()
-// const mockUser = {}
 
 const render = (): ReturnType<typeof renderWithProviders> => {
   return renderWithProviders(<App />)
@@ -33,12 +25,25 @@ const render = (): ReturnType<typeof renderWithProviders> => {
 
 describe('App', () => {
   beforeEach(() => {
+    // ToDo (kk:05/13/2024) remove type any later
+    mockedUseAuth0.mockReturnValue({
+      isAuthenticated: true,
+      user: {},
+      logout: mockLogout,
+      isLoading: false,
+    } as any)
     vi.mocked(SidePanel).mockReturnValue(<div>mock SidePanel</div>)
     vi.mocked(ChatContainer).mockReturnValue(<div>mock ChatContainer</div>)
     vi.mocked(Loading).mockReturnValue(<div>mock Loading</div>)
   })
 
   it('should render loading screen when isLoading is true', () => {
+    mockedUseAuth0.mockReturnValue({
+      isAuthenticated: false,
+      user: {},
+      logout: mockLogout,
+      isLoading: true,
+    } as any)
     render()
     screen.getByText('mock Loading')
   })
