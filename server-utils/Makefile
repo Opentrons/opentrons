@@ -49,7 +49,8 @@ ot_sources := $(ot_py_sources)
 
 # Defined separately than the clean target so the wheel file doesn’t have to
 # depend on a PHONY target
-clean_cmd = $(SHX) rm -rf build .coverage coverage.xml '*.egg-info' '**/__pycache__' '**/*.pyc' '**/.mypy_cache'
+clean_cmd = $(SHX) rm -rf build .coverage coverage.xml '*.egg-info'
+clean_cache_cmd = $(SHX) rm -rf '**/__pycache__' '**/*.pyc' '**/.mypy_cache'
 clean_wheel_cmd = $(clean_cmd) dist/*.whl
 clean_sdist_cmd = $(clean_cmd) dist/*.tar.gz
 clean_all_cmd = $(clean_cmd) dist
@@ -65,6 +66,7 @@ setup:
 .PHONY: clean
 clean:
 	$(clean_all_cmd)
+	$(clean_cache_cmd)
 
 .PHONY: teardown
 teardown:
