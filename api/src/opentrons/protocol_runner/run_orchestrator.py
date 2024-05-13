@@ -25,14 +25,14 @@ class RunOrchestrator:
 
     def __init__(
         self,
-        run_id: Optional[str],
+        run_id: str,
         protocol_engine: ProtocolEngine,
         hardware_api: HardwareControlAPI,
         fixit_runner: protocol_runner.AnyRunner,
         setup_runner: protocol_runner.AnyRunner,
         json_or_python_protocol_runner: Optional[protocol_runner.AnyRunner] = None,
     ):
-        self.run_id: str
+        self.run_id = run_id
         self._protocol_engine = protocol_engine
         self._hardware_api = hardware_api
         self._json_or_python_runner = json_or_python_protocol_runner

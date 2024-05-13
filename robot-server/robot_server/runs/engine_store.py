@@ -101,7 +101,7 @@ def _get_estop_listener(engine_store: "EngineStore") -> HardwareEventHandler:
 class EngineStore:
     """Factory and in-memory storage for ProtocolEngine."""
 
-    _run_orchestrator: Optional[RunOrchestrator] = None
+    _run_orchestrator: RunOrchestrator
 
     def __init__(
         self,
@@ -132,7 +132,7 @@ class EngineStore:
         return self._run_orchestrator.get_protocol_engine()
 
     @property
-    def runner(self) -> Optional[AnyRunner]:
+    def runner(self) -> AnyRunner:
         """Get the "current" persisted ProtocolRunner."""
         if self._run_orchestrator is None:
             raise NoRunnerEnginePairError()
