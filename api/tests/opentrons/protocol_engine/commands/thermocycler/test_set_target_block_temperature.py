@@ -10,6 +10,7 @@ from opentrons.protocol_engine.state.module_substates import (
 )
 from opentrons.protocol_engine.execution import EquipmentHandler
 from opentrons.protocol_engine.commands import thermocycler as tc_commands
+from opentrons.protocol_engine.commands.command import SuccessData
 from opentrons.protocol_engine.commands.thermocycler.set_target_block_temperature import (
     SetTargetBlockTemperatureImpl,
 )
@@ -66,4 +67,4 @@ async def test_set_target_block_temperature(
         ),
         times=1,
     )
-    assert result == expected_result
+    assert result == SuccessData(public=expected_result, private=None)

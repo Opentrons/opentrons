@@ -9,6 +9,7 @@ from opentrons.protocol_engine.state.module_substates import (
     MagneticModuleSubState,
 )
 from opentrons.protocol_engine.execution import EquipmentHandler
+from opentrons.protocol_engine.commands.command import SuccessData
 from opentrons.protocol_engine.commands.magnetic_module import (
     EngageParams,
     EngageResult,
@@ -50,4 +51,4 @@ async def test_magnetic_module_engage_implementation(
     result = await subject.execute(params=params)
 
     decoy.verify(await magnetic_module_hw.engage(9001), times=1)
-    assert result == EngageResult()
+    assert result == SuccessData(public=EngageResult(), private=None)

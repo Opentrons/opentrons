@@ -10,7 +10,8 @@ from .pipetting_common import (
     WellLocationMixin,
     DestinationPositionResult,
 )
-from .command import AbstractCommandImpl, BaseCommand, BaseCommandCreate
+from .command import AbstractCommandImpl, BaseCommand, BaseCommandCreate, SuccessData
+from ..errors.error_occurrence import ErrorOccurrence
 
 if TYPE_CHECKING:
     from ..state import StateView
@@ -49,7 +50,9 @@ class PickUpTipResult(DestinationPositionResult):
     )
 
 
-class PickUpTipImplementation(AbstractCommandImpl[PickUpTipParams, PickUpTipResult]):
+class PickUpTipImplementation(
+    AbstractCommandImpl[PickUpTipParams, SuccessData[PickUpTipResult, None]]
+):
     """Pick up tip command implementation."""
 
     def __init__(
@@ -63,7 +66,9 @@ class PickUpTipImplementation(AbstractCommandImpl[PickUpTipParams, PickUpTipResu
         self._tip_handler = tip_handler
         self._movement = movement
 
-    async def execute(self, params: PickUpTipParams) -> PickUpTipResult:
+    async def execute(
+        self, params: PickUpTipParams
+    ) -> SuccessData[PickUpTipResult, None]:
         """Move to and pick up a tip using the requested pipette."""
         pipette_id = params.pipetteId
         labware_id = params.labwareId
@@ -83,15 +88,18 @@ class PickUpTipImplementation(AbstractCommandImpl[PickUpTipParams, PickUpTipResu
             well_name=well_name,
         )
 
-        return PickUpTipResult(
-            tipVolume=tip_geometry.volume,
-            tipLength=tip_geometry.length,
-            tipDiameter=tip_geometry.diameter,
-            position=DeckPoint(x=position.x, y=position.y, z=position.z),
+        return SuccessData(
+            public=PickUpTipResult(
+                tipVolume=tip_geometry.volume,
+                tipLength=tip_geometry.length,
+                tipDiameter=tip_geometry.diameter,
+                position=DeckPoint(x=position.x, y=position.y, z=position.z),
+            ),
+            private=None,
         )
 
 
-class PickUpTip(BaseCommand[PickUpTipParams, PickUpTipResult]):
+class PickUpTip(BaseCommand[PickUpTipParams, PickUpTipResult, ErrorOccurrence]):
     """Pick up tip command model."""
 
     commandType: PickUpTipCommandType = "pickUpTip"

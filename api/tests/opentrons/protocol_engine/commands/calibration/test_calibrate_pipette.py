@@ -11,6 +11,7 @@ from opentrons.protocol_engine.commands.calibration.calibrate_pipette import (
     CalibratePipetteImplementation,
     CalibratePipetteParams,
 )
+from opentrons.protocol_engine.commands.command import SuccessData
 from opentrons.protocol_engine.errors.exceptions import HardwareNotSupportedError
 from opentrons.protocol_engine.types import InstrumentOffsetVector
 
@@ -59,8 +60,11 @@ async def test_calibrate_pipette_implementation(
         times=1,
     )
 
-    assert result == CalibratePipetteResult(
-        pipetteOffset=InstrumentOffsetVector(x=3, y=4, z=6)
+    assert result == SuccessData(
+        public=CalibratePipetteResult(
+            pipetteOffset=InstrumentOffsetVector(x=3, y=4, z=6)
+        ),
+        private=None,
     )
 
 
