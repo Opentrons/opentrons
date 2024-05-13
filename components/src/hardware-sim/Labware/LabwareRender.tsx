@@ -60,10 +60,12 @@ export interface LabwareRenderProps {
   onLabwareClick?: () => void
   /** Hide labware outline */
   hideOutline?: boolean
+  /** Provides well data attribute */
+  isInteractive?: boolean
 }
 
 export const LabwareRender = (props: LabwareRenderProps): JSX.Element => {
-  const { gRef, definition, hideOutline } = props
+  const { gRef, definition, hideOutline, isInteractive } = props
 
   const cornerOffsetFromSlot = definition.cornerOffsetFromSlot
   const labwareLoadName = definition.parameters.loadName
@@ -97,6 +99,7 @@ export const LabwareRender = (props: LabwareRenderProps): JSX.Element => {
       transform={`translate(${cornerOffsetFromSlot.x}, ${cornerOffsetFromSlot.y})`}
       ref={gRef}
     >
+      {/* TODO(bh, 2024-05-13): refactor rendering of wells - multiple layers of styled wells, DOM ordering determines which are visible */}
       <StaticLabware
         definition={props.definition}
         onMouseEnterWell={props.onMouseEnterWell}
@@ -104,6 +107,7 @@ export const LabwareRender = (props: LabwareRenderProps): JSX.Element => {
         onLabwareClick={props.onLabwareClick}
         highlight={props.highlight}
         hideOutline={hideOutline}
+        isInteractive={isInteractive}
       />
       {props.wellStroke != null ? (
         <StrokedWells

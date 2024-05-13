@@ -15,21 +15,16 @@ import {
 } from './utils'
 import { SelectionRect } from './SelectionRect'
 
-import type { WellMouseEvent, WellFill, WellGroup } from '@opentrons/components'
-import type { ContentsByWell, GenericRect, NozzleType } from './types'
+import type { WellFill, WellGroup, WellStroke } from '@opentrons/components'
+import type { LabwareDefinition2 } from '@opentrons/shared-data'
+import type { GenericRect, NozzleType } from './types'
 
 interface WellSelectionProps {
-  labwareProps: Omit<
-    React.ComponentProps<typeof LabwareRender>,
-    'selectedWells'
-  >
+  definition: LabwareDefinition2
   /** array of primary wells. Overrides labwareProps.selectedWells */
   selectedPrimaryWells: WellGroup
   selectWells: (wellGroup: WellGroup) => unknown
-  deselectWells: (wellGroup: WellGroup) => unknown
-  updateHighlightedWells: (wellGroup: WellGroup) => unknown
   nozzleType: NozzleType | null
-  wellContents: ContentsByWell
 }
 
 type ChannelType = 8 | 96
@@ -43,16 +38,9 @@ const getChannelsFromNozzleType = (nozzleType: NozzleType): ChannelType => {
 }
 
 export function WellSelection(props: WellSelectionProps): JSX.Element {
-  const {
-    labwareProps,
-    selectedPrimaryWells,
-    selectWells,
-    deselectWells,
-    updateHighlightedWells,
-    nozzleType,
-    wellContents,
-  } = props
-  const labwareDef = labwareProps.definition
+  const { definition, selectedPrimaryWells, selectWells, nozzleType } = props
+
+  const [highlightedWells, setHighlightedWells] = React.useState<WellGroup>({})
 
   const _wellsFromSelected: (
     selectedWells: WellGroup
@@ -66,7 +54,7 @@ export function WellSelection(props: WellSelectionProps): JSX.Element {
         selectedWells,
         (acc: WellGroup, _, wellName: string): WellGroup => {
           const wellSet = getWellSetForMultichannel(
-            labwareDef,
+            definition,
             wellName,
             channels
           )
@@ -87,59 +75,34 @@ export function WellSelection(props: WellSelectionProps): JSX.Element {
     return _wellsFromSelected(selectedWells)
   }
 
-  const handleSelectionMove: (e: MouseEvent, rect: GenericRect) => void = (
-    e,
-    rect
-  ) => {
-    if (!e.shiftKey) {
-      if (nozzleType != null) {
-        const channels = getChannelsFromNozzleType(nozzleType)
-        const selectedWells = _getWellsFromRect(rect)
-        const allWellsForMulti: WellGroup = reduce(
-          selectedWells,
-          (acc: WellGroup, _, wellName: string): WellGroup => {
-            const wellSetForMulti =
-              getWellSetForMultichannel(labwareDef, wellName, channels) || []
-            const channelWells = arrayToWellGroup(wellSetForMulti)
-            return {
-              ...acc,
-              ...channelWells,
-            }
-          },
-          {}
-        )
-        updateHighlightedWells(allWellsForMulti)
-      } else {
-        updateHighlightedWells(_getWellsFromRect(rect))
-      }
-    }
-  }
-
-  const handleSelectionDone: (e: MouseEvent, rect: GenericRect) => void = (
-    e,
-    rect
-  ) => {
-    const wells = _wellsFromSelected(_getWellsFromRect(rect))
-    if (e.shiftKey) {
-      deselectWells(wells)
-    } else {
-      selectWells(wells)
-    }
-  }
-
-  const handleMouseEnterWell: (args: WellMouseEvent) => void = args => {
+  const handleSelectionMove: (rect: GenericRect) => void = rect => {
     if (nozzleType != null) {
       const channels = getChannelsFromNozzleType(nozzleType)
-      const wellSet = getWellSetForMultichannel(
-        labwareDef,
-        args.wellName,
-        channels
+      const selectedWells = _getWellsFromRect(rect)
+      const allWellsForMulti: WellGroup = reduce(
+        selectedWells,
+        (acc: WellGroup, _, wellName: string): WellGroup => {
+          const wellSetForMulti =
+            getWellSetForMultichannel(definition, wellName, channels) || []
+          const channelWells = arrayToWellGroup(wellSetForMulti)
+          return {
+            ...acc,
+            ...channelWells,
+          }
+        },
+        {}
       )
-      const nextHighlightedWells = arrayToWellGroup(wellSet || [])
-      nextHighlightedWells && updateHighlightedWells(nextHighlightedWells)
+      setHighlightedWells(allWellsForMulti)
     } else {
-      updateHighlightedWells({ [args.wellName]: null })
+      setHighlightedWells(_getWellsFromRect(rect))
     }
+  }
+
+  const handleSelectionDone: (rect: GenericRect) => void = rect => {
+    const wells = _wellsFromSelected(_getWellsFromRect(rect))
+
+    selectWells(wells)
+    setHighlightedWells({})
   }
 
   // For rendering, show all wells not just primary wells
@@ -150,7 +113,7 @@ export function WellSelection(props: WellSelectionProps): JSX.Element {
           (acc, _, wellName): WellGroup => {
             const channels = getChannelsFromNozzleType(nozzleType)
             const wellSet = getWellSetForMultichannel(
-              labwareDef,
+              definition,
               wellName,
               channels
             )
@@ -162,10 +125,15 @@ export function WellSelection(props: WellSelectionProps): JSX.Element {
       : selectedPrimaryWells
 
   const wellFill: WellFill = {}
-  Object.keys(labwareProps.definition.wells).forEach(wellName => {
+  const wellStroke: WellStroke = {}
+  Object.keys(definition.wells).forEach(wellName => {
     wellFill[wellName] = COLORS.blue35
+    wellStroke[wellName] = COLORS.transparent
   })
   Object.keys(allSelectedWells).forEach(wellName => {
+    wellFill[wellName] = COLORS.blue50
+  })
+  Object.keys(highlightedWells).forEach(wellName => {
     wellFill[wellName] = COLORS.blue50
   })
 
@@ -176,19 +144,13 @@ export function WellSelection(props: WellSelectionProps): JSX.Element {
     >
       <RobotCoordinateSpace viewBox="0 0 128 86">
         <LabwareRender
-          {...labwareProps}
+          definition={definition}
           selectedWells={allSelectedWells}
-          onMouseLeaveWell={() => {
-            updateHighlightedWells({})
-          }}
-          onMouseEnterWell={({ wellName, event }) => {
-            if (wellContents !== null) {
-              handleMouseEnterWell({ wellName, event })
-            }
-          }}
           hideOutline
+          isInteractive
           wellLabelOption={WELL_LABEL_OPTIONS.SHOW_LABEL_INSIDE}
           wellFill={wellFill}
+          wellStroke={wellStroke}
         />
       </RobotCoordinateSpace>
     </SelectionRect>

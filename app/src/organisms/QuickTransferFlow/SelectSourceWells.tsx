@@ -60,19 +60,12 @@ export function SelectSourceWells(props: SelectSourceWellsProps): JSX.Element {
       >
         {state.source != null ? (
           <WellSelection
-            labwareProps={{ definition: state.source }}
+            definition={state.source}
             selectedPrimaryWells={selectedWells}
             selectWells={wellGroup => {
               setSelectedWells(prevWells => ({ ...prevWells, ...wellGroup }))
             }}
-            deselectWells={wellGroup => {
-              setSelectedWells(wellGroup)
-            }}
-            updateHighlightedWells={wellGroup => {
-              console.log(wellGroup)
-            }}
             nozzleType={null}
-            wellContents={{}}
           />
         ) : null}
       </Flex>

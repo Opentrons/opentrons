@@ -24,6 +24,8 @@ export interface StaticLabwareProps {
   onMouseEnterWell?: (e: WellMouseEvent) => unknown
   /** Optional callback to be executed when mouse leaves a well element */
   onMouseLeaveWell?: (e: WellMouseEvent) => unknown
+  /** Provides well data attribute */
+  isInteractive?: boolean
 }
 
 const TipDecoration = React.memo(function TipDecoration(props: {
@@ -55,6 +57,7 @@ export function StaticLabwareComponent(props: StaticLabwareProps): JSX.Element {
     definition,
     hideOutline = false,
     highlight,
+    isInteractive,
     onLabwareClick,
     onMouseEnterWell,
     onMouseLeaveWell,
@@ -80,6 +83,7 @@ export function StaticLabwareComponent(props: StaticLabwareProps): JSX.Element {
                     well={definition.wells[wellName]}
                     onMouseEnterWell={onMouseEnterWell}
                     onMouseLeaveWell={onMouseLeaveWell}
+                    isInteractive={isInteractive}
                     {...(isTiprack
                       ? STYLE_BY_WELL_CONTENTS.tipPresent
                       : STYLE_BY_WELL_CONTENTS.defaultWell)}

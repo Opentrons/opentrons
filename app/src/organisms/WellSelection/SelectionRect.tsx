@@ -3,8 +3,8 @@ import * as React from 'react'
 import type { DragRect, GenericRect } from './types'
 
 interface SelectionRectProps {
-  onSelectionMove?: (e: MouseEvent, arg: GenericRect) => void
-  onSelectionDone?: (e: MouseEvent, arg: GenericRect) => void
+  onSelectionMove?: (rect: GenericRect) => void
+  onSelectionDone?: (rect: GenericRect) => void
   children?: React.ReactNode
 }
 
@@ -33,7 +33,7 @@ export function SelectionRect(props: SelectionRectProps): JSX.Element {
           yDynamic: e.clientY,
         }
         const rect = getRect(nextRect)
-        onSelectionMove && onSelectionMove(e, rect)
+        onSelectionMove && onSelectionMove(rect)
 
         return nextRect
       }
@@ -50,7 +50,7 @@ export function SelectionRect(props: SelectionRectProps): JSX.Element {
       return prevPositions === positions ? null : prevPositions
     })
     // call onSelectionDone callback with {x0, x1, y0, y1} of final selection rectangle
-    onSelectionDone && finalRect && onSelectionDone(e, finalRect)
+    onSelectionDone && finalRect && onSelectionDone(finalRect)
   }
 
   const handleMouseDown: React.MouseEventHandler = e => {
