@@ -22,6 +22,7 @@ from pydantic.generics import GenericModel
 
 from opentrons.hardware_control import HardwareControlAPI
 
+from ..resources import ModelUtils
 from ..errors import ErrorOccurrence
 from ..notes import CommandNote, CommandNoteAdder
 
@@ -264,6 +265,7 @@ class AbstractCommandImpl(
         tip_handler: execution.TipHandler,
         run_control: execution.RunControlHandler,
         rail_lights: execution.RailLightsHandler,
+        model_utils: ModelUtils,
         status_bar: execution.StatusBarHandler,
         command_note_adder: CommandNoteAdder,
     ) -> None:

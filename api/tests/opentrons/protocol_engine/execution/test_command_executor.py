@@ -330,6 +330,7 @@ async def test_execute(
             tip_handler=mock_tip_handler,
             run_control=run_control,
             rail_lights=rail_lights,
+            model_utils=model_utils,
             status_bar=status_bar,
             command_note_adder=command_note_tracker,
         )
@@ -479,6 +480,7 @@ async def test_execute_raises_protocol_engine_error(
             tip_handler=mock_tip_handler,
             run_control=run_control,
             rail_lights=rail_lights,
+            model_utils=model_utils,
             status_bar=status_bar,
             command_note_adder=command_note_tracker,
         )

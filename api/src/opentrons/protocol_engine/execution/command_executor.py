@@ -128,6 +128,7 @@ class CommandExecutor:
             tip_handler=self._tip_handler,
             run_control=self._run_control,
             rail_lights=self._rail_lights,
+            model_utils=self._model_utils,
             status_bar=self._status_bar,
             command_note_adder=note_tracker,
         )
