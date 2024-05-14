@@ -20,6 +20,9 @@ The Opentrons AI application's server.
    1. This will create a `.python-version` file in this directory
 1. select the node version with `nvs` or `nvm` currently 18.19\*
 1. Install pipenv and python dependencies `make setup`
+1. to build and deploy you must have
+1. AWS credentials and the right roles
+1. docker installed
 
 ## Install a dev dependency
 
@@ -29,15 +32,7 @@ The Opentrons AI application's server.
 
 `python -m pipenv install openai==1.25.1`
 
-## Stack and structure
-
-### Tools
-
-- [powertools](https://powertools.aws.dev/)
-- [pytest]: https://docs.pytest.org/en/
-- [openai python api library]: https://pypi.org/project/openai/
-
-### Lambda Code Organizations and Separation of Concerns
+## Lambda Code Organizations and Separation of Concerns
 
 - handler
   - the lambda handler
@@ -51,8 +46,16 @@ The Opentrons AI application's server.
 1. Make your changes
 1. Fix what can be automatically then lent and unit test like CI will `make pre-commit`
 1. `make pre-commit` passes
-1. deploy to sandbox `make build deploy test-live ENV=sandbox AWS_PROFILE=the-profile`
+1. deploy to sandbox `make deploy test-live ENV=sandbox AWS_PROFILE=the-profile`
 
-## TODO
+## Custom runtime
 
-- llama-index is gigantic. Have to figure out how to get it in the lambda
+- Due to the size requirements of `llama-index` and our data we switched to a custom runtime
+- This also allows us to use HTTP streaming
+- The runtime is defined in the `Dockerfile`
+- deploy.py contains the steps to
+  1. build the container image
+  1. tag the container image (currently uses the epoch until versioning in place)
+  1. log into and push to the correct ECR
+  1. create a new lambda version against the new image
+  1. await the function to be ready
