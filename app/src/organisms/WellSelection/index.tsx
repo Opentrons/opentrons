@@ -41,6 +41,7 @@ export function WellSelection(props: WellSelectionProps): JSX.Element {
   const { definition, selectedPrimaryWells, selectWells, nozzleType } = props
 
   const [highlightedWells, setHighlightedWells] = React.useState<WellGroup>({})
+  const showButtonControls = definition.parameters.format === '384Standard'
 
   const _wellsFromSelected: (
     selectedWells: WellGroup
@@ -137,22 +138,27 @@ export function WellSelection(props: WellSelectionProps): JSX.Element {
     wellFill[wellName] = COLORS.blue50
   })
 
+  const labwareRender = (
+  <RobotCoordinateSpace viewBox="0 0 128 86">
+    <RobotCoordinateSpace viewBox="0 0 128 86">
+      <LabwareRender
+        definition={definition}
+        selectedWells={allSelectedWells}
+        hideOutline
+        isInteractive
+        wellLabelOption={WELL_LABEL_OPTIONS.SHOW_LABEL_INSIDE}
+        wellFill={wellFill}
+        wellStroke={wellStroke}
+      />
+    </RobotCoordinateSpace>
+  </RobotCoordinateSpace>
+  )
   return (
     <SelectionRect
       onSelectionMove={handleSelectionMove}
       onSelectionDone={handleSelectionDone}
     >
-      <RobotCoordinateSpace viewBox="0 0 128 86">
-        <LabwareRender
-          definition={definition}
-          selectedWells={allSelectedWells}
-          hideOutline
-          isInteractive
-          wellLabelOption={WELL_LABEL_OPTIONS.SHOW_LABEL_INSIDE}
-          wellFill={wellFill}
-          wellStroke={wellStroke}
-        />
-      </RobotCoordinateSpace>
+      {labwareRender}
     </SelectionRect>
   )
 }
