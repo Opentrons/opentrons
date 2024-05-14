@@ -19,13 +19,13 @@ ErrorIntervention.args = {
   type: 'error',
   heading: <StyledText as="h3">Oh no, an error!</StyledText>,
   iconName: 'alert-circle',
-  children: <StyledText as="p">Here's some error content</StyledText>,
+  children: <StyledText as="p">Heres some error content</StyledText>,
 }
 
 export const InterventionRequiredIntervention = Template.bind({})
 InterventionRequiredIntervention.args = {
   robotName: 'Otie',
   type: 'intervention-required',
-  heading: <StyledText as="h3">Looks like there's something to do</StyledText>,
-  children: <StyledText as="p">You've got to intervene!</StyledText>,
+  heading: <StyledText as="h3">Looks like theres something to do</StyledText>,
+  children: <StyledText as="p">Youve got to intervene!</StyledText>,
 }

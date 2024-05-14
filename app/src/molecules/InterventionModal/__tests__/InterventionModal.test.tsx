@@ -5,6 +5,7 @@ import { screen } from '@testing-library/react'
 import { COLORS, BORDERS } from '@opentrons/components'
 import { renderWithProviders } from '../../../__testing-utils__'
 import { InterventionModal } from '../'
+import type { ModalType } from '../'
 
 const render = (props: React.ComponentProps<typeof InterventionModal>) => {
   return renderWithProviders(<InterventionModal {...props} />)[0]
@@ -21,7 +22,7 @@ describe('InterventionModal', () => {
       type: 'intervention-required',
     }
   })
-  ;['intervention-required', 'error'].forEach(type => {
+  ;(['intervention-required', 'error'] as ModalType[]).forEach(type => {
     const color =
       type === 'intervention-required' ? COLORS.blue50 : COLORS.red50
     it(`renders with the ${type} style`, () => {
