@@ -5,6 +5,7 @@ from typing import Dict, Optional, List
 
 from opentrons.drivers.types import AbsorbanceReaderLidStatus
 from opentrons.drivers.absorbance_reader.abstract import AbstractAbsorbanceReaderDriver
+from opentrons.drivers.rpi_drivers.types import USBPort
 from .async_byonoy import AsyncByonoy
 
 
@@ -13,12 +14,13 @@ class AbsorbanceReaderDriver(AbstractAbsorbanceReaderDriver):
     async def create(
         cls,
         port: str,
+        usb_port: USBPort,
         loop: Optional[asyncio.AbstractEventLoop],
     ) -> AbsorbanceReaderDriver:
         """Create an absorbance reader driver."""
         from .async_byonoy import AsyncByonoy
 
-        connection = await AsyncByonoy.create(port=port, loop=loop)
+        connection = await AsyncByonoy.create(port=port, usb_port=usb_port, loop=loop)
         return cls(connection=connection)
 
     def __init__(self, connection: AsyncByonoy) -> None:

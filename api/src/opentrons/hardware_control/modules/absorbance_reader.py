@@ -43,7 +43,9 @@ class AbsorbanceReader(mod_abc.AbstractModule):
         """Create an AbsorbanceReader."""
         driver: AbstractAbsorbanceReaderDriver
         if not simulating:
-            driver = await AbsorbanceReaderDriver.create(port, hw_control_loop)
+            driver = await AbsorbanceReaderDriver.create(
+                port, usb_port, hw_control_loop
+            )
         else:
             driver = SimulatingDriver(serial_number=sim_serial_number)
         module = cls(

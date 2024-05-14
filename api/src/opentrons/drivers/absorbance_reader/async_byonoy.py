@@ -2,10 +2,10 @@ from __future__ import annotations
 
 import asyncio
 import re
-import subprocess
 from concurrent.futures.thread import ThreadPoolExecutor
 from functools import partial
 from typing import Optional, List, Dict
+import usb.core as usb_core  # type: ignore[import-untyped]
 
 
 from .hid_protocol import AbsorbanceHidInterface as AbsProtocol, ErrorCodeNames
@@ -13,6 +13,7 @@ from opentrons.drivers.types import (
     AbsorbanceReaderLidStatus,
     AbsorbanceReaderPlatePresence,
 )
+from opentrons.drivers.rpi_drivers.types import USBPort
 
 
 SN_PARSER = re.compile(r'ATTRS{serial}=="(?P<serial>.+?)"')
@@ -31,25 +32,21 @@ class AsyncByonoy:
         raise RuntimeError(f"Unavailble module with serial number: {sn}")
 
     @staticmethod
-    def serial_number_from_port(port: str) -> str:
+    def serial_number_from_port(name: str) -> str:
         """
-        Get the serial number from a port using udevadm.
-
-        We need to walk up the chain of parent devices to look for the first
-        serial number value because the hid interface doesn't provide it.
+        Get the serial number from a port using pyusb.
         """
-        output = subprocess.check_output(
-            f"udevadm info --name {port} --attribute-walk | grep serial -m1", shell=True
-        ).decode()
-        m = SN_PARSER.search(output)
-        if m:
-            return m.group("serial")
-        raise RuntimeError(f"Could not find serial number for port: {port}")
+        port_numbers = tuple(int(s) for s in name.split("-")[1].split("."))
+        device = usb_core.find(port_numbers=port_numbers)
+        if device:
+            return str(device.serial_number)
+        raise RuntimeError(f"Could not find serial number for port: {name}")
 
     @classmethod
     async def create(
         cls,
         port: str,
+        usb_port: USBPort,
         loop: Optional[asyncio.AbstractEventLoop] = None,
     ) -> AsyncByonoy:
         """
@@ -71,7 +68,7 @@ class AsyncByonoy:
 
         interface: AbsProtocol = byonoy
 
-        device_sn = cls.serial_number_from_port(port)
+        device_sn = cls.serial_number_from_port(usb_port.name)
         found: List[AbsProtocol.Device] = await loop.run_in_executor(
             executor=executor, func=byonoy.byonoy_available_devices
         )
