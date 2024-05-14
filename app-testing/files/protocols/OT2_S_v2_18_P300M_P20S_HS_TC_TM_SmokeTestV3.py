@@ -55,7 +55,7 @@
 
 # - Heater-Shaker Module support added
 
-from opentrons import protocol_api
+from opentrons import protocol_api, types
 
 metadata = {
     "protocolName": "🛠️ 2.18 Smoke Test V3 🪄",
@@ -268,240 +268,270 @@ def run(ctx: protocol_api.ProtocolContext) -> None:
 
     hs_module.close_labware_latch()
 
-    pipette_right.pick_up_tip()
+    # pipette_right.pick_up_tip()
 
-    ##################################
-    # Manual Deck State Modification #
-    ##################################
+    # ##################################
+    # # Manual Deck State Modification #
+    # ##################################
 
-    # -------------------------- #
-    # Added in API version: 2.15 #
-    # -------------------------- #
+    # # -------------------------- #
+    # # Added in API version: 2.15 #
+    # # -------------------------- #
 
-    # Putting steps for this at beginning of protocol so y    # >= 2.14 define_liquid and load_liquidou can do the manual stuff
-    # then walk away to let the rest of the protocol execute
+    # # Putting steps for this at beginning of protocol so y    # >= 2.14 define_liquid and load_liquidou can do the manual stuff
+    # # then walk away to let the rest of the protocol execute
 
-    # The test flow is as follows:
-    #   1. Remove the existing PCR plate from slot 2
-    #   2. Move the reservoir from slot 3 to slot 2
-    #   3. Pickup P20 tip, move pipette to reservoir A1 in slot 2
-    #   4. Pause and ask user to validate that the tip is in the middle of reservoir A1 in slot 2
-    #   5. Move the reservoir back to slot 3 from slot 2
-    #   6. Move pipette to reservoir A1 in slot 3
-    #   7. Pause and ask user to validate that the tip is in the middle of reservoir A1 in slot 3
-    #   8. Move custom labware from slot 6 to slot 2
-    #   9. Move pipette to well A1 in slot 2
-    #   10. Pause and ask user to validate that the tip is in the middle of well A1 in slot 2
-    #   11. Move the custom labware back to slot 6 from slot 2
-    #   12. Move pipette to well A1 in slot 6
-    #   13. Pause and ask user to validate that the tip is in the middle of well A1 in slot 6
-    #   14. Move the offdeck PCR plate back to slot 2
-    #   15. Move pipette to well A1 in slot 2
-    #   16. Pause and ask user to validate that the tip is in the middle of well A1 in slot 2
+    # # The test flow is as follows:
+    # #   1. Remove the existing PCR plate from slot 2
+    # #   2. Move the reservoir from slot 3 to slot 2
+    # #   3. Pickup P20 tip, move pipette to reservoir A1 in slot 2
+    # #   4. Pause and ask user to validate that the tip is in the middle of reservoir A1 in slot 2
+    # #   5. Move the reservoir back to slot 3 from slot 2
+    # #   6. Move pipette to reservoir A1 in slot 3
+    # #   7. Pause and ask user to validate that the tip is in the middle of reservoir A1 in slot 3
+    # #   8. Move custom labware from slot 6 to slot 2
+    # #   9. Move pipette to well A1 in slot 2
+    # #   10. Pause and ask user to validate that the tip is in the middle of well A1 in slot 2
+    # #   11. Move the custom labware back to slot 6 from slot 2
+    # #   12. Move pipette to well A1 in slot 6
+    # #   13. Pause and ask user to validate that the tip is in the middle of well A1 in slot 6
+    # #   14. Move the offdeck PCR plate back to slot 2
+    # #   15. Move pipette to well A1 in slot 2
+    # #   16. Pause and ask user to validate that the tip is in the middle of well A1 in slot 2
 
-    # In effect, nothing will actually change to the protocol,
-    # but we will be able to test that the UI responds appropriately.
+    # # In effect, nothing will actually change to the protocol,
+    # # but we will be able to test that the UI responds appropriately.
 
-    # Note:
-    #   logo_destination_plate is a nest_96_wellplate_100ul_pcr_full_skirt - starting position is slot 2
-    #   dye_container is aRESERVOIR_NAME- starting position is slot 3
+    # # Note:
+    # #   logo_destination_plate is a nest_96_wellplate_100ul_pcr_full_skirt - starting position is slot 2
+    # #   dye_container is aRESERVOIR_NAME- starting position is slot 3
 
-    # Step 1
-    ctx.move_labware(
-        labware=logo_destination_plate,
-        new_location=protocol_api.OFF_DECK,
-    )
+    # # Step 1
+    # ctx.move_labware(
+    #     labware=logo_destination_plate,
+    #     new_location=protocol_api.OFF_DECK,
+    # )
 
-    # Step 2
-    ctx.move_labware(labware=dye_container, new_location="2")
+    # # Step 2
+    # ctx.move_labware(labware=dye_container, new_location="2")
 
-    # Step 3
-    pipette_right.move_to(location=dye_container.wells_by_name()["A1"].top())
+    # # Step 3
+    # pipette_right.move_to(location=dye_container.wells_by_name()["A1"].top())
 
-    # Step 4
-    ctx.pause("Is the pipette tip in the middle of reservoir A1 in slot 2?")
+    # # Step 4
+    # ctx.pause("Is the pipette tip in the middle of reservoir A1 in slot 2?")
 
-    # Step 5
-    ctx.move_labware(labware=dye_container, new_location="3")
+    # # Step 5
+    # ctx.move_labware(labware=dye_container, new_location="3")
 
-    # Step 6
-    pipette_right.move_to(location=dye_container.wells_by_name()["A1"].top())
+    # # Step 6
+    # pipette_right.move_to(location=dye_container.wells_by_name()["A1"].top())
 
-    # Step 7
-    ctx.pause("Is the pipette tip in the middle of reservoir A1 in slot 3?")
+    # # Step 7
+    # ctx.pause("Is the pipette tip in the middle of reservoir A1 in slot 3?")
 
-    # Step 8
-    ctx.move_labware(labware=custom_labware, new_location="2")
+    # # Step 8
+    # ctx.move_labware(labware=custom_labware, new_location="2")
 
-    # Step 9
-    pipette_right.move_to(location=custom_labware.wells_by_name()["A1"].top())
+    # # Step 9
+    # pipette_right.move_to(location=custom_labware.wells_by_name()["A1"].top())
 
-    # Step 10
-    ctx.pause("Is the pipette tip in the middle of custom labware A1 in slot 2?")
+    # # Step 10
+    # ctx.pause("Is the pipette tip in the middle of custom labware A1 in slot 2?")
 
-    # Step 11
-    ctx.move_labware(labware=custom_labware, new_location="6")
+    # # Step 11
+    # ctx.move_labware(labware=custom_labware, new_location="6")
 
-    # Step 12
-    pipette_right.move_to(location=custom_labware.wells_by_name()["A1"].top())
+    # # Step 12
+    # pipette_right.move_to(location=custom_labware.wells_by_name()["A1"].top())
 
-    # Step 13
-    ctx.pause("Is the pipette tip in the middle of custom labware A1 in slot 6?")
+    # # Step 13
+    # ctx.pause("Is the pipette tip in the middle of custom labware A1 in slot 6?")
 
-    # Step 14
-    ctx.move_labware(labware=logo_destination_plate, new_location="2")
+    # # Step 14
+    # ctx.move_labware(labware=logo_destination_plate, new_location="2")
 
-    # Step 15
-    pipette_right.move_to(location=logo_destination_plate.wells_by_name()["A1"].top())
+    # # Step 15
+    # pipette_right.move_to(location=logo_destination_plate.wells_by_name()["A1"].top())
 
-    # Step 16
-    ctx.pause("Is the pipette tip in the middle of well A1 in slot 2?")
+    # # Step 16
+    # ctx.pause("Is the pipette tip in the middle of well A1 in slot 2?")
 
-    #######################
-    # prepare_to_aspirate #
-    #######################
+    # #######################
+    # # prepare_to_aspirate #
+    # #######################
 
-    # -------------------------- #
-    # Added in API version: 2.16 #
-    # -------------------------- #
+    # # -------------------------- #
+    # # Added in API version: 2.16 #
+    # # -------------------------- #
 
-    pipette_right.prepare_to_aspirate()
-    pipette_right.move_to(dye_container.wells_by_name()["A1"].bottom(z=2))
-    ctx.pause(
-        "Testing prepare_to_aspirate - watch pipette until next pause.\n The pipette should only move up out of the well after it has aspirated."
-    )
-    pipette_right.aspirate(10, dye_container.wells_by_name()["A1"].bottom(z=2))
-    ctx.pause("Did the pipette move up out of the well, only once, after aspirating?")
-    pipette_right.dispense(10, dye_container.wells_by_name()["A1"].bottom(z=2))
+    # pipette_right.prepare_to_aspirate()
+    # pipette_right.move_to(dye_container.wells_by_name()["A1"].bottom(z=2))
+    # ctx.pause(
+    #     "Testing prepare_to_aspirate - watch pipette until next pause.\n The pipette should only move up out of the well after it has aspirated."
+    # )
+    # pipette_right.aspirate(10, dye_container.wells_by_name()["A1"].bottom(z=2))
+    # ctx.pause("Did the pipette move up out of the well, only once, after aspirating?")
+    # pipette_right.dispense(10, dye_container.wells_by_name()["A1"].bottom(z=2))
 
-    #########################################
-    # protocol_context.fixed_trash property #
-    #########################################
+    # #########################################
+    # # protocol_context.fixed_trash property #
+    # #########################################
+
+    # # ---------------------------- #
+    # # Changed in API version: 2.16 #
+    # # ---------------------------- #
+
+    # pipette_right.move_to(ctx.fixed_trash)
+    # ctx.pause("Is the pipette over the trash? Pipette will home after this pause.")
+    # ctx.home()
+
+    # ###############################################
+    # # instrument_context.trash_container property #
+    # ###############################################
+
+    # # ---------------------------- #
+    # # Changed in API version: 2.16 #
+    # # ---------------------------- #
+
+    # pipette_right.move_to(pipette_right.trash_container)
+    # ctx.pause("Is the pipette over the trash?")
+
+    # # Distribute dye
+    # pipette_right.distribute(
+    #     volume=18,
+    #     source=dye_source,
+    #     dest=dye_destination_wells,
+    #     new_tip="never",
+    # )
+    # pipette_right.drop_tip()
+
+    # # transfer
+    # transfer_destinations = [
+    #     logo_destination_plate.wells_by_name()["A11"],
+    #     logo_destination_plate.wells_by_name()["B11"],
+    #     logo_destination_plate.wells_by_name()["C11"],
+    # ]
+    # pipette_right.pick_up_tip()
+    # pipette_right.transfer(
+    #     volume=60,
+    #     source=dye_container.wells_by_name()["A2"],
+    #     dest=transfer_destinations,
+    #     new_tip="never",
+    #     touch_tip=True,
+    #     blow_out=True,
+    #     blowout_location="destination well",
+    #     mix_before=(3, 20),
+    #     mix_after=(1, 20),
+    #     mix_touch_tip=True,
+    # )
+
+    # # consolidate
+    # pipette_right.consolidate(
+    #     volume=20,
+    #     source=transfer_destinations,
+    #     dest=dye_container.wells_by_name()["A5"],
+    #     new_tip="never",
+    #     touch_tip=False,
+    #     blow_out=True,
+    #     blowout_location="destination well",
+    #     mix_before=(3, 20),
+    # )
+
+    # # well to well
+    # pipette_right.return_tip()
+    # pipette_right.pick_up_tip()
+    # pipette_right.aspirate(volume=5, location=logo_destination_plate.wells_by_name()["A11"])
+    # pipette_right.air_gap(volume=10)
+    # ctx.delay(seconds=DELAY_TIME)
+    # pipette_right.dispense(volume=5, location=logo_destination_plate.wells_by_name()["H11"])
+
+    # # move to
+    # pipette_right.move_to(logo_destination_plate.wells_by_name()["E12"].top())
+    # pipette_right.move_to(logo_destination_plate.wells_by_name()["E11"].bottom())
+    # pipette_right.blow_out()
+    # # touch tip
+    # # pipette ends in the middle of the well as of 6.3.0 in all touch_tip
+    # pipette_right.touch_tip(location=logo_destination_plate.wells_by_name()["H1"])
+    # ctx.pause("Is the pipette tip in the middle of the well?")
+    # pipette_right.return_tip()
+
+    # # Play with the modules
+    # temperature_module.await_temperature(25)
+
+    # hs_module.set_and_wait_for_shake_speed(466)
+    # ctx.delay(seconds=DELAY_TIME)
+
+    # hs_module.set_and_wait_for_temperature(HEATER_SHAKER_TEMPERATURE)
+
+    # thermocycler_module.open_lid()
+    # thermocycler_module.close_lid()
+    # thermocycler_module.set_lid_temperature(38)  # 37 is the minimum
+    # thermocycler_module.set_block_temperature(temperature=28, hold_time_seconds=5)
+    # thermocycler_module.deactivate_block()
+    # thermocycler_module.deactivate_lid()
+    # thermocycler_module.open_lid()
+
+    # hs_module.deactivate_shaker()
+
+    # # dispense to modules
+
+    # # to temperature module
+    # pipette_right.pick_up_tip()
+    # pipette_right.aspirate(volume=15, location=dye_source)
+    # pipette_right.dispense(volume=15, location=temp_plate.well(0))
+    # pipette_right.drop_tip()
+
+    # # to heater shaker
+    # pipette_left.pick_up_tip()
+    # pipette_left.aspirate(volume=50, location=dye_source)
+    # pipette_left.dispense(volume=50, location=hs_plate.well(0))
+    # hs_module.set_and_wait_for_shake_speed(350)
+    # ctx.delay(DELAY_TIME)
+    # hs_module.deactivate_shaker()
+
+    # # to custom labware
+    # # This labware does not EXIST!!!! so...
+    # # Use tip rack lid to catch dye on wet run
+    # pipette_right.pick_up_tip()
+    # pipette_right.aspirate(volume=10, location=dye_source, rate=2.0)
+    # pipette_right.dispense(volume=10, location=custom_labware.well(3), rate=1.5)
+    # pipette_right.drop_tip()
+
+    # # to thermocycler
+    # pipette_left.aspirate(volume=75, location=dye_source)
+    # pipette_left.dispense(volume=60, location=tc_plate.wells_by_name()["A6"])
+    # pipette_left.drop_tip()
+
+    ########################
+    # unique top() methods #
+    ########################
 
     # ---------------------------- #
-    # Changed in API version: 2.16 #
+    # Changed in API version: 2.18 #
     # ---------------------------- #
 
-    pipette_right.move_to(ctx.fixed_trash)
-    ctx.pause("Is the pipette over the trash? Pipette will home after this pause.")
-    ctx.home()
+    assert isinstance(ctx.fixed_trash.top(), protocol_api.TrashBin)
+    assert isinstance(dye_container.wells_by_name()["A1"].top(), types.Location)
 
-    ###############################################
-    # instrument_context.trash_container property #
-    ###############################################
+
+    #############################
+    # drop_tip location changes #
+    #############################
 
     # ---------------------------- #
-    # Changed in API version: 2.16 #
+    # Changed in API version: 2.18 #
     # ---------------------------- #
 
-    pipette_right.move_to(pipette_right.trash_container)
-    ctx.pause("Is the pipette over the trash?")
+    ctx.pause("Watch the next 5 tips drop in the trash. They should drop in a different location each time.")
+    for _ in range(5):
+        pipette_right.pick_up_tip()
+        pipette_right.drop_tip()
 
-    # Distribute dye
-    pipette_right.distribute(
-        volume=18,
-        source=dye_source,
-        dest=dye_destination_wells,
-        new_tip="never",
-    )
-    pipette_right.drop_tip()
-
-    # transfer
-    transfer_destinations = [
-        logo_destination_plate.wells_by_name()["A11"],
-        logo_destination_plate.wells_by_name()["B11"],
-        logo_destination_plate.wells_by_name()["C11"],
-    ]
-    pipette_right.pick_up_tip()
-    pipette_right.transfer(
-        volume=60,
-        source=dye_container.wells_by_name()["A2"],
-        dest=transfer_destinations,
-        new_tip="never",
-        touch_tip=True,
-        blow_out=True,
-        blowout_location="destination well",
-        mix_before=(3, 20),
-        mix_after=(1, 20),
-        mix_touch_tip=True,
-    )
-
-    # consolidate
-    pipette_right.consolidate(
-        volume=20,
-        source=transfer_destinations,
-        dest=dye_container.wells_by_name()["A5"],
-        new_tip="never",
-        touch_tip=False,
-        blow_out=True,
-        blowout_location="destination well",
-        mix_before=(3, 20),
-    )
-
-    # well to well
-    pipette_right.return_tip()
-    pipette_right.pick_up_tip()
-    pipette_right.aspirate(volume=5, location=logo_destination_plate.wells_by_name()["A11"])
-    pipette_right.air_gap(volume=10)
-    ctx.delay(seconds=DELAY_TIME)
-    pipette_right.dispense(volume=5, location=logo_destination_plate.wells_by_name()["H11"])
-
-    # move to
-    pipette_right.move_to(logo_destination_plate.wells_by_name()["E12"].top())
-    pipette_right.move_to(logo_destination_plate.wells_by_name()["E11"].bottom())
-    pipette_right.blow_out()
-    # touch tip
-    # pipette ends in the middle of the well as of 6.3.0 in all touch_tip
-    pipette_right.touch_tip(location=logo_destination_plate.wells_by_name()["H1"])
-    ctx.pause("Is the pipette tip in the middle of the well?")
-    pipette_right.return_tip()
-
-    # Play with the modules
-    temperature_module.await_temperature(25)
-
-    hs_module.set_and_wait_for_shake_speed(466)
-    ctx.delay(seconds=DELAY_TIME)
-
-    hs_module.set_and_wait_for_temperature(HEATER_SHAKER_TEMPERATURE)
-
-    thermocycler_module.open_lid()
-    thermocycler_module.close_lid()
-    thermocycler_module.set_lid_temperature(38)  # 37 is the minimum
-    thermocycler_module.set_block_temperature(temperature=28, hold_time_seconds=5)
-    thermocycler_module.deactivate_block()
-    thermocycler_module.deactivate_lid()
-    thermocycler_module.open_lid()
-
-    hs_module.deactivate_shaker()
-
-    # dispense to modules
-
-    # to temperature module
-    pipette_right.pick_up_tip()
-    pipette_right.aspirate(volume=15, location=dye_source)
-    pipette_right.dispense(volume=15, location=temp_plate.well(0))
-    pipette_right.drop_tip()
-
-    # to heater shaker
-    pipette_left.pick_up_tip()
-    pipette_left.aspirate(volume=50, location=dye_source)
-    pipette_left.dispense(volume=50, location=hs_plate.well(0))
-    hs_module.set_and_wait_for_shake_speed(350)
-    ctx.delay(DELAY_TIME)
-    hs_module.deactivate_shaker()
-
-    # to custom labware
-    # This labware does not EXIST!!!! so...
-    # Use tip rack lid to catch dye on wet run
-    pipette_right.pick_up_tip()
-    pipette_right.aspirate(volume=10, location=dye_source, rate=2.0)
-    pipette_right.dispense(volume=10, location=custom_labware.well(3), rate=1.5)
-    pipette_right.drop_tip()
-
-    # to thermocycler
-    pipette_left.aspirate(volume=75, location=dye_source)
-    pipette_left.dispense(volume=60, location=tc_plate.wells_by_name()["A6"])
-    pipette_left.drop_tip()
+    ctx.pause("Watch the next 5 tips drop in the trash. They should drop in the same location each time.")
+    for _ in range(5):
+        pipette_right.pick_up_tip()
+        pipette_right.drop_tip(location=ctx.fixed_trash)
 
     ######################
     # labware.set_offset #
