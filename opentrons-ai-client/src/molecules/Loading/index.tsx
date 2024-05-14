@@ -18,9 +18,10 @@ export function Loading(): JSX.Element {
       justifyContent={JUSTIFY_CENTER}
       alignItems={ALIGN_CENTER}
       gridGap={SPACING.spacing16}
+      height="100vh"
     >
-      <StyledText>{t('loading')}</StyledText>
-      <Icon name="ot-spinner" size="2rem" spin />
+      <StyledText as="h3">{t('loading')}</StyledText>
+      <Icon name="ot-spinner" size="3rem" spin />
     </Flex>
   )
 }
