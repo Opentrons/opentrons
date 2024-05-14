@@ -26,11 +26,8 @@ TEST_ACCELERATION = 1500  # used during gravimetric tests
 
 DEFAULT_ACCELERATION = DEFAULT_ACCELERATIONS.low_throughput[types.OT3AxisKind.P]
 DEFAULT_CURRENT = DEFAULT_RUN_CURRENT.low_throughput[types.OT3AxisKind.P]
-print(f"DEFAULT_CURRENT: {DEFAULT_CURRENT}")
 DEFAULT_SPEED = DEFAULT_MAX_SPEEDS.low_throughput[types.OT3AxisKind.P]
-
 MUST_PASS_CURRENT = round(DEFAULT_CURRENT * 0.75, 2)  # the target spec (must pass here)
-print(f"MUST_PASS_CURRENT: {MUST_PASS_CURRENT}")
 assert (
     MUST_PASS_CURRENT < DEFAULT_CURRENT
 ), "must-pass current must be less than default current"
@@ -47,9 +44,9 @@ PLUNGER_CURRENTS_SPEED = {
     MUST_PASS_CURRENT: TEST_SPEEDS,
     DEFAULT_CURRENT: TEST_SPEEDS,
 }
-print(f"PLUNGER_CURRENTS_SPEED: {PLUNGER_CURRENTS_SPEED}")
 
 MUST_PASS_CURRENT_TURE = 0.4
+PASS_PRINT_LIST = []
 
 MAX_SPEED = max(TEST_SPEEDS)
 MAX_CURRENT = max(max(list(PLUNGER_CURRENTS_SPEED.keys())), 1.0)
@@ -215,6 +212,8 @@ async def _test_plunger(
     # start at HIGHEST (easiest) current
     currents = sorted(list(PLUNGER_CURRENTS_SPEED.keys()), reverse=False)
     max_failed_current = 0.0
+    global PASS_PRINT_LIST
+    PASS_PRINT_LIST = []
     for current in currents:
         ui.print_title(f"CURRENT = {current}")
         # start at LOWEST (easiest) speed
@@ -242,6 +241,10 @@ async def _test_plunger(
                         ui.print_error(
                             f"failed moving {direction} at {current} amps and {speed} mm/sec"
                         )
+                        if  _includes_result(current,speed):
+                            failval = f"向{direction}移动时,在电流 {current} amps 速度 {speed} mm/sec 不通过"
+                            PASS_PRINT_LIST.append(failval)
+
                         max_failed_current = max(max_failed_current, current)
                         if continue_after_stall:
                             break
@@ -295,11 +298,10 @@ async def _main(is_simulating: bool, trials: int, continue_after_stall: bool) ->
     global MUST_PASS_CURRENT_TURE
     if "single" in pipptype[types.OT3Mount.LEFT]['name']:
         
-        MUST_PASS_CURRENT_TURE = 0.3
-    elif "multi" in pipptype[types.OT3Mount.LEFT]['name']:
         MUST_PASS_CURRENT_TURE = 0.5
-    else:
-        raise Exception("pipette type not found(没有找到移液器,请检查是否烧录条码)")
+    elif "multi" in pipptype[types.OT3Mount.LEFT]['name']:
+        MUST_PASS_CURRENT_TURE = 0.75
+    
    
 
     # test each attached pipette
@@ -318,6 +320,16 @@ async def _main(is_simulating: bool, trials: int, continue_after_stall: bool) ->
         ui.print_title("DONE")
         report.save_to_disk()
         report.print_results()
+
+        
+        if len(PASS_PRINT_LIST) > 0:
+            ui.print_title("电流测试不通过(CURRENT SPEED TESTING FAIL)")
+            printlist = list(set(PASS_PRINT_LIST))
+            for printval in printlist:
+                print(" - ",printval)
+        else:
+            ui.print_title("电流测试通过(CURRENT SPEED TESTING PASS)")
+
         if api.is_simulator:
             break
 
