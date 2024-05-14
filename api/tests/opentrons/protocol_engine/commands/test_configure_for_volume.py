@@ -10,6 +10,7 @@ from opentrons.protocol_engine.resources.pipette_data_provider import (
     LoadedStaticPipetteData,
 )
 
+from opentrons.protocol_engine.commands.command import SuccessData
 from opentrons.protocol_engine.commands.configure_for_volume import (
     ConfigureForVolumeParams,
     ConfigureForVolumeResult,
@@ -65,9 +66,11 @@ async def test_configure_for_volume_implementation(
         )
     )
 
-    result, private_result = await subject.execute(data)
+    result = await subject.execute(data)
 
-    assert result == ConfigureForVolumeResult()
-    assert private_result == ConfigureForVolumePrivateResult(
-        pipette_id="pipette-id", serial_number="some number", config=config
+    assert result == SuccessData(
+        public=ConfigureForVolumeResult(),
+        private=ConfigureForVolumePrivateResult(
+            pipette_id="pipette-id", serial_number="some number", config=config
+        ),
     )

@@ -2,6 +2,7 @@
 import asyncio
 from logging import getLogger
 from typing import Optional, List, Protocol
+from typing_extensions import assert_never
 
 from opentrons.hardware_control import HardwareControlAPI
 
@@ -11,16 +12,12 @@ from opentrons_shared_data.errors.exceptions import (
     PythonException,
 )
 
+from opentrons.protocol_engine.commands.command import SuccessData
 from opentrons.protocol_engine.error_recovery_policy import ErrorRecoveryPolicy
 
 from ..state import StateStore
 from ..resources import ModelUtils
-from ..commands import (
-    CommandStatus,
-    AbstractCommandImpl,
-    CommandResult,
-    CommandPrivateResult,
-)
+from ..commands import CommandStatus
 from ..actions import (
     ActionDispatcher,
     RunCommandAction,
@@ -142,17 +139,17 @@ class CommandExecutor:
         )
         running_command = self._state_store.commands.get(queued_command.id)
 
+        log.debug(
+            f"Executing {running_command.id}, {running_command.commandType}, {running_command.params}"
+        )
         try:
-            log.debug(
-                f"Executing {running_command.id}, {running_command.commandType}, {running_command.params}"
+            result = await command_impl.execute(
+                running_command.params  # type: ignore[arg-type]
             )
-            if isinstance(command_impl, AbstractCommandImpl):
-                result: CommandResult = await command_impl.execute(running_command.params)  # type: ignore[arg-type]
-                private_result: Optional[CommandPrivateResult] = None
-            else:
-                result, private_result = await command_impl.execute(running_command.params)  # type: ignore[arg-type]
 
         except (Exception, asyncio.CancelledError) as error:
+            # The command encountered an undefined error.
+
             log.warning(f"Execution of {running_command.id} failed", exc_info=error)
             # TODO(mc, 2022-11-14): mark command as stopped rather than failed
             # https://opentrons.atlassian.net/browse/RCORE-390
@@ -184,16 +181,23 @@ class CommandExecutor:
                     ),
                 )
             )
+
         else:
-            update = {
-                "result": result,
-                "status": CommandStatus.SUCCEEDED,
-                "completedAt": self._model_utils.get_timestamp(),
-                "notes": note_tracker.get_notes(),
-            }
-            succeeded_command = running_command.copy(update=update)
-            self._action_dispatcher.dispatch(
-                SucceedCommandAction(
-                    command=succeeded_command, private_result=private_result
-                ),
-            )
+            if isinstance(result, SuccessData):
+                update = {
+                    "result": result.public,
+                    "status": CommandStatus.SUCCEEDED,
+                    "completedAt": self._model_utils.get_timestamp(),
+                    "notes": note_tracker.get_notes(),
+                }
+                succeeded_command = running_command.copy(update=update)
+                self._action_dispatcher.dispatch(
+                    SucceedCommandAction(
+                        command=succeeded_command, private_result=result.private
+                    ),
+                )
+            else:
+                # The command encountered a defined error.
+                # TODO(mm, 2024-05-10): Once commands start returning DefinedErrorData,
+                # handle it here by dispatching a FailCommandAction.
+                assert_never(result)

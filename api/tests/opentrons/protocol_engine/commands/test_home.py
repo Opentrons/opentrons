@@ -5,6 +5,7 @@ from opentrons.protocol_engine.types import MotorAxis
 from opentrons.types import MountType
 from opentrons.protocol_engine.execution import MovementHandler
 
+from opentrons.protocol_engine.commands.command import SuccessData
 from opentrons.protocol_engine.commands.home import (
     HomeParams,
     HomeResult,
@@ -20,7 +21,7 @@ async def test_home_implementation(decoy: Decoy, movement: MovementHandler) -> N
 
     result = await subject.execute(data)
 
-    assert result == HomeResult()
+    assert result == SuccessData(public=HomeResult(), private=None)
     decoy.verify(await movement.home(axes=[MotorAxis.X, MotorAxis.Y]))
 
 
@@ -32,7 +33,7 @@ async def test_home_all_implementation(decoy: Decoy, movement: MovementHandler) 
 
     result = await subject.execute(data)
 
-    assert result == HomeResult()
+    assert result == SuccessData(public=HomeResult(), private=None)
     decoy.verify(await movement.home(axes=None))
 
 
@@ -51,7 +52,7 @@ async def test_home_with_invalid_position(
     )
 
     result = await subject.execute(data)
-    assert result == HomeResult()
+    assert result == SuccessData(public=HomeResult(), private=None)
 
     decoy.verify(await movement.home(axes=[MotorAxis.X, MotorAxis.Y]), times=1)
     decoy.reset()
@@ -60,6 +61,6 @@ async def test_home_with_invalid_position(
         await movement.check_for_valid_position(mount=MountType.LEFT)
     ).then_return(True)
     result = await subject.execute(data)
-    assert result == HomeResult()
+    assert result == SuccessData(public=HomeResult(), private=None)
 
     decoy.verify(await movement.home(axes=[MotorAxis.X, MotorAxis.Y]), times=0)
