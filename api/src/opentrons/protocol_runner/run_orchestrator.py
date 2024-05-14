@@ -118,6 +118,7 @@ class RunOrchestrator:
         ):
             return self._json_or_python_runner.set_command_queued(request)
 
+    # TODO(tz, 2024-5-13): what runner should we return?
     def get_protocol_runner(self) -> Optional[Union[protocol_runner.JsonRunner, protocol_runner.PythonAndLegacyRunner]]:
         return self._json_or_python_runner
 

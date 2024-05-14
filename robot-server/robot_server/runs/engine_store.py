@@ -183,7 +183,9 @@ class EngineStore:
             )
             # if we are doing this we probably need a lock on _run_orchestrator
             self._run_orchestrator = RunOrchestrator.build_orchestrator(
-                protocol_engine=engine, hardware_api=self._hardware_api
+                run_id="initial-engine",
+                protocol_engine=engine,
+                hardware_api=self._hardware_api,
             )
             return self._run_orchestrator.get_protocol_engine()
 
