@@ -17,8 +17,6 @@ import { SidePanel } from './molecules/SidePanel'
 import { ChatContainer } from './organisms/ChatContainer'
 import { Loading } from './molecules/Loading'
 
-const LOGIN_PAGE_URL = 'https://auth-dev.opentrons.com/'
-
 export function App(): JSX.Element {
   const { t } = useTranslation('protocol_generator')
   const { isAuthenticated, logout, isLoading, loginWithRedirect } = useAuth0()
