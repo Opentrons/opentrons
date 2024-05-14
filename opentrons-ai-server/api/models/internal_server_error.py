@@ -1,7 +1,9 @@
-from typing import Annotated
-
-from pydantic import BaseModel, Field
+from pydantic import BaseModel
 
 
-class InternalServerErrorOutput(BaseModel):
-    error: Annotated[str, Field(description="Error description")] = "internal server error"
+class InternalServerError(BaseModel):
+    message: str = "Internal server error"
+    exception_object: Exception
+
+    class Config:
+        arbitrary_types_allowed = True
