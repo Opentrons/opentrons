@@ -61,7 +61,6 @@ export const RunPreviewComponent = (
   // we only ever want one request done for terminal runs because this is a heavy request
   const {
     data: commandsFromQueryResponse,
-    isLoading: isRunCommandsLoading,
   } = useNotifyAllCommandsAsPreSerializedList(
     runId,
     { cursor: 0, pageLength: MAX_COMMANDS },
@@ -72,8 +71,7 @@ export const RunPreviewComponent = (
     }
   )
   const commandsFromQuery = commandsFromQueryResponse?.data
-  const nullCheckedCommandsFromQuery =
-    commandsFromQuery == null ? robotSideAnalysis?.commands : commandsFromQuery
+  const nullCheckedCommandsFromQuery = commandsFromQuery ?? []
   const viewPortRef = React.useRef<HTMLDivElement | null>(null)
   const currentRunCommandKey = useNotifyLastRunCommand(runId, {
     refetchInterval: LIVE_RUN_COMMANDS_POLL_MS,
@@ -84,7 +82,7 @@ export const RunPreviewComponent = (
   ] = React.useState<boolean>(true)
   if (robotSideAnalysis == null) return null
   const commands =
-    (isRunTerminal && !isRunCommandsLoading
+    (isRunTerminal
       ? nullCheckedCommandsFromQuery
       : robotSideAnalysis.commands) ?? []
   // pass relevant data from run rather than analysis so that CommandText utilities can properly hash the entities' IDs
