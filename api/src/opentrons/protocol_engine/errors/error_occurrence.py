@@ -52,7 +52,6 @@ class ErrorOccurrence(BaseModel):
         ),
     )
 
-    # TODO: Document new meaning of errorType.
     # TODO(mm, 2023-09-07):
     # The Opentrons App and Flex ODD use `errorType` in the title of error modals, but it's unclear
     # if they should. Is this field redundant now that we have `errorCode` and `detail`?
@@ -67,7 +66,6 @@ class ErrorOccurrence(BaseModel):
         ),
     )
 
-    # TODO: Punctuation?
     detail: str = Field(
         ...,
         description=(

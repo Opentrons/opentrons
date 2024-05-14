@@ -144,7 +144,6 @@ class PickUpTipImplementation(
                 public=TipPhysicallyMissingError(
                     id=self._model_utils.generate_id(),
                     createdAt=self._model_utils.get_timestamp(),
-                    # TODO: Is this the correct way to wrap this?
                     wrappedErrors=[
                         ErrorOccurrence.from_failed(
                             id=self._model_utils.generate_id(),
