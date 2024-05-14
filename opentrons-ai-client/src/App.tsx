@@ -3,8 +3,10 @@ import { useAuth0 } from '@auth0/auth0-react'
 import { useTranslation } from 'react-i18next'
 
 import {
+  ALIGN_CENTER,
   DIRECTION_ROW,
   Flex,
+  JUSTIFY_CENTER,
   Link as LinkButton,
   POSITION_ABSOLUTE,
   POSITION_RELATIVE,
@@ -19,33 +21,43 @@ const LOGIN_PAGE_URL = 'https://auth-dev.opentrons.com/'
 
 export function App(): JSX.Element {
   const { t } = useTranslation('protocol_generator')
-  const { isAuthenticated, logout, isLoading } = useAuth0()
+  const { isAuthenticated, logout, isLoading, loginWithRedirect } = useAuth0()
 
-  // if not authenticated redirect to login page
-  if (!isAuthenticated) {
-    window.location.href = LOGIN_PAGE_URL
-  }
+  console.log('isAuthenticated', isAuthenticated)
 
   return (
     <>
       {isLoading ? (
         <Loading />
       ) : (
-        <Flex flexDirection={DIRECTION_ROW} position={POSITION_RELATIVE}>
+        <>
           {isAuthenticated ? (
-            // Note: this logout button is temporary
-            <Flex position={POSITION_ABSOLUTE} top="1rem" right="1rem">
+            <Flex flexDirection={DIRECTION_ROW} position={POSITION_RELATIVE}>
+              {isAuthenticated ? (
+                // Note: this logout button is temporary
+                <Flex position={POSITION_ABSOLUTE} top="1rem" right="1rem">
+                  <LinkButton
+                    onClick={() => logout()}
+                    textDecoration={TYPOGRAPHY.textDecorationUnderline}
+                  >
+                    {t('logout')}
+                  </LinkButton>
+                </Flex>
+              ) : null}
+              <SidePanel />
+              <ChatContainer />
+            </Flex>
+          ) : (
+            <Flex justifyContent={JUSTIFY_CENTER} alignItems={ALIGN_CENTER}>
               <LinkButton
-                onClick={() => logout()}
+                onClick={() => loginWithRedirect()}
                 textDecoration={TYPOGRAPHY.textDecorationUnderline}
               >
-                {t('logout')}
+                {t('login')}
               </LinkButton>
             </Flex>
-          ) : null}
-          <SidePanel />
-          <ChatContainer />
-        </Flex>
+          )}
+        </>
       )}
     </>
   )
