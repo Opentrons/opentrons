@@ -491,7 +491,7 @@ async def test_execute_raises_protocol_engine_error(
         datetime(year=2023, month=3, day=3),
     )
 
-    decoy.when(error_recovery_policy(matchers.Anything(), expected_error)).then_return(
+    decoy.when(error_recovery_policy(matchers.Anything(), None)).then_return(
         ErrorRecoveryType.WAIT_FOR_RECOVERY
     )
 
