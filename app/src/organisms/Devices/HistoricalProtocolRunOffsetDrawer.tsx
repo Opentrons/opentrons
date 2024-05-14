@@ -103,7 +103,7 @@ export function HistoricalProtocolRunOffsetDrawer(
       <Flex justifyContent={JUSTIFY_FLEX_START} alignItems={ALIGN_END}>
         <Box
           width="25.25%"
-          padding={`${SPACING.spacing8} ${SPACING.spacing4} ${SPACING.spacing8} ${SPACING.spacing4}`}
+          padding={`${SPACING.spacing4} ${SPACING.spacing8} ${SPACING.spacing4} ${SPACING.spacing4}`}
         >
           <StyledText
             as="label"
