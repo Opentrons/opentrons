@@ -25,6 +25,7 @@ import type { WellFill, WellGroup, WellStroke } from '@opentrons/components'
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import type { GenericRect, NozzleType } from './types'
 import { useTranslation } from 'react-i18next'
+import { IconButton } from '../../atoms/buttons/IconButton'
 
 interface WellSelectionProps {
   definition: LabwareDefinition2
@@ -155,10 +156,14 @@ export function WellSelection(props: WellSelectionProps): JSX.Element {
     </RobotCoordinateSpace>
   )
   return showButtonControls ? (
-    <>
-      {labwareRender}
-      <ButtonControls channels={channels} />
-    </>
+    <Flex justifyContent={JUSTIFY_SPACE_BETWEEN} width="100%">
+      <Flex flex="2" >
+        {labwareRender}
+      </Flex>
+      <Flex flex="1">
+        <ButtonControls channels={channels} />
+      </Flex>
+    </Flex>
   ) : (
     <SelectionRect
       onSelectionMove={handleSelectionMove}
@@ -174,11 +179,15 @@ interface ButtonControlsProps {
 }
 function ButtonControls(props: ButtonControlsProps): JSX.Element {
   const { channels } = props
-  const { t } = useTranslation('quick_transfer')
+  const { t, i18n } = useTranslation('quick_transfer')
 
   const addOrRemoveButtons = channels !== 96 ? (
     <Flex flexDirection={DIRECTION_COLUMN} alignItems={ALIGN_FLEX_START}>
-      <StyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>{t('add_or_remove')}</StyledText>
+      <StyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>{i18n.format(t('add_or_remove'), 'capitalize')}</StyledText>
+      <Flex>
+        <IconButton onClick={() => {console.log('TODO handle minus')}} iconName="minus" />
+        <IconButton onClick={() => {console.log('TODO handle plus')}} iconName="plus" />
+      </Flex>
     </Flex>
   ) : null
   return (

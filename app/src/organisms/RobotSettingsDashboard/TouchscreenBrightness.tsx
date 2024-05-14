@@ -12,7 +12,6 @@ import {
   DIRECTION_COLUMN,
   DIRECTION_ROW,
   Flex,
-  Icon,
   JUSTIFY_CENTER,
   SPACING,
   RESPONSIVENESS,
@@ -27,6 +26,7 @@ import {
 
 import type { Dispatch } from '../../redux/types'
 import type { SetSettingOption } from '../../pages/RobotSettingsDashboard'
+import { IconButton } from '../../atoms/buttons/IconButton'
 
 interface BrightnessTileProps {
   isActive: boolean
@@ -91,9 +91,8 @@ export function TouchscreenBrightness({
           disabled={brightness === LOWEST_BRIGHTNESS}
           onClick={() => handleClick('down')}
           data-testid="TouchscreenBrightness_decrease"
-        >
-          <Icon size="5rem" name="minus" />
-        </IconButton>
+          iconName="minus"
+        />
         <Flex
           flexDirection={DIRECTION_ROW}
           gridGap={SPACING.spacing8}
@@ -111,30 +110,11 @@ export function TouchscreenBrightness({
           disabled={brightness === HIGHEST_BRIGHTNESS}
           onClick={() => handleClick('up')}
           data-testid="TouchscreenBrightness_increase"
-        >
-          <Icon size="5rem" name="plus" />
-        </IconButton>
+          iconName="plus"
+        />
       </Flex>
     </Flex>
   )
 }
 
-const IconButton = styled('button')`
-  border-radius: 50%;
-  max-height: 100%;
-  background-color: ${COLORS.white};
 
-  &:active {
-    background-color: ${COLORS.grey35};
-  }
-  &:focus-visible {
-    box-shadow: ${ODD_FOCUS_VISIBLE};
-    background-color: ${COLORS.grey35};
-  }
-  &:disabled {
-    background-color: transparent;
-  }
-  @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
-    cursor: default;
-  }
-`
