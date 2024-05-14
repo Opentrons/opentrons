@@ -523,7 +523,7 @@ async def _read_pressure_and_check_results(
                 f"ERROR: channel {c + 1} samples are too far apart, "
                 f"max={round(_c_max, 2)} and min={round(_c_min, 2)}"
             )
-            print(f"04-01:状态:{tag.value} channel {c + 1} 气压差变动最大值:{round(_c_max, 2)} 与最小值:{round(_c_min, 2)} 超过阈值{pressure_event_config.stability_threshold}")
+            print(f"04-01:状态:{tag.value},channel {c + 1} 气压差变动最大值:{round(_c_max, 2)}与 最小值:{round(_c_min, 2)}差{abs(round(_c_max, 2)-round(_c_min, 2))} 超过阈值{pressure_event_config.stability_threshold}")
             test_pass_stability = False
     csv_data_stability = [
         f"pressure-{tag.value}",
@@ -544,7 +544,7 @@ async def _read_pressure_and_check_results(
             f"ERROR: samples are out of range, "
             f"max={round(_samples_max, 2)} and min={round(_samples_min, 2)}"
         )
-        print(f"04-02:状态:{tag.value} 气压值超出阈值, 最大值:{round(_samples_max, 2)} 最小值:{round(_samples_min, 2)}, 阈值:{pressure_event_config.min}~{pressure_event_config.max}")
+        print(f"04-02:状态{tag.value},读取的气压最大值{round(_samples_max, 2)} 最小值{round(_samples_min, 2)}超出阈值范围, 阈值:{pressure_event_config.min}~{pressure_event_config.max}")
         test_pass_accuracy = False
     else:
         test_pass_accuracy = True
@@ -574,7 +574,7 @@ async def _read_pressure_and_check_results(
                     f"out of range: max={_delta_max}, min={_delta_min}"
                 )
                 print(" ")
-                print(f"04-03:状态:{tag.value} channel:{c + 1} 气压值增量:{_delta}超出阈值, 阈值:{_delta_max}~{_delta_min}")
+                print(f"04-03:状态{tag.value},channel {c + 1} 气压值增量 {_delta}不在阈值范围内, 阈值:{_delta_max}~{_delta_min}")
                 test_pass_delta = False
         csv_data_delta = [
             f"pressure-{tag.value}",
