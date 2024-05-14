@@ -121,7 +121,7 @@ class EngineStore:
         self._hardware_api = hardware_api
         self._robot_type = robot_type
         self._deck_type = deck_type
-        # self._default_engine: Optional[ProtocolEngine] = None
+        self._default_engine: Optional[ProtocolEngine] = None
         # self._runner_engine_pair: Optional[RunnerEnginePair] = None
         hardware_api.register_callback(_get_estop_listener(self))
 
@@ -182,13 +182,13 @@ class EngineStore:
                     block_on_door_open=False,
                 ),
             )
-            # if we are doing this we probably need a lock on _run_orchestrator
-            self._run_orchestrator = RunOrchestrator.build_orchestrator(
-                run_id="initial-engine",
-                protocol_engine=engine,
-                hardware_api=self._hardware_api,
-            )
-            return self._run_orchestrator.get_protocol_engine()
+            self._default_engine = engine
+            # # if we are doing this we probably need a lock on _run_orchestrator
+            # self._run_orchestrator = RunOrchestrator.build_orchestrator(
+            #     protocol_engine=engine,
+            #     hardware_api=self._hardware_api,
+            # )
+            return engine
 
     async def create(
         self,

@@ -27,12 +27,12 @@ class RunOrchestrator:
 
     def __init__(
         self,
-        run_id: str,
         protocol_engine: ProtocolEngine,
         hardware_api: HardwareControlAPI,
         fixit_runner: protocol_runner.AnyRunner,
         setup_runner: protocol_runner.AnyRunner,
         json_or_python_protocol_runner: Optional[protocol_runner.AnyRunner] = None,
+        run_id: Optional[str] = None,
     ):
         self.run_id = run_id
         self._protocol_engine = protocol_engine
@@ -44,7 +44,6 @@ class RunOrchestrator:
     @classmethod
     def build_orchestrator(
         cls,
-        run_id:Optional[str],
         protocol_engine: ProtocolEngine,
         hardware_api: HardwareControlAPI,
         protocol_config: Optional[
@@ -52,6 +51,7 @@ class RunOrchestrator:
         ] = None,
         post_run_hardware_state: PostRunHardwareState = PostRunHardwareState.HOME_AND_STAY_ENGAGED,
         drop_tips_after_run: bool = True,
+        run_id: Optional[str] = None,
     ) -> "RunOrchestrator":
         setup_runner = protocol_runner.create_protocol_runner(
             protocol_engine=protocol_engine,
@@ -120,7 +120,6 @@ class RunOrchestrator:
         ):
             return self._json_or_python_runner.set_command_queued(request)
 
-    # TODO(tz, 2024-5-13): what runner should we return?
     def get_protocol_runner(self) -> protocol_runner.AnyRunner:
         return self._json_or_python_runner or self._setup_runner
 
