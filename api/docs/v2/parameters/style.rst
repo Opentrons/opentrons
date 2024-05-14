@@ -124,7 +124,7 @@ Number Choices
         - ✅ Low (10 µL), Medium (20 µL), High (50 µL)
         - ❌ Low volume, Medium volume, High volume
 
-**Use a range instead of choices when all values are acceptable.** It is faster and easier to enter a numeric value than to choose from a long list. For example, a "Number of columns" parameter that accepts any number 1 through 12 should specify a ``minimum`` and ``maximum``, rather than ``choices``. However, if the application requires that the parameter only accepts even numbers, you need to specify choices (2, 4, 6, 8, 10, 12).
+**Use a range instead of choices when all values are acceptable.** It's faster and easier to enter a numeric value than to choose from a long list. For example, a "Number of columns" parameter that accepts any number 1 through 12 should specify a ``minimum`` and ``maximum``, rather than ``choices``. However, if the application requires that the parameter only accepts even numbers, you need to specify choices (2, 4, 6, 8, 10, 12).
 
 Strings
 -------

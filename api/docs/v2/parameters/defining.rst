@@ -28,7 +28,8 @@ Depending on the :ref:`type of parameter <rtp-types>`, you'll need to specify so
        - An optional longer explanation of what the parameter does, or how its values will affect the execution of the protocol.
        - Maximum 100 characters.
    * - ``default``
-     - The value the parameter will have if the user makes no changes to it during run setup.
+     - 
+       - The value the parameter will have if the technician makes no changes to it during run setup.
    * - ``minimum`` and ``maximum``
      -
        - For numeric parameters only.
@@ -43,7 +44,7 @@ Depending on the :ref:`type of parameter <rtp-types>`, you'll need to specify so
        - Can't be used at the same time as ``minimum`` and ``maximum``.
    * - ``units``
      -
-       - Optional, for numeric parameters only.
+       - Optional, for numeric parameters with ``minimum`` and ``maximum`` only.
        - Displays after the number during run setup.
        - Does not affect the parameter's value or protocol execution.
        - Maximum 10 characters.
@@ -55,7 +56,7 @@ Depending on the :ref:`type of parameter <rtp-types>`, you'll need to specify so
 The ``add_parameters()`` Function
 =================================
 
-All parameter definitions are contained in a Python function, which must be named ``add_parameters`` and takes a single argument. You must define ``add_parameters`` before the ``run`` function that contains protocol commands.
+All parameter definitions are contained in a Python function, which must be named ``add_parameters`` and takes a single argument. Define ``add_parameters()`` before the ``run()`` function that contains protocol commands.
 
 The examples on this page assume the following definition, which uses the argument name ``parameters``. The type specification of the argument is optional.
 
@@ -86,7 +87,7 @@ Boolean parameters are ``True`` or ``False`` only.
         default=False
     )
 
-During run setup, users can toggle between the two values. In the Opentrons App, Boolean parameters appear as a toggle switch. On the touchscreen, they appear as *On* or *Off*, for ``True`` and ``False`` respectively.
+During run setup, the technician can toggle between the two values. In the Opentrons App, Boolean parameters appear as a toggle switch. On the touchscreen, they appear as *On* or *Off*, for ``True`` and ``False`` respectively.
 
 .. versionadded:: 2.18
 
@@ -109,7 +110,7 @@ To specify a range, include ``minimum`` and ``maximum``.
         unit="µL"
     )
 
-During run setup, the user can enter any integer value from the minimum up to the maximum. Entering a value outside of the range will show an error. At that point, they can correct their custom value or restore the default value.
+During run setup, the technician can enter any integer value from the minimum up to the maximum. Entering a value outside of the range will show an error. At that point, they can correct their custom value or restore the default value.
 
 To specify a list of numbers, include ``choices``. Each choice is a dictionary with entries for display name and value. The display names let you briefly explain the effect each choice will have.
 
@@ -127,7 +128,7 @@ To specify a list of numbers, include ``choices``. Each choice is a dictionary w
         ]
     )
 
-During run setup, the user can choose from a menu of the provided choices.
+During run setup, the technician can choose from a menu of the provided choices.
 
 .. versionadded:: 2.18
 
@@ -175,6 +176,6 @@ A common use for string display names is to provide an easy-to-read version of a
         default="flex_1channel_50",
     )
 
-During run setup, the user can choose from a menu of the provided choices.
+During run setup, the technician can choose from a menu of the provided choices.
 
 .. versionadded:: 2.18

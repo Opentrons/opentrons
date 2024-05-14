@@ -6,7 +6,7 @@
 Parameter Use Case – Dry Run
 ****************************
 
-When testing out a new protocol, it's common to perform a dry run to watch your robot go through all the steps without actually handling samples or reagents. This use case explores how to add a single boolean parameter for whether you're performing a dry run.
+When testing out a new protocol, it's common to perform a dry run to watch your robot go through all the steps without actually handling samples or reagents. This use case explores how to add a single Boolean parameter for whether you're performing a dry run.
 
 The code examples will show how this single value can control:
 
@@ -112,7 +112,7 @@ Then call that function throughout your protocol::
 
 Additionally, if your protocol uses enough tips that you have to replenish tip racks, you'll need separate behavior for dry runs and live runs. In a live run, once you've used all the tips, the rack is empty, because the tips are in the trash. In a dry run, once you've used all the tips in a rack, the rack is *full*, because you returned the tips.
 
-The API has methods to handle both of these situations. To continue using the same tip rack without physically replace it, call :py:meth:`.reset_tipracks`. In the live run, move the empty tip rack off the deck and move a full one into place::
+The API has methods to handle both of these situations. To continue using the same tip rack without physically replacing it, call :py:meth:`.reset_tipracks`. In the live run, move the empty tip rack off the deck and move a full one into place::
 
     if protocol.params.dry_run is True:
         pipette.reset_tipracks()
