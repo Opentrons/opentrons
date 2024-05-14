@@ -1,10 +1,12 @@
 """This module provides function to generate the initial setup of an Opentrons protocol."""
+
 import ast
 import typing
-from test_data_generation.python_protocol_generation import ast_helpers as ast_h
-from test_data_generation.python_protocol_generation.util import (
+
+from test_data_generation.constants import (
     PROTOCOL_CONTEXT_VAR_NAME,
 )
+from test_data_generation.python_protocol_generation import ast_helpers as ast_h
 
 
 def create_requirements_dict(

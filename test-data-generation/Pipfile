@@ -17,6 +17,7 @@ opentrons-shared-data = {file = "../shared-data/python", editable = true}
 opentrons = { editable = true, path = "../api"}
 test-data-generation = {file = ".", editable = true}
 astor = "0.8.1"
+pytest-xdist = "*"
 
 [requires]
 python_version = "3.10"
