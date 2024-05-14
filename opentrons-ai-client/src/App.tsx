@@ -46,7 +46,11 @@ export function App(): JSX.Element {
               <ChatContainer />
             </Flex>
           ) : (
-            <Flex justifyContent={JUSTIFY_CENTER} alignItems={ALIGN_CENTER}>
+            <Flex
+              justifyContent={JUSTIFY_CENTER}
+              alignItems={ALIGN_CENTER}
+              height="100vh"
+            >
               <LinkButton
                 onClick={() => loginWithRedirect()}
                 textDecoration={TYPOGRAPHY.textDecorationUnderline}
