@@ -359,27 +359,23 @@ async def test_execute(
 
 
 @pytest.mark.parametrize(
-    ["command_error", "expected_error", "unexpected_error"],
+    ["command_error", "expected_error"],
     [
         (
             errors.ProtocolEngineError(message="oh no"),
             matchers.ErrorMatching(errors.ProtocolEngineError, match="oh no"),
-            False,
         ),
         (
             EStopActivatedError(),
             matchers.ErrorMatching(PE_EStopActivatedError),
-            True,
         ),
         (
             RuntimeError("oh no"),
             matchers.ErrorMatching(PythonException, match="oh no"),
-            True,
         ),
         (
             asyncio.CancelledError(),
             matchers.ErrorMatching(errors.RunStoppedError),
-            False,
         ),
     ],
 )
@@ -403,7 +399,6 @@ async def test_execute_raises_protocol_engine_error(
     error_recovery_policy: ErrorRecoveryPolicy,
     command_error: Exception,
     expected_error: Any,
-    unexpected_error: bool,
 ) -> None:
     """It should handle an error occuring during execution."""
     TestCommandImplCls = decoy.mock(func=_TestCommandImpl)
