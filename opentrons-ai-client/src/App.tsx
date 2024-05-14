@@ -21,8 +21,6 @@ export function App(): JSX.Element {
   const { t } = useTranslation('protocol_generator')
   const { isAuthenticated, logout, isLoading, loginWithRedirect } = useAuth0()
 
-  console.log('isAuthenticated', isAuthenticated)
-
   return (
     <>
       {isLoading ? (
