@@ -121,22 +121,9 @@ class RunOrchestrator:
             return self._json_or_python_runner.set_command_queued(request)
 
     # TODO(tz, 2024-5-13): what runner should we return?
-    def get_protocol_runner(self) -> Optional[Union[protocol_runner.JsonRunner, protocol_runner.PythonAndLegacyRunner]]:
-        return self._json_or_python_runner
+    def get_protocol_runner(self) -> protocol_runner.AnyRunner:
+        return self._json_or_python_runner or self._setup_runner
 
     def get_protocol_engine(self) -> ProtocolEngine:
         return self._protocol_engine
-
-    async def load(
-        self,
-        protocol_source: ProtocolSource,
-        python_parse_mode: PythonParseMode,
-        run_time_param_values: Optional[RunTimeParamValuesType],
-    ) -> None:
-        pass
-
-    def prepare(
-        self,
-    ) -> None:
-        pass
 

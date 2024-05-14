@@ -11,11 +11,7 @@ from opentrons.types import DeckSlotName
 from opentrons.hardware_control import HardwareControlAPI, API
 from opentrons.hardware_control.types import EstopStateNotification, EstopState
 from opentrons.protocol_engine import ProtocolEngine, StateSummary, types as pe_types
-from opentrons.protocol_runner import (
-    RunResult,
-    LiveRunner,
-    JsonRunner,
-)
+from opentrons.protocol_runner import RunResult, LiveRunner, JsonRunner, RunOrchestrator
 from opentrons.protocol_reader import ProtocolReader, ProtocolSource
 
 from robot_server.protocols.protocol_store import ProtocolResource
@@ -25,11 +21,18 @@ from robot_server.runs.engine_store import (
     NoRunnerEnginePairError,
     handle_estop_event,
 )
+from robot_server.runs.run_models import Run
 
 
 def mock_notify_publishers() -> None:
     """A mock notify_publishers."""
     return None
+
+
+@pytest.fixture
+async def mock_run_orchestrator(decoy: Decoy) -> RunOrchestrator:
+    """A mock RunOrchestrator"""
+    return decoy.mock(cls=RunOrchestrator)
 
 
 @pytest.fixture
@@ -53,7 +56,9 @@ async def json_protocol_source() -> ProtocolSource:
     return await ProtocolReader().read_saved(files=[simple_protocol], directory=None)
 
 
-async def test_create_engine(subject: EngineStore) -> None:
+async def test_create_engine(
+    decoy: Decoy, subject: EngineStore, mock_run_orchestrator: RunOrchestrator
+) -> None:
     """It should create an engine for a run."""
     result = await subject.create(
         run_id="run-id",

@@ -255,13 +255,11 @@ class EngineStore:
         # concurrency hazard. If two requests simultaneously call this method,
         # they will both "succeed" (with undefined results) instead of one
         # raising EngineConflictError.
-        if isinstance(
-            self._run_orchestrator.get_protocol_runner(), PythonAndLegacyRunner
-        ):
+        if isinstance(self.runner, PythonAndLegacyRunner):
             assert (
                 protocol is not None
             ), "A Python protocol should have a protocol source file."
-            await self._run_orchestrator.load(
+            await self.runner.load(
                 protocol.source,
                 # Conservatively assume that we're re-running a protocol that
                 # was uploaded before we added stricter validation, and that
@@ -269,13 +267,13 @@ class EngineStore:
                 python_parse_mode=PythonParseMode.ALLOW_LEGACY_METADATA_AND_REQUIREMENTS,
                 run_time_param_values=run_time_param_values,
             )
-        elif isinstance(self._run_orchestrator.get_protocol_runner(), JsonRunner):
+        elif isinstance(self.runner, JsonRunner):
             assert (
                 protocol is not None
             ), "A JSON protocol should have a protocol source file."
-            await self._run_orchestrator.load(protocol.source)
+            await self.runner.load(protocol.source)
         else:
-            self._run_orchestrator.prepare()
+            self.runner.prepare()
 
         for offset in labware_offsets:
             engine.add_labware_offset(offset)
@@ -295,8 +293,8 @@ class EngineStore:
             EngineConflictError: The current runner/engine pair is not idle, so
             they cannot be cleared.
         """
-        engine = self._run_orchestrator.get_protocol_engine()
-        runner = self._run_orchestrator.get_protocol_runner()
+        engine = self.engine
+        runner = self.runner
         if engine.state_view.commands.get_is_okay_to_clear():
             await engine.finish(
                 drop_tips_after_run=False,
