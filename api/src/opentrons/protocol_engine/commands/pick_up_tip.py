@@ -86,17 +86,13 @@ class TipPhysicallyMissingErrorInternalData:
     well_name: str
 
 
-class PickUpTipImplementation(
-    AbstractCommandImpl[
-        PickUpTipParams,
-        Union[
-            SuccessData[PickUpTipResult, None],
-            DefinedErrorData[
-                TipPhysicallyMissingError, TipPhysicallyMissingErrorInternalData
-            ],
-        ],
-    ]
-):
+_ExecuteReturn = Union[
+    SuccessData[PickUpTipResult, None],
+    DefinedErrorData[TipPhysicallyMissingError, TipPhysicallyMissingErrorInternalData],
+]
+
+
+class PickUpTipImplementation(AbstractCommandImpl[PickUpTipParams, _ExecuteReturn]):
     """Pick up tip command implementation."""
 
     def __init__(
@@ -114,12 +110,7 @@ class PickUpTipImplementation(
 
     async def execute(
         self, params: PickUpTipParams
-    ) -> Union[
-        SuccessData[PickUpTipResult, None],
-        DefinedErrorData[
-            TipPhysicallyMissingError, TipPhysicallyMissingErrorInternalData
-        ],
-    ]:
+    ) -> Union[SuccessData[PickUpTipResult, None], _ExecuteReturn]:
         """Move to and pick up a tip using the requested pipette."""
         pipette_id = params.pipetteId
         labware_id = params.labwareId
