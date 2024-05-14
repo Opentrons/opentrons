@@ -8,7 +8,7 @@ from functools import partial
 from typing import Optional, List, Dict
 
 
-from .hid_protocol import AbsorbanceHidInterface as AbsProtocol
+from .hid_protocol import AbsorbanceHidInterface as AbsProtocol, ErrorCodeNames
 from opentrons.drivers.types import (
     AbsorbanceReaderLidStatus,
     AbsorbanceReaderPlatePresence,
@@ -127,33 +127,37 @@ class AsyncByonoy:
         )
         return self._device_handle
 
+    def _raise_if_error(
+        self,
+        err_name: ErrorCodeNames,
+        msg: str = "Error occurred: ",
+    ) -> None:
+        if err_name != "BYONOY_ERROR_NO_ERROR":
+            raise RuntimeError(msg, err_name)
+
     def _get_device_information(self) -> AbsProtocol.DeviceInfo:
         handle = self.verify_device_handle()
         err, device_info = self._interface.byonoy_get_device_information(handle)
-        if err.name != "BYONOY_ERROR_NO_ERROR":
-            raise RuntimeError(f"Error getting device information: {err}")
+        self._raise_if_error(err.name, "Error getting device information: ")
         return device_info
 
     def _get_device_status(self) -> AbsProtocol.DeviceState:
         handle = self.verify_device_handle()
         err, status = self._interface.byonoy_get_device_status(handle)
-        if err.name != "BYONOY_ERROR_NO_ERROR":
-            raise RuntimeError(f"Error getting device status: {err}")
+        self._raise_if_error(err.name, "Error getting device status: ")
         return status
 
     def _get_slot_status(self) -> AbsProtocol.SlotState:
         handle = self.verify_device_handle()
         err, slot_status = self._interface.byonoy_get_device_slot_status(handle)
-        if err.name != "BYONOY_ERROR_NO_ERROR":
-            raise RuntimeError(f"Error getting slot status: {err}")
+        self._raise_if_error(err.name, "Error getting slot status: ")
         return slot_status
 
     def _get_lid_status(self) -> bool:
         handle = self.verify_device_handle()
         lid_on: bool
         err, lid_on = self._interface.byonoy_get_device_parts_aligned(handle)
-        if err.name != "BYONOY_ERROR_NO_ERROR":
-            raise RuntimeError(f"Error getting slot status: {err}")
+        self._raise_if_error(err.name, "Error getting lid status: ")
         return lid_on
 
     def _get_supported_wavelengths(self) -> List[int]:
@@ -162,24 +166,21 @@ class AsyncByonoy:
         err, wavelengths = self._interface.byonoy_abs96_get_available_wavelengths(
             handle
         )
-        if err.name != "BYONOY_ERROR_NO_ERROR":
-            raise RuntimeError(f"Error getting supported wavelengths: {err}")
+        self._raise_if_error(err.name, "Error getting available wavelengths: ")
         self._supported_wavelengths = wavelengths
         return wavelengths
 
     def _initialize_measurement(self, conf: AbsProtocol.MeasurementConfig) -> None:
         handle = self.verify_device_handle()
         err = self._interface.byonoy_abs96_initialize_single_measurement(handle, conf)
-        if err.name != "BYONOY_ERROR_NO_ERROR":
-            raise RuntimeError(f"Error initializing measurement: {err}")
+        self._raise_if_error(err.name, "Error initializing measurement: ")
         self._current_config = conf
 
     def _single_measurement(self, conf: AbsProtocol.MeasurementConfig) -> List[float]:
         handle = self.verify_device_handle()
         measurements: List[float]
         err, measurements = self._interface.byonoy_abs96_single_measure(handle, conf)
-        if err.name != "BYONOY_ERROR_NO_ERROR":
-            raise RuntimeError(f"Error getting single measurement: {err}")
+        self._raise_if_error(err.name, "Error getting single measurement: ")
         return measurements
 
     def _set_sample_wavelength(self, wavelength: int) -> AbsProtocol.MeasurementConfig:

@@ -2,6 +2,7 @@ from typing import (
     Dict,
     Protocol,
     List,
+    Literal,
     Tuple,
     ClassVar,
     runtime_checkable,
@@ -9,6 +10,31 @@ from typing import (
 )
 
 Response = TypeVar("Response")
+
+ErrorCodeNames = Literal[
+    "BYONOY_ERROR_NO_ERROR",
+    "BYONOY_ERROR_UNKNOWN_ERROR",
+    "BYONOY_ERROR_DEVICE_CLOSED",
+    "BYONOY_ERROR_INVALID_ARGUMENT",
+    "BYONOY_ERROR_NO_MEMORY",
+    "BYONOY_ERROR_UNSUPPORTED_OPERATION",
+    "BYONOY_ERROR_DEVICE_COMMUNICATION_FAILURE",
+    "BYONOY_ERROR_DEVICE_OPERATION_FAILED",
+    "BYONOY_ERROR_DEVICE_OPEN_PREFIX",
+    "BYONOY_ERROR_DEVICE_NOT_FOUND",
+    "BYONOY_ERROR_DEVICE_TOO_NEW",
+    "BYONOY_ERROR_DEVICE_ALREADY_OPEN",
+    "BYONOY_ERROR_FIRMWARE_UPDATE_ERROR_PREFIX",
+    "BYONOY_ERROR_FIRMWARE_UPDATE_FILE_NOT_FOUND",
+    "BYONOY_ERROR_FIRMWARE_UPDATE_FILE_NOT_VALID",
+    "BYONOY_ERROR_FIRMWARE_UPDATE_FAILED",
+    "BYONOY_ERROR_FILE_ERROR_PREFIX",
+    "BYONOY_ERROR_FILE_WRITE_ERROR",
+    "BYONOY_ERROR_MEASUTEMNT_ERROR_PREFIX",
+    "BYONOY_ERROR_MEASUTEMNT_SLOT_NOT_EMPTY",
+    "BYONOY_ERROR_NOT_INITIALIZED",
+    "BYONOY_ERROR_INTERNAL",
+]
 
 
 @runtime_checkable
@@ -19,8 +45,8 @@ class AbsorbanceHidInterface(Protocol):
 
     @runtime_checkable
     class ErrorCode(Protocol):
-        __members__: Dict[str, int]
-        name: str
+        __members__: Dict[ErrorCodeNames, int]
+        name: ErrorCodeNames
         value: int
 
     @runtime_checkable
