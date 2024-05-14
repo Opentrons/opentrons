@@ -26,6 +26,7 @@ The UI stack is built using:
 - [React][]
 - [Babel][]
 - [Vite][]
+- [Jotai][]
 
 Some important directories:
 
@@ -59,5 +60,6 @@ TBD
 [react]: https://react.dev/
 [babel]: https://babeljs.io/
 [vite]: https://vitejs.dev/
+[jotai]: https://jotai.org/
 [bundle-analyzer]: https://github.com/webpack-contrib/webpack-bundle-analyzer
 [opentrons-ai-server]: https://github.com/Opentrons/opentrons/tree/edge/opentrons-ai-server

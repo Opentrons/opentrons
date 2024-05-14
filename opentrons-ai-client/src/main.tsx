@@ -1,8 +1,8 @@
 import React from 'react'
 import ReactDOM from 'react-dom/client'
 import { I18nextProvider } from 'react-i18next'
-import { GlobalStyle } from './atoms/GlobalStyle'
 
+import { GlobalStyle } from './atoms/GlobalStyle'
 import { i18n } from './i18n'
 import { App } from './App'
 

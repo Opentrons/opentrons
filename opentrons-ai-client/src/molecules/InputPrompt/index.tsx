@@ -149,6 +149,7 @@ const StyledTextarea = styled.textarea`
   width: 100%;
   font-size: ${TYPOGRAPHY.fontSize20};
   line-height: ${TYPOGRAPHY.lineHeight24};
+  padding: 1.2rem 0;
 
   ::placeholder {
     position: absolute;
