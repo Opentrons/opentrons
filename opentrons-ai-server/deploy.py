@@ -1,5 +1,4 @@
 import argparse
-import json
 import time
 from dataclasses import dataclass
 from pathlib import Path
@@ -13,7 +12,6 @@ from rich.traceback import install
 install()
 
 ENVIRONMENTS = ["sandbox", "dev"]
-ACTIONS = ["deploy", "test"]
 
 
 @dataclass(frozen=True)
@@ -38,7 +36,7 @@ class DevDeploymentConfig(BaseDeploymentConfig):
     FUNCTION_NAME: str = "dev-api-function"
 
 
-class AWSActions:
+class Deploy:
     def __init__(self, config: SandboxDeploymentConfig | DevDeploymentConfig) -> None:
         self.config: SandboxDeploymentConfig | DevDeploymentConfig = config
         self.lambda_client = boto3.client("lambda")
@@ -92,52 +90,27 @@ class AWSActions:
                 print("Status still 'Pending'. Checking again in 3 seconds...")
                 time.sleep(3)  # Wait for 3 seconds before checking again
 
-    def invoke_lambda(self, version: str) -> None:
-        """Invoke the updated Lambda function."""
-        with open(self.config.HEALTH_EVENT, "r") as f:
-            event = json.load(f)
-        function_with_version = f"{self.config.FUNCTION_NAME}:{version}"
-        print(f"Invoking Lambda function: {function_with_version}")
-        response = self.lambda_client.invoke(FunctionName=function_with_version, Payload=json.dumps(event))
-        print("Invoked Lambda function response:")
-        print(response)
-        print("Payload:")
-        print(response["Payload"].read().decode())
-
-    def invoke_latest_lambda(self) -> None:
-        """Invoke the latest version of the Lambda function."""
-        with open(self.config.HEALTH_EVENT, "r") as f:
-            event = json.load(f)
-        response = self.lambda_client.invoke(FunctionName=self.config.FUNCTION_NAME, Payload=json.dumps(event))
-        print("Invoked Lambda function response:")
-        print(response)
-        print("Payload:")
-        print(response["Payload"].read().decode())
-
     def deploy(self) -> None:
         self.upload_to_s3()
         version = self.update_lambda()
         if version:
             self.wait_for_lambda_status(version)
-            self.invoke_lambda(version)
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(description="Manage Lambda deployment or testing.")
+    parser = argparse.ArgumentParser(description="Manage Lambda deployment.")
     parser.add_argument("--env", type=str, help=f"Deployment environment {ENVIRONMENTS}")
-    parser.add_argument(
-        "--action", type=str, choices=ACTIONS, default="test", help=f"Choose action to perform: {ACTIONS} (default is test)"
-    )
     args = parser.parse_args()
 
     # Determine if the script was called with command-line arguments
-    if args.env and args.action:
+    if args.env:
+        if args.env.lower() not in ENVIRONMENTS:
+            print(f"[red]Invalid environment specified: {args.env}[/red]")
+            exit(1)
         env = args.env.lower()
-        action = args.action.lower()
     else:
         # Interactive prompts if no command-line arguments
         env = Prompt.ask("[bold magenta]Enter the deployment environment[/]", choices=ENVIRONMENTS, default="sandbox")
-        action = Prompt.ask("[bold cyan]Choose the action[/]", choices=ACTIONS, default="test")
 
     # Validate environment
     config: SandboxDeploymentConfig | DevDeploymentConfig
@@ -148,16 +121,8 @@ def main() -> None:
     else:
         print(f"[red]Invalid environment specified: {env}[/red]")
         exit(1)
-
-    print(f"[green]Environment: {env}[/]")
-    print(f"[green]Action: {action}[/]")
-
-    if action == "deploy":
-        aws_actions = AWSActions(config)
-        aws_actions.deploy()
-    elif action == "test":
-        aws_actions = AWSActions(config)
-        aws_actions.invoke_latest_lambda()
+    aws_actions = Deploy(config)
+    aws_actions.deploy()
 
 
 if __name__ == "__main__":

@@ -1,55 +1,14 @@
 import os
+from dataclasses import asdict, dataclass
 from pathlib import Path
+from typing import Type
 
-import boto3
 from dotenv import load_dotenv
-from pydantic import (
-    SecretStr,
-)
+from pydantic import SecretStr
+
+from api.integration.aws_secrets_manager import fetch_secret
 
 ENV_PATH: Path = Path(Path(__file__).parent.parent, ".env")
-
-
-class Settings:
-    def __init__(self) -> None:
-        # Load environment variables from .env file if it exists
-        # These map to the the environment variables defined and set in terraform
-        # These may also be set with some future need during lambda version creation
-        load_dotenv(ENV_PATH)
-        self.typicode_base_url: str = os.getenv("TYPICODE_BASE_URL", "https://jsonplaceholder.typicode.com")
-        self.openai_base_url: str = os.getenv("OPENAI_BASE_URL", "https://api.openai.com")
-        self.huggingface_base_url: str = os.getenv("HUGGINGFACE_BASE_URL", "https://api-inference.huggingface.co")
-        self.log_level: str = os.getenv("LOG_LEVEL", "debug")
-        self.service_name: str = os.getenv("SERVICE_NAME", "local-ai-api")
-        self.environment: str = os.getenv("ENVIRONMENT", "local")
-        if is_running_on_lambda():
-            # Fetch secrets from AWS Secrets manager using AWS Lambda Powertools
-            self.openai_api_key: SecretStr = self.fetch_secret(f"{self.environment}-openai-api-key")
-            self.huggingface_api_key: SecretStr = self.fetch_secret(f"{self.environment}-huggingface-api-key")
-        else:
-            # Use values from .env or defaults if not set
-            self.openai_api_key = SecretStr(os.getenv("OPENAI_API_KEY", "default-openai-secret"))  # can change to throw
-            self.huggingface_api_key = SecretStr(os.getenv("HUGGINGFACE_API_KEY", "default-huggingface-secret"))  # can change to throw
-
-    @staticmethod
-    def fetch_secret(secret_name: str) -> SecretStr:
-        """Fetch a secret using Boto3."""
-        client = boto3.client("secretsmanager")
-        response = client.get_secret_value(SecretId=secret_name)
-        return SecretStr(response["SecretString"])
-
-
-def generate_env_file(settings: Settings) -> None:
-    """
-    Generates a .env file from the current settings including defaults.
-    """
-    with open(ENV_PATH, "w") as file:
-        for field, value in vars(settings).items():
-            # Ensure we handle secret types appropriately
-            value = value.get_secret_value() if isinstance(value, SecretStr) else value
-            if value is not None:
-                file.write(f"{field.upper()}={value}\n")
-    print(f".env file generated at {str(ENV_PATH)}")
 
 
 def is_running_on_lambda() -> bool:
@@ -57,7 +16,63 @@ def is_running_on_lambda() -> bool:
     return "AWS_LAMBDA_FUNCTION_NAME" in os.environ
 
 
+@dataclass(frozen=True)
+class Settings:
+    HUGGINGFACE_SIMULATE_ENDPOINT: str
+    LOG_LEVEL: str
+    SERVICE_NAME: str
+    ENVIRONMENT: str
+    OPENAI_MODEL_NAME: str
+    openai_api_key: SecretStr
+    huggingface_api_key: SecretStr
+
+    @classmethod
+    def build(cls: Type["Settings"]) -> "Settings":
+        # Load environment variables from .env file if it exists
+        load_dotenv(ENV_PATH)
+
+        environment = os.getenv("ENVIRONMENT", "local")
+        service_name = os.getenv("SERVICE_NAME", "local-ai-api")
+        openai_model_name = os.getenv("OPENAI_MODEL_NAME", "gpt-4-1106-preview")
+        huggingface_simulate_endpoint = os.getenv("HUGGINGFACE_SIMULATE_ENDPOINT", "https://Opentrons-simulator.hf.space/protocol")
+        log_level = os.getenv("LOG_LEVEL", "debug")
+
+        if is_running_on_lambda():
+            openai_api_key = fetch_secret(f"{environment}-openai-api-key")
+            huggingface_api_key = fetch_secret(f"{environment}-huggingface-api-key")
+        else:
+            openai_api_key = SecretStr(os.getenv("OPENAI_API_KEY", ""))
+            huggingface_api_key = SecretStr(os.getenv("HUGGINGFACE_API_KEY", ""))
+
+        return cls(
+            HUGGINGFACE_SIMULATE_ENDPOINT=huggingface_simulate_endpoint,
+            LOG_LEVEL=log_level,
+            SERVICE_NAME=service_name,
+            ENVIRONMENT=environment,
+            OPENAI_MODEL_NAME=openai_model_name,
+            openai_api_key=openai_api_key,
+            huggingface_api_key=huggingface_api_key,
+        )
+
+    @staticmethod
+    def get_service_name() -> str:
+        return os.getenv("SERVICE_NAME", "local-ai-api")
+
+
+def generate_env_file(settings: Settings) -> None:
+    """
+    Generates a .env file from the current settings including defaults.
+    """
+
+    with open(ENV_PATH, "w") as file:
+        for field, value in asdict(settings).items():
+            if value is not None:
+                file.write(f"{field.upper()}={value}\n")
+
+    print(f".env file generated at {str(ENV_PATH)}")
+
+
 # Example usage
 if __name__ == "__main__":
-    config = Settings()
+    config: Settings = Settings.build()
     generate_env_file(config)
