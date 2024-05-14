@@ -16,6 +16,7 @@ from opentrons.hardware_control.types import (
     EstopStateNotification,
     HardwareEventHandler,
 )
+from opentrons.protocol_reader import ProtocolSource
 from opentrons.protocols.parse import PythonParseMode
 from opentrons.protocols.api_support.deck_type import should_load_fixed_trash
 from opentrons.protocol_runner import (
@@ -101,7 +102,7 @@ def _get_estop_listener(engine_store: "EngineStore") -> HardwareEventHandler:
 class EngineStore:
     """Factory and in-memory storage for ProtocolEngine."""
 
-    _run_orchestrator: RunOrchestrator
+    _run_orchestrator: Optional[RunOrchestrator] = None
 
     def __init__(
         self,
@@ -238,6 +239,9 @@ class EngineStore:
         post_run_hardware_state = PostRunHardwareState.HOME_AND_STAY_ENGAGED
         drop_tips_after_run = True
 
+        if self._run_orchestrator is not None:
+            raise EngineConflictError("Another run is currently active.")
+
         self._run_orchestrator = RunOrchestrator.build_orchestrator(
             run_id=run_id,
             protocol_engine=engine,
@@ -246,9 +250,6 @@ class EngineStore:
             post_run_hardware_state=post_run_hardware_state,
             drop_tips_after_run=drop_tips_after_run,
         )
-
-        if self._run_orchestrator is not None:
-            raise EngineConflictError("Another run is currently active.")
 
         # FIXME(mm, 2022-12-21): These `await runner.load()`s introduce a
         # concurrency hazard. If two requests simultaneously call this method,

@@ -10,8 +10,10 @@ from ..protocol_engine import (
     CommandIntent,
 )
 from ..protocol_engine.errors import CommandNotAllowedError
-from ..protocol_engine.types import PostRunHardwareState
+from ..protocol_engine.types import PostRunHardwareState, RunTimeParamValuesType
 from ..protocol_reader import JsonProtocolConfig, PythonProtocolConfig
+
+from opentrons.protocols.parse import PythonParseMode
 
 
 class RunOrchestrator:
@@ -124,4 +126,17 @@ class RunOrchestrator:
 
     def get_protocol_engine(self) -> ProtocolEngine:
         return self._protocol_engine
+
+    async def load(
+        self,
+        protocol_source: ProtocolSource,
+        python_parse_mode: PythonParseMode,
+        run_time_param_values: Optional[RunTimeParamValuesType],
+    ) -> None:
+        pass
+
+    def prepare(
+        self,
+    ) -> None:
+        pass
 
