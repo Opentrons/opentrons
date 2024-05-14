@@ -66,6 +66,10 @@ class TipPhysicallyMissingError(ErrorOccurrence):
 
     That space in the tip rack is marked internally as not having any tip,
     as if the tip were consumed by a pickup.
+
+    The pipette will act as if no tip was picked up. So, you won't be able to aspirate
+    anything, and movement commands will assume there is no tip hanging off the bottom
+    of the pipette.
     """
 
     errorType: Literal["tipPhysicallyMissing"] = "tipPhysicallyMissing"
