@@ -71,7 +71,6 @@ export const RunPreviewComponent = (
     }
   )
   const commandsFromQuery = commandsFromQueryResponse?.data
-  const nullCheckedCommandsFromQuery = commandsFromQuery ?? []
   const viewPortRef = React.useRef<HTMLDivElement | null>(null)
   const currentRunCommandKey = useNotifyLastRunCommand(runId, {
     refetchInterval: LIVE_RUN_COMMANDS_POLL_MS,
@@ -81,10 +80,9 @@ export const RunPreviewComponent = (
     setIsCurrentCommandVisible,
   ] = React.useState<boolean>(true)
   if (robotSideAnalysis == null) return null
-  const commands =
-    (isRunTerminal
-      ? nullCheckedCommandsFromQuery
-      : robotSideAnalysis.commands) ?? []
+  const commands = isRunTerminal
+    ? commandsFromQuery
+    : robotSideAnalysis.commands
   // pass relevant data from run rather than analysis so that CommandText utilities can properly hash the entities' IDs
   // TODO (nd:05/02/2024, AUTH-380): update name and types for CommandText (and children/utilities) use of analysis.
   // We should ideally pass only subset of analysis/run data required by these children and utilities
@@ -96,13 +94,23 @@ export const RunPreviewComponent = (
           modules: runRecord.data.modules ?? [],
           pipettes: runRecord.data.pipettes ?? [],
           liquids: runRecord.data.liquids ?? [],
-          commands: commands,
+          commands: commands ?? [],
         }
       : robotSideAnalysis
-  const currentRunCommandIndex = commands.findIndex(
-    c => c.key === currentRunCommandKey
-  )
+  const currentRunCommandIndex =
+    commands != null
+      ? commands.findIndex(c => c.key === currentRunCommandKey)
+      : 0
 
+  if (commands == null) {
+    return (
+      <Flex flexDirection={DIRECTION_COLUMN} padding={SPACING.spacing16}>
+        <StyledText alignSelf={ALIGN_CENTER} color={COLORS.grey50}>
+          {t('protocol_setup:loading_data')}
+        </StyledText>
+      </Flex>
+    )
+  }
   return commands.length === 0 ? (
     <Flex flexDirection={DIRECTION_COLUMN} padding={SPACING.spacing16}>
       <InfoScreen contentType="runNotStarted" />
