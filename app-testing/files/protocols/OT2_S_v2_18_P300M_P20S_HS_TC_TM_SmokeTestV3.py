@@ -1,15 +1,5 @@
 """Smoke Test v3.0 """
 # https://opentrons.atlassian.net/projects/RQA?selectedItem=com.atlassian.plugins.atlassian-connect-plugin:com.kanoah.test-manager__main-project-page#!/testCase/QB-T497
-from opentrons import protocol_api
-
-metadata = {
-    "protocolName": "🛠️ 2.18 Smoke Test V3 🪄",
-    "author": "Opentrons Engineering <engineering@opentrons.com>",
-    "source": "Software Testing Team",
-    "description": ("Description of the protocol that is longish \n has \n returns and \n emoji 😊 ⬆️ "),
-}
-
-requirements = {"robotType": "OT-2", "apiLevel": "2.18"}
 
 #############
 # CHANGELOG #
@@ -19,8 +9,11 @@ requirements = {"robotType": "OT-2", "apiLevel": "2.18"}
 # 2.18
 # ----
 
-# labware.set_offset
-# ^^^ Needs to be implemented in the protocol once dev is finished with the feature^^^
+# - labware.set_offset
+# - Runtime Parameters added
+# - TrashContainer.top() and Well.top() now return objects of the same type
+# - pipette.drop_tip() if location argument not specified the tips will be dropped at different locations in the bin
+# - pipette.drop_tip() if location is specified, the tips will be dropped in the same place every time
 
 # ----
 # 2.17
@@ -30,7 +23,7 @@ requirements = {"robotType": "OT-2", "apiLevel": "2.18"}
 # This protocol is exactly the same as 2.16 Smoke Test V3
 # The only difference is the API version in the metadata
 # There were no new positive test cases for 2.17
-# The negative test cases are captured in the 2.17 dispense changes protcol
+# The negative test cases are captured in the 2.17 dispense changes protocol
 
 # ----
 # 2.16
@@ -61,11 +54,92 @@ requirements = {"robotType": "OT-2", "apiLevel": "2.18"}
 
 # - Heater-Shaker Module support added
 
+from opentrons import protocol_api
+
+metadata = {
+    "protocolName": "🛠️ 2.18 Smoke Test V3 🪄",
+    "author": "Opentrons Engineering <engineering@opentrons.com>",
+    "source": "Software Testing Team",
+    "description": ("Description of the protocol that is longish \n has \n returns and \n emoji 😊 ⬆️ "),
+}
+
+requirements = {"robotType": "OT-2", "apiLevel": "2.18"}
+
+##############################
+# Runtime Parameters Support #
+##############################
+
+# -------------------------- #
+# Added in API version: 2.18 #
+# -------------------------- #
+
+
+def add_parameters(parameters: protocol_api.Parameters):
+    reservoir_choices = [
+        {"display_name": "Nest 12 Well 15 mL", "value": "nest_12_reservoir_15ml"},
+        {"display_name": "USA Scientific 12 Well 22 mL", "value": "usascientific_12_reservoir_22ml"},
+    ]
+
+    well_plate_choices = [
+        {"display_name": "Nest 96 Well 100 µL", "value": "nest_96_wellplate_100ul_pcr_full_skirt"},
+        {"display_name": "Corning 96 Well 360 µL", "value": "corning_96_wellplate_360ul_flat"},
+        {"display_name": "Opentrons Tough 96 Well 200 µL", "value": "opentrons_96_wellplate_200ul_pcr_full_skirt"},
+    ]
+
+    parameters.add_str(
+        variable_name="reservoir_name",
+        display_name="Reservoir Name",
+        description="Name of the reservoir",
+        default="nest_12_reservoir_15ml",
+        choices=reservoir_choices,
+    )
+    parameters.add_str(
+        variable_name="well_plate_name",
+        display_name="Well Plate Name",
+        description="Name of the well plate",
+        default="nest_96_wellplate_100ul_pcr_full_skirt",
+        choices=well_plate_choices,
+    )
+
+    parameters.add_int(
+        variable_name="delay_time",
+        display_name="Delay Time",
+        description="Time to delay in seconds",
+        default=3,
+        minimum=1,
+        maximum=10,
+        unit="seconds",
+    )
+    parameters.add_bool(variable_name="robot_lights", display_name="Robot Lights", description="Turn on the robot lights?", default=True)
+    parameters.add_float(
+        variable_name="heater_shaker_temperature",
+        display_name="Heater Shaker Temperature",
+        description="Temperature to set the heater shaker to",
+        default=38.0,
+        minimum=37.0,
+        maximum=100.0,
+        unit="°C",
+    )
+
 
 def run(ctx: protocol_api.ProtocolContext) -> None:
     """This method is run by the protocol engine."""
 
-    ctx.set_rail_lights(True)
+    ##############################
+    # Runtime Parameters Support #
+    ##############################
+
+    # -------------------------- #
+    # Added in API version: 2.18 #
+    # -------------------------- #
+
+    RESERVOIR_NAME: str = ctx.params.reservoir_name
+    WELL_PLATE_NAME: str = ctx.params.well_plate_name
+    DELAY_TIME: int = ctx.params.delay_time
+    ROBOT_LIGHTS: bool = ctx.params.robot_lights
+    HEATER_SHAKER_TEMPERATURE: float = ctx.params.heater_shaker_temperature
+
+    ctx.set_rail_lights(ROBOT_LIGHTS)
     ctx.comment(f"Let there be light! {ctx.rail_lights_on} 🌠🌠🌠")
     ctx.comment(f"Is the door is closed? {ctx.door_closed} 🚪🚪🚪")
     ctx.comment(f"Is this a simulation? {ctx.is_simulating()} 🔮🔮🔮")
@@ -122,11 +196,11 @@ def run(ctx: protocol_api.ProtocolContext) -> None:
     # module labware
     temp_adapter = temperature_module.load_adapter("opentrons_96_well_aluminum_block")
     temp_plate = temp_adapter.load_labware(
-        "nest_96_wellplate_100ul_pcr_full_skirt",
+        WELL_PLATE_NAME,
         label="Temperature-Controlled plate",
     )
-    hs_plate = hs_module.load_labware(name="nest_96_wellplate_100ul_pcr_full_skirt", adapter="opentrons_96_pcr_adapter")
-    tc_plate = thermocycler_module.load_labware("nest_96_wellplate_100ul_pcr_full_skirt")
+    hs_plate = hs_module.load_labware(name=WELL_PLATE_NAME, adapter="opentrons_96_pcr_adapter")
+    tc_plate = thermocycler_module.load_labware(WELL_PLATE_NAME)
 
     ###################################
     # Load Labware with no parameters #
@@ -144,13 +218,13 @@ def run(ctx: protocol_api.ProtocolContext) -> None:
 
     # create plates and pattern list
     logo_destination_plate = ctx.load_labware(
-        load_name="nest_96_wellplate_100ul_pcr_full_skirt",
+        load_name=WELL_PLATE_NAME,
         location=logo_position,
         label="logo destination",
     )
 
     dye_container = ctx.load_labware(
-        load_name="nest_12_reservoir_15ml",
+        load_name=RESERVOIR_NAME,
         location=dye_source_position,
         label="dye container",
     )
@@ -229,7 +303,7 @@ def run(ctx: protocol_api.ProtocolContext) -> None:
 
     # Note:
     #   logo_destination_plate is a nest_96_wellplate_100ul_pcr_full_skirt - starting position is slot 2
-    #   dye_container is a nest_12_reservoir_15ml - starting position is slot 3
+    #   dye_container is aRESERVOIR_NAME- starting position is slot 3
 
     # Step 1
     ctx.move_labware(
@@ -368,7 +442,7 @@ def run(ctx: protocol_api.ProtocolContext) -> None:
     pipette_right.pick_up_tip()
     pipette_right.aspirate(volume=5, location=logo_destination_plate.wells_by_name()["A11"])
     pipette_right.air_gap(volume=10)
-    ctx.delay(seconds=3)
+    ctx.delay(seconds=DELAY_TIME)
     pipette_right.dispense(volume=5, location=logo_destination_plate.wells_by_name()["H11"])
 
     # move to
@@ -385,9 +459,9 @@ def run(ctx: protocol_api.ProtocolContext) -> None:
     temperature_module.await_temperature(25)
 
     hs_module.set_and_wait_for_shake_speed(466)
-    ctx.delay(seconds=5)
+    ctx.delay(seconds=DELAY_TIME)
 
-    hs_module.set_and_wait_for_temperature(38)
+    hs_module.set_and_wait_for_temperature(HEATER_SHAKER_TEMPERATURE)
 
     thermocycler_module.open_lid()
     thermocycler_module.close_lid()
@@ -412,7 +486,7 @@ def run(ctx: protocol_api.ProtocolContext) -> None:
     pipette_left.aspirate(volume=50, location=dye_source)
     pipette_left.dispense(volume=50, location=hs_plate.well(0))
     hs_module.set_and_wait_for_shake_speed(350)
-    ctx.delay(seconds=5)
+    ctx.delay(DELAY_TIME)
     hs_module.deactivate_shaker()
 
     # to custom labware
