@@ -3,6 +3,7 @@ import isEqual from 'lodash/isEqual'
 import { useTranslation } from 'react-i18next'
 import {
   ALIGN_CENTER,
+  ALIGN_END,
   BORDERS,
   Box,
   COLORS,
@@ -99,7 +100,7 @@ export function HistoricalProtocolRunOffsetDrawer(
           </Flex>
         </Banner>
       ) : null}
-      <Flex justifyContent={JUSTIFY_FLEX_START}>
+      <Flex justifyContent={JUSTIFY_FLEX_START} alignItems={ALIGN_END}>
         <Box
           width="25.25%"
           padding={`${SPACING.spacing8} ${SPACING.spacing4} ${SPACING.spacing8} ${SPACING.spacing4}`}
@@ -158,7 +159,7 @@ export function HistoricalProtocolRunOffsetDrawer(
             borderRadius={BORDERS.borderRadius4}
             gridGap={SPACING.spacing24}
           >
-            <Box width="23.5%">
+            <Box width="23.25%">
               <StyledText as="label">
                 {t('slot', { slotName: offset.location.slotName })}
                 {offset.location.moduleModel != null &&
