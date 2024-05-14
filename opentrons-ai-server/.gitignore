@@ -3,3 +3,7 @@ results
 package
 function.zip
 requirements.txt
+test.env
+cached_token.txt
+tests/helpers/cached_token.txt
+tests/helpers/test.env

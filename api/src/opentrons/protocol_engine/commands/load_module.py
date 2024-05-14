@@ -4,7 +4,8 @@ from typing import TYPE_CHECKING, Optional, Type
 from typing_extensions import Literal
 from pydantic import BaseModel, Field
 
-from .command import AbstractCommandImpl, BaseCommand, BaseCommandCreate
+from .command import AbstractCommandImpl, BaseCommand, BaseCommandCreate, SuccessData
+from ..errors.error_occurrence import ErrorOccurrence
 from ..types import (
     DeckSlotLocation,
     ModuleType,
@@ -101,7 +102,9 @@ class LoadModuleResult(BaseModel):
     )
 
 
-class LoadModuleImplementation(AbstractCommandImpl[LoadModuleParams, LoadModuleResult]):
+class LoadModuleImplementation(
+    AbstractCommandImpl[LoadModuleParams, SuccessData[LoadModuleResult, None]]
+):
     """The implementation of the load module command."""
 
     def __init__(
@@ -110,7 +113,9 @@ class LoadModuleImplementation(AbstractCommandImpl[LoadModuleParams, LoadModuleR
         self._equipment = equipment
         self._state_view = state_view
 
-    async def execute(self, params: LoadModuleParams) -> LoadModuleResult:
+    async def execute(
+        self, params: LoadModuleParams
+    ) -> SuccessData[LoadModuleResult, None]:
         """Check that the requested module is attached and assign its identifier."""
         module_type = params.model.as_type()
         self._ensure_module_location(params.location.slotName, module_type)
@@ -146,11 +151,14 @@ class LoadModuleImplementation(AbstractCommandImpl[LoadModuleParams, LoadModuleR
                 module_id=params.moduleId,
             )
 
-        return LoadModuleResult(
-            moduleId=loaded_module.module_id,
-            serialNumber=loaded_module.serial_number,
-            model=loaded_module.definition.model,
-            definition=loaded_module.definition,
+        return SuccessData(
+            public=LoadModuleResult(
+                moduleId=loaded_module.module_id,
+                serialNumber=loaded_module.serial_number,
+                model=loaded_module.definition.model,
+                definition=loaded_module.definition,
+            ),
+            private=None,
         )
 
     def _ensure_module_location(
@@ -178,7 +186,7 @@ class LoadModuleImplementation(AbstractCommandImpl[LoadModuleParams, LoadModuleR
                 )
 
 
-class LoadModule(BaseCommand[LoadModuleParams, LoadModuleResult]):
+class LoadModule(BaseCommand[LoadModuleParams, LoadModuleResult, ErrorOccurrence]):
     """The model for a load module command."""
 
     commandType: LoadModuleCommandType = "loadModule"

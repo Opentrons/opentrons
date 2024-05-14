@@ -10,7 +10,6 @@ import {
   RUN_STATUS_AWAITING_RECOVERY,
 } from '@opentrons/api-client'
 import {
-  useAllCommandsQuery,
   useProtocolAnalysesQuery,
   useProtocolQuery,
   useRunActionMutations,
@@ -35,10 +34,11 @@ import { RunPausedSplash } from '../../../organisms/OnDeviceDisplay/RunningProto
 import { OpenDoorAlertModal } from '../../../organisms/OpenDoorAlertModal'
 import { RunningProtocol } from '..'
 import {
-  useNotifyLastRunCommand,
   useNotifyRunQuery,
+  useNotifyAllCommandsQuery,
 } from '../../../resources/runs'
 import { useFeatureFlag } from '../../../redux/config'
+import { useLastRunCommand } from '../../../organisms/Devices/hooks/useLastRunCommand'
 
 import type { UseQueryResult } from 'react-query'
 import type { ProtocolAnalyses, RunCommandSummary } from '@opentrons/api-client'
@@ -58,6 +58,7 @@ vi.mock('../../../organisms/OnDeviceDisplay/RunningProtocol/CancelingRunModal')
 vi.mock('../../../organisms/OpenDoorAlertModal')
 vi.mock('../../../resources/runs')
 vi.mock('../../../redux/config')
+vi.mock('../../../organisms/Devices/hooks/useLastRunCommand')
 
 const RUN_ID = 'run_id'
 const ROBOT_NAME = 'otie'
@@ -134,10 +135,10 @@ describe('RunningProtocol', () => {
     when(vi.mocked(useMostRecentCompletedAnalysis))
       .calledWith(RUN_ID)
       .thenReturn(mockRobotSideAnalysis)
-    when(vi.mocked(useAllCommandsQuery))
+    when(vi.mocked(useNotifyAllCommandsQuery))
       .calledWith(RUN_ID, { cursor: null, pageLength: 1 })
       .thenReturn(mockUseAllCommandsResponseNonDeterministic)
-    vi.mocked(useNotifyLastRunCommand).mockReturnValue({
+    vi.mocked(useLastRunCommand).mockReturnValue({
       key: 'FAKE_COMMAND_KEY',
     } as RunCommandSummary)
     when(vi.mocked(useFeatureFlag))

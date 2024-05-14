@@ -10,10 +10,12 @@ from pydantic import BaseModel
 from opentrons.hardware_control import HardwareControlAPI, OT2HardwareControlAPI
 
 from opentrons.protocol_engine import errors
+from opentrons.protocol_engine.commands.command import SuccessData
 from opentrons.protocol_engine.error_recovery_policy import (
     ErrorRecoveryPolicy,
     ErrorRecoveryType,
 )
+from opentrons.protocol_engine.errors.error_occurrence import ErrorOccurrence
 from opentrons.protocol_engine.errors.exceptions import (
     EStopActivatedError as PE_EStopActivatedError,
 )
@@ -210,8 +212,12 @@ class _TestCommandResult(BaseModel):
     bar: str = "bar"
 
 
-class _TestCommandImpl(AbstractCommandImpl[_TestCommandParams, _TestCommandResult]):
-    async def execute(self, params: _TestCommandParams) -> _TestCommandResult:
+class _TestCommandImpl(
+    AbstractCommandImpl[_TestCommandParams, SuccessData[_TestCommandResult, None]]
+):
+    async def execute(
+        self, params: _TestCommandParams
+    ) -> SuccessData[_TestCommandResult, None]:
         raise NotImplementedError()
 
 
@@ -237,7 +243,9 @@ async def test_execute(
     TestCommandImplCls = decoy.mock(func=_TestCommandImpl)
     command_impl = decoy.mock(cls=_TestCommandImpl)
 
-    class _TestCommand(BaseCommand[_TestCommandParams, _TestCommandResult]):
+    class _TestCommand(
+        BaseCommand[_TestCommandParams, _TestCommandResult, ErrorOccurrence]
+    ):
         commandType: str = "testCommand"
         params: _TestCommandParams
         result: Optional[_TestCommandResult]
@@ -245,7 +253,7 @@ async def test_execute(
         _ImplementationCls: Type[_TestCommandImpl] = TestCommandImplCls
 
     command_params = _TestCommandParams()
-    command_result = _TestCommandResult()
+    command_result = SuccessData(public=_TestCommandResult(), private=None)
 
     queued_command = cast(
         Command,
@@ -289,7 +297,7 @@ async def test_execute(
             completedAt=datetime(year=2023, month=3, day=3),
             status=CommandStatus.SUCCEEDED,
             params=command_params,
-            result=command_result,
+            result=command_result.public,
             notes=command_notes,
         ),
     )
@@ -400,7 +408,9 @@ async def test_execute_raises_protocol_engine_error(
     TestCommandImplCls = decoy.mock(func=_TestCommandImpl)
     command_impl = decoy.mock(cls=_TestCommandImpl)
 
-    class _TestCommand(BaseCommand[_TestCommandParams, _TestCommandResult]):
+    class _TestCommand(
+        BaseCommand[_TestCommandParams, _TestCommandResult, ErrorOccurrence]
+    ):
         commandType: str = "testCommand"
         params: _TestCommandParams
         result: Optional[_TestCommandResult]

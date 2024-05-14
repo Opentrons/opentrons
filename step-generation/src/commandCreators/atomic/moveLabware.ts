@@ -103,6 +103,10 @@ export const moveLabware: CommandCreator<MoveLabwareArgs> = (
   }
 
   const initialLabwareSlot = prevRobotState.labware[labware]?.slot
+
+  if (hasWasteChute && initialLabwareSlot === 'gripperWasteChute') {
+    errors.push(errorCreators.labwareDiscarded())
+  }
   const initialAdapterSlot = prevRobotState.labware[initialLabwareSlot]?.slot
   const initialSlot =
     initialAdapterSlot != null ? initialAdapterSlot : initialLabwareSlot

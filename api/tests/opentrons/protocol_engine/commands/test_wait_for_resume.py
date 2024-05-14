@@ -3,6 +3,7 @@ from decoy import Decoy
 
 from opentrons.protocol_engine.execution import RunControlHandler
 
+from opentrons.protocol_engine.commands.command import SuccessData
 from opentrons.protocol_engine.commands.wait_for_resume import (
     WaitForResumeCreate,
     WaitForResumeParams,
@@ -22,7 +23,7 @@ async def test_wait_for_resume_implementation(
 
     result = await subject.execute(data)
 
-    assert result == WaitForResumeResult()
+    assert result == SuccessData(public=WaitForResumeResult(), private=None)
     decoy.verify(await run_control.wait_for_resume(), times=1)
 
 

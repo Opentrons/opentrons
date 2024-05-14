@@ -10,6 +10,7 @@ from opentrons.protocol_engine.state.module_substates import (
 )
 from opentrons.protocol_engine.execution import EquipmentHandler
 from opentrons.protocol_engine.commands import thermocycler as tc_commands
+from opentrons.protocol_engine.commands.command import SuccessData
 from opentrons.protocol_engine.commands.thermocycler.wait_for_lid_temperature import (
     WaitForLidTemperatureImpl,
 )
@@ -50,4 +51,4 @@ async def test_set_target_block_temperature(
         tc_module_substate.get_target_lid_temperature(),
         await tc_hardware.wait_for_lid_target(),
     )
-    assert result == expected_result
+    assert result == SuccessData(public=expected_result, private=None)

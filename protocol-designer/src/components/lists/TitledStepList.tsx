@@ -88,7 +88,7 @@ export function TitledStepList(props: Props): JSX.Element {
   )
 
   const multiSelectIconName = props.selected
-    ? 'checkbox-marked'
+    ? 'ot-checkbox'
     : 'checkbox-blank-outline'
 
   return (
