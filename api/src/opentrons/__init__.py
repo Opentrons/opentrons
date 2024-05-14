@@ -24,16 +24,16 @@ from opentrons.util import logging_config
 from opentrons.protocols.types import ApiDeprecationError
 from opentrons.protocols.api_support.types import APIVersion
 
+from ._resources_path import RESOURCES_PATH
 from ._version import version
 
-HERE = os.path.abspath(os.path.dirname(__file__))
 __version__ = version
 
 
 LEGACY_MODULES = ["robot", "reset", "instruments", "containers", "labware", "modules"]
 
 
-__all__ = ["version", "__version__", "HERE", "config"]
+__all__ = ["version", "__version__", "config"]
 
 
 def __getattr__(attrname: str) -> None:
@@ -64,15 +64,14 @@ def _find_smoothie_file() -> Tuple[Path, str]:
     if IS_ROBOT:
         resources.extend(ROBOT_FIRMWARE_DIR.iterdir())  # type: ignore
 
-    resources_path = Path(HERE) / "resources"
-    resources.extend(resources_path.iterdir())
+    resources.extend(RESOURCES_PATH.iterdir())
 
     for path in resources:
         matches = SMOOTHIE_HEX_RE.search(path.name)
         if matches:
             branch_plus_ref = matches.group(1)
             return path, branch_plus_ref
-    raise OSError(f"Could not find smoothie firmware file in {resources_path}")
+    raise OSError(f"Could not find smoothie firmware file in {RESOURCES_PATH}")
 
 
 def _get_motor_control_serial_port() -> Any:
