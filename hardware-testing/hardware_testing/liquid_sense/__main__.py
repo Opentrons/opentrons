@@ -256,7 +256,7 @@ if __name__ == "__main__":
     )
     parser.add_argument("--plunger-speed", type=float, default=-1.0)
     parser.add_argument("--isolate-plungers", action="store_true")
-    parser.add_argument("--start-height-offset", type=float, default=0)
+    parser.add_argument("--start-height-offset", type=float, default=2.0)
     parser.add_argument("--ignore-scale", action="store_true")
     parser.add_argument("--ignore-env", action="store_true")
     parser.add_argument("--ignore-dial", action="store_true")
