@@ -3,12 +3,15 @@ import reduce from 'lodash/reduce'
 
 import {
   ALIGN_FLEX_START,
+  ALIGN_STRETCH,
+  Box,
   COLORS,
   DIRECTION_COLUMN,
   Flex,
   JUSTIFY_SPACE_BETWEEN,
   LabwareRender,
   RobotCoordinateSpace,
+  SPACING,
   StyledText,
   TYPOGRAPHY,
   WELL_LABEL_OPTIONS,
@@ -84,7 +87,7 @@ export function WellSelection(props: WellSelectionProps): JSX.Element {
 
   const handleSelectionMove: (rect: GenericRect) => void = rect => {
     const selectedWells = _getWellsFromRect(rect)
-    if (channels != 1) {
+    if (channels !== 1) {
       const allWellsForMulti: WellGroup = reduce(
         selectedWells,
         (acc: WellGroup, _, wellName: string): WellGroup => {
@@ -143,7 +146,7 @@ export function WellSelection(props: WellSelectionProps): JSX.Element {
   })
 
   const labwareRender = (
-    <RobotCoordinateSpace viewBox="0 0 128 86">
+    <RobotCoordinateSpace viewBox="0 0 128 86" >
       <LabwareRender
         definition={definition}
         selectedWells={allSelectedWells}
@@ -156,13 +159,9 @@ export function WellSelection(props: WellSelectionProps): JSX.Element {
     </RobotCoordinateSpace>
   )
   return showButtonControls ? (
-    <Flex justifyContent={JUSTIFY_SPACE_BETWEEN} width="100%">
-      <Flex flex="2" >
-        {labwareRender}
-      </Flex>
-      <Flex flex="1">
-        <ButtonControls channels={channels} />
-      </Flex>
+    <Flex justifyContent={JUSTIFY_SPACE_BETWEEN} gridGap={SPACING.spacing40} width="100%">
+      <Box flex="2 0 0">{labwareRender}</Box>
+      <ButtonControls channels={channels} flex="1 0 0" />
     </Flex>
   ) : (
     <SelectionRect
@@ -176,22 +175,31 @@ export function WellSelection(props: WellSelectionProps): JSX.Element {
 
 interface ButtonControlsProps {
   channels: ChannelType
+  flex: React.ComponentProps<typeof Flex>['flex']
 }
 function ButtonControls(props: ButtonControlsProps): JSX.Element {
-  const { channels } = props
+  const { channels, flex } = props
   const { t, i18n } = useTranslation('quick_transfer')
 
   const addOrRemoveButtons = channels !== 96 ? (
-    <Flex flexDirection={DIRECTION_COLUMN} alignItems={ALIGN_FLEX_START}>
+    <Flex flexDirection={DIRECTION_COLUMN} alignItems={ALIGN_STRETCH} gridGap={SPACING.spacing16}>
       <StyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>{i18n.format(t('add_or_remove'), 'capitalize')}</StyledText>
-      <Flex>
-        <IconButton onClick={() => {console.log('TODO handle minus')}} iconName="minus" />
-        <IconButton onClick={() => {console.log('TODO handle plus')}} iconName="plus" />
+      <Flex alignSelf={ALIGN_STRETCH} gridGap={SPACING.spacing16}>
+        <IconButton
+          onClick={() => { console.log('TODO handle minus') }}
+          iconName="minus"
+          hasBackground />
+        <IconButton
+          onClick={() => { console.log('TODO handle plus') }}
+          iconName="plus"
+          hasBackground />
       </Flex>
     </Flex>
   ) : null
   return (
-    <Flex flexDirection={DIRECTION_COLUMN}>
+    <Flex
+      flex={flex}
+      flexDirection={DIRECTION_COLUMN}>
       {addOrRemoveButtons}
     </Flex>
   )
