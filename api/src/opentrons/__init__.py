@@ -1,3 +1,5 @@
+# noqa: D104
+
 import logging
 from typing import List
 
@@ -17,9 +19,9 @@ __all__ = ["version", "__version__", "config"]
 
 
 def __getattr__(attrname: str) -> None:
-    """
-    Prevent import of legacy modules from global to officially
-    deprecate Python API Version 1.0.
+    """Prevent import of legacy modules from global.
+
+    This is to officially deprecate deprecate Python API Version 1.0.
     """
     if attrname in LEGACY_MODULES:
         raise ApiDeprecationError(APIVersion(1, 0))
