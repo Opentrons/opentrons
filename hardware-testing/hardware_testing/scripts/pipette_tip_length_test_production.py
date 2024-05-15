@@ -342,9 +342,9 @@ async def _main() -> None:
             print("tip_count: ", tip_count)
             print("y_offset: ",y_offset)
             if args.channel == 1:
-                if tip_count % 8 == 0:
+                if (tip_count - 1) % 8 == 0:
                     y_offset = 0
-                if tip_count % 8 == 0:
+                if (tip_count - 1) % 8 == 0:
                     x_offset += 9
             else:
                 x_offset += 9
