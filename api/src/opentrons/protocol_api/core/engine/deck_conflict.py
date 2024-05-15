@@ -423,43 +423,24 @@ def check_safe_for_tip_pickup_and_return(
         )
 
 
-# TODO (spp, 2023-02-06): update the extents check to use all nozzle bounds instead of
-#  just position of primary nozzle when checking if the pipette is out-of-bounds
 def _is_within_pipette_extents(
     engine_state: StateView,
     pipette_id: str,
     location: Point,
 ) -> bool:
     """Whether a given point is within the extents of a configured pipette on the specified robot."""
-    robot_type = engine_state.config.robot_type
-    pipette_channels = engine_state.pipettes.get_channels(pipette_id)
-    nozzle_config = engine_state.pipettes.get_nozzle_layout_type(pipette_id)
-    primary_nozzle = engine_state.pipettes.get_primary_nozzle(pipette_id)
-    if robot_type == "OT-3 Standard":
-        if pipette_channels == 96 and nozzle_config == NozzleConfigurationType.COLUMN:
-            # TODO (spp, 2023-12-18): change this eventually to use column mappings in
-            #  the pipette geometry definitions.
-            if primary_nozzle == "A12":
-                return (
-                    A12_column_front_left_bound.x
-                    <= location.x
-                    <= A12_column_back_right_bound.x
-                    and A12_column_front_left_bound.y
-                    <= location.y
-                    <= A12_column_back_right_bound.y
-                )
-            elif primary_nozzle == "A1":
-                return (
-                    A1_column_front_left_bound.x
-                    <= location.x
-                    <= A1_column_back_right_bound.x
-                    and A1_column_front_left_bound.y
-                    <= location.y
-                    <= A1_column_back_right_bound.y
-                )
-    # TODO (spp, 2023-11-07): check for 8-channel nozzle A1 & H1 extents on Flex & OT2
-    return True
-
+    robot_extents = engine_state.geometry.deck_extents
+    mount_offsets = engine_state.geometry.mount_offsets
+    # Get the relative robot bounding box based on the pipette's current configuration 
+    rel_robot_bounding_box = engine_state.pipettes.get_robot_extent_per_pipette(pipette_id, mount_offsets, robot_extents)
+    return (
+        rel_robot_bounding_box.back_right.x
+        <= location.x
+        <= rel_robot_bounding_box.front_left.x
+        and rel_robot_bounding_box.back_right.y
+        <= location.y
+        <= rel_robot_bounding_box.front_left.y
+    )
 
 def _map_labware(
     engine_state: StateView,
