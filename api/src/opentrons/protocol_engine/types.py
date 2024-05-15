@@ -4,7 +4,15 @@ import re
 from datetime import datetime
 from enum import Enum
 from dataclasses import dataclass
-from pydantic import BaseModel, Field, validator
+from pydantic import (
+    BaseModel,
+    Field,
+    StrictBool,
+    StrictFloat,
+    StrictInt,
+    StrictStr,
+    validator,
+)
 from typing import Optional, Union, List, Dict, Any, NamedTuple, Tuple, FrozenSet
 from typing_extensions import Literal, TypeGuard
 
@@ -894,17 +902,17 @@ class NumberParameter(RTPBase):
     type: Literal["int", "float"] = Field(
         ..., description="String specifying whether the number is an int or float type."
     )
-    min: float = Field(
+    min: Union[StrictInt, StrictFloat] = Field(
         ..., description="Minimum value that the number param is allowed to have."
     )
-    max: float = Field(
+    max: Union[StrictInt, StrictFloat] = Field(
         ..., description="Maximum value that the number param is allowed to have."
     )
-    value: float = Field(
+    value: Union[StrictInt, StrictFloat] = Field(
         ...,
         description="The value assigned to the parameter; if not supplied by the client, will be assigned the default value.",
     )
-    default: float = Field(
+    default: Union[StrictInt, StrictFloat] = Field(
         ...,
         description="Default value of the parameter, to be used when there is no client-specified value.",
     )
@@ -916,11 +924,11 @@ class BooleanParameter(RTPBase):
     type: Literal["bool"] = Field(
         default="bool", description="String specifying the type of this parameter"
     )
-    value: bool = Field(
+    value: StrictBool = Field(
         ...,
         description="The value assigned to the parameter; if not supplied by the client, will be assigned the default value.",
     )
-    default: bool = Field(
+    default: StrictBool = Field(
         ...,
         description="Default value of the parameter, to be used when there is no client-specified value.",
     )
@@ -929,8 +937,10 @@ class BooleanParameter(RTPBase):
 class EnumChoice(BaseModel):
     """Components of choices used in RTP Enum Parameters."""
 
-    displayName: str = Field(..., description="Display string for the param's choice.")
-    value: Union[float, str] = Field(
+    displayName: StrictStr = Field(
+        ..., description="Display string for the param's choice."
+    )
+    value: Union[StrictInt, StrictFloat, StrictStr] = Field(
         ..., description="Enum value of the param's choice."
     )
 
@@ -945,11 +955,11 @@ class EnumParameter(RTPBase):
     choices: List[EnumChoice] = Field(
         ..., description="List of valid choices for this parameter."
     )
-    value: Union[float, str] = Field(
+    value: Union[StrictInt, StrictFloat, StrictStr] = Field(
         ...,
         description="The value assigned to the parameter; if not supplied by the client, will be assigned the default value.",
     )
-    default: Union[float, str] = Field(
+    default: Union[StrictInt, StrictFloat, StrictStr] = Field(
         ...,
         description="Default value of the parameter, to be used when there is no client-specified value.",
     )
@@ -958,5 +968,5 @@ class EnumParameter(RTPBase):
 RunTimeParameter = Union[NumberParameter, EnumParameter, BooleanParameter]
 
 RunTimeParamValuesType = Dict[
-    str, Union[float, bool, str]
+    StrictStr, Union[StrictInt, StrictFloat, StrictBool, StrictStr]
 ]  # update value types as more RTP types are added
