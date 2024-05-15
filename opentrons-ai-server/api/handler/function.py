@@ -46,6 +46,25 @@ def get_health(event: Dict[str, Any]) -> Dict[str, Any]:
     return create_response(HTTPStatus.OK, {"version": "0.0.1"})
 
 
+def get_options(event: Dict[str, Any]) -> Dict[str, Any]:
+    """These are the CORS headers that are returned when an OPTIONS request is made"""
+    # These match the settings in terraform
+    allowed_origins = ",".join(["*"])
+    allowed_methods = ",".join(["GET", "POST", "OPTIONS"])
+    allowed_headers = ",".join(["content-type", "authorization", "origin", "accept"])
+    expose_headers = ",".join(["content-type"])
+
+    cors_headers = {
+        "Access-Control-Allow-Origin": allowed_origins,
+        "Access-Control-Allow-Methods": allowed_methods,
+        "Access-Control-Allow-Headers": allowed_headers,
+        "Access-Control-Expose-Headers": expose_headers,
+        "Access-Control-Max-Age": "3600",
+    }
+
+    return create_response(HTTPStatus.OK, cors_headers)
+
+
 def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
     settings: Settings = Settings.build()
     raw_path: str = event.get("rawPath", "")
@@ -57,5 +76,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
         return create_chat_completion(event)
     elif raw_path == f"/{settings.ENVIRONMENT}/health".lower() and method.upper() == "GET":
         return get_health(event)
+    elif method.upper() == "OPTIONS":
+        return get_options(event)
     else:
         return create_response(HTTPStatus.NOT_FOUND, {"message": f"path {raw_path} method {method} not found"})
