@@ -45,6 +45,18 @@ API_LEVEL = "2.18"
 
 LABWARE_OFFSETS: List[LabwareOffset] = []
 
+# NOTE: (sigler) plunger on 1ch/8ch won't move faster than ~20mm second
+#       which means it take ~3.5 seconds to reach full plunger travel.
+#       Therefore, there is no need for any probing in this test script to
+#       take longer than 3.5 seconds.
+# NOTE: (sigler) configuring the starting height of each probing sequence
+#       not based on millimeters but instead on the number seconds it takes
+#       before the tip contacts the meniscus will help make sure that adjusting
+#       the Z-speed will inadvertently affect the pressure's rate-of-change
+#       (which could happen if the meniscus seal is formed at wildly different
+#       positions along the plunger travel).
+MAX_PROBE_SECONDS = 3.5
+
 
 LIQUID_SENSE_CFG = {
     50: {
@@ -91,7 +103,7 @@ class RunArgs:
     ctx: ProtocolContext
     protocol_cfg: Any
     test_report: CSVReport
-    start_height_offset: float
+    probe_seconds_before_contact: float
     aspirate: bool
     dial_indicator: Optional[mitutoyo_digimatic_indicator.Mitutoyo_Digimatic_Indicator]
     plunger_speed: float
@@ -207,7 +219,7 @@ class RunArgs:
             args.liquid,
             protocol_cfg.LABWARE_ON_SCALE,  # type: ignore[attr-defined]
             args.z_speed,
-            args.start_height_offset,
+            args.probe_seconds_before_contact,
         )
         return RunArgs(
             tip_volumes=tip_volumes,
@@ -226,7 +238,7 @@ class RunArgs:
             ctx=_ctx,
             protocol_cfg=protocol_cfg,
             test_report=report,
-            start_height_offset=args.start_height_offset,
+            probe_seconds_before_contact=args.probe_seconds_before_contact,
             aspirate=args.plunger_direction == "aspirate",
             dial_indicator=dial,
             plunger_speed=args.plunger_speed,
@@ -256,7 +268,7 @@ if __name__ == "__main__":
     )
     parser.add_argument("--plunger-speed", type=float, default=-1.0)
     parser.add_argument("--isolate-plungers", action="store_true")
-    parser.add_argument("--start-height-offset", type=float, default=2.0)
+    parser.add_argument("--probe-seconds-before-contact", type=float, default=2.0)
     parser.add_argument("--ignore-scale", action="store_true")
     parser.add_argument("--ignore-env", action="store_true")
     parser.add_argument("--ignore-dial", action="store_true")
@@ -264,6 +276,9 @@ if __name__ == "__main__":
     parser.add_argument("--multi-passes", type=int, default=1)
 
     args = parser.parse_args()
+    assert (
+        0.0 < args.probe_seconds_before_contact <= MAX_PROBE_SECONDS
+    ), f"'--probe-seconds-before-contact' must be between 0.0-{MAX_PROBE_SECONDS}"
     run_args = RunArgs.build_run_args(args)
     exit_error = os.EX_OK
     try:
