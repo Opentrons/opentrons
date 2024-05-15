@@ -38,7 +38,7 @@
 # - ProtocolContext.load_adapter added
 # - OFF_DECK location added
 
-from opentrons import protocol_api
+from opentrons import protocol_api, types
 
 metadata = {
     "protocolName": "Flex Smoke Test - v2.18",
@@ -573,6 +573,24 @@ def run(ctx: protocol_api.ProtocolContext) -> None:
 
         ctx.pause("!!!!!!!!!!YOU NEED TO REDO LPC!!!!!!!!!!")
 
+    def test_unique_top_methods():
+        """
+        Test the unique top() methods for TrashBin and WasteChute.
+
+        Well objects should remain the same
+        """
+        ########################
+        # unique top() methods #
+        ########################
+
+        # ---------------------------- #
+        # Changed in API version: 2.18 #
+        # ---------------------------- #
+
+        assert isinstance(trash_bin.top(), protocol_api.TrashBin)
+        assert isinstance(waste_chute.top(), protocol_api.WasteChute)
+        assert isinstance(source_reservoir.wells_by_name()["A1"].top(), types.Location)
+
     ###################################################################################################
     ### THE ORDER OF THESE FUNCTION CALLS MATTER. CHANGING THEM WILL CAUSE THE PROTOCOL NOT TO WORK ###
     ###################################################################################################
@@ -581,6 +599,7 @@ def run(ctx: protocol_api.ProtocolContext) -> None:
     test_module_usage()
     test_manual_moves()
     test_labware_set_offset()
+    test_unique_top_methods()
 
     ###################################################################################################
     ### THE ORDER OF THESE FUNCTION CALLS MATTER. CHANGING THEM WILL CAUSE THE PROTOCOL NOT TO WORK ###
