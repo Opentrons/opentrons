@@ -157,21 +157,15 @@ class EngineStore:
         Raises:
             EngineConflictError: if a run-specific engine is active.
         """
-        # simplify this via orchestrator
-        if self._run_orchestrator:
-            engine = self._run_orchestrator.get_protocol_engine()
-            if (
-                self._run_orchestrator is not None
-                and engine.state_view.commands.has_been_played()
-                and not engine.state_view.commands.get_is_stopped()
-            ):
-                raise EngineConflictError("An engine for a run is currently active")
+        if (
+            self._run_orchestrator is not None
+            and self.engine.state_view.commands.has_been_played()
+            and not self.engine.state_view.commands.get_is_stopped()
+        ):
+            raise EngineConflictError("An engine for a run is currently active")
 
-            engine = self._run_orchestrator.get_protocol_engine()
-
-            return engine
-        else:
-            # TODO(tz, 2024-5-9): should we just return None? dosent this mean there is no active run?
+        engine = self._default_engine
+        if engine is None:
             # remove this after we redirect every thing through the orchestrator
             # TODO(mc, 2022-03-21): potential race condition
             engine = await create_protocol_engine(
@@ -188,7 +182,7 @@ class EngineStore:
             #     protocol_engine=engine,
             #     hardware_api=self._hardware_api,
             # )
-            return engine
+        return engine
 
     async def create(
         self,
