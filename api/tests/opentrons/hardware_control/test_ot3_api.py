@@ -115,7 +115,6 @@ def fake_liquid_settings() -> LiquidProbeSettings:
     return LiquidProbeSettings(
         starting_mount_height=100,
         max_z_distance=15,
-        min_z_distance=10,
         mount_speed=40,
         plunger_speed=10,
         sensor_threshold_pascals=15,
@@ -800,7 +799,6 @@ async def test_liquid_probe(
         fake_settings_aspirate = LiquidProbeSettings(
             starting_mount_height=100,
             max_z_distance=15,
-            min_z_distance=5,
             mount_speed=40,
             plunger_speed=10,
             sensor_threshold_pascals=15,
