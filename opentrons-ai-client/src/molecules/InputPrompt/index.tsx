@@ -41,9 +41,10 @@ export function InputPrompt(): JSX.Element {
 
   const [data, setData] = React.useState<any>(null)
   const [loading, setLoading] = React.useState<boolean>(false)
-  const [error, setError] = React.useState<string>('')
+  // ToDo (kk:05/15/2024) this will be used in the future
+  // const [error, setError] = React.useState<string>('')
 
-  const { getAccessTokenWithPopup } = useAuth0()
+  const { getAccessTokenSilently } = useAuth0()
 
   const userPrompt = watch('userPrompt') ?? ''
 
@@ -52,35 +53,28 @@ export function InputPrompt(): JSX.Element {
     return rowsNum
   }
 
-  // const isLocalhost = (): boolean => {
-  //   const { hostname } = window.location
-  //   return hostname === 'localhost' || hostname === '127.0.0.1'
-  // }
-
   const fetchData = async (prompt: string): Promise<void> => {
     if (prompt !== '') {
       setLoading(true)
       try {
-        const token = await getAccessTokenWithPopup({
+        const accessToken = await getAccessTokenSilently({
           authorizationParams: {
             audience: 'sandbox-ai-api',
           },
         })
-        console.log('token', token)
         const postData = {
           message: prompt,
           fake: false,
         }
-        const response = await axios.post(url, {
-          postData,
-          headers: {
-            Authorization: `Bearer ${token}`,
-            'Content-Type': 'application/json',
-          },
-        })
+        const headers = {
+          Authorization: `Bearer ${accessToken}`,
+          'Content-Type': 'application/json',
+        }
+        const response = await axios.post(url, postData, { headers })
         setData(response.data)
       } catch (err) {
-        setError('Error fetching data from the API.')
+        // setError('Error fetching data from the API.')
+        console.error(`error: ${err}`)
       } finally {
         setLoading(false)
       }
@@ -90,7 +84,7 @@ export function InputPrompt(): JSX.Element {
   const handleClick = (): void => {
     const userInput: ChatData = {
       role: 'user',
-      content: userPrompt,
+      reply: userPrompt,
     }
     setChatData(chatData => [...chatData, userInput])
     void fetchData(userPrompt)
@@ -104,10 +98,10 @@ export function InputPrompt(): JSX.Element {
 
   React.useEffect(() => {
     if (submitted && data && !loading) {
-      const { role, content } = data.data
+      const { role, reply } = data
       const assistantResponse: ChatData = {
         role,
-        content,
+        reply,
       }
       setChatData(chatData => [...chatData, assistantResponse])
       setSubmitted(false)
@@ -115,7 +109,7 @@ export function InputPrompt(): JSX.Element {
   }, [data, loading, submitted])
 
   // ToDo (kk:05/02/2024) This is also temp. Asking the design about error.
-  console.error('error', error)
+  // console.error('error', error)
 
   return (
     <StyledForm id="User_Prompt">
