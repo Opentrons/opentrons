@@ -22,6 +22,7 @@ from pydantic.generics import GenericModel
 
 from opentrons.hardware_control import HardwareControlAPI
 
+from ..resources import ModelUtils
 from ..errors import ErrorOccurrence
 from ..notes import CommandNote, CommandNoteAdder
 
