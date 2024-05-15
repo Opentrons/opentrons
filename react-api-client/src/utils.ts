@@ -10,8 +10,8 @@ import mapValues from 'lodash/mapValues'
  *
  * @returns {Object | null} Returns value-updated object
  */
-export function getSanitizedQueryKeyObject(obj: Object | null) {
-  const test =
-    obj == null ? null : mapValues(obj, v => (v !== undefined ? v : null))
-  return test
+export function getSanitizedQueryKeyObject(obj: Object | null): Object | null {
+  return obj != null
+    ? mapValues(obj, (v: any) => (v !== undefined ? v : null))
+    : null
 }
