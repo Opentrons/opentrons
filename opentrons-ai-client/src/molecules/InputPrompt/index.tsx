@@ -4,6 +4,7 @@ import styled, { css } from 'styled-components'
 import { useForm } from 'react-hook-form'
 import { useAtom } from 'jotai'
 import axios from 'axios'
+import { useAuth0 } from '@auth0/auth0-react'
 
 import {
   ALIGN_CENTER,
@@ -20,8 +21,8 @@ import { preparedPromptAtom, chatDataAtom } from '../../resources/atoms'
 
 import type { ChatData } from '../../resources/types'
 
-// ToDo (kk:05/02/2024) This url is temporary
-const url = 'http://localhost:8000/streaming/ask'
+const url =
+  'https://fk0py9eu3e.execute-api.us-east-2.amazonaws.com/sandbox/chat/completion'
 
 interface InputType {
   userPrompt: string
@@ -42,6 +43,8 @@ export function InputPrompt(): JSX.Element {
   const [loading, setLoading] = React.useState<boolean>(false)
   const [error, setError] = React.useState<string>('')
 
+  const { getAccessTokenWithPopup } = useAuth0()
+
   const userPrompt = watch('userPrompt') ?? ''
 
   const calcTextAreaHeight = (): number => {
@@ -49,15 +52,31 @@ export function InputPrompt(): JSX.Element {
     return rowsNum
   }
 
+  // const isLocalhost = (): boolean => {
+  //   const { hostname } = window.location
+  //   return hostname === 'localhost' || hostname === '127.0.0.1'
+  // }
+
   const fetchData = async (prompt: string): Promise<void> => {
     if (prompt !== '') {
       setLoading(true)
       try {
+        const token = await getAccessTokenWithPopup({
+          authorizationParams: {
+            audience: 'sandbox-ai-api',
+          },
+        })
+        console.log('token', token)
+        const postData = {
+          message: prompt,
+          fake: false,
+        }
         const response = await axios.post(url, {
+          postData,
           headers: {
+            Authorization: `Bearer ${token}`,
             'Content-Type': 'application/json',
           },
-          query: prompt,
         })
         setData(response.data)
       } catch (err) {
