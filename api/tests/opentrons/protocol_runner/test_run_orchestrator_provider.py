@@ -1,15 +1,10 @@
 import pytest
-from multidict import istr
 from pytest_lazyfixture import lazy_fixture  # type: ignore[import-untyped]
 from decoy import Decoy
 from typing import Union, Optional
 
 from opentrons.protocols.api_support.types import APIVersion
-from opentrons.protocol_engine import (
-    ProtocolEngine,
-    commands as pe_commands,
-    CommandIntent,
-)
+from opentrons.protocol_engine import ProtocolEngine
 from opentrons.protocol_engine.types import PostRunHardwareState
 from opentrons.hardware_control import API as HardwareAPI
 from opentrons.protocol_reader import JsonProtocolConfig, PythonProtocolConfig
@@ -19,7 +14,6 @@ from opentrons.protocol_runner.protocol_runner import (
     JsonRunner,
     PythonAndLegacyRunner,
     LiveRunner,
-    AnyRunner,
 )
 
 

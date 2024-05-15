@@ -3,20 +3,13 @@ from typing import Optional, Union
 
 from . import protocol_runner
 from ..hardware_control import HardwareControlAPI
-from ..protocol_engine import (
-    ProtocolEngine,
-    CommandCreate,
-    CommandIntent,
-)
-from ..protocol_engine.errors import CommandNotAllowedError
-from ..protocol_engine.types import PostRunHardwareState, RunTimeParamValuesType
+from ..protocol_engine import ProtocolEngine
+from ..protocol_engine.types import PostRunHardwareState
 from ..protocol_reader import JsonProtocolConfig, PythonProtocolConfig
 
 
 class RunOrchestrator:
-    _json_or_python_runner: Optional[
-        protocol_runner.AnyRunner
-    ]  # I want to use type, should I just add a type ignore?
+    _json_or_python_runner: Optional[protocol_runner.AnyRunner]
     _setup_runner: protocol_runner.AnyRunner
     _fixit_runner: protocol_runner.AnyRunner
     _hardware_api: HardwareControlAPI

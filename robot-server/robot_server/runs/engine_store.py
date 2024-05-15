@@ -1,7 +1,7 @@
 """In-memory storage of ProtocolEngine instances."""
 import asyncio
 import logging
-from typing import List, NamedTuple, Optional, Callable
+from typing import List, Optional, Callable
 
 from opentrons.protocol_engine.errors.exceptions import EStopActivatedError
 from opentrons.protocol_engine.types import PostRunHardwareState
@@ -16,7 +16,6 @@ from opentrons.hardware_control.types import (
     EstopStateNotification,
     HardwareEventHandler,
 )
-from opentrons.protocol_reader import ProtocolSource
 from opentrons.protocols.parse import PythonParseMode
 from opentrons.protocols.api_support.deck_type import should_load_fixed_trash
 from opentrons.protocol_runner import (
@@ -24,7 +23,6 @@ from opentrons.protocol_runner import (
     JsonRunner,
     PythonAndLegacyRunner,
     RunResult,
-    create_protocol_runner,
     RunOrchestrator,
 )
 from opentrons.protocol_engine import (
@@ -122,7 +120,6 @@ class EngineStore:
         self._robot_type = robot_type
         self._deck_type = deck_type
         self._default_engine: Optional[ProtocolEngine] = None
-        # self._runner_engine_pair: Optional[RunnerEnginePair] = None
         hardware_api.register_callback(_get_estop_listener(self))
 
     @property
@@ -148,7 +145,7 @@ class EngineStore:
             else None
         )
 
-    # TODO(tz, probably dont need this once its all redirected via orchestrator
+    # TODO(tz, 2024-5-14): probably dont need this once its all redirected via orchestrator
     # TODO(mc, 2022-03-21): this resource locking is insufficient;
     # come up with something more sophisticated without race condition holes.
     async def get_default_engine(self) -> ProtocolEngine:
@@ -166,7 +163,6 @@ class EngineStore:
 
         engine = self._default_engine
         if engine is None:
-            # remove this after we redirect every thing through the orchestrator
             # TODO(mc, 2022-03-21): potential race condition
             engine = await create_protocol_engine(
                 hardware_api=self._hardware_api,
@@ -177,11 +173,6 @@ class EngineStore:
                 ),
             )
             self._default_engine = engine
-            # # if we are doing this we probably need a lock on _run_orchestrator
-            # self._run_orchestrator = RunOrchestrator.build_orchestrator(
-            #     protocol_engine=engine,
-            #     hardware_api=self._hardware_api,
-            # )
         return engine
 
     async def create(
@@ -271,12 +262,6 @@ class EngineStore:
 
         for offset in labware_offsets:
             engine.add_labware_offset(offset)
-
-        # self._runner_engine_pair = RunnerEnginePair(
-        #     run_id=run_id,
-        #     runner=runner,
-        #     engine=engine,
-        # )
 
         return engine.state_view.get_summary()
 
