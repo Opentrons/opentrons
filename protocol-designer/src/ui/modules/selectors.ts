@@ -17,8 +17,8 @@ import {
   getMagnetLabwareEngageHeight as getMagnetLabwareEngageHeightUtil,
   getModulesOnDeckByType,
   getModulesHaveLabware,
-  ModuleAndLabware,
 } from './utils'
+import type { ModuleAndLabware } from './utils'
 import type { Options } from '@opentrons/components'
 import type { Selector } from '../../types'
 import type { LabwareNamesByModuleId } from '../../steplist/types'

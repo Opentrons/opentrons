@@ -1,6 +1,7 @@
 import { describe, it, vi, expect, beforeEach } from 'vitest'
-import { getLabwareDisplayName, ModuleModel } from '@opentrons/shared-data'
+import { getLabwareDisplayName } from '@opentrons/shared-data'
 import { getLocationInfoNames } from '../getLocationInfoNames'
+import type { ModuleModel } from '@opentrons/shared-data'
 
 const ADAPTER_DISPLAY_NAME = 'Opentrons 96 Flat Bottom Adapter'
 const LABWARE_DISPLAY_NAME = 'Corning 24 Well Plate 3.4 mL Flat'

@@ -6,7 +6,7 @@ import {
   DEFAULT_DELAY_SECONDS,
   DEFAULT_MM_BLOWOUT_OFFSET_FROM_TOP,
 } from '../../constants'
-import { StepType, StepFieldName } from '../../form-types'
+import type { StepType, StepFieldName } from '../../form-types'
 export function getDefaultsForStepType(
   stepType: StepType
 ): Record<StepFieldName, any> {

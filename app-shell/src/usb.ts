@@ -1,5 +1,5 @@
-import { ipcMain, IpcMainInvokeEvent } from 'electron'
-import axios, { AxiosRequestConfig } from 'axios'
+import { ipcMain } from 'electron'
+import axios from 'axios'
 import FormData from 'form-data'
 
 import {
@@ -17,6 +17,8 @@ import {
   USB_DEVICE_REMOVED,
 } from './constants'
 
+import type { IpcMainInvokeEvent } from 'electron'
+import type { AxiosRequestConfig } from 'axios'
 import type { IPCSafeFormData } from '@opentrons/app/src/redux/shell/types'
 import type { UsbDevice } from '@opentrons/app/src/redux/system-info/types'
 import type { PortInfo } from '@opentrons/usb-bridge/node-client'

@@ -3,16 +3,14 @@ import type {
   ThermocyclerModuleModel,
   MagneticModuleModel,
   HeaterShakerModuleModel,
-} from '@opentrons/shared-data'
-
-import {
   TEMPERATURE_MODULE_TYPE,
   MAGNETIC_MODULE_TYPE,
   THERMOCYCLER_MODULE_TYPE,
   HEATERSHAKER_MODULE_TYPE,
 } from '@opentrons/shared-data'
 
-import * as ApiTypes from './api-types'
+import type * as ApiTypes from './api-types'
+
 export * from './api-types'
 
 // common types

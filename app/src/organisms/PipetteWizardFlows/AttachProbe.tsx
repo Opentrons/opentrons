@@ -9,12 +9,7 @@ import {
   StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
-import {
-  LEFT,
-  MotorAxes,
-  WASTE_CHUTE_CUTOUT,
-  CreateCommand,
-} from '@opentrons/shared-data'
+import { LEFT, WASTE_CHUTE_CUTOUT } from '@opentrons/shared-data'
 import { Banner } from '../../atoms/Banner'
 import { GenericWizardTile } from '../../molecules/GenericWizardTile'
 import { SimpleWizardBody } from '../../molecules/SimpleWizardBody'
@@ -27,6 +22,7 @@ import { getPipetteAnimations } from './utils'
 import { ProbeNotAttached } from './ProbeNotAttached'
 import { useNotifyDeckConfigurationQuery } from '../../resources/deck_configuration'
 
+import type { MotorAxes, CreateCommand } from '@opentrons/shared-data'
 import type { PipetteWizardStepProps } from './types'
 
 interface AttachProbeProps extends PipetteWizardStepProps {

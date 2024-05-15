@@ -5,15 +5,16 @@ import {
   getSavedStepForms,
 } from '../step-forms/selectors'
 import { getFileMetadata } from '../file-data/selectors'
-import { trackEvent, AnalyticsEvent } from './mixpanel'
+import { trackEvent } from './mixpanel'
 import { getHasOptedIn } from './selectors'
 import { flattenNestedProperties } from './utils/flattenNestedProperties'
-import { Middleware } from 'redux'
-import { BaseState } from '../types'
-import { FormData, StepIdType, StepType } from '../form-types'
-import { StepArgsAndErrors } from '../steplist'
-import { SaveStepFormAction } from '../ui/steps/actions/thunks'
-import { AnalyticsEventAction } from './actions'
+import type { Middleware } from 'redux'
+import type { BaseState } from '../types'
+import type { FormData, StepIdType, StepType } from '../form-types'
+import type { StepArgsAndErrors } from '../steplist'
+import type { SaveStepFormAction } from '../ui/steps/actions/thunks'
+import type { AnalyticsEventAction } from './actions'
+import type { AnalyticsEvent } from './mixpanel'
 
 // Converts Redux actions to analytics events (read: Mixpanel events).
 // Returns null if there is no analytics event associated with the action,

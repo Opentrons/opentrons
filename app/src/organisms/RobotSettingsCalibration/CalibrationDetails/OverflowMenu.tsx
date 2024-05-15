@@ -1,6 +1,7 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { saveAs } from 'file-saver'
+import { css } from 'styled-components'
 
 import {
   Flex,
@@ -10,7 +11,6 @@ import {
   DIRECTION_COLUMN,
   POSITION_RELATIVE,
   ALIGN_FLEX_END,
-  Mount,
   useOnClickOutside,
 } from '@opentrons/components'
 import { isFlexPipette, SINGLE_MOUNT_PIPETTES } from '@opentrons/shared-data'
@@ -36,10 +36,10 @@ import { PipetteWizardFlows } from '../../PipetteWizardFlows'
 import { FLOWS } from '../../PipetteWizardFlows/constants'
 import { useIsEstopNotDisengaged } from '../../../resources/devices/hooks/useIsEstopNotDisengaged'
 
+import type { Mount } from '@opentrons/components'
 import type { PipetteName } from '@opentrons/shared-data'
 import type { DeleteCalRequestParams } from '@opentrons/api-client'
 import type { SelectablePipettes } from '../../PipetteWizardFlows/types'
-import { css } from 'styled-components'
 
 interface OverflowMenuProps {
   calType: 'pipetteOffset' | 'tipLength'
@@ -74,7 +74,9 @@ export function OverflowMenu({
   } = useMenuHandleClickOutside()
 
   const calsOverflowWrapperRef = useOnClickOutside<HTMLDivElement>({
-    onClickOutside: () => setShowOverflowMenu(false),
+    onClickOutside: () => {
+      setShowOverflowMenu(false)
+    },
   })
   const pipetteOffsetCalibrations = useAllPipetteOffsetCalibrationsQuery().data
     ?.data
@@ -184,7 +186,9 @@ export function OverflowMenu({
         <PipetteWizardFlows
           flowType={FLOWS.CALIBRATE}
           mount={mount}
-          closeFlow={() => setShowPipetteWizardFlows(false)}
+          closeFlow={() => {
+            setShowPipetteWizardFlows(false)
+          }}
           selectedPipette={selectedPipette}
           onComplete={() => {
             setSelectedPipette(SINGLE_MOUNT_PIPETTES)

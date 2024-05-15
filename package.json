@@ -85,6 +85,7 @@
     "eslint-config-prettier": "^8.1.0",
     "eslint-config-standard": "^16.0.2",
     "eslint-config-standard-with-typescript": "^43.0.1",
+    "eslint-formatter-summary-chart": "0.3.0",
     "eslint-plugin-cypress": "^2.11.2",
     "eslint-plugin-import": "^2.29.1",
     "eslint-plugin-json": "^3.1.0",

@@ -20,7 +20,7 @@ import type {
   CompletedProtocolAnalysis,
   DeckConfiguration,
 } from '@opentrons/shared-data'
-import { Modules } from '@opentrons/api-client'
+import type { Modules } from '@opentrons/api-client'
 
 vi.mock('@opentrons/components/src/hardware-sim/BaseDeck/index')
 vi.mock('@opentrons/react-api-client')

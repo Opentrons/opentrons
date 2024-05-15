@@ -2,7 +2,6 @@ import { when } from 'vitest-when'
 import { describe, it, beforeEach, vi, expect, afterEach } from 'vitest'
 
 import {
-  CompletedProtocolAnalysis,
   getLabwareDefURI,
   multiple_tipacks_with_tc,
   opentrons96PcrAdapterV1,
@@ -14,6 +13,7 @@ import type {
   LoadedLabware,
   LoadedModule,
   LabwareDefinition2,
+  CompletedProtocolAnalysis,
 } from '@opentrons/shared-data'
 
 vi.mock('../getLabwareLocation')

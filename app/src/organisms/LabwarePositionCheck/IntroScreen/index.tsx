@@ -19,9 +19,6 @@ import {
 } from '@opentrons/components'
 import { RobotMotionLoader } from '../RobotMotionLoader'
 import { getPrepCommands } from './getPrepCommands'
-import { useChainRunCommands } from '../../../resources/runs'
-import type { RegisterPositionAction } from '../types'
-import type { Jog } from '../../../molecules/JogControls'
 import { WizardRequiredEquipmentList } from '../../../molecules/WizardRequiredEquipmentList'
 import { getLatestCurrentOffsets } from '../../Devices/ProtocolRun/SetupLabwarePositionCheck/utils'
 import { getIsOnDevice } from '../../../redux/config'
@@ -40,6 +37,9 @@ import type {
   CompletedProtocolAnalysis,
   LabwareDefinition2,
 } from '@opentrons/shared-data'
+import type { useChainRunCommands } from '../../../resources/runs'
+import type { RegisterPositionAction } from '../types'
+import type { Jog } from '../../../molecules/JogControls'
 
 export const INTERVAL_MS = 3000
 

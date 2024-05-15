@@ -1,12 +1,13 @@
 // fetch wrapper to throw if response is not ok
 import fs from 'fs'
 import fsPromises from 'fs/promises'
-import { Transform, Readable } from 'stream'
+import { Transform } from 'stream'
 import pump from 'pump'
 import _fetch from 'node-fetch'
 import FormData from 'form-data'
 
 import type { Request, RequestInit, Response } from 'node-fetch'
+import type { Readable } from 'stream'
 
 type RequestInput = Request | string
 
