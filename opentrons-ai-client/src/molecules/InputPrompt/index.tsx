@@ -3,7 +3,6 @@ import { useTranslation } from 'react-i18next'
 import styled, { css } from 'styled-components'
 import { useForm } from 'react-hook-form'
 import { useAtom } from 'jotai'
-import axios from 'axios'
 import { useAuth0 } from '@auth0/auth0-react'
 
 import {
@@ -18,11 +17,12 @@ import {
 } from '@opentrons/components'
 import { SendButton } from '../../atoms/SendButton'
 import { preparedPromptAtom, chatDataAtom } from '../../resources/atoms'
+import { useApiCall } from '../../resources/hooks/useApiCall'
+import { calcTextAreaHeight } from '../../resources/utils/utils'
+import { END_POINT } from '../../resources/constants'
 
+import type { AxiosRequestConfig } from 'axios'
 import type { ChatData } from '../../resources/types'
-
-const url =
-  'https://fk0py9eu3e.execute-api.us-east-2.amazonaws.com/sandbox/chat/completion'
 
 interface InputType {
   userPrompt: string
@@ -39,8 +39,9 @@ export function InputPrompt(): JSX.Element {
   const [, setChatData] = useAtom(chatDataAtom)
   const [submitted, setSubmitted] = React.useState<boolean>(false)
 
-  const [data, setData] = React.useState<any>(null)
-  const [loading, setLoading] = React.useState<boolean>(false)
+  // const [data, setData] = React.useState<any>(null)
+  // const [loading, setLoading] = React.useState<boolean>(false)
+
   // ToDo (kk:05/15/2024) this will be used in the future
   // const [error, setError] = React.useState<string>('')
 
@@ -48,49 +49,75 @@ export function InputPrompt(): JSX.Element {
 
   const userPrompt = watch('userPrompt') ?? ''
 
-  const calcTextAreaHeight = (): number => {
-    const rowsNum = userPrompt.split('\n').length
-    return rowsNum
-  }
+  const { data, error, isLoading, fetchData } = useApiCall()
 
-  // ToDo (kk:05/15/2024) This will be moved to a better place
-  const fetchData = async (prompt: string): Promise<void> => {
-    if (prompt !== '') {
-      setLoading(true)
-      try {
-        const accessToken = await getAccessTokenSilently({
-          authorizationParams: {
-            audience: 'sandbox-ai-api',
-          },
-        })
-        const postData = {
-          message: prompt,
-          fake: false,
-        }
-        const headers = {
-          Authorization: `Bearer ${accessToken}`,
-          'Content-Type': 'application/json',
-        }
-        const response = await axios.post(url, postData, { headers })
-        setData(response.data)
-      } catch (err) {
-        // setError('Error fetching data from the API.')
-        console.error(`error: ${err}`)
-      } finally {
-        setLoading(false)
-      }
-    }
-  }
+  // // ToDo (kk:05/15/2024) This will be moved to a better place
+  // const fetchData = async (prompt: string): Promise<void> => {
+  //   if (prompt !== '') {
+  //     setLoading(true)
+  //     try {
+  //       const accessToken = await getAccessTokenSilently({
+  //         authorizationParams: {
+  //           audience: 'sandbox-ai-api',
+  //         },
+  //       })
+  //       const postData = {
+  //         message: prompt,
+  //         fake: false,
+  //       }
+  //       const headers = {
+  //         Authorization: `Bearer ${accessToken}`,
+  //         'Content-Type': 'application/json',
+  //       }
+  //       const response = await axios.post(END_POINT, postData, { headers })
+  //       setData(response.data)
+  //     } catch (err) {
+  //       // setError('Error fetching data from the API.')
+  //       console.error(`error: ${err}`)
+  //     } finally {
+  //       setLoading(false)
+  //     }
+  //   }
+  // }
 
-  const handleClick = (): void => {
+  const handleClick = async (): Promise<void> => {
     const userInput: ChatData = {
       role: 'user',
       reply: userPrompt,
     }
     setChatData(chatData => [...chatData, userInput])
-    void fetchData(userPrompt)
-    setSubmitted(true)
-    reset()
+
+    try {
+      const accessToken = await getAccessTokenSilently({
+        authorizationParams: {
+          audience: 'sandbox-ai-api',
+        },
+      })
+
+      const headers = {
+        Authorization: `Bearer ${accessToken}`,
+        'Content-Type': 'application/json',
+      }
+
+      const config = {
+        url: END_POINT,
+        method: 'POST',
+        headers,
+        data: {
+          message: userPrompt,
+          fake: false,
+        },
+        withCredentials: true,
+      }
+      console.log('called')
+      await fetchData(config as AxiosRequestConfig)
+      console.log('fetched')
+      console.log('data', data)
+      setSubmitted(true)
+      reset()
+    } catch (err) {
+      console.error(`error: ${err}`)
+    }
   }
 
   React.useEffect(() => {
@@ -98,7 +125,7 @@ export function InputPrompt(): JSX.Element {
   }, [preparedPrompt, setValue])
 
   React.useEffect(() => {
-    if (submitted && data != null && !loading) {
+    if (submitted && data != null && !isLoading) {
       const { role, reply } = data
       const assistantResponse: ChatData = {
         role,
@@ -107,7 +134,7 @@ export function InputPrompt(): JSX.Element {
       setChatData(chatData => [...chatData, assistantResponse])
       setSubmitted(false)
     }
-  }, [data, loading, submitted])
+  }, [data, isLoading, submitted])
 
   // ToDo (kk:05/02/2024) This is also temp. Asking the design about error.
   // console.error('error', error)
@@ -116,13 +143,13 @@ export function InputPrompt(): JSX.Element {
     <StyledForm id="User_Prompt">
       <Flex css={CONTAINER_STYLE}>
         <StyledTextarea
-          rows={calcTextAreaHeight()}
+          rows={calcTextAreaHeight(userPrompt)}
           placeholder={t('type_your_prompt')}
           {...register('userPrompt')}
         />
         <SendButton
           disabled={userPrompt.length === 0}
-          isLoading={loading}
+          isLoading={isLoading}
           handleClick={handleClick}
         />
       </Flex>
