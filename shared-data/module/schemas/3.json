@@ -81,13 +81,14 @@
         "magneticModuleType",
         "thermocyclerModuleType",
         "heaterShakerModuleType",
-        "magneticBlockType"
+        "magneticBlockType",
+        "absorbanceReaderType"
       ],
       "type": "string"
     },
     "model": {
       "type": "string",
-      "pattern": "^(temperatureModule|magneticModule|thermocyclerModule|heaterShakerModule|magneticBlock)V[0-9]+$"
+      "pattern": "^(temperatureModule|magneticModule|thermocyclerModule|heaterShakerModule|magneticBlock|absorbanceReader)V[0-9]+$"
     },
     "labwareOffset": { "$ref": "#/definitions/coordinates" },
     "dimensions": {
