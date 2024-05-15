@@ -11,7 +11,6 @@ import {
   JUSTIFY_SPACE_AROUND,
 } from '@opentrons/components'
 
-import { SmallButton } from '../../atoms/buttons'
 import { ChildNavigation } from '../../organisms/ChildNavigation'
 import { DeckFixtureSetupInstructionsModal } from '../../organisms/DeviceDetailsDeckConfiguration/DeckFixtureSetupInstructionsModal'
 import { DeckConfigurationDiscardChangesModal } from '../../organisms/DeviceDetailsDeckConfiguration/DeckConfigurationDiscardChangesModal'
@@ -23,8 +22,17 @@ import {
 } from '../../resources/deck_configuration'
 =======
 
+<<<<<<< HEAD
 import type { CutoutId, DeckConfiguration } from '@opentrons/shared-data'
 >>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
+=======
+import type {
+  CutoutFixtureId,
+  CutoutId,
+  DeckConfiguration,
+} from '@opentrons/shared-data'
+import type { SmallButton } from '../../atoms/buttons'
+>>>>>>> f3c86ff7d8 (fix(app, components, protocol-designer, shared-data): import type lint rule to error, fix occurrences (#15168))
 
 export function DeckConfigurationEditor(): JSX.Element {
   const { t, i18n } = useTranslation([

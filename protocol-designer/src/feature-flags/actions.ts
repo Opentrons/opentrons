@@ -1,4 +1,4 @@
-import { Flags } from './types'
+import type { Flags } from './types'
 export interface SetFeatureFlagAction {
   type: 'SET_FEATURE_FLAGS'
   payload: Partial<Flags>

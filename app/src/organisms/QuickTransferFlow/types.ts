@@ -1,6 +1,6 @@
-import { ACTIONS, CONSOLIDATE, DISTRIBUTE, TRANSFER } from './constants'
 import type { Mount } from '@opentrons/api-client'
 import type { LabwareDefinition2, PipetteV2Specs } from '@opentrons/shared-data'
+import type { ACTIONS, CONSOLIDATE, DISTRIBUTE, TRANSFER } from './constants'
 
 export interface QuickTransferSetupState {
   pipette?: PipetteV2Specs

@@ -14,7 +14,7 @@ import type {
 } from '../../robot-api/operators'
 
 import type { UpdateLightsAction } from '../types'
-import { RobotApiRequestMeta } from '../../robot-api/types'
+import type { RobotApiRequestMeta } from '../../robot-api/types'
 
 const mapActionToRequest: ActionToRequestMapper<UpdateLightsAction> = action => ({
   method: POST,

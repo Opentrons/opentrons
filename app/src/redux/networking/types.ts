@@ -3,7 +3,7 @@ import type {
   RobotApiErrorResponse,
 } from '../robot-api/types'
 
-import {
+import type {
   FETCH_STATUS,
   FETCH_STATUS_SUCCESS,
   FETCH_STATUS_FAILURE,
@@ -21,7 +21,7 @@ import {
   FETCH_EAP_OPTIONS_FAILURE,
 } from './constants'
 
-import * as ApiTypes from './api-types'
+import type * as ApiTypes from './api-types'
 
 export * from './api-types'
 

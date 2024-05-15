@@ -1,11 +1,11 @@
 import { describe, it, expect } from 'vitest'
 import '@testing-library/jest-dom/vitest'
-import {
-  transfer_settings,
+import { transfer_settings } from '@opentrons/shared-data'
+import { createSnippet } from '../createSnippet'
+import type {
   ModuleModel,
   CompletedProtocolAnalysis,
 } from '@opentrons/shared-data'
-import { createSnippet } from '../createSnippet'
 
 const protocolWithMagTempTC = ({
   ...transfer_settings,

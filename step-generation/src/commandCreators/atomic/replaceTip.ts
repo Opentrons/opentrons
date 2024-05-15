@@ -1,7 +1,6 @@
 import {
   ALL,
   COLUMN,
-  NozzleConfigurationStyle,
   FLEX_ROBOT_TYPE,
   OT2_ROBOT_TYPE,
 } from '@opentrons/shared-data'
@@ -23,6 +22,8 @@ import {
   getWasteChuteAddressableAreaNamePip,
 } from '../../utils'
 import { dropTip } from './dropTip'
+
+import type { NozzleConfigurationStyle } from '@opentrons/shared-data'
 import type {
   CommandCreator,
   CommandCreatorError,

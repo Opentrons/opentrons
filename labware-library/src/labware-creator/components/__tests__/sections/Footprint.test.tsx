@@ -1,14 +1,15 @@
 import React from 'react'
 import { vi, describe, it, expect, beforeEach, afterEach } from 'vitest'
 import '@testing-library/jest-dom/vitest'
-import { FormikConfig } from 'formik'
 import { when } from 'vitest-when'
 import { render, screen } from '@testing-library/react'
 import { nestedTextMatcher } from '../../__testUtils__/nestedTextMatcher'
-import { getDefaultFormState, LabwareFields } from '../../../fields'
+import { getDefaultFormState } from '../../../fields'
 import { Footprint } from '../../sections/Footprint'
 import { wrapInFormik } from '../../utils/wrapInFormik'
 import { isEveryFieldHidden } from '../../../utils'
+import type { FormikConfig } from 'formik'
+import type { LabwareFields } from '../../../fields'
 
 vi.mock('../../../utils')
 

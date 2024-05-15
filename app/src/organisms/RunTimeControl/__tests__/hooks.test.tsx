@@ -1,5 +1,4 @@
 import { when } from 'vitest-when'
-import { UseQueryResult } from 'react-query'
 import { act, renderHook } from '@testing-library/react'
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import '@testing-library/jest-dom/vitest'
@@ -31,6 +30,7 @@ import {
   mockCommand,
 } from '../__fixtures__'
 
+import type { UseQueryResult } from 'react-query'
 import type { Run } from '@opentrons/api-client'
 import type * as ApiClient from '@opentrons/react-api-client'
 

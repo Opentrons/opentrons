@@ -10,9 +10,6 @@ import uniq from 'lodash/uniq'
 import * as Yup from 'yup'
 import { ModalShell } from '@opentrons/components'
 import {
-  ModuleType,
-  ModuleModel,
-  PipetteName,
   OT2_ROBOT_TYPE,
   TEMPERATURE_MODULE_TYPE,
   HEATERSHAKER_MODULE_TYPE,
@@ -21,12 +18,7 @@ import {
   FLEX_ROBOT_TYPE,
   WASTE_CHUTE_CUTOUT,
 } from '@opentrons/shared-data'
-import {
-  actions as stepFormActions,
-  FormPipettesByMount,
-  FormPipette,
-  PipetteOnDeck,
-} from '../../../step-forms'
+import { actions as stepFormActions } from '../../../step-forms'
 import { INITIAL_DECK_SETUP_STEP_ID } from '../../../constants'
 import { uuid } from '../../../utils'
 import { actions as navigationActions } from '../../../navigation'
@@ -53,8 +45,18 @@ import { WizardHeader } from './WizardHeader'
 import { StagingAreaTile } from './StagingAreaTile'
 import { getTrashSlot } from './utils'
 
+import type {
+  ModuleType,
+  ModuleModel,
+  PipetteName,
+} from '@opentrons/shared-data'
 import type { NormalizedPipette } from '@opentrons/step-generation'
 import type { ThunkDispatch } from 'redux-thunk'
+import type {
+  FormPipettesByMount,
+  FormPipette,
+  PipetteOnDeck,
+} from '../../../step-forms'
 import type { BaseState } from '../../../types'
 import type { FormState } from './types'
 

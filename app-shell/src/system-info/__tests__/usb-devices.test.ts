@@ -3,9 +3,10 @@ import { usb } from 'usb'
 import { vi, it, expect, describe, afterEach } from 'vitest'
 
 import * as Fixtures from '@opentrons/app/src/redux/system-info/__fixtures__'
-import { createLogger } from '../../log'
 import { createUsbDeviceMonitor, getWindowsDriverVersion } from '../usb-devices'
 import { isWindows } from '../../os'
+
+import type { createLogger } from '../../log'
 
 vi.mock('execa')
 vi.mock('usb')

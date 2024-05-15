@@ -26,7 +26,7 @@ import {
 } from '../AdvancedTab'
 import { RobotSettingsAdvanced } from '../RobotSettingsAdvanced'
 
-import { ShellUpdateState } from '../../../../redux/shell/types'
+import type { ShellUpdateState } from '../../../../redux/shell/types'
 import type * as ShellUpdate from '../../../../redux/shell/update'
 
 vi.mock('../../../../redux/robot-settings/selectors')

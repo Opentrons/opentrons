@@ -102,7 +102,6 @@ module.exports = {
         '@typescript-eslint/no-unnecessary-type-assertion': 'warn',
         '@typescript-eslint/no-unnecessary-boolean-literal-compare': 'warn',
         '@typescript-eslint/no-unsafe-argument': 'warn',
-        '@typescript-eslint/consistent-type-imports': 'warn',
         '@typescript-eslint/consistent-indexed-object-style': 'warn',
         '@typescript-eslint/no-confusing-void-expression': 'warn',
         '@typescript-eslint/ban-types': 'warn',

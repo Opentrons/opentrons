@@ -1,5 +1,8 @@
+<<<<<<< HEAD
 import * as React from 'react'
 <<<<<<< HEAD
+=======
+>>>>>>> f3c86ff7d8 (fix(app, components, protocol-designer, shared-data): import type lint rule to error, fix occurrences (#15168))
 import { vi, it, expect, describe, beforeEach } from 'vitest'
 =======
 import { vi, it, expect, describe } from 'vitest'
@@ -12,6 +15,7 @@ import {
 } from '@opentrons/api-client'
 import { useIsOEMMode } from '../../../../resources/robot-settings/hooks'
 import { useAttachedPipettesFromInstrumentsQuery } from '..'
+import type * as React from 'react'
 
 vi.mock('@opentrons/react-api-client')
 <<<<<<< HEAD

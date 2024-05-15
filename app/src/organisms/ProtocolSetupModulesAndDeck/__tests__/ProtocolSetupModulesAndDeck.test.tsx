@@ -1,14 +1,17 @@
 import * as React from 'react'
-import { UseQueryResult } from 'react-query'
 import { fireEvent, screen, waitFor } from '@testing-library/react'
 import { vi, it, expect, describe, beforeEach, afterEach } from 'vitest'
 import { when } from 'vitest-when'
 import { MemoryRouter } from 'react-router-dom'
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 import { useDeckConfigurationQuery } from '@opentrons/react-api-client'
 >>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
+=======
+import { RUN_STATUS_IDLE } from '@opentrons/api-client'
+>>>>>>> f3c86ff7d8 (fix(app, components, protocol-designer, shared-data): import type lint rule to error, fix occurrences (#15168))
 import {
   FLEX_ROBOT_TYPE,
   WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE,
@@ -43,7 +46,7 @@ import { useNotifyDeckConfigurationQuery } from '../../../resources/deck_configu
 import { useRunStatus } from '../../RunTimeControl/hooks'
 
 import type { CutoutConfig, DeckConfiguration } from '@opentrons/shared-data'
-import { RUN_STATUS_IDLE } from '@opentrons/api-client'
+import type { UseQueryResult } from 'react-query'
 
 <<<<<<< HEAD
 vi.mock('../../../resources/runs')

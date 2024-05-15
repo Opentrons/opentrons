@@ -2,7 +2,6 @@ import { beforeEach, describe, it, expect } from 'vitest'
 import {
   getLabwareDefURI,
   MAGNETIC_MODULE_TYPE,
-  LabwareDefinition2,
   fixtureTiprack300ul as _fixtureTiprack300ul,
 } from '@opentrons/shared-data'
 import {
@@ -18,7 +17,9 @@ import {
   _getNextTip,
   getModuleState,
 } from '../'
-import { InvariantContext } from '../types'
+
+import type { LabwareDefinition2 } from '@opentrons/shared-data'
+import type { InvariantContext } from '../types'
 let invariantContext: InvariantContext
 
 const fixtureTiprack300ul = _fixtureTiprack300ul as LabwareDefinition2

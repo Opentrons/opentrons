@@ -5,7 +5,6 @@ import { when } from 'vitest-when'
 import {
   getPipetteNameSpecs,
   getLoadedLabwareDefinitionsByUri,
-  RunTimeCommand,
   opentrons96Tiprack10UlV1Uncasted as _tiprack10ul,
 } from '@opentrons/shared-data'
 import { useAllTipLengthCalibrationsQuery } from '@opentrons/react-api-client'
@@ -140,7 +139,7 @@ describe('useRunPipetteInfoByMount hook', () => {
       } as SharedData.PipetteNameSpecs)
     when(vi.mocked(getLoadedLabwareDefinitionsByUri))
       .calledWith(
-        _uncastedModifiedSimpleV6Protocol.commands as RunTimeCommand[]
+        _uncastedModifiedSimpleV6Protocol.commands as SharedData.RunTimeCommand[]
       )
       .thenReturn(_uncastedModifiedSimpleV6Protocol.labwareDefinitions as {})
   })

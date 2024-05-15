@@ -8,13 +8,13 @@ import { LEFT } from '@opentrons/shared-data'
 import { mockPipetteInfo } from '../../../redux/pipettes/__fixtures__'
 import { CheckPipettesButton } from '../CheckPipettesButton'
 import { ConfirmPipette } from '../ConfirmPipette'
-import { LevelingVideo } from '../LevelPipette'
 
 import type {
   PipetteModelSpecs,
   PipetteNameSpecs,
 } from '@opentrons/shared-data'
 import type { PipetteOffsetCalibration } from '../../../redux/calibration/types'
+import type { LevelingVideo } from '../LevelPipette'
 
 vi.mock('../CheckPipettesButton')
 vi.mock('../LevelPipette', async importOriginal => {

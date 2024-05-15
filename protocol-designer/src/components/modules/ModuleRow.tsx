@@ -17,7 +17,7 @@ import {
   FLEX_ROBOT_TYPE,
   THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
-import { actions as stepFormActions, ModuleOnDeck } from '../../step-forms'
+import { actions as stepFormActions } from '../../step-forms'
 import {
   SPAN7_8_10_11_SLOT,
   DEFAULT_MODEL_FOR_MODULE_TYPE,
@@ -28,6 +28,7 @@ import { isModuleWithCollisionIssue } from './utils'
 import styles from './styles.module.css'
 
 import type { ModuleType, RobotType } from '@opentrons/shared-data'
+import type { ModuleOnDeck } from '../../step-forms'
 
 interface Props {
   robotType?: RobotType

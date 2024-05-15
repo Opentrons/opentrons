@@ -1,13 +1,7 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { useSelector, useDispatch } from 'react-redux'
-import {
-  Control,
-  Controller,
-  ControllerRenderProps,
-  useForm,
-  useWatch,
-} from 'react-hook-form'
+import { Controller, useForm, useWatch } from 'react-hook-form'
 import {
   BUTTON_TYPE_SUBMIT,
   OutlineButton,
@@ -24,8 +18,6 @@ import {
   DIRECTION_COLUMN,
 } from '@opentrons/components'
 import {
-  CutoutId,
-  DeckConfiguration,
   SINGLE_RIGHT_SLOT_FIXTURE,
   STAGING_AREA_CUTOUTS,
   STAGING_AREA_RIGHT_SLOT_FIXTURE,
@@ -38,7 +30,9 @@ import {
 import { getSlotIsEmpty } from '../../step-forms'
 import { getInitialDeckSetup } from '../../step-forms/selectors'
 import { PDAlert } from '../alerts/PDAlert'
+import type { Control, ControllerRenderProps } from 'react-hook-form'
 import type { AdditionalEquipmentEntity } from '@opentrons/step-generation'
+import type { CutoutId, DeckConfiguration } from '@opentrons/shared-data'
 
 export interface StagingAreasValues {
   selectedSlots: string[]

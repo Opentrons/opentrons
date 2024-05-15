@@ -1,5 +1,3 @@
-import { UseQueryResult } from 'react-query'
-
 import {
   useAllSessionsQuery,
   useCurrentAllSubsystemUpdatesQuery,
@@ -17,6 +15,7 @@ import { useIsFlex } from '../useIsFlex'
 import { useNotifyCurrentMaintenanceRun } from '../../../../resources/maintenance_runs'
 import { useNotifyAllRunsQuery } from '../../../../resources/runs'
 
+import type { UseQueryResult } from 'react-query'
 import type { Sessions, Runs } from '@opentrons/api-client'
 import type { AxiosError } from 'axios'
 

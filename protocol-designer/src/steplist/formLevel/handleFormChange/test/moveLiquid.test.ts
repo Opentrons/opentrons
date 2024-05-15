@@ -22,11 +22,14 @@ import {
 import {
   fixtureP10SingleV2Specs,
   fixtureP300SingleV2Specs,
-  LabwareDefinition2,
 } from '@opentrons/shared-data'
+<<<<<<< HEAD
 =======
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
 >>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
+=======
+import type { LabwareDefinition2 } from '@opentrons/shared-data'
+>>>>>>> f3c86ff7d8 (fix(app, components, protocol-designer, shared-data): import type lint rule to error, fix occurrences (#15168))
 import type {
   PipetteEntities,
   LabwareEntities,

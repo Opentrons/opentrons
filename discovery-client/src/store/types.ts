@@ -10,13 +10,13 @@ import type {
 
 import type { MdnsBrowserService } from '../mdns-browser'
 
-import {
+import type {
   HEALTH_STATUS_UNREACHABLE,
   HEALTH_STATUS_NOT_OK,
   HEALTH_STATUS_OK,
 } from '../constants'
 
-import {
+import type {
   INITIALIZE_STATE,
   SERVICE_FOUND,
   HEALTH_POLLED,

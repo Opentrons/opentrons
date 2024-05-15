@@ -3,8 +3,8 @@ import { selectors as fileDataSelectors } from '../../file-data'
 import { selectors as stepFormSelectors } from '../../step-forms'
 import { getSelectedStepId } from '../../ui/steps'
 import { selectors as dismissSelectors } from '../../dismiss'
-import { CommandCreatorWarning } from '@opentrons/step-generation'
-import { Selector } from '../../types'
+import type { CommandCreatorWarning } from '@opentrons/step-generation'
+import type { Selector } from '../../types'
 export const getTimelineWarningsForSelectedStep: Selector<
   CommandCreatorWarning[]
 > = createSelector(

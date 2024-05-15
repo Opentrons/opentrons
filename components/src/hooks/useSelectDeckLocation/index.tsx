@@ -2,7 +2,6 @@ import * as React from 'react'
 import isEqual from 'lodash/isEqual'
 import { useTranslation } from 'react-i18next'
 import {
-  CutoutConfig,
   FLEX_CUTOUT_BY_SLOT_ID,
   FLEX_SINGLE_SLOT_BY_CUTOUT_ID,
   FLEX_ROBOT_TYPE,
@@ -11,9 +10,6 @@ import {
   getFixtureDisplayName,
   isAddressableAreaStandardSlot,
   OT2_ROBOT_TYPE,
-  AddressableArea,
-  CoordinateTuple,
-  CutoutFixtureId,
 } from '@opentrons/shared-data'
 import {
   DeckFromLayers,
@@ -32,6 +28,10 @@ import { SPACING, TYPOGRAPHY } from '../../ui-style-constants'
 import { COLORS } from '../../helix-design-system'
 
 import type {
+  CutoutConfig,
+  AddressableArea,
+  CoordinateTuple,
+  CutoutFixtureId,
   DeckDefinition,
   ModuleLocation,
   RobotType,

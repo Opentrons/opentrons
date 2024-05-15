@@ -1,4 +1,5 @@
-import { setMixpanelTracking, AnalyticsEvent } from './mixpanel'
+import { setMixpanelTracking } from './mixpanel'
+import type { AnalyticsEvent } from './mixpanel'
 
 export interface SetOptIn {
   type: 'SET_OPT_IN'

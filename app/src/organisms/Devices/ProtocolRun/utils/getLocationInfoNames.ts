@@ -1,5 +1,5 @@
-import {
-  getLabwareDisplayName,
+import { getLabwareDisplayName } from '@opentrons/shared-data'
+import type {
   LoadLabwareRunTimeCommand,
   RunTimeCommand,
   LoadModuleRunTimeCommand,

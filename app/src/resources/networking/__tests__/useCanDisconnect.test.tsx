@@ -3,7 +3,7 @@ import { when } from 'vitest-when'
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { createStore } from 'redux'
 import { Provider } from 'react-redux'
-import { SECURITY_WPA_EAP, WifiNetwork } from '@opentrons/api-client'
+import { SECURITY_WPA_EAP } from '@opentrons/api-client'
 import { renderHook } from '@testing-library/react'
 import { getRobotApiVersionByName } from '../../../redux/discovery'
 
@@ -11,6 +11,7 @@ import { useIsFlex } from '../../../organisms/Devices/hooks'
 import { useCanDisconnect } from '../hooks/useCanDisconnect'
 import { useWifiList } from '../hooks/useWifiList'
 
+import type { WifiNetwork } from '@opentrons/api-client'
 import type { Store } from 'redux'
 import type { State } from '../../../redux/types'
 

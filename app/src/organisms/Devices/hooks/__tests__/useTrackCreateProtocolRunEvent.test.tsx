@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { createStore, Store } from 'redux'
+import { createStore } from 'redux'
 import { Provider } from 'react-redux'
 import { QueryClient, QueryClientProvider } from 'react-query'
 import { vi, it, expect, describe, beforeEach, afterEach } from 'vitest'
@@ -13,6 +13,7 @@ import { useTrackEvent } from '../../../../redux/analytics'
 import { storedProtocolData } from '../../../../redux/protocol-storage/__fixtures__'
 
 import type { Mock } from 'vitest'
+import type { Store } from 'redux'
 import type { ProtocolAnalyticsData } from '../../../../redux/analytics/types'
 
 vi.mock('../../hooks')

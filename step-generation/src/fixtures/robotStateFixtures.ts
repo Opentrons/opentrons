@@ -28,12 +28,6 @@ import {
 >>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
 } from '@opentrons/shared-data'
 
-import {
-  TEMPERATURE_APPROACHING_TARGET,
-  TEMPERATURE_AT_TARGET,
-  TEMPERATURE_DEACTIVATED,
-  FIXED_TRASH_ID,
-} from '../constants'
 import { makeInitialRobotState } from '../utils'
 import {
   DEFAULT_PIPETTE,
@@ -44,6 +38,12 @@ import {
   TROUGH_LABWARE,
   tiprackWellNamesFlat,
 } from './data'
+import { TEMPERATURE_DEACTIVATED, FIXED_TRASH_ID } from '../constants'
+
+import type {
+  TEMPERATURE_APPROACHING_TARGET,
+  TEMPERATURE_AT_TARGET,
+} from '../constants'
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import type { AdditionalEquipmentEntities } from '../types'
 import type {

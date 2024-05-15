@@ -1,4 +1,4 @@
-import { PDProtocolFile } from '../file-types'
+import type { PDProtocolFile } from '../file-types'
 import type { RobotType } from '@opentrons/shared-data'
 
 export type FileUploadErrorType = 'INVALID_FILE_TYPE' | 'INVALID_JSON_FILE'

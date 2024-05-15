@@ -2,13 +2,14 @@ import React from 'react'
 import { vi, describe, it, expect, beforeEach, afterEach } from 'vitest'
 import '@testing-library/jest-dom/vitest'
 import { when } from 'vitest-when'
-import { FormikConfig } from 'formik'
 import { render, screen } from '@testing-library/react'
 import { nestedTextMatcher } from '../../__testUtils__/nestedTextMatcher'
-import { getDefaultFormState, LabwareFields } from '../../../fields'
+import { getDefaultFormState } from '../../../fields'
 import { isEveryFieldHidden } from '../../../utils'
 import { Height } from '../../sections/Height'
 import { wrapInFormik } from '../../utils/wrapInFormik'
+import type { FormikConfig } from 'formik'
+import type { LabwareFields } from '../../../fields'
 
 vi.mock('../../../utils')
 

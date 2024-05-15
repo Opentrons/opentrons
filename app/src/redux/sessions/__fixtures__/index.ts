@@ -16,12 +16,12 @@ import {
   mockPipetteOffsetCalibrationSessionDetails,
   mockPipetteOffsetCalibrationSessionParams,
 } from './pipette-offset-calibration'
+import * as Constants from '../constants'
 
 import type { ResponseFixtures } from '../../robot-api/__fixtures__'
 import type { RobotApiV2ErrorResponseBody } from '../../robot-api/types'
 
-import * as Types from '../types'
-import * as Constants from '../constants'
+import type * as Types from '../types'
 
 export * from './calibration-check'
 export * from './tip-length-calibration'

@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { InputField } from '@opentrons/components'
-import { FieldProps } from '../types'
+import type { FieldProps } from '../types'
 
 type TextFieldProps = FieldProps & {
   className?: string

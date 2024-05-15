@@ -3,12 +3,9 @@ import styled from 'styled-components'
 import flatMap from 'lodash/flatMap'
 import { animated, useSpring, easings } from '@react-spring/web'
 import {
-  LabwareWell,
-  LoadedModule,
   getDeckDefFromRobotType,
   getModuleDef2,
   getPositionFromSlotId,
-  LoadedLabware,
 } from '@opentrons/shared-data'
 
 import { COLORS } from '../../helix-design-system'
@@ -16,6 +13,9 @@ import { IDENTITY_AFFINE_TRANSFORM, multiplyMatrices } from '../utils'
 import { BaseDeck } from '../BaseDeck'
 
 import type {
+  LoadedLabware,
+  LabwareWell,
+  LoadedModule,
   Coordinates,
   LabwareDefinition2,
   LabwareLocation,

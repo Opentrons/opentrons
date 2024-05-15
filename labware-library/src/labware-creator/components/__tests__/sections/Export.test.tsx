@@ -1,6 +1,9 @@
 import React from 'react'
+<<<<<<< HEAD
 import { FormikConfig } from 'formik'
 <<<<<<< HEAD
+=======
+>>>>>>> f3c86ff7d8 (fix(app, components, protocol-designer, shared-data): import type lint rule to error, fix occurrences (#15168))
 import { vi, describe, it, beforeEach, afterEach } from 'vitest'
 =======
 import { vi, describe, it, expect, beforeEach, afterEach } from 'vitest'
@@ -8,14 +11,12 @@ import { vi, describe, it, expect, beforeEach, afterEach } from 'vitest'
 import { when } from 'vitest-when'
 import { render, screen } from '@testing-library/react'
 import '@testing-library/jest-dom/vitest'
-import {
-  getDefaultFormState,
-  getInitialStatus,
-  LabwareFields,
-} from '../../../fields'
+import { getDefaultFormState, getInitialStatus } from '../../../fields'
 import { isEveryFieldHidden } from '../../../utils'
 import { Export } from '../../sections/Export'
 import { wrapInFormik } from '../../utils/wrapInFormik'
+import type { FormikConfig } from 'formik'
+import type { LabwareFields } from '../../../fields'
 
 vi.mock('../../../utils')
 

@@ -1,11 +1,12 @@
-import { createSelector, Selector } from 'reselect'
+import { createSelector } from 'reselect'
 import forEach from 'lodash/forEach'
 import mapValues from 'lodash/mapValues'
 import max from 'lodash/max'
 import reduce from 'lodash/reduce'
-import { Options } from '@opentrons/components'
-import { LabwareLiquidState } from '@opentrons/step-generation'
-import {
+import type { Selector } from 'reselect'
+import type { Options } from '@opentrons/components'
+import type { LabwareLiquidState } from '@opentrons/step-generation'
+import type {
   RootState,
   ContainersState,
   DrillDownLabwareId,
@@ -13,13 +14,13 @@ import {
   SelectedContainerId,
   SelectedLiquidGroupState,
 } from './reducers'
-import {
+import type {
   AllIngredGroupFields,
   IngredInputs,
   LiquidGroup,
   OrderedLiquids,
 } from './types'
-import { BaseState, DeckSlot } from './../types'
+import type { BaseState, DeckSlot } from './../types'
 // TODO: Ian 2019-02-15 no RootSlice, use BaseState
 interface RootSlice {
   labwareIngred: RootState

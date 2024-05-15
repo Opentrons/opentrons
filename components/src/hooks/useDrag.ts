@@ -1,11 +1,6 @@
-import {
-  useState,
-  useEffect,
-  useRef,
-  CSSProperties,
-  MutableRefObject,
-} from 'react'
+import { useState, useEffect, useRef } from 'react'
 import interact from 'interactjs'
+import type { CSSProperties, MutableRefObject } from 'react'
 
 export interface ElementPosition {
   width: number

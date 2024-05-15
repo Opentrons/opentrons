@@ -1,5 +1,4 @@
 import * as React from 'react'
-import { FlattenSimpleInterpolation } from 'styled-components'
 import { Flex } from '../primitives'
 import { ALIGN_CENTER, JUSTIFY_CENTER } from '../styles'
 import singleSrc from './single_channel_GEN1_800px.png'
@@ -10,6 +9,7 @@ import singleFlexSrc from './single-channel-flex.png'
 import eightChannelFlexSrc from './eight-channel-flex.png'
 import ninetySixSrc from './ninety-six-channel-gen1.png'
 
+import type { FlattenSimpleInterpolation } from 'styled-components'
 import type { PipetteV2Specs } from '@opentrons/shared-data'
 import type { Mount } from '../robot-types'
 import type { StyleProps } from '..'

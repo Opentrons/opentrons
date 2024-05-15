@@ -8,11 +8,13 @@ import {
   ot2DeckDefV4,
 >>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
   getModuleDef2,
+} from '@opentrons/shared-data'
+import { getProtocolModulesInfo } from '../getProtocolModulesInfo'
+import type {
   ProtocolAnalysisOutput,
   LoadedLabware,
   LoadedModule,
 } from '@opentrons/shared-data'
-import { getProtocolModulesInfo } from '../getProtocolModulesInfo'
 
 const protocolWithMagTempTC = ({
   ...transfer_settings,

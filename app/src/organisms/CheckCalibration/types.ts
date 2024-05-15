@@ -1,5 +1,5 @@
 import type { CalibrationCheckSession } from '../../redux/sessions/types'
-import { DispatchRequestsType } from '../../redux/robot-api'
+import type { DispatchRequestsType } from '../../redux/robot-api'
 
 export interface CalibrationCheckParentProps {
   robotName: string

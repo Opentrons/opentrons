@@ -2,11 +2,16 @@ import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 <<<<<<< HEAD
 import { COLORS, TYPOGRAPHY, StyledText } from '@opentrons/components'
+<<<<<<< HEAD
 =======
 import { COLORS, TYPOGRAPHY } from '@opentrons/components'
 >>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
 import { MAGNETIC_MODULE_V1, MAGNETIC_MODULE_V2 } from '@opentrons/shared-data'
+=======
+import { MAGNETIC_MODULE_V2 } from '@opentrons/shared-data'
+>>>>>>> f3c86ff7d8 (fix(app, components, protocol-designer, shared-data): import type lint rule to error, fix occurrences (#15168))
 import { StatusLabel } from '../../atoms/StatusLabel'
+import type { MAGNETIC_MODULE_V1 } from '@opentrons/shared-data'
 import type { MagneticStatus } from '../../redux/modules/api-types'
 
 interface MagModuleProps {

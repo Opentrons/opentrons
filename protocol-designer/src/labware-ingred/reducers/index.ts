@@ -1,18 +1,19 @@
-import { Reducer, combineReducers } from 'redux'
+import { combineReducers } from 'redux'
 import { handleActions } from 'redux-actions'
 import omit from 'lodash/omit'
 import mapValues from 'lodash/mapValues'
 import pickBy from 'lodash/pickBy'
 import { getPDMetadata } from '../../file-types'
-import {
+import type { Reducer } from 'redux'
+import type {
   SingleLabwareLiquidState,
   LocationLiquidState,
   LabwareLiquidState,
 } from '@opentrons/step-generation'
-import { Action, DeckSlot } from '../../types'
-import { LiquidGroupsById, DisplayLabware } from '../types'
-import { LoadFileAction } from '../../load-file'
-import {
+import type { Action, DeckSlot } from '../../types'
+import type { LiquidGroupsById, DisplayLabware } from '../types'
+import type { LoadFileAction } from '../../load-file'
+import type {
   RemoveWellsContentsAction,
   CreateContainerAction,
   DeleteLiquidGroupAction,

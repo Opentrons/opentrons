@@ -1,14 +1,10 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import cx from 'classnames'
-import {
-  Tooltip,
-  useHoverTooltip,
-  TOOLTIP_FIXED,
-  UseHoverTooltipTargetProps,
-} from '@opentrons/components'
+import { Tooltip, useHoverTooltip, TOOLTIP_FIXED } from '@opentrons/components'
 import { PDListItem } from '../lists'
 import { LabwareTooltipContents } from './LabwareTooltipContents'
+<<<<<<< HEAD
 <<<<<<< HEAD
 import type { ModuleType } from '@opentrons/shared-data'
 
@@ -17,6 +13,11 @@ import styles from './StepItem.module.css'
 import styles from './StepItem.module.css'
 import { ModuleType } from '@opentrons/shared-data'
 >>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
+=======
+import styles from './StepItem.module.css'
+import type { UseHoverTooltipTargetProps } from '@opentrons/components'
+import type { ModuleType } from '@opentrons/shared-data'
+>>>>>>> f3c86ff7d8 (fix(app, components, protocol-designer, shared-data): import type lint rule to error, fix occurrences (#15168))
 
 export interface ModuleStepItemRowProps {
   label?: string | null

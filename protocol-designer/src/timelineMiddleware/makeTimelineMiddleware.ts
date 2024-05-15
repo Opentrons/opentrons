@@ -7,13 +7,13 @@ import { getInitialRobotState } from '../file-data/selectors'
 import {
   computeRobotStateTimelineRequest,
   computeRobotStateTimelineSuccess,
-  ComputeRobotStateTimelineSuccessAction,
 } from '../file-data/actions'
 import { getLabwareNamesByModuleId } from '../ui/modules/selectors'
-import { Middleware } from 'redux'
-import { BaseState } from '../types'
-import { GenerateRobotStateTimelineArgs } from './generateRobotStateTimeline'
-import { SubstepsArgsNoTimeline } from './types'
+import type { ComputeRobotStateTimelineSuccessAction } from '../file-data/actions'
+import type { Middleware } from 'redux'
+import type { BaseState } from '../types'
+import type { GenerateRobotStateTimelineArgs } from './generateRobotStateTimeline'
+import type { SubstepsArgsNoTimeline } from './types'
 
 const hasChanged = (
   nextValues: { [key in any]?: any },

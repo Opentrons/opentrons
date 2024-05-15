@@ -1,5 +1,5 @@
-import { LabwareFields } from '../fields'
 import { displayAsTube } from './displayAsTube'
+import type { LabwareFields } from '../fields'
 
 export const getLabwareName = (
   values: LabwareFields,

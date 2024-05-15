@@ -1,24 +1,19 @@
-import { Reducer, combineReducers } from 'redux'
-
+import { combineReducers } from 'redux'
 import { handleActions } from 'redux-actions'
 import omit from 'lodash/omit'
 import { getPDMetadata } from '../../file-types'
-import {
-  SubstepIdentifier,
-  TerminalItemId,
-  START_TERMINAL_ITEM_ID,
-  PRESAVED_STEP_ID,
-} from '../../steplist/types'
-
-import { Action } from '../../types'
-import { LoadFileAction } from '../../load-file'
-import { StepIdType } from '../../form-types'
-import { SaveStepFormAction } from '../steps/actions/thunks'
-import {
+import { START_TERMINAL_ITEM_ID, PRESAVED_STEP_ID } from '../../steplist/types'
+import type { Reducer } from 'redux'
+import type { SubstepIdentifier, TerminalItemId } from '../../steplist/types'
+import type {
   DeleteStepAction,
   DeleteMultipleStepsAction,
 } from '../../steplist/actions'
-import {
+import type { Action } from '../../types'
+import type { LoadFileAction } from '../../load-file'
+import type { StepIdType } from '../../form-types'
+import type { SaveStepFormAction } from '../steps/actions/thunks'
+import type {
   AddStepAction,
   HoverOnStepAction,
   HoverOnSubstepAction,
@@ -30,6 +25,7 @@ import {
   ExpandMultipleStepsAction,
   CollapseMultipleStepsAction,
 } from './actions/types'
+
 export type CollapsedStepsState = Record<StepIdType, boolean>
 // @ts-expect-error(sa, 2021-6-10): cannot use string literals as action type
 // TODO IMMEDIATELY: refactor this to the old fashioned way if we cannot have type safety: https://github.com/redux-utilities/redux-actions/issues/282#issuecomment-595163081

@@ -7,7 +7,6 @@ import {
   FormGroup,
   DeprecatedCheckboxField,
   DropdownField,
-  Options,
   Flex,
   DIRECTION_COLUMN,
   SPACING,
@@ -20,6 +19,7 @@ import { TextField } from './TextField'
 import { FlowRateField } from './FlowRateField'
 import { BlowoutZOffsetField } from './BlowoutZOffsetField'
 
+import type { Options } from '@opentrons/components'
 import type { PathOption, StepType } from '../../../form-types'
 import type { FieldProps, FieldPropsByName } from '../types'
 

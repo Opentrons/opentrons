@@ -8,10 +8,10 @@ import {
   OutlineButton,
 } from '@opentrons/components'
 import { actions as steplistActions } from '../../steplist'
-import { StepFieldName } from '../../steplist/fieldLevel'
 import modalStyles from './modal.module.css'
 import styles from './MoreOptionsModal.module.css'
 
+import type { StepFieldName } from '../../steplist/fieldLevel'
 import type { FormData } from '../../form-types'
 import type { ChangeFormPayload } from '../../steplist/actions'
 

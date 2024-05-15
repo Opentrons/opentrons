@@ -2,7 +2,7 @@ import * as React from 'react'
 import { vi, it, expect, describe, beforeEach, afterEach } from 'vitest'
 import { when } from 'vitest-when'
 import { Provider } from 'react-redux'
-import { createStore, Store } from 'redux'
+import { createStore } from 'redux'
 import { renderHook } from '@testing-library/react'
 import { QueryClient, QueryClientProvider } from 'react-query'
 import { useCalibrationStatusQuery } from '@opentrons/react-api-client'
@@ -12,6 +12,7 @@ import { getDiscoverableRobotByName } from '../../../../redux/discovery'
 
 import { useDeckCalibrationStatus } from '..'
 import { mockConnectableRobot } from '../../../../redux/discovery/__fixtures__'
+import type { Store } from 'redux'
 
 vi.mock('@opentrons/react-api-client')
 vi.mock('../../../../redux/calibration')

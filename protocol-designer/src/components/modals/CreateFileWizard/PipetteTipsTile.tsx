@@ -7,7 +7,6 @@ import {
   Flex,
   Text,
   SPACING,
-  Mount,
   ALIGN_CENTER,
   PrimaryButton,
   JUSTIFY_SPACE_BETWEEN,
@@ -32,6 +31,7 @@ import { GoBack } from './GoBack'
 import { EquipmentOption } from './EquipmentOption'
 import { HandleEnter } from './HandleEnter'
 
+import type { Mount } from '@opentrons/components'
 import type { PipetteName } from '@opentrons/shared-data'
 import type { FormState, WizardTileProps } from './types'
 import type { ThunkDispatch } from 'redux-thunk'

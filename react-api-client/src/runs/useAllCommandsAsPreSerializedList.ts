@@ -1,8 +1,12 @@
+<<<<<<< HEAD
 import mapValues from 'lodash/mapValues'
 import { UseQueryResult, useQuery } from 'react-query'
+=======
+import { useQuery } from 'react-query'
+>>>>>>> f3c86ff7d8 (fix(app, components, protocol-designer, shared-data): import type lint rule to error, fix occurrences (#15168))
 import { getCommandsAsPreSerializedList } from '@opentrons/api-client'
 import { useHost } from '../api'
-import type { UseQueryOptions } from 'react-query'
+import type { UseQueryOptions, UseQueryResult } from 'react-query'
 import type {
   GetCommandsParams,
   HostConfig,

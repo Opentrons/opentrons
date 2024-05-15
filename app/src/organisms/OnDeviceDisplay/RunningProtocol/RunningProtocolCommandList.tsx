@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { css } from 'styled-components'
-import { ViewportList, ViewportListRef } from 'react-viewport-list'
+import { ViewportList } from 'react-viewport-list'
 
 import {
   ALIGN_CENTER,
@@ -28,6 +28,7 @@ import { PlayPauseButton } from './PlayPauseButton'
 import { StopButton } from './StopButton'
 import { ANALYTICS_PROTOCOL_RUN_ACTION } from '../../../redux/analytics'
 
+import type { ViewportListRef } from 'react-viewport-list'
 import type {
   CompletedProtocolAnalysis,
   RobotType,
