@@ -28,8 +28,28 @@ export function useAllCommandsAsPreSerializedList<TError = Error>(
     enabled: host !== null && runId != null && options.enabled !== false,
   }
   const { cursor, pageLength } = nullCheckedParams
+  // reduce hostKey into a new object to make nullish values play nicely with react-query key hash
+  const hostKey =
+    host != null
+      ? Object.entries(host).reduce<Object>((acc, current) => {
+          const [key, val] = current
+          if (val != null) {
+            return { ...acc, [key]: val }
+          } else {
+            return { ...acc, [key]: 'no value' }
+          }
+        }, {})
+      : {}
+
   const query = useQuery<CommandsData, TError>(
-    [host, 'runs', runId, 'getCommandsAsPreSerializedList', cursor, pageLength],
+    [
+      hostKey,
+      'runs',
+      runId,
+      'getCommandsAsPreSerializedList',
+      cursor,
+      pageLength,
+    ],
     () => {
       return getCommandsAsPreSerializedList(
         host as HostConfig,

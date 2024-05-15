@@ -12,6 +12,7 @@ import {
   DISPLAY_FLEX,
   DISPLAY_NONE,
   Flex,
+  InfoScreen,
   POSITION_FIXED,
   PrimaryButton,
   SPACING,
@@ -58,7 +59,10 @@ export const RunPreviewComponent = (
       ? (RUN_STATUSES_TERMINAL as RunStatus[]).includes(runStatus)
       : false
   // we only ever want one request done for terminal runs because this is a heavy request
-  const commandsFromQuery = useNotifyAllCommandsAsPreSerializedList(
+  const {
+    data: commandsFromQueryResponse,
+    isLoading: isRunCommandDataLoading,
+  } = useNotifyAllCommandsAsPreSerializedList(
     runId,
     { cursor: 0, pageLength: MAX_COMMANDS },
     {
@@ -66,9 +70,8 @@ export const RunPreviewComponent = (
       cacheTime: Infinity,
       enabled: isRunTerminal,
     }
-  ).data?.data
-  const nullCheckedCommandsFromQuery =
-    commandsFromQuery == null ? robotSideAnalysis?.commands : commandsFromQuery
+  )
+  const commandsFromQuery = commandsFromQueryResponse?.data
   const viewPortRef = React.useRef<HTMLDivElement | null>(null)
   const currentRunCommandKey = useNotifyLastRunCommand(runId, {
     refetchInterval: LIVE_RUN_COMMANDS_POLL_MS,
@@ -78,10 +81,9 @@ export const RunPreviewComponent = (
     setIsCurrentCommandVisible,
   ] = React.useState<boolean>(true)
   if (robotSideAnalysis == null) return null
-  const commands =
-    (isRunTerminal
-      ? nullCheckedCommandsFromQuery
-      : robotSideAnalysis.commands) ?? []
+  const commands = isRunTerminal
+    ? commandsFromQuery
+    : robotSideAnalysis.commands
   // pass relevant data from run rather than analysis so that CommandText utilities can properly hash the entities' IDs
   // TODO (nd:05/02/2024, AUTH-380): update name and types for CommandText (and children/utilities) use of analysis.
   // We should ideally pass only subset of analysis/run data required by these children and utilities
@@ -93,14 +95,28 @@ export const RunPreviewComponent = (
           modules: runRecord.data.modules ?? [],
           pipettes: runRecord.data.pipettes ?? [],
           liquids: runRecord.data.liquids ?? [],
-          commands: commands,
+          commands: commands ?? [],
         }
       : robotSideAnalysis
-  const currentRunCommandIndex = commands.findIndex(
-    c => c.key === currentRunCommandKey
-  )
+  const currentRunCommandIndex =
+    commands != null
+      ? commands.findIndex(c => c.key === currentRunCommandKey)
+      : 0
 
-  return (
+  if (isRunCommandDataLoading || commands == null) {
+    return (
+      <Flex flexDirection={DIRECTION_COLUMN} padding={SPACING.spacing16}>
+        <StyledText alignSelf={ALIGN_CENTER} color={COLORS.grey50}>
+          {t('protocol_setup:loading_data')}
+        </StyledText>
+      </Flex>
+    )
+  }
+  return commands.length === 0 ? (
+    <Flex flexDirection={DIRECTION_COLUMN} padding={SPACING.spacing16}>
+      <InfoScreen contentType="runNotStarted" />
+    </Flex>
+  ) : (
     <Flex
       ref={viewPortRef}
       flexDirection={DIRECTION_COLUMN}
@@ -110,99 +126,101 @@ export const RunPreviewComponent = (
       gridGap={SPACING.spacing8}
       padding={SPACING.spacing16}
     >
-      <Flex gridGap={SPACING.spacing8} alignItems={ALIGN_CENTER}>
-        <StyledText as="h3" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
-          {t('run_preview')}
+      <>
+        <Flex gridGap={SPACING.spacing8} alignItems={ALIGN_CENTER}>
+          <StyledText as="h3" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
+            {t('run_preview')}
+          </StyledText>
+          <StyledText as="label" color={COLORS.grey50}>
+            {t('steps_total', { count: commands.length })}
+          </StyledText>
+        </Flex>
+        <StyledText as="p" marginBottom={SPACING.spacing8}>
+          {t('preview_of_protocol_steps')}
         </StyledText>
-        <StyledText as="label" color={COLORS.grey50}>
-          {t('steps_total', { count: commands.length })}
-        </StyledText>
-      </Flex>
-      <StyledText as="p" marginBottom={SPACING.spacing8}>
-        {t('preview_of_protocol_steps')}
-      </StyledText>
-      <Divider marginX={`calc(-1 * ${SPACING.spacing16})`} />
-      <ViewportList
-        viewportRef={viewPortRef}
-        ref={ref}
-        items={commands}
-        onViewportIndexesChange={([
-          lowestVisibleIndex,
-          highestVisibleIndex,
-        ]) => {
-          if (currentRunCommandIndex >= 0) {
-            setIsCurrentCommandVisible(
-              currentRunCommandIndex >= lowestVisibleIndex &&
-                currentRunCommandIndex <= highestVisibleIndex
-            )
-          }
-        }}
-        initialIndex={currentRunCommandIndex}
-      >
-        {(command, index) => {
-          const isCurrent = index === currentRunCommandIndex
-          const backgroundColor = isCurrent ? COLORS.blue30 : COLORS.grey20
-          const iconColor = isCurrent ? COLORS.blue60 : COLORS.grey50
-          return (
-            <Flex
-              key={command.id}
-              alignItems={ALIGN_CENTER}
-              gridGap={SPACING.spacing8}
-            >
-              <StyledText
-                minWidth={SPACING.spacing16}
-                fontSize={TYPOGRAPHY.fontSizeCaption}
-              >
-                {index + 1}
-              </StyledText>
+        <Divider marginX={`calc(-1 * ${SPACING.spacing16})`} />
+        <ViewportList
+          viewportRef={viewPortRef}
+          ref={ref}
+          items={commands}
+          onViewportIndexesChange={([
+            lowestVisibleIndex,
+            highestVisibleIndex,
+          ]) => {
+            if (currentRunCommandIndex >= 0) {
+              setIsCurrentCommandVisible(
+                currentRunCommandIndex >= lowestVisibleIndex &&
+                  currentRunCommandIndex <= highestVisibleIndex
+              )
+            }
+          }}
+          initialIndex={currentRunCommandIndex}
+        >
+          {(command, index) => {
+            const isCurrent = index === currentRunCommandIndex
+            const backgroundColor = isCurrent ? COLORS.blue30 : COLORS.grey20
+            const iconColor = isCurrent ? COLORS.blue60 : COLORS.grey50
+            return (
               <Flex
-                flexDirection={DIRECTION_COLUMN}
-                gridGap={SPACING.spacing4}
-                width="100%"
-                backgroundColor={
-                  index === jumpedIndex ? '#F5E3FF' : backgroundColor
-                }
-                color={COLORS.black90}
-                borderRadius={BORDERS.borderRadius4}
-                padding={SPACING.spacing8}
-                css={css`
-                  transition: background-color ${COLOR_FADE_MS}ms ease-out,
-                    border-color ${COLOR_FADE_MS}ms ease-out;
-                `}
+                key={command.id}
+                alignItems={ALIGN_CENTER}
+                gridGap={SPACING.spacing8}
               >
-                <Flex alignItems={ALIGN_CENTER} gridGap={SPACING.spacing8}>
-                  <CommandIcon command={command} color={iconColor} />
-                  <CommandText
-                    command={command}
-                    robotSideAnalysis={protocolDataFromAnalysisOrRun}
-                    robotType={robotType}
-                    color={COLORS.black90}
-                  />
+                <StyledText
+                  minWidth={SPACING.spacing16}
+                  fontSize={TYPOGRAPHY.fontSizeCaption}
+                >
+                  {index + 1}
+                </StyledText>
+                <Flex
+                  flexDirection={DIRECTION_COLUMN}
+                  gridGap={SPACING.spacing4}
+                  width="100%"
+                  backgroundColor={
+                    index === jumpedIndex ? '#F5E3FF' : backgroundColor
+                  }
+                  color={COLORS.black90}
+                  borderRadius={BORDERS.borderRadius4}
+                  padding={SPACING.spacing8}
+                  css={css`
+                    transition: background-color ${COLOR_FADE_MS}ms ease-out,
+                      border-color ${COLOR_FADE_MS}ms ease-out;
+                  `}
+                >
+                  <Flex alignItems={ALIGN_CENTER} gridGap={SPACING.spacing8}>
+                    <CommandIcon command={command} color={iconColor} />
+                    <CommandText
+                      command={command}
+                      robotSideAnalysis={protocolDataFromAnalysisOrRun}
+                      robotType={robotType}
+                      color={COLORS.black90}
+                    />
+                  </Flex>
                 </Flex>
               </Flex>
-            </Flex>
-          )
-        }}
-      </ViewportList>
-      {currentRunCommandIndex >= 0 ? (
-        <PrimaryButton
-          position={POSITION_FIXED}
-          bottom={SPACING.spacing40}
-          left={`calc(calc(100% + ${NAV_BAR_WIDTH})/2)`} // add width of half of nav bar to center within run tab
-          transform="translate(-50%)"
-          borderRadius={SPACING.spacing32}
-          display={isCurrentCommandVisible ? DISPLAY_NONE : DISPLAY_FLEX}
-          onClick={makeHandleScrollToStep(currentRunCommandIndex)}
-          id="RunLog_jumpToCurrentStep"
-        >
-          {t('view_current_step')}
-        </PrimaryButton>
-      ) : null}
-      {currentRunCommandIndex === commands.length - 1 ? (
-        <StyledText as="h6" color={COLORS.grey60}>
-          {t('end_of_protocol')}
-        </StyledText>
-      ) : null}
+            )
+          }}
+        </ViewportList>
+        {currentRunCommandIndex >= 0 ? (
+          <PrimaryButton
+            position={POSITION_FIXED}
+            bottom={SPACING.spacing40}
+            left={`calc(calc(100% + ${NAV_BAR_WIDTH})/2)`} // add width of half of nav bar to center within run tab
+            transform="translate(-50%)"
+            borderRadius={SPACING.spacing32}
+            display={isCurrentCommandVisible ? DISPLAY_NONE : DISPLAY_FLEX}
+            onClick={makeHandleScrollToStep(currentRunCommandIndex)}
+            id="RunLog_jumpToCurrentStep"
+          >
+            {t('view_current_step')}
+          </PrimaryButton>
+        ) : null}
+        {currentRunCommandIndex === commands.length - 1 ? (
+          <StyledText as="h6" color={COLORS.grey60}>
+            {t('end_of_protocol')}
+          </StyledText>
+        ) : null}
+      </>
     </Flex>
   )
 }
