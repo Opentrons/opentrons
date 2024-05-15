@@ -37,6 +37,8 @@ def should_use_ot3() -> bool:
     """Return true if ot3 hardware controller should be used."""
     if ff.enable_ot3_hardware_controller():
         try:
+            # Try this OT-3-specific import as an extra check in case the feature
+            # flag is mistakenly enabled on an OT-2 for some reason.
             from opentrons_hardware.drivers.can_bus import CanDriver  # noqa: F401
 
             return True
