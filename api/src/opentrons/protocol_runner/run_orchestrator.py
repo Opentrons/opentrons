@@ -5,15 +5,12 @@ from . import protocol_runner
 from ..hardware_control import HardwareControlAPI
 from ..protocol_engine import (
     ProtocolEngine,
-    Command,
     CommandCreate,
     CommandIntent,
 )
 from ..protocol_engine.errors import CommandNotAllowedError
 from ..protocol_engine.types import PostRunHardwareState, RunTimeParamValuesType
 from ..protocol_reader import JsonProtocolConfig, PythonProtocolConfig
-
-from opentrons.protocols.parse import PythonParseMode
 
 
 class RunOrchestrator:
@@ -82,43 +79,6 @@ class RunOrchestrator:
             hardware_api=hardware_api,
             protocol_engine=protocol_engine,
         )
-
-    def add_command(
-        self, request: CommandCreate, failed_command_id: Optional[str] = None
-    ) -> CommandCreate:
-        """Add a command to the queue.
-
-        Arguments:
-            request: The command type and payload data used to construct
-                the command in state.
-            failed_command_id: the failed command id this command is trying to fix.
-
-        Returns:
-            The full, newly queued command.
-
-        Raises:
-            SetupCommandNotAllowed: the request specified a setup command,
-                but the engine was not idle or paused.
-            RunStoppedError: the run has been stopped, so no new commands
-                may be added.
-            CommandNotAllowedError: the request specified a failed command id
-                with a non fixit command.
-        """
-        if failed_command_id and request.intent != CommandIntent.FIXIT:
-            raise CommandNotAllowedError(
-                "failed command id should be supplied with a FIXIT command."
-            )
-
-        # pass the failed_command_id somewhere
-        if request.intent == CommandIntent.SETUP:
-            return self._setup_runner.set_command_queued(request)
-        elif request.intent == CommandIntent.FIXIT:
-            return self._fixit_runner.set_command_queued(request)
-        elif (
-            request.intent == CommandIntent.PROTOCOL
-            and self._json_or_python_runner is not None
-        ):
-            return self._json_or_python_runner.set_command_queued(request)
 
     def get_protocol_runner(self) -> protocol_runner.AnyRunner:
         return self._json_or_python_runner or self._setup_runner

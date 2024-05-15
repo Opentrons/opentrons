@@ -20,8 +20,6 @@ from opentrons.protocol_engine import (
     StateSummary,
     Command,
     commands as pe_commands,
-    CommandIntent,
-    CommandCreate,
 )
 from opentrons.protocols.parse import PythonParseMode
 from opentrons.util.broker import Broker
@@ -38,7 +36,6 @@ from .legacy_wrappers import (
     LegacyExecutor,
     LegacyLoadInfo,
 )
-from ..ordered_set import OrderedSet
 from ..protocol_engine.errors import ProtocolCommandFailedError
 from ..protocol_engine.types import (
     PostRunHardwareState,
@@ -68,21 +65,9 @@ class AbstractRunner(ABC):
     you will need a new Runner to do another run.
     """
 
-    _queued_protocol_commands: List[CommandCreate]
-    """The IDs of queued commands, in FIFO order"""
-
-    _queued_setup_commands: List[CommandCreate]
-    """The IDs of queued setup commands, in FIFO order"""
-
-    _queued_fixit_commands: List[CommandCreate]
-    """The IDs of queued fixit commands, in FIFO order"""
-
     def __init__(self, protocol_engine: ProtocolEngine) -> None:
         self._protocol_engine = protocol_engine
         self._broker = LegacyBroker()
-        self._queued_protocol_commands = []
-        self._queued_setup_commands = []
-        self._queued_fixit_commands = []
 
     # TODO(mm, 2023-10-03): `LegacyBroker` is specific to Python protocols and JSON protocols ≤v5.
     # We'll need to extend this in order to report progress from newer JSON protocols.
@@ -142,10 +127,6 @@ class AbstractRunner(ABC):
     ) -> RunResult:
         """Run a given protocol to completion."""
 
-    @abstractmethod
-    def set_command_queued(self, command: CommandCreate) -> CommandCreate:
-        """add command to queue."""
-
 
 class PythonAndLegacyRunner(AbstractRunner):
     """Protocol runner implementation for Python protocols, and JSON protocols ≤v5."""
@@ -186,10 +167,6 @@ class PythonAndLegacyRunner(AbstractRunner):
         if self._parameter_context is not None:
             return self._parameter_context.export_parameters_for_analysis()
         return []
-
-    def set_command_queued(self, command: CommandCreate) -> CommandCreate:
-        """add command to queue."""
-        return command
 
     async def load(
         self,
@@ -307,6 +284,7 @@ class JsonRunner(AbstractRunner):
         )
 
         self._hardware_api.should_taskify_movement_execution(taskify=False)
+        self._queued_commands: List[pe_commands.CommandCreate] = []
 
     async def load(self, protocol_source: ProtocolSource) -> None:
         """Load a JSONv6+ ProtocolSource into managed ProtocolEngine."""
@@ -353,10 +331,9 @@ class JsonRunner(AbstractRunner):
             params=pe_commands.HomeParams(axes=None)
         )
         # this command homes all axes, including pipette plugner and gripper jaw
-        self.set_command_queued(initial_home_command)
+        self._protocol_engine.add_command(request=initial_home_command)
 
-        for command in commands:
-            self.set_command_queued(command)
+        self._queued_commands = commands
 
         self._task_queue.set_run_func(func=self._add_command_and_execute)
 
@@ -380,24 +357,13 @@ class JsonRunner(AbstractRunner):
         return RunResult(commands=commands, state_summary=run_data, parameters=[])
 
     async def _add_command_and_execute(self) -> None:
-        for command in self._queued_protocol_commands:
-            # TODO(Tamar): should_add_execute_command change to only wait_for_command?
+        for command in self._queued_commands:
             result = await self._protocol_engine.add_and_execute_command(command)
             if result and result.error:
                 raise ProtocolCommandFailedError(
                     original_error=result.error,
                     message=f"{result.error.errorType}: {result.error.detail}",
                 )
-
-    def set_command_queued(self, command: CommandCreate) -> CommandCreate:
-        """add command to queue."""
-        self._add_to_queue(command)
-        return command
-
-    def _add_to_queue(self, command: CommandCreate) -> CommandCreate:
-        """Add new ID to the queued."""
-        self._queued_protocol_commands.append(command)
-        return command
 
 
 class LiveRunner(AbstractRunner):
@@ -440,32 +406,15 @@ class LiveRunner(AbstractRunner):
         commands = self._protocol_engine.state_view.commands.get_all()
         return RunResult(commands=commands, state_summary=run_data, parameters=[])
 
-    def set_command_queued(self, command: CommandCreate) -> CommandCreate:
-        """add command to queue."""
-        if command.intent == CommandIntent.SETUP:
-            self._add_to_setup_queue(command)
-        elif command.intent == CommandIntent.FIXIT:
-            self._add_to_fixit_queue(command)
-
-        return command
-
-    def _add_to_setup_queue(self, command: CommandCreate) -> None:
-        """Add a new ID to the queued setup."""
-        self._queued_setup_commands.append(command)
-
-    def _add_to_fixit_queue(self, command: CommandCreate) -> None:
-        """Add a new ID to the queued fixit."""
-        self._queued_fixit_commands.append(command)
-
 
 AnyRunner = Union[PythonAndLegacyRunner, JsonRunner, LiveRunner]
 
 
 def create_protocol_runner(
+    protocol_config: Optional[Union[JsonProtocolConfig, PythonProtocolConfig]],
     protocol_engine: ProtocolEngine,
     hardware_api: HardwareControlAPI,
     task_queue: Optional[TaskQueue] = None,
-    protocol_config: Optional[Union[JsonProtocolConfig, PythonProtocolConfig]] = None,
     json_file_reader: Optional[JsonFileReader] = None,
     json_translator: Optional[JsonTranslator] = None,
     legacy_file_reader: Optional[LegacyFileReader] = None,
