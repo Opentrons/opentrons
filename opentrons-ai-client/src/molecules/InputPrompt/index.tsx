@@ -3,7 +3,6 @@ import { useTranslation } from 'react-i18next'
 import styled, { css } from 'styled-components'
 import { useForm } from 'react-hook-form'
 import { useAtom } from 'jotai'
-import { useAuth0 } from '@auth0/auth0-react'
 
 import {
   ALIGN_CENTER,
@@ -17,7 +16,7 @@ import {
 } from '@opentrons/components'
 import { SendButton } from '../../atoms/SendButton'
 import { preparedPromptAtom, chatDataAtom } from '../../resources/atoms'
-import { useApiCall } from '../../resources/hooks/useApiCall'
+import { useApiCall, useGetAccessToken } from '../../resources/hooks'
 import { calcTextAreaHeight } from '../../resources/utils/utils'
 import { END_POINT } from '../../resources/constants'
 
@@ -45,40 +44,10 @@ export function InputPrompt(): JSX.Element {
   // ToDo (kk:05/15/2024) this will be used in the future
   // const [error, setError] = React.useState<string>('')
 
-  const { getAccessTokenSilently } = useAuth0()
-
   const userPrompt = watch('userPrompt') ?? ''
 
   const { data, error, isLoading, fetchData } = useApiCall()
-
-  // // ToDo (kk:05/15/2024) This will be moved to a better place
-  // const fetchData = async (prompt: string): Promise<void> => {
-  //   if (prompt !== '') {
-  //     setLoading(true)
-  //     try {
-  //       const accessToken = await getAccessTokenSilently({
-  //         authorizationParams: {
-  //           audience: 'sandbox-ai-api',
-  //         },
-  //       })
-  //       const postData = {
-  //         message: prompt,
-  //         fake: false,
-  //       }
-  //       const headers = {
-  //         Authorization: `Bearer ${accessToken}`,
-  //         'Content-Type': 'application/json',
-  //       }
-  //       const response = await axios.post(END_POINT, postData, { headers })
-  //       setData(response.data)
-  //     } catch (err) {
-  //       // setError('Error fetching data from the API.')
-  //       console.error(`error: ${err}`)
-  //     } finally {
-  //       setLoading(false)
-  //     }
-  //   }
-  // }
+  const { getAccessToken } = useGetAccessToken()
 
   const handleClick = async (): Promise<void> => {
     const userInput: ChatData = {
@@ -88,12 +57,7 @@ export function InputPrompt(): JSX.Element {
     setChatData(chatData => [...chatData, userInput])
 
     try {
-      const accessToken = await getAccessTokenSilently({
-        authorizationParams: {
-          audience: 'sandbox-ai-api',
-        },
-      })
-
+      const accessToken = await getAccessToken()
       const headers = {
         Authorization: `Bearer ${accessToken}`,
         'Content-Type': 'application/json',
@@ -117,6 +81,7 @@ export function InputPrompt(): JSX.Element {
       reset()
     } catch (err) {
       console.error(`error: ${err}`)
+      throw err
     }
   }
 

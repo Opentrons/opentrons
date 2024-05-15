@@ -10,6 +10,11 @@ interface UseApiCallResult<T> {
   fetchData: (config: AxiosRequestConfig) => Promise<void>
 }
 
+/**
+ * React hook to initiate an API call and track its progress and result.
+ * @template T The type of the data returned by the API call.
+ * @returns An object with the current state of the API call and a function to initiate the call.
+ */
 export const useApiCall = <T>(): UseApiCallResult<T> => {
   const [data, setData] = useState<T | null>(null)
   const [error, setError] = useState<string | null>(null)
