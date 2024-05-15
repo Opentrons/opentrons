@@ -143,6 +143,7 @@ if __name__ == "__main__":
         whole_description_str,
         run_log_file_path,
     ) = get_error_info_from_robot(ip, one_run, storage_directory)
+    affects_version = "internal release - any"
     # Get Calibration Data
     saved_file_path_calibration, calibration = read_robot_logs.get_calibration_offsets(
         ip, storage_directory

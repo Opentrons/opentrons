@@ -141,3 +141,36 @@ class google_sheet:
             print("Row not found.")
             return None
         return row_index
+    
+    def create__line_chart(self, titles: List[str], series: List[Dict[str, Any]], spreadsheet_id: str):
+        """Create chart of data on google sheet."""
+        chart_data = {
+                        "chart": {
+                        "spec": {
+                            "title": titles[0],
+                            "basicChart": {
+                            "chartType": "LINE",
+                            "legendPosition": "BOTTOM_LEGEND",
+                            "axis": [
+                                {
+                                "position": "BOTTOM_AXIS",
+                                "title": titles[1]
+                                },
+                                {
+                                "position": "LEFT_AXIS",
+                                "title": titles[2]
+                                }
+                            ],
+                            "ranges": [
+                                series
+                            ],
+                            "headerCount": 1
+                            }
+                        },
+                        "position": {
+                            "newSheet": True
+                        }
+                        }
+                    }
+        body = {"requests": [{"addChart": {"chart": chart_data}}]}
+        self.batchUpdate(spreadsheet_id, body = body).execute()
