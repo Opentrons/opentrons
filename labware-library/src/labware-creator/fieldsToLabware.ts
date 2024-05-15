@@ -1,17 +1,16 @@
-import {
-  createRegularLabware,
+import { createRegularLabware } from '@opentrons/shared-data'
+
+import { DISPLAY_VOLUME_UNITS } from './fields'
+import { getIsCustomTubeRack } from './utils'
+
+import type { ProcessedLabwareFields } from './fields'
+import type {
   LabwareWellGroup,
   //   createIrregularLabware,
-} from '@opentrons/shared-data'
-import { DISPLAY_VOLUME_UNITS } from './fields'
-
-import type {
   LabwareDefinition2,
   LabwareDisplayCategory,
   LabwareWellProperties,
 } from '@opentrons/shared-data'
-import type { ProcessedLabwareFields } from './fields'
-import { getIsCustomTubeRack } from './utils'
 
 // TODO Ian 2019-07-29: move this constant to shared-data?
 // This is the distance from channel 1 to channel 8 of any 8-channel, not tied to name/model

@@ -4,13 +4,13 @@ import { selectors as labwareDefSelectors } from '../../labware-defs'
 import { selectors as stepFormSelectors } from '../../step-forms'
 import { selectors as uiLabwareSelectors } from '../../ui/labware'
 import { getNextAvailableDeckSlot, getNextNickname } from '../utils'
-import {
+import { getRobotType } from '../../file-data/selectors'
+import type {
   CreateContainerArgs,
   CreateContainerAction,
   DuplicateLabwareAction,
 } from './actions'
-import { ThunkAction } from '../../types'
-import { getRobotType } from '../../file-data/selectors'
+import type { ThunkAction } from '../../types'
 export interface RenameLabwareAction {
   type: 'RENAME_LABWARE'
   payload: {

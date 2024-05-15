@@ -3,13 +3,14 @@ import mapValues from 'lodash/mapValues'
 import omit from 'lodash/omit'
 import omitBy from 'lodash/omitBy'
 import flow from 'lodash/flow'
-import { PipetteName, getPipetteSpecsV2 } from '@opentrons/shared-data'
+import { getPipetteSpecsV2 } from '@opentrons/shared-data'
 import { getLegacyLabwareDef } from '../../labware-defs'
 import type {
   FileLabware,
   FilePipette,
   ProtocolFile,
 } from '@opentrons/shared-data/protocol/types/schemaV1'
+import type { PipetteName } from '@opentrons/shared-data'
 import type { FormPatch } from '../../steplist/actions'
 import type { FormData } from '../../form-types'
 

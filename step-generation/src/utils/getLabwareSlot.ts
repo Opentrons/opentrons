@@ -1,4 +1,4 @@
-import { RobotState } from '../types'
+import type { RobotState } from '../types'
 
 // this function returns the slot a labware is in (which should be a string 1-12)
 // the reason this function is needed is because if a labware is on top of a module

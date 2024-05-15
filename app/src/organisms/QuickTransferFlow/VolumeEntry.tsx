@@ -7,13 +7,13 @@ import {
   ALIGN_CENTER,
 } from '@opentrons/components'
 
-import { SmallButton } from '../../atoms/buttons'
 import { ChildNavigation } from '../ChildNavigation'
 import { InputField } from '../../atoms/InputField'
 import { NumericalKeyboard } from '../../atoms/SoftwareKeyboard'
 import { getVolumeLimits } from './utils'
 import { CONSOLIDATE, DISTRIBUTE } from './constants'
 
+import type { SmallButton } from '../../atoms/buttons'
 import type {
   QuickTransferSetupState,
   QuickTransferWizardAction,

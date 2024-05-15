@@ -1,11 +1,8 @@
 import * as React from 'react'
 import { fireEvent, screen } from '@testing-library/react'
 import { describe, it, expect, vi, beforeEach } from 'vitest'
+import { getLabwareDefURI } from '@opentrons/shared-data'
 import { renderWithProviders } from '../../../__testing-utils__'
-import {
-  CompletedProtocolAnalysis,
-  getLabwareDefURI,
-} from '@opentrons/shared-data'
 
 import { i18n } from '../../../i18n'
 import { InterventionModal } from '..'
@@ -18,6 +15,7 @@ import {
 } from '../__fixtures__'
 import { mockTipRackDefinition } from '../../../redux/custom-labware/__fixtures__'
 import { useIsFlex } from '../../Devices/hooks'
+import type { CompletedProtocolAnalysis } from '@opentrons/shared-data'
 
 const ROBOT_NAME = 'Otie'
 

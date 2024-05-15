@@ -1,7 +1,6 @@
 import flow from 'lodash/flow'
 import takeRightWhile from 'lodash/takeRightWhile'
 import semver from 'semver'
-import { PDProtocolFile } from '../../file-types'
 import { migrateFile as migrateFileOne } from './1_1_0'
 import { migrateFile as migrateFileThree } from './3_0_0'
 import { migrateFile as migrateFileFour } from './4_0_0'
@@ -12,6 +11,7 @@ import { migrateFile as migrateFileSix } from './6_0_0'
 import { migrateFile as migrateFileSeven } from './7_0_0'
 import { migrateFile as migrateFileEight } from './8_0_0'
 import { migrateFile as migrateFileEightOne } from './8_1_0'
+import type { PDProtocolFile } from '../../file-types'
 
 export const OLDEST_MIGRATEABLE_VERSION = '1.0.0'
 type Version = string

@@ -1,8 +1,8 @@
-import { UseQueryResult, useQuery } from 'react-query'
+import { useQuery } from 'react-query'
 import { getCommands } from '@opentrons/api-client'
 import { useHost } from '../api'
 import { getSanitizedQueryKeyObject } from '../utils'
-import type { UseQueryOptions } from 'react-query'
+import type { UseQueryOptions, UseQueryResult } from 'react-query'
 import type {
   GetCommandsParams,
   HostConfig,

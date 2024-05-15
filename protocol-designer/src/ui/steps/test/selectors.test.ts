@@ -27,7 +27,7 @@ import * as utils from '../../modules/utils'
 
 import type { FormData } from '../../../form-types'
 import type { StepArgsAndErrorsById } from '../../../steplist/types'
-import { AllTemporalPropertiesForTimelineFrame } from '../../../step-forms'
+import type { AllTemporalPropertiesForTimelineFrame } from '../../../step-forms'
 
 vi.mock('../../modules/utils')
 

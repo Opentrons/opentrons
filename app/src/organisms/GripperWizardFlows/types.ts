@@ -1,4 +1,6 @@
-import {
+import type { useCreateCommandMutation } from '@opentrons/react-api-client'
+import type { Coordinates, CreateCommand } from '@opentrons/shared-data'
+import type {
   SECTIONS,
   GRIPPER_FLOW_TYPES,
   MOVE_PIN_FROM_FRONT_JAW_TO_REAR_JAW,
@@ -9,8 +11,6 @@ import {
   SUCCESSFULLY_DETACHED,
   SUCCESSFULLY_CALIBRATED,
 } from './constants'
-import { useCreateCommandMutation } from '@opentrons/react-api-client'
-import type { Coordinates, CreateCommand } from '@opentrons/shared-data'
 
 export type GripperWizardStep =
   | BeforeBeginningStep

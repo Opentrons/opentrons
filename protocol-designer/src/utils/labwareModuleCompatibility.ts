@@ -1,16 +1,14 @@
 // PD-specific info about labware<>module compatibilty
-
 import {
   MAGNETIC_MODULE_TYPE,
   TEMPERATURE_MODULE_TYPE,
   THERMOCYCLER_MODULE_TYPE,
-  LabwareDefinition2,
-  ModuleType,
   HEATERSHAKER_MODULE_TYPE,
   MAGNETIC_BLOCK_TYPE,
 } from '@opentrons/shared-data'
-import { LabwareDefByDefURI } from '../labware-defs'
-import { LabwareOnDeck } from '../step-forms'
+import type { LabwareDefByDefURI } from '../labware-defs'
+import type { LabwareOnDeck } from '../step-forms'
+import type { LabwareDefinition2, ModuleType } from '@opentrons/shared-data'
 // NOTE: this does not distinguish btw versions. Standard labware only (assumes namespace is 'opentrons')
 export const COMPATIBLE_LABWARE_ALLOWLIST_BY_MODULE_TYPE: Record<
   ModuleType,

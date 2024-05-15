@@ -8,11 +8,13 @@ import {
 } from '@opentrons/components'
 import {
   getModuleDisplayName,
+  THERMOCYCLER_MODULE_V1,
+  THERMOCYCLER_MODULE_V2,
+} from '@opentrons/shared-data'
+import type {
   ModuleDefinition,
   ModuleModel,
   ModuleOrientation,
-  THERMOCYCLER_MODULE_V1,
-  THERMOCYCLER_MODULE_V2,
 } from '@opentrons/shared-data'
 
 interface Ot2ModuleTagProps {

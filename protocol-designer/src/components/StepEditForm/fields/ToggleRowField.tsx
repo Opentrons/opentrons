@@ -5,7 +5,7 @@ import { ToggleField } from '@opentrons/components'
 
 import styles from '../StepEditForm.module.css'
 
-import { FieldProps } from '../types'
+import type { FieldProps } from '../types'
 
 type ToggleRowProps = FieldProps & {
   offLabel?: string

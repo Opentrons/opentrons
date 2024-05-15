@@ -5,7 +5,7 @@ import type {
   WifiKey,
 } from '../../../../redux/networking/types'
 
-import {
+import type {
   CONNECT,
   DISCONNECT,
   JOIN_OTHER,

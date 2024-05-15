@@ -2,13 +2,7 @@ import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { useSelector, useDispatch } from 'react-redux'
 import some from 'lodash/some'
-import {
-  Control,
-  Controller,
-  useController,
-  useForm,
-  UseFormWatch,
-} from 'react-hook-form'
+import { Controller, useController, useForm } from 'react-hook-form'
 
 import {
   FormGroup,
@@ -35,12 +29,9 @@ import {
   THERMOCYCLER_MODULE_TYPE,
   MAGNETIC_MODULE_TYPE,
   HEATERSHAKER_MODULE_TYPE,
-  ModuleType,
-  ModuleModel,
   OT2_STANDARD_MODEL,
   THERMOCYCLER_MODULE_V1,
   TEMPERATURE_MODULE_V1,
-  RobotType,
   FLEX_ROBOT_TYPE,
   THERMOCYCLER_MODULE_V2,
   OT2_ROBOT_TYPE,
@@ -70,6 +61,8 @@ import { ModelDropdown } from './ModelDropdown'
 import { SlotDropdown } from './SlotDropdown'
 import styles from './EditModules.module.css'
 
+import type { ModuleType, ModuleModel, RobotType } from '@opentrons/shared-data'
+import type { Control, UseFormWatch } from 'react-hook-form'
 import type { ModuleOnDeck } from '../../../step-forms/types'
 import type { ModelModuleInfo } from '../../EditModules'
 

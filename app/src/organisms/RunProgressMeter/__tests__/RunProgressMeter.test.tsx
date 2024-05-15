@@ -9,7 +9,6 @@ import {
   RUN_STATUS_IDLE,
   RUN_STATUS_RUNNING,
   RUN_STATUS_SUCCEEDED,
-  RunCommandSummary,
 } from '@opentrons/api-client'
 
 import { i18n } from '../../../i18n'
@@ -36,6 +35,7 @@ import { RunProgressMeter } from '..'
 import { renderWithProviders } from '../../../__testing-utils__'
 import { useLastRunCommand } from '../../Devices/hooks/useLastRunCommand'
 
+import type { RunCommandSummary } from '@opentrons/api-client'
 import type * as ApiClient from '@opentrons/react-api-client'
 
 vi.mock('@opentrons/react-api-client', async importOriginal => {
