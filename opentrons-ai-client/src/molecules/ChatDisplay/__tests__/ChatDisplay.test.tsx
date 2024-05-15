@@ -17,8 +17,9 @@ describe('ChatDisplay', () => {
     props = {
       chat: {
         role: 'assistant',
-        content: 'mock text from the backend',
+        reply: 'mock text from the backend',
       },
+      chatId: 'mockId',
     }
   })
   it('should display response from the backend and label', () => {
@@ -33,8 +34,9 @@ describe('ChatDisplay', () => {
     props = {
       chat: {
         role: 'user',
-        content: 'mock text from user input',
+        reply: 'mock text from user input',
       },
+      chatId: 'mockId',
     }
     render(props)
     screen.getByText('You')
