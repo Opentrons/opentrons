@@ -29,6 +29,7 @@ class Metadata(TypedDict, total=False):
 
 class Robot(TypedDict):
     model: RobotModel
+    extents: List[float]
 
 
 class BoundingBox(TypedDict):

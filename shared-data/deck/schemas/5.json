@@ -98,12 +98,16 @@
     },
     "robot": {
       "type": "object",
-      "required": ["model"],
+      "required": ["model", "extents"],
       "properties": {
         "model": {
           "description": "Model of the robot",
           "type": "string",
           "enum": ["OT-2 Standard", "OT-3 Standard"]
+        },
+        "extents": {
+          "description": "The maximum addressable coordinates",
+          "$ref": "#/definitions/xyzArray"
         }
       }
     },
