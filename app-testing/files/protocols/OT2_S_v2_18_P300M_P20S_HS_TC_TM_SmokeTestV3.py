@@ -530,12 +530,12 @@ def run(ctx: protocol_api.ProtocolContext) -> None:
     # Changed in API version: 2.18 #
     # ---------------------------- #
 
-    ctx.pause("Watch the next 5 tips drop in the trash. They should drop in a different location each time.")
+    ctx.pause("Watch the next 5 tips drop in the trash. They should drop in different locations of the trash each time.")
     for _ in range(5):
         pipette_right.pick_up_tip()
         pipette_right.drop_tip()
 
-    ctx.pause("Watch the next 5 tips drop in the trash. They should drop in the same location each time.")
+    ctx.pause("Watch the next 5 tips drop in the trash. They should drop in the same location of the trash each time.")
     for _ in range(5):
         pipette_right.pick_up_tip()
         pipette_right.drop_tip(location=ctx.fixed_trash)
