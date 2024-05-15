@@ -40,6 +40,10 @@ Modules in Deck Configuration
 - All run log steps now appear in the same font size.
 - The app now properly sends custom labware definitions, along with the corresponding Python protocol, to Flex robots connected via USB.
 
+### Known Issues
+
+- Previously saved labware offset data may not be available when setting up a run via a USB connection from a Windows computer. Re-run Labware Position Check or use a Wi-Fi connection instead.
+
 ---
 
 ## Opentrons App Changes in 7.2.2
