@@ -1,7 +1,47 @@
+#############
+# CHANGELOG #
+#############
+
+# ----
+# 2.18
+# ----
+
+# - labware.set_offset
+# - Runtime Parameters added
+# - TrashContainer.top() and Well.top() now return objects of the same type
+# - pipette.drop_tip() if location argument not specified the tips will be dropped at different locations in the bin
+# - pipette.drop_tip() if location is specified, the tips will be dropped in the same place every time
+
+# ----
+# 2.17
+# ----
+
+# NOTHING NEW
+# This protocol is exactly the same as 2.16 Smoke Test V3
+# The only difference is the API version in the metadata
+# There were no new positive test cases for 2.17
+# The negative test cases are captured in the 2.17 dispense changes protocol
+
+# ----
+# 2.16
+# ----
+
+# - prepare_to_aspirate added
+# - fixed_trash property changed
+# - instrument_context.trash_container property changed
+
+# ----
+# 2.15
+# ----
+
+# - move_labware added - Manual Deck State Modification
+# - ProtocolContext.load_adapter added
+# - OFF_DECK location added
+
 from opentrons import protocol_api
 
 metadata = {
-    "protocolName": "QA Protocol - MEGAAA PROTOCOL - LETS BREAK, I MEAN TEST, EVERYTHING!!!!!",
+    "protocolName": "Flex Smoke Test - v2.18",
     "author": "Derek Maggio <derek.maggio@opentrons.com>",
 }
 
@@ -28,18 +68,100 @@ TEMPERATURE_MODULE_ADAPTER_NAME = "opentrons_96_well_aluminum_block"
 TEMPERATURE_MODULE_NAME = "temperature module gen2"
 THERMOCYCLER_NAME = "thermocycler module gen2"
 
-PCR_PLATE_96_NAME = "nest_96_wellplate_100ul_pcr_full_skirt"
-RESERVOIR_NAME = "nest_1_reservoir_290ml"
 TIPRACK_96_ADAPTER_NAME = "opentrons_flex_96_tiprack_adapter"
 TIPRACK_96_NAME = "opentrons_flex_96_tiprack_1000ul"
 
 PIPETTE_96_CHANNEL_NAME = "flex_96channel_1000"
 
-USING_GRIPPER = True
-RESET_AFTER_EACH_MOVE = True
+##############################
+# Runtime Parameters Support #
+##############################
+
+# -------------------------- #
+# Added in API version: 2.18 #
+# -------------------------- #
+
+
+def add_parameters(parameters: protocol_api.Parameters):
+    reservoir_choices = [
+        {"display_name": "Agilent 1 Well 290 mL", "value": "agilent_1_reservoir_290ml"},
+        {"display_name": "Nest 1 Well 290 mL", "value": "nest_1_reservoir_290ml"},
+    ]
+
+    well_plate_choices = [
+        {"display_name": "Nest 96 Well 100 µL", "value": "nest_96_wellplate_100ul_pcr_full_skirt"},
+        {"display_name": "Corning 96 Well 360 µL", "value": "corning_96_wellplate_360ul_flat"},
+        {"display_name": "Opentrons Tough 96 Well 200 µL", "value": "opentrons_96_wellplate_200ul_pcr_full_skirt"},
+    ]
+
+    parameters.add_str(
+        variable_name="reservoir_name",
+        display_name="Reservoir Name",
+        description="Name of the reservoir",
+        default="nest_1_reservoir_290ml",
+        choices=reservoir_choices,
+    )
+
+    parameters.add_str(
+        variable_name="well_plate_name",
+        display_name="Well Plate Name",
+        description="Name of the well plate",
+        default="nest_96_wellplate_100ul_pcr_full_skirt",
+        choices=well_plate_choices,
+    )
+
+    parameters.add_bool(
+        variable_name="use_gripper",
+        display_name="Use Gripper",
+        description="Use Gripper for labware movements?",
+        default=True,
+    )
+
+    parameters.add_bool(
+        variable_name="reset_after_each_move",
+        display_name="Reset After Each Move",
+        description="Reset labware after each move?",
+        default=True,
+    )
+
+    parameters.add_float(
+        variable_name="heater_shaker_temperature",
+        display_name="Heater Shaker Temperature",
+        description="Temperature to set the heater shaker to",
+        default=75.0,
+        minimum=37.0,
+        maximum=100.0,
+        unit="°C",
+    )
+
+    parameters.add_int(
+        variable_name="heater_shaker_speed",
+        display_name="Heater Shaker Shake Speed",
+        description="Speed to set the heater shaker to",
+        default=1000,
+        minimum=200,
+        maximum=3000,
+        unit="seconds",
+    )
 
 
 def run(ctx: protocol_api.ProtocolContext) -> None:
+
+    ##############################
+    # Runtime Parameters Support #
+    ##############################
+
+    # -------------------------- #
+    # Added in API version: 2.18 #
+    # -------------------------- #
+
+    PCR_PLATE_96_NAME = ctx.params.well_plate_name
+    RESERVOIR_NAME = ctx.params.reservoir_name
+    USING_GRIPPER = ctx.params.use_gripper
+    RESET_AFTER_EACH_MOVE = ctx.params.reset_after_each_move
+    HEATER_SHAKER_TEMPERATURE: float = ctx.params.heater_shaker_temperature
+    HEATER_SHAKER_SPEED: int = ctx.params.heater_shaker_speed
+
     ################
     ### FIXTURES ###
     ################
@@ -87,8 +209,9 @@ def run(ctx: protocol_api.ProtocolContext) -> None:
     ##########################
 
     pipette_96_channel = ctx.load_instrument(PIPETTE_96_CHANNEL_NAME, mount="left", tip_racks=tip_racks)
+    pipette_96_channel.trash_container = waste_chute
 
-    assert isinstance(pipette_96_channel.trash_container, protocol_api.TrashBin)
+    assert isinstance(pipette_96_channel.trash_container, protocol_api.WasteChute)
 
     ########################
     ### LOAD SOME LIQUID ###
@@ -284,14 +407,30 @@ def run(ctx: protocol_api.ProtocolContext) -> None:
     def test_pipetting():
         def test_partial_tip_pickup_usage():
             pipette_96_channel.configure_nozzle_layout(style=protocol_api.COLUMN, start="A12")
+
             for i in range(1, 13):
+
                 pipette_96_channel.pick_up_tip(tip_rack_2[f"A{i}"])
 
                 pipette_96_channel.aspirate(5, source_reservoir["A1"])
                 pipette_96_channel.touch_tip()
 
                 pipette_96_channel.dispense(5, dest_pcr_plate[f"A{i}"])
-                pipette_96_channel.drop_tip(trash_bin)
+
+                if i == 1:
+                    ctx.pause(
+                        "Watch the next 6 tips drop in the waste chute. They should drop in the same location of the waste chute each time."
+                    )
+
+                if i == 7:
+                    ctx.pause(
+                        "Watch the next 6 tips drop in the waste chute. They should drop in different locations of the waste chute each time."
+                    )
+
+                if i <= 6:
+                    pipette_96_channel.drop_tip(waste_chute)
+                else:
+                    pipette_96_channel.drop_tip()
 
             # leave this dropping in waste chute, do not use get_disposal_preference
             # want to test partial drop
@@ -353,8 +492,8 @@ def run(ctx: protocol_api.ProtocolContext) -> None:
             heater_shaker.open_labware_latch()
             heater_shaker.close_labware_latch()
 
-            heater_shaker.set_target_temperature(75.0)
-            heater_shaker.set_and_wait_for_shake_speed(1000)
+            heater_shaker.set_target_temperature(HEATER_SHAKER_TEMPERATURE)
+            heater_shaker.set_and_wait_for_shake_speed(HEATER_SHAKER_SPEED)
             heater_shaker.wait_for_temperature()
 
             heater_shaker.deactivate_heater()
