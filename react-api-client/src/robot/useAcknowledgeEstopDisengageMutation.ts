@@ -1,6 +1,7 @@
 import { useMutation } from 'react-query'
 import { acknowledgeEstopDisengage } from '@opentrons/api-client'
 import { useHost } from '../api'
+import { getSanitizedQueryKeyObject } from '../utils'
 import type { AxiosError } from 'axios'
 import type {
   UseMutationResult,
@@ -8,16 +9,6 @@ import type {
   UseMutationOptions,
 } from 'react-query'
 import type { HostConfig, EstopStatus } from '@opentrons/api-client'
-
-import {
-  HostConfig,
-  EstopStatus,
-  acknowledgeEstopDisengage,
-} from '@opentrons/api-client'
-
-import { useHost } from '../api'
-import { getSanitizedQueryKeyObject } from '../utils'
-import type { AxiosError } from 'axios'
 
 export type UseAcknowledgeEstopDisengageMutationResult = UseMutationResult<
   EstopStatus,

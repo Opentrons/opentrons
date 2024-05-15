@@ -1,15 +1,18 @@
 import { createMaintenanceRun } from '@opentrons/api-client'
 import { useMutation } from 'react-query'
 import { useHost } from '../api'
+import { getSanitizedQueryKeyObject } from '../utils'
 import type { AxiosError } from 'axios'
 import type {
   UseMutationResult,
   UseMutateAsyncFunction,
   UseMutationOptions,
 } from 'react-query'
-import { useHost } from '../api'
-import { getSanitizedQueryKeyObject } from '../utils'
-import type { AxiosError } from 'axios'
+import type {
+  CreateMaintenanceRunData,
+  HostConfig,
+  MaintenanceRun,
+} from '@opentrons/api-client'
 
 export type CreateMaintenanceRunType = UseMutateAsyncFunction<
   MaintenanceRun,
