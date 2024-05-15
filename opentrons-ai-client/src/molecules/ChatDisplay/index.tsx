@@ -62,7 +62,7 @@ export function ChatDisplay({ chat, chatId }: ChatDisplayProps): JSX.Element {
       >
         <Markdown
           components={{
-            div: ParagraphText,
+            div: undefined,
             ul: UnnumberedListText,
             h2: HeaderText,
             li: ListItemText,
