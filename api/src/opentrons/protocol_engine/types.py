@@ -885,12 +885,14 @@ class TipPresenceStatus(str, Enum):
 class RTPBase(BaseModel):
     """Parameters defined in a protocol."""
 
-    displayName: str = Field(..., description="Display string for the parameter.")
-    variableName: str = Field(..., description="Python variable name of the parameter.")
-    description: Optional[str] = Field(
+    displayName: StrictStr = Field(..., description="Display string for the parameter.")
+    variableName: StrictStr = Field(
+        ..., description="Python variable name of the parameter."
+    )
+    description: Optional[StrictStr] = Field(
         None, description="Detailed description of the parameter."
     )
-    suffix: Optional[str] = Field(
+    suffix: Optional[StrictStr] = Field(
         None,
         description="Units (like mL, mm/sec, etc) or a custom suffix for the parameter.",
     )
