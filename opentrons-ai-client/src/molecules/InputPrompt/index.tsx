@@ -53,6 +53,7 @@ export function InputPrompt(): JSX.Element {
     return rowsNum
   }
 
+  // ToDo (kk:05/15/2024) This will be moved to a better place
   const fetchData = async (prompt: string): Promise<void> => {
     if (prompt !== '') {
       setLoading(true)
@@ -97,7 +98,7 @@ export function InputPrompt(): JSX.Element {
   }, [preparedPrompt, setValue])
 
   React.useEffect(() => {
-    if (submitted && data && !loading) {
+    if (submitted && data != null && !loading) {
       const { role, reply } = data
       const assistantResponse: ChatData = {
         role,
