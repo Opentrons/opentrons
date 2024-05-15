@@ -209,9 +209,9 @@ def run(ctx: protocol_api.ProtocolContext) -> None:
     ##########################
 
     pipette_96_channel = ctx.load_instrument(PIPETTE_96_CHANNEL_NAME, mount="left", tip_racks=tip_racks)
-    pipette_96_channel.trash_container = waste_chute
+    pipette_96_channel.trash_container = trash_bin
 
-    assert isinstance(pipette_96_channel.trash_container, protocol_api.WasteChute)
+    assert isinstance(pipette_96_channel.trash_container, protocol_api.TrashBin)
 
     ########################
     ### LOAD SOME LIQUID ###
