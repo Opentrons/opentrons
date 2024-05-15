@@ -37,17 +37,13 @@ export function SummaryAndSettings(
   const [selectedCategory, setSelectedCategory] = React.useState<string>(
     'overview'
   )
-  // if any value from the wizard flow hasn't been set, return null
-  // this should never happen but allows us to strictly type summary state
-  // @ts-expect-error figure out how to make this type non-null
+  // @ts-expect-error TODO figure out how to make this type non-null as we know
+  // none of these values will be undefined
   const initialSummaryState = getInitialSummaryState(wizardFlowState)
   const [state] = React.useReducer(
     quickTransferSummaryReducer,
     initialSummaryState
   )
-  if (Object.values(wizardFlowState).some(value => value == null)) {
-    return null
-  }
 
   return (
     <Flex>

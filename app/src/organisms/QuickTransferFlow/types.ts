@@ -1,7 +1,6 @@
 import type { Mount } from '@opentrons/api-client'
 import type { LabwareDefinition2, PipetteV2Specs } from '@opentrons/shared-data'
 import type { ACTIONS, CONSOLIDATE, DISTRIBUTE, TRANSFER } from './constants'
-import type { ChangeTipOptions } from '@opentrons/step-generation'
 
 export interface QuickTransferWizardState {
   pipette?: PipetteV2Specs
@@ -15,6 +14,12 @@ export interface QuickTransferWizardState {
   volume?: number
 }
 export type PathOption = 'single' | 'multiAspirate' | 'multiDispense'
+export type ChangeTipOptions =
+  | 'always'
+  | 'once'
+  | 'never'
+  | 'perDest'
+  | 'perSource'
 
 export interface QuickTransferSummaryState {
   pipette: PipetteV2Specs
