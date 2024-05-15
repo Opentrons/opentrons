@@ -61,6 +61,7 @@ export const RunPreviewComponent = (
   // we only ever want one request done for terminal runs because this is a heavy request
   const {
     data: commandsFromQueryResponse,
+    isLoading: isRunCommandDataLoading,
   } = useNotifyAllCommandsAsPreSerializedList(
     runId,
     { cursor: 0, pageLength: MAX_COMMANDS },
@@ -102,7 +103,7 @@ export const RunPreviewComponent = (
       ? commands.findIndex(c => c.key === currentRunCommandKey)
       : 0
 
-  if (commands == null) {
+  if (isRunCommandDataLoading || commands == null) {
     return (
       <Flex flexDirection={DIRECTION_COLUMN} padding={SPACING.spacing16}>
         <StyledText alignSelf={ALIGN_CENTER} color={COLORS.grey50}>
