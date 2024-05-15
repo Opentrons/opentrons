@@ -7,6 +7,7 @@ import {
 } from 'react-query'
 import { createProtocol } from '@opentrons/api-client'
 import { useHost } from '../api'
+import { getSanitizedQueryKeyObject } from '../utils'
 import type { AxiosError } from 'axios'
 import type {
   ErrorResponse,
@@ -47,13 +48,14 @@ export function useCreateProtocolMutation(
   const host =
     hostOverride != null ? { ...contextHost, ...hostOverride } : contextHost
   const queryClient = useQueryClient()
+  const sanitizedHost = getSanitizedQueryKeyObject(host)
 
   const mutation = useMutation<
     Protocol,
     AxiosError<ErrorResponse>,
     CreateProtocolVariables
   >(
-    [host, 'protocols'],
+    [sanitizedHost, 'protocols'],
     ({ files: protocolFiles, protocolKey }) =>
       createProtocol(
         host as HostConfig,
@@ -64,10 +66,10 @@ export function useCreateProtocolMutation(
         .then(response => {
           const protocolId = response.data.data.id
           queryClient
-            .invalidateQueries([host, 'protocols'])
+            .invalidateQueries([sanitizedHost, 'protocols'])
             .then(() =>
               queryClient.setQueryData(
-                [host, 'protocols', protocolId],
+                [sanitizedHost, 'protocols', protocolId],
                 response.data
               )
             )

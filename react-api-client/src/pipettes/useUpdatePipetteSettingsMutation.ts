@@ -12,6 +12,7 @@ import {
   UseMutationResult,
 } from 'react-query'
 import { useHost } from '../api'
+import { getSanitizedQueryKeyObject } from '../utils'
 import type { AxiosError } from 'axios'
 
 export type UpdatePipetteSettingsType = UseMutateAsyncFunction<
@@ -43,17 +44,18 @@ export function useUpdatePipetteSettingsMutation(
   const queryClient = useQueryClient()
   const host =
     hostOverride != null ? { ...contextHost, ...hostOverride } : contextHost
+  const sanitizedHost = getSanitizedQueryKeyObject(host)
   const mutation = useMutation<
     IndividualPipetteSettings,
     AxiosError,
     UpdatePipetteSettingsData
   >(
-    [host, 'pipettes', 'settings'],
+    [sanitizedHost, 'pipettes', 'settings'],
     ({ fields }) =>
       updatePipetteSettings(host as HostConfig, pipetteId, { fields })
         .then(response => {
           queryClient
-            .invalidateQueries([host, 'pipettes', 'settings'])
+            .invalidateQueries([sanitizedHost, 'pipettes', 'settings'])
             .catch((e: Error) =>
               console.error(
                 `error invalidating pipette settings query: ${e.message}`

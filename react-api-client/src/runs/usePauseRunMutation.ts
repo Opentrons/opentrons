@@ -11,6 +11,7 @@ import {
   UseMutationOptions,
 } from 'react-query'
 import { useHost } from '../api'
+import { getSanitizedQueryKeyObject } from '../utils'
 
 import type { AxiosError } from 'axios'
 
@@ -33,7 +34,7 @@ export const usePauseRunMutation = (
 ): UsePauseRunMutationResult => {
   const host = useHost()
   const mutation = useMutation<RunAction, AxiosError, string>(
-    [host, 'runs', RUN_ACTION_TYPE_PAUSE],
+    [getSanitizedQueryKeyObject(host), 'runs', RUN_ACTION_TYPE_PAUSE],
     (runId: string) =>
       createRunAction(host as HostConfig, runId, {
         actionType: RUN_ACTION_TYPE_PAUSE,

@@ -1,6 +1,7 @@
 import { UseQueryResult, useQuery } from 'react-query'
 import { getCommands } from '@opentrons/api-client'
 import { useHost } from '../api'
+import { getSanitizedQueryKeyObject } from '../utils'
 import type { UseQueryOptions } from 'react-query'
 import type {
   GetCommandsParams,
@@ -28,7 +29,14 @@ export function useAllCommandsQuery<TError = Error>(
   }
   const { cursor, pageLength } = nullCheckedParams
   const query = useQuery<CommandsData, TError>(
-    [host, 'runs', runId, 'commands', cursor, pageLength],
+    [
+      getSanitizedQueryKeyObject(host),
+      'runs',
+      runId,
+      'commands',
+      cursor,
+      pageLength,
+    ],
     () => {
       return getCommands(
         host as HostConfig,

@@ -1,5 +1,6 @@
 import { UseQueryResult, useQuery } from 'react-query'
 import { getCommandsAsPreSerializedList } from '@opentrons/api-client'
+import { getSanitizedQueryKeyObject } from '../utils'
 import { useHost } from '../api'
 import type { UseQueryOptions } from 'react-query'
 import type {
@@ -29,7 +30,14 @@ export function useAllCommandsAsPreSerializedList<TError = Error>(
   }
   const { cursor, pageLength } = nullCheckedParams
   const query = useQuery<CommandsData, TError>(
-    [host, 'runs', runId, 'getCommandsAsPreSerializedList', cursor, pageLength],
+    [
+      getSanitizedQueryKeyObject(host),
+      'runs',
+      runId,
+      'getCommandsAsPreSerializedList',
+      cursor,
+      pageLength,
+    ],
     () => {
       return getCommandsAsPreSerializedList(
         host as HostConfig,

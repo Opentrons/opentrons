@@ -11,6 +11,7 @@ import {
   UseMutationOptions,
 } from 'react-query'
 import { useHost } from '../api'
+import { getSanitizedQueryKeyObject } from '../utils'
 import type { AxiosError } from 'axios'
 
 export type UseSetLightsMutationResult = UseMutationResult<
@@ -35,7 +36,7 @@ export function useSetLightsMutation(
   const host =
     hostOverride != null ? { ...contextHost, ...hostOverride } : contextHost
   const mutation = useMutation<Lights, AxiosError, SetLightsData>(
-    [host, 'robot', 'lights'],
+    [getSanitizedQueryKeyObject(host), 'robot', 'lights'],
     setLightsData =>
       setLights(host as HostConfig, setLightsData)
         .then(response => response.data)

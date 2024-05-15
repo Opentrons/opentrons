@@ -12,6 +12,7 @@ import type {
   CreateCommandParams,
 } from '@opentrons/api-client'
 import type { CreateCommand } from '@opentrons/shared-data'
+import { getSanitizedQueryKeyObject } from '../utils'
 
 interface CreateMaintenanceCommandMutateParams extends CreateCommandParams {
   maintenanceRunId: string
@@ -52,7 +53,10 @@ export function useCreateMaintenanceCommandMutation(): UseCreateMaintenanceComma
       timeout,
     }).then(response => {
       queryClient
-        .invalidateQueries([host, 'maintenance_runs'])
+        .invalidateQueries([
+          getSanitizedQueryKeyObject(host),
+          'maintenance_runs',
+        ])
         .catch((e: Error) =>
           console.error(
             `error invalidating maintenance runs query: ${e.message}`

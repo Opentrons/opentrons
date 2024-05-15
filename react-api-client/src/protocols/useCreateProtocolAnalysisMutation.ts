@@ -1,6 +1,7 @@
 import { createProtocolAnalysis } from '@opentrons/api-client'
 import { useMutation, useQueryClient } from 'react-query'
 import { useHost } from '../api'
+import { getSanitizedQueryKeyObject } from '../utils'
 import type {
   ErrorResponse,
   HostConfig,
@@ -46,13 +47,14 @@ export function useCreateProtocolAnalysisMutation(
   const host =
     hostOverride != null ? { ...contextHost, ...hostOverride } : contextHost
   const queryClient = useQueryClient()
+  const sanitizedHost = getSanitizedQueryKeyObject(host)
 
   const mutation = useMutation<
     ProtocolAnalysisSummary[],
     AxiosError<ErrorResponse>,
     CreateProtocolAnalysisVariables
   >(
-    [host, 'protocols', protocolId, 'analyses'],
+    [sanitizedHost, 'protocols', protocolId, 'analyses'],
     ({ protocolKey, runTimeParameterValues, forceReAnalyze }) =>
       createProtocolAnalysis(
         host as HostConfig,
@@ -62,10 +64,15 @@ export function useCreateProtocolAnalysisMutation(
       )
         .then(response => {
           queryClient
-            .invalidateQueries([host, 'protocols', protocolId, 'analyses'])
+            .invalidateQueries([
+              sanitizedHost,
+              'protocols',
+              protocolId,
+              'analyses',
+            ])
             .then(() =>
               queryClient.setQueryData(
-                [host, 'protocols', protocolId, 'analyses'],
+                [sanitizedHost, 'protocols', protocolId, 'analyses'],
                 response.data
               )
             )

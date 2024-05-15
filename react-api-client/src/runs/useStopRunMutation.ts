@@ -6,6 +6,7 @@ import {
 } from '@opentrons/api-client'
 import { useMutation } from 'react-query'
 import { useHost } from '../api'
+import { getSanitizedQueryKeyObject } from '../utils'
 
 import type {
   UseMutationResult,
@@ -32,7 +33,7 @@ export const useStopRunMutation = (
 ): UseStopRunMutationResult => {
   const host = useHost()
   const mutation = useMutation<RunAction, unknown, string>(
-    [host, 'runs', RUN_ACTION_TYPE_STOP],
+    [getSanitizedQueryKeyObject(host), 'runs', RUN_ACTION_TYPE_STOP],
     (runId: string) =>
       createRunAction(host as HostConfig, runId, {
         actionType: RUN_ACTION_TYPE_STOP,

@@ -1,6 +1,7 @@
 import { UseQueryResult, useQuery } from 'react-query'
 import { getProtocol } from '@opentrons/api-client'
 import { useHost } from '../api'
+import { getSanitizedQueryKeyObject } from '../utils'
 import type { HostConfig, Protocol } from '@opentrons/api-client'
 import type { UseQueryOptions } from 'react-query'
 
@@ -24,7 +25,7 @@ export function useProtocolQuery(
         : false,
   }
   const query = useQuery<Protocol>(
-    [host, 'protocols', protocolId],
+    [getSanitizedQueryKeyObject(host), 'protocols', protocolId],
     () =>
       getProtocol(host as HostConfig, protocolId as string).then(
         response => response.data

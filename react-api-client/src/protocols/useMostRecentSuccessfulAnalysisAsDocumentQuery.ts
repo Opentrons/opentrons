@@ -1,6 +1,7 @@
 import { useQuery } from 'react-query'
 import { getProtocolAnalysisAsDocument } from '@opentrons/api-client'
 import { useHost } from '../api'
+import { getSanitizedQueryKeyObject } from '../utils'
 
 import type { UseQueryResult, UseQueryOptions } from 'react-query'
 import type { HostConfig } from '@opentrons/api-client'
@@ -35,7 +36,13 @@ export function useMostRecentSuccessfulAnalysisAsDocumentQuery<TError = Error>(
   const host = useHost()
 
   const query = useQuery<CompletedProtocolAnalysis | null, TError>(
-    [host, 'protocols', protocolId, 'analyses', 'mostRecentSuccessful'],
+    [
+      getSanitizedQueryKeyObject(host),
+      'protocols',
+      protocolId,
+      'analyses',
+      'mostRecentSuccessful',
+    ],
     async () => {
       const analysisIds = analysisSummaries.map(summary => summary.id)
 

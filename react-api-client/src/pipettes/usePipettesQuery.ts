@@ -1,6 +1,7 @@
 import { useQuery } from 'react-query'
 import { getPipettes } from '@opentrons/api-client'
 import { useHost } from '../api'
+import { getSanitizedQueryKeyObject } from '../utils'
 import type { UseQueryResult, UseQueryOptions } from 'react-query'
 import type {
   HostConfig,
@@ -18,7 +19,7 @@ export function usePipettesQuery(
 ): UseQueryResult<Pipettes> {
   const host = useHost()
   const query = useQuery<Pipettes>(
-    [host, 'pipettes'],
+    [getSanitizedQueryKeyObject(host), 'pipettes'],
     () =>
       getPipettes(host as HostConfig, params).then(response => response.data),
     { enabled: host !== null, ...options }

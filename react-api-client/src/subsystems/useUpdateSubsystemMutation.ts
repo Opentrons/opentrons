@@ -1,6 +1,7 @@
 import { useMutation, useQueryClient } from 'react-query'
 import { updateSubsystem } from '@opentrons/api-client'
 import { useHost } from '../api'
+import { getSanitizedQueryKeyObject } from '../utils'
 
 import type {
   UseMutationResult,
@@ -36,6 +37,7 @@ export function useUpdateSubsystemMutation(
 ): UseUpdateSubsystemMutationResult {
   const host = useHost()
   const queryClient = useQueryClient()
+  const sanitizedHost = getSanitizedQueryKeyObject(host)
 
   const mutation = useMutation<
     SubsystemUpdateProgressData,
@@ -44,9 +46,9 @@ export function useUpdateSubsystemMutation(
   >(
     (subsystem: Subsystem) =>
       updateSubsystem(host as HostConfig, subsystem).then(response => {
-        queryClient.removeQueries([host, 'subsystems/updates'])
+        queryClient.removeQueries([sanitizedHost, 'subsystems/updates'])
         queryClient
-          .invalidateQueries([host, 'subsystems/updates'])
+          .invalidateQueries([sanitizedHost, 'subsystems/updates'])
           .catch((e: Error) =>
             console.error(`error invalidating subsystems query: ${e.message}`)
           )

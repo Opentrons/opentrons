@@ -5,6 +5,7 @@ import {
   usePauseRunMutation,
   useStopRunMutation,
 } from '..'
+import { getSanitizedQueryKeyObject } from '../utils'
 
 interface UseRunActionMutations {
   playRun: () => void
@@ -21,7 +22,7 @@ export function useRunActionMutations(runId: string): UseRunActionMutations {
 
   const onSuccess = (): void => {
     queryClient
-      .invalidateQueries([host, 'runs', runId])
+      .invalidateQueries([getSanitizedQueryKeyObject(host), 'runs', runId])
       .catch((e: Error) =>
         console.error(`error invalidating run ${runId} query: ${e.message}`)
       )

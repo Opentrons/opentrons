@@ -11,6 +11,7 @@ import {
   UseMutationOptions,
 } from 'react-query'
 import { useHost } from '../api'
+import { getSanitizedQueryKeyObject } from '../utils'
 import type { AxiosError } from 'axios'
 
 export type CreateMaintenanceRunType = UseMutateAsyncFunction<
@@ -45,7 +46,7 @@ export function useCreateMaintenanceRunMutation(
     AxiosError,
     CreateMaintenanceRunData
   >(
-    [host, 'maintenance_runs'],
+    [getSanitizedQueryKeyObject(host), 'maintenance_runs'],
     (createMaintenanceRunData = {}) =>
       createMaintenanceRun(host as HostConfig, createMaintenanceRunData)
         .then(response => response.data)
