@@ -33,6 +33,9 @@ def __dir__() -> List[str]:
 log = logging.getLogger(__name__)
 
 
+# todo(mm, 2024-05-15): Having functions in the package's top-level __init__.py
+# can cause problems with import performance and circular dependencies. Can this
+# be moved elsewhere?
 def should_use_ot3() -> bool:
     """Return true if ot3 hardware controller should be used."""
     if ff.enable_ot3_hardware_controller():
