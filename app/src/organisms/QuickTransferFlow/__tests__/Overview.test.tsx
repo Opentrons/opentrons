@@ -21,19 +21,19 @@ describe('Overview', () => {
         pipette: {
           displayName: 'Pipette display name',
         } as any,
-        source: {
+        sourceLabware: {
           metadata: {
             displayName: 'Source labware name',
           },
         } as any,
-        destination: {
+        destinationLabware: {
           metadata: {
             displayName: 'Destination labware name',
           },
         } as any,
         transferType: 'transfer',
         volume: 25,
-      },
+      } as any,
     }
   })
   afterEach(() => {
@@ -57,19 +57,19 @@ describe('Overview', () => {
         pipette: {
           displayName: 'Pipette display name',
         } as any,
-        source: {
+        sourceLabware: {
           metadata: {
             displayName: 'Source labware name',
           },
         } as any,
-        destination: {
+        destinationLabware: {
           metadata: {
             displayName: 'Destination labware name',
           },
         } as any,
         transferType: 'consolidate',
         volume: 25,
-      },
+      } as any,
     }
     render(props)
     screen.getByText('Aspirate volume per well')
@@ -80,19 +80,19 @@ describe('Overview', () => {
         pipette: {
           displayName: 'Pipette display name',
         } as any,
-        source: {
+        sourceLabware: {
           metadata: {
             displayName: 'Source labware name',
           },
         } as any,
-        destination: {
+        destinationLabware: {
           metadata: {
             displayName: 'Destination labware name',
           },
         } as any,
         transferType: 'distribute',
         volume: 25,
-      },
+      } as any,
     }
     render(props)
     screen.getByText('Dispense volume per well')

@@ -13,20 +13,21 @@ import {
 import { TabbedButton } from '../../atoms/buttons'
 import { ChildNavigation } from '../ChildNavigation'
 import { Overview } from './Overview'
+import { getInitialSummaryState, quickTransferSummaryReducer } from './utils'
 
 import type { SmallButton } from '../../atoms/buttons'
-import type { QuickTransferSetupState } from './types'
+import type { QuickTransferWizardState } from './types'
 
 interface SummaryAndSettingsProps {
   onNext: () => void
   exitButtonProps: React.ComponentProps<typeof SmallButton>
-  state: QuickTransferSetupState
+  state: QuickTransferWizardState
 }
 
 export function SummaryAndSettings(
   props: SummaryAndSettingsProps
 ): JSX.Element | null {
-  const { onNext, exitButtonProps, state } = props
+  const { onNext, exitButtonProps, state: wizardFlowState } = props
   const { t } = useTranslation(['quick_transfer', 'shared'])
   const displayCategory: string[] = [
     'overview',
@@ -36,11 +37,22 @@ export function SummaryAndSettings(
   const [selectedCategory, setSelectedCategory] = React.useState<string>(
     'overview'
   )
+  // if any value from the wizard flow hasn't been set, return null
+  // this should never happen but allows us to strictly type summary state
+  // @ts-expect-error figure out how to make this type non-null
+  const initialSummaryState = getInitialSummaryState(wizardFlowState)
+  const [state] = React.useReducer(
+    quickTransferSummaryReducer,
+    initialSummaryState
+  )
+  if (Object.values(wizardFlowState).some(value => value == null)) {
+    return null
+  }
 
   return (
     <Flex>
       <ChildNavigation
-        header={t('quick_transfer_volume', { volume: state.volume })}
+        header={t('quick_transfer_volume', { volume: wizardFlowState.volume })}
         buttonText={t('create_transfer')}
         onClickButton={onNext}
         secondaryButtonProps={exitButtonProps}

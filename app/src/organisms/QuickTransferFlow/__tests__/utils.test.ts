@@ -6,10 +6,10 @@ import {
   NINETY_SIX_CHANNEL_COMPATIBLE_LABWARE,
 } from '../constants'
 
-import type { QuickTransferSetupState } from '../types'
+import type { QuickTransferWizardState } from '../types'
 
 describe('getVolumeLimits', () => {
-  const state: QuickTransferSetupState = {
+  const state: QuickTransferWizardState = {
     pipette: {
       liquids: [
         {

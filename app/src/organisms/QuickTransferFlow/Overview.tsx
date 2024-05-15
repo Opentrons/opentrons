@@ -13,10 +13,10 @@ import {
 import { ListItem } from '../../atoms/ListItem'
 import { CONSOLIDATE, DISTRIBUTE } from './constants'
 
-import type { QuickTransferSetupState } from './types'
+import type { QuickTransferSummaryState } from './types'
 
 interface OverviewProps {
-  state: QuickTransferSetupState
+  state: QuickTransferSummaryState
 }
 
 export function Overview(props: OverviewProps): JSX.Element | null {
@@ -33,18 +33,18 @@ export function Overview(props: OverviewProps): JSX.Element | null {
   const displayItems = [
     {
       option: t('pipette'),
-      value: state.pipette?.displayName,
+      value: state.pipette.displayName,
     },
     {
       option: t('source_labware'),
-      value: state.source?.metadata.displayName,
+      value: state.sourceLabware.metadata.displayName,
     },
     {
       option: t('destination_labware'),
       value:
-        state.destination === 'source'
-          ? state.source?.metadata.displayName
-          : state.destination?.metadata.displayName,
+        state.destinationLabware === 'source'
+          ? state.sourceLabware.metadata.displayName
+          : state.destinationLabware.metadata.displayName,
     },
     {
       option: transferCopy,

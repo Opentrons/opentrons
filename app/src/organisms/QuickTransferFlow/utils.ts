@@ -18,17 +18,22 @@ import type {
   PipetteV2Specs,
   WellSetHelpers,
 } from '@opentrons/shared-data'
+import type { Mount } from '@opentrons/api-client'
 import type {
-  QuickTransferSetupState,
+  QuickTransferWizardState,
+  QuickTransferSummaryState,
   QuickTransferWizardAction,
+  QuickTransferSummaryAction,
   TransferType,
+  PathOption,
 } from './types'
+
 import type { LabwareFilter } from '../../pages/Labware/types'
 
-export function quickTransferReducer(
-  state: QuickTransferSetupState,
+export function quickTransferWizardReducer(
+  state: QuickTransferWizardState,
   action: QuickTransferWizardAction
-): QuickTransferSetupState {
+): QuickTransferWizardState {
   switch (action.type) {
     case 'SELECT_PIPETTE': {
       return {
@@ -110,6 +115,172 @@ export function quickTransferReducer(
   }
 }
 
+// sets up the initial summary state with defaults based on selections made
+// in the wizard flow
+export function getInitialSummaryState(props: {
+  pipette: PipetteV2Specs
+  mount: Mount
+  tipRack: LabwareDefinition2
+  source: LabwareDefinition2
+  sourceWells: string[]
+  destination: LabwareDefinition2 | 'source'
+  destinationWells: string[]
+  transferType: TransferType
+  volume: number
+}): QuickTransferSummaryState {
+  const tipVolume = Object.values(props.tipRack.wells)[0].totalLiquidVolume
+  const tipType = `t${tipVolume}`
+  const flowRatesForSupportedTip =
+    props.pipette.liquids.default.supportedTips[tipType]
+
+  const volumeLimits = getVolumeLimits(props)
+
+  let path: PathOption = 'single'
+  if (
+    props.transferType === 'consolidate' &&
+    volumeLimits.max >= props.volume * 2
+  ) {
+    path = 'multiAspirate'
+  } else if (
+    props.transferType === 'distribute' &&
+    volumeLimits.max >= props.volume * 2
+  ) {
+    path = 'multiDispense'
+  }
+
+  return {
+    pipette: props.pipette,
+    mount: props.mount,
+    tipRack: props.tipRack,
+    sourceLabware: props.source,
+    sourceWells: props.sourceWells,
+    destinationLabware: props.destination,
+    destinationWells: props.destinationWells,
+    transferType: props.transferType,
+    volume: props.volume,
+    aspirateFlowRate: flowRatesForSupportedTip.defaultAspirateFlowRate.default,
+    dispenseFlowRate: flowRatesForSupportedTip.defaultDispenseFlowRate.default,
+    path: path,
+    tipPositionAspirate: 1,
+    preWetTip: false,
+    tipPositionDispense: 1,
+    // TODO add default logic for change tip depending on path, transfer type, number of tips
+    changeTip: 'once',
+    // TODO add default logic for drop tip location depending on deck config
+    dropTipLocation: 'trashBin',
+  }
+}
+
+export function quickTransferSummaryReducer(
+  state: QuickTransferSummaryState,
+  action: QuickTransferSummaryAction
+): QuickTransferSummaryState {
+  switch (action.type) {
+    case 'SET_ASPIRATE_FLOW_RATE': {
+      return {
+        ...state,
+        aspirateFlowRate: action.rate,
+      }
+    }
+    case 'SET_DISPENSE_FLOW_RATE': {
+      return {
+        ...state,
+        dispenseFlowRate: action.rate,
+      }
+    }
+    case 'SET_PIPETTE_PATH': {
+      return {
+        ...state,
+        path: action.path,
+      }
+    }
+    case 'SET_ASPIRATE_TIP_POSITION': {
+      return {
+        ...state,
+        tipPositionAspirate: action.position,
+      }
+    }
+    case 'SET_PRE_WET_TIP': {
+      return {
+        ...state,
+        preWetTip: action.preWetTip,
+      }
+    }
+    case 'SET_MIX_ON_ASPIRATE': {
+      return {
+        ...state,
+        mixOnAspirate: action.mixSettings,
+      }
+    }
+    case 'SET_DELAY_ASPIRATE': {
+      return {
+        ...state,
+        delayAspirate: action.delaySettings,
+      }
+    }
+    case 'SET_TOUCH_TIP_ASPIRATE': {
+      return {
+        ...state,
+        touchTipAspirate: action.position,
+      }
+    }
+    case 'SET_AIR_GAP_ASPIRATE': {
+      return {
+        ...state,
+        airGapAspirate: action.volume,
+      }
+    }
+    case 'SET_DISPENSE_TIP_POSITION': {
+      return {
+        ...state,
+        tipPositionDispense: action.position,
+      }
+    }
+    case 'SET_MIX_ON_DISPENSE': {
+      return {
+        ...state,
+        mixOnDispense: action.mixSettings,
+      }
+    }
+    case 'SET_DELAY_DISPENSE': {
+      return {
+        ...state,
+        delayDispense: action.delaySettings,
+      }
+    }
+    case 'SET_TOUCH_TIP_DISPENSE': {
+      return {
+        ...state,
+        touchTipDispense: action.position,
+      }
+    }
+    case 'SET_BLOW_OUT': {
+      return {
+        ...state,
+        blowOut: action.location,
+      }
+    }
+    case 'SET_AIR_GAP_DISPENSE': {
+      return {
+        ...state,
+        airGapDispense: action.volume,
+      }
+    }
+    case 'SET_CHANGE_TIP': {
+      return {
+        ...state,
+        changeTip: action.changeTip,
+      }
+    }
+    case 'SET_DROP_TIP_LOCATION': {
+      return {
+        ...state,
+        dropTipLocation: action.location,
+      }
+    }
+  }
+}
+
 export function getCompatibleLabwareByCategory(
   pipetteChannels: 1 | 8 | 96,
   category: LabwareFilter
@@ -151,7 +322,7 @@ export function getCompatibleLabwareByCategory(
 }
 
 export function getVolumeLimits(
-  state: QuickTransferSetupState
+  state: QuickTransferWizardState
 ): { min: number; max: number } {
   if (
     state.pipette == null ||
