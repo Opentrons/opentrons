@@ -5,7 +5,8 @@ from typing import Dict, List, Mapping, Optional, Tuple, Union
 from typing_extensions import assert_type
 
 from opentrons_shared_data.pipette import pipette_definition
-from opentrons.config.defaults_ot2 import Z_RETRACT_DISTANCE
+from opentrons.config.defaults_ot2 import Z_RETRACT_DISTANCE, DEFAULT_MOUNT_OFFSET
+from opentrons.config.defaults_ot3 import DEFAULT_CARRIAGE_OFFSET, DEFAULT_LEFT_MOUNT_OFFSET, DEFAULT_RIGHT_MOUNT_OFFSET
 from opentrons.hardware_control.dev_types import PipetteDict
 from opentrons.hardware_control.nozzle_manager import (
     NozzleConfigurationType,
@@ -118,6 +119,14 @@ class StaticPipetteConfig:
     pipette_bounding_box_offsets: PipetteBoundingBoxOffsets
     bounding_nozzle_offsets: BoundingNozzlesOffsets
     default_nozzle_map: NozzleMap
+
+
+
+@dataclass
+class RelativeRobotExtent:
+    """Relative robot extents based off the active nozzle offset."""
+    back_right: Point
+    front_left: Point
 
 
 @dataclass
@@ -759,6 +768,23 @@ class PipetteView(HasState[PipetteState]):
     ) -> BoundingNozzlesOffsets:
         """Get the nozzle offsets of the pipette's bounding nozzles."""
         return self.get_config(pipette_id).bounding_nozzle_offsets
+    
+    def get_mount_stackup(self, pipette_id: str, robot_type: str) -> Point:
+        return self.get_config(pipette_id).mount_stackup[robot_type]
+    
+    def get_robot_extent_per_pipette(self, pipette_id: str, robot_type: str, robot_extents) -> RelativeRobotExtent:
+        """Get the relative robot extents of the provided pipette based off the current nozzle configuration and provided robot extents."""
+        primary_nozzle_offset = self.get_primary_nozzle_offset(pipette_id)
+        # figure out how to better get the corner nozzles. Need front left and back right.
+        pipette_bounds_offsets = self.get_config(
+            pipette_id
+        ).pipette_bounding_box_offsets
+        robot_mount_stackup = self.get_mount_stackup(pipette_id, robot_type)
+        # TODO determine if we need to subtract or add here
+        # TODO get the max pipette bound 
+        from_back_right = robot_extents.back_right - robot_mount_stackup - pipette_bounds_offsets.back_right_corner
+        from_front_left = robot_extents.front_left - robot_mount_stackup - pipette_bounds_offsets.front_right_corner
+        return RelativeRobotExtent(back_right=from_back_right, front_left=from_front_left)
 
     def get_pipette_bounds_at_specified_move_to_position(
         self,
@@ -768,6 +794,7 @@ class PipetteView(HasState[PipetteState]):
         """Get the pipette's bounding offsets when primary nozzle is at the given position."""
         primary_nozzle_offset = self.get_primary_nozzle_offset(pipette_id)
         tip = self.get_attached_tip(pipette_id)
+        # TODO update this for pipette robot stackup
         # Primary nozzle position at destination, in deck coordinates
         primary_nozzle_position = destination_position + Point(
             x=0, y=0, z=tip.length if tip else 0

@@ -8,7 +8,8 @@
     "tags": ["ot2", "12 slots", "short trash"]
   },
   "robot": {
-    "model": "OT-2 Standard"
+    "model": "OT-2 Standard",
+    "extents": [446.75, 347.50, 0.0]
   },
   "locations": {
     "addressableAreas": [

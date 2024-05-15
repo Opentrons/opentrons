@@ -95,6 +95,10 @@ class GeometryView:
         self._addressable_areas = addressable_area_view
         self._last_drop_tip_location_spot: Dict[str, _TipDropSection] = {}
 
+    @property
+    def deck_extents(self) -> Point:
+        return self._addressable_areas.deck_extents
+
     def get_labware_highest_z(self, labware_id: str) -> float:
         """Get the highest Z-point of a labware."""
         labware_data = self._labware.get(labware_id)

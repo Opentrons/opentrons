@@ -1,5 +1,6 @@
 """Basic addressable area data state and store."""
 from dataclasses import dataclass
+from functools import cached_property
 from typing import Dict, List, Optional, Set, Union
 
 from opentrons_shared_data.robot.dev_types import RobotType
@@ -324,6 +325,11 @@ class AddressableAreaView(HasState[AddressableAreaState]):
             state: Addressable area state dataclass used for all calculations.
         """
         self._state = state
+
+    @cached_property
+    def deck_extents(self) -> Point:
+        extents = self.state.deck_definition.robot.extents
+        return Point(x=extents[0], y=extents[1], z=extents[2])
 
     def get_addressable_area(self, addressable_area_name: str) -> AddressableArea:
         """Get addressable area."""
