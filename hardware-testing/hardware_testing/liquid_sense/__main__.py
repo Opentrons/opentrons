@@ -159,13 +159,7 @@ class RunArgs:
         pipette.trash_container = trash
         pipette_tag = helpers._get_tag_from_pipette(pipette, False, False)
 
-        if args.trials == 0:
-            if args.channels < 96:
-                trials = 10
-            else:
-                trials = 7
-        else:
-            trials = args.trials
+        trials = args.trials
 
         if args.tip == 0:
             if args.pipette == 1000:
@@ -247,7 +241,7 @@ if __name__ == "__main__":
     parser.add_argument("--pipette", type=int, choices=[50, 1000], required=True)
     parser.add_argument("--channels", type=int, choices=[1, 8, 96], default=1)
     parser.add_argument("--tip", type=int, choices=[0, 50, 200, 1000], default=0)
-    parser.add_argument("--trials", type=int, default=0)
+    parser.add_argument("--trials", type=int, default=5)
     parser.add_argument("--return-tip", action="store_true")
     parser.add_argument("--skip-labware-offsets", action="store_true")
     parser.add_argument(
@@ -260,7 +254,6 @@ if __name__ == "__main__":
         choices=["aspirate", "dispense"],
         default="aspirate",
     )
-    parser.add_argument("--labware-type", type=str, default="nest_1_reservoir_195ml")
     parser.add_argument("--plunger-speed", type=float, default=-1.0)
     parser.add_argument("--isolate-plungers", action="store_true")
     parser.add_argument("--start-height-offset", type=float, default=0)
