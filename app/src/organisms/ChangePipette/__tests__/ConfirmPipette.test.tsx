@@ -435,6 +435,9 @@ describe('ConfirmPipette', () => {
     }
     const { getByRole } = render(props)
     expect(getByRole('button', { name: 'exit' })).toBeDisabled()
+    expect(
+      getByRole('button', { name: 'Calibrate pipette offset' })
+    ).toBeDisabled()
   })
   it('should render buttons as disabled on failure when robot is in motion/isDisabled is true', () => {
     props = {
