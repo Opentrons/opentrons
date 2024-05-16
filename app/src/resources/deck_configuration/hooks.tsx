@@ -76,23 +76,23 @@ export function useDeckConfigurationCompatibility(
       // get the on-deck labware name for a missing single-slot addressable area
       const missingSingleSlotLabware =
         cutoutFixtureId != null &&
-          // fixture mismatch
-          !compatibleCutoutFixtureIds.includes(cutoutFixtureId) &&
-          compatibleCutoutFixtureIds[0] != null &&
-          // compatible fixture is single-slot
-          SINGLE_SLOT_FIXTURES.includes(compatibleCutoutFixtureIds[0])
+        // fixture mismatch
+        !compatibleCutoutFixtureIds.includes(cutoutFixtureId) &&
+        compatibleCutoutFixtureIds[0] != null &&
+        // compatible fixture is single-slot
+        SINGLE_SLOT_FIXTURES.includes(compatibleCutoutFixtureIds[0])
           ? labwareInSlots.find(
-            ({ location }) =>
-              // match the addressable area to an on-deck labware
-              requiredAddressableAreasForCutoutId[0] === location.slotName
-          )
+              ({ location }) =>
+                // match the addressable area to an on-deck labware
+                requiredAddressableAreasForCutoutId[0] === location.slotName
+            )
           : null
 
       const missingLabwareDisplayName =
         missingSingleSlotLabware != null
           ? missingSingleSlotLabware.labwareNickName ??
-          getLabwareDisplayName(missingSingleSlotLabware.labwareDef) ??
-          null
+            getLabwareDisplayName(missingSingleSlotLabware.labwareDef) ??
+            null
           : null
 
       return [
@@ -110,12 +110,17 @@ export function useDeckConfigurationCompatibility(
   )
 }
 
-interface DeckConfigurationEditingTools { 
-  addFixtureToCutout: (cutoutId: CutoutId) => void, 
-  removeFixtureFromCutout: (cutoutId: CutoutId, cutoutFixtureId: CutoutFixtureId) => void
+interface DeckConfigurationEditingTools {
+  addFixtureToCutout: (cutoutId: CutoutId) => void
+  removeFixtureFromCutout: (
+    cutoutId: CutoutId,
+    cutoutFixtureId: CutoutFixtureId
+  ) => void
   addFixtureModal: React.ReactNode
 }
-export function useDeckConfigurationEditingTools(isOnDevice: boolean): DeckConfigurationEditingTools {
+export function useDeckConfigurationEditingTools(
+  isOnDevice: boolean
+): DeckConfigurationEditingTools {
   const deckDef = getDeckDefFromRobotType(FLEX_ROBOT_TYPE)
   const deckConfig =
     useNotifyDeckConfigurationQuery({
@@ -182,12 +187,13 @@ export function useDeckConfigurationEditingTools(isOnDevice: boolean): DeckConfi
   return {
     addFixtureToCutout,
     removeFixtureFromCutout,
-    addFixtureModal: targetCutoutId != null ? (
-      <AddFixtureModal
-        cutoutId={targetCutoutId}
-        closeModal={() => setTargetCutoutId(null)}
-        isOnDevice={isOnDevice}
-      />
-    ) : null
+    addFixtureModal:
+      targetCutoutId != null ? (
+        <AddFixtureModal
+          cutoutId={targetCutoutId}
+          closeModal={() => setTargetCutoutId(null)}
+          isOnDevice={isOnDevice}
+        />
+      ) : null,
   }
 }

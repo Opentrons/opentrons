@@ -16,7 +16,10 @@ import { ChildNavigation } from '../../organisms/ChildNavigation'
 import { DeckFixtureSetupInstructionsModal } from '../../organisms/DeviceDetailsDeckConfiguration/DeckFixtureSetupInstructionsModal'
 import { DeckConfigurationDiscardChangesModal } from '../../organisms/DeviceDetailsDeckConfiguration/DeckConfigurationDiscardChangesModal'
 import { getTopPortalEl } from '../../App/portal'
-import { useDeckConfigurationEditingTools, useNotifyDeckConfigurationQuery } from '../../resources/deck_configuration'
+import {
+  useDeckConfigurationEditingTools,
+  useNotifyDeckConfigurationQuery,
+} from '../../resources/deck_configuration'
 
 export function DeckConfigurationEditor(): JSX.Element {
   const { t, i18n } = useTranslation([

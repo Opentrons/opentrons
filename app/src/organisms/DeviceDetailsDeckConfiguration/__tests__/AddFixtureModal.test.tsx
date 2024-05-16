@@ -23,7 +23,7 @@ import type { Modules } from '@opentrons/api-client'
 vi.mock('@opentrons/react-api-client')
 vi.mock('../../../resources/deck_configuration')
 
-const mockSetShowAddFixtureModal = vi.fn()
+const mockCloseModal = vi.fn()
 const mockUpdateDeckConfiguration = vi.fn()
 const mockSetCurrentDeckConfig = vi.fn()
 
@@ -39,8 +39,7 @@ describe('Touchscreen AddFixtureModal', () => {
   beforeEach(() => {
     props = {
       cutoutId: 'cutoutD3',
-      setShowAddFixtureModal: mockSetShowAddFixtureModal,
-      setCurrentDeckConfig: mockSetCurrentDeckConfig,
+      closeModal: mockCloseModal,
       isOnDevice: true,
     }
     vi.mocked(useUpdateDeckConfigurationMutation).mockReturnValue({
@@ -96,7 +95,7 @@ describe('Desktop AddFixtureModal', () => {
   beforeEach(() => {
     props = {
       cutoutId: 'cutoutD3',
-      setShowAddFixtureModal: mockSetShowAddFixtureModal,
+      closeModal: mockCloseModal,
     }
     vi.mocked(useUpdateDeckConfigurationMutation).mockReturnValue({
       updateDeckConfiguration: mockUpdateDeckConfiguration,

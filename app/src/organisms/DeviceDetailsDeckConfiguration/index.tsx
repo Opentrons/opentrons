@@ -36,7 +36,10 @@ import { Banner } from '../../atoms/Banner'
 import { DeckFixtureSetupInstructionsModal } from './DeckFixtureSetupInstructionsModal'
 import { useIsRobotViewable, useRunStatuses } from '../Devices/hooks'
 import { useIsEstopNotDisengaged } from '../../resources/devices/hooks/useIsEstopNotDisengaged'
-import { useDeckConfigurationEditingTools, useNotifyDeckConfigurationQuery } from '../../resources/deck_configuration'
+import {
+  useDeckConfigurationEditingTools,
+  useNotifyDeckConfigurationQuery,
+} from '../../resources/deck_configuration'
 
 import type { CutoutId } from '@opentrons/shared-data'
 

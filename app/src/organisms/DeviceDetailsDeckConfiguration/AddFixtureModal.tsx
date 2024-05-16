@@ -304,7 +304,9 @@ export function AddFixtureModal({
         )?.usbPort.port
       )}
       buttonText={t('add')}
-      onClickHandler={() => { handleAddFixture(cutoutConfigs) }}
+      onClickHandler={() => {
+        handleAddFixture(cutoutConfigs)
+      }}
       isOnDevice={isOnDevice}
     />
   ))
@@ -315,9 +317,7 @@ export function AddFixtureModal({
         <Modal
           header={modalHeader}
           onOutsideClick={() =>
-            providedFixtureOptions != null
-              ? null
-              : closeModal()
+            providedFixtureOptions != null ? null : closeModal()
           }
         >
           <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing32}>

@@ -76,11 +76,7 @@ export function ProtocolSetupDeckConfiguration({
       : config
   )
 
-  const [
-    currentDeckConfig,
-    setCurrentDeckConfig,
-  ] = React.useState<DeckConfiguration>(mergedDeckConfig)
-  const modulesOnDeck = currentDeckConfig.reduce<ModuleOnDeck[]>(
+  const modulesOnDeck = mergedDeckConfig.reduce<ModuleOnDeck[]>(
     (acc, cutoutConfig) => {
       const matchingFixtureIdsAndModel = Object.entries(
         MODULE_FIXTURES_BY_MODEL
@@ -117,9 +113,7 @@ export function ProtocolSetupDeckConfiguration({
     []
   )
 
-  const { updateDeckConfiguration } = useUpdateDeckConfigurationMutation()
   const handleClickConfirm = (): void => {
-    updateDeckConfiguration(currentDeckConfig)
     setSetupScreen('modules')
   }
 
@@ -135,9 +129,8 @@ export function ProtocolSetupDeckConfiguration({
           {showConfigurationModal && cutoutId != null ? (
             <AddFixtureModal
               cutoutId={cutoutId}
-              setShowAddFixtureModal={setShowConfigurationModal}
+              closeModal={() => setShowConfigurationModal(false)}
               providedFixtureOptions={providedFixtureOptions}
-              setCurrentDeckConfig={setCurrentDeckConfig}
               isOnDevice
             />
           ) : null}
@@ -158,7 +151,7 @@ export function ProtocolSetupDeckConfiguration({
           height="28.4375rem"
         >
           <BaseDeck
-            deckConfig={currentDeckConfig}
+            deckConfig={mergedDeckConfig}
             robotType={FLEX_ROBOT_TYPE}
             modulesOnDeck={modulesOnDeck}
           />
