@@ -3,6 +3,10 @@ import { fireEvent, screen } from '@testing-library/react'
 import { when } from 'vitest-when'
 import { describe, it, beforeEach, vi, afterEach } from 'vitest'
 
+import {
+  DeckConfiguration,
+  TRASH_BIN_ADAPTER_FIXTURE,
+} from '@opentrons/shared-data'
 import { DeckConfigurator } from '@opentrons/components'
 import {
   useModulesQuery,
@@ -16,10 +20,14 @@ import { DeckFixtureSetupInstructionsModal } from '../DeckFixtureSetupInstructio
 import { useIsEstopNotDisengaged } from '../../../resources/devices/hooks/useIsEstopNotDisengaged'
 import { DeviceDetailsDeckConfiguration } from '../'
 import { useNotifyCurrentMaintenanceRun } from '../../../resources/maintenance_runs'
+import {
+  useDeckConfigurationEditingTools,
+  useNotifyDeckConfigurationQuery,
+} from '../../../resources/deck_configuration'
 
+import type { UseQueryResult } from 'react-query'
 import type { MaintenanceRun } from '@opentrons/api-client'
 import type * as OpentronsComponents from '@opentrons/components'
-import type * as DeckConfigResources from '../../../resources/deck_configuration'
 
 vi.mock('@opentrons/components', async importOriginal => {
   const actual = await importOriginal<typeof OpentronsComponents>()
@@ -33,16 +41,14 @@ vi.mock('../DeckFixtureSetupInstructionsModal')
 vi.mock('../../Devices/hooks')
 vi.mock('../../../resources/maintenance_runs')
 vi.mock('../../../resources/devices/hooks/useIsEstopNotDisengaged')
-vi.mock('../../../resources/deck_configuration', async importOriginal => {
-  const actual = await importOriginal<typeof DeckConfigResources>()
-  return {
-    ...actual,
-    useNotifyDeckConfigurationQuery: vi
-      .fn()
-      .mockReturnValue({ data: [] } as any),
-  }
-})
+vi.mock('../../../resources/deck_configuration')
 
+const mockDeckConfig = [
+  {
+    cutoutId: 'cutoutC3',
+    cutoutFixtureId: TRASH_BIN_ADAPTER_FIXTURE,
+  },
+]
 const ROBOT_NAME = 'otie'
 const mockUpdateDeckConfiguration = vi.fn()
 const RUN_STATUSES = {
@@ -88,6 +94,14 @@ describe('DeviceDetailsDeckConfiguration', () => {
       .calledWith(ROBOT_NAME)
       .thenReturn(false)
     when(vi.mocked(useIsRobotViewable)).calledWith(ROBOT_NAME).thenReturn(true)
+    vi.mocked(useNotifyDeckConfigurationQuery).mockReturnValue({
+      data: mockDeckConfig,
+    } as UseQueryResult<DeckConfiguration>)
+    vi.mocked(useDeckConfigurationEditingTools).mockReturnValue({
+      addFixtureToCutout: vi.fn(),
+      removeFixtureFromCutout: vi.fn(),
+      addFixtureModal: null,
+    })
   })
 
   afterEach(() => {
@@ -137,6 +151,9 @@ describe('DeviceDetailsDeckConfiguration', () => {
   })
 
   it('should render no deck fixtures, if deck configs are not set', () => {
+    vi.mocked(useNotifyDeckConfigurationQuery).mockReturnValue({
+      data: [],
+    } as UseQueryResult<DeckConfiguration>)
     render(props)
     screen.getByText('No deck fixtures')
   })
