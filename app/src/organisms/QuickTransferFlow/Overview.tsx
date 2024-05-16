@@ -36,6 +36,10 @@ export function Overview(props: OverviewProps): JSX.Element | null {
       value: state.pipette.displayName,
     },
     {
+      option: t('tip_rack'),
+      value: state.tipRack.metadata.displayName,
+    },
+    {
       option: t('source_labware'),
       value: state.sourceLabware.metadata.displayName,
     },
@@ -61,7 +65,7 @@ export function Overview(props: OverviewProps): JSX.Element | null {
       {displayItems.map(displayItem => (
         <ListItem type="noActive" key={displayItem.option}>
           <Flex justifyContent={JUSTIFY_SPACE_BETWEEN} width="100%">
-            <StyledText css={TYPOGRAPHY.level4HeaderSemiBold} width="30rem">
+            <StyledText css={TYPOGRAPHY.level4HeaderSemiBold} width="20rem">
               {displayItem.option}
             </StyledText>
             <StyledText

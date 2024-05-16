@@ -21,6 +21,11 @@ describe('Overview', () => {
         pipette: {
           displayName: 'Pipette display name',
         } as any,
+        tipRack: {
+          metadata: {
+            displayName: 'Tip rack display name',
+          },
+        } as any,
         sourceLabware: {
           metadata: {
             displayName: 'Source labware name',
@@ -44,6 +49,8 @@ describe('Overview', () => {
     render(props)
     screen.getByText('Pipette')
     screen.getByText('Pipette display name')
+    screen.getByText('Tip rack')
+    screen.getByText('Tip rack display name')
     screen.getByText('Source labware')
     screen.getByText('Source labware name')
     screen.getByText('Destination labware')
@@ -56,6 +63,11 @@ describe('Overview', () => {
       state: {
         pipette: {
           displayName: 'Pipette display name',
+        } as any,
+        tipRack: {
+          metadata: {
+            displayName: 'Tip rack display name',
+          },
         } as any,
         sourceLabware: {
           metadata: {
@@ -79,6 +91,11 @@ describe('Overview', () => {
       state: {
         pipette: {
           displayName: 'Pipette display name',
+        } as any,
+        tipRack: {
+          metadata: {
+            displayName: 'Tip rack display name',
+          },
         } as any,
         sourceLabware: {
           metadata: {
