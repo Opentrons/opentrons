@@ -83,7 +83,7 @@ SECONDS_BETWEEN_READINGS = 0.25
 DEFAULT_SPEED = 91
 FLOW_ACCELERATION = 24000.0/15.9
 
-MOTOR_CURRENT = 1.25
+MOTOR_CURRENT = 1.0
 
 def _get_test_tag(flow: float, trial: int) -> str:
     return f"flow-{flow}-trial-{trial}"
