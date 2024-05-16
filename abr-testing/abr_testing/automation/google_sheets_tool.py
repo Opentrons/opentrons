@@ -87,6 +87,25 @@ class google_sheet:
         """Delete Row from google sheet."""
         self.worksheet.delete_rows(row_index)
 
+    def batch_delete_rows(self, row_indices: List[int]) -> None:
+        """Batch delete rows in list of indices."""
+        delete_body = {
+            "requests": [
+                {
+                    "deleteDimension": {
+                        "range": {
+                            "sheetId": 0,
+                            "dimension": "ROWS",
+                            "startIndex": index,
+                            "endIndex": index + 1,
+                        }
+                    }
+                }
+                for index in row_indices
+            ]
+        }
+        self.spread_sheet.batch_update(body=delete_body)
+
     def update_cell(
         self, row: int, column: int, single_data: Any
     ) -> Tuple[int, int, Any]:
@@ -94,7 +113,7 @@ class google_sheet:
         self.worksheet.update_cell(row, column, single_data)
         return row, column, single_data
 
-    def get_all_data(self) -> Dict[str, Any]:
+    def get_all_data(self) -> List[Dict[str, Any]]:
         """Get all the Data recorded from worksheet."""
         return self.worksheet.get_all_records()
 
@@ -141,36 +160,45 @@ class google_sheet:
             print("Row not found.")
             return None
         return row_index
-    
-    def create__line_chart(self, titles: List[str], series: List[Dict[str, Any]], spreadsheet_id: str):
+
+    def create_line_chart(
+        self,
+        titles: List[str],
+        series: List[Dict[str, Any]],
+        domains: List[Dict[str, Any]],
+    ) -> None:
         """Create chart of data on google sheet."""
-        chart_data = {
+        request_body = {
+            "requests": [
+                {
+                    "addChart": {
                         "chart": {
-                        "spec": {
-                            "title": titles[0],
-                            "basicChart": {
-                            "chartType": "LINE",
-                            "legendPosition": "BOTTOM_LEGEND",
-                            "axis": [
-                                {
-                                "position": "BOTTOM_AXIS",
-                                "title": titles[1]
+                            "spec": {
+                                "title": titles[0],
+                                "basicChart": {
+                                    "chartType": "LINE",
+                                    "legendPosition": "RIGHT_LEGEND",
+                                    "axis": [
+                                        {"position": "BOTTOM_AXIS", "title": titles[1]},
+                                        {"position": "LEFT_AXIS", "title": titles[2]},
+                                    ],
+                                    "domains": domains,
+                                    "series": series,
+                                    "headerCount": 1,
                                 },
-                                {
-                                "position": "LEFT_AXIS",
-                                "title": titles[2]
+                            },
+                            "position": {
+                                "overlayPosition": {
+                                    "anchorCell": {
+                                        "sheetId": 0,
+                                        "rowIndex": 1,
+                                        "columnIndex": 1,
+                                    }
                                 }
-                            ],
-                            "ranges": [
-                                series
-                            ],
-                            "headerCount": 1
-                            }
-                        },
-                        "position": {
-                            "newSheet": True
-                        }
+                            },
                         }
                     }
-        body = {"requests": [{"addChart": {"chart": chart_data}}]}
-        self.batchUpdate(spreadsheet_id, body = body).execute()
+                }
+            ]
+        }
+        self.spread_sheet.batch_update(body=request_body)
