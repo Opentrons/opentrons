@@ -107,8 +107,8 @@ class CommandSlice:
 
 
 @dataclass(frozen=True)
-class CurrentCommand:
-    """The "current" command's ID and index in the overall commands list."""
+class CommandPointer:
+    """Brief info about a command and where to find it."""
 
     command_id: str
     command_key: str
@@ -593,7 +593,7 @@ class CommandView(HasState[CommandState]):
         """Get the IDs of all queued protocol commands, in FIFO order."""
         return self._state.command_history.get_queue_ids()
 
-    def get_current(self) -> Optional[CurrentCommand]:
+    def get_current(self) -> Optional[CommandPointer]:
         """Return the "current" command, if any.
 
         The "current" command is the command that is currently executing,
@@ -601,7 +601,7 @@ class CommandView(HasState[CommandState]):
         """
         running_command = self._state.command_history.get_running_command()
         if running_command:
-            return CurrentCommand(
+            return CommandPointer(
                 command_id=running_command.command.id,
                 command_key=running_command.command.key,
                 created_at=running_command.command.createdAt,
@@ -610,7 +610,7 @@ class CommandView(HasState[CommandState]):
 
         most_recently_finalized_command = self.get_most_recently_finalized_command()
         if most_recently_finalized_command:
-            return CurrentCommand(
+            return CommandPointer(
                 command_id=most_recently_finalized_command.command.id,
                 command_key=most_recently_finalized_command.command.key,
                 created_at=most_recently_finalized_command.command.createdAt,

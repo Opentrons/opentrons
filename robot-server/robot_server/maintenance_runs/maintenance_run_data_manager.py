@@ -7,7 +7,7 @@ from opentrons.protocol_engine import (
     LabwareOffsetCreate,
     StateSummary,
     CommandSlice,
-    CurrentCommand,
+    CommandPointer,
     Command,
 )
 
@@ -183,7 +183,7 @@ class MaintenanceRunDataManager:
         )
         return the_slice
 
-    def get_current_command(self, run_id: str) -> Optional[CurrentCommand]:
+    def get_current_command(self, run_id: str) -> Optional[CommandPointer]:
         """Get the "current" command, if any.
 
         See `ProtocolEngine.state_view.commands.get_current()` for the definition

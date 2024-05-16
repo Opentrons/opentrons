@@ -6,7 +6,7 @@ from decoy import Decoy, matchers
 
 from opentrons.protocol_engine import (
     CommandSlice,
-    CurrentCommand,
+    CommandPointer,
     ProtocolEngine,
     CommandNote,
     commands as pe_commands,
@@ -321,7 +321,7 @@ async def test_get_run_commands(
     )
 
     decoy.when(mock_run_data_manager.get_current_command("run-id")).then_return(
-        CurrentCommand(
+        CommandPointer(
             command_id="current-command-id",
             command_key="current-command-key",
             created_at=datetime(year=2024, month=4, day=4),
