@@ -12,7 +12,10 @@ import { TRASH_BIN_ADAPTER_FIXTURE } from '@opentrons/shared-data'
 import { i18n } from '../../../i18n'
 import { DeckFixtureSetupInstructionsModal } from '../../../organisms/DeviceDetailsDeckConfiguration/DeckFixtureSetupInstructionsModal'
 import { DeckConfigurationEditor } from '..'
-import { useNotifyDeckConfigurationQuery } from '../../../resources/deck_configuration'
+import {
+  useNotifyDeckConfigurationQuery,
+  useDeckConfigurationEditingTools,
+} from '../../../resources/deck_configuration'
 
 import type { UseQueryResult } from 'react-query'
 import type { DeckConfiguration } from '@opentrons/shared-data'
@@ -71,6 +74,11 @@ describe('DeckConfigurationEditor', () => {
     vi.mocked(useUpdateDeckConfigurationMutation).mockReturnValue({
       updateDeckConfiguration: mockUpdateDeckConfiguration,
     } as any)
+    vi.mocked(useDeckConfigurationEditingTools).mockReturnValue({
+      addFixtureToCutout: vi.fn(),
+      removeFixtureFromCutout: vi.fn(),
+      addFixtureModal: null,
+    })
   })
 
   it('should render text, button and DeckConfigurator', () => {
