@@ -62,39 +62,15 @@ gen-env:
 unit-test:
 	python -m pipenv run python -m pytest tests -m unit
 
-.PHONY: clean-package
-clean-package:
-	rm -f requirements.txt
-	rm -f function.zip
-	rm -rf package
-
 .PHONY: gen-requirements
 gen-requirements:
 	@echo "Generating requirements.txt from Pipfile.lock..."
 	python -m pipenv requirements > requirements.txt
 
-.PHONY: install-deps
-install-deps:
-	@echo "Installing dependencies to package/ directory..."
-	mkdir -p package
-	docker run --rm -v "$$PWD":/var/task "public.ecr.aws/sam/build-python3.12" /bin/sh -c "pip install -r requirements.txt -t ./package"
-
-.PHONY: package-lambda
-package-lambda:
-	@echo "Copying source code to package/ directory..."
-	mkdir -p package
-	cp -r api/. package/api
-	@echo "Creating the deployment zip file..."
-	cd package && zip -r ../function.zip . && cd ..
-	@echo "Package created successfully."
-
-.PHONY: build
-build: clean-package gen-requirements install-deps package-lambda
-
 ENV ?= sandbox
 
 .PHONY: deploy
-deploy:
+deploy: gen-requirements
 	@echo "Deploying to environment: $(ENV)"
 	python -m pipenv run python deploy.py --env $(ENV)
 

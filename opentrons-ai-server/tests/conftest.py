@@ -8,7 +8,9 @@ from tests.helpers.settings import get_settings
 
 def pytest_addoption(parser: pytest.Parser) -> None:
     """Add an option to pytest command-line parser to specify the environment."""
-    parser.addoption("--env", action="store", default="sandbox", help="Set the environment for the tests (dev, sandbox, staging, prod)")
+    parser.addoption(
+        "--env", action="store", default="sandbox", help="Set the environment for the tests (dev, sandbox, crt, staging, prod)"
+    )
 
 
 @pytest.fixture(scope="session")

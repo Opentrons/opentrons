@@ -68,6 +68,23 @@ class SandboxSettings(Settings):
         self._set_properties()
 
 
+class CrtSettings(Settings):
+    ENV_VARIABLE_MAP = {
+        "TOKEN_URL": "CRT_TOKEN_URL",
+        "BASE_URL": "CRT_BASE_URL",
+        "CLIENT_ID": "CRT_CLIENT_ID",
+        "SECRET": "CRT_SECRET",
+        "AUDIENCE": "CRT_AUDIENCE",
+        "GRANT_TYPE": "CRT_GRANT_TYPE",
+        "CACHED_TOKEN_PATH": str(Path(Path(__file__).parent, "cached_token.txt")),
+    }
+
+    def __init__(self) -> None:
+        super().__init__()
+        load_dotenv(self.ENV_PATH)
+        self._set_properties()
+
+
 # TODO:y3rsh:2024-05-11: Add staging and prod
 
 
@@ -76,6 +93,8 @@ def get_settings(env: str) -> Settings:
         return DevSettings()
     elif env.lower() == "sandbox":
         return SandboxSettings()
+    elif env.lower() == "crt":
+        return CrtSettings()
     elif env.lower() == "staging":
         raise NotImplementedError("Staging environment not implemented.")
     elif env.lower() == "prod":
@@ -87,7 +106,7 @@ def get_settings(env: str) -> Settings:
 # Print the environment variable skeleton
 # This is what you print when building the secret
 if __name__ == "__main__":
-    for env in [SandboxSettings, DevSettings]:
+    for env in [SandboxSettings, DevSettings, CrtSettings]:
         for _var, name in env.ENV_VARIABLE_MAP.items():
             if _var in env.excluded:
                 continue

@@ -51,6 +51,10 @@ class Client:
             headers=headers,
         )
 
+    def get_options(self) -> Response:
+        """Call the OPTIONS endpoint and return the response."""
+        return self.httpx.options("/", headers=self.type_headers)
+
 
 def print_response(response: Response) -> None:
     """Prints the HTTP response using rich."""
@@ -61,7 +65,7 @@ def print_response(response: Response) -> None:
 
 def main() -> None:
     console = Console()
-    env = Prompt.ask("Select environment", choices=["dev", "sandbox"], default="sandbox")
+    env = Prompt.ask("Select environment", choices=["dev", "sandbox", "crt"], default="sandbox")
     settings = get_settings(env=env)
     client = Client(settings)
     try:
@@ -75,6 +79,10 @@ def main() -> None:
 
         console.print(Panel("Getting chat completion with fake=True and bad auth to show 401 error (won't call OpenAI)", expand=False))
         response = client.get_chat_completion("How do I load a pipette?", bad_auth=True)
+        print_response(response)
+
+        console.print(Panel("Getting OPTIONS", expand=False))
+        response = client.get_options()
         print_response(response)
 
         real = Prompt.ask("Actually call OpenAI API?", choices=["y", "n"], default="n")
