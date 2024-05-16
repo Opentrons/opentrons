@@ -15,7 +15,6 @@ import type {
 interface SelectSourceWellsProps {
   onNext: () => void
   onBack: () => void
-  exitButtonProps: React.ComponentProps<typeof SmallButton>
   state: QuickTransferSetupState
   dispatch: React.Dispatch<QuickTransferWizardAction>
 }
@@ -70,6 +69,7 @@ export function SelectSourceWells(props: SelectSourceWellsProps): JSX.Element {
             selectWells={wellGroup => {
               setSelectedWells(prevWells => ({ ...prevWells, ...wellGroup }))
             }}
+            // TODO: nozzle type
             nozzleType={null}
           />
         ) : null}
