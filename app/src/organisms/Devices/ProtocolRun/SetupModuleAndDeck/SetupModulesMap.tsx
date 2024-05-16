@@ -54,7 +54,8 @@ export const SetupModulesMap = ({
   const attachedProtocolModuleMatches = getAttachedProtocolModuleMatches(
     attachedModules,
     protocolModulesInfo,
-    actualDeckConfig
+    actualDeckConfig,
+    robotType
   )
 
   const modulesOnDeck = attachedProtocolModuleMatches.map(module => ({
