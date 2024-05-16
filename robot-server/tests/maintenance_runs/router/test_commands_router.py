@@ -27,14 +27,16 @@ from robot_server.maintenance_runs.maintenance_run_models import (
     MaintenanceRunNotFoundError,
 )
 from robot_server.maintenance_runs.router.commands_router import (
-    CommandCollectionLinks,
-    CommandLink,
-    CommandLinkMeta,
-    RequestModelWithCommandCreate,
     create_run_command,
     get_run_command,
     get_run_commands,
     get_current_run_engine_from_url,
+)
+from robot_server.runs.command_models import (
+    RequestModelWithCommandCreate,
+    CommandCollectionLinks,
+    CommandLink,
+    CommandLinkMeta,
 )
 
 
