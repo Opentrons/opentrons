@@ -10,7 +10,10 @@ from ..protocol_reader import JsonProtocolConfig, PythonProtocolConfig
 
 
 class RunOrchestrator:
-    """Provider for runners and associated protocol engine."""
+    """Provider for runners and associated protocol engine.
+
+    Build runners, manage command execution, run state and in-memory protocol engine associated to the runners.
+    """
 
     _protocol_runner: Optional[
         Union[protocol_runner.JsonRunner, protocol_runner.PythonAndLegacyRunner, None]
@@ -31,6 +34,16 @@ class RunOrchestrator:
         ] = None,
         run_id: Optional[str] = None,
     ) -> None:
+        """Initialize a run orchestrator interface.
+
+        Arguments:
+            protocol_engine: Protocol engine instance.
+            hardware_api: Hardware control API instance.
+            fixit_runner: LiveRunner for fixit commands.
+            setup_runner: LiveRunner for setup commands.
+            json_or_python_protocol_runner: JsonRunner/PythonAndLegacyRunner for protocol commands.
+            run_id: run id if any, associated to the runner/engine.
+        """
         self.run_id = run_id
         self._protocol_engine = protocol_engine
         self._hardware_api = hardware_api
