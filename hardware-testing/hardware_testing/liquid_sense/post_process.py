@@ -2,6 +2,7 @@
 import csv
 import os
 from typing import List, Dict, Tuple
+import statistics
 from math import isclose
 
 COL_TRIAL_CONVERSION = {
@@ -210,6 +211,322 @@ def process_csv_directory(  # noqa: C901
                         )
                     final_report_writer.writerow(pressure_row)
                     time += 0.001
+
+
+def process_google_sheet(
+    google_sheet,
+    run_args,
+    data_directory: str,
+    tips: List[int],
+    trials: int,
+    make_graph: bool = False,
+) -> None:
+    """Write results and graphs to google sheet."""
+    sheet_title = run_args.run_id
+    sheet_id = google_sheet.create_worksheet(run_args.run_id)
+    test_parameters = [
+        [
+            "Tester Name",
+            "Serial Number",
+            "Pipette Type",
+            "Tip Size",
+            "Z Speed (mm/s)",
+            "Plunger Speed (mm/s)",
+            "Threshold (pascal)",
+            "Direction",
+            "Target Height (mm)",
+        ]
+    ]
+    ## TODO: get test parameters
+    google_sheet.batch_update_cells(sheet_title, test_parameters, "A", 1)
+    target_height: int = 0
+    height: List = []
+    plunger_pos: List = []
+    tip_length_offset: List = []
+    adjusted_height: List = []
+    normalized_height = [
+        float(height) - float(target_height) for height in adjusted_height
+    ]
+    list_of_values = [
+        trials,
+        height,
+        plunger_pos,
+        tip_length_offset,
+        adjusted_height,
+        normalized_height,
+    ]
+    google_sheet.batch_update_cells(sheet_title, list_of_values, "A", 11)
+    # Find accuracy, precision, repeatability
+    accuracy = statistics.mean(normalized_height)
+    precision = max(normalized_height) - min(normalized_height) / 2
+    repeatability = 100 - (statistics.stdev(normalized_height) / len(height) * 100)
+    summary = [
+        ["Accuracy (mm)", "Precision (+/- mm)", "Repeatability (%)"],
+        [accuracy, precision, repeatability],
+    ]
+    google_sheet.batch_update_cells(sheet_title, summary, "D", 2)
+    # Write pressure to google sheet
+    pressure_data: List[List[int]]
+    time: List[int]
+    google_sheet.batch_update_cells(sheet_title, pressure_data, "J", 11)
+
+    # Create Graphs
+    # 1. Create pressure vs time graph zoomed out
+    # Determine where time values start
+    time_index = google_sheet.get_row_index_with_value("time", 1) - 1
+    titles = ["Pressure vs Time", "Time (s)", "Pressure (P)", ""]
+    axis = [
+        {"position": "BOTTOM_AXIS", "title": titles[1]},
+        {"position": "LEFT_AXIS", "title": titles[2]},
+        {"position": "RIGHT_AXIS", "title": titles[3]},
+    ]
+    # TODO: Create less hard coded zoom in
+
+    domains_pressure = [
+        {
+            "domain": {
+                "sourceRange": {
+                    "sources": [
+                        {
+                            "sheetId": sheet_id,
+                            "startRowIndex": 11,
+                            "endRowIndex": 1494,
+                            "startColumnIndex": 7,
+                            "endColumnIndex": 8,
+                        }
+                    ]
+                }
+            }
+        }
+    ]
+    series_pressure = [
+        {
+            "series": {
+                "sourceRange": {
+                    "sources": [
+                        {
+                            "sheetId": sheet_id,
+                            "startRowIndex": 11,
+                            "endRowIndex": 1494,
+                            "startColumnIndex": 9,
+                            "endColumnIndex": 10,
+                        }
+                    ]
+                }
+            },
+            "targetAxis": "LEFT_AXIS",
+        },
+        {
+            "series": {
+                "sourceRange": {
+                    "sources": [
+                        {
+                            "sheetId": sheet_id,
+                            "startRowIndex": 11,
+                            "endRowIndex": 1494,
+                            "startColumnIndex": 13,
+                            "endColumnIndex": 14,
+                        }
+                    ]
+                }
+            },
+            "targetAxis": "LEFT_AXIS",
+        },
+        {
+            "series": {
+                "sourceRange": {
+                    "sources": [
+                        {
+                            "sheetId": sheet_id,
+                            "startRowIndex": 11,
+                            "endRowIndex": 1494,
+                            "startColumnIndex": 17,
+                            "endColumnIndex": 18,
+                        }
+                    ]
+                }
+            },
+            "targetAxis": "LEFT_AXIS",
+        },
+        {
+            "series": {
+                "sourceRange": {
+                    "sources": [
+                        {
+                            "sheetId": sheet_id,
+                            "startRowIndex": 1,
+                            "endRowIndex": 1494,
+                            "startColumnIndex": 21,
+                            "endColumnIndex": 25,
+                        }
+                    ]
+                }
+            },
+            "targetAxis": "LEFT_AXIS",
+        },
+        {
+            "series": {
+                "sourceRange": {
+                    "sources": [
+                        {
+                            "sheetId": sheet_id,
+                            "startRowIndex": time_index,
+                            "endRowIndex": 1494,
+                            "startColumnIndex": 25,
+                            "endColumnIndex": 26,
+                        }
+                    ]
+                }
+            },
+            "targetAxis": "LEFT_AXIS",
+        },
+    ]
+    google_sheet.create_line_chart(
+        titles, series_pressure, domains_pressure, axis, 0, sheet_id
+    )
+    # Zoomed in pressure chart
+    # Determine where pressure changes
+    p1 = google_sheet.get_single_col_range("J" + str(time_index + 2) + ":J1400")
+    for x, y in zip(p1[0::], p1[1::]):
+        diff = float(y) - float(x)
+        if diff > 15:
+            big_change = google_sheet.get_row_index_with_value(str(y), 3)
+            break
+    time_cell = google_sheet.get_cell("A" + str(big_change))
+    axis_zoomed = [
+        {
+            "position": "BOTTOM_AXIS",
+            "title": titles[1],
+            "viewWindowOptions": {"viewWindowMin": float(time_cell) - 0.2},
+        },
+        {"position": "LEFT_AXIS", "title": titles[2]},
+        {"position": "RIGHT_AXIS", "title": titles[3]},
+    ]
+    titles_zoomed = ["Pressure vs Time Zoomed", "Time (s)", "Pressure (P)", ""]
+    google_sheet.create_line_chart(
+        titles_zoomed, series_pressure, domains_pressure, axis_zoomed, 7, sheet_id
+    )
+
+    # 2. Height vs Offset Comparison
+    axis = [
+        {"position": "BOTTOM_AXIS", "title": titles[1]},
+        {
+            "position": "LEFT_AXIS",
+            "title": titles[2],
+            "viewWindowOptions": {
+                "viewWindowMin": float(min(height)) - 1,
+                "viewWindowMax": float(max(height)) + 1,
+            },
+        },
+        {"position": "RIGHT_AXIS", "title": titles[3]},
+    ]
+    domain_trials = [
+        {
+            "domain": {
+                "sourceRange": {
+                    "sources": [
+                        {
+                            "sheetId": sheet_id,
+                            "startRowIndex": 10,
+                            "endRowIndex": 16,
+                            "startColumnIndex": 0,
+                            "endColumnIndex": 1,
+                        }
+                    ]
+                }
+            }
+        }
+    ]
+    series_offsets = [
+        {
+            "series": {
+                "sourceRange": {
+                    "sources": [
+                        {
+                            "sheetId": sheet_id,
+                            "startRowIndex": 10,
+                            "endRowIndex": 16,
+                            "startColumnIndex": 1,
+                            "endColumnIndex": 2,
+                        }
+                    ]
+                }
+            },
+            "targetAxis": "LEFT_AXIS",
+            "lineStyle": {"type": "MEDIUM_DASHED"},
+            "pointStyle": {"size": 5},
+        },
+        {
+            "series": {
+                "sourceRange": {
+                    "sources": [
+                        {
+                            "sheetId": sheet_id,
+                            "startRowIndex": 10,
+                            "endRowIndex": 16,
+                            "startColumnIndex": 3,
+                            "endColumnIndex": 4,
+                        }
+                    ]
+                }
+            },
+            "targetAxis": "RIGHT_AXIS",
+            "lineStyle": {"type": "MEDIUM_DASHED"},
+            "pointStyle": {"size": 5},
+        },
+    ]
+    titles = [
+        "Height & Offset Comparison",
+        "Trials",
+        "Measured Height (mm)",
+        "Tip Length Offset (mm)",
+    ]
+    google_sheet.create_line_chart(
+        titles, series_offsets, domain_trials, axis, 14, sheet_id
+    )
+
+    # 3. Liquid Level Detection
+    lld_titles = ["Liquid Level Detection", "Trials", "Normalized Height", ""]
+    series_normalized_height = [
+        {
+            "series": {
+                "sourceRange": {
+                    "sources": [
+                        {
+                            "sheetId": sheet_id,
+                            "startRowIndex": 10,
+                            "endRowIndex": 16,
+                            "startColumnIndex": 5,
+                            "endColumnIndex": 6,
+                        }
+                    ]
+                }
+            },
+            "targetAxis": "LEFT_AXIS",
+            "lineStyle": {"type": "MEDIUM_DASHED"},
+            "pointStyle": {"size": 5},
+        }
+    ]
+    normalized_axis = [
+        {"position": "BOTTOM_AXIS", "title": titles[1]},
+        {
+            "position": "LEFT_AXIS",
+            "title": titles[2],
+            "viewWindowOptions": {
+                "viewWindowMin": float(min(normalized_height)) - 0.5,
+                "viewWindowMax": float(max(normalized_height)) + 0.5,
+            },
+        },
+        {"position": "RIGHT_AXIS", "title": titles[3]},
+    ]
+    google_sheet.create_line_chart(
+        lld_titles,
+        series_normalized_height,
+        domain_trials,
+        normalized_axis,
+        21,
+        sheet_id,
+    )
 
 
 if __name__ == "__main__":

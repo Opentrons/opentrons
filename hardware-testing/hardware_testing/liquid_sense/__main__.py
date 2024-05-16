@@ -8,6 +8,7 @@ from time import sleep
 import os
 from typing import List, Any, Optional
 import traceback
+import sys
 
 from hardware_testing.opentrons_api import helpers_ot3
 from hardware_testing.gravimetric import helpers, workarounds
@@ -274,8 +275,20 @@ if __name__ == "__main__":
     parser.add_argument("--ignore-dial", action="store_true")
     parser.add_argument("--trials-before-jog", type=int, default=10)
     parser.add_argument("--multi-passes", type=int, default=1)
+    parser.add_argument("--google-sheet-name", type=str, default="LLD-Shared-Data")
 
     args = parser.parse_args()
+    # Connect to google sheet
+    try:
+        sys.path.insert(0, "/var/lib/jupyter/notebooks")
+        import google_sheets_tool  # type: ignore[import]
+
+        credentials_path = "/var/lib/jupyter/notebooks/abr.json"
+    except ImportError:
+        raise ImportError(
+            "Run on robot. Make sure google_sheets_tool.py is in jupyter notebook."
+        )
+    print(os.path.exists(credentials_path))
     assert (
         0.0 < args.probe_seconds_before_contact <= MAX_PROBE_SECONDS
     ), f"'--probe-seconds-before-contact' must be between 0.0-{MAX_PROBE_SECONDS}"
