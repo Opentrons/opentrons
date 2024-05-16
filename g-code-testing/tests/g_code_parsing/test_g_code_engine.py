@@ -1,7 +1,7 @@
 import pytest
 import os
 
-from opentrons import APIVersion
+from opentrons.protocols.api_support.types import APIVersion
 
 from g_code_parsing.g_code_engine import GCodeEngine
 from g_code_parsing.g_code_program.supported_text_modes import (

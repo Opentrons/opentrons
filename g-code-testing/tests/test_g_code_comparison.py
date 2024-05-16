@@ -1,5 +1,5 @@
 import pytest
-from opentrons import APIVersion
+from opentrons.protocols.api_support.types import APIVersion
 
 from g_code_parsing.g_code_differ import GCodeDiffer
 from g_code_test_data.g_code_configuration import ProtocolGCodeConfirmConfig

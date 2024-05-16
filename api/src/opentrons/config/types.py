@@ -1,8 +1,11 @@
 from enum import Enum
 from dataclasses import dataclass, asdict, fields
-from typing import Dict, Tuple, TypeVar, Generic, List, cast, Optional
+from typing import Dict, Tuple, TypeVar, Generic, List, cast, Optional, TYPE_CHECKING
 from typing_extensions import TypedDict, Literal
-from opentrons.hardware_control.types import OT3AxisKind, InstrumentProbeType
+
+if TYPE_CHECKING:
+    # Work around circular import.
+    from opentrons.hardware_control.types import OT3AxisKind, InstrumentProbeType
 
 
 class AxisDict(TypedDict):
@@ -31,7 +34,7 @@ class ByGantryLoad(Generic[Vt]):
         return cast(Vt, asdict(self)[key.value])
 
 
-PerPipetteAxisSettings = ByGantryLoad[Dict[OT3AxisKind, float]]
+PerPipetteAxisSettings = ByGantryLoad[Dict["OT3AxisKind", float]]
 
 
 class CurrentDictDefault(TypedDict):
@@ -82,7 +85,7 @@ class OT3MotionSettings:
 
     def by_gantry_load(
         self, gantry_load: GantryLoad
-    ) -> Dict[str, Dict[OT3AxisKind, float]]:
+    ) -> Dict[str, Dict["OT3AxisKind", float]]:
         return dict(
             (field.name, getattr(self, field.name)[gantry_load])
             for field in fields(self)
@@ -96,7 +99,7 @@ class OT3CurrentSettings:
 
     def by_gantry_load(
         self, gantry_load: GantryLoad
-    ) -> Dict[str, Dict[OT3AxisKind, float]]:
+    ) -> Dict[str, Dict["OT3AxisKind", float]]:
         return dict(
             (field.name, getattr(self, field.name)[gantry_load])
             for field in fields(self)
@@ -140,6 +143,7 @@ class LiquidProbeSettings:
     num_baseline_reads: int
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
     data_files: Optional[Dict[InstrumentProbeType, str]]
 =======
     data_file: Optional[str]
@@ -147,6 +151,9 @@ class LiquidProbeSettings:
 =======
     data_files: Optional[Dict[InstrumentProbeType, str]]
 >>>>>>> b3b65dfc27 (feat(hardware-testing): enable multi sensor processing in liquid probe (#14883))
+=======
+    data_files: Optional[Dict["InstrumentProbeType", str]]
+>>>>>>> bc32d40b51 (refactor(api): Move opentrons.initialize() to its own file (#15191))
 
 
 @dataclass(frozen=True)

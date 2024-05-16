@@ -1,4 +1,4 @@
-from opentrons import APIVersion
+from opentrons.protocols.api_support.types import APIVersion
 
 from opentrons.hardware_control.emulation.settings import (
     Settings,
