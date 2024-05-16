@@ -24,44 +24,50 @@ export function SelectionRect(props: SelectionRectProps): JSX.Element {
     }
   }
 
-  const handleDrag = (e: TouchEvent | MouseEvent): void => {
-    let xDynamic: number
-    let yDynamic: number
-    if (e instanceof TouchEvent) {
-      const touch = e.touches[0]
-      xDynamic = touch.clientX
-      yDynamic = touch.clientY
-    } else {
-      xDynamic = e.clientX
-      yDynamic = e.clientY
-    }
-    setPositions(prevPositions => {
-      if (prevPositions) {
-        const nextRect = {
-          ...prevPositions,
-          xDynamic,
-          yDynamic,
-        }
-        const rect = getRect(nextRect)
-        onSelectionMove && onSelectionMove(rect)
-
-        return nextRect
+  const handleDrag = React.useCallback(
+    (e: TouchEvent | MouseEvent): void => {
+      let xDynamic: number
+      let yDynamic: number
+      if (e instanceof TouchEvent) {
+        const touch = e.touches[0]
+        xDynamic = touch.clientX
+        yDynamic = touch.clientY
+      } else {
+        xDynamic = e.clientX
+        yDynamic = e.clientY
       }
-      return prevPositions
-    })
-  }
+      setPositions(prevPositions => {
+        if (prevPositions != null) {
+          const nextRect = {
+            ...prevPositions,
+            xDynamic,
+            yDynamic,
+          }
+          const rect = getRect(nextRect)
+          onSelectionMove != null && onSelectionMove(rect)
 
-  const handleDragEnd = (e: TouchEvent | MouseEvent): void => {
-    if (!(e instanceof TouchEvent) && !(e instanceof MouseEvent)) {
-      return
-    }
-    const finalRect = positions && getRect(positions)
-    setPositions(prevPositions => {
-      return prevPositions === positions ? null : prevPositions
-    })
-    // call onSelectionDone callback with {x0, x1, y0, y1} of final selection rectangle
-    onSelectionDone && finalRect && onSelectionDone(finalRect)
-  }
+          return nextRect
+        }
+        return prevPositions
+      })
+    },
+    [onSelectionMove]
+  )
+
+  const handleDragEnd = React.useCallback(
+    (e: TouchEvent | MouseEvent): void => {
+      if (!(e instanceof TouchEvent) && !(e instanceof MouseEvent)) {
+        return
+      }
+      const finalRect = positions != null ? getRect(positions) : null
+      setPositions(prevPositions => {
+        return prevPositions === positions ? null : prevPositions
+      })
+      // call onSelectionDone callback with {x0, x1, y0, y1} of final selection rectangle
+      onSelectionDone != null && finalRect != null && onSelectionDone(finalRect)
+    },
+    [onSelectionDone, positions]
+  )
 
   const handleTouchStart: React.TouchEventHandler = e => {
     const touch = e.touches[0]
