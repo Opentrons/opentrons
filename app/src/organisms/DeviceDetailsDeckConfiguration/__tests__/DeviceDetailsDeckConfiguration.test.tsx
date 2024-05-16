@@ -153,7 +153,7 @@ describe('DeviceDetailsDeckConfiguration', () => {
   it('should render no deck fixtures, if deck configs are not set', () => {
     vi.mocked(useNotifyDeckConfigurationQuery).mockReturnValue({
       data: [],
-    } as UseQueryResult<DeckConfiguration>)
+    } as any)
     render(props)
     screen.getByText('No deck fixtures')
   })
