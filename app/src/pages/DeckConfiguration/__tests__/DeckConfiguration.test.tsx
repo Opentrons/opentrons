@@ -77,7 +77,7 @@ describe('DeckConfigurationEditor', () => {
     render()
     screen.getByText('Deck configuration')
     screen.getByText('Setup Instructions')
-    screen.getByText('Confirm')
+    screen.getByText('Save')
     expect(vi.mocked(DeckConfigurator)).toHaveBeenCalled()
   })
 
@@ -85,27 +85,5 @@ describe('DeckConfigurationEditor', () => {
     render()
     fireEvent.click(screen.getByText('Setup Instructions'))
     expect(vi.mocked(DeckFixtureSetupInstructionsModal)).toHaveBeenCalled()
-  })
-
-  it('should call a mock function when tapping confirm', () => {
-    // (kk:10/26/2023)
-    // Once get approval, I will be able to update this case
-    // render()
-    // screen.getByText('Confirm').click()
-    // expect(mockUpdateDeckConfiguration).toHaveBeenCalled()
-  })
-
-  it('should call a mock function when tapping back button if there is no change', () => {
-    render()
-    fireEvent.click(screen.getByTestId('ChildNavigation_Back_Button'))
-    expect(mockGoBack).toHaveBeenCalled()
-  })
-
-  it('should render modal when tapping back button if there is a change', () => {
-    // (kk:10/26/2023)
-    // Once get approval, I will be able to update this case
-    // render()
-    // screen.getByTestId('ChildNavigation_Back_Button').click()
-    // expect(mockGoBack).toHaveBeenCalled()
   })
 })

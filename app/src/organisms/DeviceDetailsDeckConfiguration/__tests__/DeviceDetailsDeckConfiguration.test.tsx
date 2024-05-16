@@ -16,10 +16,10 @@ import { DeckFixtureSetupInstructionsModal } from '../DeckFixtureSetupInstructio
 import { useIsEstopNotDisengaged } from '../../../resources/devices/hooks/useIsEstopNotDisengaged'
 import { DeviceDetailsDeckConfiguration } from '../'
 import { useNotifyCurrentMaintenanceRun } from '../../../resources/maintenance_runs'
-import { useNotifyDeckConfigurationQuery } from '../../../resources/deck_configuration'
 
 import type { MaintenanceRun } from '@opentrons/api-client'
 import type * as OpentronsComponents from '@opentrons/components'
+import type * as DeckConfigResources from '../../../resources/deck_configuration'
 
 vi.mock('@opentrons/components', async importOriginal => {
   const actual = await importOriginal<typeof OpentronsComponents>()
@@ -33,7 +33,15 @@ vi.mock('../DeckFixtureSetupInstructionsModal')
 vi.mock('../../Devices/hooks')
 vi.mock('../../../resources/maintenance_runs')
 vi.mock('../../../resources/devices/hooks/useIsEstopNotDisengaged')
-vi.mock('../../../resources/deck_configuration')
+vi.mock('../../../resources/deck_configuration', async importOriginal => {
+  const actual = await importOriginal<typeof DeckConfigResources>()
+  return {
+    ...actual,
+    useNotifyDeckConfigurationQuery: vi
+      .fn()
+      .mockReturnValue({ data: [] } as any),
+  }
+})
 
 const ROBOT_NAME = 'otie'
 const mockUpdateDeckConfiguration = vi.fn()
@@ -63,9 +71,6 @@ describe('DeviceDetailsDeckConfiguration', () => {
       robotName: ROBOT_NAME,
     }
     vi.mocked(useModulesQuery).mockReturnValue({ data: { data: [] } } as any)
-    vi.mocked(useNotifyDeckConfigurationQuery).mockReturnValue({
-      data: [],
-    } as any)
     vi.mocked(useUpdateDeckConfigurationMutation).mockReturnValue({
       updateDeckConfiguration: mockUpdateDeckConfiguration,
     } as any)
@@ -132,7 +137,6 @@ describe('DeviceDetailsDeckConfiguration', () => {
   })
 
   it('should render no deck fixtures, if deck configs are not set', () => {
-    vi.mocked(useNotifyDeckConfigurationQuery).mockReturnValue([] as any)
     render(props)
     screen.getByText('No deck fixtures')
   })

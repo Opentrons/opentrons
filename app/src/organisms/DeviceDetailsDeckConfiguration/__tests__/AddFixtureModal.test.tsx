@@ -25,7 +25,6 @@ vi.mock('../../../resources/deck_configuration')
 
 const mockCloseModal = vi.fn()
 const mockUpdateDeckConfiguration = vi.fn()
-const mockSetCurrentDeckConfig = vi.fn()
 
 const render = (props: React.ComponentProps<typeof AddFixtureModal>) => {
   return renderWithProviders(<AddFixtureModal {...props} />, {
@@ -68,7 +67,6 @@ describe('Touchscreen AddFixtureModal', () => {
     render(props)
     fireEvent.click(screen.getAllByText('Select options')[1])
     fireEvent.click(screen.getAllByText('Add')[0])
-    expect(mockSetCurrentDeckConfig).toHaveBeenCalled()
   })
 
   it('when fixture options are provided, should only render those options', () => {

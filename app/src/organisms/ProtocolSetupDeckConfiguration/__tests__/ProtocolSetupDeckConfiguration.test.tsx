@@ -88,7 +88,7 @@ describe('ProtocolSetupDeckConfiguration', () => {
     render(props)
     screen.getByText('Deck configuration')
     screen.getByText('mock BaseDeck')
-    screen.getByText('Confirm')
+    screen.getByText('Save')
   })
 
   it('should call a mock function when tapping the back button', () => {
@@ -99,7 +99,7 @@ describe('ProtocolSetupDeckConfiguration', () => {
 
   it('should call a mock function when tapping confirm button', () => {
     render(props)
-    fireEvent.click(screen.getByText('Confirm'))
+    fireEvent.click(screen.getByText('Save'))
     expect(mockUpdateDeckConfiguration).toHaveBeenCalled()
   })
 })
