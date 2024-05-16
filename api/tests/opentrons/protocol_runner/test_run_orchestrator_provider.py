@@ -1,3 +1,4 @@
+"""Tests for the RunOrchestrator."""
 import pytest
 from pytest_lazyfixture import lazy_fixture  # type: ignore[import-untyped]
 from decoy import Decoy
@@ -61,6 +62,7 @@ def json_protocol_subject(
     mock_fixit_runner: LiveRunner,
     mock_setup_runner: LiveRunner,
 ) -> RunOrchestrator:
+    """Get a RunOrchestrator subject with a json runner."""
     return RunOrchestrator(
         protocol_engine=mock_protocol_engine,
         hardware_api=mock_hardware_api,
@@ -78,6 +80,7 @@ def python_protocol_subject(
     mock_fixit_runner: LiveRunner,
     mock_setup_runner: LiveRunner,
 ) -> RunOrchestrator:
+    """Get a RunOrchestrator subject with a python runner."""
     return RunOrchestrator(
         protocol_engine=mock_protocol_engine,
         hardware_api=mock_hardware_api,
@@ -115,6 +118,7 @@ def test_build_run_orchestrator_provider(
     mock_fixit_runner: LiveRunner,
     mock_protocol_runner: Optional[Union[PythonAndLegacyRunner, JsonRunner]],
 ) -> None:
+    """Should get a RunOrchestrator instance."""
     mock_create_runner_func = decoy.mock(func=protocol_runner.create_protocol_runner)
     monkeypatch.setattr(
         protocol_runner, "create_protocol_runner", mock_create_runner_func

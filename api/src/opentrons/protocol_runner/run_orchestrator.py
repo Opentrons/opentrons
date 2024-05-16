@@ -1,3 +1,4 @@
+"""Engine/Runner provider."""
 from __future__ import annotations
 from typing import Optional, Union, cast
 
@@ -9,6 +10,8 @@ from ..protocol_reader import JsonProtocolConfig, PythonProtocolConfig
 
 
 class RunOrchestrator:
+    """Provider for runners and associated protocol engine."""
+
     _protocol_runner: Optional[
         Union[protocol_runner.JsonRunner, protocol_runner.PythonAndLegacyRunner, None]
     ]
@@ -27,7 +30,7 @@ class RunOrchestrator:
             Union[protocol_runner.PythonAndLegacyRunner, protocol_runner.JsonRunner]
         ] = None,
         run_id: Optional[str] = None,
-    ):
+    ) -> None:
         self.run_id = run_id
         self._protocol_engine = protocol_engine
         self._hardware_api = hardware_api
@@ -57,6 +60,7 @@ class RunOrchestrator:
         drop_tips_after_run: bool = True,
         run_id: Optional[str] = None,
     ) -> "RunOrchestrator":
+        """Build a RunOrchestrator provider."""
         setup_runner = protocol_runner.LiveRunner(
             protocol_engine=protocol_engine,
             hardware_api=hardware_api,
