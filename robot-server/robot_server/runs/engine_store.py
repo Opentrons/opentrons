@@ -127,14 +127,14 @@ class EngineStore:
         """Get the "current" persisted ProtocolEngine."""
         if self._run_orchestrator is None:
             raise NoRunnerEnginePairError()
-        return self._run_orchestrator.get_protocol_engine()
+        return self._run_orchestrator.engine
 
     @property
     def runner(self) -> AnyRunner:
         """Get the "current" persisted ProtocolRunner."""
         if self._run_orchestrator is None:
             raise NoRunnerEnginePairError()
-        return self._run_orchestrator.get_protocol_runner()
+        return self._run_orchestrator.runner
 
     @property
     def current_run_id(self) -> Optional[str]:

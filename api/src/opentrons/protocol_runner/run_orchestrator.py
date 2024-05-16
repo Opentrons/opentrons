@@ -1,7 +1,7 @@
 from __future__ import annotations
 from typing import Optional, Union
 
-from . import protocol_runner
+from . import protocol_runner, AnyRunner
 from ..hardware_control import HardwareControlAPI
 from ..protocol_engine import ProtocolEngine
 from ..protocol_engine.types import PostRunHardwareState
@@ -30,6 +30,16 @@ class RunOrchestrator:
         self._json_or_python_runner = json_or_python_protocol_runner
         self._setup_runner = setup_runner
         self._fixit_runner = fixit_runner
+
+    @property
+    def engine(self) -> ProtocolEngine:
+        """Get the "current" persisted ProtocolEngine."""
+        return self._protocol_engine
+
+    @property
+    def runner(self) -> AnyRunner:
+        """Get the "current" persisted ProtocolRunner."""
+        return self._json_or_python_runner or self._setup_runner
 
     @classmethod
     def build_orchestrator(
@@ -73,8 +83,8 @@ class RunOrchestrator:
             protocol_engine=protocol_engine,
         )
 
-    def get_protocol_runner(self) -> protocol_runner.AnyRunner:
-        return self._json_or_python_runner or self._setup_runner
-
-    def get_protocol_engine(self) -> ProtocolEngine:
-        return self._protocol_engine
+    # def get_protocol_runner(self) -> protocol_runner.AnyRunner:
+    #     return self._json_or_python_runner or self._setup_runner
+    #
+    # def get_protocol_engine(self) -> ProtocolEngine:
+    #     return self._protocol_engine
