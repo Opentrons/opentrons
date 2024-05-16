@@ -17,7 +17,7 @@ import {
 import { SendButton } from '../../atoms/SendButton'
 import { preparedPromptAtom, chatDataAtom } from '../../resources/atoms'
 import { useApiCall, useGetAccessToken } from '../../resources/hooks'
-import { calcTextAreaHeight } from '../../resources/utils/utils'
+import { calcTextAreaHeight, isLocalhost } from '../../resources/utils/utils'
 import { END_POINT } from '../../resources/constants'
 
 import type { AxiosRequestConfig } from 'axios'
@@ -63,7 +63,7 @@ export function InputPrompt(): JSX.Element {
           message: userPrompt,
           fake: false,
         },
-        withCredentials: true,
+        withCredentials: isLocalhost(),
       }
       console.log('called')
       await fetchData(config as AxiosRequestConfig)

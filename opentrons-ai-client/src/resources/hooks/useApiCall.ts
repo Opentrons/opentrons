@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import axios from 'axios'
+import { isLocalhost } from '../utils/utils'
 
 import type { AxiosRequestConfig } from 'axios'
 
@@ -28,7 +29,7 @@ export const useApiCall = <T>(): UseApiCallResult<T> => {
     try {
       const response = await axios.request<T>({
         ...config,
-        withCredentials: true,
+        withCredentials: isLocalhost(),
       })
       console.log(response)
       setData(response.data)
