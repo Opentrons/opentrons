@@ -10,6 +10,7 @@ import {
   StyledText,
 } from '@opentrons/components'
 
+// Note (kk:05/15/2024) There is no test for this since this is a temporary component
 export function Loading(): JSX.Element {
   const { t } = useTranslation('protocol_generator')
   return (
