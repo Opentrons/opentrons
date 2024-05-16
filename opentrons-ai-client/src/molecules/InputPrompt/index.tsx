@@ -38,7 +38,7 @@ export function InputPrompt(): JSX.Element {
   const [, setChatData] = useAtom(chatDataAtom)
   const [submitted, setSubmitted] = React.useState<boolean>(false)
   const userPrompt = watch('userPrompt') ?? ''
-  const { data, error, isLoading, fetchData } = useApiCall()
+  const { data, isLoading, fetchData } = useApiCall()
   const { getAccessToken } = useGetAccessToken()
 
   const handleClick = async (): Promise<void> => {
