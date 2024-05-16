@@ -42,7 +42,10 @@ import { ProgressBar } from '../../atoms/ProgressBar'
 import { useDownloadRunLog, useRobotType } from '../Devices/hooks'
 import { InterventionTicks } from './InterventionTicks'
 import { isInterventionCommand } from '../InterventionModal/utils'
-import { useNotifyRunQuery } from '../../resources/runs'
+import {
+  useNotifyLastRunCommand,
+  useNotifyRunQuery,
+} from '../../resources/runs'
 
 import type { RunStatus } from '@opentrons/api-client'
 
@@ -79,7 +82,7 @@ export function RunProgressMeter(props: RunProgressMeterProps): JSX.Element {
     pageLength: 1,
   })
   const analysisCommands = analysis?.commands ?? []
-  const lastRunCommand = allCommandsQueryData?.data[0] ?? null
+  const lastRunCommand = useNotifyLastRunCommand(runId)
   const runCommandsLength = allCommandsQueryData?.meta.totalLength
 
   const downloadIsDisabled =
