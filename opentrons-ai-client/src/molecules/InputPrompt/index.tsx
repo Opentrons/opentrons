@@ -37,15 +37,7 @@ export function InputPrompt(): JSX.Element {
   const [preparedPrompt] = useAtom(preparedPromptAtom)
   const [, setChatData] = useAtom(chatDataAtom)
   const [submitted, setSubmitted] = React.useState<boolean>(false)
-
-  // const [data, setData] = React.useState<any>(null)
-  // const [loading, setLoading] = React.useState<boolean>(false)
-
-  // ToDo (kk:05/15/2024) this will be used in the future
-  // const [error, setError] = React.useState<string>('')
-
   const userPrompt = watch('userPrompt') ?? ''
-
   const { data, error, isLoading, fetchData } = useApiCall()
   const { getAccessToken } = useGetAccessToken()
 
