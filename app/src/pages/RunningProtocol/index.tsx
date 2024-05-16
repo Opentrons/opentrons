@@ -25,6 +25,7 @@ import {
   RUN_STATUS_STOP_REQUESTED,
   RUN_STATUS_BLOCKED_BY_OPEN_DOOR,
   RUN_STATUS_AWAITING_RECOVERY,
+  RUN_STATUS_FINISHING,
 } from '@opentrons/api-client'
 
 import { useFeatureFlag } from '../../redux/config'
@@ -203,7 +204,8 @@ export function RunningProtocol(): JSX.Element {
             {interventionModalCommandKey != null &&
             runRecord?.data != null &&
             lastRunCommand != null &&
-            isInterventionCommand(lastRunCommand) ? (
+            isInterventionCommand(lastRunCommand) &&
+            runStatus !== RUN_STATUS_FINISHING ? (
               <InterventionModal
                 robotName={robotName}
                 command={lastRunCommand}
