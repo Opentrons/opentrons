@@ -8,3 +8,16 @@ export const calcTextAreaHeight = (input: string): number => {
   const rowsNum = input.split('\n').length
   return rowsNum
 }
+
+/**
+ * Checks if the current URL is localhost.
+ * @returns {boolean} - Returns true if the hostname is 'localhost', '127.0.0.1', or starts with '192.168.'.
+ */
+
+export const isLocalhost = (): boolean => {
+  const host = window.location.hostname
+  console.log('host', host)
+  return (
+    host === 'localhost' || host === '127.0.0.1' || host.startsWith('192.168.')
+  )
+}
