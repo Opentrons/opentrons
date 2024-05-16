@@ -5,7 +5,7 @@ import pytest
 from pytest_lazyfixture import lazy_fixture  # type: ignore[import-untyped]
 from decoy import Decoy, matchers
 from pathlib import Path
-from typing import List, cast, Optional, Union, Type
+from typing import List, cast, Union, Type
 
 from opentrons_shared_data.labware.labware_definition import LabwareDefinition
 from opentrons_shared_data.protocol.models import ProtocolSchemaV6, ProtocolSchemaV7
@@ -173,7 +173,6 @@ def live_runner_subject(
         (PythonProtocolConfig(api_version=APIVersion(2, 14)), PythonAndLegacyRunner),
         (JsonProtocolConfig(schema_version=5), PythonAndLegacyRunner),
         (PythonProtocolConfig(api_version=APIVersion(2, 13)), PythonAndLegacyRunner),
-        (None, LiveRunner),
     ],
 )
 def test_create_protocol_runner(
@@ -185,7 +184,7 @@ def test_create_protocol_runner(
     legacy_file_reader: LegacyFileReader,
     legacy_context_creator: LegacyContextCreator,
     legacy_executor: LegacyExecutor,
-    config: Optional[Union[JsonProtocolConfig, PythonProtocolConfig]],
+    config: Union[JsonProtocolConfig, PythonProtocolConfig],
     runner_type: Type[AnyRunner],
 ) -> None:
     """It should return protocol runner type depending on the config."""

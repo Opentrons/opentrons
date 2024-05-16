@@ -1,6 +1,6 @@
 """Engine/Runner provider."""
 from __future__ import annotations
-from typing import Optional, Union, cast
+from typing import Optional, Union
 
 from . import protocol_runner, AnyRunner
 from ..hardware_control import HardwareControlAPI
@@ -75,17 +75,12 @@ class RunOrchestrator:
         )
         json_or_python_runner = None
         if protocol_config:
-            json_or_python_runner = cast(  # or we can use type ignore
-                Union[
-                    protocol_runner.JsonRunner, protocol_runner.PythonAndLegacyRunner
-                ],
-                protocol_runner.create_protocol_runner(
-                    protocol_config=protocol_config,
-                    protocol_engine=protocol_engine,
-                    hardware_api=hardware_api,
-                    post_run_hardware_state=post_run_hardware_state,
-                    drop_tips_after_run=drop_tips_after_run,
-                ),
+            json_or_python_runner = protocol_runner.create_protocol_runner(
+                protocol_config=protocol_config,
+                protocol_engine=protocol_engine,
+                hardware_api=hardware_api,
+                post_run_hardware_state=post_run_hardware_state,
+                drop_tips_after_run=drop_tips_after_run,
             )
         return cls(
             run_id=run_id,

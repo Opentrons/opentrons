@@ -2,7 +2,7 @@
 import pytest
 from pytest_lazyfixture import lazy_fixture  # type: ignore[import-untyped]
 from decoy import Decoy
-from typing import Union, Optional
+from typing import Union
 
 from opentrons.protocols.api_support.types import APIVersion
 from opentrons.protocol_engine import ProtocolEngine
@@ -103,8 +103,6 @@ def python_protocol_subject(
             lazy_fixture("mock_protocol_python_runner"),
             lazy_fixture("python_protocol_subject"),
         ),
-        (None, None, lazy_fixture("python_protocol_subject")),
-        (None, None, lazy_fixture("json_protocol_subject")),
     ],
 )
 def test_build_run_orchestrator_provider(
@@ -113,10 +111,10 @@ def test_build_run_orchestrator_provider(
     subject: RunOrchestrator,
     mock_protocol_engine: ProtocolEngine,
     mock_hardware_api: HardwareAPI,
-    input_protocol_config: Optional[Union[PythonProtocolConfig, JsonProtocolConfig]],
+    input_protocol_config: Union[PythonProtocolConfig, JsonProtocolConfig],
     mock_setup_runner: LiveRunner,
     mock_fixit_runner: LiveRunner,
-    mock_protocol_runner: Optional[Union[PythonAndLegacyRunner, JsonRunner]],
+    mock_protocol_runner: Union[PythonAndLegacyRunner, JsonRunner],
 ) -> None:
     """Should get a RunOrchestrator instance."""
     mock_create_runner_func = decoy.mock(func=protocol_runner.create_protocol_runner)
@@ -126,31 +124,13 @@ def test_build_run_orchestrator_provider(
 
     decoy.when(
         mock_create_runner_func(
-            protocol_engine=mock_protocol_engine,
-            hardware_api=mock_hardware_api,
-            post_run_hardware_state=PostRunHardwareState.HOME_AND_STAY_ENGAGED,
-            drop_tips_after_run=True,
-        )
-    ).then_return(mock_setup_runner)
-
-    decoy.when(
-        mock_create_runner_func(
-            protocol_engine=mock_protocol_engine,
-            hardware_api=mock_hardware_api,
-            post_run_hardware_state=PostRunHardwareState.HOME_AND_STAY_ENGAGED,
-            drop_tips_after_run=True,
-        )
-    ).then_return(mock_fixit_runner)
-
-    decoy.when(
-        mock_create_runner_func(
             protocol_config=input_protocol_config,
             protocol_engine=mock_protocol_engine,
             hardware_api=mock_hardware_api,
             post_run_hardware_state=PostRunHardwareState.HOME_AND_STAY_ENGAGED,
             drop_tips_after_run=True,
         )
-    ).then_return(mock_fixit_runner)
+    ).then_return(mock_protocol_runner)
 
     result = subject.build_orchestrator(
         protocol_engine=mock_protocol_engine,
@@ -159,3 +139,5 @@ def test_build_run_orchestrator_provider(
     )
 
     assert isinstance(result, RunOrchestrator)
+    assert isinstance(result._setup_runner, LiveRunner)
+    assert isinstance(result._fixit_runner, LiveRunner)
