@@ -16,7 +16,8 @@
       "step-generation",
       "api-client",
       "react-api-client",
-      "usb-bridge/node-client"
+      "usb-bridge/node-client",
+      "opentrons-ai-client"
     ]
   },
   "config": {
