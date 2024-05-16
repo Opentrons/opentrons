@@ -24,14 +24,23 @@ export function SelectionRect(props: SelectionRectProps): JSX.Element {
     }
   }
 
-  const handleDrag = (e: TouchEvent): void => {
-    const touch = e.touches[0]
+  const handleDrag = (e: TouchEvent | MouseEvent): void => {
+    let xDynamic: number
+    let yDynamic: number
+    if (e instanceof TouchEvent) {
+      const touch = e.touches[0]
+      xDynamic = touch.clientX
+      yDynamic = touch.clientY
+    } else {
+      xDynamic = e.clientX
+      yDynamic = e.clientY
+    }
     setPositions(prevPositions => {
       if (prevPositions) {
         const nextRect = {
           ...prevPositions,
-          xDynamic: touch.clientX,
-          yDynamic: touch.clientY,
+          xDynamic,
+          yDynamic,
         }
         const rect = getRect(nextRect)
         onSelectionMove && onSelectionMove(rect)
@@ -42,8 +51,8 @@ export function SelectionRect(props: SelectionRectProps): JSX.Element {
     })
   }
 
-  const handleTouchEnd = (e: TouchEvent): void => {
-    if (!(e instanceof TouchEvent)) {
+  const handleDragEnd = (e: TouchEvent | MouseEvent): void => {
+    if (!(e instanceof TouchEvent) && !(e instanceof MouseEvent)) {
       return
     }
     const finalRect = positions && getRect(positions)
@@ -64,18 +73,32 @@ export function SelectionRect(props: SelectionRectProps): JSX.Element {
     })
   }
 
+  const handleMouseDown: React.MouseEventHandler = e => {
+    setPositions({
+      xStart: e.clientX,
+      xDynamic: e.clientX,
+      yStart: e.clientY,
+      yDynamic: e.clientY,
+    })
+  }
+
   React.useEffect(() => {
     document.addEventListener('touchmove', handleDrag)
-    document.addEventListener('touchend', handleTouchEnd)
+    document.addEventListener('touchend', handleDragEnd)
+    document.addEventListener('mousemove', handleDrag)
+    document.addEventListener('mouseup', handleDragEnd)
     return () => {
       document.removeEventListener('touchmove', handleDrag)
-      document.removeEventListener('touchend', handleTouchEnd)
+      document.removeEventListener('touchend', handleDragEnd)
+      document.removeEventListener('mousemove', handleDrag)
+      document.removeEventListener('mouseup', handleDragEnd)
     }
-  }, [handleDrag, handleTouchEnd])
+  }, [handleDrag, handleDragEnd])
 
   return (
     <div
-      // add mouse event for local development
+      // mouse events to enable local development
+      onMouseDown={handleMouseDown}
       onTouchStart={handleTouchStart}
       ref={ref => {
         parentRef.current = ref
