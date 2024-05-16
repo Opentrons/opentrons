@@ -33,6 +33,7 @@ def build_arg_parser():
     arg_parser = argparse.ArgumentParser(description='OT-3 8-Channel Partial Tip Pick-up Test')
     arg_parser.add_argument('-m', '--mount', choices=['left','right'], required=False, help='Sets the pipette mount', default='left')
     arg_parser.add_argument('-l', '--channels', choices=['1CH','8CH'], required=False, help='Sets the pipette number of channels', default='8CH')
+    arg_parser.add_argument('-d', '--direction', choices=['front','rear'], required=False, help='Sets the pipette nozzles direction', default='front')
     arg_parser.add_argument('-p', '--pipette', choices=['P50','P1K'], required=False, help='Sets the pipette type', default='P1K')
     arg_parser.add_argument('-i', '--tip_size', choices=['T50','T200','T1K'], required=False, help='Sets tip size', default='T1K')
     arg_parser.add_argument('-n', '--tip_num', type=int, required=False, help='Sets the number of tips', default=8)
@@ -52,13 +53,14 @@ def build_arg_parser():
 
 class Eight_Channel_Partial_Pickup_Test:
     def __init__(
-        self, simulate: bool, calibrate: bool, concentricity: bool, cycles: int, channels: str, pipette: str, tip_num: int, gauge_slot: str, tiprack_slot: str, trough_slot: str, trash_slot: str, feel_slot: str, center_slot: str, tip_size: str, volume: float, liquid_offset: float
+        self, simulate: bool, calibrate: bool, concentricity: bool, cycles: int, channels: str, direction: str, pipette: str, tip_num: int, gauge_slot: str, tiprack_slot: str, trough_slot: str, trash_slot: str, feel_slot: str, center_slot: str, tip_size: str, volume: float, liquid_offset: float
     ) -> None:
         self.simulate = simulate
         self.calibrate = calibrate
         self.concentricity = concentricity
         self.cycles = cycles
         self.channels = channels
+        self.direction = direction
         self.pipette = pipette
         self.tip_num = tip_num
         self.tip_size = tip_size
@@ -128,9 +130,12 @@ class Eight_Channel_Partial_Pickup_Test:
             "T50":57.9,
         }
         if self.channels == "8CH":
-            self.nozzles = [i+"1" for i in reversed(list(string.ascii_uppercase))][-8:]
+            if self.direction == "front":
+                self.nozzles = [i+"1" for i in reversed(list(string.ascii_uppercase))][-8:]
+            else:
+                self.nozzles = [i+"1" for i in list(string.ascii_uppercase)][:8]
         else:
-            self.nozzles = ["H1"]
+            self.nozzles = ["A1"]
         self.nozzle_file = "_nozzle_offsets.csv"
         self.nozzle_offset = False
         self.nozzle_offsets = {nozzle:"None" for nozzle in self.nozzles}
@@ -222,8 +227,10 @@ class Eight_Channel_Partial_Pickup_Test:
     async def _update_nozzle_manager(
         self, api: OT3API, mount: OT3Mount, tip_num: int
     ) -> None:
-        await api.update_nozzle_configuration_for_mount(mount, self.nozzles[(tip_num - 1)], self.nozzles[0])
-        # await api.update_nozzle_configuration_for_mount(mount, "A1", "A1")
+        if self.direction == "front":
+            await api.update_nozzle_configuration_for_mount(mount, self.nozzles[(tip_num - 1)], self.nozzles[0])
+        else:
+            await api.update_nozzle_configuration_for_mount(mount, self.nozzles[0], self.nozzles[-1])
 
     def getch(self):
         """
@@ -563,7 +570,9 @@ class Eight_Channel_Partial_Pickup_Test:
     ) -> None:
         self.test_data["Tip"] = str(tip)
         y_offset = self.tip_distance*(tip - 1)
-        gauge_loc = self.gauge_position._replace(y=self.gauge_position.y - y_offset)
+        if self.direction == "front":
+            y_offset = y_offset*(-1)
+        gauge_loc = self.gauge_position._replace(y=self.gauge_position.y + y_offset)
         if tip == 1:
             if nozzle:
                 cp = CriticalPoint.NOZZLE
@@ -654,34 +663,55 @@ class Eight_Channel_Partial_Pickup_Test:
 
     def _load_config(self, tip_num):
         y_offset = self.tip_distance*(8 - tip_num)
-        self.tiprack_position = Point(self.deck_slot['deck_slot'][self.tiprack_slot]['X'],
-                                    self.deck_slot['deck_slot'][self.tiprack_slot]['Y'],
-                                    # self.deck_slot['deck_slot'][self.tiprack_slot]['Y'] - y_offset,
-                                    self.deck_slot['deck_slot'][self.tiprack_slot]['Z'])
+        max_y_offset = self.tip_distance*(7)
+        if self.direction == "front":
+            self.tiprack_position = Point(self.deck_slot['deck_slot'][self.tiprack_slot]['X'],
+                                        self.deck_slot['deck_slot'][self.tiprack_slot]['Y'],
+                                        self.deck_slot['deck_slot'][self.tiprack_slot]['Z'])
 
-        self.drop_position = Point(self.deck_slot['deck_slot'][self.trash_slot]['X'],
-                                    self.deck_slot['deck_slot'][self.trash_slot]['Y'] - y_offset,
-                                    # self.deck_slot['deck_slot'][self.trash_slot]['Y'],
-                                    self.deck_slot['deck_slot'][self.trash_slot]['Z'])
+            self.drop_position = Point(self.deck_slot['deck_slot'][self.trash_slot]['X'],
+                                        self.deck_slot['deck_slot'][self.trash_slot]['Y'] - y_offset,
+                                        self.deck_slot['deck_slot'][self.trash_slot]['Z'])
 
-        self.gauge_position = Point(self.deck_slot['deck_slot'][self.gauge_slot]['X'],
-                                    self.deck_slot['deck_slot'][self.gauge_slot]['Y'] - y_offset,
-                                    self.deck_slot['deck_slot'][self.gauge_slot]['Z'])
+            self.gauge_position = Point(self.deck_slot['deck_slot'][self.gauge_slot]['X'],
+                                        self.deck_slot['deck_slot'][self.gauge_slot]['Y'] - y_offset,
+                                        self.deck_slot['deck_slot'][self.gauge_slot]['Z'])
 
-        self.trough_position = Point(self.deck_slot['deck_slot'][self.trough_slot]['X'],
-                                    self.deck_slot['deck_slot'][self.trough_slot]['Y'] - y_offset,
-                                    # self.deck_slot['deck_slot'][self.trough_slot]['Y'],
-                                    self.deck_slot['deck_slot'][self.trough_slot]['Z'])
+            self.trough_position = Point(self.deck_slot['deck_slot'][self.trough_slot]['X'],
+                                        self.deck_slot['deck_slot'][self.trough_slot]['Y'] - y_offset,
+                                        self.deck_slot['deck_slot'][self.trough_slot]['Z'])
 
-        self.feel_position = Point(self.deck_slot['deck_slot'][self.feel_slot]['X'],
-                                    self.deck_slot['deck_slot'][self.feel_slot]['Y'] - y_offset,
-                                    # self.deck_slot['deck_slot'][self.feel_slot]['Y'],
-                                    self.deck_slot['deck_slot'][self.feel_slot]['Z'])
+            self.feel_position = Point(self.deck_slot['deck_slot'][self.feel_slot]['X'],
+                                        self.deck_slot['deck_slot'][self.feel_slot]['Y'] - y_offset,
+                                        self.deck_slot['deck_slot'][self.feel_slot]['Z'])
 
-        self.hole_plate_position = Point(self.deck_slot['deck_slot'][self.center_slot]['X'],
-                                    self.deck_slot['deck_slot'][self.center_slot]['Y'] - y_offset,
-                                    # self.deck_slot['deck_slot'][self.feel_slot]['Y'],
-                                    self.deck_slot['deck_slot'][self.center_slot]['Z'])
+            self.hole_plate_position = Point(self.deck_slot['deck_slot'][self.center_slot]['X'],
+                                        self.deck_slot['deck_slot'][self.center_slot]['Y'] - y_offset,
+                                        self.deck_slot['deck_slot'][self.center_slot]['Z'])
+        else:
+            self.tiprack_position = Point(self.deck_slot['deck_slot'][self.tiprack_slot]['X'],
+                                        self.deck_slot['deck_slot'][self.tiprack_slot]['Y'] - y_offset,
+                                        self.deck_slot['deck_slot'][self.tiprack_slot]['Z'])
+
+            self.drop_position = Point(self.deck_slot['deck_slot'][self.trash_slot]['X'],
+                                        self.deck_slot['deck_slot'][self.trash_slot]['Y'],
+                                        self.deck_slot['deck_slot'][self.trash_slot]['Z'])
+
+            self.gauge_position = Point(self.deck_slot['deck_slot'][self.gauge_slot]['X'],
+                                        self.deck_slot['deck_slot'][self.gauge_slot]['Y'] - max_y_offset,
+                                        self.deck_slot['deck_slot'][self.gauge_slot]['Z'])
+
+            self.trough_position = Point(self.deck_slot['deck_slot'][self.trough_slot]['X'],
+                                        self.deck_slot['deck_slot'][self.trough_slot]['Y'],
+                                        self.deck_slot['deck_slot'][self.trough_slot]['Z'])
+
+            self.feel_position = Point(self.deck_slot['deck_slot'][self.feel_slot]['X'],
+                                        self.deck_slot['deck_slot'][self.feel_slot]['Y'],
+                                        self.deck_slot['deck_slot'][self.feel_slot]['Z'])
+
+            self.hole_plate_position = Point(self.deck_slot['deck_slot'][self.center_slot]['X'],
+                                        self.deck_slot['deck_slot'][self.feel_slot]['Y'],
+                                        self.deck_slot['deck_slot'][self.center_slot]['Z'])
 
     async def _countdown(
         self, count_time: float
@@ -761,5 +791,5 @@ if __name__ == '__main__':
     print("\nOT-3 8-Channel Partial Tip Pick-up Test\n")
     arg_parser = build_arg_parser()
     args = arg_parser.parse_args()
-    test = Eight_Channel_Partial_Pickup_Test(args.simulate, args.calibrate, args.concentricity, args.cycles, args.channels, args.pipette, args.tip_num, args.gauge_slot, args.tiprack_slot, args.trough_slot, args.trash_slot, args.feel_slot, args.center_slot, args.tip_size, args.volume, args.liquid_offset)
+    test = Eight_Channel_Partial_Pickup_Test(args.simulate, args.calibrate, args.concentricity, args.cycles, args.channels, args.direction, args.pipette, args.tip_num, args.gauge_slot, args.tiprack_slot, args.trough_slot, args.trash_slot, args.feel_slot, args.center_slot, args.tip_size, args.volume, args.liquid_offset)
     asyncio.run(test.run())
