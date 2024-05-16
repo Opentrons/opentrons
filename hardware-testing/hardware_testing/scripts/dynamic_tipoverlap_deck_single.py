@@ -38,6 +38,7 @@ liquid_retract_dist = 12
 liquid_retract_speed = 5
 retract_dist = 100
 retract_speed = 60
+
 leak_test_time = 30
 
 def dict_keys_to_line(dict):
@@ -270,13 +271,76 @@ async def calibrate_tiprack(api, home_position, mount):
     return tiprack_loc
 
 async def update_nozzle_manager(api, mount, tip_count, nozzle_config):
-    if args.nozzles == 8:
+    if args.nozzles == 1:
+        if nozzle_config[0] == 'rear_left':
+            print('upper_left, A1-A1')
+            await api.update_nozzle_configuration_for_mount(OT3Mount.LEFT, 'A1', 'A1')
+        elif nozzle_config[0] == 'front_left':
+            print('bottom_left , H1-H1')
+            await api.update_nozzle_configuration_for_mount(OT3Mount.LEFT, 'H1', 'H1')
+        elif nozzle_config[0] == 'rear_right':
+            print('upper_right, A12-A12')
+            await api.update_nozzle_configuration_for_mount(OT3Mount.LEFT, 'A12', 'A12')
+        elif nozzle_config[0] == 'front_right':
+            print('bottom_right H12-H12')
+            await api.update_nozzle_configuration_for_mount(OT3Mount.LEFT, 'H12', 'H12')
+    elif args.nozzles == 8:
         if nozzle_config[0] == 'left' and nozzle_config[1] == 'columns':
             print('left Column, A1-H1')
             await api.update_nozzle_configuration_for_mount(OT3Mount.LEFT, 'A1', 'H1')
         elif nozzle_config[0] == 'right' and nozzle_config[1] == 'columns':
             print('right column, A12-H12')
             await api.update_nozzle_configuration_for_mount(OT3Mount.LEFT, 'A12', 'H12')
+    elif args.nozzles == 16:
+        if nozzle_config[0] == 'left' and nozzle_config[1] == 'columns':
+            await api.update_nozzle_configuration_for_mount(OT3Mount.LEFT, 'A1', 'H2')
+        elif nozzle_config[0] == 'right' and nozzle_config[1] == 'columns':
+            await api.update_nozzle_configuration_for_mount(OT3Mount.LEFT, 'A11', 'H12')
+    elif args.nozzles == 24:
+        if nozzle_config[0] == 'left' and nozzle_config[1] == 'columns':
+            await api.update_nozzle_configuration_for_mount(OT3Mount.LEFT, 'A1', 'H1')
+        elif nozzle_config[0] == 'right' and nozzle_config[1] == 'columns':
+            await api.update_nozzle_configuration_for_mount(OT3Mount.LEFT, 'A12', 'H12')
+        elif nozzle_config[0] == 'front' and nozzle_config[1] == 'rows':
+            print("front row, G1-H12")
+            await api.update_nozzle_configuration_for_mount(OT3Mount.LEFT, 'G1', 'H12')
+        elif nozzle_config[0] == 'rear' and nozzle_config[1] == 'rows':
+            print("rear row, A1-B12")
+            await api.update_nozzle_configuration_for_mount(OT3Mount.LEFT, 'A1', 'B12')
+    elif args.nozzles == 12:
+        if nozzle_config[0] == 'front' and nozzle_config[1] == 'rows':
+            await api.update_nozzle_configuration_for_mount(OT3Mount.LEFT, 'A1', 'A12')
+        elif nozzle_config[0] == 'rear' and nozzle_config[1] == 'rows':
+            await api.update_nozzle_configuration_for_mount(OT3Mount.LEFT, 'H1', 'H12')
+
+def pickup_direction(nozzle):
+    if nozzle == 'front_right':
+        x_direction = 1
+        y_direction = -1
+    elif nozzle == 'front_left':
+        x_direction = -1
+        y_direction = -1
+    elif nozzle == 'rear_right':
+        x_direction = 1
+        y_direction = 1
+    elif nozzle == 'rear_left':
+        x_direction = -1
+        y_direction = 1
+    elif nozzle == 'front':
+        x_direction = 1
+        y_direction = -1
+    elif nozzle == 'rear':
+        x_direction = 1
+        y_direction = 1
+    elif nozzle == 'left':
+        x_direction = -1
+        y_direction = 1
+    elif nozzle == 'right':
+        x_direction = 1
+        y_direction = 1
+    else:
+        raise('Check Nozzle Config')
+    return x_direction, y_direction
 
 async def update_pick_up_current(api, mount, tip_count, current) -> None:
     """Update pick-up-tip current."""
@@ -308,44 +372,9 @@ async def _main() -> None:
                 'Tip Dial Pos(mm)': None,
                 'Nozzle Z Position': None,
                 'Nozzle Dial pos': None,
-                'Nozzle 1': None,
-                'Nozzle 2': None,
-                'Nozzle 3': None,
-                'Nozzle 4': None,
-                'Nozzle 5': None,
-                'Nozzle 6': None,
-                'Nozzle 7': None,
-                'Nozzle 8': None,
-                'Tip 1': None,
-                'Tip 2': None,
-                'Tip 3': None,
-                'Tip 4': None,
-                'Tip 5': None,
-                'Tip 6': None,
-                'Tip 7': None,
-                'Tip 8': None,
+                'Tip Dial Pos': None,
                 'Delta': None,
                 }
-    nozzle_data = {
-                    'Nozzle 1': None,
-                    'Nozzle 2': None,
-                    'Nozzle 3': None,
-                    'Nozzle 4': None,
-                    'Nozzle 5': None,
-                    'Nozzle 6': None,
-                    'Nozzle 7': None,
-                    'Nozzle 8': None
-                    }
-    tip_data = {
-                'Tip 1': None,
-                'Tip 2': None,
-                'Tip 3': None,
-                'Tip 4': None,
-                'Tip 5': None,
-                'Tip 6': None,
-                'Tip 7': None,
-                'Tip 8': None
-    }
     print(f'Dictionary: {dial_data}')
     instrument = hw_api._pipette_handler.get_pipette(OT3Mount.LEFT)
     details = [pipette_model, 'default-current']
@@ -359,13 +388,13 @@ async def _main() -> None:
         home_position = await hw_api.current_position_ot3(mount)
         start_time = time.perf_counter()
         # m_current = float(input("motor_current in amps: "))
-        pick_up_speed = float(input("pick up tip speed in mm/s: "))
+        # pick_up_speed = float(input("pick up tip speed in mm/s: "))
         # hw_api.clamp_tip_speed = float(input("clamp pick up Speed: "))
         # if input_str == 'single tip':
         #     pick_up_distance = float(input("pick up distance in mm: "))
         #     await update_pick_up_distance(hw_api, mount, args.nozzles, pick_up_distance)
         # await update_pick_up_current(hw_api, mount, args.nozzles, m_current)
-        await update_pick_up_speed(hw_api, mount, pick_up_speed, args.nozzles)
+        # await update_pick_up_speed(hw_api, mount, pick_up_speed, args.nozzles)
         if (args.measure_nozzles):
             cp = CriticalPoint.NOZZLE
             home_wo_tip = await hw_api.current_position_ot3(mount, cp)
@@ -380,16 +409,13 @@ async def _main() -> None:
             nozzle_loc = await jog(hw_api, current_position, cp)
             number_of_channels = args.nozzles
             nozzle_count = 0
-            x_offset = 0
-            y_offset = 0
             measurements = []
-            nozzle_measurement_map = []
-            num_of_columns = args.num_cols
+            measurement_map = []
             for tip in range(1, number_of_channels + 1):
                 cp = CriticalPoint.NOZZLE
                 nozzle_count += 1
-                nozzle_position = Point(nozzle_loc[Axis.X] + x_offset,
-                                        nozzle_loc[Axis.Y] + y_offset,
+                nozzle_position = Point(nozzle_loc[Axis.X],
+                                        nozzle_loc[Axis.Y],
                                         nozzle_loc[Axis.by_mount(mount)])
                 await move_to_point(hw_api, mount, nozzle_position, cp)
                 await asyncio.sleep(1)
@@ -398,14 +424,17 @@ async def _main() -> None:
                 print("nozzle-",nozzle_count, "(mm): " , nozzle_measurement, end="")
                 print("\r", end="")
                 measurements.append(nozzle_measurement)
-                nozzle_measurement_map.append(nozzle_measurement)
+                # if nozzle_count % number_of_channels == 0:
+                #     d_str = ''
+                #     for m in measurements:
+                #         d_str += str(m) + ','
+                #     d_str = d_str[:-1] + '\n'
+                #     print(f"{d_str}")
+                #     data.append_data_to_file(test_n, test_f, d_str)
+                    # Reset Measurements list
                 measurements = []
                 print("\r\n")
-                if nozzle_count % num_of_columns == 0:
-                    y_offset += 9
-                if nozzle_count % num_of_columns == 0:
-                    x_offset = 0
-            print(f'Nozzle Measurements: {measurements}')
+            print(f'Nozzle Measurements: {nozzle_measurement}')
         # Calibrate to tiprack
         if (args.calibrate):
             pickup_loc = await calibrate_tiprack(hw_api, home_position, mount)
@@ -418,8 +447,7 @@ async def _main() -> None:
             press_dist = await hw_api.pick_up_tip(
                 mount, tip_length=(tip_length[args.tip_size]-tip_overlap))
             print(f'Press Position:{press_dist[Axis.by_mount(mount)]}')
-            # enc_tipoverlap = (initial_press_dist[Axis.by_mount(mount)] - press_dist[Axis.by_mount(mount)]) - args.press_comp
-            enc_tipoverlap = tip_overlap
+            enc_tipoverlap = (initial_press_dist[Axis.by_mount(mount)] - press_dist[Axis.by_mount(mount)]) - args.press_comp
             print(f'Enc TipOverlap: {enc_tipoverlap}')
             instr = hw_api._pipette_handler.get_pipette(mount)
             current_tipL = instr.current_tip_length
@@ -430,8 +458,6 @@ async def _main() -> None:
             instr.add_tip((tip_length[args.tip_size]-enc_tipoverlap))
             new_tipL = instr.current_tip_length
             print(f'new_current_tipL: {new_tipL}')
-            # await hw_api.home([Axis.Z_L])
-            # home_with_tip = await hw_api.current_position(mount, cp)
 
         # await hw_api.home_z(mount)
         cp = CriticalPoint.TIP
@@ -471,9 +497,10 @@ async def _main() -> None:
             save_config_(path+cal_fn, deck_slot)
 
         tips_to_use = args.nozzles
+        # tips_to_use = (num_of_columns * 8)
         x_coord_offset = 0
         y_coord_offset = 0
-        true_tip_count = 8
+        true_tip_count = 1
         trial = 1
         num_of_columns = args.num_cols
         print(f'Trial: {trial}')
@@ -485,7 +512,7 @@ async def _main() -> None:
                 tip_count = 0
                 x_offset = 0
                 y_offset = 0
-                tip_measurement_map = []
+                measurement_map = []
                 for tip in range(1, tips_to_use + 1):
                     cp = CriticalPoint.TIP
                     tip_count += 1
@@ -499,15 +526,16 @@ async def _main() -> None:
                     print(f'tip_position: {tip_dist[Axis.by_mount(mount)]}')
                     tip_measurement = gauge.read()
                     print("tip-",tip_count, "(mm): " ,tip_measurement,"\r", end="")
-                    # measurements.append(tip_measurement)
-                    tip_measurement_map.append(tip_measurement)
+                    measurements.append(tip_measurement)
+                    # Reset Measurements list
+                    measurements = []
                     print("\r\n")
                     x_offset -= 9
                     if tip_count % num_of_columns == 0:
                         y_offset += 9
                     if tip_count % num_of_columns == 0:
                         x_offset = 0
-                print(tip_measurement_map)
+                print(measurements)
                 print(encoder_pos)
 
             if args.trough:
@@ -522,46 +550,40 @@ async def _main() -> None:
             drop_tip_location =  Point(30 , 60 , 104.5)
              # 299.66 , 389.04 , 104.5
             await move_to_point(hw_api, mount, drop_tip_location, cp)
-            measurements.append(true_tip_count)
-            measurements.append(initial_press_dist[Axis.by_mount(mount)])
-            measurements.append(press_dist[Axis.by_mount(mount)])
-            measurements.append(args.press_comp)
-            measurements.append(enc_tipoverlap)
-            measurements.append(current_tipL)
-            measurements.append(new_tipL)
-            measurements.append(tip_dist[Axis.by_mount(mount)])
-            measurements.append(nozzle_loc[Axis.by_mount(mount)])
-            # measurement_map.append(nozzle_measurement)
-            # measurement_map.append(tip_measurement)
+            measurement_map.append(true_tip_count)
+            measurement_map.append(initial_press_dist[Axis.by_mount(mount)])
+            measurement_map.append(press_dist[Axis.by_mount(mount)])
+            measurement_map.append(tip_dist[Axis.by_mount(mount)])
+            measurement_map.append(args.press_comp)
+            measurement_map.append(enc_tipoverlap)
+            measurement_map.append(current_tipL)
+            measurement_map.append(new_tipL)
+            measurement_map.append(nozzle_loc[Axis.by_mount(mount)])
+            measurement_map.append(nozzle_measurement)
+            measurement_map.append(tip_measurement)
             d_str = ''
-            for m in measurements:
-                d_str += str(m) + ','
-            print(f"{d_str}")
-            for m in nozzle_measurement_map:
-                d_str += str(m) + ','
-            print(f"{d_str}")
-            for m in tip_measurement_map:
+            for m in measurement_map:
                 d_str += str(m) + ','
             d_str = d_str[:-1] + '\n'
             print(f"{d_str}")
             data.append_data_to_file(test_n, test_f, d_str)
-            delta_list = []
-            for x,y in zip(nozzle_measurement_map, tip_measurement_map):
-                delta = y - x
-                delta_list.append(delta)
-            print(f'deltas: {delta_list}')
             input("Press Enter to Continue")
             await hw_api.drop_tip(mount)
             tips_to_use = args.nozzles
+            # tips_to_use = num_of_columns * 8
+            # await update_pick_up_current(hw_api, mount, args.nozzles, m_current)
+            # await update_pick_up_speed(hw_api, mount, pick_up_speed)
+            # await update_pick_up_distance(hw_api, mount, pick_up_distance)
             cp = CriticalPoint.NOZZLE
             x_dir, y_dir = (1,-1)
-            true_tip_count += 8
+            true_tip_count += 1
             if true_tip_count % 8 == 0:
                 x_coord_offset = x_coord_offset + x_dir*9
                 y_coord_offset = 0
                 y_dir = 0
+            y_coord_offset = y_coord_offset + y_dir*9
             pu_location = Point(pickup_loc[0] + x_coord_offset,
-                                pickup_loc[1] ,
+                                pickup_loc[1] + y_coord_offset,
                                 pickup_loc[2])
             await move_to_point(hw_api, mount, pu_location, cp)
             initial_press_dist = await hw_api.encoder_current_position_ot3(mount, cp)
@@ -573,8 +595,7 @@ async def _main() -> None:
                                     presses = 1,
                                     increment = 0)
             print(f'Press Position: {press_dist[Axis.by_mount(mount)]}')
-            # enc_tipoverlap = (initial_press_dist[Axis.by_mount(mount)] - press_dist[Axis.by_mount(mount)]) - args.press_comp
-            enc_tipoverlap = tip_overlap
+            enc_tipoverlap = (initial_press_dist[Axis.by_mount(mount)] - press_dist[Axis.by_mount(mount)]) - args.press_comp
             print(f'Enc TipOverlap: {enc_tipoverlap}')
             instr = hw_api._pipette_handler.get_pipette(mount)
             print(f'current_tipL: {instr.current_tip_length}')
@@ -586,6 +607,8 @@ async def _main() -> None:
             cp = CriticalPoint.TIP
             current_position = await hw_api.current_position_ot3(mount, cp)
             print(current_position)
+
+
 
     except KeyboardInterrupt:
         await hw_api.disengage_axes([Axis.X, Axis.Y])
@@ -621,9 +644,10 @@ if __name__ == "__main__":
     parser.add_argument("--columns", action="store_true")
     parser.add_argument("--num_cols", type=float, default=1)
     parser.add_argument("--rows", action="store_true")
+    parser.add_argument("--num_rows", type=float, default=1)
     parser.add_argument("--tip_size", type=str, default="T1K", help="Tip Size")
-    parser.add_argument("--nozzles", type=int, default=8)
-    parser.add_argument("--press_comp", type=float, default = 0.8)
+    parser.add_argument("--nozzles", type=int, default=1)
+    parser.add_argument("--press_comp", type=float, default = 0.5)
     parser.add_argument("--test_volume", type=float, default=50)
     parser.add_argument(
         "--dial_port", type=str, default="/dev/ttyUSB0", help="Dial indicator Port"
@@ -639,7 +663,7 @@ if __name__ == "__main__":
         with open(path + cal_fn, 'r') as openfile:
             deck_slot = json.load(openfile)
     tip_length = {"T1K": 95.6, "T200": 58.35, "T50": 57.9}
-    tip_overlap = 9.42
+    tip_overlap = 10.5
     if args.mount == "left":
         mount = OT3Mount.LEFT
     else:
