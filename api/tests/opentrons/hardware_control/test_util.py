@@ -1,16 +1,11 @@
 from typing import List
 
-from opentrons.hardware_control.util import plan_arc, check_motion_bounds
-from opentrons.hardware_control.types import (
-    CriticalPoint,
-    MotionChecks,
-    Axis,
-)
-from opentrons.hardware_control.errors import OutOfBoundsMove
-from opentrons.types import Point
-
-
 import pytest
+
+from opentrons.hardware_control.errors import OutOfBoundsMove
+from opentrons.hardware_control.types import Axis, CriticalPoint, MotionChecks
+from opentrons.hardware_control.util import check_motion_bounds, plan_arc
+from opentrons.types import Point
 
 
 def check_arc_basic(arc: List[Point], from_pt: Point, to_pt: Point):

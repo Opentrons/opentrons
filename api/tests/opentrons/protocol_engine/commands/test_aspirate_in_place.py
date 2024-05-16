@@ -3,20 +3,16 @@ import pytest
 from decoy import Decoy
 
 from opentrons.hardware_control import API as HardwareAPI
-
-from opentrons.protocol_engine.execution import PipettingHandler
 from opentrons.protocol_engine.commands.aspirate_in_place import (
+    AspirateInPlaceImplementation,
     AspirateInPlaceParams,
     AspirateInPlaceResult,
-    AspirateInPlaceImplementation,
 )
 from opentrons.protocol_engine.commands.command import SuccessData
 from opentrons.protocol_engine.errors.exceptions import PipetteNotReadyToAspirateError
+from opentrons.protocol_engine.execution import PipettingHandler
 from opentrons.protocol_engine.notes import CommandNoteAdder
-
-from opentrons.protocol_engine.state import (
-    StateStore,
-)
+from opentrons.protocol_engine.state import StateStore
 
 
 @pytest.fixture

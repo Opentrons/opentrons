@@ -4,9 +4,9 @@ from typing import Generator
 import pytest
 from decoy import Decoy, matchers
 
-from opentrons.protocol_engine.state import StateStore
 from opentrons.protocol_engine.errors import RunStoppedError
 from opentrons.protocol_engine.execution import CommandExecutor, QueueWorker
+from opentrons.protocol_engine.state import StateStore
 
 
 class BreakLoopError(Exception):

@@ -2,19 +2,21 @@
 from __future__ import annotations
 
 import enum
-from typing import TYPE_CHECKING, Type, Optional
-from typing_extensions import Literal
+from typing import TYPE_CHECKING, Optional, Type
 
 from pydantic import BaseModel, Field
+from typing_extensions import Literal
 
-from opentrons.types import MountType, Point, Mount
 from opentrons.hardware_control.types import Axis, CriticalPoint
-from ..command import AbstractCommandImpl, BaseCommand, BaseCommandCreate, SuccessData
-from ...errors.error_occurrence import ErrorOccurrence
 from opentrons.protocol_engine.resources.ot3_validation import ensure_ot3_hardware
+from opentrons.types import Mount, MountType, Point
+
+from ...errors.error_occurrence import ErrorOccurrence
+from ..command import AbstractCommandImpl, BaseCommand, BaseCommandCreate, SuccessData
 
 if TYPE_CHECKING:
     from opentrons.hardware_control import HardwareControlAPI
+
     from ...state import StateView
 
 # These offsets supplied from HW

@@ -1,46 +1,41 @@
 """Unit tests for the deck_conflict module."""
-import pytest
-from typing import ContextManager, Any, NamedTuple, List, Tuple
-from decoy import Decoy
 from contextlib import nullcontext as does_not_raise
+from typing import Any, ContextManager, List, NamedTuple, Tuple
+
+import pytest
+from decoy import Decoy
 from opentrons_shared_data.labware.dev_types import LabwareUri
 from opentrons_shared_data.robot.dev_types import RobotType
 
 from opentrons.hardware_control.nozzle_manager import NozzleConfigurationType
-from opentrons.motion_planning import deck_conflict as wrapped_deck_conflict
 from opentrons.motion_planning import adjacent_slots_getters
+from opentrons.motion_planning import deck_conflict as wrapped_deck_conflict
 from opentrons.motion_planning.adjacent_slots_getters import _MixedTypeSlots
-from opentrons.protocols.api_support.types import APIVersion
 from opentrons.protocol_api import MAX_SUPPORTED_VERSION
+from opentrons.protocol_api.core.engine import deck_conflict
 from opentrons.protocol_api.disposal_locations import (
+    _TRASH_BIN_CUTOUT_FIXTURE,
     TrashBin,
     WasteChute,
-    _TRASH_BIN_CUTOUT_FIXTURE,
 )
 from opentrons.protocol_api.labware import Labware
-from opentrons.protocol_api.core.engine import deck_conflict
-from opentrons.protocol_engine import (
-    Config,
-    DeckSlotLocation,
-    ModuleModel,
-    StateView,
-)
+from opentrons.protocol_engine import Config, DeckSlotLocation, ModuleModel, StateView
 from opentrons.protocol_engine.clients import SyncClient
 from opentrons.protocol_engine.errors import LabwareNotLoadedOnModuleError
-from opentrons.types import DeckSlotName, Point, StagingSlotName
-
 from opentrons.protocol_engine.types import (
     DeckType,
+    Dimensions,
     LoadedLabware,
     LoadedModule,
-    WellLocation,
-    WellOrigin,
-    WellOffset,
     OnDeckLabwareLocation,
     OnLabwareLocation,
-    Dimensions,
     StagingSlotLocation,
+    WellLocation,
+    WellOffset,
+    WellOrigin,
 )
+from opentrons.protocols.api_support.types import APIVersion
+from opentrons.types import DeckSlotName, Point, StagingSlotName
 
 
 @pytest.fixture(autouse=True)

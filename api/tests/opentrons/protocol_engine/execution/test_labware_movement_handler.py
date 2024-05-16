@@ -2,49 +2,45 @@
 from __future__ import annotations
 
 from datetime import datetime
+from typing import TYPE_CHECKING, Optional, Tuple, Union
 
 import pytest
 from decoy import Decoy, matchers
-from typing import TYPE_CHECKING, Union, Optional, Tuple
 
-from opentrons.protocol_engine.execution import EquipmentHandler, MovementHandler
 from opentrons.hardware_control import HardwareControlAPI
-from opentrons.types import DeckSlotName, Point
-
-from opentrons.hardware_control.types import OT3Mount, Axis
-from opentrons.protocol_engine.types import (
-    DeckSlotLocation,
-    ModuleLocation,
-    OnLabwareLocation,
-    LabwareOffset,
-    LabwareOffsetLocation,
-    LabwareOffsetVector,
-    LabwareLocation,
-    NonStackedLocation,
-    LabwareMovementOffsetData,
-    Dimensions,
+from opentrons.hardware_control.types import Axis, OT3Mount
+from opentrons.protocol_engine.errors import (
+    GripperNotAttachedError,
+    HardwareNotSupportedError,
+    HeaterShakerLabwareLatchNotOpenError,
+    LabwareMovementNotAllowedError,
+    ThermocyclerNotOpenError,
+)
+from opentrons.protocol_engine.execution import EquipmentHandler, MovementHandler
+from opentrons.protocol_engine.execution.heater_shaker_movement_flagger import (
+    HeaterShakerMovementFlagger,
+)
+from opentrons.protocol_engine.execution.labware_movement import LabwareMovementHandler
+from opentrons.protocol_engine.execution.thermocycler_movement_flagger import (
+    ThermocyclerMovementFlagger,
 )
 from opentrons.protocol_engine.execution.thermocycler_plate_lifter import (
     ThermocyclerPlateLifter,
 )
-from opentrons.protocol_engine.execution.thermocycler_movement_flagger import (
-    ThermocyclerMovementFlagger,
-)
-from opentrons.protocol_engine.execution.heater_shaker_movement_flagger import (
-    HeaterShakerMovementFlagger,
-)
-
-from opentrons.protocol_engine.execution.labware_movement import (
-    LabwareMovementHandler,
-)
-from opentrons.protocol_engine.errors import (
-    HardwareNotSupportedError,
-    GripperNotAttachedError,
-    LabwareMovementNotAllowedError,
-    ThermocyclerNotOpenError,
-    HeaterShakerLabwareLatchNotOpenError,
-)
 from opentrons.protocol_engine.state import StateStore
+from opentrons.protocol_engine.types import (
+    DeckSlotLocation,
+    Dimensions,
+    LabwareLocation,
+    LabwareMovementOffsetData,
+    LabwareOffset,
+    LabwareOffsetLocation,
+    LabwareOffsetVector,
+    ModuleLocation,
+    NonStackedLocation,
+    OnLabwareLocation,
+)
+from opentrons.types import DeckSlotName, Point
 
 if TYPE_CHECKING:
     from opentrons.hardware_control.ot3api import OT3API

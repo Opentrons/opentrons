@@ -2,34 +2,24 @@
 Coordinate subsystem detection and updates.
 """
 import asyncio
-from contextlib import contextmanager, ExitStack
-from dataclasses import dataclass
 import logging
-from typing import (
-    Optional,
-    Set,
-    Dict,
-    Iterator,
-    Callable,
-    AsyncIterator,
-    Union,
-    List,
-)
+from contextlib import ExitStack, contextmanager
+from dataclasses import dataclass
+from typing import AsyncIterator, Callable, Dict, Iterator, List, Optional, Set, Union
 
-from opentrons_hardware.hardware_control import network, tools
-from opentrons_hardware.drivers import can_bus, binary_usb
+from opentrons_hardware.drivers import binary_usb, can_bus
 from opentrons_hardware.firmware_bindings.constants import (
-    NodeId,
-    USBTarget,
     FirmwareTarget,
+    NodeId,
     ToolType,
+    USBTarget,
 )
 from opentrons_hardware.firmware_update import FirmwareUpdate
+from opentrons_hardware.hardware_control import network, tools
 
-from ..types import SubSystem, SubSystemState, UpdateStatus, UpdateState
-from .ot3utils import subsystem_to_target, target_to_subsystem
+from ..types import SubSystem, SubSystemState, UpdateState, UpdateStatus
 from .errors import SubsystemUpdating
-
+from .ot3utils import subsystem_to_target, target_to_subsystem
 
 log = logging.getLogger(__name__)
 

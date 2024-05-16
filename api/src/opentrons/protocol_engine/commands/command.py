@@ -7,24 +7,16 @@ from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from datetime import datetime
 from enum import Enum
-from typing import (
-    TYPE_CHECKING,
-    Generic,
-    Optional,
-    TypeVar,
-    List,
-    Type,
-    Union,
-)
+from typing import TYPE_CHECKING, Generic, List, Optional, Type, TypeVar, Union
 
 from pydantic import BaseModel, Field
 from pydantic.generics import GenericModel
 
 from opentrons.hardware_control import HardwareControlAPI
 
-from ..resources import ModelUtils
 from ..errors import ErrorOccurrence
 from ..notes import CommandNote, CommandNoteAdder
+from ..resources import ModelUtils
 
 # Work around type-only circular dependencies.
 if TYPE_CHECKING:

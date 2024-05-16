@@ -2,42 +2,42 @@
 from dataclasses import dataclass
 from typing import Dict, List, Optional, Set, Union
 
-from opentrons_shared_data.robot.dev_types import RobotType
 from opentrons_shared_data.deck.dev_types import (
+    CutoutFixture,
     DeckDefinitionV5,
     SlotDefV3,
-    CutoutFixture,
 )
+from opentrons_shared_data.robot.dev_types import RobotType
 
-from opentrons.types import Point, DeckSlotName
+from opentrons.types import DeckSlotName, Point
 
+from ..actions import Action, AddAddressableAreaAction, PlayAction, SucceedCommandAction
 from ..commands import (
     Command,
     LoadLabwareResult,
     LoadModuleResult,
     MoveLabwareResult,
-    MoveToAddressableAreaResult,
     MoveToAddressableAreaForDropTipResult,
+    MoveToAddressableAreaResult,
 )
 from ..errors import (
-    IncompatibleAddressableAreaError,
-    AreaNotInDeckConfigurationError,
-    SlotDoesNotExistError,
     AddressableAreaDoesNotExistError,
+    AreaNotInDeckConfigurationError,
     CutoutDoesNotExistError,
+    IncompatibleAddressableAreaError,
+    SlotDoesNotExistError,
 )
 from ..resources import deck_configuration_provider
 from ..types import (
-    DeckSlotLocation,
-    AddressableAreaLocation,
     AddressableArea,
-    PotentialCutoutFixture,
+    AddressableAreaLocation,
     DeckConfigurationType,
+    DeckSlotLocation,
     Dimensions,
+    PotentialCutoutFixture,
 )
-from ..actions import Action, SucceedCommandAction, PlayAction, AddAddressableAreaAction
+from .abstract_store import HandlesActions, HasState
 from .config import Config
-from .abstract_store import HasState, HandlesActions
 
 
 @dataclass

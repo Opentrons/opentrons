@@ -14,25 +14,23 @@ from typing import TYPE_CHECKING, Optional
 
 import numpy as np
 from numpy.typing import NDArray
-
 from opentrons_shared_data import module
-from opentrons_shared_data.module.dev_types import ModuleDefinitionV3
 from opentrons_shared_data.module import OLD_TC_GEN2_LABWARE_OFFSET
-
-from opentrons.types import Location, Point, LocationLabware
-from opentrons.motion_planning.adjacent_slots_getters import (
-    get_north_south_slots,
-    get_east_west_slots,
-    get_adjacent_slots,
-)
+from opentrons_shared_data.module.dev_types import ModuleDefinitionV3
 
 from opentrons.drivers.types import ThermocyclerLidStatus
 from opentrons.hardware_control.modules.types import (
     ModuleModel,
     ModuleType,
-    module_model_from_string,
     ThermocyclerModuleModel,
+    module_model_from_string,
 )
+from opentrons.motion_planning.adjacent_slots_getters import (
+    get_adjacent_slots,
+    get_east_west_slots,
+    get_north_south_slots,
+)
+from opentrons.types import Location, LocationLabware, Point
 
 if TYPE_CHECKING:
     from opentrons.protocol_api.labware import Labware
@@ -268,10 +266,10 @@ class ThermocyclerGeometry(ModuleGeometry):
     # Thermocycler `configuration="semi"` does not work properly and should be removed
     # https://opentrons.atlassian.net/browse/RSS-106
     def labware_accessor(self, labware: Labware) -> Labware:
-        from opentrons.protocol_api.labware import Labware
         from opentrons.protocol_api.core.legacy.legacy_labware_core import (
             LegacyLabwareCore,
         )
+        from opentrons.protocol_api.labware import Labware
 
         # Block first three columns from being accessed
         definition = labware._core.get_definition()

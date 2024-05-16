@@ -7,61 +7,59 @@ protocol state and side-effects like robot movements.
 The main interface is the `ProtocolEngine` class.
 """
 
+from .commands import (
+    Command,
+    CommandCreate,
+    CommandIntent,
+    CommandParams,
+    CommandStatus,
+    CommandType,
+)
 from .create_protocol_engine import (
     create_protocol_engine,
     create_protocol_engine_in_thread,
 )
-from .protocol_engine import ProtocolEngine
-from .errors import ProtocolEngineError, ErrorOccurrence
+from .errors import ErrorOccurrence, ProtocolEngineError
 from .notes import CommandNote
-from .commands import (
-    Command,
-    CommandParams,
-    CommandCreate,
-    CommandStatus,
-    CommandType,
-    CommandIntent,
-)
-from .state import State, StateView, StateSummary, CommandSlice, CurrentCommand, Config
 from .plugins import AbstractPlugin
-
+from .protocol_engine import ProtocolEngine
+from .state import CommandSlice, Config, CurrentCommand, State, StateSummary, StateView
 from .types import (
-    LabwareOffset,
-    LabwareOffsetCreate,
-    LabwareOffsetVector,
-    LabwareOffsetLocation,
-    LabwareMovementStrategy,
-    AddressableOffsetVector,
-    DeckPoint,
-    DeckType,
-    DeckSlotLocation,
-    ModuleLocation,
-    OnLabwareLocation,
-    AddressableAreaLocation,
     OFF_DECK_LOCATION,
+    AddressableAreaLocation,
+    AddressableOffsetVector,
+    AllNozzleLayoutConfiguration,
+    ColumnNozzleLayoutConfiguration,
+    DeckPoint,
+    DeckSlotLocation,
+    DeckType,
     Dimensions,
+    DropTipWellLocation,
+    DropTipWellOrigin,
     EngineStatus,
     LabwareLocation,
-    NonStackedLocation,
+    LabwareMovementStrategy,
+    LabwareOffset,
+    LabwareOffsetCreate,
+    LabwareOffsetLocation,
+    LabwareOffsetVector,
+    Liquid,
     LoadedLabware,
     LoadedModule,
     LoadedPipette,
-    MotorAxis,
-    WellLocation,
-    DropTipWellLocation,
-    WellOrigin,
-    DropTipWellOrigin,
-    WellOffset,
-    ModuleModel,
     ModuleDefinition,
-    Liquid,
-    AllNozzleLayoutConfiguration,
-    SingleNozzleLayoutConfiguration,
-    RowNozzleLayoutConfiguration,
-    ColumnNozzleLayoutConfiguration,
+    ModuleLocation,
+    ModuleModel,
+    MotorAxis,
+    NonStackedLocation,
+    OnLabwareLocation,
     QuadrantNozzleLayoutConfiguration,
+    RowNozzleLayoutConfiguration,
+    SingleNozzleLayoutConfiguration,
+    WellLocation,
+    WellOffset,
+    WellOrigin,
 )
-
 
 __all__ = [
     # main factory and interface exports

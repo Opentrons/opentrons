@@ -1,8 +1,8 @@
 from typing import Dict, Optional
 
-from .abstract import AbstractMagDeckDriver
 from opentrons.util.async_helpers import ensure_yield
 
+from .abstract import AbstractMagDeckDriver
 
 MAG_DECK_MODELS = {
     "magneticModuleV1": "mag_deck_v1.1",

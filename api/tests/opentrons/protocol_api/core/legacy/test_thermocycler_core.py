@@ -2,30 +2,23 @@
 import pytest
 from decoy import Decoy
 
-from opentrons.types import Mount, Location, Point
 from opentrons.drivers.types import ThermocyclerLidStatus
-from opentrons.hardware_control import SynchronousAdapter, SyncHardwareAPI
+from opentrons.hardware_control import SyncHardwareAPI, SynchronousAdapter
+from opentrons.hardware_control.modules import TemperatureStatus, Thermocycler
+from opentrons.hardware_control.modules.types import ThermocyclerModuleModel
 from opentrons.hardware_control.types import Axis
-from opentrons.hardware_control.modules import Thermocycler, TemperatureStatus
-from opentrons.hardware_control.modules.types import (
-    ThermocyclerModuleModel,
-)
-from opentrons.protocol_api.core.legacy.module_geometry import (
-    ThermocyclerGeometry,
-)
-
-from opentrons.protocol_api.labware import Labware
-from opentrons.protocol_api.core.legacy.legacy_protocol_core import (
-    LegacyProtocolCore,
+from opentrons.protocol_api.core.legacy.legacy_instrument_core import (
+    LegacyInstrumentCore,
 )
 from opentrons.protocol_api.core.legacy.legacy_module_core import (
     LegacyThermocyclerCore,
     create_module_core,
 )
-from opentrons.protocol_api.core.legacy.legacy_instrument_core import (
-    LegacyInstrumentCore,
-)
+from opentrons.protocol_api.core.legacy.legacy_protocol_core import LegacyProtocolCore
 from opentrons.protocol_api.core.legacy.legacy_well_core import LegacyWellCore
+from opentrons.protocol_api.core.legacy.module_geometry import ThermocyclerGeometry
+from opentrons.protocol_api.labware import Labware
+from opentrons.types import Location, Mount, Point
 
 SyncThermocyclerHardware = SynchronousAdapter[Thermocycler]
 

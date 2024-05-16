@@ -1,14 +1,14 @@
 """Tests for the APIs around waste chutes and trash bins."""
 
 
-from opentrons import protocol_api, simulate
-from opentrons.protocols.api_support.types import APIVersion
-
 import contextlib
 from typing import ContextManager, Optional, Type
-from typing_extensions import Literal
 
 import pytest
+from typing_extensions import Literal
+
+from opentrons import protocol_api, simulate
+from opentrons.protocols.api_support.types import APIVersion
 
 
 @pytest.mark.parametrize(

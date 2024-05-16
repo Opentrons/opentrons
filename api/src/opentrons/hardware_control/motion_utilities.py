@@ -1,16 +1,15 @@
 """Utilities for calculating motion correctly."""
-from functools import lru_cache
-from typing import Callable, Dict, Union, Optional, cast
 from collections import OrderedDict
+from functools import lru_cache
+from typing import Callable, Dict, Optional, Union, cast
 
 from opentrons_shared_data.robot.dev_types import RobotType
 
-from opentrons.types import Mount, Point
 from opentrons.calibration_storage.types import AttitudeMatrix
+from opentrons.types import Mount, Point
 from opentrons.util import linal
 
 from .types import Axis, OT3Mount
-
 
 # TODO: The offset_for_mount function should be defined with an overload
 # set, as with other functions in this module. Unfortunately, mypy < 0.920

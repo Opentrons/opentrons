@@ -4,25 +4,17 @@ The purpose is to provide a fake backend that responds to GCODE commands.
 """
 import logging
 from time import sleep
-from typing import (
-    Optional,
-)
+from typing import Optional
 
-from opentrons.drivers.heater_shaker.driver import (
-    GCODE,
-    HS_ACK,
-)
-from opentrons.hardware_control.emulation.parser import Parser, Command
+from opentrons.drivers.heater_shaker.driver import GCODE, HS_ACK
+from opentrons.hardware_control.emulation.parser import Command, Parser
 from opentrons.hardware_control.emulation.settings import HeaterShakerSettings
-from . import util
 
-from .abstract_emulator import AbstractEmulator
-from .simulations import (
-    Temperature,
-    RPM,
-)
-from .util import TEMPERATURE_ROOM
 from ...drivers.types import HeaterShakerLabwareLatchStatus
+from . import util
+from .abstract_emulator import AbstractEmulator
+from .simulations import RPM, Temperature
+from .util import TEMPERATURE_ROOM
 
 logger = logging.getLogger(__name__)
 

@@ -1,15 +1,13 @@
 """Deck data resource provider."""
 from dataclasses import dataclass
 from typing import List, Optional, cast
-from typing_extensions import final
 
 import anyio
-
-from opentrons_shared_data.deck import (
-    load as load_deck,
-    DEFAULT_DECK_DEFINITION_VERSION,
-)
+from opentrons_shared_data.deck import DEFAULT_DECK_DEFINITION_VERSION
+from opentrons_shared_data.deck import load as load_deck
 from opentrons_shared_data.deck.dev_types import DeckDefinitionV5
+from typing_extensions import final
+
 from opentrons.protocols.models import LabwareDefinition
 from opentrons.types import DeckSlotName
 

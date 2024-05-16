@@ -2,10 +2,10 @@ from typing import cast
 
 import mock
 import pytest
+from opentrons_shared_data.labware import load_definition as load_labware_definition
+from opentrons_shared_data.module.dev_types import ModuleDefinitionV3
 
 import opentrons.protocol_api as papi
-
-from opentrons.types import Point, Location
 from opentrons.drivers.types import (
     HeaterShakerLabwareLatchStatus,
     ThermocyclerLidStatus,
@@ -22,9 +22,7 @@ from opentrons.protocol_api.core.legacy.module_geometry import (
 )
 from opentrons.protocols.api_support.deck_type import STANDARD_OT2_DECK
 from opentrons.protocols.api_support.types import APIVersion
-
-from opentrons_shared_data.labware import load_definition as load_labware_definition
-from opentrons_shared_data.module.dev_types import ModuleDefinitionV3
+from opentrons.types import Location, Point
 
 
 @pytest.fixture

@@ -1,60 +1,61 @@
 """Test equipment command execution side effects."""
-import pytest
 import inspect
 from datetime import datetime
-from decoy import Decoy, matchers
 from typing import Any, Optional, cast
 
-from opentrons_shared_data.pipette.dev_types import PipetteNameType
-from opentrons_shared_data.pipette import pipette_definition
+import pytest
+from decoy import Decoy, matchers
 from opentrons_shared_data.labware.dev_types import LabwareUri
+from opentrons_shared_data.pipette import pipette_definition
+from opentrons_shared_data.pipette.dev_types import PipetteNameType
 
 from opentrons.calibration_storage.helpers import uri_from_details
-from opentrons.types import Mount as HwMount, MountType, DeckSlotName, Point
 from opentrons.hardware_control import HardwareControlAPI
-from opentrons.hardware_control.modules import (
-    TempDeck,
-    MagDeck,
-    HeaterShaker,
-    AbstractModule,
-)
 from opentrons.hardware_control.dev_types import PipetteDict
-from opentrons.protocols.models import LabwareDefinition
-
-from opentrons.protocol_engine import errors
-from opentrons.protocol_engine.types import (
-    DeckSlotLocation,
-    DeckType,
-    ModuleLocation,
-    OnLabwareLocation,
-    NonStackedLocation,
-    LoadedPipette,
-    LabwareOffset,
-    LabwareOffsetVector,
-    LabwareOffsetLocation,
-    ModuleModel,
-    ModuleDefinition,
-    OFF_DECK_LOCATION,
-    FlowRates,
+from opentrons.hardware_control.modules import (
+    AbstractModule,
+    HeaterShaker,
+    MagDeck,
+    TempDeck,
 )
-
-from opentrons.protocol_engine.state import Config, StateStore
-from opentrons.protocol_engine.state.modules import HardwareModule
+from opentrons.protocol_engine import errors
+from opentrons.protocol_engine.execution.equipment import (
+    EquipmentHandler,
+    LoadedLabwareData,
+    LoadedModuleData,
+    LoadedPipetteData,
+)
 from opentrons.protocol_engine.resources import (
-    ModelUtils,
     LabwareDataProvider,
+    ModelUtils,
     ModuleDataProvider,
     pipette_data_provider,
 )
 from opentrons.protocol_engine.resources.pipette_data_provider import (
     LoadedStaticPipetteData,
 )
-from opentrons.protocol_engine.execution.equipment import (
-    EquipmentHandler,
-    LoadedLabwareData,
-    LoadedPipetteData,
-    LoadedModuleData,
+from opentrons.protocol_engine.state import Config, StateStore
+from opentrons.protocol_engine.state.modules import HardwareModule
+from opentrons.protocol_engine.types import (
+    OFF_DECK_LOCATION,
+    DeckSlotLocation,
+    DeckType,
+    FlowRates,
+    LabwareOffset,
+    LabwareOffsetLocation,
+    LabwareOffsetVector,
+    LoadedPipette,
+    ModuleDefinition,
+    ModuleLocation,
+    ModuleModel,
+    NonStackedLocation,
+    OnLabwareLocation,
 )
+from opentrons.protocols.models import LabwareDefinition
+from opentrons.types import DeckSlotName
+from opentrons.types import Mount as HwMount
+from opentrons.types import MountType, Point
+
 from ..pipette_fixtures import get_default_nozzle_map
 
 

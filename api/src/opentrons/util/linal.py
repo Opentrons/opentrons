@@ -1,10 +1,12 @@
 from __future__ import annotations
+
 import logging
+from typing import List, Tuple, Union
+
 import numpy as np
-from numpy import insert, dot
+from numpy import dot, insert
 from numpy.linalg import inv
 from numpy.typing import NDArray
-from typing import List, Tuple, Union
 
 from opentrons.calibration_storage.types import AttitudeMatrix
 

@@ -3,11 +3,13 @@ import logging
 import pathlib
 import time
 from typing import Callable, Dict, Tuple
-from opentrons.hardware_control.types import BoardRevision, DoorState
-from . import RevisionPinsError
-from .types import gpio_group, PinDir, GPIOPin
 
 import gpiod  # type: ignore[import-not-found]
+
+from opentrons.hardware_control.types import BoardRevision, DoorState
+
+from . import RevisionPinsError
+from .types import GPIOPin, PinDir, gpio_group
 
 """
 Raspberry Pi GPIO control module

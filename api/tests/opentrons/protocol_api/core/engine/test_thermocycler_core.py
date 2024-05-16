@@ -5,13 +5,13 @@ from decoy import Decoy
 from opentrons.drivers.types import ThermocyclerLidStatus
 from opentrons.hardware_control import SynchronousAdapter
 from opentrons.hardware_control.modules import (
-    Thermocycler,
-    TemperatureStatus,
     ModuleType,
+    TemperatureStatus,
+    Thermocycler,
 )
-from opentrons.protocol_engine.clients import SyncClient as EngineClient
-from opentrons.protocol_api.core.engine.module_core import ThermocyclerModuleCore
 from opentrons.protocol_api import MAX_SUPPORTED_VERSION
+from opentrons.protocol_api.core.engine.module_core import ThermocyclerModuleCore
+from opentrons.protocol_engine.clients import SyncClient as EngineClient
 
 SyncThermocyclerHardware = SynchronousAdapter[Thermocycler]
 

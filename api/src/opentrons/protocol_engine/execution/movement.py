@@ -2,27 +2,26 @@
 from __future__ import annotations
 
 import logging
-from typing import Optional, List
+from typing import List, Optional
 
-from opentrons.types import Point, MountType
-from opentrons.hardware_control import HardwareControlAPI
 from opentrons_shared_data.errors.exceptions import PositionUnknownError
 
-from ..types import (
-    WellLocation,
-    DeckPoint,
-    MovementAxis,
-    MotorAxis,
-    CurrentWell,
-    AddressableOffsetVector,
-)
-from ..state import StateStore
+from opentrons.hardware_control import HardwareControlAPI
+from opentrons.types import MountType, Point
+
 from ..resources import ModelUtils
-from .thermocycler_movement_flagger import ThermocyclerMovementFlagger
-from .heater_shaker_movement_flagger import HeaterShakerMovementFlagger
-
+from ..state import StateStore
+from ..types import (
+    AddressableOffsetVector,
+    CurrentWell,
+    DeckPoint,
+    MotorAxis,
+    MovementAxis,
+    WellLocation,
+)
 from .gantry_mover import GantryMover
-
+from .heater_shaker_movement_flagger import HeaterShakerMovementFlagger
+from .thermocycler_movement_flagger import ThermocyclerMovementFlagger
 
 log = logging.getLogger(__name__)
 

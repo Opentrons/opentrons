@@ -10,7 +10,7 @@ from opentrons.util.async_helpers import async_context_manager_in_thread
 from .protocol_engine import ProtocolEngine
 from .resources import DeckDataProvider, ModuleDataProvider
 from .state import Config, StateStore
-from .types import PostRunHardwareState, DeckConfigurationType
+from .types import DeckConfigurationType, PostRunHardwareState
 
 
 # TODO(mm, 2023-06-16): Arguably, this not being a context manager makes us prone to forgetting to

@@ -3,10 +3,10 @@ from dataclasses import dataclass
 from enum import Enum
 from typing import List, Optional
 
-from opentrons.types import Point
 from opentrons.motion_planning.types import MoveType
+from opentrons.types import Point
 
-from ..types import CurrentWell, CurrentPipetteLocation
+from ..types import CurrentPipetteLocation, CurrentWell
 
 
 @dataclass

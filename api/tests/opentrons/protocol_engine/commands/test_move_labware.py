@@ -1,38 +1,38 @@
 """Test the ``moveLabware`` command."""
 import inspect
+
 import pytest
 from decoy import Decoy
-
-from opentrons_shared_data.labware.labware_definition import Parameters, Dimensions
 from opentrons_shared_data.gripper.constants import GRIPPER_PADDLE_WIDTH
+from opentrons_shared_data.labware.labware_definition import Dimensions, Parameters
 
-from opentrons.types import DeckSlotName, Point
-from opentrons.protocols.models import LabwareDefinition
-from opentrons.protocol_engine import errors, Config
-from opentrons.protocol_engine.resources import labware_validation
-from opentrons.protocol_engine.types import (
-    DeckSlotLocation,
-    ModuleLocation,
-    OnLabwareLocation,
-    LoadedLabware,
-    LabwareMovementStrategy,
-    LabwareOffsetVector,
-    LabwareMovementOffsetData,
-    DeckType,
-    AddressableAreaLocation,
-)
-from opentrons.protocol_engine.state import StateView
+from opentrons.protocol_engine import Config, errors
 from opentrons.protocol_engine.commands.command import SuccessData
 from opentrons.protocol_engine.commands.move_labware import (
+    MoveLabwareImplementation,
     MoveLabwareParams,
     MoveLabwareResult,
-    MoveLabwareImplementation,
 )
 from opentrons.protocol_engine.execution import (
     EquipmentHandler,
-    RunControlHandler,
     LabwareMovementHandler,
+    RunControlHandler,
 )
+from opentrons.protocol_engine.resources import labware_validation
+from opentrons.protocol_engine.state import StateView
+from opentrons.protocol_engine.types import (
+    AddressableAreaLocation,
+    DeckSlotLocation,
+    DeckType,
+    LabwareMovementOffsetData,
+    LabwareMovementStrategy,
+    LabwareOffsetVector,
+    LoadedLabware,
+    ModuleLocation,
+    OnLabwareLocation,
+)
+from opentrons.protocols.models import LabwareDefinition
+from opentrons.types import DeckSlotName, Point
 
 
 @pytest.fixture(autouse=True)

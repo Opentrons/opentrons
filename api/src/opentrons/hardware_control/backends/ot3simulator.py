@@ -1,69 +1,69 @@
 """OT3 Hardware Controller Backend."""
 
 from __future__ import annotations
+
 import asyncio
-from contextlib import asynccontextmanager
 import logging
+from contextlib import asynccontextmanager
 from typing import (
+    AsyncIterator,
     Dict,
     List,
-    Optional,
-    Tuple,
-    Sequence,
-    AsyncIterator,
-    cast,
-    Set,
-    Union,
     Mapping,
+    Optional,
+    Sequence,
+    Set,
+    Tuple,
+    Union,
+    cast,
 )
 
-from opentrons.config.types import OT3Config, GantryLoad, OutputOptions
-from opentrons.config import gripper_config
+from opentrons_shared_data.gripper.gripper_definition import GripperModel
+from opentrons_shared_data.pipette import load_data as load_pipette_data
+from opentrons_shared_data.pipette import (
+    pipette_load_name_conversions as pipette_load_name,
+)
+from opentrons_shared_data.pipette.dev_types import PipetteModel, PipetteName
 
-from opentrons.hardware_control.module_control import AttachedModulesControl
+from opentrons.config import gripper_config
+from opentrons.config.types import GantryLoad, OT3Config, OutputOptions
 from opentrons.hardware_control import modules
+from opentrons.hardware_control.dev_types import (
+    AttachedGripper,
+    AttachedPipette,
+    GripperSpec,
+    OT3AttachedInstruments,
+    PipetteSpec,
+)
+from opentrons.hardware_control.module_control import AttachedModulesControl
 from opentrons.hardware_control.types import (
-    BoardRevision,
     Axis,
+    BoardRevision,
+    CurrentConfig,
+    EstopOverallStatus,
+    EstopPhysicalStatus,
+    EstopState,
+    GripperJawState,
+    HardwareEventHandler,
+    HardwareEventUnsubscriber,
+    HardwareFeatureFlags,
     HepaFanState,
     HepaUVState,
-    OT3Mount,
-    OT3AxisMap,
-    CurrentConfig,
     InstrumentProbeType,
     MotorStatus,
-    UpdateStatus,
-    UpdateState,
+    OT3AxisMap,
+    OT3Mount,
+    StatusBarState,
     SubSystem,
     SubSystemState,
     TipStateType,
-    GripperJawState,
-    HardwareFeatureFlags,
-    StatusBarState,
-    EstopOverallStatus,
-    EstopState,
-    EstopPhysicalStatus,
-    HardwareEventHandler,
-    HardwareEventUnsubscriber,
-)
-
-from opentrons_shared_data.pipette.dev_types import PipetteName, PipetteModel
-from opentrons_shared_data.pipette import (
-    pipette_load_name_conversions as pipette_load_name,
-    load_data as load_pipette_data,
-)
-from opentrons_shared_data.gripper.gripper_definition import GripperModel
-from opentrons.hardware_control.dev_types import (
-    PipetteSpec,
-    GripperSpec,
-    AttachedPipette,
-    AttachedGripper,
-    OT3AttachedInstruments,
+    UpdateState,
+    UpdateStatus,
 )
 from opentrons.util.async_helpers import ensure_yield
-from .types import HWStopCondition
-from .flex_protocol import FlexBackend
 
+from .flex_protocol import FlexBackend
+from .types import HWStopCondition
 
 log = logging.getLogger(__name__)
 

@@ -1,11 +1,12 @@
+from dataclasses import asdict, dataclass, fields
 from enum import Enum
-from dataclasses import dataclass, asdict, fields
-from typing import Dict, Tuple, TypeVar, Generic, List, cast, Optional, TYPE_CHECKING
-from typing_extensions import TypedDict, Literal
+from typing import TYPE_CHECKING, Dict, Generic, List, Optional, Tuple, TypeVar, cast
+
+from typing_extensions import Literal, TypedDict
 
 if TYPE_CHECKING:
     # Work around circular import.
-    from opentrons.hardware_control.types import OT3AxisKind, InstrumentProbeType
+    from opentrons.hardware_control.types import InstrumentProbeType, OT3AxisKind
 
 
 class AxisDict(TypedDict):

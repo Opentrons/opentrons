@@ -1,6 +1,7 @@
 """Tests for `opentrons.simulate`."""
 
 from __future__ import annotations
+
 import io
 import json
 import textwrap
@@ -9,14 +10,13 @@ from typing import TYPE_CHECKING, Callable, Generator, List, TextIO, cast
 
 import pytest
 from _pytest.fixtures import SubRequest
-
 from opentrons_shared_data import get_shared_data_root, load_shared_data
 
-from opentrons import simulate, protocols
+from opentrons import protocols, simulate
 from opentrons.protocol_api.core.engine import ENGINE_CORE_API_VERSION
-from opentrons.protocols.types import ApiDeprecationError
 from opentrons.protocols.api_support.types import APIVersion
 from opentrons.protocols.execution.errors import ExceptionInProtocolError
+from opentrons.protocols.types import ApiDeprecationError
 from opentrons.util import entrypoint_util
 
 if TYPE_CHECKING:

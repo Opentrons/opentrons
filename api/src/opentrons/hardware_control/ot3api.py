@@ -1,147 +1,132 @@
 import asyncio
-from concurrent.futures import Future
 import contextlib
-from functools import partial, lru_cache, wraps
-from dataclasses import replace
 import logging
 from collections import OrderedDict
+from concurrent.futures import Future
+from dataclasses import replace
+from functools import lru_cache, partial, wraps
 from typing import (
+    Any,
     AsyncIterator,
-    cast,
+    Awaitable,
     Callable,
     Dict,
-    Union,
     List,
+    Mapping,
     Optional,
     Sequence,
     Set,
-    Any,
-    TypeVar,
     Tuple,
-    Mapping,
-    Awaitable,
-)
-from opentrons.hardware_control.modules.module_calibration import (
-    ModuleCalibrationOffset,
+    TypeVar,
+    Union,
+    cast,
 )
 
-
-from opentrons_shared_data.pipette.dev_types import (
-    PipetteName,
+from opentrons_shared_data.errors.exceptions import (
+    EnumeratedError,
+    FirmwareUpdateFailedError,
+    GripperNotPresentError,
+    InvalidActuator,
+    PositionUnknownError,
+    PythonException,
 )
 from opentrons_shared_data.pipette import (
     pipette_load_name_conversions as pipette_load_name,
 )
+from opentrons_shared_data.pipette.dev_types import PipetteName
 from opentrons_shared_data.robot.dev_types import RobotType
 
 from opentrons import types as top_types
 from opentrons.config import robot_configs
 from opentrons.config.types import (
-    RobotConfig,
-    OT3Config,
-    GantryLoad,
     CapacitivePassSettings,
+    GantryLoad,
     LiquidProbeSettings,
+    OT3Config,
+    RobotConfig,
 )
-from opentrons.drivers.rpi_drivers.types import USBPort, PortGroup
+from opentrons.drivers.rpi_drivers.types import PortGroup, USBPort
+from opentrons.hardware_control.modules.module_calibration import (
+    ModuleCalibrationOffset,
+)
 from opentrons.hardware_control.nozzle_manager import NozzleConfigurationType
-from opentrons_shared_data.errors.exceptions import (
-    EnumeratedError,
-    PythonException,
-    PositionUnknownError,
-    GripperNotPresentError,
-    InvalidActuator,
-    FirmwareUpdateFailedError,
-)
 
-from .util import use_or_initialize_loop, check_motion_bounds
-
-from .instruments.ot3.pipette import (
-    load_from_config_and_check_skip,
+from . import modules
+from .backends.errors import SubsystemUpdating
+from .backends.flex_protocol import FlexBackend
+from .backends.ot3simulator import OT3Simulator
+from .backends.types import HWStopCondition
+from .dev_types import (
+    AttachedGripper,
+    AttachedPipette,
+    GripperDict,
+    InstrumentDict,
+    PipetteDict,
+    PipetteStateDict,
 )
-from .instruments.ot3.gripper import compare_gripper_config_and_check_skip, Gripper
+from .errors import UpdateOngoingError
+from .execution_manager import ExecutionManagerProvider
+from .instruments.ot3.gripper import Gripper, compare_gripper_config_and_check_skip
+from .instruments.ot3.gripper_handler import GripperHandler
 from .instruments.ot3.instrument_calibration import (
     GripperCalibrationOffset,
     PipetteOffsetSummary,
+    load_gripper_calibration_offset,
+    load_pipette_offset,
 )
-
-from .execution_manager import ExecutionManagerProvider
-from .pause_manager import PauseManager
-from .module_control import AttachedModulesControl
-from .types import (
-    CriticalPoint,
-    DoorState,
-    DoorStateNotification,
-    ErrorMessageNotification,
-    HardwareEvent,
-    HardwareEventHandler,
-    HardwareAction,
-    HepaFanState,
-    HepaUVState,
-    MotionChecks,
-    SubSystem,
-    PauseType,
-    Axis,
-    OT3AxisKind,
-    OT3Mount,
-    OT3AxisMap,
-    InstrumentProbeType,
-    GripperProbe,
-    UpdateStatus,
-    StatusBarState,
-    SubSystemState,
-    TipStateType,
-    EstopOverallStatus,
-    EstopStateNotification,
-    EstopState,
-    HardwareFeatureFlags,
-    FailedTipStateCheck,
-)
-from .errors import (
-    UpdateOngoingError,
-)
-from . import modules
-from .ot3_calibration import OT3Transforms, OT3RobotCalibrationProvider
-
-from .protocols import FlexHardwareControlInterface
+from .instruments.ot3.pipette import load_from_config_and_check_skip
 
 # TODO (lc 09/15/2022) We should update our pipette handler to reflect OT-3 properties
 # in a follow-up PR.
 from .instruments.ot3.pipette_handler import (
-    OT3PipetteHandler,
     InstrumentsByMount,
-    TipActionSpec,
+    OT3PipetteHandler,
     TipActionMoveSpec,
+    TipActionSpec,
 )
-from .instruments.ot3.instrument_calibration import load_pipette_offset
-from .instruments.ot3.gripper_handler import GripperHandler
-from .instruments.ot3.instrument_calibration import (
-    load_gripper_calibration_offset,
-)
-
+from .module_control import AttachedModulesControl
 from .motion_utilities import (
-    target_position_from_absolute,
-    target_position_from_relative,
-    target_position_from_plunger,
-    offset_for_mount,
     deck_from_machine,
     machine_from_deck,
     machine_vector_from_deck_vector,
+    offset_for_mount,
+    target_position_from_absolute,
+    target_position_from_plunger,
+    target_position_from_relative,
 )
-
-from .dev_types import (
-    AttachedGripper,
-    AttachedPipette,
-    PipetteDict,
-    PipetteStateDict,
-    InstrumentDict,
-    GripperDict,
+from .ot3_calibration import OT3RobotCalibrationProvider, OT3Transforms
+from .pause_manager import PauseManager
+from .protocols import FlexHardwareControlInterface
+from .types import (
+    Axis,
+    CriticalPoint,
+    DoorState,
+    DoorStateNotification,
+    ErrorMessageNotification,
+    EstopOverallStatus,
+    EstopState,
+    EstopStateNotification,
+    FailedTipStateCheck,
+    GripperProbe,
+    HardwareAction,
+    HardwareEvent,
+    HardwareEventHandler,
+    HardwareFeatureFlags,
+    HepaFanState,
+    HepaUVState,
+    InstrumentProbeType,
+    MotionChecks,
+    OT3AxisKind,
+    OT3AxisMap,
+    OT3Mount,
+    PauseType,
+    StatusBarState,
+    SubSystem,
+    SubSystemState,
+    TipStateType,
+    UpdateStatus,
 )
-from .backends.types import HWStopCondition
-from .backends.flex_protocol import FlexBackend
-from .backends.ot3simulator import OT3Simulator
-from .backends.errors import SubsystemUpdating
-
+from .util import check_motion_bounds, use_or_initialize_loop
 
 mod_log = logging.getLogger(__name__)
 

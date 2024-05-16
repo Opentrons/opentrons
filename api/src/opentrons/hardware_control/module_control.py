@@ -1,25 +1,26 @@
 from __future__ import annotations
+
 import logging
 import re
-from typing import TYPE_CHECKING, List, Optional, Union
 from glob import glob
+from typing import TYPE_CHECKING, List, Optional, Union
 
-from opentrons.config import IS_ROBOT, IS_LINUX
-from opentrons.drivers.rpi_drivers import types, interfaces, usb, usb_simulator
+from opentrons.config import IS_LINUX, IS_ROBOT
+from opentrons.drivers.rpi_drivers import interfaces, types, usb, usb_simulator
 from opentrons.hardware_control.emulation.module_server.helpers import (
     listen_module_connection,
 )
+from opentrons.hardware_control.modules import SimulatingModuleAtPort
 from opentrons.hardware_control.modules.module_calibration import (
     ModuleCalibrationOffset,
     load_module_calibration_offset,
     save_module_calibration_offset,
 )
 from opentrons.hardware_control.modules.types import ModuleType
-from opentrons.hardware_control.modules import SimulatingModuleAtPort
-
 from opentrons.types import Point
-from .types import AionotifyEvent, BoardRevision, OT3Mount
+
 from . import modules
+from .types import AionotifyEvent, BoardRevision, OT3Mount
 
 if TYPE_CHECKING:
     from .api import API

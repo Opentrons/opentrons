@@ -1,32 +1,25 @@
 """Tests for the PythonAndLegacyRunner's LegacyContextPlugin."""
-import pytest
-from anyio import to_thread
-from decoy import Decoy, matchers
 from datetime import datetime
 from typing import Callable
 
-from opentrons.legacy_commands.types import (
-    CommandMessage as LegacyCommand,
-    PauseMessage,
-)
-from opentrons.protocol_engine import (
-    StateView,
-    actions as pe_actions,
-    commands as pe_commands,
-)
-from opentrons.legacy_broker import LegacyBroker
-from opentrons.util.broker import ReadOnlyBroker
-
-from opentrons.protocol_api.core.legacy.load_info import LoadInfo, LabwareLoadInfo
-
-from opentrons.protocol_runner.legacy_command_mapper import LegacyCommandMapper
-from opentrons.protocol_runner.legacy_context_plugin import LegacyContextPlugin
-
-from opentrons.types import DeckSlotName
-
+import pytest
+from anyio import to_thread
+from decoy import Decoy, matchers
 from opentrons_shared_data.labware.dev_types import (
     LabwareDefinition as LabwareDefinitionDict,
 )
+
+from opentrons.legacy_broker import LegacyBroker
+from opentrons.legacy_commands.types import CommandMessage as LegacyCommand
+from opentrons.legacy_commands.types import PauseMessage
+from opentrons.protocol_api.core.legacy.load_info import LabwareLoadInfo, LoadInfo
+from opentrons.protocol_engine import StateView
+from opentrons.protocol_engine import actions as pe_actions
+from opentrons.protocol_engine import commands as pe_commands
+from opentrons.protocol_runner.legacy_command_mapper import LegacyCommandMapper
+from opentrons.protocol_runner.legacy_context_plugin import LegacyContextPlugin
+from opentrons.types import DeckSlotName
+from opentrons.util.broker import ReadOnlyBroker
 
 
 @pytest.fixture

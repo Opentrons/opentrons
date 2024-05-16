@@ -1,41 +1,39 @@
 """Command side-effect execution logic container."""
 import asyncio
 from logging import getLogger
-from typing import Optional, List, Protocol
-
-from opentrons.hardware_control import HardwareControlAPI
+from typing import List, Optional, Protocol
 
 from opentrons_shared_data.errors.exceptions import (
-    EStopActivatedError,
     EnumeratedError,
+    EStopActivatedError,
     PythonException,
 )
 
+from opentrons.hardware_control import HardwareControlAPI
 from opentrons.protocol_engine.commands.command import SuccessData
 from opentrons.protocol_engine.error_recovery_policy import ErrorRecoveryPolicy
 
-from ..state import StateStore
-from ..resources import ModelUtils
-from ..commands import CommandStatus
 from ..actions import (
     ActionDispatcher,
+    FailCommandAction,
     RunCommandAction,
     SucceedCommandAction,
-    FailCommandAction,
 )
+from ..commands import CommandStatus
 from ..errors import RunStoppedError
 from ..errors.exceptions import EStopActivatedError as PE_EStopActivatedError
 from ..notes import CommandNote, CommandNoteTracker
+from ..resources import ModelUtils
+from ..state import StateStore
 from .equipment import EquipmentHandler
-from .movement import MovementHandler
 from .gantry_mover import GantryMover
 from .labware_movement import LabwareMovementHandler
+from .movement import MovementHandler
 from .pipetting import PipettingHandler
-from .tip_handler import TipHandler
-from .run_control import RunControlHandler
 from .rail_lights import RailLightsHandler
+from .run_control import RunControlHandler
 from .status_bar import StatusBarHandler
-
+from .tip_handler import TipHandler
 
 log = getLogger(__name__)
 

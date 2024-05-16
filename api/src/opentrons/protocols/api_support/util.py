@@ -1,10 +1,10 @@
 """ Utility functions and classes for the protocol api """
 from __future__ import annotations
 
-from collections import UserDict
 import functools
 import logging
-from dataclasses import dataclass, field, astuple
+from collections import UserDict
+from dataclasses import astuple, dataclass, field
 from typing import (
     TYPE_CHECKING,
     Any,
@@ -17,14 +17,14 @@ from typing import (
     cast,
 )
 
-from opentrons import types as top_types
-from opentrons.protocols.api_support.types import APIVersion
-from opentrons.hardware_control.types import Axis
-from opentrons.hardware_control.util import ot2_axis_to_string
 from opentrons_shared_data.robot.dev_types import RobotType
 
+from opentrons import types as top_types
+from opentrons.hardware_control.types import Axis
+from opentrons.hardware_control.util import ot2_axis_to_string
+from opentrons.protocols.api_support.types import APIVersion
+
 if TYPE_CHECKING:
-    from opentrons.protocol_api.labware import Well, Labware
     from opentrons.protocol_api.core.engine.instrument import InstrumentCore
     from opentrons.protocol_api.core.legacy.deck import Deck
     from opentrons.protocol_api.core.legacy.legacy_instrument_core import (
@@ -33,6 +33,7 @@ if TYPE_CHECKING:
     from opentrons.protocol_api.core.legacy_simulator.legacy_instrument_core import (
         LegacyInstrumentCoreSimulator,
     )
+    from opentrons.protocol_api.labware import Labware, Well
 
 MODULE_LOG = logging.getLogger(__name__)
 

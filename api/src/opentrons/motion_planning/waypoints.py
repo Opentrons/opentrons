@@ -1,13 +1,14 @@
 """Waypoint planning."""
 from typing import List, Optional, Sequence, Tuple
+
 from typing_extensions import Final
 
-from opentrons.types import Point
 from opentrons.hardware_control.types import CriticalPoint
+from opentrons.types import Point
 
-from .types import Waypoint, MoveType, GripperMovementWaypointsWithJawStatus
-from .errors import DestinationOutOfBoundsError, ArcOutOfBoundsError
 from ..protocol_engine.types import LabwareMovementOffsetData
+from .errors import ArcOutOfBoundsError, DestinationOutOfBoundsError
+from .types import GripperMovementWaypointsWithJawStatus, MoveType, Waypoint
 
 DEFAULT_GENERAL_ARC_Z_MARGIN: Final[float] = 10.0
 DEFAULT_IN_LABWARE_ARC_Z_MARGIN: Final[float] = 5.0

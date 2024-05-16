@@ -1,7 +1,7 @@
 """Abstract interface for Well core implementations."""
 
 from abc import ABC, abstractmethod
-from typing import TypeVar, Optional
+from typing import Optional, TypeVar
 
 from opentrons.types import Point
 

@@ -1,28 +1,31 @@
 """Models and implementation for the ``moveLabware`` command."""
 
 from __future__ import annotations
-from pydantic import BaseModel, Field
+
 from typing import TYPE_CHECKING, Optional, Type
+
+from opentrons_shared_data.gripper.constants import GRIPPER_PADDLE_WIDTH
+from pydantic import BaseModel, Field
 from typing_extensions import Literal
 
 from opentrons.types import Point
+
+from ..errors import LabwareMovementNotAllowedError, NotSupportedOnRobotType
+from ..errors.error_occurrence import ErrorOccurrence
+from ..resources import fixture_validation, labware_validation
 from ..types import (
-    LabwareLocation,
-    DeckSlotLocation,
-    OnLabwareLocation,
     AddressableAreaLocation,
+    DeckSlotLocation,
+    LabwareLocation,
+    LabwareMovementOffsetData,
     LabwareMovementStrategy,
     LabwareOffsetVector,
-    LabwareMovementOffsetData,
+    OnLabwareLocation,
 )
-from ..errors import LabwareMovementNotAllowedError, NotSupportedOnRobotType
-from ..resources import labware_validation, fixture_validation
 from .command import AbstractCommandImpl, BaseCommand, BaseCommandCreate, SuccessData
-from ..errors.error_occurrence import ErrorOccurrence
-from opentrons_shared_data.gripper.constants import GRIPPER_PADDLE_WIDTH
 
 if TYPE_CHECKING:
-    from ..execution import EquipmentHandler, RunControlHandler, LabwareMovementHandler
+    from ..execution import EquipmentHandler, LabwareMovementHandler, RunControlHandler
     from ..state import StateView
 
 

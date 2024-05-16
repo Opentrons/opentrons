@@ -2,17 +2,16 @@
 from decoy import Decoy
 
 from opentrons.hardware_control.modules import Thermocycler
-
-from opentrons.protocol_engine.state import StateView
-from opentrons.protocol_engine.state.module_substates import (
-    ThermocyclerModuleSubState,
-    ThermocyclerModuleId,
-)
-from opentrons.protocol_engine.execution import EquipmentHandler
 from opentrons.protocol_engine.commands import thermocycler as tc_commands
 from opentrons.protocol_engine.commands.command import SuccessData
 from opentrons.protocol_engine.commands.thermocycler.deactivate_lid import (
     DeactivateLidImpl,
+)
+from opentrons.protocol_engine.execution import EquipmentHandler
+from opentrons.protocol_engine.state import StateView
+from opentrons.protocol_engine.state.module_substates import (
+    ThermocyclerModuleId,
+    ThermocyclerModuleSubState,
 )
 
 

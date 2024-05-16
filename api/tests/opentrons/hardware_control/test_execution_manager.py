@@ -1,10 +1,9 @@
 import asyncio
+
 import pytest
-from opentrons.hardware_control import (
-    ExecutionManager,
-    ExecutionState,
-)
 from opentrons_shared_data.errors.exceptions import ExecutionCancelledError
+
+from opentrons.hardware_control import ExecutionManager, ExecutionState
 
 
 async def test_state_machine():

@@ -1,28 +1,27 @@
 """Tests for tip state store and selectors."""
 from collections import OrderedDict
-
-import pytest
-
 from typing import Optional
 
+import pytest
+from opentrons_shared_data.labware.labware_definition import LabwareDefinition
 from opentrons_shared_data.labware.labware_definition import (
-    LabwareDefinition,
     Parameters as LabwareParameters,
 )
 from opentrons_shared_data.pipette import pipette_definition
+from opentrons_shared_data.pipette.dev_types import PipetteNameType
 
 from opentrons.hardware_control.nozzle_manager import NozzleMap
 from opentrons.protocol_engine import actions, commands
-from opentrons.protocol_engine.state.tips import TipStore, TipView
-from opentrons.protocol_engine.types import FlowRates, DeckPoint
 from opentrons.protocol_engine.resources.pipette_data_provider import (
     LoadedStaticPipetteData,
 )
+from opentrons.protocol_engine.state.tips import TipStore, TipView
+from opentrons.protocol_engine.types import DeckPoint, FlowRates
 from opentrons.types import Point
-from opentrons_shared_data.pipette.dev_types import PipetteNameType
+
 from ..pipette_fixtures import (
-    NINETY_SIX_MAP,
     NINETY_SIX_COLS,
+    NINETY_SIX_MAP,
     NINETY_SIX_ROWS,
     get_default_nozzle_map,
 )

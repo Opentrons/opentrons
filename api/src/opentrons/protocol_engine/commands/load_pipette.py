@@ -1,6 +1,9 @@
 """Load pipette command request, result, and implementation models."""
 from __future__ import annotations
 
+from typing import TYPE_CHECKING, Optional, Type
+
+from opentrons_shared_data.pipette.dev_types import PipetteNameType
 from opentrons_shared_data.pipette.pipette_load_name_conversions import (
     convert_to_pipette_name_type,
 )
@@ -8,16 +11,14 @@ from opentrons_shared_data.pipette.types import PipetteGenerationType
 from opentrons_shared_data.robot import user_facing_robot_type
 from opentrons_shared_data.robot.dev_types import RobotTypeEnum
 from pydantic import BaseModel, Field
-from typing import TYPE_CHECKING, Optional, Type
 from typing_extensions import Literal
 
-from opentrons_shared_data.pipette.dev_types import PipetteNameType
 from opentrons.types import MountType
 
-from .command import AbstractCommandImpl, BaseCommand, BaseCommandCreate, SuccessData
+from ..errors import InvalidLoadPipetteSpecsError, InvalidSpecificationForRobotTypeError
 from ..errors.error_occurrence import ErrorOccurrence
+from .command import AbstractCommandImpl, BaseCommand, BaseCommandCreate, SuccessData
 from .configuring_common import PipetteConfigUpdateResultMixin
-from ..errors import InvalidSpecificationForRobotTypeError, InvalidLoadPipetteSpecsError
 
 if TYPE_CHECKING:
     from ..execution import EquipmentHandler

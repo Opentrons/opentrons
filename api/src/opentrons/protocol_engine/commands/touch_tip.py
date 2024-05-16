@@ -1,21 +1,23 @@
 """Touch tip command request, result, and implementation models."""
 from __future__ import annotations
-from pydantic import Field
+
 from typing import TYPE_CHECKING, Optional, Type
+
+from pydantic import Field
 from typing_extensions import Literal
 
-from ..errors import TouchTipDisabledError, LabwareIsTipRackError
+from ..errors import LabwareIsTipRackError, TouchTipDisabledError
+from ..errors.error_occurrence import ErrorOccurrence
 from ..types import DeckPoint
 from .command import AbstractCommandImpl, BaseCommand, BaseCommandCreate, SuccessData
-from ..errors.error_occurrence import ErrorOccurrence
 from .pipetting_common import (
+    DestinationPositionResult,
     PipetteIdMixin,
     WellLocationMixin,
-    DestinationPositionResult,
 )
 
 if TYPE_CHECKING:
-    from ..execution import MovementHandler, GantryMover
+    from ..execution import GantryMover, MovementHandler
     from ..state import StateView
 
 

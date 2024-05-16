@@ -1,11 +1,10 @@
 """ Test the Transfer class and its functions """
 import pytest
 
-from opentrons.types import Mount, TransferTipPolicy
+import opentrons.protocol_api as papi
 from opentrons.protocols.advanced_control import transfers as tx
 from opentrons.protocols.api_support.types import APIVersion
-
-import opentrons.protocol_api as papi
+from opentrons.types import Mount, TransferTipPolicy
 
 # TODO (lc 12-8-2022) We need to re-write these transfer tests so that
 # they are agnostic to the underlying hardware.

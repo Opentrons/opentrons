@@ -1,10 +1,10 @@
 """Test comment command."""
+from opentrons.protocol_engine.commands.command import SuccessData
 from opentrons.protocol_engine.commands.comment import (
+    CommentImplementation,
     CommentParams,
     CommentResult,
-    CommentImplementation,
 )
-from opentrons.protocol_engine.commands.command import SuccessData
 
 
 async def test_comment_implementation() -> None:

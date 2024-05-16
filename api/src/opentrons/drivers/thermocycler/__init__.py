@@ -1,7 +1,6 @@
-from .driver import ThermocyclerDriver, ThermocyclerDriverV2, ThermocyclerDriverFactory
-from .simulator import SimulatingDriver
 from .abstract import AbstractThermocyclerDriver
-
+from .driver import ThermocyclerDriver, ThermocyclerDriverFactory, ThermocyclerDriverV2
+from .simulator import SimulatingDriver
 
 __all__ = [
     "ThermocyclerDriver",

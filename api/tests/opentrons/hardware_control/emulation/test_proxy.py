@@ -6,8 +6,8 @@ import pytest
 
 from opentrons.hardware_control.emulation.proxy import (
     Proxy,
-    ProxySettings,
     ProxyListener,
+    ProxySettings,
 )
 
 

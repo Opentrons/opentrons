@@ -1,11 +1,13 @@
 """Motion planning base interfaces."""
 from dataclasses import dataclass
-from enum import Enum, auto as auto_enum_value
+from enum import Enum
+from enum import auto as auto_enum_value
 from typing import Optional
+
 from typing_extensions import final
 
-from opentrons.types import Point
 from opentrons.hardware_control.types import CriticalPoint
+from opentrons.types import Point
 
 
 @dataclass(frozen=True)

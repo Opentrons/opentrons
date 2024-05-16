@@ -1,18 +1,16 @@
-from typing import Sequence, Dict, Optional, Any
+from typing import Any, Dict, Optional, Sequence
 
-from opentrons_shared_data.robot.dev_types import RobotType
 from opentrons_shared_data.errors import ErrorCodes
 from opentrons_shared_data.errors.exceptions import EnumeratedError
+from opentrons_shared_data.robot.dev_types import RobotType
 
 from opentrons.config import feature_flags
-
 from opentrons.protocol_reader.protocol_source import (
+    JsonProtocolConfig,
     ProtocolConfig,
     PythonProtocolConfig,
-    JsonProtocolConfig,
 )
 from opentrons.protocols.api_support.types import APIVersion
-
 
 # TODO(mm, 2023-05-10): Deduplicate these constants with
 # opentrons.protocol_engine.types.DeckType and consider moving to shared-data.

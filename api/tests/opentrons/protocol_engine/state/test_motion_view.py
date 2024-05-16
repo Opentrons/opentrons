@@ -4,32 +4,31 @@ from typing import List
 
 import pytest
 from decoy import Decoy
-
 from opentrons_shared_data.pipette.dev_types import PipetteNameType
-from opentrons.types import Point, MountType, DeckSlotName
-from opentrons.hardware_control.types import CriticalPoint
-from opentrons import motion_planning
-
-from opentrons.protocol_engine import errors
-from opentrons.protocol_engine.types import (
-    WellLocation,
-    LoadedPipette,
-    DeckSlotLocation,
-    CurrentWell,
-    CurrentAddressableArea,
-    MotorAxis,
-    AddressableOffsetVector,
-)
-from opentrons.protocol_engine.state import PipetteLocationData, move_types
-from opentrons.protocol_engine.state.config import Config
-from opentrons.protocol_engine.state.labware import LabwareView
-from opentrons.protocol_engine.state.pipettes import PipetteView
-from opentrons.protocol_engine.state.addressable_areas import AddressableAreaView
-from opentrons.protocol_engine.state.geometry import GeometryView
-from opentrons.protocol_engine.state.motion import MotionView
-from opentrons.protocol_engine.state.modules import ModuleView
-from opentrons.protocol_engine.state.module_substates import HeaterShakerModuleId
 from opentrons_shared_data.robot.dev_types import RobotType
+
+from opentrons import motion_planning
+from opentrons.hardware_control.types import CriticalPoint
+from opentrons.protocol_engine import errors
+from opentrons.protocol_engine.state import PipetteLocationData, move_types
+from opentrons.protocol_engine.state.addressable_areas import AddressableAreaView
+from opentrons.protocol_engine.state.config import Config
+from opentrons.protocol_engine.state.geometry import GeometryView
+from opentrons.protocol_engine.state.labware import LabwareView
+from opentrons.protocol_engine.state.module_substates import HeaterShakerModuleId
+from opentrons.protocol_engine.state.modules import ModuleView
+from opentrons.protocol_engine.state.motion import MotionView
+from opentrons.protocol_engine.state.pipettes import PipetteView
+from opentrons.protocol_engine.types import (
+    AddressableOffsetVector,
+    CurrentAddressableArea,
+    CurrentWell,
+    DeckSlotLocation,
+    LoadedPipette,
+    MotorAxis,
+    WellLocation,
+)
+from opentrons.types import DeckSlotName, MountType, Point
 
 
 @pytest.fixture

@@ -1,7 +1,8 @@
 import pytest
-from opentrons import protocol_api as papi, types
 from opentrons_shared_data.deck.dev_types import DeckDefinitionV3
 
+from opentrons import protocol_api as papi
+from opentrons import types
 
 labware_name = "corning_96_wellplate_360ul_flat"
 

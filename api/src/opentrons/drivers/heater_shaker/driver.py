@@ -1,14 +1,14 @@
 from __future__ import annotations
 
-from enum import Enum
 import asyncio
+from enum import Enum
+from typing import Dict, Optional
 
-from typing import Optional, Dict
 from opentrons.drivers import utils
-from opentrons.drivers.command_builder import CommandBuilder
 from opentrons.drivers.asyncio.communication import AsyncResponseSerialConnection
+from opentrons.drivers.command_builder import CommandBuilder
 from opentrons.drivers.heater_shaker.abstract import AbstractHeaterShakerDriver
-from opentrons.drivers.types import Temperature, RPM, HeaterShakerLabwareLatchStatus
+from opentrons.drivers.types import RPM, HeaterShakerLabwareLatchStatus, Temperature
 
 
 class GCODE(str, Enum):

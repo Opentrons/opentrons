@@ -1,17 +1,15 @@
-import pytest
 from typing import AsyncIterator, Dict
+
+import pytest
 from decoy import Decoy
-
-from opentrons.hardware_control.types import OT3Mount, TipStateType, InstrumentProbeType
-from opentrons.hardware_control.backends.tip_presence_manager import TipPresenceManager
-from opentrons_hardware.hardware_control.tip_presence import (
-    TipDetector,
-    types as tp_types,
-)
-from opentrons_hardware.firmware_bindings.constants import SensorId
 from opentrons_hardware.drivers.can_bus import CanMessenger
-
+from opentrons_hardware.firmware_bindings.constants import SensorId
+from opentrons_hardware.hardware_control.tip_presence import TipDetector
+from opentrons_hardware.hardware_control.tip_presence import types as tp_types
 from opentrons_shared_data.errors.exceptions import UnmatchedTipPresenceStates
+
+from opentrons.hardware_control.backends.tip_presence_manager import TipPresenceManager
+from opentrons.hardware_control.types import InstrumentProbeType, OT3Mount, TipStateType
 
 
 @pytest.fixture

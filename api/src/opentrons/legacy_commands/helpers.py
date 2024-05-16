@@ -1,11 +1,10 @@
 from typing import List, Union
 
-from opentrons.protocol_api.labware import Well, Labware
-from opentrons.protocol_api.module_contexts import ModuleContext
-from opentrons.protocol_api.disposal_locations import TrashBin, WasteChute
 from opentrons.protocol_api._types import OffDeckType
-from opentrons.types import Location, DeckLocation
-
+from opentrons.protocol_api.disposal_locations import TrashBin, WasteChute
+from opentrons.protocol_api.labware import Labware, Well
+from opentrons.protocol_api.module_contexts import ModuleContext
+from opentrons.types import DeckLocation, Location
 
 CommandLocation = Union[Location, Well]
 

@@ -1,58 +1,58 @@
 """Tests for pipette state changes in the protocol_engine state store."""
-import pytest
 from datetime import datetime
 from typing import Optional
 
-from opentrons_shared_data.pipette.dev_types import PipetteNameType
+import pytest
 from opentrons_shared_data.pipette import pipette_definition
+from opentrons_shared_data.pipette.dev_types import PipetteNameType
 
-from opentrons.types import DeckSlotName, MountType, Point
 from opentrons.protocol_engine import commands as cmd
-from opentrons.protocol_engine.types import (
-    DeckPoint,
-    DeckSlotLocation,
-    LoadedPipette,
-    OFF_DECK_LOCATION,
-    LabwareMovementStrategy,
-    FlowRates,
-    CurrentWell,
-    TipGeometry,
-)
 from opentrons.protocol_engine.actions import (
     SetPipetteMovementSpeedAction,
     SucceedCommandAction,
 )
-from opentrons.protocol_engine.state.pipettes import (
-    PipetteStore,
-    PipetteState,
-    CurrentDeckPoint,
-    StaticPipetteConfig,
-    BoundingNozzlesOffsets,
-    PipetteBoundingBoxOffsets,
-)
 from opentrons.protocol_engine.resources.pipette_data_provider import (
     LoadedStaticPipetteData,
 )
+from opentrons.protocol_engine.state.pipettes import (
+    BoundingNozzlesOffsets,
+    CurrentDeckPoint,
+    PipetteBoundingBoxOffsets,
+    PipetteState,
+    PipetteStore,
+    StaticPipetteConfig,
+)
+from opentrons.protocol_engine.types import (
+    OFF_DECK_LOCATION,
+    CurrentWell,
+    DeckPoint,
+    DeckSlotLocation,
+    FlowRates,
+    LabwareMovementStrategy,
+    LoadedPipette,
+    TipGeometry,
+)
+from opentrons.types import DeckSlotName, MountType, Point
 
+from ..pipette_fixtures import get_default_nozzle_map
 from .command_fixtures import (
-    create_load_pipette_command,
     create_aspirate_command,
     create_aspirate_in_place_command,
-    create_dispense_command,
-    create_dispense_in_place_command,
-    create_pick_up_tip_command,
-    create_drop_tip_command,
-    create_drop_tip_in_place_command,
-    create_touch_tip_command,
-    create_move_to_well_command,
     create_blow_out_command,
     create_blow_out_in_place_command,
+    create_dispense_command,
+    create_dispense_in_place_command,
+    create_drop_tip_command,
+    create_drop_tip_in_place_command,
+    create_load_pipette_command,
     create_move_labware_command,
-    create_move_to_coordinates_command,
     create_move_relative_command,
+    create_move_to_coordinates_command,
+    create_move_to_well_command,
+    create_pick_up_tip_command,
     create_prepare_to_aspirate_command,
+    create_touch_tip_command,
 )
-from ..pipette_fixtures import get_default_nozzle_map
 
 
 @pytest.fixture

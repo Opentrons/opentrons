@@ -5,17 +5,14 @@ import pytest
 from _pytest.fixtures import SubRequest
 from decoy import Decoy
 
-from opentrons.types import Mount
 from opentrons.hardware_control import SyncHardwareAPI
-from opentrons.protocols.api_support.types import APIVersion
-from opentrons.protocols.api_support.definitions import MAX_SUPPORTED_VERSION
-from opentrons.protocol_api.core.legacy.legacy_protocol_core import (
-    LegacyProtocolCore,
-)
-
 from opentrons.protocol_api.core.legacy.legacy_instrument_core import (
     LegacyInstrumentCore,
 )
+from opentrons.protocol_api.core.legacy.legacy_protocol_core import LegacyProtocolCore
+from opentrons.protocols.api_support.definitions import MAX_SUPPORTED_VERSION
+from opentrons.protocols.api_support.types import APIVersion
+from opentrons.types import Mount
 
 
 @pytest.fixture(params=[Mount.LEFT, Mount.RIGHT])

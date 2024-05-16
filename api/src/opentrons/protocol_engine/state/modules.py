@@ -14,7 +14,9 @@ from typing import (
     Union,
     overload,
 )
-from numpy import array, dot, double as npdouble
+
+from numpy import array, dot
+from numpy import double as npdouble
 from numpy.typing import NDArray
 
 from opentrons.hardware_control.modules.magdeck import (
@@ -29,25 +31,9 @@ from opentrons.protocol_engine.commands.calibration.calibrate_module import (
     CalibrateModuleResult,
 )
 from opentrons.types import DeckSlotName, MountType
-from ..errors import ModuleNotConnectedError
 
-from ..types import (
-    LoadedModule,
-    ModuleModel,
-    ModuleOffsetVector,
-    ModuleOffsetData,
-    ModuleType,
-    ModuleDefinition,
-    DeckSlotLocation,
-    ModuleDimensions,
-    LabwareOffsetVector,
-    HeaterShakerLatchStatus,
-    HeaterShakerMovementRestrictors,
-    DeckType,
-    LabwareMovementOffsetData,
-)
-from .addressable_areas import AddressableAreaView
 from .. import errors
+from ..actions import Action, AddModuleAction, SucceedCommandAction
 from ..commands import (
     Command,
     LoadModuleResult,
@@ -55,23 +41,38 @@ from ..commands import (
     temperature_module,
     thermocycler,
 )
-from ..actions import Action, SucceedCommandAction, AddModuleAction
-from .abstract_store import HasState, HandlesActions
-from .module_substates import (
-    MagneticModuleSubState,
-    HeaterShakerModuleSubState,
-    TemperatureModuleSubState,
-    ThermocyclerModuleSubState,
-    MagneticModuleId,
-    HeaterShakerModuleId,
-    TemperatureModuleId,
-    ThermocyclerModuleId,
-    MagneticBlockSubState,
-    MagneticBlockId,
-    ModuleSubStateType,
+from ..errors import ModuleNotConnectedError
+from ..types import (
+    DeckSlotLocation,
+    DeckType,
+    HeaterShakerLatchStatus,
+    HeaterShakerMovementRestrictors,
+    LabwareMovementOffsetData,
+    LabwareOffsetVector,
+    LoadedModule,
+    ModuleDefinition,
+    ModuleDimensions,
+    ModuleModel,
+    ModuleOffsetData,
+    ModuleOffsetVector,
+    ModuleType,
 )
+from .abstract_store import HandlesActions, HasState
+from .addressable_areas import AddressableAreaView
 from .config import Config
-
+from .module_substates import (
+    HeaterShakerModuleId,
+    HeaterShakerModuleSubState,
+    MagneticBlockId,
+    MagneticBlockSubState,
+    MagneticModuleId,
+    MagneticModuleSubState,
+    ModuleSubStateType,
+    TemperatureModuleId,
+    TemperatureModuleSubState,
+    ThermocyclerModuleId,
+    ThermocyclerModuleSubState,
+)
 
 ModuleSubStateT = TypeVar("ModuleSubStateT", bound=ModuleSubStateType)
 

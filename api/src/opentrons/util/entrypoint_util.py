@@ -3,27 +3,19 @@
 
 import asyncio
 import contextlib
-from dataclasses import dataclass
 import json
 import logging
-from json import JSONDecodeError
 import pathlib
 import tempfile
-from typing import (
-    Dict,
-    Generator,
-    List,
-    Optional,
-    Sequence,
-    Union,
-    TYPE_CHECKING,
-)
+from dataclasses import dataclass
+from json import JSONDecodeError
+from typing import TYPE_CHECKING, Dict, Generator, List, Optional, Sequence, Union
 
 from jsonschema import ValidationError  # type: ignore
 
+from opentrons.calibration_storage import helpers
 from opentrons.config import IS_ROBOT, JUPYTER_NOTEBOOK_LABWARE_DIR
 from opentrons.protocol_api import labware
-from opentrons.calibration_storage import helpers
 from opentrons.protocol_engine.errors.error_occurrence import (
     ErrorOccurrence as ProtocolEngineErrorOccurrence,
 )

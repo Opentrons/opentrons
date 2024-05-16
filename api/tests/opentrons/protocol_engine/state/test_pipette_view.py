@@ -1,43 +1,43 @@
 """Tests for pipette state accessors in the protocol_engine state store."""
 from collections import OrderedDict
+from typing import Dict, List, NamedTuple, Optional, Tuple, cast
 
 import pytest
-from typing import cast, Dict, List, Optional, Tuple, NamedTuple
-
-from opentrons_shared_data.pipette.dev_types import PipetteNameType
 from opentrons_shared_data.pipette import pipette_definition
+from opentrons_shared_data.pipette.dev_types import PipetteNameType
 
 from opentrons.config.defaults_ot2 import Z_RETRACT_DISTANCE
-from opentrons.types import MountType, Mount as HwMount, Point
 from opentrons.hardware_control.dev_types import PipetteDict
+from opentrons.hardware_control.nozzle_manager import NozzleConfigurationType, NozzleMap
 from opentrons.protocol_engine import errors
-from opentrons.protocol_engine.types import (
-    LoadedPipette,
-    MotorAxis,
-    FlowRates,
-    DeckPoint,
-    CurrentPipetteLocation,
-    TipGeometry,
-)
+from opentrons.protocol_engine.errors import PipetteNotLoadedError, TipNotAttachedError
 from opentrons.protocol_engine.state.pipettes import (
-    PipetteState,
-    PipetteView,
+    BoundingNozzlesOffsets,
     CurrentDeckPoint,
     HardwarePipette,
-    StaticPipetteConfig,
-    BoundingNozzlesOffsets,
     PipetteBoundingBoxOffsets,
+    PipetteState,
+    PipetteView,
+    StaticPipetteConfig,
 )
-from opentrons.hardware_control.nozzle_manager import NozzleMap, NozzleConfigurationType
-from opentrons.protocol_engine.errors import TipNotAttachedError, PipetteNotLoadedError
+from opentrons.protocol_engine.types import (
+    CurrentPipetteLocation,
+    DeckPoint,
+    FlowRates,
+    LoadedPipette,
+    MotorAxis,
+    TipGeometry,
+)
+from opentrons.types import Mount as HwMount
+from opentrons.types import MountType, Point
 
 from ..pipette_fixtures import (
-    NINETY_SIX_ROWS,
-    NINETY_SIX_COLS,
-    NINETY_SIX_MAP,
-    EIGHT_CHANNEL_ROWS,
     EIGHT_CHANNEL_COLS,
     EIGHT_CHANNEL_MAP,
+    EIGHT_CHANNEL_ROWS,
+    NINETY_SIX_COLS,
+    NINETY_SIX_MAP,
+    NINETY_SIX_ROWS,
     get_default_nozzle_map,
 )
 

@@ -1,16 +1,18 @@
 # Inspired by:
 # https://hynek.me/articles/sharing-your-labor-of-love-pypi-quick-and-dirty/
-import sys
 import codecs
 import os
 import os.path
+import sys
 
 from setuptools import find_packages, setup  # type: ignore[import-untyped]
 
 HERE = os.path.abspath(os.path.dirname(__file__))
 sys.path.append(os.path.join(HERE, "..", "scripts"))
 
-from python_build_utils import normalize_version  # type: ignore[import-not-found] # noqa: E402
+from python_build_utils import (  # type: ignore[import-not-found] # noqa: E402
+    normalize_version,
+)
 
 # make stdout blocking since Travis sets it to nonblocking
 if os.name == "posix":

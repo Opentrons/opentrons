@@ -3,18 +3,18 @@ from opentrons.hardware_control import HardwareControlAPI
 from opentrons.protocol_engine.error_recovery_policy import ErrorRecoveryPolicy
 from opentrons.protocol_engine.execution.rail_lights import RailLightsHandler
 
-from ..state import StateStore
 from ..actions import ActionDispatcher
+from ..state import StateStore
+from .command_executor import CommandExecutor
 from .equipment import EquipmentHandler
-from .movement import MovementHandler
 from .gantry_mover import create_gantry_mover
 from .labware_movement import LabwareMovementHandler
+from .movement import MovementHandler
 from .pipetting import create_pipetting_handler
-from .tip_handler import create_tip_handler
-from .run_control import RunControlHandler
-from .command_executor import CommandExecutor
 from .queue_worker import QueueWorker
+from .run_control import RunControlHandler
 from .status_bar import StatusBarHandler
+from .tip_handler import create_tip_handler
 
 
 def create_queue_worker(

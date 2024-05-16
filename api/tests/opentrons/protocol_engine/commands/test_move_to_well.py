@@ -1,16 +1,15 @@
 """Test move to well commands."""
 from decoy import Decoy
 
-from opentrons.protocol_engine import WellLocation, WellOffset, DeckPoint
-from opentrons.protocol_engine.execution import MovementHandler
-from opentrons.types import Point
-
+from opentrons.protocol_engine import DeckPoint, WellLocation, WellOffset
 from opentrons.protocol_engine.commands.command import SuccessData
 from opentrons.protocol_engine.commands.move_to_well import (
+    MoveToWellImplementation,
     MoveToWellParams,
     MoveToWellResult,
-    MoveToWellImplementation,
 )
+from opentrons.protocol_engine.execution import MovementHandler
+from opentrons.types import Point
 
 
 async def test_move_to_well_implementation(

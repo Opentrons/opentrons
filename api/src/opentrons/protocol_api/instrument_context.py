@@ -2,41 +2,40 @@ from __future__ import annotations
 
 import logging
 from contextlib import ExitStack
-from typing import Any, List, Optional, Sequence, Union, cast, Dict
+from typing import Any, Dict, List, Optional, Sequence, Union, cast
+
 from opentrons_shared_data.errors.exceptions import (
-    CommandPreconditionViolated,
     CommandParameterLimitViolated,
+    CommandPreconditionViolated,
     UnexpectedTipRemovalError,
 )
-from opentrons.legacy_broker import LegacyBroker
-from opentrons.hardware_control.dev_types import PipetteDict
+
 from opentrons import types
+from opentrons.hardware_control.dev_types import PipetteDict
+from opentrons.hardware_control.nozzle_manager import NozzleConfigurationType
+from opentrons.legacy_broker import LegacyBroker
 from opentrons.legacy_commands import commands as cmds
-
 from opentrons.legacy_commands import publisher
-from opentrons.protocols.advanced_control.mix import mix_from_kwargs
 from opentrons.protocols.advanced_control import transfers
-
+from opentrons.protocols.advanced_control.mix import mix_from_kwargs
+from opentrons.protocols.api_support import instrument
 from opentrons.protocols.api_support.deck_type import NoTrashDefinedError
 from opentrons.protocols.api_support.types import APIVersion
-from opentrons.protocols.api_support import instrument
 from opentrons.protocols.api_support.util import (
+    APIVersionError,
     FlowRates,
     PlungerSpeeds,
     clamp_value,
     requires_version,
-    APIVersionError,
 )
-from opentrons.hardware_control.nozzle_manager import NozzleConfigurationType
 
+from . import labware, validation
+from ._nozzle_layout import NozzleLayout
+from .config import Clearances
 from .core.common import InstrumentCore, ProtocolCore
 from .core.engine import ENGINE_CORE_API_VERSION
 from .core.legacy.legacy_instrument_core import LegacyInstrumentCore
-from .config import Clearances
 from .disposal_locations import TrashBin, WasteChute
-from ._nozzle_layout import NozzleLayout
-from . import labware, validation
-
 
 AdvancedLiquidHandling = Union[
     labware.Well,

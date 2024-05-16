@@ -1,64 +1,60 @@
 """Basic pipette data state and store."""
 from __future__ import annotations
+
 from dataclasses import dataclass
 from typing import Dict, List, Mapping, Optional, Tuple
 
 from opentrons_shared_data.pipette import pipette_definition
+
 from opentrons.config.defaults_ot2 import Z_RETRACT_DISTANCE
 from opentrons.hardware_control.dev_types import PipetteDict
-from opentrons.hardware_control.nozzle_manager import (
-    NozzleConfigurationType,
-    NozzleMap,
-)
-from opentrons.types import MountType, Mount as HwMount, Point
+from opentrons.hardware_control.nozzle_manager import NozzleConfigurationType, NozzleMap
+from opentrons.types import Mount as HwMount
+from opentrons.types import MountType, Point
 
 from .. import errors
-from ..types import (
-    LoadedPipette,
-    MotorAxis,
-    FlowRates,
-    DeckPoint,
-    CurrentWell,
-    CurrentAddressableArea,
-    CurrentPipetteLocation,
-    TipGeometry,
-)
+from ..actions import Action, SetPipetteMovementSpeedAction, SucceedCommandAction
 from ..commands import (
-    Command,
-    LoadPipetteResult,
-    AspirateResult,
     AspirateInPlaceResult,
-    DispenseResult,
+    AspirateResult,
+    BlowOutInPlaceResult,
+    BlowOutResult,
+    Command,
+    CommandPrivateResult,
     DispenseInPlaceResult,
+    DispenseResult,
+    DropTipInPlaceResult,
+    DropTipResult,
+    HomeResult,
+    LoadPipetteResult,
     MoveLabwareResult,
+    MoveRelativeResult,
+    MoveToAddressableAreaForDropTipResult,
+    MoveToAddressableAreaResult,
     MoveToCoordinatesResult,
     MoveToWellResult,
-    MoveRelativeResult,
-    MoveToAddressableAreaResult,
-    MoveToAddressableAreaForDropTipResult,
     PickUpTipResult,
-    DropTipResult,
-    DropTipInPlaceResult,
-    HomeResult,
-    RetractAxisResult,
-    BlowOutResult,
-    BlowOutInPlaceResult,
-    TouchTipResult,
-    thermocycler,
-    heater_shaker,
-    CommandPrivateResult,
     PrepareToAspirateResult,
+    RetractAxisResult,
+    TouchTipResult,
+    heater_shaker,
+    thermocycler,
 )
 from ..commands.configuring_common import (
     PipetteConfigUpdateResultMixin,
     PipetteNozzleLayoutResultMixin,
 )
-from ..actions import (
-    Action,
-    SetPipetteMovementSpeedAction,
-    SucceedCommandAction,
+from ..types import (
+    CurrentAddressableArea,
+    CurrentPipetteLocation,
+    CurrentWell,
+    DeckPoint,
+    FlowRates,
+    LoadedPipette,
+    MotorAxis,
+    TipGeometry,
 )
-from .abstract_store import HasState, HandlesActions
+from .abstract_store import HandlesActions, HasState
 
 
 @dataclass(frozen=True)

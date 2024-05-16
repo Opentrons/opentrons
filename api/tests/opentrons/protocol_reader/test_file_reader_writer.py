@@ -1,11 +1,12 @@
 """Tests for opentrons.protocol_reader.file_reader_writer.FileReaderWriter."""
-import pytest
 from pathlib import Path
 
+import pytest
+
 from opentrons.protocol_reader.file_reader_writer import (
-    FileReaderWriter,
-    FileReadError,
     BufferedFile,
+    FileReadError,
+    FileReaderWriter,
 )
 
 from ._input_file import InputFile

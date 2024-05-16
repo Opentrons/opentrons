@@ -6,60 +6,55 @@ from unittest.mock import sentinel
 
 import pytest
 from decoy import Decoy
-
 from opentrons_shared_data.robot.dev_types import RobotType
-from opentrons.protocol_engine.actions.actions import ResumeFromRecoveryAction
 
-from opentrons.types import DeckSlotName
 from opentrons.hardware_control import HardwareControlAPI, OT2HardwareControlAPI
 from opentrons.hardware_control.modules import MagDeck, TempDeck
 from opentrons.hardware_control.types import PauseType as HardwarePauseType
-from opentrons.protocols.models import LabwareDefinition
-
 from opentrons.protocol_engine import ProtocolEngine, commands, slot_standardization
-from opentrons.protocol_engine.errors.exceptions import (
-    CommandNotAllowedError,
+from opentrons.protocol_engine.actions import (
+    ActionDispatcher,
+    AddAddressableAreaAction,
+    AddLabwareDefinitionAction,
+    AddLabwareOffsetAction,
+    AddLiquidAction,
+    AddModuleAction,
+    FinishAction,
+    FinishErrorDetails,
+    HardwareStoppedAction,
+    PauseAction,
+    PauseSource,
+    PlayAction,
+    QueueCommandAction,
+    ResetTipsAction,
+    StopAction,
 )
+from opentrons.protocol_engine.actions.actions import ResumeFromRecoveryAction
+from opentrons.protocol_engine.errors import ErrorOccurrence, ProtocolCommandFailedError
+from opentrons.protocol_engine.errors.exceptions import CommandNotAllowedError
+from opentrons.protocol_engine.execution import (
+    DoorWatcher,
+    HardwareStopper,
+    QueueWorker,
+)
+from opentrons.protocol_engine.plugins import AbstractPlugin, PluginStarter
+from opentrons.protocol_engine.resources import ModelUtils, ModuleDataProvider
+from opentrons.protocol_engine.state import Config, StateStore
 from opentrons.protocol_engine.types import (
+    AddressableAreaLocation,
     DeckType,
     LabwareOffset,
     LabwareOffsetCreate,
-    LabwareOffsetVector,
     LabwareOffsetLocation,
+    LabwareOffsetVector,
     LabwareUri,
+    Liquid,
     ModuleDefinition,
     ModuleModel,
-    Liquid,
     PostRunHardwareState,
-    AddressableAreaLocation,
 )
-from opentrons.protocol_engine.execution import (
-    QueueWorker,
-    HardwareStopper,
-    DoorWatcher,
-)
-from opentrons.protocol_engine.resources import ModelUtils, ModuleDataProvider
-from opentrons.protocol_engine.state import Config, StateStore
-from opentrons.protocol_engine.plugins import AbstractPlugin, PluginStarter
-from opentrons.protocol_engine.errors import ProtocolCommandFailedError, ErrorOccurrence
-
-from opentrons.protocol_engine.actions import (
-    ActionDispatcher,
-    AddLabwareOffsetAction,
-    AddLabwareDefinitionAction,
-    AddAddressableAreaAction,
-    AddLiquidAction,
-    AddModuleAction,
-    PlayAction,
-    PauseAction,
-    PauseSource,
-    StopAction,
-    FinishAction,
-    FinishErrorDetails,
-    QueueCommandAction,
-    HardwareStoppedAction,
-    ResetTipsAction,
-)
+from opentrons.protocols.models import LabwareDefinition
+from opentrons.types import DeckSlotName
 
 
 @pytest.fixture

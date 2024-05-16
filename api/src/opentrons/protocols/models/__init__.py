@@ -12,6 +12,7 @@ from opentrons_shared_data.labware.labware_definition import (
     LabwareDefinition,
     WellDefinition,
 )
+
 from .json_protocol import Model as JsonProtocol
 
 __all__ = [

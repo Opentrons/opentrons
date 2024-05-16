@@ -2,7 +2,6 @@
 from dataclasses import dataclass
 from typing import List, NewType, Optional
 
-
 AbsorbanceReaderId = NewType("AbsorbanceReaderId", str)
 
 

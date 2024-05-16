@@ -2,16 +2,16 @@
 from dataclasses import dataclass
 from typing import NewType, Optional
 
-from opentrons.protocol_engine.types import (
-    TemperatureRange,
-    SpeedRange,
-    HeaterShakerLatchStatus,
-)
 from opentrons.protocol_engine.errors import (
-    InvalidTargetTemperatureError,
-    InvalidTargetSpeedError,
-    NoTargetTemperatureSetError,
     CannotPerformModuleAction,
+    InvalidTargetSpeedError,
+    InvalidTargetTemperatureError,
+    NoTargetTemperatureSetError,
+)
+from opentrons.protocol_engine.types import (
+    HeaterShakerLatchStatus,
+    SpeedRange,
+    TemperatureRange,
 )
 
 HeaterShakerModuleId = NewType("HeaterShakerModuleId", str)

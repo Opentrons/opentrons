@@ -2,17 +2,16 @@
 from decoy import Decoy
 
 from opentrons.hardware_control.modules import TempDeck
-
-from opentrons.protocol_engine.state import StateView
-from opentrons.protocol_engine.state.module_substates import (
-    TemperatureModuleSubState,
-    TemperatureModuleId,
-)
-from opentrons.protocol_engine.execution import EquipmentHandler
 from opentrons.protocol_engine.commands import temperature_module
 from opentrons.protocol_engine.commands.command import SuccessData
 from opentrons.protocol_engine.commands.temperature_module.set_target_temperature import (
     SetTargetTemperatureImpl,
+)
+from opentrons.protocol_engine.execution import EquipmentHandler
+from opentrons.protocol_engine.state import StateView
+from opentrons.protocol_engine.state.module_substates import (
+    TemperatureModuleId,
+    TemperatureModuleSubState,
 )
 
 

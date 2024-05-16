@@ -1,18 +1,19 @@
 """Drop tip command request, result, and implementation models."""
 from __future__ import annotations
 
-from pydantic import Field
 from typing import TYPE_CHECKING, Optional, Type
+
+from pydantic import Field
 from typing_extensions import Literal
 
-from ..types import DropTipWellLocation, DeckPoint
-from .pipetting_common import PipetteIdMixin, DestinationPositionResult
-from .command import AbstractCommandImpl, BaseCommand, BaseCommandCreate, SuccessData
 from ..errors.error_occurrence import ErrorOccurrence
+from ..types import DeckPoint, DropTipWellLocation
+from .command import AbstractCommandImpl, BaseCommand, BaseCommandCreate, SuccessData
+from .pipetting_common import DestinationPositionResult, PipetteIdMixin
 
 if TYPE_CHECKING:
-    from ..state import StateView
     from ..execution import MovementHandler, TipHandler
+    from ..state import StateView
 
 
 DropTipCommandType = Literal["dropTip"]

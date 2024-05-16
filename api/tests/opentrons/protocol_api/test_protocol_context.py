@@ -4,44 +4,41 @@ from typing import cast
 
 import pytest
 from decoy import Decoy, matchers
-
-from opentrons_shared_data.pipette.dev_types import PipetteNameType
 from opentrons_shared_data.labware.dev_types import LabwareDefinition as LabwareDefDict
+from opentrons_shared_data.pipette.dev_types import PipetteNameType
 
-from opentrons.types import Mount, DeckSlotName, StagingSlotName
-from opentrons.protocol_api import OFF_DECK
-from opentrons.legacy_broker import LegacyBroker
 from opentrons.hardware_control.modules.types import ModuleType, TemperatureModuleModel
-from opentrons.protocols.api_support import instrument as mock_instrument_support
-from opentrons.protocols.api_support.types import APIVersion
-from opentrons.protocols.api_support.util import APIVersionError
+from opentrons.legacy_broker import LegacyBroker
 from opentrons.protocol_api import (
     MAX_SUPPORTED_VERSION,
-    ProtocolContext,
-    InstrumentContext,
-    ModuleContext,
-    TemperatureModuleContext,
-    MagneticModuleContext,
-    MagneticBlockContext,
-    Labware,
+    OFF_DECK,
     Deck,
-    validation as mock_validation,
+    InstrumentContext,
+    Labware,
     Liquid,
+    MagneticBlockContext,
+    MagneticModuleContext,
+    ModuleContext,
+    ProtocolContext,
+    TemperatureModuleContext,
 )
-from opentrons.protocol_api.core.core_map import LoadedCoreMap
-from opentrons.protocol_api.core.labware import LabwareLoadParams
+from opentrons.protocol_api import validation as mock_validation
 from opentrons.protocol_api.core.common import (
     InstrumentCore,
     LabwareCore,
+    MagneticBlockCore,
+    MagneticModuleCore,
     ProtocolCore,
     TemperatureModuleCore,
-    MagneticModuleCore,
-    MagneticBlockCore,
 )
+from opentrons.protocol_api.core.core_map import LoadedCoreMap
+from opentrons.protocol_api.core.labware import LabwareLoadParams
 from opentrons.protocol_api.disposal_locations import TrashBin, WasteChute
-from opentrons.protocols.api_support.deck_type import (
-    NoTrashDefinedError,
-)
+from opentrons.protocols.api_support import instrument as mock_instrument_support
+from opentrons.protocols.api_support.deck_type import NoTrashDefinedError
+from opentrons.protocols.api_support.types import APIVersion
+from opentrons.protocols.api_support.util import APIVersionError
+from opentrons.types import DeckSlotName, Mount, StagingSlotName
 
 
 @pytest.fixture(autouse=True)

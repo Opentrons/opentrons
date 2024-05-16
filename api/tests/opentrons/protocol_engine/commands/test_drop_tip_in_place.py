@@ -2,14 +2,13 @@
 import pytest
 from decoy import Decoy
 
-from opentrons.protocol_engine.execution import TipHandler
-
 from opentrons.protocol_engine.commands.command import SuccessData
 from opentrons.protocol_engine.commands.drop_tip_in_place import (
+    DropTipInPlaceImplementation,
     DropTipInPlaceParams,
     DropTipInPlaceResult,
-    DropTipInPlaceImplementation,
 )
+from opentrons.protocol_engine.execution import TipHandler
 
 
 @pytest.fixture

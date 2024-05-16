@@ -1,19 +1,19 @@
 """Pipetting command handling."""
-from typing import Optional, Iterator
-from typing_extensions import Protocol as TypingProtocol
 from contextlib import contextmanager
+from typing import Iterator, Optional
+
+from typing_extensions import Protocol as TypingProtocol
 
 from opentrons.hardware_control import HardwareControlAPI
 
-from ..state import StateView, HardwarePipette
-from ..notes import CommandNoteAdder, CommandNote
 from ..errors.exceptions import (
-    TipNotAttachedError,
     InvalidAspirateVolumeError,
-    InvalidPushOutVolumeError,
     InvalidDispenseVolumeError,
+    InvalidPushOutVolumeError,
+    TipNotAttachedError,
 )
-
+from ..notes import CommandNote, CommandNoteAdder
+from ..state import HardwarePipette, StateView
 
 # 1e-9 µL (1 femtoliter!) is a good value because:
 # * It's large relative to rounding errors that occur in practice in protocols. For

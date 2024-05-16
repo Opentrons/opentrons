@@ -1,33 +1,33 @@
 """Control a `ProtocolEngine` without async/await."""
 
-from typing import cast, List, Optional, Dict
+from typing import Dict, List, Optional, cast
 
-from opentrons_shared_data.pipette.dev_types import PipetteNameType
 from opentrons_shared_data.labware.dev_types import LabwareUri
 from opentrons_shared_data.labware.labware_definition import LabwareDefinition
+from opentrons_shared_data.pipette.dev_types import PipetteNameType
 
+from opentrons.hardware_control.modules.types import ThermocyclerStep
 from opentrons.legacy_commands.protocol_commands import (
     comment as make_legacy_comment_command,
 )
 from opentrons.types import MountType
-from opentrons.hardware_control.modules.types import ThermocyclerStep
 
 from .. import commands
 from ..state import StateView
 from ..types import (
+    AddressableOffsetVector,
     DeckPoint,
     DeckSlotLocation,
+    DropTipWellLocation,
     LabwareLocation,
     LabwareMovementStrategy,
-    ModuleModel,
-    WellLocation,
-    DropTipWellLocation,
-    LabwareOffsetVector,
-    MotorAxis,
-    Liquid,
-    NozzleLayoutConfigurationType,
-    AddressableOffsetVector,
     LabwareOffsetCreate,
+    LabwareOffsetVector,
+    Liquid,
+    ModuleModel,
+    MotorAxis,
+    NozzleLayoutConfigurationType,
+    WellLocation,
 )
 from .transports import ChildThreadTransport
 

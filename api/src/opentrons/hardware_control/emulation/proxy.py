@@ -1,9 +1,10 @@
 """The Proxy class module."""
 from __future__ import annotations
+
 import asyncio
 import logging
-import uuid
 import socket
+import uuid
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from typing import List

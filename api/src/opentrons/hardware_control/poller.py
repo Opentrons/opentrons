@@ -3,8 +3,8 @@ import contextlib
 import logging
 from abc import ABC, abstractmethod
 from typing import AsyncGenerator, List, Optional
-from opentrons_shared_data.errors.exceptions import ModuleCommunicationError
 
+from opentrons_shared_data.errors.exceptions import ModuleCommunicationError
 
 log = logging.getLogger(__name__)
 

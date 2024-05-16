@@ -1,18 +1,17 @@
 """Test deck data provider."""
 import pytest
-from pytest_lazyfixture import lazy_fixture  # type: ignore[import-untyped]
 from decoy import Decoy
-
 from opentrons_shared_data.deck.dev_types import DeckDefinitionV5
-from opentrons.protocols.models import LabwareDefinition
-from opentrons.types import DeckSlotName
+from pytest_lazyfixture import lazy_fixture  # type: ignore[import-untyped]
 
-from opentrons.protocol_engine.types import DeckSlotLocation, DeckType
 from opentrons.protocol_engine.resources import (
-    LabwareDataProvider,
     DeckDataProvider,
     DeckFixedLabware,
+    LabwareDataProvider,
 )
+from opentrons.protocol_engine.types import DeckSlotLocation, DeckType
+from opentrons.protocols.models import LabwareDefinition
+from opentrons.types import DeckSlotName
 
 
 @pytest.fixture

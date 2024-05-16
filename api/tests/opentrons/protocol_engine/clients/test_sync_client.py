@@ -12,27 +12,26 @@ from typing import Optional
 
 import pytest
 from decoy import Decoy
-
-from opentrons_shared_data.pipette.dev_types import PipetteNameType
 from opentrons_shared_data.labware.dev_types import LabwareUri
 from opentrons_shared_data.labware.labware_definition import LabwareDefinition
+from opentrons_shared_data.pipette.dev_types import PipetteNameType
 
-from opentrons.types import DeckSlotName, MountType
-from opentrons.protocol_engine import DeckSlotLocation, DeckPoint, commands
-from opentrons.protocol_engine.clients import SyncClient, ChildThreadTransport
+from opentrons.protocol_engine import DeckPoint, DeckSlotLocation, commands
+from opentrons.protocol_engine.clients import ChildThreadTransport, SyncClient
 from opentrons.protocol_engine.types import (
-    ModuleDefinition,
-    ModuleModel,
-    WellOrigin,
-    WellOffset,
-    WellLocation,
+    AddressableOffsetVector,
     DropTipWellLocation,
-    MotorAxis,
-    Liquid,
     LabwareMovementStrategy,
     LabwareOffsetVector,
-    AddressableOffsetVector,
+    Liquid,
+    ModuleDefinition,
+    ModuleModel,
+    MotorAxis,
+    WellLocation,
+    WellOffset,
+    WellOrigin,
 )
+from opentrons.types import DeckSlotName, MountType
 
 
 @pytest.fixture

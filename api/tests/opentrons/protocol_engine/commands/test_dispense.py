@@ -1,16 +1,15 @@
 """Test dispense commands."""
 from decoy import Decoy
 
-from opentrons.protocol_engine import WellLocation, WellOrigin, WellOffset, DeckPoint
-from opentrons.protocol_engine.execution import MovementHandler, PipettingHandler
-from opentrons.types import Point
-
+from opentrons.protocol_engine import DeckPoint, WellLocation, WellOffset, WellOrigin
 from opentrons.protocol_engine.commands.command import SuccessData
 from opentrons.protocol_engine.commands.dispense import (
+    DispenseImplementation,
     DispenseParams,
     DispenseResult,
-    DispenseImplementation,
 )
+from opentrons.protocol_engine.execution import MovementHandler, PipettingHandler
+from opentrons.types import Point
 
 
 async def test_dispense_implementation(

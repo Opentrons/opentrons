@@ -1,22 +1,22 @@
 """Deck configuration resource provider."""
 from typing import List, Set, Tuple
 
-from opentrons_shared_data.deck.dev_types import DeckDefinitionV5, CutoutFixture
+from opentrons_shared_data.deck.dev_types import CutoutFixture, DeckDefinitionV5
 
 from opentrons.types import DeckSlotName
 
-from ..types import (
-    AddressableArea,
-    AreaType,
-    PotentialCutoutFixture,
-    DeckPoint,
-    Dimensions,
-    AddressableOffsetVector,
-)
 from ..errors import (
+    AddressableAreaDoesNotExistError,
     CutoutDoesNotExistError,
     FixtureDoesNotExistError,
-    AddressableAreaDoesNotExistError,
+)
+from ..types import (
+    AddressableArea,
+    AddressableOffsetVector,
+    AreaType,
+    DeckPoint,
+    Dimensions,
+    PotentialCutoutFixture,
 )
 
 

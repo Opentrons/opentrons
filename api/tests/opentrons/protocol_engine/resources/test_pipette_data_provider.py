@@ -1,21 +1,22 @@
 """Test pipette data provider."""
 import pytest
-from opentrons_shared_data.pipette.dev_types import PipetteNameType, PipetteModel
-from opentrons_shared_data.pipette import pipette_definition, types as pip_types
+from opentrons_shared_data.pipette import pipette_definition
+from opentrons_shared_data.pipette import types as pip_types
+from opentrons_shared_data.pipette.dev_types import PipetteModel, PipetteNameType
 from opentrons_shared_data.pipette.pipette_definition import (
     PipetteBoundingBoxOffsetDefinition,
 )
 
 from opentrons.hardware_control.dev_types import PipetteDict
-from opentrons.protocol_engine.types import FlowRates
+from opentrons.protocol_engine.resources import pipette_data_provider as subject
 from opentrons.protocol_engine.resources.pipette_data_provider import (
     LoadedStaticPipetteData,
     VirtualPipetteDataProvider,
 )
-
-from opentrons.protocol_engine.resources import pipette_data_provider as subject
-from ..pipette_fixtures import get_default_nozzle_map
+from opentrons.protocol_engine.types import FlowRates
 from opentrons.types import Point
+
+from ..pipette_fixtures import get_default_nozzle_map
 
 
 @pytest.fixture

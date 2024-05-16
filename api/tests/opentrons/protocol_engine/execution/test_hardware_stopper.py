@@ -1,26 +1,26 @@
 """Test hardware stopping execution and side effects."""
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 import pytest
 from decoy import Decoy
-from typing import TYPE_CHECKING
 
 from opentrons.hardware_control import API as HardwareAPI
 from opentrons.hardware_control.types import OT3Mount
-from opentrons.types import PipetteNotAttachedError as HwPipetteNotAttachedError
-
-from opentrons.protocol_engine.state import StateStore
 from opentrons.protocol_engine.execution import (
+    HardwareStopper,
     MovementHandler,
     TipHandler,
-    HardwareStopper,
 )
+from opentrons.protocol_engine.state import StateStore
 from opentrons.protocol_engine.types import (
-    MotorAxis,
-    TipGeometry,
-    PostRunHardwareState,
     AddressableOffsetVector,
+    MotorAxis,
+    PostRunHardwareState,
+    TipGeometry,
 )
+from opentrons.types import PipetteNotAttachedError as HwPipetteNotAttachedError
 
 if TYPE_CHECKING:
     from opentrons.hardware_control.ot3api import OT3API

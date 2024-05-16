@@ -7,19 +7,18 @@ from pathlib import Path
 from typing import Set
 
 import pytest
-
 from opentrons_shared_data import get_shared_data_root
 from opentrons_shared_data.labware.labware_definition import LabwareDefinition
 
-from opentrons.protocols.api_support.types import APIVersion
 from opentrons.protocol_reader import (
-    extract_labware_definitions,
+    JsonProtocolConfig,
+    ProtocolFileRole,
     ProtocolSource,
     ProtocolSourceFile,
-    ProtocolFileRole,
-    JsonProtocolConfig,
     PythonProtocolConfig,
+    extract_labware_definitions,
 )
+from opentrons.protocols.api_support.types import APIVersion
 
 
 @dataclass(frozen=True)

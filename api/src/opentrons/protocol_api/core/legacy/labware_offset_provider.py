@@ -3,7 +3,7 @@ from dataclasses import dataclass
 from typing import Optional
 
 from opentrons.hardware_control.modules import ModuleModel as HardwareModuleModel
-from opentrons.protocol_engine import ProtocolEngine, LabwareOffsetLocation, ModuleModel
+from opentrons.protocol_engine import LabwareOffsetLocation, ModuleModel, ProtocolEngine
 from opentrons.types import DeckSlotName, Point
 
 from ..labware import LabwareLoadParams

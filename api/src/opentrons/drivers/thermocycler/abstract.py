@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
-from typing import Optional, Dict
+from typing import Dict, Optional
 
-from opentrons.drivers.types import Temperature, ThermocyclerLidStatus, PlateTemperature
+from opentrons.drivers.types import PlateTemperature, Temperature, ThermocyclerLidStatus
 
 
 class AbstractThermocyclerDriver(ABC):

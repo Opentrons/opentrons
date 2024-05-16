@@ -3,10 +3,10 @@ from typing_extensions import Final
 
 from opentrons.protocols.api_support.types import APIVersion
 
-from .protocol import ProtocolCore
 from .instrument import InstrumentCore
 from .labware import LabwareCore
 from .module_core import ModuleCore
+from .protocol import ProtocolCore
 from .well import WellCore
 
 ENGINE_CORE_API_VERSION: Final = APIVersion(2, 14)

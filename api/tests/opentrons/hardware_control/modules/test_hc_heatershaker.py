@@ -1,14 +1,16 @@
 import asyncio
-import pytest
+
 import mock
-from opentrons.hardware_control import modules, ExecutionManager
-from opentrons.hardware_control.modules.types import (
-    TemperatureStatus,
-    SpeedStatus,
-    HeaterShakerStatus,
-)
+import pytest
+
 from opentrons.drivers.rpi_drivers.types import USBPort
-from opentrons.drivers.types import HeaterShakerLabwareLatchStatus, Temperature, RPM
+from opentrons.drivers.types import RPM, HeaterShakerLabwareLatchStatus, Temperature
+from opentrons.hardware_control import ExecutionManager, modules
+from opentrons.hardware_control.modules.types import (
+    HeaterShakerStatus,
+    SpeedStatus,
+    TemperatureStatus,
+)
 
 
 @pytest.fixture

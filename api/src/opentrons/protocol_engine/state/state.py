@@ -3,33 +3,32 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from typing import Callable, Dict, List, Optional, Sequence, TypeVar
-from typing_extensions import ParamSpec
 
 from opentrons_shared_data.deck.dev_types import DeckDefinitionV5
+from typing_extensions import ParamSpec
 
 from opentrons.protocol_engine.types import ModuleOffsetData
 from opentrons.util.change_notifier import ChangeNotifier
 
-from ..resources import DeckFixedLabware
 from ..actions import Action, ActionHandler
-from .abstract_store import HasState, HandlesActions
-from .commands import CommandState, CommandStore, CommandView
+from ..resources import DeckFixedLabware
+from ..types import DeckConfigurationType
+from .abstract_store import HandlesActions, HasState
 from .addressable_areas import (
     AddressableAreaState,
     AddressableAreaStore,
     AddressableAreaView,
 )
-from .labware import LabwareState, LabwareStore, LabwareView
-from .pipettes import PipetteState, PipetteStore, PipetteView
-from .modules import ModuleState, ModuleStore, ModuleView
-from .liquids import LiquidState, LiquidView, LiquidStore
-from .tips import TipState, TipView, TipStore
-from .geometry import GeometryView
-from .motion import MotionView
+from .commands import CommandState, CommandStore, CommandView
 from .config import Config
+from .geometry import GeometryView
+from .labware import LabwareState, LabwareStore, LabwareView
+from .liquids import LiquidState, LiquidStore, LiquidView
+from .modules import ModuleState, ModuleStore, ModuleView
+from .motion import MotionView
+from .pipettes import PipetteState, PipetteStore, PipetteView
 from .state_summary import StateSummary
-from ..types import DeckConfigurationType
-
+from .tips import TipState, TipStore, TipView
 
 _ParamsT = ParamSpec("_ParamsT")
 _ReturnT = TypeVar("_ReturnT")

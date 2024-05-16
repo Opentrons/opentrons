@@ -5,43 +5,39 @@ Add new tests to test_command_state.py, where they can be tested together.
 """
 
 
-import pytest
 from datetime import datetime
 from typing import NamedTuple, Type
 
+import pytest
 from opentrons_shared_data.errors import ErrorCodes
 from opentrons_shared_data.pipette.dev_types import PipetteNameType
 
-from opentrons.ordered_set import OrderedSet
-from opentrons.protocol_engine.actions.actions import RunCommandAction
-from opentrons.types import MountType, DeckSlotName
 from opentrons.hardware_control.types import DoorState
-
+from opentrons.ordered_set import OrderedSet
 from opentrons.protocol_engine import commands, errors
-from opentrons.protocol_engine.types import DeckSlotLocation, DeckType, WellLocation
+from opentrons.protocol_engine.actions import (
+    DoorChangeAction,
+    FinishAction,
+    FinishErrorDetails,
+    HardwareStoppedAction,
+    PauseAction,
+    PauseSource,
+    PlayAction,
+    QueueCommandAction,
+    StopAction,
+    SucceedCommandAction,
+)
+from opentrons.protocol_engine.actions.actions import RunCommandAction
 from opentrons.protocol_engine.state import Config
+from opentrons.protocol_engine.state.command_history import CommandEntry, CommandHistory
 from opentrons.protocol_engine.state.commands import (
     CommandState,
     CommandStore,
-    RunResult,
     QueueStatus,
+    RunResult,
 )
-from opentrons.protocol_engine.state.command_history import CommandEntry
-
-from opentrons.protocol_engine.actions import (
-    QueueCommandAction,
-    SucceedCommandAction,
-    PlayAction,
-    PauseAction,
-    PauseSource,
-    FinishAction,
-    FinishErrorDetails,
-    StopAction,
-    HardwareStoppedAction,
-    DoorChangeAction,
-)
-
-from opentrons.protocol_engine.state.command_history import CommandHistory
+from opentrons.protocol_engine.types import DeckSlotLocation, DeckType, WellLocation
+from opentrons.types import DeckSlotName, MountType
 
 from .command_fixtures import create_succeeded_command
 

@@ -1,28 +1,25 @@
 import pytest
+from opentrons_shared_data.labware.dev_types import LabwareDefinition
+from opentrons_shared_data.pipette.dev_types import PipetteNameType
 
 from opentrons import types
 from opentrons.hardware_control import ThreadManagedHardware
 from opentrons.protocol_api import MAX_SUPPORTED_VERSION
 from opentrons.protocol_api.core.legacy.deck import Deck
-from opentrons.protocol_api.core.legacy.legacy_labware_core import LegacyLabwareCore
-from opentrons.protocol_api.core.legacy.legacy_protocol_core import (
-    LegacyProtocolCore,
-)
 from opentrons.protocol_api.core.legacy.labware_offset_provider import (
     NullLabwareOffsetProvider,
 )
 from opentrons.protocol_api.core.legacy.legacy_instrument_core import (
     LegacyInstrumentCore,
 )
+from opentrons.protocol_api.core.legacy.legacy_labware_core import LegacyLabwareCore
+from opentrons.protocol_api.core.legacy.legacy_protocol_core import LegacyProtocolCore
 from opentrons.protocol_api.core.legacy_simulator.legacy_instrument_core import (
     LegacyInstrumentCoreSimulator,
 )
 from opentrons.protocol_api.core.legacy_simulator.legacy_protocol_core import (
     LegacyProtocolCoreSimulator,
 )
-
-from opentrons_shared_data.labware.dev_types import LabwareDefinition
-from opentrons_shared_data.pipette.dev_types import PipetteNameType
 
 
 @pytest.fixture

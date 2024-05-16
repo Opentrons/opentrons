@@ -1,18 +1,18 @@
 import asyncio
-from typing import Optional, Mapping, List, Dict, Any, Tuple
+from typing import Any, Dict, List, Mapping, Optional, Tuple
 
-from opentrons.drivers.rpi_drivers.types import USBPort
 from opentrons.drivers.absorbance_reader import (
-    AbstractAbsorbanceReaderDriver,
     AbsorbanceReaderDriver,
+    AbstractAbsorbanceReaderDriver,
     SimulatingDriver,
 )
+from opentrons.drivers.rpi_drivers.types import USBPort
 from opentrons.hardware_control.execution_manager import ExecutionManager
 from opentrons.hardware_control.modules import mod_abc
 from opentrons.hardware_control.modules.types import (
-    ModuleType,
     AbsorbanceReaderStatus,
     LiveData,
+    ModuleType,
     UploadFunction,
 )
 

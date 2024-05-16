@@ -1,16 +1,15 @@
 """Tests for the top-level StateStore/StateView."""
-from typing import Callable, Union
 from datetime import datetime
+from typing import Callable, Union
 
 import pytest
 from decoy import Decoy
-
 from opentrons_shared_data.deck.dev_types import DeckDefinitionV5
-from opentrons.util.change_notifier import ChangeNotifier
 
 from opentrons.protocol_engine.actions import PlayAction
-from opentrons.protocol_engine.state import State, StateStore, Config
+from opentrons.protocol_engine.state import Config, State, StateStore
 from opentrons.protocol_engine.types import DeckType
+from opentrons.util.change_notifier import ChangeNotifier
 
 
 @pytest.fixture

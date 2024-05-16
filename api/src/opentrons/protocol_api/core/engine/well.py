@@ -3,15 +3,14 @@ from typing import Optional
 
 from opentrons_shared_data.labware.constants import WELL_NAME_PATTERN
 
-from opentrons.protocol_engine import WellLocation, WellOrigin, WellOffset
+from opentrons.protocol_engine import WellLocation, WellOffset, WellOrigin
 from opentrons.protocol_engine.clients import SyncClient as EngineClient
 from opentrons.protocols.api_support.util import APIVersionError
 from opentrons.types import Point
 
-from . import point_calculations
-from . import stringify
-from ..well import AbstractWellCore
 from ..._liquid import Liquid
+from ..well import AbstractWellCore
+from . import point_calculations, stringify
 
 
 class WellCore(AbstractWellCore):

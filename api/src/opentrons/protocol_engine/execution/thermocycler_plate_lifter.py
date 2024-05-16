@@ -2,11 +2,12 @@
 from __future__ import annotations
 
 import asyncio
-from typing import TYPE_CHECKING, AsyncGenerator, Optional
-from opentrons.hardware_control.modules.thermocycler import Thermocycler
-from opentrons.protocol_engine.types import LabwareLocation, ModuleLocation, ModuleModel
-from opentrons.protocol_engine.state import StateStore, ThermocyclerModuleId
 from contextlib import asynccontextmanager
+from typing import TYPE_CHECKING, AsyncGenerator, Optional
+
+from opentrons.hardware_control.modules.thermocycler import Thermocycler
+from opentrons.protocol_engine.state import StateStore, ThermocyclerModuleId
+from opentrons.protocol_engine.types import LabwareLocation, ModuleLocation, ModuleModel
 
 if TYPE_CHECKING:
     from opentrons.protocol_engine.execution import EquipmentHandler, MovementHandler

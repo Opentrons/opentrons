@@ -1,21 +1,21 @@
 """Parameter definition and associated validators."""
 
-from typing import Generic, Optional, List, Set, Union, get_args
+from typing import Generic, List, Optional, Set, Union, get_args
 
-from opentrons.protocols.parameters.types import (
-    ParamType,
-    ParameterChoice,
-    AllowedTypes,
-    ParameterDefinitionError,
-    ParameterValueError,
+from opentrons.protocol_engine.types import (
+    BooleanParameter,
+    EnumChoice,
+    EnumParameter,
+    NumberParameter,
+    RunTimeParameter,
 )
 from opentrons.protocols.parameters import validation
-from opentrons.protocol_engine.types import (
-    RunTimeParameter,
-    NumberParameter,
-    BooleanParameter,
-    EnumParameter,
-    EnumChoice,
+from opentrons.protocols.parameters.types import (
+    AllowedTypes,
+    ParameterChoice,
+    ParameterDefinitionError,
+    ParameterValueError,
+    ParamType,
 )
 
 

@@ -3,32 +3,31 @@ from __future__ import annotations
 import logging
 from typing import TYPE_CHECKING, Optional, Union
 
+from opentrons_shared_data.errors.exceptions import (
+    UnexpectedTipAttachError,
+    UnexpectedTipRemovalError,
+)
+
 from opentrons import types
 from opentrons.hardware_control.dev_types import PipetteDict
+from opentrons.hardware_control.nozzle_manager import NozzleMap
 from opentrons.hardware_control.types import HardwareAction
+from opentrons.protocol_api._nozzle_layout import NozzleLayout
 from opentrons.protocols.api_support import instrument as instrument_support
+from opentrons.protocols.api_support.definitions import MAX_SUPPORTED_VERSION
 from opentrons.protocols.api_support.labware_like import LabwareLike
 from opentrons.protocols.api_support.types import APIVersion
-from opentrons.protocols.api_support.definitions import MAX_SUPPORTED_VERSION
 from opentrons.protocols.api_support.util import (
+    APIVersionError,
     FlowRates,
     PlungerSpeeds,
-    APIVersionError,
 )
 from opentrons.protocols.geometry import planning
-from opentrons_shared_data.errors.exceptions import (
-    UnexpectedTipRemovalError,
-    UnexpectedTipAttachError,
-)
 
 from ...disposal_locations import TrashBin, WasteChute
-from opentrons.protocol_api._nozzle_layout import NozzleLayout
-from opentrons.hardware_control.nozzle_manager import NozzleMap
-
 from ..instrument import AbstractInstrument
-
+from ..legacy.legacy_module_core import LegacyHeaterShakerCore, LegacyThermocyclerCore
 from ..legacy.legacy_well_core import LegacyWellCore
-from ..legacy.legacy_module_core import LegacyThermocyclerCore, LegacyHeaterShakerCore
 
 if TYPE_CHECKING:
     from .legacy_protocol_core import LegacyProtocolCoreSimulator

@@ -11,16 +11,15 @@ tiprack") to points in deck coordinates.
 from __future__ import annotations
 
 import logging
-
 from itertools import dropwhile
-from typing import TYPE_CHECKING, Any, List, Dict, Optional, Union, Tuple, cast
+from typing import TYPE_CHECKING, Any, Dict, List, Optional, Tuple, Union, cast
 
 from opentrons_shared_data.labware.dev_types import LabwareDefinition, LabwareParameters
 
-from opentrons.types import Location, Point
-from opentrons.protocols.api_support.types import APIVersion
-from opentrons.protocols.api_support.util import requires_version, APIVersionError
 from opentrons.hardware_control.nozzle_manager import NozzleMap
+from opentrons.protocols.api_support.types import APIVersion
+from opentrons.protocols.api_support.util import APIVersionError, requires_version
+from opentrons.types import Location, Point
 
 # isort: off
 # TODO(mc, 2022-09-02): re-exports provided for backwards compatibility
@@ -38,17 +37,16 @@ from . import validation
 from ._liquid import Liquid
 from ._types import OffDeckType
 from .core import well_grid
+from .core.core_map import LoadedCoreMap
 from .core.engine import ENGINE_CORE_API_VERSION, SET_OFFSET_RESTORED_API_VERSION
 from .core.labware import AbstractLabware
-from .core.module import AbstractModuleCore
-from .core.core_map import LoadedCoreMap
 from .core.legacy.legacy_labware_core import LegacyLabwareCore
 from .core.legacy.legacy_well_core import LegacyWellCore
 from .core.legacy.well_geometry import WellGeometry
-
+from .core.module import AbstractModuleCore
 
 if TYPE_CHECKING:
-    from .core.common import LabwareCore, WellCore, ProtocolCore
+    from .core.common import LabwareCore, ProtocolCore, WellCore
     from .protocol_context import ModuleTypes
 
 

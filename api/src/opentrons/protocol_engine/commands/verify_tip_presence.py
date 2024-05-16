@@ -1,15 +1,15 @@
 """Verify tip presence command request, result and implementation models."""
 from __future__ import annotations
 
-from pydantic import Field, BaseModel
 from typing import TYPE_CHECKING, Optional, Type
+
+from pydantic import BaseModel, Field
 from typing_extensions import Literal
 
-from .pipetting_common import PipetteIdMixin
-from .command import AbstractCommandImpl, BaseCommand, BaseCommandCreate, SuccessData
 from ..errors.error_occurrence import ErrorOccurrence
-
-from ..types import TipPresenceStatus, InstrumentSensorId
+from ..types import InstrumentSensorId, TipPresenceStatus
+from .command import AbstractCommandImpl, BaseCommand, BaseCommandCreate, SuccessData
+from .pipetting_common import PipetteIdMixin
 
 if TYPE_CHECKING:
     from ..execution import TipHandler

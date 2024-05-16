@@ -1,17 +1,18 @@
 import asyncio
-from typing import Dict, Optional, Any, List, Union
-from typing_extensions import Literal
-from dataclasses import dataclass, asdict, field, replace
 import json
+from dataclasses import asdict, dataclass, field, replace
 from pathlib import Path
+from typing import Any, Dict, List, Optional, Union
 from warnings import warn
 
+from typing_extensions import Literal
+
 from opentrons.config import robot_configs
-from opentrons.config.types import RobotConfig, OT3Config
-from opentrons.types import Mount
+from opentrons.config.types import OT3Config, RobotConfig
 from opentrons.hardware_control import API, HardwareControlAPI, ThreadManager
-from opentrons.hardware_control.types import OT3Mount, HardwareFeatureFlags
 from opentrons.hardware_control.modules import SimulatingModule
+from opentrons.hardware_control.types import HardwareFeatureFlags, OT3Mount
+from opentrons.types import Mount
 
 
 # Name and kwargs for a module function

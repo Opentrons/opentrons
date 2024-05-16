@@ -10,32 +10,28 @@ from opentrons.protocols.api_support.definitions import (
     MIN_SUPPORTED_VERSION_FOR_FLEX,
 )
 
-from .protocol_context import ProtocolContext
+from ._liquid import Liquid
+from ._nozzle_layout import ALL, COLUMN
+from ._parameter_context import ParameterContext
+from ._parameters import Parameters
+from ._types import OFF_DECK
+from .create_protocol_context import (
+    ProtocolEngineCoreRequiredError,
+    create_protocol_context,
+)
 from .deck import Deck
+from .disposal_locations import TrashBin, WasteChute
 from .instrument_context import InstrumentContext
 from .labware import Labware, Well
 from .module_contexts import (
-    ModuleContext,
-    ThermocyclerContext,
-    MagneticModuleContext,
-    TemperatureModuleContext,
     HeaterShakerContext,
     MagneticBlockContext,
+    MagneticModuleContext,
+    ModuleContext,
+    TemperatureModuleContext,
+    ThermocyclerContext,
 )
-from .disposal_locations import TrashBin, WasteChute
-from ._liquid import Liquid
-from ._types import OFF_DECK
-from ._nozzle_layout import (
-    COLUMN,
-    ALL,
-)
-from ._parameters import Parameters
-from ._parameter_context import ParameterContext
-
-from .create_protocol_context import (
-    create_protocol_context,
-    ProtocolEngineCoreRequiredError,
-)
+from .protocol_context import ProtocolContext
 
 __all__ = [
     "MAX_SUPPORTED_VERSION",

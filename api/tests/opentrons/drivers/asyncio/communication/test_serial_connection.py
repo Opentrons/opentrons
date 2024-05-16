@@ -1,19 +1,19 @@
 from typing import Type, Union
 
+import mock
 import pytest
 from _pytest.fixtures import SubRequest
 from mock import AsyncMock, call
-import mock
 
-from opentrons.drivers.asyncio.communication.async_serial import AsyncSerial
-from opentrons.drivers.asyncio.communication.serial_connection import (
-    SerialConnection,
-    AsyncResponseSerialConnection,
-)
 from opentrons.drivers.asyncio.communication import (
-    NoResponse,
     AlarmResponse,
     ErrorResponse,
+    NoResponse,
+)
+from opentrons.drivers.asyncio.communication.async_serial import AsyncSerial
+from opentrons.drivers.asyncio.communication.serial_connection import (
+    AsyncResponseSerialConnection,
+    SerialConnection,
 )
 
 

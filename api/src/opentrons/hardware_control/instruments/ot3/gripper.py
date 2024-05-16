@@ -3,34 +3,29 @@ from __future__ import annotations
 """ Classes and functions for gripper state tracking
 """
 import logging
-from typing import Any, Optional, Set, Dict, Tuple, Final
+from typing import Any, Dict, Final, Optional, Set, Tuple
 
-from opentrons.types import Point
-from opentrons.config import gripper_config
-from opentrons.hardware_control.types import (
-    GripperProbe,
-    CriticalPoint,
-    GripperJawState,
-)
-from opentrons.hardware_control.errors import (
-    InvalidCriticalPoint,
-)
-from .instrument_calibration import (
-    GripperCalibrationOffset,
-    load_gripper_calibration_offset,
-    save_gripper_calibration_offset,
-)
-from ..instrument_abc import AbstractInstrument
-from opentrons.hardware_control.dev_types import AttachedGripper, GripperDict
 from opentrons_shared_data.errors.exceptions import (
     CommandPreconditionViolated,
     MotionFailedError,
 )
+from opentrons_shared_data.gripper import Geometry, GripForceProfile, GripperDefinition
 
-from opentrons_shared_data.gripper import (
-    GripperDefinition,
-    GripForceProfile,
-    Geometry,
+from opentrons.config import gripper_config
+from opentrons.hardware_control.dev_types import AttachedGripper, GripperDict
+from opentrons.hardware_control.errors import InvalidCriticalPoint
+from opentrons.hardware_control.types import (
+    CriticalPoint,
+    GripperJawState,
+    GripperProbe,
+)
+from opentrons.types import Point
+
+from ..instrument_abc import AbstractInstrument
+from .instrument_calibration import (
+    GripperCalibrationOffset,
+    load_gripper_calibration_offset,
+    save_gripper_calibration_offset,
 )
 
 RECONFIG_KEYS = {"quirks", "grip_force_profile"}

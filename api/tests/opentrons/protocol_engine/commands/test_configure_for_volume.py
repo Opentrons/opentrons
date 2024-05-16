@@ -1,25 +1,25 @@
 """Test load pipette commands."""
 from decoy import Decoy
-
-from opentrons.protocol_engine.execution import (
-    LoadedConfigureForVolumeData,
-    EquipmentHandler,
-)
-from opentrons.protocol_engine.types import FlowRates
-from opentrons.protocol_engine.resources.pipette_data_provider import (
-    LoadedStaticPipetteData,
-)
+from opentrons_shared_data.pipette.dev_types import PipetteNameType
 
 from opentrons.protocol_engine.commands.command import SuccessData
 from opentrons.protocol_engine.commands.configure_for_volume import (
-    ConfigureForVolumeParams,
-    ConfigureForVolumeResult,
-    ConfigureForVolumePrivateResult,
     ConfigureForVolumeImplementation,
+    ConfigureForVolumeParams,
+    ConfigureForVolumePrivateResult,
+    ConfigureForVolumeResult,
 )
-from opentrons_shared_data.pipette.dev_types import PipetteNameType
-from ..pipette_fixtures import get_default_nozzle_map
+from opentrons.protocol_engine.execution import (
+    EquipmentHandler,
+    LoadedConfigureForVolumeData,
+)
+from opentrons.protocol_engine.resources.pipette_data_provider import (
+    LoadedStaticPipetteData,
+)
+from opentrons.protocol_engine.types import FlowRates
 from opentrons.types import Point
+
+from ..pipette_fixtures import get_default_nozzle_map
 
 
 async def test_configure_for_volume_implementation(

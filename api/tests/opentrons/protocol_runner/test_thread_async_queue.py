@@ -9,10 +9,7 @@ from typing import List, NamedTuple
 
 import pytest
 
-from opentrons.protocol_runner.thread_async_queue import (
-    ThreadAsyncQueue,
-    QueueClosed,
-)
+from opentrons.protocol_runner.thread_async_queue import QueueClosed, ThreadAsyncQueue
 
 
 def test_basic_single_threaded_behavior() -> None:

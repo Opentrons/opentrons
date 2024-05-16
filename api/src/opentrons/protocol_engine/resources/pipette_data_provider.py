@@ -2,14 +2,13 @@
 from dataclasses import dataclass
 from typing import Dict, Optional
 
-from opentrons_shared_data.pipette.dev_types import PipetteName, PipetteModel
+from opentrons_shared_data.pipette import load_data as load_pipette_data
+from opentrons_shared_data.pipette import pipette_definition
 from opentrons_shared_data.pipette import (
     pipette_load_name_conversions as pipette_load_name,
-    load_data as load_pipette_data,
-    types as pip_types,
-    pipette_definition,
 )
-
+from opentrons_shared_data.pipette import types as pip_types
+from opentrons_shared_data.pipette.dev_types import PipetteModel, PipetteName
 
 from opentrons.hardware_control.dev_types import PipetteDict
 from opentrons.hardware_control.nozzle_manager import (
@@ -17,8 +16,8 @@ from opentrons.hardware_control.nozzle_manager import (
     NozzleMap,
 )
 
-from ..types import FlowRates
 from ...types import Point
+from ..types import FlowRates
 
 
 @dataclass(frozen=True)

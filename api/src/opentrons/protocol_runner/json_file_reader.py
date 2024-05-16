@@ -4,10 +4,11 @@ from typing import Union
 from opentrons_shared_data.protocol.models.protocol_schema_v6 import ProtocolSchemaV6
 from opentrons_shared_data.protocol.models.protocol_schema_v7 import ProtocolSchemaV7
 from opentrons_shared_data.protocol.models.protocol_schema_v8 import ProtocolSchemaV8
+
 from opentrons.protocol_reader import (
-    ProtocolSource,
     JsonProtocolConfig,
     ProtocolFilesInvalidError,
+    ProtocolSource,
 )
 
 

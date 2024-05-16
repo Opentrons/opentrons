@@ -1,16 +1,12 @@
 """Tests for `slot_standardization`."""
 
 import pytest
-
 from opentrons_shared_data.robot.dev_types import RobotType
 
-from opentrons.types import DeckSlotName
 from opentrons.protocol_engine import (
-    commands,
-    slot_standardization as subject,
+    OFF_DECK_LOCATION,
     CommandIntent,
     DeckSlotLocation,
-    OnLabwareLocation,
     LabwareLocation,
     LabwareMovementStrategy,
     LabwareOffsetCreate,
@@ -18,8 +14,11 @@ from opentrons.protocol_engine import (
     LabwareOffsetVector,
     ModuleLocation,
     ModuleModel,
-    OFF_DECK_LOCATION,
+    OnLabwareLocation,
+    commands,
 )
+from opentrons.protocol_engine import slot_standardization as subject
+from opentrons.types import DeckSlotName
 
 
 @pytest.mark.parametrize("module_model", [None, ModuleModel.MAGNETIC_MODULE_V1])

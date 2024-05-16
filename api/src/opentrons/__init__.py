@@ -25,8 +25,8 @@ def __getattr__(attrname: str) -> None:
         # Local imports for performance. This case is not hit frequently, and we
         # don't want to drag these imports in any time anything is imported from
         # anywhere in the `opentrons` package.
-        from opentrons.protocols.types import ApiDeprecationError
         from opentrons.protocols.api_support.types import APIVersion
+        from opentrons.protocols.types import ApiDeprecationError
 
         raise ApiDeprecationError(APIVersion(1, 0))
     raise AttributeError(attrname)

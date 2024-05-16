@@ -8,11 +8,11 @@ from datetime import datetime
 from enum import Enum
 from typing import List, Optional, Union
 
-from opentrons.protocols.models import LabwareDefinition
-from opentrons.hardware_control.types import DoorState
-from opentrons.hardware_control.modules import LiveData
-
 from opentrons_shared_data.errors import EnumeratedError
+
+from opentrons.hardware_control.modules import LiveData
+from opentrons.hardware_control.types import DoorState
+from opentrons.protocols.models import LabwareDefinition
 
 from ..commands import (
     Command,
@@ -23,11 +23,11 @@ from ..commands import (
 from ..error_recovery_policy import ErrorRecoveryType
 from ..notes.notes import CommandNote
 from ..types import (
-    LabwareOffsetCreate,
-    ModuleDefinition,
-    Liquid,
-    DeckConfigurationType,
     AddressableAreaLocation,
+    DeckConfigurationType,
+    LabwareOffsetCreate,
+    Liquid,
+    ModuleDefinition,
 )
 
 

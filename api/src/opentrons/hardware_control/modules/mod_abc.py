@@ -3,12 +3,14 @@ import asyncio
 import logging
 import re
 from typing import ClassVar, Mapping, Optional, TypeVar
-from packaging.version import InvalidVersion, parse, Version
+
+from packaging.version import InvalidVersion, Version, parse
+
 from opentrons.config import IS_ROBOT, ROBOT_FIRMWARE_DIR
 from opentrons.drivers.rpi_drivers.types import USBPort
 
 from ..execution_manager import ExecutionManager
-from .types import BundledFirmware, UploadFunction, LiveData, ModuleType
+from .types import BundledFirmware, LiveData, ModuleType, UploadFunction
 
 mod_log = logging.getLogger(__name__)
 

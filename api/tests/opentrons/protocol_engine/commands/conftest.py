@@ -6,11 +6,11 @@ from decoy import Decoy
 
 from opentrons.protocol_engine.execution import (
     EquipmentHandler,
+    LabwareMovementHandler,
     MovementHandler,
     PipettingHandler,
-    RunControlHandler,
     RailLightsHandler,
-    LabwareMovementHandler,
+    RunControlHandler,
     StatusBarHandler,
     TipHandler,
 )

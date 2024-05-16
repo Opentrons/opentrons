@@ -5,12 +5,9 @@ from decoy import Decoy
 from opentrons.hardware_control import SynchronousAdapter
 from opentrons.hardware_control.modules import AbstractModule
 from opentrons.hardware_control.modules.types import TemperatureModuleModel
-from opentrons.protocol_api.core.legacy.module_geometry import ModuleGeometry
-
-from opentrons.protocol_api.core.legacy.legacy_protocol_core import (
-    LegacyProtocolCore,
-)
 from opentrons.protocol_api.core.legacy.legacy_module_core import LegacyModuleCore
+from opentrons.protocol_api.core.legacy.legacy_protocol_core import LegacyProtocolCore
+from opentrons.protocol_api.core.legacy.module_geometry import ModuleGeometry
 
 
 @pytest.fixture

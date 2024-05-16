@@ -1,20 +1,20 @@
 import json
 import logging
 import os
+from dataclasses import asdict
 from functools import lru_cache
 from pathlib import Path
-from opentrons.hardware_control.modules.types import ModuleType
-from opentrons.hardware_control.types import OT3Mount
-from pydantic import ValidationError
 from typing import List, Optional, Union, no_type_check
-from dataclasses import asdict
+
+from pydantic import ValidationError
 
 from opentrons import config, types
-
-
-from .. import file_operators as io, types as local_types
+from opentrons.hardware_control.modules.types import ModuleType
+from opentrons.hardware_control.types import OT3Mount
 from opentrons.util.helpers import utc_now
 
+from .. import file_operators as io
+from .. import types as local_types
 from .models import v1
 
 log = logging.getLogger(__name__)

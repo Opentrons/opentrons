@@ -1,52 +1,56 @@
 from __future__ import annotations
+
 import asyncio
-from contextlib import contextmanager, AsyncExitStack
 import logging
+from contextlib import AsyncExitStack, contextmanager
+from pathlib import Path
 from typing import (
-    Callable,
-    Iterator,
+    TYPE_CHECKING,
     Any,
+    Callable,
     Dict,
+    Iterator,
     List,
     Optional,
-    Tuple,
-    TYPE_CHECKING,
-    Union,
     Sequence,
+    Tuple,
+    Union,
     cast,
 )
+
 from typing_extensions import Final
-from pathlib import Path
 
 try:
     import aionotify  # type: ignore[import-untyped]
 except (OSError, ModuleNotFoundError):
     aionotify = None
 
+from opentrons_shared_data.pipette import mutable_configurations
 from opentrons_shared_data.pipette import (
     pipette_load_name_conversions as pipette_load_name,
-    mutable_configurations,
 )
 from opentrons_shared_data.pipette.dev_types import PipetteName
 
-from opentrons.drivers.smoothie_drivers import SmoothieDriver
-from opentrons.drivers.rpi_drivers import build_gpio_chardev
 import opentrons.config
 from opentrons.config.types import RobotConfig
+from opentrons.drivers.rpi_drivers import build_gpio_chardev
+from opentrons.drivers.smoothie_drivers import SmoothieDriver
 from opentrons.types import Mount
 
 from ..module_control import AttachedModulesControl
-from ..types import AionotifyEvent, BoardRevision, Axis, DoorState
+from ..types import AionotifyEvent, Axis, BoardRevision, DoorState
 from ..util import ot2_axis_to_string
 
 if TYPE_CHECKING:
     from opentrons_shared_data.pipette.dev_types import PipetteModel
+
+    from opentrons.drivers.rpi_drivers.dev_types import GPIODriverLike
+
     from ..dev_types import (
-        AttachedPipette,
         AttachedInstruments,
+        AttachedPipette,
         InstrumentHardwareConfigs,
     )
-    from opentrons.drivers.rpi_drivers.dev_types import GPIODriverLike
 
 MODULE_LOG = logging.getLogger(__name__)
 

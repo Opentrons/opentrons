@@ -2,25 +2,26 @@ from __future__ import annotations
 
 import asyncio
 import logging
-from typing import Optional, Mapping
+from typing import Mapping, Optional
+
 from typing_extensions import Final
 
-from opentrons.drivers.rpi_drivers.types import USBPort
-from opentrons.drivers.heater_shaker.driver import HeaterShakerDriver
 from opentrons.drivers.heater_shaker.abstract import AbstractHeaterShakerDriver
+from opentrons.drivers.heater_shaker.driver import HeaterShakerDriver
 from opentrons.drivers.heater_shaker.simulator import SimulatingDriver
-from opentrons.drivers.types import Temperature, RPM, HeaterShakerLabwareLatchStatus
+from opentrons.drivers.rpi_drivers.types import USBPort
+from opentrons.drivers.types import RPM, HeaterShakerLabwareLatchStatus, Temperature
 from opentrons.hardware_control.execution_manager import ExecutionManager
-from opentrons.hardware_control.poller import Reader, Poller
 from opentrons.hardware_control.modules import mod_abc, update
 from opentrons.hardware_control.modules.types import (
-    ModuleType,
-    TemperatureStatus,
-    SpeedStatus,
     HeaterShakerStatus,
-    UploadFunction,
     LiveData,
+    ModuleType,
+    SpeedStatus,
+    TemperatureStatus,
+    UploadFunction,
 )
+from opentrons.hardware_control.poller import Poller, Reader
 
 log = logging.getLogger(__name__)
 

@@ -2,13 +2,13 @@
 import pytest
 from decoy import Decoy, matchers
 
-from opentrons.legacy_broker import LegacyBroker
 from opentrons.drivers.types import HeaterShakerLabwareLatchStatus
-from opentrons.hardware_control.modules import TemperatureStatus, SpeedStatus
-from opentrons.protocols.api_support.types import APIVersion
+from opentrons.hardware_control.modules import SpeedStatus, TemperatureStatus
+from opentrons.legacy_broker import LegacyBroker
 from opentrons.protocol_api import MAX_SUPPORTED_VERSION, HeaterShakerContext
-from opentrons.protocol_api.core.common import ProtocolCore, HeaterShakerCore
+from opentrons.protocol_api.core.common import HeaterShakerCore, ProtocolCore
 from opentrons.protocol_api.core.core_map import LoadedCoreMap
+from opentrons.protocols.api_support.types import APIVersion
 
 
 @pytest.fixture

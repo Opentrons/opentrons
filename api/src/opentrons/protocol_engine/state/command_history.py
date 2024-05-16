@@ -6,7 +6,7 @@ from typing import Dict, List, Optional
 from opentrons.ordered_set import OrderedSet
 from opentrons.protocol_engine.errors.exceptions import CommandDoesNotExistError
 
-from ..commands import Command, CommandStatus, CommandIntent
+from ..commands import Command, CommandIntent, CommandStatus
 
 
 @dataclass(frozen=True)

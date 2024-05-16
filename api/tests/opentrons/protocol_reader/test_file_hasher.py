@@ -1,9 +1,6 @@
 """Tests for opentrons.protocol_reader.file_hasher."""
 
-from opentrons.protocol_reader import (
-    FileHasher,
-    BufferedFile,
-)
+from opentrons.protocol_reader import BufferedFile, FileHasher
 
 
 async def test_hash_files_different_order() -> None:

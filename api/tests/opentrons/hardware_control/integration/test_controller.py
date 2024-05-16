@@ -1,10 +1,11 @@
 from typing import Iterator
 
 import pytest
+
 from opentrons.config.robot_configs import build_config
 from opentrons.hardware_control import Controller
-from opentrons.hardware_control.initialization import _find_smoothie_file
 from opentrons.hardware_control.emulation.settings import Settings
+from opentrons.hardware_control.initialization import _find_smoothie_file
 from opentrons.types import Mount
 
 

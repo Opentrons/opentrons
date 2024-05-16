@@ -1,4 +1,5 @@
 from typing import Dict, Optional
+
 from typing_extensions import Protocol
 
 from ..types import SubSystem, SubSystemState

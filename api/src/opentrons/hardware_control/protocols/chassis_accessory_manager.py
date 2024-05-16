@@ -1,6 +1,8 @@
 from typing import Dict, Optional
+
 from typing_extensions import Protocol
-from ..types import DoorState, StatusBarState, EstopState
+
+from ..types import DoorState, EstopState, StatusBarState
 from .event_sourcer import EventSourcer
 
 

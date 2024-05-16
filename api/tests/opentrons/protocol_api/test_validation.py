@@ -1,30 +1,30 @@
 """Tests for Protocol API input validation."""
-from typing import ContextManager, List, Type, Union, Optional, Dict, Any
 from contextlib import nullcontext as do_not_raise
+from typing import Any, ContextManager, Dict, List, Optional, Type, Union
 
-from decoy import Decoy
 import pytest
-
+from decoy import Decoy
+from opentrons_shared_data.labware.labware_definition import LabwareRole
 from opentrons_shared_data.labware.labware_definition import (
-    LabwareRole,
     Parameters as LabwareDefinitionParameters,
 )
 from opentrons_shared_data.pipette.dev_types import PipetteNameType
 from opentrons_shared_data.robot.dev_types import RobotType
 
-from opentrons.types import Mount, DeckSlotName, StagingSlotName, Location, Point
 from opentrons.hardware_control.modules.types import (
-    ModuleModel,
+    HeaterShakerModuleModel,
     MagneticModuleModel,
+    ModuleModel,
     TemperatureModuleModel,
     ThermocyclerModuleModel,
-    HeaterShakerModuleModel,
     ThermocyclerStep,
 )
-from opentrons.protocols.models import LabwareDefinition
+from opentrons.protocol_api import Labware, Well
+from opentrons.protocol_api import validation as subject
 from opentrons.protocols.api_support.types import APIVersion
 from opentrons.protocols.api_support.util import APIVersionError
-from opentrons.protocol_api import validation as subject, Well, Labware
+from opentrons.protocols.models import LabwareDefinition
+from opentrons.types import DeckSlotName, Location, Mount, Point, StagingSlotName
 
 
 @pytest.mark.parametrize(

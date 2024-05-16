@@ -2,13 +2,13 @@
 import pytest
 from decoy import Decoy, matchers
 
-from opentrons.legacy_broker import LegacyBroker
 from opentrons.hardware_control.modules import MagneticStatus
+from opentrons.legacy_broker import LegacyBroker
+from opentrons.protocol_api import MAX_SUPPORTED_VERSION, MagneticModuleContext
+from opentrons.protocol_api.core.common import MagneticModuleCore, ProtocolCore
+from opentrons.protocol_api.core.core_map import LoadedCoreMap
 from opentrons.protocols.api_support.types import APIVersion
 from opentrons.protocols.api_support.util import APIVersionError
-from opentrons.protocol_api import MAX_SUPPORTED_VERSION, MagneticModuleContext
-from opentrons.protocol_api.core.common import ProtocolCore, MagneticModuleCore
-from opentrons.protocol_api.core.core_map import LoadedCoreMap
 
 
 @pytest.fixture

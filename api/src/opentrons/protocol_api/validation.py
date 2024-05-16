@@ -1,36 +1,36 @@
 from __future__ import annotations
+
 from typing import (
+    TYPE_CHECKING,
     Any,
     Dict,
     List,
-    Optional,
-    Sequence,
-    Union,
-    Tuple,
     Mapping,
     NamedTuple,
-    TYPE_CHECKING,
+    Optional,
+    Sequence,
+    Tuple,
+    Union,
 )
-
-from typing_extensions import TypeGuard
 
 from opentrons_shared_data.labware.labware_definition import LabwareRole
 from opentrons_shared_data.pipette.dev_types import PipetteNameType
 from opentrons_shared_data.robot.dev_types import RobotType
+from typing_extensions import TypeGuard
 
+from opentrons.hardware_control.modules.types import (
+    HeaterShakerModuleModel,
+    MagneticBlockModel,
+    MagneticModuleModel,
+    ModuleModel,
+    TemperatureModuleModel,
+    ThermocyclerModuleModel,
+    ThermocyclerStep,
+)
 from opentrons.protocols.api_support.types import APIVersion
 from opentrons.protocols.api_support.util import APIVersionError
 from opentrons.protocols.models import LabwareDefinition
-from opentrons.types import Mount, DeckSlotName, StagingSlotName, Location
-from opentrons.hardware_control.modules.types import (
-    ModuleModel,
-    MagneticModuleModel,
-    TemperatureModuleModel,
-    ThermocyclerModuleModel,
-    HeaterShakerModuleModel,
-    MagneticBlockModel,
-    ThermocyclerStep,
-)
+from opentrons.types import DeckSlotName, Location, Mount, StagingSlotName
 
 from .disposal_locations import TrashBin, WasteChute
 

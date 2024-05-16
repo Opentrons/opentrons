@@ -1,15 +1,14 @@
 """Test pause command."""
 from decoy import Decoy
 
-from opentrons.protocol_engine.execution import RunControlHandler
-
 from opentrons.protocol_engine.commands.command import SuccessData
 from opentrons.protocol_engine.commands.wait_for_resume import (
     WaitForResumeCreate,
+    WaitForResumeImplementation,
     WaitForResumeParams,
     WaitForResumeResult,
-    WaitForResumeImplementation,
 )
+from opentrons.protocol_engine.execution import RunControlHandler
 
 
 async def test_wait_for_resume_implementation(

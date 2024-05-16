@@ -1,9 +1,9 @@
 import logging
-from logging.config import dictConfig
 import sys
+from logging.config import dictConfig
 from typing import Any, Dict
 
-from opentrons.config import CONFIG, ARCHITECTURE, SystemArchitecture
+from opentrons.config import ARCHITECTURE, CONFIG, SystemArchitecture
 
 
 def _host_config(level_value: int) -> Dict[str, Any]:

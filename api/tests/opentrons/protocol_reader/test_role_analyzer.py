@@ -1,22 +1,22 @@
 """Tests for opentrons.protocol_reader.role_analyzer.RoleAnalyzer."""
-import pytest
 from typing import List, Union
 
-from opentrons.protocols.api_support.types import APIVersion
+import pytest
 
-from opentrons.protocol_reader.file_reader_writer import BufferedFile
 from opentrons.protocol_reader.file_identifier import (
+    IdentifiedData,
     IdentifiedFile,
     IdentifiedJsonMain,
-    IdentifiedPythonMain,
     IdentifiedLabwareDefinition,
-    IdentifiedData,
+    IdentifiedPythonMain,
 )
+from opentrons.protocol_reader.file_reader_writer import BufferedFile
 from opentrons.protocol_reader.role_analyzer import (
-    RoleAnalyzer,
     RoleAnalysis,
     RoleAnalysisError,
+    RoleAnalyzer,
 )
+from opentrons.protocols.api_support.types import APIVersion
 
 
 def dummy_python_protocol_file(file_name: str) -> IdentifiedPythonMain:

@@ -1,27 +1,25 @@
 """Test calibrate-pipette command."""
 from __future__ import annotations
-from typing import TYPE_CHECKING
 
 import inspect
+from typing import TYPE_CHECKING
+
 import pytest
 from decoy import Decoy
+from opentrons_shared_data.errors.exceptions import EarlyCapacitiveSenseTrigger
 
+from opentrons.hardware_control import ot3_calibration as calibration
+from opentrons.hardware_control.api import API
+from opentrons.hardware_control.types import OT3Mount
 from opentrons.protocol_engine.commands.calibration.calibrate_pipette import (
-    CalibratePipetteResult,
     CalibratePipetteImplementation,
     CalibratePipetteParams,
+    CalibratePipetteResult,
 )
 from opentrons.protocol_engine.commands.command import SuccessData
 from opentrons.protocol_engine.errors.exceptions import HardwareNotSupportedError
 from opentrons.protocol_engine.types import InstrumentOffsetVector
-
-from opentrons.hardware_control.api import API
-from opentrons.hardware_control.types import OT3Mount
 from opentrons.types import MountType, Point
-
-from opentrons.hardware_control import ot3_calibration as calibration
-
-from opentrons_shared_data.errors.exceptions import EarlyCapacitiveSenseTrigger
 
 if TYPE_CHECKING:
     from opentrons.hardware_control.ot3api import OT3API

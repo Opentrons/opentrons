@@ -2,28 +2,24 @@
 import pytest
 from decoy import Decoy
 
-from opentrons.types import Location, Point
 from opentrons.drivers.types import HeaterShakerLabwareLatchStatus
-from opentrons.hardware_control import SynchronousAdapter, SyncHardwareAPI
-from opentrons.hardware_control.types import Axis
+from opentrons.hardware_control import SyncHardwareAPI, SynchronousAdapter
 from opentrons.hardware_control.modules import HeaterShaker
 from opentrons.hardware_control.modules.types import (
     HeaterShakerModuleModel,
-    TemperatureStatus,
     SpeedStatus,
+    TemperatureStatus,
 )
-from opentrons.protocol_api.core.legacy.module_geometry import (
-    HeaterShakerGeometry,
-)
-from opentrons.protocol_api.core.legacy.legacy_protocol_core import (
-    LegacyProtocolCore,
-)
+from opentrons.hardware_control.types import Axis
 from opentrons.protocol_api.core.legacy.legacy_module_core import (
-    LegacyHeaterShakerCore,
-    create_module_core,
     CannotPerformModuleAction,
+    LegacyHeaterShakerCore,
     NoTargetTemperatureSetError,
+    create_module_core,
 )
+from opentrons.protocol_api.core.legacy.legacy_protocol_core import LegacyProtocolCore
+from opentrons.protocol_api.core.legacy.module_geometry import HeaterShakerGeometry
+from opentrons.types import Location, Point
 
 SyncHeaterShakerHardware = SynchronousAdapter[HeaterShaker]
 

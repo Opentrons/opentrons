@@ -2,12 +2,11 @@ from pathlib import Path
 
 import numpy as np
 
-from opentrons import config, calibration_storage
-
+from opentrons import calibration_storage, config
 from opentrons.hardware_control import robot_calibration
 from opentrons.hardware_control.instruments.ot2 import instrument_calibration
-from opentrons.util.helpers import utc_now
 from opentrons.types import Mount, Point
+from opentrons.util.helpers import utc_now
 
 
 def test_migrate_affine_xy_to_attitude():

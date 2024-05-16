@@ -1,51 +1,54 @@
 """Tests for the JSON JsonTranslator interface."""
-import pytest
 from typing import Dict, List
 
+import pytest
 from opentrons_shared_data.labware.labware_definition import (
-    LabwareDefinition,
-    Parameters,
-    Metadata,
-    DisplayCategory,
     BrandData,
     CornerOffsetFromSlot,
     Dimensions,
+    DisplayCategory,
     Group,
+    LabwareDefinition,
+    Metadata,
     Metadata1,
+    Parameters,
     WellDefinition,
 )
+from opentrons_shared_data.pipette.dev_types import PipetteNameType
+from opentrons_shared_data.protocol.models import Labware, Liquid, Location
+from opentrons_shared_data.protocol.models import Metadata as SD_Metadata
+from opentrons_shared_data.protocol.models import (
+    Module,
+    OffsetVector,
+    Pipette,
+    ProfileStep,
+    Robot,
+)
+from opentrons_shared_data.protocol.models import WellLocation as SD_WellLocation
 from opentrons_shared_data.protocol.models import (
     protocol_schema_v6,
     protocol_schema_v7,
     protocol_schema_v8,
-    Liquid,
-    Labware,
-    Location,
-    ProfileStep,
-    WellLocation as SD_WellLocation,
-    OffsetVector,
-    Metadata as SD_Metadata,
-    Module,
-    Pipette,
-    Robot,
 )
-from opentrons_shared_data.pipette.dev_types import PipetteNameType
-from opentrons.types import DeckSlotName, MountType
-from opentrons.protocol_runner.json_translator import JsonTranslator
+
 from opentrons.protocol_engine import (
-    commands as pe_commands,
     DeckPoint,
     DeckSlotLocation,
-    WellLocation,
     DropTipWellLocation,
-    WellOrigin,
     DropTipWellOrigin,
-    WellOffset,
-    ModuleModel,
-    ModuleLocation,
-    Liquid as PE_Liquid,
 )
+from opentrons.protocol_engine import Liquid as PE_Liquid
+from opentrons.protocol_engine import (
+    ModuleLocation,
+    ModuleModel,
+    WellLocation,
+    WellOffset,
+    WellOrigin,
+)
+from opentrons.protocol_engine import commands as pe_commands
 from opentrons.protocol_engine.types import HexColor
+from opentrons.protocol_runner.json_translator import JsonTranslator
+from opentrons.types import DeckSlotName, MountType
 
 VALID_TEST_PARAMS = [
     (

@@ -1,55 +1,59 @@
 """OT3 Hardware Controller Backend."""
 
 from __future__ import annotations
+
 import asyncio
-from contextlib import asynccontextmanager
-from functools import wraps
 import logging
+from contextlib import asynccontextmanager
 from copy import deepcopy
-from numpy import isclose
+from functools import wraps
 from typing import (
     Any,
+    AsyncIterator,
     Awaitable,
     Callable,
     Dict,
-    List,
-    Optional,
-    Tuple,
-    Sequence,
-    AsyncIterator,
-    cast,
-    Set,
-    TypeVar,
     Iterator,
     KeysView,
-    Union,
+    List,
     Mapping,
+    Optional,
+    Sequence,
+    Set,
+    Tuple,
+    TypeVar,
+    Union,
+    cast,
 )
-from opentrons.config.types import OT3Config, GantryLoad, OutputOptions
+
+from numpy import isclose
+
 from opentrons.config import gripper_config
+from opentrons.config.types import GantryLoad, OT3Config, OutputOptions
+
 from .ot3utils import (
+    LIMIT_SWITCH_OVERTRAVEL_DISTANCE,
     axis_convert,
-    create_move_group,
     axis_to_node,
-    get_current_settings,
-    create_home_groups,
-    node_to_axis,
-    sensor_node_for_mount,
-    sensor_node_for_pipette,
-    sensor_id_for_instrument,
     create_gripper_jaw_grip_group,
-    create_gripper_jaw_home_group,
     create_gripper_jaw_hold_group,
+    create_gripper_jaw_home_group,
+    create_home_groups,
+    create_move_group,
     create_tip_action_group,
     create_tip_motor_home_group,
-    motor_nodes,
-    LIMIT_SWITCH_OVERTRAVEL_DISTANCE,
-    map_pipette_type_to_sensor_id,
-    moving_axes_in_move_group,
-    gripper_jaw_state_from_fw,
+    get_current_settings,
     get_system_constraints,
     get_system_constraints_for_calibration,
     get_system_constraints_for_plunger_acceleration,
+    gripper_jaw_state_from_fw,
+    map_pipette_type_to_sensor_id,
+    motor_nodes,
+    moving_axes_in_move_group,
+    node_to_axis,
+    sensor_id_for_instrument,
+    sensor_node_for_mount,
+    sensor_node_for_pipette,
 )
 from .tip_presence_manager import TipPresenceManager
 
@@ -60,152 +64,134 @@ except (OSError, ModuleNotFoundError):
 
 
 from opentrons_hardware.drivers import SystemDrivers
-from opentrons_hardware.drivers.can_bus import CanMessenger, DriverSettings
-from opentrons_hardware.drivers.can_bus.abstract_driver import AbstractCanDriver
-from opentrons_hardware.drivers.can_bus.build import build_driver
 from opentrons_hardware.drivers.binary_usb import (
     BinaryMessenger,
     SerialUsbDriver,
     build_rear_panel_driver,
 )
-from opentrons_hardware.drivers.eeprom import EEPROMDriver, EEPROMData
-from opentrons_hardware.hardware_control.move_group_runner import MoveGroupRunner
-from opentrons_hardware.hardware_control.motion_planning import (
-    MoveManager,
-    MoveTarget,
-    ZeroLengthMoveError,
-)
-from opentrons_hardware.hardware_control.estop.detector import (
-    EstopDetector,
-)
-
-from opentrons.hardware_control.backends.estop_state import EstopStateMachine
-
-from opentrons_hardware.hardware_control.motor_enable_disable import (
-    set_enable_motor,
-    set_disable_motor,
-    set_enable_tip_motor,
-    set_disable_tip_motor,
-    get_motor_enabled,
-)
-from opentrons_hardware.hardware_control.motor_position_status import (
-    get_motor_position,
-    update_motor_position_estimation,
-)
-from opentrons_hardware.hardware_control.limit_switches import get_limit_switches
-from opentrons_hardware.hardware_control.current_settings import (
-    set_run_current,
-    set_hold_current,
-    set_currents,
-)
+from opentrons_hardware.drivers.can_bus import CanMessenger, DriverSettings
+from opentrons_hardware.drivers.can_bus.abstract_driver import AbstractCanDriver
+from opentrons_hardware.drivers.can_bus.build import build_driver
+from opentrons_hardware.drivers.eeprom import EEPROMData, EEPROMDriver
+from opentrons_hardware.drivers.gpio import OT3GPIO, RemoteOT3GPIO
+from opentrons_hardware.firmware_bindings.binary_constants import BinaryMessageId
+from opentrons_hardware.firmware_bindings.constants import ErrorCode, NodeId
 from opentrons_hardware.firmware_bindings.constants import (
-    NodeId,
     PipetteName as FirmwarePipetteName,
-    ErrorCode,
+)
+from opentrons_hardware.firmware_bindings.messages.binary_message_definitions import (
+    BinaryMessageDefinition,
+    DoorSwitchStateInfo,
 )
 from opentrons_hardware.firmware_bindings.messages.message_definitions import (
     StopRequest,
 )
 from opentrons_hardware.firmware_bindings.messages.payloads import EmptyPayload
-from opentrons_hardware.hardware_control import status_bar
-
-from opentrons_hardware.firmware_bindings.binary_constants import BinaryMessageId
-from opentrons_hardware.firmware_bindings.messages.binary_message_definitions import (
-    BinaryMessageDefinition,
-    DoorSwitchStateInfo,
-)
 from opentrons_hardware.firmware_update import FirmwareUpdate
-from opentrons_hardware.hardware_control import network, tools
-
-from opentrons.hardware_control.module_control import AttachedModulesControl
-from opentrons.hardware_control.types import (
-    BoardRevision,
-    Axis,
-    AionotifyEvent,
-    OT3Mount,
-    OT3AxisMap,
-    OT3AxisKind,
-    CurrentConfig,
-    MotorStatus,
-    InstrumentProbeType,
-    UpdateStatus,
-    DoorState,
-    SubSystemState,
-    SubSystem,
-    TipStateType,
-    GripperJawState,
-    HardwareFeatureFlags,
-    EstopOverallStatus,
-    EstopAttachLocation,
-    EstopState,
-    HardwareEventHandler,
-    HardwareEventUnsubscriber,
+from opentrons_hardware.hardware_control import network, status_bar, tools
+from opentrons_hardware.hardware_control.current_settings import (
+    set_currents,
+    set_hold_current,
+    set_run_current,
 )
-from opentrons.hardware_control.errors import (
-    InvalidPipetteName,
-    InvalidPipetteModel,
+from opentrons_hardware.hardware_control.estop.detector import EstopDetector
+from opentrons_hardware.hardware_control.gripper_settings import get_gripper_jaw_state
+from opentrons_hardware.hardware_control.hepa_uv_settings import (
+    get_hepa_fan_state as get_hepa_fan_state_fw,
 )
-from opentrons_hardware.hardware_control.motion import (
-    MoveStopCondition,
-    MoveGroup,
-)
-from opentrons_hardware.hardware_control.types import (
-    NodeMap,
-    MotorPositionStatus,
-    MoveCompleteAck,
-)
-from opentrons_hardware.hardware_control.tools import types as ohc_tool_types
-
-from opentrons_hardware.hardware_control.tool_sensors import (
-    capacitive_probe,
-    capacitive_pass,
-    liquid_probe,
-    check_overpressure,
-)
-from opentrons_hardware.hardware_control.rear_panel_settings import (
-    get_door_state,
-    set_deck_light,
-    get_deck_light_state,
-)
-from opentrons_hardware.hardware_control.gripper_settings import (
-    get_gripper_jaw_state,
+from opentrons_hardware.hardware_control.hepa_uv_settings import (
+    get_hepa_uv_state as get_hepa_uv_state_fw,
 )
 from opentrons_hardware.hardware_control.hepa_uv_settings import (
     set_hepa_fan_state as set_hepa_fan_state_fw,
-    get_hepa_fan_state as get_hepa_fan_state_fw,
+)
+from opentrons_hardware.hardware_control.hepa_uv_settings import (
     set_hepa_uv_state as set_hepa_uv_state_fw,
-    get_hepa_uv_state as get_hepa_uv_state_fw,
 )
-
-from opentrons_hardware.drivers.gpio import OT3GPIO, RemoteOT3GPIO
-from opentrons_shared_data.pipette.dev_types import PipetteName
-from opentrons_shared_data.pipette import (
-    pipette_load_name_conversions as pipette_load_name,
-    load_data as load_pipette_data,
+from opentrons_hardware.hardware_control.limit_switches import get_limit_switches
+from opentrons_hardware.hardware_control.motion import MoveGroup, MoveStopCondition
+from opentrons_hardware.hardware_control.motion_planning import (
+    MoveManager,
+    MoveTarget,
+    ZeroLengthMoveError,
 )
-from opentrons_shared_data.gripper.gripper_definition import GripForceProfile
-
+from opentrons_hardware.hardware_control.motor_enable_disable import (
+    get_motor_enabled,
+    set_disable_motor,
+    set_disable_tip_motor,
+    set_enable_motor,
+    set_enable_tip_motor,
+)
+from opentrons_hardware.hardware_control.motor_position_status import (
+    get_motor_position,
+    update_motor_position_estimation,
+)
+from opentrons_hardware.hardware_control.move_group_runner import MoveGroupRunner
+from opentrons_hardware.hardware_control.rear_panel_settings import (
+    get_deck_light_state,
+    get_door_state,
+    set_deck_light,
+)
+from opentrons_hardware.hardware_control.tool_sensors import (
+    capacitive_pass,
+    capacitive_probe,
+    check_overpressure,
+    liquid_probe,
+)
+from opentrons_hardware.hardware_control.tools import types as ohc_tool_types
+from opentrons_hardware.hardware_control.types import (
+    MotorPositionStatus,
+    MoveCompleteAck,
+    NodeMap,
+)
 from opentrons_shared_data.errors.exceptions import (
     EStopActivatedError,
     EStopNotPresentError,
-    PipetteOverpressureError,
-    FirmwareUpdateRequiredError,
     FailedGripperPickupError,
+    FirmwareUpdateRequiredError,
     LiquidNotFoundError,
+    PipetteOverpressureError,
+)
+from opentrons_shared_data.gripper.gripper_definition import GripForceProfile
+from opentrons_shared_data.pipette import load_data as load_pipette_data
+from opentrons_shared_data.pipette import (
+    pipette_load_name_conversions as pipette_load_name,
+)
+from opentrons_shared_data.pipette.dev_types import PipetteName
+
+from opentrons.hardware_control.backends.estop_state import EstopStateMachine
+from opentrons.hardware_control.errors import InvalidPipetteModel, InvalidPipetteName
+from opentrons.hardware_control.module_control import AttachedModulesControl
+from opentrons.hardware_control.types import (
+    AionotifyEvent,
+    Axis,
+    BoardRevision,
+    CurrentConfig,
+    DoorState,
+    EstopAttachLocation,
+    EstopOverallStatus,
+    EstopState,
+    GripperJawState,
+    HardwareEventHandler,
+    HardwareEventUnsubscriber,
+    HardwareFeatureFlags,
+    InstrumentProbeType,
+    MotorStatus,
+    OT3AxisKind,
+    OT3AxisMap,
+    OT3Mount,
+    SubSystem,
+    SubSystemState,
+    TipStateType,
+    UpdateStatus,
 )
 
-from .subsystem_manager import SubsystemManager
-
-from ..dev_types import (
-    AttachedPipette,
-    AttachedGripper,
-    OT3AttachedInstruments,
-)
+from ..dev_types import AttachedGripper, AttachedPipette, OT3AttachedInstruments
 from ..types import HepaFanState, HepaUVState, StatusBarState
-
-from .types import HWStopCondition
 from .flex_protocol import FlexBackend
 from .status_bar_state import StatusBarStateController
+from .subsystem_manager import SubsystemManager
+from .types import HWStopCondition
 
 log = logging.getLogger(__name__)
 

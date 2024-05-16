@@ -3,14 +3,14 @@ from typing import Callable, cast
 
 import pytest
 from _pytest.fixtures import SubRequest
+from opentrons_shared_data.errors.exceptions import (
+    UnexpectedTipAttachError,
+    UnexpectedTipRemovalError,
+)
 from pytest_lazyfixture import lazy_fixture  # type: ignore[import-untyped]
 
 from opentrons.protocol_api.core.common import InstrumentCore, LabwareCore
 from opentrons.types import Location, Point
-from opentrons_shared_data.errors.exceptions import (
-    UnexpectedTipRemovalError,
-    UnexpectedTipAttachError,
-)
 
 # TODO (lc 12-8-2022) Not sure if we plan to keep these tests, but if we do
 # we should re-write them to be agnostic to the underlying hardware. Otherwise

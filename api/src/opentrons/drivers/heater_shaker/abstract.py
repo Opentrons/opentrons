@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 from typing import Dict
 
-from opentrons.drivers.types import Temperature, RPM, HeaterShakerLabwareLatchStatus
+from opentrons.drivers.types import RPM, HeaterShakerLabwareLatchStatus, Temperature
 
 
 class AbstractHeaterShakerDriver(ABC):

@@ -1,13 +1,13 @@
 """Utililty methods and classes for interacting with the Module Status Server."""
 
 import asyncio
-from typing import Sequence, Set, Callable, List, Awaitable
+from typing import Awaitable, Callable, List, Sequence, Set
 
 from opentrons.drivers.rpi_drivers.types import USBPort
 from opentrons.hardware_control.emulation.module_server.client import (
-    ModuleStatusClient,
     ModuleServerClientError,
     ModuleServerDisconnected,
+    ModuleStatusClient,
 )
 from opentrons.hardware_control.emulation.module_server.models import Message
 from opentrons.hardware_control.emulation.module_server.server import log

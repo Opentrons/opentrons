@@ -1,37 +1,34 @@
 """MovementHandler command subject."""
-import pytest
-from decoy import Decoy
 from typing import NamedTuple
 
-from opentrons.types import MountType, Point, DeckSlotName, Mount
+import pytest
+from decoy import Decoy
+from opentrons_shared_data.errors.exceptions import PositionUnknownError
+
 from opentrons.hardware_control import API as HardwareAPI
 from opentrons.hardware_control.types import CriticalPoint
 from opentrons.motion_planning import Waypoint
-
-from opentrons.protocol_engine.types import (
-    DeckPoint,
-    MovementAxis,
-    WellLocation,
-    WellOrigin,
-    WellOffset,
-    DeckSlotLocation,
-    CurrentWell,
-    MotorAxis,
-    AddressableOffsetVector,
-)
-from opentrons.protocol_engine.state import (
-    StateStore,
-    PipetteLocationData,
+from opentrons.protocol_engine.execution.gantry_mover import GantryMover
+from opentrons.protocol_engine.execution.heater_shaker_movement_flagger import (
+    HeaterShakerMovementFlagger,
 )
 from opentrons.protocol_engine.execution.movement import MovementHandler
 from opentrons.protocol_engine.execution.thermocycler_movement_flagger import (
     ThermocyclerMovementFlagger,
 )
-from opentrons.protocol_engine.execution.heater_shaker_movement_flagger import (
-    HeaterShakerMovementFlagger,
+from opentrons.protocol_engine.state import PipetteLocationData, StateStore
+from opentrons.protocol_engine.types import (
+    AddressableOffsetVector,
+    CurrentWell,
+    DeckPoint,
+    DeckSlotLocation,
+    MotorAxis,
+    MovementAxis,
+    WellLocation,
+    WellOffset,
+    WellOrigin,
 )
-from opentrons.protocol_engine.execution.gantry_mover import GantryMover
-from opentrons_shared_data.errors.exceptions import PositionUnknownError
+from opentrons.types import DeckSlotName, Mount, MountType, Point
 
 
 @pytest.fixture

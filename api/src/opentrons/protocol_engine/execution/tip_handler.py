@@ -1,25 +1,25 @@
 """Tip pickup and drop procedures."""
-from typing import Optional, Dict
+from typing import Dict, Optional
+
+from opentrons_shared_data.errors.exceptions import (
+    CommandParameterLimitViolated,
+    CommandPreconditionViolated,
+    PythonException,
+)
 from typing_extensions import Protocol as TypingProtocol
 
 from opentrons.hardware_control import HardwareControlAPI
 from opentrons.hardware_control.types import FailedTipStateCheck, InstrumentProbeType
-from opentrons_shared_data.errors.exceptions import (
-    CommandPreconditionViolated,
-    CommandParameterLimitViolated,
-    PythonException,
-)
 
+from ..errors import (
+    HardwareNotSupportedError,
+    ProtocolEngineError,
+    TipAttachedError,
+    TipNotAttachedError,
+)
 from ..resources import LabwareDataProvider, ensure_ot3_hardware
 from ..state import StateView
 from ..types import TipGeometry, TipPresenceStatus
-from ..errors import (
-    HardwareNotSupportedError,
-    TipNotAttachedError,
-    TipAttachedError,
-    ProtocolEngineError,
-)
-
 
 PRIMARY_NOZZLE_TO_ENDING_NOZZLE_MAP = {
     "A1": {"COLUMN": "H1", "ROW": "A12"},

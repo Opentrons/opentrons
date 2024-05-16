@@ -1,7 +1,7 @@
 """Protocol engine exceptions."""
 
 from logging import getLogger
-from typing import Any, Dict, Optional, Union, Iterator, Sequence
+from typing import Any, Dict, Iterator, Optional, Sequence, Union
 
 from opentrons_shared_data.errors import ErrorCodes
 from opentrons_shared_data.errors.exceptions import EnumeratedError, PythonException

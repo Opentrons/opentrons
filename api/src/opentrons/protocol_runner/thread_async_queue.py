@@ -9,7 +9,6 @@ from typing import AsyncIterable, Deque, Generic, Iterable, TypeVar
 
 from anyio.to_thread import run_sync
 
-
 _T = TypeVar("_T")
 
 

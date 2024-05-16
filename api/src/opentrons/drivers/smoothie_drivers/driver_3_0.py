@@ -8,74 +8,73 @@
 """
 
 from __future__ import annotations
+
 import asyncio
 import contextlib
 import logging
+from math import isclose
 from os import environ
 from time import time
-from typing import Any, Dict, Optional, Union, List, Tuple, cast, AsyncIterator
+from typing import Any, AsyncIterator, Dict, List, Optional, Tuple, Union, cast
 
-from math import isclose
-
-from opentrons.drivers.serial_communication import get_ports_by_name
 from serial.serialutil import SerialException  # type: ignore[import-untyped]
 
-from opentrons.drivers.smoothie_drivers.connection import SmoothieConnection
-from opentrons.drivers.smoothie_drivers.constants import (
-    GCODE,
-    HOMED_POSITION,
-    Y_BOUND_OVERRIDE,
-    SMOOTHIE_COMMAND_TERMINATOR,
-    SMOOTHIE_ACK,
-    PLUNGER_BACKLASH_MM,
-    CURRENT_CHANGE_DELAY,
-    PIPETTE_READ_DELAY,
-    Y_SWITCH_BACK_OFF_MM,
-    Y_SWITCH_REVERSE_BACK_OFF_MM,
-    Y_BACKOFF_LOW_CURRENT,
-    Y_BACKOFF_SLOW_SPEED,
-    Y_RETRACT_SPEED,
-    Y_RETRACT_DISTANCE,
-    UNSTICK_DISTANCE,
-    UNSTICK_SPEED,
-    DEFAULT_AXES_SPEED,
-    XY_HOMING_SPEED,
-    HOME_SEQUENCE,
-    AXES,
-    DISABLE_AXES,
-    SEC_PER_MIN,
-    DEFAULT_ACK_TIMEOUT,
-    DEFAULT_EXECUTE_TIMEOUT,
-    DEFAULT_MOVEMENT_TIMEOUT,
-    SMOOTHIE_BOOT_TIMEOUT,
-    DEFAULT_STABILIZE_DELAY,
-    DEFAULT_COMMAND_RETRIES,
-    MICROSTEPPING_GCODES,
-    GCODE_ROUNDING_PRECISION,
-)
-from opentrons.drivers.smoothie_drivers.errors import (
-    SmoothieError,
-    SmoothieAlarm,
-    TipProbeError,
-)
-from opentrons.drivers.smoothie_drivers import parse_utils
-from opentrons.drivers.command_builder import CommandBuilder
-
-from opentrons.config.types import RobotConfig
 from opentrons.config.robot_configs import current_for_revision
+from opentrons.config.types import RobotConfig
 from opentrons.drivers.asyncio.communication import (
-    SerialConnection,
-    NoResponse,
     AlarmResponse,
     ErrorResponse,
+    NoResponse,
+    SerialConnection,
+)
+from opentrons.drivers.command_builder import CommandBuilder
+from opentrons.drivers.rpi_drivers.dev_types import GPIODriverLike
+from opentrons.drivers.rpi_drivers.gpio_simulator import SimulatingGPIOCharDev
+from opentrons.drivers.serial_communication import get_ports_by_name
+from opentrons.drivers.smoothie_drivers import parse_utils
+from opentrons.drivers.smoothie_drivers.connection import SmoothieConnection
+from opentrons.drivers.smoothie_drivers.constants import (
+    AXES,
+    CURRENT_CHANGE_DELAY,
+    DEFAULT_ACK_TIMEOUT,
+    DEFAULT_AXES_SPEED,
+    DEFAULT_COMMAND_RETRIES,
+    DEFAULT_EXECUTE_TIMEOUT,
+    DEFAULT_MOVEMENT_TIMEOUT,
+    DEFAULT_STABILIZE_DELAY,
+    DISABLE_AXES,
+    GCODE,
+    GCODE_ROUNDING_PRECISION,
+    HOME_SEQUENCE,
+    HOMED_POSITION,
+    MICROSTEPPING_GCODES,
+    PIPETTE_READ_DELAY,
+    PLUNGER_BACKLASH_MM,
+    SEC_PER_MIN,
+    SMOOTHIE_ACK,
+    SMOOTHIE_BOOT_TIMEOUT,
+    SMOOTHIE_COMMAND_TERMINATOR,
+    UNSTICK_DISTANCE,
+    UNSTICK_SPEED,
+    XY_HOMING_SPEED,
+    Y_BACKOFF_LOW_CURRENT,
+    Y_BACKOFF_SLOW_SPEED,
+    Y_BOUND_OVERRIDE,
+    Y_RETRACT_DISTANCE,
+    Y_RETRACT_SPEED,
+    Y_SWITCH_BACK_OFF_MM,
+    Y_SWITCH_REVERSE_BACK_OFF_MM,
+)
+from opentrons.drivers.smoothie_drivers.errors import (
+    SmoothieAlarm,
+    SmoothieError,
+    TipProbeError,
 )
 from opentrons.drivers.types import MoveSplits
 from opentrons.drivers.utils import AxisMoveTimestamp, ParseError, string_to_hex
-from opentrons.drivers.rpi_drivers.gpio_simulator import SimulatingGPIOCharDev
-from opentrons.drivers.rpi_drivers.dev_types import GPIODriverLike
 from opentrons.system import smoothie_update
-from .types import AxisCurrentSettings
 
+from .types import AxisCurrentSettings
 
 log = logging.getLogger(__name__)
 

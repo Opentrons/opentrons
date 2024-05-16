@@ -1,16 +1,15 @@
-import pytest
-from typing import Any, TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 
-from opentrons.types import Mount, Point
-from opentrons.calibration_storage import (
-    types as cs_types,
-)
+import pytest
+
+from opentrons.calibration_storage import types as cs_types
 from opentrons.calibration_storage.ot2 import (
-    save_pipette_calibration,
-    get_pipette_offset,
     clear_pipette_offset_calibrations,
     delete_pipette_offset_file,
+    get_pipette_offset,
+    save_pipette_calibration,
 )
+from opentrons.types import Mount, Point
 
 if TYPE_CHECKING:
     from opentrons_shared_data.deck.dev_types import RobotModel

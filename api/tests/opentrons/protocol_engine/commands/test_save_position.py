@@ -2,17 +2,16 @@
 import pytest
 from decoy import Decoy
 
-from opentrons.protocol_engine.types import DeckPoint
-from opentrons.protocol_engine.execution import GantryMover
-from opentrons.protocol_engine.resources import ModelUtils
-from opentrons.types import Point
-
 from opentrons.protocol_engine.commands.command import SuccessData
 from opentrons.protocol_engine.commands.save_position import (
+    SavePositionImplementation,
     SavePositionParams,
     SavePositionResult,
-    SavePositionImplementation,
 )
+from opentrons.protocol_engine.execution import GantryMover
+from opentrons.protocol_engine.resources import ModelUtils
+from opentrons.protocol_engine.types import DeckPoint
+from opentrons.types import Point
 
 
 @pytest.fixture

@@ -2,22 +2,21 @@
 from dataclasses import dataclass
 from typing import NewType, Optional
 
-from opentrons.protocol_engine.errors import (
-    InvalidTargetTemperatureError,
-    InvalidBlockVolumeError,
-    NoTargetTemperatureSetError,
-    InvalidHoldTimeError,
-)
-
 # TODO(mc, 2022-04-25): move to module definition
 # https://github.com/Opentrons/opentrons/issues/9800
 from opentrons.drivers.thermocycler.driver import (
-    BLOCK_TARGET_MIN,
     BLOCK_TARGET_MAX,
-    BLOCK_VOL_MIN,
+    BLOCK_TARGET_MIN,
     BLOCK_VOL_MAX,
-    LID_TARGET_MIN,
+    BLOCK_VOL_MIN,
     LID_TARGET_MAX,
+    LID_TARGET_MIN,
+)
+from opentrons.protocol_engine.errors import (
+    InvalidBlockVolumeError,
+    InvalidHoldTimeError,
+    InvalidTargetTemperatureError,
+    NoTargetTemperatureSetError,
 )
 
 ThermocyclerModuleId = NewType("ThermocyclerModuleId", str)

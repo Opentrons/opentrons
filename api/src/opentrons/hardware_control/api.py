@@ -1,22 +1,22 @@
 import asyncio
 import contextlib
-from dataclasses import replace
-from functools import partial
 import logging
 import pathlib
 from collections import OrderedDict
+from dataclasses import replace
+from functools import partial
 from typing import (
+    Any,
     Callable,
     Dict,
-    Union,
     List,
+    Mapping,
     Optional,
-    Tuple,
     Sequence,
     Set,
-    Any,
+    Tuple,
     TypeVar,
-    Mapping,
+    Union,
     cast,
 )
 
@@ -29,52 +29,49 @@ from opentrons_shared_data.pipette import (
 )
 from opentrons_shared_data.pipette.dev_types import PipetteName
 from opentrons_shared_data.robot.dev_types import RobotType
+
 from opentrons import types as top_types
 from opentrons.config import robot_configs
-from opentrons.config.types import RobotConfig, OT3Config
-from opentrons.drivers.rpi_drivers.types import USBPort, PortGroup
+from opentrons.config.types import OT3Config, RobotConfig
+from opentrons.drivers.rpi_drivers.types import PortGroup, USBPort
 
-from .util import use_or_initialize_loop, check_motion_bounds, ot2_axis_to_string
+from . import modules
+from .backends import Controller, Simulator
+from .execution_manager import ExecutionManagerProvider
+from .instruments.ot2.instrument_calibration import load_pipette_offset
 from .instruments.ot2.pipette import (
     generate_hardware_configs,
     load_from_config_and_check_skip,
 )
-from .backends import Controller, Simulator
-from .execution_manager import ExecutionManagerProvider
-from .pause_manager import PauseManager
+from .instruments.ot2.pipette_handler import PipetteHandlerProvider
 from .module_control import AttachedModulesControl
+from .motion_utilities import (
+    deck_from_machine,
+    machine_from_deck,
+    target_position_from_absolute,
+    target_position_from_plunger,
+    target_position_from_relative,
+)
+from .pause_manager import PauseManager
+from .protocols import HardwareControlInterface
+from .robot_calibration import RobotCalibration, RobotCalibrationProvider
 from .types import (
     Axis,
     CriticalPoint,
     DoorState,
     DoorStateNotification,
     ErrorMessageNotification,
-    HardwareEventHandler,
+    EstopState,
     HardwareAction,
+    HardwareEventHandler,
+    HardwareFeatureFlags,
     MotionChecks,
     PauseType,
     StatusBarState,
-    EstopState,
     SubSystem,
     SubSystemState,
-    HardwareFeatureFlags,
 )
-from . import modules
-from .robot_calibration import (
-    RobotCalibrationProvider,
-    RobotCalibration,
-)
-from .protocols import HardwareControlInterface
-from .instruments.ot2.pipette_handler import PipetteHandlerProvider
-from .instruments.ot2.instrument_calibration import load_pipette_offset
-from .motion_utilities import (
-    target_position_from_absolute,
-    target_position_from_relative,
-    target_position_from_plunger,
-    deck_from_machine,
-    machine_from_deck,
-)
-
+from .util import check_motion_bounds, ot2_axis_to_string, use_or_initialize_loop
 
 mod_log = logging.getLogger(__name__)
 

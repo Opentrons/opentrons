@@ -5,43 +5,40 @@ Add new tests to test_command_state.py, where they can be tested together.
 """
 
 
-import pytest
 from contextlib import nullcontext as does_not_raise
 from datetime import datetime
 from typing import Dict, List, NamedTuple, Optional, Sequence, Type, Union
 
-from opentrons.protocol_engine import EngineStatus, commands as cmd, errors
-from opentrons.protocol_engine.actions import (
-    PlayAction,
-    PauseAction,
-    PauseSource,
-    StopAction,
-    QueueCommandAction,
-)
-from opentrons.protocol_engine.actions.actions import ResumeFromRecoveryAction
-
-from opentrons.protocol_engine.error_recovery_policy import ErrorRecoveryType
-from opentrons.protocol_engine.state.commands import (
-    CommandState,
-    CommandView,
-    CommandSlice,
-    CurrentCommand,
-    RunResult,
-    QueueStatus,
-)
-
-from opentrons.protocol_engine.state.command_history import CommandEntry
-
-from opentrons.protocol_engine.errors import ProtocolCommandFailedError, ErrorOccurrence
-
+import pytest
 from opentrons_shared_data.errors.codes import ErrorCodes
 
-from opentrons.protocol_engine.state.command_history import CommandHistory
+from opentrons.protocol_engine import EngineStatus
+from opentrons.protocol_engine import commands as cmd
+from opentrons.protocol_engine import errors
+from opentrons.protocol_engine.actions import (
+    PauseAction,
+    PauseSource,
+    PlayAction,
+    QueueCommandAction,
+    StopAction,
+)
+from opentrons.protocol_engine.actions.actions import ResumeFromRecoveryAction
+from opentrons.protocol_engine.error_recovery_policy import ErrorRecoveryType
+from opentrons.protocol_engine.errors import ErrorOccurrence, ProtocolCommandFailedError
+from opentrons.protocol_engine.state.command_history import CommandEntry, CommandHistory
+from opentrons.protocol_engine.state.commands import (
+    CommandSlice,
+    CommandState,
+    CommandView,
+    CurrentCommand,
+    QueueStatus,
+    RunResult,
+)
 
 from .command_fixtures import (
+    create_failed_command,
     create_queued_command,
     create_running_command,
-    create_failed_command,
     create_succeeded_command,
 )
 

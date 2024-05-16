@@ -1,28 +1,29 @@
 import logging
-from typing import Dict, TYPE_CHECKING
+from typing import TYPE_CHECKING, Dict
 
-from opentrons.protocol_api import ProtocolContext, InstrumentContext, Labware, Well
-from opentrons.protocols.api_support.labware_like import LabwareLike
-from opentrons.types import Point, Location
 from opentrons_shared_data.protocol.constants import (
     JsonPipetteCommand,
     JsonRobotCommand,
 )
 
+from opentrons.protocol_api import InstrumentContext, Labware, ProtocolContext, Well
+from opentrons.protocols.api_support.labware_like import LabwareLike
+from opentrons.types import Location, Point
 
 if TYPE_CHECKING:
     from opentrons_shared_data.protocol.dev_types import (
-        JsonProtocolV3,
-        JsonProtocol,
-        PipetteAccessParams,
-        StandardLiquidHandlingParams,
+        BlowoutParams,
         DelayParams,
         FlowRateParams,
-        TouchTipParams,
-        PipetteAccessWithOffsetParams,
-        BlowoutParams,
+        JsonProtocol,
+        JsonProtocolV3,
         MoveToSlotParams,
+        PipetteAccessParams,
+        PipetteAccessWithOffsetParams,
+        StandardLiquidHandlingParams,
+        TouchTipParams,
     )
+
     from opentrons.protocols.execution.dev_types import PipetteDispatch
 
 MODULE_LOG = logging.getLogger(__name__)

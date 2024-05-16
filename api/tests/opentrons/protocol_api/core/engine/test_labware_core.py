@@ -3,20 +3,25 @@ from typing import cast
 
 import pytest
 from decoy import Decoy
-
+from opentrons_shared_data.labware.dev_types import LabwareDefinition as LabwareDefDict
 from opentrons_shared_data.labware.dev_types import (
-    LabwareDefinition as LabwareDefDict,
     LabwareParameters as LabwareParamsDict,
-    LabwareUri,
 )
+from opentrons_shared_data.labware.dev_types import LabwareUri
 from opentrons_shared_data.labware.labware_definition import (
     LabwareDefinition,
     LabwareRole,
-    Parameters as LabwareDefinitionParameters,
+)
+from opentrons_shared_data.labware.labware_definition import (
     Metadata as LabwareDefinitionMetadata,
 )
+from opentrons_shared_data.labware.labware_definition import (
+    Parameters as LabwareDefinitionParameters,
+)
 
-from opentrons.types import DeckSlotName, Point
+from opentrons.calibration_storage.helpers import uri_from_details
+from opentrons.protocol_api.core.engine import LabwareCore, WellCore
+from opentrons.protocol_api.core.labware import LabwareLoadParams
 from opentrons.protocol_engine.clients import SyncClient as EngineClient
 from opentrons.protocol_engine.errors import LabwareNotOnDeckError
 from opentrons.protocol_engine.types import (
@@ -24,10 +29,7 @@ from opentrons.protocol_engine.types import (
     LabwareOffsetLocation,
     LabwareOffsetVector,
 )
-
-from opentrons.protocol_api.core.labware import LabwareLoadParams
-from opentrons.protocol_api.core.engine import LabwareCore, WellCore
-from opentrons.calibration_storage.helpers import uri_from_details
+from opentrons.types import DeckSlotName, Point
 
 
 @pytest.fixture

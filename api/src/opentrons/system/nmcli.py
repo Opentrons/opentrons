@@ -11,19 +11,17 @@ is relevant in particular because they mostly do not handle exceptions coming
 from subprocess itself, only parsing nmcli output.
 """
 
-import csv
-import logging
-import re
 import copy
-from typing import Optional, List, Tuple, Dict, Callable, Any, NamedTuple
+import csv
 import enum
+import logging
 import os
-
-from shlex import quote
+import re
 from asyncio import subprocess as as_subprocess
+from shlex import quote
+from typing import Any, Callable, Dict, List, NamedTuple, Optional, Tuple
 
 from opentrons import config
-
 
 log = logging.getLogger(__name__)
 

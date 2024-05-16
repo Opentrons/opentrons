@@ -1,12 +1,12 @@
 """Tests for opentrons.protocol_api."""
-from typing import List, overload, Optional
+from typing import List, Optional, overload
 
-from opentrons.protocols.api_support.types import APIVersion
 from opentrons.protocol_api import (
     MAX_SUPPORTED_VERSION,
     MIN_SUPPORTED_VERSION,
     MIN_SUPPORTED_VERSION_FOR_FLEX,
 )
+from opentrons.protocols.api_support.types import APIVersion
 
 
 def versions_at_or_above(from_version: APIVersion) -> List[APIVersion]:

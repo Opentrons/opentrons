@@ -6,36 +6,34 @@ from typing import List, Optional, Union, cast
 from opentrons_shared_data.labware.dev_types import LabwareDefinition
 from opentrons_shared_data.module.dev_types import ModuleModel, ModuleType
 
-from opentrons.legacy_broker import LegacyBroker
 from opentrons.hardware_control.modules import ThermocyclerStep
+from opentrons.legacy_broker import LegacyBroker
 from opentrons.legacy_commands import module_commands as cmds
 from opentrons.legacy_commands.publisher import CommandPublisher, publish
 from opentrons.protocols.api_support.types import APIVersion
 from opentrons.protocols.api_support.util import APIVersionError, requires_version
 
+from . import validation
 from .core.common import (
-    ProtocolCore,
-    LabwareCore,
-    ModuleCore,
-    TemperatureModuleCore,
-    MagneticModuleCore,
-    ThermocyclerCore,
     HeaterShakerCore,
+    LabwareCore,
     MagneticBlockCore,
+    MagneticModuleCore,
+    ModuleCore,
+    ProtocolCore,
+    TemperatureModuleCore,
+    ThermocyclerCore,
 )
 from .core.core_map import LoadedCoreMap
 from .core.engine import ENGINE_CORE_API_VERSION
+from .core.legacy.legacy_labware_core import LegacyLabwareCore as LegacyLabwareCore
 from .core.legacy.legacy_module_core import LegacyModuleCore
 from .core.legacy.module_geometry import ModuleGeometry as LegacyModuleGeometry
-from .core.legacy.legacy_labware_core import LegacyLabwareCore as LegacyLabwareCore
-
-from .module_validation_and_errors import (
-    validate_heater_shaker_temperature,
-    validate_heater_shaker_speed,
-)
 from .labware import Labware
-from . import validation
-
+from .module_validation_and_errors import (
+    validate_heater_shaker_speed,
+    validate_heater_shaker_temperature,
+)
 
 _MAGNETIC_MODULE_HEIGHT_PARAM_REMOVED_IN = APIVersion(2, 14)
 

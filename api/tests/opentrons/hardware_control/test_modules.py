@@ -1,33 +1,33 @@
 import asyncio
-from typing import AsyncIterator, Union, Type, TypeVar, Optional
 from pathlib import Path
+from typing import AsyncIterator, Optional, Type, TypeVar, Union
 from unittest import mock
 
-from packaging.version import Version
 import pytest
+from packaging.version import Version
 
+from opentrons.drivers.rpi_drivers.types import USBPort
 from opentrons.hardware_control import ExecutionManager
-from opentrons.hardware_control.modules import ModuleAtPort
+from opentrons.hardware_control.modules import (
+    AbstractModule,
+    HeaterShaker,
+    MagDeck,
+    ModuleAtPort,
+    SimulatingModule,
+    TempDeck,
+    Thermocycler,
+)
+from opentrons.hardware_control.modules import build as build_module
+from opentrons.hardware_control.modules.mod_abc import parse_fw_version
 from opentrons.hardware_control.modules.types import (
     BundledFirmware,
-    ModuleModel,
-    MagneticModuleModel,
-    TemperatureModuleModel,
     HeaterShakerModuleModel,
-    ThermocyclerModuleModel,
+    MagneticModuleModel,
+    ModuleModel,
     ModuleType,
+    TemperatureModuleModel,
+    ThermocyclerModuleModel,
 )
-from opentrons.hardware_control.modules import (
-    TempDeck,
-    MagDeck,
-    Thermocycler,
-    HeaterShaker,
-    AbstractModule,
-    SimulatingModule,
-    build as build_module,
-)
-from opentrons.hardware_control.modules.mod_abc import parse_fw_version
-from opentrons.drivers.rpi_drivers.types import USBPort
 
 
 async def test_get_modules_simulating() -> None:

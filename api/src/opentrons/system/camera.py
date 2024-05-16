@@ -2,9 +2,10 @@ import asyncio
 import os
 from pathlib import Path
 
-from opentrons.config import ARCHITECTURE, SystemArchitecture
-from opentrons_shared_data.errors.exceptions import CommunicationError
 from opentrons_shared_data.errors.codes import ErrorCodes
+from opentrons_shared_data.errors.exceptions import CommunicationError
+
+from opentrons.config import ARCHITECTURE, SystemArchitecture
 
 
 class CameraException(CommunicationError):

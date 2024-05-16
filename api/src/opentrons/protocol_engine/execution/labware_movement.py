@@ -1,35 +1,31 @@
 """Labware movement command handling."""
 from __future__ import annotations
 
-from typing import Optional, TYPE_CHECKING
-
-from opentrons.types import Point
+from typing import TYPE_CHECKING, Optional
 
 from opentrons.hardware_control import HardwareControlAPI
-from opentrons.hardware_control.types import OT3Mount, Axis
+from opentrons.hardware_control.types import Axis, OT3Mount
 from opentrons.motion_planning import get_gripper_labware_movement_waypoints
-
-from opentrons.protocol_engine.state import StateStore
 from opentrons.protocol_engine.resources.ot3_validation import ensure_ot3_hardware
-
-from .thermocycler_movement_flagger import ThermocyclerMovementFlagger
-from .heater_shaker_movement_flagger import HeaterShakerMovementFlagger
-from .thermocycler_plate_lifter import ThermocyclerPlateLifter
+from opentrons.protocol_engine.state import StateStore
+from opentrons.types import Point
 
 from ..errors import (
+    CannotPerformGripperAction,
     GripperNotAttachedError,
+    HeaterShakerLabwareLatchNotOpenError,
     LabwareMovementNotAllowedError,
     ThermocyclerNotOpenError,
-    HeaterShakerLabwareLatchNotOpenError,
-    CannotPerformGripperAction,
 )
-
 from ..types import (
-    OnLabwareLocation,
     LabwareLocation,
     LabwareMovementOffsetData,
     OnDeckLabwareLocation,
+    OnLabwareLocation,
 )
+from .heater_shaker_movement_flagger import HeaterShakerMovementFlagger
+from .thermocycler_movement_flagger import ThermocyclerMovementFlagger
+from .thermocycler_plate_lifter import ThermocyclerPlateLifter
 
 if TYPE_CHECKING:
     from opentrons.protocol_engine.execution import EquipmentHandler, MovementHandler

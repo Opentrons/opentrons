@@ -1,101 +1,96 @@
 """ Tests for behaviors specific to the OT3 hardware controller.
 """
-from typing import (
-    AsyncIterator,
-    Iterator,
-    Union,
-    Dict,
-    Tuple,
-    List,
-    Any,
-    OrderedDict,
-    Optional,
-    cast,
-    TypedDict,
-)
-from typing_extensions import Literal
 from math import copysign
+from typing import (
+    Any,
+    AsyncIterator,
+    Dict,
+    Iterator,
+    List,
+    Optional,
+    OrderedDict,
+    Tuple,
+    TypedDict,
+    Union,
+    cast,
+)
+
 import pytest
 from decoy import Decoy
-from mock import AsyncMock, patch, Mock, PropertyMock, MagicMock
-from hypothesis import given, strategies, settings, HealthCheck, assume, example
+from hypothesis import HealthCheck, assume, example, given, settings, strategies
+from mock import AsyncMock, MagicMock, Mock, PropertyMock, patch
+from opentrons_hardware.firmware_bindings.constants import NodeId
+from opentrons_hardware.hardware_control.motion_planning.types import Move
+from opentrons_shared_data.errors.exceptions import (
+    CommandParameterLimitViolated,
+    CommandPreconditionViolated,
+    GripperNotPresentError,
+)
+from opentrons_shared_data.gripper.gripper_definition import GripperModel
+from opentrons_shared_data.pipette import load_data as load_pipette_data
+from opentrons_shared_data.pipette.dev_types import PipetteModel
+from opentrons_shared_data.pipette.types import (
+    LiquidClasses,
+    PipetteChannelType,
+    PipetteModelType,
+    PipetteVersionType,
+)
+from typing_extensions import Literal
 
 from opentrons.calibration_storage.types import CalibrationStatus, SourceType
+from opentrons.config import gripper_config as gc
 from opentrons.config.types import (
-    GantryLoad,
     CapacitivePassSettings,
+    GantryLoad,
     LiquidProbeSettings,
     OutputOptions,
 )
+from opentrons.hardware_control import ThreadManager
+from opentrons.hardware_control.backends.ot3simulator import OT3Simulator
+from opentrons.hardware_control.backends.types import HWStopCondition
 from opentrons.hardware_control.dev_types import (
     AttachedGripper,
     AttachedPipette,
     GripperDict,
     GripperSpec,
 )
-from opentrons.hardware_control.motion_utilities import target_position_from_plunger
+from opentrons.hardware_control.errors import InvalidCriticalPoint
 from opentrons.hardware_control.instruments.ot3.gripper_handler import GripperHandler
 from opentrons.hardware_control.instruments.ot3.instrument_calibration import (
     GripperCalibrationOffset,
     PipetteOffsetByPipetteMount,
 )
+from opentrons.hardware_control.instruments.ot3.pipette import Pipette
 from opentrons.hardware_control.instruments.ot3.pipette_handler import (
     OT3PipetteHandler,
-    TipActionSpec,
     TipActionMoveSpec,
-)
-from opentrons.hardware_control.instruments.ot3.pipette import Pipette
-from opentrons.hardware_control.types import (
-    OT3Mount,
-    Axis,
-    OT3AxisKind,
-    CriticalPoint,
-    GripperProbe,
-    InstrumentProbeType,
-    SubSystem,
-    GripperJawState,
-    EstopState,
-    EstopStateNotification,
-    TipStateType,
-)
-from opentrons.hardware_control.nozzle_manager import NozzleConfigurationType
-from opentrons.hardware_control.errors import InvalidCriticalPoint
-from opentrons.hardware_control.ot3api import OT3API
-from opentrons.hardware_control import ThreadManager
-
-from opentrons.hardware_control.backends.ot3simulator import OT3Simulator
-from opentrons_hardware.firmware_bindings.constants import NodeId
-from opentrons.types import Point, Mount
-
-from opentrons_hardware.hardware_control.motion_planning.types import Move
-
-from opentrons.config import gripper_config as gc
-from opentrons_shared_data.errors.exceptions import (
-    GripperNotPresentError,
-    CommandPreconditionViolated,
-    CommandParameterLimitViolated,
-)
-from opentrons_shared_data.gripper.gripper_definition import GripperModel
-from opentrons_shared_data.pipette.types import (
-    PipetteModelType,
-    PipetteChannelType,
-    PipetteVersionType,
-    LiquidClasses,
-)
-from opentrons_shared_data.pipette import (
-    load_data as load_pipette_data,
-)
-from opentrons_shared_data.pipette.dev_types import PipetteModel
-from opentrons.hardware_control.modules import (
-    Thermocycler,
-    TempDeck,
-    MagDeck,
-    HeaterShaker,
-    SpeedStatus,
+    TipActionSpec,
 )
 from opentrons.hardware_control.module_control import AttachedModulesControl
-from opentrons.hardware_control.backends.types import HWStopCondition
-
+from opentrons.hardware_control.modules import (
+    HeaterShaker,
+    MagDeck,
+    SpeedStatus,
+    TempDeck,
+    Thermocycler,
+)
+from opentrons.hardware_control.motion_utilities import target_position_from_plunger
+from opentrons.hardware_control.nozzle_manager import NozzleConfigurationType
+from opentrons.hardware_control.ot3api import OT3API
+from opentrons.hardware_control.types import (
+    Axis,
+    CriticalPoint,
+    EstopState,
+    EstopStateNotification,
+    GripperJawState,
+    GripperProbe,
+    InstrumentProbeType,
+    OT3AxisKind,
+    OT3Mount,
+    SubSystem,
+    TipStateType,
+)
+from opentrons.types import Mount, Point
 
 # TODO (spp, 2023-08-22): write tests for ot3api.stop & ot3api.halt
 

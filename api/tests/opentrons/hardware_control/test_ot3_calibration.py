@@ -1,37 +1,41 @@
 """Tests for OT3 calibration."""
 import copy
-from dataclasses import replace
-import pytest
 import json
+from dataclasses import replace
 from math import isclose
-from typing import AsyncIterator, Iterator, Tuple, Any, Literal
-from mock import patch, AsyncMock, Mock, call as mock_call
-from opentrons.hardware_control import ThreadManager
-from opentrons.hardware_control.ot3api import OT3API
-from opentrons.hardware_control.types import OT3Mount, Axis, InstrumentProbeType
+from typing import Any, AsyncIterator, Iterator, Literal, Tuple
+
+import pytest
+from mock import AsyncMock, Mock
+from mock import call as mock_call
+from mock import patch
+from opentrons_shared_data.deck import get_calibration_square_position_in_slot
+from opentrons_shared_data.errors.exceptions import (
+    CalibrationStructureNotFoundError,
+    EarlyCapacitiveSenseTrigger,
+    EdgeNotFoundError,
+    InaccurateNonContactSweepError,
+)
+
 from opentrons.config.types import OT3CalibrationSettings
+from opentrons.hardware_control import ThreadManager
 from opentrons.hardware_control.ot3_calibration import (
-    find_edge_binary,
-    find_axis_center,
-    find_calibration_structure_height,
-    find_slot_center_binary,
-    find_slot_center_noncontact,
-    calibrate_pipette,
+    EDGES,
+    PREP_OFFSET_DEPTH,
     CalibrationMethod,
     _edges_from_data,
     _probe_deck_at,
     _verify_edge_pos,
-    PREP_OFFSET_DEPTH,
-    EDGES,
+    calibrate_pipette,
+    find_axis_center,
+    find_calibration_structure_height,
+    find_edge_binary,
+    find_slot_center_binary,
+    find_slot_center_noncontact,
 )
+from opentrons.hardware_control.ot3api import OT3API
+from opentrons.hardware_control.types import Axis, InstrumentProbeType, OT3Mount
 from opentrons.types import Point
-from opentrons_shared_data.deck import get_calibration_square_position_in_slot
-from opentrons_shared_data.errors.exceptions import (
-    CalibrationStructureNotFoundError,
-    EdgeNotFoundError,
-    EarlyCapacitiveSenseTrigger,
-    InaccurateNonContactSweepError,
-)
 
 
 @pytest.fixture(autouse=True)

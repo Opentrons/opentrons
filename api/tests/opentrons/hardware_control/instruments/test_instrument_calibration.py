@@ -3,20 +3,17 @@ from datetime import datetime
 from typing import Union, cast
 
 import pytest
-from pytest_lazyfixture import lazy_fixture  # type: ignore[import-untyped]
 from decoy import Decoy
-
-from opentrons_shared_data.labware.dev_types import (
-    LabwareUri,
-    LabwareDefinition as LabwareDefDict,
-)
+from opentrons_shared_data.labware.dev_types import LabwareDefinition as LabwareDefDict
+from opentrons_shared_data.labware.dev_types import LabwareUri
 from opentrons_shared_data.labware.labware_definition import (
     LabwareDefinition,
     Parameters,
 )
+from pytest_lazyfixture import lazy_fixture  # type: ignore[import-untyped]
 
-
-from opentrons import calibration_storage, types as top_types
+from opentrons import calibration_storage
+from opentrons import types as top_types
 from opentrons.calibration_storage import helpers as calibration_storage_helpers
 from opentrons.calibration_storage.ot2.models import v1 as v1_models
 from opentrons.hardware_control.instruments.ot2 import instrument_calibration as subject

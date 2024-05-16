@@ -1,28 +1,27 @@
 """Pipetting execution handler."""
+from contextlib import nullcontext as does_not_raise
+from typing import ContextManager, Dict, Optional
+
 import pytest
 from decoy import Decoy
-
-from typing import Dict, ContextManager, Optional
-from contextlib import nullcontext as does_not_raise
-
-from opentrons.types import Mount, MountType
-from opentrons.hardware_control import API as HardwareAPI
-from opentrons.hardware_control.types import TipStateType
-from opentrons.hardware_control.protocols.types import OT2RobotType, FlexRobotType
-
-from opentrons.protocols.models import LabwareDefinition
-from opentrons.protocol_engine.state import StateView
-from opentrons.protocol_engine.types import TipGeometry, TipPresenceStatus
-from opentrons.protocol_engine.resources import LabwareDataProvider
 from opentrons_shared_data.errors.exceptions import (
-    CommandPreconditionViolated,
     CommandParameterLimitViolated,
+    CommandPreconditionViolated,
 )
+
+from opentrons.hardware_control import API as HardwareAPI
+from opentrons.hardware_control.protocols.types import FlexRobotType, OT2RobotType
+from opentrons.hardware_control.types import TipStateType
 from opentrons.protocol_engine.execution.tip_handler import (
     HardwareTipHandler,
     VirtualTipHandler,
     create_tip_handler,
 )
+from opentrons.protocol_engine.resources import LabwareDataProvider
+from opentrons.protocol_engine.state import StateView
+from opentrons.protocol_engine.types import TipGeometry, TipPresenceStatus
+from opentrons.protocols.models import LabwareDefinition
+from opentrons.types import Mount, MountType
 
 
 @pytest.fixture

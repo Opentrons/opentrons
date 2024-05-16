@@ -4,21 +4,20 @@ import inspect
 import pytest
 from decoy import Decoy
 
+from opentrons.protocol_engine.types import (
+    BooleanParameter,
+    EnumChoice,
+    EnumParameter,
+    NumberParameter,
+)
 from opentrons.protocols.parameters import validation as mock_validation
-from opentrons.protocols.parameters.types import ParameterValueError
 from opentrons.protocols.parameters.parameter_definition import (
-    create_int_parameter,
-    create_float_parameter,
     create_bool_parameter,
+    create_float_parameter,
+    create_int_parameter,
     create_str_parameter,
 )
-
-from opentrons.protocol_engine.types import (
-    NumberParameter,
-    BooleanParameter,
-    EnumParameter,
-    EnumChoice,
-)
+from opentrons.protocols.parameters.types import ParameterValueError
 
 
 @pytest.fixture(autouse=True)

@@ -9,12 +9,13 @@ there, the ProtocolEngine state is inspected to check that
 everything was loaded and run as expected.
 """
 from datetime import datetime
-from decoy import matchers
 from pathlib import Path
 
+from decoy import matchers
 from opentrons_shared_data.pipette.dev_types import PipetteNameType
-from opentrons.types import MountType, DeckSlotName
+
 from opentrons.protocol_engine import (
+    DeckPoint,
     DeckSlotLocation,
     LoadedLabware,
     LoadedModule,
@@ -22,10 +23,10 @@ from opentrons.protocol_engine import (
     ModuleDefinition,
     ModuleModel,
     commands,
-    DeckPoint,
 )
 from opentrons.protocol_reader import ProtocolReader
 from opentrons.protocol_runner import create_simulating_runner
+from opentrons.types import DeckSlotName, MountType
 
 
 async def test_runner_with_python(

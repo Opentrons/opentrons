@@ -1,38 +1,38 @@
 """Protocol API module implementation logic."""
 from __future__ import annotations
 
-from typing import Optional, List
+from typing import List, Optional
 
-from opentrons.hardware_control import SynchronousAdapter, modules as hw_modules
-from opentrons.hardware_control.modules.types import (
-    ModuleModel,
-    TemperatureStatus,
-    MagneticStatus,
-    ThermocyclerStep,
-    SpeedStatus,
-    module_model_from_string,
-)
 from opentrons.drivers.types import (
     HeaterShakerLabwareLatchStatus,
     ThermocyclerLidStatus,
 )
-from opentrons.types import DeckSlotName
+from opentrons.hardware_control import SynchronousAdapter
+from opentrons.hardware_control import modules as hw_modules
+from opentrons.hardware_control.modules.types import (
+    MagneticStatus,
+    ModuleModel,
+    SpeedStatus,
+    TemperatureStatus,
+    ThermocyclerStep,
+    module_model_from_string,
+)
 from opentrons.protocol_engine.clients import SyncClient as ProtocolEngineClient
 from opentrons.protocol_engine.errors.exceptions import (
     LabwareNotLoadedOnModuleError,
     NoMagnetEngageHeightError,
 )
-
 from opentrons.protocols.api_support.types import APIVersion
+from opentrons.types import DeckSlotName
 
 from ... import validation
 from ..module import (
-    AbstractModuleCore,
-    AbstractTemperatureModuleCore,
-    AbstractMagneticModuleCore,
-    AbstractThermocyclerCore,
     AbstractHeaterShakerCore,
     AbstractMagneticBlockCore,
+    AbstractMagneticModuleCore,
+    AbstractModuleCore,
+    AbstractTemperatureModuleCore,
+    AbstractThermocyclerCore,
 )
 from .exceptions import InvalidMagnetEngageHeightError
 

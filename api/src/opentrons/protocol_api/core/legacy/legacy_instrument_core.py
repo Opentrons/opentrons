@@ -6,24 +6,24 @@ from typing import TYPE_CHECKING, Optional, Union
 from opentrons import types
 from opentrons.hardware_control import CriticalPoint
 from opentrons.hardware_control.dev_types import PipetteDict
+from opentrons.hardware_control.nozzle_manager import NozzleMap
+from opentrons.protocol_api._nozzle_layout import NozzleLayout
 from opentrons.protocols.api_support import instrument as instrument_support
 from opentrons.protocols.api_support.definitions import MAX_SUPPORTED_VERSION
 from opentrons.protocols.api_support.labware_like import LabwareLike
 from opentrons.protocols.api_support.types import APIVersion
 from opentrons.protocols.api_support.util import (
-    build_edges,
+    APIVersionError,
     FlowRates,
     PlungerSpeeds,
-    APIVersionError,
+    build_edges,
 )
 from opentrons.protocols.geometry import planning
-from opentrons.protocol_api._nozzle_layout import NozzleLayout
-from opentrons.hardware_control.nozzle_manager import NozzleMap
 
 from ...disposal_locations import TrashBin, WasteChute
 from ..instrument import AbstractInstrument
+from .legacy_module_core import LegacyHeaterShakerCore, LegacyThermocyclerCore
 from .legacy_well_core import LegacyWellCore
-from .legacy_module_core import LegacyThermocyclerCore, LegacyHeaterShakerCore
 
 if TYPE_CHECKING:
     from .legacy_protocol_core import LegacyProtocolCore

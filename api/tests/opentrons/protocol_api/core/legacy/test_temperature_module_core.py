@@ -8,15 +8,12 @@ from opentrons.hardware_control.modules.types import (
     TemperatureModuleModel,
     TemperatureStatus,
 )
-from opentrons.protocol_api.core.legacy.module_geometry import ModuleGeometry
-
-from opentrons.protocol_api.core.legacy.legacy_protocol_core import (
-    LegacyProtocolCore,
-)
 from opentrons.protocol_api.core.legacy.legacy_module_core import (
     LegacyTemperatureModuleCore,
     create_module_core,
 )
+from opentrons.protocol_api.core.legacy.legacy_protocol_core import LegacyProtocolCore
+from opentrons.protocol_api.core.legacy.module_geometry import ModuleGeometry
 
 
 @pytest.fixture

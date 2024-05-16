@@ -1,31 +1,26 @@
 """Protocol engine state module."""
 
-from .state import State, StateStore, StateView
-from .state_summary import StateSummary
-from .config import Config
-from .commands import (
-    CommandState,
-    CommandView,
-    CommandSlice,
-    CurrentCommand,
-)
 from .command_history import CommandEntry
+from .commands import CommandSlice, CommandState, CommandView, CurrentCommand
+from .config import Config
+from .geometry import GeometryView
 from .labware import LabwareState, LabwareView
-from .pipettes import PipetteState, PipetteView, HardwarePipette
-from .modules import ModuleState, ModuleView, HardwareModule
 from .module_substates import (
-    MagneticModuleId,
-    MagneticModuleSubState,
     HeaterShakerModuleId,
     HeaterShakerModuleSubState,
+    MagneticModuleId,
+    MagneticModuleSubState,
+    ModuleSubStateType,
     TemperatureModuleId,
     TemperatureModuleSubState,
     ThermocyclerModuleId,
     ThermocyclerModuleSubState,
-    ModuleSubStateType,
 )
-from .geometry import GeometryView
+from .modules import HardwareModule, ModuleState, ModuleView
 from .motion import MotionView, PipetteLocationData
+from .pipettes import HardwarePipette, PipetteState, PipetteView
+from .state import State, StateStore, StateView
+from .state_summary import StateSummary
 
 __all__ = [
     # top level state value and interfaces

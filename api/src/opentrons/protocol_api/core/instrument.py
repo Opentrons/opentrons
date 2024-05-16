@@ -2,14 +2,14 @@
 
 from __future__ import annotations
 
-from abc import abstractmethod, ABC
+from abc import ABC, abstractmethod
 from typing import Any, Generic, Optional, TypeVar, Union
 
 from opentrons import types
 from opentrons.hardware_control.dev_types import PipetteDict
-from opentrons.protocols.api_support.util import FlowRates
-from opentrons.protocol_api._nozzle_layout import NozzleLayout
 from opentrons.hardware_control.nozzle_manager import NozzleMap
+from opentrons.protocol_api._nozzle_layout import NozzleLayout
+from opentrons.protocols.api_support.util import FlowRates
 
 from ..disposal_locations import TrashBin, WasteChute
 from .well import WellCoreType

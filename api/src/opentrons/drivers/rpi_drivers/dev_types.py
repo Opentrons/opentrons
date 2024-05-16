@@ -1,7 +1,10 @@
 import asyncio
 from typing import Callable, Dict, Tuple
+
 from typing_extensions import Protocol
+
 from opentrons.hardware_control.types import BoardRevision, DoorState
+
 from .types import GPIOPin
 
 

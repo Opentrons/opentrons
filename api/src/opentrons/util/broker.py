@@ -5,7 +5,6 @@ from abc import ABC, abstractmethod
 from contextlib import contextmanager
 from typing import Callable, ContextManager, Generator, Generic, Set, TypeVar
 
-
 _MessageT = TypeVar("_MessageT")
 _CallbackT = Callable[[_MessageT], None]
 

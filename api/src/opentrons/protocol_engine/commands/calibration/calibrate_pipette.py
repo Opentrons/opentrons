@@ -1,20 +1,18 @@
 """Calibrate-pipette command for OT3 hardware. request, result, and implementation models."""
 from typing import Optional, Type
-from typing_extensions import Literal
+
 from pydantic import BaseModel, Field
-
-from ..command import AbstractCommandImpl, BaseCommand, BaseCommandCreate, SuccessData
-from ...errors.error_occurrence import ErrorOccurrence
-from ...types import InstrumentOffsetVector
-
-from opentrons.protocol_engine.resources.ot3_validation import ensure_ot3_hardware
-
+from typing_extensions import Literal
 
 from opentrons.hardware_control import HardwareControlAPI
-from opentrons.hardware_control.types import OT3Mount
 from opentrons.hardware_control import ot3_calibration as calibration
-
+from opentrons.hardware_control.types import OT3Mount
+from opentrons.protocol_engine.resources.ot3_validation import ensure_ot3_hardware
 from opentrons.types import MountType
+
+from ...errors.error_occurrence import ErrorOccurrence
+from ...types import InstrumentOffsetVector
+from ..command import AbstractCommandImpl, BaseCommand, BaseCommandCreate, SuccessData
 
 CalibratePipetteCommandType = Literal["calibration/calibratePipette"]
 

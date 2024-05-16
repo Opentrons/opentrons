@@ -1,14 +1,14 @@
 """Parameter context for python protocols."""
 
-from typing import List, Optional, Union, Dict
+from typing import Dict, List, Optional, Union
 
+from opentrons.protocol_engine.types import RunTimeParameter, RunTimeParamValuesType
 from opentrons.protocols.api_support.types import APIVersion
 from opentrons.protocols.parameters import parameter_definition, validation
 from opentrons.protocols.parameters.types import (
     ParameterChoice,
     ParameterDefinitionError,
 )
-from opentrons.protocol_engine.types import RunTimeParameter, RunTimeParamValuesType
 
 from ._parameters import Parameters
 

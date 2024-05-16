@@ -3,7 +3,7 @@ import asyncio
 import pytest
 
 from opentrons.drivers.rpi_drivers.types import USBPort
-from opentrons.hardware_control import modules, ExecutionManager
+from opentrons.hardware_control import ExecutionManager, modules
 
 
 @pytest.fixture

@@ -1,23 +1,21 @@
+from typing import TYPE_CHECKING, Any
+
 import pytest
-from typing import Any, TYPE_CHECKING
+from opentrons_shared_data.pipette.dev_types import LabwareUri
 
 from opentrons import config
-from opentrons.calibration_storage import (
-    types as cs_types,
-    helpers,
-    file_operators as io,
-)
-
+from opentrons.calibration_storage import file_operators as io
+from opentrons.calibration_storage import helpers
+from opentrons.calibration_storage import types as cs_types
 from opentrons.calibration_storage.ot2 import (
+    clear_tip_length_calibration,
     create_tip_length_data,
+    delete_tip_length_calibration,
+    load_tip_length_calibration,
+    models,
     save_tip_length_calibration,
     tip_lengths_for_pipette,
-    load_tip_length_calibration,
-    delete_tip_length_calibration,
-    clear_tip_length_calibration,
-    models,
 )
-from opentrons_shared_data.pipette.dev_types import LabwareUri
 
 if TYPE_CHECKING:
     from opentrons_shared_data.labware.dev_types import LabwareDefinition

@@ -1,17 +1,16 @@
 from typing import List, Optional
 
-from opentrons.calibration_storage import helpers
-from opentrons.protocols.geometry.labware_geometry import LabwareGeometry
-from opentrons.protocols.api_support.tip_tracker import TipTracker
+from opentrons_shared_data.labware.dev_types import LabwareDefinition, LabwareParameters
 
-from opentrons.types import DeckSlotName, Location, Point
+from opentrons.calibration_storage import helpers
 from opentrons.hardware_control.nozzle_manager import NozzleMap
-from opentrons_shared_data.labware.dev_types import LabwareParameters, LabwareDefinition
+from opentrons.protocols.api_support.tip_tracker import TipTracker
+from opentrons.protocols.geometry.labware_geometry import LabwareGeometry
+from opentrons.types import DeckSlotName, Location, Point
 
 from ..labware import AbstractLabware, LabwareLoadParams
 from .legacy_well_core import LegacyWellCore
 from .well_geometry import WellGeometry
-
 
 # URIs of labware whose definitions accidentally specify an engage height
 # in units of half-millimeters instead of millimeters.

@@ -7,17 +7,18 @@ from typing import (
     TYPE_CHECKING,
     Any,
     Dict,
+    List,
     Mapping,
+    NamedTuple,
+    Optional,
     Tuple,
     Union,
-    Optional,
-    NamedTuple,
     cast,
-    List,
 )
 
-from opentrons.config import CONFIG, ARCHITECTURE, SystemArchitecture
 from opentrons_shared_data.robot.dev_types import RobotTypeEnum
+
+from opentrons.config import ARCHITECTURE, CONFIG, SystemArchitecture
 
 if TYPE_CHECKING:
     from pathlib import Path

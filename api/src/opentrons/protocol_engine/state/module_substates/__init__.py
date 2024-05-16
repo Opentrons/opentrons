@@ -1,18 +1,18 @@
 """Hardware Modules' substates."""
 
 from typing import Union
-from .magnetic_module_substate import MagneticModuleSubState, MagneticModuleId
-from .heater_shaker_module_substate import (
-    HeaterShakerModuleSubState,
-    HeaterShakerModuleId,
-)
-from .temperature_module_substate import TemperatureModuleSubState, TemperatureModuleId
-from .thermocycler_module_substate import (
-    ThermocyclerModuleSubState,
-    ThermocyclerModuleId,
-)
-from .magnetic_block_substate import MagneticBlockSubState, MagneticBlockId
 
+from .heater_shaker_module_substate import (
+    HeaterShakerModuleId,
+    HeaterShakerModuleSubState,
+)
+from .magnetic_block_substate import MagneticBlockId, MagneticBlockSubState
+from .magnetic_module_substate import MagneticModuleId, MagneticModuleSubState
+from .temperature_module_substate import TemperatureModuleId, TemperatureModuleSubState
+from .thermocycler_module_substate import (
+    ThermocyclerModuleId,
+    ThermocyclerModuleSubState,
+)
 
 ModuleSubStateType = Union[
     HeaterShakerModuleSubState,

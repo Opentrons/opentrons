@@ -1,19 +1,17 @@
 """Gantry movement wrapper for hardware and simulation based movement."""
-from typing import Optional, List, Dict
-from typing_extensions import Protocol as TypingProtocol
+from typing import Dict, List, Optional
 
-from opentrons.types import Point, Mount
+from opentrons_shared_data.errors.exceptions import PositionUnknownError
+from typing_extensions import Protocol as TypingProtocol
 
 from opentrons.hardware_control import HardwareControlAPI
 from opentrons.hardware_control.types import Axis as HardwareAxis
-from opentrons_shared_data.errors.exceptions import PositionUnknownError
-
 from opentrons.motion_planning import Waypoint
+from opentrons.types import Mount, Point
 
+from ..errors import InvalidAxisForRobotType, MustHomeError
 from ..state import StateView
-from ..types import MotorAxis, CurrentWell
-from ..errors import MustHomeError, InvalidAxisForRobotType
-
+from ..types import CurrentWell, MotorAxis
 
 _MOTOR_AXIS_TO_HARDWARE_AXIS: Dict[MotorAxis, HardwareAxis] = {
     MotorAxis.X: HardwareAxis.X,

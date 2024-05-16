@@ -4,18 +4,15 @@
 import json
 import tempfile
 import textwrap
-
 from dataclasses import dataclass, replace
-from typing import Any, Dict, Iterator, List, Optional
 from pathlib import Path
+from typing import Any, Dict, Iterator, List, Optional
 
 import pytest
 from click.testing import CliRunner
-from opentrons_shared_data.performance.dev_types import (
-    RobotContextState,
-)
-from opentrons.util.performance_helpers import _get_robot_context_tracker
+from opentrons_shared_data.performance.dev_types import RobotContextState
 
+from opentrons.util.performance_helpers import _get_robot_context_tracker
 
 # Enable tracking for the RobotContextTracker
 # This must come before the import of the analyze CLI

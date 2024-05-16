@@ -2,12 +2,12 @@ from __future__ import annotations
 
 import asyncio
 import logging
-from typing import Optional, List
+from typing import List, Optional
 
 from opentrons.drivers.command_builder import CommandBuilder
 
-from .errors import NoResponse, AlarmResponse, ErrorResponse
 from .async_serial import AsyncSerial
+from .errors import AlarmResponse, ErrorResponse, NoResponse
 
 log = logging.getLogger(__name__)
 

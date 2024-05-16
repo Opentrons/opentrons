@@ -1,14 +1,40 @@
 """ProtocolEngine-based Protocol API core implementation."""
 from __future__ import annotations
-from typing import Dict, Optional, Type, Union, List, Tuple, TYPE_CHECKING
 
-from opentrons.protocol_engine.commands import LoadModuleResult
+from typing import TYPE_CHECKING, Dict, List, Optional, Tuple, Type, Union
+
 from opentrons_shared_data.deck.dev_types import DeckDefinitionV5, SlotDefV3
-from opentrons_shared_data.labware.labware_definition import LabwareDefinition
 from opentrons_shared_data.labware.dev_types import LabwareDefinition as LabwareDefDict
+from opentrons_shared_data.labware.labware_definition import LabwareDefinition
 from opentrons_shared_data.pipette.dev_types import PipetteNameType
 from opentrons_shared_data.robot.dev_types import RobotType
 
+from opentrons.hardware_control import SyncHardwareAPI, SynchronousAdapter
+from opentrons.hardware_control.modules import AbstractModule
+from opentrons.hardware_control.modules.types import ModuleModel, ModuleType
+from opentrons.hardware_control.types import DoorState
+from opentrons.protocol_engine import (
+    AddressableAreaLocation,
+    DeckSlotLocation,
+    LabwareMovementStrategy,
+    LabwareOffsetVector,
+    LoadedLabware,
+    LoadedModule,
+    ModuleLocation,
+)
+from opentrons.protocol_engine import ModuleModel as EngineModuleModel
+from opentrons.protocol_engine import OnLabwareLocation
+from opentrons.protocol_engine.clients import SyncClient as ProtocolEngineClient
+from opentrons.protocol_engine.commands import LoadModuleResult
+from opentrons.protocol_engine.errors import (
+    LabwareNotLoadedOnLabwareError,
+    LabwareNotLoadedOnModuleError,
+)
+from opentrons.protocol_engine.types import OFF_DECK_LOCATION, LabwareLocation
+from opentrons.protocol_engine.types import ModuleModel as ProtocolEngineModuleModel
+from opentrons.protocol_engine.types import NonStackedLocation
+from opentrons.protocols.api_support.types import APIVersion
+from opentrons.protocols.api_support.util import AxisMaxSpeeds
 from opentrons.types import (
     DeckSlotName,
     Location,
@@ -17,57 +43,26 @@ from opentrons.types import (
     Point,
     StagingSlotName,
 )
-from opentrons.hardware_control import SyncHardwareAPI, SynchronousAdapter
-from opentrons.hardware_control.modules import AbstractModule
-from opentrons.hardware_control.modules.types import ModuleModel, ModuleType
-from opentrons.hardware_control.types import DoorState
-from opentrons.protocols.api_support.util import AxisMaxSpeeds
-from opentrons.protocols.api_support.types import APIVersion
-
-
-from opentrons.protocol_engine import (
-    DeckSlotLocation,
-    AddressableAreaLocation,
-    ModuleLocation,
-    OnLabwareLocation,
-    ModuleModel as EngineModuleModel,
-    LabwareMovementStrategy,
-    LabwareOffsetVector,
-    LoadedLabware,
-    LoadedModule,
-)
-from opentrons.protocol_engine.types import (
-    ModuleModel as ProtocolEngineModuleModel,
-    OFF_DECK_LOCATION,
-    LabwareLocation,
-    NonStackedLocation,
-)
-from opentrons.protocol_engine.clients import SyncClient as ProtocolEngineClient
-from opentrons.protocol_engine.errors import (
-    LabwareNotLoadedOnModuleError,
-    LabwareNotLoadedOnLabwareError,
-)
 
 from ... import validation
-from ..._types import OffDeckType
 from ..._liquid import Liquid
+from ..._types import OffDeckType
 from ...disposal_locations import TrashBin, WasteChute
-from ..protocol import AbstractProtocol
 from ..labware import LabwareLoadParams
-from .labware import LabwareCore
-from .instrument import InstrumentCore
-from .module_core import (
-    ModuleCore,
-    TemperatureModuleCore,
-    MagneticModuleCore,
-    ThermocyclerModuleCore,
-    HeaterShakerModuleCore,
-    NonConnectedModuleCore,
-    MagneticBlockCore,
-)
+from ..protocol import AbstractProtocol
+from . import deck_conflict, load_labware_params
 from .exceptions import InvalidModuleLocationError
-from . import load_labware_params
-from . import deck_conflict
+from .instrument import InstrumentCore
+from .labware import LabwareCore
+from .module_core import (
+    HeaterShakerModuleCore,
+    MagneticBlockCore,
+    MagneticModuleCore,
+    ModuleCore,
+    NonConnectedModuleCore,
+    TemperatureModuleCore,
+    ThermocyclerModuleCore,
+)
 
 if TYPE_CHECKING:
     from ...labware import Labware

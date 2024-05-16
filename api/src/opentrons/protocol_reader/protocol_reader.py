@@ -4,26 +4,26 @@ from typing import Optional, Sequence
 
 from opentrons.protocols.parse import PythonParseMode
 
+from .file_format_validator import FileFormatValidator
+from .file_hasher import FileHasher
 from .file_identifier import (
     FileIdentifier,
+    IdentifiedData,
     IdentifiedFile,
     IdentifiedJsonMain,
-    IdentifiedPythonMain,
     IdentifiedLabwareDefinition,
-    IdentifiedData,
+    IdentifiedPythonMain,
 )
-from .role_analyzer import RoleAnalyzer, RoleAnalysis
-from .file_format_validator import FileFormatValidator
-from .file_reader_writer import FileReaderWriter, BufferedFile
-from .file_hasher import FileHasher
+from .file_reader_writer import BufferedFile, FileReaderWriter
 from .protocol_source import (
-    ProtocolSource,
-    ProtocolSourceFile,
+    JsonProtocolConfig,
     ProtocolConfig,
     ProtocolFileRole,
-    JsonProtocolConfig,
+    ProtocolSource,
+    ProtocolSourceFile,
     PythonProtocolConfig,
 )
+from .role_analyzer import RoleAnalysis, RoleAnalyzer
 
 
 class ProtocolReader:

@@ -5,9 +5,9 @@ contexts for running protocols during interactive sessions like Jupyter or just
 regular python shells. It also provides a console entrypoint for running a
 protocol from the command line.
 """
+import argparse
 import asyncio
 import atexit
-import argparse
 import contextlib
 import logging
 import os
@@ -26,34 +26,13 @@ from typing import (
 from opentrons_shared_data.labware.labware_definition import LabwareDefinition
 from opentrons_shared_data.robot.dev_types import RobotType
 
-from opentrons import protocol_api, __version__, should_use_ot3
-
-from opentrons.legacy_commands import types as command_types
-
-from opentrons.hardware_control import (
-    API as OT2API,
-    ThreadManagedHardware,
-    ThreadManager,
-)
+from opentrons import __version__, protocol_api, should_use_ot3
+from opentrons.hardware_control import API as OT2API
+from opentrons.hardware_control import ThreadManagedHardware, ThreadManager
 from opentrons.hardware_control.types import HardwareFeatureFlags
-
-from opentrons.protocols import parse
-from opentrons.protocols.api_support.deck_type import (
-    guess_from_global_config as guess_deck_type_from_global_config,
-    should_load_fixed_trash,
-    should_load_fixed_trash_labware_for_python_protocol,
-)
-from opentrons.protocols.api_support.types import APIVersion
-from opentrons.protocols.execution import execute as execute_apiv2
-from opentrons.protocols.types import (
-    ApiDeprecationError,
-    Protocol,
-    PythonProtocol,
-)
-
+from opentrons.legacy_commands import types as command_types
 from opentrons.protocol_api.core.engine import ENGINE_CORE_API_VERSION
 from opentrons.protocol_api.protocol_context import ProtocolContext
-
 from opentrons.protocol_engine import (
     Config,
     DeckType,
@@ -62,10 +41,19 @@ from opentrons.protocol_engine import (
     create_protocol_engine_in_thread,
 )
 from opentrons.protocol_engine.types import PostRunHardwareState
-
 from opentrons.protocol_reader import ProtocolSource
-
 from opentrons.protocol_runner import create_protocol_runner
+from opentrons.protocols import parse
+from opentrons.protocols.api_support.deck_type import (
+    guess_from_global_config as guess_deck_type_from_global_config,
+)
+from opentrons.protocols.api_support.deck_type import (
+    should_load_fixed_trash,
+    should_load_fixed_trash_labware_for_python_protocol,
+)
+from opentrons.protocols.api_support.types import APIVersion
+from opentrons.protocols.execution import execute as execute_apiv2
+from opentrons.protocols.types import ApiDeprecationError, Protocol, PythonProtocol
 
 from .util import entrypoint_util
 

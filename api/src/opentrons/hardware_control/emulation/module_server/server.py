@@ -3,13 +3,14 @@ import asyncio
 import logging
 from typing import Dict, Set
 
+from typing_extensions import Final
+
 from opentrons.hardware_control.emulation.module_server.models import (
-    ModuleConnection,
     Message,
+    ModuleConnection,
 )
 from opentrons.hardware_control.emulation.proxy import ProxyListener
 from opentrons.hardware_control.emulation.settings import ModuleServerSettings
-from typing_extensions import Final
 
 log = logging.getLogger(__name__)
 

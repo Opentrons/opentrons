@@ -1,17 +1,16 @@
 """Test move to addressable area for drop tip commands."""
 from decoy import Decoy
 
-from opentrons.protocol_engine import DeckPoint, AddressableOffsetVector
+from opentrons.protocol_engine import AddressableOffsetVector, DeckPoint
+from opentrons.protocol_engine.commands.command import SuccessData
+from opentrons.protocol_engine.commands.move_to_addressable_area_for_drop_tip import (
+    MoveToAddressableAreaForDropTipImplementation,
+    MoveToAddressableAreaForDropTipParams,
+    MoveToAddressableAreaForDropTipResult,
+)
 from opentrons.protocol_engine.execution import MovementHandler
 from opentrons.protocol_engine.state import StateView
 from opentrons.types import Point
-
-from opentrons.protocol_engine.commands.command import SuccessData
-from opentrons.protocol_engine.commands.move_to_addressable_area_for_drop_tip import (
-    MoveToAddressableAreaForDropTipParams,
-    MoveToAddressableAreaForDropTipResult,
-    MoveToAddressableAreaForDropTipImplementation,
-)
 
 
 async def test_move_to_addressable_area_for_drop_tip_implementation(

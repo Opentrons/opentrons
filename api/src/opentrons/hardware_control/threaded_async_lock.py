@@ -4,7 +4,6 @@ import threading
 import time
 from typing import Any
 
-
 log = logging.getLogger(__name__)
 
 

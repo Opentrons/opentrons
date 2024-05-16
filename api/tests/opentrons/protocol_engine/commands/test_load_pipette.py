@@ -1,25 +1,25 @@
 """Test load pipette commands."""
 import pytest
 from decoy import Decoy
-
 from opentrons_shared_data.pipette.dev_types import PipetteNameType
 from opentrons_shared_data.robot.dev_types import RobotType
-from opentrons.types import MountType, Point
 
+from opentrons.protocol_engine.commands.command import SuccessData
+from opentrons.protocol_engine.commands.load_pipette import (
+    LoadPipetteImplementation,
+    LoadPipetteParams,
+    LoadPipettePrivateResult,
+    LoadPipetteResult,
+)
 from opentrons.protocol_engine.errors import InvalidSpecificationForRobotTypeError
-from opentrons.protocol_engine.types import FlowRates
-from opentrons.protocol_engine.execution import LoadedPipetteData, EquipmentHandler
+from opentrons.protocol_engine.execution import EquipmentHandler, LoadedPipetteData
 from opentrons.protocol_engine.resources.pipette_data_provider import (
     LoadedStaticPipetteData,
 )
 from opentrons.protocol_engine.state import StateView
-from opentrons.protocol_engine.commands.command import SuccessData
-from opentrons.protocol_engine.commands.load_pipette import (
-    LoadPipetteParams,
-    LoadPipetteResult,
-    LoadPipettePrivateResult,
-    LoadPipetteImplementation,
-)
+from opentrons.protocol_engine.types import FlowRates
+from opentrons.types import MountType, Point
+
 from ..pipette_fixtures import get_default_nozzle_map
 
 

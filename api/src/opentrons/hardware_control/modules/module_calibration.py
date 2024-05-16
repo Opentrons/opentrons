@@ -1,7 +1,7 @@
-from datetime import datetime
-
 from dataclasses import dataclass
+from datetime import datetime
 from typing import List, Optional
+
 from opentrons.calibration_storage.ot3.models.v1 import CalibrationStatus
 from opentrons.calibration_storage.ot3.module_offset import (
     get_module_offset,
@@ -11,8 +11,6 @@ from opentrons.calibration_storage.ot3.module_offset import (
 from opentrons.calibration_storage.types import SourceType
 from opentrons.hardware_control.modules.types import ModuleType
 from opentrons.hardware_control.types import OT3Mount
-
-
 from opentrons.types import Point
 
 

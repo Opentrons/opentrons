@@ -1,67 +1,63 @@
 """Tests for module state accessors in the protocol engine state store."""
-import pytest
-from math import isclose
-from pytest_lazyfixture import lazy_fixture  # type: ignore[import-untyped]
-
 from contextlib import nullcontext as does_not_raise
+from math import isclose
 from typing import (
+    Any,
     ContextManager,
     Dict,
+    List,
     NamedTuple,
     Optional,
+    Set,
     Type,
     Union,
-    Any,
-    List,
-    Set,
     cast,
 )
 
-from opentrons_shared_data.robot.dev_types import RobotType
-from opentrons_shared_data.deck.dev_types import DeckDefinitionV5
-
+import pytest
 from opentrons_shared_data import load_shared_data
-from opentrons.types import DeckSlotName, MountType
+from opentrons_shared_data.deck import load as load_deck
+from opentrons_shared_data.deck.dev_types import DeckDefinitionV5
+from opentrons_shared_data.robot.dev_types import RobotType
+from pytest_lazyfixture import lazy_fixture  # type: ignore[import-untyped]
+
 from opentrons.protocol_engine import errors
-from opentrons.protocol_engine.types import (
-    LoadedModule,
-    DeckSlotLocation,
-    ModuleDefinition,
-    ModuleModel,
-    LabwareOffsetVector,
-    DeckType,
-    ModuleOffsetData,
-    HeaterShakerLatchStatus,
-    LabwareMovementOffsetData,
-    AddressableArea,
-    DeckConfigurationType,
-    PotentialCutoutFixture,
+from opentrons.protocol_engine.state.addressable_areas import (
+    AddressableAreaState,
+    AddressableAreaView,
+)
+from opentrons.protocol_engine.state.module_substates import (
+    HeaterShakerModuleId,
+    HeaterShakerModuleSubState,
+    MagneticModuleId,
+    MagneticModuleSubState,
+    ModuleSubStateType,
+    TemperatureModuleId,
+    TemperatureModuleSubState,
+    ThermocyclerModuleId,
+    ThermocyclerModuleSubState,
 )
 from opentrons.protocol_engine.state.modules import (
-    ModuleView,
-    ModuleState,
     HardwareModule,
+    ModuleState,
+    ModuleView,
 )
-from opentrons.protocol_engine.state.addressable_areas import (
-    AddressableAreaView,
-    AddressableAreaState,
+from opentrons.protocol_engine.types import (
+    AddressableArea,
+    DeckConfigurationType,
+    DeckSlotLocation,
+    DeckType,
+    HeaterShakerLatchStatus,
+    LabwareMovementOffsetData,
+    LabwareOffsetVector,
+    LoadedModule,
+    ModuleDefinition,
+    ModuleModel,
+    ModuleOffsetData,
+    PotentialCutoutFixture,
 )
-
-from opentrons.protocol_engine.state.module_substates import (
-    HeaterShakerModuleSubState,
-    HeaterShakerModuleId,
-    MagneticModuleSubState,
-    MagneticModuleId,
-    TemperatureModuleSubState,
-    TemperatureModuleId,
-    ThermocyclerModuleSubState,
-    ThermocyclerModuleId,
-    ModuleSubStateType,
-)
-from opentrons_shared_data.deck import load as load_deck
-from opentrons.protocols.api_support.deck_type import (
-    STANDARD_OT3_DECK,
-)
+from opentrons.protocols.api_support.deck_type import STANDARD_OT3_DECK
+from opentrons.types import DeckSlotName, MountType
 
 
 @pytest.fixture(scope="session")

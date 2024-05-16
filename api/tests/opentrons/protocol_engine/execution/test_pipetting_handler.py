@@ -4,24 +4,24 @@ from typing import cast
 import pytest
 from decoy import Decoy
 
-from opentrons.types import Mount
 from opentrons.hardware_control import API as HardwareAPI
 from opentrons.hardware_control.dev_types import PipetteDict
-
-from opentrons.protocol_engine.state import StateView, HardwarePipette
-from opentrons.protocol_engine.types import TipGeometry
+from opentrons.protocol_engine.errors.exceptions import (
+    InvalidAspirateVolumeError,
+    InvalidDispenseVolumeError,
+    InvalidPushOutVolumeError,
+    TipNotAttachedError,
+)
 from opentrons.protocol_engine.execution.pipetting import (
     HardwarePipettingHandler,
     VirtualPipettingHandler,
     create_pipetting_handler,
 )
-from opentrons.protocol_engine.errors.exceptions import (
-    TipNotAttachedError,
-    InvalidAspirateVolumeError,
-    InvalidPushOutVolumeError,
-    InvalidDispenseVolumeError,
-)
-from opentrons.protocol_engine.notes import CommandNoteAdder, CommandNote
+from opentrons.protocol_engine.notes import CommandNote, CommandNoteAdder
+from opentrons.protocol_engine.state import HardwarePipette, StateView
+from opentrons.protocol_engine.types import TipGeometry
+from opentrons.types import Mount
+
 from ..note_utils import CommandNoteMatcher
 
 

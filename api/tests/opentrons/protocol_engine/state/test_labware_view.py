@@ -1,51 +1,52 @@
 """Labware state store tests."""
-import pytest
-from datetime import datetime
-from typing import Dict, Optional, cast, ContextManager, Any, Union, NamedTuple, List
 from contextlib import nullcontext as does_not_raise
+from datetime import datetime
+from typing import Any, ContextManager, Dict, List, NamedTuple, Optional, Union, cast
 
+import pytest
 from opentrons_shared_data.deck import load as load_deck
 from opentrons_shared_data.deck.dev_types import DeckDefinitionV5
-from opentrons_shared_data.pipette.dev_types import LabwareUri
 from opentrons_shared_data.labware import load_definition
 from opentrons_shared_data.labware.labware_definition import (
-    Parameters,
-    LabwareRole,
-    OverlapOffset as SharedDataOverlapOffset,
     GripperOffsets,
+    LabwareRole,
     OffsetVector,
 )
+from opentrons_shared_data.labware.labware_definition import (
+    OverlapOffset as SharedDataOverlapOffset,
+)
+from opentrons_shared_data.labware.labware_definition import Parameters
+from opentrons_shared_data.pipette.dev_types import LabwareUri
 
+from opentrons.protocol_engine import errors
+from opentrons.protocol_engine.state.labware import (
+    LabwareLoadParams,
+    LabwareState,
+    LabwareView,
+)
+from opentrons.protocol_engine.state.move_types import EdgePathType
+from opentrons.protocol_engine.types import (
+    OFF_DECK_LOCATION,
+    AddressableAreaLocation,
+    DeckSlotLocation,
+    Dimensions,
+    LabwareLocation,
+    LabwareMovementOffsetData,
+    LabwareOffset,
+    LabwareOffsetLocation,
+    LabwareOffsetVector,
+    LoadedLabware,
+    ModuleLocation,
+    ModuleModel,
+    OnLabwareLocation,
+    OverlapOffset,
+)
 from opentrons.protocols.api_support.deck_type import (
     STANDARD_OT2_DECK,
     STANDARD_OT3_DECK,
 )
 from opentrons.protocols.models import LabwareDefinition
 from opentrons.types import DeckSlotName, MountType
-
-from opentrons.protocol_engine import errors
-from opentrons.protocol_engine.types import (
-    DeckSlotLocation,
-    Dimensions,
-    LabwareOffset,
-    LabwareOffsetVector,
-    LabwareOffsetLocation,
-    LoadedLabware,
-    ModuleModel,
-    ModuleLocation,
-    OnLabwareLocation,
-    LabwareLocation,
-    AddressableAreaLocation,
-    OFF_DECK_LOCATION,
-    OverlapOffset,
-    LabwareMovementOffsetData,
-)
-from opentrons.protocol_engine.state.move_types import EdgePathType
-from opentrons.protocol_engine.state.labware import (
-    LabwareState,
-    LabwareView,
-    LabwareLoadParams,
-)
 
 plate = LoadedLabware(
     id="plate-id",

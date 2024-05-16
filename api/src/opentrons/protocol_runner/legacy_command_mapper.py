@@ -4,39 +4,43 @@ from collections import defaultdict
 from datetime import datetime
 from typing import Dict, List, Optional, Tuple, Union
 
-from opentrons.hardware_control.modules.types import (
-    ModuleModel as HardwareModuleModel,
-    TemperatureModuleModel,
-    MagneticModuleModel,
-    ThermocyclerModuleModel,
-    HeaterShakerModuleModel,
-)
+from opentrons_shared_data.errors import EnumeratedError, ErrorCodes, PythonException
+from opentrons_shared_data.labware.labware_definition import LabwareDefinition
 from opentrons_shared_data.pipette.dev_types import PipetteNameType
-from opentrons.types import MountType, DeckSlotName, Location
+
+from opentrons.hardware_control.modules.types import (
+    HeaterShakerModuleModel,
+    MagneticModuleModel,
+)
+from opentrons.hardware_control.modules.types import ModuleModel as HardwareModuleModel
+from opentrons.hardware_control.modules.types import (
+    TemperatureModuleModel,
+    ThermocyclerModuleModel,
+)
 from opentrons.legacy_commands import types as legacy_command_types
 from opentrons.protocol_api import InstrumentContext
 from opentrons.protocol_api.core.legacy.deck import FIXED_TRASH_ID
 from opentrons.protocol_api.core.legacy.load_info import (
-    LoadInfo as LegacyLoadInfo,
-    LabwareLoadInfo as LegacyLabwareLoadInfo,
     InstrumentLoadInfo as LegacyInstrumentLoadInfo,
+)
+from opentrons.protocol_api.core.legacy.load_info import (
+    LabwareLoadInfo as LegacyLabwareLoadInfo,
+)
+from opentrons.protocol_api.core.legacy.load_info import LoadInfo as LegacyLoadInfo
+from opentrons.protocol_api.core.legacy.load_info import (
     ModuleLoadInfo as LegacyModuleLoadInfo,
 )
-from opentrons.protocol_engine import (
-    ProtocolEngineError,
-    actions as pe_actions,
-    commands as pe_commands,
-    types as pe_types,
-)
+from opentrons.protocol_engine import ProtocolEngineError
+from opentrons.protocol_engine import actions as pe_actions
+from opentrons.protocol_engine import commands as pe_commands
+from opentrons.protocol_engine import types as pe_types
 from opentrons.protocol_engine.error_recovery_policy import ErrorRecoveryType
 from opentrons.protocol_engine.resources import (
     ModelUtils,
     ModuleDataProvider,
     pipette_data_provider,
 )
-
-from opentrons_shared_data.labware.labware_definition import LabwareDefinition
-from opentrons_shared_data.errors import ErrorCodes, EnumeratedError, PythonException
+from opentrons.types import DeckSlotName, Location, MountType
 
 
 class LegacyCommandParams(pe_commands.CustomParams):

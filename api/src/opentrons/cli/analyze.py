@@ -1,49 +1,48 @@
 """Opentrons analyze CLI."""
-import click
-
-from anyio import run
+import logging
+import sys
 from contextlib import contextmanager
 from dataclasses import dataclass
 from datetime import datetime, timezone
 from pathlib import Path
-from pydantic import BaseModel
 from typing import (
+    IO,
     Any,
+    Callable,
     Dict,
+    Iterator,
     List,
+    Literal,
     Optional,
     Sequence,
-    Union,
-    Literal,
-    Callable,
-    IO,
     TypeVar,
-    Iterator,
+    Union,
 )
-import logging
-import sys
 
-from opentrons.protocol_engine.types import RunTimeParameter
-from opentrons.protocols.api_support.types import APIVersion
-from opentrons.protocol_reader import (
-    ProtocolReader,
-    ProtocolFileRole,
-    ProtocolType,
-    JsonProtocolConfig,
-    ProtocolFilesInvalidError,
-    ProtocolSource,
-)
-from opentrons.protocol_runner import create_simulating_runner, RunResult
+import click
+from anyio import run
+from opentrons_shared_data.robot.dev_types import RobotType
+from pydantic import BaseModel
+
 from opentrons.protocol_engine import (
     Command,
     ErrorOccurrence,
-    LoadedLabware,
-    LoadedPipette,
-    LoadedModule,
     Liquid,
+    LoadedLabware,
+    LoadedModule,
+    LoadedPipette,
 )
-
-from opentrons_shared_data.robot.dev_types import RobotType
+from opentrons.protocol_engine.types import RunTimeParameter
+from opentrons.protocol_reader import (
+    JsonProtocolConfig,
+    ProtocolFileRole,
+    ProtocolFilesInvalidError,
+    ProtocolReader,
+    ProtocolSource,
+    ProtocolType,
+)
+from opentrons.protocol_runner import RunResult, create_simulating_runner
+from opentrons.protocols.api_support.types import APIVersion
 from opentrons.util.performance_helpers import track_analysis
 
 OutputKind = Literal["json", "human-json"]

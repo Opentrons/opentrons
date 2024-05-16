@@ -1,27 +1,26 @@
+from pathlib import Path
+from typing import Callable, Union
+
 import pytest
 from mock import patch
-from typing import Union, Callable
-from pathlib import Path
 from opentrons_shared_data.errors.exceptions import InvalidLiquidClassName
-from opentrons.calibration_storage import types as cal_types
-from opentrons.types import Point, Mount
-from pytest_lazyfixture import lazy_fixture  # type: ignore[import]
-from opentrons.hardware_control.instruments.ot2 import (
-    pipette as ot2_pipette,
-    instrument_calibration,
+from opentrons_shared_data.pipette import load_data as load_pipette_data
+from opentrons_shared_data.pipette import mutable_configurations, pipette_definition
+from opentrons_shared_data.pipette import (
+    pipette_load_name_conversions as pipette_load_name,
 )
+from opentrons_shared_data.pipette import types as pip_types
+from pytest_lazyfixture import lazy_fixture  # type: ignore[import]
+
+from opentrons.calibration_storage import types as cal_types
+from opentrons.hardware_control import types
+from opentrons.hardware_control.instruments.ot2 import instrument_calibration
+from opentrons.hardware_control.instruments.ot2 import pipette as ot2_pipette
 from opentrons.hardware_control.instruments.ot3 import (
-    pipette as ot3_pipette,
     instrument_calibration as ot3_calibration,
 )
-from opentrons.hardware_control import types
-from opentrons_shared_data.pipette import (
-    pipette_definition,
-    pipette_load_name_conversions as pipette_load_name,
-    load_data as load_pipette_data,
-    mutable_configurations,
-    types as pip_types,
-)
+from opentrons.hardware_control.instruments.ot3 import pipette as ot3_pipette
+from opentrons.types import Mount, Point
 
 OT2_PIP_CAL = instrument_calibration.PipetteOffsetByPipetteMount(
     offset=Point(0, 0, 0),

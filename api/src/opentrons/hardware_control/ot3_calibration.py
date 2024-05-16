@@ -1,49 +1,46 @@
 """Functions and utilites for OT3 calibration."""
 from __future__ import annotations
-from functools import lru_cache
-from dataclasses import dataclass
-from typing_extensions import Final, Literal, TYPE_CHECKING
-from typing import Tuple, List, Dict, Any, Optional, Union
+
 import datetime
-import numpy as np
-from enum import Enum
-from math import floor, copysign
-from logging import getLogger
-from opentrons.util.linal import solve_attitude, SolvePoints, DoubleMatrix
-
-from .types import OT3Mount, Axis, GripperProbe
-from opentrons.types import Point
-from opentrons.config.types import CapacitivePassSettings, EdgeSenseSettings, OT3Config
-from opentrons.hardware_control.types import InstrumentProbeType
 import json
+from dataclasses import dataclass
+from enum import Enum
+from functools import lru_cache
+from logging import getLogger
+from math import copysign, floor
+from typing import Any, Dict, List, Optional, Tuple, Union
 
+import numpy as np
+from opentrons_shared_data.deck import CALIBRATION_PROBE_RADIUS
+from opentrons_shared_data.deck import CALIBRATION_SQUARE_EDGES as SQUARE_EDGES
 from opentrons_shared_data.deck import (
-    get_calibration_square_position_in_slot,
     Z_PREP_OFFSET,
-    CALIBRATION_PROBE_RADIUS,
-    CALIBRATION_SQUARE_EDGES as SQUARE_EDGES,
+    get_calibration_square_position_in_slot,
 )
 from opentrons_shared_data.errors.exceptions import (
     CalibrationStructureNotFoundError,
-    EdgeNotFoundError,
     EarlyCapacitiveSenseTrigger,
+    EdgeNotFoundError,
     InaccurateNonContactSweepError,
     MisalignedGantryError,
 )
-from .robot_calibration import (
-    RobotCalibration,
-    DeckCalibration,
-)
+from typing_extensions import TYPE_CHECKING, Final, Literal
+
 from opentrons.calibration_storage import types
 from opentrons.calibration_storage.ot3.deck_attitude import (
-    save_robot_belt_attitude,
-    get_robot_belt_attitude,
     delete_robot_belt_attitude,
-)
-from opentrons.config.robot_configs import (
-    default_ot3_deck_calibration,
+    get_robot_belt_attitude,
+    save_robot_belt_attitude,
 )
 from opentrons.config import defaults_ot3
+from opentrons.config.robot_configs import default_ot3_deck_calibration
+from opentrons.config.types import CapacitivePassSettings, EdgeSenseSettings, OT3Config
+from opentrons.hardware_control.types import InstrumentProbeType
+from opentrons.types import Point
+from opentrons.util.linal import DoubleMatrix, SolvePoints, solve_attitude
+
+from .robot_calibration import DeckCalibration, RobotCalibration
+from .types import Axis, GripperProbe, OT3Mount
 from .util import DeckTransformState
 
 if TYPE_CHECKING:

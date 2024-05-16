@@ -1,5 +1,4 @@
-from typing import TypeVar, Union, TypedDict
-
+from typing import TypedDict, TypeVar, Union
 
 AllowedTypes = Union[str, int, float, bool]
 

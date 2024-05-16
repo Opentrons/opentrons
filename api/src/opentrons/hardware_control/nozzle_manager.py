@@ -1,16 +1,17 @@
-from typing import Dict, List, Optional, Any, Sequence, Iterator, Tuple, cast
-from dataclasses import dataclass
 from collections import OrderedDict
+from dataclasses import dataclass
 from enum import Enum
 from itertools import chain
+from typing import Any, Dict, Iterator, List, Optional, Sequence, Tuple, cast
 
-from opentrons.hardware_control.types import CriticalPoint
-from opentrons.types import Point
+from opentrons_shared_data.errors import ErrorCodes, GeneralError, PythonException
 from opentrons_shared_data.pipette.pipette_definition import (
     PipetteGeometryDefinition,
     PipetteRowDefinition,
 )
-from opentrons_shared_data.errors import ErrorCodes, GeneralError, PythonException
+
+from opentrons.hardware_control.types import CriticalPoint
+from opentrons.types import Point
 
 MAXIMUM_NOZZLE_COUNT = 24
 

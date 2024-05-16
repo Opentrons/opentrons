@@ -1,23 +1,22 @@
-from typing import Optional, Tuple, List, AsyncIterator, Union
 import contextlib
+from typing import AsyncIterator, List, Optional, Tuple, Union
+
 from typing_extensions import Protocol
 
 from opentrons import types as top_types
-from opentrons.config.types import (
-    CapacitivePassSettings,
-)
-from opentrons.hardware_control.types import (
-    Axis,
-    OT3Mount,
-    InstrumentProbeType,
-    GripperProbe,
-)
+from opentrons.config.types import CapacitivePassSettings
 from opentrons.hardware_control.instruments.ot3.instrument_calibration import (
     GripperCalibrationOffset,
     PipetteOffsetSummary,
 )
 from opentrons.hardware_control.modules.module_calibration import (
     ModuleCalibrationOffset,
+)
+from opentrons.hardware_control.types import (
+    Axis,
+    GripperProbe,
+    InstrumentProbeType,
+    OT3Mount,
 )
 
 

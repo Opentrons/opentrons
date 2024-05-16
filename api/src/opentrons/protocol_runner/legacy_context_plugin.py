@@ -1,14 +1,15 @@
 """Customize the ProtocolEngine to monitor and control legacy (APIv2) protocols."""
 from __future__ import annotations
 
-from asyncio import create_task, Task
+from asyncio import Task, create_task
 from contextlib import ExitStack
 from typing import List, Optional
 
-from opentrons.legacy_commands.types import CommandMessage as LegacyCommand
 from opentrons.legacy_broker import LegacyBroker
+from opentrons.legacy_commands.types import CommandMessage as LegacyCommand
 from opentrons.protocol_api.core.legacy.load_info import LoadInfo
-from opentrons.protocol_engine import AbstractPlugin, actions as pe_actions
+from opentrons.protocol_engine import AbstractPlugin
+from opentrons.protocol_engine import actions as pe_actions
 from opentrons.util.broker import ReadOnlyBroker
 
 from .legacy_command_mapper import LegacyCommandMapper

@@ -7,24 +7,24 @@ from opentrons.motion_planning.adjacent_slots_getters import (
     get_north_south_slots,
 )
 
+from ...drivers.types import (
+    HeaterShakerLabwareLatchStatus as HeaterShakerHardwareLatchStatus,
+)
+from ...hardware_control import HardwareControlAPI
+from ...hardware_control.modules import HeaterShaker as HardwareHeaterShaker
 from ..errors import (
-    PipetteMovementRestrictedByHeaterShakerError,
     HeaterShakerLabwareLatchNotOpenError,
     HeaterShakerLabwareLatchStatusUnknown,
+    PipetteMovementRestrictedByHeaterShakerError,
     WrongModuleTypeError,
 )
 from ..state import StateStore
 from ..state.module_substates import HeaterShakerModuleSubState
 from ..types import (
-    HeaterShakerMovementRestrictors,
     HeaterShakerLatchStatus,
+    HeaterShakerMovementRestrictors,
     LabwareLocation,
     ModuleLocation,
-)
-from ...hardware_control import HardwareControlAPI
-from ...hardware_control.modules import HeaterShaker as HardwareHeaterShaker
-from ...drivers.types import (
-    HeaterShakerLabwareLatchStatus as HeaterShakerHardwareLatchStatus,
 )
 
 

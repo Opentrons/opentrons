@@ -7,16 +7,14 @@ from typing import Callable, Optional
 
 from opentrons.hardware_control import HardwareControlAPI
 from opentrons.hardware_control.types import (
-    HardwareEvent,
-    DoorStateNotification,
     DoorState,
+    DoorStateNotification,
+    HardwareEvent,
     PauseType,
 )
-
 from opentrons.protocol_engine.actions import ActionDispatcher, DoorChangeAction
 
 from ..state import StateStore
-
 
 _UnsubscribeCallback = Callable[[], None]
 

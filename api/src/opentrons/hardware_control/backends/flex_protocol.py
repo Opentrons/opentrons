@@ -1,43 +1,44 @@
 import asyncio
 from contextlib import asynccontextmanager
 from typing import (
-    Protocol,
+    AsyncIterator,
     Dict,
-    Optional,
     List,
     Mapping,
-    AsyncIterator,
+    Optional,
+    Protocol,
     Sequence,
-    Tuple,
     Set,
+    Tuple,
     TypeVar,
 )
-from opentrons_shared_data.pipette.dev_types import (
-    PipetteName,
-)
+
+from opentrons_shared_data.pipette.dev_types import PipetteName
+
 from opentrons.config.types import GantryLoad, OutputOptions
+from opentrons.hardware_control.module_control import AttachedModulesControl
 from opentrons.hardware_control.types import (
-    BoardRevision,
     Axis,
-    OT3Mount,
-    OT3AxisMap,
+    BoardRevision,
+    EstopOverallStatus,
+    EstopState,
+    GripperJawState,
+    HardwareEventHandler,
+    HardwareEventUnsubscriber,
+    HardwareFeatureFlags,
+    HepaFanState,
+    HepaUVState,
     InstrumentProbeType,
     MotorStatus,
-    UpdateStatus,
+    OT3AxisMap,
+    OT3Mount,
+    StatusBarState,
     SubSystem,
     SubSystemState,
     TipStateType,
-    GripperJawState,
-    HardwareFeatureFlags,
-    EstopOverallStatus,
-    EstopState,
-    HardwareEventHandler,
-    HardwareEventUnsubscriber,
-    HepaFanState,
-    HepaUVState,
-    StatusBarState,
+    UpdateStatus,
 )
-from opentrons.hardware_control.module_control import AttachedModulesControl
+
 from ..dev_types import OT3AttachedInstruments
 from .types import HWStopCondition
 

@@ -1,25 +1,27 @@
 """Aspirate in place command request, result, and implementation models."""
 
 from __future__ import annotations
+
 from typing import TYPE_CHECKING, Optional, Type
+
 from typing_extensions import Literal
 
 from opentrons.hardware_control import HardwareControlAPI
 
-from .pipetting_common import (
-    PipetteIdMixin,
-    AspirateVolumeMixin,
-    FlowRateMixin,
-    BaseLiquidHandlingResult,
-)
-from .command import AbstractCommandImpl, BaseCommand, BaseCommandCreate, SuccessData
 from ..errors.error_occurrence import ErrorOccurrence
 from ..errors.exceptions import PipetteNotReadyToAspirateError
+from .command import AbstractCommandImpl, BaseCommand, BaseCommandCreate, SuccessData
+from .pipetting_common import (
+    AspirateVolumeMixin,
+    BaseLiquidHandlingResult,
+    FlowRateMixin,
+    PipetteIdMixin,
+)
 
 if TYPE_CHECKING:
     from ..execution import PipettingHandler
-    from ..state import StateView
     from ..notes import CommandNoteAdder
+    from ..state import StateView
 
 AspirateInPlaceCommandType = Literal["aspirateInPlace"]
 

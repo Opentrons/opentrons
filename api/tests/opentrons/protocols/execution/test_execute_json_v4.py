@@ -1,39 +1,41 @@
 from unittest import mock
+
 import pytest
-from opentrons.protocols.parse import parse
-from opentrons.protocols.execution.execute_json_v4 import (
-    dispatch_json,
-    _engage_magnet,
-    _disengage_magnet,
-    load_modules_from_json,
-    _temperature_module_set_temp,
-    _temperature_module_deactivate,
-    _temperature_module_await_temp,
-    _thermocycler_close_lid,
-    _thermocycler_open_lid,
-    _thermocycler_deactivate_block,
-    _thermocycler_deactivate_lid,
-    _thermocycler_set_block_temperature,
-    _thermocycler_set_lid_temperature,
-    _thermocycler_run_profile,
-    assert_no_async_tc_behavior,
-    assert_tc_commands_do_not_use_unimplemented_params,
-    TC_SPANNING_SLOT,
+from opentrons_shared_data.protocol.constants import JsonMagneticModuleCommand as JMMC
+from opentrons_shared_data.protocol.constants import JsonPipetteCommand as JPC
+from opentrons_shared_data.protocol.constants import (
+    JsonTemperatureModuleCommand as JTMC,
 )
+from opentrons_shared_data.protocol.constants import JsonThermocyclerCommand as JTHC
+
 import opentrons.protocols.execution.execute_json_v4 as v4
 from opentrons.protocol_api import (
     MagneticModuleContext,
+    ProtocolContext,
     TemperatureModuleContext,
     ThermocyclerContext,
-    ProtocolContext,
 )
 from opentrons.protocols.execution import execute
-from opentrons_shared_data.protocol.constants import (
-    JsonPipetteCommand as JPC,
-    JsonMagneticModuleCommand as JMMC,
-    JsonTemperatureModuleCommand as JTMC,
-    JsonThermocyclerCommand as JTHC,
+from opentrons.protocols.execution.execute_json_v4 import (
+    TC_SPANNING_SLOT,
+    _disengage_magnet,
+    _engage_magnet,
+    _temperature_module_await_temp,
+    _temperature_module_deactivate,
+    _temperature_module_set_temp,
+    _thermocycler_close_lid,
+    _thermocycler_deactivate_block,
+    _thermocycler_deactivate_lid,
+    _thermocycler_open_lid,
+    _thermocycler_run_profile,
+    _thermocycler_set_block_temperature,
+    _thermocycler_set_lid_temperature,
+    assert_no_async_tc_behavior,
+    assert_tc_commands_do_not_use_unimplemented_params,
+    dispatch_json,
+    load_modules_from_json,
 )
+from opentrons.protocols.parse import parse
 
 
 # autouse set to True to setup/teardown mock after each run

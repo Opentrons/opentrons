@@ -1,6 +1,7 @@
 """Tests for Protocol API engine parameter validation."""
-import pytest
 from typing import List, Optional
+
+import pytest
 
 from opentrons.protocol_api.core.engine import load_labware_params as subject
 from opentrons.protocol_engine.state.labware import LabwareLoadParams

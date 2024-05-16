@@ -1,5 +1,6 @@
 # Uncomment to enable logging during tests
 from __future__ import annotations
+
 import asyncio
 import contextlib
 import inspect
@@ -20,11 +21,11 @@ from typing import (
     Union,
     cast,
 )
-from typing_extensions import TypedDict
 
 import pytest
 from _pytest.fixtures import SubRequest
 from decoy import Decoy
+from typing_extensions import TypedDict
 
 from opentrons.protocol_engine.types import PostRunHardwareState
 
@@ -33,19 +34,17 @@ try:
 except (OSError, ModuleNotFoundError):
     aionotify = None
 
-from opentrons_shared_data.robot.dev_types import RobotTypeEnum
-from opentrons_shared_data.protocol.dev_types import JsonProtocol
-from opentrons_shared_data.labware.dev_types import LabwareDefinition
-from opentrons_shared_data.module.dev_types import ModuleDefinitionV3
+from opentrons_shared_data.deck import DEFAULT_DECK_DEFINITION_VERSION
+from opentrons_shared_data.deck import load as load_deck
 from opentrons_shared_data.deck.dev_types import (
-    RobotModel,
     DeckDefinitionV3,
     DeckDefinitionV5,
+    RobotModel,
 )
-from opentrons_shared_data.deck import (
-    load as load_deck,
-    DEFAULT_DECK_DEFINITION_VERSION,
-)
+from opentrons_shared_data.labware.dev_types import LabwareDefinition
+from opentrons_shared_data.module.dev_types import ModuleDefinitionV3
+from opentrons_shared_data.protocol.dev_types import JsonProtocol
+from opentrons_shared_data.robot.dev_types import RobotTypeEnum
 
 from opentrons import config
 from opentrons import hardware_control as hc
@@ -53,24 +52,20 @@ from opentrons.drivers.rpi_drivers.gpio_simulator import SimulatingGPIOCharDev
 from opentrons.hardware_control import (
     API,
     HardwareControlAPI,
-    ThreadManager,
     ThreadManagedHardware,
+    ThreadManager,
 )
-from opentrons.protocol_api import ProtocolContext, Labware, create_protocol_context
-from opentrons.protocol_api.core.legacy.legacy_labware_core import LegacyLabwareCore
+from opentrons.protocol_api import Labware, ProtocolContext, create_protocol_context
 from opentrons.protocol_api.core.legacy.deck import (
     DEFAULT_LEGACY_DECK_DEFINITION_VERSION,
 )
-from opentrons.protocol_engine import (
-    create_protocol_engine_in_thread,
-    Config as ProtocolEngineConfig,
-    DeckType,
-)
+from opentrons.protocol_api.core.legacy.legacy_labware_core import LegacyLabwareCore
+from opentrons.protocol_engine import Config as ProtocolEngineConfig
+from opentrons.protocol_engine import DeckType, create_protocol_engine_in_thread
 from opentrons.protocols.api_support import deck_type
-from opentrons.protocols.api_support.types import APIVersion
 from opentrons.protocols.api_support.definitions import MAX_SUPPORTED_VERSION
+from opentrons.protocols.api_support.types import APIVersion
 from opentrons.types import Location, Point
-
 
 if TYPE_CHECKING:
     from opentrons.drivers.smoothie_drivers import SmoothieDriver as SmoothieDriverType
@@ -355,8 +350,8 @@ async def smoothie(
     virtual_smoothie_env: None,
     monkeypatch: pytest.MonkeyPatch,
 ) -> AsyncGenerator[SmoothieDriverType, None]:
-    from opentrons.drivers.smoothie_drivers import SmoothieDriver
     from opentrons.config import robot_configs
+    from opentrons.drivers.smoothie_drivers import SmoothieDriver
 
     driver = SmoothieDriver(
         robot_configs.load_ot2(), SimulatingGPIOCharDev("simulated")

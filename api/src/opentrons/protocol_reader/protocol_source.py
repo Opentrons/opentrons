@@ -1,13 +1,13 @@
 """Protocol source value objects."""
-from enum import Enum
 from dataclasses import dataclass
+from enum import Enum
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Union
+
+from opentrons_shared_data.robot.dev_types import RobotType
 from typing_extensions import Literal
 
 from opentrons.protocols.api_support.types import APIVersion
-
-from opentrons_shared_data.robot.dev_types import RobotType
 
 
 class ProtocolType(str, Enum):

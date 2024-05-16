@@ -1,6 +1,8 @@
 """Tests for the ChangeNotifier interface."""
 import asyncio
+
 import pytest
+
 from opentrons.util.change_notifier import ChangeNotifier
 
 

@@ -1,22 +1,21 @@
 """Tests for motion planning module."""
 import pytest
 
+from opentrons.hardware_control.types import CriticalPoint as CP
+from opentrons.motion_planning import (
+    ArcOutOfBoundsError,
+    DestinationOutOfBoundsError,
+    MoveType,
+    Waypoint,
+    get_gripper_labware_movement_waypoints,
+    get_waypoints,
+)
 from opentrons.motion_planning.types import GripperMovementWaypointsWithJawStatus
 from opentrons.protocol_engine.types import (
     LabwareMovementOffsetData,
     LabwareOffsetVector,
 )
 from opentrons.types import Point
-from opentrons.hardware_control.types import CriticalPoint as CP
-
-from opentrons.motion_planning import (
-    get_waypoints,
-    Waypoint,
-    MoveType,
-    DestinationOutOfBoundsError,
-    ArcOutOfBoundsError,
-    get_gripper_labware_movement_waypoints,
-)
 
 
 def test_get_waypoints_direct() -> None:

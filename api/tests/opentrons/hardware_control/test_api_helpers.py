@@ -1,13 +1,11 @@
 import pytest
-from opentrons.calibration_storage.types import (
-    SourceType,
-    CalibrationStatus,
+
+from opentrons.calibration_storage.types import CalibrationStatus, SourceType
+from opentrons.hardware_control.robot_calibration import (
+    DeckCalibration,
+    RobotCalibration,
 )
 from opentrons.hardware_control.util import DeckTransformState
-from opentrons.hardware_control.robot_calibration import (
-    RobotCalibration,
-    DeckCalibration,
-)
 
 
 @pytest.mark.ot2_only  # ot3 attitude is always correct

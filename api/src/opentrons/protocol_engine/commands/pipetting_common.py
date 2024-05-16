@@ -1,8 +1,9 @@
 """Common pipetting command base models."""
-from pydantic import BaseModel, Field
 from typing import Optional
 
-from ..types import WellLocation, DeckPoint
+from pydantic import BaseModel, Field
+
+from ..types import DeckPoint, WellLocation
 
 
 class PipetteIdMixin(BaseModel):

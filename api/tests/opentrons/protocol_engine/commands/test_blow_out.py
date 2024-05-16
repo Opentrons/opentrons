@@ -1,20 +1,17 @@
 """Test blow-out command."""
 from decoy import Decoy
 
-from opentrons.types import Point
-from opentrons.protocol_engine import WellLocation, WellOrigin, WellOffset, DeckPoint
-from opentrons.protocol_engine.state import StateView
+from opentrons.hardware_control import HardwareControlAPI
+from opentrons.protocol_engine import DeckPoint, WellLocation, WellOffset, WellOrigin
 from opentrons.protocol_engine.commands import (
-    BlowOutResult,
     BlowOutImplementation,
     BlowOutParams,
+    BlowOutResult,
 )
 from opentrons.protocol_engine.commands.command import SuccessData
-from opentrons.protocol_engine.execution import (
-    MovementHandler,
-    PipettingHandler,
-)
-from opentrons.hardware_control import HardwareControlAPI
+from opentrons.protocol_engine.execution import MovementHandler, PipettingHandler
+from opentrons.protocol_engine.state import StateView
+from opentrons.types import Point
 
 
 async def test_blow_out_implementation(

@@ -1,13 +1,13 @@
 """Test legacy module command mapping in an end-to-end environment."""
 
-import pytest
 import textwrap
 from datetime import datetime
-from decoy import matchers
 from pathlib import Path
 
-from opentrons.protocol_engine import ModuleModel, commands
+import pytest
+from decoy import matchers
 
+from opentrons.protocol_engine import ModuleModel, commands
 from opentrons.protocol_reader import ProtocolReader
 from opentrons.protocol_runner import create_simulating_runner
 

@@ -1,21 +1,19 @@
+import functools
 import logging
-from typing import Optional, List
+import math
+from dataclasses import dataclass
+from typing import List, Optional
+
 from typing_extensions import Final
 
-import math
-import functools
-
-from dataclasses import dataclass
-
 from opentrons.legacy_commands import types
+from opentrons.protocol_api.core.legacy.deck import Deck
 from opentrons.protocols.api_support.deck_type import (
     guess_from_global_config as guess_deck_type_from_global_config,
 )
 from opentrons.protocols.api_support.labware_like import LabwareLike
 from opentrons.protocols.duration.errors import DurationEstimatorException
-from opentrons.protocol_api.core.legacy.deck import Deck
 from opentrons.types import Location
-
 
 # We refer to page 3 of the GEN2 Temperature Module White-Paper
 # https://blog.opentrons.com/opentrons-technical-documentation/

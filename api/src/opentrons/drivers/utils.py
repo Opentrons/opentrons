@@ -1,14 +1,14 @@
 import binascii
 import logging
-import time
-from typing import Dict, Optional, Mapping, Iterable, Sequence
 import re
+import time
+from typing import Dict, Iterable, Mapping, Optional, Sequence
 
 from opentrons.drivers.types import (
-    Temperature,
-    PlateTemperature,
     RPM,
     HeaterShakerLabwareLatchStatus,
+    PlateTemperature,
+    Temperature,
 )
 
 log = logging.getLogger(__name__)

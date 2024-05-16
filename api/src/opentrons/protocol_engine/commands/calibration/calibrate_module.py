@@ -2,24 +2,25 @@
 from __future__ import annotations
 
 from typing import TYPE_CHECKING, Optional, Type
-from typing_extensions import Literal
-from pydantic import BaseModel, Field
 
-from opentrons.types import MountType
+from pydantic import BaseModel, Field
+from typing_extensions import Literal
+
 from opentrons.protocol_engine.resources.ot3_validation import ensure_ot3_hardware
-from ..command import AbstractCommandImpl, BaseCommand, BaseCommandCreate, SuccessData
+from opentrons.types import MountType
+
 from ...errors.error_occurrence import ErrorOccurrence
+from ..command import AbstractCommandImpl, BaseCommand, BaseCommandCreate, SuccessData
 
 # Work around type-only circular dependencies.
 if TYPE_CHECKING:
     from ...state import StateView
 
-from ...types import ModuleOffsetVector, DeckSlotLocation
-
 from opentrons.hardware_control import HardwareControlAPI
-from opentrons.hardware_control.types import OT3Mount
 from opentrons.hardware_control import ot3_calibration as calibration
+from opentrons.hardware_control.types import OT3Mount
 
+from ...types import DeckSlotLocation, ModuleOffsetVector
 
 CalibrateModuleCommandType = Literal["calibration/calibrateModule"]
 

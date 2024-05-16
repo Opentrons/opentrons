@@ -4,11 +4,7 @@ from __future__ import annotations
 import pytest
 from decoy import Decoy, matchers
 
-from opentrons.protocol_engine.types import (
-    ModuleLocation,
-    ModuleModel,
-    DeckSlotLocation,
-)
+from opentrons.hardware_control.modules import Thermocycler
 from opentrons.protocol_engine.execution import EquipmentHandler, MovementHandler
 from opentrons.protocol_engine.execution.thermocycler_plate_lifter import (
     ThermocyclerPlateLifter,
@@ -18,8 +14,11 @@ from opentrons.protocol_engine.state import (
     ThermocyclerModuleId,
     ThermocyclerModuleSubState,
 )
-
-from opentrons.hardware_control.modules import Thermocycler
+from opentrons.protocol_engine.types import (
+    DeckSlotLocation,
+    ModuleLocation,
+    ModuleModel,
+)
 from opentrons.types import DeckSlotName
 
 

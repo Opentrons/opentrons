@@ -1,31 +1,25 @@
 """Test load labware commands."""
 import inspect
-import pytest
 
+import pytest
 from decoy import Decoy
 
-from opentrons.types import DeckSlotName
-from opentrons.protocols.models import LabwareDefinition
-
+from opentrons.protocol_engine.commands.command import SuccessData
+from opentrons.protocol_engine.commands.load_labware import (
+    LoadLabwareImplementation,
+    LoadLabwareParams,
+    LoadLabwareResult,
+)
 from opentrons.protocol_engine.errors import (
     LabwareIsNotAllowedInLocationError,
     LocationIsOccupiedError,
 )
-
-from opentrons.protocol_engine.types import (
-    DeckSlotLocation,
-    OnLabwareLocation,
-)
-from opentrons.protocol_engine.execution import LoadedLabwareData, EquipmentHandler
+from opentrons.protocol_engine.execution import EquipmentHandler, LoadedLabwareData
 from opentrons.protocol_engine.resources import labware_validation
 from opentrons.protocol_engine.state import StateView
-
-from opentrons.protocol_engine.commands.command import SuccessData
-from opentrons.protocol_engine.commands.load_labware import (
-    LoadLabwareParams,
-    LoadLabwareResult,
-    LoadLabwareImplementation,
-)
+from opentrons.protocol_engine.types import DeckSlotLocation, OnLabwareLocation
+from opentrons.protocols.models import LabwareDefinition
+from opentrons.types import DeckSlotName
 
 
 @pytest.fixture(autouse=True)

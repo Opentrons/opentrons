@@ -1,6 +1,7 @@
 import pytest
-from opentrons.types import DeckSlotName, Point, Location
+
 from opentrons.protocol_api.labware import Labware
+from opentrons.types import DeckSlotName, Location, Point
 
 
 def test_point_mul() -> None:

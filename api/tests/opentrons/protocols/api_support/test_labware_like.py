@@ -1,15 +1,15 @@
 from unittest.mock import MagicMock
 
 import pytest
+from opentrons_shared_data.labware.dev_types import LabwareDefinition
+
 from opentrons.hardware_control.modules.types import TemperatureModuleModel
-from opentrons.protocol_api import labware, OFF_DECK
-from opentrons.protocols.api_support.labware_like import LabwareLike, LabwareLikeType
-from opentrons.protocols.api_support.deck_type import STANDARD_OT2_DECK
+from opentrons.protocol_api import OFF_DECK, labware
 from opentrons.protocol_api.core.legacy import module_geometry
 from opentrons.protocol_api.core.legacy.deck import Deck
+from opentrons.protocols.api_support.deck_type import STANDARD_OT2_DECK
+from opentrons.protocols.api_support.labware_like import LabwareLike, LabwareLikeType
 from opentrons.types import Location
-
-from opentrons_shared_data.labware.dev_types import LabwareDefinition
 
 
 @pytest.fixture(scope="session")

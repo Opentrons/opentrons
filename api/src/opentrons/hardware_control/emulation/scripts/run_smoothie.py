@@ -1,13 +1,11 @@
 """Script for starting up a python smoothie emulator."""
-import logging
 import asyncio
+import logging
 
-from opentrons.hardware_control.emulation.smoothie import SmoothieEmulator
 from opentrons.hardware_control.emulation.parser import Parser
-
-
 from opentrons.hardware_control.emulation.run_emulator import run_emulator_server
 from opentrons.hardware_control.emulation.settings import Settings
+from opentrons.hardware_control.emulation.smoothie import SmoothieEmulator
 
 
 async def run(settings: Settings) -> None:

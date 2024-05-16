@@ -6,39 +6,39 @@ a protocol from the command line.
 import argparse
 import asyncio
 import atexit
-from contextlib import ExitStack, contextmanager
-import sys
 import logging
 import os
 import pathlib
 import queue
+import sys
+from contextlib import ExitStack, contextmanager
 from typing import (
     TYPE_CHECKING,
-    Generator,
     Any,
+    BinaryIO,
     Dict,
+    Generator,
     List,
     Mapping,
+    Optional,
     TextIO,
     Tuple,
-    BinaryIO,
-    Optional,
     Union,
 )
+
+from opentrons_shared_data.labware.labware_definition import LabwareDefinition
+from opentrons_shared_data.robot.dev_types import RobotType
 from typing_extensions import Literal
 
-from opentrons_shared_data.robot.dev_types import RobotType
-
 import opentrons
-from opentrons import should_use_ot3
-from opentrons.hardware_control import (
-    API as OT2API,
-    ThreadManager,
-    ThreadManagedHardware,
-)
-from opentrons.hardware_control.types import HardwareFeatureFlags
-
+from opentrons import protocol_api, should_use_ot3
+from opentrons.config import IS_ROBOT
+from opentrons.hardware_control import API as OT2API
+from opentrons.hardware_control import ThreadManagedHardware, ThreadManager
 from opentrons.hardware_control.simulator_setup import load_simulator
+from opentrons.hardware_control.types import HardwareFeatureFlags
+from opentrons.legacy_broker import LegacyBroker
+from opentrons.legacy_commands import types as command_types
 from opentrons.protocol_api.core.engine import ENGINE_CORE_API_VERSION
 from opentrons.protocol_api.protocol_context import ProtocolContext
 from opentrons.protocol_engine import create_protocol_engine
@@ -49,27 +49,23 @@ from opentrons.protocol_engine.state.config import Config
 from opentrons.protocol_engine.types import DeckType, EngineStatus, PostRunHardwareState
 from opentrons.protocol_reader.protocol_source import ProtocolSource
 from opentrons.protocol_runner.protocol_runner import create_protocol_runner
-from opentrons.protocols.duration import DurationEstimator
-from opentrons.protocols.execution import execute
-from opentrons.legacy_broker import LegacyBroker
-from opentrons.config import IS_ROBOT
-from opentrons import protocol_api
-from opentrons.legacy_commands import types as command_types
-
-from opentrons.protocols import parse, bundle
-from opentrons.protocols.types import (
-    ApiDeprecationError,
-    Protocol,
-    PythonProtocol,
-    BundleContents,
-)
+from opentrons.protocols import bundle, parse
 from opentrons.protocols.api_support.deck_type import (
     for_simulation as deck_type_for_simulation,
+)
+from opentrons.protocols.api_support.deck_type import (
     should_load_fixed_trash,
     should_load_fixed_trash_labware_for_python_protocol,
 )
 from opentrons.protocols.api_support.types import APIVersion
-from opentrons_shared_data.labware.labware_definition import LabwareDefinition
+from opentrons.protocols.duration import DurationEstimator
+from opentrons.protocols.execution import execute
+from opentrons.protocols.types import (
+    ApiDeprecationError,
+    BundleContents,
+    Protocol,
+    PythonProtocol,
+)
 
 from .util import entrypoint_util
 

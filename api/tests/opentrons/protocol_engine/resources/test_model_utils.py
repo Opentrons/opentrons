@@ -1,7 +1,7 @@
 """Simple functional tests for the ModelUtils provider."""
 import re
-from opentrons.protocol_engine.resources import ModelUtils
 
+from opentrons.protocol_engine.resources import ModelUtils
 
 RE_UUID = re.compile(
     r"^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$",

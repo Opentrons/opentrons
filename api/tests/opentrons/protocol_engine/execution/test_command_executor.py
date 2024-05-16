@@ -5,11 +5,24 @@ from typing import Any, Optional, Type, Union, cast
 
 import pytest
 from decoy import Decoy, matchers
+from opentrons_shared_data.errors.exceptions import EStopActivatedError, PythonException
 from pydantic import BaseModel
 
 from opentrons.hardware_control import HardwareControlAPI, OT2HardwareControlAPI
-
 from opentrons.protocol_engine import errors
+from opentrons.protocol_engine.actions import (
+    ActionDispatcher,
+    FailCommandAction,
+    RunCommandAction,
+    SucceedCommandAction,
+)
+from opentrons.protocol_engine.commands import (
+    AbstractCommandImpl,
+    BaseCommand,
+    Command,
+    CommandStatus,
+)
+from opentrons.protocol_engine.commands.command import DefinedErrorData, SuccessData
 from opentrons.protocol_engine.error_recovery_policy import (
     ErrorRecoveryPolicy,
     ErrorRecoveryType,
@@ -18,41 +31,24 @@ from opentrons.protocol_engine.errors.error_occurrence import ErrorOccurrence
 from opentrons.protocol_engine.errors.exceptions import (
     EStopActivatedError as PE_EStopActivatedError,
 )
-from opentrons.protocol_engine.resources import ModelUtils
-from opentrons.protocol_engine.state import StateStore
-from opentrons.protocol_engine.actions import (
-    ActionDispatcher,
-    RunCommandAction,
-    SucceedCommandAction,
-    FailCommandAction,
-)
-
-from opentrons.protocol_engine.commands import (
-    AbstractCommandImpl,
-    BaseCommand,
-    CommandStatus,
-    Command,
-)
-from opentrons.protocol_engine.commands.command import DefinedErrorData, SuccessData
-
 from opentrons.protocol_engine.execution import (
     CommandExecutor,
     EquipmentHandler,
-    MovementHandler,
     GantryMover,
     LabwareMovementHandler,
+    MovementHandler,
     PipettingHandler,
-    TipHandler,
-    RunControlHandler,
     RailLightsHandler,
+    RunControlHandler,
     StatusBarHandler,
+    TipHandler,
 )
 from opentrons.protocol_engine.execution.command_executor import (
     CommandNoteTrackerProvider,
 )
-
-from opentrons_shared_data.errors.exceptions import EStopActivatedError, PythonException
-from opentrons.protocol_engine.notes import CommandNoteTracker, CommandNote
+from opentrons.protocol_engine.notes import CommandNote, CommandNoteTracker
+from opentrons.protocol_engine.resources import ModelUtils
+from opentrons.protocol_engine.state import StateStore
 
 
 @pytest.fixture

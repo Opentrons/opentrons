@@ -1,10 +1,10 @@
 """
 functions and utilities for handling zipped protocol bundles
 """
-from datetime import date
 import json
-from pathlib import PurePosixPath, PurePath
-from typing import Dict, BinaryIO, TYPE_CHECKING
+from datetime import date
+from pathlib import PurePath, PurePosixPath
+from typing import TYPE_CHECKING, BinaryIO, Dict
 from zipfile import ZipFile
 
 from opentrons.calibration_storage.helpers import uri_from_definition

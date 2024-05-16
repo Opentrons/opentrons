@@ -1,17 +1,16 @@
 """Test move to addressable area commands."""
 from decoy import Decoy
 
-from opentrons.protocol_engine import DeckPoint, AddressableOffsetVector
+from opentrons.protocol_engine import AddressableOffsetVector, DeckPoint
+from opentrons.protocol_engine.commands.command import SuccessData
+from opentrons.protocol_engine.commands.move_to_addressable_area import (
+    MoveToAddressableAreaImplementation,
+    MoveToAddressableAreaParams,
+    MoveToAddressableAreaResult,
+)
 from opentrons.protocol_engine.execution import MovementHandler
 from opentrons.protocol_engine.state import StateView
 from opentrons.types import Point
-
-from opentrons.protocol_engine.commands.command import SuccessData
-from opentrons.protocol_engine.commands.move_to_addressable_area import (
-    MoveToAddressableAreaParams,
-    MoveToAddressableAreaResult,
-    MoveToAddressableAreaImplementation,
-)
 
 
 async def test_move_to_addressable_area_implementation(

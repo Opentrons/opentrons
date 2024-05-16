@@ -1,8 +1,10 @@
 """Generate a JSON schema against which all create commands statically validate."""
-import json
-import pydantic
 import argparse
+import json
 import sys
+
+import pydantic
+
 from opentrons.protocol_engine.commands.command_unions import CommandCreate
 
 

@@ -1,45 +1,43 @@
 """ProtocolEngine-based InstrumentContext core implementation."""
 from __future__ import annotations
 
-from typing import Optional, TYPE_CHECKING, cast, Union
-from opentrons.protocols.api_support.types import APIVersion
+from typing import TYPE_CHECKING, Optional, Union, cast
 
-from opentrons.types import Location, Mount
+from opentrons_shared_data.pipette.dev_types import PipetteNameType
+
 from opentrons.hardware_control import SyncHardwareAPI
 from opentrons.hardware_control.dev_types import PipetteDict
-from opentrons.protocols.api_support.util import FlowRates, find_value_for_api_version
+from opentrons.hardware_control.nozzle_manager import NozzleConfigurationType, NozzleMap
+from opentrons.protocol_api._nozzle_layout import NozzleLayout
 from opentrons.protocol_engine import (
+    AllNozzleLayoutConfiguration,
+    ColumnNozzleLayoutConfiguration,
     DeckPoint,
     DropTipWellLocation,
     DropTipWellOrigin,
-    WellLocation,
-    WellOrigin,
-    WellOffset,
-    AllNozzleLayoutConfiguration,
-    SingleNozzleLayoutConfiguration,
-    RowNozzleLayoutConfiguration,
-    ColumnNozzleLayoutConfiguration,
     QuadrantNozzleLayoutConfiguration,
+    RowNozzleLayoutConfiguration,
+    SingleNozzleLayoutConfiguration,
+    WellLocation,
+    WellOffset,
+    WellOrigin,
 )
+from opentrons.protocol_engine.clients import SyncClient as EngineClient
+from opentrons.protocol_engine.errors.exceptions import TipNotAttachedError
 from opentrons.protocol_engine.types import (
     PRIMARY_NOZZLE_LITERAL,
-    NozzleLayoutConfigurationType,
     AddressableOffsetVector,
+    NozzleLayoutConfigurationType,
 )
-from opentrons.protocol_engine.errors.exceptions import TipNotAttachedError
-from opentrons.protocol_engine.clients import SyncClient as EngineClient
 from opentrons.protocols.api_support.definitions import MAX_SUPPORTED_VERSION
-
-from opentrons_shared_data.pipette.dev_types import PipetteNameType
-from opentrons.protocol_api._nozzle_layout import NozzleLayout
-from opentrons.hardware_control.nozzle_manager import NozzleConfigurationType
-from opentrons.hardware_control.nozzle_manager import NozzleMap
-from . import deck_conflict
-
-from ..instrument import AbstractInstrument
-from .well import WellCore
+from opentrons.protocols.api_support.types import APIVersion
+from opentrons.protocols.api_support.util import FlowRates, find_value_for_api_version
+from opentrons.types import Location, Mount
 
 from ...disposal_locations import TrashBin, WasteChute
+from ..instrument import AbstractInstrument
+from . import deck_conflict
+from .well import WellCore
 
 if TYPE_CHECKING:
     from .protocol import ProtocolCore

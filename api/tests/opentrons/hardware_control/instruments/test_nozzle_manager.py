@@ -1,17 +1,16 @@
+from typing import Dict, Iterator, List, Tuple, Union, cast
+
 import pytest
-from typing import Dict, List, Tuple, Union, Iterator, cast
-
-from opentrons.hardware_control import nozzle_manager
-
-from opentrons.types import Point
-
 from opentrons_shared_data.pipette.load_data import load_definition
+from opentrons_shared_data.pipette.pipette_definition import PipetteConfigurations
 from opentrons_shared_data.pipette.types import (
-    PipetteModelType,
     PipetteChannelType,
+    PipetteModelType,
     PipetteVersionType,
 )
-from opentrons_shared_data.pipette.pipette_definition import PipetteConfigurations
+
+from opentrons.hardware_control import nozzle_manager
+from opentrons.types import Point
 
 
 @pytest.mark.parametrize(

@@ -6,33 +6,32 @@ from opentrons_shared_data.labware.dev_types import LabwareDefinition
 
 from opentrons.hardware_control import (
     HardwareControlAPI,
-    ThreadManager,
     SynchronousAdapter,
+    ThreadManager,
 )
 from opentrons.legacy_broker import LegacyBroker
-from opentrons.util.broker import Broker
 from opentrons.protocol_engine import ProtocolEngine
-from opentrons.protocol_engine.clients import SyncClient, ChildThreadTransport
-from opentrons.protocols.api_support.types import APIVersion
+from opentrons.protocol_engine.clients import ChildThreadTransport, SyncClient
 from opentrons.protocols.api_support.deck_type import (
     should_load_fixed_trash_area_for_python_protocol,
 )
 from opentrons.protocols.api_support.definitions import MAX_SUPPORTED_VERSION
-
-from .protocol_context import ProtocolContext
-from .deck import Deck
-from .disposal_locations import TrashBin
+from opentrons.protocols.api_support.types import APIVersion
+from opentrons.util.broker import Broker
 
 from .core.common import ProtocolCore as AbstractProtocolCore
+from .core.engine import ENGINE_CORE_API_VERSION, ProtocolCore
 from .core.legacy.deck import Deck as LegacyDeck
-from .core.legacy.legacy_protocol_core import LegacyProtocolCore
 from .core.legacy.labware_offset_provider import (
     AbstractLabwareOffsetProvider,
     LabwareOffsetProvider,
     NullLabwareOffsetProvider,
 )
+from .core.legacy.legacy_protocol_core import LegacyProtocolCore
 from .core.legacy_simulator.legacy_protocol_core import LegacyProtocolCoreSimulator
-from .core.engine import ENGINE_CORE_API_VERSION, ProtocolCore
+from .deck import Deck
+from .disposal_locations import TrashBin
+from .protocol_context import ProtocolContext
 
 
 class ProtocolEngineCoreRequiredError(Exception):

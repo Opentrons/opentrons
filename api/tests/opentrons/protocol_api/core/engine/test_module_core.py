@@ -1,16 +1,18 @@
 """Tests for opentrons.protocol_api.core.engine.ModuleCore."""
-import pytest
 import inspect
+
+import pytest
 from decoy import Decoy
 
 from opentrons.hardware_control import SynchronousAdapter
 from opentrons.hardware_control.modules import AbstractModule
+from opentrons.protocol_api import MAX_SUPPORTED_VERSION
+from opentrons.protocol_api import validation as mock_validation
+from opentrons.protocol_api.core.engine.module_core import ModuleCore
 from opentrons.protocol_engine import DeckSlotLocation
 from opentrons.protocol_engine.clients import SyncClient as EngineClient
-from opentrons.protocol_engine.types import ModuleModel, ModuleDefinition
-from opentrons.protocol_api import MAX_SUPPORTED_VERSION, validation as mock_validation
+from opentrons.protocol_engine.types import ModuleDefinition, ModuleModel
 from opentrons.protocols.api_support.types import APIVersion
-from opentrons.protocol_api.core.engine.module_core import ModuleCore
 from opentrons.types import DeckSlotName
 
 

@@ -1,5 +1,6 @@
 """Definitions of data and interface shapes for notes."""
-from typing import Union, Literal, Protocol, List
+from typing import List, Literal, Protocol, Union
+
 from pydantic import BaseModel, Field
 
 NoteKind = Union[Literal["warning", "information"], str]

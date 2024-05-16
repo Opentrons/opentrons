@@ -3,32 +3,22 @@ import asyncio
 import mock
 import pytest
 from decoy import Decoy
-
-from opentrons import config, types
-from opentrons import hardware_control as hc
-from opentrons.calibration_storage.types import (
-    SourceType,
-    CalibrationStatus,
-)
-from opentrons.config.types import GantryLoad
-from opentrons.hardware_control.types import (
-    Axis,
-    CriticalPoint,
-    MotionChecks,
-)
-from opentrons.hardware_control.errors import (
-    InvalidCriticalPoint,
-    OutOfBoundsMove,
-)
-from opentrons.hardware_control.robot_calibration import (
-    RobotCalibration,
-    DeckCalibration,
-)
-
 from opentrons_shared_data.errors.exceptions import (
     MoveConditionNotMetError,
     PositionUnknownError,
 )
+
+from opentrons import config
+from opentrons import hardware_control as hc
+from opentrons import types
+from opentrons.calibration_storage.types import CalibrationStatus, SourceType
+from opentrons.config.types import GantryLoad
+from opentrons.hardware_control.errors import InvalidCriticalPoint, OutOfBoundsMove
+from opentrons.hardware_control.robot_calibration import (
+    DeckCalibration,
+    RobotCalibration,
+)
+from opentrons.hardware_control.types import Axis, CriticalPoint, MotionChecks
 
 
 async def test_controller_must_home(hardware_api):

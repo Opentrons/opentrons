@@ -1,11 +1,12 @@
-import pytest
-from mock import patch, MagicMock
 from typing import Iterator, cast
 
+import pytest
+from mock import MagicMock, patch
+
+from opentrons.drivers.rpi_drivers.types import PortGroup, USBPort
+from opentrons.drivers.rpi_drivers.usb import USBBus
 from opentrons.hardware_control.modules.types import ModuleAtPort
 from opentrons.hardware_control.types import BoardRevision
-from opentrons.drivers.rpi_drivers.usb import USBBus
-from opentrons.drivers.rpi_drivers.types import USBPort, PortGroup
 
 fake_bus_og = [
     "/sys/bus/usb/devices/usb1/dev",

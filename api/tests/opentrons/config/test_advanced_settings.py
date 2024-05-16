@@ -1,10 +1,11 @@
-import pytest
-from pytest_lazyfixture import lazy_fixture  # type: ignore[import-untyped]
 from typing import Dict, Generator, Optional
 from unittest.mock import MagicMock, patch
 
-from opentrons.config import advanced_settings, CONFIG
+import pytest
 from opentrons_shared_data.robot.dev_types import RobotTypeEnum
+from pytest_lazyfixture import lazy_fixture  # type: ignore[import-untyped]
+
+from opentrons.config import CONFIG, advanced_settings
 
 
 @pytest.fixture

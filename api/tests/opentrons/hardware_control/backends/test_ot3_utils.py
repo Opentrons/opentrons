@@ -1,13 +1,12 @@
-from opentrons_hardware.hardware_control.motion_planning import Move
-from opentrons_hardware.hardware_control.motion import (
-    create_step,
-)
-from opentrons.hardware_control.backends import ot3utils
-from opentrons_hardware.firmware_bindings.constants import NodeId
-from opentrons.hardware_control.types import Axis, OT3Mount
 from numpy import float64 as f64
+from opentrons_hardware.firmware_bindings.constants import NodeId
+from opentrons_hardware.hardware_control.motion import create_step
+from opentrons_hardware.hardware_control.motion_planning import Move
 
-from opentrons.config import defaults_ot3, types as conf_types
+from opentrons.config import defaults_ot3
+from opentrons.config import types as conf_types
+from opentrons.hardware_control.backends import ot3utils
+from opentrons.hardware_control.types import Axis, OT3Mount
 
 
 def test_create_step() -> None:

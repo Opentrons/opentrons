@@ -1,16 +1,17 @@
+from typing import List, Optional, Tuple, cast
+
 import pytest
 from decoy import Decoy
-from typing import List, Tuple, Optional, cast
+from opentrons_hardware.hardware_control.estop.detector import (
+    EstopDetector,
+    EstopSummary,
+)
 
 from opentrons.hardware_control.backends.estop_state import EstopStateMachine
-from opentrons_hardware.hardware_control.estop.detector import (
-    EstopSummary,
-    EstopDetector,
-)
 from opentrons.hardware_control.types import (
-    EstopState,
-    EstopPhysicalStatus,
     EstopAttachLocation,
+    EstopPhysicalStatus,
+    EstopState,
     EstopStateNotification,
     HardwareEvent,
 )

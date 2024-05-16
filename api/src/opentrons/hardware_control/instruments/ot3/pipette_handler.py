@@ -1,53 +1,44 @@
 """Shared code for managing pipette configuration and storage."""
-from dataclasses import dataclass
 import logging
-from typing import (
-    Dict,
-    Optional,
-    Tuple,
-    Any,
-    cast,
-    List,
-    TypeVar,
+from dataclasses import dataclass
+from typing import Any, Dict, List, Optional, Tuple, TypeVar, cast
+
+import numpy
+from opentrons_shared_data.errors.exceptions import (
+    CommandParameterLimitViolated,
+    CommandPreconditionViolated,
+    UnexpectedTipAttachError,
+    UnexpectedTipRemovalError,
+)
+from opentrons_shared_data.pipette.dev_types import UlPerMmAction
+from opentrons_shared_data.pipette.pipette_definition import (
+    CamActionPickUpTipConfiguration,
+    PressFitPickUpTipConfiguration,
+    liquid_class_for_volume_between_default_and_defaultlowvolume,
 )
 from typing_extensions import Final
-import numpy
-from opentrons_shared_data.pipette.dev_types import UlPerMmAction
-
-from opentrons_shared_data.errors.exceptions import (
-    CommandPreconditionViolated,
-    CommandParameterLimitViolated,
-    UnexpectedTipRemovalError,
-    UnexpectedTipAttachError,
-)
-from opentrons_shared_data.pipette.pipette_definition import (
-    liquid_class_for_volume_between_default_and_defaultlowvolume,
-    PressFitPickUpTipConfiguration,
-    CamActionPickUpTipConfiguration,
-)
 
 from opentrons import types as top_types
-from opentrons.hardware_control.types import (
-    CriticalPoint,
-    HardwareAction,
-    Axis,
-    OT3Mount,
-)
 from opentrons.hardware_control.constants import (
-    SHAKE_OFF_TIPS_SPEED,
-    SHAKE_OFF_TIPS_PICKUP_DISTANCE,
     DROP_TIP_RELEASE_DISTANCE,
     SHAKE_OFF_TIPS_DROP_DISTANCE,
+    SHAKE_OFF_TIPS_PICKUP_DISTANCE,
+    SHAKE_OFF_TIPS_SPEED,
+)
+from opentrons.hardware_control.dev_types import PipetteDict
+from opentrons.hardware_control.types import (
+    Axis,
+    CriticalPoint,
+    HardwareAction,
+    OT3Mount,
 )
 
-from opentrons.hardware_control.dev_types import PipetteDict
-from .pipette import Pipette
 from .instrument_calibration import (
-    PipetteOffsetSummary,
     PipetteOffsetByPipetteMount,
+    PipetteOffsetSummary,
     check_instrument_offset_reasonability,
 )
-
+from .pipette import Pipette
 
 MOD_LOG = logging.getLogger(__name__)
 

@@ -2,22 +2,20 @@
 
 import json
 from dataclasses import dataclass
-from typing import Any, Dict, Sequence, Union, Optional
+from typing import Any, Dict, Optional, Sequence, Union
 
 import anyio
-
-from opentrons_shared_data.robot.dev_types import RobotType
 from opentrons_shared_data.errors.exceptions import EnumeratedError, PythonException
+from opentrons_shared_data.robot.dev_types import RobotType
 
+from opentrons.protocols import parse
 from opentrons.protocols.api_support.definitions import MAX_SUPPORTED_VERSION
 from opentrons.protocols.api_support.types import APIVersion
-from opentrons.protocols import parse
 from opentrons.protocols.types import MalformedPythonProtocolError, PythonProtocol
 
 from .file_reader_writer import BufferedFile
 from .protocol_files_invalid_error import ProtocolFilesInvalidError
 from .protocol_source import Metadata
-
 
 JsonDict = Dict[str, Any]
 

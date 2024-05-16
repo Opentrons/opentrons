@@ -3,33 +3,31 @@
 import functools
 import logging
 from collections import UserDict
-from typing import Dict, Optional, List, Union, Mapping
-from typing_extensions import Protocol, Final
+from typing import Dict, List, Mapping, Optional, Union
 
 from opentrons_shared_data.deck import load as load_deck
-
 from opentrons_shared_data.deck.dev_types import SlotDefV3
 from opentrons_shared_data.labware.dev_types import LabwareUri
+from typing_extensions import Final, Protocol
 
 from opentrons.hardware_control.modules.types import ModuleType
 from opentrons.motion_planning import deck_conflict
+from opentrons.protocol_api.core.labware import AbstractLabware
+from opentrons.protocol_api.deck import CalibrationPosition
+from opentrons.protocol_api.labware import Labware
+from opentrons.protocol_api.labware import load as load_lw
 from opentrons.protocols.api_support.labware_like import LabwareLike
 from opentrons.types import (
     DeckLocation,
+    DeckSlotName,
     Location,
     Mount,
     Point,
-    DeckSlotName,
     StagingSlotName,
 )
 
-from opentrons.protocol_api.core.labware import AbstractLabware
-from opentrons.protocol_api.deck import CalibrationPosition
-from opentrons.protocol_api.labware import load as load_lw, Labware
-
 from .legacy_labware_core import LegacyLabwareCore
-from .module_geometry import ModuleGeometry, HeaterShakerGeometry, ThermocyclerGeometry
-
+from .module_geometry import HeaterShakerGeometry, ModuleGeometry, ThermocyclerGeometry
 
 _log = logging.getLogger(__name__)
 

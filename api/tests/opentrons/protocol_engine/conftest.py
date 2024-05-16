@@ -1,27 +1,27 @@
 """ProtocolEngine shared test fixtures."""
 from __future__ import annotations
 
-import pytest
 from typing import TYPE_CHECKING
-from decoy import Decoy
 
+import pytest
+from decoy import Decoy
 from opentrons_shared_data import load_shared_data
 from opentrons_shared_data.deck import load as load_deck
 from opentrons_shared_data.deck.dev_types import DeckDefinitionV5
 from opentrons_shared_data.labware import load_definition
 from opentrons_shared_data.pipette import pipette_definition
-from opentrons.protocols.models import LabwareDefinition
-from opentrons.protocols.api_support.deck_type import (
-    STANDARD_OT2_DECK,
-    SHORT_TRASH_DECK,
-    STANDARD_OT3_DECK,
-)
-from opentrons.protocol_engine.types import ModuleDefinition
 
 from opentrons.hardware_control import HardwareControlAPI, OT2HardwareControlAPI
 from opentrons.hardware_control.api import API
 from opentrons.hardware_control.protocols.types import FlexRobotType, OT2RobotType
 from opentrons.protocol_engine.notes import CommandNoteAdder
+from opentrons.protocol_engine.types import ModuleDefinition
+from opentrons.protocols.api_support.deck_type import (
+    SHORT_TRASH_DECK,
+    STANDARD_OT2_DECK,
+    STANDARD_OT3_DECK,
+)
+from opentrons.protocols.models import LabwareDefinition
 
 if TYPE_CHECKING:
     from opentrons.hardware_control.ot3api import OT3API

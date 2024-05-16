@@ -4,7 +4,7 @@ from typing import Any, Dict
 
 import pytest
 
-from opentrons.config import CONFIG, robot_configs, defaults_ot2, defaults_ot3
+from opentrons.config import CONFIG, defaults_ot2, defaults_ot3, robot_configs
 from opentrons.config.types import CurrentDict
 from opentrons.hardware_control.types import BoardRevision
 

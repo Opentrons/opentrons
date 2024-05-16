@@ -1,7 +1,9 @@
 from __future__ import annotations
 
-from typing_extensions import Literal, Final, TypedDict
-from typing import Optional, List, Sequence, TYPE_CHECKING, Union
+from typing import TYPE_CHECKING, List, Optional, Sequence, Union
+
+from typing_extensions import Final, Literal, TypedDict
+
 from opentrons.hardware_control.modules import ThermocyclerStep
 
 if TYPE_CHECKING:
@@ -10,7 +12,6 @@ if TYPE_CHECKING:
     from opentrons.protocol_api.disposal_locations import TrashBin, WasteChute
 
 from opentrons.types import Location
-
 
 # type for subscriptions
 COMMAND: Final = "command"

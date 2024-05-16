@@ -1,20 +1,16 @@
 """Flex-specific extensions to instrument configuration."""
-from typing import Union, Optional
+from typing import Optional, Union
+
 from typing_extensions import Protocol
 
-from .types import MountArgType
-
-from opentrons.hardware_control.dev_types import (
-    PipetteStateDict,
-)
-from opentrons.hardware_control.types import (
-    TipStateType,
-    InstrumentProbeType,
-)
+from opentrons.hardware_control.dev_types import PipetteStateDict
 from opentrons.hardware_control.instruments.ot3.instrument_calibration import (
-    PipetteOffsetSummary,
     GripperCalibrationOffset,
+    PipetteOffsetSummary,
 )
+from opentrons.hardware_control.types import InstrumentProbeType, TipStateType
+
+from .types import MountArgType
 
 
 class FlexInstrumentConfigurer(Protocol[MountArgType]):

@@ -5,13 +5,15 @@ from abc import ABC, abstractmethod
 from typing import Any, Generic, List, NamedTuple, Optional, TypeVar
 
 from opentrons_shared_data.labware.dev_types import (
-    LabwareUri,
-    LabwareParameters as LabwareParametersDict,
     LabwareDefinition as LabwareDefinitionDict,
 )
+from opentrons_shared_data.labware.dev_types import (
+    LabwareParameters as LabwareParametersDict,
+)
+from opentrons_shared_data.labware.dev_types import LabwareUri
 
-from opentrons.types import DeckSlotName, Point
 from opentrons.hardware_control.nozzle_manager import NozzleMap
+from opentrons.types import DeckSlotName, Point
 
 from .well import WellCoreType
 

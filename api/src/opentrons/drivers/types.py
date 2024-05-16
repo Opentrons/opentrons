@@ -1,7 +1,7 @@
 """ Type definitions for modules in this tree """
 from dataclasses import dataclass
-from typing import Dict, NamedTuple, Optional
 from enum import Enum
+from typing import Dict, NamedTuple, Optional
 
 
 class MoveSplit(NamedTuple):

@@ -1,29 +1,28 @@
 """Addressable area state store tests."""
 import pytest
-
 from opentrons_shared_data.deck.dev_types import DeckDefinitionV5
 from opentrons_shared_data.labware.labware_definition import Parameters
-from opentrons.protocols.models import LabwareDefinition
-from opentrons.types import DeckSlotName
 
-from opentrons.protocol_engine.commands import Command
 from opentrons.protocol_engine.actions import (
-    SucceedCommandAction,
     AddAddressableAreaAction,
+    SucceedCommandAction,
 )
+from opentrons.protocol_engine.commands import Command
 from opentrons.protocol_engine.state import Config
 from opentrons.protocol_engine.state.addressable_areas import (
-    AddressableAreaStore,
     AddressableAreaState,
+    AddressableAreaStore,
 )
 from opentrons.protocol_engine.types import (
-    DeckType,
-    DeckConfigurationType,
-    ModuleModel,
-    LabwareMovementStrategy,
-    DeckSlotLocation,
     AddressableAreaLocation,
+    DeckConfigurationType,
+    DeckSlotLocation,
+    DeckType,
+    LabwareMovementStrategy,
+    ModuleModel,
 )
+from opentrons.protocols.models import LabwareDefinition
+from opentrons.types import DeckSlotName
 
 from .command_fixtures import (
     create_load_labware_command,

@@ -2,8 +2,8 @@ import hashlib
 import logging
 import os
 import shutil
-from typing import Generator, Optional, Dict, Any, TypedDict, List
 from dataclasses import dataclass
+from typing import Any, Dict, Generator, List, Optional, TypedDict
 
 from opentrons.config import CONFIG
 from opentrons.system import nmcli

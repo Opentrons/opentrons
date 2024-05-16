@@ -1,21 +1,21 @@
+import math
 from unittest.mock import MagicMock
 
-import math
 import pytest
 
 from opentrons.legacy_commands import types
 from opentrons.protocol_api import InstrumentContext
+from opentrons.protocol_api.core.legacy.deck import Deck
 from opentrons.protocols.duration.estimator import (
-    DurationEstimator,
     TEMP_MOD_HIGH_THRESH,
-    TEMP_MOD_RATE_HIGH_AND_ABOVE,
     TEMP_MOD_LOW_THRESH,
+    TEMP_MOD_RATE_HIGH_AND_ABOVE,
     TEMP_MOD_RATE_LOW_TO_HIGH,
     TEMP_MOD_RATE_ZERO_TO_LOW,
     THERMO_HIGH_THRESH,
     THERMO_LOW_THRESH,
+    DurationEstimator,
 )
-from opentrons.protocol_api.core.legacy.deck import Deck
 from opentrons.types import Location, Point
 
 

@@ -1,6 +1,14 @@
 import pytest
 
-from opentrons.types import Location, Point
+from opentrons.hardware_control.modules.types import (
+    MagneticModuleModel,
+    TemperatureModuleModel,
+    ThermocyclerModuleModel,
+)
+from opentrons.hardware_control.types import CriticalPoint
+from opentrons.protocol_api import labware
+from opentrons.protocol_api.core.legacy import module_geometry
+from opentrons.protocol_api.core.legacy.deck import Deck
 from opentrons.protocols.api_support.deck_type import (
     SHORT_TRASH_DECK,
     STANDARD_OT2_DECK,
@@ -10,15 +18,7 @@ from opentrons.protocols.geometry.planning import (
     safe_height,
     should_dodge_thermocycler,
 )
-from opentrons.protocol_api.core.legacy import module_geometry
-from opentrons.protocol_api.core.legacy.deck import Deck
-from opentrons.protocol_api import labware
-from opentrons.hardware_control.types import CriticalPoint
-from opentrons.hardware_control.modules.types import (
-    ThermocyclerModuleModel,
-    TemperatureModuleModel,
-    MagneticModuleModel,
-)
+from opentrons.types import Location, Point
 
 tall_lw_name = "opentrons_96_tiprack_1000ul"
 labware_name = "corning_96_wellplate_360ul_flat"

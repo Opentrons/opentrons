@@ -1,14 +1,12 @@
 """Tests for opentrons.protocols.geometry.deck_conflict."""
-from typing import ContextManager
 from contextlib import nullcontext
+from typing import ContextManager
 
 import pytest
-
 from opentrons_shared_data.labware.dev_types import LabwareUri
 from opentrons_shared_data.robot.dev_types import RobotType
 
 from opentrons.motion_planning import deck_conflict
-
 from opentrons.types import DeckSlotName, StagingSlotName
 
 

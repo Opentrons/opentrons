@@ -3,23 +3,21 @@ from datetime import datetime
 
 from decoy import Decoy, matchers
 
-from opentrons.types import MountType, Point
-
-from opentrons.protocol_engine import WellLocation, WellOffset, DeckPoint
+from opentrons.protocol_engine import DeckPoint, WellLocation, WellOffset
+from opentrons.protocol_engine.commands.command import DefinedErrorData, SuccessData
+from opentrons.protocol_engine.commands.pick_up_tip import (
+    PickUpTipImplementation,
+    PickUpTipParams,
+    PickUpTipResult,
+    TipPhysicallyMissingError,
+    TipPhysicallyMissingErrorInternalData,
+)
 from opentrons.protocol_engine.errors import TipNotAttachedError
 from opentrons.protocol_engine.execution import MovementHandler, TipHandler
 from opentrons.protocol_engine.resources import ModelUtils
 from opentrons.protocol_engine.state import StateView
 from opentrons.protocol_engine.types import TipGeometry
-
-from opentrons.protocol_engine.commands.command import DefinedErrorData, SuccessData
-from opentrons.protocol_engine.commands.pick_up_tip import (
-    PickUpTipParams,
-    PickUpTipResult,
-    PickUpTipImplementation,
-    TipPhysicallyMissingError,
-    TipPhysicallyMissingErrorInternalData,
-)
+from opentrons.types import MountType, Point
 
 
 async def test_success(

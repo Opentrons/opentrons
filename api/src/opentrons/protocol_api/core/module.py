@@ -2,19 +2,19 @@
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
-from typing import List, Optional, TypeVar, ClassVar
+from typing import ClassVar, List, Optional, TypeVar
 
 from opentrons.drivers.types import (
     HeaterShakerLabwareLatchStatus,
     ThermocyclerLidStatus,
 )
 from opentrons.hardware_control.modules.types import (
+    MagneticStatus,
     ModuleModel,
     ModuleType,
+    SpeedStatus,
     TemperatureStatus,
     ThermocyclerStep,
-    MagneticStatus,
-    SpeedStatus,
 )
 from opentrons.types import DeckSlotName
 

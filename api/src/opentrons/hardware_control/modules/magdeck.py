@@ -1,14 +1,16 @@
 import asyncio
 import logging
 from typing import Mapping, Optional
+
 from opentrons.drivers.mag_deck import (
-    SimulatingDriver,
-    MagDeckDriver,
     AbstractMagDeckDriver,
+    MagDeckDriver,
+    SimulatingDriver,
 )
 from opentrons.drivers.rpi_drivers.types import USBPort
+
 from ..execution_manager import ExecutionManager
-from . import update, mod_abc, types
+from . import mod_abc, types, update
 
 log = logging.getLogger(__name__)
 

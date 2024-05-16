@@ -1,19 +1,17 @@
 """Move to addressable area for drop tip command request, result, and implementation models."""
 from __future__ import annotations
-from pydantic import Field
+
 from typing import TYPE_CHECKING, Optional, Type
+
+from pydantic import Field
 from typing_extensions import Literal
 
 from ..errors import LocationNotAccessibleByPipetteError
-from ..types import DeckPoint, AddressableOffsetVector
-from ..resources import fixture_validation
-from .pipetting_common import (
-    PipetteIdMixin,
-    MovementMixin,
-    DestinationPositionResult,
-)
-from .command import AbstractCommandImpl, BaseCommand, BaseCommandCreate, SuccessData
 from ..errors.error_occurrence import ErrorOccurrence
+from ..resources import fixture_validation
+from ..types import AddressableOffsetVector, DeckPoint
+from .command import AbstractCommandImpl, BaseCommand, BaseCommandCreate, SuccessData
+from .pipetting_common import DestinationPositionResult, MovementMixin, PipetteIdMixin
 
 if TYPE_CHECKING:
     from ..execution import MovementHandler

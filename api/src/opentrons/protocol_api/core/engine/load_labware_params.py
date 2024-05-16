@@ -1,8 +1,7 @@
-from typing import Dict, Tuple, List, Optional
+from typing import Dict, List, Optional, Tuple
 
-from opentrons.protocols.api_support.constants import OPENTRONS_NAMESPACE
 from opentrons.protocol_engine.state.labware import LabwareLoadParams
-
+from opentrons.protocols.api_support.constants import OPENTRONS_NAMESPACE
 
 # Default versions of Opentrons standard labware definitions in Python Protocol API
 # v2.14 and above. Labware not explicitly listed here default to 1.

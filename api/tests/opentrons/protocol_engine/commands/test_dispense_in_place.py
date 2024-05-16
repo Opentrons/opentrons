@@ -1,14 +1,13 @@
 """Test dispense-in-place commands."""
 from decoy import Decoy
 
-from opentrons.protocol_engine.execution import PipettingHandler
-
 from opentrons.protocol_engine.commands.command import SuccessData
 from opentrons.protocol_engine.commands.dispense_in_place import (
+    DispenseInPlaceImplementation,
     DispenseInPlaceParams,
     DispenseInPlaceResult,
-    DispenseInPlaceImplementation,
 )
+from opentrons.protocol_engine.execution import PipettingHandler
 
 
 async def test_dispense_in_place_implementation(

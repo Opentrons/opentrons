@@ -1,27 +1,27 @@
 """Translation of JSON protocol commands into ProtocolEngine commands."""
-from typing import cast, List, Union
-from pydantic import parse_obj_as
+from typing import List, Union, cast
 
+from opentrons_shared_data import command as command_schema
 from opentrons_shared_data.pipette.dev_types import PipetteNameType
 from opentrons_shared_data.protocol.models import (
     ProtocolSchemaV6,
-    protocol_schema_v6,
     ProtocolSchemaV7,
-    protocol_schema_v7,
     ProtocolSchemaV8,
+    protocol_schema_v6,
+    protocol_schema_v7,
     protocol_schema_v8,
 )
-from opentrons_shared_data import command as command_schema
+from pydantic import parse_obj_as
 
-from opentrons.types import MountType
 from opentrons.protocol_engine import (
-    commands as pe_commands,
-    LabwareLocation,
-    ModuleModel,
     DeckSlotLocation,
+    LabwareLocation,
     Liquid,
+    ModuleModel,
 )
+from opentrons.protocol_engine import commands as pe_commands
 from opentrons.protocol_engine.types import HexColor
+from opentrons.types import MountType
 
 
 class CommandTranslatorError(Exception):

@@ -4,27 +4,28 @@ from typing import cast
 
 import pytest
 from decoy import Decoy
-
 from opentrons_shared_data.labware.dev_types import LabwareDefinition as LabwareDefDict
 
-from opentrons.protocols.api_support.types import APIVersion
-from opentrons.protocols.api_support.util import APIVersionError
-from opentrons.protocol_api import MAX_SUPPORTED_VERSION, Labware, Well
+from opentrons.protocol_api import (
+    MAX_SUPPORTED_VERSION,
+    Labware,
+    TemperatureModuleContext,
+    Well,
+)
 from opentrons.protocol_api.core import well_grid
 from opentrons.protocol_api.core.common import (
     LabwareCore,
-    WellCore,
-    ProtocolCore,
     ModuleCore,
+    ProtocolCore,
+    WellCore,
 )
-
-from opentrons.protocol_api.core.labware import LabwareLoadParams
 from opentrons.protocol_api.core.core_map import LoadedCoreMap
-from opentrons.protocol_api import TemperatureModuleContext
-
+from opentrons.protocol_api.core.labware import LabwareLoadParams
+from opentrons.protocols.api_support.types import APIVersion
+from opentrons.protocols.api_support.util import APIVersionError
 from opentrons.types import Point
 
-from . import versions_at_or_below, versions_at_or_above, versions_between
+from . import versions_at_or_above, versions_at_or_below, versions_between
 
 
 @pytest.fixture(autouse=True)

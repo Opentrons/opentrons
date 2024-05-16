@@ -1,12 +1,12 @@
 from __future__ import annotations
+
 from typing import TYPE_CHECKING, List, Union, overload
 
-
-from .helpers import stringify_location, stringify_disposal_location, listify
-from . import types as command_types
-
-from opentrons.types import Location
 from opentrons.protocol_api.disposal_locations import TrashBin, WasteChute
+from opentrons.types import Location
+
+from . import types as command_types
+from .helpers import listify, stringify_disposal_location, stringify_location
 
 if TYPE_CHECKING:
     from opentrons.protocol_api import InstrumentContext

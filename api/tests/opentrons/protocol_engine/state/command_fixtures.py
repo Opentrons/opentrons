@@ -1,23 +1,25 @@
 """Command factories to use in tests as data fixtures."""
 from datetime import datetime
-from pydantic import BaseModel
 from typing import Optional, cast
 
 from opentrons_shared_data.pipette.dev_types import PipetteNameType
-from opentrons.types import MountType
-from opentrons.protocols.models import LabwareDefinition
-from opentrons.protocol_engine import ErrorOccurrence, commands as cmd
+from pydantic import BaseModel
+
+from opentrons.protocol_engine import ErrorOccurrence
+from opentrons.protocol_engine import commands as cmd
 from opentrons.protocol_engine.types import (
+    AddressableOffsetVector,
     DeckPoint,
-    ModuleModel,
+    DeckSlotLocation,
+    LabwareLocation,
+    LabwareMovementStrategy,
     ModuleDefinition,
+    ModuleModel,
     MovementAxis,
     WellLocation,
-    LabwareLocation,
-    DeckSlotLocation,
-    LabwareMovementStrategy,
-    AddressableOffsetVector,
 )
+from opentrons.protocols.models import LabwareDefinition
+from opentrons.types import MountType
 
 
 def create_queued_command(

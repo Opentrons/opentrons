@@ -22,9 +22,9 @@ from opentrons_shared_data.robot.dev_types import RobotType
 from . import commands
 from .types import (
     OFF_DECK_LOCATION,
+    AddressableAreaLocation,
     DeckSlotLocation,
     LabwareLocation,
-    AddressableAreaLocation,
     LabwareOffsetCreate,
     ModuleLocation,
     OnLabwareLocation,

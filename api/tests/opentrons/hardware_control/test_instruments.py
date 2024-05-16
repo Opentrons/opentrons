@@ -1,9 +1,9 @@
 import asyncio
-import mock
+from typing import Iterator
 
+import mock
 import pytest
 from decoy import Decoy
-from typing import Iterator
 
 try:
     import aionotify
@@ -11,11 +11,11 @@ except (OSError, ModuleNotFoundError):
     aionotify = None  # type: ignore
 
 
-from opentrons import types
-from opentrons.hardware_control import API
-from opentrons.hardware_control.types import Axis, OT3Mount, HardwareFeatureFlags
 from opentrons_shared_data.errors.exceptions import CommandPreconditionViolated
 
+from opentrons import types
+from opentrons.hardware_control import API
+from opentrons.hardware_control.types import Axis, HardwareFeatureFlags, OT3Mount
 
 LEFT_PIPETTE_PREFIX = "p10_single"
 LEFT_PIPETTE_MODEL = "{}_v1".format(LEFT_PIPETTE_PREFIX)

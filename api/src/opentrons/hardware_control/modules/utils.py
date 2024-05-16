@@ -5,15 +5,13 @@ from typing import Dict, Optional, Type
 from opentrons.drivers.rpi_drivers.types import USBPort
 
 from ..execution_manager import ExecutionManager
-
-from .types import ModuleType, SpeedStatus
+from .absorbance_reader import AbsorbanceReader
+from .heater_shaker import HeaterShaker
+from .magdeck import MagDeck
 from .mod_abc import AbstractModule
 from .tempdeck import TempDeck
-from .magdeck import MagDeck
 from .thermocycler import Thermocycler
-from .heater_shaker import HeaterShaker
-from .absorbance_reader import AbsorbanceReader
-
+from .types import ModuleType, SpeedStatus
 
 log = logging.getLogger(__name__)
 

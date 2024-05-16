@@ -6,13 +6,13 @@ from opentrons.drivers.types import HeaterShakerLabwareLatchStatus
 from opentrons.hardware_control import SynchronousAdapter
 from opentrons.hardware_control.modules import HeaterShaker
 from opentrons.hardware_control.modules.types import (
-    TemperatureStatus,
-    SpeedStatus,
     ModuleType,
+    SpeedStatus,
+    TemperatureStatus,
 )
-from opentrons.protocol_engine.clients import SyncClient as EngineClient
-from opentrons.protocol_api.core.engine.module_core import HeaterShakerModuleCore
 from opentrons.protocol_api import MAX_SUPPORTED_VERSION
+from opentrons.protocol_api.core.engine.module_core import HeaterShakerModuleCore
+from opentrons.protocol_engine.clients import SyncClient as EngineClient
 
 SyncHeaterShakerHardware = SynchronousAdapter[HeaterShaker]
 

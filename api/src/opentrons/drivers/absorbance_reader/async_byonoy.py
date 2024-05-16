@@ -4,17 +4,18 @@ import asyncio
 import re
 from concurrent.futures.thread import ThreadPoolExecutor
 from functools import partial
-from typing import Optional, List, Dict
+from typing import Dict, List, Optional
+
 import usb.core as usb_core  # type: ignore[import-untyped]
 
-
-from .hid_protocol import AbsorbanceHidInterface as AbsProtocol, ErrorCodeNames
+from opentrons.drivers.rpi_drivers.types import USBPort
 from opentrons.drivers.types import (
     AbsorbanceReaderLidStatus,
     AbsorbanceReaderPlatePresence,
 )
-from opentrons.drivers.rpi_drivers.types import USBPort
 
+from .hid_protocol import AbsorbanceHidInterface as AbsProtocol
+from .hid_protocol import ErrorCodeNames
 
 SN_PARSER = re.compile(r'ATTRS{serial}=="(?P<serial>.+?)"')
 

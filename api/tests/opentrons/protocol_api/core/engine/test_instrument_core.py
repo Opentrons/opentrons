@@ -1,47 +1,46 @@
 """Test for the ProtocolEngine-based instrument API core."""
-from typing import cast, Optional, Union
+from typing import Optional, Union, cast
 
 import pytest
 from decoy import Decoy
-
 from opentrons_shared_data.pipette.dev_types import PipetteNameType
 
 from opentrons.hardware_control import SyncHardwareAPI
 from opentrons.hardware_control.dev_types import PipetteDict
 from opentrons.hardware_control.nozzle_manager import NozzleConfigurationType
+from opentrons.protocol_api._nozzle_layout import NozzleLayout
+from opentrons.protocol_api.core.engine import (
+    InstrumentCore,
+    ProtocolCore,
+    WellCore,
+    deck_conflict,
+)
+from opentrons.protocol_api.disposal_locations import (
+    DisposalOffset,
+    TrashBin,
+    WasteChute,
+)
 from opentrons.protocol_engine import (
     DeckPoint,
+    DropTipWellLocation,
+    DropTipWellOrigin,
     LoadedPipette,
     MotorAxis,
     WellLocation,
     WellOffset,
     WellOrigin,
-    DropTipWellLocation,
-    DropTipWellOrigin,
 )
+from opentrons.protocol_engine.clients import SyncClient as EngineClient
 from opentrons.protocol_engine.clients.sync_client import SyncClient
 from opentrons.protocol_engine.errors.exceptions import TipNotAttachedError
-from opentrons.protocol_engine.clients import SyncClient as EngineClient
 from opentrons.protocol_engine.types import (
+    AddressableOffsetVector,
+    ColumnNozzleLayoutConfiguration,
     FlowRates,
-    TipGeometry,
     NozzleLayoutConfigurationType,
     RowNozzleLayoutConfiguration,
     SingleNozzleLayoutConfiguration,
-    ColumnNozzleLayoutConfiguration,
-    AddressableOffsetVector,
-)
-from opentrons.protocol_api.disposal_locations import (
-    TrashBin,
-    WasteChute,
-    DisposalOffset,
-)
-from opentrons.protocol_api._nozzle_layout import NozzleLayout
-from opentrons.protocol_api.core.engine import (
-    InstrumentCore,
-    WellCore,
-    ProtocolCore,
-    deck_conflict,
+    TipGeometry,
 )
 from opentrons.protocols.api_support.definitions import MAX_SUPPORTED_VERSION
 from opentrons.protocols.api_support.types import APIVersion

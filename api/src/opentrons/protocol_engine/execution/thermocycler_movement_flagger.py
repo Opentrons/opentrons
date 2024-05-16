@@ -6,9 +6,9 @@ from opentrons.drivers.types import ThermocyclerLidStatus
 from opentrons.hardware_control import HardwareControlAPI
 from opentrons.hardware_control.modules import Thermocycler as HardwareThermocycler
 
-from ..types import ModuleLocation, LabwareLocation
-from ..state import StateStore
 from ..errors import ThermocyclerNotOpenError, WrongModuleTypeError
+from ..state import StateStore
+from ..types import LabwareLocation, ModuleLocation
 
 
 class ThermocyclerMovementFlagger:

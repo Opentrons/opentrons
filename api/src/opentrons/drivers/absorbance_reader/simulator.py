@@ -1,7 +1,7 @@
 from typing import Dict, List, Optional
-from opentrons.util.async_helpers import ensure_yield
 
 from opentrons.drivers.types import AbsorbanceReaderLidStatus
+from opentrons.util.async_helpers import ensure_yield
 
 from .abstract import AbstractAbsorbanceReaderDriver
 

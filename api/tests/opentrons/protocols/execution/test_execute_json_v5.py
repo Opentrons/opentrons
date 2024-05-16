@@ -1,10 +1,10 @@
 from unittest import mock
 
+from opentrons.protocol_api import MAX_SUPPORTED_VERSION, InstrumentContext, labware
 from opentrons.protocol_api.core.legacy.legacy_well_core import LegacyWellCore
 from opentrons.protocol_api.core.legacy.well_geometry import WellGeometry
-from opentrons.types import Point
-from opentrons.protocol_api import InstrumentContext, labware, MAX_SUPPORTED_VERSION
 from opentrons.protocols.execution.execute_json_v5 import _move_to_well
+from opentrons.types import Point
 
 
 def test_move_to_well_with_optional_params():

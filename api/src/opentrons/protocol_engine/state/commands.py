@@ -5,13 +5,12 @@ import enum
 from dataclasses import dataclass
 from datetime import datetime
 from typing import Dict, List, Optional, Union
-from typing_extensions import assert_never
 
 from opentrons_shared_data.errors import EnumeratedError, ErrorCodes, PythonException
-
-from opentrons.ordered_set import OrderedSet
+from typing_extensions import assert_never
 
 from opentrons.hardware_control.types import DoorState
+from opentrons.ordered_set import OrderedSet
 from opentrons.protocol_engine.actions.actions import (
     ResumeFromRecoveryAction,
     RunCommandAction,
@@ -21,35 +20,31 @@ from opentrons.protocol_engine.notes.notes import CommandNote
 
 from ..actions import (
     Action,
-    QueueCommandAction,
-    SucceedCommandAction,
+    DoorChangeAction,
     FailCommandAction,
-    PlayAction,
-    PauseAction,
-    StopAction,
     FinishAction,
     HardwareStoppedAction,
-    DoorChangeAction,
+    PauseAction,
+    PlayAction,
+    QueueCommandAction,
+    StopAction,
+    SucceedCommandAction,
 )
-
-from ..commands import Command, CommandStatus, CommandIntent
+from ..commands import Command, CommandIntent, CommandStatus
 from ..errors import (
-    RunStoppedError,
     ErrorOccurrence,
-    RobotDoorOpenError,
-    SetupCommandNotAllowedError,
     FixitCommandNotAllowedError,
-    ResumeFromRecoveryNotAllowedError,
     PauseNotAllowedError,
-    UnexpectedProtocolError,
     ProtocolCommandFailedError,
+    ResumeFromRecoveryNotAllowedError,
+    RobotDoorOpenError,
+    RunStoppedError,
+    SetupCommandNotAllowedError,
+    UnexpectedProtocolError,
 )
 from ..types import EngineStatus
-from .abstract_store import HasState, HandlesActions
-from .command_history import (
-    CommandEntry,
-    CommandHistory,
-)
+from .abstract_store import HandlesActions, HasState
+from .command_history import CommandEntry, CommandHistory
 from .config import Config
 
 

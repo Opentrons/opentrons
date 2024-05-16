@@ -1,82 +1,84 @@
 """Test state getters for retrieving geometry views of state."""
 import inspect
-
 import json
+from datetime import datetime
+from typing import List, NamedTuple, Optional, Tuple, cast
+
 import pytest
 from decoy import Decoy
-from typing import cast, List, Tuple, Optional, NamedTuple
-from datetime import datetime
-
-from opentrons_shared_data.deck.dev_types import DeckDefinitionV5
+from opentrons_shared_data import load_shared_data
 from opentrons_shared_data.deck import load as load_deck
+from opentrons_shared_data.deck.dev_types import DeckDefinitionV5
 from opentrons_shared_data.labware.dev_types import LabwareUri
-from opentrons_shared_data.pipette import pipette_definition
-from opentrons.calibration_storage.helpers import uri_from_details
-from opentrons.protocols.models import LabwareDefinition
-from opentrons.types import Point, DeckSlotName, MountType
-from opentrons_shared_data.pipette.dev_types import PipetteNameType
+from opentrons_shared_data.labware.labware_definition import CornerOffsetFromSlot
 from opentrons_shared_data.labware.labware_definition import (
     Dimensions as LabwareDimensions,
+)
+from opentrons_shared_data.labware.labware_definition import (
     Parameters as LabwareDefinitionParameters,
-    CornerOffsetFromSlot,
 )
-from opentrons_shared_data import load_shared_data
+from opentrons_shared_data.pipette import pipette_definition
+from opentrons_shared_data.pipette.dev_types import PipetteNameType
 
+from opentrons.calibration_storage.helpers import uri_from_details
 from opentrons.protocol_engine import errors
-from opentrons.protocol_engine.types import (
-    OFF_DECK_LOCATION,
-    LabwareOffsetVector,
-    DeckSlotLocation,
-    ModuleLocation,
-    OnLabwareLocation,
-    AddressableAreaLocation,
-    ModuleOffsetVector,
-    ModuleOffsetData,
-    LoadedLabware,
-    LoadedModule,
-    ModuleModel,
-    WellLocation,
-    WellOrigin,
-    DropTipWellLocation,
-    DropTipWellOrigin,
-    WellOffset,
-    Dimensions,
-    OverlapOffset,
-    DeckType,
-    CurrentWell,
-    CurrentAddressableArea,
-    CurrentPipetteLocation,
-    LabwareMovementOffsetData,
-    LoadedPipette,
-    TipGeometry,
-    ModuleDefinition,
-)
+from opentrons.protocol_engine.actions import SucceedCommandAction
 from opentrons.protocol_engine.commands import (
     CommandStatus,
-    LoadLabwareResult,
     LoadLabware,
     LoadLabwareParams,
-    LoadModuleResult,
+    LoadLabwareResult,
     LoadModule,
     LoadModuleParams,
+    LoadModuleResult,
 )
-from opentrons.protocol_engine.actions import SucceedCommandAction
 from opentrons.protocol_engine.state import move_types
+from opentrons.protocol_engine.state.addressable_areas import (
+    AddressableAreaStore,
+    AddressableAreaView,
+)
 from opentrons.protocol_engine.state.config import Config
-from opentrons.protocol_engine.state.labware import LabwareView, LabwareStore
-from opentrons.protocol_engine.state.modules import ModuleView, ModuleStore
+from opentrons.protocol_engine.state.geometry import GeometryView, _GripperMoveType
+from opentrons.protocol_engine.state.labware import LabwareStore, LabwareView
+from opentrons.protocol_engine.state.modules import ModuleStore, ModuleView
 from opentrons.protocol_engine.state.pipettes import (
-    PipetteView,
-    PipetteStore,
-    StaticPipetteConfig,
     BoundingNozzlesOffsets,
     PipetteBoundingBoxOffsets,
+    PipetteStore,
+    PipetteView,
+    StaticPipetteConfig,
 )
-from opentrons.protocol_engine.state.addressable_areas import (
-    AddressableAreaView,
-    AddressableAreaStore,
+from opentrons.protocol_engine.types import (
+    OFF_DECK_LOCATION,
+    AddressableAreaLocation,
+    CurrentAddressableArea,
+    CurrentPipetteLocation,
+    CurrentWell,
+    DeckSlotLocation,
+    DeckType,
+    Dimensions,
+    DropTipWellLocation,
+    DropTipWellOrigin,
+    LabwareMovementOffsetData,
+    LabwareOffsetVector,
+    LoadedLabware,
+    LoadedModule,
+    LoadedPipette,
+    ModuleDefinition,
+    ModuleLocation,
+    ModuleModel,
+    ModuleOffsetData,
+    ModuleOffsetVector,
+    OnLabwareLocation,
+    OverlapOffset,
+    TipGeometry,
+    WellLocation,
+    WellOffset,
+    WellOrigin,
 )
-from opentrons.protocol_engine.state.geometry import GeometryView, _GripperMoveType
+from opentrons.protocols.models import LabwareDefinition
+from opentrons.types import DeckSlotName, MountType, Point
+
 from ..pipette_fixtures import get_default_nozzle_map
 
 

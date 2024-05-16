@@ -2,13 +2,16 @@ import json
 import logging
 import os
 from pathlib import Path
+from typing import Any, Dict, List, Optional, Union, cast
 
-from typing import Any, Dict, List, Union, Optional, cast
 from typing_extensions import Literal
 
-from . import CONFIG, defaults_ot3, defaults_ot2, gripper_config, feature_flags as ff
 from opentrons.hardware_control.types import BoardRevision
-from .types import CurrentDict, RobotConfig, AxisDict, OT3Config
+
+from . import CONFIG, defaults_ot2, defaults_ot3
+from . import feature_flags as ff
+from . import gripper_config
+from .types import AxisDict, CurrentDict, OT3Config, RobotConfig
 
 log = logging.getLogger(__name__)
 

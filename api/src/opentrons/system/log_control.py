@@ -9,7 +9,6 @@ import logging
 import subprocess
 from typing import List
 
-
 LOG = logging.getLogger(__name__)
 
 MAX_RECORDS = 100000

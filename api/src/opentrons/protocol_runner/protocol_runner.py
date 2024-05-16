@@ -1,48 +1,43 @@
 """Protocol run control and management."""
 import asyncio
-from typing import List, NamedTuple, Optional, Union
-
 from abc import ABC, abstractmethod
+from typing import List, NamedTuple, Optional, Union
 
 import anyio
 
-from opentrons.hardware_control import HardwareControlAPI
 from opentrons import protocol_reader
+from opentrons.hardware_control import HardwareControlAPI
 from opentrons.legacy_broker import LegacyBroker
 from opentrons.protocol_api import ParameterContext
 from opentrons.protocol_api.core.legacy.load_info import LoadInfo
+from opentrons.protocol_engine import Command, ProtocolEngine, StateSummary
+from opentrons.protocol_engine import commands as pe_commands
 from opentrons.protocol_reader import (
-    ProtocolSource,
     JsonProtocolConfig,
+    ProtocolSource,
     PythonProtocolConfig,
-)
-from opentrons.protocol_engine import (
-    ProtocolEngine,
-    StateSummary,
-    Command,
-    commands as pe_commands,
 )
 from opentrons.protocols.parse import PythonParseMode
 from opentrons.util.broker import Broker
 
-from .task_queue import TaskQueue
+from ..protocol_engine.errors import ProtocolCommandFailedError
+from ..protocol_engine.types import (
+    DeckConfigurationType,
+    PostRunHardwareState,
+    RunTimeParameter,
+    RunTimeParamValuesType,
+)
 from .json_file_reader import JsonFileReader
 from .json_translator import JsonTranslator
 from .legacy_context_plugin import LegacyContextPlugin
 from .python_protocol_wrappers import (
-    LEGACY_PYTHON_API_VERSION_CUTOFF,
     LEGACY_JSON_SCHEMA_VERSION_CUTOFF,
-    PythonAndLegacyFileReader,
+    LEGACY_PYTHON_API_VERSION_CUTOFF,
     ProtocolContextCreator,
+    PythonAndLegacyFileReader,
     PythonProtocolExecutor,
 )
-from ..protocol_engine.errors import ProtocolCommandFailedError
-from ..protocol_engine.types import (
-    PostRunHardwareState,
-    DeckConfigurationType,
-    RunTimeParameter,
-    RunTimeParamValuesType,
-)
+from .task_queue import TaskQueue
 
 
 class RunResult(NamedTuple):

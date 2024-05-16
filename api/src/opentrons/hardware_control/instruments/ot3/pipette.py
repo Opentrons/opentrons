@@ -1,53 +1,51 @@
-import logging
 import functools
-
+import logging
 from typing import Any, Dict, Optional, Set, Tuple, Union, cast
 
-from opentrons.types import Point
-
-from opentrons_shared_data.pipette.pipette_definition import (
-    PipetteConfigurations,
-    PlungerPositions,
-    MotorConfigurations,
-    SupportedTipsDefinition,
-    PickUpTipConfigurations,
-    PressFitPickUpTipConfiguration,
-    CamActionPickUpTipConfiguration,
-    DropTipConfigurations,
-    PlungerHomingConfigurations,
-    PipetteNameType,
-    PipetteModelVersionType,
-    PipetteLiquidPropertiesDefinition,
-    default_tip_for_liquid_class,
-)
 from opentrons_shared_data.errors.exceptions import (
-    InvalidLiquidClassName,
     CommandPreconditionViolated,
+    InvalidLiquidClassName,
     PythonException,
 )
+from opentrons_shared_data.pipette import load_data as load_pipette_data
+from opentrons_shared_data.pipette import types as pip_types
+from opentrons_shared_data.pipette.dev_types import (
+    PipetteModel,
+    PipetteName,
+    UlPerMmAction,
+)
+from opentrons_shared_data.pipette.pipette_definition import (
+    CamActionPickUpTipConfiguration,
+    DropTipConfigurations,
+    MotorConfigurations,
+    PickUpTipConfigurations,
+    PipetteConfigurations,
+    PipetteLiquidPropertiesDefinition,
+    PipetteModelVersionType,
+    PipetteNameType,
+    PlungerHomingConfigurations,
+    PlungerPositions,
+    PressFitPickUpTipConfiguration,
+    SupportedTipsDefinition,
+    default_tip_for_liquid_class,
+)
 from opentrons_shared_data.pipette.ul_per_mm import (
-    piecewise_volume_conversion,
     PIPETTING_FUNCTION_FALLBACK_VERSION,
     PIPETTING_FUNCTION_LATEST_VERSION,
+    piecewise_volume_conversion,
 )
+
+from opentrons.hardware_control import nozzle_manager
+from opentrons.hardware_control.errors import InvalidCriticalPoint
+from opentrons.hardware_control.types import CriticalPoint, OT3Mount
+from opentrons.types import Point
+
 from ..instrument_abc import AbstractInstrument
 from .instrument_calibration import (
-    save_pipette_offset_calibration,
-    load_pipette_offset,
     PipetteOffsetByPipetteMount,
+    load_pipette_offset,
+    save_pipette_offset_calibration,
 )
-from opentrons_shared_data.pipette.dev_types import (
-    UlPerMmAction,
-    PipetteName,
-    PipetteModel,
-)
-from opentrons_shared_data.pipette import (
-    load_data as load_pipette_data,
-    types as pip_types,
-)
-from opentrons.hardware_control.types import CriticalPoint, OT3Mount
-from opentrons.hardware_control.errors import InvalidCriticalPoint
-from opentrons.hardware_control import nozzle_manager
 
 mod_log = logging.getLogger(__name__)
 

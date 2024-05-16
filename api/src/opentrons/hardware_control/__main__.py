@@ -11,12 +11,13 @@ _should_ only be run on an OT-2.
 import argparse
 import asyncio
 import logging
-from typing import Optional, Dict, Any
+from typing import Any, Dict, Optional
+
+from opentrons.config import robot_configs as rc
+from opentrons.config.types import RobotConfig
 
 from . import API
 from .types import HardwareFeatureFlags
-from opentrons.config import robot_configs as rc
-from opentrons.config.types import RobotConfig
 
 LOG = logging.getLogger("opentrons.hardware_control.__main__")
 

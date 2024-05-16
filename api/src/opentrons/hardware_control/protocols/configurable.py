@@ -1,8 +1,10 @@
-from typing import Dict, Any
+from typing import Any, Dict
+
 from typing_extensions import Protocol
 
-from .types import ConfigType
 from opentrons.hardware_control.types import HardwareFeatureFlags
+
+from .types import ConfigType
 
 
 class Configurable(Protocol[ConfigType]):

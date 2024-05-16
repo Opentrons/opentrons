@@ -1,27 +1,28 @@
 """Equipment command side-effect logic."""
 from dataclasses import dataclass
-from typing import Optional, overload, Union
+from typing import Optional, Union, overload
 
 from opentrons_shared_data.pipette.dev_types import PipetteNameType
 
 from opentrons.calibration_storage.helpers import uri_from_details
-from opentrons.protocols.models import LabwareDefinition
-from opentrons.types import MountType
 from opentrons.hardware_control import HardwareControlAPI
 from opentrons.hardware_control.modules import (
     AbstractModule,
-    MagDeck,
     HeaterShaker,
+    MagDeck,
     TempDeck,
     Thermocycler,
 )
 from opentrons.hardware_control.nozzle_manager import NozzleMap
 from opentrons.protocol_engine.state.module_substates import (
-    MagneticModuleId,
     HeaterShakerModuleId,
+    MagneticModuleId,
     TemperatureModuleId,
     ThermocyclerModuleId,
 )
+from opentrons.protocols.models import LabwareDefinition
+from opentrons.types import MountType
+
 from ..errors import (
     FailedToLoadPipetteError,
     LabwareDefinitionDoesNotExistError,
@@ -29,21 +30,21 @@ from ..errors import (
 )
 from ..resources import (
     LabwareDataProvider,
-    ModuleDataProvider,
     ModelUtils,
+    ModuleDataProvider,
     pipette_data_provider,
 )
-from ..state import StateStore, HardwareModule
+from ..state import HardwareModule, StateStore
 from ..types import (
-    LabwareLocation,
+    AddressableAreaLocation,
     DeckSlotLocation,
-    ModuleLocation,
-    OnLabwareLocation,
+    LabwareLocation,
     LabwareOffset,
     LabwareOffsetLocation,
-    ModuleModel,
     ModuleDefinition,
-    AddressableAreaLocation,
+    ModuleLocation,
+    ModuleModel,
+    OnLabwareLocation,
 )
 
 

@@ -3,18 +3,16 @@ import inspect
 
 import pytest
 from decoy import Decoy
-
 from opentrons_shared_data.labware.labware_definition import WellDefinition
 
 from opentrons.protocol_api import MAX_SUPPORTED_VERSION
-from opentrons.protocol_engine import WellLocation, WellOrigin, WellOffset
+from opentrons.protocol_api._liquid import Liquid
+from opentrons.protocol_api.core.engine import WellCore, point_calculations, stringify
+from opentrons.protocol_engine import WellLocation, WellOffset, WellOrigin
 from opentrons.protocol_engine.clients import SyncClient as EngineClient
 from opentrons.protocols.api_support.types import APIVersion
 from opentrons.protocols.api_support.util import APIVersionError
 from opentrons.types import Point
-
-from opentrons.protocol_api._liquid import Liquid
-from opentrons.protocol_api.core.engine import WellCore, point_calculations, stringify
 
 
 @pytest.fixture(autouse=True)

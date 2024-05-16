@@ -3,30 +3,29 @@ from typing_extensions import Protocol, Type
 
 from opentrons.hardware_control.types import Axis
 
-from .module_provider import ModuleProvider
-from .hardware_manager import HardwareManager
-from .chassis_accessory_manager import ChassisAccessoryManager
-from .event_sourcer import EventSourcer
-from .liquid_handler import LiquidHandler
-from .calibratable import Calibratable
-from .configurable import Configurable
-from .motion_controller import MotionController
-from .instrument_configurer import InstrumentConfigurer
-from .execution_controllable import ExecutionControllable
 from .asyncio_configurable import AsyncioConfigurable
-from .stoppable import Stoppable
-from .simulatable import Simulatable
-from .identifiable import Identifiable
-from .gripper_controller import GripperController
+from .calibratable import Calibratable
+from .chassis_accessory_manager import ChassisAccessoryManager
+from .configurable import Configurable
+from .event_sourcer import EventSourcer
+from .execution_controllable import ExecutionControllable
 from .flex_calibratable import FlexCalibratable
 from .flex_instrument_configurer import FlexInstrumentConfigurer
-
+from .gripper_controller import GripperController
+from .hardware_manager import HardwareManager
+from .identifiable import Identifiable
+from .instrument_configurer import InstrumentConfigurer
+from .liquid_handler import LiquidHandler
+from .module_provider import ModuleProvider
+from .motion_controller import MotionController
+from .simulatable import Simulatable
+from .stoppable import Stoppable
 from .types import (
     CalibrationType,
-    MountArgType,
     ConfigType,
-    OT2RobotType,
     FlexRobotType,
+    MountArgType,
+    OT2RobotType,
 )
 
 

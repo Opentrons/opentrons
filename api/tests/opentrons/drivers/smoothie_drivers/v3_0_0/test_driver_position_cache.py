@@ -1,7 +1,8 @@
 import pytest
-from opentrons.drivers.smoothie_drivers import SmoothieDriver
 
-from opentrons.drivers.smoothie_drivers.constants import AXES, HOMED_POSITION as HP
+from opentrons.drivers.smoothie_drivers import SmoothieDriver
+from opentrons.drivers.smoothie_drivers.constants import AXES
+from opentrons.drivers.smoothie_drivers.constants import HOMED_POSITION as HP
 
 POSITION_ON_BOOT = {axis: 0 for axis in AXES}
 

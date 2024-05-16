@@ -2,12 +2,12 @@
 import pytest
 from decoy import Decoy
 
-from opentrons.protocol_engine.commands.command import SuccessData
 from opentrons.protocol_engine.commands import (
-    LoadLiquidResult,
     LoadLiquidImplementation,
     LoadLiquidParams,
+    LoadLiquidResult,
 )
+from opentrons.protocol_engine.commands.command import SuccessData
 from opentrons.protocol_engine.state import StateView
 
 

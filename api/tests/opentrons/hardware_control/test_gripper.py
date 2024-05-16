@@ -1,13 +1,14 @@
-from typing import Optional, Callable, TYPE_CHECKING
-import pytest
+from typing import TYPE_CHECKING, Callable, Optional
 
-from opentrons.types import Point
+import pytest
+from opentrons_shared_data.errors.exceptions import MotionFailedError
+from opentrons_shared_data.gripper import GripperModel
+
 from opentrons.calibration_storage import types as cal_types
+from opentrons.config import gripper_config
 from opentrons.hardware_control.instruments.ot3 import gripper, instrument_calibration
 from opentrons.hardware_control.types import CriticalPoint
-from opentrons.config import gripper_config
-from opentrons_shared_data.gripper import GripperModel
-from opentrons_shared_data.errors.exceptions import MotionFailedError
+from opentrons.types import Point
 
 if TYPE_CHECKING:
     from opentrons.hardware_control.instruments.ot3.instrument_calibration import (

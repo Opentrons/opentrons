@@ -1,9 +1,9 @@
 """Common configuration command base models."""
 
 from dataclasses import dataclass
-from opentrons.hardware_control.nozzle_manager import (
-    NozzleMap,
-)
+
+from opentrons.hardware_control.nozzle_manager import NozzleMap
+
 from ..resources import pipette_data_provider
 
 

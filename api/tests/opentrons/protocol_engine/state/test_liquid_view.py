@@ -1,9 +1,9 @@
 """Liquid view tests."""
 import pytest
 
-from opentrons.protocol_engine.state.liquids import LiquidState, LiquidView
 from opentrons.protocol_engine import Liquid
 from opentrons.protocol_engine.errors import LiquidDoesNotExistError
+from opentrons.protocol_engine.state.liquids import LiquidState, LiquidView
 
 
 @pytest.fixture

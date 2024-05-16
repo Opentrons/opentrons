@@ -1,43 +1,42 @@
 """Test load module command."""
-import pytest
 from typing import cast
+
+import pytest
 from decoy import Decoy
-
-from opentrons.protocol_engine.errors import LocationIsOccupiedError
-from opentrons.protocol_engine.state import StateView
+from opentrons_shared_data.deck import load as load_deck
+from opentrons_shared_data.deck.dev_types import DeckDefinitionV5, SlotDefV3
 from opentrons_shared_data.robot.dev_types import RobotType
-from opentrons.types import DeckSlotName
-from opentrons.protocol_engine.types import (
-    DeckSlotLocation,
-    ModuleModel,
-    ModuleDefinition,
-)
-from opentrons.protocol_engine.execution import EquipmentHandler, LoadedModuleData
-from opentrons.protocol_engine import ModuleModel as EngineModuleModel
-from opentrons.hardware_control.modules import ModuleType
 
+from opentrons.hardware_control.modules import ModuleType
+from opentrons.hardware_control.modules.types import (
+    HeaterShakerModuleModel,
+    MagneticModuleModel,
+)
+from opentrons.hardware_control.modules.types import ModuleModel as HardwareModuleModel
+from opentrons.hardware_control.modules.types import (
+    TemperatureModuleModel,
+    ThermocyclerModuleModel,
+)
+from opentrons.protocol_engine import ModuleModel as EngineModuleModel
 from opentrons.protocol_engine.commands.command import SuccessData
 from opentrons.protocol_engine.commands.load_module import (
+    LoadModuleImplementation,
     LoadModuleParams,
     LoadModuleResult,
-    LoadModuleImplementation,
 )
-from opentrons.hardware_control.modules.types import (
-    ModuleModel as HardwareModuleModel,
-    TemperatureModuleModel,
-    MagneticModuleModel,
-    ThermocyclerModuleModel,
-    HeaterShakerModuleModel,
+from opentrons.protocol_engine.errors import LocationIsOccupiedError
+from opentrons.protocol_engine.execution import EquipmentHandler, LoadedModuleData
+from opentrons.protocol_engine.state import StateView
+from opentrons.protocol_engine.types import (
+    DeckSlotLocation,
+    ModuleDefinition,
+    ModuleModel,
 )
-from opentrons_shared_data.deck.dev_types import (
-    DeckDefinitionV5,
-    SlotDefV3,
-)
-from opentrons_shared_data.deck import load as load_deck
 from opentrons.protocols.api_support.deck_type import (
     STANDARD_OT2_DECK,
     STANDARD_OT3_DECK,
 )
+from opentrons.types import DeckSlotName
 
 
 async def test_load_module_implementation(

@@ -3,17 +3,17 @@ import os
 import shutil
 from enum import Enum
 from pathlib import Path
-from typing import NamedTuple, Dict, Set
+from typing import Dict, NamedTuple, Set
 
 from opentrons_shared_data.robot.dev_types import RobotTypeEnum
-from opentrons.config import IS_ROBOT
+
 from opentrons.calibration_storage import (
     delete_robot_deck_attitude,
     gripper_offset,
     ot2,
     ot3,
 )
-
+from opentrons.config import IS_ROBOT
 
 DATA_BOOT_D = Path("/data/boot.d")
 AUTHORIZED_KEYS = Path(os.path.expanduser("~/.ssh/authorized_keys"))

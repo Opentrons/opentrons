@@ -1,29 +1,28 @@
 """Labware state store tests."""
-import pytest
-
 from datetime import datetime
 
-from opentrons.calibration_storage.helpers import uri_from_details
+import pytest
 from opentrons_shared_data.deck.dev_types import DeckDefinitionV5
-from opentrons.protocols.models import LabwareDefinition
-from opentrons.types import DeckSlotName
 
-from opentrons.protocol_engine.types import (
-    LabwareOffset,
-    LabwareOffsetCreate,
-    LabwareOffsetVector,
-    LabwareOffsetLocation,
-    DeckSlotLocation,
-    LoadedLabware,
-    OFF_DECK_LOCATION,
-    LabwareMovementStrategy,
-)
+from opentrons.calibration_storage.helpers import uri_from_details
 from opentrons.protocol_engine.actions import (
-    AddLabwareOffsetAction,
     AddLabwareDefinitionAction,
+    AddLabwareOffsetAction,
     SucceedCommandAction,
 )
-from opentrons.protocol_engine.state.labware import LabwareStore, LabwareState
+from opentrons.protocol_engine.state.labware import LabwareState, LabwareStore
+from opentrons.protocol_engine.types import (
+    OFF_DECK_LOCATION,
+    DeckSlotLocation,
+    LabwareMovementStrategy,
+    LabwareOffset,
+    LabwareOffsetCreate,
+    LabwareOffsetLocation,
+    LabwareOffsetVector,
+    LoadedLabware,
+)
+from opentrons.protocols.models import LabwareDefinition
+from opentrons.types import DeckSlotName
 
 from .command_fixtures import (
     create_load_labware_command,

@@ -1,55 +1,55 @@
 """Geometry state getters."""
 import enum
-from numpy import array, dot, double as npdouble
+from typing import Dict, List, Optional, Tuple, TypeVar, Union, cast
+
+from numpy import array, dot
+from numpy import double as npdouble
 from numpy.typing import NDArray
-from typing import Optional, List, Tuple, Union, cast, TypeVar, Dict
-
-from opentrons.types import Point, DeckSlotName, StagingSlotName, MountType
-
-from opentrons_shared_data.labware.constants import WELL_NAME_PATTERN
 from opentrons_shared_data.deck.dev_types import CutoutFixture
+from opentrons_shared_data.labware.constants import WELL_NAME_PATTERN
 from opentrons_shared_data.pipette import PIPETTE_X_SPAN
 from opentrons_shared_data.pipette.dev_types import ChannelCount
 
+from opentrons.types import DeckSlotName, MountType, Point, StagingSlotName
+
 from .. import errors
 from ..errors import (
+    LabwareMovementNotAllowedError,
     LabwareNotLoadedOnLabwareError,
     LabwareNotLoadedOnModuleError,
-    LabwareMovementNotAllowedError,
 )
 from ..resources import fixture_validation
 from ..types import (
     OFF_DECK_LOCATION,
-    LoadedLabware,
-    LoadedModule,
-    WellLocation,
-    DropTipWellLocation,
-    WellOrigin,
-    DropTipWellOrigin,
-    WellOffset,
-    DeckSlotLocation,
-    ModuleLocation,
-    OnLabwareLocation,
-    LabwareLocation,
-    LabwareOffsetVector,
-    ModuleOffsetVector,
-    ModuleOffsetData,
-    CurrentWell,
-    CurrentPipetteLocation,
-    TipGeometry,
-    LabwareMovementOffsetData,
-    OnDeckLabwareLocation,
     AddressableAreaLocation,
     AddressableOffsetVector,
-    StagingSlotLocation,
+    CurrentPipetteLocation,
+    CurrentWell,
+    DeckSlotLocation,
+    DropTipWellLocation,
+    DropTipWellOrigin,
+    LabwareLocation,
+    LabwareMovementOffsetData,
     LabwareOffsetLocation,
+    LabwareOffsetVector,
+    LoadedLabware,
+    LoadedModule,
+    ModuleLocation,
+    ModuleOffsetData,
+    ModuleOffsetVector,
+    OnDeckLabwareLocation,
+    OnLabwareLocation,
+    StagingSlotLocation,
+    TipGeometry,
+    WellLocation,
+    WellOffset,
+    WellOrigin,
 )
+from .addressable_areas import AddressableAreaView
 from .config import Config
 from .labware import LabwareView
 from .modules import ModuleView
 from .pipettes import PipetteView
-from .addressable_areas import AddressableAreaView
-
 
 SLOT_WIDTH = 128
 _PIPETTE_HOMED_POSITION_Z = (

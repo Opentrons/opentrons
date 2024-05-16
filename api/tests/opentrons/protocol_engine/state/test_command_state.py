@@ -8,7 +8,6 @@ from datetime import datetime
 from unittest.mock import sentinel
 
 import pytest
-
 from opentrons_shared_data.errors import ErrorCodes, PythonException
 
 from opentrons.ordered_set import OrderedSet
@@ -17,10 +16,7 @@ from opentrons.protocol_engine.error_recovery_policy import ErrorRecoveryType
 from opentrons.protocol_engine.errors.error_occurrence import ErrorOccurrence
 from opentrons.protocol_engine.errors.exceptions import EStopActivatedError
 from opentrons.protocol_engine.notes.notes import CommandNote
-from opentrons.protocol_engine.state.commands import (
-    CommandStore,
-    CommandView,
-)
+from opentrons.protocol_engine.state.commands import CommandStore, CommandView
 from opentrons.protocol_engine.state.config import Config
 from opentrons.protocol_engine.types import DeckType, EngineStatus
 

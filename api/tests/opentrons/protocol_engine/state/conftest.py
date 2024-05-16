@@ -2,10 +2,10 @@
 import pytest
 from decoy import Decoy
 
-from opentrons.protocol_engine.state.labware import LabwareView
-from opentrons.protocol_engine.state.pipettes import PipetteView
 from opentrons.protocol_engine.state.addressable_areas import AddressableAreaView
 from opentrons.protocol_engine.state.geometry import GeometryView
+from opentrons.protocol_engine.state.labware import LabwareView
+from opentrons.protocol_engine.state.pipettes import PipetteView
 
 
 @pytest.fixture

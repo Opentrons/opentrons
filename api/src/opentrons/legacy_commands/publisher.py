@@ -6,12 +6,9 @@ from uuid import uuid4
 
 from opentrons.legacy_broker import LegacyBroker
 
-from .types import (
-    COMMAND as COMMAND_TOPIC,
-    Command as CommandPayload,
-    CommandMessage,
-    MessageSequenceId,
-)
+from .types import COMMAND as COMMAND_TOPIC
+from .types import Command as CommandPayload
+from .types import CommandMessage, MessageSequenceId
 
 
 class CommandPublisher:

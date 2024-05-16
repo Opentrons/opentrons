@@ -1,5 +1,5 @@
-import sys
 import logging
+import sys
 
 _pyversion = sys.version_info[0:2]
 

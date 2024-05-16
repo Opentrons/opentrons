@@ -1,39 +1,40 @@
 from __future__ import annotations
+
 import asyncio
 import copy
 import logging
-from threading import Event
-from typing import Dict, Optional, List, Tuple, TYPE_CHECKING, Sequence, Iterator, cast
 from contextlib import contextmanager
+from threading import Event
+from typing import TYPE_CHECKING, Dict, Iterator, List, Optional, Sequence, Tuple, cast
 
+from opentrons_shared_data.pipette import mutable_configurations, pipette_definition
 from opentrons_shared_data.pipette import (
     pipette_load_name_conversions as pipette_load_name,
-    mutable_configurations,
-    pipette_definition,
 )
 
 from opentrons import types
-from opentrons.config.types import RobotConfig
 from opentrons.config import get_opentrons_path
-from opentrons.drivers.smoothie_drivers import SimulatingDriver
-
+from opentrons.config.types import RobotConfig
 from opentrons.drivers.rpi_drivers.gpio_simulator import SimulatingGPIOCharDev
+from opentrons.drivers.smoothie_drivers import SimulatingDriver
 from opentrons.util.async_helpers import ensure_yield
 
 from .. import modules
-from ..types import BoardRevision, Axis
 from ..module_control import AttachedModulesControl
+from ..types import Axis, BoardRevision
 from ..util import ot2_axis_to_string
 
 if TYPE_CHECKING:
-    from opentrons_shared_data.pipette.dev_types import PipetteName, PipetteModel
-    from ..dev_types import (
-        AttachedPipette,
-        AttachedInstruments,
-        PipetteSpec,
-        InstrumentHardwareConfigs,
-    )
+    from opentrons_shared_data.pipette.dev_types import PipetteModel, PipetteName
+
     from opentrons.drivers.rpi_drivers.dev_types import GPIODriverLike
+
+    from ..dev_types import (
+        AttachedInstruments,
+        AttachedPipette,
+        InstrumentHardwareConfigs,
+        PipetteSpec,
+    )
 
 
 MODULE_LOG = logging.getLogger(__name__)

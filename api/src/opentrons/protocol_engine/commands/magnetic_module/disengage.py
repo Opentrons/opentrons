@@ -3,13 +3,13 @@
 
 from __future__ import annotations
 
-from typing import Optional, TYPE_CHECKING
-from typing_extensions import Literal, Type
+from typing import TYPE_CHECKING, Optional
 
 from pydantic import BaseModel, Field
+from typing_extensions import Literal, Type
 
-from ..command import AbstractCommandImpl, BaseCommand, BaseCommandCreate, SuccessData
 from ...errors.error_occurrence import ErrorOccurrence
+from ..command import AbstractCommandImpl, BaseCommand, BaseCommandCreate, SuccessData
 
 if TYPE_CHECKING:
     from opentrons.protocol_engine.execution import EquipmentHandler

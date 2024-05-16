@@ -1,8 +1,12 @@
 import logging
-from typing import Optional, Any
+from typing import Any, Optional
 
 from opentrons_shared_data.labware.dev_types import (
     LabwareDefinition as LabwareDefinitionDict,
+)
+from opentrons_shared_data.protocol.dev_types import (
+    BlowoutLocation,
+    LiquidHandlingCommand,
 )
 
 from opentrons import types
@@ -16,10 +20,6 @@ from opentrons.hardware_control.instruments.ot2 import (
 )
 from opentrons.protocol_api.labware import Labware
 from opentrons.protocols.api_support.types import APIVersion
-from opentrons_shared_data.protocol.dev_types import (
-    LiquidHandlingCommand,
-    BlowoutLocation,
-)
 
 
 def validate_blowout_location(

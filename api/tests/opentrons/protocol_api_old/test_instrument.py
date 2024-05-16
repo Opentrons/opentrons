@@ -1,12 +1,12 @@
 """ Test the InstrumentContext class and its functions """
-import pytest
 from unittest import mock
 
-from opentrons.types import Mount
-from opentrons.protocols.advanced_control import transfers
-from opentrons.protocols.api_support.types import APIVersion
+import pytest
 
 import opentrons.protocol_api as papi
+from opentrons.protocols.advanced_control import transfers
+from opentrons.protocols.api_support.types import APIVersion
+from opentrons.types import Mount
 
 pytestmark = pytest.mark.ot2_only
 

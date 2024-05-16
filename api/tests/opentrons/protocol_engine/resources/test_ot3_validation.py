@@ -2,11 +2,10 @@
 import pytest
 from decoy import Decoy
 
-from opentrons.protocol_engine.resources.ot3_validation import ensure_ot3_hardware
-from opentrons.protocol_engine.errors.exceptions import HardwareNotSupportedError
-
 from opentrons.hardware_control.api import API
 from opentrons.hardware_control.protocols.types import FlexRobotType, OT2RobotType
+from opentrons.protocol_engine.errors.exceptions import HardwareNotSupportedError
+from opentrons.protocol_engine.resources.ot3_validation import ensure_ot3_hardware
 
 
 @pytest.mark.ot3_only

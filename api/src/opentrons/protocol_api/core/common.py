@@ -4,16 +4,15 @@
 from .instrument import AbstractInstrument
 from .labware import AbstractLabware
 from .module import (
-    AbstractModuleCore,
-    AbstractTemperatureModuleCore,
-    AbstractMagneticModuleCore,
-    AbstractThermocyclerCore,
     AbstractHeaterShakerCore,
     AbstractMagneticBlockCore,
+    AbstractMagneticModuleCore,
+    AbstractModuleCore,
+    AbstractTemperatureModuleCore,
+    AbstractThermocyclerCore,
 )
 from .protocol import AbstractProtocol
 from .well import AbstractWellCore
-
 
 WellCore = AbstractWellCore
 LabwareCore = AbstractLabware[WellCore]

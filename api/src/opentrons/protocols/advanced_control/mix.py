@@ -1,6 +1,6 @@
 import typing
 
-from opentrons.protocols.advanced_control.transfers import MixStrategy, Mix
+from opentrons.protocols.advanced_control.transfers import Mix, MixStrategy
 
 
 def mix_from_kwargs(

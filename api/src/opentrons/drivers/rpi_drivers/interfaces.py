@@ -1,4 +1,5 @@
 from typing import List, Union
+
 from typing_extensions import Protocol
 
 from opentrons.hardware_control.modules.types import (

@@ -3,22 +3,21 @@ import pytest
 from decoy import Decoy
 
 from opentrons.protocol_engine import (
+    DeckPoint,
     DropTipWellLocation,
     DropTipWellOrigin,
     WellLocation,
     WellOffset,
-    DeckPoint,
 )
-from opentrons.protocol_engine.state import StateView
-from opentrons.protocol_engine.execution import MovementHandler, TipHandler
-from opentrons.types import Point
-
 from opentrons.protocol_engine.commands.command import SuccessData
 from opentrons.protocol_engine.commands.drop_tip import (
+    DropTipImplementation,
     DropTipParams,
     DropTipResult,
-    DropTipImplementation,
 )
+from opentrons.protocol_engine.execution import MovementHandler, TipHandler
+from opentrons.protocol_engine.state import StateView
+from opentrons.types import Point
 
 
 @pytest.fixture

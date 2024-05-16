@@ -4,17 +4,16 @@ from decoy import Decoy
 
 from opentrons.hardware_control.types import CriticalPoint
 from opentrons.motion_planning import Waypoint
-from opentrons.protocol_engine import WellLocation, WellOffset, DeckPoint, errors
-from opentrons.protocol_engine.execution import MovementHandler, GantryMover
-from opentrons.protocol_engine.state import StateView
-from opentrons.types import Point
-
+from opentrons.protocol_engine import DeckPoint, WellLocation, WellOffset, errors
 from opentrons.protocol_engine.commands.command import SuccessData
 from opentrons.protocol_engine.commands.touch_tip import (
+    TouchTipImplementation,
     TouchTipParams,
     TouchTipResult,
-    TouchTipImplementation,
 )
+from opentrons.protocol_engine.execution import GantryMover, MovementHandler
+from opentrons.protocol_engine.state import StateView
+from opentrons.types import Point
 
 
 @pytest.fixture

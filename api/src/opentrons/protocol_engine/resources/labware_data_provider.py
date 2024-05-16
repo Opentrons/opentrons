@@ -4,17 +4,17 @@ This module is a wrapper around existing, but older, internal APIs to
 abstract away rough edges until we can improve those underlying interfaces.
 """
 import logging
+
 from anyio import to_thread
 
-from opentrons.protocols.models import LabwareDefinition
-from opentrons.protocols.labware import get_labware_definition
+from opentrons.calibration_storage.types import TipLengthCalNotFound
 
 # TODO (lc 09-26-2022) We should conditionally import ot2 or ot3 calibration
 from opentrons.hardware_control.instruments.ot2 import (
     instrument_calibration as instr_cal,
 )
-from opentrons.calibration_storage.types import TipLengthCalNotFound
-
+from opentrons.protocols.labware import get_labware_definition
+from opentrons.protocols.models import LabwareDefinition
 
 log = logging.getLogger(__name__)
 

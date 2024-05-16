@@ -2,11 +2,11 @@
 from typing import cast
 
 from opentrons_shared_data.labware.dev_types import LabwareDefinition as LabwareDefDict
-from opentrons.calibration_storage.helpers import hash_labware_def
-from opentrons.protocols.models import LabwareDefinition
-from opentrons.protocol_api.labware import get_labware_definition
 
+from opentrons.calibration_storage.helpers import hash_labware_def
+from opentrons.protocol_api.labware import get_labware_definition
 from opentrons.protocol_engine.resources import LabwareDataProvider
+from opentrons.protocols.models import LabwareDefinition
 
 
 async def test_labware_data_gets_standard_definition() -> None:

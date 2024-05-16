@@ -4,12 +4,10 @@ from decoy import Decoy
 
 from opentrons.hardware_control import SynchronousAdapter
 from opentrons.hardware_control.modules import TempDeck
-from opentrons.hardware_control.modules.types import TemperatureStatus, ModuleType
-
-from opentrons.protocol_engine.clients import SyncClient as EngineClient
-
-from opentrons.protocol_api.core.engine.module_core import TemperatureModuleCore
+from opentrons.hardware_control.modules.types import ModuleType, TemperatureStatus
 from opentrons.protocol_api import MAX_SUPPORTED_VERSION
+from opentrons.protocol_api.core.engine.module_core import TemperatureModuleCore
+from opentrons.protocol_engine.clients import SyncClient as EngineClient
 
 TempDeckHardware = SynchronousAdapter[TempDeck]
 

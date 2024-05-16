@@ -3,33 +3,29 @@ from __future__ import annotations
 # this file defines types that require dev dependencies
 # and are only relevant for static typechecking. this file should only
 # be imported if typing.TYPE_CHECKING is True
-from typing import Optional, Dict, List, Union
+from typing import Dict, List, Optional, Union
 
-from typing_extensions import TypedDict, Literal
+from opentrons_shared_data.gripper import GripperDefinition, GripperModel
+from opentrons_shared_data.pipette.dev_types import (
+    ChannelCount,
+    PipetteModel,
+    PipetteName,
+)
+from opentrons_shared_data.pipette.pipette_definition import (
+    PipetteBoundingBoxOffsetDefinition,
+    PipetteConfigurations,
+    SupportedTipsDefinition,
+)
+from opentrons_shared_data.pipette.types import PipetteTipType
+from typing_extensions import Literal, TypedDict
 
+from opentrons.drivers.types import MoveSplit
 from opentrons.hardware_control.instruments.ot3.instrument_calibration import (
     GripperCalibrationOffset,
 )
-from opentrons_shared_data.pipette.dev_types import (
-    PipetteModel,
-    PipetteName,
-    ChannelCount,
-)
-from opentrons_shared_data.pipette.types import PipetteTipType
-from opentrons_shared_data.pipette.pipette_definition import (
-    PipetteConfigurations,
-    SupportedTipsDefinition,
-    PipetteBoundingBoxOffsetDefinition,
-)
-from opentrons_shared_data.gripper import (
-    GripperModel,
-    GripperDefinition,
-)
-
-from opentrons.drivers.types import MoveSplit
-from opentrons.types import Mount
-from opentrons.hardware_control.types import GripperJawState
 from opentrons.hardware_control.nozzle_manager import NozzleMap
+from opentrons.hardware_control.types import GripperJawState
+from opentrons.types import Mount
 
 
 class InstrumentSpec(TypedDict):

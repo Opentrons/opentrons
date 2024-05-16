@@ -1,25 +1,23 @@
 import asyncio
-from typing import Dict, Set, Optional, AsyncIterator, Tuple
 from itertools import chain
+from typing import AsyncIterator, Dict, Optional, Set, Tuple
 
 import pytest
-
 from decoy import Decoy, matchers
-
+from opentrons_hardware.drivers import binary_usb, can_bus
 from opentrons_hardware.firmware_bindings.constants import (
-    NodeId,
-    USBTarget,
-    ToolType,
     FirmwareTarget,
+    NodeId,
     PipetteName,
+    ToolType,
+    USBTarget,
 )
-from opentrons_hardware.hardware_control import network, tools, types
 from opentrons_hardware.firmware_update import FirmwareUpdate, RunUpdate
-from opentrons_hardware.firmware_update.types import StatusElement, FirmwareUpdateStatus
-from opentrons_hardware.drivers import can_bus, binary_usb
+from opentrons_hardware.firmware_update.types import FirmwareUpdateStatus, StatusElement
+from opentrons_hardware.hardware_control import network, tools, types
 
-from opentrons.hardware_control.backends.subsystem_manager import SubsystemManager
 from opentrons.hardware_control.backends.errors import SubsystemUpdating
+from opentrons.hardware_control.backends.subsystem_manager import SubsystemManager
 from opentrons.hardware_control.types import SubSystem, SubSystemState
 
 

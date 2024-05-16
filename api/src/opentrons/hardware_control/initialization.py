@@ -1,31 +1,20 @@
-import os
-
-from pathlib import Path
 import logging
+import os
 import re
+from pathlib import Path
 from typing import Any, List, Tuple
 
 from opentrons import should_use_ot3
-from opentrons.drivers.serial_communication import get_ports_by_name
-from opentrons.hardware_control import (
-    API as HardwareAPI,
-    ThreadManager,
-    ThreadManagedHardware,
-    types as hw_types,
-)
-
-from opentrons.config import (
-    feature_flags as ff,
-    name,
-    robot_configs,
-    IS_ROBOT,
-    ROBOT_FIRMWARE_DIR,
-)
-from opentrons.util import logging_config
-
 from opentrons._resources_path import RESOURCES_PATH
 from opentrons._version import version
-
+from opentrons.config import IS_ROBOT, ROBOT_FIRMWARE_DIR
+from opentrons.config import feature_flags as ff
+from opentrons.config import name, robot_configs
+from opentrons.drivers.serial_communication import get_ports_by_name
+from opentrons.hardware_control import API as HardwareAPI
+from opentrons.hardware_control import ThreadManagedHardware, ThreadManager
+from opentrons.hardware_control import types as hw_types
+from opentrons.util import logging_config
 
 SMOOTHIE_HEX_RE = re.compile("smoothie-(.*).hex")
 

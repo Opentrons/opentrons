@@ -1,22 +1,22 @@
 import enum
 from typing import (
+    TYPE_CHECKING,
     Any,
-    Dict,
-    List,
-    Optional,
-    Union,
-    NamedTuple,
     Callable,
+    Dict,
     Generator,
     Iterator,
+    List,
+    NamedTuple,
+    Optional,
     Tuple,
-    TYPE_CHECKING,
     TypeVar,
+    Union,
 )
-from opentrons.protocol_api.labware import Labware, Well
-from opentrons import types
-from opentrons.protocols.api_support.types import APIVersion
 
+from opentrons import types
+from opentrons.protocol_api.labware import Labware, Well
+from opentrons.protocols.api_support.types import APIVersion
 
 if TYPE_CHECKING:
     from opentrons.protocol_api import InstrumentContext

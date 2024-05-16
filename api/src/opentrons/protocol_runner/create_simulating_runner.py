@@ -1,19 +1,17 @@
 """Simulating AbstractRunner factory."""
 
-from opentrons.hardware_control import API as OT2API, HardwareControlAPI
-from opentrons.protocols.api_support import deck_type
-from opentrons.protocols.api_support.deck_type import should_load_fixed_trash
-from opentrons.protocol_engine import (
-    Config as ProtocolEngineConfig,
-    DeckType,
-    create_protocol_engine,
-)
-from opentrons.protocol_reader.protocol_source import ProtocolConfig
-
 from opentrons_shared_data.robot.dev_types import RobotType
 
+from opentrons.hardware_control import API as OT2API
+from opentrons.hardware_control import HardwareControlAPI
+from opentrons.protocol_engine import Config as ProtocolEngineConfig
+from opentrons.protocol_engine import DeckType, create_protocol_engine
+from opentrons.protocol_reader.protocol_source import ProtocolConfig
+from opentrons.protocols.api_support import deck_type
+from opentrons.protocols.api_support.deck_type import should_load_fixed_trash
+
+from .protocol_runner import AbstractRunner, create_protocol_runner
 from .python_protocol_wrappers import SimulatingContextCreator
-from .protocol_runner import create_protocol_runner, AbstractRunner
 
 
 async def create_simulating_runner(

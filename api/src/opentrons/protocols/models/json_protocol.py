@@ -9,11 +9,10 @@ from __future__ import annotations
 
 from typing import Any, Dict, List, Optional, Union
 
-from pydantic import BaseModel, Extra, Field
-from typing_extensions import Literal
-
 from opentrons_shared_data.labware.labware_definition import LabwareDefinition
 from opentrons_shared_data.protocol import dev_types
+from pydantic import BaseModel, Extra, Field
+from typing_extensions import Literal
 
 CommandAspirate: dev_types.AspirateCommandId = "aspirate"
 CommandDispense: dev_types.DispenseCommandId = "dispense"

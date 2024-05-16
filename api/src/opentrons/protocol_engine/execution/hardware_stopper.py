@@ -3,19 +3,17 @@ import logging
 from typing import Optional
 
 from opentrons.hardware_control import HardwareControlAPI
+from opentrons.protocol_engine.types import AddressableOffsetVector
 from opentrons.types import PipetteNotAttachedError as HwPipetteNotAttachedError
 
+from ...hardware_control.types import OT3Mount
+from ..errors import HardwareNotSupportedError
 from ..resources.ot3_validation import ensure_ot3_hardware
 from ..state import StateStore
 from ..types import MotorAxis, PostRunHardwareState
-from ..errors import HardwareNotSupportedError
-
-from .movement import MovementHandler
 from .gantry_mover import HardwareGantryMover
-from .tip_handler import TipHandler, HardwareTipHandler
-from ...hardware_control.types import OT3Mount
-
-from opentrons.protocol_engine.types import AddressableOffsetVector
+from .movement import MovementHandler
+from .tip_handler import HardwareTipHandler, TipHandler
 
 log = logging.getLogger(__name__)
 

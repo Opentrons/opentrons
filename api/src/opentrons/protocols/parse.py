@@ -11,34 +11,31 @@ import logging
 import re
 import traceback
 from io import BytesIO
+from typing import TYPE_CHECKING, Any, Dict, Optional, Tuple, Union
 from zipfile import ZipFile
-from typing import Any, Dict, Optional, Union, Tuple, TYPE_CHECKING
 
 import jsonschema  # type: ignore
-
 from opentrons_shared_data.labware import load_schema as load_labware_schema
-from opentrons_shared_data.protocol import (
-    Schema as JSONProtocolSchema,
-    load_schema as load_protocol_schema,
-)
+from opentrons_shared_data.protocol import Schema as JSONProtocolSchema
+from opentrons_shared_data.protocol import load_schema as load_protocol_schema
 from opentrons_shared_data.robot.dev_types import RobotType
 
 from opentrons.ordered_set import OrderedSet
 
 from .api_support.definitions import MIN_SUPPORTED_VERSION_FOR_FLEX
 from .api_support.types import APIVersion
+from .bundle import extract_bundle
 from .types import (
     RUN_FUNCTION_MESSAGE,
+    ApiDeprecationError,
+    JsonProtocol,
+    MalformedPythonProtocolError,
     Protocol,
     PythonProtocol,
-    JsonProtocol,
-    StaticPythonInfo,
     PythonProtocolMetadata,
     PythonProtocolRequirements,
-    MalformedPythonProtocolError,
-    ApiDeprecationError,
+    StaticPythonInfo,
 )
-from .bundle import extract_bundle
 
 if TYPE_CHECKING:
     from opentrons_shared_data.labware.dev_types import LabwareDefinition

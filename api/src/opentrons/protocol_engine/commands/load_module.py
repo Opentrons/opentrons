@@ -1,24 +1,21 @@
 """Implementation, request models, and response models for the load module command."""
 from __future__ import annotations
-from typing import TYPE_CHECKING, Optional, Type
-from typing_extensions import Literal
-from pydantic import BaseModel, Field
 
-from .command import AbstractCommandImpl, BaseCommand, BaseCommandCreate, SuccessData
-from ..errors.error_occurrence import ErrorOccurrence
-from ..types import (
-    DeckSlotLocation,
-    ModuleType,
-    ModuleModel,
-    ModuleDefinition,
-)
-from opentrons.types import DeckSlotName
+from typing import TYPE_CHECKING, Optional, Type
+
+from pydantic import BaseModel, Field
+from typing_extensions import Literal
 
 from opentrons.protocol_engine.resources import deck_configuration_provider
+from opentrons.types import DeckSlotName
+
+from ..errors.error_occurrence import ErrorOccurrence
+from ..types import DeckSlotLocation, ModuleDefinition, ModuleModel, ModuleType
+from .command import AbstractCommandImpl, BaseCommand, BaseCommandCreate, SuccessData
 
 if TYPE_CHECKING:
-    from ..state import StateView
     from ..execution import EquipmentHandler
+    from ..state import StateView
 
 
 LoadModuleCommandType = Literal["loadModule"]

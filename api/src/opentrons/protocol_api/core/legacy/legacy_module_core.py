@@ -8,30 +8,29 @@ from opentrons.drivers.types import (
     HeaterShakerLabwareLatchStatus,
     ThermocyclerLidStatus,
 )
-from opentrons.hardware_control import SynchronousAdapter, modules as hw_modules
-from opentrons.hardware_control.types import Axis
+from opentrons.hardware_control import SynchronousAdapter
+from opentrons.hardware_control import modules as hw_modules
 from opentrons.hardware_control.modules.types import (
-    ModuleModel,
-    TemperatureStatus,
-    MagneticStatus,
-    SpeedStatus,
     MagneticModuleModel,
+    MagneticStatus,
+    ModuleModel,
+    SpeedStatus,
+    TemperatureStatus,
     ThermocyclerStep,
 )
+from opentrons.hardware_control.types import Axis
 from opentrons.types import DeckSlotName, Location
 
-
+from ...labware import Labware
 from ..module import (
+    AbstractHeaterShakerCore,
+    AbstractMagneticModuleCore,
     AbstractModuleCore,
     AbstractTemperatureModuleCore,
-    AbstractMagneticModuleCore,
     AbstractThermocyclerCore,
-    AbstractHeaterShakerCore,
 )
-
 from .legacy_labware_core import LegacyLabwareCore
-from .module_geometry import ModuleGeometry, ThermocyclerGeometry, HeaterShakerGeometry
-from ...labware import Labware
+from .module_geometry import HeaterShakerGeometry, ModuleGeometry, ThermocyclerGeometry
 
 if TYPE_CHECKING:
     from .legacy_protocol_core import LegacyProtocolCore

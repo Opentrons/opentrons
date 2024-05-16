@@ -1,9 +1,11 @@
 """Pick up tip command request, result, and implementation models."""
 from __future__ import annotations
+
 from dataclasses import dataclass
+from typing import TYPE_CHECKING, Optional, Type, Union
+
 from opentrons_shared_data.errors import ErrorCodes
 from pydantic import Field
-from typing import TYPE_CHECKING, Optional, Type, Union
 from typing_extensions import Literal
 
 from opentrons.protocol_engine.errors.exceptions import TipNotAttachedError
@@ -11,11 +13,6 @@ from opentrons.protocol_engine.errors.exceptions import TipNotAttachedError
 from ..errors import ErrorOccurrence
 from ..resources import ModelUtils
 from ..types import DeckPoint
-from .pipetting_common import (
-    PipetteIdMixin,
-    WellLocationMixin,
-    DestinationPositionResult,
-)
 from .command import (
     AbstractCommandImpl,
     BaseCommand,
@@ -23,10 +20,15 @@ from .command import (
     DefinedErrorData,
     SuccessData,
 )
+from .pipetting_common import (
+    DestinationPositionResult,
+    PipetteIdMixin,
+    WellLocationMixin,
+)
 
 if TYPE_CHECKING:
-    from ..state import StateView
     from ..execution import MovementHandler, TipHandler
+    from ..state import StateView
 
 
 PickUpTipCommandType = Literal["pickUpTip"]

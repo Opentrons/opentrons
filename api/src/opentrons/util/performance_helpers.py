@@ -1,19 +1,17 @@
 """Performance helpers for tracking robot context."""
 
 from pathlib import Path
+from typing import Callable, Type
+
 from opentrons_shared_data.performance.dev_types import (
-    SupportsTracking,
     F,
     RobotContextState,
+    SupportsTracking,
 )
 from opentrons_shared_data.robot.dev_types import RobotTypeEnum
-from typing import Callable, Type
-from opentrons.config import (
-    feature_flags as ff,
-    get_performance_metrics_data_dir,
-    robot_configs,
-)
 
+from opentrons.config import feature_flags as ff
+from opentrons.config import get_performance_metrics_data_dir, robot_configs
 
 _should_track = ff.enable_performance_metrics(
     RobotTypeEnum.robot_literal_to_enum(robot_configs.load().model)

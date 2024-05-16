@@ -1,17 +1,16 @@
 """A helper for controlling a `ProtocolEngine` without async/await."""
 from asyncio import AbstractEventLoop, run_coroutine_threadsafe
 from typing import Any, Final, overload
-from typing_extensions import Literal
 
 from opentrons_shared_data.labware.dev_types import LabwareUri
 from opentrons_shared_data.labware.labware_definition import LabwareDefinition
+from typing_extensions import Literal
 
-
-from ..protocol_engine import ProtocolEngine
-from ..errors import ProtocolCommandFailedError
-from ..error_recovery_policy import ErrorRecoveryType
-from ..state import StateView
 from ..commands import Command, CommandCreate, CommandResult, CommandStatus
+from ..error_recovery_policy import ErrorRecoveryType
+from ..errors import ProtocolCommandFailedError
+from ..protocol_engine import ProtocolEngine
+from ..state import StateView
 
 
 class RunStoppedBeforeCommandError(RuntimeError):

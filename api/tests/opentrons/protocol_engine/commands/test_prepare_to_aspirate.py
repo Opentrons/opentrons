@@ -2,16 +2,13 @@
 
 from decoy import Decoy
 
-from opentrons.protocol_engine.execution import (
-    PipettingHandler,
-)
-
 from opentrons.protocol_engine.commands.command import SuccessData
 from opentrons.protocol_engine.commands.prepare_to_aspirate import (
-    PrepareToAspirateParams,
     PrepareToAspirateImplementation,
+    PrepareToAspirateParams,
     PrepareToAspirateResult,
 )
+from opentrons.protocol_engine.execution import PipettingHandler
 
 
 async def test_prepare_to_aspirate_implmenetation(

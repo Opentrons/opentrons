@@ -1,11 +1,14 @@
 """Tests for the HardwareApi class."""
-import pytest
+from typing import Dict, List, Optional, Tuple
 
+import pytest
 from decoy import Decoy
-from typing import Optional, Tuple, Dict, List
+from opentrons_shared_data.pipette.pipette_definition import (
+    CamActionPickUpTipConfiguration,
+    PressFitPickUpTipConfiguration,
+)
 
 from opentrons import types
-from opentrons.hardware_control.types import OT3Mount, Axis
 from opentrons.hardware_control.instruments.ot2.pipette import Pipette
 from opentrons.hardware_control.instruments.ot2.pipette_handler import (
     PipetteHandlerProvider,
@@ -15,11 +18,7 @@ from opentrons.hardware_control.instruments.ot3.pipette_handler import (
     OT3PipetteHandler,
     TipActionMoveSpec,
 )
-
-from opentrons_shared_data.pipette.pipette_definition import (
-    PressFitPickUpTipConfiguration,
-    CamActionPickUpTipConfiguration,
-)
+from opentrons.hardware_control.types import Axis, OT3Mount
 
 
 @pytest.fixture

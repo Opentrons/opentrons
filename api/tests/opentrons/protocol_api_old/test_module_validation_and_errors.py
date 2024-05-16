@@ -1,10 +1,10 @@
 import pytest
 
 from opentrons.protocol_api.module_validation_and_errors import (
-    validate_heater_shaker_temperature,
-    validate_heater_shaker_speed,
-    InvalidTargetTemperatureError,
     InvalidTargetSpeedError,
+    InvalidTargetTemperatureError,
+    validate_heater_shaker_speed,
+    validate_heater_shaker_temperature,
 )
 
 

@@ -1,13 +1,14 @@
 from __future__ import annotations
 
-from typing import Optional, cast, TYPE_CHECKING
+from typing import TYPE_CHECKING, Optional, cast
 
-from opentrons.types import Point
 from opentrons_shared_data.labware.dev_types import (
-    WellDefinition,
     CircularWellDefinition,
     RectangularWellDefinition,
+    WellDefinition,
 )
+
+from opentrons.types import Point
 
 if TYPE_CHECKING:
     from .legacy_labware_core import LegacyLabwareCore

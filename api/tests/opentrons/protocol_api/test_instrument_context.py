@@ -1,15 +1,31 @@
 """Tests for the InstrumentContext public interface."""
-from collections import OrderedDict
 import inspect
+from collections import OrderedDict
+from contextlib import nullcontext as does_not_raise
+from typing import ContextManager, Optional
 
 import pytest
-from pytest_lazyfixture import lazy_fixture  # type: ignore[import-untyped]
 from decoy import Decoy
+from opentrons_shared_data.errors.exceptions import CommandPreconditionViolated
+from pytest_lazyfixture import lazy_fixture  # type: ignore[import-untyped]
 
+from opentrons.hardware_control.nozzle_manager import NozzleMap
 from opentrons.legacy_broker import LegacyBroker
-from typing import ContextManager, Optional
-from contextlib import nullcontext as does_not_raise
-
+from opentrons.protocol_api import (
+    MAX_SUPPORTED_VERSION,
+    InstrumentContext,
+    Labware,
+    Well,
+    labware,
+)
+from opentrons.protocol_api import validation as mock_validation
+from opentrons.protocol_api._nozzle_layout import NozzleLayout
+from opentrons.protocol_api.core.common import InstrumentCore, ProtocolCore
+from opentrons.protocol_api.core.legacy.legacy_instrument_core import (
+    LegacyInstrumentCore,
+)
+from opentrons.protocol_api.disposal_locations import TrashBin, WasteChute
+from opentrons.protocol_api.validation import PointTarget, WellTarget
 from opentrons.protocols.api_support import instrument as mock_instrument_support
 from opentrons.protocols.api_support.types import APIVersion
 from opentrons.protocols.api_support.util import (
@@ -17,28 +33,7 @@ from opentrons.protocols.api_support.util import (
     FlowRates,
     PlungerSpeeds,
 )
-from opentrons.protocol_api import (
-    MAX_SUPPORTED_VERSION,
-    InstrumentContext,
-    Labware,
-    Well,
-    labware,
-    validation as mock_validation,
-)
-from opentrons.protocol_api.validation import WellTarget, PointTarget
-from opentrons.protocol_api.core.common import InstrumentCore, ProtocolCore
-from opentrons.protocol_api.core.legacy.legacy_instrument_core import (
-    LegacyInstrumentCore,
-)
-
-from opentrons.hardware_control.nozzle_manager import NozzleMap
-from opentrons.protocol_api.disposal_locations import TrashBin, WasteChute
-from opentrons.protocol_api._nozzle_layout import NozzleLayout
 from opentrons.types import Location, Mount, Point
-
-from opentrons_shared_data.errors.exceptions import (
-    CommandPreconditionViolated,
-)
 
 
 @pytest.fixture(autouse=True)

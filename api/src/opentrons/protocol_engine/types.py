@@ -1,9 +1,17 @@
 """Public protocol engine value types and models."""
 from __future__ import annotations
+
 import re
+from dataclasses import dataclass
 from datetime import datetime
 from enum import Enum
-from dataclasses import dataclass
+from typing import Any, Dict, FrozenSet, List, NamedTuple, Optional, Tuple, Union
+
+from opentrons_shared_data.module.dev_types import ModuleType as SharedDataModuleType
+from opentrons_shared_data.pipette.dev_types import (  # noqa: F401; convenience re-export of LabwareUri type
+    LabwareUri as LabwareUri,
+)
+from opentrons_shared_data.pipette.dev_types import PipetteNameType
 from pydantic import (
     BaseModel,
     Field,
@@ -13,24 +21,12 @@ from pydantic import (
     StrictStr,
     validator,
 )
-from typing import Optional, Union, List, Dict, Any, NamedTuple, Tuple, FrozenSet
 from typing_extensions import Literal, TypeGuard
 
-from opentrons_shared_data.pipette.dev_types import PipetteNameType
-from opentrons.types import MountType, DeckSlotName, StagingSlotName
-from opentrons.hardware_control.types import (
-    TipStateType as HwTipStateType,
-    InstrumentProbeType,
-)
-from opentrons.hardware_control.modules import (
-    ModuleType as ModuleType,
-)
-
-from opentrons_shared_data.pipette.dev_types import (  # noqa: F401
-    # convenience re-export of LabwareUri type
-    LabwareUri as LabwareUri,
-)
-from opentrons_shared_data.module.dev_types import ModuleType as SharedDataModuleType
+from opentrons.hardware_control.modules import ModuleType as ModuleType
+from opentrons.hardware_control.types import InstrumentProbeType
+from opentrons.hardware_control.types import TipStateType as HwTipStateType
+from opentrons.types import DeckSlotName, MountType, StagingSlotName
 
 
 class EngineStatus(str, Enum):

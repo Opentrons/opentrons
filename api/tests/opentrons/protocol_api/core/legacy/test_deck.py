@@ -3,23 +3,21 @@ from typing import Any
 
 import pytest
 from decoy import Decoy, matchers
-
 from opentrons_shared_data.labware.dev_types import LabwareUri
 
 from opentrons.motion_planning import deck_conflict
+from opentrons.protocol_api.core.legacy.deck import Deck
+from opentrons.protocol_api.core.legacy.legacy_labware_core import LegacyLabwareCore
+from opentrons.protocol_api.core.legacy.module_geometry import (
+    HeaterShakerGeometry,
+    ModuleGeometry,
+    ThermocyclerGeometry,
+)
+from opentrons.protocol_api.labware import Labware
 from opentrons.protocols.api_support.deck_type import (
     SHORT_TRASH_DECK,
     STANDARD_OT2_DECK,
 )
-from opentrons.protocol_api.labware import Labware
-from opentrons.protocol_api.core.legacy.legacy_labware_core import LegacyLabwareCore
-from opentrons.protocol_api.core.legacy.module_geometry import (
-    ModuleGeometry,
-    ThermocyclerGeometry,
-    HeaterShakerGeometry,
-)
-from opentrons.protocol_api.core.legacy.deck import Deck
-
 from opentrons.types import DeckSlotName
 
 

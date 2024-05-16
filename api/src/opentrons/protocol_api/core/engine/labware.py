@@ -2,21 +2,18 @@
 from typing import List, Optional, cast
 
 from opentrons_shared_data.labware.dev_types import (
-    LabwareParameters as LabwareParametersDict,
     LabwareDefinition as LabwareDefinitionDict,
 )
-
+from opentrons_shared_data.labware.dev_types import (
+    LabwareParameters as LabwareParametersDict,
+)
 from opentrons_shared_data.labware.labware_definition import LabwareRole
 
-from opentrons.protocol_engine.errors import LabwareNotOnDeckError, ModuleNotOnDeckError
-from opentrons.protocol_engine.clients import SyncClient as ProtocolEngineClient
-from opentrons.protocol_engine.types import (
-    LabwareOffsetCreate,
-    LabwareOffsetVector,
-)
-from opentrons.types import DeckSlotName, Point
 from opentrons.hardware_control.nozzle_manager import NozzleMap
-
+from opentrons.protocol_engine.clients import SyncClient as ProtocolEngineClient
+from opentrons.protocol_engine.errors import LabwareNotOnDeckError, ModuleNotOnDeckError
+from opentrons.protocol_engine.types import LabwareOffsetCreate, LabwareOffsetVector
+from opentrons.types import DeckSlotName, Point
 
 from ..labware import AbstractLabware, LabwareLoadParams
 from .well import WellCore

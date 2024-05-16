@@ -1,33 +1,32 @@
 import logging
-from typing import Dict, List, Optional, Set, Union, cast, Tuple
+from typing import Dict, List, Optional, Set, Tuple, Union, cast
 
 from opentrons_shared_data.deck.dev_types import DeckDefinitionV5, SlotDefV3
 from opentrons_shared_data.labware.dev_types import LabwareDefinition
 from opentrons_shared_data.pipette.dev_types import PipetteNameType
 from opentrons_shared_data.robot.dev_types import RobotType
 
-from opentrons.types import DeckSlotName, StagingSlotName, Location, Mount, Point
-from opentrons.util.broker import Broker
 from opentrons.hardware_control import SyncHardwareAPI
 from opentrons.hardware_control.modules import AbstractModule, ModuleModel, ModuleType
 from opentrons.hardware_control.types import DoorState, PauseType
-from opentrons.protocols.api_support.types import APIVersion
-from opentrons.protocols.api_support.util import AxisMaxSpeeds, APIVersionError
 from opentrons.protocols import labware as labware_definition
+from opentrons.protocols.api_support.types import APIVersion
+from opentrons.protocols.api_support.util import APIVersionError, AxisMaxSpeeds
+from opentrons.types import DeckSlotName, Location, Mount, Point, StagingSlotName
+from opentrons.util.broker import Broker
 
-from ...labware import Labware
-from ...disposal_locations import TrashBin, WasteChute
 from ..._liquid import Liquid
 from ..._types import OffDeckType
-from ..protocol import AbstractProtocol
+from ...disposal_locations import TrashBin, WasteChute
+from ...labware import Labware
 from ..labware import LabwareLoadParams
-
+from ..protocol import AbstractProtocol
 from . import legacy_module_core, module_geometry
 from .deck import Deck
-from .legacy_instrument_core import LegacyInstrumentCore
 from .labware_offset_provider import AbstractLabwareOffsetProvider
+from .legacy_instrument_core import LegacyInstrumentCore
 from .legacy_labware_core import LegacyLabwareCore
-from .load_info import LoadInfo, InstrumentLoadInfo, LabwareLoadInfo, ModuleLoadInfo
+from .load_info import InstrumentLoadInfo, LabwareLoadInfo, LoadInfo, ModuleLoadInfo
 
 logger = logging.getLogger(__name__)
 

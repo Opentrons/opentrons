@@ -1,24 +1,22 @@
 from __future__ import annotations
 
-import logging
 import json
+import logging
 import os
-
 from pathlib import Path
-from typing import Any, AnyStr, List, Dict, Optional, Union
+from typing import Any, AnyStr, Dict, List, Optional, Union
 
 import jsonschema  # type: ignore
+from opentrons_shared_data import get_shared_data_root, load_shared_data
+from opentrons_shared_data.labware.dev_types import LabwareDefinition
 
-from opentrons.protocols.api_support.util import ModifiedList
-from opentrons_shared_data import load_shared_data, get_shared_data_root
 from opentrons.protocols.api_support.constants import (
-    OPENTRONS_NAMESPACE,
     CUSTOM_NAMESPACE,
+    OPENTRONS_NAMESPACE,
     STANDARD_DEFS_PATH,
     USER_DEFS_PATH,
 )
-from opentrons_shared_data.labware.dev_types import LabwareDefinition
-
+from opentrons.protocols.api_support.util import ModifiedList
 
 MODULE_LOG = logging.getLogger(__name__)
 

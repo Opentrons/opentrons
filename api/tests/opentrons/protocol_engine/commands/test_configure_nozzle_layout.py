@@ -1,35 +1,28 @@
 """Test configure nozzle layout commands."""
+from collections import OrderedDict
+from typing import Dict, Union
+
 import pytest
 from decoy import Decoy
-from typing import Union, Dict
-from collections import OrderedDict
 
-from opentrons.protocol_engine.execution import (
-    EquipmentHandler,
-    TipHandler,
-)
-from opentrons.types import Point
 from opentrons.hardware_control.nozzle_manager import NozzleMap
-
 from opentrons.protocol_engine.commands.command import SuccessData
 from opentrons.protocol_engine.commands.configure_nozzle_layout import (
-    ConfigureNozzleLayoutParams,
-    ConfigureNozzleLayoutResult,
-    ConfigureNozzleLayoutPrivateResult,
     ConfigureNozzleLayoutImplementation,
+    ConfigureNozzleLayoutParams,
+    ConfigureNozzleLayoutPrivateResult,
+    ConfigureNozzleLayoutResult,
 )
-
+from opentrons.protocol_engine.execution import EquipmentHandler, TipHandler
 from opentrons.protocol_engine.types import (
     AllNozzleLayoutConfiguration,
     ColumnNozzleLayoutConfiguration,
     QuadrantNozzleLayoutConfiguration,
     SingleNozzleLayoutConfiguration,
 )
-from ..pipette_fixtures import (
-    NINETY_SIX_MAP,
-    NINETY_SIX_COLS,
-    NINETY_SIX_ROWS,
-)
+from opentrons.types import Point
+
+from ..pipette_fixtures import NINETY_SIX_COLS, NINETY_SIX_MAP, NINETY_SIX_ROWS
 
 
 @pytest.mark.parametrize(

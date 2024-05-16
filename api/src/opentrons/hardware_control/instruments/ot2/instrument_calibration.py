@@ -1,21 +1,22 @@
 import typing
-from typing_extensions import Literal
 from dataclasses import dataclass
 from datetime import datetime
-from opentrons.config.robot_configs import default_pipette_offset
-
-from opentrons.calibration_storage import ot2 as calibration_storage
-from opentrons.calibration_storage import types, helpers
-from opentrons.types import Mount, Point
-from opentrons.hardware_control.types import OT3Mount
 
 from opentrons_shared_data.labware.labware_definition import LabwareDefinition
+from typing_extensions import Literal
+
+from opentrons.calibration_storage import helpers
+from opentrons.calibration_storage import ot2 as calibration_storage
+from opentrons.calibration_storage import types
+from opentrons.config.robot_configs import default_pipette_offset
+from opentrons.hardware_control.types import OT3Mount
+from opentrons.types import Mount, Point
 
 if typing.TYPE_CHECKING:
-    from opentrons_shared_data.pipette.dev_types import LabwareUri
     from opentrons_shared_data.labware.dev_types import (
         LabwareDefinition as TypeDictLabwareDef,
     )
+    from opentrons_shared_data.pipette.dev_types import LabwareUri
 
 # These type aliases aid typechecking in tests that work the same on this and
 # the hardware_control.instruments.ot3 variant

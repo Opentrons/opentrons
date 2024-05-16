@@ -1,11 +1,11 @@
 from enum import Enum, auto
-from typing import TYPE_CHECKING, Optional, Union, cast, Tuple, List, Set
+from typing import TYPE_CHECKING, List, Optional, Set, Tuple, Union, cast
 
 if TYPE_CHECKING:
-    from opentrons.protocol_api.labware import Labware, Well
-    from opentrons.protocol_api.core.legacy.module_geometry import ModuleGeometry
-    from opentrons.protocol_api.module_contexts import ModuleContext
     from opentrons.protocol_api._types import OffDeckType
+    from opentrons.protocol_api.core.legacy.module_geometry import ModuleGeometry
+    from opentrons.protocol_api.labware import Labware, Well
+    from opentrons.protocol_api.module_contexts import ModuleContext
 
 WrappableLabwareLike = Union[
     "Labware",
@@ -36,12 +36,10 @@ class LabwareLike:
         Create a labware like object. Used by Location object's labware field.
         """
         # Import locally to avoid circular dependency
-        from opentrons.protocol_api.labware import Labware, Well
-        from opentrons.protocol_api.core.legacy.module_geometry import (
-            ModuleGeometry,
-        )
-        from opentrons.protocol_api.module_contexts import ModuleContext
         from opentrons.protocol_api._types import OffDeckType
+        from opentrons.protocol_api.core.legacy.module_geometry import ModuleGeometry
+        from opentrons.protocol_api.labware import Labware, Well
+        from opentrons.protocol_api.module_contexts import ModuleContext
 
         self._labware_like = labware_like
         self._type = LabwareLikeType.NONE
@@ -128,9 +126,7 @@ class LabwareLike:
         return cast(Labware, self.object)
 
     def as_module(self) -> Union["ModuleContext", "ModuleGeometry"]:
-        from opentrons.protocol_api.core.legacy.module_geometry import (
-            ModuleGeometry,
-        )
+        from opentrons.protocol_api.core.legacy.module_geometry import ModuleGeometry
         from opentrons.protocol_api.module_contexts import ModuleContext
 
         if isinstance(self.object, ModuleContext):

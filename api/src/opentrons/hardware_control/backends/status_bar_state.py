@@ -1,11 +1,12 @@
-from opentrons.hardware_control.types import StatusBarState
-from opentrons_hardware.hardware_control import status_bar
+from typing import List
+
 from opentrons_hardware.firmware_bindings.binary_constants import (
     LightAnimationType,
     LightTransitionType,
 )
+from opentrons_hardware.hardware_control import status_bar
 
-from typing import List
+from opentrons.hardware_control.types import StatusBarState
 
 
 class StatusBarStateController:

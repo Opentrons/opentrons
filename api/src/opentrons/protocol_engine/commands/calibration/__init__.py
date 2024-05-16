@@ -1,34 +1,31 @@
 """Calibration commands."""
 from .calibrate_gripper import (
+    CalibrateGripper,
+    CalibrateGripperCommandType,
+    CalibrateGripperCreate,
     CalibrateGripperParams,
     CalibrateGripperResult,
-    CalibrateGripperCreate,
-    CalibrateGripperCommandType,
-    CalibrateGripper,
 )
-
-from .calibrate_pipette import (
-    CalibratePipetteParams,
-    CalibratePipetteResult,
-    CalibratePipetteCreate,
-    CalibratePipetteCommandType,
-    CalibratePipette,
-)
-
 from .calibrate_module import (
+    CalibrateModule,
+    CalibrateModuleCommandType,
+    CalibrateModuleCreate,
     CalibrateModuleParams,
     CalibrateModuleResult,
-    CalibrateModuleCreate,
-    CalibrateModuleCommandType,
-    CalibrateModule,
 )
-
+from .calibrate_pipette import (
+    CalibratePipette,
+    CalibratePipetteCommandType,
+    CalibratePipetteCreate,
+    CalibratePipetteParams,
+    CalibratePipetteResult,
+)
 from .move_to_maintenance_position import (
+    MoveToMaintenancePosition,
+    MoveToMaintenancePositionCommandType,
+    MoveToMaintenancePositionCreate,
     MoveToMaintenancePositionParams,
     MoveToMaintenancePositionResult,
-    MoveToMaintenancePositionCreate,
-    MoveToMaintenancePositionCommandType,
-    MoveToMaintenancePosition,
 )
 
 __all__ = [

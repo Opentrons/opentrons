@@ -2,7 +2,7 @@
 import asyncio
 from typing import Optional, Type, TypeVar, cast
 
-from opentrons.drivers.rpi_drivers.types import USBPort, PortGroup
+from opentrons.drivers.rpi_drivers.types import PortGroup, USBPort
 from opentrons.hardware_control import ExecutionManager
 from opentrons.hardware_control.modules import AbstractModule
 

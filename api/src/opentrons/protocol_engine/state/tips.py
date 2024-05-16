@@ -1,30 +1,25 @@
 """Tip state tracking."""
 from dataclasses import dataclass
 from enum import Enum
-from typing import Dict, Optional, List, Union
+from typing import Dict, List, Optional, Union
 
-from .abstract_store import HasState, HandlesActions
-from ..actions import (
-    Action,
-    SucceedCommandAction,
-    FailCommandAction,
-    ResetTipsAction,
-)
+from opentrons.hardware_control.nozzle_manager import NozzleMap
+
+from ..actions import Action, FailCommandAction, ResetTipsAction, SucceedCommandAction
 from ..commands import (
     Command,
+    DropTipInPlaceResult,
+    DropTipResult,
     LoadLabwareResult,
     PickUpTip,
     PickUpTipResult,
-    DropTipResult,
-    DropTipInPlaceResult,
 )
 from ..commands.configuring_common import (
     PipetteConfigUpdateResultMixin,
     PipetteNozzleLayoutResultMixin,
 )
 from ..error_recovery_policy import ErrorRecoveryType
-
-from opentrons.hardware_control.nozzle_manager import NozzleMap
+from .abstract_store import HandlesActions, HasState
 
 
 class TipRackWellState(Enum):

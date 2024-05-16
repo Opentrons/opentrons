@@ -1,15 +1,16 @@
 from typing import Dict, Optional
-from typing_extensions import Protocol
 
 from opentrons_shared_data.pipette.dev_types import PipetteName
-from opentrons.types import Mount
-from .types import MountArgType
+from typing_extensions import Protocol
 
 # TODO (lc 12-05-2022) This protocol has deviated from the OT3 api. We
 # need to figure out how to combine them again in follow-up refactors.
 from opentrons.hardware_control.instruments.ot2.pipette import Pipette
+from opentrons.types import Mount
+
 from ..dev_types import PipetteDict
 from ..types import CriticalPoint
+from .types import MountArgType
 
 
 class InstrumentConfigurer(Protocol[MountArgType]):

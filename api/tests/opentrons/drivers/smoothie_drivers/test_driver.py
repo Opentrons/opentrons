@@ -1,19 +1,19 @@
 from copy import deepcopy
 from typing import Dict, cast
 
+import pytest
+from mock import AsyncMock, patch
+
 from opentrons.drivers import utils
 from opentrons.drivers.asyncio.communication import AlarmResponse
-from mock import AsyncMock, patch
-import pytest
+from opentrons.drivers.rpi_drivers.gpio_simulator import SimulatingGPIOCharDev
+from opentrons.drivers.smoothie_drivers import constants, driver_3_0
 from opentrons.drivers.smoothie_drivers.connection import SmoothieConnection
 from opentrons.drivers.smoothie_drivers.constants import (
     HOMED_POSITION,
     Y_BOUND_OVERRIDE,
 )
-from opentrons.drivers.rpi_drivers.gpio_simulator import SimulatingGPIOCharDev
-
-from opentrons.drivers.smoothie_drivers import driver_3_0, constants
-from opentrons.drivers.smoothie_drivers.errors import SmoothieError, SmoothieAlarm
+from opentrons.drivers.smoothie_drivers.errors import SmoothieAlarm, SmoothieError
 
 
 @pytest.fixture

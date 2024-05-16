@@ -7,57 +7,45 @@ import functools
 import logging
 from typing import Any, Dict, Optional, Set, Tuple, Union, cast
 
+from opentrons_shared_data.errors.exceptions import (
+    CommandPreconditionViolated,
+    InvalidLiquidClassName,
+)
+from opentrons_shared_data.pipette import load_data as load_pipette_data
+from opentrons_shared_data.pipette import types as pip_types
+from opentrons_shared_data.pipette.dev_types import (
+    PipetteModel,
+    PipetteName,
+    UlPerMmAction,
+)
 from opentrons_shared_data.pipette.pipette_definition import (
-    PipetteConfigurations,
-    PlungerPositions,
-    MotorConfigurations,
-    SupportedTipsDefinition,
-    PickUpTipConfigurations,
     DropTipConfigurations,
+    MotorConfigurations,
+    PickUpTipConfigurations,
+    PipetteConfigurations,
+    PipetteLiquidPropertiesDefinition,
     PipetteModelVersionType,
     PipetteNameType,
-    PipetteLiquidPropertiesDefinition,
-)
-from opentrons_shared_data.pipette import (
-    load_data as load_pipette_data,
-    types as pip_types,
-)
-from opentrons_shared_data.errors.exceptions import (
-    InvalidLiquidClassName,
-    CommandPreconditionViolated,
+    PlungerPositions,
+    SupportedTipsDefinition,
 )
 from opentrons_shared_data.pipette.ul_per_mm import (
-    piecewise_volume_conversion,
     PIPETTING_FUNCTION_FALLBACK_VERSION,
     PIPETTING_FUNCTION_LATEST_VERSION,
+    piecewise_volume_conversion,
 )
 
-
-from opentrons.types import Point, Mount
 from opentrons.config import robot_configs
 from opentrons.config.types import RobotConfig
 from opentrons.drivers.types import MoveSplit
-from ..instrument_abc import AbstractInstrument
-
-from .instrument_calibration import (
-    PipetteOffsetByPipetteMount,
-    load_pipette_offset,
-)
-from opentrons.hardware_control.types import (
-    CriticalPoint,
-    BoardRevision,
-)
-from opentrons.hardware_control.errors import InvalidCriticalPoint
 from opentrons.hardware_control import nozzle_manager
-
-
-from opentrons_shared_data.pipette.dev_types import (
-    UlPerMmAction,
-    PipetteName,
-    PipetteModel,
-)
 from opentrons.hardware_control.dev_types import InstrumentHardwareConfigs
+from opentrons.hardware_control.errors import InvalidCriticalPoint
+from opentrons.hardware_control.types import BoardRevision, CriticalPoint
+from opentrons.types import Mount, Point
 
+from ..instrument_abc import AbstractInstrument
+from .instrument_calibration import PipetteOffsetByPipetteMount, load_pipette_offset
 
 RECONFIG_KEYS = {"quirks"}
 

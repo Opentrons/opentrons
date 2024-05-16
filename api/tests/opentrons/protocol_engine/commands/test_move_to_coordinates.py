@@ -2,17 +2,16 @@
 from decoy import Decoy
 
 from opentrons.hardware_control import HardwareControlAPI
+from opentrons.protocol_engine.commands.command import SuccessData
+from opentrons.protocol_engine.commands.move_to_coordinates import (
+    MoveToCoordinatesImplementation,
+    MoveToCoordinatesParams,
+    MoveToCoordinatesResult,
+)
 from opentrons.protocol_engine.execution import MovementHandler
 from opentrons.protocol_engine.state import StateView
 from opentrons.protocol_engine.types import DeckPoint
 from opentrons.types import Point
-
-from opentrons.protocol_engine.commands.command import SuccessData
-from opentrons.protocol_engine.commands.move_to_coordinates import (
-    MoveToCoordinatesParams,
-    MoveToCoordinatesResult,
-    MoveToCoordinatesImplementation,
-)
 
 
 async def test_move_to_coordinates_implementation(

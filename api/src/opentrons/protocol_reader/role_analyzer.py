@@ -3,11 +3,11 @@ from dataclasses import dataclass
 from typing import List, Sequence, Union
 
 from .file_identifier import (
+    IdentifiedData,
     IdentifiedFile,
     IdentifiedJsonMain,
-    IdentifiedPythonMain,
     IdentifiedLabwareDefinition,
-    IdentifiedData,
+    IdentifiedPythonMain,
 )
 from .protocol_files_invalid_error import ProtocolFilesInvalidError
 

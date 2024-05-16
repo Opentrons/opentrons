@@ -3,21 +3,19 @@
 import json
 
 import pytest
-
 from opentrons_shared_data import load_shared_data
 
-from opentrons.protocols.api_support.types import APIVersion
-
-from opentrons.protocol_reader.file_identifier import (
-    IdentifiedJsonMain,
-    IdentifiedPythonMain,
-    IdentifiedLabwareDefinition,
-)
-from opentrons.protocol_reader.file_reader_writer import BufferedFile
 from opentrons.protocol_reader.file_format_validator import (
     FileFormatValidationError,
     FileFormatValidator,
 )
+from opentrons.protocol_reader.file_identifier import (
+    IdentifiedJsonMain,
+    IdentifiedLabwareDefinition,
+    IdentifiedPythonMain,
+)
+from opentrons.protocol_reader.file_reader_writer import BufferedFile
+from opentrons.protocols.api_support.types import APIVersion
 
 
 @pytest.mark.parametrize(

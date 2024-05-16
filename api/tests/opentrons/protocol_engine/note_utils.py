@@ -1,6 +1,7 @@
 """Test utilities for dealing with notes."""
 import re
 from typing import Optional
+
 from opentrons.protocol_engine.notes import CommandNote
 
 

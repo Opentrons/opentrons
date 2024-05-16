@@ -1,104 +1,95 @@
-import mock
-import pytest
-from decoy import Decoy
 import asyncio
-
-from contextlib import (
-    nullcontext as does_not_raise,
-    AbstractContextManager,
-)
+from contextlib import AbstractContextManager
+from contextlib import nullcontext as does_not_raise
 from typing import (
-    cast,
+    Any,
+    AsyncIterator,
+    ContextManager,
     Dict,
+    Iterator,
     List,
     Optional,
     Set,
     Tuple,
-    Any,
-    Iterator,
-    AsyncIterator,
-    ContextManager,
+    cast,
 )
 
+import mock
+import pytest
+from decoy import Decoy
+from opentrons_hardware.drivers.binary_usb import SerialUsbDriver
+from opentrons_hardware.drivers.can_bus.abstract_driver import AbstractCanDriver
+from opentrons_hardware.drivers.can_bus.can_messenger import (
+    CanMessenger,
+    MessageListenerCallback,
+    MessageListenerCallbackFilter,
+)
+from opentrons_hardware.drivers.eeprom import EEPROMDriver
+from opentrons_hardware.firmware_bindings.arbitration_id import ArbitrationId
+from opentrons_hardware.firmware_bindings.constants import NodeId
+from opentrons_hardware.firmware_bindings.constants import (
+    PipetteName as FirmwarePipetteName,
+)
+from opentrons_hardware.firmware_bindings.constants import USBTarget
+from opentrons_hardware.firmware_bindings.messages.messages import MessageDefinition
+from opentrons_hardware.firmware_bindings.utils import UInt8Field
+from opentrons_hardware.hardware_control import current_settings
+from opentrons_hardware.hardware_control.motion import (
+    MoveGroupSingleAxisStep,
+    MoveStopCondition,
+    MoveType,
+)
+from opentrons_hardware.hardware_control.move_group_runner import MoveGroupRunner
+from opentrons_hardware.hardware_control.network import DeviceInfoCache
+from opentrons_hardware.hardware_control.tools.types import (
+    GripperInformation,
+    PipetteInformation,
+    ToolSummary,
+)
+from opentrons_hardware.hardware_control.types import (
+    MotorPositionStatus,
+    MoveCompleteAck,
+    PCBARevision,
+)
+from opentrons_shared_data.errors.exceptions import (
+    EStopActivatedError,
+    EStopNotPresentError,
+    FailedGripperPickupError,
+    FirmwareUpdateRequiredError,
+    LiquidNotFoundError,
+)
+
+from opentrons.config.robot_configs import build_config_ot3
+from opentrons.config.types import (
+    GantryLoad,
+    LiquidProbeSettings,
+    OT3Config,
+    OutputOptions,
+)
+from opentrons.hardware_control.backends.estop_state import EstopStateMachine
 from opentrons.hardware_control.backends.ot3controller import OT3Controller
 from opentrons.hardware_control.backends.ot3utils import (
-    node_to_axis,
     axis_to_node,
+    node_to_axis,
     sensor_node_for_mount,
     subsystem_to_target,
     target_to_subsystem,
 )
 from opentrons.hardware_control.backends.subsystem_manager import SubsystemManager
-from opentrons_hardware.drivers.eeprom import EEPROMDriver
-from opentrons_hardware.drivers.can_bus.can_messenger import (
-    MessageListenerCallback,
-    MessageListenerCallbackFilter,
-    CanMessenger,
-)
-from opentrons.config.types import (
-    OT3Config,
-    GantryLoad,
-    LiquidProbeSettings,
-    OutputOptions,
-)
-from opentrons.config.robot_configs import build_config_ot3
-from opentrons_hardware.firmware_bindings.arbitration_id import ArbitrationId
-from opentrons_hardware.firmware_bindings.constants import (
-    NodeId,
-    PipetteName as FirmwarePipetteName,
-    USBTarget,
-)
-from opentrons_hardware.drivers.can_bus.abstract_driver import AbstractCanDriver
-from opentrons_hardware.drivers.binary_usb import SerialUsbDriver
+from opentrons.hardware_control.errors import InvalidPipetteModel, InvalidPipetteName
 from opentrons.hardware_control.types import (
     Axis,
-    OT3Mount,
-    OT3AxisMap,
+    CurrentConfig,
+    EstopState,
+    InstrumentProbeType,
     MotorStatus,
+    OT3AxisMap,
+    OT3Mount,
     SubSystem,
     SubSystemState,
-    UpdateStatus,
     UpdateState,
-    EstopState,
-    CurrentConfig,
-    InstrumentProbeType,
+    UpdateStatus,
 )
-from opentrons.hardware_control.errors import (
-    InvalidPipetteName,
-    InvalidPipetteModel,
-)
-
-from opentrons_hardware.firmware_bindings.utils import UInt8Field
-from opentrons_hardware.firmware_bindings.messages.messages import MessageDefinition
-from opentrons_hardware.hardware_control.motion import (
-    MoveType,
-    MoveStopCondition,
-    MoveGroupSingleAxisStep,
-)
-from opentrons_hardware.hardware_control.types import (
-    PCBARevision,
-    MotorPositionStatus,
-    MoveCompleteAck,
-)
-from opentrons_hardware.hardware_control import current_settings
-from opentrons_hardware.hardware_control.network import DeviceInfoCache
-from opentrons_hardware.hardware_control.tools.types import (
-    ToolSummary,
-    PipetteInformation,
-    GripperInformation,
-)
-
-from opentrons.hardware_control.backends.estop_state import EstopStateMachine
-
-from opentrons_shared_data.errors.exceptions import (
-    EStopActivatedError,
-    EStopNotPresentError,
-    FirmwareUpdateRequiredError,
-    FailedGripperPickupError,
-    LiquidNotFoundError,
-)
-
-from opentrons_hardware.hardware_control.move_group_runner import MoveGroupRunner
 
 
 @pytest.fixture

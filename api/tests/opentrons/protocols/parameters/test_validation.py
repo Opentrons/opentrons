@@ -1,15 +1,15 @@
-import pytest
-from typing import Optional, List, Union
+from typing import List, Optional, Union
 
+import pytest
+
+from opentrons.protocols.parameters import validation as subject
 from opentrons.protocols.parameters.types import (
     AllowedTypes,
     ParameterChoice,
+    ParameterDefinitionError,
     ParameterNameError,
     ParameterValueError,
-    ParameterDefinitionError,
 )
-
-from opentrons.protocols.parameters import validation as subject
 
 
 def test_validate_variable_name_unique() -> None:

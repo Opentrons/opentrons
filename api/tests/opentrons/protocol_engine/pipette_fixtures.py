@@ -2,10 +2,10 @@
 
 from collections import OrderedDict
 
-from opentrons.types import Point
-from opentrons.hardware_control.nozzle_manager import NozzleMap
 from opentrons_shared_data.pipette.dev_types import PipetteNameType
 
+from opentrons.hardware_control.nozzle_manager import NozzleMap
+from opentrons.types import Point
 
 NINETY_SIX_ROWS = OrderedDict(
     (

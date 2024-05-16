@@ -2,63 +2,55 @@
 from contextlib import AsyncExitStack
 from logging import getLogger
 from typing import Dict, Optional, Union
+
+from opentrons_shared_data.errors import EnumeratedError, ErrorCodes
+
+from opentrons.hardware_control import HardwareControlAPI
+from opentrons.hardware_control.modules import AbstractModule as HardwareModuleAPI
+from opentrons.hardware_control.types import PauseType as HardwarePauseType
 from opentrons.protocol_engine.actions.actions import ResumeFromRecoveryAction
 from opentrons.protocol_engine.error_recovery_policy import (
     ErrorRecoveryPolicy,
     error_recovery_by_ff,
 )
-
 from opentrons.protocols.models import LabwareDefinition
-from opentrons.hardware_control import HardwareControlAPI
-from opentrons.hardware_control.modules import AbstractModule as HardwareModuleAPI
-from opentrons.hardware_control.types import PauseType as HardwarePauseType
-from opentrons_shared_data.errors import (
-    ErrorCodes,
-    EnumeratedError,
-)
 
-from .errors import ProtocolCommandFailedError, ErrorOccurrence, CommandNotAllowedError
-from .errors.exceptions import EStopActivatedError
 from . import commands, slot_standardization
+from .actions import (
+    ActionDispatcher,
+    AddAddressableAreaAction,
+    AddLabwareDefinitionAction,
+    AddLabwareOffsetAction,
+    AddLiquidAction,
+    AddModuleAction,
+    FinishAction,
+    FinishErrorDetails,
+    HardwareStoppedAction,
+    PauseAction,
+    PauseSource,
+    PlayAction,
+    QueueCommandAction,
+    ResetTipsAction,
+    SetPipetteMovementSpeedAction,
+    StopAction,
+)
+from .errors import CommandNotAllowedError, ErrorOccurrence, ProtocolCommandFailedError
+from .errors.exceptions import EStopActivatedError
+from .execution import DoorWatcher, HardwareStopper, QueueWorker, create_queue_worker
+from .plugins import AbstractPlugin, PluginStarter
 from .resources import ModelUtils, ModuleDataProvider
+from .state import StateStore, StateView
 from .types import (
+    AddressableAreaLocation,
+    DeckConfigurationType,
+    HexColor,
     LabwareOffset,
     LabwareOffsetCreate,
     LabwareUri,
-    ModuleModel,
     Liquid,
-    HexColor,
+    ModuleModel,
     PostRunHardwareState,
-    DeckConfigurationType,
-    AddressableAreaLocation,
 )
-from .execution import (
-    QueueWorker,
-    create_queue_worker,
-    DoorWatcher,
-    HardwareStopper,
-)
-from .state import StateStore, StateView
-from .plugins import AbstractPlugin, PluginStarter
-from .actions import (
-    ActionDispatcher,
-    PlayAction,
-    PauseAction,
-    PauseSource,
-    StopAction,
-    FinishAction,
-    FinishErrorDetails,
-    QueueCommandAction,
-    AddLabwareOffsetAction,
-    AddLabwareDefinitionAction,
-    AddLiquidAction,
-    AddAddressableAreaAction,
-    AddModuleAction,
-    HardwareStoppedAction,
-    ResetTipsAction,
-    SetPipetteMovementSpeedAction,
-)
-
 
 _log = getLogger(__name__)
 

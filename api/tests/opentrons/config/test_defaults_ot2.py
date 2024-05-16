@@ -1,5 +1,5 @@
-from opentrons.config.types import CurrentDict
 from opentrons.config import defaults_ot2
+from opentrons.config.types import CurrentDict
 
 
 def test_load_currents() -> None:

@@ -1,14 +1,15 @@
 """Move to coordinates command request, result, and implementation models."""
 from __future__ import annotations
 
+from typing import TYPE_CHECKING, Optional, Type
+
 from pydantic import Field
-from typing import Optional, Type, TYPE_CHECKING
 from typing_extensions import Literal
 
-from ..types import DeckPoint
-from .pipetting_common import PipetteIdMixin, MovementMixin, DestinationPositionResult
-from .command import AbstractCommandImpl, BaseCommand, BaseCommandCreate, SuccessData
 from ..errors.error_occurrence import ErrorOccurrence
+from ..types import DeckPoint
+from .command import AbstractCommandImpl, BaseCommand, BaseCommandCreate, SuccessData
+from .pipetting_common import DestinationPositionResult, MovementMixin, PipetteIdMixin
 
 if TYPE_CHECKING:
     from ..execution import MovementHandler

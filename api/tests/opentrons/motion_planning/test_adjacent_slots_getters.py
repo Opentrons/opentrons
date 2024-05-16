@@ -1,23 +1,23 @@
 """Tests for adjacent_slots_getters."""
-import pytest
 from typing import List, Optional
 
+import pytest
 from opentrons_shared_data.robot.dev_types import RobotType
 
-from opentrons.types import DeckSlotName, StagingSlotName
 from opentrons.motion_planning.adjacent_slots_getters import (
-    get_east_slot,
-    get_south_slot,
-    get_west_slot,
-    get_north_slot,
-    get_east_west_slots,
-    get_north_south_slots,
-    get_adjacent_slots,
-    get_west_of_staging_slot,
-    get_adjacent_staging_slot,
     _MixedTypeSlots,
+    get_adjacent_slots,
+    get_adjacent_staging_slot,
+    get_east_slot,
+    get_east_west_slots,
+    get_north_slot,
+    get_north_south_slots,
+    get_south_slot,
     get_surrounding_slots,
+    get_west_of_staging_slot,
+    get_west_slot,
 )
+from opentrons.types import DeckSlotName, StagingSlotName
 
 
 @pytest.mark.parametrize(

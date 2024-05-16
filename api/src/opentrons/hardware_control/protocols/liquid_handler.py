@@ -1,12 +1,12 @@
 from typing import Optional
+
 from typing_extensions import Protocol
 
-from .types import MountArgType, CalibrationType, ConfigType
-
+from .calibratable import Calibratable
+from .configurable import Configurable
 from .instrument_configurer import InstrumentConfigurer
 from .motion_controller import MotionController
-from .configurable import Configurable
-from .calibratable import Calibratable
+from .types import CalibrationType, ConfigType, MountArgType
 
 
 class LiquidHandler(

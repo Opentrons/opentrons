@@ -1,18 +1,15 @@
 """Test blow-out-in-place commands."""
 from decoy import Decoy
 
-from opentrons.protocol_engine.state import StateView
+from opentrons.hardware_control import HardwareControlAPI
 from opentrons.protocol_engine.commands.blow_out_in_place import (
+    BlowOutInPlaceImplementation,
     BlowOutInPlaceParams,
     BlowOutInPlaceResult,
-    BlowOutInPlaceImplementation,
 )
 from opentrons.protocol_engine.commands.command import SuccessData
-from opentrons.protocol_engine.execution import (
-    MovementHandler,
-    PipettingHandler,
-)
-from opentrons.hardware_control import HardwareControlAPI
+from opentrons.protocol_engine.execution import MovementHandler, PipettingHandler
+from opentrons.protocol_engine.state import StateView
 
 
 async def test_blow_out_in_place_implementation(

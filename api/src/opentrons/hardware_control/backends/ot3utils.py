@@ -1,62 +1,65 @@
 """Shared utilities for ot3 hardware control."""
-from typing import Dict, Iterable, List, Set, Tuple, TypeVar, cast, Sequence, Optional
-from typing_extensions import Literal
 from logging import getLogger
-from opentrons.config.defaults_ot3 import DEFAULT_CALIBRATION_AXIS_MAX_SPEED
-from opentrons.config.types import OT3MotionSettings, OT3CurrentSettings, GantryLoad
-from opentrons.hardware_control.types import (
-    Axis,
-    OT3AxisKind,
-    OT3AxisMap,
-    CurrentConfig,
-    SubSystem,
-    OT3Mount,
-    InstrumentProbeType,
-    PipetteSubType,
-    UpdateState,
-    UpdateStatus,
-    GripperJawState,
-)
-import numpy as np
+from typing import Dict, Iterable, List, Optional, Sequence, Set, Tuple, TypeVar, cast
 
+import numpy as np
+from opentrons_hardware.firmware_bindings.constants import FirmwareTarget
+from opentrons_hardware.firmware_bindings.constants import (
+    GripperJawState as FirmwareGripperjawState,
+)
 from opentrons_hardware.firmware_bindings.constants import (
     NodeId,
-    FirmwareTarget,
+    PipetteTipActionType,
     PipetteType,
     SensorId,
-    PipetteTipActionType,
     USBTarget,
-    GripperJawState as FirmwareGripperjawState,
 )
 from opentrons_hardware.firmware_update.types import FirmwareUpdateStatus, StatusElement
 from opentrons_hardware.hardware_control import network
+from opentrons_hardware.hardware_control.constants import interrupts_per_sec
+from opentrons_hardware.hardware_control.motion import (
+    MoveGroup,
+    MoveStopCondition,
+    MoveType,
+    NodeIdMotionValues,
+    create_backoff_step,
+    create_gripper_jaw_step,
+    create_home_step,
+    create_step,
+    create_tip_action_backoff_step,
+    create_tip_action_step,
+)
 from opentrons_hardware.hardware_control.motion_planning import (
     AxisConstraints,
-    SystemConstraints,
     Coordinates,
-    Move,
     CoordinateValue,
+    Move,
+    SystemConstraints,
+)
+from opentrons_hardware.hardware_control.motion_planning.move_utils import (
+    unit_vector_multiplication,
 )
 from opentrons_hardware.hardware_control.tool_sensors import (
     InstrumentProbeTarget,
     PipetteProbeTarget,
 )
-from opentrons_hardware.hardware_control.motion_planning.move_utils import (
-    unit_vector_multiplication,
+from typing_extensions import Literal
+
+from opentrons.config.defaults_ot3 import DEFAULT_CALIBRATION_AXIS_MAX_SPEED
+from opentrons.config.types import GantryLoad, OT3CurrentSettings, OT3MotionSettings
+from opentrons.hardware_control.types import (
+    Axis,
+    CurrentConfig,
+    GripperJawState,
+    InstrumentProbeType,
+    OT3AxisKind,
+    OT3AxisMap,
+    OT3Mount,
+    PipetteSubType,
+    SubSystem,
+    UpdateState,
+    UpdateStatus,
 )
-from opentrons_hardware.hardware_control.motion import (
-    create_step,
-    NodeIdMotionValues,
-    create_home_step,
-    create_backoff_step,
-    create_tip_action_backoff_step,
-    MoveGroup,
-    MoveType,
-    MoveStopCondition,
-    create_gripper_jaw_step,
-    create_tip_action_step,
-)
-from opentrons_hardware.hardware_control.constants import interrupts_per_sec
 
 GRIPPER_JAW_HOME_TIME: float = 10
 GRIPPER_JAW_GRIP_TIME: float = 10

@@ -1,24 +1,19 @@
 """Tests for opentrons.legacy.Deck."""
 import inspect
-from typing import cast, Dict
+from typing import Dict, cast
 
 import pytest
 from decoy import Decoy
-
 from opentrons_shared_data.deck.dev_types import DeckDefinitionV5, SlotDefV3
 
 from opentrons.motion_planning import adjacent_slots_getters as mock_adjacent_slots
+from opentrons.protocol_api import OFF_DECK, Deck, Labware
+from opentrons.protocol_api import validation as mock_validation
+from opentrons.protocol_api.core.common import LabwareCore, ModuleCore, ProtocolCore
+from opentrons.protocol_api.core.core_map import LoadedCoreMap
+from opentrons.protocol_api.deck import CalibrationPosition
 from opentrons.protocols.api_support.types import APIVersion
 from opentrons.protocols.api_support.util import APIVersionError
-from opentrons.protocol_api.core.common import ProtocolCore, LabwareCore, ModuleCore
-from opentrons.protocol_api.core.core_map import LoadedCoreMap
-from opentrons.protocol_api import (
-    Deck,
-    Labware,
-    OFF_DECK,
-    validation as mock_validation,
-)
-from opentrons.protocol_api.deck import CalibrationPosition
 from opentrons.types import DeckSlotName, Point
 
 

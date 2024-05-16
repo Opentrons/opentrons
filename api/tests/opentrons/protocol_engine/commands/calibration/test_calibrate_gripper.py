@@ -3,34 +3,31 @@
 from __future__ import annotations
 
 import inspect
-import pytest
 from datetime import datetime
-from decoy import Decoy
 from typing import TYPE_CHECKING
 
+import pytest
+from decoy import Decoy
+from opentrons_shared_data.errors.exceptions import EarlyCapacitiveSenseTrigger
+
+from opentrons.calibration_storage.types import CalibrationStatus
+from opentrons.calibration_storage.types import SourceType as CalibrationSourceType
 from opentrons.hardware_control import ot3_calibration
 from opentrons.hardware_control.api import API as OT2API
-from opentrons.hardware_control.types import GripperProbe, OT3Mount
 from opentrons.hardware_control.instruments.ot3.instrument_calibration import (
     GripperCalibrationOffset,
 )
-from opentrons.calibration_storage.types import (
-    CalibrationStatus,
-    SourceType as CalibrationSourceType,
-)
-from opentrons.types import Point
-
+from opentrons.hardware_control.types import GripperProbe, OT3Mount
 from opentrons.protocol_engine.commands.calibration.calibrate_gripper import (
-    CalibrateGripperResult,
     CalibrateGripperImplementation,
     CalibrateGripperParams,
     CalibrateGripperParamsJaw,
+    CalibrateGripperResult,
 )
 from opentrons.protocol_engine.commands.command import SuccessData
 from opentrons.protocol_engine.errors import HardwareNotSupportedError
 from opentrons.protocol_engine.types import Vec3f
-
-from opentrons_shared_data.errors.exceptions import EarlyCapacitiveSenseTrigger
+from opentrons.types import Point
 
 if TYPE_CHECKING:
     # Support environments without OT-3 hardware control dependencies.

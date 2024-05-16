@@ -1,4 +1,4 @@
-from typing import Dict, Optional, Any
+from typing import Any, Dict, Optional
 
 from opentrons.protocols.parameters.types import AllowedTypes, ParameterNameError
 

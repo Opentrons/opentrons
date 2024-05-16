@@ -1,16 +1,15 @@
 """Test get tip presence commands."""
-from decoy import Decoy
 import pytest
-
-from opentrons.protocol_engine.execution import TipHandler
-from opentrons.protocol_engine.types import TipPresenceStatus
+from decoy import Decoy
 
 from opentrons.protocol_engine.commands.command import SuccessData
 from opentrons.protocol_engine.commands.get_tip_presence import (
+    GetTipPresenceImplementation,
     GetTipPresenceParams,
     GetTipPresenceResult,
-    GetTipPresenceImplementation,
 )
+from opentrons.protocol_engine.execution import TipHandler
+from opentrons.protocol_engine.types import TipPresenceStatus
 
 
 @pytest.mark.parametrize(

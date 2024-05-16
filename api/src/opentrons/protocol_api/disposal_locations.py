@@ -1,13 +1,13 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+
 from typing_extensions import Protocol as TypingProtocol
 
-from opentrons.types import DeckSlotName
+from opentrons.protocol_engine.clients import SyncClient
 from opentrons.protocols.api_support.types import APIVersion
 from opentrons.protocols.api_support.util import requires_version
-from opentrons.protocol_engine.clients import SyncClient
-
+from opentrons.types import DeckSlotName
 
 # TODO(jbl 2024-02-26) these are hardcoded here since there is a 1 to many relationship going from
 #   addressable area names to cutout fixture ids. Currently for trash and waste chute this would not be

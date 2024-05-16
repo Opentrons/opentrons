@@ -6,22 +6,21 @@ from datetime import datetime
 import pytest
 from decoy import Decoy
 
-from opentrons.types import DeckSlotName, Point
 from opentrons.hardware_control.modules.types import TemperatureModuleModel
-from opentrons.protocol_engine import (
-    ProtocolEngine,
-    LabwareOffset,
-    LabwareOffsetVector,
-    LabwareOffsetLocation,
-    ModuleModel,
-)
-from opentrons.protocol_engine.state import LabwareView
-
 from opentrons.protocol_api.core.labware import LabwareLoadParams
 from opentrons.protocol_api.core.legacy.labware_offset_provider import (
     LabwareOffsetProvider,
     ProvidedLabwareOffset,
 )
+from opentrons.protocol_engine import (
+    LabwareOffset,
+    LabwareOffsetLocation,
+    LabwareOffsetVector,
+    ModuleModel,
+    ProtocolEngine,
+)
+from opentrons.protocol_engine.state import LabwareView
+from opentrons.types import DeckSlotName, Point
 
 
 @pytest.fixture

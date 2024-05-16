@@ -1,19 +1,17 @@
 """Addressable area state view tests."""
 import inspect
+from typing import Dict, Optional, Set, cast
 
 import pytest
 from decoy import Decoy
-from typing import Dict, Set, Optional, cast
-
-from opentrons_shared_data.robot.dev_types import RobotType
 from opentrons_shared_data.deck.dev_types import DeckDefinitionV5
-from opentrons.types import Point, DeckSlotName
+from opentrons_shared_data.robot.dev_types import RobotType
 
 from opentrons.protocol_engine.errors import (
+    AddressableAreaDoesNotExistError,
     AreaNotInDeckConfigurationError,
     IncompatibleAddressableAreaError,
     SlotDoesNotExistError,
-    AddressableAreaDoesNotExistError,
 )
 from opentrons.protocol_engine.resources import deck_configuration_provider
 from opentrons.protocol_engine.state.addressable_areas import (
@@ -22,13 +20,14 @@ from opentrons.protocol_engine.state.addressable_areas import (
 )
 from opentrons.protocol_engine.types import (
     AddressableArea,
+    AddressableOffsetVector,
     AreaType,
     DeckConfigurationType,
-    PotentialCutoutFixture,
-    Dimensions,
     DeckPoint,
-    AddressableOffsetVector,
+    Dimensions,
+    PotentialCutoutFixture,
 )
+from opentrons.types import DeckSlotName, Point
 
 
 @pytest.fixture(autouse=True)

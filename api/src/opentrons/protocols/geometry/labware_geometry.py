@@ -1,7 +1,8 @@
 from abc import ABC, abstractmethod
 
-from opentrons.types import Location, Point
 from opentrons_shared_data.labware.dev_types import LabwareDefinition
+
+from opentrons.types import Location, Point
 
 
 class AbstractLabwareGeometry(ABC):

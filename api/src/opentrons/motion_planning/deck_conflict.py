@@ -3,17 +3,17 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from typing import List, Mapping, NamedTuple, Optional, Set, Union
-from typing_extensions import Final
 
 from opentrons_shared_data.labware.dev_types import LabwareUri
 from opentrons_shared_data.robot.dev_types import RobotType
+from typing_extensions import Final
+
 from opentrons.motion_planning.adjacent_slots_getters import (
-    get_east_west_slots,
-    get_south_slot,
     get_adjacent_slots,
     get_adjacent_staging_slot,
+    get_east_west_slots,
+    get_south_slot,
 )
-
 from opentrons.types import DeckSlotName, StagingSlotName
 
 _FIXED_TRASH_SLOT: Final[Set[DeckSlotName]] = {

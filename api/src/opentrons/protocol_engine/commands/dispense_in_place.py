@@ -1,18 +1,19 @@
 """Dispense-in-place command request, result, and implementation models."""
 from __future__ import annotations
+
 from typing import TYPE_CHECKING, Optional, Type
-from typing_extensions import Literal
 
 from pydantic import Field
+from typing_extensions import Literal
 
+from ..errors.error_occurrence import ErrorOccurrence
+from .command import AbstractCommandImpl, BaseCommand, BaseCommandCreate, SuccessData
 from .pipetting_common import (
-    PipetteIdMixin,
+    BaseLiquidHandlingResult,
     DispenseVolumeMixin,
     FlowRateMixin,
-    BaseLiquidHandlingResult,
+    PipetteIdMixin,
 )
-from .command import AbstractCommandImpl, BaseCommand, BaseCommandCreate, SuccessData
-from ..errors.error_occurrence import ErrorOccurrence
 
 if TYPE_CHECKING:
     from ..execution import PipettingHandler

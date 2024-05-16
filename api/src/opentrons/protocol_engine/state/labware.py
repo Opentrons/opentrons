@@ -7,12 +7,12 @@ from typing import (
     Dict,
     List,
     Mapping,
+    NamedTuple,
     Optional,
     Sequence,
     Tuple,
-    NamedTuple,
-    cast,
     Union,
+    cast,
 )
 
 from opentrons_shared_data.deck.dev_types import DeckDefinitionV5
@@ -20,46 +20,45 @@ from opentrons_shared_data.gripper.constants import LABWARE_GRIP_FORCE
 from opentrons_shared_data.labware.labware_definition import LabwareRole
 from opentrons_shared_data.pipette.dev_types import LabwareUri
 
-from opentrons.types import DeckSlotName, StagingSlotName, MountType
+from opentrons.calibration_storage.helpers import uri_from_details
 from opentrons.protocols.api_support.constants import OPENTRONS_NAMESPACE
 from opentrons.protocols.models import LabwareDefinition, WellDefinition
-from opentrons.calibration_storage.helpers import uri_from_details
+from opentrons.types import DeckSlotName, MountType, StagingSlotName
 
 from .. import errors
-from ..resources import DeckFixedLabware, labware_validation, fixture_validation
+from ..actions import (
+    Action,
+    AddLabwareDefinitionAction,
+    AddLabwareOffsetAction,
+    SucceedCommandAction,
+)
 from ..commands import (
     Command,
     LoadLabwareResult,
     MoveLabwareResult,
     ReloadLabwareResult,
 )
+from ..resources import DeckFixedLabware, fixture_validation, labware_validation
 from ..types import (
-    DeckSlotLocation,
-    OnLabwareLocation,
+    OFF_DECK_LOCATION,
     AddressableAreaLocation,
-    NonStackedLocation,
+    DeckSlotLocation,
     Dimensions,
-    LabwareOffset,
-    LabwareOffsetVector,
-    LabwareOffsetLocation,
     LabwareLocation,
+    LabwareMovementOffsetData,
+    LabwareOffset,
+    LabwareOffsetLocation,
+    LabwareOffsetVector,
     LoadedLabware,
     ModuleLocation,
     ModuleModel,
-    OverlapOffset,
-    LabwareMovementOffsetData,
+    NonStackedLocation,
     OnDeckLabwareLocation,
-    OFF_DECK_LOCATION,
+    OnLabwareLocation,
+    OverlapOffset,
 )
-from ..actions import (
-    Action,
-    SucceedCommandAction,
-    AddLabwareOffsetAction,
-    AddLabwareDefinitionAction,
-)
-from .abstract_store import HasState, HandlesActions
+from .abstract_store import HandlesActions, HasState
 from .move_types import EdgePathType
-
 
 # URIs of labware whose definitions accidentally specify an engage height
 # in units of half-millimeters instead of millimeters.

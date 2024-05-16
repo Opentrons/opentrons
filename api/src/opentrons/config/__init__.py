@@ -23,15 +23,15 @@ This module's interface to the rest of the system are the IS_* attributes and
 the CONFIG attribute.
 """
 import enum
-import os
 import json
 import logging
-from pathlib import Path
+import os
 import re
 import shutil
 import subprocess
 import sys
 from enum import Enum, auto
+from pathlib import Path
 from typing import Dict, NamedTuple, Optional, cast
 
 _CONFIG_FILENAME = "config.json"

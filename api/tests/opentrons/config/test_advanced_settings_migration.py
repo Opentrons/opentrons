@@ -3,7 +3,8 @@ from typing import Any, Dict, cast
 import pytest
 from _pytest.fixtures import SubRequest
 from pytest_lazyfixture import lazy_fixture  # type: ignore[import-untyped]
-from opentrons.config.advanced_settings import _migrate, _ensure
+
+from opentrons.config.advanced_settings import _ensure, _migrate
 
 
 @pytest.fixture

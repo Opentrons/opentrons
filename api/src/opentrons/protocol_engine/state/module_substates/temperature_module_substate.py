@@ -3,11 +3,11 @@
 from dataclasses import dataclass
 from typing import NewType, Optional
 
-from opentrons.protocol_engine.types import TemperatureRange
 from opentrons.protocol_engine.errors import (
     InvalidTargetTemperatureError,
     NoTargetTemperatureSetError,
 )
+from opentrons.protocol_engine.types import TemperatureRange
 
 TemperatureModuleId = NewType("TemperatureModuleId", str)
 

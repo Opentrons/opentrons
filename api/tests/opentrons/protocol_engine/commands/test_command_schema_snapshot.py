@@ -1,7 +1,7 @@
 """Test that the command schema is in sync with it's source models."""
-from opentrons_shared_data.command import load_schema_string, get_newest_schema_version
-from opentrons.protocol_engine.commands import generate_command_schema
+from opentrons_shared_data.command import get_newest_schema_version, load_schema_string
 
+from opentrons.protocol_engine.commands import generate_command_schema
 
 SCHEMA_CHANGED_MESSAGE = """\
 The Python models for Protocol Engine commands do not match the shared JSON schema.

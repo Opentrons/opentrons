@@ -1,78 +1,69 @@
 """Command models for Thermocycler commands."""
 
-from .set_target_block_temperature import (
-    SetTargetBlockTemperatureCommandType,
-    SetTargetBlockTemperatureParams,
-    SetTargetBlockTemperatureResult,
-    SetTargetBlockTemperature,
-    SetTargetBlockTemperatureCreate,
-)
-
-from .wait_for_block_temperature import (
-    WaitForBlockTemperatureCommandType,
-    WaitForBlockTemperatureParams,
-    WaitForBlockTemperatureResult,
-    WaitForBlockTemperature,
-    WaitForBlockTemperatureCreate,
-)
-
-from .set_target_lid_temperature import (
-    SetTargetLidTemperatureCommandType,
-    SetTargetLidTemperatureParams,
-    SetTargetLidTemperatureResult,
-    SetTargetLidTemperature,
-    SetTargetLidTemperatureCreate,
-)
-
-from .wait_for_lid_temperature import (
-    WaitForLidTemperatureCommandType,
-    WaitForLidTemperatureParams,
-    WaitForLidTemperatureResult,
-    WaitForLidTemperature,
-    WaitForLidTemperatureCreate,
-)
-
-from .deactivate_block import (
-    DeactivateBlockCommandType,
-    DeactivateBlockParams,
-    DeactivateBlockResult,
-    DeactivateBlock,
-    DeactivateBlockCreate,
-)
-
-from .deactivate_lid import (
-    DeactivateLidCommandType,
-    DeactivateLidParams,
-    DeactivateLidResult,
-    DeactivateLid,
-    DeactivateLidCreate,
-)
-
-from .open_lid import (
-    OpenLidCommandType,
-    OpenLidParams,
-    OpenLidResult,
-    OpenLid,
-    OpenLidCreate,
-)
-
 from .close_lid import (
+    CloseLid,
     CloseLidCommandType,
+    CloseLidCreate,
     CloseLidParams,
     CloseLidResult,
-    CloseLid,
-    CloseLidCreate,
 )
-
+from .deactivate_block import (
+    DeactivateBlock,
+    DeactivateBlockCommandType,
+    DeactivateBlockCreate,
+    DeactivateBlockParams,
+    DeactivateBlockResult,
+)
+from .deactivate_lid import (
+    DeactivateLid,
+    DeactivateLidCommandType,
+    DeactivateLidCreate,
+    DeactivateLidParams,
+    DeactivateLidResult,
+)
+from .open_lid import (
+    OpenLid,
+    OpenLidCommandType,
+    OpenLidCreate,
+    OpenLidParams,
+    OpenLidResult,
+)
 from .run_profile import (
-    RunProfileCommandType,
-    RunProfileParams,
-    RunProfileStepParams,
-    RunProfileResult,
     RunProfile,
+    RunProfileCommandType,
     RunProfileCreate,
+    RunProfileParams,
+    RunProfileResult,
+    RunProfileStepParams,
 )
-
+from .set_target_block_temperature import (
+    SetTargetBlockTemperature,
+    SetTargetBlockTemperatureCommandType,
+    SetTargetBlockTemperatureCreate,
+    SetTargetBlockTemperatureParams,
+    SetTargetBlockTemperatureResult,
+)
+from .set_target_lid_temperature import (
+    SetTargetLidTemperature,
+    SetTargetLidTemperatureCommandType,
+    SetTargetLidTemperatureCreate,
+    SetTargetLidTemperatureParams,
+    SetTargetLidTemperatureResult,
+)
+from .wait_for_block_temperature import (
+    WaitForBlockTemperature,
+    WaitForBlockTemperatureCommandType,
+    WaitForBlockTemperatureCreate,
+    WaitForBlockTemperatureParams,
+    WaitForBlockTemperatureResult,
+)
+from .wait_for_lid_temperature import (
+    WaitForLidTemperature,
+    WaitForLidTemperatureCommandType,
+    WaitForLidTemperatureCreate,
+    WaitForLidTemperatureParams,
+    WaitForLidTemperatureResult,
+)
 
 __all__ = [
     # Set target block temperature command models

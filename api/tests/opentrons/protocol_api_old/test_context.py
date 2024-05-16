@@ -1,34 +1,32 @@
 """ Test the functions and classes in the protocol context """
 
 import json
-import mock
 from typing import Any, Dict
 
+import mock
+import pytest
 from opentrons_shared_data import load_shared_data
-from opentrons_shared_data.pipette.dev_types import LabwareUri
 from opentrons_shared_data.errors.exceptions import UnexpectedTipRemovalError
+from opentrons_shared_data.pipette.dev_types import LabwareUri
 
 import opentrons.protocol_api as papi
 import opentrons.protocols.api_support as papi_support
 import opentrons.protocols.geometry as papi_geometry
-from opentrons.protocols.api_support.deck_type import STANDARD_OT2_DECK
-
-from opentrons.protocol_api.module_contexts import (
-    ThermocyclerContext,
-    HeaterShakerContext,
-)
-from opentrons.types import Mount, Point, Location, TransferTipPolicy
+from opentrons.calibration_storage import types as cs_types
 from opentrons.hardware_control import API, ThreadManagedHardware
 from opentrons.hardware_control.instruments.ot2.pipette import Pipette
-from opentrons.hardware_control.types import Axis
 from opentrons.hardware_control.modules import SimulatingModule
+from opentrons.hardware_control.types import Axis
+from opentrons.protocol_api.module_contexts import (
+    HeaterShakerContext,
+    ThermocyclerContext,
+)
 from opentrons.protocols.advanced_control import transfers as tf
 from opentrons.protocols.api_support import instrument as instrument_support
+from opentrons.protocols.api_support.deck_type import STANDARD_OT2_DECK
 from opentrons.protocols.api_support.types import APIVersion
-from opentrons.calibration_storage import types as cs_types
+from opentrons.types import Location, Mount, Point, TransferTipPolicy
 from opentrons.util.helpers import utc_now
-
-import pytest
 
 # TODO (lc 12-8-2022) Not sure if we plan to keep these tests, but if we do
 # we should re-write them to be agnostic to the underlying hardware. Otherwise
@@ -1015,10 +1013,10 @@ def test_order_of_module_load():
 def test_tip_length_for_caldata(ctx, decoy, monkeypatch):
     # TODO (lc 10-27-2022) We need to investigate why the pipette id is
     # being reported as none for this test (and probably all the others)
+    from opentrons.calibration_storage import types as CSTypes
     from opentrons.hardware_control.instruments.ot2 import (
         instrument_calibration as instr_cal,
     )
-    from opentrons.calibration_storage import types as CSTypes
 
     instr = ctx.load_instrument("p20_single_gen2", "left")
     tip_rack = ctx.load_labware("geb_96_tiprack_10ul", "1")

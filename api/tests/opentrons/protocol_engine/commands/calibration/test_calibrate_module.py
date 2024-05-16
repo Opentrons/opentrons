@@ -1,30 +1,29 @@
 """Test calibrate-module command."""
 from __future__ import annotations
-from typing import TYPE_CHECKING
 
 import inspect
+from typing import TYPE_CHECKING
+
 import pytest
 from decoy import Decoy
-from opentrons.hardware_control.api import API as OT2API
 
+from opentrons.hardware_control import ot3_calibration as calibration
+from opentrons.hardware_control.api import API as OT2API
+from opentrons.hardware_control.types import OT3Mount
 from opentrons.protocol_engine.commands.calibration.calibrate_module import (
-    CalibrateModuleResult,
     CalibrateModuleImplementation,
     CalibrateModuleParams,
+    CalibrateModuleResult,
 )
 from opentrons.protocol_engine.commands.command import SuccessData
 from opentrons.protocol_engine.errors.exceptions import HardwareNotSupportedError
 from opentrons.protocol_engine.state.state import StateView
 from opentrons.protocol_engine.types import (
     DeckSlotLocation,
-    ModuleOffsetVector,
     ModuleOffsetData,
+    ModuleOffsetVector,
 )
-
-from opentrons.hardware_control.types import OT3Mount
 from opentrons.types import DeckSlotName, MountType, Point
-
-from opentrons.hardware_control import ot3_calibration as calibration
 
 if TYPE_CHECKING:
     from opentrons.hardware_control.ot3api import OT3API

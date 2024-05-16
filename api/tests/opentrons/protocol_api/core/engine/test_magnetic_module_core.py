@@ -5,17 +5,15 @@ from decoy import Decoy
 from opentrons.hardware_control import SynchronousAdapter
 from opentrons.hardware_control.modules import MagDeck
 from opentrons.hardware_control.modules.types import MagneticStatus, ModuleType
-
-from opentrons.protocol_engine.clients import SyncClient as EngineClient
-from opentrons.protocol_engine.types import ModuleModel
-
-from opentrons.protocol_api.core.engine.module_core import MagneticModuleCore
+from opentrons.protocol_api import MAX_SUPPORTED_VERSION
 from opentrons.protocol_api.core.engine.exceptions import InvalidMagnetEngageHeightError
+from opentrons.protocol_api.core.engine.module_core import MagneticModuleCore
+from opentrons.protocol_engine.clients import SyncClient as EngineClient
 from opentrons.protocol_engine.errors.exceptions import (
     LabwareNotLoadedOnModuleError,
     NoMagnetEngageHeightError,
 )
-from opentrons.protocol_api import MAX_SUPPORTED_VERSION
+from opentrons.protocol_engine.types import ModuleModel
 
 MagDeckHardware = SynchronousAdapter[MagDeck]
 

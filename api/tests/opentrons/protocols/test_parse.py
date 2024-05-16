@@ -1,29 +1,28 @@
 import json
 from textwrap import dedent
-from typing import Any, Callable, Optional, Union, Literal
+from typing import Any, Callable, Literal, Optional, Union
 
 import pytest
 from opentrons_shared_data.robot.dev_types import RobotType
 
+from opentrons.protocols.api_support.types import APIVersion
 from opentrons.protocols.parse import (
-    PythonParseMode,
-    _get_protocol_schema_version,
-    validate_json,
-    parse,
     API_VERSION_FOR_JSON_V5_AND_BELOW,
     MAX_SUPPORTED_JSON_SCHEMA_VERSION,
     JSONSchemaVersionTooNewError,
+    PythonParseMode,
+    _get_protocol_schema_version,
+    parse,
+    validate_json,
 )
 from opentrons.protocols.types import (
+    ApiDeprecationError,
     JsonProtocol,
+    MalformedPythonProtocolError,
     Protocol,
     PythonProtocol,
     PythonProtocolMetadata,
-    MalformedPythonProtocolError,
-    ApiDeprecationError,
 )
-from opentrons.protocols.api_support.types import APIVersion
-
 
 parse_version_cases = [
     # No explicitly-declared apiLevel (infer heuristically from APIv1 imports):

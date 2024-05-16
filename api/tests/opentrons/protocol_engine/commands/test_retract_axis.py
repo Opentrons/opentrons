@@ -1,15 +1,14 @@
 """Test retractAxis command."""
 from decoy import Decoy
 
-from opentrons.protocol_engine.types import MotorAxis
-from opentrons.protocol_engine.execution import MovementHandler
-
 from opentrons.protocol_engine.commands.command import SuccessData
 from opentrons.protocol_engine.commands.retract_axis import (
+    RetractAxisImplementation,
     RetractAxisParams,
     RetractAxisResult,
-    RetractAxisImplementation,
 )
+from opentrons.protocol_engine.execution import MovementHandler
+from opentrons.protocol_engine.types import MotorAxis
 
 
 async def test_retract_axis_implementation(

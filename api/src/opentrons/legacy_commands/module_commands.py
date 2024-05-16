@@ -1,5 +1,5 @@
-from typing import List
 from math import trunc
+from typing import List
 
 from opentrons.drivers import utils
 from opentrons.hardware_control.modules import ThermocyclerStep
