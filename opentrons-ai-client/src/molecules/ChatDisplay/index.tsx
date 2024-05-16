@@ -73,11 +73,11 @@ export function ChatDisplay({ chat, chatId }: ChatDisplayProps): JSX.Element {
         >
           {reply}
         </Markdown>
-        {role === 'assistant' ? (
+        {!isUser ? (
           <PrimaryButton
             position={POSITION_ABSOLUTE}
             right={SPACING.spacing16}
-            bottom={`-${SPACING.spacing16}`}
+            bottom={`-${SPACING.spacing24}`}
             borderRadius={BORDERS.borderRadiusFull}
             onClick={handleClickCopy}
           >
