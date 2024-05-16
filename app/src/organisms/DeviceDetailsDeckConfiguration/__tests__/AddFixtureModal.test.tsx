@@ -23,9 +23,8 @@ import type { Modules } from '@opentrons/api-client'
 vi.mock('@opentrons/react-api-client')
 vi.mock('../../../resources/deck_configuration')
 
-const mockSetShowAddFixtureModal = vi.fn()
+const mockCloseModal = vi.fn()
 const mockUpdateDeckConfiguration = vi.fn()
-const mockSetCurrentDeckConfig = vi.fn()
 
 const render = (props: React.ComponentProps<typeof AddFixtureModal>) => {
   return renderWithProviders(<AddFixtureModal {...props} />, {
@@ -39,8 +38,7 @@ describe('Touchscreen AddFixtureModal', () => {
   beforeEach(() => {
     props = {
       cutoutId: 'cutoutD3',
-      setShowAddFixtureModal: mockSetShowAddFixtureModal,
-      setCurrentDeckConfig: mockSetCurrentDeckConfig,
+      closeModal: mockCloseModal,
       isOnDevice: true,
     }
     vi.mocked(useUpdateDeckConfigurationMutation).mockReturnValue({
@@ -69,7 +67,6 @@ describe('Touchscreen AddFixtureModal', () => {
     render(props)
     fireEvent.click(screen.getAllByText('Select options')[1])
     fireEvent.click(screen.getAllByText('Add')[0])
-    expect(mockSetCurrentDeckConfig).toHaveBeenCalled()
   })
 
   it('when fixture options are provided, should only render those options', () => {
@@ -96,7 +93,7 @@ describe('Desktop AddFixtureModal', () => {
   beforeEach(() => {
     props = {
       cutoutId: 'cutoutD3',
-      setShowAddFixtureModal: mockSetShowAddFixtureModal,
+      closeModal: mockCloseModal,
     }
     vi.mocked(useUpdateDeckConfigurationMutation).mockReturnValue({
       updateDeckConfiguration: mockUpdateDeckConfiguration,
