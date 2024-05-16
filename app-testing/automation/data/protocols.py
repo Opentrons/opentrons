@@ -703,6 +703,22 @@ class Protocols:
         robot_error=True,
     )
 
+    Flex_S_v2_18_P1000_96_TipTrackingBug: Protocol = Protocol(
+        file_stem="Flex_S_v2_18_P1000_96_TipTrackingBug",
+        file_extension="py",
+        robot="Flex",
+        app_error=False,
+        robot_error=False,
+    )
+
+    Flex_X_v2_18_NO_PIPETTES_ReservedWord: Protocol = Protocol(
+        file_stem="Flex_X_v2_18_NO_PIPETTES_ReservedWord",
+        file_extension="py",
+        robot="Flex",
+        app_error=True,
+        robot_error=True,
+    )
+
     OT2_X_v2_18_None_None_duplicateRTPVariableName: Protocol = Protocol(
         file_stem="OT2_X_v2_18_None_None_duplicateRTPVariableName",
         file_extension="py",

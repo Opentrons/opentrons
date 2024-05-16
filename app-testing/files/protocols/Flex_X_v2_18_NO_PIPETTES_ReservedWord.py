@@ -1,7 +1,29 @@
 from dataclasses import dataclass, fields
-from typing import Union
+from typing import List, Type, Union
 
-from typing import Union, Type, List
+
+metadata = {
+    "protocolName": "Default not in range",
+}
+
+requirements = {"robotType": "Flex", "apiLevel": "2.18"}
+
+
+def add_parameters(parameters):
+    parameters.add_int(
+        display_name="int min/max all",
+        variable_name="def",
+        default=6,
+        minimum=1,
+        maximum=12,
+        description="description text",
+        unit="μl",
+    )
+
+
+def run(context):
+    for variable_name, value in context.params.get_all().items():
+        context.comment(f"variable {variable_name} has value {value}")
 
 
 def not_my_type(the_type: Type) -> List[Union[str, float, int, bool, dict, list, tuple, set, frozenset]]:
@@ -26,6 +48,9 @@ def not_my_type(the_type: Type) -> List[Union[str, float, int, bool, dict, list,
 
     # Collect values that are not of 'the_type'.
     return [value for value in locals().values() if not isinstance(value, the_type)]
+
+
+# Other examples
 
 
 @dataclass
