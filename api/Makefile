@@ -44,6 +44,8 @@ tests ?= tests
 cov_opts ?= --cov=src/opentrons --cov-report term-missing:skip-covered --cov-report xml:coverage.xml
 test_opts ?=
 
+paths_to_format := src tests setup.py
+
 # These variables must be overridden when make deploy or make deploy-staging is run
 # to set the auth details for pypi
 pypi_username ?=
@@ -122,12 +124,14 @@ test-ot2:
 .PHONY: lint
 lint:
 	$(python) -m mypy src tests
-	$(python) -m black --check src tests setup.py
 	$(python) -m flake8 src tests setup.py
+	$(python) -m isort --check --diff $(paths_to_format)
+	$(python) -m black --check $(paths_to_format)
 
 .PHONY: format
 format:
-	$(python) -m black src tests setup.py
+	$(python) -m isort $(paths_to_format)
+	$(python) -m black $(paths_to_format)
 
 docs/build/html/v%: docs/v%
 	$(sphinx_build) -b html -d docs/build/doctrees -n $< $@
