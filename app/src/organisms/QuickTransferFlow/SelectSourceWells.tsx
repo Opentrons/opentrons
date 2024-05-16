@@ -24,7 +24,12 @@ export function SelectSourceWells(props: SelectSourceWellsProps): JSX.Element {
   const { onNext, onBack, state, dispatch } = props
   const { i18n, t } = useTranslation(['quick_transfer', 'shared'])
 
-  const [selectedWells, setSelectedWells] = React.useState({})
+  const sourceWells = state.sourceWells ?? []
+  const sourceWellGroup = sourceWells.reduce((acc, well) => {
+    return { ...acc, [well]: null }
+  }, {})
+
+  const [selectedWells, setSelectedWells] = React.useState(sourceWellGroup)
 
   const handleClickNext = (): void => {
     dispatch({
