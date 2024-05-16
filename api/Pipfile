@@ -50,3 +50,4 @@ pytest-profiling = "~=1.7.0"
 jinja2 = ">=2.3,<3.1"
 hypothesis = "==6.96.1"
 performance-metrics = {file = "../performance-metrics", editable = true}
+pyusb = "==1.2.1"
