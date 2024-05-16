@@ -132,9 +132,11 @@ export function WellSelection(props: WellSelectionProps): JSX.Element {
   })
   Object.keys(allSelectedWells).forEach(wellName => {
     wellFill[wellName] = COLORS.blue50
+    wellStroke[wellName] = COLORS.transparent
   })
   Object.keys(highlightedWells).forEach(wellName => {
     wellFill[wellName] = COLORS.blue50
+    wellStroke[wellName] = COLORS.transparent
   })
 
   return (
@@ -145,7 +147,6 @@ export function WellSelection(props: WellSelectionProps): JSX.Element {
       <RobotCoordinateSpace viewBox="0 0 128 86">
         <LabwareRender
           definition={definition}
-          selectedWells={allSelectedWells}
           hideOutline
           isInteractive
           wellLabelOption={WELL_LABEL_OPTIONS.SHOW_LABEL_INSIDE}
