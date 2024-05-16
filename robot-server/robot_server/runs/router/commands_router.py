@@ -108,7 +108,7 @@ async def get_current_run_engine_from_url(
     description=textwrap.dedent(
         """
         Add a single command to the run. You can add commands to a run
-        for two reasons:
+        for three reasons:
 
         - Setup commands (`data.source == "setup"`)
         - Protocol commands (`data.source == "protocol"`)
