@@ -13,8 +13,13 @@ To get started: clone the `Opentrons/opentrons` repository, set up your computer
 ```shell
 # change into the cloned directory
 cd opentrons
+
 # prerequisite: install dependencies as specified in project setup
 make setup
+
+# if you have done the setup already, you can run the following instead of make setup
+make teardown-js && make setup-js
+
 # launch the dev server
 make -C opentrons-ai-client dev
 ```
@@ -27,6 +32,7 @@ The UI stack is built using:
 - [Babel][]
 - [Vite][]
 - [Jotai][]
+- [styled-components][]
 
 Some important directories:
 
@@ -61,5 +67,6 @@ TBD
 [babel]: https://babeljs.io/
 [vite]: https://vitejs.dev/
 [jotai]: https://jotai.org/
+[styled-components]: https://styled-components.com/
 [bundle-analyzer]: https://github.com/webpack-contrib/webpack-bundle-analyzer
 [opentrons-ai-server]: https://github.com/Opentrons/opentrons/tree/edge/opentrons-ai-server
