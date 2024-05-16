@@ -1,4 +1,4 @@
-"""Get Unique LPC Values from Run logs."""
+"""Automated LPC Data Analysis."""
 import os
 import argparse
 from abr_testing.automation import google_sheets_tool
