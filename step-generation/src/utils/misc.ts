@@ -7,7 +7,6 @@ import {
   getLabwareDefURI,
   getWellNamePerMultiTip,
   WASTE_CHUTE_CUTOUT,
-  PipetteChannels,
   ONE_CHANNEL_WASTE_CHUTE_ADDRESSABLE_AREA,
   EIGHT_CHANNEL_WASTE_CHUTE_ADDRESSABLE_AREA,
   NINETY_SIX_CHANNEL_WASTE_CHUTE_ADDRESSABLE_AREA,
@@ -26,6 +25,7 @@ import type {
   AddressableAreaName,
   LabwareDefinition2,
   BlowoutParams,
+  PipetteChannels,
 } from '@opentrons/shared-data'
 import type {
   AdditionalEquipmentEntities,

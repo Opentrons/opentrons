@@ -268,16 +268,19 @@ class CommandStore(HasState[CommandState], HandlesActions):
             self._state.command_history.set_command_succeeded(succeeded_command)
 
         elif isinstance(action, FailCommandAction):
-            error_occurrence = ErrorOccurrence.from_failed(
-                id=action.error_id,
-                createdAt=action.failed_at,
-                error=action.error,
-            )
+            if isinstance(action.error, EnumeratedError):
+                public_error_occurrence = ErrorOccurrence.from_failed(
+                    id=action.error_id,
+                    createdAt=action.failed_at,
+                    error=action.error,
+                )
+            else:
+                public_error_occurrence = action.error.public
 
             self._update_to_failed(
                 command_id=action.command_id,
                 failed_at=action.failed_at,
-                error_occurrence=error_occurrence,
+                error_occurrence=public_error_occurrence,
                 error_recovery_type=action.type,
                 notes=action.notes,
             )

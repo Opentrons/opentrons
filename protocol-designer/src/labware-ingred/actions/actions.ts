@@ -1,7 +1,7 @@
 import { createAction } from 'redux-actions'
 import { selectors } from '../selectors'
-import { DeckSlot, ThunkAction } from '../../types'
-import { IngredInputs } from '../types'
+import type { DeckSlot, ThunkAction } from '../../types'
+import type { IngredInputs } from '../types'
 // ===== Labware selector actions =====
 export interface OpenAddLabwareModalAction {
   type: 'OPEN_ADD_LABWARE_MODAL'

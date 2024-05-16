@@ -1,14 +1,18 @@
 """Test data generation for deck configuration tests."""
+
 import typing
+
 from hypothesis import strategies as st
-from test_data_generation.deck_configuration.datashapes import (
+
+from test_data_generation.constants import ColumnName, RowName
+from test_data_generation.datashapes import (
     Column,
+    DeckConfiguration,
     Row,
     Slot,
-    PossibleSlotContents as PSC,
-    DeckConfiguration,
-    RowName,
-    ColumnName,
+)
+from test_data_generation.datashapes import (
+    DeckConfigurationFixtures as DCF,
 )
 
 
@@ -18,7 +22,7 @@ def a_slot(
     row: RowName,
     col: ColumnName,
     thermocycler_on_deck: bool,
-    content_options: typing.List[PSC] = PSC.all(),
+    content_options: typing.List[DCF] = DCF.all(),
 ) -> Slot:
     """Generate a slot with a random content.
 
@@ -26,7 +30,7 @@ def a_slot(
     filtering logic.
     """
     no_thermocycler = [
-        content for content in content_options if content is not PSC.THERMOCYCLER_MODULE
+        content for content in content_options if content is not DCF.THERMOCYCLER_MODULE
     ]
     no_waste_chute_or_thermocycler = [
         content for content in no_thermocycler if not content.is_a_waste_chute()
@@ -54,7 +58,7 @@ def a_slot(
                 Slot,
                 row=st.just(row),
                 col=st.just(col),
-                contents=st.just(PSC.THERMOCYCLER_MODULE),
+                contents=st.just(DCF.THERMOCYCLER_MODULE),
             )
         )
     elif col == "3":
@@ -94,7 +98,7 @@ def a_row(
     draw: st.DrawFn,
     row: RowName,
     thermocycler_on_deck: bool,
-    content_options: typing.List[PSC] = PSC.all(),
+    content_options: typing.List[DCF] = DCF.all(),
 ) -> Row:
     """Generate a row with random slots."""
     return draw(
@@ -128,7 +132,7 @@ def a_column(
     draw: st.DrawFn,
     col: ColumnName,
     thermocycler_on_deck: bool,
-    content_options: typing.List[PSC] = PSC.all(),
+    content_options: typing.List[DCF] = DCF.all(),
 ) -> Column:
     """Generate a column with random slots."""
     return draw(
@@ -167,9 +171,9 @@ def a_column(
 def a_deck_by_columns(
     draw: st.DrawFn,
     thermocycler_on_deck: bool | None = None,
-    col_1_contents: typing.List[PSC] = PSC.all(),
-    col_2_contents: typing.List[PSC] = PSC.all(),
-    col_3_contents: typing.List[PSC] = PSC.all(),
+    col_1_contents: typing.List[DCF] = DCF.all(),
+    col_2_contents: typing.List[DCF] = DCF.all(),
+    col_3_contents: typing.List[DCF] = DCF.all(),
 ) -> DeckConfiguration:
     """Generate a deck by columns."""
     # Let the thermocycler existence be another generated value if

@@ -1,4 +1,3 @@
-import * as React from 'react'
 import { vi, it, expect, describe, beforeEach } from 'vitest'
 import { renderHook } from '@testing-library/react'
 import { useInstrumentsQuery } from '@opentrons/react-api-client'
@@ -8,6 +7,7 @@ import {
 } from '@opentrons/api-client'
 import { useIsOEMMode } from '../../../../resources/robot-settings/hooks'
 import { useAttachedPipettesFromInstrumentsQuery } from '..'
+import type * as React from 'react'
 
 vi.mock('@opentrons/react-api-client')
 vi.mock('../../../../resources/robot-settings/hooks')

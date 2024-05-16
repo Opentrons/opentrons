@@ -2100,7 +2100,7 @@ class OT3API(
         real_mount = OT3Mount.from_mount(mount)
         status = await self.get_tip_presence_status(real_mount, follow_singular_sensor)
         if status != expected:
-            raise FailedTipStateCheck(expected, status.value)
+            raise FailedTipStateCheck(expected, status)
 
     async def _force_pick_up_tip(
         self, mount: OT3Mount, pipette_spec: TipActionSpec

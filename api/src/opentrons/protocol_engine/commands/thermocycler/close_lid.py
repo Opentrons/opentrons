@@ -5,7 +5,8 @@ from typing_extensions import Literal, Type
 
 from pydantic import BaseModel, Field
 
-from ..command import AbstractCommandImpl, BaseCommand, BaseCommandCreate
+from ..command import AbstractCommandImpl, BaseCommand, BaseCommandCreate, SuccessData
+from ...errors.error_occurrence import ErrorOccurrence
 from opentrons.protocol_engine.types import MotorAxis
 
 if TYPE_CHECKING:
@@ -26,7 +27,9 @@ class CloseLidResult(BaseModel):
     """Result data from closing a Thermocycler's lid."""
 
 
-class CloseLidImpl(AbstractCommandImpl[CloseLidParams, CloseLidResult]):
+class CloseLidImpl(
+    AbstractCommandImpl[CloseLidParams, SuccessData[CloseLidResult, None]]
+):
     """Execution implementation of a Thermocycler's close lid command."""
 
     def __init__(
@@ -40,7 +43,9 @@ class CloseLidImpl(AbstractCommandImpl[CloseLidParams, CloseLidResult]):
         self._equipment = equipment
         self._movement = movement
 
-    async def execute(self, params: CloseLidParams) -> CloseLidResult:
+    async def execute(
+        self, params: CloseLidParams
+    ) -> SuccessData[CloseLidResult, None]:
         """Close a Thermocycler's lid."""
         thermocycler_state = self._state_view.modules.get_thermocycler_module_substate(
             params.moduleId
@@ -60,10 +65,10 @@ class CloseLidImpl(AbstractCommandImpl[CloseLidParams, CloseLidResult]):
         if thermocycler_hardware is not None:
             await thermocycler_hardware.close()
 
-        return CloseLidResult()
+        return SuccessData(public=CloseLidResult(), private=None)
 
 
-class CloseLid(BaseCommand[CloseLidParams, CloseLidResult]):
+class CloseLid(BaseCommand[CloseLidParams, CloseLidResult, ErrorOccurrence]):
     """A command to close a Thermocycler's lid."""
 
     commandType: CloseLidCommandType = "thermocycler/closeLid"

@@ -27,12 +27,12 @@ import { DeckFromLayers } from '../Deck/DeckFromLayers'
 import { SlotLabels } from '../Deck'
 import { COLORS } from '../../helix-design-system'
 
-import { Svg } from '../../primitives'
 import { SingleSlotFixture } from './SingleSlotFixture'
 import { StagingAreaFixture } from './StagingAreaFixture'
 import { WasteChuteFixture } from './WasteChuteFixture'
 import { WasteChuteStagingAreaFixture } from './WasteChuteStagingAreaFixture'
 
+import type { Svg } from '../../primitives'
 import type {
   CutoutFixtureId,
   DeckConfiguration,

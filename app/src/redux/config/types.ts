@@ -1,4 +1,4 @@
-import {
+import type {
   INITIALIZED,
   VALUE_UPDATED,
   UPDATE_VALUE,

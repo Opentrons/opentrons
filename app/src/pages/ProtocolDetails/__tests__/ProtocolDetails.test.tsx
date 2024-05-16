@@ -5,12 +5,7 @@ import { when } from 'vitest-when'
 import { Route, MemoryRouter } from 'react-router-dom'
 import '@testing-library/jest-dom/vitest'
 import { renderWithProviders } from '../../../__testing-utils__'
-import {
-  deleteProtocol,
-  deleteRun,
-  getProtocol,
-  HostConfig,
-} from '@opentrons/api-client'
+import { deleteProtocol, deleteRun, getProtocol } from '@opentrons/api-client'
 import {
   useCreateRunMutation,
   useHost,
@@ -33,6 +28,7 @@ import { Hardware } from '../Hardware'
 import { Labware } from '../Labware'
 import { Parameters } from '../Parameters'
 import { mockRunTimeParameterData } from '../fixtures'
+import type { HostConfig } from '@opentrons/api-client'
 
 // Mock IntersectionObserver
 class IntersectionObserver {

@@ -14,8 +14,8 @@ import {
 import {
   fixtureP10SingleV2Specs,
   fixtureP300SingleV2Specs,
-  LabwareDefinition2,
 } from '@opentrons/shared-data'
+import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import type {
   PipetteEntities,
   LabwareEntities,

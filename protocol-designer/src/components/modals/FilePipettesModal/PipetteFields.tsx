@@ -1,30 +1,17 @@
 import * as React from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import {
-  Control,
-  FormState,
-  UseFormSetValue,
-  UseFormTrigger,
-} from 'react-hook-form'
 import { useTranslation } from 'react-i18next'
 import isEmpty from 'lodash/isEmpty'
-import {
-  FormGroup,
-  PipetteSelect,
-  OutlineButton,
-  Mount,
-} from '@opentrons/components'
+import { FormGroup, PipetteSelect, OutlineButton } from '@opentrons/components'
 import {
   getIncompatiblePipetteNames,
   OT2_PIPETTES,
   OT2_ROBOT_TYPE,
   OT3_PIPETTES,
   RIGHT,
-  RobotType,
 } from '@opentrons/shared-data'
 import { createCustomTiprackDef } from '../../../labware-defs/actions'
 import { getLabwareDefsByURI } from '../../../labware-defs/selectors'
-import { FormPipettesByMount } from '../../../step-forms'
 import { getAllowAllTipracks } from '../../../feature-flags/selectors'
 import { getTiprackOptions } from '../utils'
 import { PipetteDiagram } from './PipetteDiagram'
@@ -33,8 +20,16 @@ import { TiprackSelect } from './TiprackSelect'
 import styles from './FilePipettesModal.module.css'
 import formStyles from '../../forms/forms.module.css'
 
-import type { PipetteName } from '@opentrons/shared-data'
+import type {
+  Control,
+  FormState,
+  UseFormSetValue,
+  UseFormTrigger,
+} from 'react-hook-form'
 import type { ThunkDispatch } from 'redux-thunk'
+import type { Mount } from '@opentrons/components'
+import type { RobotType, PipetteName } from '@opentrons/shared-data'
+import type { FormPipettesByMount } from '../../../step-forms'
 import type { BaseState } from '../../../types'
 import type { FormState as TypeFormState } from './index'
 

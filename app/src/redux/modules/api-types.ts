@@ -1,11 +1,8 @@
-import {
+import type {
   TEMPDECK,
   MAGDECK,
   THERMOCYCLER,
   ModuleType,
-} from '@opentrons/shared-data'
-
-import type {
   MagneticModuleModel,
   TemperatureModuleModel,
   ThermocyclerModuleModel,

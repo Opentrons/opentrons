@@ -6,7 +6,6 @@ import { ChildNavigation } from '../../organisms/ChildNavigation'
 import { WellSelection } from '../../organisms/WellSelection'
 
 import type { SmallButton } from '../../atoms/buttons'
-
 import type {
   QuickTransferSetupState,
   QuickTransferWizardAction,
