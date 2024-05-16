@@ -1,20 +1,38 @@
 """Smoke Test v3.0 """
 
 # https://opentrons.atlassian.net/projects/RQA?selectedItem=com.atlassian.plugins.atlassian-connect-plugin:com.kanoah.test-manager__main-project-page#!/testCase/QB-T497
-from opentrons import protocol_api
-
-metadata = {
-    "protocolName": "🛠️ 2.15 Smoke Test V3 🪄",
-    "author": "Opentrons Engineering <engineering@opentrons.com>",
-    "source": "Software Testing Team",
-    "description": ("Description of the protocol that is longish \n has \n returns and \n emoji 😊 ⬆️ "),
-}
-
-requirements = {"robotType": "OT-2", "apiLevel": "2.15"}
 
 #############
 # CHANGELOG #
 #############
+
+# ----
+# 2.18
+# ----
+
+# - labware.set_offset
+# - Runtime Parameters added
+# - TrashContainer.top() and Well.top() now return objects of the same type
+# - pipette.drop_tip() if location argument not specified the tips will be dropped at different locations in the bin
+# - pipette.drop_tip() if location is specified, the tips will be dropped in the same place every time
+
+# ----
+# 2.17
+# ----
+
+# NOTHING NEW
+# This protocol is exactly the same as 2.16 Smoke Test V3
+# The only difference is the API version in the metadata
+# There were no new positive test cases for 2.17
+# The negative test cases are captured in the 2.17 dispense changes protocol
+
+# ----
+# 2.16
+# ----
+
+# - prepare_to_aspirate added
+# - fixed_trash property changed
+# - instrument_context.trash_container property changed
 
 # ----
 # 2.15
@@ -37,11 +55,100 @@ requirements = {"robotType": "OT-2", "apiLevel": "2.15"}
 
 # - Heater-Shaker Module support added
 
+from opentrons import protocol_api, types
+
+metadata = {
+    "protocolName": "🛠️ 2.18 Smoke Test V3 🪄",
+    "author": "Opentrons Engineering <engineering@opentrons.com>",
+    "source": "Software Testing Team",
+    "description": ("Description of the protocol that is longish \n has \n returns and \n emoji 😊 ⬆️ "),
+}
+
+requirements = {"robotType": "OT-2", "apiLevel": "2.18"}
+
+##############################
+# Runtime Parameters Support #
+##############################
+
+# -------------------------- #
+# Added in API version: 2.18 #
+# -------------------------- #
+
+
+def add_parameters(parameters: protocol_api.Parameters):
+    reservoir_choices = [
+        {"display_name": "Nest 12 Well 15 mL", "value": "nest_12_reservoir_15ml"},
+        {"display_name": "USA Scientific 12 Well 22 mL", "value": "usascientific_12_reservoir_22ml"},
+    ]
+
+    well_plate_choices = [
+        {"display_name": "Nest 96 Well 100 µL", "value": "nest_96_wellplate_100ul_pcr_full_skirt"},
+        {"display_name": "Corning 96 Well 360 µL", "value": "corning_96_wellplate_360ul_flat"},
+        {"display_name": "Opentrons Tough 96 Well 200 µL", "value": "opentrons_96_wellplate_200ul_pcr_full_skirt"},
+    ]
+
+    parameters.add_str(
+        variable_name="reservoir_name",
+        display_name="Reservoir Name",
+        description="Name of the reservoir",
+        default="nest_12_reservoir_15ml",
+        choices=reservoir_choices,
+    )
+
+    parameters.add_str(
+        variable_name="well_plate_name",
+        display_name="Well Plate Name",
+        description="Name of the well plate",
+        default="nest_96_wellplate_100ul_pcr_full_skirt",
+        choices=well_plate_choices,
+    )
+
+    parameters.add_int(
+        variable_name="delay_time",
+        display_name="Delay Time",
+        description="Time to delay in seconds",
+        default=3,
+        minimum=1,
+        maximum=10,
+        unit="seconds",
+    )
+
+    parameters.add_bool(
+        variable_name="robot_lights",
+        display_name="Robot Lights",
+        description="Turn on the robot lights?",
+        default=True,
+    )
+
+    parameters.add_float(
+        variable_name="heater_shaker_temperature",
+        display_name="Heater Shaker Temperature",
+        description="Temperature to set the heater shaker to",
+        default=38.0,
+        minimum=37.0,
+        maximum=100.0,
+        unit="°C",
+    )
+
 
 def run(ctx: protocol_api.ProtocolContext) -> None:
     """This method is run by the protocol engine."""
 
-    ctx.set_rail_lights(True)
+    ##############################
+    # Runtime Parameters Support #
+    ##############################
+
+    # -------------------------- #
+    # Added in API version: 2.18 #
+    # -------------------------- #
+
+    RESERVOIR_NAME: str = ctx.params.reservoir_name
+    WELL_PLATE_NAME: str = ctx.params.well_plate_name
+    DELAY_TIME: int = ctx.params.delay_time
+    ROBOT_LIGHTS: bool = ctx.params.robot_lights
+    HEATER_SHAKER_TEMPERATURE: float = ctx.params.heater_shaker_temperature
+
+    ctx.set_rail_lights(ROBOT_LIGHTS)
     ctx.comment(f"Let there be light! {ctx.rail_lights_on} 🌠🌠🌠")
     ctx.comment(f"Is the door is closed? {ctx.door_closed} 🚪🚪🚪")
     ctx.comment(f"Is this a simulation? {ctx.is_simulating()} 🔮🔮🔮")
@@ -91,7 +198,6 @@ def run(ctx: protocol_api.ProtocolContext) -> None:
     # Added in API version: 2.13 #
     # -------------------------- #
 
-    # modules https://docs.opentrons.com/v2/new_modules.html#available-modules
     hs_module = ctx.load_module("heaterShakerModuleV1", hs_position)
     temperature_module = ctx.load_module("temperature module gen2", temperature_position)
     thermocycler_module = ctx.load_module("thermocycler module gen2")
@@ -99,11 +205,11 @@ def run(ctx: protocol_api.ProtocolContext) -> None:
     # module labware
     temp_adapter = temperature_module.load_adapter("opentrons_96_well_aluminum_block")
     temp_plate = temp_adapter.load_labware(
-        "nest_96_wellplate_100ul_pcr_full_skirt",
+        WELL_PLATE_NAME,
         label="Temperature-Controlled plate",
     )
-    hs_plate = hs_module.load_labware(name="nest_96_wellplate_100ul_pcr_full_skirt", adapter="opentrons_96_pcr_adapter")
-    tc_plate = thermocycler_module.load_labware("nest_96_wellplate_100ul_pcr_full_skirt")
+    hs_plate = hs_module.load_labware(name=WELL_PLATE_NAME, adapter="opentrons_96_pcr_adapter")
+    tc_plate = thermocycler_module.load_labware(WELL_PLATE_NAME)
 
     ###################################
     # Load Labware with no parameters #
@@ -121,13 +227,13 @@ def run(ctx: protocol_api.ProtocolContext) -> None:
 
     # create plates and pattern list
     logo_destination_plate = ctx.load_labware(
-        load_name="nest_96_wellplate_100ul_pcr_full_skirt",
+        load_name=WELL_PLATE_NAME,
         location=logo_position,
         label="logo destination",
     )
 
     dye_container = ctx.load_labware(
-        load_name="nest_12_reservoir_15ml",
+        load_name=RESERVOIR_NAME,
         location=dye_source_position,
         label="dye container",
     )
@@ -172,15 +278,15 @@ def run(ctx: protocol_api.ProtocolContext) -> None:
 
     pipette_right.pick_up_tip()
 
-    ########################################
-    # Manual Deck State Modification Start #
-    ########################################
+    ##################################
+    # Manual Deck State Modification #
+    ##################################
 
     # -------------------------- #
     # Added in API version: 2.15 #
     # -------------------------- #
 
-    # Putting steps for this at beginning of protocol so you can do the manual stuff
+    # Putting steps for this at beginning of protocol so y    # >= 2.14 define_liquid and load_liquidou can do the manual stuff
     # then walk away to let the rest of the protocol execute
 
     # The test flow is as follows:
@@ -206,7 +312,7 @@ def run(ctx: protocol_api.ProtocolContext) -> None:
 
     # Note:
     #   logo_destination_plate is a nest_96_wellplate_100ul_pcr_full_skirt - starting position is slot 2
-    #   dye_container is a nest_12_reservoir_15ml - starting position is slot 3
+    #   dye_container is aRESERVOIR_NAME- starting position is slot 3
 
     # Step 1
     ctx.move_labware(
@@ -259,9 +365,45 @@ def run(ctx: protocol_api.ProtocolContext) -> None:
     # Step 16
     ctx.pause("Is the pipette tip in the middle of well A1 in slot 2?")
 
-    ######################################
-    # Manual Deck State Modification End #
-    ######################################
+    #######################
+    # prepare_to_aspirate #
+    #######################
+
+    # -------------------------- #
+    # Added in API version: 2.16 #
+    # -------------------------- #
+
+    pipette_right.prepare_to_aspirate()
+    pipette_right.move_to(dye_container.wells_by_name()["A1"].bottom(z=2))
+    ctx.pause(
+        "Testing prepare_to_aspirate - watch pipette until next pause.\n The pipette should only move up out of the well after it has aspirated."
+    )
+    pipette_right.aspirate(10, dye_container.wells_by_name()["A1"].bottom(z=2))
+    ctx.pause("Did the pipette move up out of the well, only once, after aspirating?")
+    pipette_right.dispense(10, dye_container.wells_by_name()["A1"].bottom(z=2))
+
+    #########################################
+    # protocol_context.fixed_trash property #
+    #########################################
+
+    # ---------------------------- #
+    # Changed in API version: 2.16 #
+    # ---------------------------- #
+
+    pipette_right.move_to(ctx.fixed_trash)
+    ctx.pause("Is the pipette over the trash? Pipette will home after this pause.")
+    ctx.home()
+
+    ###############################################
+    # instrument_context.trash_container property #
+    ###############################################
+
+    # ---------------------------- #
+    # Changed in API version: 2.16 #
+    # ---------------------------- #
+
+    pipette_right.move_to(pipette_right.trash_container)
+    ctx.pause("Is the pipette over the trash?")
 
     # Distribute dye
     pipette_right.distribute(
@@ -309,7 +451,7 @@ def run(ctx: protocol_api.ProtocolContext) -> None:
     pipette_right.pick_up_tip()
     pipette_right.aspirate(volume=5, location=logo_destination_plate.wells_by_name()["A11"])
     pipette_right.air_gap(volume=10)
-    ctx.delay(seconds=3)
+    ctx.delay(seconds=DELAY_TIME)
     pipette_right.dispense(volume=5, location=logo_destination_plate.wells_by_name()["H11"])
 
     # move to
@@ -326,9 +468,9 @@ def run(ctx: protocol_api.ProtocolContext) -> None:
     temperature_module.await_temperature(25)
 
     hs_module.set_and_wait_for_shake_speed(466)
-    ctx.delay(seconds=5)
+    ctx.delay(seconds=DELAY_TIME)
 
-    hs_module.set_and_wait_for_temperature(38)
+    hs_module.set_and_wait_for_temperature(HEATER_SHAKER_TEMPERATURE)
 
     thermocycler_module.open_lid()
     thermocycler_module.close_lid()
@@ -353,7 +495,7 @@ def run(ctx: protocol_api.ProtocolContext) -> None:
     pipette_left.aspirate(volume=50, location=dye_source)
     pipette_left.dispense(volume=50, location=hs_plate.well(0))
     hs_module.set_and_wait_for_shake_speed(350)
-    ctx.delay(seconds=5)
+    ctx.delay(DELAY_TIME)
     hs_module.deactivate_shaker()
 
     # to custom labware
@@ -368,3 +510,86 @@ def run(ctx: protocol_api.ProtocolContext) -> None:
     pipette_left.aspirate(volume=75, location=dye_source)
     pipette_left.dispense(volume=60, location=tc_plate.wells_by_name()["A6"])
     pipette_left.drop_tip()
+
+    ########################
+    # unique top() methods #
+    ########################
+
+    # ---------------------------- #
+    # Changed in API version: 2.18 #
+    # ---------------------------- #
+
+    assert isinstance(ctx.fixed_trash.top(), protocol_api.TrashBin)
+    assert isinstance(dye_container.wells_by_name()["A1"].top(), types.Location)
+
+    #############################
+    # drop_tip location changes #
+    #############################
+
+    # ---------------------------- #
+    # Changed in API version: 2.18 #
+    # ---------------------------- #
+
+    ctx.pause("Watch the next 5 tips drop in the trash. They should drop in different locations of the trash each time.")
+    for _ in range(5):
+        pipette_right.pick_up_tip()
+        pipette_right.drop_tip()
+
+    ctx.pause("Watch the next 5 tips drop in the trash. They should drop in the same location of the trash each time.")
+    for _ in range(5):
+        pipette_right.pick_up_tip()
+        pipette_right.drop_tip(location=ctx.fixed_trash)
+
+    ######################
+    # labware.set_offset #
+    ######################
+
+    # -------------------------- #
+    # Added in API version: 2.18 #
+    # -------------------------- #
+
+    SET_OFFSET_AMOUNT = 10.0
+
+    pipette_right.pick_up_tip()
+
+    ctx.move_labware(labware=logo_destination_plate, new_location=protocol_api.OFF_DECK)
+    pipette_right.move_to(dye_container.wells_by_name()["A1"].top())
+
+    ctx.pause("Is the pipette tip in the middle of reservoir A1 in slot 3? It should be at the LPC calibrated height.")
+
+    dye_container.set_offset(
+        x=0.0,
+        y=0.0,
+        z=SET_OFFSET_AMOUNT,
+    )
+
+    pipette_right.move_to(dye_container.wells_by_name()["A1"].top())
+    ctx.pause("Is the pipette tip in the middle of reservoir A1 in slot 3? It should be 10mm higher than the LPC calibrated height.")
+
+    ctx.move_labware(labware=dye_container, new_location="2")
+    pipette_right.move_to(dye_container.wells_by_name()["A1"].top())
+
+    ctx.pause("Is the pipette tip in the middle of reservoir A1 in slot 2? It should be at the LPC calibrated height.")
+
+    dye_container.set_offset(
+        x=0.0,
+        y=0.0,
+        z=SET_OFFSET_AMOUNT,
+    )
+
+    pipette_right.move_to(dye_container.wells_by_name()["A1"].top())
+    ctx.pause("Is the pipette tip in the middle of reservoir A1 in slot 2? It should be 10mm higher than the LPC calibrated height.")
+
+    ctx.move_labware(labware=dye_container, new_location="3")
+    pipette_right.move_to(dye_container.wells_by_name()["A1"].top())
+
+    ctx.pause("Is the pipette tip in the middle of reservoir A1 in slot 3? It should be 10mm higher than the LPC calibrated height.")
+
+    ctx.move_labware(labware=logo_destination_plate, new_location="2")
+    pipette_right.move_to(logo_destination_plate.wells_by_name()["A1"].top())
+
+    ctx.pause("Is the pipette tip in the middle of well A1 in slot 2? It should be at the LPC calibrated height.")
+
+    ctx.pause("!!!!!!!!!!YOU NEED TO REDO LPC!!!!!!!!!!")
+
+    pipette_right.return_tip()
