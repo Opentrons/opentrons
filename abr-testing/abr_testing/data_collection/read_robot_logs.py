@@ -15,11 +15,17 @@ import requests
 import sys
 
 
-def lpc_data(file_results: Dict[str, Any], protocol_info: Dict) -> List[Dict[str, Any]]:
+def lpc_data(
+    file_results: Dict[str, Any],
+    protocol_info: Dict[str, Any],
+    runs_and_lpc: Dict[str, Any],
+) -> Tuple[Dict[str, Dict[str, Any]], List[str]]:
     """Get labware offsets from one run log."""
     offsets = file_results.get("labwareOffsets", "")
-    all_offsets: List[Dict[str, Any]] = []
+    n = 0
+    # TODO: per UNIQUE slot AND LABWARE TYPE only keep the most recent LPC recording
     if len(offsets) > 0:
+        unique_offsets: Dict[Any, Any] = {}
         for offset in offsets:
             labware_type = offset.get("definitionUri", "")
             slot = offset["location"].get("slotName", "")
@@ -29,19 +35,32 @@ def lpc_data(file_results: Dict[str, Any], protocol_info: Dict) -> List[Dict[str
             y_offset = offset["vector"].get("y", 0.0)
             z_offset = offset["vector"].get("z", 0.0)
             created_at = offset.get("createdAt", "")
-            row = {
-                "createdAt": created_at,
-                "Labware Type": labware_type,
-                "Slot": slot,
-                "Module": module_location,
-                "Adapter": adapter,
-                "X": x_offset,
-                "Y": y_offset,
-                "Z": z_offset,
-            }
-            row2 = {**protocol_info, **row}
-            all_offsets.append(row2)
-    return all_offsets
+            if (
+                slot,
+                labware_type,
+            ) not in unique_offsets or created_at > unique_offsets[
+                (slot, labware_type)
+            ][
+                "createdAt"
+            ]:
+                unique_offsets[(slot, labware_type)] = {
+                    **protocol_info,
+                    "createdAt": created_at,
+                    "Labware Type": labware_type,
+                    "Slot": slot,
+                    "Module": module_location,
+                    "Adapter": adapter,
+                    "X": x_offset,
+                    "Y": y_offset,
+                    "Z": z_offset,
+                }
+    for item in unique_offsets:
+        run_id = protocol_info["Run_ID"] + "_" + str(n)
+        runs_and_lpc[run_id] = unique_offsets[item]
+        n += 1
+    headers_lpc = list(unique_offsets[(slot, labware_type)].keys())
+
+    return runs_and_lpc, headers_lpc
 
 
 def command_time(command: Dict[str, str]) -> Tuple[float, float]:
@@ -323,13 +342,12 @@ def write_to_local_and_google_sheet(
     """Write data dictionary to google sheet and local csv."""
     sheet_location = os.path.join(storage_directory, file_name)
     file_exists = os.path.exists(sheet_location) and os.path.getsize(sheet_location) > 0
-    list_of_runs = list(runs_and_robots.keys())
     with open(sheet_location, "a", newline="") as f:
         writer = csv.writer(f)
         if not file_exists:
             writer.writerow(header)
-        for run in range(len(list_of_runs)):
-            row = runs_and_robots[list_of_runs[run]].values()
+        for run in runs_and_robots:
+            row = runs_and_robots[run].values()
             row_list = list(row)
             writer.writerow(row_list)
             google_sheet.write_header(header)

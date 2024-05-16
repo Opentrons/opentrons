@@ -33,7 +33,12 @@ if __name__ == "__main__":
         sys.exit()
     # Get Runs from Storage and Read Logs
     run_ids_in_storage = read_robot_logs.get_run_ids_from_storage(run_log_file_path)
-    runs_and_robots, header = abr_google_drive.create_data_dictionary(
+    (
+        runs_and_robots,
+        header,
+        runs_and_lpc,
+        lpc_headers,
+    ) = abr_google_drive.create_data_dictionary(
         run_ids_in_storage, run_log_file_path, ""
     )
     list_of_runs = list(runs_and_robots.keys())

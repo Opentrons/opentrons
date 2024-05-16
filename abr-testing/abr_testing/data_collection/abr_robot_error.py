@@ -7,9 +7,7 @@ from abr_testing.automation import jira_tool, google_sheets_tool, google_drive_t
 import shutil
 import os
 import subprocess
-import json
 import sys
-import gspread  # type: ignore[import]
 
 
 def get_error_runs_from_robot(ip: str) -> List[str]:
@@ -145,6 +143,7 @@ if __name__ == "__main__":
         whole_description_str,
         run_log_file_path,
     ) = get_error_info_from_robot(ip, one_run, storage_directory)
+    affects_version = "internal release - any"
     # Get Calibration Data
     saved_file_path_calibration, calibration = read_robot_logs.get_calibration_offsets(
         ip, storage_directory
@@ -183,35 +182,31 @@ if __name__ == "__main__":
     # CONNECT TO GOOGLE DRIVE
     credentials_path = os.path.join(storage_directory, "credentials.json")
     google_sheet_name = "ABR-run-data"
-    try:
-        google_drive = google_drive_tool.google_drive(
-            credentials_path,
-            "1Cvej0eadFOTZr9ILRXJ0Wg65ymOtxL4m",
-            "rhyann.clarke@opentrons.ocm",
-        )
-        print("Connected to google drive.")
-    except json.decoder.JSONDecodeError:
-        print(
-            "Credential file is damaged. Get from https://console.cloud.google.com/apis/credentials"
-        )
-        sys.exit()
+    google_drive = google_drive_tool.google_drive(
+        credentials_path,
+        "1Cvej0eadFOTZr9ILRXJ0Wg65ymOtxL4m",
+        "rhyann.clarke@opentrons.ocm",
+    )
     # CONNECT TO GOOGLE SHEET
-    try:
-        google_sheet = google_sheets_tool.google_sheet(
-            credentials_path, google_sheet_name, 0
-        )
-        print(f"Connected to google sheet: {google_sheet_name}")
-    except gspread.exceptions.APIError:
-        print("ERROR: Check google sheet name. Check credentials file.")
-        sys.exit()
+    google_sheet = google_sheets_tool.google_sheet(
+        credentials_path, google_sheet_name, 0
+    )
     # WRITE ERRORED RUN TO GOOGLE SHEET
     error_run_log = os.path.join(error_folder_path, os.path.basename(run_log_file_path))
     google_drive.upload_file(error_run_log)
     run_id = os.path.basename(error_run_log).split("_")[1].split(".")[0]
-    runs_and_robots, headers = abr_google_drive.create_data_dictionary(
-        run_id, error_folder_path, issue_url
-    )
+    (
+        runs_and_robots,
+        headers,
+        runs_and_lpc,
+        headers_lpc,
+    ) = abr_google_drive.create_data_dictionary(run_id, error_folder_path, issue_url)
     read_robot_logs.write_to_local_and_google_sheet(
         runs_and_robots, storage_directory, google_sheet_name, google_sheet, headers
     )
     print("Wrote run to ABR-run-data")
+    # Add LPC to google sheet
+    google_sheet_lpc = google_sheets_tool.google_sheet(credentials_path, "ABR-LPC", 0)
+    read_robot_logs.write_to_local_and_google_sheet(
+        runs_and_lpc, storage_directory, "ABR-LPC", google_sheet_lpc, headers_lpc
+    )
