@@ -1,5 +1,5 @@
 from __future__ import annotations
-from typing import Optional, Union
+from typing import Optional, Union, cast
 
 from . import protocol_runner, AnyRunner
 from ..hardware_control import HardwareControlAPI
@@ -9,9 +9,11 @@ from ..protocol_reader import JsonProtocolConfig, PythonProtocolConfig
 
 
 class RunOrchestrator:
-    _json_or_python_runner: Optional[protocol_runner.AnyRunner]
-    _setup_runner: protocol_runner.AnyRunner
-    _fixit_runner: protocol_runner.AnyRunner
+    _protocol_runner: Optional[
+        Union[protocol_runner.JsonRunner, protocol_runner.PythonAndLegacyRunner, None]
+    ]
+    _setup_runner: protocol_runner.LiveRunner
+    _fixit_runner: protocol_runner.LiveRunner
     _hardware_api: HardwareControlAPI
     _protocol_engine: ProtocolEngine
 
@@ -19,15 +21,17 @@ class RunOrchestrator:
         self,
         protocol_engine: ProtocolEngine,
         hardware_api: HardwareControlAPI,
-        fixit_runner: protocol_runner.AnyRunner,
-        setup_runner: protocol_runner.AnyRunner,
-        json_or_python_protocol_runner: Optional[protocol_runner.AnyRunner] = None,
+        fixit_runner: protocol_runner.LiveRunner,
+        setup_runner: protocol_runner.LiveRunner,
+        json_or_python_protocol_runner: Optional[
+            Union[protocol_runner.PythonAndLegacyRunner, protocol_runner.JsonRunner]
+        ] = None,
         run_id: Optional[str] = None,
     ):
         self.run_id = run_id
         self._protocol_engine = protocol_engine
         self._hardware_api = hardware_api
-        self._json_or_python_runner = json_or_python_protocol_runner
+        self._protocol_runner = json_or_python_protocol_runner
         self._setup_runner = setup_runner
         self._fixit_runner = fixit_runner
 
@@ -39,7 +43,7 @@ class RunOrchestrator:
     @property
     def runner(self) -> AnyRunner:
         """Get the "current" persisted ProtocolRunner."""
-        return self._json_or_python_runner or self._setup_runner
+        return self._protocol_runner or self._setup_runner
 
     @classmethod
     def build_orchestrator(
@@ -53,26 +57,31 @@ class RunOrchestrator:
         drop_tips_after_run: bool = True,
         run_id: Optional[str] = None,
     ) -> "RunOrchestrator":
-        setup_runner = protocol_runner.create_protocol_runner(
+        setup_runner = protocol_runner.LiveRunner(
             protocol_engine=protocol_engine,
             hardware_api=hardware_api,
-            post_run_hardware_state=post_run_hardware_state,
-            drop_tips_after_run=drop_tips_after_run,
+            # post_run_hardware_state=post_run_hardware_state,
+            # drop_tips_after_run=drop_tips_after_run,
         )
-        fixit_runner = protocol_runner.create_protocol_runner(
+        fixit_runner = protocol_runner.LiveRunner(
             protocol_engine=protocol_engine,
             hardware_api=hardware_api,
-            post_run_hardware_state=post_run_hardware_state,
-            drop_tips_after_run=drop_tips_after_run,
+            # post_run_hardware_state=post_run_hardware_state,
+            # drop_tips_after_run=drop_tips_after_run,
         )
         json_or_python_runner = None
         if protocol_config:
-            json_or_python_runner = protocol_runner.create_protocol_runner(
-                protocol_config=protocol_config,
-                protocol_engine=protocol_engine,
-                hardware_api=hardware_api,
-                post_run_hardware_state=post_run_hardware_state,
-                drop_tips_after_run=drop_tips_after_run,
+            json_or_python_runner = cast(  # or we can use type ignore
+                Union[
+                    protocol_runner.JsonRunner, protocol_runner.PythonAndLegacyRunner
+                ],
+                protocol_runner.create_protocol_runner(
+                    protocol_config=protocol_config,
+                    protocol_engine=protocol_engine,
+                    hardware_api=hardware_api,
+                    post_run_hardware_state=post_run_hardware_state,
+                    drop_tips_after_run=drop_tips_after_run,
+                ),
             )
         return cls(
             run_id=run_id,
@@ -84,7 +93,7 @@ class RunOrchestrator:
         )
 
     # def get_protocol_runner(self) -> protocol_runner.AnyRunner:
-    #     return self._json_or_python_runner or self._setup_runner
+    #     return self._protocol_runner or self._setup_runner
     #
     # def get_protocol_engine(self) -> ProtocolEngine:
     #     return self._protocol_engine
