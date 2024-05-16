@@ -11,6 +11,7 @@ from opentrons.protocol_engine.state.module_substates import (
 )
 from opentrons.protocol_engine.execution import EquipmentHandler, MovementHandler
 from opentrons.protocol_engine.commands import thermocycler as tc_commands
+from opentrons.protocol_engine.commands.command import SuccessData
 from opentrons.protocol_engine.commands.thermocycler.open_lid import (
     OpenLidImpl,
 )
@@ -52,4 +53,4 @@ async def test_open_lid(
         await tc_hardware.open(),
         times=1,
     )
-    assert result == expected_result
+    assert result == SuccessData(public=expected_result, private=None)

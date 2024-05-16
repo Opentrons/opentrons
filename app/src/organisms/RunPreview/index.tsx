@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { css } from 'styled-components'
 import { useTranslation } from 'react-i18next'
-import { ViewportList, ViewportListRef } from 'react-viewport-list'
+import { ViewportList } from 'react-viewport-list'
 
 import { RUN_STATUSES_TERMINAL } from '@opentrons/api-client'
 import {
@@ -21,15 +21,18 @@ import {
 
 import { useMostRecentCompletedAnalysis } from '../LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import {
-  useNotifyLastRunCommand,
   useNotifyAllCommandsAsPreSerializedList,
+  useNotifyRunQuery,
 } from '../../resources/runs'
 import { CommandText } from '../CommandText'
 import { Divider } from '../../atoms/structure'
 import { NAV_BAR_WIDTH } from '../../App/constants'
 import { CommandIcon } from './CommandIcon'
 import { useRunStatus } from '../RunTimeControl/hooks'
+import { getCommandTextData } from '../CommandText/utils/getCommandTextData'
+import { useLastRunCommand } from '../Devices/hooks/useLastRunCommand'
 
+import type { ViewportListRef } from 'react-viewport-list'
 import type { RunStatus } from '@opentrons/api-client'
 import type { RobotType } from '@opentrons/shared-data'
 
@@ -51,6 +54,7 @@ export const RunPreviewComponent = (
   const { t } = useTranslation('run_details')
   const robotSideAnalysis = useMostRecentCompletedAnalysis(runId)
   const runStatus = useRunStatus(runId)
+  const { data: runRecord } = useNotifyRunQuery(runId)
   const isRunTerminal =
     runStatus != null
       ? (RUN_STATUSES_TERMINAL as RunStatus[]).includes(runStatus)
@@ -68,7 +72,7 @@ export const RunPreviewComponent = (
   const nullCheckedCommandsFromQuery =
     commandsFromQuery == null ? robotSideAnalysis?.commands : commandsFromQuery
   const viewPortRef = React.useRef<HTMLDivElement | null>(null)
-  const currentRunCommandKey = useNotifyLastRunCommand(runId, {
+  const currentRunCommandKey = useLastRunCommand(runId, {
     refetchInterval: LIVE_RUN_COMMANDS_POLL_MS,
   })?.key
   const [
@@ -80,6 +84,10 @@ export const RunPreviewComponent = (
     (isRunTerminal
       ? nullCheckedCommandsFromQuery
       : robotSideAnalysis.commands) ?? []
+  const commandTextData =
+    isRunTerminal && runRecord?.data != null
+      ? getCommandTextData(runRecord.data, nullCheckedCommandsFromQuery)
+      : getCommandTextData(robotSideAnalysis)
   const currentRunCommandIndex = commands.findIndex(
     c => c.key === currentRunCommandKey
   )
@@ -158,7 +166,7 @@ export const RunPreviewComponent = (
                   <CommandIcon command={command} color={iconColor} />
                   <CommandText
                     command={command}
-                    robotSideAnalysis={robotSideAnalysis}
+                    commandTextData={commandTextData}
                     robotType={robotType}
                     color={COLORS.black90}
                   />

@@ -5,7 +5,7 @@ import type {
 
 import type { AllPipetteOffsetCalibrations } from '../api-types'
 
-import {
+import type {
   FETCH_PIPETTE_OFFSET_CALIBRATIONS,
   FETCH_PIPETTE_OFFSET_CALIBRATIONS_SUCCESS,
   FETCH_PIPETTE_OFFSET_CALIBRATIONS_FAILURE,

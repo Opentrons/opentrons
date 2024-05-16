@@ -235,6 +235,7 @@ class LogListener:
         self.response_queue: asyncio.Queue[float] = asyncio.Queue()
         self.mount = mount
         self.start_time = 0.0
+        self.event: Any = None
 
     async def __aenter__(self) -> None:
         """Create a csv heading for logging pressure readings."""
@@ -247,6 +248,16 @@ class LogListener:
     async def __aexit__(self, *args: Any) -> None:
         """Close csv file."""
         self.data_file.close()
+
+    async def wait_for_complete(self, wait_time: float = 2.0) -> None:
+        """Wait for the data to stop, only use this with a send_accumulated_data_request."""
+        self.event = asyncio.Event()
+        recieving = True
+        while recieving:
+            await asyncio.sleep(wait_time)
+            recieving = self.event.is_set()
+            self.event.clear()
+        self.event = None
 
     def __call__(
         self,
@@ -261,3 +272,5 @@ class LogListener:
             self.response_queue.put_nowait(data)
             current_time = round((time.time() - self.start_time), 3)
             self.csv_writer.writerow([current_time, data])  # type: ignore
+            if self.event is not None:
+                self.event.set()

@@ -2,10 +2,8 @@ import * as React from 'react'
 import {
   fixture96Plate,
   getModuleDef2,
-  LabwareDefinition2,
   MAGNETIC_MODULE_V1,
   MAGNETIC_MODULE_V2,
-  ModuleModel,
   TEMPERATURE_MODULE_V1,
   TEMPERATURE_MODULE_V2,
   THERMOCYCLER_MODULE_V1,
@@ -18,6 +16,7 @@ import { RobotCoordinateSpace } from '../RobotCoordinateSpace'
 import { Module as ModuleComponent } from './'
 
 import type { Story, Meta } from '@storybook/react'
+import type { LabwareDefinition2, ModuleModel } from '@opentrons/shared-data'
 
 const moduleModels: ModuleModel[] = [
   TEMPERATURE_MODULE_V2,

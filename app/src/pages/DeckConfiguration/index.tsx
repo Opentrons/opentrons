@@ -22,7 +22,6 @@ import {
   FLEX_ROBOT_TYPE,
 } from '@opentrons/shared-data'
 
-import { SmallButton } from '../../atoms/buttons'
 import { ChildNavigation } from '../../organisms/ChildNavigation'
 import { AddFixtureModal } from '../../organisms/DeviceDetailsDeckConfiguration/AddFixtureModal'
 import { DeckFixtureSetupInstructionsModal } from '../../organisms/DeviceDetailsDeckConfiguration/DeckFixtureSetupInstructionsModal'
@@ -35,6 +34,7 @@ import type {
   CutoutId,
   DeckConfiguration,
 } from '@opentrons/shared-data'
+import type { SmallButton } from '../../atoms/buttons'
 
 export function DeckConfigurationEditor(): JSX.Element {
   const { t, i18n } = useTranslation([

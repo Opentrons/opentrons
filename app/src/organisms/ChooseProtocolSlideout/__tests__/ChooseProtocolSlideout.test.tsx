@@ -150,6 +150,28 @@ describe('ChooseProtocolSlideout', () => {
     screen.getByText('Restore default values')
   })
 
+  it('shows tooltip when disabled Restore default values link is clicked', () => {
+    const protocolDataWithoutRunTimeParameter = {
+      ...storedProtocolDataFixture,
+    }
+    vi.mocked(getStoredProtocols).mockReturnValue([
+      protocolDataWithoutRunTimeParameter,
+    ])
+
+    render({
+      robot: mockConnectableRobot,
+      onCloseClick: vi.fn(),
+      showSlideout: true,
+    })
+    const proceedButton = screen.getByRole('button', {
+      name: 'Continue to parameters',
+    })
+    fireEvent.click(proceedButton)
+    const restoreValuesLink = screen.getByText('Restore default values')
+    fireEvent.click(restoreValuesLink)
+    screen.getByText('No custom values specified')
+  })
+
   // ToDo (kk:04/18/2024) I will update test for RTP
   /*
   it('renders error state when there is a run creation error', () => {

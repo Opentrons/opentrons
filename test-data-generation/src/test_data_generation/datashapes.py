@@ -1,17 +1,18 @@
 """Data shapes for the deck configuration of a Flex."""
 
-import enum
 import dataclasses
+import enum
 import typing
 
-ColumnName = typing.Literal["1", "2", "3"]
-RowName = typing.Literal["a", "b", "c", "d"]
-SlotName = typing.Literal[
-    "a1", "a2", "a3", "b1", "b2", "b3", "c1", "c2", "c3", "d1", "d2", "d3"
-]
+from test_data_generation.constants import (
+    ColumnName,
+    DeckConfigurationSlotName,
+    PipetteNames,
+    RowName,
+)
 
 
-class PossibleSlotContents(enum.Enum):
+class DeckConfigurationFixtures(enum.Enum):
     """Possible contents of a slot on a Flex."""
 
     # Implicitly defined fixtures
@@ -35,7 +36,7 @@ class PossibleSlotContents(enum.Enum):
     @classmethod
     def longest_string(cls) -> int:
         """Return the longest string representation of the slot content."""
-        length = max([len(e.name) for e in PossibleSlotContents])
+        length = max([len(e.name) for e in DeckConfigurationFixtures])
         return length if length % 2 == 0 else length + 1
 
     def __str__(self) -> str:
@@ -43,59 +44,59 @@ class PossibleSlotContents(enum.Enum):
         return f"{self.name.replace('_', ' ')}"
 
     @classmethod
-    def all(cls) -> typing.List["PossibleSlotContents"]:
+    def all(cls) -> typing.List["DeckConfigurationFixtures"]:
         """Return all possible slot contents."""
         return list(cls)
 
-    @property
-    def modules(self) -> typing.List["PossibleSlotContents"]:
+    @classmethod
+    def modules(cls) -> typing.List["DeckConfigurationFixtures"]:
         """Return the modules."""
         return [
-            PossibleSlotContents.THERMOCYCLER_MODULE,
-            PossibleSlotContents.MAGNETIC_BLOCK_MODULE,
-            PossibleSlotContents.TEMPERATURE_MODULE,
-            PossibleSlotContents.HEATER_SHAKER_MODULE,
+            cls.THERMOCYCLER_MODULE,
+            cls.MAGNETIC_BLOCK_MODULE,
+            cls.TEMPERATURE_MODULE,
+            cls.HEATER_SHAKER_MODULE,
         ]
 
-    @property
-    def staging_areas(self) -> typing.List["PossibleSlotContents"]:
+    @classmethod
+    def staging_areas(cls) -> typing.List["DeckConfigurationFixtures"]:
         """Return the staging areas."""
         return [
-            PossibleSlotContents.STAGING_AREA,
-            PossibleSlotContents.STAGING_AREA_WITH_WASTE_CHUTE,
-            PossibleSlotContents.STAGING_AREA_WITH_WASTE_CHUTE_NO_COVER,
-            PossibleSlotContents.STAGING_AREA_WITH_MAGNETIC_BLOCK,
+            cls.STAGING_AREA,
+            cls.STAGING_AREA_WITH_WASTE_CHUTE,
+            cls.STAGING_AREA_WITH_WASTE_CHUTE_NO_COVER,
+            cls.STAGING_AREA_WITH_MAGNETIC_BLOCK,
         ]
 
-    @property
-    def waste_chutes(self) -> typing.List["PossibleSlotContents"]:
+    @classmethod
+    def waste_chutes(cls) -> typing.List["DeckConfigurationFixtures"]:
         """Return the waste chutes."""
         return [
-            PossibleSlotContents.WASTE_CHUTE,
-            PossibleSlotContents.WASTE_CHUTE_NO_COVER,
-            PossibleSlotContents.STAGING_AREA_WITH_WASTE_CHUTE,
-            PossibleSlotContents.STAGING_AREA_WITH_WASTE_CHUTE_NO_COVER,
+            cls.WASTE_CHUTE,
+            cls.WASTE_CHUTE_NO_COVER,
+            cls.STAGING_AREA_WITH_WASTE_CHUTE,
+            cls.STAGING_AREA_WITH_WASTE_CHUTE_NO_COVER,
         ]
 
-    def is_one_of(self, contents: typing.List["PossibleSlotContents"]) -> bool:
+    def is_one_of(self, contents: typing.List["DeckConfigurationFixtures"]) -> bool:
         """Return True if the slot contains one of the contents."""
-        return any([self is content for content in contents])
+        return any(self is content for content in contents)
 
     def is_a_module(self) -> bool:
         """Return True if the slot contains a module."""
-        return self.is_one_of(self.modules)
+        return self.is_one_of(self.modules())
 
     def is_module_or_trash_bin(self) -> bool:
         """Return True if the slot contains a module or trash bin."""
-        return self.is_one_of(self.modules + [PossibleSlotContents.TRASH_BIN])
+        return self.is_one_of(self.modules() + [DeckConfigurationFixtures.TRASH_BIN])
 
     def is_a_staging_area(self) -> bool:
         """Return True if the slot contains a staging area."""
-        return self.is_one_of(self.staging_areas)
+        return self.is_one_of(self.staging_areas())
 
     def is_a_waste_chute(self) -> bool:
         """Return True if the slot contains a waste chute."""
-        return self.is_one_of(self.waste_chutes)
+        return self.is_one_of(self.waste_chutes())
 
 
 @dataclasses.dataclass
@@ -104,21 +105,21 @@ class Slot:
 
     row: RowName
     col: ColumnName
-    contents: PossibleSlotContents
+    contents: "DeckConfigurationFixtures"
 
     def __str__(self) -> str:
         """Return a string representation of the slot."""
         return f"{(self.row + self.col).center(self.contents.longest_string())}{self.contents}"
 
     @property
-    def __label(self) -> SlotName:
+    def label(self) -> DeckConfigurationSlotName:
         """Return the slot label."""
-        return typing.cast(SlotName, f"{self.row}{self.col}")
+        return typing.cast(DeckConfigurationSlotName, f"{self.row}{self.col}")
 
     @property
     def slot_label_string(self) -> str:
         """Return the slot label."""
-        return f"{self.__label.center(self.contents.longest_string())}"
+        return f"{self.label.center(self.contents.longest_string())}"
 
     @property
     def contents_string(self) -> str:
@@ -182,7 +183,7 @@ class Column:
         """Return the slot by name."""
         return getattr(self, f"{name}")  # type: ignore
 
-    def number_of(self, contents: PossibleSlotContents) -> int:
+    def number_of(self, contents: DeckConfigurationFixtures) -> int:
         """Return the number of slots with the contents."""
         return len([True for slot in self.slots if slot.contents is contents])
 
@@ -213,8 +214,8 @@ class DeckConfiguration:
     def __str__(self) -> str:
         """Return a string representation of the deck."""
         string_list = []
-        dashed_line = "-" * (PossibleSlotContents.longest_string() * 3)
-        equal_line = "=" * (PossibleSlotContents.longest_string() * 3)
+        dashed_line = "-" * (DeckConfigurationFixtures.longest_string() * 3)
+        equal_line = "=" * (DeckConfigurationFixtures.longest_string() * 3)
         for row in self.rows:
             string_list.append(
                 " | ".join([slot.slot_label_string for slot in row.slots])
@@ -225,6 +226,10 @@ class DeckConfiguration:
         joined_string = "\n".join(string_list)
 
         return f"\n{joined_string}\n\n{equal_line}"
+
+    def comment_string(self) -> str:
+        """Return a string representation of the deck."""
+        return str(self).replace("\n", "\n# ") + "\n"
 
     def __hash__(self) -> int:
         """Return the hash of the deck."""
@@ -278,7 +283,7 @@ class DeckConfiguration:
             return None
         return self.rows[row_index + 1].slot_by_col_number(slot.col)
 
-    def number_of(self, contents: PossibleSlotContents) -> int:
+    def number_of(self, contents: DeckConfigurationFixtures) -> int:
         """Return the number of slots with the contents."""
         return len([True for slot in self.slots if slot.contents is contents])
 
@@ -297,3 +302,11 @@ class DeckConfiguration:
             c=self.c.slot_by_col_number(number),
             d=self.d.slot_by_col_number(number),
         )
+
+
+@dataclasses.dataclass
+class PipetteConfiguration:
+    """Configuration for a pipette."""
+
+    left: PipetteNames | None
+    right: PipetteNames | None

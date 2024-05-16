@@ -13,6 +13,7 @@ from opentrons.protocol_engine.resources.pipette_data_provider import (
     LoadedStaticPipetteData,
 )
 from opentrons.protocol_engine.state import StateView
+from opentrons.protocol_engine.commands.command import SuccessData
 from opentrons.protocol_engine.commands.load_pipette import (
     LoadPipetteParams,
     LoadPipetteResult,
@@ -66,11 +67,13 @@ async def test_load_pipette_implementation(
         )
     )
 
-    result, private_result = await subject.execute(data)
+    result = await subject.execute(data)
 
-    assert result == LoadPipetteResult(pipetteId="some id")
-    assert private_result == LoadPipettePrivateResult(
-        pipette_id="some id", serial_number="some-serial-number", config=config_data
+    assert result == SuccessData(
+        public=LoadPipetteResult(pipetteId="some id"),
+        private=LoadPipettePrivateResult(
+            pipette_id="some id", serial_number="some-serial-number", config=config_data
+        ),
     )
 
 
@@ -117,11 +120,13 @@ async def test_load_pipette_implementation_96_channel(
         )
     )
 
-    result, private_result = await subject.execute(data)
+    result = await subject.execute(data)
 
-    assert result == LoadPipetteResult(pipetteId="pipette-id")
-    assert private_result == LoadPipettePrivateResult(
-        pipette_id="pipette-id", serial_number="some id", config=config_data
+    assert result == SuccessData(
+        public=LoadPipetteResult(pipetteId="pipette-id"),
+        private=LoadPipettePrivateResult(
+            pipette_id="pipette-id", serial_number="some id", config=config_data
+        ),
     )
 
 

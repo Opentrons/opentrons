@@ -6,7 +6,7 @@ import {
 
 import { useNotifyRunQuery } from '../../../resources/runs'
 
-import { AnalysisError } from '@opentrons/shared-data'
+import type { AnalysisError } from '@opentrons/shared-data'
 
 export interface ProtocolAnalysisErrors {
   analysisErrors: AnalysisError[] | null

@@ -9,11 +9,11 @@ import { useRunTimestamps } from '../../RunTimeControl/hooks'
 import { formatInterval } from '../../RunTimeControl/utils'
 import { EMPTY_TIMESTAMP } from '../constants'
 
+import type { ProtocolAnalysisOutput } from '@opentrons/shared-data'
 import type { ProtocolAnalyticsData } from '../../../redux/analytics/types'
 import type { StoredProtocolData } from '../../../redux/protocol-storage/types'
-import type { ProtocolAnalysisOutput } from '@opentrons/shared-data'
 import type { State } from '../../../redux/types'
-import { DiscoveredRobot } from '../../../redux/discovery/types'
+import type { DiscoveredRobot } from '../../../redux/discovery/types'
 
 export const parseProtocolRunAnalyticsData = (
   protocolAnalysis: ProtocolAnalysisOutput | null,

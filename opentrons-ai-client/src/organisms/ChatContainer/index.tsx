@@ -7,8 +7,6 @@ import {
   COLORS,
   DIRECTION_COLUMN,
   Flex,
-  POSITION_ABSOLUTE,
-  POSITION_RELATIVE,
   SPACING,
   StyledText,
   TYPOGRAPHY,
@@ -27,14 +25,13 @@ export function ChatContainer(): JSX.Element {
       padding={`${SPACING.spacing40} ${SPACING.spacing40} ${SPACING.spacing24}`}
       backgroundColor={COLORS.grey10}
       width="100%"
+      id="ChatContainer"
+      flexDirection={DIRECTION_COLUMN}
+      gridGap={SPACING.spacing40}
     >
       {/* This will be updated when input textbox and function are implemented */}
 
-      <Flex
-        flexDirection={DIRECTION_COLUMN}
-        position={POSITION_RELATIVE}
-        width="100%"
-      >
+      <Flex width="100%" height="100%" overflow="auto">
         <ChatDataContainer>
           <StyledText>{t('opentronsai')}</StyledText>
           {/* Prompt Guide remain as a reference for users. */}
@@ -42,30 +39,28 @@ export function ChatContainer(): JSX.Element {
           {chatData.length > 0
             ? chatData.map((chat, index) => (
                 <ChatDisplay
-                  key={`response-from_${chat.role}_${index}`}
+                  key={`prompt-from_${chat.role}_${index}`}
                   chat={chat}
+                  chatId={`${chat.role}_${index}`}
                 />
               ))
             : null}
         </ChatDataContainer>
-        <Flex
-          position={POSITION_ABSOLUTE}
-          bottom="0"
-          width="100%"
-          gridGap={SPACING.spacing24}
-          flexDirection={DIRECTION_COLUMN}
-        >
-          <InputPrompt />
-          <StyledText css={DISCLAIMER_TEXT_STYLE}>{t('disclaimer')}</StyledText>
-        </Flex>
+      </Flex>
+      <Flex
+        bottom="0"
+        width="100%"
+        gridGap={SPACING.spacing24}
+        flexDirection={DIRECTION_COLUMN}
+      >
+        <InputPrompt />
+        <StyledText css={DISCLAIMER_TEXT_STYLE}>{t('disclaimer')}</StyledText>
       </Flex>
     </Flex>
   )
 }
 
 const ChatDataContainer = styled(Flex)`
-  max-height: calc(100vh);
-  overflow-y: auto;
   flex-direction: ${DIRECTION_COLUMN};
   grid-gap: ${SPACING.spacing12};
   width: 100%;

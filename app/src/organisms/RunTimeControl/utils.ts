@@ -1,5 +1,6 @@
-import { intervalToDuration, Duration } from 'date-fns'
+import { intervalToDuration } from 'date-fns'
 import padStart from 'lodash/padStart'
+import type { Duration } from 'date-fns'
 
 /**
  * utility to format a date-fns duration object to hh:mm:ss

@@ -13,7 +13,7 @@ import * as selectors from '../selectors'
 import { INITIAL_STATE } from '../reducer'
 
 import type { Action, State } from '../../types'
-import { RobotApiResponse } from '../../robot-api/types'
+import type { RobotApiResponse } from '../../robot-api/types'
 
 vi.mock('../selectors')
 vi.mock('../../robot-api/http')

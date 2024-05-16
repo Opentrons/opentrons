@@ -29,6 +29,7 @@ import {
   useAttachedModules,
   useLPCDisabledReason,
   useModuleCalibrationStatus,
+  useProtocolAnalysisErrors,
   useRobotType,
   useRunCreatedAtTimestamp,
   useTrackProtocolRunEvent,
@@ -248,6 +249,9 @@ describe('ProtocolSetup', () => {
           },
         },
       } as any)
+    when(vi.mocked(useProtocolAnalysisErrors))
+      .calledWith(RUN_ID)
+      .thenReturn({ analysisErrors: null })
     when(vi.mocked(useProtocolQuery))
       .calledWith(PROTOCOL_ID, { staleTime: Infinity })
       .thenReturn({

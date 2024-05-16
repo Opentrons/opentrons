@@ -1,4 +1,4 @@
-import { HeaterShakerArgs } from '@opentrons/step-generation'
+import type { HeaterShakerArgs } from '@opentrons/step-generation'
 import type { HydratedHeaterShakerFormData } from '../../../form-types'
 
 export const heaterShakerFormToArgs = (

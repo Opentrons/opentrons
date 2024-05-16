@@ -1,7 +1,6 @@
 import * as React from 'react'
 import reduce from 'lodash/reduce'
 
-import { WellMouseEvent, WellGroup } from '@opentrons/components'
 import { COLUMN } from '@opentrons/shared-data'
 import {
   arrayToWellGroup,
@@ -12,6 +11,7 @@ import { SingleLabware } from './SingleLabware'
 import { SelectionRect } from '../SelectionRect'
 import { WellTooltip } from './WellTooltip'
 
+import type { WellMouseEvent, WellGroup } from '@opentrons/components'
 import type { ContentsByWell } from '../../labware-ingred/types'
 import type { WellIngredientNames } from '../../steplist/types'
 import type { GenericRect } from '../../collision-types'

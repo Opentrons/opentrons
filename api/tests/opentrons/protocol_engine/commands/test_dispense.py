@@ -5,6 +5,7 @@ from opentrons.protocol_engine import WellLocation, WellOrigin, WellOffset, Deck
 from opentrons.protocol_engine.execution import MovementHandler, PipettingHandler
 from opentrons.types import Point
 
+from opentrons.protocol_engine.commands.command import SuccessData
 from opentrons.protocol_engine.commands.dispense import (
     DispenseParams,
     DispenseResult,
@@ -50,4 +51,7 @@ async def test_dispense_implementation(
 
     result = await subject.execute(data)
 
-    assert result == DispenseResult(volume=42, position=DeckPoint(x=1, y=2, z=3))
+    assert result == SuccessData(
+        public=DispenseResult(volume=42, position=DeckPoint(x=1, y=2, z=3)),
+        private=None,
+    )

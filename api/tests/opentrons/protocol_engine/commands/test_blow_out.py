@@ -9,6 +9,7 @@ from opentrons.protocol_engine.commands import (
     BlowOutImplementation,
     BlowOutParams,
 )
+from opentrons.protocol_engine.commands.command import SuccessData
 from opentrons.protocol_engine.execution import (
     MovementHandler,
     PipettingHandler,
@@ -52,7 +53,9 @@ async def test_blow_out_implementation(
 
     result = await subject.execute(data)
 
-    assert result == BlowOutResult(position=DeckPoint(x=1, y=2, z=3))
+    assert result == SuccessData(
+        public=BlowOutResult(position=DeckPoint(x=1, y=2, z=3)), private=None
+    )
 
     decoy.verify(
         await pipetting.blow_out_in_place(pipette_id="pipette-id", flow_rate=1.234),

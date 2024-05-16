@@ -5,7 +5,6 @@ import { screen } from '@testing-library/react'
 
 import { renderWithProviders } from '../../../../__testing-utils__'
 import { i18n } from '../../../../i18n'
-import { ModuleModel, ModuleType } from '@opentrons/shared-data'
 import { useInstrumentsQuery } from '@opentrons/react-api-client'
 import { ProtocolRunModuleControls } from '../ProtocolRunModuleControls'
 import { ModuleCard } from '../../../ModuleCard'
@@ -16,6 +15,7 @@ import {
   mockThermocycler,
   mockHeaterShaker,
 } from '../../../../redux/modules/__fixtures__'
+import type { ModuleModel, ModuleType } from '@opentrons/shared-data'
 
 vi.mock('@opentrons/react-api-client')
 vi.mock('../../../ModuleCard')

@@ -5,16 +5,18 @@ import {
   getNextRobotStateAndWarningsSingleCommand,
 } from '@opentrons/step-generation'
 import {
-  AddressableAreaName,
   FLEX_ROBOT_TYPE,
   ALL,
   COLUMN,
-  CreateCommand,
   OT2_ROBOT_TYPE,
+} from '@opentrons/shared-data'
+import { getCutoutIdByAddressableArea } from '../utils'
+import type { Channels } from '@opentrons/components'
+import type {
+  AddressableAreaName,
+  CreateCommand,
   NozzleConfigurationStyle,
 } from '@opentrons/shared-data'
-import { Channels } from '@opentrons/components'
-import { getCutoutIdByAddressableArea } from '../utils'
 import type {
   CommandCreatorError,
   CommandsAndWarnings,

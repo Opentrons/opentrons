@@ -1,11 +1,7 @@
-import {
-  UseMutationResult,
-  useMutation,
-  UseMutateFunction,
-  useQueryClient,
-} from 'react-query'
+import { useMutation, useQueryClient } from 'react-query'
 import { deleteProtocol } from '@opentrons/api-client'
 import { useHost } from '../api'
+import type { UseMutationResult, UseMutateFunction } from 'react-query'
 import type { HostConfig, EmptyResponse } from '@opentrons/api-client'
 
 export type UseDeleteProtocolMutationResult = UseMutationResult<

@@ -2,7 +2,6 @@ import * as React from 'react'
 import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
-import { UseMutateFunction } from 'react-query'
 import {
   useConditionalConfirm,
   Flex,
@@ -35,6 +34,7 @@ import { UnmountGripper } from './UnmountGripper'
 import { Success } from './Success'
 import { ExitConfirmation } from './ExitConfirmation'
 
+import type { UseMutateFunction } from 'react-query'
 import type { GripperWizardFlowType } from './types'
 import type { AxiosError } from 'axios'
 import type {

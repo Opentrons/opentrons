@@ -2,7 +2,7 @@ import * as React from 'react'
 import { vi, it, expect, describe, beforeEach, afterEach } from 'vitest'
 import { when } from 'vitest-when'
 import { Provider } from 'react-redux'
-import { createStore, Store } from 'redux'
+import { createStore } from 'redux'
 import { renderHook } from '@testing-library/react'
 import { QueryClient, QueryClientProvider } from 'react-query'
 
@@ -15,9 +15,10 @@ import { useDispatchApiRequest } from '../../../../redux/robot-api'
 import { useRobot } from '../useRobot'
 import { usePipetteOffsetCalibration } from '..'
 
+import type { Store } from 'redux'
 import type { DiscoveredRobot } from '../../../../redux/discovery/types'
 import type { DispatchApiRequestType } from '../../../../redux/robot-api'
-import { AttachedPipette, Mount } from '../../../../redux/pipettes/types'
+import type { AttachedPipette, Mount } from '../../../../redux/pipettes/types'
 
 vi.mock('../../../../redux/calibration')
 vi.mock('../../../../redux/robot-api')

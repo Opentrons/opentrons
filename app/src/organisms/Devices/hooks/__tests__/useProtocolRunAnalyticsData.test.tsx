@@ -2,7 +2,7 @@ import * as React from 'react'
 import { vi, it, expect, describe, beforeEach, afterEach } from 'vitest'
 import { when } from 'vitest-when'
 import { renderHook, waitFor } from '@testing-library/react'
-import { createStore, Store } from 'redux'
+import { createStore } from 'redux'
 import { Provider } from 'react-redux'
 import { QueryClient, QueryClientProvider } from 'react-query'
 
@@ -14,6 +14,7 @@ import { useProtocolMetadata } from '../useProtocolMetadata'
 import { useRunTimestamps } from '../../../RunTimeControl/hooks'
 import { formatInterval } from '../../../RunTimeControl/utils'
 import { mockConnectableRobot } from '../../../../redux/discovery/__fixtures__'
+import type { Store } from 'redux'
 
 vi.mock('../../../../redux/analytics/hash')
 vi.mock('../../../../redux/protocol-storage')

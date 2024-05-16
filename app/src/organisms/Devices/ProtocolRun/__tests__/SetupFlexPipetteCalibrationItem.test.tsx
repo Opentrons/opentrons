@@ -11,7 +11,7 @@ import { useMostRecentCompletedAnalysis } from '../../../LabwarePositionCheck/us
 import { PipetteWizardFlows } from '../../../PipetteWizardFlows'
 import { SetupFlexPipetteCalibrationItem } from '../SetupFlexPipetteCalibrationItem'
 import _uncastedModifiedSimpleV6Protocol from '../../hooks/__fixtures__/modifiedSimpleV6.json'
-import { CompletedProtocolAnalysis } from '@opentrons/shared-data'
+import type { CompletedProtocolAnalysis } from '@opentrons/shared-data'
 
 vi.mock('@opentrons/react-api-client')
 vi.mock('../../../PipetteWizardFlows')

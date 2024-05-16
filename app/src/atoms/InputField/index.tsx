@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { css } from 'styled-components'
+import styled, { css } from 'styled-components'
 
 import {
   ALIGN_CENTER,
@@ -172,7 +172,6 @@ function Input(props: InputFieldProps): JSX.Element {
 
     @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
       height: ${size === 'small' ? '4.25rem' : '5rem'};
-      box-shadow: ${hasError ? BORDERS.shadowBig : 'none'};
       font-size: ${TYPOGRAPHY.fontSize28};
       padding: ${SPACING.spacing16} ${SPACING.spacing24};
       border: 2px ${BORDERS.styleSolid}
@@ -277,7 +276,7 @@ function Input(props: InputFieldProps): JSX.Element {
             }
           }}
         >
-          <input
+          <StyledInput
             {...inputProps}
             data-testid={props.id}
             value={value}
@@ -315,3 +314,9 @@ function Input(props: InputFieldProps): JSX.Element {
     </Flex>
   )
 }
+
+const StyledInput = styled.input`
+  &::placeholder {
+    color: ${COLORS.grey40};
+  }
+`

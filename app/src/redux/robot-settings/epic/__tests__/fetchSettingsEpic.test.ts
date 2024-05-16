@@ -7,9 +7,9 @@ import * as DiscoverySelectors from '../../../discovery/selectors'
 import * as Fixtures from '../../__fixtures__'
 import * as Selectors from '../../selectors'
 import * as Actions from '../../actions'
-import * as Types from '../../types'
 import { robotSettingsEpic } from '..'
 
+import type * as Types from '../../types'
 import type { Action, State } from '../../../types'
 import type { RobotApiRequestMeta } from '../../../robot-api/types'
 

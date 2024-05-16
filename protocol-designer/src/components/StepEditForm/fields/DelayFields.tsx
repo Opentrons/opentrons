@@ -4,8 +4,8 @@ import { TextField } from './TextField'
 import { CheckboxRowField } from './CheckboxRowField'
 import { TipPositionField } from './TipPositionField'
 import styles from '../StepEditForm.module.css'
-import { FieldPropsByName } from '../types'
-import { StepFieldName } from '../../../form-types'
+import type { FieldPropsByName } from '../types'
+import type { StepFieldName } from '../../../form-types'
 
 export interface DelayFieldProps {
   checkboxFieldName: StepFieldName // TODO(IL, 2021-03-03): strictly, could be DelayCheckboxFields!

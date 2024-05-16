@@ -1,6 +1,6 @@
 import { addUniqueConfigValue, subtractConfigValue } from '../config'
 import * as Constants from './constants'
-import * as Types from './types'
+import type * as Types from './types'
 
 import type {
   AddUniqueConfigValueAction,

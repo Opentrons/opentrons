@@ -12,6 +12,14 @@ metadata = {
 
 requirements = {"robotType": "OT-2", "apiLevel": "2.13"}
 
+#############
+# CHANGELOG #
+#############
+
+# 2.13
+
+# - Heater-Shaker Module support added
+
 
 def run(ctx: protocol_api.ProtocolContext) -> None:
     """This method is run by the protocol engine."""
@@ -57,6 +65,14 @@ def run(ctx: protocol_api.ProtocolContext) -> None:
     pipette_left = ctx.load_instrument(instrument_name="p300_multi_gen2", mount="left", tip_racks=tips_300ul)
 
     pipette_right = ctx.load_instrument(instrument_name="p20_single_gen2", mount="right", tip_racks=tips_20ul)
+
+    #########################
+    # Heater-Shaker Support #
+    #########################
+
+    # -------------------------- #
+    # Added in API version: 2.13 #
+    # -------------------------- #
 
     # modules https://docs.opentrons.com/v2/new_modules.html#available-modules
     hs_module = ctx.load_module("heaterShakerModuleV1", hs_position)

@@ -1,11 +1,11 @@
 import { getLoadedModule } from './accessors'
 
-import type { CompletedProtocolAnalysis } from '@opentrons/shared-data'
+import type { CommandTextData } from '../types'
 
 export function getModuleDisplayLocation(
-  analysis: CompletedProtocolAnalysis,
+  commandTextData: CommandTextData,
   moduleId: string
 ): string {
-  const loadedModule = getLoadedModule(analysis, moduleId)
+  const loadedModule = getLoadedModule(commandTextData, moduleId)
   return loadedModule != null ? loadedModule.location.slotName : ''
 }
