@@ -58,6 +58,7 @@ export function ConfirmPipette(props: ConfirmPipetteProps): JSX.Element {
     actualPipette,
     setConfirmPipetteLevel,
     confirmPipetteLevel,
+    isDisabled,
   } = props
   const { t } = useTranslation('change_pipette')
 
@@ -141,6 +142,7 @@ export function ConfirmPipette(props: ConfirmPipetteProps): JSX.Element {
           <SuccessAndExitButtons
             {...props}
             confirmPipetteLevel={confirmPipetteLevel}
+            isDisabled={isDisabled}
           />
         ) : null}
       </>
@@ -221,6 +223,7 @@ function SuccessAndExitButtons(props: ConfirmPipetteProps): JSX.Element {
     toCalibrationDashboard,
     success,
     wrongWantedPipette,
+    isDisabled,
   } = props
   const { t } = useTranslation('change_pipette')
   return (
@@ -230,11 +233,16 @@ function SuccessAndExitButtons(props: ConfirmPipetteProps): JSX.Element {
         <SecondaryButton
           marginRight={SPACING.spacing8}
           onClick={toCalibrationDashboard}
+          disabled={isDisabled}
         >
           {t('calibrate_pipette_offset')}
         </SecondaryButton>
       ) : null}
-      <PrimaryButton textTransform={TEXT_TRANSFORM_CAPITALIZE} onClick={exit}>
+      <PrimaryButton
+        textTransform={TEXT_TRANSFORM_CAPITALIZE}
+        onClick={exit}
+        disabled={isDisabled}
+      >
         {t('shared:exit')}
       </PrimaryButton>
     </>
