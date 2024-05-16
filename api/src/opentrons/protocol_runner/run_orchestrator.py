@@ -103,9 +103,3 @@ class RunOrchestrator:
             hardware_api=hardware_api,
             protocol_engine=protocol_engine,
         )
-
-    # def get_protocol_runner(self) -> protocol_runner.AnyRunner:
-    #     return self._protocol_runner or self._setup_runner
-    #
-    # def get_protocol_engine(self) -> ProtocolEngine:
-    #     return self._protocol_engine
