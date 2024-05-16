@@ -6,11 +6,9 @@ import {
   StrokedWells,
   StaticLabware,
 } from './labwareInternals'
-import {
-  LabwareAdapter,
-  LabwareAdapterLoadName,
-  labwareAdapterLoadNames,
-} from './LabwareAdapter'
+import { LabwareAdapter, labwareAdapterLoadNames } from './LabwareAdapter'
+
+import type { CSSProperties } from 'styled-components'
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import type {
   HighlightedWellLabels,
@@ -19,7 +17,8 @@ import type {
   WellStroke,
   WellGroup,
 } from './labwareInternals/types'
-import type { CSSProperties } from 'styled-components'
+import type { LabwareAdapterLoadName } from './LabwareAdapter'
+
 export const WELL_LABEL_OPTIONS = {
   SHOW_LABEL_INSIDE: 'SHOW_LABEL_INSIDE',
   SHOW_LABEL_OUTSIDE: 'SHOW_LABEL_OUTSIDE',

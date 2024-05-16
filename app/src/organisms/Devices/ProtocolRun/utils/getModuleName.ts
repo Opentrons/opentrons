@@ -1,4 +1,4 @@
-import { ModuleTypesThatRequireExtraAttention } from './getModuleTypesThatRequireExtraAttention'
+import type { ModuleTypesThatRequireExtraAttention } from './getModuleTypesThatRequireExtraAttention'
 
 export const getModuleName = (
   type: ModuleTypesThatRequireExtraAttention

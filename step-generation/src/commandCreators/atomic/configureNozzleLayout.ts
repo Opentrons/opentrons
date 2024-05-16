@@ -1,6 +1,7 @@
-import { COLUMN, NozzleConfigurationStyle } from '@opentrons/shared-data'
+import { COLUMN } from '@opentrons/shared-data'
 import { uuid } from '../../utils'
 import type { CommandCreator } from '../../types'
+import type { NozzleConfigurationStyle } from '@opentrons/shared-data'
 
 interface configureNozzleLayoutArgs {
   pipetteId: string

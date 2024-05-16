@@ -10,9 +10,9 @@ import {
   DIRECTION_COLUMN,
 } from '@opentrons/components'
 
-import { SmallButton } from '../../atoms/buttons'
 import { ChildNavigation } from '../ChildNavigation'
 import { useNotifyDeckConfigurationQuery } from '../../resources/deck_configuration'
+import type { SmallButton } from '../../atoms/buttons'
 
 interface CreateNewTransferProps {
   onNext: () => void

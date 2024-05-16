@@ -5,7 +5,6 @@ import {
   TEMPERATURE_MODULE_TYPE,
   TEMPERATURE_MODULE_V1,
   THERMOCYCLER_MODULE_TYPE,
-  LabwareDefinition2,
   getIsLabwareAboveHeight,
   MAX_LABWARE_HEIGHT_EAST_WEST_HEATER_SHAKER_MM,
   HEATERSHAKER_MODULE_TYPE,
@@ -29,7 +28,7 @@ import {
   SOURCE_WELL_BLOWOUT_DESTINATION,
   splitLiquid,
 } from '../utils/misc'
-import { Diff, thermocyclerStateDiff } from '../utils/thermocyclerStateDiff'
+import { thermocyclerStateDiff } from '../utils/thermocyclerStateDiff'
 import { DEFAULT_CONFIG } from '../fixtures'
 import {
   getIsHeaterShakerEastWestWithLatchOpen,
@@ -38,6 +37,10 @@ import {
   pipetteAdjacentHeaterShakerWhileShaking,
   thermocyclerPipetteCollision,
 } from '../utils'
+import { getIsHeaterShakerNorthSouthOfNonTiprackWithMultiChannelPipette } from '../utils/heaterShakerCollision'
+import * as SharedData from '@opentrons/shared-data'
+
+import type { Diff } from '../utils/thermocyclerStateDiff'
 import type { RobotState } from '../'
 import type {
   LabwareEntities,
@@ -45,8 +48,7 @@ import type {
   ThermocyclerModuleState,
   ThermocyclerStateStepArgs,
 } from '../types'
-import { getIsHeaterShakerNorthSouthOfNonTiprackWithMultiChannelPipette } from '../utils/heaterShakerCollision'
-import * as SharedData from '@opentrons/shared-data'
+import type { LabwareDefinition2 } from '@opentrons/shared-data'
 
 vi.mock('@opentrons/shared-data', async importOriginal => {
   const actualSharedData = await importOriginal<typeof SharedData>()

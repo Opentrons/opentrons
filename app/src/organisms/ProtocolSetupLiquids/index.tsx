@@ -16,11 +16,12 @@ import {
   parseLiquidsInLoadOrder,
   parseLabwareInfoByLiquidId,
 } from '@opentrons/api-client'
-import { MICRO_LITERS, RunTimeCommand } from '@opentrons/shared-data'
+import { MICRO_LITERS } from '@opentrons/shared-data'
 import { ODDBackButton } from '../../molecules/ODDBackButton'
 import { useMostRecentCompletedAnalysis } from '../LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import { getTotalVolumePerLiquidId } from '../Devices/ProtocolRun/SetupLiquids/utils'
 import { LiquidDetails } from './LiquidDetails'
+import type { RunTimeCommand } from '@opentrons/shared-data'
 import type { ParsedLiquid } from '@opentrons/api-client'
 import type { SetupScreens } from '../../pages/ProtocolSetup'
 

@@ -1,4 +1,5 @@
-import { ModuleType, THERMOCYCLER_MODULE_TYPE } from '@opentrons/shared-data'
+import { THERMOCYCLER_MODULE_TYPE } from '@opentrons/shared-data'
+import type { ModuleType } from '@opentrons/shared-data'
 
 // common constants
 

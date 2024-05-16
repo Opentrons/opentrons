@@ -1,6 +1,6 @@
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
 
-import {
+import type {
   CREATE_SESSION,
   CREATE_SESSION_SUCCESS,
   CREATE_SESSION_FAILURE,
@@ -30,15 +30,15 @@ import type {
   RobotApiV2ErrorResponseBody,
 } from '../robot-api/types'
 
-import * as CalCheckTypes from './calibration-check/types'
-import * as TipLengthCalTypes from './tip-length-calibration/types'
-import * as DeckCalTypes from './deck-calibration/types'
-import * as PipOffsetCalTypes from './pipette-offset-calibration/types'
-import * as CalCheckConstants from './calibration-check/constants'
-import * as TipCalConstants from './tip-length-calibration/constants'
-import * as DeckCalConstants from './deck-calibration/constants'
-import * as PipOffsetCalConstants from './pipette-offset-calibration/constants'
-import * as CommonCalConstants from './common-calibration/constants'
+import type * as CalCheckTypes from './calibration-check/types'
+import type * as TipLengthCalTypes from './tip-length-calibration/types'
+import type * as DeckCalTypes from './deck-calibration/types'
+import type * as PipOffsetCalTypes from './pipette-offset-calibration/types'
+import type * as CalCheckConstants from './calibration-check/constants'
+import type * as TipCalConstants from './tip-length-calibration/constants'
+import type * as DeckCalConstants from './deck-calibration/constants'
+import type * as PipOffsetCalConstants from './pipette-offset-calibration/constants'
+import type * as CommonCalConstants from './common-calibration/constants'
 
 export * from './calibration-check/types'
 export * from './tip-length-calibration/types'

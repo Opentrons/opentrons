@@ -1,7 +1,5 @@
-import * as React from 'react'
 import { vi, it, expect, describe, beforeEach } from 'vitest'
 import { when } from 'vitest-when'
-import { UseQueryResult } from 'react-query'
 import { renderHook } from '@testing-library/react'
 import { usePipettesQuery } from '@opentrons/react-api-client'
 import { getPipetteModelSpecs } from '@opentrons/shared-data'
@@ -10,6 +8,8 @@ import {
   pipetteResponseFixtureLeft,
   pipetteResponseFixtureRight,
 } from '@opentrons/api-client'
+import type * as React from 'react'
+import type { UseQueryResult } from 'react-query'
 import type { FetchPipettesResponseBody } from '@opentrons/api-client'
 import type { PipetteModelSpecs } from '@opentrons/shared-data'
 

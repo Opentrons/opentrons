@@ -53,11 +53,11 @@ class SavePositionImplementation(
     def __init__(
         self,
         gantry_mover: GantryMover,
-        model_utils: Optional[ModelUtils] = None,
+        model_utils: ModelUtils,
         **kwargs: object,
     ) -> None:
         self._gantry_mover = gantry_mover
-        self._model_utils = model_utils or ModelUtils()
+        self._model_utils = model_utils
 
     async def execute(
         self, params: SavePositionParams

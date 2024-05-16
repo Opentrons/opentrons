@@ -1,4 +1,4 @@
-import { LabwareFields } from '../fields'
+import type { LabwareFields } from '../fields'
 
 export const displayAsTube = (values: LabwareFields): boolean =>
   values.labwareType === 'tubeRack' ||

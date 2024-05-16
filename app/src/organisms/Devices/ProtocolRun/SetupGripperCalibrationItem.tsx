@@ -8,14 +8,15 @@ import {
   JUSTIFY_FLEX_END,
   WRAP,
 } from '@opentrons/components'
-import { GripperModel, getGripperDisplayName } from '@opentrons/shared-data'
+import { getGripperDisplayName } from '@opentrons/shared-data'
 import { TertiaryButton } from '../../../atoms/buttons'
 import { SetupCalibrationItem } from './SetupCalibrationItem'
 import { GripperWizardFlows } from '../../GripperWizardFlows'
+import { GRIPPER_FLOW_TYPES } from '../../GripperWizardFlows/constants'
 
 import type { GripperData } from '@opentrons/api-client'
+import type { GripperModel } from '@opentrons/shared-data'
 import type { GripperWizardFlowType } from '../../GripperWizardFlows/types'
-import { GRIPPER_FLOW_TYPES } from '../../GripperWizardFlows/constants'
 
 interface SetupGripperCalibrationItemProps {
   gripperData: GripperData | null
