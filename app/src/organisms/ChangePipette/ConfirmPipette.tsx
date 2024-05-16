@@ -233,6 +233,7 @@ function SuccessAndExitButtons(props: ConfirmPipetteProps): JSX.Element {
         <SecondaryButton
           marginRight={SPACING.spacing8}
           onClick={toCalibrationDashboard}
+          disabled={isDisabled}
         >
           {t('calibrate_pipette_offset')}
         </SecondaryButton>
