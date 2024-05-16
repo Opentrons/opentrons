@@ -19,7 +19,7 @@ __all__ = ["version", "__version__", "config"]
 def __getattr__(attrname: str) -> None:
     """Prevent import of legacy modules from global.
 
-    This is to officially deprecate deprecate Python API Version 1.0.
+    This is to officially deprecate Python API Version 1.0.
     """
     if attrname in LEGACY_MODULES:
         # Local imports for performance. This case is not hit frequently, and we
