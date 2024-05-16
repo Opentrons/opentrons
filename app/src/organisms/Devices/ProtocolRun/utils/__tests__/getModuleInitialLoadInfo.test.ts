@@ -1,10 +1,10 @@
 import { describe, it, expect } from 'vitest'
-import {
-  transfer_settings,
+import { transfer_settings } from '@opentrons/shared-data'
+import { getModuleInitialLoadInfo } from '../getModuleInitialLoadInfo'
+import type {
+  LoadModuleRunTimeCommand,
   CompletedProtocolAnalysis,
 } from '@opentrons/shared-data'
-import { getModuleInitialLoadInfo } from '../getModuleInitialLoadInfo'
-import type { LoadModuleRunTimeCommand } from '@opentrons/shared-data'
 
 const protocolWithMagTempTC = (transfer_settings as unknown) as CompletedProtocolAnalysis
 

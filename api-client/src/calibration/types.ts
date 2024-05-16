@@ -1,4 +1,4 @@
-import { Mount } from '../pipettes'
+import type { Mount } from '../pipettes'
 
 export interface PipOffsetDeletionParams {
   calType: 'pipetteOffset'

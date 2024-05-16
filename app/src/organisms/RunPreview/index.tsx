@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { css } from 'styled-components'
 import { useTranslation } from 'react-i18next'
-import { ViewportList, ViewportListRef } from 'react-viewport-list'
+import { ViewportList } from 'react-viewport-list'
 
 import { RUN_STATUSES_TERMINAL } from '@opentrons/api-client'
 import {
@@ -32,6 +32,7 @@ import { useRunStatus } from '../RunTimeControl/hooks'
 import { getCommandTextData } from '../CommandText/utils/getCommandTextData'
 import { useLastRunCommand } from '../Devices/hooks/useLastRunCommand'
 
+import type { ViewportListRef } from 'react-viewport-list'
 import type { RunStatus } from '@opentrons/api-client'
 import type { RobotType } from '@opentrons/shared-data'
 

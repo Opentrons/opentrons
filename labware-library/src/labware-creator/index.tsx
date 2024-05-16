@@ -11,19 +11,16 @@ import {
   aluminumBlockAutofills,
   aluminumBlockChildTypeOptions,
   aluminumBlockTypeOptions,
-  FormStatus,
   getDefaultFormState,
   getInitialStatus,
   tubeRackAutofills,
   tubeRackInsertOptions,
 } from './fields'
+
 import { makeAutofillOnChange } from './utils/makeAutofillOnChange'
 import { labwareDefToFields } from './labwareDefToFields'
 import { labwareFormSchema } from './labwareFormSchema'
-import {
-  formLevelValidation,
-  LabwareCreatorErrors,
-} from './formLevelValidation'
+import { formLevelValidation } from './formLevelValidation'
 import { fieldsToLabware } from './fieldsToLabware'
 import { LabwareCreator as LabwareCreatorComponent } from './components/LabwareCreator'
 import { Dropdown } from './components/Dropdown'
@@ -48,17 +45,19 @@ import { Volume } from './components/sections/Volume'
 import { WellBottomAndDepth } from './components/sections/WellBottomAndDepth'
 import { WellShapeAndSides } from './components/sections/WellShapeAndSides'
 import { WellSpacing } from './components/sections/WellSpacing'
+import { getDefaultedDef } from './getDefaultedDef'
+import { getIsXYGeometryChanged } from './utils/getIsXYGeometryChanged'
 
 import styles from './styles.module.css'
 
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
+import type { LabwareCreatorErrors } from './formLevelValidation'
 import type {
+  FormStatus,
   ImportError,
   LabwareFields,
   ProcessedLabwareFields,
 } from './fields'
-import { getDefaultedDef } from './getDefaultedDef'
-import { getIsXYGeometryChanged } from './utils/getIsXYGeometryChanged'
 
 const ajv = new Ajv()
 const validateLabwareSchema = ajv.compile(labwareSchema)

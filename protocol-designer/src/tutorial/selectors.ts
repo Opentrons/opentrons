@@ -10,9 +10,9 @@ import {
   getAdditionalEquipmentEntities,
 } from '../step-forms/selectors'
 import isEmpty from 'lodash/isEmpty'
-import { BaseState, Selector } from '../types'
-import { HintKey } from '.'
 import { getHasWasteChute } from '../components/labware'
+import type { BaseState, Selector } from '../types'
+import type { HintKey } from '.'
 
 const rootSelector = (state: BaseState): BaseState['tutorial'] => state.tutorial
 

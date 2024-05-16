@@ -1,9 +1,5 @@
 import * as React from 'react'
-import {
-  getPipetteNameSpecs,
-  LabwareDefinition2,
-  PipetteName,
-} from '@opentrons/shared-data'
+import { getPipetteNameSpecs } from '@opentrons/shared-data'
 import { C_MED_DARK_GRAY, C_MED_GRAY } from '../../styles'
 import { BORDERS } from '../../helix-design-system'
 import { RobotCoordsForeignDiv } from '../Deck/RobotCoordsForeignDiv'
@@ -18,6 +14,7 @@ import {
 } from './constants'
 import { EmanatingNozzle } from './EmanatingNozzle'
 import { EightEmanatingNozzles } from './EightEmanatingNozzles'
+import type { LabwareDefinition2, PipetteName } from '@opentrons/shared-data'
 
 interface PipetteRenderProps {
   labwareDef: LabwareDefinition2

@@ -9,7 +9,6 @@ import {
   InputField,
   Tooltip,
   useHoverTooltip,
-  UseHoverTooltipTargetProps,
 } from '@opentrons/components'
 import { getWellsDepth, getWellDimension } from '@opentrons/shared-data'
 import {
@@ -25,6 +24,7 @@ import type {
   TipYOffsetFields,
   TipZOffsetFields,
 } from '../../../../form-types'
+import type { UseHoverTooltipTargetProps } from '@opentrons/components'
 import type { FieldPropsByName } from '../../types'
 import type { PositionSpecs } from './TipPositionModal'
 
