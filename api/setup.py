@@ -63,6 +63,7 @@ INSTALL_REQUIRES = [
     "numpy>=1.20.0,<2",
     "pydantic>=1.10.9,<2.0.0",
     "pyserial>=3.5",
+    "pyusb==1.2.1",
     "typing-extensions>=4.0.0,<5",
     "click>=8.0.0,<9",
     'importlib-metadata >= 1.0 ; python_version < "3.8"',
