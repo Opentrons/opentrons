@@ -606,13 +606,13 @@ class CommandView(HasState[CommandState]):
                 index=running_command.index,
             )
 
-        final_command = self.get_final_command()
-        if final_command:
+        most_recently_finalized_command = self.get_most_recently_finalized_command()
+        if most_recently_finalized_command:
             return CurrentCommand(
-                command_id=final_command.command.id,
-                command_key=final_command.command.key,
-                created_at=final_command.command.createdAt,
-                index=final_command.index,
+                command_id=most_recently_finalized_command.command.id,
+                command_key=most_recently_finalized_command.command.key,
+                created_at=most_recently_finalized_command.command.createdAt,
+                index=most_recently_finalized_command.index,
             )
 
         return None
@@ -676,7 +676,7 @@ class CommandView(HasState[CommandState]):
         """Get whether the protocol is running & queued commands should be executed."""
         return self._state.queue_status == QueueStatus.RUNNING
 
-    def get_final_command(self) -> Optional[CommandEntry]:
+    def get_most_recently_finalized_command(self) -> Optional[CommandEntry]:
         """Get the most recent command that has reached its final `status`. See get_command_is_final."""
         run_requested_to_stop = self._state.run_result is not None
 
@@ -689,22 +689,22 @@ class CommandView(HasState[CommandState]):
             else:
                 return self._state.command_history.get_prev(tail_command.command.id)
         else:
-            final_command = self._state.command_history.get_terminal_command()
+            most_recently_finalized = self._state.command_history.get_terminal_command()
             # This iteration is effectively O(1) as we'll only ever have to iterate one or two times at most.
-            while final_command is not None:
+            while most_recently_finalized is not None:
                 next_command = self._state.command_history.get_next(
-                    final_command.command.id
+                    most_recently_finalized.command.id
                 )
                 if (
                     next_command is not None
                     and next_command.command.status != CommandStatus.QUEUED
                     and next_command.command.status != CommandStatus.RUNNING
                 ):
-                    final_command = next_command
+                    most_recently_finalized = next_command
                 else:
                     break
 
-        return final_command
+            return most_recently_finalized
 
     def get_command_is_final(self, command_id: str) -> bool:
         """Get whether a given command has reached its final `status`.
