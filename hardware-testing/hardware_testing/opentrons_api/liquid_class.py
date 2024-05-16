@@ -1,7 +1,7 @@
 """Liquid Class."""
 from dataclasses import dataclass
 from enum import Enum
-from typing import Union, Optional
+from typing import Union, Optional, Tuple
 
 from opentrons.protocol_api import InstrumentContext
 from opentrons.protocol_api.labware import Well
@@ -20,22 +20,6 @@ class HeightRef(str, Enum):
 class Height:
     value: float
     reference: HeightRef
-
-    def in_well(self, well: Union[Location, Well]) -> Location:
-        well = well.labware if isinstance(well, Location) else well
-        assert isinstance(well, Well)
-        ref = self.reference
-        if self.reference == HeightRef.WELL_TOP:
-            return well.top(self.value)
-        elif self.reference == HeightRef.WELL_BOTTOM:
-            return well.bottom(self.value)
-        elif (
-            self.reference == HeightRef.MENISCUS_START
-            or self.reference == HeightRef.MENISCUS_END
-        ):
-            raise NotImplementedError("meniscus-relative pipetting not yet supported")
-        else:
-            raise ValueError(f"unexpected height reference: {ref}")
 
 
 class TouchStrategy(str, Enum):
@@ -100,14 +84,13 @@ class Liquid:
     dispense: Dispense
     touch: Touch
 
-    def submerge_location_in_well(self, location: Union[Location, Well]) -> Location:
-        return self.submerge.height.in_well(location)
-
-    def retract_location_in_well(self, location: Union[Location, Well]) -> Location:
-        return self.retract.height.in_well(location)
-
 
 class LiquidClassPipette(InstrumentContext):
+    
+    def __init__(self, *args, **kwargs) -> None:
+        self._submerged = False
+        super(LiquidClassPipette, self).__init__(*args, **kwargs)
+    
     @property
     def _last_well(self) -> Optional[Well]:
         prev_loc = self._get_last_location_by_api_version()
@@ -115,20 +98,49 @@ class LiquidClassPipette(InstrumentContext):
             return prev_loc.labware.as_well()
         return None
 
-    def _need_to_retract(self, location: Optional[Union[Location, Well]]) -> bool:
+    def _need_to_retract(self, location: Optional[Union[Location, Well]], liquid: Liquid) -> bool:
+        # a) if target well is different
+        # b) same well, but new height is outside well/liquid
         if not location or not self._last_well:
             return False
         new_well = location.labware if isinstance(location, Location) else location
-        return new_well and (self._last_well != new_well)
+        assert new_well
+        if self._last_well != new_well:  # totally different well?
+            return True
+        elif not self._loc_in_well(new_well, liquid.submerge.height)[1]:  # same well, but now not submerged
+            return self._submerged  # no need to submerge if not already submerged
 
-    def _need_to_submerge(self, location: Union[Location, Well]) -> bool:
+    def _need_to_submerge(self, location: Union[Location, Well], liquid: Liquid) -> bool:
+        # TODO: make this work the same as retract logic, checking submerged flag and what-not
         if not location:
             return False
         if (
-            self._need_to_retract(location)
+            self._need_to_retract(location, liquid)
             or not self._get_last_location_by_api_version()
         ):
             return True
+
+    def _loc_in_well(self, well: Well, height: Height) -> Tuple[Location, bool]:
+        if height.reference == HeightRef.WELL_TOP:
+            loc = well.top(height.value)
+            submerged = height.value < 0
+        elif height.reference == HeightRef.WELL_BOTTOM:
+            loc = well.bottom(height.value)
+            submerged = height.value < well.depth
+        else:
+            raise NotImplementedError(
+                f"height reference {HeightRef.MENISCUS_START} pipetting not yet supported"
+            )
+        return loc, submerged
+
+    def _move_in_well(self, location: Union[Location, Well], height: Height, speed: Optional[float] = None) -> None:
+        if isinstance(location, Location):
+            self.move_to(location, speed=speed)
+        else:
+            well = location.labware if isinstance(location, Location) else location
+            loc, submerged = self._loc_in_well(well, height)
+            self.move_to(loc, speed=speed)
+            self._submerged = submerged
 
     def _retract_from_well(
         self,
@@ -138,7 +150,7 @@ class LiquidClassPipette(InstrumentContext):
         touch_tip: bool = False,
     ) -> None:
         speed = speed if speed else liquid.retract.speed
-        self.move_to(liquid.retract.height.in_well(location), speed=speed)
+        self._move_in_well(location, liquid.retract.height, speed)
         self.delay(seconds=liquid.retract.delay if liquid.retract.delay else 0)
         if not self.current_volume and liquid.retract.blow_out:
             self.Blow_out(liquid=liquid)
@@ -147,8 +159,7 @@ class LiquidClassPipette(InstrumentContext):
         self.prepare_to_aspirate()
         if liquid.retract.air_gap is not None:
             self.air_gap(liquid.retract.air_gap)
-        safe_height = Height(value=1, reference=HeightRef.WELL_TOP)
-        self.move_to(safe_height.in_well(location))
+        self._move_in_well(location, Height(value=1, reference=HeightRef.WELL_TOP))
 
     def _submerge_into_well(
         self,
@@ -156,10 +167,9 @@ class LiquidClassPipette(InstrumentContext):
         location: Union[Location, Well],
         speed: Optional[float] = None,
     ) -> None:
-        safe_height = Height(value=1, reference=HeightRef.WELL_TOP)
-        self.move_to(safe_height.in_well(location))
+        self._move_in_well(location, Height(value=1, reference=HeightRef.WELL_TOP))
         speed = speed if speed else liquid.submerge.speed
-        self.move_to(liquid.submerge.height.in_well(location), speed=speed)
+        self._move_in_well(location, liquid.submerge.height, speed)
         self.delay(seconds=liquid.submerge.delay if liquid.submerge.delay else 0)
 
     def Aspirate(
@@ -227,15 +237,16 @@ class LiquidClassPipette(InstrumentContext):
 
     def Move_to(
         self,
-        location: Union[Location, TrashBin, WasteChute],
+        location: Union[Well, Location, TrashBin, WasteChute],
         speed: Optional[float] = None,
         liquid: Optional[Liquid] = None,
         **kwargs,
     ) -> "LiquidClassPipette":
+        """Public facing move command. """
         if liquid:
-            if self._need_to_retract(location):
+            if self._need_to_retract(location, liquid):
                 self._retract_from_well(liquid, self._last_well, speed=speed)
-            if self._need_to_submerge(location):
+            if self._need_to_submerge(location, liquid):
                 self._submerge_into_well(liquid, location, speed=speed)
         else:
             self.move_to(location, speed=speed, **kwargs)
