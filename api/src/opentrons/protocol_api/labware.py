@@ -22,6 +22,7 @@ from opentrons.protocols.api_support.types import APIVersion
 from opentrons.protocols.api_support.util import requires_version, APIVersionError
 from opentrons.hardware_control.nozzle_manager import NozzleMap
 
+# isort: off
 # TODO(mc, 2022-09-02): re-exports provided for backwards compatibility
 # remove when their usage is no longer needed
 from opentrons.protocols.labware import (  # noqa: F401
@@ -30,6 +31,8 @@ from opentrons.protocols.labware import (  # noqa: F401
     verify_definition as verify_definition,
     save_definition as save_definition,
 )
+
+# isort: on
 
 from . import validation
 from ._liquid import Liquid
