@@ -384,12 +384,12 @@ class CommandStore(HasState[CommandState], HandlesActions):
                 else:
                     self._state.run_result = RunResult.STOPPED
 
-            if not self._state.run_error and action.error_details:
-                self._state.run_error = self._map_run_exception_to_error_occurrence(
-                    action.error_details.error_id,
-                    action.error_details.created_at,
-                    action.error_details.error,
-                )
+                if not self._state.run_error and action.error_details:
+                    self._state.run_error = self._map_run_exception_to_error_occurrence(
+                        action.error_details.error_id,
+                        action.error_details.created_at,
+                        action.error_details.error,
+                    )
 
         elif isinstance(action, HardwareStoppedAction):
             self._state.queue_status = QueueStatus.PAUSED
