@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
-import { Flex, JUSTIFY_CENTER, SPACING } from '@opentrons/components'
+import { Flex, POSITION_FIXED, SPACING } from '@opentrons/components'
 
 import { ChildNavigation } from '../../organisms/ChildNavigation'
 import { WellSelection } from '../../organisms/WellSelection'
@@ -57,9 +57,12 @@ export function SelectSourceWells(props: SelectSourceWellsProps): JSX.Element {
         top={SPACING.spacing8}
       />
       <Flex
-        justifyContent={JUSTIFY_CENTER}
         marginTop={SPACING.spacing120}
         padding={`${SPACING.spacing16} ${SPACING.spacing60} ${SPACING.spacing40} ${SPACING.spacing60}`}
+        position={POSITION_FIXED}
+        top="0"
+        left="0"
+        width="100%"
       >
         {state.source != null ? (
           <WellSelection

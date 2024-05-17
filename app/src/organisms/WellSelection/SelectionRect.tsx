@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { Flex, JUSTIFY_CENTER } from '@opentrons/components'
 
 import type { DragRect, GenericRect } from './types'
 
@@ -102,17 +103,17 @@ export function SelectionRect(props: SelectionRectProps): JSX.Element {
   }, [handleDrag, handleDragEnd])
 
   return (
-    <div
+    <Flex
       // mouse events to enable local development
       onMouseDown={handleMouseDown}
       onTouchStart={handleTouchStart}
-      ref={ref => {
+      ref={(ref: HTMLDivElement | SVGAElement | null) => {
         parentRef.current = ref
       }}
-      // don't hard-code this width
-      style={{ width: '600px' }}
+      justifyContent={JUSTIFY_CENTER}
+      width="100%"
     >
-      {children}
-    </div>
+      <Flex width="75%">{children}</Flex>
+    </Flex>
   )
 }
