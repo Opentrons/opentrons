@@ -7,7 +7,6 @@ import {
   RobotCoordinateSpace,
   WELL_LABEL_OPTIONS,
 } from '@opentrons/components'
-import { COLUMN } from '@opentrons/shared-data'
 import {
   arrayToWellGroup,
   getCollidingWells,
@@ -16,29 +15,22 @@ import {
 import { SelectionRect } from './SelectionRect'
 
 import type { WellFill, WellGroup, WellStroke } from '@opentrons/components'
-import type { LabwareDefinition2 } from '@opentrons/shared-data'
-import type { GenericRect, NozzleType } from './types'
+import type {
+  LabwareDefinition2,
+  PipetteChannels,
+} from '@opentrons/shared-data'
+import type { GenericRect } from './types'
 
 interface WellSelectionProps {
   definition: LabwareDefinition2
   /** array of primary wells. Overrides labwareProps.selectedWells */
   selectedPrimaryWells: WellGroup
   selectWells: (wellGroup: WellGroup) => unknown
-  nozzleType: NozzleType | null
-}
-
-type ChannelType = 8 | 96
-
-const getChannelsFromNozzleType = (nozzleType: NozzleType): ChannelType => {
-  if (nozzleType === '8-channel' || nozzleType === COLUMN) {
-    return 8
-  } else {
-    return 96
-  }
+  channels: PipetteChannels
 }
 
 export function WellSelection(props: WellSelectionProps): JSX.Element {
-  const { definition, selectedPrimaryWells, selectWells, nozzleType } = props
+  const { definition, selectedPrimaryWells, selectWells, channels } = props
 
   const [highlightedWells, setHighlightedWells] = React.useState<WellGroup>({})
 
@@ -46,8 +38,7 @@ export function WellSelection(props: WellSelectionProps): JSX.Element {
     selectedWells: WellGroup
   ) => WellGroup = selectedWells => {
     // Returns PRIMARY WELLS from the selection.
-    if (nozzleType != null) {
-      const channels = getChannelsFromNozzleType(nozzleType)
+    if (channels === 8 || channels === 96) {
       // for the wells that have been highlighted,
       // get all 8-well well sets and merge them
       const primaryWells: WellGroup = reduce(
@@ -76,8 +67,7 @@ export function WellSelection(props: WellSelectionProps): JSX.Element {
   }
 
   const handleSelectionMove: (rect: GenericRect) => void = rect => {
-    if (nozzleType != null) {
-      const channels = getChannelsFromNozzleType(nozzleType)
+    if (channels === 8 || channels === 96) {
       const selectedWells = _getWellsFromRect(rect)
       const allWellsForMulti: WellGroup = reduce(
         selectedWells,
@@ -107,11 +97,10 @@ export function WellSelection(props: WellSelectionProps): JSX.Element {
 
   // For rendering, show all wells not just primary wells
   const allSelectedWells =
-    nozzleType != null
+    channels === 8 || channels === 96
       ? reduce<WellGroup, WellGroup>(
           selectedPrimaryWells,
           (acc, _, wellName): WellGroup => {
-            const channels = getChannelsFromNozzleType(nozzleType)
             const wellSet = getWellSetForMultichannel(
               definition,
               wellName,

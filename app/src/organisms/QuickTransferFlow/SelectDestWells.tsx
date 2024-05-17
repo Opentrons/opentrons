@@ -70,8 +70,7 @@ export function SelectDestWells(props: SelectDestWellsProps): JSX.Element {
             selectWells={wellGroup => {
               setSelectedWells(prevWells => ({ ...prevWells, ...wellGroup }))
             }}
-            // TODO: nozzle type
-            nozzleType={null}
+            channels={state.pipette?.channels ?? 1}
           />
         ) : null}
       </Flex>
