@@ -165,7 +165,9 @@ def _load_scale(
     return recorder
 
 
-def run(tip: int, run_args: RunArgs, google_sheet: Optional[Any]) -> None:
+def run(
+    tip: int, run_args: RunArgs, google_sheet: Optional[Any], starting_tip: str = "A1"
+) -> None:
     """Run a liquid probe test."""
     test_labware: Labware = _load_test_well(run_args)
     dial_indicator: Labware = _load_dial_indicator(run_args)
@@ -178,6 +180,10 @@ def run(tip: int, run_args: RunArgs, google_sheet: Optional[Any]) -> None:
     tips: List[Well] = get_unused_tips(
         ctx=run_args.ctx, tip_volume=tip, pipette_mount=""
     )
+    row = "ABCDEFGH".index(starting_tip[0])
+    column = int(starting_tip[1:]) - 1
+    num_of_tips_to_skip = (column * 8) + row
+    del tips[:num_of_tips_to_skip]
     assert len(tips) >= run_args.trials
     results: List[float] = []
     adjusted_results: List[float] = []

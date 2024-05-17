@@ -1,7 +1,7 @@
 """Post process script csvs."""
 import csv
 import os
-from typing import List, Dict, Tuple, Any
+from typing import List, Dict, Tuple, Any, Optional
 import statistics
 from math import isclose
 
@@ -155,10 +155,13 @@ def process_csv_directory(  # noqa: C901
                     ]
                 )
             # Add header to google sheet
-            pressure_header_for_google_sheet = [[x] for x in pressure_header_row]
-            google_sheet.batch_update_cells(
-                sheet_name, pressure_header_for_google_sheet, "H", 10
-            )
+            try:
+                pressure_header_for_google_sheet = [[x] for x in pressure_header_row]
+                google_sheet.batch_update_cells(
+                    sheet_name, pressure_header_for_google_sheet, "H", 10
+                )
+            except:
+                print("did not log to google sheet.")
             # we want to line up the z height's of each trial at time==0
             # to do this we drop the results at the beginning of each of the trials
             # except for one with the longest tip (lower tip offset are longer tips)
@@ -220,21 +223,24 @@ def process_csv_directory(  # noqa: C901
                         )
                     final_report_writer.writerow(pressure_row)
                     # Add pressure to google sheet
-                    pressure_row_for_google_sheet = [[x] for x in pressure_row]
-                    google_sheet.batch_update_cells(
-                        sheet_name, pressure_row_for_google_sheet, "H", 11
-                    )
+                    try:
+                        pressure_row_for_google_sheet = [[x] for x in pressure_row]
+                        google_sheet.batch_update_cells(
+                            sheet_name, pressure_row_for_google_sheet, "H", 11
+                        )
+                    except:
+                        print("did not log to google sheet.")
                     time += 0.001
 
 
 def process_google_sheet(
-    google_sheet,
+    google_sheet: Any,
     run_args,
-    test_info,
+    test_info: List,
 ) -> None:
     """Write results and graphs to google sheet."""
-    sheet_title = run_args.run_id
     sheet_id = google_sheet.create_worksheet(run_args.run_id)
+    sheet_title = run_args.run_id
     test_parameters = [
         [
             "Tester Name",
@@ -271,7 +277,7 @@ def process_google_sheet(
     # Create Graphs
     # 1. Create pressure vs time graph zoomed out
     titles = ["Pressure vs Time", "Time (s)", "Pressure (P)", ""]
-    axis = [
+    axis_pressure_vs_time = [
         {"position": "BOTTOM_AXIS", "title": titles[1]},
         {"position": "LEFT_AXIS", "title": titles[2]},
         {"position": "RIGHT_AXIS", "title": titles[3]},
@@ -378,7 +384,7 @@ def process_google_sheet(
         },
     ]
     google_sheet.create_line_chart(
-        titles, series_pressure, domains_pressure, axis, 0, sheet_id
+        titles, series_pressure, domains_pressure, axis_pressure_vs_time, 0, sheet_id
     )
     # Zoomed in pressure chart
     # Determine where pressure changes
@@ -411,8 +417,8 @@ def process_google_sheet(
             "position": "LEFT_AXIS",
             "title": titles[2],
             "viewWindowOptions": {
-                "viewWindowMin": str(float(min(heights)) - 1),
-                "viewWindowMax": str(float(max(heights)) + 1),
+                "viewWindowMin": float(min(heights)) - 1,
+                "viewWindowMax": float(max(heights)) + 1,
             },
         },
         {"position": "RIGHT_AXIS", "title": titles[3]},

@@ -214,14 +214,17 @@ def store_trial(
     )
     if google_sheet is not None:
         # Write trial to google sheet
-        trial_for_google_sheet = [
-            [trial],
-            [height],
-            [plunger_pos],
-            [tip_length_offset],
-            [height + tip_length_offset],
-        ]
-        google_sheet.batch_write_cells(sheet_name, trial_for_google_sheet, "B", 11)
+        try:
+            trial_for_google_sheet = [
+                [trial],
+                [height],
+                [plunger_pos],
+                [tip_length_offset],
+                [height + tip_length_offset],
+            ]
+            google_sheet.batch_update_cells(sheet_name, trial_for_google_sheet, "B", 11+int(trial))
+        except:
+            print("did not log to google sheet.")
 
 
 def store_tip_results(

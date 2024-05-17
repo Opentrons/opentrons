@@ -264,6 +264,8 @@ if __name__ == "__main__":
     parser.add_argument("--google-sheet-name", type=str, default="LLD-Shared-Data")
     parser.add_argument("--liquid", type=str, default="unknown")
     parser.add_argument("--skip-labware-offsets", action="store_true")
+    parser.add_argument("--probe-seconds-before-contact", type=float, default=2.0)
+    parser.add_argument("--starting-tip", type=str, default="A1")
 
     args = parser.parse_args()
 
@@ -271,7 +273,7 @@ if __name__ == "__main__":
         0.0 < args.probe_seconds_before_contact <= MAX_PROBE_SECONDS
     ), f"'--probe-seconds-before-contact' must be between 0.0-{MAX_PROBE_SECONDS}"
     run_args = RunArgs.build_run_args(args)
-    exit_error = os.EX_OK
+    exit_error = os.X_OK
     try:
         if not run_args.ctx.is_simulating():
             data_dir = get_testing_data_directory()
@@ -294,8 +296,9 @@ if __name__ == "__main__":
                 )
             print(os.path.exists(credentials_path))
             google_sheet = google_sheets_tool.google_sheet(
-                credentials_path, args.google_sheet_name, 0
+                credentials_path, "LLD-Shared-Sheet", 0
             )
+            sheet_id = google_sheet.create_worksheet(run_args.run_id)
         else:
             google_sheet = None
         hw = run_args.ctx._core.get_hardware()
@@ -344,7 +347,10 @@ if __name__ == "__main__":
                 "threshold",
                 args.plunger_direction,
             ]
-            process_google_sheet(google_sheet, run_args, test_info)
+            try:
+                process_google_sheet(google_sheet, run_args, test_info)
+            except:
+                print("did not log to google sheet")
 
         run_args.ctx.cleanup()
         if not args.simulate:
