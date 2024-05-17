@@ -1,3 +1,4 @@
+import { getTipTypeFromTipRackDefinition } from '@opentrons/shared-data'
 import { getVolumeRange } from './'
 
 import type { LabwareDefinition2, PipetteV2Specs } from '@opentrons/shared-data'
@@ -21,8 +22,7 @@ export function getInitialSummaryState(props: {
   transferType: TransferType
   volume: number
 }): QuickTransferSummaryState {
-  const tipVolume = Object.values(props.tipRack.wells)[0].totalLiquidVolume
-  const tipType = `t${tipVolume}`
+  const tipType = getTipTypeFromTipRackDefinition(props.tipRack)
   const flowRatesForSupportedTip =
     props.pipette.liquids.default.supportedTips[tipType]
 
