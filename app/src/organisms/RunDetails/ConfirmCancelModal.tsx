@@ -23,11 +23,15 @@ import {
 } from '@opentrons/api-client'
 import { useStopRunMutation } from '@opentrons/react-api-client'
 
+<<<<<<< HEAD
 import { getModalPortalEl } from '../../App/portal'
 <<<<<<< HEAD
 =======
 import { StyledText } from '../../atoms/text'
 >>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
+=======
+import { getTopPortalEl } from '../../App/portal'
+>>>>>>> b3c120dde7 (fix(app): allow navbar during LegacyModals on the modal portal (#15166))
 import { LegacyModal } from '../../molecules/LegacyModal'
 import { useTrackProtocolRunEvent, useIsFlex } from '../Devices/hooks'
 import { useRunStatus } from '../RunTimeControl/hooks'
@@ -119,6 +123,6 @@ export function ConfirmCancelModal(
         </Flex>
       </Flex>
     </LegacyModal>,
-    getModalPortalEl()
+    getTopPortalEl()
   )
 }
