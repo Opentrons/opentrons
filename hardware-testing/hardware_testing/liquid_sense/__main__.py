@@ -154,15 +154,13 @@ class RunArgs:
         """Build."""
         _ctx = RunArgs._get_protocol_context(args)
         run_id, start_time = create_run_id_and_start_time()
-        environment_sensor = asair_sensor.BuildAsairSensor(
-            _ctx.is_simulating() or args.ignore_env
-        )
+        environment_sensor = asair_sensor.BuildAsairSensor(simulate=True)
         git_description = get_git_description()
         protocol_cfg = LIQUID_SENSE_CFG[args.pipette][args.channels]
         name = protocol_cfg.metadata["protocolName"]  # type: ignore[attr-defined]
         ui.print_header("LOAD PIPETTE")
         pipette = _ctx.load_instrument(
-            f"flex_{args.channels}channel_{args.pipette}", "left"
+            f"flex_{args.channels}channel_{args.pipette}", args.mount
         )
         loaded_labwares = _ctx.loaded_labwares
         if 12 in loaded_labwares.keys():
@@ -182,17 +180,17 @@ class RunArgs:
         else:
             tip_volumes = [args.tip]
 
-        scale = Scale.build(simulate=_ctx.is_simulating() or args.ignore_scale)
+        scale = Scale.build(simulate=True)
         recorder: GravimetricRecorder = execute._load_scale(
             name,
             scale,
             run_id,
             pipette_tag,
             start_time,
-            _ctx.is_simulating() or args.ignore_scale,
+            simulating=True,
         )
         dial: Optional[mitutoyo_digimatic_indicator.Mitutoyo_Digimatic_Indicator] = None
-        if not _ctx.is_simulating() and not args.ignore_dial:
+        if not _ctx.is_simulating():
             dial_port = list_ports_and_select("Dial Indicator")
             dial = mitutoyo_digimatic_indicator.Mitutoyo_Digimatic_Indicator(
                 port=dial_port
@@ -216,7 +214,7 @@ class RunArgs:
             args.pipette,
             tip_volumes,
             trials,
-            args.plunger_direction,
+            "aspirate" if args.aspirate else "dispense",
             args.liquid,
             protocol_cfg.LABWARE_ON_SCALE,  # type: ignore[attr-defined]
             args.z_speed,
@@ -240,7 +238,7 @@ class RunArgs:
             protocol_cfg=protocol_cfg,
             test_report=report,
             probe_seconds_before_contact=args.probe_seconds_before_contact,
-            aspirate=args.plunger_direction == "aspirate",
+            aspirate=args.aspirate,
             dial_indicator=dial,
             plunger_speed=args.plunger_speed,
             trials_before_jog=args.trials_before_jog,
@@ -252,30 +250,20 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser("Pipette Testing")
     parser.add_argument("--simulate", action="store_true")
     parser.add_argument("--pipette", type=int, choices=[50, 1000], required=True)
+    parser.add_argument("--mount", type=str, choices=["left", "right"], default="left")
     parser.add_argument("--channels", type=int, choices=[1, 8, 96], default=1)
     parser.add_argument("--tip", type=int, choices=[0, 50, 200, 1000], default=0)
-    parser.add_argument("--trials", type=int, default=5)
+    parser.add_argument("--probe-seconds-before-contact", type=float, default=1.0)
     parser.add_argument("--return-tip", action="store_true")
-    parser.add_argument("--skip-labware-offsets", action="store_true")
-    parser.add_argument(
-        "--liquid", type=str, choices=["water", "glycerol", "alchohol"], default="water"
-    )
-    parser.add_argument("--z-speed", type=float, default=5)
-    parser.add_argument(
-        "--plunger-direction",
-        type=str,
-        choices=["aspirate", "dispense"],
-        default="aspirate",
-    )
+    parser.add_argument("--trials", type=int, default=7)
+    parser.add_argument("--trials-before-jog", type=int, default=7)
+    parser.add_argument("--z-speed", type=float, default=1)
+    parser.add_argument("--aspirate", action="store_true")
     parser.add_argument("--plunger-speed", type=float, default=-1.0)
-    parser.add_argument("--isolate-plungers", action="store_true")
-    parser.add_argument("--probe-seconds-before-contact", type=float, default=2.0)
-    parser.add_argument("--ignore-scale", action="store_true")
-    parser.add_argument("--ignore-env", action="store_true")
-    parser.add_argument("--ignore-dial", action="store_true")
-    parser.add_argument("--trials-before-jog", type=int, default=10)
     parser.add_argument("--multi-passes", type=int, default=1)
     parser.add_argument("--google-sheet-name", type=str, default="LLD-Shared-Data")
+    parser.add_argument("--liquid", type=str, default="unknown")
+    parser.add_argument("--skip-labware-offsets", action="store_true")
 
     args = parser.parse_args()
     # Connect to google sheet
@@ -294,10 +282,11 @@ if __name__ == "__main__":
     ), f"'--probe-seconds-before-contact' must be between 0.0-{MAX_PROBE_SECONDS}"
     run_args = RunArgs.build_run_args(args)
     exit_error = os.EX_OK
+    serial_logger: Optional[subprocess.Popen] = None
+    data_dir = get_testing_data_directory()
+    data_file = f"/{data_dir}/{run_args.name}/{run_args.run_id}/serial.log"
     try:
         if not run_args.ctx.is_simulating():
-            data_dir = get_testing_data_directory()
-            data_file = f"/{data_dir}/{run_args.name}/{run_args.run_id}/serial.log"
             ui.print_info(f"logging can data to {data_file}")
             serial_logger = subprocess.Popen(
                 [f"python3 -m opentrons_hardware.scripts.can_mon > {data_file}"],
@@ -305,13 +294,9 @@ if __name__ == "__main__":
             )
             sleep(1)
         hw = run_args.ctx._core.get_hardware()
-        if not run_args.ctx.is_simulating():
-            ui.get_user_ready("CLOSE the door, and MOVE AWAY from machine")
         ui.print_info("homing...")
         run_args.ctx.home()
         for tip in run_args.tip_volumes:
-            if args.channels == 96 and not run_args.ctx.is_simulating():
-                ui.alert_user_ready(f"prepare the {tip}ul tipracks", hw)
             execute.run(tip, run_args)
     except Exception as e:
         ui.print_info(f"got error {e}")
@@ -320,9 +305,7 @@ if __name__ == "__main__":
     finally:
         if run_args.recorder is not None:
             ui.print_info("ending recording")
-            run_args.recorder.stop()
-            run_args.recorder.deactivate()
-        if not run_args.ctx.is_simulating():
+        if not run_args.ctx.is_simulating() and serial_logger:
             ui.print_info("killing serial log")
             serial_logger.terminate()
         if run_args.dial_indicator is not None:
