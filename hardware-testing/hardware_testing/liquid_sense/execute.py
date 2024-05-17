@@ -310,7 +310,11 @@ def get_plunger_travel(run_args: RunArgs) -> float:
 
 
 def find_max_z_distances(
-    run_args: RunArgs, tip: int, well: Well, p_speed: float
+    run_args: RunArgs,
+    tip: int,
+    well: Well,
+    p_speed: float,
+    starting_mount_height: float,
 ) -> List[float]:
     """Returns a list of max z distances for each probe.
 
@@ -321,7 +325,7 @@ def find_max_z_distances(
     truncated to avoid collisions.
     """
     z_speed = run_args.z_speed
-    max_z_distance = well.depth + run_args.start_height_offset
+    max_z_distance = starting_mount_height - well.bottom().point.z
     plunger_travel = get_plunger_travel(run_args)
     p_travel_time = min(
         plunger_travel / p_speed, PROBE_MAX_TIME[run_args.pipette_channels]
@@ -360,14 +364,15 @@ def _run_trial(
         if run_args.plunger_speed == -1
         else run_args.plunger_speed
     )
-
-    z_distances: List[float] = find_max_z_distances(run_args, tip, well, plunger_speed)
-    z_distances = z_distances[: run_args.multi_passes]
     starting_mm_above_liquid = run_args.probe_seconds_before_contact * run_args.z_speed
     starting_mount_height = (
         well.bottom(z=liquid_height).point.z + starting_mm_above_liquid
     )
     start_height = starting_mount_height
+    z_distances: List[float] = find_max_z_distances(
+        run_args, tip, well, plunger_speed, starting_mount_height
+    )
+    z_distances = z_distances[: run_args.multi_passes]
     for z_dist in z_distances:
         lps = LiquidProbeSettings(
             starting_mount_height=start_height,
