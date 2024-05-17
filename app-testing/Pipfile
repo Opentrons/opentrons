@@ -18,6 +18,7 @@ ruff = "==0.3.4"
 docker = "==7.0.0"
 syrupy = "==4.6.1"
 pytest-html = "==4.1.1"
+pyusb = "==1.2.1"
 
 [requires]
 python_version = "3.12"
