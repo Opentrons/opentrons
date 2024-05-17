@@ -7,14 +7,14 @@ import { WellSelection } from '../../organisms/WellSelection'
 
 import type { SmallButton } from '../../atoms/buttons'
 import type {
-  QuickTransferSetupState,
+  QuickTransferWizardState,
   QuickTransferWizardAction,
 } from './types'
 
 interface SelectSourceWellsProps {
   onNext: () => void
   onBack: () => void
-  state: QuickTransferSetupState
+  state: QuickTransferWizardState
   dispatch: React.Dispatch<QuickTransferWizardAction>
 }
 
