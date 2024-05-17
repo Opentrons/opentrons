@@ -21,6 +21,7 @@ from api.domain.prompts import (
     system_notes,
     tools,
 )
+from api.domain.utils import refine_characters
 from api.settings import Settings, is_running_on_lambda
 
 ROOT_PATH: Path = Path(Path(__file__)).parent.parent.parent
@@ -33,80 +34,6 @@ class OpenAIPredict:
         li_settings.embed_model = OpenAIEmbedding(
             model_name="text-embedding-3-large", api_key=self.settings.openai_api_key.get_secret_value()
         )
-
-    def refine_characters(self, prompt: str) -> str:
-        """
-        Converts specific Greek characters in a string to their English phonetic equivalents and replaces
-        certain special characters. The function is designed to handle text with Greek characters and
-        special characters like backticks, converting them into more standardized or readable forms while
-        preserving the structure and formatting of the original text.
-
-        Parameters:
-        - text (str): The input string containing Greek characters and possibly special characters.
-
-        Returns:
-        - str: The modified string with Greek characters replaced by their English phonetic equivalents
-            and certain special characters like backticks replaced with single quotes.
-
-        Example:
-        >>> refine_characters("Transfer `10μ`")
-        'Transfer '10m''
-        """
-
-        greek_to_english = {
-            "α": "a",
-            "β": "b",
-            "γ": "g",
-            "δ": "d",
-            "ε": "e",
-            "ζ": "z",
-            "η": "e",
-            "θ": "th",
-            "ι": "i",
-            "κ": "k",
-            "λ": "l",
-            "μ": "m",
-            "ν": "n",
-            "ξ": "x",
-            "ο": "o",
-            "π": "p",
-            "ρ": "r",
-            "σ": "s",
-            "ς": "s",
-            "τ": "t",
-            "υ": "u",
-            "φ": "ph",
-            "χ": "ch",
-            "ψ": "ps",
-            "ω": "o",
-            "Α": "A",
-            "Β": "B",
-            "Γ": "G",
-            "Δ": "D",
-            "Ε": "E",
-            "Ζ": "Z",
-            "Η": "E",
-            "Θ": "Th",
-            "Ι": "I",
-            "Κ": "K",
-            "Λ": "L",
-            "Μ": "M",
-            "Ν": "N",
-            "Ξ": "X",
-            "Ο": "O",
-            "Π": "P",
-            "Ρ": "R",
-            "Σ": "S",
-            "Τ": "T",
-            "Υ": "U",
-            "Φ": "Ph",
-            "Χ": "Ch",
-            "Ψ": "Ps",
-            "Ω": "O",
-        }
-        translation_table = str.maketrans(greek_to_english)
-        translated_text = prompt.translate(translation_table)
-        return translated_text
 
     def get_docs_all(self, query: str) -> Tuple[str, str, str]:
         commands = self.extract_atomic_description(query)
@@ -192,7 +119,7 @@ class OpenAIPredict:
 
     def predict(self, prompt: str, chat_completion_message_params: List[ChatCompletionMessageParam] | None = None) -> None | str:
 
-        prompt = self.refine_characters(prompt)
+        prompt = refine_characters(prompt)
         messages: List[ChatCompletionMessageParam] = [{"role": "system", "content": system_notes}]
         if chat_completion_message_params:
             messages += chat_completion_message_params
