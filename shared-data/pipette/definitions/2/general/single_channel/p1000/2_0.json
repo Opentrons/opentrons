@@ -3,18 +3,30 @@
   "displayName": "P1000 Single-Channel GEN2",
   "model": "p1000",
   "displayCategory": "GEN2",
+  "validNozzleMaps": {
+    "maps": {
+      "A1": ["A1"]
+    }
+  },
   "pickUpTipConfigurations": {
     "pressFit": {
-      "speedByTipCount": {
-        "1": 10.0
-      },
       "presses": 1,
       "increment": 0.0,
-      "distanceByTipCount": {
-        "1": 17.0
-      },
-      "currentByTipCount": {
-        "1": 0.17
+      "configurationsByNozzleMap": {
+        "A1": {
+          "default": {
+            "speed": 10.0,
+            "distance": 17.0,
+            "current": 0.17,
+            "tipOverlap": 7.47
+          },
+          "t200": {
+            "speed": 10.0,
+            "distance": 17.0,
+            "current": 0.17,
+            "tipOverlap": 6.1
+          }
+        }
       }
     }
   },

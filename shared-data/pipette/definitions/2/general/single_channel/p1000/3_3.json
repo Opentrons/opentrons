@@ -3,18 +3,30 @@
   "displayName": "Flex 1-Channel 1000 μL",
   "model": "p1000",
   "displayCategory": "FLEX",
+  "validNozzleMaps": {
+    "maps": {
+      "A1": ["A1"]
+    }
+  },
   "pickUpTipConfigurations": {
     "pressFit": {
       "presses": 1,
-      "speedByTipCount": {
-        "1": 5.0
-      },
       "increment": 0.0,
-      "distanceByTipCount": {
-        "1": 13.0
-      },
-      "currentByTipCount": {
-        "1": 0.15
+      "configurationsByNozzleMap": {
+        "A1": {
+          "default": {
+            "speed": 5.0,
+            "distance": 13.0,
+            "current": 0.15,
+            "tipOverlap": 10.5
+          },
+          "t50": {
+            "speed": 5.0,
+            "distance": 13.0,
+            "current": 0.15,
+            "tipOverlap": 10.05
+          }
+        }
       }
     }
   },

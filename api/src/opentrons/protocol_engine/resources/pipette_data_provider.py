@@ -36,7 +36,7 @@ class LoadedStaticPipetteData:
     tip_configuration_lookup_table: Dict[
         float, pipette_definition.SupportedTipsDefinition
     ]
-    nominal_tip_overlap: float
+    nominal_tip_overlap: Dict[str, float]
     nozzle_map: NozzleMap
     back_left_corner_offset: Point
     front_right_corner_offset: Point
@@ -127,7 +127,7 @@ class VirtualPipetteDataProvider:
             pipette_model.pipette_version,
         )
 
-    def _get_virtual_pipette_static_config_by_model(
+    def _get_virtual_pipette_static_config_by_model(  # noqa: C901
         self, pipette_model: pipette_definition.PipetteModelVersionType, pipette_id: str
     ) -> LoadedStaticPipetteData:
         if pipette_id not in self._liquid_class_by_id:
@@ -157,7 +157,7 @@ class VirtualPipetteDataProvider:
         )
         nozzle_manager = NozzleConfigurationManager.build_from_config(config)
 
-        tip_overlap_for_tip_type = None
+        tip_overlap_dict_for_tip_type = None
         for configuration in (
             config.pick_up_tip_configurations.press_fit,
             config.pick_up_tip_configurations.cam_action,
@@ -178,23 +178,25 @@ class VirtualPipetteDataProvider:
 
             if configuration is not None:
                 try:
-                    tip_overlap_for_tip_type = (
+                    tip_overlap_dict_for_tip_type = (
                         configuration.configuration_by_nozzle_map[approved_map][
                             tip_type.name
-                        ].tip_overlap
+                        ].tip_overlap_dictionary
                     )
                     break
-                except:
+                except KeyError:
                     try:
                         default = configuration.configuration_by_nozzle_map[
                             approved_map
                         ].get("default")
                         if default is not None:
-                            tip_overlap_for_tip_type = default.tip_overlap
+                            tip_overlap_dict_for_tip_type = (
+                                default.tip_overlap_dictionary
+                            )
                             break
-                    except:
-                        tip_overlap_for_tip_type = None
-        if tip_overlap_for_tip_type is None:
+                    except KeyError:
+                        tip_overlap_dict_for_tip_type = None
+        if tip_overlap_dict_for_tip_type is None:
             raise ValueError(
                 "Virtual Static Nozzle Configuration does not have a valid pick up tip configuration."
             )
@@ -220,7 +222,7 @@ class VirtualPipetteDataProvider:
                 default_aspirate=tip_configuration.default_aspirate_flowrate.values_by_api_level,
                 default_dispense=tip_configuration.default_dispense_flowrate.values_by_api_level,
             ),
-            nominal_tip_overlap=tip_overlap_for_tip_type,
+            nominal_tip_overlap=tip_overlap_dict_for_tip_type,
             nozzle_map=nozzle_manager.current_configuration,
             back_left_corner_offset=Point(
                 pip_back_left[0], pip_back_left[1], pip_back_left[2]

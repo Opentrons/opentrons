@@ -3,18 +3,30 @@
   "displayName": "P50 Single-Channel GEN1",
   "model": "p50",
   "displayCategory": "GEN1",
+  "validNozzleMaps": {
+    "maps": {
+      "A1": ["A1"]
+    }
+  },
   "pickUpTipConfigurations": {
     "pressFit": {
-      "speedByTipCount": {
-        "1": 30.0
-      },
       "presses": 3,
       "increment": 1.0,
-      "distanceByTipCount": {
-        "1": 10.0
-      },
-      "currentByTipCount": {
-        "1": 0.1
+      "configurationsByNozzleMap": {
+        "A1": {
+          "default": {
+            "speed": 30.0,
+            "distance": 10.0,
+            "current": 0.1,
+            "tipOverlap": 7.47
+          },
+          "t200": {
+            "speed": 30.0,
+            "distance": 10.0,
+            "current": 0.1,
+            "tipOverlap": 6.1
+          }
+        }
       }
     }
   },

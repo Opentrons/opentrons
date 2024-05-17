@@ -106,7 +106,7 @@ class StaticPipetteConfig:
     tip_configuration_lookup_table: Dict[
         float, pipette_definition.SupportedTipsDefinition
     ]
-    nominal_tip_overlap: float
+    nominal_tip_overlap: Dict[str, float]
     home_position: float
     nozzle_offset_z: float
     pipette_bounding_box_offsets: PipetteBoundingBoxOffsets
@@ -649,10 +649,14 @@ class PipetteView(HasState[PipetteState]):
                 f"Pipette {pipette_id} not found; unable to get pipette flow rates."
             ) from e
 
-    def get_nominal_tip_overlap(self, pipette_id: str) -> float:
+    def get_nominal_tip_overlap(self, pipette_id: str, labware_uri: str) -> float:
         """Get the nominal tip overlap for a given labware from config."""
-        nominal_tip_overlap = self.get_config(pipette_id).nominal_tip_overlap
-        return nominal_tip_overlap
+        tip_overlaps_by_uri = self.get_config(pipette_id).nominal_tip_overlap
+
+        try:
+            return tip_overlaps_by_uri[labware_uri]
+        except KeyError:
+            return tip_overlaps_by_uri.get("default", 0)
 
     def get_z_axis(self, pipette_id: str) -> MotorAxis:
         """Get the MotorAxis representing this pipette's Z stage."""

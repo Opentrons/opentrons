@@ -64,7 +64,10 @@ def tip_length_for(
             pipette["pipette_id"], tip_rack_definition
         ).tip_length
     except TipLengthCalNotFound:
-        tip_overlap = pipette["tip_overlap"]
+        tip_overlap = pipette["tip_overlap"].get(
+            uri_from_definition(tip_rack_definition),
+            pipette["tip_overlap"]["default"],
+        )
         tip_length = tip_rack_definition["parameters"]["tipLength"]
         return tip_length - tip_overlap
 
