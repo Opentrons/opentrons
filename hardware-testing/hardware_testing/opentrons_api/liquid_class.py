@@ -1,12 +1,19 @@
 """Liquid Class."""
 from dataclasses import dataclass
 from enum import Enum
-from typing import Union, Optional, Tuple
+from typing import Union, Optional, Tuple, List, Dict
 
 from opentrons.protocol_api import InstrumentContext
 from opentrons.protocol_api.labware import Well
 from opentrons.protocol_api.disposal_locations import TrashBin, WasteChute
 from opentrons.types import Location
+
+
+@dataclass
+class Volume:
+    max: float
+    min: float
+    adjustment: List[Tuple[float, float]]
 
 
 class HeightRef(str, Enum):
@@ -78,10 +85,11 @@ class Dispense(_PipettingMove):
 
 @dataclass
 class Liquid:
+    volume: Volume
     submerge: Submerge
-    retract: Retract
     aspirate: Aspirate
     dispense: Dispense
+    retract: Retract
     touch: Touch
 
 
@@ -275,36 +283,45 @@ class LiquidClassPipette(InstrumentContext):
         return self
 
 
-DEFAULT: Liquid = Liquid(
-    submerge=Submerge(
-        speed=60,
-        height=None,
-        delay=None,
-    ),
-    retract=Retract(
-        speed=60,
-        height=Height(1.0, HeightRef.WELL_TOP),
-        delay=0,
-        air_gap=5.0,
-        blow_out=True,
-    ),
-    aspirate=Aspirate(
-        flow_rate=50.0,
-        height=Height(1, HeightRef.WELL_BOTTOM),
-        z_tracking=False,
-        delay=0.5,
-    ),
-    dispense=Dispense(
-        flow_rate=50.0,
-        height=Height(1, HeightRef.WELL_BOTTOM),
-        z_tracking=False,
-        delay=0.5,
-        push_out=7.0,
-    ),
-    touch=Touch(
-        speed=30.0,
-        height=Height(-1, HeightRef.WELL_TOP),
-        delay=None,
-        strategy=TouchStrategy.FOUR_SIDES,
-    ),
-)
+GLYCEROL_50_PERCENT: Dict[str, Dict[str, Liquid]] = {
+    "p1000_single_v3.6": {
+        "opentrons_flex_96_filtertiprack_50ul": Liquid(
+            volume=Volume(
+                min=3.0,
+                max=35.0,
+                adjustment=[(4.1, 3.04), (39.0, 35.78)]
+            ),
+            submerge=Submerge(
+                speed=60,
+                height=None,
+                delay=None,
+            ),
+            aspirate=Aspirate(
+                flow_rate=50.0,
+                height=Height(1, HeightRef.WELL_BOTTOM),
+                z_tracking=False,
+                delay=0.5,
+            ),
+            dispense=Dispense(
+                flow_rate=50.0,
+                height=Height(1, HeightRef.WELL_BOTTOM),
+                z_tracking=False,
+                delay=0.5,
+                push_out=7.0,
+            ),
+            retract=Retract(
+                speed=60,
+                height=Height(1.0, HeightRef.WELL_TOP),
+                delay=0,
+                air_gap=5.0,
+                blow_out=True,
+            ),
+            touch=Touch(
+                speed=30.0,
+                height=Height(-1, HeightRef.WELL_TOP),
+                delay=None,
+                strategy=TouchStrategy.FOUR_SIDES,
+            ),
+        )
+    }
+}
