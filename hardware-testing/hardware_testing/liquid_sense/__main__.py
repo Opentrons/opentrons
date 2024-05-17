@@ -305,7 +305,7 @@ if __name__ == "__main__":
         ui.print_info("homing...")
         run_args.ctx.home()
         for tip in run_args.tip_volumes:
-            execute.run(tip, run_args, google_sheet)
+            execute.run(tip, run_args, google_sheet, args.starting_tip)
     except Exception as e:
         ui.print_info(f"got error {e}")
         ui.print_info(traceback.format_exc())
