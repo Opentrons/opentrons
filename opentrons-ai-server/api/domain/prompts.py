@@ -457,3 +457,56 @@ Otherwise, return the prompt as it is.
 When you respond dont be verbose like reiterating what you have done, just return the python protocol.
 </instructions>
 """
+
+prompt_template_str = """\
+        Below is a protocol description containing detailed information about the protocol:
+
+        {protocol_description}
+
+        Convert the protocol description to several atomic descriptions. \
+        If statements are split by hyphen (-) or numbers (1), then each split can be considered\
+        as a single atomic item. Get the statements fully.
+        If they are not split or unclear, please decide yourself.
+        If a protocol contains metadata and requirements, please ignore them.
+        If nothing is provided, return blank.
+
+        Example input:
+        ```
+        INTRO
+
+        Metadata:
+        - M-1
+        - M-2
+        - M-3
+
+        Requirements:
+        - R-1
+
+        Modules
+        - M-1
+
+        Adapter
+        - A-1
+
+        Labware:
+        - L-1
+        - L-2
+        - L-3
+
+        Pipette mount:
+        - P-1
+
+        Well Allocation:
+        - wa-11
+        - wa-12
+
+        Commands:
+        1. C-1
+        2. C-2
+        ```
+
+        Output:
+        ```
+        [INTRO, M-1, A-1, L-1, L-2, L-3, P-1, wa-11, wa-12, C-1, C-2]
+        ```
+        """

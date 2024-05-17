@@ -19,6 +19,7 @@ from api.domain.prompts import (
     standard_labware_api,
     system_notes,
     tools,
+    prompt_template_str
 )
 from api.settings import Settings, is_running_on_lambda
 
@@ -149,64 +150,13 @@ class OpenAIPredict:
             """
             Model for atomic descriptions
             """
-
             desc: List[str]
 
-        prompt_template_str = """\
-                Below is a protocol description containing detailed information about the protocol:
-
-                {protocol_description}
-
-                Convert the protocol description to several atomic descriptions. \
-                If statements are split by hyphen (-) or numbers (1), then each split can be considered\
-                as a single atomic item. Get the statements fully.
-                If they are not split or unclear, please decide yourself.
-                If a protocol contains metadata and requirements, please ignore them.
-                If nothing is provided, return blank.
-
-                Example input:
-                ```
-                INTRO
-
-                Metadata:
-                - M-1
-                - M-2
-                - M-3
-
-                Requirements:
-                - R-1
-
-                Modules
-                - M-1
-
-                Adapter
-                - A-1
-
-                Labware:
-                - L-1
-                - L-2
-                - L-3
-
-                Pipette mount:
-                - P-1
-
-                Well Allocation:
-                - wa-11
-                - wa-12
-
-                Commands:
-                1. C-1
-                2. C-2
-                ```
-
-                Output:
-                ```
-                [INTRO, M-1, A-1, L-1, L-2, L-3, P-1, wa-11, wa-12, C-1, C-2]
-                ```
-                """
-
         program = OpenAIPydanticProgram.from_defaults(
-            output_cls=atomic_descr, prompt_template_str=prompt_template_str, verbose=False, llm=liOpenAI(model="gpt-4-1106-preview")
+            output_cls=atomic_descr, 
+            prompt_template_str=prompt_template_str.format(protocol_description=protocol_description), 
+            verbose=False, 
+            llm=liOpenAI(model="gpt-4-1106-preview")
         )
         details = program(protocol_description=protocol_description)
         descriptions = []
