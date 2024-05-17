@@ -222,7 +222,9 @@ def store_trial(
                 [tip_length_offset],
                 [height + tip_length_offset],
             ]
-            google_sheet.batch_update_cells(sheet_name, trial_for_google_sheet, "B", 11+int(trial))
+            google_sheet.batch_update_cells(
+                sheet_name, trial_for_google_sheet, "B", 11 + int(trial)
+            )
         except:
             print("did not log to google sheet.")
 
