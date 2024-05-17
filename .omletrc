@@ -1,0 +1,9 @@
+{
+  "workspaces": {
+    "@opentrons/components": {
+      "exports": {
+        ".": […]
+      }
+    }
+  }
+}
