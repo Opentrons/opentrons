@@ -1,12 +1,10 @@
 """Router for /maintenance_runs commands endpoints."""
 import textwrap
-from datetime import datetime
 from typing import Optional, Union
 from typing_extensions import Final, Literal
 
 from anyio import move_on_after
 from fastapi import APIRouter, Depends, Query, status
-from pydantic import BaseModel, Field
 
 from opentrons.protocol_engine import (
     ProtocolEngine,
@@ -16,13 +14,18 @@ from opentrons.protocol_engine.errors import CommandDoesNotExistError
 
 from robot_server.errors.error_responses import ErrorDetails, ErrorBody
 from robot_server.service.json_api import (
-    RequestModel,
     SimpleBody,
     MultiBody,
     MultiBodyMeta,
     PydanticResponse,
 )
 from robot_server.robot.control.dependencies import require_estop_in_good_state
+from robot_server.runs.command_models import (
+    RequestModelWithCommandCreate,
+    CommandCollectionLinks,
+    CommandLink,
+    CommandLinkMeta,
+)
 
 from ..maintenance_run_models import (
     MaintenanceRunCommandSummary,
@@ -42,17 +45,6 @@ _DEFAULT_COMMAND_LIST_LENGTH: Final = 20
 commands_router = APIRouter()
 
 
-class RequestModelWithCommandCreate(RequestModel[pe_commands.CommandCreate]):
-    """Equivalent to RequestModel[CommandCreate].
-
-    This works around a Pydantic v<2 bug where RequestModel[CommandCreate]
-    doesn't parse using the CommandCreate union discriminator.
-    https://github.com/pydantic/pydantic/issues/3782
-    """
-
-    data: pe_commands.CommandCreate
-
-
 class CommandNotFound(ErrorDetails):
     """An error if a given run command is not found."""
 
@@ -65,35 +57,6 @@ class CommandNotAllowed(ErrorDetails):
 
     id: Literal["CommandNotAllowed"] = "CommandNotAllowed"
     title: str = "Setup Command Not Allowed"
-
-
-class CommandLinkMeta(BaseModel):
-    """Metadata about a command resource referenced in `links`."""
-
-    runId: str = Field(..., description="The ID of the command's run.")
-    commandId: str = Field(..., description="The ID of the command.")
-    index: int = Field(..., description="Index of the command in the overall list.")
-    key: str = Field(..., description="Value of the current command's `key` field.")
-    createdAt: datetime = Field(
-        ...,
-        description="When the current command was created.",
-    )
-
-
-class CommandLink(BaseModel):
-    """A link to a command resource."""
-
-    href: str = Field(..., description="The path to a command")
-    meta: CommandLinkMeta = Field(..., description="Information about the command.")
-
-
-class CommandCollectionLinks(BaseModel):
-    """Links returned along with a collection of commands."""
-
-    current: Optional[CommandLink] = Field(
-        None,
-        description="Path to the currently running or next queued command.",
-    )
 
 
 async def get_current_run_engine_from_url(
