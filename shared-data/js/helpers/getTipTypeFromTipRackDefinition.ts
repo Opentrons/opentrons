@@ -1,4 +1,4 @@
-import { LabwareDefinition2 } from '..'
+import type { LabwareDefinition2 } from '..'
 
 export function getTipTypeFromTipRackDefinition(
   tipRackDef: LabwareDefinition2
