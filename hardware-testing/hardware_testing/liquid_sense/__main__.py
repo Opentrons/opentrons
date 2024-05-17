@@ -32,7 +32,7 @@ from opentrons.protocol_engine.types import LabwareOffset
 
 from hardware_testing.liquid_sense import execute
 from .report import build_ls_report, store_config, store_serial_numbers
-from .post_process import process_csv_directory
+from .post_process import process_csv_directory, process_google_sheet
 
 from hardware_testing.protocols.liquid_sense_lpc import (
     liquid_sense_ot3_p50_single,
@@ -154,13 +154,15 @@ class RunArgs:
         """Build."""
         _ctx = RunArgs._get_protocol_context(args)
         run_id, start_time = create_run_id_and_start_time()
-        environment_sensor = asair_sensor.BuildAsairSensor(simulate=True)
+        environment_sensor = asair_sensor.BuildAsairSensor(
+            _ctx.is_simulating() or args.ignore_env
+        )
         git_description = get_git_description()
         protocol_cfg = LIQUID_SENSE_CFG[args.pipette][args.channels]
         name = protocol_cfg.metadata["protocolName"]  # type: ignore[attr-defined]
         ui.print_header("LOAD PIPETTE")
         pipette = _ctx.load_instrument(
-            f"flex_{args.channels}channel_{args.pipette}", args.mount
+            f"flex_{args.channels}channel_{args.pipette}", "left"
         )
         loaded_labwares = _ctx.loaded_labwares
         if 12 in loaded_labwares.keys():
@@ -180,17 +182,17 @@ class RunArgs:
         else:
             tip_volumes = [args.tip]
 
-        scale = Scale.build(simulate=True)
+        scale = Scale.build(simulate=_ctx.is_simulating() or args.ignore_scale)
         recorder: GravimetricRecorder = execute._load_scale(
             name,
             scale,
             run_id,
             pipette_tag,
             start_time,
-            simulating=True,
+            _ctx.is_simulating() or args.ignore_scale,
         )
         dial: Optional[mitutoyo_digimatic_indicator.Mitutoyo_Digimatic_Indicator] = None
-        if not _ctx.is_simulating():
+        if not _ctx.is_simulating() and not args.ignore_dial:
             dial_port = list_ports_and_select("Dial Indicator")
             dial = mitutoyo_digimatic_indicator.Mitutoyo_Digimatic_Indicator(
                 port=dial_port
@@ -214,7 +216,7 @@ class RunArgs:
             args.pipette,
             tip_volumes,
             trials,
-            "aspirate" if args.aspirate else "dispense",
+            args.plunger_direction,
             args.liquid,
             protocol_cfg.LABWARE_ON_SCALE,  # type: ignore[attr-defined]
             args.z_speed,
@@ -238,7 +240,7 @@ class RunArgs:
             protocol_cfg=protocol_cfg,
             test_report=report,
             probe_seconds_before_contact=args.probe_seconds_before_contact,
-            aspirate=args.aspirate,
+            aspirate=args.plunger_direction == "aspirate",
             dial_indicator=dial,
             plunger_speed=args.plunger_speed,
             trials_before_jog=args.trials_before_jog,
@@ -250,10 +252,8 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser("Pipette Testing")
     parser.add_argument("--simulate", action="store_true")
     parser.add_argument("--pipette", type=int, choices=[50, 1000], required=True)
-    parser.add_argument("--mount", type=str, choices=["left", "right"], default="left")
     parser.add_argument("--channels", type=int, choices=[1, 8, 96], default=1)
     parser.add_argument("--tip", type=int, choices=[0, 50, 200, 1000], default=0)
-    parser.add_argument("--probe-seconds-before-contact", type=float, default=1.0)
     parser.add_argument("--return-tip", action="store_true")
     parser.add_argument("--trials", type=int, default=7)
     parser.add_argument("--trials-before-jog", type=int, default=7)
@@ -266,37 +266,44 @@ if __name__ == "__main__":
     parser.add_argument("--skip-labware-offsets", action="store_true")
 
     args = parser.parse_args()
-    # Connect to google sheet
-    try:
-        sys.path.insert(0, "/var/lib/jupyter/notebooks")
-        import google_sheets_tool  # type: ignore[import]
 
-        credentials_path = "/var/lib/jupyter/notebooks/abr.json"
-    except ImportError:
-        raise ImportError(
-            "Run on robot. Make sure google_sheets_tool.py is in jupyter notebook."
-        )
-    print(os.path.exists(credentials_path))
     assert (
         0.0 < args.probe_seconds_before_contact <= MAX_PROBE_SECONDS
     ), f"'--probe-seconds-before-contact' must be between 0.0-{MAX_PROBE_SECONDS}"
     run_args = RunArgs.build_run_args(args)
     exit_error = os.EX_OK
-    serial_logger: Optional[subprocess.Popen] = None
-    data_dir = get_testing_data_directory()
-    data_file = f"/{data_dir}/{run_args.name}/{run_args.run_id}/serial.log"
     try:
         if not run_args.ctx.is_simulating():
+            data_dir = get_testing_data_directory()
+            data_file = f"/{data_dir}/{run_args.name}/{run_args.run_id}/serial.log"
             ui.print_info(f"logging can data to {data_file}")
             serial_logger = subprocess.Popen(
                 [f"python3 -m opentrons_hardware.scripts.can_mon > {data_file}"],
                 shell=True,
             )
             sleep(1)
+            # Connect to Google Sheet
+            try:
+                sys.path.insert(0, "/var/lib/jupyter/notebooks")
+                import google_sheets_tool  # type: ignore[import]
+
+                credentials_path = "/var/lib/jupyter/notebooks/abr.json"
+            except ImportError:
+                raise ImportError(
+                    "Run on robot. Make sure google_sheets_tool.py is in jupyter notebook."
+                )
+            print(os.path.exists(credentials_path))
+            google_sheet = google_sheets_tool.google_sheet(
+                credentials_path, args.google_sheet_name, 0
+            )
         hw = run_args.ctx._core.get_hardware()
+        if not run_args.ctx.is_simulating():
+            ui.get_user_ready("CLOSE the door, and MOVE AWAY from machine")
         ui.print_info("homing...")
         run_args.ctx.home()
         for tip in run_args.tip_volumes:
+            if args.channels == 96 and not run_args.ctx.is_simulating():
+                ui.alert_user_ready(f"prepare the {tip}ul tipracks", hw)
             execute.run(tip, run_args)
     except Exception as e:
         ui.print_info(f"got error {e}")
@@ -305,7 +312,9 @@ if __name__ == "__main__":
     finally:
         if run_args.recorder is not None:
             ui.print_info("ending recording")
-        if not run_args.ctx.is_simulating() and serial_logger:
+            run_args.recorder.stop()
+            run_args.recorder.deactivate()
+        if not run_args.ctx.is_simulating():
             ui.print_info("killing serial log")
             serial_logger.terminate()
         if run_args.dial_indicator is not None:
@@ -318,8 +327,24 @@ if __name__ == "__main__":
                 f"{data_dir}/{run_args.name}/{run_args.run_id}",
                 run_args.tip_volumes,
                 run_args.trials,
+                google_sheet,
+                run_args.run_id,
                 make_graph=True,
             )
+            # Log to Google Sheet
+            test_info = [
+                "TESTER NAME",
+                run_args.pipette_tag,
+                args.pipette,
+                args.tip,
+                args.z_speed,
+                args.plunger_speed,
+                "threshold",
+                args.plunger_direction,
+                liquid_height_from_deck,
+            ]
+            process_google_sheet(google_sheet, test_info)
+
         run_args.ctx.cleanup()
         if not args.simulate:
             helpers_ot3.restart_server_ot3()

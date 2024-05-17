@@ -7,7 +7,7 @@ from hardware_testing.data.csv_report import (
     CSVLine,
     CSVLineRepeating,
 )
-from typing import List, Union
+from typing import List, Union, Any
 
 """
 CSV Test Report:
@@ -193,6 +193,8 @@ def store_trial(
     plunger_travel: float,
     tip_length_offset: float,
     target_height: float,
+    google_sheet: Any,
+    sheet_name: str,
 ) -> None:
     """Report Trial."""
     report(
@@ -210,6 +212,15 @@ def store_trial(
             target_height,
         ],
     )
+    # Write trial to google sheet
+    trial_for_google_sheet = [
+        [trial],
+        [height],
+        [plunger_pos],
+        [tip_length_offset],
+        [height + tip_length_offset],
+    ]
+    google_sheet.batch_write_cells(sheet_name, trial_for_google_sheet, "B", 11)
 
 
 def store_tip_results(

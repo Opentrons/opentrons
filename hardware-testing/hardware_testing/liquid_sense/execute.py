@@ -279,6 +279,8 @@ def run(tip: int, run_args: RunArgs) -> None:
                 plunger_start - end_pos[Axis.P_L],
                 tip_length_offset,
                 liquid_height_from_deck,
+                google_sheet,
+                sheet_name,
             )
             ui.print_info(
                 f"\n\n Z axis start pos {start_pos[Axis.Z_L]} end pos {end_pos[Axis.Z_L]}"

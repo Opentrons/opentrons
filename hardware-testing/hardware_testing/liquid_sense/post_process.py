@@ -1,7 +1,7 @@
 """Post process script csvs."""
 import csv
 import os
-from typing import List, Dict, Tuple
+from typing import List, Dict, Tuple, Any
 import statistics
 from math import isclose
 
@@ -42,7 +42,12 @@ def _get_pressure_results(result_file: str) -> Tuple[float, float, float, List[f
 
 
 def process_csv_directory(  # noqa: C901
-    data_directory: str, tips: List[int], trials: int, make_graph: bool = False
+    data_directory: str,
+    tips: List[int],
+    trials: int,
+    google_sheet: Any,
+    sheet_name: str,
+    make_graph: bool = False,
 ) -> None:
     """Post process script csvs."""
     csv_files: List[str] = os.listdir(data_directory)
@@ -149,7 +154,11 @@ def process_csv_directory(  # noqa: C901
                         f"p_travel T{i+1}",
                     ]
                 )
-
+            # Add header to google sheet
+            pressure_header_for_google_sheet = [[x] for x in pressure_header_row]
+            google_sheet.batch_update_cells(
+                sheet_name, pressure_header_for_google_sheet, "H", 10
+            )
             # we want to line up the z height's of each trial at time==0
             # to do this we drop the results at the beginning of each of the trials
             # except for one with the longest tip (lower tip offset are longer tips)
@@ -210,16 +219,18 @@ def process_csv_directory(  # noqa: C901
                             f"{abs(results_settings[tip][trial][1]) * time + p_offsets[tip][trial]}"
                         )
                     final_report_writer.writerow(pressure_row)
+                    # Add pressure to google sheet
+                    pressure_row_for_google_sheet = [[x] for x in pressure_row]
+                    google_sheet.batch_update_cells(
+                        sheet_name, pressure_row_for_google_sheet, "H", 11
+                    )
                     time += 0.001
 
 
 def process_google_sheet(
     google_sheet,
     run_args,
-    data_directory: str,
-    tips: List[int],
-    trials: int,
-    make_graph: bool = False,
+    test_info,
 ) -> None:
     """Write results and graphs to google sheet."""
     sheet_title = run_args.run_id
@@ -235,45 +246,30 @@ def process_google_sheet(
             "Threshold (pascal)",
             "Direction",
             "Target Height (mm)",
-        ]
+        ],
+        test_info,
     ]
-    ## TODO: get test parameters
     google_sheet.batch_update_cells(sheet_title, test_parameters, "A", 1)
-    target_height: int = 0
-    height: List = []
-    plunger_pos: List = []
-    tip_length_offset: List = []
+    target_height = google_sheet.get_cell(sheet_title, "A9")
     adjusted_height: List = []
     normalized_height = [
         float(height) - float(target_height) for height in adjusted_height
     ]
-    list_of_values = [
-        trials,
-        height,
-        plunger_pos,
-        tip_length_offset,
-        adjusted_height,
-        normalized_height,
-    ]
-    google_sheet.batch_update_cells(sheet_title, list_of_values, "A", 11)
+    google_sheet.batch_update_cells(sheet_title, normalized_height, "F", 11)
     # Find accuracy, precision, repeatability
     accuracy = statistics.mean(normalized_height)
     precision = max(normalized_height) - min(normalized_height) / 2
-    repeatability = 100 - (statistics.stdev(normalized_height) / len(height) * 100)
+    repeatability = 100 - (
+        statistics.stdev(normalized_height) / len(normalized_height) * 100
+    )
     summary = [
         ["Accuracy (mm)", "Precision (+/- mm)", "Repeatability (%)"],
         [accuracy, precision, repeatability],
     ]
     google_sheet.batch_update_cells(sheet_title, summary, "D", 2)
-    # Write pressure to google sheet
-    pressure_data: List[List[int]]
-    time: List[int]
-    google_sheet.batch_update_cells(sheet_title, pressure_data, "J", 11)
 
     # Create Graphs
     # 1. Create pressure vs time graph zoomed out
-    # Determine where time values start
-    time_index = google_sheet.get_row_index_with_value("time", 1) - 1
     titles = ["Pressure vs Time", "Time (s)", "Pressure (P)", ""]
     axis = [
         {"position": "BOTTOM_AXIS", "title": titles[1]},
@@ -370,7 +366,7 @@ def process_google_sheet(
                     "sources": [
                         {
                             "sheetId": sheet_id,
-                            "startRowIndex": time_index,
+                            "startRowIndex": 11,
                             "endRowIndex": 1494,
                             "startColumnIndex": 25,
                             "endColumnIndex": 26,
@@ -386,7 +382,7 @@ def process_google_sheet(
     )
     # Zoomed in pressure chart
     # Determine where pressure changes
-    p1 = google_sheet.get_single_col_range("J" + str(time_index + 2) + ":J1400")
+    p1 = google_sheet.get_single_col_range("J11:J1400")
     for x, y in zip(p1[0::], p1[1::]):
         diff = float(y) - float(x)
         if diff > 15:
