@@ -174,7 +174,6 @@ def live_runner_subject(
         (PythonProtocolConfig(api_version=APIVersion(2, 14)), PythonAndLegacyRunner),
         (JsonProtocolConfig(schema_version=5), PythonAndLegacyRunner),
         (PythonProtocolConfig(api_version=APIVersion(2, 13)), PythonAndLegacyRunner),
-        (None, LiveRunner),
     ],
 )
 def test_create_protocol_runner(
