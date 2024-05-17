@@ -13,7 +13,8 @@ import {
 import { TabbedButton } from '../../atoms/buttons'
 import { ChildNavigation } from '../ChildNavigation'
 import { Overview } from './Overview'
-import { getInitialSummaryState, quickTransferSummaryReducer } from './utils'
+import { getInitialSummaryState } from './utils'
+import { quickTransferSummaryReducer } from './reducers'
 
 import type { SmallButton } from '../../atoms/buttons'
 import type { QuickTransferWizardState } from './types'

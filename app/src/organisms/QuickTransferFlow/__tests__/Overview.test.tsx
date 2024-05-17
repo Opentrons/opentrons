@@ -26,12 +26,12 @@ describe('Overview', () => {
             displayName: 'Tip rack display name',
           },
         } as any,
-        sourceLabware: {
+        source: {
           metadata: {
             displayName: 'Source labware name',
           },
         } as any,
-        destinationLabware: {
+        destination: {
           metadata: {
             displayName: 'Destination labware name',
           },
@@ -69,12 +69,12 @@ describe('Overview', () => {
             displayName: 'Tip rack display name',
           },
         } as any,
-        sourceLabware: {
+        source: {
           metadata: {
             displayName: 'Source labware name',
           },
         } as any,
-        destinationLabware: {
+        destination: {
           metadata: {
             displayName: 'Destination labware name',
           },
@@ -97,12 +97,12 @@ describe('Overview', () => {
             displayName: 'Tip rack display name',
           },
         } as any,
-        sourceLabware: {
+        source: {
           metadata: {
             displayName: 'Source labware name',
           },
         } as any,
-        destinationLabware: {
+        destination: {
           metadata: {
             displayName: 'Destination labware name',
           },

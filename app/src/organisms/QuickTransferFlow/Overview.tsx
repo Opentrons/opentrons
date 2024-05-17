@@ -41,14 +41,14 @@ export function Overview(props: OverviewProps): JSX.Element | null {
     },
     {
       option: t('source_labware'),
-      value: state.sourceLabware.metadata.displayName,
+      value: state.source.metadata.displayName,
     },
     {
       option: t('destination_labware'),
       value:
-        state.destinationLabware === 'source'
-          ? state.sourceLabware.metadata.displayName
-          : state.destinationLabware.metadata.displayName,
+        state.destination === 'source'
+          ? state.source.metadata.displayName
+          : state.destination.metadata.displayName,
     },
     {
       option: transferCopy,

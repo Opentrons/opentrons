@@ -16,7 +16,7 @@ import { SelectDestLabware } from './SelectDestLabware'
 import { SelectDestWells } from './SelectDestWells'
 import { VolumeEntry } from './VolumeEntry'
 import { SummaryAndSettings } from './SummaryAndSettings'
-import { quickTransferWizardReducer } from './utils'
+import { quickTransferWizardReducer } from './reducers'
 
 import type { SmallButton } from '../../atoms/buttons'
 import type { QuickTransferWizardState } from './types'

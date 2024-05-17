@@ -25,9 +25,9 @@ export interface QuickTransferSummaryState {
   pipette: PipetteV2Specs
   mount: Mount
   tipRack: LabwareDefinition2
-  sourceLabware: LabwareDefinition2
+  source: LabwareDefinition2
   sourceWells: string[]
-  destinationLabware: LabwareDefinition2 | 'source'
+  destination: LabwareDefinition2 | 'source'
   destinationWells: string[]
   transferType: TransferType
   volume: number
