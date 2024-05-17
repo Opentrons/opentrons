@@ -353,17 +353,23 @@ export function ProtocolRunHeader({
           <ProtocolAnalysisErrorBanner errors={analysisErrors} />
         )}
         {runStatus === RUN_STATUS_BLOCKED_BY_OPEN_DOOR ? (
-          <Banner type="warning">{t('close_door_to_resume')}</Banner>
+          <Banner type="warning" iconMarginLeft={SPACING.spacing4}>
+            {t('close_door_to_resume')}
+          </Banner>
         ) : null}
         {runStatus === RUN_STATUS_STOPPED ? (
-          <Banner type="warning">{t('run_canceled')}</Banner>
+          <Banner type="warning" iconMarginLeft={SPACING.spacing4}>
+            {t('run_canceled')}
+          </Banner>
         ) : null}
         {/* Note: This banner is for before running a protocol */}
         {isDoorOpen &&
         runStatus !== RUN_STATUS_BLOCKED_BY_OPEN_DOOR &&
         runStatus != null &&
         CANCELLABLE_STATUSES.includes(runStatus) ? (
-          <Banner type="warning">{t('shared:close_robot_door')}</Banner>
+          <Banner type="warning" iconMarginLeft={SPACING.spacing4}>
+            {t('shared:close_robot_door')}
+          </Banner>
         ) : null}
         {mostRecentRunId === runId ? (
           <TerminalRunBanner
@@ -833,6 +839,7 @@ function TerminalRunBanner(props: TerminalRunProps): JSX.Element | null {
         type="success"
         onCloseClick={handleRunSuccessClick}
         isCloseActionLoading={isClosingCurrentRun}
+        iconMarginLeft={SPACING.spacing4}
       >
         <Flex justifyContent={JUSTIFY_SPACE_BETWEEN} width="100%">
           {t('run_completed')}
@@ -843,7 +850,7 @@ function TerminalRunBanner(props: TerminalRunProps): JSX.Element | null {
 
   const buildErrorBanner = (): JSX.Element => {
     return (
-      <Banner type="error">
+      <Banner type="error" iconMarginLeft={SPACING.spacing4}>
         <Flex justifyContent={JUSTIFY_SPACE_BETWEEN} width="100%">
           <StyledText>
             {t('error_info', {

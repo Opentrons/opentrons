@@ -1,10 +1,7 @@
 import * as React from 'react'
-import { UseQueryResult } from 'react-query'
 import { describe, it, vi, beforeEach, afterEach, expect } from 'vitest'
 import { screen } from '@testing-library/react'
 import { when } from 'vitest-when'
-
-import { Run } from '@opentrons/api-client'
 import { InfoScreen } from '@opentrons/components'
 import { renderWithProviders } from '../../../../__testing-utils__'
 import { i18n } from '../../../../i18n'
@@ -12,9 +9,9 @@ import { useMostRecentCompletedAnalysis } from '../../../LabwarePositionCheck/us
 import { useRunStatus } from '../../../RunTimeControl/hooks'
 import { useNotifyRunQuery } from '../../../../resources/runs'
 import { mockSucceededRun } from '../../../RunTimeControl/__fixtures__'
-
 import { ProtocolRunRuntimeParameters } from '../ProtocolRunRunTimeParameters'
-
+import type { UseQueryResult } from 'react-query'
+import type { Run } from '@opentrons/api-client'
 import type {
   CompletedProtocolAnalysis,
   RunTimeParameter,
@@ -169,7 +166,7 @@ describe('ProtocolRunRuntimeParameters', () => {
         runTimeParameters: [] as RunTimeParameter[],
       } as CompletedProtocolAnalysis)
     render(props)
-    screen.getByText('Parameters')
+    expect(screen.queryByText('Parameters')).not.toBeInTheDocument()
     expect(screen.queryByText('Default values')).not.toBeInTheDocument()
     screen.getByText('mock InfoScreen')
   })

@@ -109,6 +109,7 @@ package-deps: clean lib deps
 package dist-posix dist-osx dist-linux dist-win: export NODE_ENV := production
 package dist-posix dist-osx dist-linux dist-win: export BUILD_ID := $(build_id)
 package dist-posix dist-osx dist-linux dist-win: export NO_PYTHON := $(if $(no_python_bundle),true,false)
+package dist-posix dist-osx dist-linux dist-win: export USE_HARD_LINKS := false
 
 .PHONY: package
 package: package-deps
@@ -170,18 +171,16 @@ _dist-collect-artifacts:
 # development
 #####################################################################
 
-.PHONY: clean-dev-autoupdate
-clean-dev-autoupdate:
-	rm -f ./dev-app-update.yml
 
-dev-app-update.yml:
+.PHONY: dev-app-update-file
+dev-app-update-file:
 	cp ./dev-app-update-$(OPENTRONS_PROJECT).yml ./dev-app-update.yml
 
 
 .PHONY: dev
 dev: export NODE_ENV := development
 dev: export OPENTRONS_PROJECT := $(OPENTRONS_PROJECT)
-dev: clean-dev-autoupdate ./dev-app-update.yml
+dev: dev-app-update-file
 	vite build
 	$(electron)
 

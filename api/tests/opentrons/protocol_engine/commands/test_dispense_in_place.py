@@ -3,6 +3,7 @@ from decoy import Decoy
 
 from opentrons.protocol_engine.execution import PipettingHandler
 
+from opentrons.protocol_engine.commands.command import SuccessData
 from opentrons.protocol_engine.commands.dispense_in_place import (
     DispenseInPlaceParams,
     DispenseInPlaceResult,
@@ -31,4 +32,4 @@ async def test_dispense_in_place_implementation(
 
     result = await subject.execute(data)
 
-    assert result == DispenseInPlaceResult(volume=42)
+    assert result == SuccessData(public=DispenseInPlaceResult(volume=42), private=None)

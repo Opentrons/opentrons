@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
-import { Control, Controller, useForm, useWatch } from 'react-hook-form'
+import { Controller, useForm, useWatch } from 'react-hook-form'
 import { useSelector, useDispatch } from 'react-redux'
 import {
   FormGroup,
@@ -18,7 +18,6 @@ import {
   JUSTIFY_SPACE_BETWEEN,
   JUSTIFY_FLEX_END,
   JUSTIFY_END,
-  DropdownOption,
 } from '@opentrons/components'
 import {
   FLEX_ROBOT_TYPE,
@@ -33,6 +32,8 @@ import { getSlotIsEmpty } from '../../step-forms'
 import { getInitialDeckSetup } from '../../step-forms/selectors'
 import { SlotDropdown } from '../modals/EditModulesModal/SlotDropdown'
 import { PDAlert } from '../alerts/PDAlert'
+import type { Control } from 'react-hook-form'
+import type { DropdownOption } from '@opentrons/components'
 
 export interface TrashValues {
   selectedSlot: string
@@ -85,13 +86,16 @@ const TrashModalComponent = (props: TrashModalComponentProps): JSX.Element => {
   const selectedSlot = useWatch({
     control,
     name: 'selectedSlot',
-    defaultValue: defaultValue,
+    defaultValue,
   })
-  const isSlotEmpty = getSlotIsEmpty(
-    initialDeckSetup,
-    selectedSlot,
-    trashName === 'trashBin'
-  )
+  const hasTrashAlreadyInSlot = Object.values(
+    initialDeckSetup.additionalEquipmentOnDeck
+  ).find(aE => aE.name === 'trashBin' && aE.location === selectedSlot)
+
+  const isSlotEmpty =
+    getSlotIsEmpty(initialDeckSetup, selectedSlot, trashName === 'trashBin') ||
+    hasTrashAlreadyInSlot
+
   const slotFromCutout = selectedSlot.replace('cutout', '')
   const flexDeck = getDeckDefFromRobotType(FLEX_ROBOT_TYPE)
 

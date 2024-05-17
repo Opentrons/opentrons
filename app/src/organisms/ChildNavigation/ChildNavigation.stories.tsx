@@ -1,8 +1,8 @@
 import * as React from 'react'
 import { VIEWPORT } from '@opentrons/components'
-import { SmallButton } from '../../atoms/buttons'
 import { ChildNavigation } from '.'
 import type { Story, Meta } from '@storybook/react'
+import type { SmallButton } from '../../atoms/buttons'
 
 export default {
   title: 'ODD/Organisms/ChildNavigation',

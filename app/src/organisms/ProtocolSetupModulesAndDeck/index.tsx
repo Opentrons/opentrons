@@ -34,6 +34,9 @@ import { useNotifyDeckConfigurationQuery } from '../../resources/deck_configurat
 
 import type { CutoutId, CutoutFixtureId } from '@opentrons/shared-data'
 import type { SetupScreens } from '../../pages/ProtocolSetup'
+import { useRunStatus } from '../RunTimeControl/hooks'
+import { RUN_STATUS_STOPPED } from '@opentrons/api-client'
+import { useHistory } from 'react-router-dom'
 
 const ATTACHED_MODULE_POLL_MS = 5000
 const DECK_CONFIG_POLL_MS = 5000
@@ -55,7 +58,13 @@ export function ProtocolSetupModulesAndDeck({
   setProvidedFixtureOptions,
 }: ProtocolSetupModulesAndDeckProps): JSX.Element {
   const { i18n, t } = useTranslation('protocol_setup')
-
+  const history = useHistory()
+  const runStatus = useRunStatus(runId)
+  React.useEffect(() => {
+    if (runStatus === RUN_STATUS_STOPPED) {
+      history.push('/protocols')
+    }
+  }, [runStatus, history])
   const [
     showSetupInstructionsModal,
     setShowSetupInstructionsModal,
@@ -128,7 +137,7 @@ export function ProtocolSetupModulesAndDeck({
       <Flex
         flexDirection={DIRECTION_COLUMN}
         gridGap={SPACING.spacing24}
-        marginTop="5.5rem"
+        marginTop="5.75rem"
         marginBottom={SPACING.spacing80}
       >
         {isModuleMismatch && !clearModuleMismatchBanner ? (
@@ -142,7 +151,7 @@ export function ProtocolSetupModulesAndDeck({
             message={t('module_mismatch_body')}
           />
         ) : null}
-        <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing32}>
+        <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing8}>
           <Flex
             color={COLORS.grey60}
             fontSize={TYPOGRAPHY.fontSize22}

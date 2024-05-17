@@ -10,10 +10,12 @@ import {
   FLEX_SINGLE_SLOT_ADDRESSABLE_AREAS,
   getCutoutIdForSlotName,
   getDeckDefFromRobotType,
-  RunTimeParameter,
   getCutoutFixtureIdsForModuleModel,
   getCutoutFixturesForModuleModel,
   FLEX_MODULE_ADDRESSABLE_AREAS,
+  getModuleType,
+  MAGNETIC_MODULE_TYPE,
+  FLEX_USB_MODULE_ADDRESSABLE_AREAS,
 } from '@opentrons/shared-data'
 import { getLabwareSetupItemGroups } from '../utils'
 import { getProtocolUsesGripper } from '../../../organisms/ProtocolSetupInstruments/utils'
@@ -28,10 +30,11 @@ import type {
   PipetteName,
   ProtocolAnalysisOutput,
   RobotType,
+  RunTimeParameter,
 } from '@opentrons/shared-data'
 import type { LabwareSetupItem } from '../utils'
 
-interface ProtocolPipette {
+export interface ProtocolPipette {
   hardwareType: 'pipette'
   pipetteName: PipetteName
   mount: 'left' | 'right'
@@ -107,8 +110,9 @@ export const useRequiredProtocolHardwareFromAnalysis = (
       ]
     : []
 
-  const requiredModules: ProtocolModule[] = analysis.modules.map(
-    ({ location, model }) => {
+  const requiredModules: ProtocolModule[] = analysis.modules
+    .filter(m => getModuleType(m.model) !== MAGNETIC_MODULE_TYPE)
+    .map(({ location, model }) => {
       const cutoutIdForSlotName = getCutoutIdForSlotName(
         location.slotName,
         deckDef
@@ -141,8 +145,7 @@ export const useRequiredProtocolHardwareFromAnalysis = (
             cutoutFixtureId !== getCutoutFixtureIdsForModuleModel(model)[0]
         ),
       }
-    }
-  )
+    })
 
   const requiredPipettes: ProtocolPipette[] = analysis.pipettes.map(
     ({ mount, pipetteName }) => ({
@@ -173,11 +176,12 @@ export const useRequiredProtocolHardwareFromAnalysis = (
   )
 
   const requiredFixtures = requiredDeckConfigCompatibility
-    // filter out all module fixtures as they're handled in the requiredModules section via hardwareType === 'module'
+    // filter out all fixtures that only provide usb module addressable areas
+    // as they're handled in the requiredModules section via hardwareType === 'module'
     .filter(
       ({ requiredAddressableAreas }) =>
-        !FLEX_MODULE_ADDRESSABLE_AREAS.some(modAA =>
-          requiredAddressableAreas.includes(modAA)
+        !requiredAddressableAreas.every(modAA =>
+          FLEX_USB_MODULE_ADDRESSABLE_AREAS.includes(modAA)
         )
     )
     .map(({ cutoutFixtureId, cutoutId, compatibleCutoutFixtureIds }) => ({
@@ -286,7 +290,6 @@ const useMissingProtocolHardwareFromRequiredProtocolHardware = (
     robotType,
     protocolAnalysis
   )
-
   // determine missing or conflicted hardware
   return {
     missingProtocolHardware: [

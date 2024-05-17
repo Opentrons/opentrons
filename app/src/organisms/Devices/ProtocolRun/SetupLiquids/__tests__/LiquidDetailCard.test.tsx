@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { fireEvent, screen } from '@testing-library/react'
-import { describe, it, beforeEach, vi, expect, Mock } from 'vitest'
+import { describe, it, beforeEach, vi, expect } from 'vitest'
 
 import { SPACING, COLORS } from '@opentrons/components'
 
@@ -15,6 +15,7 @@ import {
 } from '../../../../../redux/analytics'
 import { getIsOnDevice } from '../../../../../redux/config'
 import { LiquidDetailCard } from '../LiquidDetailCard'
+import type { Mock } from 'vitest'
 
 vi.mock('../../../../../redux/analytics')
 vi.mock('../../../../../redux/config')
@@ -53,7 +54,7 @@ describe('LiquidDetailCard', () => {
     render(props)
     screen.getByText('Mock Liquid')
     screen.getByText('Mock Description')
-    screen.getAllByText(nestedTextMatcher('100 µL'))
+    screen.getAllByText(nestedTextMatcher('100.0 µL'))
   })
 
   it('renders clickable box, clicking on it calls track event', () => {
@@ -72,7 +73,7 @@ describe('LiquidDetailCard', () => {
     })
     screen.getByText('A1')
     screen.getByText('B1')
-    screen.getAllByText(nestedTextMatcher('50 µL'))
+    screen.getAllByText(nestedTextMatcher('50.0 µL'))
   })
   it('renders well range for volume info if selected', () => {
     render({
@@ -81,15 +82,14 @@ describe('LiquidDetailCard', () => {
       volumeByWell: { A1: 50, B1: 50, C1: 50, D1: 50 },
     })
     screen.getByText('A1: D1')
-    screen.getByText(nestedTextMatcher('50 µL'))
+    screen.getByText(nestedTextMatcher('50.0 µL'))
   })
   it('renders liquid name, description, total volume for odd, and clicking item selects the box', () => {
     vi.mocked(getIsOnDevice).mockReturnValue(true)
     render(props)
     screen.getByText('Mock Liquid')
     screen.getByText('Mock Description')
-    screen.getAllByText(nestedTextMatcher('100 µL'))
-    screen.getAllByText(nestedTextMatcher('total volume'))
+    screen.getAllByText(nestedTextMatcher('100.0 µL'))
     expect(screen.getByLabelText('liquidBox_odd')).toHaveStyle(
       `border: ${SPACING.spacing4} solid ${COLORS.grey30}`
     )

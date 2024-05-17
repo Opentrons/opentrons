@@ -17,11 +17,13 @@ import { TertiaryButton } from '../../../../atoms/buttons'
 interface FactoryModeProps {
   isRobotBusy: boolean
   setShowFactoryModeSlideout: React.Dispatch<React.SetStateAction<boolean>>
+  sn: string | null
 }
 
 export function FactoryMode({
   isRobotBusy,
   setShowFactoryModeSlideout,
+  sn,
 }: FactoryModeProps): JSX.Element {
   const { t } = useTranslation('device_settings')
 
@@ -37,7 +39,7 @@ export function FactoryMode({
         </StyledText>
       </Box>
       <TertiaryButton
-        disabled={isRobotBusy}
+        disabled={isRobotBusy || sn == null}
         marginLeft={SPACING_AUTO}
         onClick={() => {
           setShowFactoryModeSlideout(true)

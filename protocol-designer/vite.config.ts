@@ -70,6 +70,9 @@ export default defineConfig(
           ...testAliases,
         },
       },
+      server: {
+        port: 5178
+      }
     }
   }
 )

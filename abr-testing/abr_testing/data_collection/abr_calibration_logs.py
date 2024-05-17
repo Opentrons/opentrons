@@ -3,7 +3,6 @@ from typing import Dict, Any, List, Union
 import argparse
 import os
 import json
-import gspread  # type: ignore[import]
 import sys
 import time as t
 from abr_testing.data_collection import read_robot_logs
@@ -156,18 +155,10 @@ if __name__ == "__main__":
     parser.add_argument(
         "email", metavar="EMAIL", type=str, nargs=1, help="opentrons gmail."
     )
-    parser.add_argument(
-        "ip_or_all",
-        metavar="IP_OR_ALL",
-        type=str,
-        nargs=1,
-        help="Enter 'ALL' to read IPs.json or type full IP address of 1 robot.",
-    )
     args = parser.parse_args()
     storage_directory = args.storage_directory[0]
     folder_name = args.folder_name[0]
     google_sheet_name = args.google_sheet_name[0]
-    ip_or_all = args.ip_or_all[0]
     email = args.email[0]
     # Connect to google drive.
     try:
@@ -175,38 +166,24 @@ if __name__ == "__main__":
     except FileNotFoundError:
         print(f"Add credentials.json file to: {storage_directory}.")
         sys.exit()
-    try:
-        google_drive = google_drive_tool.google_drive(
-            credentials_path, folder_name, email
-        )
-        # Upload calibration logs to google drive.
-        print("Connected to google drive.")
-    except json.decoder.JSONDecodeError:
-        print(
-            "Credential file is damaged. Get from https://console.cloud.google.com/apis/credentials"
-        )
-        sys.exit()
+    google_drive = google_drive_tool.google_drive(credentials_path, folder_name, email)
     # Connect to google sheet
-    try:
-        google_sheet_instruments = google_sheets_tool.google_sheet(
-            credentials_path, google_sheet_name, 0
-        )
-        google_sheet_modules = google_sheets_tool.google_sheet(
-            credentials_path, google_sheet_name, 1
-        )
-        google_sheet_deck = google_sheets_tool.google_sheet(
-            credentials_path, google_sheet_name, 2
-        )
-        print(f"Connected to google sheet: {google_sheet_name}")
-    except gspread.exceptions.APIError:
-        print("ERROR: Check google sheet name. Check credentials file.")
-        sys.exit()
+    google_sheet_instruments = google_sheets_tool.google_sheet(
+        credentials_path, google_sheet_name, 0
+    )
+    google_sheet_modules = google_sheets_tool.google_sheet(
+        credentials_path, google_sheet_name, 1
+    )
+    google_sheet_deck = google_sheets_tool.google_sheet(
+        credentials_path, google_sheet_name, 2
+    )
     ip_json_file = os.path.join(storage_directory, "IPs.json")
     try:
         ip_file = json.load(open(ip_json_file))
     except FileNotFoundError:
         print(f"Add .json file with robot IPs to: {storage_directory}.")
         sys.exit()
+    ip_or_all = input("IP Address or ALL: ")
 
     if ip_or_all == "ALL":
         ip_address_list = ip_file["ip_address_list"]

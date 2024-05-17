@@ -1,4 +1,5 @@
 """Tests for hash_command_params."""
+import pytest
 
 from opentrons.protocol_engine import CommandIntent
 from opentrons.protocol_engine import commands
@@ -66,10 +67,11 @@ def test_repeated_commands() -> None:
     assert a_hash != b_hash
 
 
-def test_setup_command() -> None:
-    """Setup commands should always hash to None."""
+@pytest.mark.parametrize("command_intent", [CommandIntent.SETUP, CommandIntent.FIXIT])
+def test_setup_and_fixit_command(command_intent: CommandIntent) -> None:
+    """Setup and fixit commands should always skip hashing."""
     setup_command = commands.WaitForDurationCreate(
         params=commands.WaitForDurationParams(seconds=123),
-        intent=CommandIntent.SETUP,
+        intent=command_intent,
     )
     assert hash_protocol_command_params(setup_command, None) is None

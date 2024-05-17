@@ -1,16 +1,17 @@
 import React from 'react'
-import { FormikConfig } from 'formik'
 import isEqual from 'lodash/isEqual'
 import { vi, describe, it, expect, beforeEach, afterEach } from 'vitest'
 import { when } from 'vitest-when'
 import { render, screen } from '@testing-library/react'
 import { nestedTextMatcher } from '../../__testUtils__/nestedTextMatcher'
-import { getDefaultFormState, LabwareFields } from '../../../fields'
+import { getDefaultFormState } from '../../../fields'
 import { isEveryFieldHidden, getLabwareName } from '../../../utils'
 import { GridOffset } from '../../sections/GridOffset'
 import { FormAlerts } from '../../alerts/FormAlerts'
 import { TextField } from '../../TextField'
 import { wrapInFormik } from '../../utils/wrapInFormik'
+import type { FormikConfig } from 'formik'
+import type { LabwareFields } from '../../../fields'
 
 vi.mock('../../../utils')
 vi.mock('../../TextField')

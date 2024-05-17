@@ -8,7 +8,8 @@ from typing_extensions import Literal, Type
 
 from pydantic import BaseModel, Field
 
-from ..command import AbstractCommandImpl, BaseCommand, BaseCommandCreate
+from ..command import AbstractCommandImpl, BaseCommand, BaseCommandCreate, SuccessData
+from ...errors.error_occurrence import ErrorOccurrence
 
 if TYPE_CHECKING:
     from opentrons.protocol_engine.execution import EquipmentHandler
@@ -36,7 +37,9 @@ class DisengageResult(BaseModel):
     pass
 
 
-class DisengageImplementation(AbstractCommandImpl[DisengageParams, DisengageResult]):
+class DisengageImplementation(
+    AbstractCommandImpl[DisengageParams, SuccessData[DisengageResult, None]]
+):
     """The implementation of a Magnetic Module disengage command."""
 
     def __init__(
@@ -48,7 +51,9 @@ class DisengageImplementation(AbstractCommandImpl[DisengageParams, DisengageResu
         self._state_view = state_view
         self._equipment = equipment
 
-    async def execute(self, params: DisengageParams) -> DisengageResult:
+    async def execute(
+        self, params: DisengageParams
+    ) -> SuccessData[DisengageResult, None]:
         """Execute a Magnetic Module disengage command.
 
         Raises:
@@ -70,10 +75,10 @@ class DisengageImplementation(AbstractCommandImpl[DisengageParams, DisengageResu
         if hardware_module is not None:  # Not virtualizing modules.
             await hardware_module.deactivate()
 
-        return DisengageResult()
+        return SuccessData(public=DisengageResult(), private=None)
 
 
-class Disengage(BaseCommand[DisengageParams, DisengageResult]):
+class Disengage(BaseCommand[DisengageParams, DisengageResult, ErrorOccurrence]):
     """A command to disengage a Magnetic Module's magnets."""
 
     commandType: DisengageCommandType = "magneticModule/disengage"

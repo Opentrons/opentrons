@@ -3,7 +3,6 @@ import argparse
 import os
 import sys
 import json
-import gspread  # type: ignore[import]
 from datetime import datetime, timedelta
 from abr_testing.data_collection import read_robot_logs
 from typing import Set, Dict, Any, Tuple, List, Union
@@ -33,9 +32,10 @@ def create_data_dictionary(
     runs_to_save: Union[Set[str], str],
     storage_directory: str,
     issue_url: str,
-) -> Tuple[Dict[Any, Dict[str, Any]], List]:
+) -> Tuple[Dict[str, Dict[str, Any]], List[str], Dict[str, Dict[str, Any]], List[str]]:
     """Pull data from run files and format into a dictionary."""
-    runs_and_robots = {}
+    runs_and_robots: Dict[Any, Dict[str, Any]] = {}
+    runs_and_lpc: Dict[Any, Dict[str, Any]] = {}
     for filename in os.listdir(storage_directory):
         file_path = os.path.join(storage_directory, filename)
         if file_path.endswith(".json"):
@@ -109,6 +109,7 @@ def create_data_dictionary(
                 hs_dict = read_robot_logs.hs_commands(file_results)
                 tm_dict = read_robot_logs.temperature_module_commands(file_results)
                 notes = {"Note1": "", "Jira Link": issue_url}
+                row_for_lpc = {**row, **all_modules, **notes}
                 row_2 = {
                     **row,
                     **all_modules,
@@ -117,13 +118,15 @@ def create_data_dictionary(
                     **tm_dict,
                     **tc_dict,
                 }
-                headers = list(row_2.keys())
+                headers: List[str] = list(row_2.keys())
                 runs_and_robots[run_id] = row_2
+                # LPC Data Recording
+                runs_and_lpc, headers_lpc = read_robot_logs.lpc_data(
+                    file_results, row_for_lpc, runs_and_lpc
+                )
             else:
                 continue
-                # os.remove(file_path)
-                # print(f"Run ID: {run_id} has a run time of 0 minutes. Run removed.")
-    return runs_and_robots, headers
+    return runs_and_robots, headers, runs_and_lpc, headers_lpc
 
 
 if __name__ == "__main__":
@@ -162,33 +165,12 @@ if __name__ == "__main__":
     except FileNotFoundError:
         print(f"Add credentials.json file to: {storage_directory}.")
         sys.exit()
-    try:
-        google_drive = google_drive_tool.google_drive(
-            credentials_path, folder_name, email
-        )
-        print("Connected to google drive.")
-    except json.decoder.JSONDecodeError:
-        print(
-            "Credential file is damaged. Get from https://console.cloud.google.com/apis/credentials"
-        )
-        sys.exit()
+    google_drive = google_drive_tool.google_drive(credentials_path, folder_name, email)
     # Get run ids on google sheet
-    try:
-        google_sheet = google_sheets_tool.google_sheet(
-            credentials_path, google_sheet_name, 0
-        )
-        print(f"Connected to google sheet: {google_sheet_name}")
-    except gspread.exceptions.APIError:
-        print("ERROR: Check google sheet name. Check credentials file.")
-        sys.exit()
-    try:
-        google_sheet_lpc = google_sheets_tool.google_sheet(
-            credentials_path, "ABR-LPC", 0
-        )
-        print("Connected to google sheet ABR-LPC")
-    except gspread.exceptions.APIError:
-        print("ERROR: Check google sheet name. Check credentials file.")
-        sys.exit()
+    google_sheet = google_sheets_tool.google_sheet(
+        credentials_path, google_sheet_name, 0
+    )
+
     run_ids_on_gs = google_sheet.get_column(2)
     run_ids_on_gs = set(run_ids_on_gs)
 
@@ -201,9 +183,14 @@ if __name__ == "__main__":
         run_ids_on_gd, run_ids_on_gs
     )
     # Add missing runs to google sheet
-    runs_and_robots, headers = create_data_dictionary(
+    runs_and_robots, headers, runs_and_lpc, headers_lpc = create_data_dictionary(
         missing_runs_from_gs, storage_directory, ""
     )
     read_robot_logs.write_to_local_and_google_sheet(
         runs_and_robots, storage_directory, google_sheet_name, google_sheet, headers
+    )
+    # Add LPC to google sheet
+    google_sheet_lpc = google_sheets_tool.google_sheet(credentials_path, "ABR-LPC", 0)
+    read_robot_logs.write_to_local_and_google_sheet(
+        runs_and_lpc, storage_directory, "ABR-LPC", google_sheet_lpc, headers_lpc
     )

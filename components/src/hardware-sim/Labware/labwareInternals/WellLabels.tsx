@@ -1,9 +1,10 @@
 import * as React from 'react'
 import { C_BLACK, C_BLUE } from '../../../styles/colors'
 import { RobotCoordsText } from '../../Deck'
-import { WellLabelOption, WELL_LABEL_OPTIONS } from '../LabwareRender'
+import { WELL_LABEL_OPTIONS } from '../LabwareRender'
 import { COLORS } from '../../../helix-design-system'
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
+import type { WellLabelOption } from '../LabwareRender'
 import type { HighlightedWellLabels } from './types'
 
 // magic layout numbers to make the letters close to the edges of the labware

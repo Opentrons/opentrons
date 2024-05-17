@@ -1,11 +1,11 @@
 import * as React from 'react'
-import { CSSProp } from 'styled-components'
 
 import { RUN_STATUS_STOP_REQUESTED } from '@opentrons/api-client'
 import { useInterval, TYPOGRAPHY, StyledText } from '@opentrons/components'
 
 import { formatInterval } from '../../../organisms/RunTimeControl/utils'
 import { EMPTY_TIMESTAMP } from '../constants'
+import type { CSSProp } from 'styled-components'
 
 export function RunTimer({
   runStatus,

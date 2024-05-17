@@ -1,18 +1,9 @@
-/* eslint-disable @typescript-eslint/no-var-requires */
-import {
-  createStore,
-  combineReducers,
-  applyMiddleware,
-  compose,
-  Store,
-  Reducer,
-} from 'redux'
+import { createStore, combineReducers, applyMiddleware, compose } from 'redux'
 import thunk from 'redux-thunk'
 import { trackEventMiddleware } from './analytics/middleware'
 import { makePersistSubscriber, rehydratePersistedAction } from './persist'
 import { fileUploadMessage } from './load-file/actions'
 import { makeTimelineMiddleware } from './timelineMiddleware/makeTimelineMiddleware'
-import { BaseState, Action } from './types'
 import { rootReducer as analyticsReducer } from './analytics'
 import { rootReducer as dismissReducer } from './dismiss'
 import { rootReducer as featureFlagsReducer } from './feature-flags'
@@ -24,6 +15,8 @@ import { rootReducer as stepFormsReducer } from './step-forms'
 import { rootReducer as tutorialReducer } from './tutorial'
 import { rootReducer as uiReducer } from './ui'
 import { rootReducer as wellSelectionReducer } from './well-selection/reducers'
+import type { Store, Reducer } from 'redux'
+import type { BaseState, Action } from './types'
 
 const timelineMiddleware = makeTimelineMiddleware()
 

@@ -1,4 +1,4 @@
-import { PipetteName } from '../../js'
+import type { PipetteName } from '../../js'
 import type {
   DeckSlotId,
   LabwareDefinition2,

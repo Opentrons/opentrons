@@ -72,7 +72,8 @@ pressure_output_file_heading = [
 # FIXME we should restrict some of these functions by instrument type.
 
 
-def _build_pass_step(
+def _fix_pass_step_for_buffer(
+    move_group: MoveGroupStep,
     movers: List[NodeId],
     distance: Dict[NodeId, float],
     speed: Dict[NodeId, float],
@@ -82,19 +83,6 @@ def _build_pass_step(
     pipette_nodes = [
         i for i in movers if i in [NodeId.pipette_left, NodeId.pipette_right]
     ]
-
-    move_group = create_step(
-        distance={ax: float64(abs(distance[ax])) for ax in movers},
-        velocity={
-            ax: float64(speed[ax] * copysign(1.0, distance[ax])) for ax in movers
-        },
-        acceleration={},
-        # use any node present to calculate duration of the move, assuming the durations
-        #   will be the same
-        duration=float64(abs(distance[movers[0]] / speed[movers[0]])),
-        present_nodes=movers,
-        stop_condition=stop_condition,
-    )
     pipette_move = create_step(
         distance={ax: float64(abs(distance[ax])) for ax in movers},
         velocity={
@@ -110,6 +98,28 @@ def _build_pass_step(
     )
     for node in pipette_nodes:
         move_group[node] = pipette_move[node]
+    return move_group
+
+
+def _build_pass_step(
+    movers: List[NodeId],
+    distance: Dict[NodeId, float],
+    speed: Dict[NodeId, float],
+    stop_condition: MoveStopCondition = MoveStopCondition.sync_line,
+    sensor_to_use: Optional[SensorId] = None,
+) -> MoveGroupStep:
+    move_group = create_step(
+        distance={ax: float64(abs(distance[ax])) for ax in movers},
+        velocity={
+            ax: float64(speed[ax] * copysign(1.0, distance[ax])) for ax in movers
+        },
+        acceleration={},
+        # use any node present to calculate duration of the move, assuming the durations
+        #   will be the same
+        duration=float64(abs(distance[movers[0]] / speed[movers[0]])),
+        present_nodes=movers,
+        stop_condition=stop_condition,
+    )
     return move_group
 
 
@@ -144,7 +154,7 @@ async def run_sync_buffer_to_csv(
                     )
                 ),
             )
-            await asyncio.sleep(10)
+            await sensor_capturer.wait_for_complete()
             messenger.remove_listener(sensor_capturer)
         await messenger.send(
             node_id=tool,
@@ -234,7 +244,7 @@ async def _setup_pressure_sensors(
 
     for sensor in sensors:
         pressure_sensor = PressureSensor.build(
-            sensor_id=sensor_id,
+            sensor_id=sensor,
             node_id=tool,
             stop_threshold=threshold_fixed_point,
         )
@@ -323,6 +333,15 @@ async def liquid_probe(
         stop_condition=MoveStopCondition.sync_line,
         sensor_to_use=sensor_id,
     )
+    if sync_buffer_output:
+        sensor_group = _fix_pass_step_for_buffer(
+            sensor_group,
+            movers=[head_node, tool],
+            distance={head_node: max_z_distance, tool: max_z_distance},
+            speed={head_node: mount_speed, tool: plunger_speed},
+            stop_condition=MoveStopCondition.sync_line,
+            sensor_to_use=sensor_id,
+        )
 
     sensor_runner = MoveGroupRunner(move_groups=[[sensor_group]])
     if csv_output:

@@ -753,9 +753,14 @@ def test_drop_tip_to_randomized_trash_location(
     )
 
 
+@pytest.mark.parametrize(
+    ["api_version", "alternate_drop"],
+    [(APIVersion(2, 17), True), (APIVersion(2, 18), False)],
+)
 def test_drop_tip_in_trash_bin(
     decoy: Decoy,
     mock_instrument_core: InstrumentCore,
+    alternate_drop: bool,
     subject: InstrumentContext,
 ) -> None:
     """It should drop a tip in a deck configured trash bin."""
@@ -767,14 +772,20 @@ def test_drop_tip_in_trash_bin(
         mock_instrument_core.drop_tip_in_disposal_location(
             trash_bin,
             home_after=None,
+            alternate_tip_drop=alternate_drop,
         ),
         times=1,
     )
 
 
+@pytest.mark.parametrize(
+    ["api_version", "alternate_drop"],
+    [(APIVersion(2, 17), True), (APIVersion(2, 18), False)],
+)
 def test_drop_tip_in_waste_chute(
     decoy: Decoy,
     mock_instrument_core: InstrumentCore,
+    alternate_drop: bool,
     subject: InstrumentContext,
 ) -> None:
     """It should drop a tip in a deck configured trash bin or waste chute."""
@@ -786,6 +797,7 @@ def test_drop_tip_in_waste_chute(
         mock_instrument_core.drop_tip_in_disposal_location(
             waste_chute,
             home_after=None,
+            alternate_tip_drop=alternate_drop,
         ),
         times=1,
     )

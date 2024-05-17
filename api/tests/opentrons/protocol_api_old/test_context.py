@@ -21,6 +21,7 @@ from opentrons.types import Mount, Point, Location, TransferTipPolicy
 from opentrons.hardware_control import API, ThreadManagedHardware
 from opentrons.hardware_control.instruments.ot2.pipette import Pipette
 from opentrons.hardware_control.types import Axis
+from opentrons.hardware_control.modules import SimulatingModule
 from opentrons.protocols.advanced_control import transfers as tf
 from opentrons.protocols.api_support import instrument as instrument_support
 from opentrons.protocols.api_support.types import APIVersion
@@ -85,7 +86,7 @@ async def test_motion(ctx, hardware):
     old_pos[Axis.X] = 0.0
     old_pos[Axis.Y] = 0.0
     old_pos[Axis.A] = 0.0
-    old_pos[Axis.C] = 2.0
+    old_pos[Axis.C] = 2.5
     assert await hardware.current_position(instr._core.get_mount()) == pytest.approx(
         old_pos
     )
@@ -959,7 +960,15 @@ def test_order_of_module_load():
     import opentrons.hardware_control as hardware_control
     import opentrons.protocol_api as protocol_api
 
-    mods = {"tempdeck": ["111", "333"], "thermocycler": ["222"]}
+    mods = {
+        "tempdeck": [
+            SimulatingModule(serial_number="111", model="temperatureModuleV1"),
+            SimulatingModule(serial_number="333", model="temperatureModuleV2"),
+        ],
+        "thermocycler": [
+            SimulatingModule(serial_number="222", model="thermocyclerModuleV2")
+        ],
+    }
     thread_manager = hardware_control.ThreadManager(
         hardware_control.API.build_hardware_simulator, attached_modules=mods
     )

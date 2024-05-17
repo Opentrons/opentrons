@@ -1,11 +1,11 @@
 import { when } from 'vitest-when'
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { SECURITY_WPA_EAP, WifiNetwork } from '@opentrons/api-client'
+import { SECURITY_WPA_EAP } from '@opentrons/api-client'
 import { useWifiQuery } from '@opentrons/react-api-client'
 import { useRobot } from '../../../organisms/Devices/hooks'
 import { useWifiList } from '../hooks'
-import type { WifiListResponse } from '@opentrons/api-client'
 import type { UseQueryResult } from 'react-query'
+import type { WifiNetwork, WifiListResponse } from '@opentrons/api-client'
 
 vi.mock('@opentrons/react-api-client')
 vi.mock('../../../organisms/Devices/hooks')

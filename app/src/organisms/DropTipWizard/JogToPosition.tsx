@@ -22,10 +22,11 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 // import { NeedHelpLink } from '../CalibrationPanels'
+import { JogControls } from '../../molecules/JogControls'
 import { SmallButton } from '../../atoms/buttons'
-import { Jog, JogControls } from '../../molecules/JogControls'
 import { InProgressModal } from '../../molecules/InProgressModal/InProgressModal'
 import { SimpleWizardBody } from '../../molecules/SimpleWizardBody'
+import type { Jog } from '../../molecules/JogControls'
 
 // TODO: get help link article URL
 // const NEED_HELP_URL = ''

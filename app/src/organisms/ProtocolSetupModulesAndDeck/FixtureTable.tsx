@@ -14,7 +14,7 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 import {
-  FLEX_MODULE_ADDRESSABLE_AREAS,
+  FLEX_USB_MODULE_ADDRESSABLE_AREAS,
   getCutoutDisplayName,
   getDeckDefFromRobotType,
   getFixtureDisplayName,
@@ -86,8 +86,10 @@ export function FixtureTable({
   return sortedDeckConfigCompatibility.length > 0 ? (
     <>
       {sortedDeckConfigCompatibility.map((fixtureCompatibility, index) => {
-        return fixtureCompatibility.requiredAddressableAreas.some(raa =>
-          FLEX_MODULE_ADDRESSABLE_AREAS.includes(raa)
+        // filter out all fixtures that only provide module addressable areas (e.g. everything but StagingAreaWithMagBlockV1)
+        // as they're handled in the Modules Table
+        return fixtureCompatibility.requiredAddressableAreas.every(raa =>
+          FLEX_USB_MODULE_ADDRESSABLE_AREAS.includes(raa)
         ) ? null : (
           <FixtureTableItem
             key={`FixtureTableItem_${index}`}

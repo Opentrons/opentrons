@@ -1,6 +1,6 @@
-import { ACTIONS } from './constants'
 import type { Mount } from '@opentrons/api-client'
 import type { LabwareDefinition2, PipetteV2Specs } from '@opentrons/shared-data'
+import type { ACTIONS, CONSOLIDATE, DISTRIBUTE, TRANSFER } from './constants'
 
 export interface QuickTransferSetupState {
   pipette?: PipetteV2Specs
@@ -8,10 +8,16 @@ export interface QuickTransferSetupState {
   tipRack?: LabwareDefinition2
   source?: LabwareDefinition2
   sourceWells?: string[]
-  destination?: LabwareDefinition2
+  destination?: LabwareDefinition2 | 'source'
   destinationWells?: string[]
+  transferType?: TransferType
   volume?: number
 }
+
+export type TransferType =
+  | typeof CONSOLIDATE
+  | typeof DISTRIBUTE
+  | typeof TRANSFER
 
 export type QuickTransferWizardAction =
   | SelectPipetteAction
@@ -41,7 +47,7 @@ interface SetSourceWellsAction {
 }
 interface SetDestLabwareAction {
   type: typeof ACTIONS.SET_DEST_LABWARE
-  labware: LabwareDefinition2
+  labware: LabwareDefinition2 | 'source'
 }
 interface SetDestWellsAction {
   type: typeof ACTIONS.SET_DEST_WELLS

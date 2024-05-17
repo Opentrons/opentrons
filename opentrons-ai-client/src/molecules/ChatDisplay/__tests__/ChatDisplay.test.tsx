@@ -15,8 +15,11 @@ describe('ChatDisplay', () => {
 
   beforeEach(() => {
     props = {
-      content: 'mock text from the backend',
-      isUserInput: false,
+      chat: {
+        role: 'assistant',
+        reply: 'mock text from the backend',
+      },
+      chatId: 'mockId',
     }
   })
   it('should display response from the backend and label', () => {
@@ -29,8 +32,11 @@ describe('ChatDisplay', () => {
   })
   it('should display input from use and label', () => {
     props = {
-      content: 'mock text from user input',
-      isUserInput: true,
+      chat: {
+        role: 'user',
+        reply: 'mock text from user input',
+      },
+      chatId: 'mockId',
     }
     render(props)
     screen.getByText('You')

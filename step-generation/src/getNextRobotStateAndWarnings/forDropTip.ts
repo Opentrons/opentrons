@@ -20,6 +20,7 @@ export function forDropTip(
     labwareId,
     useFullVolume: true,
     wellName,
+    robotStateAndWarnings,
   })
   robotState.tipState.pipettes[pipetteId] = false
 }

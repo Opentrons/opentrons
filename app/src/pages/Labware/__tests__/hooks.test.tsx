@@ -21,7 +21,7 @@ import { useAllLabware, useLabwareFailure, useNewLabwareName } from '../hooks'
 
 import type { Store } from 'redux'
 import type { State } from '../../../redux/types'
-import { FailedLabwareFile } from '../../../redux/custom-labware/types'
+import type { FailedLabwareFile } from '../../../redux/custom-labware/types'
 
 vi.mock('../../../redux/custom-labware')
 vi.mock('../helpers/getAllDefs')

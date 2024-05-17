@@ -1,12 +1,11 @@
 """Router for /runs commands endpoints."""
 import textwrap
-from datetime import datetime
 from typing import Optional, Union
 from typing_extensions import Final, Literal
 
 from anyio import move_on_after
 from fastapi import APIRouter, Depends, Query, status
-from pydantic import BaseModel, Field
+
 
 from opentrons.protocol_engine import (
     ProtocolEngine,
@@ -16,16 +15,22 @@ from opentrons.protocol_engine import (
 
 from robot_server.errors.error_responses import ErrorDetails, ErrorBody
 from robot_server.service.json_api import (
-    RequestModel,
     SimpleBody,
     MultiBody,
     MultiBodyMeta,
     PydanticResponse,
+    SimpleMultiBody,
 )
 from robot_server.robot.control.dependencies import require_estop_in_good_state
 
+from ..command_models import (
+    RequestModelWithCommandCreate,
+    CommandCollectionLinks,
+    CommandLink,
+    CommandLinkMeta,
+)
 from ..run_models import RunCommandSummary
-from ..run_data_manager import RunDataManager
+from ..run_data_manager import RunDataManager, PreSerializedCommandsNotAvailableError
 from ..engine_store import EngineStore
 from ..run_store import RunStore, CommandNotFoundError
 from ..run_models import RunNotFoundError
@@ -36,17 +41,6 @@ from .base_router import RunNotFound, RunStopped
 _DEFAULT_COMMAND_LIST_LENGTH: Final = 20
 
 commands_router = APIRouter()
-
-
-class RequestModelWithCommandCreate(RequestModel[pe_commands.CommandCreate]):
-    """Equivalent to RequestModel[CommandCreate].
-
-    This works around a Pydantic v<2 bug where RequestModel[CommandCreate]
-    doesn't parse using the CommandCreate union discriminator.
-    https://github.com/pydantic/pydantic/issues/3782
-    """
-
-    data: pe_commands.CommandCreate
 
 
 class CommandNotFound(ErrorDetails):
@@ -70,32 +64,15 @@ class CommandNotAllowed(ErrorDetails):
     title: str = "Command Not Allowed"
 
 
-class CommandLinkMeta(BaseModel):
-    """Metadata about a command resource referenced in `links`."""
+class PreSerializedCommandsNotAvailable(ErrorDetails):
+    """An error if one tries to fetch pre-serialized commands before they are written to the database."""
 
-    runId: str = Field(..., description="The ID of the command's run.")
-    commandId: str = Field(..., description="The ID of the command.")
-    index: int = Field(..., description="Index of the command in the overall list.")
-    key: str = Field(..., description="Value of the current command's `key` field.")
-    createdAt: datetime = Field(
-        ...,
-        description="When the current command was created.",
-    )
-
-
-class CommandLink(BaseModel):
-    """A link to a command resource."""
-
-    href: str = Field(..., description="The path to a command")
-    meta: CommandLinkMeta = Field(..., description="Information about the command.")
-
-
-class CommandCollectionLinks(BaseModel):
-    """Links returned along with a collection of commands."""
-
-    current: Optional[CommandLink] = Field(
-        None,
-        description="Path to the currently running or next queued command.",
+    id: Literal[
+        "PreSerializedCommandsNotAvailable"
+    ] = "PreSerializedCommandsNotAvailable"
+    title: str = "Pre-Serialized commands not available."
+    detail: str = (
+        "Pre-serialized commands are only available once a run has finished running."
     )
 
 
@@ -131,7 +108,7 @@ async def get_current_run_engine_from_url(
     description=textwrap.dedent(
         """
         Add a single command to the run. You can add commands to a run
-        for two reasons:
+        for three reasons:
 
         - Setup commands (`data.source == "setup"`)
         - Protocol commands (`data.source == "protocol"`)
@@ -348,6 +325,56 @@ async def get_run_commands(
     return await PydanticResponse.create(
         content=MultiBody.construct(data=data, meta=meta, links=links),
         status_code=status.HTTP_200_OK,
+    )
+
+
+# TODO (spp, 2024-05-01): explore alternatives to returning commands as list of strings.
+#                Options: 1. JSON Lines
+#                         2. Simple de-serialized commands list w/o pydantic model conversion
+@PydanticResponse.wrap_route(
+    commands_router.get,
+    path="/runs/{runId}/commandsAsPreSerializedList",
+    summary="Get all commands of a completed run as a list of pre-serialized commands",
+    description=(
+        "Get all commands of a completed run as a list of pre-serialized commands."
+        "**Warning:** This endpoint is experimental. We may change or remove it without warning."
+        "\n\n"
+        "The commands list will only be available after a run has completed"
+        " (whether successful, failed or stopped) and its data has been committed to the database."
+        " If a request is received before the run is completed, it will return a 503 Unavailable error."
+        " This is a faster alternative to fetching the full commands list using"
+        " `GET /runs/{runId}/commands`. For large protocols (10k+ commands), the above"
+        " endpoint can take minutes to respond, whereas this one should only take a few seconds."
+    ),
+    responses={
+        status.HTTP_404_NOT_FOUND: {"model": ErrorBody[RunNotFound]},
+        status.HTTP_503_SERVICE_UNAVAILABLE: {
+            "model": ErrorBody[PreSerializedCommandsNotAvailable]
+        },
+    },
+)
+async def get_run_commands_as_pre_serialized_list(
+    runId: str,
+    run_data_manager: RunDataManager = Depends(get_run_data_manager),
+) -> PydanticResponse[SimpleMultiBody[str]]:
+    """Get all commands of a completed run as a list of pre-serialized (string encoded) commands.
+
+    Arguments:
+        runId: Requested run ID, from the URL
+        run_data_manager: Run data retrieval interface.
+    """
+    try:
+        commands = run_data_manager.get_all_commands_as_preserialized_list(runId)
+    except RunNotFoundError as e:
+        raise RunNotFound.from_exc(e).as_error(status.HTTP_404_NOT_FOUND) from e
+    except PreSerializedCommandsNotAvailableError as e:
+        raise PreSerializedCommandsNotAvailable.from_exc(e).as_error(
+            status.HTTP_503_SERVICE_UNAVAILABLE
+        ) from e
+    return await PydanticResponse.create(
+        content=SimpleMultiBody.construct(
+            data=commands, meta=MultiBodyMeta(cursor=0, totalLength=len(commands))
+        )
     )
 
 

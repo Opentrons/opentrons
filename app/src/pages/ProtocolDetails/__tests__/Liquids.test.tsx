@@ -1,6 +1,5 @@
 import * as React from 'react'
 import { vi, it, describe, beforeEach } from 'vitest'
-import { UseQueryResult } from 'react-query'
 import { when } from 'vitest-when'
 import {
   useProtocolAnalysisAsDocumentQuery,
@@ -9,12 +8,13 @@ import {
 import {
   parseLabwareInfoByLiquidId,
   parseLiquidsInLoadOrder,
-  Protocol,
 } from '@opentrons/api-client'
 import { renderWithProviders } from '../../../__testing-utils__'
 import { i18n } from '../../../i18n'
 import { Liquids } from '../Liquids'
-import { CompletedProtocolAnalysis } from '@opentrons/shared-data'
+import type { UseQueryResult } from 'react-query'
+import type { Protocol } from '@opentrons/api-client'
+import type { CompletedProtocolAnalysis } from '@opentrons/shared-data'
 
 vi.mock('@opentrons/api-client')
 vi.mock('@opentrons/react-api-client')

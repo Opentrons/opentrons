@@ -2,7 +2,7 @@ import * as React from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import { useTranslation } from 'react-i18next'
 
-import { TitleBar, Icon, IconName } from '@opentrons/components'
+import { TitleBar, Icon } from '@opentrons/components'
 import { getLabwareDisplayName } from '@opentrons/shared-data'
 import styles from './TitleBar.module.css'
 import { START_TERMINAL_TITLE, END_TERMINAL_TITLE } from '../constants'
@@ -20,6 +20,7 @@ import { selectors as fileDataSelectors } from '../file-data'
 import { closeIngredientSelector } from '../labware-ingred/actions'
 import { stepIconsByType } from '../form-types'
 import { selectors } from '../navigation'
+import type { IconName } from '@opentrons/components'
 interface TitleWithIconProps {
   iconName: IconName | null | undefined
   text: string | null | undefined

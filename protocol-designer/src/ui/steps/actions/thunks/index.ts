@@ -18,9 +18,9 @@ import {
 } from '../../../../tutorial'
 import * as uiModuleSelectors from '../../../../ui/modules/selectors'
 import * as fileDataSelectors from '../../../../file-data/selectors'
-import { StepType, StepIdType, FormData } from '../../../../form-types'
-import { ThunkAction } from '../../../../types'
-import {
+import type { StepType, StepIdType, FormData } from '../../../../form-types'
+import type { ThunkAction } from '../../../../types'
+import type {
   DuplicateStepAction,
   DuplicateMultipleStepsAction,
   SelectMultipleStepsAction,

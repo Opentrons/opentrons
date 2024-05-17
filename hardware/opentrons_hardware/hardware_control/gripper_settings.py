@@ -64,7 +64,7 @@ async def set_reference_voltage(
         expected_nodes=[NodeId.gripper_g],
     )
     if error != ErrorCode.ok:
-        log.error(f"recieved error trying to set gripper vref {str(error)}")
+        log.error(f"received error trying to set gripper vref {str(error)}")
 
 
 async def set_pwm_param(
@@ -80,7 +80,7 @@ async def set_pwm_param(
         expected_nodes=[NodeId.gripper_g],
     )
     if error != ErrorCode.ok:
-        log.error(f"recieved error trying to set gripper pwm {str(error)}")
+        log.error(f"received error trying to set gripper pwm {str(error)}")
 
 
 async def set_error_tolerance(
@@ -100,7 +100,7 @@ async def set_error_tolerance(
         expected_nodes=[NodeId.gripper_g],
     )
     if error != ErrorCode.ok:
-        log.error(f"recieved error trying to set gripper error tolerance {str(error)}")
+        log.error(f"received error trying to set gripper error tolerance {str(error)}")
 
 
 async def set_jaw_holdoff(
@@ -119,7 +119,7 @@ async def set_jaw_holdoff(
     )
     if error != ErrorCode.ok:
         log.error(
-            f"recieved error trying to set gripper jaw holdoff value {str(error)}"
+            f"received error trying to set gripper jaw holdoff value {str(error)}"
         )
 
 
