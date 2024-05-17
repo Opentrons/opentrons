@@ -4,7 +4,7 @@ from typing import List, Tuple
 from llama_index.core import Settings as li_settings
 from llama_index.core import StorageContext, load_index_from_storage
 from llama_index.embeddings.openai import OpenAIEmbedding
-from llama_index.llms.openai import OpenAI as liOpenAI
+from llama_index.llms.openai import OpenAI as li_OpenAI
 from llama_index.program.openai import OpenAIPydanticProgram
 from openai import OpenAI
 from openai.types.chat import ChatCompletion, ChatCompletionFunctionMessageParam, ChatCompletionMessage, ChatCompletionMessageParam
@@ -15,11 +15,11 @@ from api.domain.prompts import (
     execute_function_call,
     general_rules_1,
     pipette_type,
+    prompt_template_str,
     rules_for_transfer,
     standard_labware_api,
     system_notes,
     tools,
-    prompt_template_str
 )
 from api.settings import Settings, is_running_on_lambda
 
@@ -150,13 +150,14 @@ class OpenAIPredict:
             """
             Model for atomic descriptions
             """
+
             desc: List[str]
 
         program = OpenAIPydanticProgram.from_defaults(
-            output_cls=atomic_descr, 
-            prompt_template_str=prompt_template_str.format(protocol_description=protocol_description), 
-            verbose=False, 
-            llm=liOpenAI(model="gpt-4-1106-preview")
+            output_cls=atomic_descr,
+            prompt_template_str=prompt_template_str.format(protocol_description=protocol_description),
+            verbose=False,
+            llm=li_OpenAI(model=self.settings.OPENAI_MODEL_NAME),
         )
         details = program(protocol_description=protocol_description)
         descriptions = []
@@ -169,7 +170,7 @@ class OpenAIPredict:
     def refine_response(self, assitant_message: str) -> str:
         if assitant_message is None:
             return ""
-        sys_msg: ChatCompletionMessageParam = {
+        system_message: ChatCompletionMessageParam = {
             "role": "system",
             "content": f"{general_rules_1}\n Please leave useful comments for each command.",
         }
@@ -178,7 +179,7 @@ class OpenAIPredict:
 
         response = self.client.chat.completions.create(
             model=self.settings.OPENAI_MODEL_NAME,
-            messages=[sys_msg, user_message],
+            messages=[system_message, user_message],
             stream=False,
             temperature=0.005,
             max_tokens=4000,
