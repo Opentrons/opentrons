@@ -8,6 +8,13 @@ import { SummaryAndSettings } from '../SummaryAndSettings'
 import { Overview } from '../Overview'
 
 vi.mock('../Overview')
+vi.mock('../utils', async () => {
+  const actual = await vi.importActual('../utils')
+  return {
+    ...actual,
+    getInitialSummaryState: vi.fn(),
+  }
+})
 
 const render = (props: React.ComponentProps<typeof SummaryAndSettings>) => {
   return renderWithProviders(<SummaryAndSettings {...props} />, {
@@ -27,6 +34,14 @@ describe('SummaryAndSettings', () => {
         onClick: vi.fn(),
       },
       state: {
+        pipette: {} as any,
+        mount: 'left',
+        tipRack: {} as any,
+        source: {} as any,
+        sourceWells: ['A1'],
+        destination: {} as any,
+        destinationWells: ['A1'],
+        transferType: 'transfer',
         volume: 25,
       },
     }

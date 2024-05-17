@@ -16,19 +16,19 @@ import { SelectDestLabware } from './SelectDestLabware'
 import { SelectDestWells } from './SelectDestWells'
 import { VolumeEntry } from './VolumeEntry'
 import { SummaryAndSettings } from './SummaryAndSettings'
-import { quickTransferReducer } from './utils'
+import { quickTransferWizardReducer } from './reducers'
 
 import type { SmallButton } from '../../atoms/buttons'
-import type { QuickTransferSetupState } from './types'
+import type { QuickTransferWizardState } from './types'
 
 const QUICK_TRANSFER_WIZARD_STEPS = 8
-const initialQuickTransferState: QuickTransferSetupState = {}
+const initialQuickTransferState: QuickTransferWizardState = {}
 
 export const QuickTransferFlow = (): JSX.Element => {
   const history = useHistory()
   const { i18n, t } = useTranslation(['quick_transfer', 'shared'])
   const [state, dispatch] = React.useReducer(
-    quickTransferReducer,
+    quickTransferWizardReducer,
     initialQuickTransferState
   )
   const [currentStep, setCurrentStep] = React.useState(0)

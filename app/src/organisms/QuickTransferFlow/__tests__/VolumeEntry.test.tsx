@@ -6,7 +6,7 @@ import { renderWithProviders } from '../../../__testing-utils__'
 import { i18n } from '../../../i18n'
 import { InputField } from '../../../atoms/InputField'
 import { NumericalKeyboard } from '../../../atoms/SoftwareKeyboard'
-import { getVolumeLimits } from '../utils'
+import { getVolumeRange } from '../utils'
 import { VolumeEntry } from '../VolumeEntry'
 
 vi.mock('../../../atoms/InputField')
@@ -42,7 +42,7 @@ describe('VolumeEntry', () => {
       },
       dispatch: vi.fn(),
     }
-    vi.mocked(getVolumeLimits).mockReturnValue({ min: 5, max: 50 })
+    vi.mocked(getVolumeRange).mockReturnValue({ min: 5, max: 50 })
   })
   afterEach(() => {
     vi.resetAllMocks()

@@ -21,6 +21,11 @@ describe('Overview', () => {
         pipette: {
           displayName: 'Pipette display name',
         } as any,
+        tipRack: {
+          metadata: {
+            displayName: 'Tip rack display name',
+          },
+        } as any,
         source: {
           metadata: {
             displayName: 'Source labware name',
@@ -33,7 +38,7 @@ describe('Overview', () => {
         } as any,
         transferType: 'transfer',
         volume: 25,
-      },
+      } as any,
     }
   })
   afterEach(() => {
@@ -44,6 +49,8 @@ describe('Overview', () => {
     render(props)
     screen.getByText('Pipette')
     screen.getByText('Pipette display name')
+    screen.getByText('Tip rack')
+    screen.getByText('Tip rack display name')
     screen.getByText('Source labware')
     screen.getByText('Source labware name')
     screen.getByText('Destination labware')
@@ -57,6 +64,11 @@ describe('Overview', () => {
         pipette: {
           displayName: 'Pipette display name',
         } as any,
+        tipRack: {
+          metadata: {
+            displayName: 'Tip rack display name',
+          },
+        } as any,
         source: {
           metadata: {
             displayName: 'Source labware name',
@@ -69,7 +81,7 @@ describe('Overview', () => {
         } as any,
         transferType: 'consolidate',
         volume: 25,
-      },
+      } as any,
     }
     render(props)
     screen.getByText('Aspirate volume per well')
@@ -79,6 +91,11 @@ describe('Overview', () => {
       state: {
         pipette: {
           displayName: 'Pipette display name',
+        } as any,
+        tipRack: {
+          metadata: {
+            displayName: 'Tip rack display name',
+          },
         } as any,
         source: {
           metadata: {
@@ -92,7 +109,7 @@ describe('Overview', () => {
         } as any,
         transferType: 'distribute',
         volume: 25,
-      },
+      } as any,
     }
     render(props)
     screen.getByText('Dispense volume per well')
