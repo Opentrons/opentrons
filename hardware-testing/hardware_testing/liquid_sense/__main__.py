@@ -296,6 +296,8 @@ if __name__ == "__main__":
             google_sheet = google_sheets_tool.google_sheet(
                 credentials_path, args.google_sheet_name, 0
             )
+        else:
+            google_sheet = None
         hw = run_args.ctx._core.get_hardware()
         if not run_args.ctx.is_simulating():
             ui.get_user_ready("CLOSE the door, and MOVE AWAY from machine")
@@ -304,7 +306,7 @@ if __name__ == "__main__":
         for tip in run_args.tip_volumes:
             if args.channels == 96 and not run_args.ctx.is_simulating():
                 ui.alert_user_ready(f"prepare the {tip}ul tipracks", hw)
-            execute.run(tip, run_args)
+            execute.run(tip, run_args, google_sheet)
     except Exception as e:
         ui.print_info(f"got error {e}")
         ui.print_info(traceback.format_exc())
@@ -341,9 +343,8 @@ if __name__ == "__main__":
                 args.plunger_speed,
                 "threshold",
                 args.plunger_direction,
-                liquid_height_from_deck,
             ]
-            process_google_sheet(google_sheet, test_info)
+            process_google_sheet(google_sheet, run_args, test_info)
 
         run_args.ctx.cleanup()
         if not args.simulate:

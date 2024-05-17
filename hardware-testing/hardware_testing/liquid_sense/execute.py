@@ -165,7 +165,7 @@ def _load_scale(
     return recorder
 
 
-def run(tip: int, run_args: RunArgs) -> None:
+def run(tip: int, run_args: RunArgs, google_sheet: Optional[Any]) -> None:
     """Run a liquid probe test."""
     test_labware: Labware = _load_test_well(run_args)
     dial_indicator: Labware = _load_dial_indicator(run_args)
@@ -280,7 +280,7 @@ def run(tip: int, run_args: RunArgs) -> None:
                 tip_length_offset,
                 liquid_height_from_deck,
                 google_sheet,
-                sheet_name,
+                run_args.run_id,
             )
             ui.print_info(
                 f"\n\n Z axis start pos {start_pos[Axis.Z_L]} end pos {end_pos[Axis.Z_L]}"

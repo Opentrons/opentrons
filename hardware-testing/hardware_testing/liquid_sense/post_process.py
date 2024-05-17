@@ -404,14 +404,15 @@ def process_google_sheet(
     )
 
     # 2. Height vs Offset Comparison
+    heights = google_sheet.get_single_col_range(sheet_title, "B10:B20")
     axis = [
         {"position": "BOTTOM_AXIS", "title": titles[1]},
         {
             "position": "LEFT_AXIS",
             "title": titles[2],
             "viewWindowOptions": {
-                "viewWindowMin": float(min(height)) - 1,
-                "viewWindowMax": float(max(height)) + 1,
+                "viewWindowMin": str(float(min(heights)) - 1),
+                "viewWindowMax": str(float(max(heights)) + 1),
             },
         },
         {"position": "RIGHT_AXIS", "title": titles[3]},
@@ -525,5 +526,6 @@ def process_google_sheet(
     )
 
 
-if __name__ == "__main__":
-    process_csv_directory("/home/ryan/testdata", [50], 10)
+#
+# if __name__ == "__main__":
+#    process_csv_directory("/home/ryan/testdata", [50], 10)
