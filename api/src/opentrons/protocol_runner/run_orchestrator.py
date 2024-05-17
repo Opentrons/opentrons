@@ -77,14 +77,10 @@ class RunOrchestrator:
         setup_runner = protocol_runner.LiveRunner(
             protocol_engine=protocol_engine,
             hardware_api=hardware_api,
-            # post_run_hardware_state=post_run_hardware_state,
-            # drop_tips_after_run=drop_tips_after_run,
         )
         fixit_runner = protocol_runner.LiveRunner(
             protocol_engine=protocol_engine,
             hardware_api=hardware_api,
-            # post_run_hardware_state=post_run_hardware_state,
-            # drop_tips_after_run=drop_tips_after_run,
         )
         json_or_python_runner = None
         if protocol_config:
