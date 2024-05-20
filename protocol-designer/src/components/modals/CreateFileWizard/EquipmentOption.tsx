@@ -151,7 +151,6 @@ export function EquipmentOption(props: EquipmentOptionProps): JSX.Element {
     } else if (numItems > 0) {
       downArrowStyle = ARROW_STYLE_ACTIVE
     }
-    console.log('isDisabled', isDisabled, )
     iconInfo = (
       <Flex
         flexDirection={DIRECTION_COLUMN}
