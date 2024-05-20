@@ -18,13 +18,15 @@
             "speed": 5.0,
             "distance": 13.0,
             "current": 0.15,
-            "tipOverlap": 10.5
-          },
-          "t50": {
-            "speed": 5.0,
-            "distance": 13.0,
-            "current": 0.15,
-            "tipOverlap": 10.05
+            "tipOverlaps": {
+              "default": 10.5,
+              "opentrons/opentrons_flex_96_tiprack_1000ul/1": 10.5,
+              "opentrons/opentrons_flex_96_tiprack_200ul/1": 10.5,
+              "opentrons/opentrons_flex_96_tiprack_50ul/1": 10.5,
+              "opentrons/opentrons_flex_96_filtertiprack_1000ul/1": 10.5,
+              "opentrons/opentrons_flex_96_filtertiprack_200ul/1": 10.5,
+              "opentrons/opentrons_flex_96_filtertiprack_50ul/1": 10.5
+            }
           }
         }
       }

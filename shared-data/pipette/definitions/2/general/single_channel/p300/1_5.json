@@ -18,13 +18,12 @@
             "speed": 30.0,
             "distance": 10.0,
             "current": 0.1,
-            "tipOverlap": 7.47
-          },
-          "t200": {
-            "speed": 30.0,
-            "distance": 10.0,
-            "current": 0.1,
-            "tipOverlap": 6.1
+            "tipOverlaps": {
+              "default": 7.47,
+              "opentrons/tipone_96_tiprack_200ul/1": 6.1,
+              "opentrons/opentrons_96_filtertiprack_200ul/1": 7.47,
+              "opentrons/opentrons_96_tiprack_300ul/1": 7.47
+            }
           }
         }
       }
