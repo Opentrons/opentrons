@@ -75,7 +75,7 @@ export function PromptGuide(): JSX.Element {
               <StyledText>{t('example')}</StyledText>
             </li>
             <li>
-              <StyledText>{t('type_simulate')}</StyledText>
+              <StyledText>{t('simulate_description')}</StyledText>
             </li>
             <li>
               <StyledText>{t('reload_page')}</StyledText>

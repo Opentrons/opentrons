@@ -39,7 +39,7 @@ describe('PromptGuide', () => {
       'For example prompts, click the buttons in the left panel.'
     )
     screen.getByText(
-      'Once OpentronsAI has written your protocol, type “simulate” in the prompt box to try it out.'
+      'Once OpentronsAI has written your protocol, type `simulate` in the prompt box to try it out.'
     )
     screen.getByText(
       'To start over and create a new protocol, simply reload the page.'
