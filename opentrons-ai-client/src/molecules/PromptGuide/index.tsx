@@ -33,26 +33,18 @@ export function PromptGuide(): JSX.Element {
         <StyledText css={BODY_TEXT_STYLE}>
           {t('make_sure_your_prompt')}
         </StyledText>
-        <StyledText css={BODY_TEXT_STYLE}>
-          {t('key_info')}
-        </StyledText>
+        <StyledText css={BODY_TEXT_STYLE}>{t('key_info')}</StyledText>
         <Flex
           css={BODY_TEXT_STYLE}
           flexDirection={DIRECTION_COLUMN}
           paddingLeft={SPACING.spacing32}
         >
-          <ul>
+          <StyledUl>
             <li>
               <StyledText>{t('robot_type')}</StyledText>
             </li>
             <li>
               <StyledText>{t('modules_and_adapters')}</StyledText>
-            </li>
-            <li>
-              <StyledText>{t('labware_and_tipracks')}</StyledText>
-            </li>
-            <li>
-              <StyledText>{t('liquid_locations')}</StyledText>
             </li>
             <li>
               <Trans
@@ -65,13 +57,14 @@ export function PromptGuide(): JSX.Element {
               />
             </li>
             <li>
+              <StyledText>{t('liquid_locations')}</StyledText>
+            </li>
+            <li>
               <StyledText>{t('commands')}</StyledText>
             </li>
-          </ul>
+          </StyledUl>
         </Flex>
-        <StyledText css={BODY_TEXT_STYLE}>
-          {t('notes')}
-        </StyledText>
+        <StyledText css={BODY_TEXT_STYLE}>{t('notes')}</StyledText>
         <Flex
           css={BODY_TEXT_STYLE}
           flexDirection={DIRECTION_COLUMN}
