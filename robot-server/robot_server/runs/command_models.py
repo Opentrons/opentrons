@@ -49,5 +49,9 @@ class CommandCollectionLinks(BaseModel):
 
     current: Optional[CommandLink] = Field(
         None,
-        description="Path to the currently running or next queued command.",
+        description=(
+            'Information about the "current" command.'
+            ' The "current" command is the one that\'s running right now,'
+            " or, if there is none, the one that was running most recently."
+        ),
     )
