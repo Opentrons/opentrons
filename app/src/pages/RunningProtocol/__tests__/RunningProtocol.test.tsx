@@ -157,7 +157,7 @@ describe('RunningProtocol', () => {
       <div>MOCK ERROR RECOVERY</div>
     )
     vi.mocked(useErrorRecoveryFlows).mockReturnValue({
-      isEREnabled: false,
+      isERActive: false,
       toggleER: vi.fn(),
       failedCommand: {} as any,
     })
@@ -207,7 +207,7 @@ describe('RunningProtocol', () => {
     expect(screen.queryByText('MOCK ERROR RECOVERY')).not.toBeInTheDocument()
 
     vi.mocked(useErrorRecoveryFlows).mockReturnValue({
-      isEREnabled: true,
+      isERActive: true,
       toggleER: vi.fn(),
       failedCommand: {} as any,
     })

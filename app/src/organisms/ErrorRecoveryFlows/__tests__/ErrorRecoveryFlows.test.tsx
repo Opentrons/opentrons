@@ -30,7 +30,7 @@ describe('useErrorRecovery', () => {
       useErrorRecoveryFlows('MOCK_ID', RUN_STATUS_RUNNING)
     )
 
-    expect(result.current.isEREnabled).toBe(false)
+    expect(result.current.isERActive).toBe(false)
   })
 
   it('should toggle the value of isEREnabled properly', () => {
@@ -41,13 +41,13 @@ describe('useErrorRecovery', () => {
       result.current.toggleER()
     })
 
-    expect(result.current.isEREnabled).toBe(true)
+    expect(result.current.isERActive).toBe(true)
 
     act(() => {
       result.current.toggleER()
     })
 
-    expect(result.current.isEREnabled).toBe(false)
+    expect(result.current.isERActive).toBe(false)
   })
 
   it('should disable error recovery when runStatus is not "awaiting-recovery"', () => {
@@ -65,7 +65,7 @@ describe('useErrorRecovery', () => {
     // @ts-expect-error "running" is a valid status here
     rerender(RUN_STATUS_RUNNING)
 
-    expect(result.current.isEREnabled).toBe(false)
+    expect(result.current.isERActive).toBe(false)
 
     act(() => {
       result.current.toggleER()
@@ -73,7 +73,7 @@ describe('useErrorRecovery', () => {
 
     rerender(RUN_STATUS_AWAITING_RECOVERY)
 
-    expect(result.current.isEREnabled).toBe(false)
+    expect(result.current.isERActive).toBe(false)
   })
 
   it('should return the failed run command', () => {

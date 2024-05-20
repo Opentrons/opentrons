@@ -123,7 +123,7 @@ export function RunningProtocol(): JSX.Element {
   const robotAnalyticsData = useRobotAnalyticsData(robotName)
   const robotType = useRobotType(robotName)
   const enableRunNotes = useFeatureFlag('enableRunNotes')
-  const { isEREnabled, failedCommand, toggleER } = useErrorRecoveryFlows(
+  const { isERActive, failedCommand, toggleER } = useErrorRecoveryFlows(
     runId,
     runStatus
   )
@@ -166,7 +166,7 @@ export function RunningProtocol(): JSX.Element {
 
   return (
     <>
-      {isEREnabled ? (
+      {isERActive ? (
         <ErrorRecoveryFlows runId={runId} failedCommand={failedCommand} />
       ) : null}
       {runStatus === RUN_STATUS_AWAITING_RECOVERY && enableRunNotes ? (

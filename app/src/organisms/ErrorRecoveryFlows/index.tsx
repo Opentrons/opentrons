@@ -9,7 +9,7 @@ import type { RunStatus } from '@opentrons/api-client'
 import type { FailedCommand } from './types'
 
 interface UseErrorRecoveryResult {
-  isEREnabled: boolean
+  isERActive: boolean
   failedCommand: FailedCommand | null
   toggleER: () => void
 }
@@ -18,22 +18,22 @@ export function useErrorRecoveryFlows(
   runId: string,
   runStatus: RunStatus | null
 ): UseErrorRecoveryResult {
-  const [isEREnabled, setIsEREnabled] = React.useState(false)
+  const [isERActive, setIsERActive] = React.useState(false)
   const failedCommand = useCurrentlyFailedRunCommand(runId, runStatus)
 
   const toggleER = (): void => {
-    setIsEREnabled(!isEREnabled)
+    setIsERActive(!isERActive)
   }
 
   // Because multiple ER flows may occur per run, disable ER when the status is not "awaiting-recovery."
   React.useEffect(() => {
-    if (isEREnabled && runStatus !== RUN_STATUS_AWAITING_RECOVERY) {
-      setIsEREnabled(false)
+    if (isERActive && runStatus !== RUN_STATUS_AWAITING_RECOVERY) {
+      setIsERActive(false)
     }
-  }, [isEREnabled, runStatus])
+  }, [isERActive, runStatus])
 
   return {
-    isEREnabled,
+    isERActive,
     failedCommand,
     toggleER,
   }

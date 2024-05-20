@@ -21,13 +21,11 @@ import type {
 
 // TODO(jh, 05-09-24): Migrate utils, useRecoveryCommands.ts, and respective tests to a utils dir, and make each util a separate file.
 
-// TODO(jh, 05-09-24): It is possible for a desktop app not to detect the most recently failed run command if there are
-// too many FIXIT commands. See PR associated with TODO for explanation.
-
 // While the run is "awaiting-recovery", return the most recently failed run command with a protocol intent.
 // Otherwise, returns null.
 const ALL_COMMANDS_POLL_MS = 5000
 
+// TODO(jh, 05-20-24): Update the logic for returning the failed run command once EXEC-458 merges.
 export function useCurrentlyFailedRunCommand(
   runId: string,
   runStatus: RunStatus | null

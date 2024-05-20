@@ -129,6 +129,6 @@ export function useInitialPipetteHome(
   React.useLayoutEffect(() => {
     void setRobotInMotion(true)
       .then(() => homePipetteZAxes())
-      .then(() => setRobotInMotion(false))
+      .finally(() => setRobotInMotion(false))
   }, [])
 }
