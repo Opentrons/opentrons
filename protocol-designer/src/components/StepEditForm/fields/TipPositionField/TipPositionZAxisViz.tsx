@@ -7,6 +7,7 @@ import WELL_CROSS_SECTION_IMAGE from '../../../../images/well_cross_section.svg'
 import styles from './TipPositionInput.module.css'
 
 const WELL_HEIGHT_PIXELS = 145
+const TIP_X_OFFSET_PIXELS = 20
 const PIXEL_DECIMALS = 2
 interface TipPositionZAxisVizProps {
   wellDepthMm: number
@@ -30,7 +31,7 @@ export function TipPositionZAxisViz(
       <img
         src={PIPETTE_TIP_IMAGE}
         className={styles.pipette_tip_image}
-        style={{ bottom: `${bottomPx}px` }}
+        style={{ bottom: `${bottomPx}px`, right: `${TIP_X_OFFSET_PIXELS}px` }}
       />
       {props.wellDepthMm !== null && (
         <span className={styles.well_height_label}>{props.wellDepthMm}mm</span>
