@@ -356,8 +356,8 @@ def test_error_recovery_type_tracking() -> None:
     assert view.get_error_recovery_type("c2") == ErrorRecoveryType.FAIL_RUN
 
 
-def test_get_recovery_in_progress_for_command() -> None:
-    """It should return whether error recovery is in progress for the given command."""
+def test_recovery_target_tracking() -> None:
+    """It should keep track of the command currently undergoing error recovery."""
     subject = CommandStore(config=_make_config(), is_door_open=False)
     subject_view = CommandView(subject.state)
 
@@ -382,12 +382,14 @@ def test_get_recovery_in_progress_for_command() -> None:
     subject.handle_action(fail_1)
 
     # c1 failed recoverably and we're currently recovering from it.
+    assert subject_view.get_recovery_target_id() == "c1"
     assert subject_view.get_recovery_in_progress_for_command("c1")
 
     resume_from_1_recovery = actions.ResumeFromRecoveryAction()
     subject.handle_action(resume_from_1_recovery)
 
     # c1 failed recoverably, but we've already completed its recovery.
+    assert subject_view.get_recovery_target_id() is None
     assert not subject_view.get_recovery_in_progress_for_command("c1")
 
     queue_2 = actions.QueueCommandAction(
@@ -411,6 +413,7 @@ def test_get_recovery_in_progress_for_command() -> None:
     subject.handle_action(fail_2)
 
     # c2 failed recoverably and we're currently recovering from it.
+    assert subject_view.get_recovery_target_id() == "c2"
     assert subject_view.get_recovery_in_progress_for_command("c2")
     # ...and that means we're *not* currently recovering from c1,
     # even though it failed recoverably before.
@@ -439,7 +442,8 @@ def test_get_recovery_in_progress_for_command() -> None:
     subject.handle_action(fail_3)
 
     # c3 failed, but not recoverably.
-    assert not subject_view.get_recovery_in_progress_for_command("c2")
+    assert subject_view.get_recovery_target_id() is None
+    assert not subject_view.get_recovery_in_progress_for_command("c3")
 
 
 def test_final_state_after_estop() -> None:
