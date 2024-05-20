@@ -197,7 +197,7 @@ class MaintenanceRunDataManager:
         else:
             # todo(mm, 2024-05-20):
             # For historical runs to behave consistently with the current run,
-            # this should the most recently completed command, not `None`.
+            # this should be the most recently completed command, not `None`.
             return None
 
     def get_recovery_target_command(self, run_id: str) -> Optional[CommandPointer]:
