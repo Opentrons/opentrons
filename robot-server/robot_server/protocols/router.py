@@ -311,17 +311,35 @@ async def create_protocol(
 
     protocol_auto_deleter.make_room_for_new_protocol()
     protocol_store.insert(protocol_resource)
-
-    task_runner.run(
-        protocol_analyzer.analyze,
-        protocol_resource=protocol_resource,
-        analysis_id=analysis_id,
-        run_time_param_values=parsed_rtp,
-    )
-    pending_analysis = analysis_store.add_pending(
-        protocol_id=protocol_id,
-        analysis_id=analysis_id,
-    )
+    try:
+        run_time_parameters = await protocol_analyzer.load_runner(
+            protocol_resource=protocol_resource,
+            run_time_param_values=parsed_rtp,
+        )
+    except BaseException as error:
+        analysis_store.add_pending(
+            protocol_id=protocol_id,
+            analysis_id=analysis_id,
+            run_time_parameters=[],
+        )
+        await protocol_analyzer.update_to_failed_analysis(
+            analysis_id=analysis_id,
+            protocol_robot_type=protocol_resource.source.robot_type,
+            error=error,
+            run_time_parameters=[],
+        )
+    else:
+        analysis_store.add_pending(
+            protocol_id=protocol_id,
+            analysis_id=analysis_id,
+            run_time_parameters=run_time_parameters,
+        )
+        task_runner.run(
+            protocol_analyzer.analyze,
+            protocol_resource=protocol_resource,
+            analysis_id=analysis_id,
+            run_time_parameters=run_time_parameters,
+        )
 
     data = Protocol(
         id=protocol_id,
@@ -329,7 +347,7 @@ async def create_protocol(
         protocolType=source.config.protocol_type,
         robotType=source.robot_type,
         metadata=Metadata.parse_obj(source.metadata),
-        analysisSummaries=[pending_analysis],
+        analysisSummaries=analysis_store.get_summaries_by_protocol(protocol_id),
         key=key,
         files=[ProtocolFile(name=f.path.name, role=f.role) for f in source.files],
     )
@@ -373,19 +391,39 @@ async def _start_new_analysis_if_necessary(
             analysis_summary=analyses[-1], new_rtp_values=rtp_values
         )
     ):
-        task_runner.run(
-            protocol_analyzer.analyze,
-            protocol_resource=resource,
-            analysis_id=analysis_id,
-            run_time_param_values=rtp_values,
-        )
         started_new_analysis = True
-        analyses.append(
+        try:
+            run_time_parameters = await protocol_analyzer.load_runner(
+                protocol_resource=resource,
+                run_time_param_values=rtp_values,
+            )
+        except BaseException as error:
             analysis_store.add_pending(
                 protocol_id=protocol_id,
                 analysis_id=analysis_id,
+                run_time_parameters=[],
             )
-        )
+            await protocol_analyzer.update_to_failed_analysis(
+                analysis_id=analysis_id,
+                protocol_robot_type=resource.source.robot_type,
+                error=error,
+                run_time_parameters=[],
+            )
+        else:
+            analyses.append(
+                analysis_store.add_pending(
+                    protocol_id=protocol_id,
+                    analysis_id=analysis_id,
+                    run_time_parameters=run_time_parameters,
+                )
+            )
+            task_runner.run(
+                protocol_analyzer.analyze,
+                protocol_resource=resource,
+                analysis_id=analysis_id,
+                run_time_parameters=run_time_parameters,
+            )
+
     return analyses, started_new_analysis
 
 

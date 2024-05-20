@@ -116,7 +116,12 @@ class AnalysisStore:
             current_analyzer_version=_CURRENT_ANALYZER_VERSION,
         )
 
-    def add_pending(self, protocol_id: str, analysis_id: str) -> AnalysisSummary:
+    def add_pending(
+        self,
+        protocol_id: str,
+        analysis_id: str,
+        run_time_parameters: Optional[List[RunTimeParameter]] = None,
+    ) -> AnalysisSummary:
         """Add a new pending analysis to the store.
 
         Args:
@@ -125,12 +130,16 @@ class AnalysisStore:
                 a pending analysis.
             analysis_id: The ID of the new analysis.
                 Must be unique across *all* protocols, not just this one.
+            run_time_parameters: Run time parameters defined in the protocol, along with
+                override values for the run.
 
         Returns:
             A summary of the just-added analysis.
         """
         new_pending_analysis = self._pending_store.add(
-            protocol_id=protocol_id, analysis_id=analysis_id
+            protocol_id=protocol_id,
+            analysis_id=analysis_id,
+            run_time_parameters=run_time_parameters or [],
         )
         return _summarize_pending(pending_analysis=new_pending_analysis)
 
@@ -371,13 +380,20 @@ class _PendingAnalysisStore:
         self._analysis_ids_by_protocol_id: Dict[str, str] = {}
         self._protocol_ids_by_analysis_id: Dict[str, str] = {}
 
-    def add(self, protocol_id: str, analysis_id: str) -> PendingAnalysis:
+    def add(
+        self,
+        protocol_id: str,
+        analysis_id: str,
+        run_time_parameters: List[RunTimeParameter],
+    ) -> PendingAnalysis:
         """Add a new pending analysis and associate it with the given protocol."""
         assert (
             protocol_id not in self._analysis_ids_by_protocol_id
         ), "Protocol must not already have a pending analysis."
 
-        new_pending_analysis = PendingAnalysis.construct(id=analysis_id)
+        new_pending_analysis = PendingAnalysis.construct(
+            id=analysis_id, runTimeParameters=run_time_parameters
+        )
 
         self._analyses_by_id[analysis_id] = new_pending_analysis
         self._analysis_ids_by_protocol_id[protocol_id] = analysis_id

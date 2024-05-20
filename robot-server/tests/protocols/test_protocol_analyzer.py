@@ -163,7 +163,6 @@ async def test_analyze(
     await subject.analyze(
         protocol_resource=protocol_resource,
         analysis_id="analysis-id",
-        run_time_param_values=None,
     )
 
     decoy.verify(
@@ -246,7 +245,6 @@ async def test_analyze_updates_pending_on_error(
     await subject.analyze(
         protocol_resource=protocol_resource,
         analysis_id="analysis-id",
-        run_time_param_values=None,
     )
 
     decoy.verify(
