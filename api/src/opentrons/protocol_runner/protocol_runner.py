@@ -43,6 +43,7 @@ from ..protocol_engine.types import (
     RunTimeParameter,
     RunTimeParamValuesType,
 )
+from ..protocols.types import PythonProtocol
 
 
 class RunResult(NamedTuple):
@@ -193,7 +194,17 @@ class PythonAndLegacyRunner(AbstractRunner):
         protocol = self._protocol_file_reader.read(
             protocol_source, labware_definitions, python_parse_mode
         )
-        self._parameter_context = ParameterContext(api_version=protocol.api_level)
+        if isinstance(protocol, PythonProtocol):
+            self._parameter_context = ParameterContext(api_version=protocol.api_level)
+            run_time_parameters_with_overrides = (
+                self._protocol_executor.extract_run_parameters(
+                    protocol=protocol,
+                    parameter_context=self._parameter_context,
+                    run_time_param_overrides=run_time_param_values,
+                )
+            )
+        else:
+            run_time_parameters_with_overrides = None
         equipment_broker = None
 
         if protocol.api_level < LEGACY_PYTHON_API_VERSION_CUTOFF:
@@ -224,8 +235,7 @@ class PythonAndLegacyRunner(AbstractRunner):
             await self._protocol_executor.execute(
                 protocol=protocol,
                 context=context,
-                parameter_context=self._parameter_context,
-                run_time_param_values=run_time_param_values,
+                run_time_parameters_with_overrides=run_time_parameters_with_overrides,
             )
 
         self._task_queue.set_run_func(run_func)

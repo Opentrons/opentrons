@@ -603,8 +603,7 @@ async def test_load_legacy_python(
         await python_protocol_executor.execute(
             protocol=legacy_protocol,
             context=protocol_context,
-            parameter_context=python_runner_subject._parameter_context,
-            run_time_param_values=None,
+            run_time_parameters_with_overrides=None,
         ),
     )
 
@@ -745,8 +744,7 @@ async def test_load_legacy_json(
         await python_protocol_executor.execute(
             protocol=legacy_protocol,
             context=protocol_context,
-            parameter_context=python_runner_subject._parameter_context,
-            run_time_param_values=None,
+            run_time_parameters_with_overrides=None,
         ),
     )
 
