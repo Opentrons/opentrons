@@ -1,147 +1,131 @@
 export const reagentTransfer = `
-Write a protocol for the Opentrons OT-2 as described below:
-
-Metadata:
-- Application: Reagent transfer
-- Robot: OT-2
-- API: 2.15
+Write a protocol using the Opentrons Python Protocol API v2 for OT-2 robot according to the following description:
+  
+Labware:
+- Source Labware: \`Thermo Scientific Nunc 96 Well Plate 1300 uL\` in slot 9
+- Destination Labware: \`Opentrons 96 Flat Bottom Adapter with NEST 96 Well Plate 200 uL Flat\` in slot 10
+- \`Opentrons 96 Filter Tip Rack 1000 uL\` in slot 8
+- \`Opentrons 96 Tip Rack 1000 uL\` in slot 3
 
 Pipette mount:
-- P1000 Single-Channel GEN2 is mounted on left
-- P300 Single-Channel GEN2 is mounted on right
-
-Labware:
-- Source Labware: Thermo Scientific Nunc 96 Well Plate 2000 µL on slot 7
-- Destination Labware: Opentrons 24 Well Aluminum Block with NEST 0.5 mL Screwcap on slot 3
-- Tiprack: Opentrons 96 Filter Tip Rack 1000 µL on slot 4
+- P1000 Single-Channel GEN2 is mounted on the left
+- P1000 Single-Channel GEN2 is mounted on the right
 
 Commands:
-- Using P1000 Single-Channel GEN2 pipette on left mount, transfer 195.0 uL of reagent
-  from H10, F12, D7, B1, C8  wells in source labware
-  to first well in the destination labware.
-  Use  new tip for each transfer.
+1. Use the left-mounted P1000 Single-Channel GEN2 pipette to transfer 196 uL of reagent from wells A7, A6, A5, A2, A3 
+of the source labware to the corresponding wells A5, A9, A1, A10, A2 of the destination labware. Use a new tip for each transfer.
+2. Use the right-mounted P1000 Single-Channel GEN2 pipette to transfer 8 uL of liquid from wells A9, A12, A6, A10, A3 
+of the source labware to the corresponding wells A7, A11, A6, A3, A9 of the destination labware. Use the same tip for all transfers.
 `
 
 export const flexReagentTransfer = `
-Write a protocol for the Opentrons Flex as described below: 
-
-Metadata and requirements:
-- Application: Reagent transfer
-- Robot: Flex
-- API: 2.15
+Write a protocol using the Opentrons Python Protocol API v2 for Flex robot according to the following description: 
+  
+Labware:
+- Source Labware: \`Opentrons 96 PCR Heater-Shaker Adapter with NEST Well Plate 100 ul\`, in slot D1
+- Destination Labware: \`Opentrons 96 Well Aluminum Block with Bio-Rad Well Plate 200 uL\`, in slot C2
+- Tiprack: \`Opentrons Flex 96 Filter Tip Rack 1000 uL\`,  in slot C1
 
 Pipette Mount:
-- Flex 1-Channel 1000 µL Pipette is mounted on the left side
-- Flex 1-Channel 50 µL Pipette is mounted on the right side
+- Flex 1-Channel 1000 uL Pipette is mounted on the left side
 
-Labware:
-- Source Labware 1: NEST 1 Well Reservoir 195 mL  is positioned on slot B1
-- Source Labware 2: Bio-Rad 384 Well Plate 50 µL is positioned on slot B2
-- Source Labware 3: Bio-Rad 96 Well Plate 200 µL is positioned on slot B3
-- Destination Labware 1: Corning 384 Well Plate 112 µL Flat is positioned on slot D1
-- Destination Labware 2: Corning 96 Well Plate 360 µL Flat is positioned on slot D2
-- Tiprack 1: Opentrons Flex 96 Filter Tip Rack 200 µL is used on slot A1
-- Tiprack 2: Opentrons Flex 96 Filter Tip Rack 50 µL is used on slot A2
-
-Commands
-- Using Flex 1-Channel 50 µL Pipette on right mount, transfer 15 µL from first of source labware 1 to each well
-  in destination labware 1 and destination labware 2. Reuse the same tip.
-- Again using Flex 1-Channel 50 µL Pipette, transfer 20 µL from each well in source labware 2 to
-  each well in the destination labware 1. Reuse the same tip.
-- Using Flex 1-Channel 1000 µL Pipette on left mount, transfer 100µL liquid from each well in source labware 3
-  to each well in destination labware 2. Use a new tip each time.
+Commands:
+1. Using Flex 1-Channel 1000 uL Pipette on left mount, transfer 117.0 uL  of reagent from the first well in source labware 
+to E12, G12, B9, A6, D7 wells in the destination labware. Use a new tip for each transfer.
 `
 
 export const pcr = `
-Write a protocol for the Opentrons OT-2 as described below:
-
-Metadata:
-- Application: ThermoPrime Taq DNA Polymerase, with 10x buffer and separate vial of 25 mM MgCl2Thermo Scientific kit PCR amplification
-- Robot: OT-2
-- API: 2.15
-
-Pipette mount:
-- P20 Single Channel is mounted on the right side
-
+Write a protocol using the Opentrons Python Protocol API v2 for the OT-2 robot according to the following description:
+      
 Modules:
-- Thermocycler module is present on slot 7
-- Temperature module is place on slot 3
+- The thermocycler module is located in slot 7.
+- The sample temperature module is positioned in slot 1.
+- The mastermix temperature module is positioned in slot 3.
 
 Labware:
-- Source sample labware is Opentrons 96 Well Aluminum Block with NEST Well Plate 100 µL plate placed on slot 1
-- Source mastermix labware is Opentrons 24 Well Aluminum Block with NEST 1.5 mL Snapcap, placed on temperature module on slot 3
-- Destination Labware is an Opentrons Tough 96 Well Plate 200 µL PCR Full Skirt placed on thermocycler module on slot 7
-- 20 ul Filter tiprack is used on slot 4
+- The source sample labware, an Opentrons Tough 96 Well Plate 200 uL PCR Full Skirt, is placed on the temperature module in slot 1.
+- The source mastermix labware, an Opentrons Tough 96 Well Plate 200 uL PCR Full Skirt, is placed on the temperature module in slot 3.
+- The destination labware, an Opentrons Tough 96 Well Plate 200 uL PCR Full Skirt, is placed on the thermocycler module in slot 7.
+- A 20 uL filter tip rack is used in slot 4.
 
-Well allocation:
-- source wells are first 41 wells column wise in both master mix and sample source plates
-- destination wells: first 41 wells column wise on thermocycler
+Pipette Mount:
+- A P20 Multi-Channel Gen2 pipette is mounted on the left side.
+
+Well Allocation:
+- Sample source wells: the first 64 wells column-wise in the sample source plate.
+- Mastermix source wells: the first 64 wells column-wise in the mastermix plate.
+- Destination wells: the first 64 wells column-wise in the thermocycler.
 
 Commands:
-Note that every step is a single entity. Do not combine. Also, every step should be performed in order.
-1. The total number of samples is 41
-2. Set the thermocycler such that:
- - block temperature is 6 degree C 
- - lid temperature to 90 degree C
- - lid open 
-3. Set the master mix temperature module at 10 C. The temperature module wait time is 50 seconds.
-4. Transfer 10 uL of mastermix from source well to destination well. Use the same pipette tip for all transfers.
-5. Transfer 3 ul of sample to destination well reusing tip everytime. After dispensing, mix the sample and mastermix
-of 13 ul total volume 4 times and then perform blowout before dropping tip.
-6. Close the lid of the thermocycler.
-7. Set the thermocycle to following parameters  (**note that each step is independent**):
-   Step 1: 66 degree C for 47 seconds for 1 cycles
-   Step 2: 88 degree C for 28 seconds, 82 degree C for 14 seconds, 68 degree C for 68 seconds for 15 cycles
-   Step 3: 70 degree C for 240 seconds for 1 cycles
-Then, execute thermocycler profile for each step.
-8. After the above three steps are completed, hold thermocycler block at 4 C
-9. Open thermocycler lid
-10. Deactivate the temperature modules
+1. Set the total number of samples to 64.
+2. Open the thermocycler lid.
+3. Set the thermocycler block temperature to 6C.
+4. Set the thermocycler lid temperature to 55C.
+5. Set the sample temperature module to 4C.
+6. Set the mastermix temperature module to 10C.
+7. Transfer 7 uL of mastermix from the mastermix source wells to the destination wells. Use the same pipette tip for all transfers.
+8. Transfer 5 uL of the sample from the source to the destination. Mix the sample and mastermix for a total volume of 12 uL 9 times. 
+Blow out to \`destination well\` after each transfer. Use a new tip for each transfer.
+9. Close the thermocycler lid.
+10. Execute the thermocycler with the following profile:
+    - 74C for 65 seconds for 1 cycle, block max volume is sample and mastermix volume
+11. Execute the thermocycler with the following profile:
+    - 60C for 7 seconds, 84C for 19 seconds, 57C for 44 seconds for 13 cycles,  block max volume is sample and mastermix volume
+12. Execute the thermocycler with the following profile:
+    - 75C for 480 seconds for 1 cycle,  block max volume is sample and mastermix volume
+13. Hold the thermocycler block at 4C.
+14. Open the thermocycler lid.
+15. Deactivate the mastermix temperature module.
+16. Deactivate the sample temperature module.
 `
 
 export const flexPcr = `
-Write a protocol for the Opentrons Flex as described below: 
+Write a protocol using the Opentrons Python Protocol API v2 for Flex robot according to the following description:
+      
+Modules:
+- Thermocycler module GEN 2
+- Sample temperature module GEN 2 is placed in slot D1
+- Mastermix temperature module GEN 2 is placed in slot D3
 
-Metadata and requirements:
-- Application: GeneAmp2x PCR amplification
-- Robot: Flex
-- API: 2.15
-
-Pipette mount:
-- Flex 1-Channel 50 µL Pipette is mounted on the right side
-
-Modules and adapters:
-- Thermocycler GEN 2 module is present on slot A1+B1
-- Temperature module GEN 2 is place on slot D3
+Adapter:
+- Opentrons 96 Well Aluminum Block adapter is placed on the sample temperature module GEN 2
+- Opentrons 96 Well Aluminum Block adapter is placed on the mastermix temperature module GEN 2
 
 Labware:
-- Source sample labware is Opentrons 96 Well Aluminum Block with NEST Well Plate 100 µL plate placed on slot D1
-- Source mastermix labware is Opentrons 24 Well Aluminum Block with NEST 1.5 mL Snapcap, placed on temperature module on slot D3
-- Destination Labware is an Opentrons Tough 96 Well Plate 200 µL PCR Full Skirt placed on thermocycler GEN 2 module
-- Opentrons Flex 96 Filter Tip Rack 50 µL is used on slot C1
+- Source sample labware is Opentrons Tough 96 Well Plate 200 uL PCR Full Skirt placed on the adapter on the sample temperature module in slot 1
+- Source mastermix labware is Opentrons Tough 96 Well Plate 200 uL PCR Full Skirt placed on the adapter on the mastermix temperature module in slot 3
+- Destination Labware is an Opentrons Tough 96 Well Plate 200 uL PCR Full Skirt placed on thermocycler module in slot 7
+- Opentrons Flex 96 Filter Tip Rack 1000 uL is used in slot C1
+- Opentrons Flex 96 Filter Tip Rack 50 uL is used in slot C2
 
-Sample position:
-- source wells are first 64 wells column wise in both master mix and sample source plates
-- destination wells: first 64 wells column wise on thermocycler
+Pipette mount:
+- Flex 8-Channel 1000 uL Pipette is mounted on the left side
+- Flex 8-channel 50 ul pipette is mounted on the right side
+
+Well allocation:
+- mastermix source wells: the first 9 columns in the mastermix plate
+- sample source wells: the first 9 columns of the sample plate
+- destination wells: first 9 columns on thermocycler
 
 Commands:
-Note that every step is a single entity. Do not combine. Also, every step should be performed in order.
-1. The total number of samples is 64
-2. Set the thermocycler such that
- - block temperature is 6 degree C
- - lid temperature to 90 degree C
- - lid open 
-3. Set the master mix temperature module at 10 C. The temperature module wait time is 50 seconds.
-4. Transfer 10 uL of mastermix from source well to destination well. Use the same pipette tip for all transfers.
-5. Transfer 3 ul of sample to destination well reusing tip everytime. After dispensing, mix the sample and mastermix
-of 13 ul total volume 4 times and then perform blowout before dropping tip.
-6. Close the lid of the thermocycler.
-7. Set the thermocycle to following parameters  (**note that each step is independent**):
-   Step 1: 66 degree C for 47 seconds for 1 cycles
-   Step 2: 88 degree C for 28 seconds, 82 degree C for 14 seconds, 68 degree C for 68 seconds for 15 cycles
-   Step 3: 70 degree C for 240 seconds for 1 cycles
-Then, execute thermocycler profile for each step.
-8. After the above three steps are completed, hold thermocycler block at 4 C
-9. Open thermocycler lid
-10. Deactivate the temperature modules
+1. Set the total number of samples to 72.
+2. Set the thermocycler block temperature to 6 degree C.
+3. Set the thermocycler lid temperature to 55 degree C.
+4. Open the thermocycler lid.
+5. Set the sample temperature module to 37 degree C.
+6. Set the master mix temperature module to 10 C.
+7. Use right pipette to transfer 15 uL of mastermix from source well to destination well. Use the same pipette tip for all transfers.
+8. Use left pipette to transfer 10 ul of sample from the source to destination well. Mix the sample and mastermix of
+25 ul total volume 9 times. Blow out to \`destination well\`. Use a new tip for each transfer.
+9. Close the thermocycler lid.
+10. Execute the thermocycle with the following profile:
+   - 74 degree C for 65 seconds for 1 cycle, block max volume is sample and mastermix volume
+11. Execute the thermocycle with the following profile:
+   - 60 degree C for 7 seconds, 84 degree C for 19 seconds, 57 degree C for 44 seconds for 25 cycles, block max volume is sample and mastermix volume
+12. Execute the thermocycle with the following profile:
+   - 75 degree C for 480 seconds for 1 cycle, block max volume is sample and mastermix volume
+13. Hold thermocycler block at 4 C.
+14. Open thermocycler lid.
+15. Deactivate the master mix temperature module.
+16. Deactivate the sample temperature module.
 `
