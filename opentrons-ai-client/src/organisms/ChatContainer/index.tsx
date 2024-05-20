@@ -20,6 +20,12 @@ import { chatDataAtom } from '../../resources/atoms'
 export function ChatContainer(): JSX.Element {
   const { t } = useTranslation('protocol_generator')
   const [chatData] = useAtom(chatDataAtom)
+  const scrollRef = React.useRef<HTMLSpanElement | null>(null)
+
+  React.useEffect(() => {
+    if (scrollRef.current != null)
+      scrollRef.current.scrollIntoView({ behavior: 'smooth' })
+  }, [chatData.length])
 
   return (
     <Flex
@@ -49,6 +55,7 @@ export function ChatContainer(): JSX.Element {
             : null}
         </ChatDataContainer>
       </Flex>
+      <span ref={scrollRef} />
       <Flex position={POSITION_STICKY}>
         <ChatFooter />
       </Flex>

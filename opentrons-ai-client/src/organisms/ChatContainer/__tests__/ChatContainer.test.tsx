@@ -9,6 +9,8 @@ import { ChatContainer } from '../index'
 
 vi.mock('../../../molecules/PromptGuide')
 vi.mock('../../../molecules/ChatFooter')
+// Note (kk:05/20/2024) to avoid TypeError: scrollRef.current.scrollIntoView is not a function
+window.HTMLElement.prototype.scrollIntoView = vi.fn()
 
 const render = (): ReturnType<typeof renderWithProviders> => {
   return renderWithProviders(<ChatContainer />, {
