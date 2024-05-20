@@ -1,7 +1,7 @@
 import pytest
 
-from opentrons import APIVersion
 from opentrons.protocol_api import ParameterContext
+from opentrons.protocols.api_support.types import APIVersion
 from opentrons.protocols.execution import execute, execute_python
 from opentrons.protocols.parse import parse
 
