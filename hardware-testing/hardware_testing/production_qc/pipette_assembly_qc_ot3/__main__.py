@@ -1798,8 +1798,8 @@ async def _main(test_config: TestConfig) -> None:  # noqa: C901
                         csv_cb.write([csv_label, round(found_height, 2)])
                     precision = abs(max(probe_data) - min(probe_data)) * 0.5
                     accuracy = sum(probe_data) / len(probe_data)
-                    prec_tag = f"liquid-probe-{tip_vol}-tip-{probe.name.lower()}-probe-precision (03-01:{tip_vol}针管{probe.name.lower()}自动点水精度结果"
-                    acc_tag = f"liquid-probe-{tip_vol}-tip-{probe.name.lower()}-probe-accuracy (03-02:{tip_vol}针管{probe.name.lower()}自动点水准确度结果"
+                    prec_tag = f"liquid-probe-{tip_vol}-tip-{probe.name.lower()}-probe-precision (03-01:{tip_vol}针管{probe.name.lower()}自动点水 精度 结果"
+                    acc_tag = f"liquid-probe-{tip_vol}-tip-{probe.name.lower()}-probe-accuracy (03-02:{tip_vol}针管{probe.name.lower()}自动点水 准确度 结果"
                     tip_tag = f"liquid-probe-{tip_vol}-tip-{probe.name.lower()}-probe (03-02:{tip_vol}针管{probe.name.lower()}自动点水测试结果"
                     precision_passed = bool(
                         precision < LIQUID_PROBE_ERROR_THRESHOLD_PRECISION_MM
@@ -1821,9 +1821,9 @@ async def _main(test_config: TestConfig) -> None:  # noqa: C901
                     if not tip_passed:
                         test_passed = False
                     if not precision_passed:
-                        FINAL_TEST_FAIL_INFOR.append(prec_tag + precision_passed +" 阈值为(<0.4mm)")
+                        FINAL_TEST_FAIL_INFOR.append(prec_tag + _bool_to_pass_fail(precision_passed) +" 阈值为(<0.4mm)")
                     if not accuracy_passed:
-                        FINAL_TEST_FAIL_INFOR.append(acc_tag + accuracy_passed +" 阈值为(<1.5mm)")
+                        FINAL_TEST_FAIL_INFOR.append(acc_tag + _bool_to_pass_fail(accuracy_passed) +" 阈值为(<1.5mm)")
 
             csv_cb.results("liquid-probe", test_passed)
 
@@ -1839,7 +1839,7 @@ async def _main(test_config: TestConfig) -> None:  # noqa: C901
                     droplet_wait_time=droplet_wait_seconds,
                 )
                 if not test_passed:
-                    printsig = f"04-01:吸液保持测试结果FAIL,吸水后等待 {droplet_wait_seconds} 秒针管漏液"
+                    printsig = f"FAIL 04-01:吸液保持结果FAIL,吸水后等待 {droplet_wait_seconds} 秒针管漏液"
                     print(printsig)
                     FINAL_TEST_FAIL_INFOR.append(printsig)
                 csv_cb.results(f"droplets-{droplet_wait_seconds}", test_passed)
@@ -1897,12 +1897,11 @@ async def _main(test_config: TestConfig) -> None:  # noqa: C901
 
         
         if len(FINAL_TEST_FAIL_INFOR) > 0:
-            ui.print_title("电流测试不通过(CURRENT SPEED TESTING FAIL)")
-            printlist = list(set(FINAL_TEST_FAIL_INFOR))
-            for printval in printlist:
+            ui.print_title("移液器诊断测试不通过(QC TESTING FAIL)")
+            for printval in FINAL_TEST_FAIL_INFOR:
                 print(" - ",printval)
         else:
-            ui.print_title("电流测试通过(CURRENT SPEED TESTING PASS)")
+            ui.print_title("移液器诊断测试通过(QC TESTING PASS)")
 
 
     print("done")
