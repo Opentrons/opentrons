@@ -520,6 +520,8 @@ class CommandView(HasState[CommandState]):
         queued_command_ids = self._state.command_history.get_queue_ids()
         total_length = self._state.command_history.length()
 
+        # TODO(mm, 2024-05-17): This looks like it's attempting to do the same thing
+        # as self.get_current(), but in a different way. Can we unify them?
         if cursor is None:
             if running_command is not None:
                 cursor = running_command.index
