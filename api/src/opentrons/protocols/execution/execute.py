@@ -28,12 +28,11 @@ def run_protocol(
     :param protocol: The :py:class:`.protocols.types.Protocol` to execute
     :param context: The protocol context to use.
     :param run_time_parameters_with_overrides: Run time parameters defined in the protocol,
-        updated with the run's RTP override values.
+        updated with the run's RTP override values. When we are running either simulate
+        or execute, this will be None (until RTP is supported in cli commands)
     """
     if isinstance(protocol, PythonProtocol):
         if protocol.api_level >= APIVersion(2, 0):
-            # If this is None here then we're either running simulate or execute, in any case we don't need to report
-            # this in analysis which is the reason we'd pass it to this function
             exec_run(
                 proto=protocol,
                 context=context,
