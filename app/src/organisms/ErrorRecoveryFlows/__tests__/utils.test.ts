@@ -139,8 +139,8 @@ describe('useRouteUpdateActions', () => {
 
     setRobotInMotion(false)
     expect(mockSetRecoveryMap).toHaveBeenCalledWith({
-      route: RECOVERY_MAP.OPTION_SELECTION.ROUTE,
-      step: RECOVERY_MAP.OPTION_SELECTION.STEPS.SELECT,
+      route: RECOVERY_MAP.RESUME.ROUTE,
+      step: RECOVERY_MAP.RESUME.STEPS.CONFIRM_RESUME,
     })
   })
 })

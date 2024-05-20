@@ -110,7 +110,7 @@ export function useRouteUpdateActions({
   setRecoveryMap,
 }: GetRouteUpdateActionsParams): UseRouteUpdateActionsResult {
   const { route: currentRoute, step: currentStep } = recoveryMap
-  const [stashedMap, setStashedMap] = React.useState<IRecoveryMap | null>(null)
+  const stashedMapRef = React.useRef<IRecoveryMap | null>(null)
   const { OPTION_SELECTION, ROBOT_IN_MOTION } = RECOVERY_MAP
 
   // Redirect to the previous step for the current route if it exists, otherwise redirects to the option selection route.
@@ -156,12 +156,7 @@ export function useRouteUpdateActions({
     (route: RecoveryRoute): Promise<void> => {
       return new Promise((resolve, reject) => {
         const newFlowSteps = STEP_ORDER[route]
-
-        setRecoveryMap({
-          route,
-          step: head(newFlowSteps) as RouteStep,
-        })
-
+        setRecoveryMap({ route, step: head(newFlowSteps) as RouteStep })
         resolve()
       })
     },
@@ -173,23 +168,20 @@ export function useRouteUpdateActions({
     (inMotion: boolean, robotMovingRoute?: RobotMovingRoute): Promise<void> => {
       return new Promise((resolve, reject) => {
         if (inMotion) {
-          if (stashedMap == null) {
-            setStashedMap({ route: currentRoute, step: currentStep })
+          if (stashedMapRef.current == null) {
+            stashedMapRef.current = { route: currentRoute, step: currentStep }
           }
+
           const route = robotMovingRoute ?? ROBOT_IN_MOTION.ROUTE
           const step =
             robotMovingRoute != null
               ? (head(STEP_ORDER[robotMovingRoute]) as RouteStep)
               : ROBOT_IN_MOTION.STEPS.IN_MOTION
-
-          setRecoveryMap({
-            route,
-            step,
-          })
+          setRecoveryMap({ route, step })
         } else {
-          if (stashedMap != null) {
-            setRecoveryMap(stashedMap)
-            setStashedMap(null)
+          if (stashedMapRef.current != null) {
+            setRecoveryMap(stashedMapRef.current)
+            stashedMapRef.current = null
           } else {
             setRecoveryMap({
               route: OPTION_SELECTION.ROUTE,
@@ -201,7 +193,7 @@ export function useRouteUpdateActions({
         resolve()
       })
     },
-    [currentRoute, currentStep, stashedMap]
+    [currentRoute, currentStep]
   )
 
   return { goBackPrevStep, proceedNextStep, proceedToRoute, setRobotInMotion }

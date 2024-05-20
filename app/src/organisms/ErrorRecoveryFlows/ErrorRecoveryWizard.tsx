@@ -36,8 +36,8 @@ export function ErrorRecoveryWizard({
    * Recovery Step: Analogous to a "step" in other wizard flows.
    */
   const [recoveryMap, setRecoveryMap] = React.useState<IRecoveryMap>({
-    route: RECOVERY_MAP.ROBOT_IN_MOTION.ROUTE, // Initialize the route to "in motion", since wizard always start with a home command.
-    step: RECOVERY_MAP.ROBOT_IN_MOTION.STEPS.IN_MOTION,
+    route: RECOVERY_MAP.OPTION_SELECTION.ROUTE,
+    step: RECOVERY_MAP.OPTION_SELECTION.STEPS.SELECT,
   })
 
   const errorKind = getErrorKind(failedCommand?.error?.errorType)
@@ -125,7 +125,8 @@ export function useInitialPipetteHome(
   const { homePipetteZAxes } = recoveryCommands
   const { setRobotInMotion } = routeUpdateActions
 
-  React.useEffect(() => {
+  // Synchronously set the recovery route to "robot in motion" before initial render to prevent screen flicker on ER launch.
+  React.useLayoutEffect(() => {
     void setRobotInMotion(true)
       .then(() => homePipetteZAxes())
       .then(() => setRobotInMotion(false))
