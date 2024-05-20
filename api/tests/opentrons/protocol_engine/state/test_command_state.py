@@ -382,14 +382,16 @@ def test_recovery_target_tracking() -> None:
     subject.handle_action(fail_1)
 
     # c1 failed recoverably and we're currently recovering from it.
-    assert subject_view.get_recovery_target_id() == "c1"
+    recovery_target = subject_view.get_recovery_target()
+    assert recovery_target is not None
+    assert recovery_target.command_id == "c1"
     assert subject_view.get_recovery_in_progress_for_command("c1")
 
     resume_from_1_recovery = actions.ResumeFromRecoveryAction()
     subject.handle_action(resume_from_1_recovery)
 
     # c1 failed recoverably, but we've already completed its recovery.
-    assert subject_view.get_recovery_target_id() is None
+    assert subject_view.get_recovery_target() is None
     assert not subject_view.get_recovery_in_progress_for_command("c1")
 
     queue_2 = actions.QueueCommandAction(
@@ -413,7 +415,9 @@ def test_recovery_target_tracking() -> None:
     subject.handle_action(fail_2)
 
     # c2 failed recoverably and we're currently recovering from it.
-    assert subject_view.get_recovery_target_id() == "c2"
+    recovery_target = subject_view.get_recovery_target()
+    assert recovery_target is not None
+    assert recovery_target.command_id == "c2"
     assert subject_view.get_recovery_in_progress_for_command("c2")
     # ...and that means we're *not* currently recovering from c1,
     # even though it failed recoverably before.
@@ -442,7 +446,7 @@ def test_recovery_target_tracking() -> None:
     subject.handle_action(fail_3)
 
     # c3 failed, but not recoverably.
-    assert subject_view.get_recovery_target_id() is None
+    assert subject_view.get_recovery_target() is None
     assert not subject_view.get_recovery_in_progress_for_command("c3")
 
 

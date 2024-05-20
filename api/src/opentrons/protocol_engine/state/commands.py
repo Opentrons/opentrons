@@ -751,13 +751,24 @@ class CommandView(HasState[CommandState]):
 
         return no_command_running and no_command_to_execute
 
-    def get_recovery_target_id(self) -> Optional[str]:
-        """Return the ID of the command currently undergoing error recovery, if any."""
-        return self._state.recovery_target_command_id
+    def get_recovery_target(self) -> Optional[CommandPointer]:
+        """Return the command currently undergoing error recovery, if any."""
+        recovery_target_command_id = self._state.recovery_target_command_id
+        if recovery_target_command_id is None:
+            return None
+        else:
+            entry = self._state.command_history.get(recovery_target_command_id)
+            return CommandPointer(
+                command_id=entry.command.id,
+                command_key=entry.command.key,
+                created_at=entry.command.createdAt,
+                index=entry.index,
+            )
 
     def get_recovery_in_progress_for_command(self, command_id: str) -> bool:
         """Return whether the given command failed and its error recovery is in progress."""
-        return self.get_recovery_target_id() == command_id
+        pointer = self.get_recovery_target()
+        return pointer is not None and pointer.command_id == command_id
 
     def raise_fatal_command_error(self) -> None:
         """Raise the run's fatal command error, if there was one, as an exception.
