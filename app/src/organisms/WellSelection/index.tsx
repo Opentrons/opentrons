@@ -23,7 +23,6 @@ import type { GenericRect } from './types'
 
 interface WellSelectionProps {
   definition: LabwareDefinition2
-  /** array of primary wells. Overrides labwareProps.selectedWells */
   selectedPrimaryWells: WellGroup
   selectWells: (wellGroup: WellGroup) => unknown
   channels: PipetteChannels
