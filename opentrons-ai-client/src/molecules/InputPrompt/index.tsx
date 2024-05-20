@@ -17,9 +17,13 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { SendButton } from '../../atoms/SendButton'
-import { preparedPromptAtom, chatDataAtom } from '../../resources/atoms'
+import {
+  preparedPromptAtom,
+  chatDataAtom,
+  chatHistoryAtom,
+} from '../../resources/atoms'
 
-import type { ChatData } from '../../resources/types'
+import type { Chat, ChatData } from '../../resources/types'
 
 const url =
   'https://fk0py9eu3e.execute-api.us-east-2.amazonaws.com/sandbox/chat/completion'
@@ -37,6 +41,7 @@ export function InputPrompt(): JSX.Element {
   })
   const [preparedPrompt] = useAtom(preparedPromptAtom)
   const [, setChatData] = useAtom(chatDataAtom)
+  const [chatHistory, setChatHistory] = useAtom(chatHistoryAtom)
   const [submitted, setSubmitted] = React.useState<boolean>(false)
 
   const [data, setData] = React.useState<any>(null)
@@ -63,8 +68,12 @@ export function InputPrompt(): JSX.Element {
             audience: 'sandbox-ai-api',
           },
         })
+        const message: Chat = {
+          role: 'user',
+          content: prompt,
+        }
         const postData = {
-          message: prompt,
+          messages: [...chatHistory, message],
           fake: false,
         }
         const headers = {
@@ -87,6 +96,10 @@ export function InputPrompt(): JSX.Element {
       role: 'user',
       reply: userPrompt,
     }
+    setChatHistory(chatHistory => [
+      ...chatHistory,
+      { role: 'user', content: userPrompt },
+    ])
     setChatData(chatData => [...chatData, userInput])
     void fetchData(userPrompt)
     setSubmitted(true)
@@ -104,6 +117,7 @@ export function InputPrompt(): JSX.Element {
         role,
         reply,
       }
+      setChatHistory(chatHistory => [...chatHistory, { role, content: reply }])
       setChatData(chatData => [...chatData, assistantResponse])
       setSubmitted(false)
     }
