@@ -3,7 +3,7 @@ from typing import Optional
 
 from opentrons.protocol_api import ProtocolContext
 from opentrons.protocol_api._parameters import Parameters
-from opentrons.protocols.execution.execute_python import run_python
+from opentrons.protocols.execution.execute_python import exec_run
 from opentrons.protocols.execution.json_dispatchers import (
     pipette_command_map,
     temperature_module_command_map,
@@ -34,7 +34,7 @@ def run_protocol(
         if protocol.api_level >= APIVersion(2, 0):
             # If this is None here then we're either running simulate or execute, in any case we don't need to report
             # this in analysis which is the reason we'd pass it to this function
-            run_python(
+            exec_run(
                 proto=protocol,
                 context=context,
                 run_time_parameters_with_overrides=run_time_parameters_with_overrides,
