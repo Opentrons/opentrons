@@ -154,7 +154,6 @@ export function EquipmentOption(props: EquipmentOptionProps): JSX.Element {
     } else if (numItems > 0) {
       downArrowStyle = ARROW_STYLE_ACTIVE
     }
-
     iconInfo = (
       <Flex
         flexDirection={DIRECTION_COLUMN}
@@ -179,7 +178,7 @@ export function EquipmentOption(props: EquipmentOptionProps): JSX.Element {
         <Flex
           data-testid="EquipmentOption_downArrow"
           onClick={
-            isDisabled || numMultiples === 0
+            numMultiples === 0
               ? undefined
               : () => {
                   multiples.setValue(numMultiples - 1)

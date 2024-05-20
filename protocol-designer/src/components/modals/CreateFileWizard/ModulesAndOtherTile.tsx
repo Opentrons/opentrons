@@ -223,7 +223,7 @@ function FlexModuleFields(props: WizardTileProps): JSX.Element {
           getNumSlotsAvailable(modules, additionalEquipment) === 0
         //  special-casing TC since it takes up 2 slots
         if (moduleType === THERMOCYCLER_MODULE_TYPE) {
-          isDisabled = getNumSlotsAvailable(modules, additionalEquipment) === 1
+          isDisabled = getNumSlotsAvailable(modules, additionalEquipment) <= 1
         }
 
         const handleMultiplesClick = (num: number): void => {
