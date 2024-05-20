@@ -20,7 +20,7 @@ import {
 } from '@opentrons/api-client'
 import { useStopRunMutation } from '@opentrons/react-api-client'
 
-import { getModalPortalEl } from '../../App/portal'
+import { getTopPortalEl } from '../../App/portal'
 import { LegacyModal } from '../../molecules/LegacyModal'
 import { useTrackProtocolRunEvent, useIsFlex } from '../Devices/hooks'
 import { useRunStatus } from '../RunTimeControl/hooks'
@@ -108,6 +108,6 @@ export function ConfirmCancelModal(
         </Flex>
       </Flex>
     </LegacyModal>,
-    getModalPortalEl()
+    getTopPortalEl()
   )
 }

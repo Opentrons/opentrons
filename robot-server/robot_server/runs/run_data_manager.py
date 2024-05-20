@@ -335,7 +335,8 @@ class RunDataManager:
             )
         else:
             state_summary = self._engine_store.engine.state_view.get_summary()
-            parameters = self._engine_store.runner.run_time_parameters
+            runner = self._engine_store.runner
+            parameters = runner.run_time_parameters if runner else []
             run_resource = self._run_store.get(run_id=run_id)
 
         return _build_run(
@@ -373,7 +374,10 @@ class RunDataManager:
         )
 
     def get_current_command(self, run_id: str) -> Optional[CurrentCommand]:
-        """Get the currently executing command, if any.
+        """Get the "current" command, if any.
+
+        See `ProtocolEngine.state_view.commands.get_current()` for the definition
+        of "current."
 
         Args:
             run_id: ID of the run.
@@ -423,6 +427,7 @@ class RunDataManager:
 
     def _get_run_time_parameters(self, run_id: str) -> List[RunTimeParameter]:
         if run_id == self._engine_store.current_run_id:
-            return self._engine_store.runner.run_time_parameters
+            runner = self._engine_store.runner
+            return runner.run_time_parameters if runner else []
         else:
             return self._run_store.get_run_time_parameters(run_id=run_id)

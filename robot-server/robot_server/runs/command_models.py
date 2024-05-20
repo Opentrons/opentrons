@@ -4,7 +4,6 @@ These are shared between the `/runs` and `/maintenance_runs` endpoints.
 """
 
 from datetime import datetime
-from textwrap import dedent
 from typing import Optional
 
 from pydantic import BaseModel, Field
@@ -49,18 +48,20 @@ class CommandCollectionLinks(BaseModel):
 
     current: Optional[CommandLink] = Field(
         None,
-        description="Information about the currently running or next queued command.",
+        description=(
+            'Information about the "current" command.'
+            ' The "current" command is the one that\'s running right now,'
+            " or, if there is none, the one that was running most recently."
+        ),
     )
 
     recoveryTarget: Optional[CommandLink] = Field(
         None,
-        description=dedent(
-            """\
-            Information about the command currently undergoing error recovery.
-
-            This is basically the most recent protocol command to have failed,
-            except that once you complete error recovery (see `GET /runs/{id}/actions`),
-            this goes back to being `null` or omitted.
-            """
+        description=(
+            "Information about the command currently undergoing error recovery."
+            " This is basically the most recent protocol command to have failed,"
+            " except that once you complete error recovery"
+            " (see `GET /runs/{id}/actions`), this goes back to being"
+            " `null` or omitted."
         ),
     )

@@ -184,7 +184,10 @@ class MaintenanceRunDataManager:
         return the_slice
 
     def get_current_command(self, run_id: str) -> Optional[CurrentCommand]:
-        """Get the currently executing command, if any.
+        """Get the "current" command, if any.
+
+        See `ProtocolEngine.state_view.commands.get_current()` for the definition
+        of "current."
 
         Args:
             run_id: ID of the run.
