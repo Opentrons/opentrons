@@ -36,10 +36,7 @@ from .post_process import process_csv_directory, process_google_sheet
 
 from hardware_testing.protocols.liquid_sense_lpc import (
     liquid_sense_ot3_p50_single_vial,
-    liquid_sense_ot3_p50_multi,
     liquid_sense_ot3_p1000_single_vial,
-    liquid_sense_ot3_p1000_multi,
-    liquid_sense_ot3_p1000_96,
 )
 
 API_LEVEL = "2.18"
@@ -62,12 +59,12 @@ MAX_PROBE_SECONDS = 3.5
 LIQUID_SENSE_CFG = {
     50: {
         1: liquid_sense_ot3_p50_single_vial,
-        8: liquid_sense_ot3_p50_multi,
+        8: None,
     },
     1000: {
         1: liquid_sense_ot3_p1000_single_vial,
-        8: liquid_sense_ot3_p1000_multi,
-        96: liquid_sense_ot3_p1000_96,
+        8: None,
+        96: None,
     },
 }
 
