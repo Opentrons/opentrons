@@ -18,7 +18,7 @@ from typing import (
     Union,
 )
 
-from opentrons import APIVersion
+from opentrons.protocols.api_support.types import APIVersion
 
 from g_code_parsing.errors import UnparsableCLICommandError
 from g_code_parsing.g_code_differ import GCodeDiffer

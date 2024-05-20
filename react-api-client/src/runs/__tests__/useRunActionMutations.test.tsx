@@ -6,14 +6,16 @@ import { act, renderHook } from '@testing-library/react'
 import { RUN_ID_1 } from '../__fixtures__'
 import {
   useRunActionMutations,
-  UsePlayRunMutationResult,
-  UsePauseRunMutationResult,
-  UseStopRunMutationResult,
-  UseResumeRunFromRecoveryMutationResult,
   usePlayRunMutation,
   usePauseRunMutation,
   useStopRunMutation,
   useResumeRunFromRecoveryMutation,
+} from '..'
+import type {
+  UsePlayRunMutationResult,
+  UsePauseRunMutationResult,
+  UseStopRunMutationResult,
+  UseResumeRunFromRecoveryMutationResult,
 } from '..'
 
 vi.mock('../usePlayRunMutation')

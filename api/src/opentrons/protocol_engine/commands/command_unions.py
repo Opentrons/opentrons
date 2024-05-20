@@ -1,9 +1,11 @@
 """Union types of concrete command definitions."""
 
-from typing import Union, TypeVar
+from typing import Union
 from typing_extensions import Annotated
 
 from pydantic import Field
+
+from .command import DefinedErrorData
 
 from . import heater_shaker
 from . import magnetic_module
@@ -203,6 +205,8 @@ from .pick_up_tip import (
     PickUpTipCreate,
     PickUpTipResult,
     PickUpTipCommandType,
+    TipPhysicallyMissingError,
+    TipPhysicallyMissingErrorInternalData,
 )
 
 from .touch_tip import (
@@ -624,4 +628,8 @@ CommandPrivateResult = Union[
     ConfigureNozzleLayoutPrivateResult,
 ]
 
-CommandT = TypeVar("CommandT", bound=Command)
+# All `DefinedErrorData`s that implementations will actually return in practice.
+# There's just one right now, but this will eventually be a Union.
+CommandDefinedErrorData = DefinedErrorData[
+    TipPhysicallyMissingError, TipPhysicallyMissingErrorInternalData
+]

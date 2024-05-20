@@ -22,12 +22,12 @@ import {
   getLabwareFieldForPositioningField,
 } from '../StepEditForm/utils'
 import { FormColumn } from './FormColumn'
-import { FieldPropsByName } from '../StepEditForm/types'
-import { WellOrderOption } from '../../form-types'
 // TODO(IL, 2021-03-01): refactor these fragmented style rules (see #7402)
 import formStyles from '../forms/forms.module.css'
 import styles from '../StepEditForm/StepEditForm.module.css'
 import buttonStyles from '../StepEditForm/ButtonRow/styles.module.css'
+import type { FieldPropsByName } from '../StepEditForm/types'
+import type { WellOrderOption } from '../../form-types'
 
 interface BatchEditMixProps {
   batchEditFormHasChanges: boolean

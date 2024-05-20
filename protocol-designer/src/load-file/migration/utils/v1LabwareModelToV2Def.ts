@@ -1,5 +1,5 @@
 import { getOnlyLatestDefs } from '../../../labware-defs'
-import { LabwareDefinition2 } from '@opentrons/shared-data'
+import type { LabwareDefinition2 } from '@opentrons/shared-data'
 const v1ModelTov2LoadNameMap = {
   '6-well-plate': 'corning_6_wellplate_16.8ml_flat',
   '12-well-plate': 'corning_12_wellplate_6.9ml_flat',

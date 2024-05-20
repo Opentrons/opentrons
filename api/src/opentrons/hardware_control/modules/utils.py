@@ -12,6 +12,7 @@ from .tempdeck import TempDeck
 from .magdeck import MagDeck
 from .thermocycler import Thermocycler
 from .heater_shaker import HeaterShaker
+from .absorbance_reader import AbsorbanceReader
 
 
 log = logging.getLogger(__name__)
@@ -24,6 +25,7 @@ MODULE_TYPE_BY_NAME = {
     TempDeck.name(): TempDeck.MODULE_TYPE,
     Thermocycler.name(): Thermocycler.MODULE_TYPE,
     HeaterShaker.name(): HeaterShaker.MODULE_TYPE,
+    AbsorbanceReader.name(): AbsorbanceReader.MODULE_TYPE,
 }
 
 _MODULE_CLS_BY_TYPE: Dict[ModuleType, Type[AbstractModule]] = {
@@ -31,6 +33,7 @@ _MODULE_CLS_BY_TYPE: Dict[ModuleType, Type[AbstractModule]] = {
     TempDeck.MODULE_TYPE: TempDeck,
     Thermocycler.MODULE_TYPE: Thermocycler,
     HeaterShaker.MODULE_TYPE: HeaterShaker,
+    AbsorbanceReader.MODULE_TYPE: AbsorbanceReader,
 }
 
 

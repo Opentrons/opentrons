@@ -1,10 +1,10 @@
 import * as React from 'react'
-import { UseQueryResult } from 'react-query'
 import { fireEvent, screen, waitFor } from '@testing-library/react'
 import { vi, it, expect, describe, beforeEach, afterEach } from 'vitest'
 import { when } from 'vitest-when'
 import { MemoryRouter } from 'react-router-dom'
 
+import { RUN_STATUS_IDLE } from '@opentrons/api-client'
 import {
   FLEX_ROBOT_TYPE,
   WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE,
@@ -39,7 +39,7 @@ import { useNotifyDeckConfigurationQuery } from '../../../resources/deck_configu
 import { useRunStatus } from '../../RunTimeControl/hooks'
 
 import type { CutoutConfig, DeckConfiguration } from '@opentrons/shared-data'
-import { RUN_STATUS_IDLE } from '@opentrons/api-client'
+import type { UseQueryResult } from 'react-query'
 
 vi.mock('../../../resources/runs')
 vi.mock('../../../redux/discovery')

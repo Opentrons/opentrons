@@ -27,7 +27,7 @@ interface ChatDisplayProps {
 export function ChatDisplay({ chat, chatId }: ChatDisplayProps): JSX.Element {
   const { t } = useTranslation('protocol_generator')
   const [isCopied, setIsCopied] = React.useState<boolean>(false)
-  const { role, content } = chat
+  const { role, reply } = chat
   const isUser = role === 'user'
 
   const handleClickCopy = async (): Promise<void> => {
@@ -71,13 +71,13 @@ export function ChatDisplay({ chat, chatId }: ChatDisplayProps): JSX.Element {
             code: CodeText,
           }}
         >
-          {content}
+          {reply}
         </Markdown>
-        {role === 'assistant' ? (
+        {!isUser ? (
           <PrimaryButton
             position={POSITION_ABSOLUTE}
             right={SPACING.spacing16}
-            bottom={`-${SPACING.spacing16}`}
+            bottom={`-${SPACING.spacing24}`}
             borderRadius={BORDERS.borderRadiusFull}
             onClick={handleClickCopy}
           >

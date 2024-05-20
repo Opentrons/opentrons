@@ -4,6 +4,7 @@ import styled, { css } from 'styled-components'
 import { useForm } from 'react-hook-form'
 import { useAtom } from 'jotai'
 import axios from 'axios'
+import { useAuth0 } from '@auth0/auth0-react'
 
 import {
   ALIGN_CENTER,
@@ -20,8 +21,8 @@ import { preparedPromptAtom, chatDataAtom } from '../../resources/atoms'
 
 import type { ChatData } from '../../resources/types'
 
-// ToDo (kk:05/02/2024) This url is temporary
-const url = 'http://localhost:8000/streaming/ask'
+const url =
+  'https://fk0py9eu3e.execute-api.us-east-2.amazonaws.com/sandbox/chat/completion'
 
 interface InputType {
   userPrompt: string
@@ -40,7 +41,10 @@ export function InputPrompt(): JSX.Element {
 
   const [data, setData] = React.useState<any>(null)
   const [loading, setLoading] = React.useState<boolean>(false)
-  const [error, setError] = React.useState<string>('')
+  // ToDo (kk:05/15/2024) this will be used in the future
+  // const [error, setError] = React.useState<string>('')
+
+  const { getAccessTokenSilently } = useAuth0()
 
   const userPrompt = watch('userPrompt') ?? ''
 
@@ -49,19 +53,29 @@ export function InputPrompt(): JSX.Element {
     return rowsNum
   }
 
+  // ToDo (kk:05/15/2024) This will be moved to a better place
   const fetchData = async (prompt: string): Promise<void> => {
     if (prompt !== '') {
       setLoading(true)
       try {
-        const response = await axios.post(url, {
-          headers: {
-            'Content-Type': 'application/json',
+        const accessToken = await getAccessTokenSilently({
+          authorizationParams: {
+            audience: 'sandbox-ai-api',
           },
-          query: prompt,
         })
+        const postData = {
+          message: prompt,
+          fake: false,
+        }
+        const headers = {
+          Authorization: `Bearer ${accessToken}`,
+          'Content-Type': 'application/json',
+        }
+        const response = await axios.post(url, postData, { headers })
         setData(response.data)
       } catch (err) {
-        setError('Error fetching data from the API.')
+        // setError('Error fetching data from the API.')
+        console.error(`error: ${err}`)
       } finally {
         setLoading(false)
       }
@@ -71,7 +85,7 @@ export function InputPrompt(): JSX.Element {
   const handleClick = (): void => {
     const userInput: ChatData = {
       role: 'user',
-      content: userPrompt,
+      reply: userPrompt,
     }
     setChatData(chatData => [...chatData, userInput])
     void fetchData(userPrompt)
@@ -84,11 +98,11 @@ export function InputPrompt(): JSX.Element {
   }, [preparedPrompt, setValue])
 
   React.useEffect(() => {
-    if (submitted && data && !loading) {
-      const { role, content } = data.data
+    if (submitted && data != null && !loading) {
+      const { role, reply } = data
       const assistantResponse: ChatData = {
         role,
-        content,
+        reply,
       }
       setChatData(chatData => [...chatData, assistantResponse])
       setSubmitted(false)
@@ -96,7 +110,7 @@ export function InputPrompt(): JSX.Element {
   }, [data, loading, submitted])
 
   // ToDo (kk:05/02/2024) This is also temp. Asking the design about error.
-  console.error('error', error)
+  // console.error('error', error)
 
   return (
     <StyledForm id="User_Prompt">
@@ -149,6 +163,7 @@ const StyledTextarea = styled.textarea`
   width: 100%;
   font-size: ${TYPOGRAPHY.fontSize20};
   line-height: ${TYPOGRAPHY.lineHeight24};
+  padding: 1.2rem 0;
 
   ::placeholder {
     position: absolute;

@@ -37,7 +37,7 @@ from .command_unions import (
     CommandResult,
     CommandType,
     CommandPrivateResult,
-    CommandT,
+    CommandDefinedErrorData,
 )
 
 from .aspirate import (
@@ -332,10 +332,9 @@ __all__ = [
     "CommandResult",
     "CommandType",
     "CommandPrivateResult",
-    "CommandT",
+    "CommandDefinedErrorData",
     # base interfaces
     "AbstractCommandImpl",
-    "AbstractCommandWithPrivateResultImpl",
     "BaseCommand",
     "BaseCommandCreate",
     "CommandStatus",

@@ -19,6 +19,7 @@
   },
   "homepage": "https://github.com/Opentrons/opentrons",
   "dependencies": {
+    "@auth0/auth0-react": "2.2.4",
     "@fontsource/public-sans": "5.0.3",
     "@opentrons/components": "link:../components",
     "axios": "^0.21.1",

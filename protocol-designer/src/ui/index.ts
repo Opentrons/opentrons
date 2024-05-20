@@ -1,6 +1,9 @@
-import { combineReducers, Reducer } from 'redux'
-import { rootReducer as stepsReducer, StepsState } from './steps/reducers'
-import { Action } from '../types'
+import { combineReducers } from 'redux'
+import { rootReducer as stepsReducer } from './steps/reducers'
+import type { Reducer } from 'redux'
+import type { Action } from '../types'
+import type { StepsState } from './steps/reducers'
+
 export interface RootState {
   steps: StepsState
 }

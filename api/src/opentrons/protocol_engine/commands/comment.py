@@ -4,7 +4,8 @@ from pydantic import BaseModel, Field
 from typing import Optional, Type
 from typing_extensions import Literal
 
-from .command import AbstractCommandImpl, BaseCommand, BaseCommandCreate
+from .command import AbstractCommandImpl, BaseCommand, BaseCommandCreate, SuccessData
+from ..errors.error_occurrence import ErrorOccurrence
 
 CommentCommandType = Literal["comment"]
 
@@ -22,18 +23,20 @@ class CommentResult(BaseModel):
     """Result data from the execution of a Comment command."""
 
 
-class CommentImplementation(AbstractCommandImpl[CommentParams, CommentResult]):
+class CommentImplementation(
+    AbstractCommandImpl[CommentParams, SuccessData[CommentResult, None]]
+):
     """Comment command implementation."""
 
     def __init__(self, **kwargs: object) -> None:
         pass
 
-    async def execute(self, params: CommentParams) -> CommentResult:
+    async def execute(self, params: CommentParams) -> SuccessData[CommentResult, None]:
         """No operation taken other than capturing message in command."""
-        return CommentResult()
+        return SuccessData(public=CommentResult(), private=None)
 
 
-class Comment(BaseCommand[CommentParams, CommentResult]):
+class Comment(BaseCommand[CommentParams, CommentResult, ErrorOccurrence]):
     """Comment command model."""
 
     commandType: CommentCommandType = "comment"

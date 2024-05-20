@@ -4,7 +4,8 @@ from pydantic import BaseModel, Field
 from typing import TYPE_CHECKING, Optional, Type
 from typing_extensions import Literal
 
-from .command import AbstractCommandImpl, BaseCommand, BaseCommandCreate
+from .command import AbstractCommandImpl, BaseCommand, BaseCommandCreate, SuccessData
+from ..errors.error_occurrence import ErrorOccurrence
 
 if TYPE_CHECKING:
     from ..state import StateView
@@ -45,7 +46,7 @@ class ReloadLabwareResult(BaseModel):
 
 
 class ReloadLabwareImplementation(
-    AbstractCommandImpl[ReloadLabwareParams, ReloadLabwareResult]
+    AbstractCommandImpl[ReloadLabwareParams, SuccessData[ReloadLabwareResult, None]]
 ):
     """Reload labware command implementation."""
 
@@ -55,19 +56,26 @@ class ReloadLabwareImplementation(
         self._equipment = equipment
         self._state_view = state_view
 
-    async def execute(self, params: ReloadLabwareParams) -> ReloadLabwareResult:
+    async def execute(
+        self, params: ReloadLabwareParams
+    ) -> SuccessData[ReloadLabwareResult, None]:
         """Reload the definition and calibration data for a specific labware."""
         reloaded_labware = await self._equipment.reload_labware(
             labware_id=params.labwareId,
         )
 
-        return ReloadLabwareResult(
-            labwareId=params.labwareId,
-            offsetId=reloaded_labware.offsetId,
+        return SuccessData(
+            public=ReloadLabwareResult(
+                labwareId=params.labwareId,
+                offsetId=reloaded_labware.offsetId,
+            ),
+            private=None,
         )
 
 
-class ReloadLabware(BaseCommand[ReloadLabwareParams, ReloadLabwareResult]):
+class ReloadLabware(
+    BaseCommand[ReloadLabwareParams, ReloadLabwareResult, ErrorOccurrence]
+):
     """Reload labware command resource model."""
 
     commandType: ReloadLabwareCommandType = "reloadLabware"

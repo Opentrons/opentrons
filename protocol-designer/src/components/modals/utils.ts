@@ -2,9 +2,9 @@ import {
   getLabwareDefURI,
   getLabwareDisplayName,
   getPipetteSpecsV2,
-  PipetteName,
 } from '@opentrons/shared-data'
-import { LabwareDefByDefURI } from '../../labware-defs'
+import type { PipetteName } from '@opentrons/shared-data'
+import type { LabwareDefByDefURI } from '../../labware-defs'
 
 export interface TiprackOption {
   name: string

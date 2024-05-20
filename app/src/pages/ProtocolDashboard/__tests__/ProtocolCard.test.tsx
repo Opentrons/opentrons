@@ -2,7 +2,6 @@ import * as React from 'react'
 import { vi, it, describe, expect, beforeEach } from 'vitest'
 import { act, fireEvent, screen } from '@testing-library/react'
 import { MemoryRouter } from 'react-router-dom'
-import { UseQueryResult } from 'react-query'
 import {
   useMostRecentSuccessfulAnalysisAsDocumentQuery,
   useProtocolAnalysisAsDocumentQuery,
@@ -12,7 +11,7 @@ import { renderWithProviders } from '../../../__testing-utils__'
 import { i18n } from '../../../i18n'
 import { ProtocolCard } from '../ProtocolCard'
 import type * as ReactRouterDom from 'react-router-dom'
-
+import type { UseQueryResult } from 'react-query'
 import type {
   CompletedProtocolAnalysis,
   ProtocolResource,

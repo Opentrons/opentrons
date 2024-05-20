@@ -1,4 +1,4 @@
-import {
+import type {
   HORIZONTAL_PLANE,
   VERTICAL_PLANE,
   NULL_STEP_SIZE_MM,

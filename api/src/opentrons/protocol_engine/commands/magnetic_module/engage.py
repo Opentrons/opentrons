@@ -5,7 +5,8 @@ from typing_extensions import Literal, Type
 
 from pydantic import BaseModel, Field
 
-from ..command import AbstractCommandImpl, BaseCommand, BaseCommandCreate
+from ..command import AbstractCommandImpl, BaseCommand, BaseCommandCreate, SuccessData
+from ...errors.error_occurrence import ErrorOccurrence
 
 if TYPE_CHECKING:
     from opentrons.protocol_engine.execution import EquipmentHandler
@@ -52,7 +53,9 @@ class EngageResult(BaseModel):
     pass
 
 
-class EngageImplementation(AbstractCommandImpl[EngageParams, EngageResult]):
+class EngageImplementation(
+    AbstractCommandImpl[EngageParams, SuccessData[EngageResult, None]]
+):
     """The implementation of a Magnetic Module engage command."""
 
     def __init__(
@@ -64,7 +67,7 @@ class EngageImplementation(AbstractCommandImpl[EngageParams, EngageResult]):
         self._state_view = state_view
         self._equipment = equipment
 
-    async def execute(self, params: EngageParams) -> EngageResult:
+    async def execute(self, params: EngageParams) -> SuccessData[EngageResult, None]:
         """Execute a Magnetic Module engage command.
 
         Raises:
@@ -92,10 +95,10 @@ class EngageImplementation(AbstractCommandImpl[EngageParams, EngageResult]):
         if hardware_module is not None:  # Not virtualizing modules.
             await hardware_module.engage(height=hardware_height)
 
-        return EngageResult()
+        return SuccessData(public=EngageResult(), private=None)
 
 
-class Engage(BaseCommand[EngageParams, EngageResult]):
+class Engage(BaseCommand[EngageParams, EngageResult, ErrorOccurrence]):
     """A command to engage a Magnetic Module's magnets."""
 
     commandType: EngageCommandType = "magneticModule/engage"

@@ -8,7 +8,6 @@ import { ErrorBoundary } from 'react-error-boundary'
 import {
   getModuleType,
   getPipetteNameSpecs,
-  ProtocolAnalysisOutput,
   FLEX_STANDARD_MODEL,
   getGripperDisplayName,
 } from '@opentrons/shared-data'
@@ -42,6 +41,7 @@ import { getIsProtocolAnalysisInProgress } from '../../redux/protocol-storage'
 import { InstrumentContainer } from '../../atoms/InstrumentContainer'
 import { ProtocolOverflowMenu } from './ProtocolOverflowMenu'
 import { ProtocolAnalysisFailure } from '../ProtocolAnalysisFailure'
+import { getProtocolUsesGripper } from '../ProtocolSetupInstruments/utils'
 import { ProtocolAnalysisStale } from '../ProtocolAnalysisFailure/ProtocolAnalysisStale'
 import {
   getAnalysisStatus,
@@ -49,9 +49,9 @@ import {
   getRobotTypeDisplayName,
 } from './utils'
 
+import type { ProtocolAnalysisOutput } from '@opentrons/shared-data'
 import type { StoredProtocolData } from '../../redux/protocol-storage'
 import type { State } from '../../redux/types'
-import { getProtocolUsesGripper } from '../ProtocolSetupInstruments/utils'
 
 interface ProtocolCardProps {
   handleRunProtocol: (storedProtocolData: StoredProtocolData) => void

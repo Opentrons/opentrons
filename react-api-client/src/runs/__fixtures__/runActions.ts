@@ -1,10 +1,10 @@
 import {
-  RunAction,
   RUN_ACTION_TYPE_PLAY,
   RUN_ACTION_TYPE_PAUSE,
   RUN_ACTION_TYPE_STOP,
   RUN_ACTION_TYPE_RESUME_FROM_RECOVERY,
 } from '@opentrons/api-client'
+import type { RunAction } from '@opentrons/api-client'
 
 export const mockPlayRunAction: RunAction = {
   id: '1',

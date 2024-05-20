@@ -4,13 +4,11 @@ import {
   MAGNETIC_MODULE_TYPE,
   TEMPERATURE_MODULE_TYPE,
   THERMOCYCLER_MODULE_TYPE,
-  ModuleType,
   MAGNETIC_MODULE_V1,
   MAGNETIC_MODULE_V2,
   TEMPERATURE_MODULE_V1,
   TEMPERATURE_MODULE_V2,
   THERMOCYCLER_MODULE_V1,
-  ModuleModel,
   HEATERSHAKER_MODULE_TYPE,
   HEATERSHAKER_MODULE_V1,
   THERMOCYCLER_MODULE_V2,
@@ -26,6 +24,7 @@ import thermocycler from '../../images/modules/thermocycler.png'
 import thermocycler_gen2 from '../../images/modules/thermocycler_gen2.png'
 import heater_shaker_module_transparent from '../../images/modules/heater_shaker_module_transparent.png'
 import mag_block from '../../images/modules/mag_block.png'
+import type { ModuleType, ModuleModel } from '@opentrons/shared-data'
 
 interface Props {
   type: ModuleType

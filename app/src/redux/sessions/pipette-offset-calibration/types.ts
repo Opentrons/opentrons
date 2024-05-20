@@ -1,5 +1,5 @@
 // pipette offset calibration types
-import {
+import type {
   PIP_OFFSET_STEP_SESSION_STARTED,
   PIP_OFFSET_STEP_LABWARE_LOADED,
   PIP_OFFSET_STEP_PREPARING_PIPETTE,
