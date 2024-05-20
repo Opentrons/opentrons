@@ -235,7 +235,6 @@ jobs:
           node-version: '18.19.0'
           registry-url: 'https://registry.npmjs.org'
       - name: 'install udev for usb-detection'
-        if: startsWith(matrix.os, 'ubuntu')
         run: |
           # WORKAROUND: Remove microsoft debian repo due to https://github.com/microsoft/linux-package-repositories/issues/130. Remove line below after it is resolved
           sudo rm -f /etc/apt/sources.list.d/microsoft-prod.list
