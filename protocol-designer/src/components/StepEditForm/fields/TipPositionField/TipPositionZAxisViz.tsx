@@ -7,7 +7,7 @@ import WELL_CROSS_SECTION_IMAGE from '../../../../images/well_cross_section.svg'
 import styles from './TipPositionInput.module.css'
 
 const WELL_HEIGHT_PIXELS = 145
-const TIP_X_OFFSET_PIXELS = 20
+const TIP_X_OFFSET_PIXELS = 22
 const PIXEL_DECIMALS = 2
 interface TipPositionZAxisVizProps {
   wellDepthMm: number
