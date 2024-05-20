@@ -55,7 +55,7 @@ class CommandCollectionLinks(BaseModel):
         ),
     )
 
-    recoveryTarget: Optional[CommandLink] = Field(
+    currentlyRecoveringFrom: Optional[CommandLink] = Field(
         None,
         description=(
             "Information about the command currently undergoing error recovery."

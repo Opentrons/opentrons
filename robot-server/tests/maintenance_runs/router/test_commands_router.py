@@ -263,7 +263,7 @@ async def test_get_run_commands(
                 index=101,
             ),
         ),
-        recoveryTarget=CommandLink(
+        currentlyRecoveringFrom=CommandLink(
             href="/maintenance_runs/run-id/commands/recovery-target-command-id",
             meta=CommandLinkMeta(
                 runId="run-id",

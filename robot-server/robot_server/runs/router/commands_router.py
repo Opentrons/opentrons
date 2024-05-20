@@ -312,7 +312,7 @@ async def get_run_commands(
 
     links = CommandCollectionLinks.construct(
         current=_make_command_link(runId, current_command),
-        recoveryTarget=_make_command_link(runId, recovery_target_command),
+        currentlyRecoveringFrom=_make_command_link(runId, recovery_target_command),
     )
 
     return await PydanticResponse.create(
