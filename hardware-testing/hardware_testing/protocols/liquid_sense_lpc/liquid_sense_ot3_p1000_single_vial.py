@@ -1,4 +1,4 @@
-"""Liquid Sense OT3 P1000."""
+"""Liquid Sense OT3."""
 from opentrons.protocol_api import ProtocolContext, OFF_DECK
 
 metadata = {"protocolName": "liquid-sense-ot3-p1000-single-vial"}
@@ -16,6 +16,7 @@ LABWARE_ON_SCALE = "radwag_pipette_calibration_vial"
 
 def run(ctx: ProtocolContext) -> None:
     """Run."""
+    trash = ctx.load_trash_bin("A3")
     vial = ctx.load_labware(LABWARE_ON_SCALE, SLOT_SCALE)
     dial = ctx.load_labware("dial_indicator", SLOT_DIAL)
     pipette = ctx.load_instrument("flex_1channel_1000", "left")
@@ -27,5 +28,5 @@ def run(ctx: ProtocolContext) -> None:
             pipette.dispense(10, vial["A1"].top())
             pipette.aspirate(10, dial["A1"].top())
             pipette.dispense(10, dial["A1"].top())
-            pipette.drop_tip()
+            pipette.drop_tip(trash)
             ctx.move_labware(rack, OFF_DECK)

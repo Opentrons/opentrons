@@ -14,6 +14,7 @@ LABWARE_ON_SCALE = "radwag_pipette_calibration_vial"
 
 def run(ctx: ProtocolContext) -> None:
     """Run."""
+    trash = ctx.load_trash_bin("A3")
     vial = ctx.load_labware(LABWARE_ON_SCALE, SLOT_SCALE)
     dial = ctx.load_labware("dial_indicator", SLOT_DIAL)
     pipette = ctx.load_instrument("flex_1channel_50", "left")
@@ -25,5 +26,5 @@ def run(ctx: ProtocolContext) -> None:
             pipette.dispense(10, vial["A1"].top())
             pipette.aspirate(10, dial["A1"].top())
             pipette.dispense(10, dial["A1"].top())
-            pipette.drop_tip()
+            pipette.drop_tip(trash)
             ctx.move_labware(rack, OFF_DECK)
