@@ -166,7 +166,11 @@ def _load_scale(
 
 
 def run(
-    tip: int, run_args: RunArgs, google_sheet: Optional[Any], starting_tip: str = "A1"
+    tip: int,
+    run_args: RunArgs,
+    google_sheet: Optional[Any],
+    sheet_id: str,
+    starting_tip: str = "A1",
 ) -> None:
     """Run a liquid probe test."""
     test_labware: Labware = _load_test_well(run_args)
@@ -229,6 +233,8 @@ def run(
         env_data.temperature,
         test_well.top().point.z - liquid_height_from_deck,
         tip_offset - lpc_offset,
+        google_sheet,
+        run_args.run_id,
     )
 
     trials_before_jog = run_args.trials_before_jog
@@ -259,7 +265,7 @@ def run(
                 run_args.pipette._retract()
                 ui.print_info(f"Tip Offset  {tip_length_offset}")
 
-            ui.print_info("Droping tip")
+            ui.print_info("Dropping tip")
             if run_args.return_tip:
                 run_args.pipette.return_tip()
             else:
@@ -287,6 +293,7 @@ def run(
                 liquid_height_from_deck,
                 google_sheet,
                 run_args.run_id,
+                sheet_id,
             )
             ui.print_info(
                 f"\n\n Z axis start pos {start_pos[Axis.Z_L]} end pos {end_pos[Axis.Z_L]}"
@@ -364,6 +371,8 @@ def _run_trial(
         if run_args.plunger_speed == -1
         else run_args.plunger_speed
     )
+    # operator defines num of seconds btwn start of the probe movement and meniscus contact
+    # calculating ideal starting position is then easy bc no acceleration is involved during probe
     starting_mm_above_liquid = run_args.probe_seconds_before_contact * run_args.z_speed
     starting_mount_height = (
         well.bottom(z=liquid_height).point.z + starting_mm_above_liquid

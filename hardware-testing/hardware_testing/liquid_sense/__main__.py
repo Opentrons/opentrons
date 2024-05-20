@@ -305,7 +305,7 @@ if __name__ == "__main__":
         ui.print_info("homing...")
         run_args.ctx.home()
         for tip in run_args.tip_volumes:
-            execute.run(tip, run_args, google_sheet, args.starting_tip)
+            execute.run(tip, run_args, google_sheet, sheet_id, args.starting_tip)
     except Exception as e:
         ui.print_info(f"got error {e}")
         ui.print_info(traceback.format_exc())
@@ -328,9 +328,14 @@ if __name__ == "__main__":
                 run_args.trials,
                 google_sheet,
                 run_args.run_id,
+                sheet_id,
                 make_graph=True,
             )
             # Log to Google Sheet
+            if args.aspirate is False:
+                plunger_direction = "dispense"
+            else:
+                plunger_direction = "aspirate"
             test_info = [
                 "TESTER NAME",
                 run_args.pipette_tag,
@@ -339,12 +344,12 @@ if __name__ == "__main__":
                 args.z_speed,
                 args.plunger_speed,
                 "threshold",
-                args.plunger_direction,
+                plunger_direction,
             ]
             try:
-                process_google_sheet(google_sheet, run_args, test_info)
+                process_google_sheet(google_sheet, run_args, test_info, sheet_id)
             except:
-                print("did not log to google sheet")
+                print('error making graphs or logging data on google sheet')
 
         run_args.ctx.cleanup()
         if not args.simulate:

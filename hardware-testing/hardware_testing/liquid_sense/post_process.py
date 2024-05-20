@@ -1,9 +1,11 @@
 """Post process script csvs."""
 import csv
 import os
-from typing import List, Dict, Tuple, Any, Optional
+from typing import List, Dict, Tuple, Any
 import statistics
 from math import isclose
+import gspread  # type: ignore[import]
+
 
 COL_TRIAL_CONVERSION = {
     1: "E",
@@ -47,6 +49,7 @@ def process_csv_directory(  # noqa: C901
     trials: int,
     google_sheet: Any,
     sheet_name: str,
+    sheet_id: str,
     make_graph: bool = False,
 ) -> None:
     """Post process script csvs."""
@@ -158,10 +161,10 @@ def process_csv_directory(  # noqa: C901
             try:
                 pressure_header_for_google_sheet = [[x] for x in pressure_header_row]
                 google_sheet.batch_update_cells(
-                    sheet_name, pressure_header_for_google_sheet, "H", 10
+                    sheet_name, pressure_header_for_google_sheet, "H", 10, sheet_id
                 )
-            except:
-                print("did not log to google sheet.")
+            except gspread.exceptions.APIError:
+                print("Header did not write on google sheet.")
             # we want to line up the z height's of each trial at time==0
             # to do this we drop the results at the beginning of each of the trials
             # except for one with the longest tip (lower tip offset are longer tips)
@@ -198,6 +201,7 @@ def process_csv_directory(  # noqa: C901
                 meniscus_time = (meniscus_travel + min_tip_offset) / results_settings[
                     tip
                 ][0][0]
+                pressure_rows = []
                 for i in range(max_results_len):
                     pressure_row: List[str] = [f"{time}"]
                     if isclose(
@@ -223,24 +227,23 @@ def process_csv_directory(  # noqa: C901
                         )
                     final_report_writer.writerow(pressure_row)
                     # Add pressure to google sheet
-                    try:
-                        pressure_row_for_google_sheet = [[x] for x in pressure_row]
-                        google_sheet.batch_update_cells(
-                            sheet_name, pressure_row_for_google_sheet, "H", 11
-                        )
-                    except:
-                        print("did not log to google sheet.")
+                    pressure_rows.append(pressure_row)
                     time += 0.001
+
+                transposed_pressure_rows = list(map(list, zip(*pressure_rows)))
+                try:
+                    google_sheet.batch_update_cells(
+                        sheet_name, transposed_pressure_rows, "H", 11, sheet_id
+                    )
+                except gspread.exceptions.APIError:
+                    print("Did not write pressure data to google sheet.")
 
 
 def process_google_sheet(
-    google_sheet: Any,
-    run_args,
-    test_info: List,
+    google_sheet: Any, run_args, test_info: List, sheet_id: str
 ) -> None:
     """Write results and graphs to google sheet."""
-    sheet_id = google_sheet.create_worksheet(run_args.run_id)
-    sheet_title = run_args.run_id
+    sheet_name = run_args.run_id
     test_parameters = [
         [
             "Tester Name",
@@ -255,24 +258,33 @@ def process_google_sheet(
         ],
         test_info,
     ]
-    google_sheet.batch_update_cells(sheet_title, test_parameters, "A", 1)
-    target_height = google_sheet.get_cell(sheet_title, "A9")
-    adjusted_height: List = []
+    num_of_trials = run_args.trials
+    google_sheet.batch_update_cells(sheet_name, test_parameters, "A", 1, sheet_id)
+    target_height = google_sheet.get_cell(sheet_name, "B9")
+    print(target_height)
+    last_trial_row = 10 + num_of_trials
+    adjusted_height_range = "E11:E" + str(last_trial_row)
+    adjusted_height = google_sheet.get_single_col_range(
+        sheet_name, adjusted_height_range
+    )
     normalized_height = [
         float(height) - float(target_height) for height in adjusted_height
     ]
-    google_sheet.batch_update_cells(sheet_title, normalized_height, "F", 11)
+    google_sheet.batch_update_cells(sheet_name, [normalized_height], "F", 11, sheet_id)
     # Find accuracy, precision, repeatability
-    accuracy = statistics.mean(normalized_height)
-    precision = max(normalized_height) - min(normalized_height) / 2
-    repeatability = 100 - (
-        statistics.stdev(normalized_height) / len(normalized_height) * 100
-    )
-    summary = [
-        ["Accuracy (mm)", "Precision (+/- mm)", "Repeatability (%)"],
-        [accuracy, precision, repeatability],
-    ]
-    google_sheet.batch_update_cells(sheet_title, summary, "D", 2)
+    try:
+        accuracy = statistics.mean(normalized_height)
+        precision = max(normalized_height) - min(normalized_height) / 2
+        repeatability = 100 - (
+            statistics.stdev(normalized_height) / len(normalized_height) * 100
+        )
+        summary = [
+            ["Accuracy (mm)", "Precision (+/- mm)", "Repeatability (%)"],
+            [accuracy, precision, repeatability],
+        ]
+        google_sheet.batch_update_cells(sheet_name, summary, "D", 2, sheet_id)
+    except gspread.exceptions.APIError:
+        print("stats didn't work.")
 
     # Create Graphs
     # 1. Create pressure vs time graph zoomed out
@@ -283,7 +295,7 @@ def process_google_sheet(
         {"position": "RIGHT_AXIS", "title": titles[3]},
     ]
     # TODO: Create less hard coded zoom in
-
+    print("starting to make graphs")
     domains_pressure = [
         {
             "domain": {
@@ -291,7 +303,7 @@ def process_google_sheet(
                     "sources": [
                         {
                             "sheetId": sheet_id,
-                            "startRowIndex": 11,
+                            "startRowIndex": 9,
                             "endRowIndex": 1494,
                             "startColumnIndex": 7,
                             "endColumnIndex": 8,
@@ -301,116 +313,35 @@ def process_google_sheet(
             }
         }
     ]
-    series_pressure = [
-        {
+    series_pressure = []
+    for i in range(num_of_trials):
+        series_dict = {
             "series": {
                 "sourceRange": {
                     "sources": [
                         {
                             "sheetId": sheet_id,
-                            "startRowIndex": 11,
+                            "startRowIndex": 9,
                             "endRowIndex": 1494,
-                            "startColumnIndex": 9,
-                            "endColumnIndex": 10,
+                            "startColumnIndex": 9 + 4 * i,
+                            "endColumnIndex": 10 + 4 * i,
                         }
                     ]
                 }
             },
             "targetAxis": "LEFT_AXIS",
-        },
-        {
-            "series": {
-                "sourceRange": {
-                    "sources": [
-                        {
-                            "sheetId": sheet_id,
-                            "startRowIndex": 11,
-                            "endRowIndex": 1494,
-                            "startColumnIndex": 13,
-                            "endColumnIndex": 14,
-                        }
-                    ]
-                }
-            },
-            "targetAxis": "LEFT_AXIS",
-        },
-        {
-            "series": {
-                "sourceRange": {
-                    "sources": [
-                        {
-                            "sheetId": sheet_id,
-                            "startRowIndex": 11,
-                            "endRowIndex": 1494,
-                            "startColumnIndex": 17,
-                            "endColumnIndex": 18,
-                        }
-                    ]
-                }
-            },
-            "targetAxis": "LEFT_AXIS",
-        },
-        {
-            "series": {
-                "sourceRange": {
-                    "sources": [
-                        {
-                            "sheetId": sheet_id,
-                            "startRowIndex": 1,
-                            "endRowIndex": 1494,
-                            "startColumnIndex": 21,
-                            "endColumnIndex": 25,
-                        }
-                    ]
-                }
-            },
-            "targetAxis": "LEFT_AXIS",
-        },
-        {
-            "series": {
-                "sourceRange": {
-                    "sources": [
-                        {
-                            "sheetId": sheet_id,
-                            "startRowIndex": 11,
-                            "endRowIndex": 1494,
-                            "startColumnIndex": 25,
-                            "endColumnIndex": 26,
-                        }
-                    ]
-                }
-            },
-            "targetAxis": "LEFT_AXIS",
-        },
-    ]
-    google_sheet.create_line_chart(
-        titles, series_pressure, domains_pressure, axis_pressure_vs_time, 0, sheet_id
-    )
-    # Zoomed in pressure chart
-    # Determine where pressure changes
-    p1 = google_sheet.get_single_col_range("J11:J1400")
-    for x, y in zip(p1[0::], p1[1::]):
-        diff = float(y) - float(x)
-        if diff > 15:
-            big_change = google_sheet.get_row_index_with_value(str(y), 3)
-            break
-    time_cell = google_sheet.get_cell("A" + str(big_change))
-    axis_zoomed = [
-        {
-            "position": "BOTTOM_AXIS",
-            "title": titles[1],
-            "viewWindowOptions": {"viewWindowMin": float(time_cell) - 0.2},
-        },
-        {"position": "LEFT_AXIS", "title": titles[2]},
-        {"position": "RIGHT_AXIS", "title": titles[3]},
-    ]
-    titles_zoomed = ["Pressure vs Time Zoomed", "Time (s)", "Pressure (P)", ""]
-    google_sheet.create_line_chart(
-        titles_zoomed, series_pressure, domains_pressure, axis_zoomed, 7, sheet_id
-    )
-
+        }
+        series_pressure.append(series_dict)
+    try:
+        google_sheet.create_line_chart(
+            titles, series_pressure, domains_pressure, axis_pressure_vs_time, 0, sheet_id
+        )
+    except:
+        print("did not make pressure vs time graph.")
+    
     # 2. Height vs Offset Comparison
-    heights = google_sheet.get_single_col_range(sheet_title, "B10:B20")
+    heights_range = "B11:B" + str(last_trial_row)
+    heights = google_sheet.get_single_col_range(sheet_name, heights_range)
     axis = [
         {"position": "BOTTOM_AXIS", "title": titles[1]},
         {
@@ -430,8 +361,8 @@ def process_google_sheet(
                     "sources": [
                         {
                             "sheetId": sheet_id,
-                            "startRowIndex": 10,
-                            "endRowIndex": 16,
+                            "startRowIndex": 9,
+                            "endRowIndex": last_trial_row,
                             "startColumnIndex": 0,
                             "endColumnIndex": 1,
                         }
@@ -447,8 +378,8 @@ def process_google_sheet(
                     "sources": [
                         {
                             "sheetId": sheet_id,
-                            "startRowIndex": 10,
-                            "endRowIndex": 16,
+                            "startRowIndex": 9,
+                            "endRowIndex": last_trial_row,
                             "startColumnIndex": 1,
                             "endColumnIndex": 2,
                         }
@@ -465,8 +396,8 @@ def process_google_sheet(
                     "sources": [
                         {
                             "sheetId": sheet_id,
-                            "startRowIndex": 10,
-                            "endRowIndex": 16,
+                            "startRowIndex": 9,
+                            "endRowIndex": last_trial_row,
                             "startColumnIndex": 3,
                             "endColumnIndex": 4,
                         }
@@ -484,9 +415,12 @@ def process_google_sheet(
         "Measured Height (mm)",
         "Tip Length Offset (mm)",
     ]
-    google_sheet.create_line_chart(
-        titles, series_offsets, domain_trials, axis, 14, sheet_id
-    )
+    try:
+        google_sheet.create_line_chart(
+            titles, series_offsets, domain_trials, axis, 14, sheet_id
+        )
+    except:
+        print("did not make height vs offset graph.")
 
     # 3. Liquid Level Detection
     lld_titles = ["Liquid Level Detection", "Trials", "Normalized Height", ""]
@@ -497,8 +431,8 @@ def process_google_sheet(
                     "sources": [
                         {
                             "sheetId": sheet_id,
-                            "startRowIndex": 10,
-                            "endRowIndex": 16,
+                            "startRowIndex": 9,
+                            "endRowIndex": last_trial_row,
                             "startColumnIndex": 5,
                             "endColumnIndex": 6,
                         }
@@ -522,14 +456,35 @@ def process_google_sheet(
         },
         {"position": "RIGHT_AXIS", "title": titles[3]},
     ]
-    google_sheet.create_line_chart(
-        lld_titles,
-        series_normalized_height,
-        domain_trials,
-        normalized_axis,
-        21,
-        sheet_id,
-    )
+    try:
+        google_sheet.create_line_chart(
+            lld_titles,
+            series_normalized_height,
+            domain_trials,
+            normalized_axis,
+            21,
+            sheet_id,
+        )
+    except:
+        print("did not make lld graph.")
+    
+    # TODO: create a better way to zoom into graph based on slope change
+    axis_zoomed = [
+        {
+            "position": "BOTTOM_AXIS",
+            "title": titles[1],
+            "viewWindowOptions": {"viewWindowMin": 0.75, "viewWindowMax": 1.5},
+        },
+        {"position": "LEFT_AXIS", "title": titles[2]},
+        {"position": "RIGHT_AXIS", "title": titles[3]},
+    ]
+    titles_zoomed = ["Pressure vs Time Zoomed", "Time (s)", "Pressure (P)", ""]
+    try:
+        google_sheet.create_line_chart(
+            titles_zoomed, series_pressure, domains_pressure, axis_zoomed, 7, sheet_id
+        )
+    except:
+        print("did not make zoomed in pressure chart.")
 
 
 #

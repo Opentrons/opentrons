@@ -8,6 +8,7 @@ from hardware_testing.data.csv_report import (
     CSVLineRepeating,
 )
 from typing import List, Union, Any, Optional
+import gspread  # type: ignore[import]
 
 """
 CSV Test Report:
@@ -163,8 +164,14 @@ def store_baseline_trial(
     temp: float,
     z_travel: float,
     measured_error: float,
+    google_sheet: Any,
+    sheet_title: str,
 ) -> None:
     """Report Trial."""
+    try:
+        google_sheet.update_cell(sheet_title, 9, 2, height)
+    except gspread.exceptions.APIError:
+        print("did not store baseline trial on google sheet.")
     report(
         "TRIALS",
         f"trial-baseline-{tip}ul",
@@ -195,6 +202,7 @@ def store_trial(
     target_height: float,
     google_sheet: Optional[Any],
     sheet_name: str,
+    sheet_id: str,
 ) -> None:
     """Report Trial."""
     report(
@@ -214,19 +222,30 @@ def store_trial(
     )
     if google_sheet is not None:
         # Write trial to google sheet
+        if trial == 0:
+            # Write header
+            gs_header = [
+                ["Trial"],
+                ["Height"],
+                ["Plunger Position"],
+                ["Tip Length Offset"],
+                ["Adjusted Height"],
+                ["Normalized Height"],
+            ]
+            google_sheet.batch_update_cells(sheet_name, gs_header, "A", 10, sheet_id)
         try:
             trial_for_google_sheet = [
-                [trial],
+                [trial + 1],
                 [height],
                 [plunger_pos],
                 [tip_length_offset],
                 [height + tip_length_offset],
             ]
             google_sheet.batch_update_cells(
-                sheet_name, trial_for_google_sheet, "B", 11 + int(trial)
+                sheet_name, trial_for_google_sheet, "A", 11 + int(trial), sheet_id
             )
-        except:
-            print("did not log to google sheet.")
+        except gspread.exceptions.APIError:
+            print(f"did not log trial {trial+1} to google sheet.")
 
 
 def store_tip_results(
