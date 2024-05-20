@@ -85,34 +85,57 @@ def _parse_and_set_parameters(
     return parameter_context.export_parameters_for_protocol()
 
 
-def run_python(
+def _get_filename(
+    protocol: PythonProtocol,
+) -> str:
+    # TODO(mm, 2023-10-11): This coupling to opentrons.protocols.parse is fragile.
+    # Can we get the correct filename directly from proto.contents?
+    if protocol.filename and protocol.filename.endswith("zip"):
+        # The ".zip" extension needs to match what opentrons.protocols.parse recognizes as a bundle,
+        # and the "protocol.ot2.py" fallback needs to match what opentrons.protocol.py sets as the
+        # AST filename.
+        return "protocol.ot2.py"
+    else:
+        # "<protocol>" needs to match what opentrons.protocols.parse sets as the fallback
+        # AST filename.
+        return protocol.filename or "<protocol>"
+
+
+def exec_add_parameters(
+    protocol: PythonProtocol,
+    parameter_context: ParameterContext,
+    run_time_param_overrides: Optional[RunTimeParamValuesType],
+) -> Optional[Parameters]:
+    """Exec the add_parameters function and get the final run time parameters with overrides."""
+    new_globs: Dict[Any, Any] = {}
+    exec(protocol.contents, new_globs)
+    filename = _get_filename(protocol)
+
+    return (
+        _parse_and_set_parameters(
+            parameter_context=parameter_context,
+            run_time_param_overrides=run_time_param_overrides,
+            new_globs=new_globs,
+            filename=filename,
+        )
+        if new_globs.get("add_parameters")
+        else None
+    )
+
+
+def exec_run(
     proto: PythonProtocol,
     context: ProtocolContext,
-    parameter_context: ParameterContext,
-    run_time_param_overrides: Optional[RunTimeParamValuesType] = None,
+    run_time_parameters_with_overrides: Optional[Parameters] = None,
 ) -> None:
     new_globs: Dict[Any, Any] = {}
     exec(proto.contents, new_globs)
     # If the protocol is written correctly, it will have defined a function
     # like run(context: ProtocolContext). If so, that function is now in the
     # current scope.
-
-    # TODO(mm, 2023-10-11): This coupling to opentrons.protocols.parse is fragile.
-    # Can we get the correct filename directly from proto.contents?
-    if proto.filename and proto.filename.endswith("zip"):
-        # The ".zip" extension needs to match what opentrons.protocols.parse recognizes as a bundle,
-        # and the "protocol.ot2.py" fallback needs to match what opentrons.protocol.py sets as the
-        # AST filename.
-        filename = "protocol.ot2.py"
-    else:
-        # "<protocol>" needs to match what opentrons.protocols.parse sets as the fallback
-        # AST filename.
-        filename = proto.filename or "<protocol>"
-
-    if new_globs.get("add_parameters"):
-        context._params = _parse_and_set_parameters(
-            parameter_context, run_time_param_overrides, new_globs, filename
-        )
+    filename = _get_filename(proto)
+    if run_time_parameters_with_overrides:
+        context._params = run_time_parameters_with_overrides
 
     try:
         _runfunc_ok(new_globs.get("run"))

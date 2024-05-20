@@ -602,7 +602,9 @@ def _run_file_non_pe(
     try:
         # TODO (spp, 2024-03-18): use true run-time param overrides once enabled
         #  for cli protocol simulation/ execution
-        execute_apiv2.run_protocol(protocol, context, run_time_param_overrides=None)
+        execute_apiv2.run_protocol(
+            protocol, context, run_time_parameters_with_overrides=None
+        )
     finally:
         context.cleanup()
 
