@@ -33,39 +33,23 @@ export function PromptGuide(): JSX.Element {
         <StyledText css={BODY_TEXT_STYLE}>
           {t('make_sure_your_prompt')}
         </StyledText>
+        <StyledText css={BODY_TEXT_STYLE}>{t('key_info')}</StyledText>
         <Flex
           css={BODY_TEXT_STYLE}
           flexDirection={DIRECTION_COLUMN}
           paddingLeft={SPACING.spacing32}
         >
-          <ul>
+          <StyledUl>
             <li>
-              <StyledText>{t('metadata')}</StyledText>
-              <StyledUl>
-                <li>
-                  <StyledText>{t('application')}</StyledText>
-                </li>
-                <li>
-                  <StyledText>{t('robot')}</StyledText>
-                </li>
-                <li>
-                  <StyledText>{t('api')}</StyledText>
-                </li>
-              </StyledUl>
+              <StyledText>{t('robot_type')}</StyledText>
             </li>
             <li>
-              <StyledText>{t('ot2_pipettes')}</StyledText>
-            </li>
-            <li>
-              <StyledText>{t('modules')}</StyledText>
-            </li>
-            <li>
-              <StyledText>{t('well_allocations')}</StyledText>
+              <StyledText>{t('modules_and_adapters')}</StyledText>
             </li>
             <li>
               <Trans
                 t={t}
-                i18nKey="tipracks_and_labware"
+                i18nKey="labware_and_tipracks"
                 components={{
                   a: <ExternalLink external href={LABWARE_LIBRARY_URL} />,
                   span: <StyledText css={BODY_TEXT_STYLE} />,
@@ -73,22 +57,32 @@ export function PromptGuide(): JSX.Element {
               />
             </li>
             <li>
+              <StyledText>{t('liquid_locations')}</StyledText>
+            </li>
+            <li>
               <StyledText>{t('commands')}</StyledText>
             </li>
-          </ul>
+          </StyledUl>
+        </Flex>
+        <StyledText css={BODY_TEXT_STYLE}>{t('notes')}</StyledText>
+        <Flex
+          css={BODY_TEXT_STYLE}
+          flexDirection={DIRECTION_COLUMN}
+          paddingLeft={SPACING.spacing32}
+        >
+          <StyledUl>
+            <li>
+              <StyledText>{t('example')}</StyledText>
+            </li>
+            <li>
+              <StyledText>{t('simulate_description')}</StyledText>
+            </li>
+            <li>
+              <StyledText>{t('reload_page')}</StyledText>
+            </li>
+          </StyledUl>
         </Flex>
       </Flex>
-      <Trans
-        t={t}
-        i18nKey="what_if_you"
-        components={{
-          bold: <strong />,
-          span: <StyledText css={BODY_TEXT_STYLE} />,
-        }}
-      />
-      <StyledText css={BODY_TEXT_STYLE}>
-        {t('simulator_description')}
-      </StyledText>
     </Flex>
   )
 }
