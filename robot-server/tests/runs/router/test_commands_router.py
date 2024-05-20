@@ -328,6 +328,14 @@ async def test_get_run_commands(
             index=101,
         )
     )
+    decoy.when(mock_run_data_manager.get_recovery_target_command("run-id")).then_return(
+        CommandPointer(
+            command_id="recovery-target-command-id",
+            command_key="recovery-target-command-key",
+            created_at=datetime(year=2025, month=5, day=5),
+            index=202,
+        )
+    )
     decoy.when(
         mock_run_data_manager.get_commands_slice(
             run_id="run-id",
@@ -374,7 +382,17 @@ async def test_get_run_commands(
                 createdAt=datetime(year=2024, month=4, day=4),
                 index=101,
             ),
-        )
+        ),
+        recoveryTarget=CommandLink(
+            href="/runs/run-id/commands/recovery-target-command-id",
+            meta=CommandLinkMeta(
+                runId="run-id",
+                commandId="recovery-target-command-id",
+                key="recovery-target-command-key",
+                createdAt=datetime(year=2025, month=5, day=5),
+                index=202,
+            ),
+        ),
     )
     assert result.status_code == 200
 
