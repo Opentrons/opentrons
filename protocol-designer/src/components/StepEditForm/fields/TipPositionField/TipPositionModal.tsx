@@ -261,6 +261,7 @@ export const TipPositionModal = (
       <Flex
         flexDirection={DIRECTION_COLUMN}
         gridGap={SPACING.spacing4}
+        width="max-content"
         {...targetProps}
       >
         <StyledText as="label" paddingLeft={SPACING.spacing24}>
@@ -278,6 +279,7 @@ export const TipPositionModal = (
           units="mm"
           value={yValue ?? ''}
         />
+        <Tooltip {...tooltipProps}>{t('tooltip:y_position_value')}</Tooltip>
       </Flex>
       <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
         <StyledText as="label" paddingLeft={SPACING.spacing24}>
@@ -297,8 +299,6 @@ export const TipPositionModal = (
           value={zValue !== null ? zValue : ''}
         />
       </Flex>
-
-      <Tooltip {...tooltipProps}>{t('tooltip:y_position_value')}</Tooltip>
     </Flex>
   ) : null
 
