@@ -108,6 +108,7 @@ export const getToV8_1MigrationMessage = (props: ModalProps): ModalContents => {
         </p>
         <p>{t('migrations.toV8_1Migration.body2')}</p>
         <p>{t('migrations.toV8_1Migration.body3')}</p>
+        <p>{t('migrations.toV8_1Migration.body4')}</p>
       </div>
     ),
   }
