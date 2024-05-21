@@ -14,8 +14,8 @@ import {
   getCutoutFixturesForModuleModel,
   FLEX_MODULE_ADDRESSABLE_AREAS,
   getModuleType,
-  MAGNETIC_MODULE_TYPE,
   FLEX_USB_MODULE_ADDRESSABLE_AREAS,
+  MAGNETIC_BLOCK_TYPE,
 } from '@opentrons/shared-data'
 import { getLabwareSetupItemGroups } from '../utils'
 import { getProtocolUsesGripper } from '../../../organisms/ProtocolSetupInstruments/utils'
@@ -111,7 +111,8 @@ export const useRequiredProtocolHardwareFromAnalysis = (
     : []
 
   const requiredModules: ProtocolModule[] = analysis.modules
-    .filter(m => getModuleType(m.model) !== MAGNETIC_MODULE_TYPE)
+    // remove magnetic blocks, they're handled by required fixtures
+    .filter(m => getModuleType(m.model) !== MAGNETIC_BLOCK_TYPE)
     .map(({ location, model }) => {
       const cutoutIdForSlotName = getCutoutIdForSlotName(
         location.slotName,
