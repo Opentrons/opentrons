@@ -1,4 +1,6 @@
 from pydantic import BaseModel
+from openai.types.chat import ChatCompletionMessageParam
+
 from typing import List, Optional
 
 class Chat(BaseModel):
@@ -7,5 +9,5 @@ class Chat(BaseModel):
 
 class ChatRequest(BaseModel):
     message: str
-    history: Optional[List[Chat]] = None
+    history: Optional[List[ChatCompletionMessageParam]] = None
     fake: bool
