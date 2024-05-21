@@ -325,6 +325,11 @@ class AnalysisStore:
         parameters in the analysis use default values.
         """
         if analysis_summary.status == AnalysisStatus.PENDING:
+            # TODO: extract defaults and values from pending analysis now that they're available
+            #   If the pending analysis RTPs match the current RTPs, do nothing(?).
+            #   If the pending analysis RTPs DO NOT match the current RTPs, raise the
+            #   AnalysisIsPending error. Eventually, we might allow either canceling the
+            #   pending analysis or starting another analysis when there's already a pending one.
             raise AnalysisIsPendingError(analysis_summary.id)
 
         rtp_values_and_defaults_in_last_analysis = (
