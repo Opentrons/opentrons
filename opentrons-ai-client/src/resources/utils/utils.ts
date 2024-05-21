@@ -16,7 +16,6 @@ export const calcTextAreaHeight = (input: string): number => {
 
 export const isLocalhost = (): boolean => {
   const host = window.location.hostname
-  console.log('host', host)
   return (
     host === 'localhost' || host === '127.0.0.1' || host.startsWith('192.168.')
   )
