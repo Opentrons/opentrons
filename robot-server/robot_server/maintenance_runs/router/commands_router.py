@@ -7,6 +7,7 @@ from anyio import move_on_after
 from fastapi import APIRouter, Depends, Query, status
 
 from opentrons.protocol_engine import (
+    CommandPointer,
     ProtocolEngine,
     commands as pe_commands,
 )
@@ -220,6 +221,7 @@ async def get_run_commands(
         raise RunNotFound(detail=str(e)).as_error(status.HTTP_404_NOT_FOUND) from e
 
     current_command = run_data_manager.get_current_command(run_id=runId)
+    recovery_target_command = run_data_manager.get_recovery_target_command(run_id=runId)
 
     data = [
         MaintenanceRunCommandSummary.construct(
@@ -242,19 +244,10 @@ async def get_run_commands(
         totalLength=command_slice.total_length,
     )
 
-    links = CommandCollectionLinks()
-
-    if current_command is not None:
-        links.current = CommandLink(
-            href=f"/runs/{runId}/commands/{current_command.command_id}",
-            meta=CommandLinkMeta(
-                runId=runId,
-                commandId=current_command.command_id,
-                index=current_command.index,
-                key=current_command.command_key,
-                createdAt=current_command.created_at,
-            ),
-        )
+    links = CommandCollectionLinks.construct(
+        current=_make_command_link(runId, current_command),
+        currentlyRecoveringFrom=_make_command_link(runId, recovery_target_command),
+    )
 
     return await PydanticResponse.create(
         content=MultiBody.construct(data=data, meta=meta, links=links),
@@ -301,4 +294,23 @@ async def get_run_command(
     return await PydanticResponse.create(
         content=SimpleBody.construct(data=command),
         status_code=status.HTTP_200_OK,
+    )
+
+
+def _make_command_link(
+    run_id: str, command_pointer: Optional[CommandPointer]
+) -> Optional[CommandLink]:
+    return (
+        CommandLink.construct(
+            href=f"/maintenance_runs/{run_id}/commands/{command_pointer.command_id}",
+            meta=CommandLinkMeta(
+                runId=run_id,
+                commandId=command_pointer.command_id,
+                index=command_pointer.index,
+                key=command_pointer.command_key,
+                createdAt=command_pointer.created_at,
+            ),
+        )
+        if command_pointer is not None
+        else None
     )
