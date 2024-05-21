@@ -1,3 +1,4 @@
+import isEqual from 'lodash/isEqual'
 import {
   getArgsAndErrorsByStepId,
   getOrderedStepIds,
@@ -21,7 +22,7 @@ const hasChanged = (
 ): boolean =>
   Object.keys(nextValues).some(
     (selectorKey: string) =>
-      nextValues[selectorKey] !== memoizedValues?.[selectorKey]
+      !isEqual(nextValues[selectorKey], memoizedValues?.[selectorKey])
   )
 
 const getTimelineArgs = (state: BaseState): GenerateRobotStateTimelineArgs => ({
