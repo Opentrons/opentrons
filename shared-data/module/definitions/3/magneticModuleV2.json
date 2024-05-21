@@ -87,6 +87,7 @@
     }
   },
   "compatibleWith": [],
+  "incompatibleWithDecks": ["ot3_standard"],
   "twoDimensionalRendering": {
     "name": "svg",
     "type": "element",
