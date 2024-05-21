@@ -11,7 +11,7 @@ import {
 } from '@opentrons/components'
 
 import { getIsOnDevice } from '../../redux/config'
-import { getModalPortalEl } from '../../App/portal'
+import { getTopPortalEl } from '../../App/portal'
 import { BeforeBeginning } from './BeforeBeginning'
 import { SelectRecoveryOption, ResumeRun } from './RecoveryOptions'
 import { ErrorRecoveryHeader } from './ErrorRecoveryHeader'
@@ -80,7 +80,7 @@ function ErrorRecoveryComponent(props: RecoveryContentProps): JSX.Element {
       <ErrorRecoveryHeader errorKind={props.errorKind} />
       <ErrorRecoveryContent {...props} />
     </Flex>,
-    getModalPortalEl()
+    getTopPortalEl()
   )
 }
 
