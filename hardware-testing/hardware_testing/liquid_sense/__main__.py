@@ -293,7 +293,7 @@ if __name__ == "__main__":
                 )
             print(os.path.exists(credentials_path))
             google_sheet = google_sheets_tool.google_sheet(
-                credentials_path, "LLD-Shared-Sheet", 0
+                credentials_path, args.google_sheet_name, 0
             )
             sheet_id = google_sheet.create_worksheet(run_args.run_id)
         else:
