@@ -37,7 +37,7 @@ export function IncompatibleModuleODDModalBody({
           gridGap={SPACING.spacing8}
           maxHeight="196px"
         >
-          {...modules.map(module => (
+          {modules.map(module => (
             <ListItem key={module.id} type="noActive">
               <StyledText
                 as="p"

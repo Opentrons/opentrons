@@ -50,7 +50,7 @@ export function IncompatibleModuleDesktopModalBody({
           maxHeight="196px"
           as="ul"
         >
-          {...modules.map(module => (
+          {modules.map(module => (
             <li key={module.id}>
               <Flex
                 flexDirection={DIRECTION_ROW}
