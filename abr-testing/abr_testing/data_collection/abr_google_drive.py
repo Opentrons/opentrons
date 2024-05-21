@@ -32,10 +32,10 @@ def create_data_dictionary(
     runs_to_save: Union[Set[str], str],
     storage_directory: str,
     issue_url: str,
-) -> Tuple[Dict[str, Dict[str, Any]], List[str], Dict[str, Dict[str, Any]], List[str]]:
+) -> Tuple[List[List[Any]], List[str], List[List[Any]], List[str]]:
     """Pull data from run files and format into a dictionary."""
-    runs_and_robots: Dict[Any, Dict[str, Any]] = {}
-    runs_and_lpc: Dict[Any, Dict[str, Any]] = {}
+    runs_and_robots: List[Any] = []
+    runs_and_lpc: List[Dict[str, Any]] = []
     for filename in os.listdir(storage_directory):
         file_path = os.path.join(storage_directory, filename)
         if file_path.endswith(".json"):
@@ -119,14 +119,17 @@ def create_data_dictionary(
                     **tc_dict,
                 }
                 headers: List[str] = list(row_2.keys())
-                runs_and_robots[run_id] = row_2
+                # runs_and_robots[run_id] = row_2
+                runs_and_robots.append(list(row_2.values()))
                 # LPC Data Recording
                 runs_and_lpc, headers_lpc = read_robot_logs.lpc_data(
                     file_results, row_for_lpc, runs_and_lpc
                 )
             else:
                 continue
-    return runs_and_robots, headers, runs_and_lpc, headers_lpc
+    transposed_runs_and_robots = list(map(list, zip(*runs_and_robots)))
+    transposed_runs_and_lpc = list(map(list, zip(*runs_and_lpc)))
+    return transposed_runs_and_robots, headers, transposed_runs_and_lpc, headers_lpc
 
 
 if __name__ == "__main__":
@@ -183,14 +186,19 @@ if __name__ == "__main__":
         run_ids_on_gd, run_ids_on_gs
     )
     # Add missing runs to google sheet
-    runs_and_robots, headers, runs_and_lpc, headers_lpc = create_data_dictionary(
-        missing_runs_from_gs, storage_directory, ""
-    )
-    read_robot_logs.write_to_local_and_google_sheet(
-        runs_and_robots, storage_directory, google_sheet_name, google_sheet, headers
-    )
+    (
+        transposed_runs_and_robots,
+        headers,
+        transposed_runs_and_lpc,
+        headers_lpc,
+    ) = create_data_dictionary(missing_runs_from_gs, storage_directory, "")
+
+    start_row = google_sheet.get_index_row() + 1
+    google_sheet.batch_update_cells(transposed_runs_and_robots, "A", start_row, "0")
+
     # Add LPC to google sheet
     google_sheet_lpc = google_sheets_tool.google_sheet(credentials_path, "ABR-LPC", 0)
-    read_robot_logs.write_to_local_and_google_sheet(
-        runs_and_lpc, storage_directory, "ABR-LPC", google_sheet_lpc, headers_lpc
+    start_row_lpc = google_sheet_lpc.get_index_row() + 1
+    google_sheet_lpc.batch_update_cells(
+        transposed_runs_and_lpc, "A", start_row_lpc, "0"
     )
