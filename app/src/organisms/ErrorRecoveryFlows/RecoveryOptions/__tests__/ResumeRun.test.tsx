@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { vi, describe, it, expect, beforeEach } from 'vitest'
-import { screen, fireEvent } from '@testing-library/react'
+import { screen, fireEvent, waitFor } from '@testing-library/react'
 
 import { renderWithProviders } from '../../../../__testing-utils__'
 import { i18n } from '../../../../i18n'
@@ -16,20 +16,19 @@ const render = (props: React.ComponentProps<typeof ResumeRun>) => {
 }
 
 describe('RecoveryFooterButtons', () => {
-  const { RESUME } = RECOVERY_MAP
+  const { RESUME, ROBOT_RETRYING_COMMAND } = RECOVERY_MAP
   let props: React.ComponentProps<typeof ResumeRun>
-  let mockOnComplete: Mock
   let mockGoBackPrevStep: Mock
 
   beforeEach(() => {
-    mockOnComplete = vi.fn()
     mockGoBackPrevStep = vi.fn()
     const mockRouteUpdateActions = { goBackPrevStep: mockGoBackPrevStep } as any
 
     props = {
       isOnDevice: true,
+      recoveryCommands: {} as any,
+      failedCommand: {} as any,
       errorKind: ERROR_KINDS.GENERAL_ERROR,
-      onComplete: mockOnComplete,
       routeUpdateActions: mockRouteUpdateActions,
       recoveryMap: {
         route: RESUME.ROUTE,
@@ -38,7 +37,7 @@ describe('RecoveryFooterButtons', () => {
     }
   })
 
-  it('renders appropriate copy and click behavior', () => {
+  it('renders appropriate copy and click behavior', async () => {
     render(props)
 
     screen.getByText('Are you sure you want to resume?')
@@ -46,13 +45,60 @@ describe('RecoveryFooterButtons', () => {
       'The run will resume from the point at which the error occurred.'
     )
 
-    const primaryBtn = screen.getByRole('button', { name: 'Confirm' })
     const secondaryBtn = screen.getByRole('button', { name: 'Go back' })
 
-    fireEvent.click(primaryBtn)
     fireEvent.click(secondaryBtn)
 
-    expect(mockOnComplete).toHaveBeenCalled()
     expect(mockGoBackPrevStep).toHaveBeenCalled()
+  })
+
+  it('should call commands in the correct order for the primaryOnClick callback', async () => {
+    const setRobotInMotionMock = vi.fn(() => Promise.resolve())
+    const retryFailedCommandMock = vi.fn(() => Promise.resolve())
+    const resumeRunMock = vi.fn()
+
+    const mockRecoveryCommands = {
+      retryFailedCommand: retryFailedCommandMock,
+      resumeRun: resumeRunMock,
+    } as any
+
+    const mockRouteUpdateActions = {
+      setRobotInMotion: setRobotInMotionMock,
+    } as any
+
+    render({
+      ...props,
+      recoveryCommands: mockRecoveryCommands,
+      routeUpdateActions: mockRouteUpdateActions,
+    })
+
+    const primaryBtn = screen.getByRole('button', { name: 'Confirm' })
+    fireEvent.click(primaryBtn)
+
+    await waitFor(() => {
+      expect(setRobotInMotionMock).toHaveBeenCalledTimes(1)
+    })
+    await waitFor(() => {
+      expect(setRobotInMotionMock).toHaveBeenCalledWith(
+        true,
+        ROBOT_RETRYING_COMMAND.ROUTE
+      )
+    })
+    await waitFor(() => {
+      expect(retryFailedCommandMock).toHaveBeenCalledTimes(1)
+    })
+    await waitFor(() => {
+      expect(resumeRunMock).toHaveBeenCalledTimes(1)
+    })
+
+    expect(setRobotInMotionMock.mock.invocationCallOrder[0]).toBeLessThan(
+      retryFailedCommandMock.mock.invocationCallOrder[0]
+    )
+
+    await waitFor(() => {
+      expect(retryFailedCommandMock.mock.invocationCallOrder[0]).toBeLessThan(
+        resumeRunMock.mock.invocationCallOrder[0]
+      )
+    })
   })
 })

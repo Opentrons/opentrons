@@ -81,10 +81,12 @@ describe('HistoricalProtocolRunOverflowMenu', () => {
         pause: () => {},
         stop: () => {},
         reset: () => {},
+        resumeFromRecovery: () => {},
         isPlayRunActionLoading: false,
         isPauseRunActionLoading: false,
         isStopRunActionLoading: false,
         isResetRunLoading: false,
+        isResumeRunFromRecoveryActionLoading: false,
       })
     when(useNotifyAllCommandsQuery)
       .calledWith(
