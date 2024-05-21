@@ -11,7 +11,7 @@ import {
   getErrorKind,
   getRecoveryRouteNavigation,
   useRouteUpdateActions,
-  useCurrentlyFailedRunCommand,
+  useCurrentlyRecoveringFrom,
 } from '../utils'
 import { useNotifyAllCommandsQuery } from '../../../resources/runs'
 
@@ -165,7 +165,7 @@ describe('useCurrentlyFailedRunCommand', () => {
 
   it('returns null on initial render when the run status is not "awaiting-recovery"', () => {
     const { result } = renderHook(() =>
-      useCurrentlyFailedRunCommand(MOCK_RUN_ID, RUN_STATUS_RUNNING)
+      useCurrentlyRecoveringFrom(MOCK_RUN_ID, RUN_STATUS_RUNNING)
     )
 
     expect(result.current).toBeNull()
@@ -174,7 +174,7 @@ describe('useCurrentlyFailedRunCommand', () => {
   it('sets recentFailedCommand correctly when runStatus is "awaiting-recovery" and there is no recent failed command', () => {
     const { result, rerender } = renderHook(
       // @ts-expect-error this works
-      props => useCurrentlyFailedRunCommand(...props),
+      props => useCurrentlyRecoveringFrom(...props),
       {
         initialProps: [MOCK_RUN_ID, RUN_STATUS_RUNNING],
       }
@@ -194,7 +194,7 @@ describe('useCurrentlyFailedRunCommand', () => {
   it('always returns the  failed protocol run command that caused the run to enter "awaiting-recovery"', () => {
     const { result, rerender } = renderHook(
       // @ts-expect-error this works
-      props => useCurrentlyFailedRunCommand(...props),
+      props => useCurrentlyRecoveringFrom(...props),
       {
         initialProps: [MOCK_RUN_ID, RUN_STATUS_AWAITING_RECOVERY],
       }
@@ -216,7 +216,7 @@ describe('useCurrentlyFailedRunCommand', () => {
   it('sets recentFailedCommand to null when runStatus is not "awaiting-recovery"', () => {
     const { result, rerender } = renderHook(
       // @ts-expect-error this works
-      props => useCurrentlyFailedRunCommand(...props),
+      props => useCurrentlyRecoveringFrom(...props),
       {
         initialProps: ['runId', 'awaiting-recovery'],
       }

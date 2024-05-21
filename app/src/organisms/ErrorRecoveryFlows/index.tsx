@@ -3,7 +3,7 @@ import * as React from 'react'
 import { RUN_STATUS_AWAITING_RECOVERY } from '@opentrons/api-client'
 
 import { ErrorRecoveryWizard } from './ErrorRecoveryWizard'
-import { useCurrentlyFailedRunCommand } from './utils'
+import { useCurrentlyRecoveringFrom } from './utils'
 
 import type { RunStatus } from '@opentrons/api-client'
 import type { FailedCommand } from './types'
@@ -19,7 +19,7 @@ export function useErrorRecoveryFlows(
   runStatus: RunStatus | null
 ): UseErrorRecoveryResult {
   const [isERActive, setIsERActive] = React.useState(false)
-  const failedCommand = useCurrentlyFailedRunCommand(runId, runStatus)
+  const failedCommand = useCurrentlyRecoveringFrom(runId, runStatus)
 
   const toggleER = (): void => {
     setIsERActive(!isERActive)

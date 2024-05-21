@@ -11,7 +11,7 @@ import { renderWithProviders } from '../../../__testing-utils__'
 import { i18n } from '../../../i18n'
 import { ErrorRecoveryFlows, useErrorRecoveryFlows } from '..'
 import { ErrorRecoveryWizard } from '../ErrorRecoveryWizard'
-import { useCurrentlyFailedRunCommand } from '../utils'
+import { useCurrentlyRecoveringFrom } from '../utils'
 
 import type { RunStatus } from '@opentrons/api-client'
 
@@ -20,9 +20,7 @@ vi.mock('../utils')
 
 describe('useErrorRecovery', () => {
   beforeEach(() => {
-    vi.mocked(useCurrentlyFailedRunCommand).mockReturnValue(
-      'mockCommand' as any
-    )
+    vi.mocked(useCurrentlyRecoveringFrom).mockReturnValue('mockCommand' as any)
   })
 
   it('should have initial state of isEREnabled as false', () => {

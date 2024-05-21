@@ -26,7 +26,7 @@ import type {
 const ALL_COMMANDS_POLL_MS = 5000
 
 // TODO(jh, 05-20-24): Update the logic for returning the failed run command once EXEC-458 merges.
-export function useCurrentlyFailedRunCommand(
+export function useCurrentlyRecoveringFrom(
   runId: string,
   runStatus: RunStatus | null
 ): FailedCommand | null {
