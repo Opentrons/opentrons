@@ -2,7 +2,6 @@ import * as React from 'react'
 import reduce from 'lodash/reduce'
 
 import {
-  ALIGN_FLEX_START,
   ALIGN_STRETCH,
   Box,
   COLORS,
@@ -16,7 +15,6 @@ import {
   TYPOGRAPHY,
   WELL_LABEL_OPTIONS,
 } from '@opentrons/components'
-import { ALL, COLUMN } from '@opentrons/shared-data'
 import {
   arrayToWellGroup,
   getCollidingWells,
@@ -25,59 +23,51 @@ import {
 import { SelectionRect } from './SelectionRect'
 
 import type { WellFill, WellGroup, WellStroke } from '@opentrons/components'
-import type { LabwareDefinition2 } from '@opentrons/shared-data'
-import type { GenericRect, NozzleType } from './types'
+import type {
+  LabwareDefinition2,
+  PipetteChannels,
+} from '@opentrons/shared-data'
+import type { GenericRect } from './types'
 import { useTranslation } from 'react-i18next'
 import { IconButton } from '../../atoms/buttons/IconButton'
 
 interface WellSelectionProps {
   definition: LabwareDefinition2
-  /** array of primary wells. Overrides labwareProps.selectedWells */
   selectedPrimaryWells: WellGroup
   selectWells: (wellGroup: WellGroup) => unknown
-  nozzleType: NozzleType | null
-}
-
-type ChannelType = 1 | 8 | 96
-
-const getChannelsFromNozzleType = (nozzleType: NozzleType | null): ChannelType => {
-  if (nozzleType === '8-channel' || nozzleType === COLUMN) {
-    return 8
-  } else if (nozzleType === ALL) {
-    return 96
-  } else {
-    return 1
-  }
+  channels: PipetteChannels
 }
 
 export function WellSelection(props: WellSelectionProps): JSX.Element {
-  const { definition, selectedPrimaryWells, selectWells, nozzleType } = props
+  const { definition, selectedPrimaryWells, selectWells, channels } = props
 
   const [highlightedWells, setHighlightedWells] = React.useState<WellGroup>({})
-  const showButtonControls = definition.parameters.format === '384Standard'
-  const channels = getChannelsFromNozzleType(nozzleType)
 
   const _wellsFromSelected: (
     selectedWells: WellGroup
   ) => WellGroup = selectedWells => {
     // Returns PRIMARY WELLS from the selection.
-    if (channels === 1) return selectedWells
-    // for the wells that have been highlighted,
-    // get all 8-well well sets and merge them
-    const primaryWells: WellGroup = reduce(
-      selectedWells,
-      (acc: WellGroup, _, wellName: string): WellGroup => {
-        const wellSet = getWellSetForMultichannel(
-          definition,
-          wellName,
-          channels
-        )
-        if (!wellSet) return acc
-        return { ...acc, [wellSet[0]]: null }
-      },
-      {}
-    )
-    return primaryWells
+    if (channels === 8 || channels === 96) {
+      // for the wells that have been highlighted,
+      // get all 8-well well sets and merge them
+      const primaryWells: WellGroup = reduce(
+        selectedWells,
+        (acc: WellGroup, _, wellName: string): WellGroup => {
+          const wellSet = getWellSetForMultichannel(
+            definition,
+            wellName,
+            channels
+          )
+          if (!wellSet) return acc
+          return { ...acc, [wellSet[0]]: null }
+        },
+        {}
+      )
+      return primaryWells
+    }
+
+    // single-channel or ingred selection mode
+    return selectedWells
   }
 
   const _getWellsFromRect: (rect: GenericRect) => WellGroup = rect => {
@@ -86,8 +76,8 @@ export function WellSelection(props: WellSelectionProps): JSX.Element {
   }
 
   const handleSelectionMove: (rect: GenericRect) => void = rect => {
-    const selectedWells = _getWellsFromRect(rect)
-    if (channels !== 1) {
+    if (channels === 8 || channels === 96) {
+      const selectedWells = _getWellsFromRect(rect)
       const allWellsForMulti: WellGroup = reduce(
         selectedWells,
         (acc: WellGroup, _, wellName: string): WellGroup => {
@@ -103,7 +93,7 @@ export function WellSelection(props: WellSelectionProps): JSX.Element {
       )
       setHighlightedWells(allWellsForMulti)
     } else {
-      setHighlightedWells(selectedWells)
+      setHighlightedWells(_getWellsFromRect(rect))
     }
   }
 
@@ -116,7 +106,7 @@ export function WellSelection(props: WellSelectionProps): JSX.Element {
 
   // For rendering, show all wells not just primary wells
   const allSelectedWells =
-    channels != 1
+    channels === 8 || channels === 96
       ? reduce<WellGroup, WellGroup>(
         selectedPrimaryWells,
         (acc, _, wellName): WellGroup => {
@@ -140,25 +130,26 @@ export function WellSelection(props: WellSelectionProps): JSX.Element {
   })
   Object.keys(allSelectedWells).forEach(wellName => {
     wellFill[wellName] = COLORS.blue50
+    wellStroke[wellName] = COLORS.transparent
   })
   Object.keys(highlightedWells).forEach(wellName => {
     wellFill[wellName] = COLORS.blue50
+    wellStroke[wellName] = COLORS.transparent
   })
 
   const labwareRender = (
-    <RobotCoordinateSpace viewBox="0 0 128 86" >
+    <RobotCoordinateSpace viewBox="0 0 128 86">
       <LabwareRender
         definition={definition}
-        selectedWells={allSelectedWells}
         hideOutline
-        isInteractive={!showButtonControls}
+        isInteractive
         wellLabelOption={WELL_LABEL_OPTIONS.SHOW_LABEL_INSIDE}
         wellFill={wellFill}
         wellStroke={wellStroke}
       />
     </RobotCoordinateSpace>
   )
-  return showButtonControls ? (
+  return definition.parameters.format === '384Standard' ? (
     <Flex justifyContent={JUSTIFY_SPACE_BETWEEN} gridGap={SPACING.spacing40} width="100%">
       <Box flex="2 0 0">{labwareRender}</Box>
       <ButtonControls channels={channels} flex="1 0 0" />
@@ -168,13 +159,13 @@ export function WellSelection(props: WellSelectionProps): JSX.Element {
       onSelectionMove={handleSelectionMove}
       onSelectionDone={handleSelectionDone}
     >
-      {labwareRender}
-    </SelectionRect>
+      { labwareRender }
+    </SelectionRect >
   )
 }
 
 interface ButtonControlsProps {
-  channels: ChannelType
+  channels: PipetteChannels 
   flex: React.ComponentProps<typeof Flex>['flex']
 }
 function ButtonControls(props: ButtonControlsProps): JSX.Element {

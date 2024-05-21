@@ -10,22 +10,25 @@ import {
   ALIGN_CENTER,
 } from '@opentrons/components'
 
-import { SmallButton, TabbedButton } from '../../atoms/buttons'
+import { TabbedButton } from '../../atoms/buttons'
 import { ChildNavigation } from '../ChildNavigation'
 import { Overview } from './Overview'
+import { getInitialSummaryState } from './utils'
+import { quickTransferSummaryReducer } from './reducers'
 
-import type { QuickTransferSetupState } from './types'
+import type { SmallButton } from '../../atoms/buttons'
+import type { QuickTransferWizardState } from './types'
 
 interface SummaryAndSettingsProps {
   onNext: () => void
   exitButtonProps: React.ComponentProps<typeof SmallButton>
-  state: QuickTransferSetupState
+  state: QuickTransferWizardState
 }
 
 export function SummaryAndSettings(
   props: SummaryAndSettingsProps
 ): JSX.Element | null {
-  const { onNext, exitButtonProps, state } = props
+  const { onNext, exitButtonProps, state: wizardFlowState } = props
   const { t } = useTranslation(['quick_transfer', 'shared'])
   const displayCategory: string[] = [
     'overview',
@@ -35,11 +38,18 @@ export function SummaryAndSettings(
   const [selectedCategory, setSelectedCategory] = React.useState<string>(
     'overview'
   )
+  // @ts-expect-error TODO figure out how to make this type non-null as we know
+  // none of these values will be undefined
+  const initialSummaryState = getInitialSummaryState(wizardFlowState)
+  const [state] = React.useReducer(
+    quickTransferSummaryReducer,
+    initialSummaryState
+  )
 
   return (
     <Flex>
       <ChildNavigation
-        header={t('quick_transfer_volume', { volume: state.volume })}
+        header={t('quick_transfer_volume', { volume: wizardFlowState.volume })}
         buttonText={t('create_transfer')}
         onClickButton={onNext}
         secondaryButtonProps={exitButtonProps}

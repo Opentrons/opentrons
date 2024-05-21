@@ -1,5 +1,5 @@
 import { resetConfigValue } from '../config'
-import * as Types from './types'
+import type * as Types from './types'
 
 import type { ResetConfigValueAction } from '../config/types'
 

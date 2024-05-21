@@ -2,7 +2,7 @@ import * as React from 'react'
 import { Trans, useTranslation } from 'react-i18next'
 
 import styles from './modalContents.module.css'
-import { FileUploadMessage } from '../../../load-file'
+import type { FileUploadMessage } from '../../../load-file'
 import type { ModalContents } from './types'
 
 const PD = 'Protocol Designer'

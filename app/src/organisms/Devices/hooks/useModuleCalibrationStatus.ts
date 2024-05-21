@@ -1,8 +1,8 @@
 import omitBy from 'lodash/omitBy'
 import { MAGNETIC_BLOCK_TYPE } from '@opentrons/shared-data'
 import { useModuleRenderInfoForProtocolById } from './useModuleRenderInfoForProtocolById'
-import { ProtocolCalibrationStatus } from './useRunCalibrationStatus'
 import { useIsFlex } from './useIsFlex'
+import type { ProtocolCalibrationStatus } from './useRunCalibrationStatus'
 
 export function useModuleCalibrationStatus(
   robotName: string,

@@ -1,11 +1,7 @@
 import * as React from 'react'
 import { vi, describe, it, expect, beforeEach, afterEach } from 'vitest'
 import { fireEvent, screen, cleanup } from '@testing-library/react'
-import {
-  FLEX_ROBOT_TYPE,
-  LabwareDefinition2,
-  fixtureTiprack300ul,
-} from '@opentrons/shared-data'
+import { FLEX_ROBOT_TYPE, fixtureTiprack300ul } from '@opentrons/shared-data'
 import { renderWithProviders } from '../../../__testing-utils__'
 import { createFile, getRobotType } from '../../../file-data/selectors'
 import {
@@ -24,6 +20,7 @@ import { useBlockingHint } from '../../Hints/useBlockingHint'
 import { getUnusedStagingAreas } from '../utils/getUnusedStagingAreas'
 import { getUnusedTrash } from '../utils/getUnusedTrash'
 import { FileSidebar } from '../FileSidebar'
+import type { LabwareDefinition2 } from '@opentrons/shared-data'
 
 vi.mock('../../../step-forms/selectors')
 vi.mock('../../../load-file/selectors')

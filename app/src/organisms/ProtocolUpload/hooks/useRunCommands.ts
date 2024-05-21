@@ -1,4 +1,5 @@
-import { useAllCommandsQuery } from '@opentrons/react-api-client'
+import { useNotifyAllCommandsQuery } from '../../../resources/runs'
+
 import type { UseQueryOptions } from 'react-query'
 import type {
   CommandsData,
@@ -13,7 +14,7 @@ export function useRunCommands(
   params?: GetCommandsParams,
   options?: UseQueryOptions<CommandsData>
 ): RunCommandSummary[] | null {
-  const { data: commandsData } = useAllCommandsQuery(runId, params, {
+  const { data: commandsData } = useNotifyAllCommandsQuery(runId, params, {
     refetchInterval: REFETCH_INTERVAL,
     ...options,
   })

@@ -9,7 +9,11 @@ import type { RobotMovingRoute, RecoveryContentProps } from './types'
 export function RecoveryInProgress({
   recoveryMap,
 }: RecoveryContentProps): JSX.Element {
-  const { ROBOT_IN_MOTION, ROBOT_RESUMING } = RECOVERY_MAP
+  const {
+    ROBOT_IN_MOTION,
+    ROBOT_RESUMING,
+    ROBOT_RETRYING_COMMAND,
+  } = RECOVERY_MAP
   const { t } = useTranslation('error_recovery')
   const { route } = recoveryMap
 
@@ -19,6 +23,8 @@ export function RecoveryInProgress({
         return t('stand_back')
       case ROBOT_RESUMING.ROUTE:
         return t('stand_back_resuming')
+      case ROBOT_RETRYING_COMMAND.ROUTE:
+        return t('stand_back_retrying')
       default:
         return t('stand_back')
     }

@@ -1,58 +1,46 @@
 """Test pick up tip commands."""
-import pytest
-from decoy import Decoy
+from datetime import datetime
+
+from decoy import Decoy, matchers
 
 from opentrons.types import MountType, Point
 
 from opentrons.protocol_engine import WellLocation, WellOffset, DeckPoint
-from opentrons.protocol_engine.types import TipGeometry
-from opentrons.protocol_engine.state import StateView
+from opentrons.protocol_engine.errors import TipNotAttachedError
 from opentrons.protocol_engine.execution import MovementHandler, TipHandler
+from opentrons.protocol_engine.resources import ModelUtils
+from opentrons.protocol_engine.state import StateView
+from opentrons.protocol_engine.types import TipGeometry
 
+from opentrons.protocol_engine.commands.command import DefinedErrorData, SuccessData
 from opentrons.protocol_engine.commands.pick_up_tip import (
     PickUpTipParams,
     PickUpTipResult,
     PickUpTipImplementation,
+    TipPhysicallyMissingError,
+    TipPhysicallyMissingErrorInternalData,
 )
 
 
-@pytest.fixture
-def mock_state_view(decoy: Decoy) -> StateView:
-    """Get a mock StateView."""
-    return decoy.mock(cls=StateView)
-
-
-@pytest.fixture
-def mock_movement_handler(decoy: Decoy) -> MovementHandler:
-    """Get a mock MovementHandler."""
-    return decoy.mock(cls=MovementHandler)
-
-
-@pytest.fixture
-def mock_tip_handler(decoy: Decoy) -> TipHandler:
-    """Get a mock TipHandler."""
-    return decoy.mock(cls=TipHandler)
-
-
-async def test_pick_up_tip_implementation(
+async def test_success(
     decoy: Decoy,
-    mock_state_view: StateView,
-    mock_movement_handler: MovementHandler,
-    mock_tip_handler: TipHandler,
+    state_view: StateView,
+    movement: MovementHandler,
+    tip_handler: TipHandler,
+    model_utils: ModelUtils,
 ) -> None:
     """A PickUpTip command should have an execution implementation."""
     subject = PickUpTipImplementation(
-        state_view=mock_state_view,
-        movement=mock_movement_handler,
-        tip_handler=mock_tip_handler,
+        state_view=state_view,
+        movement=movement,
+        tip_handler=tip_handler,
+        model_utils=model_utils,
     )
 
-    decoy.when(mock_state_view.pipettes.get_mount("pipette-id")).then_return(
-        MountType.LEFT
-    )
+    decoy.when(state_view.pipettes.get_mount("pipette-id")).then_return(MountType.LEFT)
 
     decoy.when(
-        await mock_movement_handler.move_to_well(
+        await movement.move_to_well(
             pipette_id="pipette-id",
             labware_id="labware-id",
             well_name="A3",
@@ -61,7 +49,7 @@ async def test_pick_up_tip_implementation(
     ).then_return(Point(x=111, y=222, z=333))
 
     decoy.when(
-        await mock_tip_handler.pick_up_tip(
+        await tip_handler.pick_up_tip(
             pipette_id="pipette-id",
             labware_id="labware-id",
             well_name="A3",
@@ -77,9 +65,55 @@ async def test_pick_up_tip_implementation(
         )
     )
 
-    assert result == PickUpTipResult(
-        tipLength=42,
-        tipVolume=300,
-        tipDiameter=5,
-        position=DeckPoint(x=111, y=222, z=333),
+    assert result == SuccessData(
+        public=PickUpTipResult(
+            tipLength=42,
+            tipVolume=300,
+            tipDiameter=5,
+            position=DeckPoint(x=111, y=222, z=333),
+        ),
+        private=None,
+    )
+
+
+async def test_tip_physically_missing_error(
+    decoy: Decoy,
+    state_view: StateView,
+    movement: MovementHandler,
+    tip_handler: TipHandler,
+    model_utils: ModelUtils,
+) -> None:
+    """It should return a TipPhysicallyMissingError if the HW API indicates that."""
+    subject = PickUpTipImplementation(
+        state_view=state_view,
+        movement=movement,
+        tip_handler=tip_handler,
+        model_utils=model_utils,
+    )
+
+    pipette_id = "pipette-id"
+    labware_id = "labware-id"
+    well_name = "well-name"
+    error_id = "error-id"
+    error_created_at = datetime(1234, 5, 6)
+
+    decoy.when(
+        await tip_handler.pick_up_tip(
+            pipette_id=pipette_id, labware_id=labware_id, well_name=well_name
+        )
+    ).then_raise(TipNotAttachedError())
+    decoy.when(model_utils.generate_id()).then_return(error_id)
+    decoy.when(model_utils.get_timestamp()).then_return(error_created_at)
+
+    result = await subject.execute(
+        PickUpTipParams(pipetteId=pipette_id, labwareId=labware_id, wellName=well_name)
+    )
+
+    assert result == DefinedErrorData(
+        public=TipPhysicallyMissingError.construct(
+            id=error_id, createdAt=error_created_at, wrappedErrors=[matchers.Anything()]
+        ),
+        private=TipPhysicallyMissingErrorInternalData(
+            pipette_id=pipette_id, labware_id=labware_id, well_name=well_name
+        ),
     )

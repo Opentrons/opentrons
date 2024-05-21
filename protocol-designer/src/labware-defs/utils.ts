@@ -2,12 +2,14 @@ import groupBy from 'lodash/groupBy'
 import {
   getLabwareDefURI,
   PD_DO_NOT_LIST,
-  LabwareDefinition1,
-  LabwareDefinition2,
   getAllDefinitions as _getAllDefinitions,
   getAllLegacyDefinitions,
 } from '@opentrons/shared-data'
-import { LabwareDefByDefURI } from './types'
+import type {
+  LabwareDefinition1,
+  LabwareDefinition2,
+} from '@opentrons/shared-data'
+import type { LabwareDefByDefURI } from './types'
 
 export function getLegacyLabwareDef(
   loadName: string | null | undefined

@@ -1,5 +1,5 @@
-import * as Types from './types'
 import * as Constants from './constants'
+import type * as Types from './types'
 import type {
   RobotApiRequestMeta,
   RobotApiV2ErrorResponseBody,

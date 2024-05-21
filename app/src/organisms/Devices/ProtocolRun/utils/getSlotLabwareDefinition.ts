@@ -1,4 +1,4 @@
-import { LabwareDefinition2, RunTimeCommand } from '@opentrons/shared-data'
+import type { LabwareDefinition2, RunTimeCommand } from '@opentrons/shared-data'
 
 export function getSlotLabwareDefinition(
   labwareId: string,

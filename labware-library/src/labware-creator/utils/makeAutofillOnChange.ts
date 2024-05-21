@@ -1,6 +1,6 @@
 import mapValues from 'lodash/mapValues'
-import { LabwareFields } from '../fields'
 import type { FormikTouched } from 'formik'
+import type { LabwareFields } from '../fields'
 
 interface MakeAutofillOnChangeArgs {
   name: keyof LabwareFields

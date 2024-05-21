@@ -237,7 +237,13 @@ export const LiquidPlacementForm = (): JSX.Element | null => {
           </OutlineButton>
           <DeprecatedPrimaryButton
             type="submit"
-            disabled={volumeErrors != null || volume == null || volume === ''}
+            disabled={
+              volumeErrors != null ||
+              volume == null ||
+              volume === '' ||
+              selectedLiquidId == null ||
+              selectedLiquidId === ''
+            }
           >
             {t('button:save')}
           </DeprecatedPrimaryButton>

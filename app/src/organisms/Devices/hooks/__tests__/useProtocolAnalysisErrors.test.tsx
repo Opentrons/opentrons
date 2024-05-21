@@ -1,6 +1,5 @@
 import { vi, it, expect, describe, beforeEach } from 'vitest'
 import { when } from 'vitest-when'
-import { UseQueryResult } from 'react-query'
 import { renderHook } from '@testing-library/react'
 
 import {
@@ -13,6 +12,7 @@ import { useNotifyRunQuery } from '../../../../resources/runs'
 
 import { RUN_ID_2 } from '../../../RunTimeControl/__fixtures__'
 
+import type { UseQueryResult } from 'react-query'
 import type { Run, Protocol } from '@opentrons/api-client'
 import type {
   CompletedProtocolAnalysis,

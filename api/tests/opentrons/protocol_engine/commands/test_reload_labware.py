@@ -18,6 +18,7 @@ from opentrons.protocol_engine.execution import ReloadedLabwareData, EquipmentHa
 from opentrons.protocol_engine.resources import labware_validation
 from opentrons.protocol_engine.state import StateView
 
+from opentrons.protocol_engine.commands.command import SuccessData
 from opentrons.protocol_engine.commands.reload_labware import (
     ReloadLabwareParams,
     ReloadLabwareResult,
@@ -56,9 +57,12 @@ async def test_reload_labware_implementation(
 
     result = await subject.execute(data)
 
-    assert result == ReloadLabwareResult(
-        labwareId="my-labware-id",
-        offsetId="labware-offset-id",
+    assert result == SuccessData(
+        public=ReloadLabwareResult(
+            labwareId="my-labware-id",
+            offsetId="labware-offset-id",
+        ),
+        private=None,
     )
 
 

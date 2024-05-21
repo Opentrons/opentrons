@@ -21,8 +21,8 @@ import type {
   MixArgs,
   TransferArgs,
 } from '@opentrons/step-generation'
-import { StepIdType } from '../form-types'
-import {
+import type { StepIdType } from '../form-types'
+import type {
   NamedIngred,
   StepArgsAndErrors,
   StepItemSourceDestRow,

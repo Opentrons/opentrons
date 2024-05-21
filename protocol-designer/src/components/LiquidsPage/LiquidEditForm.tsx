@@ -97,7 +97,7 @@ export function LiquidEditForm(props: LiquidEditFormProps): JSX.Element {
 
   const {
     handleSubmit,
-    formState: { errors, isDirty, touchedFields },
+    formState: { errors, touchedFields },
     control,
     watch,
     setValue,
@@ -117,6 +117,7 @@ export function LiquidEditForm(props: LiquidEditFormProps): JSX.Element {
       serialize: values.serialize || false,
     })
   }
+
   return (
     <Card className={styles.form_card}>
       <form onSubmit={handleSubmit(handleLiquidEdits)}>
@@ -215,7 +216,10 @@ export function LiquidEditForm(props: LiquidEditFormProps): JSX.Element {
           </DeprecatedPrimaryButton>
           <DeprecatedPrimaryButton
             disabled={
-              !isDirty || errors.name != null || errors.displayColor != null
+              !touchedFields.name ||
+              errors.name != null ||
+              name === '' ||
+              errors.displayColor != null
             }
             type="submit"
           >

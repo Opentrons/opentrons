@@ -1,22 +1,20 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
-import { Flex, JUSTIFY_CENTER, SPACING } from '@opentrons/components'
+import { Flex, JUSTIFY_CENTER, POSITION_FIXED, SPACING } from '@opentrons/components'
 
 import { ChildNavigation } from '../../organisms/ChildNavigation'
 import { WellSelection } from '../../organisms/WellSelection'
 
 import type { SmallButton } from '../../atoms/buttons'
-
 import type {
-  QuickTransferSetupState,
+  QuickTransferWizardState,
   QuickTransferWizardAction,
 } from './types'
 
 interface SelectSourceWellsProps {
   onNext: () => void
   onBack: () => void
-  exitButtonProps: React.ComponentProps<typeof SmallButton>
-  state: QuickTransferSetupState
+  state: QuickTransferWizardState
   dispatch: React.Dispatch<QuickTransferWizardAction>
 }
 
@@ -24,7 +22,12 @@ export function SelectSourceWells(props: SelectSourceWellsProps): JSX.Element {
   const { onNext, onBack, state, dispatch } = props
   const { i18n, t } = useTranslation(['quick_transfer', 'shared'])
 
-  const [selectedWells, setSelectedWells] = React.useState({})
+  const sourceWells = state.sourceWells ?? []
+  const sourceWellGroup = sourceWells.reduce((acc, well) => {
+    return { ...acc, [well]: null }
+  }, {})
+
+  const [selectedWells, setSelectedWells] = React.useState(sourceWellGroup)
 
   const handleClickNext = (): void => {
     dispatch({
@@ -57,6 +60,10 @@ export function SelectSourceWells(props: SelectSourceWellsProps): JSX.Element {
         justifyContent={JUSTIFY_CENTER}
         marginTop={SPACING.spacing120}
         padding={`${SPACING.spacing16} ${SPACING.spacing60} ${SPACING.spacing40} ${SPACING.spacing60}`}
+        position={POSITION_FIXED}
+        top="0"
+        left="0"
+        width="100%"
       >
         {state.source != null ? (
           <WellSelection
@@ -65,7 +72,7 @@ export function SelectSourceWells(props: SelectSourceWellsProps): JSX.Element {
             selectWells={wellGroup => {
               setSelectedWells(prevWells => ({ ...prevWells, ...wellGroup }))
             }}
-            nozzleType={null}
+            channels={state.pipette?.channels ?? 1}
           />
         ) : null}
       </Flex>

@@ -2,7 +2,7 @@ import * as React from 'react'
 import { vi, it, expect, describe, beforeEach, afterEach } from 'vitest'
 import { when } from 'vitest-when'
 import { renderHook } from '@testing-library/react'
-import { createStore, Store } from 'redux'
+import { createStore } from 'redux'
 import { Provider } from 'react-redux'
 import { QueryClient, QueryClientProvider } from 'react-query'
 
@@ -18,6 +18,7 @@ import {
   getRobotSerialNumber,
 } from '../../../../redux/discovery'
 
+import type { Store } from 'redux'
 import type { DiscoveredRobot } from '../../../../redux/discovery/types'
 import type { AttachedPipettesByMount } from '../../../../redux/pipettes/types'
 

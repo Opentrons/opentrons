@@ -18,7 +18,6 @@ import {
   DIRECTION_COLUMN,
 } from '@opentrons/components'
 import {
-  DeckConfiguration,
   SINGLE_RIGHT_SLOT_FIXTURE,
   TEMPERATURE_MODULE_CUTOUTS,
   TEMPERATURE_MODULE_TYPE,
@@ -30,8 +29,12 @@ import { getLabwareOnSlot, getSlotIsEmpty } from '../../../step-forms'
 import { getInitialDeckSetup } from '../../../step-forms/selectors'
 import { getLabwareIsCompatible } from '../../../utils/labwareModuleCompatibility'
 import { PDAlert } from '../../alerts/PDAlert'
+import type {
+  DeckConfiguration,
+  CutoutId,
+  ModuleType,
+} from '@opentrons/shared-data'
 import type { Control, ControllerRenderProps } from 'react-hook-form'
-import type { CutoutId, ModuleType } from '@opentrons/shared-data'
 import type { ModuleOnDeck } from '../../../step-forms'
 
 export interface EditMultipleModulesModalValues {

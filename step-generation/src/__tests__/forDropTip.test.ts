@@ -7,7 +7,7 @@ import {
 } from '../fixtures'
 import { makeImmutableStateUpdater } from '../__utils__'
 import { forDropTip as _forDropTip } from '../getNextRobotStateAndWarnings/forDropTip'
-import { InvariantContext, RobotState } from '../types'
+import type { InvariantContext, RobotState } from '../types'
 const forDropTip = makeImmutableStateUpdater(_forDropTip)
 
 describe('dropTip', () => {

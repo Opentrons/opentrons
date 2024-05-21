@@ -15,5 +15,6 @@
   "run_will_resume": "The run will resume from the point at which the error occurred. Take any necessary actions to correct the problem first. If the step is completed successfully, the protocol continues.",
   "stand_back": "Stand back, robot is in motion",
   "stand_back_resuming": "Stand back, resuming current step",
+  "stand_back_retrying": "Stand back, retrying current command",
   "view_recovery_options": "View recovery options"
 }

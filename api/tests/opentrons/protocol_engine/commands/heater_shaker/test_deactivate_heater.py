@@ -10,6 +10,7 @@ from opentrons.protocol_engine.state.module_substates import (
 )
 from opentrons.protocol_engine.execution import EquipmentHandler
 from opentrons.protocol_engine.commands import heater_shaker
+from opentrons.protocol_engine.commands.command import SuccessData
 from opentrons.protocol_engine.commands.heater_shaker.deactivate_heater import (
     DeactivateHeaterImpl,
 )
@@ -44,4 +45,6 @@ async def test_deactivate_heater(
 
     result = await subject.execute(data)
     decoy.verify(await hs_hardware.deactivate_heater(), times=1)
-    assert result == heater_shaker.DeactivateHeaterResult()
+    assert result == SuccessData(
+        public=heater_shaker.DeactivateHeaterResult(), private=None
+    )

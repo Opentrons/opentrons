@@ -21,7 +21,7 @@ black-check:
 
 .PHONY: ruff
 ruff:
-	python -m pipenv run python -m ruff check . --fix
+	python -m pipenv run python -m ruff check . --fix --unsafe-fixes
 
 .PHONY: ruff-check
 ruff-check:
@@ -29,7 +29,7 @@ ruff-check:
 
 .PHONY: mypy
 mypy:
-	python -m pipenv run python -m mypy aws_actions.py api
+	python -m pipenv run python -m mypy deploy.py api tests
 
 .PHONY: format-readme
 format-readme:
@@ -56,49 +56,36 @@ pre-commit: fixup unit-test
 
 .PHONY: gen-env
 gen-env:
-	python -m pipenv run python api/settings.py
+	python -m pipenv run python -m api.settings
 
 .PHONY: unit-test
 unit-test:
 	python -m pipenv run python -m pytest tests -m unit
 
-.PHONY: clean-package
-clean-package:
-	rm -f requirements.txt
-	rm -f function.zip
-	rm -rf package
-
 .PHONY: gen-requirements
 gen-requirements:
 	@echo "Generating requirements.txt from Pipfile.lock..."
-	python -m pipenv requirements --hash > requirements.txt
-
-.PHONY: install-deps
-install-deps:
-	@echo "Installing dependencies to package/ directory..."
-	mkdir -p package
-	python -m pipenv run pip install -r requirements.txt --target ./package --upgrade
-
-.PHONY: package-lambda
-package-lambda:
-	@echo "Copying source code to package/ directory..."
-	mkdir -p package
-	cp -r api/. package/api
-	@echo "Creating the deployment zip file..."
-	cd package && zip -r ../function.zip . && cd ..
-	@echo "Package created successfully."
-
-.PHONY: build
-build: clean-package gen-requirements install-deps package-lambda
+	python -m pipenv requirements > requirements.txt
 
 ENV ?= sandbox
 
 .PHONY: deploy
-deploy:
+deploy: gen-requirements
 	@echo "Deploying to environment: $(ENV)"
-	python -m pipenv run python aws_actions.py --env $(ENV) --action deploy
+	python -m pipenv run python deploy.py --env $(ENV)
 
-.PHONY: test-lambda
-test-lambda:
-	@echo "Invoking the latest version of the lambda: $(ENV)"
-	python -m pipenv run python aws_actions.py --env $(ENV) --action test
+.PHONY: direct-chat-completion
+direct-chat-completion:
+	python -m pipenv run python -m api.domain.openai_predict
+
+.PHONY: print-client-settings-vars
+print-client-settings-vars:
+	python -m pipenv run python -m tests.helpers.settings
+
+.PHONY: live-client
+live-client:
+	python -m pipenv run python -m tests.helpers.client
+
+.PHONY: test-live
+test-live:
+	python -m pipenv run python -m pytest tests -m live --env $(ENV)

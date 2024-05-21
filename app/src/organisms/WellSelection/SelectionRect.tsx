@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { Flex, JUSTIFY_CENTER } from '@opentrons/components'
 
 import type { DragRect, GenericRect } from './types'
 
@@ -24,33 +25,59 @@ export function SelectionRect(props: SelectionRectProps): JSX.Element {
     }
   }
 
-  const handleDrag = (e: MouseEvent): void => {
-    setPositions(prevPositions => {
-      if (prevPositions) {
-        const nextRect = {
-          ...prevPositions,
-          xDynamic: e.clientX,
-          yDynamic: e.clientY,
-        }
-        const rect = getRect(nextRect)
-        onSelectionMove && onSelectionMove(rect)
-
-        return nextRect
+  const handleDrag = React.useCallback(
+    (e: TouchEvent | MouseEvent): void => {
+      let xDynamic: number
+      let yDynamic: number
+      if (e instanceof TouchEvent) {
+        const touch = e.touches[0]
+        xDynamic = touch.clientX
+        yDynamic = touch.clientY
+      } else {
+        xDynamic = e.clientX
+        yDynamic = e.clientY
       }
-      return prevPositions
-    })
-  }
+      setPositions(prevPositions => {
+        if (prevPositions != null) {
+          const nextRect = {
+            ...prevPositions,
+            xDynamic,
+            yDynamic,
+          }
+          const rect = getRect(nextRect)
+          onSelectionMove != null && onSelectionMove(rect)
 
-  const handleMouseUp = (e: MouseEvent): void => {
-    if (!(e instanceof MouseEvent)) {
-      return
-    }
-    const finalRect = positions && getRect(positions)
-    setPositions(prevPositions => {
-      return prevPositions === positions ? null : prevPositions
+          return nextRect
+        }
+        return prevPositions
+      })
+    },
+    [onSelectionMove]
+  )
+
+  const handleDragEnd = React.useCallback(
+    (e: TouchEvent | MouseEvent): void => {
+      if (!(e instanceof TouchEvent) && !(e instanceof MouseEvent)) {
+        return
+      }
+      const finalRect = positions != null ? getRect(positions) : null
+      setPositions(prevPositions => {
+        return prevPositions === positions ? null : prevPositions
+      })
+      // call onSelectionDone callback with {x0, x1, y0, y1} of final selection rectangle
+      onSelectionDone != null && finalRect != null && onSelectionDone(finalRect)
+    },
+    [onSelectionDone, positions]
+  )
+
+  const handleTouchStart: React.TouchEventHandler = e => {
+    const touch = e.touches[0]
+    setPositions({
+      xStart: touch.clientX,
+      xDynamic: touch.clientX,
+      yStart: touch.clientY,
+      yDynamic: touch.clientY,
     })
-    // call onSelectionDone callback with {x0, x1, y0, y1} of final selection rectangle
-    onSelectionDone && finalRect && onSelectionDone(finalRect)
   }
 
   const handleMouseDown: React.MouseEventHandler = e => {
@@ -63,23 +90,30 @@ export function SelectionRect(props: SelectionRectProps): JSX.Element {
   }
 
   React.useEffect(() => {
+    document.addEventListener('touchmove', handleDrag)
+    document.addEventListener('touchend', handleDragEnd)
     document.addEventListener('mousemove', handleDrag)
-    document.addEventListener('mouseup', handleMouseUp)
+    document.addEventListener('mouseup', handleDragEnd)
     return () => {
+      document.removeEventListener('touchmove', handleDrag)
+      document.removeEventListener('touchend', handleDragEnd)
       document.removeEventListener('mousemove', handleDrag)
-      document.removeEventListener('mouseup', handleMouseUp)
+      document.removeEventListener('mouseup', handleDragEnd)
     }
-  }, [handleDrag, handleMouseUp])
+  }, [handleDrag, handleDragEnd])
 
   return (
-    <div
+    <Flex
+      // mouse events to enable local development
       onMouseDown={handleMouseDown}
-      ref={ref => {
+      onTouchStart={handleTouchStart}
+      ref={(ref: HTMLDivElement | SVGAElement | null) => {
         parentRef.current = ref
       }}
-      style={{ width: '600px' }}
+      justifyContent={JUSTIFY_CENTER}
+      width="100%"
     >
-      {children}
-    </div>
+      <Flex width="75%">{children}</Flex>
+    </Flex>
   )
 }

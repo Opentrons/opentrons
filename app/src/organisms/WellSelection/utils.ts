@@ -7,7 +7,7 @@ import type { WellGroup } from '@opentrons/components'
 import type { WellSetHelpers } from '@opentrons/shared-data'
 import type { BoundingRect, GenericRect } from './types'
 
-// Collision detection for SelectionRect / SelectableLabware
+// Collision detection for SelectionRect / WellSelection
 export const rectCollision = (
   rect1: BoundingRect,
   rect2: BoundingRect
@@ -62,9 +62,11 @@ export const getCollidingWells = (rectPositions: GenericRect): WellGroup => {
   )
   return collidedWellData
 }
+
 export const arrayToWellGroup = (w: string[]): WellGroup =>
   w.reduce((acc, wellName) => ({ ...acc, [wellName]: null }), {})
-// cross-PD memoization of well set utils
+
+// memoization of well set utils
 const wellSetHelpers: WellSetHelpers = makeWellSetHelpers()
 const {
   canPipetteUseLabware,
