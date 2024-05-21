@@ -17,7 +17,7 @@ import {
 import { SendButton } from '../../atoms/SendButton'
 import { preparedPromptAtom, chatDataAtom } from '../../resources/atoms'
 import { useApiCall, useGetAccessToken } from '../../resources/hooks'
-import { calcTextAreaHeight, isLocalhost } from '../../resources/utils/utils'
+import { calcTextAreaHeight } from '../../resources/utils/utils'
 import { END_POINT } from '../../resources/constants'
 
 import type { AxiosRequestConfig } from 'axios'
@@ -38,7 +38,7 @@ export function InputPrompt(): JSX.Element {
   const [, setChatData] = useAtom(chatDataAtom)
   const [submitted, setSubmitted] = React.useState<boolean>(false)
   const userPrompt = watch('userPrompt') ?? ''
-  const { data, isLoading, fetchData } = useApiCall()
+  const { data, isLoading, callApi } = useApiCall()
   const { getAccessToken } = useGetAccessToken()
 
   const handleClick = async (): Promise<void> => {
@@ -55,24 +55,22 @@ export function InputPrompt(): JSX.Element {
         'Content-Type': 'application/json',
       }
 
+      const postData = {
+        message: userPrompt,
+        fake: false,
+      }
+
       const config = {
         url: END_POINT,
         method: 'POST',
         headers,
-        data: {
-          message: userPrompt,
-          fake: false,
-        },
-        withCredentials: isLocalhost(),
+        data: postData,
       }
-      console.log('called')
-      await fetchData(config as AxiosRequestConfig)
-      console.log('fetched')
-      console.log('data', data)
+      await callApi(config as AxiosRequestConfig)
       setSubmitted(true)
       reset()
-    } catch (err) {
-      console.error(`error: ${err}`)
+    } catch (err: any) {
+      console.error(`error: ${err.message}`)
       throw err
     }
   }
@@ -92,9 +90,6 @@ export function InputPrompt(): JSX.Element {
       setSubmitted(false)
     }
   }, [data, isLoading, submitted])
-
-  // ToDo (kk:05/02/2024) This is also temp. Asking the design about error.
-  // console.error('error', error)
 
   return (
     <StyledForm id="User_Prompt">

@@ -14,7 +14,7 @@ describe('useApiCall', () => {
     const { result } = renderHook(() => useApiCall())
 
     await act(async () => {
-      await result.current.fetchData({
+      await result.current.callApi({
         url: '/test',
         method: 'POST',
         data: mockData,
@@ -32,7 +32,7 @@ describe('useApiCall', () => {
     const { result } = renderHook(() => useApiCall())
 
     await act(async () => {
-      await result.current.fetchData({ url: '/test', method: 'POST', data: {} })
+      await result.current.callApi({ url: '/test', method: 'POST', data: {} })
     })
 
     expect(result.current.isLoading).toBe(false)

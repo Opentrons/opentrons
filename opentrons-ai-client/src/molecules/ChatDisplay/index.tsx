@@ -15,6 +15,7 @@ import {
   PrimaryButton,
   SPACING,
   StyledText,
+  TYPOGRAPHY,
 } from '@opentrons/components'
 
 import type { ChatData } from '../../resources/types'
@@ -101,7 +102,13 @@ function ExternalLink(props: JSX.IntrinsicAttributes): JSX.Element {
 }
 
 function ParagraphText(props: JSX.IntrinsicAttributes): JSX.Element {
-  return <StyledText {...props} as="p" />
+  return (
+    <StyledText
+      {...props}
+      fontSize={TYPOGRAPHY.fontSize20}
+      lineHeight={TYPOGRAPHY.lineHeight24}
+    />
+  )
 }
 
 function HeaderText(props: JSX.IntrinsicAttributes): JSX.Element {
