@@ -65,6 +65,7 @@ INSTALL_REQUIRES = [
     "pyserial>=3.5",
     "typing-extensions>=4.0.0,<5",
     "click>=8.0.0,<9",
+    "pyusb==1.2.1",
     'importlib-metadata >= 1.0 ; python_version < "3.8"',
 ]
 
