@@ -5,6 +5,7 @@ from multiprocessing import Process
 from typing import AsyncGenerator, Callable, Iterator, Union
 from collections import namedtuple
 
+from opentrons import APIVersion
 from opentrons.hardware_control.emulation.settings import Settings
 from opentrons.protocol_engine import create_protocol_engine, Config, DeckType
 from opentrons.protocol_reader.protocol_source import (
@@ -14,7 +15,6 @@ from opentrons.protocol_reader.protocol_source import (
     PythonProtocolConfig,
 )
 from opentrons.protocol_runner.protocol_runner import create_protocol_runner
-from opentrons.protocols.api_support.types import APIVersion
 from opentrons.protocols.parse import parse
 from opentrons.protocols.execution import execute
 from opentrons.protocols.api_support import deck_type

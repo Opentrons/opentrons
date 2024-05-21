@@ -20,8 +20,7 @@ from contextlib import contextmanager, suppress
 from opentrons_shared_data import deck
 from opentrons_shared_data.robot.dev_types import RobotType, RobotTypeEnum
 
-from opentrons import should_use_ot3
-from opentrons.hardware_control.initialization import initialize as initialize_api
+from opentrons import initialize as initialize_api, should_use_ot3
 from opentrons.config import (
     IS_ROBOT,
     ARCHITECTURE,
