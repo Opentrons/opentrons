@@ -54,7 +54,6 @@ export const TipPositionModal = (
     closeModal,
   } = props
   const [targetProps, tooltipProps] = useHoverTooltip()
-  console.log(specs)
   const zSpec = specs.z
   const ySpec = specs.y
   const xSpec = specs.x
