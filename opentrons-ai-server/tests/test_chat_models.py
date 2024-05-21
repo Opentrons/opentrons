@@ -7,7 +7,7 @@ from pydantic import ValidationError
 @pytest.mark.unit
 def test_chat_request_model() -> None:
     # Test valid data
-    request_data = {"message": "Hello", "fake": False}
+    request_data = {"message": "Hello", "chat_history":[] , "fake": False}
     request = ChatRequest(**request_data)
     assert request.message == "Hello"
     assert request.fake is False
@@ -28,5 +28,5 @@ def test_chat_response_model() -> None:
 
     # Test invalid data
     with pytest.raises(ValidationError):
-        invalid_response_data = {"reply": 123, "fake": "false"}
+        invalid_response_data = {"reply": 123, "history": "history", "fake": "false"}
         ChatResponse(**invalid_response_data)

@@ -7,5 +7,5 @@ class Chat(BaseModel):
 
 class ChatRequest(BaseModel):
     message: str
-    chat_history: List[Chat]
+    history: Optional[List[Chat]] = None
     fake: bool
