@@ -670,7 +670,8 @@ class OT3Controller(FlexBackend):
         mounts_moving = [
             k
             for k in moving_axes_in_move_group(move_group)
-            if k in [NodeId.pipette_left, NodeId.pipette_right]
+            if k
+            in [NodeId.pipette_left, NodeId.pipette_right, NodeId.head_l, NodeId.head_r]
         ]
         async with self._monitor_overpressure(mounts_moving):
             positions = await runner.run(can_messenger=self._messenger)
