@@ -54,6 +54,7 @@ export const TipPositionModal = (
     closeModal,
   } = props
   const [targetProps, tooltipProps] = useHoverTooltip()
+  console.log(specs)
   const zSpec = specs.z
   const ySpec = specs.y
   const xSpec = specs.x
@@ -72,7 +73,7 @@ export const TipPositionModal = (
   })
 
   const [zValue, setZValue] = React.useState<string | null>(
-    zSpec?.value == null ? null : String(zSpec?.value)
+    zSpec?.value == null ? String(defaultMmFromBottom) : String(zSpec?.value)
   )
   const [yValue, setYValue] = React.useState<string | null>(
     ySpec?.value == null ? null : String(ySpec?.value)
