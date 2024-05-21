@@ -5,8 +5,7 @@
  */
 
 export const calcTextAreaHeight = (input: string): number => {
-  const rowsNum = input.split('\n').length
-  return rowsNum
+  return input.split('\n').length
 }
 
 /**
