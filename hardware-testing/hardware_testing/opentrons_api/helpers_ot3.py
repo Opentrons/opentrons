@@ -588,7 +588,7 @@ async def update_pick_up_speed(
 ) -> None:
     """Update pick-up-tip current."""
     pipette = _get_pipette_from_mount(api, mount)
-    pipette.get_pick_up_configuration_for_tip_count(tip_count).speed = speed
+    pipette.get_pick_up_configuration_for_tip_count(tip_count).speed_by_tip_count[tip_count] = speed
     print(f'Settings: {pipette.get_pick_up_configuration_for_tip_count(tip_count)}')
     # config_model = pipette.pick_up_configurations.press_fit
     # config_model.speed = speed
