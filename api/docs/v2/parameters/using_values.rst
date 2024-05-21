@@ -70,3 +70,25 @@ Since ``params`` is only available within the ``run()`` function, there are cert
       - In the ``add_parameters()`` function.
     * - Non-nested function definitions
       - Anywhere outside of ``run()``.
+
+Additionally, keep in mind that updated parameter values are applied by reanalyzing the protocol. This means you can't depend on updated values for any action that takes place *prior to reanalysis*.
+
+An example of such an action is applying labware offset data. Say you have a parameter that changes the type of well plate you load in a particular slot::
+
+    # within add_parameters()
+    parameters.add_str(
+        variable_name="plate_type",
+        display_name="Well plate type",
+        choices=[
+            {"display_name": "Corning", "value": "corning_96_wellplate_360ul_flat"},
+            {"display_name": "NEST", "value": "nest_96_wellplate_200ul_flat"},
+        ],
+        default="corning_96_wellplate_360ul_flat",
+    )
+
+    # within run()
+    plate = protocol.load_labware(
+        load_name="protocol.params.plate_type", location="D2"
+    )
+
+When performing run setup, you're prompted to apply offsets before selecting parameter values. This is your only opportunity to apply offsets, so they're applied for the default parameter values — in this case, the Corning plate. If you then change the "Well plate type" parameter to the NEST plate, the NEST plate will have default offset values (0.0 on all axes). You can fix this by running Labware Position Check, since it takes place after reanalysis, or by using :py:meth:`.Labware.set_offset` in your protocol.
