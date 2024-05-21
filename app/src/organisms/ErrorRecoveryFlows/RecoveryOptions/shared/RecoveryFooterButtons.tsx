@@ -4,7 +4,6 @@ import { useTranslation } from 'react-i18next'
 import {
   ALIGN_CENTER,
   Flex,
-  JUSTIFY_CENTER,
   JUSTIFY_SPACE_BETWEEN,
   SPACING,
 } from '@opentrons/components'
