@@ -107,8 +107,8 @@ class CommandSlice:
 
 
 @dataclass(frozen=True)
-class CurrentCommand:
-    """The "current" command's ID and index in the overall commands list."""
+class CommandPointer:
+    """Brief info about a command and where to find it."""
 
     command_id: str
     command_key: str
@@ -593,7 +593,7 @@ class CommandView(HasState[CommandState]):
         """Get the IDs of all queued protocol commands, in FIFO order."""
         return self._state.command_history.get_queue_ids()
 
-    def get_current(self) -> Optional[CurrentCommand]:
+    def get_current(self) -> Optional[CommandPointer]:
         """Return the "current" command, if any.
 
         The "current" command is the command that is currently executing,
@@ -601,20 +601,20 @@ class CommandView(HasState[CommandState]):
         """
         running_command = self._state.command_history.get_running_command()
         if running_command:
-            return CurrentCommand(
+            return CommandPointer(
                 command_id=running_command.command.id,
                 command_key=running_command.command.key,
                 created_at=running_command.command.createdAt,
                 index=running_command.index,
             )
 
-        final_command = self.get_final_command()
-        if final_command:
-            return CurrentCommand(
-                command_id=final_command.command.id,
-                command_key=final_command.command.key,
-                created_at=final_command.command.createdAt,
-                index=final_command.index,
+        most_recently_finalized_command = self.get_most_recently_finalized_command()
+        if most_recently_finalized_command:
+            return CommandPointer(
+                command_id=most_recently_finalized_command.command.id,
+                command_key=most_recently_finalized_command.command.key,
+                created_at=most_recently_finalized_command.command.createdAt,
+                index=most_recently_finalized_command.index,
             )
 
         return None
@@ -678,7 +678,7 @@ class CommandView(HasState[CommandState]):
         """Get whether the protocol is running & queued commands should be executed."""
         return self._state.queue_status == QueueStatus.RUNNING
 
-    def get_final_command(self) -> Optional[CommandEntry]:
+    def get_most_recently_finalized_command(self) -> Optional[CommandEntry]:
         """Get the most recent command that has reached its final `status`. See get_command_is_final."""
         run_requested_to_stop = self._state.run_result is not None
 
@@ -691,22 +691,22 @@ class CommandView(HasState[CommandState]):
             else:
                 return self._state.command_history.get_prev(tail_command.command.id)
         else:
-            final_command = self._state.command_history.get_terminal_command()
+            most_recently_finalized = self._state.command_history.get_terminal_command()
             # This iteration is effectively O(1) as we'll only ever have to iterate one or two times at most.
-            while final_command is not None:
+            while most_recently_finalized is not None:
                 next_command = self._state.command_history.get_next(
-                    final_command.command.id
+                    most_recently_finalized.command.id
                 )
                 if (
                     next_command is not None
                     and next_command.command.status != CommandStatus.QUEUED
                     and next_command.command.status != CommandStatus.RUNNING
                 ):
-                    final_command = next_command
+                    most_recently_finalized = next_command
                 else:
                     break
 
-        return final_command
+            return most_recently_finalized
 
     def get_command_is_final(self, command_id: str) -> bool:
         """Get whether a given command has reached its final `status`.
@@ -751,9 +751,24 @@ class CommandView(HasState[CommandState]):
 
         return no_command_running and no_command_to_execute
 
+    def get_recovery_target(self) -> Optional[CommandPointer]:
+        """Return the command currently undergoing error recovery, if any."""
+        recovery_target_command_id = self._state.recovery_target_command_id
+        if recovery_target_command_id is None:
+            return None
+        else:
+            entry = self._state.command_history.get(recovery_target_command_id)
+            return CommandPointer(
+                command_id=entry.command.id,
+                command_key=entry.command.key,
+                created_at=entry.command.createdAt,
+                index=entry.index,
+            )
+
     def get_recovery_in_progress_for_command(self, command_id: str) -> bool:
         """Return whether the given command failed and its error recovery is in progress."""
-        return self._state.recovery_target_command_id == command_id
+        pointer = self.get_recovery_target()
+        return pointer is not None and pointer.command_id == command_id
 
     def raise_fatal_command_error(self) -> None:
         """Raise the run's fatal command error, if there was one, as an exception.

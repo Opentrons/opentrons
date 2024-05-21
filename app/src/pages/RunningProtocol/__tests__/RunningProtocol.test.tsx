@@ -2,6 +2,7 @@ import * as React from 'react'
 import { Route, MemoryRouter } from 'react-router-dom'
 import { vi, it, describe, expect, beforeEach, afterEach } from 'vitest'
 import { when } from 'vitest-when'
+import { screen } from '@testing-library/react'
 
 import {
   RUN_STATUS_BLOCKED_BY_OPEN_DOOR,
@@ -38,6 +39,10 @@ import {
   useNotifyAllCommandsQuery,
 } from '../../../resources/runs'
 import { useFeatureFlag } from '../../../redux/config'
+import {
+  ErrorRecoveryFlows,
+  useErrorRecoveryFlows,
+} from '../../../organisms/ErrorRecoveryFlows'
 import { useLastRunCommand } from '../../../organisms/Devices/hooks/useLastRunCommand'
 
 import type { UseQueryResult } from 'react-query'
@@ -58,6 +63,7 @@ vi.mock('../../../organisms/OnDeviceDisplay/RunningProtocol/CancelingRunModal')
 vi.mock('../../../organisms/OpenDoorAlertModal')
 vi.mock('../../../resources/runs')
 vi.mock('../../../redux/config')
+vi.mock('../../../organisms/ErrorRecoveryFlows')
 vi.mock('../../../organisms/Devices/hooks/useLastRunCommand')
 
 const RUN_ID = 'run_id'
@@ -72,6 +78,7 @@ const PROTOCOL_ANALYSIS = {
 const mockPlayRun = vi.fn()
 const mockPauseRun = vi.fn()
 const mockStopRun = vi.fn()
+const mockResumeRunFromRecovery = vi.fn()
 
 const render = (path = '/') => {
   return renderWithProviders(
@@ -128,9 +135,11 @@ describe('RunningProtocol', () => {
       playRun: mockPlayRun,
       pauseRun: mockPauseRun,
       stopRun: mockStopRun,
+      resumeRunFromRecovery: mockResumeRunFromRecovery,
       isPlayRunActionLoading: false,
       isPauseRunActionLoading: false,
       isStopRunActionLoading: false,
+      isResumeRunFromRecoveryActionLoading: false,
     })
     when(vi.mocked(useMostRecentCompletedAnalysis))
       .calledWith(RUN_ID)
@@ -144,6 +153,14 @@ describe('RunningProtocol', () => {
     when(vi.mocked(useFeatureFlag))
       .calledWith('enableRunNotes')
       .thenReturn(true)
+    vi.mocked(ErrorRecoveryFlows).mockReturnValue(
+      <div>MOCK ERROR RECOVERY</div>
+    )
+    vi.mocked(useErrorRecoveryFlows).mockReturnValue({
+      isERActive: false,
+      toggleER: vi.fn(),
+      failedCommand: {} as any,
+    })
   })
 
   afterEach(() => {
@@ -183,6 +200,19 @@ describe('RunningProtocol', () => {
       .thenReturn(RUN_STATUS_AWAITING_RECOVERY)
     render(`/runs/${RUN_ID}/run`)
     expect(vi.mocked(RunPausedSplash)).toHaveBeenCalled()
+  })
+
+  it('should render ErrorRecovery appropriately', () => {
+    render(`/runs/${RUN_ID}/run`)
+    expect(screen.queryByText('MOCK ERROR RECOVERY')).not.toBeInTheDocument()
+
+    vi.mocked(useErrorRecoveryFlows).mockReturnValue({
+      isERActive: true,
+      toggleER: vi.fn(),
+      failedCommand: {} as any,
+    })
+    render(`/runs/${RUN_ID}/run`)
+    screen.getByText('MOCK ERROR RECOVERY')
   })
 
   // ToDo (kj:04/04/2023) need to figure out the way to simulate swipe

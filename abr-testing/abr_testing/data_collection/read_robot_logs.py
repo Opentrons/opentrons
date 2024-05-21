@@ -18,11 +18,10 @@ import sys
 def lpc_data(
     file_results: Dict[str, Any],
     protocol_info: Dict[str, Any],
-    runs_and_lpc: Dict[str, Any],
-) -> Tuple[Dict[str, Dict[str, Any]], List[str]]:
+    runs_and_lpc: List[Dict[str, Any]],
+) -> Tuple[List[Dict[str, Any]], List[str]]:
     """Get labware offsets from one run log."""
     offsets = file_results.get("labwareOffsets", "")
-    n = 0
     # TODO: per UNIQUE slot AND LABWARE TYPE only keep the most recent LPC recording
     if len(offsets) > 0:
         unique_offsets: Dict[Any, Any] = {}
@@ -55,9 +54,7 @@ def lpc_data(
                     "Z": z_offset,
                 }
     for item in unique_offsets:
-        run_id = protocol_info["Run_ID"] + "_" + str(n)
-        runs_and_lpc[run_id] = unique_offsets[item]
-        n += 1
+        runs_and_lpc.append(unique_offsets[item].values())
     headers_lpc = list(unique_offsets[(slot, labware_type)].keys())
 
     return runs_and_lpc, headers_lpc
@@ -298,6 +295,7 @@ def create_abr_data_sheet(
 def get_error_info(file_results: Dict[str, Any]) -> Tuple[int, str, str, str, str]:
     """Determines if errors exist in run log and documents them."""
     error_levels = []
+    error_level = ""
     # Read error levels file
     with open(ERROR_LEVELS_PATH, "r") as error_file:
         error_levels = list(csv.reader(error_file))
@@ -328,6 +326,8 @@ def get_error_info(file_results: Dict[str, Any]) -> Tuple[int, str, str, str, st
         code_error = error[1]
         if code_error == error_code:
             error_level = error[4]
+    if len(error_level) < 1:
+        error_level = str(4)
 
     return num_of_errors, error_type, error_code, error_instrument, error_level
 

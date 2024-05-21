@@ -28,8 +28,9 @@ describe('BeforeBeginning', () => {
 
     props = {
       isOnDevice: true,
+      recoveryCommands: {} as any,
+      failedCommand: {} as any,
       errorKind: ERROR_KINDS.GENERAL_ERROR,
-      onComplete: vi.fn(),
       routeUpdateActions: mockRouteUpdateActions,
       recoveryMap: {
         route: BEFORE_BEGINNING.ROUTE,

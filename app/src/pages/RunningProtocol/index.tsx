@@ -52,7 +52,10 @@ import { ConfirmCancelRunModal } from '../../organisms/OnDeviceDisplay/RunningPr
 import { RunPausedSplash } from '../../organisms/OnDeviceDisplay/RunningProtocol/RunPausedSplash'
 import { getLocalRobot } from '../../redux/discovery'
 import { OpenDoorAlertModal } from '../../organisms/OpenDoorAlertModal'
-import { ErrorRecoveryFlows } from '../../organisms/ErrorRecoveryFlows'
+import {
+  useErrorRecoveryFlows,
+  ErrorRecoveryFlows,
+} from '../../organisms/ErrorRecoveryFlows'
 import { useLastRunCommand } from '../../organisms/Devices/hooks/useLastRunCommand'
 
 import type { OnDeviceRouteParams } from '../../App/types'
@@ -104,8 +107,6 @@ export function RunningProtocol(): JSX.Element {
   const runStatus = useRunStatus(runId, {
     refetchInterval: RUN_STATUS_REFETCH_INTERVAL,
   })
-  const [enableSplash, setEnableSplash] = React.useState(true)
-  const [showErrorRecovery, setShowErrorRecovery] = React.useState(false)
   const { startedAt, stoppedAt, completedAt } = useRunTimestamps(runId)
   const { data: runRecord } = useNotifyRunQuery(runId, { staleTime: Infinity })
   const protocolId = runRecord?.data.protocolId ?? null
@@ -121,9 +122,12 @@ export function RunningProtocol(): JSX.Element {
   const { trackProtocolRunEvent } = useTrackProtocolRunEvent(runId, robotName)
   const robotAnalyticsData = useRobotAnalyticsData(robotName)
   const robotType = useRobotType(robotName)
-  const errorType = runRecord?.data.errors[0]?.errorType
-
   const enableRunNotes = useFeatureFlag('enableRunNotes')
+  const { isERActive, failedCommand, toggleER } = useErrorRecoveryFlows(
+    runId,
+    runStatus
+  )
+  const errorType = failedCommand?.error?.errorType
 
   React.useEffect(() => {
     if (
@@ -160,21 +164,14 @@ export function RunningProtocol(): JSX.Element {
     }
   }, [lastRunCommand, interventionModalCommandKey])
 
-  const handleCompleteRecovery = (): void => {
-    setShowErrorRecovery(false)
-    setEnableSplash(false)
-  }
-
   return (
     <>
-      {showErrorRecovery ? (
-        <ErrorRecoveryFlows onComplete={handleCompleteRecovery} />
+      {isERActive ? (
+        <ErrorRecoveryFlows runId={runId} failedCommand={failedCommand} />
       ) : null}
-      {enableSplash &&
-      runStatus === RUN_STATUS_AWAITING_RECOVERY &&
-      enableRunNotes ? (
+      {runStatus === RUN_STATUS_AWAITING_RECOVERY && enableRunNotes ? (
         <RunPausedSplash
-          onClick={() => setShowErrorRecovery(true)}
+          onClick={toggleER}
           errorType={errorType}
           protocolName={protocolName}
         />

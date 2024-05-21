@@ -8,6 +8,7 @@ export const ERROR_KINDS = {
   GENERAL_ERROR: 'GENERAL_ERROR',
 } as const
 
+// TODO(jh, 05-09-24): Refactor to a directed graph. EXEC-430.
 // Valid recovery routes and steps.
 export const RECOVERY_MAP = {
   BEFORE_BEGINNING: {
@@ -36,6 +37,12 @@ export const RECOVERY_MAP = {
       RESUMING: 'resuming',
     },
   },
+  ROBOT_RETRYING_COMMAND: {
+    ROUTE: 'robot-retrying-command',
+    STEPS: {
+      RETRYING: 'retrying',
+    },
+  },
   OPTION_SELECTION: {
     ROUTE: 'option-selection',
     STEPS: { SELECT: 'select' },
@@ -48,6 +55,7 @@ const {
   RESUME,
   ROBOT_RESUMING,
   ROBOT_IN_MOTION,
+  ROBOT_RETRYING_COMMAND,
   DROP_TIP,
   REFILL_AND_RESUME,
   IGNORE_AND_RESUME,
@@ -61,6 +69,7 @@ export const STEP_ORDER: StepOrder = {
   [RESUME.ROUTE]: [RESUME.STEPS.CONFIRM_RESUME],
   [ROBOT_IN_MOTION.ROUTE]: [ROBOT_IN_MOTION.STEPS.IN_MOTION],
   [ROBOT_RESUMING.ROUTE]: [ROBOT_RESUMING.STEPS.RESUMING],
+  [ROBOT_RETRYING_COMMAND.ROUTE]: [ROBOT_RETRYING_COMMAND.STEPS.RETRYING],
   [DROP_TIP.ROUTE]: [],
   [REFILL_AND_RESUME.ROUTE]: [],
   [IGNORE_AND_RESUME.ROUTE]: [],
