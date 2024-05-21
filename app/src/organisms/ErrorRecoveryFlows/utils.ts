@@ -2,9 +2,8 @@ import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import head from 'lodash/head'
 import last from 'lodash/last'
-import findLast from 'lodash/findLast'
 
-import { RUN_STATUS_AWAITING_RECOVERY } from '@opentrons/api-client'
+import { useCommandQuery } from '@opentrons/react-api-client'
 
 import { useNotifyAllCommandsQuery } from '../../resources/runs'
 import { RECOVERY_MAP, ERROR_KINDS, INVALID, STEP_ORDER } from './constants'
@@ -21,46 +20,35 @@ import type {
 
 // TODO(jh, 05-09-24): Migrate utils, useRecoveryCommands.ts, and respective tests to a utils dir, and make each util a separate file.
 
-// While the run is "awaiting-recovery", return the most recently failed run command with a protocol intent.
-// Otherwise, returns null.
 const ALL_COMMANDS_POLL_MS = 5000
 
-// TODO(jh, 05-20-24): Update the logic for returning the failed run command once EXEC-458 merges.
+// Return the `currentlyRecoveringFrom` command returned by the server, if any.
+// Otherwise, returns null.
 export function useCurrentlyRecoveringFrom(
   runId: string,
   runStatus: RunStatus | null
 ): FailedCommand | null {
-  const [
-    recentFailedCommand,
-    setRecentFailedCommand,
-  ] = React.useState<FailedCommand | null>(null)
-  // The most recently failed protocol command causes the run to enter "awaiting-recovery", therefore only check
-  // for a newly failed command when the run first enters "awaiting-recovery."
-  const isRunStatusAwaitingRecovery = runStatus === RUN_STATUS_AWAITING_RECOVERY
-
   const { data: allCommandsQueryData } = useNotifyAllCommandsQuery(
     runId,
-    null,
+    { cursor: null, pageLength: 0 }, // pageLength 0 because we only care about the links.
     {
-      enabled: isRunStatusAwaitingRecovery && recentFailedCommand == null,
       refetchInterval: ALL_COMMANDS_POLL_MS,
     }
   )
+  const currentlyRecoveringFromLink =
+    allCommandsQueryData?.links.currentlyRecoveringFrom
 
-  React.useEffect(() => {
-    if (isRunStatusAwaitingRecovery && recentFailedCommand == null) {
-      const failedCommand =
-        findLast(
-          allCommandsQueryData?.data,
-          command => command.status === 'failed' && command.intent !== 'fixit'
-        ) ?? null
-      setRecentFailedCommand(failedCommand)
-    } else if (!isRunStatusAwaitingRecovery && recentFailedCommand != null) {
-      setRecentFailedCommand(null)
-    }
-  }, [isRunStatusAwaitingRecovery, recentFailedCommand, allCommandsQueryData])
+  // One-shot query for the full details of the currentlyRecoveringFrom command.
+  //
+  // TODO(mm, 2024-05-21): When the server supports fetching the
+  // currentlyRecoveringFrom command in one step, do that instead of this chained query.
+  const { data: commandQueryData } = useCommandQuery(
+    currentlyRecoveringFromLink?.meta.runId ?? null,
+    currentlyRecoveringFromLink?.meta.commandId ?? null,
+    { enabled: currentlyRecoveringFromLink != null, staleTime: Infinity }
+  )
 
-  return recentFailedCommand
+  return commandQueryData?.data ?? null
 }
 
 export function useErrorName(errorKind: ErrorKind): string {
