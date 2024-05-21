@@ -15,7 +15,7 @@ export interface IncompatibleModuleTakeoverProps {
 export function IncompatibleModuleTakeover({
   isOnDevice,
   robotName,
-}: IncompatibleModuleTakeoverProps): JSX.Element {
+}: IncompatibleModuleTakeoverProps): JSX.Element | null {
   const incompatibleModules = useIncompatibleModulesAttached({
     refetchInterval: POLL_INTERVAL_MS,
   })
