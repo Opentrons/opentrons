@@ -61,7 +61,9 @@ async def test_initialize(
     get_current_command = AsyncMock()
     get_state_summary = AsyncMock()
 
-    await runs_publisher.initialize(run_id, get_current_command, get_state_summary)
+    await runs_publisher.start_publishing_for_run(
+        run_id, get_current_command, get_state_summary
+    )
 
     assert runs_publisher._run_hooks
     assert runs_publisher._run_hooks.run_id == run_id
@@ -82,7 +84,7 @@ async def test_clean_up_current_run(
     runs_publisher: RunsPublisher, notification_client: AsyncMock
 ) -> None:
     """It should publish to appropriate topics at the end of a run."""
-    await runs_publisher.initialize("1234", AsyncMock(), AsyncMock())
+    await runs_publisher.start_publishing_for_run("1234", AsyncMock(), AsyncMock())
 
     await runs_publisher.clean_up_run(run_id="1234")
 
@@ -106,7 +108,7 @@ async def test_handle_current_command_change(
     runs_publisher: RunsPublisher, notification_client: AsyncMock
 ) -> None:
     """It should handle command changes appropriately."""
-    await runs_publisher.initialize(
+    await runs_publisher.start_publishing_for_run(
         "1234", lambda _: mock_curent_command("command1"), AsyncMock()
     )
 
@@ -135,7 +137,7 @@ async def test_handle_engine_status_change(
     runs_publisher: RunsPublisher, notification_client: AsyncMock
 ) -> None:
     """It should handle engine status changes appropriately."""
-    await runs_publisher.initialize(
+    await runs_publisher.start_publishing_for_run(
         "1234", lambda _: mock_curent_command("command1"), AsyncMock()
     )
 
@@ -168,7 +170,7 @@ async def test_publish_pre_serialized_commannds_notif(
     runs_publisher: RunsPublisher, notification_client: AsyncMock
 ) -> None:
     """It should send out a notification for pre serialized commands."""
-    await runs_publisher.initialize(
+    await runs_publisher.start_publishing_for_run(
         "1234", lambda _: mock_curent_command("command1"), AsyncMock()
     )
 
