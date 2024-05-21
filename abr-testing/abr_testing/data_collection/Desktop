@@ -110,7 +110,6 @@ def create_data_dictionary(
                 tm_dict = read_robot_logs.temperature_module_commands(file_results)
                 notes = {"Note1": "", "Jira Link": issue_url}
                 row_for_lpc = {**row, **all_modules, **notes}
-                plate_accuracy = {"Plate Measured": plate_name, "End of Volume Accuracy (%)": accuracy}
                 row_2 = {
                     **row,
                     **all_modules,
