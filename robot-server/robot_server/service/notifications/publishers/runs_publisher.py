@@ -20,6 +20,7 @@ class _RunHooks:
 
     run_id: str
     get_current_command: Callable[[str], Optional[CommandPointer]]
+    get_recovery_target_command: Callable[[str], Optional[CommandPointer]]
     get_state_summary: Callable[[str], Optional[StateSummary]]
 
 
@@ -28,6 +29,7 @@ class _EngineStateSlice:
     """Protocol Engine state relevant to RunsPublisher."""
 
     current_command: Optional[CommandPointer] = None
+    recovery_target_command: Optional[CommandPointer] = None
     state_summary_status: Optional[EngineStatus] = None
 
 
@@ -44,13 +46,18 @@ class RunsPublisher:
         self._engine_state_slice: Optional[_EngineStateSlice] = None
 
         publisher_notifier.register_publish_callbacks(
-            [self._handle_current_command_change, self._handle_engine_status_change]
+            [
+                self._handle_current_command_change,
+                self._handle_recovery_target_command_change,
+                self._handle_engine_status_change,
+            ]
         )
 
     async def start_publishing_for_run(
         self,
         run_id: str,
         get_current_command: Callable[[str], Optional[CommandPointer]],
+        get_recovery_target_command: Callable[[str], Optional[CommandPointer]],
         get_state_summary: Callable[[str], Optional[StateSummary]],
     ) -> None:
         """Initialize RunsPublisher with necessary information derived from the current run.
@@ -63,6 +70,7 @@ class RunsPublisher:
         self._run_hooks = _RunHooks(
             run_id=run_id,
             get_current_command=get_current_command,
+            get_recovery_target_command=get_recovery_target_command,
             get_state_summary=get_state_summary,
         )
         self._engine_state_slice = _EngineStateSlice()
@@ -74,10 +82,14 @@ class RunsPublisher:
         await self._publish_runs_advise_refetch_async(run_id=run_id)
         await self._publish_runs_advise_unsubscribe_async(run_id=run_id)
 
-    async def _publish_current_command(self) -> None:
-        """Publishes the equivalent of GET /runs/:runId/commands?cursor=null&pageLength=1."""
+    async def _publish_command_links(self) -> None:
+        """Publish an update to the run's command links.
+
+        Corresponds to the `links` field in `GET /runs/:runId/commands`
+        (regardless of query parameters).
+        """
         await self._client.publish_advise_refetch_async(
-            topic=Topics.RUNS_CURRENT_COMMAND
+            topic=Topics.RUNS_COMMANDS_LINKS
         )
 
     async def _publish_runs_advise_refetch_async(self, run_id: str) -> None:
@@ -96,7 +108,7 @@ class RunsPublisher:
                 topic=f"{Topics.RUNS}/{run_id}"
             )
             await self._client.publish_advise_unsubscribe_async(
-                topic=Topics.RUNS_CURRENT_COMMAND
+                topic=Topics.RUNS_COMMANDS_LINKS
             )
             await self._client.publish_advise_unsubscribe_async(
                 topic=f"{Topics.RUNS_PRE_SERIALIZED_COMMANDS}/{run_id}"
@@ -116,8 +128,22 @@ class RunsPublisher:
                 self._run_hooks.run_id
             )
             if self._engine_state_slice.current_command != new_current_command:
-                await self._publish_current_command()
+                await self._publish_command_links()
                 self._engine_state_slice.current_command = new_current_command
+
+    async def _handle_recovery_target_command_change(self) -> None:
+        if self._run_hooks is not None and self._engine_state_slice is not None:
+            new_recovery_target_command = self._run_hooks.get_recovery_target_command(
+                self._run_hooks.run_id
+            )
+            if (
+                self._engine_state_slice.recovery_target_command
+                != new_recovery_target_command
+            ):
+                await self._publish_command_links()
+                self._engine_state_slice.recovery_target_command = (
+                    new_recovery_target_command
+                )
 
     async def _handle_engine_status_change(self) -> None:
         """Publish a refetch flag if the engine status has changed."""

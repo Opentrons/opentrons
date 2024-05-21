@@ -11,8 +11,14 @@ export function useNotifyAllCommandsQuery<TError = Error>(
   params?: GetCommandsParams | null,
   options: QueryOptionsWithPolling<CommandsData, TError> = {}
 ): UseQueryResult<CommandsData, TError> {
+  // Assume the useAllCommandsQuery() response can only change when the command links change.
+  //
+  // TODO(mm, 2024-05-21): I don't think this is correct. If a command goes from
+  // running to succeeded, that may change the useAllCommandsQuery response, but it
+  // will not necessarily change the command links. We might need an MQTT topic
+  // covering "any change in `GET /runs/{id}/commands`".
   const { notifyOnSettled, isNotifyEnabled } = useNotifyService({
-    topic: 'robot-server/runs/current_command', // only updates to the current command cause all commands to change
+    topic: 'robot-server/runs/commands_links',
     options,
   })
 

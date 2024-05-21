@@ -96,7 +96,7 @@ async def test_clean_up_current_run(
         topic=f"{Topics.RUNS}/1234"
     )
     notification_client.publish_advise_unsubscribe_async.assert_any_await(
-        topic=Topics.RUNS_CURRENT_COMMAND
+        topic=Topics.RUNS_COMMANDS_LINKS
     )
     notification_client.publish_advise_unsubscribe_async.assert_any_await(
         topic=f"{Topics.RUNS_PRE_SERIALIZED_COMMANDS}/1234"
@@ -128,7 +128,7 @@ async def test_handle_current_command_change(
     await runs_publisher._handle_current_command_change()
 
     notification_client.publish_advise_refetch_async.assert_any_await(
-        topic=Topics.RUNS_CURRENT_COMMAND
+        topic=Topics.RUNS_COMMANDS_LINKS
     )
 
 
