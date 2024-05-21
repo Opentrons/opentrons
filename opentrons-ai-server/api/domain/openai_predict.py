@@ -94,15 +94,15 @@ class OpenAIPredict:
                 descriptions.append(x)
         return descriptions
 
-    def refine_response(self, assitant_message: str) -> str:
-        if assitant_message is None:
+    def refine_response(self, assistant_message: str) -> str:
+        if assistant_message is None:
             return ""
         system_message: ChatCompletionMessageParam = {
             "role": "system",
             "content": f"{general_rules_1}\n Please leave useful comments for each command.",
         }
 
-        user_message: ChatCompletionMessageParam = {"role": "user", "content": assitant_message}
+        user_message: ChatCompletionMessageParam = {"role": "user", "content": assistant_message}
 
         response = self.client.chat.completions.create(
             model=self.settings.OPENAI_MODEL_NAME,
