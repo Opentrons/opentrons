@@ -29,7 +29,7 @@ def create_chat_completion(event: Dict[str, Any]) -> Dict[str, Any]:
 
         settings: Settings = Settings.build()
         openai: OpenAIPredict = OpenAIPredict(settings=settings)
-        response: Union[str, None] = openai.predict(prompt=body.message)
+        response: Union[str, None] = openai.predict(prompt=body.messag, chat_completion_message_params=body.chat_history)
 
         if response is None or response == "":
             return create_response(HTTPStatus.NO_CONTENT, ChatResponse(reply="No response was generated", fake=body.fake).model_dump())
