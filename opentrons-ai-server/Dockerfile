@@ -1,4 +1,4 @@
-FROM public.ecr.aws/lambda/python:3.12
+FROM --platform=linux/amd64 public.ecr.aws/lambda/python:3.12
 
 COPY --from=public.ecr.aws/datadog/lambda-extension:57 /opt/. /opt/
 
