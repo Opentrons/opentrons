@@ -19,22 +19,21 @@ export function IncompatibleModuleTakeover({
   const incompatibleModules = useIncompatibleModulesAttached({
     refetchInterval: POLL_INTERVAL_MS,
   })
-  return (
-    <>
-      {incompatibleModules.length !== 0
-        ? isOnDevice
-          ? createPortal(
-              <IncompatibleModuleODDModalBody modules={incompatibleModules} />,
-              getTopPortalEl()
-            )
-          : createPortal(
-              <IncompatibleModuleDesktopModalBody
-                modules={incompatibleModules}
-                robotName={robotName ?? ''}
-              />,
-              getModalPortalEl()
-            )
-        : null}
-    </>
-  )
+  if (incompatibleModules.length === 0) {
+    return null
+  }
+  if (isOnDevice) {
+    return createPortal(
+      <IncompatibleModuleODDModalBody modules={incompatibleModules} />,
+      getTopPortalEl()
+    )
+  } else {
+    return createPortal(
+      <IncompatibleModuleDesktopModalBody
+        modules={incompatibleModules}
+        robotName={robotName ?? ''}
+      />,
+      getModalPortalEl()
+    )
+  }
 }
