@@ -15,8 +15,8 @@ export interface CommandDetail {
 }
 
 export interface CommandsLinks {
-  current: CommandsLink
-  currentlyRecoveringFrom: CommandsLink
+  current?: CommandsLink | null
+  currentlyRecoveringFrom?: CommandsLink | null
 }
 
 interface CommandsLink {
