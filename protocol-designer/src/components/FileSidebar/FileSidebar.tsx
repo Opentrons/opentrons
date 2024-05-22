@@ -31,7 +31,6 @@ import styles from './FileSidebar.module.css'
 
 import type {
   CreateCommand,
-  ModuleType,
   ProtocolFile,
   RobotType,
 } from '@opentrons/shared-data'
@@ -44,7 +43,6 @@ import type {
 } from '../../step-forms'
 import type { ThunkDispatch } from '../../types'
 import { createPortal } from 'react-dom'
-import { e } from 'vitest/dist/reporters-1evA5lom'
 
 export interface AdditionalEquipment {
   [additionalEquipmentId: string]: {
