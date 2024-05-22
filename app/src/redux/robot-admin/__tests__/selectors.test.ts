@@ -6,7 +6,7 @@ import {
   getNextRestartStatus,
   getResetConfigOptions,
 } from '../selectors'
-import { ConnectivityStatus } from '../../discovery/types'
+import type { ConnectivityStatus } from '../../discovery/types'
 import type { State } from '../../types'
 
 const START_TIME = new Date('2000-01-01')

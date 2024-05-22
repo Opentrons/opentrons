@@ -5,7 +5,7 @@ import { describe, it, beforeEach, vi, afterEach } from 'vitest'
 
 import { DeckConfigurator } from '@opentrons/components'
 import {
-  useDeckConfigurationQuery,
+  useModulesQuery,
   useUpdateDeckConfigurationMutation,
 } from '@opentrons/react-api-client'
 
@@ -16,6 +16,7 @@ import { DeckFixtureSetupInstructionsModal } from '../DeckFixtureSetupInstructio
 import { useIsEstopNotDisengaged } from '../../../resources/devices/hooks/useIsEstopNotDisengaged'
 import { DeviceDetailsDeckConfiguration } from '../'
 import { useNotifyCurrentMaintenanceRun } from '../../../resources/maintenance_runs'
+import { useNotifyDeckConfigurationQuery } from '../../../resources/deck_configuration'
 
 import type { MaintenanceRun } from '@opentrons/api-client'
 import type * as OpentronsComponents from '@opentrons/components'
@@ -32,6 +33,7 @@ vi.mock('../DeckFixtureSetupInstructionsModal')
 vi.mock('../../Devices/hooks')
 vi.mock('../../../resources/maintenance_runs')
 vi.mock('../../../resources/devices/hooks/useIsEstopNotDisengaged')
+vi.mock('../../../resources/deck_configuration')
 
 const ROBOT_NAME = 'otie'
 const mockUpdateDeckConfiguration = vi.fn()
@@ -60,7 +62,10 @@ describe('DeviceDetailsDeckConfiguration', () => {
     props = {
       robotName: ROBOT_NAME,
     }
-    vi.mocked(useDeckConfigurationQuery).mockReturnValue({ data: [] } as any)
+    vi.mocked(useModulesQuery).mockReturnValue({ data: { data: [] } } as any)
+    vi.mocked(useNotifyDeckConfigurationQuery).mockReturnValue({
+      data: [],
+    } as any)
     vi.mocked(useUpdateDeckConfigurationMutation).mockReturnValue({
       updateDeckConfiguration: mockUpdateDeckConfiguration,
     } as any)
@@ -89,7 +94,7 @@ describe('DeviceDetailsDeckConfiguration', () => {
     screen.getByText('otie deck configuration')
     screen.getByRole('button', { name: 'Setup Instructions' })
     screen.getByText('Location')
-    screen.getByText('Fixture')
+    screen.getByText('Deck hardware')
     screen.getByText('mock DeckConfigurator')
   })
 
@@ -127,7 +132,7 @@ describe('DeviceDetailsDeckConfiguration', () => {
   })
 
   it('should render no deck fixtures, if deck configs are not set', () => {
-    vi.mocked(useDeckConfigurationQuery).mockReturnValue([] as any)
+    vi.mocked(useNotifyDeckConfigurationQuery).mockReturnValue([] as any)
     render(props)
     screen.getByText('No deck fixtures')
   })

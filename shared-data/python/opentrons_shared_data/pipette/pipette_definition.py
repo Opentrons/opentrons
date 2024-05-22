@@ -88,17 +88,17 @@ class SupportedTipsDefinition(BaseModel):
 
     default_aspirate_flowrate: FlowRateDefinition = Field(
         ...,
-        description="The flowrate used in aspirations by default.",
+        description="The flowrate used in aspirations by default. For lowVolumeDefault only, the flowrate matches uiMaxFlowRate for ui purposes, it does not change physical behavior.",
         alias="defaultAspirateFlowRate",
     )
     default_dispense_flowrate: FlowRateDefinition = Field(
         ...,
-        description="The flowrate used in dispenses by default.",
+        description="The flowrate used in dispenses by default. For lowVolumeDefault only, the flowrate matches uiMaxFlowRate for ui purposes, it does not change physical behavior.",
         alias="defaultDispenseFlowRate",
     )
     default_blowout_flowrate: FlowRateDefinition = Field(
         ...,
-        description="The flowrate used in blowouts by default.",
+        description="The flowrate used in blowouts by default. For lowVolumeDefault only, the flowrate matches uiMaxFlowRate for ui purposes, it does not change physical behavior.",
         alias="defaultBlowOutFlowRate",
     )
     default_flow_acceleration: float = Field(
@@ -126,6 +126,13 @@ class SupportedTipsDefinition(BaseModel):
         ...,
         description="The default volume for a push-out during dispense.",
         alias="defaultPushOutVolume",
+    )
+    ui_max_flow_rate: float = Field(
+        float(
+            "inf"
+        ),  # some pipettes (GEN1, unreleased prototype models) don't have a max flow rate
+        description="The lowest volume max flow rate for a pipette's given supported tip, minus 2 percent for safety.",
+        alias="uiMaxFlowRate",
     )
 
 

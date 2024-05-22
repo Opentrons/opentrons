@@ -8,7 +8,6 @@ import { ErrorBoundary } from 'react-error-boundary'
 import {
   getModuleType,
   getPipetteNameSpecs,
-  ProtocolAnalysisOutput,
   FLEX_STANDARD_MODEL,
   getGripperDisplayName,
 } from '@opentrons/shared-data'
@@ -42,6 +41,7 @@ import { getIsProtocolAnalysisInProgress } from '../../redux/protocol-storage'
 import { InstrumentContainer } from '../../atoms/InstrumentContainer'
 import { ProtocolOverflowMenu } from './ProtocolOverflowMenu'
 import { ProtocolAnalysisFailure } from '../ProtocolAnalysisFailure'
+import { getProtocolUsesGripper } from '../ProtocolSetupInstruments/utils'
 import { ProtocolAnalysisStale } from '../ProtocolAnalysisFailure/ProtocolAnalysisStale'
 import {
   getAnalysisStatus,
@@ -49,9 +49,9 @@ import {
   getRobotTypeDisplayName,
 } from './utils'
 
+import type { ProtocolAnalysisOutput } from '@opentrons/shared-data'
 import type { StoredProtocolData } from '../../redux/protocol-storage'
 import type { State } from '../../redux/types'
-import { getProtocolUsesGripper } from '../ProtocolSetupInstruments/utils'
 
 interface ProtocolCardProps {
   handleRunProtocol: (storedProtocolData: StoredProtocolData) => void
@@ -184,8 +184,20 @@ function AnalysisInfo(props: AnalysisInfoProps): JSX.Element {
                 size={SIZE_3}
               />
             ),
-            error: <Box size="6rem" backgroundColor={COLORS.grey30} />,
-            stale: <Box size="6rem" backgroundColor={COLORS.grey30} />,
+            error: (
+              <Box
+                size="6rem"
+                backgroundColor={COLORS.grey30}
+                borderRadius={SPACING.spacing8}
+              />
+            ),
+            stale: (
+              <Box
+                size="6rem"
+                backgroundColor={COLORS.grey30}
+                borderRadius={SPACING.spacing8}
+              />
+            ),
             complete:
               mostRecentAnalysis != null ? (
                 <ProtocolDeck protocolAnalysis={mostRecentAnalysis} />

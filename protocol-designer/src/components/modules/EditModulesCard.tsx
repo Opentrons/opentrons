@@ -5,15 +5,12 @@ import {
   MAGNETIC_MODULE_TYPE,
   TEMPERATURE_MODULE_TYPE,
   HEATERSHAKER_MODULE_TYPE,
-  ModuleType,
-  PipetteName,
   FLEX_ROBOT_TYPE,
   getPipetteSpecsV2,
 } from '@opentrons/shared-data'
 import {
   selectors as stepFormSelectors,
   getIsCrashablePipetteSelected,
-  ModulesForEditModulesCard,
 } from '../../step-forms'
 import { selectors as featureFlagSelectors } from '../../feature-flags'
 import { SUPPORTED_MODULE_TYPES } from '../../modules'
@@ -27,10 +24,14 @@ import { CrashInfoBox } from './CrashInfoBox'
 import { ModuleRow } from './ModuleRow'
 import { AdditionalItemsRow } from './AdditionalItemsRow'
 import { isModuleWithCollisionIssue } from './utils'
-import styles from './styles.module.css'
-import { AdditionalEquipmentEntity } from '@opentrons/step-generation'
 import { StagingAreasRow } from './StagingAreasRow'
+import { MultipleModulesRow } from './MultipleModulesRow'
 
+import type { AdditionalEquipmentEntity } from '@opentrons/step-generation'
+import type { ModuleType, PipetteName } from '@opentrons/shared-data'
+import type { ModulesForEditModulesCard } from '../../step-forms'
+
+import styles from './styles.module.css'
 export interface Props {
   modules: ModulesForEditModulesCard
   openEditModuleModal: (moduleType: ModuleType, moduleId?: string) => void
@@ -38,6 +39,7 @@ export interface Props {
 
 export function EditModulesCard(props: Props): JSX.Element {
   const { modules, openEditModuleModal } = props
+
   const pipettesByMount = useSelector(
     stepFormSelectors.getPipettesForEditPipetteForm
   )
@@ -67,10 +69,10 @@ export function EditModulesCard(props: Props): JSX.Element {
   )
   const hasCrashableMagneticModule =
     magneticModuleOnDeck &&
-    isModuleWithCollisionIssue(magneticModuleOnDeck.model)
+    isModuleWithCollisionIssue(magneticModuleOnDeck[0].model)
   const hasCrashableTempModule =
     temperatureModuleOnDeck &&
-    isModuleWithCollisionIssue(temperatureModuleOnDeck.model)
+    isModuleWithCollisionIssue(temperatureModuleOnDeck[0].model)
   const isHeaterShakerOnDeck = Boolean(heaterShakerOnDeck)
 
   const showTempPipetteCollisons =
@@ -130,22 +132,33 @@ export function EditModulesCard(props: Props): JSX.Element {
         ) : null}
         {SUPPORTED_MODULE_TYPES_FILTERED.map((moduleType, i) => {
           const moduleData = modules[moduleType]
-          if (moduleData) {
+          if (moduleData != null && moduleData.length === 1) {
             return (
               <ModuleRow
                 type={moduleType}
-                moduleOnDeck={moduleData}
+                moduleOnDeck={moduleData[0]}
                 showCollisionWarnings={warningsEnabled}
-                key={i}
+                key={`${moduleType}_${i}`}
                 openEditModuleModal={openEditModuleModal}
                 robotType={robotType}
+              />
+            )
+          } else if (moduleData != null && moduleData.length > 1) {
+            return (
+              <MultipleModulesRow
+                moduleType={moduleType}
+                moduleOnDeck={moduleData}
+                key={`${moduleType}_${i}`}
+                moduleOnDeckType={moduleData[0].type}
+                moduleOnDeckModel={moduleData[0].model}
+                openEditModuleModal={openEditModuleModal}
               />
             )
           } else {
             return (
               <ModuleRow
                 type={moduleType}
-                key={i}
+                key={`noModule_${i}`}
                 openEditModuleModal={openEditModuleModal}
               />
             )

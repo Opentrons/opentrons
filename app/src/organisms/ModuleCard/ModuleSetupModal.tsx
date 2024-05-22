@@ -26,7 +26,7 @@ interface ModuleSetupModalProps {
 
 export const ModuleSetupModal = (props: ModuleSetupModalProps): JSX.Element => {
   const { moduleDisplayName } = props
-  const { t, i18n } = useTranslation(['protocol_setup', 'shared'])
+  const { t, i18n } = useTranslation(['protocol_setup', 'shared', 'branded'])
 
   return createPortal(
     <LegacyModal
@@ -42,7 +42,7 @@ export const ModuleSetupModal = (props: ModuleSetupModalProps): JSX.Element => {
             width="50%"
           >
             <StyledText as="p" marginBottom={SPACING.spacing16}>
-              {t('modal_instructions')}
+              {t('branded:modal_instructions')}
             </StyledText>
             <Link
               external

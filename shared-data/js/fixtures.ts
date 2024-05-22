@@ -6,9 +6,57 @@ import {
   WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE,
   STAGING_AREA_SLOT_WITH_WASTE_CHUTE_RIGHT_ADAPTER_COVERED_FIXTURE,
   STAGING_AREA_SLOT_WITH_WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE,
+  A1_ADDRESSABLE_AREA,
+  A2_ADDRESSABLE_AREA,
+  A3_ADDRESSABLE_AREA,
+  B1_ADDRESSABLE_AREA,
+  B2_ADDRESSABLE_AREA,
+  B3_ADDRESSABLE_AREA,
+  C1_ADDRESSABLE_AREA,
+  C2_ADDRESSABLE_AREA,
+  C3_ADDRESSABLE_AREA,
+  D1_ADDRESSABLE_AREA,
+  D2_ADDRESSABLE_AREA,
+  D3_ADDRESSABLE_AREA,
+  ADDRESSABLE_AREA_1,
+  ADDRESSABLE_AREA_2,
+  ADDRESSABLE_AREA_3,
+  ADDRESSABLE_AREA_4,
+  ADDRESSABLE_AREA_5,
+  ADDRESSABLE_AREA_6,
+  ADDRESSABLE_AREA_7,
+  ADDRESSABLE_AREA_8,
+  ADDRESSABLE_AREA_9,
+  ADDRESSABLE_AREA_10,
+  ADDRESSABLE_AREA_11,
+  HEATERSHAKER_MODULE_V1_FIXTURE,
+  HEATERSHAKER_MODULE_V1,
+  TEMPERATURE_MODULE_V2_FIXTURE,
+  TEMPERATURE_MODULE_V2,
+  MAGNETIC_BLOCK_V1_FIXTURE,
+  MAGNETIC_BLOCK_V1,
+  THERMOCYCLER_V2_REAR_FIXTURE,
+  THERMOCYCLER_MODULE_V2,
+  THERMOCYCLER_V2_FRONT_FIXTURE,
+  MODULE_FIXTURES_BY_MODEL,
+  STAGING_AREA_SLOT_WITH_MAGNETIC_BLOCK_V1_FIXTURE,
 } from './constants'
-import type { CutoutFixtureId, CutoutId, OT2CutoutId } from '../deck'
-import type { AddressableArea, CoordinateTuple, DeckDefinition } from './types'
+import { getModuleDisplayName } from './modules'
+import { getCutoutIdForSlotName } from './helpers'
+import type {
+  AddressableAreaName,
+  CutoutFixtureId,
+  CutoutId,
+  OT2CutoutId,
+} from '../deck'
+import type {
+  AddressableArea,
+  CoordinateTuple,
+  CutoutFixture,
+  DeckDefinition,
+  ModuleModel,
+} from './types'
+import type { ModuleLocation } from '../command'
 
 export function getCutoutDisplayName(cutout: CutoutId): string {
   return cutout.replace('cutout', '')
@@ -107,66 +155,172 @@ export function getAddressableAreaFromSlotId(
   )
 }
 
+export function getCutoutFixtureIdsForModuleModel(
+  moduleModel: ModuleModel
+): CutoutFixtureId[] {
+  const moduleFixtures = MODULE_FIXTURES_BY_MODEL[moduleModel]
+  return moduleFixtures ?? []
+}
+
+export function getCutoutFixturesForModuleModel(
+  moduleModel: ModuleModel,
+  deckDef: DeckDefinition
+): CutoutFixture[] {
+  const moduleFixtureIds = getCutoutFixtureIdsForModuleModel(moduleModel)
+  return moduleFixtureIds.reduce<CutoutFixture[]>((acc, id) => {
+    const moduleFixture = deckDef.cutoutFixtures.find(cf => cf.id === id)
+    return moduleFixture != null ? [...acc, moduleFixture] : acc
+  }, [])
+}
+
+export function getFixtureIdByCutoutIdFromModuleAnchorCutoutId(
+  anchorCutoutId: CutoutId | null,
+  moduleFixtures: CutoutFixture[] // cutout fixtures for a specific module model
+): { [cutoutId in CutoutId]?: CutoutFixtureId } {
+  // find the first fixture for this specific module model that may mount to the cutout implied by the slotName
+  const anchorFixture = moduleFixtures.find(fixture =>
+    fixture.mayMountTo.some(cutoutId => cutoutId === anchorCutoutId)
+  )
+  if (anchorCutoutId != null && anchorFixture != null) {
+    const groupedFixtures = anchorFixture.fixtureGroup[anchorCutoutId]
+    return groupedFixtures?.[0] ?? { [anchorCutoutId]: anchorFixture.id }
+  }
+  return {}
+}
+
+export function getFixtureIdByCutoutIdFromModuleSlotName(
+  slotName: string,
+  moduleFixtures: CutoutFixture[], // cutout fixtures for a specific module model
+  deckDef: DeckDefinition
+): { [cutoutId in CutoutId]?: CutoutFixtureId } {
+  const anchorCutoutId = getCutoutIdForSlotName(slotName, deckDef)
+  return getFixtureIdByCutoutIdFromModuleAnchorCutoutId(
+    anchorCutoutId,
+    moduleFixtures
+  )
+}
+
+export function getCutoutIdsFromModuleSlotName(
+  slotName: string,
+  moduleFixtures: CutoutFixture[], // cutout fixtures for a specific module model
+  deckDef: DeckDefinition
+): CutoutId[] {
+  const fixtureIdByCutoutId = getFixtureIdByCutoutIdFromModuleSlotName(
+    slotName,
+    moduleFixtures,
+    deckDef
+  )
+  return Object.keys(fixtureIdByCutoutId) as CutoutId[]
+}
+
+export function getAddressableAreaNamesFromLoadedModule(
+  moduleModel: ModuleModel,
+  slotName: ModuleLocation['slotName'],
+  deckDef: DeckDefinition
+): AddressableAreaName[] {
+  const moduleFixtures = getCutoutFixturesForModuleModel(moduleModel, deckDef)
+  const cutoutIds = getCutoutIdsFromModuleSlotName(
+    slotName,
+    moduleFixtures,
+    deckDef
+  )
+  return moduleFixtures.reduce<AddressableAreaName[]>((acc, cutoutFixture) => {
+    const providedAddressableAreas = cutoutIds.reduce<AddressableAreaName[]>(
+      (innerAcc, cutoutId) => {
+        const newAddressableAreas =
+          cutoutFixture?.providesAddressableAreas[cutoutId] ?? []
+        return [...innerAcc, ...newAddressableAreas]
+      },
+      []
+    )
+    return [...acc, ...providedAddressableAreas]
+  }, [])
+}
+
 export function getFixtureDisplayName(
-  cutoutFixtureId: CutoutFixtureId | null
+  cutoutFixtureId: CutoutFixtureId | null,
+  usbPortNumber?: number
 ): string {
-  if (cutoutFixtureId === STAGING_AREA_RIGHT_SLOT_FIXTURE) {
-    return 'Staging area slot'
-  } else if (cutoutFixtureId === TRASH_BIN_ADAPTER_FIXTURE) {
-    return 'Trash bin'
-  } else if (cutoutFixtureId === WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE) {
-    return 'Waste chute only'
-  } else if (cutoutFixtureId === WASTE_CHUTE_RIGHT_ADAPTER_COVERED_FIXTURE) {
-    return 'Waste chute only with cover'
-  } else if (
-    cutoutFixtureId ===
-    STAGING_AREA_SLOT_WITH_WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE
-  ) {
-    return 'Waste chute with staging area slot'
-  } else if (
-    cutoutFixtureId ===
-    STAGING_AREA_SLOT_WITH_WASTE_CHUTE_RIGHT_ADAPTER_COVERED_FIXTURE
-  ) {
-    return 'Waste chute with staging area slot and cover'
-  } else {
-    return 'Slot'
+  switch (cutoutFixtureId) {
+    case STAGING_AREA_RIGHT_SLOT_FIXTURE:
+      return 'Staging area slot'
+    case TRASH_BIN_ADAPTER_FIXTURE:
+      return 'Trash bin'
+    case WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE:
+      return 'Waste chute only'
+    case WASTE_CHUTE_RIGHT_ADAPTER_COVERED_FIXTURE:
+      return 'Waste chute only with cover'
+    case STAGING_AREA_SLOT_WITH_WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE:
+      return 'Waste chute with staging area slot'
+    case STAGING_AREA_SLOT_WITH_WASTE_CHUTE_RIGHT_ADAPTER_COVERED_FIXTURE:
+      return 'Waste chute with staging area slot and cover'
+    case HEATERSHAKER_MODULE_V1_FIXTURE:
+      return usbPortNumber != null
+        ? `${getModuleDisplayName(
+            HEATERSHAKER_MODULE_V1
+          )} in USB-${usbPortNumber}`
+        : getModuleDisplayName(HEATERSHAKER_MODULE_V1)
+    case TEMPERATURE_MODULE_V2_FIXTURE:
+      return usbPortNumber != null
+        ? `${getModuleDisplayName(
+            TEMPERATURE_MODULE_V2
+          )} in USB-${usbPortNumber}`
+        : getModuleDisplayName(TEMPERATURE_MODULE_V2)
+    case MAGNETIC_BLOCK_V1_FIXTURE:
+      return `${getModuleDisplayName(MAGNETIC_BLOCK_V1)}`
+    case STAGING_AREA_SLOT_WITH_MAGNETIC_BLOCK_V1_FIXTURE:
+      return `${getModuleDisplayName(MAGNETIC_BLOCK_V1)} with staging area slot`
+    case THERMOCYCLER_V2_REAR_FIXTURE:
+      return usbPortNumber != null
+        ? `${getModuleDisplayName(
+            THERMOCYCLER_MODULE_V2
+          )} in USB-${usbPortNumber}`
+        : getModuleDisplayName(THERMOCYCLER_MODULE_V2)
+    case THERMOCYCLER_V2_FRONT_FIXTURE:
+      return usbPortNumber != null
+        ? `${getModuleDisplayName(
+            THERMOCYCLER_MODULE_V2
+          )} in USB-${usbPortNumber}`
+        : getModuleDisplayName(THERMOCYCLER_MODULE_V2)
+    default:
+      return 'Slot'
   }
 }
 
-const STANDARD_OT2_SLOTS = [
-  '1',
-  '2',
-  '3',
-  '4',
-  '5',
-  '6',
-  '7',
-  '8',
-  '9',
-  '10',
-  '11',
+const STANDARD_OT2_SLOTS: AddressableAreaName[] = [
+  ADDRESSABLE_AREA_1,
+  ADDRESSABLE_AREA_2,
+  ADDRESSABLE_AREA_3,
+  ADDRESSABLE_AREA_4,
+  ADDRESSABLE_AREA_5,
+  ADDRESSABLE_AREA_6,
+  ADDRESSABLE_AREA_7,
+  ADDRESSABLE_AREA_8,
+  ADDRESSABLE_AREA_9,
+  ADDRESSABLE_AREA_10,
+  ADDRESSABLE_AREA_11,
 ]
 
-const STANDARD_FLEX_SLOTS = [
-  'A1',
-  'A2',
-  'A3',
-  'B1',
-  'B2',
-  'B3',
-  'C1',
-  'C2',
-  'C3',
-  'D1',
-  'D2',
-  'D3',
+const STANDARD_FLEX_SLOTS: AddressableAreaName[] = [
+  A1_ADDRESSABLE_AREA,
+  A2_ADDRESSABLE_AREA,
+  A3_ADDRESSABLE_AREA,
+  B1_ADDRESSABLE_AREA,
+  B2_ADDRESSABLE_AREA,
+  B3_ADDRESSABLE_AREA,
+  C1_ADDRESSABLE_AREA,
+  C2_ADDRESSABLE_AREA,
+  C3_ADDRESSABLE_AREA,
+  D1_ADDRESSABLE_AREA,
+  D2_ADDRESSABLE_AREA,
+  D3_ADDRESSABLE_AREA,
 ]
 
 export const isAddressableAreaStandardSlot = (
-  addressableAreaId: string,
+  addressableAreaName: AddressableAreaName,
   deckDef: DeckDefinition
 ): boolean =>
   (deckDef.robot.model === FLEX_ROBOT_TYPE
     ? STANDARD_FLEX_SLOTS
     : STANDARD_OT2_SLOTS
-  ).includes(addressableAreaId)
+  ).includes(addressableAreaName)

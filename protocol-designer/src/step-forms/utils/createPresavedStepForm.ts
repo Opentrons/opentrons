@@ -18,17 +18,17 @@ import {
   getMagnetLabwareEngageHeight,
 } from '../../ui/modules/utils'
 import { maskField } from '../../steplist/fieldLevel'
-import {
+import type {
   PipetteEntities,
   LabwareEntities,
   RobotState,
   Timeline,
   AdditionalEquipmentEntities,
 } from '@opentrons/step-generation'
-import { FormData, StepType, StepIdType } from '../../form-types'
-import { InitialDeckSetup } from '../types'
-import { FormPatch } from '../../steplist/actions/types'
-import { SavedStepFormState, OrderedStepIdsState } from '../reducers'
+import type { FormData, StepType, StepIdType } from '../../form-types'
+import type { InitialDeckSetup } from '../types'
+import type { FormPatch } from '../../steplist/actions/types'
+import type { SavedStepFormState, OrderedStepIdsState } from '../reducers'
 export interface CreatePresavedStepFormArgs {
   stepId: StepIdType
   stepType: StepType
@@ -107,53 +107,6 @@ const _patchDefaultDropTipLocation = (args: {
     const updatedFields = handleFormChange(
       {
         dropTip_location: defaultDropTipId,
-      },
-      formData,
-      pipetteEntities,
-      labwareEntities
-    )
-    return updatedFields
-  }
-
-  return null
-}
-
-const _patchDefaultTiprack = (args: {
-  initialDeckSetup: InitialDeckSetup
-  labwareEntities: LabwareEntities
-  pipetteEntities: PipetteEntities
-  savedStepForms: SavedStepFormState
-  orderedStepIds: OrderedStepIdsState
-}): FormUpdater => formData => {
-  const {
-    initialDeckSetup,
-    labwareEntities,
-    pipetteEntities,
-    savedStepForms,
-    orderedStepIds,
-  } = args
-  const labware = initialDeckSetup.labware
-  const tipRackIds = Object.values(labware)
-    .filter(lw => lw.def.parameters.isTiprack)
-    .map(lw => lw.id)
-
-  const defaultPipetteId = getNextDefaultPipetteId(
-    savedStepForms,
-    orderedStepIds,
-    initialDeckSetup.pipettes
-  )
-
-  const pipetteFirstTiprackDefUri =
-    pipetteEntities[defaultPipetteId].tiprackDefURI[0]
-  const defaultTiprackId = tipRackIds.find(id =>
-    id.includes(pipetteFirstTiprackDefUri)
-  )
-  const formHasTipRackField = formData && 'tipRack' in formData
-
-  if (formHasTipRackField && defaultTiprackId != null) {
-    const updatedFields = handleFormChange(
-      {
-        tipRack: defaultTiprackId,
       },
       formData,
       pipetteEntities,
@@ -320,14 +273,6 @@ export const createPresavedStepForm = ({
     additionalEquipmentEntities,
   })
 
-  const updateDefaultTipRack = _patchDefaultTiprack({
-    initialDeckSetup,
-    labwareEntities,
-    orderedStepIds,
-    pipetteEntities,
-    savedStepForms,
-  })
-
   const updateDefaultPipette = _patchDefaultPipette({
     initialDeckSetup,
     labwareEntities,
@@ -368,7 +313,6 @@ export const createPresavedStepForm = ({
   return [
     updateDefaultPipette,
     updateDefaultDropTip,
-    updateDefaultTipRack,
     updateTemperatureModuleId,
     updateThermocyclerFields,
     updateHeaterShakerModuleId,

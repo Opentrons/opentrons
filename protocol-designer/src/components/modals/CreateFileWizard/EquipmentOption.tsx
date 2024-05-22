@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { css } from 'styled-components'
-import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
+import { FLEX_ROBOT_TYPE, OT2_ROBOT_TYPE } from '@opentrons/shared-data'
 
 import {
   Flex,
@@ -57,6 +57,7 @@ interface EquipmentOptionProps extends StyleProps {
   showCheckbox?: boolean
   disabled?: boolean
   multiples?: MultiplesProps
+  type?: 'module' | 'pipetteTip'
 }
 export function EquipmentOption(props: EquipmentOptionProps): JSX.Element {
   const {
@@ -66,6 +67,7 @@ export function EquipmentOption(props: EquipmentOptionProps): JSX.Element {
     image = null,
     showCheckbox = false,
     disabled = false,
+    type = 'module',
     robotType,
     multiples,
     ...styleProps
@@ -126,11 +128,11 @@ export function EquipmentOption(props: EquipmentOptionProps): JSX.Element {
     iconInfo = (
       <Icon
         aria-label={`EquipmentOption_${
-          isSelected ? 'checkbox-marked' : 'checkbox-blank-outline'
+          isSelected ? 'ot-checkbox' : 'checkbox-blank-outline'
         }`}
         color={isSelected ? COLORS.blue50 : COLORS.grey50}
         size="1.5rem"
-        name={isSelected ? 'checkbox-marked' : 'checkbox-blank-outline'}
+        name={isSelected ? 'ot-checkbox' : 'checkbox-blank-outline'}
       />
     )
   } else if (showCheckbox && disabled) {
@@ -149,7 +151,6 @@ export function EquipmentOption(props: EquipmentOptionProps): JSX.Element {
     } else if (numItems > 0) {
       downArrowStyle = ARROW_STYLE_ACTIVE
     }
-
     iconInfo = (
       <Flex
         flexDirection={DIRECTION_COLUMN}
@@ -161,7 +162,7 @@ export function EquipmentOption(props: EquipmentOptionProps): JSX.Element {
           {...tempTargetProps}
           data-testid="EquipmentOption_upArrow"
           onClick={
-            numMultiples === 7
+            isDisabled || numMultiples === 7
               ? undefined
               : () => {
                   multiples.setValue(numMultiples + 1)
@@ -197,6 +198,14 @@ export function EquipmentOption(props: EquipmentOptionProps): JSX.Element {
     )
   }
 
+  let optionTooltip
+  if (robotType === FLEX_ROBOT_TYPE && type === 'module') {
+    optionTooltip = t('disabled_no_space_additional_items')
+  } else if (robotType === OT2_ROBOT_TYPE && type === 'module') {
+    optionTooltip = t('disabled_you_can_add_one_type')
+  } else if (type === 'pipetteTip') {
+    optionTooltip = t('disabled_no_space_pipette')
+  }
   return (
     <>
       <Flex
@@ -255,13 +264,7 @@ export function EquipmentOption(props: EquipmentOptionProps): JSX.Element {
         </Flex>
       </Flex>
       {disabled ? (
-        <Tooltip {...equipmentTooltipProps}>
-          {t(
-            robotType === FLEX_ROBOT_TYPE
-              ? 'disabled_no_space_additional_items'
-              : 'disabled_you_can_add_one_type'
-          )}
-        </Tooltip>
+        <Tooltip {...equipmentTooltipProps}>{optionTooltip}</Tooltip>
       ) : null}
     </>
   )

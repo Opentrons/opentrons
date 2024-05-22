@@ -25,6 +25,7 @@ import {
 } from '@opentrons/components'
 import {
   useHost,
+  useMostRecentSuccessfulAnalysisAsDocumentQuery,
   useProtocolAnalysisAsDocumentQuery,
 } from '@opentrons/react-api-client'
 import { deleteProtocol, deleteRun, getProtocol } from '@opentrons/api-client'
@@ -60,14 +61,26 @@ export function ProtocolCard(props: {
     showFailedAnalysisModal,
     setShowFailedAnalysisModal,
   ] = React.useState<boolean>(false)
-  const { t, i18n } = useTranslation('protocol_info')
+  const { t, i18n } = useTranslation(['protocol_info', 'branded'])
   const protocolName = protocol.metadata.protocolName ?? protocol.files[0].name
   const longpress = useLongPress()
   const queryClient = useQueryClient()
   const host = useHost()
 
+  const { id: protocolId, analysisSummaries } = protocol
+  const {
+    data: mostRecentSuccessfulAnalysis,
+  } = useMostRecentSuccessfulAnalysisAsDocumentQuery(
+    protocolId,
+    analysisSummaries,
+    {
+      enabled: protocol != null,
+      refetchInterval: analysisData =>
+        analysisData == null ? REFETCH_INTERVAL : false,
+    }
+  )
   const { data: mostRecentAnalysis } = useProtocolAnalysisAsDocumentQuery(
-    protocol.id,
+    protocolId,
     last(protocol.analysisSummaries)?.id ?? null,
     {
       enabled: protocol != null,
@@ -76,14 +89,18 @@ export function ProtocolCard(props: {
     }
   )
 
+  const analysisForProtocolCard =
+    mostRecentSuccessfulAnalysis == null
+      ? mostRecentAnalysis
+      : mostRecentSuccessfulAnalysis
   const isFailedAnalysis =
-    (mostRecentAnalysis != null &&
-      'result' in mostRecentAnalysis &&
-      (mostRecentAnalysis.result === 'error' ||
-        mostRecentAnalysis.result === 'not-ok')) ??
+    (analysisForProtocolCard != null &&
+      'result' in analysisForProtocolCard &&
+      (analysisForProtocolCard.result === 'error' ||
+        analysisForProtocolCard.result === 'not-ok')) ??
     false
 
-  const isPendingAnalysis = mostRecentAnalysis == null
+  const isPendingAnalysis = analysisForProtocolCard == null
 
   const handleProtocolClick = (
     longpress: UseLongPressResult,
@@ -264,7 +281,9 @@ export function ProtocolCard(props: {
                   }}
                 />
 
-                <StyledText as="p">{t('delete_protocol_from_app')}</StyledText>
+                <StyledText as="p">
+                  {t('branded:delete_protocol_from_app')}
+                </StyledText>
               </Flex>
               <SmallButton
                 onClick={handleDeleteProtocol}

@@ -14,3 +14,5 @@ class Topics(str, Enum):
     MAINTENANCE_RUNS_CURRENT_RUN = f"{_TOPIC_BASE}/maintenance_runs/current_run"
     RUNS_CURRENT_COMMAND = f"{_TOPIC_BASE}/runs/current_command"
     RUNS = f"{_TOPIC_BASE}/runs"
+    DECK_CONFIGURATION = f"{_TOPIC_BASE}/deck_configuration"
+    RUNS_PRE_SERIALIZED_COMMANDS = f"{_TOPIC_BASE}/runs/pre_serialized_commands"

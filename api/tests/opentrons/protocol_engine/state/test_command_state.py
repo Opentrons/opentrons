@@ -5,6 +5,7 @@ implementation detail.
 """
 
 from datetime import datetime
+from unittest.mock import sentinel
 
 import pytest
 
@@ -13,10 +14,15 @@ from opentrons_shared_data.errors import ErrorCodes, PythonException
 from opentrons.ordered_set import OrderedSet
 from opentrons.protocol_engine import actions, commands, errors
 from opentrons.protocol_engine.error_recovery_policy import ErrorRecoveryType
+from opentrons.protocol_engine.errors.error_occurrence import ErrorOccurrence
+from opentrons.protocol_engine.errors.exceptions import EStopActivatedError
 from opentrons.protocol_engine.notes.notes import CommandNote
-from opentrons.protocol_engine.state.commands import CommandStore, CommandView
+from opentrons.protocol_engine.state.commands import (
+    CommandStore,
+    CommandView,
+)
 from opentrons.protocol_engine.state.config import Config
-from opentrons.protocol_engine.types import DeckType
+from opentrons.protocol_engine.types import DeckType, EngineStatus
 
 
 def _make_config() -> Config:
@@ -350,8 +356,8 @@ def test_error_recovery_type_tracking() -> None:
     assert view.get_error_recovery_type("c2") == ErrorRecoveryType.FAIL_RUN
 
 
-def test_get_recovery_in_progress_for_command() -> None:
-    """It should return whether error recovery is in progress for the given command."""
+def test_recovery_target_tracking() -> None:
+    """It should keep track of the command currently undergoing error recovery."""
     subject = CommandStore(config=_make_config(), is_door_open=False)
     subject_view = CommandView(subject.state)
 
@@ -376,12 +382,16 @@ def test_get_recovery_in_progress_for_command() -> None:
     subject.handle_action(fail_1)
 
     # c1 failed recoverably and we're currently recovering from it.
+    recovery_target = subject_view.get_recovery_target()
+    assert recovery_target is not None
+    assert recovery_target.command_id == "c1"
     assert subject_view.get_recovery_in_progress_for_command("c1")
 
     resume_from_1_recovery = actions.ResumeFromRecoveryAction()
     subject.handle_action(resume_from_1_recovery)
 
     # c1 failed recoverably, but we've already completed its recovery.
+    assert subject_view.get_recovery_target() is None
     assert not subject_view.get_recovery_in_progress_for_command("c1")
 
     queue_2 = actions.QueueCommandAction(
@@ -405,6 +415,9 @@ def test_get_recovery_in_progress_for_command() -> None:
     subject.handle_action(fail_2)
 
     # c2 failed recoverably and we're currently recovering from it.
+    recovery_target = subject_view.get_recovery_target()
+    assert recovery_target is not None
+    assert recovery_target.command_id == "c2"
     assert subject_view.get_recovery_in_progress_for_command("c2")
     # ...and that means we're *not* currently recovering from c1,
     # even though it failed recoverably before.
@@ -433,4 +446,34 @@ def test_get_recovery_in_progress_for_command() -> None:
     subject.handle_action(fail_3)
 
     # c3 failed, but not recoverably.
-    assert not subject_view.get_recovery_in_progress_for_command("c2")
+    assert subject_view.get_recovery_target() is None
+    assert not subject_view.get_recovery_in_progress_for_command("c3")
+
+
+def test_final_state_after_estop() -> None:
+    """Test the final state of the run after it's E-stopped."""
+    subject = CommandStore(config=_make_config(), is_door_open=False)
+    subject_view = CommandView(subject.state)
+
+    error_details = actions.FinishErrorDetails(
+        error=EStopActivatedError(), error_id="error-id", created_at=datetime.now()
+    )
+    expected_error_occurrence = ErrorOccurrence(
+        id=error_details.error_id,
+        createdAt=error_details.created_at,
+        errorCode=ErrorCodes.E_STOP_ACTIVATED.value.code,
+        errorType="EStopActivatedError",
+        detail="E-stop activated.",
+    )
+
+    subject.handle_action(actions.StopAction(from_estop=True))
+    subject.handle_action(actions.FinishAction(error_details=error_details))
+    subject.handle_action(
+        actions.HardwareStoppedAction(
+            completed_at=sentinel.hardware_stopped_action_completed_at,
+            finish_error_details=None,
+        )
+    )
+
+    assert subject_view.get_status() == EngineStatus.FAILED
+    assert subject_view.get_error() == expected_error_occurrence

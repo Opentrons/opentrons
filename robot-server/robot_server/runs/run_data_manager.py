@@ -9,7 +9,7 @@ from opentrons.protocol_engine import (
     LabwareOffsetCreate,
     StateSummary,
     CommandSlice,
-    CurrentCommand,
+    CommandPointer,
     Command,
 )
 from opentrons.protocol_engine.types import RunTimeParamValuesType
@@ -22,13 +22,14 @@ from .engine_store import EngineStore
 from .run_store import RunResource, RunStore, BadRunResource, BadStateSummary
 from .run_models import Run, BadRun, RunDataError
 
-from opentrons.protocol_engine.types import DeckConfigurationType
+from opentrons.protocol_engine.types import DeckConfigurationType, RunTimeParameter
 
 
 def _build_run(
     run_resource: Union[RunResource, BadRunResource],
     state_summary: Union[StateSummary, BadStateSummary],
     current: bool,
+    run_time_parameters: List[RunTimeParameter],
 ) -> Union[Run, BadRun]:
     # TODO(mc, 2022-05-16): improve persistence strategy
     # such that this default summary object is not needed
@@ -49,6 +50,7 @@ def _build_run(
             completedAt=state_summary.completedAt,
             startedAt=state_summary.startedAt,
             liquids=state_summary.liquids,
+            runTimeParameters=run_time_parameters,
         )
 
     errors: List[EnumeratedError] = []
@@ -102,11 +104,16 @@ def _build_run(
         completedAt=state.completedAt,
         startedAt=state.startedAt,
         liquids=state.liquids,
+        runTimeParameters=run_time_parameters,
     )
 
 
 class RunNotCurrentError(ValueError):
     """Error raised when a requested run is not the current run."""
+
+
+class PreSerializedCommandsNotAvailableError(LookupError):
+    """Error raised when a run's commands are not available as pre-serialized list of commands."""
 
 
 class RunDataManager:
@@ -172,6 +179,7 @@ class RunDataManager:
                 run_id=prev_run_id,
                 summary=prev_run_result.state_summary,
                 commands=prev_run_result.commands,
+                run_time_parameters=prev_run_result.parameters,
             )
         state_summary = await self._engine_store.create(
             run_id=run_id,
@@ -196,6 +204,7 @@ class RunDataManager:
             run_resource=run_resource,
             state_summary=state_summary,
             current=True,
+            run_time_parameters=[],
         )
 
     def get(self, run_id: str) -> Union[Run, BadRun]:
@@ -215,9 +224,10 @@ class RunDataManager:
         """
         run_resource = self._run_store.get(run_id=run_id)
         state_summary = self._get_state_summary(run_id=run_id)
+        parameters = self._get_run_time_parameters(run_id=run_id)
         current = run_id == self._engine_store.current_run_id
 
-        return _build_run(run_resource, state_summary, current)
+        return _build_run(run_resource, state_summary, current, parameters)
 
     def get_run_loaded_labware_definitions(
         self, run_id: str
@@ -260,6 +270,7 @@ class RunDataManager:
                 run_resource=run_resource,
                 state_summary=self._get_state_summary(run_resource.run_id),
                 current=run_resource.run_id == self._engine_store.current_run_id,
+                run_time_parameters=self._get_run_time_parameters(run_resource.run_id),
             )
             for run_resource in self._run_store.get_all(length)
         ]
@@ -277,15 +288,22 @@ class RunDataManager:
         """
         if run_id == self._engine_store.current_run_id:
             await self._engine_store.clear()
-            await self._runs_publisher.clean_up_current_run()
+
+        await self._runs_publisher.clean_up_run(run_id=run_id)
 
         self._run_store.remove(run_id=run_id)
 
     async def update(self, run_id: str, current: Optional[bool]) -> Union[Run, BadRun]:
-        """Get and potentially archive a run.
+        """Get and potentially archive the current run.
 
         Args:
             run_id: The run to get and maybe archive.
+            current: Whether to mark the run as current or not.
+                     If `current` set to False, then the run is 'un-current'ed by
+                     stopping the run, saving the final run data to the run store,
+                     and clearing the engine and runner.
+                     If 'current' is True or not specified, we simply fetch the run's
+                     data from memory and database.
 
         Returns:
             The updated run.
@@ -310,15 +328,22 @@ class RunDataManager:
                 run_id=run_id,
                 summary=state_summary,
                 commands=commands,
+                run_time_parameters=parameters,
+            )
+            await self._runs_publisher.publish_pre_serialized_commands_notification(
+                run_id
             )
         else:
             state_summary = self._engine_store.engine.state_view.get_summary()
+            runner = self._engine_store.runner
+            parameters = runner.run_time_parameters if runner else []
             run_resource = self._run_store.get(run_id=run_id)
 
         return _build_run(
             run_resource=run_resource,
             state_summary=state_summary,
             current=next_current,
+            run_time_parameters=parameters,
         )
 
     def get_commands_slice(
@@ -348,15 +373,36 @@ class RunDataManager:
             run_id=run_id, cursor=cursor, length=length
         )
 
-    def get_current_command(self, run_id: str) -> Optional[CurrentCommand]:
-        """Get the currently executing command, if any.
+    def get_current_command(self, run_id: str) -> Optional[CommandPointer]:
+        """Get the "current" command, if any.
+
+        See `ProtocolEngine.state_view.commands.get_current()` for the definition
+        of "current."
 
         Args:
             run_id: ID of the run.
         """
         if self._engine_store.current_run_id == run_id:
             return self._engine_store.engine.state_view.commands.get_current()
-        return None
+        else:
+            # todo(mm, 2024-05-20):
+            # For historical runs to behave consistently with the current run,
+            # this should be the most recently completed command, not `None`.
+            return None
+
+    def get_recovery_target_command(self, run_id: str) -> Optional[CommandPointer]:
+        """Get the current error recovery target.
+
+        See `ProtocolEngine.state_view.commands.get_recovery_target()`.
+
+        Args:
+            run_id: ID of the run.
+        """
+        if self._engine_store.current_run_id == run_id:
+            return self._engine_store.engine.state_view.commands.get_recovery_target()
+        else:
+            # Historical runs can't have any ongoing error recovery.
+            return None
 
     def get_command(self, run_id: str, command_id: str) -> Command:
         """Get a run's command by ID.
@@ -376,6 +422,17 @@ class RunDataManager:
 
         return self._run_store.get_command(run_id=run_id, command_id=command_id)
 
+    def get_all_commands_as_preserialized_list(self, run_id: str) -> List[str]:
+        """Get all commands of a run in a serialized json list."""
+        if (
+            run_id == self._engine_store.current_run_id
+            and not self._engine_store.engine.state_view.commands.get_is_terminal()
+        ):
+            raise PreSerializedCommandsNotAvailableError(
+                "Pre-serialized commands are only available after a run has ended."
+            )
+        return self._run_store.get_all_commands_as_preserialized_list(run_id)
+
     def _get_state_summary(self, run_id: str) -> Union[StateSummary, BadStateSummary]:
         if run_id == self._engine_store.current_run_id:
             return self._engine_store.engine.state_view.get_summary()
@@ -385,3 +442,10 @@ class RunDataManager:
     def _get_good_state_summary(self, run_id: str) -> Optional[StateSummary]:
         summary = self._get_state_summary(run_id)
         return summary if isinstance(summary, StateSummary) else None
+
+    def _get_run_time_parameters(self, run_id: str) -> List[RunTimeParameter]:
+        if run_id == self._engine_store.current_run_id:
+            runner = self._engine_store.runner
+            return runner.run_time_parameters if runner else []
+        else:
+            return self._run_store.get_run_time_parameters(run_id=run_id)

@@ -7,7 +7,8 @@ from typing_extensions import Literal
 
 from ..types import DeckPoint
 from ..resources import ModelUtils
-from .command import AbstractCommandImpl, BaseCommand, BaseCommandCreate
+from .command import AbstractCommandImpl, BaseCommand, BaseCommandCreate, SuccessData
+from ..errors.error_occurrence import ErrorOccurrence
 
 if TYPE_CHECKING:
     from ..execution import GantryMover
@@ -45,20 +46,22 @@ class SavePositionResult(BaseModel):
 
 
 class SavePositionImplementation(
-    AbstractCommandImpl[SavePositionParams, SavePositionResult]
+    AbstractCommandImpl[SavePositionParams, SuccessData[SavePositionResult, None]]
 ):
     """Save position command implementation."""
 
     def __init__(
         self,
         gantry_mover: GantryMover,
-        model_utils: Optional[ModelUtils] = None,
+        model_utils: ModelUtils,
         **kwargs: object,
     ) -> None:
         self._gantry_mover = gantry_mover
-        self._model_utils = model_utils or ModelUtils()
+        self._model_utils = model_utils
 
-    async def execute(self, params: SavePositionParams) -> SavePositionResult:
+    async def execute(
+        self, params: SavePositionParams
+    ) -> SuccessData[SavePositionResult, None]:
         """Check the requested pipette's current position."""
         position_id = self._model_utils.ensure_id(params.positionId)
         fail_on_not_homed = (
@@ -68,13 +71,18 @@ class SavePositionImplementation(
             pipette_id=params.pipetteId, fail_on_not_homed=fail_on_not_homed
         )
 
-        return SavePositionResult(
-            positionId=position_id,
-            position=DeckPoint(x=x, y=y, z=z),
+        return SuccessData(
+            public=SavePositionResult(
+                positionId=position_id,
+                position=DeckPoint(x=x, y=y, z=z),
+            ),
+            private=None,
         )
 
 
-class SavePosition(BaseCommand[SavePositionParams, SavePositionResult]):
+class SavePosition(
+    BaseCommand[SavePositionParams, SavePositionResult, ErrorOccurrence]
+):
     """Save Position command model."""
 
     commandType: SavePositionCommandType = "savePosition"

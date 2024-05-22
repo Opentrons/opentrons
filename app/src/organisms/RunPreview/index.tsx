@@ -1,8 +1,9 @@
 import * as React from 'react'
 import { css } from 'styled-components'
 import { useTranslation } from 'react-i18next'
-import { ViewportList, ViewportListRef } from 'react-viewport-list'
+import { ViewportList } from 'react-viewport-list'
 
+import { RUN_STATUSES_TERMINAL } from '@opentrons/api-client'
 import {
   ALIGN_CENTER,
   BORDERS,
@@ -19,15 +20,26 @@ import {
 } from '@opentrons/components'
 
 import { useMostRecentCompletedAnalysis } from '../LabwarePositionCheck/useMostRecentCompletedAnalysis'
-import { useNotifyLastRunCommandKey } from '../../resources/runs'
+import {
+  useNotifyAllCommandsAsPreSerializedList,
+  useNotifyRunQuery,
+} from '../../resources/runs'
 import { CommandText } from '../CommandText'
 import { Divider } from '../../atoms/structure'
 import { NAV_BAR_WIDTH } from '../../App/constants'
 import { CommandIcon } from './CommandIcon'
+import { useRunStatus } from '../RunTimeControl/hooks'
+import { getCommandTextData } from '../CommandText/utils/getCommandTextData'
+import { useLastRunCommand } from '../Devices/hooks/useLastRunCommand'
+
+import type { ViewportListRef } from 'react-viewport-list'
+import type { RunStatus } from '@opentrons/api-client'
 import type { RobotType } from '@opentrons/shared-data'
 
 const COLOR_FADE_MS = 500
 const LIVE_RUN_COMMANDS_POLL_MS = 3000
+// arbitrary large number of commands
+const MAX_COMMANDS = 100000
 
 interface RunPreviewProps {
   runId: string
@@ -41,16 +53,42 @@ export const RunPreviewComponent = (
 ): JSX.Element | null => {
   const { t } = useTranslation('run_details')
   const robotSideAnalysis = useMostRecentCompletedAnalysis(runId)
+  const runStatus = useRunStatus(runId)
+  const { data: runRecord } = useNotifyRunQuery(runId)
+  const isRunTerminal =
+    runStatus != null
+      ? (RUN_STATUSES_TERMINAL as RunStatus[]).includes(runStatus)
+      : false
+  // we only ever want one request done for terminal runs because this is a heavy request
+  const commandsFromQuery = useNotifyAllCommandsAsPreSerializedList(
+    runId,
+    { cursor: 0, pageLength: MAX_COMMANDS },
+    {
+      staleTime: Infinity,
+      cacheTime: Infinity,
+      enabled: isRunTerminal,
+    }
+  ).data?.data
+  const nullCheckedCommandsFromQuery =
+    commandsFromQuery == null ? robotSideAnalysis?.commands : commandsFromQuery
   const viewPortRef = React.useRef<HTMLDivElement | null>(null)
-  const currentRunCommandKey = useNotifyLastRunCommandKey(runId, {
+  const currentRunCommandKey = useLastRunCommand(runId, {
     refetchInterval: LIVE_RUN_COMMANDS_POLL_MS,
-  })
+  })?.key
   const [
     isCurrentCommandVisible,
     setIsCurrentCommandVisible,
   ] = React.useState<boolean>(true)
   if (robotSideAnalysis == null) return null
-  const currentRunCommandIndex = robotSideAnalysis.commands.findIndex(
+  const commands =
+    (isRunTerminal
+      ? nullCheckedCommandsFromQuery
+      : robotSideAnalysis.commands) ?? []
+  const commandTextData =
+    isRunTerminal && runRecord?.data != null
+      ? getCommandTextData(runRecord.data, nullCheckedCommandsFromQuery)
+      : getCommandTextData(robotSideAnalysis)
+  const currentRunCommandIndex = commands.findIndex(
     c => c.key === currentRunCommandKey
   )
 
@@ -69,7 +107,7 @@ export const RunPreviewComponent = (
           {t('run_preview')}
         </StyledText>
         <StyledText as="label" color={COLORS.grey50}>
-          {t('steps_total', { count: robotSideAnalysis.commands.length })}
+          {t('steps_total', { count: commands.length })}
         </StyledText>
       </Flex>
       <StyledText as="p" marginBottom={SPACING.spacing8}>
@@ -79,7 +117,7 @@ export const RunPreviewComponent = (
       <ViewportList
         viewportRef={viewPortRef}
         ref={ref}
-        items={robotSideAnalysis.commands}
+        items={commands}
         onViewportIndexesChange={([
           lowestVisibleIndex,
           highestVisibleIndex,
@@ -128,7 +166,7 @@ export const RunPreviewComponent = (
                   <CommandIcon command={command} color={iconColor} />
                   <CommandText
                     command={command}
-                    robotSideAnalysis={robotSideAnalysis}
+                    commandTextData={commandTextData}
                     robotType={robotType}
                     color={COLORS.black90}
                   />
@@ -152,7 +190,7 @@ export const RunPreviewComponent = (
           {t('view_current_step')}
         </PrimaryButton>
       ) : null}
-      {currentRunCommandIndex === robotSideAnalysis.commands.length - 1 ? (
+      {currentRunCommandIndex === commands.length - 1 ? (
         <StyledText as="h6" color={COLORS.grey60}>
           {t('end_of_protocol')}
         </StyledText>

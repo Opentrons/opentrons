@@ -80,7 +80,6 @@ class RunArgs:
     pipette: InstrumentContext
     pipette_tag: str
     git_description: str
-    robot_serial: str
     recorder: GravimetricRecorder
     pipette_volume: int
     pipette_channels: int
@@ -95,8 +94,9 @@ class RunArgs:
     start_height_offset: float
     aspirate: bool
     dial_indicator: Optional[mitutoyo_digimatic_indicator.Mitutoyo_Digimatic_Indicator]
-    plunger_speed: bool
+    plunger_speed: float
     trials_before_jog: int
+    multi_passes: int
 
     @classmethod
     def _get_protocol_context(cls, args: argparse.Namespace) -> ProtocolContext:
@@ -140,7 +140,6 @@ class RunArgs:
     def build_run_args(cls, args: argparse.Namespace) -> "RunArgs":
         """Build."""
         _ctx = RunArgs._get_protocol_context(args)
-        robot_serial = helpers._get_robot_serial(_ctx.is_simulating())
         run_id, start_time = create_run_id_and_start_time()
         environment_sensor = asair_sensor.BuildAsairSensor(
             _ctx.is_simulating() or args.ignore_env
@@ -161,7 +160,10 @@ class RunArgs:
         pipette_tag = helpers._get_tag_from_pipette(pipette, False, False)
 
         if args.trials == 0:
-            trials = 10
+            if args.channels < 96:
+                trials = 10
+            else:
+                trials = 7
         else:
             trials = args.trials
 
@@ -195,7 +197,6 @@ class RunArgs:
         # go ahead and store the meta data now
         store_serial_numbers(
             report,
-            robot_serial,
             pipette_tag,
             scale.read_serial_number(),
             environment_sensor.get_serial(),
@@ -220,7 +221,6 @@ class RunArgs:
             pipette=pipette,
             pipette_tag=pipette_tag,
             git_description=git_description,
-            robot_serial=robot_serial,
             recorder=recorder,
             pipette_volume=args.pipette,
             pipette_channels=args.channels,
@@ -237,6 +237,7 @@ class RunArgs:
             dial_indicator=dial,
             plunger_speed=args.plunger_speed,
             trials_before_jog=args.trials_before_jog,
+            multi_passes=args.multi_passes,
         )
 
 
@@ -267,9 +268,11 @@ if __name__ == "__main__":
     parser.add_argument("--ignore-env", action="store_true")
     parser.add_argument("--ignore-dial", action="store_true")
     parser.add_argument("--trials-before-jog", type=int, default=10)
+    parser.add_argument("--multi-passes", type=int, default=1)
 
     args = parser.parse_args()
     run_args = RunArgs.build_run_args(args)
+    exit_error = os.EX_OK
     try:
         if not run_args.ctx.is_simulating():
             data_dir = get_testing_data_directory()
@@ -292,6 +295,7 @@ if __name__ == "__main__":
     except Exception as e:
         ui.print_info(f"got error {e}")
         ui.print_info(traceback.format_exc())
+        exit_error = 1
     finally:
         if run_args.recorder is not None:
             ui.print_info("ending recording")
@@ -314,4 +318,4 @@ if __name__ == "__main__":
         run_args.ctx.cleanup()
         if not args.simulate:
             helpers_ot3.restart_server_ot3()
-        os._exit(os.EX_OK)
+        os._exit(exit_error)

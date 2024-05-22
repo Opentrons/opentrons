@@ -10,8 +10,8 @@ import { selectors as stepFormSelectors } from '../../step-forms'
 import { getActiveItem } from '../../ui/steps'
 import { TERMINAL_ITEM_SELECTION_TYPE } from '../../ui/steps/reducers'
 import { selectors as fileDataSelectors } from '../../file-data'
-import { WellGroup } from '@opentrons/components'
-import { Selector } from '../../types'
+import type { WellGroup } from '@opentrons/components'
+import type { Selector } from '../../types'
 export const getMissingTipsByLabwareId: Selector<Record<
   string,
   WellGroup

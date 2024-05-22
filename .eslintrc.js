@@ -38,6 +38,28 @@ module.exports = {
     'no-case-declarations': 'warn',
     'prefer-regex-literals': 'warn',
     'react/prop-types': 'warn',
+
+    // Enforce notification hooks
+    'no-restricted-imports': [
+      'error',
+      {
+        paths: [
+          {
+            name: '@opentrons/react-api-client',
+            importNames: [
+              'useAllRunsQuery',
+              'useRunQuery',
+              'useAllCommandsQuery',
+              'useCurrentMaintenanceRun',
+              'useDeckConfigurationQuery',
+              'useAllCommandsAsPreSerializedList',
+            ],
+            message:
+              'HTTP hook deprecated. Use the equivalent notification wrapper (useNotifyXYZ).',
+          },
+        ],
+      },
+    ],
   },
 
   globals: {},
@@ -80,7 +102,6 @@ module.exports = {
         '@typescript-eslint/no-unnecessary-type-assertion': 'warn',
         '@typescript-eslint/no-unnecessary-boolean-literal-compare': 'warn',
         '@typescript-eslint/no-unsafe-argument': 'warn',
-        '@typescript-eslint/consistent-type-imports': 'warn',
         '@typescript-eslint/consistent-indexed-object-style': 'warn',
         '@typescript-eslint/no-confusing-void-expression': 'warn',
         '@typescript-eslint/ban-types': 'warn',
@@ -135,6 +156,13 @@ module.exports = {
       extends: ['plugin:cypress/recommended'],
       rules: {
         'cypress/unsafe-to-chain-command': 'warn',
+      },
+    },
+    // Allow HTTP hooks in notification wrappers and tests
+    {
+      files: ['app/src/resources/**', '**/__tests__/**test**'],
+      rules: {
+        'no-restricted-imports': 'off',
       },
     },
   ],

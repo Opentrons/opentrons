@@ -6,7 +6,8 @@ from typing_extensions import Literal
 
 from opentrons.types import MountType
 from ..types import MotorAxis
-from .command import AbstractCommandImpl, BaseCommand, BaseCommandCreate
+from .command import AbstractCommandImpl, BaseCommand, BaseCommandCreate, SuccessData
+from ..errors.error_occurrence import ErrorOccurrence
 
 if TYPE_CHECKING:
     from ..execution import MovementHandler
@@ -40,13 +41,15 @@ class HomeResult(BaseModel):
     """Result data from the execution of a Home command."""
 
 
-class HomeImplementation(AbstractCommandImpl[HomeParams, HomeResult]):
+class HomeImplementation(
+    AbstractCommandImpl[HomeParams, SuccessData[HomeResult, None]]
+):
     """Home command implementation."""
 
     def __init__(self, movement: MovementHandler, **kwargs: object) -> None:
         self._movement = movement
 
-    async def execute(self, params: HomeParams) -> HomeResult:
+    async def execute(self, params: HomeParams) -> SuccessData[HomeResult, None]:
         """Home some or all motors to establish positional accuracy."""
         if (
             params.skipIfMountPositionOk is None
@@ -55,10 +58,10 @@ class HomeImplementation(AbstractCommandImpl[HomeParams, HomeResult]):
             )
         ):
             await self._movement.home(axes=params.axes)
-        return HomeResult()
+        return SuccessData(public=HomeResult(), private=None)
 
 
-class Home(BaseCommand[HomeParams, HomeResult]):
+class Home(BaseCommand[HomeParams, HomeResult, ErrorOccurrence]):
     """Command to send some (or all) motors to their home positions.
 
     Homing a motor re-establishes positional accuracy the first time a motor

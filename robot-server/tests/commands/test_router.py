@@ -6,7 +6,7 @@ from decoy import Decoy
 from opentrons.protocol_engine import (
     ProtocolEngine,
     CommandSlice,
-    CurrentCommand,
+    CommandPointer,
     commands as pe_commands,
 )
 from opentrons.protocol_engine.errors import CommandDoesNotExistError
@@ -147,7 +147,7 @@ async def test_get_commands_list(
     )
 
     decoy.when(protocol_engine.state_view.commands.get_current()).then_return(
-        CurrentCommand(
+        CommandPointer(
             command_id="abc123",
             command_key="command-key-1",
             created_at=datetime(year=2021, month=1, day=1),

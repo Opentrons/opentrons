@@ -26,7 +26,7 @@ import {
   SecondaryButton,
   StyledText,
   TYPOGRAPHY,
-  useHoverTooltip,
+  useTooltip,
 } from '@opentrons/components'
 import { ApiHostProvider } from '@opentrons/react-api-client'
 
@@ -63,6 +63,8 @@ export const CARD_OUTLINE_BORDER_STYLE = css`
   }
 `
 
+const TOOLTIP_DELAY_MS = 2000
+
 const _getFileBaseName = (filePath: string): string => {
   return filePath.split('/').reverse()[0]
 }
@@ -78,7 +80,11 @@ export function ChooseProtocolSlideoutComponent(
   const { t } = useTranslation(['device_details', 'shared'])
   const history = useHistory()
   const logger = useLogger(new URL('', import.meta.url).pathname)
-  const [targetProps, tooltipProps] = useHoverTooltip()
+  const [targetProps, tooltipProps] = useTooltip()
+  const [
+    showRestoreValuesTooltip,
+    setShowRestoreValuesTooltip,
+  ] = React.useState<boolean>(false)
 
   const { robot, showSlideout, onCloseClick } = props
   const { name } = robot
@@ -93,6 +99,7 @@ export function ChooseProtocolSlideoutComponent(
   ] = React.useState<RunTimeParameter[]>([])
   const [currentPage, setCurrentPage] = React.useState<number>(1)
   const [hasParamError, setHasParamError] = React.useState<boolean>(false)
+  const [isInputFocused, setIsInputFocused] = React.useState<boolean>(false)
 
   React.useEffect(() => {
     setRunTimeParametersOverrides(
@@ -105,7 +112,6 @@ export function ChooseProtocolSlideoutComponent(
 
   const runTimeParametersFromAnalysis =
     selectedProtocol?.mostRecentAnalysis?.runTimeParameters ?? []
-  console.log('runTimeParametersFromAnalysis', runTimeParametersFromAnalysis)
 
   const hasRunTimeParameters = runTimeParametersFromAnalysis.length > 0
 
@@ -230,7 +236,7 @@ export function ChooseProtocolSlideoutComponent(
         const value = runtimeParam.value as number
         const id = `InputField_${runtimeParam.variableName}_${index.toString()}`
         const error =
-          Number.isNaN(value) ||
+          (Number.isNaN(value) && !isInputFocused) ||
           value < runtimeParam.min ||
           value > runtimeParam.max
             ? t(`protocol_details:value_out_of_range`, {
@@ -259,6 +265,8 @@ export function ChooseProtocolSlideoutComponent(
             caption={`${runtimeParam.min}-${runtimeParam.max}`}
             id={id}
             error={error}
+            onBlur={() => setIsInputFocused(false)}
+            onFocus={() => setIsInputFocused(true)}
             onChange={e => {
               const clone = runTimeParametersOverrides.map((parameter, i) => {
                 if (i === index) {
@@ -332,8 +340,17 @@ export function ChooseProtocolSlideoutComponent(
       }
     }) ?? null
 
+  const resetRunTimeParameters = (): void => {
+    setRunTimeParametersOverrides(
+      runTimeParametersOverrides?.map(parameter => ({
+        ...parameter,
+        value: parameter.default,
+      }))
+    )
+  }
+
   const pageTwoBody = (
-    <Flex flexDirection={DIRECTION_COLUMN}>
+    <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing10}>
       <Flex justifyContent={JUSTIFY_END}>
         <LinkComponent
           textAlign={TYPOGRAPHY.textAlignRight}
@@ -341,22 +358,34 @@ export function ChooseProtocolSlideoutComponent(
             isRestoreDefaultsLinkEnabled ? ENABLED_LINK_CSS : DISABLED_LINK_CSS
           }
           onClick={() => {
-            const clone = runTimeParametersOverrides.map(parameter => ({
-              ...parameter,
-              value: parameter.default,
-            }))
-            setRunTimeParametersOverrides(clone)
+            if (isRestoreDefaultsLinkEnabled) {
+              resetRunTimeParameters?.()
+            } else {
+              setShowRestoreValuesTooltip(true)
+              setTimeout(
+                () => setShowRestoreValuesTooltip(false),
+                TOOLTIP_DELAY_MS
+              )
+            }
           }}
           paddingBottom={SPACING.spacing10}
           {...targetProps}
         >
           {t('protocol_details:restore_defaults')}
         </LinkComponent>
-        {!isRestoreDefaultsLinkEnabled && (
-          <Tooltip tooltipProps={tooltipProps}>
-            {t('protocol_details:no_custom_values')}
-          </Tooltip>
-        )}
+        <Tooltip
+          tooltipProps={{
+            ...tooltipProps,
+            visible: showRestoreValuesTooltip,
+          }}
+          css={css`
+            &:hover {
+              cursor: auto;
+            }
+          `}
+        >
+          {t('protocol_details:no_custom_values')}
+        </Tooltip>{' '}
       </Flex>
       <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing16}>
         {runTimeParametersInputs}
@@ -409,7 +438,11 @@ export function ChooseProtocolSlideoutComponent(
   return (
     <MultiSlideout
       isExpanded={showSlideout}
-      onCloseClick={onCloseClick}
+      onCloseClick={() => {
+        onCloseClick()
+        setCurrentPage(1)
+        resetRunTimeParameters()
+      }}
       currentStep={currentPage}
       maxSteps={hasRunTimeParameters ? 2 : 1}
       title={t('choose_protocol_to_run', { name })}
@@ -455,7 +488,7 @@ export function ChooseProtocolSlideoutComponent(
                 setSelectedProtocol(storedProtocol)
               }
             }}
-            robotName={robot.name}
+            robot={robot}
             {...{ selectedProtocol, runCreationError, runCreationErrorCode }}
           />
         ) : (
@@ -477,7 +510,7 @@ interface StoredProtocolListProps {
   handleSelectProtocol: (storedProtocol: StoredProtocolData | null) => void
   runCreationError: string | null
   runCreationErrorCode: number | null
-  robotName: string
+  robot: Robot
 }
 
 function StoredProtocolList(props: StoredProtocolListProps): JSX.Element {
@@ -486,11 +519,13 @@ function StoredProtocolList(props: StoredProtocolListProps): JSX.Element {
     handleSelectProtocol,
     runCreationError,
     runCreationErrorCode,
-    robotName,
+    robot,
   } = props
   const { t } = useTranslation(['device_details', 'protocol_details', 'shared'])
   const storedProtocols = useSelector((state: State) =>
     getStoredProtocols(state)
+  ).filter(
+    protocol => protocol.mostRecentAnalysis?.robotType === robot.robotModel
   )
   React.useEffect(() => {
     handleSelectProtocol(first(storedProtocols) ?? null)
@@ -517,20 +552,32 @@ function StoredProtocolList(props: StoredProtocolListProps): JSX.Element {
                 isWarning={missingAnalysisData}
                 onClick={() => handleSelectProtocol(storedProtocol)}
               >
-                <Box display="grid" gridTemplateColumns="1fr 3fr">
-                  <Box
-                    marginY={SPACING.spacingAuto}
-                    backgroundColor={isSelected ? COLORS.white : 'inherit'}
-                    marginRight={SPACING.spacing16}
-                    height="4.25rem"
-                    width="4.75rem"
-                  >
-                    {!missingAnalysisData ? (
+                <Box
+                  display="grid"
+                  gridTemplateColumns="1fr 3fr"
+                  marginRight={SPACING.spacing16}
+                >
+                  {!missingAnalysisData ? (
+                    <Box
+                      marginY={SPACING.spacingAuto}
+                      backgroundColor={isSelected ? COLORS.white : 'inherit'}
+                      marginRight={SPACING.spacing16}
+                      height="4.25rem"
+                      width="4.75rem"
+                    >
                       <ProtocolDeck
                         protocolAnalysis={storedProtocol.mostRecentAnalysis}
                       />
-                    ) : null}
-                  </Box>
+                    </Box>
+                  ) : (
+                    <Box
+                      height="4.25rem"
+                      width="4.75rem"
+                      marginRight={SPACING.spacing16}
+                      backgroundColor={COLORS.grey30}
+                      borderRadius={SPACING.spacing8}
+                    />
+                  )}
                   <StyledText
                     as="p"
                     fontWeight={TYPOGRAPHY.fontWeightSemiBold}
@@ -579,7 +626,7 @@ function StoredProtocolList(props: StoredProtocolListProps): JSX.Element {
                             color: ${COLORS.red60};
                             text-decoration: ${TYPOGRAPHY.textDecorationUnderline};
                           `}
-                          to={`/devices/${robotName}`}
+                          to={`/devices/${robot.name}`}
                         />
                       ),
                     }}

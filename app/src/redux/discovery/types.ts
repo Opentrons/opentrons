@@ -5,7 +5,7 @@ import type {
   HealthStatus,
 } from '@opentrons/discovery-client'
 
-import {
+import type {
   HEALTH_STATUS_OK,
   CONNECTABLE,
   REACHABLE,

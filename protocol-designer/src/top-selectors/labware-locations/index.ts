@@ -7,10 +7,10 @@ import {
   FLEX_ROBOT_TYPE,
   WASTE_CHUTE_ADDRESSABLE_AREAS,
   WASTE_CHUTE_CUTOUT,
-  CutoutId,
   STAGING_AREA_RIGHT_SLOT_FIXTURE,
   isAddressableAreaStandardSlot,
   MOVABLE_TRASH_ADDRESSABLE_AREAS,
+  FLEX_MODULE_ADDRESSABLE_AREAS,
 } from '@opentrons/shared-data'
 import { COLUMN_4_SLOTS } from '@opentrons/step-generation'
 import {
@@ -19,10 +19,7 @@ import {
   PRESAVED_STEP_ID,
 } from '../../steplist'
 import { getHasWasteChute } from '../../components/labware'
-import {
-  AllTemporalPropertiesForTimelineFrame,
-  selectors as stepFormSelectors,
-} from '../../step-forms'
+import { selectors as stepFormSelectors } from '../../step-forms'
 import { getActiveItem } from '../../ui/steps'
 import { TERMINAL_ITEM_SELECTION_TYPE } from '../../ui/steps/reducers'
 import { selectors as fileDataSelectors } from '../../file-data'
@@ -34,9 +31,10 @@ import {
   getAdditionalEquipmentEntities,
 } from '../../step-forms/selectors'
 import { getIsAdapter } from '../../utils'
+import type { CutoutId, AddressableAreaName } from '@opentrons/shared-data'
 import type { RobotState } from '@opentrons/step-generation'
+import type { AllTemporalPropertiesForTimelineFrame } from '../../step-forms'
 import type { Selector } from '../../types'
-import type { AddressableAreaName } from '@opentrons/shared-data'
 
 interface Option {
   name: string
@@ -232,7 +230,8 @@ export const getUnoccupiedLabwareLocationOptions: Selector<
             .includes(slotId) &&
           !isTrashSlot &&
           !WASTE_CHUTE_ADDRESSABLE_AREAS.includes(slotId) &&
-          !notSelectedStagingAreaAddressableAreas.includes(slotId)
+          !notSelectedStagingAreaAddressableAreas.includes(slotId) &&
+          !FLEX_MODULE_ADDRESSABLE_AREAS.includes(slotId)
         )
       })
       .map(slotId => ({ name: slotId, value: slotId }))

@@ -191,6 +191,9 @@ from opentrons_shared_data.errors.exceptions import (
     PipetteOverpressureError,
     FirmwareUpdateRequiredError,
     FailedGripperPickupError,
+    LiquidNotFoundError,
+    CommunicationError,
+    PythonException,
 )
 
 from .subsystem_manager import SubsystemManager
@@ -1185,7 +1188,14 @@ class OT3Controller(FlexBackend):
     async def is_motor_engaged(self, axis: Axis) -> bool:
         node = axis_to_node(axis)
         result = await get_motor_enabled(self._messenger, {node})
-        engaged = result[node]
+        try:
+            engaged = result[node]
+        except KeyError as ke:
+            raise CommunicationError(
+                message=f"No response from {node.name} for motor engagement query",
+                detail={"node": node.name},
+                wrapping=[PythonException(ke)],
+            ) from ke
         self._engaged_axes.update({axis: engaged})
         return engaged
 
@@ -1351,7 +1361,7 @@ class OT3Controller(FlexBackend):
         plunger_speed: float,
         threshold_pascals: float,
         output_option: OutputOptions = OutputOptions.can_bus_only,
-        data_file: Optional[str] = None,
+        data_files: Optional[Dict[InstrumentProbeType, str]] = None,
         auto_zero_sensor: bool = True,
         num_baseline_reads: int = 10,
         probe: InstrumentProbeType = InstrumentProbeType.PRIMARY,
@@ -1372,6 +1382,14 @@ class OT3Controller(FlexBackend):
         can_bus_only_output = bool(
             output_option.value & OutputOptions.can_bus_only.value
         )
+        data_files_transposed = (
+            None
+            if data_files is None
+            else {
+                sensor_id_for_instrument(probe): data_files[probe]
+                for probe in data_files.keys()
+            }
+        )
         positions = await liquid_probe(
             messenger=self._messenger,
             tool=tool,
@@ -1383,7 +1401,7 @@ class OT3Controller(FlexBackend):
             csv_output=csv_output,
             sync_buffer_output=sync_buffer_output,
             can_bus_only_output=can_bus_only_output,
-            data_file=data_file,
+            data_files=data_files_transposed,
             auto_zero_sensor=auto_zero_sensor,
             num_baseline_reads=num_baseline_reads,
             sensor_id=sensor_id_for_instrument(probe),
@@ -1391,6 +1409,18 @@ class OT3Controller(FlexBackend):
         for node, point in positions.items():
             self._position.update({node: point.motor_position})
             self._encoder_position.update({node: point.encoder_position})
+        if (
+            head_node not in positions
+            or positions[head_node].move_ack
+            == MoveCompleteAck.complete_without_condition
+        ):
+            raise LiquidNotFoundError(
+                "Liquid not found during probe.",
+                {
+                    str(node_to_axis(node)): str(point.motor_position)
+                    for node, point in positions.items()
+                },
+            )
         return self._position[axis_to_node(Axis.by_mount(mount))]
 
     async def capacitive_probe(
@@ -1513,8 +1543,14 @@ class OT3Controller(FlexBackend):
     async def teardown_tip_detector(self, mount: OT3Mount) -> None:
         await self._tip_presence_manager.clear_detector(mount)
 
-    async def get_tip_status(self, mount: OT3Mount) -> TipStateType:
-        return await self.tip_presence_manager.get_tip_status(mount)
+    async def get_tip_status(
+        self,
+        mount: OT3Mount,
+        follow_singular_sensor: Optional[InstrumentProbeType] = None,
+    ) -> TipStateType:
+        return await self.tip_presence_manager.get_tip_status(
+            mount, follow_singular_sensor
+        )
 
     def current_tip_state(self, mount: OT3Mount) -> Optional[bool]:
         return self.tip_presence_manager.current_tip_state(mount)

@@ -9,7 +9,7 @@ import {
 } from '@opentrons/components'
 
 import magTempCombined from '../../../images/modules/magdeck_tempdeck_combined.png'
-import thermocycler from '../../../images/modules/thermocycler.jpg'
+import thermocycler from '../../../images/modules/thermocycler.png'
 import multiSelect from '../../../images/announcements/multi_select.gif'
 import batchEdit from '../../../images/announcements/batch_edit.gif'
 import heaterShaker from '../../../images/modules/heatershaker.png'
@@ -258,6 +258,40 @@ export const useAnnouncements = (): Announcement[] => {
             <Trans
               t={t}
               i18nKey={'announcements.deckConfigAnd96Channel.body2'}
+              components={{ strong: <strong /> }}
+              values={{ app: APP }}
+            />
+          </p>
+        </>
+      ),
+    },
+    {
+      announcementKey: 'customParamsAndMultiTipAndModule8.1',
+      image: <Flex />,
+      heading: t('announcements.header', { pd: PD }),
+      message: (
+        <>
+          <p>
+            {t('announcements.customParamsAndMultiTipAndModule.body1', {
+              pd: PD,
+            })}
+          </p>
+          <ul>
+            <li>{t('announcements.customParamsAndMultiTipAndModule.body2')}</li>
+            <li>
+              <Trans
+                t={t}
+                i18nKey={'announcements.customParamsAndMultiTipAndModule.body3'}
+                components={{ i: <em /> }}
+              />
+            </li>
+            <li>{t('announcements.customParamsAndMultiTipAndModule.body4')}</li>
+            <li>{t('announcements.customParamsAndMultiTipAndModule.body5')}</li>
+          </ul>
+          <p>
+            <Trans
+              t={t}
+              i18nKey={'announcements.customParamsAndMultiTipAndModule.body6'}
               components={{ strong: <strong /> }}
               values={{ app: APP }}
             />

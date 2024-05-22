@@ -3,6 +3,7 @@ import { vi, it, describe, expect, beforeEach } from 'vitest'
 
 import { StaticRouter } from 'react-router-dom'
 import { fireEvent, screen } from '@testing-library/react'
+import { OT2_ROBOT_TYPE } from '@opentrons/shared-data'
 
 import { renderWithProviders } from '../../../__testing-utils__'
 import { i18n } from '../../../i18n'
@@ -22,7 +23,7 @@ import { useFeatureFlag } from '../../../redux/config'
 import { getNetworkInterfaces } from '../../../redux/networking'
 import { ChooseRobotSlideout } from '..'
 import { useNotifyService } from '../../../resources/useNotifyService'
-import { OT2_ROBOT_TYPE, RunTimeParameter } from '@opentrons/shared-data'
+import type { RunTimeParameter } from '@opentrons/shared-data'
 
 vi.mock('../../../redux/discovery')
 vi.mock('../../../redux/robot-update')
@@ -294,5 +295,37 @@ describe('ChooseRobotSlideout', () => {
       name: 'otherRobot',
       ip: 'otherIp',
     })
+  })
+
+  it('sets selected robot to null if no available robots', () => {
+    vi.mocked(getConnectableRobots).mockReturnValue([])
+    render({
+      onCloseClick: vi.fn(),
+      isExpanded: true,
+      isSelectedRobotOnDifferentSoftwareVersion: false,
+      selectedRobot: null,
+      setSelectedRobot: mockSetSelectedRobot,
+      title: 'choose robot slideout title',
+      robotType: OT2_ROBOT_TYPE,
+    })
+    expect(mockSetSelectedRobot).toBeCalledWith(null)
+  })
+
+  it('shows tooltip when disabled Restore default values link is clicked', () => {
+    render({
+      onCloseClick: vi.fn(),
+      isExpanded: true,
+      isSelectedRobotOnDifferentSoftwareVersion: false,
+      selectedRobot: null,
+      setSelectedRobot: mockSetSelectedRobot,
+      title: 'choose robot slideout title',
+      robotType: OT2_ROBOT_TYPE,
+      multiSlideout: { currentPage: 2 },
+      runTimeParametersOverrides: mockRunTimeParameters,
+    })
+
+    const restoreValuesLink = screen.getByText('Restore default values')
+    fireEvent.click(restoreValuesLink)
+    screen.getByText('No custom values specified')
   })
 })

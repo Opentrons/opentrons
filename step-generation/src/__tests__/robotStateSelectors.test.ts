@@ -2,7 +2,6 @@ import { beforeEach, describe, it, expect } from 'vitest'
 import {
   getLabwareDefURI,
   MAGNETIC_MODULE_TYPE,
-  LabwareDefinition2,
   fixtureTiprack300ul as _fixtureTiprack300ul,
 } from '@opentrons/shared-data'
 import {
@@ -18,11 +17,15 @@ import {
   _getNextTip,
   getModuleState,
 } from '../'
-import { InvariantContext } from '../types'
+
+import type { LabwareDefinition2 } from '@opentrons/shared-data'
+import type { InvariantContext } from '../types'
 let invariantContext: InvariantContext
 
 const fixtureTiprack300ul = _fixtureTiprack300ul as LabwareDefinition2
-const mockTiprackId = 'tiprack1Id'
+const mockTiprackURI = getLabwareDefURI(
+  fixtureTiprack300ul as LabwareDefinition2
+)
 
 beforeEach(() => {
   invariantContext = makeContext()
@@ -153,7 +156,7 @@ describe('getNextTiprack - single-channel', () => {
 
     const result = getNextTiprack(
       DEFAULT_PIPETTE,
-      mockTiprackId,
+      mockTiprackURI,
       invariantContext,
       robotState
     )
@@ -172,7 +175,7 @@ describe('getNextTiprack - single-channel', () => {
 
     const result = getNextTiprack(
       DEFAULT_PIPETTE,
-      mockTiprackId,
+      mockTiprackURI,
       invariantContext,
       robotState
     )
@@ -191,7 +194,7 @@ describe('getNextTiprack - single-channel', () => {
     })
     const result = getNextTiprack(
       DEFAULT_PIPETTE,
-      mockTiprackId,
+      mockTiprackURI,
       invariantContext,
       robotState
     )
@@ -215,7 +218,7 @@ describe('getNextTiprack - single-channel', () => {
     robotState.tipState.tipracks.tiprack2Id.A1 = false
     const result = getNextTiprack(
       DEFAULT_PIPETTE,
-      mockTiprackId,
+      mockTiprackURI,
       invariantContext,
       robotState
     )
@@ -236,7 +239,7 @@ describe('getNextTiprack - single-channel', () => {
     })
     const result = getNextTiprack(
       DEFAULT_PIPETTE,
-      mockTiprackId,
+      mockTiprackURI,
       invariantContext,
       robotState
     )
@@ -258,7 +261,7 @@ describe('getNextTiprack - 8-channel', () => {
 
     const result = getNextTiprack(
       'p300MultiId',
-      mockTiprackId,
+      mockTiprackURI,
       invariantContext,
       robotState
     )
@@ -284,7 +287,7 @@ describe('getNextTiprack - 8-channel', () => {
     }
     const result = getNextTiprack(
       'p300MultiId',
-      mockTiprackId,
+      mockTiprackURI,
       invariantContext,
       robotState
     )
@@ -304,7 +307,7 @@ describe('getNextTiprack - 8-channel', () => {
     })
     const result = getNextTiprack(
       'p300MultiId',
-      mockTiprackId,
+      mockTiprackURI,
       invariantContext,
       robotState
     )
@@ -339,7 +342,7 @@ describe('getNextTiprack - 8-channel', () => {
 
     const result = getNextTiprack(
       'p300MultiId',
-      mockTiprackId,
+      mockTiprackURI,
       invariantContext,
       robotState
     )
@@ -360,7 +363,7 @@ describe('getNextTiprack - 8-channel', () => {
     })
     const result = getNextTiprack(
       'p300MultiId',
-      mockTiprackId,
+      mockTiprackURI,
       invariantContext,
       robotState
     )
@@ -420,7 +423,7 @@ describe('getNextTiprack - 8-channel', () => {
 
     const result = getNextTiprack(
       'p300MultiId',
-      mockTiprackId,
+      mockTiprackURI,
       invariantContext,
       robotState
     )
@@ -446,7 +449,7 @@ describe('getNextTiprack - 8-channel', () => {
     })
     const result = getNextTiprack(
       'p300MultiId',
-      mockTiprackId,
+      mockTiprackURI,
       invariantContext,
       robotState
     )

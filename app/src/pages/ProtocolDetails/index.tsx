@@ -291,7 +291,7 @@ const ProtocolSectionContent = ({
   }
   return (
     <Flex
-      marginTop={SPACING.spacing32}
+      paddingTop={SPACING.spacing32}
       justifyContent={currentOption === 'Deck' ? JUSTIFY_CENTER : undefined}
     >
       {protocolSection}
@@ -346,13 +346,12 @@ export function ProtocolDetails(): JSX.Element | null {
   let pinnedProtocolIds = useSelector(getPinnedProtocolIds) ?? []
   const pinned = pinnedProtocolIds.includes(protocolId)
 
-  const { data: protocolData } = useProtocolQuery(protocolId)
   const {
     data: mostRecentAnalysis,
   } = useProtocolAnalysisAsDocumentQuery(
     protocolId,
-    last(protocolData?.data.analysisSummaries)?.id ?? null,
-    { enabled: protocolData != null }
+    last(protocolRecord?.data.analysisSummaries)?.id ?? null,
+    { enabled: protocolRecord != null }
   )
 
   const shouldApplyOffsets = useSelector(getApplyHistoricOffsets)

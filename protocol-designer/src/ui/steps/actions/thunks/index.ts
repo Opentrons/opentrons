@@ -18,9 +18,9 @@ import {
 } from '../../../../tutorial'
 import * as uiModuleSelectors from '../../../../ui/modules/selectors'
 import * as fileDataSelectors from '../../../../file-data/selectors'
-import { StepType, StepIdType, FormData } from '../../../../form-types'
-import { ThunkAction } from '../../../../types'
-import {
+import type { StepType, StepIdType, FormData } from '../../../../form-types'
+import type { ThunkAction } from '../../../../types'
+import type {
   DuplicateStepAction,
   DuplicateMultipleStepsAction,
   SelectMultipleStepsAction,
@@ -49,9 +49,10 @@ export const addAndSelectStepWithHints: (arg: {
   const temperatureModuleOnDeck = uiModuleSelectors.getTemperatureModuleIds(
     state
   )
-  const thermocyclerModuleOnDeck = uiModuleSelectors.getSingleThermocyclerModuleId(
+  const heaterShakerModuleHasLabware = uiModuleSelectors.getHeaterShakerModuleHasLabware(
     state
   )
+
   const tempHasNoLabware = temperatureModulesHaveLabware.some(
     module => !module.hasLabware
   )
@@ -59,19 +60,25 @@ export const addAndSelectStepWithHints: (arg: {
   const stepNeedsLiquid = ['mix', 'moveLiquid'].includes(payload.stepType)
   const stepMagnetNeedsLabware = ['magnet'].includes(payload.stepType)
   const stepTemperatureNeedsLabware = ['temperature'].includes(payload.stepType)
+  const stepThermocyclerNeedsLabware = ['thermocycler'].includes(
+    payload.stepType
+  )
+  const stepHeaterShakerNeedsLabware = ['heaterShaker'].includes(
+    payload.stepType
+  )
+
   const stepModuleMissingLabware =
     (stepMagnetNeedsLabware && !magnetModuleHasLabware) ||
-    (stepTemperatureNeedsLabware &&
-      thermocyclerModuleOnDeck &&
-      !thermocyclerModuleHasLabware) ||
-    (temperatureModuleOnDeck?.length === 1 && tempHasNoLabware)
+    (stepThermocyclerNeedsLabware && !thermocyclerModuleHasLabware) ||
+    (temperatureModuleOnDeck?.length === 0 && stepTemperatureNeedsLabware) ||
+    (stepHeaterShakerNeedsLabware && !heaterShakerModuleHasLabware)
 
   if (stepNeedsLiquid && !deckHasLiquid) {
     dispatch(tutorialActions.addHint('add_liquids_and_labware'))
   }
   if (stepModuleMissingLabware) {
     dispatch(tutorialActions.addHint('module_without_labware'))
-  } else if (temperatureModuleOnDeck && tempHasNoLabware) {
+  } else if (temperatureModuleOnDeck != null && tempHasNoLabware) {
     dispatch(tutorialActions.addHint('multiple_modules_without_labware'))
   }
 }

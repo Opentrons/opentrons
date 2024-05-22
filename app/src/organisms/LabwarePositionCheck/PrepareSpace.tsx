@@ -16,20 +16,19 @@ import {
   BaseDeck,
   ALIGN_FLEX_START,
 } from '@opentrons/components'
-import {
-  CompletedProtocolAnalysis,
-  LabwareDefinition2,
-  THERMOCYCLER_MODULE_TYPE,
-  getModuleType,
-  RobotType,
-} from '@opentrons/shared-data'
+import { THERMOCYCLER_MODULE_TYPE, getModuleType } from '@opentrons/shared-data'
 
 import { getIsOnDevice } from '../../redux/config'
 import { SmallButton } from '../../atoms/buttons'
 import { NeedHelpLink } from '../CalibrationPanels'
+import { useNotifyDeckConfigurationQuery } from '../../resources/deck_configuration'
 
+import type {
+  CompletedProtocolAnalysis,
+  LabwareDefinition2,
+  RobotType,
+} from '@opentrons/shared-data'
 import type { CheckLabwareStep } from './types'
-import { useDeckConfigurationQuery } from '@opentrons/react-api-client'
 
 const LPC_HELP_LINK_URL =
   'https://support.opentrons.com/s/article/How-Labware-Offsets-work-on-the-OT-2'
@@ -71,7 +70,7 @@ export const PrepareSpace = (props: PrepareSpaceProps): JSX.Element | null => {
   const { location, labwareDef, protocolData, header, body, robotType } = props
 
   const isOnDevice = useSelector(getIsOnDevice)
-  const deckConfig = useDeckConfigurationQuery().data ?? []
+  const deckConfig = useNotifyDeckConfigurationQuery().data ?? []
 
   if (protocolData == null || robotType == null) return null
 

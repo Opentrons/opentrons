@@ -3,10 +3,8 @@ import { when } from 'vitest-when'
 import { screen } from '@testing-library/react'
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import '@testing-library/jest-dom/vitest'
-import {
-  useAllCommandsQuery,
-  useCommandQuery,
-} from '@opentrons/react-api-client'
+
+import { useCommandQuery } from '@opentrons/react-api-client'
 import {
   RUN_STATUS_IDLE,
   RUN_STATUS_RUNNING,
@@ -19,8 +17,8 @@ import { ProgressBar } from '../../../atoms/ProgressBar'
 import { useRunStatus } from '../../RunTimeControl/hooks'
 import { useMostRecentCompletedAnalysis } from '../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import {
-  useNotifyLastRunCommandKey,
   useNotifyRunQuery,
+  useNotifyAllCommandsQuery,
 } from '../../../resources/runs'
 import { useDownloadRunLog } from '../../Devices/hooks'
 import {
@@ -35,13 +33,15 @@ import {
 } from '../../InterventionModal/__fixtures__'
 import { RunProgressMeter } from '..'
 import { renderWithProviders } from '../../../__testing-utils__'
+import { useLastRunCommand } from '../../Devices/hooks/useLastRunCommand'
+
+import type { RunCommandSummary } from '@opentrons/api-client'
 import type * as ApiClient from '@opentrons/react-api-client'
 
 vi.mock('@opentrons/react-api-client', async importOriginal => {
   const actual = await importOriginal<typeof ApiClient>()
   return {
     ...actual,
-    useAllCommandsQuery: vi.fn(),
     useCommandQuery: vi.fn(),
   }
 })
@@ -51,6 +51,7 @@ vi.mock('../../../resources/runs')
 vi.mock('../../Devices/hooks')
 vi.mock('../../../atoms/ProgressBar')
 vi.mock('../../InterventionModal')
+vi.mock('../../Devices/hooks/useLastRunCommand')
 
 const render = (props: React.ComponentProps<typeof RunProgressMeter>) => {
   return renderWithProviders(<RunProgressMeter {...props} />, {
@@ -72,7 +73,7 @@ describe('RunProgressMeter', () => {
     when(useMostRecentCompletedAnalysis)
       .calledWith(NON_DETERMINISTIC_RUN_ID)
       .thenReturn(null)
-    when(useAllCommandsQuery)
+    when(useNotifyAllCommandsQuery)
       .calledWith(NON_DETERMINISTIC_RUN_ID, { cursor: null, pageLength: 1 })
       .thenReturn(mockUseAllCommandsResponseNonDeterministic)
     when(useCommandQuery)
@@ -82,9 +83,9 @@ describe('RunProgressMeter', () => {
       downloadRunLog: vi.fn(),
       isRunLogLoading: false,
     })
-    when(useNotifyLastRunCommandKey)
+    when(useLastRunCommand)
       .calledWith(NON_DETERMINISTIC_RUN_ID, { refetchInterval: 1000 })
-      .thenReturn(NON_DETERMINISTIC_COMMAND_KEY)
+      .thenReturn({ key: NON_DETERMINISTIC_COMMAND_KEY } as RunCommandSummary)
 
     vi.mocked(useNotifyRunQuery).mockReturnValue({ data: null } as any)
 
@@ -111,7 +112,7 @@ describe('RunProgressMeter', () => {
     screen.getByText('Download run log')
   })
   it('should render an intervention modal when lastRunCommand is a pause command', () => {
-    vi.mocked(useAllCommandsQuery).mockReturnValue({
+    vi.mocked(useNotifyAllCommandsQuery).mockReturnValue({
       data: { data: [mockPauseCommandWithStartTime], meta: { totalLength: 1 } },
     } as any)
     vi.mocked(useNotifyRunQuery).mockReturnValue({
@@ -123,7 +124,7 @@ describe('RunProgressMeter', () => {
   })
 
   it('should render an intervention modal when lastRunCommand is a move labware command', () => {
-    vi.mocked(useAllCommandsQuery).mockReturnValue({
+    vi.mocked(useNotifyAllCommandsQuery).mockReturnValue({
       data: {
         data: [mockMoveLabwareCommandFromSlot],
         meta: { totalLength: 1 },

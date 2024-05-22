@@ -10,6 +10,7 @@ from opentrons.hardware_control import HardwareControlAPI
 from opentrons import protocol_reader
 from opentrons.legacy_broker import LegacyBroker
 from opentrons.protocol_api import ParameterContext
+from opentrons.protocol_api.core.legacy.load_info import LoadInfo
 from opentrons.protocol_reader import (
     ProtocolSource,
     JsonProtocolConfig,
@@ -28,13 +29,12 @@ from .task_queue import TaskQueue
 from .json_file_reader import JsonFileReader
 from .json_translator import JsonTranslator
 from .legacy_context_plugin import LegacyContextPlugin
-from .legacy_wrappers import (
+from .python_protocol_wrappers import (
     LEGACY_PYTHON_API_VERSION_CUTOFF,
     LEGACY_JSON_SCHEMA_VERSION_CUTOFF,
-    LegacyFileReader,
-    LegacyContextCreator,
-    LegacyExecutor,
-    LegacyLoadInfo,
+    PythonAndLegacyFileReader,
+    ProtocolContextCreator,
+    PythonProtocolExecutor,
 )
 from ..protocol_engine.errors import ProtocolCommandFailedError
 from ..protocol_engine.types import (
@@ -43,6 +43,7 @@ from ..protocol_engine.types import (
     RunTimeParameter,
     RunTimeParamValuesType,
 )
+from ..protocols.types import PythonProtocol
 
 
 class RunResult(NamedTuple):
@@ -101,12 +102,12 @@ class AbstractRunner(ABC):
 
     def pause(self) -> None:
         """Pause the run."""
-        self._protocol_engine.pause()
+        self._protocol_engine.request_pause()
 
     async def stop(self) -> None:
         """Stop (cancel) the run."""
         if self.was_started():
-            await self._protocol_engine.stop()
+            await self._protocol_engine.request_stop()
         else:
             await self._protocol_engine.finish(
                 drop_tips_after_run=False,
@@ -136,21 +137,26 @@ class PythonAndLegacyRunner(AbstractRunner):
         protocol_engine: ProtocolEngine,
         hardware_api: HardwareControlAPI,
         task_queue: Optional[TaskQueue] = None,
-        legacy_file_reader: Optional[LegacyFileReader] = None,
-        legacy_context_creator: Optional[LegacyContextCreator] = None,
-        legacy_executor: Optional[LegacyExecutor] = None,
+        python_and_legacy_file_reader: Optional[PythonAndLegacyFileReader] = None,
+        protocol_context_creator: Optional[ProtocolContextCreator] = None,
+        python_protocol_executor: Optional[PythonProtocolExecutor] = None,
         post_run_hardware_state: PostRunHardwareState = PostRunHardwareState.HOME_AND_STAY_ENGAGED,
         drop_tips_after_run: bool = True,
     ) -> None:
         """Initialize the PythonAndLegacyRunner with its dependencies."""
         super().__init__(protocol_engine)
         self._hardware_api = hardware_api
-        self._legacy_file_reader = legacy_file_reader or LegacyFileReader()
-        self._legacy_context_creator = legacy_context_creator or LegacyContextCreator(
-            hardware_api=hardware_api,
-            protocol_engine=protocol_engine,
+        self._protocol_file_reader = (
+            python_and_legacy_file_reader or PythonAndLegacyFileReader()
         )
-        self._legacy_executor = legacy_executor or LegacyExecutor()
+        self._protocol_context_creator = (
+            protocol_context_creator
+            or ProtocolContextCreator(
+                hardware_api=hardware_api,
+                protocol_engine=protocol_engine,
+            )
+        )
+        self._protocol_executor = python_protocol_executor or PythonProtocolExecutor()
         # TODO(mc, 2022-01-11): replace task queue with specific implementations
         # of runner interface
         self._task_queue = task_queue or TaskQueue()
@@ -185,14 +191,24 @@ class PythonAndLegacyRunner(AbstractRunner):
 
         # fixme(mm, 2022-12-23): This does I/O and compute-bound parsing that will block
         # the event loop. Jira RSS-165.
-        protocol = self._legacy_file_reader.read(
+        protocol = self._protocol_file_reader.read(
             protocol_source, labware_definitions, python_parse_mode
         )
-        self._parameter_context = ParameterContext(api_version=protocol.api_level)
+        if isinstance(protocol, PythonProtocol):
+            self._parameter_context = ParameterContext(api_version=protocol.api_level)
+            run_time_parameters_with_overrides = (
+                self._protocol_executor.extract_run_parameters(
+                    protocol=protocol,
+                    parameter_context=self._parameter_context,
+                    run_time_param_overrides=run_time_param_values,
+                )
+            )
+        else:
+            run_time_parameters_with_overrides = None
         equipment_broker = None
 
         if protocol.api_level < LEGACY_PYTHON_API_VERSION_CUTOFF:
-            equipment_broker = Broker[LegacyLoadInfo]()
+            equipment_broker = Broker[LoadInfo]()
             self._protocol_engine.add_plugin(
                 LegacyContextPlugin(
                     broker=self._broker, equipment_broker=equipment_broker
@@ -202,7 +218,7 @@ class PythonAndLegacyRunner(AbstractRunner):
         else:
             self._hardware_api.should_taskify_movement_execution(taskify=False)
 
-        context = self._legacy_context_creator.create(
+        context = self._protocol_context_creator.create(
             protocol=protocol,
             broker=self._broker,
             equipment_broker=equipment_broker,
@@ -216,11 +232,10 @@ class PythonAndLegacyRunner(AbstractRunner):
             await self._protocol_engine.add_and_execute_command(
                 request=initial_home_command
             )
-            await self._legacy_executor.execute(
+            await self._protocol_executor.execute(
                 protocol=protocol,
                 context=context,
-                parameter_context=self._parameter_context,
-                run_time_param_values=run_time_param_values,
+                run_time_parameters_with_overrides=run_time_parameters_with_overrides,
             )
 
         self._task_queue.set_run_func(run_func)
@@ -411,50 +426,43 @@ AnyRunner = Union[PythonAndLegacyRunner, JsonRunner, LiveRunner]
 
 
 def create_protocol_runner(
-    protocol_config: Optional[Union[JsonProtocolConfig, PythonProtocolConfig]],
     protocol_engine: ProtocolEngine,
     hardware_api: HardwareControlAPI,
+    protocol_config: Union[JsonProtocolConfig, PythonProtocolConfig],
     task_queue: Optional[TaskQueue] = None,
     json_file_reader: Optional[JsonFileReader] = None,
     json_translator: Optional[JsonTranslator] = None,
-    legacy_file_reader: Optional[LegacyFileReader] = None,
-    legacy_context_creator: Optional[LegacyContextCreator] = None,
-    legacy_executor: Optional[LegacyExecutor] = None,
+    python_and_legacy_file_reader: Optional[PythonAndLegacyFileReader] = None,
+    protocol_context_creator: Optional[ProtocolContextCreator] = None,
+    python_protocol_executor: Optional[PythonProtocolExecutor] = None,
     post_run_hardware_state: PostRunHardwareState = PostRunHardwareState.HOME_AND_STAY_ENGAGED,
     drop_tips_after_run: bool = True,
-) -> AnyRunner:
+) -> Union[JsonRunner, PythonAndLegacyRunner]:
     """Create a protocol runner."""
-    if protocol_config:
-        if (
-            isinstance(protocol_config, JsonProtocolConfig)
-            and protocol_config.schema_version >= LEGACY_JSON_SCHEMA_VERSION_CUTOFF
-        ):
-            return JsonRunner(
-                protocol_engine=protocol_engine,
-                hardware_api=hardware_api,
-                json_file_reader=json_file_reader,
-                json_translator=json_translator,
-                task_queue=task_queue,
-                post_run_hardware_state=post_run_hardware_state,
-                drop_tips_after_run=drop_tips_after_run,
-            )
-        else:
-            return PythonAndLegacyRunner(
-                protocol_engine=protocol_engine,
-                hardware_api=hardware_api,
-                task_queue=task_queue,
-                legacy_file_reader=legacy_file_reader,
-                legacy_context_creator=legacy_context_creator,
-                legacy_executor=legacy_executor,
-                post_run_hardware_state=post_run_hardware_state,
-                drop_tips_after_run=drop_tips_after_run,
-            )
-
-    return LiveRunner(
-        protocol_engine=protocol_engine,
-        hardware_api=hardware_api,
-        task_queue=task_queue,
-    )
+    if (
+        isinstance(protocol_config, JsonProtocolConfig)
+        and protocol_config.schema_version >= LEGACY_JSON_SCHEMA_VERSION_CUTOFF
+    ):
+        return JsonRunner(
+            protocol_engine=protocol_engine,
+            hardware_api=hardware_api,
+            json_file_reader=json_file_reader,
+            json_translator=json_translator,
+            task_queue=task_queue,
+            post_run_hardware_state=post_run_hardware_state,
+            drop_tips_after_run=drop_tips_after_run,
+        )
+    else:
+        return PythonAndLegacyRunner(
+            protocol_engine=protocol_engine,
+            hardware_api=hardware_api,
+            task_queue=task_queue,
+            python_and_legacy_file_reader=python_and_legacy_file_reader,
+            protocol_context_creator=protocol_context_creator,
+            python_protocol_executor=python_protocol_executor,
+            post_run_hardware_state=post_run_hardware_state,
+            drop_tips_after_run=drop_tips_after_run,
+        )
 
 
 async def _yield() -> None:

@@ -45,7 +45,7 @@ from robot_server.deck_configuration.fastapi_dependencies import (
     get_deck_configuration_store,
 )
 from robot_server.deck_configuration.store import DeckConfigurationStore
-from robot_server.service.notifications import get_notify_publishers
+from robot_server.service.notifications import get_pe_notify_publishers
 
 log = logging.getLogger(__name__)
 base_router = APIRouter()
@@ -144,7 +144,7 @@ async def create_run(
     deck_configuration_store: DeckConfigurationStore = Depends(
         get_deck_configuration_store
     ),
-    notify_publishers: Callable[[], None] = Depends(get_notify_publishers),
+    notify_publishers: Callable[[], None] = Depends(get_pe_notify_publishers),
 ) -> PydanticResponse[SimpleBody[Union[Run, BadRun]]]:
     """Create a new run.
 

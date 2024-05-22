@@ -3,7 +3,7 @@
 
 from collections import defaultdict
 from dataclasses import dataclass
-from typing import DefaultDict, FrozenSet, List, Set, Tuple, Union
+from typing import DefaultDict, FrozenSet, List, Set, Tuple, Union, Optional
 
 from opentrons_shared_data.deck import dev_types as deck_types
 
@@ -14,6 +14,7 @@ class Placement:
 
     cutout_id: str
     cutout_fixture_id: str
+    opentrons_module_serial_number: Optional[str]
 
 
 @dataclass(frozen=True)
@@ -43,10 +44,36 @@ class InvalidLocationError:
 
 @dataclass(frozen=True)
 class UnrecognizedCutoutFixtureError:
-    """When an cutout fixture has been mounted that's not defined by the deck definition."""
+    """When a cutout fixture has been mounted that's not defined by the deck definition."""
 
     cutout_fixture_id: str
     allowed_cutout_fixture_ids: FrozenSet[str]
+
+
+@dataclass(frozen=True)
+class InvalidSerialNumberError:
+    """When a module cutout fixture has been mounted but not given a serial number."""
+
+    cutout_id: str
+    cutout_fixture_id: str
+
+
+@dataclass(frozen=True)
+class UnexpectedSerialNumberError:
+    """When a cutout fixture that is not a module has been provided a serial number."""
+
+    cutout_id: str
+    cutout_fixture_id: str
+    opentrons_module_serial_number: str
+
+
+@dataclass(frozen=True)
+class MissingGroupFixtureError:
+    """When a member of a fixture group has been mounted but other required members of that group have not."""
+
+    cutout_id: str
+    cutout_fixture_id: str
+    missing_fixture_id: str
 
 
 ConfigurationError = Union[
@@ -54,11 +81,14 @@ ConfigurationError = Union[
     OvercrowdedCutoutError,
     InvalidLocationError,
     UnrecognizedCutoutFixtureError,
+    InvalidSerialNumberError,
+    UnexpectedSerialNumberError,
+    MissingGroupFixtureError,
 ]
 
 
-def get_configuration_errors(
-    deck_definition: deck_types.DeckDefinitionV4,
+def get_configuration_errors(  # noqa: C901
+    deck_definition: deck_types.DeckDefinitionV5,
     placements: List[Placement],
 ) -> Set[ConfigurationError]:
     """Return all the problems with the given deck configration.
@@ -98,12 +128,55 @@ def get_configuration_errors(
                         allowed_cutout_ids=allowed_cutout_ids,
                     )
                 )
+            if found_cutout_fixture[
+                "expectOpentronsModuleSerialNumber"
+            ] is False and isinstance(placement.opentrons_module_serial_number, str):
+                errors.add(
+                    UnexpectedSerialNumberError(
+                        cutout_id=placement.cutout_id,
+                        cutout_fixture_id=placement.cutout_fixture_id,
+                        opentrons_module_serial_number=placement.opentrons_module_serial_number,
+                    )
+                )
+            elif (
+                found_cutout_fixture["expectOpentronsModuleSerialNumber"] is True
+                and placement.opentrons_module_serial_number is None
+            ):
+                errors.add(
+                    InvalidSerialNumberError(
+                        cutout_id=placement.cutout_id,
+                        cutout_fixture_id=placement.cutout_fixture_id,
+                    )
+                )
 
+            for cutout_id in found_cutout_fixture["fixtureGroup"]:
+                if cutout_id == placement.cutout_id:
+                    map = found_cutout_fixture["fixtureGroup"][cutout_id]
+                    member_found = False
+                    for item in map:
+                        for group_member_cutout_id in item:
+                            group_member_fixture_id = item[group_member_cutout_id]
+                            for deck_item in placements:
+                                if (
+                                    group_member_fixture_id
+                                    == deck_item.cutout_fixture_id
+                                    and group_member_cutout_id == deck_item.cutout_id
+                                ):
+                                    member_found = True
+                            if member_found is False:
+                                errors.add(
+                                    MissingGroupFixtureError(
+                                        cutout_id=placement.cutout_id,
+                                        cutout_fixture_id=placement.cutout_fixture_id,
+                                        missing_fixture_id=group_member_fixture_id,
+                                    )
+                                )
+                            member_found = False
     return errors
 
 
 def _find_cutout_fixture(
-    deck_definition: deck_types.DeckDefinitionV4, cutout_fixture_id: str
+    deck_definition: deck_types.DeckDefinitionV5, cutout_fixture_id: str
 ) -> Union[deck_types.CutoutFixture, UnrecognizedCutoutFixtureError]:
     cutout_fixtures = deck_definition["cutoutFixtures"]
     try:

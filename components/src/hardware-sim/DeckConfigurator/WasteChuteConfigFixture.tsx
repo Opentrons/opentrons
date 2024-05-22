@@ -11,18 +11,28 @@ import {
   CONFIG_STYLE_READ_ONLY,
   FIXTURE_HEIGHT,
   STAGING_AREA_FIXTURE_WIDTH,
-  SINGLE_SLOT_FIXTURE_WIDTH,
+  COLUMN_3_SINGLE_SLOT_FIXTURE_WIDTH,
   WASTE_CHUTE_DISPLAY_NAME,
   Y_ADJUSTMENT,
+  CONFIG_STYLE_SELECTED,
 } from './constants'
 
-import type { CutoutId, DeckDefinition } from '@opentrons/shared-data'
+import type {
+  CutoutFixtureId,
+  CutoutId,
+  DeckDefinition,
+} from '@opentrons/shared-data'
 
 interface WasteChuteConfigFixtureProps {
   deckDefinition: DeckDefinition
   fixtureLocation: CutoutId
-  handleClickRemove?: (fixtureLocation: CutoutId) => void
+  cutoutFixtureId: CutoutFixtureId
+  handleClickRemove?: (
+    fixtureLocation: CutoutId,
+    cutoutFixtureId: CutoutFixtureId
+  ) => void
   hasStagingAreas?: boolean
+  selected?: boolean
 }
 
 export function WasteChuteConfigFixture(
@@ -32,7 +42,9 @@ export function WasteChuteConfigFixture(
     deckDefinition,
     handleClickRemove,
     fixtureLocation,
+    cutoutFixtureId,
     hasStagingAreas = false,
+    selected = false,
   } = props
 
   const wasteChuteCutout = deckDefinition.locations.cutouts.find(
@@ -49,10 +61,13 @@ export function WasteChuteConfigFixture(
   const x = xSlotPosition + COLUMN_3_X_ADJUSTMENT
   const y = ySlotPosition + Y_ADJUSTMENT
 
+  const editableStyle = selected ? CONFIG_STYLE_SELECTED : CONFIG_STYLE_EDITABLE
   return (
     <RobotCoordsForeignObject
       width={
-        hasStagingAreas ? STAGING_AREA_FIXTURE_WIDTH : SINGLE_SLOT_FIXTURE_WIDTH
+        hasStagingAreas
+          ? STAGING_AREA_FIXTURE_WIDTH
+          : COLUMN_3_SINGLE_SLOT_FIXTURE_WIDTH
       }
       height={FIXTURE_HEIGHT}
       x={x}
@@ -61,15 +76,11 @@ export function WasteChuteConfigFixture(
       foreignObjectProps={{ flex: '1' }}
     >
       <Btn
-        css={
-          handleClickRemove != null
-            ? CONFIG_STYLE_EDITABLE
-            : CONFIG_STYLE_READ_ONLY
-        }
+        css={handleClickRemove != null ? editableStyle : CONFIG_STYLE_READ_ONLY}
         cursor={handleClickRemove != null ? 'pointer' : 'default'}
         onClick={
           handleClickRemove != null
-            ? () => handleClickRemove(fixtureLocation)
+            ? () => handleClickRemove(fixtureLocation, cutoutFixtureId)
             : () => {}
         }
       >

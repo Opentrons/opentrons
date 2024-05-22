@@ -4,7 +4,7 @@ import { useDispatch, useSelector } from 'react-redux'
 import cx from 'classnames'
 import { Icon } from '@opentrons/components'
 import { getLabwareDisplayName } from '@opentrons/shared-data'
-import { DropTargetMonitor, useDrag, useDrop } from 'react-dnd'
+import { useDrag, useDrop } from 'react-dnd'
 import { NameThisLabware } from './NameThisLabware'
 import { DND_TYPES } from '../../../constants'
 import {
@@ -14,9 +14,10 @@ import {
   openIngredientSelector,
 } from '../../../labware-ingred/actions'
 import { selectors as labwareIngredSelectors } from '../../../labware-ingred/selectors'
-import { ThunkDispatch } from '../../../types'
-import { LabwareOnDeck } from '../../../step-forms'
 import styles from './LabwareOverlays.module.css'
+import type { DropTargetMonitor } from 'react-dnd'
+import type { ThunkDispatch } from '../../../types'
+import type { LabwareOnDeck } from '../../../step-forms'
 
 interface Props {
   labwareOnDeck: LabwareOnDeck

@@ -16,6 +16,7 @@ from .types import (
     PipetteInformation,
     ToolSummary,
     GripperInformation,
+    HepaUVInformation,
 )
 from opentrons_hardware.hardware_control.tools.types import ToolDetectionResult
 
@@ -44,7 +45,7 @@ async def _await_one_result(callback: WaitableCallback) -> ToolDetectionResult:
         if isinstance(response, message_definitions.PushToolsDetectedNotification):
             return _handle_detection_result(response)
         if isinstance(response, message_definitions.ErrorMessage):
-            log.error(f"Recieved error message {str(response)}")
+            log.error(f"Received error message {str(response)}")
     raise CanbusCommunicationError(message="Messenger closed before a tool was found")
 
 
@@ -58,7 +59,7 @@ def _decode_or_default(orig: bytes) -> str:
 async def _await_responses(
     callback: WaitableCallback,
     for_nodes: Set[NodeId],
-    response_queue: "asyncio.Queue[Tuple[NodeId, Union[PipetteInformation, GripperInformation]]]",
+    response_queue: "asyncio.Queue[Tuple[NodeId, Union[PipetteInformation, GripperInformation, HepaUVInformation]]]",
 ) -> None:
     """Wait for pipette or gripper information and send back through a queue."""
     seen: Set[NodeId] = set()
@@ -77,12 +78,34 @@ async def _await_responses(
                 )
                 seen.add(node)
                 break
+            elif isinstance(response, message_definitions.HepaUVInfoResponse):
+                node = await _handle_hepa_uv_info(
+                    response_queue, response, arbitration_id
+                )
             elif isinstance(response, message_definitions.ErrorMessage):
-                log.error(f"Recieved error message {str(response)}")
+                log.error(f"Received error message {str(response)}")
+
+
+async def _handle_hepa_uv_info(
+    response_queue: "asyncio.Queue[Tuple[NodeId, Union[PipetteInformation, GripperInformation, HepaUVInformation]]]",
+    response: message_definitions.HepaUVInfoResponse,
+    arbitration_id: ArbitrationId,
+) -> NodeId:
+    node = NodeId(arbitration_id.parts.originating_node_id)
+    await response_queue.put(
+        (
+            node,
+            HepaUVInformation(
+                model=model_versionstring_from_int(response.payload.model.value),
+                serial=_decode_or_default(response.payload.serial.value),
+            ),
+        )
+    )
+    return node
 
 
 async def _handle_gripper_info(
-    response_queue: "asyncio.Queue[Tuple[NodeId, Union[PipetteInformation, GripperInformation]]]",
+    response_queue: "asyncio.Queue[Tuple[NodeId, Union[PipetteInformation, GripperInformation, HepaUVInformation]]]",
     response: message_definitions.GripperInfoResponse,
     arbitration_id: ArbitrationId,
 ) -> NodeId:
@@ -100,7 +123,7 @@ async def _handle_gripper_info(
 
 
 async def _handle_pipette_info(
-    response_queue: "asyncio.Queue[Tuple[NodeId, Union[PipetteInformation, GripperInformation]]]",
+    response_queue: "asyncio.Queue[Tuple[NodeId, Union[PipetteInformation, GripperInformation, HepaUVInformation]]]",
     response: message_definitions.PipetteInfoResponse,
     arbitration_id: ArbitrationId,
 ) -> NodeId:
@@ -139,7 +162,9 @@ def _need_type_query(attached: ToolDetectionResult) -> Set[NodeId]:
 
 
 IntermediateResolution = Tuple[
-    Dict[NodeId, PipetteInformation], Dict[NodeId, GripperInformation]
+    Dict[NodeId, PipetteInformation],
+    Dict[NodeId, GripperInformation],
+    Dict[NodeId, HepaUVInformation],
 ]
 
 
@@ -153,7 +178,7 @@ async def _do_tool_resolve(
         node_id=NodeId.broadcast,
         message=message_definitions.InstrumentInfoRequest(),
     )
-    incoming_queue: "asyncio.Queue[Tuple[NodeId, Union[PipetteInformation, GripperInformation]]]" = (
+    incoming_queue: "asyncio.Queue[Tuple[NodeId, Union[PipetteInformation, GripperInformation, HepaUVInformation]]]" = (
         asyncio.Queue()
     )
     try:
@@ -166,14 +191,17 @@ async def _do_tool_resolve(
 
     pipettes: Dict[NodeId, PipetteInformation] = {}
     gripper: Dict[NodeId, GripperInformation] = {}
+    hepa_uv: Dict[NodeId, HepaUVInformation] = {}
     while not incoming_queue.empty():
         node, info = incoming_queue.get_nowait()
         if isinstance(info, PipetteInformation):
             pipettes[node] = info
-        else:
+        elif isinstance(info, GripperInformation):
             gripper[node] = info
+        elif isinstance(info, HepaUVInformation):
+            hepa_uv[node] = info
 
-    return pipettes, gripper
+    return pipettes, gripper, hepa_uv
 
 
 async def _resolve_with_stimulus_retries(
@@ -187,15 +215,23 @@ async def _resolve_with_stimulus_retries(
         should_respond
     )
     expected_gripper = {NodeId.gripper}.intersection(should_respond)
+    expected_hepa_uv = {NodeId.hepa_uv}.intersection(should_respond)
 
     while True:
-        pipettes, gripper = await _do_tool_resolve(
+        pipettes, gripper, hepa_uv = await _do_tool_resolve(
             messenger, wc, should_respond, attempt_timeout_sec
         )
-        output_queue.put_nowait((pipettes, gripper))
+        output_queue.put_nowait((pipettes, gripper, hepa_uv))
         seen_pipettes = set([k.application_for() for k in pipettes.keys()])
         seen_gripper = set([k.application_for() for k in gripper.keys()])
-        if seen_pipettes == expected_pipettes and seen_gripper == expected_gripper:
+        seen_hepa_uv = set([k.application_for() for k in hepa_uv.keys()])
+        if all(
+            [
+                seen_pipettes == expected_pipettes,
+                seen_gripper == expected_gripper,
+                seen_hepa_uv == expected_hepa_uv,
+            ]
+        ):
             return
 
 
@@ -222,7 +258,7 @@ async def _resolve_tool_types(
     except asyncio.TimeoutError:
         log.warning("No response from expected tool")
 
-    last_element: IntermediateResolution = ({}, {})
+    last_element: IntermediateResolution = ({}, {}, {})
     try:
         while True:
             last_element = resolve_queue.get_nowait()

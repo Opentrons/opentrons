@@ -1,9 +1,14 @@
 import {
+  FLEX_ROBOT_TYPE,
   NON_CONNECTING_MODULE_TYPES,
   checkModuleCompatibility,
+  getCutoutFixturesForModuleModel,
+  getCutoutIdsFromModuleSlotName,
+  getDeckDefFromRobotType,
   getModuleType,
 } from '@opentrons/shared-data'
 
+import type { DeckConfiguration } from '@opentrons/shared-data'
 import type { ProtocolModuleInfo } from '../../organisms/Devices/ProtocolRun/utils/getProtocolModulesInfo'
 import type { AttachedModule } from '../../redux/modules/types'
 
@@ -11,14 +16,26 @@ export type AttachedProtocolModuleMatch = ProtocolModuleInfo & {
   attachedModuleMatch: AttachedModule | null
 }
 
+// NOTE: this is a FLEX only function
 // some logic copied from useModuleRenderInfoForProtocolById
 export function getAttachedProtocolModuleMatches(
   attachedModules: AttachedModule[],
-  protocolModulesInfo: ProtocolModuleInfo[]
+  protocolModulesInfo: ProtocolModuleInfo[],
+  deckConfig: DeckConfiguration
 ): AttachedProtocolModuleMatch[] {
+  const deckDef = getDeckDefFromRobotType(FLEX_ROBOT_TYPE) // this is only used for Flex ODD
   const matchedAttachedModules: AttachedModule[] = []
   const attachedProtocolModuleMatches = protocolModulesInfo.map(
     protocolModule => {
+      const moduleFixtures = getCutoutFixturesForModuleModel(
+        protocolModule.moduleDef.model,
+        deckDef
+      )
+      const moduleCutoutIds = getCutoutIdsFromModuleSlotName(
+        protocolModule.slotName,
+        moduleFixtures,
+        deckDef
+      )
       const compatibleAttachedModule =
         attachedModules.find(
           attachedModule =>
@@ -27,10 +44,17 @@ export function getAttachedProtocolModuleMatches(
               protocolModule.moduleDef.model
             ) &&
             // check id instead of object reference in useModuleRenderInfoForProtocolById
-            matchedAttachedModules.find(
+            !matchedAttachedModules.some(
               matchedAttachedModule =>
-                matchedAttachedModule.id === attachedModule.id
-            ) == null
+                matchedAttachedModule.serialNumber ===
+                attachedModule.serialNumber
+            ) &&
+            // check deck config has module with expected serial number in expected location
+            deckConfig.some(
+              ({ cutoutId, opentronsModuleSerialNumber }) =>
+                attachedModule.serialNumber === opentronsModuleSerialNumber &&
+                moduleCutoutIds.includes(cutoutId)
+            )
         ) ?? null
       if (compatibleAttachedModule !== null) {
         matchedAttachedModules.push(compatibleAttachedModule)

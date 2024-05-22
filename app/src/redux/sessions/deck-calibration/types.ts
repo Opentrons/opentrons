@@ -1,6 +1,6 @@
 // deck calibration types
 
-import {
+import type {
   DECK_STEP_SESSION_STARTED,
   DECK_STEP_LABWARE_LOADED,
   DECK_STEP_PREPARING_PIPETTE,

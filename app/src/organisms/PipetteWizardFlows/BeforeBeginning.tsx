@@ -1,6 +1,5 @@
 import * as React from 'react'
 import { Trans, useTranslation } from 'react-i18next'
-import { UseMutateFunction } from 'react-query'
 import {
   COLORS,
   DIRECTION_COLUMN,
@@ -13,16 +12,14 @@ import {
   RIGHT,
   SINGLE_MOUNT_PIPETTES,
   WEIGHT_OF_96_CHANNEL,
-  LoadedPipette,
-  getPipetteNameSpecs,
   WASTE_CHUTE_CUTOUT,
 } from '@opentrons/shared-data'
-import { useDeckConfigurationQuery } from '@opentrons/react-api-client'
 import { Banner } from '../../atoms/Banner'
 import { SimpleWizardBody } from '../../molecules/SimpleWizardBody'
 import { GenericWizardTile } from '../../molecules/GenericWizardTile'
 import { InProgressModal } from '../../molecules/InProgressModal/InProgressModal'
 import { WizardRequiredEquipmentList } from '../../molecules/WizardRequiredEquipmentList'
+import { usePipetteNameSpecs } from '../../resources/instruments/hooks'
 import {
   CALIBRATION_PROBE,
   FLOWS,
@@ -33,8 +30,15 @@ import {
   BODY_STYLE,
 } from './constants'
 import { getIsGantryEmpty } from './utils'
+import { useNotifyDeckConfigurationQuery } from '../../resources/deck_configuration'
+
+import type { UseMutateFunction } from 'react-query'
 import type { AxiosError } from 'axios'
-import type { CreateCommand } from '@opentrons/shared-data'
+import type {
+  CreateCommand,
+  LoadedPipette,
+  PipetteName,
+} from '@opentrons/shared-data'
 import type {
   CreateMaintenanceRunData,
   MaintenanceRun,
@@ -84,10 +88,14 @@ export const BeforeBeginning = (
     isGantryEmpty &&
     selectedPipette === NINETY_SIX_CHANNEL &&
     flowType === FLOWS.ATTACH
-  const deckConfig = useDeckConfigurationQuery().data
+  const deckConfig = useNotifyDeckConfigurationQuery().data
   const isWasteChuteOnDeck =
     deckConfig?.find(fixture => fixture.cutoutId === WASTE_CHUTE_CUTOUT) ??
     false
+
+  const pipetteDisplayName = usePipetteNameSpecs(
+    requiredPipette?.pipetteName as PipetteName
+  )?.displayName
 
   if (
     pipetteId == null &&
@@ -108,9 +116,7 @@ export const BeforeBeginning = (
       bodyTranslationKey = 'remove_labware'
       let displayName: string | undefined
       if (requiredPipette != null) {
-        displayName =
-          getPipetteNameSpecs(requiredPipette.pipetteName)?.displayName ??
-          requiredPipette.pipetteName
+        displayName = pipetteDisplayName ?? requiredPipette.pipetteName
       }
       if (selectedPipette === SINGLE_MOUNT_PIPETTES) {
         equipmentList = [
@@ -133,9 +139,7 @@ export const BeforeBeginning = (
     }
     case FLOWS.DETACH: {
       if (requiredPipette != null) {
-        const displayName =
-          getPipetteNameSpecs(requiredPipette.pipetteName)?.displayName ??
-          requiredPipette.pipetteName
+        const displayName = pipetteDisplayName ?? requiredPipette.pipetteName
         bodyTranslationKey = 'remove_labware'
 
         if (requiredPipette.pipetteName === 'p1000_96') {

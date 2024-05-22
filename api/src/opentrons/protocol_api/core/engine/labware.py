@@ -10,8 +10,13 @@ from opentrons_shared_data.labware.models import LabwareRole
 
 from opentrons.protocol_engine.errors import LabwareNotOnDeckError, ModuleNotOnDeckError
 from opentrons.protocol_engine.clients import SyncClient as ProtocolEngineClient
+from opentrons.protocol_engine.types import (
+    LabwareOffsetCreate,
+    LabwareOffsetVector,
+)
 from opentrons.types import DeckSlotName, Point
 from opentrons.hardware_control.nozzle_manager import NozzleMap
+
 
 from ..labware import AbstractLabware, LabwareLoadParams
 from .well import WellCore
@@ -92,8 +97,28 @@ class LabwareCore(AbstractLabware[WellCore]):
         return self._definition.parameters.quirks or []
 
     def set_calibration(self, delta: Point) -> None:
-        raise NotImplementedError(
-            "Setting a labware's calibration after it's been loaded is not supported."
+        """Add a labware offset for this labware at its current location.
+
+        This will override any previous labware offsets for this definition URI and location,
+        even if the other labware offset was for a different specific labware instance.
+        """
+        offset_location = self._engine_client.state.geometry.get_offset_location(
+            self._labware_id
+        )
+        if not offset_location:
+            raise LabwareNotOnDeckError(
+                message=f"Cannot set offset for {self.get_name()} as it is not currently in a deck slot.",
+                details={"kind": "labware-not-in-slot"},
+            )
+
+        request = LabwareOffsetCreate.construct(
+            definitionUri=self.get_uri(),
+            location=offset_location,
+            vector=LabwareOffsetVector(x=delta.x, y=delta.y, z=delta.z),
+        )
+        self._engine_client.add_labware_offset(request)
+        self._engine_client.reload_labware(
+            labware_id=self._labware_id,
         )
 
     def get_calibrated_offset(self) -> Point:

@@ -32,7 +32,7 @@ const GITHUB_LINK =
 export function RobotServerVersion({
   robotName,
 }: RobotServerVersionProps): JSX.Element {
-  const { t } = useTranslation(['device_settings', 'shared'])
+  const { t } = useTranslation(['device_settings', 'shared', 'branded'])
   const robot = useRobot(robotName)
   const isFlex = useIsFlex(robotName)
   const { autoUpdateAction } = useSelector((state: State) => {
@@ -65,7 +65,7 @@ export function RobotServerVersion({
           </StyledText>
           {isFlex ? (
             <StyledText as="p" paddingBottom={SPACING.spacing4}>
-              {t('robot_server_version_ot3_description')}
+              {t('branded:robot_server_version_ot3_description')}
             </StyledText>
           ) : null}
           <StyledText as="p">

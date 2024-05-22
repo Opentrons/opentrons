@@ -53,10 +53,10 @@
       "title": "Missing labware",
       "body": "One or more module has no labware on it. We recommend you add labware before proceeding"
     },
-    "export_v8_protocol_7_1": {
+    "export_v8_1_protocol_7_3": {
       "title": "Robot and app update may be required",
       "body1": "This protocol can only run on app and robot server version",
-      "body2": "7.1 or higher",
+      "body2": "7.3.0 or higher",
       "body3": ". Please ensure your robot is updated to the correct version."
     },
     "change_magnet_module_model": {
@@ -96,6 +96,14 @@
   },
   "timeline": {
     "error": {
+      "LABWARE_DISCARDED_IN_WASTE_CHUTE": {
+        "title": "The labware has been previously discarded into the waste chute",
+        "body": "Please select a different labware to move."
+      },
+      "LABWARE_ON_ANOTHER_ENTITY": {
+        "title": "Attempting to move a labware on top of another entity",
+        "body": "Please reselect which slot your labware should move to."
+      },
       "INSUFFICIENT_TIPS": {
         "title": "Not enough tips to complete action",
         "body": "Add another tip rack to an empty slot in "
@@ -218,6 +226,11 @@
   "export": "Export",
   "import": "Import",
   "module_placement": {
+    "SLOTS_OCCUPIED": {
+      "title": "Cannot place module",
+      "single": "Slot {{slotName}} is occupied",
+      "multi": "Multiple slots are occupied"
+    },
     "SLOT_OCCUPIED": {
       "title": "Cannot place module",
       "body": "Slot {{selectedSlot}} is occupied. Navigate to the design tab and remove the labware or remove the additional item to continue."

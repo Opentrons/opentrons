@@ -1,7 +1,6 @@
 import fse from 'fs-extra'
 import path from 'path'
 import { shell } from 'electron'
-import first from 'lodash/first'
 
 import {
   ADD_PROTOCOL,
@@ -46,18 +45,6 @@ export const getParsedAnalysisFromPath = (
         : 'protocol analysis file cannot be parsed'
     return createFailedAnalysis(errorMessage)
   }
-}
-
-export const getProtocolSrcFilePaths = (
-  protocolKey: string
-): Promise<string[]> => {
-  const protocolDir = `${FileSystem.PROTOCOLS_DIRECTORY_PATH}/${protocolKey}`
-  return ensureDir(protocolDir)
-    .then(() => FileSystem.parseProtocolDirs([protocolDir]))
-    .then(storedProtocols => {
-      const storedProtocol = first(storedProtocols)
-      return storedProtocol?.srcFilePaths ?? []
-    })
 }
 
 // Revert a v7.0.0 pre-parity stop-gap solution.

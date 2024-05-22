@@ -8,7 +8,10 @@ import {
   useCreateLiveCommandMutation,
   useModulesQuery,
 } from '@opentrons/react-api-client'
-import { ot3StandardDeckV4 as ot3StandardDeckDef } from '@opentrons/shared-data'
+import {
+  HEATERSHAKER_MODULE_V1_FIXTURE,
+  ot3StandardDeckV5 as ot3StandardDeckDef,
+} from '@opentrons/shared-data'
 
 import { renderWithProviders } from '../../../__testing-utils__'
 import { i18n } from '../../../i18n'
@@ -24,6 +27,7 @@ import {
   mockUseModulesQueryOpening,
   mockUseModulesQueryUnknown,
 } from '../__fixtures__'
+import { useNotifyDeckConfigurationQuery } from '../../../resources/deck_configuration'
 
 import type * as ReactApiClient from '@opentrons/react-api-client'
 
@@ -40,6 +44,7 @@ vi.mock(
   '../../../organisms/LabwarePositionCheck/useMostRecentCompletedAnalysis'
 )
 vi.mock('../../Devices/ProtocolRun/utils/getProtocolModulesInfo')
+vi.mock('../../../resources/deck_configuration')
 
 const RUN_ID = "otie's run"
 const mockSetSetupScreen = vi.fn()
@@ -75,6 +80,16 @@ describe('ProtocolSetupLabware', () => {
     } as any)
     vi.mocked(useCreateLiveCommandMutation).mockReturnValue({
       createLiveCommand: mockCreateLiveCommand,
+    } as any)
+    vi.mocked(useNotifyDeckConfigurationQuery).mockReturnValue({
+      data: [
+        {
+          cutoutId: 'cutoutB1',
+          cutoutFixtureId: HEATERSHAKER_MODULE_V1_FIXTURE,
+          opentronsModuleSerialNumber:
+            mockUseModulesQueryClosed.data.data[0].serialNumber,
+        },
+      ],
     } as any)
   })
   afterEach(() => {

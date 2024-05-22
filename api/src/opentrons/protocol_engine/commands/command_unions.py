@@ -1,9 +1,11 @@
 """Union types of concrete command definitions."""
 
-from typing import Union, TypeVar
+from typing import Union
 from typing_extensions import Annotated
 
 from pydantic import Field, TypeAdapter
+
+from .command import DefinedErrorData
 
 from . import heater_shaker
 from . import magnetic_module
@@ -98,6 +100,14 @@ from .load_labware import (
     LoadLabwareCreate,
     LoadLabwareResult,
     LoadLabwareCommandType,
+)
+
+from .reload_labware import (
+    ReloadLabware,
+    ReloadLabwareParams,
+    ReloadLabwareCreate,
+    ReloadLabwareResult,
+    ReloadLabwareCommandType,
 )
 
 from .load_liquid import (
@@ -195,6 +205,8 @@ from .pick_up_tip import (
     PickUpTipCreate,
     PickUpTipResult,
     PickUpTipCommandType,
+    TipPhysicallyMissingError,
+    TipPhysicallyMissingErrorInternalData,
 )
 
 from .touch_tip import (
@@ -304,6 +316,7 @@ Command = Annotated[
         Home,
         RetractAxis,
         LoadLabware,
+        ReloadLabware,
         LoadLiquid,
         LoadModule,
         LoadPipette,
@@ -368,6 +381,7 @@ CommandParams = Union[
     HomeParams,
     RetractAxisParams,
     LoadLabwareParams,
+    ReloadLabwareParams,
     LoadLiquidParams,
     LoadModuleParams,
     LoadPipetteParams,
@@ -431,6 +445,7 @@ CommandType = Union[
     HomeCommandType,
     RetractAxisCommandType,
     LoadLabwareCommandType,
+    ReloadLabwareCommandType,
     LoadLiquidCommandType,
     LoadModuleCommandType,
     LoadPipetteCommandType,
@@ -494,6 +509,7 @@ CommandCreate = Annotated[
         HomeCreate,
         RetractAxisCreate,
         LoadLabwareCreate,
+        ReloadLabwareCreate,
         LoadLiquidCreate,
         LoadModuleCreate,
         LoadPipetteCreate,
@@ -563,6 +579,7 @@ CommandResult = Union[
     HomeResult,
     RetractAxisResult,
     LoadLabwareResult,
+    ReloadLabwareResult,
     LoadLiquidResult,
     LoadModuleResult,
     LoadPipetteResult,
@@ -616,4 +633,8 @@ CommandPrivateResult = Union[
     ConfigureNozzleLayoutPrivateResult,
 ]
 
-CommandT = TypeVar("CommandT", bound=Command)
+# All `DefinedErrorData`s that implementations will actually return in practice.
+# There's just one right now, but this will eventually be a Union.
+CommandDefinedErrorData = DefinedErrorData[
+    TipPhysicallyMissingError, TipPhysicallyMissingErrorInternalData
+]

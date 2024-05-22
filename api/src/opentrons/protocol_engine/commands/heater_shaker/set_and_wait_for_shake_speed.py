@@ -4,7 +4,8 @@ from typing import Optional, TYPE_CHECKING
 from typing_extensions import Literal, Type
 from pydantic import BaseModel, Field
 
-from ..command import AbstractCommandImpl, BaseCommand, BaseCommandCreate
+from ..command import AbstractCommandImpl, BaseCommand, BaseCommandCreate, SuccessData
+from ...errors.error_occurrence import ErrorOccurrence
 
 if TYPE_CHECKING:
     from opentrons.protocol_engine.state import StateView
@@ -33,7 +34,9 @@ class SetAndWaitForShakeSpeedResult(BaseModel):
 
 
 class SetAndWaitForShakeSpeedImpl(
-    AbstractCommandImpl[SetAndWaitForShakeSpeedParams, SetAndWaitForShakeSpeedResult]
+    AbstractCommandImpl[
+        SetAndWaitForShakeSpeedParams, SuccessData[SetAndWaitForShakeSpeedResult, None]
+    ]
 ):
     """Execution implementation of Heater-Shaker's set and wait shake speed command."""
 
@@ -51,7 +54,7 @@ class SetAndWaitForShakeSpeedImpl(
     async def execute(
         self,
         params: SetAndWaitForShakeSpeedParams,
-    ) -> SetAndWaitForShakeSpeedResult:
+    ) -> SuccessData[SetAndWaitForShakeSpeedResult, None]:
         """Set and wait for a Heater-Shaker's target shake speed."""
         # Allow propagation of ModuleNotLoadedError and WrongModuleTypeError.
         hs_module_substate = self._state_view.modules.get_heater_shaker_module_substate(
@@ -83,11 +86,18 @@ class SetAndWaitForShakeSpeedImpl(
         if hs_hardware_module is not None:
             await hs_hardware_module.set_speed(rpm=validated_speed)
 
-        return SetAndWaitForShakeSpeedResult(pipetteRetracted=pipette_should_retract)
+        return SuccessData(
+            public=SetAndWaitForShakeSpeedResult(
+                pipetteRetracted=pipette_should_retract
+            ),
+            private=None,
+        )
 
 
 class SetAndWaitForShakeSpeed(
-    BaseCommand[SetAndWaitForShakeSpeedParams, SetAndWaitForShakeSpeedResult]
+    BaseCommand[
+        SetAndWaitForShakeSpeedParams, SetAndWaitForShakeSpeedResult, ErrorOccurrence
+    ]
 ):
     """A command to set and wait for a Heater-Shaker's shake speed."""
 

@@ -1,5 +1,5 @@
-import { Mount } from '@opentrons/components'
-import {
+import type { Mount } from '@opentrons/components'
+import type {
   ModuleType,
   ModuleModel,
   MAGNETIC_MODULE_TYPE,
@@ -9,9 +9,9 @@ import {
   MAGNETIC_BLOCK_TYPE,
   NozzleConfigurationStyle,
 } from '@opentrons/shared-data'
-import { DeckSlot } from '../types'
+import type { DeckSlot } from '../types'
 
-import {
+import type {
   TemperatureStatus,
   ModuleEntity,
   PipetteEntity,
@@ -72,7 +72,7 @@ export interface ModuleTemporalProperties {
 }
 export type ModuleOnDeck = ModuleEntity & ModuleTemporalProperties
 export type ModulesForEditModulesCard = Partial<
-  Record<ModuleType, ModuleOnDeck | null | undefined>
+  Record<ModuleType, ModuleOnDeck[] | null | undefined>
 >
 // =========== LABWARE ========
 export type NormalizedLabwareById = Record<

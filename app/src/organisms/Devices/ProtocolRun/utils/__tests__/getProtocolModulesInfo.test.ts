@@ -2,13 +2,15 @@ import { describe, it, expect } from 'vitest'
 import {
   transfer_settings,
   multiple_temp_modules,
-  ot2DeckDefV4,
+  ot2DeckDefV5,
   getModuleDef2,
+} from '@opentrons/shared-data'
+import { getProtocolModulesInfo } from '../getProtocolModulesInfo'
+import type {
   ProtocolAnalysisOutput,
   LoadedLabware,
   LoadedModule,
 } from '@opentrons/shared-data'
-import { getProtocolModulesInfo } from '../getProtocolModulesInfo'
 
 const protocolWithMagTempTC = ({
   ...transfer_settings,
@@ -174,7 +176,7 @@ const protocolWithMultipleTemps = ({
     },
   ] as LoadedModule[],
 } as unknown) as ProtocolAnalysisOutput
-const standardDeckDef = ot2DeckDefV4 as any
+const standardDeckDef = ot2DeckDefV5 as any
 
 describe('getProtocolModulesInfo', () => {
   it('should gather protocol module info for temp, mag, and tc', () => {

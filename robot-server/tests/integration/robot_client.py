@@ -220,6 +220,14 @@ class RobotClient:
         response.raise_for_status()
         return response
 
+    async def get_preserialized_commands(self, run_id: str) -> Response:
+        """GET /runs/:run_id/commandsAsPreSerializedList."""
+        response = await self.httpx_client.get(
+            url=f"{self.base_url}/runs/{run_id}/commandsAsPreSerializedList",
+        )
+        response.raise_for_status()
+        return response
+
     async def post_labware_offset(
         self,
         run_id: str,
@@ -308,6 +316,18 @@ class RobotClient:
         """DELETE /sessions/{session_id}."""
         response = await self.httpx_client.delete(
             url=f"{self.base_url}/sessions/{session_id}"
+        )
+        response.raise_for_status()
+        return response
+
+    async def put_deck_configuration(
+        self,
+        req_body: Dict[str, object],
+    ) -> Response:
+        """PUT /deck_configuration."""
+        response = await self.httpx_client.put(
+            url=f"{self.base_url}/deck_configuration",
+            json=req_body,
         )
         response.raise_for_status()
         return response

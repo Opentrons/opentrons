@@ -22,7 +22,6 @@ from opentrons.hardware_control.dev_types import PipetteDict
 from opentrons.protocols.models import LabwareDefinition
 
 from opentrons.protocol_engine import errors
-from opentrons.protocol_engine.actions import ActionDispatcher
 from opentrons.protocol_engine.types import (
     DeckSlotLocation,
     DeckType,
@@ -82,12 +81,6 @@ def patch_mock_pipette_data_provider(
 def state_store(decoy: Decoy) -> StateStore:
     """Get a mocked out StateStore instance."""
     return decoy.mock(cls=StateStore)
-
-
-@pytest.fixture
-def action_dispatcher(decoy: Decoy) -> ActionDispatcher:
-    """Get a mocked out ActionDispatcher instance."""
-    return decoy.mock(cls=ActionDispatcher)
 
 
 @pytest.fixture
@@ -166,7 +159,6 @@ def virtual_pipette_data_provider(
 def subject(
     hardware_api: HardwareControlAPI,
     state_store: StateStore,
-    action_dispatcher: ActionDispatcher,
     labware_data_provider: LabwareDataProvider,
     module_data_provider: ModuleDataProvider,
     model_utils: ModelUtils,
@@ -176,7 +168,6 @@ def subject(
     return EquipmentHandler(
         hardware_api=hardware_api,
         state_store=state_store,
-        action_dispatcher=action_dispatcher,
         labware_data_provider=labware_data_provider,
         module_data_provider=module_data_provider,
         model_utils=model_utils,
@@ -614,7 +605,6 @@ async def test_load_pipette(
     model_utils: ModelUtils,
     hardware_api: HardwareControlAPI,
     state_store: StateStore,
-    action_dispatcher: ActionDispatcher,
     loaded_static_pipette_data: LoadedStaticPipetteData,
     subject: EquipmentHandler,
 ) -> None:
@@ -665,7 +655,6 @@ async def test_load_pipette_96_channels(
     model_utils: ModelUtils,
     hardware_api: HardwareControlAPI,
     state_store: StateStore,
-    action_dispatcher: ActionDispatcher,
     loaded_static_pipette_data: LoadedStaticPipetteData,
     subject: EquipmentHandler,
 ) -> None:
@@ -702,7 +691,6 @@ async def test_load_pipette_uses_provided_id(
     decoy: Decoy,
     hardware_api: HardwareControlAPI,
     state_store: StateStore,
-    action_dispatcher: ActionDispatcher,
     loaded_static_pipette_data: LoadedStaticPipetteData,
     subject: EquipmentHandler,
 ) -> None:
@@ -734,7 +722,6 @@ async def test_load_pipette_use_virtual(
     decoy: Decoy,
     model_utils: ModelUtils,
     state_store: StateStore,
-    action_dispatcher: ActionDispatcher,
     loaded_static_pipette_data: LoadedStaticPipetteData,
     subject: EquipmentHandler,
     virtual_pipette_data_provider: pipette_data_provider.VirtualPipetteDataProvider,
@@ -837,6 +824,7 @@ async def test_load_module(
                 HardwareModule(serial_number="serial-1", definition=tempdeck_v1_def),
                 HardwareModule(serial_number="serial-2", definition=tempdeck_v2_def),
             ],
+            expected_serial_number=None,
         )
     ).then_return(HardwareModule(serial_number="serial-1", definition=tempdeck_v1_def))
 

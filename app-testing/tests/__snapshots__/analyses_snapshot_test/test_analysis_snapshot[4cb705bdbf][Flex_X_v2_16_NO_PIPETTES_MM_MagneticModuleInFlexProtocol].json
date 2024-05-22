@@ -1,0 +1,105 @@
+{
+  "commands": [
+    {
+      "commandType": "home",
+      "notes": [],
+      "params": {},
+      "result": {},
+      "status": "succeeded"
+    },
+    {
+      "commandType": "loadModule",
+      "error": {
+        "detail": "ValueError: Module Type magneticModuleType does not have a related fixture ID.",
+        "errorCode": "4000",
+        "errorInfo": {
+          "args": "('Module Type magneticModuleType does not have a related fixture ID.',)",
+          "class": "ValueError",
+          "traceback": "  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocol_engine/execution/command_executor.py\", line 146, in execute\n    result = await command_impl.execute(\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocol_engine/commands/load_module.py\", line 121, in execute\n    self._ensure_module_location(params.location.slotName, module_type)\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocol_engine/commands/load_module.py\", line 175, in _ensure_module_location\n    cutout_fixture_id = ModuleType.to_module_fixture_id(module_type)\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/hardware_control/modules/types.py\", line 80, in to_module_fixture_id\n    raise ValueError(\n"
+        },
+        "errorType": "PythonException",
+        "wrappedErrors": []
+      },
+      "notes": [],
+      "params": {
+        "location": {
+          "slotName": "C1"
+        },
+        "model": "magneticModuleV2"
+      },
+      "status": "failed"
+    }
+  ],
+  "config": {
+    "apiVersion": [
+      2,
+      16
+    ],
+    "protocolType": "python"
+  },
+  "errors": [
+    {
+      "detail": "ProtocolCommandFailedError [line 15]: Error 4000 GENERAL_ERROR (ProtocolCommandFailedError): PythonException: ValueError: Module Type magneticModuleType does not have a related fixture ID.",
+      "errorCode": "4000",
+      "errorInfo": {},
+      "errorType": "ExceptionInProtocolError",
+      "wrappedErrors": [
+        {
+          "detail": "PythonException: ValueError: Module Type magneticModuleType does not have a related fixture ID.",
+          "errorCode": "4000",
+          "errorInfo": {},
+          "errorType": "ProtocolCommandFailedError",
+          "wrappedErrors": [
+            {
+              "detail": "ValueError: Module Type magneticModuleType does not have a related fixture ID.",
+              "errorCode": "4000",
+              "errorInfo": {
+                "args": "('Module Type magneticModuleType does not have a related fixture ID.',)",
+                "class": "ValueError",
+                "traceback": "  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocol_engine/execution/command_executor.py\", line 146, in execute\n    result = await command_impl.execute(\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocol_engine/commands/load_module.py\", line 121, in execute\n    self._ensure_module_location(params.location.slotName, module_type)\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocol_engine/commands/load_module.py\", line 175, in _ensure_module_location\n    cutout_fixture_id = ModuleType.to_module_fixture_id(module_type)\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/hardware_control/modules/types.py\", line 80, in to_module_fixture_id\n    raise ValueError(\n"
+              },
+              "errorType": "PythonException",
+              "wrappedErrors": []
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "files": [
+    {
+      "name": "Flex_X_v2_16_NO_PIPETTES_MM_MagneticModuleInFlexProtocol.py",
+      "role": "main"
+    },
+    {
+      "name": "cpx_4_tuberack_100ul.json",
+      "role": "labware"
+    },
+    {
+      "name": "opentrons_ot3_96_tiprack_1000ul_rss.json",
+      "role": "labware"
+    },
+    {
+      "name": "opentrons_ot3_96_tiprack_200ul_rss.json",
+      "role": "labware"
+    },
+    {
+      "name": "opentrons_ot3_96_tiprack_50ul_rss.json",
+      "role": "labware"
+    },
+    {
+      "name": "sample_labware.json",
+      "role": "labware"
+    }
+  ],
+  "labware": [],
+  "liquids": [],
+  "metadata": {
+    "author": "Derek Maggio <derek.maggio@opentrons.com>",
+    "protocolName": "QA Protocol - Analysis Error - Magnetic Module in Flex Protocol"
+  },
+  "modules": [],
+  "pipettes": [],
+  "robotType": "OT-3 Standard",
+  "runTimeParameters": []
+}

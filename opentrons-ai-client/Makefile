@@ -6,6 +6,9 @@ SHELL := bash
 # add node_modules/.bin to PATH
 PATH := $(shell cd .. && yarn bin):$(PATH)
 
+# dev server port
+PORT ?= 5173
+
 benchmark_output := $(shell node -e 'console.log(new Date());')
 
 # These variables can be overriden when make is invoked to customize the
@@ -42,6 +45,7 @@ build:
 
 .PHONY: dev
 dev: export NODE_ENV := development
+dev: export PORT := $(PORT)
 dev:
 	vite serve
 
@@ -57,3 +61,7 @@ test:
 .PHONY: test-cov
 test-cov:
 	make -C .. test-js-ai-client tests=$(tests) test_opts="$(test_opts)" cov_opts="$(cov_opts)"
+
+.PHONY: dev-deploy
+dev-deploy:
+	aws s3 sync ./dist s3://dev-opentrons-ai-front-end/ --delete

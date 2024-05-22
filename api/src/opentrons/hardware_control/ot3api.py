@@ -413,7 +413,7 @@ class OT3API(
             Dict[OT3Mount, Dict[str, Optional[str]]],
             Dict[top_types.Mount, Dict[str, Optional[str]]],
         ] = None,
-        attached_modules: Optional[Dict[str, List[str]]] = None,
+        attached_modules: Optional[Dict[str, List[modules.SimulatingModule]]] = None,
         config: Union[RobotConfig, OT3Config, None] = None,
         loop: Optional[asyncio.AbstractEventLoop] = None,
         strict_attached_instruments: bool = True,
@@ -1521,14 +1521,8 @@ class OT3API(
         # G, Q should be handled in the backend through `self._home()`
         assert axis not in [Axis.G, Axis.Q]
 
-        # TODO(CM): This is a temporary fix in response to the right mount causing
-        # errors while trying to home on startup or attachment. We should remove this
-        # when we fix this issue in the firmware.
-        enable_right_mount_on_startup = (
-            self._gantry_load == GantryLoad.HIGH_THROUGHPUT and axis == Axis.Z_R
-        )
         encoder_ok = self._backend.check_encoder_status([axis])
-        if encoder_ok or enable_right_mount_on_startup:
+        if encoder_ok:
             # enable motor (if needed) and update estimation
             await self._enable_before_update_estimation(axis)
 
@@ -1538,6 +1532,12 @@ class OT3API(
         if Axis.to_kind(axis) == OT3AxisKind.P:
             await self._set_plunger_current_and_home(axis, motor_ok, encoder_ok)
             return
+
+        # TODO: (ba, 2024-04-19): We need to explictly engage the axis and enable
+        # the motor when we are attempting to move. This should be already
+        # happening but something on the firmware is either not enabling the motor or
+        # disabling the motor.
+        await self.engage_axes([axis])
 
         # we can move to safe home distance!
         if encoder_ok and motor_ok:
@@ -1655,16 +1655,24 @@ class OT3API(
         motor_ok = self._backend.check_motor_status([axis])
         encoder_ok = self._backend.check_encoder_status([axis])
 
-        if motor_ok and encoder_ok:
-            # we can move to the home position without checking the limit switch
-            origin = await self._backend.update_position()
-            target_pos = {axis: self._backend.home_position()[axis]}
-            await self._backend.move(origin, target_pos, 400, HWStopCondition.none)
-        else:
-            # home the axis
-            await self._home_axis(axis)
-        await self._cache_current_position()
-        await self._cache_encoder_position()
+        async with self._motion_lock:
+            if motor_ok and encoder_ok:
+                # TODO: (ba, 2024-04-19): We need to explictly engage the axis and enable
+                # the motor when we are attempting to move. This should be already
+                # happening but something on the firmware is either not enabling the motor or
+                # disabling the motor.
+                await self.engage_axes([axis])
+
+                # we can move to the home position without checking the limit switch
+                origin = await self._backend.update_position()
+                target_pos = {axis: self._backend.home_position()[axis]}
+                await self._backend.move(origin, target_pos, 400, HWStopCondition.none)
+            else:
+                # home the axis
+                await self._home_axis(axis)
+
+            await self._cache_current_position()
+            await self._cache_encoder_position()
 
     # Gantry/frame (i.e. not pipette) config API
     @property
@@ -2064,6 +2072,7 @@ class OT3API(
     async def get_tip_presence_status(
         self,
         mount: Union[top_types.Mount, OT3Mount],
+        follow_singular_sensor: Optional[InstrumentProbeType] = None,
     ) -> TipStateType:
         """
         Check tip presence status. If a high throughput pipette is present,
@@ -2077,30 +2086,38 @@ class OT3API(
                     and self._gantry_load == GantryLoad.HIGH_THROUGHPUT
                 ):
                     await stack.enter_async_context(self._high_throughput_check_tip())
-                result = await self._backend.get_tip_status(real_mount)
+                result = await self._backend.get_tip_status(
+                    real_mount, follow_singular_sensor
+                )
             return result
 
     async def verify_tip_presence(
-        self, mount: Union[top_types.Mount, OT3Mount], expected: TipStateType
+        self,
+        mount: Union[top_types.Mount, OT3Mount],
+        expected: TipStateType,
+        follow_singular_sensor: Optional[InstrumentProbeType] = None,
     ) -> None:
         real_mount = OT3Mount.from_mount(mount)
-        status = await self.get_tip_presence_status(real_mount)
+        status = await self.get_tip_presence_status(real_mount, follow_singular_sensor)
         if status != expected:
-            raise FailedTipStateCheck(expected, status.value)
+            raise FailedTipStateCheck(expected, status)
 
     async def _force_pick_up_tip(
         self, mount: OT3Mount, pipette_spec: TipActionSpec
     ) -> None:
         for press in pipette_spec.tip_action_moves:
             async with self._backend.motor_current(run_currents=press.currents):
-                target_down = target_position_from_relative(
+                target = target_position_from_relative(
                     mount, top_types.Point(z=press.distance), self._current_position
                 )
-                await self._move(target_down, speed=press.speed, expect_stalls=True)
-            if press.distance < 0:
-                # we expect a stall has happened during a downward movement into the tiprack, so
-                # we want to update the motor estimation
-                await self._update_position_estimation([Axis.by_mount(mount)])
+                if press.distance < 0:
+                    # we expect a stall has happened during a downward movement into the tiprack, so
+                    # we want to update the motor estimation
+                    await self._move(target, speed=press.speed, expect_stalls=True)
+                    await self._update_position_estimation([Axis.by_mount(mount)])
+                else:
+                    # we should not ignore stalls that happen during the retract part of the routine
+                    await self._move(target, speed=press.speed, expect_stalls=False)
 
     async def _tip_motor_action(
         self, mount: OT3Mount, pipette_spec: List[TipActionMoveSpec]
@@ -2539,9 +2556,7 @@ class OT3API(
         reading from the pressure sensor.
 
         If the move is completed without the specified threshold being triggered, a
-        LiquidNotFound error will be thrown.
-        If the threshold is triggered before the minimum z distance has been traveled,
-        a EarlyLiquidSenseTrigger error will be thrown.
+        LiquidNotFoundError error will be thrown.
 
         Otherwise, the function will stop moving once the threshold is triggered,
         and return the position of the
@@ -2584,7 +2599,7 @@ class OT3API(
             (probe_settings.plunger_speed * plunger_direction),
             probe_settings.sensor_threshold_pascals,
             probe_settings.output_option,
-            probe_settings.data_file,
+            probe_settings.data_files,
             probe_settings.auto_zero_sensor,
             probe_settings.num_baseline_reads,
             probe=probe if probe else InstrumentProbeType.PRIMARY,

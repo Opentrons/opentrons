@@ -5,7 +5,8 @@ from typing import TYPE_CHECKING, Optional, Type
 from typing_extensions import Literal
 
 from .pipetting_common import PipetteIdMixin
-from .command import AbstractCommandImpl, BaseCommand, BaseCommandCreate
+from .command import AbstractCommandImpl, BaseCommand, BaseCommandCreate, SuccessData
+from ..errors.error_occurrence import ErrorOccurrence
 
 if TYPE_CHECKING:
     from ..execution import TipHandler
@@ -34,7 +35,7 @@ class DropTipInPlaceResult(BaseModel):
 
 
 class DropTipInPlaceImplementation(
-    AbstractCommandImpl[DropTipInPlaceParams, DropTipInPlaceResult]
+    AbstractCommandImpl[DropTipInPlaceParams, SuccessData[DropTipInPlaceResult, None]]
 ):
     """Drop tip in place command implementation."""
 
@@ -45,16 +46,20 @@ class DropTipInPlaceImplementation(
     ) -> None:
         self._tip_handler = tip_handler
 
-    async def execute(self, params: DropTipInPlaceParams) -> DropTipInPlaceResult:
+    async def execute(
+        self, params: DropTipInPlaceParams
+    ) -> SuccessData[DropTipInPlaceResult, None]:
         """Drop a tip using the requested pipette."""
         await self._tip_handler.drop_tip(
             pipette_id=params.pipetteId, home_after=params.homeAfter
         )
 
-        return DropTipInPlaceResult()
+        return SuccessData(public=DropTipInPlaceResult(), private=None)
 
 
-class DropTipInPlace(BaseCommand[DropTipInPlaceParams, DropTipInPlaceResult]):
+class DropTipInPlace(
+    BaseCommand[DropTipInPlaceParams, DropTipInPlaceResult, ErrorOccurrence]
+):
     """Drop tip in place command model."""
 
     commandType: DropTipInPlaceCommandType = "dropTipInPlace"

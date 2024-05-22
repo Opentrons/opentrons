@@ -15,7 +15,8 @@ from ..types import (
     AddressableAreaLocation,
 )
 
-from .command import AbstractCommandImpl, BaseCommand, BaseCommandCreate
+from .command import AbstractCommandImpl, BaseCommand, BaseCommandCreate, SuccessData
+from ..errors.error_occurrence import ErrorOccurrence
 
 if TYPE_CHECKING:
     from ..state import StateView
@@ -86,7 +87,7 @@ class LoadLabwareResult(BaseModel):
 
 
 class LoadLabwareImplementation(
-    AbstractCommandImpl[LoadLabwareParams, LoadLabwareResult]
+    AbstractCommandImpl[LoadLabwareParams, SuccessData[LoadLabwareResult, None]]
 ):
     """Load labware command implementation."""
 
@@ -96,7 +97,9 @@ class LoadLabwareImplementation(
         self._equipment = equipment
         self._state_view = state_view
 
-    async def execute(self, params: LoadLabwareParams) -> LoadLabwareResult:
+    async def execute(
+        self, params: LoadLabwareParams
+    ) -> SuccessData[LoadLabwareResult, None]:
         """Load definition and calibration data necessary for a labware."""
         # TODO (tz, 8-15-2023): extend column validation to column 1 when working
         # on https://opentrons.atlassian.net/browse/RSS-258 and completing
@@ -144,14 +147,17 @@ class LoadLabwareImplementation(
                 bottom_labware_id=verified_location.labwareId,
             )
 
-        return LoadLabwareResult(
-            labwareId=loaded_labware.labware_id,
-            definition=loaded_labware.definition,
-            offsetId=loaded_labware.offsetId,
+        return SuccessData(
+            public=LoadLabwareResult(
+                labwareId=loaded_labware.labware_id,
+                definition=loaded_labware.definition,
+                offsetId=loaded_labware.offsetId,
+            ),
+            private=None,
         )
 
 
-class LoadLabware(BaseCommand[LoadLabwareParams, LoadLabwareResult]):
+class LoadLabware(BaseCommand[LoadLabwareParams, LoadLabwareResult, ErrorOccurrence]):
     """Load labware command resource model."""
 
     commandType: LoadLabwareCommandType = "loadLabware"

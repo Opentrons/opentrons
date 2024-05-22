@@ -22,13 +22,13 @@ import { getNetworkInterfaces, fetchStatus } from '../../redux/networking'
 import { appShellRequestor } from '../../redux/shell/remote'
 import OT2_PNG from '../../assets/images/OT2-R_HERO.png'
 import FLEX_PNG from '../../assets/images/FLEX.png'
-import { RobotBusyStatusAction } from '.'
 import { useNotifyAllRunsQuery } from '../../resources/runs'
 
 import type { IconName } from '@opentrons/components'
 import type { Runs } from '@opentrons/api-client'
 import type { Robot } from '../../redux/discovery/types'
 import type { Dispatch, State } from '../../redux/types'
+import type { RobotBusyStatusAction } from '.'
 
 interface AvailableRobotOptionProps {
   robot: Robot
@@ -53,7 +53,7 @@ export function AvailableRobotOption(
     registerRobotBusyStatus,
   } = props
   const { ip, local, name: robotName } = robot ?? {}
-  const { t } = useTranslation('protocol_list')
+  const { t } = useTranslation(['protocol_list', 'branded'])
   const dispatch = useDispatch<Dispatch>()
   const robotModel = useSelector((state: State) =>
     getRobotModelByName(state, robotName)
@@ -160,7 +160,7 @@ export function AvailableRobotOption(
         >
           <Trans
             t={t}
-            i18nKey="a_robot_software_update_is_available"
+            i18nKey="branded:a_robot_software_update_is_available"
             components={{
               robotLink: <NavLink to={`/devices/${robotName}`} />,
             }}

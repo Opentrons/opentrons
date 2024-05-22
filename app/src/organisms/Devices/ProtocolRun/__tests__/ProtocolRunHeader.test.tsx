@@ -59,11 +59,7 @@ import { mockHeaterShaker } from '../../../../redux/modules/__fixtures__'
 import {
   useTrackEvent,
   ANALYTICS_PROTOCOL_PROCEED_TO_RUN,
-  ANALYTICS_PROTOCOL_RUN_AGAIN,
-  ANALYTICS_PROTOCOL_RUN_FINISH,
-  ANALYTICS_PROTOCOL_RUN_PAUSE,
-  ANALYTICS_PROTOCOL_RUN_START,
-  ANALYTICS_PROTOCOL_RUN_RESUME,
+  ANALYTICS_PROTOCOL_RUN_ACTION,
 } from '../../../../redux/analytics'
 import { mockConnectableRobot } from '../../../../redux/discovery/__fixtures__'
 import { getRobotUpdateDisplayInfo } from '../../../../redux/robot-update'
@@ -282,10 +278,12 @@ describe('ProtocolRunHeader', () => {
         pause: () => {},
         stop: () => {},
         reset: () => {},
+        resumeFromRecovery: () => {},
         isPlayRunActionLoading: false,
         isPauseRunActionLoading: false,
         isStopRunActionLoading: false,
         isResetRunLoading: false,
+        isResumeRunFromRecoveryActionLoading: false,
       })
     when(vi.mocked(useRunStatus)).calledWith(RUN_ID).thenReturn(RUN_STATUS_IDLE)
     when(vi.mocked(useRunTimestamps)).calledWith(RUN_ID).thenReturn({
@@ -427,7 +425,7 @@ describe('ProtocolRunHeader', () => {
     fireEvent.click(button)
     expect(mockTrackProtocolRunEvent).toBeCalledTimes(1)
     expect(mockTrackProtocolRunEvent).toBeCalledWith({
-      name: ANALYTICS_PROTOCOL_RUN_START,
+      name: ANALYTICS_PROTOCOL_RUN_ACTION.START,
       properties: {},
     })
   })
@@ -445,7 +443,7 @@ describe('ProtocolRunHeader', () => {
     expect(mockCloseCurrentRun).toBeCalled()
     expect(mockTrackProtocolRunEvent).toBeCalled()
     expect(mockTrackProtocolRunEvent).toBeCalledWith({
-      name: ANALYTICS_PROTOCOL_RUN_FINISH,
+      name: ANALYTICS_PROTOCOL_RUN_ACTION.FINISH,
       properties: {},
     })
   })
@@ -526,7 +524,7 @@ describe('ProtocolRunHeader', () => {
     screen.getByText('Protocol end')
     fireEvent.click(button)
     expect(mockTrackProtocolRunEvent).toBeCalledWith({
-      name: ANALYTICS_PROTOCOL_RUN_PAUSE,
+      name: ANALYTICS_PROTOCOL_RUN_ACTION.PAUSE,
     })
   })
 
@@ -564,7 +562,7 @@ describe('ProtocolRunHeader', () => {
     screen.getByText('Paused')
     fireEvent.click(button)
     expect(mockTrackProtocolRunEvent).toBeCalledWith({
-      name: ANALYTICS_PROTOCOL_RUN_RESUME,
+      name: ANALYTICS_PROTOCOL_RUN_ACTION.RESUME,
       properties: {},
     })
   })
@@ -649,7 +647,7 @@ describe('ProtocolRunHeader', () => {
     screen.getByText(formatTimestamp(COMPLETED_AT))
     fireEvent.click(button)
     expect(mockTrackProtocolRunEvent).toBeCalledWith({
-      name: ANALYTICS_PROTOCOL_RUN_AGAIN,
+      name: ANALYTICS_PROTOCOL_RUN_ACTION.AGAIN,
     })
   })
 
@@ -676,7 +674,7 @@ describe('ProtocolRunHeader', () => {
     screen.getByText(formatTimestamp(COMPLETED_AT))
     fireEvent.click(button)
     expect(mockTrackProtocolRunEvent).toBeCalledWith({
-      name: ANALYTICS_PROTOCOL_RUN_AGAIN,
+      name: ANALYTICS_PROTOCOL_RUN_ACTION.AGAIN,
     })
   })
 
@@ -710,7 +708,7 @@ describe('ProtocolRunHeader', () => {
       },
     })
     expect(mockTrackProtocolRunEvent).toBeCalledWith({
-      name: ANALYTICS_PROTOCOL_RUN_AGAIN,
+      name: ANALYTICS_PROTOCOL_RUN_ACTION.AGAIN,
     })
   })
 
@@ -781,10 +779,12 @@ describe('ProtocolRunHeader', () => {
         pause: () => {},
         stop: () => {},
         reset: () => {},
+        resumeFromRecovery: () => {},
         isPlayRunActionLoading: false,
         isPauseRunActionLoading: false,
         isStopRunActionLoading: false,
         isResetRunLoading: true,
+        isResumeRunFromRecoveryActionLoading: false,
       })
     render()
 
@@ -814,7 +814,7 @@ describe('ProtocolRunHeader', () => {
 
     screen.getByText('Run completed.')
   })
-  it('clicking close on a terminal run banner closes the run context and dismisses the banner', async () => {
+  it('clicking close on a terminal run banner closes the run context', async () => {
     when(vi.mocked(useNotifyRunQuery))
       .calledWith(RUN_ID)
       .thenReturn({
@@ -827,9 +827,20 @@ describe('ProtocolRunHeader', () => {
 
     fireEvent.click(screen.getByTestId('Banner_close-button'))
     expect(mockCloseCurrentRun).toBeCalled()
-    await waitFor(() => {
-      expect(screen.queryByText('Run completed.')).not.toBeInTheDocument()
-    })
+  })
+
+  it('does not display the "run successful" banner if the successful run is not current', async () => {
+    when(vi.mocked(useNotifyRunQuery))
+      .calledWith(RUN_ID)
+      .thenReturn({
+        data: { data: { ...mockSucceededRun, current: false } },
+      } as UseQueryResult<OpentronsApiClient.Run>)
+    when(vi.mocked(useRunStatus))
+      .calledWith(RUN_ID)
+      .thenReturn(RUN_STATUS_SUCCEEDED)
+    render()
+
+    expect(screen.queryByText('Run completed.')).not.toBeInTheDocument()
   })
 
   it('if a heater shaker is shaking, clicking on start run should render HeaterShakerIsRunningModal', async () => {

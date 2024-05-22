@@ -1,11 +1,20 @@
 import * as React from 'react'
 import { screen } from '@testing-library/react'
-import { describe, it, beforeEach } from 'vitest'
+import { describe, it, beforeEach, vi } from 'vitest'
+import { InfoScreen } from '@opentrons/components'
 import { renderWithProviders } from '../../../__testing-utils__'
 import { i18n } from '../../../i18n'
 import { ProtocolLabwareDetails } from '../ProtocolLabwareDetails'
 
 import type { LoadLabwareRunTimeCommand } from '@opentrons/shared-data'
+
+vi.mock('@opentrons/components', async importOriginal => {
+  const actual = await importOriginal<typeof InfoScreen>()
+  return {
+    ...actual,
+    InfoScreen: vi.fn(),
+  }
+})
 
 const mockRequiredLabwareDetails = [
   {
@@ -70,6 +79,7 @@ describe('ProtocolLabwareDetails', () => {
     props = {
       requiredLabwareDetails: mockRequiredLabwareDetails,
     }
+    vi.mocked(InfoScreen).mockReturnValue(<div>mock InfoScreen</div>)
   })
 
   it('should render an opentrons labware', () => {
@@ -135,5 +145,13 @@ describe('ProtocolLabwareDetails', () => {
     screen.getByText('NEST 96 Well Plate 100 µL PCR Full Skirt')
     screen.getByText('Quantity')
     screen.getByText('2')
+  })
+
+  it('should render mock infoscreen when no labware', () => {
+    props = {
+      requiredLabwareDetails: [],
+    }
+    render(props)
+    screen.getByText('mock InfoScreen')
   })
 })

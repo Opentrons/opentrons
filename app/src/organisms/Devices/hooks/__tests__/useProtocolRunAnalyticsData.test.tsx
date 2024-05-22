@@ -2,7 +2,7 @@ import * as React from 'react'
 import { vi, it, expect, describe, beforeEach, afterEach } from 'vitest'
 import { when } from 'vitest-when'
 import { renderHook, waitFor } from '@testing-library/react'
-import { createStore, Store } from 'redux'
+import { createStore } from 'redux'
 import { Provider } from 'react-redux'
 import { QueryClient, QueryClientProvider } from 'react-query'
 
@@ -14,6 +14,7 @@ import { useProtocolMetadata } from '../useProtocolMetadata'
 import { useRunTimestamps } from '../../../RunTimeControl/hooks'
 import { formatInterval } from '../../../RunTimeControl/utils'
 import { mockConnectableRobot } from '../../../../redux/discovery/__fixtures__'
+import type { Store } from 'redux'
 
 vi.mock('../../../../redux/analytics/hash')
 vi.mock('../../../../redux/protocol-storage')
@@ -37,6 +38,16 @@ const MODULES = {
   module1: { model: 'module1' },
   module2: { model: 'module2' },
 }
+const RUNTIME_PARAMETERS = [
+  {
+    displayName: 'test param',
+    variableName: 'test_param',
+    description: 'Mock boolean parameter',
+    type: 'bool',
+    default: true,
+    value: true,
+  },
+]
 const FORMATTED_MODULES = 'module1,module2'
 const STORED_PROTOCOL_ANALYSIS = {
   config: { protocolType: 'json', schemaVersion: 1.11 },
@@ -49,11 +60,13 @@ const STORED_PROTOCOL_ANALYSIS = {
   robotType: 'OT-2 Standard',
   pipettes: PIPETTES,
   modules: MODULES,
+  runTimeParameters: RUNTIME_PARAMETERS,
 }
 const ROBOT_PROTOCOL_ANALYSIS = {
   robotType: 'OT-2 Standard',
   pipettes: PIPETTES,
   modules: MODULES,
+  runTimeParameters: RUNTIME_PARAMETERS,
 }
 
 describe('useProtocolAnalysisErrors hook', () => {
@@ -126,12 +139,14 @@ describe('useProtocolAnalysisErrors hook', () => {
         protocolAppName: 'Python API',
         protocolAppVersion: 2.3,
         protocolAuthor: 'hashedString',
+        protocolHasRunTimeParameterCustomValues: false,
+        protocolHasRunTimeParameters: true,
         protocolName: 'robot protocol',
         protocolSource: 'robot protocol source',
         protocolText: 'hashedString',
         protocolType: '',
         robotType: 'OT-2 Standard',
-        robotSerialNumber: '',
+        robotSerialNumber: 'mock-serial',
       },
       runTime: '1:00:00',
     })
@@ -156,11 +171,13 @@ describe('useProtocolAnalysisErrors hook', () => {
         protocolAppVersion: '1.1',
         protocolAuthor: 'hashedString',
         protocolName: 'stored protocol',
+        protocolHasRunTimeParameterCustomValues: false,
+        protocolHasRunTimeParameters: true,
         protocolSource: 'stored protocol source',
         protocolText: 'hashedString',
         protocolType: 'json',
         robotType: 'OT-2 Standard',
-        robotSerialNumber: '',
+        robotSerialNumber: 'mock-serial',
       },
       runTime: '1:00:00',
     })

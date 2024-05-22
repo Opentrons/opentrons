@@ -4,14 +4,12 @@ import { useSelector } from 'react-redux'
 import isEqual from 'lodash/isEqual'
 import { useTranslation } from 'react-i18next'
 import {
-  CompletedProtocolAnalysis,
   getLabwareDefURI,
   getLabwareDisplayName,
   getModuleType,
   getVectorDifference,
   getVectorSum,
   IDENTITY_VECTOR,
-  LabwareDefinition2,
 } from '@opentrons/shared-data'
 import { NeedHelpLink } from '../CalibrationPanels'
 import {
@@ -42,6 +40,10 @@ import { getCurrentOffsetForLabwareInLocation } from '../Devices/ProtocolRun/uti
 import { getLabwareDefinitionsFromCommands } from './utils/labware'
 import { getDisplayLocation } from './utils/getDisplayLocation'
 
+import type {
+  CompletedProtocolAnalysis,
+  LabwareDefinition2,
+} from '@opentrons/shared-data'
 import type {
   LabwareOffset,
   LabwareOffsetCreateData,

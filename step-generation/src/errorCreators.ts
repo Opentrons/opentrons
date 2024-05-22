@@ -175,13 +175,11 @@ export const tallLabwareEastWestOfHeaterShaker = (
   }
 }
 
-export const tallLabwareWestOf96ChannelPipetteLabware = (args: {
-  source: string
-  labware: string
-}): CommandCreatorError => {
+export const possiblePipetteCollision = (): CommandCreatorError => {
   return {
-    type: 'TALL_LABWARE_WEST_OF_96_CHANNEL_LABWARE',
-    message: `Labware to the left of the ${args.source} ${args.labware} is too tall and will collide with the 96-channel.`,
+    type: 'POSSIBLE_PIPETTE_COLLISION',
+    message:
+      'There is a possibility that the Pipette will collide with the a labware or module on the deck',
   }
 }
 
@@ -217,6 +215,14 @@ export const labwareOffDeck = (): CommandCreatorError => {
   return {
     type: 'LABWARE_OFF_DECK',
     message: 'Attempted to interact with labware off deck',
+  }
+}
+
+export const multipleEntitiesOnSameSlotName = (): CommandCreatorError => {
+  return {
+    type: 'LABWARE_ON_ANOTHER_ENTITY',
+    message:
+      'Attempted to move labware onto another entity with the same slotName',
   }
 }
 
@@ -261,5 +267,12 @@ export const noTipSelected = (): CommandCreatorError => {
   return {
     type: 'NO_TIP_SELECTED',
     message: 'No tips were selected for this step',
+  }
+}
+
+export const labwareDiscarded = (): CommandCreatorError => {
+  return {
+    type: 'LABWARE_DISCARDED_IN_WASTE_CHUTE',
+    message: 'The labware was discarded in waste chute in a previous step.',
   }
 }

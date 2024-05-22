@@ -10,13 +10,12 @@ import { handleTipsAttachedModal } from '../TipsAttachedModal'
 import { LEFT } from '@opentrons/shared-data'
 import { mockPipetteInfo } from '../../../redux/pipettes/__fixtures__'
 import { ROBOT_MODEL_OT3 } from '../../../redux/discovery'
-import { useNotifyCurrentMaintenanceRun } from '../../../resources/maintenance_runs'
+import { useCloseCurrentRun } from '../../ProtocolUpload/hooks'
 
 import type { PipetteModelSpecs } from '@opentrons/shared-data'
 import type { HostConfig } from '@opentrons/api-client'
 
-vi.mock('../../../resources/maintenance_runs')
-vi.mock('../../../resources/useNotifyService')
+vi.mock('../../ProtocolUpload/hooks')
 
 const MOCK_ACTUAL_PIPETTE = {
   ...mockPipetteInfo.pipetteSpecs,
@@ -53,12 +52,8 @@ const render = (pipetteSpecs: PipetteModelSpecs) => {
 
 describe('TipsAttachedModal', () => {
   beforeEach(() => {
-    vi.mocked(useNotifyCurrentMaintenanceRun).mockReturnValue({
-      data: {
-        data: {
-          id: 'test',
-        },
-      },
+    vi.mocked(useCloseCurrentRun).mockReturnValue({
+      closeCurrentRun: vi.fn(),
     } as any)
   })
 

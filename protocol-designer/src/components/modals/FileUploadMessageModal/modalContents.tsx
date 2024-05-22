@@ -2,7 +2,7 @@ import * as React from 'react'
 import { Trans, useTranslation } from 'react-i18next'
 
 import styles from './modalContents.module.css'
-import { FileUploadMessage } from '../../../load-file'
+import type { FileUploadMessage } from '../../../load-file'
 import type { ModalContents } from './types'
 
 const PD = 'Protocol Designer'
@@ -96,6 +96,23 @@ export const getToV8MigrationMessage = (props: ModalProps): ModalContents => {
   }
 }
 
+export const getToV8_1MigrationMessage = (props: ModalProps): ModalContents => {
+  const { t } = props
+
+  return {
+    title: t('migrations.header', { pd: PD }),
+    body: (
+      <div className={styles.migration_message}>
+        <p>
+          <p>{t('migrations.toV8_1Migration.body1')}</p>
+        </p>
+        <p>{t('migrations.toV8_1Migration.body2')}</p>
+        <p>{t('migrations.toV8_1Migration.body3')}</p>
+      </div>
+    ),
+  }
+}
+
 export const getToV3MigrationMessage = (props: ModalProps): ModalContents => {
   const { t } = props
 
@@ -152,9 +169,12 @@ export const getMigrationMessage = (
   ) {
     return getNoBehaviorChangeMessage({ t })
   }
-  if (migrationsRan.includes('8.0.0')) {
+  if (migrationsRan.includes('8.1.0')) {
+    return getToV8_1MigrationMessage({ t })
+  } else if (migrationsRan.includes('8.0.0')) {
     return getToV8MigrationMessage({ t })
   }
+
   return getGenericDidMigrateMessage({ t })
 }
 

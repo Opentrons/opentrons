@@ -23,6 +23,7 @@ from opentrons.protocol_engine import (
     ModuleModel,
     commands,
     DeckPoint,
+    EngineStatus,
 )
 from opentrons.protocol_reader import ProtocolReader
 from opentrons.protocol_runner import create_simulating_runner
@@ -295,6 +296,89 @@ async def test_runner_with_legacy_json(legacy_json_protocol_file: Path) -> None:
         result=commands.PickUpTipResult(
             tipVolume=300.0, tipLength=51.83, position=DeckPoint(x=0, y=0, z=0)
         ),
+    )
+
+    assert expected_command in commands_result
+
+
+async def test_runner_with_python_and_run_time_parameters(
+    python_protocol_file_with_run_time_params: Path,
+) -> None:
+    """It should run a Python protocol on the PythonAndLegacyRunner."""
+    protocol_reader = ProtocolReader()
+    protocol_source = await protocol_reader.read_saved(
+        files=[python_protocol_file_with_run_time_params],
+        directory=None,
+    )
+
+    subject = await create_simulating_runner(
+        robot_type="OT-2 Standard",
+        protocol_config=protocol_source.config,
+    )
+    result = await subject.run(
+        deck_configuration=[],
+        protocol_source=protocol_source,
+        run_time_param_values={"aspirate_volume": 40.2},
+    )
+    commands_result = result.commands
+    pipettes_result = result.state_summary.pipettes
+    tiprack_result = result.state_summary.labware
+
+    pipette_id_captor = matchers.Captor()
+    tiprack_id_captor = matchers.Captor()
+    reservoir_id_captor = matchers.Captor()
+
+    expected_pipette = LoadedPipette.construct(
+        id=pipette_id_captor,
+        pipetteName=PipetteNameType.P300_SINGLE,
+        mount=MountType.LEFT,
+    )
+
+    expected_tiprack = LoadedLabware.construct(
+        id=tiprack_id_captor,
+        location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
+        loadName="opentrons_96_tiprack_300ul",
+        definitionUri="opentrons/opentrons_96_tiprack_300ul/1",
+        # fixme(mm, 2021-11-11): We should smoke-test that the engine picks up labware
+        # offsets, but it's unclear to me what the best way of doing that is, since
+        # we don't have access to the engine here to add offsets to it.
+        offsetId=None,
+    )
+
+    expected_reservoir = LoadedLabware.construct(
+        id=reservoir_id_captor,
+        location=DeckSlotLocation(slotName=DeckSlotName.SLOT_2),
+        loadName="nest_1_reservoir_195ml",
+        definitionUri="opentrons/nest_1_reservoir_195ml/2",
+        # fixme(mm, 2021-11-11): We should smoke-test that the engine picks up labware
+        # offsets, but it's unclear to me what the best way of doing that is, since
+        # we don't have access to the engine here to add offsets to it.
+        offsetId=None,
+    )
+
+    assert expected_pipette in pipettes_result
+    assert expected_tiprack in tiprack_result
+    assert expected_reservoir in tiprack_result
+
+    assert result.state_summary.status == EngineStatus.SUCCEEDED
+
+    expected_command = commands.Aspirate.construct(
+        id=matchers.IsA(str),
+        key=matchers.IsA(str),
+        status=commands.CommandStatus.SUCCEEDED,
+        createdAt=matchers.IsA(datetime),
+        startedAt=matchers.IsA(datetime),
+        completedAt=matchers.IsA(datetime),
+        params=commands.AspirateParams.construct(
+            labwareId=reservoir_id_captor.value,
+            wellName=matchers.IsA(str),
+            wellLocation=matchers.Anything(),
+            flowRate=matchers.IsA(float),
+            volume=40.2,
+            pipetteId=pipette_id_captor.value,
+        ),
+        notes=[],
+        result=matchers.Anything(),
     )
 
     assert expected_command in commands_result

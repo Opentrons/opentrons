@@ -25,7 +25,7 @@ from opentrons.protocol_engine.state.commands import (
     CommandState,
     CommandView,
     CommandSlice,
-    CurrentCommand,
+    CommandPointer,
     RunResult,
     QueueStatus,
 )
@@ -46,7 +46,7 @@ from .command_fixtures import (
 )
 
 
-def get_command_view(
+def get_command_view(  # noqa: C901
     queue_status: QueueStatus = QueueStatus.SETUP,
     run_completed_at: Optional[datetime] = None,
     run_started_at: Optional[datetime] = None,
@@ -55,6 +55,7 @@ def get_command_view(
     running_command_id: Optional[str] = None,
     queued_command_ids: Sequence[str] = (),
     queued_setup_command_ids: Sequence[str] = (),
+    queued_fixit_command_ids: Sequence[str] = (),
     run_error: Optional[errors.ErrorOccurrence] = None,
     failed_command: Optional[CommandEntry] = None,
     command_error_recovery_types: Optional[Dict[str, ErrorRecoveryType]] = None,
@@ -74,6 +75,9 @@ def get_command_view(
     if queued_setup_command_ids:
         for command_id in queued_setup_command_ids:
             command_history._add_to_setup_queue(command_id)
+    if queued_fixit_command_ids:
+        for command_id in queued_fixit_command_ids:
+            command_history._add_to_fixit_queue(command_id)
     if commands:
         for index, command in enumerate(commands):
             command_history._add(
@@ -93,7 +97,7 @@ def get_command_view(
         command_error_recovery_types=command_error_recovery_types or {},
         recovery_target_command_id=recovery_target_command_id,
         run_started_at=run_started_at,
-        latest_command_hash=latest_command_hash,
+        latest_protocol_command_hash=latest_command_hash,
         stopped_by_estop=False,
     )
 
@@ -133,6 +137,7 @@ def test_get_next_to_execute_returns_first_queued() -> None:
     subject = get_command_view(
         queue_status=QueueStatus.RUNNING,
         queued_command_ids=["command-id-1", "command-id-2"],
+        queued_fixit_command_ids=["fixit-id-1", "fixit-id-2"],
     )
 
     assert subject.get_next_to_execute() == "command-id-1"
@@ -153,6 +158,24 @@ def test_get_next_to_execute_prioritizes_setup_command_queue(
     )
 
     assert subject.get_next_to_execute() == "setup-command-id"
+
+
+@pytest.mark.parametrize(
+    "queue_status",
+    [QueueStatus.AWAITING_RECOVERY],
+)
+def test_get_next_to_execute_prioritizes_fixit_command_queue(
+    queue_status: QueueStatus,
+) -> None:
+    """It should prioritize fixit command queue over protocol command queue."""
+    subject = get_command_view(
+        queue_status=queue_status,
+        queued_command_ids=["command-id-1", "command-id-2"],
+        queued_setup_command_ids=["setup-command-id"],
+        queued_fixit_command_ids=["fixit-1", "fixit-2"],
+    )
+
+    assert subject.get_next_to_execute() == "fixit-1"
 
 
 def test_get_next_to_execute_returns_none_when_no_queued() -> None:
@@ -186,6 +209,20 @@ def test_get_next_to_execute_returns_no_commands_if_paused() -> None:
         queue_status=QueueStatus.PAUSED,
         queued_setup_command_ids=["setup-id-1", "setup-id-2"],
         queued_command_ids=["command-id-1", "command-id-2"],
+        queued_fixit_command_ids=["fixit-id-1", "fixit-id-2"],
+    )
+    result = subject.get_next_to_execute()
+
+    assert result is None
+
+
+def test_get_next_to_execute_returns_no_commands_if_awaiting_recovery_no_fixit() -> None:
+    """It should not return any type of command if the engine is awaiting-recovery."""
+    subject = get_command_view(
+        queue_status=QueueStatus.AWAITING_RECOVERY,
+        queued_setup_command_ids=["setup-id-1", "setup-id-2"],
+        queued_command_ids=["command-id-1", "command-id-2"],
+        queued_fixit_command_ids=[],
     )
     result = subject.get_next_to_execute()
 
@@ -486,12 +523,69 @@ action_allowed_specs: List[ActionAllowedSpec] = [
         ),
         expected_error=errors.SetupCommandNotAllowedError,
     ),
-    # Resuming from error recovery is not implemented yet.
-    # https://opentrons.atlassian.net/browse/EXEC-301
+    # fixit command is disallowed if not in recovery mode
     ActionAllowedSpec(
-        subject=get_command_view(),
+        subject=get_command_view(queue_status=QueueStatus.RUNNING),
+        action=QueueCommandAction(
+            request=cmd.HomeCreate(
+                params=cmd.HomeParams(),
+                intent=cmd.CommandIntent.FIXIT,
+            ),
+            request_hash=None,
+            command_id="command-id",
+            created_at=datetime(year=2021, month=1, day=1),
+        ),
+        expected_error=errors.FixitCommandNotAllowedError,
+    ),
+    ActionAllowedSpec(
+        subject=get_command_view(
+            queue_status=QueueStatus.AWAITING_RECOVERY,
+            failed_command=CommandEntry(
+                index=2,
+                command=create_failed_command(
+                    command_id="command-id-3",
+                    error=ErrorOccurrence(
+                        id="error-id",
+                        errorType="ProtocolEngineError",
+                        createdAt=datetime(year=2022, month=2, day=2),
+                        detail="oh no",
+                        errorCode=ErrorCodes.GENERAL_ERROR.value.code,
+                    ),
+                ),
+            ),
+        ),
+        action=QueueCommandAction(
+            request=cmd.HomeCreate(
+                params=cmd.HomeParams(),
+                intent=cmd.CommandIntent.FIXIT,
+            ),
+            request_hash=None,
+            command_id="command-id",
+            created_at=datetime(year=2021, month=1, day=1),
+        ),
+        expected_error=None,
+    ),
+    # resume from recovery not allowed if fixit commands in queue
+    ActionAllowedSpec(
+        subject=get_command_view(
+            queue_status=QueueStatus.AWAITING_RECOVERY,
+            queued_fixit_command_ids=["fixit-id-1", "fixit-id-2"],
+            failed_command=CommandEntry(
+                index=2,
+                command=create_failed_command(
+                    command_id="command-id-3",
+                    error=ErrorOccurrence(
+                        id="error-id",
+                        errorType="ProtocolEngineError",
+                        createdAt=datetime(year=2022, month=2, day=2),
+                        detail="oh no",
+                        errorCode=ErrorCodes.GENERAL_ERROR.value.code,
+                    ),
+                ),
+            ),
+        ),
         action=ResumeFromRecoveryAction(),
-        expected_error=NotImplementedError,
+        expected_error=errors.ResumeFromRecoveryNotAllowedError,
     ),
 ]
 
@@ -752,7 +846,7 @@ def test_get_current() -> None:
         queued_command_ids=[],
         commands=[command],
     )
-    assert subject.get_current() == CurrentCommand(
+    assert subject.get_current() == CommandPointer(
         index=0,
         command_id="command-id",
         command_key="command-key",
@@ -772,7 +866,7 @@ def test_get_current() -> None:
     subject = get_command_view(commands=[command_1, command_2])
     subject.state.command_history._set_terminal_command_id(command_1.id)
 
-    assert subject.get_current() == CurrentCommand(
+    assert subject.get_current() == CommandPointer(
         index=1,
         command_id="command-id-2",
         command_key="key-2",
@@ -792,7 +886,7 @@ def test_get_current() -> None:
     subject = get_command_view(commands=[command_1, command_2])
     subject.state.command_history._set_terminal_command_id(command_1.id)
 
-    assert subject.get_current() == CurrentCommand(
+    assert subject.get_current() == CommandPointer(
         index=1,
         command_id="command-id-2",
         command_key="key-2",
@@ -931,4 +1025,4 @@ def test_get_slice_default_cursor_queued() -> None:
 def test_get_latest_command_hash() -> None:
     """It should get the latest command hash from state, if set."""
     subject = get_command_view(latest_command_hash="abc123")
-    assert subject.get_latest_command_hash() == "abc123"
+    assert subject.get_latest_protocol_command_hash() == "abc123"

@@ -63,7 +63,7 @@ describe('pipette data accessors', () => {
   })
 
   describe('getPipetteSpecsV2', () => {
-    it('returns the correct info for p1000_single_flex', () => {
+    it('returns the correct info for p1000_single_flex which should be the latest model version 3.6', () => {
       const mockP1000Specs = {
         $otSharedSchema: '#/pipette/schemas/2/pipetteGeometrySchema.json',
         availableSensors: {
@@ -77,7 +77,7 @@ describe('pipette data accessors', () => {
         channels: 1,
         displayCategory: 'FLEX',
         displayName: 'Flex 1-Channel 1000 μL',
-        dropTipConfigurations: { plungerEject: { current: 1, speed: 10 } },
+        dropTipConfigurations: { plungerEject: { current: 1, speed: 15 } },
         liquids: {
           default: {
             $otSharedSchema:
@@ -124,7 +124,7 @@ describe('pipette data accessors', () => {
         plungerHomingConfigurations: { current: 1, speed: 30 },
         plungerMotorConfigurations: { idle: 0.3, run: 1 },
         plungerPositionsConfigurations: {
-          default: { blowout: 76.5, bottom: 71.5, drop: 90.5, top: 0.5 },
+          default: { blowout: 76.5, bottom: 71.5, drop: 90.5, top: 0 },
         },
         quirks: [],
         shaftDiameter: 4.5,
@@ -142,7 +142,7 @@ describe('pipette data accessors', () => {
       )
     })
   })
-  it('returns the correct liquid info for a p50 pipette with default and lowVolume', () => {
+  it('returns the correct liquid info for a p50 pipette model version with default and lowVolume', () => {
     const tiprack50uL = 'opentrons/opentrons_flex_96_tiprack_50ul/1'
     const tiprackFilter50uL = 'opentrons/opentrons_flex_96_filtertiprack_50ul/1'
 
@@ -158,6 +158,7 @@ describe('pipette data accessors', () => {
       minVolume: 5,
       supportedTips: {
         t50: {
+          uiMaxFlowRate: 57,
           aspirate: {
             default: {
               1: expect.anything(),
@@ -205,27 +206,28 @@ describe('pipette data accessors', () => {
       minVolume: 1,
       supportedTips: {
         t50: {
+          uiMaxFlowRate: 26.7,
           aspirate: {
             default: {
               1: expect.anything(),
             },
           },
           defaultAspirateFlowRate: {
-            default: 35,
+            default: 26.7,
             valuesByApiLevel: {
-              2.14: 35,
+              2.14: 26.7,
             },
           },
           defaultBlowOutFlowRate: {
-            default: 57,
+            default: 26.7,
             valuesByApiLevel: {
-              2.14: 57,
+              2.14: 26.7,
             },
           },
           defaultDispenseFlowRate: {
-            default: 57,
+            default: 26.7,
             valuesByApiLevel: {
-              2.14: 57,
+              2.14: 26.7,
             },
           },
           defaultFlowAcceleration: 1200,

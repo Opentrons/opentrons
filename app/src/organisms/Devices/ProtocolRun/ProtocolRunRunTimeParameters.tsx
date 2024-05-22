@@ -1,6 +1,11 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import styled, { css } from 'styled-components'
+import {
+  RUN_ACTION_TYPE_PLAY,
+  RUN_STATUS_STOPPED,
+  RUN_STATUSES_TERMINAL,
+} from '@opentrons/api-client'
 import { formatRunTimeParameterValue } from '@opentrons/shared-data'
 import {
   ALIGN_CENTER,
@@ -23,8 +28,11 @@ import { Banner } from '../../../atoms/Banner'
 import { Divider } from '../../../atoms/structure'
 import { Tooltip } from '../../../atoms/Tooltip'
 import { useMostRecentCompletedAnalysis } from '../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
+import { useRunStatus } from '../../RunTimeControl/hooks'
+import { useNotifyRunQuery } from '../../../resources/runs'
 
 import type { RunTimeParameter } from '@opentrons/shared-data'
+import type { RunStatus } from '@opentrons/api-client'
 
 interface ProtocolRunRuntimeParametersProps {
   runId: string
@@ -34,18 +42,36 @@ export function ProtocolRunRuntimeParameters({
 }: ProtocolRunRuntimeParametersProps): JSX.Element {
   const { t } = useTranslation('protocol_setup')
   const mostRecentAnalysis = useMostRecentCompletedAnalysis(runId)
-  const runTimeParameters = mostRecentAnalysis?.runTimeParameters ?? []
-  const hasParameter = runTimeParameters.length > 0
-
-  const hasCustomValues = runTimeParameters.some(
+  const runStatus = useRunStatus(runId)
+  const isRunTerminal =
+    runStatus == null
+      ? false
+      : (RUN_STATUSES_TERMINAL as RunStatus[]).includes(runStatus)
+  // we access runTimeParameters from the run record rather than the most recent analysis
+  // because the most recent analysis may not reflect the selected run (e.g. cloning a run
+  // from a historical protocol run from the device details page)
+  const run = useNotifyRunQuery(runId).data
+  const runTimeParameters =
+    (isRunTerminal
+      ? run?.data?.runTimeParameters
+      : mostRecentAnalysis?.runTimeParameters) ?? []
+  const hasRunTimeParameters = runTimeParameters.length > 0
+  const hasCustomRunTimeParameterValues = runTimeParameters.some(
     parameter => parameter.value !== parameter.default
   )
+
+  const runActions = run?.data.actions
+  const hasRunStarted = runActions?.some(
+    action => action.actionType === RUN_ACTION_TYPE_PLAY
+  )
+  const isRunCancelledWithoutStarting =
+    !hasRunStarted && runStatus === RUN_STATUS_STOPPED
 
   return (
     <>
       <Flex
         flexDirection={DIRECTION_COLUMN}
-        padding={SPACING.spacing16}
+        padding={hasRunTimeParameters ? SPACING.spacing16 : undefined}
         gridGap={SPACING.spacing10}
       >
         <Flex
@@ -53,16 +79,20 @@ export function ProtocolRunRuntimeParameters({
           gridGap={SPACING.spacing8}
           alignItems={ALIGN_CENTER}
         >
-          <StyledText as="h3" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
-            {t('parameters')}
-          </StyledText>
-          {hasParameter ? (
+          {hasRunTimeParameters ? (
+            <StyledText as="h3" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
+              {t('parameters')}
+            </StyledText>
+          ) : null}
+          {hasRunTimeParameters ? (
             <StyledText as="label" color={COLORS.grey60}>
-              {hasCustomValues ? t('custom_values') : t('default_values')}
+              {hasCustomRunTimeParameterValues
+                ? t('custom_values')
+                : t('default_values')}
             </StyledText>
           ) : null}
         </Flex>
-        {hasParameter ? (
+        {hasRunTimeParameters ? (
           <Banner
             type="informing"
             width="100%"
@@ -77,9 +107,14 @@ export function ProtocolRunRuntimeParameters({
           </Banner>
         ) : null}
       </Flex>
-      {!hasParameter ? (
+      {!hasRunTimeParameters ? (
         <Flex padding={SPACING.spacing16}>
-          <InfoScreen contentType="parameters" />
+          <InfoScreen
+            contentType={
+              isRunCancelledWithoutStarting ? 'runNotStarted' : 'parameters'
+            }
+            t={t}
+          />
         </Flex>
       ) : (
         <>

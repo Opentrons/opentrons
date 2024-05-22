@@ -1,11 +1,10 @@
 import * as React from 'react'
-import { UseQueryResult } from 'react-query'
 import { fireEvent, screen, waitFor } from '@testing-library/react'
 import { vi, it, expect, describe, beforeEach, afterEach } from 'vitest'
 import { when } from 'vitest-when'
 import { MemoryRouter } from 'react-router-dom'
 
-import { useDeckConfigurationQuery } from '@opentrons/react-api-client'
+import { RUN_STATUS_IDLE } from '@opentrons/api-client'
 import {
   FLEX_ROBOT_TYPE,
   WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE,
@@ -36,13 +35,16 @@ import { SetupInstructionsModal } from '../SetupInstructionsModal'
 import { FixtureTable } from '../FixtureTable'
 import { ModulesAndDeckMapViewModal } from '../ModulesAndDeckMapViewModal'
 import { ProtocolSetupModulesAndDeck } from '..'
+import { useNotifyDeckConfigurationQuery } from '../../../resources/deck_configuration'
+import { useRunStatus } from '../../RunTimeControl/hooks'
 
 import type { CutoutConfig, DeckConfiguration } from '@opentrons/shared-data'
+import type { UseQueryResult } from 'react-query'
 
-vi.mock('@opentrons/react-api-client')
 vi.mock('../../../resources/runs')
 vi.mock('../../../redux/discovery')
 vi.mock('../../../organisms/Devices/hooks')
+vi.mock('../../../resources/deck_configuration')
 vi.mock(
   '../../../organisms/LabwarePositionCheck/useMostRecentCompletedAnalysis'
 )
@@ -53,6 +55,7 @@ vi.mock('../../ModuleWizardFlows')
 vi.mock('../FixtureTable')
 vi.mock('../../Devices/ProtocolRun/SetupModuleAndDeck/LocationConflictModal')
 vi.mock('../ModulesAndDeckMapViewModal')
+vi.mock('../../RunTimeControl/hooks')
 
 const ROBOT_NAME = 'otie'
 const RUN_ID = '1'
@@ -107,7 +110,7 @@ describe('ProtocolSetupModulesAndDeck', () => {
       .calledWith(mockRobotSideAnalysis, flexDeckDef)
       .thenReturn([])
     when(vi.mocked(getAttachedProtocolModuleMatches))
-      .calledWith([], [])
+      .calledWith([], [], [])
       .thenReturn([])
     when(vi.mocked(getUnmatchedModulesForProtocol))
       .calledWith([], [])
@@ -119,7 +122,7 @@ describe('ProtocolSetupModulesAndDeck', () => {
     vi.mocked(LocationConflictModal).mockReturnValue(
       <div>mock location conflict modal</div>
     )
-    vi.mocked(useDeckConfigurationQuery).mockReturnValue(({
+    vi.mocked(useNotifyDeckConfigurationQuery).mockReturnValue(({
       data: [],
     } as unknown) as UseQueryResult<DeckConfiguration>)
     when(vi.mocked(useRunCalibrationStatus))
@@ -134,6 +137,7 @@ describe('ProtocolSetupModulesAndDeck', () => {
       chainLiveCommands: mockChainLiveCommands,
     } as any)
     vi.mocked(FixtureTable).mockReturnValue(<div>mock FixtureTable</div>)
+    vi.mocked(useRunStatus).mockReturnValue(RUN_STATUS_IDLE)
   })
 
   afterEach(() => {
@@ -148,7 +152,7 @@ describe('ProtocolSetupModulesAndDeck', () => {
       },
     ])
     render()
-    screen.getByText('Module')
+    screen.getByText('Deck hardware')
     screen.getByText('Location')
     screen.getByText('Status')
     screen.getByText('Setup Instructions')
@@ -307,13 +311,13 @@ describe('ProtocolSetupModulesAndDeck', () => {
   })
 
   it('should render mock Fixture table and module location conflict', () => {
-    vi.mocked(useDeckConfigurationQuery).mockReturnValue({
+    vi.mocked(useNotifyDeckConfigurationQuery).mockReturnValue({
       data: [mockFixture],
     } as UseQueryResult<DeckConfiguration>)
     vi.mocked(getAttachedProtocolModuleMatches).mockReturnValue([
       {
         ...mockProtocolModuleInfo[0],
-        attachedModuleMatch: calibratedMockApiHeaterShaker,
+        attachedModuleMatch: undefined,
         slotName: 'D3',
       },
     ])

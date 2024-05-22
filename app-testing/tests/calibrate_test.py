@@ -1,4 +1,5 @@
 """Test the initial state the application with various setups."""
+
 import time
 from typing import List
 

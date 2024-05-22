@@ -1,4 +1,4 @@
-import { DispatchRequestsType } from '../../redux/robot-api'
+import type { DispatchRequestsType } from '../../redux/robot-api'
 import type { TipLengthCalibrationSession } from '../../redux/sessions/types'
 
 export interface CalibrateTipLengthParentProps {

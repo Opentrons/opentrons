@@ -7,9 +7,7 @@ from abr_testing.automation import jira_tool, google_sheets_tool, google_drive_t
 import shutil
 import os
 import subprocess
-import json
 import sys
-import gspread  # type: ignore[import]
 
 
 def get_error_runs_from_robot(ip: str) -> List[str]:
@@ -49,6 +47,7 @@ def get_error_info_from_robot(
     ) = read_robot_logs.get_error_info(results)
     # JIRA Ticket Fields
     failure_level = "Level " + str(error_level) + " Failure"
+
     components = [failure_level, "Flex-RABR"]
     affects_version = results["API_Version"]
     parent = results.get("robot_name", "")
@@ -92,13 +91,6 @@ if __name__ == "__main__":
         help="Path to long term storage directory for run logs.",
     )
     parser.add_argument(
-        "robot_ip",
-        metavar="ROBOT_IP",
-        type=str,
-        nargs=1,
-        help="IP address of robot as string.",
-    )
-    parser.add_argument(
         "jira_api_token",
         metavar="JIRA_API_TOKEN",
         type=str,
@@ -130,14 +122,19 @@ if __name__ == "__main__":
     )
     args = parser.parse_args()
     storage_directory = args.storage_directory[0]
-    ip = args.robot_ip[0]
+    ip = str(input("Enter Robot IP: "))
     url = "https://opentrons.atlassian.net"
     api_token = args.jira_api_token[0]
     email = args.email[0]
     board_id = args.board_id[0]
     reporter_id = args.reporter_id[0]
     ticket = jira_tool.JiraTicket(url, api_token, email)
-    error_runs = get_error_runs_from_robot(ip)
+    ticket.issues_on_board(board_id)
+    try:
+        error_runs = get_error_runs_from_robot(ip)
+    except requests.exceptions.InvalidURL:
+        print("Invalid IP address.")
+        sys.exit()
     one_run = error_runs[-1]  # Most recent run with error.
     (
         summary,
@@ -147,7 +144,8 @@ if __name__ == "__main__":
         whole_description_str,
         run_log_file_path,
     ) = get_error_info_from_robot(ip, one_run, storage_directory)
-    # get calibration data
+    affects_version = "internal release - any"
+    # Get Calibration Data
     saved_file_path_calibration, calibration = read_robot_logs.get_calibration_offsets(
         ip, storage_directory
     )
@@ -156,6 +154,7 @@ if __name__ == "__main__":
     # TODO: make argument or see if I can get rid of with using board_id.
     project_key = "RABR"
     parent_key = project_key + "-" + robot[-1]
+    # TODO: read board to see if ticket for run id already exists.
     # CREATE TICKET
     issue_key = ticket.create_ticket(
         summary,
@@ -172,7 +171,7 @@ if __name__ == "__main__":
     issue_url = ticket.open_issue(issue_key)
     # MOVE FILES TO ERROR FOLDER.
     error_files = [saved_file_path_calibration, run_log_file_path] + file_paths
-    error_folder_path = os.path.join(storage_directory, str("RABR-238"))
+    error_folder_path = os.path.join(storage_directory, issue_key)
     os.makedirs(error_folder_path, exist_ok=True)
     for source_file in error_files:
         destination_file = os.path.join(
@@ -184,35 +183,30 @@ if __name__ == "__main__":
     # CONNECT TO GOOGLE DRIVE
     credentials_path = os.path.join(storage_directory, "credentials.json")
     google_sheet_name = "ABR-run-data"
-    try:
-        google_drive = google_drive_tool.google_drive(
-            credentials_path,
-            "1Cvej0eadFOTZr9ILRXJ0Wg65ymOtxL4m",
-            "rhyann.clarke@opentrons.ocm",
-        )
-        print("Connected to google drive.")
-    except json.decoder.JSONDecodeError:
-        print(
-            "Credential file is damaged. Get from https://console.cloud.google.com/apis/credentials"
-        )
-        sys.exit()
+    google_drive = google_drive_tool.google_drive(
+        credentials_path,
+        "1Cvej0eadFOTZr9ILRXJ0Wg65ymOtxL4m",
+        "rhyann.clarke@opentrons.ocm",
+    )
     # CONNECT TO GOOGLE SHEET
-    try:
-        google_sheet = google_sheets_tool.google_sheet(
-            credentials_path, google_sheet_name, 0
-        )
-        print(f"Connected to google sheet: {google_sheet_name}")
-    except gspread.exceptions.APIError:
-        print("ERROR: Check google sheet name. Check credentials file.")
-        sys.exit()
+    google_sheet = google_sheets_tool.google_sheet(
+        credentials_path, google_sheet_name, 0
+    )
     # WRITE ERRORED RUN TO GOOGLE SHEET
     error_run_log = os.path.join(error_folder_path, os.path.basename(run_log_file_path))
     google_drive.upload_file(error_run_log)
     run_id = os.path.basename(error_run_log).split("_")[1].split(".")[0]
-    runs_and_robots, headers = abr_google_drive.create_data_dictionary(
-        run_id, error_folder_path, issue_url
-    )
-    read_robot_logs.write_to_local_and_google_sheet(
-        runs_and_robots, storage_directory, google_sheet_name, google_sheet, headers
-    )
+    (
+        runs_and_robots,
+        headers,
+        runs_and_lpc,
+        headers_lpc,
+    ) = abr_google_drive.create_data_dictionary(run_id, error_folder_path, issue_url)
+
+    start_row = google_sheet.get_index_row() + 1
+    google_sheet.batch_update_cells(runs_and_robots, "A", start_row, "0")
     print("Wrote run to ABR-run-data")
+    # Add LPC to google sheet
+    google_sheet_lpc = google_sheets_tool.google_sheet(credentials_path, "ABR-LPC", 0)
+    start_row_lpc = google_sheet_lpc.get_index_row() + 1
+    google_sheet_lpc.batch_update_cells(runs_and_lpc, "A", start_row_lpc, "0")

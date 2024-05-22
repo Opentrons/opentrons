@@ -9,6 +9,7 @@ from opentrons.protocol_engine.state.module_substates import (
     MagneticModuleSubState,
     MagneticModuleId,
 )
+from opentrons.protocol_engine.commands.command import SuccessData
 from opentrons.protocol_engine.commands.magnetic_module import (
     DisengageParams,
     DisengageResult,
@@ -45,4 +46,4 @@ async def test_magnetic_module_disengage_implementation(
     result = await subject.execute(params=params)
 
     decoy.verify(await magnetic_module_hw.deactivate(), times=1)
-    assert result == DisengageResult()
+    assert result == SuccessData(public=DisengageResult(), private=None)

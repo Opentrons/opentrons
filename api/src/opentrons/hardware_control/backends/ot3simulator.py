@@ -104,7 +104,7 @@ class OT3Simulator(FlexBackend):
     async def build(
         cls,
         attached_instruments: Dict[OT3Mount, Dict[str, Optional[str]]],
-        attached_modules: Dict[str, List[str]],
+        attached_modules: Dict[str, List[modules.SimulatingModule]],
         config: OT3Config,
         loop: asyncio.AbstractEventLoop,
         strict_attached_instruments: bool = True,
@@ -130,7 +130,7 @@ class OT3Simulator(FlexBackend):
     def __init__(
         self,
         attached_instruments: Dict[OT3Mount, Dict[str, Optional[str]]],
-        attached_modules: Dict[str, List[str]],
+        attached_modules: Dict[str, List[modules.SimulatingModule]],
         config: OT3Config,
         loop: asyncio.AbstractEventLoop,
         strict_attached_instruments: bool = True,
@@ -346,7 +346,7 @@ class OT3Simulator(FlexBackend):
         plunger_speed: float,
         threshold_pascals: float,
         output_format: OutputOptions = OutputOptions.can_bus_only,
-        data_file: Optional[str] = None,
+        data_files: Optional[Dict[InstrumentProbeType, str]] = None,
         auto_zero_sensor: bool = True,
         num_baseline_reads: int = 10,
         probe: InstrumentProbeType = InstrumentProbeType.PRIMARY,
@@ -605,13 +605,14 @@ class OT3Simulator(FlexBackend):
     @ensure_yield
     async def watch(self, loop: asyncio.AbstractEventLoop) -> None:
         new_mods_at_ports = []
-        for mod, serials in self._stubbed_attached_modules.items():
-            for serial in serials:
+        for mod_name, list_of_modules in self._stubbed_attached_modules.items():
+            for module_details in list_of_modules:
                 new_mods_at_ports.append(
                     modules.SimulatingModuleAtPort(
-                        port=f"/dev/ot_module_sim_{mod}{str(serial)}",
-                        name=mod,
-                        serial_number=serial,
+                        port=f"/dev/ot_module_sim_{mod_name}{str(module_details.serial_number)}",
+                        name=mod_name,
+                        serial_number=module_details.serial_number,
+                        model=module_details.model,
                     )
                 )
         await self.module_controls.register_modules(new_mods_at_ports=new_mods_at_ports)
@@ -780,7 +781,11 @@ class OT3Simulator(FlexBackend):
             for axis in self._present_axes
         }
 
-    async def get_tip_status(self, mount: OT3Mount) -> TipStateType:
+    async def get_tip_status(
+        self,
+        mount: OT3Mount,
+        follow_singular_sensor: Optional[InstrumentProbeType] = None,
+    ) -> TipStateType:
         return TipStateType(self._sim_tip_state[mount])
 
     def current_tip_state(self, mount: OT3Mount) -> Optional[bool]:

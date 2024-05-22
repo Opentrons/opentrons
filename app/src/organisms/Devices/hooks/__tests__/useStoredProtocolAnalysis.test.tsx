@@ -1,9 +1,9 @@
 import * as React from 'react'
 import { vi, it, expect, describe, beforeEach, afterEach } from 'vitest'
 import { when } from 'vitest-when'
-import { QueryClient, QueryClientProvider, UseQueryResult } from 'react-query'
+import { QueryClient, QueryClientProvider } from 'react-query'
 import { Provider } from 'react-redux'
-import { createStore, Store } from 'redux'
+import { createStore } from 'redux'
 import { renderHook } from '@testing-library/react'
 
 import {
@@ -12,12 +12,10 @@ import {
   parsePipetteEntity,
 } from '@opentrons/api-client'
 import { useProtocolQuery } from '@opentrons/react-api-client'
+import { OT2_ROBOT_TYPE } from '@opentrons/shared-data'
 
 import { storedProtocolData } from '../../../../redux/protocol-storage/__fixtures__'
-import {
-  getStoredProtocol,
-  StoredProtocolData,
-} from '../../../../redux/protocol-storage'
+import { getStoredProtocol } from '../../../../redux/protocol-storage'
 import { useStoredProtocolAnalysis } from '../useStoredProtocolAnalysis'
 import {
   LABWARE_ENTITY,
@@ -27,7 +25,10 @@ import {
 } from '../__fixtures__/storedProtocolAnalysis'
 import { useNotifyRunQuery } from '../../../../resources/runs'
 
+import type { Store } from 'redux'
+import type { UseQueryResult } from 'react-query'
 import type { Protocol, Run } from '@opentrons/api-client'
+import type { StoredProtocolData } from '../../../../redux/protocol-storage'
 
 vi.mock('@opentrons/api-client')
 vi.mock('@opentrons/react-api-client')
@@ -44,6 +45,7 @@ const modifiedStoredProtocolData = {
     errors: storedProtocolData?.mostRecentAnalysis?.errors,
     runTimeParameters:
       storedProtocolData?.mostRecentAnalysis?.runTimeParameters,
+    robotType: OT2_ROBOT_TYPE,
   },
 }
 

@@ -8,13 +8,16 @@ import merge from 'lodash/merge'
 import omit from 'lodash/omit'
 import produce from 'immer'
 import { createEmptyLiquidState, createTipLiquidState } from '../utils'
-import { makeContext, DEFAULT_PIPETTE, SOURCE_LABWARE } from '../fixtures'
-
 import {
-  dispenseUpdateLiquidState,
-  DispenseUpdateLiquidStateArgs,
-} from '../getNextRobotStateAndWarnings/dispenseUpdateLiquidState'
+  makeContext,
+  DEFAULT_PIPETTE,
+  SOURCE_LABWARE,
+  getInitialRobotStateStandard,
+} from '../fixtures'
+import { dispenseUpdateLiquidState } from '../getNextRobotStateAndWarnings/dispenseUpdateLiquidState'
+
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
+import type { DispenseUpdateLiquidStateArgs } from '../getNextRobotStateAndWarnings/dispenseUpdateLiquidState'
 import type { InvariantContext, RobotState } from '../types'
 
 const fixture96Plate = _fixture96Plate as LabwareDefinition2
@@ -33,6 +36,10 @@ beforeEach(() => {
     useFullVolume: false,
     labwareId: SOURCE_LABWARE,
     wellName: 'A1',
+    robotStateAndWarnings: {
+      robotState: getInitialRobotStateStandard(invariantContext),
+      warnings: [],
+    },
   }
 })
 
@@ -396,6 +403,10 @@ describe('...8-channel pipette', () => {
             useFullVolume: false,
             volume: 150,
             wellName: 'A1',
+            robotStateAndWarnings: {
+              robotState: getInitialRobotStateStandard(invariantContext),
+              warnings: [],
+            },
           },
           initialLiquidState
         )

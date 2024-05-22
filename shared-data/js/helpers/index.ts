@@ -1,8 +1,8 @@
 import uniq from 'lodash/uniq'
 
 import { OPENTRONS_LABWARE_NAMESPACE } from '../constants'
-import standardOt2DeckDef from '../../deck/definitions/4/ot2_standard.json'
-import standardFlexDeckDef from '../../deck/definitions/4/ot3_standard.json'
+import standardOt2DeckDef from '../../deck/definitions/5/ot2_standard.json'
+import standardFlexDeckDef from '../../deck/definitions/5/ot3_standard.json'
 import type {
   DeckDefinition,
   LabwareDefinition2,
@@ -16,10 +16,12 @@ export { getWellTotalVolume } from './getWellTotalVolume'
 export { wellIsRect } from './wellIsRect'
 export { orderWells } from './orderWells'
 export { get96Channel384WellPlateWells } from './get96Channel384WellPlateWells'
+export { getTipTypeFromTipRackDefinition } from './getTipTypeFromTipRackDefinition'
 
 export * from './parseProtocolData'
 export * from './volume'
 export * from './wellSets'
+export * from './getAreFlexSlotsAdjacent'
 export * from './getModuleVizDims'
 export * from './getVectorDifference'
 export * from './getVectorSum'
@@ -27,6 +29,7 @@ export * from './getLoadedLabwareDefinitionsByUri'
 export * from './getOccludedSlotCountForModule'
 export * from './labwareInference'
 export * from './getAddressableAreasInProtocol'
+export * from './getFlexSurroundingSlots'
 export * from './getSimplestFlexDeckConfig'
 export * from './formatRunTimeParameterDefaultValue'
 export * from './formatRunTimeParameterValue'

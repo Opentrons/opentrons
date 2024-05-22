@@ -22,11 +22,11 @@ export const AboutGripperSlideout = (
   props: AboutGripperSlideoutProps
 ): JSX.Element | null => {
   const { serialNumber, firmwareVersion, isExpanded, onCloseClick } = props
-  const { i18n, t } = useTranslation(['device_details', 'shared'])
+  const { i18n, t } = useTranslation(['device_details', 'shared', 'branded'])
 
   return (
     <Slideout
-      title={t('about_flex_gripper')}
+      title={t('branded:about_flex_gripper')}
       onCloseClick={onCloseClick}
       isExpanded={isExpanded}
       footer={

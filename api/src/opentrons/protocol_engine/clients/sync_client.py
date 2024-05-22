@@ -27,6 +27,7 @@ from ..types import (
     Liquid,
     NozzleLayoutConfigurationType,
     AddressableOffsetVector,
+    LabwareOffsetCreate,
 )
 from .transports import ChildThreadTransport
 
@@ -92,6 +93,10 @@ class SyncClient:
             labware_id=labware_id,
         )
 
+    def add_labware_offset(self, request: LabwareOffsetCreate) -> None:
+        """Add a labware offset."""
+        self._transport.call_method("add_labware_offset", request=request)
+
     def set_pipette_movement_speed(
         self, pipette_id: str, speed: Optional[float]
     ) -> None:
@@ -126,6 +131,19 @@ class SyncClient:
         result = self._transport.execute_command(request=request)
 
         return commands.LoadLabwareResult.model_validate(result)
+
+    def reload_labware(
+        self,
+        labware_id: str,
+    ) -> commands.ReloadLabwareResult:
+        """Execute a ReloadLabware command and return the result."""
+        request = commands.ReloadLabwareCreate(
+            params=commands.ReloadLabwareParams(
+                labwareId=labware_id,
+            )
+        )
+        result = self._transport.execute_command(request=request)
+        return cast(commands.ReloadLabwareResult, result)
 
     # TODO (spp, 2022-12-14): https://opentrons.atlassian.net/browse/RLAB-237
     def move_labware(

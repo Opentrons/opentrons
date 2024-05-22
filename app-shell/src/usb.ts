@@ -1,8 +1,6 @@
-import { ipcMain, IpcMainInvokeEvent } from 'electron'
-import axios, { AxiosRequestConfig } from 'axios'
+import { ipcMain } from 'electron'
+import axios from 'axios'
 import FormData from 'form-data'
-import fs from 'fs'
-import path from 'path'
 
 import {
   fetchSerialPortList,
@@ -12,7 +10,6 @@ import {
 } from '@opentrons/usb-bridge/node-client'
 
 import { createLogger } from './log'
-import { getProtocolSrcFilePaths } from './protocol-storage'
 import { usbRequestsStart, usbRequestsStop } from './config/actions'
 import {
   SYSTEM_INFO_INITIALIZED,
@@ -20,6 +17,9 @@ import {
   USB_DEVICE_REMOVED,
 } from './constants'
 
+import type { IpcMainInvokeEvent } from 'electron'
+import type { AxiosRequestConfig } from 'axios'
+import type { IPCSafeFormData } from '@opentrons/app/src/redux/shell/types'
 import type { UsbDevice } from '@opentrons/app/src/redux/system-info/types'
 import type { PortInfo } from '@opentrons/usb-bridge/node-client'
 import type { Action, Dispatch } from './types'
@@ -83,6 +83,17 @@ function isUsbDeviceOt3(device: UsbDevice): boolean {
     device.vendorId === parseInt(DEFAULT_VENDOR_ID, 16)
   )
 }
+
+function reconstructFormData(ipcSafeFormData: IPCSafeFormData): FormData {
+  const result = new FormData()
+  ipcSafeFormData.forEach(entry => {
+    entry.type === 'file'
+      ? result.append(entry.name, Buffer.from(entry.value), entry.filename)
+      : result.append(entry.name, entry.value)
+  })
+  return result
+}
+
 async function usbListener(
   _event: IpcMainInvokeEvent,
   config: AxiosRequestConfig
@@ -92,21 +103,9 @@ async function usbListener(
   let formHeaders = {}
 
   // check for formDataProxy
-  if (data?.formDataProxy != null) {
+  if (data?.proxiedFormData != null) {
     // reconstruct FormData
-    const formData = new FormData()
-    const { protocolKey } = data.formDataProxy
-
-    const srcFilePaths: string[] = await getProtocolSrcFilePaths(protocolKey)
-
-    // create readable stream from file
-    srcFilePaths.forEach(srcFilePath => {
-      const readStream = fs.createReadStream(srcFilePath)
-      formData.append('files', readStream, path.basename(srcFilePath))
-    })
-
-    formData.append('key', protocolKey)
-
+    const formData = reconstructFormData(data.proxiedFormData)
     formHeaders = formData.getHeaders()
     data = formData
   }

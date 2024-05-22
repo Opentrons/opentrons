@@ -6,7 +6,8 @@ from typing_extensions import Literal
 import enum
 
 from opentrons.hardware_control.types import StatusBarState
-from .command import AbstractCommandImpl, BaseCommand, BaseCommandCreate
+from .command import AbstractCommandImpl, BaseCommand, BaseCommandCreate, SuccessData
+from ..errors.error_occurrence import ErrorOccurrence
 
 if TYPE_CHECKING:
     from ..execution import StatusBarHandler
@@ -48,22 +49,26 @@ class SetStatusBarResult(BaseModel):
 
 
 class SetStatusBarImplementation(
-    AbstractCommandImpl[SetStatusBarParams, SetStatusBarResult]
+    AbstractCommandImpl[SetStatusBarParams, SuccessData[SetStatusBarResult, None]]
 ):
     """setStatusBar command implementation."""
 
     def __init__(self, status_bar: StatusBarHandler, **kwargs: object) -> None:
         self._status_bar = status_bar
 
-    async def execute(self, params: SetStatusBarParams) -> SetStatusBarResult:
+    async def execute(
+        self, params: SetStatusBarParams
+    ) -> SuccessData[SetStatusBarResult, None]:
         """Execute the setStatusBar command."""
         if not self._status_bar.status_bar_should_not_be_changed():
             state = _animation_to_status_bar_state(params.animation)
             await self._status_bar.set_status_bar(state)
-        return SetStatusBarResult()
+        return SuccessData(public=SetStatusBarResult(), private=None)
 
 
-class SetStatusBar(BaseCommand[SetStatusBarParams, SetStatusBarResult]):
+class SetStatusBar(
+    BaseCommand[SetStatusBarParams, SetStatusBarResult, ErrorOccurrence]
+):
     """setStatusBar command model."""
 
     commandType: SetStatusBarCommandType = "setStatusBar"

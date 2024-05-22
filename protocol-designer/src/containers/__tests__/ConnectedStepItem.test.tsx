@@ -1,7 +1,8 @@
 import * as React from 'react'
 import { describe, it, beforeEach, vi } from 'vitest'
 import { screen } from '@testing-library/react'
-import { fixture96Plate } from '@opentrons/shared-data'
+import '@testing-library/jest-dom/vitest'
+import { fixture96Plate, fixtureTiprack1000ul } from '@opentrons/shared-data'
 import { renderWithProviders } from '../../__testing-utils__'
 import { i18n } from '../../localization'
 import {
@@ -49,8 +50,9 @@ const heaterShakerStepId = 'hsStepId'
 const thermocyclerStepId = 'tcStepId'
 const temperatureStepId = 'tempStepId'
 const moveLabwareStepId = 'moveLabwareId'
+const mixStepId = 'mixStepId'
+const moveLiquidStepId = 'moveLiquidStepId'
 
-//  TODO(jr, 4/8/24): add test coverage for mix and moveLiquid!!!
 describe('ConnectedStepItem', () => {
   let props: React.ComponentProps<typeof ConnectedStepItem>
   beforeEach(() => {
@@ -89,6 +91,14 @@ describe('ConnectedStepItem', () => {
         stepType: 'moveLabware',
         id: moveLabwareStepId,
       },
+      [mixStepId]: {
+        stepType: 'mix',
+        id: mixStepId,
+      },
+      [moveLiquidStepId]: {
+        stepType: 'moveLiquid',
+        id: moveLiquidStepId,
+      },
     })
     vi.mocked(getArgsAndErrorsByStepId).mockReturnValue({
       [pauseStepId]: {
@@ -115,6 +125,14 @@ describe('ConnectedStepItem', () => {
         errors: false,
         stepArgs: null,
       },
+      [mixStepId]: {
+        errors: false,
+        stepArgs: null,
+      },
+      [moveLiquidStepId]: {
+        errors: false,
+        stepArgs: null,
+      },
     })
     vi.mocked(getErrorStepId).mockReturnValue(null)
     vi.mocked(getHasTimelineWarningsPerStep).mockReturnValue({
@@ -124,6 +142,8 @@ describe('ConnectedStepItem', () => {
       [thermocyclerStepId]: false,
       [temperatureStepId]: false,
       [moveLabwareStepId]: false,
+      [mixStepId]: false,
+      [moveLiquidStepId]: false,
     })
     vi.mocked(getHasFormLevelWarningsPerStep).mockReturnValue({
       [pauseStepId]: false,
@@ -132,6 +152,8 @@ describe('ConnectedStepItem', () => {
       [thermocyclerStepId]: false,
       [temperatureStepId]: false,
       [moveLabwareStepId]: false,
+      [mixStepId]: false,
+      [moveLiquidStepId]: false,
     })
     vi.mocked(getInitialDeckSetup).mockReturnValue({
       pipettes: {},
@@ -179,6 +201,12 @@ describe('ConnectedStepItem', () => {
           slot: 'A2',
           def: fixture96Plate as LabwareDefinition2,
         },
+        tipId: {
+          id: 'tipId',
+          labwareDefURI: `opentrons/${fixtureTiprack1000ul.parameters.loadName}/1`,
+          slot: 'D2',
+          def: fixtureTiprack1000ul as LabwareDefinition2,
+        },
       },
     })
     vi.mocked(getCollapsedSteps).mockReturnValue({
@@ -188,6 +216,8 @@ describe('ConnectedStepItem', () => {
       [thermocyclerStepId]: true,
       [temperatureStepId]: true,
       [moveLabwareStepId]: true,
+      [mixStepId]: true,
+      [moveLiquidStepId]: true,
     })
     vi.mocked(getHoveredSubstep).mockReturnValue(null)
     vi.mocked(getSelectedStepId).mockReturnValue(pauseStepId)
@@ -198,6 +228,8 @@ describe('ConnectedStepItem', () => {
       thermocyclerStepId,
       moveLabwareStepId,
       temperatureStepId,
+      mixStepId,
+      moveLiquidStepId,
     ])
     vi.mocked(getMultiSelectItemIds).mockReturnValue(null)
     vi.mocked(getMultiSelectLastSelected).mockReturnValue(null)
@@ -260,6 +292,32 @@ describe('ConnectedStepItem', () => {
           newLocation: { slotName: 'B2' },
         },
       },
+      [mixStepId]: {
+        substepType: 'sourceDest',
+        multichannel: false,
+        commandCreatorFnName: 'mix',
+        parentStepId: mixStepId,
+        rows: [
+          {
+            activeTips: null,
+          },
+        ],
+      },
+      [moveLiquidStepId]: {
+        substepType: 'sourceDest',
+        multichannel: false,
+        commandCreatorFnName: 'transfer',
+        parentStepId: moveLiquidStepId,
+        rows: [
+          {
+            activeTips: { labwareId: 'tipId', wellName: 'A1' },
+            substepIndex: 2,
+            source: { well: 'A1', preIngreds: {}, postIngreds: {} },
+            dest: { well: 'A1', preIngreds: {}, postIngreds: {} },
+            volume: 50,
+          },
+        ],
+      },
     })
     vi.mocked(labwareIngredSelectors.getLiquidNamesById).mockReturnValue({})
     vi.mocked(getLabwareNicknamesById).mockReturnValue({})
@@ -286,6 +344,8 @@ describe('ConnectedStepItem', () => {
       [thermocyclerStepId]: true,
       [temperatureStepId]: true,
       [moveLabwareStepId]: true,
+      [mixStepId]: true,
+      [moveLiquidStepId]: true,
     })
     vi.mocked(getSelectedStepId).mockReturnValue(magnetStepId)
     props.stepId = magnetStepId
@@ -303,6 +363,8 @@ describe('ConnectedStepItem', () => {
       [thermocyclerStepId]: true,
       [temperatureStepId]: true,
       [moveLabwareStepId]: true,
+      [mixStepId]: true,
+      [moveLiquidStepId]: true,
     })
     vi.mocked(getSelectedStepId).mockReturnValue(heaterShakerStepId)
     props.stepId = heaterShakerStepId
@@ -326,6 +388,8 @@ describe('ConnectedStepItem', () => {
       [thermocyclerStepId]: false,
       [temperatureStepId]: true,
       [moveLabwareStepId]: true,
+      [mixStepId]: true,
+      [moveLiquidStepId]: true,
     })
     vi.mocked(getSelectedStepId).mockReturnValue(thermocyclerStepId)
     props.stepId = thermocyclerStepId
@@ -348,6 +412,8 @@ describe('ConnectedStepItem', () => {
       [thermocyclerStepId]: true,
       [temperatureStepId]: false,
       [moveLabwareStepId]: true,
+      [mixStepId]: true,
+      [moveLiquidStepId]: true,
     })
     vi.mocked(getSelectedStepId).mockReturnValue(temperatureStepId)
     props.stepId = temperatureStepId
@@ -367,6 +433,8 @@ describe('ConnectedStepItem', () => {
       [thermocyclerStepId]: true,
       [temperatureStepId]: true,
       [moveLabwareStepId]: false,
+      [mixStepId]: true,
+      [moveLiquidStepId]: true,
     })
     vi.mocked(getSelectedStepId).mockReturnValue(moveLabwareStepId)
     props.stepId = moveLabwareStepId
@@ -375,5 +443,69 @@ describe('ConnectedStepItem', () => {
     screen.getByText('Manually')
     screen.getByText('labware')
     screen.getByText('new location')
+  })
+  it('renders an expanded step for mix', () => {
+    vi.mocked(getCollapsedSteps).mockReturnValue({
+      [pauseStepId]: true,
+      [magnetStepId]: true,
+      [heaterShakerStepId]: true,
+      [thermocyclerStepId]: true,
+      [temperatureStepId]: true,
+      [moveLabwareStepId]: true,
+      [mixStepId]: false,
+      [moveLiquidStepId]: true,
+    })
+    vi.mocked(getSelectedStepId).mockReturnValue(mixStepId)
+    props.stepId = mixStepId
+    render(props)
+    screen.getByText('2. mix')
+    screen.getByText('uL')
+    screen.getByText('μL')
+  })
+  it('renders an expanded step for move liquid (transfer)', () => {
+    vi.mocked(getCollapsedSteps).mockReturnValue({
+      [pauseStepId]: true,
+      [magnetStepId]: true,
+      [heaterShakerStepId]: true,
+      [thermocyclerStepId]: true,
+      [temperatureStepId]: true,
+      [moveLabwareStepId]: true,
+      [mixStepId]: true,
+      [moveLiquidStepId]: false,
+    })
+    vi.mocked(getSelectedStepId).mockReturnValue(moveLiquidStepId)
+    props.stepId = moveLiquidStepId
+    render(props)
+    screen.getByText('2. transfer')
+    screen.getByText('ASPIRATE')
+    screen.getByText('DISPENSE')
+    screen.getAllByText('A1')
+    screen.getByText('50 μL')
+  })
+  it('renders a timeline warning icon for move liquid', () => {
+    vi.mocked(getHasTimelineWarningsPerStep).mockReturnValue({
+      [pauseStepId]: false,
+      [magnetStepId]: false,
+      [heaterShakerStepId]: false,
+      [thermocyclerStepId]: false,
+      [temperatureStepId]: false,
+      [moveLabwareStepId]: false,
+      [mixStepId]: false,
+      [moveLiquidStepId]: true,
+    })
+    vi.mocked(getCollapsedSteps).mockReturnValue({
+      [pauseStepId]: true,
+      [magnetStepId]: true,
+      [heaterShakerStepId]: true,
+      [thermocyclerStepId]: true,
+      [temperatureStepId]: true,
+      [moveLabwareStepId]: true,
+      [mixStepId]: true,
+      [moveLiquidStepId]: false,
+    })
+    vi.mocked(getSelectedStepId).mockReturnValue(moveLiquidStepId)
+    props.stepId = moveLiquidStepId
+    render(props)
+    screen.getByTestId('TitledStepList_icon_alert-circle')
   })
 })

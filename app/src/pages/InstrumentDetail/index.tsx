@@ -2,12 +2,6 @@ import * as React from 'react'
 import { useParams } from 'react-router-dom'
 import styled from 'styled-components'
 
-import {
-  getGripperDisplayName,
-  getPipetteModelSpecs,
-  GripperModel,
-  PipetteModel,
-} from '@opentrons/shared-data'
 import { useInstrumentsQuery, useHost } from '@opentrons/react-api-client'
 import {
   Icon,
@@ -21,11 +15,16 @@ import {
 } from '@opentrons/components'
 
 import { BackButton } from '../../atoms/buttons/BackButton'
+import { ODD_FOCUS_VISIBLE } from '../../atoms/buttons/constants'
 import { InstrumentInfo } from '../../organisms/InstrumentInfo'
 import { handleInstrumentDetailOverflowMenu } from '../../pages/InstrumentDetail/InstrumentDetailOverflowMenu'
-import { ODD_FOCUS_VISIBLE } from '../../atoms/buttons/constants'
+import {
+  useGripperDisplayName,
+  usePipetteModelSpecs,
+} from '../../resources/instruments/hooks'
 
 import type { GripperData, PipetteData } from '@opentrons/api-client'
+import type { GripperModel, PipetteModel } from '@opentrons/shared-data'
 
 export const InstrumentDetail = (): JSX.Element => {
   const host = useHost()
@@ -36,11 +35,15 @@ export const InstrumentDetail = (): JSX.Element => {
       (i): i is PipetteData | GripperData => i.ok && i.mount === mount
     ) ?? null
 
+  const pipetteDisplayName = usePipetteModelSpecs(
+    instrument?.instrumentModel as PipetteModel
+  )?.displayName
+  const gripperDisplayName = useGripperDisplayName(
+    instrument?.instrumentModel as GripperModel
+  )
+
   const displayName =
-    instrument?.mount !== 'extension'
-      ? getPipetteModelSpecs(instrument?.instrumentModel as PipetteModel)
-          ?.displayName
-      : getGripperDisplayName(instrument?.instrumentModel as GripperModel)
+    instrument?.mount !== 'extension' ? pipetteDisplayName : gripperDisplayName
 
   return (
     <>

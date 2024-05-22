@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { useHistory } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
 
@@ -38,6 +39,7 @@ import type { ProtocolResource } from '@opentrons/shared-data'
 export function ProtocolDashboard(): JSX.Element {
   const protocols = useAllProtocolsQuery()
   const runs = useNotifyAllRunsQuery()
+  const history = useHistory()
   const { t } = useTranslation('protocol_info')
   const dispatch = useDispatch<Dispatch>()
   const [navMenuIsOpened, setNavMenuIsOpened] = React.useState<boolean>(false)
@@ -58,6 +60,9 @@ export function ProtocolDashboard(): JSX.Element {
   const pinnedProtocolIds = useSelector(getPinnedProtocolIds) ?? []
   const pinnedProtocols: ProtocolResource[] = []
 
+  // TODO(sb, 4/15/24): The quick transfer button is going to be moved to a new quick transfer
+  // tab before the feature is released. Because of this, we're not adding test cov
+  // for this button in ProtocolDashboard
   const enableQuickTransferFF = useFeatureFlag('enableQuickTransfer')
 
   // We only need to grab out the pinned protocol data once all the protocols load
@@ -181,7 +186,6 @@ export function ProtocolDashboard(): JSX.Element {
                 backgroundColor={COLORS.white}
                 flexDirection={DIRECTION_ROW}
                 paddingBottom={SPACING.spacing16}
-                paddingTop={SPACING.spacing16}
                 position={
                   navMenuIsOpened || longPressModalIsOpened
                     ? POSITION_STATIC
@@ -280,7 +284,7 @@ export function ProtocolDashboard(): JSX.Element {
           buttonText={t('quick_transfer')}
           iconName="plus"
           onClick={() => {
-            console.log('launch quick transfer flow')
+            history.push('/quick-transfer')
           }}
         />
       )}

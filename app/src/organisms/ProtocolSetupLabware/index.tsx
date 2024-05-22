@@ -28,8 +28,6 @@ import {
   getLabwareDefURI,
   getLabwareDisplayName,
   HEATERSHAKER_MODULE_TYPE,
-  LoadLabwareRunTimeCommand,
-  RunTimeCommand,
 } from '@opentrons/shared-data'
 import { parseInitialLoadedLabwareByAdapter } from '@opentrons/api-client'
 import {
@@ -46,10 +44,9 @@ import { useMostRecentCompletedAnalysis } from '../LabwarePositionCheck/useMostR
 import { getLabwareSetupItemGroups } from '../../pages/Protocols/utils'
 import { getProtocolModulesInfo } from '../Devices/ProtocolRun/utils/getProtocolModulesInfo'
 import { getAttachedProtocolModuleMatches } from '../ProtocolSetupModulesAndDeck/utils'
-import {
-  getNestedLabwareInfo,
-  NestedLabwareInfo,
-} from '../Devices/ProtocolRun/SetupLabware/getNestedLabwareInfo'
+import { getNestedLabwareInfo } from '../Devices/ProtocolRun/SetupLabware/getNestedLabwareInfo'
+import { LabwareMapViewModal } from './LabwareMapViewModal'
+import { useNotifyDeckConfigurationQuery } from '../../resources/deck_configuration'
 
 import type { UseQueryResult } from 'react-query'
 import type {
@@ -57,14 +54,17 @@ import type {
   HeaterShakerOpenLatchCreateCommand,
   LabwareDefinition2,
   LabwareLocation,
+  LoadLabwareRunTimeCommand,
+  RunTimeCommand,
 } from '@opentrons/shared-data'
 import type { HeaterShakerModule, Modules } from '@opentrons/api-client'
 import type { LabwareSetupItem } from '../../pages/Protocols/utils'
 import type { SetupScreens } from '../../pages/ProtocolSetup'
+import type { NestedLabwareInfo } from '../Devices/ProtocolRun/SetupLabware/getNestedLabwareInfo'
 import type { AttachedProtocolModuleMatch } from '../ProtocolSetupModulesAndDeck/utils'
-import { LabwareMapViewModal } from './LabwareMapViewModal'
 
-const MODULE_REFETCH_INTERVAL = 5000
+const MODULE_REFETCH_INTERVAL_MS = 5000
+const DECK_CONFIG_POLL_MS = 5000
 
 const LabwareThumbnail = styled.svg`
   transform: scale(1, -1);
@@ -97,20 +97,25 @@ export function ProtocolSetupLabware({
 
   const mostRecentAnalysis = useMostRecentCompletedAnalysis(runId)
   const deckDef = getDeckDefFromRobotType(FLEX_ROBOT_TYPE)
+  const { data: deckConfig = [] } = useNotifyDeckConfigurationQuery({
+    refetchInterval: DECK_CONFIG_POLL_MS,
+  })
   const { offDeckItems, onDeckItems } = getLabwareSetupItemGroups(
     mostRecentAnalysis?.commands ?? []
   )
   const moduleQuery = useModulesQuery({
-    refetchInterval: MODULE_REFETCH_INTERVAL,
+    refetchInterval: MODULE_REFETCH_INTERVAL_MS,
   })
   const attachedModules = moduleQuery?.data?.data ?? []
   const protocolModulesInfo =
     mostRecentAnalysis != null
       ? getProtocolModulesInfo(mostRecentAnalysis, deckDef)
       : []
+
   const attachedProtocolModuleMatches = getAttachedProtocolModuleMatches(
     attachedModules,
-    protocolModulesInfo
+    protocolModulesInfo,
+    deckConfig
   )
   const initialLoadedLabwareByAdapter = parseInitialLoadedLabwareByAdapter(
     mostRecentAnalysis?.commands ?? []

@@ -413,11 +413,11 @@ async def test_verify_tip_presence_on_ot3(
         decoy.when(mock_state_view.pipettes.get_mount("pipette-id")).then_return(
             MountType.LEFT
         )
-        await subject.verify_tip_presence("pipette-id", expected)
+        await subject.verify_tip_presence("pipette-id", expected, None)
 
         decoy.verify(
             await ot3_hardware_api.verify_tip_presence(
-                Mount.LEFT, expected.to_hw_state()
+                Mount.LEFT, expected.to_hw_state(), None
             )
         )
 

@@ -1,3 +1,4 @@
+import { FLEX_ROBOT_TYPE, OT2_ROBOT_TYPE } from '@opentrons/shared-data'
 import * as errorCreators from '../../errorCreators'
 import {
   modulePipetteCollision,
@@ -26,6 +27,7 @@ export const moveToWell: CommandCreator<v5MoveToWellParams> = (
   const { pipette, labware, well, offset, minimumZHeight, forceDirect } = args
   const actionName = 'moveToWell'
   const errors: CommandCreatorError[] = []
+  const labwareState = prevRobotState.labware
   // TODO(2020-07-30, IL): the below is duplicated or at least similar
   // across aspirate/dispense/blowout, we can probably DRY it up
   const pipetteSpec = invariantContext.pipetteEntities[pipette]?.spec
@@ -63,6 +65,13 @@ export const moveToWell: CommandCreator<v5MoveToWellParams> = (
     errors.push(
       errorCreators.pipettingIntoColumn4({ typeOfStep: 'move to well' })
     )
+  } else if (labwareState[slotName] != null) {
+    const adapterSlot = labwareState[slotName].slot
+    if (COLUMN_4_SLOTS.includes(adapterSlot)) {
+      errors.push(
+        errorCreators.pipettingIntoColumn4({ typeOfStep: actionName })
+      )
+    }
   }
 
   if (
@@ -105,13 +114,16 @@ export const moveToWell: CommandCreator<v5MoveToWellParams> = (
   ) {
     errors.push(errorCreators.heaterShakerIsShaking())
   }
+  if (
+    pipetteAdjacentHeaterShakerWhileShaking(
+      prevRobotState.modules,
+      slotName,
+      isFlexPipette ? FLEX_ROBOT_TYPE : OT2_ROBOT_TYPE
+    )
+  ) {
+    errors.push(errorCreators.heaterShakerNorthSouthEastWestShaking())
+  }
   if (!isFlexPipette) {
-    if (
-      pipetteAdjacentHeaterShakerWhileShaking(prevRobotState.modules, slotName)
-    ) {
-      errors.push(errorCreators.heaterShakerNorthSouthEastWestShaking())
-    }
-
     if (
       getIsHeaterShakerEastWestWithLatchOpen(prevRobotState.modules, slotName)
     ) {

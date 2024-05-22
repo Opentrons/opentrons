@@ -1,9 +1,11 @@
 import type {
+  Liquid,
   LoadedLabware,
   LoadedModule,
   LoadedPipette,
   ModuleModel,
   RunTimeCommand,
+  RunTimeParameter,
 } from '@opentrons/shared-data'
 import type { ResourceLink, ErrorDetails } from '../types'
 export * from './commands/types'
@@ -44,10 +46,11 @@ export interface LegacyGoodRunData {
   errors: RunError[]
   pipettes: LoadedPipette[]
   labware: LoadedLabware[]
+  liquids: Liquid[]
   modules: LoadedModule[]
   protocolId?: string
   labwareOffsets?: LabwareOffset[]
-  runTimeParameterValues?: RunTimeParameterCreateData
+  runTimeParameters: RunTimeParameter[]
 }
 
 export interface KnownGoodRunData extends LegacyGoodRunData {

@@ -17,7 +17,6 @@ from opentrons.protocol_engine import (
     LabwareOffsetCreate,
     Liquid,
 )
-from robot_server.maintenance_runs.maintenance_action_models import MaintenanceRunAction
 from robot_server.service.json_api import ResourceModel
 
 
@@ -70,9 +69,15 @@ class MaintenanceRun(ResourceModel):
             " There can be, at most, one current run."
         ),
     )
-    actions: List[MaintenanceRunAction] = Field(
+    actions: List[object] = Field(
         ...,
-        description="Client-initiated run control actions.",
+        description=(
+            " This is currently always an empty list,"
+            " and is provided for symmetry with non-maintenance runs."
+            " Non-maintenance runs let you issue actions with"
+            " `POST /runs/{id}/actions`, but there is currently no equivalent"
+            " endpoint for maintenance runs."
+        ),
     )
     errors: List[ErrorOccurrence] = Field(
         ...,

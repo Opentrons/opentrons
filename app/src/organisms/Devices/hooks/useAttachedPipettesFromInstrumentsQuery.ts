@@ -1,7 +1,10 @@
 import { useInstrumentsQuery } from '@opentrons/react-api-client'
-import { getPipetteModelSpecs, PipetteModel } from '@opentrons/shared-data'
+import { LEFT, RIGHT } from '@opentrons/shared-data'
+import { usePipetteModelSpecs } from '../../../resources/instruments/hooks'
+
 import type { PipetteData } from '@opentrons/api-client'
 import type { Mount } from '@opentrons/components'
+import type { PipetteModel } from '@opentrons/shared-data'
 
 export interface PipetteInformation extends PipetteData {
   displayName: string
@@ -9,27 +12,32 @@ export interface PipetteInformation extends PipetteData {
 export type AttachedPipettesFromInstrumentsQuery = {
   [mount in Mount]: null | PipetteInformation
 }
-
 export function useAttachedPipettesFromInstrumentsQuery(): AttachedPipettesFromInstrumentsQuery {
-  const { data: attachedInstruments } = useInstrumentsQuery()
-  return (attachedInstruments?.data ?? []).reduce(
-    (acc, instrumentData) => {
-      if (instrumentData.instrumentType !== 'pipette' || !instrumentData.ok) {
-        return acc
-      }
-      const { mount, instrumentModel } = instrumentData
-      return {
-        ...acc,
-        [mount as Mount]: {
-          ...instrumentData,
-          displayName:
-            instrumentModel != null
-              ? getPipetteModelSpecs(instrumentModel as PipetteModel)
-                  ?.displayName ?? ''
-              : '',
-        },
-      }
-    },
-    { left: null, right: null }
+  const attachedInstruments = useInstrumentsQuery()?.data?.data ?? []
+
+  const okPipettes = attachedInstruments.filter(
+    (instrument): instrument is PipetteData =>
+      instrument.instrumentType === 'pipette' && instrument.ok
   )
+
+  const leftPipette = okPipettes.find(({ mount }) => mount === LEFT) ?? null
+  const rightPipette = okPipettes.find(({ mount }) => mount === RIGHT) ?? null
+
+  const leftDisplayName =
+    usePipetteModelSpecs(leftPipette?.instrumentModel as PipetteModel)
+      ?.displayName ?? ''
+  const rightDisplayName =
+    usePipetteModelSpecs(rightPipette?.instrumentModel as PipetteModel)
+      ?.displayName ?? ''
+
+  return {
+    [LEFT]:
+      leftPipette != null
+        ? { ...leftPipette, displayName: leftDisplayName }
+        : null,
+    [RIGHT]:
+      rightPipette != null
+        ? { ...rightPipette, displayName: rightDisplayName }
+        : null,
+  }
 }

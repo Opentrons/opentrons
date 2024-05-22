@@ -22,7 +22,7 @@ describe('TertiaryButton', () => {
   it('renders tertiary button with text', () => {
     render(props)
     const button = screen.getByText('tertiary button')
-    expect(button).toHaveStyle(`background-color: ${COLORS.blue60}`)
+    expect(button).toHaveStyle(`background-color: ${COLORS.blue50}`)
     expect(button).toHaveStyle(
       `padding: ${SPACING.spacing8} ${SPACING.spacing16} ${SPACING.spacing8} ${SPACING.spacing16}`
     )
@@ -52,7 +52,7 @@ describe('TertiaryButton', () => {
     props.backgroundColor = COLORS.red50
     render(props)
     const button = screen.getByText('tertiary button')
-    expect(button).toHaveStyle(`background-color: ${COLORS.blue60}`)
+    expect(button).toHaveStyle(`background-color: ${COLORS.red50}`)
     expect(button).toHaveStyle(`color: ${COLORS.white}`)
   })
 })

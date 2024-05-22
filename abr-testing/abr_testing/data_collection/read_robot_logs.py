@@ -12,13 +12,19 @@ from typing import List, Dict, Any, Tuple, Set
 import time as t
 import json
 import requests
+import sys
 
 
-def lpc_data(file_results: Dict[str, Any], protocol_info: Dict) -> List[Dict[str, Any]]:
+def lpc_data(
+    file_results: Dict[str, Any],
+    protocol_info: Dict[str, Any],
+    runs_and_lpc: List[Dict[str, Any]],
+) -> Tuple[List[Dict[str, Any]], List[str]]:
     """Get labware offsets from one run log."""
     offsets = file_results.get("labwareOffsets", "")
-    all_offsets: List[Dict[str, Any]] = []
+    # TODO: per UNIQUE slot AND LABWARE TYPE only keep the most recent LPC recording
     if len(offsets) > 0:
+        unique_offsets: Dict[Any, Any] = {}
         for offset in offsets:
             labware_type = offset.get("definitionUri", "")
             slot = offset["location"].get("slotName", "")
@@ -28,19 +34,30 @@ def lpc_data(file_results: Dict[str, Any], protocol_info: Dict) -> List[Dict[str
             y_offset = offset["vector"].get("y", 0.0)
             z_offset = offset["vector"].get("z", 0.0)
             created_at = offset.get("createdAt", "")
-            row = {
-                "createdAt": created_at,
-                "Labware Type": labware_type,
-                "Slot": slot,
-                "Module": module_location,
-                "Adapter": adapter,
-                "X": x_offset,
-                "Y": y_offset,
-                "Z": z_offset,
-            }
-            row2 = {**protocol_info, **row}
-            all_offsets.append(row2)
-    return all_offsets
+            if (
+                slot,
+                labware_type,
+            ) not in unique_offsets or created_at > unique_offsets[
+                (slot, labware_type)
+            ][
+                "createdAt"
+            ]:
+                unique_offsets[(slot, labware_type)] = {
+                    **protocol_info,
+                    "createdAt": created_at,
+                    "Labware Type": labware_type,
+                    "Slot": slot,
+                    "Module": module_location,
+                    "Adapter": adapter,
+                    "X": x_offset,
+                    "Y": y_offset,
+                    "Z": z_offset,
+                }
+    for item in unique_offsets:
+        runs_and_lpc.append(unique_offsets[item].values())
+    headers_lpc = list(unique_offsets[(slot, labware_type)].keys())
+
+    return runs_and_lpc, headers_lpc
 
 
 def command_time(command: Dict[str, str]) -> Tuple[float, float]:
@@ -72,9 +89,10 @@ def hs_commands(file_results: Dict[str, Any]) -> Dict[str, float]:
     hs_home_count: float = 0.0
     hs_speed: float = 0.0
     hs_rotations: Dict[str, float] = dict()
-    hs_temps: Dict[str, float] = dict()
+    hs_temps: Dict[float, float] = dict()
     temp_time = None
     shake_time = None
+    deactivate_time = None
     for command in commandData:
         commandType = command["commandType"]
         # Heatershaker
@@ -87,17 +105,21 @@ def hs_commands(file_results: Dict[str, Any]) -> Dict[str, float]:
         # Home count
         elif commandType == "heaterShaker/deactivateShaker":
             hs_home_count += 1
+            shake_deactivate_time = datetime.strptime(
+                command.get("startedAt", ""), "%Y-%m-%dT%H:%M:%S.%f%z"
+            )
+            if shake_time is not None and shake_deactivate_time > shake_time:
+                shake_duration = (shake_deactivate_time - shake_time).total_seconds()
+                hs_rotations[hs_speed] = hs_rotations.get(hs_speed, 0.0) + (
+                    (hs_speed * shake_duration) / 60
+                )
+        elif commandType == "heaterShaker/deactivateHeater":
             deactivate_time = datetime.strptime(
                 command.get("startedAt", ""), "%Y-%m-%dT%H:%M:%S.%f%z"
             )
             if temp_time is not None and deactivate_time > temp_time:
                 temp_duration = (deactivate_time - temp_time).total_seconds()
                 hs_temps[hs_temp] = hs_temps.get(hs_temp, 0.0) + temp_duration
-            if shake_time is not None and deactivate_time > shake_time:
-                shake_duration = (deactivate_time - shake_time).total_seconds()
-                hs_rotations[hs_speed] = hs_rotations.get(hs_speed, 0.0) + (
-                    (hs_speed * shake_duration) / 60
-                )
         # of Rotations
         elif commandType == "heaterShaker/setAndWaitForShakeSpeed":
             hs_speed = command["params"]["rpm"]
@@ -111,6 +133,13 @@ def hs_commands(file_results: Dict[str, Any]) -> Dict[str, float]:
             temp_time = datetime.strptime(
                 command.get("completedAt", ""), "%Y-%m-%dT%H:%M:%S.%f%z"
             )
+    if temp_time is not None and deactivate_time is None:
+        # If heater shaker module is not deactivated, protocol completedAt time stamp used.
+        protocol_end = datetime.strptime(
+            file_results.get("completedAt", ""), "%Y-%m-%dT%H:%M:%S.%f%z"
+        )
+        temp_duration = (protocol_end - temp_time).total_seconds()
+        hs_temps[hs_temp] = hs_temps.get(hs_temp, 0.0) + temp_duration
     hs_latch_sets = hs_latch_count / 2  # one set of open/close
     hs_total_rotations = sum(hs_rotations.values())
     hs_total_temp_time = sum(hs_temps.values())
@@ -254,7 +283,7 @@ def create_abr_data_sheet(
     file_name_csv = file_name + ".csv"
     sheet_location = os.path.join(storage_directory, file_name_csv)
     if os.path.exists(sheet_location):
-        print(f"File {sheet_location} located. Not overwriting.")
+        return sheet_location
     else:
         with open(sheet_location, "w") as csvfile:
             writer = csv.DictWriter(csvfile, fieldnames=headers)
@@ -266,6 +295,7 @@ def create_abr_data_sheet(
 def get_error_info(file_results: Dict[str, Any]) -> Tuple[int, str, str, str, str]:
     """Determines if errors exist in run log and documents them."""
     error_levels = []
+    error_level = ""
     # Read error levels file
     with open(ERROR_LEVELS_PATH, "r") as error_file:
         error_levels = list(csv.reader(error_file))
@@ -286,17 +316,18 @@ def get_error_info(file_results: Dict[str, Any]) -> Tuple[int, str, str, str, st
             # Instrument Error
             error_instrument = run_command_error["error"]["errorInfo"]["node"]
         except KeyError:
-            # Module Error
+            # Module
             error_instrument = run_command_error["error"]["errorInfo"].get("port", "")
     else:
         error_type = file_results["errors"][0]["errorType"]
-        print(error_type)
         error_code = file_results["errors"][0]["errorCode"]
         error_instrument = file_results["errors"][0]["detail"]
     for error in error_levels:
         code_error = error[1]
         if code_error == error_code:
             error_level = error[4]
+    if len(error_level) < 1:
+        error_level = str(4)
 
     return num_of_errors, error_type, error_code, error_instrument, error_level
 
@@ -311,13 +342,12 @@ def write_to_local_and_google_sheet(
     """Write data dictionary to google sheet and local csv."""
     sheet_location = os.path.join(storage_directory, file_name)
     file_exists = os.path.exists(sheet_location) and os.path.getsize(sheet_location) > 0
-    list_of_runs = list(runs_and_robots.keys())
     with open(sheet_location, "a", newline="") as f:
         writer = csv.writer(f)
         if not file_exists:
             writer.writerow(header)
-        for run in range(len(list_of_runs)):
-            row = runs_and_robots[list_of_runs[run]].values()
+        for run in runs_and_robots:
+            row = runs_and_robots[run].values()
             row_list = list(row)
             writer.writerow(row_list)
             google_sheet.write_header(header)
@@ -368,7 +398,6 @@ def get_run_ids_from_storage(storage_directory: str) -> Set[str]:
 def get_unseen_run_ids(runs: Set[str], runs_from_storage: Set[str]) -> Set[str]:
     """Subtracts runs from storage from current runs being read."""
     runs_to_save = runs - runs_from_storage
-    print(f"There are {str(len(runs_to_save))} new run(s) to save.")
     return runs_to_save
 
 
@@ -406,7 +435,7 @@ def write_to_sheets(
         google_sheet.write_header(headers)
         google_sheet.update_row_index()
         google_sheet.write_to_row(row_list)
-        t.sleep(5)  # Sleep added to avoid API error.
+        t.sleep(5)
 
 
 def get_calibration_offsets(
@@ -415,9 +444,14 @@ def get_calibration_offsets(
     """Connect to robot via ip and get calibration data."""
     calibration = dict()
     # Robot Information [Name, Software Version]
-    response = requests.get(
-        f"http://{ip}:31950/health", headers={"opentrons-version": "3"}
-    )
+    try:
+        response = requests.get(
+            f"http://{ip}:31950/health", headers={"opentrons-version": "3"}
+        )
+        print(f"Connected to {ip}")
+    except Exception:
+        print(f"ERROR: Failed to read IP address: {ip}")
+        sys.exit()
     health_data = response.json()
     robot_name = health_data.get("name", "")
     api_version = health_data.get("api_version", "")
@@ -470,11 +504,10 @@ def get_logs(storage_directory: str, ip: str) -> List[str]:
             )
             response.raise_for_status()
             log_data = response.text
-            log_name = ip + "_" + log_type.split(".")[0] + ".json"
+            log_name = ip + "_" + log_type.split(".")[0] + ".log"
             file_path = os.path.join(storage_directory, log_name)
             with open(file_path, mode="w", encoding="utf-8") as file:
-                file.write(response.text)
-            json.dump(log_data, open(file_path, mode="w"))
+                file.write(log_data)
         except RuntimeError:
             print(f"Request exception. Did not save {log_type}")
             continue

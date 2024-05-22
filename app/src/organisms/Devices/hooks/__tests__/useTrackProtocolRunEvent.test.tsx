@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { createStore, Store } from 'redux'
+import { createStore } from 'redux'
 import { Provider } from 'react-redux'
 import { QueryClient, QueryClientProvider } from 'react-query'
 import { vi, it, expect, describe, beforeEach, afterEach } from 'vitest'
@@ -10,11 +10,12 @@ import { useTrackProtocolRunEvent } from '../useTrackProtocolRunEvent'
 import { useProtocolRunAnalyticsData } from '../useProtocolRunAnalyticsData'
 import {
   useTrackEvent,
-  ANALYTICS_PROTOCOL_RUN_START,
+  ANALYTICS_PROTOCOL_RUN_ACTION,
 } from '../../../../redux/analytics'
 import { mockConnectableRobot } from '../../../../redux/discovery/__fixtures__'
 import { useRobot } from '../useRobot'
 
+import type { Store } from 'redux'
 import type { Mock } from 'vitest'
 
 vi.mock('../useRobot')
@@ -85,12 +86,12 @@ describe('useTrackProtocolRunEvent hook', () => {
     )
     await waitFor(() =>
       result.current.trackProtocolRunEvent({
-        name: ANALYTICS_PROTOCOL_RUN_START,
+        name: ANALYTICS_PROTOCOL_RUN_ACTION.START,
         properties: {},
       })
     )
     expect(mockTrackEvent).toHaveBeenCalledWith({
-      name: ANALYTICS_PROTOCOL_RUN_START,
+      name: ANALYTICS_PROTOCOL_RUN_ACTION.START,
       properties: PROTOCOL_PROPERTIES,
     })
   })
@@ -112,12 +113,12 @@ describe('useTrackProtocolRunEvent hook', () => {
     )
     await waitFor(() =>
       result.current.trackProtocolRunEvent({
-        name: ANALYTICS_PROTOCOL_RUN_START,
+        name: ANALYTICS_PROTOCOL_RUN_ACTION.START,
         properties: {},
       })
     )
     expect(mockTrackEvent).toHaveBeenCalledWith({
-      name: ANALYTICS_PROTOCOL_RUN_START,
+      name: ANALYTICS_PROTOCOL_RUN_ACTION.START,
       properties: {},
     })
   })

@@ -127,12 +127,53 @@ function getWarningContent({
   }
 
   const pipettesDetails = pipettesWithoutStep
-    .map(pipette => `${pipette.mount} ${pipette.spec.displayName}`)
+    .map(pipette =>
+      pipette.spec.channels === 96
+        ? `${pipette.spec.displayName} pipette`
+        : `${pipette.mount} ${pipette.spec.displayName} pipette`
+    )
     .join(' and ')
 
-  const modulesDetails = modulesWithoutStep
-    .map(moduleOnDeck => t(`modules:module_long_names.${moduleOnDeck.type}`))
-    .join(' and ')
+  const unusedModuleCounts = modulesWithoutStep.reduce<{
+    [key: string]: number
+  }>((acc, mod) => {
+    if (!(mod.type in acc)) {
+      return { ...acc, [mod.type]: 1 }
+    } else {
+      return { ...acc, [mod.type]: acc[mod.type] + 1 }
+    }
+  }, {})
+
+  const modulesDetails = Object.keys(unusedModuleCounts)
+    // sorting by module count
+    .sort((k1, k2) => {
+      if (unusedModuleCounts[k1] < unusedModuleCounts[k2]) {
+        return 1
+      } else if (unusedModuleCounts[k1] > unusedModuleCounts[k2]) {
+        return -1
+      } else {
+        return 0
+      }
+    })
+    .map(modType =>
+      unusedModuleCounts[modType] === 1
+        ? t(`modules:module_long_names.${modType}`)
+        : `${t(`modules:module_long_names.${modType}`)}s`
+    )
+    // transform list of modules with counts to string
+    .reduce((acc, modName, index, arr) => {
+      if (arr.length > 2) {
+        if (index === arr.length - 1) {
+          return `${acc} and ${modName}`
+        } else {
+          return `${acc}${modName}, `
+        }
+      } else if (arr.length === 2) {
+        return index === 0 ? `${modName} and ` : `${acc}${modName}`
+      } else {
+        return modName
+      }
+    }, '')
 
   if (pipettesWithoutStep.length && modulesWithoutStep.length) {
     return {
@@ -237,9 +278,9 @@ export function v8WarningContent(t: any): JSX.Element {
   return (
     <div>
       <p>
-        {t(`hint.export_v8_protocol_7_1.body1`)}{' '}
-        <strong>{t(`hint.export_v8_protocol_7_1.body2`)}</strong>
-        {t(`hint.export_v8_protocol_7_1.body3`)}
+        {t(`hint.export_v8_1_protocol_7_3.body1`)}{' '}
+        <strong>{t(`hint.export_v8_1_protocol_7_3.body2`)}</strong>
+        {t(`hint.export_v8_1_protocol_7_3.body3`)}
       </p>
     </div>
   )
@@ -350,7 +391,7 @@ export function FileSidebar(): JSX.Element {
     content: React.ReactNode
   } => {
     return {
-      hintKey: 'export_v8_protocol_7_1',
+      hintKey: 'export_v8_1_protocol_7_3',
       content: v8WarningContent(t),
     }
   }

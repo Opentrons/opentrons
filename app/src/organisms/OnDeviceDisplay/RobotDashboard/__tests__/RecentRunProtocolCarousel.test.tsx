@@ -26,6 +26,7 @@ const mockRun = {
   pipettes: [],
   protocolId: 'mockSortedProtocolID',
   status: 'stopped',
+  runTimeParameters: [],
 }
 
 const render = (

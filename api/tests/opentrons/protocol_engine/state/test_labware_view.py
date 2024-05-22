@@ -5,7 +5,7 @@ from typing import Dict, Optional, cast, ContextManager, Any, Union, NamedTuple,
 from contextlib import nullcontext as does_not_raise
 
 from opentrons_shared_data.deck import load as load_deck
-from opentrons_shared_data.deck.dev_types import DeckDefinitionV4
+from opentrons_shared_data.deck.dev_types import DeckDefinitionV5
 from opentrons_shared_data.pipette.dev_types import LabwareUri
 from opentrons_shared_data.labware import load_definition
 from opentrons_shared_data.labware.models import (
@@ -110,14 +110,14 @@ def get_labware_view(
     labware_by_id: Optional[Dict[str, LoadedLabware]] = None,
     labware_offsets_by_id: Optional[Dict[str, LabwareOffset]] = None,
     definitions_by_uri: Optional[Dict[str, LabwareDefinition]] = None,
-    deck_definition: Optional[DeckDefinitionV4] = None,
+    deck_definition: Optional[DeckDefinitionV5] = None,
 ) -> LabwareView:
     """Get a labware view test subject."""
     state = LabwareState(
         labware_by_id=labware_by_id or {},
         labware_offsets_by_id=labware_offsets_by_id or {},
         definitions_by_uri=definitions_by_uri or {},
-        deck_definition=deck_definition or cast(DeckDefinitionV4, {"fake": True}),
+        deck_definition=deck_definition or cast(DeckDefinitionV5, {"fake": True}),
     )
 
     return LabwareView(state=state)
@@ -696,7 +696,7 @@ def test_get_labware_overlap_offsets() -> None:
 class ModuleOverlapSpec(NamedTuple):
     """Spec data to test LabwareView.get_module_overlap_offsets."""
 
-    spec_deck_definition: DeckDefinitionV4
+    spec_deck_definition: DeckDefinitionV5
     module_model: ModuleModel
     stacking_offset_with_module: Dict[str, SharedDataOverlapOffset]
     expected_offset: OverlapOffset
@@ -705,7 +705,7 @@ class ModuleOverlapSpec(NamedTuple):
 module_overlap_specs: List[ModuleOverlapSpec] = [
     ModuleOverlapSpec(
         # Labware on temp module on OT2, with stacking overlap for temp module
-        spec_deck_definition=load_deck(STANDARD_OT2_DECK, 4),
+        spec_deck_definition=load_deck(STANDARD_OT2_DECK, 5),
         module_model=ModuleModel.TEMPERATURE_MODULE_V2,
         stacking_offset_with_module={
             str(ModuleModel.TEMPERATURE_MODULE_V2.value): SharedDataOverlapOffset(
@@ -716,7 +716,7 @@ module_overlap_specs: List[ModuleOverlapSpec] = [
     ),
     ModuleOverlapSpec(
         # Labware on TC Gen1 on OT2, with stacking overlap for TC Gen1
-        spec_deck_definition=load_deck(STANDARD_OT2_DECK, 4),
+        spec_deck_definition=load_deck(STANDARD_OT2_DECK, 5),
         module_model=ModuleModel.THERMOCYCLER_MODULE_V1,
         stacking_offset_with_module={
             str(ModuleModel.THERMOCYCLER_MODULE_V1.value): SharedDataOverlapOffset(
@@ -727,21 +727,21 @@ module_overlap_specs: List[ModuleOverlapSpec] = [
     ),
     ModuleOverlapSpec(
         # Labware on TC Gen2 on OT2, with no stacking overlap
-        spec_deck_definition=load_deck(STANDARD_OT2_DECK, 4),
+        spec_deck_definition=load_deck(STANDARD_OT2_DECK, 5),
         module_model=ModuleModel.THERMOCYCLER_MODULE_V2,
         stacking_offset_with_module={},
         expected_offset=OverlapOffset(x=0, y=0, z=10.7),
     ),
     ModuleOverlapSpec(
         # Labware on TC Gen2 on Flex, with no stacking overlap
-        spec_deck_definition=load_deck(STANDARD_OT3_DECK, 4),
+        spec_deck_definition=load_deck(STANDARD_OT3_DECK, 5),
         module_model=ModuleModel.THERMOCYCLER_MODULE_V2,
         stacking_offset_with_module={},
         expected_offset=OverlapOffset(x=0, y=0, z=0),
     ),
     ModuleOverlapSpec(
         # Labware on TC Gen2 on Flex, with stacking overlap for TC Gen2
-        spec_deck_definition=load_deck(STANDARD_OT3_DECK, 4),
+        spec_deck_definition=load_deck(STANDARD_OT3_DECK, 5),
         module_model=ModuleModel.THERMOCYCLER_MODULE_V2,
         stacking_offset_with_module={
             str(ModuleModel.THERMOCYCLER_MODULE_V2.value): SharedDataOverlapOffset(
@@ -758,7 +758,7 @@ module_overlap_specs: List[ModuleOverlapSpec] = [
     argvalues=module_overlap_specs,
 )
 def test_get_module_overlap_offsets(
-    spec_deck_definition: DeckDefinitionV4,
+    spec_deck_definition: DeckDefinitionV5,
     module_model: ModuleModel,
     stacking_offset_with_module: Dict[str, SharedDataOverlapOffset],
     expected_offset: OverlapOffset,
@@ -800,7 +800,7 @@ def test_get_default_magnet_height(
     assert subject.get_default_magnet_height(module_id="module-id", offset=2) == 12.0
 
 
-def test_get_deck_definition(ot2_standard_deck_def: DeckDefinitionV4) -> None:
+def test_get_deck_definition(ot2_standard_deck_def: DeckDefinitionV5) -> None:
     """It should get the deck definition from the state."""
     subject = get_labware_view(deck_definition=ot2_standard_deck_def)
 
@@ -1392,7 +1392,7 @@ def test_raise_if_labware_cannot_be_stacked_on_labware_on_adapter() -> None:
         )
 
 
-def test_get_deck_gripper_offsets(ot3_standard_deck_def: DeckDefinitionV4) -> None:
+def test_get_deck_gripper_offsets(ot3_standard_deck_def: DeckDefinitionV5) -> None:
     """It should get the deck's gripper offsets."""
     subject = get_labware_view(deck_definition=ot3_standard_deck_def)
 

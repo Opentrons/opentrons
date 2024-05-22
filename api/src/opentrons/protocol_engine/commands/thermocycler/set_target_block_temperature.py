@@ -5,7 +5,8 @@ from typing_extensions import Literal, Type
 
 from pydantic import BaseModel, Field
 
-from ..command import AbstractCommandImpl, BaseCommand, BaseCommandCreate
+from ..command import AbstractCommandImpl, BaseCommand, BaseCommandCreate, SuccessData
+from ...errors.error_occurrence import ErrorOccurrence
 
 if TYPE_CHECKING:
     from opentrons.protocol_engine.state import StateView
@@ -45,7 +46,7 @@ class SetTargetBlockTemperatureResult(BaseModel):
 class SetTargetBlockTemperatureImpl(
     AbstractCommandImpl[
         SetTargetBlockTemperatureParams,
-        SetTargetBlockTemperatureResult,
+        SuccessData[SetTargetBlockTemperatureResult, None],
     ]
 ):
     """Execution implementation of a Thermocycler's set block temperature command."""
@@ -62,7 +63,7 @@ class SetTargetBlockTemperatureImpl(
     async def execute(
         self,
         params: SetTargetBlockTemperatureParams,
-    ) -> SetTargetBlockTemperatureResult:
+    ) -> SuccessData[SetTargetBlockTemperatureResult, None]:
         """Set a Thermocycler's target block temperature."""
         thermocycler_state = self._state_view.modules.get_thermocycler_module_substate(
             params.moduleId
@@ -92,13 +93,20 @@ class SetTargetBlockTemperatureImpl(
                 target_temperature, volume=target_volume, hold_time_seconds=hold_time
             )
 
-        return SetTargetBlockTemperatureResult(
-            targetBlockTemperature=target_temperature
+        return SuccessData(
+            public=SetTargetBlockTemperatureResult(
+                targetBlockTemperature=target_temperature
+            ),
+            private=None,
         )
 
 
 class SetTargetBlockTemperature(
-    BaseCommand[SetTargetBlockTemperatureParams, SetTargetBlockTemperatureResult]
+    BaseCommand[
+        SetTargetBlockTemperatureParams,
+        SetTargetBlockTemperatureResult,
+        ErrorOccurrence,
+    ]
 ):
     """A command to set a Thermocycler's target block temperature."""
 

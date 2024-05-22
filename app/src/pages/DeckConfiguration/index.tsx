@@ -11,24 +11,30 @@ import {
   JUSTIFY_CENTER,
   JUSTIFY_SPACE_AROUND,
 } from '@opentrons/components'
-import {
-  useDeckConfigurationQuery,
-  useUpdateDeckConfigurationMutation,
-} from '@opentrons/react-api-client'
+import { useUpdateDeckConfigurationMutation } from '@opentrons/react-api-client'
 import {
   SINGLE_RIGHT_CUTOUTS,
   SINGLE_LEFT_SLOT_FIXTURE,
   SINGLE_RIGHT_SLOT_FIXTURE,
+  SINGLE_LEFT_CUTOUTS,
+  SINGLE_CENTER_SLOT_FIXTURE,
+  getDeckDefFromRobotType,
+  FLEX_ROBOT_TYPE,
 } from '@opentrons/shared-data'
 
-import { SmallButton } from '../../atoms/buttons'
 import { ChildNavigation } from '../../organisms/ChildNavigation'
 import { AddFixtureModal } from '../../organisms/DeviceDetailsDeckConfiguration/AddFixtureModal'
 import { DeckFixtureSetupInstructionsModal } from '../../organisms/DeviceDetailsDeckConfiguration/DeckFixtureSetupInstructionsModal'
 import { DeckConfigurationDiscardChangesModal } from '../../organisms/DeviceDetailsDeckConfiguration/DeckConfigurationDiscardChangesModal'
 import { getTopPortalEl } from '../../App/portal'
+import { useNotifyDeckConfigurationQuery } from '../../resources/deck_configuration'
 
-import type { CutoutId, DeckConfiguration } from '@opentrons/shared-data'
+import type {
+  CutoutFixtureId,
+  CutoutId,
+  DeckConfiguration,
+} from '@opentrons/shared-data'
+import type { SmallButton } from '../../atoms/buttons'
 
 export function DeckConfigurationEditor(): JSX.Element {
   const { t, i18n } = useTranslation([
@@ -53,7 +59,8 @@ export function DeckConfigurationEditor(): JSX.Element {
     setShowDiscardChangeModal,
   ] = React.useState<boolean>(false)
 
-  const deckConfig = useDeckConfigurationQuery().data ?? []
+  const deckDef = getDeckDefFromRobotType(FLEX_ROBOT_TYPE)
+  const deckConfig = useNotifyDeckConfigurationQuery().data ?? []
   const { updateDeckConfiguration } = useUpdateDeckConfigurationMutation()
 
   const [
@@ -66,19 +73,53 @@ export function DeckConfigurationEditor(): JSX.Element {
     setShowConfigurationModal(true)
   }
 
-  const handleClickRemove = (cutoutId: CutoutId): void => {
-    setCurrentDeckConfig(prevDeckConfig =>
-      prevDeckConfig.map(fixture =>
-        fixture.cutoutId === cutoutId
+  const handleClickRemove = (
+    cutoutId: CutoutId,
+    cutoutFixtureId: CutoutFixtureId
+  ): void => {
+    let replacementFixtureId: CutoutFixtureId = SINGLE_CENTER_SLOT_FIXTURE
+    if (SINGLE_RIGHT_CUTOUTS.includes(cutoutId)) {
+      replacementFixtureId = SINGLE_RIGHT_SLOT_FIXTURE
+    } else if (SINGLE_LEFT_CUTOUTS.includes(cutoutId)) {
+      replacementFixtureId = SINGLE_LEFT_SLOT_FIXTURE
+    }
+
+    const fixtureGroup =
+      deckDef.cutoutFixtures.find(cf => cf.id === cutoutFixtureId)
+        ?.fixtureGroup ?? {}
+
+    let newDeckConfig = currentDeckConfig
+    if (cutoutId in fixtureGroup) {
+      const groupMap =
+        fixtureGroup[cutoutId]?.find(group =>
+          Object.entries(group).every(([cId, cfId]) =>
+            currentDeckConfig.find(
+              config =>
+                config.cutoutId === cId && config.cutoutFixtureId === cfId
+            )
+          )
+        ) ?? {}
+      newDeckConfig = currentDeckConfig.map(cutoutConfig =>
+        cutoutConfig.cutoutId in groupMap
           ? {
-              ...fixture,
-              cutoutFixtureId: SINGLE_RIGHT_CUTOUTS.includes(cutoutId)
-                ? SINGLE_RIGHT_SLOT_FIXTURE
-                : SINGLE_LEFT_SLOT_FIXTURE,
+              ...cutoutConfig,
+              cutoutFixtureId: replacementFixtureId,
+              opentronsModuleSerialNumber: undefined,
             }
-          : fixture
+          : cutoutConfig
       )
-    )
+    } else {
+      newDeckConfig = currentDeckConfig.map(cutoutConfig =>
+        cutoutConfig.cutoutId === cutoutId
+          ? {
+              ...cutoutConfig,
+              cutoutFixtureId: replacementFixtureId,
+              opentronsModuleSerialNumber: undefined,
+            }
+          : cutoutConfig
+      )
+    }
+    setCurrentDeckConfig(newDeckConfig)
   }
 
   const handleClickConfirm = (): void => {

@@ -22,10 +22,11 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 // import { NeedHelpLink } from '../CalibrationPanels'
+import { JogControls } from '../../molecules/JogControls'
 import { SmallButton } from '../../atoms/buttons'
-import { Jog, JogControls } from '../../molecules/JogControls'
 import { InProgressModal } from '../../molecules/InProgressModal/InProgressModal'
 import { SimpleWizardBody } from '../../molecules/SimpleWizardBody'
+import type { Jog } from '../../molecules/JogControls'
 
 // TODO: get help link article URL
 // const NEED_HELP_URL = ''
@@ -148,7 +149,6 @@ interface JogToPositionProps {
   handleJog: Jog
   handleProceed: () => void
   body: string
-  isRobotMoving: boolean
   currentStep: string
   isOnDevice: boolean
 }
@@ -161,7 +161,6 @@ export const JogToPosition = (
     handleJog,
     handleProceed,
     body,
-    isRobotMoving,
     currentStep,
     isOnDevice,
   } = props
@@ -171,10 +170,10 @@ export const JogToPosition = (
     setShowPositionConfirmation,
   ] = React.useState(false)
   // Includes special case homing only present in this step.
-  const [isRobotInMotion, setIsRobotInMotion] = React.useState(isRobotMoving)
+  const [isRobotInMotion, setIsRobotInMotion] = React.useState(false)
 
   const onGoBack = (): void => {
-    setIsRobotInMotion(() => true)
+    setIsRobotInMotion(true)
     handleGoBack()
   }
 
@@ -199,11 +198,6 @@ export const JogToPosition = (
         currentStep={currentStep}
       />
     )
-  }
-
-  // Moving due to "Exit" or "Go back" click.
-  if (isRobotInMotion) {
-    return <InProgressModal description={t('stand_back_exiting')} />
   }
 
   if (isOnDevice) {

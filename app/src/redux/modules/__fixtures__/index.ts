@@ -1,5 +1,5 @@
-import * as Types from '../types'
-import * as ApiTypes from '../api-types'
+import type * as Types from '../types'
+import type * as ApiTypes from '../api-types'
 import type {
   RobotApiResponse,
   RobotApiResponseMeta,

@@ -10,6 +10,7 @@ from opentrons.protocol_engine.commands.aspirate import (
     AspirateResult,
     AspirateImplementation,
 )
+from opentrons.protocol_engine.commands.command import SuccessData
 
 from opentrons.protocol_engine.state import StateView
 
@@ -84,7 +85,10 @@ async def test_aspirate_implementation_no_prep(
 
     result = await subject.execute(data)
 
-    assert result == AspirateResult(volume=50, position=DeckPoint(x=1, y=2, z=3))
+    assert result == SuccessData(
+        public=AspirateResult(volume=50, position=DeckPoint(x=1, y=2, z=3)),
+        private=None,
+    )
 
 
 async def test_aspirate_implementation_with_prep(
@@ -138,7 +142,10 @@ async def test_aspirate_implementation_with_prep(
 
     result = await subject.execute(data)
 
-    assert result == AspirateResult(volume=50, position=DeckPoint(x=1, y=2, z=3))
+    assert result == SuccessData(
+        public=AspirateResult(volume=50, position=DeckPoint(x=1, y=2, z=3)),
+        private=None,
+    )
 
     decoy.verify(
         await movement.move_to_well(

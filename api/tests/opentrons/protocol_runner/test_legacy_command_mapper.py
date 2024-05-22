@@ -7,7 +7,13 @@ import pytest
 from decoy import matchers, Decoy
 
 from opentrons.hardware_control.dev_types import PipetteDict
+from opentrons.hardware_control.modules.types import TemperatureModuleModel
 from opentrons.legacy_commands.types import CommentMessage, PauseMessage, CommandMessage
+from opentrons.protocol_api.core.legacy.load_info import (
+    LabwareLoadInfo as LegacyLabwareLoadInfo,
+    InstrumentLoadInfo as LegacyInstrumentLoadInfo,
+    ModuleLoadInfo as LegacyModuleLoadInfo,
+)
 from opentrons.protocol_engine import (
     DeckSlotLocation,
     ModuleLocation,
@@ -28,12 +34,6 @@ from opentrons.protocol_runner.legacy_command_mapper import (
     LegacyContextCommandError,
     LegacyCommandMapper,
     LegacyCommandParams,
-)
-from opentrons.protocol_runner.legacy_wrappers import (
-    LegacyInstrumentLoadInfo,
-    LegacyLabwareLoadInfo,
-    LegacyModuleLoadInfo,
-    LegacyTemperatureModuleModel,
 )
 from opentrons_shared_data.labware.dev_types import LabwareDefinition
 from opentrons_shared_data.module.dev_types import ModuleDefinitionV3
@@ -396,8 +396,8 @@ def test_map_module_load(
     """It should correctly map a module load."""
     test_definition = ModuleDefinition.model_validate(minimal_module_def)
     input = LegacyModuleLoadInfo(
-        requested_model=LegacyTemperatureModuleModel.TEMPERATURE_V1,
-        loaded_model=LegacyTemperatureModuleModel.TEMPERATURE_V2,
+        requested_model=TemperatureModuleModel.TEMPERATURE_V1,
+        loaded_model=TemperatureModuleModel.TEMPERATURE_V2,
         deck_slot=DeckSlotName.SLOT_1,
         configuration="conf",
         module_serial="module-serial",
@@ -579,6 +579,7 @@ def test_map_pause() -> None:
         "command.DISTRIBUTE",
         "command.TRANSFER",
         "command.RETURN_TIP",
+        "command.AIR_GAP",
     ],
 )
 def test_filter_higher_order_commands(command_type: str) -> None:

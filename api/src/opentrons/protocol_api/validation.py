@@ -87,6 +87,10 @@ class InvalidTrashBinLocationError(ValueError):
     """An error raised when attempting to load trash bins in invalid slots."""
 
 
+class InvalidFixtureLocationError(ValueError):
+    """An error raised when attempting to load a fixture in an invalid cutout."""
+
+
 def ensure_mount_for_pipette(
     mount: Union[str, Mount, None], pipette: PipetteNameType
 ) -> Mount:

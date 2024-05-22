@@ -1,4 +1,5 @@
 """Left Menu Locators."""
+
 from typing import Literal
 
 from rich.console import Console

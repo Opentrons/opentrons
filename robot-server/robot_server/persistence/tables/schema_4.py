@@ -85,6 +85,13 @@ run_table = sqlalchemy.Table(
     sqlalchemy.Column("engine_status", sqlalchemy.String, nullable=True),
     # column added in schema v1
     sqlalchemy.Column("_updated_at", UTCDateTime, nullable=True),
+    # column added in schema v4
+    sqlalchemy.Column(
+        "run_time_parameters",
+        # Stores a JSON string. See RunStore.
+        sqlalchemy.String,
+        nullable=True,
+    ),
 )
 
 action_table = sqlalchemy.Table(

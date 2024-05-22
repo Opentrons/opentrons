@@ -19,13 +19,13 @@ from opentrons.protocol_api._types import OffDeckType
 from opentrons.protocol_api._nozzle_layout import NozzleLayout
 from opentrons.protocols.types import APIVersion
 from opentrons.hardware_control.thread_manager import ThreadManager
-from opentrons.hardware_control.types import OT3Mount, Axis
+from opentrons.hardware_control.types import OT3Mount, Axis, HardwareFeatureFlags
 from opentrons.hardware_control.ot3api import OT3API
 from opentrons.hardware_control.instruments.ot3.pipette import Pipette
 
 from opentrons import execute, simulate
-from opentrons.types import Point, Location
-
+from opentrons.types import Point, Location, Mount
+from opentrons.config.types import OT3Config, RobotConfig
 from opentrons_shared_data.labware.dev_types import LabwareDefinition
 
 from hardware_testing.opentrons_api import helpers_ot3
@@ -81,7 +81,17 @@ def get_api_context(
     """Get api context."""
 
     async def _thread_manager_build_hw_api(
-        *args: Any, loop: asyncio.AbstractEventLoop, **kwargs: Any
+        attached_instruments: Optional[
+            Dict[Union[Mount, OT3Mount], Dict[str, Optional[str]]]
+        ] = None,
+        attached_modules: Optional[List[str]] = None,
+        config: Union[OT3Config, RobotConfig, None] = None,
+        loop: Optional[asyncio.AbstractEventLoop] = None,
+        strict_attached_instruments: bool = True,
+        use_usb_bus: bool = False,
+        update_firmware: bool = True,
+        status_bar_enabled: bool = True,
+        feature_flags: Optional[HardwareFeatureFlags] = None,
     ) -> OT3API:
         return await helpers_ot3.build_async_ot3_hardware_api(
             is_simulating=is_simulating,
@@ -434,7 +444,9 @@ def _load_pipette(
     # NOTE: 8ch QC testing means testing 1 channel at a time,
     #       so we need to decrease the pick-up current to work with 1 tip.
     if pipette.channels == 8 and not increment and not photometric:
-        pipette.configure_nozzle_layout(NozzleLayout.SINGLE, "A1")
+        pipette._core.configure_nozzle_layout(
+            style=NozzleLayout.SINGLE, primary_nozzle="A1", front_right_nozzle="A1"
+        )
         # override deck conflict checking cause we specially lay out our tipracks
         DeckConflit.check_safe_for_pipette_movement = (
             _override_check_safe_for_pipette_movement

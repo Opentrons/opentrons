@@ -47,6 +47,7 @@ import {
   useAttachedModules,
   useLPCDisabledReason,
   useModuleCalibrationStatus,
+  useProtocolAnalysisErrors,
   useRobotAnalyticsData,
   useRobotType,
   useTrackProtocolRunEvent,
@@ -64,12 +65,12 @@ import { ProtocolSetupDeckConfiguration } from '../../organisms/ProtocolSetupDec
 import { useLaunchLPC } from '../../organisms/LabwarePositionCheck/useLaunchLPC'
 import { getUnmatchedModulesForProtocol } from '../../organisms/ProtocolSetupModulesAndDeck/utils'
 import { ConfirmCancelRunModal } from '../../organisms/OnDeviceDisplay/RunningProtocol'
+import { AnalysisFailedModal } from '../../organisms/ProtocolSetupParameters/AnalysisFailedModal'
 import {
   getIncompleteInstrumentCount,
   getProtocolUsesGripper,
 } from '../../organisms/ProtocolSetupInstruments/utils'
 import {
-  useProtocolHasRunTimeParameters,
   useRunControls,
   useRunStatus,
 } from '../../organisms/RunTimeControl/hooks'
@@ -79,7 +80,7 @@ import { getLabwareSetupItemGroups } from '../Protocols/utils'
 import { getLocalRobot, getRobotSerialNumber } from '../../redux/discovery'
 import {
   ANALYTICS_PROTOCOL_PROCEED_TO_RUN,
-  ANALYTICS_PROTOCOL_RUN_START,
+  ANALYTICS_PROTOCOL_RUN_ACTION,
   useTrackEvent,
 } from '../../redux/analytics'
 import { getIsHeaterShakerAttached } from '../../redux/config'
@@ -91,6 +92,7 @@ import { getRequiredDeckConfig } from '../../resources/deck_configuration/utils'
 import { useNotifyRunQuery } from '../../resources/runs'
 import { ViewOnlyParameters } from '../../organisms/ProtocolSetupParameters/ViewOnlyParameters'
 
+import type { Run } from '@opentrons/api-client'
 import type { CutoutFixtureId, CutoutId } from '@opentrons/shared-data'
 import type { OnDeviceRouteParams } from '../../App/types'
 import type {
@@ -102,7 +104,7 @@ import type { ProtocolModuleInfo } from '../../organisms/Devices/ProtocolRun/uti
 const FETCH_DURATION_MS = 5000
 interface ProtocolSetupStepProps {
   onClickSetupStep: () => void
-  status: 'ready' | 'not ready' | 'general'
+  status: 'ready' | 'not ready' | 'general' | 'inform'
   title: string
   // first line of detail text
   detail?: string | null
@@ -136,6 +138,7 @@ export function ProtocolSetupStep({
     ready: COLORS.green35,
     'not ready': COLORS.yellow35,
     general: COLORS.grey35,
+    inform: COLORS.grey35,
   }
   const { makeSnackbar } = useToaster()
 
@@ -153,6 +156,9 @@ export function ProtocolSetupStep({
         break
       case 'ready':
         backgroundColor = COLORS.green40
+        break
+      case 'inform':
+        backgroundColor = COLORS.grey50
         break
       default:
         backgroundColor = COLORS.yellow40
@@ -184,7 +190,10 @@ export function ProtocolSetupStep({
         padding={`${SPACING.spacing20} ${SPACING.spacing24}`}
         css={PUSHED_STATE_STYLE}
       >
-        {status !== 'general' && !disabled ? (
+        {status !== 'general' &&
+        !disabled &&
+        status !== 'inform' &&
+        !disabled ? (
           <Icon
             color={status === 'ready' ? COLORS.green50 : COLORS.yellow50}
             size="2rem"
@@ -202,7 +211,11 @@ export function ProtocolSetupStep({
           >
             {title}
           </StyledText>
-          <StyledText as="h4" color={COLORS.grey50} maxWidth="35rem">
+          <StyledText
+            as="h4"
+            color={disabled ? COLORS.grey50 : COLORS.grey60}
+            maxWidth="35rem"
+          >
             {description}
           </StyledText>
         </Flex>
@@ -245,6 +258,7 @@ interface PrepareToRunProps {
   confirmAttachment: () => void
   play: () => void
   robotName: string
+  runRecord: Run | null
 }
 
 function PrepareToRun({
@@ -253,13 +267,11 @@ function PrepareToRun({
   confirmAttachment,
   play,
   robotName,
+  runRecord,
 }: PrepareToRunProps): JSX.Element {
   const { t, i18n } = useTranslation(['protocol_setup', 'shared'])
   const history = useHistory()
   const { makeSnackbar } = useToaster()
-  const hasRunTimeParameters = useProtocolHasRunTimeParameters(runId)
-  console.log(hasRunTimeParameters)
-  // Watch for scrolling to toggle dropshadow
   const scrollRef = React.useRef<HTMLDivElement>(null)
   const [isScrolled, setIsScrolled] = React.useState<boolean>(false)
   const observer = new IntersectionObserver(([entry]) => {
@@ -269,7 +281,6 @@ function PrepareToRun({
     observer.observe(scrollRef.current)
   }
 
-  const { data: runRecord } = useNotifyRunQuery(runId, { staleTime: Infinity })
   const protocolId = runRecord?.data?.protocolId ?? null
   const { data: protocolRecord } = useProtocolQuery(protocolId, {
     staleTime: Infinity,
@@ -365,6 +376,12 @@ function PrepareToRun({
       incompleteInstrumentCount != null && incompleteInstrumentCount > 0,
   })
   const moduleCalibrationStatus = useModuleCalibrationStatus(robotName, runId)
+
+  const runTimeParameters = mostRecentAnalysis?.runTimeParameters ?? []
+  const hasRunTimeParameters = runTimeParameters.length > 0
+  const hasCustomRunTimeParameters = runTimeParameters.some(
+    parameter => parameter.value !== parameter.default
+  )
 
   const [
     showConfirmCancelModal,
@@ -490,7 +507,7 @@ function PrepareToRun({
         if (isReadyToRun) {
           play()
           trackProtocolRunEvent({
-            name: ANALYTICS_PROTOCOL_RUN_START,
+            name: ANALYTICS_PROTOCOL_RUN_ACTION.START,
             properties: robotAnalyticsData != null ? robotAnalyticsData : {},
           })
         } else {
@@ -623,11 +640,11 @@ function PrepareToRun({
     doorStatus?.data.status === 'open' &&
     doorStatus?.data.doorRequiredClosedForProtocol
 
-  //  TODO(Jr, 3/20/24): wire up custom values
-  const hasCustomValues = false
-  const parametersDetail = hasCustomValues
-    ? t('custom_values')
-    : t('default_values')
+  const parametersDetail = hasRunTimeParameters
+    ? hasCustomRunTimeParameters
+      ? t('custom_values')
+      : t('default_values')
+    : t('no_parameters_specified')
 
   return (
     <>
@@ -703,7 +720,7 @@ function PrepareToRun({
             />
             <ProtocolSetupStep
               onClickSetupStep={() => setSetupScreen('modules')}
-              title={t('modules_and_deck')}
+              title={t('deck_hardware')}
               detail={modulesDetail}
               subDetail={modulesSubDetail}
               status={modulesStatus}
@@ -733,11 +750,7 @@ function PrepareToRun({
             <ProtocolSetupStep
               onClickSetupStep={() => setSetupScreen('view only parameters')}
               title={t('parameters')}
-              detail={t(
-                hasRunTimeParameters
-                  ? parametersDetail
-                  : t('no_parameters_specified')
-              )}
+              detail={parametersDetail}
               subDetail={null}
               status="general"
               disabled={!hasRunTimeParameters}
@@ -792,11 +805,17 @@ export type SetupScreens =
 
 export function ProtocolSetup(): JSX.Element {
   const { runId } = useParams<OnDeviceRouteParams>()
+  const { data: runRecord } = useNotifyRunQuery(runId, { staleTime: Infinity })
+  const { analysisErrors } = useProtocolAnalysisErrors(runId)
   const localRobot = useSelector(getLocalRobot)
   const robotSerialNumber =
     localRobot?.status != null ? getRobotSerialNumber(localRobot) : null
   const trackEvent = useTrackEvent()
   const { play } = useRunControls(runId)
+  const [
+    showAnalysisFailedModal,
+    setShowAnalysisFailedModal,
+  ] = React.useState<boolean>(true)
 
   const handleProceedToRunClick = (): void => {
     trackEvent({
@@ -833,6 +852,7 @@ export function ProtocolSetup(): JSX.Element {
         confirmAttachment={confirmAttachment}
         play={play}
         robotName={localRobot?.name != null ? localRobot.name : 'no name'}
+        runRecord={runRecord ?? null}
       />
     ),
     instruments: (
@@ -867,6 +887,15 @@ export function ProtocolSetup(): JSX.Element {
 
   return (
     <>
+      {showAnalysisFailedModal &&
+      analysisErrors != null &&
+      analysisErrors?.length > 0 ? (
+        <AnalysisFailedModal
+          setShowAnalysisFailedModal={setShowAnalysisFailedModal}
+          protocolId={runRecord?.data.protocolId ?? null}
+          errors={analysisErrors.map(error => error.detail)}
+        />
+      ) : null}
       {showConfirmationModal ? (
         <ConfirmAttachedModal
           onCloseClick={cancelExit}

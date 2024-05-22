@@ -624,6 +624,7 @@ class GripperJawState(enum.Enum):
 class InstrumentProbeType(enum.Enum):
     PRIMARY = enum.auto()
     SECONDARY = enum.auto()
+    BOTH = enum.auto()
 
 
 class GripperProbe(enum.Enum):
@@ -693,25 +694,13 @@ class EarlyLiquidSenseTrigger(RuntimeError):
         )
 
 
-class LiquidNotFound(RuntimeError):
-    """Error raised if liquid sensing move completes without detecting liquid."""
-
-    def __init__(
-        self, position: Dict[Axis, float], max_z_pos: Dict[Axis, float]
-    ) -> None:
-        """Initialize LiquidNotFound error."""
-        super().__init__(
-            f"Liquid threshold not found, current_position = {position}"
-            f"position at max travel allowed = {max_z_pos}"
-        )
-
-
 class FailedTipStateCheck(RuntimeError):
     """Error raised if the tip ejector state does not match the expected value."""
 
-    def __init__(self, tip_state_type: TipStateType, actual_state: int) -> None:
+    def __init__(
+        self, expected_state: TipStateType, actual_state: TipStateType
+    ) -> None:
         """Initialize FailedTipStateCheck error."""
         super().__init__(
-            f"Failed to correctly determine tip state for tip {str(tip_state_type)} "
-            f"received {bool(actual_state)} but expected {bool(tip_state_type.value)}"
+            f"Expected tip state {expected_state}, but received {actual_state}."
         )

@@ -26,6 +26,15 @@ from opentrons.protocol_api._types import OffDeckType
 
 from opentrons.protocol_api import ProtocolContext, Well, Labware
 
+from opentrons_shared_data.errors.exceptions import LiquidNotFoundError
+
+
+PROBE_MAX_TIME: Dict[int, float] = {
+    1: 2.75,
+    8: 1.75,
+    96: 0.85,
+}
+
 
 def _load_tipracks(
     ctx: ProtocolContext, pipette_channels: int, protocol_cfg: Any, tip: int
@@ -176,45 +185,57 @@ def run(tip: int, run_args: RunArgs) -> None:
         lpc_offset = run_args.dial_indicator.read_stable()
         run_args.pipette._retract()
 
-    def _get_baseline() -> float:
-        run_args.pipette.pick_up_tip(tips.pop(0))
-        liquid_height = _jog_to_find_liquid_height(
-            run_args.ctx, run_args.pipette, test_well
-        )
-        target_height = test_well.bottom(liquid_height).point.z
-
-        run_args.pipette._retract()
-        # tip_offset = 0.0
+    def _get_tip_offset() -> float:
+        tip_offset = 0.0
         if run_args.dial_indicator is not None:
             run_args.pipette.move_to(dial_well.top())
             tip_offset = run_args.dial_indicator.read_stable()
             run_args.pipette._retract()
-        if run_args.return_tip:
-            run_args.pipette.return_tip()
-        else:
-            run_args.pipette.drop_tip()
+        return tip_offset
 
-        env_data = run_args.environment_sensor.get_reading()
-
-        store_baseline_trial(
-            run_args.test_report,
-            tip,
-            target_height,
-            env_data.relative_humidity,
-            env_data.temperature,
-            test_well.top().point.z - target_height,
-            tip_offset - lpc_offset,
+    def _get_target_height() -> float:
+        run_args.pipette.pick_up_tip(tips[0])
+        del tips[: run_args.pipette_channels]
+        liquid_height = _jog_to_find_liquid_height(
+            run_args.ctx, run_args.pipette, test_well
         )
+        target_height = test_well.bottom(liquid_height).point.z
+        run_args.pipette._retract()
         return target_height
 
+    target_height = _get_target_height()
+    tip_offset = _get_tip_offset()
+
+    if run_args.return_tip:
+        run_args.pipette.return_tip()
+    else:
+        run_args.pipette.drop_tip()
+
+    env_data = run_args.environment_sensor.get_reading()
+
+    store_baseline_trial(
+        run_args.test_report,
+        tip,
+        target_height,
+        env_data.relative_humidity,
+        env_data.temperature,
+        test_well.top().point.z - target_height,
+        tip_offset - lpc_offset,
+    )
+
     trials_before_jog = run_args.trials_before_jog
-    tip_offset = 0.0
+
     for trial in range(run_args.trials):
-        if trial % trials_before_jog == 0:
-            tip_offset = _get_baseline()
+        if trial > 0 and trial % trials_before_jog == 0:
+            target_height = _get_target_height()
+            if run_args.return_tip:
+                run_args.pipette.return_tip()
+            else:
+                run_args.pipette.drop_tip()
 
         ui.print_info(f"Picking up {tip}ul tip")
-        run_args.pipette.pick_up_tip(tips.pop(0))
+        run_args.pipette.pick_up_tip(tips[0])
+        del tips[: run_args.pipette_channels]
         run_args.pipette.move_to(test_well.top())
 
         start_pos = hw_api.current_position_ot3(OT3Mount.LEFT)
@@ -223,7 +244,6 @@ def run(tip: int, run_args: RunArgs) -> None:
         run_args.pipette.blow_out()
         tip_length_offset = 0.0
         if run_args.dial_indicator is not None:
-
             run_args.pipette._retract()
             run_args.pipette.move_to(dial_well.top())
             tip_length_offset = tip_offset - run_args.dial_indicator.read_stable()
@@ -255,6 +275,7 @@ def run(tip: int, run_args: RunArgs) -> None:
             start_pos[Axis.Z_L] - end_pos[Axis.Z_L],
             plunger_start - end_pos[Axis.P_L],
             tip_length_offset,
+            target_height,
         )
         ui.print_info(
             f"\n\n Z axis start pos {start_pos[Axis.Z_L]} end pos {end_pos[Axis.Z_L]}"
@@ -268,40 +289,95 @@ def run(tip: int, run_args: RunArgs) -> None:
     store_tip_results(run_args.test_report, tip, results, adjusted_results)
 
 
+def get_plunger_travel(run_args: RunArgs) -> float:
+    """Get the travel distance for the pipette."""
+    hw_mount = OT3Mount.LEFT if run_args.pipette.mount == "left" else OT3Mount.RIGHT
+    hw_api = get_sync_hw_api(run_args.ctx)
+    plunger_positions = hw_api._pipette_handler.get_pipette(hw_mount).plunger_positions
+    plunger_travel = plunger_positions.bottom - plunger_positions.top
+    return plunger_travel
+
+
+def find_max_z_distances(
+    run_args: RunArgs, tip: int, well: Well, p_speed: float
+) -> List[float]:
+    """Returns a list of max z distances for each probe.
+
+    Each element is the max travel for the z mount for a particular call
+    to hw_api.liquid_probe, it is the limit of z distance the pipette can
+    move with the combination of z speed and plunger speed,
+    if the distance would exceed the well depth then the number is
+    truncated to avoid collisions.
+    """
+    z_speed = run_args.z_speed
+    max_z_distance = well.depth + run_args.start_height_offset
+    plunger_travel = get_plunger_travel(run_args)
+    p_travel_time = min(
+        plunger_travel / p_speed, PROBE_MAX_TIME[run_args.pipette_channels]
+    )
+
+    z_travels: List[float] = []
+    while max_z_distance > 0:
+        next_travel = min(p_travel_time * z_speed, max_z_distance)
+        z_travels.append(next_travel)
+        max_z_distance -= next_travel
+    return z_travels
+
+
 def _run_trial(run_args: RunArgs, tip: int, well: Well, trial: int) -> float:
     hw_api = get_sync_hw_api(run_args.ctx)
     lqid_cfg: Dict[str, int] = LIQUID_PROBE_SETTINGS[run_args.pipette_volume][
         run_args.pipette_channels
     ][tip]
     data_dir = get_testing_data_directory()
-    data_filename = f"pressure_sensor_data-trial{trial}-tip{tip}.csv"
-    data_file = f"{data_dir}/{run_args.name}/{run_args.run_id}/{data_filename}"
-    ui.print_info(f"logging pressure data to {data_file}")
+    probes: List[InstrumentProbeType] = [InstrumentProbeType.PRIMARY]
+    probe_target: InstrumentProbeType = InstrumentProbeType.PRIMARY
+    if run_args.pipette_channels > 1:
+        probes.append(InstrumentProbeType.SECONDARY)
+        probe_target = InstrumentProbeType.BOTH
+    data_files: Dict[InstrumentProbeType, str] = {}
+    for probe in probes:
+        data_filename = f"pressure_sensor_data-trial{trial}-tip{tip}-{probe.name}.csv"
+        data_file = f"{data_dir}/{run_args.name}/{run_args.run_id}/{data_filename}"
+        ui.print_info(f"logging pressure data to {data_file}")
+        data_files[probe] = data_file
 
     plunger_speed = (
         lqid_cfg["plunger_speed"]
         if run_args.plunger_speed == -1
         else run_args.plunger_speed
     )
-    lps = LiquidProbeSettings(
-        starting_mount_height=well.top().point.z + run_args.start_height_offset,
-        max_z_distance=min(well.depth, lqid_cfg["max_z_distance"]),
-        min_z_distance=lqid_cfg["min_z_distance"],
-        mount_speed=run_args.z_speed,
-        plunger_speed=plunger_speed,
-        sensor_threshold_pascals=lqid_cfg["sensor_threshold_pascals"],
-        expected_liquid_height=110,
-        output_option=OutputOptions.sync_buffer_to_csv,
-        aspirate_while_sensing=run_args.aspirate,
-        auto_zero_sensor=True,
-        num_baseline_reads=10,
-        data_file=data_file,
-    )
 
-    hw_mount = OT3Mount.LEFT if run_args.pipette.mount == "left" else OT3Mount.RIGHT
-    run_args.recorder.set_sample_tag(f"trial-{trial}-{tip}ul")
-    # TODO add in stuff for secondary probe
-    height = hw_api.liquid_probe(hw_mount, lps, InstrumentProbeType.PRIMARY)
+    z_distances: List[float] = find_max_z_distances(run_args, tip, well, plunger_speed)
+    z_distances = z_distances[: run_args.multi_passes]
+    start_height = well.top().point.z + run_args.start_height_offset
+    for z_dist in z_distances:
+        lps = LiquidProbeSettings(
+            starting_mount_height=start_height,
+            max_z_distance=z_dist,
+            min_z_distance=lqid_cfg["min_z_distance"],
+            mount_speed=run_args.z_speed,
+            plunger_speed=plunger_speed,
+            sensor_threshold_pascals=lqid_cfg["sensor_threshold_pascals"],
+            expected_liquid_height=110,
+            output_option=OutputOptions.sync_buffer_to_csv,
+            aspirate_while_sensing=run_args.aspirate,
+            auto_zero_sensor=True,
+            num_baseline_reads=10,
+            data_files=data_files,
+        )
+
+        hw_mount = OT3Mount.LEFT if run_args.pipette.mount == "left" else OT3Mount.RIGHT
+        run_args.recorder.set_sample_tag(f"trial-{trial}-{tip}ul")
+        # TODO add in stuff for secondary probe
+        try:
+            height = hw_api.liquid_probe(hw_mount, lps, probe_target)
+        except LiquidNotFoundError as lnf:
+            ui.print_info(f"Liquid not found current position {lnf.detail}")
+            start_height -= z_dist
+        else:
+            break
+        run_args.recorder.clear_sample_tag()
+
     ui.print_info(f"Trial {trial} complete")
-    run_args.recorder.clear_sample_tag()
     return height

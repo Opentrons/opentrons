@@ -32,7 +32,7 @@ export function Privacy({
   robotName,
   setCurrentOption,
 }: PrivacyProps): JSX.Element {
-  const { t } = useTranslation('app_settings')
+  const { t } = useTranslation(['app_settings', 'branded'])
   const dispatch = useDispatch<Dispatch>()
 
   const allRobotSettings = useSelector((state: State) =>
@@ -62,7 +62,7 @@ export function Privacy({
           lineHeight={TYPOGRAPHY.lineHeight36}
           fontWeight={TYPOGRAPHY.fontWeightRegular}
         >
-          {t('opentrons_cares_about_privacy')}
+          {t('branded:opentrons_cares_about_privacy')}
         </StyledText>
         <Flex flexDirection={DIRECTION_COLUMN}>
           <RobotSettingButton
@@ -82,7 +82,7 @@ export function Privacy({
           />
           <RobotSettingButton
             settingName={t('share_display_usage')}
-            settingInfo={t('share_display_usage_description')}
+            settingInfo={t('branded:share_display_usage_description')}
             dataTestId="RobotSettingButton_share_app_analytics"
             rightElement={<OnOffToggle isOn={appAnalyticsOptedIn} />}
             onClick={() => dispatch(toggleAnalyticsOptedIn())}

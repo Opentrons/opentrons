@@ -196,7 +196,6 @@ class BinaryMessenger:
                         if filter and not filter(
                             BinaryMessageId(message_definition.message_id.value)
                         ):
-                            log.debug("message ignored by filter")
                             continue
                         listener(message_definition)
                     if (

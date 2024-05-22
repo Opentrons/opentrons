@@ -21,20 +21,17 @@ import { RUN_STATUS_RUNNING, RUN_STATUS_IDLE } from '@opentrons/api-client'
 
 import { CommandText } from '../../CommandText'
 import { RunTimer } from '../../Devices/ProtocolRun/RunTimer'
+import { getCommandTextData } from '../../CommandText/utils/getCommandTextData'
 import { PlayPauseButton } from './PlayPauseButton'
 import { StopButton } from './StopButton'
-import {
-  ANALYTICS_PROTOCOL_RUN_START,
-  ANALYTICS_PROTOCOL_RUN_RESUME,
-  ANALYTICS_PROTOCOL_RUN_PAUSE,
-} from '../../../redux/analytics'
+import { ANALYTICS_PROTOCOL_RUN_ACTION } from '../../../redux/analytics'
 
 import type {
   CompletedProtocolAnalysis,
   RobotType,
   RunTimeCommand,
 } from '@opentrons/shared-data'
-import type { RunStatus } from '@opentrons/api-client'
+import type { RunCommandSummary, RunStatus } from '@opentrons/api-client'
 import type { TrackProtocolRunEvent } from '../../Devices/hooks'
 import type { RobotAnalyticsData } from '../../../redux/analytics/types'
 
@@ -121,6 +118,7 @@ interface CurrentRunningProtocolCommandProps {
   trackProtocolRunEvent: TrackProtocolRunEvent
   robotAnalyticsData: RobotAnalyticsData | null
   lastAnimatedCommand: string | null
+  lastRunCommand: RunCommandSummary | null
   updateLastAnimatedCommand: (newCommandKey: string) => void
   protocolName?: string
   currentRunCommandIndex?: number
@@ -138,13 +136,15 @@ export function CurrentRunningProtocolCommand({
   robotType,
   protocolName,
   currentRunCommandIndex,
+  lastRunCommand,
   lastAnimatedCommand,
   updateLastAnimatedCommand,
 }: CurrentRunningProtocolCommandProps): JSX.Element | null {
   const { t } = useTranslation('run_details')
-  const currentCommand = robotSideAnalysis?.commands.find(
-    (c: RunTimeCommand, index: number) => index === currentRunCommandIndex
-  )
+  const currentCommand =
+    robotSideAnalysis?.commands.find(
+      (c: RunTimeCommand, index: number) => index === currentRunCommandIndex
+    ) ?? lastRunCommand
 
   let shouldAnimate = true
   if (currentCommand?.key != null) {
@@ -168,14 +168,14 @@ export function CurrentRunningProtocolCommand({
   const onTogglePlayPause = (): void => {
     if (runStatus === RUN_STATUS_RUNNING) {
       pauseRun()
-      trackProtocolRunEvent({ name: ANALYTICS_PROTOCOL_RUN_PAUSE })
+      trackProtocolRunEvent({ name: ANALYTICS_PROTOCOL_RUN_ACTION.PAUSE })
     } else {
       playRun()
       trackProtocolRunEvent({
         name:
           runStatus === RUN_STATUS_IDLE
-            ? ANALYTICS_PROTOCOL_RUN_START
-            : ANALYTICS_PROTOCOL_RUN_RESUME,
+            ? ANALYTICS_PROTOCOL_RUN_ACTION.START
+            : ANALYTICS_PROTOCOL_RUN_ACTION.RESUME,
         properties:
           runStatus === RUN_STATUS_IDLE && robotAnalyticsData != null
             ? robotAnalyticsData
@@ -234,7 +234,7 @@ export function CurrentRunningProtocolCommand({
         {robotSideAnalysis != null && currentCommand != null ? (
           <CommandText
             command={currentCommand}
-            robotSideAnalysis={robotSideAnalysis}
+            commandTextData={getCommandTextData(robotSideAnalysis)}
             robotType={robotType}
             isOnDevice={true}
           />

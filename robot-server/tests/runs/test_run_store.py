@@ -120,6 +120,41 @@ def state_summary() -> StateSummary:
     )
 
 
+@pytest.fixture()
+def run_time_parameters() -> List[pe_types.RunTimeParameter]:
+    """Get a RunTimeParameter list."""
+    return [
+        pe_types.BooleanParameter(
+            displayName="Display Name 1",
+            variableName="variable_name_1",
+            value=False,
+            default=True,
+        ),
+        pe_types.NumberParameter(
+            displayName="Display Name 2",
+            variableName="variable_name_2",
+            type="int",
+            min=123.0,
+            max=456.0,
+            value=333.0,
+            default=222.0,
+        ),
+        pe_types.EnumParameter(
+            displayName="Display Name 3",
+            variableName="variable_name_3",
+            type="str",
+            choices=[
+                pe_types.EnumChoice(
+                    displayName="Choice Name",
+                    value="cool choice",
+                )
+            ],
+            default="cooler choice",
+            value="coolest choice",
+        ),
+    ]
+
+
 @pytest.fixture
 def invalid_state_summary() -> StateSummary:
     """Should fail pydantic validation."""
@@ -164,6 +199,7 @@ def test_update_run_state(
     subject: RunStore,
     state_summary: StateSummary,
     protocol_commands: List[pe_commands.Command],
+    run_time_parameters: List[pe_types.RunTimeParameter],
     mock_runs_publisher: mock.Mock,
 ) -> None:
     """It should be able to update a run state to the store."""
@@ -184,8 +220,10 @@ def test_update_run_state(
         run_id="run-id",
         summary=state_summary,
         commands=protocol_commands,
+        run_time_parameters=run_time_parameters,
     )
     run_summary_result = subject.get_state_summary(run_id="run-id")
+    parameters_result = subject.get_run_time_parameters(run_id="run-id")
     commands_result = subject.get_commands_slice(
         run_id="run-id",
         length=len(protocol_commands),
@@ -200,6 +238,7 @@ def test_update_run_state(
         actions=[action],
     )
     assert run_summary_result == state_summary
+    assert parameters_result == run_time_parameters
     assert commands_result.commands == protocol_commands
     mock_runs_publisher.publish_runs_advise_refetch.assert_called_once_with(
         run_id="run-id"
@@ -217,6 +256,7 @@ def test_update_state_run_not_found(
             run_id="run-not-found",
             summary=state_summary,
             commands=protocol_commands,
+            run_time_parameters=[],
         )
 
 
@@ -436,7 +476,9 @@ def test_get_state_summary(
         protocol_id=None,
         created_at=datetime(year=2021, month=1, day=1, tzinfo=timezone.utc),
     )
-    subject.update_run_state(run_id="run-id", summary=state_summary, commands=[])
+    subject.update_run_state(
+        run_id="run-id", summary=state_summary, commands=[], run_time_parameters=[]
+    )
     result = subject.get_state_summary(run_id="run-id")
     assert result == state_summary
     mock_runs_publisher.publish_runs_advise_refetch.assert_called_once_with(
@@ -454,7 +496,10 @@ def test_get_state_summary_failure(
         created_at=datetime(year=2021, month=1, day=1, tzinfo=timezone.utc),
     )
     subject.update_run_state(
-        run_id="run-id", summary=invalid_state_summary, commands=[]
+        run_id="run-id",
+        summary=invalid_state_summary,
+        commands=[],
+        run_time_parameters=[],
     )
     result = subject.get_state_summary(run_id="run-id")
     assert isinstance(result, BadStateSummary)
@@ -471,6 +516,62 @@ def test_get_state_summary_none(subject: RunStore) -> None:
     result = subject.get_state_summary(run_id="run-id")
     assert isinstance(result, BadStateSummary)
     assert result.dataError.code == ErrorCodes.INVALID_STORED_DATA
+
+
+def test_get_run_time_parameters(
+    subject: RunStore,
+    state_summary: StateSummary,
+    run_time_parameters: List[pe_types.RunTimeParameter],
+) -> None:
+    """It should be able to get store run time parameters."""
+    subject.insert(
+        run_id="run-id",
+        protocol_id=None,
+        created_at=datetime(year=2021, month=1, day=1, tzinfo=timezone.utc),
+    )
+    subject.update_run_state(
+        run_id="run-id",
+        summary=state_summary,
+        commands=[],
+        run_time_parameters=run_time_parameters,
+    )
+    result = subject.get_run_time_parameters(run_id="run-id")
+    assert result == run_time_parameters
+
+
+def test_get_run_time_parameters_invalid(
+    subject: RunStore,
+    state_summary: StateSummary,
+) -> None:
+    """It should return an empty list if there invalid parameters."""
+    bad_parameters = [pe_types.BooleanParameter.construct(foo="bar")]  # type: ignore[call-arg]
+    subject.insert(
+        run_id="run-id",
+        protocol_id=None,
+        created_at=datetime(year=2021, month=1, day=1, tzinfo=timezone.utc),
+    )
+    subject.update_run_state(
+        run_id="run-id",
+        summary=state_summary,
+        commands=[],
+        run_time_parameters=bad_parameters,  # type: ignore[arg-type]
+    )
+    result = subject.get_run_time_parameters(run_id="run-id")
+    assert result == []
+
+
+def test_get_run_time_parameters_none(
+    subject: RunStore,
+    state_summary: StateSummary,
+) -> None:
+    """It should return an empty list if there are no run time parameters associated."""
+    subject.insert(
+        run_id="run-id",
+        protocol_id=None,
+        created_at=datetime(year=2021, month=1, day=1, tzinfo=timezone.utc),
+    )
+    result = subject.get_run_time_parameters(run_id="run-id")
+    assert result == []
 
 
 def test_has_run_id(subject: RunStore) -> None:
@@ -503,6 +604,7 @@ def test_get_command(
         run_id="run-id",
         summary=state_summary,
         commands=protocol_commands,
+        run_time_parameters=[],
     )
     result = subject.get_command(run_id="run-id", command_id="pause-2")
 
@@ -532,6 +634,7 @@ def test_get_command_raise_exception(
         run_id="run-id",
         summary=state_summary,
         commands=protocol_commands,
+        run_time_parameters=[],
     )
     with pytest.raises(expected_exception):
         subject.get_command(run_id=input_run_id, command_id=input_command_id)
@@ -552,6 +655,7 @@ def test_get_command_slice(
         run_id="run-id",
         summary=state_summary,
         commands=protocol_commands,
+        run_time_parameters=[],
     )
     result = subject.get_commands_slice(
         run_id="run-id", cursor=0, length=len(protocol_commands)
@@ -598,6 +702,7 @@ def test_get_commands_slice_clamping(
         run_id="run-id",
         summary=state_summary,
         commands=protocol_commands,
+        run_time_parameters=[],
     )
     result = subject.get_commands_slice(
         run_id="run-id", cursor=input_cursor, length=input_length
@@ -629,3 +734,31 @@ def test_get_commands_slice_run_not_found(subject: RunStore) -> None:
     )
     with pytest.raises(RunNotFoundError):
         subject.get_commands_slice(run_id="not-run-id", cursor=1, length=3)
+
+
+def test_get_all_commands_as_preserialized_list(
+    subject: RunStore,
+    protocol_commands: List[pe_commands.Command],
+    state_summary: StateSummary,
+) -> None:
+    """It should get all commands stored in DB as a pre-serialized list."""
+    subject.insert(
+        run_id="run-id",
+        protocol_id=None,
+        created_at=datetime(year=2021, month=1, day=1, tzinfo=timezone.utc),
+    )
+    subject.update_run_state(
+        run_id="run-id",
+        summary=state_summary,
+        commands=protocol_commands,
+        run_time_parameters=[],
+    )
+    result = subject.get_all_commands_as_preserialized_list(run_id="run-id")
+    assert result == [
+        '{"id": "pause-1", "createdAt": "2021-01-01T00:00:00", "commandType": "waitForResume",'
+        ' "key": "command-key", "status": "succeeded", "params": {"message": "hello world"}, "result": {}}',
+        '{"id": "pause-2", "createdAt": "2022-02-02T00:00:00", "commandType": "waitForResume",'
+        ' "key": "command-key", "status": "succeeded", "params": {"message": "hey world"}, "result": {}}',
+        '{"id": "pause-3", "createdAt": "2023-03-03T00:00:00", "commandType": "waitForResume",'
+        ' "key": "command-key", "status": "succeeded", "params": {"message": "sup world"}, "result": {}}',
+    ]

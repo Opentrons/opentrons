@@ -24,12 +24,6 @@ def enable_door_safety_switch(robot_type: RobotTypeEnum) -> bool:
     return advs.get_setting_with_env_overload("enableDoorSafetySwitch", robot_type)
 
 
-def disable_fast_protocol_upload() -> bool:
-    return advs.get_setting_with_env_overload(
-        "disableFastProtocolUpload", RobotTypeEnum.FLEX
-    )
-
-
 def enable_ot3_hardware_controller() -> bool:
     """Get whether to use the OT-3 hardware controller."""
 
@@ -80,3 +74,7 @@ def enable_error_recovery_experiments() -> bool:
 
 def enable_performance_metrics(robot_type: RobotTypeEnum) -> bool:
     return advs.get_setting_with_env_overload("enablePerformanceMetrics", robot_type)
+
+
+def oem_mode_enabled() -> bool:
+    return advs.get_setting_with_env_overload("enableOEMMode", RobotTypeEnum.FLEX)
