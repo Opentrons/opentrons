@@ -17,25 +17,29 @@ import {
   DISPLAY_FLEX,
 } from '@opentrons/components'
 
+import type { FailedCommand } from './types'
+
 interface RunPausedSplashProps {
   onClick: () => void
-  errorType?: string
-  protocolName?: string
+  failedCommand: FailedCommand | null
 }
 
 export function RunPausedSplash({
   onClick,
-  errorType,
-  protocolName,
+  failedCommand,
 }: RunPausedSplashProps): JSX.Element {
   const { t } = useTranslation('error_recovery')
+
+  const errorType = failedCommand?.error?.errorType
 
   let subText: string | null
   switch (errorType) {
     default:
-      subText = protocolName ?? null
+      subText = 'test' ?? null
   }
 
+  // TODO(jh 05-22-24): The hardcoded Z-indexing is non-ideal but must be done to keep the splash page above
+  // several components in the RunningProtocol page. Investigate why these components have seemingly arbitrary zIndex values.
   return (
     <Btn
       display={DISPLAY_FLEX}
@@ -49,6 +53,7 @@ export function RunPausedSplash({
       padding={SPACING.spacing120}
       backgroundColor={COLORS.grey50}
       onClick={onClick}
+      zIndex={5}
     >
       <SplashFrame>
         <Flex gridGap={SPACING.spacing32} alignItems={ALIGN_CENTER}>

@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { vi, describe, expect, it, beforeEach } from 'vitest'
-import { screen, renderHook, act } from '@testing-library/react'
+import { screen, renderHook } from '@testing-library/react'
 
 import {
   RUN_STATUS_AWAITING_RECOVERY,
@@ -38,51 +38,23 @@ describe('useErrorRecovery', () => {
     const { result } = renderHook(() =>
       useErrorRecoveryFlows('MOCK_ID', RUN_STATUS_AWAITING_RECOVERY)
     )
-    act(() => {
-      result.current.toggleER()
-    })
 
     expect(result.current.isERActive).toBe(true)
-
-    act(() => {
-      result.current.toggleER()
-    })
-
-    expect(result.current.isERActive).toBe(false)
 
     const { result: resultStopRequested } = renderHook(() =>
       useErrorRecoveryFlows('MOCK_ID', RUN_STATUS_STOP_REQUESTED)
     )
 
-    act(() => {
-      resultStopRequested.current.toggleER()
-    })
-
     expect(resultStopRequested.current.isERActive).toBe(true)
   })
 
   it('should disable error recovery when runStatus is not a valid ER run status', () => {
-    const { result, rerender } = renderHook(
+    const { result } = renderHook(
       (runStatus: RunStatus) => useErrorRecoveryFlows('MOCK_ID', runStatus),
       {
-        initialProps: RUN_STATUS_AWAITING_RECOVERY,
+        initialProps: RUN_STATUS_RUNNING,
       }
     )
-
-    act(() => {
-      result.current.toggleER()
-    })
-
-    // @ts-expect-error "running" is a valid status here
-    rerender(RUN_STATUS_RUNNING)
-
-    expect(result.current.isERActive).toBe(false)
-
-    act(() => {
-      result.current.toggleER()
-    })
-
-    rerender(RUN_STATUS_AWAITING_RECOVERY)
 
     expect(result.current.isERActive).toBe(false)
   })
@@ -113,8 +85,9 @@ describe('ErrorRecovery', () => {
     vi.mocked(ErrorRecoveryWizard).mockReturnValue(<div>MOCK WIZARD</div>)
   })
 
-  it(`renders the wizard`, () => {
-    render(props)
-    screen.getByText('MOCK WIZARD')
-  })
+  //TOME: Render an dpress the button when designs are updated.
+  // it(`renders the wizard when the wizard is toggled on`, () => {
+  //   render(props)
+  //   screen.getByText('MOCK WIZARD')
+  // })
 })

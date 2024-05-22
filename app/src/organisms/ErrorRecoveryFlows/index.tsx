@@ -5,7 +5,9 @@ import {
   RUN_STATUS_STOP_REQUESTED,
 } from '@opentrons/api-client'
 
+import { useFeatureFlag } from '../../redux/config'
 import { ErrorRecoveryWizard } from './ErrorRecoveryWizard'
+import { RunPausedSplash } from './RunPausedSplash'
 import { useCurrentlyFailedRunCommand } from './utils'
 
 import type { RunStatus } from '@opentrons/api-client'
@@ -19,7 +21,6 @@ const VALID_ER_RUN_STATUSES: RunStatus[] = [
 interface UseErrorRecoveryResult {
   isERActive: boolean
   failedCommand: FailedCommand | null
-  toggleER: () => void
 }
 
 export function useErrorRecoveryFlows(
@@ -29,26 +30,22 @@ export function useErrorRecoveryFlows(
   const [isERActive, setIsERActive] = React.useState(false)
   const failedCommand = useCurrentlyFailedRunCommand(runId, runStatus)
 
-  const toggleER = (): void => {
-    setIsERActive(!isERActive)
-  }
+  const isValidRunStatus =
+    runStatus != null && VALID_ER_RUN_STATUSES.includes(runStatus)
 
+  if (!isERActive && isValidRunStatus) {
+    setIsERActive(true)
+  }
   // Because multiple ER flows may occur per run, disable ER when the status is not "awaiting-recovery" or a
   // terminating run status in which we want to persist ER flows. Specific recovery commands cause run status to change.
   // See a specific command's docstring for details.
-  React.useEffect(() => {
-    const isValidRunStatus =
-      runStatus != null && VALID_ER_RUN_STATUSES.includes(runStatus)
-
-    if (isERActive && !isValidRunStatus) {
-      setIsERActive(false)
-    }
-  }, [isERActive, runStatus])
+  else if (isERActive && !isValidRunStatus) {
+    setIsERActive(false)
+  }
 
   return {
     isERActive,
     failedCommand,
-    toggleER,
   }
 }
 
@@ -56,9 +53,28 @@ interface ErrorRecoveryFlowsProps {
   runId: string
   failedCommand: FailedCommand | null
 }
+
 export function ErrorRecoveryFlows({
   runId,
   failedCommand,
 }: ErrorRecoveryFlowsProps): JSX.Element | null {
-  return <ErrorRecoveryWizard runId={runId} failedCommand={failedCommand} />
+  const [showERWizard, setShowERWizard] = React.useState(false)
+  const enableRunNotes = useFeatureFlag('enableRunNotes')
+
+  const toggleER = (): void => {
+    setShowERWizard(!showERWizard)
+  }
+
+  if (!enableRunNotes) {
+    return null
+  }
+
+  return (
+    <>
+      {showERWizard ? (
+        <ErrorRecoveryWizard runId={runId} failedCommand={failedCommand} />
+      ) : null}
+      <RunPausedSplash onClick={toggleER} failedCommand={failedCommand} />
+    </>
+  )
 }
