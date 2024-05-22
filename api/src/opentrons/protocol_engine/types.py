@@ -3,28 +3,28 @@ from __future__ import annotations
 from datetime import datetime
 from enum import Enum
 from dataclasses import dataclass
-from pydantic import BaseModel, Field, RootModel
+
 from typing import (
-    Optional,
-    Union,
-    List,
-    Dict,
     Any,
-    NamedTuple,
-    Tuple,
+    Dict,
     FrozenSet,
+    List,
+    NamedTuple,
+    Optional,
+    Tuple,
+    Union,
 )
+from typing_extensions import Literal, TypeGuard
+
 from pydantic import (
     BaseModel,
     Field,
+    RootModel,
     StrictBool,
     StrictFloat,
     StrictInt,
     StrictStr,
-    validator,
 )
-from typing import Optional, Union, List, Dict, Any, NamedTuple, Tuple, FrozenSet
-from typing_extensions import Literal, TypeGuard
 
 from opentrons_shared_data.pipette.dev_types import PipetteNameType
 from opentrons.types import MountType, DeckSlotName, StagingSlotName

@@ -2,7 +2,7 @@ import pytest
 
 from pydantic import ValidationError
 from opentrons_shared_data.labware import load_definition
-from opentrons_shared_data.labware.labware_definition import LabwareDefinition
+from opentrons_shared_data.labware.models import LabwareDefinition
 
 from . import get_ot_defs
 

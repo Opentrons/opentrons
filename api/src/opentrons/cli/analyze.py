@@ -232,9 +232,13 @@ async def _analyze(
             for f in protocol_source.files
         ],
         config=(
-            JsonConfig.model_construct(schemaVersion=protocol_source.config.schema_version)
+            JsonConfig.model_construct(
+                schemaVersion=protocol_source.config.schema_version
+            )
             if isinstance(protocol_source.config, JsonProtocolConfig)
-            else PythonConfig.model_construct(apiVersion=protocol_source.config.api_version)
+            else PythonConfig.model_construct(
+                apiVersion=protocol_source.config.api_version
+            )
         ),
         metadata=protocol_source.metadata,
         robotType=protocol_source.robot_type,
