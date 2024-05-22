@@ -87,9 +87,9 @@ async def _await_responses(
 
 
 async def _handle_hepa_uv_info(
-        response_queue: "asyncio.Queue[Tuple[NodeId, Union[PipetteInformation, GripperInformation, HepaUVInformation]]]",
-        response: message_definitions.HepaUVInfoResponse,
-        arbitration_id: ArbitrationId,
+    response_queue: "asyncio.Queue[Tuple[NodeId, Union[PipetteInformation, GripperInformation, HepaUVInformation]]]",
+    response: message_definitions.HepaUVInfoResponse,
+    arbitration_id: ArbitrationId,
 ) -> NodeId:
     node = NodeId(arbitration_id.parts.originating_node_id)
     await response_queue.put(
@@ -123,7 +123,7 @@ async def _handle_gripper_info(
 
 
 async def _handle_pipette_info(
-    response_queue: "asyncio.Queue[Tuple[NodeId, Union[PipetteInformation, GripperInformation]]]",
+    response_queue: "asyncio.Queue[Tuple[NodeId, Union[PipetteInformation, GripperInformation, HepaUVInformation]]]",
     response: message_definitions.PipetteInfoResponse,
     arbitration_id: ArbitrationId,
 ) -> NodeId:
@@ -164,7 +164,7 @@ def _need_type_query(attached: ToolDetectionResult) -> Set[NodeId]:
 IntermediateResolution = Tuple[
     Dict[NodeId, PipetteInformation],
     Dict[NodeId, GripperInformation],
-    Dict[NodeId, HepaUVInformation]
+    Dict[NodeId, HepaUVInformation],
 ]
 
 
@@ -226,11 +226,11 @@ async def _resolve_with_stimulus_retries(
         seen_gripper = set([k.application_for() for k in gripper.keys()])
         seen_hepa_uv = set([k.application_for() for k in hepa_uv.keys()])
         if all(
-                [
-                    seen_pipettes == expected_pipettes,
-                    seen_gripper == expected_gripper,
-                    seen_hepa_uv == expected_hepa_uv,
-                ]
+            [
+                seen_pipettes == expected_pipettes,
+                seen_gripper == expected_gripper,
+                seen_hepa_uv == expected_hepa_uv,
+            ]
         ):
             return
 
@@ -258,7 +258,7 @@ async def _resolve_tool_types(
     except asyncio.TimeoutError:
         log.warning("No response from expected tool")
 
-    last_element: IntermediateResolution = ({}, {})
+    last_element: IntermediateResolution = ({}, {}, {})
     try:
         while True:
             last_element = resolve_queue.get_nowait()
