@@ -119,7 +119,7 @@ class EngineStore:
         self._hardware_api = hardware_api
         self._robot_type = robot_type
         self._deck_type = deck_type
-        self._default_engine: Optional[ProtocolEngine] = None
+        self._default_run_orchestrator: Optional[RunOrchestrator] = None
         hardware_api.register_callback(_get_estop_listener(self))
 
     @property
@@ -161,8 +161,8 @@ class EngineStore:
         ):
             raise EngineConflictError("An engine for a run is currently active")
 
-        engine = self._default_engine
-        if engine is None:
+        default_orchestrator = self._default_run_orchestrator
+        if default_orchestrator is None:
             # TODO(mc, 2022-03-21): potential race condition
             engine = await create_protocol_engine(
                 hardware_api=self._hardware_api,
@@ -172,8 +172,10 @@ class EngineStore:
                     block_on_door_open=False,
                 ),
             )
-            self._default_engine = engine
-        return engine
+            self._default_run_orchestrator = RunOrchestrator.build_orchestrator(
+                protocol_engine=engine, hardware_api=self._hardware_api
+            )
+        return default_orchestrator.engine
 
     async def create(
         self,
