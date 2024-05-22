@@ -14,7 +14,7 @@ export const getTimelineWarningsForSelectedStep: Selector<
   (dismissedWarningTypes, warningsPerStep, stepId) => {
     if (stepId == null) return []
     return (warningsPerStep[stepId] || []).filter(
-      warning => !(dismissedWarningTypes[stepId] || []).includes(warning.type)
+      warning => !dismissedWarningTypes.includes(warning.type)
     )
   }
 )
@@ -28,12 +28,9 @@ export const getHasTimelineWarningsPerStep: Selector<HasWarningsPerStep> = creat
       const warningTypesForStep = (warningsPerStep[stepId] || []).map(
         w => w.type
       )
-      const dismissedWarningTypesForStep = new Set(
-        dismissedWarningTypes[stepId] || []
-      )
       const hasUndismissedWarnings =
         warningTypesForStep.filter(
-          warningType => !dismissedWarningTypesForStep.has(warningType)
+          warningType => !dismissedWarningTypes.includes(warningType)
         ).length > 0
       return { ...stepAcc, [stepId]: hasUndismissedWarnings }
     }, {})
