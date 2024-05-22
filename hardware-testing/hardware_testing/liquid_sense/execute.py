@@ -222,6 +222,7 @@ def run(
         run_args.pipette.return_tip()
     else:
         run_args.pipette.drop_tip()
+        run_args.pipette._retract()
 
     env_data = run_args.environment_sensor.get_reading()
 
@@ -247,6 +248,7 @@ def run(
                     run_args.pipette.return_tip()
                 else:
                     run_args.pipette.drop_tip()
+                    run_args.pipette._retract()
 
             ui.print_info(f"Picking up {tip}ul tip")
             run_args.pipette.pick_up_tip(tips[0])
@@ -270,6 +272,7 @@ def run(
                 run_args.pipette.return_tip()
             else:
                 run_args.pipette.drop_tip()
+                run_args.pipette._retract()
             results.append(height)
             adjusted_results.append(height + tip_length_offset)
             env_data = run_args.environment_sensor.get_reading()
