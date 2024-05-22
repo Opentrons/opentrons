@@ -8,7 +8,6 @@ import { useCommandQuery } from '@opentrons/react-api-client'
 import { useNotifyAllCommandsQuery } from '../../resources/runs'
 import { RECOVERY_MAP, ERROR_KINDS, INVALID, STEP_ORDER } from './constants'
 
-import type { RunStatus } from '@opentrons/api-client'
 import type {
   RouteStep,
   IRecoveryMap,
@@ -25,8 +24,7 @@ const ALL_COMMANDS_POLL_MS = 5000
 // Return the `currentlyRecoveringFrom` command returned by the server, if any.
 // Otherwise, returns null.
 export function useCurrentlyRecoveringFrom(
-  runId: string,
-  runStatus: RunStatus | null
+  runId: string
 ): FailedCommand | null {
   const { data: allCommandsQueryData } = useNotifyAllCommandsQuery(
     runId,
