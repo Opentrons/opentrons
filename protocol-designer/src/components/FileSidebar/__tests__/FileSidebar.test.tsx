@@ -230,7 +230,7 @@ describe('FileSidebar', () => {
       'One or more modules specified in your protocol in Slot(s) A1,B1 are not currently used in any step. In order to run this protocol you will need to power up and connect the modules to your robot.'
     )
   })
-  it.only('renders the formatted unused pipettes and modules warning sorted by count', () => {
+  it('renders the formatted unused pipettes and modules warning sorted by count', () => {
     vi.mocked(getInitialDeckSetup).mockReturnValue({
       modules: {
         moduleId1: {
@@ -280,7 +280,6 @@ describe('FileSidebar', () => {
     })
     render()
     fireEvent.click(screen.getByRole('button', { name: 'Export' }))
-    screen.debug()
     screen.getByText(
       'The mock display name pipette and Temperature modules, Thermocycler module, and Heater-Shaker module in your protocol are not currently used in any step. In order to run this protocol you will need to attach this pipette as well as power up and connect the module to your robot.'
     )
