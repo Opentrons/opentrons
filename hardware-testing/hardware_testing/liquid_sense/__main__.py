@@ -8,7 +8,6 @@ from time import sleep
 import os
 from typing import List, Any, Optional
 import traceback
-import sys
 
 from hardware_testing.opentrons_api import helpers_ot3
 from hardware_testing.gravimetric import helpers, workarounds
@@ -38,6 +37,15 @@ from hardware_testing.protocols.liquid_sense_lpc import (
     liquid_sense_ot3_p50_single_vial,
     liquid_sense_ot3_p1000_single_vial,
 )
+
+try:
+    from . import google_sheets_tool  # type: ignore[import]
+except Exception:
+    print("WARNING: unable to import google_sheets_tool, "
+          "if not simulating check your environment")
+
+
+CREDENTIALS_PATH = "/var/lib/jupyter/notebooks/abr.json"
 
 API_LEVEL = "2.18"
 
@@ -282,18 +290,9 @@ if __name__ == "__main__":
             )
             sleep(1)
             # Connect to Google Sheet
-            try:
-                sys.path.insert(0, "/var/lib/jupyter/notebooks")
-                import google_sheets_tool  # type: ignore[import]
-
-                credentials_path = "/var/lib/jupyter/notebooks/abr.json"
-            except ImportError:
-                raise ImportError(
-                    "Run on robot. Make sure google_sheets_tool.py is in jupyter notebook."
-                )
-            print(os.path.exists(credentials_path))
+            print(os.path.exists(CREDENTIALS_PATH))
             google_sheet = google_sheets_tool.google_sheet(
-                credentials_path, args.google_sheet_name, 0
+                CREDENTIALS_PATH, args.google_sheet_name, 0
             )
             sheet_id = google_sheet.create_worksheet(run_args.run_id)
         else:
