@@ -76,6 +76,7 @@ export function useErrorName(errorKind: ErrorKind): string {
 export function useErrorMessage(errorKind: ErrorKind): string {
   const { t } = useTranslation('error_recovery')
 
+  // TOME: Need a new utility function here to get the splash screen subtext.
   switch (errorKind) {
     default:
       return t('general_error_message')
