@@ -31,6 +31,7 @@ describe('ErrorRecoveryContent', () => {
     OPTION_SELECTION,
     BEFORE_BEGINNING,
     RESUME,
+    ROBOT_CANCELING,
     ROBOT_RESUMING,
     ROBOT_IN_MOTION,
     ROBOT_RETRYING_COMMAND,
@@ -90,6 +91,19 @@ describe('ErrorRecoveryContent', () => {
     render(props)
 
     screen.getByText('MOCK_RESUME_RUN')
+  })
+
+  it(`returns RecoveryInProgressModal when the route is ${ROBOT_CANCELING.ROUTE}`, () => {
+    props = {
+      ...props,
+      recoveryMap: {
+        ...props.recoveryMap,
+        route: ROBOT_CANCELING.ROUTE,
+      },
+    }
+    render(props)
+
+    screen.getByText('MOCK_IN_PROGRESS')
   })
 
   it(`returns RecoveryInProgressModal when the route is ${ROBOT_IN_MOTION.ROUTE}`, () => {

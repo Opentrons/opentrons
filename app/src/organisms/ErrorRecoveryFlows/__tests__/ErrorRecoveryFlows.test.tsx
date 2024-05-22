@@ -5,6 +5,7 @@ import { screen, renderHook, act } from '@testing-library/react'
 import {
   RUN_STATUS_AWAITING_RECOVERY,
   RUN_STATUS_RUNNING,
+  RUN_STATUS_STOP_REQUESTED,
 } from '@opentrons/api-client'
 
 import { renderWithProviders } from '../../../__testing-utils__'
@@ -33,7 +34,7 @@ describe('useErrorRecovery', () => {
     expect(result.current.isERActive).toBe(false)
   })
 
-  it('should toggle the value of isEREnabled properly', () => {
+  it('should toggle the value of isEREnabled properly when the run status is valid', () => {
     const { result } = renderHook(() =>
       useErrorRecoveryFlows('MOCK_ID', RUN_STATUS_AWAITING_RECOVERY)
     )
@@ -48,9 +49,19 @@ describe('useErrorRecovery', () => {
     })
 
     expect(result.current.isERActive).toBe(false)
+
+    const { result: resultStopRequested } = renderHook(() =>
+      useErrorRecoveryFlows('MOCK_ID', RUN_STATUS_STOP_REQUESTED)
+    )
+
+    act(() => {
+      resultStopRequested.current.toggleER()
+    })
+
+    expect(resultStopRequested.current.isERActive).toBe(true)
   })
 
-  it('should disable error recovery when runStatus is not "awaiting-recovery"', () => {
+  it('should disable error recovery when runStatus is not a valid ER run status', () => {
     const { result, rerender } = renderHook(
       (runStatus: RunStatus) => useErrorRecoveryFlows('MOCK_ID', runStatus),
       {

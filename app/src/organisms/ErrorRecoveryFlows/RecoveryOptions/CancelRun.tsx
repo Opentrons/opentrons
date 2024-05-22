@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next'
 import {
   ALIGN_CENTER,
   DIRECTION_COLUMN,
+  COLORS,
   Flex,
   Icon,
   JUSTIFY_SPACE_BETWEEN,
@@ -16,21 +17,19 @@ import { RecoveryFooterButtons } from './shared'
 
 import type { RecoveryContentProps } from '../types'
 
-export function ResumeRun({
+export function CancelRun({
   isOnDevice,
   routeUpdateActions,
   recoveryCommands,
 }: RecoveryContentProps): JSX.Element | null {
-  const { ROBOT_RETRYING_COMMAND } = RECOVERY_MAP
+  const { ROBOT_CANCELING } = RECOVERY_MAP
   const { t } = useTranslation('error_recovery')
 
-  const { retryFailedCommand, resumeRun } = recoveryCommands
+  const { cancelRun } = recoveryCommands
   const { goBackPrevStep, setRobotInMotion } = routeUpdateActions
 
   const primaryBtnOnClick = (): Promise<void> => {
-    return setRobotInMotion(true, ROBOT_RETRYING_COMMAND.ROUTE)
-      .then(() => retryFailedCommand())
-      .then(() => resumeRun())
+    return setRobotInMotion(true, ROBOT_CANCELING.ROUTE).then(() => cancelRun())
   }
 
   if (isOnDevice) {
@@ -50,12 +49,17 @@ export function ResumeRun({
           height="100%"
           width="848px"
         >
-          <Icon name="ot-alert" size="3.75rem" marginTop={SPACING.spacing24} />
+          <Icon
+            name="ot-alert"
+            size="3.75rem"
+            marginTop={SPACING.spacing24}
+            color={COLORS.red50}
+          />
           <StyledText as="h3Bold">
-            {t('are_you_sure_you_want_to_resume')}
+            {t('are_you_sure_you_want_to_cancel')}
           </StyledText>
-          <StyledText as="h4" textAlign={ALIGN_CENTER}>
-            {t('run_will_resume')}
+          <StyledText as="h4" color={COLORS.grey60} textAlign={ALIGN_CENTER}>
+            {t('if_tips_are_attached')}
           </StyledText>
         </Flex>
         <RecoveryFooterButtons
