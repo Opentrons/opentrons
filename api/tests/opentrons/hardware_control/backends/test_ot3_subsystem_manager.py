@@ -226,12 +226,13 @@ class ToolDetectionController:
             if device.subidentifier != 0
             else default_name
         )
-        return tools.types.PipetteInformation(
-            pipette_name.name,
-            f"dummyserial{pipette_name.name}",
-            pipette_name,
-            pipette_name.value,
+        tool = tools.types.PipetteInformation(
+            name=pipette_name,
+            name_int=pipette_name.value,
+            model=pipette_name.name,
+            serial=f"dummyserial{pipette_name.name}",
         )
+        return tool
 
     def _auto_tool_summary(
         self, devices: Dict[FirmwareTarget, network.DeviceInfoCache]
