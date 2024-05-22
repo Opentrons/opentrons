@@ -1,4 +1,7 @@
 import pytest
+
+from opentrons.protocol_api import ParameterContext
+from opentrons.protocols.api_support.types import APIVersion
 from opentrons.protocols.execution import execute, execute_python
 from opentrons.protocols.parse import parse
 
@@ -93,3 +96,17 @@ metadata={"apiLevel": "2.0"};
         execute.run_protocol(protocol, context=ctx)
     assert "[line 5]" in str(e.value)
     assert "Exception [line 5]: hi" in str(e.value)
+
+
+@pytest.mark.ot2_only
+@pytest.mark.parametrize("protocol_file", ["testosaur_with_rtp.py"])
+def test_rtp_extraction(protocol, protocol_file) -> None:
+    """It should set the RTP definitions in protocol with override values from run."""
+    proto = parse(protocol.text, protocol.filename)
+    parameter_context = ParameterContext(api_version=APIVersion(2, 18))
+    run_time_param_overrides = {"sample_count": 2}
+    assert execute_python.exec_add_parameters(  # type: ignore
+        protocol=proto,
+        parameter_context=parameter_context,
+        run_time_param_overrides=run_time_param_overrides,
+    ).get_all() == {"sample_count": 2, "mount": "left"}

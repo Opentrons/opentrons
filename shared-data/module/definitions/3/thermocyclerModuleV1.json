@@ -38,6 +38,7 @@
   "quirks": [],
   "slotTransforms": {},
   "compatibleWith": ["thermocyclerModuleV1"],
+  "incompatibleWithDecks": ["ot3_standard"],
   "twoDimensionalRendering": {
     "name": "svg",
     "type": "element",

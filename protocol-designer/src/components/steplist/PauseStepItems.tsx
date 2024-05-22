@@ -15,6 +15,7 @@ export function PauseStepItems(props: Props): JSX.Element | null {
   }
   const { message, wait } = pauseArgs
   const { hours, minutes, seconds } = pauseArgs.meta
+
   return (
     <>
       {wait !== true ? (
@@ -41,9 +42,9 @@ export function PauseStepItems(props: Props): JSX.Element | null {
           </li>
         </>
       )}
-      {message && (
+      {message != null && message !== '' ? (
         <li className={styles.substep_content}>&quot;{message}&quot;</li>
-      )}
+      ) : null}
     </>
   )
 }

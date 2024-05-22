@@ -274,8 +274,8 @@
     },
     "toV8_1Migration": {
       "body1": "Your protocol will be automatically updated to the latest version.",
-      "body2": "The default dispense height is now 1mm from the bottom of the well. If your protocol contains any dispense commands without a custom height, it will be automatically updated.",
-      "body3": "As always, please contact us with any questions or feedback."
+      "body2": "The default dispense height is now 1 mm from the bottom of the well, instead of 0.5 mm. All dispense commands without a custom height will change to use the new default height.",
+      "body3": "Additionally, blowout actions now precede touch tip actions. The new order affects all dispenses that include both actions."
     },
     "toV8Migration": {
       "body1": "Your protocol will be automatically updated to the latest version.",

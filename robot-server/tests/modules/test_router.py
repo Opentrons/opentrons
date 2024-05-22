@@ -49,7 +49,9 @@ def module_identifier(decoy: Decoy) -> ModuleIdentifier:
 
 
 @pytest.fixture()
-def module_data_mapper(decoy: Decoy) -> ModuleDataMapper:
+def module_data_mapper(
+    decoy: Decoy,
+) -> ModuleDataMapper:
     """Get a mock module data mapper."""
     return decoy.mock(cls=ModuleDataMapper)
 
@@ -87,6 +89,7 @@ async def test_get_modules_maps_data_and_id(
         hasAvailableUpdate=True,
         moduleType=ModuleType.MAGNETIC,
         moduleModel=ModuleModel.MAGNETIC_MODULE_V1,
+        compatibleWithRobot=True,
         usbPort=UsbPort(
             port=42,
             hub=False,

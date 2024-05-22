@@ -2,7 +2,6 @@ import * as React from 'react'
 import styled from 'styled-components'
 import {
   COLORS,
-  POSITION_FIXED,
   POSITION_ABSOLUTE,
   ALIGN_CENTER,
   JUSTIFY_CENTER,
@@ -76,7 +75,7 @@ export function LegacyModalShell(props: LegacyModalShellProps): JSX.Element {
 }
 
 const Overlay = styled.div`
-  position: ${POSITION_FIXED};
+  position: ${POSITION_ABSOLUTE};
   left: 0;
   right: 0;
   top: 0;

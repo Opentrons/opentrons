@@ -2,7 +2,6 @@
 import asyncio
 from logging import getLogger
 from typing import Optional, List, Protocol
-from typing_extensions import assert_never
 
 from opentrons.hardware_control import HardwareControlAPI
 
@@ -128,6 +127,7 @@ class CommandExecutor:
             tip_handler=self._tip_handler,
             run_control=self._run_control,
             rail_lights=self._rail_lights,
+            model_utils=self._model_utils,
             status_bar=self._status_bar,
             command_note_adder=note_tracker,
         )
@@ -168,16 +168,9 @@ class CommandExecutor:
                     error_id=self._model_utils.generate_id(),
                     failed_at=self._model_utils.get_timestamp(),
                     notes=note_tracker.get_notes(),
-                    # todo(mm, 2024-03-13):
-                    # When a command fails recoverably, and we handle it with
-                    # WAIT_FOR_RECOVERY or CONTINUE, we want to update our logical
-                    # protocol state as if the command succeeded. (e.g. if a tip
-                    # pickup failed, pretend that it succeeded and that the tip is now
-                    # on the pipette.) However, this currently does the opposite,
-                    # acting as if the command never executed.
                     type=self._error_recovery_policy(
                         running_command,
-                        error,
+                        None,
                     ),
                 )
             )
@@ -198,6 +191,14 @@ class CommandExecutor:
                 )
             else:
                 # The command encountered a defined error.
-                # TODO(mm, 2024-05-10): Once commands start returning DefinedErrorData,
-                # handle it here by dispatching a FailCommandAction.
-                assert_never(result)
+                self._action_dispatcher.dispatch(
+                    FailCommandAction(
+                        error=result,
+                        command_id=running_command.id,
+                        running_command=running_command,
+                        error_id=result.public.id,
+                        failed_at=result.public.createdAt,
+                        notes=note_tracker.get_notes(),
+                        type=self._error_recovery_policy(running_command, result),
+                    )
+                )
