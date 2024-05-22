@@ -62,17 +62,6 @@
       "patternProperties": {
         "\\d+": { "$ref": "#/definitions/currentRange" }
       }
-    },
-    "configurationValues": {
-
-    },
-    "configurationsByNozzleMap": {
-      "type": "array",
-      "description": "Configurations for a given cam action or press fit regarding speed, distance, current and tip overlap.",
-      "items": {
-        "type": "configurationValues",
-
-      }
     }
   },
   "description": "Version-level pipette specifications, which may vary across different versions of the same pipette",
@@ -201,27 +190,22 @@
               "type": "object",
               "required": [
                 "presses",
+                "speedByTipCount",
                 "increment",
-                "configurationsByNozzleMap"
-                // NOW HERE WE INJECT THE NEW ARCH
-                // "speedByTipCount",
-                // "increment",
-                // "distanceByTipCount",
-                // "currentByTipCount"
+                "distanceByTipCount",
+                "currentByTipCount"
               ],
               "additionalProperties": false,
               "properties": {
                 "presses": { "$ref": "#/definitions/positiveNumber" },
-                //"speedByTipCount": { "$ref": "#/definitions/speedByTipCount" },
+                "speedByTipCount": { "$ref": "#/definitions/speedByTipCount" },
                 "increment": { "$ref": "#/definitions/positiveNumber" },
-                "configurationsByNozzleMap": { "$ref": "#/definitions/configurationsByNozzleMap"}
-                // ^make that configuration real
-                // "distanceByTipCount": {
-                //   "$ref": "#/definitions/distanceByTipCount"
-                // },
-                // "currentByTipCount": {
-                //   "$ref": "#/definitions/currentByTipCount"
-                // }
+                "distanceByTipCount": {
+                  "$ref": "#/definitions/distanceByTipCount"
+                },
+                "currentByTipCount": {
+                  "$ref": "#/definitions/currentByTipCount"
+                }
               }
             }
           }

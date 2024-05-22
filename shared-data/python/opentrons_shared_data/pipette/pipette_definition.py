@@ -158,11 +158,13 @@ class PlungerHomingConfigurations(BaseModel):
         description="The speed to move the plunger axis for homing.",
     )
 
+
 class ValidNozzleMaps(BaseModel):
     maps: Dict[str, List[str]] = Field(
         ...,
         description="Dictionary of predetermined nozzle maps for partial tip configurations.",
     )
+
 
 class PressAndCamConfigurationValues(BaseModel):
     speed: float = Field(
@@ -193,11 +195,14 @@ class PressFitPickUpTipConfiguration(BaseModel):
         ...,
         description="The increment to move the pipette down on each force tip pickup press",
     )
-    configuration_by_nozzle_map: Dict[str, Dict[str, PressAndCamConfigurationValues]]= Field(
+    configuration_by_nozzle_map: Dict[
+        str, Dict[str, PressAndCamConfigurationValues]
+    ] = Field(
         ...,
         description="The speed, distance, current and overlap configurations for a given partial tip configuration by tip type.",
         alias="configurationsByNozzleMap",
     )
+
 
 class CamActionPickUpTipConfiguration(BaseModel):
     prep_move_distance: float = Field(
@@ -210,7 +215,9 @@ class CamActionPickUpTipConfiguration(BaseModel):
         description="The distance to move the head down to connect with the tiprack before clamping.",
         alias="connectTiprackDistanceMM",
     )
-    configuration_by_nozzle_map: Dict[str, Dict[str, PressAndCamConfigurationValues]]= Field(
+    configuration_by_nozzle_map: Dict[
+        str, Dict[str, PressAndCamConfigurationValues]
+    ] = Field(
         ...,
         description="The speed, distance, current and overlap configurations for a given partial tip configuration by tip type.",
         alias="configurationsByNozzleMap",

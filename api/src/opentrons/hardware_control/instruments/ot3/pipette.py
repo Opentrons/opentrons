@@ -689,28 +689,54 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
             if not config:
                 continue
             approved_map = self._get_matching_approved_nozzle_map()
-
-            if isinstance(config, PressFitPickUpTipConfiguration) and all(
-                [
+            try:
+                if isinstance(config, PressFitPickUpTipConfiguration) and all(
+                    [
+                        config.configuration_by_nozzle_map[approved_map][
+                            self._active_tip_setting_name.name
+                        ].speed,
+                        config.configuration_by_nozzle_map[approved_map][
+                            self._active_tip_setting_name.name
+                        ].distance,
+                        config.configuration_by_nozzle_map[approved_map][
+                            self._active_tip_setting_name.name
+                        ].current,
+                    ]
+                ):
+                    return config
+                elif (
                     config.configuration_by_nozzle_map[approved_map][
                         self._active_tip_setting_name.name
-                    ].speed,
-                    config.configuration_by_nozzle_map[approved_map][
-                        self._active_tip_setting_name.name
-                    ].distance,
-                    config.configuration_by_nozzle_map[approved_map][
-                        self._active_tip_setting_name.name
-                    ].current,
-                ]
-            ):
-                return config
-            elif (
-                config.configuration_by_nozzle_map[approved_map][
-                    self._active_tip_setting_name.name
-                ].current
-                is not None
-            ):
-                return config
+                    ].current
+                    is not None
+                ):
+                    return config
+            except KeyError:
+                try:
+                    if isinstance(config, PressFitPickUpTipConfiguration) and all(
+                        [
+                            config.configuration_by_nozzle_map[approved_map]
+                            .get("default")
+                            .speed,
+                            config.configuration_by_nozzle_map[approved_map]
+                            .get("default")
+                            .distance,
+                            config.configuration_by_nozzle_map[approved_map]
+                            .get("default")
+                            .current,
+                        ]
+                    ):
+                        return config
+                    elif (
+                        config.configuration_by_nozzle_map[approved_map]
+                        .get("default")
+                        .current
+                        is not None
+                    ):
+                        return config
+                except KeyError:
+                    # No valid key found for the approved nozzle map under this configuration - try the next
+                    continue
 
         raise CommandPreconditionViolated(
             message=f"No pick up tip configuration for {count} tips",

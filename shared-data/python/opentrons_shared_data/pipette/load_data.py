@@ -261,6 +261,7 @@ def load_definition(
         }
     )
 
+
 def load_valid_nozzle_maps(
     model: PipetteModelType,
     channels: PipetteChannelType,
@@ -271,6 +272,6 @@ def load_valid_nozzle_maps(
         or version.minor not in PipetteModelMinorVersion
     ):
         raise KeyError("Pipette version not found.")
-    
+
     physical_dict = _physical(channels, model, version)
     return ValidNozzleMaps.parse_obj(physical_dict["validNozzleMaps"])
