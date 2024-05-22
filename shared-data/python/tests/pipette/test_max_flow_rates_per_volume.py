@@ -82,7 +82,7 @@ def test_max_flow_rates_per_volume(pipette: PipetteModel, action: str) -> None:
         for tip_type, supported_tip in liquid_properties.supported_tips.items():
 
             """TODO: the following models do not pass the asserts since the uiMaxFlowRate was raised
-            to match the default blowout and dispense flowRates. uiMaxFlowRate will be reevaluated 
+            to match the default blowout and dispense flowRates. uiMaxFlowRate will be reevaluated
             in the future."""
             if not (
                 pipette_model_version_str
