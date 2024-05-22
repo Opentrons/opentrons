@@ -34,7 +34,8 @@ export function useErrorRecoveryFlows(
   }
 
   // Because multiple ER flows may occur per run, disable ER when the status is not "awaiting-recovery" or a
-  // terminating run status in which we want to persist ER flows.
+  // terminating run status in which we want to persist ER flows. Specific recovery commands cause run status to change.
+  // See a specific command's docstring for details.
   React.useEffect(() => {
     const isValidRunStatus =
       runStatus != null && VALID_ER_RUN_STATUSES.includes(runStatus)

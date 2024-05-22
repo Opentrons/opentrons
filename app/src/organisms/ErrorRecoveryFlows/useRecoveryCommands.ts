@@ -16,12 +16,16 @@ interface UseRecoveryCommandsParams {
   failedCommand: FailedCommand | null
 }
 export interface UseRecoveryCommandsResult {
+  /* A terminal recovery command that causes ER to exit as the run status becomes "running" */
   resumeRun: () => void
+  /* A terminal recovery command that causes ER to exit as the run status becomes "stop-requested" */
   cancelRun: () => void
+  /* A non-terminal recovery command */
   retryFailedCommand: () => Promise<CommandData[]>
+  /* A non-terminal recovery command */
   homePipetteZAxes: () => Promise<CommandData[]>
 }
-// Returns recovery command functions.
+// Returns commands with a "fixit" intent. Commands may or may not terminate Error Recovery. See each command docstring for details.
 export function useRecoveryCommands({
   runId,
   failedCommand,
