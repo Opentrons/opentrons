@@ -8,7 +8,10 @@ from hardware_testing.data.csv_report import (
     CSVLineRepeating,
 )
 from typing import List, Union, Any, Optional
-import gspread  # type: ignore[import]
+try:
+    import gspread  # type: ignore[import]
+except ImportError:
+    print("WARNING: unable to import gspread, if not simulating check your environment")
 
 """
 CSV Test Report:
@@ -164,14 +167,15 @@ def store_baseline_trial(
     temp: float,
     z_travel: float,
     measured_error: float,
-    google_sheet: Any,
+    google_sheet: Optional[Any],
     sheet_title: str,
 ) -> None:
     """Report Trial."""
-    try:
-        google_sheet.update_cell(sheet_title, 9, 2, height)
-    except gspread.exceptions.APIError:
-        print("did not store baseline trial on google sheet.")
+    if google_sheet:
+        try:
+            google_sheet.update_cell(sheet_title, 9, 2, height)
+        except gspread.exceptions.APIError:
+            print("did not store baseline trial on google sheet.")
     report(
         "TRIALS",
         f"trial-baseline-{tip}ul",

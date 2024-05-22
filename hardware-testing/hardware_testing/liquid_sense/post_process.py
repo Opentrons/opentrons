@@ -1,10 +1,13 @@
 """Post process script csvs."""
 import csv
 import os
-from typing import List, Dict, Tuple, Any
+from typing import List, Dict, Tuple, Any, Optional
 import statistics
 from math import isclose
-import gspread  # type: ignore[import]
+try:
+    import gspread  # type: ignore[import]
+except ImportError:
+    print("WARNING: unable to import gspread, if not simulating check your environment")
 
 
 COL_TRIAL_CONVERSION = {
@@ -47,7 +50,7 @@ def process_csv_directory(  # noqa: C901
     data_directory: str,
     tips: List[int],
     trials: int,
-    google_sheet: Any,
+    google_sheet: Optional[Any],
     sheet_name: str,
     sheet_id: str,
     make_graph: bool = False,
@@ -158,13 +161,14 @@ def process_csv_directory(  # noqa: C901
                     ]
                 )
             # Add header to google sheet
-            try:
-                pressure_header_for_google_sheet = [[x] for x in pressure_header_row]
-                google_sheet.batch_update_cells(
-                    sheet_name, pressure_header_for_google_sheet, "H", 10, sheet_id
-                )
-            except gspread.exceptions.APIError:
-                print("Header did not write on google sheet.")
+            if google_sheet:
+                try:
+                    pressure_header_for_google_sheet = [[x] for x in pressure_header_row]
+                    google_sheet.batch_update_cells(
+                        sheet_name, pressure_header_for_google_sheet, "H", 10, sheet_id
+                    )
+                except gspread.exceptions.APIError:
+                    print("Header did not write on google sheet.")
             # we want to line up the z height's of each trial at time==0
             # to do this we drop the results at the beginning of each of the trials
             # except for one with the longest tip (lower tip offset are longer tips)
@@ -230,19 +234,22 @@ def process_csv_directory(  # noqa: C901
                     pressure_rows.append(pressure_row)
                     time += 0.001
 
-                transposed_pressure_rows = list(map(list, zip(*pressure_rows)))
-                try:
-                    google_sheet.batch_update_cells(
-                        sheet_name, transposed_pressure_rows, "H", 11, sheet_id
-                    )
-                except gspread.exceptions.APIError:
-                    print("Did not write pressure data to google sheet.")
+                if google_sheet:
+                    transposed_pressure_rows = list(map(list, zip(*pressure_rows)))
+                    try:
+                        google_sheet.batch_update_cells(
+                            sheet_name, transposed_pressure_rows, "H", 11, sheet_id
+                        )
+                    except gspread.exceptions.APIError:
+                        print("Did not write pressure data to google sheet.")
 
 
 def process_google_sheet(
-    google_sheet: Any, run_args, test_info: List, sheet_id: str
+    google_sheet: Optional[Any], run_args, test_info: List, sheet_id: str
 ) -> None:
     """Write results and graphs to google sheet."""
+    if not google_sheet:
+        return
     sheet_name = run_args.run_id
     test_parameters = [
         [
