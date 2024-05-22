@@ -18,11 +18,10 @@ import sys
 def lpc_data(
     file_results: Dict[str, Any],
     protocol_info: Dict[str, Any],
-    runs_and_lpc: Dict[str, Any],
-) -> Tuple[Dict[str, Dict[str, Any]], List[str]]:
+    runs_and_lpc: List[Dict[str, Any]],
+) -> Tuple[List[Dict[str, Any]], List[str]]:
     """Get labware offsets from one run log."""
     offsets = file_results.get("labwareOffsets", "")
-    n = 0
     # TODO: per UNIQUE slot AND LABWARE TYPE only keep the most recent LPC recording
     if len(offsets) > 0:
         unique_offsets: Dict[Any, Any] = {}
@@ -55,9 +54,7 @@ def lpc_data(
                     "Z": z_offset,
                 }
     for item in unique_offsets:
-        run_id = protocol_info["Run_ID"] + "_" + str(n)
-        runs_and_lpc[run_id] = unique_offsets[item]
-        n += 1
+        runs_and_lpc.append(unique_offsets[item].values())
     headers_lpc = list(unique_offsets[(slot, labware_type)].keys())
 
     return runs_and_lpc, headers_lpc

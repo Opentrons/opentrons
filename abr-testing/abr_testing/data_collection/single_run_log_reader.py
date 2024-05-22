@@ -15,16 +15,8 @@ if __name__ == "__main__":
         nargs=1,
         help="Folder path that holds individual run logs of interest.",
     )
-    parser.add_argument(
-        "google_sheet_name",
-        metavar="GOOGLE_SHEET_NAME",
-        type=str,
-        nargs=1,
-        help="Google sheet name.",
-    )
     args = parser.parse_args()
     run_log_file_path = args.run_log_file_path[0]
-    google_sheet_name = args.google_sheet_name[0]
 
     try:
         credentials_path = os.path.join(run_log_file_path, "credentials.json")
@@ -39,9 +31,9 @@ if __name__ == "__main__":
         runs_and_lpc,
         lpc_headers,
     ) = abr_google_drive.create_data_dictionary(
-        run_ids_in_storage, run_log_file_path, ""
+        run_ids_in_storage, run_log_file_path, "", "", ""
     )
-    list_of_runs = list(runs_and_robots.keys())
+    transposed_list = list(zip(*runs_and_robots))
     # Adds Run to local csv
     sheet_location = os.path.join(run_log_file_path, "saved_data.csv")
     file_exists = os.path.exists(sheet_location) and os.path.getsize(sheet_location) > 0
@@ -49,8 +41,6 @@ if __name__ == "__main__":
         writer = csv.writer(f)
         if not file_exists:
             writer.writerow(header)
-        for run in list_of_runs:
+        for run in transposed_list:
             # Add new row
-            row = runs_and_robots[run].values()
-            row_list = list(row)
-            writer.writerow(row_list)
+            writer.writerow(run)

@@ -6,7 +6,7 @@ import time as t
 import sys
 from datetime import datetime
 from oauth2client.service_account import ServiceAccountCredentials  # type: ignore[import]
-from typing import Dict, List, Any, Set, Tuple
+from typing import Dict, List, Any, Set, Tuple, Optional
 
 """Google Sheets Tool.
 
@@ -48,13 +48,14 @@ class google_sheet:
         """Open individual worksheet within a googlesheet."""
         return self.spread_sheet.get_worksheet(tab_number)
 
-    def create_worksheet(self, title: str) -> None:
+    def create_worksheet(self, title: str) -> Optional[str]:
         """Create a worksheet with tab name. Existing spreadsheet needed."""
         try:
-            new_sheet = self.spread_sheet.add_worksheet(title, rows="2000", cols="26")
+            new_sheet = self.spread_sheet.add_worksheet(title, rows="2500", cols="40")
             return new_sheet.id
         except gspread.exceptions.APIError:
             print("Sheet already exists.")
+            return new_sheet.id
 
     def write_header(self, header: List) -> None:
         """Write Header to first row if not present."""
@@ -108,17 +109,55 @@ class google_sheet:
         self.spread_sheet.batch_update(body=delete_body)
 
     def batch_update_cells(
-        self, sheet_title: str, data: List[List[str]], start_column: str, start_row: int
+        self,
+        data: List[List[Any]],
+        start_column: str,
+        start_row: int,
+        sheet_id: str,
     ) -> None:
         """Writes to multiple cells at once in a specific sheet."""
-        sheet = self.spread_sheet.worksheet(sheet_title)
-        for idx, values in enumerate(data):
-            column = chr(ord(start_column) + idx)  # Convert index to column letter
-            location = f"{column}{start_row}:{column}{start_row + len(values) - 1}"
-            cells_to_update = sheet.range(location)
-            for cell, value in zip(cells_to_update, values):
-                cell.value = value
-            sheet.update_cells(cells_to_update)
+
+        def column_letter_to_index(column_letter: str) -> int:
+            """Convert a column letter (e.g., 'A') to a 1-based column index (e.g., 1)."""
+            index = 0
+            for char in column_letter.upper():
+                index = index * 26 + (ord(char) - ord("A") + 1)
+            return index
+
+        requests = []
+        user_entered_value: Dict[str, Any] = {}
+        start_column_index = column_letter_to_index(start_column) - 1
+
+        for col_offset, col_values in enumerate(data):
+            column_index = start_column_index + col_offset
+            # column_letter = index_to_column_letter(column_index)
+            for row_offset, value in enumerate(col_values):
+                row_index = start_row + row_offset
+                try:
+                    float_value = float(value)
+                    user_entered_value = {"numberValue": float_value}
+                except ValueError:
+                    user_entered_value = {"stringValue": str(value)}
+                requests.append(
+                    {
+                        "updateCells": {
+                            "range": {
+                                "sheetId": sheet_id,
+                                "startRowIndex": row_index - 1,
+                                "endRowIndex": row_index,
+                                "startColumnIndex": column_index,
+                                "endColumnIndex": column_index + 1,
+                            },
+                            "rows": [
+                                {"values": [{"userEnteredValue": user_entered_value}]}
+                            ],
+                            "fields": "userEnteredValue",
+                        }
+                    }
+                )
+
+        body = {"requests": requests}
+        self.spread_sheet.batch_update(body=body)
 
     def update_cell(
         self, sheet_title: str, row: int, column: int, single_data: Any
@@ -135,13 +174,13 @@ class google_sheet:
         """Get all values in column."""
         return self.worksheet.col_values(column_number)
 
-    def get_cell(self, cell: str) -> Any:
+    def get_cell(self, sheet_title: str, cell: str) -> Any:
         """Get cell value with location ex: 'A1'."""
-        return self.worksheet.acell(cell).value
+        return self.spread_sheet.worksheet(sheet_title).acell(cell).value
 
-    def get_single_col_range(self, range: str) -> List:
+    def get_single_col_range(self, sheet_name: str, range: str) -> List:
         """Get cell values from one column range."""
-        values_range = self.worksheet.range(range)
+        values_range = self.spread_sheet.worksheet(sheet_name).range(range)
         return [cell.value for cell in values_range]
 
     def get_index_row(self) -> int:
@@ -214,7 +253,7 @@ class google_sheet:
                                 "overlayPosition": {
                                     "anchorCell": {
                                         "sheetId": sheet_id,
-                                        "rowIndex": 1,
+                                        "rowIndex": 15,
                                         "columnIndex": col_position,
                                     }
                                 }
