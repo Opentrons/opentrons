@@ -285,53 +285,53 @@
       "choices": [
         {
           "displayName": "20",
-          "value": 20.0
+          "value": 20
         },
         {
           "displayName": "16",
-          "value": 16.0
+          "value": 16
         }
       ],
-      "default": 20.0,
+      "default": 20,
       "description": "Reused description for all parameters.",
       "displayName": "int choices all",
       "type": "int",
-      "value": 20.0,
+      "value": 20,
       "variableName": "int_choices_all_fields"
     },
     {
       "choices": [
         {
           "displayName": "1X",
-          "value": 6.0
+          "value": 6
         },
         {
           "displayName": "2X",
-          "value": 12.0
+          "value": 12
         }
       ],
-      "default": 6.0,
+      "default": 6,
       "description": "Reused description for all parameters.",
       "displayName": "int choice no unit",
       "type": "int",
-      "value": 6.0,
+      "value": 6,
       "variableName": "int_choice_no_unit"
     },
     {
       "choices": [
         {
           "displayName": "10X",
-          "value": 10.0
+          "value": 10
         },
         {
           "displayName": "100X",
-          "value": 100.0
+          "value": 100
         }
       ],
-      "default": 10.0,
+      "default": 10,
       "displayName": "int choice no unit, desc",
       "type": "int",
-      "value": 10.0,
+      "value": 10,
       "variableName": "int_choice_no_unit_desc"
     },
     {
