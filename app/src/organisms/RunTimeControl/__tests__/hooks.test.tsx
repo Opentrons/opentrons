@@ -51,14 +51,17 @@ describe('useRunControls hook', () => {
     const mockPauseRun = vi.fn()
     const mockStopRun = vi.fn()
     const mockCloneRun = vi.fn()
+    const mockResumeRunFromRecovery = vi.fn()
 
     when(useRunActionMutations).calledWith(mockPausedRun.id).thenReturn({
       playRun: mockPlayRun,
       pauseRun: mockPauseRun,
       stopRun: mockStopRun,
+      resumeRunFromRecovery: mockResumeRunFromRecovery,
       isPlayRunActionLoading: false,
       isPauseRunActionLoading: false,
       isStopRunActionLoading: false,
+      isResumeRunFromRecoveryActionLoading: false,
     })
     when(useCloneRun)
       .calledWith(mockPausedRun.id, undefined, true)

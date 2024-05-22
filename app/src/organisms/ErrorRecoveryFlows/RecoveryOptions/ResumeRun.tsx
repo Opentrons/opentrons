@@ -11,17 +11,27 @@ import {
   StyledText,
 } from '@opentrons/components'
 
+import { RECOVERY_MAP } from '../constants'
 import { RecoveryFooterButtons } from './shared'
 
 import type { RecoveryContentProps } from '../types'
 
 export function ResumeRun({
   isOnDevice,
-  onComplete,
   routeUpdateActions,
+  recoveryCommands,
 }: RecoveryContentProps): JSX.Element | null {
+  const { ROBOT_RETRYING_COMMAND } = RECOVERY_MAP
   const { t } = useTranslation('error_recovery')
-  const { goBackPrevStep } = routeUpdateActions
+
+  const { retryFailedCommand, resumeRun } = recoveryCommands
+  const { goBackPrevStep, setRobotInMotion } = routeUpdateActions
+
+  const primaryBtnOnClick = (): Promise<void> => {
+    return setRobotInMotion(true, ROBOT_RETRYING_COMMAND.ROUTE)
+      .then(() => retryFailedCommand())
+      .then(() => resumeRun())
+  }
 
   if (isOnDevice) {
     return (
@@ -50,7 +60,7 @@ export function ResumeRun({
         </Flex>
         <RecoveryFooterButtons
           isOnDevice={isOnDevice}
-          primaryBtnOnClick={onComplete}
+          primaryBtnOnClick={primaryBtnOnClick}
           secondaryBtnOnClick={goBackPrevStep}
           primaryBtnTextOverride={t('confirm')}
         />

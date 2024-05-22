@@ -7,9 +7,9 @@ import logging
 import re
 from typing import Optional, Dict
 
+from opentrons import _find_smoothie_file
 from opentrons.drivers import utils
 from opentrons.drivers.smoothie_drivers.constants import GCODE, HOMED_POSITION
-from opentrons.hardware_control.initialization import _find_smoothie_file
 from opentrons.hardware_control.emulation.parser import Command, Parser
 
 from .abstract_emulator import AbstractEmulator

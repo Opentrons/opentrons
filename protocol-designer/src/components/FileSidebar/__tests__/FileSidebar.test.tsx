@@ -230,4 +230,58 @@ describe('FileSidebar', () => {
       'One or more modules specified in your protocol in Slot(s) A1,B1 are not currently used in any step. In order to run this protocol you will need to power up and connect the modules to your robot.'
     )
   })
+  it('renders the formatted unused pipettes and modules warning sorted by count', () => {
+    vi.mocked(getInitialDeckSetup).mockReturnValue({
+      modules: {
+        moduleId1: {
+          slot: 'A1',
+          moduleState: {} as any,
+          id: 'moduleId',
+          type: 'thermocyclerModuleType',
+          model: 'thermocyclerModuleV2',
+        },
+        moduleId2: {
+          slot: 'C3',
+          moduleState: {} as any,
+          id: 'moduleId1',
+          type: 'temperatureModuleType',
+          model: 'temperatureModuleV2',
+        },
+        moduleId3: {
+          slot: 'D3',
+          moduleState: {} as any,
+          id: 'moduleId2',
+          type: 'temperatureModuleType',
+          model: 'temperatureModuleV2',
+        },
+        moduleId4: {
+          slot: 'C1',
+          moduleState: {} as any,
+          id: 'moduleId3',
+          type: 'heaterShakerModuleType',
+          model: 'heaterShakerModuleV1',
+        },
+      },
+      pipettes: {
+        pipetteId: {
+          mount: 'left',
+          name: 'p1000_96',
+          id: 'pipetteId',
+          tiprackLabwareDef: [fixtureTiprack300ul as LabwareDefinition2],
+          tiprackDefURI: ['mockDefUri'],
+          spec: {
+            displayName: 'mock display name',
+            channels: 96,
+          } as any,
+        },
+      },
+      additionalEquipmentOnDeck: {},
+      labware: {},
+    })
+    render()
+    fireEvent.click(screen.getByRole('button', { name: 'Export' }))
+    screen.getByText(
+      'The mock display name pipette and Temperature modules, Thermocycler module, and Heater-Shaker module in your protocol are not currently used in any step. In order to run this protocol you will need to attach this pipette as well as power up and connect the module to your robot.'
+    )
+  })
 })
