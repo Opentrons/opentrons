@@ -83,7 +83,7 @@ export const FilePage = (): JSX.Element => {
   const saveFileMetadata = (nextFormValues: FileMetadataFields): void => {
     dispatch(actions.saveFileMetadata(nextFormValues))
   }
-
+  const [isManualDirty, setManualDirty] = React.useState<boolean>(false)
   const {
     handleSubmit,
     watch,
@@ -91,7 +91,6 @@ export const FilePage = (): JSX.Element => {
     setValue,
     formState: { isDirty },
   } = useForm<FileMetadataFields>({ defaultValues: formValues })
-
   //  to ensure that values from watch are up to date if the defaultValues
   //  change
   React.useEffect(() => {
@@ -155,6 +154,7 @@ export const FilePage = (): JSX.Element => {
                     name="protocolName"
                     value={protocolName}
                     onChange={field.onChange}
+                    onClick={() => setManualDirty(true)}
                   />
                 )}
               />
@@ -172,6 +172,7 @@ export const FilePage = (): JSX.Element => {
                     name="author"
                     value={author}
                     onChange={field.onChange}
+                    onClick={() => setManualDirty(true)}
                   />
                 )}
               />
@@ -190,6 +191,7 @@ export const FilePage = (): JSX.Element => {
                   name="description"
                   value={description}
                   onChange={field.onChange}
+                  onClick={() => setManualDirty(true)}
                 />
               )}
             />
@@ -198,9 +200,12 @@ export const FilePage = (): JSX.Element => {
             <OutlineButton
               type="submit"
               className={styles.update_button}
-              disabled={!isDirty}
+              disabled={!isDirty || !isManualDirty}
+              onClick={() => setManualDirty(false)}
             >
-              {isDirty ? t('application:update') : t('application:updated')}
+              {isManualDirty
+                ? t('application:update')
+                : t('application:updated')}
             </OutlineButton>
           </div>
         </form>
