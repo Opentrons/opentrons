@@ -53,4 +53,15 @@ describe('LargeButton', () => {
     render(props)
     expect(screen.getByRole('button')).toBeDisabled()
   })
+
+  it('renders the icon override color if specified', () => {
+    props = {
+      ...props,
+      iconColorOverride: COLORS.red50,
+    }
+    render(props)
+    expect(screen.getByLabelText('play-round-corners icon')).toHaveStyle(
+      `color: ${COLORS.red50}`
+    )
+  })
 })
