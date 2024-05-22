@@ -45,7 +45,6 @@ from opentrons_hardware.sensors.sensor_types import (
     SensorInformation,
     PressureSensor,
     CapacitiveSensor,
-    BaseSensorType,
 )
 from opentrons_hardware.sensors.scheduler import SensorScheduler
 from opentrons_hardware.drivers.can_bus.can_messenger import CanMessenger
@@ -60,6 +59,9 @@ from opentrons_hardware.hardware_control.types import MotorPositionStatus
 LOG = getLogger(__name__)
 PipetteProbeTarget = Literal[NodeId.pipette_left, NodeId.pipette_right]
 InstrumentProbeTarget = Union[PipetteProbeTarget, Literal[NodeId.gripper]]
+ProbeSensorDict = Union[
+    Dict[SensorId, PressureSensor], Dict[SensorId, CapacitiveSensor]
+]
 
 pressure_output_file_heading = [
     "time(s)",
@@ -86,7 +88,7 @@ def _build_pass_step_pressure(
     distance: Dict[NodeId, float],
     speed: Dict[NodeId, float],
     stop_condition: MoveStopCondition = MoveStopCondition.sync_line,
-    sensor_to_use: Optional[SensorId] = None,
+    sensor_id: Optional[SensorId] = None,
 ) -> MoveGroupStep:
     pipette_nodes = [
         i for i in movers if i in [NodeId.pipette_left, NodeId.pipette_right]
@@ -103,8 +105,8 @@ def _build_pass_step_pressure(
         duration=float64(abs(distance[movers[0]] / speed[movers[0]])),
         present_nodes=movers,
         stop_condition=stop_condition,
-        sensor_type=SensorType.pressure,
-        sensor_id=SensorId.S0,
+        sensor_type_pass=SensorType.pressure,
+        sensor_id_pass=sensor_id,
     )
     pipette_move = create_step(
         distance={ax: float64(abs(distance[ax])) for ax in movers},
@@ -117,8 +119,8 @@ def _build_pass_step_pressure(
         duration=float64(abs(distance[movers[0]] / speed[movers[0]])),
         present_nodes=pipette_nodes,
         stop_condition=MoveStopCondition.sensor_report,
-        sensor_type=SensorType.pressure,
-        sensor_id=SensorId.S0,
+        sensor_type_pass=SensorType.pressure,
+        sensor_id_pass=sensor_id,
     )
     for node in pipette_nodes:
         move_group[node] = pipette_move[node]
@@ -130,6 +132,7 @@ def _build_pass_step_capacitive(
     distance: Dict[NodeId, float],
     speed: Dict[NodeId, float],
     stop_condition: MoveStopCondition = MoveStopCondition.sync_line,
+    sensor_id: Optional[SensorId] = None,
 ) -> MoveGroupStep:
     tool_nodes = [
         i
@@ -148,8 +151,8 @@ def _build_pass_step_capacitive(
         duration=float64(abs(distance[movers[0]] / speed[movers[0]])),
         present_nodes=movers,
         stop_condition=stop_condition,
-        sensor_type=SensorType.capacitive,
-        sensor_id=SensorId.S0,
+        sensor_type_pass=SensorType.capacitive,
+        sensor_id_pass=sensor_id,
     )
     tool_move = create_step(
         distance={},
@@ -160,8 +163,8 @@ def _build_pass_step_capacitive(
         duration=float64(abs(distance[movers[0]] / speed[movers[0]])),
         present_nodes=tool_nodes,
         stop_condition=MoveStopCondition.sensor_report,
-        sensor_type=SensorType.capacitive,
-        sensor_id=SensorId.S0,
+        sensor_type_pass=SensorType.capacitive,
+        sensor_id_pass=sensor_id,
     )
     for node in tool_nodes:
         move_group[node] = tool_move[node]
@@ -218,7 +221,7 @@ async def run_sync_buffer_to_csv(
 
 async def run_stream_output_to_csv(
     messenger: CanMessenger,
-    sensors: Dict[SensorId, BaseSensorType],
+    sensors: ProbeSensorDict,
     mount_speed: float,
     plunger_speed: float,
     threshold: float,
@@ -311,7 +314,7 @@ async def _setup_capacitive_sensors(
     messenger: CanMessenger,
     sensor_id: SensorId,
     tool: InstrumentProbeTarget,
-    threshold: float,
+    relative_threshold_pf: float,
     sensor_driver: SensorDriver,
 ) -> Dict[SensorId, CapacitiveSensor]:
     sensors: List[SensorId] = []
@@ -326,7 +329,7 @@ async def _setup_capacitive_sensors(
         capacitive_sensor = CapacitiveSensor.build(
             sensor_id=sensor,
             node_id=tool,
-            stop_threshold=threshold,
+            stop_threshold=relative_threshold_pf,
         )
         threshold = await sensor_driver.send_stop_threshold(
             messenger, capacitive_sensor, SensorThresholdMode.auto_baseline
@@ -340,7 +343,7 @@ async def _setup_capacitive_sensors(
 
 async def _run_with_binding(
     messenger: CanMessenger,
-    sensors: Dict[SensorId, BaseSensorType],
+    sensors: ProbeSensorDict,
     sensor_runner: MoveGroupRunner,
     binding: List[SensorOutputBinding],
 ) -> Dict[NodeId, MotorPositionStatus]:
@@ -505,6 +508,7 @@ async def capacitive_probe(
         {mover: distance, tool: distance},
         {mover: speed, tool: speed},
         MoveStopCondition.sync_line,
+        sensor_id=sensor_id,
     )
 
     runner = MoveGroupRunner(move_groups=[[pass_group]])
@@ -530,7 +534,6 @@ async def capacitive_probe(
             runner,
             log_files,
             tool=tool,
-            sensor_id=sensor_id,
             sensor_type=SensorType.capacitive,
             output_file_heading=capacitive_output_file_heading,
         )

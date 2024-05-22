@@ -24,8 +24,6 @@ from opentrons_hardware.firmware_bindings.constants import (
     GearMotorId,
     MoveAckId,
     MotorDriverErrorCode,
-    SensorId,
-    SensorType,
 )
 from opentrons_hardware.drivers.can_bus.can_messenger import CanMessenger
 from opentrons_hardware.firmware_bindings.messages import MessageDefinition
@@ -310,6 +308,7 @@ class MoveGroupRunner:
             return HomeRequest(payload=home_payload)
         elif step.move_type == MoveType.sensor:
             # stop_condition = step.stop_condition.value
+            assert step.sensor_type is not None
             assert step.sensor_id is not None
             stop_condition = MoveStopCondition.sync_line
             sensor_move_payload = AddSensorLinearMoveBasePayload(

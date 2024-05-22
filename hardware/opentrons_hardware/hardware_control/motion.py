@@ -135,8 +135,8 @@ def create_step(
     duration: np.float64,
     present_nodes: Iterable[NodeId],
     stop_condition: MoveStopCondition = MoveStopCondition.none,
-    sensor_type: Optional[SensorType] = None,
-    sensor_id: Optional[SensorId] = None,
+    sensor_type_pass: Optional[SensorType] = None,
+    sensor_id_pass: Optional[SensorId] = None,
 ) -> MoveGroupStep:
     """Create a move from a block.
 
@@ -163,8 +163,8 @@ def create_step(
             duration_sec=duration,
             stop_condition=stop_condition,
             move_type=MoveType.get_move_type(stop_condition),
-            sensor_type=sensor_type,
-            sensor_id=sensor_id,
+            sensor_type=sensor_type_pass,
+            sensor_id=sensor_id_pass,
         )
     return step
 
