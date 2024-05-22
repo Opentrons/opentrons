@@ -198,6 +198,11 @@ push-description-ot3:
 	$(python) -c "from hardware_testing.data import create_git_description_file; create_git_description_file()"
 	scp $(ssh_helper_ot3) ./.hardware-testing-description root@$(host):/data/
 
+.PHONY: push-labware-ot3
+push-labware-ot3:
+	ssh $(ssh_helper_ot3) root@$(host) "mkdir -p /data/labware/v2/custom_definitions/custom_beta"
+	scp $(ssh_helper_ot3) -r hardware_testing/labware/* root@$(host):/data/labware/v2/custom_definitions/custom_beta/
+
 .PHONY: restart
 restart:
 	$(call restart-service,$(host),$(ssh_key),$(ssh_opts),"opentrons-robot-server")
@@ -218,10 +223,10 @@ push-no-restart-ot3: sdist Pipfile.lock
 	$(call push-python-sdist,$(host),$(ssh_key),$(ssh_opts),$(sdist_file),/opt/opentrons-robot-server,"hardware_testing",,,$(version_file))
 
 .PHONY: push-ot3
-push-ot3: push-no-restart-ot3 push-plot-webpage-ot3 push-description-ot3
+push-ot3: push-no-restart-ot3 push-plot-webpage-ot3 push-description-ot3 push-labware-ot3
 
 .PHONY: push-all
-push-all: clean wheel push-no-restart push-plot-webpage
+push-all: clean wheel push-no-restart push-plot-webpage-ot3
 
 .PHONY: term
 term:
@@ -294,8 +299,6 @@ sync-ot3: sync-sw-ot3 sync-fw-ot3
 .PHONY: push-ot3-gravimetric
 push-ot3-gravimetric:
 	$(MAKE) push-ot3
-	ssh $(ssh_helper_ot3) root@$(host) "mkdir -p /data/labware/v2/custom_definitions/custom_beta"
-	scp $(ssh_helper_ot3) -r hardware_testing/labware/* root@$(host):/data/labware/v2/custom_definitions/custom_beta/
 	$(MAKE) apply-patches-gravimetric
 	cd ../ && $(MAKE) -C shared-data push-ot3
 	$(MAKE) remove-patches-gravimetric
