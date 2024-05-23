@@ -300,7 +300,7 @@ async def test_get_default_engine_run_stopped(subject: EngineStore) -> None:
         protocol=None,
         notify_publishers=mock_notify_publishers,
     )
-    await subject.finish()
+    await subject.finish(error=None)
 
     result = await subject.get_default_engine()
     assert isinstance(result, ProtocolEngine)
@@ -321,22 +321,23 @@ async def test_estop_callback(
 
     decoy.when(engine_store.current_run_id).then_return(None)
     await handle_estop_event(engine_store, disengage_event)
-    assert subject._run_orchestrator is not None
+    assert engine_store._run_orchestrator is not None
     decoy.verify(
         engine_store._run_orchestrator.engine.estop(),
         ignore_extra_args=True,
         times=0,
     )
     decoy.verify(
-        await engine_store.finish(),
+        await engine_store.finish(error=None),
         ignore_extra_args=True,
         times=0,
     )
 
     decoy.when(engine_store.current_run_id).then_return("fake-run-id")
     await handle_estop_event(engine_store, engage_event)
+    assert engine_store._run_orchestrator is not None
     decoy.verify(
-        engine_store.engine.estop(),
+        engine_store._run_orchestrator.engine.estop(),
         await engine_store.finish(error=matchers.IsA(EStopActivatedError)),
         times=1,
     )
