@@ -5967,3 +5967,57 @@ exports[`pipette data accessors > getPipetteNameSpecs > name p1000_single snapsh
   },
 }
 `;
+
+exports[`pipette data accessors > getPipetteNameSpecs > name p1000_single_flex snapshot 1`] = `
+{
+  "channels": 1,
+  "defaultAspirateFlowRate": {
+    "max": 812,
+    "min": 3,
+    "value": 478,
+    "valuesByApiLevel": {
+      "2.0": 137.35,
+      "2.14": 478,
+      "2.6": 274.7,
+    },
+  },
+  "defaultBlowOutFlowRate": {
+    "max": 812,
+    "min": 3,
+    "value": 478,
+    "valuesByApiLevel": {
+      "2.0": 137.35,
+      "2.14": 478,
+      "2.6": 274.7,
+    },
+  },
+  "defaultDispenseFlowRate": {
+    "max": 812,
+    "min": 3,
+    "value": 478,
+    "valuesByApiLevel": {
+      "2.0": 137.35,
+      "2.14": 478,
+      "2.6": 274.7,
+    },
+  },
+  "defaultTipracks": [
+    "opentrons/opentrons_flex_96_tiprack_1000ul/1",
+    "opentrons/opentrons_flex_96_filtertiprack_1000ul/1",
+    "opentrons/opentrons_flex_96_tiprack_200ul/1",
+    "opentrons/opentrons_flex_96_filtertiprack_200ul/1",
+    "opentrons/opentrons_flex_96_tiprack_50ul/1",
+    "opentrons/opentrons_flex_96_filtertiprack_50ul/1",
+  ],
+  "displayCategory": "FLEX",
+  "displayName": "Flex 1-Channel 1000 μL",
+  "maxVolume": 1000,
+  "minVolume": 5,
+  "name": "p1000_single_flex",
+  "smoothieConfigs": {
+    "homePosition": 230.15,
+    "stepsPerMM": 2133.33,
+    "travelDistance": 80,
+  },
+}
+`;

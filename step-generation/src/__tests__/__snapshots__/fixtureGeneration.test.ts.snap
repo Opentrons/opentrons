@@ -9652,6 +9652,7 @@ exports[`snapshot tests > makeContext 1`] = `
         },
         "lldSettings": {},
         "model": "p1000",
+        "name": "p1000_96",
         "nozzleMap": {
           "A1": [
             -36,
@@ -12273,6 +12274,7 @@ exports[`snapshot tests > makeContext 1`] = `
         },
         "lldSettings": {},
         "model": "p10",
+        "name": "p10_multi",
         "nozzleMap": {
           "A1": [
             0,
@@ -13911,6 +13913,7 @@ exports[`snapshot tests > makeContext 1`] = `
         },
         "lldSettings": {},
         "model": "p10",
+        "name": "p10_single",
         "nozzleMap": {
           "A1": [
             0,
@@ -15275,6 +15278,7 @@ exports[`snapshot tests > makeContext 1`] = `
         },
         "lldSettings": {},
         "model": "p300",
+        "name": "p300_multi",
         "nozzleMap": {
           "A1": [
             0,
@@ -17005,6 +17009,7 @@ exports[`snapshot tests > makeContext 1`] = `
         },
         "lldSettings": {},
         "model": "p300",
+        "name": "p300_single",
         "nozzleMap": {
           "A1": [
             0,
