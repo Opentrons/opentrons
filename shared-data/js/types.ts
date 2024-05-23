@@ -30,7 +30,7 @@ import type {
 } from './constants'
 import type { RunTimeCommand, LabwareLocation } from '../command/types'
 import type { AddressableAreaName, CutoutFixtureId, CutoutId } from '../deck'
-import type { PipetteName } from './pipettes'
+import type { PipetteModel, PipetteName } from './pipettes'
 
 export type RobotType = 'OT-2 Standard' | 'OT-3 Standard'
 
@@ -418,6 +418,7 @@ interface pressAndCamConfigurationValues {
 }
 export interface PipetteV2GeneralSpecs {
   displayName: string
+  name: PipetteName
   model: string
   displayCategory: PipetteDisplayCategory
   validNozzleMaps: {

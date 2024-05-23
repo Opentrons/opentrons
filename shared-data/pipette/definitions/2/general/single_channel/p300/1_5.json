@@ -1,6 +1,7 @@
 {
   "$otSharedSchema": "#/pipette/schemas/2/pipettePropertiesSchema.json",
   "displayName": "P300 Single-Channel GEN1",
+  "name": "p300_single",
   "model": "p300",
   "displayCategory": "GEN1",
   "validNozzleMaps": {
