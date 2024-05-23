@@ -17,23 +17,39 @@ import {
   JUSTIFY_SPACE_BETWEEN,
 } from '@opentrons/components'
 
-import type { FailedCommand } from './types'
 import { getErrorKind, useErrorMessage, useErrorName } from './utils'
 import { LargeButton } from '../../atoms/buttons'
+import { RECOVERY_MAP } from './constants'
+
+import type { FailedCommand } from './types'
+import type { UseRouteUpdateActionsResult } from './utils'
 
 interface RunPausedSplashProps {
-  onClick: () => void
+  toggleERWiz: (launchER: boolean) => Promise<void>
+  routeUpdateActions: UseRouteUpdateActionsResult
   failedCommand: FailedCommand | null
 }
 
 export function RunPausedSplash({
-  onClick,
+  toggleERWiz,
+  routeUpdateActions,
   failedCommand,
 }: RunPausedSplashProps): JSX.Element {
   const { t } = useTranslation('error_recovery')
   const errorKind = getErrorKind(failedCommand?.error?.errorType)
   const title = useErrorName(errorKind)
   const subText = useErrorMessage(errorKind)
+
+  const { proceedToRoute } = routeUpdateActions
+
+  // Do not launch error recovery, but do utilize the wizard's cancel route.
+  const onCancelClick = (): Promise<void> => {
+    return toggleERWiz(false).then(() =>
+      proceedToRoute(RECOVERY_MAP.CANCEL_RUN.ROUTE)
+    )
+  }
+
+  const onLaunchERClick = (): Promise<void> => toggleERWiz(true)
 
   // TODO(jh 05-22-24): The hardcoded Z-indexing is non-ideal but must be done to keep the splash page above
   // several components in the RunningProtocol page. Investigate why these components have seemingly arbitrary zIndex values
@@ -63,14 +79,14 @@ export function RunPausedSplash({
       </SplashFrame>
       <Flex justifyContent={JUSTIFY_SPACE_BETWEEN} gridGap={SPACING.spacing16}>
         <LargeButton
-          onClick={() => null}
+          onClick={onCancelClick}
           buttonText={t('cancel_run')}
           css={CANCEL_RUN_BTN_STYLE}
           iconName={'remove'}
           iconColorOverride={COLORS.red50}
         />
         <LargeButton
-          onClick={() => null}
+          onClick={onLaunchERClick}
           buttonText={t('launch_recovery_mode')}
           css={LAUNCH_RECOVERY_BTN_STYLE}
           iconName={'recovery'}

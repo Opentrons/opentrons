@@ -65,4 +65,5 @@ export interface RecoveryContentProps {
   recoveryMap: IRecoveryMap
   routeUpdateActions: UseRouteUpdateActionsResult
   recoveryCommands: UseRecoveryCommandsResult
+  hasLaunchedRecovery: boolean
 }

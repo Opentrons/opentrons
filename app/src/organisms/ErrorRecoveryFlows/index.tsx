@@ -8,10 +8,12 @@ import {
 import { useFeatureFlag } from '../../redux/config'
 import { ErrorRecoveryWizard } from './ErrorRecoveryWizard'
 import { RunPausedSplash } from './RunPausedSplash'
-import { useCurrentlyFailedRunCommand } from './utils'
+import { useCurrentlyFailedRunCommand, useRouteUpdateActions } from './utils'
+import { useRecoveryCommands } from './useRecoveryCommands'
+import { RECOVERY_MAP } from './constants'
 
 import type { RunStatus } from '@opentrons/api-client'
-import type { FailedCommand } from './types'
+import type { FailedCommand, IRecoveryMap } from './types'
 
 const VALID_ER_RUN_STATUSES: RunStatus[] = [
   RUN_STATUS_AWAITING_RECOVERY,
@@ -58,12 +60,30 @@ export function ErrorRecoveryFlows({
   runId,
   failedCommand,
 }: ErrorRecoveryFlowsProps): JSX.Element | null {
-  const [showERWizard, setShowERWizard] = React.useState(false)
   const enableRunNotes = useFeatureFlag('enableRunNotes')
+  const { hasLaunchedRecovery, toggleERWizard, showERWizard } = useERWizard()
 
-  const toggleER = (): void => {
-    setShowERWizard(!showERWizard)
-  }
+  /**
+   * ER Wizard routing.
+   * Recovery Route: A logically-related collection of recovery steps or a single step if unrelated to any existing recovery route.
+   * Recovery Step: Analogous to a "step" in other wizard flows.
+   */
+  const [recoveryMap, setRecoveryMap] = React.useState<IRecoveryMap>({
+    route: RECOVERY_MAP.OPTION_SELECTION.ROUTE,
+    step: RECOVERY_MAP.OPTION_SELECTION.STEPS.SELECT,
+  })
+
+  const routeUpdateActions = useRouteUpdateActions({
+    hasLaunchedRecovery,
+    recoveryMap,
+    toggleERWizard,
+    setRecoveryMap,
+  })
+
+  const recoveryCommands = useRecoveryCommands({
+    runId,
+    failedCommand,
+  })
 
   if (!enableRunNotes) {
     return null
@@ -72,9 +92,41 @@ export function ErrorRecoveryFlows({
   return (
     <>
       {showERWizard ? (
-        <ErrorRecoveryWizard runId={runId} failedCommand={failedCommand} />
+        <ErrorRecoveryWizard
+          failedCommand={failedCommand}
+          recoveryMap={recoveryMap}
+          routeUpdateActions={routeUpdateActions}
+          recoveryCommands={recoveryCommands}
+          hasLaunchedRecovery={hasLaunchedRecovery}
+        />
       ) : null}
-      <RunPausedSplash onClick={toggleER} failedCommand={failedCommand} />
+      <RunPausedSplash
+        failedCommand={failedCommand}
+        toggleERWiz={toggleERWizard}
+        routeUpdateActions={routeUpdateActions}
+      />
     </>
   )
+}
+
+interface UseERWizardResult {
+  hasLaunchedRecovery: boolean
+  showERWizard: boolean
+  toggleERWizard: (hasLaunchedER: boolean) => Promise<void>
+}
+
+function useERWizard(): UseERWizardResult {
+  const [showERWizard, setShowERWizard] = React.useState(false)
+  // Because RunPausedSplash has access to some ER Wiz routes but is not a part of the ER wizard, the splash screen
+  // is the "home" route as opposed to SelectRecoveryOption (accessed by pressing "go back" or "continue" enough times)
+  // when recovery mode has not been launched.
+  const [hasLaunchedRecovery, setHasLaunchedRecovery] = React.useState(false)
+
+  const toggleERWizard = (hasLaunchedER: boolean): Promise<void> => {
+    setHasLaunchedRecovery(hasLaunchedER)
+    setShowERWizard(!showERWizard)
+    return Promise.resolve()
+  }
+
+  return { showERWizard, toggleERWizard, hasLaunchedRecovery }
 }

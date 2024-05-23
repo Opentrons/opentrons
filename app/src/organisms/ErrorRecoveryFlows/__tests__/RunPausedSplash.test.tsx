@@ -28,7 +28,7 @@ describe('ConfirmCancelRunModal', () => {
 
   beforeEach(() => {
     props = {
-      onClick: mockOnClose,
+      toggleERWiz: mockOnClose,
       errorType: '',
     }
   })
