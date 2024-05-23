@@ -1,11 +1,12 @@
 """Main FastAPI application."""
 import asyncio
 import logging
-from typing import Optional
+from typing import Optional, AsyncGenerator
 from pathlib import Path
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from contextlib import asynccontextmanager
 
 from opentrons import __version__
 
@@ -43,36 +44,16 @@ from .service.notifications import (
 log = logging.getLogger(__name__)
 
 
-app = FastAPI(
-    title="Opentrons OT-2 HTTP API Spec",
-    description=(
-        "This OpenAPI spec describes the HTTP API of the Opentrons "
-        "OT-2. It may be retrieved from a robot on port 31950 at "
-        "/openapi. Some schemas used in requests and responses use "
-        "the `x-patternProperties` key to mean the JSON Schema "
-        "`patternProperties` behavior."
-    ),
-    version=__version__,
-    exception_handlers=exception_handlers,
-    # Disable documentation hosting via Swagger UI, normally at /docs.
-    # We instead focus on the docs hosted by ReDoc, at /redoc.
-    docs_url=None,
-)
-
-# cors
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=("*"),
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
-
-# main router
-app.include_router(router=router)
+@asynccontextmanager
+async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
+    """Lifespan event handler for FastAPI."""
+    try:
+        await on_startup()
+        yield
+    finally:
+        await on_shutdown()
 
 
-@app.on_event("startup")
 async def on_startup() -> None:
     """Handle app startup."""
     settings = get_settings()
@@ -111,7 +92,6 @@ async def on_startup() -> None:
     )
 
 
-@app.on_event("shutdown")
 async def on_shutdown() -> None:
     """Handle app shutdown."""
     # FIXME(mm, 2024-01-31): Cleaning up everything concurrently like this is prone to
@@ -131,3 +111,33 @@ async def on_shutdown() -> None:
 
     for e in shutdown_errors:
         log.warning("Error during shutdown", exc_info=e)
+
+
+app = FastAPI(
+    title="Opentrons HTTP API Spec",
+    description=(
+        "This OpenAPI spec describes the HTTP API of the Opentrons "
+        "robots. It may be retrieved from a robot on port 31950 at "
+        "/openapi. Some schemas used in requests and responses use "
+        "the `x-patternProperties` key to mean the JSON Schema "
+        "`patternProperties` behavior."
+    ),
+    version=__version__,
+    exception_handlers=exception_handlers,
+    # Disable documentation hosting via Swagger UI, normally at /docs.
+    # We instead focus on the docs hosted by ReDoc, at /redoc.
+    docs_url=None,
+    lifespan=lifespan,
+)
+
+# cors
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=("*"),
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+# main router
+app.include_router(router=router)

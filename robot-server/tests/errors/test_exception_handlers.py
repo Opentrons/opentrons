@@ -161,7 +161,7 @@ def test_handles_body_validation_error(app: FastAPI, client: TestClient) -> None
                 "id": "InvalidRequest",
                 "title": "Invalid Request",
                 "detail": "Input should be a valid integer, unable to parse "
-                          "string as an integer",
+                "string as an integer",
                 "source": {"pointer": "/int_field"},
             },
             {
@@ -169,7 +169,7 @@ def test_handles_body_validation_error(app: FastAPI, client: TestClient) -> None
                 "id": "InvalidRequest",
                 "title": "Invalid Request",
                 "detail": "Input should be a valid boolean, unable to interpret "
-                          "input",
+                "input",
                 "source": {"pointer": "/array_field/0"},
             },
         ]
@@ -193,7 +193,7 @@ def test_handles_query_validation_error(app: FastAPI, client: TestClient) -> Non
                 "id": "InvalidRequest",
                 "title": "Invalid Request",
                 "detail": "Input should be a valid integer, unable to parse "
-                          "string as an integer",
+                "string as an integer",
                 "source": {"parameter": "count"},
             },
         ]

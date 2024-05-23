@@ -12,7 +12,7 @@ from typing import (
     Callable,
 )
 from typing_extensions import get_args
-from pydantic import Field, BaseModel, RootModel
+from pydantic import Field, BaseModel, RootModel, model_serializer
 from fastapi.responses import JSONResponse
 from fastapi.dependencies.utils import get_typed_return_annotation
 from .resource_links import ResourceLinks as DeprecatedResourceLinks
@@ -40,20 +40,15 @@ class BaseResponseBody(BaseModel):
     JSON responses adhere to the server's generated OpenAPI Spec.
     """
 
-    def dict(self, *args: Any, **kwargs: Any) -> Dict[str, Any]:
+    @model_serializer
+    def serializer(self) -> Dict[str, Any]:
         """Always exclude `None` when serializing to an object.
 
         The OpenAPI spec marks `Optional` BaseModel fields as omittable, but
         not nullable. This `dict` method override ensures that `null` is never
         returned in a response, which would violate the spec.
         """
-        kwargs["exclude_none"] = True
-        return super().model_dump(*args, **kwargs)
-
-    def json(self, *args: Any, **kwargs: Any) -> str:
-        """See notes in `.dict()`."""
-        kwargs["exclude_none"] = True
-        return super().json(*args, **kwargs)
+        return {k: v for k, v in self.__dict__.items() if v is not None}
 
 
 class SimpleBody(BaseResponseBody, BaseModel, Generic[ResponseDataT]):

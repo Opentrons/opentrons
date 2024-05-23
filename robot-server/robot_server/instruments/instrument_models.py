@@ -50,14 +50,14 @@ class _GenericInstrument(BaseModel, Generic[InstrumentModelT, InstrumentDataT]):
     instrumentModel: InstrumentModelT = Field(..., description="Instrument model.")
     serialNumber: str = Field(..., description="Instrument hardware serial number.")
     subsystem: Optional[SubSystem] = Field(
-        None,
+        default=None,
         description="The subsystem corresponding to this instrument.",
     )
     ok: Literal[True] = Field(
         ..., description="Whether this instrument is OK and ready to go"
     )
     firmwareVersion: Optional[str] = Field(
-        None, description="The firmware version of this instrument (if applicable)"
+        default=None, description="The firmware version of this instrument (if applicable)"
     )
     data: InstrumentDataT
 
@@ -78,7 +78,7 @@ class GripperData(BaseModel):
     # TODO (spp, 2023-01-03): update calibration field as decided after
     #  spike https://opentrons.atlassian.net/browse/RSS-167
     calibratedOffset: Optional[InstrumentCalibrationData] = Field(
-        None, description="Calibrated gripper offset."
+       default=None, description="Calibrated gripper offset."
     )
 
 
@@ -89,7 +89,7 @@ class PipetteData(BaseModel):
     min_volume: float = Field(..., description="Minimum pipette volume.")
     max_volume: float = Field(..., description="Maximum pipette volume.")
     calibratedOffset: Optional[InstrumentCalibrationData] = Field(
-        None, description="Calibrated pipette offset."
+        default=None, description="Calibrated pipette offset."
     )
 
     # TODO (spp, 2022-12-20): update/ add fields according to client needs.
@@ -113,7 +113,7 @@ class Pipette(_GenericInstrument[PipetteModel, PipetteData]):
     instrumentName: PipetteName
     instrumentModel: PipetteModel
     data: PipetteData
-    state: Optional[PipetteState]
+    state: Optional[PipetteState] = None
 
 
 class Gripper(_GenericInstrument[GripperModelStr, GripperData]):
