@@ -61,8 +61,8 @@ async def test_create_engine(decoy: Decoy, subject: EngineStore) -> None:
 
     assert subject.current_run_id == "run-id"
     assert isinstance(result, StateSummary)
-    assert isinstance(subject.runner, LiveRunner)
-    assert isinstance(subject.engine, ProtocolEngine)
+    assert isinstance(subject._run_orchestrator.runner, LiveRunner)
+    assert isinstance(subject._run_orchestrator.engine, ProtocolEngine)
 
 
 async def test_create_engine_with_protocol(

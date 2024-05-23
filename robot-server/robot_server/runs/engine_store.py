@@ -122,19 +122,19 @@ class EngineStore:
         self._default_run_orchestrator: Optional[RunOrchestrator] = None
         hardware_api.register_callback(_get_estop_listener(self))
 
-    @property
-    def engine(self) -> ProtocolEngine:
-        """Get the "current" persisted ProtocolEngine."""
-        if self._run_orchestrator is None:
-            raise NoRunnerEngineError()
-        return self._run_orchestrator.engine
-
-    @property
-    def runner(self) -> AnyRunner:
-        """Get the "current" persisted ProtocolRunner."""
-        if self._run_orchestrator is None:
-            raise NoRunnerEngineError()
-        return self._run_orchestrator.runner
+    # @property
+    # def engine(self) -> ProtocolEngine:
+    #     """Get the "current" persisted ProtocolEngine."""
+    #     if self._run_orchestrator is None:
+    #         raise NoRunnerEngineError()
+    #     return self._run_orchestrator.engine
+    #
+    # @property
+    # def runner(self) -> AnyRunner:
+    #     """Get the "current" persisted ProtocolRunner."""
+    #     if self._run_orchestrator is None:
+    #         raise NoRunnerEngineError()
+    #     return self._run_orchestrator.runner
 
     @property
     def current_run_id(self) -> Optional[str]:
@@ -156,8 +156,8 @@ class EngineStore:
         """
         if (
             self._run_orchestrator is not None
-            and self.engine.state_view.commands.has_been_played()
-            and not self.engine.state_view.commands.get_is_stopped()
+            and self._run_orchestrator.engine.state_view.commands.has_been_played()
+            and not self._run_orchestrator.engine.state_view.commands.get_is_stopped()
         ):
             raise EngineConflictError("An engine for a run is currently active")
 
@@ -242,11 +242,11 @@ class EngineStore:
         # concurrency hazard. If two requests simultaneously call this method,
         # they will both "succeed" (with undefined results) instead of one
         # raising EngineConflictError.
-        if isinstance(self.runner, PythonAndLegacyRunner):
+        if isinstance(self._run_orchestrator.runner, PythonAndLegacyRunner):
             assert (
                 protocol is not None
             ), "A Python protocol should have a protocol source file."
-            await self.runner.load(
+            await self._run_orchestrator.runner.load(
                 protocol.source,
                 # Conservatively assume that we're re-running a protocol that
                 # was uploaded before we added stricter validation, and that
@@ -254,18 +254,18 @@ class EngineStore:
                 python_parse_mode=PythonParseMode.ALLOW_LEGACY_METADATA_AND_REQUIREMENTS,
                 run_time_param_values=run_time_param_values,
             )
-        elif isinstance(self.runner, JsonRunner):
+        elif isinstance(self._run_orchestrator.runner, JsonRunner):
             assert (
                 protocol is not None
-            ), "A JSON protocol should have a protocol source file."
-            await self.runner.load(protocol.source)
+            ), "A JSON protocol shouZld have a protocol source file."
+            await self._run_orchestrator.runner.load(protocol.source)
         else:
-            self.runner.prepare()
+            self._run_orchestrator.runner.prepare()
 
         for offset in labware_offsets:
-            engine.add_labware_offset(offset)
+            self._run_orchestrator.engine.add_labware_offset(offset)
 
-        return engine.state_view.get_summary()
+        return self._run_orchestrator.engine.state_view.get_summary()
 
     async def clear(self) -> RunResult:
         """Remove the persisted ProtocolEngine.
@@ -274,8 +274,9 @@ class EngineStore:
             EngineConflictError: The current runner/engine pair is not idle, so
             they cannot be cleared.
         """
-        engine = self.engine
-        runner = self.runner
+        assert self._run_orchestrator is not None
+        engine = self._run_orchestrator.engine
+        runner = self._run_orchestrator.runner
         if engine.state_view.commands.get_is_okay_to_clear():
             await engine.finish(
                 drop_tips_after_run=False,
