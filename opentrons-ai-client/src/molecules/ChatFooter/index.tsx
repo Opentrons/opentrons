@@ -5,7 +5,6 @@ import {
   COLORS,
   DIRECTION_COLUMN,
   Flex,
-  //   POSITION_STICKY,
   SPACING,
   StyledText,
   TYPOGRAPHY,
@@ -17,8 +16,6 @@ export function ChatFooter(): JSX.Element {
 
   return (
     <Flex
-      //   position={POSITION_STICKY}
-      bottom="0"
       width="100%"
       gridGap={SPACING.spacing24}
       flexDirection={DIRECTION_COLUMN}

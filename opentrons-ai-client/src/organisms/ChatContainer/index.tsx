@@ -56,7 +56,7 @@ export function ChatContainer(): JSX.Element {
         </ChatDataContainer>
       </Flex>
       <span ref={scrollRef} />
-      <Flex position={POSITION_STICKY}>
+      <Flex position={POSITION_STICKY} bottom="0">
         <ChatFooter />
       </Flex>
     </Flex>
