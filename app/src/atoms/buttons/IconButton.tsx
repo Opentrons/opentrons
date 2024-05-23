@@ -1,17 +1,25 @@
 import * as React from 'react'
-import { BORDERS, COLORS, Icon, RESPONSIVENESS } from "@opentrons/components"
-import { ODD_FOCUS_VISIBLE } from "./constants"
-import styled, { css } from "styled-components"
+import { css } from 'styled-components'
+import {
+  BORDERS,
+  Btn,
+  COLORS,
+  Icon,
+  RESPONSIVENESS,
+} from '@opentrons/components'
+import { ODD_FOCUS_VISIBLE } from './constants'
 
-interface IconButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+interface IconButtonProps
+  // extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+  extends React.ComponentProps<typeof Btn> {
   iconName: React.ComponentProps<typeof Icon>['name']
   hasBackground?: boolean
 }
 
-export function IconButton(props: IconButtonProps) {
+export function IconButton(props: IconButtonProps): JSX.Element {
   const { iconName, hasBackground = false, ...buttonProps } = props
   return (
-    <button
+    <Btn
       css={css`
         border-radius: ${hasBackground ? BORDERS.borderRadius8 : '50%'};
         max-height: 100%;
@@ -22,11 +30,15 @@ export function IconButton(props: IconButtonProps) {
         }
         &:focus-visible {
           box-shadow: ${ODD_FOCUS_VISIBLE};
-          background-color: ${hasBackground ? COLORS.grey35 : COLORS.transparent};
+          background-color: ${hasBackground
+            ? COLORS.grey35
+            : COLORS.transparent};
         }
         &:disabled {
-          background-color: ${hasBackground ? COLORS.grey35 : COLORS.transparent};
-          color: ${COLORS.grey35}
+          background-color: ${hasBackground
+            ? COLORS.grey35
+            : COLORS.transparent};
+          color: ${COLORS.grey35};
         }
         @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
           cursor: default;
@@ -35,9 +47,6 @@ export function IconButton(props: IconButtonProps) {
       {...buttonProps}
     >
       <Icon size="5rem" name={iconName} />
-    </button>
+    </Btn>
   )
 }
-
-const ButtonWrapper = styled('button')
-

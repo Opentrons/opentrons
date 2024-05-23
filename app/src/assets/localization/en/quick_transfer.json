@@ -1,10 +1,12 @@
 {
+  "add_or_remove_columns": "add or remove columns",
   "add_or_remove": "add or remove",
   "advanced_settings": "Advanced settings",
   "all": "All labware",
   "aspirate_volume": "Aspirate volume per well",
   "aspirate_volume_µL": "Aspirate volume per well (µL)",
   "both_mounts": "Left + Right Mount",
+  "columns": "columns",
   "create_new_transfer": "Create new quick transfer",
   "create_transfer": "Create transfer",
   "destination": "Destination",
@@ -21,6 +23,7 @@
   "reservoir": "Reservoirs",
   "source": "Source",
   "select_attached_pipette": "Select attached pipette",
+  "select_by": "select by",
   "select_dest_labware": "Select destination labware",
   "select_dest_wells": "Select destination wells",
   "select_source_labware": "Select source labware",
@@ -31,6 +34,7 @@
   "set_transfer_volume": "Set transfer volume",
   "source_labware": "Source labware",
   "source_labware_d2": "Source labware in D2",
+  "starting_well": "starting well",
   "use_deck_slots": "<block>Quick transfers use deck slots B2-D2. These slots hold a tip rack, a source labware, and a destination labware.</block><block>Make sure that your deck configuration is up to date to avoid collisions.</block>",
   "tip_management": "Tip management",
   "tip_rack": "Tip rack",
@@ -42,5 +46,6 @@
   "pipette_currently_attached": "Quick transfer options depend on the pipettes currently attached to your robot.",
   "wellPlate": "Well plates",
   "well_selection": "Well selection",
-  "well_ratio": "Quick transfers with multiple source wells can either be one-to-one (select {{wells}} for this transfer) or consolidate (select 1 destination well)."
+  "well_ratio": "Quick transfers with multiple source wells can either be one-to-one (select {{wells}} for this transfer) or consolidate (select 1 destination well).",
+  "wells": "wells"
 }

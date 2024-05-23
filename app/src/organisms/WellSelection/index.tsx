@@ -1,9 +1,10 @@
 import * as React from 'react'
+import { useTranslation } from 'react-i18next'
 import reduce from 'lodash/reduce'
 
 import {
-  ALIGN_STRETCH,
   Box,
+  Checkbox,
   COLORS,
   DIRECTION_COLUMN,
   Flex,
@@ -15,6 +16,9 @@ import {
   TYPOGRAPHY,
   WELL_LABEL_OPTIONS,
 } from '@opentrons/components'
+
+import { IconButton } from '../../atoms/buttons/IconButton'
+import { RadioButton } from '../../atoms/buttons/RadioButton'
 import {
   arrayToWellGroup,
   getCollidingWells,
@@ -28,8 +32,6 @@ import type {
   PipetteChannels,
 } from '@opentrons/shared-data'
 import type { GenericRect } from './types'
-import { useTranslation } from 'react-i18next'
-import { IconButton } from '../../atoms/buttons/IconButton'
 
 interface WellSelectionProps {
   definition: LabwareDefinition2
@@ -108,18 +110,18 @@ export function WellSelection(props: WellSelectionProps): JSX.Element {
   const allSelectedWells =
     channels === 8 || channels === 96
       ? reduce<WellGroup, WellGroup>(
-        selectedPrimaryWells,
-        (acc, _, wellName): WellGroup => {
-          const wellSet = getWellSetForMultichannel(
-            definition,
-            wellName,
-            channels
-          )
-          if (!wellSet) return acc
-          return { ...acc, ...arrayToWellGroup(wellSet) }
-        },
-        {}
-      )
+          selectedPrimaryWells,
+          (acc, _, wellName): WellGroup => {
+            const wellSet = getWellSetForMultichannel(
+              definition,
+              wellName,
+              channels
+            )
+            if (!wellSet) return acc
+            return { ...acc, ...arrayToWellGroup(wellSet) }
+          },
+          {}
+        )
       : selectedPrimaryWells
 
   const wellFill: WellFill = {}
@@ -150,48 +152,117 @@ export function WellSelection(props: WellSelectionProps): JSX.Element {
     </RobotCoordinateSpace>
   )
   return definition.parameters.format === '384Standard' ? (
-    <Flex justifyContent={JUSTIFY_SPACE_BETWEEN} gridGap={SPACING.spacing40} width="100%">
+    <Flex
+      justifyContent={JUSTIFY_SPACE_BETWEEN}
+      gridGap={SPACING.spacing40}
+      width="100%"
+    >
       <Box flex="2 0 0">{labwareRender}</Box>
-      <ButtonControls channels={channels} flex="1 0 0" />
+      <Flex
+        flex="1 0 0"
+        flexDirection={DIRECTION_COLUMN}
+        gridGap={SPACING.spacing32}
+      >
+        {channels === 1 ? <SelectBy /> : <StartingWell channels={channels} />}
+        <ButtonControls channels={channels} />
+      </Flex>
     </Flex>
   ) : (
     <SelectionRect
       onSelectionMove={handleSelectionMove}
       onSelectionDone={handleSelectionDone}
     >
-      { labwareRender }
-    </SelectionRect >
+      {labwareRender}
+    </SelectionRect>
+  )
+}
+
+function SelectBy(): JSX.Element {
+  const { t, i18n } = useTranslation('quick_transfer')
+
+  return (
+    <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing16}>
+      <StyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
+        {i18n.format(t('select_by'), 'capitalize')}
+      </StyledText>
+      <RadioButton
+        buttonLabel={i18n.format(t('columns'), 'capitalize')}
+        buttonValue="columns"
+        onChange={() => console.log('columns')}
+        radioButtonType="small"
+      />
+      <RadioButton
+        buttonLabel={i18n.format(t('wells'), 'capitalize')}
+        buttonValue="wells"
+        onChange={() => console.log('wells')}
+        radioButtonType="small"
+      />
+    </Flex>
+  )
+}
+
+function StartingWell({
+  channels,
+}: {
+  channels: PipetteChannels
+}): JSX.Element {
+  const { t, i18n } = useTranslation('quick_transfer')
+
+  const checkboxWellOptions =
+    channels === 8 ? ['A1', 'B1'] : ['A1', 'A2', 'B1', 'B2']
+
+  return (
+    <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing16}>
+      <StyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
+        {i18n.format(t('starting_well'), 'capitalize')}
+      </StyledText>
+      {checkboxWellOptions.map(well => (
+        <Checkbox
+          key={well}
+          isChecked
+          labelText={well}
+          onClick={() => console.log(well)}
+        />
+      ))}
+    </Flex>
   )
 }
 
 interface ButtonControlsProps {
-  channels: PipetteChannels 
-  flex: React.ComponentProps<typeof Flex>['flex']
+  channels: PipetteChannels
 }
 function ButtonControls(props: ButtonControlsProps): JSX.Element {
-  const { channels, flex } = props
+  const { channels } = props
   const { t, i18n } = useTranslation('quick_transfer')
 
-  const addOrRemoveButtons = channels !== 96 ? (
-    <Flex flexDirection={DIRECTION_COLUMN} alignItems={ALIGN_STRETCH} gridGap={SPACING.spacing16}>
-      <StyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>{i18n.format(t('add_or_remove'), 'capitalize')}</StyledText>
-      <Flex alignSelf={ALIGN_STRETCH} gridGap={SPACING.spacing16}>
-        <IconButton
-          onClick={() => { console.log('TODO handle minus') }}
-          iconName="minus"
-          hasBackground />
-        <IconButton
-          onClick={() => { console.log('TODO handle plus') }}
-          iconName="plus"
-          hasBackground />
+  const addOrRemoveButtons =
+    channels !== 96 ? (
+      <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing16}>
+        <StyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
+          {i18n.format(
+            t(channels === 8 ? 'add_or_remove_columns' : 'add_or_remove'),
+            'capitalize'
+          )}
+        </StyledText>
+        <Flex gridGap={SPACING.spacing16}>
+          <IconButton
+            onClick={() => {
+              console.log('TODO handle minus')
+            }}
+            iconName="minus"
+            hasBackground
+            flex="1"
+          />
+          <IconButton
+            onClick={() => {
+              console.log('TODO handle plus')
+            }}
+            iconName="plus"
+            hasBackground
+            flex="1"
+          />
+        </Flex>
       </Flex>
-    </Flex>
-  ) : null
-  return (
-    <Flex
-      flex={flex}
-      flexDirection={DIRECTION_COLUMN}>
-      {addOrRemoveButtons}
-    </Flex>
-  )
+    ) : null
+  return <Flex flexDirection={DIRECTION_COLUMN}>{addOrRemoveButtons}</Flex>
 }
