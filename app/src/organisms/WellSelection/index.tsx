@@ -3,7 +3,7 @@ import reduce from 'lodash/reduce'
 
 import {
   COLORS,
-  LabwareRender,
+  Labware,
   RobotCoordinateSpace,
   WELL_LABEL_OPTIONS,
 } from '@opentrons/components'
@@ -133,7 +133,7 @@ export function WellSelection(props: WellSelectionProps): JSX.Element {
       onSelectionDone={handleSelectionDone}
     >
       <RobotCoordinateSpace viewBox="0 0 128 86">
-        <LabwareRender
+        <Labware
           definition={definition}
           hideOutline
           isInteractive
