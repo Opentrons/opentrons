@@ -57,9 +57,6 @@ export function SelectRecoveryOption({
           primaryBtnOnClick={() =>
             proceedToRoute(selectedRoute as RecoveryRoute)
           }
-          secondaryBtnOnClick={() =>
-            proceedToRoute(RECOVERY_MAP.BEFORE_BEGINNING.ROUTE)
-          }
         />
       </Flex>
     )
