@@ -519,6 +519,112 @@ def test_get_next_tip_with_starting_tip_8_channel(
     assert result == "A3"
 
 
+def test_get_next_tip_with_1_channel_followed_by_8_channel(
+    subject: TipStore,
+    load_labware_command: commands.LoadLabware,
+    supported_tip_fixture: pipette_definition.SupportedTipsDefinition,
+) -> None:
+    """It should return the first tip of column 2 for the 8 channel after performing a single tip pickup on column 1."""
+    subject.handle_action(
+        actions.SucceedCommandAction(private_result=None, command=load_labware_command)
+    )
+    load_pipette_command = commands.LoadPipette.construct(  # type: ignore[call-arg]
+        result=commands.LoadPipetteResult(pipetteId="pipette-id")
+    )
+    load_pipette_private_result = commands.LoadPipettePrivateResult(
+        pipette_id="pipette-id",
+        serial_number="pipette-serial",
+        config=LoadedStaticPipetteData(
+            channels=1,
+            max_volume=15,
+            min_volume=3,
+            model="gen a",
+            display_name="display name",
+            flow_rates=FlowRates(
+                default_aspirate={},
+                default_dispense={},
+                default_blow_out={},
+            ),
+            tip_configuration_lookup_table={15: supported_tip_fixture},
+            nominal_tip_overlap={},
+            nozzle_offset_z=1.23,
+            home_position=4.56,
+            nozzle_map=get_default_nozzle_map(PipetteNameType.P300_SINGLE_GEN2),
+            back_left_corner_offset=Point(0, 0, 0),
+            front_right_corner_offset=Point(0, 0, 0),
+        ),
+    )
+    subject.handle_action(
+        actions.SucceedCommandAction(
+            private_result=load_pipette_private_result, command=load_pipette_command
+        )
+    )
+    load_pipette_command2 = commands.LoadPipette.construct(  # type: ignore[call-arg]
+        result=commands.LoadPipetteResult(pipetteId="pipette-id2")
+    )
+    load_pipette_private_result2 = commands.LoadPipettePrivateResult(
+        pipette_id="pipette-id2",
+        serial_number="pipette-serial2",
+        config=LoadedStaticPipetteData(
+            channels=8,
+            max_volume=15,
+            min_volume=3,
+            model="gen a",
+            display_name="display name2",
+            flow_rates=FlowRates(
+                default_aspirate={},
+                default_dispense={},
+                default_blow_out={},
+            ),
+            tip_configuration_lookup_table={15: supported_tip_fixture},
+            nominal_tip_overlap={},
+            nozzle_offset_z=1.23,
+            home_position=4.56,
+            nozzle_map=get_default_nozzle_map(PipetteNameType.P300_MULTI_GEN2),
+            back_left_corner_offset=Point(0, 0, 0),
+            front_right_corner_offset=Point(0, 0, 0),
+        ),
+    )
+    subject.handle_action(
+        actions.SucceedCommandAction(
+            private_result=load_pipette_private_result2, command=load_pipette_command2
+        )
+    )
+
+    result = TipView(subject.state).get_next_tip(
+        labware_id="cool-labware",
+        num_tips=1,
+        starting_tip_name=None,
+        nozzle_map=get_default_nozzle_map(PipetteNameType.P300_SINGLE_GEN2),
+    )
+
+    assert result == "A1"
+
+    pick_up_tip2 = commands.PickUpTip.construct(  # type: ignore[call-arg]
+        params=commands.PickUpTipParams.construct(
+            pipetteId="pipette-id2",
+            labwareId="cool-labware",
+            wellName="A1",
+        ),
+        result=commands.PickUpTipResult.construct(
+            position=DeckPoint(x=0, y=0, z=0), tipLength=1.23
+        ),
+    )
+
+    subject.handle_action(
+        actions.SucceedCommandAction(private_result=None, command=pick_up_tip2)
+    )
+
+    result = TipView(subject.state).get_next_tip(
+        labware_id="cool-labware",
+        num_tips=8,
+        starting_tip_name=None,
+        nozzle_map=get_default_nozzle_map(PipetteNameType.P300_MULTI_GEN2),
+    )
+
+    assert result == "A2"
+
+
 def test_get_next_tip_with_starting_tip_out_of_tips(
     subject: TipStore,
     load_labware_command: commands.LoadLabware,

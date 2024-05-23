@@ -267,6 +267,14 @@ class TipView(HasState[TipState]):
             elif all(wells[well] == TipRackWellState.USED for well in tip_cluster):
                 return None
             else:
+                # In the case of an 8ch pipette where a column has mixed state tips we may simply progress to the next column in our search
+                if (
+                    nozzle_map is not None
+                    and len(nozzle_map.full_instrument_map_store) == 8
+                ):
+                    return None
+
+                # In the case of a 96ch we can attempt to index in by singular rows and columns assuming that indexed direction is safe
                 # The tip cluster list is ordered: Each row from a column in order by columns
                 tip_cluster_final_column = []
                 for i in range(active_rows):
