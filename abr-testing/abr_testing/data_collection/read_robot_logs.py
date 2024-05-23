@@ -23,8 +23,9 @@ def lpc_data(
     """Get labware offsets from one run log."""
     offsets = file_results.get("labwareOffsets", "")
     # TODO: per UNIQUE slot AND LABWARE TYPE only keep the most recent LPC recording
+    unique_offsets: Dict[Any, Any] = {}
+    headers_lpc = []
     if len(offsets) > 0:
-        unique_offsets: Dict[Any, Any] = {}
         for offset in offsets:
             labware_type = offset.get("definitionUri", "")
             slot = offset["location"].get("slotName", "")
@@ -53,9 +54,9 @@ def lpc_data(
                     "Y": y_offset,
                     "Z": z_offset,
                 }
-    for item in unique_offsets:
-        runs_and_lpc.append(unique_offsets[item].values())
-    headers_lpc = list(unique_offsets[(slot, labware_type)].keys())
+        for item in unique_offsets:
+            runs_and_lpc.append(unique_offsets[item].values())
+        headers_lpc = list(unique_offsets[(slot, labware_type)].keys())
 
     return runs_and_lpc, headers_lpc
 
@@ -306,8 +307,11 @@ def get_error_info(file_results: Dict[str, Any]) -> Tuple[int, str, str, str, st
         error_level = ""
         return 0, error_type, error_code, error_instrument, error_level
     commands_of_run: List[Dict[str, Any]] = file_results.get("commands", [])
-    run_command_error: Dict[str, Any] = commands_of_run[-1]
-    error_str: int = len(run_command_error.get("error", ""))
+    try:
+        run_command_error: Dict[str, Any] = commands_of_run[-1]
+        error_str: int = len(run_command_error.get("error", ""))
+    except IndexError:
+        error_str = 0
     if error_str > 1:
         error_type = run_command_error["error"].get("errorType", "")
         error_code = run_command_error["error"].get("errorCode", "")
