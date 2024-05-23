@@ -3,6 +3,7 @@ import csv
 import os
 from typing import List, Dict, Tuple, Any, Optional
 import statistics
+import math
 from math import isclose
 try:
     import gspread  # type: ignore[import]
@@ -281,13 +282,11 @@ def process_google_sheet(
     # Find accuracy, precision, repeatability
     try:
         accuracy = statistics.mean(normalized_height)
-        precision = max(normalized_height) - min(normalized_height) / 2
-        repeatability = 100 - (
-            statistics.stdev(normalized_height) / len(normalized_height) * 100
-        )
+        precision = (max(normalized_height) - min(normalized_height)) / 2
+        repeatability_error = statistics.stdev(normalized_height) / math.sqrt(len(normalized_height))
         summary = [
             ["Accuracy (mm)", "Precision (+/- mm)", "Repeatability (%)"],
-            [accuracy, precision, repeatability],
+            [accuracy, precision, 100.0 - 100.0 * repeatability_error],
         ]
         google_sheet.batch_update_cells(sheet_name, summary, "D", 2, sheet_id)
     except gspread.exceptions.APIError:
