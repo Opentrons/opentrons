@@ -25,7 +25,7 @@ from opentrons.protocol_engine.state.commands import (
     CommandState,
     CommandView,
     CommandSlice,
-    CurrentCommand,
+    CommandPointer,
     RunResult,
     QueueStatus,
 )
@@ -846,7 +846,7 @@ def test_get_current() -> None:
         queued_command_ids=[],
         commands=[command],
     )
-    assert subject.get_current() == CurrentCommand(
+    assert subject.get_current() == CommandPointer(
         index=0,
         command_id="command-id",
         command_key="command-key",
@@ -866,7 +866,7 @@ def test_get_current() -> None:
     subject = get_command_view(commands=[command_1, command_2])
     subject.state.command_history._set_terminal_command_id(command_1.id)
 
-    assert subject.get_current() == CurrentCommand(
+    assert subject.get_current() == CommandPointer(
         index=1,
         command_id="command-id-2",
         command_key="key-2",
@@ -886,7 +886,7 @@ def test_get_current() -> None:
     subject = get_command_view(commands=[command_1, command_2])
     subject.state.command_history._set_terminal_command_id(command_1.id)
 
-    assert subject.get_current() == CurrentCommand(
+    assert subject.get_current() == CommandPointer(
         index=1,
         command_id="command-id-2",
         command_key="key-2",

@@ -1,11 +1,8 @@
 from enum import Enum
 from dataclasses import dataclass, asdict, fields
-from typing import Dict, Tuple, TypeVar, Generic, List, cast, Optional, TYPE_CHECKING
+from typing import Dict, Tuple, TypeVar, Generic, List, cast, Optional
 from typing_extensions import TypedDict, Literal
-
-if TYPE_CHECKING:
-    # Work around circular import.
-    from opentrons.hardware_control.types import OT3AxisKind, InstrumentProbeType
+from opentrons.hardware_control.types import OT3AxisKind, InstrumentProbeType
 
 
 class AxisDict(TypedDict):
@@ -34,7 +31,7 @@ class ByGantryLoad(Generic[Vt]):
         return cast(Vt, asdict(self)[key.value])
 
 
-PerPipetteAxisSettings = ByGantryLoad[Dict["OT3AxisKind", float]]
+PerPipetteAxisSettings = ByGantryLoad[Dict[OT3AxisKind, float]]
 
 
 class CurrentDictDefault(TypedDict):
@@ -85,7 +82,7 @@ class OT3MotionSettings:
 
     def by_gantry_load(
         self, gantry_load: GantryLoad
-    ) -> Dict[str, Dict["OT3AxisKind", float]]:
+    ) -> Dict[str, Dict[OT3AxisKind, float]]:
         return dict(
             (field.name, getattr(self, field.name)[gantry_load])
             for field in fields(self)
@@ -99,7 +96,7 @@ class OT3CurrentSettings:
 
     def by_gantry_load(
         self, gantry_load: GantryLoad
-    ) -> Dict[str, Dict["OT3AxisKind", float]]:
+    ) -> Dict[str, Dict[OT3AxisKind, float]]:
         return dict(
             (field.name, getattr(self, field.name)[gantry_load])
             for field in fields(self)
@@ -133,7 +130,6 @@ class OutputOptions(int, Enum):
 class LiquidProbeSettings:
     starting_mount_height: float
     max_z_distance: float
-    min_z_distance: float
     mount_speed: float
     plunger_speed: float
     sensor_threshold_pascals: float
@@ -142,7 +138,7 @@ class LiquidProbeSettings:
     aspirate_while_sensing: bool
     auto_zero_sensor: bool
     num_baseline_reads: int
-    data_files: Optional[Dict["InstrumentProbeType", str]]
+    data_files: Optional[Dict[InstrumentProbeType, str]]
 
 
 @dataclass(frozen=True)

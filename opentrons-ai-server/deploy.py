@@ -37,7 +37,7 @@ class BaseDeploymentConfig:
 @dataclass(frozen=True)
 class CrtDeploymentConfig(BaseDeploymentConfig):
     ECR_REPOSITORY: str = "crt-ecr-repo"
-    ECR_URL: str = f"{get_aws_account_id}.dkr.ecr.{get_aws_region()}.amazonaws.com"
+    ECR_URL: str = f"{get_aws_account_id()}.dkr.ecr.{get_aws_region()}.amazonaws.com"
     FUNCTION_NAME: str = "crt-api-function"
     IMAGE_NAME: str = "crt-ai-server"
 

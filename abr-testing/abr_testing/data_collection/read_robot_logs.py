@@ -57,7 +57,6 @@ def lpc_data(
         for item in unique_offsets:
             runs_and_lpc.append(unique_offsets[item].values())
         headers_lpc = list(unique_offsets[(slot, labware_type)].keys())
-
     return runs_and_lpc, headers_lpc
 
 
@@ -296,6 +295,7 @@ def create_abr_data_sheet(
 def get_error_info(file_results: Dict[str, Any]) -> Tuple[int, str, str, str, str]:
     """Determines if errors exist in run log and documents them."""
     error_levels = []
+    error_level = ""
     # Read error levels file
     with open(ERROR_LEVELS_PATH, "r") as error_file:
         error_levels = list(csv.reader(error_file))
@@ -329,6 +329,8 @@ def get_error_info(file_results: Dict[str, Any]) -> Tuple[int, str, str, str, st
         code_error = error[1]
         if code_error == error_code:
             error_level = error[4]
+    if len(error_level) < 1:
+        error_level = str(4)
 
     return num_of_errors, error_type, error_code, error_instrument, error_level
 

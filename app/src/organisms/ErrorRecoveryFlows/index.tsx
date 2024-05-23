@@ -1,12 +1,20 @@
 import * as React from 'react'
 
-import { RUN_STATUS_AWAITING_RECOVERY } from '@opentrons/api-client'
+import {
+  RUN_STATUS_AWAITING_RECOVERY,
+  RUN_STATUS_STOP_REQUESTED,
+} from '@opentrons/api-client'
 
 import { ErrorRecoveryWizard } from './ErrorRecoveryWizard'
 import { useCurrentlyFailedRunCommand } from './utils'
 
 import type { RunStatus } from '@opentrons/api-client'
 import type { FailedCommand } from './types'
+
+const VALID_ER_RUN_STATUSES: RunStatus[] = [
+  RUN_STATUS_AWAITING_RECOVERY,
+  RUN_STATUS_STOP_REQUESTED,
+]
 
 interface UseErrorRecoveryResult {
   isERActive: boolean
@@ -25,9 +33,13 @@ export function useErrorRecoveryFlows(
     setIsERActive(!isERActive)
   }
 
-  // Because multiple ER flows may occur per run, disable ER when the status is not "awaiting-recovery."
+  // Because multiple ER flows may occur per run, disable ER when the status is not "awaiting-recovery" or a
+  // terminating run status in which we want to persist ER flows.
   React.useEffect(() => {
-    if (isERActive && runStatus !== RUN_STATUS_AWAITING_RECOVERY) {
+    const isValidRunStatus =
+      runStatus != null && VALID_ER_RUN_STATUSES.includes(runStatus)
+
+    if (isERActive && !isValidRunStatus) {
       setIsERActive(false)
     }
   }, [isERActive, runStatus])

@@ -1,6 +1,9 @@
 import * as React from 'react'
 
-import { useResumeRunFromRecoveryMutation } from '@opentrons/react-api-client'
+import {
+  useResumeRunFromRecoveryMutation,
+  useStopRunMutation,
+} from '@opentrons/react-api-client'
 
 import { useChainRunCommands } from '../../resources/runs'
 
@@ -14,6 +17,7 @@ interface UseRecoveryCommandsParams {
 }
 export interface UseRecoveryCommandsResult {
   resumeRun: () => void
+  cancelRun: () => void
   retryFailedCommand: () => Promise<CommandData[]>
   homePipetteZAxes: () => Promise<CommandData[]>
 }
@@ -24,6 +28,7 @@ export function useRecoveryCommands({
 }: UseRecoveryCommandsParams): UseRecoveryCommandsResult {
   const { chainRunCommands } = useChainRunCommands(runId, failedCommand?.id)
   const { resumeRunFromRecovery } = useResumeRunFromRecoveryMutation()
+  const { stopRun } = useStopRunMutation()
 
   const chainRunRecoveryCommands = React.useCallback(
     (
@@ -54,8 +59,13 @@ export function useRecoveryCommands({
     resumeRunFromRecovery(runId)
   }, [runId, resumeRunFromRecovery])
 
+  const cancelRun = React.useCallback((): void => {
+    stopRun(runId)
+  }, [runId])
+
   return {
     resumeRun,
+    cancelRun,
     retryFailedCommand,
     homePipetteZAxes,
   }

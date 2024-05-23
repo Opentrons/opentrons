@@ -4,12 +4,12 @@ from datetime import datetime
 from unittest.mock import MagicMock, AsyncMock
 
 from robot_server.service.notifications import RunsPublisher, Topics
-from opentrons.protocol_engine import CurrentCommand, EngineStatus, StateSummary
+from opentrons.protocol_engine import CommandPointer, EngineStatus, StateSummary
 
 
-def mock_curent_command(command_id: str) -> CurrentCommand:
-    """Create a mock CurrentCommand."""
-    return CurrentCommand(
+def mock_curent_command(command_id: str) -> CommandPointer:
+    """Create a mock CommandPointer."""
+    return CommandPointer(
         command_id=command_id,
         command_key="1",
         index=0,

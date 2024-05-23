@@ -355,7 +355,6 @@ def _run_trial(run_args: RunArgs, tip: int, well: Well, trial: int) -> float:
         lps = LiquidProbeSettings(
             starting_mount_height=start_height,
             max_z_distance=z_dist,
-            min_z_distance=lqid_cfg["min_z_distance"],
             mount_speed=run_args.z_speed,
             plunger_speed=plunger_speed,
             sensor_threshold_pascals=lqid_cfg["sensor_threshold_pascals"],

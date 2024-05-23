@@ -3,7 +3,7 @@ from fastapi import Depends
 from dataclasses import dataclass
 from typing import Callable, Optional
 
-from opentrons.protocol_engine import CurrentCommand, StateSummary, EngineStatus
+from opentrons.protocol_engine import CommandPointer, StateSummary, EngineStatus
 
 from server_utils.fastapi_utils.app_state import (
     AppState,
@@ -20,7 +20,7 @@ class RunHooks:
     """Generated during a protocol run. Utilized by RunsPublisher."""
 
     run_id: str
-    get_current_command: Callable[[str], Optional[CurrentCommand]]
+    get_current_command: Callable[[str], Optional[CommandPointer]]
     get_state_summary: Callable[[str], Optional[StateSummary]]
 
 
@@ -28,7 +28,7 @@ class RunHooks:
 class EngineStateSlice:
     """Protocol Engine state relevant to RunsPublisher."""
 
-    current_command: Optional[CurrentCommand] = None
+    current_command: Optional[CommandPointer] = None
     state_summary_status: Optional[EngineStatus] = None
 
 
@@ -54,7 +54,7 @@ class RunsPublisher:
     async def initialize(
         self,
         run_id: str,
-        get_current_command: Callable[[str], Optional[CurrentCommand]],
+        get_current_command: Callable[[str], Optional[CommandPointer]],
         get_state_summary: Callable[[str], Optional[StateSummary]],
     ) -> None:
         """Initialize RunsPublisher with necessary information derived from the current run.
