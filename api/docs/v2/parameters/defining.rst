@@ -62,7 +62,7 @@ The examples on this page assume the following definition, which uses the argume
 
 .. code-block::
 
-    def add_parameters(parameters: protocol_api.ProtocolContext.Parameters):
+    def add_parameters(parameters: protocol_api.Parameters):
 
 Within this function definition, call methods on ``parameters`` to define parameters. The next section demonstrates how each type of parameter has its own method.
 
