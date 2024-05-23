@@ -53,8 +53,8 @@ describe('useRouteUpdateActions', () => {
 
     useRouteUpdateActionsParams = {
       recoveryMap: {
-        route: RECOVERY_MAP.RESUME.ROUTE,
-        step: RECOVERY_MAP.RESUME.STEPS.CONFIRM_RESUME,
+        route: RECOVERY_MAP.RETRY_FAILED_COMMAND.ROUTE,
+        step: RECOVERY_MAP.RETRY_FAILED_COMMAND.STEPS.CONFIRM_RETRY,
       },
       setRecoveryMap: mockSetRecoveryMap,
     }
@@ -139,8 +139,8 @@ describe('useRouteUpdateActions', () => {
 
     setRobotInMotion(false)
     expect(mockSetRecoveryMap).toHaveBeenCalledWith({
-      route: RECOVERY_MAP.RESUME.ROUTE,
-      step: RECOVERY_MAP.RESUME.STEPS.CONFIRM_RESUME,
+      route: RECOVERY_MAP.RETRY_FAILED_COMMAND.ROUTE,
+      step: RECOVERY_MAP.RETRY_FAILED_COMMAND.STEPS.CONFIRM_RETRY,
     })
   })
 })

@@ -13,7 +13,7 @@ import {
 import { getIsOnDevice } from '../../redux/config'
 import { getTopPortalEl } from '../../App/portal'
 import { BeforeBeginning } from './BeforeBeginning'
-import { SelectRecoveryOption, ResumeRun, CancelRun } from './RecoveryOptions'
+import { SelectRecoveryOption, RetryStep, CancelRun } from './RecoveryOptions'
 import { ErrorRecoveryHeader } from './ErrorRecoveryHeader'
 import { RecoveryInProgress } from './RecoveryInProgress'
 import { getErrorKind } from './utils'
@@ -97,7 +97,7 @@ export function ErrorRecoveryContent(props: RecoveryContentProps): JSX.Element {
   }
 
   const buildResumeRun = (): JSX.Element => {
-    return <ResumeRun {...props} />
+    return <RetryStep {...props} />
   }
 
   const buildCancelRun = (): JSX.Element => {
@@ -109,7 +109,7 @@ export function ErrorRecoveryContent(props: RecoveryContentProps): JSX.Element {
       return buildBeforeBeginning()
     case RECOVERY_MAP.OPTION_SELECTION.ROUTE:
       return buildSelectRecoveryOption()
-    case RECOVERY_MAP.RESUME.ROUTE:
+    case RECOVERY_MAP.RETRY_FAILED_COMMAND.ROUTE:
       return buildResumeRun()
     case RECOVERY_MAP.CANCEL_RUN.ROUTE:
       return buildCancelRun()

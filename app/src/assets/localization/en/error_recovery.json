@@ -13,7 +13,7 @@
   "launch_recovery_mode": "Launch Recovery Mode",
   "recovery_mode": "Recovery Mode",
   "recovery_mode_explanation": "<block>Recovery Mode provides you with guided and manual controls for handling errors at runtime.</block><br/><block>You can make changes to ensure the step in progress when the error occurred can be completed or choose to cancel the protocol. When changes are made and no subsequent errors are detected, the method completes. Depending on the conditions that caused the error, you will only be provided with appropriate options.</block>",
-  "resume": "Resume",
+  "retry_step": "Retry step",
   "run_paused": "Run paused",
   "run_will_resume": "The run will resume from the point at which the error occurred. Take any necessary actions to correct the problem first. If the step is completed successfully, the protocol continues.",
   "if_tips_are_attached": "If tips are attached, you can choose to blow out any aspirated liquid and drop tips before the run is terminated.",

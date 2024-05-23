@@ -4,20 +4,20 @@ import { screen, fireEvent, waitFor } from '@testing-library/react'
 
 import { renderWithProviders } from '../../../../__testing-utils__'
 import { i18n } from '../../../../i18n'
-import { ResumeRun } from '../ResumeRun'
+import { RetryStep } from '../RetryStep'
 import { RECOVERY_MAP, ERROR_KINDS } from '../../constants'
 
 import type { Mock } from 'vitest'
 
-const render = (props: React.ComponentProps<typeof ResumeRun>) => {
-  return renderWithProviders(<ResumeRun {...props} />, {
+const render = (props: React.ComponentProps<typeof RetryStep>) => {
+  return renderWithProviders(<RetryStep {...props} />, {
     i18nInstance: i18n,
   })[0]
 }
 
 describe('RecoveryFooterButtons', () => {
-  const { RESUME, ROBOT_RETRYING_COMMAND } = RECOVERY_MAP
-  let props: React.ComponentProps<typeof ResumeRun>
+  const { RETRY_FAILED_COMMAND, ROBOT_RETRYING_COMMAND } = RECOVERY_MAP
+  let props: React.ComponentProps<typeof RetryStep>
   let mockGoBackPrevStep: Mock
 
   beforeEach(() => {
@@ -31,8 +31,8 @@ describe('RecoveryFooterButtons', () => {
       errorKind: ERROR_KINDS.GENERAL_ERROR,
       routeUpdateActions: mockRouteUpdateActions,
       recoveryMap: {
-        route: RESUME.ROUTE,
-        step: RESUME.STEPS.CONFIRM_RESUME,
+        route: RETRY_FAILED_COMMAND.ROUTE,
+        step: RETRY_FAILED_COMMAND.STEPS.CONFIRM_RETRY,
       },
     }
   })

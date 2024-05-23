@@ -16,7 +16,7 @@ import { RecoveryFooterButtons } from './shared'
 
 import type { RecoveryContentProps } from '../types'
 
-export function ResumeRun({
+export function RetryStep({
   isOnDevice,
   routeUpdateActions,
   recoveryCommands,

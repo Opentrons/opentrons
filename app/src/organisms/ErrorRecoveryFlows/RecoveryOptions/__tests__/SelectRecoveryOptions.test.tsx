@@ -31,7 +31,7 @@ const renderRecoveryOptions = (
 }
 
 describe('SelectRecoveryOption', () => {
-  const { RESUME } = RECOVERY_MAP
+  const { RETRY_FAILED_COMMAND } = RECOVERY_MAP
   let props: React.ComponentProps<typeof SelectRecoveryOption>
   let mockProceedToRoute: Mock
 
@@ -46,8 +46,8 @@ describe('SelectRecoveryOption', () => {
       recoveryCommands: {} as any,
       routeUpdateActions: mockRouteUpdateActions,
       recoveryMap: {
-        route: RESUME.ROUTE,
-        step: RESUME.STEPS.CONFIRM_RESUME,
+        route: RETRY_FAILED_COMMAND.ROUTE,
+        step: RETRY_FAILED_COMMAND.STEPS.CONFIRM_RETRY,
       },
     }
   })
@@ -64,7 +64,7 @@ describe('SelectRecoveryOption', () => {
     fireEvent.click(resumeOptionRadioLabel)
     fireEvent.click(primaryBtn)
 
-    expect(mockProceedToRoute).toHaveBeenCalledWith(RESUME.ROUTE)
+    expect(mockProceedToRoute).toHaveBeenCalledWith(RETRY_FAILED_COMMAND.ROUTE)
 
     renderSelectRecoveryOption(props)
 

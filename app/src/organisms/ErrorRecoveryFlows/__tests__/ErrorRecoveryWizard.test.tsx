@@ -10,7 +10,7 @@ import {
 } from '../ErrorRecoveryWizard'
 import { ERROR_KINDS, RECOVERY_MAP } from '../constants'
 import { BeforeBeginning } from '../BeforeBeginning'
-import { SelectRecoveryOption, ResumeRun } from '../RecoveryOptions'
+import { SelectRecoveryOption, RetryStep } from '../RecoveryOptions'
 import { RecoveryInProgress } from '../RecoveryInProgress'
 
 import type { Mock } from 'vitest'
@@ -30,7 +30,7 @@ describe('ErrorRecoveryContent', () => {
   const {
     OPTION_SELECTION,
     BEFORE_BEGINNING,
-    RESUME,
+    RETRY_FAILED_COMMAND,
     ROBOT_CANCELING,
     ROBOT_RESUMING,
     ROBOT_IN_MOTION,
@@ -57,7 +57,7 @@ describe('ErrorRecoveryContent', () => {
       <div>MOCK_SELECT_RECOVERY_OPTION</div>
     )
     vi.mocked(BeforeBeginning).mockReturnValue(<div>MOCK_BEFORE_BEGINNING</div>)
-    vi.mocked(ResumeRun).mockReturnValue(<div>MOCK_RESUME_RUN</div>)
+    vi.mocked(RetryStep).mockReturnValue(<div>MOCK_RESUME_RUN</div>)
     vi.mocked(RecoveryInProgress).mockReturnValue(<div>MOCK_IN_PROGRESS</div>)
   })
 
@@ -80,12 +80,12 @@ describe('ErrorRecoveryContent', () => {
     screen.getByText('MOCK_BEFORE_BEGINNING')
   })
 
-  it(`returns ResumeRun when the route is ${RESUME.ROUTE}`, () => {
+  it(`returns ResumeRun when the route is ${RETRY_FAILED_COMMAND.ROUTE}`, () => {
     props = {
       ...props,
       recoveryMap: {
         ...props.recoveryMap,
-        route: RESUME.ROUTE,
+        route: RETRY_FAILED_COMMAND.ROUTE,
       },
     }
     render(props)
