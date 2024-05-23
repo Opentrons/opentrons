@@ -39,6 +39,9 @@
     },
     {
       "path": "./usb-bridge/node-client"
+    },
+    {
+      "path": "./scripts/deploy"
     }
   ]
 }
