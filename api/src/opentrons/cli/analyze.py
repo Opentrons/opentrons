@@ -255,14 +255,14 @@ async def _analyze(
         "json",
         outputs,
         lambda to_file: to_file.write(
-            results.json(exclude_none=True).encode("utf-8"),
+            results.model_dump_json(exclude_none=True).encode("utf-8"),
         ),
     )
     _call_for_output_of_kind(
         "human-json",
         outputs,
         lambda to_file: to_file.write(
-            results.json(exclude_none=True, indent=2).encode("utf-8")
+            results.model_dump_json(exclude_none=True, indent=2).encode("utf-8")
         ),
     )
     if check:
