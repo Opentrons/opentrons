@@ -15,6 +15,7 @@ const render = (props: React.ComponentProps<typeof RecoveryInProgress>) => {
 
 describe('RecoveryInProgress', () => {
   const {
+    ROBOT_CANCELING,
     ROBOT_IN_MOTION,
     ROBOT_RESUMING,
     ROBOT_RETRYING_COMMAND,
@@ -65,5 +66,18 @@ describe('RecoveryInProgress', () => {
     render(props)
 
     screen.getByText('Stand back, retrying current command')
+  })
+
+  it(`renders appropriate copy when the route is ${ROBOT_CANCELING.ROUTE}`, () => {
+    props = {
+      ...props,
+      recoveryMap: {
+        route: ROBOT_CANCELING.ROUTE,
+        step: ROBOT_CANCELING.STEPS.CANCELING,
+      },
+    }
+    render(props)
+
+    screen.getByText('Canceling run')
   })
 })

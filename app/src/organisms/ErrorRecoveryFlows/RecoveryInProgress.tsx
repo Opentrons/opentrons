@@ -10,6 +10,7 @@ export function RecoveryInProgress({
   recoveryMap,
 }: RecoveryContentProps): JSX.Element {
   const {
+    ROBOT_CANCELING,
     ROBOT_IN_MOTION,
     ROBOT_RESUMING,
     ROBOT_RETRYING_COMMAND,
@@ -19,6 +20,8 @@ export function RecoveryInProgress({
 
   const buildDescription = (): RobotMovingRoute => {
     switch (route) {
+      case ROBOT_CANCELING.ROUTE:
+        return t('canceling_run')
       case ROBOT_IN_MOTION.ROUTE:
         return t('stand_back')
       case ROBOT_RESUMING.ROUTE:
