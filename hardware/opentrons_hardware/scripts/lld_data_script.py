@@ -106,7 +106,7 @@ class LLDSMAT(LLDAlgoABC):
             pressures[0], self.samples_n_smat, self.running_samples_smat_p
         )
         new_avg_s, self.running_samples_smad_s = LLDSMAT._tick_one_sensor(
-            pressures[1], self.samples_n_smat, self.running_samples_smat_p
+            pressures[1], self.samples_n_smat, self.running_samples_smat_s
         )
         return (
             abs(new_avg_p) > self.threshold_smat
@@ -279,7 +279,7 @@ class LLDEMAD(LLDAlgoABC):
     ) -> Tuple[float, float]:
         """ticks one sensor returns the new current average, new derivative and updated running samples."""
         if current_average == impossible_pressure:
-            return (impossible_pressure, 0.0)
+            return (pressure, 0.0)
         else:
             new_average = (pressure * smoothing_factor) + (
                 current_average * (1 - smoothing_factor)
@@ -289,16 +289,16 @@ class LLDEMAD(LLDAlgoABC):
 
     def tick(self, pressures: Tuple[float, float]) -> Tuple[bool, Tuple[float, float]]:
         """Simulate firmware motor interrupt tick."""
-        new_avg_p, der_p = LLDEMAD._tick_one_sensor(
+        self.current_average_emad_p, der_p = LLDEMAD._tick_one_sensor(
             pressures[0], self.current_average_emad_p, self.smoothing_factor
         )
-        new_avg_s, der_s = LLDEMAD._tick_one_sensor(
+        self.current_average_emad_s, der_s = LLDEMAD._tick_one_sensor(
             pressures[1], self.current_average_emad_s, self.smoothing_factor
         )
         return (
             abs(der_p) > self.derivative_threshold_emad
             or abs(der_s) > self.derivative_threshold_emad,
-            (new_avg_p, new_avg_s),
+            (self.current_average_emad_p, self.current_average_emad_s),
         )
 
 
@@ -406,10 +406,10 @@ def run(
             p_travel = []
             for row in range((59 + number_of_trials), len(reader_list)):
                 current_time = reader_list[row][0]
-                current_pressure_s0 = reader_list[row][3 * trial + 2]
-                current_pressure_s1 = reader_list[row][3 * trial + 3]
-                current_z_pos = reader_list[row][3 * trial + 4]
-                current_p_pos = reader_list[row][3 * trial + 5]
+                current_pressure_s0 = reader_list[row][4 * trial + 2]
+                current_pressure_s1 = reader_list[row][4 * trial + 3]
+                current_z_pos = reader_list[row][4 * trial + 4]
+                current_p_pos = reader_list[row][4 * trial + 5]
 
                 if any(
                     [
