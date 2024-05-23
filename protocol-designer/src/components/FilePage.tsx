@@ -115,7 +115,6 @@ export const FilePage = (): JSX.Element => {
     'author',
     'description',
   ])
-  console.log('!isDirty || !isManualDirty', !isDirty || !isManualDirty)
   return (
     <div className={styles.file_page}>
       <Card title={t('application:information')}>
