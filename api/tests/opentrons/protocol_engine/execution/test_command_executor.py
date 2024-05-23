@@ -549,7 +549,7 @@ async def test_execute_defined_error(
     ):
         commandType: str = "testCommand"
         params: _TestCommandParams
-        result: Optional[_TestCommandResult]
+        result: Optional[_TestCommandResult] = None
 
         _ImplementationCls: Type[_TestCommandImpl] = TestCommandImplCls
 
