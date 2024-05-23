@@ -308,6 +308,10 @@
       "type": "string",
       "description": "Display name of the pipette include model and generation number in readable format."
     },
+    "name": {
+      "type": "string",
+      "description": "Name of pipette that is used to identify instrument in LoadPipette commands"
+    },
     "tipPresenceCheckDistanceMM": {
       "$ref": "#/definitions/positiveNumber",
       "description": "The distance to move the gear motors down to check tip presence status."
