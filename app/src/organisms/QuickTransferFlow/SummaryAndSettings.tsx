@@ -9,11 +9,13 @@ import {
   POSITION_FIXED,
   ALIGN_CENTER,
 } from '@opentrons/components'
+import { useNotifyDeckConfigurationQuery } from '../../resources/deck_configuration'
 
 import { TabbedButton } from '../../atoms/buttons'
 import { ChildNavigation } from '../ChildNavigation'
 import { Overview } from './Overview'
 import { getInitialSummaryState } from './utils'
+import { createQuickTransferFile } from './utils/createQuickTransferFile'
 import { quickTransferSummaryReducer } from './reducers'
 
 import type { SmallButton } from '../../atoms/buttons'
@@ -38,6 +40,8 @@ export function SummaryAndSettings(
   const [selectedCategory, setSelectedCategory] = React.useState<string>(
     'overview'
   )
+  const deckConfig = useNotifyDeckConfigurationQuery().data ?? []
+
   // @ts-expect-error TODO figure out how to make this type non-null as we know
   // none of these values will be undefined
   const initialSummaryState = getInitialSummaryState(wizardFlowState)
@@ -51,7 +55,11 @@ export function SummaryAndSettings(
       <ChildNavigation
         header={t('quick_transfer_volume', { volume: wizardFlowState.volume })}
         buttonText={t('create_transfer')}
-        onClickButton={onNext}
+        onClickButton={() => {
+          const JSONProtocol = createQuickTransferFile(state, deckConfig)
+          console.log('here is the protocol!!!', JSONProtocol)
+          onNext()
+        }}
         secondaryButtonProps={exitButtonProps}
       />
       <Flex

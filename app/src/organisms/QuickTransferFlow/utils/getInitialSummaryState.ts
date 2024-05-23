@@ -33,12 +33,12 @@ export function getInitialSummaryState(props: {
     props.transferType === 'consolidate' &&
     volumeLimits.max >= props.volume * 2
   ) {
-    path = 'multiAspirate'
+    path = 'multiDispense'
   } else if (
     props.transferType === 'distribute' &&
     volumeLimits.max >= props.volume * 2
   ) {
-    path = 'multiDispense'
+    path = 'multiAspirate'
   }
 
   return {
@@ -53,6 +53,7 @@ export function getInitialSummaryState(props: {
     volume: props.volume,
     aspirateFlowRate: flowRatesForSupportedTip.defaultAspirateFlowRate.default,
     dispenseFlowRate: flowRatesForSupportedTip.defaultDispenseFlowRate.default,
+    blowOut: 'dest_well',
     path: path,
     tipPositionAspirate: 1,
     preWetTip: false,
