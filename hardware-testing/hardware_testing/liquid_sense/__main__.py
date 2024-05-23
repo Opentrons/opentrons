@@ -333,7 +333,7 @@ if __name__ == "__main__":
             else:
                 plunger_direction = "aspirate"
             test_info = [
-                "TESTER NAME",
+                run_args.run_id,
                 run_args.pipette_tag,
                 args.pipette,
                 args.tip,
