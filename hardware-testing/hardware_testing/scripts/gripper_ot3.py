@@ -74,7 +74,6 @@ ALUMINUM_SEAL_SETTINGS = CapacitivePassSettings(
     speed_mm_per_s=1,
     sensor_threshold_pf=0.5,
     output_option=OutputOptions.sync_only,
-    data_file="fake_file_name",
 )
 LABWARE_PROBE_CORNER_TOP_LEFT_XY = {
     "plate": Point(x=5, y=-5),

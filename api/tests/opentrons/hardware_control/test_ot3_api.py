@@ -108,7 +108,6 @@ def fake_settings() -> CapacitivePassSettings:
         speed_mm_per_s=4,
         sensor_threshold_pf=1.0,
         output_option=OutputOptions.sync_only,
-        data_files={InstrumentProbeType.PRIMARY: "fake_file_name"},
     )
 
 

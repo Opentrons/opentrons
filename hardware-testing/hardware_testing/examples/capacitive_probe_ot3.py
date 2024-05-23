@@ -45,7 +45,6 @@ PROBE_SETTINGS_Z_AXIS = CapacitivePassSettings(
     speed_mm_per_s=1,
     sensor_threshold_pf=STABLE_CAP_PF,
     output_option=OutputOptions.sync_only,
-    data_file="fake_file_name",
 )
 PROBE_SETTINGS_XY_AXIS = CapacitivePassSettings(
     prep_distance_mm=CUTOUT_SIZE / 2,
@@ -53,7 +52,6 @@ PROBE_SETTINGS_XY_AXIS = CapacitivePassSettings(
     speed_mm_per_s=1,
     sensor_threshold_pf=STABLE_CAP_PF,
     output_option=OutputOptions.sync_only,
-    data_file="fake_file_name",
 )
 
 

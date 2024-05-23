@@ -1,6 +1,6 @@
 """Test the tool-sensor coordination code."""
 import logging
-from mock import patch, ANY, AsyncMock, call
+from mock import patch, AsyncMock, call
 import os
 import pytest
 from contextlib import asynccontextmanager
@@ -43,6 +43,7 @@ from opentrons_hardware.hardware_control.tool_sensors import (
     check_overpressure,
     InstrumentProbeTarget,
     PipetteProbeTarget,
+    _run_with_binding,
 )
 from opentrons_hardware.firmware_bindings.constants import (
     NodeId,
@@ -90,6 +91,23 @@ def mock_bind_output() -> Iterator[AsyncMock]:
 
     with patch(
         "opentrons_hardware.sensors.sensor_driver.SensorDriver.bind_output",
+        _fake_bind,
+    ):
+        yield mock_bind
+
+
+@pytest.fixture
+def mock_run_with_binding() -> Iterator[AsyncMock]:
+    """Mock sensor output binding via tool sensors module."""
+    mock_bind = AsyncMock(spec=_run_with_binding)
+
+    @asynccontextmanager
+    async def _fake_bind(*args: Any, **kwargs: Any) -> AsyncIterator[None]:
+        await mock_bind(*args, **kwargs)
+        yield
+
+    with patch(
+        "opentrons_hardware.hardware_control.tool_sensors._run_with_binding",
         _fake_bind,
     ):
         yield mock_bind
@@ -315,7 +333,7 @@ async def test_capacitive_probe(
     mock_messenger: AsyncMock,
     message_send_loopback: CanLoopback,
     mock_sensor_threshold: AsyncMock,
-    mock_bind_output: AsyncMock,
+    mock_run_with_binding: AsyncMock,
     target_node: InstrumentProbeTarget,
     motor_node: NodeId,
     caplog: Any,
@@ -381,7 +399,7 @@ async def test_capacitive_probe(
     message_send_loopback.add_responder(move_responder)
 
     status = await capacitive_probe(
-        mock_messenger, target_node, motor_node, distance, speed
+        mock_messenger, target_node, motor_node, distance, speed, speed
     )
     assert status.motor_position == 10  # this comes from the current_position_um above
     assert status.encoder_position == 10
@@ -391,8 +409,8 @@ async def test_capacitive_probe(
         data=SensorDataType.build(1.0, sensor_info.sensor_type),
         mode=SensorThresholdMode.auto_baseline,
     )
-    mock_bind_output.assert_called_once()
-    assert mock_bind_output.call_args_list[0][0][3] == [
+    mock_run_with_binding.assert_called_once()
+    assert mock_run_with_binding.call_args_list[0][0][3] == [
         SensorOutputBinding.sync,
     ]
 

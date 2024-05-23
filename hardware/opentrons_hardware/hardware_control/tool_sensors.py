@@ -93,7 +93,9 @@ def _fix_pass_step_for_buffer(
     stop_condition: MoveStopCondition = MoveStopCondition.sync_line,
 ) -> MoveGroupStep:
     tool_nodes = [
-        i for i in movers if i in InstrumentProbeTarget
+        i
+        for i in movers
+        if i in [NodeId.pipette_left, NodeId.pipette_right, NodeId.gripper]
     ]
     if sensor_type == SensorType.pressure:
         tool_move = create_step(
@@ -470,7 +472,7 @@ async def capacitive_probe(
     tool: InstrumentProbeTarget,
     mover: NodeId,
     distance: float,
-    plunger_speed: float, # ok to add second speed arg?
+    plunger_speed: float,
     mount_speed: float,
     sensor_id: SensorId = SensorId.S0,
     relative_threshold_pf: float = 1.0,
@@ -496,11 +498,11 @@ async def capacitive_probe(
         relative_threshold_pf,
         sensor_driver,
     )
-    
+
     sensor_group = _build_pass_step(
         movers=[mover, tool],
-        distance={mover: distance, tool: distance},
-        speed={mover: mount_speed, tool: plunger_speed},
+        distance={mover: distance, tool: 0.0},
+        speed={mover: mount_speed, tool: 0.0},
         sensor_type=SensorType.capacitive,
         sensor_id=sensor_id,
         stop_condition=MoveStopCondition.sync_line,
@@ -521,7 +523,7 @@ async def capacitive_probe(
         positions = await run_stream_output_to_csv(
             messenger,
             capacitive_sensors,
-            speed,
+            mount_speed,
             0.0,
             relative_threshold_pf,
             mover,
@@ -532,7 +534,7 @@ async def capacitive_probe(
     elif sync_buffer_output:
         positions = await run_sync_buffer_to_csv(
             messenger,
-            speed,
+            mount_speed,
             0.0,
             relative_threshold_pf,
             mover,
@@ -570,8 +572,16 @@ async def capacitive_pass(
         sensor_id=sensor_id,
         node_id=tool,
     )
-    pass_group = _build_pass_step_capacitive([mover], {mover: distance}, {mover: speed})
-    runner = MoveGroupRunner(move_groups=[[pass_group]])
+
+    sensor_group = _build_pass_step(
+        movers=[mover],
+        distance={mover: distance},
+        speed={mover: speed},
+        sensor_type=SensorType.capacitive,
+        sensor_id=sensor_id,
+    )
+
+    runner = MoveGroupRunner(move_groups=[[sensor_group]])
     await runner.prep(messenger)
     async with sensor_scheduler.capture_output(sensor_info, messenger) as output_queue:
         await runner.execute(messenger)

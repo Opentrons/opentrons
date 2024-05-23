@@ -31,7 +31,6 @@ PROBE_SETTINGS = CapacitivePassSettings(
     speed_mm_per_s=Z_PROBE_DISTANCE_MM / Z_PROBE_TIME_SECONDS,
     sensor_threshold_pf=1.0,
     output_option=OutputOptions.can_bus_only,
-    data_file="fake_file_name",
 )
 
 RELATIVE_MOVE_FROM_HOME_DELTA = Point(x=-500, y=-300)

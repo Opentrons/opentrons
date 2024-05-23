@@ -139,7 +139,7 @@ ot3_dummy_settings = {
                 "speed_mm_per_s": 3,
                 "sensor_threshold_pf": 4,
                 "output_option": OutputOptions.sync_only,
-                "data_file": "/data/capacitive_sensor_data.csv",
+                "data_files": None,
             },
         },
         "edge_sense": {
@@ -151,7 +151,7 @@ ot3_dummy_settings = {
                 "speed_mm_per_s": 6,
                 "sensor_threshold_pf": 7,
                 "output_option": OutputOptions.sync_only,
-                "data_file": "/data/capacitive_sensor_data.csv",
+                "data_files": None,
             },
             "search_initial_tolerance_mm": 18,
             "search_iteration_limit": 3,
