@@ -38,7 +38,6 @@
         "max": { "type": "number" },
         "units": { "type": "string" },
         "type": { "type": "string" },
-        "name": { "type": "string" },
         "displayName": { "type": "string" }
       }
     },
