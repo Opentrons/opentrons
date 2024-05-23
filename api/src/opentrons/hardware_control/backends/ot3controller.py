@@ -667,9 +667,9 @@ class OT3Controller(FlexBackend):
             else False,
         )
 
-        mounts_moving = moving_pipettes_in_move_group(move_group)
+        pipettes_moving = moving_pipettes_in_move_group(move_group)
 
-        async with self._monitor_overpressure(mounts_moving):
+        async with self._monitor_overpressure(pipettes_moving):
             positions = await runner.run(can_messenger=self._messenger)
         self._handle_motor_status_response(positions)
 
