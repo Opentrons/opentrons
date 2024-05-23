@@ -35,7 +35,7 @@ def _create_listener(
             )
             return
         if message.message_id == MessageId.error_message:
-            log.error(f"recieved an error {str(message)}")
+            log.error(f"received an error {str(message)}")
             return
         elif message.message_id != MessageId.limit_sw_response:
             log.warning(f"unexpected message id: 0x{message.message_id:x}")

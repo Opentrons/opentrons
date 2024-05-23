@@ -55,7 +55,7 @@ function checkColor(hex: string): boolean {
 
 const INVALID_DISPLAY_COLORS = ['#000000', '#ffffff', DEPRECATED_WHALE_GREY]
 
-export const liquidEditFormSchema: any = Yup.object().shape({
+const liquidEditFormSchema: any = Yup.object().shape({
   name: Yup.string().required('liquid name is required'),
   displayColor: Yup.string().test(
     'disallowed-color',
@@ -66,7 +66,7 @@ export const liquidEditFormSchema: any = Yup.object().shape({
       }
       return !INVALID_DISPLAY_COLORS.includes(value)
         ? !checkColor(value)
-        : !INVALID_DISPLAY_COLORS.includes(value)
+        : false
     }
   ),
   description: Yup.string(),
@@ -97,7 +97,7 @@ export function LiquidEditForm(props: LiquidEditFormProps): JSX.Element {
 
   const {
     handleSubmit,
-    formState: { errors, isDirty, touchedFields },
+    formState: { errors, touchedFields },
     control,
     watch,
     setValue,
@@ -181,7 +181,7 @@ export function LiquidEditForm(props: LiquidEditFormProps): JSX.Element {
             fontWeight={TYPOGRAPHY.fontWeightSemiBold}
             marginTop={errors.name != null ? '-0.25rem' : '0rem'}
           >
-            {errors.displayColor != null ? errors.displayColor : null}
+            {errors.displayColor != null ? errors.displayColor.message : null}
           </Flex>
         </section>
         <section className={styles.section}>
@@ -216,7 +216,10 @@ export function LiquidEditForm(props: LiquidEditFormProps): JSX.Element {
           </DeprecatedPrimaryButton>
           <DeprecatedPrimaryButton
             disabled={
-              !isDirty || errors.name != null || errors.displayColor != null
+              !touchedFields.name ||
+              errors.name != null ||
+              name === '' ||
+              errors.displayColor != null
             }
             type="submit"
           >

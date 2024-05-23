@@ -83,63 +83,59 @@ capacitive_output_file_heading = [
 # FIXME we should restrict some of these functions by instrument type.
 
 
-def _build_pass_step_pressure(
+def _fix_pass_step_for_buffer(
+    move_group: MoveGroupStep,
     movers: List[NodeId],
     distance: Dict[NodeId, float],
     speed: Dict[NodeId, float],
+    sensor_type: SensorType,
+    sensor_id: SensorId,
     stop_condition: MoveStopCondition = MoveStopCondition.sync_line,
-    sensor_id: Optional[SensorId] = None,
 ) -> MoveGroupStep:
-    pipette_nodes = [
-        i for i in movers if i in [NodeId.pipette_left, NodeId.pipette_right]
+    tool_nodes = [
+        i for i in movers if i in InstrumentProbeTarget
     ]
-
-    move_group = create_step(
-        distance={ax: float64(abs(distance[ax])) for ax in movers},
-        velocity={
-            ax: float64(speed[ax] * copysign(1.0, distance[ax])) for ax in movers
-        },
-        acceleration={},
-        # use any node present to calculate duration of the move, assuming the durations
-        #   will be the same
-        duration=float64(abs(distance[movers[0]] / speed[movers[0]])),
-        present_nodes=movers,
-        stop_condition=stop_condition,
-        sensor_type_pass=SensorType.pressure,
-        sensor_id_pass=sensor_id,
-    )
-    pipette_move = create_step(
-        distance={ax: float64(abs(distance[ax])) for ax in movers},
-        velocity={
-            ax: float64(speed[ax] * copysign(1.0, distance[ax])) for ax in movers
-        },
-        acceleration={},
-        # use any node present to calculate duration of the move, assuming the durations
-        #   will be the same
-        duration=float64(abs(distance[movers[0]] / speed[movers[0]])),
-        present_nodes=pipette_nodes,
-        stop_condition=MoveStopCondition.sensor_report,
-        sensor_type_pass=SensorType.pressure,
-        sensor_id_pass=sensor_id,
-    )
-    for node in pipette_nodes:
-        move_group[node] = pipette_move[node]
+    if sensor_type == SensorType.pressure:
+        tool_move = create_step(
+            distance={ax: float64(abs(distance[ax])) for ax in movers},
+            velocity={
+                ax: float64(speed[ax] * copysign(1.0, distance[ax])) for ax in movers
+            },
+            acceleration={},
+            # use any node present to calculate duration of the move, assuming the durations
+            #   will be the same
+            duration=float64(abs(distance[movers[0]] / speed[movers[0]])),
+            present_nodes=tool_nodes,
+            stop_condition=MoveStopCondition.sensor_report,
+            sensor_type_pass=sensor_type,
+            sensor_id_pass=sensor_id,
+        )
+    elif sensor_type == SensorType.capacitive:
+        tool_move = create_step(
+            distance={},
+            velocity={},
+            acceleration={},
+            # use any node present to calculate duration of the move, assuming the durations
+            #   will be the same
+            duration=float64(abs(distance[movers[0]] / speed[movers[0]])),
+            present_nodes=tool_nodes,
+            stop_condition=MoveStopCondition.sensor_report,
+            sensor_type_pass=sensor_type,
+            sensor_id_pass=sensor_id,
+        )
+    for node in tool_nodes:
+        move_group[node] = tool_move[node]
     return move_group
 
 
-def _build_pass_step_capacitive(
+def _build_pass_step(
     movers: List[NodeId],
     distance: Dict[NodeId, float],
     speed: Dict[NodeId, float],
+    sensor_type: SensorType,
+    sensor_id: SensorId,
     stop_condition: MoveStopCondition = MoveStopCondition.sync_line,
-    sensor_id: Optional[SensorId] = None,
 ) -> MoveGroupStep:
-    tool_nodes = [
-        i
-        for i in movers
-        if i in [NodeId.pipette_left, NodeId.pipette_right, NodeId.gripper]
-    ]
-
     move_group = create_step(
         distance={ax: float64(abs(distance[ax])) for ax in movers},
         velocity={
@@ -151,23 +147,9 @@ def _build_pass_step_capacitive(
         duration=float64(abs(distance[movers[0]] / speed[movers[0]])),
         present_nodes=movers,
         stop_condition=stop_condition,
-        sensor_type_pass=SensorType.capacitive,
+        sensor_type_pass=sensor_type,
         sensor_id_pass=sensor_id,
     )
-    tool_move = create_step(
-        distance={},
-        velocity={},
-        acceleration={},
-        # use any node present to calculate duration of the move, assuming the durations
-        #   will be the same
-        duration=float64(abs(distance[movers[0]] / speed[movers[0]])),
-        present_nodes=tool_nodes,
-        stop_condition=MoveStopCondition.sensor_report,
-        sensor_type_pass=SensorType.capacitive,
-        sensor_id_pass=sensor_id,
-    )
-    for node in tool_nodes:
-        move_group[node] = tool_move[node]
     return move_group
 
 
@@ -204,7 +186,7 @@ async def run_sync_buffer_to_csv(
                     )
                 ),
             )
-            await asyncio.sleep(10)
+            await sensor_capturer.wait_for_complete()
             messenger.remove_listener(sensor_capturer)
         await messenger.send(
             node_id=tool,
@@ -407,13 +389,24 @@ async def liquid_probe(
         auto_zero_sensor,
     )
 
-    sensor_group = _build_pass_step_pressure(
+    sensor_group = _build_pass_step(
         movers=[head_node, tool],
         distance={head_node: max_z_distance, tool: max_z_distance},
         speed={head_node: mount_speed, tool: plunger_speed},
-        stop_condition=MoveStopCondition.sync_line,
+        sensor_type=SensorType.pressure,
         sensor_id=sensor_id,
+        stop_condition=MoveStopCondition.sync_line,
     )
+    if sync_buffer_output:
+        sensor_group = _fix_pass_step_for_buffer(
+            sensor_group,
+            movers=[head_node, tool],
+            distance={head_node: max_z_distance, tool: max_z_distance},
+            speed={head_node: mount_speed, tool: plunger_speed},
+            sensor_type=SensorType.pressure,
+            sensor_id=sensor_id,
+            stop_condition=MoveStopCondition.sync_line,
+        )
 
     sensor_runner = MoveGroupRunner(move_groups=[[sensor_group]])
     if csv_output:
@@ -477,7 +470,8 @@ async def capacitive_probe(
     tool: InstrumentProbeTarget,
     mover: NodeId,
     distance: float,
-    speed: float,
+    plunger_speed: float, # ok to add second speed arg?
+    mount_speed: float,
     sensor_id: SensorId = SensorId.S0,
     relative_threshold_pf: float = 1.0,
     csv_output: bool = False,
@@ -502,16 +496,27 @@ async def capacitive_probe(
         relative_threshold_pf,
         sensor_driver,
     )
-
-    pass_group = _build_pass_step_capacitive(
-        [mover, tool],
-        {mover: distance, tool: distance},
-        {mover: speed, tool: speed},
-        MoveStopCondition.sync_line,
+    
+    sensor_group = _build_pass_step(
+        movers=[mover, tool],
+        distance={mover: distance, tool: distance},
+        speed={mover: mount_speed, tool: plunger_speed},
+        sensor_type=SensorType.capacitive,
         sensor_id=sensor_id,
+        stop_condition=MoveStopCondition.sync_line,
     )
+    if sync_buffer_output:
+        sensor_group = _fix_pass_step_for_buffer(
+            sensor_group,
+            movers=[mover, tool],
+            distance={mover: distance, tool: distance},
+            speed={mover: mount_speed, tool: plunger_speed},
+            sensor_type=SensorType.capacitive,
+            sensor_id=sensor_id,
+            stop_condition=MoveStopCondition.sync_line,
+        )
 
-    runner = MoveGroupRunner(move_groups=[[pass_group]])
+    runner = MoveGroupRunner(move_groups=[[sensor_group]])
     if csv_output:
         positions = await run_stream_output_to_csv(
             messenger,

@@ -158,7 +158,7 @@ describe('pipette data accessors', () => {
       minVolume: 5,
       supportedTips: {
         t50: {
-          uiMaxFlowRate: 47,
+          uiMaxFlowRate: 57,
           aspirate: {
             default: {
               1: expect.anything(),

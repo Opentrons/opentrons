@@ -42,7 +42,8 @@ describe('SelectRecoveryOption', () => {
     props = {
       isOnDevice: true,
       errorKind: ERROR_KINDS.GENERAL_ERROR,
-      onComplete: vi.fn(),
+      failedCommand: {} as any,
+      recoveryCommands: {} as any,
       routeUpdateActions: mockRouteUpdateActions,
       recoveryMap: {
         route: RESUME.ROUTE,

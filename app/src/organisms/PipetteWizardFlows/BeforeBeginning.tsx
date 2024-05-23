@@ -1,6 +1,5 @@
 import * as React from 'react'
 import { Trans, useTranslation } from 'react-i18next'
-import { UseMutateFunction } from 'react-query'
 import {
   COLORS,
   DIRECTION_COLUMN,
@@ -33,6 +32,7 @@ import {
 import { getIsGantryEmpty } from './utils'
 import { useNotifyDeckConfigurationQuery } from '../../resources/deck_configuration'
 
+import type { UseMutateFunction } from 'react-query'
 import type { AxiosError } from 'axios'
 import type {
   CreateCommand,

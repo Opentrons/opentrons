@@ -67,7 +67,8 @@
     "quirks",
     "slotTransforms",
     "compatibleWith",
-    "twoDimensionalRendering"
+    "twoDimensionalRendering",
+    "incompatibleWithDecks"
   ],
   "additionalProperties": false,
   "properties": {
@@ -81,13 +82,14 @@
         "magneticModuleType",
         "thermocyclerModuleType",
         "heaterShakerModuleType",
-        "magneticBlockType"
+        "magneticBlockType",
+        "absorbanceReaderType"
       ],
       "type": "string"
     },
     "model": {
       "type": "string",
-      "pattern": "^(temperatureModule|magneticModule|thermocyclerModule|heaterShakerModule|magneticBlock)V[0-9]+$"
+      "pattern": "^(temperatureModule|magneticModule|thermocyclerModule|heaterShakerModule|magneticBlock|absorbanceReader)V[0-9]+$"
     },
     "labwareOffset": { "$ref": "#/definitions/coordinates" },
     "dimensions": {
@@ -195,6 +197,13 @@
       "items": {
         "type": "string",
         "description": "A compatible module model (e.g. temperatureModuleV1)"
+      }
+    },
+    "incompatibleWithDecks": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "description": "A list of robot decks (by their definition name) not compatible with this module."
       }
     },
     "twoDimensionalRendering": {

@@ -5,7 +5,7 @@ import pytest
 from pytest_lazyfixture import lazy_fixture  # type: ignore[import-untyped]
 from decoy import Decoy, matchers
 from pathlib import Path
-from typing import List, cast, Optional, Union, Type
+from typing import List, cast, Union, Type
 
 from opentrons_shared_data.labware.labware_definition import LabwareDefinition
 from opentrons_shared_data.labware.dev_types import (
@@ -174,7 +174,6 @@ def live_runner_subject(
         (PythonProtocolConfig(api_version=APIVersion(2, 14)), PythonAndLegacyRunner),
         (JsonProtocolConfig(schema_version=5), PythonAndLegacyRunner),
         (PythonProtocolConfig(api_version=APIVersion(2, 13)), PythonAndLegacyRunner),
-        (None, LiveRunner),
     ],
 )
 def test_create_protocol_runner(
@@ -186,7 +185,7 @@ def test_create_protocol_runner(
     python_and_legacy_file_reader: PythonAndLegacyFileReader,
     protocol_context_creator: ProtocolContextCreator,
     python_protocol_executor: PythonProtocolExecutor,
-    config: Optional[Union[JsonProtocolConfig, PythonProtocolConfig]],
+    config: Union[JsonProtocolConfig, PythonProtocolConfig],
     runner_type: Type[AnyRunner],
 ) -> None:
     """It should return protocol runner type depending on the config."""
@@ -604,8 +603,7 @@ async def test_load_legacy_python(
         await python_protocol_executor.execute(
             protocol=legacy_protocol,
             context=protocol_context,
-            parameter_context=python_runner_subject._parameter_context,
-            run_time_param_values=None,
+            run_time_parameters_with_overrides=None,
         ),
     )
 
@@ -746,8 +744,7 @@ async def test_load_legacy_json(
         await python_protocol_executor.execute(
             protocol=legacy_protocol,
             context=protocol_context,
-            parameter_context=python_runner_subject._parameter_context,
-            run_time_param_values=None,
+            run_time_parameters_with_overrides=None,
         ),
     )
 

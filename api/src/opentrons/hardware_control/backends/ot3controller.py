@@ -191,6 +191,9 @@ from opentrons_shared_data.errors.exceptions import (
     PipetteOverpressureError,
     FirmwareUpdateRequiredError,
     FailedGripperPickupError,
+    LiquidNotFoundError,
+    CommunicationError,
+    PythonException,
 )
 
 from .subsystem_manager import SubsystemManager
@@ -1185,7 +1188,14 @@ class OT3Controller(FlexBackend):
     async def is_motor_engaged(self, axis: Axis) -> bool:
         node = axis_to_node(axis)
         result = await get_motor_enabled(self._messenger, {node})
-        engaged = result[node]
+        try:
+            engaged = result[node]
+        except KeyError as ke:
+            raise CommunicationError(
+                message=f"No response from {node.name} for motor engagement query",
+                detail={"node": node.name},
+                wrapping=[PythonException(ke)],
+            ) from ke
         self._engaged_axes.update({axis: engaged})
         return engaged
 
@@ -1399,6 +1409,18 @@ class OT3Controller(FlexBackend):
         for node, point in positions.items():
             self._position.update({node: point.motor_position})
             self._encoder_position.update({node: point.encoder_position})
+        if (
+            head_node not in positions
+            or positions[head_node].move_ack
+            == MoveCompleteAck.complete_without_condition
+        ):
+            raise LiquidNotFoundError(
+                "Liquid not found during probe.",
+                {
+                    str(node_to_axis(node)): str(point.motor_position)
+                    for node, point in positions.items()
+                },
+            )
         return self._position[axis_to_node(Axis.by_mount(mount))]
 
     async def capacitive_probe(

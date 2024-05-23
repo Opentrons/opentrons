@@ -1,6 +1,6 @@
 """Tests for /subsystems routes."""
 from datetime import datetime
-from typing import Set, Dict, TYPE_CHECKING
+from typing import Set, Dict, TYPE_CHECKING, cast
 from fastapi import Response, Request
 from starlette.datastructures import URL, MutableHeaders
 
@@ -72,10 +72,10 @@ def thread_manager(decoy: Decoy, ot3_hardware_api: "OT3API") -> ThreadManagedHar
         from opentrons.hardware_control.ot3api import OT3API
     except ImportError:
         pytest.skip("Cannot run on OT-2 (for now)")
-    manager = decoy.mock(cls=ThreadManagedHardware)
+    manager = decoy.mock(cls=ThreadManagedHardware)  # type: ignore[misc]
     decoy.when(manager.wrapped()).then_return(ot3_hardware_api)
     decoy.when(manager.wraps_instance(OT3API)).then_return(True)
-    return manager
+    return cast(ThreadManagedHardware, manager)
 
 
 def _build_attached_subsystem(

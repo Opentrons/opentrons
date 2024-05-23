@@ -115,16 +115,14 @@ async def _create_thread_manager() -> ThreadManagedHardware:
         from opentrons.hardware_control.ot3api import OT3API
 
         thread_manager = ThreadManager(
-            OT3API.build_hardware_controller,
+            ThreadManager.nonblocking_builder(OT3API.build_hardware_controller),
             use_usb_bus=ff.rear_panel_integration(),
-            threadmanager_nonblocking=True,
             status_bar_enabled=ff.status_bar_enabled(),
             feature_flags=hw_types.HardwareFeatureFlags.build_from_ff(),
         )
     else:
         thread_manager = ThreadManager(
-            HardwareAPI.build_hardware_controller,
-            threadmanager_nonblocking=True,
+            ThreadManager.nonblocking_builder(HardwareAPI.build_hardware_controller),
             port=_get_motor_control_serial_port(),
             firmware=_find_smoothie_file(),
             feature_flags=hw_types.HardwareFeatureFlags.build_from_ff(),

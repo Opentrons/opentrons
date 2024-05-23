@@ -64,7 +64,7 @@ async def set_hepa_fan_state(
         expected_nodes=[NodeId.hepa_uv],
     )
     if error != ErrorCode.ok:
-        log.error(f"recieved error trying to set hepa fan state {str(error)}")
+        log.error(f"received error trying to set hepa fan state {str(error)}")
     return error == ErrorCode.ok
 
 
@@ -117,7 +117,7 @@ async def set_hepa_uv_state(
         expected_nodes=[NodeId.hepa_uv],
     )
     if error != ErrorCode.ok:
-        log.error(f"recieved error trying to set hepa uv light state {str(error)}")
+        log.error(f"received error trying to set hepa uv light state {str(error)}")
     return error == ErrorCode.ok
 
 

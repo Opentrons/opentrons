@@ -4,6 +4,7 @@ from opentrons.protocol_engine.commands.comment import (
     CommentResult,
     CommentImplementation,
 )
+from opentrons.protocol_engine.commands.command import SuccessData
 
 
 async def test_comment_implementation() -> None:
@@ -14,4 +15,4 @@ async def test_comment_implementation() -> None:
 
     result = await subject.execute(data)
 
-    assert result == CommentResult()
+    assert result == SuccessData(public=CommentResult(), private=None)

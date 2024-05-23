@@ -1,7 +1,9 @@
 {
+  "are_you_sure_you_want_to_cancel": "Are you sure you want to cancel?",
   "are_you_sure_you_want_to_resume": "Are you sure you want to resume?",
   "before_you_begin": "Before you begin",
   "cancel_run": "Cancel run",
+  "canceling_run": "Canceling run",
   "confirm": "Confirm",
   "continue": "Continue",
   "general_error": "General error",
@@ -13,7 +15,9 @@
   "resume": "Resume",
   "run_paused": "Run paused",
   "run_will_resume": "The run will resume from the point at which the error occurred. Take any necessary actions to correct the problem first. If the step is completed successfully, the protocol continues.",
+  "if_tips_are_attached": "If tips are attached, you can choose to blow out any aspirated liquid and drop tips before the run is terminated.",
   "stand_back": "Stand back, robot is in motion",
   "stand_back_resuming": "Stand back, resuming current step",
+  "stand_back_retrying": "Stand back, retrying current command",
   "view_recovery_options": "View recovery options"
 }

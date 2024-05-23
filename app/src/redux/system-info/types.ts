@@ -1,6 +1,6 @@
 // system-info types
 
-import {
+import type {
   INITIALIZED,
   USB_DEVICE_ADDED,
   USB_DEVICE_REMOVED,

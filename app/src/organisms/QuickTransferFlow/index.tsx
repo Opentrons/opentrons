@@ -6,7 +6,6 @@ import {
   StepMeter,
   POSITION_STICKY,
 } from '@opentrons/components'
-import { SmallButton } from '../../atoms/buttons'
 import { ConfirmExitModal } from './ConfirmExitModal'
 import { CreateNewTransfer } from './CreateNewTransfer'
 import { SelectPipette } from './SelectPipette'
@@ -16,36 +15,29 @@ import { SelectSourceWells } from './SelectSourceWells'
 import { SelectDestLabware } from './SelectDestLabware'
 import { SelectDestWells } from './SelectDestWells'
 import { VolumeEntry } from './VolumeEntry'
-import { quickTransferReducer } from './utils'
+import { SummaryAndSettings } from './SummaryAndSettings'
+import { quickTransferWizardReducer } from './reducers'
 
-import type { QuickTransferSetupState } from './types'
+import type { SmallButton } from '../../atoms/buttons'
+import type { QuickTransferWizardState } from './types'
 
 const QUICK_TRANSFER_WIZARD_STEPS = 8
-const initialQuickTransferState: QuickTransferSetupState = {}
+const initialQuickTransferState: QuickTransferWizardState = {}
 
 export const QuickTransferFlow = (): JSX.Element => {
   const history = useHistory()
   const { i18n, t } = useTranslation(['quick_transfer', 'shared'])
   const [state, dispatch] = React.useReducer(
-    quickTransferReducer,
+    quickTransferWizardReducer,
     initialQuickTransferState
   )
-  const [currentStep, setCurrentStep] = React.useState(1)
+  const [currentStep, setCurrentStep] = React.useState(0)
 
   const {
     confirm: confirmExit,
     showConfirmation: showConfirmExit,
     cancel: cancelExit,
   } = useConditionalConfirm(() => history.push('protocols'), true)
-
-  React.useEffect(() => {
-    if (state.volume != null) {
-      // until summary screen is implemented, log the final state and close flow
-      // once volume is set
-      console.log('final quick transfer flow state:', state)
-      history.push('protocols')
-    }
-  }, [state.volume])
 
   const exitButtonProps: React.ComponentProps<typeof SmallButton> = {
     buttonType: 'tertiaryLowLight',
@@ -60,19 +52,27 @@ export const QuickTransferFlow = (): JSX.Element => {
     exitButtonProps,
   }
 
-  const modalContentInOrder: JSX.Element[] = [
+  const contentInOrder: JSX.Element[] = [
     <CreateNewTransfer
-      key={1}
+      key={0}
       onNext={() => setCurrentStep(prevStep => prevStep + 1)}
       exitButtonProps={exitButtonProps}
     />,
-    <SelectPipette key={2} {...sharedMiddleStepProps} />,
-    <SelectTipRack key={3} {...sharedMiddleStepProps} />,
-    <SelectSourceLabware key={4} {...sharedMiddleStepProps} />,
-    <SelectSourceWells key={5} {...sharedMiddleStepProps} />,
-    <SelectDestLabware key={6} {...sharedMiddleStepProps} />,
-    <SelectDestWells key={7} {...sharedMiddleStepProps} />,
-    <VolumeEntry key={8} {...sharedMiddleStepProps} onNext={() => {}} />,
+    <SelectPipette key={1} {...sharedMiddleStepProps} />,
+    <SelectTipRack key={2} {...sharedMiddleStepProps} />,
+    <SelectSourceLabware key={3} {...sharedMiddleStepProps} />,
+    <SelectSourceWells key={4} {...sharedMiddleStepProps} />,
+    <SelectDestLabware key={5} {...sharedMiddleStepProps} />,
+    <SelectDestWells key={6} {...sharedMiddleStepProps} />,
+    <VolumeEntry key={7} {...sharedMiddleStepProps} />,
+    <SummaryAndSettings
+      key={8}
+      {...sharedMiddleStepProps}
+      onNext={() => {
+        console.log('final quick transfer flow state:', state)
+        history.push('protocols')
+      }}
+    />,
   ]
 
   return (
@@ -81,13 +81,15 @@ export const QuickTransferFlow = (): JSX.Element => {
         <ConfirmExitModal confirmExit={confirmExit} cancelExit={cancelExit} />
       ) : (
         <>
-          <StepMeter
-            totalSteps={QUICK_TRANSFER_WIZARD_STEPS}
-            currentStep={currentStep}
-            position={POSITION_STICKY}
-            top="0"
-          />
-          {modalContentInOrder[currentStep]}
+          {currentStep < QUICK_TRANSFER_WIZARD_STEPS ? (
+            <StepMeter
+              totalSteps={QUICK_TRANSFER_WIZARD_STEPS}
+              currentStep={currentStep + 1}
+              position={POSITION_STICKY}
+              top="0"
+            />
+          ) : null}
+          {contentInOrder[currentStep]}
         </>
       )}
     </>

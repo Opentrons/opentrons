@@ -10,22 +10,23 @@ import {
   ALIGN_CENTER,
 } from '@opentrons/components'
 
-import { SmallButton, LargeButton, TabbedButton } from '../../atoms/buttons'
+import { LargeButton, TabbedButton } from '../../atoms/buttons'
 import { ChildNavigation } from '../ChildNavigation'
 import { getCompatibleLabwareByCategory } from './utils'
 
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
+import type { SmallButton } from '../../atoms/buttons'
+import type { LabwareFilter } from '../../pages/Labware/types'
 import type {
-  QuickTransferSetupState,
+  QuickTransferWizardState,
   QuickTransferWizardAction,
 } from './types'
-import { LabwareFilter } from '../../pages/Labware/types'
 
 interface SelectDestLabwareProps {
   onNext: () => void
   onBack: () => void
   exitButtonProps: React.ComponentProps<typeof SmallButton>
-  state: QuickTransferSetupState
+  state: QuickTransferWizardState
   dispatch: React.Dispatch<QuickTransferWizardAction>
 }
 
@@ -118,7 +119,7 @@ export function SelectDestLabware(
               onClick={() => {
                 setSelectedLabware('source')
               }}
-              buttonText={t('source_labware')}
+              buttonText={t('source_labware_d2')}
               subtext={state.source.metadata.displayName}
             />
           ) : null}

@@ -6,9 +6,11 @@
   "disabled_step_creation": "New steps cannot be added in Batch Edit mode.",
   "disabled_no_space_additional_items": "No space for this combination of staging area slots, trash, and modules.",
   "disabled_you_can_add_one_type": "Only one module of each type is allowed on the deck at a time",
+  "disabled_no_space_pipette": "Only up to 3 tipracks can be assigned",
   "not_enough_space_for_temp": "There is not enough space on the deck to add more temperature modules",
   "not_in_beta": "ⓘ Coming Soon",
   "missing_tiprack": "Missing a tiprack? Make sure it is added to the deck",
+  "y_position_value": "A negative value moves towards the front",
 
   "step_description": {
     "heaterShaker": "Set heat, shake, or labware latch commands for the Heater-Shaker module",
@@ -40,7 +42,7 @@
       "dispense_flowRate": "The speed at which the pipette dispenses",
       "dispense_mix_checkbox": "Pipette up and down after dispensing",
       "dispense_mmFromBottom": "Adjust tip position for dispense",
-      "dispense_touchTip_checkbox": "Touch tip to each side of well after dispensing",
+      "dispense_touchTip_checkbox": "Touch tip to each side of well after dispensing and other dispense advanced setting commands",
       "dispense_touchTip_mmFromBottom": "Distance from the bottom of the well",
       "disposalVolume_checkbox": "Aspirate extra volume that is disposed of after a multi-dispense is complete. We recommend a disposal volume of at least the pipette's minimum.",
       "heaterShakerSetTimer": "Once this counter has elapsed, the module will deactivate the heater and shaker",

@@ -1,5 +1,5 @@
-import { THERMOCYCLER_PROFILE, THERMOCYCLER_STATE } from '../constants'
-import {
+import type { THERMOCYCLER_PROFILE, THERMOCYCLER_STATE } from '../constants'
+import type {
   CommandCreatorArgs,
   MoveLabwareArgs,
   PauseArgs,

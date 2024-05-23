@@ -4,19 +4,16 @@ import {
   getModuleDisplayName,
   getModuleType,
   getOccludedSlotCountForModule,
-  LabwareLocation,
 } from '@opentrons/shared-data'
 import { getModuleDisplayLocation } from './getModuleDisplayLocation'
 import { getModuleModel } from './getModuleModel'
 import { getLabwareDefinitionsFromCommands } from '../../LabwarePositionCheck/utils/labware'
-import type {
-  CompletedProtocolAnalysis,
-  RobotType,
-} from '@opentrons/shared-data/'
+import type { RobotType, LabwareLocation } from '@opentrons/shared-data'
 import type { TFunction } from 'i18next'
+import type { CommandTextData } from '../types'
 
 export function getLabwareDisplayLocation(
-  robotSideAnalysis: CompletedProtocolAnalysis,
+  commandTextData: CommandTextData,
   location: LabwareLocation,
   t: TFunction,
   robotType: RobotType,
@@ -33,13 +30,13 @@ export function getLabwareDisplayLocation(
       ? location.addressableAreaName
       : t('slot', { slot_name: location.addressableAreaName })
   } else if ('moduleId' in location) {
-    const moduleModel = getModuleModel(robotSideAnalysis, location.moduleId)
+    const moduleModel = getModuleModel(commandTextData, location.moduleId)
     if (moduleModel == null) {
       console.warn('labware is located on an unknown module model')
       return ''
     } else {
       const slotName = getModuleDisplayLocation(
-        robotSideAnalysis,
+        commandTextData,
         location.moduleId
       )
       return isOnDevice
@@ -54,12 +51,10 @@ export function getLabwareDisplayLocation(
           })
     }
   } else if ('labwareId' in location) {
-    const adapter = robotSideAnalysis.labware.find(
+    const adapter = commandTextData.labware.find(
       lw => lw.id === location.labwareId
     )
-    const allDefs = getLabwareDefinitionsFromCommands(
-      robotSideAnalysis.commands
-    )
+    const allDefs = getLabwareDefinitionsFromCommands(commandTextData.commands)
     const adapterDef = allDefs.find(
       def => getLabwareDefURI(def) === adapter?.definitionUri
     )
@@ -83,7 +78,7 @@ export function getLabwareDisplayLocation(
       })
     } else if ('moduleId' in adapter.location) {
       const moduleIdUnderAdapter = adapter.location.moduleId
-      const moduleModel = robotSideAnalysis.modules.find(
+      const moduleModel = commandTextData.modules.find(
         module => module.id === moduleIdUnderAdapter
       )?.model
       if (moduleModel == null) {
@@ -91,7 +86,7 @@ export function getLabwareDisplayLocation(
         return ''
       }
       const slotName = getModuleDisplayLocation(
-        robotSideAnalysis,
+        commandTextData,
         adapter.location.moduleId
       )
       return t('adapter_in_mod_in_slot', {

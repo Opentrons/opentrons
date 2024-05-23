@@ -1,4 +1,9 @@
-import { ALL, COLUMN, NozzleConfigurationStyle } from '@opentrons/shared-data'
+import {
+  ALL,
+  COLUMN,
+  FLEX_ROBOT_TYPE,
+  OT2_ROBOT_TYPE,
+} from '@opentrons/shared-data'
 import { getNextTiprack } from '../../robotStateSelectors'
 import * as errorCreators from '../../errorCreators'
 import { COLUMN_4_SLOTS } from '../../constants'
@@ -17,6 +22,8 @@ import {
   getWasteChuteAddressableAreaNamePip,
 } from '../../utils'
 import { dropTip } from './dropTip'
+
+import type { NozzleConfigurationStyle } from '@opentrons/shared-data'
 import type {
   CommandCreator,
   CommandCreatorError,
@@ -200,13 +207,18 @@ export const replaceTip: CommandCreator<ReplaceTipArgs> = (
     prevRobotState.labware,
     prevRobotState.modules
   )
-
-  if (!isFlexPipette) {
-    if (
-      pipetteAdjacentHeaterShakerWhileShaking(prevRobotState.modules, slotName)
-    ) {
-      return { errors: [errorCreators.heaterShakerNorthSouthEastWestShaking()] }
+  if (
+    pipetteAdjacentHeaterShakerWhileShaking(
+      prevRobotState.modules,
+      slotName,
+      isFlexPipette ? FLEX_ROBOT_TYPE : OT2_ROBOT_TYPE
+    )
+  ) {
+    return {
+      errors: [errorCreators.heaterShakerNorthSouthEastWestShaking()],
     }
+  }
+  if (!isFlexPipette) {
     if (
       getIsHeaterShakerEastWestWithLatchOpen(prevRobotState.modules, slotName)
     ) {

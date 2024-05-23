@@ -1,9 +1,10 @@
 import reduce from 'lodash/reduce'
-import { AdditionalEquipmentEntities, AIR } from '@opentrons/step-generation'
-import { WellFill } from '@opentrons/components'
+import { AIR } from '@opentrons/step-generation'
 import { WASTE_CHUTE_CUTOUT } from '@opentrons/shared-data'
 import { swatchColors, MIXED_WELL_COLOR } from '../swatchColors'
-import { ContentsByWell, WellContents } from '../../labware-ingred/types'
+import type { AdditionalEquipmentEntities } from '@opentrons/step-generation'
+import type { WellFill } from '@opentrons/components'
+import type { ContentsByWell, WellContents } from '../../labware-ingred/types'
 
 const ingredIdsToColor = (
   groupIds: string[],

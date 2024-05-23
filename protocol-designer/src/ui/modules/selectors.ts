@@ -17,8 +17,8 @@ import {
   getMagnetLabwareEngageHeight as getMagnetLabwareEngageHeightUtil,
   getModulesOnDeckByType,
   getModulesHaveLabware,
-  ModuleAndLabware,
 } from './utils'
+import type { ModuleAndLabware } from './utils'
 import type { Options } from '@opentrons/components'
 import type { Selector } from '../../types'
 import type { LabwareNamesByModuleId } from '../../steplist/types'
@@ -114,6 +114,14 @@ export const getMagnetModuleHasLabware: Selector<boolean> = createSelector(
   getInitialDeckSetup,
   initialDeckSetup => {
     return getModuleHasLabware(initialDeckSetup, MAGNETIC_MODULE_TYPE)
+  }
+)
+
+/** Returns boolean if heater-shaker module has labware */
+export const getHeaterShakerModuleHasLabware: Selector<boolean> = createSelector(
+  getInitialDeckSetup,
+  initialDeckSetup => {
+    return getModuleHasLabware(initialDeckSetup, HEATERSHAKER_MODULE_TYPE)
   }
 )
 

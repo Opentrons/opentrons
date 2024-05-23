@@ -10,9 +10,9 @@ import {
   DIRECTION_COLUMN,
 } from '@opentrons/components'
 
-import { SmallButton } from '../../atoms/buttons'
 import { ChildNavigation } from '../ChildNavigation'
 import { useNotifyDeckConfigurationQuery } from '../../resources/deck_configuration'
+import type { SmallButton } from '../../atoms/buttons'
 
 interface CreateNewTransferProps {
   onNext: () => void
@@ -64,8 +64,8 @@ export function CreateNewTransfer(props: CreateNewTransferProps): JSX.Element {
               handleClickRemove={() => {}}
               additionalStaticFixtures={[
                 { location: 'cutoutB2', label: t('tip_rack') },
-                { location: 'cutoutC2', label: t('labware') },
-                { location: 'cutoutD2', label: t('labware') },
+                { location: 'cutoutC2', label: t('source') },
+                { location: 'cutoutD2', label: t('destination') },
               ]}
             />
           </Flex>

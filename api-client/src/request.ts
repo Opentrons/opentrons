@@ -1,6 +1,11 @@
-import axios, { AxiosRequestConfig } from 'axios'
+import Axios from 'axios'
 
-import type { Method, AxiosPromise, AxiosResponse } from 'axios'
+import type {
+  AxiosRequestConfig,
+  Method,
+  AxiosPromise,
+  AxiosResponse,
+} from 'axios'
 import type { HostConfig } from './types'
 
 export type ResponsePromise<Data> = AxiosPromise<Data>
@@ -26,7 +31,12 @@ export function request<ResData, ReqData = null>(
   config: HostConfig,
   params?: AxiosRequestConfig['params']
 ): ResponsePromise<ResData> {
-  const { hostname, port, requestor = axios.request, token } = config
+  const {
+    hostname,
+    port,
+    requestor = (...args) => Axios.request(...args),
+    token,
+  } = config
 
   const tokenHeader = token != null ? { authenticationBearer: token } : {}
   const headers = { ...DEFAULT_HEADERS, ...tokenHeader }

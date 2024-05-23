@@ -10,7 +10,8 @@ from .pipetting_common import (
     MovementMixin,
     DestinationPositionResult,
 )
-from .command import AbstractCommandImpl, BaseCommand, BaseCommandCreate
+from .command import AbstractCommandImpl, BaseCommand, BaseCommandCreate, SuccessData
+from ..errors.error_occurrence import ErrorOccurrence
 
 if TYPE_CHECKING:
     from ..execution import MovementHandler
@@ -30,13 +31,17 @@ class MoveToWellResult(DestinationPositionResult):
     pass
 
 
-class MoveToWellImplementation(AbstractCommandImpl[MoveToWellParams, MoveToWellResult]):
+class MoveToWellImplementation(
+    AbstractCommandImpl[MoveToWellParams, SuccessData[MoveToWellResult, None]]
+):
     """Move to well command implementation."""
 
     def __init__(self, movement: MovementHandler, **kwargs: object) -> None:
         self._movement = movement
 
-    async def execute(self, params: MoveToWellParams) -> MoveToWellResult:
+    async def execute(
+        self, params: MoveToWellParams
+    ) -> SuccessData[MoveToWellResult, None]:
         """Move the requested pipette to the requested well."""
         x, y, z = await self._movement.move_to_well(
             pipette_id=params.pipetteId,
@@ -48,10 +53,12 @@ class MoveToWellImplementation(AbstractCommandImpl[MoveToWellParams, MoveToWellR
             speed=params.speed,
         )
 
-        return MoveToWellResult(position=DeckPoint(x=x, y=y, z=z))
+        return SuccessData(
+            public=MoveToWellResult(position=DeckPoint(x=x, y=y, z=z)), private=None
+        )
 
 
-class MoveToWell(BaseCommand[MoveToWellParams, MoveToWellResult]):
+class MoveToWell(BaseCommand[MoveToWellParams, MoveToWellResult, ErrorOccurrence]):
     """Move to well command model."""
 
     commandType: MoveToWellCommandType = "moveToWell"

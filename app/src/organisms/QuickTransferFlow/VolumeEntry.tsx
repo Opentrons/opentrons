@@ -7,14 +7,15 @@ import {
   ALIGN_CENTER,
 } from '@opentrons/components'
 
-import { SmallButton } from '../../atoms/buttons'
 import { ChildNavigation } from '../ChildNavigation'
 import { InputField } from '../../atoms/InputField'
 import { NumericalKeyboard } from '../../atoms/SoftwareKeyboard'
-import { getVolumeLimits } from './utils'
+import { getVolumeRange } from './utils'
+import { CONSOLIDATE, DISTRIBUTE } from './constants'
 
+import type { SmallButton } from '../../atoms/buttons'
 import type {
-  QuickTransferSetupState,
+  QuickTransferWizardState,
   QuickTransferWizardAction,
 } from './types'
 
@@ -22,7 +23,7 @@ interface VolumeEntryProps {
   onNext: () => void
   onBack: () => void
   exitButtonProps: React.ComponentProps<typeof SmallButton>
-  state: QuickTransferSetupState
+  state: QuickTransferWizardState
   dispatch: React.Dispatch<QuickTransferWizardAction>
 }
 
@@ -34,23 +35,15 @@ export function VolumeEntry(props: VolumeEntryProps): JSX.Element {
   const [volume, setVolume] = React.useState<string>(
     state.volume ? state.volume.toString() : ''
   )
-  const volumeRange = getVolumeLimits(state)
+  const volumeRange = getVolumeRange(state)
   let headerCopy = t('set_transfer_volume')
-  let textEntryCopy = t('volume_per_well')
-  if (
-    state.sourceWells != null &&
-    state.destinationWells != null &&
-    state.sourceWells.length > state.destinationWells?.length
-  ) {
+  let textEntryCopy = t('volume_per_well_µL')
+  if (state.transferType === CONSOLIDATE) {
     headerCopy = t('set_aspirate_volume')
-    textEntryCopy = t('aspirate_volume')
-  } else if (
-    state.sourceWells != null &&
-    state.destinationWells != null &&
-    state.sourceWells.length < state.destinationWells.length
-  ) {
+    textEntryCopy = t('aspirate_volume_µL')
+  } else if (state.transferType === DISTRIBUTE) {
     headerCopy = t('set_dispense_volume')
-    textEntryCopy = t('dispense_volume')
+    textEntryCopy = t('dispense_volume_µL')
   }
 
   const volumeAsNumber = Number(volume)

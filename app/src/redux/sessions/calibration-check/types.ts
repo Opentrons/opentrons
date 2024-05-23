@@ -4,7 +4,7 @@ import type { LabwareDefinition2, PipetteModel } from '@opentrons/shared-data'
 
 // calibration check session types
 
-import {
+import type {
   CHECK_STEP_SESSION_STARTED,
   CHECK_STEP_LABWARE_LOADED,
   CHECK_STEP_INSPECTING_TIP,

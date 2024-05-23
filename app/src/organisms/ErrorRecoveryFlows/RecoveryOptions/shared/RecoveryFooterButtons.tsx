@@ -4,16 +4,11 @@ import { useTranslation } from 'react-i18next'
 import {
   ALIGN_CENTER,
   Flex,
-  JUSTIFY_CENTER,
   JUSTIFY_SPACE_BETWEEN,
   SPACING,
 } from '@opentrons/components'
 
 import { SmallButton } from '../../../../atoms/buttons'
-import {
-  NON_SANCTIONED_RECOVERY_COLOR_STYLE_PRIMARY,
-  NON_SANCTIONED_RECOVERY_COLOR_STYLE_SECONDARY,
-} from '../../constants'
 
 interface RecoveryOptionProps {
   isOnDevice: boolean
@@ -39,20 +34,14 @@ export function RecoveryFooterButtons({
         gridGap={SPACING.spacing8}
       >
         <SmallButton
-          buttonType="secondary"
-          flex="1"
-          css={NON_SANCTIONED_RECOVERY_COLOR_STYLE_SECONDARY}
+          buttonType="tertiaryLowLight"
           buttonText={t('go_back')}
-          justifyContent={JUSTIFY_CENTER}
           onClick={secondaryBtnOnClick}
           marginTop="auto"
         />
         <SmallButton
           buttonType="primary"
-          flex="1"
-          css={NON_SANCTIONED_RECOVERY_COLOR_STYLE_PRIMARY}
           buttonText={primaryBtnTextOverride ?? t('continue')}
-          justifyContent={JUSTIFY_CENTER}
           onClick={primaryBtnOnClick}
           marginTop="auto"
         />
