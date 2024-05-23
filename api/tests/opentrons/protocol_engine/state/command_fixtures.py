@@ -34,6 +34,10 @@ def create_queued_command(
     params: Optional[BaseModel] = None,
 ) -> cmd.Command:
     """Given command data, build a pending command model."""
+
+    class DummyParams(BaseModel):
+        pass
+
     return cast(
         cmd.Command,
         cmd.BaseCommand(
@@ -42,7 +46,7 @@ def create_queued_command(
             commandType=command_type,
             createdAt=datetime(year=2021, month=1, day=1),
             status=cmd.CommandStatus.QUEUED,
-            params=params or BaseModel(),
+            params=params or DummyParams(),
             intent=intent,
         ),
     )
