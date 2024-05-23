@@ -1,6 +1,6 @@
 """Control a `ProtocolEngine` without async/await."""
 
-from typing import List, Optional, Dict
+from typing import cast, List, Optional, Dict
 
 from opentrons_shared_data.pipette.dev_types import PipetteNameType
 from opentrons_shared_data.labware.dev_types import LabwareUri
@@ -130,7 +130,7 @@ class SyncClient:
         )
         result = self._transport.execute_command(request=request)
 
-        return commands.LoadLabwareResult.model_validate(result)
+        return cast(commands.LoadLabwareResult, result)
 
     def reload_labware(
         self,
@@ -166,7 +166,7 @@ class SyncClient:
         )
         result = self._transport.execute_command(request=request)
 
-        return commands.MoveLabwareResult.model_validate(result)
+        return cast(commands.MoveLabwareResult, result)
 
     def load_pipette(
         self,
@@ -179,7 +179,7 @@ class SyncClient:
         )
         result = self._transport.execute_command(request=request)
 
-        return commands.LoadPipetteResult.model_validate(result)
+        return cast(commands.LoadPipetteResult, result)
 
     def move_to_well(
         self,
@@ -205,7 +205,7 @@ class SyncClient:
         )
         result = self._transport.execute_command(request=request)
 
-        return commands.MoveToWellResult.model_validate(result)
+        return cast(commands.MoveToWellResult, result)
 
     def move_to_addressable_area(
         self,
@@ -229,7 +229,7 @@ class SyncClient:
         )
         result = self._transport.execute_command(request=request)
 
-        return commands.MoveToAddressableAreaResult.model_validate(result)
+        return cast(commands.MoveToAddressableAreaResult, result)
 
     def move_to_addressable_area_for_drop_tip(
         self,
@@ -257,7 +257,7 @@ class SyncClient:
         )
         result = self._transport.execute_command(request=request)
 
-        return commands.MoveToAddressableAreaForDropTipResult.model_validate(result)
+        return cast(commands.MoveToAddressableAreaForDropTipResult, result)
 
     def move_to_coordinates(
         self,
@@ -279,7 +279,7 @@ class SyncClient:
         )
         result = self._transport.execute_command(request=request)
 
-        return commands.MoveToCoordinatesResult.model_validate(result)
+        return cast(commands.MoveToCoordinatesResult, result)
 
     def load_module(
         self,
@@ -292,7 +292,7 @@ class SyncClient:
         )
         result = self._transport.execute_command(request=request)
 
-        return commands.LoadModuleResult.model_validate(result)
+        return cast(commands.LoadModuleResult, result)
 
     def pick_up_tip(
         self,
@@ -312,7 +312,7 @@ class SyncClient:
         )
         result = self._transport.execute_command(request=request)
 
-        return commands.PickUpTipResult.model_validate(result)
+        return cast(commands.PickUpTipResult, result)
 
     def pick_up_tip_wait_for_recovery(
         self,
@@ -335,7 +335,7 @@ class SyncClient:
         )
         command = self._transport.execute_command_wait_for_recovery(request=request)
 
-        return commands.PickUpTip.model_validate(command)
+        return cast(commands.PickUpTip, command)
 
     def drop_tip(
         self,
@@ -358,7 +358,7 @@ class SyncClient:
             )
         )
         result = self._transport.execute_command(request=request)
-        return commands.DropTipResult.model_validate(result)
+        return cast(commands.DropTipResult, result)
 
     def drop_tip_in_place(
         self,
@@ -373,7 +373,7 @@ class SyncClient:
             )
         )
         result = self._transport.execute_command(request=request)
-        return commands.DropTipInPlaceResult.model_validate(result)
+        return cast(commands.DropTipInPlaceResult, result)
 
     def configure_for_volume(
         self, pipette_id: str, volume: float
@@ -385,7 +385,7 @@ class SyncClient:
             )
         )
         result = self._transport.execute_command(request=request)
-        return commands.ConfigureForVolumeResult.model_validate(result)
+        return cast(commands.ConfigureForVolumeResult, result)
 
     def prepare_to_aspirate(self, pipette_id: str) -> commands.PrepareToAspirateResult:
         """Execute a PrepareToAspirate command."""
@@ -393,7 +393,7 @@ class SyncClient:
             params=commands.PrepareToAspirateParams(pipetteId=pipette_id)
         )
         result = self._transport.execute_command(request=request)
-        return commands.PrepareToAspirateResult.model_validate(result)
+        return cast(commands.PrepareToAspirateResult, result)
 
     def configure_nozzle_layout(
         self,
@@ -407,7 +407,7 @@ class SyncClient:
             )
         )
         result = self._transport.execute_command(request=request)
-        return commands.ConfigureNozzleLayoutResult.model_validate(result)
+        return cast(commands.ConfigureNozzleLayoutResult, result)
 
     def aspirate(
         self,
@@ -431,7 +431,7 @@ class SyncClient:
         )
         result = self._transport.execute_command(request=request)
 
-        return commands.AspirateResult.model_validate(result)
+        return cast(commands.AspirateResult, result)
 
     def aspirate_in_place(
         self,
@@ -449,7 +449,7 @@ class SyncClient:
         )
         result = self._transport.execute_command(request=request)
 
-        return commands.AspirateInPlaceResult.model_validate(result)
+        return cast(commands.AspirateInPlaceResult, result)
 
     def dispense(
         self,
@@ -474,7 +474,7 @@ class SyncClient:
             )
         )
         result = self._transport.execute_command(request=request)
-        return commands.DispenseResult.model_validate(result)
+        return cast(commands.DispenseResult, result)
 
     def dispense_in_place(
         self,
@@ -493,7 +493,7 @@ class SyncClient:
             )
         )
         result = self._transport.execute_command(request=request)
-        return commands.DispenseInPlaceResult.model_validate(result)
+        return cast(commands.DispenseInPlaceResult, result)
 
     def blow_out(
         self,
@@ -514,7 +514,7 @@ class SyncClient:
             )
         )
         result = self._transport.execute_command(request=request)
-        return commands.BlowOutResult.model_validate(result)
+        return cast(commands.BlowOutResult, result)
 
     def blow_out_in_place(
         self,
@@ -529,7 +529,7 @@ class SyncClient:
             )
         )
         result = self._transport.execute_command(request=request)
-        return commands.BlowOutInPlaceResult.model_validate(result)
+        return cast(commands.BlowOutInPlaceResult, result)
 
     def touch_tip(
         self,
@@ -552,7 +552,7 @@ class SyncClient:
             )
         )
         result = self._transport.execute_command(request=request)
-        return commands.TouchTipResult.model_validate(result)
+        return cast(commands.TouchTipResult, result)
 
     def wait_for_duration(
         self, seconds: float, message: Optional[str]
@@ -562,7 +562,7 @@ class SyncClient:
             params=commands.WaitForDurationParams(seconds=seconds, message=message)
         )
         result = self._transport.execute_command(request=request)
-        return commands.WaitForDurationResult.model_validate(result)
+        return cast(commands.WaitForDurationResult, result)
 
     def wait_for_resume(self, message: Optional[str]) -> commands.WaitForResumeResult:
         """Execute a `WaitForResume` command and return the result."""
@@ -570,7 +570,7 @@ class SyncClient:
             params=commands.WaitForResumeParams(message=message)
         )
         result = self._transport.execute_command(request=request)
-        return commands.WaitForResumeResult.model_validate(result)
+        return cast(commands.WaitForResumeResult, result)
 
     def comment(self, message: str) -> commands.CustomResult:
         """Execute a comment command and return the result."""
@@ -591,7 +591,7 @@ class SyncClient:
             )
         )
         result = self._transport.execute_command(request=request)
-        return commands.CustomResult.model_validate(result)
+        return cast(commands.CustomResult, result)
 
     def set_rail_lights(self, on: bool) -> commands.SetRailLightsResult:
         """Execute a ``setRailLights`` command and return the result."""
@@ -599,7 +599,7 @@ class SyncClient:
             params=commands.SetRailLightsParams(on=on)
         )
         result = self._transport.execute_command(request=request)
-        return commands.SetRailLightsResult.model_validate(result)
+        return cast(commands.SetRailLightsResult, result)
 
     def magnetic_module_engage(
         self, module_id: str, engage_height: float
@@ -611,7 +611,7 @@ class SyncClient:
             )
         )
         result = self._transport.execute_command(request=request)
-        return commands.magnetic_module.EngageResult.model_validate(result)
+        return cast(commands.magnetic_module.EngageResult, result)
 
     def magnetic_module_disengage(
         self, module_id: str
@@ -621,7 +621,7 @@ class SyncClient:
             params=commands.magnetic_module.DisengageParams(moduleId=module_id)
         )
         result = self._transport.execute_command(request=request)
-        return commands.magnetic_module.DisengageResult.model_validate(result)
+        return cast(commands.magnetic_module.DisengageResult, result)
 
     def thermocycler_set_target_lid_temperature(
         self, module_id: str, celsius: float
@@ -633,9 +633,7 @@ class SyncClient:
             )
         )
         result = self._transport.execute_command(request=request)
-        return commands.thermocycler.SetTargetLidTemperatureResult.model_validate(
-            result
-        )
+        return cast(commands.thermocycler.SetTargetLidTemperatureResult, result)
 
     def thermocycler_set_target_block_temperature(
         self,
@@ -654,9 +652,7 @@ class SyncClient:
             )
         )
         result = self._transport.execute_command(request=request)
-        return commands.thermocycler.SetTargetBlockTemperatureResult.model_validate(
-            result
-        )
+        return cast(commands.thermocycler.SetTargetBlockTemperatureResult, result)
 
     def thermocycler_wait_for_lid_temperature(
         self, module_id: str
@@ -666,7 +662,7 @@ class SyncClient:
             params=commands.thermocycler.WaitForLidTemperatureParams(moduleId=module_id)
         )
         result = self._transport.execute_command(request=request)
-        return commands.thermocycler.WaitForLidTemperatureResult.model_validate(result)
+        return cast(commands.thermocycler.WaitForLidTemperatureResult, result)
 
     def thermocycler_wait_for_block_temperature(
         self, module_id: str
@@ -678,9 +674,7 @@ class SyncClient:
             )
         )
         result = self._transport.execute_command(request=request)
-        return commands.thermocycler.WaitForBlockTemperatureResult.model_validate(
-            result
-        )
+        return cast(commands.thermocycler.WaitForBlockTemperatureResult, result)
 
     def thermocycler_run_profile(
         self,
@@ -703,7 +697,7 @@ class SyncClient:
             )
         )
         result = self._transport.execute_command(request=request)
-        return commands.thermocycler.RunProfileResult.model_validate(result)
+        return cast(commands.thermocycler.RunProfileResult, result)
 
     def thermocycler_deactivate_block(
         self, module_id: str
@@ -713,7 +707,7 @@ class SyncClient:
             params=commands.thermocycler.DeactivateBlockParams(moduleId=module_id)
         )
         result = self._transport.execute_command(request=request)
-        return commands.thermocycler.DeactivateBlockResult.model_validate(result)
+        return cast(commands.thermocycler.DeactivateBlockResult, result)
 
     def thermocycler_deactivate_lid(
         self, module_id: str
@@ -723,7 +717,7 @@ class SyncClient:
             params=commands.thermocycler.DeactivateLidParams(moduleId=module_id)
         )
         result = self._transport.execute_command(request=request)
-        return commands.thermocycler.DeactivateLidResult.model_validate(result)
+        return cast(commands.thermocycler.DeactivateLidResult, result)
 
     def thermocycler_open_lid(
         self, module_id: str
@@ -733,7 +727,7 @@ class SyncClient:
             params=commands.thermocycler.OpenLidParams(moduleId=module_id)
         )
         result = self._transport.execute_command(request=request)
-        return commands.thermocycler.OpenLidResult.model_validate(result)
+        return cast(commands.thermocycler.OpenLidResult, result)
 
     def thermocycler_close_lid(
         self, module_id: str
@@ -743,7 +737,7 @@ class SyncClient:
             params=commands.thermocycler.CloseLidParams(moduleId=module_id)
         )
         result = self._transport.execute_command(request=request)
-        return commands.thermocycler.CloseLidResult.model_validate(result)
+        return cast(commands.thermocycler.CloseLidResult, result)
 
     def heater_shaker_set_target_temperature(
         self, module_id: str, celsius: float
@@ -755,7 +749,7 @@ class SyncClient:
             )
         )
         result = self._transport.execute_command(request=request)
-        return commands.heater_shaker.SetTargetTemperatureResult.model_validate(result)
+        return cast(commands.heater_shaker.SetTargetTemperatureResult, result)
 
     def heater_shaker_wait_for_temperature(
         self,
@@ -768,7 +762,7 @@ class SyncClient:
             )
         )
         result = self._transport.execute_command(request=request)
-        return commands.heater_shaker.WaitForTemperatureResult.model_validate(result)
+        return cast(commands.heater_shaker.WaitForTemperatureResult, result)
 
     def heater_shaker_set_and_wait_for_shake_speed(
         self, module_id: str, rpm: float
@@ -780,9 +774,7 @@ class SyncClient:
             )
         )
         result = self._transport.execute_command(request=request)
-        return commands.heater_shaker.SetAndWaitForShakeSpeedResult.model_validate(
-            result
-        )
+        return cast(commands.heater_shaker.SetAndWaitForShakeSpeedResult, result)
 
     def heater_shaker_open_labware_latch(
         self, module_id: str
@@ -792,7 +784,7 @@ class SyncClient:
             params=commands.heater_shaker.OpenLabwareLatchParams(moduleId=module_id)
         )
         result = self._transport.execute_command(request=request)
-        return commands.heater_shaker.OpenLabwareLatchResult.model_validate(result)
+        return cast(commands.heater_shaker.OpenLabwareLatchResult, result)
 
     def heater_shaker_close_labware_latch(
         self, module_id: str
@@ -802,7 +794,7 @@ class SyncClient:
             params=commands.heater_shaker.CloseLabwareLatchParams(moduleId=module_id)
         )
         result = self._transport.execute_command(request=request)
-        return commands.heater_shaker.CloseLabwareLatchResult.model_validate(result)
+        return cast(commands.heater_shaker.CloseLabwareLatchResult, result)
 
     def heater_shaker_deactivate_shaker(
         self, module_id: str
@@ -812,7 +804,7 @@ class SyncClient:
             params=commands.heater_shaker.DeactivateShakerParams(moduleId=module_id)
         )
         result = self._transport.execute_command(request=request)
-        return commands.heater_shaker.DeactivateShakerResult.model_validate(result)
+        return cast(commands.heater_shaker.DeactivateShakerResult, result)
 
     def heater_shaker_deactivate_heater(
         self, module_id: str
@@ -822,7 +814,7 @@ class SyncClient:
             params=commands.heater_shaker.DeactivateHeaterParams(moduleId=module_id)
         )
         result = self._transport.execute_command(request=request)
-        return commands.heater_shaker.DeactivateHeaterResult.model_validate(result)
+        return cast(commands.heater_shaker.DeactivateHeaterResult, result)
 
     def temperature_module_set_target_temperature(
         self, module_id: str, celsius: float
@@ -834,9 +826,7 @@ class SyncClient:
             ),
         )
         result = self._transport.execute_command(request=request)
-        return commands.temperature_module.SetTargetTemperatureResult.model_validate(
-            result
-        )
+        return cast(commands.temperature_module.SetTargetTemperatureResult, result)
 
     def temperature_module_wait_for_target_temperature(
         self, module_id: str, celsius: Optional[float]
@@ -848,9 +838,7 @@ class SyncClient:
             ),
         )
         result = self._transport.execute_command(request=request)
-        return commands.temperature_module.WaitForTemperatureResult.model_validate(
-            result
-        )
+        return cast(commands.temperature_module.WaitForTemperatureResult, result)
 
     def temperature_module_deactivate(
         self, module_id: str
@@ -862,15 +850,13 @@ class SyncClient:
             ),
         )
         result = self._transport.execute_command(request=request)
-        return commands.temperature_module.DeactivateTemperatureResult.model_validate(
-            result
-        )
+        return cast(commands.temperature_module.DeactivateTemperatureResult, result)
 
     def home(self, axes: Optional[List[MotorAxis]]) -> commands.HomeResult:
         """Execute a `home` command and return the result."""
         request = commands.HomeCreate(params=commands.HomeParams(axes=axes))
         result = self._transport.execute_command(request=request)
-        return commands.HomeResult.model_validate(result)
+        return cast(commands.HomeResult, result)
 
     def load_liquid(
         self, labware_id: str, liquid_id: str, volume_by_well: Dict[str, float]
@@ -882,4 +868,4 @@ class SyncClient:
             )
         )
         result = self._transport.execute_command(request=request)
-        return commands.LoadLiquidResult.model_validate(result)
+        return cast(commands.LoadLiquidResult, result)
