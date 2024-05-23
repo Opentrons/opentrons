@@ -295,3 +295,11 @@ class EngineStore:
         return RunResult(
             state_summary=run_data, commands=commands, parameters=run_time_parameters
         )
+
+    def play(self, deck_configuration: Optional[DeckConfigurationType] = None) -> None:
+        """Start or resume the run."""
+        self._run_orchestrator.engine.play(deck_configuration=deck_configuration)
+
+    async def finish(self, error: Optional[Exception]) -> None:
+        """Stop the run."""
+        self._run_orchestrator.engine.finish(error=error)

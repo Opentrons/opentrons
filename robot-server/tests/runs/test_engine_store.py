@@ -61,6 +61,7 @@ async def test_create_engine(decoy: Decoy, subject: EngineStore) -> None:
 
     assert subject.current_run_id == "run-id"
     assert isinstance(result, StateSummary)
+    assert subject._run_orchestrator is not None
     assert isinstance(subject._run_orchestrator.runner, LiveRunner)
     assert isinstance(subject._run_orchestrator.engine, ProtocolEngine)
 
@@ -90,8 +91,9 @@ async def test_create_engine_with_protocol(
     )
     assert subject.current_run_id == "run-id"
     assert isinstance(result, StateSummary)
-    assert isinstance(subject.runner, JsonRunner)
-    assert isinstance(subject.engine, ProtocolEngine)
+    assert subject._run_orchestrator is not None
+    assert isinstance(subject._run_orchestrator.runner, JsonRunner)
+    assert isinstance(subject._run_orchestrator.engine, ProtocolEngine)
 
 
 @pytest.mark.parametrize("robot_type", ["OT-2 Standard", "OT-3 Standard"])
@@ -115,7 +117,8 @@ async def test_create_engine_uses_robot_type(
         notify_publishers=mock_notify_publishers,
     )
 
-    assert subject.engine.state_view.config.robot_type == robot_type
+    assert subject._run_orchestrator is not None
+    assert subject._run_orchestrator.engine.state_view.config.robot_type == robot_type
 
 
 async def test_create_engine_with_labware_offsets(subject: EngineStore) -> None:
@@ -176,17 +179,18 @@ async def test_clear_engine(subject: EngineStore) -> None:
         protocol=None,
         notify_publishers=mock_notify_publishers,
     )
-    await subject.runner.run(deck_configuration=[])
+    assert subject._run_orchestrator is not None
+    await subject._run_orchestrator.runner.run(deck_configuration=[])
     result = await subject.clear()
 
     assert subject.current_run_id is None
     assert isinstance(result, RunResult)
 
     with pytest.raises(NoRunnerEngineError):
-        subject.engine
+        subject._run_orchestrator.engine
 
     with pytest.raises(NoRunnerEngineError):
-        subject.runner
+        subject._run_orchestrator.runner
 
 
 async def test_clear_engine_not_stopped_or_idle(
@@ -200,7 +204,8 @@ async def test_clear_engine_not_stopped_or_idle(
         protocol=None,
         notify_publishers=mock_notify_publishers,
     )
-    subject.runner.play(deck_configuration=[])
+    assert subject._run_orchestrator is not None
+    subject._run_orchestrator.runner.play(deck_configuration=[])
 
     with pytest.raises(EngineConflictError):
         await subject.clear()
@@ -215,16 +220,17 @@ async def test_clear_idle_engine(subject: EngineStore) -> None:
         protocol=None,
         notify_publishers=mock_notify_publishers,
     )
-    assert subject.engine is not None
-    assert subject.runner is not None
+    assert subject._run_orchestrator is not None
+    assert subject._run_orchestrator.engine is not None
+    assert subject._run_orchestrator.runner is not None
 
     await subject.clear()
 
     # TODO: test engine finish is called
     with pytest.raises(NoRunnerEngineError):
-        subject.engine
+        subject._run_orchestrator.engine
     with pytest.raises(NoRunnerEngineError):
-        subject.runner
+        subject._run_orchestrator.runner
 
 
 async def test_get_default_engine_idempotent(subject: EngineStore) -> None:
@@ -279,7 +285,7 @@ async def test_get_default_engine_conflict(subject: EngineStore) -> None:
         protocol=None,
         notify_publishers=mock_notify_publishers,
     )
-    subject.engine.play()
+    subject.play()
 
     with pytest.raises(EngineConflictError):
         await subject.get_default_engine()
@@ -294,7 +300,7 @@ async def test_get_default_engine_run_stopped(subject: EngineStore) -> None:
         protocol=None,
         notify_publishers=mock_notify_publishers,
     )
-    await subject.engine.finish()
+    await subject.finish()
 
     result = await subject.get_default_engine()
     assert isinstance(result, ProtocolEngine)
@@ -315,13 +321,14 @@ async def test_estop_callback(
 
     decoy.when(engine_store.current_run_id).then_return(None)
     await handle_estop_event(engine_store, disengage_event)
+    assert subject._run_orchestrator is not None
     decoy.verify(
-        engine_store.engine.estop(),
+        engine_store._run_orchestrator.engine.estop(),
         ignore_extra_args=True,
         times=0,
     )
     decoy.verify(
-        await engine_store.engine.finish(),
+        await engine_store.finish(),
         ignore_extra_args=True,
         times=0,
     )
@@ -330,6 +337,6 @@ async def test_estop_callback(
     await handle_estop_event(engine_store, engage_event)
     decoy.verify(
         engine_store.engine.estop(),
-        await engine_store.engine.finish(error=matchers.IsA(EStopActivatedError)),
+        await engine_store.finish(error=matchers.IsA(EStopActivatedError)),
         times=1,
     )
