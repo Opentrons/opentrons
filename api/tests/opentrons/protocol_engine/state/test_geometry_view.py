@@ -1947,7 +1947,7 @@ def test_get_slot_item_that_is_overflowed_module(
     subject: GeometryView,
 ) -> None:
     """It should return the module that occupies the slot, even if not loaded on it."""
-    module = LoadedModule.construct(id="cool-module")  # type: ignore[call-arg]
+    module = LoadedModule.construct(id="cool-module")
     decoy.when(mock_labware_view.get_by_slot(DeckSlotName.SLOT_3)).then_return(None)
     decoy.when(mock_module_view.get_by_slot(DeckSlotName.SLOT_3)).then_return(None)
     decoy.when(

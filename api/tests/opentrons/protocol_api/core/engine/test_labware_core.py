@@ -74,12 +74,14 @@ def test_get_load_params(subject: LabwareCore) -> None:
 @pytest.mark.parametrize(
     "labware_definition",
     [
-        LabwareDefinition.construct(  # type: ignore[call-arg]
+        LabwareDefinition.construct(
             namespace="hello",
             version=42,
-            parameters=LabwareDefinitionParameters.construct(loadName="world"),  # type: ignore[call-arg]
+            parameters=LabwareDefinitionParameters.construct(loadName="world"),
             ordering=[],
-            metadata=LabwareDefinitionMetadata.construct(displayName="what a cool labware"),  # type: ignore[call-arg]
+            metadata=LabwareDefinitionMetadata.construct(
+                displayName="what a cool labware"
+            ),
         )
     ],
 )
@@ -124,10 +126,10 @@ def test_set_calibration_succeeds_in_ok_location(
 @pytest.mark.parametrize(
     "labware_definition",
     [
-        LabwareDefinition.construct(  # type: ignore[call-arg]
+        LabwareDefinition.construct(
             namespace="hello",
             version=42,
-            parameters=LabwareDefinitionParameters.construct(loadName="world"),  # type: ignore[call-arg]
+            parameters=LabwareDefinitionParameters.construct(loadName="world"),
             ordering=[],
         )
     ],
