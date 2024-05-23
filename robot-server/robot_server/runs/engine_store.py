@@ -175,6 +175,7 @@ class EngineStore:
             self._default_run_orchestrator = RunOrchestrator.build_orchestrator(
                 protocol_engine=engine, hardware_api=self._hardware_api
             )
+            return self._default_run_orchestrator.engine
         return default_orchestrator.engine
 
     async def create(
