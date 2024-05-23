@@ -5,6 +5,8 @@ from typing import List, Optional, Callable
 
 from opentrons.protocol_engine.errors.exceptions import EStopActivatedError
 from opentrons.protocol_engine.types import PostRunHardwareState
+
+from opentrons_shared_data.labware.labware_definition import LabwareDefinition
 from opentrons_shared_data.robot.dev_types import RobotType
 from opentrons_shared_data.robot.dev_types import RobotTypeEnum
 
@@ -303,3 +305,11 @@ class EngineStore:
     async def finish(self, error: Optional[Exception]) -> None:
         """Stop the run."""
         self._run_orchestrator.engine.finish(error=error)
+
+    async def get_state_summary(self) -> StateSummary:
+        return self._run_orchestrator.engine.state_view.get_summary()
+
+    def get_loaded_labware_definitions(self) -> List[LabwareDefinition]:
+        return (
+            self._run_orchestrator.engine.state_view.labware.get_loaded_labware_definitions()
+        )
