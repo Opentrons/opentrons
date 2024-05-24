@@ -10,12 +10,12 @@ import {
   FormGroup,
   DropdownField,
 } from '@opentrons/components'
-import modalStyles from '../../../modals/modal.module.css'
-
-import styles from './WellOrderInput.module.css'
-import stepEditStyles from '../../StepEditForm.module.css'
 import { WellOrderViz } from './WellOrderViz'
 import type { WellOrderOption } from '../../../../form-types'
+
+import modalStyles from '../../../modals/modal.module.css'
+import stepEditStyles from '../../StepEditForm.module.css'
+import styles from './WellOrderInput.module.css'
 
 const DEFAULT_FIRST: WellOrderOption = 't2b'
 const DEFAULT_SECOND: WellOrderOption = 'l2r'
@@ -98,10 +98,10 @@ export const WellOrderModal = (
     firstValue,
     secondValue,
   } = props
-  const getInitialFirstValues: () => {
+  const getInitialFirstValues = (): {
     initialFirstValue: WellOrderOption
     initialSecondValue: WellOrderOption
-  } = () => {
+  } => {
     if (firstValue == null || secondValue == null) {
       return {
         initialFirstValue: DEFAULT_FIRST,
@@ -113,20 +113,19 @@ export const WellOrderModal = (
       initialSecondValue: secondValue,
     }
   }
+  const { initialFirstValue, initialSecondValue } = getInitialFirstValues()
 
   const [wellOrder, setWellOrder] = React.useState<State>({
-    firstValue: DEFAULT_FIRST,
-    secondValue: DEFAULT_SECOND,
+    firstValue: initialFirstValue,
+    secondValue: initialSecondValue,
   })
 
   React.useEffect(() => {
-    if (firstValue != null && secondValue != null) {
-      setWellOrder({
-        firstValue: firstValue,
-        secondValue: secondValue,
-      })
-    }
-  }, [firstValue, secondValue])
+    setWellOrder({
+      firstValue: initialFirstValue,
+      secondValue: initialSecondValue,
+    })
+  }, [initialFirstValue, initialSecondValue])
 
   const applyChanges = (): void => {
     updateValues(wellOrder.firstValue, wellOrder.secondValue)
@@ -156,8 +155,8 @@ export const WellOrderModal = (
     event: React.ChangeEvent<HTMLSelectElement>
   ): void => {
     const { value } = event.currentTarget
-    // @ts-expect-error (ce, 2021-06-22) missing one prop or the other
-    let nextState: State = { [`${ordinality}Value`]: value }
+    let nextState: State = { ...wellOrder, [`${ordinality}Value`]: value }
+
     if (ordinality === 'first') {
       if (
         VERTICAL_VALUES.includes(value as WellOrderOption) &&
@@ -225,7 +224,7 @@ export const WellOrderModal = (
             />
           </div>
         </FormGroup>
-        <FormGroup label={t('well_order.viz_label')}>
+        <FormGroup label={t('modal:well_order.viz_label')}>
           <WellOrderViz
             firstValue={wellOrder.firstValue}
             secondValue={wellOrder.secondValue}
