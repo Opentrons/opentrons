@@ -56,6 +56,10 @@ export type FlexAddressableAreaName =
   | 'magneticBlockV1B3'
   | 'magneticBlockV1C3'
   | 'magneticBlockV1D3'
+  | 'absorbanceReaderV1A3'
+  | 'absorbanceReaderV1B3'
+  | 'absorbanceReaderV1C3'
+  | 'absorbanceReaderV1D3'
 
 export type OT2AddressableAreaName =
   | '1'
@@ -126,6 +130,7 @@ export type FlexModuleCutoutFixtureId =
   | 'stagingAreaSlotWithMagneticBlockV1'
   | 'thermocyclerModuleV2Rear'
   | 'thermocyclerModuleV2Front'
+  | 'absorbanceReaderV1'
 
 export type OT2SingleStandardSlot = 'singleStandardSlot'
 
