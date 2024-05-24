@@ -156,9 +156,10 @@ describe('useCurrentlyRecoveringFrom', () => {
 
     const { result } = renderHook(() => useCurrentlyRecoveringFrom(MOCK_RUN_ID))
 
+    expect(vi.mocked(useCommandQuery)).toHaveBeenCalledWith(null, null, {
+      enabled: false,
+    })
     expect(result.current).toStrictEqual(null)
-    // TODO(mm, 2024-05-22): Figure out how to assert that useCommandQuery was
-    // called with `enabled: false`.
   })
 
   it('fetches and returns the currentlyRecoveringFrom command, given that there is one', () => {
@@ -167,6 +168,7 @@ describe('useCurrentlyRecoveringFrom', () => {
         links: {
           currentlyRecoveringFrom: {
             meta: {
+              runId: MOCK_RUN_ID,
               commandId: MOCK_COMMAND_ID,
             },
           },
@@ -179,8 +181,11 @@ describe('useCurrentlyRecoveringFrom', () => {
 
     const { result } = renderHook(() => useCurrentlyRecoveringFrom(MOCK_RUN_ID))
 
+    expect(vi.mocked(useCommandQuery)).toHaveBeenCalledWith(
+      MOCK_RUN_ID,
+      MOCK_COMMAND_ID,
+      { enabled: true }
+    )
     expect(result.current).toStrictEqual('mockCommandDetails')
-    // TODO(mm, 2024-05-22): Figure out how to assert that useCommandQuery was
-    // called with `enabled: true`.
   })
 })
