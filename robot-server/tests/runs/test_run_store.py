@@ -544,7 +544,7 @@ def test_get_run_time_parameters_invalid(
     state_summary: StateSummary,
 ) -> None:
     """It should return an empty list if there invalid parameters."""
-    bad_parameters = [pe_types.BooleanParameter.construct(foo="bar")]  # type: ignore[call-arg]
+    bad_parameters = [pe_types.BooleanParameter.construct(foo="bar")]
     subject.insert(
         run_id="run-id",
         protocol_id=None,
