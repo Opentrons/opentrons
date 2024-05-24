@@ -10,6 +10,7 @@ import type { QuickTransferSummaryState } from '../types'
 import type {
   LabwareDefinition2,
   DeckConfiguration,
+  PipetteName,
 } from '@opentrons/shared-data'
 import type {
   ConsolidateArgs,
@@ -41,9 +42,18 @@ function getInvariantContextAndRobotState(
   const pipetteId = uuid()
   const tipRackId = uuid()
   const tipRackDefURI = getLabwareDefURI(quickTransferState.tipRack)
+  let pipetteName = quickTransferState.pipette.model
+  if (quickTransferState.pipette.channels === 1) {
+    pipetteName = pipetteName + `_single_flex`
+  } else if (quickTransferState.pipette.channels === 8) {
+    pipetteName = pipetteName + `_multi_flex`
+  } else {
+    pipetteName = pipetteName + `_96`
+  }
+
   const pipetteEntities: PipetteEntities = {
     [pipetteId]: {
-      name: quickTransferState.pipette.name,
+      name: pipetteName as PipetteName,
       id: pipetteId,
       tiprackDefURI: [tipRackDefURI],
       tiprackLabwareDef: [quickTransferState.tipRack],
@@ -203,6 +213,19 @@ export function generateQuickTransferArgs(
     blowoutLocation = wasteChuteEntity?.id
   }
 
+  let dropTipLocation = quickTransferState.dropTipLocation
+  if (quickTransferState.dropTipLocation === 'trashBin') {
+    const trashBinEntity = Object.values(
+      invariantContext.additionalEquipmentEntities
+    ).find(entity => entity.name === 'trashBin')
+    dropTipLocation = trashBinEntity?.id ?? 'trashBin'
+  } else if (quickTransferState.dropTipLocation === 'wasteChute') {
+    const wasteChuteEntity = Object.values(
+      invariantContext.additionalEquipmentEntities
+    ).find(entity => entity.name === 'wasteChute')
+    dropTipLocation = wasteChuteEntity?.id ?? 'wasteChute'
+  }
+
   const tipType = getTipTypeFromTipRackDefinition(quickTransferState.tipRack)
   const flowRatesForSupportedTip =
     quickTransferState.pipette.liquids.default.supportedTips[tipType]
@@ -253,10 +276,7 @@ export function generateQuickTransferArgs(
       quickTransferState.touchTipDispense != null
         ? quickTransferState.touchTipDispense
         : 0,
-    // fix this to be variable - grab correct id
-    dropTipLocation: Object.values(
-      invariantContext.additionalEquipmentEntities
-    )[0].id,
+    dropTipLocation,
     aspirateXOffset: 0,
     aspirateYOffset: 0,
     dispenseXOffset: 0,

@@ -28,7 +28,7 @@ const uuid: () => string = uuidv1
 export function createQuickTransferFile(
   quickTransferState: QuickTransferSummaryState,
   deckConfig: DeckConfiguration
-): string {
+): File {
   const {
     stepArgs,
     invariantContext,
@@ -95,7 +95,6 @@ export function createQuickTransferFile(
     ...loadLabwareCommands,
     ...nonLoadCommands,
   ]
-
   const protocolBase = {
     $otSharedSchema: '#/protocol/schemas/8',
     schemaVersion: 8,
@@ -144,8 +143,7 @@ export function createQuickTransferFile(
     commandAnnotationSchemaId: 'opentronsCommandAnnotationSchemaV1',
     commandAnnotations: [],
   }
-
-  return JSON.stringify({
+  const protocolContents = JSON.stringify({
     ...protocolBase,
     ...flexDeckSpec,
     ...labwareV2Mixin,
@@ -153,4 +151,11 @@ export function createQuickTransferFile(
     ...commandv8Mixin,
     ...commandAnnotionaV1Mixin,
   })
+
+  // Leaving this in for debugging while work is still in flight
+  console.log('Here are the protocol contents:', protocolContents)
+  return new File(
+    [protocolContents],
+    `${protocolBase.metadata.protocolName}.json`
+  )
 }
