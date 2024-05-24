@@ -123,7 +123,7 @@ async function versionDetailsFromGit(tag, allowOld) {
   }
   const allVersions = await Promise.all(allTags.map(tag => detailsFromTag(tag)))
   const sortedVersions = allVersions
-        .map(details => details[1])
+    .map(details => details[1])
     .sort(semver.compare)
     .reverse()
   const previousVersion = versionPrevious(currentVersion, sortedVersions)
