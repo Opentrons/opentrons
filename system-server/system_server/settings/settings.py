@@ -66,14 +66,16 @@ class SystemServerSettings(BaseSettings):
             " the splash screen changes when the flag is enabled/disabled."
         ),
     )
-    model_config = SettingsConfigDict(env_file=Environment().dot_env_path, env_prefix="OT_SYSTEM_SERVER_")
+    model_config = SettingsConfigDict(
+        env_file=Environment().dot_env_path, env_prefix="OT_SYSTEM_SERVER_"
+    )
 
 
 def save_settings(settings: SystemServerSettings) -> bool:
     """Save the settings to the dotenv file."""
     env_path = Environment().dot_env_path
     env_path = env_path or f"{settings.persistence_directory}/system.env"
-    prefix = settings.Config.env_prefix
+    prefix = settings.model_config.get("env_prefix")
     try:
         for key, val in settings.dict().items():
             name = f"{prefix}{key}"
