@@ -56,7 +56,7 @@ INSTALL_REQUIRES = [
     f"opentrons-shared-data=={VERSION}",
     f"server-utils=={VERSION}",
     "anyio==3.7.1",
-    "fastapi>=0.100.0",
+    "fastapi==0.100.0",
     "python-dotenv==1.0.1",
     "python-multipart==0.0.6",
     "pydantic==2.6.4",
