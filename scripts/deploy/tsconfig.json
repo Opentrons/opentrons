@@ -4,7 +4,8 @@
       "rootDir": ".",
       "outDir": "lib",
       "allowJs": true,
-      "allowImportingTsExtensions": true
+      "allowImportingTsExtensions": true,
+      "module": "commonjs" 
     },
     "include": ["typings", "."]
 }

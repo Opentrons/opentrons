@@ -27,7 +27,7 @@ const { getAssumeRole } = require('./assume-role.ts')
     'arn:aws:cloudfront::043748923082:distribution/EB2QTLE7OJ8O6'
 
   const USAGE =
-    '\nUsage:\n  ts-node ./scripts/deploy/promote-to-staging <project_domain> <tag> [--deploy]'
+    '\nUsage:\n  node ./scripts/deploy/promote-to-staging <project_domain> <tag> [--deploy]'
 
   const { args, flags } = parseArgs(process.argv.slice(2))
   const [projectDomain, tag] = args

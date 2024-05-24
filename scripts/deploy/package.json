@@ -1,0 +1,33 @@
+{
+    "repository": {
+      "type": "git",
+      "url": "https://github.com/Opentrons/opentrons.git"
+    },
+    "author": {
+      "name": "Opentrons Labworks",
+      "email": "engineering@opentrons.com"
+    },
+    "name": "@opentrons/deploy",
+    "productName": "Opentrons Scripts Deploy",
+    "private": true,
+    "version": "0.0.0-dev",
+    "description": "Scripts deploy",
+    "types": "lib/index.d.ts",
+    "bugs": {
+      "url": "https://github.com/Opentrons/opentrons/issues"
+    },
+    "homepage": "https://github.com/Opentrons/opentrons",
+    "license": "Apache-2.0",
+    "type": "module",  
+    "dependencies": {
+        "@aws-sdk/client-cloudfront": "^3.582.0",
+        "@aws-sdk/client-s3": "^3.582.0",
+        "@aws-sdk/client-dynamodb": "^3.582.0",
+        "@aws-sdk/credential-provider-ini": "^3.582.0",
+        "ts-node": "^10.9.2"
+    },
+    "scripts": {
+        "build": "tsc --build",
+        "clean": "tsc --build --clean"
+    }
+}
