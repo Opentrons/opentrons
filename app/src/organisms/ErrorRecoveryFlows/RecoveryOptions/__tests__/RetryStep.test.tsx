@@ -4,8 +4,9 @@ import { screen, fireEvent, waitFor } from '@testing-library/react'
 
 import { renderWithProviders } from '../../../../__testing-utils__'
 import { i18n } from '../../../../i18n'
+import { mockRecoveryContentProps } from '../../__fixtures__'
 import { RetryStep } from '../RetryStep'
-import { RECOVERY_MAP, ERROR_KINDS } from '../../constants'
+import { RECOVERY_MAP } from '../../constants'
 
 import type { Mock } from 'vitest'
 
@@ -25,10 +26,7 @@ describe('RecoveryFooterButtons', () => {
     const mockRouteUpdateActions = { goBackPrevStep: mockGoBackPrevStep } as any
 
     props = {
-      isOnDevice: true,
-      recoveryCommands: {} as any,
-      failedCommand: {} as any,
-      errorKind: ERROR_KINDS.GENERAL_ERROR,
+      ...mockRecoveryContentProps,
       routeUpdateActions: mockRouteUpdateActions,
       recoveryMap: {
         route: RETRY_FAILED_COMMAND.ROUTE,

@@ -29,7 +29,29 @@ import type {
   UseRecoveryCommandsResult,
 } from './useRecoveryCommands'
 
-export interface ErrorRecoveryFlowsProps {
+interface UseERWizardResult {
+  hasLaunchedRecovery: boolean
+  showERWizard: boolean
+  toggleERWizard: (hasLaunchedER: boolean) => Promise<void>
+}
+
+export function useERWizard(): UseERWizardResult {
+  const [showERWizard, setShowERWizard] = React.useState(false)
+  // Because RunPausedSplash has access to some ER Wiz routes but is not a part of the ER wizard, the splash screen
+  // is the "home" route as opposed to SelectRecoveryOption (accessed by pressing "go back" or "continue" enough times)
+  // when recovery mode has not been launched.
+  const [hasLaunchedRecovery, setHasLaunchedRecovery] = React.useState(false)
+
+  const toggleERWizard = (hasLaunchedER: boolean): Promise<void> => {
+    setHasLaunchedRecovery(hasLaunchedER)
+    setShowERWizard(!showERWizard)
+    return Promise.resolve()
+  }
+
+  return { showERWizard, toggleERWizard, hasLaunchedRecovery }
+}
+
+export interface ErrorRecoveryWizardProps {
   failedCommand: FailedCommand | null
   recoveryMap: IRecoveryMap
   routeUpdateActions: UseRouteUpdateActionsResult
@@ -38,7 +60,7 @@ export interface ErrorRecoveryFlowsProps {
 }
 
 export function ErrorRecoveryWizard(
-  props: ErrorRecoveryFlowsProps
+  props: ErrorRecoveryWizardProps
 ): JSX.Element {
   const {
     hasLaunchedRecovery,

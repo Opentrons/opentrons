@@ -47,11 +47,15 @@ describe('useRouteUpdateActions', () => {
 
   let useRouteUpdateActionsParams: GetRouteUpdateActionsParams
   let mockSetRecoveryMap: Mock
+  let mockToggleERWizard: Mock
 
   beforeEach(() => {
     mockSetRecoveryMap = vi.fn()
+    mockToggleERWizard = vi.fn()
 
     useRouteUpdateActionsParams = {
+      hasLaunchedRecovery: true,
+      toggleERWizard: mockToggleERWizard,
       recoveryMap: {
         route: RECOVERY_MAP.RETRY_FAILED_COMMAND.ROUTE,
         step: RECOVERY_MAP.RETRY_FAILED_COMMAND.STEPS.CONFIRM_RETRY,
@@ -71,6 +75,22 @@ describe('useRouteUpdateActions', () => {
       route: OPTION_SELECTION.ROUTE,
       step: OPTION_SELECTION.STEPS.SELECT,
     })
+    expect(mockToggleERWizard).not.toHaveBeenCalled()
+  })
+
+  it('toggles off the ER Wizard if proceedNextStep is called and hasLaunchedRecovery is false', () => {
+    const { result } = renderHook(() =>
+      useRouteUpdateActions({
+        ...useRouteUpdateActionsParams,
+        hasLaunchedRecovery: false,
+      })
+    )
+
+    const { proceedNextStep } = result.current
+
+    proceedNextStep()
+
+    expect(mockToggleERWizard).toHaveBeenCalled()
   })
 
   it(`routes to ${OPTION_SELECTION.ROUTE} ${OPTION_SELECTION.STEPS.SELECT} if proceedPrevStep is called and the previous step does not exist`, () => {
@@ -84,6 +104,22 @@ describe('useRouteUpdateActions', () => {
       route: OPTION_SELECTION.ROUTE,
       step: OPTION_SELECTION.STEPS.SELECT,
     })
+    expect(mockToggleERWizard).not.toHaveBeenCalled()
+  })
+
+  it('toggles off the ER Wizard if proceedPrevStep is called and hasLaunchedRecovery is false', () => {
+    const { result } = renderHook(() =>
+      useRouteUpdateActions({
+        ...useRouteUpdateActionsParams,
+        hasLaunchedRecovery: false,
+      })
+    )
+
+    const { goBackPrevStep } = result.current
+
+    goBackPrevStep()
+
+    expect(mockToggleERWizard).toHaveBeenCalled()
   })
 
   it('routes to the first step of the supplied route when proceedToRoute is called', () => {

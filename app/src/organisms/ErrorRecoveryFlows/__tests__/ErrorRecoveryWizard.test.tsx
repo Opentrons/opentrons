@@ -1,24 +1,51 @@
 import * as React from 'react'
 import { vi, describe, it, expect, beforeEach } from 'vitest'
-import { renderHook, screen, waitFor } from '@testing-library/react'
+import { renderHook, act, screen, waitFor } from '@testing-library/react'
 
 import { renderWithProviders } from '../../../__testing-utils__'
 import { i18n } from '../../../i18n'
+import { mockRecoveryContentProps } from '../__fixtures__'
 import {
   ErrorRecoveryContent,
   useInitialPipetteHome,
+  useERWizard,
 } from '../ErrorRecoveryWizard'
-import { ERROR_KINDS, RECOVERY_MAP } from '../constants'
+import { RECOVERY_MAP } from '../constants'
 import { BeforeBeginning } from '../BeforeBeginning'
 import { SelectRecoveryOption, RetryStep } from '../RecoveryOptions'
 import { RecoveryInProgress } from '../RecoveryInProgress'
 
 import type { Mock } from 'vitest'
-import type { IRecoveryMap } from '../types'
 
 vi.mock('../BeforeBeginning')
 vi.mock('../RecoveryOptions')
 vi.mock('../RecoveryInProgress')
+
+describe('useERWizard', () => {
+  it('has correct initial values', () => {
+    const { result } = renderHook(() => useERWizard())
+    expect(result.current.showERWizard).toBe(false)
+    expect(result.current.hasLaunchedRecovery).toBe(false)
+  })
+
+  it('correctly toggles showERWizard and updates hasLaunchedRecovery as expected', async () => {
+    const { result } = renderHook(() => useERWizard())
+
+    await act(async () => {
+      await result.current.toggleERWizard(true)
+    })
+
+    expect(result.current.showERWizard).toBe(true)
+    expect(result.current.hasLaunchedRecovery).toBe(true)
+
+    await act(async () => {
+      await result.current.toggleERWizard(false)
+    })
+
+    expect(result.current.showERWizard).toBe(false)
+    expect(result.current.hasLaunchedRecovery).toBe(false)
+  })
+})
 
 const render = (props: React.ComponentProps<typeof ErrorRecoveryContent>) => {
   return renderWithProviders(<ErrorRecoveryContent {...props} />, {
@@ -38,20 +65,9 @@ describe('ErrorRecoveryContent', () => {
   } = RECOVERY_MAP
 
   let props: React.ComponentProps<typeof ErrorRecoveryContent>
-  const mockRecoveryMap: IRecoveryMap = {
-    route: OPTION_SELECTION.ROUTE,
-    step: OPTION_SELECTION.STEPS.SELECT,
-  }
 
   beforeEach(() => {
-    props = {
-      failedCommand: {} as any,
-      recoveryCommands: {} as any,
-      errorKind: ERROR_KINDS.GENERAL_ERROR,
-      routeUpdateActions: {} as any,
-      recoveryMap: mockRecoveryMap,
-      isOnDevice: true,
-    }
+    props = mockRecoveryContentProps
 
     vi.mocked(SelectRecoveryOption).mockReturnValue(
       <div>MOCK_SELECT_RECOVERY_OPTION</div>
@@ -167,9 +183,25 @@ describe('useInitialPipetteHome', () => {
     } as any
   })
 
+  it('does not z-home the pipettes if error recovery was not launched', () => {
+    renderHook(() =>
+      useInitialPipetteHome({
+        hasLaunchedRecovery: false,
+        recoveryCommands: mockRecoveryCommands,
+        routeUpdateActions: mockRouteUpdateActions,
+      })
+    )
+
+    expect(mockSetRobotInMotion).not.toHaveBeenCalled()
+  })
+
   it('sets the motion screen properly and z-homes all pipettes only on the initial render of Error Recovery', async () => {
     const { rerender } = renderHook(() =>
-      useInitialPipetteHome(mockRecoveryCommands, mockRouteUpdateActions)
+      useInitialPipetteHome({
+        hasLaunchedRecovery: true,
+        recoveryCommands: mockRecoveryCommands,
+        routeUpdateActions: mockRouteUpdateActions,
+      })
     )
 
     await waitFor(() => {

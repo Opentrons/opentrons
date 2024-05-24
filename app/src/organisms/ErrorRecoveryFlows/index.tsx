@@ -6,8 +6,8 @@ import {
 } from '@opentrons/api-client'
 
 import { useFeatureFlag } from '../../redux/config'
-import { ErrorRecoveryWizard } from './ErrorRecoveryWizard'
-import { RunPausedSplash } from './RunPausedSplash'
+import { ErrorRecoveryWizard, useERWizard } from './ErrorRecoveryWizard'
+import { useRunPausedSplash, RunPausedSplash } from './RunPausedSplash'
 import { useCurrentlyFailedRunCommand, useRouteUpdateActions } from './utils'
 import { useRecoveryCommands } from './useRecoveryCommands'
 import { RECOVERY_MAP } from './constants'
@@ -62,6 +62,7 @@ export function ErrorRecoveryFlows({
 }: ErrorRecoveryFlowsProps): JSX.Element | null {
   const enableRunNotes = useFeatureFlag('enableRunNotes')
   const { hasLaunchedRecovery, toggleERWizard, showERWizard } = useERWizard()
+  const showSplash = useRunPausedSplash()
 
   /**
    * ER Wizard routing.
@@ -100,33 +101,13 @@ export function ErrorRecoveryFlows({
           hasLaunchedRecovery={hasLaunchedRecovery}
         />
       ) : null}
-      <RunPausedSplash
-        failedCommand={failedCommand}
-        toggleERWiz={toggleERWizard}
-        routeUpdateActions={routeUpdateActions}
-      />
+      {showSplash ? (
+        <RunPausedSplash
+          failedCommand={failedCommand}
+          toggleERWiz={toggleERWizard}
+          routeUpdateActions={routeUpdateActions}
+        />
+      ) : null}
     </>
   )
-}
-
-interface UseERWizardResult {
-  hasLaunchedRecovery: boolean
-  showERWizard: boolean
-  toggleERWizard: (hasLaunchedER: boolean) => Promise<void>
-}
-
-function useERWizard(): UseERWizardResult {
-  const [showERWizard, setShowERWizard] = React.useState(false)
-  // Because RunPausedSplash has access to some ER Wiz routes but is not a part of the ER wizard, the splash screen
-  // is the "home" route as opposed to SelectRecoveryOption (accessed by pressing "go back" or "continue" enough times)
-  // when recovery mode has not been launched.
-  const [hasLaunchedRecovery, setHasLaunchedRecovery] = React.useState(false)
-
-  const toggleERWizard = (hasLaunchedER: boolean): Promise<void> => {
-    setHasLaunchedRecovery(hasLaunchedER)
-    setShowERWizard(!showERWizard)
-    return Promise.resolve()
-  }
-
-  return { showERWizard, toggleERWizard, hasLaunchedRecovery }
 }

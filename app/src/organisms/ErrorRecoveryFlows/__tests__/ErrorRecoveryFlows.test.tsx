@@ -10,16 +10,22 @@ import {
 
 import { renderWithProviders } from '../../../__testing-utils__'
 import { i18n } from '../../../i18n'
+import { mockFailedCommand } from '../__fixtures__'
 import { ErrorRecoveryFlows, useErrorRecoveryFlows } from '..'
-import { ErrorRecoveryWizard } from '../ErrorRecoveryWizard'
 import { useCurrentlyFailedRunCommand } from '../utils'
+import { useFeatureFlag } from '../../../redux/config'
+import { useERWizard, ErrorRecoveryWizard } from '../ErrorRecoveryWizard'
+import { useRunPausedSplash, RunPausedSplash } from '../RunPausedSplash'
 
 import type { RunStatus } from '@opentrons/api-client'
 
 vi.mock('../ErrorRecoveryWizard')
 vi.mock('../utils')
+vi.mock('../useRecoveryCommands')
+vi.mock('../../../redux/config')
+vi.mock('../RunPausedSplash')
 
-describe('useErrorRecovery', () => {
+describe('useErrorRecoveryFlows', () => {
   beforeEach(() => {
     vi.mocked(useCurrentlyFailedRunCommand).mockReturnValue(
       'mockCommand' as any
@@ -79,15 +85,46 @@ describe('ErrorRecovery', () => {
 
   beforeEach(() => {
     props = {
-      failedCommand: {} as any,
+      failedCommand: mockFailedCommand,
       runId: 'MOCK_RUN_ID',
     }
     vi.mocked(ErrorRecoveryWizard).mockReturnValue(<div>MOCK WIZARD</div>)
+    vi.mocked(RunPausedSplash).mockReturnValue(
+      <div>MOCK RUN PAUSED SPLASH</div>
+    )
+    vi.mocked(useFeatureFlag).mockReturnValue(true)
+    vi.mocked(useERWizard).mockReturnValue({
+      hasLaunchedRecovery: true,
+      toggleERWizard: () => Promise.resolve(),
+      showERWizard: true,
+    })
+    vi.mocked(useRunPausedSplash).mockReturnValue(true)
   })
 
-  //TOME: Render an dpress the button when designs are updated.
-  // it(`renders the wizard when the wizard is toggled on`, () => {
-  //   render(props)
-  //   screen.getByText('MOCK WIZARD')
-  // })
+  it('renders the wizard when the wizard is toggled on', () => {
+    render(props)
+    screen.getByText('MOCK WIZARD')
+  })
+
+  it('does not render the wizard when the wizard is toggled off', () => {
+    vi.mocked(useERWizard).mockReturnValue({
+      hasLaunchedRecovery: true,
+      toggleERWizard: () => Promise.resolve(),
+      showERWizard: false,
+    })
+
+    render(props)
+    expect(screen.queryByText('MOCK WIZARD')).not.toBeInTheDocument()
+  })
+
+  it('renders the splash when the showSplash is true', () => {
+    render(props)
+    screen.getByText('MOCK RUN PAUSED SPLASH')
+  })
+
+  it('does not render the splash when the showSplash is false', () => {
+    vi.mocked(useRunPausedSplash).mockReturnValue(false)
+    render(props)
+    expect(screen.queryByText('MOCK RUN PAUSED SPLASH')).not.toBeInTheDocument()
+  })
 })

@@ -1,6 +1,7 @@
 import * as React from 'react'
 import styled, { css } from 'styled-components'
 import { useTranslation } from 'react-i18next'
+import { useSelector } from 'react-redux'
 
 import {
   Flex,
@@ -17,6 +18,7 @@ import {
   JUSTIFY_SPACE_BETWEEN,
 } from '@opentrons/components'
 
+import { getIsOnDevice } from '../../redux/config'
 import { getErrorKind, useErrorMessage, useErrorName } from './utils'
 import { LargeButton } from '../../atoms/buttons'
 import { RECOVERY_MAP } from './constants'
@@ -24,12 +26,15 @@ import { RECOVERY_MAP } from './constants'
 import type { FailedCommand } from './types'
 import type { UseRouteUpdateActionsResult } from './utils'
 
+export function useRunPausedSplash(): boolean {
+  return useSelector(getIsOnDevice)
+}
+
 interface RunPausedSplashProps {
   toggleERWiz: (launchER: boolean) => Promise<void>
   routeUpdateActions: UseRouteUpdateActionsResult
   failedCommand: FailedCommand | null
 }
-
 export function RunPausedSplash({
   toggleERWiz,
   routeUpdateActions,
