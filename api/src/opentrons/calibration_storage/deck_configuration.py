@@ -10,7 +10,7 @@ from . import file_operators as io
 class _CutoutFixturePlacementModel(pydantic.BaseModel):
     cutoutId: str
     cutoutFixtureId: str
-    opentronsModuleSerialNumber: Optional[str]
+    opentronsModuleSerialNumber: Optional[str] = None
 
 
 class _DeckConfigurationModel(pydantic.BaseModel):
