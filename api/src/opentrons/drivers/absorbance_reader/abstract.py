@@ -1,6 +1,9 @@
 from abc import ABC, abstractmethod
 from typing import Dict, List
-from opentrons.drivers.types import AbsorbanceReaderLidStatus
+from opentrons.drivers.types import (
+    AbsorbanceReaderLidStatus,
+    AbsorbanceReaderDeviceState,
+)
 
 
 class AbstractAbsorbanceReaderDriver(ABC):
@@ -36,7 +39,7 @@ class AbstractAbsorbanceReaderDriver(ABC):
         ...
 
     @abstractmethod
-    async def get_status(self) -> None:
+    async def get_status(self) -> AbsorbanceReaderDeviceState:
         ...
 
     @abstractmethod
