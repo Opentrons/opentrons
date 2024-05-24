@@ -59,7 +59,6 @@ export function getInitialSummaryState(props: {
     volume: props.volume,
     aspirateFlowRate: flowRatesForSupportedTip.defaultAspirateFlowRate.default,
     dispenseFlowRate: flowRatesForSupportedTip.defaultDispenseFlowRate.default,
-    blowOut: 'dest_well',
     path: path,
     tipPositionAspirate: 1,
     preWetTip: false,
