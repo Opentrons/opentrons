@@ -60,6 +60,7 @@ INSTALL_REQUIRES = [
     "python-dotenv==1.0.1",
     "python-multipart==0.0.6",
     "pydantic==2.6.4",
+    "pydantic-settings==2.2.1",
     "typing-extensions>=4.0.0,<5",
     "uvicorn==0.27.0.post1",
     "wsproto==1.2.0",
