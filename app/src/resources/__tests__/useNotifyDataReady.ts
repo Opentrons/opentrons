@@ -5,7 +5,7 @@ import { when } from 'vitest-when'
 
 import { useHost } from '@opentrons/react-api-client'
 
-import { useNotifyService } from '../useNotifyService'
+import { useNotifyDataReady } from '../useNotifyDataReady'
 import { appShellListener } from '../../redux/shell/remote'
 import { useTrackEvent } from '../../redux/analytics'
 import { notifySubscribeAction } from '../../redux/shell'
@@ -13,9 +13,9 @@ import { useFeatureFlag } from '../../redux/config'
 
 import type { Mock } from 'vitest'
 import type { HostConfig } from '@opentrons/api-client'
-import type { QueryOptionsWithPolling } from '../useNotifyService'
+import type { QueryOptionsWithPolling } from '../useNotifyDataReady'
 
-vi.unmock('../useNotifyService')
+vi.unmock('../useNotifyDataReady')
 vi.mock('react-redux')
 vi.mock('@opentrons/react-api-client')
 vi.mock('../../redux/analytics')
@@ -30,7 +30,7 @@ const MOCK_OPTIONS: QueryOptionsWithPolling<any, any> = {
   forceHttpPolling: false,
 }
 
-describe('useNotifyService', () => {
+describe('useNotifyDataReady', () => {
   let mockDispatch: Mock
   let mockTrackEvent: Mock
   let mockHTTPRefetch: Mock
@@ -54,12 +54,12 @@ describe('useNotifyService', () => {
 
   it('should trigger an HTTP refetch and subscribe action on a successful initial mount', () => {
     const { result } = renderHook(() =>
-      useNotifyService({
+      useNotifyDataReady({
         topic: MOCK_TOPIC,
         options: MOCK_OPTIONS,
       } as any)
     )
-    expect(result.current.isNotifyEnabled).toEqual(true)
+    expect(result.current.shouldRefetch).toEqual(true)
     expect(mockDispatch).toHaveBeenCalledWith(
       notifySubscribeAction(MOCK_HOST_CONFIG.hostname, MOCK_TOPIC)
     )
@@ -68,36 +68,36 @@ describe('useNotifyService', () => {
 
   it('should not subscribe to notifications if forceHttpPolling is true', () => {
     const { result } = renderHook(() =>
-      useNotifyService({
+      useNotifyDataReady({
         topic: MOCK_TOPIC,
         options: { ...MOCK_OPTIONS, forceHttpPolling: true },
       } as any)
     )
-    expect(result.current.isNotifyEnabled).toEqual(true)
+    expect(result.current.shouldRefetch).toEqual(true)
     expect(appShellListener).not.toHaveBeenCalled()
     expect(mockDispatch).not.toHaveBeenCalled()
   })
 
   it('should not subscribe to notifications if enabled is false', () => {
     const { result } = renderHook(() =>
-      useNotifyService({
+      useNotifyDataReady({
         topic: MOCK_TOPIC,
         options: { ...MOCK_OPTIONS, enabled: false },
       } as any)
     )
-    expect(result.current.isNotifyEnabled).toEqual(true)
+    expect(result.current.shouldRefetch).toEqual(true)
     expect(appShellListener).not.toHaveBeenCalled()
     expect(mockDispatch).not.toHaveBeenCalled()
   })
 
   it('should not subscribe to notifications if staleTime is Infinity', () => {
     const { result } = renderHook(() =>
-      useNotifyService({
+      useNotifyDataReady({
         topic: MOCK_TOPIC,
         options: { ...MOCK_OPTIONS, staleTime: Infinity },
       } as any)
     )
-    expect(result.current.isNotifyEnabled).toEqual(true)
+    expect(result.current.shouldRefetch).toEqual(true)
     expect(appShellListener).not.toHaveBeenCalled()
     expect(mockDispatch).not.toHaveBeenCalled()
   })
@@ -108,14 +108,14 @@ describe('useNotifyService', () => {
     errorSpy.mockImplementation(() => {})
 
     const { result } = renderHook(() =>
-      useNotifyService({
+      useNotifyDataReady({
         topic: MOCK_TOPIC,
         setRefetch: mockHTTPRefetch,
         options: MOCK_OPTIONS,
       } as any)
     )
 
-    expect(result.current.isNotifyEnabled).toEqual(true)
+    expect(result.current.shouldRefetch).toEqual(true)
   })
 
   it('should return set HTTP refetch to always and fire an analytics reporting event if the connection was refused', () => {
@@ -126,7 +126,7 @@ describe('useNotifyService', () => {
       callback('ECONNREFUSED')
     })
     const { rerender, result } = renderHook(() =>
-      useNotifyService({
+      useNotifyDataReady({
         topic: MOCK_TOPIC,
         setRefetch: mockHTTPRefetch,
         options: MOCK_OPTIONS,
@@ -134,7 +134,7 @@ describe('useNotifyService', () => {
     )
     expect(mockTrackEvent).toHaveBeenCalled()
     rerender()
-    expect(result.current.isNotifyEnabled).toEqual(true)
+    expect(result.current.shouldRefetch).toEqual(true)
   })
 
   it('should trigger a single HTTP refetch if the refetch flag was returned', () => {
@@ -145,14 +145,14 @@ describe('useNotifyService', () => {
       callback({ refetch: true })
     })
     const { rerender, result } = renderHook(() =>
-      useNotifyService({
+      useNotifyDataReady({
         topic: MOCK_TOPIC,
         setRefetch: mockHTTPRefetch,
         options: MOCK_OPTIONS,
       } as any)
     )
     rerender()
-    expect(result.current.isNotifyEnabled).toEqual(true)
+    expect(result.current.shouldRefetch).toEqual(true)
   })
 
   it('should trigger a single HTTP refetch if the unsubscribe flag was returned', () => {
@@ -163,18 +163,18 @@ describe('useNotifyService', () => {
       callback({ unsubscribe: true })
     })
     const { rerender, result } = renderHook(() =>
-      useNotifyService({
+      useNotifyDataReady({
         topic: MOCK_TOPIC,
         options: MOCK_OPTIONS,
       } as any)
     )
     rerender()
-    expect(result.current.isNotifyEnabled).toEqual(true)
+    expect(result.current.shouldRefetch).toEqual(true)
   })
 
   it('should clean up the listener on dismount', () => {
     const { unmount } = renderHook(() =>
-      useNotifyService({
+      useNotifyDataReady({
         topic: MOCK_TOPIC,
         options: MOCK_OPTIONS,
       })
@@ -185,7 +185,7 @@ describe('useNotifyService', () => {
 
   it('should still clean up the listener if the hostname changes to null after subscribing', () => {
     const { unmount, rerender } = renderHook(() =>
-      useNotifyService({
+      useNotifyDataReady({
         hostOverride: MOCK_HOST_CONFIG,
         topic: MOCK_TOPIC,
         options: MOCK_OPTIONS,
@@ -204,13 +204,13 @@ describe('useNotifyService', () => {
       .thenReturn(true)
 
     const { result } = renderHook(() =>
-      useNotifyService({
+      useNotifyDataReady({
         topic: MOCK_TOPIC,
         options: MOCK_OPTIONS,
       } as any)
     )
 
-    expect(result.current.isNotifyEnabled).toEqual(true)
+    expect(result.current.shouldRefetch).toEqual(true)
     expect(appShellListener).not.toHaveBeenCalled()
   })
 })

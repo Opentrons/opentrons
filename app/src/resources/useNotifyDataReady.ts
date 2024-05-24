@@ -23,22 +23,22 @@ export interface QueryOptionsWithPolling<TData, TError = Error>
   forceHttpPolling?: boolean
 }
 
-interface UseNotifyServiceProps<TData, TError = Error> {
+interface useNotifyDataReadyProps<TData, TError = Error> {
   topic: NotifyTopic
   options: QueryOptionsWithPolling<TData, TError>
   hostOverride?: HostConfig | null
 }
 
-interface UseNotifyServiceResults {
+interface useNotifyDataReadyResults {
   notifyOnSettled: () => void
-  isNotifyEnabled: boolean
+  shouldRefetch: boolean
 }
 
-export function useNotifyService<TData, TError = Error>({
+export function useNotifyDataReady<TData, TError = Error>({
   topic,
   options,
   hostOverride,
-}: UseNotifyServiceProps<TData, TError>): UseNotifyServiceResults {
+}: useNotifyDataReadyProps<TData, TError>): useNotifyDataReadyResults {
   const dispatch = useDispatch()
   const hostFromProvider = useHost()
   const host = hostOverride ?? hostFromProvider
@@ -104,5 +104,5 @@ export function useNotifyService<TData, TError = Error>({
     }
   }, [refetch])
 
-  return { notifyOnSettled, isNotifyEnabled: refetch != null }
+  return { notifyOnSettled, shouldRefetch: refetch != null }
 }
