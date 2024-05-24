@@ -13,14 +13,14 @@ export function useNotifyRunQuery<TError = Error>(
 ): UseQueryResult<Run, TError> {
   const isEnabled = options.enabled !== false && runId != null
 
-  const { notifyOnSettled, isNotifyEnabled } = useNotifyService({
+  const { notifyOnSettled, shouldRefetch } = useNotifyService({
     topic: `robot-server/runs/${runId}` as NotifyTopic,
     options: { ...options, enabled: options.enabled != null && runId != null },
   })
 
   const httpResponse = useRunQuery(runId, {
     ...options,
-    enabled: isEnabled && isNotifyEnabled,
+    enabled: isEnabled && shouldRefetch,
     onSettled: notifyOnSettled,
   })
 

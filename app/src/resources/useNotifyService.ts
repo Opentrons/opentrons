@@ -30,7 +30,7 @@ interface UseNotifyServiceProps<TData, TError = Error> {
 
 interface UseNotifyServiceResults {
   notifyOnSettled: () => void
-  isNotifyEnabled: boolean
+  shouldRefetch: boolean
 }
 
 export function useNotifyService<TData, TError = Error>({
@@ -101,5 +101,5 @@ export function useNotifyService<TData, TError = Error>({
     }
   }, [refetch])
 
-  return { notifyOnSettled, isNotifyEnabled: refetch != null }
+  return { notifyOnSettled, shouldRefetch: refetch != null }
 }

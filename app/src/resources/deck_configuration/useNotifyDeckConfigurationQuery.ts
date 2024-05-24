@@ -9,14 +9,14 @@ import type { QueryOptionsWithPolling } from '../useNotifyService'
 export function useNotifyDeckConfigurationQuery(
   options: QueryOptionsWithPolling<DeckConfiguration, unknown> = {}
 ): UseQueryResult<DeckConfiguration> {
-  const { notifyOnSettled, isNotifyEnabled } = useNotifyService({
+  const { notifyOnSettled, shouldRefetch } = useNotifyService({
     topic: 'robot-server/deck_configuration',
     options,
   })
 
   const httpQueryResult = useDeckConfigurationQuery({
     ...options,
-    enabled: options?.enabled !== false && isNotifyEnabled,
+    enabled: options?.enabled !== false && shouldRefetch,
     onSettled: notifyOnSettled,
   })
 

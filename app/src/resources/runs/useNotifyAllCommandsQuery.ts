@@ -11,14 +11,14 @@ export function useNotifyAllCommandsQuery<TError = Error>(
   params?: GetCommandsParams | null,
   options: QueryOptionsWithPolling<CommandsData, TError> = {}
 ): UseQueryResult<CommandsData, TError> {
-  const { notifyOnSettled, isNotifyEnabled } = useNotifyService({
+  const { notifyOnSettled, shouldRefetch } = useNotifyService({
     topic: 'robot-server/runs/current_command', // only updates to the current command cause all commands to change
     options,
   })
 
   const httpResponse = useAllCommandsQuery(runId, params, {
     ...options,
-    enabled: options?.enabled !== false && isNotifyEnabled,
+    enabled: options?.enabled !== false && shouldRefetch,
     onSettled: notifyOnSettled,
   })
 

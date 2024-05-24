@@ -9,14 +9,14 @@ import type { QueryOptionsWithPolling } from '../useNotifyService'
 export function useNotifyCurrentMaintenanceRun(
   options: QueryOptionsWithPolling<MaintenanceRun, Error> = {}
 ): UseQueryResult<MaintenanceRun> | UseQueryResult<MaintenanceRun, Error> {
-  const { notifyOnSettled, isNotifyEnabled } = useNotifyService({
+  const { notifyOnSettled, shouldRefetch } = useNotifyService({
     topic: 'robot-server/maintenance_runs/current_run',
     options,
   })
 
   const httpQueryResult = useCurrentMaintenanceRun({
     ...options,
-    enabled: options?.enabled !== false && isNotifyEnabled,
+    enabled: options?.enabled !== false && shouldRefetch,
     onSettled: notifyOnSettled,
   })
 

@@ -53,7 +53,7 @@ describe('useNotifyService', () => {
         options: MOCK_OPTIONS,
       } as any)
     )
-    expect(result.current.isNotifyEnabled).toEqual(true)
+    expect(result.current.shouldRefetch).toEqual(true)
     expect(mockDispatch).toHaveBeenCalledWith(
       notifySubscribeAction(MOCK_HOST_CONFIG.hostname, MOCK_TOPIC)
     )
@@ -67,7 +67,7 @@ describe('useNotifyService', () => {
         options: { ...MOCK_OPTIONS, forceHttpPolling: true },
       } as any)
     )
-    expect(result.current.isNotifyEnabled).toEqual(true)
+    expect(result.current.shouldRefetch).toEqual(true)
     expect(appShellListener).not.toHaveBeenCalled()
     expect(mockDispatch).not.toHaveBeenCalled()
   })
@@ -79,7 +79,7 @@ describe('useNotifyService', () => {
         options: { ...MOCK_OPTIONS, enabled: false },
       } as any)
     )
-    expect(result.current.isNotifyEnabled).toEqual(true)
+    expect(result.current.shouldRefetch).toEqual(true)
     expect(appShellListener).not.toHaveBeenCalled()
     expect(mockDispatch).not.toHaveBeenCalled()
   })
@@ -91,7 +91,7 @@ describe('useNotifyService', () => {
         options: { ...MOCK_OPTIONS, staleTime: Infinity },
       } as any)
     )
-    expect(result.current.isNotifyEnabled).toEqual(true)
+    expect(result.current.shouldRefetch).toEqual(true)
     expect(appShellListener).not.toHaveBeenCalled()
     expect(mockDispatch).not.toHaveBeenCalled()
   })
@@ -109,7 +109,7 @@ describe('useNotifyService', () => {
       } as any)
     )
 
-    expect(result.current.isNotifyEnabled).toEqual(true)
+    expect(result.current.shouldRefetch).toEqual(true)
   })
 
   it('should return set HTTP refetch to always and fire an analytics reporting event if the connection was refused', () => {
@@ -128,7 +128,7 @@ describe('useNotifyService', () => {
     )
     expect(mockTrackEvent).toHaveBeenCalled()
     rerender()
-    expect(result.current.isNotifyEnabled).toEqual(true)
+    expect(result.current.shouldRefetch).toEqual(true)
   })
 
   it('should trigger a single HTTP refetch if the refetch flag was returned', () => {
@@ -146,7 +146,7 @@ describe('useNotifyService', () => {
       } as any)
     )
     rerender()
-    expect(result.current.isNotifyEnabled).toEqual(true)
+    expect(result.current.shouldRefetch).toEqual(true)
   })
 
   it('should trigger a single HTTP refetch if the unsubscribe flag was returned', () => {
@@ -163,7 +163,7 @@ describe('useNotifyService', () => {
       } as any)
     )
     rerender()
-    expect(result.current.isNotifyEnabled).toEqual(true)
+    expect(result.current.shouldRefetch).toEqual(true)
   })
 
   it('should clean up the listener on dismount', () => {

@@ -13,7 +13,7 @@ export function useNotifyAllRunsQuery(
   options: QueryOptionsWithPolling<UseAllRunsQueryOptions, AxiosError> = {},
   hostOverride?: HostConfig | null
 ): UseQueryResult<Runs, AxiosError> {
-  const { notifyOnSettled, isNotifyEnabled } = useNotifyService({
+  const { notifyOnSettled, shouldRefetch } = useNotifyService({
     topic: 'robot-server/runs',
     options,
     hostOverride,
@@ -23,7 +23,7 @@ export function useNotifyAllRunsQuery(
     params,
     {
       ...(options as UseAllRunsQueryOptions),
-      enabled: options?.enabled !== false && isNotifyEnabled,
+      enabled: options?.enabled !== false && shouldRefetch,
       onSettled: notifyOnSettled,
     },
     hostOverride
