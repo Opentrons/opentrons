@@ -1,8 +1,8 @@
 """Store Pydantic objects in the SQL database."""
 
 import json
-from typing import Type, TypeVar, List, Sequence
-from pydantic import BaseModel, parse_obj_as
+from typing import Type, TypeVar, List, Sequence, Union
+from pydantic import BaseModel, TypeAdapter, parse_obj_as
 
 
 _BaseModelT = TypeVar("_BaseModelT", bound=BaseModel)
@@ -23,9 +23,14 @@ def pydantic_list_to_json(obj_list: Sequence[BaseModel]) -> str:
     return json.dumps([obj.dict(by_alias=True, exclude_none=True) for obj in obj_list])
 
 
-def json_to_pydantic(model: Type[_BaseModelT], json_str: str) -> _BaseModelT:
+def json_to_pydantic(
+    model: Union[Type[_BaseModelT], TypeAdapter[_BaseModelT]], json_str: str
+) -> _BaseModelT:
     """Parse a Pydantic object stored in the SQL database."""
-    return model.model_validate_json(json_str)
+    if isinstance(model, TypeAdapter):
+        return model.validate_json(json_str)
+    else:
+        return model.model_validate_json(json_str)
 
 
 def json_to_pydantic_list(model: Type[_BaseModelT], json_str: str) -> List[_BaseModelT]:

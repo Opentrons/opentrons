@@ -563,6 +563,8 @@ CommandCreate = Annotated[
 # See https://docs.pydantic.dev/latest/concepts/performance/#typeadapter-instantiated-once
 CommandCreateAdatper: TypeAdapter[CommandCreate] = TypeAdapter(CommandCreate)  # type: ignore[arg-type]
 
+CommandAdapter: TypeAdapter[Command] = TypeAdapter(Command)  # type: ignore[arg-type]
+
 CommandResult = Union[
     AspirateResult,
     AspirateInPlaceResult,

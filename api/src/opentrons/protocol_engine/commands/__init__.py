@@ -32,6 +32,7 @@ from .command import (
 
 from .command_unions import (
     Command,
+    CommandAdapter,
     CommandParams,
     CommandCreate,
     CommandCreateAdatper,
@@ -328,6 +329,7 @@ from .verify_tip_presence import (
 __all__ = [
     # command type unions
     "Command",
+    "CommandAdapter",
     "CommandParams",
     "CommandCreate",
     "CommandCreateAdatper",
