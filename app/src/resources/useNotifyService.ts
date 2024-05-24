@@ -10,6 +10,7 @@ import {
   useTrackEvent,
   ANALYTICS_NOTIFICATION_PORT_BLOCK_ERROR,
 } from '../redux/analytics'
+import { useFeatureFlag } from '../redux/config'
 
 import type { UseQueryOptions } from 'react-query'
 import type { HostConfig } from '@opentrons/api-client'
@@ -43,6 +44,7 @@ export function useNotifyService<TData, TError = Error>({
   const host = hostOverride ?? hostFromProvider
   const hostname = host?.hostname ?? null
   const doTrackEvent = useTrackEvent()
+  const forcePollingFF = useFeatureFlag('forceHttpPolling')
   const seenHostname = React.useRef<string | null>(null)
   const [refetch, setRefetch] = React.useState<HTTPRefetchFrequency>(null)
 
@@ -52,7 +54,8 @@ export function useNotifyService<TData, TError = Error>({
     !forceHttpPolling &&
     enabled !== false &&
     hostname != null &&
-    staleTime !== Infinity
+    staleTime !== Infinity &&
+    !forcePollingFF
 
   React.useEffect(() => {
     if (shouldUseNotifications) {
