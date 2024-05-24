@@ -19,7 +19,7 @@ export function useErrorRecoveryFlows(
   runStatus: RunStatus | null
 ): UseErrorRecoveryResult {
   const [isERActive, setIsERActive] = React.useState(false)
-  const failedCommand = useCurrentlyRecoveringFrom(runId)
+  const failedCommand = useCurrentlyRecoveringFrom(runId, runStatus)
 
   const toggleER = (): void => {
     setIsERActive(!isERActive)
