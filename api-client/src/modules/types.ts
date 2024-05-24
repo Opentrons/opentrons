@@ -3,13 +3,16 @@ import type {
   ThermocyclerModuleModel,
   MagneticModuleModel,
   HeaterShakerModuleModel,
+  AbsorbanceReaderModel,
   TEMPERATURE_MODULE_TYPE,
   MAGNETIC_MODULE_TYPE,
   THERMOCYCLER_MODULE_TYPE,
   HEATERSHAKER_MODULE_TYPE,
+  ABSORBANCE_READER_TYPE,
 } from '@opentrons/shared-data'
 
 import type * as ApiTypes from './api-types'
+import { A } from 'vitest/dist/reporters-1evA5lom'
 
 export * from './api-types'
 
@@ -44,11 +47,18 @@ export interface HeaterShakerModule extends CommonModuleInfo {
   data: ApiTypes.HeaterShakerData
 }
 
+export interface AbsorbanceReaderModule extends CommonModuleInfo {
+  moduleType: typeof ABSORBANCE_READER_TYPE
+  moduleModel: AbsorbanceReaderModel
+  data: ApiTypes.AbsorbanceReaderData
+}
+
 export type AttachedModule =
   | TemperatureModule
   | MagneticModule
   | ThermocyclerModule
   | HeaterShakerModule
+  | AbsorbanceReaderModule
 
 export interface ModulesMeta {
   cursor: number
