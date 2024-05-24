@@ -33,7 +33,7 @@ interface UseNotifyServiceResults {
   shouldRefetch: boolean
 }
 
-export function useNotifyService<TData, TError = Error>({
+export function useNotifyDataReady<TData, TError = Error>({
   topic,
   options,
   hostOverride,

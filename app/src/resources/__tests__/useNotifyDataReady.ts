@@ -4,14 +4,14 @@ import { describe, it, vi, expect, beforeEach, afterEach } from 'vitest'
 
 import { useHost } from '@opentrons/react-api-client'
 
-import { useNotifyService } from '../useNotifyService'
+import { useNotifyDataReady } from '../useNotifyDataReady'
 import { appShellListener } from '../../redux/shell/remote'
 import { useTrackEvent } from '../../redux/analytics'
 import { notifySubscribeAction } from '../../redux/shell'
 
 import type { Mock } from 'vitest'
 import type { HostConfig } from '@opentrons/api-client'
-import type { QueryOptionsWithPolling } from '../useNotifyService'
+import type { QueryOptionsWithPolling } from '../useNotifyDataReady'
 
 vi.unmock('../useNotifyService')
 vi.mock('react-redux')
@@ -48,7 +48,7 @@ describe('useNotifyService', () => {
 
   it('should trigger an HTTP refetch and subscribe action on a successful initial mount', () => {
     const { result } = renderHook(() =>
-      useNotifyService({
+      useNotifyDataReady({
         topic: MOCK_TOPIC,
         options: MOCK_OPTIONS,
       } as any)
@@ -62,7 +62,7 @@ describe('useNotifyService', () => {
 
   it('should not subscribe to notifications if forceHttpPolling is true', () => {
     const { result } = renderHook(() =>
-      useNotifyService({
+      useNotifyDataReady({
         topic: MOCK_TOPIC,
         options: { ...MOCK_OPTIONS, forceHttpPolling: true },
       } as any)
@@ -74,7 +74,7 @@ describe('useNotifyService', () => {
 
   it('should not subscribe to notifications if enabled is false', () => {
     const { result } = renderHook(() =>
-      useNotifyService({
+      useNotifyDataReady({
         topic: MOCK_TOPIC,
         options: { ...MOCK_OPTIONS, enabled: false },
       } as any)
@@ -86,7 +86,7 @@ describe('useNotifyService', () => {
 
   it('should not subscribe to notifications if staleTime is Infinity', () => {
     const { result } = renderHook(() =>
-      useNotifyService({
+      useNotifyDataReady({
         topic: MOCK_TOPIC,
         options: { ...MOCK_OPTIONS, staleTime: Infinity },
       } as any)
@@ -102,7 +102,7 @@ describe('useNotifyService', () => {
     errorSpy.mockImplementation(() => {})
 
     const { result } = renderHook(() =>
-      useNotifyService({
+      useNotifyDataReady({
         topic: MOCK_TOPIC,
         setRefetch: mockHTTPRefetch,
         options: MOCK_OPTIONS,
@@ -120,7 +120,7 @@ describe('useNotifyService', () => {
       callback('ECONNREFUSED')
     })
     const { rerender, result } = renderHook(() =>
-      useNotifyService({
+      useNotifyDataReady({
         topic: MOCK_TOPIC,
         setRefetch: mockHTTPRefetch,
         options: MOCK_OPTIONS,
@@ -139,7 +139,7 @@ describe('useNotifyService', () => {
       callback({ refetch: true })
     })
     const { rerender, result } = renderHook(() =>
-      useNotifyService({
+      useNotifyDataReady({
         topic: MOCK_TOPIC,
         setRefetch: mockHTTPRefetch,
         options: MOCK_OPTIONS,
@@ -157,7 +157,7 @@ describe('useNotifyService', () => {
       callback({ unsubscribe: true })
     })
     const { rerender, result } = renderHook(() =>
-      useNotifyService({
+      useNotifyDataReady({
         topic: MOCK_TOPIC,
         options: MOCK_OPTIONS,
       } as any)
@@ -168,7 +168,7 @@ describe('useNotifyService', () => {
 
   it('should clean up the listener on dismount', () => {
     const { unmount } = renderHook(() =>
-      useNotifyService({
+      useNotifyDataReady({
         topic: MOCK_TOPIC,
         options: MOCK_OPTIONS,
       })
@@ -179,7 +179,7 @@ describe('useNotifyService', () => {
 
   it('should still clean up the listener if the hostname changes to null after subscribing', () => {
     const { unmount, rerender } = renderHook(() =>
-      useNotifyService({
+      useNotifyDataReady({
         hostOverride: MOCK_HOST_CONFIG,
         topic: MOCK_TOPIC,
         options: MOCK_OPTIONS,

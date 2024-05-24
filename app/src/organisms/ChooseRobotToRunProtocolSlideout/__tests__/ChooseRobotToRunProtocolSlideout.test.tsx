@@ -31,7 +31,7 @@ import { storedProtocolData as storedProtocolDataFixture } from '../../../redux/
 import { useCreateRunFromProtocol } from '../useCreateRunFromProtocol'
 import { useOffsetCandidatesForAnalysis } from '../../ApplyHistoricOffsets/hooks/useOffsetCandidatesForAnalysis'
 import { ChooseRobotToRunProtocolSlideout } from '../'
-import { useNotifyService } from '../../../resources/useNotifyService'
+import { useNotifyDataReady } from '../../../resources/useNotifyDataReady'
 
 import type { State } from '../../../redux/types'
 
@@ -128,7 +128,7 @@ describe('ChooseRobotToRunProtocolSlideout', () => {
     when(vi.mocked(getNetworkInterfaces))
       .calledWith({} as State, expect.any(String))
       .thenReturn({ wifi: null, ethernet: null })
-    vi.mocked(useNotifyService).mockReturnValue({} as any)
+    vi.mocked(useNotifyDataReady).mockReturnValue({} as any)
   })
   afterEach(() => {
     vi.resetAllMocks()

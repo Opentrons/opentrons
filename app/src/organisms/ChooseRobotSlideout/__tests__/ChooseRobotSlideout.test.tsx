@@ -22,7 +22,7 @@ import {
 import { useFeatureFlag } from '../../../redux/config'
 import { getNetworkInterfaces } from '../../../redux/networking'
 import { ChooseRobotSlideout } from '..'
-import { useNotifyService } from '../../../resources/useNotifyService'
+import { useNotifyDataReady } from '../../../resources/useNotifyDataReady'
 import type { RunTimeParameter } from '@opentrons/shared-data'
 
 vi.mock('../../../redux/discovery')
@@ -111,7 +111,7 @@ describe('ChooseRobotSlideout', () => {
       wifi: null,
       ethernet: null,
     })
-    vi.mocked(useNotifyService).mockReturnValue({} as any)
+    vi.mocked(useNotifyDataReady).mockReturnValue({} as any)
   })
 
   it('renders slideout if isExpanded true', () => {
