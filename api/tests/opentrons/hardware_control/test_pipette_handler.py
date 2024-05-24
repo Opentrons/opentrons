@@ -160,9 +160,7 @@ def test_plan_check_pick_up_tip_with_presses_argument_ot3(
     increment = 1
 
     decoy.when(mock_pipette_ot3.has_tip).then_return(False)
-    decoy.when(
-        mock_pipette_ot3.get_pick_up_configuration_for_tip_count(channels)
-    ).then_return(
+    decoy.when(mock_pipette_ot3.get_pick_up_configuration()).then_return(
         CamActionPickUpTipConfiguration(
             distance=10,
             speed=5.5,

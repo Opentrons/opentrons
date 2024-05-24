@@ -747,7 +747,7 @@ class OT3PipetteHandler:
             raise UnexpectedTipAttachError("pick_up_tip", instrument.name, mount.name)
         self._ihp_log.debug(f"Picking up tip on {mount.name}")
 
-        pick_up_config = instrument.get_pick_up_configuration_for_tip_count(tip_count)
+        pick_up_config = instrument.get_pick_up_configuration()
         if not isinstance(pick_up_config, CamActionPickUpTipConfiguration):
             raise CommandPreconditionViolated(
                 f"Low-throughput pick up tip got wrong config for {instrument.name} on {mount.name}"
@@ -788,7 +788,7 @@ class OT3PipetteHandler:
             raise UnexpectedTipAttachError("pick_up_tip", instrument.name, mount.name)
         self._ihp_log.debug(f"Picking up tip on {mount.name}")
 
-        pick_up_config = instrument.get_pick_up_configuration_for_tip_count(tip_count)
+        pick_up_config = instrument.get_pick_up_configuration()
         if not isinstance(pick_up_config, PressFitPickUpTipConfiguration):
             raise CommandPreconditionViolated(
                 f"Low-throughput pick up tip got wrong config for {instrument.name} on {mount.name}"

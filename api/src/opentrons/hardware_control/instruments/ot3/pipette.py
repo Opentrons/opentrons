@@ -103,7 +103,9 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
         )
         self._nozzle_offset = self._config.nozzle_offset
         self._nozzle_manager = (
-            nozzle_manager.NozzleConfigurationManager.build_from_config(self._config)
+            nozzle_manager.NozzleConfigurationManager.build_from_config(
+                self._config, self._valid_nozzle_maps
+            )
         )
         self._current_volume = 0.0
         self._working_volume = float(self._liquid_class.max_volume)
@@ -265,7 +267,9 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
             self.get_nominal_tip_overlap_dictionary_by_configuration()
         )
         self._nozzle_manager = (
-            nozzle_manager.NozzleConfigurationManager.build_from_config(self._config)
+            nozzle_manager.NozzleConfigurationManager.build_from_config(
+                self._config, self._valid_nozzle_maps
+            )
         )
 
     def reset_pipette_offset(self, mount: OT3Mount, to_default: bool) -> None:
@@ -669,18 +673,8 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
         )
         self._working_volume = min(tip_type.value, self.liquid_class.max_volume)
 
-    def _get_matching_approved_nozzle_map(self) -> str:
-        for map_key in self._valid_nozzle_maps.maps.keys():
-            if self._valid_nozzle_maps.maps[map_key] == list(
-                self._nozzle_manager.current_configuration.map_store.keys()
-            ):
-                return map_key
-        raise ValueError(
-            "Nozzle Configuration does not match any approved map layout for the current pipette."
-        )
-
-    def get_pick_up_configuration_for_tip_count(
-        self, count: int
+    def get_pick_up_configuration(  # noqa: C901
+        self,
     ) -> Union[CamActionPickUpTipConfiguration, PressFitPickUpTipConfiguration]:
         for config in (
             self._config.pick_up_tip_configurations.press_fit,
@@ -688,112 +682,91 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
         ):
             if not config:
                 continue
-            approved_map = self._get_matching_approved_nozzle_map()
+            config_values = None
             try:
-                if isinstance(config, PressFitPickUpTipConfiguration) and all(
-                    [
-                        config.configuration_by_nozzle_map[approved_map][
-                            self._active_tip_setting_name.name
-                        ].speed,
-                        config.configuration_by_nozzle_map[approved_map][
-                            self._active_tip_setting_name.name
-                        ].distance,
-                        config.configuration_by_nozzle_map[approved_map][
-                            self._active_tip_setting_name.name
-                        ].current,
-                    ]
-                ):
-                    return config
-                elif (
-                    config.configuration_by_nozzle_map[approved_map][
-                        self._active_tip_setting_name.name
-                    ].current
-                    is not None
-                ):
-                    return config
+                config_values = config.configuration_by_nozzle_map[
+                    self._nozzle_manager.current_configuration.valid_map_key
+                ][self._active_tip_setting_name.name]
             except KeyError:
                 try:
-                    if isinstance(config, PressFitPickUpTipConfiguration) and all(
-                        [
-                            config.configuration_by_nozzle_map[approved_map]
-                            .get("default")
-                            .speed,
-                            config.configuration_by_nozzle_map[approved_map]
-                            .get("default")
-                            .distance,
-                            config.configuration_by_nozzle_map[approved_map]
-                            .get("default")
-                            .current,
-                        ]
-                    ):
-                        return config
-                    elif (
-                        config.configuration_by_nozzle_map[approved_map]
-                        .get("default")
-                        .current
-                        is not None
-                    ):
-                        return config
+                    config_values = config.configuration_by_nozzle_map[
+                        self._nozzle_manager.current_configuration.valid_map_key
+                    ].get("default")
+                    if config_values is None:
+                        raise KeyError(
+                            f"Default tip type configuration values do not exist for Nozzle Map {self._nozzle_manager.current_configuration.valid_map_key}."
+                        )
                 except KeyError:
                     # No valid key found for the approved nozzle map under this configuration - try the next
                     continue
+            if config_values is not None:
+                if isinstance(config, PressFitPickUpTipConfiguration) and all(
+                    [
+                        config_values.speed,
+                        config_values.distance,
+                        config_values.current,
+                    ]
+                ):
+                    return config
+                elif config_values.current is not None:
+                    return config
 
         raise CommandPreconditionViolated(
-            message=f"No pick up tip configuration for {count} tips",
+            message="No valid pick up tip configuration values found in instrument definition.",
         )
 
     def get_pick_up_speed_by_configuration(
         self,
         config: Union[CamActionPickUpTipConfiguration, PressFitPickUpTipConfiguration],
     ) -> float:
-        approved_map = self._get_matching_approved_nozzle_map()
-
         try:
-            return config.configuration_by_nozzle_map[approved_map][
-                self._active_tip_setting_name.name
-            ].speed
+            return config.configuration_by_nozzle_map[
+                self._nozzle_manager.current_configuration.valid_map_key
+            ][self._active_tip_setting_name.name].speed
         except KeyError:
-            default = config.configuration_by_nozzle_map[approved_map].get("default")
+            default = config.configuration_by_nozzle_map[
+                self._nozzle_manager.current_configuration.valid_map_key
+            ].get("default")
             if default is not None:
                 return default.speed
             raise KeyError(
-                f"Default tip type configuration values do not exist for Nozzle Map {approved_map}."
+                f"Default tip type configuration values do not exist for Nozzle Map {self._nozzle_manager.current_configuration.valid_map_key}."
             )
 
     def get_pick_up_distance_by_configuration(
         self,
         config: Union[CamActionPickUpTipConfiguration, PressFitPickUpTipConfiguration],
     ) -> float:
-        approved_map = self._get_matching_approved_nozzle_map()
-
         try:
-            return config.configuration_by_nozzle_map[approved_map][
-                self._active_tip_setting_name.name
-            ].distance
+            return config.configuration_by_nozzle_map[
+                self._nozzle_manager.current_configuration.valid_map_key
+            ][self._active_tip_setting_name.name].distance
         except KeyError:
-            default = config.configuration_by_nozzle_map[approved_map].get("default")
+            default = config.configuration_by_nozzle_map[
+                self._nozzle_manager.current_configuration.valid_map_key
+            ].get("default")
             if default is not None:
                 return default.distance
             raise KeyError(
-                f"Default tip type configuration values do not exist for Nozzle Map {approved_map}."
+                f"Default tip type configuration values do not exist for Nozzle Map {self._nozzle_manager.current_configuration.valid_map_key}."
             )
 
     def get_pick_up_current_by_configuration(
         self,
         config: Union[CamActionPickUpTipConfiguration, PressFitPickUpTipConfiguration],
     ) -> float:
-        approved_map = self._get_matching_approved_nozzle_map()
-
         try:
-            return config.configuration_by_nozzle_map[approved_map][
-                self._active_tip_setting_name.name
-            ].current
+            return config.configuration_by_nozzle_map[
+                self._nozzle_manager.current_configuration.valid_map_key
+            ][self._active_tip_setting_name.name].current
         except KeyError:
-            default = config.configuration_by_nozzle_map[approved_map].get("default")
+            default = config.configuration_by_nozzle_map[
+                self._nozzle_manager.current_configuration.valid_map_key
+            ].get("default")
             if default is not None:
                 return default.current
             raise KeyError(
-                f"Default tip type configuration values do not exist for Nozzle Map {approved_map}."
+                f"Default tip type configuration values do not exist for Nozzle Map {self._nozzle_manager.current_configuration.valid_map_key}."
             )
 
     def get_nominal_tip_overlap_dictionary_by_configuration(self) -> Dict[str, float]:
@@ -803,21 +776,20 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
         ):
             if not config:
                 continue
-            approved_map = self._get_matching_approved_nozzle_map()
 
             try:
-                return config.configuration_by_nozzle_map[approved_map][
-                    self._active_tip_setting_name.name
-                ].tip_overlap_dictionary
+                return config.configuration_by_nozzle_map[
+                    self._nozzle_manager.current_configuration.valid_map_key
+                ][self._active_tip_setting_name.name].tip_overlap_dictionary
             except KeyError:
                 try:
-                    default = config.configuration_by_nozzle_map[approved_map].get(
-                        "default"
-                    )
+                    default = config.configuration_by_nozzle_map[
+                        self._nozzle_manager.current_configuration.valid_map_key
+                    ].get("default")
                     if default is not None:
                         return default.tip_overlap_dictionary
                     raise KeyError(
-                        f"Default tip type configuration values do not exist for Nozzle Map {approved_map}."
+                        f"Default tip type configuration values do not exist for Nozzle Map {self._nozzle_manager.current_configuration.valid_map_key}."
                     )
                 except KeyError:
                     # No valid key found for the approved nozzle map under this configuration - try the next

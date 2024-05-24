@@ -10,7 +10,6 @@ from opentrons_shared_data.pipette import (
     pipette_definition,
 )
 
-
 from opentrons.hardware_control.dev_types import PipetteDict
 from opentrons.hardware_control.nozzle_manager import (
     NozzleConfigurationManager,
@@ -63,7 +62,15 @@ class VirtualPipetteDataProvider:
             config = self._get_virtual_pipette_full_config_by_model_string(
                 pipette_model_string
             )
-            new_nozzle_manager = NozzleConfigurationManager.build_from_config(config)
+
+            valid_nozzle_maps = load_pipette_data.load_valid_nozzle_maps(
+                config.pipette_type,
+                config.channels,
+                config.version,
+            )
+            new_nozzle_manager = NozzleConfigurationManager.build_from_config(
+                config, valid_nozzle_maps
+            )
             if back_left_nozzle and front_right_nozzle:
                 new_nozzle_manager.update_nozzle_configuration(
                     back_left_nozzle, front_right_nozzle, starting_nozzle
@@ -155,7 +162,9 @@ class VirtualPipetteDataProvider:
             pipette_model.pipette_channels,
             pipette_model.pipette_version,
         )
-        nozzle_manager = NozzleConfigurationManager.build_from_config(config)
+        nozzle_manager = NozzleConfigurationManager.build_from_config(
+            config, valid_nozzle_maps
+        )
 
         tip_overlap_dict_for_tip_type = None
         for configuration in (
@@ -179,15 +188,15 @@ class VirtualPipetteDataProvider:
             if configuration is not None:
                 try:
                     tip_overlap_dict_for_tip_type = (
-                        configuration.configuration_by_nozzle_map[approved_map][
-                            tip_type.name
-                        ].tip_overlap_dictionary
+                        configuration.configuration_by_nozzle_map[
+                            nozzle_manager.current_configuration.valid_map_key
+                        ][tip_type.name].tip_overlap_dictionary
                     )
                     break
                 except KeyError:
                     try:
                         default = configuration.configuration_by_nozzle_map[
-                            approved_map
+                            nozzle_manager.current_configuration.valid_map_key
                         ].get("default")
                         if default is not None:
                             tip_overlap_dict_for_tip_type = (
