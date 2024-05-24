@@ -457,7 +457,8 @@ def run(
                 # )
                 results.append(float(threshold_z_pos))
             else:
-                print("No threshold found")
+                print("No threshold found {algorithm.name()}")
+                results.append(sys.float_info.max)
         print(
             f"{algorithm.name()}, expected {expected_height} max {max(results)} min{min(results)}, avg {sum(results)/len(results)}"
         )
