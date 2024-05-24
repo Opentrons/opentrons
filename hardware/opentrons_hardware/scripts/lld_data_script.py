@@ -2,6 +2,7 @@
 import csv
 import os
 import argparse
+import sys
 from typing import List, Optional, Tuple, Any, Dict
 import matplotlib.pyplot as plot
 import numpy
@@ -271,7 +272,8 @@ class LLDEMAD(LLDAlgoABC):
 
     def reset(self) -> None:
         """Reset simulator between runs."""
-        self.current_average_emad = impossible_pressure
+        self.current_average_emad_p = impossible_pressure
+        self.current_average_emad_s = impossible_pressure
 
     @staticmethod
     def _tick_one_sensor(
@@ -289,16 +291,22 @@ class LLDEMAD(LLDAlgoABC):
 
     def tick(self, pressures: Tuple[float, float]) -> Tuple[bool, Tuple[float, float]]:
         """Simulate firmware motor interrupt tick."""
+        prev_avg_p = self.current_average_emad_p
+        prev_avg_s = self.current_average_emad_s
         self.current_average_emad_p, der_p = LLDEMAD._tick_one_sensor(
             pressures[0], self.current_average_emad_p, self.smoothing_factor
         )
         self.current_average_emad_s, der_s = LLDEMAD._tick_one_sensor(
             pressures[1], self.current_average_emad_s, self.smoothing_factor
         )
+        if prev_avg_p is impossible_pressure or prev_avg_s is impossible_pressure:
+            ret_avg = (impossible_pressure, impossible_pressure)
+        else:
+            ret_avg = (self.current_average_emad_p, self.current_average_emad_s)
         return (
             abs(der_p) > self.derivative_threshold_emad
             or abs(der_s) > self.derivative_threshold_emad,
-            (self.current_average_emad_p, self.current_average_emad_s),
+            ret_avg,
         )
 
 
