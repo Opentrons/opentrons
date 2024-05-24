@@ -314,6 +314,7 @@ class ModuleModel(str, Enum):
     THERMOCYCLER_MODULE_V2 = "thermocyclerModuleV2"
     HEATER_SHAKER_MODULE_V1 = "heaterShakerModuleV1"
     MAGNETIC_BLOCK_V1 = "magneticBlockV1"
+    ABSORBANCE_READER_V1 = "absorbanceReaderV1"
 
     def as_type(self) -> ModuleType:
         """Get the ModuleType of this model."""
@@ -327,6 +328,8 @@ class ModuleModel(str, Enum):
             return ModuleType.HEATER_SHAKER
         elif ModuleModel.is_magnetic_block(self):
             return ModuleType.MAGNETIC_BLOCK
+        elif ModuleModel.is_absorbance_reader(self):
+            return ModuleType.ABSORBANCE_READER
 
         assert False, f"Invalid ModuleModel {self}"
 
@@ -363,6 +366,13 @@ class ModuleModel(str, Enum):
         """Whether a given model is a Magnetic block."""
         return model == cls.MAGNETIC_BLOCK_V1
 
+    @classmethod
+    def is_absorbance_reader(
+        cls, model: ModuleModel
+    ) -> TypeGuard[AbsorbanceReaderModel]:
+        """Whether a given model is a Magnetic block."""
+        return model == cls.ABSORBANCE_READER_V1
+
 
 TemperatureModuleModel = Literal[
     ModuleModel.TEMPERATURE_MODULE_V1, ModuleModel.TEMPERATURE_MODULE_V2
@@ -375,6 +385,7 @@ ThermocyclerModuleModel = Literal[
 ]
 HeaterShakerModuleModel = Literal[ModuleModel.HEATER_SHAKER_MODULE_V1]
 MagneticBlockModel = Literal[ModuleModel.MAGNETIC_BLOCK_V1]
+AbsorbanceReaderModel = Literal[ModuleModel.ABSORBANCE_READER_V1]
 
 
 class ModuleDimensions(BaseModel):
@@ -729,6 +740,7 @@ class AreaType(Enum):
     HEATER_SHAKER = "heaterShaker"
     TEMPERATURE = "temperatureModule"
     MAGNETICBLOCK = "magneticBlock"
+    ABSORBANCE_READER = "absorbanceReader"
 
 
 @dataclass(frozen=True)
