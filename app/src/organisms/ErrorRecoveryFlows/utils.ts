@@ -43,7 +43,7 @@ export function useCurrentlyRecoveringFrom(
   const { data: commandQueryData } = useCommandQuery(
     currentlyRecoveringFromLink?.meta.runId ?? null,
     currentlyRecoveringFromLink?.meta.commandId ?? null,
-    { enabled: currentlyRecoveringFromLink != null, staleTime: Infinity }
+    { enabled: currentlyRecoveringFromLink != null }
   )
 
   return commandQueryData?.data ?? null
