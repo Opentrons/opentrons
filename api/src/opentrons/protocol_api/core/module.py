@@ -343,3 +343,21 @@ class AbstractMagneticBlockCore(AbstractModuleCore):
     """Core control interface for an attached Magnetic Block."""
 
     MODULE_TYPE: ClassVar = ModuleType.MAGNETIC_BLOCK
+
+
+class AbstractAbsorbanceReaderCore(AbstractModuleCore):
+    """Core control interface for an attached Absorbance Reader Module."""
+
+    MODULE_TYPE: ClassVar = ModuleType.ABSORBANCE_READER
+
+    @abstractmethod
+    def get_serial_number(self) -> str:
+        """Get the module's unique hardware serial number."""
+
+    @abstractmethod
+    def initialize(self, wavelength: int) -> None:
+        """Initialize the Absorbance Reader by taking zero reading."""
+
+    @abstractmethod
+    def initiate_read(self) -> None:
+        """Initiate read on the Absorbance Reader."""
