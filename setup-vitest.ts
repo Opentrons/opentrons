@@ -7,11 +7,11 @@ vi.mock('electron-store')
 vi.mock('electron-updater')
 vi.mock('electron')
 vi.mock('./app/src/redux/shell/remote')
-vi.mock('./app/src/resources/useNotifyService', async () => {
-  const actual = await vi.importActual('./app/src/resources/useNotifyService')
+vi.mock('./app/src/resources/useNotifyDataReady', async () => {
+  const actual = await vi.importActual('./app/src/resources/useNotifyDataReady')
   return {
     ...actual,
-    useNotifyService: () => ({
+    useNotifyDataReady: () => ({
       notifyOnSettled: vi.fn(),
       isNotifyEnabled: true,
     }),

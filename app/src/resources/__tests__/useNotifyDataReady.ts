@@ -15,7 +15,7 @@ import type { Mock } from 'vitest'
 import type { HostConfig } from '@opentrons/api-client'
 import type { QueryOptionsWithPolling } from '../useNotifyDataReady'
 
-vi.unmock('../useNotifyService')
+vi.unmock('../useNotifyDataReady')
 vi.mock('react-redux')
 vi.mock('@opentrons/react-api-client')
 vi.mock('../../redux/analytics')
@@ -30,7 +30,7 @@ const MOCK_OPTIONS: QueryOptionsWithPolling<any, any> = {
   forceHttpPolling: false,
 }
 
-describe('useNotifyService', () => {
+describe('useNotifyDataReady', () => {
   let mockDispatch: Mock
   let mockTrackEvent: Mock
   let mockHTTPRefetch: Mock
@@ -204,13 +204,13 @@ describe('useNotifyService', () => {
       .thenReturn(true)
 
     const { result } = renderHook(() =>
-      useNotifyService({
+      useNotifyDataReady({
         topic: MOCK_TOPIC,
         options: MOCK_OPTIONS,
       } as any)
     )
 
-    expect(result.current.isNotifyEnabled).toEqual(true)
+    expect(result.current.shouldRefetch).toEqual(true)
     expect(appShellListener).not.toHaveBeenCalled()
   })
 })

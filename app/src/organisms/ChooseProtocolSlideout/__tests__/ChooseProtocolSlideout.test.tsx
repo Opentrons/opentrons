@@ -23,7 +23,7 @@ vi.mock('../../ChooseRobotToRunProtocolSlideout/useCreateRunFromProtocol')
 vi.mock('../../../redux/protocol-storage')
 vi.mock('../../../organisms/Devices/hooks')
 vi.mock('../../../redux/config')
-vi.mock('../../../resources/useNotifyService')
+vi.mock('../../../resources/useNotifyDataReady')
 
 const render = (props: React.ComponentProps<typeof ChooseProtocolSlideout>) => {
   return renderWithProviders(

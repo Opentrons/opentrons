@@ -44,7 +44,7 @@ vi.mock('../../../redux/networking')
 vi.mock('../../../redux/config')
 vi.mock('../useCreateRunFromProtocol')
 vi.mock('../../ApplyHistoricOffsets/hooks/useOffsetCandidatesForAnalysis')
-vi.mock('../../../resources/useNotifyService')
+vi.mock('../../../resources/useNotifyDataReady')
 vi.mock('../../../redux/config')
 
 const render = (

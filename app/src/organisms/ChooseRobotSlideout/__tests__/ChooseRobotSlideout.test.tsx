@@ -28,7 +28,7 @@ import type { RunTimeParameter } from '@opentrons/shared-data'
 vi.mock('../../../redux/discovery')
 vi.mock('../../../redux/robot-update')
 vi.mock('../../../redux/networking')
-vi.mock('../../../resources/useNotifyService')
+vi.mock('../../../resources/useNotifyDataReady')
 vi.mock('../../../redux/config')
 const render = (props: React.ComponentProps<typeof ChooseRobotSlideout>) => {
   return renderWithProviders(
