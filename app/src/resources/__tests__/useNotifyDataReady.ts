@@ -1,6 +1,7 @@
 import { useDispatch } from 'react-redux'
 import { renderHook } from '@testing-library/react'
 import { describe, it, vi, expect, beforeEach, afterEach } from 'vitest'
+import { when } from 'vitest-when'
 
 import { useHost } from '@opentrons/react-api-client'
 
@@ -8,6 +9,7 @@ import { useNotifyDataReady } from '../useNotifyDataReady'
 import { appShellListener } from '../../redux/shell/remote'
 import { useTrackEvent } from '../../redux/analytics'
 import { notifySubscribeAction } from '../../redux/shell'
+import { useFeatureFlag } from '../../redux/config'
 
 import type { Mock } from 'vitest'
 import type { HostConfig } from '@opentrons/api-client'
@@ -17,6 +19,7 @@ vi.unmock('../useNotifyService')
 vi.mock('react-redux')
 vi.mock('@opentrons/react-api-client')
 vi.mock('../../redux/analytics')
+vi.mock('../../redux/config')
 vi.mock('../../redux/shell/remote', () => ({
   appShellListener: vi.fn(),
 }))
@@ -39,6 +42,9 @@ describe('useNotifyService', () => {
     vi.mocked(useDispatch).mockReturnValue(mockDispatch)
     vi.mocked(useHost).mockReturnValue(MOCK_HOST_CONFIG)
     vi.mocked(appShellListener).mockClear()
+    when(vi.mocked(useFeatureFlag))
+      .calledWith('forceHttpPolling')
+      .thenReturn(false)
   })
 
   afterEach(() => {
@@ -190,5 +196,21 @@ describe('useNotifyService', () => {
     expect(appShellListener).toHaveBeenCalledWith(
       expect.objectContaining({ hostname: MOCK_HOST_CONFIG.hostname })
     )
+  })
+
+  it('should not utilize notifications if the feature flag is set to true', () => {
+    when(vi.mocked(useFeatureFlag))
+      .calledWith('forceHttpPolling')
+      .thenReturn(true)
+
+    const { result } = renderHook(() =>
+      useNotifyService({
+        topic: MOCK_TOPIC,
+        options: MOCK_OPTIONS,
+      } as any)
+    )
+
+    expect(result.current.isNotifyEnabled).toEqual(true)
+    expect(appShellListener).not.toHaveBeenCalled()
   })
 })
