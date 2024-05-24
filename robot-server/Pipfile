@@ -36,7 +36,6 @@ sqlalchemy2-stubs = "==0.0.2a21"
 # limited by tavern
 python-box = "==6.1.0"
 types-paho-mqtt = "==1.6.0.20240106"
-performance-metrics = {file = "../performance-metrics", editable = true}
 pyusb = "==1.2.1"
 
 [packages]
@@ -60,5 +59,6 @@ opentrons-hardware = {editable = true, path='../hardware', extras=['FLEX']}
 opentrons = { editable = true, path = "../api"}
 opentrons-shared-data = { editable = true, path = "../shared-data/python" }
 server-utils = {editable = true, path = "./../server-utils"}
+performance-metrics = {file = "../performance-metrics", editable = true}
 robot-server = { editable = true, path = "."}
 pydantic-settings = "==2.2.1"
