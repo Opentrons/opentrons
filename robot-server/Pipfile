@@ -42,7 +42,7 @@ pyusb = "==1.2.1"
 [packages]
 anyio = "==3.7.1"
 aiohttp = "==3.8.1"
-fastapi = "==0.110.1"
+fastapi = "==0.100.0"
 python-dotenv = "==1.0.1"
 python-multipart = "==0.0.6"
 pydantic = "==2.6.4"
