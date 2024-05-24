@@ -22,6 +22,7 @@ interface LargeButtonProps extends StyleProps {
   buttonType?: LargeButtonTypes
   buttonText: React.ReactNode
   iconName?: IconName
+  iconColorOverride?: string
   subtext?: string
   disabled?: boolean
 }
@@ -31,6 +32,7 @@ export function LargeButton(props: LargeButtonProps): JSX.Element {
     buttonType = 'primary',
     buttonText,
     iconName,
+    iconColorOverride,
     subtext,
     disabled = false,
     ...buttonProps
@@ -130,7 +132,8 @@ export function LargeButton(props: LargeButtonProps): JSX.Element {
           color={
             disabled
               ? COLORS.grey50
-              : LARGE_BUTTON_PROPS_BY_TYPE[buttonType].iconColor
+              : iconColorOverride ??
+                LARGE_BUTTON_PROPS_BY_TYPE[buttonType].iconColor
           }
           size="5rem"
         />

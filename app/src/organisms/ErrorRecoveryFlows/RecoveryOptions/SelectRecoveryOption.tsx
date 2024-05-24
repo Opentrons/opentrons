@@ -57,9 +57,6 @@ export function SelectRecoveryOption({
           primaryBtnOnClick={() =>
             proceedToRoute(selectedRoute as RecoveryRoute)
           }
-          secondaryBtnOnClick={() =>
-            proceedToRoute(RECOVERY_MAP.BEFORE_BEGINNING.ROUTE)
-          }
         />
       </Flex>
     )
@@ -83,8 +80,8 @@ export function RecoveryOptions({
   return validRecoveryOptions.map((recoveryOption: RecoveryRoute) => {
     const buildOptionName = (): string => {
       switch (recoveryOption) {
-        case RECOVERY_MAP.RESUME.ROUTE:
-          return t('resume')
+        case RECOVERY_MAP.RETRY_FAILED_COMMAND.ROUTE:
+          return t('retry_step')
         case RECOVERY_MAP.CANCEL_RUN.ROUTE:
           return t('cancel_run')
         default:
@@ -113,6 +110,6 @@ export function getRecoveryOptions(errorKind: ErrorKind): RecoveryRoute[] {
 }
 
 export const GENERAL_ERROR_OPTIONS: RecoveryRoute[] = [
-  RECOVERY_MAP.RESUME.ROUTE,
+  RECOVERY_MAP.RETRY_FAILED_COMMAND.ROUTE,
   RECOVERY_MAP.CANCEL_RUN.ROUTE,
 ]
