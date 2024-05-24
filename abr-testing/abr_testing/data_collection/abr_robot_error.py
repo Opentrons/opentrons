@@ -201,7 +201,9 @@ if __name__ == "__main__":
         headers,
         runs_and_lpc,
         headers_lpc,
-    ) = abr_google_drive.create_data_dictionary(run_id, error_folder_path, issue_url)
+    ) = abr_google_drive.create_data_dictionary(
+        run_id, error_folder_path, issue_url, "", ""
+    )
 
     start_row = google_sheet.get_index_row() + 1
     google_sheet.batch_update_cells(runs_and_robots, "A", start_row, "0")

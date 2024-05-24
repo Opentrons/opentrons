@@ -1377,7 +1377,6 @@ async def _test_liquid_probe(
             probe_settings = LiquidProbeSettings(
                 starting_mount_height=start_pos.z,
                 max_z_distance=max_z_distance_machine_coords,  # FIXME: deck coords
-                min_z_distance=0,  # FIXME: remove
                 mount_speed=probe_cfg.mount_speed,
                 plunger_speed=probe_cfg.plunger_speed,
                 sensor_threshold_pascals=probe_cfg.sensor_threshold_pascals,

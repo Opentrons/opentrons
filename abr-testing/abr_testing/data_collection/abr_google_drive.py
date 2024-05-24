@@ -32,6 +32,8 @@ def create_data_dictionary(
     runs_to_save: Union[Set[str], str],
     storage_directory: str,
     issue_url: str,
+    plate: str,
+    accuracy: Any,
 ) -> Tuple[List[List[Any]], List[str], List[List[Any]], List[str]]:
     """Pull data from run files and format into a dictionary."""
     runs_and_robots: List[Any] = []
@@ -109,6 +111,10 @@ def create_data_dictionary(
                 hs_dict = read_robot_logs.hs_commands(file_results)
                 tm_dict = read_robot_logs.temperature_module_commands(file_results)
                 notes = {"Note1": "", "Jira Link": issue_url}
+                plate_measure = {
+                    "Plate Measured": plate,
+                    "End Volume Accuracy (%)": accuracy,
+                }
                 row_for_lpc = {**row, **all_modules, **notes}
                 row_2 = {
                     **row,
@@ -117,6 +123,7 @@ def create_data_dictionary(
                     **hs_dict,
                     **tm_dict,
                     **tc_dict,
+                    **plate_measure,
                 }
                 headers: List[str] = list(row_2.keys())
                 # runs_and_robots[run_id] = row_2
@@ -191,7 +198,7 @@ if __name__ == "__main__":
         headers,
         transposed_runs_and_lpc,
         headers_lpc,
-    ) = create_data_dictionary(missing_runs_from_gs, storage_directory, "")
+    ) = create_data_dictionary(missing_runs_from_gs, storage_directory, "", "", "")
 
     start_row = google_sheet.get_index_row() + 1
     google_sheet.batch_update_cells(transposed_runs_and_robots, "A", start_row, "0")
