@@ -29,17 +29,17 @@ def test_attributes_as_item_model_empty_dict():
     assert e.value.errors() == [
         {
             "loc": ("data", "name"),
-            "msg": "field required",
+            "msg": "Field required",
             "type": "value_error.missing",
         },
         {
             "loc": ("data", "quantity"),
-            "msg": "field required",
+            "msg": "Field required",
             "type": "value_error.missing",
         },
         {
             "loc": ("data", "price"),
-            "msg": "field required",
+            "msg": "Field required",
             "type": "value_error.missing",
         },
     ]

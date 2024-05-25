@@ -27,5 +27,5 @@ def test_must_be_self_key_with_string_value():
     with raises(ValidationError) as e:
         ThingWithLink.model_validate(invalid_structure_to_validate)
     assert e.value.errors() == [
-        {"loc": ("links",), "msg": "field required", "type": "value_error.missing"}
+        {"loc": ("links",), "msg": "Field required", "type": "value_error.missing"}
     ]
