@@ -323,12 +323,15 @@ async def _main(is_simulating: bool, trials: int, continue_after_stall: bool) ->
 
         
         if len(PASS_PRINT_LIST) > 0:
-            ui.print_title("电流测试不通过(CURRENT SPEED TESTING FAIL)")
-            printlist = list(set(PASS_PRINT_LIST))
-            for printval in printlist:
-                print(" - ",printval)
+            # ui.print_title("电流测试不通过(CURRENT SPEED TESTING FAIL)")
+            # printlist = list(set(PASS_PRINT_LIST))
+            # for printval in printlist:
+            #     print(" - ",printval)
+
+            ui.print_results(set(PASS_PRINT_LIST),False)
         else:
-            ui.print_title("电流测试通过(CURRENT SPEED TESTING PASS)")
+            ui.print_test_results("电流测试通过(CURRENT SPEED TESTING PASS)",True)
+            #ui.print_title("电流测试通过(CURRENT SPEED TESTING PASS)")
 
         if api.is_simulator:
             break

@@ -1308,7 +1308,7 @@ async def _jog_for_tip_state(
             print(f"found {tip_state.name} displacement: {current_z} ({passed})")
 
             if not passed:
-                printsig = f"06-02:状态{tip_state.name}移动值为{current_z})结果为{passed}阈值为{min(criteria)} ~ {max(criteria)}"
+                printsig = f"06-02:状态{tip_state.name}移动值为{current_z}结果为{passed}阈值为{min(criteria)} ~ {max(criteria)}"
                 ui.print_fail(printsig)
                 FINAL_TEST_FAIL_INFOR.append(printsig)
             return passed
@@ -1951,13 +1951,16 @@ async def _main(test_config: TestConfig) -> None:  # noqa: C901
         await api.move_to(OT3Mount.RIGHT, attach_pos._replace(z=current_pos.z))
 
     setflag = 0
+    sensor_err = []
     if len(FINAL_TEST_FAIL_INFOR) > 0:
         for errval in FINAL_TEST_FAIL_INFOR:
             if "07-" in FINAL_TEST_FAIL_INFOR:
-                ui.print_test_results(errval)
+                sensor_err.append(errval)
                 setflag = 1
         if setflag == 0:
             ui.print_results(FINAL_TEST_FAIL_INFOR,False)
+        elif setflag == 1:
+            ui.print_results(sensor_err,False)
     else:
         ui.print_results(FINAL_TEST_FAIL_INFOR,True)
     print("done")
