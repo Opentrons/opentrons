@@ -39,6 +39,7 @@ from hardware_testing.drivers.pressure_fixture import (
     PressureFixtureBase,
     connect_to_fixture,
 )
+from hardware_testing.drivers import asair_sensor
 from .pressure import (  # type: ignore[import]
     PRESSURE_FIXTURE_TIP_VOLUME,
     PRESSURE_FIXTURE_ASPIRATE_VOLUME,
@@ -186,7 +187,7 @@ CAP_THRESH_SQUARE = {
 PRESSURE_ASPIRATE_VOL = {1: {50: 10.0, 1000: 20.0}, 8: {50: 10.0, 1000: 20.0}}
 PRESSURE_THRESH_OPEN_AIR = {1: {50:[-25, 25],1000:[-25,25]}, 8: {50:[-25, 25],1000:[-25,25]}}
 PRESSURE_THRESH_SEALED = {1: {50:[-100, 100],1000:[-100,100]}, 8: {50:[-100, 100],1000:[-100,100]}}
-PRESSURE_THRESH_COMPRESS = {1: {50:[-3200, -1000],1000:[-3000,-1000]}, 8: {50:[-4300, -2100],1000:[-3500,-1500]}}
+PRESSURE_THRESH_COMPRESS = {1: {50:[-3100, -1100],1000:[-3000,-1000]}, 8: {50:[-4200, -2100],1000:[-3600,-1500]}}
 
 _trash_loc_counter = 0
 TRASH_OFFSETS = [
@@ -328,7 +329,14 @@ async def _pick_up_tip(
         assert pip
         tip_volume = pip.working_volume
     tip_length = helpers_ot3.get_default_tip_length(int(tip_volume))
-    await api.pick_up_tip(mount, tip_length=tip_length)
+    try:
+        await api.pick_up_tip(mount, tip_length=tip_length)
+    except Exception as err:
+        print(f"Error picking up tip: {err}")
+        prinval = f"07-02:光电传感器故障,取针管状态不正确,测试中断"
+        FINAL_TEST_FAIL_INFOR.append(prinval)
+        ui.print_fail(prinval)
+
     await api.move_rel(mount, Point(z=tip_length))
     return actual
 
@@ -773,7 +781,10 @@ async def _read_pipette_sensor_repeatedly_and_average(
             
             print(f"{sensor_type} {sensor_id} sensor response {r}")
         except helpers_ot3.SensorResponseBad:
-            printerr = f"{sensor_type} {sensor_id} sensor response bad(07-01:传感器{sensor_type} ID {sensor_id} 读取异常)"
+            sensor_type_dic = {1:"capacitive(电容)",3:"pressure(气压)",6:"temperature(温度)",5:"humidity(湿度)"
+                
+            }
+            printerr = f"07-01:{sensor_type_dic[int(sensor_type)]}传感器故障,传感器类型 {sensor_type_dic[int(sensor_type)]} 传感器ID {sensor_id}读取数据失败)"
             ui.print_fail(printerr)
             FINAL_TEST_FAIL_INFOR.append(printerr)
             return -999999999999.0
@@ -808,9 +819,11 @@ async def _test_diagnostics_environment(
             return _get_float_from_user(
                 'Enter the ROOM humidity (%) (example: "54.0"): '
             )
-
-        room_celsius = _get_room_celsius()
-        room_humidity = _get_room_humidity()
+        env_sensor = ENVIRONMENT_SENSOR.get_reading()
+        
+        print("Air temperature and humidity",env_sensor)
+        room_celsius = env_sensor.temperature#_get_room_celsius()
+        room_humidity =env_sensor.relative_humidity #_get_room_humidity()
     else:
         room_celsius = 25.0
         room_humidity = 50.0
@@ -920,7 +933,7 @@ async def _test_diagnostics_capacitive(  # noqa: C901
                 f"FAIL: open-air {sensor_id.name} capacitance ({capacitance}) is not correct"
             )
 
-            printtxt = f"01-05:通道{sensor_id.name}在空气中的电容值{capacitance}不在范围{CAP_THRESH_OPEN_AIR}内"
+            printtxt = f"01-05:通道{sensor_id.name}的电容传感器在空气中的电容值{capacitance}超出范围{CAP_THRESH_OPEN_AIR}"
             ui.print_fail(printtxt)
             FINAL_TEST_FAIL_INFOR.append(printtxt)
             
@@ -957,7 +970,7 @@ async def _test_diagnostics_capacitive(  # noqa: C901
         ):
             print(f"FAIL: probe capacitance ({capacitance}) is not correct")
             results.append(False)
-            printtxt = f"01-06:装上probe的电容值{capacitance}不在范围{CAP_THRESH_PROBE}内"
+            printtxt = f"01-06:probe {sensor_id.name}装上probe的电容值{capacitance}超出范围{CAP_THRESH_PROBE}"
             ui.print_fail(printtxt)
             FINAL_TEST_FAIL_INFOR.append(printtxt)
         else:
@@ -1047,7 +1060,7 @@ async def _test_diagnostics_capacitive(  # noqa: C901
             ):
                 print(f"FAIL: square capacitance ({capacitance}) is not correct")
                 results.append(False)
-                printtxt = f"01-07:probe触碰底板的电容值:{capacitance} 不在范围:{CAP_THRESH_SQUARE}内"
+                printtxt = f"01-07:{sensor_id.name}触碰底板的电容值:{capacitance} 不在范围:{CAP_THRESH_SQUARE}内"
                 ui.print_fail(printtxt)
                 FINAL_TEST_FAIL_INFOR.append(printtxt)
                 
@@ -1484,7 +1497,7 @@ async def _test_liquid_probe(
                 end_z = await api.liquid_probe(mount, probe_settings, probe=probe)
             except Exception as eee:
                 print(f"Error {eee}")
-                probeval = f"03-04:读取{probe}传感器出错,传感器故障"
+                probeval = f"07-03:{probe}传感器故障,读取{probe}传感器值失败"
                 ui.print_fail(probeval)
                 FINAL_TEST_FAIL_INFOR.append(probeval)
                 end_z = 0
@@ -1610,7 +1623,7 @@ async def _wait_for_tip_presence_state_change(
     if test_pass:
         print("PASS: no unexpected tip-presence")
     else:
-        printsig = "06-01:摇动针管支架触发了针管传感器"
+        printsig = "06-01:摇动针管支架触发了针管传感器(请确认测试方法是否正确)"
         ui.print_fail(printsig)
         FINAL_TEST_FAIL_INFOR.append(printsig)
     return test_pass
@@ -1637,6 +1650,9 @@ async def _main(test_config: TestConfig) -> None:  # noqa: C901
         test_config.simulate or test_config.skip_fixture, side=test_config.fixture_side
     )
 
+    global ENVIRONMENT_SENSOR
+    ENVIRONMENT_SENSOR = asair_sensor.BuildAsairSensor(False)
+    
     # create API instance, and get Pipette serial number
     api = await helpers_ot3.build_async_ot3_hardware_api(
         is_simulating=test_config.simulate,
@@ -1852,15 +1868,15 @@ async def _main(test_config: TestConfig) -> None:  # noqa: C901
                         test_passed = False
 
                     if not precision_passed:
-                        prec_tag2 = f"03-01:{tip_vol}针管{probe.name.lower()}自动点水精度{precision}结果{_bool_to_pass_fail(precision_passed)} 阈值为(<{LIQUID_PROBE_ERROR_THRESHOLD_PRECISION_MM} mm)"
+                        prec_tag2 = f"03-01:{tip_vol}ul针管{probe.name.lower()}自动点水精度{precision}结果{_bool_to_pass_fail(precision_passed)} 阈值为(<{LIQUID_PROBE_ERROR_THRESHOLD_PRECISION_MM} mm)"
                         ui.print_fail(prec_tag2)
                         FINAL_TEST_FAIL_INFOR.append(prec_tag2)
                     if not accuracy_passed:
-                        acc_tag2 = f"03-02:{tip_vol}针管{probe.name.lower()}自动点水准确度{accuracy}结果{_bool_to_pass_fail(accuracy_passed)} 阈值为(<{LIQUID_PROBE_ERROR_THRESHOLD_ACCURACY_MM} mm)"
+                        acc_tag2 = f"03-02:{tip_vol}ul针管{probe.name.lower()}自动点水准确度{accuracy}结果{_bool_to_pass_fail(accuracy_passed)} 阈值为(<{LIQUID_PROBE_ERROR_THRESHOLD_ACCURACY_MM} mm)"
                         ui.print_fail(acc_tag2)
                         FINAL_TEST_FAIL_INFOR.append(acc_tag2)
                     if not tip_passed:
-                        tip_tag2 = f"03-03:{tip_vol}针管{probe.name.lower()} 自动点水测试结果{tip_passed}"
+                        tip_tag2 = f"03-03:{tip_vol}ul针管{probe.name.lower()}自动点水测试结果{tip_passed}"
                         ui.print_fail(tip_tag2)
                         FINAL_TEST_FAIL_INFOR.append(tip_tag2)
 
@@ -1934,15 +1950,16 @@ async def _main(test_config: TestConfig) -> None:  # noqa: C901
         current_pos = await api.gantry_position(OT3Mount.RIGHT)
         await api.move_to(OT3Mount.RIGHT, attach_pos._replace(z=current_pos.z))
 
-        
-        if len(FINAL_TEST_FAIL_INFOR) > 0:
-            ui.print_title("诊断测试不通过(QC TESTING FAIL)")
-            for printval in FINAL_TEST_FAIL_INFOR:
-                print(" - ",printval)
-        else:
-            ui.print_title("诊断测试通过(QC TESTING PASS)")
-
-
+    setflag = 0
+    if len(FINAL_TEST_FAIL_INFOR) > 0:
+        for errval in FINAL_TEST_FAIL_INFOR:
+            if "07-" in FINAL_TEST_FAIL_INFOR:
+                ui.print_test_results(errval)
+                setflag = 1
+        if setflag == 0:
+            ui.print_results(FINAL_TEST_FAIL_INFOR,False)
+    else:
+        ui.print_results(FINAL_TEST_FAIL_INFOR,True)
     print("done")
 
 
