@@ -187,7 +187,7 @@ CAP_THRESH_SQUARE = {
 PRESSURE_ASPIRATE_VOL = {1: {50: 10.0, 1000: 20.0}, 8: {50: 10.0, 1000: 20.0}}
 PRESSURE_THRESH_OPEN_AIR = {1: {50:[-25, 25],1000:[-25,25]}, 8: {50:[-25, 25],1000:[-25,25]}}
 PRESSURE_THRESH_SEALED = {1: {50:[-100, 100],1000:[-100,100]}, 8: {50:[-100, 100],1000:[-100,100]}}
-PRESSURE_THRESH_COMPRESS = {1: {50:[-3100, -1100],1000:[-3000,-1000]}, 8: {50:[-4200, -2100],1000:[-3600,-1500]}}
+PRESSURE_THRESH_COMPRESS = {1: {50:[-3100, -1100],1000:[-1500,-500]}, 8: {50:[-4200, -2100],1000:[-3600,-1500]}}
 
 _trash_loc_counter = 0
 TRASH_OFFSETS = [
@@ -1105,11 +1105,13 @@ async def _test_diagnostics_pressure(
 
     
     global CHTYPE_PIPPETE 
+    movez = -100
     if "p50" in pipptype[OT3Mount.LEFT]['name']:
-        
         CHTYPE_PIPPETE = 50
+        movez = -155.5
     elif "p1000" in pipptype[OT3Mount.LEFT]['name']:
         CHTYPE_PIPPETE = 1000
+        movez = -117.86
     
     
 
@@ -1153,12 +1155,12 @@ async def _test_diagnostics_pressure(
         slot_5_pos = helpers_ot3.get_slot_calibration_square_position_ot3(11)
         current_pos = await api.gantry_position(mount)
         await api.move_to(mount, slot_5_pos._replace(z=current_pos.z))
-        await api.move_rel(mount, Point(z=-155.46))
+        await api.move_rel(mount, Point(z=movez))
     elif "multi" in pipptype[OT3Mount.LEFT]['name']:
         slot_5_pos = helpers_ot3.get_slot_calibration_square_position_ot3(11)
         current_pos = await api.gantry_position(mount)
         await api.move_to(mount, slot_5_pos._replace(y=slot_5_pos.y+29,z=current_pos.z))
-        await api.move_rel(mount, Point(z=-155.8))
+        await api.move_rel(mount, Point(z=movez))
     await asyncio.sleep(0.2)
     for sensor_id in sensor_ids:
         pressure = await _read_pressure(sensor_id)
