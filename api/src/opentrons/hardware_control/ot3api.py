@@ -1796,12 +1796,14 @@ class OT3API(
         self._gripper_handler.check_ready_for_jaw_move("hold_jaw_width")
         await self._hold_jaw_width(jaw_width_mm)
 
-    async def execute_pick_up_tip(
+    async def tip_pickup_moves(
         self,
         mount: OT3Mount,
         presses: Optional[int] = None,
         increment: Optional[float] = None,
     ) -> None:
+        """This is a slightly more barebones variation of pick_up_tip. This is only the motor routine
+        directly involved in tip pickup, and leaves any state updates and plunger moves to the caller."""
         realmount = OT3Mount.from_mount(mount)
         instrument = self._pipette_handler.get_pipette(realmount)
         if (
@@ -2204,7 +2206,7 @@ class OT3API(
 
         await self._move_to_plunger_bottom(realmount, rate=1.0)
 
-        await self.execute_pick_up_tip(realmount, presses, increment)
+        await self.tip_pickup_moves(realmount, presses, increment)
 
         add_tip_to_instr()
 

@@ -651,9 +651,9 @@ async def test_pickup_moves(
         mock_move_to_plunger_bottom.reset_mock()
         mock_move_rel.reset_mock()
 
-        #  make sure that execute_pick_up_tip has the same set of moves,
+        #  make sure that tip_pickup_moves has the same set of moves,
         #  except no calls to move_to_plunger_bottom
-        await ot3_hardware.execute_pick_up_tip(Mount.LEFT, 40.0)
+        await ot3_hardware.tip_pickup_moves(Mount.LEFT, 40.0)
         move_call_list = [call.args for call in mock_move_rel.call_args_list]
         if gantry_load == GantryLoad.HIGH_THROUGHPUT:
             assert move_call_list == [

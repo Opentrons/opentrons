@@ -65,7 +65,7 @@ from .robot_calibration import (
     RobotCalibration,
 )
 from .protocols import HardwareControlInterface
-from .instruments.ot2.pipette_handler import PipetteHandlerProvider
+from .instruments.ot2.pipette_handler import PipetteHandlerProvider, PickUpTipSpec
 from .instruments.ot2.instrument_calibration import load_pipette_offset
 from .motion_utilities import (
     target_position_from_absolute,
@@ -1152,6 +1152,30 @@ class API(
                 mount, back_left_nozzle, front_right_nozzle, starting_nozzle
             )
 
+    async def tip_pickup_moves(
+        self,
+        mount: top_types.Mount,
+        spec: PickUpTipSpec,
+    ) -> None:
+        for press in spec.presses:
+            with self._backend.save_current():
+                self._backend.set_active_current(press.current)
+                target_down = target_position_from_relative(
+                    mount, press.relative_down, self._current_position
+                )
+                await self._move(target_down, speed=press.speed)
+            target_up = target_position_from_relative(
+                mount, press.relative_up, self._current_position
+            )
+            await self._move(target_up)
+        # neighboring tips tend to get stuck in the space between
+        # the volume chamber and the drop-tip sleeve on p1000.
+        # This extra shake ensures those tips are removed
+        for rel_point, speed in spec.shake_off_list:
+            await self.move_rel(mount, rel_point, speed=speed)
+
+        await self.retract(mount, spec.retract_target)
+
     async def pick_up_tip(
         self,
         mount: top_types.Mount,
@@ -1176,25 +1200,9 @@ class API(
             home_flagged_axes=False,
         )
 
-        for press in spec.presses:
-            with self._backend.save_current():
-                self._backend.set_active_current(press.current)
-                target_down = target_position_from_relative(
-                    mount, press.relative_down, self._current_position
-                )
-                await self._move(target_down, speed=press.speed)
-            target_up = target_position_from_relative(
-                mount, press.relative_up, self._current_position
-            )
-            await self._move(target_up)
+        await self.tip_pickup_moves(mount, spec)
         _add_tip_to_instrs()
-        # neighboring tips tend to get stuck in the space between
-        # the volume chamber and the drop-tip sleeve on p1000.
-        # This extra shake ensures those tips are removed
-        for rel_point, speed in spec.shake_off_list:
-            await self.move_rel(mount, rel_point, speed=speed)
 
-        await self.retract(mount, spec.retract_target)
         if prep_after:
             await self.prepare_for_aspirate(mount)
 
