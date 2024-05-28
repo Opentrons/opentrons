@@ -135,6 +135,6 @@ const SplashFrame = styled(Flex)`
 `
 
 const SHARED_BUTTON_STYLE = css`
-  width: 464px;
-  height: 216px;
+  width: 29rem;
+  height: 13.5rem;
 `
