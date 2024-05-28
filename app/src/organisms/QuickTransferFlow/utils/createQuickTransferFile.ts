@@ -1,12 +1,5 @@
 import uuidv1 from 'uuid/v4'
-import {
-  consolidate,
-  transfer,
-  distribute,
-  ConsolidateArgs,
-  TransferArgs,
-  DistributeArgs,
-} from '@opentrons/step-generation'
+import { consolidate, transfer, distribute } from '@opentrons/step-generation'
 import { generateQuickTransferArgs } from './generateQuickTransferArgs'
 import { FLEX_ROBOT_TYPE, FLEX_STANDARD_DECKID } from '@opentrons/shared-data'
 import type {
@@ -21,6 +14,11 @@ import type {
   OT3RobotMixin,
   LabwareDefinition2,
 } from '@opentrons/shared-data'
+import type {
+  ConsolidateArgs,
+  TransferArgs,
+  DistributeArgs,
+} from '@opentrons/step-generation'
 import type { QuickTransferSummaryState } from '../types'
 
 const uuid: () => string = uuidv1
@@ -90,7 +88,7 @@ export function createQuickTransferFile(
       ? nonLoadCommandCreator.commands
       : []
 
-  let commands: CreateCommand[] = [
+  const commands: CreateCommand[] = [
     loadPipetteCommand,
     ...loadLabwareCommands,
     ...nonLoadCommands,
@@ -104,7 +102,7 @@ export function createQuickTransferFile(
       subcategory: null,
       tags: [],
     },
-    //TODO: formalize designer application data type
+    // TODO: formalize designer application data type
     designerApplication: {
       name: 'Quick Transfer',
       version: '0.0',
