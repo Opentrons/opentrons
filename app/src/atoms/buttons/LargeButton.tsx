@@ -16,13 +16,17 @@ import {
 import { ODD_FOCUS_VISIBLE } from './constants'
 import type { IconName, StyleProps } from '@opentrons/components'
 
-type LargeButtonTypes = 'primary' | 'secondary' | 'alert'
+type LargeButtonTypes =
+  | 'primary'
+  | 'secondary'
+  | 'alert'
+  | 'onColor'
+  | 'alertAlt'
 interface LargeButtonProps extends StyleProps {
   onClick: () => void
   buttonType?: LargeButtonTypes
   buttonText: React.ReactNode
   iconName?: IconName
-  iconColorOverride?: string
   subtext?: string
   disabled?: boolean
 }
@@ -32,7 +36,6 @@ export function LargeButton(props: LargeButtonProps): JSX.Element {
     buttonType = 'primary',
     buttonText,
     iconName,
-    iconColorOverride,
     subtext,
     disabled = false,
     ...buttonProps
@@ -43,27 +46,61 @@ export function LargeButton(props: LargeButtonProps): JSX.Element {
     {
       defaultBackgroundColor: string
       activeBackgroundColor: string
+      disabledBackgroundColor: string
       defaultColor: string
+      disabledColor: string
       iconColor: string
+      disabledIconColor: string
+      border?: string
+      disabledBorder?: string
     }
   > = {
     secondary: {
       defaultColor: COLORS.black90,
+      disabledColor: COLORS.grey50,
       defaultBackgroundColor: COLORS.blue35,
       activeBackgroundColor: COLORS.blue40,
+      disabledBackgroundColor: COLORS.grey35,
       iconColor: COLORS.blue50,
+      disabledIconColor: COLORS.grey50,
     },
     alert: {
       defaultColor: COLORS.red60,
+      disabledColor: COLORS.grey50,
       defaultBackgroundColor: COLORS.red35,
       activeBackgroundColor: COLORS.red40,
+      disabledBackgroundColor: COLORS.grey35,
       iconColor: COLORS.red60,
+      disabledIconColor: COLORS.grey50,
     },
     primary: {
       defaultColor: COLORS.white,
+      disabledColor: COLORS.grey50,
       defaultBackgroundColor: COLORS.blue50,
       activeBackgroundColor: COLORS.blue60,
+      disabledBackgroundColor: COLORS.grey35,
       iconColor: COLORS.white,
+      disabledIconColor: COLORS.grey50,
+    },
+    onColor: {
+      defaultColor: COLORS.white,
+      disabledColor: COLORS.grey40,
+      defaultBackgroundColor: COLORS.transparent,
+      activeBackgroundColor: COLORS.transparent,
+      disabledBackgroundColor: COLORS.transparent,
+      iconColor: COLORS.white,
+      disabledIconColor: COLORS.grey40,
+      border: `${BORDERS.borderRadius4} solid ${COLORS.white}`,
+      disabledBorder: `${BORDERS.borderRadius4} solid ${COLORS.grey35}`,
+    },
+    alertAlt: {
+      defaultColor: COLORS.red50,
+      disabledColor: COLORS.grey50,
+      defaultBackgroundColor: COLORS.white,
+      activeBackgroundColor: COLORS.white,
+      disabledBackgroundColor: COLORS.grey35,
+      iconColor: COLORS.red50,
+      disabledIconColor: COLORS.grey50,
     },
   }
 
@@ -77,6 +114,7 @@ export function LargeButton(props: LargeButtonProps): JSX.Element {
     box-shadow: none;
     padding: ${SPACING.spacing24};
     line-height: ${TYPOGRAPHY.lineHeight20};
+    border: ${LARGE_BUTTON_PROPS_BY_TYPE[buttonType].border};
     ${TYPOGRAPHY.pSemiBold}
 
     &:focus {
@@ -85,7 +123,7 @@ export function LargeButton(props: LargeButtonProps): JSX.Element {
       box-shadow: none;
     }
     &:hover {
-      border: none;
+      border: ${LARGE_BUTTON_PROPS_BY_TYPE[buttonType].border};
       box-shadow: none;
       background-color: ${LARGE_BUTTON_PROPS_BY_TYPE[buttonType]
         .defaultBackgroundColor};
@@ -102,8 +140,9 @@ export function LargeButton(props: LargeButtonProps): JSX.Element {
     }
 
     &:disabled {
-      background-color: ${COLORS.grey35};
-      color: ${COLORS.grey50};
+      color: ${LARGE_BUTTON_PROPS_BY_TYPE[buttonType].disabledColor};
+      background-color: ${LARGE_BUTTON_PROPS_BY_TYPE[buttonType]
+        .disabledBackgroundColor};
     }
   `
   return (
@@ -131,9 +170,8 @@ export function LargeButton(props: LargeButtonProps): JSX.Element {
           aria-label={`${iconName} icon`}
           color={
             disabled
-              ? COLORS.grey50
-              : iconColorOverride ??
-                LARGE_BUTTON_PROPS_BY_TYPE[buttonType].iconColor
+              ? LARGE_BUTTON_PROPS_BY_TYPE[buttonType].disabledIconColor
+              : LARGE_BUTTON_PROPS_BY_TYPE[buttonType].iconColor
           }
           size="5rem"
         />
