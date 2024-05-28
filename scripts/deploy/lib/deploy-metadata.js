@@ -27,7 +27,15 @@ async function getDeployMetadata(s3Client, bucket, path) {
         Key: getDeployMetadataKey(path),
       })
     )
-    return data.Body ? JSON.parse(data.Body) : {}
+
+    return data.Body
+      ? JSON.parse(
+          Buffer.from(
+            await data.Body?.transformToString('base64'),
+            'base64'
+          ).toString('utf-8')
+        )
+      : {}
   } catch (error) {
     console.warn(`Error retrieving deploy metadata: ${error.message}`)
     return {}
