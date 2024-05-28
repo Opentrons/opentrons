@@ -958,7 +958,7 @@ def test_get_all_commands_as_preserialized_list_errors_for_active_runs(
 ) -> None:
     """It should raise an error when fetching pre-serialized commands list while run is active."""
     decoy.when(mock_engine_store.current_run_id).then_return("current-run-id")
-    decoy.when(mock_engine_store.get_run_is_terminal()).then_return(False)
+    decoy.when(mock_engine_store.get_is_run_terminal()).then_return(False)
     with pytest.raises(PreSerializedCommandsNotAvailableError):
         subject.get_all_commands_as_preserialized_list("current-run-id")
 

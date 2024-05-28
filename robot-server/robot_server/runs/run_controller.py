@@ -67,9 +67,9 @@ class RunController:
 
         try:
             if action_type == RunActionType.PLAY:
-                if self._engine_store.runner.was_started():
+                if self._engine_store.run_was_started():
                     log.info(f'Resuming run "{self._run_id}".')
-                    self._engine_store.runner.play()
+                    self._engine_store.play()
                 else:
                     log.info(f'Starting run "{self._run_id}".')
                     # TODO(mc, 2022-05-13): engine_store.runner.run could raise
@@ -83,14 +83,14 @@ class RunController:
 
             elif action_type == RunActionType.PAUSE:
                 log.info(f'Pausing run "{self._run_id}".')
-                self._engine_store.runner.pause()
+                self._engine_store.pause()
 
             elif action_type == RunActionType.STOP:
                 log.info(f'Stopping run "{self._run_id}".')
-                self._task_runner.run(self._engine_store.runner.stop)
+                self._task_runner.run(self._engine_store.stop)
 
             elif action_type == RunActionType.RESUME_FROM_RECOVERY:
-                self._engine_store.runner.resume_from_recovery()
+                self._engine_store.resume_from_recovery()
 
         except ProtocolEngineError as e:
             raise RunActionNotAllowedError(message=e.message, wrapping=[e]) from e
@@ -103,7 +103,7 @@ class RunController:
     async def _run_protocol_and_insert_result(
         self, deck_configuration: DeckConfigurationType
     ) -> None:
-        result = await self._engine_store.runner.run(
+        result = await self._engine_store.run(
             deck_configuration=deck_configuration,
         )
         self._run_store.update_run_state(

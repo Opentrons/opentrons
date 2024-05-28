@@ -305,6 +305,24 @@ class EngineStore:
         """Start or resume the run."""
         self._run_orchestrator.engine.play(deck_configuration=deck_configuration)
 
+    async def run(
+        self, deck_configuration: Optional[DeckConfigurationType] = None
+    ) -> RunResult:
+        """Start or resume the run."""
+        return self._run_orchestrator.runner.run(deck_configuration=deck_configuration)
+
+    def pause(self) -> None:
+        """Start or resume the run."""
+        self._run_orchestrator.runner.pause()
+
+    async def stop(self) -> None:
+        """Start or resume the run."""
+        self._run_orchestrator.runner.stop()
+
+    def resume_from_recovery(self) -> None:
+        """Start or resume the run."""
+        self._run_orchestrator.runner.resume_from_recovery()
+
     async def finish(self, error: Optional[Exception]) -> None:
         """Stop the run."""
         self._run_orchestrator.engine.finish(error=error)
@@ -356,3 +374,6 @@ class EngineStore:
 
     def get_is_run_terminal(self) -> bool:
         return self._run_orchestrator.engine.state_view.commands.get_is_terminal()
+
+    def run_was_started(self) -> bool:
+        return self._run_orchestrator.runner.was_started()
