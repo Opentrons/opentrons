@@ -277,6 +277,16 @@ push-ot3-fixture:
 	$(MAKE) remove-patches-fixture
 
 
+.PHONY: push-ot3-lld
+push-ot3-lld:
+	$(MAKE) apply-patches-fixture
+	cd ../ && $(MAKE) -C shared-data push-ot3
+	cd ../ && $(MAKE) -C hardware push-ot3
+	cd ../ && $(MAKE) -C hardware_testing push-ot3
+	cd ../ && $(MAKE) -C api push-ot3
+	$(MAKE) remove-patches-fixture
+
+
 .PHONY: apply-patches-fixture
 apply-patches-fixture:
 	cd ../ && git apply ./hardware-testing/fixture_overrides/*.patch --allow-empty
