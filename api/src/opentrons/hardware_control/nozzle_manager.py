@@ -217,7 +217,7 @@ class NozzleMap:
         return len(self.map_store)
 
     @classmethod
-    def build(
+    def build(  # noqa: C901
         cls,
         physical_nozzles: "OrderedDict[str, Point]",
         physical_rows: "OrderedDict[str, List[str]]",
