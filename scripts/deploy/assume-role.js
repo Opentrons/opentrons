@@ -1,23 +1,21 @@
-const AWS = require('aws-sdk')
+const { STSClient, AssumeRoleCommand } = require('@aws-sdk/client-sts')
 
 function getAssumeRole(roleArn, roleSessionName) {
-  const sts = new AWS.STS({ apiVersion: '2011-06-15' })
+  const client = new STSClient({ region: 'us-east-1' })
 
-  return new Promise((resolve, reject) => {
-    sts.assumeRole(
-      {
+  return client
+    .send(
+      new AssumeRoleCommand({
         RoleArn: roleArn,
         RoleSessionName: roleSessionName,
-      },
-      (err, data) => {
-        if (err) {
-          reject(err)
-        } else {
-          resolve(data.Credentials)
-        }
+      })
+    )
+    .then(
+      data => data.Credentials,
+      err => {
+        throw err
       }
     )
-  })
 }
 
 module.exports = { getAssumeRole }

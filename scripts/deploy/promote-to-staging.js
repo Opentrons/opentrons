@@ -2,7 +2,7 @@
 'use strict'
 
 const assert = require('assert')
-const AWS = require('aws-sdk')
+const { S3Client } = require('@aws-sdk/client-s3')
 
 const parseArgs = require('./lib/parseArgs')
 const syncBuckets = require('./lib/syncBuckets')
@@ -66,54 +66,45 @@ async function runPromoteToStaging() {
       process.exit(0)
     }
 
-    await getAssumeRole(ROLE_ARN, 'promoteToStaging')
-      .then(credentials => {
-        const stagingCredentials = new AWS.Credentials({
-          accessKeyId: credentials.AccessKeyId,
-          secretAccessKey: credentials.SecretAccessKey,
-          sessionToken: credentials.SessionToken,
-        })
+    const credentials = await getAssumeRole(ROLE_ARN, 'promoteToStaging')
 
-        const s3WithCreds = new AWS.S3({
-          apiVersion: '2006-03-01',
-          region: 'us-east-1',
-          credentials: stagingCredentials,
-        })
+    const stagingCredentials = {
+      accessKeyId: credentials.AccessKeyId,
+      secretAccessKey: credentials.SecretAccessKey,
+      sessionToken: credentials.SessionToken,
+    }
 
-        getDeployMetadata(s3WithCreds, stagingBucket)
-          .then(prevDeployMetadata => {
-            console.log('Previous deploy metadata: %j', prevDeployMetadata)
-            return syncBuckets(
-              s3WithCreds,
-              { bucket: sandboxBucket, path: tag },
-              { bucket: stagingBucket },
-              dryrun
-            ).then(() =>
-              setDeployMetadata(
-                s3WithCreds,
-                stagingBucket,
-                '',
-                { previous: prevDeployMetadata.current || null, current: tag },
-                dryrun
-              )
-            )
-          })
-          .then(() => {
-            console.log('Promotion to staging done\n')
-            getCreateInvalidation(stagingCredentials, cloudfrontArn)
-          })
-          .then(() => {
-            console.log('Cache invalidation initiated for staging\n')
-            process.exit(0)
-          })
-          .catch(error => {
-            console.error(error.message)
-            process.exit(1)
-          })
-      })
-      .catch(err => {
-        console.error(err)
-      })
+    const s3WithCreds = new S3Client({
+      apiVersion: '2006-03-01',
+      region: 'us-east-1',
+      credentials: stagingCredentials,
+    })
+    console.log(`Promoting ${projectDomain} from sandbox to staging\n`)
+    const prevDeployMetadata = await getDeployMetadata(
+      s3WithCreds,
+      stagingBucket
+    )
+
+    await syncBuckets(
+      s3WithCreds,
+      { bucket: sandboxBucket, path: tag },
+      { bucket: stagingBucket },
+      dryrun
+    )
+
+    await setDeployMetadata(
+      s3WithCreds,
+      stagingBucket,
+      '',
+      { previous: prevDeployMetadata.current || null, current: tag },
+      dryrun
+    )
+
+    console.log('Promotion to staging done')
+    await getCreateInvalidation(stagingCredentials, cloudfrontArn)
+    console.log('Cache invalidation initiated for staging')
+
+    process.exit(0)
   } catch (error) {
     console.error(error.message)
     process.exit(1)

@@ -2,7 +2,7 @@
 'use strict'
 
 const assert = require('assert')
-const AWS = require('aws-sdk')
+const { S3Client } = require('@aws-sdk/client-s3')
 
 const { getAssumeRole } = require('./assume-role')
 const { checkCurrentAWSProfile } = require('./check-current-profile')
@@ -31,41 +31,42 @@ assert(
   USAGE
 )
 
-function performRollback(s3, sandboxBucket, rollbackBucket, dryrun) {
-  return getDeployMetadata(s3, rollbackBucket)
-    .then(deployMetadata => {
-      const { previous } = deployMetadata
+async function performRollback(
+  s3Client,
+  sandboxBucket,
+  rollbackBucket,
+  dryrun
+) {
+  try {
+    const deployMetadata = await getDeployMetadata(s3Client, rollbackBucket)
+    const { previous } = deployMetadata
+    console.log(`${rollbackBucket} deploy metadata: %j`, deployMetadata)
+    assert(
+      previous,
+      'Unable to find previous deploy tag; was this environment already rolled back?'
+    )
 
-      console.log(`${rollbackBucket} deploy metadata: %j`, deployMetadata)
-      assert(
-        previous,
-        'Unable to find previous deploy tag; was this environment already rolled back?'
-      )
+    await syncBuckets(
+      s3Client,
+      { bucket: sandboxBucket, path: previous },
+      { bucket: rollbackBucket },
+      dryrun
+    )
 
-      return syncBuckets(
-        s3,
-        { bucket: sandboxBucket, path: previous },
-        { bucket: rollbackBucket },
-        dryrun
-      )
-        .then(() =>
-          setDeployMetadata(
-            s3,
-            rollbackBucket,
-            '',
-            { previous: null, current: previous || null },
-            dryrun
-          )
-        )
-        .then(() => {
-          console.log(`Rollback of ${rollbackBucket} to ${previous} done\n`)
-        })
-    })
-    .then(() => process.exit(0))
-    .catch(error => {
-      console.error(error.message)
-      process.exit(1)
-    })
+    await setDeployMetadata(
+      s3Client,
+      rollbackBucket,
+      '',
+      { previous: null, current: previous || null },
+      dryrun
+    )
+
+    console.log(`Rollback of ${rollbackBucket} to ${previous} done\n`)
+    process.exit(0)
+  } catch (error) {
+    console.error(error.message)
+    process.exit(1)
+  }
 }
 
 async function runRollback() {
@@ -81,35 +82,29 @@ async function runRollback() {
       process.exit(0)
     }
 
-    await getAssumeRole(
+    const credentials = await getAssumeRole(
       projectDomain === PROTOCOL_DESIGNER_DOMAIN
         ? ADMINISTRATOR_ROLE_ARN
         : ROBOTICS_STATIC_WEBSITE_ROLE_ARN,
       'rollBack'
     )
-      .then(credentials => {
-        const rollBackCredentials = new AWS.Credentials({
-          accessKeyId: credentials.AccessKeyId,
-          secretAccessKey: credentials.SecretAccessKey,
-          sessionToken: credentials.SessionToken,
-        })
 
-        const s3 = new AWS.S3({
-          apiVersion: '2006-03-01',
-          region: 'us-east-1',
-          credentials: rollBackCredentials,
-        })
+    const rollBackCredentials = {
+      accessKeyId: credentials.AccessKeyId,
+      secretAccessKey: credentials.SecretAccessKey,
+      sessionToken: credentials.SessionToken,
+    }
 
-        const sandboxBucket = `sandbox.${projectDomain}`
-        const rollbackBucket =
-          environment === 'production'
-            ? projectDomain
-            : `staging.${projectDomain}`
-        return performRollback(s3, sandboxBucket, rollbackBucket, dryrun)
-      })
-      .catch(error => {
-        console.error(error)
-      })
+    const s3Client = new S3Client({
+      apiVersion: '2006-03-01',
+      region: 'us-east-1',
+      credentials: rollBackCredentials,
+    })
+
+    const sandboxBucket = `sandbox.${projectDomain}`
+    const rollbackBucket =
+      environment === 'production' ? projectDomain : `staging.${projectDomain}`
+    return performRollback(s3Client, sandboxBucket, rollbackBucket, dryrun)
   } catch (error) {
     console.error(error.message)
     process.exit(1)
