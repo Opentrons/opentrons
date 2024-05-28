@@ -149,7 +149,7 @@ stages:
               commandId: !anystr
               index: 3
               key: !anystr
-              createdAt: !anystr
+              createdAt: !re_search "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))$"
         meta:
           cursor: 0
           totalLength: 4

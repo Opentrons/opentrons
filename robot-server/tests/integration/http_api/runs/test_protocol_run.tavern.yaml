@@ -29,7 +29,7 @@ stages:
         data:
           id: !anystr
           ok: True
-          createdAt: !anystr
+          createdAt: !re_search "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))$"
           status: idle
           current: True
           actions: []
@@ -98,7 +98,7 @@ stages:
       json:
         data:
           id: !anystr
-          createdAt: !anystr
+          createdAt: !re_search "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))$"
           definitionUri: opentrons/biorad_96_wellplate_200ul_pcr/1
           location:
             slotName: '1'
@@ -160,7 +160,7 @@ stages:
               commandId: !anystr
               index: 1
               key: !anystr
-              createdAt: !anystr
+              createdAt: !re_search "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))$"
         meta:
           cursor: 0
           totalLength: 2
@@ -168,9 +168,9 @@ stages:
           - id: !anystr
             key: !anystr
             commandType: home
-            createdAt: !anystr
-            startedAt: !anystr
-            completedAt: !anystr
+            createdAt: !re_search "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))$"
+            startedAt: !re_search "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))$"
+            completedAt: !re_search "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))$"
             status: succeeded
             notes: []
             params: {}

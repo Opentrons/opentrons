@@ -91,38 +91,36 @@ stages:
           - id: !anystr
             key: !anystr
             commandType: home
-            createdAt: !anystr
-            startedAt: !anystr
-            completedAt: !anystr
+            createdAt: !re_search "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))$"
+            startedAt: !re_search "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))$"
+            completedAt: !re_search "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))$"
             status: succeeded
             params: {}
             notes: []
           - id: !anystr
             key: !anystr
             commandType: home
-            createdAt: !anystr
-            startedAt: !anystr
-            completedAt: !anystr
+            createdAt: !re_search "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))$"
+            startedAt: !re_search "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))$"
+            completedAt: !re_search "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))$"
             status: succeeded
-            params: { }
-            notes: [ ]
+            params: {}
+            notes: []
           - id: !anystr
             key: !anystr
             commandType: waitForDuration
-            createdAt: !anystr
-            startedAt: !anystr
-            completedAt: !anystr
+            createdAt: !re_search "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))$"
+            startedAt: !re_search "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))$"
+            completedAt: !re_search "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))$"
             status: failed
             params:
               seconds: 30
-            notes: [ ]
+            notes: []
             error:
-              createdAt: !anystr
+              createdAt: !re_search "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))$"
               detail: 'Run was cancelled'
               errorCode: '4000'
-              errorInfo: { }
+              errorInfo: {}
               errorType: 'RunStoppedError'
               id: !anystr
-              wrappedErrors: [ ]
-
-
+              wrappedErrors: []

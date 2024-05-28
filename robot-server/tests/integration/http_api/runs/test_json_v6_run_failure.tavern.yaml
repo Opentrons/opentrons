@@ -67,7 +67,7 @@ stages:
         data:
           errors:
             - id: !anystr
-              createdAt: !anystr
+              createdAt: !re_search "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))$"
               errorCode: '3005'
               errorType: TipNotAttachedError
               detail: Pipette should have a tip attached, but does not.
@@ -88,7 +88,7 @@ stages:
               commandId: !anystr
               index: 3
               key: !anystr
-              createdAt: !anystr
+              createdAt: !re_search "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))$"
         meta:
           cursor: 3
           totalLength: 4
@@ -96,15 +96,15 @@ stages:
           - id: !anystr
             key: !anystr
             commandType: aspirate
-            createdAt: !anystr
-            startedAt: !anystr
-            completedAt: !anystr
+            createdAt: !re_search "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))$"
+            startedAt: !re_search "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))$"
+            completedAt: !re_search "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))$"
             status: failed
             notes: []
             error:
               id: !anystr
               errorType: TipNotAttachedError
-              createdAt: !anystr
+              createdAt: !re_search "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))$"
               detail: Pipette should have a tip attached, but does not.
               errorCode: '3005'
               errorInfo: !anydict
