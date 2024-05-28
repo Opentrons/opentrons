@@ -12,7 +12,7 @@ stages:
       status_code: 200
       json:
         data:
-          systemTime: !re_search "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))$"
+          systemTime: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"
           id: 'time'
         links:
           self:
@@ -27,18 +27,18 @@ marks:
 stages:
   - name: System Time PUT request without a time returns a missing field error
     request:
-      url: "{ot2_server_base_url}/system/time"
+      url: '{ot2_server_base_url}/system/time'
       method: PUT
       json:
         data:
-          id: "time"
+          id: 'time'
     response:
       status_code: 422
       json:
         errors:
-          - id: "InvalidRequest"
-            title: "Invalid Request"
-            detail: "field required"
+          - id: 'InvalidRequest'
+            title: 'Invalid Request'
+            detail: 'field required'
             errorCode: '4000'
             source:
               pointer: '/data/systemTime'
