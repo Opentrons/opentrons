@@ -187,7 +187,7 @@ CAP_THRESH_SQUARE = {
 PRESSURE_ASPIRATE_VOL = {1: {50: 10.0, 1000: 20.0}, 8: {50: 10.0, 1000: 20.0}}
 PRESSURE_THRESH_OPEN_AIR = {1: {50:[-25, 25],1000:[-25,25]}, 8: {50:[-25, 25],1000:[-25,25]}}
 PRESSURE_THRESH_SEALED = {1: {50:[-100, 100],1000:[-100,100]}, 8: {50:[-100, 100],1000:[-100,100]}}
-PRESSURE_THRESH_COMPRESS = {1: {50:[-3100, -1100],1000:[-1500,-500]}, 8: {50:[-4200, -2100],1000:[-3600,-1500]}}
+PRESSURE_THRESH_COMPRESS = {1: {50:[-3100, -1100],1000:[-1500,-500]}, 8: {50:[-4200, -2100],1000:[-1900,-500]}}
 
 _trash_loc_counter = 0
 TRASH_OFFSETS = [
@@ -333,7 +333,7 @@ async def _pick_up_tip(
         await api.pick_up_tip(mount, tip_length=tip_length)
     except Exception as err:
         print(f"Error picking up tip: {err}")
-        prinval = f"07-02:光电传感器故障,取针管状态不正确,测试中断"
+        prinval = f"07-02:光电传感器故障,取针管状态不正确"
         FINAL_TEST_FAIL_INFOR.append(prinval)
         ui.print_fail(prinval)
 
@@ -541,7 +541,7 @@ async def _read_pressure_and_check_results(
                 f"ERROR: channel {c + 1} samples are too far apart, "
                 f"max={round(_c_max, 2)} and min={round(_c_min, 2)}"
             )
-            printsig = f"05-01:状态{tag.value},ch{c + 1}气压差变动最大值{round(_c_max, 2)}与最小值 {round(_c_min, 2)}差值 {abs(round(_c_max, 2)-round(_c_min, 2))} 超过阈值{pressure_event_config.stability_threshold}"
+            printsig = f"05-01:测试工装气压,状态{tag.value},ch{c + 1}气压差变动最大值{round(_c_max, 2)}与最小值 {round(_c_min, 2)}差值 {abs(round(_c_max, 2)-round(_c_min, 2))} 超过阈值{pressure_event_config.stability_threshold}"
             #print(f"05-01:状态:{tag.value},channel {c + 1} 气压差变动最大值 {round(_c_max, 2)}与最小值 {round(_c_min, 2)}差值 {abs(round(_c_max, 2)-round(_c_min, 2))} 超过阈值{pressure_event_config.stability_threshold}")
             ui.print_fail(printsig)
             FINAL_TEST_FAIL_INFOR.append(printsig)
@@ -565,7 +565,7 @@ async def _read_pressure_and_check_results(
             f"ERROR: samples are out of range, "
             f"max={round(_samples_max, 2)} and min={round(_samples_min, 2)}"
         )
-        printsig =f"05-02:状态{tag.value},读取fixture的气压最大值{round(_samples_max, 2)}最小值{round(_samples_min, 2)}超出阈值范围{pressure_event_config.min}~{pressure_event_config.max}"
+        printsig =f"05-02:测试工装气压,状态{tag.value},读取fixture的气压最大值{round(_samples_max, 2)}最小值{round(_samples_min, 2)}超出阈值范围{pressure_event_config.min}~{pressure_event_config.max}"
         #print(f"05-02:状态{tag.value},读取的气压最大值 {round(_samples_max, 2)} 最小值 {round(_samples_min, 2)} 超出阈值范围, 阈值:{pressure_event_config.min}~{pressure_event_config.max}")
         ui.print_fail(printsig)
         FINAL_TEST_FAIL_INFOR.append(printsig)
@@ -598,7 +598,7 @@ async def _read_pressure_and_check_results(
                     f"out of range: max={_delta_max}, min={_delta_min}"
                 )
                 print(" ")
-                printsig = f"05-03:状态{tag.value},ch{c + 1}气压值增量{_delta}不在阈值范围{_delta_max}~{_delta_min}"
+                printsig = f"05-03:测试工装气压,状态{tag.value},ch{c + 1}气压值增量{_delta}不在阈值范围{_delta_max}~{_delta_min}"
                 #print(f"05-03:状态{tag.value},channel {c + 1} 气压值增量 {_delta} 不在阈值范围内, 阈值:{_delta_max}~{_delta_min}")
                 ui.print_fail(printsig)
                 FINAL_TEST_FAIL_INFOR.append(printsig)
@@ -835,7 +835,7 @@ async def _test_diagnostics_environment(
     print(f"celsius: {celsius} C")
     if celsius < TEMP_THRESH[0] or celsius > TEMP_THRESH[1]:
         print(f"FAIL: celsius {celsius} is out of range")
-        printtxt=f"01-01 温度值 {humidity} 超出阈值 {TEMP_THRESH}"
+        printtxt=f"01-01:移液器内温度,温度值 {humidity} 超出阈值 {TEMP_THRESH}"
         ui.print_fail(printtxt)
         FINAL_TEST_FAIL_INFOR.append(printtxt)
         celsius_pass = False
@@ -848,7 +848,7 @@ async def _test_diagnostics_environment(
     print(f"humidity: {humidity} C")
     if humidity < HUMIDITY_THRESH[0] or humidity > HUMIDITY_THRESH[1]:
         print(f"FAIL: humidity {humidity} is out of range")
-        printtxt = f"01-02:湿度值 {humidity} 超出阈值 {HUMIDITY_THRESH}"
+        printtxt = f"01-02:移液器内湿度,湿度值 {humidity} 超出阈值 {HUMIDITY_THRESH}"
         ui.print_fail(printtxt)
         FINAL_TEST_FAIL_INFOR.append(printtxt)
 
@@ -933,7 +933,7 @@ async def _test_diagnostics_capacitive(  # noqa: C901
                 f"FAIL: open-air {sensor_id.name} capacitance ({capacitance}) is not correct"
             )
 
-            printtxt = f"01-05:通道{sensor_id.name}的电容传感器在空气中的电容值{capacitance}超出范围{CAP_THRESH_OPEN_AIR}"
+            printtxt = f"01-05:电容传感器,通道{sensor_id.name}在空气中的电容值{capacitance}超出范围{CAP_THRESH_OPEN_AIR}"
             ui.print_fail(printtxt)
             FINAL_TEST_FAIL_INFOR.append(printtxt)
             
@@ -970,7 +970,7 @@ async def _test_diagnostics_capacitive(  # noqa: C901
         ):
             print(f"FAIL: probe capacitance ({capacitance}) is not correct")
             results.append(False)
-            printtxt = f"01-06:probe {sensor_id.name}装上probe的电容值{capacitance}超出范围{CAP_THRESH_PROBE}"
+            printtxt = f"01-06:电容传感器,通道{sensor_id.name}装上probe的电容值{capacitance}超出范围{CAP_THRESH_PROBE}"
             ui.print_fail(printtxt)
             FINAL_TEST_FAIL_INFOR.append(printtxt)
         else:
@@ -1060,7 +1060,7 @@ async def _test_diagnostics_capacitive(  # noqa: C901
             ):
                 print(f"FAIL: square capacitance ({capacitance}) is not correct")
                 results.append(False)
-                printtxt = f"01-07:{sensor_id.name}触碰底板的电容值:{capacitance} 不在范围:{CAP_THRESH_SQUARE}内"
+                printtxt = f"01-07:电容传感器,通道{sensor_id.name}触碰OT3底板的电容值:{capacitance} 不在范围:{CAP_THRESH_SQUARE}内"
                 ui.print_fail(printtxt)
                 FINAL_TEST_FAIL_INFOR.append(printtxt)
                 
@@ -1126,7 +1126,7 @@ async def _test_diagnostics_pressure(
                     f"FAIL: open-air {sensor_id.name} pressure ({pressure}) is not correct"
                 )
             results.append(False)
-            printtxt = f"01-08:通道{sensor_id.name}在空气中的气压差值{pressure}超出范围值{PRESSURE_THRESH_OPEN_AIR[pip_channels][CHTYPE_PIPPETE]}"
+            printtxt = f"01-08:气压传感器,通道{sensor_id.name}在空气中的气压差值{pressure}超出范围值{PRESSURE_THRESH_OPEN_AIR[pip_channels][CHTYPE_PIPPETE]}"
             ui.print_fail(printtxt)
             FINAL_TEST_FAIL_INFOR.append(printtxt)
 
@@ -1171,7 +1171,7 @@ async def _test_diagnostics_pressure(
         ):
             print(f"FAIL: sealed {sensor_id.name} pressure ({pressure}) is not correct")
             results.append(False)
-            printtxt = f"01-09:通道{sensor_id.name}堵住针管时的气压差值{pressure}超出范围值{PRESSURE_THRESH_SEALED[pip_channels][CHTYPE_PIPPETE]}"
+            printtxt = f"01-09:气压传感器,通道{sensor_id.name}堵住针管时的气压差值{pressure}超出范围值{PRESSURE_THRESH_SEALED[pip_channels][CHTYPE_PIPPETE]}"
             ui.print_fail(printtxt)
             FINAL_TEST_FAIL_INFOR.append(printtxt)
             
@@ -1203,7 +1203,7 @@ async def _test_diagnostics_pressure(
             print(
                 f"FAIL: compressed {sensor_id.name} pressure ({pressure}) is not correct"
             )
-            printtxt = f"01-10:通道{sensor_id.name}吸液{plunger_aspirate_ul}ul时的气压差{pressure}超出范围值{PRESSURE_THRESH_COMPRESS[pip_channels][CHTYPE_PIPPETE]}"
+            printtxt = f"01-10:气压传感器,通道{sensor_id.name}吸液{plunger_aspirate_ul}ul时的气压差{pressure}超出范围值{PRESSURE_THRESH_COMPRESS[pip_channels][CHTYPE_PIPPETE]}"
             ui.print_fail(printtxt)
             FINAL_TEST_FAIL_INFOR.append(printtxt)
         else:
@@ -1310,7 +1310,7 @@ async def _jog_for_tip_state(
             print(f"found {tip_state.name} displacement: {current_z} ({passed})")
 
             if not passed:
-                printsig = f"06-02:状态{tip_state.name}移动值为{current_z}结果为{passed}阈值为{min(criteria)} ~ {max(criteria)}"
+                printsig = f"06-02:针管存在状态,{tip_state.name}移动值为{current_z}结果为{passed}阈值为{min(criteria)} ~ {max(criteria)}"
                 ui.print_fail(printsig)
                 FINAL_TEST_FAIL_INFOR.append(printsig)
             return passed
@@ -1625,7 +1625,7 @@ async def _wait_for_tip_presence_state_change(
     if test_pass:
         print("PASS: no unexpected tip-presence")
     else:
-        printsig = "06-01:摇动针管支架触发了针管传感器(请确认测试方法是否正确)"
+        printsig = "06-01:针管存在状态,摇动针管支架触发了针管状态光电开关传感器"
         ui.print_fail(printsig)
         FINAL_TEST_FAIL_INFOR.append(printsig)
     return test_pass
@@ -1870,15 +1870,15 @@ async def _main(test_config: TestConfig) -> None:  # noqa: C901
                         test_passed = False
 
                     if not precision_passed:
-                        prec_tag2 = f"03-01:{tip_vol}ul针管{probe.name.lower()}自动点水精度{precision}结果{_bool_to_pass_fail(precision_passed)} 阈值为(<{LIQUID_PROBE_ERROR_THRESHOLD_PRECISION_MM} mm)"
+                        prec_tag2 = f"03-01:测试液体探测,{tip_vol}ul针管{probe.name.lower()}自动点水精度{precision}结果{_bool_to_pass_fail(precision_passed)} 阈值为(<{LIQUID_PROBE_ERROR_THRESHOLD_PRECISION_MM} mm)"
                         ui.print_fail(prec_tag2)
                         FINAL_TEST_FAIL_INFOR.append(prec_tag2)
                     if not accuracy_passed:
-                        acc_tag2 = f"03-02:{tip_vol}ul针管{probe.name.lower()}自动点水准确度{accuracy}结果{_bool_to_pass_fail(accuracy_passed)} 阈值为(<{LIQUID_PROBE_ERROR_THRESHOLD_ACCURACY_MM} mm)"
+                        acc_tag2 = f"03-02:测试液体探测,{tip_vol}ul针管{probe.name.lower()}自动点水准确度{accuracy}结果{_bool_to_pass_fail(accuracy_passed)} 阈值为(<{LIQUID_PROBE_ERROR_THRESHOLD_ACCURACY_MM} mm)"
                         ui.print_fail(acc_tag2)
                         FINAL_TEST_FAIL_INFOR.append(acc_tag2)
                     if not tip_passed:
-                        tip_tag2 = f"03-03:{tip_vol}ul针管{probe.name.lower()}自动点水测试结果{tip_passed}"
+                        tip_tag2 = f"03-03:测试液体探测,{tip_vol}ul针管{probe.name.lower()}自动点水测试结果{tip_passed}"
                         ui.print_fail(tip_tag2)
                         FINAL_TEST_FAIL_INFOR.append(tip_tag2)
 
@@ -1896,7 +1896,7 @@ async def _main(test_config: TestConfig) -> None:  # noqa: C901
                     droplet_wait_time=droplet_wait_seconds,
                 )
                 if not test_passed:
-                    printsig = f"04-01:吸液保持结果,吸水后等待 {droplet_wait_seconds} 秒针管漏液"
+                    printsig = f"04-01:测试吸液保持,吸水后等待 {droplet_wait_seconds} 秒针管漏液"
                     ui.print_fail(printsig)
                     FINAL_TEST_FAIL_INFOR.append(printsig)
                 csv_cb.results(f"droplets-{droplet_wait_seconds}", test_passed)
