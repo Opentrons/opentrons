@@ -1,6 +1,10 @@
 """Common pipetting command base models."""
+from dataclasses import dataclass
+from opentrons_shared_data.errors import ErrorCodes
 from pydantic import BaseModel, Field
-from typing import Optional
+from typing import Literal, Optional, TypedDict
+
+from opentrons.protocol_engine.errors.error_occurrence import ErrorOccurrence
 
 from ..types import WellLocation, DeckPoint
 
@@ -117,3 +121,41 @@ class DestinationPositionResult(BaseModel):
             " after the move was completed."
         ),
     )
+
+
+class OverpressureErrorInfo(TypedDict):  # noqa: D101
+    # Documentation for this is on the field in OverpressureError
+    # so it shows up in robot-server's OpenAPI spec.
+    volume: float
+
+
+class OverpressureError(ErrorOccurrence):
+    """Returned when sensors detect an overpressure error.
+
+    This is returned by commands that move the pipette plunger. The plunger motion is
+    stopped at the point of the error. After this error, It's safe to issue subsequent
+    `aspirate`, `dispense` etc. commands to pick up from where the error happened.
+    """
+
+    isDefined: bool = True
+
+    errorType: Literal["overpressure"] = "overpressure"
+
+    errorCode: str = ErrorCodes.PIPETTE_OVERPRESSURE.value.code
+    detail: str = ErrorCodes.PIPETTE_OVERPRESSURE.value.detail
+
+    errorInfo: OverpressureErrorInfo = Field(
+        ...,
+        description=(
+            "The amount, in µL, aspirated or dispensed by this command before it"
+            " encountered the overpressure error."
+        ),
+    )
+
+
+@dataclass(frozen=True)
+class OverpressureErrorInternalData:
+    """Internal-to-ProtocolEngine data about an OverpressureError."""
+
+    position: DeckPoint
+    """Same meaning as DestinationPositionResult.position."""
