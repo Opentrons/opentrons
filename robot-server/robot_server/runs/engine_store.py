@@ -4,7 +4,7 @@ import logging
 from typing import List, Optional, Callable
 
 from opentrons.protocol_engine.errors.exceptions import EStopActivatedError
-from opentrons.protocol_engine.types import PostRunHardwareState
+from opentrons.protocol_engine.types import PostRunHardwareState, RunTimeParameter
 
 from opentrons_shared_data.labware.labware_definition import LabwareDefinition
 from opentrons_shared_data.robot.dev_types import RobotType
@@ -34,6 +34,9 @@ from opentrons.protocol_engine import (
     ProtocolEngine,
     StateSummary,
     create_protocol_engine,
+    CommandSlice,
+    CommandPointer,
+    Command,
 )
 
 from robot_server.protocols.protocol_store import ProtocolResource
@@ -306,10 +309,50 @@ class EngineStore:
         """Stop the run."""
         self._run_orchestrator.engine.finish(error=error)
 
-    async def get_state_summary(self) -> StateSummary:
+    def get_state_summary(self) -> StateSummary:
         return self._run_orchestrator.engine.state_view.get_summary()
 
     def get_loaded_labware_definitions(self) -> List[LabwareDefinition]:
         return (
             self._run_orchestrator.engine.state_view.labware.get_loaded_labware_definitions()
         )
+
+    def get_run_time_parameters(self) -> List[RunTimeParameter]:
+        """Parameter definitions defined by protocol, if any. Will always be empty before execution."""
+        return self._run_orchestrator.runner.run_time_parameters
+
+    def get_current_command(self) -> Optional[CommandPointer]:
+        """Parameter definitions defined by protocol, if any. Will always be empty before execution."""
+        return self._run_orchestrator.engine.state_view.commands.get_current()
+
+    def get_command_slice(
+        self,
+        cursor: Optional[int],
+        length: int,
+    ) -> CommandSlice:
+        """Get a slice of run commands.
+
+        Args:
+            run_id: ID of the run.
+            cursor: Requested index of first command in the returned slice.
+            length: Length of slice to return.
+
+        Raises:
+            RunNotFoundError: The given run identifier was not found in the database.
+        """
+        return self._run_orchestrator.engine.state_view.commands.get_slice(
+            cursor=cursor, length=length
+        )
+
+    def get_command_recovery_target(self) -> Optional[CommandPointer]:
+        """Get the current error recovery target."""
+        return self._run_orchestrator.engine.state_view.commands.get_recovery_target()
+
+    def get_command(self, command_id: str) -> Command:
+        """Get a run's command by ID."""
+        return self._run_orchestrator.engine.state_view.commands.get(
+            command_id=command_id
+        )
+
+    def get_is_run_terminal(self) -> bool:
+        return self._run_orchestrator.engine.state_view.commands.get_is_terminal()
