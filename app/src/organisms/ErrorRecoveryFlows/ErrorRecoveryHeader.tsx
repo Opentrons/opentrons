@@ -31,6 +31,8 @@ export function ErrorRecoveryHeader({
   const { t } = useTranslation('error_recovery')
   const errorName = useErrorName(errorKind)
 
+  // TOME: Delete this file.
+
   return (
     <Box css={BOX_STYLE}>
       <Flex css={HEADER_CONTAINER_STYLE}>

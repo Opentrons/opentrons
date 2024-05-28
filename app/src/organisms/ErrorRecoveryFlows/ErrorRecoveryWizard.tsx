@@ -8,10 +8,12 @@ import {
   DIRECTION_COLUMN,
   Flex,
   POSITION_ABSOLUTE,
+  StyledText,
 } from '@opentrons/components'
 
 import { getIsOnDevice } from '../../redux/config'
 import { getTopPortalEl } from '../../App/portal'
+import { InterventionModal } from '../../molecules/InterventionModal'
 import { BeforeBeginning } from './BeforeBeginning'
 import { SelectRecoveryOption, RetryStep, CancelRun } from './RecoveryOptions'
 import { ErrorRecoveryHeader } from './ErrorRecoveryHeader'
@@ -86,21 +88,18 @@ export function ErrorRecoveryWizard(
   )
 }
 
+//TOME: Update types and fill stuff in as needed.
 function ErrorRecoveryComponent(props: RecoveryContentProps): JSX.Element {
   return createPortal(
-    <Flex
-      flexDirection={DIRECTION_COLUMN}
-      width="992px"
-      height="568px"
-      left="14.5px"
-      top="16px"
-      borderRadius={BORDERS.borderRadius12}
-      position={POSITION_ABSOLUTE}
-      backgroundColor={COLORS.white}
+    <InterventionModal
+      iconName="information"
+      iconHeading={<StyledText as="pSemiBold">View error details</StyledText>}
+      titleHeading={<StyledText as="h4Bold">Error Recovery</StyledText>}
+      type={'error'}
+      iconHeadingOnClick={() => null}
     >
-      <ErrorRecoveryHeader errorKind={props.errorKind} />
       <ErrorRecoveryContent {...props} />
-    </Flex>,
+    </InterventionModal>,
     getTopPortalEl()
   )
 }

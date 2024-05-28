@@ -5,7 +5,6 @@ import { useTranslation } from 'react-i18next'
 import {
   DIRECTION_COLUMN,
   Flex,
-  JUSTIFY_SPACE_BETWEEN,
   SPACING,
   StyledText,
 } from '@opentrons/components'
@@ -16,7 +15,7 @@ import {
   ODD_SECTION_TITLE_STYLE,
 } from '../constants'
 import { RadioButton } from '../../../atoms/buttons'
-import { RecoveryFooterButtons } from './shared'
+import { RecoveryFooterButtons, RecoverySingleColumnContent } from '../shared'
 
 import type { ErrorKind, RecoveryContentProps, RecoveryRoute } from '../types'
 
@@ -34,14 +33,11 @@ export function SelectRecoveryOption({
     head(validRecoveryOptions) as RecoveryRoute
   )
 
+  // TOME: You need to abstract the wrapper component for all of these! Move the shared library up a bit and adjust it there.
+  // Then, do the
   if (isOnDevice) {
     return (
-      <Flex
-        padding={SPACING.spacing32}
-        flexDirection={DIRECTION_COLUMN}
-        justifyContent={JUSTIFY_SPACE_BETWEEN}
-        height="100%"
-      >
+      <RecoverySingleColumnContent>
         <StyledText css={ODD_SECTION_TITLE_STYLE} as="h4SemiBold">
           {t('how_do_you_want_to_proceed')}
         </StyledText>
@@ -58,7 +54,7 @@ export function SelectRecoveryOption({
             proceedToRoute(selectedRoute as RecoveryRoute)
           }
         />
-      </Flex>
+      </RecoverySingleColumnContent>
     )
   } else {
     return null

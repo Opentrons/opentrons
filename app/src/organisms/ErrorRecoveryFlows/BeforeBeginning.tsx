@@ -16,6 +16,7 @@ import {
   BODY_TEXT_STYLE,
   ODD_SECTION_TITLE_STYLE,
 } from './constants'
+import { RecoverySingleColumnContent } from './shared'
 
 import type { RecoveryContentProps } from './types'
 
@@ -28,12 +29,7 @@ export function BeforeBeginning({
 
   if (isOnDevice) {
     return (
-      <Flex
-        padding={SPACING.spacing32}
-        flexDirection={DIRECTION_COLUMN}
-        justifyContent={JUSTIFY_SPACE_BETWEEN}
-        height="100%"
-      >
+      <RecoverySingleColumnContent>
         <Flex flexDirection={DIRECTION_COLUMN} height="100%">
           <StyledText css={ODD_SECTION_TITLE_STYLE} as="h4SemiBold">
             {t('before_you_begin')}
@@ -52,7 +48,7 @@ export function BeforeBeginning({
             marginTop="auto"
           />
         </Flex>
-      </Flex>
+      </RecoverySingleColumnContent>
     )
   } else {
     return null

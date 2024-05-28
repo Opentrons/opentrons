@@ -12,7 +12,7 @@ import {
 } from '@opentrons/components'
 
 import { RECOVERY_MAP } from '../constants'
-import { RecoveryFooterButtons } from './shared'
+import { RecoveryFooterButtons, RecoverySingleColumnContent } from '../shared'
 
 import type { RecoveryContentProps } from '../types'
 
@@ -35,13 +35,9 @@ export function RetryStep({
 
   if (isOnDevice) {
     return (
-      <Flex
-        padding={SPACING.spacing32}
+      <RecoverySingleColumnContent
         gridGap={SPACING.spacing24}
-        flexDirection={DIRECTION_COLUMN}
-        justifyContent={JUSTIFY_SPACE_BETWEEN}
         alignItems={ALIGN_CENTER}
-        height="100%"
       >
         <Flex
           flexDirection={DIRECTION_COLUMN}
@@ -64,7 +60,7 @@ export function RetryStep({
           secondaryBtnOnClick={goBackPrevStep}
           primaryBtnTextOverride={t('confirm')}
         />
-      </Flex>
+      </RecoverySingleColumnContent>
     )
   } else {
     return null
