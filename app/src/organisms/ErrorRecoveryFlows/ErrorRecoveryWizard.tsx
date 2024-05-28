@@ -88,13 +88,15 @@ export function ErrorRecoveryWizard(
   )
 }
 
-function ErrorRecoveryComponent(props: RecoveryContentProps): JSX.Element {
+export function ErrorRecoveryComponent(
+  props: RecoveryContentProps
+): JSX.Element {
   const { t } = useTranslation('error_recovery')
 
   const buildTitleHeading = (): JSX.Element => {
     const titleText = props.hasLaunchedRecovery
-      ? t('cancel_run')
-      : t('recovery_mode')
+      ? t('recovery_mode')
+      : t('cancel_run')
     return <StyledText as="h4Bold">{titleText}</StyledText>
   }
 
@@ -107,7 +109,7 @@ function ErrorRecoveryComponent(props: RecoveryContentProps): JSX.Element {
       iconName="information"
       iconHeading={buildIconHeading()}
       titleHeading={buildTitleHeading()}
-      type={'error'}
+      type="error"
     >
       <ErrorRecoveryContent {...props} />
     </InterventionModal>,
