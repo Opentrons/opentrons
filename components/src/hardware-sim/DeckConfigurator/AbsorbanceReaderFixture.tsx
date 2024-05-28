@@ -20,7 +20,6 @@ import type {
   DeckDefinition,
 } from '@opentrons/shared-data'
 
-
 interface AbsorbanceReaderFixtureProps {
   deckDefinition: DeckDefinition
   fixtureLocation: CutoutId

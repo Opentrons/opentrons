@@ -107,7 +107,9 @@ export function DeckConfigurator(props: DeckConfiguratorProps): JSX.Element {
       STAGING_AREA_SLOT_WITH_MAGNETIC_BLOCK_V1_FIXTURE,
     ] as CutoutFixtureId[]).includes(cutoutFixtureId)
   )
-  const absorbanceReaderFixtures = deckConfig.filter(({ cutoutFixtureId }) => cutoutFixtureId === ABSORBANCE_READER_V1_FIXTURE )
+  const absorbanceReaderFixtures = deckConfig.filter(
+    ({ cutoutFixtureId }) => cutoutFixtureId === ABSORBANCE_READER_V1_FIXTURE
+  )
 
   return (
     <RobotCoordinateSpace

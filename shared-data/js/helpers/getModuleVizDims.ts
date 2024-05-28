@@ -1,6 +1,7 @@
 // NOTE: Ian 2019-10-24 these are by-eye numbers that intentionally
 // ignore the real-life data to emphasize overhangs etc
 import {
+  ABSORBANCE_READER_TYPE,
   MAGNETIC_MODULE_TYPE,
   TEMPERATURE_MODULE_TYPE,
   THERMOCYCLER_MODULE_TYPE,
@@ -68,6 +69,17 @@ const MODULE_VIZ_DIMS: Record<ModuleType, ModuleVizDims> = {
   },
   // TODO(sh, 2022-02-28): This is stubbed out using magdeck dimensions, all of this logic should be deprecated
   [MAGNETIC_BLOCK_TYPE]: {
+    xOffset: -1 * (SLOT_X * 0.2 + DIVIDER),
+    yOffset: -1 * DIVIDER,
+    xDimension: SLOT_X * 1.2 + DIVIDER * 2,
+    yDimension: SLOT_Y + DIVIDER * 2,
+    childXOffset: 0,
+    childYOffset: 0,
+    childXDimension: SLOT_X,
+    childYDimension: SLOT_Y,
+  },
+  // TODO(aa, 2024-05-06): This is stubbed out and needs to be revised!
+  [ABSORBANCE_READER_TYPE]: {
     xOffset: -1 * (SLOT_X * 0.2 + DIVIDER),
     yOffset: -1 * DIVIDER,
     xDimension: SLOT_X * 1.2 + DIVIDER * 2,
