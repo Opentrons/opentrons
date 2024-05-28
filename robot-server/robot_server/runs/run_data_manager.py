@@ -360,10 +360,7 @@ class RunDataManager:
             RunNotFoundError: The given run identifier was not found in the database.
         """
         if run_id == self._engine_store.current_run_id:
-            the_slice = self._engine_store.get_command_slice(
-                cursor=cursor, length=length
-            )
-            return the_slice
+            return self._engine_store.get_command_slice(cursor=cursor, length=length)
 
         # Let exception propagate
         return self._run_store.get_commands_slice(
@@ -421,7 +418,7 @@ class RunDataManager:
         """Get all commands of a run in a serialized json list."""
         if (
             run_id == self._engine_store.current_run_id
-            and not self._engine_store.get_is_command_terminal()
+            and not self._engine_store.get_is_run_terminal()
         ):
             raise PreSerializedCommandsNotAvailableError(
                 "Pre-serialized commands are only available after a run has ended."
@@ -440,7 +437,6 @@ class RunDataManager:
 
     def _get_run_time_parameters(self, run_id: str) -> List[RunTimeParameter]:
         if run_id == self._engine_store.current_run_id:
-            runner = self._engine_store.runner
-            return runner.run_time_parameters if runner else []
+            return self._engine_store.get_run_time_parameters()
         else:
             return self._run_store.get_run_time_parameters(run_id=run_id)
