@@ -16,7 +16,7 @@ describe('InterventionModal', () => {
 
   beforeEach(() => {
     props = {
-      heading: 'mock intervention heading',
+      iconHeading: 'mock intervention heading',
       children: 'mock intervention children',
       iconName: 'alert-circle',
       type: 'intervention-required',
