@@ -1,4 +1,4 @@
-import { Page } from './types'
+import type { Page } from './types'
 export interface NavigateToPageAction {
   type: 'NAVIGATE_TO_PAGE'
   payload: Page

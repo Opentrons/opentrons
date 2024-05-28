@@ -2,12 +2,13 @@ import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { Flex, SPACING, DIRECTION_COLUMN } from '@opentrons/components'
 import { getAllDefinitions } from '@opentrons/shared-data'
-import { SmallButton, LargeButton } from '../../atoms/buttons'
+import { LargeButton } from '../../atoms/buttons'
 import { ChildNavigation } from '../ChildNavigation'
 
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
+import type { SmallButton } from '../../atoms/buttons'
 import type {
-  QuickTransferSetupState,
+  QuickTransferWizardState,
   QuickTransferWizardAction,
 } from './types'
 
@@ -15,7 +16,7 @@ interface SelectTipRackProps {
   onNext: () => void
   onBack: () => void
   exitButtonProps: React.ComponentProps<typeof SmallButton>
-  state: QuickTransferSetupState
+  state: QuickTransferWizardState
   dispatch: React.Dispatch<QuickTransferWizardAction>
 }
 
@@ -64,6 +65,7 @@ export function SelectTipRack(props: SelectTipRackProps): JSX.Element {
 
           return tipRackDef != null ? (
             <LargeButton
+              key={tipRack}
               buttonType={
                 selectedTipRack === tipRackDef ? 'primary' : 'secondary'
               }

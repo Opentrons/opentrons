@@ -1,7 +1,7 @@
 import { getBatchEditFieldChanges } from '../selectors'
-import { ThunkAction } from '../../types'
-import { StepIdType, StepFieldName } from '../../form-types'
-import { BatchEditFormChangesState } from '../reducers'
+import type { ThunkAction } from '../../types'
+import type { StepIdType, StepFieldName } from '../../form-types'
+import type { BatchEditFormChangesState } from '../reducers'
 export * from './modules'
 export * from './pipettes'
 export interface ChangeBatchEditFieldAction {

@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { css } from 'styled-components'
 import { useTranslation } from 'react-i18next'
-import { ViewportList, ViewportListRef } from 'react-viewport-list'
+import { ViewportList } from 'react-viewport-list'
 
 import { RUN_STATUSES_TERMINAL } from '@opentrons/api-client'
 import {
@@ -22,7 +22,6 @@ import {
 
 import { useMostRecentCompletedAnalysis } from '../LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import {
-  useNotifyLastRunCommand,
   useNotifyAllCommandsAsPreSerializedList,
   useNotifyRunQuery,
 } from '../../resources/runs'
@@ -31,9 +30,11 @@ import { Divider } from '../../atoms/structure'
 import { NAV_BAR_WIDTH } from '../../App/constants'
 import { CommandIcon } from './CommandIcon'
 import { useRunStatus } from '../RunTimeControl/hooks'
+import { useLastRunCommand } from '../Devices/hooks/useLastRunCommand'
 
 import type { RunStatus } from '@opentrons/api-client'
 import type { RobotType } from '@opentrons/shared-data'
+import type { ViewportListRef } from 'react-viewport-list'
 
 const COLOR_FADE_MS = 500
 const LIVE_RUN_COMMANDS_POLL_MS = 3000
@@ -73,7 +74,7 @@ export const RunPreviewComponent = (
   )
   const commandsFromQuery = commandsFromQueryResponse?.data
   const viewPortRef = React.useRef<HTMLDivElement | null>(null)
-  const currentRunCommandKey = useNotifyLastRunCommand(runId, {
+  const currentRunCommandKey = useLastRunCommand(runId, {
     refetchInterval: LIVE_RUN_COMMANDS_POLL_MS,
   })?.key
   const [
@@ -191,7 +192,7 @@ export const RunPreviewComponent = (
                     <CommandIcon command={command} color={iconColor} />
                     <CommandText
                       command={command}
-                      robotSideAnalysis={protocolDataFromAnalysisOrRun}
+                      commandTextData={protocolDataFromAnalysisOrRun}
                       robotType={robotType}
                       color={COLORS.black90}
                     />

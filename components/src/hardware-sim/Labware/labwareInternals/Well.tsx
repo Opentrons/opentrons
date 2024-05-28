@@ -16,6 +16,8 @@ export interface WellProps extends StyleProps {
   /** Optional callback, called with WellMouseEvent args onMouseOver */
   onMouseEnterWell?: (e: WellMouseEvent) => unknown
   onMouseLeaveWell?: (e: WellMouseEvent) => unknown
+  /** Provides well data attribute */
+  isInteractive?: boolean
 }
 
 export function WellComponent(props: WellProps): JSX.Element {
@@ -27,10 +29,10 @@ export function WellComponent(props: WellProps): JSX.Element {
     fill = COLORS.white,
     onMouseEnterWell,
     onMouseLeaveWell,
+    isInteractive = onMouseEnterWell != null || onMouseLeaveWell != null,
   } = props
   const { x, y } = well
 
-  const isInteractive = onMouseEnterWell != null || onMouseLeaveWell != null
   const pointerEvents: React.CSSProperties['pointerEvents'] = isInteractive
     ? 'auto'
     : 'none'

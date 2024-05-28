@@ -64,26 +64,6 @@ export const MOVABLE_TRASH_CUTOUTS = [
   },
 ]
 
-export const getUnoccupiedStagingAreaSlots = (
-  modules: FormState['modules']
-): DeckConfiguration => {
-  let unoccupiedSlots = STANDARD_EMPTY_SLOTS
-  const moduleCutoutIds =
-    modules != null
-      ? Object.values(modules).flatMap(module =>
-          module.type === THERMOCYCLER_MODULE_TYPE
-            ? [`cutout${module.slot}`, 'cutoutA1']
-            : `cutout${module.slot}`
-        )
-      : []
-
-  unoccupiedSlots = unoccupiedSlots.filter(emptySlot => {
-    return !moduleCutoutIds.includes(emptySlot.cutoutId)
-  })
-
-  return unoccupiedSlots
-}
-
 const TOTAL_MODULE_SLOTS = 8
 
 export const getNumSlotsAvailable = (
@@ -126,6 +106,19 @@ export const getNumSlotsAvailable = (
     TOTAL_MODULE_SLOTS -
     (filteredModuleLength + filteredAdditionalEquipmentLength)
   )
+}
+
+export const getUnoccupiedStagingAreaSlots = (
+  modules: FormState['modules'],
+  additionalEquipment: FormState['additionalEquipment']
+): DeckConfiguration => {
+  const numSlotsAvailable = getNumSlotsAvailable(modules, additionalEquipment)
+  let unoccupiedSlots = STANDARD_EMPTY_SLOTS
+
+  if (numSlotsAvailable < 4) {
+    unoccupiedSlots = STANDARD_EMPTY_SLOTS.slice(0, numSlotsAvailable)
+  }
+  return unoccupiedSlots
 }
 
 interface TrashOptionDisabledProps {

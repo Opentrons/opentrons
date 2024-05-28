@@ -1,5 +1,5 @@
 // tip length calibration types
-import {
+import type {
   TIP_LENGTH_STEP_SESSION_STARTED,
   TIP_LENGTH_STEP_LABWARE_LOADED,
   TIP_LENGTH_STEP_MEASURING_NOZZLE_OFFSET,

@@ -5,7 +5,7 @@ port ?= 6060
 
 # These variables can be overriden when make is invoked to customize the
 # behavior of jest
-tests ?=
+tests ?= src
 cov_opts ?= --coverage=true
 test_opts ?=
 
@@ -30,6 +30,10 @@ dist:
 lib: export NODE_ENV := production
 lib:
 	yarn vite build
+
+.PHONY: build-ts
+build-ts:
+	yarn tsc --build --emitDeclarationOnly
 
 # development
 #####################################################################

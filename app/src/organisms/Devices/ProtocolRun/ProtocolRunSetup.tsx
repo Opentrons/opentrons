@@ -394,6 +394,7 @@ function StepRightElement(props: StepRightElementProps): JSX.Element | null {
           marginRight={SPACING.spacing16}
           textTransform={TYPOGRAPHY.textTransformCapitalize}
           id="RunSetupCard_calibrationText"
+          whiteSpace="nowrap"
         >
           {statusText}
         </StyledText>
@@ -414,6 +415,7 @@ function LearnAboutLPC(): JSX.Element {
       <Link
         css={TYPOGRAPHY.linkPSemiBold}
         marginRight={SPACING.spacing16}
+        whiteSpace="nowrap"
         onClick={(e: React.MouseEvent) => {
           // clicking link shouldn't toggle step expanded state
           e.preventDefault()

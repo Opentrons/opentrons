@@ -4,13 +4,13 @@ import { selectors as labwareDefSelectors } from '../../labware-defs'
 import { selectors as stepFormSelectors } from '../../step-forms'
 import { selectors as uiLabwareSelectors } from '../../ui/labware'
 import { getNextAvailableDeckSlot, getNextNickname } from '../utils'
-import {
+import { getRobotType } from '../../file-data/selectors'
+import type {
   CreateContainerArgs,
   CreateContainerAction,
   DuplicateLabwareAction,
 } from './actions'
-import { ThunkAction } from '../../types'
-import { getRobotType } from '../../file-data/selectors'
+import type { ThunkAction } from '../../types'
 export interface RenameLabwareAction {
   type: 'RENAME_LABWARE'
   payload: {
@@ -53,11 +53,12 @@ export const createContainer: (
   const state = getState()
   const initialDeckSetup = stepFormSelectors.getInitialDeckSetup(state)
   const robotType = getRobotType(state)
-  const slot =
-    args.slot || getNextAvailableDeckSlot(initialDeckSetup, robotType)
   const labwareDef = labwareDefSelectors.getLabwareDefsByURI(state)[
     args.labwareDefURI
   ]
+  const slot =
+    args.slot ||
+    getNextAvailableDeckSlot(initialDeckSetup, robotType, labwareDef)
   const isTiprack = getIsTiprack(labwareDef)
 
   if (slot) {
@@ -122,7 +123,14 @@ export const duplicateLabware: (
   const initialDeckSetup = stepFormSelectors.getInitialDeckSetup(state)
   const templateLabwareIdIsOffDeck =
     initialDeckSetup.labware[templateLabwareId].slot === 'offDeck'
-  const duplicateSlot = getNextAvailableDeckSlot(initialDeckSetup, robotType)
+  const labwareDef = labwareDefSelectors.getLabwareDefsByURI(state)[
+    templateLabwareDefURI
+  ]
+  const duplicateSlot = getNextAvailableDeckSlot(
+    initialDeckSetup,
+    robotType,
+    labwareDef
+  )
   if (duplicateSlot == null) {
     console.error('no slots available, cannot duplicate labware')
   }

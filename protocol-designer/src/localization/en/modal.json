@@ -272,6 +272,11 @@
       "body2": "We have added new features since the last time this protocol was updated, but have not made any changes to existing protocol behavior. Because of this we do not expect any changes in how the robot will execute this protocol. To be safe we will still recommend keeping a separate copy of the file you just imported.",
       "body3": "As always, please contact us with any questions or feedback."
     },
+    "toV8_1Migration": {
+      "body1": "Your protocol will be automatically updated to the latest version.",
+      "body2": "The default dispense height is now 1 mm from the bottom of the well, instead of 0.5 mm. All dispense commands without a custom height will change to use the new default height.",
+      "body3": "Additionally, blowout actions now precede touch tip actions. The new order affects all dispenses that include both actions."
+    },
     "toV8Migration": {
       "body1": "Your protocol will be automatically updated to the latest version.",
       "body2": "{{pd}} no longer supports aspirate or mix actions in a trash bin. If your protocol contains these actions, an error icon will appear next to them in the Protocol Timeline. To resolve the error, choose another location for aspirating or mixing.",

@@ -75,6 +75,7 @@ export function SetupStep({
             justifyContent={JUSTIFY_SPACE_BETWEEN}
             width="100%"
             onClick={toggleExpanded}
+            gridGap={SPACING.spacing40}
           >
             <Flex flexDirection={DIRECTION_COLUMN}>
               <StyledText

@@ -10,13 +10,13 @@ import {
   SPACING,
   DIRECTION_COLUMN,
 } from '@opentrons/components'
-import { PipetteModelSpecs } from '@opentrons/shared-data'
 
 import { MenuItem } from '../../../atoms/MenuList/MenuItem'
 import { Divider } from '../../../atoms/structure'
 
-import type { Mount } from '../../../redux/pipettes/types'
+import type { PipetteModelSpecs } from '@opentrons/shared-data'
 import type { PipetteSettingsFieldsMap } from '@opentrons/api-client'
+import type { Mount } from '../../../redux/pipettes/types'
 
 interface PipetteOverflowMenuProps {
   pipetteSpecs: PipetteModelSpecs | null

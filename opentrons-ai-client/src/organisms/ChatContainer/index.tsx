@@ -1,64 +1,70 @@
 import React from 'react'
 import { useTranslation } from 'react-i18next'
-import { css } from 'styled-components'
+import styled from 'styled-components'
+import { useAtom } from 'jotai'
+
 import {
   COLORS,
   DIRECTION_COLUMN,
   Flex,
-  POSITION_ABSOLUTE,
-  POSITION_RELATIVE,
+  OVERFLOW_AUTO,
+  POSITION_STICKY,
   SPACING,
   StyledText,
-  TYPOGRAPHY,
 } from '@opentrons/components'
 import { PromptGuide } from '../../molecules/PromptGuide'
-import { InputPrompt } from '../../molecules/InputPrompt'
+import { ChatDisplay } from '../../molecules/ChatDisplay'
+import { ChatFooter } from '../../molecules/ChatFooter'
+import { chatDataAtom } from '../../resources/atoms'
 
 export function ChatContainer(): JSX.Element {
   const { t } = useTranslation('protocol_generator')
-  const isDummyInitial = true
+  const [chatData] = useAtom(chatDataAtom)
+  const scrollRef = React.useRef<HTMLSpanElement | null>(null)
+
+  React.useEffect(() => {
+    if (scrollRef.current != null)
+      scrollRef.current.scrollIntoView({ behavior: 'smooth' })
+  }, [chatData.length])
+
   return (
     <Flex
+      marginTop="2.5rem"
+      marginLeft="24.375rem"
       padding={`${SPACING.spacing40} ${SPACING.spacing40} ${SPACING.spacing24}`}
       backgroundColor={COLORS.grey10}
-      width="100%"
+      width="auto"
+      flexDirection={DIRECTION_COLUMN}
+      gridGap={SPACING.spacing40}
+      minHeight={`calc(100vh-24.375rem)`}
+      overflowY={OVERFLOW_AUTO}
     >
-      {/* This will be updated when input textbox and function are implemented */}
-      {isDummyInitial ? (
-        <Flex
-          flexDirection={DIRECTION_COLUMN}
-          position={POSITION_RELATIVE}
-          width="100%"
-        >
-          <Flex
-            flexDirection={DIRECTION_COLUMN}
-            gridGap={SPACING.spacing12}
-            width="100%"
-          >
-            <StyledText>{t('opentronsai')}</StyledText>
-            <PromptGuide />
-          </Flex>
-          <Flex
-            position={POSITION_ABSOLUTE}
-            bottom="0"
-            width="100%"
-            gridGap={SPACING.spacing24}
-            flexDirection={DIRECTION_COLUMN}
-          >
-            <InputPrompt />
-            <StyledText css={DISCLAIMER_TEXT_STYLE}>
-              {t('disclaimer')}
-            </StyledText>
-          </Flex>
-        </Flex>
-      ) : null}
+      <Flex width="100%" height="100%">
+        <ChatDataContainer>
+          <StyledText>{t('opentronsai')}</StyledText>
+          {/* Prompt Guide remain as a reference for users. */}
+          <PromptGuide />
+          {chatData.length > 0
+            ? chatData.map((chat, index) => (
+                <ChatDisplay
+                  key={`prompt-from_${chat.role}_${index}`}
+                  chat={chat}
+                  chatId={`${chat.role}_${index}`}
+                />
+              ))
+            : null}
+        </ChatDataContainer>
+      </Flex>
+      <span ref={scrollRef} />
+      <Flex position={POSITION_STICKY}>
+        <ChatFooter />
+      </Flex>
     </Flex>
   )
 }
 
-const DISCLAIMER_TEXT_STYLE = css`
-  color: ${COLORS.grey55};
-  font-size: ${TYPOGRAPHY.fontSize20};
-  line-height: ${TYPOGRAPHY.lineHeight24};
-  text-align: ${TYPOGRAPHY.textAlignCenter};
+const ChatDataContainer = styled(Flex)`
+  flex-direction: ${DIRECTION_COLUMN};
+  grid-gap: ${SPACING.spacing40};
+  width: 100%;
 `

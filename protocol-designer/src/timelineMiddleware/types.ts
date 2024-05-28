@@ -1,7 +1,7 @@
-import { Timeline } from '@opentrons/step-generation'
-import { Substeps } from '../steplist/types'
-import { GenerateRobotStateTimelineArgs } from './generateRobotStateTimeline'
-import { GenerateSubstepsArgs } from './generateSubsteps'
+import type { Timeline } from '@opentrons/step-generation'
+import type { Substeps } from '../steplist/types'
+import type { GenerateRobotStateTimelineArgs } from './generateRobotStateTimeline'
+import type { GenerateSubstepsArgs } from './generateSubsteps'
 // worker itself will spread the robotStateTimeline in
 export type SubstepsArgsNoTimeline = Omit<
   GenerateSubstepsArgs,

@@ -7,6 +7,7 @@ export const mockModulesResponse = [
     hasAvailableUpdate: false,
     moduleType: 'thermocyclerModuleType',
     moduleModel: 'thermocyclerModuleV1',
+    compatibleWithRobot: true,
     data: {
       status: 'holding at target',
       currentTemperature: 3.0,
@@ -31,6 +32,7 @@ export const mockModulesResponse = [
     hasAvailableUpdate: false,
     moduleType: 'heaterShakerModuleType',
     moduleModel: 'heaterShakerModuleV1',
+    compatibleWithRobot: true,
     data: {
       status: 'idle',
       labwareLatchStatus: 'idle_unknown',
@@ -55,6 +57,7 @@ export const mockModulesResponse = [
     hasAvailableUpdate: false,
     moduleType: 'temperatureModuleType',
     moduleModel: 'temperatureModuleV1',
+    compatibleWithRobot: true,
     data: {
       status: 'holding at target',
       currentTemperature: 3.0,
@@ -75,6 +78,7 @@ export const mockModulesResponse = [
     hasAvailableUpdate: false,
     moduleType: 'magneticModuleType',
     moduleModel: 'magneticModuleV1',
+    compatibleWithRobot: true,
     data: {
       status: 'engaged',
       engaged: true,
@@ -86,6 +90,29 @@ export const mockModulesResponse = [
       hub: false,
       portGroup: 'unknown',
     },
+  },
+]
+
+export const mockUnknownModuleResponse = [
+  ...mockModulesResponse,
+  {
+    name: 'unknown',
+    displayName: 'UnknownModule',
+    moduleModel: 'unknownModule',
+    port: '/dev/unknown',
+    usbPort: {
+      port: 0,
+      hub: false,
+      portGroup: 'unknown',
+      path: '',
+    },
+    serial: 'dummySerialMD',
+    model: 'unknown_v1.1',
+    revision: 'unknown_v1.1',
+    fwVersion: 'dummyVersionMD',
+    hasAvailableUpdate: false,
+    status: 'engaged',
+    data: {},
   },
 ]
 

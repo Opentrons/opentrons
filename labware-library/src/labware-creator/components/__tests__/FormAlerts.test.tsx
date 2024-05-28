@@ -9,7 +9,8 @@ import {
   LABWARE_TOO_SMALL_ERROR,
   LABWARE_TOO_LARGE_ERROR,
 } from '../../fields'
-import { FormAlerts, Props as FormAlertProps } from '../alerts/FormAlerts'
+import { FormAlerts } from '../alerts/FormAlerts'
+import type { Props as FormAlertProps } from '../alerts/FormAlerts'
 
 vi.mock('../../formSelectors')
 

@@ -1,4 +1,4 @@
-import {
+import type {
   PAUSE_UNTIL_RESUME,
   PAUSE_UNTIL_TIME,
   PAUSE_UNTIL_TEMP,
@@ -233,6 +233,7 @@ export interface HydratedMoveLiquidFormData {
     dispense_x_position?: number | null
     dispense_y_position?: number | null
     blowout_z_offset?: number | null
+    blowout_flowRate?: number | null
   }
 }
 
@@ -277,6 +278,7 @@ export interface HydratedMixFormDataLegacy {
   mix_x_position?: number | null
   mix_y_position?: number | null
   blowout_z_offset?: number | null
+  blowout_flowRate?: number | null
 }
 export type MagnetAction = 'engage' | 'disengage'
 export type HydratedMagnetFormData = AnnotationFields & {

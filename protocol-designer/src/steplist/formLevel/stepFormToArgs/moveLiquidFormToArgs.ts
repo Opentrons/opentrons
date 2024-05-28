@@ -1,4 +1,4 @@
-import { getWellsDepth, LabwareDefinition2 } from '@opentrons/shared-data'
+import { getWellsDepth } from '@opentrons/shared-data'
 import { DEST_WELL_BLOWOUT_DESTINATION } from '@opentrons/step-generation'
 import {
   DEFAULT_MM_FROM_BOTTOM_ASPIRATE,
@@ -8,14 +8,15 @@ import {
 } from '../../../constants'
 import { getOrderedWells } from '../../utils'
 import { getMoveLiquidDelayData } from './getDelayData'
-import { HydratedMoveLiquidFormData } from '../../../form-types'
+import { getMatchingTipLiquidSpecs } from '../../../utils'
 import type {
   ConsolidateArgs,
   DistributeArgs,
   TransferArgs,
   InnerMixArgs,
 } from '@opentrons/step-generation'
-import { getMatchingTipLiquidSpecs } from '../../../utils'
+import type { LabwareDefinition2 } from '@opentrons/shared-data'
+import type { HydratedMoveLiquidFormData } from '../../../form-types'
 type MoveLiquidFields = HydratedMoveLiquidFormData['fields']
 
 // NOTE(sa, 2020-08-11): leaving this as fn so it can be expanded later for dispense air gap
@@ -202,7 +203,7 @@ export const moveLiquidFormToArgs = (
     dispenseOffsetFromBottomMm:
       fields.dispense_mmFromBottom || DEFAULT_MM_FROM_BOTTOM_DISPENSE,
     blowoutFlowRateUlSec:
-      fields.dispense_flowRate ||
+      fields.blowout_flowRate ||
       matchingTipLiquidSpecs.defaultBlowOutFlowRate.default,
     blowoutOffsetFromTopMm,
     changeTip: fields.changeTip,

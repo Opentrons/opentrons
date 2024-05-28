@@ -1,10 +1,11 @@
-import { GEN_ONE_MULTI_PIPETTES, ModuleType } from '@opentrons/shared-data'
-import { LabwareDefByDefURI } from '../../labware-defs'
-import { InitialDeckSetup, LabwareOnDeck } from '../../step-forms'
+import { GEN_ONE_MULTI_PIPETTES } from '@opentrons/shared-data'
 import {
   getLabwareIsCompatible,
   getLabwareIsCustom,
 } from '../../utils/labwareModuleCompatibility'
+import type { InitialDeckSetup, LabwareOnDeck } from '../../step-forms'
+import type { ModuleType } from '@opentrons/shared-data'
+import type { LabwareDefByDefURI } from '../../labware-defs'
 
 export interface SwapBlockedArgs {
   hoveredLabware?: LabwareOnDeck | null

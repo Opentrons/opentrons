@@ -2,6 +2,7 @@ import * as React from 'react'
 import { Route, MemoryRouter } from 'react-router-dom'
 import { vi, it, describe, expect, beforeEach, afterEach } from 'vitest'
 import { when } from 'vitest-when'
+import { screen } from '@testing-library/react'
 
 import {
   RUN_STATUS_BLOCKED_BY_OPEN_DOOR,
@@ -10,7 +11,6 @@ import {
   RUN_STATUS_AWAITING_RECOVERY,
 } from '@opentrons/api-client'
 import {
-  useAllCommandsQuery,
   useProtocolAnalysesQuery,
   useProtocolQuery,
   useRunActionMutations,
@@ -31,14 +31,18 @@ import { getLocalRobot } from '../../../redux/discovery'
 import { CancelingRunModal } from '../../../organisms/OnDeviceDisplay/RunningProtocol/CancelingRunModal'
 import { useTrackProtocolRunEvent } from '../../../organisms/Devices/hooks'
 import { useMostRecentCompletedAnalysis } from '../../../organisms/LabwarePositionCheck/useMostRecentCompletedAnalysis'
-import { RunPausedSplash } from '../../../organisms/OnDeviceDisplay/RunningProtocol/RunPausedSplash'
 import { OpenDoorAlertModal } from '../../../organisms/OpenDoorAlertModal'
 import { RunningProtocol } from '..'
 import {
-  useNotifyLastRunCommand,
   useNotifyRunQuery,
+  useNotifyAllCommandsQuery,
 } from '../../../resources/runs'
 import { useFeatureFlag } from '../../../redux/config'
+import {
+  ErrorRecoveryFlows,
+  useErrorRecoveryFlows,
+} from '../../../organisms/ErrorRecoveryFlows'
+import { useLastRunCommand } from '../../../organisms/Devices/hooks/useLastRunCommand'
 
 import type { UseQueryResult } from 'react-query'
 import type { ProtocolAnalyses, RunCommandSummary } from '@opentrons/api-client'
@@ -50,7 +54,6 @@ vi.mock('../../../organisms/RunTimeControl/hooks')
 vi.mock(
   '../../../organisms/LabwarePositionCheck/useMostRecentCompletedAnalysis'
 )
-vi.mock('../../../organisms/OnDeviceDisplay/RunningProtocol/RunPausedSplash')
 vi.mock('../../../organisms/RunTimeControl/hooks')
 vi.mock('../../../organisms/OnDeviceDisplay/RunningProtocol')
 vi.mock('../../../redux/discovery')
@@ -58,6 +61,8 @@ vi.mock('../../../organisms/OnDeviceDisplay/RunningProtocol/CancelingRunModal')
 vi.mock('../../../organisms/OpenDoorAlertModal')
 vi.mock('../../../resources/runs')
 vi.mock('../../../redux/config')
+vi.mock('../../../organisms/ErrorRecoveryFlows')
+vi.mock('../../../organisms/Devices/hooks/useLastRunCommand')
 
 const RUN_ID = 'run_id'
 const ROBOT_NAME = 'otie'
@@ -71,6 +76,7 @@ const PROTOCOL_ANALYSIS = {
 const mockPlayRun = vi.fn()
 const mockPauseRun = vi.fn()
 const mockStopRun = vi.fn()
+const mockResumeRunFromRecovery = vi.fn()
 
 const render = (path = '/') => {
   return renderWithProviders(
@@ -127,22 +133,31 @@ describe('RunningProtocol', () => {
       playRun: mockPlayRun,
       pauseRun: mockPauseRun,
       stopRun: mockStopRun,
+      resumeRunFromRecovery: mockResumeRunFromRecovery,
       isPlayRunActionLoading: false,
       isPauseRunActionLoading: false,
       isStopRunActionLoading: false,
+      isResumeRunFromRecoveryActionLoading: false,
     })
     when(vi.mocked(useMostRecentCompletedAnalysis))
       .calledWith(RUN_ID)
       .thenReturn(mockRobotSideAnalysis)
-    when(vi.mocked(useAllCommandsQuery))
+    when(vi.mocked(useNotifyAllCommandsQuery))
       .calledWith(RUN_ID, { cursor: null, pageLength: 1 })
       .thenReturn(mockUseAllCommandsResponseNonDeterministic)
-    vi.mocked(useNotifyLastRunCommand).mockReturnValue({
+    vi.mocked(useLastRunCommand).mockReturnValue({
       key: 'FAKE_COMMAND_KEY',
     } as RunCommandSummary)
     when(vi.mocked(useFeatureFlag))
       .calledWith('enableRunNotes')
       .thenReturn(true)
+    vi.mocked(ErrorRecoveryFlows).mockReturnValue(
+      <div>MOCK ERROR RECOVERY</div>
+    )
+    vi.mocked(useErrorRecoveryFlows).mockReturnValue({
+      isERActive: false,
+      failedCommand: {} as any,
+    })
   })
 
   afterEach(() => {
@@ -181,7 +196,18 @@ describe('RunningProtocol', () => {
       .calledWith(RUN_ID, { refetchInterval: 5000 })
       .thenReturn(RUN_STATUS_AWAITING_RECOVERY)
     render(`/runs/${RUN_ID}/run`)
-    expect(vi.mocked(RunPausedSplash)).toHaveBeenCalled()
+  })
+
+  it('should render ErrorRecovery appropriately', () => {
+    render(`/runs/${RUN_ID}/run`)
+    expect(screen.queryByText('MOCK ERROR RECOVERY')).not.toBeInTheDocument()
+
+    vi.mocked(useErrorRecoveryFlows).mockReturnValue({
+      isERActive: true,
+      failedCommand: {} as any,
+    })
+    render(`/runs/${RUN_ID}/run`)
+    screen.getByText('MOCK ERROR RECOVERY')
   })
 
   // ToDo (kj:04/04/2023) need to figure out the way to simulate swipe

@@ -10,14 +10,14 @@ import { IngredPill } from './IngredPill'
 import { PDListItem } from '../lists'
 import { swatchColors } from '../swatchColors'
 import { formatVolume, formatPercentage } from './utils'
-import { LocationLiquidState } from '@opentrons/step-generation'
-import {
+import styles from './StepItem.module.css'
+import type { LocationLiquidState } from '@opentrons/step-generation'
+import type {
   SubstepIdentifier,
   SubstepWellData,
   WellIngredientVolumeData,
   WellIngredientNames,
 } from '../../steplist/types'
-import styles from './StepItem.module.css'
 
 interface SubstepRowProps {
   volume: number | string | null | undefined

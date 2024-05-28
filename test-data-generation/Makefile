@@ -27,11 +27,30 @@ wheel:
 	$(python) setup.py $(wheel_opts) bdist_wheel
 	rm -rf build
 
-.PHONY: test
-test:
-	$(pytest) tests \
+.PHONY: debug-test
+debug-test:
+	$(pytest) ./tests \
+	-vvv \
+	--tb=long \
 	-s \
 	--hypothesis-show-statistics \
-	--hypothesis-verbosity=normal \
 	--hypothesis-explain \
-	-vvv
+	--hypothesis-profile=dev
+
+.PHONY: exploratory-test
+exploratory-test:
+	$(pytest) ./tests \
+	--numprocesses=auto \
+	-s \
+	--hypothesis-show-statistics \
+	--hypothesis-explain \
+	--hypothesis-profile=exploratory
+
+.PHONY: test
+test:
+	$(pytest) ./tests \
+	--numprocesses=auto \
+	-s \
+	--hypothesis-show-statistics \
+	--hypothesis-explain \
+	--hypothesis-profile=ci

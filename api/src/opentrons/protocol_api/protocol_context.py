@@ -224,6 +224,15 @@ class ProtocolContext(CommandPublisher):
     @property
     @requires_version(2, 18)
     def params(self) -> Parameters:
+        """
+        The values of runtime parameters, as set during run setup.
+
+        Each attribute of this object corresponds to the ``variable_name`` of a parameter.
+        See :ref:`using-rtp` for details.
+
+        Parameter values can only be set during run setup. If you try to alter the value
+        of any attribute of ``params``, the API will raise an error.
+        """
         return self._params
 
     def cleanup(self) -> None:

@@ -1,4 +1,4 @@
-import * as allSharedData from '@opentrons/shared-data'
+import type * as allSharedData from '@opentrons/shared-data'
 
 declare global {
   interface Window {

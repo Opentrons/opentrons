@@ -1,7 +1,6 @@
 import * as React from 'react'
 import { vi, it, describe, expect, beforeEach } from 'vitest'
 import { fireEvent } from '@testing-library/react'
-import { useHistory } from 'react-router-dom'
 
 import { getPipetteNameSpecs } from '@opentrons/shared-data'
 
@@ -22,6 +21,7 @@ import { ExitModal } from '../ExitModal'
 import { ConfirmPipette } from '../ConfirmPipette'
 import { ChangePipette } from '..'
 
+import type { useHistory } from 'react-router-dom'
 import type { PipetteNameSpecs } from '@opentrons/shared-data'
 import type { AttachedPipette } from '../../../redux/pipettes/types'
 import type { DispatchApiRequestType } from '../../../redux/robot-api'

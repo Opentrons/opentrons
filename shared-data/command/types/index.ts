@@ -38,6 +38,7 @@ export interface CommandNote {
   source: string
 }
 export type CommandStatus = 'queued' | 'running' | 'succeeded' | 'failed'
+export type CommandIntent = 'protocol' | 'setup' | 'fixit'
 export interface CommonCommandRunTimeInfo {
   key?: string
   id: string
@@ -46,10 +47,11 @@ export interface CommonCommandRunTimeInfo {
   createdAt: string
   startedAt: string | null
   completedAt: string | null
-  intent?: 'protocol' | 'setup'
+  intent?: CommandIntent
   notes?: CommandNote[] | null
 }
 export interface CommonCommandCreateInfo {
+  intent?: CommandIntent
   key?: string
   meta?: { [key: string]: any }
 }
@@ -75,9 +77,13 @@ export type RunTimeCommand =
   | AnnotationRunTimeCommand // annotating command execution
   | IncidentalRunTimeCommand // command with only incidental effects (status bar animations)
 
-interface RunCommandError {
-  id: string
-  errorType: string
+// TODO(jh, 05-24-24): Update when some of these newer properties become more finalized.
+export interface RunCommandError {
   createdAt: string
   detail: string
+  errorCode: string
+  errorType: string
+  id: string
+  errorInfo?: Record<string, unknown>
+  wrappedErrors?: Array<Record<string, unknown>>
 }

@@ -1,7 +1,6 @@
 import { beforeEach, describe, it, expect, afterEach, vi } from 'vitest'
 import {
   HEATERSHAKER_MODULE_TYPE,
-  LabwareDefinition2,
   WASTE_CHUTE_CUTOUT,
 } from '@opentrons/shared-data'
 import {
@@ -14,9 +13,11 @@ import {
   SOURCE_LABWARE,
   TIPRACK_1,
 } from '../fixtures'
-import { moveLabware, MoveLabwareArgs } from '..'
+import { moveLabware } from '..'
 
+import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import type { InvariantContext, RobotState } from '../types'
+import type { MoveLabwareArgs } from '..'
 
 const mockWasteChuteId = 'mockWasteChuteId'
 const mockGripperId = 'mockGripperId'
@@ -112,6 +113,49 @@ describe('moveLabware', () => {
     expect(getErrorResult(result).errors).toHaveLength(1)
     expect(getErrorResult(result).errors[0]).toMatchObject({
       type: 'LABWARE_OFF_DECK',
+    })
+  })
+  it('should return an error for trying to move the labware to an occupied slot', () => {
+    const params = {
+      commandCreatorFnName: 'moveLabware',
+      labware: SOURCE_LABWARE,
+      useGripper: true,
+      newLocation: { slotName: '1' },
+    } as MoveLabwareArgs
+
+    const result = moveLabware(params, invariantContext, robotState)
+    expect(getErrorResult(result).errors).toHaveLength(1)
+    expect(getErrorResult(result).errors[0]).toMatchObject({
+      type: 'LABWARE_ON_ANOTHER_ENTITY',
+    })
+  })
+  it('should return an error for the labware already being discarded in previous step', () => {
+    const wasteChuteInvariantContext = {
+      ...invariantContext,
+      additionalEquipmentEntities: {
+        ...invariantContext.additionalEquipmentEntities,
+        mockWasteChuteId: {
+          name: 'wasteChute',
+          id: mockWasteChuteId,
+          location: WASTE_CHUTE_CUTOUT,
+        },
+      },
+    } as InvariantContext
+
+    robotState.labware = {
+      [SOURCE_LABWARE]: { slot: 'gripperWasteChute' },
+    }
+    const params = {
+      commandCreatorFnName: 'moveLabware',
+      labware: SOURCE_LABWARE,
+      useGripper: true,
+      newLocation: { slotName: 'A1' },
+    } as MoveLabwareArgs
+
+    const result = moveLabware(params, wasteChuteInvariantContext, robotState)
+    expect(getErrorResult(result).errors).toHaveLength(1)
+    expect(getErrorResult(result).errors[0]).toMatchObject({
+      type: 'LABWARE_DISCARDED_IN_WASTE_CHUTE',
     })
   })
   it('should return an error for trying to move the labware off deck with a gripper', () => {

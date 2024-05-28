@@ -15,5 +15,6 @@ export function forBlowout(
     wellName,
     prevLiquidState: robotState.liquidState,
     invariantContext,
+    robotStateAndWarnings,
   })
 }

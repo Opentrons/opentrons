@@ -1,11 +1,9 @@
 import * as React from 'react'
-import {
-  createAuthorization,
-  createRegistration,
-  HostConfig,
-} from '@opentrons/api-client'
+import { createAuthorization, createRegistration } from '@opentrons/api-client'
 import { useHost } from '../api'
+
 import type {
+  HostConfig,
   AuthorizationToken,
   CreateRegistrationParams,
   RegistrationToken,

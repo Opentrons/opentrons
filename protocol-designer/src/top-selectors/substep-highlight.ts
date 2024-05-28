@@ -1,18 +1,16 @@
 import { createSelector } from 'reselect'
 import mapValues from 'lodash/mapValues'
-import {
-  ALL,
-  COLUMN,
-  getWellNamePerMultiTip,
-  NozzleConfigurationStyle,
-} from '@opentrons/shared-data'
-import { WellGroup } from '@opentrons/components'
+import { ALL, COLUMN, getWellNamePerMultiTip } from '@opentrons/shared-data'
 import * as StepGeneration from '@opentrons/step-generation'
 import { selectors as stepFormSelectors } from '../step-forms'
 import { selectors as fileDataSelectors } from '../file-data'
 import { getHoveredStepId, getHoveredSubstep } from '../ui/steps'
 import { getWellSetForMultichannel } from '../utils'
-import type { CreateCommand } from '@opentrons/shared-data'
+import type { WellGroup } from '@opentrons/components'
+import type {
+  NozzleConfigurationStyle,
+  CreateCommand,
+} from '@opentrons/shared-data'
 import type { PipetteEntity, LabwareEntity } from '@opentrons/step-generation'
 import type { Selector } from '../types'
 import type { SubstepItemData } from '../steplist/types'
@@ -202,13 +200,19 @@ function _getSelectedWellsForSubstep(
 
   // source + dest steps
 
-  // @ts-expect-error(sa, 2021-6-22): `sourceLabware` is missing in `MixArgs`
-  if (stepArgs.sourceLabware && stepArgs.sourceLabware === labwareId) {
+  if (
+    'sourceLabware' in stepArgs &&
+    stepArgs.sourceLabware != null &&
+    stepArgs.sourceLabware === labwareId
+  ) {
     wells.push(...getWells('source'))
   }
 
-  // @ts-expect-error(sa, 2021-6-22): property `destLabware` is missing in `MixArgs`
-  if (stepArgs.destLabware && stepArgs.destLabware === labwareId) {
+  if (
+    'destLabware' in stepArgs &&
+    stepArgs.destLabware != null &&
+    stepArgs.destLabware === labwareId
+  ) {
     wells.push(...getWells('dest'))
   }
 

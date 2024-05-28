@@ -1,3 +1,5 @@
+import pytest
+from typing import List
 from opentrons_hardware.hardware_control.motion_planning import Move
 from opentrons_hardware.hardware_control.motion import (
     create_step,
@@ -119,3 +121,48 @@ def test_get_system_contraints_for_plunger() -> None:
     )
 
     assert updated_contraints[axis].max_acceleration == set_acceleration
+
+
+@pytest.mark.parametrize(
+    ["moving", "expected"],
+    [
+        [
+            [NodeId.gantry_x, NodeId.gantry_y, NodeId.gripper_g, NodeId.gripper_z],
+            [],
+        ],
+        [
+            [NodeId.head_l],
+            [NodeId.pipette_left],
+        ],
+        [
+            [NodeId.head_r],
+            [NodeId.pipette_right],
+        ],
+    ],
+)
+def test_moving_pipettes_in_move_group(
+    moving: List[NodeId], expected: List[NodeId]
+) -> None:
+    """Test that we can filter out the nonmoving nodes."""
+    present_nodes = [
+        NodeId.gantry_x,
+        NodeId.gantry_y,
+        NodeId.head_l,
+        NodeId.head_r,
+        NodeId.pipette_left,
+        NodeId.pipette_right,
+        NodeId.gripper_g,
+        NodeId.gripper_z,
+    ]
+    move_group = [
+        create_step(
+            distance={node: f64(100) for node in moving},
+            velocity={node: f64(100) for node in moving},
+            acceleration={node: f64(0) for node in moving},
+            duration=f64(1),
+            present_nodes=present_nodes,
+        )
+    ]
+
+    moving_pipettes = ot3utils.moving_pipettes_in_move_group(move_group)
+    assert set(moving_pipettes) == set(expected)

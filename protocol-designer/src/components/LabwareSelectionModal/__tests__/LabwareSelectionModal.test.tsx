@@ -121,7 +121,7 @@ describe('LabwareSelectionModal', () => {
     })
     render()
     fireEvent.click(
-      screen.getByText(nestedTextMatcher('adapter compatible labware'))
+      screen.getByText(nestedTextMatcher('Adapter Compatible Labware'))
     )
     screen.getByText('Opentrons GEB 1000uL Tiprack')
   })

@@ -1,6 +1,6 @@
 import { useContext } from 'react'
-import { HostConfig } from '@opentrons/api-client'
 import { ApiHostContext } from './ApiHostProvider'
+import type { HostConfig } from '@opentrons/api-client'
 
 export function useHost(): HostConfig | null {
   return useContext(ApiHostContext)

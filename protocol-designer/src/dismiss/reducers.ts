@@ -1,26 +1,29 @@
-import { Reducer, combineReducers } from 'redux'
+import { combineReducers } from 'redux'
 import { handleActions } from 'redux-actions'
-import omit from 'lodash/omit'
 import { getPDMetadata } from '../file-types'
-import { PRESAVED_STEP_ID } from '../steplist/types'
-import { DismissFormWarning, DismissTimelineWarning } from './actions'
-import { BaseState, Action } from '../types'
-import { LoadFileAction } from '../load-file'
-import {
-  CancelStepFormAction,
-  DeleteStepAction,
-  DeleteMultipleStepsAction,
-} from '../steplist/actions'
-import { StepIdType } from '../form-types'
+import type { Reducer } from 'redux'
+import type { BaseState, Action } from '../types'
+import type { LoadFileAction } from '../load-file'
+import type { StepIdType } from '../form-types'
+import type { DismissFormWarning, DismissTimelineWarning } from './actions'
+
 export type WarningType = string
-export type DismissedWarningsAllSteps = Record<
+
+export interface DismissedWarningState {
+  form: WarningType[]
+  timeline: WarningType[]
+}
+
+//  these legacy types are used for the migration 8_1_0
+type LegacyDismissedWarningsAllSteps = Record<
   StepIdType,
   WarningType[] | null | undefined
 >
-export interface DismissedWarningState {
-  form: DismissedWarningsAllSteps
-  timeline: DismissedWarningsAllSteps
+export interface LegacyDismissedWarningState {
+  form: LegacyDismissedWarningsAllSteps
+  timeline: LegacyDismissedWarningsAllSteps
 }
+
 // @ts-expect-error(sa, 2021-6-10): cannot use string literals as action type
 // TODO IMMEDIATELY: refactor this to the old fashioned way if we cannot have type safety: https://github.com/redux-utilities/redux-actions/issues/282#issuecomment-595163081
 const dismissedWarnings: Reducer<DismissedWarningState, any> = handleActions(
@@ -30,13 +33,9 @@ const dismissedWarnings: Reducer<DismissedWarningState, any> = handleActions(
       action: DismissFormWarning
     ): DismissedWarningState => {
       const { type } = action.payload
-      const stepId = action.payload.stepId
       return {
         ...state,
-        form: {
-          ...state.form,
-          [stepId]: [...(state.form[stepId] || []), type],
-        },
+        form: state.form ? [...state.form, type] : [type],
       }
     },
     DISMISS_TIMELINE_WARNING: (
@@ -44,34 +43,9 @@ const dismissedWarnings: Reducer<DismissedWarningState, any> = handleActions(
       action: DismissTimelineWarning
     ): DismissedWarningState => {
       const { type } = action.payload
-      const stepId = action.payload.stepId
       return {
         ...state,
-        timeline: {
-          ...state.timeline,
-          [stepId]: [...(state.timeline[stepId] || []), type],
-        },
-      }
-    },
-    DELETE_STEP: (
-      state: DismissedWarningState,
-      action: DeleteStepAction
-    ): DismissedWarningState => {
-      // remove key for deleted step
-      const stepId = action.payload
-      return {
-        form: omit(state.form, stepId),
-        timeline: omit(state.timeline, stepId),
-      }
-    },
-    DELETE_MULTIPLE_STEPS: (
-      state: DismissedWarningState,
-      action: DeleteMultipleStepsAction
-    ): DismissedWarningState => {
-      const stepIds = action.payload
-      return {
-        form: omit(state.form, stepIds),
-        timeline: omit(state.timeline, stepIds),
+        timeline: state.timeline ? [...state.timeline, type] : [type],
       }
     },
     LOAD_FILE: (
@@ -79,17 +53,10 @@ const dismissedWarnings: Reducer<DismissedWarningState, any> = handleActions(
       action: LoadFileAction
     ): DismissedWarningState =>
       getPDMetadata(action.payload.file).dismissedWarnings,
-    CANCEL_STEP_FORM: (
-      state: DismissedWarningState,
-      action: CancelStepFormAction
-    ): DismissedWarningState => ({
-      form: omit(state.form, PRESAVED_STEP_ID),
-      timeline: omit(state.timeline, PRESAVED_STEP_ID),
-    }),
   },
   {
-    form: {},
-    timeline: {},
+    form: [],
+    timeline: [],
   }
 )
 export const _allReducers = {

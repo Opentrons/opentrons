@@ -1,4 +1,4 @@
-import {
+import type {
   STATUS_NONE,
   STATUS_PORTAL,
   STATUS_LIMITED,

@@ -3,10 +3,7 @@ import { fireEvent, screen } from '@testing-library/react'
 import { when } from 'vitest-when'
 import { describe, it, beforeEach, vi, afterEach } from 'vitest'
 
-import {
-  DeckConfiguration,
-  TRASH_BIN_ADAPTER_FIXTURE,
-} from '@opentrons/shared-data'
+import { TRASH_BIN_ADAPTER_FIXTURE } from '@opentrons/shared-data'
 import { DeckConfigurator } from '@opentrons/components'
 import {
   useModulesQuery,
@@ -27,6 +24,7 @@ import {
 
 import type { UseQueryResult } from 'react-query'
 import type { MaintenanceRun } from '@opentrons/api-client'
+import type { DeckConfiguration } from '@opentrons/shared-data'
 import type * as OpentronsComponents from '@opentrons/components'
 
 vi.mock('@opentrons/components', async importOriginal => {

@@ -413,7 +413,7 @@ class OT3API(
             Dict[OT3Mount, Dict[str, Optional[str]]],
             Dict[top_types.Mount, Dict[str, Optional[str]]],
         ] = None,
-        attached_modules: Optional[Dict[str, List[str]]] = None,
+        attached_modules: Optional[Dict[str, List[modules.SimulatingModule]]] = None,
         config: Union[RobotConfig, OT3Config, None] = None,
         loop: Optional[asyncio.AbstractEventLoop] = None,
         strict_attached_instruments: bool = True,
@@ -2100,7 +2100,7 @@ class OT3API(
         real_mount = OT3Mount.from_mount(mount)
         status = await self.get_tip_presence_status(real_mount, follow_singular_sensor)
         if status != expected:
-            raise FailedTipStateCheck(expected, status.value)
+            raise FailedTipStateCheck(expected, status)
 
     async def _force_pick_up_tip(
         self, mount: OT3Mount, pipette_spec: TipActionSpec
@@ -2556,9 +2556,7 @@ class OT3API(
         reading from the pressure sensor.
 
         If the move is completed without the specified threshold being triggered, a
-        LiquidNotFound error will be thrown.
-        If the threshold is triggered before the minimum z distance has been traveled,
-        a EarlyLiquidSenseTrigger error will be thrown.
+        LiquidNotFoundError error will be thrown.
 
         Otherwise, the function will stop moving once the threshold is triggered,
         and return the position of the
@@ -2582,13 +2580,22 @@ class OT3API(
         if probe_settings.aspirate_while_sensing:
             await self._move_to_plunger_bottom(mount, rate=1.0)
         else:
-            # TODO: shorten this distance by only moving just far enough
-            #       to account for the specified "max-z-distance"
-            target_pos = target_position_from_plunger(
-                checked_mount, instrument.plunger_positions.top, self._current_position
+            # find the ideal travel distance by multiplying the plunger speed
+            # by the time it will take to complete the z move.
+            ideal_travel = probe_settings.plunger_speed * (
+                probe_settings.max_z_distance / probe_settings.mount_speed
             )
-            # FIXME: this should really be the slower "aspirate" speed,
-            #        but this is still in testing phase so let's bias towards speed
+
+            # TODO limit the z distance to the max  allowed by the plunger travel at this speed.
+            # or here is probably the ideal place to implement multi-probe
+            assert (
+                instrument.plunger_positions.bottom - ideal_travel
+                >= instrument.plunger_positions.top
+            )
+            target_point = instrument.plunger_positions.bottom - ideal_travel
+            target_pos = target_position_from_plunger(
+                checked_mount, target_point, self._current_position
+            )
             max_speeds = self.config.motion_settings.default_max_speed
             speed = max_speeds[self.gantry_load][OT3AxisKind.P]
             await self._move(target_pos, speed=speed, acquire_lock=True)

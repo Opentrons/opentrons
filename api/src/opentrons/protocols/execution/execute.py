@@ -1,9 +1,9 @@
 import logging
 from typing import Optional
 
-from opentrons.protocol_api import ProtocolContext, ParameterContext
-from opentrons.protocol_engine.types import RunTimeParamValuesType
-from opentrons.protocols.execution.execute_python import run_python
+from opentrons.protocol_api import ProtocolContext
+from opentrons.protocol_api._parameters import Parameters
+from opentrons.protocols.execution.execute_python import exec_run
 from opentrons.protocols.execution.json_dispatchers import (
     pipette_command_map,
     temperature_module_command_map,
@@ -21,27 +21,22 @@ MODULE_LOG = logging.getLogger(__name__)
 def run_protocol(
     protocol: Protocol,
     context: ProtocolContext,
-    parameter_context: Optional[ParameterContext] = None,
-    run_time_param_overrides: Optional[RunTimeParamValuesType] = None,
+    run_time_parameters_with_overrides: Optional[Parameters] = None,
 ) -> None:
     """Run a protocol.
 
     :param protocol: The :py:class:`.protocols.types.Protocol` to execute
     :param context: The protocol context to use.
-    :param parameter_context: The parameter context to use.
-    :param run_time_param_overrides: Any parameter values that are potentially overriding the defaults
+    :param run_time_parameters_with_overrides: Run time parameters defined in the protocol,
+        updated with the run's RTP override values. When we are running either simulate
+        or execute, this will be None (until RTP is supported in cli commands)
     """
     if isinstance(protocol, PythonProtocol):
         if protocol.api_level >= APIVersion(2, 0):
-            # If this is None here then we're either running simulate or execute, in any case we don't need to report
-            # this in analysis which is the reason we'd pass it to this function
-            if parameter_context is None:
-                parameter_context = ParameterContext(protocol.api_level)
-            run_python(
+            exec_run(
                 proto=protocol,
                 context=context,
-                parameter_context=parameter_context,
-                run_time_param_overrides=run_time_param_overrides,
+                run_time_parameters_with_overrides=run_time_parameters_with_overrides,
             )
         else:
             raise RuntimeError(f"Unsupported python API version: {protocol.api_level}")

@@ -11,7 +11,8 @@ from .pipetting_common import (
     BaseLiquidHandlingResult,
     DestinationPositionResult,
 )
-from .command import AbstractCommandImpl, BaseCommand, BaseCommandCreate
+from .command import AbstractCommandImpl, BaseCommand, BaseCommandCreate, SuccessData
+from ..errors.error_occurrence import ErrorOccurrence
 
 from opentrons.hardware_control import HardwareControlAPI
 
@@ -40,7 +41,9 @@ class AspirateResult(BaseLiquidHandlingResult, DestinationPositionResult):
     pass
 
 
-class AspirateImplementation(AbstractCommandImpl[AspirateParams, AspirateResult]):
+class AspirateImplementation(
+    AbstractCommandImpl[AspirateParams, SuccessData[AspirateResult, None]]
+):
     """Aspirate command implementation."""
 
     def __init__(
@@ -58,7 +61,9 @@ class AspirateImplementation(AbstractCommandImpl[AspirateParams, AspirateResult]
         self._movement = movement
         self._command_note_adder = command_note_adder
 
-    async def execute(self, params: AspirateParams) -> AspirateResult:
+    async def execute(
+        self, params: AspirateParams
+    ) -> SuccessData[AspirateResult, None]:
         """Move to and aspirate from the requested well.
 
         Raises:
@@ -107,12 +112,16 @@ class AspirateImplementation(AbstractCommandImpl[AspirateParams, AspirateResult]
             command_note_adder=self._command_note_adder,
         )
 
-        return AspirateResult(
-            volume=volume, position=DeckPoint(x=position.x, y=position.y, z=position.z)
+        return SuccessData(
+            public=AspirateResult(
+                volume=volume,
+                position=DeckPoint(x=position.x, y=position.y, z=position.z),
+            ),
+            private=None,
         )
 
 
-class Aspirate(BaseCommand[AspirateParams, AspirateResult]):
+class Aspirate(BaseCommand[AspirateParams, AspirateResult, ErrorOccurrence]):
     """Aspirate command model."""
 
     commandType: AspirateCommandType = "aspirate"
