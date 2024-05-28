@@ -540,6 +540,19 @@ async def test_no_pipette(sim_and_instr):
         assert not hw_api._current_volume[types.Mount.RIGHT]
 
 
+async def test_execute_pick_up_tip(dummy_instruments_ot3, ot3_api_obj):
+    """Make sure that execute_pick_up_tip does not add a tip to the instrument."""
+    hw_api = await ot3_api_obj(
+        attached_instruments=dummy_instruments_ot3[0], loop=asyncio.get_running_loop()
+    )
+    mount = types.Mount.LEFT
+    await hw_api.home()
+    await hw_api.cache_instruments()
+
+    await hw_api.execute_pick_up_tip(mount)
+    assert not hw_api.hardware_instruments[mount].has_tip
+
+
 async def test_pick_up_tip(is_robot, sim_and_instr):
     sim_builder, (dummy_instruments, _) = sim_and_instr
     hw_api = await sim_builder(
