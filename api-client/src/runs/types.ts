@@ -48,7 +48,6 @@ export interface LegacyGoodRunData {
   labware: LoadedLabware[]
   liquids: Liquid[]
   modules: LoadedModule[]
-  liquids: Liquid[]
   protocolId?: string
   labwareOffsets?: LabwareOffset[]
   runTimeParameters: RunTimeParameter[]
