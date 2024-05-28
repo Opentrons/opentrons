@@ -17,6 +17,7 @@ import {
   dropTipInPlaceHelper,
   moveToAddressableAreaHelper,
   DEFAULT_PIPETTE,
+  PIPETTE_96,
 } from '../fixtures'
 import { replaceTip } from '../commandCreators/atomic/replaceTip'
 import { FIXED_TRASH_ID } from '../constants'
@@ -127,6 +128,49 @@ describe('replaceTip', () => {
       expect(res.commands).toEqual([
         ...dropTipHelper(p300SingleId),
         pickUpTipHelper('B1'),
+      ])
+    })
+    it('96-channel full tip and emits the configure nozzle layout command before picking up tip', () => {
+      const initialTestRobotState = merge({}, initialRobotState, {
+        tipState: {
+          tipracks: {
+            [tiprack1Id]: {
+              A1: false,
+            },
+          },
+          pipettes: {
+            [PIPETTE_96]: true,
+          },
+        },
+        pipettes: {
+          [PIPETTE_96]: { nozzles: 'ALL' },
+        },
+      })
+      const result = replaceTip(
+        {
+          pipette: PIPETTE_96,
+          dropTipLocation: FIXED_TRASH_ID,
+          tipRack: tiprackURI1,
+          nozzles: COLUMN,
+        },
+        invariantContext,
+        initialTestRobotState
+      )
+      const res = getSuccessResult(result)
+      expect(res.commands).toEqual([
+        ...dropTipHelper(PIPETTE_96),
+        {
+          commandType: 'configureNozzleLayout',
+          key: expect.any(String),
+          params: {
+            pipetteId: PIPETTE_96,
+            configurationParams: {
+              primaryNozzle: 'A12',
+              style: COLUMN,
+            },
+          },
+        },
+        pickUpTipHelper('A2', { pipetteId: PIPETTE_96 }),
       ])
     })
     it('Single-channel: used all tips in first rack, move to second rack', () => {
