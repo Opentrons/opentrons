@@ -62,7 +62,7 @@ export function SummaryAndSettings(
     initialSummaryState
   )
   // TODO: adjust this mutation to add the quick transfer query parameter
-  const { mutateAsync: createProtocolAsync } = useCreateProtocolMutation({})
+  const { mutateAsync: createProtocolAsync } = useCreateProtocolMutation()
 
   const { createRun } = useCreateRunMutation(
     {
