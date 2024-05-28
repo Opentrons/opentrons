@@ -381,6 +381,7 @@ def _run_trial(
         well.bottom(z=liquid_height).point.z + starting_mm_above_liquid
     )
     start_height = starting_mount_height
+    height = 2 * start_height
     z_distances: List[float] = find_max_z_distances(
         run_args, tip, well, plunger_speed, starting_mount_height
     )
