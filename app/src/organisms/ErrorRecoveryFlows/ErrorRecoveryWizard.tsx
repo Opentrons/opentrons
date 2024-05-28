@@ -29,6 +29,7 @@ import type {
   useRecoveryCommands,
   UseRecoveryCommandsResult,
 } from './useRecoveryCommands'
+import { useTranslation } from 'react-i18next'
 
 interface UseERWizardResult {
   hasLaunchedRecovery: boolean
@@ -87,15 +88,26 @@ export function ErrorRecoveryWizard(
   )
 }
 
-//TOME: Update types and fill stuff in as needed.
 function ErrorRecoveryComponent(props: RecoveryContentProps): JSX.Element {
+  const { t } = useTranslation('error_recovery')
+
+  const buildTitleHeading = (): JSX.Element => {
+    const titleText = props.hasLaunchedRecovery
+      ? t('cancel_run')
+      : t('recovery_mode')
+    return <StyledText as="h4Bold">{titleText}</StyledText>
+  }
+
+  const buildIconHeading = (): JSX.Element => (
+    <StyledText as="pSemiBold">{t('view_error_details')}</StyledText>
+  )
+
   return createPortal(
     <InterventionModal
       iconName="information"
-      iconHeading={<StyledText as="pSemiBold">View error details</StyledText>}
-      titleHeading={<StyledText as="h4Bold">Error Recovery</StyledText>}
+      iconHeading={buildIconHeading()}
+      titleHeading={buildTitleHeading()}
       type={'error'}
-      iconHeadingOnClick={() => null}
     >
       <ErrorRecoveryContent {...props} />
     </InterventionModal>,

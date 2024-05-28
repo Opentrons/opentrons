@@ -124,6 +124,7 @@ export function InterventionModal(props: InterventionModalProps): JSX.Element {
             {...HEADER_STYLE}
             backgroundColor={headerColor}
             justifyContent={headerJustifyContent}
+            onClick={props.iconHeadingOnClick}
           >
             {props.titleHeading}
             <Flex alignItems={ALIGN_CENTER} gridGap={SPACING.spacing12}>

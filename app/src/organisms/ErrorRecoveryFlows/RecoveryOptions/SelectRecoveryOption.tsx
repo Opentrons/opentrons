@@ -33,8 +33,6 @@ export function SelectRecoveryOption({
     head(validRecoveryOptions) as RecoveryRoute
   )
 
-  // TOME: You need to abstract the wrapper component for all of these! Move the shared library up a bit and adjust it there.
-  // Then, do the
   if (isOnDevice) {
     return (
       <RecoverySingleColumnContent>
