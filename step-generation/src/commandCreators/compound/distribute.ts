@@ -22,7 +22,6 @@ import {
 import {
   aspirate,
   configureForVolume,
-  configureNozzleLayout,
   delay,
   dispense,
   dropTip,
@@ -460,20 +459,7 @@ export const distribute: CommandCreator<DistributeArgs> = (
           ]
         : []
 
-      const stateNozzles = prevRobotState.pipettes[args.pipette].nozzles
-      const configureNozzleLayoutCommand: CurriedCommandCreator[] =
-        //  only emit the command if previous nozzle state is different
-        is96Channel && args.nozzles != null && args.nozzles !== stateNozzles
-          ? [
-              curryCommandCreator(configureNozzleLayout, {
-                nozzles: args.nozzles,
-                pipetteId: args.pipette,
-              }),
-            ]
-          : []
-
       return [
-        ...configureNozzleLayoutCommand,
         ...tipCommands,
         ...configureForVolumeCommand,
         ...mixBeforeAspirateCommands,
