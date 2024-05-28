@@ -68,6 +68,20 @@ class google_drive:
             if not file_names:
                 print("No folders or files found in Google Drive.")
         return file_names
+    
+    def create_folder(self, new_folder_name: str) -> str:
+        """Create folder within defined folder."""
+        file_metadata = {
+            "name": new_folder_name,
+            "mimeType": "application/vnd.google-apps.folder",
+            "parents": self.parent_folder
+            }
+        file = self.drive_service.files().create(body=file_metadata, fields="id", supportsAllDrives="true").execute()
+        folder_id = file.get("id")
+        self.share_permissions(folder_id)
+        # SHARE FOLDER WITH EMAIL
+        print(f'Folder ID: "{file.get("id")}".')
+        return file.get("id")
 
     def delete_files(self, file_or_folder_id: str) -> None:
         """Delete a file or folder in Google Drive by ID."""
