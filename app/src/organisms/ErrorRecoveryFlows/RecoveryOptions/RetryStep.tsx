@@ -16,7 +16,7 @@ import { RecoveryFooterButtons } from './shared'
 
 import type { RecoveryContentProps } from '../types'
 
-export function ResumeRun({
+export function RetryStep({
   isOnDevice,
   routeUpdateActions,
   recoveryCommands,
@@ -28,7 +28,7 @@ export function ResumeRun({
   const { goBackPrevStep, setRobotInMotion } = routeUpdateActions
 
   const primaryBtnOnClick = (): Promise<void> => {
-    return setRobotInMotion(true, ROBOT_RETRYING_COMMAND.ROUTE) // Show the "retrying" motion screen while exiting ER.
+    return setRobotInMotion(true, ROBOT_RETRYING_COMMAND.ROUTE)
       .then(() => retryFailedCommand())
       .then(() => resumeRun())
   }

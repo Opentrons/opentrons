@@ -10,6 +10,7 @@ export type RobotMovingRoute =
   | typeof RECOVERY_MAP['ROBOT_IN_MOTION']['ROUTE']
   | typeof RECOVERY_MAP['ROBOT_RESUMING']['ROUTE']
   | typeof RECOVERY_MAP['ROBOT_RETRYING_COMMAND']['ROUTE']
+  | typeof RECOVERY_MAP['ROBOT_CANCELING']['ROUTE']
 export type ErrorKind = keyof typeof ERROR_KINDS
 
 interface RecoveryMapDetails {
@@ -27,6 +28,7 @@ type RecoveryStep<
   K extends keyof RecoveryMap
 > = RecoveryMap[K]['STEPS'][keyof RecoveryMap[K]['STEPS']]
 
+type RobotCancellingRunStep = RecoveryStep<'ROBOT_CANCELING'>
 type RobotInMotionStep = RecoveryStep<'ROBOT_IN_MOTION'>
 type RobotResumingStep = RecoveryStep<'ROBOT_RESUMING'>
 type RobotRetryingCommandStep = RecoveryStep<'ROBOT_RETRYING_COMMAND'>
@@ -49,6 +51,7 @@ export type RouteStep =
   | ResumeStep
   | OptionSelectionStep
   | RefillAndResumeStep
+  | RobotCancellingRunStep
 
 export interface IRecoveryMap {
   route: RecoveryRoute
@@ -62,4 +65,5 @@ export interface RecoveryContentProps {
   recoveryMap: IRecoveryMap
   routeUpdateActions: UseRouteUpdateActionsResult
   recoveryCommands: UseRecoveryCommandsResult
+  hasLaunchedRecovery: boolean
 }

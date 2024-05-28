@@ -1,11 +1,12 @@
 import * as React from 'react'
-import { beforeEach, describe, it, vi } from 'vitest'
+import { beforeEach, describe, it } from 'vitest'
 import { screen } from '@testing-library/react'
 
 import { renderWithProviders } from '../../../__testing-utils__'
 import { i18n } from '../../../i18n'
+import { mockRecoveryContentProps } from '../__fixtures__'
 import { RecoveryInProgress } from '../RecoveryInProgress'
-import { ERROR_KINDS, RECOVERY_MAP } from '../constants'
+import { RECOVERY_MAP } from '../constants'
 
 const render = (props: React.ComponentProps<typeof RecoveryInProgress>) => {
   return renderWithProviders(<RecoveryInProgress {...props} />, {
@@ -15,6 +16,7 @@ const render = (props: React.ComponentProps<typeof RecoveryInProgress>) => {
 
 describe('RecoveryInProgress', () => {
   const {
+    ROBOT_CANCELING,
     ROBOT_IN_MOTION,
     ROBOT_RESUMING,
     ROBOT_RETRYING_COMMAND,
@@ -23,11 +25,7 @@ describe('RecoveryInProgress', () => {
 
   beforeEach(() => {
     props = {
-      isOnDevice: true,
-      errorKind: ERROR_KINDS.GENERAL_ERROR,
-      failedCommand: {} as any,
-      recoveryCommands: {} as any,
-      routeUpdateActions: vi.fn() as any,
+      ...mockRecoveryContentProps,
       recoveryMap: {
         route: ROBOT_IN_MOTION.ROUTE,
         step: ROBOT_IN_MOTION.STEPS.IN_MOTION,
@@ -65,5 +63,18 @@ describe('RecoveryInProgress', () => {
     render(props)
 
     screen.getByText('Stand back, retrying current command')
+  })
+
+  it(`renders appropriate copy when the route is ${ROBOT_CANCELING.ROUTE}`, () => {
+    props = {
+      ...props,
+      recoveryMap: {
+        route: ROBOT_CANCELING.ROUTE,
+        step: ROBOT_CANCELING.STEPS.CANCELING,
+      },
+    }
+    render(props)
+
+    screen.getByText('Canceling run')
   })
 })

@@ -50,6 +50,7 @@
     "ot3_standard": {}
   },
   "compatibleWith": [],
+  "incompatibleWithDecks": [],
   "twoDimensionalRendering": {
     "name": "svg",
     "type": "element",

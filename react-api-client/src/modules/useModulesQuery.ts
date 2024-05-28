@@ -3,6 +3,7 @@ import { getModules } from '@opentrons/api-client'
 import { useHost } from '../api'
 import type { UseQueryResult, UseQueryOptions } from 'react-query'
 import type { HostConfig, Modules } from '@opentrons/api-client'
+import { MODULE_MODELS } from '@opentrons/shared-data'
 
 export type UseModulesQueryOptions = UseQueryOptions<Modules>
 
@@ -26,7 +27,20 @@ export function useModulesQuery(
           }
         }
       }),
-    { enabled: host !== null, ...options }
+    {
+      enabled: host !== null,
+      // Filter unknown modules so we don't block the app, which
+      // can happen when developing new devices not yet known to the client.
+      select: resp => {
+        return {
+          ...resp,
+          data: resp.data.filter(module =>
+            MODULE_MODELS.includes(module.moduleModel)
+          ),
+        }
+      },
+      ...options,
+    }
   )
 
   return query

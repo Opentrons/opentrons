@@ -269,6 +269,8 @@ To use these optional methods, first create a liquid object with :py:meth:`.Prot
 
 Let's examine how these two methods work. The following examples demonstrate how to define colored water samples for a well plate and reservoir.
 
+.. _defining-liquids:
+
 Defining Liquids
 ================
 
@@ -290,6 +292,8 @@ This example uses ``define_liquid`` to create two liquid objects and instantiate
 .. versionadded:: 2.14
         
 The ``display_color`` parameter accepts a hex color code, which adds a color to that liquid's label when you import your protocol into the Opentrons App. The ``define_liquid`` method accepts standard 3-, 4-, 6-, and 8-character hex color codes.
+
+.. _loading-liquids:
 
 Labeling Wells and Reservoirs
 =============================

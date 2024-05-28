@@ -4,20 +4,21 @@ import { screen, fireEvent, waitFor } from '@testing-library/react'
 
 import { renderWithProviders } from '../../../../__testing-utils__'
 import { i18n } from '../../../../i18n'
-import { ResumeRun } from '../ResumeRun'
-import { RECOVERY_MAP, ERROR_KINDS } from '../../constants'
+import { mockRecoveryContentProps } from '../../__fixtures__'
+import { CancelRun } from '../CancelRun'
+import { RECOVERY_MAP } from '../../constants'
 
 import type { Mock } from 'vitest'
 
-const render = (props: React.ComponentProps<typeof ResumeRun>) => {
-  return renderWithProviders(<ResumeRun {...props} />, {
+const render = (props: React.ComponentProps<typeof CancelRun>) => {
+  return renderWithProviders(<CancelRun {...props} />, {
     i18nInstance: i18n,
   })[0]
 }
 
 describe('RecoveryFooterButtons', () => {
-  const { RESUME, ROBOT_RETRYING_COMMAND } = RECOVERY_MAP
-  let props: React.ComponentProps<typeof ResumeRun>
+  const { CANCEL_RUN, ROBOT_CANCELING } = RECOVERY_MAP
+  let props: React.ComponentProps<typeof CancelRun>
   let mockGoBackPrevStep: Mock
 
   beforeEach(() => {
@@ -25,14 +26,11 @@ describe('RecoveryFooterButtons', () => {
     const mockRouteUpdateActions = { goBackPrevStep: mockGoBackPrevStep } as any
 
     props = {
-      isOnDevice: true,
-      recoveryCommands: {} as any,
-      failedCommand: {} as any,
-      errorKind: ERROR_KINDS.GENERAL_ERROR,
+      ...mockRecoveryContentProps,
       routeUpdateActions: mockRouteUpdateActions,
       recoveryMap: {
-        route: RESUME.ROUTE,
-        step: RESUME.STEPS.CONFIRM_RESUME,
+        route: CANCEL_RUN.ROUTE,
+        step: CANCEL_RUN.STEPS.CONFIRM_CANCEL,
       },
     }
   })
@@ -40,9 +38,9 @@ describe('RecoveryFooterButtons', () => {
   it('renders appropriate copy and click behavior', async () => {
     render(props)
 
-    screen.getByText('Are you sure you want to resume?')
+    screen.getByText('Are you sure you want to cancel?')
     screen.queryByText(
-      'The run will resume from the point at which the error occurred.'
+      'If tips are attached, you can choose to blowout any aspirated liquid and drop tips before the run is terminated.'
     )
 
     const secondaryBtn = screen.getByRole('button', { name: 'Go back' })
@@ -54,12 +52,10 @@ describe('RecoveryFooterButtons', () => {
 
   it('should call commands in the correct order for the primaryOnClick callback', async () => {
     const setRobotInMotionMock = vi.fn(() => Promise.resolve())
-    const retryFailedCommandMock = vi.fn(() => Promise.resolve())
-    const resumeRunMock = vi.fn()
+    const cancelRunMock = vi.fn(() => Promise.resolve())
 
     const mockRecoveryCommands = {
-      retryFailedCommand: retryFailedCommandMock,
-      resumeRun: resumeRunMock,
+      cancelRun: cancelRunMock,
     } as any
 
     const mockRouteUpdateActions = {
@@ -81,24 +77,15 @@ describe('RecoveryFooterButtons', () => {
     await waitFor(() => {
       expect(setRobotInMotionMock).toHaveBeenCalledWith(
         true,
-        ROBOT_RETRYING_COMMAND.ROUTE
+        ROBOT_CANCELING.ROUTE
       )
     })
     await waitFor(() => {
-      expect(retryFailedCommandMock).toHaveBeenCalledTimes(1)
-    })
-    await waitFor(() => {
-      expect(resumeRunMock).toHaveBeenCalledTimes(1)
+      expect(cancelRunMock).toHaveBeenCalledTimes(1)
     })
 
     expect(setRobotInMotionMock.mock.invocationCallOrder[0]).toBeLessThan(
-      retryFailedCommandMock.mock.invocationCallOrder[0]
+      cancelRunMock.mock.invocationCallOrder[0]
     )
-
-    await waitFor(() => {
-      expect(retryFailedCommandMock.mock.invocationCallOrder[0]).toBeLessThan(
-        resumeRunMock.mock.invocationCallOrder[0]
-      )
-    })
   })
 })

@@ -1,6 +1,9 @@
 import * as React from 'react'
 
-import { useResumeRunFromRecoveryMutation } from '@opentrons/react-api-client'
+import {
+  useResumeRunFromRecoveryMutation,
+  useStopRunMutation,
+} from '@opentrons/react-api-client'
 
 import { useChainRunCommands } from '../../resources/runs'
 
@@ -13,17 +16,23 @@ interface UseRecoveryCommandsParams {
   failedCommand: FailedCommand | null
 }
 export interface UseRecoveryCommandsResult {
+  /* A terminal recovery command that causes ER to exit as the run status becomes "running" */
   resumeRun: () => void
+  /* A terminal recovery command that causes ER to exit as the run status becomes "stop-requested" */
+  cancelRun: () => void
+  /* A non-terminal recovery command */
   retryFailedCommand: () => Promise<CommandData[]>
+  /* A non-terminal recovery command */
   homePipetteZAxes: () => Promise<CommandData[]>
 }
-// Returns recovery command functions.
+// Returns commands with a "fixit" intent. Commands may or may not terminate Error Recovery. See each command docstring for details.
 export function useRecoveryCommands({
   runId,
   failedCommand,
 }: UseRecoveryCommandsParams): UseRecoveryCommandsResult {
   const { chainRunCommands } = useChainRunCommands(runId, failedCommand?.id)
   const { resumeRunFromRecovery } = useResumeRunFromRecoveryMutation()
+  const { stopRun } = useStopRunMutation()
 
   const chainRunRecoveryCommands = React.useCallback(
     (
@@ -54,8 +63,13 @@ export function useRecoveryCommands({
     resumeRunFromRecovery(runId)
   }, [runId, resumeRunFromRecovery])
 
+  const cancelRun = React.useCallback((): void => {
+    stopRun(runId)
+  }, [runId])
+
   return {
     resumeRun,
+    cancelRun,
     retryFailedCommand,
     homePipetteZAxes,
   }

@@ -117,6 +117,14 @@ export const getMagnetModuleHasLabware: Selector<boolean> = createSelector(
   }
 )
 
+/** Returns boolean if heater-shaker module has labware */
+export const getHeaterShakerModuleHasLabware: Selector<boolean> = createSelector(
+  getInitialDeckSetup,
+  initialDeckSetup => {
+    return getModuleHasLabware(initialDeckSetup, HEATERSHAKER_MODULE_TYPE)
+  }
+)
+
 /** Returns all moduleIds and if they have labware for MoaM */
 export const getTemperatureModulesHaveLabware: Selector<
   ModuleAndLabware[]

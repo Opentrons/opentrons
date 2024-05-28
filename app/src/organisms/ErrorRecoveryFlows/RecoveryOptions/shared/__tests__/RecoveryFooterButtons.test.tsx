@@ -48,4 +48,13 @@ describe('RecoveryFooterButtons', () => {
 
     screen.getByRole('button', { name: 'MOCK_OVERRIDE_TEXT' })
   })
+
+  it('does not render the secondary button if no on click handler is supplied', () => {
+    props = { ...props, secondaryBtnOnClick: undefined }
+    render(props)
+
+    expect(
+      screen.queryByRole('button', { name: 'Go back' })
+    ).not.toBeInTheDocument()
+  })
 })

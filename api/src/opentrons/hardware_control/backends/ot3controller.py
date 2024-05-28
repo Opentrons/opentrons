@@ -192,6 +192,9 @@ from opentrons_shared_data.errors.exceptions import (
     FirmwareUpdateRequiredError,
     FailedGripperPickupError,
     LiquidNotFoundError,
+    CommunicationError,
+    PythonException,
+    UnsupportedHardwareCommand,
 )
 
 from .subsystem_manager import SubsystemManager
@@ -1186,7 +1189,14 @@ class OT3Controller(FlexBackend):
     async def is_motor_engaged(self, axis: Axis) -> bool:
         node = axis_to_node(axis)
         result = await get_motor_enabled(self._messenger, {node})
-        engaged = result[node]
+        try:
+            engaged = result[node]
+        except KeyError as ke:
+            raise CommunicationError(
+                message=f"No response from {node.name} for motor engagement query",
+                detail={"node": node.name},
+                wrapping=[PythonException(ke)],
+            ) from ke
         self._engaged_axes.update({axis: engaged})
         return engaged
 
@@ -1358,12 +1368,16 @@ class OT3Controller(FlexBackend):
         probe: InstrumentProbeType = InstrumentProbeType.PRIMARY,
     ) -> float:
         if output_option == OutputOptions.sync_buffer_to_csv:
-            assert (
+            if (
                 self._subsystem_manager.device_info[
                     SubSystem.of_mount(mount)
                 ].revision.tertiary
                 == "1"
-            )
+            ):
+                raise UnsupportedHardwareCommand(
+                    "Liquid Probe not supported on this pipette firmware"
+                )
+
         head_node = axis_to_node(Axis.by_mount(mount))
         tool = sensor_node_for_pipette(OT3Mount(mount.value))
         csv_output = bool(output_option.value & OutputOptions.stream_to_csv.value)
