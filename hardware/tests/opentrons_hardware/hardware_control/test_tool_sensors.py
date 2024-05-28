@@ -43,7 +43,6 @@ from opentrons_hardware.hardware_control.tool_sensors import (
     check_overpressure,
     InstrumentProbeTarget,
     PipetteProbeTarget,
-    _run_with_binding,
 )
 from opentrons_hardware.firmware_bindings.constants import (
     NodeId,
@@ -91,23 +90,6 @@ def mock_bind_output() -> Iterator[AsyncMock]:
 
     with patch(
         "opentrons_hardware.sensors.sensor_driver.SensorDriver.bind_output",
-        _fake_bind,
-    ):
-        yield mock_bind
-
-
-@pytest.fixture
-def mock_run_with_binding() -> Iterator[AsyncMock]:
-    """Mock sensor output binding via tool sensors module."""
-    mock_bind = AsyncMock(spec=_run_with_binding)
-
-    @asynccontextmanager
-    async def _fake_bind(*args: Any, **kwargs: Any) -> AsyncIterator[None]:
-        await mock_bind(*args, **kwargs)
-        yield
-
-    with patch(
-        "opentrons_hardware.hardware_control.tool_sensors._run_with_binding",
         _fake_bind,
     ):
         yield mock_bind
@@ -333,7 +315,6 @@ async def test_capacitive_probe(
     mock_messenger: AsyncMock,
     message_send_loopback: CanLoopback,
     mock_sensor_threshold: AsyncMock,
-    mock_run_with_binding: AsyncMock,
     target_node: InstrumentProbeTarget,
     motor_node: NodeId,
     caplog: Any,
@@ -409,10 +390,6 @@ async def test_capacitive_probe(
         data=SensorDataType.build(1.0, sensor_info.sensor_type),
         mode=SensorThresholdMode.auto_baseline,
     )
-    mock_run_with_binding.assert_called_once()
-    assert mock_run_with_binding.call_args_list[0][0][3] == [
-        SensorOutputBinding.sync,
-    ]
 
 
 @pytest.mark.parametrize(
