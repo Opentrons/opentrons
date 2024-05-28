@@ -43,6 +43,7 @@ from robot_server.protocols.protocol_store import ProtocolResource
 from opentrons.protocol_engine.types import (
     DeckConfigurationType,
     RunTimeParamValuesType,
+    EngineStatus,
 )
 
 
@@ -371,6 +372,10 @@ class EngineStore:
         return self._run_orchestrator.engine.state_view.commands.get(
             command_id=command_id
         )
+
+    def get_status(self) -> EngineStatus:
+        """Get the current execution status of the engine."""
+        return self._run_orchestrator.engine.state_view.commands.get_status()
 
     def get_is_run_terminal(self) -> bool:
         return self._run_orchestrator.engine.state_view.commands.get_is_terminal()
