@@ -86,15 +86,16 @@ export function RunPausedSplash({
         <LargeButton
           onClick={onCancelClick}
           buttonText={t('cancel_run')}
-          css={CANCEL_RUN_BTN_STYLE}
+          css={SHARED_BUTTON_STYLE}
           iconName={'remove'}
-          iconColorOverride={COLORS.red50}
+          buttonType="alertAlt"
         />
         <LargeButton
           onClick={onLaunchERClick}
           buttonText={t('launch_recovery_mode')}
-          css={LAUNCH_RECOVERY_BTN_STYLE}
+          css={SHARED_BUTTON_STYLE}
           iconName={'recovery'}
+          buttonType="onColor"
         />
       </Flex>
     </Flex>
@@ -133,45 +134,7 @@ const SplashFrame = styled(Flex)`
   padding-bottom: 0px;
 `
 
-const SHARED_BUTTON_STYLE = `
-width: 464px;
-height: 216px;
-`
-
-const LAUNCH_RECOVERY_BTN_STYLE = css`
-  ${SHARED_BUTTON_STYLE};
-  background-color: transparent;
-  border: 4px solid ${COLORS.white};
-
-  &:hover {
-    background-color: transparent;
-    border: 4px solid ${COLORS.white};
-  }
-  &:active {
-    background-color: transparent;
-    border: 4px solid ${COLORS.white};
-  }
-  &:focus-visible {
-    background-color: transparent;
-    border: 4px solid ${COLORS.white};
-  }
-`
-
-const CANCEL_RUN_BTN_STYLE = css`
-  ${SHARED_BUTTON_STYLE};
-  color: ${COLORS.red50};
-  background-color: ${COLORS.white};
-
-  &:hover {
-    color: ${COLORS.red50};
-    background-color: ${COLORS.white};
-  }
-  &:active {
-    color: ${COLORS.red50};
-    background-color: ${COLORS.white};
-  }
-  &:focus-visible {
-    color: ${COLORS.red50};
-    background-color: ${COLORS.white};
-  }
+const SHARED_BUTTON_STYLE = css`
+  width: 29rem;
+  height: 13.5rem;
 `
