@@ -173,7 +173,8 @@ async def run(api: OT3API, report: CSVReport, section: str) -> None:
                 NodeId.pipette_left,
                 NodeId.head_l,
                 distance=distance,
-                speed=speed,
+                plunger_speed=speed,
+                mount_speed=speed,
                 sensor_id=sensor_id,
                 relative_threshold_pf=default_probe_cfg.sensor_threshold_pf,
             )
