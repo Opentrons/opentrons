@@ -323,6 +323,7 @@ export function useModuleOverflowMenu(
             : () => handleSlideoutClick(false),
       },
     ],
+    absorbanceReaderType: [],
   }
 
   return {

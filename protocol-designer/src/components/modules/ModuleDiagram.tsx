@@ -14,6 +14,8 @@ import {
   THERMOCYCLER_MODULE_V2,
   MAGNETIC_BLOCK_TYPE,
   MAGNETIC_BLOCK_V1,
+  ABSORBANCE_READER_TYPE,
+  ABSORBANCE_READER_V1,
 } from '@opentrons/shared-data'
 
 import magdeck_gen1 from '../../images/modules/magdeck_gen1.png'
@@ -55,6 +57,10 @@ const MODULE_IMG_BY_TYPE: ModuleImg = {
   },
   [MAGNETIC_BLOCK_TYPE]: {
     [MAGNETIC_BLOCK_V1]: mag_block,
+  },
+  [ABSORBANCE_READER_TYPE]: {
+    // TODO (AA): update absorbance reader image
+    [ABSORBANCE_READER_V1]: heater_shaker_module_transparent,
   },
 }
 

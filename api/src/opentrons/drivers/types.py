@@ -73,7 +73,7 @@ class AbsorbanceReaderPlatePresence(str, Enum):
 
     UNKNOWN = "unknown"
     PRESENT = "present"
-    ABSENCE = "absence"
+    ABSENT = "absent"
 
 
 class AbsorbanceReaderDeviceState(str, Enum):
