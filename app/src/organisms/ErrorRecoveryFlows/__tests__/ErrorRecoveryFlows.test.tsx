@@ -12,7 +12,7 @@ import { renderWithProviders } from '../../../__testing-utils__'
 import { i18n } from '../../../i18n'
 import { mockFailedCommand } from '../__fixtures__'
 import { ErrorRecoveryFlows, useErrorRecoveryFlows } from '..'
-import { useCurrentlyFailedRunCommand } from '../utils'
+import { useCurrentlyRecoveringFrom } from '../utils'
 import { useFeatureFlag } from '../../../redux/config'
 import { useERWizard, ErrorRecoveryWizard } from '../ErrorRecoveryWizard'
 import { useRunPausedSplash, RunPausedSplash } from '../RunPausedSplash'
@@ -27,9 +27,7 @@ vi.mock('../RunPausedSplash')
 
 describe('useErrorRecoveryFlows', () => {
   beforeEach(() => {
-    vi.mocked(useCurrentlyFailedRunCommand).mockReturnValue(
-      'mockCommand' as any
-    )
+    vi.mocked(useCurrentlyRecoveringFrom).mockReturnValue('mockCommand' as any)
   })
 
   it('should have initial state of isEREnabled as false', () => {
