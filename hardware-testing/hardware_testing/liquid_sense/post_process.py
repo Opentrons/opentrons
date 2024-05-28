@@ -1,15 +1,13 @@
 """Post process script csvs."""
 import csv
-import os
-from typing import List, Dict, Tuple, Any, Optional
-import statistics
+import gspread
 import math
-from math import isclose
-try:
-    import gspread  # type: ignore[import]
-except ImportError:
-    print("WARNING: unable to import gspread, if not simulating check your environment")
+import os
+import statistics
+import traceback
+from typing import List, Dict, Tuple, Any, Optional
 
+from hardware_testing.data import ui
 
 COL_TRIAL_CONVERSION = {
     1: "E",
@@ -53,7 +51,7 @@ def process_csv_directory(  # noqa: C901
     trials: int,
     google_sheet: Optional[Any],
     sheet_name: str,
-    sheet_id: str,
+    sheet_id: Optional[str],
     make_graph: bool = False,
 ) -> None:
     """Post process script csvs."""
@@ -164,12 +162,14 @@ def process_csv_directory(  # noqa: C901
             # Add header to google sheet
             if google_sheet:
                 try:
-                    pressure_header_for_google_sheet = [[x] for x in pressure_header_row]
+                    pressure_header_for_google_sheet = [
+                        [x] for x in pressure_header_row
+                    ]
                     google_sheet.batch_update_cells(
                         sheet_name, pressure_header_for_google_sheet, "H", 10, sheet_id
                     )
                 except gspread.exceptions.APIError:
-                    print("Header did not write on google sheet.")
+                    ui.print_error("Header did not write on google sheet.")
             # we want to line up the z height's of each trial at time==0
             # to do this we drop the results at the beginning of each of the trials
             # except for one with the longest tip (lower tip offset are longer tips)
@@ -209,7 +209,7 @@ def process_csv_directory(  # noqa: C901
                 pressure_rows = []
                 for i in range(max_results_len):
                     pressure_row: List[str] = [f"{time}"]
-                    if isclose(
+                    if math.isclose(
                         time,
                         meniscus_time,
                         rel_tol=0.001,
@@ -242,20 +242,22 @@ def process_csv_directory(  # noqa: C901
                             sheet_name, transposed_pressure_rows, "H", 11, sheet_id
                         )
                     except gspread.exceptions.APIError:
-                        print("Did not write pressure data to google sheet.")
+                        ui.print_error("Did not write pressure data to google sheet.")
 
 
 def process_google_sheet(
-    google_sheet: Optional[Any], run_args, test_info: List, sheet_id: str
+    google_sheet: Optional[Any],
+    run_args: Any,
+    test_info: List,
+    sheet_id: Optional[str],
 ) -> None:
     """Write results and graphs to google sheet."""
     if not google_sheet:
         return
-    sheet_name = run_args.run_id
+    sheet_name = run_args.run_id  # type: ignore[attr-defined]
     test_parameters = [
         [
-            "Run ID"
-            "Serial Number",
+            "Run ID" "Serial Number",
             "Pipette Type",
             "Tip Size",
             "Z Speed (mm/s)",
@@ -266,10 +268,10 @@ def process_google_sheet(
         ],
         test_info,
     ]
-    num_of_trials = run_args.trials
+    num_of_trials = run_args.trials  # type: ignore[attr-defined]
     google_sheet.batch_update_cells(sheet_name, test_parameters, "A", 1, sheet_id)
     target_height = google_sheet.get_cell(sheet_name, "B9")
-    print(target_height)
+    ui.print_info(target_height)
     last_trial_row = 10 + num_of_trials
     adjusted_height_range = "E11:E" + str(last_trial_row)
     adjusted_height = google_sheet.get_single_col_range(
@@ -283,14 +285,16 @@ def process_google_sheet(
     try:
         accuracy = statistics.mean(normalized_height)
         precision = (max(normalized_height) - min(normalized_height)) / 2
-        repeatability_error = statistics.stdev(normalized_height) / math.sqrt(len(normalized_height))
+        repeatability_error = statistics.stdev(normalized_height) / math.sqrt(
+            len(normalized_height)
+        )
         summary = [
             ["Accuracy (mm)", "Precision (+/- mm)", "Repeatability (%)"],
             [accuracy, precision, 100.0 - 100.0 * repeatability_error],
         ]
         google_sheet.batch_update_cells(sheet_name, summary, "D", 2, sheet_id)
     except gspread.exceptions.APIError:
-        print("stats didn't work.")
+        ui.print_error("stats didn't work.")
 
     # Create Graphs
     # 1. Create pressure vs time graph zoomed out
@@ -301,7 +305,7 @@ def process_google_sheet(
         {"position": "RIGHT_AXIS", "title": titles[3]},
     ]
     # TODO: Create less hard coded zoom in
-    print("starting to make graphs")
+    ui.print_info("starting to make graphs")
     domains_pressure = [
         {
             "domain": {
@@ -340,11 +344,18 @@ def process_google_sheet(
         series_pressure.append(series_dict)
     try:
         google_sheet.create_line_chart(
-            titles, series_pressure, domains_pressure, axis_pressure_vs_time, 0, sheet_id
+            titles,
+            series_pressure,
+            domains_pressure,
+            axis_pressure_vs_time,
+            0,
+            sheet_id,
         )
-    except:
-        print("did not make pressure vs time graph.")
-    
+    except Exception as e:
+        ui.print_error("did not make pressure vs time graph.")
+        ui.print_error(f"got error {e}")
+        ui.print_error(traceback.format_exc())
+
     # 2. Height vs Offset Comparison
     heights_range = "B11:B" + str(last_trial_row)
     heights = google_sheet.get_single_col_range(sheet_name, heights_range)
@@ -425,8 +436,10 @@ def process_google_sheet(
         google_sheet.create_line_chart(
             titles, series_offsets, domain_trials, axis, 14, sheet_id
         )
-    except:
-        print("did not make height vs offset graph.")
+    except Exception as e:
+        ui.print_error("did not make height vs offset graph.")
+        ui.print_error(f"got error {e}")
+        ui.print_error(traceback.format_exc())
 
     # 3. Liquid Level Detection
     lld_titles = ["Liquid Level Detection", "Trials", "Normalized Height", ""]
@@ -471,9 +484,11 @@ def process_google_sheet(
             21,
             sheet_id,
         )
-    except:
-        print("did not make lld graph.")
-    
+    except Exception as e:
+        ui.print_error("did not make lld graph.")
+        ui.print_error(f"got error {e}")
+        ui.print_error(traceback.format_exc())
+
     # TODO: create a better way to zoom into graph based on slope change
     axis_zoomed = [
         {
@@ -489,8 +504,10 @@ def process_google_sheet(
         google_sheet.create_line_chart(
             titles_zoomed, series_pressure, domains_pressure, axis_zoomed, 7, sheet_id
         )
-    except:
-        print("did not make zoomed in pressure chart.")
+    except Exception as e:
+        ui.print_error("did not make zoomed in pressure chart.")
+        ui.print_error(f"got error {e}")
+        ui.print_error(traceback.format_exc())
 
 
 #

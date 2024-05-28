@@ -28,6 +28,8 @@ from opentrons.protocol_api import ProtocolContext, Well, Labware
 
 from opentrons_shared_data.errors.exceptions import LiquidNotFoundError
 
+from . import google_sheets_tool
+
 
 PROBE_MAX_TIME: Dict[int, float] = {
     1: 2.75,
@@ -168,8 +170,8 @@ def _load_scale(
 def run(
     tip: int,
     run_args: RunArgs,
-    google_sheet: Optional[Any],
-    sheet_id: str,
+    google_sheet: Optional[google_sheets_tool.google_sheet],
+    sheet_id: Optional[str],
     starting_tip: str = "A1",
 ) -> None:
     """Run a liquid probe test."""

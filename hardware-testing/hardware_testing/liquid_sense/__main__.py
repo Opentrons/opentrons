@@ -38,11 +38,7 @@ from hardware_testing.protocols.liquid_sense_lpc import (
     liquid_sense_ot3_p1000_single_vial,
 )
 
-try:
-    from . import google_sheets_tool  # type: ignore[import]
-except Exception:
-    print("WARNING: unable to import google_sheets_tool, "
-          "if not simulating check your environment")
+from . import google_sheets_tool
 
 
 CREDENTIALS_PATH = "/var/lib/jupyter/notebooks/abr.json"
@@ -162,7 +158,7 @@ class RunArgs:
         environment_sensor = asair_sensor.BuildAsairSensor(simulate=True)
         git_description = get_git_description()
         protocol_cfg = LIQUID_SENSE_CFG[args.pipette][args.channels]
-        name = protocol_cfg.metadata["protocolName"]  # type: ignore[attr-defined]
+        name = protocol_cfg.metadata["protocolName"]  # type: ignore[union-attr]
         ui.print_header("LOAD PIPETTE")
         pipette = _ctx.load_instrument(
             f"flex_{args.channels}channel_{args.pipette}", args.mount
@@ -221,7 +217,7 @@ class RunArgs:
             trials,
             "aspirate" if args.aspirate else "dispense",
             args.liquid,
-            protocol_cfg.LABWARE_ON_SCALE,  # type: ignore[attr-defined]
+            protocol_cfg.LABWARE_ON_SCALE,  # type: ignore[union-attr]
             args.z_speed,
             args.probe_seconds_before_contact,
         )
@@ -277,7 +273,7 @@ if __name__ == "__main__":
         0.0 < args.probe_seconds_before_contact <= MAX_PROBE_SECONDS
     ), f"'--probe-seconds-before-contact' must be between 0.0-{MAX_PROBE_SECONDS}"
     run_args = RunArgs.build_run_args(args)
-    exit_error = os.X_OK
+    exit_error = 0
     serial_logger: Optional[subprocess.Popen] = None
     data_dir = get_testing_data_directory()
     data_file = f"/{data_dir}/{run_args.name}/{run_args.run_id}/serial.log"
@@ -290,21 +286,24 @@ if __name__ == "__main__":
             )
             sleep(1)
             # Connect to Google Sheet
-            print(os.path.exists(CREDENTIALS_PATH))
-            google_sheet = google_sheets_tool.google_sheet(
+            ui.print_info(f"robot has credentials: {os.path.exists(CREDENTIALS_PATH)}")
+            google_sheet: Optional[
+                google_sheets_tool.google_sheet
+            ] = google_sheets_tool.google_sheet(
                 CREDENTIALS_PATH, args.google_sheet_name, 0
             )
-            sheet_id = google_sheet.create_worksheet(run_args.run_id)
+            sheet_id = google_sheet.create_worksheet(run_args.run_id)  # type: ignore[union-attr]
         else:
             google_sheet = None
+            sheet_id = None
         hw = run_args.ctx._core.get_hardware()
         ui.print_info("homing...")
         run_args.ctx.home()
         for tip in run_args.tip_volumes:
             execute.run(tip, run_args, google_sheet, sheet_id, args.starting_tip)
     except Exception as e:
-        ui.print_info(f"got error {e}")
-        ui.print_info(traceback.format_exc())
+        ui.print_error(f"got error {e}")
+        ui.print_error(traceback.format_exc())
         exit_error = 1
     finally:
         if run_args.recorder is not None:
@@ -344,8 +343,11 @@ if __name__ == "__main__":
             ]
             try:
                 process_google_sheet(google_sheet, run_args, test_info, sheet_id)
-            except:
-                print('error making graphs or logging data on google sheet')
+            except Exception as e:
+                ui.print_error("error making graphs or logging data on google sheet")
+                ui.print_error(f"got error {e}")
+                ui.print_error(traceback.format_exc())
+                exit_error = 2
 
         run_args.ctx.cleanup()
         if not args.simulate:

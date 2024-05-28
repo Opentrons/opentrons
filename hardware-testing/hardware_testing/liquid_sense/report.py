@@ -1,17 +1,19 @@
 """Format the csv report for a liquid-sense run."""
 
+import gspread
 import statistics
+from typing import List, Union, Optional
+
+from . import google_sheets_tool
+
+from hardware_testing.data import ui
+
 from hardware_testing.data.csv_report import (
     CSVReport,
     CSVSection,
     CSVLine,
     CSVLineRepeating,
 )
-from typing import List, Union, Any, Optional
-try:
-    import gspread  # type: ignore[import]
-except ImportError:
-    print("WARNING: unable to import gspread, if not simulating check your environment")
 
 """
 CSV Test Report:
@@ -167,7 +169,7 @@ def store_baseline_trial(
     temp: float,
     z_travel: float,
     measured_error: float,
-    google_sheet: Optional[Any],
+    google_sheet: Optional[google_sheets_tool.google_sheet],
     sheet_title: str,
 ) -> None:
     """Report Trial."""
@@ -175,7 +177,7 @@ def store_baseline_trial(
         try:
             google_sheet.update_cell(sheet_title, 9, 2, height)
         except gspread.exceptions.APIError:
-            print("did not store baseline trial on google sheet.")
+            ui.print_error("did not store baseline trial on google sheet.")
     report(
         "TRIALS",
         f"trial-baseline-{tip}ul",
@@ -204,9 +206,9 @@ def store_trial(
     plunger_travel: float,
     tip_length_offset: float,
     target_height: float,
-    google_sheet: Optional[Any],
+    google_sheet: Optional[google_sheets_tool.google_sheet],
     sheet_name: str,
-    sheet_id: str,
+    sheet_id: Optional[str],
 ) -> None:
     """Report Trial."""
     report(
@@ -224,11 +226,11 @@ def store_trial(
             target_height,
         ],
     )
-    if google_sheet is not None:
+    if google_sheet is not None and sheet_id is not None:
         # Write trial to google sheet
         if trial == 0:
             # Write header
-            gs_header = [
+            gs_header: List[List[str]] = [
                 ["Trial"],
                 ["Height"],
                 ["Plunger Position"],
@@ -238,18 +240,18 @@ def store_trial(
             ]
             google_sheet.batch_update_cells(sheet_name, gs_header, "A", 10, sheet_id)
         try:
-            trial_for_google_sheet = [
-                [trial + 1],
-                [height],
-                [plunger_pos],
-                [tip_length_offset],
-                [height + tip_length_offset],
+            trial_for_google_sheet: List[List[str]] = [
+                [f"{trial + 1}"],
+                [f"{height}"],
+                [f"{plunger_pos}"],
+                [f"{tip_length_offset}"],
+                [f"{height + tip_length_offset}"],
             ]
             google_sheet.batch_update_cells(
                 sheet_name, trial_for_google_sheet, "A", 11 + int(trial), sheet_id
             )
         except gspread.exceptions.APIError:
-            print(f"did not log trial {trial+1} to google sheet.")
+            ui.print_error(f"did not log trial {trial+1} to google sheet.")
 
 
 def store_tip_results(

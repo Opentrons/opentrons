@@ -1,12 +1,14 @@
 """Google Sheet Tool."""
-import gspread  # type: ignore[import]
+import gspread
 import socket
-import httplib2
+import httplib2  # type: ignore[import]
 import time as t
 import sys
 from datetime import datetime
 from oauth2client.service_account import ServiceAccountCredentials  # type: ignore[import]
 from typing import Dict, List, Any, Set, Tuple, Optional
+
+from hardware_testing.data import ui
 
 """Google Sheets Tool.
 
@@ -34,9 +36,9 @@ class google_sheet:
             self.spread_sheet = self.open_google_sheet()
             self.worksheet = self.open_worksheet(self.tab_number)
             self.row_index = 1
-            print(f"Connected to google sheet: {self.file_name}")
+            ui.print_info(f"Connected to google sheet: {self.file_name}")
         except gspread.exceptions.APIError:
-            print("ERROR: Check google sheet name. Check credentials file.")
+            ui.print_error("ERROR: Check google sheet name. Check credentials file.")
             sys.exit()
 
     def open_google_sheet(self) -> Any:
@@ -54,7 +56,8 @@ class google_sheet:
             new_sheet = self.spread_sheet.add_worksheet(title, rows="2500", cols="40")
             return new_sheet.id
         except gspread.exceptions.APIError:
-            print("Sheet already exists.")
+            ui.print_error("Sheet already exists.")
+            return None
 
     def write_header(self, header: List) -> None:
         """Write Header to first row if not present."""
@@ -76,11 +79,11 @@ class google_sheet:
         except socket.gaierror:
             pass
         except httplib2.ServerNotFoundError:
-            print("UNABLE TO CONNECT TO SERVER!!, CHECK CONNECTION")
+            ui.print_error("UNABLE TO CONNECT TO SERVER!!, CHECK CONNECTION")
         except Exception as error:
-            print(error.__traceback__)
+            ui.print_error(str(error.__traceback__))
         except gspread.exceptions.APIError:
-            print("Write quotes exceeded. Waiting 30 sec before writing.")
+            ui.print_error("Write quotes exceeded. Waiting 30 sec before writing.")
             t.sleep(30)
             self.worksheet.insert_row(data, index=self.row_index)
 
@@ -106,61 +109,64 @@ class google_sheet:
             ]
         }
         self.spread_sheet.batch_update(body=delete_body)
-    
 
     def batch_update_cells(
-        self, sheet_title: str, data: List[List[str]], start_column: str, start_row: int, sheet_id: str
+        self,
+        sheet_title: str,
+        data: List[List[str]],
+        start_column: str,
+        start_row: int,
+        sheet_id: str,
     ) -> None:
         """Writes to multiple cells at once in a specific sheet."""
+
         def column_letter_to_index(column_letter: str) -> int:
             """Convert a column letter (e.g., 'A') to a 1-based column index (e.g., 1)."""
             index = 0
             for char in column_letter.upper():
-                index = index * 26 + (ord(char) - ord('A') + 1)
+                index = index * 26 + (ord(char) - ord("A") + 1)
             return index
-    
+
         def index_to_column_letter(index: int) -> str:
             """Convert a zero-based column index to a column letter."""
             result = []
             while index >= 0:
                 index, remainder = divmod(index, 26)
-                result.append(chr(remainder + ord('A')))
+                result.append(chr(remainder + ord("A")))
                 index -= 1
-            return ''.join(result[::-1])
+            return "".join(result[::-1])
+
         requests = []
         start_column_index = column_letter_to_index(start_column) - 1
-        
+
         for col_offset, col_values in enumerate(data):
             column_index = start_column_index + col_offset
-            column_letter = index_to_column_letter(column_index)
             for row_offset, value in enumerate(col_values):
                 row_index = start_row + row_offset
                 try:
                     float_value = float(value)
-                    user_entered_value = {'numberValue': float_value}
+                    user_entered_value = {"numberValue": str(float_value)}
                 except ValueError:
-                    user_entered_value = {'stringValue': str(value)}
-                requests.append({
-                    'updateCells': {
-                        'range': {
-                            'sheetId': sheet_id,
-                            'startRowIndex': row_index - 1,
-                            'endRowIndex': row_index,
-                            'startColumnIndex': column_index,
-                            'endColumnIndex': column_index + 1,
-                        },
-                        'rows': [{
-                            'values': [{
-                                'userEnteredValue': user_entered_value
-                            }]
-                        }],
-                        'fields': 'userEnteredValue',
+                    user_entered_value = {"stringValue": str(value)}
+                requests.append(
+                    {
+                        "updateCells": {
+                            "range": {
+                                "sheetId": sheet_id,
+                                "startRowIndex": row_index - 1,
+                                "endRowIndex": row_index,
+                                "startColumnIndex": column_index,
+                                "endColumnIndex": column_index + 1,
+                            },
+                            "rows": [
+                                {"values": [{"userEnteredValue": user_entered_value}]}
+                            ],
+                            "fields": "userEnteredValue",
+                        }
                     }
-                })
+                )
 
-        body = {
-            'requests': requests
-        }
+        body = {"requests": requests}
         self.spread_sheet.batch_update(body=body)
 
     def update_cell(
@@ -190,7 +196,7 @@ class google_sheet:
     def get_index_row(self) -> int:
         """Check for the next available row to write too."""
         row_index = len(self.get_column(1))
-        print(f"Row Index: {row_index} recorded on google sheet.")
+        ui.print_info(f"Row Index: {row_index} recorded on google sheet.")
         return row_index
 
     def update_row_index(self) -> None:
@@ -215,7 +221,7 @@ class google_sheet:
     def token_check(self) -> None:
         """Check if still credentials are still logged in."""
         if self.credentials.access_token_expired:
-            self.gc.login()
+            self.gc = gspread.authorize(self.credentials)
 
     def get_row_index_with_value(self, some_string: str, col_num: int) -> Any:
         """Find row index of string by looking in specific column."""
@@ -223,7 +229,7 @@ class google_sheet:
         try:
             row_index = int(cell.row)
         except AttributeError:
-            print("Row not found.")
+            ui.print_error("Row not found.")
             return None
         return row_index
 
