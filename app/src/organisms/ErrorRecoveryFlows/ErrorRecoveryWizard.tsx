@@ -2,19 +2,13 @@ import * as React from 'react'
 import { createPortal } from 'react-dom'
 import { useSelector } from 'react-redux'
 
-import {
-  BORDERS,
-  COLORS,
-  DIRECTION_COLUMN,
-  Flex,
-  POSITION_ABSOLUTE,
-} from '@opentrons/components'
+import { StyledText } from '@opentrons/components'
 
 import { getIsOnDevice } from '../../redux/config'
 import { getTopPortalEl } from '../../App/portal'
+import { InterventionModal } from '../../molecules/InterventionModal'
 import { BeforeBeginning } from './BeforeBeginning'
 import { SelectRecoveryOption, RetryStep, CancelRun } from './RecoveryOptions'
-import { ErrorRecoveryHeader } from './ErrorRecoveryHeader'
 import { RecoveryInProgress } from './RecoveryInProgress'
 import { getErrorKind } from './utils'
 import { RECOVERY_MAP } from './constants'
@@ -28,6 +22,7 @@ import type {
   useRecoveryCommands,
   UseRecoveryCommandsResult,
 } from './useRecoveryCommands'
+import { useTranslation } from 'react-i18next'
 
 interface UseERWizardResult {
   hasLaunchedRecovery: boolean
@@ -86,21 +81,31 @@ export function ErrorRecoveryWizard(
   )
 }
 
-function ErrorRecoveryComponent(props: RecoveryContentProps): JSX.Element {
+export function ErrorRecoveryComponent(
+  props: RecoveryContentProps
+): JSX.Element {
+  const { t } = useTranslation('error_recovery')
+
+  const buildTitleHeading = (): JSX.Element => {
+    const titleText = props.hasLaunchedRecovery
+      ? t('recovery_mode')
+      : t('cancel_run')
+    return <StyledText as="h4Bold">{titleText}</StyledText>
+  }
+
+  const buildIconHeading = (): JSX.Element => (
+    <StyledText as="pSemiBold">{t('view_error_details')}</StyledText>
+  )
+
   return createPortal(
-    <Flex
-      flexDirection={DIRECTION_COLUMN}
-      width="992px"
-      height="568px"
-      left="14.5px"
-      top="16px"
-      borderRadius={BORDERS.borderRadius12}
-      position={POSITION_ABSOLUTE}
-      backgroundColor={COLORS.white}
+    <InterventionModal
+      iconName="information"
+      iconHeading={buildIconHeading()}
+      titleHeading={buildTitleHeading()}
+      type="error"
     >
-      <ErrorRecoveryHeader errorKind={props.errorKind} />
       <ErrorRecoveryContent {...props} />
-    </Flex>,
+    </InterventionModal>,
     getTopPortalEl()
   )
 }

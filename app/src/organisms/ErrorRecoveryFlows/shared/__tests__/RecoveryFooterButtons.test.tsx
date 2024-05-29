@@ -2,8 +2,8 @@ import * as React from 'react'
 import { vi, describe, it, expect, beforeEach } from 'vitest'
 import { screen, fireEvent } from '@testing-library/react'
 
-import { renderWithProviders } from '../../../../../__testing-utils__'
-import { i18n } from '../../../../../i18n'
+import { renderWithProviders } from '../../../../__testing-utils__'
+import { i18n } from '../../../../i18n'
 import { RecoveryFooterButtons } from '../RecoveryFooterButtons'
 
 import type { Mock } from 'vitest'

@@ -1,5 +1,5 @@
 import * as React from 'react'
-import styled from 'styled-components'
+import styled, { css } from 'styled-components'
 import { useSelector } from 'react-redux'
 import isEqual from 'lodash/isEqual'
 import { useTranslation } from 'react-i18next'
@@ -23,6 +23,7 @@ import {
   JUSTIFY_SPACE_BETWEEN,
   LocationIcon,
   MODULE_ICON_NAME_BY_TYPE,
+  OVERFLOW_AUTO,
   PrimaryButton,
   RESPONSIVENESS,
   SPACING,
@@ -157,7 +158,17 @@ export const ResultsSummary = (
       <Flex
         flexDirection={DIRECTION_COLUMN}
         maxHeight="20rem"
-        overflowY="scroll"
+        css={css`
+          overflow-y: ${OVERFLOW_AUTO};
+          &::-webkit-scrollbar {
+            width: 0.75rem;
+            background-color: transparent;
+          }
+          &::-webkit-scrollbar-thumb {
+            background: ${COLORS.grey50};
+            border-radius: 11px;
+          }
+        `}
       >
         <Header>{t('new_labware_offset_data')}</Header>
         {isLabwareOffsetCodeSnippetsOn ? (
@@ -362,7 +373,12 @@ export const TerseOffsetTable = (props: OffsetTableProps): JSX.Element => {
                 ) : null}
               </TerseTableDatum>
               <TerseTableDatum>
-                <StyledText as="p">{labwareDisplayName}</StyledText>
+                <StyledText
+                  fontSize={TYPOGRAPHY.fontSize20}
+                  lineHeight={TYPOGRAPHY.lineHeight24}
+                >
+                  {labwareDisplayName}
+                </StyledText>
               </TerseTableDatum>
               <TerseTableDatum>
                 {isEqual(vector, IDENTITY_VECTOR) ? (
@@ -372,14 +388,20 @@ export const TerseOffsetTable = (props: OffsetTableProps): JSX.Element => {
                     {[vector.x, vector.y, vector.z].map((axis, index) => (
                       <React.Fragment key={index}>
                         <StyledText
-                          as="p"
+                          fontSize={TYPOGRAPHY.fontSize20}
+                          lineHeight={TYPOGRAPHY.lineHeight24}
                           marginLeft={index > 0 ? SPACING.spacing8 : 0}
                           marginRight={SPACING.spacing4}
                           fontWeight={TYPOGRAPHY.fontWeightSemiBold}
                         >
                           {['X', 'Y', 'Z'][index]}
                         </StyledText>
-                        <StyledText as="p">{axis.toFixed(1)}</StyledText>
+                        <StyledText
+                          fontSize={TYPOGRAPHY.fontSize20}
+                          lineHeight={TYPOGRAPHY.lineHeight24}
+                        >
+                          {axis.toFixed(1)}
+                        </StyledText>
                       </React.Fragment>
                     ))}
                   </Flex>

@@ -31,7 +31,7 @@ export function IncompatibleModuleDesktopModalBody({
   const displayName = isFlex ? 'Flex' : 'OT-2'
   return (
     <InterventionModal
-      heading={
+      iconHeading={
         <Trans
           as="h4"
           fontSize={TYPOGRAPHY.fontSizeH4}

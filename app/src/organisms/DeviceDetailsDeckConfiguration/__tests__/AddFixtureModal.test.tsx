@@ -23,9 +23,8 @@ import type { Modules } from '@opentrons/api-client'
 vi.mock('@opentrons/react-api-client')
 vi.mock('../../../resources/deck_configuration')
 
-const mockSetShowAddFixtureModal = vi.fn()
+const mockCloseModal = vi.fn()
 const mockUpdateDeckConfiguration = vi.fn()
-const mockSetCurrentDeckConfig = vi.fn()
 
 const render = (props: React.ComponentProps<typeof AddFixtureModal>) => {
   return renderWithProviders(<AddFixtureModal {...props} />, {
@@ -39,8 +38,7 @@ describe('Touchscreen AddFixtureModal', () => {
   beforeEach(() => {
     props = {
       cutoutId: 'cutoutD3',
-      setShowAddFixtureModal: mockSetShowAddFixtureModal,
-      setCurrentDeckConfig: mockSetCurrentDeckConfig,
+      closeModal: mockCloseModal,
       isOnDevice: true,
     }
     vi.mocked(useUpdateDeckConfigurationMutation).mockReturnValue({
@@ -58,7 +56,7 @@ describe('Touchscreen AddFixtureModal', () => {
     render(props)
     screen.getByText('Add to slot D3')
     screen.getByText(
-      'Choose an item below to add to your deck configuration. It will be referenced during protocol analysis.'
+      'Add this hardware to your deck configuration. It will be referenced during protocol analysis.'
     )
     screen.getByText('Fixtures')
     screen.getByText('Modules')
@@ -69,7 +67,6 @@ describe('Touchscreen AddFixtureModal', () => {
     render(props)
     fireEvent.click(screen.getAllByText('Select options')[1])
     fireEvent.click(screen.getAllByText('Add')[0])
-    expect(mockSetCurrentDeckConfig).toHaveBeenCalled()
   })
 
   it('when fixture options are provided, should only render those options', () => {
@@ -80,7 +77,7 @@ describe('Touchscreen AddFixtureModal', () => {
     render(props)
     screen.getByText('Add to slot D3')
     screen.getByText(
-      'Choose an item below to add to your deck configuration. It will be referenced during protocol analysis.'
+      'Add this hardware to your deck configuration. It will be referenced during protocol analysis.'
     )
     expect(screen.queryByText('Staging area slot')).toBeNull()
     screen.getByText('Trash bin')
@@ -96,7 +93,7 @@ describe('Desktop AddFixtureModal', () => {
   beforeEach(() => {
     props = {
       cutoutId: 'cutoutD3',
-      setShowAddFixtureModal: mockSetShowAddFixtureModal,
+      closeModal: mockCloseModal,
     }
     vi.mocked(useUpdateDeckConfigurationMutation).mockReturnValue({
       updateDeckConfiguration: mockUpdateDeckConfiguration,
@@ -111,7 +108,7 @@ describe('Desktop AddFixtureModal', () => {
     render(props)
     screen.getByText('Add to slot D3')
     screen.getByText(
-      'Add this item to your deck configuration. It will be referenced during protocol analysis.'
+      'Add this hardware to your deck configuration. It will be referenced during protocol analysis.'
     )
 
     screen.getByText('Fixtures')
@@ -131,7 +128,7 @@ describe('Desktop AddFixtureModal', () => {
     render(props)
     screen.getByText('Add to slot A1')
     screen.getByText(
-      'Add this item to your deck configuration. It will be referenced during protocol analysis.'
+      'Add this hardware to your deck configuration. It will be referenced during protocol analysis.'
     )
     screen.getByText('Fixtures')
     screen.getByText('Modules')
@@ -145,7 +142,7 @@ describe('Desktop AddFixtureModal', () => {
     render(props)
     screen.getByText('Add to slot B3')
     screen.getByText(
-      'Add this item to your deck configuration. It will be referenced during protocol analysis.'
+      'Add this hardware to your deck configuration. It will be referenced during protocol analysis.'
     )
     screen.getByText('Fixtures')
     screen.getByText('Modules')
@@ -160,7 +157,7 @@ describe('Desktop AddFixtureModal', () => {
     render(props)
     screen.getByText('Add to slot B2')
     screen.getByText(
-      'Add this item to your deck configuration. It will be referenced during protocol analysis.'
+      'Add this hardware to your deck configuration. It will be referenced during protocol analysis.'
     )
     screen.getByText('Magnetic Block GEN1')
     expect(screen.getByRole('button', { name: 'Add' })).toBeInTheDocument()

@@ -45,8 +45,6 @@ export interface InputFieldProps {
   tooltipText?: string
   /** optional caption. hidden when `error` is given */
   caption?: string | null
-  /** appears to the right of the caption. Used for character limits, eg '0/45' */
-  secondaryCaption?: string | null
   /** optional input type (default "text") */
   type?:
     | typeof INPUT_TYPE_TEXT
@@ -59,7 +57,7 @@ export interface InputFieldProps {
   /** blur handler */
   onBlur?: (event: React.FocusEvent<HTMLInputElement>) => unknown
   /** makes input field read-only */
-  readOnly?: boolean | undefined
+  readOnly?: boolean
   /** html tabindex property */
   tabIndex?: number
   /** automatically focus field on renders */
@@ -75,245 +73,248 @@ export interface InputFieldProps {
     | typeof TYPOGRAPHY.textAlignCenter
   /** small or medium input field height, relevant only */
   size?: 'medium' | 'small'
+  /** react useRef to control input field instead of react event */
+  ref?: React.MutableRefObject<HTMLInputElement | null>
 }
 
-export function InputField(props: InputFieldProps): JSX.Element {
-  return (
-    <Flex
-      alignItems={ALIGN_CENTER}
-      lineHeight={1}
-      fontSize={TYPOGRAPHY.fontSizeP}
-      fontWeight={TYPOGRAPHY.fontWeightRegular}
-      color={props.error != null ? COLOR_WARNING_DARK : COLORS.black90}
-      opacity={props.disabled ?? false ? 0.5 : ''}
-    >
-      <Input {...props} />
-    </Flex>
-  )
-}
+export const InputField = React.forwardRef<HTMLInputElement, InputFieldProps>(
+  (props, ref): JSX.Element => {
+    const {
+      placeholder,
+      textAlign = TYPOGRAPHY.textAlignLeft,
+      size = 'small',
+      title,
+      tooltipText,
+      tabIndex = 0,
+      ...inputProps
+    } = props
+    const hasError = props.error != null
+    const value = props.isIndeterminate ?? false ? '' : props.value ?? ''
+    const placeHolder = props.isIndeterminate ?? false ? '-' : props.placeholder
+    const [targetProps, tooltipProps] = useHoverTooltip()
 
-function Input(props: InputFieldProps): JSX.Element {
-  const {
-    placeholder,
-    textAlign = TYPOGRAPHY.textAlignLeft,
-    size = 'small',
-    title,
-    tooltipText,
-    tabIndex = 0,
-    ...inputProps
-  } = props
-  const hasError = props.error != null
-  const value = props.isIndeterminate ?? false ? '' : props.value ?? ''
-  const placeHolder = props.isIndeterminate ?? false ? '-' : props.placeholder
-  const [targetProps, tooltipProps] = useHoverTooltip()
-
-  const OUTER_CSS = css`
-    @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
-      grid-gap: ${SPACING.spacing8};
-      &:focus-within {
-        filter: ${hasError
-          ? 'none'
-          : `drop-shadow(0px 0px 10px ${COLORS.blue50})`};
+    const OUTER_CSS = css`
+      @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
+        grid-gap: ${SPACING.spacing8};
+        &:focus-within {
+          filter: ${hasError
+            ? 'none'
+            : `drop-shadow(0px 0px 10px ${COLORS.blue50})`};
+        }
       }
-    }
-  `
+    `
 
-  const INPUT_FIELD = css`
-    display: flex;
-    background-color: ${COLORS.white};
-    border-radius: ${BORDERS.borderRadius4};
-    padding: ${SPACING.spacing8};
-    border: 1px ${BORDERS.styleSolid} ${hasError ? COLORS.red50 : COLORS.grey50};
-    font-size: ${TYPOGRAPHY.fontSizeP};
-    width: 100%;
-    height: 2rem;
-
-    &:active:enabled {
-      border: 1px ${BORDERS.styleSolid} ${COLORS.blue50};
-    }
-
-    & input {
-      border-radius: inherit;
-      color: ${COLORS.black90};
-      border: none;
-      flex: 1 1 auto;
-      width: 100%;
-      height: ${SPACING.spacing16};
-      text-align: ${textAlign};
-    }
-    & input:focus {
-      outline: none;
-    }
-
-    &:hover {
+    const INPUT_FIELD = css`
+      display: flex;
+      background-color: ${COLORS.white};
+      border-radius: ${BORDERS.borderRadius4};
+      padding: ${SPACING.spacing8};
       border: 1px ${BORDERS.styleSolid}
-        ${hasError ? COLORS.red50 : COLORS.grey60};
-    }
-
-    &:focus-visible {
-      border: 1px ${BORDERS.styleSolid} ${COLORS.grey55};
-      outline: 2px ${BORDERS.styleSolid} ${COLORS.blue50};
-      outline-offset: 2px;
-    }
-
-    &:focus-within {
-      border: 1px ${BORDERS.styleSolid}
-        ${hasError ? COLORS.red50 : COLORS.blue50};
-    }
-
-    &:disabled {
-      border: 1px ${BORDERS.styleSolid} ${COLORS.grey30};
-    }
-    input[type='number']::-webkit-inner-spin-button,
-    input[type='number']::-webkit-outer-spin-button {
-      -webkit-appearance: none;
-      margin: 0;
-    }
-
-    @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
-      height: ${size === 'small' ? '4.25rem' : '5rem'};
-      font-size: ${TYPOGRAPHY.fontSize28};
-      padding: ${SPACING.spacing16} ${SPACING.spacing24};
-      border: 2px ${BORDERS.styleSolid}
         ${hasError ? COLORS.red50 : COLORS.grey50};
+      font-size: ${TYPOGRAPHY.fontSizeP};
+      width: 100%;
+      height: 2rem;
 
-      &:focus-within {
-        box-shadow: none;
-        border: ${hasError ? '2px' : '3px'} ${BORDERS.styleSolid}
-          ${hasError ? COLORS.red50 : COLORS.blue50};
+      &:active:enabled {
+        border: 1px ${BORDERS.styleSolid} ${COLORS.blue50};
       }
 
       & input {
+        border-radius: inherit;
         color: ${COLORS.black90};
+        border: none;
         flex: 1 1 auto;
         width: 100%;
-        height: 100%;
-        font-size: ${TYPOGRAPHY.fontSize28};
-        line-height: ${TYPOGRAPHY.lineHeight36};
+        height: ${SPACING.spacing16};
+        text-align: ${textAlign};
       }
-    }
-  `
+      & input:focus {
+        outline: none;
+      }
 
-  const FORM_BOTTOM_SPACE_STYLE = css`
-    padding-top: ${SPACING.spacing4};
-    @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
-      padding: ${SPACING.spacing8} 0rem;
-      padding-bottom: 0;
-    }
-  `
+      &:hover {
+        border: 1px ${BORDERS.styleSolid}
+          ${hasError ? COLORS.red50 : COLORS.grey60};
+      }
 
-  const TITLE_STYLE = css`
-    color: ${hasError ? COLORS.red50 : COLORS.black90};
-    padding-bottom: ${SPACING.spacing8};
-    text-align: ${textAlign};
-    @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
-      font-size: ${TYPOGRAPHY.fontSize22};
-      font-weight: ${TYPOGRAPHY.fontWeightRegular};
-      line-height: ${TYPOGRAPHY.lineHeight28};
-      justify-content: ${textAlign};
-    }
-  `
+      &:focus-visible {
+        border: 1px ${BORDERS.styleSolid} ${COLORS.grey55};
+        outline: 2px ${BORDERS.styleSolid} ${COLORS.blue50};
+        outline-offset: 2px;
+      }
 
-  const ERROR_TEXT_STYLE = css`
-    color: ${COLORS.red50};
-    padding-top: ${SPACING.spacing4};
-    @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
-      font-size: ${TYPOGRAPHY.fontSize22};
+      &:focus-within {
+        border: 1px ${BORDERS.styleSolid}
+          ${hasError ? COLORS.red50 : COLORS.blue50};
+      }
+
+      &:disabled {
+        border: 1px ${BORDERS.styleSolid} ${COLORS.grey30};
+      }
+      input[type='number']::-webkit-inner-spin-button,
+      input[type='number']::-webkit-outer-spin-button {
+        -webkit-appearance: none;
+        margin: 0;
+      }
+
+      @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
+        height: ${size === 'small' ? '4.25rem' : '5rem'};
+        font-size: ${size === 'small'
+          ? TYPOGRAPHY.fontSize28
+          : TYPOGRAPHY.fontSize38};
+        padding: ${SPACING.spacing16} ${SPACING.spacing24};
+        border: 2px ${BORDERS.styleSolid}
+          ${hasError ? COLORS.red50 : COLORS.grey50};
+
+        &:focus-within {
+          box-shadow: none;
+          border: ${hasError ? '2px' : '3px'} ${BORDERS.styleSolid}
+            ${hasError ? COLORS.red50 : COLORS.blue50};
+        }
+
+        & input {
+          color: ${COLORS.black90};
+          flex: 1 1 auto;
+          width: 100%;
+          height: 100%;
+          font-size: ${size === 'small'
+            ? TYPOGRAPHY.fontSize28
+            : TYPOGRAPHY.fontSize38};
+          line-height: ${size === 'small'
+            ? TYPOGRAPHY.lineHeight36
+            : TYPOGRAPHY.lineHeight48};
+        }
+
+        /* the size of dot for password is handled by font-size */
+        input[type='password'] {
+          font-size: ${size === 'small' ? '71px' : '77px'};
+        }
+      }
+    `
+
+    const FORM_BOTTOM_SPACE_STYLE = css`
+      padding-top: ${SPACING.spacing4};
+      @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
+        padding: ${SPACING.spacing8} 0rem;
+        padding-bottom: 0;
+      }
+    `
+
+    const TITLE_STYLE = css`
+      color: ${hasError ? COLORS.red50 : COLORS.black90};
+      padding-bottom: ${SPACING.spacing8};
+      text-align: ${textAlign};
+      @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
+        font-size: ${TYPOGRAPHY.fontSize22};
+        font-weight: ${TYPOGRAPHY.fontWeightRegular};
+        line-height: ${TYPOGRAPHY.lineHeight28};
+        justify-content: ${textAlign};
+      }
+    `
+
+    const ERROR_TEXT_STYLE = css`
       color: ${COLORS.red50};
-      padding-top: ${SPACING.spacing8};
-    }
-  `
+      padding-top: ${SPACING.spacing4};
+      @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
+        font-size: ${TYPOGRAPHY.fontSize22};
+        color: ${COLORS.red50};
+        padding-top: ${SPACING.spacing8};
+      }
+    `
 
-  const UNITS_STYLE = css`
-    color: ${props.disabled ? COLORS.grey40 : COLORS.grey50};
-    font-size: ${TYPOGRAPHY.fontSizeLabel};
-    font-weight: ${TYPOGRAPHY.fontWeightSemiBold};
-    line-height: ${TYPOGRAPHY.lineHeight12};
-    align-text: ${TEXT_ALIGN_RIGHT};
-    @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
+    const UNITS_STYLE = css`
       color: ${props.disabled ? COLORS.grey40 : COLORS.grey50};
-      font-size: ${TYPOGRAPHY.fontSize22};
-      font-weight: ${TYPOGRAPHY.fontWeightRegular};
-      line-height: ${TYPOGRAPHY.lineHeight28};
-      justify-content: ${textAlign};
-    }
-  `
+      font-size: ${TYPOGRAPHY.fontSizeLabel};
+      font-weight: ${TYPOGRAPHY.fontWeightSemiBold};
+      line-height: ${TYPOGRAPHY.lineHeight12};
+      align-text: ${TEXT_ALIGN_RIGHT};
+      @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
+        color: ${props.disabled ? COLORS.grey40 : COLORS.grey50};
+        font-size: ${TYPOGRAPHY.fontSize22};
+        font-weight: ${TYPOGRAPHY.fontWeightRegular};
+        line-height: ${TYPOGRAPHY.lineHeight28};
+        justify-content: ${textAlign};
+      }
+    `
 
-  return (
-    <Flex flexDirection={DIRECTION_COLUMN} width="100%">
-      {title != null ? (
-        <Flex gridGap={SPACING.spacing8}>
-          <StyledText
-            as="label"
-            fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-            htmlFor={props.id}
-            css={TITLE_STYLE}
-          >
-            {title}
-          </StyledText>
-          {tooltipText != null ? (
-            <>
-              <Flex {...targetProps}>
-                <Icon
-                  name="information"
-                  size={SPACING.spacing12}
-                  color={COLORS.grey60}
-                />
-              </Flex>
-              <Tooltip tooltipProps={tooltipProps}>{tooltipText}</Tooltip>
-            </>
+    return (
+      <Flex
+        alignItems={ALIGN_CENTER}
+        lineHeight={1}
+        fontSize={TYPOGRAPHY.fontSizeP}
+        fontWeight={TYPOGRAPHY.fontWeightRegular}
+        color={props.error != null ? COLOR_WARNING_DARK : COLORS.black90}
+        opacity={props.disabled ?? false ? 0.5 : ''}
+      >
+        <Flex flexDirection={DIRECTION_COLUMN} width="100%">
+          {title != null ? (
+            <Flex gridGap={SPACING.spacing8}>
+              <StyledText
+                as="label"
+                fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+                htmlFor={props.id}
+                css={TITLE_STYLE}
+              >
+                {title}
+              </StyledText>
+              {tooltipText != null ? (
+                <>
+                  <Flex {...targetProps}>
+                    <Icon
+                      name="information"
+                      size={SPACING.spacing12}
+                      color={COLORS.grey60}
+                    />
+                  </Flex>
+                  <Tooltip tooltipProps={tooltipProps}>{tooltipText}</Tooltip>
+                </>
+              ) : null}
+            </Flex>
           ) : null}
-        </Flex>
-      ) : null}
-      <Flex width="100%" flexDirection={DIRECTION_COLUMN} css={OUTER_CSS}>
-        <Flex
-          tabIndex={tabIndex}
-          css={INPUT_FIELD}
-          alignItems={ALIGN_CENTER}
-          onClick={() => {
-            if (props.id != null) {
-              document.getElementById(props.id)?.focus()
-            }
-          }}
-        >
-          <StyledInput
-            {...inputProps}
-            data-testid={props.id}
-            value={value}
-            placeholder={placeHolder}
-            onWheel={event => event.currentTarget.blur()} // prevent value change with scrolling
-          />
-          {props.units != null ? (
-            <Flex css={UNITS_STYLE}>{props.units}</Flex>
+          <Flex width="100%" flexDirection={DIRECTION_COLUMN} css={OUTER_CSS}>
+            <Flex
+              tabIndex={tabIndex}
+              css={INPUT_FIELD}
+              alignItems={ALIGN_CENTER}
+              onClick={() => {
+                if (props.id != null) {
+                  document.getElementById(props.id)?.focus()
+                }
+              }}
+            >
+              <StyledInput
+                {...inputProps}
+                data-testid={props.id}
+                value={value}
+                placeholder={placeHolder}
+                onWheel={event => event.currentTarget.blur()} // prevent value change with scrolling
+                type={props.type}
+                ref={ref}
+              />
+              {props.units != null ? (
+                <Flex css={UNITS_STYLE}>{props.units}</Flex>
+              ) : null}
+            </Flex>
+          </Flex>
+          {props.caption != null ? (
+            <StyledText
+              as="label"
+              css={FORM_BOTTOM_SPACE_STYLE}
+              color={COLORS.grey60}
+            >
+              {props.caption}
+            </StyledText>
+          ) : null}
+          {hasError ? (
+            <StyledText as="label" css={ERROR_TEXT_STYLE}>
+              {props.error}
+            </StyledText>
           ) : null}
         </Flex>
       </Flex>
-      {props.caption != null ? (
-        <StyledText
-          as="label"
-          css={FORM_BOTTOM_SPACE_STYLE}
-          color={COLORS.grey60}
-        >
-          {props.caption}
-        </StyledText>
-      ) : null}
-      {props.secondaryCaption != null ? (
-        <StyledText
-          as="label"
-          css={FORM_BOTTOM_SPACE_STYLE}
-          color={COLORS.grey60}
-        >
-          {props.secondaryCaption}
-        </StyledText>
-      ) : null}
-      {hasError ? (
-        <StyledText as="label" css={ERROR_TEXT_STYLE}>
-          {props.error}
-        </StyledText>
-      ) : null}
-    </Flex>
-  )
-}
+    )
+  }
+)
 
 const StyledInput = styled.input`
   &::placeholder {

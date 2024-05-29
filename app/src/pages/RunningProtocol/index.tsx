@@ -24,6 +24,7 @@ import {
 import {
   RUN_STATUS_STOP_REQUESTED,
   RUN_STATUS_BLOCKED_BY_OPEN_DOOR,
+  RUN_STATUS_FINISHING,
 } from '@opentrons/api-client'
 
 import { StepMeter } from '../../atoms/StepMeter'
@@ -190,7 +191,8 @@ export function RunningProtocol(): JSX.Element {
         {interventionModalCommandKey != null &&
         runRecord?.data != null &&
         lastRunCommand != null &&
-        isInterventionCommand(lastRunCommand) ? (
+        isInterventionCommand(lastRunCommand) &&
+        runStatus !== RUN_STATUS_FINISHING ? (
           <InterventionModal
             robotName={robotName}
             command={lastRunCommand}

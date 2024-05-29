@@ -7,6 +7,7 @@ import { i18n } from '../../../i18n'
 import { mockRecoveryContentProps } from '../__fixtures__'
 import {
   ErrorRecoveryContent,
+  ErrorRecoveryComponent,
   useInitialPipetteHome,
   useERWizard,
 } from '../ErrorRecoveryWizard'
@@ -47,7 +48,9 @@ describe('useERWizard', () => {
   })
 })
 
-const render = (props: React.ComponentProps<typeof ErrorRecoveryContent>) => {
+const renderRecoveryContent = (
+  props: React.ComponentProps<typeof ErrorRecoveryContent>
+) => {
   return renderWithProviders(<ErrorRecoveryContent {...props} />, {
     i18nInstance: i18n,
   })[0]
@@ -78,7 +81,7 @@ describe('ErrorRecoveryContent', () => {
   })
 
   it(`returns SelectRecoveryOption when the route is ${OPTION_SELECTION.ROUTE}`, () => {
-    render(props)
+    renderRecoveryContent(props)
 
     screen.getByText('MOCK_SELECT_RECOVERY_OPTION')
   })
@@ -91,7 +94,7 @@ describe('ErrorRecoveryContent', () => {
         route: BEFORE_BEGINNING.ROUTE,
       },
     }
-    render(props)
+    renderRecoveryContent(props)
 
     screen.getByText('MOCK_BEFORE_BEGINNING')
   })
@@ -104,7 +107,7 @@ describe('ErrorRecoveryContent', () => {
         route: RETRY_FAILED_COMMAND.ROUTE,
       },
     }
-    render(props)
+    renderRecoveryContent(props)
 
     screen.getByText('MOCK_RESUME_RUN')
   })
@@ -117,7 +120,7 @@ describe('ErrorRecoveryContent', () => {
         route: ROBOT_CANCELING.ROUTE,
       },
     }
-    render(props)
+    renderRecoveryContent(props)
 
     screen.getByText('MOCK_IN_PROGRESS')
   })
@@ -130,7 +133,7 @@ describe('ErrorRecoveryContent', () => {
         route: ROBOT_IN_MOTION.ROUTE,
       },
     }
-    render(props)
+    renderRecoveryContent(props)
 
     screen.getByText('MOCK_IN_PROGRESS')
   })
@@ -143,7 +146,7 @@ describe('ErrorRecoveryContent', () => {
         route: ROBOT_IN_MOTION.ROUTE,
       },
     }
-    render(props)
+    renderRecoveryContent(props)
 
     screen.getByText('MOCK_IN_PROGRESS')
   })
@@ -156,7 +159,7 @@ describe('ErrorRecoveryContent', () => {
         route: ROBOT_IN_MOTION.ROUTE,
       },
     }
-    render(props)
+    renderRecoveryContent(props)
 
     screen.getByText('MOCK_IN_PROGRESS')
   })
@@ -229,5 +232,34 @@ describe('useInitialPipetteHome', () => {
     await waitFor(() => {
       expect(mockZHomePipetteZAxes).toHaveBeenCalledTimes(1)
     })
+  })
+})
+
+const renderRecoveryComponent = (
+  props: React.ComponentProps<typeof ErrorRecoveryComponent>
+) => {
+  return renderWithProviders(<ErrorRecoveryComponent {...props} />, {
+    i18nInstance: i18n,
+  })[0]
+}
+
+describe('ErrorRecoveryComponent', () => {
+  let props: React.ComponentProps<typeof ErrorRecoveryComponent>
+
+  beforeEach(() => {
+    props = mockRecoveryContentProps
+  })
+
+  it('renders an intervention modal with appropriate text', () => {
+    renderRecoveryComponent(props)
+    screen.getByTestId('__otInterventionModal')
+    screen.getByText('Recovery Mode')
+    screen.getByText('View error details')
+  })
+
+  it('renders alternative header text if the recovery mode has not been launched', () => {
+    props = { ...props, hasLaunchedRecovery: false }
+    renderRecoveryComponent(props)
+    screen.getByText('Cancel run')
   })
 })

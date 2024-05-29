@@ -62,7 +62,7 @@ export const ChooseModuleToConfigureModal = (
     robotName,
     displaySlotName,
   } = props
-  const { t } = useTranslation(['protocol_setup', 'shared'])
+  const { t, i18n } = useTranslation(['protocol_setup', 'shared'])
   const attachedModules =
     useModulesQuery({ refetchInterval: EQUIPMENT_POLL_MS })?.data?.data ?? []
   const deckConfig = useNotifyDeckConfigurationQuery()?.data ?? []
@@ -106,7 +106,7 @@ export const ChooseModuleToConfigureModal = (
             handleConfigureModule(serialNumber)
           }}
           optionName={getFixtureDisplayName(moduleFixtures[0].id, usbPort)}
-          buttonText={t('shared:add')}
+          buttonText={i18n.format(t('shared:add'), 'capitalize')}
           isOnDevice={isOnDevice}
         />
       )
@@ -117,7 +117,7 @@ export const ChooseModuleToConfigureModal = (
 
   const contents =
     fixtureOptions.length > 0 ? (
-      <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing16}>
+      <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing32}>
         <StyledText as="p">{t('add_this_deck_hardware')}</StyledText>
         <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing8}>
           {fixtureOptions}
@@ -145,13 +145,7 @@ export const ChooseModuleToConfigureModal = (
           onClick: onCloseClick,
         }}
       >
-        <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing32}>
-          <Flex flexDirection={DIRECTION_COLUMN}>
-            <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing8}>
-              {contents}
-            </Flex>
-          </Flex>
-        </Flex>
+        {contents}
       </Modal>
     ) : (
       <LegacyModal
@@ -169,16 +163,8 @@ export const ChooseModuleToConfigureModal = (
         onClose={onCloseClick}
         width="27.75rem"
       >
-        <Flex flexDirection={DIRECTION_COLUMN}>
-          <Flex paddingY={SPACING.spacing16} flexDirection={DIRECTION_COLUMN}>
-            <Flex
-              flexDirection={DIRECTION_COLUMN}
-              paddingTop={SPACING.spacing8}
-              gridGap={SPACING.spacing8}
-            >
-              {contents}
-            </Flex>
-          </Flex>
+        <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing8}>
+          {contents}
         </Flex>
       </LegacyModal>
     ),
@@ -226,15 +212,16 @@ function NoUnconfiguredModules(props: NoUnconfiguredModulesProps): JSX.Element {
     <Flex
       paddingX={SPACING.spacing80}
       paddingY={SPACING.spacing40}
-      gridGap={isOnDevice ? SPACING.spacing40 : SPACING.spacing10}
+      gridGap={isOnDevice ? SPACING.spacing32 : SPACING.spacing10}
       borderRadius={isOnDevice ? BORDERS.borderRadius12 : BORDERS.borderRadius8}
-      backgroundColor={COLORS.grey35}
+      backgroundColor={isOnDevice ? COLORS.grey35 : COLORS.grey30}
       flexDirection={DIRECTION_COLUMN}
       alignItems={ALIGN_CENTER}
     >
       <Icon
         size={isOnDevice ? '2rem' : '1.25rem'}
         marginLeft={SPACING.spacing8}
+        color={COLORS.grey60}
         name="ot-spinner"
         spin
       />
@@ -248,7 +235,10 @@ function NoUnconfiguredModules(props: NoUnconfiguredModulesProps): JSX.Element {
     </Flex>
   )
   return (
-    <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing32}>
+    <Flex
+      flexDirection={DIRECTION_COLUMN}
+      gridGap={isOnDevice ? SPACING.spacing32 : SPACING.spacing24}
+    >
       {configuredModuleMatches.length > 0 ? (
         <>
           <StyledText as="p">

@@ -8,7 +8,7 @@ import {
 import { useFeatureFlag } from '../../redux/config'
 import { ErrorRecoveryWizard, useERWizard } from './ErrorRecoveryWizard'
 import { useRunPausedSplash, RunPausedSplash } from './RunPausedSplash'
-import { useCurrentlyFailedRunCommand, useRouteUpdateActions } from './utils'
+import { useCurrentlyRecoveringFrom, useRouteUpdateActions } from './utils'
 import { useRecoveryCommands } from './useRecoveryCommands'
 import { RECOVERY_MAP } from './constants'
 
@@ -30,7 +30,7 @@ export function useErrorRecoveryFlows(
   runStatus: RunStatus | null
 ): UseErrorRecoveryResult {
   const [isERActive, setIsERActive] = React.useState(false)
-  const failedCommand = useCurrentlyFailedRunCommand(runId, runStatus)
+  const failedCommand = useCurrentlyRecoveringFrom(runId, runStatus)
 
   const isValidRunStatus =
     runStatus != null && VALID_ER_RUN_STATUSES.includes(runStatus)
