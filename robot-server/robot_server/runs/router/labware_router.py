@@ -64,7 +64,7 @@ async def add_labware_offset(
             status.HTTP_409_CONFLICT
         )
 
-    added_offset = engine_store.engine.add_labware_offset(request_body.data)
+    added_offset = engine_store.add_labware_offset(request_body.data)
     log.info(f'Added labware offset "{added_offset.id}"' f' to run "{run.id}".')
 
     return await PydanticResponse.create(
@@ -106,7 +106,7 @@ async def add_labware_definition(
             status.HTTP_409_CONFLICT
         )
 
-    uri = engine_store.engine.add_labware_definition(request_body.data)
+    uri = engine_store.add_labware_definition(request_body.data)
     log.info(f'Added labware definition "{uri}"' f' to run "{run.id}".')
 
     return PydanticResponse(
