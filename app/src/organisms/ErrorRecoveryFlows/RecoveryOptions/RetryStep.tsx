@@ -6,7 +6,6 @@ import {
   DIRECTION_COLUMN,
   Flex,
   Icon,
-  JUSTIFY_SPACE_BETWEEN,
   SPACING,
   StyledText,
 } from '@opentrons/components'

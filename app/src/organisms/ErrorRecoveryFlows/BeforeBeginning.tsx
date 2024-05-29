@@ -4,8 +4,6 @@ import { Trans, useTranslation } from 'react-i18next'
 import {
   DIRECTION_COLUMN,
   Flex,
-  JUSTIFY_SPACE_BETWEEN,
-  SPACING,
   JUSTIFY_CENTER,
   StyledText,
 } from '@opentrons/components'

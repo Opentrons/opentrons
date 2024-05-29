@@ -2,14 +2,7 @@ import * as React from 'react'
 import { createPortal } from 'react-dom'
 import { useSelector } from 'react-redux'
 
-import {
-  BORDERS,
-  COLORS,
-  DIRECTION_COLUMN,
-  Flex,
-  POSITION_ABSOLUTE,
-  StyledText,
-} from '@opentrons/components'
+import { StyledText } from '@opentrons/components'
 
 import { getIsOnDevice } from '../../redux/config'
 import { getTopPortalEl } from '../../App/portal'
