@@ -23,11 +23,9 @@ import type { FailedCommand, IRecoveryMap, RecoveryContentProps } from './types'
 import type {
   useRouteUpdateActions,
   UseRouteUpdateActionsResult,
-} from './utils'
-import type {
   useRecoveryCommands,
   UseRecoveryCommandsResult,
-} from './useRecoveryCommands'
+} from './utils'
 
 interface UseERWizardResult {
   hasLaunchedRecovery: boolean

@@ -1,47 +1,14 @@
-import { vi, describe, it, expect, beforeEach } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { renderHook } from '@testing-library/react'
 
-import { ERROR_KINDS, INVALID, RECOVERY_MAP } from '../constants'
 import {
-  getErrorKind,
-  getRecoveryRouteNavigation,
   useRouteUpdateActions,
-  useCurrentlyRecoveringFrom,
-} from '../utils'
-import { useNotifyAllCommandsQuery } from '../../../resources/runs'
+  getRecoveryRouteNavigation,
+} from '../useRouteUpdateActions'
+import { INVALID, RECOVERY_MAP } from '../../constants'
 
 import type { Mock } from 'vitest'
-import type { GetRouteUpdateActionsParams } from '../utils'
-import { useCommandQuery } from '@opentrons/react-api-client'
-import {
-  RUN_STATUS_AWAITING_RECOVERY,
-  RUN_STATUS_IDLE,
-} from '@opentrons/api-client'
-
-vi.mock('@opentrons/react-api-client')
-vi.mock('../../../resources/runs')
-
-describe('getErrorKind', () => {
-  it(`returns ${ERROR_KINDS.GENERAL_ERROR} if the errorType isn't handled explicitly`, () => {
-    const mockErrorType = 'NON_HANDLED_ERROR'
-    const result = getErrorKind(mockErrorType)
-    expect(result).toEqual(ERROR_KINDS.GENERAL_ERROR)
-  })
-})
-
-describe('getRecoveryRouteNavigation', () => {
-  it(`getNextStep and getPrevStep return ${INVALID} if the recovery route does not contain multiple steps`, () => {
-    const { ROBOT_IN_MOTION } = RECOVERY_MAP
-    const { getNextStep, getPrevStep } = getRecoveryRouteNavigation(
-      ROBOT_IN_MOTION.ROUTE
-    )
-    const nextStepResult = getNextStep(ROBOT_IN_MOTION.STEPS.IN_MOTION)
-    const prevStepResult = getPrevStep(ROBOT_IN_MOTION.STEPS.IN_MOTION)
-
-    expect(nextStepResult).toEqual(INVALID)
-    expect(prevStepResult).toEqual(INVALID)
-  })
-})
+import type { GetRouteUpdateActionsParams } from '../useRouteUpdateActions'
 
 describe('useRouteUpdateActions', () => {
   const { OPTION_SELECTION } = RECOVERY_MAP
@@ -182,88 +149,16 @@ describe('useRouteUpdateActions', () => {
   })
 })
 
-const MOCK_RUN_ID = 'runId'
-const MOCK_COMMAND_ID = 'commandId'
-
-describe('useCurrentlyRecoveringFrom', () => {
-  it('disables all queries if the run is not awaiting-recovery', () => {
-    vi.mocked(useNotifyAllCommandsQuery).mockReturnValue({
-      data: {
-        links: {
-          currentlyRecoveringFrom: {
-            meta: {
-              runId: MOCK_RUN_ID,
-              commandId: MOCK_COMMAND_ID,
-            },
-          },
-        },
-      },
-    } as any)
-    vi.mocked(useCommandQuery).mockReturnValue({
-      data: { data: 'mockCommandDetails' },
-    } as any)
-
-    const { result } = renderHook(() =>
-      useCurrentlyRecoveringFrom(MOCK_RUN_ID, RUN_STATUS_IDLE)
+describe('getRecoveryRouteNavigation', () => {
+  it(`getNextStep and getPrevStep return ${INVALID} if the recovery route does not contain multiple steps`, () => {
+    const { ROBOT_IN_MOTION } = RECOVERY_MAP
+    const { getNextStep, getPrevStep } = getRecoveryRouteNavigation(
+      ROBOT_IN_MOTION.ROUTE
     )
+    const nextStepResult = getNextStep(ROBOT_IN_MOTION.STEPS.IN_MOTION)
+    const prevStepResult = getPrevStep(ROBOT_IN_MOTION.STEPS.IN_MOTION)
 
-    expect(vi.mocked(useNotifyAllCommandsQuery)).toHaveBeenCalledWith(
-      MOCK_RUN_ID,
-      { cursor: null, pageLength: 0 },
-      { enabled: false, refetchInterval: 5000 }
-    )
-    expect(vi.mocked(useCommandQuery)).toHaveBeenCalledWith(
-      MOCK_RUN_ID,
-      MOCK_COMMAND_ID,
-      { enabled: false }
-    )
-    expect(result.current).toStrictEqual(null)
-  })
-
-  it('returns null if there is no currentlyRecoveringFrom command', () => {
-    vi.mocked(useNotifyAllCommandsQuery).mockReturnValue({
-      data: {
-        links: {},
-      },
-    } as any)
-    vi.mocked(useCommandQuery).mockReturnValue({} as any)
-
-    const { result } = renderHook(() =>
-      useCurrentlyRecoveringFrom(MOCK_RUN_ID, RUN_STATUS_AWAITING_RECOVERY)
-    )
-
-    expect(vi.mocked(useCommandQuery)).toHaveBeenCalledWith(null, null, {
-      enabled: false,
-    })
-    expect(result.current).toStrictEqual(null)
-  })
-
-  it('fetches and returns the currentlyRecoveringFrom command, given that there is one', () => {
-    vi.mocked(useNotifyAllCommandsQuery).mockReturnValue({
-      data: {
-        links: {
-          currentlyRecoveringFrom: {
-            meta: {
-              runId: MOCK_RUN_ID,
-              commandId: MOCK_COMMAND_ID,
-            },
-          },
-        },
-      },
-    } as any)
-    vi.mocked(useCommandQuery).mockReturnValue({
-      data: { data: 'mockCommandDetails' },
-    } as any)
-
-    const { result } = renderHook(() =>
-      useCurrentlyRecoveringFrom(MOCK_RUN_ID, RUN_STATUS_AWAITING_RECOVERY)
-    )
-
-    expect(vi.mocked(useCommandQuery)).toHaveBeenCalledWith(
-      MOCK_RUN_ID,
-      MOCK_COMMAND_ID,
-      { enabled: true }
-    )
-    expect(result.current).toStrictEqual('mockCommandDetails')
+    expect(nextStepResult).toEqual(INVALID)
+    expect(prevStepResult).toEqual(INVALID)
   })
 })
