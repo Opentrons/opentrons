@@ -1,14 +1,33 @@
 import * as React from 'react'
-import { describe, it, expect, beforeEach } from 'vitest'
+import { vi, describe, it, expect, beforeEach } from 'vitest'
+import { when } from 'vitest-when'
 import '@testing-library/jest-dom/vitest'
-import { screen } from '@testing-library/react'
+
+import { screen, fireEvent } from '@testing-library/react'
 import { COLORS, BORDERS } from '@opentrons/components'
+
+import { i18n } from '../../../i18n'
 import { renderWithProviders } from '../../../__testing-utils__'
+import { getIsOnDevice } from '../../../redux/config'
+
 import { InterventionModal } from '../'
+
 import type { ModalType } from '../'
+import type { State } from '../../../redux/types'
+
+vi.mock('../../../redux/config')
+
+const MOCK_STATE: State = {
+  config: {
+    isOnDevice: false,
+  },
+} as any
 
 const render = (props: React.ComponentProps<typeof InterventionModal>) => {
-  return renderWithProviders(<InterventionModal {...props} />)[0]
+  return renderWithProviders(<InterventionModal {...props} />, {
+    i18nInstance: i18n,
+    initialState: MOCK_STATE,
+  })[0]
 }
 
 describe('InterventionModal', () => {
@@ -16,11 +35,12 @@ describe('InterventionModal', () => {
 
   beforeEach(() => {
     props = {
-      heading: 'mock intervention heading',
+      iconHeading: 'mock intervention icon heading',
       children: 'mock intervention children',
       iconName: 'alert-circle',
       type: 'intervention-required',
     }
+    when(vi.mocked(getIsOnDevice)).calledWith(MOCK_STATE).thenReturn(false)
   })
   ;(['intervention-required', 'error'] as ModalType[]).forEach(type => {
     const color =
@@ -45,7 +65,7 @@ describe('InterventionModal', () => {
   it('renders passed elements', () => {
     render(props)
     screen.getByText('mock intervention children')
-    screen.getByText('mock intervention heading')
+    screen.getByText('mock intervention icon heading')
   })
   it('renders an icon if an icon is specified', () => {
     const { container } = render(props)
@@ -62,5 +82,40 @@ describe('InterventionModal', () => {
       '[aria-roledescription="alert-circle"]'
     )
     expect(icon).toBeNull()
+  })
+
+  it('renders title heading text if passed', () => {
+    props = { ...props, titleHeading: 'mock intervention title heading' }
+    render(props)
+    screen.getByText('mock intervention title heading')
+  })
+
+  it('fires an onClick when clicking on the iconHeading if passed', () => {
+    const mockOnClick = vi.fn()
+    props = { ...props, iconHeadingOnClick: mockOnClick }
+    render(props)
+
+    fireEvent.click(screen.getByText('mock intervention icon heading'))
+
+    expect(mockOnClick).toHaveBeenCalled()
+  })
+
+  it('renders the alternative desktop style when isOnDevice is false', () => {
+    render(props)
+
+    expect(screen.getByTestId('__otInterventionModal')).toHaveStyle({
+      width: '47rem',
+      maxHeight: '100%',
+    })
+  })
+
+  it('renders the alternative ODD style when isOnDevice is true', () => {
+    when(vi.mocked(getIsOnDevice)).calledWith(MOCK_STATE).thenReturn(true)
+    render(props)
+
+    expect(screen.getByTestId('__otInterventionModal')).toHaveStyle({
+      width: '62rem',
+      height: '35.5rem',
+    })
   })
 })

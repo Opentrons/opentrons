@@ -21,5 +21,6 @@
   "stand_back_resuming": "Stand back, resuming current step",
   "stand_back_retrying": "Stand back, retrying current command",
   "tip_not_detected": "Tip not detected",
+  "view_error_details": "View error details",
   "view_recovery_options": "View recovery options"
 }

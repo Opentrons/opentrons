@@ -9,7 +9,7 @@ import {
   SPACING,
 } from '@opentrons/components'
 
-import { SmallButton } from '../../../../atoms/buttons'
+import { SmallButton } from '../../../atoms/buttons'
 
 interface RecoveryOptionProps {
   isOnDevice: boolean
