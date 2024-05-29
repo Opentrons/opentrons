@@ -194,7 +194,7 @@ if __name__ == "__main__":
     )
     # WRITE ERRORED RUN TO GOOGLE SHEET
     error_run_log = os.path.join(error_folder_path, os.path.basename(run_log_file_path))
-    google_drive.upload_file(error_run_log)
+    google_drive.upload_file(error_run_log, "1Cvej0eadFOTZr9ILRXJ0Wg65ymOtxL4m")
     run_id = os.path.basename(error_run_log).split("_")[1].split(".")[0]
     (
         runs_and_robots,
