@@ -5,11 +5,11 @@ import {
   useStopRunMutation,
 } from '@opentrons/react-api-client'
 
-import { useChainRunCommands } from '../../resources/runs'
+import { useChainRunCommands } from '../../../resources/runs'
 
 import type { CreateCommand } from '@opentrons/shared-data'
 import type { CommandData } from '@opentrons/api-client'
-import type { FailedCommand } from './types'
+import type { FailedCommand } from '../types'
 
 interface UseRecoveryCommandsParams {
   runId: string

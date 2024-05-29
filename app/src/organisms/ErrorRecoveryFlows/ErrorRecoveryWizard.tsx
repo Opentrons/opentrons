@@ -1,6 +1,7 @@
 import * as React from 'react'
 import { createPortal } from 'react-dom'
 import { useSelector } from 'react-redux'
+import { useTranslation } from 'react-i18next'
 
 import { StyledText } from '@opentrons/components'
 
@@ -17,12 +18,9 @@ import type { FailedCommand, IRecoveryMap, RecoveryContentProps } from './types'
 import type {
   useRouteUpdateActions,
   UseRouteUpdateActionsResult,
-} from './utils'
-import type {
   useRecoveryCommands,
   UseRecoveryCommandsResult,
-} from './useRecoveryCommands'
-import { useTranslation } from 'react-i18next'
+} from './utils'
 
 interface UseERWizardResult {
   hasLaunchedRecovery: boolean
