@@ -21,8 +21,6 @@ import { getIsOnDevice } from '../../redux/config'
 
 import type { IconName } from '@opentrons/components'
 
-import { getIsOnDevice } from '../../redux/config'
-
 export type ModalType = 'intervention-required' | 'error'
 
 const BASE_STYLE = {
