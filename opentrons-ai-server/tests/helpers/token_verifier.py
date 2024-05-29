@@ -8,7 +8,7 @@ from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives import serialization
 from cryptography.hazmat.primitives.asymmetric.rsa import RSAPublicNumbers
 from jwt.exceptions import DecodeError, ExpiredSignatureError, InvalidTokenError
-from rich import inspect, print
+from rich import print
 
 from tests.helpers.settings import Settings
 
@@ -68,7 +68,7 @@ class TokenVerifier:
                 options={"verify_signature": True},
             )
             print("Decoded token:")
-            inspect(decoded_token)
+            print(decoded_token)
             return True
         except (DecodeError, ExpiredSignatureError, InvalidTokenError) as e:
             print(f"JWT validation error: {str(e)}")

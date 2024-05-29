@@ -3,10 +3,10 @@ import * as React from 'react'
 import { Flex } from '../../primitives'
 import { COLORS } from '../../helix-design-system'
 import { SPACING, VIEWPORT } from '../../ui-style-constants'
-import { Chip } from '.'
+import { Chip as ChipComponent } from '.'
 import type { Meta, StoryObj } from '@storybook/react'
 
-const meta: Meta<typeof Chip> = {
+const meta: Meta<typeof ChipComponent> = {
   title: 'Library/Atoms/Chip',
   argTypes: {
     type: {
@@ -33,7 +33,7 @@ const meta: Meta<typeof Chip> = {
       },
     },
   },
-  component: Chip,
+  component: ChipComponent,
   parameters: VIEWPORT.touchScreenViewport,
   decorators: [
     Story => (
@@ -49,9 +49,9 @@ const meta: Meta<typeof Chip> = {
 }
 
 export default meta
-type Story = StoryObj<typeof Chip>
+type Story = StoryObj<typeof ChipComponent>
 
-export const ChipComponent: Story = {
+export const Chip: Story = {
   args: {
     type: 'success',
     text: 'Chip component',

@@ -54,15 +54,13 @@ import type {
   CutoutConfig,
   CutoutId,
   CutoutFixtureId,
-  DeckConfiguration,
 } from '@opentrons/shared-data'
 import type { ModalHeaderBaseProps } from '../../molecules/Modal/types'
 import type { LegacyModalProps } from '../../molecules/LegacyModal'
 
 interface AddFixtureModalProps {
   cutoutId: CutoutId
-  setShowAddFixtureModal: (showAddFixtureModal: boolean) => void
-  setCurrentDeckConfig?: React.Dispatch<React.SetStateAction<CutoutConfig[]>>
+  closeModal: () => void
   providedFixtureOptions?: CutoutFixtureId[]
   isOnDevice?: boolean
 }
@@ -75,8 +73,7 @@ type OptionStage =
 
 export function AddFixtureModal({
   cutoutId,
-  setShowAddFixtureModal,
-  setCurrentDeckConfig,
+  closeModal,
   providedFixtureOptions,
   isOnDevice = false,
 }: AddFixtureModalProps): JSX.Element {
@@ -109,18 +106,14 @@ export function AddFixtureModal({
       slotName: getCutoutDisplayName(cutoutId),
     }),
     hasExitIcon: providedFixtureOptions == null,
-    onClick: () => {
-      setShowAddFixtureModal(false)
-    },
+    onClick: closeModal,
   }
 
   const modalProps: LegacyModalProps = {
     title: t('add_to_slot', {
       slotName: getCutoutDisplayName(cutoutId),
     }),
-    onClose: () => {
-      setShowAddFixtureModal(false)
-    },
+    onClose: closeModal,
     closeOnOutsideClick: true,
     childrenPadding: SPACING.spacing24,
     width: '26.75rem',
@@ -289,22 +282,7 @@ export function AddFixtureModal({
     )
   }
 
-  const handleAddODD = (addedCutoutConfigs: CutoutConfig[]): void => {
-    if (setCurrentDeckConfig != null)
-      setCurrentDeckConfig(
-        (prevDeckConfig: DeckConfiguration): DeckConfiguration =>
-          prevDeckConfig.map((fixture: CutoutConfig) => {
-            const replacementCutoutConfig = addedCutoutConfigs.find(
-              c => c.cutoutId === fixture.cutoutId
-            )
-            return replacementCutoutConfig ?? fixture
-          })
-      )
-
-    setShowAddFixtureModal(false)
-  }
-
-  const handleAddDesktop = (addedCutoutConfigs: CutoutConfig[]): void => {
+  const handleAddFixture = (addedCutoutConfigs: CutoutConfig[]): void => {
     const newDeckConfig = deckConfig.map(fixture => {
       const replacementCutoutConfig = addedCutoutConfigs.find(
         c => c.cutoutId === fixture.cutoutId
@@ -313,7 +291,7 @@ export function AddFixtureModal({
     })
 
     updateDeckConfiguration(newDeckConfig)
-    setShowAddFixtureModal(false)
+    closeModal()
   }
 
   const fixtureOptions = availableOptions.map(cutoutConfigs => (
@@ -327,9 +305,7 @@ export function AddFixtureModal({
       )}
       buttonText={t('add')}
       onClickHandler={() => {
-        isOnDevice
-          ? handleAddODD(cutoutConfigs)
-          : handleAddDesktop(cutoutConfigs)
+        handleAddFixture(cutoutConfigs)
       }}
       isOnDevice={isOnDevice}
     />
@@ -341,13 +317,11 @@ export function AddFixtureModal({
         <Modal
           header={modalHeader}
           onOutsideClick={() =>
-            providedFixtureOptions != null
-              ? null
-              : setShowAddFixtureModal(false)
+            providedFixtureOptions != null ? null : closeModal()
           }
         >
           <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing32}>
-            <StyledText as="p">{t('add_to_slot_description')}</StyledText>
+            <StyledText as="p">{t('add_fixture_description')}</StyledText>
             <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing8}>
               {fixtureOptions}
               {nextStageOptions}

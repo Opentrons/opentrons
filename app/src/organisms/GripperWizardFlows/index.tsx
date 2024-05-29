@@ -120,11 +120,18 @@ export function GripperWizardFlows(
     if (props?.onComplete != null) props.onComplete()
     if (maintenanceRunData != null) {
       deleteMaintenanceRun(maintenanceRunData?.data.id)
+    } else {
+      closeFlow()
     }
-    closeFlow()
   }
 
-  const { deleteMaintenanceRun } = useDeleteMaintenanceRunMutation({})
+  const {
+    deleteMaintenanceRun,
+    isLoading: isDeleteLoading,
+  } = useDeleteMaintenanceRunMutation({
+    onSuccess: () => closeFlow(),
+    onError: () => closeFlow(),
+  })
 
   const handleCleanUpAndClose = (): void => {
     if (maintenanceRunData?.data.id == null) handleClose()
@@ -153,7 +160,10 @@ export function GripperWizardFlows(
       createMaintenanceRun={createTargetedMaintenanceRun}
       isCreateLoading={isCreateLoading}
       isRobotMoving={
-        isChainCommandMutationLoading || isCommandLoading || isExiting
+        isChainCommandMutationLoading ||
+        isCommandLoading ||
+        isExiting ||
+        isDeleteLoading
       }
       handleCleanUpAndClose={handleCleanUpAndClose}
       handleClose={handleClose}

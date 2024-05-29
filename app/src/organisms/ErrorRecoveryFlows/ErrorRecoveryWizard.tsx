@@ -2,84 +2,110 @@ import * as React from 'react'
 import { createPortal } from 'react-dom'
 import { useSelector } from 'react-redux'
 
-import {
-  BORDERS,
-  COLORS,
-  DIRECTION_COLUMN,
-  Flex,
-  POSITION_ABSOLUTE,
-} from '@opentrons/components'
+import { StyledText } from '@opentrons/components'
 
 import { getIsOnDevice } from '../../redux/config'
 import { getTopPortalEl } from '../../App/portal'
+import { InterventionModal } from '../../molecules/InterventionModal'
 import { BeforeBeginning } from './BeforeBeginning'
-import { SelectRecoveryOption, ResumeRun, CancelRun } from './RecoveryOptions'
-import { ErrorRecoveryHeader } from './ErrorRecoveryHeader'
+import { SelectRecoveryOption, RetryStep, CancelRun } from './RecoveryOptions'
 import { RecoveryInProgress } from './RecoveryInProgress'
-import { getErrorKind, useRouteUpdateActions } from './utils'
-import { useRecoveryCommands } from './useRecoveryCommands'
+import { getErrorKind } from './utils'
 import { RECOVERY_MAP } from './constants'
 
 import type { FailedCommand, IRecoveryMap, RecoveryContentProps } from './types'
+import type {
+  useRouteUpdateActions,
+  UseRouteUpdateActionsResult,
+} from './utils'
+import type {
+  useRecoveryCommands,
+  UseRecoveryCommandsResult,
+} from './useRecoveryCommands'
+import { useTranslation } from 'react-i18next'
 
-export interface ErrorRecoveryFlowsProps {
-  runId: string
-  failedCommand: FailedCommand | null
+interface UseERWizardResult {
+  hasLaunchedRecovery: boolean
+  showERWizard: boolean
+  toggleERWizard: (hasLaunchedER: boolean) => Promise<void>
 }
 
-export function ErrorRecoveryWizard({
-  runId,
-  failedCommand,
-}: ErrorRecoveryFlowsProps): JSX.Element {
-  /**
-   * Recovery Route: A logically-related collection of recovery steps or a single step if unrelated to any existing recovery route.
-   * Recovery Step: Analogous to a "step" in other wizard flows.
-   */
-  const [recoveryMap, setRecoveryMap] = React.useState<IRecoveryMap>({
-    route: RECOVERY_MAP.OPTION_SELECTION.ROUTE,
-    step: RECOVERY_MAP.OPTION_SELECTION.STEPS.SELECT,
-  })
+export function useERWizard(): UseERWizardResult {
+  const [showERWizard, setShowERWizard] = React.useState(false)
+  // Because RunPausedSplash has access to some ER Wiz routes but is not a part of the ER wizard, the splash screen
+  // is the "home" route as opposed to SelectRecoveryOption (accessed by pressing "go back" or "continue" enough times)
+  // when recovery mode has not been launched.
+  const [hasLaunchedRecovery, setHasLaunchedRecovery] = React.useState(false)
 
+  const toggleERWizard = (hasLaunchedER: boolean): Promise<void> => {
+    setHasLaunchedRecovery(hasLaunchedER)
+    setShowERWizard(!showERWizard)
+    return Promise.resolve()
+  }
+
+  return { showERWizard, toggleERWizard, hasLaunchedRecovery }
+}
+
+export interface ErrorRecoveryWizardProps {
+  failedCommand: FailedCommand | null
+  recoveryMap: IRecoveryMap
+  routeUpdateActions: UseRouteUpdateActionsResult
+  recoveryCommands: UseRecoveryCommandsResult
+  hasLaunchedRecovery: boolean
+}
+
+export function ErrorRecoveryWizard(
+  props: ErrorRecoveryWizardProps
+): JSX.Element {
+  const {
+    hasLaunchedRecovery,
+    failedCommand,
+    recoveryCommands,
+    routeUpdateActions,
+  } = props
   const errorKind = getErrorKind(failedCommand?.error?.errorType)
   const isOnDevice = useSelector(getIsOnDevice)
-  const routeUpdateActions = useRouteUpdateActions({
-    recoveryMap,
-    setRecoveryMap,
-  })
-  const recoveryCommands = useRecoveryCommands({
-    runId,
-    failedCommand,
-  })
 
-  useInitialPipetteHome(recoveryCommands, routeUpdateActions)
+  useInitialPipetteHome({
+    hasLaunchedRecovery,
+    recoveryCommands,
+    routeUpdateActions,
+  })
 
   return (
     <ErrorRecoveryComponent
-      failedCommand={failedCommand}
       errorKind={errorKind}
       isOnDevice={isOnDevice}
-      recoveryMap={recoveryMap}
-      routeUpdateActions={routeUpdateActions}
-      recoveryCommands={recoveryCommands}
+      {...props}
     />
   )
 }
 
-function ErrorRecoveryComponent(props: RecoveryContentProps): JSX.Element {
+export function ErrorRecoveryComponent(
+  props: RecoveryContentProps
+): JSX.Element {
+  const { t } = useTranslation('error_recovery')
+
+  const buildTitleHeading = (): JSX.Element => {
+    const titleText = props.hasLaunchedRecovery
+      ? t('recovery_mode')
+      : t('cancel_run')
+    return <StyledText as="h4Bold">{titleText}</StyledText>
+  }
+
+  const buildIconHeading = (): JSX.Element => (
+    <StyledText as="pSemiBold">{t('view_error_details')}</StyledText>
+  )
+
   return createPortal(
-    <Flex
-      flexDirection={DIRECTION_COLUMN}
-      width="992px"
-      height="568px"
-      left="14.5px"
-      top="16px"
-      borderRadius={BORDERS.borderRadius12}
-      position={POSITION_ABSOLUTE}
-      backgroundColor={COLORS.white}
+    <InterventionModal
+      iconName="information"
+      iconHeading={buildIconHeading()}
+      titleHeading={buildTitleHeading()}
+      type="error"
     >
-      <ErrorRecoveryHeader errorKind={props.errorKind} />
       <ErrorRecoveryContent {...props} />
-    </Flex>,
+    </InterventionModal>,
     getTopPortalEl()
   )
 }
@@ -98,7 +124,7 @@ export function ErrorRecoveryContent(props: RecoveryContentProps): JSX.Element {
   }
 
   const buildResumeRun = (): JSX.Element => {
-    return <ResumeRun {...props} />
+    return <RetryStep {...props} />
   }
 
   const buildCancelRun = (): JSX.Element => {
@@ -110,7 +136,7 @@ export function ErrorRecoveryContent(props: RecoveryContentProps): JSX.Element {
       return buildBeforeBeginning()
     case RECOVERY_MAP.OPTION_SELECTION.ROUTE:
       return buildSelectRecoveryOption()
-    case RECOVERY_MAP.RESUME.ROUTE:
+    case RECOVERY_MAP.RETRY_FAILED_COMMAND.ROUTE:
       return buildResumeRun()
     case RECOVERY_MAP.CANCEL_RUN.ROUTE:
       return buildCancelRun()
@@ -123,19 +149,26 @@ export function ErrorRecoveryContent(props: RecoveryContentProps): JSX.Element {
       return buildSelectRecoveryOption()
   }
 }
-
-// Home the Z-axis of all attached pipettes on Error Recovery launch.
-export function useInitialPipetteHome(
-  recoveryCommands: ReturnType<typeof useRecoveryCommands>,
+interface UseInitialPipetteHomeParams {
+  hasLaunchedRecovery: boolean
+  recoveryCommands: ReturnType<typeof useRecoveryCommands>
   routeUpdateActions: ReturnType<typeof useRouteUpdateActions>
-): void {
+}
+// Home the Z-axis of all attached pipettes on Error Recovery launch.
+export function useInitialPipetteHome({
+  hasLaunchedRecovery,
+  recoveryCommands,
+  routeUpdateActions,
+}: UseInitialPipetteHomeParams): void {
   const { homePipetteZAxes } = recoveryCommands
   const { setRobotInMotion } = routeUpdateActions
 
   // Synchronously set the recovery route to "robot in motion" before initial render to prevent screen flicker on ER launch.
   React.useLayoutEffect(() => {
-    void setRobotInMotion(true)
-      .then(() => homePipetteZAxes())
-      .finally(() => setRobotInMotion(false))
-  }, [])
+    if (hasLaunchedRecovery) {
+      void setRobotInMotion(true)
+        .then(() => homePipetteZAxes())
+        .finally(() => setRobotInMotion(false))
+    }
+  }, [hasLaunchedRecovery])
 }

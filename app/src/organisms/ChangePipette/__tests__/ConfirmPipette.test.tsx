@@ -427,7 +427,19 @@ describe('ConfirmPipette', () => {
     fireEvent.click(pocBtn)
     expect(props.toCalibrationDashboard).toBeCalled()
   })
-  it('should render buttons as disabled when robot is in motion/isDisabled is true', () => {
+  it('should render buttons as disabled on success when robot is in motion/isDisabled is true', () => {
+    props = {
+      ...props,
+      success: true,
+      isDisabled: true,
+    }
+    const { getByRole } = render(props)
+    expect(getByRole('button', { name: 'exit' })).toBeDisabled()
+    expect(
+      getByRole('button', { name: 'Calibrate pipette offset' })
+    ).toBeDisabled()
+  })
+  it('should render buttons as disabled on failure when robot is in motion/isDisabled is true', () => {
     props = {
       ...props,
       success: false,

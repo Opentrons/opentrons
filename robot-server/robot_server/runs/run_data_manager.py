@@ -194,8 +194,9 @@ class RunDataManager:
             created_at=created_at,
             protocol_id=protocol.protocol_id if protocol is not None else None,
         )
-        await self._runs_publisher.initialize(
+        await self._runs_publisher.start_publishing_for_run(
             get_current_command=self.get_current_command,
+            get_recovery_target_command=self.get_recovery_target_command,
             get_state_summary=self._get_good_state_summary,
             run_id=run_id,
         )

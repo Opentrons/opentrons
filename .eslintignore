@@ -33,3 +33,4 @@ app-testing/files
 # app testing don't format the snapshots
 app-testing/tests/__snapshots__
 opentrons-ai-server/package
+opentrons-ai-server/api/storage/index/

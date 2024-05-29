@@ -59,6 +59,7 @@
   "load_module_protocol_setup": "Load {{module}} in Slot {{slot_name}}",
   "load_pipette_protocol_setup": "Load {{pipette_name}} in {{mount_name}} Mount",
   "loading_protocol": "Loading Protocol",
+  "loading_data": "Loading data...",
   "location": "location",
   "module_controls": "Module Controls",
   "module_slot_number": "Slot {{slot_number}}",

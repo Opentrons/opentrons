@@ -1,13 +1,15 @@
 import json
+import logging
 import uuid
 from typing import Any, Dict, Iterable
 
 import requests
 from openai.types.chat import ChatCompletionToolParam
 
-from api.settings import Settings
+from api.settings import Settings, get_settings
 
-settings = Settings.build()
+settings: Settings = get_settings()
+logger = logging.getLogger(__name__)
 
 
 def generate_unique_name() -> str:
@@ -25,23 +27,23 @@ def send_post_request(payload: str) -> str:
     response = requests.post(url, json=data, headers=headers)
 
     if response.status_code != 200:
-        print("Error: " + response.text)
+        logger.error("Error: " + response.text)
         return "Error: " + response.text
 
     # Check the response before returning it
     # ToDo clean up code
     response_data: Dict[str, Any] = response.json()
     if "error_message" in response_data:
-        print("Error in response:", response_data["error_message"])
+        logger.error("Error in response:", response_data["error_message"])
         return str(response_data["error_message"])
     elif "protocol_name" in response_data:
-        # print("Protocol executed successfully. Run log:", response_data["run_log"])
+        logger.debug("Protocol executed successfully", extra={"response_data": response_data["run_log"]})
 
         return str(response_data["run_status"])
         # ToDo if run_log option is on
         # return response_data["run_log"]
     else:
-        print("Unexpected response:", response_data)
+        logger.info("Unexpected response:", extra={"response_data": response_data})
         return "Unexpected response"
 
 

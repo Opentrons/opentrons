@@ -1,13 +1,37 @@
+import time
+from functools import wraps
+from typing import Any, Callable, TypeVar
+
 from api.models.chat_request import ChatRequest
 from httpx import Client as HttpxClient
 from httpx import Response, Timeout
-from rich import inspect
-from rich.console import Console
+from rich.console import Console, Group
 from rich.panel import Panel
+from rich.pretty import Pretty
 from rich.prompt import Prompt
+from rich.rule import Rule
+from rich.text import Text
 
 from tests.helpers.settings import Settings, get_settings
 from tests.helpers.token import Token
+
+F = TypeVar("F", bound=Callable[..., Any])
+
+
+def timeit(func: F) -> F:
+    @wraps(func)
+    def wrapper(*args: Any, **kwargs: Any) -> Any:
+        start_time = time.time()
+        result = func(*args, **kwargs)
+        end_time = time.time()
+        elapsed_time = end_time - start_time
+        console.print(f"[bold green]{func.__name__} completed in {elapsed_time:.4f} seconds[/bold green]")
+        return result
+
+    return wrapper  # type: ignore
+
+
+console = Console()
 
 
 class Client:
@@ -21,7 +45,7 @@ class Client:
             **self.type_headers,
             **self.auth_headers,
         }
-        self.timeout = Timeout(connect=5.0, read=120.0, write=120.0, pool=5.0)
+        self.timeout = Timeout(connect=5.0, read=180.0, write=180.0, pool=5.0)
         self.httpx = HttpxClient(base_url=self.settings.BASE_URL, timeout=self.timeout)
 
     def close(self) -> None:
@@ -37,6 +61,7 @@ class Client:
         """Call the /health endpoint and return the response."""
         return self.httpx.get("/health", headers=self.type_headers)
 
+    @timeit
     def get_chat_completion(self, message: str, fake: bool = True, bad_auth: bool = False) -> Response:
         """Call the /chat/completion endpoint and return the response."""
         request = ChatRequest(message=message, fake=fake)
@@ -58,33 +83,44 @@ class Client:
 
 def print_response(response: Response) -> None:
     """Prints the HTTP response using rich."""
-    console = Console()
-    console.print(Panel("Response", expand=False))
-    inspect(response)
+    status_code_text = Text(f"Status code: {response.status_code}", style="bold green")
+    try:
+        json = response.json()
+    except Exception:
+        json = None
+    if json:
+        text = Pretty(json)
+    else:
+        text = Pretty(response.text)
+    url = Pretty(response.request.url)
+    # Group the text elements
+    panel_content = Group(url, status_code_text, text)
+    # Print the panel with grouped content
+    console.print(Panel(panel_content, title="Response", expand=False))
 
 
 def main() -> None:
-    console = Console()
-    env = Prompt.ask("Select environment", choices=["dev", "sandbox", "crt"], default="sandbox")
+    env = Prompt.ask("Select environment", choices=["local", "dev", "sandbox", "crt", "staging"], default="local")
     settings = get_settings(env=env)
     client = Client(settings)
     try:
-        console.print(Panel("Getting health endpoint", expand=False))
+        console.print(Rule("Getting health endpoint", style="bold"))
         response = client.get_health()
         print_response(response)
 
-        console.print(Panel("Getting chat completion with fake=True and good auth (won't call OpenAI)", expand=False))
+        console.print(Rule("Getting chat completion with fake=True and good auth (won't call OpenAI)", style="bold"))
         response = client.get_chat_completion("How do I load a pipette?")
         print_response(response)
 
-        console.print(Panel("Getting chat completion with fake=True and bad auth to show 401 error (won't call OpenAI)", expand=False))
+        console.print(Rule("Getting chat completion with fake=True and bad auth to show 401 error (won't call OpenAI)", style="bold"))
         response = client.get_chat_completion("How do I load a pipette?", bad_auth=True)
         print_response(response)
 
-        console.print(Panel("Getting OPTIONS", expand=False))
+        console.print(Rule("Getting OPTIONS", style="bold"))
         response = client.get_options()
         print_response(response)
 
+        console.print(Rule("Now interact", style="bold"))
         real = Prompt.ask("Actually call OpenAI API?", choices=["y", "n"], default="n")
         if real == "y":
             message = Prompt.ask("Enter a message")

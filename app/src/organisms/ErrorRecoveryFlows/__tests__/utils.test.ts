@@ -1,23 +1,24 @@
 import { vi, describe, it, expect, beforeEach } from 'vitest'
-import { renderHook, act } from '@testing-library/react'
-
-import {
-  RUN_STATUS_AWAITING_RECOVERY,
-  RUN_STATUS_RUNNING,
-} from '@opentrons/api-client'
+import { renderHook } from '@testing-library/react'
 
 import { ERROR_KINDS, INVALID, RECOVERY_MAP } from '../constants'
 import {
   getErrorKind,
   getRecoveryRouteNavigation,
   useRouteUpdateActions,
-  useCurrentlyFailedRunCommand,
+  useCurrentlyRecoveringFrom,
 } from '../utils'
 import { useNotifyAllCommandsQuery } from '../../../resources/runs'
 
 import type { Mock } from 'vitest'
 import type { GetRouteUpdateActionsParams } from '../utils'
+import { useCommandQuery } from '@opentrons/react-api-client'
+import {
+  RUN_STATUS_AWAITING_RECOVERY,
+  RUN_STATUS_IDLE,
+} from '@opentrons/api-client'
 
+vi.mock('@opentrons/react-api-client')
 vi.mock('../../../resources/runs')
 
 describe('getErrorKind', () => {
@@ -47,14 +48,18 @@ describe('useRouteUpdateActions', () => {
 
   let useRouteUpdateActionsParams: GetRouteUpdateActionsParams
   let mockSetRecoveryMap: Mock
+  let mockToggleERWizard: Mock
 
   beforeEach(() => {
     mockSetRecoveryMap = vi.fn()
+    mockToggleERWizard = vi.fn()
 
     useRouteUpdateActionsParams = {
+      hasLaunchedRecovery: true,
+      toggleERWizard: mockToggleERWizard,
       recoveryMap: {
-        route: RECOVERY_MAP.RESUME.ROUTE,
-        step: RECOVERY_MAP.RESUME.STEPS.CONFIRM_RESUME,
+        route: RECOVERY_MAP.RETRY_FAILED_COMMAND.ROUTE,
+        step: RECOVERY_MAP.RETRY_FAILED_COMMAND.STEPS.CONFIRM_RETRY,
       },
       setRecoveryMap: mockSetRecoveryMap,
     }
@@ -71,6 +76,22 @@ describe('useRouteUpdateActions', () => {
       route: OPTION_SELECTION.ROUTE,
       step: OPTION_SELECTION.STEPS.SELECT,
     })
+    expect(mockToggleERWizard).not.toHaveBeenCalled()
+  })
+
+  it('toggles off the ER Wizard if proceedNextStep is called and hasLaunchedRecovery is false', () => {
+    const { result } = renderHook(() =>
+      useRouteUpdateActions({
+        ...useRouteUpdateActionsParams,
+        hasLaunchedRecovery: false,
+      })
+    )
+
+    const { proceedNextStep } = result.current
+
+    proceedNextStep()
+
+    expect(mockToggleERWizard).toHaveBeenCalled()
   })
 
   it(`routes to ${OPTION_SELECTION.ROUTE} ${OPTION_SELECTION.STEPS.SELECT} if proceedPrevStep is called and the previous step does not exist`, () => {
@@ -84,6 +105,22 @@ describe('useRouteUpdateActions', () => {
       route: OPTION_SELECTION.ROUTE,
       step: OPTION_SELECTION.STEPS.SELECT,
     })
+    expect(mockToggleERWizard).not.toHaveBeenCalled()
+  })
+
+  it('toggles off the ER Wizard if proceedPrevStep is called and hasLaunchedRecovery is false', () => {
+    const { result } = renderHook(() =>
+      useRouteUpdateActions({
+        ...useRouteUpdateActionsParams,
+        hasLaunchedRecovery: false,
+      })
+    )
+
+    const { goBackPrevStep } = result.current
+
+    goBackPrevStep()
+
+    expect(mockToggleERWizard).toHaveBeenCalled()
   })
 
   it('routes to the first step of the supplied route when proceedToRoute is called', () => {
@@ -139,93 +176,94 @@ describe('useRouteUpdateActions', () => {
 
     setRobotInMotion(false)
     expect(mockSetRecoveryMap).toHaveBeenCalledWith({
-      route: RECOVERY_MAP.RESUME.ROUTE,
-      step: RECOVERY_MAP.RESUME.STEPS.CONFIRM_RESUME,
+      route: RECOVERY_MAP.RETRY_FAILED_COMMAND.ROUTE,
+      step: RECOVERY_MAP.RETRY_FAILED_COMMAND.STEPS.CONFIRM_RETRY,
     })
   })
 })
 
-const MOCK_COMMANDS_QUERY = {
-  data: {
-    data: [
-      { status: 'failed', intent: 'fixit', id: '0' },
-      { status: 'failed', intent: 'protocol', id: '111' },
-      { status: 'failed', intent: 'protocol', id: '123' },
-      { status: 'success', intent: 'fixit', id: '1' },
-    ],
-  },
-} as any
-
 const MOCK_RUN_ID = 'runId'
+const MOCK_COMMAND_ID = 'commandId'
 
-describe('useCurrentlyFailedRunCommand', () => {
-  beforeEach(() => {
-    vi.mocked(useNotifyAllCommandsQuery).mockReturnValue(MOCK_COMMANDS_QUERY)
-  })
-
-  it('returns null on initial render when the run status is not "awaiting-recovery"', () => {
-    const { result } = renderHook(() =>
-      useCurrentlyFailedRunCommand(MOCK_RUN_ID, RUN_STATUS_RUNNING)
-    )
-
-    expect(result.current).toBeNull()
-  })
-
-  it('sets recentFailedCommand correctly when runStatus is "awaiting-recovery" and there is no recent failed command', () => {
-    const { result, rerender } = renderHook(
-      // @ts-expect-error this works
-      props => useCurrentlyFailedRunCommand(...props),
-      {
-        initialProps: [MOCK_RUN_ID, RUN_STATUS_RUNNING],
-      }
-    )
-
-    act(() => {
-      rerender([MOCK_RUN_ID, RUN_STATUS_AWAITING_RECOVERY])
-    })
-
-    expect(result.current).toEqual({
-      status: 'failed',
-      intent: 'protocol',
-      id: '123',
-    })
-  })
-
-  it('always returns the  failed protocol run command that caused the run to enter "awaiting-recovery"', () => {
-    const { result, rerender } = renderHook(
-      // @ts-expect-error this works
-      props => useCurrentlyFailedRunCommand(...props),
-      {
-        initialProps: [MOCK_RUN_ID, RUN_STATUS_AWAITING_RECOVERY],
-      }
-    )
-
+describe('useCurrentlyRecoveringFrom', () => {
+  it('disables all queries if the run is not awaiting-recovery', () => {
     vi.mocked(useNotifyAllCommandsQuery).mockReturnValue({
-      ...MOCK_COMMANDS_QUERY,
-      ...{ status: 'failed', intent: 'protocol', id: '124' },
-    })
-    rerender([MOCK_RUN_ID, RUN_STATUS_AWAITING_RECOVERY])
+      data: {
+        links: {
+          currentlyRecoveringFrom: {
+            meta: {
+              runId: MOCK_RUN_ID,
+              commandId: MOCK_COMMAND_ID,
+            },
+          },
+        },
+      },
+    } as any)
+    vi.mocked(useCommandQuery).mockReturnValue({
+      data: { data: 'mockCommandDetails' },
+    } as any)
 
-    expect(result.current).toEqual({
-      status: 'failed',
-      intent: 'protocol',
-      id: '123',
-    })
-  })
-
-  it('sets recentFailedCommand to null when runStatus is not "awaiting-recovery"', () => {
-    const { result, rerender } = renderHook(
-      // @ts-expect-error this works
-      props => useCurrentlyFailedRunCommand(...props),
-      {
-        initialProps: ['runId', 'awaiting-recovery'],
-      }
+    const { result } = renderHook(() =>
+      useCurrentlyRecoveringFrom(MOCK_RUN_ID, RUN_STATUS_IDLE)
     )
 
-    act(() => {
-      rerender([MOCK_RUN_ID, RUN_STATUS_RUNNING])
-    })
+    expect(vi.mocked(useNotifyAllCommandsQuery)).toHaveBeenCalledWith(
+      MOCK_RUN_ID,
+      { cursor: null, pageLength: 0 },
+      { enabled: false, refetchInterval: 5000 }
+    )
+    expect(vi.mocked(useCommandQuery)).toHaveBeenCalledWith(
+      MOCK_RUN_ID,
+      MOCK_COMMAND_ID,
+      { enabled: false }
+    )
+    expect(result.current).toStrictEqual(null)
+  })
 
-    expect(result.current).toBeNull()
+  it('returns null if there is no currentlyRecoveringFrom command', () => {
+    vi.mocked(useNotifyAllCommandsQuery).mockReturnValue({
+      data: {
+        links: {},
+      },
+    } as any)
+    vi.mocked(useCommandQuery).mockReturnValue({} as any)
+
+    const { result } = renderHook(() =>
+      useCurrentlyRecoveringFrom(MOCK_RUN_ID, RUN_STATUS_AWAITING_RECOVERY)
+    )
+
+    expect(vi.mocked(useCommandQuery)).toHaveBeenCalledWith(null, null, {
+      enabled: false,
+    })
+    expect(result.current).toStrictEqual(null)
+  })
+
+  it('fetches and returns the currentlyRecoveringFrom command, given that there is one', () => {
+    vi.mocked(useNotifyAllCommandsQuery).mockReturnValue({
+      data: {
+        links: {
+          currentlyRecoveringFrom: {
+            meta: {
+              runId: MOCK_RUN_ID,
+              commandId: MOCK_COMMAND_ID,
+            },
+          },
+        },
+      },
+    } as any)
+    vi.mocked(useCommandQuery).mockReturnValue({
+      data: { data: 'mockCommandDetails' },
+    } as any)
+
+    const { result } = renderHook(() =>
+      useCurrentlyRecoveringFrom(MOCK_RUN_ID, RUN_STATUS_AWAITING_RECOVERY)
+    )
+
+    expect(vi.mocked(useCommandQuery)).toHaveBeenCalledWith(
+      MOCK_RUN_ID,
+      MOCK_COMMAND_ID,
+      { enabled: true }
+    )
+    expect(result.current).toStrictEqual('mockCommandDetails')
   })
 })

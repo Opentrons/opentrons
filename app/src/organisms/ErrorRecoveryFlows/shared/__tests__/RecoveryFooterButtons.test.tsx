@@ -2,8 +2,8 @@ import * as React from 'react'
 import { vi, describe, it, expect, beforeEach } from 'vitest'
 import { screen, fireEvent } from '@testing-library/react'
 
-import { renderWithProviders } from '../../../../../__testing-utils__'
-import { i18n } from '../../../../../i18n'
+import { renderWithProviders } from '../../../../__testing-utils__'
+import { i18n } from '../../../../i18n'
 import { RecoveryFooterButtons } from '../RecoveryFooterButtons'
 
 import type { Mock } from 'vitest'
@@ -47,5 +47,14 @@ describe('RecoveryFooterButtons', () => {
     render(props)
 
     screen.getByRole('button', { name: 'MOCK_OVERRIDE_TEXT' })
+  })
+
+  it('does not render the secondary button if no on click handler is supplied', () => {
+    props = { ...props, secondaryBtnOnClick: undefined }
+    render(props)
+
+    expect(
+      screen.queryByRole('button', { name: 'Go back' })
+    ).not.toBeInTheDocument()
   })
 })

@@ -9,9 +9,16 @@ import { NumericalKeyboard } from '../../../atoms/SoftwareKeyboard'
 import { getVolumeRange } from '../utils'
 import { VolumeEntry } from '../VolumeEntry'
 
-vi.mock('../../../atoms/InputField')
 vi.mock('../../../atoms/SoftwareKeyboard')
 vi.mock('../utils')
+
+vi.mock('../../../atoms/InputField', async importOriginal => {
+  const actualComponents = await importOriginal<typeof InputField>()
+  return {
+    ...actualComponents,
+    InputField: vi.fn(),
+  }
+})
 
 const render = (props: React.ComponentProps<typeof VolumeEntry>) => {
   return renderWithProviders(<VolumeEntry {...props} />, {

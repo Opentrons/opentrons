@@ -224,7 +224,7 @@ export function FactoryModeSlideout({
           <Controller
             control={control}
             name="factoryModeInput"
-            render={({ field, fieldState }) => (
+            render={({ field }) => (
               <InputField
                 id="factoryModeInput"
                 name="factoryModeInput"
@@ -234,21 +234,16 @@ export function FactoryModeSlideout({
                   clearErrors()
                 }}
                 value={field.value}
-                error={fieldState.error?.message && ' '}
+                error={
+                  errors.factoryModeInput != null
+                    ? errors.factoryModeInput.message
+                    : null
+                }
                 onBlur={field.onBlur}
                 title={t('enter_factory_password')}
               />
             )}
           />
-          {errors.factoryModeInput != null ? (
-            <StyledText
-              as="label"
-              color={COLORS.red50}
-              marginTop={SPACING.spacing4}
-            >
-              {errors.factoryModeInput.message}
-            </StyledText>
-          ) : null}
         </Flex>
       ) : null}
       {currentStep === 2 ? (

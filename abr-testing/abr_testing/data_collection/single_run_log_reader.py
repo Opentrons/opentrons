@@ -31,7 +31,7 @@ if __name__ == "__main__":
         runs_and_lpc,
         lpc_headers,
     ) = abr_google_drive.create_data_dictionary(
-        run_ids_in_storage, run_log_file_path, ""
+        run_ids_in_storage, run_log_file_path, "", "", ""
     )
     transposed_list = list(zip(*runs_and_robots))
     # Adds Run to local csv
