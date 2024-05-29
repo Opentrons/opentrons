@@ -13,9 +13,8 @@ benchmark_output := $(shell node -e 'console.log(new Date());')
 
 # These variables can be overriden when make is invoked to customize the
 # behavior of jest
-tests ?=
-# Temporary turn off the coverage check
-cov_opts ?= --coverage=false
+tests ?= src
+cov_opts ?= --coverage=true
 test_opts ?=
 
 # standard targets

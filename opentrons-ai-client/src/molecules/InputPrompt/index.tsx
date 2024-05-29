@@ -15,13 +15,17 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { SendButton } from '../../atoms/SendButton'
-import { preparedPromptAtom, chatDataAtom } from '../../resources/atoms'
+import {
+  chatDataAtom,
+  chatHistoryAtom,
+  preparedPromptAtom,
+} from '../../resources/atoms'
 import { useApiCall, useGetAccessToken } from '../../resources/hooks'
 import { calcTextAreaHeight } from '../../resources/utils/utils'
 import { END_POINT } from '../../resources/constants'
 
 import type { AxiosRequestConfig } from 'axios'
-import type { ChatData } from '../../resources/types'
+import type { Chat, ChatData } from '../../resources/types'
 
 interface InputType {
   userPrompt: string
@@ -36,6 +40,7 @@ export function InputPrompt(): JSX.Element {
   })
   const [preparedPrompt] = useAtom(preparedPromptAtom)
   const [, setChatData] = useAtom(chatDataAtom)
+  const [chatHistory, setChatHistory] = useAtom(chatHistoryAtom)
   const [submitted, setSubmitted] = React.useState<boolean>(false)
   const userPrompt = watch('userPrompt') ?? ''
   const { data, isLoading, callApi } = useApiCall()
@@ -55,17 +60,20 @@ export function InputPrompt(): JSX.Element {
         'Content-Type': 'application/json',
       }
 
-      const postData = {
-        message: userPrompt,
-        fake: false,
-      }
-
       const config = {
         url: END_POINT,
         method: 'POST',
         headers,
-        data: postData,
+        data: {
+          message: userPrompt,
+          history: chatHistory,
+          fake: false,
+        },
       }
+      setChatHistory(chatHistory => [
+        ...chatHistory,
+        { role: 'user', content: userPrompt },
+      ])
       await callApi(config as AxiosRequestConfig)
       setSubmitted(true)
       reset()
@@ -86,6 +94,7 @@ export function InputPrompt(): JSX.Element {
         role,
         reply,
       }
+      setChatHistory(chatHistory => [...chatHistory, { role, content: reply }])
       setChatData(chatData => [...chatData, assistantResponse])
       setSubmitted(false)
     }
