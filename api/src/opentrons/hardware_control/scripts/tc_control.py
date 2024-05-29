@@ -17,7 +17,7 @@ gcode_shortcuts = {
     "cl": "M127",  # close lid
     "sw": "M901.D",  # status of all switches
     "lt": "M141.D",  # get lid temperature
-    "pt": "M105.D"  # get plate temperature
+    "pt": "M105.D",  # get plate temperature
 }
 
 
