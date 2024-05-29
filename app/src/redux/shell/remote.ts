@@ -100,10 +100,4 @@ export function appShellListener({
   return callbackStore
 }
 
-// Instantiate the notify listener at runtime.
-remote.ipcRenderer.on(
-  'notify',
-  (_, shellHostname, shellTopic, shellMessage) => {
-    callbackStore[shellHostname]?.[shellTopic]?.forEach(cb => cb(shellMessage))
-  }
-)
+export const getCallBackStore = (): CallbackStore => callbackStore

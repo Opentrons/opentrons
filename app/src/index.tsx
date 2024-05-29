@@ -12,6 +12,7 @@ import { createLogger } from './logger'
 import { uiInitialized } from './redux/shell'
 import { history } from './redux/reducer'
 import { store } from './redux/store'
+import { getCallBackStore, remote } from './redux/shell/remote'
 
 import '../src/atoms/SoftwareKeyboard/AlphanumericKeyboard'
 import '../src/atoms/SoftwareKeyboard/FullKeyboard/index.css'
@@ -25,6 +26,16 @@ const log = createLogger(new URL('', import.meta.url).pathname)
 
 // kickoff app-shell initializations
 store.dispatch(uiInitialized())
+
+// Instantiate the notify listener at runtime.
+remote.ipcRenderer.on(
+  'notify',
+  (_, shellHostname, shellTopic, shellMessage) => {
+    getCallBackStore()[shellHostname]?.[shellTopic]?.forEach(cb =>
+      cb(shellMessage)
+    )
+  }
+)
 
 log.info('Rendering app UI')
 
