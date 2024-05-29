@@ -14,7 +14,7 @@ import {
 import { useCloseCurrentRun } from '../ProtocolUpload/hooks'
 import { SmallButton } from '../../atoms/buttons'
 import { Modal } from '../../molecules/Modal'
-import { DropTipWizard } from '.'
+import { DropTipWizardFlows, useDropTipWizardFlows } from '.'
 
 import type { HostConfig, PipetteData } from '@opentrons/api-client'
 import type { PipetteModelSpecs, RobotType } from '@opentrons/shared-data'
@@ -32,14 +32,12 @@ interface TipsAttachedModalProps {
 export const handleTipsAttachedModal = (
   mount: TipsAttachedModalProps['mount'],
   instrumentModelSpecs: TipsAttachedModalProps['instrumentModelSpecs'],
-  robotType: TipsAttachedModalProps['robotType'],
   host: TipsAttachedModalProps['host'],
   onCloseClick: TipsAttachedModalProps['onCloseClick']
 ): Promise<unknown> => {
   return NiceModal.show(TipsAttachedModal, {
     mount,
     instrumentModelSpecs,
-    robotType,
     host,
     onCloseClick,
   })
@@ -50,7 +48,6 @@ const TipsAttachedModal = NiceModal.create(
     const { mount, onCloseClick, host, instrumentModelSpecs } = props
     const { t } = useTranslation(['drop_tip_wizard'])
     const modal = useModal()
-    const [showWizard, setShowWizard] = React.useState(false)
 
     const { closeCurrentRun } = useCloseCurrentRun()
 
