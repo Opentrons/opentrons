@@ -68,13 +68,13 @@ const RUN_REFETCH_INTERVAL_MS = 5000
 const JOG_COMMAND_TIMEOUT_MS = 10000
 const MANAGED_PIPETTE_ID = 'managedPipetteId'
 
-interface MaintenanceRunManagerProps {
+interface DropTipWizardProps {
   robotType: RobotType
   mount: PipetteData['mount']
   instrumentModelSpecs: PipetteModelSpecs
   closeFlow: () => void
 }
-export function DropTipWizard(props: MaintenanceRunManagerProps): JSX.Element {
+export function DropTipWizard(props: DropTipWizardProps): JSX.Element {
   const { closeFlow, mount, instrumentModelSpecs, robotType } = props
   const {
     chainRunCommands,
@@ -207,7 +207,7 @@ export function DropTipWizard(props: MaintenanceRunManagerProps): JSX.Element {
   )
 }
 
-interface DropTipWizardProps {
+interface DropTipWizardComponentProps {
   robotType: RobotType
   mount: PipetteData['mount']
   createdMaintenanceRunId: string | null
@@ -229,7 +229,7 @@ interface DropTipWizardProps {
 }
 
 export const DropTipWizardComponent = (
-  props: DropTipWizardProps
+  props: DropTipWizardComponentProps
 ): JSX.Element | null => {
   const {
     robotType,

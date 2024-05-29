@@ -92,7 +92,7 @@ import {
   useModuleCalibrationStatus,
   useRobot,
 } from '../hooks'
-import { getPipettesWithTipAttached } from '../../DropTipWizard/getPipettesWithTipAttached'
+import { getPipettesWithTipAttached } from '../../DropTipWizardFlows/getPipettesWithTipAttached'
 import { formatTimestamp } from '../utils'
 import { RunTimer } from './RunTimer'
 import { EMPTY_TIMESTAMP } from '../constants'

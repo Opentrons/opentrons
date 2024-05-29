@@ -60,8 +60,8 @@ import {
 import { getLocalRobot } from '../../redux/discovery'
 import { RunFailedModal } from '../../organisms/OnDeviceDisplay/RunningProtocol'
 import { formatTimeWithUtcLabel, useNotifyRunQuery } from '../../resources/runs'
-import { handleTipsAttachedModal } from '../../organisms/DropTipWizard/TipsAttachedModal'
-import { getPipettesWithTipAttached } from '../../organisms/DropTipWizard/getPipettesWithTipAttached'
+import { handleTipsAttachedModal } from '../../organisms/DropTipWizardFlows/TipsAttachedModal'
+import { getPipettesWithTipAttached } from '../../organisms/DropTipWizardFlows/getPipettesWithTipAttached'
 import { getPipetteModelSpecs, FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
 import { useMostRecentRunId } from '../../organisms/ProtocolUpload/hooks/useMostRecentRunId'
 
