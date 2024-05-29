@@ -42,7 +42,9 @@ export function SummaryAndSettings(
   const queryClient = useQueryClient()
   const host = useHost()
   const { t } = useTranslation(['quick_transfer', 'shared'])
-  const [showSaveOrRunModal, setShowSaveOrRunModal] = React.useState(false)
+  const [showSaveOrRunModal, setShowSaveOrRunModal] = React.useState<boolean>(
+    false
+  )
 
   const displayCategory: string[] = [
     'overview',

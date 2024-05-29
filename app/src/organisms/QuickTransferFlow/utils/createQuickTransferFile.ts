@@ -1,12 +1,23 @@
 import uuidv1 from 'uuid/v4'
-import { consolidate, transfer, distribute } from '@opentrons/step-generation'
+import {
+  consolidate,
+  transfer,
+  distribute,
+  getWasteChuteAddressableAreaNamePip,
+} from '@opentrons/step-generation'
 import { generateQuickTransferArgs } from './generateQuickTransferArgs'
-import { FLEX_ROBOT_TYPE, FLEX_STANDARD_DECKID } from '@opentrons/shared-data'
+import {
+  FLEX_ROBOT_TYPE,
+  FLEX_STANDARD_DECKID,
+  getDeckDefFromRobotType,
+} from '@opentrons/shared-data'
 import type {
+  AddressableAreaName,
   DeckConfiguration,
   CommandAnnotationV1Mixin,
   CommandV8Mixin,
   CreateCommand,
+  CutoutId,
   LabwareV2Mixin,
   LiquidV1Mixin,
   LoadLabwareCreateCommand,
@@ -18,6 +29,7 @@ import type {
   ConsolidateArgs,
   TransferArgs,
   DistributeArgs,
+  CommandCreatorResult,
 } from '@opentrons/step-generation'
 import type { QuickTransferSummaryState } from '../types'
 
@@ -44,25 +56,57 @@ export function createQuickTransferFile(
     },
   }
   const labwareEntities = Object.values(invariantContext.labwareEntities)
-  const loadLabwareCommands = labwareEntities.reduce<
+  const loadAdapterCommands = labwareEntities.reduce<
     LoadLabwareCreateCommand[]
   >((acc, entity) => {
+    const { def, id } = entity
+    const isAdapter = def.allowedRoles?.includes('adapter')
+    if (!isAdapter) return acc
     acc.push({
       key: uuid(),
       commandType: 'loadLabware' as const,
       params: {
-        displayName: entity.def.metadata.displayName,
-        labwareId: entity.id,
-        loadName: entity.def.parameters.loadName,
-        namespace: entity.def.namespace,
-        version: entity.def.version,
-        location: { slotName: initialRobotState.labware[entity.id].slot },
+        displayName: def.metadata.displayName,
+        labwareId: id,
+        loadName: def.parameters.loadName,
+        namespace: def.namespace,
+        version: def.version,
+        location: { slotName: initialRobotState.labware[id].slot },
       },
     })
     return acc
   }, [])
 
-  let nonLoadCommandCreator
+  const loadLabwareCommands = labwareEntities.reduce<
+    LoadLabwareCreateCommand[]
+  >((acc, entity) => {
+    const { def, id } = entity
+    const isAdapter = def.allowedRoles?.includes('adapter')
+    if (isAdapter) return acc
+    const location = initialRobotState.labware[id].slot
+    const isOnAdapter =
+      loadAdapterCommands.find(
+        command => command.params.labwareId === location
+      ) != null
+
+    acc.push({
+      key: uuid(),
+      commandType: 'loadLabware' as const,
+      params: {
+        displayName: def.metadata.displayName,
+        labwareId: id,
+        loadName: def.parameters.loadName,
+        namespace: def.namespace,
+        version: def.version,
+        location: isOnAdapter
+          ? { labwareId: location }
+          : { slotName: location },
+      },
+    })
+    return acc
+  }, [])
+
+  let nonLoadCommandCreator: CommandCreatorResult
   if (stepArgs?.commandCreatorFnName === 'transfer') {
     nonLoadCommandCreator = transfer(
       stepArgs as TransferArgs,
@@ -88,10 +132,57 @@ export function createQuickTransferFile(
       ? nonLoadCommandCreator.commands
       : []
 
+  let finalDropTipCommands: CreateCommand[] = []
+  let addressableAreaName: AddressableAreaName | null
+  if (quickTransferState.dropTipLocation === 'trashBin') {
+    const trash = Object.values(
+      invariantContext.additionalEquipmentEntities
+    ).find(aE => aE.name === 'trashBin')
+    const trashLocation = trash != null ? (trash.location as CutoutId) : null
+    const deckDef = getDeckDefFromRobotType(FLEX_ROBOT_TYPE)
+    const cutouts: Record<CutoutId, AddressableAreaName[]> | null =
+      deckDef.cutoutFixtures.find(
+        cutoutFixture => cutoutFixture.id === 'trashBinAdapter'
+      )?.providesAddressableAreas ?? null
+    addressableAreaName =
+      trashLocation != null && cutouts != null
+        ? cutouts[trashLocation]?.[0] ?? null
+        : null
+  } else if (quickTransferState.dropTipLocation === 'wasteChute') {
+    addressableAreaName = getWasteChuteAddressableAreaNamePip(
+      pipetteEntity.spec.channels
+    )
+  }
+  if (addressableAreaName == null) {
+    console.error(
+      `expected to find addressableAreaName with trashLocation or wasteChute at ${invariantContext.additionalEquipmentEntities} but could not`
+    )
+  } else {
+    finalDropTipCommands = [
+      {
+        key: uuid(),
+        commandType: 'moveToAddressableAreaForDropTip',
+        params: {
+          pipetteId: pipetteEntity.id,
+          addressableAreaName,
+        },
+      },
+      {
+        key: uuid(),
+        commandType: 'dropTipInPlace',
+        params: {
+          pipetteId: pipetteEntity.id,
+        },
+      },
+    ]
+  }
+
   const commands: CreateCommand[] = [
     loadPipetteCommand,
+    ...loadAdapterCommands,
     ...loadLabwareCommands,
     ...nonLoadCommands,
+    ...finalDropTipCommands,
   ]
   const protocolBase = {
     $otSharedSchema: '#/protocol/schemas/8',

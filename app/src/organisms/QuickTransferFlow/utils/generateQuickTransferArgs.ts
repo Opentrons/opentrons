@@ -2,15 +2,22 @@ import uuidv1 from 'uuid/v4'
 import intersection from 'lodash/intersection'
 import {
   orderWells,
+  getAllDefinitions,
   getLabwareDefURI,
+  getWellsDepth,
   getTipTypeFromTipRackDefinition,
 } from '@opentrons/shared-data'
 import { makeInitialRobotState } from '@opentrons/step-generation'
+import {
+  DEFAULT_MM_BLOWOUT_OFFSET_FROM_TOP,
+  DEFAULT_MM_TOUCH_TIP_OFFSET_FROM_TOP,
+} from '../constants'
 import type { QuickTransferSummaryState } from '../types'
 import type {
   LabwareDefinition2,
   DeckConfiguration,
   PipetteName,
+  NozzleConfigurationStyle,
 } from '@opentrons/shared-data'
 import type {
   ConsolidateArgs,
@@ -26,6 +33,7 @@ import type {
 type MoveLiquidStepArgs = ConsolidateArgs | DistributeArgs | TransferArgs | null
 
 const uuid: () => string = uuidv1
+const adapter96ChannelDefUri = 'opentrons/opentrons_flex_96_tiprack_adapter/1'
 
 function getOrderedWells(
   unorderedWells: string[],
@@ -68,8 +76,28 @@ function getInvariantContextAndRobotState(
   const sourceLabwareId = uuid()
   const sourceLabwareURI = getLabwareDefURI(quickTransferState.source)
 
-  // first labware entity will always be tiprack, second will always be source
-  let labwareEntities: LabwareEntities = {
+  let labwareEntities: LabwareEntities
+  let labwareLocations: RobotState['labware']
+  let adapterId: string | null = null
+
+  if (quickTransferState.pipette.channels === 96) {
+    adapterId = uuid()
+    labwareEntities = {
+      [adapterId]: {
+        id: adapterId,
+        labwareDefURI: adapter96ChannelDefUri,
+        def: getAllDefinitions()[adapter96ChannelDefUri],
+      },
+    }
+    labwareLocations = {
+      [adapterId]: {
+        slot: 'B2',
+      },
+    }
+  }
+
+  labwareEntities = {
+    ...labwareEntities,
     [tipRackId]: {
       id: tipRackId,
       labwareDefURI: tipRackDefURI,
@@ -81,15 +109,16 @@ function getInvariantContextAndRobotState(
       def: quickTransferState.source,
     },
   }
-  let labwareLocations: RobotState['labware'] = {
+  labwareLocations = {
+    ...labwareLocations,
     [tipRackId]: {
-      slot: 'B2',
+      slot: adapterId != null ? adapterId : 'B2',
     },
     [sourceLabwareId]: {
       slot: 'C2',
     },
   }
-  // if dest labware is not source, third labware entity will be the destination
+
   if (quickTransferState.destination !== 'source') {
     const destLabwareId = uuid()
     labwareEntities = {
@@ -229,17 +258,30 @@ export function generateQuickTransferArgs(
   const tipType = getTipTypeFromTipRackDefinition(quickTransferState.tipRack)
   const flowRatesForSupportedTip =
     quickTransferState.pipette.liquids.default.supportedTips[tipType]
-  const pipetteEntityValues = Object.values(invariantContext.pipetteEntities)
+  const pipetteEntity = Object.values(invariantContext.pipetteEntities)[0]
   const labwareEntityValues = Object.values(invariantContext.labwareEntities)
+  const sourceLabwareEntity = labwareEntityValues.find(
+    entity =>
+      entity.labwareDefURI === getLabwareDefURI(quickTransferState.source)
+  )
+  let destLabwareEntity = sourceLabwareEntity
+  if (quickTransferState.destination !== 'source') {
+    destLabwareEntity = labwareEntityValues.find(
+      entity =>
+        entity.labwareDefURI ===
+        getLabwareDefURI(quickTransferState.destination)
+    )
+  }
+  let nozzles = null
+  if (pipetteEntity.spec.channels === 96) {
+    nozzles = 'ALL' as NozzleConfigurationStyle
+  }
   const commonFields = {
-    pipette: pipetteEntityValues[0].id,
+    pipette: pipetteEntity.id,
     volume: quickTransferState.volume,
-    sourceLabware: labwareEntityValues[1].id,
-    destLabware:
-      labwareEntityValues.length > 2
-        ? labwareEntityValues[2].id
-        : labwareEntityValues[1].id,
-    tipRack: pipetteEntityValues[0].tiprackDefURI[0],
+    sourceLabware: sourceLabwareEntity?.id as string,
+    destLabware: destLabwareEntity?.id as string,
+    tipRack: pipetteEntity.tiprackDefURI[0],
     aspirateFlowRateUlSec: quickTransferState.aspirateFlowRate,
     dispenseFlowRateUlSec: quickTransferState.dispenseFlowRate,
     aspirateOffsetFromBottomMm: quickTransferState.tipPositionAspirate,
@@ -247,7 +289,7 @@ export function generateQuickTransferArgs(
     blowoutLocation,
     blowoutFlowRateUlSec:
       flowRatesForSupportedTip.defaultBlowOutFlowRate.default,
-    blowoutOffsetFromTopMm: 0,
+    blowoutOffsetFromTopMm: DEFAULT_MM_BLOWOUT_OFFSET_FROM_TOP,
     changeTip: quickTransferState.changeTip,
     preWetTip: quickTransferState.preWetTip,
     aspirateDelay:
@@ -270,12 +312,18 @@ export function generateQuickTransferArgs(
     touchTipAfterAspirateOffsetMmFromBottom:
       quickTransferState.touchTipAspirate != null
         ? quickTransferState.touchTipAspirate
-        : 0,
+        : getWellsDepth(quickTransferState.source, sourceWells) +
+          DEFAULT_MM_TOUCH_TIP_OFFSET_FROM_TOP,
     touchTipAfterDispense: quickTransferState.touchTipDispense != null,
     touchTipAfterDispenseOffsetMmFromBottom:
       quickTransferState.touchTipDispense != null
         ? quickTransferState.touchTipDispense
-        : 0,
+        : getWellsDepth(
+            quickTransferState.destination === 'source'
+              ? quickTransferState.source
+              : quickTransferState.destination,
+            destWells
+          ) + DEFAULT_MM_TOUCH_TIP_OFFSET_FROM_TOP,
     dropTipLocation,
     aspirateXOffset: 0,
     aspirateYOffset: 0,
@@ -283,7 +331,7 @@ export function generateQuickTransferArgs(
     dispenseYOffset: 0,
     name: null,
     description: null,
-    nozzles: null,
+    nozzles,
   }
 
   switch (quickTransferState.path) {
