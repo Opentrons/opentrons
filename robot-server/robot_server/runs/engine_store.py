@@ -37,6 +37,9 @@ from opentrons.protocol_engine import (
     CommandSlice,
     CommandPointer,
     Command,
+    CommandCreate,
+    LabwareOffset,
+    LabwareOffsetCreate,
 )
 
 from robot_server.protocols.protocol_store import ProtocolResource
@@ -45,6 +48,7 @@ from opentrons.protocol_engine.types import (
     RunTimeParamValuesType,
     EngineStatus,
 )
+from opentrons_shared_data.labware.dev_types import LabwareUri
 
 
 _log = logging.getLogger(__name__)
@@ -382,3 +386,23 @@ class EngineStore:
 
     def run_was_started(self) -> bool:
         return self._run_orchestrator.runner.was_started()
+
+    def add_labware_offset(self, request: LabwareOffsetCreate) -> LabwareOffset:
+        return self._run_orchestrator.engine.add_labware_offset(request)
+
+    def add_labware_definition(self, definition: LabwareDefinition) -> LabwareUri:
+        return self._run_orchestrator.engine.add_labware_definition(definition)
+
+    def add_command_and_wait_for_interval(
+        self,
+        request: CommandCreate,
+        wait_until_complete: bool = False,
+        timeout: Optional[int] = None,
+        failed_command_id: Optional[str] = None,
+    ) -> Command:
+        return self._run_orchestrator.add_command_and_wait_for_interval(
+            command=request,
+            failed_command_id=failed_command_id,
+            wait_until_complete=wait_until_complete,
+            timeout=timeout,
+        )

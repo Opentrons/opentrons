@@ -77,29 +77,29 @@ class PreSerializedCommandsNotAvailable(ErrorDetails):
     )
 
 
-async def get_current_run_engine_from_url(
-    runId: str,
-    engine_store: EngineStore = Depends(get_engine_store),
-    run_store: RunStore = Depends(get_run_store),
-) -> ProtocolEngine:
-    """Get run protocol engine.
-
-    Args:
-        runId: Run ID to associate the command with.
-        engine_store: Engine store to pull current run ProtocolEngine.
-        run_store: Run data storage.
-    """
-    if not run_store.has(runId):
-        raise RunNotFound(detail=f"Run {runId} not found.").as_error(
-            status.HTTP_404_NOT_FOUND
-        )
-
-    if runId != engine_store.current_run_id:
-        raise RunStopped(detail=f"Run {runId} is not the current run").as_error(
-            status.HTTP_409_CONFLICT
-        )
-
-    return engine_store.engine
+# async def get_current_run_engine_from_url(
+#     runId: str,
+#     engine_store: EngineStore = Depends(get_engine_store),
+#     run_store: RunStore = Depends(get_run_store),
+# ) -> ProtocolEngine:
+#     """Get run protocol engine.
+#
+#     Args:
+#         runId: Run ID to associate the command with.
+#         engine_store: Engine store to pull current run ProtocolEngine.
+#         run_store: Run data storage.
+#     """
+#     if not run_store.has(runId):
+#         raise RunNotFound(detail=f"Run {runId} not found.").as_error(
+#             status.HTTP_404_NOT_FOUND
+#         )
+#
+#     if runId != engine_store.current_run_id:
+#         raise RunStopped(detail=f"Run {runId} is not the current run").as_error(
+#             status.HTTP_409_CONFLICT
+#         )
+#
+#     return engine_store.engine
 
 
 @PydanticResponse.wrap_route(
@@ -185,7 +185,7 @@ async def create_run_command(
             "FIXIT command use only. Reference of the failed command id we are trying to fix."
         ),
     ),
-    protocol_engine: ProtocolEngine = Depends(get_current_run_engine_from_url),
+    engine_store: EngineStore = Depends(get_engine_store),
     check_estop: bool = Depends(require_estop_in_good_state),
 ) -> PydanticResponse[SimpleBody[pe_commands.Command]]:
     """Enqueue a protocol command.
@@ -199,7 +199,7 @@ async def create_run_command(
             Comes from a query parameter in the URL.
         failedCommandId: FIXIT command use only.
             Reference of the failed command id we are trying to fix.
-        protocol_engine: The run's `ProtocolEngine` on which the new
+        engine_store: The run's `EngineStore` on which the new
             command will be enqueued.
         check_estop: Dependency to verify the estop is in a valid state.
     """
@@ -208,8 +208,11 @@ async def create_run_command(
     command_intent = request_body.data.intent or pe_commands.CommandIntent.SETUP
     command_create = request_body.data.copy(update={"intent": command_intent})
     try:
-        command = protocol_engine.add_command(
-            request=command_create, failed_command_id=failedCommandId
+        command = engine_store.add_command_and_wait_for_interval(
+            request=command_create,
+            failed_command_id=failedCommandId,
+            wait_until_complete=waitUntilComplete,
+            timeout=timeout,
         )
 
     except pe_errors.SetupCommandNotAllowedError as e:
@@ -219,12 +222,7 @@ async def create_run_command(
     except pe_errors.CommandNotAllowedError as e:
         raise CommandNotAllowed.from_exc(e).as_error(status.HTTP_400_BAD_REQUEST)
 
-    if waitUntilComplete:
-        timeout_sec = None if timeout is None else timeout / 1000.0
-        with move_on_after(timeout_sec):
-            await protocol_engine.wait_for_command(command.id)
-
-    response_data = protocol_engine.state_view.commands.get(command.id)
+    response_data = engine_store.get_command(command.id)
 
     return await PydanticResponse.create(
         content=SimpleBody.construct(data=response_data),

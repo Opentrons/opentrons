@@ -2,9 +2,11 @@
 from __future__ import annotations
 from typing import Optional, Union
 
+from anyio import move_on_after
+
 from . import protocol_runner, AnyRunner
 from ..hardware_control import HardwareControlAPI
-from ..protocol_engine import ProtocolEngine
+from ..protocol_engine import ProtocolEngine, CommandCreate, Command
 from ..protocol_engine.types import PostRunHardwareState
 from ..protocol_reader import JsonProtocolConfig, PythonProtocolConfig
 
@@ -24,15 +26,15 @@ class RunOrchestrator:
     _protocol_engine: ProtocolEngine
 
     def __init__(
-        self,
-        protocol_engine: ProtocolEngine,
-        hardware_api: HardwareControlAPI,
-        fixit_runner: protocol_runner.LiveRunner,
-        setup_runner: protocol_runner.LiveRunner,
-        json_or_python_protocol_runner: Optional[
-            Union[protocol_runner.PythonAndLegacyRunner, protocol_runner.JsonRunner]
-        ] = None,
-        run_id: Optional[str] = None,
+            self,
+            protocol_engine: ProtocolEngine,
+            hardware_api: HardwareControlAPI,
+            fixit_runner: protocol_runner.LiveRunner,
+            setup_runner: protocol_runner.LiveRunner,
+            json_or_python_protocol_runner: Optional[
+                Union[protocol_runner.PythonAndLegacyRunner, protocol_runner.JsonRunner]
+            ] = None,
+            run_id: Optional[str] = None,
     ) -> None:
         """Initialize a run orchestrator interface.
 
@@ -63,15 +65,15 @@ class RunOrchestrator:
 
     @classmethod
     def build_orchestrator(
-        cls,
-        protocol_engine: ProtocolEngine,
-        hardware_api: HardwareControlAPI,
-        protocol_config: Optional[
-            Union[JsonProtocolConfig, PythonProtocolConfig]
-        ] = None,
-        post_run_hardware_state: PostRunHardwareState = PostRunHardwareState.HOME_AND_STAY_ENGAGED,
-        drop_tips_after_run: bool = True,
-        run_id: Optional[str] = None,
+            cls,
+            protocol_engine: ProtocolEngine,
+            hardware_api: HardwareControlAPI,
+            protocol_config: Optional[
+                Union[JsonProtocolConfig, PythonProtocolConfig]
+            ] = None,
+            post_run_hardware_state: PostRunHardwareState = PostRunHardwareState.HOME_AND_STAY_ENGAGED,
+            drop_tips_after_run: bool = True,
+            run_id: Optional[str] = None,
     ) -> "RunOrchestrator":
         """Build a RunOrchestrator provider."""
         setup_runner = protocol_runner.LiveRunner(
@@ -99,3 +101,12 @@ class RunOrchestrator:
             hardware_api=hardware_api,
             protocol_engine=protocol_engine,
         )
+
+    def add_command_and_wait_for_interval(self, command: CommandCreate, wait_until_complete: bool,
+                                          timeout: Optional[int] = None, failed_command_id: Optional[str] = None) -> Command:
+        added_command = self._protocol_engine.add_command(request=command, failed_command_id=failed_command_id)
+        if waitUntilComplete:
+            timeout_sec = None if timeout is None else timeout / 1000.0
+            with move_on_after(timeout_sec):
+                await self._protocol_engine.wait_for_command(added_command.id)
+        return added_command
