@@ -880,7 +880,6 @@ def test_96_config_map_entries(
         {"12": ["A12", "B12", "C12", "D12", "E12", "F12", "G12", "H12"]},
     )
 
-
     subject.update_nozzle_configuration("A1", "A12")
     test_map_entries(
         subject.current_configuration,
@@ -951,7 +950,6 @@ def test_96_config_map_entries(
         },
     )
 
-
     subject.update_nozzle_configuration("A1", "D6")
     test_map_entries(
         subject.current_configuration,
@@ -970,7 +968,6 @@ def test_96_config_map_entries(
             "6": ["A6", "B6", "C6", "D6"],
         },
     )
-
 
     subject.update_nozzle_configuration("E1", "H6")
     test_map_entries(

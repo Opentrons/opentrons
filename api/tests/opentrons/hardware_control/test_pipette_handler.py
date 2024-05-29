@@ -119,19 +119,19 @@ def test_plan_check_pick_up_tip_with_presses_argument(
         mock_pipette.get_pick_up_distance_by_configuration(
             mock_pipette.pick_up_configurations.press_fit
         )
-    ).then_return({1: 5})
+    ).then_return(5)
     decoy.when(mock_pipette.pick_up_configurations.press_fit.increment).then_return(0)
     decoy.when(
         mock_pipette.get_pick_up_speed_by_configuration(
             mock_pipette.pick_up_configurations.press_fit
         )
-    ).then_return({1: 10})
+    ).then_return(10)
     decoy.when(mock_pipette.config.end_tip_action_retract_distance_mm).then_return(0)
     decoy.when(
         mock_pipette.get_pick_up_current_by_configuration(
             mock_pipette.pick_up_configurations.press_fit
         )
-    ).then_return({1: 1.0})
+    ).then_return(1.0)
     decoy.when(mock_pipette.nozzle_manager.current_configuration.tip_count).then_return(
         1
     )
@@ -184,6 +184,21 @@ def test_plan_check_pick_up_tip_with_presses_argument_ot3(
             configurationsByNozzleMap={"Full": {"default": pac_values}},
         )
     )
+    decoy.when(
+        mock_pipette_ot3.get_pick_up_distance_by_configuration(
+            mock_pipette_ot3.get_pick_up_configuration()
+        )
+    ).then_return(10)
+    decoy.when(
+        mock_pipette_ot3.get_pick_up_speed_by_configuration(
+            mock_pipette_ot3.get_pick_up_configuration()
+        )
+    ).then_return(5.5)
+    decoy.when(
+        mock_pipette_ot3.get_pick_up_current_by_configuration(
+            mock_pipette_ot3.get_pick_up_configuration()
+        )
+    ).then_return(1.0)
     decoy.when(mock_pipette_ot3.plunger_motor_current.run).then_return(1)
     decoy.when(mock_pipette_ot3.config.quirks).then_return([])
     decoy.when(mock_pipette_ot3.channels).then_return(channels)
