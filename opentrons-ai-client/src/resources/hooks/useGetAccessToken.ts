@@ -1,10 +1,10 @@
 import { useAuth0 } from '@auth0/auth0-react'
+import { AUTH0_AUDIENCE } from '../constants'
 
 interface UseGetAccessTokenResult {
   getAccessToken: () => Promise<string>
 }
 
-const audience = 'sandbox-ai-api'
 export const useGetAccessToken = (): UseGetAccessTokenResult => {
   const { getAccessTokenSilently } = useAuth0()
 
@@ -12,9 +12,11 @@ export const useGetAccessToken = (): UseGetAccessTokenResult => {
     try {
       const accessToken = await getAccessTokenSilently({
         authorizationParams: {
-          audience,
+          audience: AUTH0_AUDIENCE,
         },
       })
+      // Note this is for debugging
+      console.log('accessToken', accessToken)
       return accessToken
     } catch (error) {
       console.error('Error getting access token:', error)
