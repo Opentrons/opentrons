@@ -8,8 +8,11 @@ import {
 import { useFeatureFlag } from '../../redux/config'
 import { ErrorRecoveryWizard, useERWizard } from './ErrorRecoveryWizard'
 import { useRunPausedSplash, RunPausedSplash } from './RunPausedSplash'
-import { useCurrentlyRecoveringFrom, useRouteUpdateActions } from './utils'
-import { useRecoveryCommands } from './useRecoveryCommands'
+import {
+  useCurrentlyRecoveringFrom,
+  useRouteUpdateActions,
+  useRecoveryCommands,
+} from './utils'
 import { RECOVERY_MAP } from './constants'
 
 import type { RunStatus } from '@opentrons/api-client'

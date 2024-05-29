@@ -11,9 +11,9 @@ from typing import Any, Tuple
 import sys
 
 
-def get_protocol_step_as_int() -> Tuple[int, int, str]:
+def get_protocol_step_as_int() -> Tuple[int, float, str]:
     """Get user input as integer."""
-    expected_liquid_moved = 0
+    expected_liquid_moved = 0.0
     ip = ""
     while True:
         try:
@@ -29,16 +29,16 @@ def get_protocol_step_as_int() -> Tuple[int, int, str]:
         ip = input("Robot IP: ")
         while True:
             try:
-                expected_liquid_moved = int(input("Expected volume moved: "))
-                if expected_liquid_moved >= 0:
+                expected_liquid_moved = float(input("Expected volume moved: "))
+                if expected_liquid_moved >= 0 or expected_liquid_moved <= 0:
                     break
             except ValueError:
-                print("Expected liquid moved volume should be an integer.")
+                print("Expected liquid moved volume should be an float.")
     return protocol_step, expected_liquid_moved, ip
 
 
 def get_all_plate_readings(
-    robot: str, plate: str, mass_3: float, expected_moved: int, google_sheet: Any
+    robot: str, plate: str, mass_3: float, expected_moved: float, google_sheet: Any
 ) -> float:
     """Calculate accuracy of liquid moved on final measurement step."""
     accuracy = 0.0
@@ -74,7 +74,7 @@ def get_all_plate_readings(
     else:
         starting_liquid = 0
     actual_moved = ((mass_3 - mass_1) * 1000) - starting_liquid
-    accuracy = ((float(expected_moved) - actual_moved) / actual_moved) * 100
+    accuracy = ((expected_moved - actual_moved) / actual_moved) * 100
     return accuracy
 
 

@@ -16,6 +16,9 @@ import {
   POSITION_STICKY,
   SPACING,
 } from '@opentrons/components'
+
+import { getIsOnDevice } from '../../redux/config'
+
 import type { IconName } from '@opentrons/components'
 
 import { getIsOnDevice } from '../../redux/config'
@@ -97,15 +100,22 @@ export interface InterventionModalProps {
   children: React.ReactNode
 }
 
-export function InterventionModal(props: InterventionModalProps): JSX.Element {
-  const modalType = props.type ?? 'intervention-required'
+export function InterventionModal({
+  type,
+  titleHeading,
+  iconHeadingOnClick,
+  iconName,
+  iconHeading,
+  children,
+}: InterventionModalProps): JSX.Element {
+  const modalType = type ?? 'intervention-required'
   const headerColor =
     modalType === 'error' ? ERROR_COLOR : INTERVENTION_REQUIRED_COLOR
   const border = `${BORDER_STYLE_BASE} ${
     modalType === 'error' ? ERROR_COLOR : INTERVENTION_REQUIRED_COLOR
   }`
   const headerJustifyContent =
-    props.titleHeading != null ? JUSTIFY_SPACE_BETWEEN : undefined
+    titleHeading != null ? JUSTIFY_SPACE_BETWEEN : undefined
 
   const isOnDevice = useSelector(getIsOnDevice)
   const modalStyle = isOnDevice ? MODAL_ODD_STYLE : MODAL_DESKTOP_STYLE
@@ -124,17 +134,17 @@ export function InterventionModal(props: InterventionModalProps): JSX.Element {
             {...HEADER_STYLE}
             backgroundColor={headerColor}
             justifyContent={headerJustifyContent}
-            onClick={props.iconHeadingOnClick}
+            onClick={iconHeadingOnClick}
           >
-            {props.titleHeading}
+            {titleHeading}
             <Flex alignItems={ALIGN_CENTER} gridGap={SPACING.spacing12}>
-              {props.iconName != null ? (
-                <Icon name={props.iconName} size={SPACING.spacing32} />
+              {iconName != null ? (
+                <Icon name={iconName} size={SPACING.spacing32} />
               ) : null}
-              {props.iconHeading != null ? props.iconHeading : null}
+              {iconHeading != null ? iconHeading : null}
             </Flex>
           </Flex>
-          {props.children}
+          {children}
         </Box>
       </Flex>
     </Flex>
