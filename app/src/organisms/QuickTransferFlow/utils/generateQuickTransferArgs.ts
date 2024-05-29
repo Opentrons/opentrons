@@ -267,10 +267,11 @@ export function generateQuickTransferArgs(
   )
   let destLabwareEntity = sourceLabwareEntity
   if (quickTransferState.destination !== 'source') {
-    destLabwareEntity = labwareEntityValues.find(entity => {
-      entity.labwareDefURI ===
+    destLabwareEntity = labwareEntityValues.find(
+      entity =>
+        entity.labwareDefURI ===
         getLabwareDefURI(quickTransferState.destination as LabwareDefinition2)
-    })
+    )
   }
 
   let nozzles = null

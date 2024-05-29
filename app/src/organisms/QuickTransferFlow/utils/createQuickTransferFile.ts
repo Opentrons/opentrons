@@ -155,7 +155,7 @@ export function createQuickTransferFile(
   }
   if (addressableAreaName == null) {
     console.error(
-      `expected to find addressableAreaName with trashLocation or wasteChute at ${invariantContext.additionalEquipmentEntities} but could not`
+      `expected to find addressableAreaName with trashBin or wasteChute location but could not`
     )
   } else {
     finalDropTipCommands = [
