@@ -215,9 +215,7 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
     }
 
     case 'absorbanceReaderType': {
-      moduleData = (
-        <AbsorbanceReaderData moduleData={module.data} />
-      )
+      moduleData = <AbsorbanceReaderData moduleData={module.data} />
       break
     }
   }
