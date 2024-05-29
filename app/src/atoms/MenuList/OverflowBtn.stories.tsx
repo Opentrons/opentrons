@@ -1,17 +1,17 @@
-import * as React from 'react'
-import { OverflowBtn } from './OverflowBtn'
+import { OverflowBtn as OverflowBtnComponent } from './OverflowBtn'
 
-import type { Story, Meta } from '@storybook/react'
+import type { Meta, StoryObj } from '@storybook/react'
 
-export default {
+const meta: Meta<typeof OverflowBtnComponent> = {
   title: 'App/Atoms/OverflowBtn',
-  component: OverflowBtn,
-} as Meta
+  component: OverflowBtnComponent,
+}
+export default meta
 
-const Template: Story<React.ComponentProps<typeof OverflowBtn>> = args => (
-  <OverflowBtn {...args} />
-)
-export const Basic = Template.bind({})
-Basic.args = {
-  title: 'overflow btn with all the states',
+type Story = StoryObj<typeof OverflowBtnComponent>
+
+export const OverflowBtn: Story = {
+  args: {
+    title: 'overflow btn with all the states',
+  },
 }
