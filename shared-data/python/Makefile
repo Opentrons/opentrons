@@ -50,7 +50,8 @@ tests ?= tests
 twine_auth_args := --username $(pypi_username) --password $(pypi_password)
 twine_repository_url ?= $(pypi_test_upload_url)
 
-clean_cmd = $(SHX) rm -rf build $(BUILD_DIR) .coverage coverage.xml '*.egg-info' ' **/__pycache__' '**/*.pyc' 'opentrons_shared_data/**/.mypy_cache'
+clean_cmd = $(SHX) rm -rf build $(BUILD_DIR) .coverage coverage.xml '*.egg-info'
+clean_cache_cmd	 = $(SHX) rm -rf '**/__pycache__' '**/*.pyc' '**/.mypy_cache'
 
 .PHONY: all
 all: clean sdist wheel
@@ -74,6 +75,7 @@ teardown-py:
 .PHONY: clean
 clean:
 	$(clean_cmd)
+	$(clean_cache_cmd)
 
 .PHONY: wheel
 wheel: export OPENTRONS_PROJECT=$(project_rs_default)
