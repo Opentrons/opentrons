@@ -76,8 +76,8 @@ function getInvariantContextAndRobotState(
   const sourceLabwareURI = getLabwareDefURI(quickTransferState.source)
   const sourceLabwareId = `${uuid()}_${sourceLabwareURI}`
 
-  let labwareEntities: LabwareEntities
-  let labwareLocations: RobotState['labware']
+  let labwareEntities: LabwareEntities = {}
+  let labwareLocations: RobotState['labware'] = {}
   let adapterId: string | null = null
 
   if (quickTransferState.pipette.channels === 96) {
@@ -267,12 +267,12 @@ export function generateQuickTransferArgs(
   )
   let destLabwareEntity = sourceLabwareEntity
   if (quickTransferState.destination !== 'source') {
-    destLabwareEntity = labwareEntityValues.find(
-      entity =>
-        entity.labwareDefURI ===
-        getLabwareDefURI(quickTransferState.destination)
-    )
+    destLabwareEntity = labwareEntityValues.find(entity => {
+      entity.labwareDefURI ===
+        getLabwareDefURI(quickTransferState.destination as LabwareDefinition2)
+    })
   }
+
   let nozzles = null
   if (pipetteEntity.spec.channels === 96) {
     nozzles = 'ALL' as NozzleConfigurationStyle

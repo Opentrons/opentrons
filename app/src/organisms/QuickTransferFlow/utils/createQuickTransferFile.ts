@@ -106,7 +106,7 @@ export function createQuickTransferFile(
     return acc
   }, [])
 
-  let nonLoadCommandCreator: CommandCreatorResult
+  let nonLoadCommandCreator: CommandCreatorResult | null = null
   if (stepArgs?.commandCreatorFnName === 'transfer') {
     nonLoadCommandCreator = transfer(
       stepArgs as TransferArgs,
@@ -133,7 +133,7 @@ export function createQuickTransferFile(
       : []
 
   let finalDropTipCommands: CreateCommand[] = []
-  let addressableAreaName: AddressableAreaName | null
+  let addressableAreaName: AddressableAreaName | null = null
   if (quickTransferState.dropTipLocation === 'trashBin') {
     const trash = Object.values(
       invariantContext.additionalEquipmentEntities
