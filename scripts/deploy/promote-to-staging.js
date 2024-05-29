@@ -103,7 +103,6 @@ async function runPromoteToStaging() {
     console.log('Promotion to staging done')
     await getCreateInvalidation(stagingCredentials, cloudfrontArn)
     console.log('Cache invalidation initiated for staging')
-
     process.exit(0)
   } catch (error) {
     console.error(error.message)
