@@ -115,7 +115,6 @@ def fake_liquid_settings() -> LiquidProbeSettings:
     return LiquidProbeSettings(
         starting_mount_height=100,
         max_z_distance=15,
-        min_z_distance=10,
         mount_speed=40,
         plunger_speed=10,
         sensor_threshold_pascals=15,
@@ -609,6 +608,7 @@ async def test_pickup_moves(
     pipette_handler.get_pipette(
         OT3Mount.LEFT
     ).nozzle_manager.current_configuration.configuration = NozzleConfigurationType.FULL
+    pipette_handler.get_pipette(OT3Mount.LEFT).current_volume = 0
     z_tiprack_distance = 8.0
     end_z_retract_dist = 9.0
     move_plan_return_val = TipActionSpec(
@@ -644,6 +644,24 @@ async def test_pickup_moves(
             ]
         else:
             assert move_call_list == [(OT3Mount.LEFT, Point(z=end_z_retract_dist))]
+        # pick up tip should have two calls to move_to_plunger_bottom, one before and one after
+        # the tip pickup
+        assert len(mock_move_to_plunger_bottom.call_args_list) == 2
+        mock_move_to_plunger_bottom.reset_mock()
+        mock_move_rel.reset_mock()
+
+        #  make sure that tip_pickup_moves has the same set of moves,
+        #  except no calls to move_to_plunger_bottom
+        await ot3_hardware.tip_pickup_moves(Mount.LEFT, 40.0)
+        move_call_list = [call.args for call in mock_move_rel.call_args_list]
+        if gantry_load == GantryLoad.HIGH_THROUGHPUT:
+            assert move_call_list == [
+                (OT3Mount.LEFT, Point(z=z_tiprack_distance)),
+                (OT3Mount.LEFT, Point(z=end_z_retract_dist)),
+            ]
+        else:
+            assert move_call_list == [(OT3Mount.LEFT, Point(z=end_z_retract_dist))]
+    assert len(mock_move_to_plunger_bottom.call_args_list) == 0
 
 
 @pytest.mark.parametrize("load_configs", load_pipette_configs)
@@ -776,12 +794,19 @@ async def test_liquid_probe(
     pipette_node: Axis,
     mount: OT3Mount,
     fake_liquid_settings: LiquidProbeSettings,
-    mock_instrument_handlers: Tuple[MagicMock],
     mock_current_position_ot3: AsyncMock,
-    mock_ungrip: AsyncMock,
     mock_move_to_plunger_bottom: AsyncMock,
 ) -> None:
-    mock_ungrip.return_value = None
+    instr_data = AttachedPipette(
+        config=load_pipette_data.load_definition(
+            PipetteModelType("p1000"), PipetteChannelType(1), PipetteVersionType(3, 4)
+        ),
+        id="fakepip",
+    )
+    await ot3_hardware.cache_pipette(mount, instr_data, None)
+    pipette = ot3_hardware.hardware_pipettes[mount.to_mount()]
+    assert pipette
+    await ot3_hardware.add_tip(mount, 100)
     await ot3_hardware.home()
     mock_move_to.return_value = None
 
@@ -800,7 +825,6 @@ async def test_liquid_probe(
         fake_settings_aspirate = LiquidProbeSettings(
             starting_mount_height=100,
             max_z_distance=15,
-            min_z_distance=5,
             mount_speed=40,
             plunger_speed=10,
             sensor_threshold_pascals=15,

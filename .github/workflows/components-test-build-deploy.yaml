@@ -190,9 +190,9 @@ jobs:
           npm config set cache ./.npm-cache
           yarn config set cache-folder ./.yarn-cache
           make setup-js
-      - name: 'build typescript'
-        run: make build-ts
-      - name: 'build library'
+      - name: 'build typescript types'
+        run: make -C components build-ts
+      - name: 'build js bundle'
         run: |
           make -C components lib
       # replace package.json stub version number with version from tag

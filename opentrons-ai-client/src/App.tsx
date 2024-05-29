@@ -3,7 +3,7 @@ import { useAuth0 } from '@auth0/auth0-react'
 import { useTranslation } from 'react-i18next'
 
 import {
-  DIRECTION_ROW,
+  COLORS,
   Flex,
   Link as LinkButton,
   POSITION_ABSOLUTE,
@@ -34,7 +34,11 @@ export function App(): JSX.Element | null {
   }
 
   return (
-    <Flex flexDirection={DIRECTION_ROW} position={POSITION_RELATIVE}>
+    <Flex
+      position={POSITION_RELATIVE}
+      minHeight="100vh"
+      backgroundColor={COLORS.grey10}
+    >
       <Flex position={POSITION_ABSOLUTE} top="1rem" right="1rem">
         <LinkButton
           onClick={() => logout()}

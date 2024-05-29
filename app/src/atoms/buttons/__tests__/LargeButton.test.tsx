@@ -45,6 +45,29 @@ describe('LargeButton', () => {
       `background-color: ${COLORS.blue35}`
     )
   })
+
+  it('renders the onColor button', () => {
+    props = {
+      ...props,
+      buttonType: 'onColor',
+    }
+    render(props)
+    expect(screen.getByRole('button')).toHaveStyle(
+      `background-color: ${COLORS.transparent}`
+    )
+  })
+
+  it('renders the alertAlt button', () => {
+    props = {
+      ...props,
+      buttonType: 'alertAlt',
+    }
+    render(props)
+    expect(screen.getByRole('button')).toHaveStyle(
+      `background-color: ${COLORS.white}`
+    )
+  })
+
   it('renders the button as disabled', () => {
     props = {
       ...props,

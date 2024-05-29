@@ -15,16 +15,18 @@ export interface CommandDetail {
 }
 
 export interface CommandsLinks {
-  current: {
-    // link to the currently executing command
-    href: string
-    meta: {
-      runId: string
-      commandId: string
-      key: string
-      createdAt: string
-      index: number
-    }
+  current?: CommandsLink | null
+  currentlyRecoveringFrom?: CommandsLink | null
+}
+
+interface CommandsLink {
+  href: string
+  meta: {
+    runId: string
+    commandId: string
+    key: string
+    createdAt: string
+    index: number
   }
 }
 
@@ -44,11 +46,4 @@ export interface CreateCommandParams {
   waitUntilComplete?: boolean
   timeout?: number
   failedCommandId?: string
-}
-
-export interface RunCommandError {
-  id: string
-  errorType: string
-  createdAt: string
-  detail: string
 }

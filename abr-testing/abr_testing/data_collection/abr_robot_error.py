@@ -47,6 +47,7 @@ def get_error_info_from_robot(
     ) = read_robot_logs.get_error_info(results)
     # JIRA Ticket Fields
     failure_level = "Level " + str(error_level) + " Failure"
+
     components = [failure_level, "Flex-RABR"]
     affects_version = results["API_Version"]
     parent = results.get("robot_name", "")
@@ -193,20 +194,21 @@ if __name__ == "__main__":
     )
     # WRITE ERRORED RUN TO GOOGLE SHEET
     error_run_log = os.path.join(error_folder_path, os.path.basename(run_log_file_path))
-    google_drive.upload_file(error_run_log)
+    google_drive.upload_file(error_run_log, "1Cvej0eadFOTZr9ILRXJ0Wg65ymOtxL4m")
     run_id = os.path.basename(error_run_log).split("_")[1].split(".")[0]
     (
         runs_and_robots,
         headers,
         runs_and_lpc,
         headers_lpc,
-    ) = abr_google_drive.create_data_dictionary(run_id, error_folder_path, issue_url)
-    read_robot_logs.write_to_local_and_google_sheet(
-        runs_and_robots, storage_directory, google_sheet_name, google_sheet, headers
+    ) = abr_google_drive.create_data_dictionary(
+        run_id, error_folder_path, issue_url, "", ""
     )
+
+    start_row = google_sheet.get_index_row() + 1
+    google_sheet.batch_update_cells(runs_and_robots, "A", start_row, "0")
     print("Wrote run to ABR-run-data")
     # Add LPC to google sheet
     google_sheet_lpc = google_sheets_tool.google_sheet(credentials_path, "ABR-LPC", 0)
-    read_robot_logs.write_to_local_and_google_sheet(
-        runs_and_lpc, storage_directory, "ABR-LPC", google_sheet_lpc, headers_lpc
-    )
+    start_row_lpc = google_sheet_lpc.get_index_row() + 1
+    google_sheet_lpc.batch_update_cells(runs_and_lpc, "A", start_row_lpc, "0")

@@ -27,7 +27,7 @@
           "opentrons/opentrons_flex_96_tiprack_50ul/1"
         ]
       },
-      "dismissedWarnings": { "form": {}, "timeline": {} },
+      "dismissedWarnings": { "form": [], "timeline": [] },
       "ingredients": {},
       "ingredLocations": {},
       "savedStepForms": {

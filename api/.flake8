@@ -28,6 +28,7 @@ noqa-require-code = true
 # string lints in these modules; remove entries as they are fixed
 per-file-ignores =
     setup.py:ANN,D
+    src/opentrons/__init__.py:ANN,D
     src/opentrons/execute.py:ANN,D
     src/opentrons/simulate.py:ANN,D
     src/opentrons/types.py:ANN,D
@@ -46,6 +47,7 @@ per-file-ignores =
     src/opentrons/util/linal.py:ANN,D
     src/opentrons/util/entrypoint_util.py:ANN,D
     src/opentrons/util/helpers.py:ANN,D
+    tests/opentrons/test_init.py:ANN,D
     tests/opentrons/test_types.py:ANN,D
     tests/opentrons/conftest.py:ANN,D
     tests/opentrons/calibration_storage/*:ANN,D

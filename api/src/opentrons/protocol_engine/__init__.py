@@ -22,7 +22,7 @@ from .commands import (
     CommandType,
     CommandIntent,
 )
-from .state import State, StateView, StateSummary, CommandSlice, CurrentCommand, Config
+from .state import State, StateView, StateSummary, CommandSlice, CommandPointer, Config
 from .plugins import AbstractPlugin
 
 from .types import (
@@ -85,7 +85,7 @@ __all__ = [
     "State",
     "StateView",
     "CommandSlice",
-    "CurrentCommand",
+    "CommandPointer",
     # public value interfaces and models
     "LabwareOffset",
     "LabwareOffsetCreate",

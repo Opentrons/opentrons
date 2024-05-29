@@ -356,8 +356,8 @@ def test_error_recovery_type_tracking() -> None:
     assert view.get_error_recovery_type("c2") == ErrorRecoveryType.FAIL_RUN
 
 
-def test_get_recovery_in_progress_for_command() -> None:
-    """It should return whether error recovery is in progress for the given command."""
+def test_recovery_target_tracking() -> None:
+    """It should keep track of the command currently undergoing error recovery."""
     subject = CommandStore(config=_make_config(), is_door_open=False)
     subject_view = CommandView(subject.state)
 
@@ -382,12 +382,16 @@ def test_get_recovery_in_progress_for_command() -> None:
     subject.handle_action(fail_1)
 
     # c1 failed recoverably and we're currently recovering from it.
+    recovery_target = subject_view.get_recovery_target()
+    assert recovery_target is not None
+    assert recovery_target.command_id == "c1"
     assert subject_view.get_recovery_in_progress_for_command("c1")
 
     resume_from_1_recovery = actions.ResumeFromRecoveryAction()
     subject.handle_action(resume_from_1_recovery)
 
     # c1 failed recoverably, but we've already completed its recovery.
+    assert subject_view.get_recovery_target() is None
     assert not subject_view.get_recovery_in_progress_for_command("c1")
 
     queue_2 = actions.QueueCommandAction(
@@ -411,6 +415,9 @@ def test_get_recovery_in_progress_for_command() -> None:
     subject.handle_action(fail_2)
 
     # c2 failed recoverably and we're currently recovering from it.
+    recovery_target = subject_view.get_recovery_target()
+    assert recovery_target is not None
+    assert recovery_target.command_id == "c2"
     assert subject_view.get_recovery_in_progress_for_command("c2")
     # ...and that means we're *not* currently recovering from c1,
     # even though it failed recoverably before.
@@ -439,7 +446,8 @@ def test_get_recovery_in_progress_for_command() -> None:
     subject.handle_action(fail_3)
 
     # c3 failed, but not recoverably.
-    assert not subject_view.get_recovery_in_progress_for_command("c2")
+    assert subject_view.get_recovery_target() is None
+    assert not subject_view.get_recovery_in_progress_for_command("c3")
 
 
 def test_final_state_after_estop() -> None:
@@ -469,3 +477,33 @@ def test_final_state_after_estop() -> None:
 
     assert subject_view.get_status() == EngineStatus.FAILED
     assert subject_view.get_error() == expected_error_occurrence
+
+
+def test_final_state_after_stop() -> None:
+    """Test the final state of the run after it's stopped."""
+    subject = CommandStore(config=_make_config(), is_door_open=False)
+    subject_view = CommandView(subject.state)
+
+    subject.handle_action(actions.StopAction())
+    subject.handle_action(
+        actions.FinishAction(
+            error_details=actions.FinishErrorDetails(
+                error=RuntimeError(
+                    "uh oh I was a command and then I got cancelled because someone"
+                    " stopped the run, and now I'm raising this exception because"
+                    " of that. Woe is me"
+                ),
+                error_id="error-id",
+                created_at=datetime.now(),
+            )
+        )
+    )
+    subject.handle_action(
+        actions.HardwareStoppedAction(
+            completed_at=sentinel.hardware_stopped_action_completed_at,
+            finish_error_details=None,
+        )
+    )
+
+    assert subject_view.get_status() == EngineStatus.STOPPED
+    assert subject_view.get_error() is None

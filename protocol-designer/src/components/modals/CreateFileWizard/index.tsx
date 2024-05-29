@@ -17,6 +17,7 @@ import {
   THERMOCYCLER_MODULE_TYPE,
   FLEX_ROBOT_TYPE,
   WASTE_CHUTE_CUTOUT,
+  getAreSlotsAdjacent,
 } from '@opentrons/shared-data'
 import { actions as stepFormActions } from '../../../step-forms'
 import { INITIAL_DECK_SETUP_STEP_ID } from '../../../constants'
@@ -120,6 +121,7 @@ export function CreateFileWizard(): JSX.Element | null {
       values.pipettesByMount,
       (acc, formPipette: FormPipette, mount): PipetteFieldsData[] => {
         return formPipette?.pipetteName != null &&
+          formPipette?.pipetteName !== '' &&
           formPipette.tiprackDefURI != null &&
           (mount === 'left' || mount === 'right')
           ? [
@@ -267,14 +269,22 @@ export function CreateFileWizard(): JSX.Element | null {
       const hasOt2TC = modules.find(
         module => module.type === THERMOCYCLER_MODULE_TYPE
       )
+      const heaterShakerSlot = modules.find(
+        module => module.type === HEATERSHAKER_MODULE_TYPE
+      )?.slot
       const OT2_MIDDLE_SLOTS = hasOt2TC ? ['2', '5'] : ['2', '5', '8', '11']
+      const modifiedOt2Slots = OT2_MIDDLE_SLOTS.filter(slot =>
+        heaterShakerSlot != null
+          ? !getAreSlotsAdjacent(heaterShakerSlot, slot)
+          : slot
+      )
       newTiprackModels.forEach((tiprackDefURI, index) => {
         dispatch(
           labwareIngredActions.createContainer({
             slot:
               values.fields.robotType === FLEX_ROBOT_TYPE
                 ? FLEX_MIDDLE_SLOTS[index]
-                : OT2_MIDDLE_SLOTS[index],
+                : modifiedOt2Slots[index],
             labwareDefURI: tiprackDefURI,
             adapterUnderLabwareDefURI:
               values.pipettesByMount.left.pipetteName === 'p1000_96'

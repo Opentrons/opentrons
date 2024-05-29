@@ -1,64 +1,102 @@
 import argparse
+import base64
+import datetime
+import subprocess
 import time
 from dataclasses import dataclass
-from pathlib import Path
 
 import boto3
-from botocore.exceptions import NoCredentialsError, PartialCredentialsError
+import docker
 from rich import print
 from rich.prompt import Prompt
-from rich.traceback import install
 
-install()
+ENVIRONMENTS = ["crt", "dev", "sandbox"]
 
-ENVIRONMENTS = ["sandbox", "dev"]
+
+def get_aws_account_id() -> str:
+    sts_client = boto3.client("sts")
+    response = sts_client.get_caller_identity()
+    return str(response["Account"])
+
+
+def get_aws_region() -> str:
+    session = boto3.session.Session()
+    return session.region_name
 
 
 @dataclass(frozen=True)
 class BaseDeploymentConfig:
-    S3_KEY: str = "function.zip"
-    S3_ZIP_PATH: Path = Path(Path(__file__).parent, S3_KEY)
-    HEALTH_EVENT: Path = Path(Path(__file__).parent, "test_events", "health.json")
+    IMAGE_NAME: str
+    FUNCTION_NAME: str
+    ECR_URL: str
+    ECR_REPOSITORY: str
+    TAG: str = str(int(datetime.datetime.now().timestamp()))
     DEPLOYMENT_TIMEOUT_S: int = 60
-    S3_BUCKET: str = "invalid-bucket"
-    FUNCTION_NAME: str = "invalid-function"
+
+
+@dataclass(frozen=True)
+class CrtDeploymentConfig(BaseDeploymentConfig):
+    ECR_REPOSITORY: str = "crt-ecr-repo"
+    ECR_URL: str = f"{get_aws_account_id()}.dkr.ecr.{get_aws_region()}.amazonaws.com"
+    FUNCTION_NAME: str = "crt-api-function"
+    IMAGE_NAME: str = "crt-ai-server"
 
 
 @dataclass(frozen=True)
 class SandboxDeploymentConfig(BaseDeploymentConfig):
-    S3_BUCKET: str = "sandbox-opentrons-ai-api"
+    ECR_REPOSITORY: str = "sandbox-ecr-repo"
+    ECR_URL: str = f"{get_aws_account_id()}.dkr.ecr.{get_aws_region()}.amazonaws.com"
     FUNCTION_NAME: str = "sandbox-api-function"
+    IMAGE_NAME: str = "sandbox-ai-server"
 
 
 @dataclass(frozen=True)
 class DevDeploymentConfig(BaseDeploymentConfig):
-    S3_BUCKET: str = "dev-opentrons-ai-api"
+    ECR_REPOSITORY: str = "dev-ecr-repo"
+    ECR_URL: str = f"{get_aws_account_id()}.dkr.ecr.{get_aws_region()}.amazonaws.com"
     FUNCTION_NAME: str = "dev-api-function"
+    IMAGE_NAME: str = "dev-ai-server"
 
 
 class Deploy:
-    def __init__(self, config: SandboxDeploymentConfig | DevDeploymentConfig) -> None:
-        self.config: SandboxDeploymentConfig | DevDeploymentConfig = config
+    def __init__(self, config: BaseDeploymentConfig) -> None:
+        self.config: BaseDeploymentConfig = config
+        self.ecr_client = boto3.client("ecr")
         self.lambda_client = boto3.client("lambda")
-        self.s3_client = boto3.client("s3")
+        self.docker_client = docker.from_env()
+        self.full_image_name = f"{self.config.ECR_URL}/{self.config.ECR_REPOSITORY}:{self.config.TAG}"
 
-    def upload_to_s3(self) -> None:
-        """Upload the packaged Lambda function to S3."""
-        print(f"Uploading to S3 bucket {self.config.S3_BUCKET} with key {self.config.S3_KEY}")
-        try:
-            self.s3_client.upload_file("function.zip", self.config.S3_BUCKET, self.config.S3_KEY)
-            print("Uploaded to S3 successfully!")
-        except NoCredentialsError:
-            print("Credentials not available")
-        except PartialCredentialsError:
-            print("Incomplete credentials configuration")
+    def build_docker_image(self) -> None:
+        print(f"Building Docker image {self.config.IMAGE_NAME}:{self.config.TAG}")
+        self.docker_client.images.build(path=".", tag=f"{self.config.IMAGE_NAME}:{self.config.TAG}")
+        print(f"Successfully built {self.config.IMAGE_NAME}:{self.config.TAG}")
+
+    def push_docker_image_to_ecr(self) -> None:
+        # Get the ECR login token
+        response = self.ecr_client.get_authorization_token()
+        ecr_token = response["authorizationData"][0]["authorizationToken"]
+        # Decode the authorization token
+        username, password = base64.b64decode(ecr_token).decode("utf-8").split(":")
+        # Log into Docker using --password-stdin
+        login_command = f"docker login --username {username} --password-stdin {self.config.ECR_URL}"
+        print(f"Logging into ECR {self.config.ECR_URL}")
+        process = subprocess.Popen(login_command.split(), stdin=subprocess.PIPE)
+        process.communicate(input=password.encode())
+        if process.returncode != 0:
+            print("Error logging into Docker")
+            exit(1)
+        # Tag the image
+        subprocess.run(["docker", "tag", f"{self.config.IMAGE_NAME}:{self.config.TAG}", self.full_image_name], check=True)
+        # Push the image
+        subprocess.run(["docker", "push", self.full_image_name], check=True)
+        print(f"Image pushed to ECR: {self.full_image_name}")
 
     def update_lambda(self) -> None | str:
-        """Update a Lambda function using the uploaded S3 object."""
+        """Update a Lambda function using the ECR image."""
+
         print(f"Updating Lambda function: {self.config.FUNCTION_NAME}")
-        print("If the code has not changed in the S3, the version will not be updated.")
         response = self.lambda_client.update_function_code(
-            FunctionName=self.config.FUNCTION_NAME, S3Bucket=self.config.S3_BUCKET, S3Key=self.config.S3_KEY, Publish=True
+            FunctionName=self.config.FUNCTION_NAME, ImageUri=self.full_image_name, Publish=True
         )
         print("Updated Lambda function:")
         print(response)
@@ -87,21 +125,15 @@ class Deploy:
                 print(f"Status of '{function_with_version}' is now '{status}'. Exiting loop.")
                 break
             else:
-                print("Status still 'Pending'. Checking again in 3 seconds...")
-                time.sleep(3)  # Wait for 3 seconds before checking again
-
-    def deploy(self) -> None:
-        self.upload_to_s3()
-        version = self.update_lambda()
-        if version:
-            self.wait_for_lambda_status(version)
+                sleep_time = 5
+                print(f"Status still 'Pending'. Checking again in {sleep_time} seconds...")
+                time.sleep(sleep_time)
 
 
 def main() -> None:
     parser = argparse.ArgumentParser(description="Manage Lambda deployment.")
     parser.add_argument("--env", type=str, help=f"Deployment environment {ENVIRONMENTS}")
     args = parser.parse_args()
-
     # Determine if the script was called with command-line arguments
     if args.env:
         if args.env.lower() not in ENVIRONMENTS:
@@ -110,19 +142,25 @@ def main() -> None:
         env = args.env.lower()
     else:
         # Interactive prompts if no command-line arguments
-        env = Prompt.ask("[bold magenta]Enter the deployment environment[/]", choices=ENVIRONMENTS, default="sandbox")
+        env = Prompt.ask("[bold magenta]Enter the deployment environment[/]", choices=ENVIRONMENTS, default="crt")
 
     # Validate environment
-    config: SandboxDeploymentConfig | DevDeploymentConfig
-    if env == "sandbox":
-        config = SandboxDeploymentConfig()
+    config: BaseDeploymentConfig
+    if env == "crt":
+        config = CrtDeploymentConfig()
     elif env == "dev":
         config = DevDeploymentConfig()
+    elif env == "sandbox":
+        config = SandboxDeploymentConfig()
     else:
         print(f"[red]Invalid environment specified: {env}[/red]")
         exit(1)
-    aws_actions = Deploy(config)
-    aws_actions.deploy()
+    aws = Deploy(config)
+    aws.build_docker_image()
+    aws.push_docker_image_to_ecr()
+    version = aws.update_lambda()
+    if version:
+        aws.wait_for_lambda_status(version)
 
 
 if __name__ == "__main__":

@@ -10,6 +10,8 @@ import {
   Flex,
   Icon,
   JUSTIFY_CENTER,
+  JUSTIFY_FLEX_END,
+  JUSTIFY_FLEX_START,
   POSITION_ABSOLUTE,
   POSITION_RELATIVE,
   PrimaryButton,
@@ -49,7 +51,9 @@ export function ChatDisplay({ chat, chatId }: ChatDisplayProps): JSX.Element {
       paddingLeft={isUser ? SPACING.spacing40 : undefined}
       paddingRight={isUser ? undefined : SPACING.spacing40}
     >
-      <StyledText>{isUser ? t('you') : t('opentronsai')}</StyledText>
+      <Flex justifyContent={isUser ? JUSTIFY_FLEX_END : JUSTIFY_FLEX_START}>
+        <StyledText>{isUser ? t('you') : t('opentronsai')}</StyledText>
+      </Flex>
       {/* text should be markdown so this component will have a package or function to parse markdown */}
       <Flex
         padding={SPACING.spacing32}
@@ -74,11 +78,11 @@ export function ChatDisplay({ chat, chatId }: ChatDisplayProps): JSX.Element {
         >
           {reply}
         </Markdown>
-        {role === 'assistant' ? (
+        {!isUser ? (
           <PrimaryButton
             position={POSITION_ABSOLUTE}
             right={SPACING.spacing16}
-            bottom={`-${SPACING.spacing16}`}
+            bottom={`-${SPACING.spacing24}`}
             borderRadius={BORDERS.borderRadiusFull}
             onClick={handleClickCopy}
           >
