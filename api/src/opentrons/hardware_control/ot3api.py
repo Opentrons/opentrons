@@ -1807,9 +1807,6 @@ class OT3API(
         realmount = OT3Mount.from_mount(mount)
         instrument = self._pipette_handler.get_pipette(realmount)
 
-        if isinstance(self._backend, OT3Simulator):
-            self._backend._update_tip_state(realmount, True)
-
         if (
             self.gantry_load == GantryLoad.HIGH_THROUGHPUT
             and instrument.nozzle_manager.current_configuration.configuration
@@ -1837,6 +1834,9 @@ class OT3API(
         # This extra shake ensures those tips are removed
         for rel_point, speed in spec.shake_off_moves:
             await self.move_rel(realmount, rel_point, speed=speed)
+
+        if isinstance(self._backend, OT3Simulator):
+            self._backend._update_tip_state(realmount, True)
 
         # fixme: really only need this during labware position check so user
         # can verify if a tip is properly attached
@@ -2205,8 +2205,6 @@ class OT3API(
         def add_tip_to_instr() -> None:
             instrument.add_tip(tip_length=tip_length)
             instrument.set_current_volume(0)
-            if isinstance(self._backend, OT3Simulator):
-                self._backend._update_tip_state(realmount, True)
 
         await self._move_to_plunger_bottom(realmount, rate=1.0)
 
