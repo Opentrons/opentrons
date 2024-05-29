@@ -6,14 +6,14 @@ import {
   useStopRunMutation,
 } from '@opentrons/react-api-client'
 
-import { useChainRunCommands } from '../../../resources/runs'
+import { useChainRunCommands } from '../../../../resources/runs'
 import {
   useRecoveryCommands,
   HOME_PIPETTE_Z_AXES,
 } from '../useRecoveryCommands'
 
 vi.mock('@opentrons/react-api-client')
-vi.mock('../../../resources/runs')
+vi.mock('../../../../resources/runs')
 
 const mockFailedCommand = {
   id: 'MOCK_ID',
