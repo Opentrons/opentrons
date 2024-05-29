@@ -15,6 +15,9 @@ gcode_shortcuts = {
     _MOVE_LID: "M240.D",  # move lid stepper motor
     "ol": "M126",  # open lid
     "cl": "M127",  # close lid
+    "sw": "M901.D",  # status of all switches
+    "lt": "M141.D",  # get lid temperature
+    "pt": "M105.D",  # get plate temperature
 }
 
 
@@ -68,7 +71,7 @@ async def comms_loop(dev: Serial) -> bool:
         await handle_gcode_shortcut(dev, command)
     else:
         try:
-            dev.write(f"{command}\n")
+            dev.write(f"{command}\n".encode())
             print(await message_return(dev))
         except TypeError:
             print("Invalid input.")
