@@ -47,8 +47,6 @@ function getInvariantContextAndRobotState(
   quickTransferState: QuickTransferSummaryState,
   deckConfig: DeckConfiguration
 ): { invariantContext: InvariantContext; robotState: RobotState } {
-  const pipetteId = uuid()
-  const tipRackId = uuid()
   const tipRackDefURI = getLabwareDefURI(quickTransferState.tipRack)
   let pipetteName = quickTransferState.pipette.model
   if (quickTransferState.pipette.channels === 1) {
@@ -58,6 +56,8 @@ function getInvariantContextAndRobotState(
   } else {
     pipetteName = pipetteName + `_96`
   }
+  const pipetteId = `${uuid()}_${pipetteName}`
+  const tipRackId = `${uuid()}_${tipRackDefURI}`
 
   const pipetteEntities: PipetteEntities = {
     [pipetteId]: {
@@ -73,15 +73,15 @@ function getInvariantContextAndRobotState(
       mount: quickTransferState.mount,
     },
   }
-  const sourceLabwareId = uuid()
   const sourceLabwareURI = getLabwareDefURI(quickTransferState.source)
+  const sourceLabwareId = `${uuid()}_${sourceLabwareURI}`
 
   let labwareEntities: LabwareEntities
   let labwareLocations: RobotState['labware']
   let adapterId: string | null = null
 
   if (quickTransferState.pipette.channels === 96) {
-    adapterId = uuid()
+    adapterId = `${uuid()}_${adapter96ChannelDefUri}`
     labwareEntities = {
       [adapterId]: {
         id: adapterId,
@@ -120,12 +120,13 @@ function getInvariantContextAndRobotState(
   }
 
   if (quickTransferState.destination !== 'source') {
-    const destLabwareId = uuid()
+    const destLabwareURI = getLabwareDefURI(quickTransferState.destination)
+    const destLabwareId = `${uuid()}_${destLabwareURI}`
     labwareEntities = {
       ...labwareEntities,
       [destLabwareId]: {
         id: destLabwareId,
-        labwareDefURI: getLabwareDefURI(quickTransferState.destination),
+        labwareDefURI: destLabwareURI,
         def: quickTransferState.destination,
       },
     }
@@ -144,7 +145,7 @@ function getInvariantContextAndRobotState(
     const trashLocation = deckConfig.find(
       configCutout => configCutout.cutoutFixtureId === 'trashBinAdapter'
     )?.cutoutId
-    const trashId = uuid()
+    const trashId = `${uuid()}_trashBin`
     additionalEquipmentEntities = {
       [trashId]: {
         name: 'trashBin',
@@ -162,7 +163,7 @@ function getInvariantContextAndRobotState(
         configCutout.cutoutFixtureId.includes('WasteChute') ||
         configCutout.cutoutFixtureId.includes('wasteChute')
     )?.cutoutId
-    const wasteChuteId = uuid()
+    const wasteChuteId = `${uuid()}_wasteChute`
     additionalEquipmentEntities = {
       ...additionalEquipmentEntities,
       [wasteChuteId]: {
