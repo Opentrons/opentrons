@@ -140,8 +140,13 @@ class ModuleDataMapper:
             module_cls = AbsorbanceReaderModule
             module_data = AbsorbanceReaderModuleData(
                 status=AbsorbanceReaderStatus(live_data["status"]),
-                lidStatus=cast(AbsorbanceReaderLidStatus, live_data["data"].get("lidStatus")),
-                platePresence=cast(AbsorbanceReaderPlatePresence, live_data["data"].get("platePresence")),
+                lidStatus=cast(
+                    AbsorbanceReaderLidStatus, live_data["data"].get("lidStatus")
+                ),
+                platePresence=cast(
+                    AbsorbanceReaderPlatePresence,
+                    live_data["data"].get("platePresence"),
+                ),
                 sampleWavelength=cast(int, live_data["data"].get("sampleWavelength")),
             )
         else:

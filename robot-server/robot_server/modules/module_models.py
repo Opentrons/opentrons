@@ -329,7 +329,6 @@ class AbsorbanceReaderModuleData(BaseModel):
     )
 
 
-
 class AbsorbanceReaderModule(
     _GenericModule[
         Literal[ModuleType.ABSORBANCE_READER],
@@ -342,7 +341,6 @@ class AbsorbanceReaderModule(
     moduleType: Literal[ModuleType.ABSORBANCE_READER]
     moduleModel: Literal[ModuleModel.ABSORBANCE_READER_V1]
     data: AbsorbanceReaderModuleData
-
 
 
 AttachedModule = Union[
