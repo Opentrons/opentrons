@@ -15,8 +15,6 @@ export const useGetAccessToken = (): UseGetAccessTokenResult => {
           audience: AUTH0_AUDIENCE,
         },
       })
-      // Note this is for debugging
-      console.log('accessToken', accessToken)
       return accessToken
     } catch (error) {
       console.error('Error getting access token:', error)
