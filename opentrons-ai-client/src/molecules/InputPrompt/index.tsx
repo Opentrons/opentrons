@@ -25,7 +25,7 @@ import { calcTextAreaHeight } from '../../resources/utils/utils'
 import { END_POINT } from '../../resources/constants'
 
 import type { AxiosRequestConfig } from 'axios'
-import type { Chat, ChatData } from '../../resources/types'
+import type { ChatData } from '../../resources/types'
 
 interface InputType {
   userPrompt: string
