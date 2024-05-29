@@ -12,7 +12,6 @@ import type {
 } from '@opentrons/shared-data'
 
 import type * as ApiTypes from './api-types'
-import { A } from 'vitest/dist/reporters-1evA5lom'
 
 export * from './api-types'
 
