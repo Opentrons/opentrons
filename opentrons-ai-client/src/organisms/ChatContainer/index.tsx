@@ -8,7 +8,7 @@ import {
   DIRECTION_COLUMN,
   Flex,
   OVERFLOW_AUTO,
-  POSITION_STICKY,
+  POSITION_FIXED,
   SPACING,
   StyledText,
 } from '@opentrons/components'
@@ -24,7 +24,11 @@ export function ChatContainer(): JSX.Element {
 
   React.useEffect(() => {
     if (scrollRef.current != null)
-      scrollRef.current.scrollIntoView({ behavior: 'smooth' })
+      scrollRef.current.scrollIntoView({
+        behavior: 'smooth',
+        block: 'nearest',
+        inline: 'nearest',
+      })
   }, [chatData.length])
 
   return (
@@ -56,7 +60,7 @@ export function ChatContainer(): JSX.Element {
         </ChatDataContainer>
       </Flex>
       <span ref={scrollRef} />
-      <Flex position={POSITION_STICKY}>
+      <Flex position={POSITION_FIXED} bottom="0" zIndex="2" width="69%">
         <ChatFooter />
       </Flex>
     </Flex>
@@ -67,4 +71,5 @@ const ChatDataContainer = styled(Flex)`
   flex-direction: ${DIRECTION_COLUMN};
   grid-gap: ${SPACING.spacing40};
   width: 100%;
+  height: calc(100vh + 9rem);
 `

@@ -12,8 +12,8 @@ import {
 } from '@opentrons/components'
 
 import { SidePanel } from './molecules/SidePanel'
-import { ChatContainer } from './organisms/ChatContainer'
 import { Loading } from './molecules/Loading'
+import { ChatContainer } from './organisms/ChatContainer'
 
 export function App(): JSX.Element | null {
   const { t } = useTranslation('protocol_generator')
@@ -23,7 +23,7 @@ export function App(): JSX.Element | null {
     if (!isAuthenticated && !isLoading) {
       void loginWithRedirect()
     }
-  }, [isAuthenticated, isLoading])
+  }, [isAuthenticated, isLoading, loginWithRedirect])
 
   if (isLoading) {
     return <Loading />
