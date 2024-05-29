@@ -8,6 +8,7 @@ from time import sleep
 import os
 from typing import List, Any, Optional
 import traceback
+import sys
 
 from hardware_testing.opentrons_api import helpers_ot3
 from hardware_testing.gravimetric import helpers, workarounds
@@ -264,6 +265,9 @@ if __name__ == "__main__":
     parser.add_argument("--multi-passes", type=int, default=1)
     parser.add_argument("--starting-tip", type=str, default="A1")
     parser.add_argument("--google-sheet-name", type=str, default="LLD-Shared-Data")
+    parser.add_argument(
+        "--gd-parent-folder", type=str, default="1b2V85fDPA0tNqjEhyHOGCWRZYgn8KsGf"
+    )
     parser.add_argument("--liquid", type=str, default="unknown")
     parser.add_argument("--skip-labware-offsets", action="store_true")
 
@@ -293,9 +297,22 @@ if __name__ == "__main__":
                 CREDENTIALS_PATH, args.google_sheet_name, 0
             )
             sheet_id = google_sheet.create_worksheet(run_args.run_id)  # type: ignore[union-attr]
+            try:
+                sys.path.insert(0, "/var/lib/jupyter/notebooks/")
+                import google_drive_tool  # type: ignore[import]
+                google_drive: Optional[
+                google_drive_tool.google_drive
+            ] = google_drive_tool.google_drive(
+                CREDENTIALS_PATH, args.gd_parent_folder, "rhyann.clarke@opentrons.com"
+            )
+            except ImportError:
+                raise ImportError(
+                    "Run on robot. Make sure google_drive_tool.py is in jupyter notebook."
+                )
         else:
             google_sheet = None
             sheet_id = None
+            google_drive = None
         hw = run_args.ctx._core.get_hardware()
         ui.print_info("homing...")
         run_args.ctx.home()
@@ -317,13 +334,18 @@ if __name__ == "__main__":
         run_args.test_report.print_results()
         ui.print_info("done\n\n")
         if not run_args.ctx.is_simulating():
+            new_folder_name = (
+                f"MS{args.z_speed}_PS{args.plunger_speed}_{run_args.run_id}"
+            )
             process_csv_directory(
                 f"{data_dir}/{run_args.name}/{run_args.run_id}",
                 run_args.tip_volumes,
                 run_args.trials,
                 google_sheet,
+                google_drive,
                 run_args.run_id,
                 sheet_id,
+                new_folder_name,
                 make_graph=True,
             )
             # Log to Google Sheet

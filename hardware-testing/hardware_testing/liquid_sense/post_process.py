@@ -50,8 +50,10 @@ def process_csv_directory(  # noqa: C901
     tips: List[int],
     trials: int,
     google_sheet: Optional[Any],
+    google_drive: Optional[Any],
     sheet_name: str,
     sheet_id: Optional[str],
+    new_folder_name: Optional[str],
     make_graph: bool = False,
 ) -> None:
     """Post process script csvs."""
@@ -243,6 +245,9 @@ def process_csv_directory(  # noqa: C901
                         )
                     except gspread.exceptions.APIError:
                         ui.print_error("Did not write pressure data to google sheet.")
+                if google_drive:
+                    new_folder_id = google_drive.create_folder(new_folder_name)
+                    google_drive.upload_file(final_report_file, new_folder_id)
 
 
 def process_google_sheet(
@@ -257,7 +262,8 @@ def process_google_sheet(
     sheet_name = run_args.run_id  # type: ignore[attr-defined]
     test_parameters = [
         [
-            "Run ID" "Serial Number",
+            "Run ID", 
+            "Serial Number",
             "Pipette Type",
             "Tip Size",
             "Z Speed (mm/s)",
