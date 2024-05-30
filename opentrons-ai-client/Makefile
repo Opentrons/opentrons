@@ -13,7 +13,7 @@ benchmark_output := $(shell node -e 'console.log(new Date());')
 
 # These variables can be overriden when make is invoked to customize the
 # behavior of jest
-tests ?= src
+tests ?=
 cov_opts ?= --coverage=true
 test_opts ?=
 

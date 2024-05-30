@@ -19,8 +19,9 @@ import {
   chatDataAtom,
   chatHistoryAtom,
   preparedPromptAtom,
+  tokenAtom,
 } from '../../resources/atoms'
-import { useApiCall, useGetAccessToken } from '../../resources/hooks'
+import { useApiCall } from '../../resources/hooks'
 import { calcTextAreaHeight } from '../../resources/utils/utils'
 import { END_POINT } from '../../resources/constants'
 
@@ -41,10 +42,10 @@ export function InputPrompt(): JSX.Element {
   const [preparedPrompt] = useAtom(preparedPromptAtom)
   const [, setChatData] = useAtom(chatDataAtom)
   const [chatHistory, setChatHistory] = useAtom(chatHistoryAtom)
+  const [token] = useAtom(tokenAtom)
   const [submitted, setSubmitted] = React.useState<boolean>(false)
   const userPrompt = watch('userPrompt') ?? ''
   const { data, isLoading, callApi } = useApiCall()
-  const { getAccessToken } = useGetAccessToken()
 
   const handleClick = async (): Promise<void> => {
     const userInput: ChatData = {
@@ -54,9 +55,8 @@ export function InputPrompt(): JSX.Element {
     setChatData(chatData => [...chatData, userInput])
 
     try {
-      const accessToken = await getAccessToken()
       const headers = {
-        Authorization: `Bearer ${accessToken}`,
+        Authorization: `Bearer ${token}`,
         'Content-Type': 'application/json',
       }
 

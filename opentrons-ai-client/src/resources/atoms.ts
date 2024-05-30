@@ -9,3 +9,5 @@ export const preparedPromptAtom = atom<string>('')
 export const chatDataAtom = atom<ChatData[]>([])
 
 export const chatHistoryAtom = atom<Chat[]>([])
+
+export const tokenAtom = atom<string | null>(null)
