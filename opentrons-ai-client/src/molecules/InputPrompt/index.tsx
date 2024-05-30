@@ -87,7 +87,6 @@ export function InputPrompt(): JSX.Element {
   React.useEffect(() => {
     if (preparedPrompt !== '') {
       setValue('userPrompt', preparedPrompt)
-      // setPreparedPrompt('')
     }
   }, [preparedPrompt, setPreparedPrompt, setValue])
 
