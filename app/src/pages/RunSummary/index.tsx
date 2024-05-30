@@ -61,17 +61,11 @@ import { getLocalRobot } from '../../redux/discovery'
 import { RunFailedModal } from '../../organisms/OnDeviceDisplay/RunningProtocol'
 import { formatTimeWithUtcLabel, useNotifyRunQuery } from '../../resources/runs'
 import { handleTipsAttachedModal } from '../../organisms/DropTipWizardFlows/TipsAttachedModal'
-import { getPipettesWithTipAttached } from '../../organisms/DropTipWizardFlows/getPipettesWithTipAttached'
-import { getPipetteModelSpecs, FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
 import { useMostRecentRunId } from '../../organisms/ProtocolUpload/hooks/useMostRecentRunId'
+import { useTipAttachmentStatus } from '../../organisms/DropTipWizardFlows'
 
 import type { OnDeviceRouteParams } from '../../App/types'
-import type { PipetteModelSpecs } from '@opentrons/shared-data'
-
-interface PipettesWithTip {
-  mount: 'left' | 'right'
-  specs?: PipetteModelSpecs | null
-}
+import type { PipetteWithTip } from '../../organisms/DropTipWizardFlows'
 
 export function RunSummary(): JSX.Element {
   const { runId } = useParams<OnDeviceRouteParams>()
@@ -116,10 +110,6 @@ export function RunSummary(): JSX.Element {
   const [showRunFailedModal, setShowRunFailedModal] = React.useState<boolean>(
     false
   )
-
-  const [pipettesWithTip, setPipettesWithTip] = React.useState<
-    PipettesWithTip[]
-  >([])
   const [showRunAgainSpinner, setShowRunAgainSpinner] = React.useState<boolean>(
     false
   )
@@ -135,45 +125,71 @@ export function RunSummary(): JSX.Element {
     headerText = t('run_canceled_splash')
   }
 
-  const handleReturnToDash = (): void => {
-    const { mount, specs } = pipettesWithTip[0] || {}
-    if (
-      mostRecentRunId === runId &&
-      pipettesWithTip.length !== 0 &&
-      specs != null
-    ) {
-      handleTipsAttachedModal(
-        mount,
-        specs,
-        FLEX_ROBOT_TYPE,
+  const {
+    determineTipStatus,
+    setTipStatusResolved,
+    pipettesWithTip,
+  } = useTipAttachmentStatus({
+    runId,
+    runRecord,
+    attachedInstruments,
+    host,
+    isFlex: true,
+  })
+
+  // Determine tip status on initial render only.
+  React.useEffect(() => {
+    determineTipStatus()
+  }, [])
+
+  const returnToDash = (): void => {
+    closeCurrentRun()
+    history.push('/')
+  }
+
+  // TODO(jh, 05-30-24): Refactor reset() so we can redirect to the setup page, showing the shimmer skeleton instead.
+  const runAgain = (): void => {
+    setShowRunAgainSpinner(true)
+    reset()
+    trackEvent({
+      name: ANALYTICS_PROTOCOL_PROCEED_TO_RUN,
+      properties: { sourceLocation: 'RunSummary', robotSerialNumber },
+    })
+    trackProtocolRunEvent({ name: ANALYTICS_PROTOCOL_RUN_ACTION.AGAIN })
+  }
+
+  // If no pipettes have tips attached, execute the routing callback.
+  const setTipStatusResolvedAndRoute = (
+    routeCb: (pipettesWithTip: PipetteWithTip[]) => void
+  ): (() => Promise<void>) => {
+    return () =>
+      setTipStatusResolved().then(newPipettesWithTip =>
+        routeCb(newPipettesWithTip)
+      )
+  }
+
+  const handleReturnToDash = (pipettesWithTip: PipetteWithTip[]): void => {
+    if (mostRecentRunId === runId && pipettesWithTip.length > 0) {
+      void handleTipsAttachedModal({
+        setTipStatusResolved: setTipStatusResolvedAndRoute(handleReturnToDash),
         host,
-        setPipettesWithTip
-      ).catch(e => console.log(`Error launching Tip Attachment Modal: ${e}`))
+        pipettesWithTip,
+      })
     } else {
-      closeCurrentRun()
-      history.push('/')
+      returnToDash()
     }
   }
 
-  const handleRunAgain = (): void => {
-    const { mount, specs } = pipettesWithTip[0] || {}
-    if (isRunCurrent && pipettesWithTip.length !== 0 && specs != null) {
-      handleTipsAttachedModal(
-        mount,
-        specs,
-        FLEX_ROBOT_TYPE,
+  const handleRunAgain = (pipettesWithTip: PipetteWithTip[]): void => {
+    if (isRunCurrent && pipettesWithTip.length > 0) {
+      void handleTipsAttachedModal({
+        setTipStatusResolved: setTipStatusResolvedAndRoute(handleRunAgain),
         host,
-        setPipettesWithTip
-      ).catch(e => console.log(`Error launching Tip Attachment Modal: ${e}`))
+        pipettesWithTip,
+      })
     } else {
       if (!isResetRunLoading) {
-        setShowRunAgainSpinner(true)
-        reset()
-        trackEvent({
-          name: ANALYTICS_PROTOCOL_PROCEED_TO_RUN,
-          properties: { sourceLocation: 'RunSummary', robotSerialNumber },
-        })
-        trackProtocolRunEvent({ name: ANALYTICS_PROTOCOL_RUN_ACTION.AGAIN })
+        runAgain()
       }
     }
   }
@@ -189,29 +205,6 @@ export function RunSummary(): JSX.Element {
     })
     setShowSplash(false)
   }
-
-  React.useEffect(() => {
-    getPipettesWithTipAttached({
-      host,
-      runId,
-      runRecord,
-      attachedInstruments,
-      isFlex: true,
-    })
-      .then(pipettesWithTipAttached => {
-        const pipettesWithTip = pipettesWithTipAttached.map(pipette => {
-          const specs = getPipetteModelSpecs(pipette.instrumentModel)
-          return {
-            specs,
-            mount: pipette.mount,
-          }
-        })
-        setPipettesWithTip(() => pipettesWithTip)
-      })
-      .catch(e => {
-        console.log(`Error checking pipette tip attachement state: ${e}`)
-      })
-  }, [])
 
   const RUN_AGAIN_SPINNER_TEXT = (
     <Flex justifyContent={JUSTIFY_SPACE_BETWEEN} width="25.5rem">
@@ -325,14 +318,14 @@ export function RunSummary(): JSX.Element {
               flex="1"
               iconName="arrow-left"
               buttonType="secondary"
-              onClick={handleReturnToDash}
+              onClick={() => handleReturnToDash(pipettesWithTip)}
               buttonText={t('return_to_dashboard')}
               height="17rem"
             />
             <LargeButton
               flex="1"
               iconName="play-round-corners"
-              onClick={handleRunAgain}
+              onClick={() => handleRunAgain(pipettesWithTip)}
               buttonText={
                 showRunAgainSpinner ? RUN_AGAIN_SPINNER_TEXT : t('run_again')
               }

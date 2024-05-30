@@ -1,5 +1,6 @@
 import * as React from 'react'
-import { capitalize } from 'lodash'
+import capitalize from 'lodash/capitalize'
+import head from 'lodash/head'
 import NiceModal, { useModal } from '@ebay/nice-modal-react'
 import { Trans, useTranslation } from 'react-i18next'
 
@@ -10,46 +11,39 @@ import {
   SPACING,
   StyledText,
 } from '@opentrons/components'
+import { ApiHostProvider } from '@opentrons/react-api-client'
+import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
 
-import { useCloseCurrentRun } from '../ProtocolUpload/hooks'
 import { SmallButton } from '../../atoms/buttons'
 import { Modal } from '../../molecules/Modal'
 import { DropTipWizardFlows, useDropTipWizardFlows } from '.'
 
-import type { HostConfig, PipetteData } from '@opentrons/api-client'
-import type { PipetteModelSpecs, RobotType } from '@opentrons/shared-data'
+import type { HostConfig } from '@opentrons/api-client'
 import type { ModalHeaderBaseProps } from '../../molecules/Modal/types'
-import { ApiHostProvider } from '@opentrons/react-api-client'
+import type { PipetteWithTip } from '.'
 
 interface TipsAttachedModalProps {
-  mount: PipetteData['mount']
-  instrumentModelSpecs: PipetteModelSpecs
-  robotType: RobotType
+  pipettesWithTip: PipetteWithTip[]
   host: HostConfig | null
-  onCloseClick?: (arg0: any) => void
+  setTipStatusResolved: (onEmpty?: () => void) => Promise<void>
 }
 
 export const handleTipsAttachedModal = (
-  mount: TipsAttachedModalProps['mount'],
-  instrumentModelSpecs: TipsAttachedModalProps['instrumentModelSpecs'],
-  host: TipsAttachedModalProps['host'],
-  onCloseClick: TipsAttachedModalProps['onCloseClick']
+  props: TipsAttachedModalProps
 ): Promise<unknown> => {
   return NiceModal.show(TipsAttachedModal, {
-    mount,
-    instrumentModelSpecs,
-    host,
-    onCloseClick,
+    ...props,
   })
 }
 
 const TipsAttachedModal = NiceModal.create(
   (props: TipsAttachedModalProps): JSX.Element => {
-    const { mount, onCloseClick, host, instrumentModelSpecs } = props
+    const { pipettesWithTip, host, setTipStatusResolved } = props
     const { t } = useTranslation(['drop_tip_wizard'])
     const modal = useModal()
 
-    const { closeCurrentRun } = useCloseCurrentRun()
+    const { mount, specs } = head(pipettesWithTip) as PipetteWithTip
+    const { showDTWiz, toggleDTWiz } = useDropTipWizardFlows()
 
     const tipsAttachedHeader: ModalHeaderBaseProps = {
       title: t('tips_are_attached'),
@@ -57,7 +51,12 @@ const TipsAttachedModal = NiceModal.create(
       iconColor: COLORS.yellow50,
     }
 
-    const is96Channel = instrumentModelSpecs.channels === 96
+    const cleanUpAndClose = (): void => {
+      modal.remove()
+      setTipStatusResolved()
+    }
+
+    const is96Channel = specs.channels === 96
     const displayMountText = is96Channel ? '96-Channel' : capitalize(mount)
 
     return (
@@ -81,32 +80,24 @@ const TipsAttachedModal = NiceModal.create(
                 flex="1"
                 buttonType="secondary"
                 buttonText={t('skip')}
-                onClick={() => {
-                  onCloseClick?.([])
-                  closeCurrentRun()
-                  modal.remove()
-                }}
+                onClick={cleanUpAndClose}
               />
               <SmallButton
                 flex="1"
                 buttonText={t('begin_removal')}
-                onClick={() => {
-                  setShowWizard(true)
-                }}
+                onClick={toggleDTWiz}
               />
             </Flex>
           </Flex>
         </Modal>
-        {showWizard ? (
-          <DropTipWizard
-            {...props}
+        {showDTWiz ? (
+          <DropTipWizardFlows
+            instrumentModelSpecs={specs}
+            mount={mount}
+            robotType={FLEX_ROBOT_TYPE}
             closeFlow={() => {
-              onCloseClick?.((pipettesWithTip: PipetteData[]) => {
-                const newPipettesWithTip = pipettesWithTip.slice(1)
-                if (newPipettesWithTip.length === 0) closeCurrentRun()
-                return newPipettesWithTip
-              })
-              modal.remove()
+              toggleDTWiz()
+              cleanUpAndClose()
             }}
           />
         ) : null}

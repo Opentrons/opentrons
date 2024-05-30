@@ -22,7 +22,7 @@ import { MenuList } from '../../atoms/MenuList'
 import { MenuItem } from '../../atoms/MenuList/MenuItem'
 import { PipetteWizardFlows } from '../../organisms/PipetteWizardFlows'
 import { GripperWizardFlows } from '../../organisms/GripperWizardFlows'
-import { DropTipWizard } from '../../organisms/DropTipWizard'
+import { DropTipWizardFlows } from '../../organisms/DropTipWizardFlows'
 import { FLOWS } from '../../organisms/PipetteWizardFlows/constants'
 import { GRIPPER_FLOW_TYPES } from '../../organisms/GripperWizardFlows/constants'
 
@@ -147,7 +147,7 @@ const InstrumentDetailsOverflowMenu = NiceModal.create(
         {showDropTipWizard &&
         instrument.mount !== 'extension' &&
         pipetteModelSpecs != null ? (
-          <DropTipWizard
+          <DropTipWizardFlows
             robotType={FLEX_ROBOT_TYPE}
             mount={instrument.mount}
             instrumentModelSpecs={pipetteModelSpecs}
