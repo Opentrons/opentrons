@@ -39,7 +39,7 @@ export function InputPrompt(): JSX.Element {
       userPrompt: '',
     },
   })
-  const [preparedPrompt] = useAtom(preparedPromptAtom)
+  const [preparedPrompt, setPreparedPrompt] = useAtom(preparedPromptAtom)
   const [, setChatData] = useAtom(chatDataAtom)
   const [chatHistory, setChatHistory] = useAtom(chatHistoryAtom)
   const [token] = useAtom(tokenAtom)
@@ -84,7 +84,10 @@ export function InputPrompt(): JSX.Element {
   }
 
   React.useEffect(() => {
-    if (preparedPrompt !== '') setValue('userPrompt', preparedPrompt as string)
+    if (preparedPrompt !== '') {
+      setValue('userPrompt', preparedPrompt)
+      setPreparedPrompt('')
+    }
   }, [preparedPrompt, setValue])
 
   React.useEffect(() => {
