@@ -110,3 +110,6 @@ class RunOrchestrator:
             with move_on_after(timeout_sec):
                 await self._protocol_engine.wait_for_command(added_command.id)
         return added_command
+
+    def estop(self) -> None:
+        return self._protocol_engine.estop()

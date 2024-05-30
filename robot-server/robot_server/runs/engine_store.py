@@ -82,8 +82,8 @@ async def handle_estop_event(engine_store: "EngineStore", event: HardwareEvent) 
                 return
             # todo(mm, 2024-04-17): This estop teardown sequencing belongs in the
             # runner layer.
-            engine_store.engine.estop()
-            await engine_store.engine.finish(error=EStopActivatedError())
+            engine_store._run_orchestrator.estop()
+            await engine_store._run_orchestrator.finish(error=EStopActivatedError())
     except Exception:
         # This is a background task kicked off by a hardware event,
         # so there's no one to propagate this exception to.

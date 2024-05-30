@@ -119,6 +119,8 @@ async def test_create_run_command(
                 params=pe_commands.WaitForResumeParams(message="Hello"),
                 intent=pe_commands.CommandIntent.SETUP,
             ),
+            wait_until_complete=False,
+            timeout=12,
             failed_command_id=None,
         )
     ).then_do(_stub_queued_command_state)
@@ -128,6 +130,7 @@ async def test_create_run_command(
         waitUntilComplete=False,
         engine_store=mock_engine_store,
         failedCommandId=None,
+        timeout=12
     )
 
     assert result.content.data == command_once_added
@@ -188,23 +191,15 @@ async def test_create_run_command_blocking_completion(
         result=pe_commands.WaitForResumeResult(),
     )
 
-    def _stub_queued_command_state(*_a: object, **_k: object) -> pe_commands.Command:
-        decoy.when(mock_engine_store.get_command("command-id")).then_return(
-            command_once_added
-        )
-
-        return command_once_added
-
-    def _stub_completed_command_state(*_a: object, **_k: object) -> None:
-        decoy.when(mock_engine_store.get_command("command-id")).then_return(
-            command_once_completed
-        )
-
     decoy.when(
         await mock_engine_store.add_command_and_wait_for_interval(
-            request=command_request, failed_command_id=None
+            request=command_request, failed_command_id=None, wait_until_complete=True, timeout=999
         )
-    ).then_do(_stub_queued_command_state)
+    ).then_do(command_once_completed)
+
+    decoy.when(mock_engine_store.get_command("command-id")).then_return(
+        command_once_completed
+    )
 
     result = await create_run_command(
         request_body=RequestModelWithCommandCreate(data=command_request),
@@ -214,6 +209,7 @@ async def test_create_run_command_blocking_completion(
         failedCommandId=None,
     )
 
+    print(result.content.data)
     assert result.content.data == command_once_completed
     assert result.status_code == 201
 
