@@ -98,7 +98,10 @@ export function InputPrompt(): JSX.Element {
         role,
         reply,
       }
-      setChatHistory(chatHistory => [...chatHistory, { role, content: reply }])
+      setChatHistory(chatHistory => [
+        ...chatHistory,
+        { role: 'assistant', content: reply },
+      ])
       setChatData(chatData => [...chatData, assistantResponse])
       setSubmitted(false)
     }
