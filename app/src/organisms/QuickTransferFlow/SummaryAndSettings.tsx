@@ -21,6 +21,7 @@ import { useNotifyDeckConfigurationQuery } from '../../resources/deck_configurat
 import { TabbedButton } from '../../atoms/buttons'
 import { ChildNavigation } from '../ChildNavigation'
 import { Overview } from './Overview'
+import { TipManagement } from './TipManagement'
 import { SaveOrRunModal } from './SaveOrRunModal'
 import { getInitialSummaryState } from './utils'
 import { createQuickTransferFile } from './utils/createQuickTransferFile'
@@ -59,7 +60,7 @@ export function SummaryAndSettings(
   // @ts-expect-error TODO figure out how to make this type non-null as we know
   // none of these values will be undefined
   const initialSummaryState = getInitialSummaryState(wizardFlowState)
-  const [state] = React.useReducer(
+  const [state, dispatch] = React.useReducer(
     quickTransferSummaryReducer,
     initialSummaryState
   )
@@ -135,6 +136,9 @@ export function SummaryAndSettings(
           ))}
         </Flex>
         {selectedCategory === 'overview' ? <Overview state={state} /> : null}
+        {selectedCategory === 'tip_management' ? (
+          <TipManagement state={state} dispatch={dispatch} />
+        ) : null}
       </Flex>
     </Flex>
   )
