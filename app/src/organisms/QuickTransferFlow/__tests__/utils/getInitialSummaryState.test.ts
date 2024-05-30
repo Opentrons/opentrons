@@ -6,36 +6,44 @@ vi.mock('../../utils/getVolumeRange')
 
 describe('getInitialSummaryState', () => {
   const props = {
-    pipette: {
-      liquids: {
-        default: {
-          supportedTips: {
-            t50: {
-              defaultAspirateFlowRate: {
-                default: 50,
-              },
-              defaultDispenseFlowRate: {
-                default: 75,
+    state: {
+      pipette: {
+        liquids: {
+          default: {
+            supportedTips: {
+              t50: {
+                defaultAspirateFlowRate: {
+                  default: 50,
+                },
+                defaultDispenseFlowRate: {
+                  default: 75,
+                },
               },
             },
           },
         },
-      },
-    } as any,
-    mount: 'left',
-    tipRack: {
-      wells: {
-        A1: {
-          totalLiquidVolume: 50,
+      } as any,
+      mount: 'left',
+      tipRack: {
+        wells: {
+          A1: {
+            totalLiquidVolume: 50,
+          },
         },
-      },
+      } as any,
+      source: {} as any,
+      sourceWells: ['A1'],
+      destination: 'source',
+      destinationWells: ['A1'],
+      transferType: 'transfer',
+      volume: 25,
     } as any,
-    source: {} as any,
-    sourceWells: ['A1'],
-    destination: 'source',
-    destinationWells: ['A1'],
-    transferType: 'transfer',
-    volume: 25,
+    deckConfig: [
+      {
+        cutoutId: 'cutoutA3',
+        cutoutFixtureId: 'trashBinAdapter',
+      },
+    ],
   } as any
   beforeEach(() => {
     vi.mocked(getVolumeRange).mockReturnValue({ min: 5, max: 100 })
@@ -47,7 +55,7 @@ describe('getInitialSummaryState', () => {
   it('generates the summary state with correct default value for 1 to 1 transfer', () => {
     const initialSummaryState = getInitialSummaryState(props)
     expect(initialSummaryState).toEqual({
-      ...props,
+      ...props.state,
       aspirateFlowRate: 50,
       dispenseFlowRate: 75,
       path: 'single',
@@ -55,16 +63,19 @@ describe('getInitialSummaryState', () => {
       preWetTip: false,
       tipPositionDispense: 1,
       changeTip: 'always',
-      dropTipLocation: 'trashBin',
+      dropTipLocation: { type: 'trashBin', location: 'cutoutA3' },
     })
   })
   it('generates the summary state with correct default value for n to 1 transfer', () => {
     const initialSummaryState = getInitialSummaryState({
       ...props,
-      transferType: 'consolidate',
+      state: {
+        ...props.state,
+        transferType: 'consolidate',
+      },
     })
     expect(initialSummaryState).toEqual({
-      ...props,
+      ...props.state,
       transferType: 'consolidate',
       aspirateFlowRate: 50,
       dispenseFlowRate: 75,
@@ -73,17 +84,20 @@ describe('getInitialSummaryState', () => {
       preWetTip: false,
       tipPositionDispense: 1,
       changeTip: 'always',
-      dropTipLocation: 'trashBin',
+      dropTipLocation: { type: 'trashBin', location: 'cutoutA3' },
     })
   })
   it('generates the summary state with correct default value for n to 1 transfer with too high of volume for multiAspirate', () => {
     const initialSummaryState = getInitialSummaryState({
       ...props,
-      transferType: 'consolidate',
-      volume: 60,
+      state: {
+        ...props.state,
+        transferType: 'consolidate',
+        volume: 60,
+      },
     })
     expect(initialSummaryState).toEqual({
-      ...props,
+      ...props.state,
       transferType: 'consolidate',
       volume: 60,
       aspirateFlowRate: 50,
@@ -93,16 +107,19 @@ describe('getInitialSummaryState', () => {
       preWetTip: false,
       tipPositionDispense: 1,
       changeTip: 'always',
-      dropTipLocation: 'trashBin',
+      dropTipLocation: { type: 'trashBin', location: 'cutoutA3' },
     })
   })
   it('generates the summary state with correct default value for 1 to n transfer', () => {
     const initialSummaryState = getInitialSummaryState({
       ...props,
-      transferType: 'distribute',
+      state: {
+        ...props.state,
+        transferType: 'distribute',
+      },
     })
     expect(initialSummaryState).toEqual({
-      ...props,
+      ...props.state,
       transferType: 'distribute',
       aspirateFlowRate: 50,
       dispenseFlowRate: 75,
@@ -111,17 +128,20 @@ describe('getInitialSummaryState', () => {
       preWetTip: false,
       tipPositionDispense: 1,
       changeTip: 'always',
-      dropTipLocation: 'trashBin',
+      dropTipLocation: { type: 'trashBin', location: 'cutoutA3' },
     })
   })
   it('generates the summary state with correct default value for 1 to n transfer with too high of volume for multiDispense', () => {
     const initialSummaryState = getInitialSummaryState({
       ...props,
-      transferType: 'distribute',
-      volume: 60,
+      state: {
+        ...props.state,
+        transferType: 'distribute',
+        volume: 60,
+      },
     })
     expect(initialSummaryState).toEqual({
-      ...props,
+      ...props.state,
       transferType: 'distribute',
       volume: 60,
       aspirateFlowRate: 50,
@@ -131,7 +151,7 @@ describe('getInitialSummaryState', () => {
       preWetTip: false,
       tipPositionDispense: 1,
       changeTip: 'always',
-      dropTipLocation: 'trashBin',
+      dropTipLocation: { type: 'trashBin', location: 'cutoutA3' },
     })
   })
   it('generates the summary state with correct default change tip if too few tips', () => {
@@ -251,10 +271,13 @@ describe('getInitialSummaryState', () => {
     ]
     const initialSummaryState = getInitialSummaryState({
       ...props,
-      destinationWells: destWells,
+      state: {
+        ...props.state,
+        destinationWells: destWells,
+      },
     })
     expect(initialSummaryState).toEqual({
-      ...props,
+      ...props.state,
       destinationWells: destWells,
       aspirateFlowRate: 50,
       dispenseFlowRate: 75,
@@ -263,7 +286,7 @@ describe('getInitialSummaryState', () => {
       preWetTip: false,
       tipPositionDispense: 1,
       changeTip: 'once',
-      dropTipLocation: 'trashBin',
+      dropTipLocation: { type: 'trashBin', location: 'cutoutA3' },
     })
   })
 })

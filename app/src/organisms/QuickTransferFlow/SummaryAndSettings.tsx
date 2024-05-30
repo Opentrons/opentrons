@@ -59,7 +59,10 @@ export function SummaryAndSettings(
 
   // @ts-expect-error TODO figure out how to make this type non-null as we know
   // none of these values will be undefined
-  const initialSummaryState = getInitialSummaryState(wizardFlowState)
+  const initialSummaryState = getInitialSummaryState(
+    wizardFlowState,
+    deckConfig
+  )
   const [state, dispatch] = React.useReducer(
     quickTransferSummaryReducer,
     initialSummaryState
