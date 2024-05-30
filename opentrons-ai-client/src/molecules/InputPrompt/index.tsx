@@ -52,6 +52,8 @@ export function InputPrompt(): JSX.Element {
       role: 'user',
       reply: userPrompt,
     }
+    reset()
+    setPreparedPrompt('')
     setChatData(chatData => [...chatData, userInput])
 
     try {
@@ -76,7 +78,6 @@ export function InputPrompt(): JSX.Element {
       ])
       await callApi(config as AxiosRequestConfig)
       setSubmitted(true)
-      reset()
     } catch (err: any) {
       console.error(`error: ${err.message}`)
       throw err
@@ -86,9 +87,9 @@ export function InputPrompt(): JSX.Element {
   React.useEffect(() => {
     if (preparedPrompt !== '') {
       setValue('userPrompt', preparedPrompt)
-      setPreparedPrompt('')
+      // setPreparedPrompt('')
     }
-  }, [preparedPrompt, setValue])
+  }, [preparedPrompt, setPreparedPrompt, setValue])
 
   React.useEffect(() => {
     if (submitted && data != null && !isLoading) {
