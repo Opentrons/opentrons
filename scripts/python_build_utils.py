@@ -32,6 +32,7 @@ package_entries = {
     'usb-bridge': PackageEntry('usb_bridge'),
     'system-server': PackageEntry('system_server'),
     'server-utils': PackageEntry('server_utils'),
+    'performance-metrics': PackageEntry('performance_metrics'),
 }
 
 project_entries = {

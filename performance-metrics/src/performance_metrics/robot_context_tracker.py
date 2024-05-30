@@ -1,5 +1,6 @@
 """Module for tracking robot context and execution duration for different operations."""
 
+import inspect
 from pathlib import Path
 import platform
 
@@ -48,7 +49,7 @@ class RobotContextTracker(SupportsTracking):
 
     METADATA_NAME: Final[Literal["robot_context_data"]] = "robot_context_data"
 
-    def __init__(self, storage_location: Path, should_track: bool = False) -> None:
+    def __init__(self, storage_location: Path, should_track: bool) -> None:
         """Initializes the RobotContextTracker with an empty storage list."""
         self._store = MetricsStore[RawContextData](
             MetricsMetadata(
@@ -62,7 +63,7 @@ class RobotContextTracker(SupportsTracking):
         if self._should_track:
             self._store.setup()
 
-    def track(self, state: RobotContextState) -> Callable:  # type: ignore
+    async def track(self, func_to_track: Callable, state: RobotContextState, *args, **kwargs) -> Callable:  # type: ignore
         """Decorator factory for tracking the execution duration and state of robot operations.
 
         Args:
@@ -72,31 +73,35 @@ class RobotContextTracker(SupportsTracking):
             Callable: A decorator that wraps a function to track its execution duration and state.
         """
 
-        def inner_decorator(func: Callable[P, R]) -> Callable[P, R]:
-            if not self._should_track:
-                return func
 
-            @wraps(func)
-            def wrapper(*args: P.args, **kwargs: P.kwargs) -> R:
-                function_start_time = timing_function()
-                duration_start_time = perf_counter_ns()
-                try:
-                    result = func(*args, **kwargs)
-                finally:
-                    duration_end_time = perf_counter_ns()
-                    self._store.add(
-                        RawContextData(
-                            func_start=function_start_time,
-                            duration=duration_end_time - duration_start_time,
-                            state=state,
-                        )
-                    )
+        
+        if not self._should_track:
+            return func_to_track
 
-                return result
+        function_start_time = timing_function()
+        duration_start_time = perf_counter_ns()
 
-            return wrapper
+        if inspect.iscoroutinefunction(func_to_track):
+            try:
+                result = await func_to_track(*args, **kwargs)
+            finally:
+                 duration_end_time = perf_counter_ns()
+        else:
+            try:
+                result = func_to_track(*args, **kwargs)
+            finally:
+                duration_end_time = perf_counter_ns()
+        
+        self._store.add(
+            RawContextData(
+                func_start=function_start_time,
+                duration=duration_end_time - duration_start_time,
+                state=state,
+            )
+        )
+        return result
 
-        return inner_decorator
+
 
     def store(self) -> None:
         """Returns the stored context data and clears the storage list."""

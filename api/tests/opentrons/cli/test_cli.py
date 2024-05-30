@@ -39,12 +39,6 @@ def override_data_store(tmp_path: Path) -> Iterator[None]:
     context_tracker._store = old_store  # type: ignore[attr-defined]
 
 
-@pytest.fixture
-def monkeypatch_set_store_each_to_true(monkeypatch: pytest.MonkeyPatch) -> None:
-    """Override the STORE_EACH flag for the RobotContextTracker."""
-    monkeypatch.setattr("opentrons.util.performance_helpers.STORE_EACH", True)
-
-
 def verify_metrics_store_file(file_path: Path, expected_length: int) -> None:
     """Verify that the metrics store file contains the expected number of lines."""
     with open(file_path, "r") as f:

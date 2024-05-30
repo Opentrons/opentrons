@@ -1,4 +1,6 @@
 """Tests for the ProtocolAnalyzer."""
+from dataclasses import replace
+from typing import Iterator
 import pytest
 from decoy import Decoy
 from datetime import datetime
@@ -25,6 +27,50 @@ from robot_server.protocols.protocol_analyzer import ProtocolAnalyzer
 import robot_server.errors.error_mappers as em
 
 from opentrons_shared_data.errors import EnumeratedError, ErrorCodes
+
+from opentrons_shared_data.performance.dev_types import (
+    RobotContextState,
+)
+from opentrons.util.performance_helpers import _get_robot_context_tracker
+
+# Enable tracking for the RobotContextTracker
+# This must come before the import of the analyze CLI
+context_tracker = _get_robot_context_tracker()
+
+# Ignore the type error for the next line, as we're setting a private attribute for testing purposes
+context_tracker._should_track = True  # type: ignore[attr-defined]
+
+
+@pytest.fixture
+def override_data_store(tmp_path: Path) -> Iterator[None]:
+    """Override the data store metadata for the RobotContextTracker."""
+    old_store = context_tracker._store  # type: ignore[attr-defined]
+    old_metadata = old_store.metadata
+    new_metadata = replace(old_metadata, storage_dir=tmp_path)
+    context_tracker._store = old_store.__class__(metadata=new_metadata)  # type: ignore[attr-defined]
+    context_tracker._store.setup()  # type: ignore[attr-defined]
+    yield
+    context_tracker._store = old_store  # type: ignore[attr-defined]
+
+
+@pytest.fixture
+def monkeypatch_set_store_each_to_true(monkeypatch: pytest.MonkeyPatch) -> None:
+    """Override the STORE_EACH flag for the RobotContextTracker."""
+    context_tracker._store_each = True  # type: ignore[attr-defined]
+
+
+def verify_metrics_store_file(file_path: Path, expected_length: int) -> None:
+    """Verify that the metrics store file contains the expected number of lines."""
+    with open(file_path, "r") as f:
+        stored_data = f.readlines()
+        stored_data = [line.strip() for line in stored_data if line.strip()]
+        assert len(stored_data) == expected_length
+        for line in stored_data:
+            state_id, start_time, duration = line.strip().split(",")
+            assert state_id.isdigit()
+            assert state_id == str(RobotContextState.ANALYZING_PROTOCOL.state_id)
+            assert start_time.isdigit()
+            assert duration.isdigit()
 
 
 @pytest.fixture(autouse=True)
@@ -68,6 +114,7 @@ def subject(
     )
 
 
+@pytest.mark.usefixtures("override_data_store", "monkeypatch_set_store_each_to_true")
 async def test_analyze(
     decoy: Decoy,
     analysis_store: AnalysisStore,
@@ -160,11 +207,17 @@ async def test_analyze(
         )
     )
 
+    store = context_tracker._store  # type: ignore[attr-defined]
+
+    verify_metrics_store_file(store.metadata.data_file_location, 0)
+
     await subject.analyze(
         protocol_resource=protocol_resource,
         analysis_id="analysis-id",
         run_time_param_values=None,
     )
+
+    verify_metrics_store_file(store.metadata.data_file_location, 1)
 
     decoy.verify(
         await analysis_store.update(
@@ -179,6 +232,14 @@ async def test_analyze(
             liquids=[],
         ),
     )
+
+    await subject.analyze(
+        protocol_resource=protocol_resource,
+        analysis_id="analysis-id",
+        run_time_param_values=None,
+    )
+
+    verify_metrics_store_file(store.metadata.data_file_location, 2)
 
 
 async def test_analyze_updates_pending_on_error(
