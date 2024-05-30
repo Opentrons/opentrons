@@ -1,6 +1,5 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
-import { useCreateLiveCommandMutation } from '@opentrons/react-api-client'
 import { getModuleDisplayName } from '@opentrons/shared-data'
 import { SPACING, StyledText, TYPOGRAPHY } from '@opentrons/components'
 import { Slideout } from '../../atoms/Slideout'
