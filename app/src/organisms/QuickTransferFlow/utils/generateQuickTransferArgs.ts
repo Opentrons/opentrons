@@ -6,6 +6,7 @@ import {
   getLabwareDefURI,
   getWellsDepth,
   getTipTypeFromTipRackDefinition,
+  WASTE_CHUTE_FIXTURES,
 } from '@opentrons/shared-data'
 import { makeInitialRobotState } from '@opentrons/step-generation'
 import {
@@ -158,10 +159,8 @@ function getInvariantContextAndRobotState(
     quickTransferState.dropTipLocation === 'wasteChute' ||
     quickTransferState.blowOut === 'wasteChute'
   ) {
-    const wasteChuteLocation = deckConfig.find(
-      configCutout =>
-        configCutout.cutoutFixtureId.includes('WasteChute') ||
-        configCutout.cutoutFixtureId.includes('wasteChute')
+    const wasteChuteLocation = deckConfig.find(configCutout =>
+      WASTE_CHUTE_FIXTURES.includes(configCutout.cutoutFixtureId)
     )?.cutoutId
     const wasteChuteId = `${uuid()}_wasteChute`
     additionalEquipmentEntities = {

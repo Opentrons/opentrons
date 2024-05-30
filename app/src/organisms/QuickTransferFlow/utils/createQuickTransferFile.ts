@@ -109,19 +109,19 @@ export function createQuickTransferFile(
   let nonLoadCommandCreator: CommandCreatorResult | null = null
   if (stepArgs?.commandCreatorFnName === 'transfer') {
     nonLoadCommandCreator = transfer(
-      stepArgs as TransferArgs,
+      stepArgs,
       invariantContext,
       initialRobotState
     )
   } else if (stepArgs?.commandCreatorFnName === 'consolidate') {
     nonLoadCommandCreator = consolidate(
-      stepArgs as ConsolidateArgs,
+      stepArgs,
       invariantContext,
       initialRobotState
     )
   } else if (stepArgs?.commandCreatorFnName === 'distribute') {
     nonLoadCommandCreator = distribute(
-      stepArgs as DistributeArgs,
+      stepArgs,
       invariantContext,
       initialRobotState
     )
