@@ -208,7 +208,7 @@ async def create_run_command(
     command_intent = request_body.data.intent or pe_commands.CommandIntent.SETUP
     command_create = request_body.data.copy(update={"intent": command_intent})
     try:
-        command = engine_store.add_command_and_wait_for_interval(
+        command = await engine_store.add_command_and_wait_for_interval(
             request=command_create,
             failed_command_id=failedCommandId,
             wait_until_complete=waitUntilComplete,

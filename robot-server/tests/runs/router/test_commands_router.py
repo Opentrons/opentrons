@@ -114,7 +114,7 @@ async def test_create_run_command(
         return command_once_added
 
     decoy.when(
-        mock_engine_store.add_command_and_wait_for_interval(
+        await mock_engine_store.add_command_and_wait_for_interval(
             request=pe_commands.WaitForResumeCreate(
                 params=pe_commands.WaitForResumeParams(message="Hello"),
                 intent=pe_commands.CommandIntent.SETUP,
@@ -201,7 +201,7 @@ async def test_create_run_command_blocking_completion(
         )
 
     decoy.when(
-        mock_engine_store.add_command_and_wait_for_interval(
+        await mock_engine_store.add_command_and_wait_for_interval(
             request=command_request, failed_command_id=None
         )
     ).then_do(_stub_queued_command_state)

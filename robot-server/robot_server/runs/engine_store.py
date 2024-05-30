@@ -395,14 +395,14 @@ class EngineStore:
     def add_labware_definition(self, definition: LabwareDefinition) -> LabwareUri:
         return self._run_orchestrator.engine.add_labware_definition(definition)
 
-    def add_command_and_wait_for_interval(
+    async def add_command_and_wait_for_interval(
         self,
         request: CommandCreate,
         wait_until_complete: bool = False,
         timeout: Optional[int] = None,
         failed_command_id: Optional[str] = None,
     ) -> Command:
-        return self._run_orchestrator.add_command_and_wait_for_interval(
+        return await self._run_orchestrator.add_command_and_wait_for_interval(
             command=request,
             failed_command_id=failed_command_id,
             wait_until_complete=wait_until_complete,

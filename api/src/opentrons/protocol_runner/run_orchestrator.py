@@ -102,7 +102,7 @@ class RunOrchestrator:
             protocol_engine=protocol_engine,
         )
 
-    def add_command_and_wait_for_interval(self, command: CommandCreate, wait_until_complete: bool = False,
+    async def add_command_and_wait_for_interval(self, command: CommandCreate, wait_until_complete: bool = False,
                                           timeout: Optional[int] = None, failed_command_id: Optional[str] = None) -> Command:
         added_command = self._protocol_engine.add_command(request=command, failed_command_id=failed_command_id)
         if wait_until_complete:
