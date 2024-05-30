@@ -1,16 +1,17 @@
-from typing import TypeVar, Union, TypedDict
+from typing import TypeVar, Union, TypedDict, TextIO
 
 
-AllowedTypes = Union[str, int, float, bool]
+PrimitiveAllowedTypes = Union[str, int, float, bool]
+AllAllowedTypes = Union[str, int, float, bool, TextIO, None]
 
-ParamType = TypeVar("ParamType", bound=AllowedTypes)
+ParamType = TypeVar("ParamType", bound=AllAllowedTypes)
 
 
 class ParameterChoice(TypedDict):
     """A parameter choice containing the display name and value."""
 
     display_name: str
-    value: AllowedTypes
+    value: PrimitiveAllowedTypes
 
 
 class ParameterValueError(ValueError):

@@ -3,7 +3,11 @@
 from typing import List, Optional, Union, Dict
 
 from opentrons.protocols.api_support.types import APIVersion
-from opentrons.protocols.parameters import parameter_definition, validation
+from opentrons.protocols.parameters import (
+    parameter_definition,
+    csv_parameter,
+    validation,
+)
 from opentrons.protocols.parameters.types import (
     ParameterChoice,
     ParameterDefinitionError,
@@ -13,10 +17,8 @@ from opentrons.protocol_engine.types import RunTimeParameter, RunTimeParamValues
 from ._parameters import Parameters
 
 _ParameterDefinitionTypes = Union[
-    parameter_definition.ParameterDefinition[int],
-    parameter_definition.ParameterDefinition[bool],
-    parameter_definition.ParameterDefinition[float],
-    parameter_definition.ParameterDefinition[str],
+    parameter_definition.ParameterDefinition,
+    csv_parameter.CSVParameterDefinition,
 ]
 
 
@@ -172,10 +174,14 @@ class ParameterContext:
                 raise ParameterDefinitionError(
                     f"Parameter {variable_name} is not defined as a parameter for this protocol."
                 )
-            validated_value = validation.ensure_value_type(
-                override_value, parameter.parameter_type
-            )
-            parameter.value = validated_value
+            if isinstance(parameter, csv_parameter.CSVParameterDefinition):
+                # TODO set the file here and figure out how to set the UUID
+                pass
+            else:
+                validated_value = validation.ensure_value_type(
+                    override_value, parameter.parameter_type
+                )
+                parameter.value = validated_value
 
     def export_parameters_for_analysis(self) -> List[RunTimeParameter]:
         """Exports all parameters into a protocol engine models for reporting in analysis.
@@ -197,8 +203,10 @@ class ParameterContext:
         This is intended for Opentrons internal use only and is not a guaranteed API.
         """
         return Parameters(
+            # TODO maybe raise an error here if the value of a CSV param is None?
             parameters={
                 parameter.variable_name: parameter.value
                 for parameter in self._parameters.values()
+                if parameter.value is not None
             }
         )

@@ -967,7 +967,16 @@ class EnumParameter(RTPBase):
     )
 
 
-RunTimeParameter = Union[NumberParameter, EnumParameter, BooleanParameter]
+class CSVParameter(RTPBase):
+    """A CSV file parameter defined in a protocol."""
+
+    id: Optional[str] = Field(
+        ...,
+        description="The UUID identifier of the file stored on the robot. For local analysis this will be empty.",
+    )
+
+
+RunTimeParameter = Union[NumberParameter, EnumParameter, BooleanParameter, CSVParameter]
 
 RunTimeParamValuesType = Dict[
     StrictStr, Union[StrictInt, StrictFloat, StrictBool, StrictStr]

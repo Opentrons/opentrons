@@ -1,11 +1,11 @@
 """Parameter definition and associated validators."""
-
+from abc import abstractmethod, ABC
 from typing import Generic, Optional, List, Set, Union, get_args
 
 from opentrons.protocols.parameters.types import (
     ParamType,
     ParameterChoice,
-    AllowedTypes,
+    PrimitiveAllowedTypes,
     ParameterDefinitionError,
     ParameterValueError,
 )
@@ -19,7 +19,28 @@ from opentrons.protocol_engine.types import (
 )
 
 
-class ParameterDefinition(Generic[ParamType]):
+class AbstractParameterDefinition(ABC, Generic[ParamType]):
+    @property
+    @abstractmethod
+    def variable_name(self) -> str:
+        ...
+
+    @property
+    @abstractmethod
+    def value(self) -> ParamType:
+        ...
+
+    @value.setter
+    @abstractmethod
+    def value(self, new_value: ParamType) -> None:
+        ...
+
+    @abstractmethod
+    def as_protocol_engine_type(self) -> RunTimeParameter:
+        ...
+
+
+class ParameterDefinition(AbstractParameterDefinition[PrimitiveAllowedTypes]):
     """The definition for a user defined parameter."""
 
     def __init__(
@@ -27,9 +48,9 @@ class ParameterDefinition(Generic[ParamType]):
         display_name: str,
         variable_name: str,
         parameter_type: type,
-        default: ParamType,
-        minimum: Optional[ParamType] = None,
-        maximum: Optional[ParamType] = None,
+        default: PrimitiveAllowedTypes,
+        minimum: Optional[PrimitiveAllowedTypes] = None,
+        maximum: Optional[PrimitiveAllowedTypes] = None,
         choices: Optional[List[ParameterChoice]] = None,
         description: Optional[str] = None,
         unit: Optional[str] = None,
@@ -58,14 +79,14 @@ class ParameterDefinition(Generic[ParamType]):
         self._description = validation.ensure_description(description)
         self._unit = validation.ensure_unit_string_length(unit)
 
-        if parameter_type not in get_args(AllowedTypes):
+        if parameter_type not in get_args(PrimitiveAllowedTypes):
             raise ParameterDefinitionError(
                 "Parameters can only be of type int, float, str, or bool."
             )
         self._type = parameter_type
 
         self._choices: Optional[List[ParameterChoice]] = choices
-        self._allowed_values: Optional[Set[AllowedTypes]] = None
+        self._allowed_values: Optional[Set[PrimitiveAllowedTypes]] = None
 
         self._minimum: Optional[Union[int, float]] = None
         self._maximum: Optional[Union[int, float]] = None
@@ -80,16 +101,16 @@ class ParameterDefinition(Generic[ParamType]):
             self._minimum = minimum
             self._maximum = maximum
 
-        self._default: ParamType = default
-        self.value: ParamType = default
+        self._default: PrimitiveAllowedTypes = default
+        self.value: PrimitiveAllowedTypes = default
 
     @property
-    def value(self) -> ParamType:
+    def value(self) -> PrimitiveAllowedTypes:
         """The current value of the parameter."""
         return self._value
 
     @value.setter
-    def value(self, new_value: ParamType) -> None:
+    def value(self, new_value: PrimitiveAllowedTypes) -> None:
         validation.validate_type(new_value, self._type)
         if self._allowed_values is not None and new_value not in self._allowed_values:
             raise ParameterValueError(
@@ -173,7 +194,7 @@ def create_int_parameter(
     choices: Optional[List[ParameterChoice]] = None,
     description: Optional[str] = None,
     unit: Optional[str] = None,
-) -> ParameterDefinition[int]:
+) -> ParameterDefinition:
     """Creates an integer parameter."""
     return ParameterDefinition(
         parameter_type=int,
@@ -197,7 +218,7 @@ def create_float_parameter(
     choices: Optional[List[ParameterChoice]] = None,
     description: Optional[str] = None,
     unit: Optional[str] = None,
-) -> ParameterDefinition[float]:
+) -> ParameterDefinition:
     """Creates a float parameter."""
     return ParameterDefinition(
         parameter_type=float,
@@ -218,7 +239,7 @@ def create_bool_parameter(
     default: bool,
     choices: List[ParameterChoice],
     description: Optional[str] = None,
-) -> ParameterDefinition[bool]:
+) -> ParameterDefinition:
     """Creates a boolean parameter."""
     return ParameterDefinition(
         parameter_type=bool,
@@ -236,7 +257,7 @@ def create_str_parameter(
     default: str,
     choices: Optional[List[ParameterChoice]] = None,
     description: Optional[str] = None,
-) -> ParameterDefinition[str]:
+) -> ParameterDefinition:
     """Creates a string parameter."""
     return ParameterDefinition(
         parameter_type=str,
