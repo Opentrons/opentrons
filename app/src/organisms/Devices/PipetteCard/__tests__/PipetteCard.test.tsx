@@ -11,6 +11,7 @@ import { getHasCalibrationBlock } from '../../../../redux/config'
 import { useDispatchApiRequest } from '../../../../redux/robot-api'
 import { PipetteOverflowMenu } from '../PipetteOverflowMenu'
 import { PipetteCard } from '..'
+import { useDropTipWizardFlows } from '../../../DropTipWizardFlows'
 
 import {
   mockLeftSpecs,
@@ -24,6 +25,7 @@ vi.mock('../../../../redux/config')
 vi.mock('../../../../redux/robot-api')
 vi.mock('@opentrons/react-api-client')
 vi.mock('../../../../redux/pipettes')
+vi.mock('../../../DropTipWizardFlows')
 
 const render = (props: React.ComponentProps<typeof PipetteCard>) => {
   return renderWithProviders(<PipetteCard {...props} />, {
@@ -54,6 +56,10 @@ describe('PipetteCard', () => {
       dispatchApiRequest,
       ['id'],
     ])
+    vi.mocked(useDropTipWizardFlows).mockReturnValue({
+      showDTWiz: false,
+      toggleDTWiz: vi.fn(),
+    })
     when(usePipetteSettingsQuery)
       .calledWith({ refetchInterval: 5000, enabled: true })
       .thenReturn({} as any)

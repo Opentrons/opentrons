@@ -9,14 +9,15 @@ import { handlePipetteWizardFlows } from '../../../PipetteWizardFlows'
 import { AboutPipetteSlideout } from '../AboutPipetteSlideout'
 import { FlexPipetteCard } from '../FlexPipetteCard'
 import { ChoosePipette } from '../../../PipetteWizardFlows/ChoosePipette'
-import { DropTipWizard } from '../../../DropTipWizard'
+import { useDropTipWizardFlows } from '../../../DropTipWizardFlows'
 
 import type { PipetteData } from '@opentrons/api-client'
+import type { Mock } from 'vitest'
 
 vi.mock('../../../PipetteWizardFlows')
 vi.mock('../../../PipetteWizardFlows/ChoosePipette')
 vi.mock('../AboutPipetteSlideout')
-vi.mock('../../../DropTipWizard')
+vi.mock('../../../DropTipWizardFlows')
 vi.mock('@opentrons/react-api-client')
 
 const render = (props: React.ComponentProps<typeof FlexPipetteCard>) => {
@@ -25,8 +26,11 @@ const render = (props: React.ComponentProps<typeof FlexPipetteCard>) => {
   })[0]
 }
 
+let mockDTWizToggle: Mock
+
 describe('FlexPipetteCard', () => {
   let props: React.ComponentProps<typeof FlexPipetteCard>
+  mockDTWizToggle = vi.fn()
   beforeEach(() => {
     props = {
       pipetteModelSpecs: mockLeftSpecs,
@@ -57,6 +61,10 @@ describe('FlexPipetteCard', () => {
     vi.mocked(useCurrentSubsystemUpdateQuery).mockReturnValue({
       data: undefined,
     } as any)
+    vi.mocked(useDropTipWizardFlows).mockReturnValue({
+      toggleDTWiz: mockDTWizToggle,
+      showDTWiz: false,
+    })
   })
   afterEach(() => {
     vi.resetAllMocks()
@@ -216,7 +224,7 @@ describe('FlexPipetteCard', () => {
     fireEvent.click(overflowButton)
     const dropTipButton = screen.getByText('Drop tips')
     fireEvent.click(dropTipButton)
-    expect(vi.mocked(DropTipWizard)).toHaveBeenCalled()
+    expect(vi.mocked(mockDTWizToggle)).toHaveBeenCalled()
   })
   it('renders firmware update needed state if pipette is bad', () => {
     props = {
