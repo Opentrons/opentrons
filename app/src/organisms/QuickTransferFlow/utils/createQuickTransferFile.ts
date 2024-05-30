@@ -25,12 +25,7 @@ import type {
   OT3RobotMixin,
   LabwareDefinition2,
 } from '@opentrons/shared-data'
-import type {
-  ConsolidateArgs,
-  TransferArgs,
-  DistributeArgs,
-  CommandCreatorResult,
-} from '@opentrons/step-generation'
+import type { CommandCreatorResult } from '@opentrons/step-generation'
 import type { QuickTransferSummaryState } from '../types'
 
 const uuid: () => string = uuidv1
