@@ -23,11 +23,7 @@ import {
   useHost,
   useInstrumentsQuery,
 } from '@opentrons/react-api-client'
-import {
-  getPipetteModelSpecs,
-  FLEX_ROBOT_TYPE,
-  OT2_ROBOT_TYPE,
-} from '@opentrons/shared-data'
+import { FLEX_ROBOT_TYPE, OT2_ROBOT_TYPE } from '@opentrons/shared-data'
 import {
   ALIGN_CENTER,
   BORDERS,
@@ -56,7 +52,11 @@ import { getRobotSettings } from '../../../redux/robot-settings'
 import { getRobotSerialNumber } from '../../../redux/discovery'
 import { ProtocolAnalysisErrorBanner } from './ProtocolAnalysisErrorBanner'
 import { ProtocolDropTipBanner } from './ProtocolDropTipBanner'
-import { DropTipWizard } from '../../DropTipWizard'
+import {
+  DropTipWizardFlows,
+  useDropTipWizardFlows,
+  useTipAttachmentStatus,
+} from '../../DropTipWizardFlows'
 import { ProtocolAnalysisErrorModal } from './ProtocolAnalysisErrorModal'
 import { Banner } from '../../../atoms/Banner'
 import {
@@ -92,7 +92,6 @@ import {
   useModuleCalibrationStatus,
   useRobot,
 } from '../hooks'
-import { getPipettesWithTipAttached } from '../../DropTipWizardFlows/getPipettesWithTipAttached'
 import { formatTimestamp } from '../utils'
 import { RunTimer } from './RunTimer'
 import { EMPTY_TIMESTAMP } from '../constants'
@@ -106,15 +105,9 @@ import { useMostRecentRunId } from '../../ProtocolUpload/hooks/useMostRecentRunI
 import { useNotifyRunQuery } from '../../../resources/runs'
 
 import type { Run, RunError, RunStatus } from '@opentrons/api-client'
-import type { PipetteModelSpecs } from '@opentrons/shared-data'
 import type { IconName } from '@opentrons/components'
 import type { State } from '../../../redux/types'
 import type { HeaterShakerModule } from '../../../redux/modules/types'
-
-interface PipettesWithTip {
-  mount: 'left' | 'right'
-  specs?: PipetteModelSpecs | null
-}
 
 const EQUIPMENT_POLL_MS = 5000
 const CANCELLABLE_STATUSES = [
@@ -161,11 +154,7 @@ export function ProtocolRunHeader({
   const { closeCurrentRun, isClosingCurrentRun } = useCloseCurrentRun()
   const { startedAt, stoppedAt, completedAt } = useRunTimestamps(runId)
   const [showRunFailedModal, setShowRunFailedModal] = React.useState(false)
-  const [showDropTipWizard, setShowDropTipWizard] = React.useState(false)
   const [showDropTipBanner, setShowDropTipBanner] = React.useState(true)
-  const [pipettesWithTip, setPipettesWithTip] = React.useState<
-    PipettesWithTip[]
-  >([])
   const isResetRunLoadingRef = React.useRef(false)
   const { data: runRecord } = useNotifyRunQuery(runId, { staleTime: Infinity })
   const highestPriorityError =
@@ -200,42 +189,35 @@ export function ProtocolRunHeader({
     isDoorOpen = false
   }
 
+  const { showDTWiz, toggleDTWiz } = useDropTipWizardFlows()
+  const {
+    areTipsAttached,
+    determineTipStatus,
+    resetTipStatus,
+    setTipStatusResolved,
+    pipettesWithTip,
+  } = useTipAttachmentStatus({
+    runId,
+    runRecord,
+    attachedInstruments,
+    host,
+    isFlex,
+  })
+
   React.useEffect(() => {
     if (isFlex) {
-      // Reset drop tip state when a new run occurs.
       if (runStatus === RUN_STATUS_IDLE) {
         setShowDropTipBanner(true)
-        setPipettesWithTip([])
+        void resetTipStatus()
       } else if (
         runStatus != null &&
         // @ts-expect-error runStatus expected to possibly not be terminal
         RUN_STATUSES_TERMINAL.includes(runStatus)
       ) {
-        getPipettesWithTipAttached({
-          host,
-          runId,
-          runRecord,
-          attachedInstruments,
-          isFlex,
-        })
-          .then(pipettesWithTipAttached => {
-            const newPipettesWithTipAttached = pipettesWithTipAttached.map(
-              pipette => {
-                const specs = getPipetteModelSpecs(pipette.instrumentModel)
-                return {
-                  specs,
-                  mount: pipette.mount,
-                }
-              }
-            )
-            setPipettesWithTip(() => newPipettesWithTipAttached)
-          })
-          .catch(e => {
-            console.log(`Error checking pipette tip attachement state: ${e}`)
-          })
+        void determineTipStatus()
       }
     }
-  }, [runStatus, attachedInstruments, host, runId, runRecord, isFlex])
+  }, [runStatus])
 
   React.useEffect(() => {
     if (protocolData != null && !isRobotViewable) {
@@ -384,15 +366,14 @@ export function ProtocolRunHeader({
             isRunCurrent={isRunCurrent}
           />
         ) : null}
-        {mostRecentRunId === runId &&
-        showDropTipBanner &&
-        pipettesWithTip.length !== 0 ? (
+        {mostRecentRunId === runId && showDropTipBanner && areTipsAttached ? (
           <ProtocolDropTipBanner
-            onLaunchWizardClick={setShowDropTipWizard}
-            onCloseClick={() => {
-              closeCurrentRun()
-              setShowDropTipBanner(false)
-            }}
+            onLaunchWizardClick={toggleDTWiz}
+            onCloseClick={() =>
+              resetTipStatus()
+                .then(() => setShowDropTipBanner(false))
+                .then(() => closeCurrentRun())
+            }
           />
         ) : null}
         <Box display="grid" gridTemplateColumns="4fr 3fr 3fr 4fr">
@@ -465,23 +446,12 @@ export function ProtocolRunHeader({
             robotName={robotName}
           />
         ) : null}
-        {showDropTipWizard &&
-        pipettesWithTip[0]?.specs != null &&
-        mostRecentRunId === runId ? (
-          <DropTipWizard
+        {showDTWiz && mostRecentRunId === runId ? (
+          <DropTipWizardFlows
             robotType={isFlex ? FLEX_ROBOT_TYPE : OT2_ROBOT_TYPE}
             mount={pipettesWithTip[0].mount}
             instrumentModelSpecs={pipettesWithTip[0].specs}
-            closeFlow={() => {
-              setShowDropTipWizard(false)
-              setPipettesWithTip(prevPipettesWithTip => {
-                const pipettesWithTip = prevPipettesWithTip.slice(1) ?? []
-                if (pipettesWithTip.length === 0) {
-                  closeCurrentRun()
-                }
-                return pipettesWithTip
-              })
-            }}
+            closeFlow={() => setTipStatusResolved().then(() => toggleDTWiz())}
           />
         ) : null}
       </Flex>
