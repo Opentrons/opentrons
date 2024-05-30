@@ -339,9 +339,12 @@ def find_max_z_distances(
     z_speed = run_args.z_speed
     max_z_distance = starting_mount_height - well.bottom().point.z
     plunger_travel = get_plunger_travel(run_args)
-    p_travel_time = min(
-        plunger_travel / p_speed, PROBE_MAX_TIME[run_args.pipette_channels]
-    )
+    if p_speed == 0:
+        p_travel_time = PROBE_MAX_TIME[run_args.pipette_channels]
+    else:
+        p_travel_time = min(
+            plunger_travel / p_speed, PROBE_MAX_TIME[run_args.pipette_channels]
+        )
 
     z_travels: List[float] = []
     while max_z_distance > 0:
