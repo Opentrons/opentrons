@@ -19,21 +19,18 @@ async def test_storing_to_file(tmp_path: Path) -> None:
     """Tests storing the tracked data to a file."""
     robot_context_tracker = RobotContextTracker(tmp_path, should_track=True)
 
-    @robot_context_tracker.track(state=RobotContextState.STARTING_UP)
     def starting_robot() -> None:
         sleep(STARTING_TIME)
 
-    @robot_context_tracker.track(state=RobotContextState.CALIBRATING)
     def calibrating_robot() -> None:
         sleep(CALIBRATING_TIME)
 
-    @robot_context_tracker.track(state=RobotContextState.ANALYZING_PROTOCOL)
     def analyzing_protocol() -> None:
         sleep(ANALYZING_TIME)
 
-    starting_robot()
-    calibrating_robot()
-    analyzing_protocol()
+    await robot_context_tracker.track(starting_robot, state=RobotContextState.STARTING_UP)
+    await robot_context_tracker.track(calibrating_robot, state=RobotContextState.CALIBRATING)
+    await robot_context_tracker.track(analyzing_protocol, state=RobotContextState.ANALYZING_PROTOCOL)
 
     robot_context_tracker.store()
 
