@@ -48,6 +48,7 @@ def create_data_dictionary(
         if not isinstance(file_results, dict):
             continue
         run_id = file_results.get("run_id", "NaN")
+        print(run_id)
         if run_id in runs_to_save:
             robot = file_results.get("robot_name")
             protocol_name = file_results["protocol"]["metadata"].get("protocolName", "")
@@ -110,6 +111,7 @@ def create_data_dictionary(
                 tc_dict = read_robot_logs.thermocycler_commands(file_results)
                 hs_dict = read_robot_logs.hs_commands(file_results)
                 tm_dict = read_robot_logs.temperature_module_commands(file_results)
+                pipette_dict = read_robot_logs.pipette_commands(file_results)
                 notes = {"Note1": "", "Jira Link": issue_url}
                 plate_measure = {
                     "Plate Measured": plate,
@@ -123,6 +125,7 @@ def create_data_dictionary(
                     **hs_dict,
                     **tm_dict,
                     **tc_dict,
+                    **pipette_dict,
                     **plate_measure,
                 }
                 headers: List[str] = list(row_2.keys())

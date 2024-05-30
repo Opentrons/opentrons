@@ -80,6 +80,55 @@ def command_time(command: Dict[str, str]) -> Tuple[float, float]:
     return create_to_start, start_to_complete
 
 
+def pipette_commands(file_results: Dict[str, Any]) -> Dict[str, float]:
+    """Count number of pipette commands per run."""
+    pipettes = file_results.get("pipettes", "")
+    commandData = file_results.get("commands", "")
+    left_tip_pick_up = 0.0
+    left_aspirate = 0.0
+    right_tip_pick_up = 0.0
+    right_aspirate = 0.0
+    left_dispense = 0.0
+    right_dispense = 0.0
+    right_pipette_id = ""
+    left_pipette_id = ""
+    # Match pipette mount to id
+    for pipette in pipettes:
+        if pipette["mount"] == "right":
+            right_pipette_id = pipette["id"]
+        elif pipette["mount"] == "left":
+            left_pipette_id = pipette["id"]
+    for command in commandData:
+        commandType = command["commandType"]
+        # Count tip pick ups
+        if commandType == "pickUpTip":
+            if command["params"].get("pipetteId", "") == right_pipette_id:
+                right_tip_pick_up += 1
+            elif command["params"].get("pipetteId", "") == left_pipette_id:
+                left_tip_pick_up += 1
+        # Count aspirates
+        elif commandType == "aspirate":
+            if command["params"].get("pipetteId", "") == right_pipette_id:
+                left_aspirate += 1
+            elif command["params"].get("pipetteId", "") == left_pipette_id:
+                right_aspirate += 1
+        # count dispenses/blowouts
+        elif commandType == "dispense" or commandType == "blowout":
+            if command["params"].get("pipetteId", "") == right_pipette_id:
+                left_dispense += 1
+            elif command["params"].get("pipetteId", "") == left_pipette_id:
+                right_dispense += 1
+    pipette_dict = {
+        "Left Pipette Total Tip Pick Up(s)": left_tip_pick_up,
+        "Left Pipette Total Aspirates": left_aspirate,
+        "Left Pipette Total Dispenses": left_dispense,
+        "Right Pipette Total Tip Pick Up(s)": right_tip_pick_up,
+        "Right Pipette Total Aspirates": right_aspirate,
+        "Right Pipette Total Dispenses": right_dispense,
+    }
+    return pipette_dict
+
+
 def hs_commands(file_results: Dict[str, Any]) -> Dict[str, float]:
     """Gets total latch engagements, homes, rotations and total on time (sec) for heater shaker."""
     # TODO: modify for cases that have more than 1 heater shaker.
@@ -152,10 +201,11 @@ def hs_commands(file_results: Dict[str, Any]) -> Dict[str, float]:
     return hs_dict
 
 
-def temperature_module_commands(file_results: Dict[str, Any]) -> Dict[str, float]:
+def temperature_module_commands(file_results: Dict[str, Any]) -> Dict[str, Any]:
     """Get # of temp changes and total temp on time for temperature module from run log."""
     # TODO: modify for cases that have more than 1 temperature module.
     tm_temp_change = 0
+    time_to_4c = 0
     tm_temps: Dict[str, float] = dict()
     temp_time = None
     deactivate_time = None
@@ -166,9 +216,14 @@ def temperature_module_commands(file_results: Dict[str, Any]) -> Dict[str, float
             tm_temp = command["params"]["celsius"]
             tm_temp_change += 1
         if commandType == "temperatureModule/waitForTemperature":
+            temp_time_start = datetime.strptime(
+                command.get("startedAt", ""), "%Y-%m-%dT%H:%M:%S.%f%z"
+            )
             temp_time = datetime.strptime(
                 command.get("completedAt", ""), "%Y-%m-%dT%H:%M:%S.%f%z"
             )
+            if int(tm_temp) == 4:
+                time_to_4c = (temp_time - temp_time_start).total_seconds()
         if commandType == "temperatureModule/deactivate":
             deactivate_time = datetime.strptime(
                 command.get("completedAt", ""), "%Y-%m-%dT%H:%M:%S.%f%z"
@@ -187,6 +242,7 @@ def temperature_module_commands(file_results: Dict[str, Any]) -> Dict[str, float
     tm_dict = {
         "Temp Module # of Temp Changes": tm_temp_change,
         "Temp Module Temp On Time (sec)": tm_total_temp_time,
+        "Temp Mod Time to 4C (sec)": time_to_4c,
     }
     return tm_dict
 
