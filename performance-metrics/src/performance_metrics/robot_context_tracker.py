@@ -84,11 +84,15 @@ class RobotContextTracker(SupportsTracking):
         if inspect.iscoroutinefunction(func_to_track):
             try:
                 result = await func_to_track(*args, **kwargs)
+            except Exception as e:
+                result = e
             finally:
                  duration_end_time = perf_counter_ns()
         else:
             try:
                 result = func_to_track(*args, **kwargs)
+            except Exception as e:
+                result = e
             finally:
                 duration_end_time = perf_counter_ns()
         
@@ -99,7 +103,11 @@ class RobotContextTracker(SupportsTracking):
                 state=state,
             )
         )
-        return result
+
+        if isinstance(result, Exception):
+            raise result
+        else:
+            return result
 
 
 
