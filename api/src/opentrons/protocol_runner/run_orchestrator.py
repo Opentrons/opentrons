@@ -7,7 +7,7 @@ from anyio import move_on_after
 from . import protocol_runner, AnyRunner
 from ..hardware_control import HardwareControlAPI
 from ..protocol_engine import ProtocolEngine, CommandCreate, Command
-from ..protocol_engine.types import PostRunHardwareState
+from ..protocol_engine.types import PostRunHardwareState, EngineStatus
 from ..protocol_reader import JsonProtocolConfig, PythonProtocolConfig
 
 
@@ -22,6 +22,7 @@ class RunOrchestrator:
     ]
     _setup_runner: protocol_runner.LiveRunner
     _fixit_runner: protocol_runner.LiveRunner
+    _protocol_live_runner: protocol_runner.LiveRunner
     _hardware_api: HardwareControlAPI
     _protocol_engine: ProtocolEngine
 
@@ -53,15 +54,15 @@ class RunOrchestrator:
         self._setup_runner = setup_runner
         self._fixit_runner = fixit_runner
 
-    @property
-    def engine(self) -> ProtocolEngine:
-        """Get the "current" persisted ProtocolEngine."""
-        return self._protocol_engine
-
-    @property
-    def runner(self) -> AnyRunner:
-        """Get the "current" persisted ProtocolRunner."""
-        return self._protocol_runner or self._setup_runner
+    # @property
+    # def engine(self) -> ProtocolEngine:
+    #     """Get the "current" persisted ProtocolEngine."""
+    #     return self._protocol_engine
+    #
+    # @property
+    # def runner(self) -> AnyRunner:
+    #     """Get the "current" persisted ProtocolRunner."""
+    #     return self._protocol_runner or self._setup_runner
 
     @classmethod
     def build_orchestrator(
@@ -101,6 +102,93 @@ class RunOrchestrator:
             hardware_api=hardware_api,
             protocol_engine=protocol_engine,
         )
+
+    def play(self, deck_configuration: Optional[DeckConfigurationType] = None) -> None:
+        """Start or resume the run."""
+        self.run_orchestrator.engine.play(deck_configuration=deck_configuration)
+
+    async def run(self, deck_configuration: DeckConfigurationType) -> RunResult:
+        """Start or resume the run."""
+        return await self.run_orchestrator.runner.run(
+            deck_configuration=deck_configuration
+        )
+
+    def pause(self) -> None:
+        """Start or resume the run."""
+        self.run_orchestrator.runner.pause()
+
+    async def stop(self) -> None:
+        """Start or resume the run."""
+        await self.run_orchestrator.runner.stop()
+
+    def resume_from_recovery(self) -> None:
+        """Start or resume the run."""
+        self.run_orchestrator.runner.resume_from_recovery()
+
+    async def finish(self, error: Optional[Exception]) -> None:
+        """Stop the run."""
+        await self.run_orchestrator.engine.finish(error=error)
+
+    def get_state_summary(self) -> StateSummary:
+        return self.run_orchestrator.engine.state_view.get_summary()
+
+    def get_loaded_labware_definitions(self) -> List[LabwareDefinition]:
+        return (
+            self.run_orchestrator.engine.state_view.labware.get_loaded_labware_definitions()
+        )
+
+    def get_run_time_parameters(self) -> List[RunTimeParameter]:
+        """Parameter definitions defined by protocol, if any. Will always be empty before execution."""
+        return self.run_orchestrator.runner.run_time_parameters
+
+    def get_current_command(self) -> Optional[CommandPointer]:
+        """Parameter definitions defined by protocol, if any. Will always be empty before execution."""
+        return self.run_orchestrator.engine.state_view.commands.get_current()
+
+    def get_command_slice(
+        self,
+        cursor: Optional[int],
+        length: int,
+    ) -> CommandSlice:
+        """Get a slice of run commands.
+
+        Args:
+            run_id: ID of the run.
+            cursor: Requested index of first command in the returned slice.
+            length: Length of slice to return.
+
+        Raises:
+            RunNotFoundError: The given run identifier was not found in the database.
+        """
+        return self.run_orchestrator.engine.state_view.commands.get_slice(
+            cursor=cursor, length=length
+        )
+
+    def get_command_recovery_target(self) -> Optional[CommandPointer]:
+        """Get the current error recovery target."""
+        return self.run_orchestrator.engine.state_view.commands.get_recovery_target()
+
+    def get_command(self, command_id: str) -> Command:
+        """Get a run's command by ID."""
+        return self.run_orchestrator.engine.state_view.commands.get(
+            command_id=command_id
+        )
+
+    def get_status(self) -> EngineStatus:
+        """Get the current execution status of the engine."""
+        return self._protocol_engine.state_view.commands.get_status()
+
+    def get_is_run_terminal(self) -> bool:
+        return self._protocol_engine.state_view.commands.get_is_terminal()
+
+    def run_was_started(self) -> bool:
+        return self._protocol_engine.state_view.commands.has_been_played()
+
+    def add_labware_offset(self, request: LabwareOffsetCreate) -> LabwareOffset:
+        return self.run_orchestrator.engine.add_labware_offset(request)
+
+    def add_labware_definition(self, definition: LabwareDefinition) -> LabwareUri:
+        return self.run_orchestrator.engine.add_labware_definition(definition)
 
     async def add_command_and_wait_for_interval(self, command: CommandCreate, wait_until_complete: bool = False,
                                           timeout: Optional[int] = None, failed_command_id: Optional[str] = None) -> Command:
