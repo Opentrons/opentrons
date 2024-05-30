@@ -73,10 +73,6 @@ def _get_robot_context_tracker() -> SupportsTracking:
 
 def track_analysis(func: F) -> F:
     """Track the analysis of a protocol and optionally store each run."""
-    # This will probably not stick around very long but it gives me
-    # the ability to test this on a robot
-
-    # Typing a decorator that wraps a decorator with args, nope
     @functools.wraps(func)
     async def wrapper(*args, **kwargs):  # type: ignore # noqa: ANN002, ANN003, ANN201
         tracker: SupportsTracking = _get_robot_context_tracker()
