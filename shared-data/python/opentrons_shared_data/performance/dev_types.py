@@ -5,11 +5,9 @@ from pathlib import Path
 from enum import Enum
 
 
+UnderlyingFunction = typing.Callable[..., typing.Awaitable[typing.Any] | typing.Any]
+UnderlyingFunctionParameters = typing.ParamSpec("UnderlyingFunctionParameters")
 UnderlyingFunctionReturn = typing.TypeVar("UnderlyingFunctionReturn")
-UnderlyingFunctionParams = typing.ParamSpec("UnderlyingFunctionParams")
-UnderlyingFunction = typing.TypeVar(
-    "UnderlyingFunction", bound=typing.Callable[..., typing.Any]
-)
 
 
 class SupportsTracking(typing.Protocol):
@@ -23,8 +21,8 @@ class SupportsTracking(typing.Protocol):
         self,
         func_to_track: UnderlyingFunction,
         state: "RobotContextState",
-        *args: UnderlyingFunctionParams.args,
-        **kwargs: UnderlyingFunctionParams.kwargs,
+        *args: UnderlyingFunctionParameters.args,
+        **kwargs: UnderlyingFunctionParameters.kwargs,
     ) -> UnderlyingFunctionReturn:
         """Decorator to track the given state for the decorated function."""
         ...

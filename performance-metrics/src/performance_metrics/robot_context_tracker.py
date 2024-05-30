@@ -18,7 +18,7 @@ from opentrons_shared_data.performance.dev_types import (
     SupportsTracking,
     MetricsMetadata,
     UnderlyingFunction,
-    UnderlyingFunctionParams,
+    UnderlyingFunctionParameters,
     UnderlyingFunctionReturn,
 )
 
@@ -65,8 +65,8 @@ class RobotContextTracker(SupportsTracking):
     async def __call_function(
         self,
         func_to_track: UnderlyingFunction,
-        *args: UnderlyingFunctionParams.args,
-        **kwargs: UnderlyingFunctionParams.kwargs
+        *args: UnderlyingFunctionParameters.args,
+        **kwargs: UnderlyingFunctionParameters.kwargs
     ) -> UnderlyingFunctionReturn:
         """Calls the given function and returns its result."""
         if inspect.iscoroutinefunction(func_to_track):
@@ -78,8 +78,8 @@ class RobotContextTracker(SupportsTracking):
         self,
         func_to_track: UnderlyingFunction,
         state: RobotContextState,
-        *args: UnderlyingFunctionParams.args,
-        **kwargs: UnderlyingFunctionParams.kwargs
+        *args: UnderlyingFunctionParameters.args,
+        **kwargs: UnderlyingFunctionParameters.kwargs
     ) -> UnderlyingFunctionReturn:
         """Tracks the given function and its execution duration.
 
