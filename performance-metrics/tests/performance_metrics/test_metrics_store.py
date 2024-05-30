@@ -28,9 +28,15 @@ async def test_storing_to_file(tmp_path: Path) -> None:
     def analyzing_protocol() -> None:
         sleep(ANALYZING_TIME)
 
-    await robot_context_tracker.track(starting_robot, state=RobotContextState.STARTING_UP)
-    await robot_context_tracker.track(calibrating_robot, state=RobotContextState.CALIBRATING)
-    await robot_context_tracker.track(analyzing_protocol, state=RobotContextState.ANALYZING_PROTOCOL)
+    await robot_context_tracker.track(
+        starting_robot, state=RobotContextState.STARTING_UP
+    )
+    await robot_context_tracker.track(
+        calibrating_robot, state=RobotContextState.CALIBRATING
+    )
+    await robot_context_tracker.track(
+        analyzing_protocol, state=RobotContextState.ANALYZING_PROTOCOL
+    )
 
     robot_context_tracker.store()
 
