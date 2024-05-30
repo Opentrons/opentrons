@@ -45,7 +45,7 @@
   "tip_management": "Tip management",
   "tip_rack": "Tip rack",
   "trashBin": "Trash bin",
-  "trashBin_location": "Trash bin in {{location}}",
+  "trashBin_location": "Trash bin in {{slotName}}",
   "tubeRack": "Tube racks",
   "volume_per_well": "Volume per well",
   "volume_per_well_µL": "Volume per well (µL)",
@@ -53,7 +53,7 @@
   "labware": "Labware",
   "pipette_currently_attached": "Quick transfer options depend on the pipettes currently attached to your robot.",
   "wasteChute": "Waste chute",
-  "wasteChute_location": "Waste chute in {{location}}",
+  "wasteChute_location": "Waste chute in {{slotName}}",
   "wellPlate": "Well plates",
   "well_selection": "Well selection",
   "well_ratio": "Quick transfers with multiple source wells can either be one-to-one (select {{wells}} for this transfer) or consolidate (select 1 destination well)."

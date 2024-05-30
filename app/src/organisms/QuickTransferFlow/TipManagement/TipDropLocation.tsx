@@ -3,7 +3,6 @@ import { useTranslation } from 'react-i18next'
 import { createPortal } from 'react-dom'
 import {
   Flex,
-  Box,
   SPACING,
   DIRECTION_COLUMN,
   POSITION_FIXED,
@@ -23,6 +22,7 @@ import type {
   QuickTransferSummaryState,
   QuickTransferSummaryAction,
 } from '../types'
+import type { CutoutConfig } from '@opentrons/shared-data'
 
 interface TipDropLocationProps {
   onBack: () => void
@@ -35,34 +35,25 @@ export function TipDropLocation(props: TipDropLocationProps): JSX.Element {
   const { t } = useTranslation('quick_transfer')
   const deckConfig = useNotifyDeckConfigurationQuery().data ?? []
 
-  const tipDropLocationOptions = deckConfig.reduce<
-    {
-      type: 'wasteChute' | 'trashBin'
-      location: string
-    }[]
-  >((acc, configCutout) => {
-    if (WASTE_CHUTE_FIXTURES.includes(configCutout.cutoutFixtureId)) {
-      acc.push({
-        type: 'wasteChute',
-        location: FLEX_SINGLE_SLOT_BY_CUTOUT_ID[configCutout.cutoutId],
-      })
-    } else if (TRASH_BIN_ADAPTER_FIXTURE === configCutout.cutoutFixtureId) {
-      acc.push({
-        type: 'trashBin',
-        location: FLEX_SINGLE_SLOT_BY_CUTOUT_ID[configCutout.cutoutId],
-      })
-    }
-
-    return acc
-  }, [])
+  const tipDropLocationOptions = deckConfig.reduce<CutoutConfig[]>(
+    (acc, cutoutConfig) => {
+      if (WASTE_CHUTE_FIXTURES.includes(cutoutConfig.cutoutFixtureId)) {
+        acc.push(cutoutConfig)
+      } else if (TRASH_BIN_ADAPTER_FIXTURE === cutoutConfig.cutoutFixtureId) {
+        acc.push(cutoutConfig)
+      }
+      return acc
+    },
+    []
+  )
 
   const [
     selectedTipDropLocation,
     setSelectedTipDropLocation,
-  ] = React.useState<string>(state.dropTipLocation)
+  ] = React.useState<CutoutConfig>(state.dropTipLocation)
 
   const handleClickSave = (): void => {
-    if (selectedTipDropLocation !== state.dropTipLocation) {
+    if (selectedTipDropLocation.cutoutId !== state.dropTipLocation.cutoutId) {
       dispatch({
         type: 'SET_DROP_TIP_LOCATION',
         location: selectedTipDropLocation,
@@ -88,16 +79,25 @@ export function TipDropLocation(props: TipDropLocationProps): JSX.Element {
       >
         {tipDropLocationOptions.map(option => (
           <LargeButton
-            key={option.type}
+            key={option.cutoutId}
             buttonType={
-              selectedTipDropLocation === option.type ? 'primary' : 'secondary'
+              selectedTipDropLocation.cutoutId === option.cutoutId
+                ? 'primary'
+                : 'secondary'
             }
             onClick={() => {
-              setSelectedTipDropLocation(option.type)
+              setSelectedTipDropLocation(option)
             }}
-            buttonText={t(`${option.type}_location`, {
-              location: option.location,
-            })}
+            buttonText={t(
+              `${
+                option.cutoutFixtureId === TRASH_BIN_ADAPTER_FIXTURE
+                  ? 'trashBin'
+                  : 'wasteChute'
+              }_location`,
+              {
+                slotName: FLEX_SINGLE_SLOT_BY_CUTOUT_ID[option.cutoutId],
+              }
+            )}
           />
         ))}
       </Flex>

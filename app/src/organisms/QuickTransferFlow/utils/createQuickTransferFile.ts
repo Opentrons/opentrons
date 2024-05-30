@@ -5,7 +5,7 @@ import {
   distribute,
   getWasteChuteAddressableAreaNamePip,
 } from '@opentrons/step-generation'
-import { generateQuickTransferArgs } from './generateQuickTransferArgs'
+import { generateQuickTransferArgs } from './'
 import {
   FLEX_ROBOT_TYPE,
   FLEX_STANDARD_DECKID,
@@ -129,7 +129,7 @@ export function createQuickTransferFile(
 
   let finalDropTipCommands: CreateCommand[] = []
   let addressableAreaName: AddressableAreaName | null = null
-  if (quickTransferState.dropTipLocation === 'trashBin') {
+  if (quickTransferState.dropTipLocation.type === 'trashBin') {
     const trash = Object.values(
       invariantContext.additionalEquipmentEntities
     ).find(aE => aE.name === 'trashBin')
@@ -143,7 +143,7 @@ export function createQuickTransferFile(
       trashLocation != null && cutouts != null
         ? cutouts[trashLocation]?.[0] ?? null
         : null
-  } else if (quickTransferState.dropTipLocation === 'wasteChute') {
+  } else if (quickTransferState.dropTipLocation.type === 'wasteChute') {
     addressableAreaName = getWasteChuteAddressableAreaNamePip(
       pipetteEntity.spec.channels
     )

@@ -7,11 +7,7 @@ import { getVolumeRange } from './'
 
 import type { LabwareDefinition2, PipetteV2Specs } from '@opentrons/shared-data'
 import type { Mount } from '@opentrons/api-client'
-import type {
-  CutoutFixtureId,
-  CutoutId,
-  DeckConfiguration,
-} from '@opentrons/shared-data'
+import type { DeckConfiguration } from '@opentrons/shared-data'
 import type {
   QuickTransferSummaryState,
   TransferType,
@@ -69,21 +65,7 @@ export function getInitialSummaryState(
       WASTE_CHUTE_FIXTURES.includes(configCutout.cutoutFixtureId) ||
       TRASH_BIN_ADAPTER_FIXTURE === configCutout.cutoutFixtureId
   )
-  let dropTipLocation = {
-    type: 'trashBin',
-    location: 'cutoutA3' as CutoutId,
-  }
-
-  if (trashConfigCutout != null) {
-    dropTipLocation = {
-      type: WASTE_CHUTE_FIXTURES.includes(
-        trashConfigCutout.cutoutFixtureId as CutoutFixtureId
-      )
-        ? 'wasteChute'
-        : 'trashBin',
-      location: trashConfigCutout.cutoutId as CutoutId,
-    }
-  }
+  console.log(trashConfigCutout)
 
   return {
     pipette: state.pipette,
@@ -102,6 +84,7 @@ export function getInitialSummaryState(
     preWetTip: false,
     tipPositionDispense: 1,
     changeTip,
-    dropTipLocation,
+    // @ts-expect-error this will not be undefined if there is a trash in deck config
+    dropTipLocation: trashConfigCutout,
   }
 }

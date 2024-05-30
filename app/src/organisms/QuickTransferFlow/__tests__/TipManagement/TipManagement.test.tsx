@@ -24,7 +24,9 @@ describe('TipManagement', () => {
     props = {
       state: {
         changeTip: 'once',
-        dropTipLocation: 'trashBin',
+        dropTipLocation: {
+          cutoutFixtureId: 'trashBinAdapter',
+        },
       } as any,
       dispatch: vi.fn(),
     }

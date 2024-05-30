@@ -24,7 +24,7 @@ import { Overview } from './Overview'
 import { TipManagement } from './TipManagement'
 import { SaveOrRunModal } from './SaveOrRunModal'
 import { getInitialSummaryState } from './utils'
-import { createQuickTransferFile } from './utils/createQuickTransferFile'
+import { createQuickTransferFile } from './utils'
 import { quickTransferSummaryReducer } from './reducers'
 
 import type { SmallButton } from '../../atoms/buttons'
@@ -57,12 +57,12 @@ export function SummaryAndSettings(
   )
   const deckConfig = useNotifyDeckConfigurationQuery().data ?? []
 
-  // @ts-expect-error TODO figure out how to make this type non-null as we know
-  // none of these values will be undefined
-  const initialSummaryState = getInitialSummaryState(
-    wizardFlowState,
-    deckConfig
-  )
+  const initialSummaryState = getInitialSummaryState({
+    // @ts-expect-error TODO figure out how to make this type non-null as we know
+    // none of these values will be undefined
+    state: wizardFlowState,
+    deckConfig,
+  })
   const [state, dispatch] = React.useReducer(
     quickTransferSummaryReducer,
     initialSummaryState

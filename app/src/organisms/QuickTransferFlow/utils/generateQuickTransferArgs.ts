@@ -6,6 +6,7 @@ import {
   getLabwareDefURI,
   getWellsDepth,
   getTipTypeFromTipRackDefinition,
+  TRASH_BIN_ADAPTER_FIXTURE,
   WASTE_CHUTE_FIXTURES,
 } from '@opentrons/shared-data'
 import { makeInitialRobotState } from '@opentrons/step-generation'
@@ -139,21 +140,12 @@ function getInvariantContextAndRobotState(
     }
   }
   let additionalEquipmentEntities: AdditionalEquipmentEntities = {}
+  //TODO add check for blowout location here
   if (
-    quickTransferState.dropTipLocation.type === 'trashBin' ||
-    quickTransferState.blowOut === 'trashBin'
+    quickTransferState.dropTipLocation.cutoutFixtureId ===
+    TRASH_BIN_ADAPTER_FIXTURE
   ) {
-    const trashLocation = deckConfig.find(configCutout => {
-      // if drop tip location is trash bin, add the specific trash bin selected
-      if (quickTransferState.dropTipLocation.type === 'trashBin') {
-        return (
-          configCutout.cutoutFixtureId === 'trashBinAdapter' &&
-          configCutout.cutoutId === quickTransferState.dropTipLocation.location
-        )
-      } else {
-        return configCutout.cutoutFixtureId === 'trashBinAdapter'
-      }
-    })?.cutoutId
+    const trashLocation = quickTransferState.dropTipLocation.cutoutId
     const trashId = `${uuid()}_trashBin`
     additionalEquipmentEntities = {
       [trashId]: {
@@ -163,21 +155,13 @@ function getInvariantContextAndRobotState(
       },
     }
   }
+  //TODO add check for blowout location here
   if (
-    quickTransferState.dropTipLocation.type === 'wasteChute' ||
-    quickTransferState.blowOut === 'wasteChute'
+    WASTE_CHUTE_FIXTURES.includes(
+      quickTransferState.dropTipLocation.cutoutFixtureId
+    )
   ) {
-    const wasteChuteLocation = deckConfig.find(configCutout => {
-      // if drop tip location is waste chute, add the specific waste chute selected
-      if (quickTransferState.dropTipLocation.type === 'wasteChute') {
-        return (
-          WASTE_CHUTE_FIXTURES.includes(configCutout.cutoutFixtureId) &&
-          configCutout.cutoutId === quickTransferState.dropTipLocation.location
-        )
-      } else {
-        return WASTE_CHUTE_FIXTURES.includes(configCutout.cutoutFixtureId)
-      }
-    })?.cutoutId
+    const wasteChuteLocation = quickTransferState.dropTipLocation.cutoutId
     const wasteChuteId = `${uuid()}_wasteChute`
     additionalEquipmentEntities = {
       ...additionalEquipmentEntities,
@@ -258,18 +242,12 @@ export function generateQuickTransferArgs(
     blowoutLocation = wasteChuteEntity?.id
   }
 
-  let dropTipLocation = quickTransferState.dropTipLocation.type
-  if (quickTransferState.dropTipLocation.type === 'trashBin') {
-    const trashBinEntity = Object.values(
-      invariantContext.additionalEquipmentEntities
-    ).find(entity => entity.name === 'trashBin')
-    dropTipLocation = trashBinEntity?.id ?? 'trashBin'
-  } else if (quickTransferState.dropTipLocation.type === 'wasteChute') {
-    const wasteChuteEntity = Object.values(
-      invariantContext.additionalEquipmentEntities
-    ).find(entity => entity.name === 'wasteChute')
-    dropTipLocation = wasteChuteEntity?.id ?? 'wasteChute'
-  }
+  const dropTipLocationEntity = Object.values(
+    invariantContext.additionalEquipmentEntities
+  ).find(
+    entity => entity.location === quickTransferState.dropTipLocation.cutoutId
+  )
+  const dropTipLocation = dropTipLocationEntity?.id ?? ''
 
   const tipType = getTipTypeFromTipRackDefinition(quickTransferState.tipRack)
   const flowRatesForSupportedTip =

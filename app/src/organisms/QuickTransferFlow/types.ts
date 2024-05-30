@@ -1,6 +1,6 @@
 import type { Mount } from '@opentrons/api-client'
 import type {
-  CutoutId,
+  CutoutConfig,
   LabwareDefinition2,
   PipetteV2Specs,
 } from '@opentrons/shared-data'
@@ -63,7 +63,7 @@ export interface QuickTransferSummaryState {
   blowOut?: string // trashBin or wasteChute or 'SOURCE_WELL' or 'DEST_WELL'
   airGapDispense?: number
   changeTip: ChangeTipOptions
-  dropTipLocation: { type: string; location: CutoutId }
+  dropTipLocation: CutoutConfig
 }
 
 export type TransferType =
@@ -171,7 +171,7 @@ interface SetChangeTip {
 }
 interface SetDropTipLocation {
   type: typeof ACTIONS.SET_DROP_TIP_LOCATION
-  location: string
+  location: CutoutConfig
 }
 interface SelectPipetteAction {
   type: typeof ACTIONS.SELECT_PIPETTE

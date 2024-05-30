@@ -63,7 +63,10 @@ describe('getInitialSummaryState', () => {
       preWetTip: false,
       tipPositionDispense: 1,
       changeTip: 'always',
-      dropTipLocation: { type: 'trashBin', location: 'cutoutA3' },
+      dropTipLocation: {
+        cutoutId: 'cutoutA3',
+        cutoutFixtureId: 'trashBinAdapter',
+      },
     })
   })
   it('generates the summary state with correct default value for n to 1 transfer', () => {
@@ -84,7 +87,10 @@ describe('getInitialSummaryState', () => {
       preWetTip: false,
       tipPositionDispense: 1,
       changeTip: 'always',
-      dropTipLocation: { type: 'trashBin', location: 'cutoutA3' },
+      dropTipLocation: {
+        cutoutId: 'cutoutA3',
+        cutoutFixtureId: 'trashBinAdapter',
+      },
     })
   })
   it('generates the summary state with correct default value for n to 1 transfer with too high of volume for multiAspirate', () => {
@@ -107,7 +113,10 @@ describe('getInitialSummaryState', () => {
       preWetTip: false,
       tipPositionDispense: 1,
       changeTip: 'always',
-      dropTipLocation: { type: 'trashBin', location: 'cutoutA3' },
+      dropTipLocation: {
+        cutoutId: 'cutoutA3',
+        cutoutFixtureId: 'trashBinAdapter',
+      },
     })
   })
   it('generates the summary state with correct default value for 1 to n transfer', () => {
@@ -128,7 +137,10 @@ describe('getInitialSummaryState', () => {
       preWetTip: false,
       tipPositionDispense: 1,
       changeTip: 'always',
-      dropTipLocation: { type: 'trashBin', location: 'cutoutA3' },
+      dropTipLocation: {
+        cutoutId: 'cutoutA3',
+        cutoutFixtureId: 'trashBinAdapter',
+      },
     })
   })
   it('generates the summary state with correct default value for 1 to n transfer with too high of volume for multiDispense', () => {
@@ -151,7 +163,10 @@ describe('getInitialSummaryState', () => {
       preWetTip: false,
       tipPositionDispense: 1,
       changeTip: 'always',
-      dropTipLocation: { type: 'trashBin', location: 'cutoutA3' },
+      dropTipLocation: {
+        cutoutId: 'cutoutA3',
+        cutoutFixtureId: 'trashBinAdapter',
+      },
     })
   })
   it('generates the summary state with correct default change tip if too few tips', () => {
@@ -286,7 +301,10 @@ describe('getInitialSummaryState', () => {
       preWetTip: false,
       tipPositionDispense: 1,
       changeTip: 'once',
-      dropTipLocation: { type: 'trashBin', location: 'cutoutA3' },
+      dropTipLocation: {
+        cutoutId: 'cutoutA3',
+        cutoutFixtureId: 'trashBinAdapter',
+      },
     })
   })
 })

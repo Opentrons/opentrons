@@ -13,6 +13,7 @@ import {
   SIZE_2,
   ALIGN_CENTER,
 } from '@opentrons/components'
+import { TRASH_BIN_ADAPTER_FIXTURE } from '@opentrons/shared-data'
 import { ListItem } from '../../../atoms/ListItem'
 import { ChangeTip } from './ChangeTip'
 import { TipDropLocation } from './TipDropLocation'
@@ -42,7 +43,13 @@ export function TipManagement(props: TipManagementProps): JSX.Element | null {
     },
     {
       option: t('tip_drop_location'),
-      value: t(`${state.dropTipLocation}`),
+      value: t(
+        `${
+          state.dropTipLocation.cutoutFixtureId === TRASH_BIN_ADAPTER_FIXTURE
+            ? 'trashBin'
+            : 'wasteChute'
+        }`
+      ),
       onClick: () => setSelectedSetting('tip_drop_location'),
     },
   ]
