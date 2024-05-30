@@ -130,7 +130,7 @@ async def test_create_run_command(
         waitUntilComplete=False,
         engine_store=mock_engine_store,
         failedCommandId=None,
-        timeout=12
+        timeout=12,
     )
 
     assert result.content.data == command_once_added
@@ -193,9 +193,12 @@ async def test_create_run_command_blocking_completion(
 
     decoy.when(
         await mock_engine_store.add_command_and_wait_for_interval(
-            request=command_request, failed_command_id=None, wait_until_complete=True, timeout=999
+            request=command_request,
+            failed_command_id=None,
+            wait_until_complete=True,
+            timeout=999,
         )
-    ).then_do(command_once_completed)
+    ).then_return(command_once_completed)
 
     decoy.when(mock_engine_store.get_command("command-id")).then_return(
         command_once_completed

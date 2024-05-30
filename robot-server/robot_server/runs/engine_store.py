@@ -62,8 +62,8 @@ class EngineConflictError(RuntimeError):
     """
 
 
-class NoRunnerEngineError(RuntimeError):
-    """Raised if you try to get the current engine or runner while there is none."""
+class NoRunOrchestrator(RuntimeError):
+    """Raised if you try to get the current run orchestrator while there is none."""
 
 
 async def handle_estop_event(engine_store: "EngineStore", event: HardwareEvent) -> None:
@@ -82,8 +82,8 @@ async def handle_estop_event(engine_store: "EngineStore", event: HardwareEvent) 
                 return
             # todo(mm, 2024-04-17): This estop teardown sequencing belongs in the
             # runner layer.
-            engine_store._run_orchestrator.estop()
-            await engine_store._run_orchestrator.finish(error=EStopActivatedError())
+            engine_store.run_orchestrator.estop()
+            await engine_store.run_orchestrator.finish(error=EStopActivatedError())
     except Exception:
         # This is a background task kicked off by a hardware event,
         # so there's no one to propagate this exception to.
@@ -132,27 +132,18 @@ class EngineStore:
         self._default_run_orchestrator: Optional[RunOrchestrator] = None
         hardware_api.register_callback(_get_estop_listener(self))
 
-    # @property
-    # def engine(self) -> ProtocolEngine:
-    #     """Get the "current" persisted ProtocolEngine."""
-    #     if self._run_orchestrator is None:
-    #         raise NoRunnerEngineError()
-    #     return self._run_orchestrator.engine
-    #
-    # @property
-    # def runner(self) -> AnyRunner:
-    #     """Get the "current" persisted ProtocolRunner."""
-    #     if self._run_orchestrator is None:
-    #         raise NoRunnerEngineError()
-    #     return self._run_orchestrator.runner
+    @property
+    def run_orchestrator(self) -> RunOrchestrator:
+        """Get the "current" RunOrchestrator."""
+        if self._run_orchestrator is None:
+            raise NoRunOrchestrator()
+        return self._run_orchestrator
 
     @property
     def current_run_id(self) -> Optional[str]:
         """Get the run identifier associated with the current engine/runner pair."""
         return (
-            self._run_orchestrator.run_id
-            if self._run_orchestrator is not None
-            else None
+            self.run_orchestrator.run_id if self._run_orchestrator is not None else None
         )
 
     # TODO(tz, 2024-5-14): remove this once its all redirected via orchestrator
@@ -165,9 +156,8 @@ class EngineStore:
             EngineConflictError: if a run-specific engine is active.
         """
         if (
-            self._run_orchestrator is not None
-            and self._run_orchestrator.engine.state_view.commands.has_been_played()
-            and not self._run_orchestrator.engine.state_view.commands.get_is_stopped()
+            self.run_orchestrator.engine.state_view.commands.has_been_played()
+            and not self.run_orchestrator.engine.state_view.commands.get_is_stopped()
         ):
             raise EngineConflictError("An engine for a run is currently active")
 
@@ -252,11 +242,11 @@ class EngineStore:
         # concurrency hazard. If two requests simultaneously call this method,
         # they will both "succeed" (with undefined results) instead of one
         # raising EngineConflictError.
-        if isinstance(self._run_orchestrator.runner, PythonAndLegacyRunner):
+        if isinstance(self.run_orchestrator.runner, PythonAndLegacyRunner):
             assert (
                 protocol is not None
             ), "A Python protocol should have a protocol source file."
-            await self._run_orchestrator.runner.load(
+            await self.run_orchestrator.runner.load(
                 protocol.source,
                 # Conservatively assume that we're re-running a protocol that
                 # was uploaded before we added stricter validation, and that
@@ -264,18 +254,18 @@ class EngineStore:
                 python_parse_mode=PythonParseMode.ALLOW_LEGACY_METADATA_AND_REQUIREMENTS,
                 run_time_param_values=run_time_param_values,
             )
-        elif isinstance(self._run_orchestrator.runner, JsonRunner):
+        elif isinstance(self.run_orchestrator.runner, JsonRunner):
             assert (
                 protocol is not None
             ), "A JSON protocol shouZld have a protocol source file."
-            await self._run_orchestrator.runner.load(protocol.source)
+            await self.run_orchestrator.runner.load(protocol.source)
         else:
-            self._run_orchestrator.runner.prepare()
+            self.run_orchestrator.runner.prepare()
 
         for offset in labware_offsets:
-            self._run_orchestrator.engine.add_labware_offset(offset)
+            self.run_orchestrator.engine.add_labware_offset(offset)
 
-        return self._run_orchestrator.engine.state_view.get_summary()
+        return self.run_orchestrator.engine.state_view.get_summary()
 
     async def clear(self) -> RunResult:
         """Remove the persisted ProtocolEngine.
@@ -284,9 +274,9 @@ class EngineStore:
             EngineConflictError: The current runner/engine pair is not idle, so
             they cannot be cleared.
         """
-        assert self._run_orchestrator is not None
-        engine = self._run_orchestrator.engine
-        runner = self._run_orchestrator.runner
+        assert self.run_orchestrator is not None
+        engine = self.run_orchestrator.engine
+        runner = self.run_orchestrator.runner
         if engine.state_view.commands.get_is_okay_to_clear():
             await engine.finish(
                 drop_tips_after_run=False,
@@ -308,47 +298,45 @@ class EngineStore:
 
     def play(self, deck_configuration: Optional[DeckConfigurationType] = None) -> None:
         """Start or resume the run."""
-        self._run_orchestrator.engine.play(deck_configuration=deck_configuration)
+        self.run_orchestrator.engine.play(deck_configuration=deck_configuration)
 
-    async def run(
-        self, deck_configuration: Optional[DeckConfigurationType] = None
-    ) -> RunResult:
+    async def run(self, deck_configuration: DeckConfigurationType) -> RunResult:
         """Start or resume the run."""
-        return await self._run_orchestrator.runner.run(
+        return await self.run_orchestrator.runner.run(
             deck_configuration=deck_configuration
         )
 
     def pause(self) -> None:
         """Start or resume the run."""
-        self._run_orchestrator.runner.pause()
+        self.run_orchestrator.runner.pause()
 
     async def stop(self) -> None:
         """Start or resume the run."""
-        self._run_orchestrator.runner.stop()
+        await self.run_orchestrator.runner.stop()
 
     def resume_from_recovery(self) -> None:
         """Start or resume the run."""
-        self._run_orchestrator.runner.resume_from_recovery()
+        self.run_orchestrator.runner.resume_from_recovery()
 
     async def finish(self, error: Optional[Exception]) -> None:
         """Stop the run."""
-        self._run_orchestrator.engine.finish(error=error)
+        await self.run_orchestrator.engine.finish(error=error)
 
     def get_state_summary(self) -> StateSummary:
-        return self._run_orchestrator.engine.state_view.get_summary()
+        return self.run_orchestrator.engine.state_view.get_summary()
 
     def get_loaded_labware_definitions(self) -> List[LabwareDefinition]:
         return (
-            self._run_orchestrator.engine.state_view.labware.get_loaded_labware_definitions()
+            self.run_orchestrator.engine.state_view.labware.get_loaded_labware_definitions()
         )
 
     def get_run_time_parameters(self) -> List[RunTimeParameter]:
         """Parameter definitions defined by protocol, if any. Will always be empty before execution."""
-        return self._run_orchestrator.runner.run_time_parameters
+        return self.run_orchestrator.runner.run_time_parameters
 
     def get_current_command(self) -> Optional[CommandPointer]:
         """Parameter definitions defined by protocol, if any. Will always be empty before execution."""
-        return self._run_orchestrator.engine.state_view.commands.get_current()
+        return self.run_orchestrator.engine.state_view.commands.get_current()
 
     def get_command_slice(
         self,
@@ -365,35 +353,35 @@ class EngineStore:
         Raises:
             RunNotFoundError: The given run identifier was not found in the database.
         """
-        return self._run_orchestrator.engine.state_view.commands.get_slice(
+        return self.run_orchestrator.engine.state_view.commands.get_slice(
             cursor=cursor, length=length
         )
 
     def get_command_recovery_target(self) -> Optional[CommandPointer]:
         """Get the current error recovery target."""
-        return self._run_orchestrator.engine.state_view.commands.get_recovery_target()
+        return self.run_orchestrator.engine.state_view.commands.get_recovery_target()
 
     def get_command(self, command_id: str) -> Command:
         """Get a run's command by ID."""
-        return self._run_orchestrator.engine.state_view.commands.get(
+        return self.run_orchestrator.engine.state_view.commands.get(
             command_id=command_id
         )
 
     def get_status(self) -> EngineStatus:
         """Get the current execution status of the engine."""
-        return self._run_orchestrator.engine.state_view.commands.get_status()
+        return self.run_orchestrator.engine.state_view.commands.get_status()
 
     def get_is_run_terminal(self) -> bool:
-        return self._run_orchestrator.engine.state_view.commands.get_is_terminal()
+        return self.run_orchestrator.engine.state_view.commands.get_is_terminal()
 
     def run_was_started(self) -> bool:
-        return self._run_orchestrator.runner.was_started()
+        return self.run_orchestrator.runner.was_started()
 
     def add_labware_offset(self, request: LabwareOffsetCreate) -> LabwareOffset:
-        return self._run_orchestrator.engine.add_labware_offset(request)
+        return self.run_orchestrator.engine.add_labware_offset(request)
 
     def add_labware_definition(self, definition: LabwareDefinition) -> LabwareUri:
-        return self._run_orchestrator.engine.add_labware_definition(definition)
+        return self.run_orchestrator.engine.add_labware_definition(definition)
 
     async def add_command_and_wait_for_interval(
         self,
@@ -402,7 +390,7 @@ class EngineStore:
         timeout: Optional[int] = None,
         failed_command_id: Optional[str] = None,
     ) -> Command:
-        return await self._run_orchestrator.add_command_and_wait_for_interval(
+        return await self.run_orchestrator.add_command_and_wait_for_interval(
             command=request,
             failed_command_id=failed_command_id,
             wait_until_complete=wait_until_complete,
