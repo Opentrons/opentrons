@@ -155,7 +155,7 @@ interface SetTouchTipDispense {
 }
 interface SetBlowOut {
   type: typeof ACTIONS.SET_BLOW_OUT
-  location?: string
+  location?: 'source_well' | 'dest_well' | 'trashBin' | 'wasteChute'
 }
 interface SetAirGapDispense {
   type: typeof ACTIONS.SET_AIR_GAP_DISPENSE

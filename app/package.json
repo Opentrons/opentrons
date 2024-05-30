@@ -26,6 +26,7 @@
     "@opentrons/components": "link:../components",
     "@opentrons/react-api-client": "link:../react-api-client",
     "@opentrons/shared-data": "link:../shared-data",
+    "@opentrons/step-generation": "link:../step-generation",
     "@thi.ng/paths": "1.6.5",
     "@types/uuid": "^3.4.7",
     "classnames": "2.2.5",

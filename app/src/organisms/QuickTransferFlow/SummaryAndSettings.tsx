@@ -1,5 +1,7 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
+import { useHistory } from 'react-router-dom'
+import { useQueryClient } from 'react-query'
 import {
   Flex,
   SPACING,
@@ -9,18 +11,25 @@ import {
   POSITION_FIXED,
   ALIGN_CENTER,
 } from '@opentrons/components'
+import {
+  useCreateProtocolMutation,
+  useCreateRunMutation,
+  useHost,
+} from '@opentrons/react-api-client'
+import { useNotifyDeckConfigurationQuery } from '../../resources/deck_configuration'
 
 import { TabbedButton } from '../../atoms/buttons'
 import { ChildNavigation } from '../ChildNavigation'
 import { Overview } from './Overview'
+import { SaveOrRunModal } from './SaveOrRunModal'
 import { getInitialSummaryState } from './utils'
+import { createQuickTransferFile } from './utils/createQuickTransferFile'
 import { quickTransferSummaryReducer } from './reducers'
 
 import type { SmallButton } from '../../atoms/buttons'
 import type { QuickTransferWizardState } from './types'
 
 interface SummaryAndSettingsProps {
-  onNext: () => void
   exitButtonProps: React.ComponentProps<typeof SmallButton>
   state: QuickTransferWizardState
 }
@@ -28,8 +37,15 @@ interface SummaryAndSettingsProps {
 export function SummaryAndSettings(
   props: SummaryAndSettingsProps
 ): JSX.Element | null {
-  const { onNext, exitButtonProps, state: wizardFlowState } = props
+  const { exitButtonProps, state: wizardFlowState } = props
+  const history = useHistory()
+  const queryClient = useQueryClient()
+  const host = useHost()
   const { t } = useTranslation(['quick_transfer', 'shared'])
+  const [showSaveOrRunModal, setShowSaveOrRunModal] = React.useState<boolean>(
+    false
+  )
+
   const displayCategory: string[] = [
     'overview',
     'advanced_settings',
@@ -38,6 +54,8 @@ export function SummaryAndSettings(
   const [selectedCategory, setSelectedCategory] = React.useState<string>(
     'overview'
   )
+  const deckConfig = useNotifyDeckConfigurationQuery().data ?? []
+
   // @ts-expect-error TODO figure out how to make this type non-null as we know
   // none of these values will be undefined
   const initialSummaryState = getInitialSummaryState(wizardFlowState)
@@ -45,13 +63,47 @@ export function SummaryAndSettings(
     quickTransferSummaryReducer,
     initialSummaryState
   )
+  // TODO: adjust this mutation to add the quick transfer query parameter
+  const { mutateAsync: createProtocolAsync } = useCreateProtocolMutation()
 
-  return (
+  const { createRun } = useCreateRunMutation(
+    {
+      onSuccess: data => {
+        queryClient
+          .invalidateQueries([host, 'runs'])
+          .catch((e: Error) =>
+            console.error(`error invalidating runs query: ${e.message}`)
+          )
+        history.push(`/runs/${data.data.id}/setup`)
+      },
+    },
+    host
+  )
+
+  const handleClickSave = (): void => {
+    const protocolFile = createQuickTransferFile(state, deckConfig)
+    createProtocolAsync({ files: [protocolFile] }).then(data => {
+      history.push(`protocols/${data.data.id}`)
+    })
+  }
+
+  const handleClickRun = (): void => {
+    const protocolFile = createQuickTransferFile(state, deckConfig)
+    createProtocolAsync({ files: [protocolFile] }).then(data => {
+      createRun({
+        protocolId: data.data.id,
+      })
+    })
+  }
+
+  return showSaveOrRunModal ? (
+    <SaveOrRunModal onSave={handleClickSave} onRun={handleClickRun} />
+  ) : (
     <Flex>
       <ChildNavigation
         header={t('quick_transfer_volume', { volume: wizardFlowState.volume })}
         buttonText={t('create_transfer')}
-        onClickButton={onNext}
+        onClickButton={() => setShowSaveOrRunModal(true)}
         secondaryButtonProps={exitButtonProps}
       />
       <Flex

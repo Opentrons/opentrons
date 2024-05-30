@@ -65,14 +65,7 @@ export const QuickTransferFlow = (): JSX.Element => {
     <SelectDestLabware key={5} {...sharedMiddleStepProps} />,
     <SelectDestWells key={6} {...sharedMiddleStepProps} />,
     <VolumeEntry key={7} {...sharedMiddleStepProps} />,
-    <SummaryAndSettings
-      key={8}
-      {...sharedMiddleStepProps}
-      onNext={() => {
-        console.log('final quick transfer flow state:', state)
-        history.push('protocols')
-      }}
-    />,
+    <SummaryAndSettings key={8} {...sharedMiddleStepProps} />,
   ]
 
   return (
