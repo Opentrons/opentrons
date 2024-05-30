@@ -201,7 +201,9 @@ async def test_create_run_command_blocking_completion(
         )
 
     decoy.when(
-        mock_engine_store.add_command_and_wait_for_interval(command_request, None)
+        mock_engine_store.add_command_and_wait_for_interval(
+            request=command_request, failed_command_id=None
+        )
     ).then_do(_stub_queued_command_state)
 
     result = await create_run_command(
@@ -227,7 +229,9 @@ async def test_add_conflicting_setup_command(
     )
 
     decoy.when(
-        mock_engine_store.add_command_and_wait_for_interval(command_request, None)
+        mock_engine_store.add_command_and_wait_for_interval(
+            request=command_request, failed_command_id=None
+        )
     ).then_raise(pe_errors.SetupCommandNotAllowedError("oh no"))
 
     with pytest.raises(ApiError) as exc_info:
@@ -256,7 +260,9 @@ async def test_add_command_to_stopped_engine(
     )
 
     decoy.when(
-        mock_engine_store.add_command_and_wait_for_interval(command_request, None)
+        mock_engine_store.add_command_and_wait_for_interval(
+            request=command_request, failed_command_id=None
+        )
     ).then_raise(pe_errors.RunStoppedError("oh no"))
 
     with pytest.raises(ApiError) as exc_info:

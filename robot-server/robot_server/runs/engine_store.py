@@ -314,7 +314,9 @@ class EngineStore:
         self, deck_configuration: Optional[DeckConfigurationType] = None
     ) -> RunResult:
         """Start or resume the run."""
-        return self._run_orchestrator.runner.run(deck_configuration=deck_configuration)
+        return await self._run_orchestrator.runner.run(
+            deck_configuration=deck_configuration
+        )
 
     def pause(self) -> None:
         """Start or resume the run."""
