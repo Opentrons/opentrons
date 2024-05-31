@@ -86,5 +86,5 @@ export interface RunCommandError {
   id: string
   isDefined: boolean
   errorInfo?: Record<string, unknown>
-  wrappedErrors?: Array<Record<string, unknown>>
+  wrappedErrors?: RunCommandError[]
 }
