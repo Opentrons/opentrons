@@ -1,7 +1,7 @@
 import React from 'react'
 import { useTranslation } from 'react-i18next'
 import styled, { css } from 'styled-components'
-import { useForm } from 'react-hook-form'
+import { useFormContext } from 'react-hook-form'
 import { useAtom } from 'jotai'
 
 import {
@@ -15,7 +15,7 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { SendButton } from '../../atoms/SendButton'
-import { preparedPromptAtom, chatDataAtom } from '../../resources/atoms'
+import { chatDataAtom } from '../../resources/atoms'
 import { useApiCall, useGetAccessToken } from '../../resources/hooks'
 import { calcTextAreaHeight } from '../../resources/utils/utils'
 import { END_POINT } from '../../resources/constants'
@@ -23,18 +23,9 @@ import { END_POINT } from '../../resources/constants'
 import type { AxiosRequestConfig } from 'axios'
 import type { ChatData } from '../../resources/types'
 
-interface InputType {
-  userPrompt: string
-}
-
 export function InputPrompt(): JSX.Element {
   const { t } = useTranslation('protocol_generator')
-  const { register, watch, setValue, reset } = useForm<InputType>({
-    defaultValues: {
-      userPrompt: '',
-    },
-  })
-  const [preparedPrompt] = useAtom(preparedPromptAtom)
+  const { register, watch, reset } = useFormContext()
   const [, setChatData] = useAtom(chatDataAtom)
   const [submitted, setSubmitted] = React.useState<boolean>(false)
   const userPrompt = watch('userPrompt') ?? ''
@@ -46,6 +37,7 @@ export function InputPrompt(): JSX.Element {
       role: 'user',
       reply: userPrompt,
     }
+    reset()
     setChatData(chatData => [...chatData, userInput])
 
     try {
@@ -68,16 +60,11 @@ export function InputPrompt(): JSX.Element {
       }
       await callApi(config as AxiosRequestConfig)
       setSubmitted(true)
-      reset()
     } catch (err: any) {
       console.error(`error: ${err.message}`)
       throw err
     }
   }
-
-  React.useEffect(() => {
-    if (preparedPrompt !== '') setValue('userPrompt', preparedPrompt as string)
-  }, [preparedPrompt, setValue])
 
   React.useEffect(() => {
     if (submitted && data != null && !isLoading) {
