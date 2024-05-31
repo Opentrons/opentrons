@@ -7,6 +7,7 @@ import type {
   QuickTransferSummaryState,
   TransferType,
   PathOption,
+  ChangeTipOptions,
 } from '../types'
 
 // sets up the initial summary state with defaults based on selections made
@@ -33,12 +34,17 @@ export function getInitialSummaryState(props: {
     props.transferType === 'consolidate' &&
     volumeLimits.max >= props.volume * 2
   ) {
-    path = 'multiAspirate'
+    path = 'multiDispense'
   } else if (
     props.transferType === 'distribute' &&
     volumeLimits.max >= props.volume * 2
   ) {
-    path = 'multiDispense'
+    path = 'multiAspirate'
+  }
+
+  let changeTip: ChangeTipOptions = 'always'
+  if (props.sourceWells.length > 96 || props.destinationWells.length > 96) {
+    changeTip = 'once'
   }
 
   return {
@@ -57,8 +63,8 @@ export function getInitialSummaryState(props: {
     tipPositionAspirate: 1,
     preWetTip: false,
     tipPositionDispense: 1,
-    // TODO add default logic for change tip depending on path, transfer type, number of tips
-    changeTip: 'once',
+    // TODO expand default logic for change tip depending on path, transfer type, number of tips
+    changeTip,
     // TODO add default logic for drop tip location depending on deck config
     dropTipLocation: 'trashBin',
   }
