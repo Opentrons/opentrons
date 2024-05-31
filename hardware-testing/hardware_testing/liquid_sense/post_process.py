@@ -168,7 +168,7 @@ def process_csv_directory(  # noqa: C901
                         [x] for x in pressure_header_row
                     ]
                     google_sheet.batch_update_cells(
-                        sheet_name, pressure_header_for_google_sheet, "H", 10, sheet_id
+                        pressure_header_for_google_sheet, "H", 10, sheet_id
                     )
                 except gspread.exceptions.APIError:
                     ui.print_error("Header did not write on google sheet.")

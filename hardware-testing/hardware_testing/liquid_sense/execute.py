@@ -28,7 +28,7 @@ from opentrons.protocol_api import ProtocolContext, Well, Labware
 
 from opentrons_shared_data.errors.exceptions import LiquidNotFoundError
 
-from . import google_sheets_tool
+from abr_testing.automation import google_sheets_tool
 
 
 PROBE_MAX_TIME: Dict[int, float] = {

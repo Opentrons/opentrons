@@ -4,7 +4,7 @@ import gspread
 import statistics
 from typing import List, Union, Optional
 
-from . import google_sheets_tool
+from abr_testing.automation import google_sheets_tool
 
 from hardware_testing.data import ui
 
@@ -238,7 +238,7 @@ def store_trial(
                 ["Adjusted Height"],
                 ["Normalized Height"],
             ]
-            google_sheet.batch_update_cells(sheet_name, gs_header, "A", 10, sheet_id)
+            google_sheet.batch_update_cells(gs_header, "A", 10, sheet_id)
         try:
             trial_for_google_sheet: List[List[str]] = [
                 [f"{trial + 1}"],
@@ -248,7 +248,7 @@ def store_trial(
                 [f"{height + tip_length_offset}"],
             ]
             google_sheet.batch_update_cells(
-                sheet_name, trial_for_google_sheet, "A", 11 + int(trial), sheet_id
+                trial_for_google_sheet, "A", 11 + int(trial), sheet_id
             )
         except gspread.exceptions.APIError:
             ui.print_error(f"did not log trial {trial+1} to google sheet.")

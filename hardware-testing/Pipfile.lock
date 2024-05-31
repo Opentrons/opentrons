@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "29fd7580a2384b6f20317de4c4869f27ede50315e7d87d75346bfbabd0ef683c"
+            "sha256": "1e609e94df92fa225c1352401ecd3c21e2c7ec319754ae3f209155553712704f"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -16,6 +16,10 @@
         ]
     },
     "default": {
+        "abr-testing": {
+            "editable": true,
+            "path": "./../abr-testing"
+        },
         "aionotify": {
             "hashes": [
                 "sha256:385e1becfaac2d9f4326673033d53912ef9565b6febdedbec593ee966df392c6",
@@ -749,7 +753,7 @@
                 "sha256:939de3e7a6161af0c887ef91b7d41a53e7c5a1ca976325f429cb46ea9bc30ecc",
                 "sha256:de526c12914f0c550d15924c62d72abc48d6fe7364aa87328337a31007fe8a4f"
             ],
-            "markers": "python_version >= '3.7'",
+            "markers": "python_version < '3.11'",
             "version": "==2.0.1"
         },
         "types-requests": {

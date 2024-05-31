@@ -39,7 +39,7 @@ from hardware_testing.protocols.liquid_sense_lpc import (
     liquid_sense_ot3_p1000_single_vial,
 )
 
-from . import google_sheets_tool
+from abr_testing.automation import google_sheets_tool
 
 
 CREDENTIALS_PATH = "/var/lib/jupyter/notebooks/abr.json"
