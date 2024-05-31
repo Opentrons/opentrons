@@ -147,7 +147,7 @@ export function RunSummary(): JSX.Element {
     history.push('/')
   }
 
-  // TODO(jh, 05-30-24): Refactor reset() so we can redirect to the setup page, showing the shimmer skeleton instead.
+  // TODO(jh, 05-30-24): EXEC-487. Refactor reset() so we can redirect to the setup page, showing the shimmer skeleton instead.
   const runAgain = (): void => {
     setShowRunAgainSpinner(true)
     reset()
