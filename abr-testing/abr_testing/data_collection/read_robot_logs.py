@@ -216,10 +216,16 @@ def temperature_module_commands(file_results: Dict[str, Any]) -> Dict[str, Any]:
     for command in commandData:
         commandType = command["commandType"]
         if commandType == "temperatureModule/setTargetTemperature":
+            temp_time = datetime.strptime(
+                command.get("completedAt", ""), "%Y-%m-%dT%H:%M:%S.%f%z"
+            )
             tm_temp = command["params"]["celsius"]
             tm_temp_change += 1
         if commandType == "temperatureModule/waitForTemperature" and int(tm_temp) == 4:
             time_to_4c = command_time(command)
+            temp_time = datetime.strptime(
+                command.get("completedAt", ""), "%Y-%m-%dT%H:%M:%S.%f%z"
+            )
         if commandType == "temperatureModule/deactivate":
             deactivate_time = datetime.strptime(
                 command.get("completedAt", ""), "%Y-%m-%dT%H:%M:%S.%f%z"
