@@ -105,7 +105,7 @@ async def create_command(
             Else, return immediately. Comes from a query parameter in the URL.
         timeout: The maximum time, in seconds, to wait before returning.
             Comes from a query parameter in the URL.
-        engine: The `ProtocolEngine` on which the command will be enqueued.
+        orchestrator: The `RunOrchestrator` handling engine for command to be enqueued.
     """
     command_create = request_body.data.copy(update={"intent": CommandIntent.SETUP})
     command = await orchestrator.add_command_and_wait_for_interval(

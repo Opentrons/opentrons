@@ -158,9 +158,9 @@ class RunOrchestrator:
         return self._protocol_engine.state_view.commands.get_current()
 
     def get_command_slice(
-        self,
-        cursor: Optional[int],
-        length: int,
+            self,
+            cursor: Optional[int],
+            length: int,
     ) -> CommandSlice:
         """Get a slice of run commands.
 
@@ -186,7 +186,7 @@ class RunOrchestrator:
             command_id=command_id
         )
 
-    def get_status(self) -> EngineStatus:
+    def get_run_status(self) -> EngineStatus:
         """Get the current execution status of the engine."""
         return self._protocol_engine.state_view.commands.get_status()
 
@@ -206,7 +206,8 @@ class RunOrchestrator:
         return self.run_orchestrator.engine.add_labware_definition(definition)
 
     async def add_command_and_wait_for_interval(self, command: CommandCreate, wait_until_complete: bool = False,
-                                          timeout: Optional[int] = None, failed_command_id: Optional[str] = None) -> Command:
+                                                timeout: Optional[int] = None,
+                                                failed_command_id: Optional[str] = None) -> Command:
         added_command = self._protocol_engine.add_command(request=command, failed_command_id=failed_command_id)
         if wait_until_complete:
             timeout_sec = None if timeout is None else timeout / 1000.0
@@ -217,5 +218,8 @@ class RunOrchestrator:
     def estop(self) -> None:
         return self._protocol_engine.estop()
 
-    def use_attached_modules(self, modules_by_id: Dict[str, HardwareModuleAPI]) -> None:
-        self._protocol_engine.use_attached_modules(modules_by_id=modules_by_id)
+    async def use_attached_modules(self, modules_by_id: Dict[str, HardwareModuleAPI]) -> None:
+        await self._protocol_engine.use_attached_modules(modules_by_id=modules_by_id)
+
+    def get_protocol_runner(self) -> None:
+        raise NotImplementedError()

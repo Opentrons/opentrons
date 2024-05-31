@@ -238,17 +238,16 @@ class EngineStore:
             drop_tips_after_run=drop_tips_after_run,
         )
 
+        runner = self.run_orchestrator.get_protocol_runner()
         # FIXME(mm, 2022-12-21): These `await runner.load()`s introduce a
         # concurrency hazard. If two requests simultaneously call this method,
         # they will both "succeed" (with undefined results) instead of one
         # raising EngineConflictError.
-        if isinstance(
-            self.run_orchestrator.get_protocol_runner(), PythonAndLegacyRunner
-        ):
+        if isinstance(runner, PythonAndLegacyRunner):
             assert (
                 protocol is not None
             ), "A Python protocol should have a protocol source file."
-            await self.run_orchestrator.runner.load(
+            await self.run_orchestrator.load(
                 protocol.source,
                 # Conservatively assume that we're re-running a protocol that
                 # was uploaded before we added stricter validation, and that
@@ -256,18 +255,18 @@ class EngineStore:
                 python_parse_mode=PythonParseMode.ALLOW_LEGACY_METADATA_AND_REQUIREMENTS,
                 run_time_param_values=run_time_param_values,
             )
-        elif isinstance(self.run_orchestrator.runner, JsonRunner):
+        elif isinstance(runner, JsonRunner):
             assert (
                 protocol is not None
             ), "A JSON protocol shouZld have a protocol source file."
-            await self.run_orchestrator.runner.load(protocol.source)
+            await self.run_orchestrator.load(protocol.source)
         else:
-            self.run_orchestrator.runner.prepare()
+            self.run_orchestrator.prepare()
 
         for offset in labware_offsets:
-            self.run_orchestrator.engine.add_labware_offset(offset)
+            self.run_orchestrator.add_labware_offset(offset)
 
-        return self.run_orchestrator.engine.state_view.get_summary()
+        return self.run_orchestrator.get_state_summary()
 
     async def clear(self) -> RunResult:
         """Remove the persisted ProtocolEngine.
@@ -276,11 +275,8 @@ class EngineStore:
             EngineConflictError: The current runner/engine pair is not idle, so
             they cannot be cleared.
         """
-        assert self.run_orchestrator is not None
-        engine = self.run_orchestrator.engine
-        runner = self.run_orchestrator.runner
-        if engine.state_view.commands.get_is_okay_to_clear():
-            await engine.finish(
+        if self.run_orchestrator.get_is_okay_to_clear():
+            await self.run_orchestrator.finish(
                 drop_tips_after_run=False,
                 set_run_status=False,
                 post_run_hardware_state=PostRunHardwareState.STAY_ENGAGED_IN_PLACE,
@@ -288,9 +284,9 @@ class EngineStore:
         else:
             raise EngineConflictError("Current run is not idle or stopped.")
 
-        run_data = engine.state_view.get_summary()
-        commands = engine.state_view.commands.get_all()
-        run_time_parameters = runner.run_time_parameters if runner else []
+        run_data = self.run_orchestrator.get_state_summary()
+        commands = self.run_orchestrator.get_all_commands()
+        run_time_parameters = self.run_orchestrator.get_run_time_parameters()
 
         self._run_orchestrator = None
 
@@ -323,7 +319,7 @@ class EngineStore:
         await self.run_orchestrator.finish(error=error)
 
     def get_state_summary(self) -> StateSummary:
-        return self.run_orchestrator.get_summary()
+        return self.run_orchestrator.get_state_summary()
 
     def get_loaded_labware_definitions(self) -> List[LabwareDefinition]:
         return self.run_orchestrator.get_loaded_labware_definitions()
@@ -369,7 +365,7 @@ class EngineStore:
         return self.run_orchestrator.get_is_run_terminal()
 
     def run_was_started(self) -> bool:
-        return self.run_orchestrator.was_run_started()
+        return self.run_orchestrator.run_has_started()
 
     def add_labware_offset(self, request: LabwareOffsetCreate) -> LabwareOffset:
         return self.run_orchestrator.add_labware_offset(request)

@@ -233,10 +233,10 @@ async def test_clear_idle_engine(subject: EngineStore) -> None:
         subject._run_orchestrator.runner
 
 
-async def test_get_default_engine_idempotent(subject: EngineStore) -> None:
+async def test_get_default_orchestrator_idempotent(subject: EngineStore) -> None:
     """It should create and retrieve the same default ProtocolEngine."""
-    result = await subject.get_default_engine()
-    repeated_result = await subject.get_default_engine()
+    result = await subject.get_default_orchestrator()
+    repeated_result = await subject.get_default_orchestrator()
 
     assert isinstance(result, ProtocolEngine)
     assert repeated_result is result
@@ -244,7 +244,7 @@ async def test_get_default_engine_idempotent(subject: EngineStore) -> None:
 
 @pytest.mark.parametrize("robot_type", ["OT-2 Standard", "OT-3 Standard"])
 @pytest.mark.parametrize("deck_type", pe_types.DeckType)
-async def test_get_default_engine_robot_type(
+async def test_get_default_orchestrator_robot_type(
     decoy: Decoy, robot_type: RobotType, deck_type: pe_types.DeckType
 ) -> None:
     """It should create default ProtocolEngines with the given robot and deck type."""
@@ -257,12 +257,12 @@ async def test_get_default_engine_robot_type(
         deck_type=deck_type,
     )
 
-    result = await subject.get_default_engine()
+    result = await subject.get_default_orchestrator()
 
     assert result.state_view.config.robot_type == robot_type
 
 
-async def test_get_default_engine_current_unstarted(subject: EngineStore) -> None:
+async def test_get_default_orchestrator_current_unstarted(subject: EngineStore) -> None:
     """It should allow a default engine if another engine current but unstarted."""
     await subject.create(
         run_id="run-id",
@@ -272,11 +272,11 @@ async def test_get_default_engine_current_unstarted(subject: EngineStore) -> Non
         notify_publishers=mock_notify_publishers,
     )
 
-    result = await subject.get_default_engine()
+    result = await subject.get_default_orchestrator()
     assert isinstance(result, ProtocolEngine)
 
 
-async def test_get_default_engine_conflict(subject: EngineStore) -> None:
+async def test_get_default_orchestrator_conflict(subject: EngineStore) -> None:
     """It should not allow a default engine if another engine is executing commands."""
     await subject.create(
         run_id="run-id",
@@ -288,10 +288,10 @@ async def test_get_default_engine_conflict(subject: EngineStore) -> None:
     subject.play()
 
     with pytest.raises(EngineConflictError):
-        await subject.get_default_engine()
+        await subject.get_default_orchestrator()
 
 
-async def test_get_default_engine_run_stopped(subject: EngineStore) -> None:
+async def test_get_default_orchestrator_run_stopped(subject: EngineStore) -> None:
     """It allow a default engine if another engine is terminal."""
     await subject.create(
         run_id="run-id",
@@ -302,7 +302,7 @@ async def test_get_default_engine_run_stopped(subject: EngineStore) -> None:
     )
     await subject.finish(error=None)
 
-    result = await subject.get_default_engine()
+    result = await subject.get_default_orchestrator()
     assert isinstance(result, ProtocolEngine)
 
 
