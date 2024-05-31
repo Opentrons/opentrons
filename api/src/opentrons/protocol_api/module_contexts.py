@@ -971,7 +971,7 @@ class AbsorbanceReaderContext(ModuleContext):
 
     @property
     @requires_version(2, 18)
-    def get_serial_number(self) -> str:
+    def serial_number(self) -> str:
         """Get the module's unique hardware serial number."""
         return self._core.get_serial_number()
 
