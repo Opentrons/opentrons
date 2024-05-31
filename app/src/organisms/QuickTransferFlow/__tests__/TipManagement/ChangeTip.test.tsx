@@ -6,7 +6,7 @@ import { renderWithProviders } from '../../../../__testing-utils__'
 import { i18n } from '../../../../i18n'
 import { ChangeTip } from '../../TipManagement/ChangeTip'
 
-const render = (props: React.ComponentProps<typeof ChangeTip>) => {
+const render = (props: React.ComponentProps<typeof ChangeTip>): any => {
   return renderWithProviders(<ChangeTip {...props} />, {
     i18nInstance: i18n,
   })

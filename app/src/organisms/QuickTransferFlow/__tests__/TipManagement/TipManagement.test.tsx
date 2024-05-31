@@ -11,7 +11,7 @@ import { TipManagement } from '../../TipManagement/'
 vi.mock('../../TipManagement/ChangeTip')
 vi.mock('../../TipManagement/TipDropLocation')
 
-const render = (props: React.ComponentProps<typeof TipManagement>) => {
+const render = (props: React.ComponentProps<typeof TipManagement>): any => {
   return renderWithProviders(<TipManagement {...props} />, {
     i18nInstance: i18n,
   })
