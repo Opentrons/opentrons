@@ -1,12 +1,20 @@
 """Format the csv report for a liquid-sense run."""
 
-import gspread
 import statistics
 from typing import List, Union, Optional
 
-from abr_testing.automation import google_sheets_tool
-
 from hardware_testing.data import ui
+
+try:
+    from abr_testing.automation import google_sheets_tool
+except ImportError:
+    ui.print_error(
+        "Unable to import abr repo if this isn't a simulation push the abr_testing package"
+    )
+    from . import google_sheets_tool  # type: ignore[no-redef]
+
+    pass
+
 
 from hardware_testing.data.csv_report import (
     CSVReport,
@@ -176,7 +184,7 @@ def store_baseline_trial(
     if google_sheet:
         try:
             google_sheet.update_cell(sheet_title, 9, 2, height)
-        except gspread.exceptions.APIError:
+        except google_sheets_tool.google_interaction_error:
             ui.print_error("did not store baseline trial on google sheet.")
     report(
         "TRIALS",
@@ -250,7 +258,7 @@ def store_trial(
             google_sheet.batch_update_cells(
                 trial_for_google_sheet, "A", 11 + int(trial), sheet_id
             )
-        except gspread.exceptions.APIError:
+        except google_sheets_tool.google_interaction_error:
             ui.print_error(f"did not log trial {trial+1} to google sheet.")
 
 

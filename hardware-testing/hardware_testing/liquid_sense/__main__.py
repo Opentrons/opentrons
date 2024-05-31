@@ -39,8 +39,15 @@ from hardware_testing.protocols.liquid_sense_lpc import (
     liquid_sense_ot3_p1000_single_vial,
 )
 
-from abr_testing.automation import google_sheets_tool
+try:
+    from abr_testing.automation import google_sheets_tool
+except ImportError:
+    ui.print_error(
+        "Unable to import abr repo if this isn't a simulation push the abr_testing package"
+    )
+    from . import google_sheets_tool  # type: ignore[no-redef]
 
+    pass
 
 CREDENTIALS_PATH = "/var/lib/jupyter/notebooks/abr.json"
 

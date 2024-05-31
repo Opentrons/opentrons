@@ -1,6 +1,5 @@
 """Post process script csvs."""
 import csv
-import gspread
 import math
 import os
 import statistics
@@ -8,6 +7,16 @@ import traceback
 from typing import List, Dict, Tuple, Any, Optional
 
 from hardware_testing.data import ui
+
+try:
+    from abr_testing.automation import google_sheets_tool
+except ImportError:
+    ui.print_error(
+        "Unable to import abr repo if this isn't a simulation push the abr_testing package"
+    )
+    from . import google_sheets_tool  # type: ignore[no-redef]
+
+    pass
 
 COL_TRIAL_CONVERSION = {
     1: "E",
@@ -170,7 +179,7 @@ def process_csv_directory(  # noqa: C901
                     google_sheet.batch_update_cells(
                         pressure_header_for_google_sheet, "H", 10, sheet_id
                     )
-                except gspread.exceptions.APIError:
+                except google_sheets_tool.google_interaction_error:
                     ui.print_error("Header did not write on google sheet.")
             # we want to line up the z height's of each trial at time==0
             # to do this we drop the results at the beginning of each of the trials
@@ -243,7 +252,7 @@ def process_csv_directory(  # noqa: C901
                         google_sheet.batch_update_cells(
                             sheet_name, transposed_pressure_rows, "H", 11, sheet_id
                         )
-                    except gspread.exceptions.APIError:
+                    except google_sheets_tool.google_interaction_error:
                         ui.print_error("Did not write pressure data to google sheet.")
                 if google_drive:
                     new_folder_id = google_drive.create_folder(new_folder_name)
@@ -299,7 +308,7 @@ def process_google_sheet(
             [accuracy, precision, 100.0 - 100.0 * repeatability_error],
         ]
         google_sheet.batch_update_cells(sheet_name, summary, "D", 2, sheet_id)
-    except gspread.exceptions.APIError:
+    except google_sheets_tool.google_interaction_error:
         ui.print_error("stats didn't work.")
 
     # Create Graphs

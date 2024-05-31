@@ -28,7 +28,15 @@ from opentrons.protocol_api import ProtocolContext, Well, Labware
 
 from opentrons_shared_data.errors.exceptions import LiquidNotFoundError
 
-from abr_testing.automation import google_sheets_tool
+try:
+    from abr_testing.automation import google_sheets_tool
+except ImportError:
+    ui.print_error(
+        "Unable to import abr repo if this isn't a simulation push the abr_testing package"
+    )
+    from . import google_sheets_tool  # type: ignore[no-redef]
+
+    pass
 
 
 PROBE_MAX_TIME: Dict[int, float] = {
