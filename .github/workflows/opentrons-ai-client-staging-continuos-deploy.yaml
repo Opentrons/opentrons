@@ -1,4 +1,4 @@
-name: 'OpentronsAI edge continuous deployment to dev'
+name: 'OpentronsAI client edge continuous deployment to staging'
 
 on:
   push:
@@ -20,7 +20,7 @@ jobs:
     permissions:
       id-token: write
       contents: read
-    name: 'OpentronsAI edge continuous deployment to dev'
+    name: 'OpentronsAI client edge continuous deployment to staging'
     timeout-minutes: 10
     steps:
       - uses: 'actions/checkout@v3'

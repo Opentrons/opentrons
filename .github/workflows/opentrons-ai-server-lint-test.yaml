@@ -1,6 +1,6 @@
 # This workflow runs lint on pull requests that touch anything in the opentrons-ai-server directory
 
-name: 'ai-server lint'
+name: 'Opentrons ai-server lint'
 
 on:
   pull_request:
@@ -18,7 +18,7 @@ defaults:
 jobs:
   lint:
     name: 'ai-server lint'
-    timeout-minutes: 5
+    timeout-minutes: 8
     runs-on: 'ubuntu-latest'
     steps:
       - name: Checkout opentrons repo
