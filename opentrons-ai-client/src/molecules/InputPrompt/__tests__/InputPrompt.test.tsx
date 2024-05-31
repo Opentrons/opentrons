@@ -1,6 +1,6 @@
 import React from 'react'
-import { beforeEach, describe, it, expect, vi } from 'vitest'
-import { FormProvider, useForm, useFormContext } from 'react-hook-form'
+import { describe, it, expect } from 'vitest'
+import { FormProvider, useForm } from 'react-hook-form'
 import { fireEvent, screen } from '@testing-library/react'
 import { renderWithProviders } from '../../../__testing-utils__'
 import { i18n } from '../../../i18n'
