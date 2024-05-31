@@ -3,7 +3,7 @@ from logging import getLogger
 
 from datetime import datetime
 from textwrap import dedent
-from typing import Any, Dict, List, Type, Union, Optional, Sequence
+from typing import Any, Dict, List, Mapping, Type, Union, Optional, Sequence
 from pydantic import BaseModel, Field
 from opentrons_shared_data.errors.codes import ErrorCodes
 from .exceptions import ProtocolEngineError
@@ -118,7 +118,7 @@ class ErrorOccurrence(BaseModel):
         ),
     )
 
-    errorInfo: Dict[str, str] = Field(
+    errorInfo: Mapping[str, object] = Field(
         default={},
         description=dedent(
             """\
