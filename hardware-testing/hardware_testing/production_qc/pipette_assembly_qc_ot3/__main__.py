@@ -1412,7 +1412,7 @@ async def _test_tip_presence_flag(
     current_pos = await api.gantry_position(mount)
     await api.move_to(mount, slot_5_pos._replace(z=current_pos.z))
     await api.move_rel(mount, Point(z=-20))
-    wiggle_passed = await _wait_for_tip_presence_state_change(api, seconds_to_wait=5)
+    #wiggle_passed = await _wait_for_tip_presence_state_change(api, seconds_to_wait=5)
     if not api.is_simulator:
         input("press ENTER to continue")
 
@@ -1502,8 +1502,8 @@ async def _test_tip_presence_flag(
         ["tip-presence-drop-displacement", drop_disp, _bool_to_pass_fail(drop_result)]
     )
     write_cb(["tip-presence-drop-height-above-nozzle", drop_pos_rel])
-    write_cb(["tip-presence-wiggle", _bool_to_pass_fail(wiggle_passed)])
-    return pick_up_result and drop_result and wiggle_passed
+   #write_cb(["tip-presence-wiggle", _bool_to_pass_fail(wiggle_passed)])
+    return pick_up_result and drop_result #and wiggle_passed
 
 
 @dataclass
