@@ -4,7 +4,7 @@ from typing_extensions import Literal
 from fastapi import Depends, status
 
 from opentrons.hardware_control import HardwareControlAPI
-from opentrons.protocol_engine import ProtocolEngine
+from opentrons.protocol_runner import RunOrchestrator
 
 from opentrons_shared_data.errors import ErrorCodes
 
@@ -34,7 +34,7 @@ async def get_default_orchestrator(
     engine_store: EngineStore = Depends(get_engine_store),
     hardware_api: HardwareControlAPI = Depends(get_hardware),
     module_identifier: ModuleIdentifier = Depends(ModuleIdentifier),
-) -> ProtocolEngine:
+) -> RunOrchestrator:
     """Get the default run orchestrator with attached modules loaded."""
     try:
         orchestrator = await engine_store.get_default_orchestrator()
