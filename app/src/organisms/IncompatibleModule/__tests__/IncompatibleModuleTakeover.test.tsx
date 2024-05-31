@@ -67,9 +67,7 @@ describe('IncompatibleModuleTakeover', () => {
     it(`should render nothing on ${target} when no incompatible modules are attached`, () => {
       getRenderer([])({ ...props, isOnDevice: target === 'odd' })
       expect(screen.getByTestId(TOP_PORTAL_ID)).resolves.toBeEmptyDOMElement()
-      expect(
-        screen.getByTestId(MODAL_PORTAL_ID)
-      ).resolves.toBeEmptyDOMElement()
+      expect(screen.getByTestId(MODAL_PORTAL_ID)).resolves.toBeEmptyDOMElement()
       expect(screen.queryByText(/TEST ELEMENT/)).toBeNull()
     })
   })

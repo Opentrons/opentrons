@@ -50,7 +50,9 @@ describe('EmergencyStop', () => {
     )
     screen.getByText('Continue')
     expect(screen.getByRole('button')).toBeDisabled()
-    expect(screen.getByRole('img').getAttribute('src')).toContain(ESTOP_IMAGE_NAME)
+    expect(screen.getByRole('img').getAttribute('src')).toContain(
+      ESTOP_IMAGE_NAME
+    )
   })
 
   it('should render text, icon, button when e-stop button is connected', () => {

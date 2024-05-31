@@ -198,7 +198,9 @@ describe('CommandText', () => {
         />,
         { i18nInstance: i18n }
       )
-      screen.getByText('Moving to well A1 of NEST 1 Well Reservoir 195 mL in Slot 5')
+      screen.getByText(
+        'Moving to well A1 of NEST 1 Well Reservoir 195 mL in Slot 5'
+      )
     }
   })
   it('renders correct text for labware involving an addressable area slot', () => {
@@ -404,7 +406,9 @@ describe('CommandText', () => {
       />,
       { i18nInstance: i18n }
     )
-    screen.getByText('Returning tip to A1 of Opentrons 96 Tip Rack 300 µL in Slot 9')
+    screen.getByText(
+      'Returning tip to A1 of Opentrons 96 Tip Rack 300 µL in Slot 9'
+    )
   })
   it('renders correct text for dropTipInPlace', () => {
     renderWithProviders(
@@ -649,7 +653,9 @@ describe('CommandText', () => {
         i18nInstance: i18n,
       }
     )
-    screen.getByText('Setting Temperature Module to 20°C (rounded to nearest integer)')
+    screen.getByText(
+      'Setting Temperature Module to 20°C (rounded to nearest integer)'
+    )
   })
   it('renders correct text for temperatureModule/waitForTemperature with target temp', () => {
     const mockTemp = 20
@@ -696,7 +702,9 @@ describe('CommandText', () => {
         i18nInstance: i18n,
       }
     )
-    screen.getByText('Waiting for Temperature Module to reach target temperature')
+    screen.getByText(
+      'Waiting for Temperature Module to reach target temperature'
+    )
   })
   it('renders correct text for thermocycler/setTargetBlockTemperature', () => {
     const mockTemp = 20

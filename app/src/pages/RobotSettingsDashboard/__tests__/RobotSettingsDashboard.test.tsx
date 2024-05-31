@@ -90,7 +90,9 @@ describe('RobotSettingsDashboard', () => {
     screen.getByText('Robot System Version')
     screen.getByText('Network Settings')
     screen.getByText('Status LEDs')
-    screen.getByText('Control the strip of color lights on the front of the robot.')
+    screen.getByText(
+      'Control the strip of color lights on the front of the robot.'
+    )
     screen.getByText('Touchscreen Sleep')
     screen.getByText('Touchscreen Brightness')
     screen.getByText('Privacy')

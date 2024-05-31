@@ -241,7 +241,9 @@ describe('BeforeBeginning', () => {
       screen.getByText(
         'Provided with the robot. Using another size can strip the instruments’s screws.'
       )
-      const proceedBtn = screen.getByRole('button', { name: 'Move gantry to front' })
+      const proceedBtn = screen.getByRole('button', {
+        name: 'Move gantry to front',
+      })
       fireEvent.click(proceedBtn)
       expect(props.chainRunCommands).toHaveBeenCalledWith(
         [

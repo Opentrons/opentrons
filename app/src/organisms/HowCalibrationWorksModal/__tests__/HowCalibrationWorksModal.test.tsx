@@ -30,7 +30,9 @@ describe('HowCalibrationWorksModal', () => {
     screen.getByText(
       'Robot calibration establishes how the robot knows where it is in relation to the deck. Accurate Robot calibration is essential to run protocols successfully. Robot calibration has 3 parts: Deck calibration, Tip Length calibration and Pipette Offset calibration.'
     )
-    expect(screen.getByRole('heading', { name: 'Deck Calibration' })).toBeTruthy()
+    expect(
+      screen.getByRole('heading', { name: 'Deck Calibration' })
+    ).toBeTruthy()
     screen.getByText(
       'This measures the deck X and Y values relative to the gantry. Deck Calibration is the foundation for Tip Length Calibration and Pipette Offset Calibration.'
     )
@@ -65,9 +67,11 @@ describe('HowCalibrationWorksModal', () => {
   it('should render a link to the learn more page', () => {
     render(props)
     expect(
-      screen.getByRole('link', {
-        name: 'Learn more about robot calibration',
-      }).getAttribute('href')
+      screen
+        .getByRole('link', {
+          name: 'Learn more about robot calibration',
+        })
+        .getAttribute('href')
     ).toBe(
       'https://support.opentrons.com/s/article/How-positional-calibration-works-on-the-OT-2'
     )

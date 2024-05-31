@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { fireEvent } from '@testing-library/react'
+import { fireEvent, screen } from '@testing-library/react'
 import { vi, it, describe, expect, beforeEach } from 'vitest'
 
 import { renderWithProviders } from '../../../__testing-utils__'
@@ -22,11 +22,13 @@ describe('ExitModal', () => {
     }
   })
   it('renders the correct information and buttons for attach when no pipette is attached', () => {
-    const { getByText, getByRole } = render(props)
-    getByText('Progress will be lost')
-    getByText('Are you sure you want to exit before attaching your pipette?')
-    const back = getByRole('button', { name: 'Go back' })
-    const exit = getByRole('button', { name: 'exit' })
+    render(props)
+    screen.getByText('Progress will be lost')
+    screen.getByText(
+      'Are you sure you want to exit before attaching your pipette?'
+    )
+    const back = screen.getByRole('button', { name: 'Go back' })
+    const exit = screen.getByRole('button', { name: 'exit' })
     fireEvent.click(back)
     expect(props.back).toHaveBeenCalled()
     fireEvent.click(exit)
@@ -38,8 +40,10 @@ describe('ExitModal', () => {
       ...props,
       direction: 'detach',
     }
-    const { getByText } = render(props)
-    getByText('Are you sure you want to exit before detaching your pipette?')
+    render(props)
+    screen.getByText(
+      'Are you sure you want to exit before detaching your pipette?'
+    )
   })
 
   it('renders buttons disabled when isDisbaled is true', () => {
@@ -47,8 +51,8 @@ describe('ExitModal', () => {
       ...props,
       isDisabled: true,
     }
-    const { getByRole } = render(props)
-    expect(getByRole('button', { name: 'Go back' })).toBeDisabled()
-    expect(getByRole('button', { name: 'exit' })).toBeDisabled()
+    render(props)
+    expect(screen.getByRole('button', { name: 'Go back' })).toBeDisabled()
+    expect(screen.getByRole('button', { name: 'exit' })).toBeDisabled()
   })
 })

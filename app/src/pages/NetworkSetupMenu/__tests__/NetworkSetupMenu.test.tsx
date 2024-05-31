@@ -42,7 +42,9 @@ describe('NetworkSetupMenu', () => {
     screen.getByText('Ethernet')
     screen.getByText("Connect to your lab's wired network.")
     screen.getByText('USB')
-    screen.getByText('Connect directly to a computer (running the Opentrons App).')
+    screen.getByText(
+      'Connect directly to a computer (running the Opentrons App).'
+    )
   })
 
   it('should call mock function when tapping a button', () => {

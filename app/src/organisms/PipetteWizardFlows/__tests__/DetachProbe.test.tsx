@@ -48,7 +48,9 @@ describe('DetachProbe', () => {
     screen.getByTestId(
       '/app/src/assets/videos/pipette-wizard-flows/Pipette_Detach_Probe_1.webm'
     )
-    const proceedBtn = screen.getByRole('button', { name: 'Complete calibration' })
+    const proceedBtn = screen.getByRole('button', {
+      name: 'Complete calibration',
+    })
     fireEvent.click(proceedBtn)
     expect(props.proceed).toHaveBeenCalled()
     const backBtn = screen.getByLabelText('back')

@@ -147,9 +147,7 @@ describe('UpdateBuildroot', () => {
   })
 
   it('renders appropriate options when the instrument is a pipette without calibration', () => {
-    render(
-      MOCK_PIPETTE_WITHOUT_CALIBRATION
-    )
+    render(MOCK_PIPETTE_WITHOUT_CALIBRATION)
     const btn = screen.getByTestId('testButton')
     fireEvent.click(btn)
 
@@ -196,7 +194,9 @@ describe('UpdateBuildroot', () => {
     render(MOCK_PIPETTE)
     const btn = screen.getByTestId('testButton')
     fireEvent.click(btn)
-    const menuListElement = screen.getByLabelText('BackgroundOverlay_ModalShell')
+    const menuListElement = screen.getByLabelText(
+      'BackgroundOverlay_ModalShell'
+    )
     fireEvent.click(menuListElement)
 
     expect(screen.queryByText('Recalibrate')).not.toBeInTheDocument()
