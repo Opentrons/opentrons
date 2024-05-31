@@ -34,21 +34,21 @@ export function App(): JSX.Element | null {
   }
 
   React.useEffect(() => {
-    if (!isAuthenticated && !isLoading) {
-      void loginWithRedirect()
-    }
+    // if (!isAuthenticated && !isLoading) {
+    //   void loginWithRedirect()
+    // }
     if (isAuthenticated) {
       void fetchAccessToken()
     }
   }, [isAuthenticated, isLoading, loginWithRedirect])
 
-  if (isLoading) {
-    return <Loading />
-  }
+  // if (isLoading) {
+  //   return <Loading />
+  // }
 
-  if (!isAuthenticated) {
-    return null
-  }
+  // if (!isAuthenticated) {
+  //   return null
+  // }
 
   return (
     <Flex
