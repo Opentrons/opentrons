@@ -1,7 +1,5 @@
 // ToDo (kk:05/29/2024) this should be switched by env var
-export const BASE_URL = 'http://localhost:8000'
-export const END_POINT = `${BASE_URL}/api/chat/completion`
-// export const END_POINT = 'https://staging.opentrons.ai/api/chat/completion'
+export const END_POINT = 'https://staging.opentrons.ai/api/chat/completion'
 
 // for auth0
 export const AUTH0_DOMAIN = 'identity.auth.opentrons.com'
