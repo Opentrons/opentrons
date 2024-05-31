@@ -62,6 +62,6 @@ test:
 test-cov:
 	make -C .. test-js-ai-client tests=$(tests) test_opts="$(test_opts)" cov_opts="$(cov_opts)"
 
-.PHONY: dev-deploy
+.PHONY: staging-deploy
 dev-deploy:
-	aws s3 sync ./dist s3://dev-opentrons-ai-front-end/ --delete
+	aws s3 sync ./dist s3://staging-opentrons-ai-front-end/ --delete
