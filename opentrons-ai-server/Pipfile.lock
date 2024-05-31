@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "799a525d134285522d6a1ea338a23ef883c0fad06c9d0d42cee8828d8df703b8"
+            "sha256": "3a563ef0225655c7e2e0aeb00f4c85080a8549f827a1cdd3325c991888dbfccf"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -740,11 +740,11 @@
         },
         "importlib-metadata": {
             "hashes": [
-                "sha256:7fc841f8b8332803464e5dc1c63a2e59121f46ca186c0e2e182e80bf8c1319f7",
-                "sha256:d97503976bb81f40a193d41ee6570868479c69d5068651eb039c40d850c59d67"
+                "sha256:30962b96c0c223483ed6cc7280e7f0199feb01a0e40cfae4d4450fc6fab1f570",
+                "sha256:b78938b926ee8d5f020fc4772d487045805a55ddbad2ecf21c6d60938dc7fcd2"
             ],
             "markers": "python_version >= '3.8'",
-            "version": "==7.0.0"
+            "version": "==7.1.0"
         },
         "jinja2": {
             "hashes": [
@@ -789,11 +789,11 @@
         },
         "llama-index-core": {
             "hashes": [
-                "sha256:72d30aea7a77f87484abe99a341c945021c95ea5e2adcc60199094931a07623a",
-                "sha256:c08df2a46ebf417ca0f1b68a5d797df0c053796d96c93e1cdc0456d11a89753a"
+                "sha256:cc404f6ec3c9ba563b1acd9005b95e18ba6ca5da6e83ac64d555821bd7c6f574",
+                "sha256:e514ee5a070c405f4864f07a9fda46950e06797ee5a98c30f3c5592ca0203118"
             ],
             "markers": "python_version < '4.0' and python_full_version >= '3.8.1'",
-            "version": "==0.10.40"
+            "version": "==0.10.41"
         },
         "llama-index-embeddings-openai": {
             "hashes": [
@@ -1145,20 +1145,20 @@
         },
         "openai": {
             "hashes": [
-                "sha256:f3488d9a1c4e0d332b019377d27d7cb4b3d6103fd5d0a416c7ceac780d1d9b88",
-                "sha256:fb2635efd270efaf9fac2e07558d7948373b940637d3ae3ab624c1a983d4f03f"
+                "sha256:aa2f381f476f5fa4df8728a34a3e454c321caa064b7b68ab6e9daa1ed082dbf9",
+                "sha256:f561ce86f4b4008eb6c78622d641e4b7e1ab8a8cdb15d2f0b2a49942d40d21a8"
             ],
             "index": "pypi",
             "markers": "python_full_version >= '3.7.1'",
-            "version": "==1.30.4"
+            "version": "==1.25.1"
         },
         "opentelemetry-api": {
             "hashes": [
-                "sha256:0f2c363d98d10d1ce93330015ca7fd3a65f60be64e05e30f557c61de52c80ca2",
-                "sha256:42719f10ce7b5a9a73b10a4baf620574fb8ad495a9cbe5c18d76b75d8689c67e"
+                "sha256:757fa1aa020a0f8fa139f8959e53dec2051cc26b832e76fa839a6d76ecefd737",
+                "sha256:77c4985f62f2614e42ce77ee4c9da5fa5f0bc1e1821085e9a47533a9323ae869"
             ],
             "markers": "python_version >= '3.8'",
-            "version": "==1.24.0"
+            "version": "==1.25.0"
         },
         "orjson": {
             "hashes": [
