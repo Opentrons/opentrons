@@ -12,6 +12,9 @@ package_version = $(call python_package_version,abr-testing,$(project_rs_default
 wheel_file = dist/$(call python_get_wheelname,abr-testing,$(project_rs_default),$(package_name),$(BUILD_NUMBER))
 sdist_file = dist/$(call python_get_sdistname,abr-testing,$(project_rs_default),$(package_name))
 
+# Find the branch, sha, version that will be used to update the VERSION.json file
+version_file = $(call python_get_git_version,abr-testing,$(project_rs_default),abr-testing)
+
 tests ?= tests
 test_opts ?=
 
@@ -78,3 +81,10 @@ format:
 .PHONY: test
 test:
 	@echo "No tests yet"
+
+.PHONY: push-no-restart-ot3
+push-no-restart-ot3: sdist Pipfile.lock
+	$(call push-python-sdist,$(host),$(ssh_key),$(ssh_opts),$(sdist_file),/opt/opentrons-robot-server,"abr_testing",,,$(version_file))
+
+.PHONY: push-ot3
+push-ot3: push-no-restart-ot3
