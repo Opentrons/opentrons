@@ -9,7 +9,9 @@ import { TipDropLocation } from '../../TipManagement/TipDropLocation'
 
 vi.mock('../../../../resources/deck_configuration')
 
-const render = (props: React.ComponentProps<typeof TipDropLocation>) => {
+const render = (
+  props: React.ComponentProps<typeof TipDropLocation>
+): ReturnType<typeof renderWithProviders> => {
   return renderWithProviders(<TipDropLocation {...props} />, {
     i18nInstance: i18n,
   })
