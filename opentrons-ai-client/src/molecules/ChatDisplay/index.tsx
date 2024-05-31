@@ -65,19 +65,24 @@ export function ChatDisplay({ chat, chatId }: ChatDisplayProps): JSX.Element {
         gridGap={SPACING.spacing16}
         position={POSITION_RELATIVE}
       >
-        <Markdown
-          components={{
-            div: undefined,
-            ul: UnnumberedListText,
-            h2: HeaderText,
-            li: ListItemText,
-            p: ParagraphText,
-            a: ExternalLink,
-            code: CodeText,
-          }}
-        >
-          {reply}
-        </Markdown>
+        {isUser ? (
+          <Markdown>{reply}</Markdown>
+        ) : (
+          <Markdown
+            components={{
+              div: undefined,
+              ul: UnnumberedListText,
+              h2: HeaderText,
+              li: ListItemText,
+              p: ParagraphText,
+              a: ExternalLink,
+              code: CodeText,
+            }}
+          >
+            {reply}
+          </Markdown>
+        )}
+
         {!isUser ? (
           <PrimaryButton
             position={POSITION_ABSOLUTE}
