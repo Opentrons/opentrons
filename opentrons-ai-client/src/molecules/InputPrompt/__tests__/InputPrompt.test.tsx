@@ -1,25 +1,33 @@
 import React from 'react'
 import { beforeEach, describe, it, expect, vi } from 'vitest'
-import { useFormContext } from 'react-hook-form'
+import { FormProvider, useForm, useFormContext } from 'react-hook-form'
 import { fireEvent, screen } from '@testing-library/react'
 import { renderWithProviders } from '../../../__testing-utils__'
 import { i18n } from '../../../i18n'
 import { InputPrompt } from '../index'
 
-vi.mock('react-hook-form')
+const WrappingForm = (wrappedComponent: {
+  children: React.ReactNode
+}): JSX.Element => {
+  const methods = useForm({
+    defaultValues: {
+      userPrompt: '',
+    },
+  })
+  // eslint-disable-next-line testing-library/no-node-access
+  return <FormProvider {...methods}>{wrappedComponent.children}</FormProvider>
+}
 
 const render = () => {
-  return renderWithProviders(<InputPrompt />, { i18nInstance: i18n })
+  return renderWithProviders(
+    <WrappingForm>
+      <InputPrompt />
+    </WrappingForm>,
+    { i18nInstance: i18n }
+  )
 }
 
 describe('InputPrompt', () => {
-  beforeEach(() => {
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-    vi.mocked(useFormContext).mockReturnValue({
-      watch: vi.fn(),
-      register: vi.fn(),
-    } as any)
-  })
   it('should render textarea and disabled button', () => {
     render()
     screen.getByRole('textbox')
