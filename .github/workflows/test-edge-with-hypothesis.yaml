@@ -40,4 +40,4 @@ jobs:
         project: 'test-data-generation'
 
     - name: 'Run Hypothesis tests'
-      run: 'make test'
+      run: 'make -C test-data-generation test'
