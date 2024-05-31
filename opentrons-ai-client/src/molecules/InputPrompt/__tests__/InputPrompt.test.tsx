@@ -1,15 +1,25 @@
 import React from 'react'
-import { describe, it, expect } from 'vitest'
+import { beforeEach, describe, it, expect, vi } from 'vitest'
+import { useFormContext } from 'react-hook-form'
 import { fireEvent, screen } from '@testing-library/react'
 import { renderWithProviders } from '../../../__testing-utils__'
 import { i18n } from '../../../i18n'
 import { InputPrompt } from '../index'
+
+vi.mock('react-hook-form')
 
 const render = () => {
   return renderWithProviders(<InputPrompt />, { i18nInstance: i18n })
 }
 
 describe('InputPrompt', () => {
+  beforeEach(() => {
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+    vi.mocked(useFormContext).mockReturnValue({
+      watch: vi.fn(),
+      register: vi.fn(),
+    } as any)
+  })
   it('should render textarea and disabled button', () => {
     render()
     screen.getByRole('textbox')
