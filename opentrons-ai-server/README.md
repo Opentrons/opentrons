@@ -32,7 +32,7 @@ The Opentrons AI application's server.
 
 ## Install a production dependency
 
-`python -m pipenv install openai==1.30.4`
+`python -m pipenv install openai==1.25.1`
 
 ## FastAPI Code Organization and Separation of Concerns
 

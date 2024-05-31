@@ -1,8 +1,8 @@
 import React from 'react'
 import { useAuth0 } from '@auth0/auth0-react'
 import { useTranslation } from 'react-i18next'
+import { useForm, FormProvider } from 'react-hook-form'
 import { useAtom } from 'jotai'
-
 import {
   COLORS,
   Flex,
@@ -18,6 +18,10 @@ import { SidePanel } from './molecules/SidePanel'
 import { Loading } from './molecules/Loading'
 import { MainContentContainer } from './organisms/MainContentContainer'
 
+export interface InputType {
+  userPrompt: string
+}
+
 export function App(): JSX.Element | null {
   const { t } = useTranslation('protocol_generator')
   const { isAuthenticated, logout, isLoading, loginWithRedirect } = useAuth0()
@@ -32,6 +36,11 @@ export function App(): JSX.Element | null {
       console.error('Error fetching access token:', error)
     }
   }
+  const methods = useForm<InputType>({
+    defaultValues: {
+      userPrompt: '',
+    },
+  })
 
   React.useEffect(() => {
     if (!isAuthenticated && !isLoading) {
@@ -64,8 +73,10 @@ export function App(): JSX.Element | null {
           {t('logout')}
         </LinkButton>
       </Flex>
-      <SidePanel />
-      <MainContentContainer />
+      <FormProvider {...methods}>
+        <SidePanel />
+        <MainContentContainer />
+      </FormProvider>
     </Flex>
   )
 }
