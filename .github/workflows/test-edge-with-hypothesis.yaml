@@ -2,7 +2,7 @@ name: 'Testing Edge with Hypothesis'
 
 on:
   schedule:
-  - cron: '0 45 22 ? * MON-FRI'
+  - cron: '45 22 * * 1-5'
   
   workflow_dispatch:
 
