@@ -73,12 +73,10 @@ export function App(): JSX.Element | null {
           {t('logout')}
         </LinkButton>
       </Flex>
-      <>
-        <FormProvider {...methods}>
-          <SidePanel />
-          <ChatContainer />
-        </FormProvider>
-      </>
+      <FormProvider {...methods}>
+        <SidePanel />
+        <ChatContainer />
+      </FormProvider>
     </Flex>
   )
 }
