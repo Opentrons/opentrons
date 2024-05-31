@@ -72,10 +72,34 @@ describe('useConfirmCrashRecovery', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Start over' }))
     // the confirmation should now not be null
     expect(result.current[1]).not.toBeNull()
+  })
+
+  it('renders the modal with the right props when you click back', () => {
+    const { result } = renderHook(
+      () =>
+        useConfirmCrashRecovery({
+          ...mockProps,
+          sendCommands: mockSendCommands,
+        }),
+      {
+        wrapper: ({ children }) => (
+          <I18nextProvider i18n={i18n}>{children}</I18nextProvider>
+        ),
+      }
+    )
+
     // the explicitly rerender to incorporate newly non-null confirmation
-    renderWithProviders(<div>{result.current[1] ?? result.current[0]}</div>, {
-      i18nInstance: i18n,
-    })
+    const [{ rerender }] = renderWithProviders(
+      <div>{result.current[1] ?? result.current[0]}</div>,
+      {
+        i18nInstance: i18n,
+      }
+    )
+
+    // click the link to launch the modal
+    fireEvent.click(screen.getByRole('button', { name: 'Start over' }))
+
+    rerender(<div>{result.current[1] ?? result.current[0]}</div>)
 
     // click the "back" link in the confirmation
     const closeConfirmationButton = screen.getByRole('button', {
