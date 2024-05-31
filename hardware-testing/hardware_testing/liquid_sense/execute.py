@@ -255,10 +255,20 @@ def run(
             ui.print_info(f"Picking up {tip}ul tip")
             run_args.pipette.pick_up_tip(tips[0])
             del tips[: run_args.pipette_channels]
-            run_args.pipette.move_to(test_well.top())
-
+            # operator defines num of seconds btwn start of the probe movement
+            # and meniscus contact calculating ideal starting position is then
+            # easy bc no acceleration is involved during probe
+            starting_mm_above_liquid = (
+                run_args.probe_seconds_before_contact * run_args.z_speed
+            )
+            starting_mount_height = (
+                test_well.bottom(z=liquid_height).point.z + starting_mm_above_liquid
+            )
+            run_args.pipette.move_to(
+                test_well.bottom(z=(liquid_height + starting_mm_above_liquid))
+            )
             start_pos = hw_api.current_position_ot3(OT3Mount.LEFT)
-            height = _run_trial(run_args, tip, test_well, trial, liquid_height)
+            height = _run_trial(run_args, tip, test_well, trial, starting_mount_height)
             end_pos = hw_api.current_position_ot3(OT3Mount.LEFT)
             run_args.pipette.blow_out()
             tip_length_offset = 0.0
@@ -292,7 +302,7 @@ def run(
                 end_pos[Axis.P_L],
                 env_data.relative_humidity,
                 env_data.temperature,
-                start_pos[Axis.Z_L] - end_pos[Axis.Z_L],
+                start_pos[Axis.Z_L] - height,
                 plunger_start - end_pos[Axis.P_L],
                 tip_length_offset,
                 liquid_height_from_deck,
@@ -355,7 +365,7 @@ def find_max_z_distances(
 
 
 def _run_trial(
-    run_args: RunArgs, tip: int, well: Well, trial: int, liquid_height: float
+    run_args: RunArgs, tip: int, well: Well, trial: int, starting_mount_height: float
 ) -> float:
     hw_api = get_sync_hw_api(run_args.ctx)
     lqid_cfg: Dict[str, int] = LIQUID_PROBE_SETTINGS[run_args.pipette_volume][
@@ -379,12 +389,7 @@ def _run_trial(
         if run_args.plunger_speed == -1
         else run_args.plunger_speed
     )
-    # operator defines num of seconds btwn start of the probe movement and meniscus contact
-    # calculating ideal starting position is then easy bc no acceleration is involved during probe
-    starting_mm_above_liquid = run_args.probe_seconds_before_contact * run_args.z_speed
-    starting_mount_height = (
-        well.bottom(z=liquid_height).point.z + starting_mm_above_liquid
-    )
+
     start_height = starting_mount_height
     height = 2 * start_height
     z_distances: List[float] = find_max_z_distances(
