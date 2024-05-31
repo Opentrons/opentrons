@@ -72,8 +72,8 @@ export function ChatDisplay({ chat, chatId }: ChatDisplayProps): JSX.Element {
             h2: HeaderText,
             li: ListItemText,
             p: ParagraphText,
-            a: isUser ? undefined : ExternalLink,
-            code: isUser ? undefined : CodeText,
+            a: isUser ? ParagraphText : ExternalLink,
+            code: isUser ? ParagraphText : CodeText,
           }}
         >
           {reply}
