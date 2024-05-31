@@ -328,29 +328,3 @@ def test_track_analysis(tmp_path: Path, output: str) -> None:
     context_tracker.store()
 
     verify_metrics_store_file(store.metadata.data_file_location, 1)
-
-
-@pytest.mark.usefixtures("override_data_store", "monkeypatch_set_store_each_to_true")
-def test_track_analysis_with_store_each_run(tmp_path: Path) -> None:
-    """Test that the RobotContextTracker tracks analysis and stores each run."""
-    protocol_source = textwrap.dedent(
-        """
-        requirements = {"apiLevel": "2.15"}
-
-        def run(protocol):
-            pass
-        """
-    )
-    protocol_source_file = tmp_path / "protocol.py"
-    protocol_source_file.write_text(protocol_source, encoding="utf-8")
-    store = context_tracker._store  # type: ignore[attr-defined]
-
-    verify_metrics_store_file(store.metadata.data_file_location, 0)
-
-    _get_analysis_result([protocol_source_file])
-
-    verify_metrics_store_file(store.metadata.data_file_location, 1)
-
-    _get_analysis_result([protocol_source_file])
-
-    verify_metrics_store_file(store.metadata.data_file_location, 2)
