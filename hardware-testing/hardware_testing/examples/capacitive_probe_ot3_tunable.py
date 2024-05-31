@@ -58,9 +58,7 @@ PROBE_SETTINGS_Z_AXIS_OUTPUT = CapacitivePassSettings(
 )
 
 
-async def _probe_sequence(
-    api: OT3API, mount: types.OT3Mount, stable: bool
-) -> float:
+async def _probe_sequence(api: OT3API, mount: types.OT3Mount, stable: bool) -> float:
     z_ax = types.Axis.by_mount(mount)
 
     print("Align the XY axes above Z probe location...")
