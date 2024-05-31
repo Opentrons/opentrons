@@ -15,8 +15,12 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { SendButton } from '../../atoms/SendButton'
-import { chatDataAtom } from '../../resources/atoms'
-import { useApiCall, useGetAccessToken } from '../../resources/hooks'
+import {
+  chatDataAtom,
+  chatHistoryAtom,
+  tokenAtom,
+} from '../../resources/atoms'
+import { useApiCall } from '../../resources/hooks'
 import { calcTextAreaHeight } from '../../resources/utils/utils'
 import { END_POINT } from '../../resources/constants'
 
@@ -27,10 +31,11 @@ export function InputPrompt(): JSX.Element {
   const { t } = useTranslation('protocol_generator')
   const { register, watch, reset } = useFormContext()
   const [, setChatData] = useAtom(chatDataAtom)
+  const [chatHistory, setChatHistory] = useAtom(chatHistoryAtom)
+  const [token] = useAtom(tokenAtom)
   const [submitted, setSubmitted] = React.useState<boolean>(false)
   const userPrompt = watch('userPrompt') ?? ''
   const { data, isLoading, callApi } = useApiCall()
-  const { getAccessToken } = useGetAccessToken()
 
   const handleClick = async (): Promise<void> => {
     const userInput: ChatData = {
@@ -41,23 +46,25 @@ export function InputPrompt(): JSX.Element {
     setChatData(chatData => [...chatData, userInput])
 
     try {
-      const accessToken = await getAccessToken()
       const headers = {
-        Authorization: `Bearer ${accessToken}`,
+        Authorization: `Bearer ${token}`,
         'Content-Type': 'application/json',
-      }
-
-      const postData = {
-        message: userPrompt,
-        fake: false,
       }
 
       const config = {
         url: END_POINT,
         method: 'POST',
         headers,
-        data: postData,
+        data: {
+          message: userPrompt,
+          history: chatHistory,
+          fake: false,
+        },
       }
+      setChatHistory(chatHistory => [
+        ...chatHistory,
+        { role: 'user', content: userPrompt },
+      ])
       await callApi(config as AxiosRequestConfig)
       setSubmitted(true)
     } catch (err: any) {
@@ -73,6 +80,10 @@ export function InputPrompt(): JSX.Element {
         role,
         reply,
       }
+      setChatHistory(chatHistory => [
+        ...chatHistory,
+        { role: 'assistant', content: reply },
+      ])
       setChatData(chatData => [...chatData, assistantResponse])
       setSubmitted(false)
     }

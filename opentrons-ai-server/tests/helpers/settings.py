@@ -34,6 +34,23 @@ class Settings:
             raise EnvironmentError(f"Required environment variable '{var_name}' is not set.") from err
 
 
+class LocalSettings(Settings):
+    ENV_VARIABLE_MAP = {
+        "TOKEN_URL": "LOCAL_TOKEN_URL",
+        "BASE_URL": "LOCAL_BASE_URL",
+        "CLIENT_ID": "LOCAL_CLIENT_ID",
+        "SECRET": "LOCAL_SECRET",
+        "AUDIENCE": "LOCAL_AUDIENCE",
+        "GRANT_TYPE": "LOCAL_GRANT_TYPE",
+        "CACHED_TOKEN_PATH": str(Path(Path(__file__).parent, "cached_token.txt")),
+    }
+
+    def __init__(self) -> None:
+        super().__init__()
+        load_dotenv(self.ENV_PATH)
+        self._set_properties()
+
+
 class DevSettings(Settings):
     ENV_VARIABLE_MAP = {
         "TOKEN_URL": "DEV_TOKEN_URL",
@@ -85,20 +102,53 @@ class CrtSettings(Settings):
         self._set_properties()
 
 
-# TODO:y3rsh:2024-05-11: Add staging and prod
+class StagingSettings(Settings):
+    ENV_VARIABLE_MAP = {
+        "TOKEN_URL": "STAGING_TOKEN_URL",
+        "BASE_URL": "STAGING_BASE_URL",
+        "CLIENT_ID": "STAGING_CLIENT_ID",
+        "SECRET": "STAGING_SECRET",
+        "AUDIENCE": "STAGING_AUDIENCE",
+        "GRANT_TYPE": "STAGING_GRANT_TYPE",
+        "CACHED_TOKEN_PATH": str(Path(Path(__file__).parent, "staging_cached_token.txt")),
+    }
+
+    def __init__(self) -> None:
+        super().__init__()
+        load_dotenv(self.ENV_PATH)
+        self._set_properties()
+
+
+class ProdSettings(Settings):
+    ENV_VARIABLE_MAP = {
+        "TOKEN_URL": "PROD_TOKEN_URL",
+        "BASE_URL": "PROD_BASE_URL",
+        "CLIENT_ID": "PROD_CLIENT_ID",
+        "SECRET": "PROD_SECRET",
+        "AUDIENCE": "PROD_AUDIENCE",
+        "GRANT_TYPE": "PROD_GRANT_TYPE",
+        "CACHED_TOKEN_PATH": str(Path(Path(__file__).parent, "prod_cached_token.txt")),
+    }
+
+    def __init__(self) -> None:
+        super().__init__()
+        load_dotenv(self.ENV_PATH)
+        self._set_properties()
 
 
 def get_settings(env: str) -> Settings:
-    if env.lower() == "dev":
+    if env.lower() == "local":
+        return LocalSettings()
+    elif env.lower() == "dev":
         return DevSettings()
     elif env.lower() == "sandbox":
         return SandboxSettings()
     elif env.lower() == "crt":
         return CrtSettings()
     elif env.lower() == "staging":
-        raise NotImplementedError("Staging environment not implemented.")
+        return StagingSettings()
     elif env.lower() == "prod":
-        raise NotImplementedError("Production environment not implemented.")
+        return ProdSettings()
     else:
         raise ValueError(f"Unsupported environment: {env}")
 
