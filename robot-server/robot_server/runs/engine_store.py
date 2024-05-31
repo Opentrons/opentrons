@@ -149,8 +149,8 @@ class EngineStore:
     # TODO(tz, 2024-5-14): remove this once its all redirected via orchestrator
     # TODO(mc, 2022-03-21): this resource locking is insufficient;
     # come up with something more sophisticated without race condition holes.
-    async def get_default_engine(self) -> ProtocolEngine:
-        """Get a "default" ProtocolEngine to use outside the context of a run.
+    async def get_default_orchestrator(self) -> ProtocolEngine:
+        """Get a "default" RunOrchestrator to use outside the context of a run.
 
         Raises:
             EngineConflictError: if a run-specific engine is active.
@@ -175,8 +175,8 @@ class EngineStore:
             self._default_run_orchestrator = RunOrchestrator.build_orchestrator(
                 protocol_engine=engine, hardware_api=self._hardware_api
             )
-            return self._default_run_orchestrator.engine
-        return default_orchestrator.engine
+            return self._default_run_orchestrator
+        return default_orchestrator
 
     async def create(
         self,
@@ -242,7 +242,9 @@ class EngineStore:
         # concurrency hazard. If two requests simultaneously call this method,
         # they will both "succeed" (with undefined results) instead of one
         # raising EngineConflictError.
-        if isinstance(self.run_orchestrator.runner, PythonAndLegacyRunner):
+        if isinstance(
+            self.run_orchestrator.get_protocol_runner(), PythonAndLegacyRunner
+        ):
             assert (
                 protocol is not None
             ), "A Python protocol should have a protocol source file."

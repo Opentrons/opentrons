@@ -1,13 +1,14 @@
 """Engine/Runner provider."""
 from __future__ import annotations
-from typing import Optional, Union, List
+from typing import Optional, Union, List, Dict
 
 from anyio import move_on_after
 
 from build.lib.opentrons_shared_data.labware.dev_types import LabwareUri
 from opentrons_shared_data.labware.labware_definition import LabwareDefinition
-from . import protocol_runner, AnyRunner, RunResult
+from . import protocol_runner, RunResult
 from ..hardware_control import HardwareControlAPI
+from ..hardware_control.modules import AbstractModule as HardwareModuleAPI
 from ..protocol_engine import ProtocolEngine, CommandCreate, Command, StateSummary, CommandPointer, CommandSlice
 from ..protocol_engine.types import PostRunHardwareState, EngineStatus, LabwareOffsetCreate, LabwareOffset, \
     DeckConfigurationType, RunTimeParameter
@@ -215,3 +216,6 @@ class RunOrchestrator:
 
     def estop(self) -> None:
         return self._protocol_engine.estop()
+
+    def use_attached_modules(self, modules_by_id: Dict[str, HardwareModuleAPI]) -> None:
+        self._protocol_engine.use_attached_modules(modules_by_id=modules_by_id)
