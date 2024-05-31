@@ -32,7 +32,7 @@ The Opentrons AI application's server.
 
 ## Install a production dependency
 
-`python -m pipenv install openai==1.25.1`
+`python -m pipenv install openai==1.30.4`
 
 ## FastAPI Code Organization and Separation of Concerns
 
@@ -48,8 +48,10 @@ The Opentrons AI application's server.
 1. Make your changes
 1. Fix what can be automatically then lint and unit test like CI will `make pre-commit`
 1. `make pre-commit` passes
-1. run locally `make run` this runs the FastAPI server directly
+1. run locally `make run` this runs the FastAPI server directly at localhost:8000
+   1. this watches for changes and restarts the server
 1. test locally `make live-test` (ENV=local is the default in the Makefile)
+1. use the live client `make live-client`
 
 ## ECS Fargate
 

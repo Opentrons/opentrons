@@ -13,6 +13,7 @@ fastapi = "==0.111.0"
 ddtrace = "==2.8.5"
 pydantic-settings = "==2.2.1"
 pyjwt = {extras = ["crypto"], version = "*"}
+python-json-logger = "==2.0.7"
 
 [dev-packages]
 docker = "==7.1.0"

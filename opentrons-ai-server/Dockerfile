@@ -13,4 +13,4 @@ COPY ./api /code/api
 
 EXPOSE 8000
 
-CMD ["ddtrace-run", "uvicorn", "api.handler.fast:app", "--proxy-headers",  "--host", "0.0.0.0", "--port", "8000", "--timeout-keep-alive", "178", "--workers", "3"]
+CMD ["ddtrace-run", "uvicorn", "api.handler.fast:app", "--proxy-headers",  "--host", "0.0.0.0", "--port", "8000", "--timeout-keep-alive", "190", "--workers", "3"]

@@ -6,9 +6,9 @@ from typing import Any, Dict, Iterable
 import requests
 from openai.types.chat import ChatCompletionToolParam
 
-from api.settings import Settings, get_settings
+from api.settings import Settings
 
-settings: Settings = get_settings()
+settings: Settings = Settings()
 logger = logging.getLogger(__name__)
 
 

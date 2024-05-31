@@ -23,7 +23,7 @@ from api.domain.prompts import (
     tools,
 )
 from api.domain.utils import refine_characters
-from api.settings import Settings, get_settings
+from api.settings import Settings
 
 logger = logging.getLogger(__name__)
 
@@ -188,7 +188,7 @@ def main() -> None:
     from rich import print
     from rich.prompt import Prompt
 
-    settings = get_settings()
+    settings = Settings()
     openai = OpenAIPredict(settings)
     prompt = Prompt.ask("Type a prompt to send to the OpenAI API:")
     completion = openai.predict(prompt)

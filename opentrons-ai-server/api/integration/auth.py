@@ -5,7 +5,7 @@ import jwt
 from fastapi import HTTPException, Security, status
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer, SecurityScopes
 
-from api.settings import get_settings
+from api.settings import Settings
 
 logger = logging.getLogger(__name__)
 
@@ -19,7 +19,7 @@ class VerifyToken:
     """Does all the token verification using PyJWT"""
 
     def __init__(self) -> None:
-        self.config = get_settings()
+        self.config = Settings()
 
         # This gets the JWKS from a given URL and does processing so you can
         # use any of the keys available
@@ -49,7 +49,7 @@ class VerifyToken:
                 audience=self.config.auth0_api_audience,
                 issuer=self.config.auth0_issuer,
             )
-            logger.info(f"Decoded token: {payload}")
+            logger.info("Decoded token", extra={"token": payload})
             return payload
         except jwt.ExpiredSignatureError as error:
             logger.error(error, extra={"credentials": credentials})

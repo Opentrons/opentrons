@@ -96,4 +96,4 @@ test-live:
 
 .PHONY: run
 run:
-	python -m pipenv run python -m api.handler.fast --env $(ENV)
+	python -m pipenv run python -m api.handler.local_run --env $(ENV)

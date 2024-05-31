@@ -1,4 +1,3 @@
-from functools import lru_cache
 from pathlib import Path
 
 from pydantic import SecretStr
@@ -27,15 +26,12 @@ class Settings(BaseSettings):
     auth0_algorithms: str = "RS256"
     dd_version: str = "hardcoded_default_from_settings"
     allowed_origins: str = "*"
+    dd_logs_injection: str = "true"
+
     # Secrets
     # These come from environment variables in the local and deployed execution environments
     openai_api_key: SecretStr = SecretStr("default_openai_api_key")
     huggingface_api_key: SecretStr = SecretStr("default_huggingface_api_key")
-
-
-@lru_cache()
-def get_settings() -> Settings:
-    return Settings()
 
 
 def get_settings_from_json(json_str: str) -> Settings:
@@ -60,5 +56,5 @@ def generate_env_file(settings: Settings) -> None:
 
 # Example usage
 if __name__ == "__main__":
-    config: Settings = get_settings()
+    config: Settings = Settings()
     generate_env_file(config)
