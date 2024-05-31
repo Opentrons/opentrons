@@ -140,7 +140,7 @@ function getInvariantContextAndRobotState(
     }
   }
   let additionalEquipmentEntities: AdditionalEquipmentEntities = {}
-  //TODO add check for blowout location here
+  // TODO add check for blowout location here
   if (
     quickTransferState.dropTipLocation.cutoutFixtureId ===
     TRASH_BIN_ADAPTER_FIXTURE
@@ -155,7 +155,7 @@ function getInvariantContextAndRobotState(
       },
     }
   }
-  //TODO add check for blowout location here
+  // TODO add check for blowout location here
   if (
     WASTE_CHUTE_FIXTURES.includes(
       quickTransferState.dropTipLocation.cutoutFixtureId

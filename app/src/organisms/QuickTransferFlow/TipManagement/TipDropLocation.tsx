@@ -15,8 +15,8 @@ import {
 } from '@opentrons/shared-data'
 import { getTopPortalEl } from '../../../App/portal'
 import { LargeButton } from '../../../atoms/buttons'
-import { ChildNavigation } from '../../ChildNavigation'
 import { useNotifyDeckConfigurationQuery } from '../../../resources/deck_configuration'
+import { ChildNavigation } from '../../ChildNavigation'
 
 import type {
   QuickTransferSummaryState,

@@ -5,9 +5,12 @@ import {
 } from '@opentrons/shared-data'
 import { getVolumeRange } from './'
 
-import type { LabwareDefinition2, PipetteV2Specs } from '@opentrons/shared-data'
+import type {
+  LabwareDefinition2,
+  PipetteV2Specs,
+  DeckConfiguration,
+} from '@opentrons/shared-data'
 import type { Mount } from '@opentrons/api-client'
-import type { DeckConfiguration } from '@opentrons/shared-data'
 import type {
   QuickTransferSummaryState,
   TransferType,
@@ -65,7 +68,6 @@ export function getInitialSummaryState(
       WASTE_CHUTE_FIXTURES.includes(configCutout.cutoutFixtureId) ||
       TRASH_BIN_ADAPTER_FIXTURE === configCutout.cutoutFixtureId
   )
-  console.log(trashConfigCutout)
 
   return {
     pipette: state.pipette,
