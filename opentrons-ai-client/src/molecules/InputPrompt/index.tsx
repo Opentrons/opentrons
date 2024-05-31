@@ -15,11 +15,7 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { SendButton } from '../../atoms/SendButton'
-import {
-  chatDataAtom,
-  chatHistoryAtom,
-  tokenAtom,
-} from '../../resources/atoms'
+import { chatDataAtom, chatHistoryAtom, tokenAtom } from '../../resources/atoms'
 import { useApiCall } from '../../resources/hooks'
 import { calcTextAreaHeight } from '../../resources/utils/utils'
 import { END_POINT } from '../../resources/constants'

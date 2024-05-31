@@ -1,10 +1,14 @@
 import React from 'react'
+import { FormProvider, useForm } from 'react-hook-form'
 import { fireEvent, screen } from '@testing-library/react'
 import { describe, it, beforeEach, expect, vi } from 'vitest'
 
 import { renderWithProviders } from '../../../__testing-utils__'
+import { reagentTransfer } from '../../../assets/prompts'
 import { PromptButton } from '../index'
+
 import type * as ReactHookForm from 'react-hook-form'
+import type { InputType } from '../../../App'
 
 vi.mock('react-hook-form', async importOriginal => {
   const actual = await importOriginal<typeof ReactHookForm>()
@@ -16,15 +20,31 @@ vi.mock('react-hook-form', async importOriginal => {
   }
 })
 
+const WrappingForm = (wrappedComponent: {
+  children: React.ReactNode
+}): JSX.Element => {
+  const methods = useForm<InputType>({
+    defaultValues: {
+      userPrompt: '',
+    },
+  })
+  // eslint-disable-next-line testing-library/no-node-access
+  return <FormProvider {...methods}>{wrappedComponent.children}</FormProvider>
+}
 
 const render = (props: React.ComponentProps<typeof PromptButton>) => {
-  return renderWithProviders(<PromptButton {...props} />)
+  return renderWithProviders(
+    <WrappingForm>
+      <PromptButton {...props} />
+    </WrappingForm>
+  )
 }
 
 let mockSetValue = vi.fn()
 
 describe('PromptButton', () => {
   let props: React.ComponentProps<typeof PromptButton>
+
   beforeEach(() => {
     props = {
       buttonText: 'Reagent Transfer',
@@ -37,10 +57,11 @@ describe('PromptButton', () => {
     screen.getByRole('button', { name: 'Reagent Transfer' })
   })
 
-  it('should call a mock function when clicking a button', () => {
+  it('should render reagent transfer text into the form', () => {
     render(props)
     const button = screen.getByRole('button', { name: 'Reagent Transfer' })
     fireEvent.click(button)
-    expect(mockSetValue).toHaveBeenCalled()
+    expect(mockSetValue).toHaveBeenCalledWith('userPrompt', reagentTransfer)
+    fireEvent.click(button)
   })
 })
