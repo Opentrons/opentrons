@@ -1,0 +1,42 @@
+name: 'Testing Edge with Hypothesis'
+
+on:
+  schedule:
+  - cron: '0 45 22 ? * MON-FRI'
+  
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  lint-test:
+    name: 'edge testing'
+    timeout-minutes: 60
+    runs-on: 'ubuntu-latest'
+    steps:
+    - name: 'Checkout opentrons repo'
+      uses: 'actions/checkout@v3'
+      with:
+        ref: 'edge'
+        fetch-depth: 0
+
+    - name: 'Setup Python'
+      uses: 'actions/setup-python@v5'
+      with:
+        python-version: '3.10'
+        cache: 'pipenv'
+        cache-dependency-path: 'test-data-generation/Pipfile.lock'
+
+    - name: 'Install Python deps'
+      uses: './.github/actions/python/setup'
+      with:
+        project: 'test-data-generation'
+
+    - name: 'Run Hypothesis tests'
+      run: 'make test'
