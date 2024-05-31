@@ -6,7 +6,7 @@ import * as auth0 from '@auth0/auth0-react'
 import { renderWithProviders } from './__testing-utils__'
 import { i18n } from './i18n'
 import { SidePanel } from './molecules/SidePanel'
-import { ChatContainer } from './organisms/ChatContainer'
+import { MainContainer } from './organisms/MainContainer'
 import { Loading } from './molecules/Loading'
 
 import { App } from './App'
@@ -16,7 +16,7 @@ vi.mock('@auth0/auth0-react')
 const mockLogout = vi.fn()
 
 vi.mock('./molecules/SidePanel')
-vi.mock('./organisms/ChatContainer')
+vi.mock('./organisms/MainContainer')
 vi.mock('./molecules/Loading')
 
 const render = (): ReturnType<typeof renderWithProviders> => {
@@ -28,7 +28,7 @@ const render = (): ReturnType<typeof renderWithProviders> => {
 describe('App', () => {
   beforeEach(() => {
     vi.mocked(SidePanel).mockReturnValue(<div>mock SidePanel</div>)
-    vi.mocked(ChatContainer).mockReturnValue(<div>mock ChatContainer</div>)
+    vi.mocked(MainContainer).mockReturnValue(<div>mock MainContainer</div>)
     vi.mocked(Loading).mockReturnValue(<div>mock Loading</div>)
   })
 
@@ -48,7 +48,7 @@ describe('App', () => {
     })
     render()
     screen.getByText('mock SidePanel')
-    screen.getByText('mock ChatContainer')
+    screen.getByText('mock MainContainer')
     screen.getByText('Logout')
   })
 

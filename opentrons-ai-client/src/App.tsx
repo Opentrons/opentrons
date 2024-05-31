@@ -13,7 +13,7 @@ import {
 
 import { SidePanel } from './molecules/SidePanel'
 import { Loading } from './molecules/Loading'
-import { ChatContainer } from './organisms/ChatContainer'
+import { MainContainer } from './organisms/MainContainer'
 
 export function App(): JSX.Element | null {
   const { t } = useTranslation('protocol_generator')
@@ -48,7 +48,7 @@ export function App(): JSX.Element | null {
         </LinkButton>
       </Flex>
       <SidePanel />
-      <ChatContainer />
+      <MainContainer />
     </Flex>
   )
 }

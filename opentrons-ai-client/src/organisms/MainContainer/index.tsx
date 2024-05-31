@@ -8,7 +8,8 @@ import {
   DIRECTION_COLUMN,
   Flex,
   OVERFLOW_AUTO,
-  POSITION_FIXED,
+  POSITION_ABSOLUTE,
+  // POSITION_FIXED,
   SPACING,
   StyledText,
 } from '@opentrons/components'
@@ -17,7 +18,7 @@ import { ChatDisplay } from '../../molecules/ChatDisplay'
 import { ChatFooter } from '../../molecules/ChatFooter'
 import { chatDataAtom } from '../../resources/atoms'
 
-export function ChatContainer(): JSX.Element {
+export function MainContainer(): JSX.Element {
   const { t } = useTranslation('protocol_generator')
   const [chatData] = useAtom(chatDataAtom)
   const scrollRef = React.useRef<HTMLSpanElement | null>(null)
@@ -40,10 +41,15 @@ export function ChatContainer(): JSX.Element {
       width="auto"
       flexDirection={DIRECTION_COLUMN}
       gridGap={SPACING.spacing40}
-      minHeight={`calc(100vh-24.375rem)`}
-      overflowY={OVERFLOW_AUTO}
+      // minHeight={`calc(100vh-24.375rem)`}
+      height="100vh"
+      id="MainContainer"
     >
-      <Flex width="100%" height="100%">
+      <Flex
+        width="100%"
+        maxHeight={`calc(100vh-172px)`}
+        overflowY={OVERFLOW_AUTO}
+      >
         <ChatDataContainer>
           <StyledText>{t('opentronsai')}</StyledText>
           {/* Prompt Guide remain as a reference for users. */}
@@ -60,7 +66,7 @@ export function ChatContainer(): JSX.Element {
         </ChatDataContainer>
       </Flex>
       <span ref={scrollRef} />
-      <Flex position={POSITION_FIXED} bottom="0" zIndex="2" width="69%">
+      <Flex position={POSITION_ABSOLUTE} bottom="0" zIndex="2" width="100%">
         <ChatFooter />
       </Flex>
     </Flex>
@@ -71,5 +77,5 @@ const ChatDataContainer = styled(Flex)`
   flex-direction: ${DIRECTION_COLUMN};
   grid-gap: ${SPACING.spacing40};
   width: 100%;
-  height: calc(100vh + 9rem);
+  /* height: calc(100vh + 9rem); */
 `
