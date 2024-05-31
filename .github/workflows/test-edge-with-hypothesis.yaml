@@ -5,6 +5,7 @@ on:
   - cron: '45 22 * * 1-5'
   
   workflow_dispatch:
+  push:
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
