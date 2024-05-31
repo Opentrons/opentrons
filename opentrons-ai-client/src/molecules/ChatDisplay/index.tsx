@@ -66,7 +66,18 @@ export function ChatDisplay({ chat, chatId }: ChatDisplayProps): JSX.Element {
         position={POSITION_RELATIVE}
       >
         {isUser ? (
-          <Markdown>{reply}</Markdown>
+          <Markdown
+            components={{
+              div: undefined,
+              ul: UnnumberedListText,
+              h2: HeaderText,
+              li: ListItemText,
+              p: ParagraphText,
+              a: ExternalLink,
+            }}
+          >
+            {reply}
+          </Markdown>
         ) : (
           <Markdown
             components={{
@@ -125,7 +136,7 @@ function HeaderText(props: JSX.IntrinsicAttributes): JSX.Element {
 }
 
 function ListItemText(props: JSX.IntrinsicAttributes): JSX.Element {
-  return <StyledText {...props} as="li" />
+  return <StyledText {...props} as="li" marginLeft={SPACING.spacing16} />
 }
 
 function UnnumberedListText(props: JSX.IntrinsicAttributes): JSX.Element {
