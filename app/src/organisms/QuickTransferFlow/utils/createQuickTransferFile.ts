@@ -10,6 +10,8 @@ import {
   FLEX_ROBOT_TYPE,
   FLEX_STANDARD_DECKID,
   getDeckDefFromRobotType,
+  TRASH_BIN_ADAPTER_FIXTURE,
+  WASTE_CHUTE_FIXTURES,
 } from '@opentrons/shared-data'
 import type {
   AddressableAreaName,
@@ -129,11 +131,11 @@ export function createQuickTransferFile(
 
   let finalDropTipCommands: CreateCommand[] = []
   let addressableAreaName: AddressableAreaName | null = null
-  if (quickTransferState.dropTipLocation.type === 'trashBin') {
-    const trash = Object.values(
-      invariantContext.additionalEquipmentEntities
-    ).find(aE => aE.name === 'trashBin')
-    const trashLocation = trash != null ? (trash.location as CutoutId) : null
+  if (
+    quickTransferState.dropTipLocation.cutoutFixtureId ===
+    TRASH_BIN_ADAPTER_FIXTURE
+  ) {
+    const trashLocation = quickTransferState.dropTipLocation.cutoutId
     const deckDef = getDeckDefFromRobotType(FLEX_ROBOT_TYPE)
     const cutouts: Record<CutoutId, AddressableAreaName[]> | null =
       deckDef.cutoutFixtures.find(
@@ -143,7 +145,11 @@ export function createQuickTransferFile(
       trashLocation != null && cutouts != null
         ? cutouts[trashLocation]?.[0] ?? null
         : null
-  } else if (quickTransferState.dropTipLocation.type === 'wasteChute') {
+  } else if (
+    WASTE_CHUTE_FIXTURES.includes(
+      quickTransferState.dropTipLocation.cutoutFixtureId
+    )
+  ) {
     addressableAreaName = getWasteChuteAddressableAreaNamePip(
       pipetteEntity.spec.channels
     )
