@@ -156,8 +156,8 @@ class EngineStore:
             EngineConflictError: if a run-specific engine is active.
         """
         if (
-            self.run_orchestrator.engine.state_view.commands.has_been_played()
-            and not self.run_orchestrator.engine.state_view.commands.get_is_stopped()
+            self.run_orchestrator.run_has_started()
+            and not self.run_orchestrator.run_has_stopped()
         ):
             raise EngineConflictError("An engine for a run is currently active")
 
@@ -298,45 +298,41 @@ class EngineStore:
 
     def play(self, deck_configuration: Optional[DeckConfigurationType] = None) -> None:
         """Start or resume the run."""
-        self.run_orchestrator.engine.play(deck_configuration=deck_configuration)
+        self.run_orchestrator.play(deck_configuration=deck_configuration)
 
     async def run(self, deck_configuration: DeckConfigurationType) -> RunResult:
         """Start or resume the run."""
-        return await self.run_orchestrator.runner.run(
-            deck_configuration=deck_configuration
-        )
+        return await self.run_orchestrator.run(deck_configuration=deck_configuration)
 
     def pause(self) -> None:
         """Start or resume the run."""
-        self.run_orchestrator.runner.pause()
+        self.run_orchestrator.pause()
 
     async def stop(self) -> None:
         """Start or resume the run."""
-        await self.run_orchestrator.runner.stop()
+        await self.run_orchestrator.stop()
 
     def resume_from_recovery(self) -> None:
         """Start or resume the run."""
-        self.run_orchestrator.runner.resume_from_recovery()
+        self.run_orchestrator.resume_from_recovery()
 
     async def finish(self, error: Optional[Exception]) -> None:
         """Stop the run."""
-        await self.run_orchestrator.engine.finish(error=error)
+        await self.run_orchestrator.finish(error=error)
 
     def get_state_summary(self) -> StateSummary:
-        return self.run_orchestrator.engine.state_view.get_summary()
+        return self.run_orchestrator.get_summary()
 
     def get_loaded_labware_definitions(self) -> List[LabwareDefinition]:
-        return (
-            self.run_orchestrator.engine.state_view.labware.get_loaded_labware_definitions()
-        )
+        return self.run_orchestrator.get_loaded_labware_definitions()
 
     def get_run_time_parameters(self) -> List[RunTimeParameter]:
         """Parameter definitions defined by protocol, if any. Will always be empty before execution."""
-        return self.run_orchestrator.runner.run_time_parameters
+        return self.run_orchestrator.get_run_time_parameters()
 
     def get_current_command(self) -> Optional[CommandPointer]:
         """Parameter definitions defined by protocol, if any. Will always be empty before execution."""
-        return self.run_orchestrator.engine.state_view.commands.get_current()
+        return self.run_orchestrator.get_current_command()
 
     def get_command_slice(
         self,
@@ -353,35 +349,31 @@ class EngineStore:
         Raises:
             RunNotFoundError: The given run identifier was not found in the database.
         """
-        return self.run_orchestrator.engine.state_view.commands.get_slice(
-            cursor=cursor, length=length
-        )
+        return self.run_orchestrator.get_command_slice(cursor=cursor, length=length)
 
     def get_command_recovery_target(self) -> Optional[CommandPointer]:
         """Get the current error recovery target."""
-        return self.run_orchestrator.engine.state_view.commands.get_recovery_target()
+        return self.run_orchestrator.get_recovery_target()
 
     def get_command(self, command_id: str) -> Command:
         """Get a run's command by ID."""
-        return self.run_orchestrator.engine.state_view.commands.get(
-            command_id=command_id
-        )
+        return self.run_orchestrator.get_command(command_id=command_id)
 
     def get_status(self) -> EngineStatus:
         """Get the current execution status of the engine."""
-        return self.run_orchestrator.engine.state_view.commands.get_status()
+        return self.run_orchestrator.get_run_status()
 
     def get_is_run_terminal(self) -> bool:
-        return self.run_orchestrator.engine.state_view.commands.get_is_terminal()
+        return self.run_orchestrator.get_is_run_terminal()
 
     def run_was_started(self) -> bool:
-        return self.run_orchestrator.runner.was_started()
+        return self.run_orchestrator.was_run_started()
 
     def add_labware_offset(self, request: LabwareOffsetCreate) -> LabwareOffset:
-        return self.run_orchestrator.engine.add_labware_offset(request)
+        return self.run_orchestrator.add_labware_offset(request)
 
     def add_labware_definition(self, definition: LabwareDefinition) -> LabwareUri:
-        return self.run_orchestrator.engine.add_labware_definition(definition)
+        return self.run_orchestrator.add_labware_definition(definition)
 
     async def add_command_and_wait_for_interval(
         self,
