@@ -1,13 +1,16 @@
 """Engine/Runner provider."""
 from __future__ import annotations
-from typing import Optional, Union
+from typing import Optional, Union, List
 
 from anyio import move_on_after
 
-from . import protocol_runner, AnyRunner
+from build.lib.opentrons_shared_data.labware.dev_types import LabwareUri
+from opentrons_shared_data.labware.labware_definition import LabwareDefinition
+from . import protocol_runner, AnyRunner, RunResult
 from ..hardware_control import HardwareControlAPI
-from ..protocol_engine import ProtocolEngine, CommandCreate, Command
-from ..protocol_engine.types import PostRunHardwareState, EngineStatus
+from ..protocol_engine import ProtocolEngine, CommandCreate, Command, StateSummary, CommandPointer, CommandSlice
+from ..protocol_engine.types import PostRunHardwareState, EngineStatus, LabwareOffsetCreate, LabwareOffset, \
+    DeckConfigurationType, RunTimeParameter
 from ..protocol_reader import JsonProtocolConfig, PythonProtocolConfig
 
 
@@ -105,45 +108,53 @@ class RunOrchestrator:
 
     def play(self, deck_configuration: Optional[DeckConfigurationType] = None) -> None:
         """Start or resume the run."""
-        self.run_orchestrator.engine.play(deck_configuration=deck_configuration)
+        self._protocol_engine.play(deck_configuration=deck_configuration)
 
     async def run(self, deck_configuration: DeckConfigurationType) -> RunResult:
         """Start or resume the run."""
-        return await self.run_orchestrator.runner.run(
+        # TODO(tz, 5-31-2024): call all runners?
+        return await self._protocol_runner.run(
             deck_configuration=deck_configuration
         )
 
     def pause(self) -> None:
         """Start or resume the run."""
-        self.run_orchestrator.runner.pause()
+        self._protocol_engine.request_pause()
 
     async def stop(self) -> None:
         """Start or resume the run."""
-        await self.run_orchestrator.runner.stop()
+        if self.run_has_started():
+            await self.run_orchestrator.runner.stop()
+        else:
+            self.finish(
+                drop_tips_after_run=False,
+                set_run_status=False,
+                post_run_hardware_state=PostRunHardwareState.STAY_ENGAGED_IN_PLACE,
+            )
 
     def resume_from_recovery(self) -> None:
         """Start or resume the run."""
-        self.run_orchestrator.runner.resume_from_recovery()
+        self._protocol_engine.resume_from_recovery()
 
     async def finish(self, error: Optional[Exception]) -> None:
         """Stop the run."""
-        await self.run_orchestrator.engine.finish(error=error)
+        await self._protocol_engine.finish(error=error)
 
     def get_state_summary(self) -> StateSummary:
-        return self.run_orchestrator.engine.state_view.get_summary()
+        return self._protocol_engine.state_view.get_summary()
 
     def get_loaded_labware_definitions(self) -> List[LabwareDefinition]:
         return (
-            self.run_orchestrator.engine.state_view.labware.get_loaded_labware_definitions()
+            self._protocol_engine.state_view.labware.get_loaded_labware_definitions()
         )
 
     def get_run_time_parameters(self) -> List[RunTimeParameter]:
         """Parameter definitions defined by protocol, if any. Will always be empty before execution."""
-        return self.run_orchestrator.runner.run_time_parameters
+        return [] if self._protocol_runner is None else self._protocol_runner.run_time_parameters
 
     def get_current_command(self) -> Optional[CommandPointer]:
         """Parameter definitions defined by protocol, if any. Will always be empty before execution."""
-        return self.run_orchestrator.engine.state_view.commands.get_current()
+        return self._protocol_engine.state_view.commands.get_current()
 
     def get_command_slice(
         self,
@@ -160,17 +171,17 @@ class RunOrchestrator:
         Raises:
             RunNotFoundError: The given run identifier was not found in the database.
         """
-        return self.run_orchestrator.engine.state_view.commands.get_slice(
+        return self._protocol_engine.state_view.commands.get_slice(
             cursor=cursor, length=length
         )
 
     def get_command_recovery_target(self) -> Optional[CommandPointer]:
         """Get the current error recovery target."""
-        return self.run_orchestrator.engine.state_view.commands.get_recovery_target()
+        return self._protocol_engine.state_view.commands.get_recovery_target()
 
     def get_command(self, command_id: str) -> Command:
         """Get a run's command by ID."""
-        return self.run_orchestrator.engine.state_view.commands.get(
+        return self._protocol_engine.state_view.commands.get(
             command_id=command_id
         )
 
@@ -181,11 +192,14 @@ class RunOrchestrator:
     def get_is_run_terminal(self) -> bool:
         return self._protocol_engine.state_view.commands.get_is_terminal()
 
-    def run_was_started(self) -> bool:
+    def run_has_started(self) -> bool:
         return self._protocol_engine.state_view.commands.has_been_played()
 
+    def run_has_stopped(self) -> bool:
+        return self._protocol_engine.state_view.commands.get_is_stopped()
+
     def add_labware_offset(self, request: LabwareOffsetCreate) -> LabwareOffset:
-        return self.run_orchestrator.engine.add_labware_offset(request)
+        return self._protocol_engine.add_labware_offset(request)
 
     def add_labware_definition(self, definition: LabwareDefinition) -> LabwareUri:
         return self.run_orchestrator.engine.add_labware_definition(definition)
