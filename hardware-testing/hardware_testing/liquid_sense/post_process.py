@@ -262,7 +262,7 @@ def process_google_sheet(
     sheet_name = run_args.run_id  # type: ignore[attr-defined]
     test_parameters = [
         [
-            "Run ID", 
+            "Run ID",
             "Serial Number",
             "Pipette Type",
             "Tip Size",

@@ -300,11 +300,14 @@ if __name__ == "__main__":
             try:
                 sys.path.insert(0, "/var/lib/jupyter/notebooks/")
                 import google_drive_tool  # type: ignore[import]
+
                 google_drive: Optional[
-                google_drive_tool.google_drive
-            ] = google_drive_tool.google_drive(
-                CREDENTIALS_PATH, args.gd_parent_folder, "rhyann.clarke@opentrons.com"
-            )
+                    google_drive_tool.google_drive
+                ] = google_drive_tool.google_drive(
+                    CREDENTIALS_PATH,
+                    args.gd_parent_folder,
+                    "rhyann.clarke@opentrons.com",
+                )
             except ImportError:
                 raise ImportError(
                     "Run on robot. Make sure google_drive_tool.py is in jupyter notebook."
