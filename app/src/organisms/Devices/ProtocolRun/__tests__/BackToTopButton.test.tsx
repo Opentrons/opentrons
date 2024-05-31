@@ -58,8 +58,8 @@ describe('BackToTopButton', () => {
   })
 
   it('should be enabled with no tooltip if there are no missing Ids', () => {
-    const { getByRole } = render()
-    const button = getByRole('link', { name: 'Back to top' })
+    render()
+    const button = screen.getByRole('link', { name: 'Back to top' })
     expect(button).not.toBeDisabled()
     expect(button.getAttribute('href')).toEqual(
       '/devices/otie/protocol-runs/1/setup'

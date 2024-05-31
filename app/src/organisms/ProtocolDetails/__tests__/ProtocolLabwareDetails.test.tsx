@@ -83,11 +83,11 @@ describe('ProtocolLabwareDetails', () => {
   })
 
   it('should render an opentrons labware', () => {
-    const { getByText } = render(props)
-    getByText('Labware name')
-    getByText('NEST 96 Well Plate 100 µL PCR Full Skirt')
-    getByText('Quantity')
-    getByText('1')
+    render(props)
+    screen.getByText('Labware name')
+    screen.getByText('NEST 96 Well Plate 100 µL PCR Full Skirt')
+    screen.getByText('Quantity')
+    screen.getByText('1')
   })
 
   it('should render two quantites of the same opentrons labware', () => {

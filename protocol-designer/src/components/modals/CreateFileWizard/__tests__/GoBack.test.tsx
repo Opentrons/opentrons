@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { it, describe, beforeEach, expect, vi } from 'vitest'
-import { fireEvent } from '@testing-library/react'
+import { fireEvent, screen } from '@testing-library/react'
 import { renderWithProviders } from '../../../../__testing-utils__'
 import { i18n } from '../../../../localization'
 import { GoBack } from '../GoBack'
@@ -21,9 +21,9 @@ describe('GoBack', () => {
   })
 
   it('the go back renders and clicking on it calls prop', () => {
-    const { getByLabelText } = render(props)
+    render(props)
 
-    fireEvent.click(getByLabelText('GoBack_button'))
+    fireEvent.click(screen.getByLabelText('GoBack_button'))
     expect(props.onClick).toHaveBeenCalled()
   })
 })

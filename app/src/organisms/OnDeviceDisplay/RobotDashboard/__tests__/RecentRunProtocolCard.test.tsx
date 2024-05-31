@@ -275,14 +275,14 @@ describe('RecentRunProtocolCard', () => {
     vi.mocked(useRobotInitializationStatus).mockReturnValue(
       INIT_STATUS.INITIALIZING
     )
-    const [{ getByText }] = render(props)
-    getByText('mock Skeleton')
+    render(props)
+    screen.getByText('mock Skeleton')
   })
 
   it('should render the skeleton when the robot server is unresponsive', () => {
     vi.mocked(useRobotInitializationStatus).mockReturnValue(null)
-    const [{ getByText }] = render(props)
-    getByText('mock Skeleton')
+    render(props)
+    screen.getByText('mock Skeleton')
   })
 
   it('should push to protocol details if protocol contains runtime parameters', () => {
