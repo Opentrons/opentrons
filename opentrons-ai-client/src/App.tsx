@@ -16,7 +16,7 @@ import { tokenAtom } from './resources/atoms'
 import { useGetAccessToken } from './resources/hooks'
 import { SidePanel } from './molecules/SidePanel'
 import { Loading } from './molecules/Loading'
-import { ChatContainer } from './organisms/ChatContainer'
+import { MainContentContainer } from './organisms/MainContentContainer'
 
 export interface InputType {
   userPrompt: string
@@ -75,7 +75,7 @@ export function App(): JSX.Element | null {
       </Flex>
       <FormProvider {...methods}>
         <SidePanel />
-        <ChatContainer />
+        <MainContentContainer />
       </FormProvider>
     </Flex>
   )
