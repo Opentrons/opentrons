@@ -27,41 +27,42 @@ async def test_robot_context_tracker(
 ) -> None:
     """Tests the tracking of various robot context states through RobotContextTracker."""
 
-    def starting_robot() -> None:
+    @robot_context_tracker.track(state=RobotContextState.STARTING_UP)
+    async def starting_robot() -> str:
         sleep(STARTING_TIME)
+        return "Robot is starting up."
 
+    @robot_context_tracker.track(state=RobotContextState.CALIBRATING)
     def calibrating_robot() -> None:
         sleep(CALIBRATING_TIME)
 
+    @robot_context_tracker.track(state=RobotContextState.ANALYZING_PROTOCOL)
     def analyzing_protocol() -> None:
         sleep(ANALYZING_TIME)
 
-    def running_protocol() -> None:
+    @robot_context_tracker.track(state=RobotContextState.RUNNING_PROTOCOL)
+    async def running_protocol(run_time: int) -> int:
         sleep(RUNNING_TIME)
 
-    def shutting_down_robot() -> None:
+        return run_time
+
+    @robot_context_tracker.track(state=RobotContextState.SHUTTING_DOWN)
+    def shutting_down_robot() -> str:
         sleep(SHUTTING_DOWN_TIME)
+        return "Robot is shutting down."
 
     # Ensure storage is initially empty
     assert (
         len(robot_context_tracker._store._data) == 0
     ), "Storage should be initially empty."
 
-    await robot_context_tracker.track(
-        starting_robot, state=RobotContextState.STARTING_UP
-    )
-    await robot_context_tracker.track(
-        calibrating_robot, state=RobotContextState.CALIBRATING
-    )
-    await robot_context_tracker.track(
-        analyzing_protocol, state=RobotContextState.ANALYZING_PROTOCOL
-    )
-    await robot_context_tracker.track(
-        running_protocol, state=RobotContextState.RUNNING_PROTOCOL
-    )
-    await robot_context_tracker.track(
-        shutting_down_robot, state=RobotContextState.SHUTTING_DOWN
-    )
+    assert await starting_robot() == "Robot is starting up.", "Operation should return."
+    calibrating_robot()
+    analyzing_protocol()
+    assert await running_protocol(5) == 5
+    assert (
+        shutting_down_robot() == "Robot is shutting down."
+    ), "Operation should return."
 
     # Verify that all states were tracked
     assert len(robot_context_tracker._store._data) == 5, "All states should be tracked."
@@ -88,18 +89,18 @@ async def test_multiple_operations_single_state(
 ) -> None:
     """Tests tracking multiple operations within a single robot context state."""
 
-    def first_operation() -> None:
+    async def first_operation() -> None:
         sleep(RUNNING_TIME)
 
+    @robot_context_tracker.track(state=RobotContextState.RUNNING_PROTOCOL)
     def second_operation() -> None:
         sleep(RUNNING_TIME)
 
-    await robot_context_tracker.track(
-        first_operation, state=RobotContextState.RUNNING_PROTOCOL
-    )
-    await robot_context_tracker.track(
-        second_operation, state=RobotContextState.RUNNING_PROTOCOL
-    )
+    wrapped_first_operation = robot_context_tracker.track(
+        state=RobotContextState.RUNNING_PROTOCOL
+    )(first_operation)
+    await wrapped_first_operation()
+    second_operation()
 
     assert (
         len(robot_context_tracker._store._data) == 2
@@ -116,14 +117,13 @@ async def test_exception_handling_in_tracked_function(
 ) -> None:
     """Ensures exceptions in tracked operations are handled correctly."""
 
+    @robot_context_tracker.track(state=RobotContextState.SHUTTING_DOWN)
     async def error_prone_operation() -> None:
         sleep(SHUTTING_DOWN_TIME)
         raise RuntimeError("Simulated operation failure")
 
     with pytest.raises(RuntimeError):
-        await robot_context_tracker.track(
-            error_prone_operation, state=RobotContextState.SHUTTING_DOWN
-        )
+        await error_prone_operation()
 
     assert (
         len(robot_context_tracker._store._data) == 1
@@ -139,12 +139,11 @@ async def test_async_operation_tracking(
 ) -> None:
     """Tests tracking of an asynchronous operation."""
 
+    @robot_context_tracker.track(state=RobotContextState.ANALYZING_PROTOCOL)
     async def async_analyzing_operation() -> None:
         await asyncio.sleep(ANALYZING_TIME)
 
-    await robot_context_tracker.track(
-        async_analyzing_operation, state=RobotContextState.ANALYZING_PROTOCOL
-    )
+    await async_analyzing_operation()
 
     assert (
         len(robot_context_tracker._store._data) == 1
@@ -160,14 +159,11 @@ def test_sync_operation_timing_accuracy(
 ) -> None:
     """Tests the timing accuracy of a synchronous operation tracking."""
 
+    @robot_context_tracker.track(state=RobotContextState.RUNNING_PROTOCOL)
     def running_operation() -> None:
         sleep(RUNNING_TIME)
 
-    asyncio.run(
-        robot_context_tracker.track(
-            running_operation, state=RobotContextState.RUNNING_PROTOCOL
-        )
-    )
+    running_operation()
 
     duration_data = robot_context_tracker._store._data[0]
     assert (
@@ -181,12 +177,11 @@ async def test_async_operation_timing_accuracy(
 ) -> None:
     """Tests the timing accuracy of an async operation tracking."""
 
+    @robot_context_tracker.track(state=RobotContextState.RUNNING_PROTOCOL)
     async def async_running_operation() -> None:
         await asyncio.sleep(RUNNING_TIME)
 
-    await robot_context_tracker.track(
-        async_running_operation, state=RobotContextState.RUNNING_PROTOCOL
-    )
+    await async_running_operation()
 
     duration_data = robot_context_tracker._store._data[0]
     assert (
@@ -200,14 +195,13 @@ async def test_exception_in_async_operation(
 ) -> None:
     """Ensures exceptions in tracked async operations are correctly handled."""
 
+    @robot_context_tracker.track(state=RobotContextState.SHUTTING_DOWN)
     async def async_error_prone_operation() -> None:
         await asyncio.sleep(SHUTTING_DOWN_TIME)
         raise RuntimeError("Simulated async operation failure")
 
     with pytest.raises(RuntimeError):
-        await robot_context_tracker.track(
-            async_error_prone_operation, state=RobotContextState.SHUTTING_DOWN
-        )
+        await async_error_prone_operation()
 
     assert (
         len(robot_context_tracker._store._data) == 1
@@ -223,20 +217,15 @@ async def test_concurrent_async_operations(
 ) -> None:
     """Tests tracking of concurrent async operations."""
 
+    @robot_context_tracker.track(state=RobotContextState.CALIBRATING)
     async def first_async_calibrating() -> None:
         await asyncio.sleep(CALIBRATING_TIME)
 
+    @robot_context_tracker.track(state=RobotContextState.CALIBRATING)
     async def second_async_calibrating() -> None:
         await asyncio.sleep(CALIBRATING_TIME)
 
-    await asyncio.gather(
-        robot_context_tracker.track(
-            first_async_calibrating, state=RobotContextState.CALIBRATING
-        ),
-        robot_context_tracker.track(
-            second_async_calibrating, state=RobotContextState.CALIBRATING
-        ),
-    )
+    await asyncio.gather(first_async_calibrating(), second_async_calibrating())
 
     assert (
         len(robot_context_tracker._store._data) == 2
@@ -251,50 +240,42 @@ def test_no_tracking(tmp_path: Path) -> None:
     """Tests that operations are not tracked when tracking is disabled."""
     robot_context_tracker = RobotContextTracker(tmp_path, should_track=False)
 
+    @robot_context_tracker.track(state=RobotContextState.STARTING_UP)
     def operation_without_tracking() -> None:
         sleep(STARTING_TIME)
 
-    asyncio.run(
-        robot_context_tracker.track(
-            operation_without_tracking, state=RobotContextState.STARTING_UP
-        )
-    )
+    operation_without_tracking()
 
     assert (
         len(robot_context_tracker._store._data) == 0
     ), "Operation should not be tracked when tracking is disabled."
 
 
-def test_async_exception_handling_when_not_tracking(tmp_path: Path) -> None:
+@pytest.mark.asyncio
+async def test_async_exception_handling_when_not_tracking(tmp_path: Path) -> None:
     """Ensures exceptions in operations are still raised when tracking is disabled."""
     robot_context_tracker = RobotContextTracker(tmp_path, should_track=False)
 
+    @robot_context_tracker.track(state=RobotContextState.SHUTTING_DOWN)
     async def error_prone_operation() -> None:
         sleep(SHUTTING_DOWN_TIME)
         raise RuntimeError("Simulated operation failure")
 
     with pytest.raises(RuntimeError):
-        asyncio.run(
-            robot_context_tracker.track(
-                error_prone_operation, state=RobotContextState.SHUTTING_DOWN
-            )
-        )
+        await error_prone_operation()
 
 
 def test_sync_exception_handling_when_not_tracking(tmp_path: Path) -> None:
     """Ensures exceptions in operations are still raised when tracking is disabled."""
     robot_context_tracker = RobotContextTracker(tmp_path, should_track=False)
 
+    @robot_context_tracker.track(state=RobotContextState.SHUTTING_DOWN)
     def error_prone_operation() -> None:
         sleep(SHUTTING_DOWN_TIME)
         raise RuntimeError("Simulated operation failure")
 
     with pytest.raises(RuntimeError):
-        asyncio.run(
-            robot_context_tracker.track(
-                error_prone_operation, state=RobotContextState.SHUTTING_DOWN
-            )
-        )
+        error_prone_operation()
 
 
 @patch(
@@ -306,20 +287,16 @@ def test_using_non_linux_time_functions(tmp_path: Path) -> None:
     file_path = tmp_path / "test_file.csv"
     robot_context_tracker = RobotContextTracker(file_path, should_track=True)
 
+    @robot_context_tracker.track(state=RobotContextState.STARTING_UP)
     def starting_robot() -> None:
         sleep(STARTING_TIME)
 
+    @robot_context_tracker.track(state=RobotContextState.CALIBRATING)
     def calibrating_robot() -> None:
         sleep(CALIBRATING_TIME)
 
-    asyncio.run(
-        robot_context_tracker.track(starting_robot, state=RobotContextState.STARTING_UP)
-    )
-    asyncio.run(
-        robot_context_tracker.track(
-            calibrating_robot, state=RobotContextState.CALIBRATING
-        )
-    )
+    starting_robot()
+    calibrating_robot()
 
     storage = robot_context_tracker._store._data
     assert all(
