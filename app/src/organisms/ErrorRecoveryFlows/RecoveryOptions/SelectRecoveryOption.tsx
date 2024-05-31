@@ -89,7 +89,9 @@ export function RecoveryOptions({
         key={`recovery_option_${optionName}`}
         buttonLabel={optionName}
         buttonValue={optionName}
-        onChange={() => setSelectedRoute(recoveryOption)}
+        onChange={() => {
+          setSelectedRoute(recoveryOption)
+        }}
         isSelected={recoveryOption === selectedRoute}
       />
     )

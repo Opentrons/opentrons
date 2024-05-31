@@ -29,7 +29,9 @@ export function RetryStep({
   const primaryBtnOnClick = (): Promise<void> => {
     return setRobotInMotion(true, ROBOT_RETRYING_COMMAND.ROUTE)
       .then(() => retryFailedCommand())
-      .then(() => resumeRun())
+      .then(() => {
+        resumeRun()
+      })
   }
 
   if (isOnDevice) {

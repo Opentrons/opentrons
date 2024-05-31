@@ -84,7 +84,9 @@ export const AttachProbe = (props: AttachProbeProps): JSX.Element | null => {
         },
       ],
       false
-    ).catch(error => setFatalError(error.message))
+    ).catch(error => {
+      setFatalError(error.message)
+    })
   }, [])
 
   if (pipetteName == null || pipetteMount == null) return null
@@ -123,7 +125,9 @@ export const AttachProbe = (props: AttachProbeProps): JSX.Element | null => {
     chainRunCommands(verifyCommands, false)
       .then(() => {
         chainRunCommands(homeCommands, false)
-          .then(() => proceed())
+          .then(() => {
+            proceed()
+          })
           .catch((e: Error) => {
             setFatalError(
               `AttachProbe failed to move to safe location after probe attach with message: ${e.message}`

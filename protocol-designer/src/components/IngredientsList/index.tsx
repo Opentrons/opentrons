@@ -47,7 +47,9 @@ const LiquidGroupCard = (props: LiquidGroupCardProps): JSX.Element | null => {
 
   const [expanded, setExpanded] = React.useState(true)
 
-  const toggleAccordion = (): void => setExpanded(!expanded)
+  const toggleAccordion = (): void => {
+    setExpanded(!expanded)
+  }
 
   const wellsWithIngred = Object.keys(labwareWellContents)
     .sort(sortWells)
@@ -141,10 +143,10 @@ function IngredIndividual(props: IndividProps): JSX.Element {
         <IconButton
           className={styles.close_icon}
           name="close"
-          onClick={() =>
-            window.confirm(t('are_you_sure_delete_well', { well: wellName })) &&
-            removeWellsContents({ liquidGroupId: groupId, wells: [wellName] })
-          }
+          onClick={() => {
+            if (window.confirm(t('are_you_sure_delete_well', { well: wellName })))
+              removeWellsContents({ liquidGroupId: groupId, wells: [wellName] })
+          }}
         />
       )}
     </PDListItem>
@@ -185,7 +187,9 @@ export function IngredientsList(): JSX.Element {
       {Object.keys(liquidGroupsById).map(groupIdForCard => (
         <LiquidGroupCard
           key={groupIdForCard}
-          removeWellsContents={() => removeWellsContents(selectedLabwareId)}
+          removeWellsContents={() => {
+            removeWellsContents(selectedLabwareId)
+          }}
           labwareWellContents={labwareWellContents}
           ingredGroup={liquidGroupsById[groupIdForCard]}
           groupId={groupIdForCard}

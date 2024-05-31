@@ -87,7 +87,9 @@ export function FlexPipetteCard({
     setSelectedPipette(SINGLE_MOUNT_PIPETTES)
   }
 
-  const handleLaunchPipetteWizardFlows = (flowType: PipetteWizardFlow): void =>
+  const handleLaunchPipetteWizardFlows = (
+    flowType: PipetteWizardFlow
+  ): void => {
     handlePipetteWizardFlows({
       flowType,
       mount,
@@ -95,6 +97,7 @@ export function FlexPipetteCard({
       selectedPipette: selectedPipetteForWizard,
       host,
     })
+  }
   const handleChoosePipette: React.MouseEventHandler<HTMLButtonElement> = () => {
     setShowChoosePipette(true)
   }
@@ -169,12 +172,16 @@ export function FlexPipetteCard({
           {
             label: t('about_pipette'),
             disabled: attachedPipette == null,
-            onClick: () => setShowAboutPipetteSlideout(true),
+            onClick: () => {
+              setShowAboutPipetteSlideout(true)
+            },
           },
           {
             label: i18n.format(t('drop_tips'), 'capitalize'),
             disabled: attachedPipette == null || isRunActive,
-            onClick: () => handleDropTip(),
+            onClick: () => {
+              handleDropTip()
+            },
           },
         ]
   return (
@@ -257,7 +264,9 @@ export function FlexPipetteCard({
           robotType={FLEX_ROBOT_TYPE}
           mount={mount}
           instrumentModelSpecs={pipetteModelSpecs}
-          closeFlow={() => setShowDropTipWizard(false)}
+          closeFlow={() => {
+            setShowDropTipWizard(false)
+          }}
         />
       ) : null}
       {attachedPipette?.ok && showAboutPipetteSlideout ? (
@@ -266,7 +275,9 @@ export function FlexPipetteCard({
           pipetteName={pipetteDisplayName ?? attachedPipette.instrumentName}
           firmwareVersion={attachedPipette.firmwareVersion}
           isExpanded={showAboutPipetteSlideout}
-          onCloseClick={() => setShowAboutPipetteSlideout(false)}
+          onCloseClick={() => {
+            setShowAboutPipetteSlideout(false)
+          }}
         />
       ) : null}
       {showChoosePipette ? (
@@ -274,7 +285,9 @@ export function FlexPipetteCard({
           proceed={handleAttach}
           setSelectedPipette={setSelectedPipette}
           selectedPipette={selectedPipette}
-          exit={() => setShowChoosePipette(false)}
+          exit={() => {
+            setShowChoosePipette(false)
+          }}
           mount={mount}
         />
       ) : null}

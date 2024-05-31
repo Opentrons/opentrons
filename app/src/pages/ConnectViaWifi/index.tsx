@@ -73,7 +73,9 @@ export function ConnectViaWifi(): JSX.Element {
     currentScreen = (
       <DisplayWifiList
         list={list}
-        handleJoinAnotherNetwork={() => setCurrentOption('JoinOtherNetwork')}
+        handleJoinAnotherNetwork={() => {
+          setCurrentOption('JoinOtherNetwork')
+        }}
         handleNetworkPress={(ssid: string) => {
           setSelectedSsid(ssid)
           setCurrentOption('SelectAuthType')

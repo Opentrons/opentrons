@@ -316,9 +316,9 @@ export function AddFixtureModal({
       {isOnDevice ? (
         <Modal
           header={modalHeader}
-          onOutsideClick={() =>
-            providedFixtureOptions != null ? null : closeModal()
-          }
+          onOutsideClick={() => {
+            if (providedFixtureOptions == null) closeModal()
+          }}
         >
           <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing32}>
             <StyledText as="p">{t('add_fixture_description')}</StyledText>

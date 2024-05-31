@@ -31,7 +31,9 @@ export function TitleHeader({ title }: TitleHeaderProps): JSX.Element {
       position={POSITION_RELATIVE}
     >
       <Btn
-        onClick={() => history.push('/network-setup')}
+        onClick={() => {
+          history.push('/network-setup')
+        }}
         data-testid={`${title}_header_back_button`}
       >
         <Flex

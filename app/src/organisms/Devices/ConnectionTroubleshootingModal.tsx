@@ -62,7 +62,9 @@ export function ConnectionTroubleshootingModal(props: Props): JSX.Element {
           {t('learn_more_about_troubleshooting_connection')}
         </Link>
         <PrimaryButton
-          onClick={() => props.onClose()}
+          onClick={() => {
+            props.onClose()
+          }}
           alignSelf={ALIGN_FLEX_END}
           textTransform={TYPOGRAPHY.textTransformCapitalize}
         >

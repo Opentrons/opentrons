@@ -22,10 +22,13 @@ export class MobileList extends React.Component<Props, State> {
     this.state = { menu: null }
   }
 
-  clear: () => void = () => this.setState({ menu: null })
+  clear: () => void = () => {
+    this.setState({ menu: null })
+  }
 
-  toggle: (name: MenuName) => void = name =>
+  toggle: (name: MenuName) => void = name => {
     this.setState({ menu: this.state.menu !== name ? name : null })
+  }
 
   render(): JSX.Element {
     const { menu } = this.state
@@ -35,7 +38,9 @@ export class MobileList extends React.Component<Props, State> {
           <MobileMenu
             name="About"
             active={menu === 'About'}
-            onClick={() => this.toggle('About')}
+            onClick={() => {
+              this.toggle('About')
+            }}
           >
             <MobileContent {...aboutLinkProps} />
           </MobileMenu>
@@ -45,7 +50,9 @@ export class MobileList extends React.Component<Props, State> {
           <MobileMenu
             name="Products"
             active={menu === 'Products'}
-            onClick={() => this.toggle('Products')}
+            onClick={() => {
+              this.toggle('Products')
+            }}
           >
             <ProductMobileContent />
           </MobileMenu>
@@ -55,7 +62,9 @@ export class MobileList extends React.Component<Props, State> {
           <MobileMenu
             name="Applications"
             active={menu === 'Applications'}
-            onClick={() => this.toggle('Applications')}
+            onClick={() => {
+              this.toggle('Applications')
+            }}
           >
             <MobileContent {...applicationLinkProps} />
           </MobileMenu>
@@ -65,7 +74,9 @@ export class MobileList extends React.Component<Props, State> {
           <MobileMenu
             name="Protocols"
             active={menu === 'Protocols'}
-            onClick={() => this.toggle('Protocols')}
+            onClick={() => {
+              this.toggle('Protocols')
+            }}
           >
             <ProtocolMobileContent />
           </MobileMenu>
@@ -74,7 +85,9 @@ export class MobileList extends React.Component<Props, State> {
           <MobileMenu
             name="Support & Sales"
             active={menu === 'Support'}
-            onClick={() => this.toggle('Support')}
+            onClick={() => {
+              this.toggle('Support')
+            }}
           >
             <SupportMobileContent />
           </MobileMenu>

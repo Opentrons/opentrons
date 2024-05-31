@@ -245,7 +245,9 @@ export const PickUpTip = (props: PickUpTipProps): JSX.Element | null => {
             ],
             false
           )
-            .then(() => setShowTipConfirmation(true))
+            .then(() => {
+              setShowTipConfirmation(true)
+            })
             .catch((e: Error) => {
               setFatalError(
                 `PickUpTip failed to move from final position with message: ${e.message}`
@@ -312,7 +314,9 @@ export const PickUpTip = (props: PickUpTipProps): JSX.Element | null => {
       ],
       false
     )
-      .then(() => proceed())
+      .then(() => {
+        proceed()
+      })
       .catch((e: Error) => {
         setFatalError(
           `PickUpTip failed to move to safe location after tip pick up with message: ${e.message}`

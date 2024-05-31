@@ -27,7 +27,7 @@ export const useSwipe = (): UseSwipeResult => {
           if (!event.swipe) return
 
           swipeDirs.forEach(
-            dir => event.swipe[dir] && setSwipeType(`${str}-${dir}`)
+            dir => { if (event.swipe[dir] != null) setSwipeType(`${str}-${dir}`) }
           )
         })
     }
@@ -56,7 +56,11 @@ export const useSwipe = (): UseSwipeResult => {
     isEnabled,
     setSwipeType,
     swipeType,
-    enable: () => setIsEnabled(true),
-    disable: () => setIsEnabled(false),
+    enable: () => {
+      setIsEnabled(true)
+    },
+    disable: () => {
+      setIsEnabled(false)
+    },
   }
 }

@@ -119,7 +119,9 @@ const InstrumentDetailsOverflowMenu = NiceModal.create(
           {instrument.mount !== 'extension' ? (
             <MenuItem
               key="drop-tips"
-              onClick={() => setShowDropTipWizard(true)}
+              onClick={() => {
+                setShowDropTipWizard(true)
+              }}
             >
               <Flex alignItems={ALIGN_CENTER}>
                 <Icon

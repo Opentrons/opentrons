@@ -127,8 +127,12 @@ export function UploadInput(props: UploadInputProps): JSX.Element | null {
         onDragOver={handleDragOver}
         onDragEnter={handleDragEnter}
         onDragLeave={handleDragLeave}
-        onMouseEnter={() => setIsHover(true)}
-        onMouseLeave={() => setIsHover(false)}
+        onMouseEnter={() => {
+          setIsHover(true)
+        }}
+        onMouseLeave={() => {
+          setIsHover(false)
+        }}
         css={isFileOverDropZone ? DRAG_OVER_STYLES : undefined}
       >
         <Icon

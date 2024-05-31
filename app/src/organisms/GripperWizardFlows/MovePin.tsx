@@ -114,13 +114,21 @@ export const MovePin = (props: MovePinProps): JSX.Element | null => {
                       }
                       proceed()
                     })
-                    .catch(error => setErrorMessage(error.message))
+                    .catch(error => {
+                      setErrorMessage(error.message)
+                    })
                 })
-                .catch(error => setErrorMessage(error.message))
+                .catch(error => {
+                  setErrorMessage(error.message)
+                })
             })
-            .catch(error => setErrorMessage(error.message))
+            .catch(error => {
+              setErrorMessage(error.message)
+            })
         })
-        .catch(error => setErrorMessage(error.message))
+        .catch(error => {
+          setErrorMessage(error.message)
+        })
     }
   }
   const infoByMovement: {

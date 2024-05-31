@@ -148,7 +148,9 @@ export function RunSummary(): JSX.Element {
         FLEX_ROBOT_TYPE,
         host,
         setPipettesWithTip
-      ).catch(e => console.log(`Error launching Tip Attachment Modal: ${e}`))
+      ).catch(e => {
+        console.log(`Error launching Tip Attachment Modal: ${e}`)
+      })
     } else {
       closeCurrentRun()
       history.push('/')
@@ -164,7 +166,9 @@ export function RunSummary(): JSX.Element {
         FLEX_ROBOT_TYPE,
         host,
         setPipettesWithTip
-      ).catch(e => console.log(`Error launching Tip Attachment Modal: ${e}`))
+      ).catch(e => {
+        console.log(`Error launching Tip Attachment Modal: ${e}`)
+      })
     } else {
       if (!isResetRunLoading) {
         setShowRunAgainSpinner(true)

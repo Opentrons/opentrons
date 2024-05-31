@@ -114,10 +114,11 @@ export function registerRobotSystemUpdate(dispatch: Dispatch): Dispatch {
         const systemFile =
           massStorageUpdateSet?.system ?? systemUpdateSet?.system
         if (systemFile == null) {
-          return dispatch({
+          dispatch({
             type: 'robotUpdate:UNEXPECTED_ERROR',
             payload: { message: 'System update file not downloaded' },
           })
+          return
         }
         // eslint-disable-next-line @typescript-eslint/no-floating-promises
         readFileInfoAndDispatch(dispatch, systemFile)
@@ -157,7 +158,7 @@ export function registerRobotSystemUpdate(dispatch: Dispatch): Dispatch {
 }
 
 const getVersionFromOpenedZipIfValid = (zip: StreamZip): Promise<string> =>
-  new Promise((resolve, reject) =>
+  new Promise((resolve, reject) => {
     Object.values(zip.entries()).forEach(entry => {
       if (
         entry.isFile &&
@@ -182,7 +183,7 @@ const getVersionFromOpenedZipIfValid = (zip: StreamZip): Promise<string> =>
         }
       }
     })
-  )
+  })
 
 interface FileDetails {
   path: string
@@ -226,8 +227,8 @@ export const getLatestMassStorageUpdateFiles = (
       path.endsWith('.zip')
         ? getVersionFromZipIfValid(path).catch(() => null)
         : new Promise<null>(resolve => {
-            resolve(null)
-          })
+          resolve(null)
+        })
     )
   ).then(values => {
     const update = values.reduce(
@@ -237,10 +238,10 @@ export const getLatestMassStorageUpdateFiles = (
             ? prev
             : current
           : current === null
-          ? prev
-          : Semver.gt(current.version, prev.version)
-          ? current
-          : prev,
+            ? prev
+            : Semver.gt(current.version, prev.version)
+              ? current
+              : prev,
       null
     )
     if (update === null) {
@@ -323,12 +324,13 @@ export function getLatestSystemUpdateFiles(
           return cacheUpdateSet(filepaths)
         })
         .then(
-          updateInfo =>
+          updateInfo => {
             massStorageUpdateSet === null &&
-            dispatchUpdateInfo({ force: false, ...updateInfo }, dispatch)
+              dispatchUpdateInfo({ force: false, ...updateInfo }, dispatch)
+          }
         )
         .catch((error: Error) => {
-          return dispatch({
+          dispatch({
             type: 'robotUpdate:DOWNLOAD_ERROR',
             payload: { error: error.message, target: 'flex' },
           })
@@ -347,16 +349,20 @@ export function getCachedSystemUpdateFiles(
 ): Promise<unknown> {
   if (systemUpdateSet) {
     return getInfoFromUpdateSet(systemUpdateSet)
-      .then(updateInfo =>
+      .then(updateInfo => {
         dispatchUpdateInfo({ force: false, ...updateInfo }, dispatch)
-      )
-      .catch(err => console.log(`Could not get info from update set: ${err}`))
+      })
+      .catch(err => {
+        console.log(`Could not get info from update set: ${err}`)
+      })
   } else {
     dispatchUpdateInfo(
       { version: null, releaseNotes: null, force: false },
       dispatch
     )
-    return new Promise(resolve => resolve('no files'))
+    return new Promise(resolve => {
+      resolve('no files')
+    })
   }
 }
 
@@ -366,7 +372,9 @@ function getInfoFromUpdateSet(
   const version = getLatestVersion()
   const releaseNotesContentPromise = filepaths.releaseNotes
     ? readFile(filepaths.releaseNotes, 'utf8')
-    : new Promise<string | null>(resolve => resolve(null))
+    : new Promise<string | null>(resolve => {
+      resolve(null)
+    })
   return releaseNotesContentPromise
     .then(releaseNotes => ({
       version: version,

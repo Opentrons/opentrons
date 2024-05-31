@@ -63,17 +63,17 @@ const migrateLegacyServices = (
       const { ip, port } = service
       return ip != null
         ? [
-            {
-              ip,
-              port,
-              seen: false,
-              healthStatus: null,
-              serverHealthStatus: null,
-              healthError: null,
-              serverHealthError: null,
-              advertisedModel: null,
-            },
-          ]
+          {
+            ip,
+            port,
+            seen: false,
+            healthStatus: null,
+            serverHealthStatus: null,
+            healthError: null,
+            serverHealthError: null,
+            advertisedModel: null,
+          },
+        ]
         : []
     })
 
@@ -146,20 +146,25 @@ export function registerDiscovery(
 
     switch (action.type) {
       case UI_INITIALIZED:
-      case DISCOVERY_START:
+      case DISCOVERY_START: {
         handleRobots()
-        return client.start({ healthPollInterval: FAST_POLL_INTERVAL_MS })
+        client.start({ healthPollInterval: FAST_POLL_INTERVAL_MS })
+        return
+      }
 
-      case DISCOVERY_FINISH:
-        return client.start({ healthPollInterval: SLOW_POLL_INTERVAL_MS })
+      case DISCOVERY_FINISH: {
+        client.start({ healthPollInterval: SLOW_POLL_INTERVAL_MS })
+        return
+      }
 
-      case DISCOVERY_REMOVE:
-        return client.removeRobot(
-          (action.payload as { robotName: string }).robotName
-        )
+      case DISCOVERY_REMOVE: {
+        client.removeRobot((action.payload as { robotName: string }).robotName)
+        return
+      }
 
-      case CLEAR_CACHE:
-        return clearCache()
+      case CLEAR_CACHE: {
+        clearCache()
+      }
     }
   }
 

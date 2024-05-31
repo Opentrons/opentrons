@@ -19,14 +19,20 @@ export const OffDeckLabwareButton = (): JSX.Element => {
   return (
     <Flex position={POSITION_ABSOLUTE} right={SPACING.spacing16} zIndex={2}>
       <Flex position={POSITION_RELATIVE} padding={SPACING.spacing16}>
-        <DeprecatedPrimaryButton onClick={() => setShowSlideout(true)}>
+        <DeprecatedPrimaryButton
+          onClick={() => {
+            setShowSlideout(true)
+          }}
+        >
           {t('edit_off_deck')}
         </DeprecatedPrimaryButton>
       </Flex>
       {showSlideout ? (
         <OffDeckLabwareSlideout
           isExpanded={showSlideout}
-          onCloseClick={() => setShowSlideout(false)}
+          onCloseClick={() => {
+            setShowSlideout(false)
+          }}
           initialSetupTerminalItemId={
             selectedTerminalItemId === '__initial_setup__'
           }

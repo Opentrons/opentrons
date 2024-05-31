@@ -257,7 +257,9 @@ export const LabwareCreator = (): JSX.Element => {
     <LabwareCreatorComponent>
       {importError != null ? (
         <ImportErrorModal
-          onClose={() => setImportError(null)}
+          onClose={() => {
+            setImportError(null)
+          }}
           importError={importError}
         />
       ) : null}
@@ -265,10 +267,14 @@ export const LabwareCreator = (): JSX.Element => {
         <AlertModal
           className={styles.error_modal}
           heading="Cannot export file"
-          onCloseClick={() => setShowExportErrorModal(false)}
+          onCloseClick={() => {
+            setShowExportErrorModal(false)
+          }}
           buttons={[
             {
-              onClick: () => setShowExportErrorModal(false),
+              onClick: () => {
+                setShowExportErrorModal(false)
+              },
               children: 'close',
             },
           ]}

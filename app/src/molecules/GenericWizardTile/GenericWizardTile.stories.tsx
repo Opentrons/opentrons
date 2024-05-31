@@ -84,7 +84,9 @@ WithBackButton.args = {
   rightHandBody: rightHandBody,
   bodyText: body,
   header: 'example header',
-  back: () => console.log('back'),
+  back: () => {
+    console.log('back')
+  },
   proceedButtonText: 'Continue',
 }
 
@@ -95,7 +97,9 @@ WithSkeletons.args = {
   ),
   bodyText: skeletons,
   header: <Skeleton width="17rem" height="1.75rem" backgroundSize="47rem" />,
-  back: () => console.log('back'),
+  back: () => {
+    console.log('back')
+  },
   backIsDisabled: true,
   proceedButton: <PrimaryButton disabled={true}>{'Continue'}</PrimaryButton>,
 }

@@ -175,9 +175,9 @@ export function ProtocolSetupStep({
 
   return (
     <Btn
-      onClick={() =>
+      onClick={() => {
         !disabled ? onClickSetupStep() : makeDisabledReasonSnackbar()
-      }
+      }}
       width="100%"
     >
       <Flex
@@ -690,7 +690,9 @@ function PrepareToRun({
             <CloseButton
               onClose={
                 !isLoading
-                  ? () => setShowConfirmCancelModal(true)
+                  ? () => {
+                      setShowConfirmCancelModal(true)
+                    }
                   : onConfirmCancelClose
               }
             />
@@ -712,14 +714,18 @@ function PrepareToRun({
         {!isLoading ? (
           <>
             <ProtocolSetupStep
-              onClickSetupStep={() => setSetupScreen('instruments')}
+              onClickSetupStep={() => {
+                setSetupScreen('instruments')
+              }}
               title={t('instruments')}
               detail={instrumentsDetail}
               status={instrumentsStatus}
               disabled={speccedInstrumentCount === 0}
             />
             <ProtocolSetupStep
-              onClickSetupStep={() => setSetupScreen('modules')}
+              onClickSetupStep={() => {
+                setSetupScreen('modules')
+              }}
               title={t('deck_hardware')}
               detail={modulesDetail}
               subDetail={modulesSubDetail}
@@ -748,7 +754,9 @@ function PrepareToRun({
               disabledReason={lpcDisabledReason}
             />
             <ProtocolSetupStep
-              onClickSetupStep={() => setSetupScreen('view only parameters')}
+              onClickSetupStep={() => {
+                setSetupScreen('view only parameters')
+              }}
               title={t('parameters')}
               detail={parametersDetail}
               subDetail={null}
@@ -756,7 +764,9 @@ function PrepareToRun({
               disabled={!hasRunTimeParameters}
             />
             <ProtocolSetupStep
-              onClickSetupStep={() => setSetupScreen('labware')}
+              onClickSetupStep={() => {
+                setSetupScreen('labware')
+              }}
               title={t('labware')}
               detail={labwareDetail}
               subDetail={labwareSubDetail}
@@ -764,7 +774,9 @@ function PrepareToRun({
               disabled={labwareDetail == null}
             />
             <ProtocolSetupStep
-              onClickSetupStep={() => setSetupScreen('liquids')}
+              onClickSetupStep={() => {
+                setSetupScreen('liquids')
+              }}
               title={t('liquids')}
               status="general"
               detail={

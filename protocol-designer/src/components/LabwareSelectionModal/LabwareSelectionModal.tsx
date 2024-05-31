@@ -222,7 +222,9 @@ export function LabwareSelectionModal(): JSX.Element | null {
     enabled: enqueuedLabwareType !== null,
     hintKey: 'custom_labware_with_modules',
     content: <p>{t(`alert:hint.custom_labware_with_modules.body`)}</p>,
-    handleCancel: () => setEnqueuedLabwareType(null),
+    handleCancel: () => {
+      setEnqueuedLabwareType(null)
+    },
     handleContinue: () => {
       setEnqueuedLabwareType(null)
       if (enqueuedLabwareType !== null) {
@@ -328,9 +330,13 @@ export function LabwareSelectionModal(): JSX.Element | null {
         icon="check-decagram"
         labwareDef={labwareDef}
         selectLabware={selectLabware}
-        onMouseEnter={() => setPreviewedLabware(labwareDef)}
+        onMouseEnter={() => {
+          setPreviewedLabware(labwareDef)
+        }}
         // @ts-expect-error(sa, 2021-6-22): setPreviewedLabware expects an argument (even if nullsy)
-        onMouseLeave={() => setPreviewedLabware()}
+        onMouseLeave={() => {
+          setPreviewedLabware()
+        }}
       />
     ) : null
   }
@@ -406,11 +412,11 @@ export function LabwareSelectionModal(): JSX.Element | null {
           <div className={styles.filters_section}>
             <DeprecatedCheckboxField
               className={styles.filter_checkbox}
-              onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                 isNextToHeaterShaker
                   ? setFilterHeight(e.currentTarget.checked)
                   : setFilterRecommended(e.currentTarget.checked)
-              }
+              }}
               value={isNextToHeaterShaker ? filterHeight : filterRecommended}
             />
             {isNextToHeaterShaker && (
@@ -480,11 +486,13 @@ export function LabwareSelectionModal(): JSX.Element | null {
                   key={index}
                   labwareDef={customLabwareDefs[labwareURI]}
                   selectLabware={handleSelectCustomLabware}
-                  onMouseEnter={() =>
+                  onMouseEnter={() => {
                     setPreviewedLabware(customLabwareDefs[labwareURI])
-                  }
+                  }}
                   // @ts-expect-error(sa, 2021-6-22): need to pass in a nullsy value
-                  onMouseLeave={() => setPreviewedLabware()}
+                  onMouseLeave={() => {
+                    setPreviewedLabware()
+                  }}
                 />
               ))}
             </PDTitledList>
@@ -515,9 +523,13 @@ export function LabwareSelectionModal(): JSX.Element | null {
                             }
                             labwareDef={labwareDef}
                             selectLabware={selectLabware}
-                            onMouseEnter={() => setPreviewedLabware(labwareDef)}
+                            onMouseEnter={() => {
+                              setPreviewedLabware(labwareDef)
+                            }}
                             // @ts-expect-error(sa, 2021-6-22): setPreviewedLabware expects an argument (even if nullsy)
-                            onMouseLeave={() => setPreviewedLabware()}
+                            onMouseLeave={() => {
+                              setPreviewedLabware()
+                            }}
                           />
                         )
                       }

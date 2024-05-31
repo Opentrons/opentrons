@@ -115,10 +115,10 @@ export function DeckLocationSelect({
   ): void => {
     if (isDisabled) {
       setHoveredData({
-        slot: slot,
-        slotPosition: slotPosition,
-        isDisabled: isDisabled,
-        disabledReason: disabledReason,
+        slot,
+        slotPosition,
+        isDisabled,
+        disabledReason,
       })
     } else {
       setHoveredData(null)
@@ -131,9 +131,8 @@ export function DeckLocationSelect({
 
   return (
     <RobotCoordinateSpace
-      viewBox={`${deckDef.cornerOffsetFromOrigin[0] + X_CROP_MM} ${
-        deckDef.cornerOffsetFromOrigin[1]
-      } ${deckDef.dimensions[0] - X_CROP_MM * 2} ${deckDef.dimensions[1]}`}
+      viewBox={`${deckDef.cornerOffsetFromOrigin[0] + X_CROP_MM} ${deckDef.cornerOffsetFromOrigin[1]
+        } ${deckDef.dimensions[0] - X_CROP_MM * 2} ${deckDef.dimensions[1]}`}
     >
       {deckDef.locations.addressableAreas
         // only render standard slot fixture components
@@ -200,25 +199,24 @@ export function DeckLocationSelect({
                     cutoutId={cutoutId}
                     fixtureBaseColor={fill}
                     slotClipColor={COLORS.white}
-                    onClick={() =>
-                      !isDisabled &&
-                      setSelectedLocation != null &&
-                      setSelectedLocation(slotLocation)
-                    }
+                    onClick={() => {
+                      if (!isDisabled && setSelectedLocation != null)
+                        setSelectedLocation(slotLocation)
+                    }}
                     cursor={
                       setSelectedLocation == null || isDisabled || isSelected
                         ? 'default'
                         : 'pointer'
                     }
                     deckDefinition={deckDef}
-                    onMouseEnter={() =>
+                    onMouseEnter={() => {
                       handleMouseEnter(
                         slot,
                         slotPosition,
                         isDisabled,
                         disabledReason
                       )
-                    }
+                    }}
                     onMouseLeave={handleMouseLeave}
                   />
                 </>
@@ -228,11 +226,10 @@ export function DeckLocationSelect({
                   slotBaseColor={fill}
                   slotName={slot.id}
                   slotClipColor={COLORS.white}
-                  onClick={() =>
-                    !isDisabled &&
-                    setSelectedLocation != null &&
-                    setSelectedLocation(slotLocation)
-                  }
+                  onClick={() => {
+                    if (!isDisabled && setSelectedLocation != null)
+                      setSelectedLocation(slotLocation)
+                  }}
                   cursor={
                     setSelectedLocation == null || isDisabled || isSelected
                       ? 'default'
@@ -296,14 +293,14 @@ export function DeckLocationSelect({
             innerDivProps={
               hoveredData.slot.id[0] === 'A'
                 ? {
-                    maxWidth: '25rem',
-                    maxHeight: '10rem',
-                    width: 'fit-content',
-                  }
+                  maxWidth: '25rem',
+                  maxHeight: '10rem',
+                  width: 'fit-content',
+                }
                 : {
-                    maxWidth: '20rem',
-                    width: 'fit-content',
-                  }
+                  maxWidth: '20rem',
+                  width: 'fit-content',
+                }
             }
           >
             <Text
@@ -315,10 +312,10 @@ export function DeckLocationSelect({
             >
               {hoveredData.disabledReason != null
                 ? t('location_occupied', {
-                    fixture: getFixtureDisplayName(
-                      hoveredData.disabledReason
-                    ).toLowerCase(),
-                  })
+                  fixture: getFixtureDisplayName(
+                    hoveredData.disabledReason
+                  ).toLowerCase(),
+                })
                 : 'Slot unavailable'}
             </Text>
           </RobotCoordsForeignDiv>

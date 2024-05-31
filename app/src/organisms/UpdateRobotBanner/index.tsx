@@ -35,7 +35,9 @@ export function UpdateRobotBanner(
     robot !== null &&
     robot.healthStatus === 'ok' ? (
     <Flex
-      onClick={(e: React.MouseEvent) => e.stopPropagation()}
+      onClick={(e: React.MouseEvent) => {
+        e.stopPropagation()
+      }}
       flexDirection={DIRECTION_COLUMN}
     >
       <Banner type="error" {...styleProps} iconMarginLeft={SPACING.spacing4}>
@@ -43,7 +45,9 @@ export function UpdateRobotBanner(
           {t('branded:robot_software_update_required')}
         </StyledText>
         <Btn
-          onClick={() => handleUpdateBuildroot(robot)}
+          onClick={() => {
+            handleUpdateBuildroot(robot)
+          }}
           css={TYPOGRAPHY.pRegular}
           textDecoration={TYPOGRAPHY.textDecorationUnderline}
         >

@@ -136,7 +136,9 @@ export function ProtocolSetupDeckConfiguration({
           {showConfigurationModal && cutoutId != null ? (
             <AddFixtureModal
               cutoutId={cutoutId}
-              closeModal={() => setShowConfigurationModal(false)}
+              closeModal={() => {
+                setShowConfigurationModal(false)
+              }}
               providedFixtureOptions={providedFixtureOptions}
               isOnDevice
             />

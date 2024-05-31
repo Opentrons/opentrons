@@ -60,7 +60,9 @@ export const PipetteCard = (props: PipetteCardProps): JSX.Element => {
   } = useMenuHandleClickOutside()
   const pipetteDisplayName = pipetteModelSpecs?.displayName
   const pipetteOverflowWrapperRef = useOnClickOutside<HTMLDivElement>({
-    onClickOutside: () => setShowOverflowMenu(false),
+    onClickOutside: () => {
+      setShowOverflowMenu(false)
+    },
   })
   const [showChangePipette, setChangePipette] = React.useState(false)
   const [showDropTipWizard, setShowDropTipWizard] = React.useState(false)
@@ -96,7 +98,9 @@ export const PipetteCard = (props: PipetteCardProps): JSX.Element => {
         <ChangePipette
           robotName={robotName}
           mount={mount}
-          closeModal={() => setChangePipette(false)}
+          closeModal={() => {
+            setChangePipette(false)
+          }}
         />
       )}
       {showDropTipWizard && pipetteModelSpecs != null ? (
@@ -104,7 +108,9 @@ export const PipetteCard = (props: PipetteCardProps): JSX.Element => {
           robotType={OT2_ROBOT_TYPE}
           mount={mount}
           instrumentModelSpecs={pipetteModelSpecs}
-          closeFlow={() => setShowDropTipWizard(false)}
+          closeFlow={() => {
+            setShowDropTipWizard(false)
+          }}
         />
       ) : null}
       {showSlideout &&
@@ -114,7 +120,9 @@ export const PipetteCard = (props: PipetteCardProps): JSX.Element => {
           <PipetteSettingsSlideout
             robotName={robotName}
             pipetteName={pipetteModelSpecs.displayName}
-            onCloseClick={() => setShowSlideout(false)}
+            onCloseClick={() => {
+              setShowSlideout(false)
+            }}
             isExpanded={true}
             pipetteId={pipetteId}
             settings={settings}
@@ -124,7 +132,9 @@ export const PipetteCard = (props: PipetteCardProps): JSX.Element => {
         <AboutPipetteSlideout
           pipetteId={pipetteId}
           pipetteName={pipetteModelSpecs.displayName}
-          onCloseClick={() => setShowAboutSlideout(false)}
+          onCloseClick={() => {
+            setShowAboutSlideout(false)
+          }}
           isExpanded={true}
         />
       )}
@@ -188,7 +198,9 @@ export const PipetteCard = (props: PipetteCardProps): JSX.Element => {
         <>
           <Box
             ref={pipetteOverflowWrapperRef}
-            onClick={() => setShowOverflowMenu(false)}
+            onClick={() => {
+              setShowOverflowMenu(false)
+            }}
           >
             <PipetteOverflowMenu
               pipetteSpecs={pipetteModelSpecs}
