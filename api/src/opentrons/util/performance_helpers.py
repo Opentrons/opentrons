@@ -1,6 +1,7 @@
 """Performance helpers for tracking robot context."""
 
 import inspect
+import functools
 from pathlib import Path
 from opentrons_shared_data.performance.dev_types import (
     SupportsTracking,
@@ -30,19 +31,17 @@ class StubbedTracker(SupportsTracking):
         """Initialize the stubbed tracker."""
         pass
 
-    async def track(
+    def track(
         self,
-        func_to_track: UnderlyingFunction,
-        state: RobotContextState,
-        *args: UnderlyingFunctionParameters.args,
-        **kwargs: UnderlyingFunctionParameters.kwargs
-    ) -> UnderlyingFunctionReturn:
-        """Return the function unchanged."""
+        state: "RobotContextState",
+    ) -> typing.Callable[[UnderlyingFunction], UnderlyingFunction]:
+        """Return the original function."""
 
-        if inspect.iscoroutinefunction(func_to_track):
-            return await func_to_track(*args, **kwargs)  # type: ignore
-        else:
-            return func_to_track(*args, **kwargs)  # type: ignore
+        def inner_decorator(func: UnderlyingFunction) -> UnderlyingFunction:
+            """Return the original function."""
+            return func
+
+        return inner_decorator
 
     def store(self) -> None:
         """Do nothing."""
@@ -76,54 +75,21 @@ def _get_robot_context_tracker() -> SupportsTracking:
     return _robot_context_tracker
 
 
-# def _build_track_wrapper(
-#     func: UnderlyingFunction, state: RobotContextState
-# ) -> WrappedFunction:
-#     """Decorator to track the given state for the decorated function.
-
-#     Args:
-#         func: The function to track.
-#         state: The state of the robot context during the function execution.
-
-#     Returns:
-#         The decorated function.
-#     """
-
-#     async def wrapper(
-#         *args: P.args, **kwargs: P.kwargs
-#     ) -> T:
-#         tracker: SupportsTracking = _get_robot_context_tracker()
-
-#         try:
-
-#             result: T = await tracker.track(
-#                 func_to_track=func, state=state, *args, **kwargs
-#             )
-#         finally:
-#             tracker.store()
-
-#         return result
-
-#     return wrapper
-
-
 def track_analysis(func: UnderlyingFunction) -> UnderlyingFunction:
     """Track the analysis of a protocol and optionally store each run."""
 
-    async def wrapper(
+    @functools.wraps(func)
+    def wrapper(
         *args: UnderlyingFunctionParameters.args,
         **kwargs: UnderlyingFunctionParameters.kwargs
     ) -> UnderlyingFunctionReturn:
         tracker: SupportsTracking = _get_robot_context_tracker()
-
         try:
-
-            result: UnderlyingFunctionReturn = await tracker.track(
-                func_to_track=func, state=RobotContextState.ANALYZING_PROTOCOL
+            result = tracker.track(state=RobotContextState.ANALYZING_PROTOCOL)(func)(
+                *args, **kwargs
             )
         finally:
             tracker.store()
-
         return result
 
     return wrapper
