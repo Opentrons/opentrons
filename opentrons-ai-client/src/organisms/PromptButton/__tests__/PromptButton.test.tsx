@@ -1,5 +1,4 @@
 import React from 'react'
-import { FormProvider, useForm } from 'react-hook-form'
 import { fireEvent, screen } from '@testing-library/react'
 import { describe, it, beforeEach, expect, vi } from 'vitest'
 
@@ -8,7 +7,6 @@ import { reagentTransfer } from '../../../assets/prompts'
 import { PromptButton } from '../index'
 
 import type * as ReactHookForm from 'react-hook-form'
-import type { InputType } from '../../../App'
 
 vi.mock('react-hook-form', async importOriginal => {
   const actual = await importOriginal<typeof ReactHookForm>()
@@ -20,24 +18,8 @@ vi.mock('react-hook-form', async importOriginal => {
   }
 })
 
-const WrappingForm = (wrappedComponent: {
-  children: React.ReactNode
-}): JSX.Element => {
-  const methods = useForm<InputType>({
-    defaultValues: {
-      userPrompt: '',
-    },
-  })
-  // eslint-disable-next-line testing-library/no-node-access
-  return <FormProvider {...methods}>{wrappedComponent.children}</FormProvider>
-}
-
 const render = (props: React.ComponentProps<typeof PromptButton>) => {
-  return renderWithProviders(
-    <WrappingForm>
-      <PromptButton {...props} />
-    </WrappingForm>
-  )
+  return renderWithProviders(<PromptButton {...props} />)
 }
 
 let mockSetValue = vi.fn()
