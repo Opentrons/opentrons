@@ -100,7 +100,7 @@ def print_response(response: Response) -> None:
 
 
 def main() -> None:
-    env = Prompt.ask("Select environment", choices=["local", "dev", "sandbox", "crt", "staging"], default="local")
+    env = Prompt.ask("Select environment", choices=["local", "dev", "sandbox", "crt", "staging", "prod"], default="local")
     settings = get_settings(env=env)
     client = Client(settings)
     try:
