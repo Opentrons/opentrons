@@ -8,8 +8,6 @@ import {
   DIRECTION_COLUMN,
   Flex,
   OVERFLOW_AUTO,
-  POSITION_ABSOLUTE,
-  // POSITION_FIXED,
   SPACING,
   StyledText,
 } from '@opentrons/components'
@@ -18,7 +16,7 @@ import { ChatDisplay } from '../../molecules/ChatDisplay'
 import { ChatFooter } from '../../molecules/ChatFooter'
 import { chatDataAtom } from '../../resources/atoms'
 
-export function MainContainer(): JSX.Element {
+export function MainContentContainer(): JSX.Element {
   const { t } = useTranslation('protocol_generator')
   const [chatData] = useAtom(chatDataAtom)
   const scrollRef = React.useRef<HTMLSpanElement | null>(null)
@@ -41,19 +39,20 @@ export function MainContainer(): JSX.Element {
       width="auto"
       flexDirection={DIRECTION_COLUMN}
       gridGap={SPACING.spacing40}
-      // minHeight={`calc(100vh-24.375rem)`}
       height="100vh"
-      id="MainContainer"
     >
       <Flex
         width="100%"
-        maxHeight={`calc(100vh-172px)`}
+        flexGrow="1"
         overflowY={OVERFLOW_AUTO}
+        flexDirection={DIRECTION_COLUMN}
       >
-        <ChatDataContainer>
-          <StyledText>{t('opentronsai')}</StyledText>
+        <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing12}>
           {/* Prompt Guide remain as a reference for users. */}
+          <StyledText>{t('opentronsai')}</StyledText>
           <PromptGuide />
+        </Flex>
+        <ChatDataContainer>
           {chatData.length > 0
             ? chatData.map((chat, index) => (
                 <ChatDisplay
@@ -64,9 +63,9 @@ export function MainContainer(): JSX.Element {
               ))
             : null}
         </ChatDataContainer>
+        <span ref={scrollRef} />
       </Flex>
-      <span ref={scrollRef} />
-      <Flex position={POSITION_ABSOLUTE} bottom="0" zIndex="2" width="100%">
+      <Flex bottom="0" zIndex="2" width="100%" flexDirection={DIRECTION_COLUMN}>
         <ChatFooter />
       </Flex>
     </Flex>
@@ -77,5 +76,4 @@ const ChatDataContainer = styled(Flex)`
   flex-direction: ${DIRECTION_COLUMN};
   grid-gap: ${SPACING.spacing40};
   width: 100%;
-  /* height: calc(100vh + 9rem); */
 `

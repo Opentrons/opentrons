@@ -5,7 +5,7 @@ import { renderWithProviders } from '../../../__testing-utils__'
 import { i18n } from '../../../i18n'
 import { PromptGuide } from '../../../molecules/PromptGuide'
 import { ChatFooter } from '../../../molecules/ChatFooter'
-import { MainContainer } from '../index'
+import { MainContentContainer } from '../index'
 
 vi.mock('../../../molecules/PromptGuide')
 vi.mock('../../../molecules/ChatFooter')
@@ -13,12 +13,12 @@ vi.mock('../../../molecules/ChatFooter')
 window.HTMLElement.prototype.scrollIntoView = vi.fn()
 
 const render = (): ReturnType<typeof renderWithProviders> => {
-  return renderWithProviders(<MainContainer />, {
+  return renderWithProviders(<MainContentContainer />, {
     i18nInstance: i18n,
   })
 }
 
-describe('MainContainer', () => {
+describe('MainContentContainer', () => {
   beforeEach(() => {
     vi.mocked(PromptGuide).mockReturnValue(<div>mock PromptGuide</div>)
     vi.mocked(ChatFooter).mockReturnValue(<div>mock ChatFooter</div>)

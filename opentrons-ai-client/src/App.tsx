@@ -16,7 +16,7 @@ import { tokenAtom } from './resources/atoms'
 import { useGetAccessToken } from './resources/hooks'
 import { SidePanel } from './molecules/SidePanel'
 import { Loading } from './molecules/Loading'
-import { MainContainer } from './organisms/MainContainer'
+import { MainContentContainer } from './organisms/MainContentContainer'
 
 export function App(): JSX.Element | null {
   const { t } = useTranslation('protocol_generator')
@@ -65,7 +65,7 @@ export function App(): JSX.Element | null {
         </LinkButton>
       </Flex>
       <SidePanel />
-      <MainContainer />
+      <MainContentContainer />
     </Flex>
   )
 }
