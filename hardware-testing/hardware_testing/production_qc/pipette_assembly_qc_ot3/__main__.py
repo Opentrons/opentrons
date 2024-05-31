@@ -446,6 +446,10 @@ async def _move_to_fixture(api: OT3API, mount: OT3Mount) -> None:
         CALIBRATED_LABWARE_LOCATIONS.fixture,
     )
 
+    #Z down 0.5
+    await api.move_rel(mount, Point(z=-0.5))
+    CALIBRATED_LABWARE_LOCATIONS.fixture = await api.gantry_position(mount)
+
 
 async def _drop_tip_in_trash(api: OT3API, mount: OT3Mount) -> None:
     global _trash_loc_counter
@@ -666,6 +670,7 @@ async def _fixture_check_pressure(
     # NOTE: unknown amount of pressure here (depends on where Z was calibrated)
     fixture_depth = PRESSURE_FIXTURE_INSERT_DEPTH[pip_vol]
     await api.move_rel(mount, Point(z=-fixture_depth))
+    await asyncio.sleep(1)
     r, inserted_pressure_data = await _read_pressure_and_check_results(
         api,
         pip_channels,
@@ -679,6 +684,7 @@ async def _fixture_check_pressure(
     results.append(r)
     # aspirate 50uL
     await api.aspirate(mount, PRESSURE_FIXTURE_ASPIRATE_VOLUME[pip_vol])
+    await asyncio.sleep(1)
     if pip_vol == 50:
         asp_evt = PressureEvent.ASPIRATE_P50
     else:
@@ -697,6 +703,7 @@ async def _fixture_check_pressure(
     results.append(r)
     # dispense
     await api.dispense(mount, PRESSURE_FIXTURE_ASPIRATE_VOLUME[pip_vol])
+    await asyncio.sleep(1)
     r, _ = await _read_pressure_and_check_results(
         api,
         pip_channels,
@@ -710,6 +717,7 @@ async def _fixture_check_pressure(
     results.append(r)
     # retract out of fixture
     await api.move_rel(mount, Point(z=fixture_depth))
+    await asyncio.sleep(1)
     r, _ = await _read_pressure_and_check_results(
         api,
         pip_channels,
@@ -1408,10 +1416,10 @@ async def _test_tip_presence_flag(
     assert pip
     pip_channels = pip.channels.value
     await api.retract(mount)
-    slot_5_pos = helpers_ot3.get_slot_calibration_square_position_ot3(5)
-    current_pos = await api.gantry_position(mount)
-    await api.move_to(mount, slot_5_pos._replace(z=current_pos.z))
-    await api.move_rel(mount, Point(z=-20))
+    # slot_5_pos = helpers_ot3.get_slot_calibration_square_position_ot3(5)
+    # current_pos = await api.gantry_position(mount)
+    # await api.move_to(mount, slot_5_pos._replace(z=current_pos.z))
+    # await api.move_rel(mount, Point(z=-20))
     #wiggle_passed = await _wait_for_tip_presence_state_change(api, seconds_to_wait=5)
     if not api.is_simulator:
         input("press ENTER to continue")
