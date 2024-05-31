@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { vi, it, describe, expect, beforeEach } from 'vitest'
-import { fireEvent } from '@testing-library/react'
+import { fireEvent, screen } from '@testing-library/react'
 
 import { renderWithProviders } from '../../../__testing-utils__'
 
@@ -28,24 +28,24 @@ describe('ConfirmAttachedModal', () => {
   })
 
   it('should render text and buttons', () => {
-    const [{ getByText }] = render(props)
-    getByText('Confirm Heater-Shaker Module is attached')
-    getByText(
+    render(props)
+    screen.getByText('Confirm Heater-Shaker Module is attached')
+    screen.getByText(
       'Before the run begins, module should have both anchors fully extended for a firm attachment. The thermal adapter should be attached to the module.'
     )
-    getByText('Cancel')
-    getByText('Proceed to run')
+    screen.getByText('Cancel')
+    screen.getByText('Proceed to run')
   })
 
   it('should call a mock function when tapping cancel button', () => {
-    const [{ getByText }] = render(props)
-    fireEvent.click(getByText('Cancel'))
+    render(props)
+    fireEvent.click(screen.getByText('Cancel'))
     expect(mockOnCloseClick).toHaveBeenCalled()
   })
 
   it('should call a mock function when tapping proceed to run button', () => {
-    const [{ getByText }] = render(props)
-    fireEvent.click(getByText('Proceed to run'))
+    render(props)
+    fireEvent.click(screen.getByText('Proceed to run'))
     expect(mockOnConfirmClick).toHaveBeenCalled()
   })
 })
