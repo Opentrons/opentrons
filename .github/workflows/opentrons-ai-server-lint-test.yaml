@@ -18,7 +18,7 @@ defaults:
 jobs:
   lint:
     name: 'ai-server lint'
-    timeout-minutes: 8
+    timeout-minutes: 5
     runs-on: 'ubuntu-latest'
     steps:
       - name: Checkout opentrons repo
