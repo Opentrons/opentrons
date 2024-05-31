@@ -1,6 +1,6 @@
 import * as React from 'react'
-import { it, describe, beforeEach, afterEach, expect, vi } from 'vitest'
-import { fireEvent, cleanup } from '@testing-library/react'
+import { it, describe, beforeEach, expect, vi } from 'vitest'
+import { fireEvent } from '@testing-library/react'
 import { renderWithProviders } from '../../../../__testing-utils__'
 import { i18n } from '../../../../localization'
 import { GoBack } from '../GoBack'
@@ -18,10 +18,6 @@ describe('GoBack', () => {
     props = {
       onClick: vi.fn(),
     }
-  })
-
-  afterEach(() => {
-    cleanup()
   })
 
   it('the go back renders and clicking on it calls prop', () => {
