@@ -1,7 +1,7 @@
 import React from 'react'
 import { useTranslation } from 'react-i18next'
 import styled, { css } from 'styled-components'
-import { useForm } from 'react-hook-form'
+import { useFormContext } from 'react-hook-form'
 import { useAtom } from 'jotai'
 
 import {
@@ -15,69 +15,59 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { SendButton } from '../../atoms/SendButton'
-import { preparedPromptAtom, chatDataAtom } from '../../resources/atoms'
-import { useApiCall, useGetAccessToken } from '../../resources/hooks'
+import { chatDataAtom, chatHistoryAtom, tokenAtom } from '../../resources/atoms'
+import { useApiCall } from '../../resources/hooks'
 import { calcTextAreaHeight } from '../../resources/utils/utils'
 import { END_POINT } from '../../resources/constants'
 
 import type { AxiosRequestConfig } from 'axios'
 import type { ChatData } from '../../resources/types'
 
-interface InputType {
-  userPrompt: string
-}
-
 export function InputPrompt(): JSX.Element {
   const { t } = useTranslation('protocol_generator')
-  const { register, watch, setValue, reset } = useForm<InputType>({
-    defaultValues: {
-      userPrompt: '',
-    },
-  })
-  const [preparedPrompt] = useAtom(preparedPromptAtom)
+  const { register, watch, reset } = useFormContext()
   const [, setChatData] = useAtom(chatDataAtom)
+  const [chatHistory, setChatHistory] = useAtom(chatHistoryAtom)
+  const [token] = useAtom(tokenAtom)
   const [submitted, setSubmitted] = React.useState<boolean>(false)
   const userPrompt = watch('userPrompt') ?? ''
   const { data, isLoading, callApi } = useApiCall()
-  const { getAccessToken } = useGetAccessToken()
 
   const handleClick = async (): Promise<void> => {
     const userInput: ChatData = {
       role: 'user',
       reply: userPrompt,
     }
+    reset()
     setChatData(chatData => [...chatData, userInput])
 
     try {
-      const accessToken = await getAccessToken()
       const headers = {
-        Authorization: `Bearer ${accessToken}`,
+        Authorization: `Bearer ${token}`,
         'Content-Type': 'application/json',
-      }
-
-      const postData = {
-        message: userPrompt,
-        fake: false,
       }
 
       const config = {
         url: END_POINT,
         method: 'POST',
         headers,
-        data: postData,
+        data: {
+          message: userPrompt,
+          history: chatHistory,
+          fake: false,
+        },
       }
+      setChatHistory(chatHistory => [
+        ...chatHistory,
+        { role: 'user', content: userPrompt },
+      ])
       await callApi(config as AxiosRequestConfig)
       setSubmitted(true)
-      reset()
     } catch (err: any) {
       console.error(`error: ${err.message}`)
       throw err
     }
   }
-
-  React.useEffect(() => {
-    if (preparedPrompt !== '') setValue('userPrompt', preparedPrompt as string)
-  }, [preparedPrompt, setValue])
 
   React.useEffect(() => {
     if (submitted && data != null && !isLoading) {
@@ -86,6 +76,10 @@ export function InputPrompt(): JSX.Element {
         role,
         reply,
       }
+      setChatHistory(chatHistory => [
+        ...chatHistory,
+        { role: 'assistant', content: reply },
+      ])
       setChatData(chatData => [...chatData, assistantResponse])
       setSubmitted(false)
     }

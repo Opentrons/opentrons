@@ -17,6 +17,7 @@ export const GlobalStyle = createGlobalStyle`
     width: 100%;
     height: 100%;
     color: ${COLORS.black90};
+    overflow: hidden;
   }
 
   a {

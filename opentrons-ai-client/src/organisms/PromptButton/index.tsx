@@ -1,6 +1,5 @@
 import React from 'react'
 import styled from 'styled-components'
-import { useAtom } from 'jotai'
 import { BORDERS, PrimaryButton } from '@opentrons/components'
 import {
   reagentTransfer,
@@ -8,7 +7,7 @@ import {
   pcr,
   flexPcr,
 } from '../../assets/prompts'
-import { preparedPromptAtom } from '../../resources/atoms'
+import { useFormContext } from 'react-hook-form'
 
 interface PromptButtonProps {
   buttonText: string
@@ -31,10 +30,10 @@ const PROMPT_BY_NAME: Record<string, { prompt: string }> = {
 }
 
 export function PromptButton({ buttonText }: PromptButtonProps): JSX.Element {
-  const [, setPreparedPrompt] = useAtom(preparedPromptAtom)
+  const { setValue } = useFormContext()
   const handleClick = (): void => {
     const { prompt } = PROMPT_BY_NAME[buttonText]
-    setPreparedPrompt(prompt)
+    setValue('userPrompt', prompt)
   }
 
   return <PromptBtn onClick={handleClick}>{buttonText}</PromptBtn>
