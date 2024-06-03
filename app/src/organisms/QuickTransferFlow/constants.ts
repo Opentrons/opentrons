@@ -73,6 +73,7 @@ export const SINGLE_CHANNEL_COMPATIBLE_LABWARE = [
   'opentrons/opentrons_24_tuberack_nest_2ml_snapcap/1',
   'opentrons/opentrons_6_tuberack_falcon_50ml_conical/1',
   'opentrons/opentrons_6_tuberack_nest_50ml_conical/1',
+  'opentrons/opentrons_96_deep_well_temp_deck_adapter/1',
   'opentrons/opentrons_96_aluminumblock_biorad_wellplate_200ul/1',
   'opentrons/opentrons_96_aluminumblock_generic_pcr_strip_200ul/2',
   'opentrons/opentrons_96_aluminumblock_nest_wellplate_100ul/1',
