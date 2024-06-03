@@ -47,7 +47,8 @@ class LLDPresThresh(LLDAlgoABC):
     def tick(self, pressures: Tuple[float, float]) -> Tuple[bool, Tuple[float, float]]:
         """Simulate firmware motor interrupt tick."""
         return (
-            pressures[0] < self.threshold or pressures[1] < self.threshold,
+            abs(pressures[0]) > abs(self.threshold)
+            or abs(pressures[1]) > abs(self.threshold),
             pressures,
         )
 
@@ -108,6 +109,11 @@ class LLDSMAT(LLDAlgoABC):
         new_avg_s, self.running_samples_smad_s = LLDSMAT._tick_one_sensor(
             pressures[1], self.samples_n_smat, self.running_samples_smat_s
         )
+        if (
+            abs(new_avg_p) == impossible_pressure
+            or abs(new_avg_s) == impossible_pressure
+        ):
+            return (False, (new_avg_p, new_avg_s))
         return (
             abs(new_avg_p) > self.threshold_smat
             or abs(new_avg_s) > self.threshold_smat,
@@ -329,18 +335,20 @@ def _running_avg(
     running_avg_p = []
     running_avg_s = []
     return_val = None
+    show_fail_graph = True
     for i in range(1, len(time)):
         prev_avg = average
         found, average = algorithm.tick(
             (float(pressures[i][0]), float(pressures[i][1]))
         )
-        if found:
+        if found and return_val is None:
             # if average < running_avg_threshold:
             # print(f"found z height = {z_travel[i]}")
             # print(f"at time = {time[i]}")
             return_val = time[i], z_travel[i], p_travel[i]
             if no_plot:
                 # once we find it we don't need to keep going
+                show_fail_graph = False
                 break
         if (impossible_pressure not in average) and (
             impossible_pressure not in prev_avg
@@ -370,7 +378,7 @@ def _running_avg(
         running_avg_s
     )
 
-    if not no_plot:
+    if not no_plot or show_fail_graph:
         plot.figure(plot_name)
         avg_ax = plot.subplot(211)
         avg_ax.set_title("Running Average")
@@ -404,8 +412,10 @@ def run(
             reader_list = list(reader)
 
         number_of_trials = int(reader_list[33][2])
-
-        expected_height = reader_list[44][6]
+        z_speed = float(reader_list[37][2])
+        # expected_travel = float(reader_list[43][6])
+        # expected_travel = abs(expected_travel + (z_speed * (1 if expected_travel < 0 else -1)))
+        expected_travel = z_speed
         # have a time list for each trial so the list lengths can all be equal
         results: List[float] = []
         for trial in range(number_of_trials):
