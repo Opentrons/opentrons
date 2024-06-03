@@ -5,7 +5,6 @@ from typing import Optional
 from opentrons import protocol_runner
 from opentrons.protocol_engine.errors import ErrorOccurrence
 from opentrons.protocol_engine.types import RunTimeParamValuesType
-from opentrons.util.performance_helpers import track_analysis
 import opentrons.util.helpers as datetime_helper
 
 import robot_server.errors.error_mappers as em
@@ -26,7 +25,6 @@ class ProtocolAnalyzer:
         """Initialize the analyzer and its dependencies."""
         self._analysis_store = analysis_store
 
-    @track_analysis
     async def analyze(
         self,
         protocol_resource: ProtocolResource,
