@@ -7,7 +7,6 @@ from decoy import Decoy, matchers
 from opentrons.protocol_engine import (
     CommandSlice,
     CommandPointer,
-    ProtocolEngine,
     CommandNote,
     commands as pe_commands,
     errors as pe_errors,
@@ -22,7 +21,7 @@ from robot_server.runs.command_models import (
     CommandLink,
     CommandLinkMeta,
 )
-from robot_server.runs.run_store import RunStore, CommandNotFoundError
+from robot_server.runs.run_store import CommandNotFoundError
 from robot_server.runs.engine_store import EngineStore
 from robot_server.runs.run_data_manager import RunDataManager
 from robot_server.runs.run_models import RunCommandSummary, RunNotFoundError
@@ -172,14 +171,6 @@ async def test_create_run_command_blocking_completion(
     command_request = pe_commands.WaitForResumeCreate(
         params=pe_commands.WaitForResumeParams(message="Hello"),
         intent=pe_commands.CommandIntent.PROTOCOL,
-    )
-
-    command_once_added = pe_commands.WaitForResume(
-        id="command-id",
-        key="command-key",
-        createdAt=datetime(year=2021, month=1, day=1),
-        status=pe_commands.CommandStatus.QUEUED,
-        params=pe_commands.WaitForResumeParams(message="Hello"),
     )
 
     command_once_completed = pe_commands.WaitForResume(

@@ -21,7 +21,6 @@ from opentrons.hardware_control.types import (
 from opentrons.protocols.parse import PythonParseMode
 from opentrons.protocols.api_support.deck_type import should_load_fixed_trash
 from opentrons.protocol_runner import (
-    AnyRunner,
     JsonRunner,
     PythonAndLegacyRunner,
     RunResult,
@@ -31,7 +30,6 @@ from opentrons.protocol_engine import (
     Config as ProtocolEngineConfig,
     DeckType,
     LabwareOffsetCreate,
-    ProtocolEngine,
     StateSummary,
     create_protocol_engine,
     CommandSlice,
@@ -39,7 +37,6 @@ from opentrons.protocol_engine import (
     Command,
     CommandCreate,
     LabwareOffset,
-    LabwareOffsetCreate,
 )
 
 from robot_server.protocols.protocol_store import ProtocolResource
@@ -319,9 +316,11 @@ class EngineStore:
         await self.run_orchestrator.finish(error=error)
 
     def get_state_summary(self) -> StateSummary:
+        """Get protocol run data."""
         return self.run_orchestrator.get_state_summary()
 
     def get_loaded_labware_definitions(self) -> List[LabwareDefinition]:
+        """Get loaded labware definitions."""
         return self.run_orchestrator.get_loaded_labware_definitions()
 
     def get_run_time_parameters(self) -> List[RunTimeParameter]:
@@ -362,15 +361,19 @@ class EngineStore:
         return self.run_orchestrator.get_run_status()
 
     def get_is_run_terminal(self) -> bool:
+        """Get whether engine is in a terminal state."""
         return self.run_orchestrator.get_is_run_terminal()
 
     def run_was_started(self) -> bool:
+        """Get whether the run has started."""
         return self.run_orchestrator.run_has_started()
 
     def add_labware_offset(self, request: LabwareOffsetCreate) -> LabwareOffset:
+        """Add a new labware offset to state."""
         return self.run_orchestrator.add_labware_offset(request)
 
     def add_labware_definition(self, definition: LabwareDefinition) -> LabwareUri:
+        """Add a new labware definition to state."""
         return self.run_orchestrator.add_labware_definition(definition)
 
     async def add_command_and_wait_for_interval(
@@ -380,6 +383,7 @@ class EngineStore:
         timeout: Optional[int] = None,
         failed_command_id: Optional[str] = None,
     ) -> Command:
+        """Add a new command to execute and wait for it to complete if needed."""
         return await self.run_orchestrator.add_command_and_wait_for_interval(
             command=request,
             failed_command_id=failed_command_id,

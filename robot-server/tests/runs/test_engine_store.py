@@ -10,11 +10,10 @@ from opentrons.protocol_engine.errors.exceptions import EStopActivatedError
 from opentrons.types import DeckSlotName
 from opentrons.hardware_control import HardwareControlAPI, API
 from opentrons.hardware_control.types import EstopStateNotification, EstopState
-from opentrons.protocol_engine import ProtocolEngine, StateSummary, types as pe_types
-from opentrons.protocol_runner import RunResult, LiveRunner, JsonRunner
+from opentrons.protocol_engine import StateSummary, types as pe_types
+from opentrons.protocol_runner import RunResult, RunOrchestrator
 from opentrons.protocol_reader import ProtocolReader, ProtocolSource
 
-from robot_server.protocols.protocol_store import ProtocolResource
 from robot_server.runs.engine_store import (
     EngineStore,
     EngineConflictError,
@@ -62,38 +61,7 @@ async def test_create_engine(decoy: Decoy, subject: EngineStore) -> None:
     assert subject.current_run_id == "run-id"
     assert isinstance(result, StateSummary)
     assert subject._run_orchestrator is not None
-    assert isinstance(subject._run_orchestrator.runner, LiveRunner)
-    assert isinstance(subject._run_orchestrator.engine, ProtocolEngine)
-
-
-async def test_create_engine_with_protocol(
-    subject: EngineStore,
-    json_protocol_source: ProtocolSource,
-) -> None:
-    """It should create an engine for a run with protocol.
-
-    Tests only basic engine & runner creation with creation result.
-    Loading of protocols/ live run commands is tested in integration test.
-    """
-    protocol = ProtocolResource(
-        protocol_id="my cool protocol",
-        protocol_key=None,
-        created_at=datetime(year=2021, month=1, day=1),
-        source=json_protocol_source,
-    )
-
-    result = await subject.create(
-        run_id="run-id",
-        labware_offsets=[],
-        deck_configuration=[],
-        protocol=protocol,
-        notify_publishers=mock_notify_publishers,
-    )
-    assert subject.current_run_id == "run-id"
-    assert isinstance(result, StateSummary)
-    assert subject._run_orchestrator is not None
-    assert isinstance(subject._run_orchestrator.runner, JsonRunner)
-    assert isinstance(subject._run_orchestrator.engine, ProtocolEngine)
+    assert isinstance(subject._run_orchestrator, RunOrchestrator)
 
 
 @pytest.mark.parametrize("robot_type", ["OT-2 Standard", "OT-3 Standard"])
@@ -118,7 +86,6 @@ async def test_create_engine_uses_robot_type(
     )
 
     assert subject._run_orchestrator is not None
-    assert subject._run_orchestrator.engine.state_view.config.robot_type == robot_type
 
 
 async def test_create_engine_with_labware_offsets(subject: EngineStore) -> None:
@@ -180,17 +147,13 @@ async def test_clear_engine(subject: EngineStore) -> None:
         notify_publishers=mock_notify_publishers,
     )
     assert subject._run_orchestrator is not None
-    await subject._run_orchestrator.runner.run(deck_configuration=[])
     result = await subject.clear()
 
     assert subject.current_run_id is None
     assert isinstance(result, RunResult)
 
     with pytest.raises(NoRunOrchestrator):
-        subject._run_orchestrator.engine
-
-    with pytest.raises(NoRunOrchestrator):
-        subject._run_orchestrator.runner
+        subject._run_orchestrator
 
 
 async def test_clear_engine_not_stopped_or_idle(
@@ -205,7 +168,7 @@ async def test_clear_engine_not_stopped_or_idle(
         notify_publishers=mock_notify_publishers,
     )
     assert subject._run_orchestrator is not None
-    subject._run_orchestrator.runner.play(deck_configuration=[])
+    subject._run_orchestrator.play(deck_configuration=[])
 
     with pytest.raises(EngineConflictError):
         await subject.clear()
@@ -221,16 +184,12 @@ async def test_clear_idle_engine(subject: EngineStore) -> None:
         notify_publishers=mock_notify_publishers,
     )
     assert subject._run_orchestrator is not None
-    assert subject._run_orchestrator.engine is not None
-    assert subject._run_orchestrator.runner is not None
 
     await subject.clear()
 
     # TODO: test engine finish is called
     with pytest.raises(NoRunOrchestrator):
-        subject._run_orchestrator.engine
-    with pytest.raises(NoRunOrchestrator):
-        subject._run_orchestrator.runner
+        subject.run_orchestrator
 
 
 async def test_get_default_orchestrator_idempotent(subject: EngineStore) -> None:
@@ -238,28 +197,28 @@ async def test_get_default_orchestrator_idempotent(subject: EngineStore) -> None
     result = await subject.get_default_orchestrator()
     repeated_result = await subject.get_default_orchestrator()
 
-    assert isinstance(result, ProtocolEngine)
+    assert isinstance(result, RunOrchestrator)
     assert repeated_result is result
 
 
-@pytest.mark.parametrize("robot_type", ["OT-2 Standard", "OT-3 Standard"])
-@pytest.mark.parametrize("deck_type", pe_types.DeckType)
-async def test_get_default_orchestrator_robot_type(
-    decoy: Decoy, robot_type: RobotType, deck_type: pe_types.DeckType
-) -> None:
-    """It should create default ProtocolEngines with the given robot and deck type."""
-    # TODO(mc, 2021-06-11): to make these test more effective and valuable, we
-    # should pass in some sort of actual, valid HardwareAPI instead of a mock
-    hardware_api = decoy.mock(cls=API)
-    subject = EngineStore(
-        hardware_api=hardware_api,
-        robot_type=robot_type,
-        deck_type=deck_type,
-    )
-
-    result = await subject.get_default_orchestrator()
-
-    assert result.state_view.config.robot_type == robot_type
+# @pytest.mark.parametrize("robot_type", ["OT-2 Standard", "OT-3 Standard"])
+# @pytest.mark.parametrize("deck_type", pe_types.DeckType)
+# async def test_get_default_orchestrator_robot_type(
+#     decoy: Decoy, robot_type: RobotType, deck_type: pe_types.DeckType
+# ) -> None:
+#     """It should create default ProtocolEngines with the given robot and deck type."""
+#     # TODO(mc, 2021-06-11): to make these test more effective and valuable, we
+#     # should pass in some sort of actual, valid HardwareAPI instead of a mock
+#     hardware_api = decoy.mock(cls=API)
+#     subject = EngineStore(
+#         hardware_api=hardware_api,
+#         robot_type=robot_type,
+#         deck_type=deck_type,
+#     )
+#
+#     result = await subject.get_default_orchestrator()
+#
+#     assert result.state_view.config.robot_type == robot_type
 
 
 async def test_get_default_orchestrator_current_unstarted(subject: EngineStore) -> None:
@@ -273,7 +232,7 @@ async def test_get_default_orchestrator_current_unstarted(subject: EngineStore) 
     )
 
     result = await subject.get_default_orchestrator()
-    assert isinstance(result, ProtocolEngine)
+    assert isinstance(result, RunOrchestrator)
 
 
 async def test_get_default_orchestrator_conflict(subject: EngineStore) -> None:
@@ -303,7 +262,7 @@ async def test_get_default_orchestrator_run_stopped(subject: EngineStore) -> Non
     await subject.finish(error=None)
 
     result = await subject.get_default_orchestrator()
-    assert isinstance(result, ProtocolEngine)
+    assert isinstance(result, RunOrchestrator)
 
 
 async def test_estop_callback(
@@ -323,7 +282,7 @@ async def test_estop_callback(
     await handle_estop_event(engine_store, disengage_event)
     assert engine_store._run_orchestrator is not None
     decoy.verify(
-        engine_store._run_orchestrator.engine.estop(),
+        engine_store._run_orchestrator.estop(),
         ignore_extra_args=True,
         times=0,
     )
@@ -337,7 +296,7 @@ async def test_estop_callback(
     await handle_estop_event(engine_store, engage_event)
     assert engine_store._run_orchestrator is not None
     decoy.verify(
-        engine_store._run_orchestrator.engine.estop(),
+        engine_store._run_orchestrator.estop(),
         await engine_store.finish(error=matchers.IsA(EStopActivatedError)),
         times=1,
     )

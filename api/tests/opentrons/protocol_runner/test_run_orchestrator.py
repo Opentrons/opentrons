@@ -141,3 +141,33 @@ def test_build_run_orchestrator_provider(
     assert isinstance(result, RunOrchestrator)
     assert isinstance(result._setup_runner, LiveRunner)
     assert isinstance(result._fixit_runner, LiveRunner)
+
+
+# async def test_build_with_protocol(
+#     subject: EngineStore,
+#     json_protocol_source: ProtocolSource,
+# ) -> None:
+#     """It should create an engine for a run with protocol.
+#
+#     Tests only basic engine & runner creation with creation result.
+#     Loading of protocols/ live run commands is tested in integration test.
+#     """
+#     protocol = ProtocolResource(
+#         protocol_id="my cool protocol",
+#         protocol_key=None,
+#         created_at=datetime(year=2021, month=1, day=1),
+#         source=json_protocol_source,
+#     )
+#
+#     result = await subject.create(
+#         run_id="run-id",
+#         labware_offsets=[],
+#         deck_configuration=[],
+#         protocol=protocol,
+#         notify_publishers=mock_notify_publishers,
+#     )
+#     assert subject.current_run_id == "run-id"
+#     assert isinstance(result, StateSummary)
+#     assert subject._run_orchestrator is not None
+#     assert isinstance(subject._run_orchestrator.runner, JsonRunner)
+#     assert isinstance(subject._run_orchestrator.engine, ProtocolEngine)

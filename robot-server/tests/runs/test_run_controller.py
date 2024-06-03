@@ -12,7 +12,7 @@ from opentrons.protocol_engine import (
     errors as pe_errors,
 )
 from opentrons.protocol_engine.types import RunTimeParameter, BooleanParameter
-from opentrons.protocol_runner import RunResult, JsonRunner, PythonAndLegacyRunner
+from opentrons.protocol_runner import RunResult
 
 from robot_server.service.notifications import RunsPublisher
 from robot_server.service.task_runner import TaskRunner

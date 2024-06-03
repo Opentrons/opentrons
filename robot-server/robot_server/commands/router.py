@@ -2,7 +2,6 @@
 from typing import List, Optional, cast
 from typing_extensions import Final, Literal
 
-from anyio import move_on_after
 from fastapi import APIRouter, Depends, Query, status
 
 from opentrons.protocol_engine import CommandIntent
@@ -151,7 +150,7 @@ async def get_commands_list(
     """Get a list of stateless commands.
 
     Arguments:
-        engine: Protocol engine with commands.
+        orchestrator: Run orchestrator with commands.
         cursor: Cursor index for the collection response.
         pageLength: Maximum number of items to return.
     """
@@ -187,7 +186,7 @@ async def get_command(
 
     Arguments:
         commandId: Command identifier from the URL parameter.
-        engine: Protocol engine with commands.
+        orchestrator: Run orchestrator with commands.
     """
     try:
         command = orchestrator.get_command(commandId)

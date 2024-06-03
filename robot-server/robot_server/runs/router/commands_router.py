@@ -3,13 +3,10 @@ import textwrap
 from typing import Optional, Union
 from typing_extensions import Final, Literal
 
-from anyio import move_on_after
 from fastapi import APIRouter, Depends, Query, status
-
 
 from opentrons.protocol_engine import (
     CommandPointer,
-    ProtocolEngine,
     commands as pe_commands,
     errors as pe_errors,
 )
@@ -33,9 +30,9 @@ from ..command_models import (
 from ..run_models import RunCommandSummary
 from ..run_data_manager import RunDataManager, PreSerializedCommandsNotAvailableError
 from ..engine_store import EngineStore
-from ..run_store import RunStore, CommandNotFoundError
+from ..run_store import CommandNotFoundError
 from ..run_models import RunNotFoundError
-from ..dependencies import get_engine_store, get_run_data_manager, get_run_store
+from ..dependencies import get_engine_store, get_run_data_manager
 from .base_router import RunNotFound, RunStopped
 
 
