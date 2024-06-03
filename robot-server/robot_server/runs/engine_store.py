@@ -153,7 +153,8 @@ class EngineStore:
             EngineConflictError: if a run-specific engine is active.
         """
         if (
-            self.run_orchestrator.run_has_started()
+            self._run_orchestrator is not None
+            and self.run_orchestrator.run_has_started()
             and not self.run_orchestrator.run_has_stopped()
         ):
             raise EngineConflictError("An engine for a run is currently active")

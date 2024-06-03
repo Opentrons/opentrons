@@ -230,11 +230,8 @@ class RunOrchestrator:
     async def use_attached_modules(self, modules_by_id: Dict[str, HardwareModuleAPI]) -> None:
         await self._protocol_engine.use_attached_modules(modules_by_id=modules_by_id)
 
-    def get_protocol_runner(self) -> JsonRunner | PythonAndLegacyRunner:
-        if self._protocol_runner is None:
-            raise NoProtocolRunAvailable()
-        else:
-            return self._protocol_runner
+    def get_protocol_runner(self) -> Optional[Union[JsonRunner, PythonAndLegacyRunner]]:
+        return self._protocol_runner
 
     @overload
     async def load(self,
@@ -252,3 +249,7 @@ class RunOrchestrator:
 
     def get_is_okay_to_clear(self) -> bool:
         return self._protocol_engine.state_view.commands.get_is_okay_to_clear()
+
+    def prepare(self) -> None:
+        self._setup_runner.prepare()
+        self._fixit_runner.prepare()

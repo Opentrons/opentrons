@@ -153,7 +153,7 @@ async def test_clear_engine(subject: EngineStore) -> None:
     assert isinstance(result, RunResult)
 
     with pytest.raises(NoRunOrchestrator):
-        subject._run_orchestrator
+        subject.run_orchestrator
 
 
 async def test_clear_engine_not_stopped_or_idle(
@@ -296,7 +296,9 @@ async def test_estop_callback(
     await handle_estop_event(engine_store, engage_event)
     assert engine_store._run_orchestrator is not None
     decoy.verify(
-        engine_store._run_orchestrator.estop(),
-        await engine_store.finish(error=matchers.IsA(EStopActivatedError)),
+        engine_store.run_orchestrator.estop(),
+        await engine_store.run_orchestrator.finish(
+            error=matchers.IsA(EStopActivatedError)
+        ),
         times=1,
     )
