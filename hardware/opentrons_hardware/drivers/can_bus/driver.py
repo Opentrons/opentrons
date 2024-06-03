@@ -49,7 +49,7 @@ class CanDriver(AbstractCanDriver):
             interface: The interface for pycan to use.
                 see https://python-can.readthedocs.io/en/master/interfaces.html
             channel: Optional channel
-            fcan_clock: The clock used by the can analyzer, defaults to 20MHz
+            fcan_clock: The clock used by the can analyzer, defaults to 40MHz
             sample_rate: The sample rate in which to sample the data, defaults to 87.5
             jump_width: The max time the sampling period can be lengthened or shortened
 

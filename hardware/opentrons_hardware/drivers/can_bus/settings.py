@@ -1,4 +1,7 @@
 """Driver settings."""
+
+import re
+from subprocess import check_output
 from typing_extensions import Final, TypedDict
 from typing import Optional
 from pydantic import BaseSettings, Field
@@ -11,7 +14,7 @@ DEFAULT_INTERFACE: Final = "socketcan"
 
 DEFAULT_BITRATE: Final[int] = 500000
 
-DEFAULT_FDCAN_CLK: Final[int] = 20  # MHz
+DEFAULT_FDCAN_CLK: Final[int] = 40  # MHz
 DEFAULT_SAMPLE_RATE: Final[float] = 80
 DEFAULT_JUMP_WIDTH_SEG: Final[int] = 1
 SYNC_QUANTUM: Final[int] = 1
@@ -34,6 +37,11 @@ DEFAULT_PORT: Final = 9898
 OPENTRONS_INTERFACE: Final = "opentrons_sock"
 
 US_TO_NS: Final = 1000
+
+# The version of the SOM ex. V1.1B
+SOM_VERSION_REGEX = re.compile(r"V[\d]+\.[\d]+[\w]{1}")
+# The clock speed changed to 40Mhz after this version
+SOM_CAN_CLOCK_SPEED = "V1.1E"
 
 
 class PCANParameters(TypedDict):
@@ -152,3 +160,32 @@ def calculate_fdcan_parameters(
         nom_tseg2=floor(tseg_2),
         nom_sjw=jump_width,
     )
+
+
+def get_can_clock_freq() -> int:
+    """Calculates the CAN clock frequency in MHz based on the SOM version."""
+    try:
+        output = check_output(["tdx-info", "--hardware"]).decode().strip()
+        match = SOM_VERSION_REGEX.match(output)
+        if not match:
+            raise Exception
+
+        # Return the corresponding clock frequency (MHz) based on the SOM version
+        if match.group() < "V1.1E":
+            return 20
+        elif match.group() >= "V1.1E":
+            return 40
+        else:
+            raise Exception
+    except Exception:
+        return DEFAULT_FDCAN_CLK
+
+
+def get_driver_settings(system_override: bool = True) -> DriverSettings:
+    """The Driver settings for the system we are running on."""
+    if system_override:
+        return DriverSettings(
+            fcan_clock=get_can_clock_freq(),
+        )
+    return DriverSettings()
+

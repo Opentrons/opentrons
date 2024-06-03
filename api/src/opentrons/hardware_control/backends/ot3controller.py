@@ -60,7 +60,10 @@ except (OSError, ModuleNotFoundError):
 
 
 from opentrons_hardware.drivers import SystemDrivers
-from opentrons_hardware.drivers.can_bus import CanMessenger, DriverSettings
+from opentrons_hardware.drivers.can_bus import (
+    CanMessenger,
+    get_driver_settings,
+)
 from opentrons_hardware.drivers.can_bus.abstract_driver import AbstractCanDriver
 from opentrons_hardware.drivers.can_bus.build import build_driver
 from opentrons_hardware.drivers.binary_usb import (
@@ -282,7 +285,7 @@ class OT3Controller(FlexBackend):
         Returns:
             Instance.
         """
-        driver = await build_driver(DriverSettings())
+        driver = await build_driver(get_driver_settings())
         usb_driver = None
         if use_usb_bus:
             try:
@@ -662,9 +665,9 @@ class OT3Controller(FlexBackend):
         move_group, _ = group
         runner = MoveGroupRunner(
             move_groups=[move_group],
-            ignore_stalls=True
-            if not self._feature_flags.stall_detection_enabled
-            else False,
+            ignore_stalls=(
+                True if not self._feature_flags.stall_detection_enabled else False
+            ),
         )
 
         pipettes_moving = moving_pipettes_in_move_group(move_group)
@@ -812,9 +815,9 @@ class OT3Controller(FlexBackend):
 
         runner = MoveGroupRunner(
             move_groups=[move_group],
-            ignore_stalls=True
-            if not self._feature_flags.stall_detection_enabled
-            else False,
+            ignore_stalls=(
+                True if not self._feature_flags.stall_detection_enabled else False
+            ),
         )
         try:
             positions = await runner.run(can_messenger=self._messenger)
@@ -843,9 +846,9 @@ class OT3Controller(FlexBackend):
 
         runner = MoveGroupRunner(
             move_groups=[move_group],
-            ignore_stalls=True
-            if not self._feature_flags.stall_detection_enabled
-            else False,
+            ignore_stalls=(
+                True if not self._feature_flags.stall_detection_enabled else False
+            ),
         )
         try:
             positions = await runner.run(can_messenger=self._messenger)

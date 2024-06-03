@@ -12,7 +12,7 @@ from opentrons_hardware.firmware_bindings.constants import (
     FunctionCode,
     MessageId,
 )
-from .settings import DriverSettings
+from .settings import DriverSettings, get_driver_settings
 
 
 __all__ = [
@@ -26,4 +26,5 @@ __all__ = [
     "CanMessenger",
     "DriverSettings",
     "WaitableCallback",
+    "get_driver_settings",
 ]

@@ -1,7 +1,7 @@
 """ArgumentParser setup for a can device."""
 from argparse import ArgumentParser, Namespace
 
-from opentrons_hardware.drivers.can_bus import DriverSettings
+from opentrons_hardware.drivers.can_bus import DriverSettings, get_driver_settings
 from opentrons_hardware.drivers.can_bus import settings
 
 
@@ -75,10 +75,11 @@ def add_can_args(parser: ArgumentParser) -> ArgumentParser:
 
 def build_settings(args: Namespace) -> DriverSettings:
     """Create driver settings from args."""
-    return DriverSettings(
-        interface=args.interface,
-        port=args.port,
-        host=args.host,
-        bit_rate=args.bitrate,
-        channel=args.channel,
-    )
+    settings = get_driver_settings()
+    # Override system settings with args
+    settings.interface = args.interface
+    settings.port = args.port
+    settings.host = args.host
+    settings.bit_rate = args.bitrate
+    settings.channel = args.channel
+    return settings
