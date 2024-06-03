@@ -351,7 +351,7 @@ class EngineStore:
 
     def get_command_recovery_target(self) -> Optional[CommandPointer]:
         """Get the current error recovery target."""
-        return self.run_orchestrator.get_recovery_target()
+        return self.run_orchestrator.get_command_recovery_target()
 
     def get_command(self, command_id: str) -> Command:
         """Get a run's command by ID."""

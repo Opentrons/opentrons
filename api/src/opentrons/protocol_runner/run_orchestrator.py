@@ -1,18 +1,23 @@
 """Engine/Runner provider."""
 from __future__ import annotations
-from typing import Optional, Union, List, Dict
+from typing import Optional, Union, List, Dict, overload
 
 from anyio import move_on_after
 
-from build.lib.opentrons_shared_data.labware.dev_types import LabwareUri
+from opentrons_shared_data.labware.dev_types import LabwareUri
 from opentrons_shared_data.labware.labware_definition import LabwareDefinition
-from . import protocol_runner, RunResult
+from . import protocol_runner, RunResult, JsonRunner, PythonAndLegacyRunner
 from ..hardware_control import HardwareControlAPI
 from ..hardware_control.modules import AbstractModule as HardwareModuleAPI
 from ..protocol_engine import ProtocolEngine, CommandCreate, Command, StateSummary, CommandPointer, CommandSlice
 from ..protocol_engine.types import PostRunHardwareState, EngineStatus, LabwareOffsetCreate, LabwareOffset, \
-    DeckConfigurationType, RunTimeParameter
-from ..protocol_reader import JsonProtocolConfig, PythonProtocolConfig
+    DeckConfigurationType, RunTimeParameter, RunTimeParamValuesType
+from ..protocol_reader import JsonProtocolConfig, PythonProtocolConfig, ProtocolSource
+from ..protocols.parse import PythonParseMode
+
+
+class NoProtocolRunAvailable(RuntimeError):
+    """An error raised if there is no protocol run available."""
 
 
 class RunOrchestrator:
@@ -137,9 +142,10 @@ class RunOrchestrator:
         """Start or resume the run."""
         self._protocol_engine.resume_from_recovery()
 
-    async def finish(self, error: Optional[Exception]) -> None:
+    async def finish(self,error: Optional[Exception] = None,
+                     drop_tips_after_run: bool = True, set_run_status: bool = True, post_run_hardware_state: PostRunHardwareState = PostRunHardwareState.HOME_AND_STAY_ENGAGED,) -> None:
         """Stop the run."""
-        await self._protocol_engine.finish(error=error)
+        await self._protocol_engine.finish(error=error, drop_tips_after_run=drop_tips_after_run, set_run_status=set_run_status, post_run_hardware_state=post_run_hardware_state)
 
     def get_state_summary(self) -> StateSummary:
         return self._protocol_engine.state_view.get_summary()
@@ -186,6 +192,9 @@ class RunOrchestrator:
             command_id=command_id
         )
 
+    def get_all_commands(self) -> List[Command]:
+        return self._protocol_engine.state_view.commands.get_all()
+
     def get_run_status(self) -> EngineStatus:
         """Get the current execution status of the engine."""
         return self._protocol_engine.state_view.commands.get_status()
@@ -221,5 +230,25 @@ class RunOrchestrator:
     async def use_attached_modules(self, modules_by_id: Dict[str, HardwareModuleAPI]) -> None:
         await self._protocol_engine.use_attached_modules(modules_by_id=modules_by_id)
 
-    def get_protocol_runner(self) -> None:
-        raise NotImplementedError()
+    def get_protocol_runner(self) -> JsonRunner | PythonAndLegacyRunner:
+        if self._protocol_runner is None:
+            raise NoProtocolRunAvailable()
+        else:
+            return self._protocol_runner
+
+    @overload
+    async def load(self,
+             protocol_source: ProtocolSource,
+             ) -> None:
+        self._protocol_runner.load(protocol_source=protocol_source)
+
+    @overload
+    async def load(self,
+             protocol_source: ProtocolSource,
+             python_parse_mode: PythonParseMode,
+             run_time_param_values: Optional[RunTimeParamValuesType],
+             ) -> None:
+        self._protocol_runner.load(protocol_source=protocol_source, python_parse_mode=python_parse_mode, run_time_param_values=run_time_param_values)
+
+    def get_is_okay_to_clear(self) -> bool:
+        return self._protocol_engine.state_view.commands.get_is_okay_to_clear()
