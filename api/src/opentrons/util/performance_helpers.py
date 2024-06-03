@@ -64,6 +64,12 @@ package_to_use = _handle_package_import()
 _robot_context_tracker: SupportsTracking | None = None
 
 
+# TODO: derek maggio (06-03-2024): investigate if _should_track should be 
+# reevaluated each time _get_robot_context_tracker is called. I think this
+# might get stuck in a state where after the first call, _should_track is
+# always considered the initial value. It might miss changes to the feature
+# flag. The easiest way to test this is on a robot when that is working.
+
 def _get_robot_context_tracker() -> SupportsTracking:
     """Singleton for the robot context tracker."""
     global _robot_context_tracker
