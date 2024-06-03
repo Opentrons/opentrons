@@ -15,9 +15,8 @@ accepted_error = 0.1
 class LLDAlgoABC(ABC):
     """An instance of an lld algorithm."""
 
-    @staticmethod
     @abstractmethod
-    def name() -> str:
+    def name(self) -> str:
         """Name of this algorithm."""
         ...
 
@@ -41,10 +40,9 @@ class LLDPresThresh(LLDAlgoABC):
         """Init."""
         self.threshold = thresh
 
-    @staticmethod
-    def name() -> str:
+    def name(self) -> str:
         """Name of this algorithm."""
-        return "{:<30}".format("simple threshold")
+        return "{:<40}".format(f"simple threshold {self.threshold}")
 
     def tick(self, pressures: Tuple[float, float]) -> Tuple[bool, Tuple[float, float]]:
         """Simulate firmware motor interrupt tick."""
@@ -72,10 +70,11 @@ class LLDSMAT(LLDAlgoABC):
         self.threshold_smat = thresh
         self.reset()
 
-    @staticmethod
-    def name() -> str:
+    def name(self) -> str:
         """Name of this algorithm."""
-        return "{:<30}".format("simple moving avg thresh")
+        return "{:<40}".format(
+            f"simple moving avg thresh {self.samples_n_smat} {self.threshold_smat}"
+        )
 
     def reset(self) -> None:
         """Reset simulator between runs."""
@@ -130,10 +129,11 @@ class LLDSMAD(LLDAlgoABC):
         self.derivative_threshold_smad = thresh
         self.reset()
 
-    @staticmethod
-    def name() -> str:
+    def name(self) -> str:
         """Name of this algorithm."""
-        return "{:<30}".format("simple moving avg der")
+        return "{:<40}".format(
+            f"simple moving avg der s{self.samples_n_smad} t{self.derivative_threshold_smad}"
+        )
 
     def reset(self) -> None:
         """Reset simulator between runs."""
@@ -193,10 +193,11 @@ class LLDWMAD(LLDAlgoABC):
         self.derivative_threshold_wmad = abs(thresh)
         self.reset()
 
-    @staticmethod
-    def name() -> str:
+    def name(self) -> str:
         """Name of this algorithm."""
-        return "{:<30}".format("weighted moving avg der")
+        return "{:<40}".format(
+            f"weighted moving avg der s{self.samples_n_wmad} t{self.derivative_threshold_wmad}"
+        )
 
     def reset(self) -> None:
         """Reset simulator between runs."""
@@ -265,10 +266,11 @@ class LLDEMAD(LLDAlgoABC):
         self.derivative_threshold_emad = abs(thresh)
         self.reset()
 
-    @staticmethod
-    def name() -> str:
+    def name(self) -> str:
         """Name of this algorithm."""
-        return "{:<30}".format("exponential moving avg der")
+        return "{:<40}".format(
+            f"exponential moving avg der {self.smoothing_factor} {self.derivative_threshold_emad}"
+        )
 
     def reset(self) -> None:
         """Reset simulator between runs."""
