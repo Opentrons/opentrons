@@ -387,15 +387,10 @@ class PipetteStore(HasState[PipetteState], HandlesActions):
         ):
             pipette_id = action.command.params.pipetteId
             deck_point = action.command.result.position
-
-            try:
-                loaded_pipette = self._state.pipettes_by_id[pipette_id]
-            except KeyError:
-                self._clear_deck_point()
-            else:
-                self._state.current_deck_point = CurrentDeckPoint(
-                    mount=loaded_pipette.mount, deck_point=deck_point
-                )
+            loaded_pipette = self._state.pipettes_by_id[pipette_id]
+            self._state.current_deck_point = CurrentDeckPoint(
+                mount=loaded_pipette.mount, deck_point=deck_point
+            )
         elif (
             isinstance(action, FailCommandAction)
             and isinstance(action.running_command, Aspirate)
@@ -405,14 +400,10 @@ class PipetteStore(HasState[PipetteState], HandlesActions):
             assert_type(action.error.private, OverpressureErrorInternalData)
             pipette_id = action.running_command.params.pipetteId
             deck_point = action.error.private.position
-            try:
-                loaded_pipette = self._state.pipettes_by_id[pipette_id]
-            except KeyError:
-                self._clear_deck_point()
-            else:
-                self._state.current_deck_point = CurrentDeckPoint(
-                    mount=loaded_pipette.mount, deck_point=deck_point
-                )
+            loaded_pipette = self._state.pipettes_by_id[pipette_id]
+            self._state.current_deck_point = CurrentDeckPoint(
+                mount=loaded_pipette.mount, deck_point=deck_point
+            )
 
         elif isinstance(action, SucceedCommandAction) and isinstance(
             action.command.result,
