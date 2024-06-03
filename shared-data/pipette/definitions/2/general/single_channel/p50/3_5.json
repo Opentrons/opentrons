@@ -19,9 +19,11 @@
             "distance": 13.0,
             "current": 0.2,
             "tipOverlaps": {
-              "default": 10.5,
-              "opentrons/opentrons_flex_96_tiprack_50ul/1": 10.5,
-              "opentrons/opentrons_flex_96_filtertiprack_50ul/1": 10.5
+              "v0": {
+                "default": 10.5,
+                "opentrons/opentrons_flex_96_tiprack_50ul/1": 10.5,
+                "opentrons/opentrons_flex_96_filtertiprack_50ul/1": 10.5
+              }
             }
           }
         }
