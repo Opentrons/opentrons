@@ -25,7 +25,7 @@ interface HandleDropTipCommandErrorsCbProps {
 /**
  * @description Wraps the error state setter, updating the setter if the error should be special-cased.
  */
-export function useHandleDropTipCommandErrors(
+export function useDropTipCommandErrors(
   setErrorDetails: (errorDetails: ErrorDetails) => void
 ): (cbProps: HandleDropTipCommandErrorsCbProps) => void {
   const { t } = useTranslation('drop_tip_wizard')
