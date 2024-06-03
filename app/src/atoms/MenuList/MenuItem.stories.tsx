@@ -1,24 +1,20 @@
-import * as React from 'react'
-import { MenuItem } from './MenuItem'
+import { VIEWPORT } from '@opentrons/components'
+import { MenuItem as MenuItemComponent } from './MenuItem'
 
-import type { Story, Meta } from '@storybook/react'
+import type { Meta, StoryObj } from '@storybook/react'
 
-export default {
+const meta: Meta<typeof MenuItemComponent> = {
   title: 'App/Atoms/MenuItem',
-  component: MenuItem,
-} as Meta
-
-const Template: Story<React.ComponentProps<typeof MenuItem>> = args => (
-  <MenuItem {...args} />
-)
-export const Primary = Template.bind({})
-Primary.args = {
-  children: 'Example menu btn',
-  disabled: false,
+  component: MenuItemComponent,
+  parameters: VIEWPORT.touchScreenViewport,
 }
+export default meta
 
-Primary.parameters = {
-  viewport: {
-    defaultViewport: 'onDeviceDisplay',
+type Story = StoryObj<typeof MenuItemComponent>
+
+export const MenuItem: Story = {
+  args: {
+    children: 'Example menu btn',
+    disabled: false,
   },
 }
