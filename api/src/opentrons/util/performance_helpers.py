@@ -76,7 +76,6 @@ def _get_robot_context_tracker() -> SupportsTracking:
 
 def track_analysis(func: UnderlyingFunction) -> UnderlyingFunction:
     """Track the analysis of a protocol and optionally store each run."""
-
     # TODO: derek maggio (06-03-2024): generalize creating wrapper functions for tracking different states
     @functools.wraps(func)
     def wrapper(
