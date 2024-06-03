@@ -36,7 +36,7 @@ export const SUBDOMAIN_NAV_LINKS: Links = [
   },
   {
     name: 'Protocol Library',
-    url: 'https://protocols.opentrons.com/',
+    url: 'https://library.opentrons.com/',
     linkout: true,
     gtm: {
       action: 'click',

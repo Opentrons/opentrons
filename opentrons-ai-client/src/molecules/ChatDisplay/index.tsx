@@ -72,12 +72,13 @@ export function ChatDisplay({ chat, chatId }: ChatDisplayProps): JSX.Element {
             h2: HeaderText,
             li: ListItemText,
             p: ParagraphText,
-            a: ExternalLink,
-            code: CodeText,
+            a: isUser ? ParagraphText : ExternalLink,
+            code: isUser ? ParagraphText : CodeText,
           }}
         >
           {reply}
         </Markdown>
+
         {!isUser ? (
           <PrimaryButton
             position={POSITION_ABSOLUTE}
@@ -120,7 +121,7 @@ function HeaderText(props: JSX.IntrinsicAttributes): JSX.Element {
 }
 
 function ListItemText(props: JSX.IntrinsicAttributes): JSX.Element {
-  return <StyledText {...props} as="li" />
+  return <StyledText {...props} as="li" marginLeft={SPACING.spacing16} />
 }
 
 function UnnumberedListText(props: JSX.IntrinsicAttributes): JSX.Element {
