@@ -49,7 +49,6 @@ import {
   useHandleDropTipCommandErrors,
   useDropTipErrorComponents,
   useWizardExitHeader,
-  UseDropTipRoutingResult,
 } from './utils'
 import { useNotifyDeckConfigurationQuery } from '../../resources/deck_configuration'
 
@@ -63,9 +62,8 @@ import type {
 } from '@opentrons/shared-data'
 import type { Axis, Sign, StepSize } from '../../molecules/JogControls/types'
 import type { Jog } from '../../molecules/JogControls'
-import type { ErrorDetails } from './utils'
+import type { ErrorDetails, UseDropTipRoutingResult } from './utils'
 import type { DropTipFlowsStep } from './types'
-import { useState } from 'react'
 
 const RUN_REFETCH_INTERVAL_MS = 5000
 const JOG_COMMAND_TIMEOUT_MS = 10000
@@ -577,7 +575,9 @@ export const DropTipWizardComponent = (
 
   // TOME: This could be cleaned up, but I bet you'll do that through the presentation layer cleanup anyways.
   // Yeah...I'd do a useDTWizardHeader and have the lgoic there.
-  const [hasSeenBlowoutSuccess, setHasSeenBlowoutSuccess] = useState(false)
+  const [hasSeenBlowoutSuccess, setHasSeenBlowoutSuccess] = React.useState(
+    false
+  )
 
   React.useEffect(() => {
     if (currentStep === BLOWOUT_SUCCESS) {
