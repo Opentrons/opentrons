@@ -27,6 +27,10 @@ export const DT_ROUTES = {
   DROP_TIP: DROP_TIP_STEPS,
 } as const
 
+// Setup Command Specific
+
+export const MANAGED_PIPETTE_ID = 'managedPipetteId'
+
 // Errors
 
 export const DROP_TIP_SPECIAL_ERROR_TYPES = {

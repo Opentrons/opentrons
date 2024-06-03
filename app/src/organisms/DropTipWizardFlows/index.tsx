@@ -5,11 +5,11 @@ import { getPipetteModelSpecs } from '@opentrons/shared-data'
 
 import { DropTipWizard } from './DropTipWizard'
 import { getPipettesWithTipAttached } from './getPipettesWithTipAttached'
-import { useDropTipRouting } from './utils'
+import {type ErrorDetails, useDropTipCommands, useDropTipRouting} from './utils'
 
-import type { PipetteModelSpecs } from '@opentrons/shared-data'
+import type { PipetteModelSpecs, RobotType } from '@opentrons/shared-data'
 import type { GetPipettesWithTipAttached } from './getPipettesWithTipAttached'
-import type { DropTipWizardProps } from './DropTipWizard'
+import type { PipetteData } from '@opentrons/api-client'
 
 export interface PipetteWithTip {
   mount: 'left' | 'right'
@@ -109,8 +109,23 @@ export function useDropTipWizardFlows(): {
   return { showDTWiz, toggleDTWiz }
 }
 
-export function DropTipWizardFlows(props: DropTipWizardProps): JSX.Element {
+export interface DropTipWizardFlowsProps {
+  robotType: RobotType
+  mount: PipetteData['mount']
+  instrumentModelSpecs: PipetteModelSpecs
+  closeFlow: () => void
+  issuedCommandsType?: 'setup' | 'fixit'
+}
+
+export function DropTipWizardFlows(
+  props: DropTipWizardFlowsProps
+): JSX.Element {
+  // TOME: Use this component to also determine utils used.
+  const issuedCommandsType = props.issuedCommandsType ?? 'setup'
+  const {} = useDropTipCommands(issuedCommandsType)
+
   // TOME: You'll eventually want a get first step function here that takes the override first step or otherwise defaults to before_beginning firs step.
+  // TOME: The exitScreen should be its own route as well? How would this work with ER? Think that through!
   const dropTipRoutingUtils = useDropTipRouting()
 
   return <DropTipWizard {...props} dropTipRoutingUtils={dropTipRoutingUtils} />

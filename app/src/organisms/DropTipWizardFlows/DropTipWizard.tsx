@@ -39,6 +39,7 @@ import {
   POSITION_AND_BLOWOUT,
   POSITION_AND_DROP_TIP,
   DT_ROUTES,
+  MANAGED_PIPETTE_ID,
 } from './constants'
 import { BeforeBeginning } from './BeforeBeginning'
 import { ChooseLocation } from './ChooseLocation'
@@ -46,7 +47,7 @@ import { JogToPosition } from './JogToPosition'
 import { Success } from './Success'
 import { InProgressModal } from '../../molecules/InProgressModal/InProgressModal'
 import {
-  useHandleDropTipCommandErrors,
+  useDropTipCommandErrors,
   useDropTipErrorComponents,
   useWizardExitHeader,
 } from './utils'
@@ -64,131 +65,15 @@ import type { Axis, Sign, StepSize } from '../../molecules/JogControls/types'
 import type { Jog } from '../../molecules/JogControls'
 import type { ErrorDetails, UseDropTipRoutingResult } from './utils'
 import type { DropTipFlowsStep } from './types'
+import type { DropTipWizardFlowsProps } from '.'
 
-const RUN_REFETCH_INTERVAL_MS = 5000
 const JOG_COMMAND_TIMEOUT_MS = 10000
-const MANAGED_PIPETTE_ID = 'managedPipetteId'
 
-export interface DropTipWizardProps {
+type DropTipWizardProps = DropTipWizardFlowsProps & {
   dropTipRoutingUtils: UseDropTipRoutingResult
-  robotType: RobotType
-  mount: PipetteData['mount']
-  instrumentModelSpecs: PipetteModelSpecs
-  closeFlow: () => void
 }
+
 export function DropTipWizard(props: DropTipWizardProps): JSX.Element {
-  const { closeFlow, mount, instrumentModelSpecs, robotType } = props
-  const {
-    chainRunCommands,
-    isCommandMutationLoading: isChainCommandMutationLoading,
-  } = useChainMaintenanceCommands()
-  const { createMaintenanceCommand } = useCreateMaintenanceCommandMutation()
-
-  const deckConfig = useNotifyDeckConfigurationQuery().data ?? []
-
-  const [createdMaintenanceRunId, setCreatedMaintenanceRunId] = React.useState<
-    string | null
-  >(null)
-  const hasCleanedUpAndClosed = React.useRef(false)
-
-  // we should start checking for run deletion only after the maintenance run is created
-  // and the useCurrentRun poll has returned that created id
-  const [
-    monitorMaintenanceRunForDeletion,
-    setMonitorMaintenanceRunForDeletion,
-  ] = React.useState<boolean>(false)
-
-  const {
-    createTargetedMaintenanceRun,
-  } = useCreateTargetedMaintenanceRunMutation({
-    onSuccess: response => {
-      chainRunCommands(
-        response.data.id,
-        [
-          {
-            commandType: 'loadPipette',
-            params: {
-              pipetteId: MANAGED_PIPETTE_ID,
-              mount: mount,
-              pipetteName: instrumentModelSpecs.name,
-            },
-          },
-        ],
-        false
-      )
-        .then(() => {
-          setCreatedMaintenanceRunId(response.data.id)
-        })
-        .catch(e => e)
-    },
-    onError: error => setErrorDetails({ message: error.message }),
-  })
-
-  const { data: maintenanceRunData } = useNotifyCurrentMaintenanceRun({
-    refetchInterval: RUN_REFETCH_INTERVAL_MS,
-    enabled: createdMaintenanceRunId != null,
-  })
-
-  // this will close the modal in case the run was deleted by the terminate
-  // activity modal on the ODD
-  React.useEffect(() => {
-    if (
-      createdMaintenanceRunId !== null &&
-      maintenanceRunData?.data.id === createdMaintenanceRunId
-    ) {
-      setMonitorMaintenanceRunForDeletion(true)
-    }
-    if (
-      maintenanceRunData?.data.id !== createdMaintenanceRunId &&
-      monitorMaintenanceRunForDeletion
-    ) {
-      closeFlow()
-    }
-  }, [
-    maintenanceRunData?.data.id,
-    createdMaintenanceRunId,
-    monitorMaintenanceRunForDeletion,
-    closeFlow,
-  ])
-
-  const [isExiting, setIsExiting] = React.useState<boolean>(false)
-  const [errorDetails, setErrorDetails] = React.useState<null | ErrorDetails>(
-    null
-  )
-
-  const { deleteMaintenanceRun } = useDeleteMaintenanceRunMutation({
-    onSuccess: () => closeFlow(),
-    onError: () => closeFlow(),
-  })
-
-  const handleCleanUpAndClose = (homeOnExit: boolean = true): void => {
-    if (hasCleanedUpAndClosed.current) return
-
-    hasCleanedUpAndClosed.current = true
-    setIsExiting(true)
-    if (maintenanceRunData?.data.id == null) {
-      closeFlow()
-    } else {
-      ;(homeOnExit
-        ? chainRunCommands(
-            maintenanceRunData?.data.id,
-            [
-              {
-                commandType: 'home' as const,
-                params: { axes: ['leftZ', 'rightZ', 'x', 'y'] },
-              },
-            ],
-            true
-          )
-        : new Promise<void>((resolve, reject) => resolve())
-      )
-        .catch(error => {
-          console.error(error.message)
-        })
-        .finally(() => deleteMaintenanceRun(maintenanceRunData?.data.id))
-    }
-  }
-
   // TOME: Please clean this up!!!
 
   return (
@@ -256,7 +141,7 @@ export const DropTipWizardComponent = (
   const hasInitiatedExit = React.useRef(false)
 
   const isOnDevice = useSelector(getIsOnDevice)
-  const setSpecificErrorDetails = useHandleDropTipCommandErrors(setErrorDetails)
+  const setSpecificErrorDetails = useDropTipCommandErrors(setErrorDetails)
 
   const {
     currentStep,
@@ -286,16 +171,6 @@ export const DropTipWizardComponent = (
     maintenanceRunId: createdMaintenanceRunId,
     onClose: handleCleanUpAndClose,
   })
-
-  React.useEffect(() => {
-    if (createdMaintenanceRunId == null) {
-      createMaintenanceRun({}).catch((e: Error) => {
-        setSpecificErrorDetails({
-          message: `Error creating maintenance run: ${e.message}`,
-        })
-      })
-    }
-  }, [])
 
   // TOME: This probably needs work.
   const goBackRunValid = (): void => {
@@ -327,55 +202,6 @@ export const DropTipWizardComponent = (
           message: `Error issuing jog command: ${e.message}`,
         })
       })
-    }
-  }
-
-  const moveToAddressableArea = (
-    addressableArea: AddressableAreaName
-  ): Promise<null> => {
-    if (createdMaintenanceRunId == null) {
-      return Promise.reject(
-        new Error('no maintenance run present to send move commands to')
-      )
-    }
-
-    const addressableAreaFromConfig = getAddressableAreaFromConfig(
-      addressableArea,
-      deckConfig,
-      instrumentModelSpecs.channels,
-      robotType
-    )
-
-    if (addressableAreaFromConfig != null) {
-      return chainRunCommands(
-        createdMaintenanceRunId,
-        [
-          {
-            commandType: 'moveToAddressableArea',
-            params: {
-              pipetteId: MANAGED_PIPETTE_ID,
-              stayAtHighestPossibleZ: true,
-              addressableAreaName: addressableAreaFromConfig,
-              offset: { x: 0, y: 0, z: 0 },
-            },
-          },
-        ],
-        true
-      ).then(commandData => {
-        const error = commandData[0].data.error
-        if (error != null) {
-          setSpecificErrorDetails({
-            runCommandError: error,
-            message: `Error moving to position: ${error.detail}`,
-          })
-        }
-        return null
-      })
-    } else {
-      setSpecificErrorDetails({
-        message: `Error moving to position: invalid addressable area.`,
-      })
-      return Promise.resolve(null)
     }
   }
 

@@ -15,7 +15,7 @@ export interface ErrorDetails {
   type?: string
 }
 
-interface HandleDropTipCommandErrorsCbProps {
+export interface SetRobotErrorDetailsParams {
   runCommandError?: RunCommandError
   message?: string
   header?: string
@@ -27,7 +27,7 @@ interface HandleDropTipCommandErrorsCbProps {
  */
 export function useDropTipCommandErrors(
   setErrorDetails: (errorDetails: ErrorDetails) => void
-): (cbProps: HandleDropTipCommandErrorsCbProps) => void {
+): (cbProps: SetRobotErrorDetailsParams) => void {
   const { t } = useTranslation('drop_tip_wizard')
 
   return ({
@@ -35,7 +35,7 @@ export function useDropTipCommandErrors(
     message,
     header,
     type,
-  }: HandleDropTipCommandErrorsCbProps) => {
+  }: SetRobotErrorDetailsParams) => {
     if (
       runCommandError?.errorType ===
       DROP_TIP_SPECIAL_ERROR_TYPES.MUST_HOME_ERROR
