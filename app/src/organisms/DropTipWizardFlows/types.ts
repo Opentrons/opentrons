@@ -1,16 +1,4 @@
-import type {
-  BLOWOUT_SUCCESS,
-  CHOOSE_BLOWOUT_LOCATION,
-  CHOOSE_DROP_TIP_LOCATION,
-  DROP_TIP_SUCCESS,
-  POSITION_AND_BLOWOUT,
-  POSITION_AND_DROP_TIP,
-} from './constants'
+import type { DT_ROUTES } from './constants'
 
-export type DropTipWizardStep =
-  | typeof CHOOSE_BLOWOUT_LOCATION
-  | typeof POSITION_AND_BLOWOUT
-  | typeof BLOWOUT_SUCCESS
-  | typeof CHOOSE_DROP_TIP_LOCATION
-  | typeof POSITION_AND_DROP_TIP
-  | typeof DROP_TIP_SUCCESS
+export type DropTipFlowsRoute = typeof DT_ROUTES[keyof typeof DT_ROUTES]
+export type DropTipFlowsStep = DropTipFlowsRoute[number]

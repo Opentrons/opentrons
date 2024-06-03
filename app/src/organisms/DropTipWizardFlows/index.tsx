@@ -1,10 +1,11 @@
 import * as React from 'react'
 import head from 'lodash/head'
 
+import { getPipetteModelSpecs } from '@opentrons/shared-data'
+
 import { DropTipWizard } from './DropTipWizard'
 import { getPipettesWithTipAttached } from './getPipettesWithTipAttached'
-
-import { getPipetteModelSpecs } from '@opentrons/shared-data'
+import { useDropTipRouting } from './utils'
 
 import type { PipetteModelSpecs } from '@opentrons/shared-data'
 import type { GetPipettesWithTipAttached } from './getPipettesWithTipAttached'
@@ -109,5 +110,8 @@ export function useDropTipWizardFlows(): {
 }
 
 export function DropTipWizardFlows(props: DropTipWizardProps): JSX.Element {
-  return <DropTipWizard {...props} />
+  // TOME: You'll eventually want a get first step function here that takes the override first step or otherwise defaults to before_beginning firs step.
+  const dropTipRoutingUtils = useDropTipRouting()
+
+  return <DropTipWizard {...props} dropTipRoutingUtils={dropTipRoutingUtils} />
 }

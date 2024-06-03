@@ -30,14 +30,15 @@ import {
 } from '../../resources/runs'
 import { ExitConfirmation } from './ExitConfirmation'
 import { getAddressableAreaFromConfig } from './getAddressableAreaFromConfig'
-import { getDropTipWizardSteps } from './getDropTipWizardSteps'
 import {
   BLOWOUT_SUCCESS,
-  CHOOSE_BLOWOUT_LOCATION,
+  BEFORE_BEGINNING,
   CHOOSE_DROP_TIP_LOCATION,
+  CHOOSE_BLOWOUT_LOCATION,
   DROP_TIP_SUCCESS,
   POSITION_AND_BLOWOUT,
   POSITION_AND_DROP_TIP,
+  DT_ROUTES,
 } from './constants'
 import { BeforeBeginning } from './BeforeBeginning'
 import { ChooseLocation } from './ChooseLocation'
@@ -48,6 +49,7 @@ import {
   useHandleDropTipCommandErrors,
   useDropTipErrorComponents,
   useWizardExitHeader,
+  UseDropTipRoutingResult,
 } from './utils'
 import { useNotifyDeckConfigurationQuery } from '../../resources/deck_configuration'
 
@@ -62,13 +64,15 @@ import type {
 import type { Axis, Sign, StepSize } from '../../molecules/JogControls/types'
 import type { Jog } from '../../molecules/JogControls'
 import type { ErrorDetails } from './utils'
-import type { DropTipWizardStep } from './types'
+import type { DropTipFlowsStep } from './types'
+import { useState } from 'react'
 
 const RUN_REFETCH_INTERVAL_MS = 5000
 const JOG_COMMAND_TIMEOUT_MS = 10000
 const MANAGED_PIPETTE_ID = 'managedPipetteId'
 
 export interface DropTipWizardProps {
+  dropTipRoutingUtils: UseDropTipRoutingResult
   robotType: RobotType
   mount: PipetteData['mount']
   instrumentModelSpecs: PipetteModelSpecs
@@ -187,8 +191,11 @@ export function DropTipWizard(props: DropTipWizardProps): JSX.Element {
     }
   }
 
+  // TOME: Please clean this up!!!
+
   return (
     <DropTipWizardComponent
+      dropTipRoutingUtils={props.dropTipRoutingUtils}
       robotType={robotType}
       createdMaintenanceRunId={createdMaintenanceRunId}
       maintenanceRunId={maintenanceRunData?.data.id}
@@ -208,6 +215,7 @@ export function DropTipWizard(props: DropTipWizardProps): JSX.Element {
 }
 
 interface DropTipWizardComponentProps {
+  dropTipRoutingUtils: UseDropTipRoutingResult
   robotType: RobotType
   mount: PipetteData['mount']
   createdMaintenanceRunId: string | null
@@ -244,23 +252,24 @@ export const DropTipWizardComponent = (
     createdMaintenanceRunId,
     instrumentModelSpecs,
     deckConfig,
+    dropTipRoutingUtils,
   } = props
   const { t, i18n } = useTranslation('drop_tip_wizard')
-  const [currentStepIndex, setCurrentStepIndex] = React.useState<number>(0)
-  const [shouldDispenseLiquid, setShouldDispenseLiquid] = React.useState<
-    boolean | null
-  >(null)
   const hasInitiatedExit = React.useRef(false)
 
   const isOnDevice = useSelector(getIsOnDevice)
   const setSpecificErrorDetails = useHandleDropTipCommandErrors(setErrorDetails)
 
-  const DropTipWizardSteps = getDropTipWizardSteps(shouldDispenseLiquid)
-  const currentStep =
-    shouldDispenseLiquid != null
-      ? getDropTipWizardSteps(shouldDispenseLiquid)[currentStepIndex]
-      : null
-  const isFinalStep = currentStepIndex === DropTipWizardSteps.length - 1
+  const {
+    currentStep,
+    currentRoute,
+    currentStepIdx,
+    proceed,
+    goBack,
+    proceedToRoute,
+  } = dropTipRoutingUtils
+
+  const isFinalWizardStep = currentStep === DROP_TIP_SUCCESS // The happy path always ends with this step.
 
   const {
     confirm: confirmExit,
@@ -290,17 +299,18 @@ export const DropTipWizardComponent = (
     }
   }, [])
 
-  const goBack = (): void => {
+  // TOME: This probably needs work.
+  const goBackRunValid = (): void => {
     if (createdMaintenanceRunId != null) {
-      setCurrentStepIndex(isFinalStep ? currentStepIndex : currentStepIndex - 1)
+      void goBack()
     }
   }
 
-  const proceed = (): void => {
-    if (isFinalStep) {
+  const proceedWithConditionalClose = (): void => {
+    if (isFinalWizardStep) {
       handleCleanUpAndClose()
     } else {
-      setCurrentStepIndex(currentStepIndex + 1)
+      void proceed()
     }
   }
 
@@ -380,7 +390,7 @@ export const DropTipWizardComponent = (
       return buildShowExitConfirmation()
     } else if (errorDetails != null) {
       return buildErrorScreen()
-    } else if (shouldDispenseLiquid == null) {
+    } else if (currentStep === BEFORE_BEGINNING) {
       return buildBeforeBeginning()
     } else if (
       currentStep === CHOOSE_BLOWOUT_LOCATION ||
@@ -434,12 +444,9 @@ export const DropTipWizardComponent = (
     function buildBeforeBeginning(): JSX.Element {
       return (
         <BeforeBeginning
-          {...{
-            setShouldDispenseLiquid,
-            createdMaintenanceRunId,
-            isOnDevice,
-            isRobotMoving,
-          }}
+          proceedToRoute={proceedToRoute}
+          isOnDevice={isOnDevice}
+          createdMaintenanceRunId={createdMaintenanceRunId}
         />
       )
     }
@@ -458,11 +465,8 @@ export const DropTipWizardComponent = (
       return (
         <ChooseLocation
           robotType={robotType}
-          handleProceed={proceed}
-          handleGoBack={() => {
-            setCurrentStepIndex(0)
-            setShouldDispenseLiquid(null)
-          }}
+          handleProceed={proceedWithConditionalClose}
+          handleGoBack={goBackRunValid}
           title={
             currentStep === CHOOSE_BLOWOUT_LOCATION
               ? i18n.format(t('choose_blowout_location'), 'capitalize')
@@ -515,7 +519,7 @@ export const DropTipWizardComponent = (
                       message: `Error moving to position: ${error.detail}`,
                     })
                   } else {
-                    proceed()
+                    proceedWithConditionalClose()
                   }
                 })
                 .catch(e =>
@@ -529,19 +533,28 @@ export const DropTipWizardComponent = (
                 )
             }
           }}
-          handleGoBack={goBack}
+          handleGoBack={goBackRunValid}
           body={
             currentStep === POSITION_AND_BLOWOUT
               ? t('position_and_blowout')
               : t('position_and_drop_tip')
           }
-          currentStep={currentStep as DropTipWizardStep}
+          currentStep={currentStep as DropTipFlowsStep}
           isOnDevice={isOnDevice}
         />
       )
     }
 
     function buildSuccess(): JSX.Element {
+      // Route to the drop tip route if user is at the blowout success screen, otherwise proceed conditionally.
+      const handleProceed = (): void => {
+        if (currentStep === BLOWOUT_SUCCESS) {
+          void proceedToRoute(DT_ROUTES.DROP_TIP)
+        } else {
+          proceedWithConditionalClose()
+        }
+      }
+
       return (
         <Success
           message={
@@ -549,9 +562,7 @@ export const DropTipWizardComponent = (
               ? t('blowout_complete')
               : t('drop_tip_complete')
           }
-          handleProceed={
-            currentStep === BLOWOUT_SUCCESS ? proceed : handleCleanUpAndClose
-          }
+          handleProceed={handleProceed}
           proceedText={
             currentStep === BLOWOUT_SUCCESS
               ? i18n.format(t('shared:continue'), 'capitalize')
@@ -564,23 +575,57 @@ export const DropTipWizardComponent = (
     }
   }
 
+  // TOME: This could be cleaned up, but I bet you'll do that through the presentation layer cleanup anyways.
+  // Yeah...I'd do a useDTWizardHeader and have the lgoic there.
+  const [hasSeenBlowoutSuccess, setHasSeenBlowoutSuccess] = useState(false)
+
+  React.useEffect(() => {
+    if (currentStep === BLOWOUT_SUCCESS) {
+      setHasSeenBlowoutSuccess(true)
+    }
+  }, [currentStep])
+
   const wizardHeaderOnExit = useWizardExitHeader({
-    isFinalStep,
+    isFinalStep: isFinalWizardStep,
     hasInitiatedExit: hasInitiatedExit.current,
     errorDetails,
     confirmExit,
     handleCleanUpAndClose,
   })
 
-  const wizardHeader = (
-    <WizardHeader
-      title={i18n.format(t('drop_tips'), 'capitalize')}
-      currentStep={shouldDispenseLiquid != null ? currentStepIndex + 1 : null}
-      totalSteps={DropTipWizardSteps.length}
-      onExit={wizardHeaderOnExit}
-    />
-  )
+  // TOME: Refactor these out into their own build functions. This shold really be its own component file!
+  const buildWizardHeader = (): JSX.Element => {
+    const shouldRenderStepCounter = currentRoute !== DT_ROUTES.BEFORE_BEGINNING
 
+    let totalSteps: null | number
+    if (!shouldRenderStepCounter) {
+      totalSteps = null
+    } else if (currentRoute === DT_ROUTES.BLOWOUT || hasSeenBlowoutSuccess) {
+      totalSteps = DT_ROUTES.BLOWOUT.length + DT_ROUTES.DROP_TIP.length
+    } else {
+      totalSteps = currentRoute.length
+    }
+
+    let currentStepNumber: null | number
+    if (!shouldRenderStepCounter) {
+      currentStepNumber = null
+    } else if (hasSeenBlowoutSuccess && currentRoute === DT_ROUTES.DROP_TIP) {
+      currentStepNumber = DT_ROUTES.BLOWOUT.length + currentStepIdx + 1
+    } else {
+      currentStepNumber = currentStepIdx + 1
+    }
+
+    return (
+      <WizardHeader
+        title={i18n.format(t('drop_tips'), 'capitalize')}
+        currentStep={currentStepNumber}
+        totalSteps={totalSteps}
+        onExit={wizardHeaderOnExit}
+      />
+    )
+  }
+
+  // TOME: The portal layer needs to be above the rest of the presentation layer.
   return createPortal(
     isOnDevice ? (
       <Flex
@@ -595,11 +640,15 @@ export const DropTipWizardComponent = (
         position={POSITION_ABSOLUTE}
         backgroundColor={COLORS.white}
       >
-        {wizardHeader}
+        {buildWizardHeader()}
         {modalContent}
       </Flex>
     ) : (
-      <LegacyModalShell width="47rem" header={wizardHeader} overflow="hidden">
+      <LegacyModalShell
+        width="47rem"
+        header={buildWizardHeader()}
+        overflow="hidden"
+      >
         {modalContent}
       </LegacyModalShell>
     ),

@@ -24,29 +24,37 @@ import {
 
 import { SmallButton, MediumButton } from '../../atoms/buttons'
 import { InProgressModal } from '../../molecules/InProgressModal/InProgressModal'
+import { DT_ROUTES } from './constants'
 
 import blowoutVideo from '../../assets/videos/droptip-wizard/Blowout-Liquid.webm'
 import droptipVideo from '../../assets/videos/droptip-wizard/Drop-tip.webm'
 
+import type { UseDropTipRoutingResult } from './utils'
+
 interface BeforeBeginningProps {
-  setShouldDispenseLiquid: (shouldDispenseLiquid: boolean) => void
   createdMaintenanceRunId: string | null
   isOnDevice: boolean
+  proceedToRoute: UseDropTipRoutingResult['proceedToRoute']
 }
 
 export const BeforeBeginning = (
   props: BeforeBeginningProps
 ): JSX.Element | null => {
-  const { setShouldDispenseLiquid, createdMaintenanceRunId, isOnDevice } = props
+  const { proceedToRoute, createdMaintenanceRunId, isOnDevice } = props
   const { i18n, t } = useTranslation(['drop_tip_wizard', 'shared'])
   const [flowType, setFlowType] = React.useState<
-    'liquid_and_tips' | 'only_tips' | null
+    'blowout' | 'drop_tips' | null
   >(null)
 
   const handleProceed = (): void => {
-    setShouldDispenseLiquid(flowType === 'liquid_and_tips')
+    if (flowType === 'blowout') {
+      void proceedToRoute(DT_ROUTES.BLOWOUT)
+    } else if (flowType === 'drop_tips') {
+      void proceedToRoute(DT_ROUTES.DROP_TIP)
+    }
   }
 
+  // TOME: Please refactor this out. We don't want conditional stuff like this!
   if (createdMaintenanceRunId == null) {
     return <InProgressModal description={t('getting_ready')} />
   }
@@ -65,11 +73,9 @@ export const BeforeBeginning = (
           </Flex>
           <Flex paddingBottom={SPACING.spacing8}>
             <MediumButton
-              buttonType={
-                flowType === 'liquid_and_tips' ? 'primary' : 'secondary'
-              }
+              buttonType={flowType === 'blowout' ? 'primary' : 'secondary'}
               flex="1"
-              onClick={() => setFlowType('liquid_and_tips')}
+              onClick={() => setFlowType('blowout')}
               buttonText={i18n.format(t('yes_blow_out_liquid'), 'capitalize')}
               justifyContent={JUSTIFY_FLEX_START}
               paddingLeft={SPACING.spacing24}
@@ -77,10 +83,10 @@ export const BeforeBeginning = (
           </Flex>
           <Flex>
             <MediumButton
-              buttonType={flowType === 'only_tips' ? 'primary' : 'secondary'}
+              buttonType={flowType === 'drop_tips' ? 'primary' : 'secondary'}
               flex="1"
               onClick={() => {
-                setFlowType('only_tips')
+                setFlowType('drop_tips')
               }}
               buttonText={i18n.format(
                 t('no_proceed_to_drop_tip'),
@@ -112,10 +118,10 @@ export const BeforeBeginning = (
         >
           <Flex
             onClick={() => {
-              setFlowType('liquid_and_tips')
+              setFlowType('blowout')
             }}
             css={
-              flowType === 'liquid_and_tips'
+              flowType === 'blowout'
                 ? SELECTED_OPTIONS_STYLE
                 : UNSELECTED_OPTIONS_STYLE
             }
@@ -134,9 +140,9 @@ export const BeforeBeginning = (
             <StyledText as="h3">{t('yes_blow_out_liquid')}</StyledText>
           </Flex>
           <Flex
-            onClick={() => setFlowType('only_tips')}
+            onClick={() => setFlowType('drop_tips')}
             css={
-              flowType === 'only_tips'
+              flowType === 'drop_tips'
                 ? SELECTED_OPTIONS_STYLE
                 : UNSELECTED_OPTIONS_STYLE
             }
