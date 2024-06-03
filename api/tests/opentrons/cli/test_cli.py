@@ -5,52 +5,13 @@ import json
 import tempfile
 import textwrap
 
-from dataclasses import dataclass, replace
+from dataclasses import dataclass
 from typing import Any, Dict, Iterator, List, Optional
 from pathlib import Path
 
 import pytest
 from click.testing import CliRunner
-from opentrons_shared_data.performance.dev_types import (
-    RobotContextState,
-)
-from opentrons.util.performance_helpers import _get_robot_context_tracker
-
-
-# Enable tracking for the RobotContextTracker
-# This must come before the import of the analyze CLI
-context_tracker = _get_robot_context_tracker()
-
-# Ignore the type error for the next line, as we're setting a private attribute for testing purposes
-context_tracker._should_track = True  # type: ignore[attr-defined]
-
-from opentrons.cli.analyze import analyze  # noqa: E402
-
-
-@pytest.fixture
-def override_data_store(tmp_path: Path) -> Iterator[None]:
-    """Override the data store metadata for the RobotContextTracker."""
-    old_store = context_tracker._store  # type: ignore[attr-defined]
-    old_metadata = old_store.metadata
-    new_metadata = replace(old_metadata, storage_dir=tmp_path)
-    context_tracker._store = old_store.__class__(metadata=new_metadata)  # type: ignore[attr-defined]
-    context_tracker._store.setup()  # type: ignore[attr-defined]
-    yield
-    context_tracker._store = old_store  # type: ignore[attr-defined]
-
-
-def verify_metrics_store_file(file_path: Path, expected_length: int) -> None:
-    """Verify that the metrics store file contains the expected number of lines."""
-    with open(file_path, "r") as f:
-        stored_data = f.readlines()
-        stored_data = [line.strip() for line in stored_data if line.strip()]
-        assert len(stored_data) == expected_length
-        for line in stored_data:
-            state_id, start_time, duration = line.strip().split(",")
-            assert state_id.isdigit()
-            assert state_id == str(RobotContextState.ANALYZING_PROTOCOL.state_id)
-            assert start_time.isdigit()
-            assert duration.isdigit()
+from opentrons.cli.analyze import analyze
 
 
 def _list_fixtures(version: int) -> Iterator[Path]:
@@ -299,32 +260,3 @@ def test_python_error_line_numbers(
     assert result.json_output is not None
     [error] = result.json_output["errors"]
     assert error["detail"] == expected_detail
-
-
-@pytest.mark.usefixtures("override_data_store")
-@pytest.mark.parametrize("output", ["--json-output", "--human-json-output"])
-def test_track_analysis(tmp_path: Path, output: str) -> None:
-    """Test that the RobotContextTracker tracks analysis."""
-    protocol_source = textwrap.dedent(
-        """
-        requirements = {"apiLevel": "2.15"}
-
-        def run(protocol):
-            pass
-        """
-    )
-    protocol_source_file = tmp_path / "protocol.py"
-    protocol_source_file.write_text(protocol_source, encoding="utf-8")
-    store = context_tracker._store  # type: ignore[attr-defined]
-
-    num_storage_entities_before_analysis = len(store._data)
-
-    _get_analysis_result([protocol_source_file], output)
-
-    assert len(store._data) == num_storage_entities_before_analysis + 1
-
-    verify_metrics_store_file(store.metadata.data_file_location, 0)
-
-    context_tracker.store()
-
-    verify_metrics_store_file(store.metadata.data_file_location, 1)

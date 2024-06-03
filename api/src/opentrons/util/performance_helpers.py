@@ -1,6 +1,5 @@
 """Performance helpers for tracking robot context."""
 
-import inspect
 import functools
 from pathlib import Path
 from opentrons_shared_data.performance.dev_types import (
