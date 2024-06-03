@@ -2,7 +2,7 @@ import abc
 import asyncio
 import logging
 import re
-from typing import ClassVar, Mapping, Optional, TypeVar
+from typing import ClassVar, Mapping, Optional, TypeVar, cast
 from packaging.version import InvalidVersion, parse, Version
 from opentrons.config import IS_ROBOT, ROBOT_FIRMWARE_DIR
 from opentrons.drivers.rpi_drivers.types import USBPort
@@ -18,9 +18,14 @@ TaskPayload = TypeVar("TaskPayload")
 def parse_fw_version(version: str) -> Version:
     try:
         device_version = parse(version)
+        # This is a patch for older versions of packaging - they would try and parse old
+        # kidns of versions and return a LegacyVersion object. We can't check for that
+        # explicitly because they removed it in modern versions of packaging.
+        if not isinstance(device_version, Version):
+            raise InvalidVersion()
     except InvalidVersion:
         device_version = parse("v0.0.0")
-    return device_version
+    return cast(Version, device_version)
 
 
 class AbstractModule(abc.ABC):
