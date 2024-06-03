@@ -358,11 +358,8 @@ def _run_trial(run_args: RunArgs, tip: int, well: Well, trial: int) -> float:
             mount_speed=run_args.z_speed,
             plunger_speed=plunger_speed,
             sensor_threshold_pascals=lqid_cfg["sensor_threshold_pascals"],
-            expected_liquid_height=110,
             output_option=OutputOptions.sync_buffer_to_csv,
             aspirate_while_sensing=run_args.aspirate,
-            auto_zero_sensor=True,
-            num_baseline_reads=10,
             data_files=data_files,
         )
 
