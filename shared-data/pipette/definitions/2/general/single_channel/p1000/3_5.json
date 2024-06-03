@@ -5,7 +5,7 @@
   "displayCategory": "FLEX",
   "validNozzleMaps": {
     "maps": {
-      "A1": ["A1"]
+      "SingleA1": ["A1"]
     }
   },
   "pickUpTipConfigurations": {

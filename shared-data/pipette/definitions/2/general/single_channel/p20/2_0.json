@@ -5,7 +5,7 @@
   "displayCategory": "GEN2",
   "validNozzleMaps": {
     "maps": {
-      "A1": ["A1"]
+      "SingleA1": ["A1"]
     }
   },
   "pickUpTipConfigurations": {
