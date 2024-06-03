@@ -66,7 +66,6 @@ def test_pick_up_configs_tip_count_keys() -> None:
 
 def test_tip_overlap_version_extrema_cover_definitions() -> None:
     """Check that tip overlap versions are up to date."""
-    found_min = False
     found_max = False
     for model in iterate_models():
         model_version = convert_pipette_model(model)
@@ -76,6 +75,7 @@ def test_tip_overlap_version_extrema_cover_definitions() -> None:
             model_version.pipette_version,
         )
         for lc_name, lc_value in loaded_model.liquid_properties.items():
+            found_min = False
             for version in lc_value.versioned_tip_overlap_dictionary.keys():
                 version_number = int(version[1:])
                 assert (
@@ -88,9 +88,9 @@ def test_tip_overlap_version_extrema_cover_definitions() -> None:
                     found_min = True
                 if version_number == TIP_OVERLAP_VERSION_MAXIMUM:
                     found_max = True
-    assert (
-        found_min
-    ), f"No tip overlap data for version {TIP_OVERLAP_VERSION_MINIMUM} found"
+            assert (
+                found_min
+            ), f"{model} / {lc_name} has no entry for minimum tip overlap version {TIP_OVERLAP_VERSION_MINIMUM}"
     assert (
         found_max
     ), f"No tip overlap data for version {TIP_OVERLAP_VERSION_MAXIMUM} found"

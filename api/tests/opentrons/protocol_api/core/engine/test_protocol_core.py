@@ -244,7 +244,9 @@ def test_load_instrument(
     """It should issue a LoadPipette command."""
     decoy.when(
         mock_engine_client.load_pipette(
-            pipette_name=PipetteNameType.P300_SINGLE, mount=MountType.LEFT
+            pipette_name=PipetteNameType.P300_SINGLE,
+            mount=MountType.LEFT,
+            tip_overlap_version="v0",
         )
     ).then_return(commands.LoadPipetteResult(pipetteId="cool-pipette"))
 

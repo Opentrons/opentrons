@@ -1171,3 +1171,17 @@ def test_is_tip_tracking_available(
         mock_engine_client.state.pipettes.get_primary_nozzle(subject.pipette_id)
     ).then_return(primary_nozzle)
     assert subject.is_tip_tracking_available() == expected_result
+
+
+def test_configure_for_volume(
+    decoy: Decoy,
+    mock_engine_client: EngineClient,
+    subject: InstrumentCore,
+) -> None:
+    """Configure_for_volume should specify overlap version."""
+    subject.configure_for_volume(123.0)
+    decoy.verify(
+        mock_engine_client.configure_for_volume(
+            pipette_id=subject.pipette_id, volume=123.0, tip_overlap_version="v0"
+        )
+    )

@@ -22,10 +22,27 @@ from opentrons.protocol_engine.commands.load_pipette import (
 from ..pipette_fixtures import get_default_nozzle_map
 
 
+@pytest.mark.parametrize(
+    "data",
+    [
+        LoadPipetteParams(
+            pipetteName=PipetteNameType.P300_SINGLE,
+            mount=MountType.LEFT,
+            pipetteId="some id",
+        ),
+        LoadPipetteParams(
+            pipetteName=PipetteNameType.P300_SINGLE,
+            mount=MountType.LEFT,
+            pipetteId="some id",
+            tipOverlapNotAfterVersion="v2",
+        ),
+    ],
+)
 async def test_load_pipette_implementation(
     decoy: Decoy,
     equipment: EquipmentHandler,
     state_view: StateView,
+    data: LoadPipetteParams,
 ) -> None:
     """A LoadPipette command should have an execution implementation."""
     subject = LoadPipetteImplementation(equipment=equipment, state_view=state_view)
@@ -46,17 +63,13 @@ async def test_load_pipette_implementation(
         back_left_corner_offset=Point(x=1, y=2, z=3),
         front_right_corner_offset=Point(x=4, y=5, z=6),
     )
-    data = LoadPipetteParams(
-        pipetteName=PipetteNameType.P300_SINGLE,
-        mount=MountType.LEFT,
-        pipetteId="some id",
-    )
 
     decoy.when(
         await equipment.load_pipette(
             pipette_name=PipetteNameType.P300_SINGLE,
             mount=MountType.LEFT,
             pipette_id="some id",
+            tip_overlap_version=data.tipOverlapNotAfterVersion,
         )
     ).then_return(
         LoadedPipetteData(
@@ -110,6 +123,7 @@ async def test_load_pipette_implementation_96_channel(
             pipette_name=PipetteNameType.P1000_96,
             mount=MountType.LEFT,
             pipette_id="some id",
+            tip_overlap_version=None,
         )
     ).then_return(
         LoadedPipetteData(
