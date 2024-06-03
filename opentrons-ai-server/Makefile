@@ -90,6 +90,10 @@ print-client-settings-vars:
 live-client:
 	python -m pipenv run python -m tests.helpers.client
 
+.PHONY: live-hf
+live-hf:
+	python -m pipenv run python -m tests.helpers.huggingface_client
+
 .PHONY: test-live
 test-live:
 	python -m pipenv run python -m pytest tests -m live --env $(ENV)
