@@ -13,7 +13,7 @@
       "presses": 1,
       "increment": 0.0,
       "configurationsByNozzleMap": {
-        "A1": {
+        "SingleA1": {
           "default": {
             "speed": 10.0,
             "distance": 14.0,
