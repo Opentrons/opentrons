@@ -2,7 +2,10 @@ import os
 from opentrons_shared_data import get_shared_data_root
 
 from opentrons_shared_data.pipette.pipette_definition import PipetteConfigurations
-from opentrons_shared_data.pipette.load_data import load_definition
+from opentrons_shared_data.pipette.load_data import (
+    load_definition,
+    load_valid_nozzle_maps,
+)
 from opentrons_shared_data.pipette.pipette_load_name_conversions import (
     convert_pipette_model,
 )
@@ -37,8 +40,8 @@ def test_check_all_models_are_valid() -> None:
                 assert isinstance(loaded_model, PipetteConfigurations)
 
 
-def test_pick_up_configs_tip_count_keys() -> None:
-    """Verify that speed, distance & current of pickUpTipConfigurations have same tip count keys."""
+def test_pick_up_configs_configuration_by_nozzle_map_keys() -> None:
+    """Verify that for every nozzle map the pickUpTipConfigurations have a valid configuration set."""
     paths_to_validate = (
         get_shared_data_root() / "pipette" / "definitions" / "2" / "general"
     )
@@ -62,9 +65,17 @@ def test_pick_up_configs_tip_count_keys() -> None:
                     model_version.pipette_channels,
                     model_version.pipette_version,
                 )
-                pick_up_tip_configs = loaded_model.pick_up_tip_configurations.press_fit
-                assert (
-                    pick_up_tip_configs.distance_by_tip_count.keys()
-                    == pick_up_tip_configs.speed_by_tip_count.keys()
-                    == pick_up_tip_configs.current_by_tip_count.keys()
+                valid_nozzle_maps = load_valid_nozzle_maps(
+                    model_version.pipette_type,
+                    model_version.pipette_channels,
+                    model_version.pipette_version,
                 )
+
+                pipette_maps = list(
+                    loaded_model.pick_up_tip_configurations.press_fit.configuration_by_nozzle_map.keys()
+                )
+                if loaded_model.pick_up_tip_configurations.cam_action is not None:
+                    pipette_maps += list(
+                        loaded_model.pick_up_tip_configurations.cam_action.configuration_by_nozzle_map.keys()
+                    )
+                assert pipette_maps == list(valid_nozzle_maps.maps.keys())
