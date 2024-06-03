@@ -1,7 +1,7 @@
 """Basic pipette data state and store."""
 from __future__ import annotations
 from dataclasses import dataclass
-from typing import Dict, List, Mapping, Optional, Tuple
+from typing import Dict, List, Mapping, Optional, Tuple, Union
 
 from opentrons_shared_data.pipette import pipette_definition
 from opentrons.config.defaults_ot2 import Z_RETRACT_DISTANCE
@@ -10,6 +10,7 @@ from opentrons.hardware_control.nozzle_manager import (
     NozzleConfigurationType,
     NozzleMap,
 )
+from opentrons.protocol_engine.actions.actions import FailCommandAction
 from opentrons.types import MountType, Mount as HwMount, Point
 
 from .. import errors
@@ -24,7 +25,6 @@ from ..types import (
     TipGeometry,
 )
 from ..commands import (
-    Command,
     LoadPipetteResult,
     AspirateResult,
     AspirateInPlaceResult,
@@ -46,7 +46,6 @@ from ..commands import (
     TouchTipResult,
     thermocycler,
     heater_shaker,
-    CommandPrivateResult,
     PrepareToAspirateResult,
 )
 from ..commands.configuring_common import (
@@ -150,16 +149,22 @@ class PipetteStore(HasState[PipetteState], HandlesActions):
 
     def handle_action(self, action: Action) -> None:
         """Modify state in reaction to an action."""
-        if isinstance(action, SucceedCommandAction):
-            self._handle_command(action.command, action.private_result)
+        if isinstance(action, (SucceedCommandAction, FailCommandAction)):
+            self._handle_command(action)
         elif isinstance(action, SetPipetteMovementSpeedAction):
             self._state.movement_speed_by_id[action.pipette_id] = action.speed
 
     def _handle_command(  # noqa: C901
-        self, command: Command, private_result: CommandPrivateResult
+        self, action: Union[SucceedCommandAction, FailCommandAction]
     ) -> None:
-        self._update_current_location(command)
-        self._update_deck_point(command)
+        self._update_current_location(action)
+        self._update_deck_point(action)
+        self._update_volumes(action)
+
+        if not isinstance(action, SucceedCommandAction):
+            return
+
+        command, private_result = action.command, action.private_result
 
         if isinstance(private_result, PipetteConfigUpdateResultMixin):
             config = private_result.config
@@ -212,23 +217,6 @@ class PipetteStore(HasState[PipetteState], HandlesActions):
                     pipette_id
                 ] = static_config.default_nozzle_map
 
-        elif isinstance(command.result, (AspirateResult, AspirateInPlaceResult)):
-            pipette_id = command.params.pipetteId
-            previous_volume = self._state.aspirated_volume_by_id[pipette_id] or 0
-            # PipetteHandler will have clamped command.result.volume for us, so
-            # next_volume should always be in bounds.
-            next_volume = previous_volume + command.result.volume
-
-            self._state.aspirated_volume_by_id[pipette_id] = next_volume
-
-        elif isinstance(command.result, (DispenseResult, DispenseInPlaceResult)):
-            pipette_id = command.params.pipetteId
-            previous_volume = self._state.aspirated_volume_by_id[pipette_id] or 0
-            # PipetteHandler will have clamped command.result.volume for us, so
-            # next_volume should always be in bounds.
-            next_volume = previous_volume - command.result.volume
-            self._state.aspirated_volume_by_id[pipette_id] = next_volume
-
         elif isinstance(command.result, PickUpTipResult):
             pipette_id = command.params.pipetteId
             attached_tip = TipGeometry(
@@ -277,19 +265,14 @@ class PipetteStore(HasState[PipetteState], HandlesActions):
                     default_aspirate=tip_configuration.default_aspirate_flowrate.values_by_api_level,
                     default_dispense=tip_configuration.default_dispense_flowrate.values_by_api_level,
                 )
-        elif isinstance(command.result, (BlowOutResult, BlowOutInPlaceResult)):
-            pipette_id = command.params.pipetteId
-            self._state.aspirated_volume_by_id[pipette_id] = None
 
-        elif isinstance(command.result, PrepareToAspirateResult):
-            pipette_id = command.params.pipetteId
-            self._state.aspirated_volume_by_id[pipette_id] = 0
-
-    def _update_current_location(self, command: Command) -> None:
+    def _update_current_location(  # noqa: C901
+        self, action: Union[SucceedCommandAction, FailCommandAction]
+    ) -> None:
         # These commands leave the pipette in a new location.
         # Update current_location to reflect that.
-        if isinstance(
-            command.result,
+        if isinstance(action, SucceedCommandAction) and isinstance(
+            action.command.result,
             (
                 MoveToWellResult,
                 PickUpTipResult,
@@ -301,18 +284,18 @@ class PipetteStore(HasState[PipetteState], HandlesActions):
             ),
         ):
             self._state.current_location = CurrentWell(
-                pipette_id=command.params.pipetteId,
-                labware_id=command.params.labwareId,
-                well_name=command.params.wellName,
+                pipette_id=action.command.params.pipetteId,
+                labware_id=action.command.params.labwareId,
+                well_name=action.command.params.wellName,
             )
 
-        elif isinstance(
-            command.result,
+        elif isinstance(action, SucceedCommandAction) and isinstance(
+            action.command.result,
             (MoveToAddressableAreaResult, MoveToAddressableAreaForDropTipResult),
         ):
             self._state.current_location = CurrentAddressableArea(
-                pipette_id=command.params.pipetteId,
-                addressable_area_name=command.params.addressableAreaName,
+                pipette_id=action.command.params.pipetteId,
+                addressable_area_name=action.command.params.addressableAreaName,
             )
 
         # These commands leave the pipette in a place that we can't logically associate
@@ -320,8 +303,8 @@ class PipetteStore(HasState[PipetteState], HandlesActions):
         #
         # TODO(mc, 2021-11-12): Wipe out current_location on movement failures, too.
         # TODO(jbl 2023-02-14): Need to investigate whether move relative should clear current location
-        elif isinstance(
-            command.result,
+        elif isinstance(action, SucceedCommandAction) and isinstance(
+            action.command.result,
             (
                 HomeResult,
                 RetractAxisResult,
@@ -334,14 +317,14 @@ class PipetteStore(HasState[PipetteState], HandlesActions):
 
         # Heater-Shaker commands may have left the pipette in a place that we can't
         # associate with a logical location, depending on their result.
-        elif isinstance(
-            command.result,
+        elif isinstance(action, SucceedCommandAction) and isinstance(
+            action.command.result,
             (
                 heater_shaker.SetAndWaitForShakeSpeedResult,
                 heater_shaker.OpenLabwareLatchResult,
             ),
         ):
-            if command.result.pipetteRetracted:
+            if action.command.result.pipetteRetracted:
                 self._state.current_location = None
 
         # A moveLabware command may have moved the labware that contains the current
@@ -350,9 +333,11 @@ class PipetteStore(HasState[PipetteState], HandlesActions):
         #
         # This is necessary for safe motion planning in case the next movement
         # goes to the same labware (now in a new place).
-        elif isinstance(command.result, MoveLabwareResult):
-            moved_labware_id = command.params.labwareId
-            if command.params.strategy == "usingGripper":
+        elif isinstance(action, SucceedCommandAction) and isinstance(
+            action.command.result, MoveLabwareResult
+        ):
+            moved_labware_id = action.command.params.labwareId
+            if action.command.params.strategy == "usingGripper":
                 # All mounts will have been retracted.
                 self._state.current_location = None
             elif (
@@ -361,9 +346,14 @@ class PipetteStore(HasState[PipetteState], HandlesActions):
             ):
                 self._state.current_location = None
 
-    def _update_deck_point(self, command: Command) -> None:
-        if isinstance(
-            command.result,
+    def _update_deck_point(
+        self, action: Union[SucceedCommandAction, FailCommandAction]
+    ) -> None:
+        # This function mostly mirrors self._update_current_location().
+        # See there for explanations.
+
+        if isinstance(action, SucceedCommandAction) and isinstance(
+            action.command.result,
             (
                 MoveToWellResult,
                 MoveToCoordinatesResult,
@@ -378,8 +368,8 @@ class PipetteStore(HasState[PipetteState], HandlesActions):
                 TouchTipResult,
             ),
         ):
-            pipette_id = command.params.pipetteId
-            deck_point = command.result.position
+            pipette_id = action.command.params.pipetteId
+            deck_point = action.command.result.position
 
             try:
                 loaded_pipette = self._state.pipettes_by_id[pipette_id]
@@ -390,8 +380,8 @@ class PipetteStore(HasState[PipetteState], HandlesActions):
                     mount=loaded_pipette.mount, deck_point=deck_point
                 )
 
-        elif isinstance(
-            command.result,
+        elif isinstance(action, SucceedCommandAction) and isinstance(
+            action.command.result,
             (
                 HomeResult,
                 RetractAxisResult,
@@ -401,20 +391,58 @@ class PipetteStore(HasState[PipetteState], HandlesActions):
         ):
             self._clear_deck_point()
 
-        elif isinstance(
-            command.result,
+        elif isinstance(action, SucceedCommandAction) and isinstance(
+            action.command.result,
             (
                 heater_shaker.SetAndWaitForShakeSpeedResult,
                 heater_shaker.OpenLabwareLatchResult,
             ),
         ):
-            if command.result.pipetteRetracted:
+            if action.command.result.pipetteRetracted:
                 self._clear_deck_point()
 
-        elif isinstance(command.result, MoveLabwareResult):
-            if command.params.strategy == "usingGripper":
+        elif isinstance(action, SucceedCommandAction) and isinstance(
+            action.command.result, MoveLabwareResult
+        ):
+            if action.command.params.strategy == "usingGripper":
                 # All mounts will have been retracted.
                 self._clear_deck_point()
+
+    def _update_volumes(
+        self, action: Union[SucceedCommandAction, FailCommandAction]
+    ) -> None:
+        if isinstance(action, SucceedCommandAction) and isinstance(
+            action.command.result, (AspirateResult, AspirateInPlaceResult)
+        ):
+            pipette_id = action.command.params.pipetteId
+            previous_volume = self._state.aspirated_volume_by_id[pipette_id] or 0
+            # PipetteHandler will have clamped action.command.result.volume for us, so
+            # next_volume should always be in bounds.
+            next_volume = previous_volume + action.command.result.volume
+
+            self._state.aspirated_volume_by_id[pipette_id] = next_volume
+
+        elif isinstance(action, SucceedCommandAction) and isinstance(
+            action.command.result, (DispenseResult, DispenseInPlaceResult)
+        ):
+            pipette_id = action.command.params.pipetteId
+            previous_volume = self._state.aspirated_volume_by_id[pipette_id] or 0
+            # PipetteHandler will have clamped action.command.result.volume for us, so
+            # next_volume should always be in bounds.
+            next_volume = previous_volume - action.command.result.volume
+            self._state.aspirated_volume_by_id[pipette_id] = next_volume
+
+        elif isinstance(action, SucceedCommandAction) and isinstance(
+            action.command.result, (BlowOutResult, BlowOutInPlaceResult)
+        ):
+            pipette_id = action.command.params.pipetteId
+            self._state.aspirated_volume_by_id[pipette_id] = None
+
+        elif isinstance(action, SucceedCommandAction) and isinstance(
+            action.command.result, PrepareToAspirateResult
+        ):
+            pipette_id = action.command.params.pipetteId
+            self._state.aspirated_volume_by_id[pipette_id] = 0
 
     def _clear_deck_point(self) -> None:
         """Reset last deck point to default None value for mount and point."""
