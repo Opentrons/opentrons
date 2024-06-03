@@ -30,7 +30,9 @@ lib-js: export NODE_ENV := production
 lib-js:
 	NODE_OPTIONS=--openssl-legacy-provider yarn vite build
 
-
+.PHONY: build-ts
+build-ts:
+	yarn tsc --build --emitDeclarationOnly
 
 # Python targets
 

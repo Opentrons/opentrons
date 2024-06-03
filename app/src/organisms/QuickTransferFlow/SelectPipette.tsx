@@ -15,7 +15,7 @@ import { ChildNavigation } from '../ChildNavigation'
 import type { PipetteData, Mount } from '@opentrons/api-client'
 import type { SmallButton } from '../../atoms/buttons'
 import type {
-  QuickTransferSetupState,
+  QuickTransferWizardState,
   QuickTransferWizardAction,
 } from './types'
 
@@ -23,7 +23,7 @@ interface SelectPipetteProps {
   onNext: () => void
   onBack: () => void
   exitButtonProps: React.ComponentProps<typeof SmallButton>
-  state: QuickTransferSetupState
+  state: QuickTransferWizardState
   dispatch: React.Dispatch<QuickTransferWizardAction>
 }
 

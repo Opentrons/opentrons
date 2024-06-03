@@ -21,12 +21,14 @@ from opentrons.protocol_api import (
     ProtocolContext,
     ParameterContext,
     create_protocol_context,
+    Parameters,
 )
 from opentrons.protocol_api.core.engine import ENGINE_CORE_API_VERSION
 from opentrons.protocol_api.core.legacy.load_info import LoadInfo
 
 from opentrons.protocols.parse import PythonParseMode, parse
 from opentrons.protocols.execution.execute import run_protocol
+from opentrons.protocols.execution.execute_python import exec_add_parameters
 from opentrons.protocols.types import Protocol, PythonProtocol
 
 
@@ -148,10 +150,22 @@ class PythonProtocolExecutor:
     async def execute(
         protocol: Protocol,
         context: ProtocolContext,
-        parameter_context: Optional[ParameterContext],
-        run_time_param_values: Optional[RunTimeParamValuesType],
+        run_time_parameters_with_overrides: Optional[Parameters],
     ) -> None:
         """Execute a PAPIv2 protocol with a given ProtocolContext in a child thread."""
         await to_thread.run_sync(
-            run_protocol, protocol, context, parameter_context, run_time_param_values
+            run_protocol, protocol, context, run_time_parameters_with_overrides
+        )
+
+    @staticmethod
+    def extract_run_parameters(
+        protocol: PythonProtocol,
+        parameter_context: ParameterContext,
+        run_time_param_overrides: Optional[RunTimeParamValuesType],
+    ) -> Optional[Parameters]:
+        """Extract the parameters defined in the protocol, overridden with values for the run."""
+        return exec_add_parameters(
+            protocol=protocol,
+            parameter_context=parameter_context,
+            run_time_param_overrides=run_time_param_overrides,
         )

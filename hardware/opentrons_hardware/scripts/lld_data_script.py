@@ -2,6 +2,7 @@
 import csv
 import os
 import argparse
+import sys
 from typing import List, Optional, Tuple, Any, Dict
 import matplotlib.pyplot as plot
 import numpy
@@ -21,7 +22,7 @@ class LLDAlgoABC(ABC):
         ...
 
     @abstractmethod
-    def tick(self, pressure: float) -> Tuple[bool, float]:
+    def tick(self, pressures: Tuple[float, float]) -> Tuple[bool, Tuple[float, float]]:
         """Simulate firmware motor interrupt tick."""
         ...
 
@@ -45,9 +46,12 @@ class LLDPresThresh(LLDAlgoABC):
         """Name of this algorithm."""
         return "{:<30}".format("simple threshold")
 
-    def tick(self, pressure: float) -> Tuple[bool, float]:
+    def tick(self, pressures: Tuple[float, float]) -> Tuple[bool, Tuple[float, float]]:
         """Simulate firmware motor interrupt tick."""
-        return (pressure < self.threshold, pressure)
+        return (
+            pressures[0] < self.threshold or pressures[1] < self.threshold,
+            pressures,
+        )
 
     def reset(self) -> None:
         """Reset simulator between runs."""
@@ -58,7 +62,8 @@ class LLDSMAT(LLDAlgoABC):
     """Simple moving average threshold."""
 
     samples_n_smat: int
-    running_samples_smat: List[float]
+    running_samples_smat_p: List[float]
+    running_samples_smat_s: List[float]
     threshold_smat: float
 
     def __init__(self, samples: int = 10, thresh: float = -15) -> None:
@@ -74,25 +79,40 @@ class LLDSMAT(LLDAlgoABC):
 
     def reset(self) -> None:
         """Reset simulator between runs."""
-        self.running_samples_smat = [impossible_pressure] * self.samples_n_smat
+        self.running_samples_smat_p = [impossible_pressure] * self.samples_n_smat
+        self.running_samples_smat_s = [impossible_pressure] * self.samples_n_smat
 
-    def tick(self, pressure: float) -> Tuple[bool, float]:
-        """Simulate firmware motor interrupt tick."""
+    @staticmethod
+    def _tick_one_sensor(
+        pressure: float, samples_n: int, running_samples: List[float]
+    ) -> Tuple[float, List[float]]:
+        """ticks one sensor returns the new current average and running_samples."""
         try:
-            next_ind = self.running_samples_smat.index(impossible_pressure)
+            next_ind = running_samples.index(impossible_pressure)
             # if no exception we're still filling the minimum samples
-            self.running_samples_smat[next_ind] = pressure
-            return (False, impossible_pressure)
+            running_samples[next_ind] = pressure
+            return (impossible_pressure, running_samples)
         except ValueError:  # the array has been filled
             pass
         # left shift old samples
-        for i in range(self.samples_n_smat - 1):
-            self.running_samples_smat[i] = self.running_samples_smat[i + 1]
-        self.running_samples_smat[self.samples_n_smat - 1] = pressure
-        new_running_avg = sum(self.running_samples_smat) / self.samples_n_smat
+        for i in range(samples_n - 1):
+            running_samples[i] = running_samples[i + 1]
+        running_samples[samples_n - 1] = pressure
+        new_running_avg = sum(running_samples) / samples_n
+        return (new_running_avg, running_samples)
+
+    def tick(self, pressures: Tuple[float, float]) -> Tuple[bool, Tuple[float, float]]:
+        """Simulate firmware motor interrupt tick."""
+        new_avg_p, self.running_samples_smad_p = LLDSMAT._tick_one_sensor(
+            pressures[0], self.samples_n_smat, self.running_samples_smat_p
+        )
+        new_avg_s, self.running_samples_smad_s = LLDSMAT._tick_one_sensor(
+            pressures[1], self.samples_n_smat, self.running_samples_smat_s
+        )
         return (
-            new_running_avg < self.threshold_smat,
-            new_running_avg,
+            abs(new_avg_p) > self.threshold_smat
+            or abs(new_avg_s) > self.threshold_smat,
+            (new_avg_p, new_avg_s),
         )
 
 
@@ -100,7 +120,8 @@ class LLDSMAD(LLDAlgoABC):
     """Simple moving average derivative."""
 
     samples_n_smad: int
-    running_samples_smad: List[float]
+    running_samples_smad_p: List[float]
+    running_samples_smad_s: List[float]
     derivative_threshold_smad: float
 
     def __init__(self, samples: int = 10, thresh: float = -2.5) -> None:
@@ -116,27 +137,42 @@ class LLDSMAD(LLDAlgoABC):
 
     def reset(self) -> None:
         """Reset simulator between runs."""
-        self.running_samples_smad = [impossible_pressure] * self.samples_n_smad
+        self.running_samples_smad_p = [impossible_pressure] * self.samples_n_smad
+        self.running_samples_smad_s = [impossible_pressure] * self.samples_n_smad
 
-    def tick(self, pressure: float) -> Tuple[bool, float]:
-        """Simulate firmware motor interrupt tick."""
+    @staticmethod
+    def _tick_one_sensor(
+        pressure: float, samples_n: int, running_samples: List[float]
+    ) -> Tuple[float, float, List[float]]:
+        """ticks one sensor returns the new current average, new derivative and updated running samples."""
         try:
-            next_ind = self.running_samples_smad.index(impossible_pressure)
+            next_ind = running_samples.index(impossible_pressure)
             # if no exception we're still filling the minimum samples
-            self.running_samples_smad[next_ind] = pressure
-            return (False, impossible_pressure)
+            running_samples[next_ind] = pressure
+            return (impossible_pressure, 0.0, running_samples)
         except ValueError:  # the array has been filled
             pass
         # store old running average
-        prev_running_avg = sum(self.running_samples_smad) / self.samples_n_smad
+        prev_running_avg = sum(running_samples) / samples_n
         # left shift old samples
-        for i in range(self.samples_n_smad - 1):
-            self.running_samples_smad[i] = self.running_samples_smad[i + 1]
-        self.running_samples_smad[self.samples_n_smad - 1] = pressure
-        new_running_avg = sum(self.running_samples_smad) / self.samples_n_smad
+        for i in range(samples_n - 1):
+            running_samples[i] = running_samples[i + 1]
+        running_samples[samples_n - 1] = pressure
+        new_running_avg = sum(running_samples) / samples_n
+        return (new_running_avg, new_running_avg - prev_running_avg, running_samples)
+
+    def tick(self, pressures: Tuple[float, float]) -> Tuple[bool, Tuple[float, float]]:
+        """Simulate firmware motor interrupt tick."""
+        new_avg_p, der_p, self.running_samples_smad_p = LLDSMAD._tick_one_sensor(
+            pressures[0], self.samples_n_smad, self.running_samples_smad_p
+        )
+        new_avg_s, der_s, self.running_samples_smad_s = LLDSMAD._tick_one_sensor(
+            pressures[1], self.samples_n_smad, self.running_samples_smad_s
+        )
         return (
-            (new_running_avg - prev_running_avg) < self.derivative_threshold_smad,
-            new_running_avg,
+            abs(der_p) > self.derivative_threshold_smad
+            or abs(der_s) > self.derivative_threshold_smad,
+            (new_avg_p, new_avg_s),
         )
 
 
@@ -147,13 +183,14 @@ class LLDWMAD(LLDAlgoABC):
     weights_wmad: numpy.ndarray[Any, numpy.dtype[numpy.float32]] = numpy.array(
         [0.19, 0.17, 0.15, 0.13, 0.11, 0.09, 0.07, 0.05, 0.03, 0.01]
     )
-    running_samples_wmad: numpy.ndarray[Any, numpy.dtype[numpy.float32]]
+    running_samples_wmad_p: numpy.ndarray[Any, numpy.dtype[numpy.float32]]
+    running_samples_wmad_s: numpy.ndarray[Any, numpy.dtype[numpy.float32]]
     derivative_threshold_wmad: float
 
     def __init__(self, samples: int = 10, thresh: float = -4) -> None:
         """Init."""
         self.samples_n_wmad = samples
-        self.derivative_threshold_wmad = thresh
+        self.derivative_threshold_wmad = abs(thresh)
         self.reset()
 
     @staticmethod
@@ -164,45 +201,68 @@ class LLDWMAD(LLDAlgoABC):
     def reset(self) -> None:
         """Reset simulator between runs."""
         assert numpy.sum(self.weights_wmad) == 1
-        self.running_samples_wmad = numpy.full(self.samples_n_wmad, impossible_pressure)
-
-    def tick(self, pressure: float) -> Tuple[bool, float]:
-        """Simulate firmware motor interrupt tick."""
-        if numpy.isin(impossible_pressure, self.running_samples_wmad):
-            next_ind = numpy.where(self.running_samples_wmad == impossible_pressure)[0][
-                0
-            ]
-            # if no exception we're still filling the minimum samples
-            self.running_samples_wmad[next_ind] = pressure
-            return (False, impossible_pressure)
-        # store old running average
-        prev_running_avg = numpy.sum(
-            numpy.multiply(self.running_samples_wmad, self.weights_wmad)
+        self.running_samples_wmad_p = numpy.full(
+            self.samples_n_wmad, impossible_pressure
         )
+        self.running_samples_wmad_s = numpy.full(
+            self.samples_n_wmad, impossible_pressure
+        )
+
+    @staticmethod
+    def _tick_one_sensor(
+        pressure: float,
+        samples_n: int,
+        running_samples: numpy.ndarray[Any, numpy.dtype[numpy.float32]],
+        weights_wmad: numpy.ndarray[Any, numpy.dtype[numpy.float32]],
+    ) -> Tuple[float, float, numpy.ndarray[Any, numpy.dtype[numpy.float32]]]:
+        """ticks one sensor returns the new current average, new derivative and updated running samples."""
+        if numpy.isin(impossible_pressure, running_samples):
+            next_ind = numpy.where(running_samples == impossible_pressure)[0][0]
+            # if no exception we're still filling the minimum samples
+            running_samples[next_ind] = pressure
+            return (impossible_pressure, 0.0, running_samples)
+        # store old running average
+        prev_running_avg = numpy.sum(numpy.multiply(running_samples, weights_wmad))
         # left shift old samples
-        for i in range(self.samples_n_wmad - 1):
-            self.running_samples_wmad[i] = self.running_samples_wmad[i + 1]
-        self.running_samples_wmad[self.samples_n_wmad - 1] = pressure
-        new_running_avg = numpy.sum(
-            numpy.multiply(self.running_samples_wmad, self.weights_wmad)
+        for i in range(samples_n - 1):
+            running_samples[i] = running_samples[i + 1]
+        running_samples[samples_n - 1] = pressure
+        new_running_avg = numpy.sum(numpy.multiply(running_samples, weights_wmad))
+        return (new_running_avg, (new_running_avg - prev_running_avg), running_samples)
+
+    def tick(self, pressures: Tuple[float, float]) -> Tuple[bool, Tuple[float, float]]:
+        """Simulate firmware motor interrupt tick."""
+        new_avg_p, der_p, self.running_samples_wmad_p = LLDWMAD._tick_one_sensor(
+            pressures[0],
+            self.samples_n_wmad,
+            self.running_samples_wmad_p,
+            self.weights_wmad,
+        )
+        new_avg_s, der_s, self.running_samples_wmad_s = LLDWMAD._tick_one_sensor(
+            pressures[1],
+            self.samples_n_wmad,
+            self.running_samples_wmad_s,
+            self.weights_wmad,
         )
         return (
-            (new_running_avg - prev_running_avg) < self.derivative_threshold_wmad,
-            new_running_avg,
+            abs(der_p) > self.derivative_threshold_wmad
+            or abs(der_s) > self.derivative_threshold_wmad,
+            (new_avg_p, new_avg_s),
         )
 
 
 class LLDEMAD(LLDAlgoABC):
     """Exponential moving average derivative."""
 
-    current_average_emad: float = impossible_pressure
+    current_average_emad_p: float = impossible_pressure
+    current_average_emad_s: float = impossible_pressure
     smoothing_factor: float
     derivative_threshold_emad: float
 
     def __init__(self, s_factor: float = 0.1, thresh: float = -2.5) -> None:
         """Init."""
         self.smoothing_factor = s_factor
-        self.derivative_threshold_emad = thresh
+        self.derivative_threshold_emad = abs(thresh)
         self.reset()
 
     @staticmethod
@@ -212,28 +272,47 @@ class LLDEMAD(LLDAlgoABC):
 
     def reset(self) -> None:
         """Reset simulator between runs."""
-        self.current_average_emad = impossible_pressure
+        self.current_average_emad_p = impossible_pressure
+        self.current_average_emad_s = impossible_pressure
 
-    def tick(self, pressure: float) -> Tuple[bool, float]:
-        """Simulate firmware motor interrupt tick."""
-        if self.current_average_emad == impossible_pressure:
-            self.current_average_emad = pressure
-            return (False, impossible_pressure)
+    @staticmethod
+    def _tick_one_sensor(
+        pressure: float, current_average: float, smoothing_factor: float
+    ) -> Tuple[float, float]:
+        """ticks one sensor returns the new current average, new derivative and updated running samples."""
+        if current_average == impossible_pressure:
+            return (pressure, 0.0)
         else:
-            new_average = (pressure * self.smoothing_factor) + (
-                self.current_average_emad * (1 - self.smoothing_factor)
+            new_average = (pressure * smoothing_factor) + (
+                current_average * (1 - smoothing_factor)
             )
-            derivative = new_average - self.current_average_emad
-            self.current_average_emad = new_average
-            return (
-                derivative < self.derivative_threshold_emad,
-                self.current_average_emad,
-            )
+            derivative = new_average - current_average
+            return (new_average, derivative)
+
+    def tick(self, pressures: Tuple[float, float]) -> Tuple[bool, Tuple[float, float]]:
+        """Simulate firmware motor interrupt tick."""
+        prev_avg_p = self.current_average_emad_p
+        prev_avg_s = self.current_average_emad_s
+        self.current_average_emad_p, der_p = LLDEMAD._tick_one_sensor(
+            pressures[0], self.current_average_emad_p, self.smoothing_factor
+        )
+        self.current_average_emad_s, der_s = LLDEMAD._tick_one_sensor(
+            pressures[1], self.current_average_emad_s, self.smoothing_factor
+        )
+        if prev_avg_p is impossible_pressure or prev_avg_s is impossible_pressure:
+            ret_avg = (impossible_pressure, impossible_pressure)
+        else:
+            ret_avg = (self.current_average_emad_p, self.current_average_emad_s)
+        return (
+            abs(der_p) > self.derivative_threshold_emad
+            or abs(der_s) > self.derivative_threshold_emad,
+            ret_avg,
+        )
 
 
 def _running_avg(
     time: List[float],
-    pressure: List[float],
+    pressures: List[Tuple[float, float]],
     z_travel: List[float],
     p_travel: List[float],
     no_plot: bool,
@@ -241,14 +320,18 @@ def _running_avg(
     plot_name: str,
 ) -> Optional[Tuple[float, float, float]]:
     algorithm.reset()
-    average = float(0)
+    average: Tuple[float, float] = (float(0), float(0))
     running_time = []
-    running_derivative = []
-    running_avg = []
+    running_derivative_p = []
+    running_derivative_s = []
+    running_avg_p = []
+    running_avg_s = []
     return_val = None
     for i in range(1, len(time)):
         prev_avg = average
-        found, average = algorithm.tick(float(pressure[i]))
+        found, average = algorithm.tick(
+            (float(pressures[i][0]), float(pressures[i][1]))
+        )
         if found:
             # if average < running_avg_threshold:
             # print(f"found z height = {z_travel[i]}")
@@ -257,28 +340,44 @@ def _running_avg(
             if no_plot:
                 # once we find it we don't need to keep going
                 break
-        if average != impossible_pressure and prev_avg != impossible_pressure:
-            running_avg_derivative = average - prev_avg
+        if (impossible_pressure not in average) and (
+            impossible_pressure not in prev_avg
+        ):
+            running_avg_derivative_p = average[0] - prev_avg[0]
+            running_avg_derivative_s = average[1] - prev_avg[1]
             running_time.append(time[i])
-            running_derivative.append(running_avg_derivative)
-            running_avg.append(average)
+            running_derivative_p.append(running_avg_derivative_p)
+            running_derivative_s.append(running_avg_derivative_s)
+            running_avg_p.append(average[0])
+            running_avg_s.append(average[1])
 
     time_array: numpy.ndarray[Any, numpy.dtype[numpy.float32]] = numpy.array(
         running_time
     )
-    derivative_array: numpy.ndarray[Any, numpy.dtype[numpy.float32]] = numpy.array(
-        running_derivative
+    derivative_array_p: numpy.ndarray[Any, numpy.dtype[numpy.float32]] = numpy.array(
+        running_derivative_p
     )
-    avg_array: numpy.ndarray[Any, numpy.dtype[numpy.float32]] = numpy.array(running_avg)
+    avg_array_p: numpy.ndarray[Any, numpy.dtype[numpy.float32]] = numpy.array(
+        running_avg_p
+    )
+
+    derivative_array_s: numpy.ndarray[Any, numpy.dtype[numpy.float32]] = numpy.array(
+        running_derivative_s
+    )
+    avg_array_s: numpy.ndarray[Any, numpy.dtype[numpy.float32]] = numpy.array(
+        running_avg_s
+    )
 
     if not no_plot:
         plot.figure(plot_name)
         avg_ax = plot.subplot(211)
         avg_ax.set_title("Running Average")
-        plot.plot(time_array, avg_array)
+        plot.plot(time_array, avg_array_p)
+        plot.plot(time_array, avg_array_s)
         der_ax = plot.subplot(212)
         der_ax.set_title("Derivative")
-        plot.plot(time_array, derivative_array)
+        plot.plot(time_array, derivative_array_p)
+        plot.plot(time_array, derivative_array_s)
         mng = plot.get_current_fig_manager()
         if mng is not None:
             mng.resize(*mng.window.maxsize())  # type: ignore[attr-defined]
@@ -302,7 +401,7 @@ def run(
             reader = csv.reader(file)
             reader_list = list(reader)
 
-        number_of_trials = int(reader_list[34][2])
+        number_of_trials = int(reader_list[33][2])
 
         expected_height = reader_list[44][6]
         # have a time list for each trial so the list lengths can all be equal
@@ -310,31 +409,39 @@ def run(
         for trial in range(number_of_trials):
 
             time = []
-            pressure = []
+            pressures = []
             z_travel = []
             p_travel = []
             for row in range((59 + number_of_trials), len(reader_list)):
                 current_time = reader_list[row][0]
-                current_pressure = reader_list[row][3 * trial + 2]
-                current_z_pos = reader_list[row][3 * trial + 3]
-                current_p_pos = reader_list[row][3 * trial + 4]
+                current_pressure_s0 = reader_list[row][4 * trial + 2]
+                current_pressure_s1 = reader_list[row][4 * trial + 3]
+                current_z_pos = reader_list[row][4 * trial + 4]
+                current_p_pos = reader_list[row][4 * trial + 5]
 
                 if any(
                     [
                         data == ""
-                        for data in [current_pressure, current_z_pos, current_p_pos]
+                        for data in [
+                            current_pressure_s0,
+                            current_pressure_s1,
+                            current_z_pos,
+                            current_p_pos,
+                        ]
                     ]
                 ):
                     break
 
                 time.append(float(current_time))
-                pressure.append(float(current_pressure))
+                pressures.append(
+                    (float(current_pressure_s0), float(current_pressure_s1))
+                )
                 z_travel.append(float(current_z_pos))
                 p_travel.append(float(current_p_pos))
 
             threshold_data = _running_avg(
                 time,
-                pressure,
+                pressures,
                 z_travel,
                 p_travel,
                 args.no_plot,
@@ -350,7 +457,8 @@ def run(
                 # )
                 results.append(float(threshold_z_pos))
             else:
-                print("No threshold found")
+                print("No threshold found {algorithm.name()}")
+                results.append(sys.float_info.max)
         print(
             f"{algorithm.name()}, expected {expected_height} max {max(results)} min{min(results)}, avg {sum(results)/len(results)}"
         )

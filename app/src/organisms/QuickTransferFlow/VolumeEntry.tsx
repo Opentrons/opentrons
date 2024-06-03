@@ -10,12 +10,12 @@ import {
 import { ChildNavigation } from '../ChildNavigation'
 import { InputField } from '../../atoms/InputField'
 import { NumericalKeyboard } from '../../atoms/SoftwareKeyboard'
-import { getVolumeLimits } from './utils'
+import { getVolumeRange } from './utils'
 import { CONSOLIDATE, DISTRIBUTE } from './constants'
 
 import type { SmallButton } from '../../atoms/buttons'
 import type {
-  QuickTransferSetupState,
+  QuickTransferWizardState,
   QuickTransferWizardAction,
 } from './types'
 
@@ -23,7 +23,7 @@ interface VolumeEntryProps {
   onNext: () => void
   onBack: () => void
   exitButtonProps: React.ComponentProps<typeof SmallButton>
-  state: QuickTransferSetupState
+  state: QuickTransferWizardState
   dispatch: React.Dispatch<QuickTransferWizardAction>
 }
 
@@ -35,7 +35,7 @@ export function VolumeEntry(props: VolumeEntryProps): JSX.Element {
   const [volume, setVolume] = React.useState<string>(
     state.volume ? state.volume.toString() : ''
   )
-  const volumeRange = getVolumeLimits(state)
+  const volumeRange = getVolumeRange(state)
   let headerCopy = t('set_transfer_volume')
   let textEntryCopy = t('volume_per_well_µL')
   if (state.transferType === CONSOLIDATE) {

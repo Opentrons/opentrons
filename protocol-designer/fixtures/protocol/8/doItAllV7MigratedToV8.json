@@ -30,7 +30,7 @@
           "opentrons/opentrons_flex_96_filtertiprack_50ul/1"
         ]
       },
-      "dismissedWarnings": { "form": {}, "timeline": {} },
+      "dismissedWarnings": { "form": [], "timeline": [] },
       "ingredients": {
         "0": {
           "name": "Water",

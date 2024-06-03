@@ -21,6 +21,11 @@ The Opentrons AI application's server.
 1. select the node version with `nvs` or `nvm` currently 18.19\*
 1. Install pipenv and python dependencies `make setup`
 
+## For building and deploying
+
+1. AWS credentials and config
+1. docker
+
 ## Install a dev dependency
 
 `python -m pipenv install pytest==8.2.0 --dev`
@@ -29,30 +34,27 @@ The Opentrons AI application's server.
 
 `python -m pipenv install openai==1.25.1`
 
-## Stack and structure
-
-### Tools
-
-- [powertools](https://powertools.aws.dev/)
-- [pytest]: https://docs.pytest.org/en/
-- [openai python api library]: https://pypi.org/project/openai/
-
-### Lambda Code Organizations and Separation of Concerns
+## FastAPI Code Organization and Separation of Concerns
 
 - handler
-  - the lambda handler
+  - the router and request/response handling
 - domain
-  - the business logic
+  - business logic
 - integration
-  - the integration with other services
+  - integration with other services
 
 ## Dev process
 
 1. Make your changes
-1. Fix what can be automatically then lent and unit test like CI will `make pre-commit`
+1. Fix what can be automatically then lint and unit test like CI will `make pre-commit`
 1. `make pre-commit` passes
-1. deploy to sandbox `make build deploy test-live ENV=sandbox AWS_PROFILE=the-profile`
+1. run locally `make run` this runs the FastAPI server directly at localhost:8000
+   1. this watches for changes and restarts the server
+1. test locally `make live-test` (ENV=local is the default in the Makefile)
+1. use the live client `make live-client`
 
-## TODO
+## ECS Fargate
 
-- llama-index is gigantic. Have to figure out how to get it in the lambda
+- Our first version of this service is a long running POST that may take from 1-3 minutes to complete
+- This forces us to use CloudFront(Max 180) + Load Balancer + ECS Fargate FastAPI container
+- An AWS service ticket is needed to increase the max CloudFront response time from 60 to 180 seconds

@@ -170,6 +170,7 @@
     }
   },
   "compatibleWith": [],
+  "incompatibleWithDecks": [],
   "twoDimensionalRendering": {
     "name": "svg",
     "type": "element",

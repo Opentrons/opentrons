@@ -4,8 +4,9 @@ import { fireEvent, screen } from '@testing-library/react'
 
 import { renderWithProviders } from '../../../__testing-utils__'
 import { i18n } from '../../../i18n'
+import { mockRecoveryContentProps } from '../__fixtures__'
 import { BeforeBeginning } from '../BeforeBeginning'
-import { ERROR_KINDS, RECOVERY_MAP } from '../constants'
+import { RECOVERY_MAP } from '../constants'
 
 import type { Mock } from 'vitest'
 
@@ -27,9 +28,7 @@ describe('BeforeBeginning', () => {
     } as any
 
     props = {
-      isOnDevice: true,
-      errorKind: ERROR_KINDS.GENERAL_ERROR,
-      onComplete: vi.fn(),
+      ...mockRecoveryContentProps,
       routeUpdateActions: mockRouteUpdateActions,
       recoveryMap: {
         route: BEFORE_BEGINNING.ROUTE,

@@ -6,7 +6,7 @@ import { AlertPrimaryButton, SPACING } from '@opentrons/components'
 import { DROP_TIP_SPECIAL_ERROR_TYPES } from './constants'
 import { SmallButton } from '../../atoms/buttons'
 
-import type { RunCommandError } from '@opentrons/api-client'
+import type { RunCommandError } from '@opentrons/shared-data'
 import type { useChainMaintenanceCommands } from '../../resources/runs'
 
 export interface ErrorDetails {

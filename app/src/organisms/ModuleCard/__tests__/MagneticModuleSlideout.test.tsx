@@ -1,6 +1,7 @@
 import * as React from 'react'
 import { fireEvent, screen } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { COLORS } from '@opentrons/components'
 
 import { renderWithProviders } from '../../../__testing-utils__'
 import { i18n } from '../../../i18n'
@@ -96,5 +97,13 @@ describe('MagneticModuleSlideout', () => {
       },
     })
     expect(button).not.toBeEnabled()
+  })
+
+  it('renders the correct background color in magnetic module data', () => {
+    render(props)
+    const magneticModuleInfo = screen.getByTestId(
+      'MagneticModuleSlideout_body_data_def456'
+    )
+    expect(magneticModuleInfo).toHaveStyle(`background-color: ${COLORS.grey20}`)
   })
 })

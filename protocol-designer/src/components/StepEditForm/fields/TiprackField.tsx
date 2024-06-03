@@ -36,6 +36,13 @@ export function TiprackField(props: TiprackFieldProps): JSX.Element {
     defaultTiprackUris.includes(option.value)
   )
 
+  React.useEffect(() => {
+    //  if default value is not included in the pipette's tiprack uris then
+    //  change it so it is
+    if (!defaultTiprackUris.includes(value as string)) {
+      updateValue(defaultTiprackUris[0])
+    }
+  }, [defaultTiprackUris, value, updateValue])
   const hasMissingTiprack = defaultTiprackUris.length > tiprackOptions.length
   return (
     <Box {...targetProps}>

@@ -141,7 +141,7 @@ describe('createPresavedStepForm', () => {
       pipette: 'leftPipetteId',
       nozzles: null,
       stepType: 'moveLiquid',
-      tipRack: 'defaultTipRack',
+      tipRack: null,
       // default fields
       dropTip_location: 'mockTrash',
       aspirate_airGap_checkbox: false,
@@ -228,7 +228,7 @@ describe('createPresavedStepForm', () => {
         volume: undefined,
         aspirate_flowRate: null,
         dispense_flowRate: null,
-        tipRack: 'defaultTipRack',
+        tipRack: null,
         blowout_flowRate: null,
       })
     })

@@ -90,7 +90,6 @@ LIQUID_PROBE_SETTINGS: Dict[int, Dict[int, Dict[int, Dict[str, int]]]] = {
         1: {
             50: {
                 "max_z_distance": 20,
-                "min_z_distance": 5,
                 "mount_speed": 11,
                 "plunger_speed": 21,
                 "sensor_threshold_pascals": 150,
@@ -99,7 +98,6 @@ LIQUID_PROBE_SETTINGS: Dict[int, Dict[int, Dict[int, Dict[str, int]]]] = {
         8: {
             50: {
                 "max_z_distance": 20,
-                "min_z_distance": 5,
                 "mount_speed": 11,
                 "plunger_speed": 21,
                 "sensor_threshold_pascals": 150,
@@ -110,21 +108,18 @@ LIQUID_PROBE_SETTINGS: Dict[int, Dict[int, Dict[int, Dict[str, int]]]] = {
         1: {
             50: {
                 "max_z_distance": 20,
-                "min_z_distance": 5,
                 "mount_speed": 5,
                 "plunger_speed": 10,
                 "sensor_threshold_pascals": 200,
             },
             200: {
                 "max_z_distance": 20,
-                "min_z_distance": 5,
                 "mount_speed": 5,
                 "plunger_speed": 10,
                 "sensor_threshold_pascals": 200,
             },
             1000: {
                 "max_z_distance": 20,
-                "min_z_distance": 5,
                 "mount_speed": 5,
                 "plunger_speed": 11,
                 "sensor_threshold_pascals": 150,
@@ -133,21 +128,18 @@ LIQUID_PROBE_SETTINGS: Dict[int, Dict[int, Dict[int, Dict[str, int]]]] = {
         8: {
             50: {
                 "max_z_distance": 20,
-                "min_z_distance": 5,
                 "mount_speed": 5,
                 "plunger_speed": 10,
                 "sensor_threshold_pascals": 200,
             },
             200: {
                 "max_z_distance": 20,
-                "min_z_distance": 5,
                 "mount_speed": 5,
                 "plunger_speed": 10,
                 "sensor_threshold_pascals": 200,
             },
             1000: {
                 "max_z_distance": 20,
-                "min_z_distance": 5,
                 "mount_speed": 5,
                 "plunger_speed": 11,
                 "sensor_threshold_pascals": 150,
@@ -156,21 +148,18 @@ LIQUID_PROBE_SETTINGS: Dict[int, Dict[int, Dict[int, Dict[str, int]]]] = {
         96: {
             50: {
                 "max_z_distance": 20,
-                "min_z_distance": 5,
                 "mount_speed": 5,
                 "plunger_speed": 10,
                 "sensor_threshold_pascals": 200,
             },
             200: {
                 "max_z_distance": 20,
-                "min_z_distance": 5,
                 "mount_speed": 5,
                 "plunger_speed": 10,
                 "sensor_threshold_pascals": 200,
             },
             1000: {
                 "max_z_distance": 20,
-                "min_z_distance": 5,
                 "mount_speed": 5,
                 "plunger_speed": 11,
                 "sensor_threshold_pascals": 150,
@@ -189,7 +178,6 @@ def _get_liquid_probe_settings(
     return LiquidProbeSettings(
         starting_mount_height=well.top().point.z,
         max_z_distance=min(well.depth, lqid_cfg["max_z_distance"]),
-        min_z_distance=lqid_cfg["min_z_distance"],
         mount_speed=lqid_cfg["mount_speed"],
         plunger_speed=lqid_cfg["plunger_speed"],
         sensor_threshold_pascals=lqid_cfg["sensor_threshold_pascals"],

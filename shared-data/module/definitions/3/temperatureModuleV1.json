@@ -35,6 +35,7 @@
   "quirks": [],
   "slotTransforms": {},
   "compatibleWith": ["temperatureModuleV2"],
+  "incompatibleWithDecks": ["ot3_standard"],
   "twoDimensionalRendering": {
     "name": "svg",
     "type": "element",

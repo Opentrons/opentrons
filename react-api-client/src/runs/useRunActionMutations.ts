@@ -4,6 +4,7 @@ import {
   usePlayRunMutation,
   usePauseRunMutation,
   useStopRunMutation,
+  useResumeRunFromRecoveryMutation,
 } from '..'
 import { getSanitizedQueryKeyObject } from '../utils'
 
@@ -11,9 +12,11 @@ interface UseRunActionMutations {
   playRun: () => void
   pauseRun: () => void
   stopRun: () => void
+  resumeRunFromRecovery: () => void
   isPlayRunActionLoading: boolean
   isPauseRunActionLoading: boolean
   isStopRunActionLoading: boolean
+  isResumeRunFromRecoveryActionLoading: boolean
 }
 
 export function useRunActionMutations(runId: string): UseRunActionMutations {
@@ -38,12 +41,19 @@ export function useRunActionMutations(runId: string): UseRunActionMutations {
 
   const { stopRun, isLoading: isStopRunActionLoading } = useStopRunMutation()
 
+  const {
+    resumeRunFromRecovery,
+    isLoading: isResumeRunFromRecoveryActionLoading,
+  } = useResumeRunFromRecoveryMutation()
+
   return {
     playRun: () => playRun(runId),
     pauseRun: () => pauseRun(runId),
     stopRun: () => stopRun(runId),
+    resumeRunFromRecovery: () => resumeRunFromRecovery(runId),
     isPlayRunActionLoading,
     isPauseRunActionLoading,
     isStopRunActionLoading,
+    isResumeRunFromRecoveryActionLoading,
   }
 }

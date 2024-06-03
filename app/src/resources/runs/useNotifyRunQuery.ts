@@ -1,10 +1,10 @@
 import { useRunQuery } from '@opentrons/react-api-client'
 
-import { useNotifyService } from '../useNotifyService'
+import { useNotifyDataReady } from '../useNotifyDataReady'
 
 import type { UseQueryResult } from 'react-query'
 import type { Run } from '@opentrons/api-client'
-import type { QueryOptionsWithPolling } from '../useNotifyService'
+import type { QueryOptionsWithPolling } from '../useNotifyDataReady'
 import type { NotifyTopic } from '../../redux/shell/types'
 
 export function useNotifyRunQuery<TError = Error>(
@@ -13,14 +13,14 @@ export function useNotifyRunQuery<TError = Error>(
 ): UseQueryResult<Run, TError> {
   const isEnabled = options.enabled !== false && runId != null
 
-  const { notifyOnSettled, isNotifyEnabled } = useNotifyService({
+  const { notifyOnSettled, shouldRefetch } = useNotifyDataReady({
     topic: `robot-server/runs/${runId}` as NotifyTopic,
     options: { ...options, enabled: options.enabled != null && runId != null },
   })
 
   const httpResponse = useRunQuery(runId, {
     ...options,
-    enabled: isEnabled && isNotifyEnabled,
+    enabled: isEnabled && shouldRefetch,
     onSettled: notifyOnSettled,
   })
 

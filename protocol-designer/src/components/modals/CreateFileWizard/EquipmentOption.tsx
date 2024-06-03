@@ -75,7 +75,9 @@ export function EquipmentOption(props: EquipmentOptionProps): JSX.Element {
   const { t } = useTranslation(['tooltip', 'shared'])
   const [equipmentTargetProps, equipmentTooltipProps] = useHoverTooltip()
   const [tempTargetProps, tempTooltipProps] = useHoverTooltip()
-  const [numMultiples, setNumMultiples] = React.useState<number>(0)
+  const [numMultiples, setNumMultiples] = React.useState<number>(
+    multiples?.numItems ?? 0
+  )
 
   const EQUIPMENT_OPTION_STYLE = css`
     background-color: ${COLORS.white};
@@ -176,7 +178,7 @@ export function EquipmentOption(props: EquipmentOptionProps): JSX.Element {
         <Flex
           data-testid="EquipmentOption_downArrow"
           onClick={
-            isDisabled || numMultiples === 0
+            numMultiples === 0
               ? undefined
               : () => {
                   multiples.setValue(numMultiples - 1)

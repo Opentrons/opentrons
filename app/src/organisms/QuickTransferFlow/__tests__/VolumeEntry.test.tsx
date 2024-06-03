@@ -6,12 +6,19 @@ import { renderWithProviders } from '../../../__testing-utils__'
 import { i18n } from '../../../i18n'
 import { InputField } from '../../../atoms/InputField'
 import { NumericalKeyboard } from '../../../atoms/SoftwareKeyboard'
-import { getVolumeLimits } from '../utils'
+import { getVolumeRange } from '../utils'
 import { VolumeEntry } from '../VolumeEntry'
 
-vi.mock('../../../atoms/InputField')
 vi.mock('../../../atoms/SoftwareKeyboard')
 vi.mock('../utils')
+
+vi.mock('../../../atoms/InputField', async importOriginal => {
+  const actualComponents = await importOriginal<typeof InputField>()
+  return {
+    ...actualComponents,
+    InputField: vi.fn(),
+  }
+})
 
 const render = (props: React.ComponentProps<typeof VolumeEntry>) => {
   return renderWithProviders(<VolumeEntry {...props} />, {
@@ -42,7 +49,7 @@ describe('VolumeEntry', () => {
       },
       dispatch: vi.fn(),
     }
-    vi.mocked(getVolumeLimits).mockReturnValue({ min: 5, max: 50 })
+    vi.mocked(getVolumeRange).mockReturnValue({ min: 5, max: 50 })
   })
   afterEach(() => {
     vi.resetAllMocks()

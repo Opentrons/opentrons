@@ -16,6 +16,7 @@ export { getWellTotalVolume } from './getWellTotalVolume'
 export { wellIsRect } from './wellIsRect'
 export { orderWells } from './orderWells'
 export { get96Channel384WellPlateWells } from './get96Channel384WellPlateWells'
+export { getTipTypeFromTipRackDefinition } from './getTipTypeFromTipRackDefinition'
 
 export * from './parseProtocolData'
 export * from './volume'

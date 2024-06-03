@@ -1,12 +1,14 @@
 from __future__ import annotations
 
 import asyncio
-from typing import Dict, Optional, List
+from typing import Dict, Optional, List, TYPE_CHECKING
 
 from opentrons.drivers.types import AbsorbanceReaderLidStatus
 from opentrons.drivers.absorbance_reader.abstract import AbstractAbsorbanceReaderDriver
 from opentrons.drivers.rpi_drivers.types import USBPort
-from .async_byonoy import AsyncByonoy
+
+if TYPE_CHECKING:
+    from .async_byonoy import AsyncByonoy as AsyncByonoyType
 
 
 class AbsorbanceReaderDriver(AbstractAbsorbanceReaderDriver):
@@ -23,7 +25,7 @@ class AbsorbanceReaderDriver(AbstractAbsorbanceReaderDriver):
         connection = await AsyncByonoy.create(port=port, usb_port=usb_port, loop=loop)
         return cls(connection=connection)
 
-    def __init__(self, connection: AsyncByonoy) -> None:
+    def __init__(self, connection: AsyncByonoyType) -> None:
         self._connection = connection
 
     async def get_device_info(self) -> Dict[str, str]:

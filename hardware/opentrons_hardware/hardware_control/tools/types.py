@@ -15,21 +15,29 @@ class ToolDetectionResult:
 
 
 @dataclass(frozen=True)
-class GripperInformation:
-    """Model the information you can retrieve from a gripper."""
+class BaseToolInformation:
+    """Model the base information you can retrieve from any tool."""
 
     model: str
     serial: str
 
 
 @dataclass(frozen=True)
-class PipetteInformation:
+class GripperInformation(BaseToolInformation):
+    """Model the information you can retrieve from a gripper."""
+
+
+@dataclass(frozen=True)
+class HepaUVInformation(BaseToolInformation):
+    """Model the information you can retrieve from a hepa/uv device."""
+
+
+@dataclass(frozen=True)
+class PipetteInformation(BaseToolInformation):
     """Model the information you can retrieve from a pipette."""
 
     name: PipetteName
     name_int: int
-    model: str
-    serial: str
 
 
 @dataclass(frozen=True)

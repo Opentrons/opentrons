@@ -13,7 +13,7 @@ from opentrons.protocol_engine import (
     commands,
     types as pe_types,
     CommandSlice,
-    CurrentCommand,
+    CommandPointer,
     ErrorOccurrence,
     LoadedLabware,
     LoadedPipette,
@@ -847,7 +847,7 @@ def test_get_current_command(
     run_command: commands.Command,
 ) -> None:
     """Should get current command from engine store."""
-    expected_current = CurrentCommand(
+    expected_current = CommandPointer(
         command_id=run_command.id,
         command_key=run_command.key,
         created_at=run_command.createdAt,

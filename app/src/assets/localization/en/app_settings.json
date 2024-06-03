@@ -1,4 +1,5 @@
 {
+  "__dev_internal__forceHttpPolling": "Poll all network requests instead of using MQTT",
   "__dev_internal__protocolStats": "Protocol Stats",
   "__dev_internal__enableRunNotes": "Display Notes During a Protocol Run",
   "__dev_internal__enableQuickTransfer": "Enable Quick Transfer",

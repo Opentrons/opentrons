@@ -20,6 +20,7 @@ import { OnDeviceLocalizationProvider } from '../LocalizationProvider'
 import { ToasterOven } from '../organisms/ToasterOven'
 import { MaintenanceRunTakeover } from '../organisms/TakeoverModal'
 import { FirmwareUpdateTakeover } from '../organisms/FirmwareUpdateModal/FirmwareUpdateTakeover'
+import { IncompatibleModuleTakeover } from '../organisms/IncompatibleModule'
 import { EstopTakeover } from '../organisms/EmergencyStop'
 import { ConnectViaEthernet } from '../pages/ConnectViaEthernet'
 import { ConnectViaUSB } from '../pages/ConnectViaUSB'
@@ -179,6 +180,7 @@ export const OnDeviceDisplayApp = (): JSX.Element => {
               ) : (
                 <>
                   <EstopTakeover />
+                  <IncompatibleModuleTakeover isOnDevice={true} />
                   <MaintenanceRunTakeover>
                     <FirmwareUpdateTakeover />
                     <NiceModal.Provider>

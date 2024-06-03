@@ -7,7 +7,7 @@ from .commands import (
     CommandState,
     CommandView,
     CommandSlice,
-    CurrentCommand,
+    CommandPointer,
 )
 from .command_history import CommandEntry
 from .labware import LabwareState, LabwareView
@@ -39,7 +39,7 @@ __all__ = [
     "CommandState",
     "CommandView",
     "CommandSlice",
-    "CurrentCommand",
+    "CommandPointer",
     "CommandEntry",
     # labware state and values
     "LabwareState",

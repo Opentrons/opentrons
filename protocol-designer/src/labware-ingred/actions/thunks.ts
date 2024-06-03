@@ -53,11 +53,12 @@ export const createContainer: (
   const state = getState()
   const initialDeckSetup = stepFormSelectors.getInitialDeckSetup(state)
   const robotType = getRobotType(state)
-  const slot =
-    args.slot || getNextAvailableDeckSlot(initialDeckSetup, robotType)
   const labwareDef = labwareDefSelectors.getLabwareDefsByURI(state)[
     args.labwareDefURI
   ]
+  const slot =
+    args.slot ||
+    getNextAvailableDeckSlot(initialDeckSetup, robotType, labwareDef)
   const isTiprack = getIsTiprack(labwareDef)
 
   if (slot) {
@@ -122,7 +123,14 @@ export const duplicateLabware: (
   const initialDeckSetup = stepFormSelectors.getInitialDeckSetup(state)
   const templateLabwareIdIsOffDeck =
     initialDeckSetup.labware[templateLabwareId].slot === 'offDeck'
-  const duplicateSlot = getNextAvailableDeckSlot(initialDeckSetup, robotType)
+  const labwareDef = labwareDefSelectors.getLabwareDefsByURI(state)[
+    templateLabwareDefURI
+  ]
+  const duplicateSlot = getNextAvailableDeckSlot(
+    initialDeckSetup,
+    robotType,
+    labwareDef
+  )
   if (duplicateSlot == null) {
     console.error('no slots available, cannot duplicate labware')
   }

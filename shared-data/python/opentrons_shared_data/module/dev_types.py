@@ -109,6 +109,7 @@ ModuleDefinitionV3 = TypedDict(
         "quirks": List[str],
         "slotTransforms": Dict[str, Dict[str, Dict[str, List[List[float]]]]],
         "compatibleWith": List[ModuleModel],
+        "incompatibleWithDecks": List[str],
         "twoDimensionalRendering": Dict[str, Any],
         "gripperOffsets": Dict[str, GripperOffsets],
     },
