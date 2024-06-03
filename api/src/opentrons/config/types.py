@@ -106,10 +106,12 @@ class OT3CurrentSettings:
 class OutputOptions(int, Enum):
     """Specifies where we should report sensor data to during a sensor pass."""
 
-    stream_to_csv = 0x1         # compile sensor data stream into a csv file (not working), in addition to can_bus_only behavior
-    sync_buffer_to_csv = 0x2    # collect sensor data on pipette mcu, then stream to robot server and compile into a csv file, in addition to can_bus_only behavior
-    can_bus_only = 0x4          # stream sensor data over CAN bus in addition to sync_only behavior
-    sync_only = 0x8             # trigger pipette sync line upon sensor's detection of something
+    stream_to_csv = 0x1  # compile sensor data stream into a csv file (not working), in addition to can_bus_only behavior
+    sync_buffer_to_csv = 0x2  # collect sensor data on pipette mcu, then stream to robot server and compile into a csv file, in addition to can_bus_only behavior
+    can_bus_only = (
+        0x4  # stream sensor data over CAN bus, in addition to sync_only behavior
+    )
+    sync_only = 0x8  # trigger pipette sync line upon sensor's detection of something
 
 
 @dataclass(frozen=True)
