@@ -512,14 +512,69 @@ def main() -> None:
     )
     parser.add_argument("--no-plot", action="store_true")
     args = parser.parse_args()
-
-    algorithms: List[LLDAlgoABC] = [
-        LLDPresThresh(),
-        LLDSMAD(),
-        LLDWMAD(),
-        LLDEMAD(),
-        LLDSMAT(),
+    """ Dont use we want to use the dervative
+    pt_algorithms: List[LLDAlgoABC] = [
+        LLDPresThresh(thresh=20),
+        LLDPresThresh(thresh=30),
+        LLDPresThresh(thresh=40),
+        LLDPresThresh(thresh=50),
+        LLDPresThresh(thresh=60),
+        LLDPresThresh(thresh=70),
+        LLDPresThresh(thresh=80),
+        LLDPresThresh(thresh=90),
+        LLDPresThresh(thresh=100),
     ]
+    """
+    smad_algorithms: List[LLDAlgoABC] = [
+        LLDSMAD(samples=10, thresh=1.5),
+        LLDSMAD(samples=10, thresh=1.4),
+        LLDSMAD(samples=10, thresh=1.3),
+        LLDSMAD(samples=10, thresh=1.2),
+        LLDSMAD(samples=10, thresh=1.1),
+        LLDSMAD(samples=10, thresh=1),
+        LLDSMAD(samples=10, thresh=0.9),
+        LLDSMAD(samples=10, thresh=0.8),
+        LLDSMAD(samples=10, thresh=0.7),
+    ]
+    """Dont use two proceessor heavy.
+    wmad_algorithms: List[LLDAlgoABC] = [
+        LLDWMAD(thresh=1.3),
+        LLDWMAD(thresh=1.4),
+        LLDWMAD(thresh=1.5),
+    ]
+    """
+    emad_algorithms: List[LLDAlgoABC] = [
+        LLDEMAD(s_factor=0.2, thresh=1),
+        LLDEMAD(s_factor=0.3, thresh=1),
+        LLDEMAD(s_factor=0.4, thresh=1),
+        LLDEMAD(s_factor=0.5, thresh=1),
+        LLDEMAD(s_factor=0.6, thresh=1),
+        LLDEMAD(s_factor=0.7, thresh=1),
+        LLDEMAD(s_factor=0.8, thresh=1),
+        LLDEMAD(s_factor=0.9, thresh=1),
+        LLDEMAD(s_factor=0.05, thresh=1),
+        LLDEMAD(thresh=1.1),
+        LLDEMAD(thresh=1),
+        LLDEMAD(thresh=1.1),
+        LLDEMAD(thresh=1.2),
+        LLDEMAD(thresh=1.3),
+        LLDEMAD(thresh=1.4),
+        LLDEMAD(thresh=1.5),
+        LLDEMAD(thresh=1.6),
+    ]
+    """ Dont use we want to use the dervative
+    smat_algorithms: List[LLDAlgoABC] = [
+        LLDSMAT(thresh=20),
+        LLDSMAT(thresh=30),
+        LLDSMAT(thresh=40),
+        LLDSMAT(thresh=50),
+        LLDSMAT(thresh=60),
+        LLDSMAT(thresh=70),
+        LLDSMAT(thresh=80),
+    ]
+    """
+
+    algorithms: List[LLDAlgoABC] = smad_algorithms + emad_algorithms
     analysis: List[Tuple[float, List[float], str, str]] = []
     for algorithm in algorithms:
         algorithm_results = run(args, algorithm)
@@ -527,7 +582,9 @@ def main() -> None:
     print("\n\n")
     for result in analysis:
         res_string = (
-            "FAILURE" if _check_for_failure(result[0], result[1]) else "success"
+            "\033[91mFAILURE\033[0m"
+            if _check_for_failure(result[0], result[1])
+            else "\033[92msuccess\033[0m"
         )
         print(f"Algorithm {result[2]} {res_string}")
 
