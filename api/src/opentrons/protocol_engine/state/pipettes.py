@@ -2,6 +2,7 @@
 from __future__ import annotations
 from dataclasses import dataclass
 from typing import Dict, List, Mapping, Optional, Tuple, Union
+from typing_extensions import assert_type
 
 from opentrons_shared_data.pipette import pipette_definition
 from opentrons.config.defaults_ot2 import Z_RETRACT_DISTANCE
@@ -11,6 +12,12 @@ from opentrons.hardware_control.nozzle_manager import (
     NozzleMap,
 )
 from opentrons.protocol_engine.actions.actions import FailCommandAction
+from opentrons.protocol_engine.commands.aspirate import Aspirate
+from opentrons.protocol_engine.commands.command import DefinedErrorData
+from opentrons.protocol_engine.commands.pipetting_common import (
+    OverpressureError,
+    OverpressureErrorInternalData,
+)
 from opentrons.types import MountType, Mount as HwMount, Point
 
 from .. import errors
@@ -288,7 +295,17 @@ class PipetteStore(HasState[PipetteState], HandlesActions):
                 labware_id=action.command.params.labwareId,
                 well_name=action.command.params.wellName,
             )
-
+        elif (
+            isinstance(action, FailCommandAction)
+            and isinstance(action.running_command, Aspirate)
+            and isinstance(action.error, DefinedErrorData)
+            and isinstance(action.error.public, OverpressureError)
+        ):
+            self._state.current_location = CurrentWell(
+                pipette_id=action.running_command.params.pipetteId,
+                labware_id=action.running_command.params.labwareId,
+                well_name=action.running_command.params.wellName,
+            )
         elif isinstance(action, SucceedCommandAction) and isinstance(
             action.command.result,
             (MoveToAddressableAreaResult, MoveToAddressableAreaForDropTipResult),
@@ -379,6 +396,23 @@ class PipetteStore(HasState[PipetteState], HandlesActions):
                 self._state.current_deck_point = CurrentDeckPoint(
                     mount=loaded_pipette.mount, deck_point=deck_point
                 )
+        elif (
+            isinstance(action, FailCommandAction)
+            and isinstance(action.running_command, Aspirate)
+            and isinstance(action.error, DefinedErrorData)
+            and isinstance(action.error.public, OverpressureError)
+        ):
+            assert_type(action.error.private, OverpressureErrorInternalData)
+            pipette_id = action.running_command.params.pipetteId
+            deck_point = action.error.private.position
+            try:
+                loaded_pipette = self._state.pipettes_by_id[pipette_id]
+            except KeyError:
+                self._clear_deck_point()
+            else:
+                self._state.current_deck_point = CurrentDeckPoint(
+                    mount=loaded_pipette.mount, deck_point=deck_point
+                )
 
         elif isinstance(action, SucceedCommandAction) and isinstance(
             action.command.result,
@@ -419,6 +453,18 @@ class PipetteStore(HasState[PipetteState], HandlesActions):
             # PipetteHandler will have clamped action.command.result.volume for us, so
             # next_volume should always be in bounds.
             next_volume = previous_volume + action.command.result.volume
+
+            self._state.aspirated_volume_by_id[pipette_id] = next_volume
+
+        elif (
+            isinstance(action, FailCommandAction)
+            and isinstance(action.running_command, Aspirate)
+            and isinstance(action.error, DefinedErrorData)
+            and isinstance(action.error.public, OverpressureError)
+        ):
+            pipette_id = action.running_command.params.pipetteId
+            previous_volume = self._state.aspirated_volume_by_id[pipette_id] or 0
+            next_volume = previous_volume + action.error.public.errorInfo["volume"]
 
             self._state.aspirated_volume_by_id[pipette_id] = next_volume
 
