@@ -25,7 +25,7 @@
       "pipetteTiprackAssignments": {
         "pipetteId": ["opentrons/opentrons_96_tiprack_10ul/1"]
       },
-      "dismissedWarnings": { "form": {}, "timeline": {} },
+      "dismissedWarnings": { "form": [], "timeline": [] },
       "ingredients": {},
       "ingredLocations": {},
       "savedStepForms": {

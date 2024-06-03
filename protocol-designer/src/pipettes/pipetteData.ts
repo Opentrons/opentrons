@@ -1,4 +1,3 @@
-import { DropdownOption } from '../../../components/lib/forms/DropdownField.d'
 import {
   getPipetteSpecsV2,
   getTiprackVolume,
@@ -7,6 +6,7 @@ import {
 import type { PipetteName } from '@opentrons/shared-data'
 import type { Options } from '@opentrons/components'
 import type { LabwareEntities, PipetteEntity } from '@opentrons/step-generation'
+import type { DropdownOption } from '../../../components/lib/forms/DropdownField.d'
 const supportedPipetteNames: PipetteName[] = [
   'p10_single',
   'p10_multi',

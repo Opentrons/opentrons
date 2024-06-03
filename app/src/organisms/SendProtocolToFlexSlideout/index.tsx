@@ -6,7 +6,7 @@ import { useCreateProtocolMutation } from '@opentrons/react-api-client'
 
 import { FLEX_DISPLAY_NAME, FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
 
-import { PrimaryButton, IconProps, StyleProps } from '@opentrons/components'
+import { PrimaryButton } from '@opentrons/components'
 import { ERROR_TOAST, INFO_TOAST, SUCCESS_TOAST } from '../../atoms/Toast'
 import { ChooseRobotSlideout } from '../../organisms/ChooseRobotSlideout'
 import {
@@ -17,13 +17,14 @@ import { useToaster } from '../../organisms/ToasterOven'
 import { appShellRequestor } from '../../redux/shell/remote'
 import { OPENTRONS_USB } from '../../redux/discovery'
 import { getIsProtocolAnalysisInProgress } from '../../redux/protocol-storage'
+import { getRobotUpdateDisplayInfo } from '../../redux/robot-update'
+import { getValidCustomLabwareFiles } from '../../redux/custom-labware'
 
 import type { AxiosError } from 'axios'
-import { getRobotUpdateDisplayInfo } from '../../redux/robot-update'
+import type { IconProps, StyleProps } from '@opentrons/components'
 import type { Robot } from '../../redux/discovery/types'
 import type { StoredProtocolData } from '../../redux/protocol-storage'
 import type { State } from '../../redux/types'
-import { getValidCustomLabwareFiles } from '../../redux/custom-labware'
 
 const _getFileBaseName = (filePath: string): string => {
   return filePath.split('/').reverse()[0]

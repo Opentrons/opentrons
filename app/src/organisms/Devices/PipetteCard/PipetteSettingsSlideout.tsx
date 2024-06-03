@@ -1,14 +1,14 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { Flex } from '@opentrons/components'
-import { PipetteModelSpecs } from '@opentrons/shared-data'
 import { useUpdatePipetteSettingsMutation } from '@opentrons/react-api-client'
 import { Slideout } from '../../../atoms/Slideout'
 import { ConfigFormSubmitButton } from '../../ConfigurePipette/ConfigFormSubmitButton'
 import { ConfigurePipette } from '../../ConfigurePipette'
 
-import type { AttachedPipette } from '../../../redux/pipettes/types'
+import type { PipetteModelSpecs } from '@opentrons/shared-data'
 import type { PipetteSettingsFieldsMap } from '@opentrons/api-client'
+import type { AttachedPipette } from '../../../redux/pipettes/types'
 
 interface PipetteSettingsSlideoutProps {
   robotName: string

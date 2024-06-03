@@ -1,9 +1,8 @@
 import React from 'react'
 import { useTranslation } from 'react-i18next'
 import styled, { css } from 'styled-components'
-import { useForm } from 'react-hook-form'
+import { useFormContext } from 'react-hook-form'
 import { useAtom } from 'jotai'
-import axios from 'axios'
 
 import {
   ALIGN_CENTER,
@@ -16,99 +15,87 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { SendButton } from '../../atoms/SendButton'
-import { preparedPromptAtom, chatDataAtom } from '../../resources/atoms'
+import { chatDataAtom, chatHistoryAtom, tokenAtom } from '../../resources/atoms'
+import { useApiCall } from '../../resources/hooks'
+import { calcTextAreaHeight } from '../../resources/utils/utils'
+import { END_POINT } from '../../resources/constants'
 
+import type { AxiosRequestConfig } from 'axios'
 import type { ChatData } from '../../resources/types'
-
-// ToDo (kk:05/02/2024) This url is temporary
-const url = 'http://localhost:8000/streaming/ask'
-
-interface InputType {
-  userPrompt: string
-}
 
 export function InputPrompt(): JSX.Element {
   const { t } = useTranslation('protocol_generator')
-  const { register, watch, setValue, reset } = useForm<InputType>({
-    defaultValues: {
-      userPrompt: '',
-    },
-  })
-  const [preparedPrompt] = useAtom(preparedPromptAtom)
+  const { register, watch, reset } = useFormContext()
   const [, setChatData] = useAtom(chatDataAtom)
+  const [chatHistory, setChatHistory] = useAtom(chatHistoryAtom)
+  const [token] = useAtom(tokenAtom)
   const [submitted, setSubmitted] = React.useState<boolean>(false)
-
-  const [data, setData] = React.useState<any>(null)
-  const [loading, setLoading] = React.useState<boolean>(false)
-  const [error, setError] = React.useState<string>('')
-
   const userPrompt = watch('userPrompt') ?? ''
+  const { data, isLoading, callApi } = useApiCall()
 
-  const calcTextAreaHeight = (): number => {
-    const rowsNum = userPrompt.split('\n').length
-    return rowsNum
-  }
-
-  const fetchData = async (prompt: string): Promise<void> => {
-    if (prompt !== '') {
-      setLoading(true)
-      try {
-        const response = await axios.post(url, {
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          query: prompt,
-        })
-        setData(response.data)
-      } catch (err) {
-        setError('Error fetching data from the API.')
-      } finally {
-        setLoading(false)
-      }
-    }
-  }
-
-  const handleClick = (): void => {
+  const handleClick = async (): Promise<void> => {
     const userInput: ChatData = {
       role: 'user',
-      content: userPrompt,
+      reply: userPrompt,
     }
-    setChatData(chatData => [...chatData, userInput])
-    void fetchData(userPrompt)
-    setSubmitted(true)
     reset()
+    setChatData(chatData => [...chatData, userInput])
+
+    try {
+      const headers = {
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      }
+
+      const config = {
+        url: END_POINT,
+        method: 'POST',
+        headers,
+        data: {
+          message: userPrompt,
+          history: chatHistory,
+          fake: false,
+        },
+      }
+      setChatHistory(chatHistory => [
+        ...chatHistory,
+        { role: 'user', content: userPrompt },
+      ])
+      await callApi(config as AxiosRequestConfig)
+      setSubmitted(true)
+    } catch (err: any) {
+      console.error(`error: ${err.message}`)
+      throw err
+    }
   }
 
   React.useEffect(() => {
-    if (preparedPrompt !== '') setValue('userPrompt', preparedPrompt as string)
-  }, [preparedPrompt, setValue])
-
-  React.useEffect(() => {
-    if (submitted && data && !loading) {
-      const { role, content } = data.data
+    if (submitted && data != null && !isLoading) {
+      const { role, reply } = data
       const assistantResponse: ChatData = {
         role,
-        content,
+        reply,
       }
+      setChatHistory(chatHistory => [
+        ...chatHistory,
+        { role: 'assistant', content: reply },
+      ])
       setChatData(chatData => [...chatData, assistantResponse])
       setSubmitted(false)
     }
-  }, [data, loading, submitted])
-
-  // ToDo (kk:05/02/2024) This is also temp. Asking the design about error.
-  console.error('error', error)
+  }, [data, isLoading, submitted])
 
   return (
     <StyledForm id="User_Prompt">
       <Flex css={CONTAINER_STYLE}>
         <StyledTextarea
-          rows={calcTextAreaHeight()}
+          rows={calcTextAreaHeight(userPrompt)}
           placeholder={t('type_your_prompt')}
           {...register('userPrompt')}
         />
         <SendButton
           disabled={userPrompt.length === 0}
-          isLoading={loading}
+          isLoading={isLoading}
           handleClick={handleClick}
         />
       </Flex>
@@ -149,6 +136,7 @@ const StyledTextarea = styled.textarea`
   width: 100%;
   font-size: ${TYPOGRAPHY.fontSize20};
   line-height: ${TYPOGRAPHY.lineHeight24};
+  padding: 1.2rem 0;
 
   ::placeholder {
     position: absolute;

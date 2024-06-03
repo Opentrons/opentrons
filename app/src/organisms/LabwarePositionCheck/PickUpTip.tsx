@@ -8,21 +8,16 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 import {
-  CompletedProtocolAnalysis,
-  CreateCommand,
   getLabwareDefURI,
   getLabwareDisplayName,
   getModuleType,
   getVectorDifference,
   HEATERSHAKER_MODULE_TYPE,
   IDENTITY_VECTOR,
-  MoveLabwareCreateCommand,
-  RobotType,
 } from '@opentrons/shared-data'
 import { RobotMotionLoader } from './RobotMotionLoader'
 import { PrepareSpace } from './PrepareSpace'
 import { JogToWell } from './JogToWell'
-import { useChainRunCommands } from '../../resources/runs'
 import { UnorderedList } from '../../molecules/UnorderedList'
 import { getCurrentOffsetForLabwareInLocation } from '../Devices/ProtocolRun/utils/getCurrentOffsetForLabwareInLocation'
 import { TipConfirmation } from './TipConfirmation'
@@ -32,6 +27,13 @@ import {
 } from './utils/labware'
 import { getDisplayLocation } from './utils/getDisplayLocation'
 
+import type {
+  CompletedProtocolAnalysis,
+  CreateCommand,
+  MoveLabwareCreateCommand,
+  RobotType,
+} from '@opentrons/shared-data'
+import type { useChainRunCommands } from '../../resources/runs'
 import type { Jog } from '../../molecules/JogControls/types'
 import type {
   PickUpTipStep,

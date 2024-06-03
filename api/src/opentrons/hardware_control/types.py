@@ -697,9 +697,10 @@ class EarlyLiquidSenseTrigger(RuntimeError):
 class FailedTipStateCheck(RuntimeError):
     """Error raised if the tip ejector state does not match the expected value."""
 
-    def __init__(self, tip_state_type: TipStateType, actual_state: int) -> None:
+    def __init__(
+        self, expected_state: TipStateType, actual_state: TipStateType
+    ) -> None:
         """Initialize FailedTipStateCheck error."""
         super().__init__(
-            f"Failed to correctly determine tip state for tip {str(tip_state_type)} "
-            f"received {bool(actual_state)} but expected {bool(tip_state_type.value)}"
+            f"Expected tip state {expected_state}, but received {actual_state}."
         )

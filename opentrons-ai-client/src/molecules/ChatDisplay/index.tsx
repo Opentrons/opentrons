@@ -10,11 +10,14 @@ import {
   Flex,
   Icon,
   JUSTIFY_CENTER,
+  JUSTIFY_FLEX_END,
+  JUSTIFY_FLEX_START,
   POSITION_ABSOLUTE,
   POSITION_RELATIVE,
   PrimaryButton,
   SPACING,
   StyledText,
+  TYPOGRAPHY,
 } from '@opentrons/components'
 
 import type { ChatData } from '../../resources/types'
@@ -27,7 +30,7 @@ interface ChatDisplayProps {
 export function ChatDisplay({ chat, chatId }: ChatDisplayProps): JSX.Element {
   const { t } = useTranslation('protocol_generator')
   const [isCopied, setIsCopied] = React.useState<boolean>(false)
-  const { role, content } = chat
+  const { role, reply } = chat
   const isUser = role === 'user'
 
   const handleClickCopy = async (): Promise<void> => {
@@ -48,7 +51,9 @@ export function ChatDisplay({ chat, chatId }: ChatDisplayProps): JSX.Element {
       paddingLeft={isUser ? SPACING.spacing40 : undefined}
       paddingRight={isUser ? undefined : SPACING.spacing40}
     >
-      <StyledText>{isUser ? t('you') : t('opentronsai')}</StyledText>
+      <Flex justifyContent={isUser ? JUSTIFY_FLEX_END : JUSTIFY_FLEX_START}>
+        <StyledText>{isUser ? t('you') : t('opentronsai')}</StyledText>
+      </Flex>
       {/* text should be markdown so this component will have a package or function to parse markdown */}
       <Flex
         padding={SPACING.spacing32}
@@ -67,17 +72,18 @@ export function ChatDisplay({ chat, chatId }: ChatDisplayProps): JSX.Element {
             h2: HeaderText,
             li: ListItemText,
             p: ParagraphText,
-            a: ExternalLink,
-            code: CodeText,
+            a: isUser ? ParagraphText : ExternalLink,
+            code: isUser ? ParagraphText : CodeText,
           }}
         >
-          {content}
+          {reply}
         </Markdown>
-        {role === 'assistant' ? (
+
+        {!isUser ? (
           <PrimaryButton
             position={POSITION_ABSOLUTE}
             right={SPACING.spacing16}
-            bottom={`-${SPACING.spacing16}`}
+            bottom={`-${SPACING.spacing24}`}
             borderRadius={BORDERS.borderRadiusFull}
             onClick={handleClickCopy}
           >
@@ -101,7 +107,13 @@ function ExternalLink(props: JSX.IntrinsicAttributes): JSX.Element {
 }
 
 function ParagraphText(props: JSX.IntrinsicAttributes): JSX.Element {
-  return <StyledText {...props} as="p" />
+  return (
+    <StyledText
+      {...props}
+      fontSize={TYPOGRAPHY.fontSize20}
+      lineHeight={TYPOGRAPHY.lineHeight24}
+    />
+  )
 }
 
 function HeaderText(props: JSX.IntrinsicAttributes): JSX.Element {
@@ -109,7 +121,7 @@ function HeaderText(props: JSX.IntrinsicAttributes): JSX.Element {
 }
 
 function ListItemText(props: JSX.IntrinsicAttributes): JSX.Element {
-  return <StyledText {...props} as="li" />
+  return <StyledText {...props} as="li" marginLeft={SPACING.spacing16} />
 }
 
 function UnnumberedListText(props: JSX.IntrinsicAttributes): JSX.Element {

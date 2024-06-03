@@ -1,5 +1,4 @@
 import {
-  LabwareDefinition2,
   SPAN7_8_10_11_SLOT,
   THERMOCYCLER_MODULE_V1,
   getModuleDef2,
@@ -8,6 +7,7 @@ import {
 import type { RunData } from '@opentrons/api-client'
 import type {
   LabwareDefinitionsByUri,
+  LabwareDefinition2,
   Liquid,
   LoadedLabware,
   LoadedModule,
@@ -180,7 +180,7 @@ export const mockThermocyclerModule: LoadedModule = {
 export const mockLiquid: Liquid = {
   id: 'mockLiquid',
   displayName: 'mock liquid',
-  description: 'this is my mock liquid',
+  description: 'this is my mock liquid description',
 }
 
 export const mockRunData: RunData = {

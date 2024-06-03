@@ -4,9 +4,10 @@ Example load statements: load_module, load_labware, load_waste_chute, load_pipet
 Example calls: module.labware, waste_chute.top, etc.
 This is required to ensure that the loaded entities are recognized by the analysis engine.
 """
+
 import typing
+
 from test_data_generation.python_protocol_generation import ast_helpers as ast_h
-from test_data_generation.python_protocol_generation.util import ProtocolContextMethods
 
 
 def create_call_to_attribute_on_loaded_entity(
@@ -15,10 +16,7 @@ def create_call_to_attribute_on_loaded_entity(
     """Create a call statement from a load statement."""
     assert isinstance(load_statement.value, ast_h.CallFunction)
 
-    if load_statement.value.what_to_call in [
-        ProtocolContextMethods.LOAD_WASTE_CHUTE,
-        ProtocolContextMethods.LOAD_TRASH_BIN,
-    ]:
+    if load_statement.value.what_to_call in ["load_waste_chute", "load_trash_bin"]:
         what_to_call = "location"
     else:
         what_to_call = "api_version"

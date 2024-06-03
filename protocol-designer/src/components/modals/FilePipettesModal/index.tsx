@@ -18,9 +18,6 @@ import {
   TEMPERATURE_MODULE_TYPE,
   THERMOCYCLER_MODULE_TYPE,
   HEATERSHAKER_MODULE_TYPE,
-  ModuleType,
-  ModuleModel,
-  PipetteName,
   OT2_ROBOT_TYPE,
   getPipetteSpecsV2,
 } from '@opentrons/shared-data'
@@ -28,13 +25,8 @@ import {
   actions as stepFormActions,
   selectors as stepFormSelectors,
   getIsCrashablePipetteSelected,
-  PipetteOnDeck,
-  FormPipettesByMount,
-  FormModules,
-  FormPipette,
 } from '../../../step-forms'
 import { INITIAL_DECK_SETUP_STEP_ID } from '../../../constants'
-import { NewProtocolFields } from '../../../load-file'
 import { getRobotType } from '../../../file-data/selectors'
 import { uuid } from '../../../utils'
 import { getLabwareEntities } from '../../../step-forms/selectors'
@@ -51,9 +43,21 @@ import { StepChangesConfirmModal } from '../EditPipettesModal/StepChangesConfirm
 import { PipetteFields } from './PipetteFields'
 
 import type {
+  ModuleType,
+  ModuleModel,
+  PipetteName,
+} from '@opentrons/shared-data'
+import type {
   LabwareEntities,
   NormalizedPipette,
 } from '@opentrons/step-generation'
+import type { NewProtocolFields } from '../../../load-file'
+import type {
+  PipetteOnDeck,
+  FormPipettesByMount,
+  FormModules,
+  FormPipette,
+} from '../../../step-forms'
 import type { DeckSlot, ThunkDispatch } from '../../../types'
 import type { StepIdType } from '../../../form-types'
 

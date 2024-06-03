@@ -30,8 +30,8 @@ export const fileMetadata: FileMetadataFields = {
   created: 1582667312515,
 }
 export const dismissedWarnings: DismissedWarningState = {
-  form: {},
-  timeline: {},
+  form: [],
+  timeline: [],
 }
 export const ingredients: IngredientsState = {}
 export const ingredLocations: LabwareLiquidState = {}

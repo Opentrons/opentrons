@@ -67,7 +67,7 @@ vi.mock('@opentrons/shared-data', async importOriginal => {
 
 const ROBOT_NAME = 'otie'
 const RUN_ID = '1'
-const MOCK_ROTOCOL_LIQUID_KEY = { liquids: [] }
+const MOCK_PROTOCOL_LIQUID_KEY = { liquids: [] }
 const render = () => {
   return renderWithProviders(
     <ProtocolRunSetup
@@ -88,7 +88,7 @@ describe('ProtocolRunSetup', () => {
       .calledWith(RUN_ID)
       .thenReturn({
         ...noModulesProtocol,
-        ...MOCK_ROTOCOL_LIQUID_KEY,
+        ...MOCK_PROTOCOL_LIQUID_KEY,
       } as any)
     when(vi.mocked(useProtocolAnalysisErrors)).calledWith(RUN_ID).thenReturn({
       analysisErrors: null,
@@ -97,7 +97,7 @@ describe('ProtocolRunSetup', () => {
       .calledWith(RUN_ID)
       .thenReturn(({
         ...noModulesProtocol,
-        ...MOCK_ROTOCOL_LIQUID_KEY,
+        ...MOCK_PROTOCOL_LIQUID_KEY,
       } as unknown) as SharedData.ProtocolAnalysisOutput)
     vi.mocked(parseAllRequiredModuleModels).mockReturnValue([])
     vi.mocked(parseLiquidsInLoadOrder).mockReturnValue([])
@@ -251,7 +251,7 @@ describe('ProtocolRunSetup', () => {
         .calledWith(RUN_ID)
         .thenReturn({
           ...withModulesProtocol,
-          ...MOCK_ROTOCOL_LIQUID_KEY,
+          ...MOCK_PROTOCOL_LIQUID_KEY,
         } as any)
       when(vi.mocked(useRunHasStarted)).calledWith(RUN_ID).thenReturn(false)
       when(vi.mocked(useModuleCalibrationStatus))
@@ -280,7 +280,7 @@ describe('ProtocolRunSetup', () => {
 
       render()
       screen.getByText('STEP 2')
-      screen.getByText('Modules & deck')
+      screen.getByText('Deck hardware')
       screen.getByText('Calibration needed')
     })
 
@@ -305,7 +305,7 @@ describe('ProtocolRunSetup', () => {
 
       render()
       screen.getByText('STEP 2')
-      screen.getByText('Modules & deck')
+      screen.getByText('Deck hardware')
       screen.getByText('Action needed')
     })
 
@@ -339,13 +339,13 @@ describe('ProtocolRunSetup', () => {
 
       render()
       screen.getByText('STEP 2')
-      screen.getByText('Modules & deck')
+      screen.getByText('Deck hardware')
       screen.getByText('Action needed')
     })
 
     it('renders module setup and allows the user to proceed to labware setup', () => {
       render()
-      const moduleSetup = screen.getByText('Modules')
+      const moduleSetup = screen.getByText('Deck hardware')
       fireEvent.click(moduleSetup)
       screen.getByText('Mock SetupModules')
     })
@@ -359,9 +359,9 @@ describe('ProtocolRunSetup', () => {
         'Review required pipettes and tip length calibrations for this protocol.'
       )
       screen.getByText('STEP 2')
-      screen.getByText('Modules')
+      screen.getByText('Deck hardware')
 
-      screen.getByText('Install the required modules and power them on.')
+      screen.getByText('Install the required modules.')
       screen.getByText('STEP 3')
       screen.getByText('Labware')
 
@@ -375,7 +375,7 @@ describe('ProtocolRunSetup', () => {
         .calledWith(RUN_ID)
         .thenReturn({
           ...withModulesProtocol,
-          ...MOCK_ROTOCOL_LIQUID_KEY,
+          ...MOCK_PROTOCOL_LIQUID_KEY,
           modules: [
             {
               id: '1d57adf0-67ad-11ea-9f8b-3b50068bd62d:magneticModuleType',
@@ -395,9 +395,9 @@ describe('ProtocolRunSetup', () => {
         'Review required pipettes and tip length calibrations for this protocol.'
       )
       screen.getByText('STEP 2')
-      screen.getByText('Modules')
+      screen.getByText('Deck hardware')
 
-      screen.getByText('Install the required modules and power them on.')
+      screen.getByText('Install the required module.')
       screen.getByText('STEP 3')
       screen.getByText('Labware')
       screen.getByText(
@@ -411,7 +411,7 @@ describe('ProtocolRunSetup', () => {
         .calledWith(RUN_ID)
         .thenReturn({
           ...withModulesProtocol,
-          ...MOCK_ROTOCOL_LIQUID_KEY,
+          ...MOCK_PROTOCOL_LIQUID_KEY,
           modules: [
             {
               id: '1d57adf0-67ad-11ea-9f8b-3b50068bd62d:magneticModuleType',
@@ -426,9 +426,9 @@ describe('ProtocolRunSetup', () => {
       render()
 
       screen.getByText('STEP 2')
-      screen.getByText('Modules & deck')
+      screen.getByText('Deck hardware')
       screen.getByText(
-        'Install the required modules and power them on. Install the required fixtures and review the deck configuration.'
+        'Install and calibrate the required modules. Install the required fixtures.'
       )
     })
 

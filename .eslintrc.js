@@ -49,13 +49,13 @@ module.exports = {
             importNames: [
               'useAllRunsQuery',
               'useRunQuery',
-              'useLastRunCommandKey',
+              'useAllCommandsQuery',
               'useCurrentMaintenanceRun',
               'useDeckConfigurationQuery',
               'useAllCommandsAsPreSerializedList',
             ],
             message:
-              'The HTTP hook is deprecated. Utilize the equivalent notification wrapper (useNotifyX) instead.',
+              'HTTP hook deprecated. Use the equivalent notification wrapper (useNotifyXYZ).',
           },
         ],
       },
@@ -102,7 +102,6 @@ module.exports = {
         '@typescript-eslint/no-unnecessary-type-assertion': 'warn',
         '@typescript-eslint/no-unnecessary-boolean-literal-compare': 'warn',
         '@typescript-eslint/no-unsafe-argument': 'warn',
-        '@typescript-eslint/consistent-type-imports': 'warn',
         '@typescript-eslint/consistent-indexed-object-style': 'warn',
         '@typescript-eslint/no-confusing-void-expression': 'warn',
         '@typescript-eslint/ban-types': 'warn',

@@ -31,6 +31,10 @@ lib: export NODE_ENV := production
 lib:
 	yarn vite build
 
+.PHONY: build-ts
+build-ts:
+	yarn tsc --build --emitDeclarationOnly
+
 # development
 #####################################################################
 

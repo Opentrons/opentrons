@@ -14,7 +14,12 @@ from opentrons.hardware_control.modules import LiveData
 
 from opentrons_shared_data.errors import EnumeratedError
 
-from ..commands import Command, CommandCreate, CommandPrivateResult
+from ..commands import (
+    Command,
+    CommandCreate,
+    CommandDefinedErrorData,
+    CommandPrivateResult,
+)
 from ..error_recovery_policy import ErrorRecoveryType
 from ..notes.notes import CommandNote
 from ..types import (
@@ -158,13 +163,25 @@ class FailCommandAction:
     """An ID to assign to the command's error.
 
     Must be unique to this occurrence of the error.
+
+    todo(mm, 2024-05-13): This is redundant with `error` when it's a defined error.
     """
 
     failed_at: datetime
-    """When the command failed."""
+    """When the command failed.
 
-    error: EnumeratedError
-    """The underlying exception that caused this command to fail."""
+    todo(mm, 2024-05-13): This is redundant with `error` when it's a defined error.
+    """
+
+    error: Union[CommandDefinedErrorData, EnumeratedError]
+    """The error that caused the command to fail.
+
+    If it was a defined error, this should be the `DefinedErrorData` that the command
+    returned.
+
+    If it was an undefined error, this should be the underlying exception
+    that caused the command to fail, represented as an `EnumeratedError`.
+    """
 
     notes: List[CommandNote]
     """Overwrite the command's `.notes` with these."""

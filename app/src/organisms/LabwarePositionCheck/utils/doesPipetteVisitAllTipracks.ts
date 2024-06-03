@@ -1,7 +1,11 @@
-import { getIsTiprack, LabwareDefinition2 } from '@opentrons/shared-data'
+import { getIsTiprack } from '@opentrons/shared-data'
 import { getPickUpTipCommandsWithPipette } from '../../Devices/ProtocolRun/utils/getPickUpTipCommandsWithPipette'
 import { getTipracksVisited } from '../../Devices/ProtocolRun/utils/getTipracksVisited'
-import type { LoadedLabware, RunTimeCommand } from '@opentrons/shared-data'
+import type {
+  LoadedLabware,
+  RunTimeCommand,
+  LabwareDefinition2,
+} from '@opentrons/shared-data'
 
 export const doesPipetteVisitAllTipracks = (
   pipetteId: string,

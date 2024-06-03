@@ -10,7 +10,7 @@ import type {
   ResponseToActionMapper,
 } from '../../robot-api/operators'
 import type { Action, Epic } from '../../types'
-import { FetchEapOptionsAction } from '../types'
+import type { FetchEapOptionsAction } from '../types'
 
 const mapActionToRequest: ActionToRequestMapper<FetchEapOptionsAction> = action => ({
   method: GET,

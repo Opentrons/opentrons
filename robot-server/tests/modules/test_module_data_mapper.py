@@ -1,7 +1,7 @@
 """Tests for robot_server.modules.module_data_mapper."""
 import pytest
 
-from opentrons.protocol_engine import ModuleModel
+from opentrons.protocol_engine import ModuleModel, DeckType
 from opentrons.protocol_engine.types import Vec3f
 from opentrons.drivers.rpi_drivers.types import USBPort as HardwareUSBPort, PortGroup
 from opentrons.hardware_control.modules import (
@@ -31,50 +31,88 @@ from robot_server.modules.module_models import (
 
 
 @pytest.mark.parametrize(
-    ("input_model", "input_data", "expected_output_data"),
+    (
+        "input_model",
+        "deck_type",
+        "input_data",
+        "expected_output_data",
+        "expected_compatible",
+    ),
     [
         (
             "magneticModuleV1",
+            DeckType("ot2_standard"),
             {"status": "disengaged", "data": {"engaged": False, "height": 0.0}},
             MagneticModuleData(
                 status=MagneticStatus.DISENGAGED,
                 engaged=False,
                 height=-2.5,
             ),
+            True,
         ),
         (
             "magneticModuleV1",
+            DeckType("ot3_standard"),
+            {"status": "disengaged", "data": {"engaged": False, "height": 0.0}},
+            MagneticModuleData(
+                status=MagneticStatus.DISENGAGED,
+                engaged=False,
+                height=-2.5,
+            ),
+            False,
+        ),
+        (
+            "magneticModuleV1",
+            DeckType("ot2_standard"),
             {"status": "engaged", "data": {"engaged": True, "height": 42}},
             MagneticModuleData(
                 status=MagneticStatus.ENGAGED,
                 engaged=True,
                 height=18.5,
             ),
+            True,
         ),
         (
             "magneticModuleV2",
+            DeckType("ot2_standard"),
             {"status": "disengaged", "data": {"engaged": False, "height": 0.0}},
             MagneticModuleData(
                 status=MagneticStatus.DISENGAGED,
                 engaged=False,
                 height=-2.5,
             ),
+            True,
         ),
         (
             "magneticModuleV2",
+            DeckType("ot3_standard"),
+            {"status": "disengaged", "data": {"engaged": False, "height": 0.0}},
+            MagneticModuleData(
+                status=MagneticStatus.DISENGAGED,
+                engaged=False,
+                height=-2.5,
+            ),
+            False,
+        ),
+        (
+            "magneticModuleV2",
+            DeckType("ot2_standard"),
             {"status": "engaged", "data": {"engaged": True, "height": 42}},
             MagneticModuleData(
                 status=MagneticStatus.ENGAGED,
                 engaged=True,
                 height=39.5,
             ),
+            True,
         ),
     ],
 )
 def test_maps_magnetic_module_data(
     input_model: str,
+    deck_type: DeckType,
     input_data: LiveData,
     expected_output_data: MagneticModuleData,
+    expected_compatible: bool,
 ) -> None:
     """It should map hardware data to a magnetic module."""
     module_identity = ModuleIdentity(
@@ -93,7 +131,7 @@ def test_maps_magnetic_module_data(
         device_path="/dev/null",
     )
 
-    subject = ModuleDataMapper()
+    subject = ModuleDataMapper(deck_type=deck_type)
     result = subject.map_data(
         model=input_model,
         module_identity=module_identity,
@@ -113,6 +151,7 @@ def test_maps_magnetic_module_data(
         hasAvailableUpdate=True,
         moduleType=ModuleType.MAGNETIC,
         moduleModel=ModuleModel(input_model),  # type: ignore[arg-type]
+        compatibleWithRobot=expected_compatible,
         usbPort=UsbPort(
             port=101,
             portGroup=PortGroup.UNKNOWN,
@@ -126,8 +165,13 @@ def test_maps_magnetic_module_data(
 
 
 @pytest.mark.parametrize(
-    "input_model",
-    ["temperatureModuleV1", "temperatureModuleV2"],
+    "input_model,deck_type,expected_compatible",
+    [
+        ("temperatureModuleV1", DeckType("ot2_standard"), True),
+        ("temperatureModuleV1", DeckType("ot3_standard"), False),
+        ("temperatureModuleV2", DeckType("ot2_standard"), True),
+        ("temperatureModuleV2", DeckType("ot3_standard"), True),
+    ],
 )
 @pytest.mark.parametrize(
     "input_data",
@@ -139,7 +183,12 @@ def test_maps_magnetic_module_data(
         },
     ],
 )
-def test_maps_temperature_module_data(input_model: str, input_data: LiveData) -> None:
+def test_maps_temperature_module_data(
+    input_model: str,
+    deck_type: DeckType,
+    expected_compatible: bool,
+    input_data: LiveData,
+) -> None:
     """It should map hardware data to a magnetic module."""
     module_identity = ModuleIdentity(
         module_id="module-id",
@@ -157,7 +206,7 @@ def test_maps_temperature_module_data(input_model: str, input_data: LiveData) ->
         device_path="/dev/null",
     )
 
-    subject = ModuleDataMapper()
+    subject = ModuleDataMapper(deck_type=deck_type)
     result = subject.map_data(
         model=input_model,
         module_identity=module_identity,
@@ -176,6 +225,7 @@ def test_maps_temperature_module_data(input_model: str, input_data: LiveData) ->
         hardwareRevision="4.5.6",
         hasAvailableUpdate=True,
         moduleType=ModuleType.TEMPERATURE,
+        compatibleWithRobot=expected_compatible,
         moduleModel=ModuleModel(input_model),  # type: ignore[arg-type]
         usbPort=UsbPort(
             port=101,
@@ -194,8 +244,13 @@ def test_maps_temperature_module_data(input_model: str, input_data: LiveData) ->
 
 
 @pytest.mark.parametrize(
-    "input_model",
-    ["thermocyclerModuleV1"],
+    "input_model,deck_type,expected_compatible",
+    [
+        ("thermocyclerModuleV1", DeckType("ot2_standard"), True),
+        ("thermocyclerModuleV1", DeckType("ot3_standard"), False),
+        ("thermocyclerModuleV2", DeckType("ot2_standard"), True),
+        ("thermocyclerModuleV2", DeckType("ot3_standard"), True),
+    ],
 )
 @pytest.mark.parametrize(
     "input_data",
@@ -236,7 +291,12 @@ def test_maps_temperature_module_data(input_model: str, input_data: LiveData) ->
         },
     ],
 )
-def test_maps_thermocycler_module_data(input_model: str, input_data: LiveData) -> None:
+def test_maps_thermocycler_module_data(
+    input_model: str,
+    deck_type: DeckType,
+    expected_compatible: bool,
+    input_data: LiveData,
+) -> None:
     """It should map hardware data to a magnetic module."""
     module_identity = ModuleIdentity(
         module_id="module-id",
@@ -254,7 +314,7 @@ def test_maps_thermocycler_module_data(input_model: str, input_data: LiveData) -
         device_path="/dev/null",
     )
 
-    subject = ModuleDataMapper()
+    subject = ModuleDataMapper(deck_type=deck_type)
     result = subject.map_data(
         model=input_model,
         module_identity=module_identity,
@@ -273,6 +333,7 @@ def test_maps_thermocycler_module_data(input_model: str, input_data: LiveData) -
         hardwareRevision="4.5.6",
         hasAvailableUpdate=True,
         moduleType=ModuleType.THERMOCYCLER,
+        compatibleWithRobot=expected_compatible,
         moduleModel=ModuleModel(input_model),  # type: ignore[arg-type]
         usbPort=UsbPort(
             port=101,
@@ -301,8 +362,11 @@ def test_maps_thermocycler_module_data(input_model: str, input_data: LiveData) -
 
 
 @pytest.mark.parametrize(
-    "input_model",
-    ["heaterShakerModuleV1"],
+    "input_model,deck_type",
+    [
+        ("heaterShakerModuleV1", DeckType("ot2_standard")),
+        ("heaterShakerModuleV1", DeckType("ot3_standard")),
+    ],
 )
 @pytest.mark.parametrize(
     "input_data",
@@ -335,7 +399,9 @@ def test_maps_thermocycler_module_data(input_model: str, input_data: LiveData) -
         },
     ],
 )
-def test_maps_heater_shaker_module_data(input_model: str, input_data: LiveData) -> None:
+def test_maps_heater_shaker_module_data(
+    input_model: str, deck_type: DeckType, input_data: LiveData
+) -> None:
     """It should map hardware data to a magnetic module."""
     module_identity = ModuleIdentity(
         module_id="module-id",
@@ -353,7 +419,7 @@ def test_maps_heater_shaker_module_data(input_model: str, input_data: LiveData) 
         device_path="/dev/null",
     )
 
-    subject = ModuleDataMapper()
+    subject = ModuleDataMapper(deck_type=deck_type)
     result = subject.map_data(
         model=input_model,
         module_identity=module_identity,
@@ -372,6 +438,7 @@ def test_maps_heater_shaker_module_data(input_model: str, input_data: LiveData) 
         hardwareRevision="4.5.6",
         hasAvailableUpdate=True,
         moduleType=ModuleType.HEATER_SHAKER,
+        compatibleWithRobot=True,
         moduleModel=ModuleModel(input_model),  # type: ignore[arg-type]
         usbPort=UsbPort(
             port=101,

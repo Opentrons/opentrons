@@ -1,9 +1,6 @@
 import * as React from 'react'
 import { fireEvent, screen } from '@testing-library/react'
 import { vi, it, describe, expect } from 'vitest'
-
-import { getDeckDefinitions } from '@opentrons/shared-data'
-
 import { renderWithProviders } from '../../../__testing-utils__'
 import { i18n } from '../../../i18n'
 import {
@@ -12,8 +9,9 @@ import {
   mockTipLengthCalBlock,
 } from '../../../redux/sessions/__fixtures__'
 import * as Sessions from '../../../redux/sessions'
-
 import { DeckSetup } from '../DeckSetup'
+
+import type { getDeckDefinitions } from '@opentrons/shared-data'
 
 vi.mock('../../../assets/labware/getLabware')
 vi.mock('@opentrons/shared-data', async importOriginal => {

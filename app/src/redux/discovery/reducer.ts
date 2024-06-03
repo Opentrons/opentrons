@@ -5,7 +5,7 @@ import * as actions from './actions'
 
 import type { Action } from '../types'
 import type { DiscoveryState } from './types'
-import { Reducer } from 'redux'
+import type { Reducer } from 'redux'
 
 export const INITIAL_STATE: DiscoveryState = {
   scanning: false,

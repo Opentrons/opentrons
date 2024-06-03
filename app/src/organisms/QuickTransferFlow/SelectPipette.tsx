@@ -9,12 +9,13 @@ import {
 } from '@opentrons/components'
 import { useInstrumentsQuery } from '@opentrons/react-api-client'
 import { getPipetteSpecsV2, RIGHT, LEFT } from '@opentrons/shared-data'
-import { SmallButton, LargeButton } from '../../atoms/buttons'
+import { LargeButton } from '../../atoms/buttons'
 import { ChildNavigation } from '../ChildNavigation'
 
 import type { PipetteData, Mount } from '@opentrons/api-client'
+import type { SmallButton } from '../../atoms/buttons'
 import type {
-  QuickTransferSetupState,
+  QuickTransferWizardState,
   QuickTransferWizardAction,
 } from './types'
 
@@ -22,7 +23,7 @@ interface SelectPipetteProps {
   onNext: () => void
   onBack: () => void
   exitButtonProps: React.ComponentProps<typeof SmallButton>
-  state: QuickTransferSetupState
+  state: QuickTransferWizardState
   dispatch: React.Dispatch<QuickTransferWizardAction>
 }
 

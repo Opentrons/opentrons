@@ -9,6 +9,7 @@ from opentrons.protocol_engine.execution import MovementHandler, GantryMover
 from opentrons.protocol_engine.state import StateView
 from opentrons.types import Point
 
+from opentrons.protocol_engine.commands.command import SuccessData
 from opentrons.protocol_engine.commands.touch_tip import (
     TouchTipParams,
     TouchTipResult,
@@ -120,7 +121,9 @@ async def test_touch_tip_implementation(
 
     result = await subject.execute(params)
 
-    assert result == TouchTipResult(position=DeckPoint(x=4, y=5, z=6))
+    assert result == SuccessData(
+        public=TouchTipResult(position=DeckPoint(x=4, y=5, z=6)), private=None
+    )
 
 
 async def test_touch_tip_disabled(

@@ -1,5 +1,4 @@
 import * as React from 'react'
-import { UseQueryResult } from 'react-query'
 import { screen } from '@testing-library/react'
 import { describe, it, vi, beforeEach } from 'vitest'
 import '@testing-library/jest-dom/vitest'
@@ -10,6 +9,7 @@ import { useIsRobotViewable, useRunStatuses } from '../hooks'
 import { RecentProtocolRuns } from '../RecentProtocolRuns'
 import { HistoricalProtocolRun } from '../HistoricalProtocolRun'
 
+import type { UseQueryResult } from 'react-query'
 import type { Runs } from '@opentrons/api-client'
 import type { AxiosError } from 'axios'
 

@@ -9,9 +9,9 @@ import {
 } from '@opentrons/components'
 import { getFieldDefaultTooltip } from '../utils'
 import { TextField } from './TextField'
-import { StepType } from '../../../form-types'
-import { FieldProps } from '../types'
 import styles from '../StepEditForm.module.css'
+import type { StepType } from '../../../form-types'
+import type { FieldProps } from '../types'
 
 type Props = FieldProps & {
   stepType: StepType

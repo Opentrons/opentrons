@@ -5,15 +5,12 @@ import {
   MAGNETIC_MODULE_TYPE,
   TEMPERATURE_MODULE_TYPE,
   HEATERSHAKER_MODULE_TYPE,
-  ModuleType,
-  PipetteName,
   FLEX_ROBOT_TYPE,
   getPipetteSpecsV2,
 } from '@opentrons/shared-data'
 import {
   selectors as stepFormSelectors,
   getIsCrashablePipetteSelected,
-  ModulesForEditModulesCard,
 } from '../../step-forms'
 import { selectors as featureFlagSelectors } from '../../feature-flags'
 import { SUPPORTED_MODULE_TYPES } from '../../modules'
@@ -31,6 +28,8 @@ import { StagingAreasRow } from './StagingAreasRow'
 import { MultipleModulesRow } from './MultipleModulesRow'
 
 import type { AdditionalEquipmentEntity } from '@opentrons/step-generation'
+import type { ModuleType, PipetteName } from '@opentrons/shared-data'
+import type { ModulesForEditModulesCard } from '../../step-forms'
 
 import styles from './styles.module.css'
 export interface Props {

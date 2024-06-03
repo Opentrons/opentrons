@@ -5,13 +5,10 @@ import { renderWithProviders } from '../../../../__testing-utils__'
 import { i18n } from '../../../../localization'
 import { getInitialDeckSetup } from '../../../../step-forms/selectors'
 import { getLabwareIsCompatible } from '../../../../utils/labwareModuleCompatibility'
-import {
-  getLabwareOnSlot,
-  getSlotIsEmpty,
-  ModuleOnDeck,
-} from '../../../../step-forms'
+import { getLabwareOnSlot, getSlotIsEmpty } from '../../../../step-forms'
 import { EditMultipleModulesModal } from '../EditMultipleModulesModal'
 import type * as Components from '@opentrons/components'
+import type { ModuleOnDeck } from '../../../../step-forms'
 
 vi.mock('../../../../step-forms/selectors')
 vi.mock('../../../../utils/labwareModuleCompatibility')

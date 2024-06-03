@@ -1,23 +1,24 @@
 import { vi, it, expect, describe, beforeEach } from 'vitest'
 import { when } from 'vitest-when'
-import electron from 'electron'
 import * as ProtocolAnalysis from '@opentrons/app/src/redux/protocol-analysis'
 import * as Cfg from '@opentrons/app/src/redux/config'
 
 import * as Dialogs from '../../dialogs'
-import { Config, getConfig, handleConfigChange } from '../../config'
+import { getConfig, handleConfigChange } from '../../config'
 import { getValidLabwareFilePaths } from '../../labware'
 import { selectPythonPath, getPythonPath } from '../getPythonPath'
 import { executeAnalyzeCli } from '../executeAnalyzeCli'
 import { writeFailedAnalysis } from '../writeFailedAnalysis'
-import { createLogger } from '../../log'
 
 import {
   registerProtocolAnalysis,
   analyzeProtocolSource,
   CONFIG_PYTHON_PATH_TO_PYTHON_OVERRIDE,
 } from '..'
-import { Dispatch } from '../../types'
+import type electron from 'electron'
+import type { createLogger } from '../../log'
+import type { Dispatch } from '../../types'
+import type { Config } from '../../config'
 
 vi.mock('../../labware')
 vi.mock('../../dialogs')

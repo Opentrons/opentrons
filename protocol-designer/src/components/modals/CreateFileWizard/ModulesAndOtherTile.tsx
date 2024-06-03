@@ -20,13 +20,11 @@ import {
   MAGNETIC_MODULE_TYPE,
   TEMPERATURE_MODULE_TYPE,
   getPipetteSpecsV2,
-  PipetteName,
   OT2_ROBOT_TYPE,
   THERMOCYCLER_MODULE_V2,
   HEATERSHAKER_MODULE_V1,
   MAGNETIC_BLOCK_V1,
   TEMPERATURE_MODULE_V2,
-  ModuleModel,
   getModuleDisplayName,
   getModuleType,
   FLEX_ROBOT_TYPE,
@@ -50,6 +48,7 @@ import {
 import { EquipmentOption } from './EquipmentOption'
 import { HandleEnter } from './HandleEnter'
 
+import type { ModuleModel, PipetteName } from '@opentrons/shared-data'
 import type { AdditionalEquipment, WizardTileProps } from './types'
 
 const MAX_TEMPERATURE_MODULES = 7
@@ -224,7 +223,7 @@ function FlexModuleFields(props: WizardTileProps): JSX.Element {
           getNumSlotsAvailable(modules, additionalEquipment) === 0
         //  special-casing TC since it takes up 2 slots
         if (moduleType === THERMOCYCLER_MODULE_TYPE) {
-          isDisabled = getNumSlotsAvailable(modules, additionalEquipment) === 1
+          isDisabled = getNumSlotsAvailable(modules, additionalEquipment) <= 1
         }
 
         const handleMultiplesClick = (num: number): void => {

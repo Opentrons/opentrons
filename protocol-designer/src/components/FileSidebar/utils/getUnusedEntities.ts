@@ -1,6 +1,7 @@
 import some from 'lodash/some'
 import reduce from 'lodash/reduce'
-import { FLEX_ROBOT_TYPE, RobotType } from '@opentrons/shared-data'
+import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
+import type { RobotType } from '@opentrons/shared-data'
 import type { SavedStepFormState } from '../../../step-forms'
 
 /** Pull out all entities never specified by step forms. Assumes that all forms share the entityKey */

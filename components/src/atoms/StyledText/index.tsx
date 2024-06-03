@@ -1,8 +1,8 @@
-import * as React from 'react'
 import styled, { css } from 'styled-components'
 import { Text } from '../../primitives'
 import { TYPOGRAPHY, RESPONSIVENESS } from '../../ui-style-constants'
 
+import type * as React from 'react'
 import type { FlattenSimpleInterpolation } from 'styled-components'
 
 export interface Props extends React.ComponentProps<typeof Text> {

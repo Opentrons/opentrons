@@ -1,7 +1,6 @@
 import {
   ALL,
   COLUMN,
-  NozzleConfigurationStyle,
   FLEX_ROBOT_TYPE,
   OT2_ROBOT_TYPE,
 } from '@opentrons/shared-data'
@@ -23,11 +22,15 @@ import {
   getWasteChuteAddressableAreaNamePip,
 } from '../../utils'
 import { dropTip } from './dropTip'
+import { configureNozzleLayout } from './configureNozzleLayout'
+
+import type { NozzleConfigurationStyle } from '@opentrons/shared-data'
 import type {
   CommandCreator,
   CommandCreatorError,
   CurriedCommandCreator,
 } from '../../types'
+
 interface PickUpTipArgs {
   pipette: string
   tiprack: string
@@ -90,7 +93,7 @@ export const replaceTip: CommandCreator<ReplaceTipArgs> = (
   prevRobotState
 ) => {
   const { pipette, dropTipLocation, nozzles, tipRack } = args
-
+  const stateNozzles = prevRobotState.pipettes[pipette].nozzles
   if (tipRack == null) {
     return {
       errors: [errorCreators.noTipSelected()],
@@ -105,6 +108,7 @@ export const replaceTip: CommandCreator<ReplaceTipArgs> = (
   )
   const pipetteSpec = invariantContext.pipetteEntities[pipette]?.spec
   const channels = pipetteSpec?.channels
+
   const hasMoreTipracksOnDeck =
     tipracks?.totalTipracks > tipracks?.filteredTipracks
 
@@ -240,11 +244,24 @@ export const replaceTip: CommandCreator<ReplaceTipArgs> = (
   const addressableAreaNameWasteChute = getWasteChuteAddressableAreaNamePip(
     channels
   )
+
+  const configureNozzleLayoutCommand: CurriedCommandCreator[] =
+    //  only emit the command if previous nozzle state is different
+    channels === 96 && args.nozzles != null && args.nozzles !== stateNozzles
+      ? [
+          curryCommandCreator(configureNozzleLayout, {
+            nozzles: args.nozzles,
+            pipetteId: args.pipette,
+          }),
+        ]
+      : []
+
   let commandCreators: CurriedCommandCreator[] = [
     curryCommandCreator(dropTip, {
       pipette,
       dropTipLocation,
     }),
+    ...configureNozzleLayoutCommand,
     curryCommandCreator(_pickUpTip, {
       pipette,
       tiprack: nextTiprack.tiprackId,
@@ -259,6 +276,7 @@ export const replaceTip: CommandCreator<ReplaceTipArgs> = (
         addressableAreaName: addressableAreaNameWasteChute,
         prevRobotState,
       }),
+      ...configureNozzleLayoutCommand,
       curryCommandCreator(_pickUpTip, {
         pipette,
         tiprack: nextTiprack.tiprackId,
@@ -274,6 +292,7 @@ export const replaceTip: CommandCreator<ReplaceTipArgs> = (
         prevRobotState,
         invariantContext,
       }),
+      ...configureNozzleLayoutCommand,
       curryCommandCreator(_pickUpTip, {
         pipette,
         tiprack: nextTiprack.tiprackId,

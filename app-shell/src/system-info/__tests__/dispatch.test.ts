@@ -5,7 +5,6 @@ import * as Fixtures from '@opentrons/app/src/redux/system-info/__fixtures__'
 import * as SystemInfo from '@opentrons/app/src/redux/system-info'
 import { uiInitialized } from '@opentrons/app/src/redux/shell/actions'
 import * as OS from '../../os'
-import { createLogger } from '../../log'
 import { createUsbDeviceMonitor, getWindowsDriverVersion } from '../usb-devices'
 import {
   getActiveInterfaces,
@@ -16,6 +15,7 @@ import { registerSystemInfo } from '..'
 import type { Dispatch } from '../../types'
 import type { UsbDeviceMonitor } from '../usb-devices'
 import type { NetworkInterfaceMonitor } from '../network-interfaces'
+import type { createLogger } from '../../log'
 
 vi.mock('../../os')
 vi.mock('../usb-devices')

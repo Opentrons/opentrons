@@ -3,7 +3,7 @@ import { useSelector } from 'react-redux'
 import { LabwareNameOverlay, truncateString } from '@opentrons/components'
 import { getLabwareDisplayName } from '@opentrons/shared-data'
 import { selectors as uiLabwareSelectors } from '../../../ui/labware'
-import { LabwareOnDeck } from '../../../step-forms'
+import type { LabwareOnDeck } from '../../../step-forms'
 interface LabwareNameProps {
   labwareOnDeck: LabwareOnDeck
 }

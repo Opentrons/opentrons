@@ -1,2 +1,3 @@
 export { SelectRecoveryOption } from './SelectRecoveryOption'
-export { ResumeRun } from './ResumeRun'
+export { RetryStep } from './RetryStep'
+export { CancelRun } from './CancelRun'

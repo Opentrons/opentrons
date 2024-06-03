@@ -2,8 +2,8 @@ import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { useDispatch } from 'react-redux'
 import { actions as stepsActions } from '../../../ui/steps'
-import { TerminalItemId } from '../../../steplist'
 import styles from './styles.module.css'
+import type { TerminalItemId } from '../../../steplist'
 
 interface Props {
   terminalId: TerminalItemId

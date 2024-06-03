@@ -25,7 +25,7 @@ import {
   SPACING_3,
   TYPOGRAPHY,
 } from '@opentrons/components'
-import { CountPerStepType, StepType } from '../../form-types'
+import type { CountPerStepType, StepType } from '../../form-types'
 
 interface StepPillProps {
   stepType: StepType

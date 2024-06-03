@@ -12,7 +12,10 @@ import { TRASH_BIN_ADAPTER_FIXTURE } from '@opentrons/shared-data'
 import { i18n } from '../../../i18n'
 import { DeckFixtureSetupInstructionsModal } from '../../../organisms/DeviceDetailsDeckConfiguration/DeckFixtureSetupInstructionsModal'
 import { DeckConfigurationEditor } from '..'
-import { useNotifyDeckConfigurationQuery } from '../../../resources/deck_configuration'
+import {
+  useNotifyDeckConfigurationQuery,
+  useDeckConfigurationEditingTools,
+} from '../../../resources/deck_configuration'
 
 import type { UseQueryResult } from 'react-query'
 import type { DeckConfiguration } from '@opentrons/shared-data'
@@ -71,13 +74,18 @@ describe('DeckConfigurationEditor', () => {
     vi.mocked(useUpdateDeckConfigurationMutation).mockReturnValue({
       updateDeckConfiguration: mockUpdateDeckConfiguration,
     } as any)
+    vi.mocked(useDeckConfigurationEditingTools).mockReturnValue({
+      addFixtureToCutout: vi.fn(),
+      removeFixtureFromCutout: vi.fn(),
+      addFixtureModal: null,
+    })
   })
 
   it('should render text, button and DeckConfigurator', () => {
     render()
     screen.getByText('Deck configuration')
     screen.getByText('Setup Instructions')
-    screen.getByText('Confirm')
+    screen.getByText('Save')
     expect(vi.mocked(DeckConfigurator)).toHaveBeenCalled()
   })
 
@@ -85,27 +93,5 @@ describe('DeckConfigurationEditor', () => {
     render()
     fireEvent.click(screen.getByText('Setup Instructions'))
     expect(vi.mocked(DeckFixtureSetupInstructionsModal)).toHaveBeenCalled()
-  })
-
-  it('should call a mock function when tapping confirm', () => {
-    // (kk:10/26/2023)
-    // Once get approval, I will be able to update this case
-    // render()
-    // screen.getByText('Confirm').click()
-    // expect(mockUpdateDeckConfiguration).toHaveBeenCalled()
-  })
-
-  it('should call a mock function when tapping back button if there is no change', () => {
-    render()
-    fireEvent.click(screen.getByTestId('ChildNavigation_Back_Button'))
-    expect(mockGoBack).toHaveBeenCalled()
-  })
-
-  it('should render modal when tapping back button if there is a change', () => {
-    // (kk:10/26/2023)
-    // Once get approval, I will be able to update this case
-    // render()
-    // screen.getByTestId('ChildNavigation_Back_Button').click()
-    // expect(mockGoBack).toHaveBeenCalled()
   })
 })

@@ -1,12 +1,13 @@
 import * as React from 'react'
 import { vi, it, expect, describe, beforeEach, afterEach } from 'vitest'
 import { Provider } from 'react-redux'
-import { createStore, Store } from 'redux'
+import { createStore } from 'redux'
 import { renderHook } from '@testing-library/react'
 import { QueryClient, QueryClientProvider } from 'react-query'
 
 import { syncSystemTime } from '../../../../redux/robot-admin'
 import { useSyncRobotClock } from '..'
+import type { Store } from 'redux'
 
 vi.mock('../../../../redux/discovery')
 

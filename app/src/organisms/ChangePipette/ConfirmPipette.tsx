@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
-
+import { OT2_ROBOT_TYPE } from '@opentrons/shared-data'
 import {
   COLORS,
   SPACING,
@@ -13,11 +13,10 @@ import { CheckPipettesButton } from './CheckPipettesButton'
 import { SimpleWizardBody } from '../../molecules/SimpleWizardBody'
 import { LevelPipette } from './LevelPipette'
 
-import {
+import type {
   PipetteNameSpecs,
   PipetteModelSpecs,
   PipetteDisplayCategory,
-  OT2_ROBOT_TYPE,
 } from '@opentrons/shared-data'
 import type { PipetteOffsetCalibration } from '../../redux/calibration/types'
 import type { Mount } from '../../redux/pipettes/types'
@@ -58,6 +57,7 @@ export function ConfirmPipette(props: ConfirmPipetteProps): JSX.Element {
     actualPipette,
     setConfirmPipetteLevel,
     confirmPipetteLevel,
+    isDisabled,
   } = props
   const { t } = useTranslation('change_pipette')
 
@@ -141,6 +141,7 @@ export function ConfirmPipette(props: ConfirmPipetteProps): JSX.Element {
           <SuccessAndExitButtons
             {...props}
             confirmPipetteLevel={confirmPipetteLevel}
+            isDisabled={isDisabled}
           />
         ) : null}
       </>
@@ -221,6 +222,7 @@ function SuccessAndExitButtons(props: ConfirmPipetteProps): JSX.Element {
     toCalibrationDashboard,
     success,
     wrongWantedPipette,
+    isDisabled,
   } = props
   const { t } = useTranslation('change_pipette')
   return (
@@ -230,11 +232,16 @@ function SuccessAndExitButtons(props: ConfirmPipetteProps): JSX.Element {
         <SecondaryButton
           marginRight={SPACING.spacing8}
           onClick={toCalibrationDashboard}
+          disabled={isDisabled}
         >
           {t('calibrate_pipette_offset')}
         </SecondaryButton>
       ) : null}
-      <PrimaryButton textTransform={TEXT_TRANSFORM_CAPITALIZE} onClick={exit}>
+      <PrimaryButton
+        textTransform={TEXT_TRANSFORM_CAPITALIZE}
+        onClick={exit}
+        disabled={isDisabled}
+      >
         {t('shared:exit')}
       </PrimaryButton>
     </>

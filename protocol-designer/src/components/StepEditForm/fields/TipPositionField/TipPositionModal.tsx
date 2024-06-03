@@ -10,6 +10,8 @@ import {
   RadioGroup,
   SPACING,
   StyledText,
+  Tooltip,
+  useHoverTooltip,
 } from '@opentrons/components'
 import { getMainPagePortalEl } from '../../../portals/MainPageModalPortal'
 import { getIsTouchTipField } from '../../../../form-types'
@@ -51,11 +53,12 @@ export const TipPositionModal = (
     wellYWidthMm,
     closeModal,
   } = props
+  const [targetProps, tooltipProps] = useHoverTooltip()
   const zSpec = specs.z
   const ySpec = specs.y
   const xSpec = specs.x
 
-  const { t } = useTranslation(['modal', 'button'])
+  const { t } = useTranslation(['modal', 'button', 'tooltip'])
 
   if (zSpec == null || xSpec == null || ySpec == null) {
     console.error(
@@ -69,7 +72,7 @@ export const TipPositionModal = (
   })
 
   const [zValue, setZValue] = React.useState<string | null>(
-    zSpec?.value == null ? null : String(zSpec?.value)
+    zSpec?.value == null ? String(defaultMmFromBottom) : String(zSpec?.value)
   )
   const [yValue, setYValue] = React.useState<string | null>(
     ySpec?.value == null ? null : String(ySpec?.value)
@@ -255,7 +258,12 @@ export const TipPositionModal = (
           value={xValue ?? ''}
         />
       </Flex>
-      <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
+      <Flex
+        flexDirection={DIRECTION_COLUMN}
+        gridGap={SPACING.spacing4}
+        width="max-content"
+        {...targetProps}
+      >
         <StyledText as="label" paddingLeft={SPACING.spacing24}>
           {t('tip_position.field_titles.y_position')}
         </StyledText>
@@ -271,6 +279,7 @@ export const TipPositionModal = (
           units="mm"
           value={yValue ?? ''}
         />
+        <Tooltip {...tooltipProps}>{t('tooltip:y_position_value')}</Tooltip>
       </Flex>
       <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
         <StyledText as="label" paddingLeft={SPACING.spacing24}>

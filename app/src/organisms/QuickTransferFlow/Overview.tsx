@@ -13,10 +13,10 @@ import {
 import { ListItem } from '../../atoms/ListItem'
 import { CONSOLIDATE, DISTRIBUTE } from './constants'
 
-import type { QuickTransferSetupState } from './types'
+import type { QuickTransferSummaryState } from './types'
 
 interface OverviewProps {
-  state: QuickTransferSetupState
+  state: QuickTransferSummaryState
 }
 
 export function Overview(props: OverviewProps): JSX.Element | null {
@@ -33,18 +33,22 @@ export function Overview(props: OverviewProps): JSX.Element | null {
   const displayItems = [
     {
       option: t('pipette'),
-      value: state.pipette?.displayName,
+      value: state.pipette.displayName,
+    },
+    {
+      option: t('tip_rack'),
+      value: state.tipRack.metadata.displayName,
     },
     {
       option: t('source_labware'),
-      value: state.source?.metadata.displayName,
+      value: state.source.metadata.displayName,
     },
     {
       option: t('destination_labware'),
       value:
         state.destination === 'source'
-          ? state.source?.metadata.displayName
-          : state.destination?.metadata.displayName,
+          ? state.source.metadata.displayName
+          : state.destination.metadata.displayName,
     },
     {
       option: transferCopy,
@@ -61,7 +65,7 @@ export function Overview(props: OverviewProps): JSX.Element | null {
       {displayItems.map(displayItem => (
         <ListItem type="noActive" key={displayItem.option}>
           <Flex justifyContent={JUSTIFY_SPACE_BETWEEN} width="100%">
-            <StyledText css={TYPOGRAPHY.level4HeaderSemiBold} width="30rem">
+            <StyledText css={TYPOGRAPHY.level4HeaderSemiBold} width="20rem">
               {displayItem.option}
             </StyledText>
             <StyledText

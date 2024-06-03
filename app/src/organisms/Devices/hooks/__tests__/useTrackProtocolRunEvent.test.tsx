@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { createStore, Store } from 'redux'
+import { createStore } from 'redux'
 import { Provider } from 'react-redux'
 import { QueryClient, QueryClientProvider } from 'react-query'
 import { vi, it, expect, describe, beforeEach, afterEach } from 'vitest'
@@ -15,6 +15,7 @@ import {
 import { mockConnectableRobot } from '../../../../redux/discovery/__fixtures__'
 import { useRobot } from '../useRobot'
 
+import type { Store } from 'redux'
 import type { Mock } from 'vitest'
 
 vi.mock('../useRobot')

@@ -18,8 +18,13 @@ The Opentrons AI application's server.
    1. This allows formatting of of `.md` and `.json` files
 1. select the python version `pyenv local 3.12.3`
    1. This will create a `.python-version` file in this directory
-1. select the node version `nvs` currently 18.19\*
+1. select the node version with `nvs` or `nvm` currently 18.19\*
 1. Install pipenv and python dependencies `make setup`
+
+## For building and deploying
+
+1. AWS credentials and config
+1. docker
 
 ## Install a dev dependency
 
@@ -29,27 +34,27 @@ The Opentrons AI application's server.
 
 `python -m pipenv install openai==1.25.1`
 
-## Stack and structure
-
-### Lambda Pattern
-
-- [powertools](https://powertools.aws.dev/)
-- [reinvent talk for the pattern](https://www.youtube.com/watch?v=52W3Qyg242Y)
-- [for creating docs](https://www.ranthebuilder.cloud/post/serverless-open-api-documentation-with-aws-powertools)
-
-### Lambda Code Organizations and Separation of Concerns
+## FastAPI Code Organization and Separation of Concerns
 
 - handler
-  - the lambda handler
+  - the router and request/response handling
 - domain
-  - the business logic
+  - business logic
 - integration
-  - the integration with other services
+  - integration with other services
 
-[pytest]: https://docs.pytest.org/en/
-[openai python api library]: https://pypi.org/project/openai/
+## Dev process
 
-## Deploy
+1. Make your changes
+1. Fix what can be automatically then lint and unit test like CI will `make pre-commit`
+1. `make pre-commit` passes
+1. run locally `make run` this runs the FastAPI server directly at localhost:8000
+   1. this watches for changes and restarts the server
+1. test locally `make live-test` (ENV=local is the default in the Makefile)
+1. use the live client `make live-client`
 
-1. build the package `make build`
-1. deploy the package `make deploy ENV=sandbox AWS_PROFILE=robotics_ai_sandbox`
+## ECS Fargate
+
+- Our first version of this service is a long running POST that may take from 1-3 minutes to complete
+- This forces us to use CloudFront(Max 180) + Load Balancer + ECS Fargate FastAPI container
+- An AWS service ticket is needed to increase the max CloudFront response time from 60 to 180 seconds

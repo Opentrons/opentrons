@@ -5,7 +5,7 @@ import {
 } from '@opentrons/shared-data'
 import { makeContext, getInitialRobotStateStandard } from '../fixtures'
 import { disengageMagnet } from '../commandCreators/atomic/disengageMagnet'
-import { InvariantContext, RobotState } from '../types'
+import type { InvariantContext, RobotState } from '../types'
 const moduleId = 'magneticModuleId'
 const commandCreatorFnName = 'disengageMagnet'
 describe('disengageMagnet', () => {

@@ -9,9 +9,7 @@ import {
   selectors as dismissSelectors,
 } from '../../dismiss'
 import { selectors as stepFormSelectors } from '../../step-forms'
-import { StepFieldName } from '../../steplist/fieldLevel'
 import { selectors as fileDataSelectors } from '../../file-data'
-import { PRESAVED_STEP_ID } from '../../steplist'
 import {
   getVisibleFormWarnings,
   getVisibleFormErrors,
@@ -22,6 +20,7 @@ import { ErrorContents } from './ErrorContents'
 import { WarningContents } from './WarningContents'
 
 import type { CommandCreatorError } from '@opentrons/step-generation'
+import type { StepFieldName } from '../../steplist/fieldLevel'
 import type { ProfileItem } from '../../form-types'
 import type { ProfileFormError } from '../../steplist/formLevel/profileErrors'
 import type { AlertData, AlertType } from './types'
@@ -152,15 +151,12 @@ const AlertsComponent = (props: Props): JSX.Element => {
       dispatch(
         dismissActions.dismissTimelineWarning({
           type: dismissId,
-          stepId,
         })
       )
     } else {
       dispatch(
         dismissActions.dismissFormWarning({
           type: dismissId,
-          //  if stepId does not exist, assume it is a presaved step
-          stepId: stepId ?? PRESAVED_STEP_ID,
         })
       )
     }

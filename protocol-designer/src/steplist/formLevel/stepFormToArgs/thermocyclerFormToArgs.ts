@@ -1,9 +1,9 @@
 import { THERMOCYCLER_STATE, THERMOCYCLER_PROFILE } from '../../../constants'
-import {
+import { PROFILE_STEP } from '../../../form-types'
+import type {
   ThermocyclerProfileStepArgs,
   ThermocyclerStateStepArgs,
 } from '@opentrons/step-generation'
-import { PROFILE_STEP } from '../../../form-types'
 import type {
   FormData,
   ProfileItem,

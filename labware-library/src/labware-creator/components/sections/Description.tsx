@@ -1,6 +1,5 @@
 import * as React from 'react'
 import { useFormikContext } from 'formik'
-import { LabwareFields } from '../../fields'
 import { isEveryFieldHidden } from '../../utils'
 import { getIsOpentronsTubeRack } from '../../utils/getIsOpentronsTubeRack'
 import { FormAlerts } from '../alerts/FormAlerts'
@@ -9,6 +8,7 @@ import { SectionBody } from './SectionBody'
 
 import styles from '../../styles.module.css'
 import { Flex } from '@opentrons/components'
+import type { LabwareFields } from '../../fields'
 
 interface Props {
   values: LabwareFields

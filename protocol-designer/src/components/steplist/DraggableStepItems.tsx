@@ -1,23 +1,18 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
-import {
-  DragLayerMonitor,
-  useDrop,
-  useDrag,
-  DropTargetOptions,
-} from 'react-dnd'
+import { useDrop, useDrag } from 'react-dnd'
 
 import { DND_TYPES } from '../../constants'
 import { selectors as stepFormSelectors } from '../../step-forms'
-import { stepIconsByType, StepIdType } from '../../form-types'
-import {
-  ConnectedStepItem,
-  ConnectedStepItemProps,
-} from '../../containers/ConnectedStepItem'
+import { stepIconsByType } from '../../form-types'
+import { ConnectedStepItem } from '../../containers/ConnectedStepItem'
 import { PDTitledList } from '../lists'
 import { ContextMenu } from './ContextMenu'
 import styles from './StepItem.module.css'
+import type { DragLayerMonitor, DropTargetOptions } from 'react-dnd'
+import type { StepIdType } from '../../form-types'
+import type { ConnectedStepItemProps } from '../../containers/ConnectedStepItem'
 
 interface DragDropStepItemProps extends ConnectedStepItemProps {
   stepId: StepIdType

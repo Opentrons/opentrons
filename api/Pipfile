@@ -11,6 +11,7 @@ opentrons-shared-data = { editable = true, path = "../shared-data/python" }
 opentrons = { editable = true, path = "." }
 opentrons-hardware = { editable = true, path = "./../hardware", extras=["FLEX"] }
 numpy = "==1.22.3"
+pyusb = "==1.2.1"
 
 [dev-packages]
 # atomicwrites and colorama are pytest dependencies on windows,

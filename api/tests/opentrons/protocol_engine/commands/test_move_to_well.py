@@ -5,6 +5,7 @@ from opentrons.protocol_engine import WellLocation, WellOffset, DeckPoint
 from opentrons.protocol_engine.execution import MovementHandler
 from opentrons.types import Point
 
+from opentrons.protocol_engine.commands.command import SuccessData
 from opentrons.protocol_engine.commands.move_to_well import (
     MoveToWellParams,
     MoveToWellResult,
@@ -43,4 +44,6 @@ async def test_move_to_well_implementation(
 
     result = await subject.execute(data)
 
-    assert result == MoveToWellResult(position=DeckPoint(x=9, y=8, z=7))
+    assert result == SuccessData(
+        public=MoveToWellResult(position=DeckPoint(x=9, y=8, z=7)), private=None
+    )

@@ -10,6 +10,7 @@ from opentrons.protocol_engine.state.module_substates import (
 )
 from opentrons.protocol_engine.execution import EquipmentHandler
 from opentrons.protocol_engine.commands import heater_shaker
+from opentrons.protocol_engine.commands.command import SuccessData
 from opentrons.protocol_engine.commands.heater_shaker.wait_for_temperature import (
     WaitForTemperatureImpl,
 )
@@ -48,4 +49,6 @@ async def test_wait_for_temperature(
     decoy.verify(
         await hs_hardware.await_temperature(awaiting_temperature=123.45), times=1
     )
-    assert result == heater_shaker.WaitForTemperatureResult()
+    assert result == SuccessData(
+        public=heater_shaker.WaitForTemperatureResult(), private=None
+    )

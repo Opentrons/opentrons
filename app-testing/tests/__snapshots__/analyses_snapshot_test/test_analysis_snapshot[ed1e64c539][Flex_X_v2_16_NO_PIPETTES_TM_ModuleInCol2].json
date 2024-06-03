@@ -15,7 +15,7 @@
         "errorInfo": {
           "args": "('A temperatureModuleType cannot be loaded into slot C2',)",
           "class": "ValueError",
-          "traceback": "  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocol_engine/execution/command_executor.py\", line 150, in execute\n    result: CommandResult = await command_impl.execute(running_command.params)  # type: ignore[arg-type]\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocol_engine/commands/load_module.py\", line 116, in execute\n    self._ensure_module_location(params.location.slotName, module_type)\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocol_engine/commands/load_module.py\", line 176, in _ensure_module_location\n    raise ValueError(\n"
+          "traceback": "  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocol_engine/execution/command_executor.py\", line 146, in execute\n    result = await command_impl.execute(\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocol_engine/commands/load_module.py\", line 121, in execute\n    self._ensure_module_location(params.location.slotName, module_type)\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocol_engine/commands/load_module.py\", line 184, in _ensure_module_location\n    raise ValueError(\n"
         },
         "errorType": "PythonException",
         "wrappedErrors": []
@@ -56,7 +56,7 @@
               "errorInfo": {
                 "args": "('A temperatureModuleType cannot be loaded into slot C2',)",
                 "class": "ValueError",
-                "traceback": "  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocol_engine/execution/command_executor.py\", line 150, in execute\n    result: CommandResult = await command_impl.execute(running_command.params)  # type: ignore[arg-type]\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocol_engine/commands/load_module.py\", line 116, in execute\n    self._ensure_module_location(params.location.slotName, module_type)\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocol_engine/commands/load_module.py\", line 176, in _ensure_module_location\n    raise ValueError(\n"
+                "traceback": "  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocol_engine/execution/command_executor.py\", line 146, in execute\n    result = await command_impl.execute(\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocol_engine/commands/load_module.py\", line 121, in execute\n    self._ensure_module_location(params.location.slotName, module_type)\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocol_engine/commands/load_module.py\", line 184, in _ensure_module_location\n    raise ValueError(\n"
               },
               "errorType": "PythonException",
               "wrappedErrors": []

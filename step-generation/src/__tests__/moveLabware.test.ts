@@ -1,7 +1,6 @@
 import { beforeEach, describe, it, expect, afterEach, vi } from 'vitest'
 import {
   HEATERSHAKER_MODULE_TYPE,
-  LabwareDefinition2,
   WASTE_CHUTE_CUTOUT,
 } from '@opentrons/shared-data'
 import {
@@ -14,9 +13,11 @@ import {
   SOURCE_LABWARE,
   TIPRACK_1,
 } from '../fixtures'
-import { moveLabware, MoveLabwareArgs } from '..'
+import { moveLabware } from '..'
 
+import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import type { InvariantContext, RobotState } from '../types'
+import type { MoveLabwareArgs } from '..'
 
 const mockWasteChuteId = 'mockWasteChuteId'
 const mockGripperId = 'mockGripperId'

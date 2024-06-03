@@ -28,8 +28,6 @@ import {
   getLabwareDefURI,
   getLabwareDisplayName,
   HEATERSHAKER_MODULE_TYPE,
-  LoadLabwareRunTimeCommand,
-  RunTimeCommand,
 } from '@opentrons/shared-data'
 import { parseInitialLoadedLabwareByAdapter } from '@opentrons/api-client'
 import {
@@ -46,10 +44,7 @@ import { useMostRecentCompletedAnalysis } from '../LabwarePositionCheck/useMostR
 import { getLabwareSetupItemGroups } from '../../pages/Protocols/utils'
 import { getProtocolModulesInfo } from '../Devices/ProtocolRun/utils/getProtocolModulesInfo'
 import { getAttachedProtocolModuleMatches } from '../ProtocolSetupModulesAndDeck/utils'
-import {
-  getNestedLabwareInfo,
-  NestedLabwareInfo,
-} from '../Devices/ProtocolRun/SetupLabware/getNestedLabwareInfo'
+import { getNestedLabwareInfo } from '../Devices/ProtocolRun/SetupLabware/getNestedLabwareInfo'
 import { LabwareMapViewModal } from './LabwareMapViewModal'
 import { useNotifyDeckConfigurationQuery } from '../../resources/deck_configuration'
 
@@ -59,10 +54,13 @@ import type {
   HeaterShakerOpenLatchCreateCommand,
   LabwareDefinition2,
   LabwareLocation,
+  LoadLabwareRunTimeCommand,
+  RunTimeCommand,
 } from '@opentrons/shared-data'
 import type { HeaterShakerModule, Modules } from '@opentrons/api-client'
 import type { LabwareSetupItem } from '../../pages/Protocols/utils'
 import type { SetupScreens } from '../../pages/ProtocolSetup'
+import type { NestedLabwareInfo } from '../Devices/ProtocolRun/SetupLabware/getNestedLabwareInfo'
 import type { AttachedProtocolModuleMatch } from '../ProtocolSetupModulesAndDeck/utils'
 
 const MODULE_REFETCH_INTERVAL_MS = 5000

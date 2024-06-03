@@ -2,11 +2,11 @@ import * as React from 'react'
 import { screen } from '@testing-library/react'
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import '@testing-library/jest-dom/vitest'
-import { Mount } from '@opentrons/components'
 import { i18n } from '../../../../i18n'
 import { renderWithProviders } from '../../../../__testing-utils__'
 import { TipLengthCalibrationItems } from '../TipLengthCalibrationItems'
 import { OverflowMenu } from '../OverflowMenu'
+import type { Mount } from '@opentrons/components'
 
 vi.mock('../../../../redux/custom-labware/selectors')
 vi.mock('../../../../redux/config')

@@ -9,8 +9,8 @@ import {
   CLOSE_BATCH_EDIT_FORM,
 } from '../modals/ConfirmDeleteModal'
 import { StepSelectionBannerComponent } from './StepSelectionBannerComponent'
-import { ThunkDispatch } from 'redux-thunk'
-import { BaseState } from '../../types'
+import type { ThunkDispatch } from 'redux-thunk'
+import type { BaseState } from '../../types'
 
 const MemoizedStepSelectionBannerComponent = React.memo(
   StepSelectionBannerComponent

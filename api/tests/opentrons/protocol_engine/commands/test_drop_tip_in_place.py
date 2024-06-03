@@ -4,6 +4,7 @@ from decoy import Decoy
 
 from opentrons.protocol_engine.execution import TipHandler
 
+from opentrons.protocol_engine.commands.command import SuccessData
 from opentrons.protocol_engine.commands.drop_tip_in_place import (
     DropTipInPlaceParams,
     DropTipInPlaceResult,
@@ -28,7 +29,7 @@ async def test_drop_tip_implementation(
 
     result = await subject.execute(params)
 
-    assert result == DropTipInPlaceResult()
+    assert result == SuccessData(public=DropTipInPlaceResult(), private=None)
 
     decoy.verify(
         await mock_tip_handler.drop_tip(pipette_id="abc", home_after=False),

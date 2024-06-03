@@ -6,27 +6,27 @@ import {
   StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
-import {
-  CompletedProtocolAnalysis,
-  getPipetteNameSpecs,
-  CreateCommand,
-} from '@opentrons/shared-data'
+import { getPipetteNameSpecs } from '@opentrons/shared-data'
 import { css } from 'styled-components'
 import { ProbeNotAttached } from '../PipetteWizardFlows/ProbeNotAttached'
 import { RobotMotionLoader } from './RobotMotionLoader'
 import attachProbe1 from '../../assets/videos/pipette-wizard-flows/Pipette_Attach_Probe_1.webm'
 import attachProbe8 from '../../assets/videos/pipette-wizard-flows/Pipette_Attach_Probe_8.webm'
 import attachProbe96 from '../../assets/videos/pipette-wizard-flows/Pipette_Attach_Probe_96.webm'
-import { useChainRunCommands } from '../../resources/runs'
 import { GenericWizardTile } from '../../molecules/GenericWizardTile'
 
+import type {
+  CompletedProtocolAnalysis,
+  CreateCommand,
+} from '@opentrons/shared-data'
+import type { LabwareOffset } from '@opentrons/api-client'
 import type { Jog } from '../../molecules/JogControls/types'
+import type { useChainRunCommands } from '../../resources/runs'
 import type {
   AttachProbeStep,
   RegisterPositionAction,
   WorkingOffset,
 } from './types'
-import type { LabwareOffset } from '@opentrons/api-client'
 
 interface AttachProbeProps extends AttachProbeStep {
   protocolData: CompletedProtocolAnalysis

@@ -6,9 +6,9 @@ import * as DiscoverySelectors from '../../../discovery/selectors'
 import * as Fixtures from '../../__fixtures__'
 
 import * as Actions from '../../actions'
-import * as Types from '../../types'
 import { modulesEpic } from '../../epic'
 
+import type * as Types from '../../types'
 import type { Action, State } from '../../../types'
 
 vi.mock('../../../robot-api/http')

@@ -1,7 +1,6 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import {
-  Box,
   DIRECTION_COLUMN,
   Flex,
   SPACING,
@@ -16,28 +15,26 @@ export const UnMatchedModuleWarning = (): JSX.Element | null => {
   if (!showBanner) return null
 
   return (
-    <Box marginTop={SPACING.spacing8}>
-      <Banner
-        iconMarginRight={SPACING.spacing16}
-        iconMarginLeft={SPACING.spacing8}
-        type="warning"
-        size={SPACING.spacing20}
-        onCloseClick={() => setShowBanner(false)}
-      >
-        <Flex flexDirection={DIRECTION_COLUMN}>
-          <StyledText
-            as="p"
-            fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-            data-testid="UnMatchedModuleWarning_title"
-          >
-            {t('extra_module_attached')}
-          </StyledText>
+    <Banner
+      iconMarginRight={SPACING.spacing16}
+      iconMarginLeft={SPACING.spacing8}
+      type="warning"
+      size={SPACING.spacing20}
+      onCloseClick={() => setShowBanner(false)}
+    >
+      <Flex flexDirection={DIRECTION_COLUMN}>
+        <StyledText
+          as="p"
+          fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+          data-testid="UnMatchedModuleWarning_title"
+        >
+          {t('extra_module_attached')}
+        </StyledText>
 
-          <StyledText as="p" data-testid="UnMatchedModuleWarning_body">
-            {`${t('module_mismatch_body')}.`}
-          </StyledText>
-        </Flex>
-      </Banner>
-    </Box>
+        <StyledText as="p" data-testid="UnMatchedModuleWarning_body">
+          {`${t('module_mismatch_body')}.`}
+        </StyledText>
+      </Flex>
+    </Banner>
   )
 }

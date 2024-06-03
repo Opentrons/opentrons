@@ -1,42 +1,44 @@
-import os
 from pathlib import Path
 
-import boto3
-from dotenv import load_dotenv
-from pydantic import (
-    SecretStr,
-)
+from pydantic import SecretStr
+from pydantic_settings import BaseSettings, SettingsConfigDict
 
 ENV_PATH: Path = Path(Path(__file__).parent.parent, ".env")
 
 
-class Settings:
-    def __init__(self) -> None:
-        # Load environment variables from .env file if it exists
-        # These map to the the environment variables defined and set in terraform
-        # These may also be set with some future need during lambda version creation
-        load_dotenv(ENV_PATH)
-        self.typicode_base_url: str = os.getenv("TYPICODE_BASE_URL", "https://jsonplaceholder.typicode.com")
-        self.openai_base_url: str = os.getenv("OPENAI_BASE_URL", "https://api.openai.com")
-        self.huggingface_base_url: str = os.getenv("HUGGINGFACE_BASE_URL", "https://api-inference.huggingface.co")
-        self.log_level: str = os.getenv("LOG_LEVEL", "debug")
-        self.service_name: str = os.getenv("SERVICE_NAME", "local-ai-api")
-        self.environment: str = os.getenv("ENVIRONMENT", "local")
-        if is_running_on_lambda():
-            # Fetch secrets from AWS Secrets manager using AWS Lambda Powertools
-            self.openai_api_key: SecretStr = self.fetch_secret(f"{self.environment}-openai-api-key")
-            self.huggingface_api_key: SecretStr = self.fetch_secret(f"{self.environment}-huggingface-api-key")
-        else:
-            # Use values from .env or defaults if not set
-            self.openai_api_key = SecretStr(os.getenv("OPENAI_API_KEY", "default-openai-secret"))  # can change to throw
-            self.huggingface_api_key = SecretStr(os.getenv("HUGGINGFACE_API_KEY", "default-huggingface-secret"))  # can change to throw
+class Settings(BaseSettings):
+    """
+    If the env_file file exists: It will read the configurations from the env_file file (local execution)
+    If the env_file file does not exist:
+    It will read the configurations from the environment variables set in the operating system (deployed execution)
+    If the variable is not set in the OS the default value is used (this is just for creating the .env file with default values)
+    """
 
-    @staticmethod
-    def fetch_secret(secret_name: str) -> SecretStr:
-        """Fetch a secret using Boto3."""
-        client = boto3.client("secretsmanager")
-        response = client.get_secret_value(SecretId=secret_name)
-        return SecretStr(response["SecretString"])
+    model_config = SettingsConfigDict(env_file=ENV_PATH, env_file_encoding="utf-8")
+    environment: str = "local"
+    huggingface_simulate_endpoint: str = "https://Opentrons-simulator.hf.space/protocol"
+    log_level: str = "info"
+    service_name: str = "local-ai-api"
+    openai_model_name: str = "gpt-4-1106-preview"
+    auth0_domain: str = "opentrons-dev.us.auth0.com"
+    auth0_api_audience: str = "sandbox-ai-api"
+    auth0_issuer: str = "https://identity.auth-dev.opentrons.com/"
+    auth0_algorithms: str = "RS256"
+    dd_version: str = "hardcoded_default_from_settings"
+    allowed_origins: str = "*"
+    dd_logs_injection: str = "true"
+
+    # Secrets
+    # These come from environment variables in the local and deployed execution environments
+    openai_api_key: SecretStr = SecretStr("default_openai_api_key")
+    huggingface_api_key: SecretStr = SecretStr("default_huggingface_api_key")
+
+
+def get_settings_from_json(json_str: str) -> Settings:
+    """
+    Validates the settings from a json string.
+    """
+    return Settings.model_validate_json(json_str)
 
 
 def generate_env_file(settings: Settings) -> None:
@@ -44,20 +46,15 @@ def generate_env_file(settings: Settings) -> None:
     Generates a .env file from the current settings including defaults.
     """
     with open(ENV_PATH, "w") as file:
-        for field, value in vars(settings).items():
-            # Ensure we handle secret types appropriately
-            value = value.get_secret_value() if isinstance(value, SecretStr) else value
+        for field, value in settings.model_dump().items():
             if value is not None:
+                if isinstance(value, SecretStr):
+                    value = value.get_secret_value()
                 file.write(f"{field.upper()}={value}\n")
     print(f".env file generated at {str(ENV_PATH)}")
 
 
-def is_running_on_lambda() -> bool:
-    """Check if the script is running on AWS Lambda."""
-    return "AWS_LAMBDA_FUNCTION_NAME" in os.environ
-
-
 # Example usage
 if __name__ == "__main__":
-    config = Settings()
+    config: Settings = Settings()
     generate_env_file(config)

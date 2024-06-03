@@ -26,6 +26,7 @@ from opentrons.protocol_engine.commands.calibration.calibrate_gripper import (
     CalibrateGripperParams,
     CalibrateGripperParamsJaw,
 )
+from opentrons.protocol_engine.commands.command import SuccessData
 from opentrons.protocol_engine.errors import HardwareNotSupportedError
 from opentrons.protocol_engine.types import Vec3f
 
@@ -69,7 +70,10 @@ async def test_calibrate_gripper(
     ).then_return(Point(1.1, 2.2, 3.3))
 
     result = await subject.execute(params)
-    assert result == CalibrateGripperResult(jawOffset=Vec3f(x=1.1, y=2.2, z=3.3))
+    assert result == SuccessData(
+        public=CalibrateGripperResult(jawOffset=Vec3f(x=1.1, y=2.2, z=3.3)),
+        private=None,
+    )
 
 
 @pytest.mark.ot3_only
@@ -101,8 +105,8 @@ async def test_calibrate_gripper_saves_calibration(
         )
     ).then_return(expected_calibration_data)
     result = await subject.execute(params)
-    assert result.jawOffset == Vec3f(x=1.1, y=2.2, z=3.3)
-    assert result.savedCalibration == expected_calibration_data
+    assert result.public.jawOffset == Vec3f(x=1.1, y=2.2, z=3.3)
+    assert result.public.savedCalibration == expected_calibration_data
 
 
 @pytest.mark.ot3_only

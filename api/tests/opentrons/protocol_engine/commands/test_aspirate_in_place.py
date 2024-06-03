@@ -10,6 +10,7 @@ from opentrons.protocol_engine.commands.aspirate_in_place import (
     AspirateInPlaceResult,
     AspirateInPlaceImplementation,
 )
+from opentrons.protocol_engine.commands.command import SuccessData
 from opentrons.protocol_engine.errors.exceptions import PipetteNotReadyToAspirateError
 from opentrons.protocol_engine.notes import CommandNoteAdder
 
@@ -84,7 +85,7 @@ async def test_aspirate_in_place_implementation(
 
     result = await subject.execute(params=data)
 
-    assert result == AspirateInPlaceResult(volume=123)
+    assert result == SuccessData(public=AspirateInPlaceResult(volume=123), private=None)
 
 
 async def test_handle_aspirate_in_place_request_not_ready_to_aspirate(

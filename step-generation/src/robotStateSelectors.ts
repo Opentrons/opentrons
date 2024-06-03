@@ -5,7 +5,6 @@ import {
   getLabwareDefURI,
   THERMOCYCLER_MODULE_TYPE,
   orderWells,
-  NozzleConfigurationStyle,
   COLUMN,
   ALL,
 } from '@opentrons/shared-data'
@@ -16,6 +15,7 @@ import type {
   RobotState,
   ThermocyclerModuleState,
 } from './types'
+import type { NozzleConfigurationStyle } from '@opentrons/shared-data'
 
 export function sortLabwareBySlot(
   labwareState: RobotState['labware']

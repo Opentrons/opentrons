@@ -22,12 +22,7 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 import {
-  CompletedProtocolAnalysis,
-  LabwareDefinitionsByUri,
-  LabwareLocation,
-  MoveLabwareRunTimeCommand,
   OT2_ROBOT_TYPE,
-  RobotType,
   getDeckDefFromRobotType,
   getLabwareDisplayName,
   getLoadedLabwareDefinitionsByUri,
@@ -50,6 +45,13 @@ import {
 } from '../CommandText/utils/accessors'
 import { useNotifyDeckConfigurationQuery } from '../../resources/deck_configuration'
 
+import type {
+  CompletedProtocolAnalysis,
+  LabwareDefinitionsByUri,
+  LabwareLocation,
+  MoveLabwareRunTimeCommand,
+  RobotType,
+} from '@opentrons/shared-data'
 import type { RunData } from '@opentrons/api-client'
 
 const LABWARE_DESCRIPTION_STYLE = css`

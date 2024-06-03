@@ -7,10 +7,10 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import { FLEX_ROBOT_TYPE, OT2_ROBOT_TYPE } from '@opentrons/shared-data'
 
 import { useSortedProtocols } from '../hooks'
-import { StoredProtocolData } from '../../../redux/protocol-storage'
 
 import type { Store } from 'redux'
 import type { ProtocolAnalysisOutput } from '@opentrons/shared-data'
+import type { StoredProtocolData } from '../../../redux/protocol-storage'
 import type { State } from '../../../redux/types'
 
 const mockStoredProtocolData = [

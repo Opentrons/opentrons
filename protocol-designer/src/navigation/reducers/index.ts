@@ -1,8 +1,12 @@
-import { Reducer, combineReducers } from 'redux'
+import { combineReducers } from 'redux'
 import { handleActions } from 'redux-actions'
-import { BaseState, Action } from '../../types'
-import { NavigateToPageAction, ToggleNewProtocolModalAction } from '../actions'
-import { Page } from '../types'
+import type { Reducer } from 'redux'
+import type { BaseState, Action } from '../../types'
+import type {
+  NavigateToPageAction,
+  ToggleNewProtocolModalAction,
+} from '../actions'
+import type { Page } from '../types'
 const page: Reducer<Page, any> = handleActions(
   {
     LOAD_FILE: (): Page => 'file-detail',

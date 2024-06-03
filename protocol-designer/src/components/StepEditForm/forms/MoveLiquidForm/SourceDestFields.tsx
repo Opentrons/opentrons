@@ -145,24 +145,6 @@ export const SourceDestFields = (props: SourceDestFieldsProps): JSX.Element => {
           </>
         )}
 
-        <CheckboxRowField
-          {...propsForFields[addFieldNamePrefix('touchTip_checkbox')]}
-          label={t('step_edit_form.field.touchTip.label')}
-          className={styles.small_field}
-        >
-          <TipPositionField
-            propsForFields={propsForFields}
-            zField={`${prefix}_touchTip_mmFromBottom`}
-            labwareId={
-              formData[
-                getLabwareFieldForPositioningField(
-                  addFieldNamePrefix('touchTip_mmFromBottom')
-                )
-              ]
-            }
-          />
-        </CheckboxRowField>
-
         {prefix === 'dispense' && (
           <CheckboxRowField
             {...propsForFields.blowout_checkbox}
@@ -192,6 +174,25 @@ export const SourceDestFields = (props: SourceDestFieldsProps): JSX.Element => {
             />
           </CheckboxRowField>
         )}
+
+        <CheckboxRowField
+          {...propsForFields[addFieldNamePrefix('touchTip_checkbox')]}
+          label={t('step_edit_form.field.touchTip.label')}
+          className={styles.small_field}
+        >
+          <TipPositionField
+            propsForFields={propsForFields}
+            zField={`${prefix}_touchTip_mmFromBottom`}
+            labwareId={
+              formData[
+                getLabwareFieldForPositioningField(
+                  addFieldNamePrefix('touchTip_mmFromBottom')
+                )
+              ]
+            }
+          />
+        </CheckboxRowField>
+
         <CheckboxRowField
           {...propsForFields[addFieldNamePrefix('airGap_checkbox')]}
           label={t('step_edit_form.field.airGap.label')}
