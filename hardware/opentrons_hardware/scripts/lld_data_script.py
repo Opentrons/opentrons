@@ -9,7 +9,7 @@ import numpy
 from abc import ABC, abstractmethod
 
 impossible_pressure = 9001.0
-accepted_error = 0.1
+accepted_error = 0.5
 
 
 class LLDAlgoABC(ABC):
@@ -408,6 +408,7 @@ def run(
     final_results: List[Tuple[float, List[float], str, str]] = []
     for report_file in report_files:
         with open(path + report_file, "r") as file:
+            print(report_file)
             reader = csv.reader(file)
             reader_list = list(reader)
 
@@ -472,17 +473,17 @@ def run(
                 print("No threshold found {algorithm.name()}")
                 results.append(sys.float_info.max)
         print(
-            f"{algorithm.name()}, expected {expected_height} max {max(results)} min{min(results)}, avg {sum(results)/len(results)}"
+            f"{algorithm.name()}, expected {expected_travel} max {max(results)} min{min(results)}, avg {sum(results)/len(results)}"
         )
         final_results.append(
-            (float(expected_height), results, f"{algorithm.name()}", f"{report_file}")
+            (float(expected_travel), results, f"{algorithm.name()}", f"{report_file}")
         )
     return final_results
 
 
-def _check_for_failure(expected_height: float, results: List[float]) -> bool:
+def _check_for_failure(expected_travel: float, results: List[float]) -> bool:
     for result in results:
-        if abs(expected_height - result) > accepted_error:
+        if abs(expected_travel - result) > accepted_error:
             return True
     return False
 
@@ -539,11 +540,11 @@ def main() -> None:
     precision_score: Dict[str, int] = _score(algorithms, precision)
     algorithm_score: Dict[str, int] = {algo.name(): 0 for algo in algorithms}
 
-    print("Accuracy Scores")
+    print("\nAccuracy Scores")
     for a_name in accuracy_score.keys():
         print(f"{a_name} {accuracy_score[a_name]}")
 
-    print("Precision Scores")
+    print("\nPrecision Scores")
     for a_name in precision_score.keys():
         print(f"{a_name} {precision_score[a_name]}")
         # add the two scores together for final score so we can sort before printing
@@ -552,7 +553,7 @@ def main() -> None:
     algorithm_score = dict(
         sorted(algorithm_score.items(), key=lambda item: item[1], reverse=True)
     )
-    print("Total Scores")
+    print("\nTotal Scores")
     for a_name in algorithm_score.keys():
         print(f"{a_name} {algorithm_score[a_name]}")
 
