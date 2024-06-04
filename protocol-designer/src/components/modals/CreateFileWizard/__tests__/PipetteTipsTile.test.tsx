@@ -51,6 +51,7 @@ const mockWizardTileProps: Partial<WizardTileProps> = {
   proceed: vi.fn(),
   watch: vi.fn((name: keyof typeof values) => values[name]) as any,
   getValues: vi.fn(() => values) as any,
+  setValue: vi.fn(),
 }
 
 const fixtureTipRack10ul = {

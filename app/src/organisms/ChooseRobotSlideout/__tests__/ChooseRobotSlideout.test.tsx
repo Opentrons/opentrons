@@ -22,13 +22,13 @@ import {
 import { useFeatureFlag } from '../../../redux/config'
 import { getNetworkInterfaces } from '../../../redux/networking'
 import { ChooseRobotSlideout } from '..'
-import { useNotifyService } from '../../../resources/useNotifyService'
+import { useNotifyDataReady } from '../../../resources/useNotifyDataReady'
 import type { RunTimeParameter } from '@opentrons/shared-data'
 
 vi.mock('../../../redux/discovery')
 vi.mock('../../../redux/robot-update')
 vi.mock('../../../redux/networking')
-vi.mock('../../../resources/useNotifyService')
+vi.mock('../../../resources/useNotifyDataReady')
 vi.mock('../../../redux/config')
 const render = (props: React.ComponentProps<typeof ChooseRobotSlideout>) => {
   return renderWithProviders(
@@ -111,7 +111,7 @@ describe('ChooseRobotSlideout', () => {
       wifi: null,
       ethernet: null,
     })
-    vi.mocked(useNotifyService).mockReturnValue({} as any)
+    vi.mocked(useNotifyDataReady).mockReturnValue({} as any)
   })
 
   it('renders slideout if isExpanded true', () => {
@@ -309,5 +309,23 @@ describe('ChooseRobotSlideout', () => {
       robotType: OT2_ROBOT_TYPE,
     })
     expect(mockSetSelectedRobot).toBeCalledWith(null)
+  })
+
+  it('shows tooltip when disabled Restore default values link is clicked', () => {
+    render({
+      onCloseClick: vi.fn(),
+      isExpanded: true,
+      isSelectedRobotOnDifferentSoftwareVersion: false,
+      selectedRobot: null,
+      setSelectedRobot: mockSetSelectedRobot,
+      title: 'choose robot slideout title',
+      robotType: OT2_ROBOT_TYPE,
+      multiSlideout: { currentPage: 2 },
+      runTimeParametersOverrides: mockRunTimeParameters,
+    })
+
+    const restoreValuesLink = screen.getByText('Restore default values')
+    fireEvent.click(restoreValuesLink)
+    screen.getByText('No custom values specified')
   })
 })

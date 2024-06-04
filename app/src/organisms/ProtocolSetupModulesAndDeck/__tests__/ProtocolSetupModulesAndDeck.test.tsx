@@ -1,10 +1,10 @@
 import * as React from 'react'
-import { UseQueryResult } from 'react-query'
 import { fireEvent, screen, waitFor } from '@testing-library/react'
 import { vi, it, expect, describe, beforeEach, afterEach } from 'vitest'
 import { when } from 'vitest-when'
 import { MemoryRouter } from 'react-router-dom'
 
+import { RUN_STATUS_IDLE } from '@opentrons/api-client'
 import {
   FLEX_ROBOT_TYPE,
   WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE,
@@ -36,8 +36,10 @@ import { FixtureTable } from '../FixtureTable'
 import { ModulesAndDeckMapViewModal } from '../ModulesAndDeckMapViewModal'
 import { ProtocolSetupModulesAndDeck } from '..'
 import { useNotifyDeckConfigurationQuery } from '../../../resources/deck_configuration'
+import { useRunStatus } from '../../RunTimeControl/hooks'
 
 import type { CutoutConfig, DeckConfiguration } from '@opentrons/shared-data'
+import type { UseQueryResult } from 'react-query'
 
 vi.mock('../../../resources/runs')
 vi.mock('../../../redux/discovery')
@@ -53,6 +55,7 @@ vi.mock('../../ModuleWizardFlows')
 vi.mock('../FixtureTable')
 vi.mock('../../Devices/ProtocolRun/SetupModuleAndDeck/LocationConflictModal')
 vi.mock('../ModulesAndDeckMapViewModal')
+vi.mock('../../RunTimeControl/hooks')
 
 const ROBOT_NAME = 'otie'
 const RUN_ID = '1'
@@ -134,6 +137,7 @@ describe('ProtocolSetupModulesAndDeck', () => {
       chainLiveCommands: mockChainLiveCommands,
     } as any)
     vi.mocked(FixtureTable).mockReturnValue(<div>mock FixtureTable</div>)
+    vi.mocked(useRunStatus).mockReturnValue(RUN_STATUS_IDLE)
   })
 
   afterEach(() => {

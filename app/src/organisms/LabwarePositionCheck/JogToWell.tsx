@@ -26,7 +26,6 @@ import {
   getPipetteNameSpecs,
   getVectorDifference,
   getVectorSum,
-  PipetteName,
 } from '@opentrons/shared-data'
 
 import levelWithTip from '../../assets/images/lpc_level_with_tip.svg'
@@ -41,10 +40,10 @@ import { NeedHelpLink } from '../CalibrationPanels'
 import { JogControls } from '../../molecules/JogControls'
 import { LiveOffsetValue } from './LiveOffsetValue'
 
-import type { Jog } from '../../molecules/JogControls'
-import type { LabwareDefinition2 } from '@opentrons/shared-data'
+import type { PipetteName, LabwareDefinition2 } from '@opentrons/shared-data'
 import type { WellStroke } from '@opentrons/components'
 import type { VectorOffset } from '@opentrons/api-client'
+import type { Jog } from '../../molecules/JogControls'
 
 const DECK_MAP_VIEWBOX = '-10 -10 150 105'
 const LPC_HELP_LINK_URL =

@@ -1,5 +1,4 @@
 import { handleActions } from 'redux-actions'
-import { Reducer } from 'redux'
 import mapValues from 'lodash/mapValues'
 import cloneDeep from 'lodash/cloneDeep'
 import merge from 'lodash/merge'
@@ -12,21 +11,12 @@ import {
   getLabwareDefaultEngageHeight,
   getLabwareDefURI,
   getModuleType,
-  LoadLabwareCreateCommand,
-  LoadModuleCreateCommand,
-  LoadPipetteCreateCommand,
-  MoveLabwareCreateCommand,
-  MoveToAddressableAreaCreateCommand,
-  MoveToAddressableAreaForDropTipCreateCommand,
   MAGNETIC_MODULE_TYPE,
   MAGNETIC_MODULE_V1,
-  PipetteName,
   THERMOCYCLER_MODULE_TYPE,
   WASTE_CHUTE_ADDRESSABLE_AREAS,
-  AddressableAreaName,
   MOVABLE_TRASH_ADDRESSABLE_AREAS,
 } from '@opentrons/shared-data'
-import type { RootState as LabwareDefsRootState } from '../../labware-defs'
 import { rootReducer as labwareDefsRootReducer } from '../../labware-defs'
 import { getCutoutIdByAddressableArea, uuid } from '../../utils'
 import { INITIAL_DECK_SETUP_STEP_ID, SPAN7_8_10_11_SLOT } from '../../constants'
@@ -44,14 +34,7 @@ import {
 import { getLabwareOnModule } from '../../ui/modules/utils'
 import { nestedCombineReducers } from './nestedCombineReducers'
 import { PROFILE_CYCLE, PROFILE_STEP } from '../../form-types'
-import {
-  COLUMN_4_SLOTS,
-  NormalizedAdditionalEquipmentById,
-  NormalizedPipetteById,
-} from '@opentrons/step-generation'
-import { LoadFileAction } from '../../load-file'
-import { SaveStepFormAction } from '../../ui/steps/actions/thunks'
-import { ReplaceCustomLabwareDef } from '../../labware-defs/actions'
+import { COLUMN_4_SLOTS } from '@opentrons/step-generation'
 import {
   _getPipetteEntitiesRootState,
   _getLabwareEntitiesRootState,
@@ -59,17 +42,36 @@ import {
   _getAdditionalEquipmentEntitiesRootState,
 } from '../selectors'
 import {
-  CreateDeckFixtureAction,
-  DeleteDeckFixtureAction,
-  ToggleIsGripperRequiredAction,
-} from '../actions/additionalItems'
-import {
   createPresavedStepForm,
   getDeckItemIdInSlot,
   getIdsInRange,
   getUnoccupiedSlotForMoveableTrash,
 } from '../utils'
 
+import type { Reducer } from 'redux'
+import type {
+  NormalizedAdditionalEquipmentById,
+  NormalizedPipetteById,
+} from '@opentrons/step-generation'
+import type {
+  LoadLabwareCreateCommand,
+  LoadModuleCreateCommand,
+  LoadPipetteCreateCommand,
+  MoveLabwareCreateCommand,
+  MoveToAddressableAreaCreateCommand,
+  MoveToAddressableAreaForDropTipCreateCommand,
+  PipetteName,
+  AddressableAreaName,
+} from '@opentrons/shared-data'
+import type { RootState as LabwareDefsRootState } from '../../labware-defs'
+import type { LoadFileAction } from '../../load-file'
+import type { SaveStepFormAction } from '../../ui/steps/actions/thunks'
+import type { ReplaceCustomLabwareDef } from '../../labware-defs/actions'
+import type {
+  CreateDeckFixtureAction,
+  DeleteDeckFixtureAction,
+  ToggleIsGripperRequiredAction,
+} from '../actions/additionalItems'
 import type {
   CreateModuleAction,
   CreatePipettesAction,
@@ -1353,10 +1355,9 @@ export const additionalEquipmentInvariantProperties = handleActions<NormalizedAd
             command.params.newLocation !== 'offDeck' &&
             'addressableAreaName' in command.params.newLocation &&
             WASTE_CHUTE_ADDRESSABLE_AREAS.includes(
-              command.params.addressableAreaName
+              command.params.newLocation.addressableAreaName
             ))
       )
-
       const getStagingAreaSlotNames = (
         commandType: 'moveLabware' | 'loadLabware',
         locationKey: 'newLocation' | 'location'
@@ -1381,11 +1382,13 @@ export const additionalEquipmentInvariantProperties = handleActions<NormalizedAd
         ]),
       ]
 
-      const unoccupiedSlotForMovableTrash = getUnoccupiedSlotForMoveableTrash(
-        file,
-        hasWasteChuteCommands,
-        stagingAreaSlotNames
-      )
+      const unoccupiedSlotForMovableTrash = hasWasteChuteCommands
+        ? ''
+        : getUnoccupiedSlotForMoveableTrash(
+            file,
+            hasWasteChuteCommands,
+            stagingAreaSlotNames
+          )
 
       const stagingAreas = stagingAreaSlotNames.reduce((acc, slot) => {
         const stagingAreaId = `${uuid()}:stagingArea`
@@ -1460,7 +1463,6 @@ export const additionalEquipmentInvariantProperties = handleActions<NormalizedAd
       } else if (mixStepTrashBin != null) {
         trashBinId = mixStepTrashBin.dropTip_location
       }
-
       const trashCutoutId =
         trashAddressableAreaName != null
           ? getCutoutIdByAddressableArea(
@@ -1516,6 +1518,9 @@ export const additionalEquipmentInvariantProperties = handleActions<NormalizedAd
         ) {
           wasteChuteId = moveLiquidStepWasteChute.blowOut_location
         }
+        //  new wasteChuteId generated for if there are only moveLabware commands
+      } else if (hasWasteChuteCommands && moveLiquidStepWasteChute == null) {
+        wasteChuteId = `${uuid()}:wasteChute`
       }
 
       const wasteChute =
@@ -1557,14 +1562,15 @@ export const additionalEquipmentInvariantProperties = handleActions<NormalizedAd
         [hardcodedTrashBinIdFlex]: {
           name: 'trashBin' as const,
           id: hardcodedTrashBinIdFlex,
-          location: getCutoutIdByAddressableArea(
-            hardcodedTrashAddressableAreaName as AddressableAreaName,
-            'trashBinAdapter',
-            FLEX_ROBOT_TYPE
-          ),
+          location: hasWasteChuteCommands
+            ? ''
+            : getCutoutIdByAddressableArea(
+                hardcodedTrashAddressableAreaName as AddressableAreaName,
+                'trashBinAdapter',
+                FLEX_ROBOT_TYPE
+              ),
         },
       }
-
       if (isFlex) {
         if (trashBin != null) {
           return {

@@ -60,4 +60,10 @@ describe('AnalysisFailedModal', () => {
     fireEvent.click(screen.getByText('Restart setup'))
     expect(mockPush).toHaveBeenCalledWith(`/protocols/${PROTOCOL_ID}`)
   })
+
+  it('should push to protocols dashboard when tapping restart setup button and protocol ID is null', () => {
+    render({ ...props, protocolId: null })
+    fireEvent.click(screen.getByText('Restart setup'))
+    expect(mockPush).toHaveBeenCalledWith('/protocols')
+  })
 })

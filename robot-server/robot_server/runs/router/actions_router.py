@@ -28,6 +28,7 @@ from robot_server.maintenance_runs.maintenance_engine_store import (
     MaintenanceEngineStore,
 )
 from robot_server.maintenance_runs.dependencies import get_maintenance_engine_store
+from robot_server.service.notifications import get_runs_publisher, RunsPublisher
 
 log = logging.getLogger(__name__)
 actions_router = APIRouter()
@@ -45,6 +46,7 @@ async def get_run_controller(
     task_runner: TaskRunner = Depends(get_task_runner),
     engine_store: EngineStore = Depends(get_engine_store),
     run_store: RunStore = Depends(get_run_store),
+    runs_publisher: RunsPublisher = Depends(get_runs_publisher),
 ) -> RunController:
     """Get a RunController for the current run.
 
@@ -67,6 +69,7 @@ async def get_run_controller(
         task_runner=task_runner,
         engine_store=engine_store,
         run_store=run_store,
+        runs_publisher=runs_publisher,
     )
 
 

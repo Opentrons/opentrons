@@ -23,11 +23,10 @@ import {
   UpdateRobotSoftware,
   UsageSettings,
   UseOlderAspirateBehavior,
-  UseOlderProtocol,
 } from '../AdvancedTab'
 import { RobotSettingsAdvanced } from '../RobotSettingsAdvanced'
 
-import { ShellUpdateState } from '../../../../redux/shell/types'
+import type { ShellUpdateState } from '../../../../redux/shell/types'
 import type * as ShellUpdate from '../../../../redux/shell/update'
 
 vi.mock('../../../../redux/robot-settings/selectors')
@@ -53,7 +52,6 @@ vi.mock('../AdvancedTab/Troubleshooting')
 vi.mock('../AdvancedTab/UpdateRobotSoftware')
 vi.mock('../AdvancedTab/UsageSettings')
 vi.mock('../AdvancedTab/UseOlderAspirateBehavior')
-vi.mock('../AdvancedTab/UseOlderProtocol')
 
 const mockUpdateRobotStatus = vi.fn()
 
@@ -109,9 +107,6 @@ describe('RobotSettings Advanced tab', () => {
     )
     vi.mocked(UseOlderAspirateBehavior).mockReturnValue(
       <div>Mock UseOlderAspirateBehavior Section</div>
-    )
-    vi.mocked(UseOlderProtocol).mockReturnValue(
-      <div>Mock UseOlderProtocol Section</div>
     )
     when(useIsFlex).calledWith('otie').thenReturn(false)
     vi.mocked(EnableStatusLight).mockReturnValue(
@@ -208,17 +203,6 @@ describe('RobotSettings Advanced tab', () => {
     expect(
       screen.queryByText('Mock UseOlderAspirateBehavior Section')
     ).toBeNull()
-  })
-
-  it('should render UseOlderProtocol section for OT-2', () => {
-    render()
-    screen.getByText('Mock UseOlderProtocol Section')
-  })
-
-  it('should not render UseOlderProtocol section for Flex', () => {
-    when(useIsFlex).calledWith('otie').thenReturn(true)
-    render()
-    expect(screen.queryByText('Mock UseOlderProtocol Section')).toBeNull()
   })
 
   it('should not render EnableStatusLight section for OT-2', () => {

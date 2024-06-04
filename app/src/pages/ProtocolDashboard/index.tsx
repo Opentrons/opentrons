@@ -186,7 +186,6 @@ export function ProtocolDashboard(): JSX.Element {
                 backgroundColor={COLORS.white}
                 flexDirection={DIRECTION_ROW}
                 paddingBottom={SPACING.spacing16}
-                paddingTop={SPACING.spacing16}
                 position={
                   navMenuIsOpened || longPressModalIsOpened
                     ? POSITION_STATIC

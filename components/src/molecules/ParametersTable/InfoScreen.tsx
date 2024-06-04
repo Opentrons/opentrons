@@ -8,7 +8,7 @@ import { Flex } from '../../primitives'
 import { ALIGN_CENTER, DIRECTION_COLUMN } from '../../styles'
 
 interface InfoScreenProps {
-  contentType: 'parameters' | 'moduleControls' | 'runNotStarted'
+  contentType: 'parameters' | 'moduleControls' | 'runNotStarted' | 'labware'
   t?: any
 }
 
@@ -29,6 +29,9 @@ export function InfoScreen({ contentType, t }: InfoScreenProps): JSX.Element {
       break
     case 'runNotStarted':
       bodyText = t != null ? t('run_never_started') : 'Run was never started'
+      break
+    case 'labware':
+      bodyText = 'No labware specified in this protocol'
       break
     default:
       bodyText = contentType

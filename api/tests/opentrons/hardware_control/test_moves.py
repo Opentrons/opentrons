@@ -276,6 +276,37 @@ async def test_critical_point_applied(hardware_api):
     assert await hardware_api.current_position(types.Mount.RIGHT) == target
 
 
+async def test_tip_pickup_routine(hardware_api, monkeypatch):
+
+    _move = mock.Mock(side_effect=hardware_api._move)
+    monkeypatch.setattr(hardware_api, "_move", _move)
+
+    await hardware_api.home()
+    hardware_api._backend._attached_instruments = {
+        types.Mount.LEFT: {"model": None, "id": None},
+        types.Mount.RIGHT: {"model": "p10_single_v1", "id": "testyness"},
+    }
+    await hardware_api.cache_instruments()
+    mount = types.Mount.RIGHT
+
+    spec, _ = hardware_api.plan_check_pick_up_tip(
+        mount=mount, tip_length=40.0, presses=None, increment=None
+    )
+    await hardware_api.tip_pickup_moves(mount, spec)
+
+    tip_motor_routine_num_moves = 2 * len(spec.presses)
+
+    # the tip motor routine should only make the immediate 'press' moves happen
+    assert len(_move.call_args_list) == tip_motor_routine_num_moves
+    _move.reset_mock()
+
+    # pick_up_tip should have the press moves + a plunger move both before and after
+    await hardware_api.pick_up_tip(
+        mount=mount, tip_length=40.0, presses=None, increment=None, prep_after=True
+    )
+    assert len(_move.call_args_list) == tip_motor_routine_num_moves + 2
+
+
 async def test_new_critical_point_applied(hardware_api):
     await hardware_api.home()
     hardware_api._backend._attached_instruments = {

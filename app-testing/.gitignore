@@ -1,5 +1,5 @@
 .env
 results
 analysis_results/*.json
-files/generated_protocols/*
-!files/generated_protocols/.keepme
+files/protocols/generated_protocols/*
+!files/protocols/generated_protocols/.keepme

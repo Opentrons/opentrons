@@ -68,7 +68,7 @@ The maximum supported API version for your robot is listed in the Opentrons App 
 
 If you upload a protocol that specifies a higher API level than the maximum supported, your robot won't be able to analyze or run your protocol. You can increase the maximum supported version by updating your robot software and Opentrons App. 
 
-Opentrons robots running the latest software (7.2.0) support the following version ranges: 
+Opentrons robots running the latest software (7.3.0) support the following version ranges: 
 
     * **Flex:** version 2.15–|apiLevel|.
     * **OT-2:** versions 2.0–|apiLevel|.
@@ -84,6 +84,8 @@ This table lists the correspondence between Protocol API versions and robot soft
 +-------------+------------------------------+
 | API Version | Introduced in Robot Software |
 +=============+==============================+
+|     2.18    |          7.3.0               |
++-------------+------------------------------+
 |     2.17    |          7.2.0               |
 +-------------+------------------------------+
 |     2.16    |          7.1.0               |
@@ -127,6 +129,14 @@ This table lists the correspondence between Protocol API versions and robot soft
 
 Changes in API Versions
 =======================
+
+Version 2.18
+------------
+
+- Define customizable parameters with the new ``add_parameters()`` function, and access their values on the :py:obj:`.ProtocolContext.params` object during a protocol run. See :ref:`runtime-parameters` and related pages for more information.
+- Move the pipette to positions relative to the top of a trash container. See :ref:`position-relative-trash`. The default behavior of :py:meth:`.drop_tip` also accounts for this new possibility.
+- :py:meth:`.set_offset` has been restored to the API with new behavior that applies to labware type–location pairs.
+- Automatic tip tracking is now available for all nozzle configurations.
 
 Version 2.17
 ------------

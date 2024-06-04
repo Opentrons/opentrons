@@ -291,7 +291,7 @@ const ProtocolSectionContent = ({
   }
   return (
     <Flex
-      marginTop={SPACING.spacing32}
+      paddingTop={SPACING.spacing32}
       justifyContent={currentOption === 'Deck' ? JUSTIFY_CENTER : undefined}
     >
       {protocolSection}

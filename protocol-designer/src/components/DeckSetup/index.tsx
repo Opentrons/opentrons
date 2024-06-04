@@ -10,17 +10,11 @@ import {
   RobotCoordinateSpaceWithRef,
   SingleSlotFixture,
   StagingAreaFixture,
-  StagingAreaLocation,
-  TrashCutoutId,
   useOnClickOutside,
   WasteChuteFixture,
   WasteChuteStagingAreaFixture,
 } from '@opentrons/components'
-import {
-  AdditionalEquipmentEntity,
-  MODULES_WITH_COLLISION_ISSUES,
-  ModuleTemporalProperties,
-} from '@opentrons/step-generation'
+import { MODULES_WITH_COLLISION_ISSUES } from '@opentrons/step-generation'
 import {
   FLEX_ROBOT_TYPE,
   getAddressableAreaFromSlotId,
@@ -43,17 +37,10 @@ import { selectors as labwareDefSelectors } from '../../labware-defs'
 
 import { selectors as featureFlagSelectors } from '../../feature-flags'
 import { getStagingAreaAddressableAreas } from '../../utils'
-import {
-  getSlotIdsBlockedBySpanning,
-  getSlotIsEmpty,
-  InitialDeckSetup,
-  LabwareOnDeck as LabwareOnDeckType,
-  ModuleOnDeck,
-} from '../../step-forms'
+import { getSlotIdsBlockedBySpanning, getSlotIsEmpty } from '../../step-forms'
 import * as labwareIngredActions from '../../labware-ingred/actions'
 import { getDeckSetupForActiveItem } from '../../top-selectors/labware-locations'
 import { selectors as labwareIngredSelectors } from '../../labware-ingred/selectors'
-import { TerminalItemId } from '../../steplist'
 import { getSelectedTerminalItemId } from '../../ui/steps'
 import { getRobotType } from '../../file-data/selectors'
 import { BrowseLabwareModal } from '../labware'
@@ -70,12 +57,23 @@ import { SlotLabels } from './SlotLabels'
 import { getHasGen1MultiChannelPipette, getSwapBlocked } from './utils'
 
 import type {
+  AdditionalEquipmentEntity,
+  ModuleTemporalProperties,
+} from '@opentrons/step-generation'
+import type { StagingAreaLocation, TrashCutoutId } from '@opentrons/components'
+import type {
   AddressableAreaName,
   CutoutFixture,
   CutoutId,
   DeckDefinition,
   RobotType,
 } from '@opentrons/shared-data'
+import type { TerminalItemId } from '../../steplist'
+import type {
+  InitialDeckSetup,
+  LabwareOnDeck as LabwareOnDeckType,
+  ModuleOnDeck,
+} from '../../step-forms'
 
 import styles from './DeckSetup.module.css'
 

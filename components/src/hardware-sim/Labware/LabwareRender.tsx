@@ -6,11 +6,9 @@ import {
   StrokedWells,
   StaticLabware,
 } from './labwareInternals'
-import {
-  LabwareAdapter,
-  LabwareAdapterLoadName,
-  labwareAdapterLoadNames,
-} from './LabwareAdapter'
+import { LabwareAdapter, labwareAdapterLoadNames } from './LabwareAdapter'
+
+import type { CSSProperties } from 'styled-components'
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import type {
   HighlightedWellLabels,
@@ -19,7 +17,8 @@ import type {
   WellStroke,
   WellGroup,
 } from './labwareInternals/types'
-import type { CSSProperties } from 'styled-components'
+import type { LabwareAdapterLoadName } from './LabwareAdapter'
+
 export const WELL_LABEL_OPTIONS = {
   SHOW_LABEL_INSIDE: 'SHOW_LABEL_INSIDE',
   SHOW_LABEL_OUTSIDE: 'SHOW_LABEL_OUTSIDE',
@@ -58,10 +57,14 @@ export interface LabwareRenderProps {
   onMouseLeaveWell?: (e: WellMouseEvent) => unknown
   gRef?: React.RefObject<SVGGElement>
   onLabwareClick?: () => void
+  /** Hide labware outline */
+  hideOutline?: boolean
+  /** Provides well data attribute */
+  isInteractive?: boolean
 }
 
 export const LabwareRender = (props: LabwareRenderProps): JSX.Element => {
-  const { gRef, definition } = props
+  const { gRef, definition, hideOutline, isInteractive } = props
 
   const cornerOffsetFromSlot = definition.cornerOffsetFromSlot
   const labwareLoadName = definition.parameters.loadName
@@ -95,12 +98,15 @@ export const LabwareRender = (props: LabwareRenderProps): JSX.Element => {
       transform={`translate(${cornerOffsetFromSlot.x}, ${cornerOffsetFromSlot.y})`}
       ref={gRef}
     >
+      {/* TODO(bh, 2024-05-13): refactor rendering of wells - multiple layers of styled wells, DOM ordering determines which are visible */}
       <StaticLabware
         definition={props.definition}
         onMouseEnterWell={props.onMouseEnterWell}
         onMouseLeaveWell={props.onMouseLeaveWell}
         onLabwareClick={props.onLabwareClick}
         highlight={props.highlight}
+        hideOutline={hideOutline}
+        isInteractive={isInteractive}
       />
       {props.wellStroke != null ? (
         <StrokedWells

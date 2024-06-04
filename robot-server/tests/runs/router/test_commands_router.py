@@ -6,7 +6,7 @@ from decoy import Decoy, matchers
 
 from opentrons.protocol_engine import (
     CommandSlice,
-    CurrentCommand,
+    CommandPointer,
     ProtocolEngine,
     CommandNote,
     commands as pe_commands,
@@ -16,15 +16,17 @@ from opentrons.protocol_engine import (
 from robot_server.errors.error_responses import ApiError
 from robot_server.service.json_api import MultiBodyMeta
 
+from robot_server.runs.command_models import (
+    RequestModelWithCommandCreate,
+    CommandCollectionLinks,
+    CommandLink,
+    CommandLinkMeta,
+)
 from robot_server.runs.run_store import RunStore, CommandNotFoundError
 from robot_server.runs.engine_store import EngineStore
 from robot_server.runs.run_data_manager import RunDataManager
 from robot_server.runs.run_models import RunCommandSummary, RunNotFoundError
 from robot_server.runs.router.commands_router import (
-    CommandCollectionLinks,
-    CommandLink,
-    CommandLinkMeta,
-    RequestModelWithCommandCreate,
     create_run_command,
     get_run_command,
     get_run_commands,
@@ -319,11 +321,19 @@ async def test_get_run_commands(
     )
 
     decoy.when(mock_run_data_manager.get_current_command("run-id")).then_return(
-        CurrentCommand(
+        CommandPointer(
             command_id="current-command-id",
             command_key="current-command-key",
             created_at=datetime(year=2024, month=4, day=4),
             index=101,
+        )
+    )
+    decoy.when(mock_run_data_manager.get_recovery_target_command("run-id")).then_return(
+        CommandPointer(
+            command_id="recovery-target-command-id",
+            command_key="recovery-target-command-key",
+            created_at=datetime(year=2025, month=5, day=5),
+            index=202,
         )
     )
     decoy.when(
@@ -372,7 +382,17 @@ async def test_get_run_commands(
                 createdAt=datetime(year=2024, month=4, day=4),
                 index=101,
             ),
-        )
+        ),
+        currentlyRecoveringFrom=CommandLink(
+            href="/runs/run-id/commands/recovery-target-command-id",
+            meta=CommandLinkMeta(
+                runId="run-id",
+                commandId="recovery-target-command-id",
+                key="recovery-target-command-key",
+                createdAt=datetime(year=2025, month=5, day=5),
+                index=202,
+            ),
+        ),
     )
     assert result.status_code == 200
 

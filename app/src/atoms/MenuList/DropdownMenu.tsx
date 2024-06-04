@@ -28,14 +28,24 @@ export interface DropdownOption {
 export type DropdownBorder = 'rounded' | 'neutral'
 
 export interface DropdownMenuProps {
+  /** dropdown options */
   filterOptions: DropdownOption[]
+  /** click handler */
   onClick: (value: string) => void
+  /** current selected option */
   currentOption: DropdownOption
+  /** dropdown */
   width?: string
+  /** dropdown style type  */
   dropdownType?: DropdownBorder
+  /** dropdown title */
   title?: string
+  /** dropdown item caption */
   caption?: string | null
+  /** text for tooltip */
   tooltipText?: string
+  /** html tabindex property */
+  tabIndex?: number
 }
 
 // TODO: (smb: 4/15/22) refactor this to use html select for accessibility
@@ -50,9 +60,51 @@ export function DropdownMenu(props: DropdownMenuProps): JSX.Element {
     title,
     caption,
     tooltipText,
+    tabIndex = 0,
   } = props
   const [targetProps, tooltipProps] = useHoverTooltip()
   const [showDropdownMenu, setShowDropdownMenu] = React.useState<boolean>(false)
+
+  const [dropdownPosition, setDropdownPosition] = React.useState<
+    'top' | 'bottom'
+  >('bottom')
+
+  React.useEffect(() => {
+    const handlePositionCalculation = (): void => {
+      const dropdownRect = dropDownMenuWrapperRef.current?.getBoundingClientRect()
+      if (dropdownRect != null) {
+        const parentElement = dropDownMenuWrapperRef?.current?.parentElement
+        const grandParentElement = parentElement?.parentElement?.parentElement
+        let availableHeight = window.innerHeight
+        let scrollOffset = 0
+
+        if (grandParentElement != null) {
+          const grandParentRect = grandParentElement.getBoundingClientRect()
+          availableHeight = grandParentRect.bottom - grandParentRect.top
+          scrollOffset = grandParentRect.top
+        } else if (parentElement != null) {
+          const parentRect = parentElement.getBoundingClientRect()
+          availableHeight = parentRect.bottom - parentRect.top
+          scrollOffset = parentRect.top
+        }
+
+        const dropdownBottom =
+          dropdownRect.bottom + (filterOptions.length + 1) * 34 - scrollOffset
+
+        setDropdownPosition(dropdownBottom > availableHeight ? 'top' : 'bottom')
+      }
+    }
+
+    window.addEventListener('resize', handlePositionCalculation)
+    window.addEventListener('scroll', handlePositionCalculation)
+    handlePositionCalculation()
+
+    return () => {
+      window.removeEventListener('resize', handlePositionCalculation)
+      window.removeEventListener('scroll', handlePositionCalculation)
+    }
+  }, [filterOptions.length, window.innerHeight])
+
   const toggleSetShowDropdownMenu = (): void => {
     setShowDropdownMenu(!showDropdownMenu)
   }
@@ -130,6 +182,7 @@ export function DropdownMenu(props: DropdownMenuProps): JSX.Element {
             toggleSetShowDropdownMenu()
           }}
           css={DROPDOWN_STYLE}
+          tabIndex={tabIndex}
         >
           <StyledText
             css={css`
@@ -144,9 +197,9 @@ export function DropdownMenu(props: DropdownMenuProps): JSX.Element {
             {currentOption.name}
           </StyledText>
           {showDropdownMenu ? (
-            <Icon size="1.2rem" name="menu-down" transform="rotate(180deg)" />
+            <Icon size="0.75rem" name="menu-down" transform="rotate(180deg)" />
           ) : (
-            <Icon size="1.2rem" name="menu-down" />
+            <Icon size="0.75rem" name="menu-down" />
           )}
         </Flex>
         {showDropdownMenu && (
@@ -158,7 +211,8 @@ export function DropdownMenu(props: DropdownMenuProps): JSX.Element {
             backgroundColor={COLORS.white}
             flexDirection={DIRECTION_COLUMN}
             width={width}
-            top="2.5rem"
+            top={dropdownPosition === 'bottom' ? '2.5rem' : undefined}
+            bottom={dropdownPosition === 'top' ? '2.5rem' : undefined}
           >
             {filterOptions.map((option, index) => (
               <MenuItem

@@ -42,7 +42,7 @@ export function LabwareOffsetTabs({
       flexDirection={DIRECTION_COLUMN}
       {...styleProps}
     >
-      <Flex>
+      <Flex gridGap={SPACING.spacing4} marginY={SPACING.spacing8}>
         <RoundTab
           isCurrent={currentTab === 'table'}
           onClick={() => setCurrentTab('table')}

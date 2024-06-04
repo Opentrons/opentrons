@@ -1,0 +1,64 @@
+name: 'OpentronsAI client edge continuous deployment to staging'
+
+on:
+  push:
+    branches:
+      - edge
+    paths:
+      - 'opentrons-ai-client/**'
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}-${{ github.run_id }}
+  cancel-in-progress: true
+
+env:
+  CI: true
+
+jobs:
+  js-unit-test:
+    runs-on: 'ubuntu-22.04'
+    permissions:
+      id-token: write
+      contents: read
+    name: 'OpentronsAI client edge continuous deployment to staging'
+    timeout-minutes: 10
+    steps:
+      - uses: 'actions/checkout@v3'
+      - uses: 'actions/setup-node@v3'
+        with:
+          node-version: '18.19.0'
+      - name: 'install udev'
+        run: |
+          # WORKAROUND: Remove microsoft debian repo due to https://github.com/microsoft/linux-package-repositories/issues/130. Remove line below after it is resolved
+          sudo rm -f /etc/apt/sources.list.d/microsoft-prod.list
+          sudo apt-get update && sudo apt-get install libudev-dev
+      - name: 'set complex environment variables'
+        id: 'set-vars'
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const { buildComplexEnvVars } = require(`${process.env.GITHUB_WORKSPACE}/.github/workflows/utils.js`)
+            buildComplexEnvVars(core, context)
+      - name: 'cache yarn cache'
+        uses: actions/cache@v3
+        with:
+          path: |
+            ${{ github.workspace }}/.npm-cache/_prebuild
+            ${{ github.workspace }}/.yarn-cache
+          key: js-${{ secrets.GH_CACHE_VERSION }}-${{ runner.os }}-yarn-${{ hashFiles('yarn.lock') }}
+      - name: 'setup-js'
+        run: |
+          npm config set cache ${{ github.workspace }}/.npm-cache
+          yarn config set cache-folder ${{ github.workspace }}/.yarn-cache
+          make setup-js
+      - name: 'build'
+        run: |
+          make -C opentrons-ai-client build
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.STAGING_AI_ROLE_ARN }}
+          aws-region: ${{ secrets.STAGING_AI_REGION }}
+      - name: 'deploy to staging'
+        run: |
+          make -C opentrons-ai-client staging-deploy

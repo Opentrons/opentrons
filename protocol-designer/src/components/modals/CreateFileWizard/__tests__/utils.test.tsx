@@ -31,25 +31,47 @@ let MOCK_FORM_STATE = {
 
 describe('getUnoccupiedStagingAreaSlots', () => {
   it('should return all staging area slots when there are no modules', () => {
-    const result = getUnoccupiedStagingAreaSlots(null)
+    const result = getUnoccupiedStagingAreaSlots(null, [])
     expect(result).toStrictEqual(STANDARD_EMPTY_SLOTS)
   })
-  it('should return one staging area slot when there are modules in the way of the other slots', () => {
-    const result = getUnoccupiedStagingAreaSlots({
-      0: { model: 'magneticBlockV1', type: 'magneticBlockType', slot: 'A3' },
-      1: {
-        model: 'temperatureModuleV2',
-        type: 'temperatureModuleType',
-        slot: 'B3',
+  it('should return one staging area slot when there are only 1 num slots available', () => {
+    const result = getUnoccupiedStagingAreaSlots(
+      {
+        0: {
+          model: 'heaterShakerModuleV1',
+          type: 'heaterShakerModuleType',
+          slot: 'D1',
+        },
+        1: {
+          model: 'temperatureModuleV2',
+          type: 'temperatureModuleType',
+          slot: 'D3',
+        },
+        2: {
+          model: 'temperatureModuleV2',
+          type: 'temperatureModuleType',
+          slot: 'C1',
+        },
+        3: {
+          model: 'temperatureModuleV2',
+          type: 'temperatureModuleType',
+          slot: 'B3',
+        },
+        4: {
+          model: 'thermocyclerModuleV2',
+          type: 'thermocyclerModuleType',
+          slot: 'B1',
+        },
+        5: {
+          model: 'temperatureModuleV2',
+          type: 'temperatureModuleType',
+          slot: 'A3',
+        },
       },
-      2: {
-        model: 'temperatureModuleV2',
-        type: 'temperatureModuleType',
-        slot: 'C3',
-      },
-    })
+      []
+    )
     expect(result).toStrictEqual([
-      { cutoutId: 'cutoutD3', cutoutFixtureId: SINGLE_RIGHT_SLOT_FIXTURE },
+      { cutoutId: 'cutoutA3', cutoutFixtureId: SINGLE_RIGHT_SLOT_FIXTURE },
     ])
   })
 })
@@ -112,6 +134,21 @@ describe('getNumSlotsAvailable', () => {
       'trashBin',
     ]
     const result = getNumSlotsAvailable(null, mockAdditionalEquipment)
+    expect(result).toBe(1)
+  })
+  it('shoult return 1 when it is for the waste chute and all slots are occupied with the staging area in slot d3', () => {
+    const mockAdditionalEquipment: AdditionalEquipment[] = [
+      'trashBin',
+      'trashBin',
+      'stagingArea_cutoutA3',
+      'stagingArea_cutoutB3',
+      'stagingArea_cutoutC3',
+      'stagingArea_cutoutD3',
+      'trashBin',
+      'gripper',
+      'trashBin',
+    ]
+    const result = getNumSlotsAvailable(null, mockAdditionalEquipment, true)
     expect(result).toBe(1)
   })
   it('should return 8 even when there is a magnetic block', () => {

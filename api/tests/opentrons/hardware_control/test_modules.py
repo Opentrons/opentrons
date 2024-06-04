@@ -1,9 +1,10 @@
 import asyncio
-import pytest
-
+from typing import AsyncIterator, Union, Type, TypeVar, Optional
 from pathlib import Path
 from unittest import mock
+
 from packaging.version import Version
+import pytest
 
 from opentrons.hardware_control import ExecutionManager
 from opentrons.hardware_control.modules import ModuleAtPort
@@ -22,19 +23,27 @@ from opentrons.hardware_control.modules import (
     Thermocycler,
     HeaterShaker,
     AbstractModule,
+    SimulatingModule,
+    build as build_module,
 )
 from opentrons.hardware_control.modules.mod_abc import parse_fw_version
 from opentrons.drivers.rpi_drivers.types import USBPort
 
 
-async def test_get_modules_simulating():
+async def test_get_modules_simulating() -> None:
     import opentrons.hardware_control as hardware_control
 
     mods = {
-        "tempdeck": ["111"],
-        "magdeck": ["222"],
-        "thermocycler": ["333"],
-        "heatershaker": ["444"],
+        "tempdeck": [
+            SimulatingModule(serial_number="111", model="temperatureModuleV1")
+        ],
+        "magdeck": [SimulatingModule(serial_number="222", model="magneticModuleV2")],
+        "thermocycler": [
+            SimulatingModule(serial_number="333", model="thermocyclerModuleV1")
+        ],
+        "heatershaker": [
+            SimulatingModule(serial_number="444", model="heaterShakerModuleV1")
+        ],
     }
     api = await hardware_control.API.build_hardware_simulator(attached_modules=mods)
     await asyncio.sleep(0.05)
@@ -44,10 +53,12 @@ async def test_get_modules_simulating():
         await m.cleanup()
 
 
-async def test_module_caching():
+async def test_module_caching() -> None:
     import opentrons.hardware_control as hardware_control
 
-    mod_names = {"tempdeck": ["111"]}
+    mod_names = {
+        "tempdeck": [SimulatingModule(serial_number="111", model="temperatureModuleV1")]
+    }
     api = await hardware_control.API.build_hardware_simulator(
         attached_modules=mod_names
     )
@@ -97,7 +108,9 @@ async def test_module_caching():
 )
 async def test_create_simulating_module(
     module_model: ModuleModel,
-    expected_sim_type: AbstractModule,
+    expected_sim_type: Union[
+        Type[MagDeck], Type[TempDeck], Type[Thermocycler], Type[HeaterShaker]
+    ],
 ) -> None:
     """It should create simulating module instance for specified module."""
     import opentrons.hardware_control as hardware_control
@@ -112,17 +125,16 @@ async def test_create_simulating_module(
 
 
 @pytest.fixture
-async def mod_tempdeck():
-    from opentrons.hardware_control import modules
+async def mod_tempdeck() -> AsyncIterator[AbstractModule]:
 
     usb_port = USBPort(
         name="",
-        hub=None,
+        hub=False,
         port_number=0,
         device_path="/dev/ot_module_sim_tempdeck0",
     )
 
-    tempdeck = await modules.build(
+    tempdeck = await build_module(
         port="/dev/ot_module_sim_tempdeck0",
         usb_port=usb_port,
         type=ModuleType.TEMPERATURE,
@@ -136,17 +148,15 @@ async def mod_tempdeck():
 
 
 @pytest.fixture
-async def mod_magdeck():
-    from opentrons.hardware_control import modules
-
+async def mod_magdeck() -> AsyncIterator[AbstractModule]:
     usb_port = USBPort(
         name="",
-        hub=None,
+        hub=False,
         port_number=0,
         device_path="/dev/ot_module_sim_magdeck0",
     )
 
-    magdeck = await modules.build(
+    magdeck = await build_module(
         port="/dev/ot_module_sim_magdeck0",
         usb_port=usb_port,
         type=ModuleType.MAGNETIC,
@@ -159,17 +169,15 @@ async def mod_magdeck():
 
 
 @pytest.fixture
-async def mod_thermocycler():
-    from opentrons.hardware_control import modules
-
+async def mod_thermocycler() -> AsyncIterator[AbstractModule]:
     usb_port = USBPort(
         name="",
-        hub=None,
+        hub=False,
         port_number=0,
         device_path="/dev/ot_module_sim_thermocycler0",
     )
 
-    thermocycler = await modules.build(
+    thermocycler = await build_module(
         port="/dev/ot_module_sim_thermocycler0",
         usb_port=usb_port,
         type=ModuleType.THERMOCYCLER,
@@ -182,17 +190,15 @@ async def mod_thermocycler():
 
 
 @pytest.fixture
-async def mod_thermocycler_gen2():
-    from opentrons.hardware_control import modules
-
+async def mod_thermocycler_gen2() -> AsyncIterator[AbstractModule]:
     usb_port = USBPort(
         name="",
-        hub=None,
+        hub=False,
         port_number=0,
         device_path="/dev/ot_module_sim_thermocycler0",
     )
 
-    thermocycler = await modules.build(
+    thermocycler = await build_module(
         port="/dev/ot_module_sim_thermocycler0",
         usb_port=usb_port,
         type=ModuleType.THERMOCYCLER,
@@ -206,17 +212,15 @@ async def mod_thermocycler_gen2():
 
 
 @pytest.fixture
-async def mod_heatershaker():
-    from opentrons.hardware_control import modules
-
+async def mod_heatershaker() -> AsyncIterator[AbstractModule]:
     usb_port = USBPort(
         name="",
-        hub=None,
+        hub=False,
         port_number=0,
         device_path="/dev/ot_module_sim_heatershaker0",
     )
 
-    heatershaker = await modules.build(
+    heatershaker = await build_module(
         port="/dev/ot_module_sim_heatershaker0",
         usb_port=usb_port,
         type=ModuleType.HEATER_SHAKER,
@@ -229,17 +233,19 @@ async def mod_heatershaker():
 
 
 async def test_module_update_integration(
-    monkeypatch,
-    mod_tempdeck,
-    mod_magdeck,
-    mod_thermocycler,
-    mod_heatershaker,
-    mod_thermocycler_gen2,
-):
+    monkeypatch: pytest.MonkeyPatch,
+    mod_tempdeck: AbstractModule,
+    mod_magdeck: AbstractModule,
+    mod_thermocycler: AbstractModule,
+    mod_heatershaker: AbstractModule,
+    mod_thermocycler_gen2: AbstractModule,
+) -> None:
     from opentrons.hardware_control import modules
 
-    def async_return(result):
-        f = asyncio.Future()
+    T = TypeVar("T")
+
+    def async_return(result: T) -> "asyncio.Future[T]":
+        f: "asyncio.Future[T]" = asyncio.Future()
         f.set_result(result)
         return f
 
@@ -253,7 +259,7 @@ async def test_module_update_integration(
     )
     monkeypatch.setattr(modules.update, "upload_via_avrdude", upload_via_avrdude_mock)
 
-    async def mock_find_avrdude_bootloader_port():
+    async def mock_find_avrdude_bootloader_port() -> str:
         return "ot_module_avrdude_bootloader1"
 
     monkeypatch.setattr(
@@ -279,7 +285,7 @@ async def test_module_update_integration(
     )
     monkeypatch.setattr(modules.update, "upload_via_bossa", upload_via_bossa_mock)
 
-    async def mock_find_bossa_bootloader_port():
+    async def mock_find_bossa_bootloader_port() -> str:
         return "ot_module_bossa_bootloader1"
 
     monkeypatch.setattr(
@@ -297,7 +303,7 @@ async def test_module_update_integration(
     )
     monkeypatch.setattr(modules.update, "upload_via_dfu", upload_via_dfu_mock)
 
-    async def mock_find_dfu_device_hs(pid: str, expected_device_count: int):
+    async def mock_find_dfu_device_hs(pid: str, expected_device_count: int) -> str:
         if expected_device_count == 2:
             return "df11"
         return "none"
@@ -310,7 +316,7 @@ async def test_module_update_integration(
     )
     upload_via_dfu_mock.reset_mock()
 
-    async def mock_find_dfu_device_tc2(pid: str, expected_device_count: int):
+    async def mock_find_dfu_device_tc2(pid: str, expected_device_count: int) -> str:
         if expected_device_count == 3:
             return "df11"
         return "none"
@@ -325,7 +331,7 @@ async def test_module_update_integration(
     mod_thermocycler_gen2
 
 
-async def test_get_bundled_fw(monkeypatch, tmpdir):
+async def test_get_bundled_fw(monkeypatch: pytest.MonkeyPatch, tmpdir: Path) -> None:
     from opentrons.hardware_control import modules
 
     dummy_td_file = Path(tmpdir) / "temperature-module@v1.2.3.hex"
@@ -349,10 +355,16 @@ async def test_get_bundled_fw(monkeypatch, tmpdir):
     from opentrons.hardware_control import API
 
     mods = {
-        "tempdeck": ["111"],
-        "magdeck": ["222"],
-        "thermocycler": ["333"],
-        "heatershaker": ["444"],
+        "tempdeck": [
+            SimulatingModule(serial_number="111", model="temperatureModuleV1")
+        ],
+        "magdeck": [SimulatingModule(serial_number="222", model="magneticModuleV2")],
+        "thermocycler": [
+            SimulatingModule(serial_number="333", model="thermocyclerModuleV1")
+        ],
+        "heatershaker": [
+            SimulatingModule(serial_number="444", model="heaterShakerModuleV1")
+        ],
     }
 
     api = await API.build_hardware_simulator(attached_modules=mods)
@@ -375,8 +387,11 @@ async def test_get_bundled_fw(monkeypatch, tmpdir):
 
 
 async def test_get_thermocycler_bundled_fw(
-    mod_thermocycler, mod_thermocycler_gen2, monkeypatch, tmpdir
-):
+    mod_thermocycler: AbstractModule,
+    mod_thermocycler_gen2: AbstractModule,
+    monkeypatch: pytest.MonkeyPatch,
+    tmpdir: Path,
+) -> None:
     from opentrons.hardware_control import modules
 
     dummy_tc_file = Path(tmpdir) / "thermocycler@v0.1.2.bin"
@@ -405,7 +420,7 @@ async def test_get_thermocycler_bundled_fw(
         (None, "magneticModuleV1"),
     ],
 )
-def test_magnetic_module_revision_parsing(revision, model):
+def test_magnetic_module_revision_parsing(revision: Optional[str], model: str) -> None:
     assert MagDeck._model_from_revision(revision) == model
 
 
@@ -422,7 +437,9 @@ def test_magnetic_module_revision_parsing(revision, model):
         (None, "temperatureModuleV1"),
     ],
 )
-def test_temperature_module_revision_parsing(revision, model):
+def test_temperature_module_revision_parsing(
+    revision: Optional[str], model: str
+) -> None:
     assert TempDeck._model_from_revision(revision) == model
 
 

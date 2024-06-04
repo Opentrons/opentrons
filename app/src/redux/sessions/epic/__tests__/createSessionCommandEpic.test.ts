@@ -8,7 +8,7 @@ import * as Actions from '../../actions'
 import { sessionsEpic } from '..'
 
 import type { Action } from '../../../types'
-import { CreateSessionCommandAction } from '../../types'
+import type { CreateSessionCommandAction } from '../../types'
 
 vi.mock('../../../robot-api/http')
 

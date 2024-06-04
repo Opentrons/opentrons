@@ -40,6 +40,7 @@ export function RobotSystemVersion({
     'shared',
     'device_details',
     'app_settings',
+    'branded',
   ])
   const [showModal, setShowModal] = React.useState<boolean>(isUpdateAvailable)
 
@@ -76,7 +77,7 @@ export function RobotSystemVersion({
         >
           <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing24}>
             <StyledText as="p">
-              {t('view_latest_release_notes_at', { url: GITHUB_URL })}
+              {t('branded:view_latest_release_notes_at', { url: GITHUB_URL })}
             </StyledText>
             <Flex
               backgroundColor={COLORS.grey35}

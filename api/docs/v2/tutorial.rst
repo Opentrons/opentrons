@@ -21,7 +21,9 @@ Before You Begin
 
 You're going to write some Python code, but you don't need to be a Python expert to get started writing Opentrons protocols. You should know some basic Python syntax, like how it uses `indentation <https://docs.python.org/3/reference/lexical_analysis.html#indentation>`_ to group blocks of code, dot notation for `calling methods <https://docs.python.org/3/tutorial/classes.html#method-objects>`_, and the format of `lists <https://docs.python.org/3/tutorial/introduction.html#lists>`_ and `dictionaries <https://docs.python.org/3/tutorial/datastructures.html#dictionaries>`_. You’ll also be using `common control structures <https://docs.python.org/3/tutorial/controlflow.html#if-statements>`_ like ``if`` statements and ``for`` loops. 
 
-To run your code, make sure that you've installed `Python 3 <https://wiki.python.org/moin/BeginnersGuide/Download>`_ and the `pip package installer <https://pip.pypa.io/en/stable/getting-started/>`_. You should write your code in your favorite plaintext editor or development environment and save it in a file with a ``.py`` extension, like ``dilution-tutorial.py``.
+You should write your code in your favorite plaintext editor or development environment and save it in a file with a ``.py`` extension, like ``dilution-tutorial.py``.
+
+To simulate your code, you'll need `Python 3.10 <https://www.python.org/downloads/>`_ and the `pip package installer <https://pip.pypa.io/en/stable/getting-started/>`_. Newer versions of Python aren't yet supported by the Python Protocol API. If you don't use Python 3.10 as your system Python, we recommend using `pyenv <https://github.com/pyenv/pyenv>`_ to manage multiple Python versions.
 
 Hardware and Labware
 --------------------
@@ -262,7 +264,7 @@ In each row, you first need to add solution. This will be similar to what you di
 
 .. code-block:: python
             
-        left_pipette.transfer(100, reservoir["A2"], row[0], mix_after(3, 50))
+        left_pipette.transfer(100, reservoir["A2"], row[0], mix_after=(3, 50))
 
 As before, the first argument specifies to transfer 100 µL. The second argument is the source, column 2 of the reservoir. The third argument is the destination, the element at index 0 of the current ``row``. Since Python lists are zero-indexed, but columns on labware start numbering at 1, this will be well A1 on the first time through the loop, B1 the second time, and so on. The fourth argument specifies to mix 3 times with 50 µL of fluid each time.
 
@@ -275,7 +277,7 @@ Finally, it’s time to dilute the solution down the row. One approach would be 
 
 .. code-block:: python
 
-        left_pipette.transfer(100, row[:11], row[1:], mix_after(3, 50))
+        left_pipette.transfer(100, row[:11], row[1:], mix_after=(3, 50))
 
 There’s some Python shorthand here, so let’s unpack it. You can get a range of indices from a list using the colon ``:`` operator, and omitting it at either end means “from the beginning” or “until the end” of the list. So the source is ``row[:11]``, from the beginning of the row until its 11th item. And the destination is ``row[1:]``, from index 1 (column 2!) until the end. Since both of these lists have 11 items, ``transfer()`` will *step through them in parallel*, and they’re constructed so when the source is 0, the destination is 1; when the source is 1, the destination is 2; and so on. This condenses all of the subsequent transfers down the row into a single line of code.
 
@@ -339,13 +341,7 @@ To see a text preview of the steps your Flex or OT-2 will take, use the change d
 
     opentrons_simulate dilution-tutorial.py
 
-This should generate a lot of output! As written, the protocol has about 1000 steps. If you’re curious how long that will take, you can use an experimental feature to estimate the time:
-
-.. prompt:: bash
-
-    opentrons_simulate dilution-tutorial.py -e -o nothing
-
-The ``-e`` flag estimates duration, and ``-o nothing`` suppresses printing the run log. This indicates that using a single-channel pipette for serial dilution across the whole plate will take about half an hour — plenty of time to grab a coffee while your robot pipettes for you! ☕️ 
+This should generate a lot of output! As written, the protocol has about 1000 steps. In fact, using a single-channel pipette for serial dilution across the whole plate will take about half an hour — plenty of time to grab a coffee while your robot pipettes for you! ☕️
 
 If that’s too long, you can always cancel your run partway through or modify ``for i in range(8)`` to loop through fewer rows.
 

@@ -3,8 +3,8 @@ import { fireEvent, screen } from '@testing-library/react'
 import { vi, it, describe, expect, beforeEach } from 'vitest'
 
 import { renderWithProviders } from '../../../__testing-utils__'
-import { SmallButton } from '../../../atoms/buttons'
 import { ChildNavigation } from '..'
+import type { SmallButton } from '../../../atoms/buttons'
 
 const render = (props: React.ComponentProps<typeof ChildNavigation>) =>
   renderWithProviders(<ChildNavigation {...props} />)

@@ -138,10 +138,11 @@ export interface RobotMassStorageDeviceRemoved {
 export type NotifyTopic =
   | 'ALL_TOPICS'
   | 'robot-server/maintenance_runs/current_run'
-  | 'robot-server/runs/current_command'
+  | 'robot-server/runs/commands_links'
   | 'robot-server/runs'
   | `robot-server/runs/${string}`
   | 'robot-server/deck_configuration'
+  | `robot-server/runs/pre_serialized_commands/${string}`
 
 export interface NotifySubscribeAction {
   type: 'shell:NOTIFY_SUBSCRIBE'

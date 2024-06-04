@@ -11,9 +11,13 @@ import {
 } from '@opentrons/components'
 import {
   FLEX_ROBOT_TYPE,
+  FLEX_SINGLE_SLOT_BY_CUTOUT_ID,
+  MAGNETIC_BLOCK_V1_FIXTURE,
+  MODULE_FIXTURES_BY_MODEL,
+  STAGING_AREA_SLOT_WITH_MAGNETIC_BLOCK_V1_FIXTURE,
+  THERMOCYCLER_V2_REAR_FIXTURE,
   getSimplestDeckConfigForProtocol,
 } from '@opentrons/shared-data'
-import { useUpdateDeckConfigurationMutation } from '@opentrons/react-api-client'
 
 import { ChildNavigation } from '../ChildNavigation'
 import { AddFixtureModal } from '../DeviceDetailsDeckConfiguration/AddFixtureModal'
@@ -25,8 +29,9 @@ import { useNotifyDeckConfigurationQuery } from '../../resources/deck_configurat
 import type {
   CutoutFixtureId,
   CutoutId,
-  DeckConfiguration,
+  ModuleModel,
 } from '@opentrons/shared-data'
+import type { ModuleOnDeck } from '@opentrons/components'
 import type { SetupScreens } from '../../pages/ProtocolSetup'
 
 interface ProtocolSetupDeckConfigurationProps {
@@ -42,7 +47,11 @@ export function ProtocolSetupDeckConfiguration({
   setSetupScreen,
   providedFixtureOptions,
 }: ProtocolSetupDeckConfigurationProps): JSX.Element {
-  const { t } = useTranslation(['protocol_setup', 'devices_landing', 'shared'])
+  const { i18n, t } = useTranslation([
+    'protocol_setup',
+    'devices_landing',
+    'shared',
+  ])
 
   const [
     showConfigurationModal,
@@ -60,24 +69,58 @@ export function ProtocolSetupDeckConfiguration({
     mostRecentAnalysis
   ).map(({ cutoutId, cutoutFixtureId }) => ({ cutoutId, cutoutFixtureId }))
 
-  const targetDeckConfig = simplestDeckConfig.find(
+  const targetCutoutConfig = simplestDeckConfig.find(
     deck => deck.cutoutId === cutoutId
   )
 
   const mergedDeckConfig = deckConfig.map(config =>
-    targetDeckConfig != null && config.cutoutId === targetDeckConfig.cutoutId
-      ? targetDeckConfig
+    targetCutoutConfig != null &&
+    config.cutoutId === targetCutoutConfig.cutoutId
+      ? targetCutoutConfig
       : config
   )
 
-  const [
-    currentDeckConfig,
-    setCurrentDeckConfig,
-  ] = React.useState<DeckConfiguration>(mergedDeckConfig)
+  const modulesOnDeck = mergedDeckConfig.reduce<ModuleOnDeck[]>(
+    (acc, cutoutConfig) => {
+      const matchingFixtureIdsAndModel = Object.entries(
+        MODULE_FIXTURES_BY_MODEL
+      ).find(([_moduleModel, moduleFixtureIds]) =>
+        moduleFixtureIds.includes(cutoutConfig.cutoutFixtureId)
+      )
+      if (
+        matchingFixtureIdsAndModel != null &&
+        cutoutConfig.cutoutFixtureId !== THERMOCYCLER_V2_REAR_FIXTURE
+      ) {
+        const [matchingModel] = matchingFixtureIdsAndModel
+        return [
+          ...acc,
+          {
+            moduleModel: matchingModel as ModuleModel,
+            moduleLocation: {
+              slotName: FLEX_SINGLE_SLOT_BY_CUTOUT_ID[cutoutConfig.cutoutId],
+            },
+          },
+        ]
+      } else if (
+        cutoutConfig.cutoutFixtureId ===
+        STAGING_AREA_SLOT_WITH_MAGNETIC_BLOCK_V1_FIXTURE
+      ) {
+        return [
+          ...acc,
+          {
+            moduleModel: MAGNETIC_BLOCK_V1_FIXTURE,
+            moduleLocation: {
+              slotName: FLEX_SINGLE_SLOT_BY_CUTOUT_ID[cutoutConfig.cutoutId],
+            },
+          },
+        ]
+      }
+      return acc
+    },
+    []
+  )
 
-  const { updateDeckConfiguration } = useUpdateDeckConfigurationMutation()
   const handleClickConfirm = (): void => {
-    updateDeckConfiguration(currentDeckConfig)
     setSetupScreen('modules')
   }
 
@@ -93,9 +136,8 @@ export function ProtocolSetupDeckConfiguration({
           {showConfigurationModal && cutoutId != null ? (
             <AddFixtureModal
               cutoutId={cutoutId}
-              setShowAddFixtureModal={setShowConfigurationModal}
+              closeModal={() => setShowConfigurationModal(false)}
               providedFixtureOptions={providedFixtureOptions}
-              setCurrentDeckConfig={setCurrentDeckConfig}
               isOnDevice
             />
           ) : null}
@@ -105,8 +147,7 @@ export function ProtocolSetupDeckConfiguration({
       <Flex flexDirection={DIRECTION_COLUMN}>
         <ChildNavigation
           header={t('devices_landing:deck_configuration')}
-          onClickBack={() => setSetupScreen('modules')}
-          buttonText={t('shared:confirm')}
+          buttonText={i18n.format(t('shared:save'), 'capitalize')}
           onClickButton={handleClickConfirm}
         />
         <Flex
@@ -116,8 +157,9 @@ export function ProtocolSetupDeckConfiguration({
           height="28.4375rem"
         >
           <BaseDeck
-            deckConfig={currentDeckConfig}
+            deckConfig={mergedDeckConfig}
             robotType={FLEX_ROBOT_TYPE}
+            modulesOnDeck={modulesOnDeck}
           />
         </Flex>
       </Flex>

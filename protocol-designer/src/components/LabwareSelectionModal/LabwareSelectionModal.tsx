@@ -470,7 +470,7 @@ export function LabwareSelectionModal(): JSX.Element | null {
         <ul>
           {customLabwareURIs.length > 0 ? (
             <PDTitledList
-              title="Custom Labware"
+              title={t('custom_labware')}
               collapsed={selectedCategory !== CUSTOM_CATEGORY}
               onCollapseToggle={makeToggleCategory(CUSTOM_CATEGORY)}
               onClick={makeToggleCategory(CUSTOM_CATEGORY)}
@@ -530,7 +530,7 @@ export function LabwareSelectionModal(): JSX.Element | null {
             <PDTitledList
               data-testid="LabwareSelectionModal_adapterCompatibleLabware"
               key={adapterCompatibleLabware}
-              title="adapter compatible labware"
+              title={t('adapter_compatible_labware')}
               collapsed={selectedCategory !== adapterCompatibleLabware}
               onCollapseToggle={makeToggleCategory(adapterCompatibleLabware)}
               onClick={makeToggleCategory(adapterCompatibleLabware)}

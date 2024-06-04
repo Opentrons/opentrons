@@ -21,15 +21,6 @@ class Protocols:
         robot_error=False,
     )
 
-    OT2_S_v6_P20S_P300M_HS_HSCollision: Protocol = Protocol(
-        file_stem="OT2_S_v6_P20S_P300M_HS_HSCollision",
-        file_extension="json",
-        robot="OT2",
-        app_error=False,
-        robot_error=False,
-        description="""This protocol gives an error in PD.8-Channel pipette cannot access labware8-Channel pipettes cannot access labware or tip racks to the left or right of a Heater-Shaker GEN1 module. Move labware to a different slot to access it with an 8-Channel pipette.If you export it anyway there are NOT analysis errors in the app side analysis.TODO on if there are robot side analysis errors but do not expect them?""",  # noqa: E501
-    )
-
     OT2_S_v6_P20S_P300M_TransferReTransferLiquid: Protocol = Protocol(
         file_stem="OT2_S_v6_P20S_P300M_TransferReTransferLiquid",
         file_extension="json",
@@ -299,8 +290,8 @@ class Protocols:
         robot_error=False,
     )
 
-    OT2_X_v2_17_P300M_P20S_HS_TC_TM_dispense_changes: Protocol = Protocol(
-        file_stem="OT2_X_v2_17_P300M_P20S_HS_TC_TM_dispense_changes",
+    OT2_S_v2_17_P300M_P20S_HS_TC_TM_dispense_changes: Protocol = Protocol(
+        file_stem="OT2_S_v2_17_P300M_P20S_HS_TC_TM_dispense_changes",
         file_extension="py",
         robot="OT2",
         app_error=True,
@@ -308,32 +299,32 @@ class Protocols:
         app_analysis_error="ValueError [line 15]: Cannot dispense more than pipette max volume",  # noqa: E501
     )
 
-    OT2_S_v2_14_NO_PIPETTES_TC_verifyThermocyclerLoadedSlots: Protocol = Protocol(
-        file_stem="OT2_S_v2_14_NO_PIPETTES_TC_verifyThermocyclerLoadedSlots",
+    OT2_S_v2_14_NO_PIPETTES_TC_VerifyThermocyclerLoadedSlots: Protocol = Protocol(
+        file_stem="OT2_S_v2_14_NO_PIPETTES_TC_VerifyThermocyclerLoadedSlots",
         file_extension="py",
         robot="OT2",
         app_error=False,
         robot_error=False,
     )
 
-    OT2_S_v2_15_NO_PIPETTES_TC_verifyThermocyclerLoadedSlots: Protocol = Protocol(
-        file_stem="OT2_S_v2_15_NO_PIPETTES_TC_verifyThermocyclerLoadedSlots",
+    OT2_S_v2_15_NO_PIPETTES_TC_VerifyThermocyclerLoadedSlots: Protocol = Protocol(
+        file_stem="OT2_S_v2_15_NO_PIPETTES_TC_VerifyThermocyclerLoadedSlots",
         file_extension="py",
         robot="OT2",
         app_error=False,
         robot_error=False,
     )
 
-    OT2_X_v2_16_NO_PIPETTES_TC_verifyThermocyclerLoadedSlots: Protocol = Protocol(
-        file_stem="OT2_X_v2_16_NO_PIPETTES_TC_verifyThermocyclerLoadedSlots",
+    OT2_S_v2_16_NO_PIPETTES_TC_VerifyThermocyclerLoadedSlots: Protocol = Protocol(
+        file_stem="OT2_S_v2_16_NO_PIPETTES_TC_VerifyThermocyclerLoadedSlots",
         file_extension="py",
         robot="OT2",
         app_error=False,
         robot_error=False,
     )
 
-    OT2_S_v2_17_NO_PIPETTES_TC_verifyThermocyclerLoadedSlots: Protocol = Protocol(
-        file_stem="OT2_S_v2_17_NO_PIPETTES_TC_verifyThermocyclerLoadedSlots",
+    OT2_S_v2_17_NO_PIPETTES_TC_VerifyThermocyclerLoadedSlots: Protocol = Protocol(
+        file_stem="OT2_S_v2_17_NO_PIPETTES_TC_VerifyThermocyclerLoadedSlots",
         file_extension="py",
         robot="OT2",
         app_error=False,
@@ -603,32 +594,24 @@ class Protocols:
         robot_error=False,
     )
 
-    Flex_S_v2_14_NO_PIPETTES_TC_VerifyThermocyclerLoadedSlots: Protocol = Protocol(
-        file_stem="Flex_S_v2_14_NO_PIPETTES_TC_VerifyThermocyclerLoadedSlots",
+    Flex_S_v2_15_NO_PIPETTES_TC_verifyThermocyclerLoadedSlots: Protocol = Protocol(
+        file_stem="Flex_S_v2_15_NO_PIPETTES_TC_verifyThermocyclerLoadedSlots",
         file_extension="py",
         robot="Flex",
         app_error=False,
         robot_error=False,
     )
 
-    Flex_S_v2_15_NO_PIPETTES_TC_VerifyThermocyclerLoadedSlots: Protocol = Protocol(
-        file_stem="Flex_S_v2_15_NO_PIPETTES_TC_VerifyThermocyclerLoadedSlots",
+    Flex_S_v2_16_NO_PIPETTES_TC_verifyThermocyclerLoadedSlots: Protocol = Protocol(
+        file_stem="Flex_S_v2_16_NO_PIPETTES_TC_verifyThermocyclerLoadedSlots",
         file_extension="py",
         robot="Flex",
         app_error=False,
         robot_error=False,
     )
 
-    Flex_S_v2_16_NO_PIPETTES_TC_VerifyThermocyclerLoadedSlots: Protocol = Protocol(
-        file_stem="Flex_S_v2_16_NO_PIPETTES_TC_VerifyThermocyclerLoadedSlots",
-        file_extension="py",
-        robot="Flex",
-        app_error=False,
-        robot_error=False,
-    )
-
-    Flex_S_v2_17_NO_PIPETTES_TC_VerifyThermocyclerLoadedSlots: Protocol = Protocol(
-        file_stem="Flex_S_v2_17_NO_PIPETTES_TC_VerifyThermocyclerLoadedSlots",
+    Flex_S_v2_17_NO_PIPETTES_TC_verifyThermocyclerLoadedSlots: Protocol = Protocol(
+        file_stem="Flex_S_v2_17_NO_PIPETTES_TC_verifyThermocyclerLoadedSlots",
         file_extension="py",
         robot="Flex",
         app_error=False,

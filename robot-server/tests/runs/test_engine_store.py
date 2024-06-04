@@ -11,18 +11,14 @@ from opentrons.types import DeckSlotName
 from opentrons.hardware_control import HardwareControlAPI, API
 from opentrons.hardware_control.types import EstopStateNotification, EstopState
 from opentrons.protocol_engine import ProtocolEngine, StateSummary, types as pe_types
-from opentrons.protocol_runner import (
-    RunResult,
-    LiveRunner,
-    JsonRunner,
-)
+from opentrons.protocol_runner import RunResult, LiveRunner, JsonRunner
 from opentrons.protocol_reader import ProtocolReader, ProtocolSource
 
 from robot_server.protocols.protocol_store import ProtocolResource
 from robot_server.runs.engine_store import (
     EngineStore,
     EngineConflictError,
-    NoRunnerEnginePairError,
+    NoRunnerEngineError,
     handle_estop_event,
 )
 
@@ -53,7 +49,7 @@ async def json_protocol_source() -> ProtocolSource:
     return await ProtocolReader().read_saved(files=[simple_protocol], directory=None)
 
 
-async def test_create_engine(subject: EngineStore) -> None:
+async def test_create_engine(decoy: Decoy, subject: EngineStore) -> None:
     """It should create an engine for a run."""
     result = await subject.create(
         run_id="run-id",
@@ -186,10 +182,10 @@ async def test_clear_engine(subject: EngineStore) -> None:
     assert subject.current_run_id is None
     assert isinstance(result, RunResult)
 
-    with pytest.raises(NoRunnerEnginePairError):
+    with pytest.raises(NoRunnerEngineError):
         subject.engine
 
-    with pytest.raises(NoRunnerEnginePairError):
+    with pytest.raises(NoRunnerEngineError):
         subject.runner
 
 
@@ -225,9 +221,9 @@ async def test_clear_idle_engine(subject: EngineStore) -> None:
     await subject.clear()
 
     # TODO: test engine finish is called
-    with pytest.raises(NoRunnerEnginePairError):
+    with pytest.raises(NoRunnerEngineError):
         subject.engine
-    with pytest.raises(NoRunnerEnginePairError):
+    with pytest.raises(NoRunnerEngineError):
         subject.runner
 
 

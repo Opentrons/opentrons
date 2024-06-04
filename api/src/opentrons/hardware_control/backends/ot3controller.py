@@ -45,7 +45,7 @@ from .ot3utils import (
     motor_nodes,
     LIMIT_SWITCH_OVERTRAVEL_DISTANCE,
     map_pipette_type_to_sensor_id,
-    moving_axes_in_move_group,
+    moving_pipettes_in_move_group,
     gripper_jaw_state_from_fw,
     get_system_constraints,
     get_system_constraints_for_calibration,
@@ -191,6 +191,10 @@ from opentrons_shared_data.errors.exceptions import (
     PipetteOverpressureError,
     FirmwareUpdateRequiredError,
     FailedGripperPickupError,
+    LiquidNotFoundError,
+    CommunicationError,
+    PythonException,
+    UnsupportedHardwareCommand,
 )
 
 from .subsystem_manager import SubsystemManager
@@ -663,12 +667,9 @@ class OT3Controller(FlexBackend):
             else False,
         )
 
-        mounts_moving = [
-            k
-            for k in moving_axes_in_move_group(move_group)
-            if k in [NodeId.pipette_left, NodeId.pipette_right]
-        ]
-        async with self._monitor_overpressure(mounts_moving):
+        pipettes_moving = moving_pipettes_in_move_group(move_group)
+
+        async with self._monitor_overpressure(pipettes_moving):
             positions = await runner.run(can_messenger=self._messenger)
         self._handle_motor_status_response(positions)
 
@@ -1185,7 +1186,14 @@ class OT3Controller(FlexBackend):
     async def is_motor_engaged(self, axis: Axis) -> bool:
         node = axis_to_node(axis)
         result = await get_motor_enabled(self._messenger, {node})
-        engaged = result[node]
+        try:
+            engaged = result[node]
+        except KeyError as ke:
+            raise CommunicationError(
+                message=f"No response from {node.name} for motor engagement query",
+                detail={"node": node.name},
+                wrapping=[PythonException(ke)],
+            ) from ke
         self._engaged_axes.update({axis: engaged})
         return engaged
 
@@ -1357,12 +1365,16 @@ class OT3Controller(FlexBackend):
         probe: InstrumentProbeType = InstrumentProbeType.PRIMARY,
     ) -> float:
         if output_option == OutputOptions.sync_buffer_to_csv:
-            assert (
+            if (
                 self._subsystem_manager.device_info[
                     SubSystem.of_mount(mount)
                 ].revision.tertiary
                 == "1"
-            )
+            ):
+                raise UnsupportedHardwareCommand(
+                    "Liquid Probe not supported on this pipette firmware"
+                )
+
         head_node = axis_to_node(Axis.by_mount(mount))
         tool = sensor_node_for_pipette(OT3Mount(mount.value))
         csv_output = bool(output_option.value & OutputOptions.stream_to_csv.value)
@@ -1399,6 +1411,18 @@ class OT3Controller(FlexBackend):
         for node, point in positions.items():
             self._position.update({node: point.motor_position})
             self._encoder_position.update({node: point.encoder_position})
+        if (
+            head_node not in positions
+            or positions[head_node].move_ack
+            == MoveCompleteAck.complete_without_condition
+        ):
+            raise LiquidNotFoundError(
+                "Liquid not found during probe.",
+                {
+                    str(node_to_axis(node)): str(point.motor_position)
+                    for node, point in positions.items()
+                },
+            )
         return self._position[axis_to_node(Axis.by_mount(mount))]
 
     async def capacitive_probe(

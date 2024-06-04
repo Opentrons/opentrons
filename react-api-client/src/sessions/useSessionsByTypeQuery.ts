@@ -1,11 +1,9 @@
-import {
-  getSessions,
-  HostConfig,
-  Sessions,
-  SessionType,
-} from '@opentrons/api-client'
-import { UseQueryResult, useQuery } from 'react-query'
+import { getSessions } from '@opentrons/api-client'
+import { useQuery } from 'react-query'
 import { useHost } from '../api'
+
+import type { UseQueryResult } from 'react-query'
+import type { HostConfig, Sessions, SessionType } from '@opentrons/api-client'
 
 export function useSessionsByTypeQuery(args: {
   sessionType: SessionType

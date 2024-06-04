@@ -26,6 +26,7 @@ import {
   getModuleType,
   HEATERSHAKER_MODULE_TYPE,
   HEATERSHAKER_MODULE_V1,
+  MAGNETIC_BLOCK_TYPE,
   MAGNETIC_BLOCK_V1,
   OT2_ROBOT_TYPE,
   TC_MODULE_LOCATION_OT2,
@@ -108,6 +109,8 @@ export const SetupModulesList = (props: SetupModulesListProps): JSX.Element => {
           moduleId,
           conflictedFixture,
         }) => {
+          // filter out the magnetic block here, because it is handled by the SetupFixturesList
+          if (moduleDef.moduleType === MAGNETIC_BLOCK_TYPE) return null
           return (
             <ModulesListItem
               key={`SetupModulesList_${String(

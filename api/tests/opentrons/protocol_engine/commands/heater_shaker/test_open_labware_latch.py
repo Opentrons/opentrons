@@ -10,6 +10,7 @@ from opentrons.protocol_engine.state.module_substates import (
 )
 from opentrons.protocol_engine.execution import EquipmentHandler, MovementHandler
 from opentrons.protocol_engine.commands import heater_shaker
+from opentrons.protocol_engine.commands.command import SuccessData
 from opentrons.protocol_engine.commands.heater_shaker.open_labware_latch import (
     OpenLabwareLatchImpl,
 )
@@ -62,4 +63,6 @@ async def test_open_labware_latch(
         ),
         await hs_hardware.open_labware_latch(),
     )
-    assert result == heater_shaker.OpenLabwareLatchResult(pipetteRetracted=True)
+    assert result == SuccessData(
+        public=heater_shaker.OpenLabwareLatchResult(pipetteRetracted=True), private=None
+    )

@@ -13,6 +13,7 @@ from .protocol_runner import (
     AnyRunner,
 )
 from .create_simulating_runner import create_simulating_runner
+from .run_orchestrator import RunOrchestrator
 
 __all__ = [
     "AbstractRunner",
@@ -23,4 +24,5 @@ __all__ = [
     "PythonAndLegacyRunner",
     "LiveRunner",
     "AnyRunner",
+    "RunOrchestrator",
 ]

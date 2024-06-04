@@ -1,6 +1,5 @@
 """Simulating AbstractRunner factory."""
 
-from opentrons.config import feature_flags
 from opentrons.hardware_control import API as OT2API, HardwareControlAPI
 from opentrons.protocols.api_support import deck_type
 from opentrons.protocols.api_support.deck_type import should_load_fixed_trash
@@ -13,7 +12,7 @@ from opentrons.protocol_reader.protocol_source import ProtocolConfig
 
 from opentrons_shared_data.robot.dev_types import RobotType
 
-from .legacy_wrappers import LegacySimulatingContextCreator
+from .python_protocol_wrappers import SimulatingContextCreator
 from .protocol_runner import create_protocol_runner, AbstractRunner
 
 
@@ -58,12 +57,12 @@ async def create_simulating_runner(
             use_virtual_modules=True,
             use_virtual_gripper=True,
             use_simulated_deck_config=True,
-            use_virtual_pipettes=(not feature_flags.disable_fast_protocol_upload()),
+            use_virtual_pipettes=True,
         ),
         load_fixed_trash=should_load_fixed_trash(protocol_config),
     )
 
-    simulating_legacy_context_creator = LegacySimulatingContextCreator(
+    simulating_context_creator = SimulatingContextCreator(
         hardware_api=simulating_hardware_api,
         protocol_engine=protocol_engine,
     )
@@ -72,7 +71,7 @@ async def create_simulating_runner(
         protocol_config=protocol_config,
         protocol_engine=protocol_engine,
         hardware_api=simulating_hardware_api,
-        legacy_context_creator=simulating_legacy_context_creator,
+        protocol_context_creator=simulating_context_creator,
     )
 
 

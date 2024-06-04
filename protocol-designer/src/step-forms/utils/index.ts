@@ -12,8 +12,8 @@ import {
 } from '@opentrons/shared-data'
 import { SPAN7_8_10_11_SLOT, TC_SPAN_SLOTS } from '../../constants'
 import { hydrateField } from '../../steplist/fieldLevel'
-import { LabwareDefByDefURI } from '../../labware-defs'
 import { getCutoutIdByAddressableArea } from '../../utils'
+import type { LabwareDefByDefURI } from '../../labware-defs'
 import type {
   AddressableAreaName,
   CutoutId,

@@ -27,10 +27,7 @@ import {
   RUN_STATUS_RUNNING,
   RUN_STATUS_BLOCKED_BY_OPEN_DOOR,
 } from '@opentrons/api-client'
-import {
-  useAllCommandsQuery,
-  useCommandQuery,
-} from '@opentrons/react-api-client'
+import { useCommandQuery } from '@opentrons/react-api-client'
 
 import { useMostRecentCompletedAnalysis } from '../LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import { getTopPortalEl } from '../../App/portal'
@@ -42,7 +39,11 @@ import { ProgressBar } from '../../atoms/ProgressBar'
 import { useDownloadRunLog, useRobotType } from '../Devices/hooks'
 import { InterventionTicks } from './InterventionTicks'
 import { isInterventionCommand } from '../InterventionModal/utils'
-import { useNotifyRunQuery } from '../../resources/runs'
+import {
+  useNotifyRunQuery,
+  useNotifyAllCommandsQuery,
+} from '../../resources/runs'
+import { getCommandTextData } from '../CommandText/utils/getCommandTextData'
 
 import type { RunStatus } from '@opentrons/api-client'
 
@@ -74,7 +75,7 @@ export function RunProgressMeter(props: RunProgressMeterProps): JSX.Element {
   const { data: runRecord } = useNotifyRunQuery(runId)
   const runData = runRecord?.data ?? null
   const analysis = useMostRecentCompletedAnalysis(runId)
-  const { data: allCommandsQueryData } = useAllCommandsQuery(runId, {
+  const { data: allCommandsQueryData } = useNotifyAllCommandsQuery(runId, {
     cursor: null,
     pageLength: 1,
   })
@@ -138,7 +139,7 @@ export function RunProgressMeter(props: RunProgressMeterProps): JSX.Element {
   ) {
     currentStepContents = (
       <CommandText
-        robotSideAnalysis={analysis}
+        commandTextData={getCommandTextData(analysis)}
         command={analysisCommands[lastRunAnalysisCommandIndex]}
         robotType={robotType}
       />
@@ -150,7 +151,7 @@ export function RunProgressMeter(props: RunProgressMeterProps): JSX.Element {
   ) {
     currentStepContents = (
       <CommandText
-        robotSideAnalysis={analysis}
+        commandTextData={getCommandTextData(analysis)}
         command={runCommandDetails.data}
         robotType={robotType}
       />

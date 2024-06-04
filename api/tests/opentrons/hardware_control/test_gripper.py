@@ -74,6 +74,7 @@ def test_reload_instrument_cal_ot3(fake_offset: "GripperCalibrationOffset") -> N
         fake_gripper_conf,
         fake_offset,
         "fakeid123",
+        jaw_max_offset=15,
     )
     # if only calibration is changed
     new_cal = instrument_calibration.GripperCalibrationOffset(
@@ -87,8 +88,35 @@ def test_reload_instrument_cal_ot3(fake_offset: "GripperCalibrationOffset") -> N
 
     # it's the same gripper
     assert new_gripper == old_gripper
+    # jaw offset should persists as well
+    assert new_gripper._jaw_max_offset == old_gripper._jaw_max_offset
     # we said upstream could skip
     assert skip
+
+
+@pytest.mark.ot3_only
+def test_reload_instrument_cal_ot3_conf_changed(
+    fake_offset: "GripperCalibrationOffset",
+) -> None:
+    old_gripper = gripper.Gripper(
+        fake_gripper_conf,
+        fake_offset,
+        "fakeid123",
+        jaw_max_offset=15,
+    )
+    new_conf = fake_gripper_conf.copy(
+        update={"grip_force_profile": {"default_grip_force": 1}}
+    )
+    assert new_conf != old_gripper.config
+
+    new_gripper, skip = gripper._reload_gripper(new_conf, old_gripper, fake_offset)
+
+    # it's not the same gripper
+    assert new_gripper != old_gripper
+    # do not pass in the old jaw max offse
+    assert not new_gripper._jaw_max_offset
+    # we said upstream could skip
+    assert not skip
 
 
 @pytest.mark.ot3_only

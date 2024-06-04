@@ -18,6 +18,7 @@ TemperatureModuleType = Literal["temperatureModuleType"]
 ThermocyclerModuleType = Literal["thermocyclerModuleType"]
 HeaterShakerModuleType = Literal["heaterShakerModuleType"]
 MagneticBlockType = Literal["magneticBlockType"]
+AbsorbanceReaderType = Literal["absorbanceReaderType"]
 
 ModuleType = Union[
     MagneticModuleType,
@@ -25,6 +26,7 @@ ModuleType = Union[
     ThermocyclerModuleType,
     HeaterShakerModuleType,
     MagneticBlockType,
+    AbsorbanceReaderType,
 ]
 
 MagneticModuleModel = Literal["magneticModuleV1", "magneticModuleV2"]
@@ -32,6 +34,7 @@ TemperatureModuleModel = Literal["temperatureModuleV1", "temperatureModuleV2"]
 ThermocyclerModuleModel = Literal["thermocyclerModuleV1", "thermocyclerModuleV2"]
 HeaterShakerModuleModel = Literal["heaterShakerModuleV1"]
 MagneticBlockModel = Literal["magneticBlockV1"]
+AbsorbanceReaderModel = Literal["absorbanceReaderV1"]
 
 ModuleModel = Union[
     MagneticModuleModel,
@@ -39,6 +42,7 @@ ModuleModel = Union[
     ThermocyclerModuleModel,
     HeaterShakerModuleModel,
     MagneticBlockModel,
+    AbsorbanceReaderModel,
 ]
 
 ModuleSlotTransform = TypedDict(
@@ -105,6 +109,7 @@ ModuleDefinitionV3 = TypedDict(
         "quirks": List[str],
         "slotTransforms": Dict[str, Dict[str, Dict[str, List[List[float]]]]],
         "compatibleWith": List[ModuleModel],
+        "incompatibleWithDecks": List[str],
         "twoDimensionalRendering": Dict[str, Any],
         "gripperOffsets": Dict[str, GripperOffsets],
     },

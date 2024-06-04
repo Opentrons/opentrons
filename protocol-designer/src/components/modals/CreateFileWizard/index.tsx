@@ -10,9 +10,6 @@ import uniq from 'lodash/uniq'
 import * as Yup from 'yup'
 import { ModalShell } from '@opentrons/components'
 import {
-  ModuleType,
-  ModuleModel,
-  PipetteName,
   OT2_ROBOT_TYPE,
   TEMPERATURE_MODULE_TYPE,
   HEATERSHAKER_MODULE_TYPE,
@@ -20,13 +17,9 @@ import {
   THERMOCYCLER_MODULE_TYPE,
   FLEX_ROBOT_TYPE,
   WASTE_CHUTE_CUTOUT,
+  getAreSlotsAdjacent,
 } from '@opentrons/shared-data'
-import {
-  actions as stepFormActions,
-  FormPipettesByMount,
-  FormPipette,
-  PipetteOnDeck,
-} from '../../../step-forms'
+import { actions as stepFormActions } from '../../../step-forms'
 import { INITIAL_DECK_SETUP_STEP_ID } from '../../../constants'
 import { uuid } from '../../../utils'
 import { actions as navigationActions } from '../../../navigation'
@@ -53,8 +46,18 @@ import { WizardHeader } from './WizardHeader'
 import { StagingAreaTile } from './StagingAreaTile'
 import { getTrashSlot } from './utils'
 
+import type {
+  ModuleType,
+  ModuleModel,
+  PipetteName,
+} from '@opentrons/shared-data'
 import type { NormalizedPipette } from '@opentrons/step-generation'
 import type { ThunkDispatch } from 'redux-thunk'
+import type {
+  FormPipettesByMount,
+  FormPipette,
+  PipetteOnDeck,
+} from '../../../step-forms'
 import type { BaseState } from '../../../types'
 import type { FormState } from './types'
 
@@ -118,6 +121,7 @@ export function CreateFileWizard(): JSX.Element | null {
       values.pipettesByMount,
       (acc, formPipette: FormPipette, mount): PipetteFieldsData[] => {
         return formPipette?.pipetteName != null &&
+          formPipette?.pipetteName !== '' &&
           formPipette.tiprackDefURI != null &&
           (mount === 'left' || mount === 'right')
           ? [
@@ -262,14 +266,25 @@ export function CreateFileWizard(): JSX.Element | null {
         pipettes.flatMap(pipette => pipette.tiprackDefURI)
       )
       const FLEX_MIDDLE_SLOTS = ['C2', 'B2', 'A2']
-      const OT2_MIDDLE_SLOTS = ['2', '5', '8', '11']
+      const hasOt2TC = modules.find(
+        module => module.type === THERMOCYCLER_MODULE_TYPE
+      )
+      const heaterShakerSlot = modules.find(
+        module => module.type === HEATERSHAKER_MODULE_TYPE
+      )?.slot
+      const OT2_MIDDLE_SLOTS = hasOt2TC ? ['2', '5'] : ['2', '5', '8', '11']
+      const modifiedOt2Slots = OT2_MIDDLE_SLOTS.filter(slot =>
+        heaterShakerSlot != null
+          ? !getAreSlotsAdjacent(heaterShakerSlot, slot)
+          : slot
+      )
       newTiprackModels.forEach((tiprackDefURI, index) => {
         dispatch(
           labwareIngredActions.createContainer({
             slot:
               values.fields.robotType === FLEX_ROBOT_TYPE
                 ? FLEX_MIDDLE_SLOTS[index]
-                : OT2_MIDDLE_SLOTS[index],
+                : modifiedOt2Slots[index],
             labwareDefURI: tiprackDefURI,
             adapterUnderLabwareDefURI:
               values.pipettesByMount.left.pipetteName === 'p1000_96'

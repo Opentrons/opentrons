@@ -1,28 +1,37 @@
 import React from 'react'
 import { fireEvent, screen } from '@testing-library/react'
-import { describe, it, vi, beforeEach, expect } from 'vitest'
+import { describe, it, beforeEach, expect, vi } from 'vitest'
 
 import { renderWithProviders } from '../../../__testing-utils__'
-import { setPromptContext } from '../PromptProvider'
 import { reagentTransfer } from '../../../assets/prompts'
 import { PromptButton } from '../index'
 
-const mockSetPrompt = vi.fn()
+import type * as ReactHookForm from 'react-hook-form'
+
+vi.mock('react-hook-form', async importOriginal => {
+  const actual = await importOriginal<typeof ReactHookForm>()
+  return {
+    ...actual,
+    useFormContext: vi.fn(() => ({
+      setValue: mockSetValue,
+    })),
+  }
+})
 
 const render = (props: React.ComponentProps<typeof PromptButton>) => {
-  return renderWithProviders(
-    <setPromptContext.Provider value={mockSetPrompt}>
-      <PromptButton {...props} />s
-    </setPromptContext.Provider>
-  )
+  return renderWithProviders(<PromptButton {...props} />)
 }
+
+let mockSetValue = vi.fn()
 
 describe('PromptButton', () => {
   let props: React.ComponentProps<typeof PromptButton>
+
   beforeEach(() => {
     props = {
       buttonText: 'Reagent Transfer',
     }
+    mockSetValue = vi.fn()
   })
 
   it('should render text', () => {
@@ -30,10 +39,11 @@ describe('PromptButton', () => {
     screen.getByRole('button', { name: 'Reagent Transfer' })
   })
 
-  it('should call a mock function when clicking a button', () => {
+  it('should render reagent transfer text into the form', () => {
     render(props)
     const button = screen.getByRole('button', { name: 'Reagent Transfer' })
     fireEvent.click(button)
-    expect(mockSetPrompt).toHaveBeenCalledWith(reagentTransfer)
+    expect(mockSetValue).toHaveBeenCalledWith('userPrompt', reagentTransfer)
+    fireEvent.click(button)
   })
 })

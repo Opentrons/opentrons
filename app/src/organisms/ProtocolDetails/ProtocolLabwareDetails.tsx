@@ -8,6 +8,7 @@ import {
   DIRECTION_ROW,
   Flex,
   Icon,
+  InfoScreen,
   POSITION_ABSOLUTE,
   POSITION_RELATIVE,
   SPACING,
@@ -55,36 +56,42 @@ export const ProtocolLabwareDetails = (
       : []
 
   return (
-    <Flex flexDirection={DIRECTION_COLUMN} width="100%">
-      <Flex flexDirection={DIRECTION_ROW}>
-        <StyledText
-          as="label"
-          fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-          marginBottom={SPACING.spacing8}
-          data-testid="ProtocolLabwareDetails_labware_name"
-          width="66%"
-        >
-          {t('labware_name')}
-        </StyledText>
-        <StyledText
-          as="label"
-          fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-          data-testid="ProtocolLabwareDetails_quantity"
-        >
-          {t('quantity')}
-        </StyledText>
-      </Flex>
-      {labwareDetails?.map((labware, index) => (
-        <ProtocolLabwareDetailItem
-          key={index}
-          namespace={labware.params.namespace}
-          displayName={labware.result?.definition?.metadata?.displayName}
-          quantity={labware.quantity}
-          labware={{ definition: labware.result?.definition }}
-          data-testid={`ProtocolLabwareDetails_item_${index}`}
-        />
-      ))}
-    </Flex>
+    <>
+      {labwareDetails.length > 0 ? (
+        <Flex flexDirection={DIRECTION_COLUMN} width="100%">
+          <Flex flexDirection={DIRECTION_ROW}>
+            <StyledText
+              as="label"
+              fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+              marginBottom={SPACING.spacing8}
+              data-testid="ProtocolLabwareDetails_labware_name"
+              width="66%"
+            >
+              {t('labware_name')}
+            </StyledText>
+            <StyledText
+              as="label"
+              fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+              data-testid="ProtocolLabwareDetails_quantity"
+            >
+              {t('quantity')}
+            </StyledText>
+          </Flex>
+          {labwareDetails?.map((labware, index) => (
+            <ProtocolLabwareDetailItem
+              key={index}
+              namespace={labware.params.namespace}
+              displayName={labware.result?.definition?.metadata?.displayName}
+              quantity={labware.quantity}
+              labware={{ definition: labware.result?.definition }}
+              data-testid={`ProtocolLabwareDetails_item_${index}`}
+            />
+          ))}
+        </Flex>
+      ) : (
+        <InfoScreen contentType="labware" />
+      )}
+    </>
   )
 }
 

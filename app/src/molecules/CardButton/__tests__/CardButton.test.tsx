@@ -49,7 +49,7 @@ describe('CardButton', () => {
     screen.getByText('Find a network in your lab or enter your own.')
     expect(screen.getByTestId('cardButton_icon_wifi')).toBeInTheDocument()
     const button = screen.getByRole('button')
-    expect(button).toHaveStyle(`background-color: ${COLORS.blue40}`)
+    expect(button).toHaveStyle(`background-color: ${COLORS.blue35}`)
   })
 
   it('renders the button as disabled', () => {

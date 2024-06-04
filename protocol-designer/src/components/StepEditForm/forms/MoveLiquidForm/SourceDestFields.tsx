@@ -145,6 +145,36 @@ export const SourceDestFields = (props: SourceDestFieldsProps): JSX.Element => {
           </>
         )}
 
+        {prefix === 'dispense' && (
+          <CheckboxRowField
+            {...propsForFields.blowout_checkbox}
+            label={t('step_edit_form.field.blowout.label')}
+            className={styles.small_field}
+          >
+            <BlowoutLocationField
+              {...propsForFields.blowout_location}
+              className={styles.full_width}
+              options={getBlowoutLocationOptionsForForm({
+                path: formData.path,
+                stepType: formData.stepType,
+              })}
+            />
+            <FlowRateField
+              {...propsForFields.blowout_flowRate}
+              pipetteId={formData.pipette}
+              flowRateType="blowout"
+              volume={propsForFields.volume?.value ?? 0}
+              tiprack={propsForFields.tipRack.value}
+            />
+            <BlowoutZOffsetField
+              {...propsForFields.blowout_z_offset}
+              sourceLabwareId={propsForFields.aspirate_labware.value}
+              destLabwareId={propsForFields.dispense_labware.value}
+              blowoutLabwareId={propsForFields.blowout_location.value}
+            />
+          </CheckboxRowField>
+        )}
+
         <CheckboxRowField
           {...propsForFields[addFieldNamePrefix('touchTip_checkbox')]}
           label={t('step_edit_form.field.touchTip.label')}
@@ -163,28 +193,6 @@ export const SourceDestFields = (props: SourceDestFieldsProps): JSX.Element => {
           />
         </CheckboxRowField>
 
-        {prefix === 'dispense' && (
-          <CheckboxRowField
-            {...propsForFields.blowout_checkbox}
-            label={t('step_edit_form.field.blowout.label')}
-            className={styles.small_field}
-          >
-            <BlowoutLocationField
-              {...propsForFields.blowout_location}
-              className={styles.full_width}
-              options={getBlowoutLocationOptionsForForm({
-                path: formData.path,
-                stepType: formData.stepType,
-              })}
-            />
-            <BlowoutZOffsetField
-              {...propsForFields.blowout_z_offset}
-              sourceLabwareId={propsForFields.aspirate_labware.value}
-              destLabwareId={propsForFields.dispense_labware.value}
-              blowoutLabwareId={propsForFields.blowout_location.value}
-            />
-          </CheckboxRowField>
-        )}
         <CheckboxRowField
           {...propsForFields[addFieldNamePrefix('airGap_checkbox')]}
           label={t('step_edit_form.field.airGap.label')}

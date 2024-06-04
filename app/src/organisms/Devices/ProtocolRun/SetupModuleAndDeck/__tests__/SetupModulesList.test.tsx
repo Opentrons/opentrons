@@ -3,16 +3,11 @@ import { when } from 'vitest-when'
 import { fireEvent, screen, waitFor } from '@testing-library/react'
 import { describe, it, beforeEach, expect, vi } from 'vitest'
 import { renderWithProviders } from '../../../../../__testing-utils__'
-import {
-  FLEX_ROBOT_TYPE,
-  OT2_ROBOT_TYPE,
-  STAGING_AREA_RIGHT_SLOT_FIXTURE,
-} from '@opentrons/shared-data'
+import { FLEX_ROBOT_TYPE, OT2_ROBOT_TYPE } from '@opentrons/shared-data'
 import { i18n } from '../../../../../i18n'
 import {
   mockMagneticModule as mockMagneticModuleFixture,
   mockHeaterShaker,
-  mockMagneticBlock,
 } from '../../../../../redux/modules/__fixtures__/index'
 import {
   mockMagneticModuleGen2,
@@ -410,37 +405,5 @@ describe('SetupModulesList', () => {
     const moduleSetup = screen.getByText('View setup instructions')
     fireEvent.click(moduleSetup)
     screen.getByText('mockModuleSetupModal')
-  })
-  it('should render a magnetic block with a conflicted fixture', () => {
-    when(useIsFlex).calledWith(ROBOT_NAME).thenReturn(true)
-    vi.mocked(useModuleRenderInfoForProtocolById).mockReturnValue({
-      [mockMagneticBlock.id]: {
-        moduleId: mockMagneticBlock.id,
-        x: MOCK_MAGNETIC_MODULE_COORDS[0],
-        y: MOCK_MAGNETIC_MODULE_COORDS[1],
-        z: MOCK_MAGNETIC_MODULE_COORDS[2],
-        moduleDef: {
-          id: 'magneticBlock_id',
-          model: mockMagneticBlock.moduleModel,
-          moduleType: mockMagneticBlock.moduleType,
-          displayName: mockMagneticBlock.displayName,
-        },
-        nestedLabwareDef: null,
-        nestedLabwareId: null,
-        protocolLoadOrder: 0,
-        slotName: 'B3',
-        attachedModuleMatch: null,
-        conflictedFixture: {
-          cutoutId: 'cutoutB3',
-          cutoutFixtureId: STAGING_AREA_RIGHT_SLOT_FIXTURE,
-        },
-      },
-    } as any)
-    render(props)
-    screen.getByText('No USB connection required')
-    screen.getByText('Location conflict')
-    screen.getByText('Magnetic Block GEN1')
-    fireEvent.click(screen.getByRole('button', { name: 'Resolve' }))
-    screen.getByText('mock location conflict modal')
   })
 })

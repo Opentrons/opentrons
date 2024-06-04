@@ -64,31 +64,13 @@ export const MOVABLE_TRASH_CUTOUTS = [
   },
 ]
 
-export const getUnoccupiedStagingAreaSlots = (
-  modules: FormState['modules']
-): DeckConfiguration => {
-  let unoccupiedSlots = STANDARD_EMPTY_SLOTS
-  const moduleCutoutIds =
-    modules != null
-      ? Object.values(modules).flatMap(module =>
-          module.type === THERMOCYCLER_MODULE_TYPE
-            ? [`cutout${module.slot}`, 'cutoutA1']
-            : `cutout${module.slot}`
-        )
-      : []
-
-  unoccupiedSlots = unoccupiedSlots.filter(emptySlot => {
-    return !moduleCutoutIds.includes(emptySlot.cutoutId)
-  })
-
-  return unoccupiedSlots
-}
-
 const TOTAL_MODULE_SLOTS = 8
 
 export const getNumSlotsAvailable = (
   modules: FormState['modules'],
-  additionalEquipment: FormState['additionalEquipment']
+  additionalEquipment: FormState['additionalEquipment'],
+  //  special-casing the wasteChute available slots when there is a staging area in slot 3
+  isWasteChute?: boolean
 ): number => {
   const additionalEquipmentLength = additionalEquipment.length
   const hasTC = Object.values(modules || {}).some(
@@ -119,6 +101,9 @@ export const getNumSlotsAvailable = (
   if (hasWasteChute && isStagingAreaInD3) {
     filteredAdditionalEquipmentLength = filteredAdditionalEquipmentLength - 1
   }
+  if (isWasteChute && isStagingAreaInD3) {
+    filteredAdditionalEquipmentLength = filteredAdditionalEquipmentLength - 1
+  }
   if (hasGripper) {
     filteredAdditionalEquipmentLength = filteredAdditionalEquipmentLength - 1
   }
@@ -126,6 +111,19 @@ export const getNumSlotsAvailable = (
     TOTAL_MODULE_SLOTS -
     (filteredModuleLength + filteredAdditionalEquipmentLength)
   )
+}
+
+export const getUnoccupiedStagingAreaSlots = (
+  modules: FormState['modules'],
+  additionalEquipment: FormState['additionalEquipment']
+): DeckConfiguration => {
+  const numSlotsAvailable = getNumSlotsAvailable(modules, additionalEquipment)
+  let unoccupiedSlots = STANDARD_EMPTY_SLOTS
+
+  if (numSlotsAvailable < 4) {
+    unoccupiedSlots = STANDARD_EMPTY_SLOTS.slice(0, numSlotsAvailable)
+  }
+  return unoccupiedSlots
 }
 
 interface TrashOptionDisabledProps {
@@ -139,7 +137,11 @@ export const getTrashOptionDisabled = (
 ): boolean => {
   const { additionalEquipment, modules, trashType } = props
   const hasNoSlotsAvailable =
-    getNumSlotsAvailable(modules, additionalEquipment) === 0
+    getNumSlotsAvailable(
+      modules,
+      additionalEquipment,
+      trashType === 'wasteChute'
+    ) === 0
   return hasNoSlotsAvailable && !additionalEquipment.includes(trashType)
 }
 

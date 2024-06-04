@@ -1,6 +1,6 @@
 import { when } from 'vitest-when'
 import { beforeEach, describe, it, expect, vi, afterEach } from 'vitest'
-import { getPipetteSpecsV2 } from '@opentrons/shared-data'
+import { OT2_ROBOT_TYPE, getPipetteSpecsV2 } from '@opentrons/shared-data'
 import {
   thermocyclerPipetteCollision,
   pipetteIntoHeaterShakerLatchOpen,
@@ -20,10 +20,8 @@ import {
   DEFAULT_PIPETTE,
   SOURCE_LABWARE,
 } from '../fixtures'
-import {
-  ExtendedDispenseParams,
-  dispense,
-} from '../commandCreators/atomic/dispense'
+import { dispense } from '../commandCreators/atomic/dispense'
+import type { ExtendedDispenseParams } from '../commandCreators/atomic/dispense'
 import type { InvariantContext, RobotState } from '../types'
 
 vi.mock('../utils/thermocyclerPipetteCollision')
@@ -283,7 +281,8 @@ describe('dispense', () => {
       when(pipetteAdjacentHeaterShakerWhileShaking)
         .calledWith(
           robotStateWithTip.modules,
-          robotStateWithTip.labware[SOURCE_LABWARE].slot
+          robotStateWithTip.labware[SOURCE_LABWARE].slot,
+          OT2_ROBOT_TYPE
         )
         .thenReturn(true)
 

@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { DropTargetMonitor, useDrop } from 'react-dnd'
+import { useDrop } from 'react-dnd'
 import cx from 'classnames'
 import noop from 'lodash/noop'
 import { Icon, RobotCoordsForeignDiv } from '@opentrons/components'
@@ -15,10 +15,12 @@ import {
   openAddLabwareModal,
 } from '../../../labware-ingred/actions'
 import { selectors as labwareDefSelectors } from '../../../labware-defs'
-import { START_TERMINAL_ITEM_ID, TerminalItemId } from '../../../steplist'
+import { START_TERMINAL_ITEM_ID } from '../../../steplist'
 import { BlockedSlot } from './BlockedSlot'
 
+import type { DropTargetMonitor } from 'react-dnd'
 import type { CoordinateTuple, Dimensions } from '@opentrons/shared-data'
+import type { TerminalItemId } from '../../../steplist'
 import type { LabwareOnDeck } from '../../../step-forms'
 
 import styles from './LabwareOverlays.module.css'

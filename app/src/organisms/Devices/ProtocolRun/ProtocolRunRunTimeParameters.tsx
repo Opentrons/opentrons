@@ -71,7 +71,7 @@ export function ProtocolRunRuntimeParameters({
     <>
       <Flex
         flexDirection={DIRECTION_COLUMN}
-        padding={SPACING.spacing16}
+        padding={hasRunTimeParameters ? SPACING.spacing16 : undefined}
         gridGap={SPACING.spacing10}
       >
         <Flex
@@ -79,9 +79,11 @@ export function ProtocolRunRuntimeParameters({
           gridGap={SPACING.spacing8}
           alignItems={ALIGN_CENTER}
         >
-          <StyledText as="h3" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
-            {t('parameters')}
-          </StyledText>
+          {hasRunTimeParameters ? (
+            <StyledText as="h3" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
+              {t('parameters')}
+            </StyledText>
+          ) : null}
           {hasRunTimeParameters ? (
             <StyledText as="label" color={COLORS.grey60}>
               {hasCustomRunTimeParameterValues

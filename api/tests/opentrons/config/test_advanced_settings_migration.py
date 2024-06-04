@@ -8,7 +8,7 @@ from opentrons.config.advanced_settings import _migrate, _ensure
 
 @pytest.fixture
 def migrated_file_version() -> int:
-    return 33
+    return 34
 
 
 # make sure to set a boolean value in default_file_settings only if
@@ -22,7 +22,6 @@ def default_file_settings() -> Dict[str, Any]:
         "useOldAspirationFunctions": None,
         "disableLogAggregation": None,
         "enableDoorSafetySwitch": None,
-        "disableFastProtocolUpload": None,
         "enableOT3HardwareController": None,
         "rearPanelIntegration": True,
         "disableStallDetection": None,
@@ -405,6 +404,14 @@ def v33_config(v32_config: Dict[str, Any]) -> Dict[str, Any]:
     return r
 
 
+@pytest.fixture
+def v34_config(v33_config: Dict[str, Any]) -> Dict[str, Any]:
+    r = v33_config.copy()
+    r.pop("disableFastProtocolUpload")
+    r["_version"] = 34
+    return r
+
+
 @pytest.fixture(
     scope="session",
     params=[
@@ -443,6 +450,7 @@ def v33_config(v32_config: Dict[str, Any]) -> Dict[str, Any]:
         lazy_fixture("v31_config"),
         lazy_fixture("v32_config"),
         lazy_fixture("v33_config"),
+        lazy_fixture("v34_config"),
     ],
 )
 def old_settings(request: SubRequest) -> Dict[str, Any]:
@@ -527,7 +535,6 @@ def test_ensures_config() -> None:
         "useOldAspirationFunctions": None,
         "disableLogAggregation": True,
         "enableDoorSafetySwitch": None,
-        "disableFastProtocolUpload": None,
         "enableOT3HardwareController": None,
         "rearPanelIntegration": None,
         "disableStallDetection": None,

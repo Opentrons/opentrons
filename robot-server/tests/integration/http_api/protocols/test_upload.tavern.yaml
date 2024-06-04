@@ -23,7 +23,7 @@ stages:
           files:
             - name: basic_transfer_standalone.py
               role: main
-          createdAt: !re_search "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+\\+\\d{2}:\\d{2}$"
+          createdAt: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"
           robotType: OT-2 Standard
           metadata:
             apiLevel: '2.6'
@@ -92,41 +92,3 @@ stages:
         errors:
           - id: ProtocolNotFound
             title: Protocol Not Found
-
----
-test_name: Upload, analyze and analyze using "slow analysis"
-
-marks:
-  - usefixtures:
-      - ot2_server_base_url
-      - ot2_server_set_disable_fast_analysis
-
-stages:
-  - name: Upload simple Python protocol
-    request:
-      url: '{ot2_server_base_url}/protocols'
-      method: POST
-      files:
-        files: 'tests/integration/protocols/simple.py'
-    response:
-      save:
-        json:
-          protocol_id: data.id
-          analysis_id: data.analysisSummaries[0].id
-      status_code: 201
-
-  - name: Retry until analyses status is completed and result is ok.
-    max_retries: 10
-    delay_after: 0.1
-    request:
-      url: '{ot2_server_base_url}/protocols/{protocol_id}/analyses'
-      method: GET
-    response:
-      strict:
-        - json:off
-      status_code: 200
-      json:
-        data:
-          - id: '{analysis_id}'
-            status: completed
-            result: ok

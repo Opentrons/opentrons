@@ -4,7 +4,6 @@ import { Controller, useForm } from 'react-hook-form'
 import { yupResolver } from '@hookform/resolvers/yup'
 import { useSelector } from 'react-redux'
 import * as Yup from 'yup'
-import { swatchColors } from '../swatchColors'
 import {
   Card,
   DeprecatedCheckboxField,
@@ -18,18 +17,23 @@ import {
 } from '@opentrons/components'
 import { DEPRECATED_WHALE_GREY } from '@opentrons/shared-data'
 import { selectors } from '../../labware-ingred/selectors'
+import { swatchColors } from '../swatchColors'
+import { ColorPicker } from '../ColorPicker'
 import styles from './LiquidEditForm.module.css'
 import formStyles from '../forms/forms.module.css'
 
-import { LiquidGroup } from '../../labware-ingred/types'
-import { ColorPicker } from '../ColorPicker'
-import { ColorResult } from 'react-color'
+import type { ColorResult } from 'react-color'
+import type { LiquidGroup } from '../../labware-ingred/types'
 
-type Props = LiquidGroup & {
+interface LiquidEditFormProps {
+  serialize: boolean
   canDelete: boolean
-  deleteLiquidGroup: () => unknown
-  cancelForm: () => unknown
-  saveForm: (liquidGroup: LiquidGroup) => unknown
+  deleteLiquidGroup: () => void
+  cancelForm: () => void
+  saveForm: (liquidGroup: LiquidGroup) => void
+  displayColor?: string
+  name?: string | null
+  description?: string | null
 }
 
 interface LiquidEditFormValues {
@@ -51,7 +55,7 @@ function checkColor(hex: string): boolean {
 
 const INVALID_DISPLAY_COLORS = ['#000000', '#ffffff', DEPRECATED_WHALE_GREY]
 
-export const liquidEditFormSchema: any = Yup.object().shape({
+const liquidEditFormSchema: any = Yup.object().shape({
   name: Yup.string().required('liquid name is required'),
   displayColor: Yup.string().test(
     'disallowed-color',
@@ -62,29 +66,38 @@ export const liquidEditFormSchema: any = Yup.object().shape({
       }
       return !INVALID_DISPLAY_COLORS.includes(value)
         ? !checkColor(value)
-        : !INVALID_DISPLAY_COLORS.includes(value)
+        : false
     }
   ),
   description: Yup.string(),
   serialize: Yup.boolean(),
 })
 
-export function LiquidEditForm(props: Props): JSX.Element {
-  const { deleteLiquidGroup, cancelForm, canDelete, saveForm } = props
+export function LiquidEditForm(props: LiquidEditFormProps): JSX.Element {
+  const {
+    deleteLiquidGroup,
+    cancelForm,
+    canDelete,
+    saveForm,
+    displayColor,
+    name: propName,
+    description: propDescription,
+    serialize,
+  } = props
   const selectedLiquid = useSelector(selectors.getSelectedLiquidGroupState)
   const nextGroupId = useSelector(selectors.getNextLiquidGroupId)
   const liquidId = selectedLiquid.liquidGroupId ?? nextGroupId
   const { t } = useTranslation(['form', 'button'])
   const initialValues: LiquidEditFormValues = {
-    name: props.name || '',
-    displayColor: props.displayColor ?? swatchColors(liquidId),
-    description: props.description || '',
-    serialize: props.serialize || false,
+    name: propName || '',
+    displayColor: displayColor ?? swatchColors(liquidId),
+    description: propDescription || '',
+    serialize: serialize || false,
   }
 
   const {
     handleSubmit,
-    formState: { errors, isDirty, touchedFields },
+    formState: { errors, touchedFields },
     control,
     watch,
     setValue,
@@ -94,6 +107,7 @@ export function LiquidEditForm(props: Props): JSX.Element {
   })
   const name = watch('name')
   const description = watch('description')
+  const color = watch('displayColor')
 
   const handleLiquidEdits = (values: LiquidEditFormValues): void => {
     saveForm({
@@ -150,9 +164,10 @@ export function LiquidEditForm(props: Props): JSX.Element {
                 control={control}
                 render={({ field }) => (
                   <ColorPicker
-                    value={field.value}
+                    value={color}
                     onChange={(color: ColorResult['hex']) => {
                       setValue('displayColor', color)
+                      field.onChange(color)
                     }}
                   />
                 )}
@@ -166,7 +181,7 @@ export function LiquidEditForm(props: Props): JSX.Element {
             fontWeight={TYPOGRAPHY.fontWeightSemiBold}
             marginTop={errors.name != null ? '-0.25rem' : '0rem'}
           >
-            {errors.displayColor != null ? errors.displayColor : null}
+            {errors.displayColor != null ? errors.displayColor.message : null}
           </Flex>
         </section>
         <section className={styles.section}>
@@ -201,7 +216,10 @@ export function LiquidEditForm(props: Props): JSX.Element {
           </DeprecatedPrimaryButton>
           <DeprecatedPrimaryButton
             disabled={
-              !isDirty || errors.name != null || errors.displayColor != null
+              !touchedFields.name ||
+              errors.name != null ||
+              name === '' ||
+              errors.displayColor != null
             }
             type="submit"
           >

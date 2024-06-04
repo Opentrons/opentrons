@@ -14,7 +14,7 @@ import {
   getStateAndContextTempTCModules,
   robotWithStatusAndTemp,
 } from '../fixtures/robotStateFixtures'
-import { InvariantContext, RobotState } from '../types'
+import type { InvariantContext, RobotState } from '../types'
 
 const forSetTemperature = makeImmutableStateUpdater(_forSetTemperature)
 const forDeactivateTemperature = makeImmutableStateUpdater(

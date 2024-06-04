@@ -7,9 +7,19 @@ from abr_testing.automation import jira_tool, google_sheets_tool, google_drive_t
 import shutil
 import os
 import subprocess
-import json
 import sys
-import gspread  # type: ignore[import]
+import json
+
+
+def get_user_id(user_file_path: str, assignee_name: str) -> str:
+    """Get assignee account id."""
+    users = json.load(open(user_file_path))
+    assignee_id = "-1"  # Code to leave issue unassigned.
+    for item in users:
+        user = users[item]
+        if user["displayName"] == assignee_name:
+            assignee_id = user["accountId"]
+    return assignee_id
 
 
 def get_error_runs_from_robot(ip: str) -> List[str]:
@@ -49,6 +59,7 @@ def get_error_info_from_robot(
     ) = read_robot_logs.get_error_info(results)
     # JIRA Ticket Fields
     failure_level = "Level " + str(error_level) + " Failure"
+
     components = [failure_level, "Flex-RABR"]
     affects_version = results["API_Version"]
     parent = results.get("robot_name", "")
@@ -124,12 +135,16 @@ if __name__ == "__main__":
     args = parser.parse_args()
     storage_directory = args.storage_directory[0]
     ip = str(input("Enter Robot IP: "))
+    assignee = str(input("Enter Assignee Full Name:"))
     url = "https://opentrons.atlassian.net"
     api_token = args.jira_api_token[0]
     email = args.email[0]
     board_id = args.board_id[0]
     reporter_id = args.reporter_id[0]
     ticket = jira_tool.JiraTicket(url, api_token, email)
+    ticket.issues_on_board(board_id)
+    users_file_path = ticket.get_jira_users(storage_directory)
+    assignee_id = get_user_id(users_file_path, assignee)
     try:
         error_runs = get_error_runs_from_robot(ip)
     except requests.exceptions.InvalidURL:
@@ -160,6 +175,7 @@ if __name__ == "__main__":
         whole_description_str,
         project_key,
         reporter_id,
+        assignee_id,
         "Bug",
         "Medium",
         components,
@@ -182,35 +198,32 @@ if __name__ == "__main__":
     # CONNECT TO GOOGLE DRIVE
     credentials_path = os.path.join(storage_directory, "credentials.json")
     google_sheet_name = "ABR-run-data"
-    try:
-        google_drive = google_drive_tool.google_drive(
-            credentials_path,
-            "1Cvej0eadFOTZr9ILRXJ0Wg65ymOtxL4m",
-            "rhyann.clarke@opentrons.ocm",
-        )
-        print("Connected to google drive.")
-    except json.decoder.JSONDecodeError:
-        print(
-            "Credential file is damaged. Get from https://console.cloud.google.com/apis/credentials"
-        )
-        sys.exit()
+    google_drive = google_drive_tool.google_drive(
+        credentials_path,
+        "1Cvej0eadFOTZr9ILRXJ0Wg65ymOtxL4m",
+        "rhyann.clarke@opentrons.ocm",
+    )
     # CONNECT TO GOOGLE SHEET
-    try:
-        google_sheet = google_sheets_tool.google_sheet(
-            credentials_path, google_sheet_name, 0
-        )
-        print(f"Connected to google sheet: {google_sheet_name}")
-    except gspread.exceptions.APIError:
-        print("ERROR: Check google sheet name. Check credentials file.")
-        sys.exit()
+    google_sheet = google_sheets_tool.google_sheet(
+        credentials_path, google_sheet_name, 0
+    )
     # WRITE ERRORED RUN TO GOOGLE SHEET
     error_run_log = os.path.join(error_folder_path, os.path.basename(run_log_file_path))
-    google_drive.upload_file(error_run_log)
+    google_drive.upload_file(error_run_log, "1Cvej0eadFOTZr9ILRXJ0Wg65ymOtxL4m")
     run_id = os.path.basename(error_run_log).split("_")[1].split(".")[0]
-    runs_and_robots, headers = abr_google_drive.create_data_dictionary(
-        run_id, error_folder_path, issue_url
+    (
+        runs_and_robots,
+        headers,
+        runs_and_lpc,
+        headers_lpc,
+    ) = abr_google_drive.create_data_dictionary(
+        run_id, error_folder_path, issue_url, "", ""
     )
-    read_robot_logs.write_to_local_and_google_sheet(
-        runs_and_robots, storage_directory, google_sheet_name, google_sheet, headers
-    )
+
+    start_row = google_sheet.get_index_row() + 1
+    google_sheet.batch_update_cells(runs_and_robots, "A", start_row, "0")
     print("Wrote run to ABR-run-data")
+    # Add LPC to google sheet
+    google_sheet_lpc = google_sheets_tool.google_sheet(credentials_path, "ABR-LPC", 0)
+    start_row_lpc = google_sheet_lpc.get_index_row() + 1
+    google_sheet_lpc.batch_update_cells(runs_and_lpc, "A", start_row_lpc, "0")

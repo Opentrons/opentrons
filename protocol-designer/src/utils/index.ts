@@ -1,27 +1,29 @@
 import uuidv1 from 'uuid/v4'
 import {
-  WellSetHelpers,
   makeWellSetHelpers,
-  AddressableAreaName,
   getDeckDefFromRobotType,
   FLEX_ROBOT_TYPE,
-  CutoutId,
   STAGING_AREA_RIGHT_SLOT_FIXTURE,
   isAddressableAreaStandardSlot,
-  CutoutFixtureId,
-  RobotType,
   INTERACTIVE_WELL_DATA_ATTRIBUTE,
-  SupportedTip,
   LOW_VOLUME_PIPETTES,
 } from '@opentrons/shared-data'
-import { BoundingRect, GenericRect } from '../collision-types'
 import type {
   AdditionalEquipmentEntity,
   LabwareEntities,
   PipetteEntities,
   PipetteEntity,
 } from '@opentrons/step-generation'
+import type {
+  WellSetHelpers,
+  AddressableAreaName,
+  CutoutId,
+  CutoutFixtureId,
+  RobotType,
+  SupportedTip,
+} from '@opentrons/shared-data'
 import type { WellGroup } from '@opentrons/components'
+import type { BoundingRect, GenericRect } from '../collision-types'
 
 export const uuid: () => string = uuidv1
 // Collision detection for SelectionRect / SelectableLabware

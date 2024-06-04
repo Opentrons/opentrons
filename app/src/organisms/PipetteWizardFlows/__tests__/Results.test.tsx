@@ -12,6 +12,7 @@ import { useInstrumentsQuery } from '@opentrons/react-api-client'
 
 import { renderWithProviders } from '../../../__testing-utils__'
 import { mockAttachedPipetteInformation } from '../../../redux/pipettes/__fixtures__'
+import { useIsOEMMode } from '../../../resources/robot-settings/hooks'
 import { i18n } from '../../../i18n'
 import { RUN_ID_1 } from '../../RunTimeControl/__fixtures__'
 import { Results } from '../Results'
@@ -20,6 +21,7 @@ import { FLOWS } from '../constants'
 import type { Mock } from 'vitest'
 
 vi.mock('@opentrons/react-api-client')
+vi.mock('../../../resources/robot-settings/hooks')
 
 const render = (props: React.ComponentProps<typeof Results>) => {
   return renderWithProviders(<Results {...props} />, {
@@ -57,6 +59,7 @@ describe('Results', () => {
     vi.mocked(useInstrumentsQuery).mockReturnValue({
       refetch: mockRefetchInstruments,
     } as any)
+    vi.mocked(useIsOEMMode).mockReturnValue(false)
   })
   it('renders the correct information when pipette cal is a success for calibrate flow', () => {
     props = {

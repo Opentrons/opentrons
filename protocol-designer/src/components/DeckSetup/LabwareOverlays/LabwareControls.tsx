@@ -2,8 +2,7 @@ import * as React from 'react'
 import cx from 'classnames'
 import { RobotCoordsForeignDiv } from '@opentrons/components'
 
-import { START_TERMINAL_ITEM_ID, TerminalItemId } from '../../../steplist'
-import { LabwareOnDeck } from '../../../step-forms'
+import { START_TERMINAL_ITEM_ID } from '../../../steplist'
 import { BlockedSlot } from './BlockedSlot'
 import { BrowseLabware } from './BrowseLabware'
 import { EditLabware } from './EditLabware'
@@ -12,6 +11,8 @@ import { LabwareHighlight } from './LabwareHighlight'
 import styles from './LabwareOverlays.module.css'
 
 import type { CoordinateTuple } from '@opentrons/shared-data'
+import type { TerminalItemId } from '../../../steplist'
+import type { LabwareOnDeck } from '../../../step-forms'
 
 interface LabwareControlsProps {
   labwareOnDeck: LabwareOnDeck

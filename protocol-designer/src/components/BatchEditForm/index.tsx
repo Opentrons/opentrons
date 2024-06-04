@@ -15,11 +15,12 @@ import {
   resetBatchEditFieldChanges,
   saveStepFormsMulti,
 } from '../../step-forms/actions'
-import { maskField, StepFieldName } from '../../steplist/fieldLevel'
+import { maskField } from '../../steplist/fieldLevel'
 import { BatchEditMoveLiquid } from './BatchEditMoveLiquid'
 import { BatchEditMix } from './BatchEditMix'
-import { ThunkDispatch } from 'redux-thunk'
-import { BaseState } from '../../types'
+import type { StepFieldName } from '../../steplist/fieldLevel'
+import type { ThunkDispatch } from 'redux-thunk'
+import type { BaseState } from '../../types'
 
 export const BatchEditForm = (): JSX.Element => {
   const { t } = useTranslation('tooltip')

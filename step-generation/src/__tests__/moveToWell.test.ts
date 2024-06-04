@@ -1,6 +1,6 @@
 import { when } from 'vitest-when'
 import { beforeEach, describe, it, expect, afterEach, vi } from 'vitest'
-import { getPipetteSpecsV2 } from '@opentrons/shared-data'
+import { OT2_ROBOT_TYPE, getPipetteSpecsV2 } from '@opentrons/shared-data'
 import { expectTimelineError } from '../__utils__/testMatchers'
 import { moveToWell } from '../commandCreators/atomic/moveToWell'
 import {
@@ -472,7 +472,8 @@ describe('moveToWell', () => {
     when(pipetteAdjacentHeaterShakerWhileShaking)
       .calledWith(
         robotStateWithTip.modules,
-        robotStateWithTip.labware[SOURCE_LABWARE].slot
+        robotStateWithTip.labware[SOURCE_LABWARE].slot,
+        OT2_ROBOT_TYPE
       )
       .thenReturn(true)
 

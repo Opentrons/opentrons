@@ -611,6 +611,24 @@ class MotorDriverError(RoboticsControlError):
         super().__init__(ErrorCodes.MOTOR_DRIVER_ERROR, message, detail, wrapping)
 
 
+class LiquidNotFoundError(RoboticsControlError):
+    """Error raised if liquid sensing move completes without detecting liquid."""
+
+    def __init__(
+        self,
+        message: Optional[str] = None,
+        detail: Optional[Dict[str, str]] = None,
+        wrapping: Optional[Sequence[EnumeratedError]] = None,
+    ) -> None:
+        """Initialize LiquidNotFoundError."""
+        super().__init__(
+            ErrorCodes.LIQUID_NOT_FOUND,
+            message,
+            detail,
+            wrapping,
+        )
+
+
 class LabwareDroppedError(RoboticsInteractionError):
     """An error indicating that the gripper dropped labware it was holding."""
 

@@ -151,6 +151,7 @@ export function ProtocolSetupParameters({
         secondaryButtonProps={{
           buttonType: 'tertiaryLowLight',
           buttonText: t('restore_defaults'),
+          disabled: isLoading || startSetup,
           onClick: () => showResetValuesModal(true),
         }}
       />
@@ -167,12 +168,13 @@ export function ProtocolSetupParameters({
             <React.Fragment key={`${parameter.displayName}_${index}`}>
               <ProtocolSetupStep
                 hasIcon={!(parameter.type === 'bool')}
-                status="general"
+                status="inform"
                 title={parameter.displayName}
                 onClickSetupStep={() => handleSetParameter(parameter)}
                 detail={formatRunTimeParameterValue(parameter, t)}
                 description={parameter.description}
                 fontSize="h4"
+                disabled={startSetup}
               />
             </React.Fragment>
           )

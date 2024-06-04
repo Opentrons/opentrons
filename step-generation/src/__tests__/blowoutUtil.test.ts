@@ -1,5 +1,4 @@
 import { beforeEach, describe, it, expect, vi } from 'vitest'
-import { BlowoutParams } from '@opentrons/shared-data/protocol/types/schemaV3'
 import { ONE_CHANNEL_WASTE_CHUTE_ADDRESSABLE_AREA } from '@opentrons/shared-data'
 import {
   blowoutUtil,
@@ -23,6 +22,7 @@ import {
   getInitialRobotStateStandard,
 } from '../fixtures'
 import type { RobotState, InvariantContext } from '../types'
+import type { BlowoutParams } from '@opentrons/shared-data/protocol/types/schemaV3'
 vi.mock('../utils/curryCommandCreator')
 
 let blowoutArgs: {

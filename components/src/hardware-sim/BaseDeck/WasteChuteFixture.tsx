@@ -1,7 +1,5 @@
 import * as React from 'react'
 
-import { WASTE_CHUTE_CUTOUT } from '@opentrons/shared-data'
-
 import { Icon } from '../../icons'
 import { Flex, Text } from '../../primitives'
 import {
@@ -14,8 +12,11 @@ import { SPACING, TYPOGRAPHY } from '../../ui-style-constants'
 import { COLORS } from '../../helix-design-system'
 import { RobotCoordsForeignObject } from '../Deck/RobotCoordsForeignObject'
 import { SlotBase } from './SlotBase'
-
-import type { DeckDefinition, ModuleType } from '@opentrons/shared-data'
+import type {
+  WASTE_CHUTE_CUTOUT,
+  DeckDefinition,
+  ModuleType,
+} from '@opentrons/shared-data'
 
 interface WasteChuteFixtureProps extends React.SVGProps<SVGGElement> {
   cutoutId: typeof WASTE_CHUTE_CUTOUT

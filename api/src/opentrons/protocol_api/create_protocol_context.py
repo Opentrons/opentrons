@@ -4,7 +4,6 @@ from typing import Any, Dict, Optional, Union, cast
 
 from opentrons_shared_data.labware.dev_types import LabwareDefinition
 
-from opentrons.config import feature_flags
 from opentrons.hardware_control import (
     HardwareControlAPI,
     ThreadManager,
@@ -123,8 +122,7 @@ def create_protocol_context(
             sync_hardware=sync_hardware,
         )
 
-    # TODO(mc, 2022-8-22): remove `disable_fast_protocol_upload`
-    elif use_simulating_core and not feature_flags.disable_fast_protocol_upload():
+    elif use_simulating_core:
         legacy_deck = LegacyDeck(deck_type=deck_type)
         core = LegacyProtocolCoreSimulator(
             sync_hardware=sync_hardware,

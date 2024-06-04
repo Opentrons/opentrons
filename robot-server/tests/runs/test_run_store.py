@@ -734,3 +734,31 @@ def test_get_commands_slice_run_not_found(subject: RunStore) -> None:
     )
     with pytest.raises(RunNotFoundError):
         subject.get_commands_slice(run_id="not-run-id", cursor=1, length=3)
+
+
+def test_get_all_commands_as_preserialized_list(
+    subject: RunStore,
+    protocol_commands: List[pe_commands.Command],
+    state_summary: StateSummary,
+) -> None:
+    """It should get all commands stored in DB as a pre-serialized list."""
+    subject.insert(
+        run_id="run-id",
+        protocol_id=None,
+        created_at=datetime(year=2021, month=1, day=1, tzinfo=timezone.utc),
+    )
+    subject.update_run_state(
+        run_id="run-id",
+        summary=state_summary,
+        commands=protocol_commands,
+        run_time_parameters=[],
+    )
+    result = subject.get_all_commands_as_preserialized_list(run_id="run-id")
+    assert result == [
+        '{"id": "pause-1", "createdAt": "2021-01-01T00:00:00", "commandType": "waitForResume",'
+        ' "key": "command-key", "status": "succeeded", "params": {"message": "hello world"}, "result": {}}',
+        '{"id": "pause-2", "createdAt": "2022-02-02T00:00:00", "commandType": "waitForResume",'
+        ' "key": "command-key", "status": "succeeded", "params": {"message": "hey world"}, "result": {}}',
+        '{"id": "pause-3", "createdAt": "2023-03-03T00:00:00", "commandType": "waitForResume",'
+        ' "key": "command-key", "status": "succeeded", "params": {"message": "sup world"}, "result": {}}',
+    ]

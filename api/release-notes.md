@@ -6,6 +6,31 @@ log][]. For a list of currently known issues, please see the [Opentrons issue tr
 
 ---
 
+## Opentrons Robot Software Changes in 7.3.0
+
+Welcome to the v7.3.0 release of the Opentrons robot software!
+
+### New Features
+
+- Runtime parameters: read, write, and use parameters in Python protocol runs.
+
+### Improved Features
+
+- Automatic tip tracking is now available for all nozzle configurations.
+- Flex no longer shows unnecessary pipette calibration warnings.
+- Python protocols can once again set labware offsets outside of Labware Position Check.
+
+### Changed Features
+
+- Calling `GET /runs/{id}/commands` for a JSON protocol no longer returns a full list of queued commands. Use protocol analysis to get a full list of commands.
+
+### Bug Fixes
+
+- Fixed an edge case where capitalizing part of a labware load name could cause unexpected behavior or collisions.
+- Fixed Python packages installed  on the OT-2 with `pip` not being found by `import` statements.
+
+---
+
 ## Opentrons Robot Software Changes in 7.2.2
 
 Welcome to the v7.2.2 release of the Opentrons robot software!

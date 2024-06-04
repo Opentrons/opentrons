@@ -10,7 +10,7 @@ import {
 } from '@opentrons/react-api-client'
 import { i18n } from '../../../i18n'
 import { FirmwareUpdateModal } from '..'
-import {
+import type {
   BadPipette,
   PipetteData,
   SubsystemUpdateProgressData,

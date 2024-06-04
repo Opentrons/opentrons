@@ -1,8 +1,10 @@
 import type {
+  Liquid,
   LoadedLabware,
   LoadedModule,
   LoadedPipette,
   ModuleModel,
+  RunCommandError,
   RunTimeCommand,
   RunTimeParameter,
 } from '@opentrons/shared-data'
@@ -45,6 +47,7 @@ export interface LegacyGoodRunData {
   errors: RunError[]
   pipettes: LoadedPipette[]
   labware: LoadedLabware[]
+  liquids: Liquid[]
   modules: LoadedModule[]
   protocolId?: string
   labwareOffsets?: LabwareOffset[]
@@ -135,12 +138,6 @@ export interface CommandData {
   data: RunTimeCommand
 }
 
-export interface RunError {
-  id: string
-  errorType: string
-  errorInfo: { [key: string]: string }
-  wrappedErrors: RunError[]
-  errorCode: string
-  createdAt: string
-  detail: string
-}
+// Although run errors are semantically different from command errors,
+// the server currently happens to use the exact same model for both.
+export type RunError = RunCommandError

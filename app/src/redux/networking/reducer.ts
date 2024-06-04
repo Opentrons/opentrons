@@ -7,7 +7,7 @@ import * as Constants from './constants'
 
 import type { Action } from '../types'
 import type { NetworkingState, PerRobotNetworkingState } from './types'
-import { Reducer } from 'redux'
+import type { Reducer } from 'redux'
 
 const INITIAL_STATE: NetworkingState = {}
 const INITIAL_ROBOT_STATE: PerRobotNetworkingState = {}

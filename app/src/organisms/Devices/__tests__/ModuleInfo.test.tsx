@@ -4,10 +4,10 @@ import { describe, it, vi, beforeEach, expect } from 'vitest'
 import '@testing-library/jest-dom/vitest'
 import { renderWithProviders } from '../../../__testing-utils__'
 import { when } from 'vitest-when'
-import { ModuleModel, ModuleType } from '@opentrons/shared-data'
 import { i18n } from '../../../i18n'
 import { ModuleInfo } from '../ModuleInfo'
 import { useRunHasStarted } from '../hooks'
+import type { ModuleModel, ModuleType } from '@opentrons/shared-data'
 
 vi.mock('../hooks')
 

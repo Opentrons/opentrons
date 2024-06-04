@@ -19,6 +19,7 @@ import {
   getCutoutIdsFromModuleSlotName,
   getModuleDisplayName,
   getModuleType,
+  MAGNETIC_BLOCK_TYPE,
   NON_CONNECTING_MODULE_TYPES,
   TC_MODULE_LOCATION_OT3,
   THERMOCYCLER_MODULE_TYPE,
@@ -68,6 +69,8 @@ export function ModuleTable(props: ModuleTableProps): JSX.Element {
   return (
     <>
       {attachedProtocolModuleMatches.map(module => {
+        // filter out the magnetic block here, because it is handled by the SetupFixturesList
+        if (module.moduleDef.moduleType === MAGNETIC_BLOCK_TYPE) return null
         const moduleFixtures = getCutoutFixturesForModuleModel(
           module.moduleDef.model,
           deckDef

@@ -5,13 +5,13 @@ import { MemoryRouter } from 'react-router-dom'
 import { fireEvent, renderHook } from '@testing-library/react'
 
 import { useLongPress } from '@opentrons/components'
-import { HostConfig } from '@opentrons/api-client'
 import { useCreateRunMutation, useHost } from '@opentrons/react-api-client'
 
 import { renderWithProviders } from '../../../__testing-utils__'
 import { i18n } from '../../../i18n'
 import { LongPressModal } from '../LongPressModal'
 
+import type { HostConfig } from '@opentrons/api-client'
 import type { UseLongPressResult } from '@opentrons/components'
 
 const MOCK_HOST_CONFIG = {} as HostConfig

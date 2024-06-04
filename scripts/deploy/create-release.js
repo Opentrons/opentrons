@@ -92,7 +92,7 @@ async function detailsFromTag(tag) {
 }
 
 async function tagFromDetails(project, version) {
-  return (await gitVersion()).tagFromDetails(project, version)
+  return await (await gitVersion()).tagFromDetails(project, version)
 }
 
 async function prefixForProject(project) {
@@ -113,19 +113,19 @@ async function versionDetailsFromGit(tag, allowOld) {
     }
   }
 
-  const [project, currentVersion] = detailsFromTag(tag)
+  const [project, currentVersion] = await detailsFromTag(tag)
   const prefix = await prefixForProject(project)
-  const allTags = (await monorepoGit().tags([prefix + '*'])).all
+  const allTags = (await (await monorepoGit()).tags([prefix + '*'])).all
   if (!allTags.includes(tag)) {
     throw new Error(
       `Tag ${tag} does not exist - create it before running this script`
     )
   }
-  const sortedVersions = allTags
-    .map(tag => detailsFromTag(tag)[1])
+  const allVersions = await Promise.all(allTags.map(tag => detailsFromTag(tag)))
+  const sortedVersions = allVersions
+    .map(details => details[1])
     .sort(semver.compare)
     .reverse()
-
   const previousVersion = versionPrevious(currentVersion, sortedVersions)
   return [project, currentVersion, previousVersion]
 }
@@ -144,7 +144,7 @@ async function buildChangelog(project, currentVersion, previousVersion) {
   }
   const previousTag = await tagFromDetails(project, previousVersion)
   const currentTag = await tagFromDetails(project, currentVersion)
-  const prefix = await prefixForProject(Project)
+  const prefix = await prefixForProject(project)
   const changelogStream = conventionalChangelog(
     { preset: 'angular', tagPrefix: prefix },
     {

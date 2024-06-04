@@ -1,11 +1,13 @@
 import omit from 'lodash/omit'
 import mapValues from 'lodash/mapValues'
-import { Reducer, combineReducers } from 'redux'
+import { combineReducers } from 'redux'
 import { handleActions } from 'redux-actions'
-import { Flags, FlagTypes, userFacingFlags, DEPRECATED_FLAGS } from './types'
-import { RehydratePersistedAction } from '../persist'
-import { SetFeatureFlagAction } from './actions'
-import { Action } from '../types'
+import { userFacingFlags, DEPRECATED_FLAGS } from './types'
+import type { Reducer } from 'redux'
+import type { Flags, FlagTypes } from './types'
+import type { RehydratePersistedAction } from '../persist'
+import type { SetFeatureFlagAction } from './actions'
+import type { Action } from '../types'
 // NOTE: these values will always be overridden by persisted values,
 // whenever the browser has seen the feature flag before and persisted it.
 // Only "never before seen" flags will take on the default values from `initialFlags`.
@@ -21,8 +23,6 @@ const initialFlags: Flags = {
     process.env.OT_PD_DISABLE_MODULE_RESTRICTIONS === '1' || false,
   OT_PD_ALLOW_ALL_TIPRACKS:
     process.env.OT_PD_ALLOW_ALL_TIPRACKS === '1' || false,
-  OT_PD_ENABLE_MULTI_TIP: process.env.OT_PD_ENABLE_MULTI_TIP === '1' || false,
-  OT_PD_ENABLE_MOAM: process.env.OT_PD_ENABLE_MOAM === '1' || false,
 }
 // @ts-expect-error(sa, 2021-6-10): cannot use string literals as action type
 // TODO IMMEDIATELY: refactor this to the old fashioned way if we cannot have type safety: https://github.com/redux-utilities/redux-actions/issues/282#issuecomment-595163081

@@ -3,6 +3,7 @@
 import pytest
 from decoy import Decoy
 
+from opentrons.protocol_engine.commands.command import SuccessData
 from opentrons.protocol_engine.commands.set_status_bar import (
     SetStatusBarParams,
     SetStatusBarResult,
@@ -34,7 +35,7 @@ async def test_status_bar_busy(
 
     result = await subject.execute(params=data)
 
-    assert result == SetStatusBarResult()
+    assert result == SuccessData(public=SetStatusBarResult(), private=None)
 
     decoy.verify(await status_bar.set_status_bar(status=StatusBarState.OFF), times=0)
 
@@ -62,6 +63,6 @@ async def test_set_status_bar_animation(
     data = SetStatusBarParams(animation=animation)
 
     result = await subject.execute(params=data)
-    assert result == SetStatusBarResult()
+    assert result == SuccessData(public=SetStatusBarResult(), private=None)
 
     decoy.verify(await status_bar.set_status_bar(status=expected_state), times=1)

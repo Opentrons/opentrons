@@ -16,14 +16,14 @@ import {
 import { useTrackCreateProtocolRunEvent } from '../../../organisms/Devices/hooks'
 import { useCreateRunFromProtocol } from '../../ChooseRobotToRunProtocolSlideout/useCreateRunFromProtocol'
 import { ChooseProtocolSlideout } from '../'
-import { useNotifyService } from '../../../resources/useNotifyService'
+import { useNotifyDataReady } from '../../../resources/useNotifyDataReady'
 import type { ProtocolAnalysisOutput } from '@opentrons/shared-data'
 
 vi.mock('../../ChooseRobotToRunProtocolSlideout/useCreateRunFromProtocol')
 vi.mock('../../../redux/protocol-storage')
 vi.mock('../../../organisms/Devices/hooks')
 vi.mock('../../../redux/config')
-vi.mock('../../../resources/useNotifyService')
+vi.mock('../../../resources/useNotifyDataReady')
 
 const render = (props: React.ComponentProps<typeof ChooseProtocolSlideout>) => {
   return renderWithProviders(
@@ -66,7 +66,7 @@ describe('ChooseProtocolSlideout', () => {
     vi.mocked(useTrackCreateProtocolRunEvent).mockReturnValue({
       trackCreateProtocolRunEvent: mockTrackCreateProtocolRunEvent,
     })
-    vi.mocked(useNotifyService).mockReturnValue({} as any)
+    vi.mocked(useNotifyDataReady).mockReturnValue({} as any)
   })
 
   it('renders slideout if showSlideout true', () => {
@@ -148,6 +148,28 @@ describe('ChooseProtocolSlideout', () => {
     screen.getByText('Step 2 / 2')
     screen.getByText('number of samples')
     screen.getByText('Restore default values')
+  })
+
+  it('shows tooltip when disabled Restore default values link is clicked', () => {
+    const protocolDataWithoutRunTimeParameter = {
+      ...storedProtocolDataFixture,
+    }
+    vi.mocked(getStoredProtocols).mockReturnValue([
+      protocolDataWithoutRunTimeParameter,
+    ])
+
+    render({
+      robot: mockConnectableRobot,
+      onCloseClick: vi.fn(),
+      showSlideout: true,
+    })
+    const proceedButton = screen.getByRole('button', {
+      name: 'Continue to parameters',
+    })
+    fireEvent.click(proceedButton)
+    const restoreValuesLink = screen.getByText('Restore default values')
+    fireEvent.click(restoreValuesLink)
+    screen.getByText('No custom values specified')
   })
 
   // ToDo (kk:04/18/2024) I will update test for RTP

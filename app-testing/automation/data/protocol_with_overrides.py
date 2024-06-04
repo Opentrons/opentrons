@@ -28,7 +28,7 @@ class ProtocolWithOverrides(Protocol):
             new_file_name = f"{new_file_stem}.{self.file_extension}"
             # Create the full path for the new file
             # all generated files live at files/protocols/$GENERATED_PROTOCOLS_FOLDER
-            new_file_path = Path(self.file_path.parent.parent, GENERATED_PROTOCOLS_FOLDER, new_file_name)
+            new_file_path = Path(self.file_path.parent, GENERATED_PROTOCOLS_FOLDER, new_file_name)
             # Prepare the override string to prepend
             override_string = f'{self.override_variable_name} = "{override}"\n'
             # Write the new file with the override string prepended

@@ -1,4 +1,3 @@
-import * as React from 'react'
 import { getWellRatio } from '../utils'
 import { canPipetteUseLabware } from '../../utils'
 import { MAGNETIC_MODULE_V1, MAGNETIC_MODULE_V2 } from '@opentrons/shared-data'
@@ -13,7 +12,8 @@ import {
   PAUSE_UNTIL_TEMP,
   THERMOCYCLER_PROFILE,
 } from '../../constants'
-import { StepFieldName } from '../../form-types'
+import type * as React from 'react'
+import type { StepFieldName } from '../../form-types'
 import type { LabwareEntities } from '@opentrons/step-generation'
 /*******************
  ** Error Messages **

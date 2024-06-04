@@ -1,8 +1,5 @@
-import {
-  getPipetteNameSpecs,
-  PipetteName,
-  RunTimeCommand,
-} from '@opentrons/shared-data'
+import { getPipetteNameSpecs } from '@opentrons/shared-data'
+import type { PipetteName, RunTimeCommand } from '@opentrons/shared-data'
 
 /**
  * @param pipetteName name of pipette being used

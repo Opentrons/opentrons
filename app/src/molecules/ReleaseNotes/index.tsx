@@ -1,7 +1,9 @@
 import * as React from 'react'
 import Markdown from 'react-markdown'
 
-import { StyledText } from '@opentrons/components'
+import { Box, COLORS, SPACING, StyledText } from '@opentrons/components'
+
+import { useIsOEMMode } from '../../resources/robot-settings/hooks'
 
 import styles from './styles.module.css'
 
@@ -14,9 +16,11 @@ const DEFAULT_RELEASE_NOTES = 'We recommend upgrading to the latest version.'
 export function ReleaseNotes(props: ReleaseNotesProps): JSX.Element {
   const { source } = props
 
+  const isOEMMode = useIsOEMMode()
+
   return (
     <div className={styles.release_notes}>
-      {source != null ? (
+      {source != null && !isOEMMode ? (
         <Markdown
           components={{
             div: undefined,
@@ -25,6 +29,7 @@ export function ReleaseNotes(props: ReleaseNotesProps): JSX.Element {
             li: ListItemText,
             p: ParagraphText,
             a: ExternalLink,
+            hr: HorizontalRule,
           }}
         >
           {source}
@@ -54,4 +59,14 @@ function ListItemText(props: JSX.IntrinsicAttributes): JSX.Element {
 
 function UnnumberedListText(props: JSX.IntrinsicAttributes): JSX.Element {
   return <StyledText {...props} as="ul" />
+}
+
+function HorizontalRule(): JSX.Element {
+  return (
+    <Box
+      borderBottom={`1px solid ${String(COLORS.grey30)}`}
+      marginY={SPACING.spacing16}
+      data-testid="divider"
+    />
+  )
 }
