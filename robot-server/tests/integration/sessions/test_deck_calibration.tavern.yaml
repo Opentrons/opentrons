@@ -8,7 +8,7 @@ marks:
 stages:
   - name: Create the session
     request:
-      url: "{ot2_server_base_url}/sessions"
+      url: '{ot2_server_base_url}/sessions'
       method: POST
       json:
         data:
@@ -21,16 +21,16 @@ stages:
 
   - name: Get the session
     request: &get_session
-      url: "{ot2_server_base_url}/sessions/{session_id}"
+      url: '{ot2_server_base_url}/sessions/{session_id}'
       method: GET
     response:
       status_code: 200
       json:
         links: !anydict
         data: &session_data
-          id: "{session_id}"
+          id: '{session_id}'
           sessionType: deckCalibration
-          createdAt: !re_search "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+\\+\\d{2}:\\d{2}$"
+          createdAt: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"
           createParams: null
           details: &session_data_attribute_details
             currentStep: sessionStarted
@@ -40,7 +40,7 @@ stages:
 
   - name: Load labware
     request: &post_command
-      url: "{ot2_server_base_url}/sessions/{session_id}/commands/execute"
+      url: '{ot2_server_base_url}/sessions/{session_id}/commands/execute'
       method: POST
       json:
         data:
@@ -200,7 +200,7 @@ stages:
 
   - name: Move to point one
     request:
-      url: "{ot2_server_base_url}/sessions/{session_id}/commands/execute"
+      url: '{ot2_server_base_url}/sessions/{session_id}/commands/execute'
       method: POST
       json:
         data:
@@ -222,7 +222,7 @@ stages:
 
   - name: Move to point two
     request:
-      url: "{ot2_server_base_url}/sessions/{session_id}/commands/execute"
+      url: '{ot2_server_base_url}/sessions/{session_id}/commands/execute'
       method: POST
       json:
         data:
@@ -244,7 +244,7 @@ stages:
 
   - name: Move to point three
     request:
-      url: "{ot2_server_base_url}/sessions/{session_id}/commands/execute"
+      url: '{ot2_server_base_url}/sessions/{session_id}/commands/execute'
       method: POST
       json:
         data:
@@ -266,7 +266,7 @@ stages:
 
   - name: Exit Session
     request:
-      url: "{ot2_server_base_url}/sessions/{session_id}/commands/execute"
+      url: '{ot2_server_base_url}/sessions/{session_id}/commands/execute'
       method: POST
       json:
         data:
@@ -288,15 +288,15 @@ stages:
 
   - name: Delete the session
     request:
-      url: "{ot2_server_base_url}/sessions/{session_id}"
+      url: '{ot2_server_base_url}/sessions/{session_id}'
       method: DELETE
     response:
       status_code: 200
 
   - name: There are no session
     request:
-        url: "{ot2_server_base_url}/sessions"
-        method: GET
+      url: '{ot2_server_base_url}/sessions'
+      method: GET
     response:
       status_code: 200
       json:

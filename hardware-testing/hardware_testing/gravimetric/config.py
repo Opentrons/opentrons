@@ -181,11 +181,8 @@ def _get_liquid_probe_settings(
         mount_speed=lqid_cfg["mount_speed"],
         plunger_speed=lqid_cfg["plunger_speed"],
         sensor_threshold_pascals=lqid_cfg["sensor_threshold_pascals"],
-        expected_liquid_height=110,
         output_option=OutputOptions.sync_only,
         aspirate_while_sensing=False,
-        auto_zero_sensor=True,
-        num_baseline_reads=10,
         data_files={InstrumentProbeType.PRIMARY: "/data/testing_data/pressure.csv"},
     )
 

@@ -1355,10 +1355,9 @@ export const additionalEquipmentInvariantProperties = handleActions<NormalizedAd
             command.params.newLocation !== 'offDeck' &&
             'addressableAreaName' in command.params.newLocation &&
             WASTE_CHUTE_ADDRESSABLE_AREAS.includes(
-              command.params.addressableAreaName
+              command.params.newLocation.addressableAreaName
             ))
       )
-
       const getStagingAreaSlotNames = (
         commandType: 'moveLabware' | 'loadLabware',
         locationKey: 'newLocation' | 'location'
@@ -1519,6 +1518,9 @@ export const additionalEquipmentInvariantProperties = handleActions<NormalizedAd
         ) {
           wasteChuteId = moveLiquidStepWasteChute.blowOut_location
         }
+        //  new wasteChuteId generated for if there are only moveLabware commands
+      } else if (hasWasteChuteCommands && moveLiquidStepWasteChute == null) {
+        wasteChuteId = `${uuid()}:wasteChute`
       }
 
       const wasteChute =

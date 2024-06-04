@@ -45,7 +45,7 @@ from .ot3utils import (
     motor_nodes,
     LIMIT_SWITCH_OVERTRAVEL_DISTANCE,
     map_pipette_type_to_sensor_id,
-    moving_axes_in_move_group,
+    moving_pipettes_in_move_group,
     gripper_jaw_state_from_fw,
     get_system_constraints,
     get_system_constraints_for_calibration,
@@ -667,12 +667,9 @@ class OT3Controller(FlexBackend):
             else False,
         )
 
-        mounts_moving = [
-            k
-            for k in moving_axes_in_move_group(move_group)
-            if k in [NodeId.pipette_left, NodeId.pipette_right]
-        ]
-        async with self._monitor_overpressure(mounts_moving):
+        pipettes_moving = moving_pipettes_in_move_group(move_group)
+
+        async with self._monitor_overpressure(pipettes_moving):
             positions = await runner.run(can_messenger=self._messenger)
         self._handle_motor_status_response(positions)
 
@@ -1363,8 +1360,6 @@ class OT3Controller(FlexBackend):
         threshold_pascals: float,
         output_option: OutputOptions = OutputOptions.can_bus_only,
         data_files: Optional[Dict[InstrumentProbeType, str]] = None,
-        auto_zero_sensor: bool = True,
-        num_baseline_reads: int = 10,
         probe: InstrumentProbeType = InstrumentProbeType.PRIMARY,
     ) -> float:
         if output_option == OutputOptions.sync_buffer_to_csv:
@@ -1407,8 +1402,6 @@ class OT3Controller(FlexBackend):
             sync_buffer_output=sync_buffer_output,
             can_bus_only_output=can_bus_only_output,
             data_files=data_files_transposed,
-            auto_zero_sensor=auto_zero_sensor,
-            num_baseline_reads=num_baseline_reads,
             sensor_id=sensor_id_for_instrument(probe),
         )
         for node, point in positions.items():

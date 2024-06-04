@@ -133,11 +133,8 @@ class LiquidProbeSettings:
     mount_speed: float
     plunger_speed: float
     sensor_threshold_pascals: float
-    expected_liquid_height: float
     output_option: OutputOptions
     aspirate_while_sensing: bool
-    auto_zero_sensor: bool
-    num_baseline_reads: int
     data_files: Optional[Dict[InstrumentProbeType, str]]
 
 

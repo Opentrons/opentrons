@@ -123,11 +123,8 @@ ot3_dummy_settings = {
         "mount_speed": 10,
         "plunger_speed": 10,
         "sensor_threshold_pascals": 17,
-        "expected_liquid_height": 90,
         "output_option": OutputOptions.stream_to_csv,
         "aspirate_while_sensing": False,
-        "auto_zero_sensor": True,
-        "num_baseline_reads": 10,
         "data_files": {"PRIMARY": "/data/pressure_sensor_data.csv"},
     },
     "calibration": {

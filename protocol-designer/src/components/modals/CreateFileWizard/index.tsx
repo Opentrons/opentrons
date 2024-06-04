@@ -121,6 +121,7 @@ export function CreateFileWizard(): JSX.Element | null {
       values.pipettesByMount,
       (acc, formPipette: FormPipette, mount): PipetteFieldsData[] => {
         return formPipette?.pipetteName != null &&
+          formPipette?.pipetteName !== '' &&
           formPipette.tiprackDefURI != null &&
           (mount === 'left' || mount === 'right')
           ? [

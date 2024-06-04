@@ -118,11 +118,8 @@ def fake_liquid_settings() -> LiquidProbeSettings:
         mount_speed=40,
         plunger_speed=10,
         sensor_threshold_pascals=15,
-        expected_liquid_height=109,
         output_option=OutputOptions.can_bus_only,
         aspirate_while_sensing=False,
-        auto_zero_sensor=False,
-        num_baseline_reads=10,
         data_files={InstrumentProbeType.PRIMARY: "fake_file_name"},
     )
 
@@ -608,6 +605,7 @@ async def test_pickup_moves(
     pipette_handler.get_pipette(
         OT3Mount.LEFT
     ).nozzle_manager.current_configuration.configuration = NozzleConfigurationType.FULL
+    pipette_handler.get_pipette(OT3Mount.LEFT).current_volume = 0
     z_tiprack_distance = 8.0
     end_z_retract_dist = 9.0
     move_plan_return_val = TipActionSpec(
@@ -643,6 +641,24 @@ async def test_pickup_moves(
             ]
         else:
             assert move_call_list == [(OT3Mount.LEFT, Point(z=end_z_retract_dist))]
+        # pick up tip should have two calls to move_to_plunger_bottom, one before and one after
+        # the tip pickup
+        assert len(mock_move_to_plunger_bottom.call_args_list) == 2
+        mock_move_to_plunger_bottom.reset_mock()
+        mock_move_rel.reset_mock()
+
+        #  make sure that tip_pickup_moves has the same set of moves,
+        #  except no calls to move_to_plunger_bottom
+        await ot3_hardware.tip_pickup_moves(Mount.LEFT, 40.0)
+        move_call_list = [call.args for call in mock_move_rel.call_args_list]
+        if gantry_load == GantryLoad.HIGH_THROUGHPUT:
+            assert move_call_list == [
+                (OT3Mount.LEFT, Point(z=z_tiprack_distance)),
+                (OT3Mount.LEFT, Point(z=end_z_retract_dist)),
+            ]
+        else:
+            assert move_call_list == [(OT3Mount.LEFT, Point(z=end_z_retract_dist))]
+    assert len(mock_move_to_plunger_bottom.call_args_list) == 0
 
 
 @pytest.mark.parametrize("load_configs", load_pipette_configs)
@@ -809,11 +825,8 @@ async def test_liquid_probe(
             mount_speed=40,
             plunger_speed=10,
             sensor_threshold_pascals=15,
-            expected_liquid_height=109,
             output_option=OutputOptions.can_bus_only,
             aspirate_while_sensing=True,
-            auto_zero_sensor=False,
-            num_baseline_reads=10,
             data_files={InstrumentProbeType.PRIMARY: "fake_file_name"},
         )
         await ot3_hardware.liquid_probe(mount, fake_settings_aspirate)
@@ -826,8 +839,6 @@ async def test_liquid_probe(
             fake_settings_aspirate.sensor_threshold_pascals,
             fake_settings_aspirate.output_option,
             fake_settings_aspirate.data_files,
-            fake_settings_aspirate.auto_zero_sensor,
-            fake_settings_aspirate.num_baseline_reads,
             probe=InstrumentProbeType.PRIMARY,
         )
 

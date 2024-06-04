@@ -15,6 +15,7 @@ import { Liquids } from '../Liquids'
 import type { UseQueryResult } from 'react-query'
 import type { Protocol } from '@opentrons/api-client'
 import type { CompletedProtocolAnalysis } from '@opentrons/shared-data'
+import { screen } from '@testing-library/react'
 
 vi.mock('@opentrons/api-client')
 vi.mock('@opentrons/react-api-client')
@@ -203,16 +204,16 @@ describe('Liquids', () => {
       } as UseQueryResult<CompletedProtocolAnalysis>)
   })
   it('should render the correct headers and liquids', () => {
-    const { getByRole, getByText, getByLabelText } = render(props)[0]
-    getByRole('columnheader', { name: 'Liquid Name' })
-    getByRole('columnheader', { name: 'Total Volume' })
-    getByText('Mock Liquid 1')
-    getByText('Mock Sample')
-    getByText('50 µL')
-    getByLabelText('Liquids_#ff4888')
-    getByText('Mock Liquid 2')
-    getByText('Another Mock Sample')
-    getByText('22 µL')
-    getByLabelText('Liquids_#ff8999')
+    render(props)
+    screen.getByRole('columnheader', { name: 'Liquid Name' })
+    screen.getByRole('columnheader', { name: 'Total Volume' })
+    screen.getByText('Mock Liquid 1')
+    screen.getByText('Mock Sample')
+    screen.getByText('50 µL')
+    screen.getByLabelText('Liquids_#ff4888')
+    screen.getByText('Mock Liquid 2')
+    screen.getByText('Another Mock Sample')
+    screen.getByText('22 µL')
+    screen.getByLabelText('Liquids_#ff8999')
   })
 })

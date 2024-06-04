@@ -72,6 +72,7 @@ class TipPhysicallyMissingError(ErrorOccurrence):
     of the pipette.
     """
 
+    isDefined: bool = True
     errorType: Literal["tipPhysicallyMissing"] = "tipPhysicallyMissing"
     errorCode: str = ErrorCodes.TIP_PICKUP_FAILED.value.code
     detail: str = "No tip detected."

@@ -89,8 +89,8 @@ describe('SetupTipLengthCalibrationButton', () => {
   })
 
   it('button launches the tip length calibration wizard when clicked - recalibration', () => {
-    const { getByText } = render({ hasCalibrated: true })
-    const recalibrateBtn = getByText('Recalibrate')
+    render({ hasCalibrated: true })
+    const recalibrateBtn = screen.getByText('Recalibrate')
     fireEvent.click(recalibrateBtn)
     expect(mockTipLengthCalLauncher).toHaveBeenCalled()
   })

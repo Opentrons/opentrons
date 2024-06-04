@@ -308,14 +308,14 @@ async def liquid_probe(
     sync_buffer_output: bool = False,
     can_bus_only_output: bool = False,
     data_files: Optional[Dict[SensorId, str]] = None,
-    auto_zero_sensor: bool = True,
-    num_baseline_reads: int = 10,
     sensor_id: SensorId = SensorId.S0,
 ) -> Dict[NodeId, MotorPositionStatus]:
     """Move the mount and pipette simultaneously while reading from the pressure sensor."""
     log_files: Dict[SensorId, str] = {} if not data_files else data_files
     sensor_driver = SensorDriver()
     threshold_fixed_point = threshold_pascals * sensor_fixed_point_conversion
+    # How many samples to take to level out the sensor
+    num_baseline_reads = 20
     pressure_sensors = await _setup_pressure_sensors(
         messenger,
         sensor_id,
@@ -323,7 +323,7 @@ async def liquid_probe(
         num_baseline_reads,
         threshold_fixed_point,
         sensor_driver,
-        auto_zero_sensor,
+        True,
     )
 
     sensor_group = _build_pass_step(

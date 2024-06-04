@@ -144,7 +144,6 @@ export function CurrentOffsetsTable(
     <Flex
       flexDirection={DIRECTION_COLUMN}
       justifyContent={JUSTIFY_SPACE_BETWEEN}
-      padding={SPACING.spacing16}
     >
       <StyledText as="label">
         {i18n.format(t('applied_offset_data'), 'upperCase')}

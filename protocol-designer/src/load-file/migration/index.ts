@@ -27,7 +27,11 @@ export const getMigrationVersionsToRunFromVersion = (
   const allSortedVersions = Object.keys(migrationsByVersion).sort(
     semver.compare
   )
-  return takeRightWhile(allSortedVersions, v => semver.gt(v, version))
+
+  return takeRightWhile(
+    allSortedVersions,
+    v => semver.gt(v, version) && !version.includes(v)
+  )
 }
 
 const allMigrationsByVersion: MigrationsByVersion = {

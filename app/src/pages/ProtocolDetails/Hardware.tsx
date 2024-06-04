@@ -19,6 +19,8 @@ import {
   getModuleType,
   getFixtureDisplayName,
   GRIPPER_V1_2,
+  MAGNETIC_BLOCK_FIXTURES,
+  MAGNETIC_BLOCK_TYPE,
 } from '@opentrons/shared-data'
 
 import {
@@ -119,6 +121,16 @@ function HardwareItem({
       <LocationIcon slotName={getCutoutDisplayName(hardware.location.cutout)} />
     )
   }
+  const isMagneticBlockFixture =
+    hardware.hardwareType === 'fixture' &&
+    hardware.cutoutFixtureId != null &&
+    MAGNETIC_BLOCK_FIXTURES.includes(hardware.cutoutFixtureId)
+  let iconModuleType = null
+  if (hardware.hardwareType === 'module') {
+    iconModuleType = getModuleType(hardware.moduleModel)
+  } else if (isMagneticBlockFixture) {
+    iconModuleType = MAGNETIC_BLOCK_TYPE
+  }
   return (
     <TableRow>
       <TableDatum>
@@ -126,19 +138,16 @@ function HardwareItem({
       </TableDatum>
       <TableDatum>
         <Flex paddingLeft={SPACING.spacing24}>
-          {hardware.hardwareType === 'module' && (
+          {iconModuleType != null ? (
             <Flex
               alignItems={ALIGN_CENTER}
               height="2rem"
               paddingBottom={SPACING.spacing4}
               paddingRight={SPACING.spacing8}
             >
-              <ModuleIcon
-                moduleType={getModuleType(hardware.moduleModel)}
-                size="1.75rem"
-              />
+              <ModuleIcon moduleType={iconModuleType} size="1.75rem" />
             </Flex>
-          )}
+          ) : null}
           <StyledText as="p">{hardwareName}</StyledText>
         </Flex>
       </TableDatum>

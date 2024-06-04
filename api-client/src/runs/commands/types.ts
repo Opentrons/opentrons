@@ -47,10 +47,3 @@ export interface CreateCommandParams {
   timeout?: number
   failedCommandId?: string
 }
-
-export interface RunCommandError {
-  id: string
-  errorType: string
-  createdAt: string
-  detail: string
-}

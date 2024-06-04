@@ -100,7 +100,7 @@ describe('LocationConflictModal', () => {
     expect(props.onCloseClick).toHaveBeenCalled()
     fireEvent.click(screen.getByRole('button', { name: 'Update deck' }))
     screen.getByText('Heater-Shaker Module GEN1 in USB-1')
-    fireEvent.click(screen.getByRole('button', { name: 'add' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Add' }))
     expect(mockUpdate).toHaveBeenCalled()
   })
   it('should render the modal information for a single slot fixture conflict', () => {

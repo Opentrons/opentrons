@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { it, describe, expect } from 'vitest'
-import { fireEvent } from '@testing-library/react'
+import { fireEvent, screen } from '@testing-library/react'
 
 import { renderWithProviders } from '../../../../__testing-utils__'
 import { i18n } from '../../../../i18n'
@@ -14,33 +14,33 @@ const render = () => {
 
 describe('NewRobotSetupHelp', () => {
   it('renders link and collapsed modal by default', () => {
-    const [{ getByText, queryByText }] = render()
+    render()
 
-    getByText('See how to set up a new robot')
-    expect(queryByText('How to setup a new robot')).toBeFalsy()
+    screen.getByText('See how to set up a new robot')
+    expect(screen.queryByText('How to setup a new robot')).toBeFalsy()
   })
   it('when link is clicked, modal is opened, and closes via Close button', () => {
-    const [{ getByText, getByRole, queryByText }] = render()
+    render()
 
-    const link = getByText('See how to set up a new robot')
+    const link = screen.getByText('See how to set up a new robot')
     fireEvent.click(link)
-    getByText('How to setup a new robot')
+    screen.getByText('How to setup a new robot')
 
-    const closeButton = getByRole('button', { name: 'close' })
+    const closeButton = screen.getByRole('button', { name: 'close' })
     fireEvent.click(closeButton)
 
-    expect(queryByText('How to setup a new robot')).toBeFalsy()
+    expect(screen.queryByText('How to setup a new robot')).toBeFalsy()
   })
   it('when link is clicked, modal is opened, and closes via x', () => {
-    const [{ getByText, getByRole, queryByText }] = render()
+    render()
 
-    const link = getByText('See how to set up a new robot')
+    const link = screen.getByText('See how to set up a new robot')
     fireEvent.click(link)
-    expect(getByText('How to setup a new robot')).toBeInTheDocument()
+    expect(screen.getByText('How to setup a new robot')).toBeInTheDocument()
 
-    const xButton = getByRole('button', { name: '' })
+    const xButton = screen.getByRole('button', { name: '' })
     fireEvent.click(xButton)
 
-    expect(queryByText('How to setup a new robot')).toBeFalsy()
+    expect(screen.queryByText('How to setup a new robot')).toBeFalsy()
   })
 })

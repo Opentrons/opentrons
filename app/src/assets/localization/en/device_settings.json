@@ -294,7 +294,7 @@
   "update_robot_software": "Update robot software manually with a local file (.zip)",
   "updating": "Updating",
   "update_requires_restarting_robot": "Updating the robot software requires restarting the robot",
-  "upload_custom_logo_description": "Upload a logo for the robot to display during boot up. If no file is uploaded, we will display an anonymous logo.",
+  "upload_custom_logo_description": "Upload a logo for the robot to display during boot up.",
   "upload_custom_logo_dimensions": "The logo must fit within dimensions 1024 x 600 and be a PNG file (.png).",
   "upload_custom_logo": "Upload custom logo",
   "usage_settings": "Usage Settings",

@@ -31,7 +31,6 @@ import { getLocalRobot } from '../../../redux/discovery'
 import { CancelingRunModal } from '../../../organisms/OnDeviceDisplay/RunningProtocol/CancelingRunModal'
 import { useTrackProtocolRunEvent } from '../../../organisms/Devices/hooks'
 import { useMostRecentCompletedAnalysis } from '../../../organisms/LabwarePositionCheck/useMostRecentCompletedAnalysis'
-import { RunPausedSplash } from '../../../organisms/OnDeviceDisplay/RunningProtocol/RunPausedSplash'
 import { OpenDoorAlertModal } from '../../../organisms/OpenDoorAlertModal'
 import { RunningProtocol } from '..'
 import {
@@ -55,7 +54,6 @@ vi.mock('../../../organisms/RunTimeControl/hooks')
 vi.mock(
   '../../../organisms/LabwarePositionCheck/useMostRecentCompletedAnalysis'
 )
-vi.mock('../../../organisms/OnDeviceDisplay/RunningProtocol/RunPausedSplash')
 vi.mock('../../../organisms/RunTimeControl/hooks')
 vi.mock('../../../organisms/OnDeviceDisplay/RunningProtocol')
 vi.mock('../../../redux/discovery')
@@ -158,7 +156,6 @@ describe('RunningProtocol', () => {
     )
     vi.mocked(useErrorRecoveryFlows).mockReturnValue({
       isERActive: false,
-      toggleER: vi.fn(),
       failedCommand: {} as any,
     })
   })
@@ -199,7 +196,6 @@ describe('RunningProtocol', () => {
       .calledWith(RUN_ID, { refetchInterval: 5000 })
       .thenReturn(RUN_STATUS_AWAITING_RECOVERY)
     render(`/runs/${RUN_ID}/run`)
-    expect(vi.mocked(RunPausedSplash)).toHaveBeenCalled()
   })
 
   it('should render ErrorRecovery appropriately', () => {
@@ -208,7 +204,6 @@ describe('RunningProtocol', () => {
 
     vi.mocked(useErrorRecoveryFlows).mockReturnValue({
       isERActive: true,
-      toggleER: vi.fn(),
       failedCommand: {} as any,
     })
     render(`/runs/${RUN_ID}/run`)
