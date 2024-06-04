@@ -40,6 +40,13 @@ build:
 	vite build
 	git rev-parse HEAD > dist/.commit
 
+
+.PHONY: build-staging
+build: export NODE_ENV := staging
+build:
+	vite build
+	git rev-parse HEAD > dist/.commit
+
 # development
 #####################################################################
 
