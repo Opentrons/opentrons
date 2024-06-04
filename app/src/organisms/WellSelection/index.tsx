@@ -218,6 +218,57 @@ function Selection384Wells({
   const columns = definition.ordering
   const wells = flatten(columns)
 
+  // for 96 channel: even/odd columns to be used based on labware column label, not index
+  const oddColumns = columns.filter((_column, i) => i % 2 === 0)
+  const oddColumnWells = flatten(oddColumns)
+
+  const evenColumns = columns.filter((_column, i) => i % 2 !== 0)
+  const evenColumnWells = flatten(evenColumns)
+
+  // select even/odd members of even/odd columns based on starting well
+  const A1WellGroup = oddColumnWells.reduce((acc, well, i) => {
+    if (i % 2 === 0) {
+      return { ...acc, [well]: null }
+    } else return acc
+  }, {})
+
+  const B1WellGroup = oddColumnWells.reduce((acc, well, i) => {
+    if (i % 2 !== 0) {
+      return { ...acc, [well]: null }
+    } else return acc
+  }, {})
+
+  const A2WellGroup = evenColumnWells.reduce((acc, well, i) => {
+    if (i % 2 === 0) {
+      return { ...acc, [well]: null }
+    } else return acc
+  }, {})
+
+  const B2WellGroup = evenColumnWells.reduce((acc, well, i) => {
+    if (i % 2 !== 0) {
+      return { ...acc, [well]: null }
+    } else return acc
+  }, {})
+
+  // TODO: refactor checkboxes to reflect multiselect
+  // change starting well state to object, true/false for keys
+
+  // to set 96 channel selected wells based on starting well
+  React.useEffect(() => {
+    if (channels === 96) {
+      if (startingWell === 'A1') {
+        selectWells(A1WellGroup)
+      } else if (startingWell === 'B1') {
+        selectWells(B1WellGroup)
+      } else if (startingWell === 'A2') {
+        selectWells(A2WellGroup)
+      } else if (startingWell === 'B2') {
+        selectWells(B2WellGroup)
+      }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [channels, startingWell])
+
   const handleMinus = (): void => {
     if (lastSelectedIndex == null) {
       return
