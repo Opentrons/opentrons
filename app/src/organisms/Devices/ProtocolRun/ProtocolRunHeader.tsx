@@ -208,7 +208,7 @@ export function ProtocolRunHeader({
     if (isFlex) {
       if (runStatus === RUN_STATUS_IDLE) {
         setShowDropTipBanner(true)
-        void resetTipStatus()
+        resetTipStatus()
       } else if (
         runStatus != null &&
         // @ts-expect-error runStatus expected to possibly not be terminal
@@ -369,11 +369,11 @@ export function ProtocolRunHeader({
         {mostRecentRunId === runId && showDropTipBanner && areTipsAttached ? (
           <ProtocolDropTipBanner
             onLaunchWizardClick={toggleDTWiz}
-            onCloseClick={() =>
+            onCloseClick={() => {
               resetTipStatus()
-                .then(() => setShowDropTipBanner(false))
-                .then(() => closeCurrentRun())
-            }
+              setShowDropTipBanner(false)
+              closeCurrentRun()
+            }}
           />
         ) : null}
         <Box display="grid" gridTemplateColumns="4fr 3fr 3fr 4fr">

@@ -24,7 +24,7 @@ interface TipAttachmentStatusResult {
   /** Whether tips are likely attached on *any* pipette. Typically called after determineTipStatus() */
   areTipsAttached: boolean
   /** Resets the cached pipettes with tip statuses to null.  */
-  resetTipStatus: () => Promise<void>
+  resetTipStatus: () => void
   /** Removes the first element from the tip attached cache if present.
    * @param {Function} onEmptyCache After skipping the pipette, if the attached tip cache is empty, invoke this callback.
    * */
@@ -61,9 +61,8 @@ export function useTipAttachmentStatus(
     })
   }, [params])
 
-  const resetTipStatus = (): Promise<void> => {
+  const resetTipStatus = (): void => {
     setPipettesWithTip([])
-    return Promise.resolve()
   }
 
   const setTipStatusResolved = (
