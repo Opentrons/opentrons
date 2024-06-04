@@ -68,6 +68,7 @@ stages:
           errors:
             - id: !anystr
               errorType: ExceptionInProtocolError
+              isDefined: false
               createdAt: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"
               detail: 'UnexpectedTipRemovalError [line 9]: Error 3005 UNEXPECTED_TIP_REMOVAL (UnexpectedTipRemovalError): Cannot perform PREPARE_ASPIRATE without a tip attached.'
               errorCode: '4000'
@@ -105,6 +106,7 @@ stages:
             error:
               id: !anystr
               errorType: LegacyContextCommandError
+              isDefined: false
               createdAt: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"
               detail: 'Cannot perform PREPARE_ASPIRATE without a tip attached.'
               errorCode: '3005'

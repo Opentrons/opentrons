@@ -20,6 +20,7 @@ const mockErrors = [
   {
     id: 'd0245210-dfb9-4f1c-8ad0-3416b603a7ba',
     errorType: 'generalError',
+    isDefined: false,
     createdAt: '2023-04-09T21:41:51.333171+00:00',
     detail: 'Error with code 4000 (lowest priority)',
     errorInfo: {},
@@ -28,6 +29,7 @@ const mockErrors = [
       {
         id: 'd0245210-dfb9-4f1c-8ad0-3416b603a7ba',
         errorType: 'roboticsInteractionError',
+        isDefined: false,
         createdAt: '2023-04-09T21:41:51.333171+00:00',
         detail: 'Error with code 3000 (second lowest priortiy)',
         errorInfo: {},
@@ -37,6 +39,7 @@ const mockErrors = [
       {
         id: 'd0245210-dfb9-4f1c-8ad0-3416b603a7ba',
         errorType: 'roboticsControlError',
+        isDefined: false,
         createdAt: '2023-04-09T21:41:51.333171+00:00',
         detail: 'Error with code 2000 (second highest priority)',
         errorInfo: {},
@@ -45,6 +48,7 @@ const mockErrors = [
           {
             id: 'd0245210-dfb9-4f1c-8ad0-3416b603a7ba',
             errorType: 'hardwareCommunicationError',
+            isDefined: false,
             createdAt: '2023-04-09T21:41:51.333171+00:00',
             detail: 'Error with code 1000 (highest priority)',
             errorInfo: {},
@@ -58,6 +62,7 @@ const mockErrors = [
   {
     id: 'd0245210-dfb9-4f1c-8ad0-3416b603a7ba',
     errorType: 'roboticsInteractionError',
+    isDefined: false,
     createdAt: '2023-04-09T21:41:51.333171+00:00',
     detail: 'Error with code 2001 (second highest priortiy)',
     errorInfo: {},

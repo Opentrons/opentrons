@@ -42,7 +42,7 @@ export function SetWifiCred({
 
   React.useEffect(() => {
     if (inputRef.current != null) {
-      inputRef?.current?.focus()
+      inputRef.current.focus()
     }
   }, [password])
 

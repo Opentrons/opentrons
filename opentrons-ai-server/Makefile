@@ -67,12 +67,16 @@ gen-requirements:
 	@echo "Generating requirements.txt from Pipfile.lock..."
 	python -m pipenv requirements > requirements.txt
 
-ENV ?= sandbox
+ENV ?= local
 
 .PHONY: deploy
 deploy: gen-requirements
 	@echo "Deploying to environment: $(ENV)"
 	python -m pipenv run python deploy.py --env $(ENV)
+
+.PHONY: prompted-deploy
+prompted-deploy: gen-requirements
+	python -m pipenv run python deploy.py
 
 .PHONY: direct-chat-completion
 direct-chat-completion:
@@ -86,6 +90,14 @@ print-client-settings-vars:
 live-client:
 	python -m pipenv run python -m tests.helpers.client
 
+.PHONY: live-hf
+live-hf:
+	python -m pipenv run python -m tests.helpers.huggingface_client
+
 .PHONY: test-live
 test-live:
 	python -m pipenv run python -m pytest tests -m live --env $(ENV)
+
+.PHONY: run
+run:
+	python -m pipenv run python -m api.handler.local_run --env $(ENV)

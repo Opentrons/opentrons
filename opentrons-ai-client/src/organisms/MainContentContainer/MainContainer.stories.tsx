@@ -1,13 +1,13 @@
 import React from 'react'
 import { I18nextProvider } from 'react-i18next'
 import { i18n } from '../../i18n'
-import { ChatContainer as ChatContainerComponent } from './index'
+import { MainContentContainer as MainContentContainerComponent } from './index'
 
 import type { Meta, StoryObj } from '@storybook/react'
 
-const meta: Meta<typeof ChatContainerComponent> = {
+const meta: Meta<typeof MainContentContainerComponent> = {
   title: 'AI/organisms/ChatContainer',
-  component: ChatContainerComponent,
+  component: MainContentContainerComponent,
   decorators: [
     Story => (
       <I18nextProvider i18n={i18n}>
@@ -17,5 +17,5 @@ const meta: Meta<typeof ChatContainerComponent> = {
   ],
 }
 export default meta
-type Story = StoryObj<typeof ChatContainerComponent>
+type Story = StoryObj<typeof MainContentContainerComponent>
 export const ChatContainer: Story = {}
