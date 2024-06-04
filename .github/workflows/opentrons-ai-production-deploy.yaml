@@ -81,7 +81,7 @@ jobs:
         run: |
           TAG_REF=${{ github.ref }}
           SERVER_VERSION=${TAG_REF#refs/tags/ai-server@}
-          echo "::set-output name=server_version::$SERVER_VERSION"
+          echo "SERVER_VERSION=$SERVER_VERSION" >> "$GITHUB_OUTPUT"
       - name: Checkout opentrons repo
         uses: 'actions/checkout@v4'
       - name: Setup Python
@@ -102,4 +102,4 @@ jobs:
       - name: 'deploy api to prod'
         working-directory: ./opentrons-ai-server
         run: |
-          make deploy ENV=prod TAG=${{ steps.extract_version.outputs.server_version }}
+          make deploy ENV=prod TAG=${{ steps.extract_version.outputs.SERVER_VERSION }}
