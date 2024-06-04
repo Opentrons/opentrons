@@ -1,6 +1,6 @@
 """Engine/Runner provider."""
 from __future__ import annotations
-from typing import Optional, Union, List, Dict, overload
+from typing import Optional, Union, List, Dict
 
 from anyio import move_on_after
 
@@ -9,9 +9,23 @@ from opentrons_shared_data.labware.labware_definition import LabwareDefinition
 from . import protocol_runner, RunResult, JsonRunner, PythonAndLegacyRunner
 from ..hardware_control import HardwareControlAPI
 from ..hardware_control.modules import AbstractModule as HardwareModuleAPI
-from ..protocol_engine import ProtocolEngine, CommandCreate, Command, StateSummary, CommandPointer, CommandSlice
-from ..protocol_engine.types import PostRunHardwareState, EngineStatus, LabwareOffsetCreate, LabwareOffset, \
-    DeckConfigurationType, RunTimeParameter, RunTimeParamValuesType
+from ..protocol_engine import (
+    ProtocolEngine,
+    CommandCreate,
+    Command,
+    StateSummary,
+    CommandPointer,
+    CommandSlice,
+)
+from ..protocol_engine.types import (
+    PostRunHardwareState,
+    EngineStatus,
+    LabwareOffsetCreate,
+    LabwareOffset,
+    DeckConfigurationType,
+    RunTimeParameter,
+    RunTimeParamValuesType,
+)
 from ..protocol_reader import JsonProtocolConfig, PythonProtocolConfig, ProtocolSource
 from ..protocols.parse import PythonParseMode
 
@@ -36,15 +50,15 @@ class RunOrchestrator:
     _protocol_engine: ProtocolEngine
 
     def __init__(
-            self,
-            protocol_engine: ProtocolEngine,
-            hardware_api: HardwareControlAPI,
-            fixit_runner: protocol_runner.LiveRunner,
-            setup_runner: protocol_runner.LiveRunner,
-            json_or_python_protocol_runner: Optional[
-                Union[protocol_runner.PythonAndLegacyRunner, protocol_runner.JsonRunner]
-            ] = None,
-            run_id: Optional[str] = None,
+        self,
+        protocol_engine: ProtocolEngine,
+        hardware_api: HardwareControlAPI,
+        fixit_runner: protocol_runner.LiveRunner,
+        setup_runner: protocol_runner.LiveRunner,
+        json_or_python_protocol_runner: Optional[
+            Union[protocol_runner.PythonAndLegacyRunner, protocol_runner.JsonRunner]
+        ] = None,
+        run_id: Optional[str] = None,
     ) -> None:
         """Initialize a run orchestrator interface.
 
@@ -75,15 +89,15 @@ class RunOrchestrator:
 
     @classmethod
     def build_orchestrator(
-            cls,
-            protocol_engine: ProtocolEngine,
-            hardware_api: HardwareControlAPI,
-            protocol_config: Optional[
-                Union[JsonProtocolConfig, PythonProtocolConfig]
-            ] = None,
-            post_run_hardware_state: PostRunHardwareState = PostRunHardwareState.HOME_AND_STAY_ENGAGED,
-            drop_tips_after_run: bool = True,
-            run_id: Optional[str] = None,
+        cls,
+        protocol_engine: ProtocolEngine,
+        hardware_api: HardwareControlAPI,
+        protocol_config: Optional[
+            Union[JsonProtocolConfig, PythonProtocolConfig]
+        ] = None,
+        post_run_hardware_state: PostRunHardwareState = PostRunHardwareState.HOME_AND_STAY_ENGAGED,
+        drop_tips_after_run: bool = True,
+        run_id: Optional[str] = None,
     ) -> "RunOrchestrator":
         """Build a RunOrchestrator provider."""
         setup_runner = protocol_runner.LiveRunner(
@@ -119,9 +133,8 @@ class RunOrchestrator:
     async def run(self, deck_configuration: DeckConfigurationType) -> RunResult:
         """Start or resume the run."""
         # TODO(tz, 5-31-2024): call all runners?
-        return await self._protocol_runner.run(
-            deck_configuration=deck_configuration
-        )
+        assert self._protocol_runner is not None
+        return await self._protocol_runner.run(deck_configuration=deck_configuration)
 
     def pause(self) -> None:
         """Start or resume the run."""
@@ -130,9 +143,9 @@ class RunOrchestrator:
     async def stop(self) -> None:
         """Start or resume the run."""
         if self.run_has_started():
-            await self.run_orchestrator.runner.stop()
+            await self.stop()
         else:
-            self.finish(
+            await self.finish(
                 drop_tips_after_run=False,
                 set_run_status=False,
                 post_run_hardware_state=PostRunHardwareState.STAY_ENGAGED_IN_PLACE,
@@ -142,31 +155,45 @@ class RunOrchestrator:
         """Start or resume the run."""
         self._protocol_engine.resume_from_recovery()
 
-    async def finish(self,error: Optional[Exception] = None,
-                     drop_tips_after_run: bool = True, set_run_status: bool = True, post_run_hardware_state: PostRunHardwareState = PostRunHardwareState.HOME_AND_STAY_ENGAGED,) -> None:
+    async def finish(
+        self,
+        error: Optional[Exception] = None,
+        drop_tips_after_run: bool = True,
+        set_run_status: bool = True,
+        post_run_hardware_state: PostRunHardwareState = PostRunHardwareState.HOME_AND_STAY_ENGAGED,
+    ) -> None:
         """Stop the run."""
-        await self._protocol_engine.finish(error=error, drop_tips_after_run=drop_tips_after_run, set_run_status=set_run_status, post_run_hardware_state=post_run_hardware_state)
+        await self._protocol_engine.finish(
+            error=error,
+            drop_tips_after_run=drop_tips_after_run,
+            set_run_status=set_run_status,
+            post_run_hardware_state=post_run_hardware_state,
+        )
 
     def get_state_summary(self) -> StateSummary:
+        """Get protocol run data."""
         return self._protocol_engine.state_view.get_summary()
 
     def get_loaded_labware_definitions(self) -> List[LabwareDefinition]:
-        return (
-            self._protocol_engine.state_view.labware.get_loaded_labware_definitions()
-        )
+        """Get loaded labware definitions."""
+        return self._protocol_engine.state_view.labware.get_loaded_labware_definitions()
 
     def get_run_time_parameters(self) -> List[RunTimeParameter]:
         """Parameter definitions defined by protocol, if any. Will always be empty before execution."""
-        return [] if self._protocol_runner is None else self._protocol_runner.run_time_parameters
+        return (
+            []
+            if self._protocol_runner is None
+            else self._protocol_runner.run_time_parameters
+        )
 
     def get_current_command(self) -> Optional[CommandPointer]:
         """Parameter definitions defined by protocol, if any. Will always be empty before execution."""
         return self._protocol_engine.state_view.commands.get_current()
 
     def get_command_slice(
-            self,
-            cursor: Optional[int],
-            length: int,
+        self,
+        cursor: Optional[int],
+        length: int,
     ) -> CommandSlice:
         """Get a slice of run commands.
 
@@ -188,11 +215,10 @@ class RunOrchestrator:
 
     def get_command(self, command_id: str) -> Command:
         """Get a run's command by ID."""
-        return self._protocol_engine.state_view.commands.get(
-            command_id=command_id
-        )
+        return self._protocol_engine.state_view.commands.get(command_id=command_id)
 
     def get_all_commands(self) -> List[Command]:
+        """Get all run commands."""
         return self._protocol_engine.state_view.commands.get_all()
 
     def get_run_status(self) -> EngineStatus:
@@ -200,24 +226,36 @@ class RunOrchestrator:
         return self._protocol_engine.state_view.commands.get_status()
 
     def get_is_run_terminal(self) -> bool:
+        """Get whether engine is in a terminal state."""
         return self._protocol_engine.state_view.commands.get_is_terminal()
 
     def run_has_started(self) -> bool:
+        """Get whether the run has started."""
         return self._protocol_engine.state_view.commands.has_been_played()
 
     def run_has_stopped(self) -> bool:
+        """Get whether the run has stopped."""
         return self._protocol_engine.state_view.commands.get_is_stopped()
 
     def add_labware_offset(self, request: LabwareOffsetCreate) -> LabwareOffset:
+        """Add a new labware offset to state."""
         return self._protocol_engine.add_labware_offset(request)
 
     def add_labware_definition(self, definition: LabwareDefinition) -> LabwareUri:
-        return self.run_orchestrator.engine.add_labware_definition(definition)
+        """Add a new labware definition to state."""
+        return self._protocol_engine.add_labware_definition(definition)
 
-    async def add_command_and_wait_for_interval(self, command: CommandCreate, wait_until_complete: bool = False,
-                                                timeout: Optional[int] = None,
-                                                failed_command_id: Optional[str] = None) -> Command:
-        added_command = self._protocol_engine.add_command(request=command, failed_command_id=failed_command_id)
+    async def add_command_and_wait_for_interval(
+        self,
+        command: CommandCreate,
+        wait_until_complete: bool = False,
+        timeout: Optional[int] = None,
+        failed_command_id: Optional[str] = None,
+    ) -> Command:
+        """Add a new command to execute and wait for it to complete if needed."""
+        added_command = self._protocol_engine.add_command(
+            request=command, failed_command_id=failed_command_id
+        )
         if wait_until_complete:
             timeout_sec = None if timeout is None else timeout / 1000.0
             with move_on_after(timeout_sec):
@@ -225,31 +263,48 @@ class RunOrchestrator:
         return added_command
 
     def estop(self) -> None:
+        """Handle an E-stop event from the hardware API."""
         return self._protocol_engine.estop()
 
-    async def use_attached_modules(self, modules_by_id: Dict[str, HardwareModuleAPI]) -> None:
+    async def use_attached_modules(
+        self, modules_by_id: Dict[str, HardwareModuleAPI]
+    ) -> None:
+        """Load attached modules directly into state, without locations."""
         await self._protocol_engine.use_attached_modules(modules_by_id=modules_by_id)
 
     def get_protocol_runner(self) -> Optional[Union[JsonRunner, PythonAndLegacyRunner]]:
+        """Get run's protocol runner if any, if not return None."""
         return self._protocol_runner
 
-    @overload
-    async def load(self,
-             protocol_source: ProtocolSource,
-             ) -> None:
-        self._protocol_runner.load(protocol_source=protocol_source)
+    async def load_json(
+        self,
+        protocol_source: ProtocolSource,
+    ) -> None:
+        """Load a json protocol."""
+        assert self._protocol_runner is not None
+        assert isinstance(self._protocol_runner, JsonRunner)
+        await self._protocol_runner.load(protocol_source=protocol_source)
 
-    @overload
-    async def load(self,
-             protocol_source: ProtocolSource,
-             python_parse_mode: PythonParseMode,
-             run_time_param_values: Optional[RunTimeParamValuesType],
-             ) -> None:
-        self._protocol_runner.load(protocol_source=protocol_source, python_parse_mode=python_parse_mode, run_time_param_values=run_time_param_values)
+    async def load_python(
+        self,
+        protocol_source: ProtocolSource,
+        python_parse_mode: PythonParseMode,
+        run_time_param_values: Optional[RunTimeParamValuesType],
+    ) -> None:
+        """Load a python protocol."""
+        assert self._protocol_runner is not None
+        assert isinstance(self._protocol_runner, PythonAndLegacyRunner)
+        await self._protocol_runner.load(
+            protocol_source=protocol_source,
+            python_parse_mode=python_parse_mode,
+            run_time_param_values=run_time_param_values,
+        )
 
     def get_is_okay_to_clear(self) -> bool:
+        """Get whether the engine is stopped or sitting idly so it could be removed."""
         return self._protocol_engine.state_view.commands.get_is_okay_to_clear()
 
     def prepare(self) -> None:
+        """Prepare live runner for a run."""
         self._setup_runner.prepare()
         self._fixit_runner.prepare()

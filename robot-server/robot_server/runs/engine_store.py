@@ -245,7 +245,7 @@ class EngineStore:
             assert (
                 protocol is not None
             ), "A Python protocol should have a protocol source file."
-            await self.run_orchestrator.load(
+            await self.run_orchestrator.load_python(
                 protocol.source,
                 # Conservatively assume that we're re-running a protocol that
                 # was uploaded before we added stricter validation, and that
@@ -257,7 +257,7 @@ class EngineStore:
             assert (
                 protocol is not None
             ), "A JSON protocol shouZld have a protocol source file."
-            await self.run_orchestrator.load(protocol.source)
+            await self.run_orchestrator.load_json(protocol.source)
         else:
             self.run_orchestrator.prepare()
 
