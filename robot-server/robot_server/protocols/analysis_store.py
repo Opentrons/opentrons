@@ -19,7 +19,7 @@ from opentrons.protocol_engine import (
     LoadedModule,
     Liquid,
 )
-from opentrons.protocol_engine.types import RunTimeParamValuesType
+from opentrons.protocol_engine.types import RunTimeParamValuesType, CSVParameter
 
 from .analysis_models import (
     AnalysisSummary,
@@ -29,6 +29,7 @@ from .analysis_models import (
     AnalysisResult,
     AnalysisStatus,
     RunTimeParameterAnalysisData,
+    AnalysisParameterType,
 )
 
 from .completed_analysis_store import CompletedAnalysisStore, CompletedAnalysisResource
@@ -287,10 +288,19 @@ class AnalysisStore:
 
         rtp_values_and_defaults = {}
         for param_spec in rtp_list:
+            value: AnalysisParameterType
+            if isinstance(param_spec, CSVParameter):
+                default = None
+                value = param_spec.id
+            else:
+                default = param_spec.default
+                value = param_spec.value
+            # TODO(jbl 2024-06-04) we might want to add type here, since CSV files value is a str and right now the only
+            #   thing disambiguating that is that default for that will be None, if we ever want to discern type.
             rtp_values_and_defaults.update(
                 {
                     param_spec.variableName: RunTimeParameterAnalysisData(
-                        value=param_spec.value, default=param_spec.default
+                        value=value, default=default
                     )
                 }
             )

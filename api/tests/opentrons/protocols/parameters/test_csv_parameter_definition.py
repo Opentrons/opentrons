@@ -7,7 +7,7 @@ from decoy import Decoy
 
 from opentrons.protocol_engine.types import CSVParameter
 from opentrons.protocols.parameters import validation as mock_validation
-from opentrons.protocols.parameters.csv_parameter import (
+from opentrons.protocols.parameters.csv_parameter_definition import (
     create_csv_parameter,
     CSVParameterDefinition,
 )

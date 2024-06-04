@@ -5,20 +5,23 @@ from typing import List, Optional, Union, Dict
 from opentrons.protocols.api_support.types import APIVersion
 from opentrons.protocols.parameters import (
     parameter_definition,
-    csv_parameter,
+    csv_parameter_definition,
     validation,
 )
 from opentrons.protocols.parameters.types import (
     ParameterChoice,
     ParameterDefinitionError,
 )
-from opentrons.protocol_engine.types import RunTimeParameter, RunTimeParamValuesType
+from opentrons.protocol_engine.types import (
+    RunTimeParameter,
+    RunTimeParamValuesType,
+)
 
 from ._parameters import Parameters
 
 _ParameterDefinitionTypes = Union[
     parameter_definition.ParameterDefinition,
-    csv_parameter.CSVParameterDefinition,
+    csv_parameter_definition.CSVParameterDefinition,
 ]
 
 
@@ -160,6 +163,27 @@ class ParameterContext:
         )
         self._parameters[parameter.variable_name] = parameter
 
+    def add_csv_file(
+        self,
+        display_name: str,
+        variable_name: str,
+        description: Optional[str] = None,
+    ) -> None:
+        """Creates a CSV parameter that can be set to any CSV file via the Flex ODD or a local computer.
+
+        Arguments:
+            display_name: The display name of the CSV parameter as it would show up on the frontend.
+            variable_name: The variable name the CSV parameter will be referred to in the run context.
+            description: A description of the parameter as it will show up on the frontend.
+        """
+        validation.validate_variable_name_unique(variable_name, set(self._parameters))
+        parameter = csv_parameter_definition.create_csv_parameter(
+            display_name=display_name,
+            variable_name=variable_name,
+            description=description,
+        )
+        self._parameters[parameter.variable_name] = parameter
+
     def set_parameters(self, parameter_overrides: RunTimeParamValuesType) -> None:
         """Sets parameters to values given by client, validating them as well.
 
@@ -174,8 +198,7 @@ class ParameterContext:
                 raise ParameterDefinitionError(
                     f"Parameter {variable_name} is not defined as a parameter for this protocol."
                 )
-            if isinstance(parameter, csv_parameter.CSVParameterDefinition):
-                # TODO set the file here and figure out how to set the UUID
+            if isinstance(parameter, csv_parameter_definition.CSVParameterDefinition):
                 pass
             else:
                 validated_value = validation.ensure_value_type(
@@ -203,7 +226,7 @@ class ParameterContext:
         This is intended for Opentrons internal use only and is not a guaranteed API.
         """
         return Parameters(
-            # TODO maybe raise an error here if the value of a CSV param is None?
+            # TODO(jbl 2024-06-04) potentially raise an error if a CSV parameter is None here
             parameters={
                 parameter.variable_name: parameter.value
                 for parameter in self._parameters.values()
