@@ -1403,6 +1403,27 @@ def test_next_tip_automatic_tip_tracking_tiprack_limits(
                 starting_nozzle=start,
                 back_left_nozzle=back_l,
                 front_right_nozzle=front_r,
+                valid_nozzle_maps=ValidNozzleMaps(
+                    maps={
+                        "A1": ["A1"],
+                        "H1": ["H1"],
+                        "A12": ["A12"],
+                        "H12": ["H12"],
+                        "Full": sum(
+                            [
+                                NINETY_SIX_ROWS["A"],
+                                NINETY_SIX_ROWS["B"],
+                                NINETY_SIX_ROWS["C"],
+                                NINETY_SIX_ROWS["D"],
+                                NINETY_SIX_ROWS["E"],
+                                NINETY_SIX_ROWS["F"],
+                                NINETY_SIX_ROWS["G"],
+                                NINETY_SIX_ROWS["H"],
+                            ],
+                            [],
+                        ),
+                    }
+                ),
             ),
         )
         subject.handle_action(

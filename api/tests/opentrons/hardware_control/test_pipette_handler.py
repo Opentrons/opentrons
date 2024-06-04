@@ -166,7 +166,7 @@ def test_plan_check_pick_up_tip_with_presses_argument_ot3(
     presses = presses_input
     increment = 1
     pac_values = PressAndCamConfigurationValues(
-        speed=5.5, distance=10, current=1.0, tipOverlaps={"default": 1.0}
+        speed=5.5, distance=10, current=1.0, tipOverlaps={"v0": {"default": 1.0}}
     )
 
     decoy.when(mock_pipette_ot3.has_tip).then_return(False)

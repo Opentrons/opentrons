@@ -179,9 +179,9 @@ class PressAndCamConfigurationValues(BaseModel):
         ...,
         description="The current used by a given tip configuration by tip type.",
     )
-    tip_overlap_dictionary: Dict[str, float] = Field(
+    versioned_tip_overlap_dictionary: Dict[str, Dict[str, float]] = Field(
         ...,
-        description="The default tip overlap associated with this tip type by configuration.",
+        description="Versioned default tip overlap dictionaries associated with this tip type by configuration.",
         alias="tipOverlaps",
     )
 

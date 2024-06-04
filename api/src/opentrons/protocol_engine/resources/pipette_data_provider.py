@@ -190,7 +190,7 @@ class VirtualPipetteDataProvider:
                     tip_overlap_dict_for_tip_type = (
                         configuration.configuration_by_nozzle_map[
                             nozzle_manager.current_configuration.valid_map_key
-                        ][tip_type.name].tip_overlap_dictionary
+                        ][tip_type.name].versioned_tip_overlap_dictionary["v0"]
                     )
                     break
                 except KeyError:
@@ -200,7 +200,7 @@ class VirtualPipetteDataProvider:
                         ].get("default")
                         if default is not None:
                             tip_overlap_dict_for_tip_type = (
-                                default.tip_overlap_dictionary
+                                default.versioned_tip_overlap_dictionary["v0"]
                             )
                             break
                     except KeyError:
