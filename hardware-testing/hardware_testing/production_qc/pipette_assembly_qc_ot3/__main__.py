@@ -1947,6 +1947,7 @@ async def _main(test_config: TestConfig) -> None:  # noqa: C901
             
             if not test_config.skip_diagnostics:
                 """fail code 01"""
+                LOG_GING.info("test-diagnostics")
                 await api.move_to(mount, hover_over_slot_3)
                 await api.move_rel(mount, Point(z=-20))
                 test_passed = await _test_diagnostics(api, mount, csv_cb.write)
@@ -1954,6 +1955,7 @@ async def _main(test_config: TestConfig) -> None:  # noqa: C901
                 csv_cb.results("diagnostics", test_passed)
             if not test_config.skip_plunger:
                 """fail code 02"""
+                LOG_GING.info("test-diagnostics")
                 await api.move_to(mount, hover_over_slot_3)
                 await api.move_rel(mount, Point(z=-20))
                 test_passed = await _test_plunger_positions(api, mount, csv_cb.write)
@@ -1961,6 +1963,7 @@ async def _main(test_config: TestConfig) -> None:  # noqa: C901
 
         if not test_config.skip_liquid_probe:
             """fail code 03"""
+            LOG_GING.info("test-liquid_probe")
             tip_vols = [50] if pipette_volume == 50 else [50, 200, 1000]
             probes = [InstrumentProbeType.PRIMARY]
             if pipette_channels > 1:
@@ -2030,6 +2033,7 @@ async def _main(test_config: TestConfig) -> None:  # noqa: C901
 
         if not test_config.skip_liquid:
             """fail code 04"""
+            LOG_GING.info("test-skip_liquid")
             for i in range(test_config.num_trials):
                 droplet_wait_seconds = test_config.droplet_wait_seconds * (i + 1)
                 test_passed = await _test_for_leak_by_eye(
@@ -2049,6 +2053,7 @@ async def _main(test_config: TestConfig) -> None:  # noqa: C901
 
         if not test_config.skip_fixture:
             """fail code 05"""
+            LOG_GING.info("test-fixture")
             test_passed = await _test_for_leak(
                 api,
                 mount,
@@ -2062,6 +2067,7 @@ async def _main(test_config: TestConfig) -> None:  # noqa: C901
 
         if not test_config.skip_tip_presence:
             """fail code 06"""
+            LOG_GING.info("test-tip_presence")
             test_passed = await _test_tip_presence_flag(api, mount, csv_cb.write)
             print("tip-presence: ", _bool_to_pass_fail(test_passed))
             csv_cb.results("tip-presence", test_passed)
