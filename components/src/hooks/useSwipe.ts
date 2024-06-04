@@ -26,9 +26,9 @@ export const useSwipe = (): UseSwipeResult => {
         .on('dragend', event => {
           if (!event.swipe) return
 
-          swipeDirs.forEach(
-            dir => { if (event.swipe[dir] != null) setSwipeType(`${str}-${dir}`) }
-          )
+          swipeDirs.forEach(dir => {
+            if (event.swipe[dir] != null) setSwipeType(`${str}-${dir}`)
+          })
         })
     }
   }

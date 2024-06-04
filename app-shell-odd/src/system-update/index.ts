@@ -227,8 +227,8 @@ export const getLatestMassStorageUpdateFiles = (
       path.endsWith('.zip')
         ? getVersionFromZipIfValid(path).catch(() => null)
         : new Promise<null>(resolve => {
-          resolve(null)
-        })
+            resolve(null)
+          })
     )
   ).then(values => {
     const update = values.reduce(
@@ -238,10 +238,10 @@ export const getLatestMassStorageUpdateFiles = (
             ? prev
             : current
           : current === null
-            ? prev
-            : Semver.gt(current.version, prev.version)
-              ? current
-              : prev,
+          ? prev
+          : Semver.gt(current.version, prev.version)
+          ? current
+          : prev,
       null
     )
     if (update === null) {
@@ -323,12 +323,10 @@ export function getLatestSystemUpdateFiles(
         .then(filepaths => {
           return cacheUpdateSet(filepaths)
         })
-        .then(
-          updateInfo => {
-            massStorageUpdateSet === null &&
-              dispatchUpdateInfo({ force: false, ...updateInfo }, dispatch)
-          }
-        )
+        .then(updateInfo => {
+          massStorageUpdateSet === null &&
+            dispatchUpdateInfo({ force: false, ...updateInfo }, dispatch)
+        })
         .catch((error: Error) => {
           dispatch({
             type: 'robotUpdate:DOWNLOAD_ERROR',
@@ -373,8 +371,8 @@ function getInfoFromUpdateSet(
   const releaseNotesContentPromise = filepaths.releaseNotes
     ? readFile(filepaths.releaseNotes, 'utf8')
     : new Promise<string | null>(resolve => {
-      resolve(null)
-    })
+        resolve(null)
+      })
   return releaseNotesContentPromise
     .then(releaseNotes => ({
       version: version,

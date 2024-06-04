@@ -91,7 +91,9 @@ export function FlexPipetteCard({
 
   const { showDTWiz, toggleDTWiz } = useDropTipWizardFlows()
 
-  const handleLaunchPipetteWizardFlows = (flowType: PipetteWizardFlow): void => {
+  const handleLaunchPipetteWizardFlows = (
+    flowType: PipetteWizardFlow
+  ): void => {
     handlePipetteWizardFlows({
       flowType,
       mount,
@@ -178,7 +180,9 @@ export function FlexPipetteCard({
           {
             label: i18n.format(t('drop_tips'), 'capitalize'),
             disabled: attachedPipette == null || isRunActive,
-            onClick: () => { toggleDTWiz() },
+            onClick: () => {
+              toggleDTWiz()
+            },
           },
         ]
   return (

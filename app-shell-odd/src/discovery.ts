@@ -63,17 +63,17 @@ const migrateLegacyServices = (
       const { ip, port } = service
       return ip != null
         ? [
-          {
-            ip,
-            port,
-            seen: false,
-            healthStatus: null,
-            serverHealthStatus: null,
-            healthError: null,
-            serverHealthError: null,
-            advertisedModel: null,
-          },
-        ]
+            {
+              ip,
+              port,
+              seen: false,
+              healthStatus: null,
+              serverHealthStatus: null,
+              healthError: null,
+              serverHealthError: null,
+              advertisedModel: null,
+            },
+          ]
         : []
     })
 

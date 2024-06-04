@@ -333,8 +333,8 @@ export function LabwareSelectionModal(): JSX.Element | null {
         onMouseEnter={() => {
           setPreviewedLabware(labwareDef)
         }}
-        // @ts-expect-error(sa, 2021-6-22): setPreviewedLabware expects an argument (even if nullsy)
         onMouseLeave={() => {
+          // @ts-expect-error(sa, 2021-6-22): setPreviewedLabware expects an argument (even if nullsy)
           setPreviewedLabware()
         }}
       />
@@ -489,8 +489,8 @@ export function LabwareSelectionModal(): JSX.Element | null {
                   onMouseEnter={() => {
                     setPreviewedLabware(customLabwareDefs[labwareURI])
                   }}
-                  // @ts-expect-error(sa, 2021-6-22): need to pass in a nullsy value
                   onMouseLeave={() => {
+                    // @ts-expect-error(sa, 2021-6-22): need to pass in a nullsy value
                     setPreviewedLabware()
                   }}
                 />
@@ -526,8 +526,8 @@ export function LabwareSelectionModal(): JSX.Element | null {
                             onMouseEnter={() => {
                               setPreviewedLabware(labwareDef)
                             }}
-                            // @ts-expect-error(sa, 2021-6-22): setPreviewedLabware expects an argument (even if nullsy)
                             onMouseLeave={() => {
+                              // @ts-expect-error(sa, 2021-6-22): setPreviewedLabware expects an argument (even if nullsy)
                               setPreviewedLabware()
                             }}
                           />

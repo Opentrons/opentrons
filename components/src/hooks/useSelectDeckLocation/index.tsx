@@ -131,8 +131,9 @@ export function DeckLocationSelect({
 
   return (
     <RobotCoordinateSpace
-      viewBox={`${deckDef.cornerOffsetFromOrigin[0] + X_CROP_MM} ${deckDef.cornerOffsetFromOrigin[1]
-        } ${deckDef.dimensions[0] - X_CROP_MM * 2} ${deckDef.dimensions[1]}`}
+      viewBox={`${deckDef.cornerOffsetFromOrigin[0] + X_CROP_MM} ${
+        deckDef.cornerOffsetFromOrigin[1]
+      } ${deckDef.dimensions[0] - X_CROP_MM * 2} ${deckDef.dimensions[1]}`}
     >
       {deckDef.locations.addressableAreas
         // only render standard slot fixture components
@@ -293,14 +294,14 @@ export function DeckLocationSelect({
             innerDivProps={
               hoveredData.slot.id[0] === 'A'
                 ? {
-                  maxWidth: '25rem',
-                  maxHeight: '10rem',
-                  width: 'fit-content',
-                }
+                    maxWidth: '25rem',
+                    maxHeight: '10rem',
+                    width: 'fit-content',
+                  }
                 : {
-                  maxWidth: '20rem',
-                  width: 'fit-content',
-                }
+                    maxWidth: '20rem',
+                    width: 'fit-content',
+                  }
             }
           >
             <Text
@@ -312,10 +313,10 @@ export function DeckLocationSelect({
             >
               {hoveredData.disabledReason != null
                 ? t('location_occupied', {
-                  fixture: getFixtureDisplayName(
-                    hoveredData.disabledReason
-                  ).toLowerCase(),
-                })
+                    fixture: getFixtureDisplayName(
+                      hoveredData.disabledReason
+                    ).toLowerCase(),
+                  })
                 : 'Slot unavailable'}
             </Text>
           </RobotCoordsForeignDiv>

@@ -42,13 +42,13 @@ export function BrowsableLabware(props: Props): JSX.Element | null {
             wellContents === null
               ? null
               : reduce(
-                wellContents,
-                (acc, _, wellName): WellGroup =>
-                  tooltipWellName === wellName
-                    ? { ...acc, [wellName]: null }
-                    : acc,
-                {}
-              )
+                  wellContents,
+                  (acc, _, wellName): WellGroup =>
+                    tooltipWellName === wellName
+                      ? { ...acc, [wellName]: null }
+                      : acc,
+                  {}
+                )
           }
           onMouseEnterWell={({ event, wellName }) => {
             if (wellContents !== null)

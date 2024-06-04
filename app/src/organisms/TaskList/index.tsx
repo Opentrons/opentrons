@@ -144,8 +144,8 @@ function ProgressTrackerItem({
                     isTaskListComplete || isPastSubTask
                       ? COLORS.blue50
                       : subTask.isComplete === true
-                        ? COLORS.grey40
-                        : 'initial'
+                      ? COLORS.grey40
+                      : 'initial'
                   }
                   border={TASK_CONNECTOR_STYLE}
                   borderColor={isFutureSubTask ? COLORS.grey40 : COLORS.blue50}
@@ -165,8 +165,8 @@ function ProgressTrackerItem({
                     isFinalSubTaskOfTaskList
                       ? COLORS.transparent
                       : isTaskListComplete || isPastSubTask
-                        ? COLORS.blue50
-                        : COLORS.grey40
+                      ? COLORS.blue50
+                      : COLORS.grey40
                   }
                   marginTop={`-${SPACING.spacing8}`}
                   marginBottom={
@@ -375,7 +375,9 @@ function Task({
           gridGap={SPACING.spacing24}
           // click to open the subtask drawer if subtasks are present
           cursor={hasSubTasks ? 'pointer' : ''}
-          onClick={() => { if (hasSubTasks) setIsTaskOpen(!isTaskOpen) }}
+          onClick={() => {
+            if (hasSubTasks) setIsTaskOpen(!isTaskOpen)
+          }}
         >
           <Flex
             alignItems={ALIGN_FLEX_START}
