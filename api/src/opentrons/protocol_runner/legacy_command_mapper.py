@@ -690,7 +690,10 @@ class LegacyCommandMapper:
             pipette_id=pipette_id,
             serial_number=serial,
             config=pipette_data_provider.get_pipette_static_config(
-                instrument_load_info.pipette_dict
+                # Compatibility note - this is the version of tip overlap data, it stays at 0
+                # so protocol behavior does not change when you run a legacy JSON protocol
+                instrument_load_info.pipette_dict,
+                "v0",
             ),
         )
         queue_action = pe_actions.QueueCommandAction(

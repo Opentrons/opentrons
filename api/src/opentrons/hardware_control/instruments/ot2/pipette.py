@@ -148,7 +148,7 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
             self._active_tip_settings.default_blowout_flowrate.default
         )
 
-        self._tip_overlap_lookup = self._liquid_class.tip_overlap_dictionary
+        self._tip_overlap_lookup = self._liquid_class.versioned_tip_overlap_dictionary
 
         if use_old_aspiration_functions:
             self._pipetting_function_version = PIPETTING_FUNCTION_FALLBACK_VERSION
@@ -216,7 +216,7 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
         return self._pipette_offset
 
     @property
-    def tip_overlap(self) -> Dict[str, float]:
+    def tip_overlap(self) -> Dict[str, Dict[str, float]]:
         return self._tip_overlap_lookup
 
     @property
@@ -290,7 +290,7 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
             self.active_tip_settings.default_blowout_flowrate.default
         )
 
-        self._tip_overlap_lookup = self.liquid_class.tip_overlap_dictionary
+        self._tip_overlap_lookup = self.liquid_class.versioned_tip_overlap_dictionary
         self._nozzle_manager = (
             nozzle_manager.NozzleConfigurationManager.build_from_config(self._config)
         )
@@ -571,7 +571,8 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
                 "default_dispense_flow_rates": self.dispense_flow_rates_lookup,
                 "tip_length": self.current_tip_length,
                 "return_tip_height": self.active_tip_settings.default_return_tip_height,
-                "tip_overlap": self.tip_overlap,
+                "tip_overlap": self.tip_overlap["v0"],
+                "versioned_tip_overlap": self.tip_overlap,
                 "back_compat_names": self._config.pipette_backcompat_names,
                 "supported_tips": self.liquid_class.supported_tips,
             }

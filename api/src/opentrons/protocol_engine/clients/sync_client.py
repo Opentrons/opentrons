@@ -172,10 +172,15 @@ class SyncClient:
         self,
         pipette_name: PipetteNameType,
         mount: MountType,
+        tip_overlap_version: Optional[str] = None,
     ) -> commands.LoadPipetteResult:
         """Execute a LoadPipette command and return the result."""
         request = commands.LoadPipetteCreate(
-            params=commands.LoadPipetteParams(mount=mount, pipetteName=pipette_name)
+            params=commands.LoadPipetteParams(
+                mount=mount,
+                pipetteName=pipette_name,
+                tipOverlapNotAfterVersion=tip_overlap_version,
+            )
         )
         result = self._transport.execute_command(request=request)
 
@@ -376,12 +381,14 @@ class SyncClient:
         return cast(commands.DropTipInPlaceResult, result)
 
     def configure_for_volume(
-        self, pipette_id: str, volume: float
+        self, pipette_id: str, volume: float, tip_overlap_version: Optional[str] = None
     ) -> commands.ConfigureForVolumeResult:
         """Execute a ConfigureForVolume command."""
         request = commands.ConfigureForVolumeCreate(
             params=commands.ConfigureForVolumeParams(
-                pipetteId=pipette_id, volume=volume
+                pipetteId=pipette_id,
+                volume=volume,
+                tipOverlapNotAfterVersion=tip_overlap_version,
             )
         )
         result = self._transport.execute_command(request=request)

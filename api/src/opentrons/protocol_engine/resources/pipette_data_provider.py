@@ -1,6 +1,7 @@
 """Pipette config data providers."""
 from dataclasses import dataclass
-from typing import Dict, Optional
+from typing import Dict, Optional, Sequence
+import re
 
 from opentrons_shared_data.pipette.dev_types import PipetteName, PipetteModel
 from opentrons_shared_data.pipette import (
@@ -10,15 +11,39 @@ from opentrons_shared_data.pipette import (
     pipette_definition,
 )
 
-
 from opentrons.hardware_control.dev_types import PipetteDict
 from opentrons.hardware_control.nozzle_manager import (
     NozzleConfigurationManager,
     NozzleMap,
 )
 
+from ..errors.exceptions import InvalidLoadPipetteSpecsError
 from ..types import FlowRates
 from ...types import Point
+
+_TIP_OVERLAP_VERSION_RE = re.compile(r"^v\d+$")
+
+
+def validate_and_default_tip_overlap_version(version_spec: Optional[str]) -> str:
+    """Validate and sanitize tip overlap versions for later consumption.
+
+    Something that comes out of this function will be of the correct format, but a given kind of
+    pipette may not have this version of data.
+    """
+    if version_spec is None:
+        return f"v{pipette_definition.TIP_OVERLAP_VERSION_MAXIMUM}"
+    valid = _TIP_OVERLAP_VERSION_RE.match(version_spec)
+    if not valid:
+        raise InvalidLoadPipetteSpecsError(
+            f"Tip overlap version specification {version_spec} is invalid."
+        )
+    try:
+        _ = int(version_spec[1:])
+    except ValueError:
+        raise InvalidLoadPipetteSpecsError(
+            f"Tip overlap version specification {version_spec} is invalid."
+        )
+    return version_spec
 
 
 @dataclass(frozen=True)
@@ -104,14 +129,14 @@ class VirtualPipetteDataProvider:
         return self._nozzle_manager_layout_by_id[pipette_id].current_configuration
 
     def get_virtual_pipette_static_config_by_model_string(
-        self, pipette_model_string: str, pipette_id: str
+        self, pipette_model_string: str, pipette_id: str, tip_overlap_version: str
     ) -> LoadedStaticPipetteData:
         """Get the config of a pipette when you know its model string (e.g. from state)."""
         pipette_model = pipette_load_name.convert_pipette_model(
             PipetteModel(pipette_model_string)
         )
         return self._get_virtual_pipette_static_config_by_model(
-            pipette_model, pipette_id
+            pipette_model, pipette_id, tip_overlap_version
         )
 
     def _get_virtual_pipette_full_config_by_model_string(
@@ -128,7 +153,10 @@ class VirtualPipetteDataProvider:
         )
 
     def _get_virtual_pipette_static_config_by_model(
-        self, pipette_model: pipette_definition.PipetteModelVersionType, pipette_id: str
+        self,
+        pipette_model: pipette_definition.PipetteModelVersionType,
+        pipette_id: str,
+        tip_overlap_version: str,
     ) -> LoadedStaticPipetteData:
         if pipette_id not in self._liquid_class_by_id:
             self._liquid_class_by_id[pipette_id] = pip_types.LiquidClasses.default
@@ -173,9 +201,10 @@ class VirtualPipetteDataProvider:
                 default_aspirate=tip_configuration.default_aspirate_flowrate.values_by_api_level,
                 default_dispense=tip_configuration.default_dispense_flowrate.values_by_api_level,
             ),
-            nominal_tip_overlap=config.liquid_properties[
-                liquid_class
-            ].tip_overlap_dictionary,
+            nominal_tip_overlap=get_latest_tip_overlap_before_version(
+                config.liquid_properties[liquid_class].versioned_tip_overlap_dictionary,
+                tip_overlap_version,
+            ),
             nozzle_map=nozzle_manager.current_configuration,
             back_left_corner_offset=Point(
                 pip_back_left[0], pip_back_left[1], pip_back_left[2]
@@ -186,16 +215,18 @@ class VirtualPipetteDataProvider:
         )
 
     def get_virtual_pipette_static_config(
-        self, pipette_name: PipetteName, pipette_id: str
+        self, pipette_name: PipetteName, pipette_id: str, tip_overlap_version: str
     ) -> LoadedStaticPipetteData:
         """Get the config for a virtual pipette, given only the pipette name."""
         pipette_model = pipette_load_name.convert_pipette_name(pipette_name)
         return self._get_virtual_pipette_static_config_by_model(
-            pipette_model, pipette_id
+            pipette_model, pipette_id, tip_overlap_version
         )
 
 
-def get_pipette_static_config(pipette_dict: PipetteDict) -> LoadedStaticPipetteData:
+def get_pipette_static_config(
+    pipette_dict: PipetteDict, tip_overlap_version: str
+) -> LoadedStaticPipetteData:
     """Get the config for a pipette, given the state/config object from the HW API."""
     back_left_offset = pipette_dict["pipette_bounding_box_offsets"].back_left_corner
     front_right_offset = pipette_dict["pipette_bounding_box_offsets"].front_right_corner
@@ -213,7 +244,9 @@ def get_pipette_static_config(pipette_dict: PipetteDict) -> LoadedStaticPipetteD
         tip_configuration_lookup_table={
             k.value: v for k, v in pipette_dict["supported_tips"].items()
         },
-        nominal_tip_overlap=pipette_dict["tip_overlap"],
+        nominal_tip_overlap=get_latest_tip_overlap_before_version(
+            pipette_dict["versioned_tip_overlap"], tip_overlap_version
+        ),
         # TODO(mc, 2023-02-28): these two values are not present in PipetteDict
         # https://opentrons.atlassian.net/browse/RCORE-655
         home_position=0,
@@ -226,3 +259,26 @@ def get_pipette_static_config(pipette_dict: PipetteDict) -> LoadedStaticPipetteD
             front_right_offset[0], front_right_offset[1], front_right_offset[2]
         ),
     )
+
+
+def get_latest_tip_overlap_before_version(
+    overlap: Dict[str, Dict[str, float]], version: str
+) -> Dict[str, float]:
+    """Get the latest tip overlap definitions that are equal or older than the version."""
+    # TODO: make this less awful
+    def _numeric(versionstr: str) -> int:
+        return int(versionstr[1:])
+
+    def _latest(versions: Sequence[int], target: int) -> int:
+        last = 0
+        for version in versions:
+            if version > target:
+                return last
+            last = version
+        return last
+
+    numeric_target = _numeric(version)
+    numeric_versions = sorted([_numeric(k) for k in overlap.keys()])
+    found_numeric_version = _latest(numeric_versions, numeric_target)
+    found_version = f"v{found_numeric_version}"
+    return overlap[found_version]

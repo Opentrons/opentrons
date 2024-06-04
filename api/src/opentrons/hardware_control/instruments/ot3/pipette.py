@@ -133,7 +133,7 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
         )
         self._flow_acceleration = self._active_tip_settings.default_flow_acceleration
 
-        self._tip_overlap_lookup = self._liquid_class.tip_overlap_dictionary
+        self._tip_overlap_lookup = self._liquid_class.versioned_tip_overlap_dictionary
 
         if use_old_aspiration_functions:
             self._pipetting_function_version = PIPETTING_FUNCTION_FALLBACK_VERSION
@@ -161,7 +161,7 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
         return self._backlash_distance
 
     @property
-    def tip_overlap(self) -> Dict[str, float]:
+    def tip_overlap(self) -> Dict[str, Dict[str, float]]:
         return self._tip_overlap_lookup
 
     @property
@@ -254,7 +254,7 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
         )
         self._flow_acceleration = self._active_tip_settings.default_flow_acceleration
 
-        self._tip_overlap_lookup = self.liquid_class.tip_overlap_dictionary
+        self._tip_overlap_lookup = self.liquid_class.versioned_tip_overlap_dictionary
         self._nozzle_manager = (
             nozzle_manager.NozzleConfigurationManager.build_from_config(self._config)
         )
@@ -560,7 +560,8 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
                 "default_flow_acceleration": self.active_tip_settings.default_flow_acceleration,
                 "tip_length": self.current_tip_length,
                 "return_tip_height": self.active_tip_settings.default_return_tip_height,
-                "tip_overlap": self.tip_overlap,
+                "tip_overlap": self.tip_overlap["v0"],
+                "versioned_tip_overlap": self.tip_overlap,
                 "back_compat_names": self._config.pipette_backcompat_names,
                 "supported_tips": self.liquid_class.supported_tips,
             }
@@ -655,7 +656,7 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
         self._flow_acceleration = self._active_tip_settings.default_flow_acceleration
 
         self._fallback_tip_length = self._active_tip_settings.default_tip_length
-        self._tip_overlap_lookup = self.liquid_class.tip_overlap_dictionary
+        self._tip_overlap_lookup = self.liquid_class.versioned_tip_overlap_dictionary
         self._working_volume = min(tip_type.value, self.liquid_class.max_volume)
 
     def get_pick_up_configuration_for_tip_count(

@@ -498,7 +498,9 @@ class ProtocolCore(
             An instrument core configured to use the requested instrument.
         """
         engine_mount = MountType[mount.name]
-        load_result = self._engine_client.load_pipette(instrument_name, engine_mount)
+        load_result = self._engine_client.load_pipette(
+            instrument_name, engine_mount, tip_overlap_version="v0"
+        )
 
         return InstrumentCore(
             pipette_id=load_result.pipetteId,

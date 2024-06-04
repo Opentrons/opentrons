@@ -745,7 +745,7 @@ class InstrumentCore(AbstractInstrument[WellCore]):
 
     def configure_for_volume(self, volume: float) -> None:
         self._engine_client.configure_for_volume(
-            pipette_id=self._pipette_id, volume=volume
+            pipette_id=self._pipette_id, volume=volume, tip_overlap_version="v0"
         )
 
     def prepare_to_aspirate(self) -> None:
