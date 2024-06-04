@@ -66,8 +66,7 @@ from .module_core import (
     MagneticBlockCore,
 )
 from .exceptions import InvalidModuleLocationError
-from . import load_labware_params
-from . import deck_conflict
+from . import load_labware_params, deck_conflict, overlap_versions
 
 if TYPE_CHECKING:
     from ...labware import Labware
@@ -499,7 +498,11 @@ class ProtocolCore(
         """
         engine_mount = MountType[mount.name]
         load_result = self._engine_client.load_pipette(
-            instrument_name, engine_mount, tip_overlap_version="v0"
+            instrument_name,
+            engine_mount,
+            tip_overlap_version=overlap_versions.overlap_for_api_version(
+                self._api_version
+            ),
         )
 
         return InstrumentCore(
