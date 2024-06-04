@@ -68,11 +68,12 @@ gen-requirements:
 	python -m pipenv requirements > requirements.txt
 
 ENV ?= local
+TAG ?=
 
 .PHONY: deploy
 deploy: gen-requirements
 	@echo "Deploying to environment: $(ENV)"
-	python -m pipenv run python deploy.py --env $(ENV)
+	python -m pipenv run python deploy.py --env $(ENV) $(if $(TAG),--tag $(TAG),)
 
 .PHONY: prompted-deploy
 prompted-deploy: gen-requirements

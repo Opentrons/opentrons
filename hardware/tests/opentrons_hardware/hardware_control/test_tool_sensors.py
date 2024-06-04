@@ -186,8 +186,6 @@ async def test_liquid_probe(
         csv_output=False,
         sync_buffer_output=False,
         can_bus_only_output=False,
-        auto_zero_sensor=True,
-        num_baseline_reads=8,
         sensor_id=SensorId.S0,
     )
     assert position[motor_node].positions_only()[0] == 14
@@ -285,8 +283,6 @@ async def test_liquid_probe_output_options(
             sync_buffer_output=sync_buffer_output,
             can_bus_only_output=can_bus_only_output,
             data_files={SensorId.S0: test_csv_file},
-            auto_zero_sensor=True,
-            num_baseline_reads=8,
             sensor_id=SensorId.S0,
         )
     finally:

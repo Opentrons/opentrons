@@ -1360,8 +1360,6 @@ class OT3Controller(FlexBackend):
         threshold_pascals: float,
         output_option: OutputOptions = OutputOptions.can_bus_only,
         data_files: Optional[Dict[InstrumentProbeType, str]] = None,
-        auto_zero_sensor: bool = True,
-        num_baseline_reads: int = 10,
         probe: InstrumentProbeType = InstrumentProbeType.PRIMARY,
     ) -> float:
         if output_option == OutputOptions.sync_buffer_to_csv:
@@ -1404,8 +1402,6 @@ class OT3Controller(FlexBackend):
             sync_buffer_output=sync_buffer_output,
             can_bus_only_output=can_bus_only_output,
             data_files=data_files_transposed,
-            auto_zero_sensor=auto_zero_sensor,
-            num_baseline_reads=num_baseline_reads,
             sensor_id=sensor_id_for_instrument(probe),
         )
         for node, point in positions.items():
