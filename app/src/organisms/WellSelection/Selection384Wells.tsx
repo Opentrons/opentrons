@@ -51,6 +51,7 @@ export function Selection384Wells({
   React.useEffect(() => {
     if (Object.keys(allSelectedWells).length === 0) {
       setLastSelectedIndex(null)
+      // TODO: reset starting well
     }
   }, [allSelectedWells])
 
@@ -126,6 +127,7 @@ export function Selection384Wells({
           <StartingWell
             channels={channels}
             columns={columns}
+            deselectWells={deselectWells}
             selectWells={selectWells}
           />
         )}
@@ -181,17 +183,19 @@ type StartingWellOption = 'A1' | 'B1' | 'A2' | 'B2'
 function StartingWell({
   channels,
   columns,
+  deselectWells,
   selectWells,
 }: {
   channels: PipetteChannels
   columns: string[][]
+  deselectWells: (wells: string[]) => void
   selectWells: (wellGroup: WellGroup) => void
 }): JSX.Element {
   const { t, i18n } = useTranslation('quick_transfer')
 
-  const [startingWell, setStartingWell] = React.useState<StartingWellOption>(
-    'A1'
-  )
+  const [startingWellState, setStartingWellState] = React.useState<
+    Record<StartingWellOption, boolean>
+  >({ A1: true, A2: false, B1: false, B2: false })
 
   const checkboxWellOptions: StartingWellOption[] =
     channels === 8 ? ['A1', 'B1'] : ['A1', 'A2', 'B1', 'B2']
@@ -238,6 +242,7 @@ function StartingWell({
   // on mount, select A1 well group
   React.useEffect(() => {
     selectWells(wellGroupByStartingWell.A1)
+    // TODO: 8-channel, select first column
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
@@ -249,11 +254,19 @@ function StartingWell({
       {checkboxWellOptions.map(well => (
         <Checkbox
           key={well}
-          isChecked={startingWell === well}
+          isChecked={startingWellState[well]}
           labelText={well}
           onClick={() => {
-            setStartingWell(well)
-            selectWells(wellGroupByStartingWell[well])
+            if (startingWellState[well]) {
+              deselectWells(Object.keys(wellGroupByStartingWell[well]))
+            } else {
+              selectWells(wellGroupByStartingWell[well])
+            }
+
+            setStartingWellState(startingWellState => ({
+              ...startingWellState,
+              [well]: !startingWellState[well],
+            }))
           }}
         />
       ))}
@@ -268,6 +281,7 @@ interface ButtonControlsProps {
   lastSelectedIndex: number | null
   selectBy: 'columns' | 'wells'
 }
+
 function ButtonControls(props: ButtonControlsProps): JSX.Element {
   const {
     channels,
