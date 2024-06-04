@@ -175,7 +175,7 @@ function getWarningContent({
       }
     }, '')
 
-  if (pipettesWithoutStep.length && modulesWithoutStep.length) {
+  if (pipettesWithoutStep.length > 0 && modulesWithoutStep.length > 0) {
     return {
       content: (
         <>
@@ -192,7 +192,7 @@ function getWarningContent({
     }
   }
 
-  if (pipettesWithoutStep.length) {
+  if (pipettesWithoutStep.length > 0) {
     return {
       content: (
         <>
@@ -208,7 +208,7 @@ function getWarningContent({
     }
   }
 
-  if (modulesWithoutStep.length) {
+  if (modulesWithoutStep.length > 0) {
     const moduleCase =
       modulesWithoutStep.length > 1 ? 'unused_modules' : 'unused_module'
     const slotName = modulesWithoutStep.map(module => module.slot)
@@ -250,7 +250,7 @@ function getWarningContent({
     }
   }
 
-  if (fixtureWithoutStep.stagingAreaSlots.length) {
+  if (fixtureWithoutStep.stagingAreaSlots.length > 0) {
     return {
       content: (
         <>

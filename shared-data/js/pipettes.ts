@@ -70,7 +70,7 @@ export function getPipetteModelSpecs(
 
 export function getAllPipetteNames(...sortBy: SortableProps[]): PipetteName[] {
   const models = [...ALL_PIPETTE_NAMES]
-  if (sortBy.length) models.sort(comparePipettes(sortBy))
+  if (sortBy.length > 0) models.sort(comparePipettes(sortBy))
   return models
 }
 

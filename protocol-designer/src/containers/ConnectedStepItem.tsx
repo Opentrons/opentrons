@@ -183,7 +183,7 @@ export const ConnectedStepItem = (
         )
       }
     }
-    if (stepsToSelect.length) {
+    if (stepsToSelect.length > 0) {
       selectMultipleSteps(stepsToSelect, stepId)
     }
   }

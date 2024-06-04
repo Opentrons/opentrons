@@ -83,10 +83,10 @@ export function appShellListener({
     const callbacks = callbackStore[hostname]?.[topic]
     if (callbacks != null) {
       callbackStore[hostname][topic] = callbacks.filter(cb => cb !== callback)
-      if (!callbackStore[hostname][topic].length) {
+      if (callbackStore[hostname][topic].length === 0) {
         // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
         delete callbackStore[hostname][topic]
-        if (!Object.keys(callbackStore[hostname]).length) {
+        if (Object.keys(callbackStore[hostname]).length === 0) {
           // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
           delete callbackStore[hostname]
         }
