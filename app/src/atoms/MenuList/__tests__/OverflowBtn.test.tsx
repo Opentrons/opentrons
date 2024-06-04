@@ -26,7 +26,6 @@ describe('OverflowBtn', () => {
     render({
       onClick: vi.fn(),
     })
-
     expect(screen.getByRole('button')).toHaveStyle(
       `background-color: ${COLORS.transparent}`
     )

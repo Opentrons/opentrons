@@ -16,6 +16,7 @@ const ROBOT_NAME = 'mockRobotName'
 const mockError: RunError = {
   id: '5097b3e6-3900-482d-abb1-0a8d8a0e515d',
   errorType: 'ModuleNotAttachedError',
+  isDefined: false,
   createdAt: '2023-08-07T20:16:57.720783+00:00',
   detail: 'No available thermocyclerModuleV2 found.',
   errorCode: '4000',
