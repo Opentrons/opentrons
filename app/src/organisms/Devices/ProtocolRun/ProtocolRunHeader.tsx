@@ -454,7 +454,7 @@ export function ProtocolRunHeader({
             robotType={isFlex ? FLEX_ROBOT_TYPE : OT2_ROBOT_TYPE}
             mount={pipettesWithTip[0].mount}
             instrumentModelSpecs={pipettesWithTip[0].specs}
-            closeFlow={() => setTipStatusResolved().then(() => toggleDTWiz())}
+            closeFlow={() => setTipStatusResolved().then(toggleDTWiz)}
           />
         ) : null}
       </Flex>
