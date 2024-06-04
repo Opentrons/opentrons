@@ -1,0 +1,42 @@
+{
+  "ordering": [],
+  "brand": {
+    "brand": "Opentrons",
+    "brandId": []
+  },
+  "metadata": {
+    "displayName": "Opentrons Absorbance Plate Reader Module Lid",
+    "displayCategory": "other",
+    "displayVolumeUnits": "\u00b5L",
+    "tags": []
+  },
+  "dimensions": {
+    "xDimension": 155,
+    "yDimension": 95,
+    "zDimension": 60
+  },
+  "wells": {},
+  "groups": [
+    {
+      "metadata": {},
+      "wells": []
+    }
+  ],
+  "parameters": {
+    "format": "irregular",
+    "quirks": [],
+    "isTiprack": false,
+    "isMagneticModuleCompatible": false,
+    "loadName": "opentrons_flex_lid_absorbance_plate_reader_module"
+  },
+  "namespace": "opentrons",
+  "version": 1,
+  "schemaVersion": 2,
+  "gripForce": 15,
+  "gripHeightFromLabwareBottom": 51.5,
+  "cornerOffsetFromSlot": {
+    "x": 0,
+    "y": 0,
+    "z": 0
+  }
+}
