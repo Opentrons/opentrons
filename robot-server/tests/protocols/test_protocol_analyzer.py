@@ -4,6 +4,8 @@ from decoy import Decoy
 from datetime import datetime
 from pathlib import Path
 
+from opentrons.protocols.api_support.types import APIVersion
+from opentrons.protocols.parse import PythonParseMode
 from opentrons_shared_data.robot.dev_types import RobotType
 from opentrons_shared_data.pipette.dev_types import PipetteNameType
 
@@ -16,7 +18,11 @@ from opentrons.protocol_engine import (
     types as pe_types,
 )
 import opentrons.protocol_runner as protocol_runner
-from opentrons.protocol_reader import ProtocolSource, JsonProtocolConfig
+from opentrons.protocol_reader import (
+    ProtocolSource,
+    JsonProtocolConfig,
+    PythonProtocolConfig,
+)
 import opentrons.util.helpers as datetime_helper
 
 from robot_server.protocols.analysis_store import AnalysisStore
@@ -65,6 +71,49 @@ def subject(
     """Get a ProtocolAnalyzer test subject."""
     return ProtocolAnalyzer(
         analysis_store=analysis_store,
+    )
+
+
+async def test_load_runner(
+    decoy: Decoy,
+    analysis_store: AnalysisStore,
+    subject: ProtocolAnalyzer,
+) -> None:
+    """It should load the appropriate runner."""
+    robot_type: RobotType = "OT-3 Standard"
+    protocol_source = ProtocolSource(
+        directory=Path("/dev/null"),
+        main_file=Path("/dev/null/abc.py"),
+        config=PythonProtocolConfig(api_version=APIVersion(100, 200)),
+        files=[],
+        metadata={},
+        robot_type=robot_type,
+        content_hash="abc123",
+    )
+    protocol_resource = ProtocolResource(
+        protocol_id="protocol-id",
+        created_at=datetime(year=2021, month=1, day=1),
+        source=protocol_source,
+        protocol_key="dummy-data-111",
+    )
+    python_runner = decoy.mock(cls=protocol_runner.PythonAndLegacyRunner)
+    decoy.when(
+        await protocol_runner.create_simulating_runner(
+            robot_type=robot_type,
+            protocol_config=PythonProtocolConfig(api_version=APIVersion(100, 200)),
+        )
+    ).then_return(python_runner)
+    runner = await subject.load_runner(
+        protocol_resource=protocol_resource, run_time_param_values={"rtp_var": 123}
+    )
+    assert runner == python_runner
+    decoy.verify(
+        await python_runner.load(
+            protocol_source=protocol_source,
+            python_parse_mode=PythonParseMode.NORMAL,
+            run_time_param_values={"rtp_var": 123},
+        ),
+        times=1,
     )
 
 
@@ -137,13 +186,7 @@ async def test_analyze(
         )
     ).then_return(json_runner)
 
-    decoy.when(
-        await json_runner.run(
-            deck_configuration=[],
-            protocol_source=protocol_resource.source,
-            run_time_param_values=None,
-        )
-    ).then_return(
+    decoy.when(await json_runner.run(deck_configuration=[],)).then_return(
         protocol_runner.RunResult(
             commands=[analysis_command],
             state_summary=StateSummary(
@@ -160,9 +203,14 @@ async def test_analyze(
         )
     )
 
-    await subject.analyze(
+    runner = await subject.load_runner(
         protocol_resource=protocol_resource,
+        run_time_param_values=None,
+    )
+    await subject.analyze(
+        runner=runner,
         analysis_id="analysis-id",
+        run_time_parameters=None,
     )
 
     decoy.verify(
@@ -229,8 +277,6 @@ async def test_analyze_updates_pending_on_error(
     decoy.when(
         await json_runner.run(
             deck_configuration=[],
-            protocol_source=protocol_resource.source,
-            run_time_param_values=None,
         )
     ).then_raise(raised_exception)
 
@@ -242,8 +288,12 @@ async def test_analyze_updates_pending_on_error(
         datetime(year=2023, month=3, day=3)
     )
 
-    await subject.analyze(
+    runner = await subject.load_runner(
         protocol_resource=protocol_resource,
+        run_time_param_values=None,
+    )
+    await subject.analyze(
+        runner=runner,
         analysis_id="analysis-id",
     )
 

@@ -7,7 +7,8 @@ from decoy import Decoy, matchers
 from fastapi import UploadFile
 from pathlib import Path
 
-from opentrons.protocol_engine.types import RunTimeParamValuesType
+from opentrons.protocol_engine.types import RunTimeParamValuesType, NumberParameter
+from opentrons.protocol_runner import protocol_runner
 from opentrons.protocols.api_support.types import APIVersion
 
 from opentrons.protocol_reader import (
@@ -463,7 +464,7 @@ async def test_create_protocol(
         id="analysis-id",
         status=AnalysisStatus.PENDING,
     )
-
+    mock_runner = decoy.mock(cls=protocol_runner.JsonRunner)
     decoy.when(
         await file_reader_writer.read(
             # TODO(mm, 2024-02-07): Recent FastAPI upgrades mean protocol_file.filename
@@ -482,13 +483,20 @@ async def test_create_protocol(
             content_hash="abc123",
         )
     ).then_return(protocol_source)
-
     decoy.when(
-        analysis_store.add_pending(protocol_id="protocol-id", analysis_id="analysis-id")
-    ).then_return(pending_analysis)
+        await protocol_analyzer.load_runner(
+            protocol_resource=protocol_resource,
+            run_time_param_values={},
+        )
+    ).then_return(mock_runner)
+    decoy.when(mock_runner.run_time_parameters).then_return([])
 
     decoy.when(protocol_store.get_all()).then_return([])
-
+    decoy.when(
+        analysis_store.add_pending(
+            protocol_id="protocol-id", analysis_id="analysis-id", run_time_parameters=[]
+        )
+    ).then_return(pending_analysis)
     result = await create_protocol(
         files=[protocol_file],
         key="dummy-key-111",
@@ -524,9 +532,9 @@ async def test_create_protocol(
         protocol_store.insert(protocol_resource),
         task_runner.run(
             protocol_analyzer.analyze,
+            runner=mock_runner,
             analysis_id="analysis-id",
-            protocol_resource=protocol_resource,
-            run_time_param_values={},
+            run_time_parameters=[],
         ),
     )
 
@@ -576,7 +584,16 @@ async def test_create_new_protocol_with_run_time_params(
         id="analysis-id",
         status=AnalysisStatus.PENDING,
     )
-
+    mock_runner = decoy.mock(cls=protocol_runner.JsonRunner)
+    run_time_parameter = NumberParameter(
+        displayName="My parameter",
+        variableName="cool_param",
+        type="int",
+        min=1,
+        max=5,
+        value=2.0,
+        default=3.0,
+    )
     decoy.when(
         await file_reader_writer.read(
             # TODO(mm, 2024-02-07): Recent FastAPI upgrades mean protocol_file.filename
@@ -595,11 +612,20 @@ async def test_create_new_protocol_with_run_time_params(
             content_hash="abc123",
         )
     ).then_return(protocol_source)
-
     decoy.when(
-        analysis_store.add_pending(protocol_id="protocol-id", analysis_id="analysis-id")
+        await protocol_analyzer.load_runner(
+            protocol_resource=protocol_resource,
+            run_time_param_values={"vol": 123, "dry_run": True, "mount": "left"},
+        )
+    ).then_return(mock_runner)
+    decoy.when(mock_runner.run_time_parameters).then_return([run_time_parameter])
+    decoy.when(
+        analysis_store.add_pending(
+            protocol_id="protocol-id",
+            analysis_id="analysis-id",
+            run_time_parameters=[run_time_parameter],
+        )
     ).then_return(pending_analysis)
-
     decoy.when(protocol_store.get_all()).then_return([])
 
     await create_protocol(
@@ -626,9 +652,9 @@ async def test_create_new_protocol_with_run_time_params(
         protocol_store.insert(protocol_resource),
         task_runner.run(
             protocol_analyzer.analyze,
+            runner=mock_runner,
             analysis_id="analysis-id",
-            protocol_resource=protocol_resource,
-            run_time_param_values={"vol": 123, "dry_run": True, "mount": "left"},
+            run_time_parameters=[run_time_parameter],
         ),
     )
 
@@ -677,6 +703,17 @@ async def test_create_existing_protocol_with_no_previous_analysis(
         id="analysis-id",
         status=AnalysisStatus.PENDING,
     )
+    run_time_parameter = NumberParameter(
+        displayName="My parameter",
+        variableName="cool_param",
+        type="int",
+        min=1,
+        max=5,
+        value=2.0,
+        default=3.0,
+    )
+    mock_runner = decoy.mock(cls=protocol_runner.JsonRunner)
+
     decoy.when(
         await file_reader_writer.read(
             # TODO(mm, 2024-02-07): Recent FastAPI upgrades mean protocol_file.filename
@@ -695,8 +732,17 @@ async def test_create_existing_protocol_with_no_previous_analysis(
         analysis_store.get_summaries_by_protocol(protocol_id="the-og-proto-id")
     ).then_return([])
     decoy.when(
+        await protocol_analyzer.load_runner(
+            protocol_resource=stored_protocol_resource,
+            run_time_param_values={"vol": 123, "dry_run": True, "mount": "left"},
+        )
+    ).then_return(mock_runner)
+    decoy.when(mock_runner.run_time_parameters).then_return([run_time_parameter])
+    decoy.when(
         analysis_store.add_pending(
-            protocol_id="the-og-proto-id", analysis_id="analysis-id"
+            protocol_id="the-og-proto-id",
+            analysis_id="analysis-id",
+            run_time_parameters=[run_time_parameter],
         )
     ).then_return(pending_analysis)
 
@@ -733,13 +779,9 @@ async def test_create_existing_protocol_with_no_previous_analysis(
     decoy.verify(
         task_runner.run(
             protocol_analyzer.analyze,
+            runner=mock_runner,
             analysis_id="analysis-id",
-            protocol_resource=stored_protocol_resource,
-            run_time_param_values={"vol": 123, "dry_run": True, "mount": "left"},
-        ),
-        analysis_store.add_pending(
-            protocol_id="the-og-proto-id",
-            analysis_id="analysis-id",
+            run_time_parameters=[run_time_parameter],
         ),
     )
 
@@ -794,6 +836,17 @@ async def test_create_existing_protocol_with_different_run_time_params(
         id="analysis-id",
         status=AnalysisStatus.PENDING,
     )
+    run_time_parameter = NumberParameter(
+        displayName="My parameter",
+        variableName="cool_param",
+        type="int",
+        min=1,
+        max=5,
+        value=2.0,
+        default=3.0,
+    )
+    mock_runner = decoy.mock(cls=protocol_runner.JsonRunner)
+
     decoy.when(
         await file_reader_writer.read(
             # TODO(mm, 2024-02-07): Recent FastAPI upgrades mean protocol_file.filename
@@ -817,8 +870,17 @@ async def test_create_existing_protocol_with_different_run_time_params(
         )
     ).then_return(False)
     decoy.when(
+        await protocol_analyzer.load_runner(
+            protocol_resource=stored_protocol_resource,
+            run_time_param_values={"vol": 123, "dry_run": True, "mount": "left"},
+        )
+    ).then_return(mock_runner)
+    decoy.when(mock_runner.run_time_parameters).then_return([run_time_parameter])
+    decoy.when(
         analysis_store.add_pending(
-            protocol_id="the-og-proto-id", analysis_id="analysis-id"
+            protocol_id="the-og-proto-id",
+            analysis_id="analysis-id",
+            run_time_parameters=[run_time_parameter],
         )
     ).then_return(pending_summary)
 
@@ -856,12 +918,8 @@ async def test_create_existing_protocol_with_different_run_time_params(
         task_runner.run(
             protocol_analyzer.analyze,
             analysis_id="analysis-id",
-            protocol_resource=stored_protocol_resource,
-            run_time_param_values={"vol": 123, "dry_run": True, "mount": "left"},
-        ),
-        analysis_store.add_pending(
-            protocol_id="the-og-proto-id",
-            analysis_id="analysis-id",
+            runner=mock_runner,
+            run_time_parameters=[run_time_parameter],
         ),
     )
 
@@ -967,22 +1025,6 @@ async def test_create_existing_protocol_with_same_run_time_params(
         key="dummy-key-222",
     )
     assert result.status_code == 200
-    decoy.verify(
-        task_runner.run(
-            protocol_analyzer.analyze,
-            analysis_id="analysis-id",
-            protocol_resource=stored_protocol_resource,
-            run_time_param_values={"vol": 123, "dry_run": True, "mount": "left"},
-        ),
-        times=0,
-    )
-    decoy.verify(
-        analysis_store.add_pending(
-            protocol_id="the-og-proto-id",
-            analysis_id="analysis-id",
-        ),
-        times=0,
-    )
 
 
 async def test_create_existing_protocol_with_pending_analysis_raises(
@@ -1447,12 +1489,44 @@ async def test_update_protocol_analyses_with_new_rtp_values(
 ) -> None:
     """It should start a new analysis for the new rtp values."""
     rtp_values: RunTimeParamValuesType = {"vol": 123, "dry_run": True, "mount": "left"}
+    protocol_source = ProtocolSource(
+        directory=Path("/dev/null"),
+        main_file=Path("/dev/null/foo.json"),
+        files=[
+            ProtocolSourceFile(
+                path=Path("/dev/null/foo.json"),
+                role=ProtocolFileRole.MAIN,
+            )
+        ],
+        metadata={"this_is_fake_metadata": True},
+        robot_type="OT-2 Standard",
+        config=JsonProtocolConfig(schema_version=123),
+        content_hash="a_b_c",
+    )
+
+    stored_protocol_resource = ProtocolResource(
+        protocol_id="protocol-id",
+        created_at=datetime(year=2020, month=1, day=1),
+        source=protocol_source,
+        protocol_key="dummy-key-222",
+    )
     analysis_summaries = [
         AnalysisSummary(
             id="analysis-id",
             status=AnalysisStatus.COMPLETED,
         ),
     ]
+    run_time_parameter = NumberParameter(
+        displayName="My parameter",
+        variableName="cool_param",
+        type="int",
+        min=1,
+        max=5,
+        value=2.0,
+        default=3.0,
+    )
+    mock_runner = decoy.mock(cls=protocol_runner.JsonRunner)
+
     decoy.when(protocol_store.has(protocol_id="protocol-id")).then_return(True)
     decoy.when(
         analysis_store.get_summaries_by_protocol(protocol_id="protocol-id")
@@ -1462,9 +1536,23 @@ async def test_update_protocol_analyses_with_new_rtp_values(
             analysis_summaries[-1], rtp_values
         )
     ).then_return(False)
-    decoy.when(analysis_store.add_pending("protocol-id", "analysis-id-2")).then_return(
-        AnalysisSummary(id="analysis-id-2", status=AnalysisStatus.PENDING)
+    decoy.when(protocol_store.get(protocol_id="protocol-id")).then_return(
+        stored_protocol_resource
     )
+    decoy.when(
+        await protocol_analyzer.load_runner(
+            protocol_resource=stored_protocol_resource,
+            run_time_param_values=rtp_values,
+        )
+    ).then_return(mock_runner)
+    decoy.when(mock_runner.run_time_parameters).then_return([run_time_parameter])
+    decoy.when(
+        analysis_store.add_pending(
+            "protocol-id",
+            "analysis-id-2",
+            run_time_parameters=[run_time_parameter],
+        )
+    ).then_return(AnalysisSummary(id="analysis-id-2", status=AnalysisStatus.PENDING))
     result = await create_protocol_analysis(
         protocolId="protocol-id",
         request_body=RequestModel(
@@ -1497,18 +1585,53 @@ async def test_update_protocol_analyses_with_forced_reanalysis(
             status=AnalysisStatus.COMPLETED,
         ),
     ]
+    protocol_source = ProtocolSource(
+        directory=Path("/dev/null"),
+        main_file=Path("/dev/null/foo.json"),
+        files=[
+            ProtocolSourceFile(
+                path=Path("/dev/null/foo.json"),
+                role=ProtocolFileRole.MAIN,
+            )
+        ],
+        metadata={"this_is_fake_metadata": True},
+        robot_type="OT-2 Standard",
+        config=JsonProtocolConfig(schema_version=123),
+        content_hash="a_b_c",
+    )
+
+    stored_protocol_resource = ProtocolResource(
+        protocol_id="protocol-id",
+        created_at=datetime(year=2020, month=1, day=1),
+        source=protocol_source,
+        protocol_key="dummy-key-222",
+    )
+    mock_runner = decoy.mock(cls=protocol_runner.JsonRunner)
+
     decoy.when(protocol_store.has(protocol_id="protocol-id")).then_return(True)
     decoy.when(
         analysis_store.get_summaries_by_protocol(protocol_id="protocol-id")
     ).then_return(analysis_summaries)
+    decoy.when(protocol_store.get(protocol_id="protocol-id")).then_return(
+        stored_protocol_resource
+    )
+    decoy.when(
+        await protocol_analyzer.load_runner(
+            protocol_resource=stored_protocol_resource,
+            run_time_param_values={},
+        )
+    ).then_return(mock_runner)
+    decoy.when(mock_runner.run_time_parameters).then_return([])
     decoy.when(
         await analysis_store.matching_rtp_values_in_analysis(
             analysis_summary=analysis_summaries[-1], new_rtp_values={}
         )
     ).then_return(True)
-    decoy.when(analysis_store.add_pending("protocol-id", "analysis-id-2")).then_return(
-        AnalysisSummary(id="analysis-id-2", status=AnalysisStatus.PENDING)
-    )
+    decoy.when(
+        analysis_store.add_pending(
+            "protocol-id", "analysis-id-2", run_time_parameters=[]
+        )
+    ).then_return(AnalysisSummary(id="analysis-id-2", status=AnalysisStatus.PENDING))
     result = await create_protocol_analysis(
         protocolId="protocol-id",
         request_body=RequestModel(data=AnalysisRequest(forceReAnalyze=True)),

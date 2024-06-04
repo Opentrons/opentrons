@@ -1,16 +1,14 @@
 """Protocol analysis storage."""
 from __future__ import annotations
 
-
+import sqlalchemy
 from logging import getLogger
 from typing import Dict, List, Optional
-
-from opentrons.protocol_engine.types import RunTimeParameter
 from typing_extensions import Final
+
 from opentrons_shared_data.robot.dev_types import RobotType
-
-import sqlalchemy
-
+from opentrons.util import helpers as datetime_helper
+from opentrons.protocol_engine.types import RunTimeParameter, RunTimeParamValuesType
 from opentrons.protocol_engine import (
     Command,
     ErrorOccurrence,
@@ -19,8 +17,6 @@ from opentrons.protocol_engine import (
     LoadedModule,
     Liquid,
 )
-from opentrons.protocol_engine.types import RunTimeParamValuesType
-
 from .analysis_models import (
     AnalysisSummary,
     ProtocolAnalysis,
@@ -33,6 +29,7 @@ from .analysis_models import (
 
 from .completed_analysis_store import CompletedAnalysisStore, CompletedAnalysisResource
 from .analysis_memcache import MemoryCache
+from ..errors import error_mappers
 
 _log = getLogger(__name__)
 
@@ -142,6 +139,57 @@ class AnalysisStore:
             run_time_parameters=run_time_parameters or [],
         )
         return _summarize_pending(pending_analysis=new_pending_analysis)
+
+    async def add_failed_analysis(
+        self,
+        protocol_id: str,
+        analysis_id: str,
+        robot_type: RobotType,
+        error: BaseException,
+    ) -> AnalysisSummary:
+        """Add an analysis that failed before it was added to the PendingStore.
+
+        Right now, the only time this can happen is when parsing and setting RTP values
+        during runner load.
+
+        Args:
+            protocol_id: The protocol to add the new, failed analysis to.
+            analysis_id: The ID of the new, failed analysis.
+            robot_type: See `CompletedAnalysis.robotType`.
+            error: Any error occurred during runner load.
+        """
+        completed_analysis = CompletedAnalysis.construct(
+            id=analysis_id,
+            result=AnalysisResult.NOT_OK,
+            robotType=robot_type,
+            status=AnalysisStatus.COMPLETED,
+            runTimeParameters=[],
+            commands=[],
+            labware=[],
+            modules=[],
+            pipettes=[],
+            errors=[
+                ErrorOccurrence.from_failed(
+                    id="analysis_error",
+                    createdAt=datetime_helper.utc_now(),
+                    error=error_mappers.map_unexpected_error(error=error),
+                )
+            ],
+            liquids=[],
+        )
+        completed_analysis_resource = CompletedAnalysisResource(
+            id=completed_analysis.id,
+            protocol_id=protocol_id,
+            analyzer_version=_CURRENT_ANALYZER_VERSION,
+            completed_analysis=completed_analysis,
+            run_time_parameter_values_and_defaults=self._extract_run_time_param_values_and_defaults(
+                completed_analysis
+            ),
+        )
+        await self._completed_store.make_room_and_add(
+            completed_analysis_resource=completed_analysis_resource
+        )
+        return AnalysisSummary(id=analysis_id, status=completed_analysis.status)
 
     async def update(
         self,

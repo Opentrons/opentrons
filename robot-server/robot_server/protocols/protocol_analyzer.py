@@ -28,44 +28,50 @@ class ProtocolAnalyzer:
     ) -> None:
         """Initialize the analyzer and its dependencies."""
         self._analysis_store = analysis_store
-        self._runner: Optional[AbstractRunner] = None
+        self._protocol_resource: Optional[ProtocolResource] = None
 
     async def load_runner(
         self,
         protocol_resource: ProtocolResource,
         run_time_param_values: Optional[RunTimeParamValuesType],
-    ) -> List[RunTimeParameter]:
-        """Load the runner with the protocl and run time parameters."""
-        self._runner = await protocol_runner.create_simulating_runner(
+    ) -> AbstractRunner:
+        """Load runner with the protocol and run time parameter values.
+
+        Returns: Run time parameters with the override values.
+        """
+        self._protocol_resource = protocol_resource
+        runner = await protocol_runner.create_simulating_runner(
             robot_type=protocol_resource.source.robot_type,
             protocol_config=protocol_resource.source.config,
         )
-        if isinstance(self._runner, PythonAndLegacyRunner):
-            await self._runner.load(
-                protocol_source=protocol_resource.source,
+        if isinstance(runner, PythonAndLegacyRunner):
+            await runner.load(
+                protocol_source=self._protocol_resource.source,
                 python_parse_mode=PythonParseMode.NORMAL,
                 run_time_param_values=run_time_param_values,
             )
-        elif isinstance(self._runner, JsonRunner):
-            await self._runner.load(protocol_source=protocol_resource.source)
-        return self._runner.run_time_parameters
+        else:
+            assert isinstance(runner, JsonRunner), "Unexpected runner type."
+            await runner.load(protocol_source=self._protocol_resource.source)
+
+        return runner
 
     async def analyze(
         self,
-        protocol_resource: ProtocolResource,
+        runner: AbstractRunner,
         analysis_id: str,
         run_time_parameters: Optional[List[RunTimeParameter]] = None,
     ) -> None:
         """Analyze a given protocol, storing the analysis when complete."""
-        assert self._runner is not None
+        assert self._protocol_resource is not None
         try:
-            result = await self._runner.run(
+            result = await runner.run(
                 deck_configuration=[],
             )
         except BaseException as error:
             await self.update_to_failed_analysis(
                 analysis_id=analysis_id,
-                protocol_robot_type=protocol_resource.source.robot_type,
+                protocol_robot_type=self._protocol_resource.source.robot_type,
                 error=error,
                 run_time_parameters=run_time_parameters or [],
             )
@@ -75,7 +81,7 @@ class ProtocolAnalyzer:
 
         await self._analysis_store.update(
             analysis_id=analysis_id,
-            robot_type=protocol_resource.source.robot_type,
+            robot_type=self._protocol_resource.source.robot_type,
             run_time_parameters=result.parameters,
             commands=result.commands,
             labware=result.state_summary.labware,

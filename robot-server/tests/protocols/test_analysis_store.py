@@ -7,7 +7,11 @@ from typing import List, NamedTuple
 
 import pytest
 from decoy import Decoy
-from opentrons.protocol_engine.types import RunTimeParamValuesType
+from opentrons.protocol_engine.types import (
+    RunTimeParamValuesType,
+    BooleanParameter,
+    RunTimeParameter,
+)
 
 from sqlalchemy.engine import Engine as SQLEngine
 
@@ -107,22 +111,54 @@ async def test_add_pending(
     """It should add a pending analysis to the store."""
     protocol_store.insert(make_dummy_protocol_resource(protocol_id="protocol-id"))
 
-    expected_analysis = PendingAnalysis(id="analysis-id")
+    expected_analysis = PendingAnalysis(id="analysis-id", runTimeParameters=[])
     expected_summary = AnalysisSummary(
         id="analysis-id",
         status=AnalysisStatus.PENDING,
     )
 
     result = subject.add_pending(protocol_id="protocol-id", analysis_id="analysis-id")
-
+    analysis_result = await subject.get("analysis-id")
     assert result == expected_summary
 
-    assert await subject.get("analysis-id") == expected_analysis
+    assert analysis_result == expected_analysis
     assert await subject.get_by_protocol("protocol-id") == [expected_analysis]
     assert subject.get_summaries_by_protocol("protocol-id") == [expected_summary]
     with pytest.raises(AnalysisNotFoundError, match="analysis-id"):
         # Unlike get(), get_as_document() should raise if the analysis is pending.
         await subject.get_as_document("analysis-id")
+
+
+async def test_add_pending_with_rtp(
+    subject: AnalysisStore, protocol_store: ProtocolStore
+) -> None:
+    """It should add pending analysis with run time parameters."""
+    protocol_store.insert(make_dummy_protocol_resource(protocol_id="protocol-id"))
+    run_time_parameters: List[RunTimeParameter] = [
+        BooleanParameter(
+            displayName="My bool param",
+            variableName="my_bool_param",
+            default=True,
+            value=False,
+        )
+    ]
+    expected_analysis = PendingAnalysis(
+        id="analysis-id", runTimeParameters=run_time_parameters
+    )
+    expected_summary = AnalysisSummary(
+        id="analysis-id",
+        status=AnalysisStatus.PENDING,
+    )
+
+    result = subject.add_pending(
+        protocol_id="protocol-id",
+        analysis_id="analysis-id",
+        run_time_parameters=run_time_parameters,
+    )
+    analysis_result = await subject.get("analysis-id")
+    assert result == expected_summary
+
+    assert analysis_result == expected_analysis
 
 
 async def test_returned_in_order_added(
@@ -159,6 +195,13 @@ async def test_returned_in_order_added(
     full_analyses = await subject.get_by_protocol(protocol_id="protocol-id")
     assert [s.id for s in summaries] == expected_order
     assert [a.id for a in full_analyses] == expected_order
+
+
+def test_add_failed_analysis(
+    subject: AnalysisStore,
+    protocol_store: ProtocolStore,
+) -> None:
+    """It should add the failed analysis without going through pending state."""
 
 
 async def test_update_adds_details_and_completes_analysis(
