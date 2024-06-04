@@ -1,5 +1,6 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
+import flatten from 'lodash/flatten'
 import reduce from 'lodash/reduce'
 
 import {
@@ -35,14 +36,22 @@ import type { GenericRect } from './types'
 
 interface WellSelectionProps {
   definition: LabwareDefinition2
+  deselectWells: (wells: string[]) => void
+  resetWells: () => void
   selectedPrimaryWells: WellGroup
   selectWells: (wellGroup: WellGroup) => unknown
   channels: PipetteChannels
 }
 
 export function WellSelection(props: WellSelectionProps): JSX.Element {
-  const { definition, selectedPrimaryWells, selectWells, channels } = props
-
+  const {
+    definition,
+    deselectWells,
+    resetWells,
+    selectedPrimaryWells,
+    selectWells,
+    channels,
+  } = props
   const [highlightedWells, setHighlightedWells] = React.useState<WellGroup>({})
 
   const _wellsFromSelected: (
@@ -152,6 +161,108 @@ export function WellSelection(props: WellSelectionProps): JSX.Element {
     </RobotCoordinateSpace>
   )
   return definition.parameters.format === '384Standard' ? (
+    <Selection384Wells
+      allSelectedWells={allSelectedWells}
+      channels={channels}
+      definition={definition}
+      deselectWells={deselectWells}
+      labwareRender={labwareRender}
+      resetWells={resetWells}
+      selectWells={selectWells}
+    />
+  ) : (
+    <SelectionRect
+      onSelectionMove={handleSelectionMove}
+      onSelectionDone={handleSelectionDone}
+    >
+      {labwareRender}
+    </SelectionRect>
+  )
+}
+
+interface Selection384WellsProps {
+  allSelectedWells: WellGroup
+  channels: PipetteChannels
+  definition: LabwareDefinition2
+  deselectWells: (wells: string[]) => void
+  labwareRender: React.ReactNode
+  resetWells: () => void
+  selectWells: (wellGroup: WellGroup) => unknown
+}
+
+function Selection384Wells({
+  allSelectedWells,
+  channels,
+  definition,
+  deselectWells,
+  labwareRender,
+  resetWells,
+  selectWells,
+}: Selection384WellsProps): JSX.Element {
+  const [selectBy, setSelectBy] = React.useState<'columns' | 'wells'>('columns')
+  const [startingWell, setStartingWell] = React.useState<
+    'A1' | 'A2' | 'B1' | 'B2'
+  >('A1')
+
+  const [lastSelectedIndex, setLastSelectedIndex] = React.useState<
+    number | null
+  >(null)
+
+  // to reset last selected index on page-level selected well reset
+  React.useEffect(() => {
+    if (Object.keys(allSelectedWells).length === 0) {
+      setLastSelectedIndex(null)
+    }
+  }, [allSelectedWells])
+
+  const columns = definition.ordering
+  const wells = flatten(columns)
+
+  const handleMinus = (): void => {
+    if (lastSelectedIndex == null) {
+      return
+    }
+    const deselectIndex =
+      selectBy === 'wells'
+        ? lastSelectedIndex - (lastSelectedIndex % 16)
+        : lastSelectedIndex
+
+    if (selectBy === 'wells') {
+      deselectWells(wells.slice(deselectIndex, lastSelectedIndex + 1))
+    } else {
+      deselectWells(columns[lastSelectedIndex])
+    }
+
+    setLastSelectedIndex(lastSelectedIndex => {
+      if (lastSelectedIndex != null && lastSelectedIndex !== 0) {
+        const deselectQuantity =
+          selectBy === 'wells' ? lastSelectedIndex % 16 : 0
+        return lastSelectedIndex - deselectQuantity - 1
+      } else {
+        return null
+      }
+    })
+  }
+  const handlePlus = (): void => {
+    const nextIndex = lastSelectedIndex == null ? 0 : lastSelectedIndex + 1
+
+    if (selectBy === 'columns') {
+      selectWells(
+        columns[nextIndex].reduce((acc, well) => {
+          return { ...acc, [well]: null }
+        }, {})
+      )
+    } else if (selectBy === 'wells') {
+      selectWells({
+        [wells[nextIndex]]: null,
+      })
+    }
+
+    setLastSelectedIndex(lastSelectedIndex =>
+      lastSelectedIndex == null ? 0 : lastSelectedIndex + 1
+    )
+  }
+  return (
     <Flex
       justifyContent={JUSTIFY_SPACE_BETWEEN}
       gridGap={SPACING.spacing40}
@@ -163,21 +274,40 @@ export function WellSelection(props: WellSelectionProps): JSX.Element {
         flexDirection={DIRECTION_COLUMN}
         gridGap={SPACING.spacing32}
       >
-        {channels === 1 ? <SelectBy /> : <StartingWell channels={channels} />}
-        <ButtonControls channels={channels} />
+        {channels === 1 ? (
+          <SelectBy
+            selectBy={selectBy}
+            setSelectBy={selectBy => {
+              resetWells()
+              setLastSelectedIndex(null)
+              setSelectBy(selectBy)
+            }}
+          />
+        ) : (
+          <StartingWell
+            channels={channels}
+            startingWell={startingWell}
+            setStartingWell={setStartingWell}
+          />
+        )}
+        <ButtonControls
+          channels={channels}
+          handleMinus={handleMinus}
+          handlePlus={handlePlus}
+          lastSelectedIndex={lastSelectedIndex}
+          selectBy={selectBy}
+        />
       </Flex>
     </Flex>
-  ) : (
-    <SelectionRect
-      onSelectionMove={handleSelectionMove}
-      onSelectionDone={handleSelectionDone}
-    >
-      {labwareRender}
-    </SelectionRect>
   )
 }
 
-function SelectBy(): JSX.Element {
+interface SelectByProps {
+  selectBy: 'columns' | 'wells'
+  setSelectBy: React.Dispatch<React.SetStateAction<'columns' | 'wells'>>
+}
+
+function SelectBy({ selectBy, setSelectBy }: SelectByProps): JSX.Element {
   const { t, i18n } = useTranslation('quick_transfer')
 
   return (
@@ -188,13 +318,19 @@ function SelectBy(): JSX.Element {
       <RadioButton
         buttonLabel={i18n.format(t('columns'), 'capitalize')}
         buttonValue="columns"
-        onChange={() => console.log('columns')}
+        isSelected={selectBy === 'columns'}
+        onChange={() => {
+          setSelectBy('columns')
+        }}
         radioButtonType="small"
       />
       <RadioButton
         buttonLabel={i18n.format(t('wells'), 'capitalize')}
         buttonValue="wells"
-        onChange={() => console.log('wells')}
+        isSelected={selectBy === 'wells'}
+        onChange={() => {
+          setSelectBy('wells')
+        }}
         radioButtonType="small"
       />
     </Flex>
@@ -203,12 +339,18 @@ function SelectBy(): JSX.Element {
 
 function StartingWell({
   channels,
+  startingWell,
+  setStartingWell,
 }: {
   channels: PipetteChannels
+  startingWell: 'A1' | 'B1' | 'A2' | 'B2'
+  setStartingWell: React.Dispatch<
+    React.SetStateAction<'A1' | 'B1' | 'A2' | 'B2'>
+  >
 }): JSX.Element {
   const { t, i18n } = useTranslation('quick_transfer')
 
-  const checkboxWellOptions =
+  const checkboxWellOptions: Array<'A1' | 'B1' | 'A2' | 'B2'> =
     channels === 8 ? ['A1', 'B1'] : ['A1', 'A2', 'B1', 'B2']
 
   return (
@@ -219,9 +361,11 @@ function StartingWell({
       {checkboxWellOptions.map(well => (
         <Checkbox
           key={well}
-          isChecked
+          isChecked={startingWell === well}
           labelText={well}
-          onClick={() => console.log(well)}
+          onClick={() => {
+            setStartingWell(well)
+          }}
         />
       ))}
     </Flex>
@@ -230,9 +374,19 @@ function StartingWell({
 
 interface ButtonControlsProps {
   channels: PipetteChannels
+  handleMinus: () => void
+  handlePlus: () => void
+  lastSelectedIndex: number | null
+  selectBy: 'columns' | 'wells'
 }
 function ButtonControls(props: ButtonControlsProps): JSX.Element {
-  const { channels } = props
+  const {
+    channels,
+    handleMinus,
+    handlePlus,
+    lastSelectedIndex,
+    selectBy,
+  } = props
   const { t, i18n } = useTranslation('quick_transfer')
 
   const addOrRemoveButtons =
@@ -246,17 +400,19 @@ function ButtonControls(props: ButtonControlsProps): JSX.Element {
         </StyledText>
         <Flex gridGap={SPACING.spacing16}>
           <IconButton
-            onClick={() => {
-              console.log('TODO handle minus')
-            }}
+            disabled={lastSelectedIndex == null}
+            onClick={handleMinus}
             iconName="minus"
             hasBackground
             flex="1"
           />
           <IconButton
-            onClick={() => {
-              console.log('TODO handle plus')
-            }}
+            disabled={
+              selectBy === 'columns'
+                ? lastSelectedIndex === 23
+                : lastSelectedIndex === 383
+            }
+            onClick={handlePlus}
             iconName="plus"
             hasBackground
             flex="1"

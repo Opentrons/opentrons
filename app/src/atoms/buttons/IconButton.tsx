@@ -9,9 +9,7 @@ import {
 } from '@opentrons/components'
 import { ODD_FOCUS_VISIBLE } from './constants'
 
-interface IconButtonProps
-  // extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-  extends React.ComponentProps<typeof Btn> {
+interface IconButtonProps extends React.ComponentProps<typeof Btn> {
   iconName: React.ComponentProps<typeof Icon>['name']
   hasBackground?: boolean
 }
@@ -38,7 +36,7 @@ export function IconButton(props: IconButtonProps): JSX.Element {
           background-color: ${hasBackground
             ? COLORS.grey35
             : COLORS.transparent};
-          color: ${COLORS.grey35};
+          color: ${COLORS.grey50};
         }
         @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
           cursor: default;
