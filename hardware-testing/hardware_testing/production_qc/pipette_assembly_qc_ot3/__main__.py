@@ -1380,11 +1380,8 @@ async def _test_liquid_probe(
                 mount_speed=probe_cfg.mount_speed,
                 plunger_speed=probe_cfg.plunger_speed,
                 sensor_threshold_pascals=probe_cfg.sensor_threshold_pascals,
-                expected_liquid_height=0,  # FIXME: remove
                 output_option=OutputOptions.can_bus_only,  # FIXME: remove
-                aspirate_while_sensing=False,  # FIXME: I heard this doesn't work
-                auto_zero_sensor=True,  # TODO: when would we want to adjust this?
-                num_baseline_reads=10,  # TODO: when would we want to adjust this?
+                aspirate_while_sensing=False,
                 data_files=None,
             )
             end_z = await api.liquid_probe(mount, probe_settings, probe=probe)
