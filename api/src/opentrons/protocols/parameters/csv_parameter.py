@@ -45,6 +45,14 @@ class CSVParameterDefinition(AbstractParameterDefinition[Optional[TextIO]]):
             )
         self._value = new_file
 
+    @property
+    def id(self) -> Optional[str]:
+        return self._id
+
+    @id.setter
+    def id(self, uuid: str) -> None:
+        self._id = uuid
+
     def as_protocol_engine_type(self) -> RunTimeParameter:
         """Returns CSV parameter as a Protocol Engine type to send to client."""
         return CSVParameter(
