@@ -6,7 +6,7 @@ export const PROD_END_POINT = 'https://opentrons.ai/api/chat/completion'
 // auth0 domain
 export const AUTH0_DOMAIN = 'identity.auth.opentrons.com'
 
-// auth0 for stating
+// auth0 for staging
 export const STAGING_AUTH0_CLIENT_ID = 'AV3GDND34Q9CHx9yjZSI85k8ZuvzWH4a'
 export const STAGING_AUTH0_AUDIENCE = 'https://staging.opentrons.ai/api'
 
