@@ -65,3 +65,7 @@ test-cov:
 .PHONY: staging-deploy
 staging-deploy:
 	aws s3 sync ./dist s3://staging-opentrons-ai-front-end/ --delete
+
+.PHONY: prod-deploy
+prod-deploy:
+	aws s3 sync ./dist s3://prod-opentrons-ai-front-end/ --delete
