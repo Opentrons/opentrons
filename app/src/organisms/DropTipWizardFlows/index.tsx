@@ -5,16 +5,72 @@ import { getPipetteModelSpecs } from '@opentrons/shared-data'
 
 import { DropTipWizard } from './DropTipWizard'
 import { getPipettesWithTipAttached } from './getPipettesWithTipAttached'
-import {
-  useDropTipCommands,
-  useDropTipRouting,
-  useDropTipWithType,
-} from './hooks'
+import { useDropTipRouting, useDropTipWithType } from './hooks'
 
 import type { PipetteModelSpecs, RobotType } from '@opentrons/shared-data'
 import type { PipetteData } from '@opentrons/api-client'
 import type { GetPipettesWithTipAttached } from './getPipettesWithTipAttached'
-import type { FailedCommand } from '../ErrorRecoveryFlows/types'
+
+/** Provides the user toggle for rendering Drop Tip Wizard Flows.
+ *
+ * NOTE: Rendering these flows is independent of whether tips are actually attached. First use useTipAttachmentStatus
+ * to get tip attachment status.
+ */
+export function useDropTipWizardFlows(): {
+  showDTWiz: boolean
+  toggleDTWiz: () => void
+} {
+  const [showDTWiz, setShowDTWiz] = React.useState(false)
+
+  const toggleDTWiz = (): void => {
+    setShowDTWiz(!showDTWiz)
+  }
+
+  return { showDTWiz, toggleDTWiz }
+}
+
+export type IssuedCommandsType = 'setup' | 'fixit'
+
+export interface FixitCommandTypeUtils {
+  runId: string
+  failedCommandId: string
+  onCloseFlow: () => void
+}
+
+export interface DropTipWizardFlowsProps {
+  robotType: RobotType
+  mount: PipetteData['mount']
+  instrumentModelSpecs: PipetteModelSpecs
+  closeFlow: () => void
+  /* Optional. If provided, DT will issue "fixit" commands and render alternate Error Recovery compatible views. */
+  fixitCommandTypeUtils?: FixitCommandTypeUtils
+}
+
+export function DropTipWizardFlows(
+  props: DropTipWizardFlowsProps
+): JSX.Element {
+  const issuedCommandsType: IssuedCommandsType = props.fixitCommandTypeUtils
+    ? 'fixit'
+    : 'setup'
+
+  // TOME: Use this component to also determine utils used.
+  const dropTipWithTypeUtils = useDropTipWithType({
+    ...props,
+    issuedCommandsType,
+  })
+
+  // TOME: You'll eventually want a get first step function here that takes the override first step or otherwise defaults to before_beginning firs step.
+  // TOME: The exitScreen should be its own route as well? How would this work with ER? Think that through!
+  const dropTipRoutingUtils = useDropTipRouting()
+
+  return (
+    <DropTipWizard
+      {...props}
+      {...dropTipWithTypeUtils}
+      {...dropTipRoutingUtils}
+    />
+  )
+}
 
 export interface PipetteWithTip {
   mount: 'left' | 'right'
@@ -95,58 +151,4 @@ export function useTipAttachmentStatus(
     pipettesWithTip,
     setTipStatusResolved,
   }
-}
-
-// Provides the user toggle for rendering Drop Tip Wizard Flows.
-//
-// NOTE: Rendering these flows is independent of whether tips are actually attached. First use useTipAttachmentStatus
-// to get tip attachment status.
-export function useDropTipWizardFlows(): {
-  showDTWiz: boolean
-  toggleDTWiz: () => void
-} {
-  const [showDTWiz, setShowDTWiz] = React.useState(false)
-
-  const toggleDTWiz = (): void => {
-    setShowDTWiz(!showDTWiz)
-  }
-
-  return { showDTWiz, toggleDTWiz }
-}
-
-export type IssuedCommandsType = 'setup' | 'fixit'
-
-export interface FixitCommandTypeUtils {
-  runId: string
-  failedCommandId: string
-  onCloseFlow: () => void
-}
-
-export interface DropTipWizardFlowsProps {
-  robotType: RobotType
-  mount: PipetteData['mount']
-  instrumentModelSpecs: PipetteModelSpecs
-  closeFlow: () => void
-  /* Optional. If provided, DT will issue "fixit" commands and render alternate Error Recovery compatible views. */
-  fixitCommandTypeUtils?: FixitCommandTypeUtils
-}
-
-export function DropTipWizardFlows(
-  props: DropTipWizardFlowsProps
-): JSX.Element {
-  const issuedCommandsType: IssuedCommandsType = props.fixitCommandTypeUtils
-    ? 'fixit'
-    : 'setup'
-
-  // TOME: Use this component to also determine utils used.
-  const dropTipWithTypeProps = useDropTipWithType({
-    ...props,
-    issuedCommandsType,
-  })
-
-  // TOME: You'll eventually want a get first step function here that takes the override first step or otherwise defaults to before_beginning firs step.
-  // TOME: The exitScreen should be its own route as well? How would this work with ER? Think that through!
-  const dropTipRoutingUtils = useDropTipRouting()
-
-  return <DropTipWizard {...props} dropTipRoutingUtils={dropTipRoutingUtils} />
 }
