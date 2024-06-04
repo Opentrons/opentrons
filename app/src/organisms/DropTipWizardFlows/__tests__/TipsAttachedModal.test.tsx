@@ -9,13 +9,16 @@ import { i18n } from '../../../i18n'
 import { handleTipsAttachedModal } from '../TipsAttachedModal'
 import { LEFT } from '@opentrons/shared-data'
 import { mockPipetteInfo } from '../../../redux/pipettes/__fixtures__'
-import { ROBOT_MODEL_OT3 } from '../../../redux/discovery'
 import { useCloseCurrentRun } from '../../ProtocolUpload/hooks'
+import { useDropTipWizardFlows } from '..'
 
 import type { PipetteModelSpecs } from '@opentrons/shared-data'
 import type { HostConfig } from '@opentrons/api-client'
+import type { Mock } from 'vitest'
+import type { PipetteWithTip } from '..'
 
 vi.mock('../../ProtocolUpload/hooks')
+vi.mock('..')
 
 const MOCK_ACTUAL_PIPETTE = {
   ...mockPipetteInfo.pipetteSpecs,
@@ -25,21 +28,31 @@ const MOCK_ACTUAL_PIPETTE = {
   },
 } as PipetteModelSpecs
 
-const mockOnClose = vi.fn()
+const ninetySixSpecs = {
+  ...MOCK_ACTUAL_PIPETTE,
+  channels: 96,
+} as PipetteModelSpecs
+
+const MOCK_PIPETTES_WITH_TIP: PipetteWithTip[] = [
+  { mount: LEFT, specs: MOCK_ACTUAL_PIPETTE },
+]
+const MOCK_96_WITH_TIP: PipetteWithTip[] = [
+  { mount: LEFT, specs: ninetySixSpecs },
+]
+
+const mockSetTipStatusResolved = vi.fn()
 const MOCK_HOST: HostConfig = { hostname: 'MOCK_HOST' }
 
-const render = (pipetteSpecs: PipetteModelSpecs) => {
+const render = (pipettesWithTips: PipetteWithTip[]) => {
   return renderWithProviders(
     <NiceModal.Provider>
       <button
         onClick={() =>
-          handleTipsAttachedModal(
-            LEFT,
-            pipetteSpecs,
-            ROBOT_MODEL_OT3,
-            MOCK_HOST,
-            mockOnClose
-          )
+          handleTipsAttachedModal({
+            host: MOCK_HOST,
+            pipettesWithTip: pipettesWithTips,
+            setTipStatusResolved: mockSetTipStatusResolved,
+          })
         }
         data-testid="testButton"
       />
@@ -50,51 +63,50 @@ const render = (pipetteSpecs: PipetteModelSpecs) => {
   )
 }
 
+let mockToggleDTWiz: Mock
+
 describe('TipsAttachedModal', () => {
+  mockToggleDTWiz = vi.fn()
+
   beforeEach(() => {
     vi.mocked(useCloseCurrentRun).mockReturnValue({
       closeCurrentRun: vi.fn(),
     } as any)
+    vi.mocked(useDropTipWizardFlows).mockReturnValue({
+      showDTWiz: false,
+      toggleDTWiz: mockToggleDTWiz,
+    })
   })
 
   it('renders appropriate warning given the pipette mount', () => {
-    render(MOCK_ACTUAL_PIPETTE)
+    render(MOCK_PIPETTES_WITH_TIP)
     const btn = screen.getByTestId('testButton')
     fireEvent.click(btn)
 
     screen.getByText('Tips are attached')
     screen.queryByText(`${LEFT} Pipette`)
   })
-  it('clicking the close button properly closes the modal', () => {
-    render(MOCK_ACTUAL_PIPETTE)
+  it('clicking the skip button properly closes the modal', () => {
+    render(MOCK_PIPETTES_WITH_TIP)
     const btn = screen.getByTestId('testButton')
     fireEvent.click(btn)
 
     const skipBtn = screen.getByText('Skip')
     fireEvent.click(skipBtn)
-    expect(mockOnClose).toHaveBeenCalled()
+    expect(mockSetTipStatusResolved).toHaveBeenCalled()
   })
   it('clicking the launch wizard button properly launches the wizard', () => {
-    render(MOCK_ACTUAL_PIPETTE)
+    render(MOCK_PIPETTES_WITH_TIP)
     const btn = screen.getByTestId('testButton')
     fireEvent.click(btn)
 
-    const skipBtn = screen.getByText('Begin removal')
-    fireEvent.click(skipBtn)
-    screen.queryByText('Drop tips')
+    const beginRemoval = screen.getByText('Begin removal')
+    fireEvent.click(beginRemoval)
+    expect(mockToggleDTWiz).toHaveBeenCalled()
   })
   it('renders special text when the pipette is a 96-Channel', () => {
-    const ninetySixSpecs = {
-      ...MOCK_ACTUAL_PIPETTE,
-      channels: 96,
-    } as PipetteModelSpecs
-
-    render(ninetySixSpecs)
+    render(MOCK_96_WITH_TIP)
     const btn = screen.getByTestId('testButton')
     fireEvent.click(btn)
-
-    const skipBtn = screen.getByText('Begin removal')
-    fireEvent.click(skipBtn)
-    screen.queryByText('96-Channel')
   })
 })
