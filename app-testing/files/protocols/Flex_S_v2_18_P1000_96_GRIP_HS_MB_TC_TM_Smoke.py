@@ -107,7 +107,7 @@ class AllMoveSequences:
     from_module_move_sequence: MoveSequence
 
     @classmethod
-    def dev_default(cls, all_modules: typing.List[ValidModuleLocations]) -> "AllMoveSequences":
+    def dev_configuration(cls, all_modules: typing.List[ValidModuleLocations]) -> "AllMoveSequences":
         module_to_move_to = all_modules[0]
         return cls(
             from_deck_move_sequence=MoveSequence(
@@ -137,7 +137,7 @@ class AllMoveSequences:
         )
 
     @classmethod
-    def full_default(cls, all_modules: typing.List[ValidModuleLocations]) -> "AllMoveSequences":
+    def full_configuration(cls, all_modules: typing.List[ValidModuleLocations]) -> "AllMoveSequences":
         return cls(
             from_deck_move_sequence=MoveSequence(
                 to_deck_moves=["B2"],
@@ -174,7 +174,7 @@ class ModuleTemperatureConfiguration:
     temperature_module: float
 
     @classmethod
-    def full_default(cls) -> "ModuleTemperatureConfiguration":
+    def full_configuration(cls) -> "ModuleTemperatureConfiguration":
         return cls(
             thermocycler_block=60.0,
             thermocycler_lid=80.0,
@@ -183,7 +183,7 @@ class ModuleTemperatureConfiguration:
         )
 
     @classmethod
-    def dev_default(cls) -> "ModuleTemperatureConfiguration":
+    def dev_configuration(cls) -> "ModuleTemperatureConfiguration":
         return cls(
             thermocycler_block=50.0,
             thermocycler_lid=50.0,
@@ -219,8 +219,8 @@ class TestConfiguration:
             test_set_offset=True,
             partial_tip_pickup_column_count=12,
             prefer_move_off_deck=prefer_move_off_deck,
-            module_temps=ModuleTemperatureConfiguration.full_default(),
-            moves=AllMoveSequences.full_default(all_modules),
+            module_temps=ModuleTemperatureConfiguration.full_configuration(),
+            moves=AllMoveSequences.full_configuration(all_modules),
         )
 
     @classmethod
@@ -234,8 +234,8 @@ class TestConfiguration:
             test_set_offset=False,
             partial_tip_pickup_column_count=2,
             prefer_move_off_deck=prefer_move_off_deck,
-            module_temps=ModuleTemperatureConfiguration.dev_default(),
-            moves=AllMoveSequences.dev_default(all_modules),
+            module_temps=ModuleTemperatureConfiguration.dev_configuration(),
+            moves=AllMoveSequences.dev_configuration(all_modules),
         )
 
     @classmethod
@@ -246,19 +246,19 @@ class TestConfiguration:
             protocol_api.ThermocyclerContext | protocol_api.MagneticBlockContext | protocol_api.Labware
         ],
     ) -> "TestConfiguration":
-        test_type = parameters.test_type
+        test_configuration = parameters.test_configuration
         prefer_move_off_deck = parameters.prefer_move_off_deck
         reservoir_name = parameters.reservoir_name
         well_plate_name = parameters.well_plate_name
 
-        if test_type == "full":
+        if test_configuration == "full":
             return cls._get_full_config(
                 prefer_move_off_deck=prefer_move_off_deck,
                 reservoir_name=reservoir_name,
                 well_plate_name=well_plate_name,
                 all_modules=where_to_put_labware_on_modules,
             )
-        elif test_type == "dev":
+        elif test_configuration == "dev":
             return cls._get_dev_config(
                 prefer_move_off_deck=prefer_move_off_deck,
                 reservoir_name=reservoir_name,
@@ -266,7 +266,7 @@ class TestConfiguration:
                 all_modules=where_to_put_labware_on_modules,
             )
         else:
-            raise ValueError(f"Invalid test type: {test_type}")
+            raise ValueError(f"Invalid test configuration: {test_configuration}")
 
 
 #################
@@ -296,7 +296,7 @@ PIPETTE_96_CHANNEL_NAME = "flex_96channel_1000"
 
 def add_parameters(parameters: protocol_api.Parameters):
 
-    test_type_choices = [
+    test_configuration_choices = [
         {"display_name": "Full Smoke Test", "value": "full"},
         {"display_name": "Developer Validation", "value": "dev"},
     ]
@@ -313,11 +313,11 @@ def add_parameters(parameters: protocol_api.Parameters):
     ]
 
     parameters.add_str(
-        variable_name="test_type",
-        display_name="Test Type",
-        description="Type of testing to perform",
+        variable_name="test_configuration",
+        display_name="Test Configuration",
+        description="Configuration of QA test to perform",
         default="full",
-        choices=test_type_choices,
+        choices=test_configuration_choices,
     )
 
     parameters.add_str(
