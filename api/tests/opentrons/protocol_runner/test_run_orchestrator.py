@@ -1,5 +1,6 @@
 """Tests for the RunOrchestrator."""
 import pytest
+from datetime import datetime
 from pytest_lazyfixture import lazy_fixture  # type: ignore[import-untyped]
 from decoy import Decoy
 from typing import Union
@@ -7,8 +8,12 @@ from typing import Union
 from opentrons.protocols.api_support.types import APIVersion
 from opentrons.protocol_engine import ProtocolEngine
 from opentrons.protocol_engine.types import PostRunHardwareState
+from opentrons.protocol_engine import commands as pe_commands
 from opentrons.hardware_control import API as HardwareAPI
-from opentrons.protocol_reader import JsonProtocolConfig, PythonProtocolConfig
+from opentrons.protocol_reader import (
+    JsonProtocolConfig,
+    PythonProtocolConfig,
+)
 from opentrons.protocol_runner.run_orchestrator import RunOrchestrator
 from opentrons import protocol_runner
 from opentrons.protocol_runner.protocol_runner import (
@@ -141,33 +146,31 @@ def test_build_run_orchestrator_provider(
     assert isinstance(result, RunOrchestrator)
     assert isinstance(result._setup_runner, LiveRunner)
     assert isinstance(result._fixit_runner, LiveRunner)
+    assert isinstance(result._protocol_runner, (PythonAndLegacyRunner, JsonRunner))
 
 
-# async def test_build_with_protocol(
-#     subject: EngineStore,
-#     json_protocol_source: ProtocolSource,
-# ) -> None:
-#     """It should create an engine for a run with protocol.
-#
-#     Tests only basic engine & runner creation with creation result.
-#     Loading of protocols/ live run commands is tested in integration test.
-#     """
-#     protocol = ProtocolResource(
-#         protocol_id="my cool protocol",
-#         protocol_key=None,
-#         created_at=datetime(year=2021, month=1, day=1),
-#         source=json_protocol_source,
-#     )
-#
-#     result = await subject.create(
-#         run_id="run-id",
-#         labware_offsets=[],
-#         deck_configuration=[],
-#         protocol=protocol,
-#         notify_publishers=mock_notify_publishers,
-#     )
-#     assert subject.current_run_id == "run-id"
-#     assert isinstance(result, StateSummary)
-#     assert subject._run_orchestrator is not None
-#     assert isinstance(subject._run_orchestrator.runner, JsonRunner)
-#     assert isinstance(subject._run_orchestrator.engine, ProtocolEngine)
+async def test_add_command_and_wait_for_interval(
+    decoy: Decoy,
+    json_protocol_subject: RunOrchestrator,
+    mock_protocol_engine: ProtocolEngine,
+) -> None:
+    """Should add a command a wait for it to complete."""
+    load_command = pe_commands.HomeCreate.construct(
+        params=pe_commands.HomeParams.construct()
+    )
+    added_command = pe_commands.Home(
+        params=pe_commands.HomeParams.construct(),
+        id="test-123",
+        createdAt=datetime(year=2024, month=1, day=1),
+        key="123",
+        status=pe_commands.CommandStatus.QUEUED,
+    )
+    decoy.when(
+        mock_protocol_engine.add_command(request=load_command, failed_command_id=None)
+    ).then_return(added_command)
+
+    result = await json_protocol_subject.add_command_and_wait_for_interval(
+        command=load_command, wait_until_complete=True, timeout=999
+    )
+
+    assert result == added_command

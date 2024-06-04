@@ -143,7 +143,6 @@ class EngineStore:
             self.run_orchestrator.run_id if self._run_orchestrator is not None else None
         )
 
-    # TODO(tz, 2024-5-14): remove this once its all redirected via orchestrator
     # TODO(mc, 2022-03-21): this resource locking is insufficient;
     # come up with something more sophisticated without race condition holes.
     async def get_default_orchestrator(self) -> RunOrchestrator:

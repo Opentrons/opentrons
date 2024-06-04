@@ -70,22 +70,17 @@ class RunOrchestrator:
             json_or_python_protocol_runner: JsonRunner/PythonAndLegacyRunner for protocol commands.
             run_id: run id if any, associated to the runner/engine.
         """
-        self.run_id = run_id
+        self._run_id = run_id
         self._protocol_engine = protocol_engine
         self._hardware_api = hardware_api
         self._protocol_runner = json_or_python_protocol_runner
         self._setup_runner = setup_runner
         self._fixit_runner = fixit_runner
 
-    # @property
-    # def engine(self) -> ProtocolEngine:
-    #     """Get the "current" persisted ProtocolEngine."""
-    #     return self._protocol_engine
-    #
-    # @property
-    # def runner(self) -> AnyRunner:
-    #     """Get the "current" persisted ProtocolRunner."""
-    #     return self._protocol_runner or self._setup_runner
+    @property
+    def run_id(self) -> str:
+        """Get the "current" persisted ProtocolEngine."""
+        return self._run_id
 
     @classmethod
     def build_orchestrator(
