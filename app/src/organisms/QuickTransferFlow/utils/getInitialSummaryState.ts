@@ -67,7 +67,8 @@ export function getInitialSummaryState(
     configCutout =>
       WASTE_CHUTE_FIXTURES.includes(configCutout.cutoutFixtureId) ||
       TRASH_BIN_ADAPTER_FIXTURE === configCutout.cutoutFixtureId
-  )
+    // if no trash or waste chute found, default to a trash bin in A3
+  ) ?? { cutoutId: 'cutoutA3', cutoutFixtureId: TRASH_BIN_ADAPTER_FIXTURE }
 
   return {
     pipette: state.pipette,
@@ -81,12 +82,11 @@ export function getInitialSummaryState(
     volume: state.volume,
     aspirateFlowRate: flowRatesForSupportedTip.defaultAspirateFlowRate.default,
     dispenseFlowRate: flowRatesForSupportedTip.defaultDispenseFlowRate.default,
-    path: path,
+    path,
     tipPositionAspirate: 1,
     preWetTip: false,
     tipPositionDispense: 1,
     changeTip,
-    // @ts-expect-error this will not be undefined if there is a trash in deck config
     dropTipLocation: trashConfigCutout,
   }
 }

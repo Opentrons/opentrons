@@ -35,17 +35,19 @@ export function TipDropLocation(props: TipDropLocationProps): JSX.Element {
   const { t } = useTranslation('quick_transfer')
   const deckConfig = useNotifyDeckConfigurationQuery().data ?? []
 
-  const tipDropLocationOptions = deckConfig.reduce<CutoutConfig[]>(
-    (acc, cutoutConfig) => {
-      if (WASTE_CHUTE_FIXTURES.includes(cutoutConfig.cutoutFixtureId)) {
-        acc.push(cutoutConfig)
-      } else if (TRASH_BIN_ADAPTER_FIXTURE === cutoutConfig.cutoutFixtureId) {
-        acc.push(cutoutConfig)
-      }
-      return acc
-    },
-    []
+  const tipDropLocationOptions = deckConfig.filter(
+    cutoutConfig =>
+      WASTE_CHUTE_FIXTURES.includes(cutoutConfig.cutoutFixtureId) ||
+      TRASH_BIN_ADAPTER_FIXTURE === cutoutConfig.cutoutFixtureId
   )
+
+  // add trash bin in A3 if no trash or waste chute configured
+  if (tipDropLocationOptions.length === 0) {
+    tipDropLocationOptions.push({
+      cutoutId: 'cutoutA3',
+      cutoutFixtureId: TRASH_BIN_ADAPTER_FIXTURE,
+    })
+  }
 
   const [
     selectedTipDropLocation,
