@@ -22,7 +22,10 @@ import { MenuList } from '../../atoms/MenuList'
 import { MenuItem } from '../../atoms/MenuList/MenuItem'
 import { PipetteWizardFlows } from '../../organisms/PipetteWizardFlows'
 import { GripperWizardFlows } from '../../organisms/GripperWizardFlows'
-import { DropTipWizard } from '../../organisms/DropTipWizard'
+import {
+  DropTipWizardFlows,
+  useDropTipWizardFlows,
+} from '../../organisms/DropTipWizardFlows'
 import { FLOWS } from '../../organisms/PipetteWizardFlows/constants'
 import { GRIPPER_FLOW_TYPES } from '../../organisms/GripperWizardFlows/constants'
 
@@ -49,7 +52,6 @@ const InstrumentDetailsOverflowMenu = NiceModal.create(
     const { instrument, host } = props
     const { t } = useTranslation('robot_controls')
     const modal = useModal()
-    const [showDropTipWizard, setShowDropTipWizard] = React.useState(false)
     const [wizardProps, setWizardProps] = React.useState<
       | React.ComponentProps<typeof GripperWizardFlows>
       | React.ComponentProps<typeof PipetteWizardFlows>
@@ -64,6 +66,7 @@ const InstrumentDetailsOverflowMenu = NiceModal.create(
         modal.remove()
       },
     }
+    const { showDTWiz, toggleDTWiz } = useDropTipWizardFlows()
     const pipetteModelSpecs =
       getPipetteModelSpecs((instrument as PipetteData).instrumentModel) ?? null
 
@@ -117,12 +120,7 @@ const InstrumentDetailsOverflowMenu = NiceModal.create(
             </MenuItem>
           ) : null}
           {instrument.mount !== 'extension' ? (
-            <MenuItem
-              key="drop-tips"
-              onClick={() => {
-                setShowDropTipWizard(true)
-              }}
-            >
+            <MenuItem key="drop-tips" onClick={toggleDTWiz}>
               <Flex alignItems={ALIGN_CENTER}>
                 <Icon
                   name="reset-position"
@@ -146,10 +144,10 @@ const InstrumentDetailsOverflowMenu = NiceModal.create(
         {wizardProps != null && !('mount' in wizardProps) ? (
           <GripperWizardFlows {...wizardProps} />
         ) : null}
-        {showDropTipWizard &&
+        {showDTWiz &&
         instrument.mount !== 'extension' &&
         pipetteModelSpecs != null ? (
-          <DropTipWizard
+          <DropTipWizardFlows
             robotType={FLEX_ROBOT_TYPE}
             mount={instrument.mount}
             instrumentModelSpecs={pipetteModelSpecs}

@@ -11,8 +11,9 @@ import { handleInstrumentDetailOverflowMenu } from '../InstrumentDetailOverflowM
 import { useNotifyCurrentMaintenanceRun } from '../../../resources/maintenance_runs'
 import { PipetteWizardFlows } from '../../../organisms/PipetteWizardFlows'
 import { GripperWizardFlows } from '../../../organisms/GripperWizardFlows'
-import { DropTipWizard } from '../../../organisms/DropTipWizard'
+import { useDropTipWizardFlows } from '../../../organisms/DropTipWizardFlows'
 
+import type { Mock } from 'vitest'
 import type {
   PipetteData,
   GripperData,
@@ -30,7 +31,7 @@ vi.mock('@opentrons/shared-data', async importOriginal => {
 vi.mock('../../../resources/maintenance_runs')
 vi.mock('../../../organisms/PipetteWizardFlows')
 vi.mock('../../../organisms/GripperWizardFlows')
-vi.mock('../../../organisms/DropTipWizard')
+vi.mock('../../../organisms/DropTipWizardFlows')
 
 const MOCK_PIPETTE = {
   mount: 'left',
@@ -119,7 +120,11 @@ const render = (pipetteOrGripper: PipetteData | GripperData) => {
   )
 }
 
+let mockToggleDTWiz: Mock
+
 describe('UpdateBuildroot', () => {
+  mockToggleDTWiz = vi.fn()
+
   beforeEach(() => {
     vi.mocked(getPipetteModelSpecs).mockReturnValue({
       displayName: 'mockPipette',
@@ -131,6 +136,10 @@ describe('UpdateBuildroot', () => {
         },
       },
     } as any)
+    vi.mocked(useDropTipWizardFlows).mockReturnValue({
+      showDTWiz: false,
+      toggleDTWiz: mockToggleDTWiz,
+    })
   })
 
   afterEach(() => {
@@ -178,7 +187,7 @@ describe('UpdateBuildroot', () => {
     fireEvent.click(btn)
     fireEvent.click(screen.getByText('Drop tips'))
 
-    expect(vi.mocked(DropTipWizard)).toHaveBeenCalled()
+    expect(vi.mocked(mockToggleDTWiz)).toHaveBeenCalled()
   })
 
   it('renders the gripper calibration wizard when recalibrate is clicked', () => {

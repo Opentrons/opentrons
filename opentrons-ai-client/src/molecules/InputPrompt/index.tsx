@@ -1,7 +1,7 @@
 import React from 'react'
 import { useTranslation } from 'react-i18next'
 import styled, { css } from 'styled-components'
-import { useForm } from 'react-hook-form'
+import { useFormContext } from 'react-hook-form'
 import { useAtom } from 'jotai'
 
 import {
@@ -15,12 +15,7 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { SendButton } from '../../atoms/SendButton'
-import {
-  chatDataAtom,
-  chatHistoryAtom,
-  preparedPromptAtom,
-  tokenAtom,
-} from '../../resources/atoms'
+import { chatDataAtom, chatHistoryAtom, tokenAtom } from '../../resources/atoms'
 import { useApiCall } from '../../resources/hooks'
 import { calcTextAreaHeight } from '../../resources/utils/utils'
 import { END_POINT } from '../../resources/constants'
@@ -28,18 +23,9 @@ import { END_POINT } from '../../resources/constants'
 import type { AxiosRequestConfig } from 'axios'
 import type { ChatData } from '../../resources/types'
 
-interface InputType {
-  userPrompt: string
-}
-
 export function InputPrompt(): JSX.Element {
   const { t } = useTranslation('protocol_generator')
-  const { register, watch, setValue, reset } = useForm<InputType>({
-    defaultValues: {
-      userPrompt: '',
-    },
-  })
-  const [preparedPrompt, setPreparedPrompt] = useAtom(preparedPromptAtom)
+  const { register, watch, reset } = useFormContext()
   const [, setChatData] = useAtom(chatDataAtom)
   const [chatHistory, setChatHistory] = useAtom(chatHistoryAtom)
   const [token] = useAtom(tokenAtom)
@@ -53,7 +39,6 @@ export function InputPrompt(): JSX.Element {
       reply: userPrompt,
     }
     reset()
-    setPreparedPrompt('')
     setChatData(chatData => [...chatData, userInput])
 
     try {
@@ -83,12 +68,6 @@ export function InputPrompt(): JSX.Element {
       throw err
     }
   }
-
-  React.useEffect(() => {
-    if (preparedPrompt !== '') {
-      setValue('userPrompt', preparedPrompt)
-    }
-  }, [preparedPrompt, setPreparedPrompt, setValue])
 
   React.useEffect(() => {
     if (submitted && data != null && !isLoading) {

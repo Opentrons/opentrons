@@ -129,6 +129,7 @@ export const mockFailedRun: RunData = {
     {
       id: '5',
       errorType: 'RuntimeError',
+      isDefined: false,
       createdAt: 'noon forty-five',
       detail: 'this run failed',
       errorInfo: {},

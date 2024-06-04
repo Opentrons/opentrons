@@ -26,10 +26,13 @@ import { ChangePipette } from '../../ChangePipette'
 import { PipetteOverflowMenu } from './PipetteOverflowMenu'
 import { PipetteSettingsSlideout } from './PipetteSettingsSlideout'
 import { AboutPipetteSlideout } from './AboutPipetteSlideout'
+import {
+  DropTipWizardFlows,
+  useDropTipWizardFlows,
+} from '../../DropTipWizardFlows'
 
 import type { PipetteModelSpecs } from '@opentrons/shared-data'
 import type { AttachedPipette, Mount } from '../../../redux/pipettes/types'
-import { DropTipWizard } from '../../DropTipWizard'
 
 interface PipetteCardProps {
   pipetteModelSpecs: PipetteModelSpecs | null
@@ -42,6 +45,7 @@ interface PipetteCardProps {
 
 const POLL_DURATION_MS = 5000
 
+// The OT-2 pipette card.
 export const PipetteCard = (props: PipetteCardProps): JSX.Element => {
   const { t } = useTranslation(['device_details', 'protocol_setup'])
   const {
@@ -65,9 +69,10 @@ export const PipetteCard = (props: PipetteCardProps): JSX.Element => {
     },
   })
   const [showChangePipette, setChangePipette] = React.useState(false)
-  const [showDropTipWizard, setShowDropTipWizard] = React.useState(false)
   const [showSlideout, setShowSlideout] = React.useState(false)
   const [showAboutSlideout, setShowAboutSlideout] = React.useState(false)
+
+  const { showDTWiz, toggleDTWiz } = useDropTipWizardFlows()
 
   const settings =
     usePipetteSettingsQuery({
@@ -77,9 +82,6 @@ export const PipetteCard = (props: PipetteCardProps): JSX.Element => {
 
   const handleChangePipette = (): void => {
     setChangePipette(true)
-  }
-  const handleDropTip = (): void => {
-    setShowDropTipWizard(true)
   }
   const handleAboutSlideout = (): void => {
     setShowAboutSlideout(true)
@@ -103,14 +105,12 @@ export const PipetteCard = (props: PipetteCardProps): JSX.Element => {
           }}
         />
       )}
-      {showDropTipWizard && pipetteModelSpecs != null ? (
-        <DropTipWizard
+      {showDTWiz && pipetteModelSpecs != null ? (
+        <DropTipWizardFlows
           robotType={OT2_ROBOT_TYPE}
           mount={mount}
           instrumentModelSpecs={pipetteModelSpecs}
-          closeFlow={() => {
-            setShowDropTipWizard(false)
-          }}
+          closeFlow={toggleDTWiz}
         />
       ) : null}
       {showSlideout &&
@@ -206,7 +206,7 @@ export const PipetteCard = (props: PipetteCardProps): JSX.Element => {
               pipetteSpecs={pipetteModelSpecs}
               mount={mount}
               handleChangePipette={handleChangePipette}
-              handleDropTip={handleDropTip}
+              handleDropTip={toggleDTWiz}
               handleSettingsSlideout={handleSettingsSlideout}
               handleAboutSlideout={handleAboutSlideout}
               pipetteSettings={settings}
