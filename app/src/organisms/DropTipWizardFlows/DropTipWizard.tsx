@@ -50,7 +50,7 @@ import {
   useDropTipCommandErrors,
   useDropTipErrorComponents,
   useWizardExitHeader,
-} from './utils'
+} from './hooks'
 import { useNotifyDeckConfigurationQuery } from '../../resources/deck_configuration'
 
 import type { PipetteData } from '@opentrons/api-client'
@@ -63,7 +63,7 @@ import type {
 } from '@opentrons/shared-data'
 import type { Axis, Sign, StepSize } from '../../molecules/JogControls/types'
 import type { Jog } from '../../molecules/JogControls'
-import type { ErrorDetails, UseDropTipRoutingResult } from './utils'
+import type { ErrorDetails, UseDropTipRoutingResult } from './hooks'
 import type { DropTipFlowsStep } from './types'
 import type { DropTipWizardFlowsProps } from '.'
 

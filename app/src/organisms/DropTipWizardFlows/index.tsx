@@ -9,7 +9,7 @@ import {
   useDropTipCommands,
   useDropTipRouting,
   useDropTipWithType,
-} from './utils'
+} from './hooks'
 
 import type { PipetteModelSpecs, RobotType } from '@opentrons/shared-data'
 import type { PipetteData } from '@opentrons/api-client'

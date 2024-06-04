@@ -29,7 +29,7 @@ import { DT_ROUTES } from './constants'
 import blowoutVideo from '../../assets/videos/droptip-wizard/Blowout-Liquid.webm'
 import droptipVideo from '../../assets/videos/droptip-wizard/Drop-tip.webm'
 
-import type { UseDropTipRoutingResult } from './utils'
+import type { UseDropTipRoutingResult } from './hooks'
 
 interface BeforeBeginningProps {
   createdMaintenanceRunId: string | null
