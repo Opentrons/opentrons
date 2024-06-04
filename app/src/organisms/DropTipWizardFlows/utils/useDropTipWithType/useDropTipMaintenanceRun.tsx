@@ -1,22 +1,20 @@
 import * as React from 'react'
 
 import { useNotifyCurrentMaintenanceRun } from '../../../../resources/maintenance_runs'
-import { useCreateTargetedMaintenanceRunMutation } from '../../../../resources/runs'
+import {
+  useCreateTargetedMaintenanceRunMutation,
+  useChainMaintenanceCommands,
+} from '../../../../resources/runs'
 import { MANAGED_PIPETTE_ID } from '../../constants'
 
 import type { PipetteModelSpecs, CreateCommand } from '@opentrons/shared-data'
 import type { PipetteData } from '@opentrons/api-client'
-import type { useChainMaintenanceCommands } from '../../../../resources/runs'
-import type { DropTipWizardFlowsProps } from '../..'
-import type { UseDropTipSetupTypeParams } from '.'
 import type { SetRobotErrorDetailsParams } from '../utils'
+import type { UseDTWithTypeParams } from '..'
 
 const RUN_REFETCH_INTERVAL_MS = 5000
 
-type UseDropTipMaintenanceRunParams = UseDropTipSetupTypeParams & {
-  chainRunCommands: ReturnType<
-    typeof useChainMaintenanceCommands
-  >['chainRunCommands']
+type UseDropTipMaintenanceRunParams = UseDTWithTypeParams & {
   setErrorDetails: (errorDetails: SetRobotErrorDetailsParams) => void
 }
 
@@ -25,7 +23,6 @@ export function useDropTipMaintenanceRun({
   issuedCommandsType,
   mount,
   instrumentModelSpecs,
-  chainRunCommands,
   setErrorDetails,
   closeFlow,
 }: UseDropTipMaintenanceRunParams): string | null {
@@ -53,7 +50,6 @@ export function useDropTipMaintenanceRun({
     issuedCommandsType,
     mount,
     instrumentModelName: instrumentModelSpecs.name,
-    chainRunCommands,
     setErrorDetails,
     setCreatedMaintenanceRunId,
   })
@@ -62,12 +58,9 @@ export function useDropTipMaintenanceRun({
 }
 
 interface UseCreateDropTipMaintenanceRunParams {
-  issuedCommandsType: DropTipWizardFlowsProps['issuedCommandsType']
+  issuedCommandsType: UseDTWithTypeParams['issuedCommandsType']
   mount: PipetteData['mount']
   instrumentModelName: PipetteModelSpecs['name']
-  chainRunCommands: ReturnType<
-    typeof useChainMaintenanceCommands
-  >['chainRunCommands']
   setErrorDetails: (errorDetails: SetRobotErrorDetailsParams) => void
   setCreatedMaintenanceRunId: (id: string) => void
 }
@@ -77,10 +70,11 @@ function useCreateDropTipMaintenanceRun({
   issuedCommandsType,
   mount,
   instrumentModelName,
-  chainRunCommands,
   setErrorDetails,
   setCreatedMaintenanceRunId,
 }: UseCreateDropTipMaintenanceRunParams): void {
+  const { chainRunCommands } = useChainMaintenanceCommands()
+
   const {
     createTargetedMaintenanceRun,
   } = useCreateTargetedMaintenanceRunMutation({

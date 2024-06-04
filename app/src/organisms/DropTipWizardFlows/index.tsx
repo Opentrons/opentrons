@@ -5,11 +5,16 @@ import { getPipetteModelSpecs } from '@opentrons/shared-data'
 
 import { DropTipWizard } from './DropTipWizard'
 import { getPipettesWithTipAttached } from './getPipettesWithTipAttached'
-import {type ErrorDetails, useDropTipCommands, useDropTipRouting} from './utils'
+import {
+  useDropTipCommands,
+  useDropTipRouting,
+  useDropTipWithType,
+} from './utils'
 
 import type { PipetteModelSpecs, RobotType } from '@opentrons/shared-data'
-import type { GetPipettesWithTipAttached } from './getPipettesWithTipAttached'
 import type { PipetteData } from '@opentrons/api-client'
+import type { GetPipettesWithTipAttached } from './getPipettesWithTipAttached'
+import type { FailedCommand } from '../ErrorRecoveryFlows/types'
 
 export interface PipetteWithTip {
   mount: 'left' | 'right'
@@ -109,20 +114,35 @@ export function useDropTipWizardFlows(): {
   return { showDTWiz, toggleDTWiz }
 }
 
+export type IssuedCommandsType = 'setup' | 'fixit'
+
+export interface FixitCommandTypeUtils {
+  runId: string
+  failedCommandId: string
+  onCloseFlow: () => void
+}
+
 export interface DropTipWizardFlowsProps {
   robotType: RobotType
   mount: PipetteData['mount']
   instrumentModelSpecs: PipetteModelSpecs
   closeFlow: () => void
-  issuedCommandsType?: 'setup' | 'fixit'
+  /* Optional. If provided, DT will issue "fixit" commands and render alternate Error Recovery compatible views. */
+  fixitCommandTypeUtils?: FixitCommandTypeUtils
 }
 
 export function DropTipWizardFlows(
   props: DropTipWizardFlowsProps
 ): JSX.Element {
+  const issuedCommandsType: IssuedCommandsType = props.fixitCommandTypeUtils
+    ? 'fixit'
+    : 'setup'
+
   // TOME: Use this component to also determine utils used.
-  const issuedCommandsType = props.issuedCommandsType ?? 'setup'
-  const {} = useDropTipCommands(issuedCommandsType)
+  const dropTipWithTypeProps = useDropTipWithType({
+    ...props,
+    issuedCommandsType,
+  })
 
   // TOME: You'll eventually want a get first step function here that takes the override first step or otherwise defaults to before_beginning firs step.
   // TOME: The exitScreen should be its own route as well? How would this work with ER? Think that through!

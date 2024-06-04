@@ -67,8 +67,6 @@ import type { ErrorDetails, UseDropTipRoutingResult } from './utils'
 import type { DropTipFlowsStep } from './types'
 import type { DropTipWizardFlowsProps } from '.'
 
-const JOG_COMMAND_TIMEOUT_MS = 10000
-
 type DropTipWizardProps = DropTipWizardFlowsProps & {
   dropTipRoutingUtils: UseDropTipRoutingResult
 }
@@ -187,24 +185,6 @@ export const DropTipWizardComponent = (
     }
   }
 
-  const handleJog: Jog = (axis: Axis, dir: Sign, step: StepSize): void => {
-    if (createdMaintenanceRunId != null) {
-      createRunCommand({
-        maintenanceRunId: createdMaintenanceRunId,
-        command: {
-          commandType: 'moveRelative',
-          params: { pipetteId: MANAGED_PIPETTE_ID, distance: step * dir, axis },
-        },
-        waitUntilComplete: true,
-        timeout: JOG_COMMAND_TIMEOUT_MS,
-      }).catch((e: Error) => {
-        setSpecificErrorDetails({
-          message: `Error issuing jog command: ${e.message}`,
-        })
-      })
-    }
-  }
-
   const modalContent = buildModalContent()
 
   function buildModalContent(): JSX.Element {
@@ -314,49 +294,7 @@ export const DropTipWizardComponent = (
       return (
         <JogToPosition
           handleJog={handleJog}
-          handleProceed={() => {
-            if (createdMaintenanceRunId != null) {
-              chainRunCommands(
-                createdMaintenanceRunId,
-                [
-                  currentStep === POSITION_AND_BLOWOUT
-                    ? {
-                        commandType: 'blowOutInPlace',
-                        params: {
-                          pipetteId: MANAGED_PIPETTE_ID,
-                          flowRate:
-                            instrumentModelSpecs.defaultBlowOutFlowRate.value,
-                        },
-                      }
-                    : {
-                        commandType: 'dropTipInPlace',
-                        params: { pipetteId: MANAGED_PIPETTE_ID },
-                      },
-                ],
-                true
-              )
-                .then(commandData => {
-                  const error = commandData[0].data.error
-                  if (error != null) {
-                    setSpecificErrorDetails({
-                      runCommandError: error,
-                      message: `Error moving to position: ${error.detail}`,
-                    })
-                  } else {
-                    proceedWithConditionalClose()
-                  }
-                })
-                .catch(e =>
-                  setSpecificErrorDetails({
-                    message: `Error issuing ${
-                      currentStep === POSITION_AND_BLOWOUT
-                        ? 'blowout'
-                        : 'drop tip'
-                    } command: ${e.message}`,
-                  })
-                )
-            }
-          }}
+          handleProceed={() => {}}
           handleGoBack={goBackRunValid}
           body={
             currentStep === POSITION_AND_BLOWOUT

@@ -1,8 +1,11 @@
-// TOME: Change this utils export stuff eventually.
-// TOME: Rename this entire directory to hooks!!
+// TOME: Change this utils export stuff eventually. Also rename this.
 
 export * from './utils'
 export { useDropTipRouting } from './useDropTipRouting'
-export { useDropTipCommands } from './useDropTipCommands'
+export { useDropTipWithType } from './useDropTipWithType'
 
 export type { UseDropTipRoutingResult } from './useDropTipRouting'
+export type {
+  UseDTWithTypeParams,
+  UseDTWithTypeResult,
+} from './useDropTipWithType'
