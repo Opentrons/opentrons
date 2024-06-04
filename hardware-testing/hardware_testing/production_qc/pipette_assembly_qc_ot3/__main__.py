@@ -447,7 +447,10 @@ async def _move_to_fixture(api: OT3API, mount: OT3Mount) -> None:
     )
 
     #Z down 0.5
-    await api.move_rel(mount, Point(z=-0.6))
+    if "single" in pipptype[OT3Mount.LEFT]['name']:
+        await api.move_rel(mount, Point(z=-0.4))
+    elif "multi" in pipptype[OT3Mount.LEFT]['name']:
+        await api.move_rel(mount, Point(z=0.3))
     CALIBRATED_LABWARE_LOCATIONS.fixture = await api.gantry_position(mount)
 
 
