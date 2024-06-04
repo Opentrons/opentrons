@@ -53,7 +53,7 @@ jobs:
           make setup-js
       - name: 'build'
         run: |
-          make -C opentrons-ai-client build NODE_ENV=staging
+          make -C opentrons-ai-client build-staging
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
