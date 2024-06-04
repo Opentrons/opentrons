@@ -8,7 +8,7 @@ from . import types as pip_types, dev_types
 
 # The highest and lowest existing overlap version values.
 TIP_OVERLAP_VERSION_MINIMUM = 0
-TIP_OVERLAP_VERSION_MAXIMUM = 0
+TIP_OVERLAP_VERSION_MAXIMUM = 1
 
 PLUNGER_CURRENT_MINIMUM = 0.1
 PLUNGER_CURRENT_MAXIMUM = 1.5
