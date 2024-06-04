@@ -6,6 +6,7 @@ from typing import Dict, Any, Optional, List, Mapping, Tuple, TypeVar, Union
 
 from .types import CriticalPoint, MotionChecks, Axis
 from .errors import OutOfBoundsMove
+from opentrons_shared_data.errors.exceptions import MissingConfigurationData
 from opentrons.types import Point
 from opentrons_shared_data.pipette.types import PipetteTipType
 from opentrons_shared_data.pipette.pipette_definition import (
@@ -135,8 +136,8 @@ def _get_press_and_cam_configuration_values(
         default = config.configuration_by_nozzle_map[valid_map_key].get("default")
         if default is not None:
             return default
-        raise KeyError(
-            f"Default tip type configuration values do not exist for Nozzle Map {valid_map_key}."
+        raise MissingConfigurationData(
+            message=f"Default tip type configuration values do not exist for Nozzle Map {valid_map_key}."
         )
 
 
@@ -216,15 +217,14 @@ def nominal_tip_overlap_dictionary_by_configuration(
     ):
         if not config:
             continue
-
         try:
             configuration_values = _get_press_and_cam_configuration_values(
                 config, valid_map_key, active_tip_type
             )
             return configuration_values.versioned_tip_overlap_dictionary
-
         except KeyError:
             # No valid key found for the approved nozzle map under this configuration - try the next
             continue
-    # CASEY TODO TBD new error
-    raise ValueError("No valid tip overlap dictionary identified.")
+    raise MissingConfigurationData(
+        message=f"No valid tip overlap dictionaries identified for map {valid_map_key} using tip type {active_tip_type}."
+    )
