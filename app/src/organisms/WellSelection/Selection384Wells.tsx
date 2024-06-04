@@ -47,16 +47,48 @@ export function Selection384Wells({
     number | null
   >(null)
 
-  // to reset last selected index on page-level selected well reset
+  const [startingWellState, setStartingWellState] = React.useState<
+    Record<StartingWellOption, boolean>
+  >({ A1: false, A2: false, B1: false, B2: false })
+
+  // to reset last selected index and starting well state on page-level selected well reset
   React.useEffect(() => {
     if (Object.keys(allSelectedWells).length === 0) {
       setLastSelectedIndex(null)
-      // TODO: reset starting well
+      if (channels === 96) {
+        // uncheck 96-channel starting wells
+        setStartingWellState({ A1: false, A2: false, B1: false, B2: false })
+      }
+      // ensure A1 starting well is checked on mount
+    } else if (allSelectedWells.A1 === null && channels === 96) {
+      setStartingWellState(startingWellState => ({
+        ...startingWellState,
+        A1: true,
+      }))
     }
-  }, [allSelectedWells])
+  }, [allSelectedWells, channels])
 
   const columns = definition.ordering
   const wells = flatten(columns)
+
+  // for 8-channel, filter members of columns for odd/even depending on starting well
+  const oddRowColumns = columns.map(column =>
+    column.filter((_row, i) => i % 2 === 0)
+  )
+
+  const evenRowColumns = columns.map(column =>
+    column.filter((_row, i) => i % 2 !== 0)
+  )
+
+  const multichannelColumns = startingWellState.A1
+    ? oddRowColumns
+    : evenRowColumns
+
+  const selectableColumns =
+    // for 8-channel, use all rows unless only one starting well option is selected
+    channels === 8 && startingWellState.A1 !== startingWellState.B1
+      ? multichannelColumns
+      : columns
 
   const handleMinus = (): void => {
     if (lastSelectedIndex == null) {
@@ -70,7 +102,7 @@ export function Selection384Wells({
     if (selectBy === 'wells') {
       deselectWells(wells.slice(deselectIndex, lastSelectedIndex + 1))
     } else {
-      deselectWells(columns[lastSelectedIndex])
+      deselectWells(selectableColumns[lastSelectedIndex])
     }
 
     setLastSelectedIndex(lastSelectedIndex => {
@@ -88,7 +120,7 @@ export function Selection384Wells({
 
     if (selectBy === 'columns') {
       selectWells(
-        columns[nextIndex].reduce((acc, well) => {
+        selectableColumns[nextIndex].reduce((acc, well) => {
           return { ...acc, [well]: null }
         }, {})
       )
@@ -129,6 +161,8 @@ export function Selection384Wells({
             columns={columns}
             deselectWells={deselectWells}
             selectWells={selectWells}
+            startingWellState={startingWellState}
+            setStartingWellState={setStartingWellState}
           />
         )}
         <ButtonControls
@@ -185,22 +219,24 @@ function StartingWell({
   columns,
   deselectWells,
   selectWells,
+  startingWellState,
+  setStartingWellState,
 }: {
   channels: PipetteChannels
   columns: string[][]
   deselectWells: (wells: string[]) => void
   selectWells: (wellGroup: WellGroup) => void
+  startingWellState: Record<StartingWellOption, boolean>
+  setStartingWellState: React.Dispatch<
+    React.SetStateAction<Record<StartingWellOption, boolean>>
+  >
 }): JSX.Element {
   const { t, i18n } = useTranslation('quick_transfer')
-
-  const [startingWellState, setStartingWellState] = React.useState<
-    Record<StartingWellOption, boolean>
-  >({ A1: true, A2: false, B1: false, B2: false })
 
   const checkboxWellOptions: StartingWellOption[] =
     channels === 8 ? ['A1', 'B1'] : ['A1', 'A2', 'B1', 'B2']
 
-  // for 96 channel: even/odd columns to be used based on labware column label, not index
+  // for 96-channel: even/odd columns to be used based on labware column label, not index
   const oddColumns = columns.filter((_column, i) => i % 2 === 0)
   const oddColumnWells = flatten(oddColumns)
 
@@ -239,10 +275,12 @@ function StartingWell({
     B2: B2WellGroup,
   }
 
-  // on mount, select A1 well group
+  // on mount, select A1 well group for 96-channel
   React.useEffect(() => {
-    selectWells(wellGroupByStartingWell.A1)
-    // TODO: 8-channel, select first column
+    if (channels === 96) {
+      selectWells(wellGroupByStartingWell.A1)
+    }
+    setStartingWellState({ A1: true, A2: false, B1: false, B2: false })
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
@@ -257,10 +295,12 @@ function StartingWell({
           isChecked={startingWellState[well]}
           labelText={well}
           onClick={() => {
-            if (startingWellState[well]) {
-              deselectWells(Object.keys(wellGroupByStartingWell[well]))
-            } else {
-              selectWells(wellGroupByStartingWell[well])
+            if (channels === 96) {
+              if (startingWellState[well]) {
+                deselectWells(Object.keys(wellGroupByStartingWell[well]))
+              } else {
+                selectWells(wellGroupByStartingWell[well])
+              }
             }
 
             setStartingWellState(startingWellState => ({
