@@ -14492,6 +14492,10 @@
       "role": "labware"
     },
     {
+      "name": "eppendorf_96_well_plate_150.json",
+      "role": "labware"
+    },
+    {
       "name": "opentrons_ot3_96_tiprack_1000ul_rss.json",
       "role": "labware"
     },

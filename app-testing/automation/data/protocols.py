@@ -719,6 +719,79 @@ class Protocols:
         robot_error=True,
     )
 
+    Flex_S_v2_18_AMPure_XP_48x: Protocol = Protocol(
+        file_stem="Flex_S_v2_18_AMPure_XP_48x",
+        file_extension="py",
+        robot="Flex",
+        app_error=False,
+        robot_error=False,
+    )
+
+    Flex_S_v2_18_IDT_xGen_EZ_48x: Protocol = Protocol(
+        file_stem="Flex_S_v2_18_IDT_xGen_EZ_48x",
+        file_extension="py",
+        robot="Flex",
+        app_error=False,
+        robot_error=False,
+    )
+
+    Flex_S_v2_18_Illumina_DNA_Prep_48x: Protocol = Protocol(
+        file_stem="Flex_S_v2_18_Illumina_DNA_Prep_48x",
+        file_extension="py",
+        robot="Flex",
+        app_error=False,
+        robot_error=False,
+    )
+
+    Flex_S_v2_18_Illumina_Stranded_total_RNA_Ribo_Zero: Protocol = Protocol(
+        file_stem="Flex_S_v2_18_Illumina_Stranded_total_RNA_Ribo_Zero",
+        file_extension="py",
+        robot="Flex",
+        app_error=False,
+        robot_error=False,
+        custom_labware=["eppendorf_96_well_plate_150_µl"]
+    )
+
+    Flex_S_v2_18_KAPA_Library_Quant: Protocol = Protocol(
+        file_stem="Flex_S_v2_18_KAPA_Library_Quant",
+        file_extension="py",
+        robot="Flex",
+        app_error=False,
+        robot_error=False,
+    )
+
+    Flex_S_v2_18_kapahyperplus: Protocol = Protocol(
+        file_stem="Flex_S_v2_18_kapahyperplus",
+        file_extension="py",
+        robot="Flex",
+        app_error=False,
+        robot_error=False,
+    )
+
+    Flex_S_v2_18_ligseq: Protocol = Protocol(
+        file_stem="Flex_S_v2_18_ligseq",
+        file_extension="py",
+        robot="Flex",
+        app_error=False,
+        robot_error=False,
+    )
+
+    Flex_S_v2_18_QIASeq_FX_48x: Protocol = Protocol(
+        file_stem="Flex_S_v2_18_QIASeq_FX_48x",
+        file_extension="py",
+        robot="Flex",
+        app_error=False,
+        robot_error=False,
+    )
+
+    Flex_S_v2_18_Illumina_DNA_PCR_Free: Protocol = Protocol(
+        file_stem="Flex_S_v2_18_Illumina_DNA_PCR_Free",
+        file_extension="py",
+        robot="Flex",
+        app_error=False,
+        robot_error=False,
+    )
+
     OT2_X_v2_18_None_None_duplicateRTPVariableName: Protocol = Protocol(
         file_stem="OT2_X_v2_18_None_None_duplicateRTPVariableName",
         file_extension="py",
