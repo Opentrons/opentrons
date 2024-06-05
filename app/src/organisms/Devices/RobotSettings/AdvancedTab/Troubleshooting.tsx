@@ -27,12 +27,10 @@ import type { IconProps } from '@opentrons/components'
 
 interface TroubleshootingProps {
   robotName: string
-  isEstopNotDisengaged: boolean
 }
 
 export function Troubleshooting({
   robotName,
-  isEstopNotDisengaged,
 }: TroubleshootingProps): JSX.Element {
   const { t } = useTranslation('device_settings')
   const robot = useRobot(robotName)
@@ -127,10 +125,7 @@ export function Troubleshooting({
       </Box>
       <TertiaryButton
         disabled={
-          controlDisabled ||
-          logsAvailable == null ||
-          isDownloadingRobotLogs ||
-          isEstopNotDisengaged
+          controlDisabled || logsAvailable == null || isDownloadingRobotLogs
         }
         marginLeft={SPACING_AUTO}
         onClick={handleClick}
