@@ -35,7 +35,6 @@ interface Selection384WellsProps {
 // magic numbers for 384 well plates
 const WELL_COUNT_384 = 384
 const COLUMN_COUNT_384 = 24
-const ROW_COUNT_384 = 16
 
 export function Selection384Wells({
   allSelectedWells,
@@ -99,22 +98,16 @@ export function Selection384Wells({
     if (lastSelectedIndex == null) {
       return
     }
-    const deselectIndex =
-      selectBy === 'wells'
-        ? lastSelectedIndex - (lastSelectedIndex % ROW_COUNT_384)
-        : lastSelectedIndex
 
     if (selectBy === 'wells') {
-      deselectWells(wells.slice(deselectIndex, lastSelectedIndex + 1))
+      deselectWells([wells[lastSelectedIndex]])
     } else {
       deselectWells(columns[lastSelectedIndex])
     }
 
     setLastSelectedIndex(lastSelectedIndex => {
       if (lastSelectedIndex != null && lastSelectedIndex !== 0) {
-        const deselectQuantity =
-          selectBy === 'wells' ? lastSelectedIndex % ROW_COUNT_384 : 0
-        return lastSelectedIndex - deselectQuantity - 1
+        return lastSelectedIndex - 1
       } else {
         return null
       }
