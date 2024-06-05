@@ -21,7 +21,7 @@ test_opts ?=
 #####################################################################
 
 .PHONY: all
-all: clean build
+all: clean build-production
 
 .PHONY: setup
 setup:
@@ -34,16 +34,15 @@ clean:
 # artifacts
 #####################################################################
 
-.PHONY: build
-build: export NODE_ENV := production
-build:
+.PHONY: build-production
+build-production: export NODE_ENV := production
+build-production:
 	vite build
 	git rev-parse HEAD > dist/.commit
 
-
 .PHONY: build-staging
-build: export NODE_ENV := staging
-build:
+build-staging: export NODE_ENV := staging
+build-staging:
 	vite build
 	git rev-parse HEAD > dist/.commit
 
