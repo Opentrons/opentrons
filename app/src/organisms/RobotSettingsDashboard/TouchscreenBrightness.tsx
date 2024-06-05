@@ -14,9 +14,7 @@ import {
   Flex,
   JUSTIFY_CENTER,
   SPACING,
-  RESPONSIVENESS,
 } from '@opentrons/components'
-import { ODD_FOCUS_VISIBLE } from '../../atoms/buttons/constants'
 
 import { ChildNavigation } from '../../organisms/ChildNavigation'
 import {
