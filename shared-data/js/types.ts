@@ -404,7 +404,7 @@ interface pressAndCamConfigurationValues {
   speed: number
   distance: number
   current: number
-  tipOverlaps: Record<string, Record<string, number>>
+  tipOverlaps: { [version: string]: { [labwareURI: string]: number } }
 }
 export interface PipetteV2GeneralSpecs {
   displayName: string
