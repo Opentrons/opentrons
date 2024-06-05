@@ -163,7 +163,6 @@ export function HistoricalProtocolRunOffsetDrawer(
             marginY={SPACING.spacing4}
             borderRadius={BORDERS.borderRadius4}
             gridGap={SPACING.spacing24}
-            id="data-row"
           >
             <Box width="23.25%">
               <StyledText as="label">
