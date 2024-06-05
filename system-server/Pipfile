@@ -14,6 +14,7 @@ pydantic = "==1.10.12"
 importlib-metadata = ">=4.13.0,<5"
 sqlalchemy = "==1.4.51"
 pyjwt = "==2.6.0"
+filetype = "==1.2.0"
 systemd-python = { version = "==234", markers="sys_platform == 'linux'" }
 server-utils = {editable = true, path = "./../server-utils"}
 system_server = {path = ".", editable = true}
