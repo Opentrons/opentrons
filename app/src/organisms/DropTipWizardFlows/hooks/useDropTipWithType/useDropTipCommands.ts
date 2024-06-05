@@ -38,13 +38,14 @@ type UseDropTipSetupCommandsParams = UseDTWithTypeParams & {
 
 export interface UseDropTipCommandsResult {
   /*  */
-  handleCleanUpAndClose: (homeOnExit: boolean) => Promise<void>
+  handleCleanUpAndClose: (homeOnExit?: boolean) => Promise<void>
   moveToAddressableArea: (addressableArea: AddressableAreaName) => Promise<void>
   handleJog: (axis: Axis, dir: Sign, step: StepSize) => Promise<void>
   blowoutOrDropTip: (
     currentStep: DropTipFlowsStep,
     proceed: () => void
   ) => Promise<void>
+  handleMustHome: () => Promise<void>
 }
 
 /** TOME: Next is figuring out how to do the jog properly if it's a fixit command.
@@ -101,38 +102,44 @@ export function useDropTipCommands({
   const moveToAddressableArea = (
     addressableArea: AddressableAreaName
   ): Promise<void> => {
-    const addressableAreaFromConfig = getAddressableAreaFromConfig(
-      addressableArea,
-      deckConfig,
-      instrumentModelSpecs.channels,
-      robotType
-    )
-    if (addressableAreaFromConfig != null) {
-      const moveToAACommand = buildMoveToAACommand(addressableAreaFromConfig)
-
-      return chainRunCommands([moveToAACommand], true).then(
-        (commandData: CommandData[]) => {
-          const error = commandData[0].data.error
-          if (error != null) {
-            setErrorDetails({
-              runCommandError: error,
-              message: `Error moving to position: ${error.detail}`,
-            })
-          }
-        }
+    return new Promise((resolve, reject) => {
+      const addressableAreaFromConfig = getAddressableAreaFromConfig(
+        addressableArea,
+        deckConfig,
+        instrumentModelSpecs.channels,
+        robotType
       )
-    } else {
-      setErrorDetails({
-        message: `Error moving to position: invalid addressable area.`,
-      })
 
-      return Promise.resolve()
-    }
+      if (addressableAreaFromConfig != null) {
+        const moveToAACommand = buildMoveToAACommand(addressableAreaFromConfig)
+
+        return chainRunCommands([moveToAACommand], true)
+          .then((commandData: CommandData[]) => {
+            const error = commandData[0].data.error
+            if (error != null) {
+              setErrorDetails({
+                runCommandError: error,
+                message: `Error moving to position: ${error.detail}`,
+              })
+            }
+          })
+          .then(resolve)
+          .catch(error =>
+            reject(
+              new Error(`Error issuing move to addressable area: ${error}`)
+            )
+          )
+      } else {
+        setErrorDetails({
+          message: `Error moving to position: invalid addressable area.`,
+        })
+      }
+    })
   }
 
   // TOME: You want to ALSO pass this wrapper into the function instead of passing createMaintenanceCommand.
   const handleJog = (axis: Axis, dir: Sign, step: StepSize): Promise<void> => {
-    return new Promise(() => {
+    return new Promise((resolve, reject) => {
       return runCommand({
         command: {
           commandType: 'moveRelative',
@@ -141,11 +148,12 @@ export function useDropTipCommands({
         waitUntilComplete: true,
         timeout: JOG_COMMAND_TIMEOUT_MS,
       })
-        .then(() => Promise.resolve())
+        .then(() => resolve())
         .catch((error: Error) => {
           setErrorDetails({
             message: `Error issuing jog command: ${error.message}`,
           })
+          resolve()
         })
     })
   }
@@ -154,7 +162,7 @@ export function useDropTipCommands({
     currentStep: DropTipFlowsStep,
     proceed: () => void
   ): Promise<void> => {
-    return new Promise(() => {
+    return new Promise((resolve, reject) => {
       const blowoutCommand = buildBlowoutInPlaceCommand(instrumentModelSpecs)
 
       chainRunCommands(
@@ -170,15 +178,31 @@ export function useDropTipCommands({
             })
           } else {
             proceed()
+            resolve()
           }
         })
-        .catch((error: Error) =>
+        .catch((error: Error) => {
           setErrorDetails({
             message: `Error issuing ${
               currentStep === POSITION_AND_BLOWOUT ? 'blowout' : 'drop tip'
             } command: ${error.message}`,
           })
-        )
+          resolve()
+        })
+    })
+  }
+
+  const handleMustHome = (): Promise<void> => {
+    return new Promise((resolve, reject) => {
+      return chainRunCommands([HOME], true)
+        .then(() => handleCleanUpAndClose())
+        .then(resolve)
+        .catch((error: Error) => {
+          setErrorDetails({
+            message: `Error homing ${error}`,
+          })
+          resolve()
+        })
     })
   }
 
@@ -187,10 +211,16 @@ export function useDropTipCommands({
     moveToAddressableArea,
     handleJog,
     blowoutOrDropTip,
+    handleMustHome,
   }
 }
 
 // Commands and command builders.
+
+const HOME: CreateCommand = {
+  commandType: 'home' as const,
+  params: {},
+}
 
 const HOME_EXCEPT_PLUNGERS: CreateCommand = {
   commandType: 'home' as const,

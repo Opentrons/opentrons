@@ -23,7 +23,6 @@ import {
 } from '@opentrons/components'
 
 import { SmallButton, MediumButton } from '../../atoms/buttons'
-import { InProgressModal } from '../../molecules/InProgressModal/InProgressModal'
 import { DT_ROUTES } from './constants'
 
 import blowoutVideo from '../../assets/videos/droptip-wizard/Blowout-Liquid.webm'
@@ -32,7 +31,6 @@ import droptipVideo from '../../assets/videos/droptip-wizard/Drop-tip.webm'
 import type { UseDropTipRoutingResult } from './hooks'
 
 interface BeforeBeginningProps {
-  createdMaintenanceRunId: string | null
   isOnDevice: boolean
   proceedToRoute: UseDropTipRoutingResult['proceedToRoute']
 }
@@ -40,7 +38,7 @@ interface BeforeBeginningProps {
 export const BeforeBeginning = (
   props: BeforeBeginningProps
 ): JSX.Element | null => {
-  const { proceedToRoute, createdMaintenanceRunId, isOnDevice } = props
+  const { proceedToRoute, isOnDevice } = props
   const { i18n, t } = useTranslation(['drop_tip_wizard', 'shared'])
   const [flowType, setFlowType] = React.useState<
     'blowout' | 'drop_tips' | null
@@ -55,9 +53,6 @@ export const BeforeBeginning = (
   }
 
   // TOME: Please refactor this out. We don't want conditional stuff like this!
-  if (createdMaintenanceRunId == null) {
-    return <InProgressModal description={t('getting_ready')} />
-  }
 
   if (isOnDevice) {
     return (

@@ -70,6 +70,8 @@ export function useDropTipCreateCommands({
     return new Promise((resolve, reject) => {
       if (issuedCommandsType === 'fixit') {
         void chainRunFixitCommands(commands, continuePastFailure)
+          .then(resolve)
+          .catch(reject)
       } else {
         if (activeMaintenanceRunId !== null) {
           return chainRunSetupCommands(
@@ -77,6 +79,8 @@ export function useDropTipCreateCommands({
             commands,
             continuePastFailure
           )
+            .then(resolve)
+            .catch(reject)
         } else {
           setErrorDetails({ message: 'No active maintenance run found.' })
           reject(new Error('No active maintenance run found.'))
@@ -94,12 +98,16 @@ export function useDropTipCreateCommands({
           failedCommandId,
           ...params,
         })
+          .then(resolve)
+          .catch(reject)
       } else {
         if (activeMaintenanceRunId !== null) {
           return createMaintenanceCommand({
             maintenanceRunId: activeMaintenanceRunId,
             ...params,
           })
+            .then(resolve)
+            .catch(reject)
         } else {
           setErrorDetails({ message: 'No active maintenance run found.' })
           reject(new Error('No active maintenance run found.'))

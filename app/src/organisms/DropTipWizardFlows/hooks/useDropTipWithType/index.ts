@@ -14,7 +14,7 @@ export type UseDTWithTypeParams = DropTipWizardFlowsProps & {
   issuedCommandsType: IssuedCommandsType
 }
 
-export interface UseDTWithTypeResult {
+export interface UseDropTipWithTypeResult {
   activeMaintenanceRunId: string | null
   errorDetails: ErrorDetails | null
   isExiting: boolean
@@ -30,7 +30,7 @@ export interface UseDTWithTypeResult {
  */
 export function useDropTipWithType(
   params: UseDTWithTypeParams
-): UseDTWithTypeResult {
+): UseDropTipWithTypeResult {
   const { issuedCommandsType, fixitCommandTypeUtils } = params
 
   const { isExiting, toggleIsExiting } = useIsExitingDT(issuedCommandsType)

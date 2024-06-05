@@ -7,7 +7,6 @@ import { DROP_TIP_SPECIAL_ERROR_TYPES } from '../constants'
 import { SmallButton } from '../../../atoms/buttons'
 
 import type { RunCommandError } from '@opentrons/shared-data'
-import type { useChainMaintenanceCommands } from '../../../resources/runs'
 
 export interface ErrorDetails {
   message: string
@@ -21,6 +20,8 @@ export interface SetRobotErrorDetailsParams {
   header?: string
   type?: RunCommandError['errorType']
 }
+
+//TOME: Rename and split these out!
 
 /**
  * @description Wraps the error state setter, updating the setter if the error should be special-cased.
@@ -55,36 +56,26 @@ export function useDropTipCommandErrors(
   }
 }
 
-interface DropTipErrorComponents {
+export interface DropTipErrorComponents {
   button: JSX.Element | null
   subHeader: JSX.Element
 }
 
 export interface UseDropTipErrorComponentsProps {
   isOnDevice: boolean
-  t: (translationString: string) => string
-  maintenanceRunId: string | null
-  onClose: () => void
   errorDetails: ErrorDetails | null
-  chainRunCommands: ReturnType<
-    typeof useChainMaintenanceCommands
-  >['chainRunCommands']
+  handleMustHome: () => Promise<void>
 }
 
 /**
  * @description Returns special-cased components given error details.
  */
 export function useDropTipErrorComponents({
-  t,
-  maintenanceRunId,
-  onClose,
   errorDetails,
   isOnDevice,
-  chainRunCommands,
+  handleMustHome,
 }: UseDropTipErrorComponentsProps): DropTipErrorComponents {
-  return errorDetails?.type === DROP_TIP_SPECIAL_ERROR_TYPES.MUST_HOME_ERROR
-    ? buildHandleMustHome()
-    : buildGenericError()
+  const { t } = useTranslation('drop_tip_wizard')
 
   function buildGenericError(): DropTipErrorComponents {
     return {
@@ -101,19 +92,7 @@ export function useDropTipErrorComponents({
 
   function buildHandleMustHome(): DropTipErrorComponents {
     const handleOnClick = (): void => {
-      if (maintenanceRunId !== null) {
-        void chainRunCommands(
-          maintenanceRunId,
-          [
-            {
-              commandType: 'home' as const,
-              params: {},
-            },
-          ],
-          true
-        )
-        onClose()
-      }
+      void handleMustHome()
     }
 
     return {
@@ -132,6 +111,10 @@ export function useDropTipErrorComponents({
       subHeader: <>{errorDetails?.message}</>,
     }
   }
+
+  return errorDetails?.type === DROP_TIP_SPECIAL_ERROR_TYPES.MUST_HOME_ERROR
+    ? buildHandleMustHome()
+    : buildGenericError()
 }
 
 export interface UseWizardExitHeaderProps {

@@ -53,14 +53,11 @@ export function DropTipWizardFlows(
     ? 'fixit'
     : 'setup'
 
-  // TOME: Use this component to also determine utils used.
   const dropTipWithTypeUtils = useDropTipWithType({
     ...props,
     issuedCommandsType,
   })
 
-  // TOME: You'll eventually want a get first step function here that takes the override first step or otherwise defaults to before_beginning firs step.
-  // TOME: The exitScreen should be its own route as well? How would this work with ER? Think that through!
   const dropTipRoutingUtils = useDropTipRouting()
 
   return (
@@ -68,6 +65,7 @@ export function DropTipWizardFlows(
       {...props}
       {...dropTipWithTypeUtils}
       {...dropTipRoutingUtils}
+      issuedCommandsType={issuedCommandsType}
     />
   )
 }

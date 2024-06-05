@@ -7,5 +7,5 @@ export { useDropTipWithType } from './useDropTipWithType'
 export type { UseDropTipRoutingResult } from './useDropTipRouting'
 export type {
   UseDTWithTypeParams,
-  UseDTWithTypeResult,
+  UseDropTipWithTypeResult,
 } from './useDropTipWithType'

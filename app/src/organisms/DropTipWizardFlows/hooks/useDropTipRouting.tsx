@@ -134,7 +134,7 @@ function getDropTipRouteNavigation(
     } else {
       const stepIndex = route.indexOf(step)
       return {
-        index: stepIndex + 1,
+        index: stepIndex - 1,
         updatedStep: stepIndex !== -1 ? route[stepIndex - 1] : INVALID,
       }
     }
