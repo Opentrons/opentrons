@@ -32,6 +32,11 @@ interface Selection384WellsProps {
   selectWells: (wellGroup: WellGroup) => unknown
 }
 
+// magic numbers for 384 well plates
+const WELL_COUNT_384 = 384
+const COLUMN_COUNT_384 = 24
+const ROW_COUNT_384 = 16
+
 export function Selection384Wells({
   allSelectedWells,
   channels,
@@ -96,7 +101,7 @@ export function Selection384Wells({
     }
     const deselectIndex =
       selectBy === 'wells'
-        ? lastSelectedIndex - (lastSelectedIndex % 16)
+        ? lastSelectedIndex - (lastSelectedIndex % ROW_COUNT_384)
         : lastSelectedIndex
 
     if (selectBy === 'wells') {
@@ -108,7 +113,7 @@ export function Selection384Wells({
     setLastSelectedIndex(lastSelectedIndex => {
       if (lastSelectedIndex != null && lastSelectedIndex !== 0) {
         const deselectQuantity =
-          selectBy === 'wells' ? lastSelectedIndex % 16 : 0
+          selectBy === 'wells' ? lastSelectedIndex % ROW_COUNT_384 : 0
         return lastSelectedIndex - deselectQuantity - 1
       } else {
         return null
@@ -352,8 +357,8 @@ function ButtonControls(props: ButtonControlsProps): JSX.Element {
           <IconButton
             disabled={
               selectBy === 'columns'
-                ? lastSelectedIndex === 23
-                : lastSelectedIndex === 383
+                ? lastSelectedIndex === COLUMN_COUNT_384 - 1
+                : lastSelectedIndex === WELL_COUNT_384 - 1
             }
             onClick={handlePlus}
             iconName="plus"
