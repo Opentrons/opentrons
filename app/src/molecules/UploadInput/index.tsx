@@ -46,7 +46,7 @@ const StyledInput = styled.input`
 export interface UploadInputProps {
   /** Callback function that is called when a file is uploaded. */
   onUpload: (file: File) => unknown
-  /** ptional callback function that is called when the upload button is clicked. */
+  /** Optional callback function that is called when the upload button is clicked. */
   onClick?: () => void
   /** Optional text for the upload button. If undefined, the button displays Upload */
   uploadButtonText?: string
