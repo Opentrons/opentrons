@@ -171,7 +171,6 @@ def _get_default_value_for(  # noqa: C901
                 return _do_get_default_value_for(remaining_config[tip_list[-1]], rest)
             elif first == "##EACHNOZZLEMAP##":
                 map_list = list(remaining_config.keys())
-                map_list.sort(key=lambda o: o.value if isinstance(o, Enum) else o)
                 return _do_get_default_value_for(remaining_config[map_list[-1]], rest)
             elif first == "##EACHTIPTYPE##":
                 for key in remaining_config.keys():

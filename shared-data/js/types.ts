@@ -400,17 +400,28 @@ export interface FlowRateSpec {
   max: number
 }
 
+interface pressAndCamConfigurationValues {
+  speed: number
+  distance: number
+  current: number
+  tipOverlaps: Record<string, Record<string, number>>
+}
 export interface PipetteV2GeneralSpecs {
   displayName: string
   model: string
   displayCategory: PipetteDisplayCategory
+  validNozzleMaps: {
+    maps: { [nozzleMapKey: string]: string[] }
+  }
   pickUpTipConfigurations: {
     pressFit: {
-      speedByTipCount: Record<string, number>
       presses: number
       increment: number
-      distanceByTipCount: Record<string, number>
-      currentByTipCount: Record<string, number>
+      configurationsByNozzleMap: {
+        [nozzleMapKey: string]: {
+          [tipType: string]: pressAndCamConfigurationValues
+        }
+      }
     }
   }
   dropTipConfigurations: {

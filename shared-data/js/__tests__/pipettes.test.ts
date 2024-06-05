@@ -108,13 +108,14 @@ describe('pipette data accessors', () => {
         nozzleMap: expect.anything(),
         pathTo3D:
           'pipette/definitions/2/geometry/single_channel/p1000/placeholder.gltf',
+        validNozzleMaps: {
+          maps: expect.anything(),
+        },
         pickUpTipConfigurations: {
           pressFit: {
-            speedByTipCount: expect.anything(),
             presses: 1,
             increment: 0,
-            distanceByTipCount: expect.anything(),
-            currentByTipCount: expect.anything(),
+            configurationsByNozzleMap: expect.anything(),
           },
         },
         partialTipConfigurations: {
