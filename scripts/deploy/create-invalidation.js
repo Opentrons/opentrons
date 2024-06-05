@@ -3,7 +3,11 @@ const {
   CreateInvalidationCommand,
 } = require('@aws-sdk/client-cloudfront')
 
-async function getCreateInvalidation(productionCredentials, cloudfrontArn, dryrun) {
+async function getCreateInvalidation(
+  productionCredentials,
+  cloudfrontArn,
+  dryrun
+) {
   const client = new CloudFrontClient({
     region: 'us-east-1',
     credentials: productionCredentials,
