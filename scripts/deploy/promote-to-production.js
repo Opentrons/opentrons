@@ -80,8 +80,10 @@ async function runPromoteToProduction() {
     )
     console.log('Promotion to production done\n')
 
-    await getCreateInvalidation(productionCredentials, cloudfrontArn)
-    console.log('Cache invalidation initiated for production\n')
+    await getCreateInvalidation(productionCredentials, cloudfrontArn, dryrun)
+    console.log(
+      `${dryrun ? 'DRYRUN: ' : ''}Cache invalidation initiated for production\n`
+    )
     process.exit(0)
   } catch (error) {
     console.error(error.message)
