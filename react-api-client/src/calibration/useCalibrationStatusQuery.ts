@@ -1,6 +1,7 @@
 import { getCalibrationStatus } from '@opentrons/api-client'
 import { useQuery } from 'react-query'
 import { useHost } from '../api'
+import { getSanitizedQueryKeyObject } from '../utils'
 
 import type { UseQueryOptions, UseQueryResult } from 'react-query'
 import type { CalibrationStatus, HostConfig } from '@opentrons/api-client'
@@ -18,7 +19,7 @@ export function useCalibrationStatusQuery(
   const host =
     hostOverride != null ? { ...contextHost, ...hostOverride } : contextHost
   const query = useQuery(
-    [host as HostConfig, 'calibration', 'status'],
+    [getSanitizedQueryKeyObject(host) as HostConfig, 'calibration', 'status'],
     () =>
       getCalibrationStatus(host as HostConfig).then(response => response.data),
     { enabled: host !== null, ...options }

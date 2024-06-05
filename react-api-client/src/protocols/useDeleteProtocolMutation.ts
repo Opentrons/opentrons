@@ -1,6 +1,7 @@
 import { useMutation, useQueryClient } from 'react-query'
 import { deleteProtocol } from '@opentrons/api-client'
 import { useHost } from '../api'
+import { getSanitizedQueryKeyObject } from '../utils'
 import type { UseMutationResult, UseMutateFunction } from 'react-query'
 import type { HostConfig, EmptyResponse } from '@opentrons/api-client'
 
@@ -20,7 +21,10 @@ export function useDeleteProtocolMutation(
 
   const mutation = useMutation<EmptyResponse, unknown>(() =>
     deleteProtocol(host as HostConfig, protocolId).then(response => {
-      queryClient.invalidateQueries([host, 'protocols'])
+      queryClient.invalidateQueries([
+        getSanitizedQueryKeyObject(host),
+        'protocols',
+      ])
       return response.data
     })
   )

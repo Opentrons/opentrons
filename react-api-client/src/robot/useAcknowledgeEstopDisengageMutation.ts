@@ -1,6 +1,7 @@
 import { useMutation } from 'react-query'
 import { acknowledgeEstopDisengage } from '@opentrons/api-client'
 import { useHost } from '../api'
+import { getSanitizedQueryKeyObject } from '../utils'
 import type { AxiosError } from 'axios'
 import type {
   UseMutationResult,
@@ -31,7 +32,10 @@ export function useAcknowledgeEstopDisengageMutation(
     hostOverride != null ? { ...contextHost, ...hostOverride } : contextHost
 
   const mutation = useMutation<EstopStatus, AxiosError, unknown>(
-    [host, 'robot/control/acknowledgeEstopDisengage'],
+    [
+      getSanitizedQueryKeyObject(host),
+      'robot/control/acknowledgeEstopDisengage',
+    ],
     () =>
       acknowledgeEstopDisengage(host as HostConfig)
         .then(response => response.data)

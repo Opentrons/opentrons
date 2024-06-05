@@ -1,6 +1,7 @@
 import { createSession } from '@opentrons/api-client'
 import { useMutation } from 'react-query'
 import { useHost } from '../api'
+import { getSanitizedQueryKeyObject } from '../utils'
 
 import type { UseMutationResult, UseMutateFunction } from 'react-query'
 import type {
@@ -21,12 +22,14 @@ export function useCreateSessionMutation(
   createSessionData: CreateSessionData
 ): UseCreateSessionMutationResult {
   const host = useHost()
-  const mutation = useMutation<Session, Error>(['session', host], () =>
-    createSession(host as HostConfig, createSessionData)
-      .then(response => response.data)
-      .catch((e: Error) => {
-        throw e
-      })
+  const mutation = useMutation<Session, Error>(
+    ['session', getSanitizedQueryKeyObject(host)],
+    () =>
+      createSession(host as HostConfig, createSessionData)
+        .then(response => response.data)
+        .catch((e: Error) => {
+          throw e
+        })
   )
   return {
     ...mutation,

@@ -1,6 +1,7 @@
 import { useQuery } from 'react-query'
 import { getModules } from '@opentrons/api-client'
 import { useHost } from '../api'
+import { getSanitizedQueryKeyObject } from '../utils'
 import type { UseQueryResult, UseQueryOptions } from 'react-query'
 import type { HostConfig, Modules } from '@opentrons/api-client'
 import { MODULE_MODELS } from '@opentrons/shared-data'
@@ -12,7 +13,7 @@ export function useModulesQuery(
 ): UseQueryResult<Modules> {
   const host = useHost()
   const query = useQuery<Modules>(
-    [host, 'modules'],
+    [getSanitizedQueryKeyObject(host), 'modules'],
     () =>
       getModules(host as HostConfig).then(response => {
         const modules = response.data?.data ?? []

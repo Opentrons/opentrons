@@ -1,6 +1,7 @@
 import { createRun } from '@opentrons/api-client'
 import { useMutation } from 'react-query'
 import { useHost } from '../api'
+import { getSanitizedQueryKeyObject } from '../utils'
 import type { AxiosError } from 'axios'
 import type {
   UseMutationResult,
@@ -31,7 +32,7 @@ export function useCreateRunMutation(
   const host =
     hostOverride != null ? { ...contextHost, ...hostOverride } : contextHost
   const mutation = useMutation<Run, AxiosError, CreateRunData>(
-    [host, 'runs'],
+    [getSanitizedQueryKeyObject(host), 'runs'],
     createRunData =>
       createRun(host as HostConfig, createRunData)
         .then(response => response.data)

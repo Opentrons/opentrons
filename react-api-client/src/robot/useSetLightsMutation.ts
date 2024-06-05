@@ -1,6 +1,7 @@
 import { setLights } from '@opentrons/api-client'
 import { useMutation } from 'react-query'
 import { useHost } from '../api'
+import { getSanitizedQueryKeyObject } from '../utils'
 import type {
   UseMutationResult,
   UseMutateFunction,
@@ -31,7 +32,7 @@ export function useSetLightsMutation(
   const host =
     hostOverride != null ? { ...contextHost, ...hostOverride } : contextHost
   const mutation = useMutation<Lights, AxiosError, SetLightsData>(
-    [host, 'robot', 'lights'],
+    [getSanitizedQueryKeyObject(host), 'robot', 'lights'],
     setLightsData =>
       setLights(host as HostConfig, setLightsData)
         .then(response => response.data)

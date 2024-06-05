@@ -1,6 +1,7 @@
 import { useMutation, useQueryClient } from 'react-query'
 import { createLabwareOffset } from '@opentrons/api-client'
 import { useHost } from '../api'
+import { getSanitizedQueryKeyObject } from '../utils'
 import type {
   HostConfig,
   Run,
@@ -28,13 +29,14 @@ export type UseCreateLabwareOffsetMutationResult = UseMutationResult<
 export function useCreateLabwareOffsetMutation(): UseCreateLabwareOffsetMutationResult {
   const host = useHost()
   const queryClient = useQueryClient()
+  const sanitizedHost = getSanitizedQueryKeyObject(host)
 
   const mutation = useMutation<Run, unknown, CreateLabwareOffsetParams>(
     ({ runId, data }) =>
-      createLabwareOffset(host as HostConfig, runId, data)
+      createLabwareOffset(sanitizedHost as HostConfig, runId, data)
         .then(response => {
           queryClient
-            .invalidateQueries([host, 'runs'])
+            .invalidateQueries([sanitizedHost, 'runs'])
             .catch((e: Error) =>
               console.error(`error invalidating runs query: ${e.message}`)
             )

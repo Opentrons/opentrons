@@ -1,6 +1,7 @@
 import { useMutation, useQueryClient } from 'react-query'
 import { updateRobotName } from '@opentrons/api-client'
 import { useHost } from '../api'
+import { getSanitizedQueryKeyObject } from '../utils'
 import type {
   UseMutationResult,
   UseMutationOptions,
@@ -36,21 +37,22 @@ export function useUpdateRobotNameMutation(
 ): UseUpdateRobotNameMutationResult {
   const host = useHost()
   const queryClient = useQueryClient()
+  const sanitizedHost = getSanitizedQueryKeyObject(host)
 
   const mutation = useMutation<
     UpdatedRobotName,
     AxiosError<ErrorResponse>,
     string
   >(
-    [host, 'server/name'],
+    [sanitizedHost, 'server/name'],
     (newName: string) =>
       updateRobotName(host as HostConfig, newName).then(response => {
         const robotName = response.data.name
         queryClient
-          .invalidateQueries([host, 'server/name'])
+          .invalidateQueries([sanitizedHost, 'server/name'])
           .then(() =>
             queryClient.setQueryData(
-              [host, 'server/name', robotName],
+              [sanitizedHost, 'server/name', robotName],
               response.data
             )
           )

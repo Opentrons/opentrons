@@ -2,7 +2,7 @@ import mapValues from 'lodash/mapValues'
 import { useQuery } from 'react-query'
 
 import { getCommandsAsPreSerializedList } from '@opentrons/api-client'
-
+import { getSanitizedQueryKeyObject } from '../utils'
 import { useHost } from '../api'
 
 import type { UseQueryOptions, UseQueryResult } from 'react-query'
@@ -39,7 +39,7 @@ export function useAllCommandsAsPreSerializedList<TError = Error>(
 
   const query = useQuery<CommandsData, TError>(
     [
-      hostKey,
+      getSanitizedQueryKeyObject(host),
       'runs',
       runId,
       'getCommandsAsPreSerializedList',

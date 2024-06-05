@@ -1,6 +1,7 @@
 import { useMutation, useQueryClient } from 'react-query'
 import { createLabwareDefinition } from '@opentrons/api-client'
 import { useHost } from '../api'
+import { getSanitizedQueryKeyObject } from '../utils'
 import type { UseMutationResult, UseMutateAsyncFunction } from 'react-query'
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import type {
@@ -28,16 +29,17 @@ export type UseCreateLabwareDefinitionMutationResult = UseMutationResult<
 export function useCreateLabwareDefinitionMutation(): UseCreateLabwareDefinitionMutationResult {
   const host = useHost()
   const queryClient = useQueryClient()
+  const sanitizedHost = getSanitizedQueryKeyObject(host)
 
   const mutation = useMutation<
     CreateLabwareDefinitionResponsePayload,
     unknown,
     CreateLabwareDefinitionParams
   >(({ runId, data }) =>
-    createLabwareDefinition(host as HostConfig, runId, data)
+    createLabwareDefinition(sanitizedHost as HostConfig, runId, data)
       .then(response => {
         queryClient
-          .invalidateQueries([host, 'runs'])
+          .invalidateQueries([sanitizedHost, 'runs'])
           .catch((e: Error) =>
             console.error(`error invalidating runs query: ${e.message}`)
           )

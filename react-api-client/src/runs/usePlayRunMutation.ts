@@ -1,6 +1,7 @@
 import { RUN_ACTION_TYPE_PLAY, createRunAction } from '@opentrons/api-client'
 import { useMutation } from 'react-query'
 import { useHost } from '../api'
+import { getSanitizedQueryKeyObject } from '../utils'
 
 import type {
   UseMutationResult,
@@ -29,7 +30,7 @@ export const usePlayRunMutation = (
 ): UsePlayRunMutationResult => {
   const host = useHost()
   const mutation = useMutation<RunAction, AxiosError, string>(
-    [host, 'runs', RUN_ACTION_TYPE_PLAY],
+    [getSanitizedQueryKeyObject(host), 'runs', RUN_ACTION_TYPE_PLAY],
     (runId: string) =>
       createRunAction(host as HostConfig, runId, {
         actionType: RUN_ACTION_TYPE_PLAY,

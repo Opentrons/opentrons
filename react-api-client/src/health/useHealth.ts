@@ -1,6 +1,7 @@
 import { useQuery } from 'react-query'
 import { getHealth } from '@opentrons/api-client'
 import { useHost } from '../api'
+import { getSanitizedQueryKeyObject } from '../utils'
 
 import type { UseQueryOptions, UseQueryResult } from 'react-query'
 import type { AxiosResponse, AxiosError } from 'axios'
@@ -10,7 +11,7 @@ export function useHealthQuery(
   options: UseQueryOptions<AxiosResponse<Health>, AxiosError> = {}
 ): UseQueryResult<AxiosResponse<Health>, AxiosError> {
   const host = useHost()
-  const queryKey = ['health', host]
+  const queryKey = ['health', getSanitizedQueryKeyObject(host)]
   const query = useQuery<AxiosResponse<Health>, AxiosError>(
     queryKey,
     () => getHealth(host as HostConfig),

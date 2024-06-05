@@ -1,12 +1,14 @@
 import { RUN_ACTION_TYPE_PAUSE, createRunAction } from '@opentrons/api-client'
 import { useMutation } from 'react-query'
 import { useHost } from '../api'
+import { getSanitizedQueryKeyObject } from '../utils'
 
 import type {
   UseMutationResult,
   UseMutateFunction,
   UseMutationOptions,
 } from 'react-query'
+
 import type { AxiosError } from 'axios'
 import type { HostConfig, RunAction } from '@opentrons/api-client'
 
@@ -29,7 +31,7 @@ export const usePauseRunMutation = (
 ): UsePauseRunMutationResult => {
   const host = useHost()
   const mutation = useMutation<RunAction, AxiosError, string>(
-    [host, 'runs', RUN_ACTION_TYPE_PAUSE],
+    [getSanitizedQueryKeyObject(host), 'runs', RUN_ACTION_TYPE_PAUSE],
     (runId: string) =>
       createRunAction(host as HostConfig, runId, {
         actionType: RUN_ACTION_TYPE_PAUSE,

@@ -1,6 +1,7 @@
 import { useQuery } from 'react-query'
 import { getSubsystemUpdate } from '@opentrons/api-client'
 import { useHost } from '../api'
+import { getSanitizedQueryKeyObject } from '../utils'
 
 import type { UseQueryResult, UseQueryOptions } from 'react-query'
 import type {
@@ -14,7 +15,7 @@ export function useSubsystemUpdateQuery<TError = Error>(
 ): UseQueryResult<SubsystemUpdateProgressData, TError> {
   const host = useHost()
   const query = useQuery<SubsystemUpdateProgressData, TError>(
-    [host, 'subsystems/updates/all/', updateId],
+    [getSanitizedQueryKeyObject(host), 'subsystems/updates/all/', updateId],
     () =>
       getSubsystemUpdate(host as HostConfig, updateId as string).then(
         response => response.data
