@@ -2,7 +2,7 @@ import { describe, it, vi, expect } from 'vitest'
 import { renderHook } from '@testing-library/react'
 import { useAuth0 } from '@auth0/auth0-react'
 import { useGetAccessToken } from '../useGetAccessToken'
-import { AUTH0_AUDIENCE } from '../../constants'
+import { STAGING_AUTH0_AUDIENCE } from '../../constants'
 import type { Mock } from 'vitest'
 
 vi.mock('@auth0/auth0-react')
@@ -22,7 +22,7 @@ describe('useGetAccessToken', () => {
 
     expect(mockGetAccessTokenSilently).toHaveBeenCalledWith({
       authorizationParams: {
-        audience: AUTH0_AUDIENCE,
+        audience: STAGING_AUTH0_AUDIENCE,
       },
     })
     expect(await accessToken).toBe('mockAccessToken')
@@ -41,7 +41,7 @@ describe('useGetAccessToken', () => {
 
     expect(mockGetAccessTokenSilently).toHaveBeenCalledWith({
       authorizationParams: {
-        audience: AUTH0_AUDIENCE,
+        audience: STAGING_AUTH0_AUDIENCE,
       },
     })
     await expect(accessToken).rejects.toThrow('mockError')

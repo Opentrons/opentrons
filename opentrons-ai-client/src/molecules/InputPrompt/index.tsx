@@ -18,7 +18,7 @@ import { SendButton } from '../../atoms/SendButton'
 import { chatDataAtom, chatHistoryAtom, tokenAtom } from '../../resources/atoms'
 import { useApiCall } from '../../resources/hooks'
 import { calcTextAreaHeight } from '../../resources/utils/utils'
-import { END_POINT } from '../../resources/constants'
+import { STAGING_END_POINT, PROD_END_POINT } from '../../resources/constants'
 
 import type { AxiosRequestConfig } from 'axios'
 import type { ChatData } from '../../resources/types'
@@ -48,7 +48,10 @@ export function InputPrompt(): JSX.Element {
       }
 
       const config = {
-        url: END_POINT,
+        url:
+          process.env.NODE_ENV === 'production'
+            ? PROD_END_POINT
+            : STAGING_END_POINT,
         method: 'POST',
         headers,
         data: {

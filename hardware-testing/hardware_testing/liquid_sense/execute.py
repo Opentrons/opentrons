@@ -28,6 +28,16 @@ from opentrons.protocol_api import ProtocolContext, Well, Labware
 
 from opentrons_shared_data.errors.exceptions import LiquidNotFoundError
 
+try:
+    from abr_testing.automation import google_sheets_tool
+except ImportError:
+    ui.print_error(
+        "Unable to import abr repo if this isn't a simulation push the abr_testing package"
+    )
+    from . import google_sheets_tool  # type: ignore[no-redef]
+
+    pass
+
 
 PROBE_MAX_TIME: Dict[int, float] = {
     1: 2.75,
@@ -165,17 +175,29 @@ def _load_scale(
     return recorder
 
 
-def run(tip: int, run_args: RunArgs) -> None:
+def run(
+    tip: int,
+    run_args: RunArgs,
+    google_sheet: Optional[google_sheets_tool.google_sheet],
+    sheet_id: Optional[str],
+    starting_tip: str = "A1",
+) -> None:
     """Run a liquid probe test."""
     test_labware: Labware = _load_test_well(run_args)
     dial_indicator: Labware = _load_dial_indicator(run_args)
     dial_well: Well = dial_indicator["A1"]
+    liquid_height: float = 0.0
+    liquid_height_from_deck: float = 0.0
     hw_api = get_sync_hw_api(run_args.ctx)
     test_well: Well = test_labware["A1"]
     _load_tipracks(run_args.ctx, run_args.pipette_channels, run_args.protocol_cfg, tip)
     tips: List[Well] = get_unused_tips(
         ctx=run_args.ctx, tip_volume=tip, pipette_mount=""
     )
+    row = "ABCDEFGH".index(starting_tip[0])
+    column = int(starting_tip[1:]) - 1
+    num_of_tips_to_skip = (column * 8) + row
+    del tips[:num_of_tips_to_skip]
     assert len(tips) >= run_args.trials
     results: List[float] = []
     adjusted_results: List[float] = []
@@ -193,100 +215,119 @@ def run(tip: int, run_args: RunArgs) -> None:
             run_args.pipette._retract()
         return tip_offset
 
-    def _get_target_height() -> float:
+    def _get_target_height() -> None:
+        nonlocal liquid_height, liquid_height_from_deck
         run_args.pipette.pick_up_tip(tips[0])
         del tips[: run_args.pipette_channels]
         liquid_height = _jog_to_find_liquid_height(
             run_args.ctx, run_args.pipette, test_well
         )
-        target_height = test_well.bottom(liquid_height).point.z
+        liquid_height_from_deck = test_well.bottom(liquid_height).point.z
         run_args.pipette._retract()
-        return target_height
 
-    target_height = _get_target_height()
+    _get_target_height()
     tip_offset = _get_tip_offset()
 
     if run_args.return_tip:
         run_args.pipette.return_tip()
     else:
         run_args.pipette.drop_tip()
+        run_args.pipette._retract()
 
     env_data = run_args.environment_sensor.get_reading()
 
     store_baseline_trial(
         run_args.test_report,
         tip,
-        target_height,
+        liquid_height_from_deck,
         env_data.relative_humidity,
         env_data.temperature,
-        test_well.top().point.z - target_height,
+        test_well.top().point.z - liquid_height_from_deck,
         tip_offset - lpc_offset,
+        google_sheet,
+        run_args.run_id,
     )
 
     trials_before_jog = run_args.trials_before_jog
 
-    for trial in range(run_args.trials):
-        if trial > 0 and trial % trials_before_jog == 0:
-            target_height = _get_target_height()
+    try:
+        for trial in range(run_args.trials):
+            if trial > 0 and trial % trials_before_jog == 0:
+                _get_target_height()
+                if run_args.return_tip:
+                    run_args.pipette.return_tip()
+                else:
+                    run_args.pipette.drop_tip()
+                    run_args.pipette._retract()
+
+            ui.print_info(f"Picking up {tip}ul tip")
+            run_args.pipette.pick_up_tip(tips[0])
+            del tips[: run_args.pipette_channels]
+            # operator defines num of seconds btwn start of the probe movement
+            # and meniscus contact calculating ideal starting position is then
+            # easy bc no acceleration is involved during probe
+            starting_mm_above_liquid = (
+                run_args.probe_seconds_before_contact * run_args.z_speed
+            )
+            starting_mount_height = (
+                test_well.bottom(z=liquid_height).point.z + starting_mm_above_liquid
+            )
+            run_args.pipette.move_to(
+                test_well.bottom(z=(liquid_height + starting_mm_above_liquid))
+            )
+            start_pos = hw_api.current_position_ot3(OT3Mount.LEFT)
+            height = _run_trial(run_args, tip, test_well, trial, starting_mount_height)
+            end_pos = hw_api.current_position_ot3(OT3Mount.LEFT)
+            run_args.pipette.blow_out()
+            tip_length_offset = 0.0
+            if run_args.dial_indicator is not None:
+                run_args.pipette._retract()
+                run_args.pipette.move_to(dial_well.top())
+                tip_length_offset = tip_offset - run_args.dial_indicator.read_stable()
+                run_args.pipette._retract()
+                ui.print_info(f"Tip Offset  {tip_length_offset}")
+
+            ui.print_info("Dropping tip")
             if run_args.return_tip:
                 run_args.pipette.return_tip()
             else:
                 run_args.pipette.drop_tip()
-
-        ui.print_info(f"Picking up {tip}ul tip")
-        run_args.pipette.pick_up_tip(tips[0])
-        del tips[: run_args.pipette_channels]
-        run_args.pipette.move_to(test_well.top())
-
-        start_pos = hw_api.current_position_ot3(OT3Mount.LEFT)
-        height = _run_trial(run_args, tip, test_well, trial)
-        end_pos = hw_api.current_position_ot3(OT3Mount.LEFT)
-        run_args.pipette.blow_out()
-        tip_length_offset = 0.0
-        if run_args.dial_indicator is not None:
-            run_args.pipette._retract()
-            run_args.pipette.move_to(dial_well.top())
-            tip_length_offset = tip_offset - run_args.dial_indicator.read_stable()
-            run_args.pipette._retract()
-            ui.print_info(f"Tip Offset  {tip_length_offset}")
-
-        ui.print_info("Droping tip")
-        if run_args.return_tip:
-            run_args.pipette.return_tip()
-        else:
-            run_args.pipette.drop_tip()
-        results.append(height)
-        adjusted_results.append(height + tip_length_offset)
-        env_data = run_args.environment_sensor.get_reading()
-        hw_pipette = hw_api.hardware_pipettes[top_types.Mount.LEFT]
-        plunger_start = (
-            hw_pipette.plunger_positions.bottom
-            if run_args.aspirate
-            else hw_pipette.plunger_positions.top
-        )
-        store_trial(
-            run_args.test_report,
-            trial,
-            tip,
-            height,
-            end_pos[Axis.P_L],
-            env_data.relative_humidity,
-            env_data.temperature,
-            start_pos[Axis.Z_L] - end_pos[Axis.Z_L],
-            plunger_start - end_pos[Axis.P_L],
-            tip_length_offset,
-            target_height,
-        )
-        ui.print_info(
-            f"\n\n Z axis start pos {start_pos[Axis.Z_L]} end pos {end_pos[Axis.Z_L]}"
-        )
-        ui.print_info(
-            f"plunger start pos {plunger_start} end pos {end_pos[Axis.P_L]}\n\n"
-        )
-
-    ui.print_info(f"RESULTS: \n{results}")
-    ui.print_info(f"Adjusted RESULTS: \n{adjusted_results}")
-    store_tip_results(run_args.test_report, tip, results, adjusted_results)
+                run_args.pipette._retract()
+            results.append(height)
+            adjusted_results.append(height + tip_length_offset)
+            env_data = run_args.environment_sensor.get_reading()
+            hw_pipette = hw_api.hardware_pipettes[top_types.Mount.LEFT]
+            plunger_start = (
+                hw_pipette.plunger_positions.bottom
+                if run_args.aspirate
+                else hw_pipette.plunger_positions.top
+            )
+            store_trial(
+                run_args.test_report,
+                trial,
+                tip,
+                height,
+                end_pos[Axis.P_L],
+                env_data.relative_humidity,
+                env_data.temperature,
+                start_pos[Axis.Z_L] - height,
+                plunger_start - end_pos[Axis.P_L],
+                tip_length_offset,
+                liquid_height_from_deck,
+                google_sheet,
+                run_args.run_id,
+                sheet_id,
+            )
+            ui.print_info(
+                f"\n\n Z axis start pos {start_pos[Axis.Z_L]} end pos {end_pos[Axis.Z_L]}"
+            )
+            ui.print_info(
+                f"plunger start pos {plunger_start} end pos {end_pos[Axis.P_L]}\n\n"
+            )
+    finally:
+        ui.print_info(f"RESULTS: \n{results}")
+        ui.print_info(f"Adjusted RESULTS: \n{adjusted_results}")
+        store_tip_results(run_args.test_report, tip, results, adjusted_results)
 
 
 def get_plunger_travel(run_args: RunArgs) -> float:
@@ -299,7 +340,11 @@ def get_plunger_travel(run_args: RunArgs) -> float:
 
 
 def find_max_z_distances(
-    run_args: RunArgs, tip: int, well: Well, p_speed: float
+    run_args: RunArgs,
+    tip: int,
+    well: Well,
+    p_speed: float,
+    starting_mount_height: float,
 ) -> List[float]:
     """Returns a list of max z distances for each probe.
 
@@ -310,11 +355,14 @@ def find_max_z_distances(
     truncated to avoid collisions.
     """
     z_speed = run_args.z_speed
-    max_z_distance = well.depth + run_args.start_height_offset
+    max_z_distance = starting_mount_height - well.bottom().point.z
     plunger_travel = get_plunger_travel(run_args)
-    p_travel_time = min(
-        plunger_travel / p_speed, PROBE_MAX_TIME[run_args.pipette_channels]
-    )
+    if p_speed == 0:
+        p_travel_time = PROBE_MAX_TIME[run_args.pipette_channels]
+    else:
+        p_travel_time = min(
+            plunger_travel / p_speed, PROBE_MAX_TIME[run_args.pipette_channels]
+        )
 
     z_travels: List[float] = []
     while max_z_distance > 0:
@@ -324,7 +372,9 @@ def find_max_z_distances(
     return z_travels
 
 
-def _run_trial(run_args: RunArgs, tip: int, well: Well, trial: int) -> float:
+def _run_trial(
+    run_args: RunArgs, tip: int, well: Well, trial: int, starting_mount_height: float
+) -> float:
     hw_api = get_sync_hw_api(run_args.ctx)
     lqid_cfg: Dict[str, int] = LIQUID_PROBE_SETTINGS[run_args.pipette_volume][
         run_args.pipette_channels
@@ -348,9 +398,12 @@ def _run_trial(run_args: RunArgs, tip: int, well: Well, trial: int) -> float:
         else run_args.plunger_speed
     )
 
-    z_distances: List[float] = find_max_z_distances(run_args, tip, well, plunger_speed)
+    start_height = starting_mount_height
+    height = 2 * start_height
+    z_distances: List[float] = find_max_z_distances(
+        run_args, tip, well, plunger_speed, starting_mount_height
+    )
     z_distances = z_distances[: run_args.multi_passes]
-    start_height = well.top().point.z + run_args.start_height_offset
     for z_dist in z_distances:
         lps = LiquidProbeSettings(
             starting_mount_height=start_height,
