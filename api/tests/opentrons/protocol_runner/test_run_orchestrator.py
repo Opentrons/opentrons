@@ -169,6 +169,12 @@ def test_build_run_orchestrator_provider(
     assert isinstance(result._protocol_runner, (PythonAndLegacyRunner, JsonRunner))
 
 
+def test_add_labware_definition(
+    live_protocol_subject: RunOrchestrator, mock_protocol_engine: ProtocolEngine
+) -> None:
+    """Should call protocol engine add_labware_definition"""
+
+
 async def test_add_command_and_wait_for_interval(
     decoy: Decoy,
     json_protocol_subject: RunOrchestrator,
@@ -194,6 +200,54 @@ async def test_add_command_and_wait_for_interval(
     )
 
     assert result == added_command
+
+    decoy.verify(
+        await mock_protocol_engine.wait_for_command(command_id="test-123"), times=1
+    )
+
+    result = await json_protocol_subject.add_command_and_wait_for_interval(
+        command=load_command, wait_until_complete=False, timeout=999
+    )
+
+    assert result == added_command
+
+    decoy.verify(
+        await mock_protocol_engine.wait_for_command(command_id="test-123"), times=0
+    )
+
+
+def test_estop(
+    decoy: Decoy,
+    live_protocol_subject: RunOrchestrator,
+    mock_protocol_engine: ProtocolEngine,
+) -> None:
+    live_protocol_subject.estop()
+    decoy.verify(mock_protocol_engine.estop())
+
+
+async def test_use_attached_modules(
+    decoy: Decoy,
+    live_protocol_subject: RunOrchestrator,
+    mock_protocol_engine: ProtocolEngine,
+) -> None:
+    await live_protocol_subject.use_attached_modules(modules_by_id={})
+    decoy.verify(await mock_protocol_engine.use_attached_modules({}))
+
+
+def test_get_protocol_runner(
+    json_protocol_subject: RunOrchestrator,
+    python_protocol_subject: RunOrchestrator,
+    live_protocol_subject: RunOrchestrator,
+) -> None:
+    """Should return the equivalent runner."""
+    json_runner = json_protocol_subject.get_protocol_runner()
+    assert isinstance(json_runner, JsonRunner)
+
+    python_runner = python_protocol_subject.get_protocol_runner()
+    assert isinstance(python_runner, PythonAndLegacyRunner)
+
+    live_runner = live_protocol_subject.get_protocol_runner()
+    assert live_runner is None
 
 
 async def test_load_json(
@@ -265,6 +319,29 @@ async def test_load_json_raises_no_protocol(
     )
     with pytest.raises(AssertionError):
         await live_protocol_subject.load_json(protocol_source=protocol_source)
+
+
+async def test_load_json_raises_no_runner_match(
+    decoy: Decoy,
+    json_protocol_subject: RunOrchestrator,
+    mock_protocol_engine: ProtocolEngine,
+) -> None:
+    """Should raise that there is no protocol runner."""
+    protocol_source = ProtocolSource(
+        directory=Path("/dev/null"),
+        main_file=Path("/dev/null/abc.json"),
+        files=[],
+        metadata={},
+        robot_type="OT-2 Standard",
+        config=JsonProtocolConfig(schema_version=6),
+        content_hash="abc123",
+    )
+    with pytest.raises(AssertionError):
+        await json_protocol_subject.load_python(
+            protocol_source=protocol_source,
+            python_parse_mode=PythonParseMode.NORMAL,
+            run_time_param_values=None,
+        )
 
 
 def test_get_run_id(

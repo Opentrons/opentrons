@@ -64,65 +64,65 @@ stages:
 #    response:
 #      status_code: 201
 
-#  - name: Wait for the run to complete
-#    max_retries: 10
-#    delay_after: 0.2
-#    request:
-#      url: '{ot2_server_base_url}/runs/{run_id}'
-#      method: GET
-#    response:
-#      status_code: 200
-#      strict:
-#        - json:off
-#      json:
-#        data:
-#          status: stopped
+  - name: Wait for the run to complete
+    max_retries: 10
+    delay_after: 0.2
+    request:
+      url: '{ot2_server_base_url}/runs/{run_id}'
+      method: GET
+    response:
+      status_code: 200
+      strict:
+        - json:off
+      json:
+        data:
+          status: stopped
 
-#  - name: Get run commands
-#    request:
-#      url: '{ot2_server_base_url}/runs/{run_id}/commands'
-#      method: GET
-#    response:
-#      status_code: 200
-#      strict:
-#        - json:off
-#      json:
-#        data:
-#          - id: !anystr
-#            key: !anystr
-#            commandType: home
-#            createdAt: !anystr
-#            startedAt: !anystr
-#            completedAt: !anystr
-#            status: succeeded
-#            params: {}
-#            notes: []
-#          - id: !anystr
-#            key: !anystr
-#            commandType: home
-#            createdAt: !anystr
-#            startedAt: !anystr
-#            completedAt: !anystr
-#            status: succeeded
-#            params: { }
-#            notes: [ ]
-#          - id: !anystr
-#            key: !anystr
-#            commandType: waitForDuration
-#            createdAt: !anystr
-#            startedAt: !anystr
-#            completedAt: !anystr
-#            status: failed
-#            params:
-#              seconds: 30
-#            notes: [ ]
-#            error:
-#              createdAt: !anystr
-#              detail: 'Run was cancelled'
-#              errorCode: '4000'
-#              errorInfo: { }
-#              errorType: 'RunStoppedError'
-#              id: !anystr
-#              wrappedErrors: [ ]
+  - name: Get run commands
+    request:
+      url: '{ot2_server_base_url}/runs/{run_id}/commands'
+      method: GET
+    response:
+      status_code: 200
+      strict:
+        - json:off
+      json:
+        data:
+          - id: !anystr
+            key: !anystr
+            commandType: home
+            createdAt: !anystr
+            startedAt: !anystr
+            completedAt: !anystr
+            status: succeeded
+            params: {}
+            notes: []
+          - id: !anystr
+            key: !anystr
+            commandType: home
+            createdAt: !anystr
+            startedAt: !anystr
+            completedAt: !anystr
+            status: succeeded
+            params: { }
+            notes: [ ]
+          - id: !anystr
+            key: !anystr
+            commandType: waitForDuration
+            createdAt: !anystr
+            startedAt: !anystr
+            completedAt: !anystr
+            status: failed
+            params:
+              seconds: 30
+            notes: [ ]
+            error:
+              createdAt: !anystr
+              detail: 'Run was cancelled'
+              errorCode: '4000'
+              errorInfo: { }
+              errorType: 'RunStoppedError'
+              id: !anystr
+              wrappedErrors: [ ]
 
 
