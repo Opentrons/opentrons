@@ -17,11 +17,13 @@ tests ?=
 cov_opts ?= --coverage=true
 test_opts ?=
 
+target ?= build-production
+
 # standard targets
 #####################################################################
 
 .PHONY: all
-all: clean build-production
+all: clean build-$(target)
 
 .PHONY: setup
 setup:
