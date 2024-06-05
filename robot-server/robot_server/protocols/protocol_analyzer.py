@@ -13,8 +13,8 @@ from opentrons.protocols.parse import PythonParseMode
 
 import robot_server.errors.error_mappers as em
 
-from .protocol_store import ProtocolResource
-from .analysis_store import AnalysisStore
+from robot_server.protocols.protocol_store import ProtocolResource
+from robot_server.protocols.analysis_store import AnalysisStore
 
 log = logging.getLogger(__name__)
 
@@ -25,24 +25,23 @@ class ProtocolAnalyzer:
     def __init__(
         self,
         analysis_store: AnalysisStore,
+        protocol_resource: ProtocolResource,
     ) -> None:
         """Initialize the analyzer and its dependencies."""
         self._analysis_store = analysis_store
-        self._protocol_resource: Optional[ProtocolResource] = None
+        self._protocol_resource = protocol_resource
 
     async def load_runner(
         self,
-        protocol_resource: ProtocolResource,
         run_time_param_values: Optional[RunTimeParamValuesType],
     ) -> AbstractRunner:
         """Load runner with the protocol and run time parameter values.
 
         Returns: Run time parameters with the override values.
         """
-        self._protocol_resource = protocol_resource
         runner = await protocol_runner.create_simulating_runner(
-            robot_type=protocol_resource.source.robot_type,
-            protocol_config=protocol_resource.source.config,
+            robot_type=self._protocol_resource.source.robot_type,
+            protocol_config=self._protocol_resource.source.config,
         )
         if isinstance(runner, PythonAndLegacyRunner):
             await runner.load(
@@ -119,3 +118,13 @@ class ProtocolAnalyzer:
             ],
             liquids=[],
         )
+
+
+def create_protocol_analyzer(
+    analysis_store: AnalysisStore,
+    protocol_resource: ProtocolResource,
+) -> ProtocolAnalyzer:
+    """Protocol analyzer factory function."""
+    return ProtocolAnalyzer(
+        analysis_store=analysis_store, protocol_resource=protocol_resource
+    )
