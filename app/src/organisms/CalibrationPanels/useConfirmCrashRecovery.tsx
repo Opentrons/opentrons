@@ -34,7 +34,9 @@ export function useConfirmCrashRecovery(
       <StyledText as="p">{t('jog_too_far_or_bend_tip')}</StyledText>
       <Link
         role="button"
-        onClick={() => setShowModal(true)}
+        onClick={() => {
+          setShowModal(true)
+        }}
         css={TYPOGRAPHY.linkPSemiBold}
       >
         {t('start_over')}

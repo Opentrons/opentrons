@@ -170,7 +170,9 @@ export function ModulesAndOtherTile(props: WizardTileProps): JSX.Element {
             }}
           />
           <PrimaryButton
-            onClick={() => proceed()}
+            onClick={() => {
+              proceed()
+            }}
             disabled={!hasATrash}
             {...targetProps}
           >
@@ -316,7 +318,9 @@ function FlexModuleFields(props: WizardTileProps): JSX.Element {
       })}
       <EquipmentOption
         robotType={FLEX_ROBOT_TYPE}
-        onClick={() => handleSetEquipmentOption('gripper')}
+        onClick={() => {
+          handleSetEquipmentOption('gripper')
+        }}
         isSelected={additionalEquipment.includes('gripper')}
         image={
           <AdditionalItemImage
@@ -330,7 +334,9 @@ function FlexModuleFields(props: WizardTileProps): JSX.Element {
 
       <EquipmentOption
         robotType={FLEX_ROBOT_TYPE}
-        onClick={() => handleSetEquipmentOption('wasteChute')}
+        onClick={() => {
+          handleSetEquipmentOption('wasteChute')
+        }}
         isSelected={additionalEquipment.includes('wasteChute')}
         disabled={getTrashOptionDisabled({
           additionalEquipment,
@@ -348,7 +354,9 @@ function FlexModuleFields(props: WizardTileProps): JSX.Element {
       />
       <EquipmentOption
         robotType={FLEX_ROBOT_TYPE}
-        onClick={() => handleSetEquipmentOption('trashBin')}
+        onClick={() => {
+          handleSetEquipmentOption('trashBin')
+        }}
         isSelected={additionalEquipment.includes('trashBin')}
         image={
           <AdditionalItemImage src={trashBinImage} alt="Opentrons Trash Bin" />

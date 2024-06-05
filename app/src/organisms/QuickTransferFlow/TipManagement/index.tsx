@@ -39,7 +39,9 @@ export function TipManagement(props: TipManagementProps): JSX.Element | null {
     {
       option: t('change_tip'),
       value: t(`${state.changeTip}`),
-      onClick: () => setSelectedSetting('change_tip'),
+      onClick: () => {
+        setSelectedSetting('change_tip')
+      },
     },
     {
       option: t('tip_drop_location'),
@@ -50,7 +52,9 @@ export function TipManagement(props: TipManagementProps): JSX.Element | null {
             : 'wasteChute'
         }`
       ),
-      onClick: () => setSelectedSetting('tip_drop_location'),
+      onClick: () => {
+        setSelectedSetting('tip_drop_location')
+      },
     },
   ]
 
@@ -89,14 +93,18 @@ export function TipManagement(props: TipManagementProps): JSX.Element | null {
         <ChangeTip
           state={state}
           dispatch={dispatch}
-          onBack={() => setSelectedSetting(null)}
+          onBack={() => {
+            setSelectedSetting(null)
+          }}
         />
       ) : null}
       {selectedSetting === 'tip_drop_location' ? (
         <TipDropLocation
           state={state}
           dispatch={dispatch}
-          onBack={() => setSelectedSetting(null)}
+          onBack={() => {
+            setSelectedSetting(null)
+          }}
         />
       ) : null}
     </Flex>

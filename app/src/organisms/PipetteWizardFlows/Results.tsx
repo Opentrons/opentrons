@@ -293,7 +293,9 @@ export const Results = (props: ResultsProps): JSX.Element => {
           </SecondaryButton>
         )}
         <CheckPipetteButton
-          proceed={() => setNumberOfTryAgains(numberOfTryAgains + 1)}
+          proceed={() => {
+            setNumberOfTryAgains(numberOfTryAgains + 1)
+          }}
           proceedButtonText={i18n.format(t('try_again'), 'capitalize')}
           setFetching={setFetching}
           isFetching={isFetching}

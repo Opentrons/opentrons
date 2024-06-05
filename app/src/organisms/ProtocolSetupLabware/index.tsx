@@ -225,7 +225,9 @@ export function ProtocolSetupLabware({
               deckDef={deckDef}
               attachedProtocolModuleMatches={attachedProtocolModuleMatches}
               handleLabwareClick={handleLabwareClick}
-              onCloseClick={() => setShowDeckMapModal(false)}
+              onCloseClick={() => {
+                setShowDeckMapModal(false)
+              }}
               initialLoadedLabwareByAdapter={initialLoadedLabwareByAdapter}
             />
           ) : null}
@@ -275,7 +277,9 @@ export function ProtocolSetupLabware({
       )}
       <ODDBackButton
         label={t('labware')}
-        onClick={() => setSetupScreen('prepare to run')}
+        onClick={() => {
+          setSetupScreen('prepare to run')
+        }}
       />
       <Flex
         flexDirection={DIRECTION_COLUMN}
@@ -318,7 +322,11 @@ export function ProtocolSetupLabware({
           ) : null
         })}
       </Flex>
-      <FloatingActionButton onClick={() => setShowDeckMapModal(true)} />
+      <FloatingActionButton
+        onClick={() => {
+          setShowDeckMapModal(true)
+        }}
+      />
     </>
   )
 }

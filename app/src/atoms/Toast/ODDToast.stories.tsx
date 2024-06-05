@@ -48,7 +48,12 @@ const Template: Story<React.ComponentProps<typeof Toast>> = args => {
           bottom={SPACING.spacing16}
           zIndex={1000}
         >
-          <Toast {...args} onClose={() => setIsShowToast(false)} />
+          <Toast
+            {...args}
+            onClose={() => {
+              setIsShowToast(false)
+            }}
+          />
         </Flex>
       )}
     </>

@@ -76,7 +76,9 @@ export function TouchscreenBrightness({
     <Flex flexDirection={DIRECTION_COLUMN}>
       <ChildNavigation
         header={t('touchscreen_brightness')}
-        onClickBack={() => setCurrentOption(null)}
+        onClickBack={() => {
+          setCurrentOption(null)
+        }}
       />
       <Flex
         flexDirection={DIRECTION_ROW}
@@ -89,7 +91,9 @@ export function TouchscreenBrightness({
       >
         <IconButton
           disabled={brightness === LOWEST_BRIGHTNESS}
-          onClick={() => handleClick('down')}
+          onClick={() => {
+            handleClick('down')
+          }}
           data-testid="TouchscreenBrightness_decrease"
         >
           <Icon size="5rem" name="minus" />
@@ -109,7 +113,9 @@ export function TouchscreenBrightness({
 
         <IconButton
           disabled={brightness === HIGHEST_BRIGHTNESS}
-          onClick={() => handleClick('up')}
+          onClick={() => {
+            handleClick('up')
+          }}
           data-testid="TouchscreenBrightness_increase"
         >
           <Icon size="5rem" name="plus" />

@@ -225,7 +225,9 @@ export const MagneticModuleSlideout = (
             units={info.units}
             value={engageHeightValue}
             autoFocus
-            onChange={e => setEngageHeightValue(e.target.value)}
+            onChange={e => {
+              setEngageHeightValue(e.target.value)
+            }}
             type="number"
             caption={t('module_status_range', {
               min: info.disengagedHeight,

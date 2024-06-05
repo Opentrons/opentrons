@@ -40,7 +40,9 @@ export function OT2MultipleModulesHelp(): JSX.Element {
           iconMarginLeft={SPACING.spacing8}
           size={SPACING.spacing20}
           type="informing"
-          onCloseClick={() => setShowMultipleModulesModal(true)}
+          onCloseClick={() => {
+            setShowMultipleModulesModal(true)
+          }}
           closeButton={
             <StyledText
               as="p"

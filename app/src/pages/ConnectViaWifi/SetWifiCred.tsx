@@ -28,7 +28,9 @@ export function SetWifiCred({
       <RobotSetupHeader
         buttonText={t('connect')}
         header={t('sign_into_wifi')}
-        onClickBack={() => setCurrentOption('SelectAuthType')}
+        onClickBack={() => {
+          setCurrentOption('SelectAuthType')
+        }}
         onClickButton={handleConnect}
       />
       <SetWifiCredComponent password={password} setPassword={setPassword} />

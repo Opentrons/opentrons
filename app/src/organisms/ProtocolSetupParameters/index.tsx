@@ -104,11 +104,9 @@ export function ProtocolSetupParameters({
 
   const { createRun, isLoading } = useCreateRunMutation({
     onSuccess: data => {
-      queryClient
-        .invalidateQueries([host, 'runs'])
-        .catch((e: Error) =>
-          console.error(`could not invalidate runs cache: ${e.message}`)
-        )
+      queryClient.invalidateQueries([host, 'runs']).catch((e: Error) => {
+        console.error(`could not invalidate runs cache: ${e.message}`)
+      })
     },
   })
   const handleConfirmValues = (): void => {
@@ -143,7 +141,9 @@ export function ProtocolSetupParameters({
     <>
       <ChildNavigation
         header={t('parameters')}
-        onClickBack={() => history.goBack()}
+        onClickBack={() => {
+          history.goBack()
+        }}
         onClickButton={handleConfirmValues}
         buttonText={t('confirm_values')}
         iconName={isLoading || startSetup ? 'ot-spinner' : undefined}
@@ -152,7 +152,9 @@ export function ProtocolSetupParameters({
           buttonType: 'tertiaryLowLight',
           buttonText: t('restore_defaults'),
           disabled: isLoading || startSetup,
-          onClick: () => showResetValuesModal(true),
+          onClick: () => {
+            showResetValuesModal(true)
+          },
         }}
       />
       <Flex
@@ -170,7 +172,9 @@ export function ProtocolSetupParameters({
                 hasIcon={!(parameter.type === 'bool')}
                 status="inform"
                 title={parameter.displayName}
-                onClickSetupStep={() => handleSetParameter(parameter)}
+                onClickSetupStep={() => {
+                  handleSetParameter(parameter)
+                }}
                 detail={formatRunTimeParameterValue(parameter, t)}
                 description={parameter.description}
                 fontSize="h4"
@@ -185,7 +189,9 @@ export function ProtocolSetupParameters({
   if (chooseValueScreen != null) {
     children = (
       <ChooseEnum
-        handleGoBack={() => setChooseValueScreen(null)}
+        handleGoBack={() => {
+          setChooseValueScreen(null)
+        }}
         parameter={chooseValueScreen}
         setParameter={updateParameters}
         rawValue={chooseValueScreen.value}
@@ -195,7 +201,9 @@ export function ProtocolSetupParameters({
   if (showNumericalInputScreen != null) {
     children = (
       <ChooseNumber
-        handleGoBack={() => setShowNumericalInputScreen(null)}
+        handleGoBack={() => {
+          setShowNumericalInputScreen(null)
+        }}
         parameter={showNumericalInputScreen}
         setParameter={updateParameters}
       />
@@ -208,7 +216,9 @@ export function ProtocolSetupParameters({
         <ResetValuesModal
           runTimeParametersOverrides={runTimeParametersOverrides}
           setRunTimeParametersOverrides={setRunTimeParametersOverrides}
-          handleGoBack={() => showResetValuesModal(false)}
+          handleGoBack={() => {
+            showResetValuesModal(false)
+          }}
         />
       ) : null}
       {children}
