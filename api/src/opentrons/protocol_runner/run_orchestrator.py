@@ -80,6 +80,8 @@ class RunOrchestrator:
     @property
     def run_id(self) -> str:
         """Get the "current" persisted ProtocolEngine."""
+        if not self._run_id:
+            raise NotImplementedError("default orchestrator.")
         return self._run_id
 
     @classmethod
