@@ -1,13 +1,27 @@
 """Format the csv report for a liquid-sense run."""
 
 import statistics
+from typing import List, Union, Optional
+
+from hardware_testing.data import ui
+
+try:
+    from abr_testing.automation import google_sheets_tool
+except ImportError:
+    ui.print_error(
+        "Unable to import abr repo if this isn't a simulation push the abr_testing package"
+    )
+    from . import google_sheets_tool  # type: ignore[no-redef]
+
+    pass
+
+
 from hardware_testing.data.csv_report import (
     CSVReport,
     CSVSection,
     CSVLine,
     CSVLineRepeating,
 )
-from typing import List, Union
 
 """
 CSV Test Report:
@@ -62,7 +76,7 @@ def build_config_section() -> CSVSection:
             CSVLine("liquid", [str]),
             CSVLine("labware_type", [str]),
             CSVLine("speed", [str]),
-            CSVLine("start_height_offset", [str]),
+            CSVLine("probe_seconds_before_contact", [str]),
         ],
     )
 
@@ -137,7 +151,7 @@ def store_config(
     liquid: str,
     labware_type: str,
     speed: str,
-    start_height_offset: str,
+    probe_seconds_before_contact: str,
 ) -> None:
     """Report config."""
     report("CONFIG", "protocol_name", [protocol_name])
@@ -152,7 +166,7 @@ def store_config(
     report("CONFIG", "liquid", [liquid])
     report("CONFIG", "labware_type", [labware_type])
     report("CONFIG", "speed", [speed])
-    report("CONFIG", "start_height_offset", [start_height_offset])
+    report("CONFIG", "probe_seconds_before_contact", [probe_seconds_before_contact])
 
 
 def store_baseline_trial(
@@ -163,8 +177,15 @@ def store_baseline_trial(
     temp: float,
     z_travel: float,
     measured_error: float,
+    google_sheet: Optional[google_sheets_tool.google_sheet],
+    sheet_title: str,
 ) -> None:
     """Report Trial."""
+    if google_sheet:
+        try:
+            google_sheet.update_cell(sheet_title, 9, 2, height)
+        except google_sheets_tool.google_interaction_error:
+            ui.print_error("did not store baseline trial on google sheet.")
     report(
         "TRIALS",
         f"trial-baseline-{tip}ul",
@@ -193,6 +214,9 @@ def store_trial(
     plunger_travel: float,
     tip_length_offset: float,
     target_height: float,
+    google_sheet: Optional[google_sheets_tool.google_sheet],
+    sheet_name: str,
+    sheet_id: Optional[str],
 ) -> None:
     """Report Trial."""
     report(
@@ -210,6 +234,32 @@ def store_trial(
             target_height,
         ],
     )
+    if google_sheet is not None and sheet_id is not None:
+        # Write trial to google sheet
+        if trial == 0:
+            # Write header
+            gs_header: List[List[str]] = [
+                ["Trial"],
+                ["Height"],
+                ["Plunger Position"],
+                ["Tip Length Offset"],
+                ["Adjusted Height"],
+                ["Normalized Height"],
+            ]
+            google_sheet.batch_update_cells(gs_header, "A", 10, sheet_id)
+        try:
+            trial_for_google_sheet: List[List[str]] = [
+                [f"{trial + 1}"],
+                [f"{height}"],
+                [f"{plunger_pos}"],
+                [f"{tip_length_offset}"],
+                [f"{height + tip_length_offset}"],
+            ]
+            google_sheet.batch_update_cells(
+                trial_for_google_sheet, "A", 11 + int(trial), sheet_id
+            )
+        except google_sheets_tool.google_interaction_error:
+            ui.print_error(f"did not log trial {trial+1} to google sheet.")
 
 
 def store_tip_results(
