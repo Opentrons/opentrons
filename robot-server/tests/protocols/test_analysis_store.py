@@ -114,9 +114,9 @@ async def test_add_pending(
     )
 
     result = subject.add_pending(protocol_id="protocol-id", analysis_id="analysis-id")
-    analysis_result = await subject.get("analysis-id")
-    assert result == expected_summary
+    assert result == expected_analysis
 
+    analysis_result = await subject.get("analysis-id")
     assert analysis_result == expected_analysis
     assert await subject.get_by_protocol("protocol-id") == [expected_analysis]
     assert subject.get_summaries_by_protocol("protocol-id") == [expected_summary]

@@ -27,6 +27,7 @@ stages:
           analysisSummaries:
             - id: !anystr
               status: pending
+              runTimeParameters: []
   - name: Retry until analyses status is completed.
     max_retries: 10
     delay_after: 0.1
@@ -43,6 +44,7 @@ stages:
             analysisSummaries:
               - id: '{analysis_id}'
                 status: completed
+                runTimeParameters: []
   - name: Get protocol by ID
     request:
       url: '{ot3_server_base_url}/protocols/{protocol_id}'
@@ -69,6 +71,7 @@ stages:
           analysisSummaries:
             - id: '{analysis_id}'
               status: completed
+              runTimeParameters: []
         links:
           referencingRuns: []
   - name: Get protocol analysis by ID
@@ -645,6 +648,7 @@ stages:
           analysisSummaries:
             - id: !anystr
               status: pending
+              runTimeParameters: []
   - name: Retry until analyses status is completed.
     max_retries: 10
     delay_after: 0.1
@@ -661,6 +665,7 @@ stages:
             analysisSummaries:
               - id: '{analysis_id}'
                 status: completed
+                runTimeParameters: []
   - name: Get protocol analysis by ID
     request:
       url: '{ot3_server_base_url}/protocols/{protocol_id}/analyses'

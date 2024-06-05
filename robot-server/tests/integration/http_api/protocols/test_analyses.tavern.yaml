@@ -25,6 +25,7 @@ stages:
           analysisSummaries:
             - id: !anystr
               status: pending
+              runTimeParameters: []
 
   - name: Check that the analysis summary is present in /protocols/:id; retry until it says it's completed
     max_retries: 5
@@ -39,6 +40,7 @@ stages:
           analysisSummaries:
             - id: '{analysis_id}'
               status: completed
+              runTimeParameters: []
           id: !anything
           protocolType: !anything
           files: !anything
@@ -101,5 +103,7 @@ stages:
         data:
           - id: '{analysis_id}'
             status: completed
+            runTimeParameters: []
           - id: !anystr
             status: pending
+            runTimeParameters: []

@@ -242,6 +242,9 @@ class AnalysisStore:
         completed_analysis_ids = self._completed_store.get_ids_by_protocol(
             protocol_id=protocol_id
         )
+        # TODO (spp, 2024-06-05): populate runTimeParameters in the completed analysis summaries once
+        #  we start saving RTPs to their own table. Currently, fetching RTPs from a
+        #  completed analysis requires de-serializing the full analysis resource.
         completed_analysis_summaries = [
             AnalysisSummary.construct(id=analysis_id, status=AnalysisStatus.COMPLETED)
             for analysis_id in completed_analysis_ids
