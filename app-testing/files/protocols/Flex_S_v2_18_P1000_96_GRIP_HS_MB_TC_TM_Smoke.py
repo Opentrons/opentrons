@@ -346,7 +346,7 @@ def add_parameters(parameters: protocol_api.Parameters):
 
     parameters.add_bool(
         variable_name="prefer_gripper_disposal",
-        display_name="I love to refill tip racks",
+        display_name="I LOVE TO REFILL TIP RACKS",
         description="Prefer to use the gripper to dispose of labware, instead of manual moves off deck",
         default=False,
     )
@@ -466,8 +466,10 @@ def run(ctx: protocol_api.ProtocolContext) -> None:
 
                 if i == 1:
                     pipette_96_channel.drop_tip(waste_chute)
-                else:
+                elif i == 2:
                     pipette_96_channel.drop_tip()
+                else:
+                    pipette_96_channel.drop_tip(trash_bin)
 
             dispose_with_preferred_method(tip_rack_2)
 
