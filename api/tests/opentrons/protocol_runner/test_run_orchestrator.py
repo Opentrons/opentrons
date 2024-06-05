@@ -1,4 +1,6 @@
 """Tests for the RunOrchestrator."""
+from pathlib import Path
+
 import pytest
 from datetime import datetime
 from pytest_lazyfixture import lazy_fixture  # type: ignore[import-untyped]
@@ -13,6 +15,7 @@ from opentrons.hardware_control import API as HardwareAPI
 from opentrons.protocol_reader import (
     JsonProtocolConfig,
     PythonProtocolConfig,
+    ProtocolSource,
 )
 from opentrons.protocol_runner.run_orchestrator import RunOrchestrator
 from opentrons import protocol_runner
@@ -21,6 +24,7 @@ from opentrons.protocol_runner.protocol_runner import (
     PythonAndLegacyRunner,
     LiveRunner,
 )
+from opentrons.protocols.parse import PythonParseMode
 
 
 @pytest.fixture
@@ -92,6 +96,22 @@ def python_protocol_subject(
         fixit_runner=mock_fixit_runner,
         setup_runner=mock_setup_runner,
         json_or_python_protocol_runner=mock_protocol_python_runner,
+    )
+
+
+@pytest.fixture
+def live_protocol_subject(
+    mock_protocol_engine: ProtocolEngine,
+    mock_hardware_api: HardwareAPI,
+    mock_fixit_runner: LiveRunner,
+    mock_setup_runner: LiveRunner,
+) -> RunOrchestrator:
+    """Get a RunOrchestrator subject with a live runner."""
+    return RunOrchestrator(
+        protocol_engine=mock_protocol_engine,
+        hardware_api=mock_hardware_api,
+        fixit_runner=mock_fixit_runner,
+        setup_runner=mock_setup_runner,
     )
 
 
@@ -174,3 +194,141 @@ async def test_add_command_and_wait_for_interval(
     )
 
     assert result == added_command
+
+
+async def test_load_json(
+    decoy: Decoy,
+    json_protocol_subject: RunOrchestrator,
+    mock_protocol_engine: ProtocolEngine,
+    mock_protocol_json_runner: JsonRunner,
+) -> None:
+    """Should load a json protocol runner."""
+    protocol_source = ProtocolSource(
+        directory=Path("/dev/null"),
+        main_file=Path("/dev/null/abc.json"),
+        files=[],
+        metadata={},
+        robot_type="OT-2 Standard",
+        config=JsonProtocolConfig(schema_version=6),
+        content_hash="abc123",
+    )
+    await json_protocol_subject.load_json(protocol_source=protocol_source)
+
+    decoy.verify(await mock_protocol_json_runner.load(protocol_source))
+
+
+async def test_load_python(
+    decoy: Decoy,
+    python_protocol_subject: RunOrchestrator,
+    mock_protocol_engine: ProtocolEngine,
+    mock_protocol_python_runner: PythonAndLegacyRunner,
+) -> None:
+    """Should load a json protocol runner."""
+    protocol_source = ProtocolSource(
+        directory=Path("/dev/null"),
+        main_file=Path("/dev/null/abc.json"),
+        files=[],
+        metadata={},
+        robot_type="OT-2 Standard",
+        config=JsonProtocolConfig(schema_version=6),
+        content_hash="abc123",
+    )
+    await python_protocol_subject.load_python(
+        protocol_source=protocol_source,
+        python_parse_mode=PythonParseMode.NORMAL,
+        run_time_param_values=None,
+    )
+
+    decoy.verify(
+        await mock_protocol_python_runner.load(
+            protocol_source=protocol_source,
+            python_parse_mode=PythonParseMode.NORMAL,
+            run_time_param_values=None,
+        )
+    )
+
+
+async def test_load_json_raises_no_protocol(
+    decoy: Decoy,
+    live_protocol_subject: RunOrchestrator,
+    mock_protocol_engine: ProtocolEngine,
+) -> None:
+    """Should raise that there is no protocol runner."""
+    protocol_source = ProtocolSource(
+        directory=Path("/dev/null"),
+        main_file=Path("/dev/null/abc.json"),
+        files=[],
+        metadata={},
+        robot_type="OT-2 Standard",
+        config=JsonProtocolConfig(schema_version=6),
+        content_hash="abc123",
+    )
+    with pytest.raises(AssertionError):
+        await live_protocol_subject.load_json(protocol_source=protocol_source)
+
+
+def test_get_run_id(
+    mock_protocol_engine: ProtocolEngine,
+    mock_hardware_api: HardwareAPI,
+    mock_fixit_runner: LiveRunner,
+    mock_setup_runner: LiveRunner,
+) -> None:
+    """Should get run_id if builder was created with a run id."""
+    orchestrator = RunOrchestrator(
+        run_id="test-123",
+        protocol_engine=mock_protocol_engine,
+        hardware_api=mock_hardware_api,
+        fixit_runner=mock_fixit_runner,
+        setup_runner=mock_setup_runner,
+    )
+    assert orchestrator.run_id == "test-123"
+
+
+def test_get_run_id_raises(
+    mock_protocol_engine: ProtocolEngine,
+    mock_hardware_api: HardwareAPI,
+    mock_fixit_runner: LiveRunner,
+    mock_setup_runner: LiveRunner,
+) -> None:
+    """Should get run_id if builder was created with a run id."""
+    orchestrator = RunOrchestrator(
+        protocol_engine=mock_protocol_engine,
+        hardware_api=mock_hardware_api,
+        fixit_runner=mock_fixit_runner,
+        setup_runner=mock_setup_runner,
+    )
+    with pytest.raises(NotImplementedError):
+        orchestrator.run_id
+
+
+def test_get_is_okay_to_clear(
+    decoy: Decoy,
+    mock_protocol_engine: ProtocolEngine,
+    live_protocol_subject: RunOrchestrator,
+) -> None:
+    """Should return if is ok to clear run or not."""
+    decoy.when(
+        mock_protocol_engine.state_view.commands.get_is_okay_to_clear()
+    ).then_return(True)
+    result = live_protocol_subject.get_is_okay_to_clear()
+
+    assert result is True
+
+    decoy.when(
+        mock_protocol_engine.state_view.commands.get_is_okay_to_clear()
+    ).then_return(False)
+    result = live_protocol_subject.get_is_okay_to_clear()
+
+    assert result is False
+
+
+def test_prepare(
+    decoy: Decoy,
+    live_protocol_subject: RunOrchestrator,
+    mock_fixit_runner: LiveRunner,
+    mock_setup_runner: LiveRunner,
+) -> None:
+    """Verify prepare calls runner prepare."""
+    live_protocol_subject.prepare()
+    decoy.verify(mock_fixit_runner.prepare())
+    decoy.verify(mock_setup_runner.prepare())
