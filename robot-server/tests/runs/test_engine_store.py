@@ -77,6 +77,7 @@ async def test_create_engine_with_protocol(
     protocol = ProtocolResource(
         protocol_id="my cool protocol",
         protocol_key=None,
+        protocol_kind="standard",
         created_at=datetime(year=2021, month=1, day=1),
         source=json_protocol_source,
     )

@@ -215,6 +215,7 @@ async def test_create_with_options(
         created_at=datetime(year=2022, month=2, day=2),
         source=None,  # type: ignore[arg-type]
         protocol_key=None,
+        protocol_kind="standard",
     )
 
     labware_offset = pe_types.LabwareOffsetCreate(

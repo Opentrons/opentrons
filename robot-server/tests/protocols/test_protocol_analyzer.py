@@ -89,6 +89,7 @@ async def test_analyze(
             content_hash="abc123",
         ),
         protocol_key="dummy-data-111",
+        protocol_kind="standard",
     )
 
     analysis_command = pe_commands.WaitForResume(
@@ -202,6 +203,7 @@ async def test_analyze_updates_pending_on_error(
             content_hash="abc123",
         ),
         protocol_key="dummy-data-111",
+        protocol_kind="standard",
     )
 
     raised_exception = Exception("You got me!!")

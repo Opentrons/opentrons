@@ -25,6 +25,7 @@ stages:
               role: main
           createdAt: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"
           robotType: OT-2 Standard
+          protocolKind: standard
           metadata:
             apiLevel: '2.6'
             protocolName: basic_transfer_standalone

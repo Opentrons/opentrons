@@ -26,6 +26,7 @@ stages:
               role: main
           createdAt: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"
           robotType: OT-3 Standard
+          protocolKind: standard
           metadata:
             protocolName: Deck Coordinate PAPIv2 Test
           analyses: []

@@ -44,6 +44,7 @@ stages:
           files: !anything
           createdAt: !anything
           robotType: !anything
+          protocolKind: !anything
           metadata: !anything
         links: !anything
 
