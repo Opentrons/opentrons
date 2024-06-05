@@ -24,7 +24,7 @@ async function getCreateInvalidation(
     },
   }
 
-  if (dryrun) return Promise.resolve()
+  if (dryrun) return
 
   const data = await client.send(
     new CreateInvalidationCommand(cloudFrontParams)
