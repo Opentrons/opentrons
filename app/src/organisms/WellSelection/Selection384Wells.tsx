@@ -102,7 +102,7 @@ export function Selection384Wells({
     if (selectBy === 'wells') {
       deselectWells(wells.slice(deselectIndex, lastSelectedIndex + 1))
     } else {
-      deselectWells(selectableColumns[lastSelectedIndex])
+      deselectWells(columns[lastSelectedIndex])
     }
 
     setLastSelectedIndex(lastSelectedIndex => {

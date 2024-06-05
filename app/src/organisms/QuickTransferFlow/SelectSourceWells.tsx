@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
-import xor from 'lodash/xor'
+import without from 'lodash/without'
 import {
   Flex,
   JUSTIFY_CENTER,
@@ -76,9 +76,12 @@ export function SelectSourceWells(props: SelectSourceWellsProps): JSX.Element {
             definition={state.source}
             deselectWells={(wells: string[]) => {
               setSelectedWells(prevWells =>
-                xor(Object.keys(prevWells), wells).reduce((acc, well) => {
-                  return { ...acc, [well]: null }
-                }, {})
+                without(Object.keys(prevWells), ...wells).reduce(
+                  (acc, well) => {
+                    return { ...acc, [well]: null }
+                  },
+                  {}
+                )
               )
             }}
             resetWells={() => {
