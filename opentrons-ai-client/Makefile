@@ -17,7 +17,8 @@ tests ?=
 cov_opts ?= --coverage=true
 test_opts ?=
 
-target ?= build-production
+# This variable is for all command
+target ?= production
 
 # standard targets
 #####################################################################
