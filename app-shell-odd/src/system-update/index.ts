@@ -171,7 +171,7 @@ const getVersionFromOpenedZipIfValid = (zip: StreamZip): Promise<string> =>
             reject(new Error('not a Flex release file'))
           }
           const fileVersion = parsedContents?.opentrons_api_version
-          const version = Semver.valid(fileVersion)
+          const version = Semver.valid(fileVersion as string)
           if (version === null) {
             reject(new Error(`${fileVersion} is not a valid version`))
           } else {

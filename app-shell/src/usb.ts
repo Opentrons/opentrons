@@ -105,7 +105,7 @@ async function usbListener(
   // check for formDataProxy
   if (data?.proxiedFormData != null) {
     // reconstruct FormData
-    const formData = reconstructFormData(data.proxiedFormData)
+    const formData = reconstructFormData(data.proxiedFormData as IPCSafeFormData)
     formHeaders = formData.getHeaders()
     data = formData
   }
@@ -166,7 +166,7 @@ function tryCreateAndStartUsbHttpRequests(dispatch: Dispatch): void {
             const message = err?.message ?? err
             usbLog.error(`Failed to create serial port: ${message}`)
           }
-          if (agent) {
+          if (agent != null) {
             ipcMain.removeHandler('usb:request')
             ipcMain.handle('usb:request', usbListener)
             dispatch(usbRequestsStart())
