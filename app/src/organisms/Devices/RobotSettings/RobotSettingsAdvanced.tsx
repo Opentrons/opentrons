@@ -220,10 +220,7 @@ export function RobotSettingsAdvanced({
             />
           </>
         ) : null}
-        <Troubleshooting
-          robotName={robotName}
-          isEstopNotDisengaged={isEstopNotDisengaged}
-        />
+        <Troubleshooting robotName={robotName} />
         <Divider marginY={SPACING.spacing16} />
         <DeviceReset
           updateIsExpanded={updateIsExpanded}
