@@ -749,7 +749,7 @@ class Protocols:
         robot="Flex",
         app_error=False,
         robot_error=False,
-        custom_labware=["eppendorf_96_well_plate_150_µl"]
+        custom_labware=["eppendorf_96_well_plate_150_µl"],
     )
 
     Flex_S_v2_18_KAPA_Library_Quant: Protocol = Protocol(
