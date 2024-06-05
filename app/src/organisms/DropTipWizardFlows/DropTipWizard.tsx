@@ -42,7 +42,6 @@ import type {
   UseDropTipWithTypeResult,
   DropTipErrorComponents,
 } from './hooks'
-import type { DropTipFlowsStep } from './types'
 import type { DropTipWizardFlowsProps, IssuedCommandsType } from '.'
 
 export type DropTipWizardProps = DropTipWizardFlowsProps &
@@ -178,25 +177,28 @@ export function DropTipWizardSetupType(
 }
 
 // TOME: You can probably clean up a lot of these props by just passing them directly itno components.
-export const DropTipWizardContent = ({
-  robotType,
-  isOnDevice,
-  activeMaintenanceRunId,
-  currentStep,
-  errorDetails,
-  isCommandInProgress,
-  isExiting,
-  proceed,
-  proceedToRoute,
-  showConfirmExit,
-  dropTipCommands,
-  proceedWithConditionalClose,
-  goBackRunValid,
-  confirmExit,
-  cancelExit,
-  toggleExitInitiated,
-  errorComponents,
-}: DropTipWizardContainerProps): JSX.Element => {
+export const DropTipWizardContent = (
+  props: DropTipWizardContainerProps
+): JSX.Element => {
+  const {
+    isOnDevice,
+    activeMaintenanceRunId,
+    currentStep,
+    errorDetails,
+    isCommandInProgress,
+    isExiting,
+    proceed,
+    proceedToRoute,
+    showConfirmExit,
+    dropTipCommands,
+    proceedWithConditionalClose,
+    goBackRunValid,
+    confirmExit,
+    cancelExit,
+    toggleExitInitiated,
+    errorComponents,
+  } = props
+
   const { t, i18n } = useTranslation('drop_tip_wizard')
 
   function buildGettingReady(): JSX.Element {
@@ -236,12 +238,7 @@ export const DropTipWizardContent = ({
   }
 
   function buildBeforeBeginning(): JSX.Element {
-    return (
-      <BeforeBeginning
-        proceedToRoute={proceedToRoute}
-        isOnDevice={isOnDevice}
-      />
-    )
+    return <BeforeBeginning {...props} />
   }
 
   function buildChooseLocation(): JSX.Element {
@@ -260,7 +257,7 @@ export const DropTipWizardContent = ({
 
     return (
       <ChooseLocation
-        robotType={robotType}
+        {...props}
         handleProceed={proceedWithConditionalClose}
         handleGoBack={goBackRunValid}
         title={
@@ -276,7 +273,6 @@ export const DropTipWizardContent = ({
           />
         }
         moveToAddressableArea={moveToAddressableArea}
-        isOnDevice={isOnDevice}
       />
     )
   }
@@ -286,6 +282,7 @@ export const DropTipWizardContent = ({
 
     return (
       <JogToPosition
+        {...props}
         handleJog={handleJog}
         handleProceed={() => blowoutOrDropTip(currentStep, proceed)}
         handleGoBack={goBackRunValid}
@@ -294,8 +291,6 @@ export const DropTipWizardContent = ({
             ? t('position_and_blowout')
             : t('position_and_drop_tip')
         }
-        currentStep={currentStep as DropTipFlowsStep}
-        isOnDevice={isOnDevice}
       />
     )
   }
@@ -312,6 +307,7 @@ export const DropTipWizardContent = ({
 
     return (
       <Success
+        {...props}
         message={
           currentStep === BLOWOUT_SUCCESS
             ? t('blowout_complete')
@@ -323,7 +319,6 @@ export const DropTipWizardContent = ({
             ? i18n.format(t('shared:continue'), 'capitalize')
             : i18n.format(t('shared:exit'), 'capitalize')
         }
-        isOnDevice={isOnDevice}
       />
     )
   }
