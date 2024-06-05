@@ -37,7 +37,7 @@ def get_error_runs_from_robot(ip: str) -> List[str]:
             error_run_ids.append(run_id)
     return error_run_ids
 
-def get_robot_state(ip:str)-> List[str]:
+def get_robot_state(ip:str, reported_string)-> List[str]:
     """Get robot status in case of non run error."""
     description = dict()
     # Get instruments attached to robot
@@ -53,8 +53,12 @@ def get_robot_state(ip:str)-> List[str]:
         f"http://{ip}:31950/health", headers={"opentrons-version": "3"}
     )
     health_data = response.json()
-    description["robot_name"] = health_data.get("name", "")
-    description["affects_version"] = health_data.get("api_version", "")
+    parent = health_data.get("name", "")
+    # Create summary name
+    description["robot_name"] = parent
+    summary = parent + "_" + reported_string
+    affects_version = health_data.get("api_version", "")
+    description["affects_version"] = affects_version
     # Instruments Attached
     response = requests.get(
         f"http://{ip}:31950/instruments", headers={"opentrons-version": "3"}
@@ -63,13 +67,26 @@ def get_robot_state(ip:str)-> List[str]:
     for instrument in instrument_data["data"]:
         description[instrument["mount"]] = instrument["serialNumber"]
     # Get modules attached to robot
-    # Instruments Attached
     response = requests.get(
         f"http://{ip}:31950/modules", headers={"opentrons-version": "3"}
     )
     module_data = response.json()
     for module in module_data["data"]:
-        description[module_data["mount"]] = instrument["serialNumber"]
+        print(module)
+        description[module["moduleType"]] = module["serialNumber"]
+    components = ["Flex-RABR"]
+    whole_description_str = (
+        "{"
+        + "\n".join("{!r}: {!r},".format(k, v) for k, v in description.items())
+        + "}"
+    )
+    return (
+        summary,
+        parent,
+        affects_version,
+        components,
+        whole_description_str,
+    )
 
 
 def get_run_error_info_from_robot(
@@ -170,7 +187,7 @@ if __name__ == "__main__":
     storage_directory = args.storage_directory[0]
     ip = str(input("Enter Robot IP: "))
     assignee = str(input("Enter Assignee Full Name:"))
-    run_or_other = len(str(input("Press ENTER to report run error. If not a run error, type other.")))
+    run_or_other = (str(input("Press ENTER to report run error. If not a run error, type short summary of error: ")))
     url = "https://opentrons.atlassian.net"
     api_token = args.jira_api_token[0]
     email = args.email[0]
@@ -180,20 +197,30 @@ if __name__ == "__main__":
     ticket.issues_on_board(board_id)
     users_file_path = ticket.get_jira_users(storage_directory)
     assignee_id = get_user_id(users_file_path, assignee)
+    run_log_file_path = ""
     try:
         error_runs = get_error_runs_from_robot(ip)
     except requests.exceptions.InvalidURL:
         print("Invalid IP address.")
         sys.exit()
     one_run = error_runs[-1]  # Most recent run with error.
-    (
-        summary,
-        robot,
-        affects_version,
-        components,
-        whole_description_str,
-        run_log_file_path,
-    ) = get_run_error_info_from_robot(ip, one_run, storage_directory)
+    if len(run_or_other) < 1:
+        (
+            summary,
+            robot,
+            affects_version,
+            components,
+            whole_description_str,
+            run_log_file_path,
+        ) = get_run_error_info_from_robot(ip, one_run, storage_directory)
+    else:
+        (
+            summary,
+            robot,
+            affects_version,
+            components,
+            whole_description_str,
+        ) = get_robot_state(ip, run_or_other)
     # Get Calibration Data
     saved_file_path_calibration, calibration = read_robot_logs.get_calibration_offsets(
         ip, storage_directory
@@ -220,14 +247,18 @@ if __name__ == "__main__":
     # OPEN TICKET
     issue_url = ticket.open_issue(issue_key)
     # MOVE FILES TO ERROR FOLDER.
+    
     error_files = [saved_file_path_calibration, run_log_file_path] + file_paths
     error_folder_path = os.path.join(storage_directory, issue_key)
     os.makedirs(error_folder_path, exist_ok=True)
     for source_file in error_files:
-        destination_file = os.path.join(
-            error_folder_path, os.path.basename(source_file)
-        )
-        shutil.move(source_file, destination_file)
+        try:
+            destination_file = os.path.join(
+                error_folder_path, os.path.basename(source_file)
+            )
+            shutil.move(source_file, destination_file)
+        except shutil.Error:
+            continue
     # OPEN FOLDER DIRECTORY
     subprocess.Popen(["explorer", error_folder_path])
     # CONNECT TO GOOGLE DRIVE
