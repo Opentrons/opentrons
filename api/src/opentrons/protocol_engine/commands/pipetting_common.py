@@ -2,7 +2,7 @@
 from dataclasses import dataclass
 from opentrons_shared_data.errors import ErrorCodes
 from pydantic import BaseModel, Field
-from typing import Literal, Optional, TypedDict
+from typing import Literal, Optional
 
 from opentrons.protocol_engine.errors.error_occurrence import ErrorOccurrence
 
@@ -123,18 +123,12 @@ class DestinationPositionResult(BaseModel):
     )
 
 
-class OverpressureErrorInfo(TypedDict):  # noqa: D101
-    # Documentation for this is on the field in OverpressureError
-    # so it shows up in robot-server's OpenAPI spec.
-    volume: float
-
-
 class OverpressureError(ErrorOccurrence):
-    """Returned when sensors detect an overpressure error.
+    """Returned when sensors detect an overpressure error while moving liquid.
 
-    This is returned by commands that move the pipette plunger. The plunger motion is
-    stopped at the point of the error. After this error, It's safe to issue subsequent
-    `aspirate`, `dispense` etc. commands to pick up from where the error happened.
+    The pipette plunger motion is stopped at the point of the error. The next thing to
+    move the plunger must be a `home` or `blowout` command; commands like `aspirate`
+    will return an error.
     """
 
     isDefined: bool = True
@@ -143,14 +137,6 @@ class OverpressureError(ErrorOccurrence):
 
     errorCode: str = ErrorCodes.PIPETTE_OVERPRESSURE.value.code
     detail: str = ErrorCodes.PIPETTE_OVERPRESSURE.value.detail
-
-    errorInfo: OverpressureErrorInfo = Field(
-        ...,
-        description=(
-            "The amount, in µL, aspirated or dispensed by this command before it"
-            " encountered the overpressure error."
-        ),
-    )
 
 
 @dataclass(frozen=True)

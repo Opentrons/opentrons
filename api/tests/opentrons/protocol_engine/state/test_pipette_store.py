@@ -11,7 +11,6 @@ from opentrons.protocol_engine import commands as cmd
 from opentrons.protocol_engine.commands.command import DefinedErrorData
 from opentrons.protocol_engine.commands.pipetting_common import (
     OverpressureError,
-    OverpressureErrorInfo,
     OverpressureErrorInternalData,
 )
 from opentrons.protocol_engine.error_recovery_policy import ErrorRecoveryType
@@ -177,56 +176,16 @@ def test_handles_drop_tip_in_place(subject: PipetteStore) -> None:
 
 
 @pytest.mark.parametrize(
-    "aspirate_action",
+    "aspirate_command",
     [
-        SucceedCommandAction(
-            private_result=None,
-            command=create_aspirate_command(
-                pipette_id="pipette-id", volume=42, flow_rate=1.23
-            ),
-        ),
-        FailCommandAction(
-            running_command=cmd.Aspirate(
-                params=cmd.AspirateParams(
-                    pipetteId="pipette-id",
-                    labwareId="labware-id",
-                    wellName="well-name",
-                    volume=99999,
-                    flowRate=1.23,
-                ),
-                id="command-id",
-                key="command-key",
-                createdAt=datetime.now(),
-                status=cmd.CommandStatus.RUNNING,
-            ),
-            error=DefinedErrorData(
-                public=OverpressureError(
-                    errorInfo=OverpressureErrorInfo(volume=42),
-                    id="error-id",
-                    detail="error-detail",
-                    createdAt=datetime.now(),
-                ),
-                private=OverpressureErrorInternalData(
-                    position=DeckPoint(x=0, y=0, z=0)
-                ),
-            ),
-            command_id="command-id",
-            error_id="error-id",
-            failed_at=datetime.now(),
-            notes=[],
-            type=ErrorRecoveryType.WAIT_FOR_RECOVERY,
-        ),
-        SucceedCommandAction(
-            private_result=None,
-            command=create_aspirate_in_place_command(
-                pipette_id="pipette-id", volume=42, flow_rate=1.23
-            ),
+        create_aspirate_command(pipette_id="pipette-id", volume=42, flow_rate=1.23),
+        create_aspirate_in_place_command(
+            pipette_id="pipette-id", volume=42, flow_rate=1.23
         ),
     ],
 )
 def test_aspirate_adds_volume(
-    subject: PipetteStore,
-    aspirate_action: Union[SucceedCommandAction, FailCommandAction],
+    subject: PipetteStore, aspirate_command: cmd.Command
 ) -> None:
     """It should add volume to pipette after an aspirate."""
     load_command = create_load_pipette_command(
@@ -238,11 +197,15 @@ def test_aspirate_adds_volume(
     subject.handle_action(
         SucceedCommandAction(private_result=None, command=load_command)
     )
-    subject.handle_action(aspirate_action)
+    subject.handle_action(
+        SucceedCommandAction(private_result=None, command=aspirate_command)
+    )
 
     assert subject.state.aspirated_volume_by_id["pipette-id"] == 42
 
-    subject.handle_action(aspirate_action)
+    subject.handle_action(
+        SucceedCommandAction(private_result=None, command=aspirate_command)
+    )
 
     assert subject.state.aspirated_volume_by_id["pipette-id"] == 84
 
@@ -366,7 +329,6 @@ def test_blow_out_clears_volume(
                     public=OverpressureError(
                         id="error-id",
                         createdAt=datetime.now(),
-                        errorInfo=OverpressureErrorInfo(volume=1234),
                     ),
                     private=OverpressureErrorInternalData(
                         position=DeckPoint(x=0, y=0, z=0)
@@ -848,7 +810,6 @@ def test_add_pipette_config(
             ),
             error=DefinedErrorData(
                 public=OverpressureError(
-                    errorInfo=OverpressureErrorInfo(volume=42),
                     id="error-id",
                     detail="error-detail",
                     createdAt=datetime.now(),

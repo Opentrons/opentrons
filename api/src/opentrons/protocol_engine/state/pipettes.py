@@ -447,18 +447,6 @@ class PipetteStore(HasState[PipetteState], HandlesActions):
 
             self._state.aspirated_volume_by_id[pipette_id] = next_volume
 
-        elif (
-            isinstance(action, FailCommandAction)
-            and isinstance(action.running_command, Aspirate)
-            and isinstance(action.error, DefinedErrorData)
-            and isinstance(action.error.public, OverpressureError)
-        ):
-            pipette_id = action.running_command.params.pipetteId
-            previous_volume = self._state.aspirated_volume_by_id[pipette_id] or 0
-            next_volume = previous_volume + action.error.public.errorInfo["volume"]
-
-            self._state.aspirated_volume_by_id[pipette_id] = next_volume
-
         elif isinstance(action, SucceedCommandAction) and isinstance(
             action.command.result, (DispenseResult, DispenseInPlaceResult)
         ):
