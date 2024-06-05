@@ -73,7 +73,7 @@ export function ChatDisplay({ chat, chatId }: ChatDisplayProps): JSX.Element {
             li: ListItemText,
             p: ParagraphText,
             a: isUser ? ParagraphText : ExternalLink,
-            code: isUser ? ParagraphText : CodeText,
+            code: CodeText,
           }}
         >
           {reply}
@@ -129,10 +129,12 @@ function UnnumberedListText(props: JSX.IntrinsicAttributes): JSX.Element {
 }
 
 const CodeWrapper = styled(Flex)`
+  display: inline-flex;
   font-family: monospace;
-  padding: ${SPACING.spacing16};
-  color: ${COLORS.white};
-  background-color: ${COLORS.black90};
-  border-radius: ${BORDERS.borderRadius8};
+  padding: ${SPACING.spacing4};
+  color: ${COLORS.black80};
+  background-color: ${COLORS.grey20};
+  border-radius: ${BORDERS.borderRadius4};
   overflow: auto;
+  border: 1px solid ${COLORS.blue35};
 `
