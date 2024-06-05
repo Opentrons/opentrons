@@ -37,8 +37,42 @@ def get_error_runs_from_robot(ip: str) -> List[str]:
             error_run_ids.append(run_id)
     return error_run_ids
 
+def get_robot_state(ip:str)-> List[str]:
+    """Get robot status in case of non run error."""
+    description = dict()
+    # Get instruments attached to robot
+    try:
+        response = requests.get(
+            f"http://{ip}:31950/health", headers={"opentrons-version": "3"}
+        )
+        print(f"Connected to {ip}")
+    except Exception:
+        print(f"ERROR: Failed to read IP address: {ip}")
+        sys.exit()
+    response = requests.get(
+        f"http://{ip}:31950/health", headers={"opentrons-version": "3"}
+    )
+    health_data = response.json()
+    description["robot_name"] = health_data.get("name", "")
+    description["affects_version"] = health_data.get("api_version", "")
+    # Instruments Attached
+    response = requests.get(
+        f"http://{ip}:31950/instruments", headers={"opentrons-version": "3"}
+    )
+    instrument_data = response.json()
+    for instrument in instrument_data["data"]:
+        description[instrument["mount"]] = instrument["serialNumber"]
+    # Get modules attached to robot
+    # Instruments Attached
+    response = requests.get(
+        f"http://{ip}:31950/modules", headers={"opentrons-version": "3"}
+    )
+    module_data = response.json()
+    for module in module_data["data"]:
+        description[module_data["mount"]] = instrument["serialNumber"]
 
-def get_error_info_from_robot(
+
+def get_run_error_info_from_robot(
     ip: str, one_run: str, storage_directory: str
 ) -> Tuple[str, str, str, List[str], str, str]:
     """Get error information from robot to fill out ticket."""
@@ -136,6 +170,7 @@ if __name__ == "__main__":
     storage_directory = args.storage_directory[0]
     ip = str(input("Enter Robot IP: "))
     assignee = str(input("Enter Assignee Full Name:"))
+    run_or_other = len(str(input("Press ENTER to report run error. If not a run error, type other.")))
     url = "https://opentrons.atlassian.net"
     api_token = args.jira_api_token[0]
     email = args.email[0]
@@ -158,7 +193,7 @@ if __name__ == "__main__":
         components,
         whole_description_str,
         run_log_file_path,
-    ) = get_error_info_from_robot(ip, one_run, storage_directory)
+    ) = get_run_error_info_from_robot(ip, one_run, storage_directory)
     # Get Calibration Data
     saved_file_path_calibration, calibration = read_robot_logs.get_calibration_offsets(
         ip, storage_directory
