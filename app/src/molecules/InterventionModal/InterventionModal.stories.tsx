@@ -6,7 +6,7 @@ import { StyledText } from '@opentrons/components'
 import { configReducer } from '../../redux/config/reducer'
 import { InterventionModal as InterventionModalComponent } from './'
 
-import type { Store } from 'redux'
+import type { Store, StoreEnhancer } from 'redux'
 import type { Meta, StoryObj } from '@storybook/react'
 
 const dummyConfig = {
@@ -14,7 +14,7 @@ const dummyConfig = {
     isOnDevice: false,
   },
 } as any
-const store: Store<any> = createStore(configReducer, dummyConfig)
+const store: Store<any> = createStore(configReducer, dummyConfig as StoreEnhancer)
 
 const meta: Meta<typeof InterventionModalComponent> = {
   title: 'App/Molecules/InterventionModal',

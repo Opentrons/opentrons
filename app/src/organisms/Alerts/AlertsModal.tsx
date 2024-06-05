@@ -55,7 +55,7 @@ export function AlertsModal({ toastIdRef }: AlertsModalProps): JSX.Element {
   React.useEffect(() => {
     if (hasJustUpdated) {
       makeToast(
-        t('branded:opentrons_app_successfully_updated'),
+        t('branded:opentrons_app_successfully_updated') as string,
         SUCCESS_TOAST,
         {
           closeButton: true,
@@ -69,7 +69,7 @@ export function AlertsModal({ toastIdRef }: AlertsModalProps): JSX.Element {
   React.useEffect(() => {
     if (createAppUpdateAvailableToast) {
       toastIdRef.current = makeToast(
-        t('branded:opentrons_app_update_available_variation'),
+        t('branded:opentrons_app_update_available_variation') as string,
         WARNING_TOAST,
         {
           closeButton: true,

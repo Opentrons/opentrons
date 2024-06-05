@@ -14,7 +14,7 @@ import { WizardHeader } from '../WizardHeader'
 import { configReducer } from '../../redux/config/reducer'
 import { GenericWizardTile } from './index'
 
-import type { Store } from 'redux'
+import type { Store, StoreEnhancer } from 'redux'
 import type { Story, Meta } from '@storybook/react'
 
 const dummyConfig = {
@@ -23,7 +23,7 @@ const dummyConfig = {
   },
 } as any
 
-const store: Store<any> = createStore(configReducer, dummyConfig)
+const store: Store<any> = createStore(configReducer, dummyConfig as StoreEnhancer)
 
 export default {
   title: 'App/Molecules/GenericWizardTile',
