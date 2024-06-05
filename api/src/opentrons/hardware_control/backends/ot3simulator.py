@@ -347,8 +347,6 @@ class OT3Simulator(FlexBackend):
         threshold_pascals: float,
         output_format: OutputOptions = OutputOptions.can_bus_only,
         data_files: Optional[Dict[InstrumentProbeType, str]] = None,
-        auto_zero_sensor: bool = True,
-        num_baseline_reads: int = 10,
         probe: InstrumentProbeType = InstrumentProbeType.PRIMARY,
     ) -> float:
         z_axis = Axis.by_mount(mount)

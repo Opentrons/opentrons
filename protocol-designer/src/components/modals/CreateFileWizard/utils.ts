@@ -68,7 +68,9 @@ const TOTAL_MODULE_SLOTS = 8
 
 export const getNumSlotsAvailable = (
   modules: FormState['modules'],
-  additionalEquipment: FormState['additionalEquipment']
+  additionalEquipment: FormState['additionalEquipment'],
+  //  special-casing the wasteChute available slots when there is a staging area in slot 3
+  isWasteChute?: boolean
 ): number => {
   const additionalEquipmentLength = additionalEquipment.length
   const hasTC = Object.values(modules || {}).some(
@@ -97,6 +99,9 @@ export const getNumSlotsAvailable = (
 
   let filteredAdditionalEquipmentLength = additionalEquipmentLength
   if (hasWasteChute && isStagingAreaInD3) {
+    filteredAdditionalEquipmentLength = filteredAdditionalEquipmentLength - 1
+  }
+  if (isWasteChute && isStagingAreaInD3) {
     filteredAdditionalEquipmentLength = filteredAdditionalEquipmentLength - 1
   }
   if (hasGripper) {
@@ -132,7 +137,11 @@ export const getTrashOptionDisabled = (
 ): boolean => {
   const { additionalEquipment, modules, trashType } = props
   const hasNoSlotsAvailable =
-    getNumSlotsAvailable(modules, additionalEquipment) === 0
+    getNumSlotsAvailable(
+      modules,
+      additionalEquipment,
+      trashType === 'wasteChute'
+    ) === 0
   return hasNoSlotsAvailable && !additionalEquipment.includes(trashType)
 }
 

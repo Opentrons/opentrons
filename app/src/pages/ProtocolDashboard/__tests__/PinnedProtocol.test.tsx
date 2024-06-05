@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { vi, it, describe, expect } from 'vitest'
-import { act, fireEvent } from '@testing-library/react'
+import { act, fireEvent, screen } from '@testing-library/react'
 import { MemoryRouter } from 'react-router-dom'
 
 import { renderWithProviders } from '../../../__testing-utils__'
@@ -59,25 +59,25 @@ describe('Pinned Protocol', () => {
   vi.useFakeTimers()
 
   it('should redirect to protocol details after short click', () => {
-    const [{ getByText }] = render()
-    const name = getByText('yay mock protocol')
+    render()
+    const name = screen.getByText('yay mock protocol')
     fireEvent.click(name)
     expect(mockPush).toHaveBeenCalledWith('/protocols/mockProtocol1')
   })
 
   it('should display modal after long click', async () => {
     vi.useFakeTimers()
-    const [{ getByText }] = render()
-    const name = getByText('yay mock protocol')
+    render()
+    const name = screen.getByText('yay mock protocol')
     fireEvent.mouseDown(name)
     act(() => {
       vi.advanceTimersByTime(1005)
     })
     expect(props.longPress).toHaveBeenCalled()
-    getByText('Run protocol')
+    screen.getByText('Run protocol')
     // This should ne "Unpin protocol" but I don't know how to pass state into the render
     // call so the longpress modal can see the pinned ids.
-    getByText('Pin protocol')
-    getByText('Delete protocol')
+    screen.getByText('Pin protocol')
+    screen.getByText('Delete protocol')
   })
 })

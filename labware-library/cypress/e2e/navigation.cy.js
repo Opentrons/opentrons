@@ -15,7 +15,7 @@ describe('Desktop Navigation', () => {
     cy.get("div[class*='_subdomain_nav_wrapper_']")
       .contains('Protocol Library')
       .should('have.prop', 'href')
-      .and('equal', 'https://protocols.opentrons.com/')
+      .and('equal', 'https://library.opentrons.com/')
     cy.get("div[class*='_subdomain_nav_wrapper_']")
       .contains('Protocol Designer')
       .should('have.prop', 'href')

@@ -8,6 +8,18 @@ import shutil
 import os
 import subprocess
 import sys
+import json
+
+
+def get_user_id(user_file_path: str, assignee_name: str) -> str:
+    """Get assignee account id."""
+    users = json.load(open(user_file_path))
+    assignee_id = "-1"  # Code to leave issue unassigned.
+    for item in users:
+        user = users[item]
+        if user["displayName"] == assignee_name:
+            assignee_id = user["accountId"]
+    return assignee_id
 
 
 def get_error_runs_from_robot(ip: str) -> List[str]:
@@ -123,6 +135,7 @@ if __name__ == "__main__":
     args = parser.parse_args()
     storage_directory = args.storage_directory[0]
     ip = str(input("Enter Robot IP: "))
+    assignee = str(input("Enter Assignee Full Name:"))
     url = "https://opentrons.atlassian.net"
     api_token = args.jira_api_token[0]
     email = args.email[0]
@@ -130,6 +143,8 @@ if __name__ == "__main__":
     reporter_id = args.reporter_id[0]
     ticket = jira_tool.JiraTicket(url, api_token, email)
     ticket.issues_on_board(board_id)
+    users_file_path = ticket.get_jira_users(storage_directory)
+    assignee_id = get_user_id(users_file_path, assignee)
     try:
         error_runs = get_error_runs_from_robot(ip)
     except requests.exceptions.InvalidURL:
@@ -144,7 +159,6 @@ if __name__ == "__main__":
         whole_description_str,
         run_log_file_path,
     ) = get_error_info_from_robot(ip, one_run, storage_directory)
-    affects_version = "internal release - any"
     # Get Calibration Data
     saved_file_path_calibration, calibration = read_robot_logs.get_calibration_offsets(
         ip, storage_directory
@@ -161,6 +175,7 @@ if __name__ == "__main__":
         whole_description_str,
         project_key,
         reporter_id,
+        assignee_id,
         "Bug",
         "Medium",
         components,
