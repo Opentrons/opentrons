@@ -108,18 +108,14 @@ class AllMoveSequences:
     moves: typing.List[MoveSequence]
 
     @classmethod
-    def abbreviated_moves(
-        cls, all_modules: typing.List[ValidModuleLocations]
-    ) -> "AllMoveSequences":
+    def abbreviated_moves(cls, all_modules: typing.List[ValidModuleLocations]) -> "AllMoveSequences":
         module_to_move_to = all_modules[0]
         return cls(
             [MoveSequence(move_tos=["B2", module_to_move_to, "D4", "C3"], starting_location="C2", reset_to_start_after_each_move=False)],
         )
 
     @classmethod
-    def all_moves(
-        cls, all_modules: typing.List[ValidModuleLocations]
-    ) -> "AllMoveSequences":
+    def all_moves(cls, all_modules: typing.List[ValidModuleLocations]) -> "AllMoveSequences":
         return cls(
             [
                 # Covers
@@ -157,7 +153,9 @@ class AllMoveSequences:
             ],
         )
 
-    def do_moves(self, ctx: protocol_api.ProtocolContext, labware: protocol_api.Labware, original_labware_location: DeckSlots | ValidModuleLocations):
+    def do_moves(
+        self, ctx: protocol_api.ProtocolContext, labware: protocol_api.Labware, original_labware_location: DeckSlots | ValidModuleLocations
+    ):
         for move_sequence in self.moves:
             move_sequence.do_moves(ctx, labware)
 
@@ -624,11 +622,7 @@ def run(ctx: protocol_api.ProtocolContext) -> None:
     ### THE ORDER OF THESE FUNCTION CALLS MATTER. CHANGING THEM WILL CAUSE THE PROTOCOL NOT TO WORK ###
     ###################################################################################################
     test_pipetting()
-    test_config.gripper_moves.do_moves(
-        ctx=ctx,
-        labware=dest_pcr_plate,
-        original_labware_location="C2"
-    )
+    test_config.gripper_moves.do_moves(ctx=ctx, labware=dest_pcr_plate, original_labware_location="C2")
     test_module_usage()
     test_manual_moves()
     if test_config.test_set_offset:
