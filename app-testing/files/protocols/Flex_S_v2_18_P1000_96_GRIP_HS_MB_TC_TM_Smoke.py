@@ -195,7 +195,7 @@ class TestConfiguration:
     configuration_name: TestConfigurationChoices
     reservoir_name: str
     well_plate_name: str
-    prefer_move_off_deck: bool
+    prefer_gripper_disposal: bool
 
     test_set_offset: bool
     run_abbreviated_pipetting_test: bool
@@ -216,7 +216,7 @@ class TestConfiguration:
 
     @classmethod
     def _get_qa_config(
-        cls, prefer_move_off_deck: bool, reservoir_name: str, well_plate_name: str, all_modules: typing.List[ValidModuleLocations]
+        cls, prefer_gripper_disposal: bool, reservoir_name: str, well_plate_name: str, all_modules: typing.List[ValidModuleLocations]
     ) -> "TestConfiguration":
         return cls(
             configuration_name="qa",
@@ -225,14 +225,14 @@ class TestConfiguration:
             test_set_offset=True,
             run_abbreviated_pipetting_test=False,
             partial_tip_pickup_column_count=12,
-            prefer_move_off_deck=prefer_move_off_deck,
+            prefer_gripper_disposal=prefer_gripper_disposal,
             module_temps=ModuleTemperatureConfiguration.qa_configuration(),
             gripper_moves=AllMoveSequences.all_moves(all_modules),
         )
 
     @classmethod
     def _get_dev_config(
-        cls, prefer_move_off_deck: bool, reservoir_name: str, well_plate_name: str, all_modules: typing.List[ValidModuleLocations]
+        cls, prefer_gripper_disposal: bool, reservoir_name: str, well_plate_name: str, all_modules: typing.List[ValidModuleLocations]
     ) -> "TestConfiguration":
         return cls(
             configuration_name="dev",
@@ -241,7 +241,7 @@ class TestConfiguration:
             test_set_offset=False,
             run_abbreviated_pipetting_test=True,
             partial_tip_pickup_column_count=2,
-            prefer_move_off_deck=prefer_move_off_deck,
+            prefer_gripper_disposal=prefer_gripper_disposal,
             module_temps=ModuleTemperatureConfiguration.dev_configuration(),
             gripper_moves=AllMoveSequences.abbreviated_moves(all_modules),
         )
@@ -255,20 +255,20 @@ class TestConfiguration:
         ],
     ) -> "TestConfiguration":
         test_configuration = parameters.test_configuration
-        prefer_move_off_deck = parameters.prefer_move_off_deck
+        prefer_gripper_disposal = parameters.prefer_gripper_disposal
         reservoir_name = parameters.reservoir_name
         well_plate_name = parameters.well_plate_name
 
         if test_configuration == "qa":
             return cls._get_qa_config(
-                prefer_move_off_deck=prefer_move_off_deck,
+                prefer_gripper_disposal=prefer_gripper_disposal,
                 reservoir_name=reservoir_name,
                 well_plate_name=well_plate_name,
                 all_modules=where_to_put_labware_on_modules,
             )
         elif test_configuration == "dev":
             return cls._get_dev_config(
-                prefer_move_off_deck=prefer_move_off_deck,
+                prefer_gripper_disposal=prefer_gripper_disposal,
                 reservoir_name=reservoir_name,
                 well_plate_name=well_plate_name,
                 all_modules=where_to_put_labware_on_modules,
@@ -345,15 +345,14 @@ def add_parameters(parameters: protocol_api.Parameters):
     )
 
     parameters.add_bool(
-        variable_name="prefer_move_off_deck",
-        display_name="Prefer Move Off Deck",
-        description="Prefer to move off deck, instead of waste chute disposal, if possible",
-        default=True,
+        variable_name="prefer_gripper_disposal",
+        display_name="I love to refill tip racks",
+        description="Prefer to use the gripper to dispose of labware, instead of manual moves off deck",
+        default=False,
     )
 
 
 def run(ctx: protocol_api.ProtocolContext) -> None:
-
     ################
     ### FIXTURES ###
     ################
@@ -423,7 +422,7 @@ def run(ctx: protocol_api.ProtocolContext) -> None:
     ### GRIPPER LABWARE MOVEMENT ###
     ################################
 
-    def get_disposal_preference():
+    def dispose_with_preferred_method(labware: protocol_api.Labware):
         """
         Get the disposal preference based on the PREFER_MOVE_OFF_DECK flag.
 
@@ -432,7 +431,10 @@ def run(ctx: protocol_api.ProtocolContext) -> None:
                    either `protocol_api.OFF_DECK` or `waste_chute`. The second element is a boolean indicating
                    whether the gripper is being used or not.
         """
-        return (protocol_api.OFF_DECK, False) if test_config.prefer_move_off_deck else (waste_chute, True)
+        if test_config.prefer_gripper_disposal:
+            ctx.move_labware(labware, waste_chute, use_gripper=True)
+        else:
+            ctx.move_labware(labware, protocol_api.OFF_DECK, use_gripper=False)
 
     def test_manual_moves():
         # In C4 currently
@@ -467,9 +469,7 @@ def run(ctx: protocol_api.ProtocolContext) -> None:
                 else:
                     pipette_96_channel.drop_tip()
 
-            # leave this dropping in waste chute, do not use get_disposal_preference
-            # want to test partial drop
-            ctx.move_labware(tip_rack_2, waste_chute, use_gripper=True)
+            dispose_with_preferred_method(tip_rack_2)
 
         def test_full_tip_rack_usage():
             pipette_96_channel.configure_nozzle_layout(style=protocol_api.ALL, start="A1")
@@ -485,7 +485,7 @@ def run(ctx: protocol_api.ProtocolContext) -> None:
             pipette_96_channel.blow_out(waste_chute)
 
             pipette_96_channel.return_tip()
-            ctx.move_labware(tip_rack_1, get_disposal_preference()[0], use_gripper=get_disposal_preference()[1])
+            dispose_with_preferred_method(tip_rack_1)
             ctx.move_labware(tip_rack_3, tip_rack_adapter, use_gripper=True)
 
             if not test_config.run_abbreviated_pipetting_test:
@@ -538,6 +538,10 @@ def run(ctx: protocol_api.ProtocolContext) -> None:
         test_heater_shaker()
         test_temperature_module()
         test_magnetic_block()
+
+    def test_labware_waste_chute_disposal_with_gripper():
+        ctx.move_labware(source_reservoir, waste_chute, use_gripper=True)
+        ctx.move_labware(dest_pcr_plate, waste_chute, use_gripper=True)
 
     def test_labware_set_offset():
         """Test the labware.set_offset method."""
@@ -596,7 +600,6 @@ def run(ctx: protocol_api.ProtocolContext) -> None:
         ctx.pause("Is the pipette tip in the middle of the reservoir , well A1, in slot D2? It should be at the LPC calibrated height.")
 
         pipette_96_channel.return_tip()
-        ctx.move_labware(tip_rack_3, get_disposal_preference()[0], use_gripper=get_disposal_preference()[1])
 
         ctx.pause("!!!!!!!!!!YOU NEED TO REDO LPC!!!!!!!!!!")
 
@@ -628,6 +631,7 @@ def run(ctx: protocol_api.ProtocolContext) -> None:
     if test_config.test_set_offset:
         test_labware_set_offset()
     test_unique_top_methods()
+    test_labware_waste_chute_disposal_with_gripper()
 
     ###################################################################################################
     ### THE ORDER OF THESE FUNCTION CALLS MATTER. CHANGING THEM WILL CAUSE THE PROTOCOL NOT TO WORK ###
