@@ -10688,7 +10688,8 @@
       "notes": [],
       "params": {
         "mount": "right",
-        "pipetteName": "p1000_single_flex"
+        "pipetteName": "p1000_single_flex",
+        "tipOverlapNotAfterVersion": "v0"
       },
       "result": {},
       "status": "succeeded"

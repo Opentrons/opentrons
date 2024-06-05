@@ -4,7 +4,7 @@ import math
 import numpy as np
 
 metadata = {"protocolName": "Illumina PCR-Free DNA Prep", "author": "Zach Galluzzo <zachary.galluzzo@opentrons.com>"}
-requirements = {"robotType": "Flex", "apiLevel": "2.18"}
+requirements = {"robotType": "Flex", "apiLevel": "2.19"}
 tt_50 = 0
 tt_200 = 0
 p50_rack_count = 0

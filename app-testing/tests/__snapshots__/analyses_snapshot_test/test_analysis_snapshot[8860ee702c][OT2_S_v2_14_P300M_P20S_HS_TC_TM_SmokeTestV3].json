@@ -2355,7 +2355,8 @@
       "notes": [],
       "params": {
         "mount": "left",
-        "pipetteName": "p300_multi_gen2"
+        "pipetteName": "p300_multi_gen2",
+        "tipOverlapNotAfterVersion": "v0"
       },
       "result": {},
       "status": "succeeded"
@@ -2365,7 +2366,8 @@
       "notes": [],
       "params": {
         "mount": "right",
-        "pipetteName": "p20_single_gen2"
+        "pipetteName": "p20_single_gen2",
+        "tipOverlapNotAfterVersion": "v0"
       },
       "result": {},
       "status": "succeeded"

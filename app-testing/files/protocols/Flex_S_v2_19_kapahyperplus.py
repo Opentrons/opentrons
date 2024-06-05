@@ -5,7 +5,7 @@ import numpy as np
 
 metadata = {"protocolName": "KAPA HyperPlus Library Preparation", "author": "Your Name <your.email@example.com>"}
 
-requirements = {"robotType": "Flex", "apiLevel": "2.18"}
+requirements = {"robotType": "Flex", "apiLevel": "2.19"}
 
 tt_50 = 0
 tt_200 = 0
