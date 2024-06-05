@@ -4,6 +4,7 @@ import asyncio
 
 from opentrons.config.types import CapacitivePassSettings, OutputOptions
 from opentrons.hardware_control.ot3api import OT3API
+from opentrons.hardware_control.types import InstrumentProbeType
 
 from hardware_testing.opentrons_api import types
 from hardware_testing.opentrons_api import helpers_ot3
@@ -11,12 +12,13 @@ from hardware_testing.opentrons_api import helpers_ot3
 # distance added to the pipette shaft
 # when the calibration probe is attached
 PROBE_LENGTH = 34.5
-PROBE_DIAMETER = 4
-CUTOUT_SIZE = 20
 
 # the capacitive readings need to be stable <0.1
 # before probing anything
 STABLE_CAP_PF = 0.1
+
+# capacitance relative threshold in picofarads
+CAP_REL_THRESHOLD_PF = 10.0
 
 # ideally these values come from either:
 # 1) the API config file
@@ -24,8 +26,8 @@ STABLE_CAP_PF = 0.1
 # The Z is different from the XY probing location
 # because the pipette cannot reach the bottom of the
 # cutout, so we cannot probe the Z inside the cutout
-ASSUMED_Z_LOCATION = types.Point(x=300, y=300, z=150)  # keep is SAFE
-ASSUMED_XY_LOCATION = types.Point(x=285, y=285, z=ASSUMED_Z_LOCATION.z)
+ASSUMED_Z_LOCATION = types.Point(x=228, y=150, z=80)  # C2 slot center
+ASSUMED_XY_LOCATION = types.Point(x=228, y=150, z=ASSUMED_Z_LOCATION.z)
 
 # configure how the probing motion behaves
 # capacitive_probe will always automatically do the following:
@@ -43,21 +45,20 @@ PROBE_SETTINGS_Z_AXIS = CapacitivePassSettings(
     prep_distance_mm=10,
     max_overrun_distance_mm=3,
     speed_mm_per_s=1,
-    sensor_threshold_pf=STABLE_CAP_PF,
+    sensor_threshold_pf=CAP_REL_THRESHOLD_PF,
     output_option=OutputOptions.sync_only,
 )
-PROBE_SETTINGS_XY_AXIS = CapacitivePassSettings(
-    prep_distance_mm=CUTOUT_SIZE / 2,
+PROBE_SETTINGS_Z_AXIS_OUTPUT = CapacitivePassSettings(
+    prep_distance_mm=10,
     max_overrun_distance_mm=3,
     speed_mm_per_s=1,
-    sensor_threshold_pf=STABLE_CAP_PF,
-    output_option=OutputOptions.sync_only,
+    sensor_threshold_pf=CAP_REL_THRESHOLD_PF,
+    output_option=OutputOptions.sync_buffer_to_csv,
+    data_files={InstrumentProbeType.PRIMARY: "/data/capacitive_sensor_data.csv"},
 )
 
 
-async def _probe_sequence(
-    api: OT3API, mount: types.OT3Mount, stable: bool
-) -> types.Point:
+async def _probe_sequence(api: OT3API, mount: types.OT3Mount, stable: bool) -> float:
     z_ax = types.Axis.by_mount(mount)
 
     print("Align the XY axes above Z probe location...")
@@ -72,66 +73,7 @@ async def _probe_sequence(
         mount, z_ax, ASSUMED_Z_LOCATION.z, PROBE_SETTINGS_Z_AXIS
     )
     print(f"Found deck Z location = {found_z} mm")
-
-    # move to 1mm inside the cutout
-    # we know for certain we will be 1mm inside, because we just probed the deck
-    updated_assumed_xy = ASSUMED_XY_LOCATION._replace(z=found_z - 1)
-    print("Moving to the center of the cutout...")
-    await helpers_ot3.move_to_arched_ot3(
-        api, mount, updated_assumed_xy, safe_height=found_z + 10
-    )
-
-    # probe each edge of the cutout
-    half_cutout = CUTOUT_SIZE / 2
-    if stable:
-        await helpers_ot3.wait_for_stable_capacitance_ot3(
-            api, mount, threshold_pf=STABLE_CAP_PF, duration=1.0
-        )
-    found_x_left, _ = await api.capacitive_probe(
-        mount,
-        types.Axis.X,
-        ASSUMED_XY_LOCATION.x - half_cutout,
-        PROBE_SETTINGS_XY_AXIS,
-    )
-    if stable:
-        await helpers_ot3.wait_for_stable_capacitance_ot3(
-            api, mount, threshold_pf=STABLE_CAP_PF, duration=1.0
-        )
-    found_x_right, _ = await api.capacitive_probe(
-        mount,
-        types.Axis.X,
-        ASSUMED_XY_LOCATION.x + half_cutout,
-        PROBE_SETTINGS_XY_AXIS,
-    )
-    print(f"Found X axis cutout edges: left={found_x_left}, right={found_x_right}")
-    if stable:
-        await helpers_ot3.wait_for_stable_capacitance_ot3(
-            api, mount, threshold_pf=STABLE_CAP_PF, duration=1.0
-        )
-    found_y_front, _ = await api.capacitive_probe(
-        mount,
-        types.Axis.Y,
-        ASSUMED_XY_LOCATION.y - half_cutout,
-        PROBE_SETTINGS_XY_AXIS,
-    )
-    if stable:
-        await helpers_ot3.wait_for_stable_capacitance_ot3(
-            api, mount, threshold_pf=STABLE_CAP_PF, duration=1.0
-        )
-    found_y_back, _ = await api.capacitive_probe(
-        mount,
-        types.Axis.Y,
-        ASSUMED_XY_LOCATION.y + half_cutout,
-        PROBE_SETTINGS_XY_AXIS,
-    )
-    print(f"Found Y axis cutout edges: front={found_y_front}, back={found_y_back}")
-
-    # calculate the center XYZ position of the cutout
-    center_x = (found_x_right + found_x_left) / 2
-    center_y = (found_y_back + found_y_front) / 2
-    cutout_center = types.Point(x=center_x, y=center_y, z=found_z)
-    print(f"Found cutout center = {cutout_center}")
-    return cutout_center
+    return found_z
 
 
 async def _main(is_simulating: bool, cycles: int, stable: bool) -> None:
