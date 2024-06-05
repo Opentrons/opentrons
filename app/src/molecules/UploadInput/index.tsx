@@ -6,18 +6,19 @@ import {
   BORDERS,
   COLORS,
   DIRECTION_COLUMN,
+  DISPLAY_FLEX,
   Flex,
   Icon,
   JUSTIFY_CENTER,
+  POSITION_FIXED,
   PrimaryButton,
-  SIZE_3,
   SPACING,
   StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
 const StyledLabel = styled.label`
-  display: flex;
+  display: ${DISPLAY_FLEX};
   cursor: pointer;
   flex-direction: ${DIRECTION_COLUMN};
   align-items: ${ALIGN_CENTER};
@@ -25,7 +26,7 @@ const StyledLabel = styled.label`
   padding: ${SPACING.spacing32};
   border: 2px dashed ${COLORS.grey30};
   border-radius: ${BORDERS.borderRadius4};
-  text-align: center;
+  text-align: ${TYPOGRAPHY.textAlignCenter};
   background-color: ${COLORS.white};
 
   &:hover,
@@ -38,15 +39,20 @@ const DRAG_OVER_STYLES = css`
 `
 
 const StyledInput = styled.input`
-  position: fixed;
+  position: ${POSITION_FIXED};
   clip: rect(1px 1px 1px 1px);
 `
 
 export interface UploadInputProps {
+  /** Callback function that is called when a file is uploaded. */
   onUpload: (file: File) => unknown
+  /** ptional callback function that is called when the upload button is clicked. */
   onClick?: () => void
+  /** Optional text for the upload button. If undefined, the button displays Upload */
   uploadButtonText?: string
+  /** Optional text or JSX element that is displayed above the upload button. */
   uploadText?: string | JSX.Element
+  /** Optional text or JSX element that is displayed in the drag and drop area. */
   dragAndDropText?: string | JSX.Element
 }
 
@@ -106,13 +112,19 @@ export function UploadInput(props: UploadInputProps): JSX.Element | null {
       gridGap={SPACING.spacing24}
     >
       {uploadText != null ? (
-        <StyledText
-          as="p"
-          textAlign={TYPOGRAPHY.textAlignCenter}
-          marginTop={SPACING.spacing16}
-        >
-          {uploadText}
-        </StyledText>
+        <>
+          {typeof uploadText === 'string' ? (
+            <StyledText
+              as="p"
+              textAlign={TYPOGRAPHY.textAlignCenter}
+              marginTop={SPACING.spacing16}
+            >
+              {uploadText}
+            </StyledText>
+          ) : (
+            <>{uploadText}</>
+          )}
+        </>
       ) : null}
       <PrimaryButton
         onClick={handleClick}
@@ -132,7 +144,7 @@ export function UploadInput(props: UploadInputProps): JSX.Element | null {
         css={isFileOverDropZone ? DRAG_OVER_STYLES : undefined}
       >
         <Icon
-          width={SIZE_3}
+          width="4rem"
           color={isHover ? COLORS.blue50 : COLORS.grey60}
           name="upload"
           marginBottom={SPACING.spacing24}
