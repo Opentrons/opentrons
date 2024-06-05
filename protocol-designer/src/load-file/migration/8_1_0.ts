@@ -5,6 +5,7 @@ import type {
   ProtocolFile,
   PipetteName,
 } from '@opentrons/shared-data'
+import type { LegacyDismissedWarningState } from '../../dismiss/reducers'
 import type { DesignerApplicationData } from './utils/getLoadLiquidCommands'
 
 export interface DesignerApplicationDataV8 {
@@ -24,6 +25,7 @@ export interface DesignerApplicationDataV8 {
   savedStepForms: Record<string, any>
   orderedStepIds: string[]
   pipetteTiprackAssignments: Record<string, string>
+  dismissedWarnings: LegacyDismissedWarningState
 }
 
 export const migrateFile = (
@@ -45,6 +47,8 @@ export const migrateFile = (
     },
     {}
   )
+
+  const dismissedWarnings = designerApplication.data?.dismissedWarnings
 
   const pipetteTiprackAssignments =
     designerApplication.data?.pipetteTiprackAssignments
@@ -131,6 +135,19 @@ export const migrateFile = (
     {}
   )
 
+  const newDismissedWarningsForm =
+    dismissedWarnings.form != null
+      ? Object.values(dismissedWarnings.form).flatMap(
+          formType => formType as string[]
+        )
+      : []
+  const newDismissedWarningsTimeline =
+    dismissedWarnings.timeline != null
+      ? Object.values(dismissedWarnings.timeline).flatMap(
+          timelineType => timelineType as string[]
+        )
+      : []
+
   return {
     ...appData,
     designerApplication: {
@@ -142,6 +159,10 @@ export const migrateFile = (
           ...pipettingSavedStepsWithAdditionalFields,
         },
         pipetteTiprackAssignments: newTiprackAssignments,
+        dismissedWarnings: {
+          form: newDismissedWarningsForm,
+          timeline: newDismissedWarningsTimeline,
+        },
       },
     },
   }

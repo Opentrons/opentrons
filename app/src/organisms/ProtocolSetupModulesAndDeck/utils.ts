@@ -1,6 +1,7 @@
 import {
   FLEX_ROBOT_TYPE,
   NON_CONNECTING_MODULE_TYPES,
+  OT2_ROBOT_TYPE,
   checkModuleCompatibility,
   getCutoutFixturesForModuleModel,
   getCutoutIdsFromModuleSlotName,
@@ -8,7 +9,7 @@ import {
   getModuleType,
 } from '@opentrons/shared-data'
 
-import type { DeckConfiguration } from '@opentrons/shared-data'
+import type { DeckConfiguration, RobotType } from '@opentrons/shared-data'
 import type { ProtocolModuleInfo } from '../../organisms/Devices/ProtocolRun/utils/getProtocolModulesInfo'
 import type { AttachedModule } from '../../redux/modules/types'
 
@@ -16,14 +17,15 @@ export type AttachedProtocolModuleMatch = ProtocolModuleInfo & {
   attachedModuleMatch: AttachedModule | null
 }
 
-// NOTE: this is a FLEX only function
-// some logic copied from useModuleRenderInfoForProtocolById
+// NOTE: some logic copied from useModuleRenderInfoForProtocolById
 export function getAttachedProtocolModuleMatches(
   attachedModules: AttachedModule[],
   protocolModulesInfo: ProtocolModuleInfo[],
-  deckConfig: DeckConfiguration
+  deckConfig: DeckConfiguration,
+  robotType: RobotType = FLEX_ROBOT_TYPE
 ): AttachedProtocolModuleMatch[] {
-  const deckDef = getDeckDefFromRobotType(FLEX_ROBOT_TYPE) // this is only used for Flex ODD
+  const deckDef = getDeckDefFromRobotType(robotType)
+  const robotSupportsModuleConfig = robotType !== OT2_ROBOT_TYPE
   const matchedAttachedModules: AttachedModule[] = []
   const attachedProtocolModuleMatches = protocolModulesInfo.map(
     protocolModule => {
@@ -49,12 +51,14 @@ export function getAttachedProtocolModuleMatches(
                 matchedAttachedModule.serialNumber ===
                 attachedModule.serialNumber
             ) &&
-            // check deck config has module with expected serial number in expected location
-            deckConfig.some(
-              ({ cutoutId, opentronsModuleSerialNumber }) =>
-                attachedModule.serialNumber === opentronsModuleSerialNumber &&
-                moduleCutoutIds.includes(cutoutId)
-            )
+            // then if robotType supports configurable modules check the deck config has a
+            // a module with the expected serial number in the expected location
+            (!robotSupportsModuleConfig ||
+              deckConfig.some(
+                ({ cutoutId, opentronsModuleSerialNumber }) =>
+                  attachedModule.serialNumber === opentronsModuleSerialNumber &&
+                  moduleCutoutIds.includes(cutoutId)
+              ))
         ) ?? null
       if (compatibleAttachedModule !== null) {
         matchedAttachedModules.push(compatibleAttachedModule)

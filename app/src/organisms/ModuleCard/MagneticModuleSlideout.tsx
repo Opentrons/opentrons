@@ -164,13 +164,14 @@ export const MagneticModuleSlideout = (
         {t('height_ranges', { gen: info.version })}
       </StyledText>
       <Flex
-        backgroundColor={COLORS.grey10}
+        backgroundColor={COLORS.grey20}
         flexDirection={DIRECTION_ROW}
         justifyContent={JUSTIFY_SPACE_BETWEEN}
         fontWeight={TYPOGRAPHY.fontWeightRegular}
         fontSize={TYPOGRAPHY.fontSizeP}
         padding={SPACING.spacing16}
         borderRadius={BORDERS.borderRadius4}
+        data-testid={`MagneticModuleSlideout_body_data_${module.serialNumber}`}
       >
         <Flex
           flexDirection={DIRECTION_COLUMN}

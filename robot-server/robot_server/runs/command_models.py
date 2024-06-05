@@ -29,18 +29,17 @@ class CommandLinkMeta(BaseModel):
 
     runId: str = Field(..., description="The ID of the command's run.")
     commandId: str = Field(..., description="The ID of the command.")
-    index: int = Field(..., description="Index of the command in the overall list.")
-    key: str = Field(..., description="Value of the current command's `key` field.")
-    createdAt: datetime = Field(
-        ...,
-        description="When the current command was created.",
+    index: int = Field(
+        ..., description="The index of the command in the run's overall command list."
     )
+    key: str = Field(..., description="The value of the command's `key` field.")
+    createdAt: datetime = Field(..., description="When the command was created.")
 
 
 class CommandLink(BaseModel):
     """A link to a command resource."""
 
-    href: str = Field(..., description="The path to a command")
+    href: str = Field(..., description="The HTTP API path to the command")
     meta: CommandLinkMeta = Field(..., description="Information about the command.")
 
 
@@ -53,5 +52,16 @@ class CommandCollectionLinks(BaseModel):
             'Information about the "current" command.'
             ' The "current" command is the one that\'s running right now,'
             " or, if there is none, the one that was running most recently."
+        ),
+    )
+
+    currentlyRecoveringFrom: Optional[CommandLink] = Field(
+        None,
+        description=(
+            "Information about the command currently undergoing error recovery."
+            " This is basically the most recent protocol command to have failed,"
+            " except that once you complete error recovery"
+            " (see `GET /runs/{id}/actions`), this goes back to being"
+            " `null` or omitted."
         ),
     )

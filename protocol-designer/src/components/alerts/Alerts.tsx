@@ -10,7 +10,6 @@ import {
 } from '../../dismiss'
 import { selectors as stepFormSelectors } from '../../step-forms'
 import { selectors as fileDataSelectors } from '../../file-data'
-import { PRESAVED_STEP_ID } from '../../steplist'
 import {
   getVisibleFormWarnings,
   getVisibleFormErrors,
@@ -152,15 +151,12 @@ const AlertsComponent = (props: Props): JSX.Element => {
       dispatch(
         dismissActions.dismissTimelineWarning({
           type: dismissId,
-          stepId,
         })
       )
     } else {
       dispatch(
         dismissActions.dismissFormWarning({
           type: dismissId,
-          //  if stepId does not exist, assume it is a presaved step
-          stepId: stepId ?? PRESAVED_STEP_ID,
         })
       )
     }

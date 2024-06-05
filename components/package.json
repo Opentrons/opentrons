@@ -5,7 +5,7 @@
   "source": "src/index.ts",
   "types": "lib/index.d.ts",
   "style": "src/index.module.css",
-  "main": "lib/opentrons-components.js",
+  "main": "lib/index.mjs",
   "module": "src/index.ts",
   "repository": {
     "type": "git",
@@ -35,8 +35,10 @@
     "classnames": "2.2.5",
     "interactjs": "^1.10.17",
     "lodash": "4.17.21",
+    "react-i18next": "13.5.0",
     "react-popper": "1.0.0",
     "react-remove-scroll": "2.4.3",
+    "react-router-dom": "5.3.4",
     "react-select": "5.4.0",
     "redux": "4.0.5",
     "styled-components": "5.3.6"

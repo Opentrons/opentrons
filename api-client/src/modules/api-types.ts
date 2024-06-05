@@ -36,6 +36,7 @@ export interface ApiBaseModule {
   firmwareVersion: string
   hasAvailableUpdate: boolean
   usbPort: PhysicalPort
+  compatibleWithRobot?: boolean
   moduleOffset?: ModuleOffset
 }
 

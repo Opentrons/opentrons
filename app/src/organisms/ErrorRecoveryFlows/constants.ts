@@ -8,6 +8,7 @@ export const ERROR_KINDS = {
   GENERAL_ERROR: 'GENERAL_ERROR',
 } as const
 
+// TODO(jh, 05-09-24): Refactor to a directed graph. EXEC-430.
 // Valid recovery routes and steps.
 export const RECOVERY_MAP = {
   BEFORE_BEGINNING: {
@@ -16,13 +17,22 @@ export const RECOVERY_MAP = {
       RECOVERY_DESCRIPTION: 'recovery-description',
     },
   },
-  CANCEL_RUN: { ROUTE: 'cancel-run', STEPS: {} },
+  CANCEL_RUN: {
+    ROUTE: 'cancel-run',
+    STEPS: { CONFIRM_CANCEL: 'confirm-cancel' },
+  },
   DROP_TIP: { ROUTE: 'drop-tip', STEPS: {} },
   IGNORE_AND_RESUME: { ROUTE: 'ignore-and-resume', STEPS: {} },
   REFILL_AND_RESUME: { ROUTE: 'refill-and-resume', STEPS: {} },
-  RESUME: {
-    ROUTE: 'resume',
-    STEPS: { CONFIRM_RESUME: 'confirm-resume' },
+  RETRY_FAILED_COMMAND: {
+    ROUTE: 'retry-failed-command',
+    STEPS: { CONFIRM_RETRY: 'confirm-retry' },
+  },
+  ROBOT_CANCELING: {
+    ROUTE: 'robot-cancel-run',
+    STEPS: {
+      CANCELING: 'canceling',
+    },
   },
   ROBOT_IN_MOTION: {
     ROUTE: 'robot-in-motion',
@@ -36,6 +46,12 @@ export const RECOVERY_MAP = {
       RESUMING: 'resuming',
     },
   },
+  ROBOT_RETRYING_COMMAND: {
+    ROUTE: 'robot-retrying-command',
+    STEPS: {
+      RETRYING: 'retrying',
+    },
+  },
   OPTION_SELECTION: {
     ROUTE: 'option-selection',
     STEPS: { SELECT: 'select' },
@@ -45,9 +61,11 @@ export const RECOVERY_MAP = {
 const {
   BEFORE_BEGINNING,
   OPTION_SELECTION,
-  RESUME,
+  RETRY_FAILED_COMMAND,
+  ROBOT_CANCELING,
   ROBOT_RESUMING,
   ROBOT_IN_MOTION,
+  ROBOT_RETRYING_COMMAND,
   DROP_TIP,
   REFILL_AND_RESUME,
   IGNORE_AND_RESUME,
@@ -58,13 +76,15 @@ const {
 export const STEP_ORDER: StepOrder = {
   [BEFORE_BEGINNING.ROUTE]: [BEFORE_BEGINNING.STEPS.RECOVERY_DESCRIPTION],
   [OPTION_SELECTION.ROUTE]: [OPTION_SELECTION.STEPS.SELECT],
-  [RESUME.ROUTE]: [RESUME.STEPS.CONFIRM_RESUME],
+  [RETRY_FAILED_COMMAND.ROUTE]: [RETRY_FAILED_COMMAND.STEPS.CONFIRM_RETRY],
+  [ROBOT_CANCELING.ROUTE]: [ROBOT_CANCELING.STEPS.CANCELING],
   [ROBOT_IN_MOTION.ROUTE]: [ROBOT_IN_MOTION.STEPS.IN_MOTION],
   [ROBOT_RESUMING.ROUTE]: [ROBOT_RESUMING.STEPS.RESUMING],
+  [ROBOT_RETRYING_COMMAND.ROUTE]: [ROBOT_RETRYING_COMMAND.STEPS.RETRYING],
   [DROP_TIP.ROUTE]: [],
   [REFILL_AND_RESUME.ROUTE]: [],
   [IGNORE_AND_RESUME.ROUTE]: [],
-  [CANCEL_RUN.ROUTE]: [],
+  [CANCEL_RUN.ROUTE]: [CANCEL_RUN.STEPS.CONFIRM_CANCEL],
 }
 
 export const INVALID = 'INVALID' as const

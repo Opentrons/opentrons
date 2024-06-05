@@ -17,6 +17,9 @@
       "path": "../shared-data"
     },
     {
+      "path": "../step-generation"
+    },
+    {
       "path": "../api-client"
     },
     {

@@ -178,15 +178,11 @@ def fake_liquid_settings() -> LiquidProbeSettings:
     return LiquidProbeSettings(
         starting_mount_height=100,
         max_z_distance=15,
-        min_z_distance=5,
         mount_speed=40,
         plunger_speed=10,
         sensor_threshold_pascals=15,
-        expected_liquid_height=109,
         output_option=OutputOptions.can_bus_only,
         aspirate_while_sensing=False,
-        auto_zero_sensor=False,
-        num_baseline_reads=8,
         data_files={InstrumentProbeType.PRIMARY: "fake_file_name"},
     )
 

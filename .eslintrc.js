@@ -139,10 +139,6 @@ module.exports = {
     {
       files: ['**/__tests__/**test.tsx'],
       extends: ['plugin:testing-library/react'],
-      rules: {
-        'testing-library/no-manual-cleanup': 'off',
-        'testing-library/prefer-screen-queries': 'warn',
-      },
     },
     {
       files: ['**/*.stories.tsx'],

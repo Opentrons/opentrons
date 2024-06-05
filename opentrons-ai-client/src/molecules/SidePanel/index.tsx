@@ -6,6 +6,8 @@ import {
   DIRECTION_COLUMN,
   Flex,
   Link,
+  OVERFLOW_AUTO,
+  POSITION_FIXED,
   SPACING,
   StyledText,
   TYPOGRAPHY,
@@ -20,11 +22,14 @@ export function SidePanel(): JSX.Element {
   const { t } = useTranslation('protocol_generator')
   return (
     <Flex
+      position={POSITION_FIXED}
       padding={SPACING.spacing40}
       gridGap={SPACING.spacing80}
       flexDirection={DIRECTION_COLUMN}
       backgroundColor={COLORS.black90}
       width="24.375rem"
+      overflowY={OVERFLOW_AUTO}
+      height="100vh"
     >
       {/* logo */}
       <Flex>

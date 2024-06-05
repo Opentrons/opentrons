@@ -4,6 +4,7 @@ import { screen, fireEvent } from '@testing-library/react'
 
 import { renderWithProviders } from '../../../../__testing-utils__'
 import { i18n } from '../../../../i18n'
+import { mockRecoveryContentProps } from '../../__fixtures__'
 import {
   SelectRecoveryOption,
   RecoveryOptions,
@@ -31,7 +32,7 @@ const renderRecoveryOptions = (
 }
 
 describe('SelectRecoveryOption', () => {
-  const { RESUME } = RECOVERY_MAP
+  const { RETRY_FAILED_COMMAND } = RECOVERY_MAP
   let props: React.ComponentProps<typeof SelectRecoveryOption>
   let mockProceedToRoute: Mock
 
@@ -40,38 +41,30 @@ describe('SelectRecoveryOption', () => {
     const mockRouteUpdateActions = { proceedToRoute: mockProceedToRoute } as any
 
     props = {
-      isOnDevice: true,
-      errorKind: ERROR_KINDS.GENERAL_ERROR,
-      onComplete: vi.fn(),
+      ...mockRecoveryContentProps,
       routeUpdateActions: mockRouteUpdateActions,
       recoveryMap: {
-        route: RESUME.ROUTE,
-        step: RESUME.STEPS.CONFIRM_RESUME,
+        route: RETRY_FAILED_COMMAND.ROUTE,
+        step: RETRY_FAILED_COMMAND.STEPS.CONFIRM_RETRY,
       },
     }
   })
 
-  it('renders appropriate general copy and click behavior', () => {
+  it('renders appropriate "General Error" copy and click behavior', () => {
     renderSelectRecoveryOption(props)
 
     screen.getByText('How do you want to proceed?')
 
-    const resumeOptionRadioLabel = screen.getByRole('label', { name: 'Resume' })
-    const primaryBtn = screen.getByRole('button', { name: 'Continue' })
-    const secondaryBtn = screen.getByRole('button', { name: 'Go back' })
+    const retryStepOption = screen.getByRole('label', { name: 'Retry step' })
+    const continueBtn = screen.getByRole('button', { name: 'Continue' })
+    expect(
+      screen.queryByRole('button', { name: 'Go back' })
+    ).not.toBeInTheDocument()
 
-    fireEvent.click(resumeOptionRadioLabel)
-    fireEvent.click(primaryBtn)
+    fireEvent.click(retryStepOption)
+    fireEvent.click(continueBtn)
 
-    expect(mockProceedToRoute).toHaveBeenCalledWith(RESUME.ROUTE)
-
-    renderSelectRecoveryOption(props)
-
-    fireEvent.click(secondaryBtn)
-
-    expect(mockProceedToRoute).toHaveBeenCalledWith(
-      RECOVERY_MAP.BEFORE_BEGINNING.ROUTE
-    )
+    expect(mockProceedToRoute).toHaveBeenCalledWith(RETRY_FAILED_COMMAND.ROUTE)
   })
 })
 
@@ -92,7 +85,7 @@ describe('RecoveryOptions', () => {
   it('renders valid recovery options for a general error errorKind', () => {
     renderRecoveryOptions(props)
 
-    screen.getByRole('label', { name: 'Resume' })
+    screen.getByRole('label', { name: 'Retry step' })
     screen.getByRole('label', { name: 'Cancel run' })
   })
 

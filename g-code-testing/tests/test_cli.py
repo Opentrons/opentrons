@@ -7,7 +7,7 @@ from typing import (
 )
 
 import pytest
-from opentrons.protocols.api_support.types import APIVersion
+from opentrons import APIVersion
 
 from cli import (
     GCodeCLI,

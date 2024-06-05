@@ -25,15 +25,11 @@ DEFAULT_MODULE_OFFSET = [0.0, 0.0, 0.0]
 DEFAULT_LIQUID_PROBE_SETTINGS: Final[LiquidProbeSettings] = LiquidProbeSettings(
     starting_mount_height=100,
     max_z_distance=40,
-    min_z_distance=5,
     mount_speed=10,
     plunger_speed=5,
     sensor_threshold_pascals=40,
-    expected_liquid_height=110,
     output_option=OutputOptions.stream_to_csv,
     aspirate_while_sensing=False,
-    auto_zero_sensor=True,
-    num_baseline_reads=10,
     data_files={InstrumentProbeType.PRIMARY: "/data/pressure_sensor_data.csv"},
 )
 
@@ -337,24 +333,14 @@ def _build_default_liquid_probe(
             "starting_mount_height", default.starting_mount_height
         ),
         max_z_distance=from_conf.get("max_z_distance", default.max_z_distance),
-        min_z_distance=from_conf.get("min_z_distance", default.min_z_distance),
         mount_speed=from_conf.get("mount_speed", default.mount_speed),
         plunger_speed=from_conf.get("plunger_speed", default.plunger_speed),
         sensor_threshold_pascals=from_conf.get(
             "sensor_threshold_pascals", default.sensor_threshold_pascals
         ),
-        expected_liquid_height=from_conf.get(
-            "expected_liquid_height", default.expected_liquid_height
-        ),
         output_option=from_conf.get("output_option", default.output_option),
         aspirate_while_sensing=from_conf.get(
             "aspirate_while_sensing", default.aspirate_while_sensing
-        ),
-        auto_zero_sensor=from_conf.get(
-            "get_pressure_baseline", default.auto_zero_sensor
-        ),
-        num_baseline_reads=from_conf.get(
-            "num_baseline_reads", default.num_baseline_reads
         ),
         data_files=data_files,
     )

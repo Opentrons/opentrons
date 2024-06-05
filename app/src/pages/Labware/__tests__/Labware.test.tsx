@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { vi, it, describe, expect, beforeEach, afterEach } from 'vitest'
-import { fireEvent } from '@testing-library/react'
+import { fireEvent, screen } from '@testing-library/react'
 import { MemoryRouter } from 'react-router-dom'
 import { renderWithProviders } from '../../../__testing-utils__'
 import { i18n } from '../../../i18n'
@@ -61,25 +61,25 @@ describe('Labware', () => {
   })
 
   it('renders correct title, import button and labware cards', () => {
-    const [{ getByText, getByRole, getByTestId }] = render()
-    getByText('labware')
-    getByText('Mock Labware Card')
-    getByRole('button', { name: 'Import' })
-    getByText('Category')
-    getByText('All')
-    getByText('Sort by')
-    expect(getByTestId('sortBy-label')).toHaveTextContent('Alphabetical')
+    render()
+    screen.getByText('labware')
+    screen.getByText('Mock Labware Card')
+    screen.getByRole('button', { name: 'Import' })
+    screen.getByText('Category')
+    screen.getByText('All')
+    screen.getByText('Sort by')
+    expect(screen.getByTestId('sortBy-label')).toHaveTextContent('Alphabetical')
   })
   it('renders AddCustomLabware slideout when import button is clicked', () => {
-    const [{ getByRole }] = render()
-    const importButton = getByRole('button', { name: 'Import' })
+    render()
+    const importButton = screen.getByRole('button', { name: 'Import' })
     fireEvent.click(importButton)
     expect(vi.mocked(AddCustomLabwareSlideout)).toHaveBeenCalled()
   })
   it('renders footer with labware creator link', () => {
-    const [{ getByText, getByRole }] = render()
-    getByText('Create a new labware definition')
-    const btn = getByRole('link', { name: 'Open Labware Creator' })
+    render()
+    screen.getByText('Create a new labware definition')
+    const btn = screen.getByRole('link', { name: 'Open Labware Creator' })
     fireEvent.click(btn)
     expect(mockTrackEvent).toHaveBeenCalledWith({
       name: ANALYTICS_OPEN_LABWARE_CREATOR_FROM_BOTTOM_OF_LABWARE_LIBRARY_LIST,
@@ -111,39 +111,39 @@ describe('Labware', () => {
     )
   })
   it('renders filter by menu when it is clicked', () => {
-    const [{ getByText, getByRole }] = render()
-    const filter = getByText('All')
+    render()
+    const filter = screen.getByText('All')
     fireEvent.click(filter)
-    getByRole('button', { name: 'All' })
-    getByRole('button', { name: 'Well Plate' })
-    getByRole('button', { name: 'Tip Rack' })
-    getByRole('button', { name: 'Tube Rack' })
-    getByRole('button', { name: 'Reservoir' })
-    getByRole('button', { name: 'Aluminum Block' })
+    screen.getByRole('button', { name: 'All' })
+    screen.getByRole('button', { name: 'Well Plate' })
+    screen.getByRole('button', { name: 'Tip Rack' })
+    screen.getByRole('button', { name: 'Tube Rack' })
+    screen.getByRole('button', { name: 'Reservoir' })
+    screen.getByRole('button', { name: 'Aluminum Block' })
   })
   it('renders changes filter menu button when an option is selected', () => {
-    const [{ getByText, getByRole }] = render()
-    const filter = getByText('All')
+    render()
+    const filter = screen.getByText('All')
     fireEvent.click(filter)
-    const wellPlate = getByRole('button', { name: 'Well Plate' })
+    const wellPlate = screen.getByRole('button', { name: 'Well Plate' })
     fireEvent.click(wellPlate)
-    getByText('Well Plate')
+    screen.getByText('Well Plate')
   })
   it('renders sort by menu when sort is clicked', () => {
-    const [{ getByText, getByRole }] = render()
-    const sort = getByText('Alphabetical')
+    render()
+    const sort = screen.getByText('Alphabetical')
     fireEvent.click(sort)
-    getByRole('button', { name: 'Alphabetical' })
-    getByRole('button', { name: 'Reverse alphabetical' })
+    screen.getByRole('button', { name: 'Alphabetical' })
+    screen.getByRole('button', { name: 'Reverse alphabetical' })
   })
 
   it('renders selected sort by menu when one menu is clicked', () => {
-    const [{ getByText, getByRole, getByTestId }] = render()
-    const sort = getByText('Alphabetical')
+    render()
+    const sort = screen.getByText('Alphabetical')
     fireEvent.click(sort)
-    const reverse = getByRole('button', { name: 'Reverse alphabetical' })
+    const reverse = screen.getByRole('button', { name: 'Reverse alphabetical' })
     fireEvent.click(reverse)
-    expect(getByTestId('sortBy-label')).toHaveTextContent(
+    expect(screen.getByTestId('sortBy-label')).toHaveTextContent(
       'Reverse alphabetical'
     )
   })

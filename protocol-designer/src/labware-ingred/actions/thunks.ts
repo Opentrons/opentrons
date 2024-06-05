@@ -53,11 +53,12 @@ export const createContainer: (
   const state = getState()
   const initialDeckSetup = stepFormSelectors.getInitialDeckSetup(state)
   const robotType = getRobotType(state)
-  const slot =
-    args.slot || getNextAvailableDeckSlot(initialDeckSetup, robotType)
   const labwareDef = labwareDefSelectors.getLabwareDefsByURI(state)[
     args.labwareDefURI
   ]
+  const slot =
+    args.slot ||
+    getNextAvailableDeckSlot(initialDeckSetup, robotType, labwareDef)
   const isTiprack = getIsTiprack(labwareDef)
 
   if (slot) {
@@ -122,8 +123,15 @@ export const duplicateLabware: (
   const initialDeckSetup = stepFormSelectors.getInitialDeckSetup(state)
   const templateLabwareIdIsOffDeck =
     initialDeckSetup.labware[templateLabwareId].slot === 'offDeck'
-  const duplicateSlot = getNextAvailableDeckSlot(initialDeckSetup, robotType)
-  if (duplicateSlot == null) {
+  const labwareDef = labwareDefSelectors.getLabwareDefsByURI(state)[
+    templateLabwareDefURI
+  ]
+  const duplicateSlot = getNextAvailableDeckSlot(
+    initialDeckSetup,
+    robotType,
+    labwareDef
+  )
+  if (duplicateSlot == null && !templateLabwareIdIsOffDeck) {
     console.error('no slots available, cannot duplicate labware')
   }
   const allNicknamesById = uiLabwareSelectors.getLabwareNicknamesById(state)
@@ -132,15 +140,29 @@ export const duplicateLabware: (
     Object.keys(allNicknamesById).map((id: string) => allNicknamesById[id]), // NOTE: flow won't do Object.values here >:(
     templateNickname
   )
+  const duplicateLabwareId = uuid() + ':' + templateLabwareDefURI
 
-  if (templateLabwareDefURI && duplicateSlot != null) {
+  if (templateLabwareDefURI) {
+    if (templateLabwareIdIsOffDeck) {
+      dispatch({
+        type: 'DUPLICATE_LABWARE',
+        payload: {
+          duplicateLabwareNickname,
+          templateLabwareId,
+          duplicateLabwareId,
+          slot: 'offDeck',
+        },
+      })
+    }
+  }
+  if (duplicateSlot != null && !templateLabwareIdIsOffDeck) {
     dispatch({
       type: 'DUPLICATE_LABWARE',
       payload: {
         duplicateLabwareNickname,
         templateLabwareId,
-        duplicateLabwareId: uuid() + ':' + templateLabwareDefURI,
-        slot: templateLabwareIdIsOffDeck ? 'offDeck' : duplicateSlot,
+        duplicateLabwareId,
+        slot: duplicateSlot,
       },
     })
   }

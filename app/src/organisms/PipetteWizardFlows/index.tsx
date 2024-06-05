@@ -183,11 +183,18 @@ export const PipetteWizardFlows = (
     if (onComplete != null) onComplete()
     if (maintenanceRunData != null) {
       deleteMaintenanceRun(maintenanceRunData?.data.id)
+    } else {
+      closeFlow()
     }
-    closeFlow()
   }
 
-  const { deleteMaintenanceRun } = useDeleteMaintenanceRunMutation({})
+  const {
+    deleteMaintenanceRun,
+    isLoading: isDeleteLoading,
+  } = useDeleteMaintenanceRunMutation({
+    onSuccess: () => closeFlow(),
+    onError: () => closeFlow(),
+  })
 
   const handleCleanUpAndClose = (): void => {
     if (maintenanceRunData?.data.id == null) handleClose()
@@ -232,7 +239,7 @@ export const PipetteWizardFlows = (
       : undefined
   const calibrateBaseProps = {
     chainRunCommands: chainMaintenanceRunCommands,
-    isRobotMoving: isCommandMutationLoading,
+    isRobotMoving: isCommandMutationLoading || isDeleteLoading,
     proceed,
     maintenanceRunId,
     goBack,
@@ -253,11 +260,11 @@ export const PipetteWizardFlows = (
       proceed={handleCleanUpAndClose}
       goBack={cancelExit}
       isOnDevice={isOnDevice}
-      isRobotMoving={isCommandMutationLoading}
+      isRobotMoving={isCommandMutationLoading || isDeleteLoading}
     />
   ) : (
     <ExitModal
-      isRobotMoving={isCommandMutationLoading}
+      isRobotMoving={isCommandMutationLoading || isDeleteLoading}
       goBack={cancelExit}
       proceed={handleCleanUpAndClose}
       flowType={flowType}
@@ -381,7 +388,7 @@ export const PipetteWizardFlows = (
   }
 
   let exitWizardButton = onExit
-  if (isCommandMutationLoading) {
+  if (isCommandMutationLoading || isDeleteLoading) {
     exitWizardButton = undefined
   } else if (errorMessage != null && isExiting) {
     exitWizardButton = handleClose

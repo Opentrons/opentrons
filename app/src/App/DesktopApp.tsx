@@ -28,6 +28,7 @@ import { Labware } from '../pages/Labware'
 import { useSoftwareUpdatePoll } from './hooks'
 import { Navbar } from './Navbar'
 import { EstopTakeover, EmergencyStopContext } from '../organisms/EmergencyStop'
+import { IncompatibleModuleTakeover } from '../organisms/IncompatibleModule'
 import { OPENTRONS_USB } from '../redux/discovery'
 import { appShellRequestor } from '../redux/shell/remote'
 import { useRobot, useIsFlex } from '../organisms/Devices/hooks'
@@ -153,10 +154,6 @@ function RobotControlTakeover(): JSX.Element | null {
   const params = deviceRouteMatch?.params as DesktopRouteParams
   const robotName = params?.robotName
   const robot = useRobot(robotName)
-  const isFlex = useIsFlex(robotName)
-
-  // E-stop is not supported on OT2
-  if (!isFlex) return null
 
   if (deviceRouteMatch == null || robot == null || robotName == null)
     return null
@@ -167,7 +164,29 @@ function RobotControlTakeover(): JSX.Element | null {
       hostname={robot.ip ?? null}
       requestor={robot?.ip === OPENTRONS_USB ? appShellRequestor : undefined}
     >
-      <EstopTakeover robotName={robotName} />
+      <FlexOnlyRobotControlTakeover robotName={robotName} />
+      <AllRobotsRobotControlTakeover robotName={robotName} />
     </ApiHostProvider>
   )
+}
+
+interface TakeoverProps {
+  robotName: string
+}
+
+function AllRobotsRobotControlTakeover({
+  robotName,
+}: TakeoverProps): JSX.Element | null {
+  return <IncompatibleModuleTakeover isOnDevice={false} robotName={robotName} />
+}
+
+function FlexOnlyRobotControlTakeover({
+  robotName,
+}: TakeoverProps): JSX.Element | null {
+  // E-stop is not supported on OT2
+  const isFlex = useIsFlex(robotName)
+  if (!isFlex) {
+    return null
+  }
+  return <EstopTakeover robotName={robotName} />
 }
