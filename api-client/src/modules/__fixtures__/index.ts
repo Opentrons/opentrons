@@ -93,6 +93,29 @@ export const mockModulesResponse = [
   },
 ]
 
+export const mockUnknownModuleResponse = [
+  ...mockModulesResponse,
+  {
+    name: 'unknown',
+    displayName: 'UnknownModule',
+    moduleModel: 'unknownModule',
+    port: '/dev/unknown',
+    usbPort: {
+      port: 0,
+      hub: false,
+      portGroup: 'unknown',
+      path: '',
+    },
+    serial: 'dummySerialMD',
+    model: 'unknown_v1.1',
+    revision: 'unknown_v1.1',
+    fwVersion: 'dummyVersionMD',
+    hasAvailableUpdate: false,
+    status: 'engaged',
+    data: {},
+  },
+]
+
 export const v2MockModulesResponse = [
   {
     name: 'thermocycler',

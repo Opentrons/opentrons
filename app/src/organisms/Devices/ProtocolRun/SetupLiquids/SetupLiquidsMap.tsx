@@ -82,7 +82,7 @@ export function SetupLiquidsMap(
       labwareInAdapterInMod?.params.displayName ??
       module.nestedLabwareDisplayName
     const nestedLabwareWellFill = getWellFillFromLabwareId(
-      module.nestedLabwareId ?? '',
+      topLabwareId ?? '',
       liquids,
       labwareByLiquidId
     )

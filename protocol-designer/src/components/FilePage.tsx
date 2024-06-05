@@ -82,6 +82,7 @@ export const FilePage = (): JSX.Element => {
 
   const saveFileMetadata = (nextFormValues: FileMetadataFields): void => {
     dispatch(actions.saveFileMetadata(nextFormValues))
+    setManualDirty(false)
   }
   const [isManualDirty, setManualDirty] = React.useState<boolean>(false)
   const {
@@ -114,7 +115,6 @@ export const FilePage = (): JSX.Element => {
     'author',
     'description',
   ])
-
   return (
     <div className={styles.file_page}>
       <Card title={t('application:information')}>
@@ -201,7 +201,6 @@ export const FilePage = (): JSX.Element => {
               type="submit"
               className={styles.update_button}
               disabled={!isDirty || !isManualDirty}
-              onClick={() => setManualDirty(false)}
             >
               {isManualDirty
                 ? t('application:update')

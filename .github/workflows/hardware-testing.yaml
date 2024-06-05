@@ -9,6 +9,9 @@ on:
     paths:
       - 'Makefile'
       - 'hardware-testing/**'
+      - 'api/**'
+      - 'shared-data/**'
+      - 'hardware/**'
       - '.github/workflows/hardware-testing.yaml'
       - '.github/actions/python/**'
     branches:

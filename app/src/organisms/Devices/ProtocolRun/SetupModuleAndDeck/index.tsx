@@ -84,13 +84,9 @@ export const SetupModuleAndDeck = ({
               justifyContent={JUSTIFY_SPACE_BETWEEN}
               marginTop={SPACING.spacing16}
               marginLeft={SPACING.spacing20}
-              marginBottom={SPACING.spacing4}
+              marginBottom={SPACING.spacing12}
             >
-              <StyledText
-                css={TYPOGRAPHY.labelSemiBold}
-                marginBottom={SPACING.spacing8}
-                width="45%"
-              >
+              <StyledText css={TYPOGRAPHY.labelSemiBold} width="45%">
                 {i18n.format(t('deck_hardware'), 'capitalize')}
               </StyledText>
               <StyledText

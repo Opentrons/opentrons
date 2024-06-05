@@ -5,7 +5,6 @@ import { useTranslation } from 'react-i18next'
 import {
   DIRECTION_COLUMN,
   Flex,
-  JUSTIFY_SPACE_BETWEEN,
   SPACING,
   StyledText,
 } from '@opentrons/components'
@@ -16,7 +15,7 @@ import {
   ODD_SECTION_TITLE_STYLE,
 } from '../constants'
 import { RadioButton } from '../../../atoms/buttons'
-import { RecoveryFooterButtons } from './shared'
+import { RecoveryFooterButtons, RecoverySingleColumnContent } from '../shared'
 
 import type { ErrorKind, RecoveryContentProps, RecoveryRoute } from '../types'
 
@@ -36,12 +35,7 @@ export function SelectRecoveryOption({
 
   if (isOnDevice) {
     return (
-      <Flex
-        padding={SPACING.spacing32}
-        flexDirection={DIRECTION_COLUMN}
-        justifyContent={JUSTIFY_SPACE_BETWEEN}
-        height="100%"
-      >
+      <RecoverySingleColumnContent>
         <StyledText css={ODD_SECTION_TITLE_STYLE} as="h4SemiBold">
           {t('how_do_you_want_to_proceed')}
         </StyledText>
@@ -57,11 +51,8 @@ export function SelectRecoveryOption({
           primaryBtnOnClick={() =>
             proceedToRoute(selectedRoute as RecoveryRoute)
           }
-          secondaryBtnOnClick={() =>
-            proceedToRoute(RECOVERY_MAP.BEFORE_BEGINNING.ROUTE)
-          }
         />
-      </Flex>
+      </RecoverySingleColumnContent>
     )
   } else {
     return null
@@ -83,8 +74,8 @@ export function RecoveryOptions({
   return validRecoveryOptions.map((recoveryOption: RecoveryRoute) => {
     const buildOptionName = (): string => {
       switch (recoveryOption) {
-        case RECOVERY_MAP.RESUME.ROUTE:
-          return t('resume')
+        case RECOVERY_MAP.RETRY_FAILED_COMMAND.ROUTE:
+          return t('retry_step')
         case RECOVERY_MAP.CANCEL_RUN.ROUTE:
           return t('cancel_run')
         default:
@@ -113,6 +104,6 @@ export function getRecoveryOptions(errorKind: ErrorKind): RecoveryRoute[] {
 }
 
 export const GENERAL_ERROR_OPTIONS: RecoveryRoute[] = [
-  RECOVERY_MAP.RESUME.ROUTE,
+  RECOVERY_MAP.RETRY_FAILED_COMMAND.ROUTE,
   RECOVERY_MAP.CANCEL_RUN.ROUTE,
 ]

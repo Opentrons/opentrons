@@ -144,7 +144,7 @@ export function InterventionModal({
     </Modal>
   ) : (
     <InterventionModalMolecule
-      heading={<StyledText as="h1">{headerTitle}</StyledText>}
+      iconHeading={<StyledText as="h1">{headerTitle}</StyledText>}
       iconName={iconName}
       type="intervention-required"
     >

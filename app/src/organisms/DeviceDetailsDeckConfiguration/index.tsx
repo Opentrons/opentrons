@@ -19,19 +19,11 @@ import {
   StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
-import {
-  useModulesQuery,
-  useUpdateDeckConfigurationMutation,
-} from '@opentrons/react-api-client'
+import { useModulesQuery } from '@opentrons/react-api-client'
 import {
   getCutoutDisplayName,
   getFixtureDisplayName,
-  SINGLE_RIGHT_CUTOUTS,
   SINGLE_SLOT_FIXTURES,
-  SINGLE_LEFT_SLOT_FIXTURE,
-  SINGLE_RIGHT_SLOT_FIXTURE,
-  SINGLE_CENTER_SLOT_FIXTURE,
-  SINGLE_LEFT_CUTOUTS,
   getDeckDefFromRobotType,
   FLEX_ROBOT_TYPE,
 } from '@opentrons/shared-data'
@@ -39,12 +31,14 @@ import {
 import { useNotifyCurrentMaintenanceRun } from '../../resources/maintenance_runs'
 import { Banner } from '../../atoms/Banner'
 import { DeckFixtureSetupInstructionsModal } from './DeckFixtureSetupInstructionsModal'
-import { AddFixtureModal } from './AddFixtureModal'
 import { useIsRobotViewable, useRunStatuses } from '../Devices/hooks'
 import { useIsEstopNotDisengaged } from '../../resources/devices/hooks/useIsEstopNotDisengaged'
-import { useNotifyDeckConfigurationQuery } from '../../resources/deck_configuration'
+import {
+  useDeckConfigurationEditingTools,
+  useNotifyDeckConfigurationQuery,
+} from '../../resources/deck_configuration'
 
-import type { CutoutFixtureId, CutoutId } from '@opentrons/shared-data'
+import type { CutoutId } from '@opentrons/shared-data'
 
 const DECK_CONFIG_REFETCH_INTERVAL = 5000
 const RUN_REFETCH_INTERVAL = 5000
@@ -65,12 +59,6 @@ export function DeviceDetailsDeckConfiguration({
     showSetupInstructionsModal,
     setShowSetupInstructionsModal,
   ] = React.useState<boolean>(false)
-  const [showAddFixtureModal, setShowAddFixtureModal] = React.useState<boolean>(
-    false
-  )
-  const [targetCutoutId, setTargetCutoutId] = React.useState<CutoutId | null>(
-    null
-  )
 
   const { data: modulesData } = useModulesQuery()
   const deckConfig =
@@ -78,7 +66,6 @@ export function DeviceDetailsDeckConfiguration({
       refetchInterval: DECK_CONFIG_REFETCH_INTERVAL,
     }).data ?? []
   const deckDef = getDeckDefFromRobotType(FLEX_ROBOT_TYPE)
-  const { updateDeckConfiguration } = useUpdateDeckConfigurationMutation()
   const { isRunRunning } = useRunStatuses()
   const { data: maintenanceRunData } = useNotifyCurrentMaintenanceRun({
     refetchInterval: RUN_REFETCH_INTERVAL,
@@ -87,59 +74,11 @@ export function DeviceDetailsDeckConfiguration({
   const isMaintenanceRunExisting = maintenanceRunData?.data?.id != null
   const isRobotViewable = useIsRobotViewable(robotName)
 
-  const handleClickAdd = (cutoutId: CutoutId): void => {
-    setTargetCutoutId(cutoutId)
-    setShowAddFixtureModal(true)
-  }
-
-  const handleClickRemove = (
-    cutoutId: CutoutId,
-    cutoutFixtureId: CutoutFixtureId
-  ): void => {
-    let replacementFixtureId: CutoutFixtureId = SINGLE_CENTER_SLOT_FIXTURE
-    if (SINGLE_RIGHT_CUTOUTS.includes(cutoutId)) {
-      replacementFixtureId = SINGLE_RIGHT_SLOT_FIXTURE
-    } else if (SINGLE_LEFT_CUTOUTS.includes(cutoutId)) {
-      replacementFixtureId = SINGLE_LEFT_SLOT_FIXTURE
-    }
-
-    const fixtureGroup =
-      deckDef.cutoutFixtures.find(cf => cf.id === cutoutFixtureId)
-        ?.fixtureGroup ?? {}
-
-    let newDeckConfig = deckConfig
-    if (cutoutId in fixtureGroup) {
-      const groupMap =
-        fixtureGroup[cutoutId]?.find(group =>
-          Object.entries(group).every(([cId, cfId]) =>
-            deckConfig.find(
-              config =>
-                config.cutoutId === cId && config.cutoutFixtureId === cfId
-            )
-          )
-        ) ?? {}
-      newDeckConfig = deckConfig.map(cutoutConfig =>
-        cutoutConfig.cutoutId in groupMap
-          ? {
-              ...cutoutConfig,
-              cutoutFixtureId: replacementFixtureId,
-              opentronsModuleSerialNumber: undefined,
-            }
-          : cutoutConfig
-      )
-    } else {
-      newDeckConfig = deckConfig.map(cutoutConfig =>
-        cutoutConfig.cutoutId === cutoutId
-          ? {
-              ...cutoutConfig,
-              cutoutFixtureId: replacementFixtureId,
-              opentronsModuleSerialNumber: undefined,
-            }
-          : cutoutConfig
-      )
-    }
-    updateDeckConfiguration(newDeckConfig)
-  }
+  const {
+    addFixtureToCutout,
+    removeFixtureFromCutout,
+    addFixtureModal,
+  } = useDeckConfigurationEditingTools(false)
 
   // do not show standard slot in fixture display list
   const { displayList: fixtureDisplayList } = deckConfig.reduce<{
@@ -199,12 +138,7 @@ export function DeviceDetailsDeckConfiguration({
 
   return (
     <>
-      {showAddFixtureModal && targetCutoutId != null ? (
-        <AddFixtureModal
-          cutoutId={targetCutoutId}
-          setShowAddFixtureModal={setShowAddFixtureModal}
-        />
-      ) : null}
+      {addFixtureModal}
       {showSetupInstructionsModal ? (
         <DeckFixtureSetupInstructionsModal
           setShowSetupInstructionsModal={setShowSetupInstructionsModal}
@@ -278,8 +212,8 @@ export function DeviceDetailsDeckConfiguration({
                       : deckConfig.map(({ cutoutId }) => cutoutId)
                   }
                   deckConfig={deckConfig}
-                  handleClickAdd={handleClickAdd}
-                  handleClickRemove={handleClickRemove}
+                  handleClickAdd={addFixtureToCutout}
+                  handleClickRemove={removeFixtureFromCutout}
                 />
               </Flex>
               <Flex

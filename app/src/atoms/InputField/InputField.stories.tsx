@@ -3,7 +3,6 @@ import {
   DIRECTION_COLUMN,
   Flex,
   SPACING,
-  StyledText,
   VIEWPORT,
 } from '@opentrons/components'
 import { InputField as InputFieldComponent } from './index'
@@ -31,7 +30,6 @@ export const InputField: Story = args => {
   const [value, setValue] = React.useState(args.value)
   return (
     <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
-      <StyledText as="h4">{'Input title'}</StyledText>
       <InputFieldComponent
         {...args}
         value={value}
@@ -56,10 +54,11 @@ InputField.args = {
 export const InputFieldWithError: Story = args => {
   const [value, setValue] = React.useState(args.value)
   return (
-    <Flex padding={SPACING.spacing16} width="100%">
+    <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
       <InputFieldComponent
         {...args}
         value={value}
+        width="100%"
         onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
           setValue(e.target.value)
         }}
@@ -70,8 +69,8 @@ export const InputFieldWithError: Story = args => {
 }
 
 InputFieldWithError.args = {
+  value: 300,
   type: 'number',
-  caption: 'example caption',
   max: 200,
   min: 10,
   error: 'input is not in the range',

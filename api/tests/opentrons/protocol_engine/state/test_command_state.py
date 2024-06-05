@@ -477,3 +477,33 @@ def test_final_state_after_estop() -> None:
 
     assert subject_view.get_status() == EngineStatus.FAILED
     assert subject_view.get_error() == expected_error_occurrence
+
+
+def test_final_state_after_stop() -> None:
+    """Test the final state of the run after it's stopped."""
+    subject = CommandStore(config=_make_config(), is_door_open=False)
+    subject_view = CommandView(subject.state)
+
+    subject.handle_action(actions.StopAction())
+    subject.handle_action(
+        actions.FinishAction(
+            error_details=actions.FinishErrorDetails(
+                error=RuntimeError(
+                    "uh oh I was a command and then I got cancelled because someone"
+                    " stopped the run, and now I'm raising this exception because"
+                    " of that. Woe is me"
+                ),
+                error_id="error-id",
+                created_at=datetime.now(),
+            )
+        )
+    )
+    subject.handle_action(
+        actions.HardwareStoppedAction(
+            completed_at=sentinel.hardware_stopped_action_completed_at,
+            finish_error_details=None,
+        )
+    )
+
+    assert subject_view.get_status() == EngineStatus.STOPPED
+    assert subject_view.get_error() is None

@@ -207,7 +207,7 @@ export function RobotSettingsAdvanced({
         <Divider marginY={SPACING.spacing16} />
         <UpdateRobotSoftware
           robotName={robotName}
-          isRobotBusy={isRobotBusy || isEstopNotDisengaged}
+          isRobotBusy={isRobotBusy}
           onUpdateStart={() => handleUpdateBuildroot(robot)}
         />
         {isFlex ? (

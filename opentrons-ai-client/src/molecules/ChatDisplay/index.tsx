@@ -17,6 +17,7 @@ import {
   PrimaryButton,
   SPACING,
   StyledText,
+  TYPOGRAPHY,
 } from '@opentrons/components'
 
 import type { ChatData } from '../../resources/types'
@@ -71,12 +72,13 @@ export function ChatDisplay({ chat, chatId }: ChatDisplayProps): JSX.Element {
             h2: HeaderText,
             li: ListItemText,
             p: ParagraphText,
-            a: ExternalLink,
+            a: isUser ? ParagraphText : ExternalLink,
             code: CodeText,
           }}
         >
           {reply}
         </Markdown>
+
         {!isUser ? (
           <PrimaryButton
             position={POSITION_ABSOLUTE}
@@ -105,7 +107,13 @@ function ExternalLink(props: JSX.IntrinsicAttributes): JSX.Element {
 }
 
 function ParagraphText(props: JSX.IntrinsicAttributes): JSX.Element {
-  return <StyledText {...props} as="p" />
+  return (
+    <StyledText
+      {...props}
+      fontSize={TYPOGRAPHY.fontSize20}
+      lineHeight={TYPOGRAPHY.lineHeight24}
+    />
+  )
 }
 
 function HeaderText(props: JSX.IntrinsicAttributes): JSX.Element {
@@ -113,7 +121,7 @@ function HeaderText(props: JSX.IntrinsicAttributes): JSX.Element {
 }
 
 function ListItemText(props: JSX.IntrinsicAttributes): JSX.Element {
-  return <StyledText {...props} as="li" />
+  return <StyledText {...props} as="li" marginLeft={SPACING.spacing16} />
 }
 
 function UnnumberedListText(props: JSX.IntrinsicAttributes): JSX.Element {
@@ -121,10 +129,12 @@ function UnnumberedListText(props: JSX.IntrinsicAttributes): JSX.Element {
 }
 
 const CodeWrapper = styled(Flex)`
+  display: inline-flex;
   font-family: monospace;
-  padding: ${SPACING.spacing16};
-  color: ${COLORS.white};
-  background-color: ${COLORS.black90};
-  border-radius: ${BORDERS.borderRadius8};
+  padding: ${SPACING.spacing4};
+  color: ${COLORS.black80};
+  background-color: ${COLORS.grey20};
+  border-radius: ${BORDERS.borderRadius4};
   overflow: auto;
+  border: 1px solid ${COLORS.blue35};
 `
