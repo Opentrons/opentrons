@@ -1,6 +1,4 @@
-// TOME: Change this utils export stuff eventually. Also rename this.
-
-export * from './utils'
+export * from './errors'
 export { useDropTipRouting } from './useDropTipRouting'
 export { useDropTipWithType } from './useDropTipWithType'
 

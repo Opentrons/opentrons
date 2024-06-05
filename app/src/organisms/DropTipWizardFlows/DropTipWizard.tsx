@@ -4,14 +4,14 @@ import { Trans, useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
 
 import {
-  useConditionalConfirm,
-  Flex,
-  DIRECTION_COLUMN,
-  POSITION_ABSOLUTE,
-  COLORS,
   BORDERS,
-  StyledText,
+  COLORS,
+  DIRECTION_COLUMN,
+  Flex,
   JUSTIFY_FLEX_END,
+  POSITION_ABSOLUTE,
+  StyledText,
+  useConditionalConfirm,
 } from '@opentrons/components'
 
 import { LegacyModalShell } from '../../molecules/LegacyModal'
@@ -20,14 +20,14 @@ import { SimpleWizardBody } from '../../molecules/SimpleWizardBody'
 import { getIsOnDevice } from '../../redux/config'
 import { ExitConfirmation } from './ExitConfirmation'
 import {
-  BLOWOUT_SUCCESS,
   BEFORE_BEGINNING,
-  CHOOSE_DROP_TIP_LOCATION,
+  BLOWOUT_SUCCESS,
   CHOOSE_BLOWOUT_LOCATION,
+  CHOOSE_DROP_TIP_LOCATION,
   DROP_TIP_SUCCESS,
+  DT_ROUTES,
   POSITION_AND_BLOWOUT,
   POSITION_AND_DROP_TIP,
-  DT_ROUTES,
 } from './constants'
 import { BeforeBeginning } from './BeforeBeginning'
 import { ChooseLocation } from './ChooseLocation'
@@ -37,12 +37,9 @@ import { InProgressModal } from '../../molecules/InProgressModal/InProgressModal
 import { useDropTipErrorComponents } from './hooks'
 import { DropTipWizardHeader } from './DropTipWizardHeader'
 
-import type {
-  UseDropTipRoutingResult,
-  UseDropTipWithTypeResult,
-  DropTipErrorComponents,
-} from './hooks'
-import type { DropTipWizardFlowsProps, IssuedCommandsType } from '.'
+import type { DropTipWizardFlowsProps } from '.'
+import type { DropTipWizardContainerProps, IssuedCommandsType } from './types'
+import type { UseDropTipRoutingResult, UseDropTipWithTypeResult } from './hooks'
 
 export type DropTipWizardProps = DropTipWizardFlowsProps &
   UseDropTipWithTypeResult &
@@ -106,19 +103,6 @@ export function DropTipWizard(props: DropTipWizardProps): JSX.Element {
       goBackRunValid={goBackRunValid}
     />
   )
-}
-
-type DropTipWizardContainerProps = DropTipWizardProps & {
-  isOnDevice: boolean
-  toggleExitInitiated: () => void
-  isExitInitiated: boolean
-  isFinalWizardStep: boolean
-  showConfirmExit: boolean
-  confirmExit: () => void
-  cancelExit: () => void
-  errorComponents: DropTipErrorComponents
-  proceedWithConditionalClose: () => void
-  goBackRunValid: () => void
 }
 
 export function DropTipWizardContainer(

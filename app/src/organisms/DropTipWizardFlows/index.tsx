@@ -3,12 +3,13 @@ import head from 'lodash/head'
 
 import { getPipetteModelSpecs } from '@opentrons/shared-data'
 
-import { DropTipWizard } from './DropTipWizard'
 import { getPipettesWithTipAttached } from './getPipettesWithTipAttached'
 import { useDropTipRouting, useDropTipWithType } from './hooks'
+import { DropTipWizard } from './DropTipWizard'
 
 import type { PipetteModelSpecs, RobotType } from '@opentrons/shared-data'
 import type { PipetteData } from '@opentrons/api-client'
+import type { FixitCommandTypeUtils, IssuedCommandsType } from './types'
 import type { GetPipettesWithTipAttached } from './getPipettesWithTipAttached'
 
 /** Provides the user toggle for rendering Drop Tip Wizard Flows.
@@ -27,14 +28,6 @@ export function useDropTipWizardFlows(): {
   }
 
   return { showDTWiz, toggleDTWiz }
-}
-
-export type IssuedCommandsType = 'setup' | 'fixit'
-
-export interface FixitCommandTypeUtils {
-  runId: string
-  failedCommandId: string
-  onCloseFlow: () => void
 }
 
 export interface DropTipWizardFlowsProps {

@@ -7,12 +7,7 @@ import { DROP_TIP_SPECIAL_ERROR_TYPES } from '../constants'
 import { SmallButton } from '../../../atoms/buttons'
 
 import type { RunCommandError } from '@opentrons/shared-data'
-
-export interface ErrorDetails {
-  message: string
-  header?: string
-  type?: string
-}
+import type { ErrorDetails } from '../types'
 
 export interface SetRobotErrorDetailsParams {
   runCommandError?: RunCommandError
@@ -20,8 +15,6 @@ export interface SetRobotErrorDetailsParams {
   header?: string
   type?: RunCommandError['errorType']
 }
-
-//TOME: Rename and split these out!
 
 /**
  * @description Wraps the error state setter, updating the setter if the error should be special-cased.
@@ -115,54 +108,4 @@ export function useDropTipErrorComponents({
   return errorDetails?.type === DROP_TIP_SPECIAL_ERROR_TYPES.MUST_HOME_ERROR
     ? buildHandleMustHome()
     : buildGenericError()
-}
-
-export interface UseWizardExitHeaderProps {
-  isFinalStep: boolean
-  hasInitiatedExit: boolean
-  errorDetails: ErrorDetails | null
-  handleCleanUpAndClose: (homeOnError?: boolean) => void
-  confirmExit: (homeOnError?: boolean) => void
-}
-
-/**
- * @description Determines the appropriate onClick for the wizard exit button, ensuring the exit logic can occur at
- * most one time.
- */
-export function useWizardExitHeader({
-  isFinalStep,
-  hasInitiatedExit,
-  errorDetails,
-  handleCleanUpAndClose,
-  confirmExit,
-}: UseWizardExitHeaderProps): () => void {
-  return buildHandleExit()
-
-  function buildHandleExit(): () => void {
-    if (!hasInitiatedExit) {
-      if (errorDetails != null) {
-        // When an error occurs, do not home when exiting the flow via the wizard header.
-        return buildNoHomeCleanUpAndClose()
-      } else if (isFinalStep) {
-        return buildHandleCleanUpAndClose()
-      } else {
-        return buildConfirmExit()
-      }
-    } else {
-      return buildGenericCase()
-    }
-  }
-
-  function buildGenericCase(): () => void {
-    return () => null
-  }
-  function buildNoHomeCleanUpAndClose(): () => void {
-    return () => handleCleanUpAndClose(false)
-  }
-  function buildHandleCleanUpAndClose(): () => void {
-    return handleCleanUpAndClose
-  }
-  function buildConfirmExit(): () => void {
-    return confirmExit
-  }
 }

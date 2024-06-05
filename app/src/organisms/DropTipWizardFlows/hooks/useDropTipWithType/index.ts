@@ -1,14 +1,15 @@
 // This is the main unifying function for maintenanceRun and fixit type flows.
 import * as React from 'react'
 
-import { useDropTipCommandErrors } from '../utils'
+import { useDropTipCommandErrors } from '../errors'
 import { useDropTipMaintenanceRun } from './useDropTipMaintenanceRun'
 import { useDropTipCreateCommands } from './useDropTipCreateCommands'
 import { useDropTipCommands } from './useDropTipCommands'
 
-import type { ErrorDetails, SetRobotErrorDetailsParams } from '../utils'
+import type { SetRobotErrorDetailsParams } from '../errors'
 import type { UseDropTipCommandsResult } from './useDropTipCommands'
-import type { DropTipWizardFlowsProps, IssuedCommandsType } from '../..'
+import type { ErrorDetails, IssuedCommandsType } from '../../types'
+import type { DropTipWizardFlowsProps } from '../..'
 
 export type UseDTWithTypeParams = DropTipWizardFlowsProps & {
   issuedCommandsType: IssuedCommandsType

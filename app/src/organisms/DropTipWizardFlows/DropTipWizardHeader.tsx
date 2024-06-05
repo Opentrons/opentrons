@@ -2,11 +2,10 @@ import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 
 import { BEFORE_BEGINNING, BLOWOUT_SUCCESS, DT_ROUTES } from './constants'
-import { useWizardExitHeader } from './hooks'
 import { WizardHeader } from '../../molecules/WizardHeader'
 
 import type { DropTipWizardProps } from './DropTipWizard'
-import type { DropTipFlowsRoute, DropTipFlowsStep } from './types'
+import type { DropTipFlowsRoute, DropTipFlowsStep, ErrorDetails } from './types'
 
 type DropTipWizardHeaderProps = DropTipWizardProps & {
   isExitInitiated: boolean
@@ -102,4 +101,54 @@ function useSeenBlowoutSuccess({
   }
 
   return { currentStepNumber, totalSteps }
+}
+
+export interface UseWizardExitHeaderProps {
+  isFinalStep: boolean
+  hasInitiatedExit: boolean
+  errorDetails: ErrorDetails | null
+  handleCleanUpAndClose: (homeOnError?: boolean) => void
+  confirmExit: (homeOnError?: boolean) => void
+}
+
+/**
+ * @description Determines the appropriate onClick for the wizard exit button, ensuring the exit logic can occur at
+ * most one time.
+ */
+export function useWizardExitHeader({
+  isFinalStep,
+  hasInitiatedExit,
+  errorDetails,
+  handleCleanUpAndClose,
+  confirmExit,
+}: UseWizardExitHeaderProps): () => void {
+  return buildHandleExit()
+
+  function buildHandleExit(): () => void {
+    if (!hasInitiatedExit) {
+      if (errorDetails != null) {
+        // When an error occurs, do not home when exiting the flow via the wizard header.
+        return buildNoHomeCleanUpAndClose()
+      } else if (isFinalStep) {
+        return buildHandleCleanUpAndClose()
+      } else {
+        return buildConfirmExit()
+      }
+    } else {
+      return buildGenericCase()
+    }
+  }
+
+  function buildGenericCase(): () => void {
+    return () => null
+  }
+  function buildNoHomeCleanUpAndClose(): () => void {
+    return () => handleCleanUpAndClose(false)
+  }
+  function buildHandleCleanUpAndClose(): () => void {
+    return handleCleanUpAndClose
+  }
+  function buildConfirmExit(): () => void {
+    return confirmExit
+  }
 }

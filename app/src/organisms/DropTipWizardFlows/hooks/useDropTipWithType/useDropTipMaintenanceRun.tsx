@@ -9,7 +9,7 @@ import { MANAGED_PIPETTE_ID } from '../../constants'
 
 import type { PipetteModelSpecs, CreateCommand } from '@opentrons/shared-data'
 import type { PipetteData } from '@opentrons/api-client'
-import type { SetRobotErrorDetailsParams } from '../utils'
+import type { SetRobotErrorDetailsParams } from '../errors'
 import type { UseDTWithTypeParams } from '..'
 
 const RUN_REFETCH_INTERVAL_MS = 5000

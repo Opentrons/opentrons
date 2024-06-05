@@ -52,8 +52,6 @@ export const BeforeBeginning = (
     }
   }
 
-  // TOME: Please refactor this out. We don't want conditional stuff like this!
-
   if (isOnDevice) {
     return (
       <Flex

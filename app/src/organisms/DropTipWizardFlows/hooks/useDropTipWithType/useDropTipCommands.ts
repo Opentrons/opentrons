@@ -12,14 +12,13 @@ import type {
   PipetteModelSpecs,
 } from '@opentrons/shared-data'
 import type { CommandData } from '@opentrons/api-client'
-import type { FixitCommandTypeUtils } from '../..'
 import type {
   Axis,
   Sign,
   StepSize,
 } from '../../../../molecules/JogControls/types'
-import type { DropTipFlowsStep } from '../../types'
-import type { SetRobotErrorDetailsParams } from '../utils'
+import type { DropTipFlowsStep, FixitCommandTypeUtils } from '../../types'
+import type { SetRobotErrorDetailsParams } from '../errors'
 import type { UseDTWithTypeParams } from '..'
 import type { RunCommandByCommandTypeParams } from './useDropTipCreateCommands'
 
