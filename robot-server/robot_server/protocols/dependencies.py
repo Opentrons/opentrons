@@ -111,16 +111,6 @@ async def get_analysis_store(
     return analysis_store
 
 
-# async def get_protocol_analyzer(
-#     analysis_store: AnalysisStore = Depends(get_analysis_store),
-# ) -> ProtocolAnalyzer:
-#     """Construct a ProtocolAnalyzer for a single request."""
-#     return ProtocolAnalyzer(
-#         analysis_store=analysis_store,
-#
-#     )
-
-
 async def get_analyses_manager(
     app_state: AppState = Depends(get_app_state),
     analysis_store: AnalysisStore = Depends(get_analysis_store),

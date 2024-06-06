@@ -37,7 +37,7 @@ class ProtocolAnalyzer:
     ) -> AbstractRunner:
         """Load runner with the protocol and run time parameter values.
 
-        Returns: Run time parameters with the override values.
+        Returns: The Runner instance.
         """
         runner = await protocol_runner.create_simulating_runner(
             robot_type=self._protocol_resource.source.robot_type,

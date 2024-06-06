@@ -1,4 +1,4 @@
-"""Data manager for protocol analyses."""
+"""A collaborator for managing protocol analyses."""
 from typing import Optional
 
 from opentrons.protocol_engine.types import RunTimeParamValuesType
