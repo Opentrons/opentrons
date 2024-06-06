@@ -55,7 +55,9 @@ export function RunFailedModal({
   const modalProps: LegacyModalProps = {
     type: 'error',
     title: t('run_failed_modal_title'),
-    onClose: () => setShowRunFailedModal(false),
+    onClose: () => {
+      setShowRunFailedModal(false)
+    },
     closeOnOutsideClick: true,
     childrenPadding: SPACING.spacing24,
     width: '31.25rem',

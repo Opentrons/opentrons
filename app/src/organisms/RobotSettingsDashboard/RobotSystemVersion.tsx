@@ -67,7 +67,9 @@ export function RobotSystemVersion({
                 }
               : undefined
           }
-          onClickBack={() => setCurrentOption(null)}
+          onClickBack={() => {
+            setCurrentOption(null)
+          }}
         />
         <Flex
           gridGap="16rem"
@@ -98,7 +100,9 @@ export function RobotSystemVersion({
               <MediumButton
                 flex="1"
                 buttonText={t('view_update')}
-                onClick={() => setShowModal(true)}
+                onClick={() => {
+                  setShowModal(true)
+                }}
               />
             ) : null}
           </Flex>

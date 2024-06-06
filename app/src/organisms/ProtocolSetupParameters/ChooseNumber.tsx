@@ -94,11 +94,11 @@ export function ChooseNumber({
         }}
         buttonType="tertiaryLowLight"
         buttonText={t('restore_default')}
-        onClickButton={() =>
+        onClickButton={() => {
           resetValueDisabled
             ? makeSnackbar(t('no_custom_values'))
             : setParamValue(String(parameter.default))
-        }
+        }}
       />
       <Flex
         alignSelf={ALIGN_CENTER}
@@ -132,7 +132,9 @@ export function ChooseNumber({
                 : `${parameter.min.toFixed(1)}-${parameter.max.toFixed(1)}`
             }
             error={error}
-            onBlur={e => e.target.focus()}
+            onBlur={e => {
+              e.target.focus()
+            }}
             onChange={e => {
               const updatedValue =
                 parameter.type === 'int'

@@ -75,7 +75,9 @@ export function AlertsModal({ toastIdRef }: AlertsModalProps): JSX.Element {
           closeButton: true,
           disableTimeout: true,
           linkText: t('view_update'),
-          onLinkClick: () => setShowUpdateModal(true),
+          onLinkClick: () => {
+            setShowUpdateModal(true)
+          },
         }
       )
     } else if (removeToast && toastIdRef.current) {
@@ -93,7 +95,11 @@ export function AlertsModal({ toastIdRef }: AlertsModalProps): JSX.Element {
         <U2EDriverOutdatedAlert dismissAlert={dismissDriverAlert} />
       ) : null}
       {showUpdateModal ? (
-        <UpdateAppModal closeModal={() => setShowUpdateModal(false)} />
+        <UpdateAppModal
+          closeModal={() => {
+            setShowUpdateModal(false)
+          }}
+        />
       ) : null}
     </>
   )

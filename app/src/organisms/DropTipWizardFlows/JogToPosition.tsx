@@ -193,7 +193,9 @@ export const JogToPosition = (
           setIsRobotInMotion(true)
           handleProceed()
         }}
-        handleGoBack={() => setShowPositionConfirmation(false)}
+        handleGoBack={() => {
+          setShowPositionConfirmation(false)
+        }}
         isOnDevice={isOnDevice}
         currentStep={currentStep}
       />
@@ -221,7 +223,9 @@ export const JogToPosition = (
           <Flex justifyContent={JUSTIFY_FLEX_END} width="100%">
             <SmallButton
               buttonText={t('shared:confirm_position')}
-              onClick={() => setShowPositionConfirmation(true)}
+              onClick={() => {
+                setShowPositionConfirmation(true)
+              }}
             />
           </Flex>
         </Flex>
@@ -266,7 +270,11 @@ export const JogToPosition = (
               <SecondaryButton onClick={onGoBack}>
                 {t('shared:go_back')}
               </SecondaryButton>
-              <PrimaryButton onClick={() => setShowPositionConfirmation(true)}>
+              <PrimaryButton
+                onClick={() => {
+                  setShowPositionConfirmation(true)
+                }}
+              >
                 {t('shared:confirm_position')}
               </PrimaryButton>
             </Flex>

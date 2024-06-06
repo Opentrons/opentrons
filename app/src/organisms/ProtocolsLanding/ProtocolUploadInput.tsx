@@ -51,7 +51,9 @@ export function ProtocolUploadInput(
       marginY={SPACING.spacing20}
     >
       <UploadInput
-        onUpload={(file: File) => handleUpload(file)}
+        onUpload={(file: File) => {
+          handleUpload(file)
+        }}
         uploadText={t('valid_file_types')}
         dragAndDropText={
           <StyledText as="p">

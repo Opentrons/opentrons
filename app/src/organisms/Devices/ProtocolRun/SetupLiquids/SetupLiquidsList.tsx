@@ -157,7 +157,9 @@ export function LiquidsListItem(props: LiquidsListItemProps): JSX.Element {
           labwareId={liquidDetailsLabwareId}
           liquidId={liquidId}
           runId={runId}
-          closeModal={() => setLiquidDetailsLabwareId(null)}
+          closeModal={() => {
+            setLiquidDetailsLabwareId(null)
+          }}
         />
       )}
       {openItem && (

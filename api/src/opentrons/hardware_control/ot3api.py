@@ -2624,8 +2624,6 @@ class OT3API(
             probe_settings.sensor_threshold_pascals,
             probe_settings.output_option,
             probe_settings.data_files,
-            probe_settings.auto_zero_sensor,
-            probe_settings.num_baseline_reads,
             probe=probe if probe else InstrumentProbeType.PRIMARY,
         )
         end_pos = await self.gantry_position(mount, refresh=True)
@@ -2684,7 +2682,9 @@ class OT3API(
             machine_pass_distance,
             pass_settings.speed_mm_per_s,
             pass_settings.sensor_threshold_pf,
-            probe=probe,
+            probe,
+            pass_settings.output_option,
+            pass_settings.data_files,
         )
         end_pos = await self.gantry_position(mount, refresh=True)
         if retract_after:

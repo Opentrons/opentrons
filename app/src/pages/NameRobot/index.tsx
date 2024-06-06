@@ -267,7 +267,9 @@ export function NameRobot(): JSX.Element {
                     value={field.value}
                     error={fieldState.error?.message && ''}
                     textAlign={TYPOGRAPHY.textAlignCenter}
-                    onBlur={e => e.target.focus()}
+                    onBlur={e => {
+                      e.target.focus()
+                    }}
                   />
                 )}
               />

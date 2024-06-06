@@ -38,12 +38,16 @@ export function DeckFixtureSetupInstructionsModal({
     iconName: 'information',
     iconColor: COLORS.black90,
     hasExitIcon: true,
-    onClick: () => setShowSetupInstructionsModal(false),
+    onClick: () => {
+      setShowSetupInstructionsModal(false)
+    },
   }
 
   const modalProps: LegacyModalProps = {
     title: t('deck_fixture_setup_instructions'),
-    onClose: () => setShowSetupInstructionsModal(false),
+    onClose: () => {
+      setShowSetupInstructionsModal(false)
+    },
     closeOnOutsideClick: true,
     childrenPadding: SPACING.spacing24,
     width: '39.3125rem',
@@ -54,7 +58,9 @@ export function DeckFixtureSetupInstructionsModal({
       {isOnDevice ? (
         <Modal
           header={modalHeader}
-          onOutsideClick={() => setShowSetupInstructionsModal(false)}
+          onOutsideClick={() => {
+            setShowSetupInstructionsModal(false)
+          }}
         >
           <Flex flexDirection={DIRECTION_ROW} gridGap={SPACING.spacing40}>
             <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing12}>

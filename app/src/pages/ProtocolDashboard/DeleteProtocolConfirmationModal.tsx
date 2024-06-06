@@ -67,9 +67,9 @@ export function DeleteProtocolConfirmationModal({
         .then(() =>
           queryClient
             .invalidateQueries([host, 'protocols'])
-            .catch((e: Error) =>
+            .catch((e: Error) => {
               console.error(`error invalidating runs query: ${e.message}`)
-            )
+            })
         )
         .then(() => {
           setShowIcon(false)

@@ -70,7 +70,11 @@ export function RobotTypeTile(props: WizardTileProps): JSX.Element {
           justifyContent={JUSTIFY_FLEX_END}
           width="100%"
         >
-          <PrimaryButton onClick={() => proceed()}>
+          <PrimaryButton
+            onClick={() => {
+              proceed()
+            }}
+          >
             {t('application:next')}
           </PrimaryButton>
         </Flex>

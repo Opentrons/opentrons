@@ -119,7 +119,9 @@ export function DropTipWizard(props: DropTipWizardProps): JSX.Element {
         })
         .catch(e => e)
     },
-    onError: error => setErrorDetails({ message: error.message }),
+    onError: error => {
+      setErrorDetails({ message: error.message })
+    },
   })
 
   const { data: maintenanceRunData } = useNotifyCurrentMaintenanceRun({
@@ -155,8 +157,12 @@ export function DropTipWizard(props: DropTipWizardProps): JSX.Element {
   )
 
   const { deleteMaintenanceRun } = useDeleteMaintenanceRunMutation({
-    onSuccess: () => closeFlow(),
-    onError: () => closeFlow(),
+    onSuccess: () => {
+      closeFlow()
+    },
+    onError: () => {
+      closeFlow()
+    },
   })
 
   const handleCleanUpAndClose = (homeOnExit: boolean = true): void => {
@@ -178,12 +184,16 @@ export function DropTipWizard(props: DropTipWizardProps): JSX.Element {
             ],
             true
           )
-        : new Promise<void>((resolve, reject) => resolve())
+        : new Promise<void>((resolve, reject) => {
+            resolve()
+          })
       )
         .catch(error => {
           console.error(error.message)
         })
-        .finally(() => deleteMaintenanceRun(maintenanceRunData?.data.id))
+        .finally(() => {
+          deleteMaintenanceRun(maintenanceRunData?.data.id)
+        })
     }
   }
 
@@ -518,7 +528,7 @@ export const DropTipWizardComponent = (
                     proceed()
                   }
                 })
-                .catch(e =>
+                .catch(e => {
                   setSpecificErrorDetails({
                     message: `Error issuing ${
                       currentStep === POSITION_AND_BLOWOUT
@@ -526,7 +536,7 @@ export const DropTipWizardComponent = (
                         : 'drop tip'
                     } command: ${e.message}`,
                   })
-                )
+                })
             }
           }}
           handleGoBack={goBack}

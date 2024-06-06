@@ -17,11 +17,14 @@ tests ?=
 cov_opts ?= --coverage=true
 test_opts ?=
 
+# This variable is for all command
+target ?= production
+
 # standard targets
 #####################################################################
 
 .PHONY: all
-all: clean build
+all: clean build-$(target)
 
 .PHONY: setup
 setup:
@@ -34,9 +37,15 @@ clean:
 # artifacts
 #####################################################################
 
-.PHONY: build
-build: export NODE_ENV := production
-build:
+.PHONY: build-production
+build-production: export NODE_ENV := production
+build-production:
+	vite build
+	git rev-parse HEAD > dist/.commit
+
+.PHONY: build-staging
+build-staging: export NODE_ENV := staging
+build-staging:
 	vite build
 	git rev-parse HEAD > dist/.commit
 

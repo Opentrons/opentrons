@@ -133,7 +133,9 @@ export function AdditionalItemsRow(
           >
             {name === 'trashBin' && isEquipmentAdded ? (
               <OutlineButton
-                onClick={() => openTrashModal(true)}
+                onClick={() => {
+                  openTrashModal(true)
+                }}
                 className={styles.module_button}
               >
                 {t('shared:edit')}
@@ -149,7 +151,11 @@ export function AdditionalItemsRow(
                 className={styles.module_button}
                 disabled={disabledRemoveButton}
                 onClick={
-                  addTrash ? () => openTrashModal(true) : handleAttachment
+                  addTrash
+                    ? () => {
+                        openTrashModal(true)
+                      }
+                    : handleAttachment
                 }
               >
                 {isEquipmentAdded ? t('shared:remove') : t('shared:add')}

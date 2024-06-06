@@ -86,7 +86,9 @@ export const UpdateBanner = ({
       >
         <Banner
           type={bannerType}
-          onCloseClick={() => setShowBanner(false)}
+          onCloseClick={() => {
+            setShowBanner(false)
+          }}
           closeButton={closeButtonRendered}
         >
           <Flex flexDirection={DIRECTION_COLUMN}>
@@ -95,7 +97,9 @@ export const UpdateBanner = ({
               textAlign={ALIGN_START}
               fontSize={TYPOGRAPHY.fontSizeP}
               textDecoration={TYPOGRAPHY.textDecorationUnderline}
-              onClick={() => handleUpdateClick()}
+              onClick={() => {
+                handleUpdateClick()
+              }}
             >
               {hyperlinkText}
             </Btn>

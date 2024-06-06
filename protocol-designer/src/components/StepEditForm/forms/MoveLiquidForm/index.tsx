@@ -25,7 +25,9 @@ export const MoveLiquidForm = (props: StepFormProps): JSX.Element => {
   const [collapsed, _setCollapsed] = React.useState<boolean>(true)
   const pipettes = useSelector(getPipetteEntities)
   const { t } = useTranslation(['application', 'form'])
-  const toggleCollapsed = (): void => _setCollapsed(!collapsed)
+  const toggleCollapsed = (): void => {
+    _setCollapsed(!collapsed)
+  }
 
   const { propsForFields, formData } = props
   const { stepType, path } = formData

@@ -114,7 +114,9 @@ function startUp(): void {
 
   ipcMain.on('dispatch', (_, action) => {
     log.debug('Received action via IPC from renderer', { action })
-    actionHandlers.forEach(handler => handler(action as Action))
+    actionHandlers.forEach(handler => {
+      handler(action as Action)
+    })
   })
 
   log.silly('Global references', { mainWindow, rendererLogger })

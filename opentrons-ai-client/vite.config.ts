@@ -1,6 +1,11 @@
 import path from 'path'
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
+import postCssImport from 'postcss-import'
+import postCssApply from 'postcss-apply'
+import postColorModFunction from 'postcss-color-mod-function'
+import postCssPresetEnv from 'postcss-preset-env'
+import lostCss from 'lost'
 
 export default defineConfig({
   // this makes imports relative rather than absolute
@@ -25,7 +30,13 @@ export default defineConfig({
   },
   css: {
     postcss: {
-      plugins: [],
+      plugins: [
+        postCssImport({ root: 'src/' }),
+        postCssApply(),
+        postColorModFunction(),
+        postCssPresetEnv({ stage: 0 }),
+        lostCss(),
+      ],
     },
   },
   define: {

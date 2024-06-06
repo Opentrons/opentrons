@@ -91,7 +91,9 @@ export function FlexPipetteCard({
 
   const { showDTWiz, toggleDTWiz } = useDropTipWizardFlows()
 
-  const handleLaunchPipetteWizardFlows = (flowType: PipetteWizardFlow): void =>
+  const handleLaunchPipetteWizardFlows = (
+    flowType: PipetteWizardFlow
+  ): void => {
     handlePipetteWizardFlows({
       flowType,
       mount,
@@ -99,6 +101,7 @@ export function FlexPipetteCard({
       selectedPipette: selectedPipetteForWizard,
       host,
     })
+  }
   const handleChoosePipette: React.MouseEventHandler<HTMLButtonElement> = () => {
     setShowChoosePipette(true)
   }
@@ -170,12 +173,16 @@ export function FlexPipetteCard({
           {
             label: t('about_pipette'),
             disabled: attachedPipette == null,
-            onClick: () => setShowAboutPipetteSlideout(true),
+            onClick: () => {
+              setShowAboutPipetteSlideout(true)
+            },
           },
           {
             label: i18n.format(t('drop_tips'), 'capitalize'),
             disabled: attachedPipette == null || isRunActive,
-            onClick: () => toggleDTWiz(),
+            onClick: () => {
+              toggleDTWiz()
+            },
           },
         ]
   return (
@@ -267,7 +274,9 @@ export function FlexPipetteCard({
           pipetteName={pipetteDisplayName ?? attachedPipette.instrumentName}
           firmwareVersion={attachedPipette.firmwareVersion}
           isExpanded={showAboutPipetteSlideout}
-          onCloseClick={() => setShowAboutPipetteSlideout(false)}
+          onCloseClick={() => {
+            setShowAboutPipetteSlideout(false)
+          }}
         />
       ) : null}
       {showChoosePipette ? (
@@ -275,7 +284,9 @@ export function FlexPipetteCard({
           proceed={handleAttach}
           setSelectedPipette={setSelectedPipette}
           selectedPipette={selectedPipette}
-          exit={() => setShowChoosePipette(false)}
+          exit={() => {
+            setShowChoosePipette(false)
+          }}
           mount={mount}
         />
       ) : null}

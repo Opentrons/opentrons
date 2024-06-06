@@ -98,11 +98,9 @@ export function CalibratePipetteOffset(
   }
 
   function cleanUpAndExit(): void {
-    queryClient
-      .invalidateQueries([host, 'calibration'])
-      .catch((e: Error) =>
-        console.error(`error invalidating calibration queries: ${e.message}`)
-      )
+    queryClient.invalidateQueries([host, 'calibration']).catch((e: Error) => {
+      console.error(`error invalidating calibration queries: ${e.message}`)
+    })
     if (session?.id != null) {
       dispatchRequests(
         Sessions.createSessionCommand(robotName, session.id, {
