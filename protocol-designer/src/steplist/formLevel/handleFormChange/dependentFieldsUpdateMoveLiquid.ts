@@ -263,7 +263,8 @@ const getClearedDisposalVolumeFields = (): FormPatch =>
 const clampAspirateAirGapVolume = (
   patch: FormPatch,
   rawForm: FormData,
-  pipetteEntities: PipetteEntities
+  pipetteEntities: PipetteEntities,
+  labwareEntities: LabwareEntities
 ): FormPatch => {
   const patchedAspirateAirgapVolume =
     patch.aspirate_airGap_volume ?? rawForm?.aspirate_airGap_volume
@@ -280,7 +281,8 @@ const clampAspirateAirGapVolume = (
     const minAirGapVolume = 0 // NOTE: a form level warning will occur if the air gap volume is below the pipette min volume
 
     const maxAirGapVolume =
-      getPipetteCapacity(pipetteEntity, tipRack) - minPipetteVolume
+      getPipetteCapacity(pipetteEntity, labwareEntities, tipRack) -
+      minPipetteVolume
     const clampedAirGapVolume = clamp(
       Number(patchedAspirateAirgapVolume),
       minAirGapVolume,
@@ -649,7 +651,12 @@ export function dependentFieldsUpdateMoveLiquid(
     chainPatch =>
       updatePatchDisposalVolumeFields(chainPatch, rawForm, pipetteEntities),
     chainPatch =>
-      clampAspirateAirGapVolume(chainPatch, rawForm, pipetteEntities),
+      clampAspirateAirGapVolume(
+        chainPatch,
+        rawForm,
+        pipetteEntities,
+        labwareEntities
+      ),
     chainPatch =>
       clampDisposalVolume(
         chainPatch,
