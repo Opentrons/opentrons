@@ -55,6 +55,7 @@ class RunOrchestrator:
         hardware_api: HardwareControlAPI,
         fixit_runner: protocol_runner.LiveRunner,
         setup_runner: protocol_runner.LiveRunner,
+        protocol_live_runner: protocol_runner.LiveRunner,
         json_or_python_protocol_runner: Optional[
             Union[protocol_runner.PythonAndLegacyRunner, protocol_runner.JsonRunner]
         ] = None,
@@ -76,6 +77,7 @@ class RunOrchestrator:
         self._protocol_runner = json_or_python_protocol_runner
         self._setup_runner = setup_runner
         self._fixit_runner = fixit_runner
+        self._protocol_live_runner = protocol_live_runner
 
     @property
     def run_id(self) -> str:
@@ -105,6 +107,10 @@ class RunOrchestrator:
             protocol_engine=protocol_engine,
             hardware_api=hardware_api,
         )
+        protocol_live_runner = protocol_runner.LiveRunner(
+            protocol_engine=protocol_engine,
+            hardware_api=hardware_api,
+        )
         json_or_python_runner = None
         if protocol_config:
             json_or_python_runner = protocol_runner.create_protocol_runner(
@@ -121,6 +127,7 @@ class RunOrchestrator:
             fixit_runner=fixit_runner,
             hardware_api=hardware_api,
             protocol_engine=protocol_engine,
+            protocol_live_runner=protocol_live_runner,
         )
 
     def play(self, deck_configuration: Optional[DeckConfigurationType] = None) -> None:
@@ -129,9 +136,16 @@ class RunOrchestrator:
 
     async def run(self, deck_configuration: DeckConfigurationType) -> RunResult:
         """Start or resume the run."""
-        # TODO(tz, 5-31-2024): call all runners?
-        assert self._protocol_runner is not None
-        return await self._protocol_runner.run(deck_configuration=deck_configuration)
+        if self._protocol_runner:
+            return await self._protocol_runner.run(
+                deck_configuration=deck_configuration
+            )
+        elif self._protocol_live_runner:
+            return await self._protocol_live_runner.run(
+                deck_configuration=deck_configuration
+            )
+        else:
+            return await self._setup_runner.run(deck_configuration=deck_configuration)
 
     def pause(self) -> None:
         """Start or resume the run."""
