@@ -109,7 +109,7 @@ export function useOnCancelRun({
         if (areTipsAttached) {
           void proceedToRouteAndStep(DROP_TIP_FLOWS.ROUTE)
         } else {
-          setRobotInMotion(true, ROBOT_CANCELING.ROUTE).then(() => {
+          void setRobotInMotion(true, ROBOT_CANCELING.ROUTE).then(() => {
             cancelRun()
           })
         }

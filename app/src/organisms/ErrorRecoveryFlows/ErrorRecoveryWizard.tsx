@@ -9,7 +9,12 @@ import { getIsOnDevice } from '../../redux/config'
 import { getTopPortalEl } from '../../App/portal'
 import { InterventionModal } from '../../molecules/InterventionModal'
 import { BeforeBeginning } from './BeforeBeginning'
-import { SelectRecoveryOption, RetryStep, CancelRun } from './RecoveryOptions'
+import {
+  SelectRecoveryOption,
+  RetryStep,
+  CancelRun,
+  ManageTips,
+} from './RecoveryOptions'
 import { RecoveryInProgress } from './RecoveryInProgress'
 import { getErrorKind } from './utils'
 import { RECOVERY_MAP } from './constants'
@@ -131,6 +136,10 @@ export function ErrorRecoveryContent(props: RecoveryContentProps): JSX.Element {
     return <CancelRun {...props} />
   }
 
+  const buildManageTips = (): JSX.Element => {
+    return <ManageTips {...props} />
+  }
+
   switch (props.recoveryMap.route) {
     case RECOVERY_MAP.BEFORE_BEGINNING.ROUTE:
       return buildBeforeBeginning()
@@ -140,6 +149,8 @@ export function ErrorRecoveryContent(props: RecoveryContentProps): JSX.Element {
       return buildResumeRun()
     case RECOVERY_MAP.CANCEL_RUN.ROUTE:
       return buildCancelRun()
+    case RECOVERY_MAP.DROP_TIP_FLOWS.ROUTE:
+      return buildManageTips()
     case RECOVERY_MAP.ROBOT_IN_MOTION.ROUTE:
     case RECOVERY_MAP.ROBOT_RESUMING.ROUTE:
     case RECOVERY_MAP.ROBOT_RETRYING_COMMAND.ROUTE:

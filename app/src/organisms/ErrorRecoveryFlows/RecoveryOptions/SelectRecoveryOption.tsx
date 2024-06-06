@@ -42,7 +42,7 @@ export function SelectRecoveryOption({
     return (
       <RecoverySingleColumnContent>
         <StyledText css={ODD_SECTION_TITLE_STYLE} as="h4SemiBold">
-          {t('how_do_you_want_to_proceed')}
+          {t('choose_a_recovery_action')}
         </StyledText>
         <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
           <RecoveryOptions

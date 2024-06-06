@@ -1,10 +1,6 @@
 import type { RunCommandSummary } from '@opentrons/api-client'
 import type { ERROR_KINDS, RECOVERY_MAP, INVALID } from './constants'
-import type {
-  UseRouteUpdateActionsResult,
-  UseRecoveryCommandsResult,
-} from './utils'
-import { ErrorRecoveryWizardProps } from './ErrorRecoveryWizard'
+import type { ErrorRecoveryWizardProps } from './ErrorRecoveryWizard'
 
 export type FailedCommand = RunCommandSummary
 export type InvalidStep = typeof INVALID
