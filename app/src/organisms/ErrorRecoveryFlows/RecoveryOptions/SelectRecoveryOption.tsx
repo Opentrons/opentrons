@@ -29,7 +29,7 @@ export function SelectRecoveryOption({
   tipStatusUtils,
 }: RecoveryContentProps): JSX.Element | null {
   const { t } = useTranslation('error_recovery')
-  const { proceedToRoute } = routeUpdateActions
+  const { proceedToRouteAndStep } = routeUpdateActions
   const { determineTipStatus } = tipStatusUtils
   const validRecoveryOptions = getRecoveryOptions(errorKind)
   const [selectedRoute, setSelectedRoute] = React.useState<RecoveryRoute>(
@@ -54,7 +54,7 @@ export function SelectRecoveryOption({
         <RecoveryFooterButtons
           isOnDevice={isOnDevice}
           primaryBtnOnClick={() =>
-            proceedToRoute(selectedRoute as RecoveryRoute)
+            proceedToRouteAndStep(selectedRoute as RecoveryRoute)
           }
         />
       </RecoverySingleColumnContent>
@@ -103,7 +103,7 @@ export function RecoveryOptions({
   })
 }
 
-// Pre-fetch tip attachment status. Users are not blocked from proceeding at this stage.
+// Pre-fetch tip attachment status. Users are not blocked from proceeding at this step.
 export function useCurrentTipStatus(
   determineTipStatus: () => Promise<PipetteWithTip[]>
 ): void {

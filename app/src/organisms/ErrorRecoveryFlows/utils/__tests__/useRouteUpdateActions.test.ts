@@ -94,9 +94,9 @@ describe('useRouteUpdateActions', () => {
     const { result } = renderHook(() =>
       useRouteUpdateActions(useRouteUpdateActionsParams)
     )
-    const { proceedToRoute } = result.current
+    const { proceedToRouteAndStep } = result.current
 
-    proceedToRoute(RECOVERY_MAP.ROBOT_IN_MOTION.ROUTE)
+    proceedToRouteAndStep(RECOVERY_MAP.ROBOT_IN_MOTION.ROUTE)
     expect(mockSetRecoveryMap).toHaveBeenCalledWith({
       route: RECOVERY_MAP.ROBOT_IN_MOTION.ROUTE,
       step: RECOVERY_MAP.ROBOT_IN_MOTION.STEPS.IN_MOTION,

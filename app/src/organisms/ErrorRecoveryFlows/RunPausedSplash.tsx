@@ -45,12 +45,12 @@ export function RunPausedSplash({
   const title = useErrorName(errorKind)
   const subText = useErrorMessage(errorKind)
 
-  const { proceedToRoute } = routeUpdateActions
+  const { proceedToRouteAndStep } = routeUpdateActions
 
   // Do not launch error recovery, but do utilize the wizard's cancel route.
   const onCancelClick = (): Promise<void> => {
     return toggleERWiz(false).then(() =>
-      proceedToRoute(RECOVERY_MAP.CANCEL_RUN.ROUTE)
+      proceedToRouteAndStep(RECOVERY_MAP.CANCEL_RUN.ROUTE)
     )
   }
 
