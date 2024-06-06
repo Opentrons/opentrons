@@ -57,8 +57,8 @@ class AnalysisSummary(BaseModel):
 
     id: str = Field(..., description="Unique identifier of this analysis resource")
     status: AnalysisStatus = Field(..., description="Status of the analysis")
-    runTimeParameters: List[RunTimeParameter] = Field(
-        default_factory=list,
+    runTimeParameters: Optional[List[RunTimeParameter]] = Field(
+        default=None,
         description=(
             "Run time parameters used during analysis."
             " These are the parameters that are defined in the protocol, with values"

@@ -79,8 +79,6 @@ stages:
           analysisSummaries:
             - id: '{analysis_id}'
               status: completed
-              # TODO: save RTPs in their own table so that they can be easily fetched for completed analysis summaries
-              runTimeParameters: []
           id: !anything
           protocolType: !anything
           files: !anything
@@ -127,8 +125,6 @@ stages:
           analysisSummaries:
             - id: '{analysis_id}'
               status: completed
-              # TODO: save RTPs in their own table so that they can be easily fetched for completed analysis summaries
-              runTimeParameters: []
             - id: !anystr
               status: pending
               runTimeParameters:
@@ -204,12 +200,8 @@ stages:
         data:
           - id: '{analysis_id}'
             status: completed
-            # TODO: save RTPs in their own table so that they can be easily fetched for completed analysis summaries
-            runTimeParameters: []
           - id: '{analysis_id2}'
             status: completed
-            # TODO: save RTPs in their own table so that they can be easily fetched for completed analysis summaries
-            runTimeParameters: []
           - id: !anystr
             status: pending
             runTimeParameters:

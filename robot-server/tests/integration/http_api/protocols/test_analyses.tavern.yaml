@@ -40,7 +40,6 @@ stages:
           analysisSummaries:
             - id: '{analysis_id}'
               status: completed
-              runTimeParameters: []
           id: !anything
           protocolType: !anything
           files: !anything
@@ -103,7 +102,6 @@ stages:
         data:
           - id: '{analysis_id}'
             status: completed
-            runTimeParameters: []
           - id: !anystr
             status: pending
             runTimeParameters: []

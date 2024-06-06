@@ -1537,11 +1537,7 @@ async def test_update_protocol_analyses_with_forced_reanalysis(
             protocol_resource=stored_protocol_resource,
             run_time_param_values={},
         )
-    ).then_return(
-        AnalysisSummary(
-            id="analysis-id-2", status=AnalysisStatus.PENDING, runTimeParameters=[]
-        )
-    )
+    ).then_return(AnalysisSummary(id="analysis-id-2", status=AnalysisStatus.PENDING))
 
     result = await create_protocol_analysis(
         protocolId="protocol-id",

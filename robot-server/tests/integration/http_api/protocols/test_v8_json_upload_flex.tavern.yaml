@@ -44,7 +44,6 @@ stages:
             analysisSummaries:
               - id: '{analysis_id}'
                 status: completed
-                runTimeParameters: []
   - name: Get protocol by ID
     request:
       url: '{ot3_server_base_url}/protocols/{protocol_id}'
@@ -71,7 +70,6 @@ stages:
           analysisSummaries:
             - id: '{analysis_id}'
               status: completed
-              runTimeParameters: []
         links:
           referencingRuns: []
   - name: Get protocol analysis by ID
@@ -665,7 +663,6 @@ stages:
             analysisSummaries:
               - id: '{analysis_id}'
                 status: completed
-                runTimeParameters: []
   - name: Get protocol analysis by ID
     request:
       url: '{ot3_server_base_url}/protocols/{protocol_id}/analyses'
