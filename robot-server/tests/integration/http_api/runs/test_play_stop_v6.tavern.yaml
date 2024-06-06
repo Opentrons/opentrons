@@ -54,15 +54,15 @@ stages:
           - commandType: waitForDuration
             status: running
 
-#  - name: Stop the run
-#    request:
-#      url: '{ot2_server_base_url}/runs/{run_id}/actions'
-#      method: POST
-#      json:
-#        data:
-#          actionType: stop
-#    response:
-#      status_code: 201
+  - name: Stop the run
+    request:
+      url: '{ot2_server_base_url}/runs/{run_id}/actions'
+      method: POST
+      json:
+        data:
+          actionType: stop
+    response:
+      status_code: 201
 
   - name: Wait for the run to complete
     max_retries: 10

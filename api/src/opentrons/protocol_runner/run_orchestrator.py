@@ -140,7 +140,7 @@ class RunOrchestrator:
     async def stop(self) -> None:
         """Start or resume the run."""
         if self.run_has_started():
-            await self.stop()
+            await self._protocol_engine.request_stop()
         else:
             await self.finish(
                 drop_tips_after_run=False,

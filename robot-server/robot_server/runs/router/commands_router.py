@@ -30,9 +30,9 @@ from ..command_models import (
 from ..run_models import RunCommandSummary
 from ..run_data_manager import RunDataManager, PreSerializedCommandsNotAvailableError
 from ..engine_store import EngineStore
-from ..run_store import CommandNotFoundError
+from ..run_store import CommandNotFoundError, RunStore
 from ..run_models import RunNotFoundError
-from ..dependencies import get_engine_store, get_run_data_manager
+from ..dependencies import get_engine_store, get_run_data_manager, get_run_store
 from .base_router import RunNotFound, RunStopped
 
 
@@ -74,29 +74,29 @@ class PreSerializedCommandsNotAvailable(ErrorDetails):
     )
 
 
-# async def get_current_run_engine_from_url(
-#     runId: str,
-#     engine_store: EngineStore = Depends(get_engine_store),
-#     run_store: RunStore = Depends(get_run_store),
-# ) -> ProtocolEngine:
-#     """Get run protocol engine.
-#
-#     Args:
-#         runId: Run ID to associate the command with.
-#         engine_store: Engine store to pull current run ProtocolEngine.
-#         run_store: Run data storage.
-#     """
-#     if not run_store.has(runId):
-#         raise RunNotFound(detail=f"Run {runId} not found.").as_error(
-#             status.HTTP_404_NOT_FOUND
-#         )
-#
-#     if runId != engine_store.current_run_id:
-#         raise RunStopped(detail=f"Run {runId} is not the current run").as_error(
-#             status.HTTP_409_CONFLICT
-#         )
-#
-#     return engine_store.engine
+async def get_current_run_from_url(
+    runId: str,
+    engine_store: EngineStore = Depends(get_engine_store),
+    run_store: RunStore = Depends(get_run_store),
+) -> str:
+    """Get run from url.
+
+    Args:
+        runId: Run ID to associate the command with.
+        engine_store: Engine store to pull current run ProtocolEngine.
+        run_store: Run data storage.
+    """
+    if not run_store.has(runId):
+        raise RunNotFound(detail=f"Run {runId} not found.").as_error(
+            status.HTTP_404_NOT_FOUND
+        )
+
+    if runId != engine_store.current_run_id:
+        raise RunStopped(detail=f"Run {runId} is not the current run").as_error(
+            status.HTTP_409_CONFLICT
+        )
+
+    return runId
 
 
 @PydanticResponse.wrap_route(
@@ -184,6 +184,7 @@ async def create_run_command(
     ),
     engine_store: EngineStore = Depends(get_engine_store),
     check_estop: bool = Depends(require_estop_in_good_state),
+    run_id: str = Depends(get_current_run_from_url),
 ) -> PydanticResponse[SimpleBody[pe_commands.Command]]:
     """Enqueue a protocol command.
 

@@ -169,16 +169,34 @@ def test_build_run_orchestrator_provider(
     assert isinstance(result._protocol_runner, (PythonAndLegacyRunner, JsonRunner))
 
 
-def test_add_labware_definition(
-    live_protocol_subject: RunOrchestrator, mock_protocol_engine: ProtocolEngine
+def test_get_run_time_parameters_returns_an_empty_list_no_protocol(
+    live_protocol_subject: RunOrchestrator,
 ) -> None:
-    """Should call protocol engine add_labware_definition"""
+    """Should return an empty list in case the protocol runner is not initialized."""
+    result = live_protocol_subject.get_run_time_parameters()
+    assert result == []
 
 
+def test_get_run_time_parameters_returns_an_empty_list_json_runner(
+    decoy: Decoy,
+    mock_protocol_json_runner: JsonRunner,
+    json_protocol_subject: RunOrchestrator,
+) -> None:
+    """Should return an empty list in case the protocol runner is a json runner."""
+    decoy.when(mock_protocol_json_runner.run_time_parameters).then_return([])
+    result = json_protocol_subject.get_run_time_parameters()
+    assert result == []
+
+
+@pytest.mark.parametrize(
+    "wait_for_interval_input, verify_calls", [(True, 1), (False, 0)]
+)
 async def test_add_command_and_wait_for_interval(
     decoy: Decoy,
     json_protocol_subject: RunOrchestrator,
     mock_protocol_engine: ProtocolEngine,
+    wait_for_interval_input: bool,
+    verify_calls: int,
 ) -> None:
     """Should add a command a wait for it to complete."""
     load_command = pe_commands.HomeCreate.construct(
@@ -196,23 +214,14 @@ async def test_add_command_and_wait_for_interval(
     ).then_return(added_command)
 
     result = await json_protocol_subject.add_command_and_wait_for_interval(
-        command=load_command, wait_until_complete=True, timeout=999
+        command=load_command, wait_until_complete=wait_for_interval_input, timeout=999
     )
 
     assert result == added_command
 
     decoy.verify(
-        await mock_protocol_engine.wait_for_command(command_id="test-123"), times=1
-    )
-
-    result = await json_protocol_subject.add_command_and_wait_for_interval(
-        command=load_command, wait_until_complete=False, timeout=999
-    )
-
-    assert result == added_command
-
-    decoy.verify(
-        await mock_protocol_engine.wait_for_command(command_id="test-123"), times=0
+        await mock_protocol_engine.wait_for_command(command_id="test-123"),
+        times=verify_calls,
     )
 
 
@@ -221,6 +230,7 @@ def test_estop(
     live_protocol_subject: RunOrchestrator,
     mock_protocol_engine: ProtocolEngine,
 ) -> None:
+    """Verify an estop call."""
     live_protocol_subject.estop()
     decoy.verify(mock_protocol_engine.estop())
 
@@ -230,6 +240,7 @@ async def test_use_attached_modules(
     live_protocol_subject: RunOrchestrator,
     mock_protocol_engine: ProtocolEngine,
 ) -> None:
+    """Verify a call to use_attached_modules."""
     await live_protocol_subject.use_attached_modules(modules_by_id={})
     decoy.verify(await mock_protocol_engine.use_attached_modules({}))
 
@@ -409,3 +420,29 @@ def test_prepare(
     live_protocol_subject.prepare()
     decoy.verify(mock_fixit_runner.prepare())
     decoy.verify(mock_setup_runner.prepare())
+
+
+async def test_stop(
+    decoy: Decoy,
+    mock_protocol_engine: ProtocolEngine,
+    live_protocol_subject: RunOrchestrator,
+) -> None:
+    """Should verify a call to stop/finish the run."""
+    decoy.when(mock_protocol_engine.state_view.commands.has_been_played()).then_return(
+        True
+    )
+    await live_protocol_subject.stop()
+    decoy.verify(await mock_protocol_engine.request_stop())
+
+    decoy.when(mock_protocol_engine.state_view.commands.has_been_played()).then_return(
+        False
+    )
+    await live_protocol_subject.stop()
+    decoy.verify(
+        await mock_protocol_engine.finish(
+            error=None,
+            drop_tips_after_run=False,
+            set_run_status=False,
+            post_run_hardware_state=PostRunHardwareState.STAY_ENGAGED_IN_PLACE,
+        )
+    )
