@@ -6,54 +6,36 @@ import { COLORS } from '../../helix-design-system'
 
 import {
   LabwareOutline,
+  LabwareWellLabels,
   STYLE_BY_WELL_CONTENTS,
-  StyledWells,
   Well,
-  WellLabels,
 } from './labwareInternals'
 import { LabwareAdapter, labwareAdapterLoadNames } from './LabwareAdapter'
 
-import type { CSSProperties } from 'styled-components'
 import type { LabwareDefinition2, LabwareWell } from '@opentrons/shared-data'
 import type {
   HighlightedWellLabels,
   WellMouseEvent,
   WellFill,
   WellStroke,
-  WellGroup,
 } from './labwareInternals/types'
 import type { LabwareAdapterLoadName } from './LabwareAdapter'
-
-const WELL_LABEL_OPTIONS = {
-  SHOW_LABEL_INSIDE: 'SHOW_LABEL_INSIDE',
-  SHOW_LABEL_OUTSIDE: 'SHOW_LABEL_OUTSIDE',
-} as const
-
-type WellLabelOption = keyof typeof WELL_LABEL_OPTIONS
 
 export interface LabwareProps {
   /** Labware definition to render */
   definition: LabwareDefinition2
   /** Opional Prop for labware on heater shakers sitting on right side of the deck */
   shouldRotateAdapterOrientation?: boolean
-  /** option to show well labels inside or outside of labware outline */
-  wellLabelOption?: WellLabelOption
-  /** wells to highlight */
-  highlightedWells?: WellGroup | null
-  /** option for none highlighted wells to be disabled */
-  disabledWells?: WellGroup[]
-  missingTips?: WellGroup | null
+  /** boolean to show well labels */
+  showLabels?: boolean
   /** color to render well labels */
   wellLabelColor?: string
   /** option to highlight well labels with specified color */
   highlightedWellLabels?: HighlightedWellLabels
-  selectedWells?: WellGroup | null
   /** CSS color to fill specified wells */
   wellFill?: WellFill
   /** CSS color to stroke specified wells */
   wellStroke?: WellStroke
-  /** CSS color to stroke the labware outline */
-  labwareStroke?: CSSProperties['stroke']
   /** adds thicker blue border with blur to labware */
   highlight?: boolean
   /** Optional callback, called with WellMouseEvent args onMouseEnter */
@@ -92,17 +74,27 @@ const LabwareDetailGroup = styled.g`
   stroke-width: 1;
 `
 
+/**
+ * a refactor of the legacy LabwareRender component intended to provide predictable styling
+ * initial use in ODD well selection component with ODD-specific well label styling
+ * consider adding additional styled wells props if used elsewhere
+ * @param props
+ * @returns
+ */
 export const Labware = (props: LabwareProps): JSX.Element => {
   const {
     definition,
     gRef,
     hideOutline = false,
     highlight,
+    highlightedWellLabels,
     isInteractive,
     onLabwareClick,
     onMouseEnterWell,
     onMouseLeaveWell,
+    showLabels = false,
     wellFill = {},
+    wellLabelColor,
     wellStroke = {},
   } = props
 
@@ -111,7 +103,7 @@ export const Labware = (props: LabwareProps): JSX.Element => {
 
   if (labwareAdapterLoadNames.includes(labwareLoadName)) {
     const { shouldRotateAdapterOrientation = false } = props
-    const { xDimension, yDimension } = props.definition.dimensions
+    const { xDimension, yDimension } = definition.dimensions
 
     return (
       <g
@@ -169,44 +161,11 @@ export const Labware = (props: LabwareProps): JSX.Element => {
           })}
         </g>
       </g>
-      {props.disabledWells != null
-        ? props.disabledWells.map((well, index) => (
-            <StyledWells
-              key={index}
-              wellContents="disabledWell"
-              definition={props.definition}
-              wells={well}
-            />
-          ))
-        : null}
-      {props.highlightedWells != null ? (
-        <StyledWells
-          wellContents="highlightedWell"
-          definition={props.definition}
-          wells={props.highlightedWells}
-        />
-      ) : null}
-      {props.selectedWells != null ? (
-        <StyledWells
-          wellContents="selectedWell"
-          definition={props.definition}
-          wells={props.selectedWells}
-        />
-      ) : null}
-      {props.missingTips != null ? (
-        <StyledWells
-          wellContents="tipMissing"
-          definition={props.definition}
-          wells={props.missingTips}
-        />
-      ) : null}
-      {props.wellLabelOption != null &&
-      props.definition.metadata.displayCategory !== 'adapter' ? (
-        <WellLabels
-          definition={props.definition}
-          wellLabelOption={props.wellLabelOption}
-          wellLabelColor={props.wellLabelColor}
-          highlightedWellLabels={props.highlightedWellLabels}
+      {showLabels && definition.metadata.displayCategory !== 'adapter' ? (
+        <LabwareWellLabels
+          definition={definition}
+          wellLabelColor={wellLabelColor}
+          highlightedWellLabels={highlightedWellLabels}
         />
       ) : null}
     </g>

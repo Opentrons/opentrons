@@ -1,12 +1,7 @@
 import * as React from 'react'
 import reduce from 'lodash/reduce'
 
-import {
-  COLORS,
-  Labware,
-  RobotCoordinateSpace,
-  WELL_LABEL_OPTIONS,
-} from '@opentrons/components'
+import { COLORS, Labware, RobotCoordinateSpace } from '@opentrons/components'
 import {
   arrayToWellGroup,
   getCollidingWells,
@@ -137,7 +132,7 @@ export function WellSelection(props: WellSelectionProps): JSX.Element {
           definition={definition}
           hideOutline
           isInteractive
-          wellLabelOption={WELL_LABEL_OPTIONS.SHOW_LABEL_INSIDE}
+          showLabels={true}
           wellFill={wellFill}
           wellStroke={wellStroke}
         />
