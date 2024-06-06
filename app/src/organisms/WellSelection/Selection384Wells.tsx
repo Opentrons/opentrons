@@ -28,13 +28,13 @@ interface Selection384WellsProps {
   definition: LabwareDefinition2
   deselectWells: (wells: string[]) => void
   labwareRender: React.ReactNode
-  resetWells: () => void
   selectWells: (wellGroup: WellGroup) => unknown
 }
 
 // magic numbers for 384 well plates
 const WELL_COUNT_384 = 384
 const COLUMN_COUNT_384 = 24
+const ROW_COUNT_384 = 16
 
 export function Selection384Wells({
   allSelectedWells,
@@ -42,7 +42,6 @@ export function Selection384Wells({
   definition,
   deselectWells,
   labwareRender,
-  resetWells,
   selectWells,
 }: Selection384WellsProps): JSX.Element {
   const [selectBy, setSelectBy] = React.useState<'columns' | 'wells'>('columns')
@@ -147,11 +146,8 @@ export function Selection384Wells({
         {channels === 1 ? (
           <SelectBy
             selectBy={selectBy}
-            setSelectBy={selectBy => {
-              resetWells()
-              setLastSelectedIndex(null)
-              setSelectBy(selectBy)
-            }}
+            setSelectBy={setSelectBy}
+            setLastSelectedIndex={setLastSelectedIndex}
           />
         ) : (
           <StartingWell
@@ -178,9 +174,14 @@ export function Selection384Wells({
 interface SelectByProps {
   selectBy: 'columns' | 'wells'
   setSelectBy: React.Dispatch<React.SetStateAction<'columns' | 'wells'>>
+  setLastSelectedIndex: React.Dispatch<React.SetStateAction<number | null>>
 }
 
-function SelectBy({ selectBy, setSelectBy }: SelectByProps): JSX.Element {
+function SelectBy({
+  selectBy,
+  setSelectBy,
+  setLastSelectedIndex,
+}: SelectByProps): JSX.Element {
   const { t, i18n } = useTranslation('quick_transfer')
 
   return (
@@ -194,6 +195,11 @@ function SelectBy({ selectBy, setSelectBy }: SelectByProps): JSX.Element {
         isSelected={selectBy === 'columns'}
         onChange={() => {
           setSelectBy('columns')
+          setLastSelectedIndex(lastSelectedIndex =>
+            lastSelectedIndex != null
+              ? Math.floor(lastSelectedIndex / ROW_COUNT_384)
+              : lastSelectedIndex
+          )
         }}
         radioButtonType="small"
       />
@@ -203,6 +209,11 @@ function SelectBy({ selectBy, setSelectBy }: SelectByProps): JSX.Element {
         isSelected={selectBy === 'wells'}
         onChange={() => {
           setSelectBy('wells')
+          setLastSelectedIndex(lastSelectedIndex =>
+            lastSelectedIndex != null
+              ? (lastSelectedIndex + 1) * ROW_COUNT_384 - 1
+              : lastSelectedIndex
+          )
         }}
         radioButtonType="small"
       />

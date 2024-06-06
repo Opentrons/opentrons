@@ -84,9 +84,6 @@ export function SelectSourceWells(props: SelectSourceWellsProps): JSX.Element {
                 )
               )
             }}
-            resetWells={() => {
-              setSelectedWells({})
-            }}
             selectedPrimaryWells={selectedWells}
             selectWells={wellGroup => {
               setSelectedWells(prevWells => ({ ...prevWells, ...wellGroup }))
