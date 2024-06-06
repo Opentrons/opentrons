@@ -1,5 +1,5 @@
 """Create ticket for robot with error."""
-from typing import List, Tuple
+from typing import List, Tuple, Any
 from abr_testing.data_collection import read_robot_logs, abr_google_drive, get_run_logs
 import requests
 import argparse
@@ -37,7 +37,10 @@ def get_error_runs_from_robot(ip: str) -> List[str]:
             error_run_ids.append(run_id)
     return error_run_ids
 
-def get_robot_state(ip:str, reported_string)-> List[str]:
+
+def get_robot_state(
+    ip: str, reported_string: str
+) -> Tuple[Any, Any, Any, List[str], str]:
     """Get robot status in case of non run error."""
     description = dict()
     # Get instruments attached to robot
@@ -63,9 +66,10 @@ def get_robot_state(ip:str, reported_string)-> List[str]:
     response = requests.get(
         f"http://{ip}:31950/instruments", headers={"opentrons-version": "3"}
     )
+
     instrument_data = response.json()
     for instrument in instrument_data["data"]:
-        description[instrument["mount"]] = instrument["serialNumber"]
+        description[instrument["mount"]] = instrument
     # Get modules attached to robot
     response = requests.get(
         f"http://{ip}:31950/modules", headers={"opentrons-version": "3"}
@@ -73,7 +77,7 @@ def get_robot_state(ip:str, reported_string)-> List[str]:
     module_data = response.json()
     for module in module_data["data"]:
         print(module)
-        description[module["moduleType"]] = module["serialNumber"]
+        description[module["moduleType"]] = module
     components = ["Flex-RABR"]
     whole_description_str = (
         "{"
@@ -187,7 +191,11 @@ if __name__ == "__main__":
     storage_directory = args.storage_directory[0]
     ip = str(input("Enter Robot IP: "))
     assignee = str(input("Enter Assignee Full Name:"))
-    run_or_other = (str(input("Press ENTER to report run error. If not a run error, type short summary of error: ")))
+    run_or_other = str(
+        input(
+            "Press ENTER to report run error. If not a run error, type short summary of error: "
+        )
+    )
     url = "https://opentrons.atlassian.net"
     api_token = args.jira_api_token[0]
     email = args.email[0]
@@ -247,7 +255,7 @@ if __name__ == "__main__":
     # OPEN TICKET
     issue_url = ticket.open_issue(issue_key)
     # MOVE FILES TO ERROR FOLDER.
-    
+
     error_files = [saved_file_path_calibration, run_log_file_path] + file_paths
     error_folder_path = os.path.join(storage_directory, issue_key)
     os.makedirs(error_folder_path, exist_ok=True)
@@ -261,35 +269,46 @@ if __name__ == "__main__":
             continue
     # OPEN FOLDER DIRECTORY
     subprocess.Popen(["explorer", error_folder_path])
-    # CONNECT TO GOOGLE DRIVE
-    credentials_path = os.path.join(storage_directory, "credentials.json")
-    google_sheet_name = "ABR-run-data"
-    google_drive = google_drive_tool.google_drive(
-        credentials_path,
-        "1Cvej0eadFOTZr9ILRXJ0Wg65ymOtxL4m",
-        "rhyann.clarke@opentrons.ocm",
-    )
-    # CONNECT TO GOOGLE SHEET
-    google_sheet = google_sheets_tool.google_sheet(
-        credentials_path, google_sheet_name, 0
-    )
-    # WRITE ERRORED RUN TO GOOGLE SHEET
-    error_run_log = os.path.join(error_folder_path, os.path.basename(run_log_file_path))
-    google_drive.upload_file(error_run_log, "1Cvej0eadFOTZr9ILRXJ0Wg65ymOtxL4m")
-    run_id = os.path.basename(error_run_log).split("_")[1].split(".")[0]
-    (
-        runs_and_robots,
-        headers,
-        runs_and_lpc,
-        headers_lpc,
-    ) = abr_google_drive.create_data_dictionary(
-        run_id, error_folder_path, issue_url, "", ""
-    )
 
-    start_row = google_sheet.get_index_row() + 1
-    google_sheet.batch_update_cells(runs_and_robots, "A", start_row, "0")
-    print("Wrote run to ABR-run-data")
-    # Add LPC to google sheet
-    google_sheet_lpc = google_sheets_tool.google_sheet(credentials_path, "ABR-LPC", 0)
-    start_row_lpc = google_sheet_lpc.get_index_row() + 1
-    google_sheet_lpc.batch_update_cells(runs_and_lpc, "A", start_row_lpc, "0")
+    # WRITE ERRORED RUN TO GOOGLE SHEET
+    if len(run_or_other) < 1:
+        # CONNECT TO GOOGLE DRIVE
+        credentials_path = os.path.join(storage_directory, "credentials.json")
+        google_sheet_name = "ABR-run-data"
+        google_drive = google_drive_tool.google_drive(
+            credentials_path,
+            "1Cvej0eadFOTZr9ILRXJ0Wg65ymOtxL4m",
+            "rhyann.clarke@opentrons.ocm",
+        )
+        # CONNECT TO GOOGLE SHEET
+        google_sheet = google_sheets_tool.google_sheet(
+            credentials_path, google_sheet_name, 0
+        )
+        error_run_log = os.path.join(
+            error_folder_path, os.path.basename(run_log_file_path)
+        )
+        try:
+            google_drive.upload_file(error_run_log, "1Cvej0eadFOTZr9ILRXJ0Wg65ymOtxL4m")
+        except FileNotFoundError:
+            print("Run file not uploaded.")
+        run_id = os.path.basename(error_run_log).split("_")[1].split(".")[0]
+        (
+            runs_and_robots,
+            headers,
+            runs_and_lpc,
+            headers_lpc,
+        ) = abr_google_drive.create_data_dictionary(
+            run_id, error_folder_path, issue_url, "", ""
+        )
+
+        start_row = google_sheet.get_index_row() + 1
+        google_sheet.batch_update_cells(runs_and_robots, "A", start_row, "0")
+        print("Wrote run to ABR-run-data")
+        # Add LPC to google sheet
+        google_sheet_lpc = google_sheets_tool.google_sheet(
+            credentials_path, "ABR-LPC", 0
+        )
+        start_row_lpc = google_sheet_lpc.get_index_row() + 1
+        google_sheet_lpc.batch_update_cells(runs_and_lpc, "A", start_row_lpc, "0")
+    else:
+        print("Ticket created.")
