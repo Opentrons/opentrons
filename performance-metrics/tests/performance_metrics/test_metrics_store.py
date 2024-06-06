@@ -3,9 +3,9 @@
 from pathlib import Path
 from time import sleep
 
-from opentrons_shared_data.performance.dev_types import RobotContextState
-from performance_metrics.datashapes import RawContextData
 from performance_metrics.robot_context_tracker import RobotContextTracker
+from performance_metrics.data_shapes import RawContextData
+from performance_metrics.data_definitions import RobotContextState
 
 # Corrected times in seconds
 STARTING_TIME = 0.001
