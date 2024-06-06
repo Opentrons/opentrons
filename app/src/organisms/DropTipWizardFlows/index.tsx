@@ -68,12 +68,12 @@ export interface PipetteWithTip {
   specs: PipetteModelSpecs
 }
 
-interface TipAttachmentStatusResult {
+export interface TipAttachmentStatusResult {
   /** Updates the pipettes with tip cache. Determine whether tips are likely attached on one or more pipettes.
    *
    * NOTE: Use responsibly! This function can potentially (but not likely) iterate over the entire length of a protocol run.
    * */
-  determineTipStatus: () => Promise<void>
+  determineTipStatus: () => Promise<PipetteWithTip[]>
   /** Whether tips are likely attached on *any* pipette. Typically called after determineTipStatus() */
   areTipsAttached: boolean
   /** Resets the cached pipettes with tip statuses to null.  */
@@ -97,7 +97,9 @@ export function useTipAttachmentStatus(
   const areTipsAttached =
     pipettesWithTip.length != null && head(pipettesWithTip)?.specs != null
 
-  const determineTipStatus = React.useCallback((): Promise<void> => {
+  const determineTipStatus = React.useCallback((): Promise<
+    PipetteWithTip[]
+  > => {
     return getPipettesWithTipAttached(params).then(pipettesWithTip => {
       const pipettesWithTipsData = pipettesWithTip.map(pipette => {
         const specs = getPipetteModelSpecs(pipette.instrumentModel)
@@ -111,6 +113,8 @@ export function useTipAttachmentStatus(
       ) as PipetteWithTip[]
 
       setPipettesWithTip(pipettesWithTipAndSpecs)
+
+      return Promise.resolve(pipettesWithTipAndSpecs)
     })
   }, [params])
 

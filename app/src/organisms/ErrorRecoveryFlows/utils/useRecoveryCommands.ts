@@ -1,15 +1,19 @@
 import * as React from 'react'
 
 import {
+  useHost,
+  useInstrumentsQuery,
   useResumeRunFromRecoveryMutation,
   useStopRunMutation,
 } from '@opentrons/react-api-client'
 
-import { useChainRunCommands } from '../../../resources/runs'
+import { useChainRunCommands, useNotifyRunQuery } from '../../../resources/runs'
+import { useTipAttachmentStatus } from '../../DropTipWizardFlows'
 
 import type { CreateCommand } from '@opentrons/shared-data'
-import type { CommandData } from '@opentrons/api-client'
+import type { CommandData, HostConfig } from '@opentrons/api-client'
 import type { FailedCommand } from '../types'
+import { useIsFlex } from '../../Devices/hooks'
 
 interface UseRecoveryCommandsParams {
   runId: string
@@ -63,9 +67,16 @@ export function useRecoveryCommands({
     resumeRunFromRecovery(runId)
   }, [runId, resumeRunFromRecovery])
 
-  const cancelRun = React.useCallback((): void => {
-    stopRun(runId)
-  }, [runId])
+  const cancelRun = React.useCallback(
+    (checkForTips = true): void => {
+      if (checkForTips) {
+        // TIP CHECK LOGIC HERE.
+      } else {
+        stopRun(runId)
+      }
+    },
+    [runId]
+  )
 
   return {
     resumeRun,
@@ -79,4 +90,24 @@ export const HOME_PIPETTE_Z_AXES: CreateCommand = {
   commandType: 'home',
   params: { axes: ['leftZ', 'rightZ'] },
   intent: 'fixit',
+}
+
+function useRecoveryTipStatus(runId: string) {
+  const host = useHost()
+  const isFlex = useIsFlex(host?.robotName ?? '') // Safe to return an empty string - tip presence sensors won't be used.
+
+  const { data: runRecord } = useNotifyRunQuery(runId)
+  const { data: attachedInstruments } = useInstrumentsQuery()
+
+  const {
+    determineTipStatus,
+    pipettesWithTip,
+    areTipsAttached,
+  } = useTipAttachmentStatus({
+    runId,
+    host,
+    runRecord,
+    attachedInstruments,
+    isFlex,
+  })
 }
