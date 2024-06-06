@@ -29,8 +29,6 @@ export const makeAutofillOnChange = ({
   if (_autofillValues !== undefined) {
     const autofillValues = {
       ..._autofillValues,
-      compatibleAdapters: {},
-      compatibleModules: {},
     }
 
     const namesToTrue = mapValues(autofillValues, () => true)
@@ -42,6 +40,8 @@ export const makeAutofillOnChange = ({
     setTouched({
       ...touched,
       ...namesToTrue,
+      compatibleAdapters: {},
+      compatibleModules: {},
     })
   } else {
     console.error(
