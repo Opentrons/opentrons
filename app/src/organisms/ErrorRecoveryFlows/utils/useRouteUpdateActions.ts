@@ -47,7 +47,9 @@ export function useRouteUpdateActions(
         currentRoute,
         updatedStep,
         ...routeUpdateActionsParams,
-      }).then(() => resolve())
+      }).then(() => {
+        resolve()
+      })
     })
   }, [currentStep, currentRoute, routeUpdateActionsParams])
 
@@ -61,7 +63,9 @@ export function useRouteUpdateActions(
         currentRoute,
         updatedStep,
         ...routeUpdateActionsParams,
-      }).then(() => resolve())
+      }).then(() => {
+        resolve()
+      })
     })
   }, [currentStep, currentRoute, routeUpdateActionsParams])
 

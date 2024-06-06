@@ -188,7 +188,9 @@ export const DetachPipette = (props: DetachPipetteProps): JSX.Element => {
           gridGap={SPACING.spacing8}
         >
           <Btn
-            onClick={() => setShowPipetteStillAttached(false)}
+            onClick={() => {
+              setShowPipetteStillAttached(false)
+            }}
             marginLeft={SPACING.spacing32}
           >
             <StyledText css={GO_BACK_BUTTON_TEXT_STYLE}>

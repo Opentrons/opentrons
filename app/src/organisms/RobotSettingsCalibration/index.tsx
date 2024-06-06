@@ -315,7 +315,9 @@ export function RobotSettingsCalibration({
       )}
       {showHowCalibrationWorksModal ? (
         <HowCalibrationWorksModal
-          onCloseClick={() => setShowHowCalibrationWorksModal(false)}
+          onCloseClick={() => {
+            setShowHowCalibrationWorksModal(false)
+          }}
         />
       ) : null}
       {isFlex ? (

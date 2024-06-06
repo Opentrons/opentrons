@@ -74,7 +74,9 @@ const Template: Story<ColorsStorybookProps> = args => {
           width="20rem"
           height="6rem"
           borderRadius={BORDERS.borderRadius8}
-          onClick={() => handleClick(color[0])}
+          onClick={() => {
+            handleClick(color[0])
+          }}
           style={{ cursor: 'pointer' }}
           border={`2px solid ${COLORS.black90}`}
         >

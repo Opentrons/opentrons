@@ -79,7 +79,9 @@ export function LabwareMapViewModal(
       nestedLabwareDef: topLabwareDefinition,
       onLabwareClick:
         topLabwareDefinition != null && topLabwareId != null
-          ? () => handleLabwareClick(topLabwareDefinition, topLabwareId)
+          ? () => {
+              handleLabwareClick(topLabwareDefinition, topLabwareId)
+            }
           : undefined,
       moduleChildren: null,
     }
@@ -99,8 +101,9 @@ export function LabwareMapViewModal(
         labwareLocation: { slotName },
         definition: topLabwareDefinition,
         topLabwareId,
-        onLabwareClick: () =>
-          handleLabwareClick(topLabwareDefinition, topLabwareId),
+        onLabwareClick: () => {
+          handleLabwareClick(topLabwareDefinition, topLabwareId)
+        },
         labwareChildren: null,
       }
     }

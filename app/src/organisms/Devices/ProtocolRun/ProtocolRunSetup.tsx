@@ -197,7 +197,9 @@ export function ProtocolRunSetup({
     [MODULE_SETUP_KEY]: {
       stepInternals: (
         <SetupModuleAndDeck
-          expandLabwarePositionCheckStep={() => setExpandedStepKey(LPC_KEY)}
+          expandLabwarePositionCheckStep={() => {
+            setExpandedStepKey(LPC_KEY)
+          }}
           robotName={robotName}
           runId={runId}
           hasModules={hasModules}
@@ -212,7 +214,9 @@ export function ProtocolRunSetup({
       stepInternals: (
         <SetupLabwarePositionCheck
           {...{ runId, robotName }}
-          expandLabwareStep={() => setExpandedStepKey(LABWARE_SETUP_KEY)}
+          expandLabwareStep={() => {
+            setExpandedStepKey(LABWARE_SETUP_KEY)
+          }}
         />
       ),
       description: t('labware_position_check_step_description'),
@@ -286,11 +290,11 @@ export function ProtocolRunSetup({
                       label={t('step', { index: index + 1 })}
                       title={setupStepTitle}
                       description={StepDetailMap[stepKey].description}
-                      toggleExpanded={() =>
+                      toggleExpanded={() => {
                         stepKey === expandedStepKey
                           ? setExpandedStepKey(null)
                           : setExpandedStepKey(stepKey)
-                      }
+                      }}
                       rightElement={
                         <StepRightElement
                           {...{
@@ -426,7 +430,11 @@ function LearnAboutLPC(): JSX.Element {
         {t('learn_how_it_works')}
       </Link>
       {showLPCHelpModal ? (
-        <HowLPCWorksModal onCloseClick={() => setShowLPCHelpModal(false)} />
+        <HowLPCWorksModal
+          onCloseClick={() => {
+            setShowLPCHelpModal(false)
+          }}
+        />
       ) : null}
     </>
   )

@@ -262,12 +262,12 @@ export function DeviceResetSlideout({
                     calibrationName !== '' && (
                       <CheckboxField
                         key={opt.id}
-                        onChange={() =>
+                        onChange={() => {
                           setResetOptions({
                             ...resetOptions,
                             [opt.id]: !(resetOptions[opt.id] ?? false),
                           })
-                        }
+                        }}
                         value={resetOptions[opt.id]}
                         label={calibrationName}
                       />
@@ -296,12 +296,12 @@ export function DeviceResetSlideout({
               {runHistoryOption.map(opt => (
                 <CheckboxField
                   key={opt.id}
-                  onChange={() =>
+                  onChange={() => {
                     setResetOptions({
                       ...resetOptions,
                       [opt.id]: !(resetOptions[opt.id] ?? false),
                     })
-                  }
+                  }}
                   value={resetOptions[opt.id]}
                   label={t(`clear_option_${snakeCase(opt.id)}`)}
                 />
@@ -318,12 +318,12 @@ export function DeviceResetSlideout({
               {bootScriptOption.map(opt => (
                 <CheckboxField
                   key={opt.id}
-                  onChange={() =>
+                  onChange={() => {
                     setResetOptions({
                       ...resetOptions,
                       [opt.id]: !(resetOptions[opt.id] ?? false),
                     })
-                  }
+                  }}
                   value={resetOptions[opt.id]}
                   label={t(`clear_option_${snakeCase(opt.id)}`)}
                 />
@@ -340,12 +340,12 @@ export function DeviceResetSlideout({
               {sshKeyOption.map(opt => (
                 <CheckboxField
                   key={opt.id}
-                  onChange={() =>
+                  onChange={() => {
                     setResetOptions({
                       ...resetOptions,
                       [opt.id]: !(resetOptions[opt.id] ?? false),
                     })
-                  }
+                  }}
                   value={resetOptions[opt.id]}
                   label={t(`clear_option_${snakeCase(opt.id)}`)}
                 />

@@ -36,13 +36,27 @@ export function createLogger(filename: string): Logger {
   const label = `app/${filename}`
 
   return {
-    [ERROR]: (message, meta) => log(ERROR, message, label, meta),
-    [WARN]: (message, meta) => log(WARN, message, label, meta),
-    [INFO]: (message, meta) => log(INFO, message, label, meta),
-    [HTTP]: (message, meta) => log(HTTP, message, label, meta),
-    [VERBOSE]: (message, meta) => log(VERBOSE, message, label, meta),
-    [DEBUG]: (message, meta) => log(DEBUG, message, label, meta),
-    [SILLY]: (message, meta) => log(SILLY, message, label, meta),
+    [ERROR]: (message, meta) => {
+      log(ERROR, message, label, meta)
+    },
+    [WARN]: (message, meta) => {
+      log(WARN, message, label, meta)
+    },
+    [INFO]: (message, meta) => {
+      log(INFO, message, label, meta)
+    },
+    [HTTP]: (message, meta) => {
+      log(HTTP, message, label, meta)
+    },
+    [VERBOSE]: (message, meta) => {
+      log(VERBOSE, message, label, meta)
+    },
+    [DEBUG]: (message, meta) => {
+      log(DEBUG, message, label, meta)
+    },
+    [SILLY]: (message, meta) => {
+      log(SILLY, message, label, meta)
+    },
   }
 }
 

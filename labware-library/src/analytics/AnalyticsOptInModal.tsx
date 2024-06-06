@@ -16,8 +16,18 @@ export const AnalyticsOptInModal = (props: Props): JSX.Element | null => {
       restrictOuterScroll={false}
       className={props.className}
       buttons={[
-        { onClick: () => setAnalyticsOptIn(false), children: 'NO' },
-        { onClick: () => setAnalyticsOptIn(true), children: 'YES' },
+        {
+          onClick: () => {
+            setAnalyticsOptIn(false)
+          },
+          children: 'NO',
+        },
+        {
+          onClick: () => {
+            setAnalyticsOptIn(true)
+          },
+          children: 'YES',
+        },
       ]}
     >
       {props.children}

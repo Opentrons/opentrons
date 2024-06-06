@@ -69,7 +69,9 @@ export const BeforeBeginning = (
                 flowType === 'liquid_and_tips' ? 'primary' : 'secondary'
               }
               flex="1"
-              onClick={() => setFlowType('liquid_and_tips')}
+              onClick={() => {
+                setFlowType('liquid_and_tips')
+              }}
               buttonText={i18n.format(t('yes_blow_out_liquid'), 'capitalize')}
               justifyContent={JUSTIFY_FLEX_START}
               paddingLeft={SPACING.spacing24}
@@ -134,7 +136,9 @@ export const BeforeBeginning = (
             <StyledText as="h3">{t('yes_blow_out_liquid')}</StyledText>
           </Flex>
           <Flex
-            onClick={() => setFlowType('only_tips')}
+            onClick={() => {
+              setFlowType('only_tips')
+            }}
             css={
               flowType === 'only_tips'
                 ? SELECTED_OPTIONS_STYLE

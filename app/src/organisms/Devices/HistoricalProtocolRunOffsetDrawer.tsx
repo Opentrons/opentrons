@@ -64,11 +64,12 @@ export function HistoricalProtocolRunOffsetDrawer(
       <Box
         backgroundColor={COLORS.grey20}
         width="100%"
-        padding={`${SPACING.spacing16} ${SPACING.spacing8} ${SPACING.spacing16} ${SPACING.spacing48}`}
+        padding={SPACING.spacing16}
+        borderRadius={BORDERS.borderRadius4}
       >
         <Box
           backgroundColor={COLORS.white}
-          padding={SPACING.spacing24}
+          padding={`${SPACING.spacing24} ${SPACING.spacing8}`}
           textAlign="center"
         >
           <StyledText as="label">{t('no_offsets_available')}</StyledText>
@@ -87,11 +88,15 @@ export function HistoricalProtocolRunOffsetDrawer(
     <Box
       backgroundColor={COLORS.grey20}
       width="100%"
-      padding={`${SPACING.spacing16} ${SPACING.spacing8} ${SPACING.spacing16} ${SPACING.spacing48}`}
+      padding={SPACING.spacing16}
       borderRadius={BORDERS.borderRadius4}
     >
       {isOutOfDate ? (
-        <Banner type="warning" marginTop={SPACING.spacing8}>
+        <Banner
+          type="warning"
+          marginTop={SPACING.spacing8}
+          iconMarginLeft={SPACING.spacing4}
+        >
           <Flex flexDirection={DIRECTION_COLUMN}>
             <StyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
               {t('data_out_of_date')}
@@ -153,7 +158,7 @@ export function HistoricalProtocolRunOffsetDrawer(
             key={index}
             justifyContent={JUSTIFY_FLEX_START}
             alignItems={ALIGN_CENTER}
-            padding={`${SPACING.spacing2} ${SPACING.spacing8}`}
+            padding={SPACING.spacing8}
             backgroundColor={COLORS.white}
             marginY={SPACING.spacing4}
             borderRadius={BORDERS.borderRadius4}

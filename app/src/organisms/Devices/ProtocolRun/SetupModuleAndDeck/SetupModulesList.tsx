@@ -214,7 +214,9 @@ export function ModulesListItem({
           }
         `}
         marginTop={SPACING.spacing4}
-        onClick={() => setShowModuleSetupModal(true)}
+        onClick={() => {
+          setShowModuleSetupModal(true)
+        }}
       >
         <Flex flexDirection={DIRECTION_ROW}>
           <StyledText as="p">{t('view_setup_instructions')}</StyledText>
@@ -288,7 +290,9 @@ export function ModulesListItem({
     <>
       {showLocationConflictModal && cutoutIdForSlotName != null ? (
         <LocationConflictModal
-          onCloseClick={() => setShowLocationConflictModal(false)}
+          onCloseClick={() => {
+            setShowLocationConflictModal(false)
+          }}
           cutoutId={cutoutIdForSlotName}
           requiredModule={moduleModel}
           deckDef={deckDef}
@@ -298,7 +302,9 @@ export function ModulesListItem({
       {showModuleWizard && attachedModuleMatch != null ? (
         <ModuleWizardFlows
           attachedModule={attachedModuleMatch}
-          closeFlow={() => setShowModuleWizard(false)}
+          closeFlow={() => {
+            setShowModuleWizard(false)
+          }}
           isPrepCommandLoading={isCommandMutationLoading}
           prepCommandErrorMessage={
             prepCommandErrorMessage === '' ? undefined : prepCommandErrorMessage
@@ -315,7 +321,9 @@ export function ModulesListItem({
       >
         {showModuleSetupModal && heaterShakerModuleFromProtocol != null ? (
           <ModuleSetupModal
-            close={() => setShowModuleSetupModal(false)}
+            close={() => {
+              setShowModuleSetupModal(false)
+            }}
             moduleDisplayName={
               heaterShakerModuleFromProtocol.moduleDef.displayName
             }
@@ -376,7 +384,9 @@ export function ModulesListItem({
                 />
                 <TertiaryButton
                   width="max-content"
-                  onClick={() => setShowLocationConflictModal(true)}
+                  onClick={() => {
+                    setShowLocationConflictModal(true)
+                  }}
                 >
                   <StyledText as="label" cursor="pointer">
                     {t('resolve')}

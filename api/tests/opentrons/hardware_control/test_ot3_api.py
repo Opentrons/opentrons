@@ -107,6 +107,7 @@ def fake_settings() -> CapacitivePassSettings:
         max_overrun_distance_mm=2,
         speed_mm_per_s=4,
         sensor_threshold_pf=1.0,
+        output_option=OutputOptions.sync_only,
     )
 
 
@@ -482,6 +483,8 @@ def mock_backend_capacitive_probe(
             speed_mm_per_s: float,
             threshold_pf: float,
             probe: InstrumentProbeType,
+            output_option: OutputOptions = OutputOptions.sync_only,
+            data_file: Optional[str] = None,
         ) -> None:
             hardware_backend._position[moving] += distance_mm / 2
 
@@ -881,7 +884,14 @@ async def test_capacitive_probe(
     # This is a negative probe because the current position is the home position
     # which is very large.
     mock_backend_capacitive_probe.assert_called_once_with(
-        mount, moving, 3, 4, 1.0, InstrumentProbeType.PRIMARY
+        mount,
+        moving,
+        3,
+        4,
+        1.0,
+        InstrumentProbeType.PRIMARY,
+        fake_settings.output_option,
+        fake_settings.data_files,
     )
 
     original = moving.set_in_point(here, 0)

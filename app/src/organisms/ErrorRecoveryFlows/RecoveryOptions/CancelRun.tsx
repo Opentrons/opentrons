@@ -28,7 +28,9 @@ export function CancelRun({
   const { goBackPrevStep, setRobotInMotion } = routeUpdateActions
 
   const primaryBtnOnClick = (): Promise<void> => {
-    return setRobotInMotion(true, ROBOT_CANCELING.ROUTE).then(() => cancelRun())
+    return setRobotInMotion(true, ROBOT_CANCELING.ROUTE).then(() => {
+      cancelRun()
+    })
   }
 
   if (isOnDevice) {
