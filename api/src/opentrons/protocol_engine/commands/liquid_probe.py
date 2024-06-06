@@ -3,8 +3,8 @@ from typing import Optional, Type
 from typing_extensions import Literal
 from pydantic import BaseModel, Field
 
-from ..command import AbstractCommandImpl, BaseCommand, BaseCommandCreate, SuccessData
-from ...errors.error_occurrence import ErrorOccurrence
+from .command import AbstractCommandImpl, BaseCommand, BaseCommandCreate, SuccessData
+from ..errors.error_occurrence import ErrorOccurrence
 
 from opentrons.protocol_engine.resources.ot3_validation import ensure_ot3_hardware
 
