@@ -102,7 +102,7 @@ export function volumeInCapacityForMulti(
   const pipetteEntity = pipetteEntities[rawForm.pipette]
   const pipetteCapacity =
     pipetteEntity &&
-    getPipetteCapacity(pipetteEntity, labwareEntities, rawForm.tipRack)
+    getPipetteCapacity(pipetteEntity, labwareEntities, rawForm.tipRack as string)
   const volume = Number(rawForm.volume)
   const airGapChecked = rawForm.aspirate_airGap_checkbox
   let airGapVolume = airGapChecked ? Number(rawForm.aspirate_airGap_volume) : 0
