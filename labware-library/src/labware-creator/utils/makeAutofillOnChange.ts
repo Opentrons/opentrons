@@ -29,6 +29,8 @@ export const makeAutofillOnChange = ({
   if (_autofillValues !== undefined) {
     const autofillValues = {
       ..._autofillValues,
+      compatibleAdapters: {},
+      compatibleModules: {},
     }
 
     const namesToTrue = mapValues(autofillValues, () => true)

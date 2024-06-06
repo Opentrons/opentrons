@@ -81,6 +81,26 @@ export function labwareDefToFields(
   const firstGroup: LabwareWellGroup | undefined = def.groups[0]
   const firstGroupBrand = firstGroup?.brand
 
+  const compatibleAdapters: Record<string, number> =
+    def.stackingOffsetWithLabware != null
+      ? Object.entries(def.stackingOffsetWithLabware).reduce<
+          Record<string, number>
+        >((acc, [loadName, offset]) => {
+          acc[loadName] = offset.z
+          return acc
+        }, {})
+      : {}
+
+  const compatibleModules: Record<string, number> =
+    def.stackingOffsetWithModule != null
+      ? Object.entries(def.stackingOffsetWithModule).reduce<
+          Record<string, number>
+        >((acc, [moduleModel, offset]) => {
+          acc[moduleModel] = offset.z
+          return acc
+        }, {})
+      : {}
+
   return {
     // NOTE: Ian 2019-08-26 these LC-specific fields cannot easily/reliably be inferred
     tubeRackInsertLoadName: null,
@@ -130,5 +150,7 @@ export function labwareDefToFields(
     // NOTE: intentionally null these fields, do not import them
     loadName: null,
     displayName: null,
+    compatibleAdapters,
+    compatibleModules,
   }
 }

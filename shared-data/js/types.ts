@@ -186,6 +186,8 @@ export interface LabwareDefinition2 {
   wells: LabwareWellMap
   groups: LabwareWellGroup[]
   allowedRoles?: LabwareRoles[]
+  stackingOffsetWithLabware?: Record<string, LabwareOffset>
+  stackingOffsetWithModule?: Record<string, LabwareOffset>
 }
 
 export interface LabwareDefByDefURI {

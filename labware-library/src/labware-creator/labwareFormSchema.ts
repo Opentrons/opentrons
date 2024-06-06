@@ -87,6 +87,38 @@ export const labwareFormSchemaBaseObject = Yup.object({
   labwareType: requiredString(LABELS.labwareType).oneOf(
     labwareTypeOptions.map(o => o.value)
   ),
+  compatibleModules: Yup.object()
+    .shape({})
+    .test(
+      'is-valid-compatibleModules',
+      'Please make sure each module selected has a height',
+      value => {
+        for (const [, val] of Object.entries(value)) {
+          if (typeof val !== 'string') {
+            return false
+          }
+        }
+
+        return true
+      }
+    )
+    .default({}),
+  compatibleAdapters: Yup.object()
+    .shape({})
+    .test(
+      'is-valid-compatibleAdapters',
+      'Please make sure each labware selected has a height',
+      value => {
+        for (const [, val] of Object.entries(value)) {
+          if (typeof val !== 'string') {
+            return false
+          }
+        }
+
+        return true
+      }
+    )
+    .default({}),
   tubeRackInsertLoadName: Yup.mixed().when('labwareType', {
     is: 'tubeRack',
     then: requiredString(LABELS.tubeRackInsertLoadName),
