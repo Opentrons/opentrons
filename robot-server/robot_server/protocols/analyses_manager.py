@@ -47,7 +47,8 @@ class AnalysesManager:
                 run_time_parameters=[],
             )
             return AnalysisSummary(
-                id=analysis_id, status=AnalysisStatus.COMPLETED, runTimeParameters=[]
+                id=analysis_id,
+                status=AnalysisStatus.COMPLETED,
             )
 
         self._task_runner.run(

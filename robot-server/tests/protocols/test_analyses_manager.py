@@ -112,4 +112,71 @@ async def test_start_analysis(
         status=AnalysisStatus.PENDING,
         runTimeParameters=[bool_parameter],
     )
-    # TODO: verify that task runner is called with analyzer.analyze
+    decoy.verify(
+        task_runner.run(
+            analyzer.analyze,
+            runner=runner,
+            analysis_id="analysis-id",
+            run_time_parameters=[bool_parameter],
+        )
+    )
+
+
+async def test_rtp_validation_error_in_start_analysis(
+    decoy: Decoy,
+    analysis_store: AnalysisStore,
+    task_runner: TaskRunner,
+    subject: AnalysesManager,
+) -> None:
+    """It should catch RTP validation error early and cleanup the analysis process."""
+    robot_type: RobotType = "OT-3 Standard"
+    protocol_resource = ProtocolResource(
+        protocol_id="protocol-id",
+        created_at=datetime(year=2024, month=6, day=6),
+        source=ProtocolSource(
+            directory=Path("/dev/null"),
+            main_file=Path("/dev/null/abc.json"),
+            config=JsonProtocolConfig(schema_version=123),
+            files=[],
+            metadata={},
+            robot_type=robot_type,
+            content_hash="abc123",
+        ),
+        protocol_key="dummy-data-111",
+    )
+
+    runner_load_exception = Exception("Uh oh!")
+    pending_analysis = PendingAnalysis(id="analysis-id")
+    analyzer = decoy.mock(cls=protocol_analyzer.ProtocolAnalyzer)
+    decoy.when(
+        protocol_analyzer.create_protocol_analyzer(
+            analysis_store=analysis_store,
+            protocol_resource=protocol_resource,
+        )
+    ).then_return(analyzer)
+    decoy.when(
+        analysis_store.add_pending(
+            protocol_id="protocol-id",
+            analysis_id="analysis-id",
+        )
+    ).then_return(pending_analysis)
+    decoy.when(
+        await analyzer.load_runner(run_time_param_values={"baz": True})
+    ).then_raise(runner_load_exception)
+    analysis_summary_result = await subject.start_analysis(
+        analysis_id="analysis-id",
+        protocol_resource=protocol_resource,
+        run_time_param_values={"baz": True},
+    )
+
+    assert analysis_summary_result == AnalysisSummary(
+        id="analysis-id", status=AnalysisStatus.COMPLETED
+    )
+    decoy.verify(
+        await analyzer.update_to_failed_analysis(
+            analysis_id="analysis-id",
+            protocol_robot_type=protocol_resource.source.robot_type,
+            error=runner_load_exception,
+            run_time_parameters=[],
+        )
+    )
