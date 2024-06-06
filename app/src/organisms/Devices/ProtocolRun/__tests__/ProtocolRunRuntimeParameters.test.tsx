@@ -152,6 +152,7 @@ describe('ProtocolRunRuntimeParameters', () => {
 
   it('should render RunTimeParameters when RunTimeParameters are not empty', () => {
     render(props)
+    expect(screen.queryByText('CSV File')).not.toBeInTheDocument()
     screen.getByText('Dry Run')
     screen.getByText('Off')
     screen.getByText('Columns of Samples')
