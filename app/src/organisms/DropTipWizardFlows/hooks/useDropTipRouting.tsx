@@ -143,9 +143,6 @@ function getDropTipRouteNavigation(
   return { getNextStep, getPrevStep }
 }
 
-// TOME: You'll eventually do the INVALID override logic here, just like in
-// ERFlows.
-
 // Ensures that the updated step is a valid step, redirecting back to the
 // first step of the "Before Beginning" route if the step is invalid.
 function determineValidRoute(

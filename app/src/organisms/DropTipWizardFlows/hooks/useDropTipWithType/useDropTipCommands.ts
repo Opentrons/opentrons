@@ -47,10 +47,6 @@ export interface UseDropTipCommandsResult {
   handleMustHome: () => Promise<void>
 }
 
-/** TOME: Next is figuring out how to do the jog properly if it's a fixit command.
- * After that, just encapsulate the chainRunCommands logic a layer above, and you're good to go!
- */
-
 // Returns setup commands used in Drop Tip Wizard.
 export function useDropTipCommands({
   issuedCommandsType,
@@ -142,7 +138,6 @@ export function useDropTipCommands({
     })
   }
 
-  // TOME: You want to ALSO pass this wrapper into the function instead of passing createMaintenanceCommand.
   const handleJog = (axis: Axis, dir: Sign, step: StepSize): Promise<void> => {
     return new Promise((resolve, reject) => {
       return runCommand({

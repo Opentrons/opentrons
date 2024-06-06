@@ -149,7 +149,6 @@ function useMonitorMaintenanceRunForDeletion({
   ])
 }
 
-// TOME: I believe this is only needed by the maintenance run command.
 const buildLoadPipetteCommand = (
   mount: PipetteData['mount'],
   pipetteName: PipetteModelSpecs['name']

@@ -1,15 +1,19 @@
-import * as React from "react";
-import {beforeEach, describe, expect, it, type Mock, vi} from "vitest";
-import {renderHook, screen} from "@testing-library/react";
+import * as React from 'react'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { renderHook, screen } from '@testing-library/react'
 
-import {renderWithProviders} from "../../../__testing-utils__";
-import {i18n} from "../../../i18n";
-import {mockDropTipWizardContainerProps} from "../__fixtures__";
-import {useWizardExitHeader, useSeenBlowoutSuccess, DropTipWizardHeader} from "../DropTipWizardHeader";
-import {DT_ROUTES} from "../constants";
+import { renderWithProviders } from '../../../__testing-utils__'
+import { i18n } from '../../../i18n'
+import { mockDropTipWizardContainerProps } from '../__fixtures__'
+import {
+  useWizardExitHeader,
+  useSeenBlowoutSuccess,
+  DropTipWizardHeader,
+} from '../DropTipWizardHeader'
+import { DT_ROUTES } from '../constants'
 
-import type {UseWizardExitHeaderProps} from "../DropTipWizardHeader";
-
+import type { Mock } from 'vitest'
+import type { UseWizardExitHeaderProps } from '../DropTipWizardHeader'
 
 const render = (props: React.ComponentProps<typeof DropTipWizardHeader>) => {
   return renderWithProviders(<DropTipWizardHeader {...props} />, {
@@ -24,21 +28,22 @@ describe('DropTipWizardHeader', () => {
     props = mockDropTipWizardContainerProps
   })
 
-  it('renders appropriate copy and onClick behavior', ()=> {
+  it('renders appropriate copy and onClick behavior', () => {
     render(props)
     screen.getByText('Drop tips')
     screen.getByText('Step 1 / 3')
   })
 })
 
-// TOME: Add loads of testing now.
 describe('useSeenBlowoutSuccess', () => {
   it('should not render step counter when currentRoute is BEFORE_BEGINNING', () => {
-    const { result } = renderHook(() => useSeenBlowoutSuccess({
-      currentStep: 'SOME_STEP',
-      currentRoute: DT_ROUTES.BEFORE_BEGINNING,
-      currentStepIdx: 0,
-    }))
+    const { result } = renderHook(() =>
+      useSeenBlowoutSuccess({
+        currentStep: 'SOME_STEP',
+        currentRoute: DT_ROUTES.BEFORE_BEGINNING,
+        currentStepIdx: 0,
+      })
+    )
 
     expect(result.current.totalSteps).toBe(null)
     expect(result.current.currentStepNumber).toBe(null)
