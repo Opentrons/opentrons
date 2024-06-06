@@ -39,19 +39,19 @@ export function useDropTipMaintenanceRun({
 
   const activeMaintenanceRunId = maintenanceRunData?.data.id
 
-  useMonitorMaintenanceRunForDeletion({
-    isMaintenanceRunType,
-    activeMaintenanceRunId,
-    createdMaintenanceRunId,
-    closeFlow,
-  })
-
   useCreateDropTipMaintenanceRun({
     issuedCommandsType,
     mount,
     instrumentModelName: instrumentModelSpecs.name,
     setErrorDetails,
     setCreatedMaintenanceRunId,
+  })
+
+  useMonitorMaintenanceRunForDeletion({
+    isMaintenanceRunType,
+    activeMaintenanceRunId,
+    createdMaintenanceRunId,
+    closeFlow,
   })
 
   return activeMaintenanceRunId ?? null

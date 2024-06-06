@@ -63,7 +63,7 @@ interface UseSeenBlowoutSuccessResult {
 
 // Calculate the props used for determining step count based on the route. Because blowout and drop tip are separate routes,
 // there's a need for state to track whether we've seen blowout, so the step counter is accurate when the drop tip route is active.
-function useSeenBlowoutSuccess({
+export function useSeenBlowoutSuccess({
   currentStep,
   currentRoute,
   currentStepIdx,
