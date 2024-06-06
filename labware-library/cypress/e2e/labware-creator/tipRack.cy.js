@@ -7,7 +7,6 @@ describe('Create a Tip Rack', () => {
   before(() => {
     cy.visit('/create')
     cy.viewport('macbook-15')
-    cy.contains('NO').click({ force: true })
   })
   it('Should create a tip rack', () => {
     // Tip Rack Selection from drop down
