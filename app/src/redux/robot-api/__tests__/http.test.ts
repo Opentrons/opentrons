@@ -1,4 +1,4 @@
-// tests for the robot-api fetch wrapper
+import { vi, describe, it, expect, beforeAll, afterAll } from 'vitest'
 
 import { promisify } from 'util'
 import express from 'express'
@@ -13,7 +13,7 @@ import { HTTP_API_VERSION, GET, POST, PATCH, DELETE } from '../constants'
 import type { Application } from 'express'
 import type { RobotHost } from '../types'
 
-jest.unmock('node-fetch')
+vi.unmock('node-fetch')
 
 describe('robot-api http client', () => {
   let testApp: Application
@@ -22,8 +22,7 @@ describe('robot-api http client', () => {
   let robot: RobotHost
 
   beforeAll(() => {
-    // @ts-expect-error(sa, 2021-6-28): global.fetch and node fetch have different interfaces
-    global.fetch = fetch
+    ;(global as any).fetch = fetch
     testApp = express()
     testApp.use((express as any).json())
 

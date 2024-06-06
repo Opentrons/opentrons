@@ -171,119 +171,104 @@ class Modules(BaseModel):
 
     class Config:
         schema_extra = {
-            "examples": {
-                "nothingAttached": {
-                    "description": "With no modules present",
-                    "value": {"modules": []},
+            "examples": [
+                {"modules": []},
+                {
+                    "modules": [
+                        {
+                            "name": "magdeck",
+                            "displayName": "Magnetic Module",
+                            "moduleModel": "magneticModuleV1",
+                            "port": "tty01_magdeck",
+                            "serial": "MDV2313121",
+                            "model": "mag_deck_v4.0",
+                            "revision": "mag_deck_v4.0",
+                            "fwVersion": "2.1.3",
+                            "status": "engaged",
+                            "hasAvailableUpdate": True,
+                            "data": {"engaged": True, "height": 10},
+                        }
+                    ]
                 },
-                "magneticModuleAttached": {
-                    "description": "With a Magnetic Module attached",
-                    "value": {
-                        "modules": [
-                            {
-                                "name": "magdeck",
-                                "displayName": "Magnetic Module",
-                                "moduleModel": "magneticModuleV1",
-                                "port": "tty01_magdeck",
-                                "serial": "MDV2313121",
-                                "model": "mag_deck_v4.0",
-                                "revision": "mag_deck_v4.0",
-                                "fwVersion": "2.1.3",
-                                "status": "engaged",
-                                "hasAvailableUpdate": True,
-                                "data": {"engaged": True, "height": 10},
-                            }
-                        ]
-                    },
+                {
+                    "modules": [
+                        {
+                            "name": "tempdeck",
+                            "displayName": "Temperature Module",
+                            "moduleModel": "temperatureModuleV1",
+                            "revision": "temp_deck_v10",
+                            "port": "tty2_tempdeck",
+                            "serial": "TDV10231231",
+                            "model": "temp_deck_v10",
+                            "hasAvailableUpdate": False,
+                            "fwVersion": "1.2.0",
+                            "status": "cooling",
+                            "data": {"currentTemp": 25, "targetTemp": 10},
+                        }
+                    ]
                 },
-                "tempDeckAttached": {
-                    "description": "With a Temperature Module attached",
-                    "value": {
-                        "modules": [
-                            {
-                                "name": "tempdeck",
-                                "displayName": "Temperature Module",
-                                "moduleModel": "temperatureModuleV1",
-                                "revision": "temp_deck_v10",
-                                "port": "tty2_tempdeck",
-                                "serial": "TDV10231231",
-                                "model": "temp_deck_v10",
-                                "hasAvailableUpdate": False,
-                                "fwVersion": "1.2.0",
-                                "status": "cooling",
-                                "data": {"currentTemp": 25, "targetTemp": 10},
-                            }
-                        ]
-                    },
+                {
+                    "modules": [
+                        {
+                            "name": "thermocycler",
+                            "displayName": "Thermocycler",
+                            "revision": "thermocycler_v10",
+                            "moduleModel": "thermocyclerModuleV1",
+                            "port": "tty3_thermocycler",
+                            "serial": "TCV1006052018",
+                            "model": "thermocycler_v10",
+                            "hasAvailableUpdate": True,
+                            "fwVersion": "1.0.0",
+                            "status": "cooling",
+                            "data": {
+                                "lid": "closed",
+                                "lidTarget": 10,
+                                "lidTemp": 15,
+                                "currentTemp": 20,
+                                "targetTemp": 10,
+                                "holdTime": None,
+                                "rampRate": 10,
+                                "currentCycleIndex": None,
+                                "totalCycleCount": None,
+                                "currentStepIndex": None,
+                                "totalStepCount": None,
+                            },
+                        }
+                    ]
                 },
-                "thermocyclerAttached": {
-                    "description": "With a Thermocycler attached",
-                    "value": {
-                        "modules": [
-                            {
-                                "name": "thermocycler",
-                                "displayName": "Thermocycler",
-                                "revision": "thermocycler_v10",
-                                "moduleModel": "thermocyclerModuleV1",
-                                "port": "tty3_thermocycler",
-                                "serial": "TCV1006052018",
-                                "model": "thermocycler_v10",
-                                "hasAvailableUpdate": True,
-                                "fwVersion": "1.0.0",
-                                "status": "cooling",
-                                "data": {
-                                    "lid": "closed",
-                                    "lidTarget": 10,
-                                    "lidTemp": 15,
-                                    "currentTemp": 20,
-                                    "targetTemp": 10,
-                                    "holdTime": None,
-                                    "rampRate": 10,
-                                    "currentCycleIndex": None,
-                                    "totalCycleCount": None,
-                                    "currentStepIndex": None,
-                                    "totalStepCount": None,
-                                },
-                            }
-                        ]
-                    },
+                {
+                    "modules": [
+                        {
+                            "name": "heatershaker",
+                            "displayName": "heatershaker",
+                            "fwVersion": "0.0.1",
+                            "hasAvailableUpdate": True,
+                            "model": "heater-shaker_v10",
+                            "moduleModel": "heaterShakerModuleV1",
+                            "port": "/dev/ot_module_heatershaker1",
+                            "usbPort": {
+                                "hub": False,
+                                "port": 1,
+                                "portGroup": "unknown",
+                                "hubPort": None,
+                            },
+                            "revision": "heater-shaker_v10",
+                            "serial": "HSnnnnnn",
+                            "status": "running",
+                            "data": {
+                                "temperatureStatus": "heating",
+                                "speedStatus": "holding at target",
+                                "labwareLatchStatus": "closed",
+                                "currentTemp": 25.5,
+                                "targetTemp": 50,
+                                "currentSpeed": 10,
+                                "targetSpeed": 300,
+                                "errorDetails": None,
+                            },
+                        }
+                    ]
                 },
-                "heaterShakerAttached": {
-                    "description": "With a Heater-Shaker attached",
-                    "value": {
-                        "modules": [
-                            {
-                                "name": "heatershaker",
-                                "displayName": "heatershaker",
-                                "fwVersion": "0.0.1",
-                                "hasAvailableUpdate": True,
-                                "model": "heater-shaker_v10",
-                                "moduleModel": "heaterShakerModuleV1",
-                                "port": "/dev/ot_module_heatershaker1",
-                                "usbPort": {
-                                    "hub": False,
-                                    "port": 1,
-                                    "portGroup": "unknown",
-                                    "hubPort": None,
-                                },
-                                "revision": "heater-shaker_v10",
-                                "serial": "HSnnnnnn",
-                                "status": "running",
-                                "data": {
-                                    "temperatureStatus": "heating",
-                                    "speedStatus": "holding at target",
-                                    "labwareLatchStatus": "closed",
-                                    "currentTemp": 25.5,
-                                    "targetTemp": 50,
-                                    "currentSpeed": 10,
-                                    "targetSpeed": 300,
-                                    "errorDetails": None,
-                                },
-                            }
-                        ]
-                    },
-                },
-            }
+            ]
         }
 
 
@@ -305,32 +290,16 @@ class SerialCommand(BaseModel):
     )
 
     class Config:
-        schema_extra = {
-            "examples": {
-                "tempModSetTemp": {
-                    "summary": "Set Temperature Module temperature",
-                    "description": "Set the temperature of an attached "
-                    "Temperature Module",
-                    "value": {"command_type": "set_temperature", "args": [60]},
-                }
-            }
-        }
+        schema_extra = {"examples": [{"command_type": "set_Temperature", "args": [60]}]}
 
 
 class SerialCommandResponse(BaseModel):
     """ "The result of a successful call"""
 
     message: str = Field(..., description="A human readable string")
-    returnValue: str = Field(None, description="The return value from the call")
+    returnValue: typing.Optional[str] = Field(
+        None, description="The return value from the call"
+    )
 
     class Config:
-        schema_extra = {
-            "examples": {
-                "tempModSetTemperature": {
-                    "summary": "Set temperature OK",
-                    "description": "A successful call to set_temperature "
-                    "on a Temperature Module",
-                    "value": {"message": "Success", "returnValue": None},
-                }
-            }
-        }
+        schema_extra = {"examples": [{"message": "Success", "returnValue": None}]}

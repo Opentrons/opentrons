@@ -2,20 +2,19 @@ import * as React from 'react'
 import { css } from 'styled-components'
 
 import {
+  ALIGN_CENTER,
   Box,
   Btn,
-  Flex,
-  Icon,
-  ALIGN_CENTER,
+  COLORS,
   DIRECTION_COLUMN,
   DIRECTION_ROW,
+  Flex,
+  Icon,
   JUSTIFY_SPACE_BETWEEN,
-  COLORS,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
-
-import { StyledText } from '../../../atoms/text'
 
 interface SetupStepProps {
   /** whether or not to show the full contents of the step */
@@ -49,10 +48,10 @@ const COLLAPSED_STYLE = css`
 const ACCORDION_STYLE = css`
   border-radius: 50%;
   &:hover {
-    background: ${COLORS.lightGreyHover};
+    background: ${COLORS.grey30};
   }
   &:active {
-    background: ${COLORS.lightGreyPressed};
+    background: ${COLORS.grey35};
   }
 `
 export function SetupStep({
@@ -76,10 +75,11 @@ export function SetupStep({
             justifyContent={JUSTIFY_SPACE_BETWEEN}
             width="100%"
             onClick={toggleExpanded}
+            gridGap={SPACING.spacing40}
           >
             <Flex flexDirection={DIRECTION_COLUMN}>
               <StyledText
-                color={COLORS.darkGreyEnabled}
+                color={COLORS.grey50}
                 css={TYPOGRAPHY.h6SemiBold}
                 marginBottom={SPACING.spacing2}
                 id={`CollapsibleStep_${label}`}
@@ -87,7 +87,7 @@ export function SetupStep({
                 {label}
               </StyledText>
               <StyledText
-                color={COLORS.darkBlackEnabled}
+                color={COLORS.black90}
                 css={TYPOGRAPHY.h3SemiBold}
                 marginBottom={SPACING.spacing4}
                 id={`CollapsibleStep_${String(title)}`}
@@ -96,7 +96,7 @@ export function SetupStep({
               </StyledText>
               <StyledText
                 as="p"
-                color={COLORS.darkBlackEnabled}
+                color={COLORS.black90}
                 id={`CollapsibleStep_${description}`}
               >
                 {description}
@@ -105,7 +105,7 @@ export function SetupStep({
             <Flex alignItems={ALIGN_CENTER} flexDirection={DIRECTION_ROW}>
               {rightElement}
               <Icon
-                color={COLORS.darkBlackEnabled}
+                color={COLORS.black90}
                 size="1.5rem"
                 css={ACCORDION_STYLE}
                 name={expanded ? 'minus' : 'plus'}

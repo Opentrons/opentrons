@@ -1,9 +1,9 @@
 import { migration } from './migration'
 import { selectors as fileDataSelectors } from '../file-data'
 import { saveFile } from './utils'
-import { PDProtocolFile } from '../file-types'
-import { GetState, ThunkAction, ThunkDispatch } from '../types'
-import {
+import type { PDProtocolFile } from '../file-types'
+import type { GetState, ThunkAction, ThunkDispatch } from '../types'
+import type {
   FileUploadErrorType,
   FileUploadMessage,
   LoadFileAction,
@@ -65,7 +65,9 @@ export const loadProtocolFile = (
         parsedProtocol && dispatch(loadFileAction(parsedProtocol))
       } catch (error) {
         console.error(error)
-        fileError('INVALID_JSON_FILE', error.message)
+        if (error instanceof Error) {
+          fileError('INVALID_JSON_FILE', error.message)
+        }
       }
     }
 

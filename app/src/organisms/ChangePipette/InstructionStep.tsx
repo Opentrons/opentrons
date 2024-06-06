@@ -29,12 +29,18 @@ export function InstructionStep(props: Props): JSX.Element {
 
   const display =
     displayCategory === 'GEN2'
-      ? require(`../../assets/images/change-pip/${direction}-${String(
-          mount
-        )}-${channelsKey}-GEN2-${diagram}@3x.png`)
-      : require(`../../assets/images/change-pip/${direction}-${String(
-          mount
-        )}-${channelsKey}-${diagram}@3x.png`)
+      ? new URL(
+          `../../assets/images/change-pip/${direction}-${String(
+            mount
+          )}-${channelsKey}-GEN2-${diagram}@3x.png`,
+          import.meta.url
+        ).href
+      : new URL(
+          `../../assets/images/change-pip/${direction}-${String(
+            mount
+          )}-${channelsKey}-${diagram}@3x.png`,
+          import.meta.url
+        ).href
 
   return (
     <Flex justifyContent={JUSTIFY_SPACE_EVENLY}>

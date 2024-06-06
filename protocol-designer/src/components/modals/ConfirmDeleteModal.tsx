@@ -1,8 +1,9 @@
 import * as React from 'react'
+import { createPortal } from 'react-dom'
+import { useTranslation } from 'react-i18next'
 import { AlertModal } from '@opentrons/components'
-import { i18n } from '../../localization'
-import { Portal } from '../portals/MainPageModalPortal'
-import modalStyles from './modal.css'
+import { getMainPagePortalEl } from '../portals/MainPageModalPortal'
+import modalStyles from './modal.module.css'
 
 export const DELETE_PROFILE_CYCLE: 'deleteProfileCycle' = 'deleteProfileCycle'
 export const CLOSE_STEP_FORM_WITH_CHANGES: 'closeStepFormWithChanges' =
@@ -30,11 +31,12 @@ interface Props {
 }
 
 export function ConfirmDeleteModal(props: Props): JSX.Element {
+  const { t } = useTranslation(['modal', 'button'])
   const { modalType, onCancelClick, onContinueClick } = props
-  const cancelCopy = i18n.t('button.cancel')
-  const continueCopy = i18n.t(
-    `modal.confirm_delete_modal.${modalType}.confirm_button`,
-    i18n.t('button.continue')
+  const cancelCopy = t('button:cancel')
+  const continueCopy = t(
+    `confirm_delete_modal.${modalType}.confirm_button`,
+    t('button:continue')
   )
   const buttons = [
     { title: cancelCopy, children: cancelCopy, onClick: onCancelClick },
@@ -45,18 +47,17 @@ export function ConfirmDeleteModal(props: Props): JSX.Element {
       onClick: onContinueClick,
     },
   ]
-  return (
-    <Portal>
-      <AlertModal
-        alertOverlay
-        restrictOuterScroll={false}
-        buttons={buttons}
-        onCloseClick={onCancelClick}
-        className={modalStyles.modal}
-        heading={i18n.t(`modal.confirm_delete_modal.${modalType}.title`)}
-      >
-        <p>{i18n.t(`modal.confirm_delete_modal.${modalType}.body`)}</p>
-      </AlertModal>
-    </Portal>
+  return createPortal(
+    <AlertModal
+      alertOverlay
+      restrictOuterScroll={false}
+      buttons={buttons}
+      onCloseClick={onCancelClick}
+      className={modalStyles.modal}
+      heading={t(`confirm_delete_modal.${modalType}.title`)}
+    >
+      <p>{t(`confirm_delete_modal.${modalType}.body`)}</p>
+    </AlertModal>,
+    getMainPagePortalEl()
   )
 }

@@ -1,12 +1,12 @@
 import * as React from 'react'
-import { renderWithProviders } from '@opentrons/components'
+import { screen } from '@testing-library/react'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { renderWithProviders } from '../../../__testing-utils__'
 import { i18n } from '../../../i18n'
 import { StatusLabel } from '../../../atoms/StatusLabel'
 import { HeaterShakerModuleData } from '../HeaterShakerModuleData'
 
-jest.mock('../../../atoms/StatusLabel')
-
-const mockStatusLabel = StatusLabel as jest.MockedFunction<typeof StatusLabel>
+vi.mock('../../../atoms/StatusLabel')
 
 const render = (props: React.ComponentProps<typeof HeaterShakerModuleData>) => {
   return renderWithProviders(<HeaterShakerModuleData {...props} />, {
@@ -30,16 +30,16 @@ describe('HeaterShakerModuleData', () => {
         status: 'idle',
       },
     }
-    mockStatusLabel.mockReturnValue(<div>Mock StatusLabel</div>)
+    vi.mocked(StatusLabel).mockReturnValue(<div>Mock StatusLabel</div>)
   })
   afterEach(() => {
-    jest.resetAllMocks()
+    vi.resetAllMocks()
   })
 
   it('renders an idle status', () => {
-    const { getByText } = render(props)
-    expect(getByText('Mock StatusLabel')).toHaveStyle(
-      'backgroundColor: COLORS.medGreyEnabled'
+    render(props)
+    expect(screen.getByText('Mock StatusLabel')).toHaveStyle(
+      'backgroundColor: COLORS.grey30'
     )
   })
 
@@ -57,8 +57,8 @@ describe('HeaterShakerModuleData', () => {
         status: 'idle',
       },
     }
-    const { getByText } = render(props)
-    expect(getByText('Mock StatusLabel')).toHaveStyle(
+    render(props)
+    expect(screen.getByText('Mock StatusLabel')).toHaveStyle(
       'backgroundColor: C_SKY_BLUE'
     )
   })
@@ -77,9 +77,9 @@ describe('HeaterShakerModuleData', () => {
         status: 'idle',
       },
     }
-    const { getByText } = render(props)
-    expect(getByText('Mock StatusLabel')).toHaveStyle(
-      'backgroundColor: COLORS.blueEnabled'
+    render(props)
+    expect(screen.getByText('Mock StatusLabel')).toHaveStyle(
+      'backgroundColor: COLORS.blue50'
     )
   })
 
@@ -97,11 +97,11 @@ describe('HeaterShakerModuleData', () => {
         status: 'idle',
       },
     }
-    const { getByText } = render(props)
-    getByText('Target: 200 rpm')
-    getByText('Current: 200 rpm')
-    expect(getByText('Mock StatusLabel')).toHaveStyle(
-      'backgroundColor: COLORS.blueEnabled'
+    render(props)
+    screen.getByText('Target: 200 rpm')
+    screen.getByText('Current: 200 rpm')
+    expect(screen.getByText('Mock StatusLabel')).toHaveStyle(
+      'backgroundColor: COLORS.blue50'
     )
   })
 
@@ -119,11 +119,11 @@ describe('HeaterShakerModuleData', () => {
         status: 'idle',
       },
     }
-    const { getByText } = render(props)
-    getByText('Target: N/A')
-    getByText('Current: 0 rpm')
-    expect(getByText('Mock StatusLabel')).toHaveStyle(
-      'backgroundColor: COLORS.medGreyEnabled'
+    render(props)
+    screen.getByText('Target: N/A')
+    screen.getByText('Current: 0 rpm')
+    expect(screen.getByText('Mock StatusLabel')).toHaveStyle(
+      'backgroundColor: COLORS.grey30'
     )
   })
 
@@ -141,11 +141,11 @@ describe('HeaterShakerModuleData', () => {
         status: 'idle',
       },
     }
-    const { getByText } = render(props)
-    getByText('Target: 200 rpm')
-    getByText('Current: 200 rpm')
-    expect(getByText('Mock StatusLabel')).toHaveStyle(
-      'backgroundColor: COLORS.warningBackgroundLight'
+    render(props)
+    screen.getByText('Target: 200 rpm')
+    screen.getByText('Current: 200 rpm')
+    expect(screen.getByText('Mock StatusLabel')).toHaveStyle(
+      'backgroundColor: COLORS.yellow20'
     )
   })
 
@@ -163,11 +163,11 @@ describe('HeaterShakerModuleData', () => {
         status: 'idle',
       },
     }
-    const { getByText } = render(props)
-    getByText('Target: N/A')
-    getByText('Current: 0 rpm')
-    expect(getByText('Mock StatusLabel')).toHaveStyle(
-      'backgroundColor: COLORS.medGreyEnabled'
+    render(props)
+    screen.getByText('Target: N/A')
+    screen.getByText('Current: 0 rpm')
+    expect(screen.getByText('Mock StatusLabel')).toHaveStyle(
+      'backgroundColor: COLORS.grey30'
     )
   })
 
@@ -185,9 +185,9 @@ describe('HeaterShakerModuleData', () => {
         status: 'idle',
       },
     }
-    const { getByText } = render(props)
-    expect(getByText('Mock StatusLabel')).toHaveStyle(
-      'backgroundColor: COLORS.blueEnabled'
+    render(props)
+    expect(screen.getByText('Mock StatusLabel')).toHaveStyle(
+      'backgroundColor: COLORS.blue50'
     )
   })
 
@@ -205,8 +205,8 @@ describe('HeaterShakerModuleData', () => {
         status: 'idle',
       },
     }
-    const { getByText } = render(props)
-    getByText('open')
+    render(props)
+    screen.getByText('open')
   })
 
   it('renders a correct text when latch is opening', () => {
@@ -223,8 +223,8 @@ describe('HeaterShakerModuleData', () => {
         status: 'idle',
       },
     }
-    const { getByText } = render(props)
-    getByText('open')
+    render(props)
+    screen.getByText('open')
   })
 
   it('renders a correct text when latch is unknown', () => {
@@ -241,8 +241,8 @@ describe('HeaterShakerModuleData', () => {
         status: 'idle',
       },
     }
-    const { getByText } = render(props)
-    getByText('open')
+    render(props)
+    screen.getByText('open')
   })
 
   it('renders a correct text when latch is closing and is not shaking', () => {
@@ -259,8 +259,8 @@ describe('HeaterShakerModuleData', () => {
         status: 'idle',
       },
     }
-    const { getByText } = render(props)
-    getByText('Closed')
+    render(props)
+    screen.getByText('Closed')
   })
 
   it('renders a correct text when latch is closing and is shaking', () => {
@@ -277,15 +277,15 @@ describe('HeaterShakerModuleData', () => {
         status: 'idle',
       },
     }
-    const { getByText, getByTestId } = render(props)
-    getByText('Closed and Locked')
-    getByTestId('HeaterShakerModuleData_latch_lock')
+    render(props)
+    screen.getByText('Closed and Locked')
+    screen.getByTestId('HeaterShakerModuleData_latch_lock')
   })
 
   it('renders correct information when status is idle', () => {
-    const { getByText } = render(props)
-    getByText('Target: N/A')
-    getByText('Labware Latch')
-    getByText(/Open/i)
+    render(props)
+    screen.getByText('Target: N/A')
+    screen.getByText('Labware Latch')
+    screen.getByText(/Open/i)
   })
 })

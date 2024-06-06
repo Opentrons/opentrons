@@ -19,9 +19,15 @@ from opentrons_shared_data.labware.labware_definition import (
 from opentrons.types import DeckSlotName, Point
 from opentrons.protocol_engine.clients import SyncClient as EngineClient
 from opentrons.protocol_engine.errors import LabwareNotOnDeckError
+from opentrons.protocol_engine.types import (
+    LabwareOffsetCreate,
+    LabwareOffsetLocation,
+    LabwareOffsetVector,
+)
 
 from opentrons.protocol_api.core.labware import LabwareLoadParams
 from opentrons.protocol_api.core.engine import LabwareCore, WellCore
+from opentrons.calibration_storage.helpers import uri_from_details
 
 
 @pytest.fixture
@@ -36,11 +42,9 @@ def mock_engine_client(
 ) -> EngineClient:
     """Get a mock ProtocolEngine synchronous client."""
     engine_client = decoy.mock(cls=EngineClient)
-
     decoy.when(engine_client.state.labware.get_definition("cool-labware")).then_return(
         labware_definition
     )
-
     return engine_client
 
 
@@ -67,9 +71,87 @@ def test_get_load_params(subject: LabwareCore) -> None:
     assert subject.load_name == "world"
 
 
-def test_set_calibration(subject: LabwareCore) -> None:
-    """It should raise if you attempt to set calibration."""
-    with pytest.raises(NotImplementedError):
+@pytest.mark.parametrize(
+    "labware_definition",
+    [
+        LabwareDefinition.construct(  # type: ignore[call-arg]
+            namespace="hello",
+            version=42,
+            parameters=LabwareDefinitionParameters.construct(loadName="world"),  # type: ignore[call-arg]
+            ordering=[],
+            metadata=LabwareDefinitionMetadata.construct(displayName="what a cool labware"),  # type: ignore[call-arg]
+        )
+    ],
+)
+def test_set_calibration_succeeds_in_ok_location(
+    decoy: Decoy,
+    subject: LabwareCore,
+    mock_engine_client: EngineClient,
+    labware_definition: LabwareDefinition,
+) -> None:
+    """It should pass along an AddLabwareOffset if possible."""
+    decoy.when(
+        mock_engine_client.state.labware.get_definition_uri("cool-labware")
+    ).then_return(
+        uri_from_details(
+            load_name=labware_definition.parameters.loadName,
+            namespace=labware_definition.namespace,
+            version=labware_definition.version,
+        )
+    )
+    decoy.when(
+        mock_engine_client.state.labware.get_display_name("cool-labware")
+    ).then_return("what a cool labware")
+    location = LabwareOffsetLocation(slotName=DeckSlotName.SLOT_C2)
+    decoy.when(
+        mock_engine_client.state.geometry.get_offset_location("cool-labware")
+    ).then_return(location)
+    subject.set_calibration(Point(1, 2, 3))
+    decoy.verify(
+        mock_engine_client.add_labware_offset(
+            LabwareOffsetCreate(
+                definitionUri="hello/world/42",
+                location=location,
+                vector=LabwareOffsetVector(x=1, y=2, z=3),
+            )
+        ),
+        mock_engine_client.reload_labware(
+            labware_id="cool-labware",
+        ),
+    )
+
+
+@pytest.mark.parametrize(
+    "labware_definition",
+    [
+        LabwareDefinition.construct(  # type: ignore[call-arg]
+            namespace="hello",
+            version=42,
+            parameters=LabwareDefinitionParameters.construct(loadName="world"),  # type: ignore[call-arg]
+            ordering=[],
+        )
+    ],
+)
+def test_set_calibration_fails_in_bad_location(
+    decoy: Decoy,
+    subject: LabwareCore,
+    mock_engine_client: EngineClient,
+    labware_definition: LabwareDefinition,
+) -> None:
+    """It should raise if you attempt to set calibration when the labware is not on deck."""
+    decoy.when(
+        mock_engine_client.state.labware.get_definition_uri("cool-labware")
+    ).then_return(
+        uri_from_details(
+            load_name=labware_definition.parameters.loadName,
+            namespace=labware_definition.namespace,
+            version=labware_definition.version,
+        )
+    )
+    decoy.when(
+        mock_engine_client.state.geometry.get_offset_location("cool-labware")
+    ).then_return(None)
+    with pytest.raises(LabwareNotOnDeckError):
         subject.set_calibration(Point(1, 2, 3))
 
 
@@ -80,6 +162,10 @@ def test_set_calibration(subject: LabwareCore) -> None:
             namespace="hello",
             parameters=LabwareDefinitionParameters.construct(loadName="world"),  # type: ignore[call-arg]
             ordering=[],
+            allowedRoles=[],
+            stackingOffsetWithLabware={},
+            stackingOffsetWithModule={},
+            gripperOffsets={},
         )
     ],
 )
@@ -103,7 +189,7 @@ def test_get_definition(subject: LabwareCore) -> None:
 def test_get_user_display_name(decoy: Decoy, mock_engine_client: EngineClient) -> None:
     """It should get the labware's user-provided label, if any."""
     decoy.when(
-        mock_engine_client.state.labware.get_display_name("cool-labware")
+        mock_engine_client.state.labware.get_user_specified_display_name("cool-labware")
     ).then_return("Cool Label")
 
     subject = LabwareCore(labware_id="cool-labware", engine_client=mock_engine_client)
@@ -149,7 +235,7 @@ def test_get_name_load_name(subject: LabwareCore) -> None:
 def test_get_name_display_name(decoy: Decoy, mock_engine_client: EngineClient) -> None:
     """It should get the user display name when one is defined."""
     decoy.when(
-        mock_engine_client.state.labware.get_display_name("cool-labware")
+        mock_engine_client.state.labware.get_user_specified_display_name("cool-labware")
     ).then_return("my cool display name")
 
     subject = LabwareCore(labware_id="cool-labware", engine_client=mock_engine_client)
@@ -245,13 +331,16 @@ def test_get_next_tip(
             labware_id="cool-labware",
             num_tips=8,
             starting_tip_name="B1",
+            nozzle_map=None,
         )
     ).then_return("A2")
 
     starting_tip = WellCore(
         name="B1", labware_id="cool-labware", engine_client=mock_engine_client
     )
-    result = subject.get_next_tip(num_tips=8, starting_tip=starting_tip)
+    result = subject.get_next_tip(
+        num_tips=8, starting_tip=starting_tip, nozzle_map=None
+    )
 
     assert result == "A2"
 

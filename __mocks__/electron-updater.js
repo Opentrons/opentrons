@@ -1,6 +1,6 @@
 // mock electron-updater
 'use strict'
-
+import { vi } from 'vitest'
 const EventEmitter = require('events')
 const autoUpdater = new EventEmitter()
 
@@ -13,12 +13,12 @@ module.exports.__mockReset = () => {
     currentVersion: { version: '0.0.0-mock' },
     channel: null,
 
-    checkForUpdates: jest.fn(),
-    checkForUpdatesAndNotify: jest.fn(),
-    downloadUpdate: jest.fn(),
-    getFeedURL: jest.fn(),
-    setFeedURL: jest.fn(),
-    quitAndInstall: jest.fn(),
+    checkForUpdates: vi.fn(),
+    checkForUpdatesAndNotify: vi.fn(),
+    downloadUpdate: vi.fn(),
+    getFeedURL: vi.fn(),
+    setFeedURL: vi.fn(),
+    quitAndInstall: vi.fn(),
   })
 }
 

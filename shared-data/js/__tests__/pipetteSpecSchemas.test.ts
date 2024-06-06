@@ -1,4 +1,6 @@
 import Ajv from 'ajv'
+import { describe, expect, it } from 'vitest'
+
 import nameSpecsSchema from '../../pipette/schemas/1/pipetteNameSpecsSchema.json'
 import modelSpecsSchema from '../../pipette/schemas/1/pipetteModelSpecsSchema.json'
 import pipetteNameSpecs from '../../pipette/definitions/1/pipetteNameSpecs.json'

@@ -2,15 +2,15 @@ import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { useSelector, useDispatch } from 'react-redux'
 import {
-  Flex,
   ALIGN_CENTER,
   DIRECTION_COLUMN,
+  Flex,
   JUSTIFY_SPACE_BETWEEN,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { Divider } from '../../atoms/structure'
-import { StyledText } from '../../atoms/text'
 import { ToggleButton } from '../../atoms/buttons'
 import * as Config from '../../redux/config'
 

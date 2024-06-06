@@ -12,7 +12,9 @@ export function useDeckConfigurationQuery(
   const query = useQuery<DeckConfiguration>(
     [host, 'deck_configuration'],
     () =>
-      getDeckConfiguration(host as HostConfig).then(response => response.data),
+      getDeckConfiguration(host as HostConfig).then(
+        response => response.data?.data?.cutoutFixtures ?? []
+      ),
     { enabled: host !== null, ...options }
   )
 

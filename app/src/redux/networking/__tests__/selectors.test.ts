@@ -1,3 +1,5 @@
+import { vi, describe, it, expect } from 'vitest'
+
 import noop from 'lodash/noop'
 import * as Selectors from '../selectors'
 import * as Constants from '../constants'
@@ -5,8 +7,8 @@ import * as Fixtures from '../__fixtures__'
 
 import type { State } from '../../types'
 
-jest.mock('../../config/selectors')
-jest.mock('../../discovery/selectors')
+vi.mock('../../config/selectors')
+vi.mock('../../discovery/selectors')
 
 interface SelectorSpec {
   name: string
@@ -18,10 +20,6 @@ interface SelectorSpec {
 }
 
 describe('robot settings selectors', () => {
-  afterEach(() => {
-    jest.resetAllMocks()
-  })
-
   const SPECS: SelectorSpec[] = [
     {
       name: 'getInternetStatus returns null if unavailable',

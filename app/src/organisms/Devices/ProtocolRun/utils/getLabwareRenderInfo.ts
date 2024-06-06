@@ -62,7 +62,9 @@ export const getLabwareRenderInfo = (
         return acc
       }
       const isSlot = deckDef.locations.addressableAreas.some(
-        aa => aa.id === slotName && aa.areaType === 'slot'
+        aa =>
+          aa.id === slotName &&
+          (aa.areaType === 'slot' || aa.areaType === 'stagingSlot')
       )
 
       return isSlot

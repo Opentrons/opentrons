@@ -24,7 +24,8 @@ from .module_data_mapper import ModuleDataMapper
 modules_router = APIRouter()
 
 
-@modules_router.get(
+@PydanticResponse.wrap_route(
+    modules_router.get,
     path="/modules",
     summary="Get attached modules.",
     description="Get a list of all modules currently attached to the robot.",
@@ -40,8 +41,12 @@ async def get_attached_modules(
 ) -> PydanticResponse[SimpleMultiBody[AttachedModule]]:
     """Get a list of all attached modules."""
     if requested_version <= 2:
-        return await legacy_get_attached_modules(  # type: ignore[return-value]
+        # TODO: can we use a redirect here or something
+        legacy_data = await legacy_get_attached_modules(
             hardware=hardware,
+        )
+        return await PydanticResponse.create(
+            content=legacy_data  # type: ignore[arg-type]
         )
 
     # Load any the module calibrations

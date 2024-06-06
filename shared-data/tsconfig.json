@@ -4,14 +4,19 @@
   "compilerOptions": {
     "composite": true,
     "rootDir": ".",
-    "outDir": "lib"
+    "outDir": "lib",
+    "moduleResolution": "node",
   },
+  "module": "ESNext",
   "include": [
     "js",
     "protocol",
+    "pipette",
+    "labware",
     "deck",
-    "command/types",
+    "command",
     "liquid/types",
-    "commandAnnotation/types"
+    "commandAnnotation/types",
+    "vite.config.ts",
   ]
 }

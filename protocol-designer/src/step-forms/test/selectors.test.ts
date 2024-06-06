@@ -1,3 +1,4 @@
+import { describe, it, expect, vi, beforeEach } from 'vitest'
 import {
   _hasFieldLevelErrors,
   getEquippedPipetteOptions,
@@ -7,17 +8,13 @@ import {
 } from '../selectors'
 import { getFieldErrors } from '../../steplist/fieldLevel'
 import { getProfileItemsHaveErrors } from '../utils/getProfileItemsHaveErrors'
-import { FormData } from '../../form-types'
-jest.mock('../../steplist/fieldLevel')
-jest.mock('../utils/getProfileItemsHaveErrors')
-const mockGetFieldErrors = getFieldErrors as jest.MockedFunction<
-  typeof getFieldErrors
->
-const mockGetProfileItemsHaveErrors = getProfileItemsHaveErrors as jest.MockedFunction<
-  typeof getProfileItemsHaveErrors
->
+import type { FormData } from '../../form-types'
+
+vi.mock('../../steplist/fieldLevel')
+vi.mock('../utils/getProfileItemsHaveErrors')
+
 beforeEach(() => {
-  jest.clearAllMocks()
+  vi.clearAllMocks()
 })
 describe('_hasFieldLevelErrors', () => {
   it('should return true if form is "thermocycler", has "profileItemsById" field, and _getProfileItemsHaveErrors returns true', () => {
@@ -28,14 +25,14 @@ describe('_hasFieldLevelErrors', () => {
         foo: 'abc',
       },
     }
-    mockGetProfileItemsHaveErrors.mockImplementation(profileItems => {
+    vi.mocked(getProfileItemsHaveErrors).mockImplementation(profileItems => {
       expect(profileItems).toEqual(formData.profileItemsById)
       return true
     })
 
     const result = _hasFieldLevelErrors(formData)
 
-    expect(mockGetProfileItemsHaveErrors).toHaveBeenCalled()
+    expect(vi.mocked(getProfileItemsHaveErrors)).toHaveBeenCalled()
     expect(result).toBe(true)
   })
   const testCases = [
@@ -52,7 +49,7 @@ describe('_hasFieldLevelErrors', () => {
   ]
   testCases.forEach(({ testName, mockGetFieldErrorsReturn, expected }) => {
     it(testName, () => {
-      mockGetFieldErrors.mockImplementation((name, value) => {
+      vi.mocked(getFieldErrors).mockImplementation((name, value) => {
         expect(name).toEqual('blah')
         expect(value).toEqual('spam')
         return mockGetFieldErrorsReturn

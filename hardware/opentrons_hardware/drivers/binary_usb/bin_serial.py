@@ -5,8 +5,8 @@ import concurrent.futures
 from functools import partial
 from typing import Optional, Type, Tuple
 
-import serial  # type: ignore[import]
-from serial.tools.list_ports import comports  # type: ignore[import]
+import serial  # type: ignore[import-untyped]
+from serial.tools.list_ports import comports  # type: ignore[import-untyped]
 
 from opentrons_shared_data.errors.exceptions import InternalUSBCommunicationError
 

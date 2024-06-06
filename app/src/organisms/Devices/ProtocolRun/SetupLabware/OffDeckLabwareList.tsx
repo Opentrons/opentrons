@@ -1,7 +1,6 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
-import { SPACING, TYPOGRAPHY } from '@opentrons/components'
-import { StyledText } from '../../../../atoms/text'
+import { SPACING, TYPOGRAPHY, StyledText } from '@opentrons/components'
 import { LabwareListItem } from './LabwareListItem'
 import type { RunTimeCommand } from '@opentrons/shared-data'
 import type { LabwareSetupItem } from '../../../../pages/Protocols/utils'

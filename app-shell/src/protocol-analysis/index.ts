@@ -1,13 +1,15 @@
-import * as ProtocolAnalysis from '@opentrons/app/src/redux/protocol-analysis'
-import * as Cfg from '@opentrons/app/src/redux/config'
-
 import { createLogger } from '../log'
 import { getConfig, handleConfigChange } from '../config'
+import { updateConfigValue } from '../config/actions'
 import { getValidLabwareFilePaths } from '../labware'
 import {
   showOpenDirectoryDialog,
   openDirectoryInFileExplorer,
 } from '../dialogs'
+import {
+  CHANGE_PYTHON_PATH_OVERRIDE,
+  OPEN_PYTHON_DIRECTORY,
+} from '../constants'
 import { selectPythonPath, getPythonPath } from './getPythonPath'
 import { executeAnalyzeCli } from './executeAnalyzeCli'
 import { writeFailedAnalysis } from './writeFailedAnalysis'
@@ -33,20 +35,20 @@ export function registerProtocolAnalysis(
 
   return function handleIncomingAction(action: Action): void {
     switch (action.type) {
-      case ProtocolAnalysis.OPEN_PYTHON_DIRECTORY: {
+      case OPEN_PYTHON_DIRECTORY: {
         const dir = getConfig().python.pathToPythonOverride
         openDirectoryInFileExplorer(dir).catch(err => {
           log.debug('Error opening python directory', err.message)
         })
         break
       }
-      case ProtocolAnalysis.CHANGE_PYTHON_PATH_OVERRIDE: {
+      case CHANGE_PYTHON_PATH_OVERRIDE: {
         showOpenDirectoryDialog(mainWindow)
           .then(filePaths => {
             if (filePaths.length > 0) {
               const nextValue = filePaths[0]
               dispatch(
-                Cfg.updateConfigValue(
+                updateConfigValue(
                   CONFIG_PYTHON_PATH_TO_PYTHON_OVERRIDE,
                   nextValue
                 )

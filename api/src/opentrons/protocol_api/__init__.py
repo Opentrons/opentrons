@@ -22,13 +22,15 @@ from .module_contexts import (
     HeaterShakerContext,
     MagneticBlockContext,
 )
+from .disposal_locations import TrashBin, WasteChute
 from ._liquid import Liquid
 from ._types import OFF_DECK
-from ._waste_chute import WasteChute
 from ._nozzle_layout import (
     COLUMN,
-    EMPTY,
+    ALL,
 )
+from ._parameters import Parameters
+from ._parameter_context import ParameterContext
 
 from .create_protocol_context import (
     create_protocol_context,
@@ -48,12 +50,15 @@ __all__ = [
     "ThermocyclerContext",
     "HeaterShakerContext",
     "MagneticBlockContext",
+    "ParameterContext",
     "Labware",
+    "TrashBin",
     "WasteChute",
     "Well",
     "Liquid",
+    "Parameters",
     "COLUMN",
-    "EMPTY",
+    "ALL",
     "OFF_DECK",
     # For internal Opentrons use only:
     "create_protocol_context",

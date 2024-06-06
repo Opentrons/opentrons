@@ -4,7 +4,7 @@ from typing import Optional
 
 import pytest
 from mock import MagicMock, PropertyMock, call
-from serial import Serial  # type: ignore[import]
+from serial import Serial  # type: ignore[import-untyped]
 from opentrons.drivers.asyncio.communication import AsyncSerial
 
 

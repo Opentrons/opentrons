@@ -3,7 +3,6 @@ from mock import patch, PropertyMock, MagicMock
 
 import pytest
 import asyncio
-from decoy import matchers
 from opentrons.hardware_control import ExecutionManager
 from opentrons.hardware_control.modules import (
     ModuleType,
@@ -308,7 +307,6 @@ def test_post_serial_update(api_client, hardware, tempdeck):
         p.assert_called_once_with(
             tempdeck,
             tempdeck._bundled_fw.path,
-            matchers.IsA(asyncio.AbstractEventLoop),
         )
 
         body = resp.json()

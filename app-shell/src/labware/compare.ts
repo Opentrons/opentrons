@@ -1,5 +1,3 @@
-// import type { CheckedLabwareFile } from '@opentrons/app/src/redux/custom-labware/types'
-
 // TODO(bc, 2021-02-22): this function needs to be rewritten to satisfy how TS prefers to
 // consume the `CheckedLabwareFile` union type. revisit once `app/src` is all in TS
 

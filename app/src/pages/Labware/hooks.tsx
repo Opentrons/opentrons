@@ -37,10 +37,16 @@ export function useAllLabware(
       : null
   )
   const sortLabware = (a: LabwareDefAndDate, b: LabwareDefAndDate): number => {
-    if (a.definition.metadata.displayName < b.definition.metadata.displayName) {
+    if (
+      a.definition.metadata.displayName.toUpperCase() <
+      b.definition.metadata.displayName.toUpperCase()
+    ) {
       return sortBy === 'alphabetical' ? -1 : 1
     }
-    if (a.definition.metadata.displayName > b.definition.metadata.displayName) {
+    if (
+      a.definition.metadata.displayName.toUpperCase() >
+      b.definition.metadata.displayName.toUpperCase()
+    ) {
       return sortBy === 'alphabetical' ? 1 : -1
     }
     return 0
@@ -63,7 +69,7 @@ export function useLabwareFailure(): {
   labwareFailureMessage: string | null
   clearLabwareFailure: () => unknown
 } {
-  const { t } = useTranslation('labware_landing')
+  const { t } = useTranslation(['labware_landing', 'branded'])
   const dispatch = useDispatch<Dispatch>()
   const labwareFailure = useSelector(getAddLabwareFailure)
 
@@ -76,7 +82,7 @@ export function useLabwareFailure(): {
     } else if (failedFile?.type === 'DUPLICATE_LABWARE_FILE') {
       errorMessage = t('duplicate_labware_def')
     } else if (failedFile?.type === 'OPENTRONS_LABWARE_FILE') {
-      errorMessage = t('opentrons_labware_def')
+      errorMessage = t('branded:opentrons_labware_def')
     }
     labwareFailureMessage =
       failedFile != null

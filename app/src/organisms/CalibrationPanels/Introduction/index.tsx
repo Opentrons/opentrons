@@ -9,10 +9,10 @@ import {
   ALIGN_CENTER,
   PrimaryButton,
   SecondaryButton,
+  StyledText,
 } from '@opentrons/components'
 
 import * as Sessions from '../../../redux/sessions'
-import { StyledText } from '../../../atoms/text'
 import { NeedHelpLink } from '../NeedHelpLink'
 import { ChooseTipRack } from '../ChooseTipRack'
 
@@ -121,7 +121,9 @@ export function Introduction(props: CalibrationPanelProps): JSX.Element {
       mount={props.mount}
       chosenTipRack={chosenTipRack}
       handleChosenTipRack={handleChosenTipRack}
-      closeModal={() => setShowChooseTipRack(false)}
+      closeModal={() => {
+        setShowChooseTipRack(false)
+      }}
       robotName={props.robotName}
       defaultTipracks={props.defaultTipracks}
     />
@@ -169,7 +171,11 @@ export function Introduction(props: CalibrationPanelProps): JSX.Element {
         <NeedHelpLink />
         <Flex alignItems={ALIGN_CENTER} gridGap={SPACING.spacing8}>
           {allowChangeTipRack ? (
-            <SecondaryButton onClick={() => setShowChooseTipRack(true)}>
+            <SecondaryButton
+              onClick={() => {
+                setShowChooseTipRack(true)
+              }}
+            >
               {t('change_tip_rack')}
             </SecondaryButton>
           ) : null}

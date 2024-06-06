@@ -6,7 +6,7 @@ from .command import Command, CompletedCommand, CommandResult
 
 
 CommandHandler = typing.Callable[
-    [str, typing.Dict[typing.Any, typing.Any]], typing.Coroutine
+    [str, typing.Dict[typing.Any, typing.Any]], typing.Coroutine[None, None, None]
 ]
 
 

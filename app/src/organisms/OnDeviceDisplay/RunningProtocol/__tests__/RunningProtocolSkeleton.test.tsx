@@ -1,7 +1,8 @@
 import * as React from 'react'
+import { screen } from '@testing-library/react'
+import { beforeEach, describe, expect, it } from 'vitest'
 
-import { renderWithProviders } from '@opentrons/components'
-
+import { renderWithProviders } from '../../../../__testing-utils__'
 import { RunningProtocolSkeleton } from '../RunningProtocolSkeleton'
 
 const render = (
@@ -20,9 +21,9 @@ describe('RunningProtocolSkeleton', () => {
   })
 
   it('renders Skeletons when current option is CurrentRunningProtocolCommand', () => {
-    const [{ getAllByTestId, getAllByRole }] = render(props)
-    const skeletons = getAllByTestId('Skeleton')
-    const buttons = getAllByRole('button')
+    render(props)
+    const skeletons = screen.getAllByTestId('Skeleton')
+    const buttons = screen.getAllByRole('button')
     expect(buttons.length).toBe(2)
     // Note Skeleton component checks width and height so here just check the number of skeletons and background-size
     expect(skeletons.length).toBe(4)
@@ -32,9 +33,9 @@ describe('RunningProtocolSkeleton', () => {
 
   it('renders Skeletons when current option is RunningProtocolCommandList', () => {
     props = { currentOption: 'RunningProtocolCommandList' }
-    const [{ getAllByTestId, getAllByRole }] = render(props)
-    const skeletons = getAllByTestId('Skeleton')
-    const buttons = getAllByRole('button')
+    render(props)
+    const skeletons = screen.getAllByTestId('Skeleton')
+    const buttons = screen.getAllByRole('button')
     expect(buttons.length).toBe(2)
     expect(skeletons.length).toBe(8)
     expect(skeletons[0]).toHaveStyle('animation: shimmer 2s infinite linear')

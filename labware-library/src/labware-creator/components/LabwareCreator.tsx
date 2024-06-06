@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { Nav, Breadcrumbs } from '../../components/Nav'
 import { AnalyticsOptInModal } from '../../analytics/AnalyticsOptInModal'
-import styles from './LabwareCreator.css'
+import styles from './LabwareCreator.module.css'
 
 interface Props {
   children: React.ReactNode

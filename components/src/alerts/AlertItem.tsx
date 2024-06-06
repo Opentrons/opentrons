@@ -2,7 +2,7 @@ import * as React from 'react'
 import cx from 'classnames'
 import { Icon } from '../icons'
 import { IconButton } from '../buttons'
-import styles from './alerts.css'
+import styles from './alerts.module.css'
 
 import type { IconProps } from '../icons'
 
@@ -68,7 +68,9 @@ export function AlertItem(props: AlertItemProps): JSX.Element {
     <div className={className}>
       <div className={styles.title_bar}>
         <Icon {...iconProps} />
-        <span className={styles.title}>{props.title}</span>
+        <span className={styles.title} data-testid="alert_item_title">
+          {props.title}
+        </span>
         {props.onCloseClick && (
           <IconButton
             name="close"

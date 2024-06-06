@@ -1,3 +1,5 @@
+import { describe, it, expect } from 'vitest'
+
 import { setupEpicTestMocks, runEpicTest } from '../../../robot-api/__utils__'
 
 import * as Fixtures from '../../__fixtures__'
@@ -10,10 +12,6 @@ const makeTriggerAction = (robotName: string) =>
   Actions.createSession(robotName, 'calibrationCheck')
 
 describe('createSessionEpic', () => {
-  afterEach(() => {
-    jest.resetAllMocks()
-  })
-
   const expectedRequest = {
     method: 'POST',
     path: '/sessions',

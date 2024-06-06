@@ -15,6 +15,8 @@ from opentrons.hardware_control.modules.module_calibration import (
     save_module_calibration_offset,
 )
 from opentrons.hardware_control.modules.types import ModuleType
+from opentrons.hardware_control.modules import SimulatingModuleAtPort
+
 from opentrons.types import Point
 from .types import AionotifyEvent, BoardRevision, OT3Mount
 from . import modules
@@ -26,7 +28,15 @@ if TYPE_CHECKING:
 
 log = logging.getLogger(__name__)
 
-MODULE_PORT_REGEX = re.compile("|".join(modules.MODULE_TYPE_BY_NAME.keys()), re.I)
+MODULE_PORT_REGEX = re.compile(
+    # add a negative lookbehind to suppress matches on OT-2 tempfiles udev creates
+    r"(?<!\.#ot_module_)"
+    # capture all modules by name using alternation
+    + "(" + "|".join(modules.MODULE_TYPE_BY_NAME.keys()) + ")"
+    # add a negative lookahead to suppress matches on Flex tempfiles udev creates
+    + r"\d+(?!\.tmp-c\d+:\d+)",
+    re.I,
+)
 
 
 class AttachedModulesControl:
@@ -78,6 +88,7 @@ class AttachedModulesControl:
         usb_port: types.USBPort,
         type: modules.ModuleType,
         sim_model: Optional[str] = None,
+        sim_serial_number: Optional[str] = None,
     ) -> modules.AbstractModule:
         return await modules.build(
             port=port,
@@ -87,10 +98,14 @@ class AttachedModulesControl:
             hw_control_loop=self._api.loop,
             execution_manager=self._api._execution_manager,
             sim_model=sim_model,
+            sim_serial_number=sim_serial_number,
         )
 
     async def unregister_modules(
-        self, mods_at_ports: List[modules.ModuleAtPort]
+        self,
+        mods_at_ports: Union[
+            List[modules.ModuleAtPort], List[modules.SimulatingModuleAtPort]
+        ],
     ) -> None:
         """
         De-register Modules.
@@ -120,7 +135,9 @@ class AttachedModulesControl:
 
     async def register_modules(
         self,
-        new_mods_at_ports: Optional[List[modules.ModuleAtPort]] = None,
+        new_mods_at_ports: Optional[
+            Union[List[modules.ModuleAtPort], List[modules.SimulatingModuleAtPort]]
+        ] = None,
         removed_mods_at_ports: Optional[List[modules.ModuleAtPort]] = None,
     ) -> None:
         """
@@ -146,6 +163,14 @@ class AttachedModulesControl:
                 port=mod.port,
                 usb_port=mod.usb_port,
                 type=modules.MODULE_TYPE_BY_NAME[mod.name],
+                sim_serial_number=(
+                    mod.serial_number
+                    if isinstance(mod, SimulatingModuleAtPort)
+                    else None
+                ),
+                sim_model=(
+                    mod.model if isinstance(mod, SimulatingModuleAtPort) else None
+                ),
             )
             self._available_modules.append(new_instance)
             log.info(
@@ -183,7 +208,7 @@ class AttachedModulesControl:
         """
         match = MODULE_PORT_REGEX.search(port)
         if match:
-            name = match.group().lower()
+            name = match.group(1).lower()
             if name not in modules.MODULE_TYPE_BY_NAME:
                 log.warning(f"Unexpected module connected: {name} on {port}")
                 return None
@@ -205,10 +230,10 @@ class AttachedModulesControl:
         new_modules = None
         removed_modules = None
         if maybe_module_at_port is not None:
-            if hasattr(event.flags, "DELETE"):
+            if hasattr(event.flags, "DELETE") or hasattr(event.flags, "MOVED_FROM"):
                 removed_modules = [maybe_module_at_port]
                 log.info(f"Module Removed: {maybe_module_at_port}")
-            elif hasattr(event.flags, "CREATE"):
+            elif hasattr(event.flags, "CREATE") or hasattr(event.flags, "MOVED_TO"):
                 new_modules = [maybe_module_at_port]
                 log.info(f"Module Added: {maybe_module_at_port}")
             try:

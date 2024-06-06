@@ -1,16 +1,15 @@
 import * as React from 'react'
 
 import {
+  ALIGN_CENTER,
   Btn,
+  COLORS,
   Flex,
   Icon,
-  ALIGN_CENTER,
-  COLORS,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
-
-import { StyledText } from '../../atoms/text'
 
 export function ODDBackButton(
   props: React.HTMLProps<HTMLButtonElement>
@@ -21,7 +20,7 @@ export function ODDBackButton(
     <Flex alignItems={ALIGN_CENTER} gridGap={SPACING.spacing16}>
       <Btn onClick={onClick}>
         <Icon
-          color={COLORS.darkBlack100}
+          color={COLORS.black90}
           data-testid="back_icon"
           name="back"
           width="3rem"

@@ -1,3 +1,4 @@
+export * from './getAddressableAreaDisplayName'
 export * from './getLabwareName'
 export * from './getPipetteNameOnMount'
 export * from './getModuleModel'

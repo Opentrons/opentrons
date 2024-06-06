@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { css } from 'styled-components'
-import { ViewportList, ViewportListRef } from 'react-viewport-list'
+import { ViewportList } from 'react-viewport-list'
 
 import {
   ALIGN_CENTER,
@@ -13,23 +13,22 @@ import {
   Flex,
   JUSTIFY_SPACE_BETWEEN,
   OVERFLOW_HIDDEN,
+  OVERFLOW_WRAP_ANYWHERE,
   POSITION_RELATIVE,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { RUN_STATUS_RUNNING, RUN_STATUS_IDLE } from '@opentrons/api-client'
 
-import { StyledText } from '../../../atoms/text'
 import { CommandText } from '../../CommandText'
 import { CommandIcon } from '../../RunPreview/CommandIcon'
+import { getCommandTextData } from '../../CommandText/utils/getCommandTextData'
 import { PlayPauseButton } from './PlayPauseButton'
 import { StopButton } from './StopButton'
-import {
-  ANALYTICS_PROTOCOL_RUN_START,
-  ANALYTICS_PROTOCOL_RUN_RESUME,
-  ANALYTICS_PROTOCOL_RUN_PAUSE,
-} from '../../../redux/analytics'
+import { ANALYTICS_PROTOCOL_RUN_ACTION } from '../../../redux/analytics'
 
+import type { ViewportListRef } from 'react-viewport-list'
 import type {
   CompletedProtocolAnalysis,
   RobotType,
@@ -39,7 +38,7 @@ import type { TrackProtocolRunEvent } from '../../Devices/hooks'
 import type { RobotAnalyticsData } from '../../../redux/analytics/types'
 
 const TITLE_TEXT_STYLE = css`
-  color: ${COLORS.darkBlack70};
+  color: ${COLORS.grey60};
   font-size: ${TYPOGRAPHY.fontSize28};
   font-weight: ${TYPOGRAPHY.fontWeightSemiBold};
   line-height: ${TYPOGRAPHY.lineHeight36};
@@ -47,7 +46,7 @@ const TITLE_TEXT_STYLE = css`
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 2;
   overflow: hidden;
-  overflow-wrap: anywhere;
+  overflow-wrap: ${OVERFLOW_WRAP_ANYWHERE};
   height: max-content;
 `
 
@@ -118,14 +117,14 @@ export function RunningProtocolCommandList({
   const onTogglePlayPause = (): void => {
     if (runStatus === RUN_STATUS_RUNNING) {
       pauseRun()
-      trackProtocolRunEvent({ name: ANALYTICS_PROTOCOL_RUN_PAUSE })
+      trackProtocolRunEvent({ name: ANALYTICS_PROTOCOL_RUN_ACTION.PAUSE })
     } else {
       playRun()
       trackProtocolRunEvent({
         name:
           runStatus === RUN_STATUS_IDLE
-            ? ANALYTICS_PROTOCOL_RUN_START
-            : ANALYTICS_PROTOCOL_RUN_RESUME,
+            ? ANALYTICS_PROTOCOL_RUN_ACTION.START
+            : ANALYTICS_PROTOCOL_RUN_ACTION.RESUME,
         properties:
           runStatus === RUN_STATUS_IDLE && robotAnalyticsData != null
             ? robotAnalyticsData
@@ -216,9 +215,7 @@ export function RunningProtocolCommandList({
           >
             {(command, index) => {
               const backgroundColor =
-                index === currentRunCommandIndex
-                  ? COLORS.mediumBlueEnabled
-                  : COLORS.light1
+                index === currentRunCommandIndex ? COLORS.blue35 : COLORS.grey35
               return (
                 <Flex
                   key={command.id}
@@ -233,14 +230,16 @@ export function RunningProtocolCommandList({
                     fontSize="1.375rem"
                     lineHeight="1.75rem"
                     fontWeight={TYPOGRAPHY.fontWeightRegular}
-                    borderRadius={BORDERS.borderRadiusSize2}
+                    borderRadius={BORDERS.borderRadius8}
+                    gridGap="0.875rem"
                   >
-                    <CommandIcon command={command} />
+                    <CommandIcon command={command} size="2rem" />
                     <CommandText
                       command={command}
-                      robotSideAnalysis={robotSideAnalysis}
+                      commandTextData={getCommandTextData(robotSideAnalysis)}
                       robotType={robotType}
                       css={COMMAND_ROW_STYLE}
+                      isOnDevice={true}
                     />
                   </Flex>
                 </Flex>

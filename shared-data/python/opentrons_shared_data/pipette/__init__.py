@@ -95,7 +95,7 @@ def _fuse_specs_cached(
     # unfortunately, mypy can't verify this way to build typed dicts - we'll
     # make sure it's correct in the tests, and leave the function annotated
     # properly
-    return {**model_data, **name_data}  # type: ignore
+    return {**model_data, **name_data}
 
 
 def dummy_model_for_name(pipette_name: PipetteName) -> PipetteModel:

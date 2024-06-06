@@ -123,6 +123,7 @@ def test_reset_all_set(
     mock_reset_boot_scripts.assert_called_once()
     mock_reset_pipette_offset.assert_called_once()
     mock_reset_deck_calibration.assert_called_once()
+    mock_reset_deck_calibration.assert_called_once()
     mock_reset_tip_length_calibrations.assert_called_once()
 
 

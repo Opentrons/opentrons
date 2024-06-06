@@ -1,4 +1,4 @@
-// shell/update tests
+import { describe, it, expect } from 'vitest'
 
 import * as ShellUpdate from '../update'
 import { shellUpdateReducer } from '../reducer'

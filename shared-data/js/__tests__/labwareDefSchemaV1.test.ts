@@ -1,6 +1,7 @@
 import path from 'path'
 import glob from 'glob'
 import Ajv from 'ajv'
+import { describe, expect, it, beforeAll } from 'vitest'
 
 import { labwareSchemaV1 } from '../schema'
 import type { LabwareDefinition1 } from '../types'

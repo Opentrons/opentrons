@@ -1,15 +1,16 @@
 import * as React from 'react'
+import { useTranslation } from 'react-i18next'
 import cx from 'classnames'
-import { i18n } from '../../localization'
-import { Icon, IconName } from '@opentrons/components'
+import { Icon } from '@opentrons/components'
 import { PDListItem } from '../lists'
-import styles from './styles.css'
+import styles from './styles.module.css'
 import {
   getLabwareDefURI,
   getLabwareDefIsStandard,
   getLabwareDisplayName,
-  LabwareDefinition2,
 } from '@opentrons/shared-data'
+import type { LabwareDefinition2 } from '@opentrons/shared-data'
+import type { IconName } from '@opentrons/components'
 
 interface Props {
   disabled?: boolean | null
@@ -31,7 +32,7 @@ export function LabwareItem(props: Props): JSX.Element {
     onMouseEnter,
     selectLabware,
   } = props
-
+  const { t } = useTranslation('modal')
   const displayName = getLabwareDisplayName(labwareDef)
   const labwareURI = getLabwareDefURI(labwareDef)
   const labwareLoadName = labwareDef.parameters.loadName
@@ -59,9 +60,11 @@ export function LabwareItem(props: Props): JSX.Element {
           target="_blank"
           rel="noopener noreferrer"
           href={`${LABWARE_LIBRARY_PAGE_PATH}/${labwareLoadName}`}
-          onClick={e => e.stopPropagation()}
+          onClick={e => {
+            e.stopPropagation()
+          }}
         >
-          {i18n.t('modal.labware_selection.view_measurements')}
+          {t('labware_selection.view_measurements')}
         </a>
       ) : null}
     </PDListItem>

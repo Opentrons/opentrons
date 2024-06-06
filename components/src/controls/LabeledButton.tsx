@@ -3,7 +3,7 @@ import cx from 'classnames'
 
 import { OutlineButton } from '../buttons'
 import { LabeledControl } from './LabeledControl'
-import styles from './styles.css'
+import styles from './styles.module.css'
 
 import type { ButtonProps } from '../buttons'
 

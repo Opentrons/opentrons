@@ -1,24 +1,21 @@
 import * as React from 'react'
-import { when, resetAllWhenMocks } from 'jest-when'
+import { when } from 'vitest-when'
+import { describe, it, beforeEach, vi, afterEach, expect } from 'vitest'
+import { screen } from '@testing-library/react'
 
-import { renderWithProviders } from '@opentrons/components'
-
+import { renderWithProviders } from '../../../../__testing-utils__'
 import { i18n } from '../../../../i18n'
 import { mockTipRackDefinition } from '../../../../redux/custom-labware/__fixtures__'
 import { useRunPipetteInfoByMount } from '../../hooks'
 import { SetupPipetteCalibrationItem } from '../SetupPipetteCalibrationItem'
 import { SetupInstrumentCalibration } from '../SetupInstrumentCalibration'
+import { useNotifyRunQuery } from '../../../../resources/runs'
+
 import type { PipetteInfo } from '../../hooks'
 
-jest.mock('../../hooks')
-jest.mock('../SetupPipetteCalibrationItem')
-
-const mockUseRunPipetteInfoByMount = useRunPipetteInfoByMount as jest.MockedFunction<
-  typeof useRunPipetteInfoByMount
->
-const mockSetupPipetteCalibrationItem = SetupPipetteCalibrationItem as jest.MockedFunction<
-  typeof SetupPipetteCalibrationItem
->
+vi.mock('../../hooks')
+vi.mock('../SetupPipetteCalibrationItem')
+vi.mock('../../../../resources/runs')
 
 const ROBOT_NAME = 'otie'
 const RUN_ID = '1'
@@ -49,32 +46,37 @@ const render = () => {
 
 describe('SetupPipetteCalibration', () => {
   beforeEach(() => {
-    when(mockUseRunPipetteInfoByMount).calledWith(RUN_ID).mockReturnValue({
+    when(vi.mocked(useRunPipetteInfoByMount)).calledWith(RUN_ID).thenReturn({
       left: PIPETTE_INFO,
       right: null,
     })
-    when(mockSetupPipetteCalibrationItem).mockReturnValue(
+    vi.mocked(SetupPipetteCalibrationItem).mockReturnValue(
       <div>Mock SetupPipetteCalibrationItem</div>
     )
+    vi.mocked(useNotifyRunQuery).mockReturnValue({} as any)
   })
   afterEach(() => {
-    resetAllWhenMocks()
+    vi.clearAllMocks()
   })
 
   it('renders required pipettes title', () => {
-    const { getByText } = render()
-    getByText('Required Instrument Calibrations')
+    render()
+    screen.getByText('Required Instrument Calibrations')
   })
   it('renders one SetupPipetteCalibrationItem when protocol run requires one pipette', () => {
-    const { getAllByText } = render()
-    expect(getAllByText('Mock SetupPipetteCalibrationItem')).toHaveLength(1)
+    render()
+    expect(
+      screen.getAllByText('Mock SetupPipetteCalibrationItem')
+    ).toHaveLength(1)
   })
   it('renders two SetupPipetteCalibrationItems when protocol run requires two pipettes', () => {
-    when(mockUseRunPipetteInfoByMount).calledWith(RUN_ID).mockReturnValue({
+    when(vi.mocked(useRunPipetteInfoByMount)).calledWith(RUN_ID).thenReturn({
       left: PIPETTE_INFO,
       right: PIPETTE_INFO,
     })
-    const { getAllByText } = render()
-    expect(getAllByText('Mock SetupPipetteCalibrationItem')).toHaveLength(2)
+    render()
+    expect(
+      screen.getAllByText('Mock SetupPipetteCalibrationItem')
+    ).toHaveLength(2)
   })
 })

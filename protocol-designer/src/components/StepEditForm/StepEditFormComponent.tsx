@@ -1,7 +1,6 @@
 import * as React from 'react'
 import cx from 'classnames'
 import get from 'lodash/get'
-import { StepFieldName } from '../../steplist/fieldLevel'
 import { MoreOptionsModal } from '../modals/MoreOptionsModal'
 import {
   MixForm,
@@ -13,12 +12,13 @@ import {
   ThermocyclerForm,
   HeaterShakerForm,
 } from './forms'
-import { FormAlerts } from './FormAlerts'
+import { Alerts } from '../alerts/Alerts'
 import { ButtonRow } from './ButtonRow'
-import formStyles from '../forms/forms.css'
-import styles from './StepEditForm.css'
-import { FormData, StepType } from '../../form-types'
-import { FieldPropsByName, FocusHandlers, StepFormProps } from './types'
+import formStyles from '../forms/forms.module.css'
+import styles from './StepEditForm.module.css'
+import type { StepFieldName } from '../../steplist/fieldLevel'
+import type { FormData, StepType } from '../../form-types'
+import type { FieldPropsByName, FocusHandlers, StepFormProps } from './types'
 
 type StepFormMap = {
   [K in StepType]?: React.ComponentType<StepFormProps> | null
@@ -82,8 +82,11 @@ export const StepEditFormComponent = (props: Props): JSX.Element => {
       {showMoreOptionsModal && (
         <MoreOptionsModal formData={formData} close={toggleMoreOptionsModal} />
       )}
-      {/* @ts-expect-error(ce, 2021-06-22) getting into the weeds of `connect` and props and not sure what is going on */}
-      <FormAlerts focusedField={focusedField} dirtyFields={dirtyFields} />
+      <Alerts
+        focusedField={focusedField}
+        dirtyFields={dirtyFields}
+        componentType="Form"
+      />
       <div className={cx(formStyles.form, styles[formData.stepType])}>
         <FormComponent {...{ formData, propsForFields, focusHandlers }} />
         <ButtonRow

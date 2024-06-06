@@ -1,3 +1,4 @@
+import { describe, it, expect } from 'vitest'
 import { WASTE_CHUTE_CUTOUT } from '@opentrons/shared-data'
 import { getHasWasteChute } from '..'
 import type { AdditionalEquipmentEntities } from '@opentrons/step-generation'

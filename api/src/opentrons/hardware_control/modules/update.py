@@ -3,7 +3,7 @@ import logging
 import os
 from pathlib import Path
 from glob import glob
-from typing import Any, AsyncGenerator, Dict, Tuple, Optional, Union
+from typing import Any, AsyncGenerator, Dict, Tuple, Union
 from .types import UpdateError
 from .mod_abc import AbstractModule
 from opentrons.hardware_control.threaded_async_lock import ThreadedAsyncLock
@@ -23,7 +23,6 @@ async def protect_update_transition() -> AsyncGenerator[None, None]:
 async def update_firmware(
     module: AbstractModule,
     firmware_file: Union[str, Path],
-    loop: Optional[asyncio.AbstractEventLoop],
 ) -> None:
     """Apply update of given firmware file to given module.
 
@@ -34,7 +33,6 @@ async def update_firmware(
         kwargs: Dict[str, Any] = {
             "stdout": asyncio.subprocess.PIPE,
             "stderr": asyncio.subprocess.PIPE,
-            "loop": loop,
         }
         successful, res = await module.bootloader()(
             flash_port_or_dfu_serial, str(firmware_file), kwargs

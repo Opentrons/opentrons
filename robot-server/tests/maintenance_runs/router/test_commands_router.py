@@ -1,4 +1,4 @@
-"""Tests for the /runs/.../commands routes."""
+"""Tests for the /maintenance_runs/.../commands routes."""
 import pytest
 
 from datetime import datetime
@@ -6,18 +6,15 @@ from decoy import Decoy, matchers
 
 from opentrons.protocol_engine import (
     CommandSlice,
-    CurrentCommand,
+    CommandPointer,
     ProtocolEngine,
     commands as pe_commands,
     errors as pe_errors,
 )
 from opentrons.protocol_engine.errors import CommandDoesNotExistError
 
-from robot_server.errors import ApiError
-from robot_server.service.json_api import (
-    RequestModel,
-    MultiBodyMeta,
-)
+from robot_server.errors.error_responses import ApiError
+from robot_server.service.json_api import MultiBodyMeta
 
 from robot_server.maintenance_runs.maintenance_engine_store import (
     MaintenanceEngineStore,
@@ -30,13 +27,16 @@ from robot_server.maintenance_runs.maintenance_run_models import (
     MaintenanceRunNotFoundError,
 )
 from robot_server.maintenance_runs.router.commands_router import (
-    CommandCollectionLinks,
-    CommandLink,
-    CommandLinkMeta,
     create_run_command,
     get_run_command,
     get_run_commands,
     get_current_run_engine_from_url,
+)
+from robot_server.runs.command_models import (
+    RequestModelWithCommandCreate,
+    CommandCollectionLinks,
+    CommandLink,
+    CommandLinkMeta,
 )
 
 
@@ -107,7 +107,7 @@ async def test_create_run_command(
     ).then_do(_stub_queued_command_state)
 
     result = await create_run_command(
-        request_body=RequestModel(data=command_request),
+        request_body=RequestModelWithCommandCreate(data=command_request),
         waitUntilComplete=False,
         protocol_engine=mock_protocol_engine,
     )
@@ -165,7 +165,7 @@ async def test_create_run_command_blocking_completion(
     )
 
     result = await create_run_command(
-        request_body=RequestModel(data=command_request),
+        request_body=RequestModelWithCommandCreate(data=command_request),
         waitUntilComplete=True,
         timeout=999,
         protocol_engine=mock_protocol_engine,
@@ -199,13 +199,24 @@ async def test_get_run_commands(
     decoy.when(
         mock_maintenance_run_data_manager.get_current_command("run-id")
     ).then_return(
-        CurrentCommand(
+        CommandPointer(
             command_id="current-command-id",
             command_key="current-command-key",
             created_at=datetime(year=2024, month=4, day=4),
             index=101,
         )
     )
+    decoy.when(
+        mock_maintenance_run_data_manager.get_recovery_target_command("run-id")
+    ).then_return(
+        CommandPointer(
+            command_id="recovery-target-command-id",
+            command_key="recovery-target-command-key",
+            created_at=datetime(year=2025, month=5, day=5),
+            index=202,
+        )
+    )
+
     decoy.when(
         mock_maintenance_run_data_manager.get_commands_slice(
             run_id="run-id",
@@ -243,7 +254,7 @@ async def test_get_run_commands(
     assert result.content.meta == MultiBodyMeta(cursor=1, totalLength=3)
     assert result.content.links == CommandCollectionLinks(
         current=CommandLink(
-            href="/runs/run-id/commands/current-command-id",
+            href="/maintenance_runs/run-id/commands/current-command-id",
             meta=CommandLinkMeta(
                 runId="run-id",
                 commandId="current-command-id",
@@ -251,7 +262,17 @@ async def test_get_run_commands(
                 createdAt=datetime(year=2024, month=4, day=4),
                 index=101,
             ),
-        )
+        ),
+        currentlyRecoveringFrom=CommandLink(
+            href="/maintenance_runs/run-id/commands/recovery-target-command-id",
+            meta=CommandLinkMeta(
+                runId="run-id",
+                commandId="recovery-target-command-id",
+                key="recovery-target-command-key",
+                createdAt=datetime(year=2025, month=5, day=5),
+                index=202,
+            ),
+        ),
     )
     assert result.status_code == 200
 

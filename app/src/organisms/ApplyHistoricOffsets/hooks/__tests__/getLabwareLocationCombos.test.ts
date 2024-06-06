@@ -1,15 +1,15 @@
-import fixture_tiprack_300_ul from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_300_ul.json'
-import fixture_adapter from '@opentrons/shared-data/labware/definitions/2/opentrons_96_pcr_adapter/1.json'
+import { describe, it, expect } from 'vitest'
 import {
   getLabwareDefURI,
-  ProtocolAnalysisOutput,
+  opentrons96PcrAdapterV1,
+  fixtureTiprack300ul,
 } from '@opentrons/shared-data'
 import { getLabwareLocationCombos } from '../getLabwareLocationCombos'
 
 import type { LabwareDefinition2, RunTimeCommand } from '@opentrons/shared-data'
 
-const mockAdapterDef = fixture_adapter as LabwareDefinition2
-const mockLabwareDef = fixture_tiprack_300_ul as LabwareDefinition2
+const mockAdapterDef = opentrons96PcrAdapterV1 as LabwareDefinition2
+const mockLabwareDef = fixtureTiprack300ul as LabwareDefinition2
 const mockLoadLabwareCommands: RunTimeCommand[] = [
   {
     key: 'CommandKey0',
@@ -132,7 +132,7 @@ const mockLoadLabwareCommands: RunTimeCommand[] = [
   },
 ]
 
-const mockLabwareEntities: ProtocolAnalysisOutput['labware'] = [
+const mockLabwareEntities = [
   {
     id: 'firstLabwareId',
     loadName: mockLabwareDef.parameters.loadName,
@@ -186,7 +186,7 @@ describe('getLabwareLocationCombos', () => {
     const commands: RunTimeCommand[] = mockLoadLabwareCommands
 
     const labware = mockLabwareEntities
-    const modules: ProtocolAnalysisOutput['modules'] = [
+    const modules: any = [
       {
         id: 'firstModuleId',
         model: 'heaterShakerModuleV1',
@@ -281,7 +281,7 @@ describe('getLabwareLocationCombos', () => {
       },
     ]
 
-    const labware: ProtocolAnalysisOutput['labware'] = [
+    const labware = [
       {
         id: 'firstLabwareId',
         loadName: mockLabwareDef.parameters.loadName,
@@ -304,7 +304,7 @@ describe('getLabwareLocationCombos', () => {
         displayName: 'duplicate labware nickname',
       },
     ]
-    const modules: ProtocolAnalysisOutput['modules'] = [
+    const modules: any = [
       {
         id: 'firstModuleId',
         model: 'heaterShakerModuleV1',

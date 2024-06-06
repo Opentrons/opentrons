@@ -103,3 +103,9 @@ class Liquid(BaseModel):
 class Labware(BaseModel):
     displayName: Optional[str]
     definitionId: str
+
+
+class NozzleConfigurationParams(BaseModel):
+    style: str
+    primaryNozzle: Optional[str]
+    frontRightNozzle: Optional[str]

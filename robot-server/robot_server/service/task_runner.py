@@ -73,7 +73,7 @@ class TaskRunner:
 def initialize_task_runner(app_state: AppState) -> None:
     """Create a new `TaskRunner` and store it on `app_state`
 
-    Intended to be called just once, when the server starts up.s
+    Intended to be called just once, when the server starts up.
     """
     _task_runner_accessor.set_on(app_state, TaskRunner())
 

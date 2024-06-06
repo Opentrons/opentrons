@@ -1,17 +1,32 @@
 import fse from 'fs-extra'
 import path from 'path'
 import { shell } from 'electron'
-import first from 'lodash/first'
 
-import { UI_INITIALIZED } from '@opentrons/app/src/redux/shell/actions'
-import * as ProtocolStorageActions from '@opentrons/app/src/redux/protocol-storage/actions'
-
+import {
+  ADD_PROTOCOL,
+  ANALYZE_PROTOCOL,
+  FETCH_PROTOCOLS,
+  INITIAL,
+  OPEN_PROTOCOL_DIRECTORY,
+  POLL,
+  PROTOCOL_ADDITION,
+  REMOVE_PROTOCOL,
+  UI_INITIALIZED,
+  VIEW_PROTOCOL_SOURCE_FOLDER,
+} from '../constants'
+import {
+  analyzeProtocol,
+  analyzeProtocolFailure,
+  analyzeProtocolSuccess,
+  updateProtocolList,
+  updateProtocolListFailure,
+} from '../config/actions'
 import * as FileSystem from './file-system'
 import { createFailedAnalysis } from '../protocol-analysis/writeFailedAnalysis'
 
+import type { ProtocolAnalysisOutput } from '@opentrons/shared-data'
 import type { ProtocolListActionSource as ListSource } from '@opentrons/app/src/redux/protocol-storage/types'
 import type { Action, Dispatch } from '../types'
-import { ProtocolAnalysisOutput } from '@opentrons/shared-data'
 
 const ensureDir: (dir: string) => Promise<void> = fse.ensureDir
 
@@ -20,26 +35,16 @@ export const getUnixTimeFromAnalysisPath = (analysisPath: string): number =>
 
 export const getParsedAnalysisFromPath = (
   analysisPath: string
-): ProtocolAnalysisOutput => {
+): ProtocolAnalysisOutput | undefined => {
   try {
     return fse.readJsonSync(analysisPath)
   } catch (error) {
-    return createFailedAnalysis(
-      error?.message ?? 'protocol analysis file cannot be parsed'
-    )
+    const errorMessage =
+      error instanceof Error && error?.message != null
+        ? error.message
+        : 'protocol analysis file cannot be parsed'
+    return createFailedAnalysis(errorMessage)
   }
-}
-
-export const getProtocolSrcFilePaths = (
-  protocolKey: string
-): Promise<string[]> => {
-  const protocolDir = `${FileSystem.PROTOCOLS_DIRECTORY_PATH}/${protocolKey}`
-  return ensureDir(protocolDir)
-    .then(() => FileSystem.parseProtocolDirs([protocolDir]))
-    .then(storedProtocols => {
-      const storedProtocol = first(storedProtocols)
-      return storedProtocol?.srcFilePaths ?? []
-    })
 }
 
 // Revert a v7.0.0 pre-parity stop-gap solution.
@@ -135,7 +140,7 @@ export const fetchProtocols = (
         }, null)
         const mostRecentAnalysis =
           mostRecentAnalysisFilePath != null
-            ? getParsedAnalysisFromPath(mostRecentAnalysisFilePath)
+            ? getParsedAnalysisFromPath(mostRecentAnalysisFilePath) ?? null
             : null
 
         return {
@@ -151,78 +156,58 @@ export const fetchProtocols = (
           mostRecentAnalysis,
         }
       })
-      dispatch(
-        ProtocolStorageActions.updateProtocolList(storedProtocolsData, source)
-      )
+      dispatch(updateProtocolList(storedProtocolsData, source))
     })
     .catch((error: Error) => {
-      dispatch(
-        ProtocolStorageActions.updateProtocolListFailure(error.message, source)
-      )
+      dispatch(updateProtocolListFailure(error.message, source))
     })
 }
 
 export function registerProtocolStorage(dispatch: Dispatch): Dispatch {
   return function handleActionForProtocolStorage(action: Action) {
     switch (action.type) {
-      case ProtocolStorageActions.FETCH_PROTOCOLS:
+      case FETCH_PROTOCOLS:
       case UI_INITIALIZED: {
-        const source =
-          action.type === ProtocolStorageActions.FETCH_PROTOCOLS
-            ? ProtocolStorageActions.POLL
-            : ProtocolStorageActions.INITIAL
+        const source = action.type === FETCH_PROTOCOLS ? POLL : INITIAL
         fetchProtocols(dispatch, source)
         break
       }
 
-      case ProtocolStorageActions.ADD_PROTOCOL: {
+      case ADD_PROTOCOL: {
         FileSystem.addProtocolFile(
           action.payload.protocolFilePath,
           FileSystem.PROTOCOLS_DIRECTORY_PATH
         ).then(protocolKey => {
-          fetchProtocols(dispatch, ProtocolStorageActions.PROTOCOL_ADDITION)
-          dispatch(ProtocolStorageActions.analyzeProtocol(protocolKey))
+          fetchProtocols(dispatch, PROTOCOL_ADDITION)
+          dispatch(analyzeProtocol(protocolKey))
         })
         break
       }
 
-      case ProtocolStorageActions.ANALYZE_PROTOCOL: {
+      case ANALYZE_PROTOCOL: {
         FileSystem.analyzeProtocolByKey(
           action.payload.protocolKey,
           FileSystem.PROTOCOLS_DIRECTORY_PATH
         )
           .then(() => {
-            dispatch(
-              ProtocolStorageActions.analyzeProtocolSuccess(
-                action.payload.protocolKey
-              )
-            )
-            return fetchProtocols(
-              dispatch,
-              ProtocolStorageActions.PROTOCOL_ADDITION
-            )
+            dispatch(analyzeProtocolSuccess(action.payload.protocolKey))
+            return fetchProtocols(dispatch, PROTOCOL_ADDITION)
           })
           .catch((_e: Error) => {
-            dispatch(
-              ProtocolStorageActions.analyzeProtocolFailure(
-                action.payload.protocolKey
-              )
-            )
+            dispatch(analyzeProtocolFailure(action.payload.protocolKey))
           })
         break
       }
 
-      case ProtocolStorageActions.REMOVE_PROTOCOL: {
+      case REMOVE_PROTOCOL: {
         FileSystem.removeProtocolByKey(
           action.payload.protocolKey,
           FileSystem.PROTOCOLS_DIRECTORY_PATH
-        ).then(() =>
-          fetchProtocols(dispatch, ProtocolStorageActions.PROTOCOL_ADDITION)
-        )
+        ).then(() => fetchProtocols(dispatch, PROTOCOL_ADDITION))
         break
       }
 
-      case ProtocolStorageActions.VIEW_PROTOCOL_SOURCE_FOLDER: {
+      case VIEW_PROTOCOL_SOURCE_FOLDER: {
         FileSystem.viewProtocolSourceFolder(
           action.payload.protocolKey,
           FileSystem.PROTOCOLS_DIRECTORY_PATH
@@ -230,7 +215,7 @@ export function registerProtocolStorage(dispatch: Dispatch): Dispatch {
         break
       }
 
-      case ProtocolStorageActions.OPEN_PROTOCOL_DIRECTORY: {
+      case OPEN_PROTOCOL_DIRECTORY: {
         shell.openPath(FileSystem.PROTOCOLS_DIRECTORY_PATH)
         break
       }

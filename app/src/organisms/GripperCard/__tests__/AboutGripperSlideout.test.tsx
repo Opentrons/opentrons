@@ -1,6 +1,7 @@
 import * as React from 'react'
-import { renderWithProviders } from '@opentrons/components'
-import { fireEvent } from '@testing-library/react'
+import { screen, fireEvent } from '@testing-library/react'
+import { describe, it, vi, beforeEach, expect } from 'vitest'
+import { renderWithProviders } from '../../../__testing-utils__'
 import { i18n } from '../../../i18n'
 import { AboutGripperSlideout } from '../AboutGripperSlideout'
 
@@ -16,25 +17,25 @@ describe('AboutGripperSlideout', () => {
     props = {
       serialNumber: '123',
       isExpanded: true,
-      onCloseClick: jest.fn(),
+      onCloseClick: vi.fn(),
     }
   })
 
   it('renders correct info', () => {
-    const { getByText, getByRole } = render(props)
+    render(props)
 
-    getByText('About Flex Gripper')
-    getByText('123')
-    getByText('SERIAL NUMBER')
-    const button = getByRole('button', { name: /exit/i })
+    screen.getByText('About Flex Gripper')
+    screen.getByText('123')
+    screen.getByText('SERIAL NUMBER')
+    const button = screen.getByRole('button', { name: /exit/i })
     fireEvent.click(button)
     expect(props.onCloseClick).toHaveBeenCalled()
   })
   it('renders the firmware version if it exists', () => {
     props = { ...props, firmwareVersion: '12' }
-    const { getByText } = render(props)
+    render(props)
 
-    getByText('CURRENT VERSION')
-    getByText('12')
+    screen.getByText('CURRENT VERSION')
+    screen.getByText('12')
   })
 })

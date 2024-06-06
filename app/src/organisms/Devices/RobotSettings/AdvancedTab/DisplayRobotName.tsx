@@ -2,17 +2,17 @@ import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 
 import {
-  Flex,
   ALIGN_CENTER,
-  COLORS,
-  JUSTIFY_SPACE_BETWEEN,
   Box,
-  SPACING,
+  COLORS,
+  Flex,
+  JUSTIFY_SPACE_BETWEEN,
   SPACING_AUTO,
+  SPACING,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
-import { StyledText } from '../../../../atoms/text'
 import { TertiaryButton } from '../../../../atoms/buttons'
 interface DisplayRobotNameProps {
   robotName: string
@@ -54,7 +54,7 @@ export function DisplayRobotName({
         >
           {t('robot_name')}
         </StyledText>
-        <StyledText as="p" color={COLORS.darkGreyEnabled}>
+        <StyledText as="p" color={COLORS.grey60}>
           {robotName}
         </StyledText>
       </Box>

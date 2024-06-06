@@ -37,7 +37,7 @@ export function UpdateRobotSoftware(
   const dispatch = useDispatch<Dispatch>()
 
   const session = useSelector(getRobotUpdateSession)
-  const { step, stage, progress, error: sessionError } = session ?? {
+  const { step, stage, error: sessionError } = session ?? {
     step: null,
     error: null,
   }
@@ -76,11 +76,6 @@ export function UpdateRobotSoftware(
         beforeCommittingSuccessfulUpdate && beforeCommittingSuccessfulUpdate()
       }
     }
-    return (
-      <UpdateSoftware
-        updateType={updateType}
-        processProgress={progress != null ? progress : 0}
-      />
-    )
+    return <UpdateSoftware updateType={updateType} />
   }
 }

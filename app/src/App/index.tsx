@@ -1,6 +1,5 @@
 import * as React from 'react'
 import { useSelector } from 'react-redux'
-import { hot } from 'react-hot-loader/root'
 
 import { Flex, POSITION_FIXED, DIRECTION_ROW } from '@opentrons/components'
 
@@ -10,9 +9,11 @@ import { DesktopApp } from './DesktopApp'
 import { OnDeviceDisplayApp } from './OnDeviceDisplayApp'
 import { TopPortalRoot } from './portal'
 
-const stopEvent = (event: React.MouseEvent): void => event.preventDefault()
+const stopEvent = (event: React.MouseEvent): void => {
+  event.preventDefault()
+}
 
-export const AppComponent = (): JSX.Element | null => {
+export const App = (): JSX.Element | null => {
   const hasConfigLoaded = useSelector(getConfig) != null
   const isOnDevice = useSelector(getIsOnDevice)
 
@@ -34,5 +35,3 @@ export const AppComponent = (): JSX.Element | null => {
     </>
   ) : null
 }
-
-export const App = hot(AppComponent)

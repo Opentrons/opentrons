@@ -2,13 +2,13 @@ import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 
 import {
-  Flex,
-  DIRECTION_COLUMN,
   ALIGN_CENTER,
+  DIRECTION_COLUMN,
+  Flex,
   SPACING,
+  StyledText,
 } from '@opentrons/components'
 
-import { StyledText } from '../../atoms/text'
 import { ProtocolUploadInput } from './ProtocolUploadInput'
 import { EmptyStateLinks } from './EmptyStateLinks'
 export function ProtocolsEmptyState(): JSX.Element | null {

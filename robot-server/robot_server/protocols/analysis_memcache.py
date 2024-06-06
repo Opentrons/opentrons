@@ -63,3 +63,14 @@ class MemoryCache(Generic[K, V]):
         self._pop_eldest(key)
         self._cache[key] = value
         self._cache_order.appendleft(key)
+
+    def remove(self, key: K) -> None:
+        """Remove the cached element specified by the key.
+
+        If no such element exists in cache, then simply no-op.
+        """
+        try:
+            self._cache.pop(key)
+            self._cache_order.remove(key)  # O(n) operation, use sparingly
+        except KeyError:
+            pass

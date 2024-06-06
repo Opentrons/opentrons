@@ -2,10 +2,15 @@ import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import styled, { css } from 'styled-components'
 
-import { BORDERS, COLORS, SPACING, TYPOGRAPHY } from '@opentrons/components'
-import { getModuleDisplayName } from '@opentrons/shared-data/js/modules'
+import {
+  BORDERS,
+  COLORS,
+  SPACING,
+  StyledText,
+  TYPOGRAPHY,
+} from '@opentrons/components'
+import { getModuleDisplayName } from '@opentrons/shared-data'
 
-import { StyledText } from '../../../atoms/text'
 import { formatLastCalibrated } from './utils'
 import { ModuleCalibrationOverflowMenu } from './ModuleCalibrationOverflowMenu'
 
@@ -16,12 +21,14 @@ interface ModuleCalibrationItemsProps {
   attachedModules: AttachedModule[]
   updateRobotStatus: (isRobotBusy: boolean) => void
   formattedPipetteOffsetCalibrations: FormattedPipetteOffsetCalibration[]
+  robotName: string
 }
 
 export function ModuleCalibrationItems({
   attachedModules,
   updateRobotStatus,
   formattedPipetteOffsetCalibrations,
+  robotName,
 }: ModuleCalibrationItemsProps): JSX.Element {
   const { t } = useTranslation('device_settings')
 
@@ -64,6 +71,7 @@ export function ModuleCalibrationItems({
                 formattedPipetteOffsetCalibrations={
                   formattedPipetteOffsetCalibrations
                 }
+                robotName={robotName}
               />
             </StyledTableCell>
           </StyledTableRow>
@@ -95,6 +103,6 @@ const StyledTableCell = styled.td`
 `
 
 const BODY_STYLE = css`
-  box-shadow: 0 0 0 1px ${COLORS.medGreyEnabled};
+  box-shadow: 0 0 0 1px ${COLORS.grey30};
   border-radius: 3px;
 `

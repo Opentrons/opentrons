@@ -7,11 +7,8 @@ from pydantic import BaseModel, Field
 
 from opentrons.types import MountType
 from opentrons.protocol_engine.resources.ot3_validation import ensure_ot3_hardware
-from opentrons.protocol_engine.commands.command import (
-    AbstractCommandImpl,
-    BaseCommand,
-    BaseCommandCreate,
-)
+from ..command import AbstractCommandImpl, BaseCommand, BaseCommandCreate, SuccessData
+from ...errors.error_occurrence import ErrorOccurrence
 
 # Work around type-only circular dependencies.
 if TYPE_CHECKING:
@@ -52,7 +49,7 @@ class CalibrateModuleResult(BaseModel):
 
 
 class CalibrateModuleImplementation(
-    AbstractCommandImpl[CalibrateModuleParams, CalibrateModuleResult]
+    AbstractCommandImpl[CalibrateModuleParams, SuccessData[CalibrateModuleResult, None]]
 ):
     """CalibrateModule command implementation."""
 
@@ -65,7 +62,9 @@ class CalibrateModuleImplementation(
         self._state_view = state_view
         self._hardware_api = hardware_api
 
-    async def execute(self, params: CalibrateModuleParams) -> CalibrateModuleResult:
+    async def execute(
+        self, params: CalibrateModuleParams
+    ) -> SuccessData[CalibrateModuleResult, None]:
         """Execute calibrate-module command."""
         ot3_api = ensure_ot3_hardware(
             self._hardware_api,
@@ -85,15 +84,20 @@ class CalibrateModuleImplementation(
             ot3_api, ot3_mount, slot.slotName.id, module_serial, nominal_position
         )
 
-        return CalibrateModuleResult(
-            moduleOffset=ModuleOffsetVector(
-                x=module_offset.x, y=module_offset.y, z=module_offset.z
+        return SuccessData(
+            public=CalibrateModuleResult(
+                moduleOffset=ModuleOffsetVector(
+                    x=module_offset.x, y=module_offset.y, z=module_offset.z
+                ),
+                location=slot,
             ),
-            location=slot,
+            private=None,
         )
 
 
-class CalibrateModule(BaseCommand[CalibrateModuleParams, CalibrateModuleResult]):
+class CalibrateModule(
+    BaseCommand[CalibrateModuleParams, CalibrateModuleResult, ErrorOccurrence]
+):
     """Calibrate-module command model."""
 
     commandType: CalibrateModuleCommandType = "calibration/calibrateModule"

@@ -1,17 +1,15 @@
 import * as React from 'react'
-import { when, resetAllWhenMocks } from 'jest-when'
-
-import { renderWithProviders } from '@opentrons/components'
+import { screen } from '@testing-library/react'
+import { when } from 'vitest-when'
+import { describe, it, vi, beforeEach, expect } from 'vitest'
+import '@testing-library/jest-dom/vitest'
+import { renderWithProviders } from '../../../../__testing-utils__'
 
 import { RobotSettingsFeatureFlags } from '../RobotSettingsFeatureFlags'
 
 import { getRobotSettings } from '../../../../redux/robot-settings'
 
-jest.mock('../../../../redux/robot-settings')
-
-const mockGetRobotSettings = getRobotSettings as jest.MockedFunction<
-  typeof getRobotSettings
->
+vi.mock('../../../../redux/robot-settings')
 
 const MOCK_FF_FIELD = {
   id: 'ff_1',
@@ -27,9 +25,9 @@ const render = () => {
 
 describe('RobotSettings Advanced tab', () => {
   beforeEach(() => {
-    when(mockGetRobotSettings)
+    when(getRobotSettings)
       .calledWith(expect.any(Object), 'otie')
-      .mockReturnValue([
+      .thenReturn([
         MOCK_FF_FIELD,
         { ...MOCK_FF_FIELD, id: 'ff_2', title: 'some feature flag 2' },
         ...[
@@ -50,14 +48,10 @@ describe('RobotSettings Advanced tab', () => {
       ])
   })
 
-  afterAll(() => {
-    resetAllWhenMocks()
-  })
-
   it('should render Toggle for both feature flags and none of the settings', () => {
-    const [{ getByText, queryByText }] = render()
-    getByText('some feature flag 1')
-    getByText('some feature flag 2')
-    expect(queryByText('some setting')).toBeFalsy()
+    render()
+    screen.getByText('some feature flag 1')
+    screen.getByText('some feature flag 2')
+    expect(screen.queryByText('some setting')).toBeFalsy()
   })
 })

@@ -1,6 +1,9 @@
 import * as React from 'react'
-import { fireEvent } from '@testing-library/react'
-import { renderWithProviders } from '@opentrons/components'
+import { fireEvent, screen } from '@testing-library/react'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { COLORS } from '@opentrons/components'
+
+import { renderWithProviders } from '../../../__testing-utils__'
 import { i18n } from '../../../i18n'
 import { useCreateLiveCommandMutation } from '@opentrons/react-api-client'
 import { MagneticModuleSlideout } from '../MagneticModuleSlideout'
@@ -10,11 +13,7 @@ import {
   mockMagneticModuleGen2,
 } from '../../../redux/modules/__fixtures__'
 
-jest.mock('@opentrons/react-api-client')
-
-const mockUseLiveCommandMutation = useCreateLiveCommandMutation as jest.MockedFunction<
-  typeof useCreateLiveCommandMutation
->
+vi.mock('@opentrons/react-api-client')
 
 const render = (props: React.ComponentProps<typeof MagneticModuleSlideout>) => {
   return renderWithProviders(<MagneticModuleSlideout {...props} />, {
@@ -23,68 +22,68 @@ const render = (props: React.ComponentProps<typeof MagneticModuleSlideout>) => {
 }
 describe('MagneticModuleSlideout', () => {
   let props: React.ComponentProps<typeof MagneticModuleSlideout>
-  let mockCreateLiveCommand = jest.fn()
+  let mockCreateLiveCommand = vi.fn()
   beforeEach(() => {
-    mockCreateLiveCommand = jest.fn()
+    mockCreateLiveCommand = vi.fn()
     mockCreateLiveCommand.mockResolvedValue(null)
     props = {
       module: mockMagneticModule,
       isExpanded: true,
-      onCloseClick: jest.fn(),
+      onCloseClick: vi.fn(),
     }
-    mockUseLiveCommandMutation.mockReturnValue({
+    vi.mocked(useCreateLiveCommandMutation).mockReturnValue({
       createLiveCommand: mockCreateLiveCommand,
     } as any)
   })
   afterEach(() => {
-    jest.resetAllMocks()
+    vi.resetAllMocks()
   })
 
   it('renders correct title and body for a gen1 magnetic module', () => {
-    const { getByText } = render(props)
+    render(props)
 
-    getByText('Set Engage Height for Magnetic Module GEN1')
-    getByText(
+    screen.getByText('Set Engage Height for Magnetic Module GEN1')
+    screen.getByText(
       'Set the engage height for this Magnetic Module. Enter an integer between -2.5 and 20.'
     )
-    getByText('GEN 1 Height Ranges')
-    getByText('Max Engage Height')
-    getByText('Labware Bottom')
-    getByText('Disengaged')
-    getByText('20 mm')
-    getByText('0 mm')
-    getByText('-2.5 mm')
-    getByText('Set Engage Height')
-    getByText('Confirm')
+    screen.getByText('GEN 1 Height Ranges')
+    screen.getByText('Max Engage Height')
+    screen.getByText('Labware Bottom')
+    screen.getByText('Disengaged')
+    screen.getByText('20 mm')
+    screen.getByText('0 mm')
+    screen.getByText('-2.5 mm')
+    screen.getByText('Set Engage Height')
+    screen.getByText('Confirm')
   })
 
   it('renders correct title and body for a gen2 magnetic module', () => {
     props = {
       module: mockMagneticModuleGen2,
       isExpanded: true,
-      onCloseClick: jest.fn(),
+      onCloseClick: vi.fn(),
     }
-    const { getByText } = render(props)
+    render(props)
 
-    getByText('Set Engage Height for Magnetic Module GEN2')
-    getByText(
+    screen.getByText('Set Engage Height for Magnetic Module GEN2')
+    screen.getByText(
       'Set the engage height for this Magnetic Module. Enter an integer between -2.5 and 20.'
     )
-    getByText('GEN 2 Height Ranges')
-    getByText('Max Engage Height')
-    getByText('Labware Bottom')
-    getByText('Disengaged')
-    getByText('20 mm')
-    getByText('0 mm')
-    getByText('-2.5 mm') // TODO(jr, 6/14/22): change this to -4 when ticket #9585 merges
-    getByText('Set Engage Height')
-    getByText('Confirm')
+    screen.getByText('GEN 2 Height Ranges')
+    screen.getByText('Max Engage Height')
+    screen.getByText('Labware Bottom')
+    screen.getByText('Disengaged')
+    screen.getByText('20 mm')
+    screen.getByText('0 mm')
+    screen.getByText('-2.5 mm') // TODO(jr, 6/14/22): change this to -4 when ticket #9585 merges
+    screen.getByText('Set Engage Height')
+    screen.getByText('Confirm')
   })
 
   it('renders the button and it is not clickable until there is something in form field', () => {
-    const { getByRole, getByTestId } = render(props)
-    const button = getByRole('button', { name: 'Confirm' })
-    const input = getByTestId('magneticModuleV1')
+    render(props)
+    const button = screen.getByRole('button', { name: 'Confirm' })
+    const input = screen.getByTestId('magneticModuleV1')
     fireEvent.change(input, { target: { value: '10' } })
     expect(button).toBeEnabled()
     fireEvent.click(button)
@@ -98,5 +97,13 @@ describe('MagneticModuleSlideout', () => {
       },
     })
     expect(button).not.toBeEnabled()
+  })
+
+  it('renders the correct background color in magnetic module data', () => {
+    render(props)
+    const magneticModuleInfo = screen.getByTestId(
+      'MagneticModuleSlideout_body_data_def456'
+    )
+    expect(magneticModuleInfo).toHaveStyle(`background-color: ${COLORS.grey20}`)
   })
 })

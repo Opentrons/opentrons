@@ -7,23 +7,16 @@ import {
   DeckFromLayers,
   FlexTrash,
   Module,
-  RobotCoordinateSpaceWithDOMCoords,
-  RobotWorkSpaceRenderProps,
+  RobotCoordinateSpaceWithRef,
   SingleSlotFixture,
   StagingAreaFixture,
-  StagingAreaLocation,
-  TrashCutoutId,
   useOnClickOutside,
   WasteChuteFixture,
+  WasteChuteStagingAreaFixture,
 } from '@opentrons/components'
-import {
-  AdditionalEquipmentEntity,
-  MODULES_WITH_COLLISION_ISSUES,
-  ModuleTemporalProperties,
-} from '@opentrons/step-generation'
+import { MODULES_WITH_COLLISION_ISSUES } from '@opentrons/step-generation'
 import {
   FLEX_ROBOT_TYPE,
-  FLEX_STAGING_AREA_SLOT_ADDRESSABLE_AREAS,
   getAddressableAreaFromSlotId,
   getDeckDefFromRobotType,
   getLabwareHasQuirk,
@@ -34,27 +27,20 @@ import {
   inferModuleOrientationFromXCoordinate,
   isAddressableAreaStandardSlot,
   OT2_ROBOT_TYPE,
+  STAGING_AREA_CUTOUTS,
   THERMOCYCLER_MODULE_TYPE,
   TRASH_BIN_ADAPTER_FIXTURE,
-  WASTE_CHUTE_ADDRESSABLE_AREAS,
   WASTE_CHUTE_CUTOUT,
 } from '@opentrons/shared-data'
-import { FLEX_TRASH_DEF_URI, OT_2_TRASH_DEF_URI } from '../../constants'
+import { SPAN7_8_10_11_SLOT } from '../../constants'
 import { selectors as labwareDefSelectors } from '../../labware-defs'
 
 import { selectors as featureFlagSelectors } from '../../feature-flags'
 import { getStagingAreaAddressableAreas } from '../../utils'
-import {
-  getSlotIdsBlockedBySpanning,
-  getSlotIsEmpty,
-  InitialDeckSetup,
-  LabwareOnDeck as LabwareOnDeckType,
-  ModuleOnDeck,
-} from '../../step-forms'
+import { getSlotIdsBlockedBySpanning, getSlotIsEmpty } from '../../step-forms'
 import * as labwareIngredActions from '../../labware-ingred/actions'
 import { getDeckSetupForActiveItem } from '../../top-selectors/labware-locations'
 import { selectors as labwareIngredSelectors } from '../../labware-ingred/selectors'
-import { TerminalItemId } from '../../steplist'
 import { getSelectedTerminalItemId } from '../../ui/steps'
 import { getRobotType } from '../../file-data/selectors'
 import { BrowseLabwareModal } from '../labware'
@@ -64,7 +50,6 @@ import {
   AdapterControls,
   SlotControls,
   LabwareControls,
-  DragPreview,
 } from './LabwareOverlays'
 import { FlexModuleTag } from './FlexModuleTag'
 import { Ot2ModuleTag } from './Ot2ModuleTag'
@@ -72,14 +57,25 @@ import { SlotLabels } from './SlotLabels'
 import { getHasGen1MultiChannelPipette, getSwapBlocked } from './utils'
 
 import type {
+  AdditionalEquipmentEntity,
+  ModuleTemporalProperties,
+} from '@opentrons/step-generation'
+import type { StagingAreaLocation, TrashCutoutId } from '@opentrons/components'
+import type {
   AddressableAreaName,
   CutoutFixture,
   CutoutId,
   DeckDefinition,
   RobotType,
 } from '@opentrons/shared-data'
+import type { TerminalItemId } from '../../steplist'
+import type {
+  InitialDeckSetup,
+  LabwareOnDeck as LabwareOnDeckType,
+  ModuleOnDeck,
+} from '../../step-forms'
 
-import styles from './DeckSetup.css'
+import styles from './DeckSetup.module.css'
 
 export const DECK_LAYER_BLOCKLIST = [
   'calibrationMarkings',
@@ -102,7 +98,6 @@ const OT2_STANDARD_DECK_VIEW_LAYER_BLOCK_LIST: string[] = [
 ]
 
 interface ContentsProps {
-  getRobotCoordsFromDOMCoords: RobotWorkSpaceRenderProps['getRobotCoordsFromDOMCoords']
   activeDeckSetup: InitialDeckSetup
   selectedTerminalItemId?: TerminalItemId | null
   showGen1MultichannelCollisionWarnings: boolean
@@ -112,13 +107,12 @@ interface ContentsProps {
   trashSlot: string | null
 }
 
-const lightFill = COLORS.light1
-const darkFill = COLORS.darkGreyEnabled
+const lightFill = COLORS.grey35
+const darkFill = COLORS.grey60
 
 export const DeckSetupContents = (props: ContentsProps): JSX.Element => {
   const {
     activeDeckSetup,
-    getRobotCoordsFromDOMCoords,
     showGen1MultichannelCollisionWarnings,
     deckDef,
     robotType,
@@ -149,10 +143,9 @@ export const DeckSetupContents = (props: ContentsProps): JSX.Element => {
     customLabwareDefs,
   })
 
-  const handleHoverEmptySlot = React.useCallback(
-    () => setHoveredLabware(null),
-    []
-  )
+  const handleHoverEmptySlot = React.useCallback(() => {
+    setHoveredLabware(null)
+  }, [])
 
   const slotIdsBlockedBySpanning = getSlotIdsBlockedBySpanning(activeDeckSetup)
 
@@ -191,16 +184,12 @@ export const DeckSetupContents = (props: ContentsProps): JSX.Element => {
     <>
       {/* all modules */}
       {allModules.map(moduleOnDeck => {
-        // modules can be on the deck, including pseudo-slots (eg special 'spanning' slot for thermocycler position)
-        // const moduleParentSlots = [...deckSlots, ...values(PSEUDO_DECK_SLOTS)]
-        // const slot = moduleParentSlots.find(
-        //   slot => slot.id === moduleOnDeck.slot
-        // )
-        const slotPosition = getPositionFromSlotId(moduleOnDeck.slot, deckDef)
+        const slotId =
+          moduleOnDeck.slot === SPAN7_8_10_11_SLOT ? '7' : moduleOnDeck.slot
+
+        const slotPosition = getPositionFromSlotId(slotId, deckDef)
         if (slotPosition == null) {
-          console.warn(
-            `no slot ${moduleOnDeck.slot} for module ${moduleOnDeck.id}`
-          )
+          console.warn(`no slot ${slotId} for module ${moduleOnDeck.id}`)
           return null
         }
         const moduleDef = getModuleDef2(moduleOnDeck.model)
@@ -258,7 +247,7 @@ export const DeckSetupContents = (props: ContentsProps): JSX.Element => {
             def={moduleDef}
             orientation={inferModuleOrientationFromXCoordinate(slotPosition[0])}
             innerProps={getModuleInnerProps(moduleOnDeck.moduleState)}
-            targetSlotId={moduleOnDeck.slot}
+            targetSlotId={slotId}
             targetDeckId={deckDef.otId}
           >
             {labwareLoadedOnModule != null && !shouldHideChildren ? (
@@ -269,7 +258,6 @@ export const DeckSetupContents = (props: ContentsProps): JSX.Element => {
                   labwareOnDeck={labwareLoadedOnModule}
                 />
                 {isAdapter ? (
-                  // @ts-expect-error
                   <AdapterControls
                     allLabware={allLabware}
                     onDeck={false}
@@ -300,7 +288,6 @@ export const DeckSetupContents = (props: ContentsProps): JSX.Element => {
             {labwareLoadedOnModule == null &&
             !shouldHideChildren &&
             !isAdapter ? (
-              // @ts-expect-error
               <SlotControls
                 key={moduleOnDeck.slot}
                 slotPosition={[0, 0, 0]} // Module Component already handles nested positioning
@@ -363,7 +350,6 @@ export const DeckSetupContents = (props: ContentsProps): JSX.Element => {
         })
         .map(addressableArea => {
           return (
-            // @ts-expect-error
             <SlotControls
               key={addressableArea.id}
               slotPosition={getPositionFromSlotId(addressableArea.id, deckDef)}
@@ -408,7 +394,6 @@ export const DeckSetupContents = (props: ContentsProps): JSX.Element => {
             />
             <g>
               {labwareIsAdapter ? (
-                //  @ts-expect-error
                 <AdapterControls
                   allLabware={allLabware}
                   onDeck={true}
@@ -490,7 +475,6 @@ export const DeckSetupContents = (props: ContentsProps): JSX.Element => {
           </React.Fragment>
         )
       })}
-      <DragPreview getRobotCoordsFromDOMCoords={getRobotCoordsFromDOMCoords} />
     </>
   )
 }
@@ -503,12 +487,11 @@ export const DeckSetup = (): JSX.Element => {
   const _disableCollisionWarnings = useSelector(
     featureFlagSelectors.getDisableModuleRestrictions
   )
-  const trash = Object.values(activeDeckSetup.labware).find(
-    lw =>
-      lw.labwareDefURI === OT_2_TRASH_DEF_URI ||
-      lw.labwareDefURI === FLEX_TRASH_DEF_URI
+  const trash = Object.values(activeDeckSetup.additionalEquipmentOnDeck).find(
+    ae => ae.name === 'trashBin'
   )
-  const trashSlot = trash?.slot
+
+  const trashSlot = trash?.location
   const robotType = useSelector(getRobotType)
   const dispatch = useDispatch()
 
@@ -525,31 +508,39 @@ export const DeckSetup = (): JSX.Element => {
       if (drilledDown) dispatch(labwareIngredActions.drillUpFromLabware())
     },
   })
-
   const trashBinFixtures = [
     {
-      cutoutId:
-        trash?.slot != null
-          ? getCutoutIdForAddressableArea(
-              trash?.slot as AddressableAreaName,
-              deckDef.cutoutFixtures
-            )
-          : null,
+      cutoutId: trash?.location as CutoutId,
       cutoutFixtureId: TRASH_BIN_ADAPTER_FIXTURE,
     },
   ]
   const wasteChuteFixtures = Object.values(
     activeDeckSetup.additionalEquipmentOnDeck
-  ).filter(aE =>
-    WASTE_CHUTE_ADDRESSABLE_AREAS.includes(aE.name as AddressableAreaName)
+  ).filter(
+    aE =>
+      WASTE_CHUTE_CUTOUT.includes(aE.location as CutoutId) &&
+      aE.name === 'wasteChute'
   )
   const stagingAreaFixtures: AdditionalEquipmentEntity[] = Object.values(
     activeDeckSetup.additionalEquipmentOnDeck
-  ).filter(aE =>
-    FLEX_STAGING_AREA_SLOT_ADDRESSABLE_AREAS.includes(
-      aE.name as AddressableAreaName
-    )
+  ).filter(
+    aE =>
+      STAGING_AREA_CUTOUTS.includes(aE.location as CutoutId) &&
+      aE.name === 'stagingArea'
   )
+
+  const wasteChuteStagingAreaFixtures = Object.values(
+    activeDeckSetup.additionalEquipmentOnDeck
+  ).filter(
+    aE =>
+      STAGING_AREA_CUTOUTS.includes(aE.location as CutoutId) &&
+      aE.name === 'stagingArea' &&
+      aE.location === WASTE_CHUTE_CUTOUT &&
+      wasteChuteFixtures.length > 0
+  )
+
+  const hasWasteChute =
+    wasteChuteFixtures.length > 0 || wasteChuteStagingAreaFixtures.length > 0
 
   const filteredAddressableAreas = deckDef.locations.addressableAreas.filter(
     aa => isAddressableAreaStandardSlot(aa.id, deckDef)
@@ -557,13 +548,18 @@ export const DeckSetup = (): JSX.Element => {
   return (
     <div className={styles.deck_row}>
       {drilledDown && <BrowseLabwareModal />}
+
       <div ref={wrapperRef} className={styles.deck_wrapper}>
-        <RobotCoordinateSpaceWithDOMCoords
+        <RobotCoordinateSpaceWithRef
           height="100%"
           deckDef={deckDef}
-          viewBox={`${deckDef.cornerOffsetFromOrigin[0]} ${deckDef.cornerOffsetFromOrigin[1]} ${deckDef.dimensions[0]} ${deckDef.dimensions[1]}`}
+          viewBox={`${deckDef.cornerOffsetFromOrigin[0]} ${
+            hasWasteChute
+              ? deckDef.cornerOffsetFromOrigin[1] - 30
+              : deckDef.cornerOffsetFromOrigin[1]
+          } ${deckDef.dimensions[0]} ${deckDef.dimensions[1]}`}
         >
-          {({ getRobotCoordsFromDOMCoords }) => (
+          {() => (
             <>
               {robotType === OT2_ROBOT_TYPE ? (
                 <DeckFromLayers
@@ -611,7 +607,7 @@ export const DeckSetup = (): JSX.Element => {
                               robotType={robotType}
                               trashIconColor={lightFill}
                               trashCutoutId={cutoutId as TrashCutoutId}
-                              backgroundColor={darkFill}
+                              backgroundColor={COLORS.grey50}
                             />
                           </React.Fragment>
                         ) : null
@@ -619,6 +615,14 @@ export const DeckSetup = (): JSX.Element => {
                     : null}
                   {wasteChuteFixtures.map(fixture => (
                     <WasteChuteFixture
+                      key={fixture.id}
+                      cutoutId={fixture.location as typeof WASTE_CHUTE_CUTOUT}
+                      deckDefinition={deckDef}
+                      fixtureBaseColor={lightFill}
+                    />
+                  ))}
+                  {wasteChuteStagingAreaFixtures.map(fixture => (
+                    <WasteChuteStagingAreaFixture
                       key={fixture.id}
                       cutoutId={fixture.location as typeof WASTE_CHUTE_CUTOUT}
                       deckDefinition={deckDef}
@@ -640,17 +644,18 @@ export const DeckSetup = (): JSX.Element => {
                 )}
                 {...{
                   deckDef,
-                  getRobotCoordsFromDOMCoords,
+
                   showGen1MultichannelCollisionWarnings,
                 }}
               />
               <SlotLabels
                 robotType={robotType}
                 hasStagingAreas={stagingAreaFixtures.length > 0}
+                hasWasteChute={hasWasteChute}
               />
             </>
           )}
-        </RobotCoordinateSpaceWithDOMCoords>
+        </RobotCoordinateSpaceWithRef>
       </div>
     </div>
   )

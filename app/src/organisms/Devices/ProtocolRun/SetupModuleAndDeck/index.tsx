@@ -7,11 +7,18 @@ import {
   SPACING,
   useHoverTooltip,
   PrimaryButton,
+  DIRECTION_ROW,
+  JUSTIFY_SPACE_BETWEEN,
+  StyledText,
+  TYPOGRAPHY,
 } from '@opentrons/components'
-import { FLEX_SINGLE_SLOT_ADDRESSABLE_AREAS } from '@opentrons/shared-data'
 
 import { useToggleGroup } from '../../../../molecules/ToggleGroup/useToggleGroup'
 import { useDeckConfigurationCompatibility } from '../../../../resources/deck_configuration/hooks'
+import {
+  getIsFixtureMismatch,
+  getRequiredDeckConfig,
+} from '../../../../resources/deck_configuration/utils'
 import { Tooltip } from '../../../../atoms/Tooltip'
 import {
   useRunHasStarted,
@@ -23,14 +30,17 @@ import { SetupModulesMap } from './SetupModulesMap'
 import { SetupModulesList } from './SetupModulesList'
 import { SetupFixtureList } from './SetupFixtureList'
 
-import type { RunTimeCommand } from '@opentrons/shared-data'
+import type {
+  CompletedProtocolAnalysis,
+  ProtocolAnalysisOutput,
+} from '@opentrons/shared-data'
 
 interface SetupModuleAndDeckProps {
   expandLabwarePositionCheckStep: () => void
   robotName: string
   runId: string
   hasModules: boolean
-  commands: RunTimeCommand[]
+  protocolAnalysis: CompletedProtocolAnalysis | ProtocolAnalysisOutput | null
 }
 
 export const SetupModuleAndDeck = ({
@@ -38,9 +48,9 @@ export const SetupModuleAndDeck = ({
   robotName,
   runId,
   hasModules,
-  commands,
+  protocolAnalysis,
 }: SetupModuleAndDeckProps): JSX.Element => {
-  const { t } = useTranslation('protocol_setup')
+  const { t, i18n } = useTranslation('protocol_setup')
   const [selectedValue, toggleGroup] = useToggleGroup(
     t('list_view'),
     t('map_view')
@@ -54,19 +64,13 @@ export const SetupModuleAndDeck = ({
   const moduleCalibrationStatus = useModuleCalibrationStatus(robotName, runId)
   const deckConfigCompatibility = useDeckConfigurationCompatibility(
     robotType,
-    commands
+    protocolAnalysis
   )
 
-  const nonSingleSlotDeckConfigCompatibility = deckConfigCompatibility.filter(
-    ({ requiredAddressableAreas }) =>
-      // required AA list includes a non-single-slot AA
-      !requiredAddressableAreas.every(aa =>
-        FLEX_SINGLE_SLOT_ADDRESSABLE_AREAS.includes(aa)
-      )
-  )
-  // fixture includes at least 1 required AA
-  const requiredDeckConfigCompatibility = nonSingleSlotDeckConfigCompatibility.filter(
-    fixture => fixture.requiredAddressableAreas.length > 0
+  const isFixtureMismatch = getIsFixtureMismatch(deckConfigCompatibility)
+
+  const requiredDeckConfigCompatibility = getRequiredDeckConfig(
+    deckConfigCompatibility
   )
 
   return (
@@ -75,12 +79,48 @@ export const SetupModuleAndDeck = ({
         {toggleGroup}
         {selectedValue === t('list_view') ? (
           <>
-            {hasModules ? (
-              <SetupModulesList robotName={robotName} runId={runId} />
-            ) : null}
-            <SetupFixtureList
-              deckConfigCompatibility={requiredDeckConfigCompatibility}
-            />
+            <Flex
+              flexDirection={DIRECTION_ROW}
+              justifyContent={JUSTIFY_SPACE_BETWEEN}
+              marginTop={SPACING.spacing16}
+              marginLeft={SPACING.spacing20}
+              marginBottom={SPACING.spacing12}
+            >
+              <StyledText css={TYPOGRAPHY.labelSemiBold} width="45%">
+                {i18n.format(t('deck_hardware'), 'capitalize')}
+              </StyledText>
+              <StyledText
+                css={TYPOGRAPHY.labelSemiBold}
+                marginRight={SPACING.spacing16}
+                width="15%"
+              >
+                {t('location')}
+              </StyledText>
+              <StyledText
+                css={TYPOGRAPHY.labelSemiBold}
+                marginRight={SPACING.spacing16}
+                width="15%"
+              >
+                {t('status')}
+              </StyledText>
+            </Flex>
+            <Flex
+              flexDirection={DIRECTION_COLUMN}
+              width="100%"
+              overflowY="auto"
+              gridGap={SPACING.spacing4}
+              marginBottom={SPACING.spacing24}
+            >
+              {hasModules ? (
+                <SetupModulesList robotName={robotName} runId={runId} />
+              ) : null}
+              {requiredDeckConfigCompatibility.length > 0 ? (
+                <SetupFixtureList
+                  deckConfigCompatibility={requiredDeckConfigCompatibility}
+                  robotName={robotName}
+                />
+              ) : null}
+            </Flex>
           </>
         ) : (
           <SetupModulesMap runId={runId} />
@@ -90,6 +130,7 @@ export const SetupModuleAndDeck = ({
         <PrimaryButton
           disabled={
             missingModuleIds.length > 0 ||
+            isFixtureMismatch ||
             runHasStarted ||
             !moduleCalibrationStatus.complete
           }

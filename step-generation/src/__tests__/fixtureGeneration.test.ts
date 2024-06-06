@@ -1,3 +1,4 @@
+import { describe, it, expect } from 'vitest'
 import { createEmptyLiquidState } from '../utils'
 import { makeContext, makeState } from '../fixtures'
 describe('snapshot tests', () => {
@@ -29,9 +30,6 @@ describe('snapshot tests', () => {
           },
           tiprack5Id: {
             slot: 'tiprack5AdapterId',
-          },
-          fixedTrash: {
-            slot: '12',
           },
         },
         pipetteLocations: {

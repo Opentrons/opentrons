@@ -12,15 +12,15 @@ PATH := $(shell cd .. && yarn bin):$(PATH)
 
 ot_project := $(OPENTRONS_PROJECT)
 project_rs_default = $(if $(ot_project),$(ot_project),robot-stack)
-project_ot3_default = $(if $(ot_project),$(ot_project),ot3)
+project_ir_default = $(if $(ot_project),$(ot_project),ot3)
 
 port ?= 34000
 tests ?= tests
 test_opts ?=
 wheel_file = $(call python_get_wheelname,update-server,$(project_rs_default),otupdate)
-sdist_file = $(call python_get_sdistname,update-server,$(project_ot3_default),otupdate)
+sdist_file = $(call python_get_sdistname,update-server,$(project_rs_default),otupdate)
 # Find the branch, sha, version that will be used to update the VERSION.json file
-version_file = $(call python_get_git_version,update-server,$(project_ot3_default),update-server)
+version_file = $(call python_get_git_version,update-server,$(project_rs_default),update-server)
 # Host key location for robot
 ssh_key ?= $(default_ssh_key)
 # Other SSH args for robot
@@ -74,7 +74,7 @@ wheel: clean
 	$(SHX) ls dist
 
 .PHONY: sdist
-sdist: export OPENTRONS_PROJECT=$(project_ot3_default)
+sdist: export OPENTRONS_PROJECT=$(project_rs_default)
 sdist: clean
 	$(python) setup.py sdist
 	$(SHX) rm -rf build

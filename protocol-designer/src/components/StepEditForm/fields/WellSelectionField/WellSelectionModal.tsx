@@ -7,51 +7,51 @@ import {
   Modal,
   OutlineButton,
   LabeledValue,
-  WellGroup,
   WELL_LABEL_OPTIONS,
 } from '@opentrons/components'
-import {
-  sortWells,
-  LabwareDefinition2,
-  PipetteNameSpecs,
-} from '@opentrons/shared-data'
+import { sortWells } from '@opentrons/shared-data'
 
 import { arrayToWellGroup } from '../../../../utils'
-import { WellSelectionInstructions } from '../../../WellSelectionInstructions'
-import { SelectableLabware, wellFillFromWellContents } from '../../../labware'
-
 import * as wellContentsSelectors from '../../../../top-selectors/well-contents'
 import { selectors } from '../../../../labware-ingred/selectors'
 import { selectors as stepFormSelectors } from '../../../../step-forms'
-import { ContentsByWell } from '../../../../labware-ingred/types'
-import { WellIngredientNames } from '../../../../steplist/types'
-import { StepFieldName } from '../../../../form-types'
+import { WellSelectionInstructions } from '../../../WellSelectionInstructions'
+import { SelectableLabware, wellFillFromWellContents } from '../../../labware'
 
-import styles from './WellSelectionModal.css'
-import modalStyles from '../../../modals/modal.css'
+import type { LabwareDefinition2, PipetteV2Specs } from '@opentrons/shared-data'
+import type { WellGroup } from '@opentrons/components'
+import type { ContentsByWell } from '../../../../labware-ingred/types'
+import type { WellIngredientNames } from '../../../../steplist/types'
+import type { StepFieldName } from '../../../../form-types'
+import type { NozzleType } from '../../../../types'
+
+import styles from './WellSelectionModal.module.css'
+import modalStyles from '../../../modals/modal.module.css'
 
 interface WellSelectionModalProps {
   isOpen: boolean
-  labwareId?: string | null
   name: StepFieldName
   onCloseClick: (e?: React.MouseEvent<HTMLDivElement>) => unknown
-  pipetteId?: string | null
   value: unknown
   updateValue: (val: unknown | null | undefined) => void
+  nozzleType?: NozzleType | null
+  labwareId?: string | null
+  pipetteId?: string | null
 }
 
 interface WellSelectionModalComponentProps {
   deselectWells: (wellGroup: WellGroup) => unknown
+  nozzleType: NozzleType | null
   handleSave: () => unknown
   highlightedWells: WellGroup
   ingredNames: WellIngredientNames
-  labwareDef?: LabwareDefinition2 | null
   onCloseClick: (e?: React.MouseEvent<any>) => unknown
-  pipetteSpec?: PipetteNameSpecs | null
   selectedPrimaryWells: WellGroup
   selectWells: (wellGroup: WellGroup) => unknown
   updateHighlightedWells: (wellGroup: WellGroup) => unknown
   wellContents: ContentsByWell
+  labwareDef?: LabwareDefinition2 | null
+  pipetteSpec?: PipetteV2Specs | null
 }
 
 const WellSelectionModalComponent = (
@@ -69,6 +69,7 @@ const WellSelectionModalComponent = (
     selectWells,
     wellContents,
     updateHighlightedWells,
+    nozzleType,
   } = props
   const liquidDisplayColors = useSelector(selectors.getLiquidDisplayColors)
 
@@ -107,7 +108,7 @@ const WellSelectionModalComponent = (
           selectWells={selectWells}
           deselectWells={deselectWells}
           updateHighlightedWells={updateHighlightedWells}
-          pipetteChannels={pipetteSpec ? pipetteSpec.channels : null}
+          nozzleType={nozzleType}
           ingredNames={ingredNames}
           wellContents={wellContents}
         />
@@ -121,9 +122,15 @@ const WellSelectionModalComponent = (
 export const WellSelectionModal = (
   props: WellSelectionModalProps
 ): JSX.Element | null => {
-  const { isOpen, labwareId, onCloseClick, pipetteId } = props
+  const {
+    isOpen,
+    labwareId,
+    onCloseClick,
+    pipetteId,
+    nozzleType = null,
+    updateValue,
+  } = props
   const wellFieldData = props.value
-
   // selector data
   const allWellContentsForStep = useSelector(
     wellContentsSelectors.getAllWellContentsForActiveItem
@@ -161,7 +168,7 @@ export const WellSelectionModal = (
 
   const handleSave = (): void => {
     const sortedWells = Object.keys(selectedPrimaryWells).sort(sortWells)
-    props.updateValue(sortedWells)
+    updateValue(sortedWells)
     onCloseClick()
   }
 
@@ -176,6 +183,7 @@ export const WellSelectionModal = (
         ingredNames,
         labwareDef,
         onCloseClick,
+        nozzleType,
         pipetteSpec: pipette?.spec,
         selectWells,
         selectedPrimaryWells,

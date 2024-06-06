@@ -1,7 +1,6 @@
 import * as React from 'react'
 import { css } from 'styled-components'
-import { SPACING } from '@opentrons/components'
-import { StyledText } from '../../atoms/text'
+import { SPACING, StyledText } from '@opentrons/components'
 
 interface UnorderedListProps {
   items: React.ReactNode[]

@@ -1,0 +1,70 @@
+/* stylelint-disable */
+
+/* Alphanumeric Keyboard has 3 layouts
+ 1. lower letter keys: hg-layout-default
+ 2. upper letter keys: hg-layout-shift
+ 3. number keys: hg-layout-numbers
+ 1, 2 are using the same style but 3 has own style.
+ */
+
+.simple-keyboard.oddTheme1.hg-theme-default .hg-layout-default {
+  width: 100%;
+  height: 100%;
+  background-color: #cbcccc; /* grey35 */
+  font-family: 'Public Sans', sans-serif;
+  padding: 8px;
+}
+
+.hg-layout-default .hg-row .hg-button,
+.hg-layout-shift .hg-row .hg-button,
+.hg-layout-numbers .hg-row .hg-button {
+  color: #16212d;
+  font-size: 20px;
+  font-style: normal;
+  font-weight: 600;
+  line-height: 24px;
+  background-color: #ffffff;
+  padding: 10px 22px;
+}
+
+.simple-keyboard .hg-button:active {
+  color: #16212d;
+  background-color: #dedede; /* grey30 */
+}
+
+.alphanumericKeyboard .hg-button {
+  height: 62.3px;
+}
+
+/* first row and second row */
+.hg-layout-default .hg-row:not(:last-child),
+.hg-layout-shift .hg-row:not(:last-child) {
+  grid-column: 8px;
+}
+.hg-row:not(:last-child) .hg-button {
+  width: 94px;
+}
+
+/* third row first button and last button are the same size
+the rest is the same */
+.hg-layout-default .hg-row:last-child,
+.hg-layout-shift .hg-row:last-child,
+.hg-layout-numbers .hg-row:last-child {
+  /* adding 3px because package's css add margin-right:5px */
+  grid-gap: 3px;
+}
+.hg-layout-default .hg-row:last-child .hg-button,
+.hg-layout-shift .hg-row:last-child .hg-button {
+  width: 97px;
+}
+.hg-layout-default .hg-row:last-child .hg-button:first-child,
+.hg-layout-default .hg-row:last-child .hg-button:last-child,
+.hg-layout-shift .hg-row:last-child .hg-button:first-child,
+.hg-layout-shift .hg-row:last-child .hg-button:last-child {
+  width: 132px;
+}
+
+.hg-layout-numbers .hg-row .hg-button {
+  height: 44.75px;
+  width: 330px !important;
+}

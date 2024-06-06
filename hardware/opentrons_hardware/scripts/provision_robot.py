@@ -274,14 +274,12 @@ def _main(args: argparse.Namespace, eeprom_api: EEPROMDriver) -> None:
     # Check if we have properties passed in and convert them to PropId
     properties = _format_properties(args.property) if args.property else dict()
 
-    # Add serial number from barcode
-    if not properties:
-        properties = _get_property_from_barcode()
-
     # The eeprom has been setup and is ready for action
     if args.action == "clear":
         success, msg = clear_eeprom(eeprom_api)
     elif args.action == "write":
+        # Add serial number from barcode
+        properties = properties or _get_property_from_barcode()
         success, msg = write_eeprom(eeprom_api, properties)
     elif args.action == "print":
         success, msg = print_eeprom(eeprom_api)

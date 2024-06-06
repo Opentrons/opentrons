@@ -6,7 +6,8 @@ from opentrons.types import DeckSlotName
 def is_waste_chute(addressable_area_name: str) -> bool:
     """Check if an addressable area is a Waste Chute."""
     return addressable_area_name in {
-        "1and8ChannelWasteChute",
+        "1ChannelWasteChute",
+        "8ChannelWasteChute",
         "96ChannelWasteChute",
         "gripperWasteChute",
     }
@@ -19,7 +20,11 @@ def is_gripper_waste_chute(addressable_area_name: str) -> bool:
 
 def is_drop_tip_waste_chute(addressable_area_name: str) -> bool:
     """Check if an addressable area is a Waste Chute compatible for dropping tips."""
-    return addressable_area_name in {"1and8ChannelWasteChute", "96ChannelWasteChute"}
+    return addressable_area_name in {
+        "1ChannelWasteChute",
+        "8ChannelWasteChute",
+        "96ChannelWasteChute",
+    }
 
 
 def is_trash(addressable_area_name: str) -> bool:

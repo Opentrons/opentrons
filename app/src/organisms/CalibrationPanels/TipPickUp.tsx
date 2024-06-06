@@ -10,11 +10,11 @@ import {
   ALIGN_STRETCH,
   ALIGN_FLEX_END,
   PrimaryButton,
+  StyledText,
 } from '@opentrons/components'
 
 import * as Sessions from '../../redux/sessions'
 import type { Axis, Sign, StepSize } from '../../molecules/JogControls/types'
-import { StyledText } from '../../atoms/text'
 import { JogControls } from '../../molecules/JogControls'
 import type { CalibrationPanelProps } from './types'
 import { formatJogVector } from './utils'

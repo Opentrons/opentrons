@@ -18,9 +18,9 @@ export const getGripperDef = (
       return gripperV1_2 as GripperDefinition
     default:
       console.warn(
-        `Could not find a gripper with model ${gripperModel}, falling back to most recent definition: ${GRIPPER_V1_1}`
+        `Could not find a gripper with model ${gripperModel}, falling back to most recent definition: ${GRIPPER_V1_2}`
       )
-      return gripperV1_1 as GripperDefinition
+      return gripperV1_2 as GripperDefinition
   }
 }
 

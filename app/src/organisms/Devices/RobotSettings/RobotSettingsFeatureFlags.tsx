@@ -2,15 +2,15 @@ import * as React from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 
 import {
-  Box,
-  SPACING,
-  Flex,
   ALIGN_CENTER,
+  Box,
+  Flex,
   JUSTIFY_SPACE_BETWEEN,
+  SPACING,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
-import { StyledText } from '../../../atoms/text'
 import { ToggleButton } from '../../../atoms/buttons'
 import {
   updateSetting,
@@ -29,6 +29,7 @@ interface RobotSettingsFeatureFlagsProps {
 
 const NON_FEATURE_FLAG_SETTINGS = [
   'enableDoorSafetySwitch',
+  'enableOEMMode',
   'disableHomeOnBoot',
   'deckCalibrationDots',
   'shortFixedTrash',

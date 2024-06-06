@@ -1,27 +1,17 @@
 import * as React from 'react'
-import { resetAllWhenMocks } from 'jest-when'
-import { renderWithProviders } from '@opentrons/components'
+import { fireEvent, screen } from '@testing-library/react'
+import { describe, it, vi, beforeEach, expect } from 'vitest'
+import { renderWithProviders } from '../../../__testing-utils__'
 import { useCurrentSubsystemUpdateQuery } from '@opentrons/react-api-client'
-import { fireEvent } from '@testing-library/react'
 import { i18n } from '../../../i18n'
 import { GripperWizardFlows } from '../../GripperWizardFlows'
 import { AboutGripperSlideout } from '../AboutGripperSlideout'
 import { GripperCard } from '../'
 import type { GripperData } from '@opentrons/api-client'
 
-jest.mock('../../GripperWizardFlows')
-jest.mock('../AboutGripperSlideout')
-jest.mock('@opentrons/react-api-client')
-
-const mockGripperWizardFlows = GripperWizardFlows as jest.MockedFunction<
-  typeof GripperWizardFlows
->
-const mockAboutGripperSlideout = AboutGripperSlideout as jest.MockedFunction<
-  typeof AboutGripperSlideout
->
-const mockUseCurrentSubsystemUpdateQuery = useCurrentSubsystemUpdateQuery as jest.MockedFunction<
-  typeof useCurrentSubsystemUpdateQuery
->
+vi.mock('../../GripperWizardFlows')
+vi.mock('../AboutGripperSlideout')
+vi.mock('@opentrons/react-api-client')
 
 const render = (props: React.ComponentProps<typeof GripperCard>) => {
   return renderWithProviders(<GripperCard {...props} />, {
@@ -45,33 +35,31 @@ describe('GripperCard', () => {
         },
       } as GripperData,
       isCalibrated: true,
-      setSubsystemToUpdate: jest.fn(),
       isRunActive: false,
+      isEstopNotDisengaged: false,
     }
-    mockGripperWizardFlows.mockReturnValue(<>wizard flow launched</>)
-    mockAboutGripperSlideout.mockReturnValue(<>about gripper</>)
-    mockUseCurrentSubsystemUpdateQuery.mockReturnValue({
+    vi.mocked(GripperWizardFlows).mockReturnValue(<>wizard flow launched</>)
+    vi.mocked(AboutGripperSlideout).mockReturnValue(<>about gripper</>)
+    vi.mocked(useCurrentSubsystemUpdateQuery).mockReturnValue({
       data: undefined,
     } as any)
   })
-  afterEach(() => {
-    jest.resetAllMocks()
-    resetAllWhenMocks()
-  })
 
   it('renders correct info when gripper is attached', () => {
-    const { getByText, getByRole } = render(props)
-    const image = getByRole('img', { name: 'Flex Gripper' })
-    expect(image.getAttribute('src')).toEqual('flex_gripper.png')
-    getByText('extension mount')
-    getByText('Flex Gripper')
-    const overflowButton = getByRole('button', {
+    render(props)
+    const image = screen.getByRole('img', { name: 'Flex Gripper' })
+    expect(image.getAttribute('src')).toEqual(
+      '/app/src/assets/images/flex_gripper.png'
+    )
+    screen.getByText('extension mount')
+    screen.getByText('Flex Gripper')
+    const overflowButton = screen.getByRole('button', {
       name: /overflow/i,
     })
     fireEvent.click(overflowButton)
-    getByText('Recalibrate gripper')
-    getByText('Detach gripper')
-    getByText('About gripper')
+    screen.getByText('Recalibrate gripper')
+    screen.getByText('Detach gripper')
+    screen.getByText('About gripper')
   })
   it('renders recalibrate banner when no calibration data is present', () => {
     props = props = {
@@ -87,58 +75,83 @@ describe('GripperCard', () => {
         },
       } as GripperData,
       isCalibrated: false,
-      setSubsystemToUpdate: jest.fn(),
       isRunActive: false,
+      isEstopNotDisengaged: false,
     }
 
-    const { getByText } = render(props)
-    getByText('Calibration needed.')
+    render(props)
+    screen.getByText('Calibration needed.')
+    screen.getByText('Calibrate now')
   })
+
+  it('renders recalibrate banner without calibrate now when no calibration data is present and e-stop is pressed', () => {
+    props = {
+      attachedGripper: {
+        instrumentModel: 'gripperV1.1',
+        serialNumber: '123',
+        firmwareVersion: '12',
+        ok: true,
+        data: {
+          calibratedOffset: {
+            last_modified: undefined,
+          },
+        },
+      } as GripperData,
+      isCalibrated: false,
+      isRunActive: false,
+      isEstopNotDisengaged: true,
+    }
+
+    render(props)
+    screen.getByText('Calibration needed.')
+    expect(screen.queryByText('Calibrate now')).not.toBeInTheDocument()
+  })
+
   it('opens the about gripper slideout when button is pressed', () => {
-    const { getByText, getByRole } = render(props)
-    const overflowButton = getByRole('button', {
+    render(props)
+    const overflowButton = screen.getByRole('button', {
       name: /overflow/i,
     })
-    overflowButton.click()
-    const aboutGripperButton = getByText('About gripper')
-    aboutGripperButton.click()
-    getByText('about gripper')
+    fireEvent.click(overflowButton)
+    const aboutGripperButton = screen.getByText('About gripper')
+    fireEvent.click(aboutGripperButton)
+    screen.getByText('about gripper')
   })
   it('renders wizard flow when recalibrate button is pressed', () => {
-    const { getByText, getByRole } = render(props)
-    const overflowButton = getByRole('button', {
+    render(props)
+    const overflowButton = screen.getByRole('button', {
       name: /overflow/i,
     })
-    overflowButton.click()
-    const recalibrateGripperButton = getByText('Recalibrate gripper')
-    recalibrateGripperButton.click()
-    getByText('wizard flow launched')
+    fireEvent.click(overflowButton)
+    const recalibrateGripperButton = screen.getByText('Recalibrate gripper')
+    fireEvent.click(recalibrateGripperButton)
+    screen.getByText('wizard flow launched')
   })
   it('renders wizard flow when detach button is pressed', () => {
-    const { getByText, getByRole } = render(props)
-    const overflowButton = getByRole('button', {
+    render(props)
+    const overflowButton = screen.getByRole('button', {
       name: /InstrumentCard_overflowMenu/i,
     })
-    overflowButton.click()
-    const detachGripperButton = getByText('Detach gripper')
-    detachGripperButton.click()
-    getByText('wizard flow launched')
+    fireEvent.click(overflowButton)
+    const detachGripperButton = screen.getByText('Detach gripper')
+    fireEvent.click(detachGripperButton)
+    screen.getByText('wizard flow launched')
   })
   it('renders wizard flow when attach button is pressed', () => {
     props = {
       attachedGripper: null,
       isCalibrated: false,
-      setSubsystemToUpdate: jest.fn(),
       isRunActive: false,
+      isEstopNotDisengaged: false,
     }
-    const { getByText, getByRole } = render(props)
-    const overflowButton = getByRole('button', {
+    render(props)
+    const overflowButton = screen.getByRole('button', {
       name: /overflow/i,
     })
-    overflowButton.click()
-    const attachGripperButton = getByText('Attach gripper')
-    attachGripperButton.click()
-    getByText('wizard flow launched')
+    fireEvent.click(overflowButton)
+    const attachGripperButton = screen.getByText('Attach gripper')
+    fireEvent.click(attachGripperButton)
+    screen.getByText('wizard flow launched')
   })
   it('renders firmware update needed state if gripper is bad', () => {
     props = {
@@ -146,18 +159,18 @@ describe('GripperCard', () => {
         ok: false,
       } as any,
       isCalibrated: false,
-      setSubsystemToUpdate: jest.fn(),
       isRunActive: false,
+      isEstopNotDisengaged: false,
     }
-    const { getByText } = render(props)
-    getByText('Extension mount')
-    getByText('Instrument attached')
-    getByText('Firmware update available.')
-    getByText('Update now').click()
-    expect(props.setSubsystemToUpdate).toHaveBeenCalledWith('gripper')
+    render(props)
+    screen.getByText('Extension mount')
+    screen.getByText('Instrument attached')
+    screen.getByText(
+      `Instrument firmware update needed. Start the update on the robot's touchscreen.`
+    )
   })
   it('renders firmware update in progress state if gripper is bad and update in progress', () => {
-    mockUseCurrentSubsystemUpdateQuery.mockReturnValue({
+    vi.mocked(useCurrentSubsystemUpdateQuery).mockReturnValue({
       data: { data: { updateProgress: 50 } as any },
     } as any)
     props = {
@@ -165,12 +178,12 @@ describe('GripperCard', () => {
         ok: false,
       } as any,
       isCalibrated: true,
-      setSubsystemToUpdate: jest.fn(),
       isRunActive: false,
+      isEstopNotDisengaged: false,
     }
-    const { getByText } = render(props)
-    getByText('Extension mount')
-    getByText('Instrument attached')
-    getByText('Firmware update in progress...')
+    render(props)
+    screen.getByText('Extension mount')
+    screen.getByText('Instrument attached')
+    screen.getByText('Firmware update in progress...')
   })
 })

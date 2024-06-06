@@ -1,110 +1,110 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`mergeSubstepRowsMultiChannel mock consolidate 1`] = `
-Array [
-  Array [
-    Object {
-      "activeTips": Object {
+exports[`mergeSubstepRowsMultiChannel > mock consolidate 1`] = `
+[
+  [
+    {
+      "activeTips": {
         "labware": "someTiprackId",
         "well": "A6",
       },
       "dest": undefined,
-      "source": Object {
-        "postIngreds": Object {
+      "source": {
+        "postIngreds": {
           "ingred1Id": 25,
         },
-        "preIngreds": Object {
+        "preIngreds": {
           "ingred1Id": 30,
         },
         "well": "A1",
       },
       "volume": 5,
     },
-    Object {
-      "activeTips": Object {
+    {
+      "activeTips": {
         "labware": "someTiprackId",
         "well": "A6",
       },
       "dest": undefined,
-      "source": Object {
+      "source": {
         "postIngreds": undefined,
         "preIngreds": undefined,
         "well": undefined,
       },
       "volume": 5,
     },
-    Object {
-      "activeTips": Object {
+    {
+      "activeTips": {
         "labware": "someTiprackId",
         "well": "A6",
       },
       "dest": undefined,
-      "source": Object {
+      "source": {
         "postIngreds": undefined,
         "preIngreds": undefined,
         "well": undefined,
       },
       "volume": 5,
     },
-    Object {
-      "activeTips": Object {
+    {
+      "activeTips": {
         "labware": "someTiprackId",
         "well": "A6",
       },
       "dest": undefined,
-      "source": Object {
+      "source": {
         "postIngreds": undefined,
         "preIngreds": undefined,
         "well": undefined,
       },
       "volume": 5,
     },
-    Object {
-      "activeTips": Object {
+    {
+      "activeTips": {
         "labware": "someTiprackId",
         "well": "A6",
       },
       "dest": undefined,
-      "source": Object {
+      "source": {
         "postIngreds": undefined,
         "preIngreds": undefined,
         "well": undefined,
       },
       "volume": 5,
     },
-    Object {
-      "activeTips": Object {
+    {
+      "activeTips": {
         "labware": "someTiprackId",
         "well": "A6",
       },
       "dest": undefined,
-      "source": Object {
+      "source": {
         "postIngreds": undefined,
         "preIngreds": undefined,
         "well": undefined,
       },
       "volume": 5,
     },
-    Object {
-      "activeTips": Object {
+    {
+      "activeTips": {
         "labware": "someTiprackId",
         "well": "A6",
       },
       "dest": undefined,
-      "source": Object {
+      "source": {
         "postIngreds": undefined,
         "preIngreds": undefined,
         "well": undefined,
       },
       "volume": 5,
     },
-    Object {
-      "activeTips": Object {
+    {
+      "activeTips": {
         "labware": "someTiprackId",
         "well": "A6",
       },
       "dest": undefined,
-      "source": Object {
+      "source": {
         "postIngreds": undefined,
         "preIngreds": undefined,
         "well": undefined,
@@ -112,185 +112,185 @@ Array [
       "volume": 5,
     },
   ],
-  Array [
-    Object {
-      "activeTips": Object {
+  [
+    {
+      "activeTips": {
         "labware": "someTiprackId",
         "well": "A6",
       },
-      "dest": Object {
-        "postIngreds": Object {
+      "dest": {
+        "postIngreds": {
           "ingred1Id": 10,
         },
-        "preIngreds": Object {},
+        "preIngreds": {},
         "well": "A12",
       },
-      "source": Object {
-        "postIngreds": Object {
+      "source": {
+        "postIngreds": {
           "ingred1Id": 31,
         },
-        "preIngreds": Object {
+        "preIngreds": {
           "ingred1Id": 36,
         },
         "well": "A2",
       },
       "volume": 5,
     },
-    Object {
-      "activeTips": Object {
+    {
+      "activeTips": {
         "labware": "someTiprackId",
         "well": "A6",
       },
-      "dest": Object {
-        "postIngreds": Object {
+      "dest": {
+        "postIngreds": {
           "ingred1Id": 10,
         },
-        "preIngreds": Object {},
+        "preIngreds": {},
         "well": "B12",
       },
-      "source": Object {
-        "postIngreds": Object {
+      "source": {
+        "postIngreds": {
           "ingred1Id": 31,
         },
-        "preIngreds": Object {
+        "preIngreds": {
           "ingred1Id": 36,
         },
         "well": "B2",
       },
       "volume": 5,
     },
-    Object {
-      "activeTips": Object {
+    {
+      "activeTips": {
         "labware": "someTiprackId",
         "well": "A6",
       },
-      "dest": Object {
-        "postIngreds": Object {
+      "dest": {
+        "postIngreds": {
           "ingred1Id": 10,
         },
-        "preIngreds": Object {},
+        "preIngreds": {},
         "well": "C12",
       },
-      "source": Object {
-        "postIngreds": Object {
+      "source": {
+        "postIngreds": {
           "ingred1Id": 31,
         },
-        "preIngreds": Object {
+        "preIngreds": {
           "ingred1Id": 36,
         },
         "well": "C2",
       },
       "volume": 5,
     },
-    Object {
-      "activeTips": Object {
+    {
+      "activeTips": {
         "labware": "someTiprackId",
         "well": "A6",
       },
-      "dest": Object {
-        "postIngreds": Object {
+      "dest": {
+        "postIngreds": {
           "ingred1Id": 10,
         },
-        "preIngreds": Object {},
+        "preIngreds": {},
         "well": "D12",
       },
-      "source": Object {
-        "postIngreds": Object {
+      "source": {
+        "postIngreds": {
           "ingred1Id": 31,
         },
-        "preIngreds": Object {
+        "preIngreds": {
           "ingred1Id": 36,
         },
         "well": "D2",
       },
       "volume": 5,
     },
-    Object {
-      "activeTips": Object {
+    {
+      "activeTips": {
         "labware": "someTiprackId",
         "well": "A6",
       },
-      "dest": Object {
-        "postIngreds": Object {
+      "dest": {
+        "postIngreds": {
           "ingred1Id": 10,
         },
-        "preIngreds": Object {},
+        "preIngreds": {},
         "well": "E12",
       },
-      "source": Object {
-        "postIngreds": Object {
+      "source": {
+        "postIngreds": {
           "ingred1Id": 31,
         },
-        "preIngreds": Object {
+        "preIngreds": {
           "ingred1Id": 36,
         },
         "well": "E2",
       },
       "volume": 5,
     },
-    Object {
-      "activeTips": Object {
+    {
+      "activeTips": {
         "labware": "someTiprackId",
         "well": "A6",
       },
-      "dest": Object {
-        "postIngreds": Object {
+      "dest": {
+        "postIngreds": {
           "ingred1Id": 10,
         },
-        "preIngreds": Object {},
+        "preIngreds": {},
         "well": "F12",
       },
-      "source": Object {
-        "postIngreds": Object {
+      "source": {
+        "postIngreds": {
           "ingred1Id": 31,
         },
-        "preIngreds": Object {
+        "preIngreds": {
           "ingred1Id": 36,
         },
         "well": "F2",
       },
       "volume": 5,
     },
-    Object {
-      "activeTips": Object {
+    {
+      "activeTips": {
         "labware": "someTiprackId",
         "well": "A6",
       },
-      "dest": Object {
-        "postIngreds": Object {
+      "dest": {
+        "postIngreds": {
           "ingred1Id": 10,
         },
-        "preIngreds": Object {},
+        "preIngreds": {},
         "well": "G12",
       },
-      "source": Object {
-        "postIngreds": Object {
+      "source": {
+        "postIngreds": {
           "ingred1Id": 31,
         },
-        "preIngreds": Object {
+        "preIngreds": {
           "ingred1Id": 36,
         },
         "well": "G2",
       },
       "volume": 5,
     },
-    Object {
-      "activeTips": Object {
+    {
+      "activeTips": {
         "labware": "someTiprackId",
         "well": "A6",
       },
-      "dest": Object {
-        "postIngreds": Object {
+      "dest": {
+        "postIngreds": {
           "ingred1Id": 10,
         },
-        "preIngreds": Object {},
+        "preIngreds": {},
         "well": "H12",
       },
-      "source": Object {
-        "postIngreds": Object {
+      "source": {
+        "postIngreds": {
           "ingred1Id": 31,
         },
-        "preIngreds": Object {
+        "preIngreds": {
           "ingred1Id": 36,
         },
         "well": "H2",
@@ -301,187 +301,187 @@ Array [
 ]
 `;
 
-exports[`mergeSubstepRowsMultiChannel mock distribute 1`] = `
-Array [
-  Array [
-    Object {
-      "activeTips": Object {
+exports[`mergeSubstepRowsMultiChannel > mock distribute 1`] = `
+[
+  [
+    {
+      "activeTips": {
         "labware": "someTiprackId",
         "well": "A6",
       },
-      "dest": Object {
-        "postIngreds": Object {
+      "dest": {
+        "postIngreds": {
           "ingred1Id": 5,
         },
-        "preIngreds": Object {},
+        "preIngreds": {},
         "well": "A11",
       },
-      "source": Object {
-        "postIngreds": Object {
+      "source": {
+        "postIngreds": {
           "ingred1Id": 20,
         },
-        "preIngreds": Object {
+        "preIngreds": {
           "ingred1Id": 30,
         },
         "well": "A1",
       },
       "volume": 5,
     },
-    Object {
-      "activeTips": Object {
+    {
+      "activeTips": {
         "labware": "someTiprackId",
         "well": "A6",
       },
-      "dest": Object {
-        "postIngreds": Object {
+      "dest": {
+        "postIngreds": {
           "ingred1Id": 5,
         },
-        "preIngreds": Object {},
+        "preIngreds": {},
         "well": "B11",
       },
-      "source": Object {
-        "postIngreds": Object {
+      "source": {
+        "postIngreds": {
           "ingred1Id": 20,
         },
-        "preIngreds": Object {
+        "preIngreds": {
           "ingred1Id": 30,
         },
         "well": "B1",
       },
       "volume": 5,
     },
-    Object {
-      "activeTips": Object {
+    {
+      "activeTips": {
         "labware": "someTiprackId",
         "well": "A6",
       },
-      "dest": Object {
-        "postIngreds": Object {
+      "dest": {
+        "postIngreds": {
           "ingred1Id": 5,
         },
-        "preIngreds": Object {},
+        "preIngreds": {},
         "well": "C11",
       },
-      "source": Object {
-        "postIngreds": Object {
+      "source": {
+        "postIngreds": {
           "ingred1Id": 20,
         },
-        "preIngreds": Object {
+        "preIngreds": {
           "ingred1Id": 30,
         },
         "well": "C1",
       },
       "volume": 5,
     },
-    Object {
-      "activeTips": Object {
+    {
+      "activeTips": {
         "labware": "someTiprackId",
         "well": "A6",
       },
-      "dest": Object {
-        "postIngreds": Object {
+      "dest": {
+        "postIngreds": {
           "ingred1Id": 5,
         },
-        "preIngreds": Object {},
+        "preIngreds": {},
         "well": "D11",
       },
-      "source": Object {
-        "postIngreds": Object {
+      "source": {
+        "postIngreds": {
           "ingred1Id": 20,
         },
-        "preIngreds": Object {
+        "preIngreds": {
           "ingred1Id": 30,
         },
         "well": "D1",
       },
       "volume": 5,
     },
-    Object {
-      "activeTips": Object {
+    {
+      "activeTips": {
         "labware": "someTiprackId",
         "well": "A6",
       },
-      "dest": Object {
-        "postIngreds": Object {
+      "dest": {
+        "postIngreds": {
           "ingred1Id": 5,
         },
-        "preIngreds": Object {},
+        "preIngreds": {},
         "well": "E11",
       },
-      "source": Object {
-        "postIngreds": Object {
+      "source": {
+        "postIngreds": {
           "ingred1Id": 20,
         },
-        "preIngreds": Object {
+        "preIngreds": {
           "ingred1Id": 30,
         },
         "well": "E1",
       },
       "volume": 5,
     },
-    Object {
-      "activeTips": Object {
+    {
+      "activeTips": {
         "labware": "someTiprackId",
         "well": "A6",
       },
-      "dest": Object {
-        "postIngreds": Object {
+      "dest": {
+        "postIngreds": {
           "ingred1Id": 5,
         },
-        "preIngreds": Object {},
+        "preIngreds": {},
         "well": "F11",
       },
-      "source": Object {
-        "postIngreds": Object {
+      "source": {
+        "postIngreds": {
           "ingred1Id": 20,
         },
-        "preIngreds": Object {
+        "preIngreds": {
           "ingred1Id": 30,
         },
         "well": "F1",
       },
       "volume": 5,
     },
-    Object {
-      "activeTips": Object {
+    {
+      "activeTips": {
         "labware": "someTiprackId",
         "well": "A6",
       },
-      "dest": Object {
-        "postIngreds": Object {
+      "dest": {
+        "postIngreds": {
           "ingred1Id": 5,
         },
-        "preIngreds": Object {},
+        "preIngreds": {},
         "well": "G11",
       },
-      "source": Object {
-        "postIngreds": Object {
+      "source": {
+        "postIngreds": {
           "ingred1Id": 20,
         },
-        "preIngreds": Object {
+        "preIngreds": {
           "ingred1Id": 30,
         },
         "well": "G1",
       },
       "volume": 5,
     },
-    Object {
-      "activeTips": Object {
+    {
+      "activeTips": {
         "labware": "someTiprackId",
         "well": "A6",
       },
-      "dest": Object {
-        "postIngreds": Object {
+      "dest": {
+        "postIngreds": {
           "ingred1Id": 5,
         },
-        "preIngreds": Object {},
+        "preIngreds": {},
         "well": "H11",
       },
-      "source": Object {
-        "postIngreds": Object {
+      "source": {
+        "postIngreds": {
           "ingred1Id": 20,
         },
-        "preIngreds": Object {
+        "preIngreds": {
           "ingred1Id": 30,
         },
         "well": "H1",
@@ -489,122 +489,122 @@ Array [
       "volume": 5,
     },
   ],
-  Array [
-    Object {
-      "activeTips": Object {
+  [
+    {
+      "activeTips": {
         "labware": "someTiprackId",
         "well": "A6",
       },
-      "dest": Object {
-        "postIngreds": Object {
+      "dest": {
+        "postIngreds": {
           "ingred1Id": 5,
         },
-        "preIngreds": Object {},
+        "preIngreds": {},
         "well": "A12",
       },
       "source": undefined,
       "volume": 5,
     },
-    Object {
-      "activeTips": Object {
+    {
+      "activeTips": {
         "labware": "someTiprackId",
         "well": "A6",
       },
-      "dest": Object {
-        "postIngreds": Object {
+      "dest": {
+        "postIngreds": {
           "ingred1Id": 5,
         },
-        "preIngreds": Object {},
+        "preIngreds": {},
         "well": "B12",
       },
       "source": undefined,
       "volume": 5,
     },
-    Object {
-      "activeTips": Object {
+    {
+      "activeTips": {
         "labware": "someTiprackId",
         "well": "A6",
       },
-      "dest": Object {
-        "postIngreds": Object {
+      "dest": {
+        "postIngreds": {
           "ingred1Id": 5,
         },
-        "preIngreds": Object {},
+        "preIngreds": {},
         "well": "C12",
       },
       "source": undefined,
       "volume": 5,
     },
-    Object {
-      "activeTips": Object {
+    {
+      "activeTips": {
         "labware": "someTiprackId",
         "well": "A6",
       },
-      "dest": Object {
-        "postIngreds": Object {
+      "dest": {
+        "postIngreds": {
           "ingred1Id": 5,
         },
-        "preIngreds": Object {},
+        "preIngreds": {},
         "well": "D12",
       },
       "source": undefined,
       "volume": 5,
     },
-    Object {
-      "activeTips": Object {
+    {
+      "activeTips": {
         "labware": "someTiprackId",
         "well": "A6",
       },
-      "dest": Object {
-        "postIngreds": Object {
+      "dest": {
+        "postIngreds": {
           "ingred1Id": 5,
         },
-        "preIngreds": Object {},
+        "preIngreds": {},
         "well": "E12",
       },
       "source": undefined,
       "volume": 5,
     },
-    Object {
-      "activeTips": Object {
+    {
+      "activeTips": {
         "labware": "someTiprackId",
         "well": "A6",
       },
-      "dest": Object {
-        "postIngreds": Object {
+      "dest": {
+        "postIngreds": {
           "ingred1Id": 5,
         },
-        "preIngreds": Object {},
+        "preIngreds": {},
         "well": "F12",
       },
       "source": undefined,
       "volume": 5,
     },
-    Object {
-      "activeTips": Object {
+    {
+      "activeTips": {
         "labware": "someTiprackId",
         "well": "A6",
       },
-      "dest": Object {
-        "postIngreds": Object {
+      "dest": {
+        "postIngreds": {
           "ingred1Id": 5,
         },
-        "preIngreds": Object {},
+        "preIngreds": {},
         "well": "G12",
       },
       "source": undefined,
       "volume": 5,
     },
-    Object {
-      "activeTips": Object {
+    {
+      "activeTips": {
         "labware": "someTiprackId",
         "well": "A6",
       },
-      "dest": Object {
-        "postIngreds": Object {
+      "dest": {
+        "postIngreds": {
           "ingred1Id": 5,
         },
-        "preIngreds": Object {},
+        "preIngreds": {},
         "well": "H12",
       },
       "source": undefined,
@@ -614,203 +614,203 @@ Array [
 ]
 `;
 
-exports[`mergeSubstepRowsMultiChannel mock mix 1`] = `
-Array [
-  Array [
-    Object {
-      "activeTips": Object {
+exports[`mergeSubstepRowsMultiChannel > mock mix 1`] = `
+[
+  [
+    {
+      "activeTips": {
         "labware": "someTiprackId",
         "well": "A6",
       },
-      "dest": Object {
-        "postIngreds": Object {
+      "dest": {
+        "postIngreds": {
           "ingred1Id": 20,
         },
-        "preIngreds": Object {
+        "preIngreds": {
           "ingred1Id": 30,
         },
         "well": "A1",
       },
-      "source": Object {
-        "postIngreds": Object {
+      "source": {
+        "postIngreds": {
           "ingred1Id": 20,
         },
-        "preIngreds": Object {
+        "preIngreds": {
           "ingred1Id": 30,
         },
         "well": "A1",
       },
       "volume": 10,
     },
-    Object {
-      "activeTips": Object {
+    {
+      "activeTips": {
         "labware": "someTiprackId",
         "well": "A6",
       },
-      "dest": Object {
-        "postIngreds": Object {
+      "dest": {
+        "postIngreds": {
           "ingred1Id": 20,
         },
-        "preIngreds": Object {
+        "preIngreds": {
           "ingred1Id": 30,
         },
         "well": "B1",
       },
-      "source": Object {
-        "postIngreds": Object {
+      "source": {
+        "postIngreds": {
           "ingred1Id": 20,
         },
-        "preIngreds": Object {
+        "preIngreds": {
           "ingred1Id": 30,
         },
         "well": "B1",
       },
       "volume": 10,
     },
-    Object {
-      "activeTips": Object {
+    {
+      "activeTips": {
         "labware": "someTiprackId",
         "well": "A6",
       },
-      "dest": Object {
-        "postIngreds": Object {
+      "dest": {
+        "postIngreds": {
           "ingred1Id": 20,
         },
-        "preIngreds": Object {
+        "preIngreds": {
           "ingred1Id": 30,
         },
         "well": "C1",
       },
-      "source": Object {
-        "postIngreds": Object {
+      "source": {
+        "postIngreds": {
           "ingred1Id": 20,
         },
-        "preIngreds": Object {
+        "preIngreds": {
           "ingred1Id": 30,
         },
         "well": "C1",
       },
       "volume": 10,
     },
-    Object {
-      "activeTips": Object {
+    {
+      "activeTips": {
         "labware": "someTiprackId",
         "well": "A6",
       },
-      "dest": Object {
-        "postIngreds": Object {
+      "dest": {
+        "postIngreds": {
           "ingred1Id": 20,
         },
-        "preIngreds": Object {
+        "preIngreds": {
           "ingred1Id": 30,
         },
         "well": "D1",
       },
-      "source": Object {
-        "postIngreds": Object {
+      "source": {
+        "postIngreds": {
           "ingred1Id": 20,
         },
-        "preIngreds": Object {
+        "preIngreds": {
           "ingred1Id": 30,
         },
         "well": "D1",
       },
       "volume": 10,
     },
-    Object {
-      "activeTips": Object {
+    {
+      "activeTips": {
         "labware": "someTiprackId",
         "well": "A6",
       },
-      "dest": Object {
-        "postIngreds": Object {
+      "dest": {
+        "postIngreds": {
           "ingred1Id": 20,
         },
-        "preIngreds": Object {
+        "preIngreds": {
           "ingred1Id": 30,
         },
         "well": "E1",
       },
-      "source": Object {
-        "postIngreds": Object {
+      "source": {
+        "postIngreds": {
           "ingred1Id": 20,
         },
-        "preIngreds": Object {
+        "preIngreds": {
           "ingred1Id": 30,
         },
         "well": "E1",
       },
       "volume": 10,
     },
-    Object {
-      "activeTips": Object {
+    {
+      "activeTips": {
         "labware": "someTiprackId",
         "well": "A6",
       },
-      "dest": Object {
-        "postIngreds": Object {
+      "dest": {
+        "postIngreds": {
           "ingred1Id": 20,
         },
-        "preIngreds": Object {
+        "preIngreds": {
           "ingred1Id": 30,
         },
         "well": "F1",
       },
-      "source": Object {
-        "postIngreds": Object {
+      "source": {
+        "postIngreds": {
           "ingred1Id": 20,
         },
-        "preIngreds": Object {
+        "preIngreds": {
           "ingred1Id": 30,
         },
         "well": "F1",
       },
       "volume": 10,
     },
-    Object {
-      "activeTips": Object {
+    {
+      "activeTips": {
         "labware": "someTiprackId",
         "well": "A6",
       },
-      "dest": Object {
-        "postIngreds": Object {
+      "dest": {
+        "postIngreds": {
           "ingred1Id": 20,
         },
-        "preIngreds": Object {
+        "preIngreds": {
           "ingred1Id": 30,
         },
         "well": "G1",
       },
-      "source": Object {
-        "postIngreds": Object {
+      "source": {
+        "postIngreds": {
           "ingred1Id": 20,
         },
-        "preIngreds": Object {
+        "preIngreds": {
           "ingred1Id": 30,
         },
         "well": "G1",
       },
       "volume": 10,
     },
-    Object {
-      "activeTips": Object {
+    {
+      "activeTips": {
         "labware": "someTiprackId",
         "well": "A6",
       },
-      "dest": Object {
-        "postIngreds": Object {
+      "dest": {
+        "postIngreds": {
           "ingred1Id": 20,
         },
-        "preIngreds": Object {
+        "preIngreds": {
           "ingred1Id": 30,
         },
         "well": "H1",
       },
-      "source": Object {
-        "postIngreds": Object {
+      "source": {
+        "postIngreds": {
           "ingred1Id": 20,
         },
-        "preIngreds": Object {
+        "preIngreds": {
           "ingred1Id": 30,
         },
         "well": "H1",
@@ -821,187 +821,187 @@ Array [
 ]
 `;
 
-exports[`mergeSubstepRowsMultiChannel mock transfer 1`] = `
-Array [
-  Array [
-    Object {
-      "activeTips": Object {
+exports[`mergeSubstepRowsMultiChannel > mock transfer 1`] = `
+[
+  [
+    {
+      "activeTips": {
         "labware": "someTiprackId",
         "well": "A6",
       },
-      "dest": Object {
-        "postIngreds": Object {
+      "dest": {
+        "postIngreds": {
           "ingred1Id": 10,
         },
-        "preIngreds": Object {},
+        "preIngreds": {},
         "well": "A12",
       },
-      "source": Object {
-        "postIngreds": Object {
+      "source": {
+        "postIngreds": {
           "ingred1Id": 20,
         },
-        "preIngreds": Object {
+        "preIngreds": {
           "ingred1Id": 30,
         },
         "well": "A1",
       },
       "volume": 10,
     },
-    Object {
-      "activeTips": Object {
+    {
+      "activeTips": {
         "labware": "someTiprackId",
         "well": "A6",
       },
-      "dest": Object {
-        "postIngreds": Object {
+      "dest": {
+        "postIngreds": {
           "ingred1Id": 10,
         },
-        "preIngreds": Object {},
+        "preIngreds": {},
         "well": "B12",
       },
-      "source": Object {
-        "postIngreds": Object {
+      "source": {
+        "postIngreds": {
           "ingred1Id": 20,
         },
-        "preIngreds": Object {
+        "preIngreds": {
           "ingred1Id": 30,
         },
         "well": "B1",
       },
       "volume": 10,
     },
-    Object {
-      "activeTips": Object {
+    {
+      "activeTips": {
         "labware": "someTiprackId",
         "well": "A6",
       },
-      "dest": Object {
-        "postIngreds": Object {
+      "dest": {
+        "postIngreds": {
           "ingred1Id": 10,
         },
-        "preIngreds": Object {},
+        "preIngreds": {},
         "well": "C12",
       },
-      "source": Object {
-        "postIngreds": Object {
+      "source": {
+        "postIngreds": {
           "ingred1Id": 20,
         },
-        "preIngreds": Object {
+        "preIngreds": {
           "ingred1Id": 30,
         },
         "well": "C1",
       },
       "volume": 10,
     },
-    Object {
-      "activeTips": Object {
+    {
+      "activeTips": {
         "labware": "someTiprackId",
         "well": "A6",
       },
-      "dest": Object {
-        "postIngreds": Object {
+      "dest": {
+        "postIngreds": {
           "ingred1Id": 10,
         },
-        "preIngreds": Object {},
+        "preIngreds": {},
         "well": "D12",
       },
-      "source": Object {
-        "postIngreds": Object {
+      "source": {
+        "postIngreds": {
           "ingred1Id": 20,
         },
-        "preIngreds": Object {
+        "preIngreds": {
           "ingred1Id": 30,
         },
         "well": "D1",
       },
       "volume": 10,
     },
-    Object {
-      "activeTips": Object {
+    {
+      "activeTips": {
         "labware": "someTiprackId",
         "well": "A6",
       },
-      "dest": Object {
-        "postIngreds": Object {
+      "dest": {
+        "postIngreds": {
           "ingred1Id": 10,
         },
-        "preIngreds": Object {},
+        "preIngreds": {},
         "well": "E12",
       },
-      "source": Object {
-        "postIngreds": Object {
+      "source": {
+        "postIngreds": {
           "ingred1Id": 20,
         },
-        "preIngreds": Object {
+        "preIngreds": {
           "ingred1Id": 30,
         },
         "well": "E1",
       },
       "volume": 10,
     },
-    Object {
-      "activeTips": Object {
+    {
+      "activeTips": {
         "labware": "someTiprackId",
         "well": "A6",
       },
-      "dest": Object {
-        "postIngreds": Object {
+      "dest": {
+        "postIngreds": {
           "ingred1Id": 10,
         },
-        "preIngreds": Object {},
+        "preIngreds": {},
         "well": "F12",
       },
-      "source": Object {
-        "postIngreds": Object {
+      "source": {
+        "postIngreds": {
           "ingred1Id": 20,
         },
-        "preIngreds": Object {
+        "preIngreds": {
           "ingred1Id": 30,
         },
         "well": "F1",
       },
       "volume": 10,
     },
-    Object {
-      "activeTips": Object {
+    {
+      "activeTips": {
         "labware": "someTiprackId",
         "well": "A6",
       },
-      "dest": Object {
-        "postIngreds": Object {
+      "dest": {
+        "postIngreds": {
           "ingred1Id": 10,
         },
-        "preIngreds": Object {},
+        "preIngreds": {},
         "well": "G12",
       },
-      "source": Object {
-        "postIngreds": Object {
+      "source": {
+        "postIngreds": {
           "ingred1Id": 20,
         },
-        "preIngreds": Object {
+        "preIngreds": {
           "ingred1Id": 30,
         },
         "well": "G1",
       },
       "volume": 10,
     },
-    Object {
-      "activeTips": Object {
+    {
+      "activeTips": {
         "labware": "someTiprackId",
         "well": "A6",
       },
-      "dest": Object {
-        "postIngreds": Object {
+      "dest": {
+        "postIngreds": {
           "ingred1Id": 10,
         },
-        "preIngreds": Object {},
+        "preIngreds": {},
         "well": "H12",
       },
-      "source": Object {
-        "postIngreds": Object {
+      "source": {
+        "postIngreds": {
           "ingred1Id": 20,
         },
-        "preIngreds": Object {
+        "preIngreds": {
           "ingred1Id": 30,
         },
         "well": "H1",

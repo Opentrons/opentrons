@@ -99,7 +99,9 @@ const browse = (argv: Argv): void => {
   const log = createLogger(argv)
 
   createClient(argv, robots => {
-    robots.forEach(robot => log.info('%o\n\n', robot))
+    robots.forEach(robot => {
+      log.info('%o\n\n', robot)
+    })
   })
 
   log.warn('Browsing for services')
@@ -169,11 +171,14 @@ Yargs.options({
   },
 })
   .env('OT_DC')
+  // @ts-expect-error
   .middleware([debugLogArgvMiddleware])
+  // @ts-expect-error
   .command(['$0', 'browse'], 'Browse for robots on the network', noop, browse)
   .command(
     'find [name]',
     'Find the IP of a robot by its name',
+    // @ts-expect-error
     yargs => {
       yargs.positional('name', {
         describe: 'Name of robot to find; if omitted will find first robot',

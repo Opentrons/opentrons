@@ -1,10 +1,12 @@
 import * as React from 'react'
-import { fireEvent } from '@testing-library/react'
+import { fireEvent, screen } from '@testing-library/react'
+import { describe, it, beforeEach, vi, afterEach, expect } from 'vitest'
 
-import { renderWithProviders } from '@opentrons/components'
-
+import { renderWithProviders } from '../../../../__testing-utils__'
 import { i18n } from '../../../../i18n'
 import { SetupStep } from '../SetupStep'
+
+import type { Mock } from 'vitest'
 
 describe('SetupStep', () => {
   const render = ({
@@ -31,30 +33,30 @@ describe('SetupStep', () => {
       { i18nInstance: i18n }
     )[0]
   }
-  let toggleExpandedMock: jest.MockedFunction<() => void>
+  let toggleExpandedMock: Mock
 
   beforeEach(() => {
-    toggleExpandedMock = jest.fn()
+    toggleExpandedMock = vi.fn()
   })
 
   afterEach(() => {
-    jest.resetAllMocks()
+    vi.resetAllMocks()
   })
 
   it('renders children', () => {
-    const { getByRole } = render()
-    getByRole('button', { name: 'stub children' })
+    render()
+    screen.getByRole('button', { name: 'stub children' })
   })
   it('calls toggle expanded on click', () => {
-    const { getByText } = render({ expanded: false })
-    fireEvent.click(getByText('stub title'))
+    render({ expanded: false })
+    fireEvent.click(screen.getByText('stub title'))
     expect(toggleExpandedMock).toHaveBeenCalled()
   })
   it('renders text nodes with prop contents', () => {
-    const { getByText, queryAllByText } = render({ expanded: false })
-    getByText('stub label')
-    getByText('stub title')
-    queryAllByText('stub description')
-    queryAllByText('right element')
+    render({ expanded: false })
+    screen.getByText('stub label')
+    screen.getByText('stub title')
+    screen.queryAllByText('stub description')
+    screen.queryAllByText('right element')
   })
 })

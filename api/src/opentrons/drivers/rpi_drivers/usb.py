@@ -6,24 +6,17 @@ more readable format.
 """
 
 import subprocess
-import re
 import os
-from typing import List
+from typing import List, Union
 
-from opentrons.hardware_control.modules.types import ModuleAtPort
+from opentrons.hardware_control.modules.types import (
+    ModuleAtPort,
+    SimulatingModuleAtPort,
+)
 from opentrons.hardware_control.types import BoardRevision
 
 from .interfaces import USBDriverInterface
-from .types import USBPort
-
-
-# Example usb path might look like:
-# '/sys/bus/usb/devices/usb1/1-1/1-1.3/1-1.3:1.0/tty/ttyACM1/dev'.
-# There is only 1 bus that supports USB on the raspberry pi.
-BUS_PATH = "/sys/bus/usb/devices/usb1/"
-PORT_PATTERN = r"(/\d-\d(\.?\d)+)+:"
-DEVICE_PATH = r"\d.\d/tty/tty(\w{4})/dev"
-USB_PORT_INFO = re.compile(PORT_PATTERN + DEVICE_PATH)
+from .types import BUS_PATH, USBPort
 
 
 class USBBus(USBDriverInterface):
@@ -70,17 +63,15 @@ class USBBus(USBDriverInterface):
         active_ports = self._read_bus()
         port_matches = []
         for port in active_ports:
-            match = USB_PORT_INFO.search(port)
-            if match:
-                port_matches.append(
-                    USBPort.build(match.group(0).strip("/"), self._board_revision)
-                )
+            usb_port = USBPort.build(port.strip("/"), self._board_revision)
+            if usb_port:
+                port_matches.append(usb_port)
         return port_matches
 
     def match_virtual_ports(
         self,
-        virtual_ports: List[ModuleAtPort],
-    ) -> List[ModuleAtPort]:
+        virtual_ports: Union[List[ModuleAtPort], List[SimulatingModuleAtPort]],
+    ) -> Union[List[ModuleAtPort], List[SimulatingModuleAtPort]]:
         """
         Match Virtual Ports
 
@@ -89,7 +80,7 @@ class USBBus(USBDriverInterface):
         the physical usb port information.
         The virtual port path looks something like:
         dev/ot_module_[MODULE NAME]
-        :param virtual_ports: A list of ModuleAtPort objects
+        :param virtual_ports: A list of ModuleAtPort or SimulatingModuleAtPort objects
         that hold the name and virtual port of each module
         connected to the robot.
 

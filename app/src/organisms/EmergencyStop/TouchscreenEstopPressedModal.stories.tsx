@@ -1,8 +1,10 @@
 import * as React from 'react'
 import { Provider } from 'react-redux'
 import { createStore } from 'redux'
+import { QueryClient, QueryClientProvider } from 'react-query'
 
-import { touchScreenViewport } from '../../DesignTokens/constants'
+import { VIEWPORT } from '@opentrons/components'
+
 import { configReducer } from '../../redux/config/reducer'
 import { EstopPressedModal } from '.'
 
@@ -12,7 +14,7 @@ import type { Story, Meta } from '@storybook/react'
 export default {
   title: 'ODD/Organisms/EstopPressedModal',
   component: EstopPressedModal,
-  parameters: touchScreenViewport,
+  parameters: VIEWPORT.touchScreenViewport,
 } as Meta
 
 const dummyConfig = {
@@ -22,13 +24,16 @@ const dummyConfig = {
 } as any
 
 const store: Store<any> = createStore(configReducer, dummyConfig)
+const queryClient = new QueryClient()
 
 const Template: Story<
   React.ComponentProps<typeof EstopPressedModal>
 > = args => (
-  <Provider store={store}>
-    <EstopPressedModal {...args} />
-  </Provider>
+  <QueryClientProvider client={queryClient}>
+    <Provider store={store}>
+      <EstopPressedModal {...args} />
+    </Provider>
+  </QueryClientProvider>
 )
 
 export const EstopPressed = Template.bind({})

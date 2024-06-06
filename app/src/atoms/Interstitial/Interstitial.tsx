@@ -11,10 +11,9 @@ import {
   SPACING,
   Overlay,
 } from '@opentrons/components'
-import {
-  InterstitialTitleBar,
-  InterstitialTitleBarProps,
-} from './InterstitiallTitleBar'
+import { InterstitialTitleBar } from './InterstitiallTitleBar'
+
+import type { InterstitialTitleBarProps } from './InterstitiallTitleBar'
 export interface InterstitialProps {
   titleBar: InterstitialTitleBarProps
   contentsClassName?: string
@@ -50,7 +49,7 @@ export function Interstitial(props: InterstitialProps): JSX.Element {
         padding={SPACING.spacing16}
         position={POSITION_RELATIVE}
         boxShadow="0px 1px 3px rgba(0, 0, 0, 0.3)"
-        border={`1px solid ${String(COLORS.medGreyEnabled)}`}
+        border={`1px solid ${String(COLORS.grey30)}`}
         backgroundColor={COLORS.white}
         maxHeight="100%"
         overflowY="auto"

@@ -1,30 +1,27 @@
 import * as React from 'react'
-import { renderHook } from '@testing-library/react-hooks'
+import { renderHook } from '@testing-library/react'
 import { createStore } from 'redux'
 import { I18nextProvider } from 'react-i18next'
 import { Provider } from 'react-redux'
-
+import { describe, it, vi, beforeEach, expect } from 'vitest'
+import '@testing-library/jest-dom/vitest'
 import { i18n } from '../../../../../i18n'
 import { useRobotUpdateInfo } from '../useRobotUpdateInfo'
 import { getRobotUpdateDownloadProgress } from '../../../../../redux/robot-update'
 
 import type { Store } from 'redux'
-import { State } from '../../../../../redux/types'
+import type { State } from '../../../../../redux/types'
 import type {
   RobotUpdateSession,
   UpdateSessionStep,
   UpdateSessionStage,
 } from '../../../../../redux/robot-update/types'
 
-jest.mock('../../../../../redux/robot-update')
-
-const mockGetRobotUpdateDownloadProgress = getRobotUpdateDownloadProgress as jest.MockedFunction<
-  typeof getRobotUpdateDownloadProgress
->
+vi.mock('../../../../../redux/robot-update')
 
 describe('useRobotUpdateInfo', () => {
   let store: Store<State>
-  let wrapper: React.FunctionComponent<{}>
+  let wrapper: React.FunctionComponent<{ children: React.ReactNode }>
 
   const MOCK_ROBOT_NAME = 'testRobot'
   const mockRobotUpdateSession: RobotUpdateSession | null = {
@@ -39,15 +36,15 @@ describe('useRobotUpdateInfo', () => {
   }
 
   beforeEach(() => {
-    jest.useFakeTimers()
-    store = createStore(jest.fn(), {})
-    store.dispatch = jest.fn()
+    vi.useFakeTimers()
+    store = createStore(vi.fn(), {})
+    store.dispatch = vi.fn()
     wrapper = ({ children }) => (
       <I18nextProvider i18n={i18n}>
         <Provider store={store}>{children}</Provider>
       </I18nextProvider>
     )
-    mockGetRobotUpdateDownloadProgress.mockReturnValue(50)
+    vi.mocked(getRobotUpdateDownloadProgress).mockReturnValue(50)
   })
 
   it('should return null when session is null', () => {

@@ -1,9 +1,10 @@
+import { describe, expect, it, beforeEach } from 'vitest'
 import {
   SOURCE_WELL_BLOWOUT_DESTINATION,
   DEST_WELL_BLOWOUT_DESTINATION,
 } from '@opentrons/step-generation'
-import { DropdownOption } from '@opentrons/components'
 import { getBlowoutLocationOptionsForForm } from '../utils'
+import type { DropdownOption } from '@opentrons/components'
 
 describe('getBlowoutLocationOptionsForForm', () => {
   let destOption: DropdownOption

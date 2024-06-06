@@ -12,13 +12,11 @@ import {
 import {
   FLEX_ROBOT_TYPE,
   getDeckDefFromRobotType,
+  getSimplestDeckConfigForProtocol,
   THERMOCYCLER_MODULE_V1,
 } from '@opentrons/shared-data'
 
 import { getLabwareSetupItemGroups } from '../../../../pages/Protocols/utils'
-import { getSimplestDeckConfigForProtocolCommands } from '../../../../resources/deck_configuration/utils'
-import { getAttachedProtocolModuleMatches } from '../../../ProtocolSetupModulesAndDeck/utils'
-import { useAttachedModules } from '../../hooks'
 import { LabwareInfoOverlay } from '../LabwareInfoOverlay'
 import { getLabwareRenderInfo } from '../utils/getLabwareRenderInfo'
 import { getProtocolModulesInfo } from '../utils/getProtocolModulesInfo'
@@ -30,8 +28,6 @@ import type {
   ProtocolAnalysisOutput,
 } from '@opentrons/shared-data'
 
-const ATTACHED_MODULE_POLL_MS = 5000
-
 interface SetupLabwareMapProps {
   runId: string
   protocolAnalysis: CompletedProtocolAnalysis | ProtocolAnalysisOutput | null
@@ -41,11 +37,6 @@ export function SetupLabwareMap({
   runId,
   protocolAnalysis,
 }: SetupLabwareMapProps): JSX.Element | null {
-  const attachedModules =
-    useAttachedModules({
-      refetchInterval: ATTACHED_MODULE_POLL_MS,
-    }) ?? []
-
   // early return null if no protocol analysis
   if (protocolAnalysis == null) return null
 
@@ -56,16 +47,11 @@ export function SetupLabwareMap({
 
   const protocolModulesInfo = getProtocolModulesInfo(protocolAnalysis, deckDef)
 
-  const attachedProtocolModuleMatches = getAttachedProtocolModuleMatches(
-    attachedModules,
-    protocolModulesInfo
-  )
-
   const initialLoadedLabwareByAdapter = parseInitialLoadedLabwareByAdapter(
     commands
   )
 
-  const moduleLocations = attachedProtocolModuleMatches.map(module => {
+  const modulesOnDeck = protocolModulesInfo.map(module => {
     const labwareInAdapterInMod =
       module.nestedLabwareId != null
         ? initialLoadedLabwareByAdapter[module.nestedLabwareId]
@@ -106,13 +92,11 @@ export function SetupLabwareMap({
 
   const { offDeckItems } = getLabwareSetupItemGroups(commands)
 
-  const deckConfig = getSimplestDeckConfigForProtocolCommands(
-    protocolAnalysis.commands
-  )
+  const deckConfig = getSimplestDeckConfigForProtocol(protocolAnalysis)
 
   const labwareRenderInfo = getLabwareRenderInfo(protocolAnalysis, deckDef)
 
-  const labwareLocations = map(
+  const labwareOnDeck = map(
     labwareRenderInfo,
     ({ x, y, labwareDef, displayName, slotName }, labwareId) => {
       const labwareInAdapter = initialLoadedLabwareByAdapter[labwareId]
@@ -149,8 +133,8 @@ export function SetupLabwareMap({
             deckConfig={deckConfig}
             deckLayerBlocklist={getStandardDeckViewLayerBlockList(robotType)}
             robotType={robotType}
-            labwareLocations={labwareLocations}
-            moduleLocations={moduleLocations}
+            labwareOnDeck={labwareOnDeck}
+            modulesOnDeck={modulesOnDeck}
           />
         </Box>
         <OffDeckLabwareList

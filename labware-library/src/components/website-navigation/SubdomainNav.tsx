@@ -2,7 +2,7 @@
 import * as React from 'react'
 import { Link } from 'react-router-dom'
 import { getPublicPath } from '../../public-path'
-import styles from './styles.css'
+import styles from './styles.module.css'
 
 interface LinkItem {
   name: string
@@ -36,7 +36,7 @@ export const SUBDOMAIN_NAV_LINKS: Links = [
   },
   {
     name: 'Protocol Library',
-    url: 'https://protocols.opentrons.com/',
+    url: 'https://library.opentrons.com/',
     linkout: true,
     gtm: {
       action: 'click',

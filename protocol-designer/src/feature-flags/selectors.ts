@@ -1,7 +1,7 @@
 import { createSelector } from 'reselect'
 import { getFlagsFromQueryParams } from './utils'
-import { BaseState, Selector } from '../types'
-import { Flags } from './types'
+import type { BaseState, Selector } from '../types'
+import type { Flags } from './types'
 export const getFeatureFlagData = (state: BaseState): Flags => ({
   ...state.featureFlags.flags,
   ...getFlagsFromQueryParams(),
@@ -18,16 +18,4 @@ export const getDisableModuleRestrictions: Selector<
 export const getAllowAllTipracks: Selector<boolean> = createSelector(
   getFeatureFlagData,
   flags => flags.OT_PD_ALLOW_ALL_TIPRACKS ?? false
-)
-export const getAllow96Channel: Selector<boolean> = createSelector(
-  getFeatureFlagData,
-  flags => flags.OT_PD_ALLOW_96_CHANNEL ?? false
-)
-export const getEnableDeckModification: Selector<boolean> = createSelector(
-  getFeatureFlagData,
-  flags => flags.OT_PD_ENABLE_FLEX_DECK_MODIFICATION ?? false
-)
-export const getEnableOffDeckVisAndMultiTip: Selector<boolean> = createSelector(
-  getFeatureFlagData,
-  flags => flags.OT_PD_ENABLE_OFF_DECK_VIS_AND_MULTI_TIP ?? false
 )

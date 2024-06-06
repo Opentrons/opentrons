@@ -1,0 +1,74 @@
+{
+  "commands": [
+    {
+      "commandType": "home",
+      "notes": [],
+      "params": {},
+      "result": {},
+      "status": "succeeded"
+    }
+  ],
+  "config": {
+    "apiVersion": [
+      2,
+      18
+    ],
+    "protocolType": "python"
+  },
+  "errors": [
+    {
+      "detail": "ParameterValueError [line 73]: Parameter default 6 has type 'int', but must be of type 'str'.",
+      "errorCode": "4000",
+      "errorInfo": {},
+      "errorType": "ExceptionInProtocolError",
+      "wrappedErrors": [
+        {
+          "detail": "opentrons.protocols.parameters.types.ParameterValueError: Parameter default 6 has type 'int', but must be of type 'str'.",
+          "errorCode": "4000",
+          "errorInfo": {
+            "args": "(\"Parameter default 6 has type 'int', but must be of type 'str'.\",)",
+            "class": "ParameterValueError",
+            "traceback": "  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocols/execution/execute_python.py\", line 80, in _parse_and_set_parameters\n    exec(\"add_parameters(__param_context)\", new_globs)\n\n  File \"<string>\", line 1, in <module>\n\n  File \"Flex_X_v2_18_NO_PIPETTES_Overrides_BadTypesInRTP_Override_wrong_type_in_default.py\", line 73, in add_parameters\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocol_api/_parameter_context.py\", line 152, in add_str\n    parameter = parameter_definition.create_str_parameter(\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocols/parameters/parameter_definition.py\", line 241, in create_str_parameter\n    return ParameterDefinition(\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocols/parameters/parameter_definition.py\", line 73, in __init__\n    validation.validate_options(default, minimum, maximum, choices, parameter_type)\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocols/parameters/validation.py\", line 253, in validate_options\n    raise ParameterValueError(\n"
+          },
+          "errorType": "PythonException",
+          "wrappedErrors": []
+        }
+      ]
+    }
+  ],
+  "files": [
+    {
+      "name": "Flex_X_v2_18_NO_PIPETTES_Overrides_BadTypesInRTP_Override_wrong_type_in_default.py",
+      "role": "main"
+    },
+    {
+      "name": "cpx_4_tuberack_100ul.json",
+      "role": "labware"
+    },
+    {
+      "name": "opentrons_ot3_96_tiprack_1000ul_rss.json",
+      "role": "labware"
+    },
+    {
+      "name": "opentrons_ot3_96_tiprack_200ul_rss.json",
+      "role": "labware"
+    },
+    {
+      "name": "opentrons_ot3_96_tiprack_50ul_rss.json",
+      "role": "labware"
+    },
+    {
+      "name": "sample_labware.json",
+      "role": "labware"
+    }
+  ],
+  "labware": [],
+  "liquids": [],
+  "metadata": {
+    "protocolName": "Description Too Long 2.18"
+  },
+  "modules": [],
+  "pipettes": [],
+  "robotType": "OT-3 Standard",
+  "runTimeParameters": []
+}

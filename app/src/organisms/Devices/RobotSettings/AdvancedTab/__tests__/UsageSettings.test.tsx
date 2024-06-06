@@ -1,19 +1,16 @@
 import * as React from 'react'
 import { MemoryRouter } from 'react-router-dom'
-import { fireEvent } from '@testing-library/react'
-
-import { renderWithProviders } from '@opentrons/components'
+import { screen, fireEvent } from '@testing-library/react'
+import { describe, it, vi, beforeEach, expect } from 'vitest'
+import '@testing-library/jest-dom/vitest'
+import { renderWithProviders } from '../../../../../__testing-utils__'
 
 import { i18n } from '../../../../../i18n'
 import { getRobotSettings } from '../../../../../redux/robot-settings'
 
 import { UsageSettings } from '../UsageSettings'
 
-jest.mock('../../../../../redux/robot-settings/selectors')
-
-const mockGetRobotSettings = getRobotSettings as jest.MockedFunction<
-  typeof getRobotSettings
->
+vi.mock('../../../../../redux/robot-settings/selectors')
 
 const mockSettings = {
   id: 'enableDoorSafetySwitch',
@@ -35,21 +32,17 @@ const render = (isRobotBusy = false) => {
 
 describe('RobotSettings GantryHoming', () => {
   beforeEach(() => {
-    mockGetRobotSettings.mockReturnValue([mockSettings])
-  })
-
-  afterEach(() => {
-    jest.resetAllMocks()
+    vi.mocked(getRobotSettings).mockReturnValue([mockSettings])
   })
 
   it('should render title, description and toggle button', () => {
-    const [{ getByText, getByRole }] = render()
-    getByText('Usage Settings')
-    getByText('Pause protocol when robot door opens')
-    getByText(
+    render()
+    screen.getByText('Usage Settings')
+    screen.getByText('Pause protocol when robot door opens')
+    screen.getByText(
       'When enabled, opening the robot door during a run will pause the robot after it has completed its current motion.'
     )
-    const toggleButton = getByRole('switch', {
+    const toggleButton = screen.getByRole('switch', {
       name: 'usage_settings_pause_protocol',
     })
     expect(toggleButton.getAttribute('aria-checked')).toBe('true')
@@ -60,9 +53,9 @@ describe('RobotSettings GantryHoming', () => {
       ...mockSettings,
       value: false,
     }
-    mockGetRobotSettings.mockReturnValue([tempMockSettings])
-    const [{ getByRole }] = render()
-    const toggleButton = getByRole('switch', {
+    vi.mocked(getRobotSettings).mockReturnValue([tempMockSettings])
+    render()
+    const toggleButton = screen.getByRole('switch', {
       name: 'usage_settings_pause_protocol',
     })
     fireEvent.click(toggleButton)
@@ -70,8 +63,8 @@ describe('RobotSettings GantryHoming', () => {
   })
 
   it('should call update robot status if a robot is busy', () => {
-    const [{ getByRole }] = render(true)
-    const toggleButton = getByRole('switch', {
+    render(true)
+    const toggleButton = screen.getByRole('switch', {
       name: 'usage_settings_pause_protocol',
     })
     expect(toggleButton).toBeDisabled()

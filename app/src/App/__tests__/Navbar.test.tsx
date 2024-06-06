@@ -1,5 +1,6 @@
 import * as React from 'react'
-import { render } from '@testing-library/react'
+import { describe, it } from 'vitest'
+import { screen, render } from '@testing-library/react'
 import { StaticRouter } from 'react-router-dom'
 
 import { Navbar } from '../Navbar'
@@ -14,23 +15,23 @@ const ROUTE_PROPS: RouteProps[] = [
 
 describe('Navbar', () => {
   it('should render a NavbarLink for every nav location', () => {
-    const { getByRole } = render(
+    render(
       <StaticRouter>
         <Navbar routes={ROUTE_PROPS} />
       </StaticRouter>
     )
-    getByRole('link', { name: 'foo' })
-    getByRole('link', { name: 'bar' })
-    getByRole('link', { name: 'baz' })
+    screen.getByRole('link', { name: 'foo' })
+    screen.getByRole('link', { name: 'bar' })
+    screen.getByRole('link', { name: 'baz' })
   })
   it('should render logo, settings, and help', () => {
-    const { getByRole, getByTestId } = render(
+    render(
       <StaticRouter>
         <Navbar routes={ROUTE_PROPS} />
       </StaticRouter>
     )
-    getByRole('img', { name: 'opentrons logo' })
-    getByTestId('Navbar_settingsLink')
-    getByTestId('Navbar_helpLink')
+    screen.getByRole('img', { name: 'opentrons logo' })
+    screen.getByTestId('Navbar_settingsLink')
+    screen.getByTestId('Navbar_helpLink')
   })
 })

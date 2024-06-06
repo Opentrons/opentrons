@@ -1,2 +1,5 @@
 .env
 results
+analysis_results/*.json
+files/protocols/generated_protocols/*
+!files/protocols/generated_protocols/.keepme

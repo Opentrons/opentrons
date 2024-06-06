@@ -1,4 +1,4 @@
-import { Action, Reducer } from 'redux'
+import type { Action, Reducer } from 'redux'
 export type GetNextState<S, A extends Action> = (args: {
   action: A
   state: S

@@ -9,7 +9,7 @@ from opentrons.protocol_engine import ProtocolEngine, CommandIntent
 from opentrons.protocol_engine.errors import CommandDoesNotExistError
 from opentrons_shared_data.errors import ErrorCodes
 
-from robot_server.errors import ErrorDetails, ErrorBody
+from robot_server.errors.error_responses import ErrorDetails, ErrorBody
 from robot_server.service.json_api import (
     MultiBodyMeta,
     RequestModel,
@@ -25,6 +25,17 @@ _DEFAULT_COMMAND_LIST_LENGTH: Final = 20
 
 
 commands_router = APIRouter()
+
+
+class RequestModelWithStatelessCommandCreate(RequestModel[StatelessCommandCreate]):
+    """Equivalent to RequestModel[StatelessCommandCreate].
+
+    This works around a Pydantic v<2 bug where RequestModel[StatelessCommandCreate]
+    doesn't parse using the StatelessCommandCreate union discriminator.
+    https://github.com/pydantic/pydantic/issues/3782
+    """
+
+    data: StatelessCommandCreate
 
 
 class CommandNotFound(ErrorDetails):
@@ -43,6 +54,7 @@ class CommandNotFound(ErrorDetails):
         " simple, stateless control of the robot. For complex control,"
         " create a run with ``POST /runs`` and issue commands on that run."
     ),
+    response_model=SimpleBody[StatelessCommand],
     status_code=status.HTTP_201_CREATED,
     responses={
         status.HTTP_201_CREATED: {"model": SimpleBody[StatelessCommand]},
@@ -50,7 +62,7 @@ class CommandNotFound(ErrorDetails):
     },
 )
 async def create_command(
-    request_body: RequestModel[StatelessCommandCreate],
+    request_body: RequestModelWithStatelessCommandCreate,
     waitUntilComplete: bool = Query(
         False,
         description=(
@@ -115,6 +127,7 @@ async def create_command(
         "Get a list of commands that have been run on the device since boot."
         " Only returns command run via the `/commands` endpoint."
     ),
+    response_model=SimpleMultiBody[StatelessCommand],
     responses={
         status.HTTP_200_OK: {"model": SimpleMultiBody[StatelessCommand]},
         status.HTTP_409_CONFLICT: {"model": ErrorBody[RunActive]},
@@ -127,7 +140,7 @@ async def get_commands_list(
         description=(
             "The starting index of the desired first command in the list."
             " If unspecified, a cursor will be selected automatically"
-            " based on the next queued or more recently executed command."
+            " based on the currently running or most recently executed command."
         ),
     ),
     pageLength: int = Query(
@@ -159,6 +172,7 @@ async def get_commands_list(
         "Get a single stateless command that has been queued or executed."
         " Only returns command run via the `/commands` endpoint."
     ),
+    response_model=SimpleBody[StatelessCommand],
     responses={
         status.HTTP_200_OK: {"model": SimpleBody[StatelessCommand]},
         status.HTTP_404_NOT_FOUND: {"model": ErrorBody[CommandNotFound]},

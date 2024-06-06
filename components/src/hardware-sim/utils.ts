@@ -1,4 +1,4 @@
-import { AffineTransformMatrix } from '@opentrons/shared-data'
+import type { AffineTransformMatrix } from '@opentrons/shared-data'
 
 export const IDENTITY_AFFINE_TRANSFORM: AffineTransformMatrix = [
   [1, 0, 0, 0],

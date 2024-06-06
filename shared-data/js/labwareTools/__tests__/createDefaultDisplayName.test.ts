@@ -1,3 +1,4 @@
+import { describe, it, expect } from 'vitest'
 import { createDefaultDisplayName } from '..'
 
 import type { RegularNameProps } from '..'

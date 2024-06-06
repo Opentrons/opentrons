@@ -1,6 +1,9 @@
 import * as React from 'react'
-import { renderWithProviders } from '@opentrons/components'
+import { describe, it, expect, beforeEach } from 'vitest'
+import '@testing-library/jest-dom/vitest'
+import { screen } from '@testing-library/react'
 import { i18n } from '../../../i18n'
+import { renderWithProviders } from '../../../__testing-utils__'
 import { StepMeter } from '..'
 
 const render = (props: React.ComponentProps<typeof StepMeter>) => {
@@ -18,14 +21,11 @@ describe('StepMeter', () => {
       currentStep: 0,
     }
   })
-  afterEach(() => {
-    jest.resetAllMocks()
-  })
 
   it('renders StepMeterBar at 0% width', () => {
-    const { getByTestId } = render(props)
-    getByTestId('StepMeter_StepMeterContainer')
-    const bar = getByTestId('StepMeter_StepMeterBar')
+    render(props)
+    screen.getByTestId('StepMeter_StepMeterContainer')
+    const bar = screen.getByTestId('StepMeter_StepMeterBar')
     expect(bar).toHaveStyle('width: 0%')
   })
 
@@ -34,9 +34,9 @@ describe('StepMeter', () => {
       ...props,
       currentStep: 2,
     }
-    const { getByTestId } = render(props)
-    getByTestId('StepMeter_StepMeterContainer')
-    const bar = getByTestId('StepMeter_StepMeterBar')
+    render(props)
+    screen.getByTestId('StepMeter_StepMeterContainer')
+    const bar = screen.getByTestId('StepMeter_StepMeterBar')
     expect(bar).toHaveStyle('width: 40%')
   })
 
@@ -46,9 +46,9 @@ describe('StepMeter', () => {
       ...props,
       currentStep: 6,
     }
-    const { getByTestId } = render(props)
-    getByTestId('StepMeter_StepMeterContainer')
-    const bar = getByTestId('StepMeter_StepMeterBar')
+    render(props)
+    screen.getByTestId('StepMeter_StepMeterContainer')
+    const bar = screen.getByTestId('StepMeter_StepMeterBar')
     expect(bar).toHaveStyle('width: 100%')
   })
 
@@ -57,9 +57,9 @@ describe('StepMeter', () => {
       ...props,
       currentStep: 2,
     }
-    const { getByTestId } = render(props)
-    getByTestId('StepMeter_StepMeterContainer')
-    const bar = getByTestId('StepMeter_StepMeterBar')
+    render(props)
+    screen.getByTestId('StepMeter_StepMeterContainer')
+    const bar = screen.getByTestId('StepMeter_StepMeterBar')
     expect(bar).toHaveStyle('transition: width 0.5s ease-in-out;')
 
     props = {

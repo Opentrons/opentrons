@@ -24,7 +24,7 @@ stages:
           files:
             - name: basic_transfer_standalone.py
               role: main
-          createdAt: !re_search "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+\\+\\d{2}:\\d{2}$"
+          createdAt: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"
           robotType: OT-2 Standard
           metadata:
             apiLevel: '2.6'
@@ -169,6 +169,8 @@ stages:
             author: engineer@opentrons.com
           key: duplicate_key
   - name: Upload basic_transfer_standalone protocol with same key
+    # add a delay before starting to let previous analysis complete
+    delay_before: 2
     request:
       url: '{ot2_server_base_url}/protocols'
       method: POST

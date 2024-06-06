@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { touchScreenViewport } from '../../DesignTokens/constants'
+import { VIEWPORT } from '@opentrons/components'
 import { InlineNotification } from '.'
 import type { Story, Meta } from '@storybook/react'
 
@@ -13,9 +13,9 @@ export default {
       defaultValue: false,
     },
     type: {
+      options: ['alert', 'error', 'neutral', 'success'],
       control: {
         type: 'select',
-        options: ['alert', 'error', 'neutral', 'success'],
       },
       defaultValue: 'success',
     },
@@ -26,7 +26,7 @@ export default {
       defaultValue: true,
     },
   },
-  parameters: touchScreenViewport,
+  parameters: VIEWPORT.touchScreenViewport,
 } as Meta
 
 const Template: Story<

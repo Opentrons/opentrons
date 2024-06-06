@@ -1,5 +1,5 @@
 import * as React from 'react'
-import styles from './styles.css'
+import styles from './styles.module.css'
 
 // TODO (ka 2019-2-12): Add intercom onClick to assistance text
 export function ConfigMessage(): JSX.Element {

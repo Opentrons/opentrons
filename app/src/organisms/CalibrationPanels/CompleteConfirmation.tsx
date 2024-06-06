@@ -1,21 +1,20 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import {
+  ALIGN_CENTER,
+  ALIGN_STRETCH,
+  COLORS,
+  DIRECTION_COLUMN,
   Flex,
   Icon,
-  ALIGN_CENTER,
-  JUSTIFY_FLEX_END,
-  DIRECTION_COLUMN,
-  SPACING,
-  SIZE_3,
   JUSTIFY_CENTER,
-  COLORS,
-  ALIGN_STRETCH,
+  JUSTIFY_FLEX_END,
   PrimaryButton,
+  SIZE_3,
+  SPACING,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
-
-import { StyledText } from '../../atoms/text'
 
 interface CompleteConfirmationProps {
   proceed: React.MouseEventHandler
@@ -44,7 +43,7 @@ export function CompleteConfirmation(
         {visualAid != null ? (
           visualAid
         ) : (
-          <Icon name="ot-check" size={SIZE_3} color={COLORS.successEnabled} />
+          <Icon name="ot-check" size={SIZE_3} color={COLORS.green50} />
         )}
         <StyledText as="h1" marginTop={SPACING.spacing24}>
           {t('flow_complete', { flowName })}

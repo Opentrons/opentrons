@@ -1,28 +1,32 @@
 """Router for /maintenance_runs commands endpoints."""
 import textwrap
-from datetime import datetime
 from typing import Optional, Union
 from typing_extensions import Final, Literal
 
 from anyio import move_on_after
 from fastapi import APIRouter, Depends, Query, status
-from pydantic import BaseModel, Field
 
 from opentrons.protocol_engine import (
+    CommandPointer,
     ProtocolEngine,
     commands as pe_commands,
 )
 from opentrons.protocol_engine.errors import CommandDoesNotExistError
 
-from robot_server.errors import ErrorDetails, ErrorBody
+from robot_server.errors.error_responses import ErrorDetails, ErrorBody
 from robot_server.service.json_api import (
-    RequestModel,
     SimpleBody,
     MultiBody,
     MultiBodyMeta,
     PydanticResponse,
 )
 from robot_server.robot.control.dependencies import require_estop_in_good_state
+from robot_server.runs.command_models import (
+    RequestModelWithCommandCreate,
+    CommandCollectionLinks,
+    CommandLink,
+    CommandLinkMeta,
+)
 
 from ..maintenance_run_models import (
     MaintenanceRunCommandSummary,
@@ -56,35 +60,6 @@ class CommandNotAllowed(ErrorDetails):
     title: str = "Setup Command Not Allowed"
 
 
-class CommandLinkMeta(BaseModel):
-    """Metadata about a command resource referenced in `links`."""
-
-    runId: str = Field(..., description="The ID of the command's run.")
-    commandId: str = Field(..., description="The ID of the command.")
-    index: int = Field(..., description="Index of the command in the overall list.")
-    key: str = Field(..., description="Value of the current command's `key` field.")
-    createdAt: datetime = Field(
-        ...,
-        description="When the current command was created.",
-    )
-
-
-class CommandLink(BaseModel):
-    """A link to a command resource."""
-
-    href: str = Field(..., description="The path to a command")
-    meta: CommandLinkMeta = Field(..., description="Information about the command.")
-
-
-class CommandCollectionLinks(BaseModel):
-    """Links returned along with a collection of commands."""
-
-    current: Optional[CommandLink] = Field(
-        None,
-        description="Path to the currently running or next queued command.",
-    )
-
-
 async def get_current_run_engine_from_url(
     runId: str,
     engine_store: MaintenanceEngineStore = Depends(get_maintenance_engine_store),
@@ -104,7 +79,8 @@ async def get_current_run_engine_from_url(
     return engine_store.engine
 
 
-@commands_router.post(
+@PydanticResponse.wrap_route(
+    commands_router.post,
     path="/maintenance_runs/{runId}/commands",
     summary="Enqueue a command",
     description=textwrap.dedent(
@@ -125,7 +101,7 @@ async def get_current_run_engine_from_url(
     },
 )
 async def create_run_command(
-    request_body: RequestModel[pe_commands.CommandCreate],
+    request_body: RequestModelWithCommandCreate,
     waitUntilComplete: bool = Query(
         default=False,
         description=(
@@ -182,7 +158,7 @@ async def create_run_command(
     if waitUntilComplete:
         timeout_sec = None if timeout is None else timeout / 1000.0
         with move_on_after(timeout_sec):
-            await protocol_engine.wait_for_command(command.id),
+            await protocol_engine.wait_for_command(command.id)
 
     response_data = protocol_engine.state_view.commands.get(command.id)
 
@@ -192,7 +168,8 @@ async def create_run_command(
     )
 
 
-@commands_router.get(
+@PydanticResponse.wrap_route(
+    commands_router.get,
     path="/maintenance_runs/{runId}/commands",
     summary="Get a list of all commands in the run",
     description=(
@@ -244,6 +221,7 @@ async def get_run_commands(
         raise RunNotFound(detail=str(e)).as_error(status.HTTP_404_NOT_FOUND) from e
 
     current_command = run_data_manager.get_current_command(run_id=runId)
+    recovery_target_command = run_data_manager.get_recovery_target_command(run_id=runId)
 
     data = [
         MaintenanceRunCommandSummary.construct(
@@ -266,19 +244,10 @@ async def get_run_commands(
         totalLength=command_slice.total_length,
     )
 
-    links = CommandCollectionLinks()
-
-    if current_command is not None:
-        links.current = CommandLink(
-            href=f"/runs/{runId}/commands/{current_command.command_id}",
-            meta=CommandLinkMeta(
-                runId=runId,
-                commandId=current_command.command_id,
-                index=current_command.index,
-                key=current_command.command_key,
-                createdAt=current_command.created_at,
-            ),
-        )
+    links = CommandCollectionLinks.construct(
+        current=_make_command_link(runId, current_command),
+        currentlyRecoveringFrom=_make_command_link(runId, recovery_target_command),
+    )
 
     return await PydanticResponse.create(
         content=MultiBody.construct(data=data, meta=meta, links=links),
@@ -286,7 +255,8 @@ async def get_run_commands(
     )
 
 
-@commands_router.get(
+@PydanticResponse.wrap_route(
+    commands_router.get,
     path="/maintenance_runs/{runId}/commands/{commandId}",
     summary="Get full details about a specific command in the run",
     description=(
@@ -324,4 +294,23 @@ async def get_run_command(
     return await PydanticResponse.create(
         content=SimpleBody.construct(data=command),
         status_code=status.HTTP_200_OK,
+    )
+
+
+def _make_command_link(
+    run_id: str, command_pointer: Optional[CommandPointer]
+) -> Optional[CommandLink]:
+    return (
+        CommandLink.construct(
+            href=f"/maintenance_runs/{run_id}/commands/{command_pointer.command_id}",
+            meta=CommandLinkMeta(
+                runId=run_id,
+                commandId=command_pointer.command_id,
+                index=command_pointer.index,
+                key=command_pointer.command_key,
+                createdAt=command_pointer.created_at,
+            ),
+        )
+        if command_pointer is not None
+        else None
     )

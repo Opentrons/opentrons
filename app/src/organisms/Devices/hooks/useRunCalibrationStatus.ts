@@ -5,16 +5,20 @@ import {
   useRunPipetteInfoByMount,
   useStoredProtocolAnalysis,
 } from '.'
-import { DeckCalibrationStatus } from '../../../redux/calibration/api-types'
 import { useMostRecentCompletedAnalysis } from '../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
-import {
+import { isGripperInCommands } from '../../../resources/protocols/utils'
+import { useInstrumentsQuery } from '@opentrons/react-api-client'
+import type {
+  GripperData,
+  Instruments,
+  PipetteData,
+} from '@opentrons/api-client'
+import type {
   CompletedProtocolAnalysis,
   LoadedPipette,
   ProtocolAnalysisOutput,
 } from '@opentrons/shared-data'
-import { isGripperInCommands } from '../../../resources/protocols/utils'
-import { useInstrumentsQuery } from '@opentrons/react-api-client'
-import { GripperData, Instruments, PipetteData } from '@opentrons/api-client'
+import type { DeckCalibrationStatus } from '../../../redux/calibration/api-types'
 
 export interface ProtocolCalibrationStatus {
   complete: boolean

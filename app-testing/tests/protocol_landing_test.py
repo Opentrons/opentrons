@@ -1,4 +1,5 @@
 """Test the Protocol Landing of the page."""
+
 import time
 from pathlib import Path
 from typing import Dict
@@ -43,10 +44,7 @@ def test_protocol_landing(
     # Verifying elements on Protocol Landing Page
     assert protocol_landing.get_import_button_protocol_landing().is_displayed()
     assert protocol_landing.get_deckMap_protocol_landing(protocol_name="script_pur_sample_1").is_displayed()
-    assert (
-        protocol_landing.get_protocol_name_text_protocol_landing(protocol_name="script_pur_sample_1")
-        == "script_pur_sample_1"
-    )
+    assert protocol_landing.get_protocol_name_text_protocol_landing(protocol_name="script_pur_sample_1") == "script_pur_sample_1"
     protocol_landing.click_overflow_menu()
     assert protocol_landing.get_show_in_folder().is_displayed()
     assert protocol_landing.get_run_protocol().is_displayed()

@@ -1,6 +1,8 @@
 import * as React from 'react'
-import { renderWithProviders } from '@opentrons/components'
 import { fireEvent, screen } from '@testing-library/react'
+import { vi, it, describe, expect } from 'vitest'
+
+import { renderWithProviders } from '../../../__testing-utils__'
 import { i18n } from '../../../i18n'
 import { LEFT } from '@opentrons/shared-data'
 import { mockPipetteInfo } from '../../../redux/pipettes/__fixtures__'
@@ -12,12 +14,16 @@ import type {
   PipetteNameSpecs,
 } from '@opentrons/shared-data'
 import type { PipetteOffsetCalibration } from '../../../redux/calibration/types'
+import type { LevelingVideo } from '../LevelPipette'
 
-jest.mock('../CheckPipettesButton')
-
-const mockCheckPipettesButton = CheckPipettesButton as jest.MockedFunction<
-  typeof CheckPipettesButton
->
+vi.mock('../CheckPipettesButton')
+vi.mock('../LevelPipette', async importOriginal => {
+  const actual = await importOriginal<typeof LevelingVideo>()
+  return {
+    ...actual,
+    LevelingVideo: vi.fn(),
+  }
+})
 
 const render = (props: React.ComponentProps<typeof ConfirmPipette>) => {
   return renderWithProviders(<ConfirmPipette {...props} />, {
@@ -93,21 +99,21 @@ describe('ConfirmPipette', () => {
       actualPipetteOffset: {} as PipetteOffsetCalibration,
       displayName: 'P10',
       displayCategory: 'GEN1',
-      tryAgain: jest.fn(),
-      exit: jest.fn(),
-      toCalibrationDashboard: jest.fn(),
+      tryAgain: vi.fn(),
+      exit: vi.fn(),
+      toCalibrationDashboard: vi.fn(),
       mount: LEFT,
-      setWrongWantedPipette: jest.fn(),
+      setWrongWantedPipette: vi.fn(),
       wrongWantedPipette: null,
       confirmPipetteLevel: false,
-      nextStep: jest.fn(),
-      setConfirmPipetteLevel: jest.fn(),
+      nextStep: vi.fn(),
+      setConfirmPipetteLevel: vi.fn(),
       isDisabled: false,
     }
 
-    const { getByText, getByRole } = render(props)
-    getByText('Successfully detached pipette!')
-    const btn = getByRole('button', { name: 'exit' })
+    render(props)
+    screen.getByText('Successfully detached pipette!')
+    const btn = screen.getByRole('button', { name: 'exit' })
     fireEvent.click(btn)
     expect(props.exit).toHaveBeenCalled()
   })
@@ -122,29 +128,31 @@ describe('ConfirmPipette', () => {
       actualPipetteOffset: {} as PipetteOffsetCalibration,
       displayName: 'P10',
       displayCategory: 'GEN1',
-      tryAgain: jest.fn(),
-      exit: jest.fn(),
-      toCalibrationDashboard: jest.fn(),
+      tryAgain: vi.fn(),
+      exit: vi.fn(),
+      toCalibrationDashboard: vi.fn(),
       mount: LEFT,
-      setWrongWantedPipette: jest.fn(),
+      setWrongWantedPipette: vi.fn(),
       wrongWantedPipette: null,
       confirmPipetteLevel: false,
-      nextStep: jest.fn(),
-      setConfirmPipetteLevel: jest.fn(),
+      nextStep: vi.fn(),
+      setConfirmPipetteLevel: vi.fn(),
       isDisabled: false,
     }
 
-    const { getByText, getByRole } = render(props)
-    getByText('Pipette still detected')
-    getByText(
+    render(props)
+    screen.getByText('Pipette still detected')
+    screen.getByText(
       'Check again to ensure that pipette is unplugged and entirely detached from the robot.'
     )
 
-    const leaveAttachedBtn = getByRole('button', { name: 'Leave attached' })
+    const leaveAttachedBtn = screen.getByRole('button', {
+      name: 'Leave attached',
+    })
     fireEvent.click(leaveAttachedBtn)
     expect(props.exit).toBeCalled()
 
-    const tryAgainBtn = getByRole('button', { name: 'try again' })
+    const tryAgainBtn = screen.getByRole('button', { name: 'try again' })
     fireEvent.click(tryAgainBtn)
     expect(props.tryAgain).toBeCalled()
   })
@@ -159,29 +167,31 @@ describe('ConfirmPipette', () => {
       actualPipetteOffset: {} as PipetteOffsetCalibration,
       displayName: '',
       displayCategory: null,
-      tryAgain: jest.fn(),
-      exit: jest.fn(),
-      toCalibrationDashboard: jest.fn(),
+      tryAgain: vi.fn(),
+      exit: vi.fn(),
+      toCalibrationDashboard: vi.fn(),
       mount: LEFT,
-      setWrongWantedPipette: jest.fn(),
+      setWrongWantedPipette: vi.fn(),
       wrongWantedPipette: null,
       confirmPipetteLevel: false,
-      nextStep: jest.fn(),
-      setConfirmPipetteLevel: jest.fn(),
+      nextStep: vi.fn(),
+      setConfirmPipetteLevel: vi.fn(),
       isDisabled: false,
     }
 
-    const { getByText, getByRole } = render(props)
-    getByText('Incorrect pipette attached')
-    getByText(
+    render(props)
+    screen.getByText('Incorrect pipette attached')
+    screen.getByText(
       'The attached does not match the P300 8-Channel GEN2 you had originally selected.'
     )
-    const detachTryAgainBtn = getByRole('button', {
+    const detachTryAgainBtn = screen.getByRole('button', {
       name: 'Detach and try again',
     })
     fireEvent.click(detachTryAgainBtn)
     expect(props.tryAgain).toBeCalled()
-    const useAttachedBtn = getByRole('button', { name: 'Use attached pipette' })
+    const useAttachedBtn = screen.getByRole('button', {
+      name: 'Use attached pipette',
+    })
     fireEvent.click(useAttachedBtn)
     expect(props.setWrongWantedPipette).toHaveBeenCalled()
   })
@@ -196,22 +206,22 @@ describe('ConfirmPipette', () => {
       actualPipetteOffset: {} as PipetteOffsetCalibration,
       displayName: '',
       displayCategory: null,
-      tryAgain: jest.fn(),
-      exit: jest.fn(),
-      toCalibrationDashboard: jest.fn(),
+      tryAgain: vi.fn(),
+      exit: vi.fn(),
+      toCalibrationDashboard: vi.fn(),
       mount: LEFT,
-      setWrongWantedPipette: jest.fn(),
+      setWrongWantedPipette: vi.fn(),
       wrongWantedPipette: MOCK_ACTUAL_PIPETTE,
       confirmPipetteLevel: false,
-      nextStep: jest.fn(),
-      setConfirmPipetteLevel: jest.fn(),
+      nextStep: vi.fn(),
+      setConfirmPipetteLevel: vi.fn(),
       isDisabled: false,
     }
 
-    const { getByText, getByRole } = render(props)
-    getByText('Pipette attached!')
-    getByText('P10 Single-Channel is now ready to use.')
-    const btn = getByRole('button', { name: 'exit' })
+    render(props)
+    screen.getByText('Pipette attached!')
+    screen.getByText('P10 Single-Channel is now ready to use.')
+    const btn = screen.getByRole('button', { name: 'exit' })
     fireEvent.click(btn)
     expect(props.exit).toHaveBeenCalled()
     expect(
@@ -229,29 +239,31 @@ describe('ConfirmPipette', () => {
       actualPipetteOffset: {} as PipetteOffsetCalibration,
       displayName: '',
       displayCategory: null,
-      tryAgain: jest.fn(),
-      exit: jest.fn(),
-      toCalibrationDashboard: jest.fn(),
+      tryAgain: vi.fn(),
+      exit: vi.fn(),
+      toCalibrationDashboard: vi.fn(),
       mount: LEFT,
-      setWrongWantedPipette: jest.fn(),
+      setWrongWantedPipette: vi.fn(),
       wrongWantedPipette: null,
       confirmPipetteLevel: false,
-      nextStep: jest.fn(),
-      setConfirmPipetteLevel: jest.fn(),
+      nextStep: vi.fn(),
+      setConfirmPipetteLevel: vi.fn(),
       isDisabled: false,
     }
 
-    const { getByText, getByRole } = render(props)
-    getByText('Incorrect pipette attached')
-    getByText(
+    render(props)
+    screen.getByText('Incorrect pipette attached')
+    screen.getByText(
       'The attached does not match the P300 8-Channel GEN2 you had originally selected.'
     )
-    const detachTryAgainBtn = getByRole('button', {
+    const detachTryAgainBtn = screen.getByRole('button', {
       name: 'Detach and try again',
     })
     fireEvent.click(detachTryAgainBtn)
     expect(props.tryAgain).toBeCalled()
-    const useAttachedBtn = getByRole('button', { name: 'Use attached pipette' })
+    const useAttachedBtn = screen.getByRole('button', {
+      name: 'Use attached pipette',
+    })
     fireEvent.click(useAttachedBtn)
     expect(props.setWrongWantedPipette).toHaveBeenCalled()
   })
@@ -266,21 +278,21 @@ describe('ConfirmPipette', () => {
       actualPipetteOffset: {} as PipetteOffsetCalibration,
       displayName: '',
       displayCategory: null,
-      tryAgain: jest.fn(),
-      exit: jest.fn(),
-      toCalibrationDashboard: jest.fn(),
+      tryAgain: vi.fn(),
+      exit: vi.fn(),
+      toCalibrationDashboard: vi.fn(),
       mount: LEFT,
-      setWrongWantedPipette: jest.fn(),
+      setWrongWantedPipette: vi.fn(),
       wrongWantedPipette: MOCK_WANTED_PIPETTE,
       confirmPipetteLevel: false,
-      nextStep: jest.fn(),
-      setConfirmPipetteLevel: jest.fn(),
+      nextStep: vi.fn(),
+      setConfirmPipetteLevel: vi.fn(),
       isDisabled: false,
     }
 
-    const { getByText, getByRole } = render(props)
-    getByText('Level the pipette')
-    const continueBtn = getByRole('button', { name: 'Confirm level' })
+    render(props)
+    screen.getByText('Level the pipette')
+    const continueBtn = screen.getByRole('button', { name: 'Confirm level' })
     fireEvent.click(continueBtn)
     expect(props.setConfirmPipetteLevel).toHaveBeenCalled()
   })
@@ -295,31 +307,35 @@ describe('ConfirmPipette', () => {
       actualPipetteOffset: null,
       displayName: '',
       displayCategory: null,
-      tryAgain: jest.fn(),
-      exit: jest.fn(),
-      toCalibrationDashboard: jest.fn(),
+      tryAgain: vi.fn(),
+      exit: vi.fn(),
+      toCalibrationDashboard: vi.fn(),
       mount: LEFT,
-      setWrongWantedPipette: jest.fn(),
+      setWrongWantedPipette: vi.fn(),
       wrongWantedPipette: MOCK_WANTED_PIPETTE,
       confirmPipetteLevel: true,
-      nextStep: jest.fn(),
-      setConfirmPipetteLevel: jest.fn(),
+      nextStep: vi.fn(),
+      setConfirmPipetteLevel: vi.fn(),
       isDisabled: false,
     }
 
-    const { getByText, getByRole } = render(props)
-    getByText('Pipette attached!')
-    getByText('P300 8-Channel GEN2 is now ready to use.')
-    const btn = getByRole('button', { name: 'exit' })
+    render(props)
+    screen.getByText('Pipette attached!')
+    screen.getByText('P300 8-Channel GEN2 is now ready to use.')
+    const btn = screen.getByRole('button', { name: 'exit' })
     fireEvent.click(btn)
     expect(props.exit).toHaveBeenCalled()
-    const pocBtn = getByRole('button', { name: 'Calibrate pipette offset' })
+    const pocBtn = screen.getByRole('button', {
+      name: 'Calibrate pipette offset',
+    })
     fireEvent.click(pocBtn)
     expect(props.toCalibrationDashboard).toBeCalled()
   })
 
   it('Should show unable to detect pipette when a pipette is not connected', () => {
-    mockCheckPipettesButton.mockReturnValue(<div>mock re-check connection</div>)
+    vi.mocked(CheckPipettesButton).mockReturnValue(
+      <div>mock re-check connection</div>
+    )
     props = {
       robotName: 'otie',
       success: false,
@@ -329,31 +345,31 @@ describe('ConfirmPipette', () => {
       actualPipetteOffset: {} as PipetteOffsetCalibration,
       displayName: '',
       displayCategory: null,
-      tryAgain: jest.fn(),
-      exit: jest.fn(),
-      toCalibrationDashboard: jest.fn(),
+      tryAgain: vi.fn(),
+      exit: vi.fn(),
+      toCalibrationDashboard: vi.fn(),
       mount: LEFT,
-      setWrongWantedPipette: jest.fn(),
+      setWrongWantedPipette: vi.fn(),
       wrongWantedPipette: null,
       confirmPipetteLevel: false,
-      nextStep: jest.fn(),
-      setConfirmPipetteLevel: jest.fn(),
+      nextStep: vi.fn(),
+      setConfirmPipetteLevel: vi.fn(),
       isDisabled: false,
     }
 
-    const { getByText, getByRole } = render(props)
-    getByText('Unable to detect P300 8-Channel GEN2')
-    getByText(
+    render(props)
+    screen.getByText('Unable to detect P300 8-Channel GEN2')
+    screen.getByText(
       'Make sure to press the white connector tab in as far as you can, and that you feel it connect with the pipette.'
     )
 
-    const cancelAttachmentBtn = getByRole('button', {
+    const cancelAttachmentBtn = screen.getByRole('button', {
       name: 'Cancel attachment',
     })
     fireEvent.click(cancelAttachmentBtn)
     expect(props.exit).toBeCalled()
 
-    getByText('mock re-check connection')
+    screen.getByText('mock re-check connection')
   })
 
   it('Should attach a pipette successfully', () => {
@@ -366,22 +382,22 @@ describe('ConfirmPipette', () => {
       actualPipetteOffset: {} as PipetteOffsetCalibration,
       displayName: '',
       displayCategory: null,
-      tryAgain: jest.fn(),
-      exit: jest.fn(),
-      toCalibrationDashboard: jest.fn(),
+      tryAgain: vi.fn(),
+      exit: vi.fn(),
+      toCalibrationDashboard: vi.fn(),
       mount: LEFT,
-      setWrongWantedPipette: jest.fn(),
+      setWrongWantedPipette: vi.fn(),
       wrongWantedPipette: null,
       confirmPipetteLevel: false,
-      nextStep: jest.fn(),
-      setConfirmPipetteLevel: jest.fn(),
+      nextStep: vi.fn(),
+      setConfirmPipetteLevel: vi.fn(),
       isDisabled: false,
     }
 
-    const { getByText, getByRole } = render(props)
-    getByText('Pipette attached!')
-    getByText('P10 Single-Channel is now ready to use.')
-    const btn = getByRole('button', { name: 'exit' })
+    render(props)
+    screen.getByText('Pipette attached!')
+    screen.getByText('P10 Single-Channel is now ready to use.')
+    const btn = screen.getByRole('button', { name: 'exit' })
     fireEvent.click(btn)
     expect(props.exit).toHaveBeenCalled()
   })
@@ -396,37 +412,53 @@ describe('ConfirmPipette', () => {
       actualPipetteOffset: null,
       displayName: '',
       displayCategory: null,
-      tryAgain: jest.fn(),
-      exit: jest.fn(),
-      toCalibrationDashboard: jest.fn(),
+      tryAgain: vi.fn(),
+      exit: vi.fn(),
+      toCalibrationDashboard: vi.fn(),
       mount: LEFT,
-      setWrongWantedPipette: jest.fn(),
+      setWrongWantedPipette: vi.fn(),
       wrongWantedPipette: null,
       confirmPipetteLevel: false,
-      nextStep: jest.fn(),
-      setConfirmPipetteLevel: jest.fn(),
+      nextStep: vi.fn(),
+      setConfirmPipetteLevel: vi.fn(),
       isDisabled: false,
     }
 
-    const { getByText, getByRole } = render(props)
-    getByText('Pipette attached!')
-    getByText('P10 Single-Channel is now ready to use.')
-    const btn = getByRole('button', { name: 'exit' })
+    render(props)
+    screen.getByText('Pipette attached!')
+    screen.getByText('P10 Single-Channel is now ready to use.')
+    const btn = screen.getByRole('button', { name: 'exit' })
     fireEvent.click(btn)
     expect(props.exit).toHaveBeenCalled()
 
-    const pocBtn = getByRole('button', { name: 'Calibrate pipette offset' })
+    const pocBtn = screen.getByRole('button', {
+      name: 'Calibrate pipette offset',
+    })
     fireEvent.click(pocBtn)
     expect(props.toCalibrationDashboard).toBeCalled()
   })
-  it('should render buttons as disabled when robot is in motion/isDisabled is true', () => {
+  it('should render buttons as disabled on success when robot is in motion/isDisabled is true', () => {
+    props = {
+      ...props,
+      success: true,
+      isDisabled: true,
+    }
+    render(props)
+    expect(screen.getByRole('button', { name: 'exit' })).toBeDisabled()
+    expect(
+      screen.getByRole('button', { name: 'Calibrate pipette offset' })
+    ).toBeDisabled()
+  })
+  it('should render buttons as disabled on failure when robot is in motion/isDisabled is true', () => {
     props = {
       ...props,
       success: false,
       isDisabled: true,
     }
-    const { getByRole } = render(props)
-    expect(getByRole('button', { name: 'Leave attached' })).toBeDisabled()
-    expect(getByRole('button', { name: 'try again' })).toBeDisabled()
+    render(props)
+    expect(
+      screen.getByRole('button', { name: 'Leave attached' })
+    ).toBeDisabled()
+    expect(screen.getByRole('button', { name: 'try again' })).toBeDisabled()
   })
 })

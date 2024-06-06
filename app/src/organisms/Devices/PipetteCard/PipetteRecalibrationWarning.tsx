@@ -1,13 +1,13 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import {
-  Flex,
-  DIRECTION_COLUMN,
-  TYPOGRAPHY,
-  SPACING,
   Box,
+  DIRECTION_COLUMN,
+  Flex,
+  SPACING,
+  StyledText,
+  TYPOGRAPHY,
 } from '@opentrons/components'
-import { StyledText } from '../../../atoms/text'
 import { Banner } from '../../../atoms/Banner'
 
 export const PipetteRecalibrationWarning = (): JSX.Element | null => {
@@ -22,7 +22,9 @@ export const PipetteRecalibrationWarning = (): JSX.Element | null => {
         iconMarginLeft={SPACING.spacing8}
         type="warning"
         size={SPACING.spacing20}
-        onCloseClick={() => setShowBanner(false)}
+        onCloseClick={() => {
+          setShowBanner(false)
+        }}
       >
         <Flex flexDirection={DIRECTION_COLUMN}>
           <StyledText

@@ -7,7 +7,7 @@ import { ChildNavigation } from '../../../organisms/ChildNavigation'
 import { WifiConnectionDetails } from './WifiConnectionDetails'
 
 import type { WifiSecurityType } from '@opentrons/api-client'
-import type { SetSettingOption } from '../../../pages/OnDeviceDisplay/RobotSettingsDashboard'
+import type { SetSettingOption } from '../../../pages/RobotSettingsDashboard'
 
 interface RobotSettingsWifiProps {
   setSelectedSsid: React.Dispatch<React.SetStateAction<string>>
@@ -31,14 +31,16 @@ export function RobotSettingsWifi({
     <Flex flexDirection={DIRECTION_COLUMN}>
       <ChildNavigation
         header={t('wifi')}
-        onClickBack={() => setCurrentOption('NetworkSettings')}
+        onClickBack={() => {
+          setCurrentOption('NetworkSettings')
+        }}
       />
       <WifiConnectionDetails
         activeSsid={activeSsid}
         connectedWifiAuthType={connectedWifiAuthType}
-        handleJoinAnotherNetwork={() =>
+        handleJoinAnotherNetwork={() => {
           setCurrentOption('RobotSettingsJoinOtherNetwork')
-        }
+        }}
         handleNetworkPress={(ssid: string) => {
           setSelectedSsid(ssid)
           setCurrentOption('RobotSettingsSelectAuthenticationType')

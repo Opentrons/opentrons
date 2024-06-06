@@ -57,11 +57,11 @@ class SimulatingDriver:
         - endstop debounce M365.2 (NOT for zprobe debounce)
         - retract from endstop distance M365.3
         """
-        pass
+        return {}
 
     @property
     def current(self) -> Dict[str, float]:
-        pass
+        return {}
 
     @property
     def speed(self) -> None:

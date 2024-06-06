@@ -1,5 +1,6 @@
-import { LEFT, LoadedPipette, RIGHT } from '@opentrons/shared-data'
+import { LEFT, RIGHT } from '@opentrons/shared-data'
 import { FLOWS, SECTIONS } from './constants'
+import type { LoadedPipette } from '@opentrons/shared-data'
 import type { Mount } from '../../redux/pipettes/types'
 import type { AttachedPipettesFromInstrumentsQuery } from '../Devices/hooks'
 import type { PipetteWizardStep } from './types'
@@ -8,41 +9,35 @@ export const getPipetteWizardStepsForProtocol = (
   attachedPipettes: AttachedPipettesFromInstrumentsQuery,
   pipetteInfo: LoadedPipette[],
   mount: Mount
-): PipetteWizardStep[] => {
+): PipetteWizardStep[] | null => {
   const requiredPipette = pipetteInfo.find(pipette => pipette.mount === mount)
   const nintySixChannelAttached =
     attachedPipettes[LEFT]?.instrumentName === 'p1000_96'
 
-  //  return empty array when correct pipette is attached && pipette cal not needed or
-  //  no pipette is required in the protocol
-  if (
-    (requiredPipette?.pipetteName === attachedPipettes[mount]?.instrumentName &&
-      attachedPipettes[mount]?.data?.calibratedOffset?.last_modified != null) ||
-    requiredPipette == null
-  ) {
-    return []
-    //    return calibration flow only if correct pipette is attached and pipette cal null
+  //  return empty array if no pipette is required in the protocol
+  if (requiredPipette == null) {
+    return null
+    // return calibration flow if correct pipette is attached
   } else if (
-    requiredPipette?.pipetteName === attachedPipettes[mount]?.instrumentName &&
-    attachedPipettes[mount]?.data?.calibratedOffset?.last_modified == null
+    requiredPipette?.pipetteName === attachedPipettes[mount]?.instrumentName
   ) {
     return [
       {
         section: SECTIONS.BEFORE_BEGINNING,
-        mount: mount,
+        mount,
         flowType: FLOWS.CALIBRATE,
       },
       {
         section: SECTIONS.ATTACH_PROBE,
-        mount: mount,
+        mount,
         flowType: FLOWS.CALIBRATE,
       },
       {
         section: SECTIONS.DETACH_PROBE,
-        mount: mount,
+        mount,
         flowType: FLOWS.CALIBRATE,
       },
-      { section: SECTIONS.RESULTS, mount: mount, flowType: FLOWS.CALIBRATE },
+      { section: SECTIONS.RESULTS, mount, flowType: FLOWS.CALIBRATE },
     ]
   } else if (
     requiredPipette.pipetteName !== 'p1000_96' &&
@@ -79,28 +74,28 @@ export const getPipetteWizardStepsForProtocol = (
         },
         {
           section: SECTIONS.MOUNT_PIPETTE,
-          mount: mount,
+          mount,
           flowType: FLOWS.ATTACH,
         },
         {
           section: SECTIONS.FIRMWARE_UPDATE,
-          mount: mount,
+          mount,
           flowType: FLOWS.ATTACH,
         },
-        { section: SECTIONS.RESULTS, mount: mount, flowType: FLOWS.ATTACH },
+        { section: SECTIONS.RESULTS, mount, flowType: FLOWS.ATTACH },
         {
           section: SECTIONS.ATTACH_PROBE,
-          mount: mount,
+          mount,
           flowType: FLOWS.ATTACH,
         },
         {
           section: SECTIONS.DETACH_PROBE,
-          mount: mount,
+          mount,
           flowType: FLOWS.ATTACH,
         },
         {
           section: SECTIONS.RESULTS,
-          mount: mount,
+          mount,
           flowType: FLOWS.CALIBRATE,
         },
       ]
@@ -109,39 +104,39 @@ export const getPipetteWizardStepsForProtocol = (
       return [
         {
           section: SECTIONS.BEFORE_BEGINNING,
-          mount: mount,
+          mount,
           flowType: FLOWS.DETACH,
         },
         {
           section: SECTIONS.DETACH_PIPETTE,
-          mount: mount,
+          mount,
           flowType: FLOWS.DETACH,
         },
-        { section: SECTIONS.RESULTS, mount: mount, flowType: FLOWS.DETACH },
+        { section: SECTIONS.RESULTS, mount, flowType: FLOWS.DETACH },
         {
           section: SECTIONS.MOUNT_PIPETTE,
-          mount: mount,
+          mount,
           flowType: FLOWS.ATTACH,
         },
         {
           section: SECTIONS.FIRMWARE_UPDATE,
-          mount: mount,
+          mount,
           flowType: FLOWS.ATTACH,
         },
-        { section: SECTIONS.RESULTS, mount: mount, flowType: FLOWS.ATTACH },
+        { section: SECTIONS.RESULTS, mount, flowType: FLOWS.ATTACH },
         {
           section: SECTIONS.ATTACH_PROBE,
-          mount: mount,
+          mount,
           flowType: FLOWS.ATTACH,
         },
         {
           section: SECTIONS.DETACH_PROBE,
-          mount: mount,
+          mount,
           flowType: FLOWS.ATTACH,
         },
         {
           section: SECTIONS.RESULTS,
-          mount: mount,
+          mount,
           flowType: FLOWS.CALIBRATE,
         },
       ]
@@ -389,33 +384,33 @@ export const getPipetteWizardStepsForProtocol = (
       return [
         {
           section: SECTIONS.BEFORE_BEGINNING,
-          mount: mount,
+          mount,
           flowType: FLOWS.ATTACH,
         },
         {
           section: SECTIONS.MOUNT_PIPETTE,
-          mount: mount,
+          mount,
           flowType: FLOWS.ATTACH,
         },
         {
           section: SECTIONS.FIRMWARE_UPDATE,
-          mount: mount,
+          mount,
           flowType: FLOWS.ATTACH,
         },
-        { section: SECTIONS.RESULTS, mount: mount, flowType: FLOWS.ATTACH },
+        { section: SECTIONS.RESULTS, mount, flowType: FLOWS.ATTACH },
         {
           section: SECTIONS.ATTACH_PROBE,
-          mount: mount,
+          mount,
           flowType: FLOWS.ATTACH,
         },
         {
           section: SECTIONS.DETACH_PROBE,
-          mount: mount,
+          mount,
           flowType: FLOWS.ATTACH,
         },
         {
           section: SECTIONS.RESULTS,
-          mount: mount,
+          mount,
           flowType: FLOWS.CALIBRATE,
         },
       ]

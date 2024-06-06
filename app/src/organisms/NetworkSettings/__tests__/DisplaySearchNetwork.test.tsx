@@ -1,7 +1,10 @@
 import * as React from 'react'
+import { screen } from '@testing-library/react'
+import { describe, expect, it } from 'vitest'
 
-import { COLORS, renderWithProviders } from '@opentrons/components'
+import { COLORS } from '@opentrons/components'
 
+import { renderWithProviders } from '../../../__testing-utils__'
 import { i18n } from '../../../i18n'
 import { DisplaySearchNetwork } from '../DisplaySearchNetwork'
 
@@ -13,9 +16,9 @@ const render = () => {
 
 describe('SearchNetwork', () => {
   it('should render search screen with background', () => {
-    const [{ getByText, getByTestId }] = render()
-    getByText('Searching for networks...')
-    expect(getByTestId('Display-Search-Network-text')).toHaveStyle(
+    render()
+    screen.getByText('Searching for networks...')
+    expect(screen.getByTestId('Display-Search-Network-text')).toHaveStyle(
       `background-color: ${COLORS.white}`
     )
   })

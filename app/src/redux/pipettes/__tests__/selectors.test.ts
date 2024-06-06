@@ -1,8 +1,12 @@
+import { describe, it, expect } from 'vitest'
+
 import { getPipetteModelSpecs } from '@opentrons/shared-data'
+
 import * as POCFixtures from '../../calibration/pipette-offset/__fixtures__'
 import * as TLCFixtures from '../../calibration/tip-length/__fixtures__'
 import * as Selectors from '../selectors'
 import * as Fixtures from '../__fixtures__'
+
 import type { State } from '../../types'
 
 interface SelectorSpec {

@@ -5,7 +5,6 @@ from typing import Any, Dict, Optional, Set, Tuple, Union, cast
 
 from opentrons.types import Point
 
-from opentrons.config import feature_flags as ff
 from opentrons_shared_data.pipette.pipette_definition import (
     PipetteConfigurations,
     PlungerPositions,
@@ -26,12 +25,12 @@ from opentrons_shared_data.errors.exceptions import (
     CommandPreconditionViolated,
     PythonException,
 )
-from ..instrument_abc import AbstractInstrument
-from ..instrument_helpers import (
+from opentrons_shared_data.pipette.ul_per_mm import (
     piecewise_volume_conversion,
     PIPETTING_FUNCTION_FALLBACK_VERSION,
     PIPETTING_FUNCTION_LATEST_VERSION,
 )
+from ..instrument_abc import AbstractInstrument
 from .instrument_calibration import (
     save_pipette_offset_calibration,
     load_pipette_offset,
@@ -68,6 +67,7 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
         config: PipetteConfigurations,
         pipette_offset_cal: PipetteOffsetByPipetteMount,
         pipette_id: Optional[str] = None,
+        use_old_aspiration_functions: bool = False,
     ) -> None:
         self._config = config
         self._config_as_dict = config.dict()
@@ -135,7 +135,7 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
 
         self._tip_overlap_lookup = self._liquid_class.tip_overlap_dictionary
 
-        if ff.use_old_aspiration_functions():
+        if use_old_aspiration_functions:
             self._pipetting_function_version = PIPETTING_FUNCTION_FALLBACK_VERSION
         else:
             self._pipetting_function_version = PIPETTING_FUNCTION_LATEST_VERSION
@@ -484,7 +484,6 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
         Remove the tip from the pipette (effectively updates the pipette's
         critical point)
         """
-        assert self.has_tip_length
         self._current_tip_length = 0.0
         self._has_tip_length = False
 
@@ -668,8 +667,18 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
         ):
             if not config:
                 continue
-            if count in config.current_by_tip_count:
+
+            if isinstance(config, PressFitPickUpTipConfiguration) and all(
+                [
+                    config.speed_by_tip_count.get(count),
+                    config.distance_by_tip_count.get(count),
+                    config.current_by_tip_count.get(count),
+                ]
+            ):
                 return config
+            elif config.current_by_tip_count.get(count) is not None:
+                return config
+
         raise CommandPreconditionViolated(
             message=f"No pick up tip configuration for {count} tips",
         )
@@ -679,6 +688,7 @@ def _reload_and_check_skip(
     new_config: PipetteConfigurations,
     attached_instr: Pipette,
     pipette_offset: PipetteOffsetByPipetteMount,
+    use_old_aspiration_functions: bool,
 ) -> Tuple[Pipette, bool]:
     # Once we have determined that the new and attached pipettes
     # are similar enough that we might skip, see if the configs
@@ -697,7 +707,12 @@ def _reload_and_check_skip(
                 changed.add(k)
         if changed.intersection("quirks"):
             # Something has changed that requires reconfig
-            p = Pipette(new_config, pipette_offset, attached_instr._pipette_id)
+            p = Pipette(
+                new_config,
+                pipette_offset,
+                attached_instr._pipette_id,
+                use_old_aspiration_functions,
+            )
             p.act_as(attached_instr.acting_as)
             return p, False
         # Good to skip, just need to update calibration offset and update_info
@@ -711,6 +726,7 @@ def load_from_config_and_check_skip(
     requested: Optional[PipetteName],
     serial: Optional[str],
     pipette_offset: PipetteOffsetByPipetteMount,
+    use_old_aspiration_functions: bool,
 ) -> Tuple[Optional[Pipette], bool]:
     """
     Given the pipette config for an attached pipette (if any) freshly read
@@ -742,6 +758,7 @@ def load_from_config_and_check_skip(
                         config,
                         attached,
                         pipette_offset,
+                        use_old_aspiration_functions,
                     )
             else:
                 # if there is no request, make sure that the old pipette
@@ -752,9 +769,13 @@ def load_from_config_and_check_skip(
                         config,
                         attached,
                         pipette_offset,
+                        use_old_aspiration_functions,
                     )
 
     if config:
-        return Pipette(config, pipette_offset, serial), False
+        return (
+            Pipette(config, pipette_offset, serial, use_old_aspiration_functions),
+            False,
+        )
     else:
         return None, False

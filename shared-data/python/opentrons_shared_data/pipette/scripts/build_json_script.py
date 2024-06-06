@@ -60,13 +60,15 @@ def _build_pickup_tip_data(
         distance = float(
             input("please provide the starting distance for pick up tip\n")
         )
-    print(f"TODO: Current {current} is not used yet")
+    print(
+        f"TODO: Current {current}, speed {speed} and distance {distance} is not used yet"
+    )
     return PickUpTipConfigurations(
         pressFit=PressFitPickUpTipConfiguration(
-            speed=speed,
+            speedByTipCount={},
             presses=presses,
             increment=increment,
-            distance=distance,
+            distanceByTipCount={},
             currentByTipCount={},
         )
     )
@@ -85,7 +87,8 @@ def _build_drop_tip_data(
         plungerEject=PlungerEjectDropTipConfiguration(
             current=current,
             speed=speed,
-        )
+        ),
+        camAction=None,
     )
 
 

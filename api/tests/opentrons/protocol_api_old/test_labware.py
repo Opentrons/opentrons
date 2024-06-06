@@ -15,6 +15,7 @@ from opentrons.hardware_control.modules.types import (
 from opentrons.protocols.api_support.types import APIVersion
 from opentrons.protocol_api import labware, validation
 from opentrons.protocol_api.core.labware import AbstractLabware
+from opentrons.protocol_api.core.well import AbstractWellCore
 from opentrons.protocol_api.core.legacy import module_geometry
 from opentrons.protocol_api.core.legacy.legacy_labware_core import LegacyLabwareCore
 from opentrons.protocol_api.core.legacy.legacy_well_core import LegacyWellCore
@@ -543,7 +544,10 @@ def test_tiprack_list():
         core_map=None,  # type: ignore[arg-type]
     )
 
-    assert labware.select_tiprack_from_list([tiprack], 1) == (tiprack, tiprack["A1"])
+    assert labware.select_tiprack_from_list([tiprack], 1) == (
+        tiprack,
+        tiprack["A1"],
+    )
 
     assert labware.select_tiprack_from_list([tiprack], 1, tiprack.wells()[1]) == (
         tiprack,
@@ -652,7 +656,7 @@ def test_labware_hash_func_diff_implementation_same_version(
 
 def test_set_offset(decoy: Decoy) -> None:
     """It should set the labware's offset using the implementation."""
-    labware_impl = decoy.mock(cls=AbstractLabware)
+    labware_impl: AbstractLabware[AbstractWellCore] = decoy.mock(cls=AbstractLabware)
     decoy.when(labware_impl.get_well_columns()).then_return([])
     subject = labware.Labware(
         core=labware_impl,

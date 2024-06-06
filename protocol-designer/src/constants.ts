@@ -10,15 +10,17 @@ import {
   TEMPERATURE_MODULE_V2,
   THERMOCYCLER_MODULE_V1,
   HEATERSHAKER_MODULE_V1,
-  LabwareDefinition2,
-  DeckSlot as DeckDefSlot,
   THERMOCYCLER_MODULE_V2,
   MAGNETIC_BLOCK_TYPE,
   MAGNETIC_BLOCK_V1,
 } from '@opentrons/shared-data'
-import { i18n } from './localization'
+import type {
+  LabwareDefinition2,
+  DeckSlot as DeckDefSlot,
+  ModuleType,
+  ModuleModel,
+} from '@opentrons/shared-data'
 import type { DeckSlot, WellVolumes } from './types'
-import type { ModuleType, ModuleModel } from '@opentrons/shared-data'
 
 export const getMaxVolumes = (def: LabwareDefinition2): WellVolumes =>
   mapValues(def.wells, well => well.totalLiquidVolume)
@@ -59,17 +61,17 @@ export const INITIAL_DECK_SETUP_STEP_ID = '__INITIAL_DECK_SETUP_STEP__'
 export const DEFAULT_CHANGE_TIP_OPTION: 'always' = 'always'
 // TODO: Ian 2019-06-13 don't keep these as hard-coded static values (see #3587)
 export const DEFAULT_MM_FROM_BOTTOM_ASPIRATE = 1
-export const DEFAULT_MM_FROM_BOTTOM_DISPENSE = 0.5
+export const DEFAULT_MM_FROM_BOTTOM_DISPENSE = 1
 // NOTE: in the negative Z direction, to go down from top
 export const DEFAULT_MM_TOUCH_TIP_OFFSET_FROM_TOP = -1
 export const DEFAULT_MM_BLOWOUT_OFFSET_FROM_TOP = 0
 export const DEFAULT_DELAY_SECONDS = 1
 export const DEFAULT_WELL_ORDER_FIRST_OPTION: 't2b' = 't2b'
 export const DEFAULT_WELL_ORDER_SECOND_OPTION: 'l2r' = 'l2r'
-export const MIN_ENGAGE_HEIGHT_V1 = -5
-export const MAX_ENGAGE_HEIGHT_V1 = 40
-export const MIN_ENGAGE_HEIGHT_V2 = -4
-export const MAX_ENGAGE_HEIGHT_V2 = 19
+export const MIN_ENGAGE_HEIGHT_V1 = 0
+export const MAX_ENGAGE_HEIGHT_V1 = 45
+export const MIN_ENGAGE_HEIGHT_V2 = -2.5
+export const MAX_ENGAGE_HEIGHT_V2 = 25
 export const MIN_TEMP_MODULE_TEMP = 4
 export const MAX_TEMP_MODULE_TEMP = 95
 export const MIN_HEATER_SHAKER_MODULE_TEMP = 37
@@ -96,43 +98,43 @@ export const MODELS_FOR_MODULE_TYPE: Record<
 > = {
   [MAGNETIC_MODULE_TYPE]: [
     {
-      name: i18n.t(`modules.model_display_name.${MAGNETIC_MODULE_V1}`),
+      name: 'GEN1',
       value: MAGNETIC_MODULE_V1,
     },
     {
-      name: i18n.t(`modules.model_display_name.${MAGNETIC_MODULE_V2}`),
+      name: 'GEN2',
       value: MAGNETIC_MODULE_V2,
     },
   ],
   [TEMPERATURE_MODULE_TYPE]: [
     {
-      name: i18n.t(`modules.model_display_name.${TEMPERATURE_MODULE_V1}`),
+      name: 'GEN1',
       value: TEMPERATURE_MODULE_V1,
     },
     {
-      name: i18n.t(`modules.model_display_name.${TEMPERATURE_MODULE_V2}`),
+      name: 'GEN2',
       value: TEMPERATURE_MODULE_V2,
     },
   ],
   [THERMOCYCLER_MODULE_TYPE]: [
     {
-      name: i18n.t(`modules.model_display_name.${THERMOCYCLER_MODULE_V1}`),
+      name: 'GEN1',
       value: THERMOCYCLER_MODULE_V1,
     },
     {
-      name: i18n.t(`modules.model_display_name.${THERMOCYCLER_MODULE_V2}`),
+      name: 'GEN2',
       value: THERMOCYCLER_MODULE_V2,
     },
   ],
   [HEATERSHAKER_MODULE_TYPE]: [
     {
-      name: i18n.t(`modules.model_display_name.${HEATERSHAKER_MODULE_V1}`),
+      name: 'GEN1',
       value: HEATERSHAKER_MODULE_V1,
     },
   ],
   [MAGNETIC_BLOCK_TYPE]: [
     {
-      name: i18n.t(`modules.model_display_name.${MAGNETIC_BLOCK_V1}`),
+      name: 'GEN1',
       value: MAGNETIC_BLOCK_V1,
     },
   ],
@@ -156,8 +158,3 @@ export const DND_TYPES = {
 // Values for TC fields
 export const THERMOCYCLER_STATE: 'thermocyclerState' = 'thermocyclerState'
 export const THERMOCYCLER_PROFILE: 'thermocyclerProfile' = 'thermocyclerProfile'
-
-export const OT_2_TRASH_DEF_URI = 'opentrons/opentrons_1_trash_1100ml_fixed/1'
-export const FLEX_TRASH_DEF_URI = 'opentrons/opentrons_1_trash_3200ml_fixed/1'
-
-export const COLUMN_3_SLOTS = ['A3', 'B3', 'C3', 'D3']

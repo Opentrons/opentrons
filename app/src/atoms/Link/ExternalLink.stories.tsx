@@ -1,22 +1,26 @@
 import * as React from 'react'
-import { Flex, COLORS } from '@opentrons/components'
-import { ExternalLink } from './ExternalLink'
+import { COLORS, Flex, SPACING } from '@opentrons/components'
+import { ExternalLink as ExternalLinkComponent } from './ExternalLink'
 
-import type { Story, Meta } from '@storybook/react'
+import type { Meta, StoryObj } from '@storybook/react'
 
-export default {
+const meta: Meta<typeof ExternalLinkComponent> = {
   title: 'App/Atoms/ExternalLink',
-  component: ExternalLink,
-} as Meta
+  component: ExternalLinkComponent,
+  decorators: [
+    Story => (
+      <Flex backgroundColor={COLORS.grey10} padding={SPACING.spacing16}>
+        <Story />
+      </Flex>
+    ),
+  ],
+}
+export default meta
+type Story = StoryObj<typeof ExternalLinkComponent>
 
-const Template: Story<React.ComponentProps<typeof ExternalLink>> = args => (
-  <Flex backgroundColor={COLORS.fundamentalsBackground}>
-    <ExternalLink {...args} />
-  </Flex>
-)
-
-export const Primary = Template.bind({})
-Primary.args = {
-  href: 'https://www.opentrons.com',
-  children: 'Open the link',
+export const ExternalLink: Story = {
+  args: {
+    href: 'https://www.opentrons.com',
+    children: 'Open the link',
+  },
 }

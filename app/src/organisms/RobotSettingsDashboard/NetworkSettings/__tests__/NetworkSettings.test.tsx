@@ -1,8 +1,11 @@
+/* eslint-disable testing-library/no-node-access */
 import * as React from 'react'
-
-import { renderWithProviders } from '@opentrons/components'
+import { screen } from '@testing-library/react'
+import { describe, it, expect, vi, beforeEach } from 'vitest'
+import '@testing-library/jest-dom/vitest'
 
 import { i18n } from '../../../../i18n'
+import { renderWithProviders } from '../../../../__testing-utils__'
 import { getLocalRobot } from '../../../../redux/discovery'
 import { useWifiList } from '../../../../resources/networking/hooks'
 import { WifiConnectionDetails } from '../WifiConnectionDetails'
@@ -12,22 +15,12 @@ import { NetworkSettings } from '..'
 import type { DiscoveredRobot } from '../../../../redux/discovery/types'
 import type { WifiNetwork } from '../../../../redux/networking/types'
 
-jest.mock('../../../../redux/discovery')
-jest.mock('../../../../resources/networking/hooks')
-jest.mock('../WifiConnectionDetails')
-jest.mock('../EthernetConnectionDetails')
+vi.mock('../../../../redux/discovery')
+vi.mock('../../../../resources/networking/hooks')
+vi.mock('../WifiConnectionDetails')
+vi.mock('../EthernetConnectionDetails')
 
-const mockGetLocalRobot = getLocalRobot as jest.MockedFunction<
-  typeof getLocalRobot
->
-const mockUseWifiList = useWifiList as jest.MockedFunction<typeof useWifiList>
-const mockWifiSettings = WifiConnectionDetails as jest.MockedFunction<
-  typeof WifiConnectionDetails
->
-const mockEthernetConnectionDetails = EthernetConnectionDetails as jest.MockedFunction<
-  typeof EthernetConnectionDetails
->
-const mockSetCurrentOption = jest.fn()
+const mockSetCurrentOption = vi.fn()
 
 const render = (props: React.ComponentProps<typeof NetworkSettings>) => {
   return renderWithProviders(<NetworkSettings {...props} />, {
@@ -49,59 +42,57 @@ describe('NetworkSettings', () => {
         activeSsid: 'Mock WiFi Network',
       },
     }
-    mockGetLocalRobot.mockReturnValue({
+    vi.mocked(getLocalRobot).mockReturnValue({
       name: 'Otie',
     } as DiscoveredRobot)
-    mockUseWifiList.mockReturnValue([
+    vi.mocked(useWifiList).mockReturnValue([
       {
         ssid: 'Mock WiFi Network',
         active: true,
         securityType: 'wpa-psk',
       } as WifiNetwork,
     ])
-    mockWifiSettings.mockReturnValue(<div>mock WifiConnectionDetails</div>)
-    mockEthernetConnectionDetails.mockReturnValue(
+    vi.mocked(WifiConnectionDetails).mockReturnValue(
+      <div>mock WifiConnectionDetails</div>
+    )
+    vi.mocked(EthernetConnectionDetails).mockReturnValue(
       <div>mock EthernetConnectionDetails</div>
     )
   })
 
-  afterEach(() => {
-    jest.clearAllMocks()
-  })
-
   it('displays the wifi and ethernet options', () => {
-    const [{ getByText }] = render(props)
-    expect(getByText('Wi-Fi')).toBeTruthy()
-    expect(getByText('Ethernet')).toBeTruthy()
+    render(props)
+    expect(screen.getByText('Wi-Fi')).toBeTruthy()
+    expect(screen.getByText('Ethernet')).toBeTruthy()
   })
 
   it('selecting the Wi-Fi option displays the wifi details', () => {
-    const [{ getByText }] = render(props)
-    getByText('Wi-Fi').click()
+    render(props)
+    screen.getByText('Wi-Fi').click()
     expect(mockSetCurrentOption).toHaveBeenCalledWith('RobotSettingsWifi')
   })
 
   it('clicking back on the wifi details screen shows the network settings page again', () => {
-    const [{ getByText, queryByText, container }] = render(props)
-    getByText('Wi-Fi').click()
+    const [{ container }] = render(props)
+    screen.getByText('Wi-Fi').click()
     container.querySelector('button')?.click()
-    expect(queryByText('WIFI DETAILS')).toBeFalsy()
-    expect(getByText('Network Settings')).toBeTruthy()
+    expect(screen.queryByText('WIFI DETAILS')).toBeFalsy()
+    expect(screen.getByText('Network Settings')).toBeTruthy()
   })
 
   it('selecting the Ethernet option displays the ethernet details', () => {
-    const [{ getByText }] = render(props)
-    getByText('Ethernet').click()
+    render(props)
+    screen.getByText('Ethernet').click()
     expect(mockSetCurrentOption).toHaveBeenCalledWith(
       'EthernetConnectionDetails'
     )
   })
 
   it('clicking back on the ethernet details screen shows the network settings page again', () => {
-    const [{ getByText, queryByText, container }] = render(props)
-    getByText('Ethernet').click()
+    const [{ container }] = render(props)
+    screen.getByText('Ethernet').click()
     container.querySelector('button')?.click()
-    expect(queryByText('ETHERNET DETAILS')).toBeFalsy()
-    expect(getByText('Network Settings')).toBeTruthy()
+    expect(screen.queryByText('ETHERNET DETAILS')).toBeFalsy()
+    expect(screen.getByText('Network Settings')).toBeTruthy()
   })
 })

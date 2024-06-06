@@ -1,17 +1,18 @@
 import * as React from 'react'
-import { fireEvent } from '@testing-library/react'
+import { fireEvent, screen } from '@testing-library/react'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
-import { renderWithProviders } from '@opentrons/components'
 import { RUN_STATUS_RUNNING, RUN_STATUS_IDLE } from '@opentrons/api-client'
 
+import { renderWithProviders } from '../../../../__testing-utils__'
 import { i18n } from '../../../../i18n'
 import { mockRobotSideAnalysis } from '../../../CommandText/__fixtures__'
 import { RunningProtocolCommandList } from '../RunningProtocolCommandList'
 
-const mockPlayRun = jest.fn()
-const mockPauseRun = jest.fn()
-const mockShowModal = jest.fn()
+const mockPlayRun = vi.fn()
+const mockPauseRun = vi.fn()
+const mockShowModal = vi.fn()
 
 const render = (
   props: React.ComponentProps<typeof RunningProtocolCommandList>
@@ -30,7 +31,7 @@ describe('RunningProtocolCommandList', () => {
       playRun: mockPlayRun,
       pauseRun: mockPauseRun,
       setShowConfirmCancelRunModal: mockShowModal,
-      trackProtocolRunEvent: jest.fn(), // temporary
+      trackProtocolRunEvent: vi.fn(), // temporary
       robotAnalyticsData: {} as any,
       protocolName: 'mockRunningProtocolName',
       currentRunCommandIndex: 0,
@@ -38,12 +39,12 @@ describe('RunningProtocolCommandList', () => {
     }
   })
   it('should render text and buttons', () => {
-    const [{ getByText, getByLabelText }] = render(props)
-    getByText('Running')
-    getByText('mockRunningProtocolName')
-    getByText('Load P300 Single-Channel GEN1 in Left Mount')
-    getByLabelText('stop')
-    getByLabelText('pause')
+    render(props)
+    screen.getByText('Running')
+    screen.getByText('mockRunningProtocolName')
+    screen.getByText('Load P300 Single-Channel GEN1 in Left Mount')
+    screen.getByLabelText('stop')
+    screen.getByLabelText('pause')
   })
 
   it('should render play button when runStatus is idle', () => {
@@ -51,13 +52,13 @@ describe('RunningProtocolCommandList', () => {
       ...props,
       runStatus: RUN_STATUS_IDLE,
     }
-    const [{ getByLabelText }] = render(props)
-    getByLabelText('play')
+    render(props)
+    screen.getByLabelText('play')
   })
 
   it('when tapping stop button, the modal is showing up', () => {
-    const [{ getByLabelText }] = render(props)
-    const button = getByLabelText('stop')
+    render(props)
+    const button = screen.getByLabelText('stop')
     fireEvent.click(button)
     expect(mockShowModal).toHaveBeenCalled()
   })

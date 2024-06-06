@@ -2,7 +2,7 @@ import * as React from 'react'
 
 import { LabwareRender, RobotWorkSpace } from '@opentrons/components'
 import { labwareImages } from './labware-images'
-import styles from './styles.css'
+import styles from './styles.module.css'
 
 import type { LabwareDefinition } from '../../types'
 
@@ -46,7 +46,12 @@ export function Gallery(props: GalleryProps): JSX.Element {
       {images.length > 1 && (
         <div className={styles.gallery_thumbnail_row}>
           {images.map((img, index) => (
-            <Thumbnail key={index} onClick={() => setCurrentImage(index)}>
+            <Thumbnail
+              key={index}
+              onClick={() => {
+                setCurrentImage(index)
+              }}
+            >
               {img}
             </Thumbnail>
           ))}

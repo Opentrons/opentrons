@@ -2,14 +2,15 @@ import * as React from 'react'
 import { css } from 'styled-components'
 import { useTranslation } from 'react-i18next'
 import {
-  Box,
-  Flex,
-  DIRECTION_COLUMN,
-  SPACING,
-  JUSTIFY_SPACE_BETWEEN,
-  ALIGN_STRETCH,
   ALIGN_FLEX_END,
+  ALIGN_STRETCH,
+  Box,
+  DIRECTION_COLUMN,
+  Flex,
+  JUSTIFY_SPACE_BETWEEN,
   PrimaryButton,
+  SPACING,
+  StyledText,
 } from '@opentrons/components'
 
 import { useLogger } from '../../logger'
@@ -19,7 +20,6 @@ import {
   MEDIUM_STEP_SIZE_MM,
   SMALL_STEP_SIZE_MM,
 } from '../../molecules/JogControls'
-import { StyledText } from '../../atoms/text'
 import { formatJogVector } from './utils'
 import { useConfirmCrashRecovery } from './useConfirmCrashRecovery'
 import { NeedHelpLink } from './NeedHelpLink'
@@ -129,7 +129,7 @@ const contentsBySessionTypeByCurrentStep: {
 
 export function SaveXYPoint(props: CalibrationPanelProps): JSX.Element | null {
   const { t } = useTranslation('robot_calibration')
-  const logger = useLogger(__filename)
+  const logger = useLogger(new URL('', import.meta.url).pathname)
   const {
     isMulti,
     mount,

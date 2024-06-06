@@ -33,5 +33,5 @@ Pages in this section of the documentation cover:
 
 .. note::
 
-    Throughout these pages, most code examples use coordinate deck slot locations (e.g. ``'D1'``, ``'D2'``), like those found on Flex. If you have an OT-2 and are using API version 2.14 or earlier, replace the coordinate with its numeric OT-2 equivalent. For example, slot D1 on Flex corresponds to slot 1 on an OT-2. See :ref:`deck-slots` for more information.
+    Throughout these pages, most code examples use coordinate deck slot locations (e.g. ``"D1"``, ``"D2"``), like those found on Flex. If you have an OT-2 and are using API version 2.14 or earlier, replace the coordinate with its numeric OT-2 equivalent. For example, slot D1 on Flex corresponds to slot 1 on an OT-2. See :ref:`deck-slots` for more information.
 

@@ -11,7 +11,6 @@ on:
       - 'app-shell-odd/**/*'
       - 'components/**/*'
       - 'shared-data/**/*'
-      - 'webpack-config/**/*'
       - 'discovery-client/**/*'
       - '*.js'
       - 'scripts/**/*'
@@ -32,7 +31,6 @@ on:
       - 'app-shell-odd/**/*'
       - 'components/**/*'
       - 'shared-data/**/*'
-      - 'webpack-config/**/*'
       - 'discovery-client/**/*'
       - '*.js'
       - '*.json'
@@ -61,9 +59,12 @@ jobs:
       - uses: 'actions/checkout@v3'
       - uses: 'actions/setup-node@v3'
         with:
-          node-version: '16'
+          node-version: '18.19.0'
       - name: 'install udev'
-        run: sudo apt-get update && sudo apt-get install libudev-dev
+        run: |
+          # WORKAROUND: Remove microsoft debian repo due to https://github.com/microsoft/linux-package-repositories/issues/130. Remove line below after it is resolved
+          sudo rm -f /etc/apt/sources.list.d/microsoft-prod.list
+          sudo apt-get update && sudo apt-get install libudev-dev
       - name: 'set complex environment variables'
         id: 'set-vars'
         uses: actions/github-script@v6
@@ -110,17 +111,18 @@ jobs:
           git checkout ${{ github.ref }}
       - uses: 'actions/setup-node@v3'
         with:
-          node-version: '16'
+          node-version: '18.19.0'
       - uses: actions/setup-python@v4
         with:
           python-version: '3.10'
-      - name: 'downgrade npm version'
-        run: npm install -g npm@6
       - name: check make version
         run: make --version
       - name: 'install libudev and libsystemd'
         if: startsWith(matrix.os, 'ubuntu')
-        run: sudo apt-get update && sudo apt-get install libudev-dev
+        run: |
+          # WORKAROUND: Remove microsoft debian repo due to https://github.com/microsoft/linux-package-repositories/issues/130. Remove line below after it is resolved
+          sudo rm -f /etc/apt/sources.list.d/microsoft-prod.list
+          sudo apt-get update && sudo apt-get install libudev-dev
       - name: 'set complex environment variables'
         id: 'set-vars'
         uses: actions/github-script@v6
@@ -141,7 +143,7 @@ jobs:
           yarn config set cache-folder ${{ github.workspace }}/.yarn-cache
           make setup-js
       - name: 'test native(er) packages'
-        run: make test-js-internal tests="app-shell/src app-shell-odd/src discovery-client/src" cov_opts="--coverage=true --ci=true --collectCoverageFrom='(app-shell|app-shell-odd| discovery-client)/src/**/*.(js|ts|tsx)'"
+        run: make test-js-internal tests="app-shell/src app-shell-odd/src discovery-client/src" cov_opts="--coverage=true"
       - name: 'Upload coverage report'
         uses: 'codecov/codecov-action@v3'
         with:
@@ -243,17 +245,18 @@ jobs:
           git checkout ${{ github.ref }}
       - uses: 'actions/setup-node@v3'
         with:
-          node-version: '16'
+          node-version: '18.19.0'
       - uses: actions/setup-python@v4
         with:
           python-version: '3.10'
-      - name: 'downgrade npm version'
-        run: npm install -g npm@6
       - name: check make version
         run: make --version
       - name: 'install libudev and libsystemd'
         if: startsWith(matrix.os, 'ubuntu')
-        run: sudo apt-get update && sudo apt-get install libudev-dev
+        run: |
+          # WORKAROUND: Remove microsoft debian repo due to https://github.com/microsoft/linux-package-repositories/issues/130. Remove line below after it is resolved
+          sudo rm -f /etc/apt/sources.list.d/microsoft-prod.list
+          sudo apt-get update && sudo apt-get install libudev-dev
       - name: 'set complex environment variables'
         id: 'set-vars'
         uses: actions/github-script@v6
@@ -293,7 +296,7 @@ jobs:
           OT_APP_DEPLOY_FOLDER: ${{ steps.project.outputs.folder }}
 
         run: |
-          make -C app-shell dist-${{ matrix.os }}
+          make -C app-shell dist-${{ matrix.os }} USE_HARD_LINKS=false
 
       - name: 'upload github artifact'
         if: matrix.target == 'desktop'
@@ -427,9 +430,12 @@ jobs:
           git checkout ${{ github.ref }}
       - uses: 'actions/setup-node@v3'
         with:
-          node-version: '16'
+          node-version: '18.19.0'
       - name: 'install udev'
-        run: sudo apt-get update && sudo apt-get install libudev-dev
+        run: |
+          # WORKAROUND: Remove microsoft debian repo due to https://github.com/microsoft/linux-package-repositories/issues/130. Remove line below after it is resolved
+          sudo rm -f /etc/apt/sources.list.d/microsoft-prod.list
+          sudo apt-get update && sudo apt-get install libudev-dev
       - name: 'set complex environment variables'
         id: 'set-vars'
         uses: actions/github-script@v6
@@ -443,7 +449,6 @@ jobs:
           path: |
             ${{ github.workspace }}/.npm-cache/_prebuild
             ${{ github.workspace }}/.yarn-cache
-          key: js-${{ secrets.GH_CACHE_VERSION }}-${{ runner.os }}-yarn-${{ hashFiles('yarn.lock') }}
       - name: 'setup-js'
         run: |
           npm config set cache ${{ github.workspace }}/.npm-cache

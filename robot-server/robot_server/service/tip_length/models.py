@@ -17,7 +17,15 @@ class TipLengthCalibration(DeprecatedResponseDataModel):
     """
 
     tipLength: float = Field(..., description="The tip length value in mm")
-    tiprack: str = Field(..., description="The sha256 hash of the tiprack")
+    tiprack: str = Field(
+        ...,
+        description="A hash of the labware definition of the tip rack that"
+        " was used in this calibration."
+        " This is deprecated because it was prone to bugs where semantically identical"
+        " definitions had different hashes."
+        " Use `uri` instead.",
+        deprecated=True,
+    )
     pipette: str = Field(..., description="The pipette ID")
     lastModified: datetime = Field(
         ..., description="When this calibration was last modified"

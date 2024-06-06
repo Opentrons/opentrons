@@ -1,19 +1,21 @@
 import * as React from 'react'
-import { PauseArgs } from '@opentrons/step-generation'
-import { i18n } from '../../localization'
-import styles from './StepItem.css'
+import { useTranslation } from 'react-i18next'
+import styles from './StepItem.module.css'
+import type { PauseArgs } from '@opentrons/step-generation'
 interface Props {
   pauseArgs: PauseArgs
 }
 
 export function PauseStepItems(props: Props): JSX.Element | null {
   const { pauseArgs } = props
+  const { t } = useTranslation('application')
   if (!pauseArgs.meta) {
     // No message or time, show nothing
     return null
   }
   const { message, wait } = pauseArgs
   const { hours, minutes, seconds } = pauseArgs.meta
+
   return (
     <>
       {wait !== true ? (
@@ -23,13 +25,13 @@ export function PauseStepItems(props: Props): JSX.Element | null {
           </li>
           <li className={styles.substep_content}>
             <span className={styles.substep_time}>
-              {hours} {i18n.t('application.units.hours')}
+              {hours} {t('units.hours')}
             </span>
             <span className={styles.substep_time}>
-              {minutes} {i18n.t('application.units.minutes')}
+              {minutes} {t('units.minutes')}
             </span>
             <span className={styles.substep_time}>
-              {seconds} {i18n.t('application.units.seconds')}
+              {seconds} {t('units.seconds')}
             </span>
           </li>
         </>
@@ -40,9 +42,9 @@ export function PauseStepItems(props: Props): JSX.Element | null {
           </li>
         </>
       )}
-      {message && (
+      {message != null && message !== '' ? (
         <li className={styles.substep_content}>&quot;{message}&quot;</li>
-      )}
+      ) : null}
     </>
   )
 }

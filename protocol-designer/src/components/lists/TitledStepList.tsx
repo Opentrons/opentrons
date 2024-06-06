@@ -1,7 +1,8 @@
 import * as React from 'react'
 import cx from 'classnames'
-import { Icon, IconName } from '@opentrons/components'
-import styles from './styles.css'
+import { Icon } from '@opentrons/components'
+import styles from './styles.module.css'
+import type { IconName } from '@opentrons/components'
 
 export interface Props {
   /** text of title */
@@ -87,7 +88,7 @@ export function TitledStepList(props: Props): JSX.Element {
   )
 
   const multiSelectIconName = props.selected
-    ? 'checkbox-marked'
+    ? 'ot-checkbox'
     : 'checkbox-blank-outline'
 
   return (
@@ -110,7 +111,12 @@ export function TitledStepList(props: Props): JSX.Element {
           </div>
         )}
         {iconName && (
-          <Icon {...iconProps} className={iconClass} name={iconName} />
+          <Icon
+            {...iconProps}
+            data-testid={`TitledStepList_icon_${iconName}`}
+            className={iconClass}
+            name={iconName}
+          />
         )}
         <h3 className={styles.title}>{props.title}</h3>
         {collapsible && (

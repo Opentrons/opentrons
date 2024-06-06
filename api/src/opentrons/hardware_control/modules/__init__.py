@@ -3,6 +3,7 @@ from .tempdeck import TempDeck
 from .magdeck import MagDeck
 from .thermocycler import Thermocycler
 from .heater_shaker import HeaterShaker
+from .absorbance_reader import AbsorbanceReader
 from .update import update_firmware
 from .utils import MODULE_TYPE_BY_NAME, build
 from .types import (
@@ -11,6 +12,8 @@ from .types import (
     BundledFirmware,
     UpdateError,
     ModuleAtPort,
+    SimulatingModuleAtPort,
+    SimulatingModule,
     ModuleType,
     ModuleModel,
     TemperatureStatus,
@@ -33,6 +36,8 @@ __all__ = [
     "BundledFirmware",
     "UpdateError",
     "ModuleAtPort",
+    "SimulatingModuleAtPort",
+    "SimulatingModule",
     "HeaterShaker",
     "ModuleType",
     "ModuleModel",
@@ -41,4 +46,5 @@ __all__ = [
     "HeaterShakerStatus",
     "SpeedStatus",
     "LiveData",
+    "AbsorbanceReader",
 ]

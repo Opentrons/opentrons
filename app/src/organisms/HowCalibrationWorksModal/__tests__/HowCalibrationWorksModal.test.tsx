@@ -1,6 +1,8 @@
 import * as React from 'react'
-import { fireEvent } from '@testing-library/react'
-import { renderWithProviders } from '@opentrons/components'
+import { fireEvent, screen } from '@testing-library/react'
+import '@testing-library/jest-dom/vitest'
+import { describe, it, vi, beforeEach, expect } from 'vitest'
+import { renderWithProviders } from '../../../__testing-utils__'
 import { i18n } from '../../../i18n'
 import { HowCalibrationWorksModal } from '..'
 
@@ -15,66 +17,70 @@ const render = (
 describe('HowCalibrationWorksModal', () => {
   let props: React.ComponentProps<typeof HowCalibrationWorksModal>
   beforeEach(() => {
-    props = { onCloseClick: jest.fn() }
+    props = { onCloseClick: vi.fn() }
   })
 
   it('should render the correct header', () => {
-    const { getByText } = render(props)
-    getByText('How Robot Calibration Works')
+    render(props)
+    screen.getByText('How Robot Calibration Works')
   })
 
   it('should render the correct body', () => {
-    const { getByRole, getByText } = render(props)
-    getByText(
+    render(props)
+    screen.getByText(
       'Robot calibration establishes how the robot knows where it is in relation to the deck. Accurate Robot calibration is essential to run protocols successfully. Robot calibration has 3 parts: Deck calibration, Tip Length calibration and Pipette Offset calibration.'
     )
-    expect(getByRole('heading', { name: 'Deck Calibration' })).toBeTruthy()
-    getByText(
+    expect(
+      screen.getByRole('heading', { name: 'Deck Calibration' })
+    ).toBeTruthy()
+    screen.getByText(
       'This measures the deck X and Y values relative to the gantry. Deck Calibration is the foundation for Tip Length Calibration and Pipette Offset Calibration.'
     )
-    getByText('Perform Deck Calibration during new robot setup.')
-    getByText('Redo Deck Calibration if you relocate your robot.')
+    screen.getByText('Perform Deck Calibration during new robot setup.')
+    screen.getByText('Redo Deck Calibration if you relocate your robot.')
     expect(
-      getByRole('heading', { name: 'Tip Length Calibration' })
+      screen.getByRole('heading', { name: 'Tip Length Calibration' })
     ).toBeTruthy()
-    getByText(
+    screen.getByText(
       'This measures the Z distance between the bottom of the tip and the pipette’s nozzle. If you redo the tip length calibration for the tip you used to calibrate a pipette, you will also have to redo that Pipette Offset Calibration.'
     )
-    getByText(
+    screen.getByText(
       'Perform Tip Length Calibration for each new tip type used on a pipette.'
     )
     expect(
-      getByRole('heading', { name: 'Pipette Offset Calibration' })
+      screen.getByRole('heading', { name: 'Pipette Offset Calibration' })
     ).toBeTruthy()
-    getByText(
+    screen.getByText(
       'This measures a pipette’s X, Y and Z values in relation to the pipette mount and the deck. Pipette Offset Calibration relies on Deck Calibration and Tip Length Calibration.'
     )
-    getByText(
+    screen.getByText(
       'Perform Pipette Offset calibration the first time you attach a pipette to a new mount.'
     )
-    getByText(
+    screen.getByText(
       'Redo Pipette Offset Calibration after performing Deck Calibration.'
     )
-    getByText(
+    screen.getByText(
       'Redo Pipette Offset Calibration after performing Tip Length Calibration for the tip you used to calibrate the pipette.'
     )
   })
 
   it('should render a link to the learn more page', () => {
-    const { getByRole } = render(props)
+    render(props)
     expect(
-      getByRole('link', {
-        name: 'Learn more about robot calibration',
-      }).getAttribute('href')
+      screen
+        .getByRole('link', {
+          name: 'Learn more about robot calibration',
+        })
+        .getAttribute('href')
     ).toBe(
       'https://support.opentrons.com/s/article/How-positional-calibration-works-on-the-OT-2'
     )
   })
 
   it('should call onCloseClick when the close button is pressed', () => {
-    const { getByRole } = render(props)
+    render(props)
     expect(props.onCloseClick).not.toHaveBeenCalled()
-    const closeButton = getByRole('button', { name: 'close' })
+    const closeButton = screen.getByRole('button', { name: 'close' })
     fireEvent.click(closeButton)
     expect(props.onCloseClick).toHaveBeenCalled()
   })

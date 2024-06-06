@@ -1,3 +1,4 @@
+import { beforeEach, describe, it, expect, vi } from 'vitest'
 import merge from 'lodash/merge'
 import { makeImmutableStateUpdater } from '../__utils__'
 import {
@@ -11,19 +12,17 @@ import { dispenseUpdateLiquidState } from '../getNextRobotStateAndWarnings/dispe
 import type { InvariantContext, RobotState } from '../types'
 
 const forPickUpTip = makeImmutableStateUpdater(_forPickUpTip)
-jest.mock('../getNextRobotStateAndWarnings/dispenseUpdateLiquidState')
+vi.mock('../getNextRobotStateAndWarnings/dispenseUpdateLiquidState')
 const tiprack1Id = 'tiprack1Id'
 const p300SingleId = DEFAULT_PIPETTE
 const p300MultiId = 'p300MultiId'
 let invariantContext: InvariantContext
 let initialRobotState: RobotState
-const dispenseUpdateLiquidStateMock = dispenseUpdateLiquidState as jest.MockedFunction<
-  typeof dispenseUpdateLiquidState
->
+
 beforeEach(() => {
   invariantContext = makeContext()
   initialRobotState = getInitialRobotStateStandard(invariantContext)
-  dispenseUpdateLiquidStateMock.mockClear()
+  vi.mocked(dispenseUpdateLiquidState).mockClear()
 })
 describe('tip tracking', () => {
   it('single-channel', () => {

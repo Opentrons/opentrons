@@ -1,4 +1,6 @@
 export { createAuthorization } from './createAuthorization'
 export { createRegistration } from './createRegistration'
+export { createSplash } from './createSplash'
 export { getConnections } from './getConnections'
 export * from './types'
+export * from './utils'

@@ -5,35 +5,36 @@ import { Trans, useTranslation } from 'react-i18next'
 import { NavLink } from 'react-router-dom'
 
 import {
-  SPACING,
-  Icon,
-  Flex,
   Box,
-  DIRECTION_COLUMN,
   COLORS,
-  TYPOGRAPHY,
+  DIRECTION_COLUMN,
+  Flex,
+  Icon,
   SIZE_1,
+  SPACING,
+  StyledText,
+  TYPOGRAPHY,
 } from '@opentrons/components'
-import { useAllRunsQuery } from '@opentrons/react-api-client'
 
-import { StyledText } from '../../atoms/text'
 import { MiniCard } from '../../molecules/MiniCard'
 import { getRobotModelByName, OPENTRONS_USB } from '../../redux/discovery'
 import { getNetworkInterfaces, fetchStatus } from '../../redux/networking'
 import { appShellRequestor } from '../../redux/shell/remote'
 import OT2_PNG from '../../assets/images/OT2-R_HERO.png'
 import FLEX_PNG from '../../assets/images/FLEX.png'
-import { RobotBusyStatusAction } from '.'
+import { useNotifyAllRunsQuery } from '../../resources/runs'
 
 import type { IconName } from '@opentrons/components'
+import type { Runs } from '@opentrons/api-client'
 import type { Robot } from '../../redux/discovery/types'
 import type { Dispatch, State } from '../../redux/types'
+import type { RobotBusyStatusAction } from '.'
 
 interface AvailableRobotOptionProps {
   robot: Robot
   onClick: () => void
   isSelected: boolean
-  isOnDifferentSoftwareVersion: boolean
+  isSelectedRobotOnDifferentSoftwareVersion: boolean
   registerRobotBusyStatus: React.Dispatch<RobotBusyStatusAction>
   isError?: boolean
   showIdleOnly?: boolean
@@ -47,22 +48,22 @@ export function AvailableRobotOption(
     onClick,
     isSelected,
     isError = false,
-    isOnDifferentSoftwareVersion,
+    isSelectedRobotOnDifferentSoftwareVersion,
     showIdleOnly = false,
     registerRobotBusyStatus,
   } = props
   const { ip, local, name: robotName } = robot ?? {}
-  const { t } = useTranslation('protocol_list')
+  const { t } = useTranslation(['protocol_list', 'branded'])
   const dispatch = useDispatch<Dispatch>()
   const robotModel = useSelector((state: State) =>
     getRobotModelByName(state, robotName)
   )
 
-  const { data: runsData } = useAllRunsQuery(
+  const { data: runsData } = useNotifyAllRunsQuery(
     { pageLength: 0 },
     {
       onSuccess: data => {
-        if (data?.links?.current != null)
+        if ((data as Runs)?.links?.current != null)
           registerRobotBusyStatus({ type: 'robotIsBusy', robotName })
         else {
           registerRobotBusyStatus({ type: 'robotIsIdle', robotName })
@@ -99,7 +100,9 @@ export function AvailableRobotOption(
       <MiniCard
         onClick={onClick}
         isSelected={isSelected}
-        isError={(isError || isOnDifferentSoftwareVersion) && isSelected}
+        isError={
+          (isError || isSelectedRobotOnDifferentSoftwareVersion) && isSelected
+        }
       >
         <img
           src={robotModel === 'OT-2' ? OT2_PNG : FLEX_PNG}
@@ -134,33 +137,30 @@ export function AvailableRobotOption(
             </StyledText>
           </Box>
         </Flex>
-        {(isError || isOnDifferentSoftwareVersion) && isSelected ? (
+        {(isError || isSelectedRobotOnDifferentSoftwareVersion) &&
+        isSelected ? (
           <>
             <Box flex="1 1 auto" />
-            <Icon
-              name="alert-circle"
-              size="1.25rem"
-              color={COLORS.errorEnabled}
-            />
+            <Icon name="alert-circle" size="1.25rem" color={COLORS.red50} />
           </>
         ) : null}
       </MiniCard>
 
-      {isOnDifferentSoftwareVersion && isSelected ? (
+      {isSelectedRobotOnDifferentSoftwareVersion && isSelected ? (
         <StyledText
           as="label"
-          color={COLORS.errorText}
+          color={COLORS.red60}
           marginBottom={SPACING.spacing8}
           css={css`
             & > a {
-              color: ${COLORS.errorText};
+              color: ${COLORS.red60};
               text-decoration: ${TYPOGRAPHY.textDecorationUnderline};
             }
           `}
         >
           <Trans
             t={t}
-            i18nKey="a_robot_software_update_is_available"
+            i18nKey="branded:a_robot_software_update_is_available"
             components={{
               robotLink: <NavLink to={`/devices/${robotName}`} />,
             }}

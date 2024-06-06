@@ -46,7 +46,7 @@ export const FOOTER_BUTTON_STYLE = css`
   text-transform: lowercase;
   padding-left: ${SPACING.spacing16};
   padding-right: ${SPACING.spacing16};
-  border-radius: ${BORDERS.borderRadiusSize1};
+  border-radius: ${BORDERS.borderRadius8};
   margin-top: ${SPACING.spacing16};
   margin-bottom: ${SPACING.spacing16};
 
@@ -128,7 +128,9 @@ export function UpdateRobotModal({
           {updateType === UPGRADE ? t('remind_me_later') : t('not_now')}
         </NewSecondaryBtn>
         <NewPrimaryBtn
-          onClick={() => dispatchStartRobotUpdate(robotName)}
+          onClick={() => {
+            dispatchStartRobotUpdate(robotName)
+          }}
           marginRight={SPACING.spacing12}
           css={FOOTER_BUTTON_STYLE}
           disabled={updateDisabled}
@@ -155,7 +157,7 @@ export function UpdateRobotModal({
     >
       <Flex flexDirection={DIRECTION_COLUMN}>
         <UpdateAppBanner type="informing" marginBottom={SPACING.spacing8}>
-          {t('updating_robot_system')}
+          {t('update_requires_restarting_robot')}
         </UpdateAppBanner>
         <ReleaseNotes source={releaseNotes} />
       </Flex>

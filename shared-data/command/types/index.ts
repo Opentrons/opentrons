@@ -31,8 +31,14 @@ export * from './timing'
 // NOTE: these key/value pairs will only be present on commands at analysis/run time
 // they pertain only to the actual execution status of a command on hardware, as opposed to
 // the command's identity and parameters which can be known prior to runtime
-
+export interface CommandNote {
+  noteKind: 'warning' | 'information' | string
+  shortMessage: string
+  longMessage: string
+  source: string
+}
 export type CommandStatus = 'queued' | 'running' | 'succeeded' | 'failed'
+export type CommandIntent = 'protocol' | 'setup' | 'fixit'
 export interface CommonCommandRunTimeInfo {
   key?: string
   id: string
@@ -41,9 +47,11 @@ export interface CommonCommandRunTimeInfo {
   createdAt: string
   startedAt: string | null
   completedAt: string | null
-  intent?: 'protocol' | 'setup'
+  intent?: CommandIntent
+  notes?: CommandNote[] | null
 }
 export interface CommonCommandCreateInfo {
+  intent?: CommandIntent
   key?: string
   meta?: { [key: string]: any }
 }
@@ -69,9 +77,14 @@ export type RunTimeCommand =
   | AnnotationRunTimeCommand // annotating command execution
   | IncidentalRunTimeCommand // command with only incidental effects (status bar animations)
 
-interface RunCommandError {
-  id: string
-  errorType: string
+// TODO(jh, 05-24-24): Update when some of these newer properties become more finalized.
+export interface RunCommandError {
   createdAt: string
   detail: string
+  errorCode: string
+  errorType: string
+  id: string
+  isDefined: boolean
+  errorInfo?: Record<string, unknown>
+  wrappedErrors?: RunCommandError[]
 }

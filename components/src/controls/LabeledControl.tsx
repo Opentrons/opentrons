@@ -1,7 +1,7 @@
 import * as React from 'react'
 
 import { ControlInfo } from './ControlInfo'
-import styles from './styles.css'
+import styles from './styles.module.css'
 
 export interface LabeledControlProps {
   label: string

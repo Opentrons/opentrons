@@ -3,11 +3,10 @@ import { map, mergeMap, withLatestFrom, filter } from 'rxjs/operators'
 
 import { getRobotByName } from '../discovery/selectors'
 import { fetchRobotApi } from './http'
-import * as Types from './types'
 
 import type { Observable, UnaryFunction, OperatorFunction } from 'rxjs'
 import type { State, Action } from '../types'
-import type { RobotHost } from './types'
+import type * as Types from './types'
 
 export type ActionToRequestMapper<TriggerAction> = (
   triggerAction: TriggerAction,
@@ -23,14 +22,14 @@ export type ResponseToActionMapper<TriggerAction> = (
 export function withRobotHost<A>(
   state$: Observable<State>,
   getRobotName: (action: A) => string
-): UnaryFunction<Observable<A>, Observable<[A, State, RobotHost]>> {
+): UnaryFunction<Observable<A>, Observable<[A, State, Types.RobotHost]>> {
   return pipe(
-    withLatestFrom(state$, (a: A, s: State): [A, State, RobotHost | null] => [
-      a,
-      s,
-      getRobotByName(s, getRobotName(a)) as RobotHost | null,
-    ]),
-    filter((args): args is [A, State, RobotHost] => {
+    withLatestFrom(state$, (a: A, s: State): [
+      A,
+      State,
+      Types.RobotHost | null
+    ] => [a, s, getRobotByName(s, getRobotName(a)) as Types.RobotHost | null]),
+    filter((args): args is [A, State, Types.RobotHost] => {
       const [, , maybeRobot] = args
       return maybeRobot !== null
     })

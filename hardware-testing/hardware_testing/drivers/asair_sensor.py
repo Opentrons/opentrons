@@ -189,6 +189,9 @@ class AsairSensor(AsairSensorBase):
         data_packet = "{}0300000002{}".format(
             self._sensor_address, addrs[self._sensor_address]
         )
+        data_packet = "{}0300000002{}".format(
+            self._sensor_address, addrs[self._sensor_address]
+        )
         log.debug(f"sending {data_packet}")
         command_bytes = codecs.decode(data_packet.encode(), "hex")
         try:
@@ -199,6 +202,7 @@ class AsairSensor(AsairSensorBase):
 
             length = self._th_sensor.inWaiting()
             res = self._th_sensor.read(length)
+            res = codecs.encode(res, "hex")
             res = codecs.encode(res, "hex")
             log.debug(f"received {res}")
             dev_id = res[6:14]

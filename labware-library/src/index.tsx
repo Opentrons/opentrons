@@ -7,12 +7,12 @@ import { App } from './components/App'
 import { LabwareCreator } from './labware-creator'
 
 import { getPublicPath } from './public-path'
-import './styles.global.css'
+import './styles.global.module.css'
 
 const $root = document.getElementById('root')
 
 if (!$root) {
-  throw new Error('fatal: #root not found')
+  throw new Error('fatal: :root not found')
 }
 
 const Root = (): JSX.Element => (

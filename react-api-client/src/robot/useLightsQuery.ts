@@ -1,10 +1,16 @@
-import { HostConfig, Lights, getLights } from '@opentrons/api-client'
+import { getLights } from '@opentrons/api-client'
 import { useQuery } from 'react-query'
 import { useHost } from '../api'
 import type { UseQueryResult, UseQueryOptions } from 'react-query'
+import type { HostConfig, Lights } from '@opentrons/api-client'
+
+export type UseLightsQueryOptions<TError = Error> = UseQueryOptions<
+  Lights,
+  TError
+>
 
 export function useLightsQuery<TError = Error>(
-  options: UseQueryOptions<Lights, TError> = {}
+  options: UseLightsQueryOptions<TError> = {}
 ): UseQueryResult<Lights, TError> {
   const host = useHost()
   const allOptions: UseQueryOptions<Lights, TError> = {

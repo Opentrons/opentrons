@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { createPortal } from 'react-dom'
 import map from 'lodash/map'
 import omit from 'lodash/omit'
 import isEmpty from 'lodash/isEmpty'
@@ -10,26 +11,29 @@ import { useDispatch, useSelector } from 'react-redux'
 import { ErrorBoundary } from 'react-error-boundary'
 
 import {
-  Box,
-  Btn,
-  Flex,
-  Icon,
-  Link,
   ALIGN_CENTER,
   BORDERS,
+  Box,
+  Btn,
   COLORS,
   DIRECTION_COLUMN,
   DIRECTION_ROW,
   DISPLAY_FLEX,
+  Flex,
+  Icon,
   JUSTIFY_CENTER,
   JUSTIFY_SPACE_BETWEEN,
+  Link,
+  OVERFLOW_WRAP_ANYWHERE,
   POSITION_RELATIVE,
+  PrimaryButton,
+  ProtocolDeck,
+  RoundTab,
   SIZE_1,
   SIZE_5,
   SPACING,
-  RoundTab,
+  StyledText,
   TYPOGRAPHY,
-  PrimaryButton,
 } from '@opentrons/components'
 import {
   parseInitialPipetteNamesByMount,
@@ -38,12 +42,15 @@ import {
   parseInitialLoadedLabwareByModuleId,
   parseInitialLoadedLabwareByAdapter,
 } from '@opentrons/api-client'
-import { getGripperDisplayName } from '@opentrons/shared-data'
+import {
+  MAGNETIC_BLOCK_TYPE,
+  getGripperDisplayName,
+  getModuleType,
+  getSimplestDeckConfigForProtocol,
+} from '@opentrons/shared-data'
 
-import { Portal } from '../../App/portal'
+import { getTopPortalEl } from '../../App/portal'
 import { Divider } from '../../atoms/structure'
-import { StyledText } from '../../atoms/text'
-import { DeckThumbnail } from '../../molecules/DeckThumbnail'
 import { LegacyModal } from '../../molecules/LegacyModal'
 import {
   useTrackEvent,
@@ -54,9 +61,8 @@ import {
   analyzeProtocol,
 } from '../../redux/protocol-storage'
 import { useFeatureFlag } from '../../redux/config'
-import { getSimplestDeckConfigForProtocolCommands } from '../../resources/deck_configuration/utils'
 import { ChooseRobotToRunProtocolSlideout } from '../ChooseRobotToRunProtocolSlideout'
-import { SendProtocolToOT3Slideout } from '../SendProtocolToOT3Slideout'
+import { SendProtocolToFlexSlideout } from '../SendProtocolToFlexSlideout'
 import { ProtocolAnalysisFailure } from '../ProtocolAnalysisFailure'
 import {
   getAnalysisStatus,
@@ -68,6 +74,7 @@ import { ProtocolStats } from './ProtocolStats'
 import { ProtocolLabwareDetails } from './ProtocolLabwareDetails'
 import { ProtocolLiquidsDetails } from './ProtocolLiquidsDetails'
 import { RobotConfigurationDetails } from './RobotConfigurationDetails'
+import { ProtocolParameters } from './ProtocolParameters'
 
 import type { JsonConfig, PythonConfig } from '@opentrons/shared-data'
 import type { StoredProtocolData } from '../../redux/protocol-storage'
@@ -80,18 +87,18 @@ const GRID_STYLE = css`
 `
 
 const ZOOM_ICON_STYLE = css`
-  border-radius: ${BORDERS.radiusSoftCorners};
+  border-radius: ${BORDERS.borderRadius4};
   &:hover {
-    background: ${COLORS.lightGreyHover};
+    background: ${COLORS.grey30};
   }
   &:active {
-    background: ${COLORS.lightGreyPressed};
+    background: ${COLORS.grey35};
   }
   &:disabled {
     background: ${COLORS.white};
   }
   &:focus-visible {
-    box-shadow: 0 0 0 3px ${COLORS.fundamentalsFocus};
+    background: ${COLORS.grey35};
   }
 `
 
@@ -127,7 +134,11 @@ function MetadataDetails({
         {filteredMetaData.map((item, index) => {
           return (
             <React.Fragment key={index}>
-              <StyledText as="h6" marginTop={SPACING.spacing8}>
+              <StyledText
+                as="h6"
+                marginTop={SPACING.spacing8}
+                color={COLORS.grey60}
+              >
                 {startCase(item.label)}
               </StyledText>
               <StyledText as="p">{item.value}</StyledText>
@@ -169,7 +180,9 @@ const ReadMoreContent = (props: ReadMoreContentProps): JSX.Element => {
           role="button"
           css={TYPOGRAPHY.linkPSemiBold}
           marginTop={SPACING.spacing8}
-          onClick={() => setIsReadMore(!isReadMore)}
+          onClick={() => {
+            setIsReadMore(!isReadMore)
+          }}
         >
           {isReadMore
             ? i18n.format(t('read_more'), 'capitalize')
@@ -190,30 +203,30 @@ export function ProtocolDetails(
   const { protocolKey, srcFileNames, mostRecentAnalysis, modified } = props
   const { t, i18n } = useTranslation(['protocol_details', 'shared'])
   const enableProtocolStats = useFeatureFlag('protocolStats')
+  const runTimeParameters = mostRecentAnalysis?.runTimeParameters ?? []
+  const hasRunTimeParameters = runTimeParameters.length > 0
   const [currentTab, setCurrentTab] = React.useState<
-    'robot_config' | 'labware' | 'liquids' | 'stats'
-  >('robot_config')
+    'robot_config' | 'labware' | 'liquids' | 'stats' | 'parameters'
+  >(hasRunTimeParameters ? 'parameters' : 'robot_config')
   const [
     showChooseRobotToRunProtocolSlideout,
     setShowChooseRobotToRunProtocolSlideout,
   ] = React.useState<boolean>(false)
   const [
-    showSendProtocolToOT3Slideout,
-    setShowSendProtocolToOT3Slideout,
+    showSendProtocolToFlexSlideout,
+    setShowSendProtocolToFlexSlideout,
   ] = React.useState<boolean>(false)
   const [showDeckViewModal, setShowDeckViewModal] = React.useState(false)
-
-  React.useEffect(() => {
-    if (mostRecentAnalysis != null && !('liquids' in mostRecentAnalysis)) {
-      dispatch(analyzeProtocol(protocolKey))
-    }
-  }, [])
 
   const isAnalyzing = useSelector((state: State) =>
     getIsProtocolAnalysisInProgress(state, protocolKey)
   )
+
   const analysisStatus = getAnalysisStatus(isAnalyzing, mostRecentAnalysis)
-  if (analysisStatus === 'missing') return null
+
+  if (analysisStatus === 'stale') {
+    dispatch(analyzeProtocol(protocolKey))
+  } else if (analysisStatus === 'missing') return null
 
   const { left: leftMountPipetteName, right: rightMountPipetteName } =
     mostRecentAnalysis != null
@@ -227,11 +240,19 @@ export function ProtocolDetails(
 
   const requiredModuleDetails =
     mostRecentAnalysis?.commands != null
-      ? map(parseInitialLoadedModulesBySlot(mostRecentAnalysis.commands))
+      ? map(
+          parseInitialLoadedModulesBySlot(mostRecentAnalysis.commands)
+        ).filter(
+          loadedModule =>
+            // filter out magnetic block which is already handled by the required fixture details
+            getModuleType(loadedModule.params.model) !== MAGNETIC_BLOCK_TYPE
+        )
       : []
 
-  const requiredFixtureDetails = getSimplestDeckConfigForProtocolCommands(
-    mostRecentAnalysis?.commands ?? []
+  const requiredFixtureDetails = getSimplestDeckConfigForProtocol(
+    analysisStatus !== 'stale' && analysisStatus !== 'loading'
+      ? mostRecentAnalysis
+      : null
   )
 
   const requiredLabwareDetails =
@@ -320,17 +341,19 @@ export function ProtocolDetails(
     stats: enableProtocolStats ? (
       <ProtocolStats analysis={mostRecentAnalysis} />
     ) : null,
+    parameters: <ProtocolParameters runTimeParameters={runTimeParameters} />,
   }
 
-  const deckThumbnail = <DeckThumbnail protocolAnalysis={mostRecentAnalysis} />
+  const deckMap = <ProtocolDeck protocolAnalysis={mostRecentAnalysis} />
 
   const deckViewByAnalysisStatus = {
-    missing: <Box size="14rem" backgroundColor={COLORS.medGreyEnabled} />,
-    loading: <Box size="14rem" backgroundColor={COLORS.medGreyEnabled} />,
-    error: <Box size="14rem" backgroundColor={COLORS.medGreyEnabled} />,
+    stale: <Box size="14rem" backgroundColor={COLORS.grey30} />,
+    missing: <Box size="14rem" backgroundColor={COLORS.grey30} />,
+    loading: <Box size="14rem" backgroundColor={COLORS.grey30} />,
+    error: <Box size="14rem" backgroundColor={COLORS.grey30} />,
     complete: (
       <Box size="14rem" height="auto">
-        {deckThumbnail}
+        {deckMap}
       </Box>
     ),
   }
@@ -343,8 +366,8 @@ export function ProtocolDetails(
     setShowChooseRobotToRunProtocolSlideout(true)
   }
 
-  const UNKNOWN_ATTACHMENT_ERROR = `${protocolDisplayName} protocol uses 
-  instruments or modules from a future version of Opentrons software. Please update 
+  const UNKNOWN_ATTACHMENT_ERROR = `${protocolDisplayName} protocol uses
+  instruments or modules from a future version of Opentrons software. Please update
   the app to the most recent version to run this protocol.`
 
   const UnknownAttachmentError = (
@@ -356,16 +379,19 @@ export function ProtocolDetails(
 
   return (
     <>
-      <Portal level="top">
-        {showDeckViewModal ? (
-          <LegacyModal
-            title={t('deck_view')}
-            onClose={() => setShowDeckViewModal(false)}
-          >
-            {deckThumbnail}
-          </LegacyModal>
-        ) : null}
-      </Portal>
+      {showDeckViewModal
+        ? createPortal(
+            <LegacyModal
+              title={t('deck_view')}
+              onClose={() => {
+                setShowDeckViewModal(false)
+              }}
+            >
+              {deckMap}
+            </LegacyModal>,
+            getTopPortalEl()
+          )
+        : null}
       <Flex
         flexDirection={DIRECTION_COLUMN}
         padding={SPACING.spacing16}
@@ -373,20 +399,23 @@ export function ProtocolDetails(
       >
         <ErrorBoundary fallback={UnknownAttachmentError}>
           <ChooseRobotToRunProtocolSlideout
-            onCloseClick={() => setShowChooseRobotToRunProtocolSlideout(false)}
+            onCloseClick={() => {
+              setShowChooseRobotToRunProtocolSlideout(false)
+            }}
             showSlideout={showChooseRobotToRunProtocolSlideout}
             storedProtocolData={props}
           />
-          <SendProtocolToOT3Slideout
-            isExpanded={showSendProtocolToOT3Slideout}
-            onCloseClick={() => setShowSendProtocolToOT3Slideout(false)}
+          <SendProtocolToFlexSlideout
+            isExpanded={showSendProtocolToFlexSlideout}
+            onCloseClick={() => {
+              setShowSendProtocolToFlexSlideout(false)
+            }}
             storedProtocolData={props}
           />
 
           <Flex
             backgroundColor={COLORS.white}
-            border={`1px solid ${COLORS.medGreyEnabled}`}
-            borderRadius={BORDERS.radiusSoftCorners}
+            borderRadius={BORDERS.borderRadius4}
             position={POSITION_RELATIVE}
             flexDirection={DIRECTION_ROW}
             width="100%"
@@ -410,7 +439,7 @@ export function ProtocolDetails(
                 css={TYPOGRAPHY.h2SemiBold}
                 marginBottom={SPACING.spacing16}
                 data-testid={`ProtocolDetails_${protocolDisplayName}`}
-                overflowWrap="anywhere"
+                overflowWrap={OVERFLOW_WRAP_ANYWHERE}
               >
                 {protocolDisplayName}
               </StyledText>
@@ -419,7 +448,7 @@ export function ProtocolDetails(
                   flexDirection={DIRECTION_COLUMN}
                   data-testid="ProtocolDetails_creationMethod"
                 >
-                  <StyledText as="h6" color={COLORS.darkGreyEnabled}>
+                  <StyledText as="h6" color={COLORS.grey60}>
                     {t('creation_method')}
                   </StyledText>
                   <StyledText as="p">
@@ -432,7 +461,7 @@ export function ProtocolDetails(
                   flexDirection={DIRECTION_COLUMN}
                   data-testid="ProtocolDetails_lastUpdated"
                 >
-                  <StyledText as="h6" color={COLORS.darkGreyEnabled}>
+                  <StyledText as="h6" color={COLORS.grey60}>
                     {t('last_updated')}
                   </StyledText>
                   <StyledText as="p">
@@ -445,7 +474,7 @@ export function ProtocolDetails(
                   flexDirection={DIRECTION_COLUMN}
                   data-testid="ProtocolDetails_lastAnalyzed"
                 >
-                  <StyledText as="h6" color={COLORS.darkGreyEnabled}>
+                  <StyledText as="h6" color={COLORS.grey60}>
                     {t('last_analyzed')}
                   </StyledText>
                   <StyledText as="p">
@@ -461,7 +490,9 @@ export function ProtocolDetails(
                   `}
                 >
                   <PrimaryButton
-                    onClick={() => handleRunProtocolButtonClick()}
+                    onClick={() => {
+                      handleRunProtocolButtonClick()
+                    }}
                     data-testid="ProtocolDetails_runProtocol"
                     disabled={analysisStatus === 'loading'}
                   >
@@ -475,13 +506,13 @@ export function ProtocolDetails(
                   flexDirection={DIRECTION_COLUMN}
                   data-testid="ProtocolDetails_author"
                 >
-                  <StyledText as="h6" color={COLORS.darkGreyEnabled}>
+                  <StyledText as="h6" color={COLORS.grey60}>
                     {t('org_or_author')}
                   </StyledText>
                   <StyledText
                     as="p"
                     marginRight={SPACING.spacing20}
-                    overflowWrap="anywhere"
+                    overflowWrap={OVERFLOW_WRAP_ANYWHERE}
                   >
                     {analysisStatus === 'loading'
                       ? t('shared:loading')
@@ -492,7 +523,7 @@ export function ProtocolDetails(
                   flexDirection={DIRECTION_COLUMN}
                   data-testid="ProtocolDetails_description"
                 >
-                  <StyledText as="h6" color={COLORS.darkGreyEnabled}>
+                  <StyledText as="h6" color={COLORS.grey60}>
                     {t('description')}
                   </StyledText>
                   {analysisStatus === 'loading' ? (
@@ -513,12 +544,12 @@ export function ProtocolDetails(
               right={SPACING.spacing2}
             >
               <ProtocolOverflowMenu
-                handleRunProtocol={() =>
+                handleRunProtocol={() => {
                   setShowChooseRobotToRunProtocolSlideout(true)
-                }
-                handleSendProtocolToOT3={() =>
-                  setShowSendProtocolToOT3Slideout(true)
-                }
+                }}
+                handleSendProtocolToFlex={() => {
+                  setShowSendProtocolToFlexSlideout(true)
+                }}
                 storedProtocolData={props}
                 data-testid="ProtocolDetails_overFlowMenu"
               />
@@ -527,13 +558,13 @@ export function ProtocolDetails(
           <Flex
             flexDirection={DIRECTION_ROW}
             justifyContent={JUSTIFY_SPACE_BETWEEN}
+            marginBottom={SPACING.spacing16}
           >
             <Flex
               flex={`0 0 ${String(SIZE_5)}`}
               flexDirection={DIRECTION_COLUMN}
               backgroundColor={COLORS.white}
-              border={`1px solid ${String(COLORS.medGreyEnabled)}`}
-              borderRadius={BORDERS.radiusSoftCorners}
+              borderRadius={BORDERS.borderRadius8}
               height="100%"
               data-testid="ProtocolDetails_deckMap"
             >
@@ -553,9 +584,19 @@ export function ProtocolDetails(
                   height={SPACING.spacing24}
                   width={SPACING.spacing24}
                   css={ZOOM_ICON_STYLE}
-                  onClick={() => setShowDeckViewModal(true)}
+                  onClick={() => {
+                    setShowDeckViewModal(true)
+                  }}
                 >
-                  <Icon name="union" size={SIZE_1} />
+                  <Icon
+                    name="union"
+                    size={SIZE_1}
+                    color={
+                      analysisStatus !== 'complete'
+                        ? COLORS.grey40
+                        : COLORS.grey60
+                    }
+                  />
                 </Btn>
               </Flex>
               <Box padding={SPACING.spacing16} backgroundColor={COLORS.white}>
@@ -568,21 +609,39 @@ export function ProtocolDetails(
               height="100%"
               flexDirection={DIRECTION_COLUMN}
               marginLeft={SPACING.spacing16}
+              gridGap={SPACING.spacing8}
             >
-              <Flex>
+              <Flex gridGap={SPACING.spacing4}>
+                {mostRecentAnalysis != null && (
+                  <RoundTab
+                    data-testid="ProtocolDetails_parameters"
+                    isCurrent={currentTab === 'parameters'}
+                    onClick={() => {
+                      setCurrentTab('parameters')
+                    }}
+                  >
+                    <StyledText>
+                      {i18n.format(t('parameters'), 'capitalize')}
+                    </StyledText>
+                  </RoundTab>
+                )}
                 <RoundTab
                   data-testid="ProtocolDetails_robotConfig"
                   isCurrent={currentTab === 'robot_config'}
-                  onClick={() => setCurrentTab('robot_config')}
+                  onClick={() => {
+                    setCurrentTab('robot_config')
+                  }}
                 >
                   <StyledText>
-                    {i18n.format(t('robot_configuration'), 'capitalize')}
+                    {i18n.format(t('hardware'), 'capitalize')}
                   </StyledText>
                 </RoundTab>
                 <RoundTab
                   data-testid="ProtocolDetails_labware"
                   isCurrent={currentTab === 'labware'}
-                  onClick={() => setCurrentTab('labware')}
+                  onClick={() => {
+                    setCurrentTab('labware')
+                  }}
                 >
                   <StyledText>
                     {i18n.format(t('labware'), 'capitalize')}
@@ -592,7 +651,9 @@ export function ProtocolDetails(
                   <RoundTab
                     data-testid="ProtocolDetails_liquids"
                     isCurrent={currentTab === 'liquids'}
-                    onClick={() => setCurrentTab('liquids')}
+                    onClick={() => {
+                      setCurrentTab('liquids')
+                    }}
                   >
                     <StyledText>
                       {i18n.format(t('liquids'), 'capitalize')}
@@ -603,7 +664,9 @@ export function ProtocolDetails(
                   <RoundTab
                     data-testid="ProtocolDetails_stats"
                     isCurrent={currentTab === 'stats'}
-                    onClick={() => setCurrentTab('stats')}
+                    onClick={() => {
+                      setCurrentTab('stats')
+                    }}
                   >
                     <StyledText>
                       {i18n.format(t('stats'), 'capitalize')}
@@ -613,16 +676,13 @@ export function ProtocolDetails(
               </Flex>
               <Box
                 backgroundColor={COLORS.white}
-                border={BORDERS.lineBorder}
                 // remove left upper corner border radius when first tab is active
                 borderRadius={`${
-                  currentTab === 'robot_config'
-                    ? '0'
-                    : String(BORDERS.radiusSoftCorners)
-                } ${String(BORDERS.radiusSoftCorners)} ${String(
-                  BORDERS.radiusSoftCorners
-                )} ${String(BORDERS.radiusSoftCorners)}`}
-                padding={`${SPACING.spacing16} ${SPACING.spacing16} 0 ${SPACING.spacing16}`}
+                  currentTab === 'robot_config' ? '0' : BORDERS.borderRadius4
+                } ${BORDERS.borderRadius4} ${BORDERS.borderRadius4} ${
+                  BORDERS.borderRadius4
+                }`}
+                padding={SPACING.spacing16}
               >
                 {contentsByTabName[currentTab]}
               </Box>

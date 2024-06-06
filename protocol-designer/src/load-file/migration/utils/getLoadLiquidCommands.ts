@@ -1,6 +1,7 @@
 import reduce from 'lodash/reduce'
 import { uuid } from '../../../utils'
 import type { LoadLiquidCreateCommand } from '@opentrons/shared-data/protocol/types/schemaV6/command/setup'
+import type { DismissedWarningState } from '../../../dismiss/reducers'
 
 export interface DesignerApplicationData {
   ingredients: Record<
@@ -18,6 +19,8 @@ export interface DesignerApplicationData {
   }
   savedStepForms: Record<string, any>
   orderedStepIds: string[]
+  pipetteTiprackAssignments: Record<string, string[]>
+  dismissedWarnings: DismissedWarningState
 }
 
 export const getLoadLiquidCommands = (

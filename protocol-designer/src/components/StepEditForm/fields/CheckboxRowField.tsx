@@ -6,8 +6,8 @@ import {
   TOOLTIP_TOP,
 } from '@opentrons/components'
 import cx from 'classnames'
-import styles from '../StepEditForm.css'
-import { FieldProps } from '../types'
+import styles from '../StepEditForm.module.css'
+import type { FieldProps } from '../types'
 import type { Placement } from '@opentrons/components'
 
 type CheckboxRowProps = FieldProps & {
@@ -50,9 +50,9 @@ export const CheckboxRowField = (props: CheckboxRowProps): JSX.Element => {
           label={label}
           labelProps={targetProps}
           name={name}
-          onChange={(e: React.ChangeEvent<HTMLSelectElement>) =>
+          onChange={(e: React.ChangeEvent<HTMLSelectElement>) => {
             updateValue(!value)
-          }
+          }}
           value={disabled ? false : Boolean(value)}
         />
         {value && !disabled && !isIndeterminate ? children : null}

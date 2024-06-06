@@ -1,13 +1,14 @@
-import _protocolWithMagTempTC from '@opentrons/shared-data/protocol/fixtures/6/transferSettings.json'
-import _standardDeckDef from '@opentrons/shared-data/deck/definitions/4/ot2_standard.json'
+import { describe, it, expect } from 'vitest'
+
+import { transfer_settings, ot2DeckDefV5 } from '@opentrons/shared-data'
 import { getLabwareRenderInfo } from '../getLabwareRenderInfo'
 import type {
   CompletedProtocolAnalysis,
   LoadLabwareRunTimeCommand,
 } from '@opentrons/shared-data'
 
-const protocolWithMagTempTC = (_protocolWithMagTempTC as unknown) as CompletedProtocolAnalysis
-const standardDeckDef = _standardDeckDef as any
+const protocolWithMagTempTC = (transfer_settings as unknown) as CompletedProtocolAnalysis
+const standardDeckDef = ot2DeckDefV5 as any
 
 describe('getLabwareRenderInfo', () => {
   it('should gather labware coordinates', () => {

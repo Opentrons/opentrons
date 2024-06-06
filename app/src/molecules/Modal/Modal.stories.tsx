@@ -1,6 +1,5 @@
 import * as React from 'react'
-import { COLORS, Flex, BORDERS, SPACING } from '@opentrons/components'
-import { touchScreenViewport } from '../../DesignTokens/constants'
+import { COLORS, Flex, BORDERS, SPACING, VIEWPORT } from '@opentrons/components'
 import { Modal } from './Modal'
 import type { Story, Meta } from '@storybook/react'
 
@@ -13,7 +12,7 @@ export default {
     },
     onOutsideClick: { action: 'clicked' },
   },
-  parameters: touchScreenViewport,
+  parameters: VIEWPORT.touchScreenViewport,
 } as Meta
 
 const Template: Story<React.ComponentProps<typeof Modal>> = args => (
@@ -26,11 +25,11 @@ Default.args = {
     title: 'Header',
     hasExitIcon: true,
     iconName: 'information',
-    iconColor: COLORS.black,
+    iconColor: COLORS.black90,
   },
   children: (
     <Flex
-      borderRadius={`0px 0px ${BORDERS.borderRadiusSize3} ${BORDERS.borderRadiusSize3}`}
+      borderRadius={`0px 0px ${BORDERS.borderRadius12} ${BORDERS.borderRadius12}`}
       paddingTop={SPACING.spacing32}
       height="23.5rem"
     >

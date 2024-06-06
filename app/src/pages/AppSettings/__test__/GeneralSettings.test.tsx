@@ -1,29 +1,19 @@
 import * as React from 'react'
 import { MemoryRouter } from 'react-router-dom'
+import { vi, it, describe, expect, beforeEach, afterEach } from 'vitest'
 import { screen } from '@testing-library/react'
-import '@testing-library/jest-dom'
 
-import { renderWithProviders } from '@opentrons/components'
+import { renderWithProviders } from '../../../__testing-utils__'
 
 import { i18n } from '../../../i18n'
 import { getAlertIsPermanentlyIgnored } from '../../../redux/alerts'
 import * as Shell from '../../../redux/shell'
 import { GeneralSettings } from '../GeneralSettings'
 
-jest.mock('../../../redux/config')
-jest.mock('../../../redux/shell')
-jest.mock('../../../redux/analytics')
-jest.mock('../../../redux/alerts')
-jest.mock('../../../organisms/UpdateAppModal', () => ({
-  UpdateAppModal: () => null,
-}))
-
-const getAvailableShellUpdate = Shell.getAvailableShellUpdate as jest.MockedFunction<
-  typeof Shell.getAvailableShellUpdate
->
-const mockGetAlertIsPermanentlyIgnored = getAlertIsPermanentlyIgnored as jest.MockedFunction<
-  typeof getAlertIsPermanentlyIgnored
->
+vi.mock('../../../redux/config')
+vi.mock('../../../redux/shell')
+vi.mock('../../../redux/analytics')
+vi.mock('../../../redux/alerts')
 
 const render = (): ReturnType<typeof renderWithProviders> => {
   return renderWithProviders(
@@ -38,11 +28,11 @@ const render = (): ReturnType<typeof renderWithProviders> => {
 
 describe('GeneralSettings', () => {
   beforeEach(() => {
-    getAvailableShellUpdate.mockReturnValue(null)
-    mockGetAlertIsPermanentlyIgnored.mockReturnValue(false)
+    vi.mocked(Shell.getAvailableShellUpdate).mockReturnValue(null)
+    vi.mocked(getAlertIsPermanentlyIgnored).mockReturnValue(false)
   })
   afterEach(() => {
-    jest.resetAllMocks()
+    vi.resetAllMocks()
   })
 
   it('renders correct titles', () => {
@@ -69,13 +59,13 @@ describe('GeneralSettings', () => {
     expect(
       getByRole('link', {
         name:
-          'Learn more about keeping the Opentrons app and robot software in sync',
+          'Learn more about keeping the Opentrons App and robot software in sync',
       })
     ).toHaveAttribute('href', 'https://support.opentrons.com/s/')
   })
 
   it('renders correct info if there is update available', () => {
-    getAvailableShellUpdate.mockReturnValue('5.0.0-beta.8')
+    vi.mocked(Shell.getAvailableShellUpdate).mockReturnValue('5.0.0-beta.8')
     const [{ getByRole }] = render()
     getByRole('button', { name: 'View software update' })
   })
@@ -85,8 +75,8 @@ describe('GeneralSettings', () => {
   })
 
   it('renders correct info if there is update available but alert ignored enabled', () => {
-    getAvailableShellUpdate.mockReturnValue('5.0.0-beta.8')
-    mockGetAlertIsPermanentlyIgnored.mockReturnValue(true)
+    vi.mocked(Shell.getAvailableShellUpdate).mockReturnValue('5.0.0-beta.8')
+    vi.mocked(getAlertIsPermanentlyIgnored).mockReturnValue(true)
     expect(screen.queryByText('View software update')).toBeNull()
   })
 

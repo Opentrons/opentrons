@@ -1,5 +1,5 @@
 """USB Driver tests."""
-import serial  # type: ignore[import]
+import serial  # type: ignore[import-untyped]
 import time
 from contextlib import ExitStack
 import multiprocessing
@@ -56,6 +56,20 @@ class SerialEmulator(object):
         self,
     ) -> None:
         """Open some serial ports to simulate the usb connection."""
+        # Note: fork will work on linux. it will definitely not work on windows, and probably
+        # won't work on OSX because OSX system libraries can start threads and you can't start
+        # threads from a forked process.
+        #
+        # On python 3.7, they hadn't realized this, and fork was the default OSX start method.
+        # on python 3.8 and subsequent, they had, and so by default OSX uses spawn.
+        #
+        # The code in this module sends open fileio objects and/or file descriptors to the subprocess,
+        # which is only easy on fork.
+        #
+        # So here, we're making the start method be fork, which won't work on windows (but it didn't
+        # before) and will now be pretty unreliable on OSX (which is new, but we only use that for dev
+        # tests anyway).
+        self.mp_context = multiprocessing.get_context("fork")
         self.primary_files_fd = []  # Dict of primary fd to primary file object.
         self.primary_files = []
         self.secondary_names = []  # Dict of primary fd to secondary name.
@@ -70,7 +84,7 @@ class SerialEmulator(object):
 
         self.device_port = self.secondary_names[0]
         self.client_port = self.secondary_names[1]
-        self.proc = multiprocessing.Process(
+        self.proc = self.mp_context.Process(
             target=run, args=(self.primary_files_fd, self.primary_files)
         )
         self.proc.start()
@@ -143,7 +157,7 @@ async def test_recv(subject: SerialUsbDriver, test_port_host: SerialEmulator) ->
     length = test_port_host.write(b"\x00\x01\x00\x00")
     assert length == 4
     message = await subject.read()
-    assert type(message) == Ack
+    assert type(message) is Ack
 
     assert message == Ack()
 
@@ -165,11 +179,11 @@ async def test_recv_iterator(
             break
 
     assert len(messages) == 3
-    assert type(messages[0]) == Ack
+    assert type(messages[0]) is Ack
     assert messages[0] == Ack()
 
-    assert type(messages[1]) == AckFailed
+    assert type(messages[1]) is AckFailed
     assert messages[1] == AckFailed()
 
-    assert type(messages[2]) == EnterBootloaderRequest
+    assert type(messages[2]) is EnterBootloaderRequest
     assert messages[2] == EnterBootloaderRequest()

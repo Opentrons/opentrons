@@ -6,7 +6,7 @@ from decoy import Decoy
 from opentrons.types import DeckSlotName
 from opentrons.protocol_engine import LabwareOffsetCreate, types as pe_types
 
-from robot_server.errors import ApiError
+from robot_server.errors.error_responses import ApiError
 from robot_server.service.json_api import (
     RequestModel,
     SimpleEmptyBody,
@@ -33,6 +33,13 @@ from robot_server.maintenance_runs.router.base_router import (
     AllRunsLinks,
 )
 
+from robot_server.deck_configuration.store import DeckConfigurationStore
+
+
+def mock_notify_publishers() -> None:
+    """A mock notify_publishers."""
+    return None
+
 
 @pytest.fixture
 def labware_offset_create() -> LabwareOffsetCreate:
@@ -48,6 +55,7 @@ async def test_create_run(
     decoy: Decoy,
     mock_maintenance_run_data_manager: MaintenanceRunDataManager,
     labware_offset_create: pe_types.LabwareOffsetCreate,
+    mock_deck_configuration_store: DeckConfigurationStore,
 ) -> None:
     """It should be able to create a basic run."""
     run_id = "run-id"
@@ -68,10 +76,15 @@ async def test_create_run(
     )
 
     decoy.when(
+        await mock_deck_configuration_store.get_deck_configuration()
+    ).then_return([])
+    decoy.when(
         await mock_maintenance_run_data_manager.create(
             run_id=run_id,
             created_at=run_created_at,
             labware_offsets=[labware_offset_create],
+            deck_configuration=[],
+            notify_publishers=mock_notify_publishers,
         )
     ).then_return(expected_response)
 
@@ -83,6 +96,8 @@ async def test_create_run(
         run_id=run_id,
         created_at=run_created_at,
         is_ok_to_create_maintenance_run=True,
+        deck_configuration_store=mock_deck_configuration_store,
+        notify_publishers=mock_notify_publishers,
     )
 
     assert result.content.data == expected_response
@@ -92,10 +107,13 @@ async def test_create_run(
 async def test_create_maintenance_run_with_protocol_run_conflict(
     decoy: Decoy,
     mock_maintenance_run_data_manager: MaintenanceRunDataManager,
+    mock_deck_configuration_store: DeckConfigurationStore,
 ) -> None:
     """It should respond with a conflict error if protocol run is active during maintenance run creation."""
     created_at = datetime(year=2021, month=1, day=1)
-
+    decoy.when(
+        await mock_deck_configuration_store.get_deck_configuration()
+    ).then_return([])
     with pytest.raises(ApiError) as exc_info:
         await create_run(
             run_id="run-id",
@@ -103,6 +121,7 @@ async def test_create_maintenance_run_with_protocol_run_conflict(
             request_body=None,
             run_data_manager=mock_maintenance_run_data_manager,
             is_ok_to_create_maintenance_run=False,
+            deck_configuration_store=mock_deck_configuration_store,
         )
     assert exc_info.value.status_code == 409
     assert exc_info.value.content["errors"][0]["id"] == "ProtocolRunIsActive"

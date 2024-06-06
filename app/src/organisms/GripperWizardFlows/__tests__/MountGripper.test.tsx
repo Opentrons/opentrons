@@ -1,5 +1,7 @@
 import * as React from 'react'
-import { renderWithProviders } from '@opentrons/components'
+import { fireEvent, screen, waitFor } from '@testing-library/react'
+import { describe, it, vi, beforeEach, expect } from 'vitest'
+import { renderWithProviders } from '../../../__testing-utils__'
 import { useInstrumentsQuery } from '@opentrons/react-api-client'
 import { instrumentsResponseFixture } from '@opentrons/api-client'
 import { i18n } from '../../../i18n'
@@ -7,88 +9,80 @@ import { i18n } from '../../../i18n'
 import { MountGripper } from '../MountGripper'
 import { GRIPPER_FLOW_TYPES } from '../constants'
 
-jest.mock('@opentrons/react-api-client')
-
-const mockUseInstrumentsQuery = useInstrumentsQuery as jest.MockedFunction<
-  typeof useInstrumentsQuery
->
+vi.mock('@opentrons/react-api-client')
 
 const mockRunId = 'fakeRunId'
 
 describe('MountGripper', () => {
-  let render: (
-    props?: Partial<React.ComponentProps<typeof MountGripper>>
-  ) => ReturnType<typeof renderWithProviders>
-  let mockRefetch: jest.Mock
-  let mockProceed: jest.Mock
-  let mockChainRunCommands: jest.Mock
-  let mockSetErrorMessage: jest.Mock
+  let mockRefetch: any
+  let mockProceed: any
+  let mockChainRunCommands: any
+  let mockSetErrorMessage: any
+
+  const render = (
+    props: Partial<React.ComponentProps<typeof MountGripper>> = {}
+  ) => {
+    return renderWithProviders(
+      <MountGripper
+        maintenanceRunId={mockRunId}
+        flowType={GRIPPER_FLOW_TYPES.ATTACH}
+        proceed={mockProceed}
+        attachedGripper={props?.attachedGripper ?? null}
+        chainRunCommands={mockChainRunCommands}
+        isRobotMoving={false}
+        goBack={() => null}
+        errorMessage={null}
+        setErrorMessage={mockSetErrorMessage}
+        {...props}
+      />,
+      { i18nInstance: i18n }
+    )
+  }
 
   beforeEach(() => {
-    mockProceed = jest.fn()
-    mockChainRunCommands = jest.fn()
-    mockRefetch = jest.fn(() => Promise.resolve())
-    render = (props = {}) => {
-      return renderWithProviders(
-        <MountGripper
-          maintenanceRunId={mockRunId}
-          flowType={GRIPPER_FLOW_TYPES.ATTACH}
-          proceed={mockProceed}
-          attachedGripper={props?.attachedGripper ?? null}
-          chainRunCommands={mockChainRunCommands}
-          isRobotMoving={false}
-          goBack={() => null}
-          errorMessage={null}
-          setErrorMessage={mockSetErrorMessage}
-          {...props}
-        />,
-        { i18nInstance: i18n }
-      )
-    }
-  })
-
-  afterEach(() => {
-    jest.resetAllMocks()
+    mockProceed = vi.fn()
+    mockChainRunCommands = vi.fn()
+    mockRefetch = vi.fn(() => Promise.resolve())
   })
 
   it('clicking confirm calls proceed if attached gripper', async () => {
-    mockUseInstrumentsQuery.mockReturnValue({
+    vi.mocked(useInstrumentsQuery).mockReturnValue({
       refetch: mockRefetch,
       data: instrumentsResponseFixture,
     } as any)
-    const { getByRole } = render()[0]
-    await getByRole('button', { name: 'Continue' }).click()
-    expect(mockProceed).toHaveBeenCalled()
+    render()
+    const button = screen.getByRole('button', { name: 'Continue' })
+    fireEvent.click(button)
+    await waitFor(() => expect(mockProceed).toHaveBeenCalled())
   })
 
   it('clicking confirm shows unable to detect if no gripper attached', async () => {
-    mockUseInstrumentsQuery.mockReturnValue({
+    vi.mocked(useInstrumentsQuery).mockReturnValue({
       refetch: mockRefetch,
       data: null,
     } as any)
-    const { getByRole, getByText } = render()[0]
-    await getByRole('button', { name: 'Continue' }).click()
-    expect(mockProceed).not.toHaveBeenCalled()
-    await getByText('Unable to detect Gripper')
-    let tryAgainButton = getByRole('button', { name: 'Try again' })
-    tryAgainButton.click()
-    expect(mockProceed).not.toHaveBeenCalled()
-    tryAgainButton = getByRole('button', { name: 'Try again' })
-    tryAgainButton.click()
-    const goBackButton = await getByRole('button', { name: 'Go back' })
-    goBackButton.click()
-    await getByRole('button', { name: 'Continue' }).click()
-    expect(mockProceed).not.toHaveBeenCalled()
+    render()
+    fireEvent.click(screen.getByRole('button', { name: 'Continue' }))
+    await waitFor(() => expect(mockProceed).not.toHaveBeenCalled())
+    expect(
+      await screen.findByText('Unable to detect Gripper')
+    ).toBeInTheDocument()
+    fireEvent.click(screen.getByRole('button', { name: 'Try again' }))
+    await waitFor(() => expect(mockProceed).not.toHaveBeenCalled())
+    fireEvent.click(screen.getByRole('button', { name: 'Try again' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Go back' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Continue' }))
+    await waitFor(() => expect(mockProceed).not.toHaveBeenCalled())
   })
 
   it('renders correct text', () => {
-    mockUseInstrumentsQuery.mockReturnValue({
+    vi.mocked(useInstrumentsQuery).mockReturnValue({
       refetch: mockRefetch,
       data: null,
     } as any)
-    const { getByText } = render()[0]
-    getByText('Connect and secure Flex Gripper')
-    getByText(
+    render()
+    screen.getByText('Connect and secure Flex Gripper')
+    screen.getByText(
       'Attach the gripper to the robot by aligning the connector and pressing to ensure a secure connection. Hold the gripper in place. Tighten the top gripper screw first, and the bottom screw second. Then test that the gripper is securely attached by gently pulling it side to side.'
     )
   })

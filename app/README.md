@@ -27,7 +27,7 @@ make -C app dev
 
 **Note:** If you would like to interact with a virtual robot server being served at `localhost`, you will need to manually add `localhost` to the discovery candidates list. This can be done through the app's GUI settings for "Connect to a robot via IP address / Add Manual IP Address"
 
-At this point, the Electron app will be running with [HMR][] and various Chrome devtools enabled. The app and dev server look for the following environment variables (defaults set in Makefile):
+At this point, the Electron app will be running with various Chrome devtools enabled. The app and dev server look for the following environment variables (defaults set in Makefile):
 
 | Variable             | Default      | Description                                         |
 | -------------------- | ------------ | --------------------------------------------------- |
@@ -46,7 +46,7 @@ The UI stack is built using:
 - [Redux][]
 - [CSS modules][css-modules]
 - [Babel][]
-- [Webpack][]
+- [Vite][]
 
 Some important directories:
 
@@ -54,7 +54,6 @@ Some important directories:
 - API clients (see [`api/opentrons/server`][api-server-source])
   - `api-client` - HTTP Robot API client
   - `react-api-client` - react utilities for Robot API client
-- `app/webpack` - Webpack configuration helpers
 
 ## Copy management
 
@@ -131,10 +130,9 @@ ANALYZER=1 make -C app
 [api-server-source]: ../api/opentrons/server
 [electron]: https://www.electronjs.org/
 [electron-renderer]: https://electronjs.org/docs/tutorial/quick-start#renderer-process
-[hmr]: https://webpack.js.org/concepts/hot-module-replacement/
 [react]: https://react.dev/
 [redux]: http://redux.js.org/
 [css-modules]: https://github.com/css-modules/css-modules
 [babel]: https://babeljs.io/
-[webpack]: https://webpack.js.org/
+[vite]: https://vitejs.dev/
 [bundle-analyzer]: https://github.com/webpack-contrib/webpack-bundle-analyzer

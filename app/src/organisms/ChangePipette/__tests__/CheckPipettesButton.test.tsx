@@ -1,15 +1,15 @@
 import * as React from 'react'
-import { fireEvent } from '@testing-library/react'
+import { fireEvent, screen } from '@testing-library/react'
+import { vi, it, describe, expect, beforeEach } from 'vitest'
+
 import { usePipettesQuery } from '@opentrons/react-api-client'
-import { renderWithProviders } from '@opentrons/components'
+
+import { renderWithProviders } from '../../../__testing-utils__'
 import { i18n } from '../../../i18n'
 import { CheckPipettesButton } from '../CheckPipettesButton'
 
-jest.mock('@opentrons/react-api-client')
+vi.mock('@opentrons/react-api-client')
 
-const mockUsePipettesQuery = usePipettesQuery as jest.MockedFunction<
-  typeof usePipettesQuery
->
 const render = (props: React.ComponentProps<typeof CheckPipettesButton>) => {
   return renderWithProviders(<CheckPipettesButton {...props} />, {
     i18nInstance: i18n,
@@ -22,78 +22,75 @@ describe('CheckPipettesButton', () => {
     props = {
       robotName: 'otie',
       children: <div>btn text</div>,
-      onDone: jest.fn(),
+      onDone: vi.fn(),
     }
-  })
-  afterEach(() => {
-    jest.resetAllMocks()
   })
 
   it('renders the confirm attachment btn and clicking on it calls fetchPipettes', () => {
-    const refetch = jest.fn(() => Promise.resolve())
-    mockUsePipettesQuery.mockReturnValue({
+    const refetch = vi.fn(() => Promise.resolve())
+    vi.mocked(usePipettesQuery).mockReturnValue({
       refetch,
       isFetching: false,
     } as any)
     props = {
       robotName: 'otie',
-      onDone: jest.fn(),
+      onDone: vi.fn(),
       direction: 'attach',
     }
-    const { getByLabelText, getByText } = render(props)
-    const btn = getByLabelText('Confirm')
-    getByText('Confirm attachment')
+    render(props)
+    const btn = screen.getByLabelText('Confirm')
+    screen.getByText('Confirm attachment')
     fireEvent.click(btn)
     expect(refetch).toHaveBeenCalled()
   })
 
   it('renders the confirm detachment btn and clicking on it calls fetchPipettes', () => {
-    const refetch = jest.fn(() => Promise.resolve())
-    mockUsePipettesQuery.mockReturnValue({
+    const refetch = vi.fn(() => Promise.resolve())
+    vi.mocked(usePipettesQuery).mockReturnValue({
       refetch,
       isFetching: false,
     } as any)
     props = {
       robotName: 'otie',
-      onDone: jest.fn(),
+      onDone: vi.fn(),
       direction: 'detach',
     }
-    const { getByLabelText, getByText } = render(props)
-    const btn = getByLabelText('Confirm')
-    getByText('Confirm detachment')
+    render(props)
+    const btn = screen.getByLabelText('Confirm')
+    screen.getByText('Confirm detachment')
     fireEvent.click(btn)
     expect(refetch).toHaveBeenCalled()
   })
 
   it('renders button disabled when pipettes query status is loading', () => {
-    const refetch = jest.fn(() => Promise.resolve())
-    mockUsePipettesQuery.mockReturnValue({
+    const refetch = vi.fn(() => Promise.resolve())
+    vi.mocked(usePipettesQuery).mockReturnValue({
       refetch,
     } as any)
     props = {
       robotName: 'otie',
-      onDone: jest.fn(),
+      onDone: vi.fn(),
     }
-    const { getByLabelText } = render(props)
-    const btn = getByLabelText('Confirm')
+    render(props)
+    const btn = screen.getByLabelText('Confirm')
     fireEvent.click(btn)
-    expect(getByLabelText('Confirm')).toBeDisabled()
+    expect(screen.getByLabelText('Confirm')).toBeDisabled()
   })
 
   it('renders the confirm detachment btn and with children and clicking on it calls fetchPipettes', () => {
-    const refetch = jest.fn(() => Promise.resolve())
-    mockUsePipettesQuery.mockReturnValue({
+    const refetch = vi.fn(() => Promise.resolve())
+    vi.mocked(usePipettesQuery).mockReturnValue({
       refetch,
       isFetching: false,
     } as any)
     props = {
       ...props,
     }
-    const { getByLabelText, getByText } = render(props)
-    const btn = getByLabelText('Confirm')
-    getByText('btn text')
+    render(props)
+    const btn = screen.getByLabelText('Confirm')
+    screen.getByText('btn text')
     fireEvent.click(btn)
     expect(refetch).toHaveBeenCalled()
-    expect(getByLabelText('Confirm')).toBeDisabled()
+    expect(screen.getByLabelText('Confirm')).toBeDisabled()
   })
 })

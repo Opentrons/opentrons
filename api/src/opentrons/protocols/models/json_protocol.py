@@ -673,7 +673,7 @@ class Model(BaseModel):
         None, description="All modules used in this protocol"
     )
     commands: List[AllCommands] = Field(
-        None,
+        ...,
         description="An array of command objects representing steps to be executed "
         "on the robot",
     )

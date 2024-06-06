@@ -1,4 +1,5 @@
 import { createSelector } from 'reselect'
+import mapValues from 'lodash/mapValues'
 import {
   getLabwareDisplayName,
   MAGNETIC_MODULE_TYPE,
@@ -6,7 +7,6 @@ import {
   THERMOCYCLER_MODULE_TYPE,
   HEATERSHAKER_MODULE_TYPE,
 } from '@opentrons/shared-data'
-import mapValues from 'lodash/mapValues'
 import { getInitialDeckSetup } from '../../step-forms/selectors'
 import { getLabwareNicknamesById } from '../labware/selectors'
 import {
@@ -15,10 +15,14 @@ import {
   getModuleOnDeckByType,
   getModuleHasLabware,
   getMagnetLabwareEngageHeight as getMagnetLabwareEngageHeightUtil,
+  getModulesOnDeckByType,
+  getModulesHaveLabware,
 } from './utils'
-import { Options } from '@opentrons/components'
-import { Selector } from '../../types'
-import { LabwareNamesByModuleId } from '../../steplist/types'
+import type { ModuleAndLabware } from './utils'
+import type { Options } from '@opentrons/components'
+import type { Selector } from '../../types'
+import type { LabwareNamesByModuleId } from '../../steplist/types'
+
 export const getLabwareNamesByModuleId: Selector<LabwareNamesByModuleId> = createSelector(
   getInitialDeckSetup,
   getLabwareNicknamesById,
@@ -84,16 +88,18 @@ export const getSingleMagneticModuleId: Selector<
     getModuleOnDeckByType(initialDeckSetup, MAGNETIC_MODULE_TYPE)?.id || null
 )
 
-/** Get single temperature module (assumes no multiples) */
-export const getSingleTemperatureModuleId: Selector<
-  string | null
+/** Get all temperature modules */
+export const getTemperatureModuleIds: Selector<
+  string[] | null
 > = createSelector(
   getInitialDeckSetup,
   initialDeckSetup =>
-    getModuleOnDeckByType(initialDeckSetup, TEMPERATURE_MODULE_TYPE)?.id || null
+    getModulesOnDeckByType(initialDeckSetup, TEMPERATURE_MODULE_TYPE)?.map(
+      module => module.id
+    ) || null
 )
 
-/** Get single temperature module (assumes no multiples) */
+/** Get single thermocycler module (assumes no multiples) */
 export const getSingleThermocyclerModuleId: Selector<
   string | null
 > = createSelector(
@@ -111,13 +117,20 @@ export const getMagnetModuleHasLabware: Selector<boolean> = createSelector(
   }
 )
 
-/** Returns boolean if temperature module has labware */
-export const getTemperatureModuleHasLabware: Selector<boolean> = createSelector(
+/** Returns boolean if heater-shaker module has labware */
+export const getHeaterShakerModuleHasLabware: Selector<boolean> = createSelector(
   getInitialDeckSetup,
   initialDeckSetup => {
-    return getModuleHasLabware(initialDeckSetup, TEMPERATURE_MODULE_TYPE)
+    return getModuleHasLabware(initialDeckSetup, HEATERSHAKER_MODULE_TYPE)
   }
 )
+
+/** Returns all moduleIds and if they have labware for MoaM */
+export const getTemperatureModulesHaveLabware: Selector<
+  ModuleAndLabware[]
+> = createSelector(getInitialDeckSetup, initialDeckSetup => {
+  return getModulesHaveLabware(initialDeckSetup, TEMPERATURE_MODULE_TYPE)
+})
 
 /** Returns boolean if thermocycler module has labware */
 export const getThermocyclerModuleHasLabware: Selector<boolean> = createSelector(

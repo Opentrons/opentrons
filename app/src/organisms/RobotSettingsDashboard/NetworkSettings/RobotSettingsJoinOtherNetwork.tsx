@@ -6,7 +6,7 @@ import { DIRECTION_COLUMN, Flex } from '@opentrons/components'
 import { ChildNavigation } from '../../../organisms/ChildNavigation'
 import { SetWifiSsid } from '../../../organisms/NetworkSettings/SetWifiSsid'
 
-import type { SetSettingOption } from '../../../pages/OnDeviceDisplay/RobotSettingsDashboard'
+import type { SetSettingOption } from '../../../pages/RobotSettingsDashboard'
 
 interface RobotSettingsJoinOtherNetworkProps {
   setCurrentOption: SetSettingOption
@@ -39,7 +39,9 @@ export function RobotSettingsJoinOtherNetwork({
       <ChildNavigation
         buttonText={i18n.format(t('continue'), 'capitalize')}
         header={t('join_other_network')}
-        onClickBack={() => setCurrentOption('RobotSettingsWifi')}
+        onClickBack={() => {
+          setCurrentOption('RobotSettingsWifi')
+        }}
         onClickButton={handleContinue}
       />
       <SetWifiSsid

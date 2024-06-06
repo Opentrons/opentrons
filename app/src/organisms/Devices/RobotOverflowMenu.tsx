@@ -1,10 +1,12 @@
 import * as React from 'react'
+import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
 import { useDispatch, useSelector } from 'react-redux'
 import { Link } from 'react-router-dom'
 
 import {
   Flex,
+  BORDERS,
   COLORS,
   POSITION_ABSOLUTE,
   DIRECTION_COLUMN,
@@ -20,7 +22,7 @@ import { OverflowBtn } from '../../atoms/MenuList/OverflowBtn'
 import { Tooltip } from '../../atoms/Tooltip'
 import { Divider } from '../../atoms/structure'
 import { MenuItem } from '../../atoms/MenuList/MenuItem'
-import { Portal } from '../../App/portal'
+import { getTopPortalEl } from '../../App/portal'
 import { ChooseProtocolSlideout } from '../ChooseProtocolSlideout'
 import { useCurrentRunId } from '../ProtocolUpload/hooks'
 import { ConnectionTroubleshootingModal } from './ConnectionTroubleshootingModal'
@@ -30,6 +32,7 @@ import { useIsRobotBusy } from './hooks'
 import type { StyleProps } from '@opentrons/components'
 import type { DiscoveredRobot } from '../../redux/discovery/types'
 import type { Dispatch, State } from '../../redux/types'
+import { css } from 'styled-components'
 
 interface RobotOverflowMenuProps extends StyleProps {
   robot: DiscoveredRobot
@@ -81,19 +84,25 @@ export function RobotOverflowMenu(props: RobotOverflowMenuProps): JSX.Element {
   if (robot.status === CONNECTABLE && runId == null) {
     menuItems = (
       <>
-        {!isRobotBusy ? (
-          <MenuItem
-            {...targetProps}
-            onClick={handleClickRun}
-            disabled={isRobotOnWrongVersionOfSoftware}
-            data-testid={`RobotOverflowMenu_${robot.name}_runProtocol`}
-          >
-            {t('run_a_protocol')}
-          </MenuItem>
-        ) : null}
+        <MenuItem
+          {...targetProps}
+          onClick={handleClickRun}
+          disabled={isRobotOnWrongVersionOfSoftware || isRobotBusy}
+          data-testid={`RobotOverflowMenu_${robot.name}_runProtocol`}
+          css={css`
+            border-radius: ${BORDERS.borderRadius8} ${BORDERS.borderRadius8} 0 0;
+          `}
+        >
+          {t('run_a_protocol')}
+        </MenuItem>
         {isRobotOnWrongVersionOfSoftware && (
           <Tooltip tooltipProps={tooltipProps} whiteSpace="normal">
             {t('shared:a_software_update_is_available')}
+          </Tooltip>
+        )}
+        {!isRobotOnWrongVersionOfSoftware && isRobotBusy && (
+          <Tooltip tooltipProps={tooltipProps} whiteSpace="normal">
+            {t('shared:robot_is_busy')}
           </Tooltip>
         )}
         <Divider marginY="0" />
@@ -102,6 +111,9 @@ export function RobotOverflowMenu(props: RobotOverflowMenuProps): JSX.Element {
           as={Link}
           textTransform={TYPOGRAPHY.textTransformCapitalize}
           id={`RobotOverflowMenu_${robot.name}_robotSettings`}
+          css={css`
+            border-radius: 0 0 ${BORDERS.borderRadius8} ${BORDERS.borderRadius8};
+          `}
         >
           {t('robot_settings')}
         </MenuItem>
@@ -114,6 +126,9 @@ export function RobotOverflowMenu(props: RobotOverflowMenuProps): JSX.Element {
         as={Link}
         textTransform={TYPOGRAPHY.textTransformCapitalize}
         id={`RobotOverflowMenu_${robot.name}_robotSettings_${runId}`}
+        css={css`
+          border-radius: ${BORDERS.borderRadius8};
+        `}
       >
         {t('robot_settings')}
       </MenuItem>
@@ -124,12 +139,18 @@ export function RobotOverflowMenu(props: RobotOverflowMenuProps): JSX.Element {
         <MenuItem
           onClick={handleClickConnectionTroubleshooting}
           id={`RobotOverflowMenu_${String(robot.name)}_robotUnavailable`}
+          css={css`
+            border-radius: ${BORDERS.borderRadius8} ${BORDERS.borderRadius8} 0 0;
+          `}
         >
           {t('why_is_this_robot_unavailable')}
         </MenuItem>
         <MenuItem
           onClick={() => dispatch(removeRobot(robot.name))}
           id={`RobotOverflowMenu_${String(robot.name)}_removeRobot`}
+          css={css`
+            border-radius: 0 0 ${BORDERS.borderRadius8} ${BORDERS.borderRadius8};
+          `}
         >
           {t('forget_unavailable_robot')}
         </MenuItem>
@@ -141,7 +162,7 @@ export function RobotOverflowMenu(props: RobotOverflowMenuProps): JSX.Element {
       data-testid={`RobotCard_${String(robot.name)}_overflowMenu`}
       flexDirection={DIRECTION_COLUMN}
       position={POSITION_RELATIVE}
-      onClick={e => {
+      onClick={(e: React.MouseEvent) => {
         e.stopPropagation()
       }}
       {...styleProps}
@@ -155,7 +176,7 @@ export function RobotOverflowMenu(props: RobotOverflowMenuProps): JSX.Element {
         <Flex
           whiteSpace="nowrap"
           zIndex={10}
-          borderRadius="4px 4px 0px 0px"
+          borderRadius={BORDERS.borderRadius8}
           boxShadow="0px 1px 3px rgba(0, 0, 0, 0.2)"
           position={POSITION_ABSOLUTE}
           backgroundColor={COLORS.white}
@@ -176,17 +197,19 @@ export function RobotOverflowMenu(props: RobotOverflowMenuProps): JSX.Element {
           }}
         />
       ) : null}
-      <Portal level="top">
-        {showOverflowMenu && menuOverlay}
-
-        {showConnectionTroubleshootingModal ? (
-          <ConnectionTroubleshootingModal
-            onClose={() => {
-              setShowConnectionTroubleshootingModal(false)
-            }}
-          />
-        ) : null}
-      </Portal>
+      {createPortal(
+        <>
+          {showOverflowMenu && menuOverlay}
+          {showConnectionTroubleshootingModal ? (
+            <ConnectionTroubleshootingModal
+              onClose={() => {
+                setShowConnectionTroubleshootingModal(false)
+              }}
+            />
+          ) : null}
+        </>,
+        getTopPortalEl()
+      )}
     </Flex>
   )
 }

@@ -5,7 +5,8 @@ from typing_extensions import Literal, Type
 
 from pydantic import BaseModel, Field
 
-from ..command import AbstractCommandImpl, BaseCommand, BaseCommandCreate
+from ..command import AbstractCommandImpl, BaseCommand, BaseCommandCreate, SuccessData
+from ...errors.error_occurrence import ErrorOccurrence
 
 if TYPE_CHECKING:
     from opentrons.protocol_engine.state import StateView
@@ -25,7 +26,9 @@ class DeactivateLidResult(BaseModel):
     """Result data from unsetting a Thermocycler's target lid temperature."""
 
 
-class DeactivateLidImpl(AbstractCommandImpl[DeactivateLidParams, DeactivateLidResult]):
+class DeactivateLidImpl(
+    AbstractCommandImpl[DeactivateLidParams, SuccessData[DeactivateLidResult, None]]
+):
     """Execution implementation of a Thermocycler's deactivate lid command."""
 
     def __init__(
@@ -37,7 +40,9 @@ class DeactivateLidImpl(AbstractCommandImpl[DeactivateLidParams, DeactivateLidRe
         self._state_view = state_view
         self._equipment = equipment
 
-    async def execute(self, params: DeactivateLidParams) -> DeactivateLidResult:
+    async def execute(
+        self, params: DeactivateLidParams
+    ) -> SuccessData[DeactivateLidResult, None]:
         """Unset a Thermocycler's target lid temperature."""
         thermocycler_state = self._state_view.modules.get_thermocycler_module_substate(
             params.moduleId
@@ -49,10 +54,12 @@ class DeactivateLidImpl(AbstractCommandImpl[DeactivateLidParams, DeactivateLidRe
         if thermocycler_hardware is not None:
             await thermocycler_hardware.deactivate_lid()
 
-        return DeactivateLidResult()
+        return SuccessData(public=DeactivateLidResult(), private=None)
 
 
-class DeactivateLid(BaseCommand[DeactivateLidParams, DeactivateLidResult]):
+class DeactivateLid(
+    BaseCommand[DeactivateLidParams, DeactivateLidResult, ErrorOccurrence]
+):
     """A command to unset a Thermocycler's target lid temperature."""
 
     commandType: DeactivateLidCommandType = "thermocycler/deactivateLid"

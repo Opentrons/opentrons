@@ -1,4 +1,4 @@
-from typing import Dict
+from typing import Dict, Optional
 from opentrons.util.async_helpers import ensure_yield
 from opentrons.drivers.heater_shaker.abstract import AbstractHeaterShakerDriver
 from opentrons.drivers.types import Temperature, RPM, HeaterShakerLabwareLatchStatus
@@ -7,12 +7,13 @@ from opentrons.drivers.types import Temperature, RPM, HeaterShakerLabwareLatchSt
 class SimulatingDriver(AbstractHeaterShakerDriver):
     DEFAULT_TEMP = 23
 
-    def __init__(self) -> None:
+    def __init__(self, serial_number: Optional[str] = None) -> None:
         self._labware_latch_state = HeaterShakerLabwareLatchStatus.IDLE_UNKNOWN
         self._current_temperature = self.DEFAULT_TEMP
         self._temperature = Temperature(current=self.DEFAULT_TEMP, target=None)
         self._rpm = RPM(current=0, target=None)
         self._homing_status = True
+        self._serial_number = serial_number
 
     @ensure_yield
     async def connect(self) -> None:
@@ -83,7 +84,7 @@ class SimulatingDriver(AbstractHeaterShakerDriver):
     @ensure_yield
     async def get_device_info(self) -> Dict[str, str]:
         return {
-            "serial": "dummySerialHS",
+            "serial": self._serial_number if self._serial_number else "dummySerialHS",
             "model": "dummyModelHS",
             "version": "dummyVersionHS",
         }

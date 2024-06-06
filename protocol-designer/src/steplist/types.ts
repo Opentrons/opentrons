@@ -1,13 +1,13 @@
-import { THERMOCYCLER_PROFILE, THERMOCYCLER_STATE } from '../constants'
-import {
+import type { THERMOCYCLER_PROFILE, THERMOCYCLER_STATE } from '../constants'
+import type {
   CommandCreatorArgs,
   MoveLabwareArgs,
   PauseArgs,
   ThermocyclerProfileStepArgs,
 } from '@opentrons/step-generation'
-import { ModuleType } from '@opentrons/shared-data'
-import { StepIdType } from '../form-types'
-import { FormError } from './formLevel/errors'
+import type { ModuleType } from '@opentrons/shared-data'
+import type { StepIdType } from '../form-types'
+import type { FormError } from './formLevel/errors'
 // timeline start and end
 export const START_TERMINAL_ITEM_ID: '__initial_setup__' = '__initial_setup__'
 export const END_TERMINAL_ITEM_ID: '__end__' = '__end__'
@@ -48,6 +48,7 @@ export interface SourceDestData {
   postIngreds: WellIngredientVolumeData
 }
 export interface SubstepTimelineFrame {
+  isAirGap?: boolean
   substepIndex?: number
   activeTips: TipLocation | null | undefined
   source?: SourceDestData
@@ -105,6 +106,7 @@ export interface TemperatureSubstepItem {
   substepType: 'temperature'
   temperature: number | null
   labwareNickname: string | null | undefined
+  moduleId: string | null
   message?: string
 }
 export interface PauseSubstepItem {

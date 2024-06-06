@@ -1,10 +1,10 @@
-import type { CompletedProtocolAnalysis } from '@opentrons/shared-data'
+import type { CommandTextData } from '../types'
 
 export function getLiquidDisplayName(
-  analysis: CompletedProtocolAnalysis,
+  commandTextData: CommandTextData,
   liquidId: string
-): CompletedProtocolAnalysis['liquids'][number]['displayName'] {
-  const liquidDisplayName = (analysis?.liquids ?? []).find(
+): CommandTextData['liquids'][number]['displayName'] {
+  const liquidDisplayName = (commandTextData?.liquids ?? []).find(
     liquid => liquid.id === liquidId
   )?.displayName
   return liquidDisplayName ?? ''

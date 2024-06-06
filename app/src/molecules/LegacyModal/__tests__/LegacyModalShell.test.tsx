@@ -1,6 +1,8 @@
 import * as React from 'react'
-
-import { renderWithProviders } from '@opentrons/components'
+import '@testing-library/jest-dom/vitest'
+import { screen } from '@testing-library/react'
+import { describe, it, expect, beforeEach } from 'vitest'
+import { renderWithProviders } from '../../../__testing-utils__'
 
 import { LegacyModalShell } from '../LegacyModalShell'
 
@@ -19,22 +21,26 @@ describe('LegacyModalShell', () => {
   })
 
   it('should render content', () => {
-    const [{ getByText, getByLabelText }] = render(props)
-    getByText('mock modal shell')
-    expect(getByLabelText('ModalShell_ModalArea')).toHaveStyle('height: auto')
+    render(props)
+    screen.getByText('mock modal shell')
+    expect(screen.getByLabelText('ModalShell_ModalArea')).toHaveStyle(
+      'height: auto'
+    )
   })
 
   it('should render full size modal when fullSize is true', () => {
     props.fullPage = true
-    const [{ getByLabelText }] = render(props)
-    expect(getByLabelText('ModalShell_ModalArea')).toHaveStyle('height: 100%')
+    render(props)
+    expect(screen.getByLabelText('ModalShell_ModalArea')).toHaveStyle(
+      'height: 100%'
+    )
   })
 
   it('should render header and footer', () => {
     props.header = <div>mock header</div>
     props.footer = <div>mock footer</div>
-    const [{ getByText }] = render(props)
-    getByText('mock header')
-    getByText('mock footer')
+    render(props)
+    screen.getByText('mock header')
+    screen.getByText('mock footer')
   })
 })

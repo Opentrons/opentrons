@@ -1,6 +1,6 @@
 import json
 from textwrap import dedent
-from typing import Any, Callable, Optional, Union
+from typing import Any, Callable, Optional, Union, Literal
 
 import pytest
 from opentrons_shared_data.robot.dev_types import RobotType
@@ -407,7 +407,7 @@ def test_validate_json(
 @pytest.mark.parametrize("filename", ["protocol.py", None])
 def test_parse_python_details(
     protocol_source: str,
-    protocol_text_kind: str,
+    protocol_text_kind: Literal["str", "bytes"],
     filename: Optional[str],
     expected_api_level: APIVersion,
     expected_robot_type: RobotType,
@@ -423,8 +423,11 @@ def test_parse_python_details(
     parsed = parse(text, filename)
 
     assert isinstance(parsed, PythonProtocol)
-    assert parsed.text == protocol_source
-    assert isinstance(parsed.text, str)
+    assert parsed.text == text
+    if protocol_text_kind == "str":
+        assert isinstance(parsed.text, str)
+    else:
+        assert isinstance(parsed.text, bytes)
 
     assert parsed.filename == filename
     assert parsed.contents.co_filename == (
@@ -454,13 +457,13 @@ def test_parse_json_details(
     get_json_protocol_fixture: Callable[..., Any],
     fixture_version: str,
     fixture_name: str,
-    protocol_text_kind: str,
+    protocol_text_kind: Literal["str", "bytes"],
     filename: str,
 ) -> None:
     protocol = get_json_protocol_fixture(
         fixture_version=fixture_version, fixture_name=fixture_name, decode=False
     )
-    if protocol_text_kind == "text":
+    if protocol_text_kind == "str":
         protocol_text: Union[bytes, str] = protocol
     else:
         protocol_text = protocol.encode("utf-8")

@@ -1,5 +1,7 @@
 import * as React from 'react'
-import { renderWithProviders } from '@opentrons/components'
+import { fireEvent, screen } from '@testing-library/react'
+import { describe, it, vi, beforeEach, expect } from 'vitest'
+import { renderWithProviders } from '../../../__testing-utils__'
 import { i18n } from '../../../i18n'
 import { mockPipetteData1Channel } from '../../../redux/pipettes/__fixtures__'
 import { PipetteWizardFlows } from '../../PipetteWizardFlows'
@@ -7,26 +9,20 @@ import { GripperWizardFlows } from '../../GripperWizardFlows'
 import { InstrumentInfo } from '..'
 
 import type { GripperData } from '@opentrons/api-client'
+import type * as Dom from 'react-router-dom'
 
-const mockPush = jest.fn()
+const mockPush = vi.fn()
 
-jest.mock('../../PipetteWizardFlows')
-jest.mock('../../GripperWizardFlows')
-jest.mock('react-router-dom', () => {
-  const reactRouterDom = jest.requireActual('react-router-dom')
+vi.mock('../../PipetteWizardFlows')
+vi.mock('../../GripperWizardFlows')
+vi.mock('react-router-dom', async importOriginal => {
+  const reactRouterDom = await importOriginal<typeof Dom>()
   return {
     ...reactRouterDom,
     useHistory: () => ({ push: mockPush } as any),
   }
 })
 
-const mockPipetteWizardFlows = PipetteWizardFlows as jest.MockedFunction<
-  typeof PipetteWizardFlows
->
-
-const mockGripperWizardFlows = GripperWizardFlows as jest.MockedFunction<
-  typeof GripperWizardFlows
->
 const render = (props: React.ComponentProps<typeof InstrumentInfo>) => {
   return renderWithProviders(<InstrumentInfo {...props} />, {
     i18nInstance: i18n,
@@ -71,54 +67,58 @@ const mockGripperDataWithCalData: GripperData = {
 describe('InstrumentInfo', () => {
   let props: React.ComponentProps<typeof InstrumentInfo>
   beforeEach(() => {
-    mockPipetteWizardFlows.mockReturnValue(<div>mock PipetteWizardFlows</div>)
-    mockGripperWizardFlows.mockReturnValue(<div>mock GripperWizardFlows</div>)
+    vi.mocked(PipetteWizardFlows).mockReturnValue(
+      <div>mock PipetteWizardFlows</div>
+    )
+    vi.mocked(GripperWizardFlows).mockReturnValue(
+      <div>mock GripperWizardFlows</div>
+    )
     props = {
       instrument: mockGripperData,
     }
   })
   it('returns the correct information for a gripper with no cal data', () => {
-    const { getByText, getByRole } = render(props)
-    getByText('last calibrated')
-    getByText('No calibration data')
-    getByText('firmware version')
-    getByText('12')
-    getByText('serial number')
-    getByText('123')
-    getByRole('button', { name: 'MediumButton_secondary' }).click()
-    getByText('mock GripperWizardFlows')
-    getByRole('button', { name: 'MediumButton_primary' }).click()
-    getByText('mock GripperWizardFlows')
+    render(props)
+    screen.getByText('last calibrated')
+    screen.getByText('No calibration data')
+    screen.getByText('firmware version')
+    screen.getByText('12')
+    screen.getByText('serial number')
+    screen.getByText('123')
+    fireEvent.click(screen.getByRole('button', { name: 'detach' }))
+    screen.getByText('mock GripperWizardFlows')
+    fireEvent.click(screen.getByRole('button', { name: 'calibrate' }))
+    screen.getByText('mock GripperWizardFlows')
   })
 
   it('returns the correct information for a gripper with cal data', () => {
     props = {
       instrument: mockGripperDataWithCalData,
     }
-    const { getByText, getByRole } = render(props)
-    getByText('last calibrated')
-    getByText('8/15/23 20:25 UTC')
-    getByText('firmware version')
-    getByText('12')
-    getByText('serial number')
-    getByText('123')
-    getByRole('button', { name: 'MediumButton_secondary' }).click()
-    getByText('mock GripperWizardFlows')
-    getByRole('button', { name: 'MediumButton_primary' }).click()
-    getByText('mock GripperWizardFlows')
+    render(props)
+    screen.getByText('last calibrated')
+    screen.getByText('8/15/23 20:25 UTC')
+    screen.getByText('firmware version')
+    screen.getByText('12')
+    screen.getByText('serial number')
+    screen.getByText('123')
+    fireEvent.click(screen.getByRole('button', { name: 'detach' }))
+    screen.getByText('mock GripperWizardFlows')
+    fireEvent.click(screen.getByRole('button', { name: 'recalibrate' }))
+    screen.getByText('mock GripperWizardFlows')
   })
 
   it('returns the correct information for a pipette with cal data and no firmware version', () => {
     props = {
       instrument: mockPipetteData1Channel,
     }
-    const { getByText, getByRole, queryByText } = render(props)
-    getByText('last calibrated')
-    getByText('8/25/20 20:25 UTC')
-    getByText('serial number')
-    getByText('abc')
-    getByRole('button', { name: 'MediumButton_secondary' }).click()
-    getByText('mock PipetteWizardFlows')
-    expect(queryByText('Calibrate')).not.toBeInTheDocument()
+    render(props)
+    screen.getByText('last calibrated')
+    screen.getByText('8/25/20 20:25 UTC')
+    screen.getByText('serial number')
+    screen.getByText('abc')
+    fireEvent.click(screen.getByRole('button', { name: 'detach' }))
+    screen.getByText('mock PipetteWizardFlows')
+    expect(screen.queryByText('Calibrate')).not.toBeInTheDocument()
   })
 })

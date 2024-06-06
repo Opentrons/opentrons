@@ -1,19 +1,16 @@
 import * as React from 'react'
 import { MemoryRouter } from 'react-router-dom'
-import { fireEvent } from '@testing-library/react'
-
-import { renderWithProviders } from '@opentrons/components'
+import { screen, fireEvent } from '@testing-library/react'
+import { describe, it, vi, beforeEach, expect } from 'vitest'
+import '@testing-library/jest-dom/vitest'
+import { renderWithProviders } from '../../../../../__testing-utils__'
 
 import { i18n } from '../../../../../i18n'
 import { getRobotSettings } from '../../../../../redux/robot-settings'
 
 import { UseOlderAspirateBehavior } from '../UseOlderAspirateBehavior'
 
-jest.mock('../../../../../redux/robot-settings/selectors')
-
-const mockGetRobotSettings = getRobotSettings as jest.MockedFunction<
-  typeof getRobotSettings
->
+vi.mock('../../../../../redux/robot-settings/selectors')
 
 const mockSettings = {
   id: 'useOldAspirationFunctions',
@@ -39,20 +36,16 @@ const render = (isRobotBusy = false) => {
 
 describe('RobotSettings UseOlderAspirateBehavior', () => {
   beforeEach(() => {
-    mockGetRobotSettings.mockReturnValue([mockSettings])
-  })
-
-  afterEach(() => {
-    jest.resetAllMocks()
+    vi.mocked(getRobotSettings).mockReturnValue([mockSettings])
   })
 
   it('should render title, description and toggle button', () => {
-    const [{ getByText, getByRole }] = render()
-    getByText('Use older aspirate behavior')
-    getByText(
+    render()
+    screen.getByText('Use older aspirate behavior')
+    screen.getByText(
       'Aspirate with the less accurate volumetric calibrations that were used before version 3.7.0. Use this if you need consistency with pre-v3.7.0 results. This only affects GEN1 P10S, P10M, P50M, and P300S pipettes.'
     )
-    const toggleButton = getByRole('switch', {
+    const toggleButton = screen.getByRole('switch', {
       name: 'use_older_aspirate_behavior',
     })
     expect(toggleButton.getAttribute('aria-checked')).toBe('true')
@@ -63,9 +56,9 @@ describe('RobotSettings UseOlderAspirateBehavior', () => {
       ...mockSettings,
       value: false,
     }
-    mockGetRobotSettings.mockReturnValue([tempMockSettings])
-    const [{ getByRole }] = render()
-    const toggleButton = getByRole('switch', {
+    vi.mocked(getRobotSettings).mockReturnValue([tempMockSettings])
+    render()
+    const toggleButton = screen.getByRole('switch', {
       name: 'use_older_aspirate_behavior',
     })
     fireEvent.click(toggleButton)
@@ -73,8 +66,8 @@ describe('RobotSettings UseOlderAspirateBehavior', () => {
   })
 
   it('should call update robot status if a robot is busy', () => {
-    const [{ getByRole }] = render(true)
-    const toggleButton = getByRole('switch', {
+    render(true)
+    const toggleButton = screen.getByRole('switch', {
       name: 'use_older_aspirate_behavior',
     })
     expect(toggleButton).toBeDisabled()

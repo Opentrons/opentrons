@@ -24,6 +24,7 @@ import { OPENTRONS_USB } from '@opentrons/app/src/redux/discovery/constants'
 import { getFullConfig, handleConfigChange } from './config'
 import { createLogger } from './log'
 import { getSerialPortHttpAgent } from './usb'
+import { handleNotificationConnectionsFor } from './notifications'
 
 import type {
   Address,
@@ -31,7 +32,6 @@ import type {
   LegacyService,
   DiscoveryClient,
 } from '@opentrons/discovery-client'
-
 import type { Action, Dispatch } from './types'
 import type { ConfigV1 } from '@opentrons/app/src/redux/config/schema-types'
 
@@ -152,22 +152,24 @@ export function registerDiscovery(
       case UI_INITIALIZED:
       case DISCOVERY_START: {
         handleRobots()
-        return client.start({
+        client.start({
           healthPollInterval: FAST_POLL_INTERVAL_MS,
         })
+        return
       }
       case DISCOVERY_FINISH: {
-        return client.start({
+        client.start({
           healthPollInterval: SLOW_POLL_INTERVAL_MS,
         })
+        return
       }
       case DISCOVERY_REMOVE: {
-        return client.removeRobot(
-          (action.payload as { robotName: string }).robotName
-        )
+        client.removeRobot((action.payload as { robotName: string }).robotName)
+        return
       }
       case CLEAR_CACHE: {
-        return clearCache()
+        clearCache()
+        return
       }
       case USB_HTTP_REQUESTS_START: {
         const usbHttpAgent = getSerialPortHttpAgent()
@@ -201,6 +203,7 @@ export function registerDiscovery(
 
   function handleRobots(): void {
     const robots = client.getRobots()
+    handleNotificationConnectionsFor(robots)
 
     if (!disableCache) store.set('robots', robots)
 

@@ -38,7 +38,7 @@ export function ProgressBar({
   const LINER_PROGRESS_FILLER_STYLE = css`
     height: 0.5rem;
     width: ${progress};
-    background: ${COLORS.blueEnabled};
+    background: ${COLORS.blue50};
     transition: width 0.5s ease-in-out;
     webkit-transition: width 0.5s ease-in-out;
     moz-transition: width 0.5s ease-in-out;

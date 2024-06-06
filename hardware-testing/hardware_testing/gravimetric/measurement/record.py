@@ -280,7 +280,11 @@ class GravimetricRecorder:
     """Gravimetric Recorder."""
 
     def __init__(
-        self, cfg: GravimetricRecorderConfig, scale: Scale, simulate: bool = False
+        self,
+        cfg: GravimetricRecorderConfig,
+        scale: Scale,
+        simulate: bool = False,
+        start_graph: bool = True,
     ) -> None:
         """Gravimetric Recorder."""
         self._cfg = cfg
@@ -294,7 +298,7 @@ class GravimetricRecorder:
         self._scale_serial: str = ""
         self._scale_max_capacity: float = 0.0
         super().__init__()
-        self.activate()
+        self.activate(start_graph)
 
     def _start_graph_server_process(self) -> None:
         if self.is_simulator:
@@ -350,9 +354,10 @@ class GravimetricRecorder:
         """Add simulation mass."""
         self._scale.add_simulation_mass(mass)
 
-    def activate(self) -> None:
+    def activate(self, graph: bool = True) -> None:
         """Activate."""
-        self._start_graph_server_process()
+        if graph:
+            self._start_graph_server_process()
         # Some Radwag settings cannot be controlled remotely.
         # Listed below are the things the must be done using the touchscreen:
         #   1) Set profile to USER

@@ -1,14 +1,18 @@
 import * as React from 'react'
-import { renderWithProviders } from '@opentrons/components'
+import { fireEvent, screen } from '@testing-library/react'
+import { describe, it, expect, vi, beforeEach } from 'vitest'
+import '@testing-library/jest-dom/vitest'
 
 import { i18n } from '../../../i18n'
+import { renderWithProviders } from '../../../__testing-utils__'
 import { RobotSystemVersionModal } from '../RobotSystemVersionModal'
+import type * as Dom from 'react-router-dom'
 
-const mockFn = jest.fn()
-const mockPush = jest.fn()
+const mockFn = vi.fn()
+const mockPush = vi.fn()
 
-jest.mock('react-router-dom', () => {
-  const reactRouterDom = jest.requireActual('react-router-dom')
+vi.mock('react-router-dom', async importOriginal => {
+  const reactRouterDom = await importOriginal<typeof Dom>()
   return {
     ...reactRouterDom,
     useHistory: () => ({ push: mockPush } as any),
@@ -34,27 +38,26 @@ describe('RobotSystemVersionModal', () => {
     }
   })
 
-  afterEach(() => {
-    jest.clearAllMocks()
-  })
   it('should render text and buttons', () => {
-    const [{ getByText }] = render(props)
-    getByText('Robot System Version mockVersion available')
-    getByText('Updating the robot software requires restarting the robot')
-    getByText('mockReleaseNote')
-    getByText('Not now')
-    getByText('Update')
+    render(props)
+    screen.getByText('Robot System Version mockVersion available')
+    screen.getByText(
+      'Updating the robot software requires restarting the robot'
+    )
+    screen.getByText('mockReleaseNote')
+    screen.getByText('Not now')
+    screen.getByText('Update')
   })
 
   it('should close the modal when tapping remind me later', () => {
-    const [{ getByText }] = render(props)
-    getByText('Update').click()
+    render(props)
+    fireEvent.click(screen.getByText('Update'))
     expect(mockPush).toHaveBeenCalledWith('/robot-settings/update-robot')
   })
 
   it('should call the mock function when tapping update', () => {
-    const [{ getByText }] = render(props)
-    getByText('Not now').click()
+    render(props)
+    fireEvent.click(screen.getByText('Not now'))
     expect(mockFn).toHaveBeenCalled()
   })
 })

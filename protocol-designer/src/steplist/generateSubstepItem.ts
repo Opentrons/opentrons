@@ -1,4 +1,3 @@
-import assert from 'assert'
 import cloneDeep from 'lodash/cloneDeep'
 import range from 'lodash/range'
 import mapValues from 'lodash/mapValues'
@@ -22,8 +21,8 @@ import type {
   MixArgs,
   TransferArgs,
 } from '@opentrons/step-generation'
-import { StepIdType } from '../form-types'
-import {
+import type { StepIdType } from '../form-types'
+import type {
   NamedIngred,
   StepArgsAndErrors,
   StepItemSourceDestRow,
@@ -59,6 +58,7 @@ function getCommandCreatorForTransferlikeSubsteps(
       mixBeforeAspirate: null,
       mixInDestination: null,
       preWetTip: false,
+      tiprack: stepArgs.tipRack,
     }
     return curryCommandCreator(transfer, commandCallArgs)
   } else if (stepArgs.commandCreatorFnName === 'distribute') {
@@ -75,6 +75,7 @@ function getCommandCreatorForTransferlikeSubsteps(
       // set special values for substeps
       mixBeforeAspirate: null,
       preWetTip: false,
+      tiprack: stepArgs.tipRack,
     }
     return curryCommandCreator(distribute, commandCallArgs)
   } else if (stepArgs.commandCreatorFnName === 'consolidate') {
@@ -92,6 +93,7 @@ function getCommandCreatorForTransferlikeSubsteps(
       mixFirstAspirate: null,
       mixInDestination: null,
       preWetTip: false,
+      tiprack: stepArgs.tipRack,
     }
     return curryCommandCreator(consolidate, commandCallArgs)
   } else if (stepArgs.commandCreatorFnName === 'mix') {
@@ -110,8 +112,12 @@ export const mergeSubstepRowsSingleChannel = (args: {
   showDispenseVol: boolean
 }): StepItemSourceDestRow[] => {
   const { substepRows, showDispenseVol } = args
+  //  TODO(jr, 5/2/24): filtering out air gap steps for now since a refactor would be required
+  //  to figure out if the air gap is for the aspirate or dispense labware. Otherwise, a white screen
+  //  was happening with an air gap step trying to happen in an aspirate labware well that did not exist
+  const filteredSubstepRows = substepRows.filter(row => !row.isAirGap)
   return steplistUtils.mergeWhen(
-    substepRows,
+    filteredSubstepRows,
     (
       currentRow,
       nextRow // NOTE: if aspirate then dispense rows are adjacent, collapse them into one row
@@ -158,8 +164,12 @@ export const mergeSubstepRowsMultiChannel = (args: {
   showDispenseVol: boolean
 }): StepItemSourceDestRow[][] => {
   const { substepRows, channels, isMixStep, showDispenseVol } = args
+  //  TODO(jr, 5/2/24): filtering out air gap steps for now since a refactor would be required
+  //  to figure out if the air gap is for the aspirate or dispense labware. Otherwise, a white screen
+  //  was happening with an air gap step trying to happen in an aspirate labware well that did not exist
+  const filteredSubstepRows = substepRows.filter(row => !row.isAirGap)
   return steplistUtils.mergeWhen(
-    substepRows,
+    filteredSubstepRows,
     (
       currentMultiRow: SubstepTimelineFrame,
       nextMultiRow: SubstepTimelineFrame
@@ -255,7 +265,7 @@ function transferLikeSubsteps(args: {
 
   // TODO Ian 2018-04-06 use assert here
   if (!pipetteSpec) {
-    assert(
+    console.assert(
       false,
       `Pipette "${pipetteId}" does not exist, step ${stepId} can't determine channels`
     )
@@ -271,7 +281,10 @@ function transferLikeSubsteps(args: {
   )
 
   if (!substepCommandCreator) {
-    assert(false, `transferLikeSubsteps could not make a command creator`)
+    console.assert(
+      false,
+      `transferLikeSubsteps could not make a command creator`
+    )
     return null
   }
 
@@ -281,7 +294,8 @@ function transferLikeSubsteps(args: {
       substepCommandCreator,
       invariantContext,
       initialRobotState,
-      pipetteSpec.channels
+      pipetteSpec.channels,
+      stepArgs.nozzles
     )
     const mergedMultiRows: StepItemSourceDestRow[][] = mergeSubstepRowsMultiChannel(
       {
@@ -304,7 +318,8 @@ function transferLikeSubsteps(args: {
       substepCommandCreator,
       invariantContext,
       initialRobotState,
-      1
+      1,
+      null
     )
     const mergedRows: StepItemSourceDestRow[] = mergeSubstepRowsSingleChannel({
       substepRows,
@@ -404,6 +419,7 @@ export function generateSubstepItem(
       temperature: temperature,
       labwareNickname: labwareNames?.nickname,
       message: stepArgs.message,
+      moduleId: stepArgs.module,
     }
   }
 

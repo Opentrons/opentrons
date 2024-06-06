@@ -7,15 +7,16 @@ import {
 } from '@opentrons/api-client'
 import {
   ALIGN_CENTER,
+  BORDERS,
   COLORS,
   DIRECTION_COLUMN,
   Flex,
   Icon,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { Divider } from '../../atoms/structure'
-import { StyledText } from '../../atoms/text'
 import { LiquidsListItemDetails } from '../Devices/ProtocolRun/SetupLiquids/SetupLiquidsList'
 
 import type { Liquid, RunTimeCommand } from '@opentrons/shared-data'
@@ -45,7 +46,7 @@ export const ProtocolLiquidsDetails = (
       overflowY="auto"
       data-testid="LiquidsDetailsTab"
     >
-      {liquids.length > 0 ? (
+      {liquidsInLoadOrder.length > 0 ? (
         liquidsInLoadOrder?.map((liquid, index) => {
           return (
             <React.Fragment key={liquid.id}>
@@ -67,15 +68,15 @@ export const ProtocolLiquidsDetails = (
         })
       ) : (
         <Flex
-          paddingTop={SPACING.spacing16}
-          paddingBottom={SPACING.spacing32}
-          textAlign={TYPOGRAPHY.textAlignCenter}
+          padding={`${SPACING.spacing40} ${SPACING.spacing16}`}
+          alignItems={ALIGN_CENTER}
           gridGap={SPACING.spacing12}
           flexDirection={DIRECTION_COLUMN}
+          backgroundColor={COLORS.grey30}
+          borderRadius={BORDERS.borderRadius8}
         >
           <Icon
-            color={COLORS.medGreyEnabled}
-            alignSelf={ALIGN_CENTER}
+            color={COLORS.grey60}
             size="1.25rem"
             name="ot-alert"
             aria-label="ProtocolLIquidsDetails_noLiquidsIcon"

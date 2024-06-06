@@ -3,16 +3,16 @@ import { useTranslation } from 'react-i18next'
 import { css } from 'styled-components'
 import {
   ALIGN_FLEX_END,
+  Box,
   DIRECTION_COLUMN,
   Flex,
-  Box,
   Link,
-  TYPOGRAPHY,
-  SPACING,
   PrimaryButton,
+  SPACING,
+  StyledText,
+  TYPOGRAPHY,
 } from '@opentrons/components'
 
-import { StyledText } from '../../atoms/text'
 import { LegacyModal } from '../../molecules/LegacyModal'
 
 const NEW_ROBOT_SETUP_SUPPORT_ARTICLE_HREF =
@@ -48,7 +48,7 @@ export function ConnectionTroubleshootingModal(props: Props): JSX.Element {
           steps={[t('restart_the_robot'), t('restart_the_app')]}
         />
         <StyledText as="p" marginTop={SPACING.spacing16}>
-          {t('contact_support_for_connection_help', {
+          {t('branded:contact_support_for_connection_help', {
             support_email: SUPPORT_EMAIL,
           })}
         </StyledText>
@@ -62,7 +62,9 @@ export function ConnectionTroubleshootingModal(props: Props): JSX.Element {
           {t('learn_more_about_troubleshooting_connection')}
         </Link>
         <PrimaryButton
-          onClick={() => props.onClose()}
+          onClick={() => {
+            props.onClose()
+          }}
           alignSelf={ALIGN_FLEX_END}
           textTransform={TYPOGRAPHY.textTransformCapitalize}
         >

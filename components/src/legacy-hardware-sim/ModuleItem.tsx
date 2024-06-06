@@ -12,7 +12,7 @@ import {
 
 import { Icon } from '../icons'
 import { RobotCoordsForeignDiv } from '../hardware-sim/Deck'
-import styles from './ModuleItem.css'
+import styles from './ModuleItem.module.css'
 
 import type { IconName } from '../icons'
 import type { ModuleModel, DeckSlot } from '@opentrons/shared-data'

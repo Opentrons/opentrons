@@ -144,9 +144,6 @@ export interface LabwareFields {
 
   loadName: string | null | undefined
   displayName: string | null | undefined
-
-  // fields for test protocol
-  pipetteName: string | null | undefined
 }
 
 // NOTE: these fields & types should be kept in sync with Yup schema `labwareFormSchema`.
@@ -196,37 +193,37 @@ export interface ProcessedLabwareFields {
   // if loadName or displayName are left blank, Yup schema generates them
   loadName: string
   displayName: string
-
-  // fields for test protocol
-  pipetteName: string
 }
 
 export const tubeRackInsertOptions: Options = [
   {
     name: 'Opentrons 6 tubes',
     value: '6tubes',
-    imgSrc: require('./images/6x50mL_insert_large.png'),
+    imgSrc: new URL('./images/6x50mL_insert_large.png', import.meta.url).href,
   },
   {
     name: 'Opentrons 15 tubes',
     value: '15tubes',
-    imgSrc: require('./images/15x15mL_insert_large.png'),
+    imgSrc: new URL('./images/15x15mL_insert_large.png', import.meta.url).href,
   },
   {
     name: 'Opentrons 24 tubes',
     value: '24tubesSnapCap',
-    imgSrc: require('./images/24x1_5mL_insert_large.png'),
+    imgSrc: new URL('./images/24x1_5mL_insert_large.png', import.meta.url).href,
   },
   {
     name: 'Opentrons 10 tubes',
     value: '10tubes',
-    imgSrc: require('./images/6x15mL_and_4x50mL_insert_large.png'),
+    imgSrc: new URL(
+      './images/6x15mL_and_4x50mL_insert_large.png',
+      import.meta.url
+    ).href,
     disabled: true, // 6 + 4 tube rack not yet supported
   },
   {
     name: 'Non-Opentrons tube rack',
     value: 'customTubeRack',
-    imgSrc: require('./images/blank_insert_large.png'),
+    imgSrc: new URL('./images/blank_insert_large.png', import.meta.url).href,
   },
 ]
 
@@ -286,17 +283,26 @@ export const aluminumBlockTypeOptions: Options = [
   {
     name: '96 well',
     value: '96well',
-    imgSrc: require('./images/opentrons_96_aluminumblock_side_view.png'),
+    imgSrc: new URL(
+      './images/opentrons_96_aluminumblock_side_view.png',
+      import.meta.url
+    ).href,
   },
   {
     name: '24 well',
     value: '24well',
-    imgSrc: require('./images/opentrons_24_aluminumblock_side_view.png'),
+    imgSrc: new URL(
+      './images/opentrons_24_aluminumblock_side_view.png',
+      import.meta.url
+    ).href,
   },
   {
     name: 'Flat - not available',
     value: 'flat',
-    imgSrc: require('./images/opentrons_flat_aluminumblock_side_view.png'),
+    imgSrc: new URL(
+      './images/opentrons_flat_aluminumblock_side_view.png',
+      import.meta.url
+    ).href,
     disabled: true,
   },
 ]
@@ -404,9 +410,6 @@ export const getDefaultFormState = (): LabwareFields => ({
 
   loadName: null,
   displayName: null,
-
-  // fields for test protocol
-  pipetteName: null,
 })
 
 export const LABELS: Record<keyof LabwareFields, string> = {
@@ -440,7 +443,6 @@ export const LABELS: Record<keyof LabwareFields, string> = {
   groupBrandId: 'Manufacturer/Catalog #',
   displayName: 'Display Name',
   loadName: 'API Load Name',
-  pipetteName: 'Test Pipette',
 }
 
 export const getLabel = (

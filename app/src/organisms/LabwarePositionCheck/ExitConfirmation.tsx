@@ -2,23 +2,22 @@ import * as React from 'react'
 import styled from 'styled-components'
 import { useTranslation } from 'react-i18next'
 import {
+  AlertPrimaryButton,
+  ALIGN_CENTER,
+  COLORS,
+  DIRECTION_COLUMN,
   Flex,
   Icon,
-  ALIGN_CENTER,
-  JUSTIFY_SPACE_BETWEEN,
-  DIRECTION_COLUMN,
-  SPACING,
-  SIZE_3,
-  AlertPrimaryButton,
   JUSTIFY_CENTER,
-  COLORS,
-  TYPOGRAPHY,
+  JUSTIFY_FLEX_END,
   RESPONSIVENESS,
   SecondaryButton,
-  JUSTIFY_FLEX_END,
+  SIZE_3,
+  SPACING,
+  StyledText,
   TEXT_ALIGN_CENTER,
+  TYPOGRAPHY,
 } from '@opentrons/components'
-import { StyledText } from '../../atoms/text'
 import { useSelector } from 'react-redux'
 import { getIsOnDevice } from '../../redux/config'
 import { SmallButton } from '../../atoms/buttons'
@@ -46,7 +45,7 @@ export const ExitConfirmation = (props: ExitConfirmationProps): JSX.Element => {
         alignItems={ALIGN_CENTER}
         paddingX={SPACING.spacing32}
       >
-        <Icon name="ot-alert" size={SIZE_3} color={COLORS.warningEnabled} />
+        <Icon name="ot-alert" size={SIZE_3} color={COLORS.yellow50} />
         {isOnDevice ? (
           <>
             <ConfirmationHeaderODD>
@@ -99,7 +98,7 @@ export const ExitConfirmation = (props: ExitConfirmationProps): JSX.Element => {
         <Flex
           width="100%"
           marginTop={SPACING.spacing32}
-          justifyContent={JUSTIFY_SPACE_BETWEEN}
+          justifyContent={JUSTIFY_FLEX_END}
           alignItems={ALIGN_CENTER}
         >
           <Flex gridGap={SPACING.spacing8}>
@@ -123,7 +122,7 @@ export const ExitConfirmation = (props: ExitConfirmationProps): JSX.Element => {
 
 const ConfirmationHeader = styled.h1`
   margin-top: ${SPACING.spacing24};
-  ${TYPOGRAPHY.level3HeaderSemiBold}
+  ${TYPOGRAPHY.h1Default}
   @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
     ${TYPOGRAPHY.level4HeaderSemiBold}
   }
@@ -141,5 +140,5 @@ const ConfirmationBodyODD = styled.h1`
   @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
     ${TYPOGRAPHY.level4HeaderRegular}
   }
-  color: ${COLORS.darkBlack70};
+  color: ${COLORS.grey60};
 `

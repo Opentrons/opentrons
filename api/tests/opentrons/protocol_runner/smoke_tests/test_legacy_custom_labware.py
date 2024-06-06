@@ -56,7 +56,7 @@ async def test_legacy_custom_labware(custom_labware_protocol_files: List[Path]) 
         robot_type="OT-2 Standard",
         protocol_config=protocol_source.config,
     )
-    result = await subject.run(protocol_source)
+    result = await subject.run(deck_configuration=[], protocol_source=protocol_source)
 
     expected_labware = LoadedLabware.construct(
         id=matchers.Anything(),

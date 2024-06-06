@@ -4,6 +4,7 @@ import Ajv from 'ajv'
 import path from 'path'
 import glob from 'glob'
 import omit from 'lodash/omit'
+import { describe, expect, it } from 'vitest'
 
 import protocolSchema from '../../protocol/schemas/4.json'
 import labwareV2Schema from '../../labware/schemas/2.json'

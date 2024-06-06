@@ -12,7 +12,7 @@ import type { JsonProtocolFile } from '../../protocol'
 export type ProtocolParseErrorKey = 'INVALID_FILE_TYPE' | 'INVALID_JSON_FILE'
 
 interface ProtocolParseErrorDetails {
-  rawError?: string
+  rawError?: unknown
   schemaErrors?: ErrorObject[] | null
 }
 
@@ -114,8 +114,8 @@ export function validateJsonProtocolFileContents(
 
       return parsedProtocol
     }
-  } catch (error) {
-    handleError && handleError('INVALID_JSON_FILE', { rawError: error })
+  } catch (error: any) {
+    handleError?.('INVALID_JSON_FILE', { rawError: String(error) })
     return null
   }
 }

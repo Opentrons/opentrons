@@ -1,3 +1,4 @@
+import { vi, describe, it, expect, beforeEach } from 'vitest'
 import { TestScheduler } from 'rxjs/testing'
 
 import * as RobotAdminSelectors from '../../../robot-admin/selectors'
@@ -7,36 +8,24 @@ import { robotSettingsEpic } from '..'
 
 import type { Action, State } from '../../../types'
 
-jest.mock('../../../robot-admin/selectors')
-jest.mock('../../selectors')
-
-const mockGetRobotRestarting = RobotAdminSelectors.getRobotRestarting as jest.MockedFunction<
-  typeof RobotAdminSelectors.getRobotRestarting
->
-
-const mockGetAllRestartRequiredRobots = Selectors.getAllRestartRequiredRobots as jest.MockedFunction<
-  typeof Selectors.getAllRestartRequiredRobots
->
+vi.mock('../../../robot-admin/selectors')
+vi.mock('../../selectors')
 
 describe('clearRestartPathEpic', () => {
   let testScheduler: TestScheduler
 
   beforeEach(() => {
-    mockGetAllRestartRequiredRobots.mockReturnValue([])
-    mockGetRobotRestarting.mockReturnValue(false)
+    vi.mocked(Selectors.getAllRestartRequiredRobots).mockReturnValue([])
+    vi.mocked(RobotAdminSelectors.getRobotRestarting).mockReturnValue(false)
 
     testScheduler = new TestScheduler((actual, expected) => {
       expect(actual).toEqual(expected)
     })
   })
 
-  afterEach(() => {
-    jest.resetAllMocks()
-  })
-
   it('dispatches CLEAR_RESTART_PATH on robot restart', () => {
-    mockGetAllRestartRequiredRobots.mockReturnValue(['a', 'b'])
-    mockGetRobotRestarting.mockReturnValue(true)
+    vi.mocked(Selectors.getAllRestartRequiredRobots).mockReturnValue(['a', 'b'])
+    vi.mocked(RobotAdminSelectors.getRobotRestarting).mockReturnValue(true)
 
     testScheduler.run(({ hot, cold, expectObservable }) => {
       const action$ = cold<Action>('--')

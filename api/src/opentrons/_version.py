@@ -9,7 +9,7 @@ else:
     import importlib_metadata as metadata  # type: ignore[no-redef]
 
 try:
-    version: str = metadata.version("opentrons")  # type: ignore[attr-defined]
+    version: str = metadata.version("opentrons")
 except Exception as e:
     logging.warning(
         "Could not determine version for opentrons, may be dev install, using 0.0.0-dev"

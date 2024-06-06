@@ -51,9 +51,7 @@ async def robot_client(
     async with RobotClient.make(
         base_url=ot2_server_base_url, version="*"
     ) as robot_client:
-        assert (
-            await robot_client.wait_until_alive()
-        ), "Dev Robot never became available."
+        await robot_client.wait_until_ready()
         yield robot_client
 
 

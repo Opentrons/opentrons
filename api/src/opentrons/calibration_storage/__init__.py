@@ -1,6 +1,11 @@
 from .ot3 import gripper_offset
 from .ot2 import mark_bad_calibration
 
+from .deck_configuration import (
+    serialize_deck_configuration,
+    deserialize_deck_configuration,
+)
+
 # TODO these functions are only used in robot server. We should think about moving them and/or
 # abstracting it away from a robot specific function. We should also check if the tip rack
 # definition information is still needed.
@@ -32,6 +37,9 @@ __all__ = [
     "save_robot_belt_attitude",
     "get_robot_belt_attitude",
     "delete_robot_belt_attitude",
+    # deck configuration functions
+    "serialize_deck_configuration",
+    "deserialize_deck_configuration",
     # functions only used in robot server
     "_save_custom_tiprack_definition",
     "get_custom_tiprack_definition_for_tlc",

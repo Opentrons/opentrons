@@ -1,13 +1,16 @@
-import _protocolWithMagTempTC from '@opentrons/shared-data/protocol/fixtures/6/transferSettings.json'
+import { describe, it, expect } from 'vitest'
+import { transfer_settings } from '@opentrons/shared-data'
 import { getModuleInitialLoadInfo } from '../getModuleInitialLoadInfo'
-import { CompletedProtocolAnalysis } from '@opentrons/shared-data'
-import type { LoadModuleRunTimeCommand } from '@opentrons/shared-data'
+import type {
+  LoadModuleRunTimeCommand,
+  CompletedProtocolAnalysis,
+} from '@opentrons/shared-data'
 
-const protocolWithMagTempTC = (_protocolWithMagTempTC as unknown) as CompletedProtocolAnalysis
+const protocolWithMagTempTC = (transfer_settings as unknown) as CompletedProtocolAnalysis
 
 describe('getModuleInitialLoadInfo', () => {
   it('should gather protocol module info for tc if id in params', () => {
-    const TC_ID: keyof typeof _protocolWithMagTempTC.modules =
+    const TC_ID: keyof typeof transfer_settings.modules =
       '3e039550-3412-11eb-ad93-ed232a2337cf:thermocyclerModuleType'
 
     expect(
@@ -20,7 +23,7 @@ describe('getModuleInitialLoadInfo', () => {
     })
   })
   it('should gather protocol module info for tc if id not in params', () => {
-    const TC_ID: keyof typeof _protocolWithMagTempTC.modules =
+    const TC_ID: keyof typeof transfer_settings.modules =
       '3e039550-3412-11eb-ad93-ed232a2337cf:thermocyclerModuleType'
 
     const LOAD_TC_COMMAND: LoadModuleRunTimeCommand = {

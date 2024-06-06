@@ -1,3 +1,5 @@
+import pytest
+from typing import List
 from opentrons_hardware.hardware_control.motion_planning import Move
 from opentrons_hardware.hardware_control.motion import (
     create_step,
@@ -72,7 +74,7 @@ def test_filter_zero_duration_step() -> None:
         Axis.P_R: 0,
     }
     moves = [Move.build_dummy([Axis.X, Axis.Y, Axis.Z_L, Axis.Z_R, Axis.P_L])]
-    for block in moves[0].blocks:
+    for block in (moves[0].blocks[0], moves[0].blocks[1]):
         block.distance = f64(25.0)
         block.time = f64(1.0)
         block.initial_speed = f64(25.0)
@@ -84,7 +86,7 @@ def test_filter_zero_duration_step() -> None:
         moves=moves,
         present_nodes=present_nodes,
     )
-    assert len(move_group) == 3
+    assert len(move_group) == 2
     for step in move_group:
         assert set(present_nodes) == set(step.keys())
 
@@ -119,3 +121,48 @@ def test_get_system_contraints_for_plunger() -> None:
     )
 
     assert updated_contraints[axis].max_acceleration == set_acceleration
+
+
+@pytest.mark.parametrize(
+    ["moving", "expected"],
+    [
+        [
+            [NodeId.gantry_x, NodeId.gantry_y, NodeId.gripper_g, NodeId.gripper_z],
+            [],
+        ],
+        [
+            [NodeId.head_l],
+            [NodeId.pipette_left],
+        ],
+        [
+            [NodeId.head_r],
+            [NodeId.pipette_right],
+        ],
+    ],
+)
+def test_moving_pipettes_in_move_group(
+    moving: List[NodeId], expected: List[NodeId]
+) -> None:
+    """Test that we can filter out the nonmoving nodes."""
+    present_nodes = [
+        NodeId.gantry_x,
+        NodeId.gantry_y,
+        NodeId.head_l,
+        NodeId.head_r,
+        NodeId.pipette_left,
+        NodeId.pipette_right,
+        NodeId.gripper_g,
+        NodeId.gripper_z,
+    ]
+    move_group = [
+        create_step(
+            distance={node: f64(100) for node in moving},
+            velocity={node: f64(100) for node in moving},
+            acceleration={node: f64(0) for node in moving},
+            duration=f64(1),
+            present_nodes=present_nodes,
+        )
+    ]
+
+    moving_pipettes = ot3utils.moving_pipettes_in_move_group(move_group)
+    assert set(moving_pipettes) == set(expected)

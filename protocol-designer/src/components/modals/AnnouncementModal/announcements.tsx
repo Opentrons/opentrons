@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { Trans, useTranslation } from 'react-i18next'
 import { css } from 'styled-components'
 import {
   Flex,
@@ -7,7 +8,17 @@ import {
   SPACING,
 } from '@opentrons/components'
 
-import styles from './AnnouncementModal.css'
+import magTempCombined from '../../../images/modules/magdeck_tempdeck_combined.png'
+import thermocycler from '../../../images/modules/thermocycler.png'
+import multiSelect from '../../../images/announcements/multi_select.gif'
+import batchEdit from '../../../images/announcements/batch_edit.gif'
+import heaterShaker from '../../../images/modules/heatershaker.png'
+import thermocyclerGen2 from '../../../images/modules/thermocycler_gen2.png'
+import liquidEnhancements from '../../../images/announcements/liquid-enhancements.gif'
+import opentronsFlex from '../../../images/OpentronsFlex.png'
+import deckConfigutation from '../../../images/deck_configuration.png'
+
+import styles from './AnnouncementModal.module.css'
 
 export interface Announcement {
   announcementKey: string
@@ -25,223 +36,268 @@ const batchEditStyles = css`
   }
 `
 
-export const announcements: Announcement[] = [
-  {
-    announcementKey: 'modulesRequireRunAppUpdate',
-    image: (
-      <div className={styles.modules_diagrams_row}>
-        <img
-          className={styles.modules_diagram}
-          src={require('../../../images/modules/magdeck_tempdeck_combined.png')}
-        />
-      </div>
-    ),
-    heading: "We've updated the Protocol Designer",
-    message: (
-      <>
-        <p>
-          Protocol Designer Beta now includes support for Temperature and
-          Magnetic modules.
-        </p>
-        <p>
-          Note: Protocols with modules{' '}
-          <strong>may require an app and robot update to run</strong>. You will
-          need to have the OT-2 app and robot on the latest versions (
-          <strong>3.17 or higher</strong>).
-        </p>
-      </>
-    ),
-  },
-  {
-    announcementKey: 'thermocyclerSupport',
-    image: (
-      <div className={styles.thermocycler_diagram_row}>
-        <img
-          className={styles.modules_diagram}
-          src={require('../../../images/modules/thermocycler.jpg')}
-        />
-      </div>
-    ),
-    heading: "We've updated the Protocol Designer",
-    message: (
-      <>
-        <p>Protocol Designer Beta now includes support for the Thermocycler!</p>
-        <p>
-          Note: Protocols with modules{' '}
-          <strong>may require an app and robot update to run</strong>. You will
-          need to have the OT-2 app and robot on the latest versions (
-          <strong>3.18 or higher</strong>).
-        </p>
-      </>
-    ),
-  },
-  {
-    announcementKey: 'airGapDelaySettings',
-    heading: "We've updated the Protocol Designer",
-    image: null,
-    message: (
-      <>
-        <p>
-          Protocol Designer Beta now includes support for more pipetting
-          settings: Air gap and Delay.{' '}
-        </p>
-        <p>
-          Note: Protocols using new features{' '}
-          <strong>may require an app and robot update to run.</strong> You will
-          need to have the OT-2 app and orbot on the latest versions (
-          <strong>3.20 or higher</strong>).{' '}
-        </p>
-      </>
-    ),
-  },
-  {
-    announcementKey: 'batchEditTransfer',
-    image: (
-      <Flex css={batchEditStyles}>
-        <img src={require('../../../images/announcements/multi_select.gif')} />
+const PD = 'Protocol Designer'
+const APP = 'Opentrons App'
+const OPENTRONS_PD = 'Opentrons Protocol Designer'
 
-        <img src={require('../../../images/announcements/batch_edit.gif')} />
-      </Flex>
-    ),
-    heading: "We've updated the Protocol Designer",
-    message: (
-      <>
-        <p>Starting today, you’ll be able to:</p>
-        <ul>
-          <li>Select, delete, and duplicate multiple steps at once</li>
-          <li>
-            Edit advanced settings for multiple Transfer or Mix steps at once
-          </li>
-        </ul>
+export const useAnnouncements = (): Announcement[] => {
+  const { t } = useTranslation('modal')
 
-        <p>
-          To enter multi-select mode, simply hold <strong>SHIFT</strong> or{' '}
-          <strong>CTRL/CMND</strong> and click on a step.
-        </p>
+  return [
+    {
+      announcementKey: 'modulesRequireRunAppUpdate',
+      image: (
+        <div className={styles.modules_diagrams_row}>
+          <img className={styles.modules_diagram} src={magTempCombined} />
+        </div>
+      ),
+      heading: t('announcements.header', { pd: PD }),
+      message: (
+        <>
+          <p>
+            {t('announcements.modulesRequireRunAppUpdate.body1', { pd: PD })}
+          </p>
+          <p>
+            <Trans
+              t={t}
+              i18nKey={'announcements.modulesRequireRunAppUpdate.body2'}
+              components={{ bold: <strong /> }}
+              values={{ app: APP }}
+            />
+          </p>
+        </>
+      ),
+    },
+    {
+      announcementKey: 'thermocyclerSupport',
+      image: (
+        <div className={styles.thermocycler_diagram_row}>
+          <img className={styles.modules_diagram} src={thermocycler} />
+        </div>
+      ),
+      heading: t('announcements.header', { pd: PD }),
+      message: (
+        <>
+          <p>{t('announcements.thermocyclerSupport.body1', { pd: PD })}</p>
+          <p>
+            <Trans
+              t={t}
+              i18nKey={'announcements.thermocyclerSupport.body2'}
+              components={{ strong: <strong /> }}
+              values={{ app: APP }}
+            />
+          </p>
+        </>
+      ),
+    },
+    {
+      announcementKey: 'airGapDelaySettings',
+      heading: t('announcements.header', { pd: PD }),
+      image: null,
+      message: (
+        <>
+          <p>{t('announcements.airGapDelaySettings.body1', { pd: PD })}</p>
+          <p>
+            <Trans
+              t={t}
+              i18nKey={'announcements.airGapDelaySettings.body2'}
+              components={{ strong: <strong /> }}
+              values={{ app: APP }}
+            />
+          </p>
+        </>
+      ),
+    },
+    {
+      announcementKey: 'batchEditTransfer',
+      image: (
+        <Flex css={batchEditStyles}>
+          <img src={multiSelect} />
 
-        <p>
-          From here, you can access the control bar at the top of the protocol
-          timeline, or edit advanced settings for Transfer or Mix steps!
-        </p>
-      </>
-    ),
-  },
-  {
-    announcementKey: 'heaterShakerSupport',
-    image: (
-      <div className={styles.modules_diagrams_row}>
-        <img
-          className={styles.modules_diagram}
-          src={require('../../../images/modules/heatershaker.png')}
-        />
-      </div>
-    ),
-    heading: "We've updated the Protocol Designer",
-    message: (
-      <>
-        <p>
-          The Opentrons Protocol Designer now supports our Heater-Shaker Module!
-        </p>
-        <p>
-          All protocols now require Opentrons App version
-          <strong> 6.1+ </strong> to run.
-        </p>
-      </>
-    ),
-  },
-  {
-    announcementKey: 'thermocyclerGen2Support',
-    image: (
-      <div className={styles.modules_diagrams_row}>
-        <img
-          className={styles.modules_diagram}
-          src={require('../../../images/modules/thermocycler_gen2.png')}
-        />
-      </div>
-    ),
-    heading: "We've updated the Protocol Designer",
-    message: (
-      <>
-        <p>
-          The Opentrons Protocol Designer now supports our Thermocycler Module
-          GEN2!
-        </p>
-        <p>
-          All protocols now require Opentrons App version
-          <strong> 6.2+ </strong> to run.
-        </p>
-      </>
-    ),
-  },
-  {
-    announcementKey: 'liquidColorEnhancements',
-    image: (
-      <div className={styles.modules_diagrams_color_enhancements}>
-        <img
-          className={styles.modules_diagram}
-          src={require('../../../images/announcements/liquid-enhancements.gif')}
-        />
-      </div>
-    ),
-    heading: "We've updated the Protocol Designer",
-    message: (
-      <>
-        <p>
-          The Opentrons Protocol Designer now lets you customize liquid colors!
-        </p>
-        <p>
-          All protocols now require Opentrons App version
-          <strong> 6.2+ </strong> to run.
-        </p>
-      </>
-    ),
-  },
-  {
-    announcementKey: 'flexSupport7.0',
-    image: (
-      <Flex justifyContent={JUSTIFY_CENTER}>
-        <img
-          height="240"
-          width="240"
-          src={require('../../../images/OpentronsFlex.png')}
-        />
-      </Flex>
-    ),
-    heading: "We've updated the Protocol Designer",
-    message: (
-      <>
-        <p>
-          Introducing the Protocol Designer 7.0 with Opentrons Flex support!
-        </p>
-        <p>
-          All protocols now require Opentrons App version
-          <strong> 7.0+ </strong> to run.
-        </p>
-      </>
-    ),
-  },
-  {
-    announcementKey: 'deckConfigAnd96Channel8.0',
-    image: (
-      <Flex justifyContent={JUSTIFY_CENTER} paddingTop={SPACING.spacing8}>
-        <img
-          width="340"
-          src={require('../../../images/deck_configuration.png')}
-        />
-      </Flex>
-    ),
-    heading: "We've updated the Protocol Designer",
-    message: (
-      <>
-        <p>
-          Introducing the Protocol Designer 8.0 with deck configuration and
-          96-channel pipette support!
-        </p>
-        <p>
-          All protocols now require Opentrons App version
-          <strong> 7.1+ </strong> to run.
-        </p>
-      </>
-    ),
-  },
-]
+          <img src={batchEdit} />
+        </Flex>
+      ),
+      heading: t('announcements.header', { pd: PD }),
+      message: (
+        <>
+          <p>{t('announcements.batchEditTransfer.body1')}</p>
+          <ul>
+            <li>{t('announcements.batchEditTransfer.body2')}</li>
+            <li>{t('announcements.batchEditTransfer.body3')}</li>
+          </ul>
+
+          <p>
+            <Trans
+              t={t}
+              i18nKey={'announcements.batchEditTransfer.body4'}
+              components={{ strong: <strong /> }}
+            />
+          </p>
+
+          <p>{t('announcements.batchEditTransfer.body5')}</p>
+        </>
+      ),
+    },
+    {
+      announcementKey: 'heaterShakerSupport',
+      image: (
+        <div className={styles.modules_diagrams_row}>
+          <img className={styles.modules_diagram} src={heaterShaker} />
+        </div>
+      ),
+      heading: t('announcements.header', { pd: PD }),
+      message: (
+        <>
+          <p>
+            {t('announcements.heaterShakerSupport.body1', {
+              opd: OPENTRONS_PD,
+            })}
+          </p>
+          <p>
+            <Trans
+              t={t}
+              i18nKey={'announcements.heaterShakerSupport.body2'}
+              components={{ strong: <strong /> }}
+              values={{ app: APP }}
+            />
+          </p>
+        </>
+      ),
+    },
+    {
+      announcementKey: 'thermocyclerGen2Support',
+      image: (
+        <div className={styles.modules_diagrams_row}>
+          <img className={styles.modules_diagram} src={thermocyclerGen2} />
+        </div>
+      ),
+      heading: t('announcements.header', { pd: PD }),
+      message: (
+        <>
+          <p>
+            {t('announcements.thermocyclerGen2Support.body1', {
+              opd: OPENTRONS_PD,
+            })}
+          </p>
+          <p>
+            <Trans
+              t={t}
+              i18nKey={'announcements.thermocyclerGen2Support.body2'}
+              components={{ strong: <strong /> }}
+              values={{ app: APP }}
+            />
+          </p>
+        </>
+      ),
+    },
+    {
+      announcementKey: 'liquidColorEnhancements',
+      image: (
+        <div className={styles.modules_diagrams_color_enhancements}>
+          <img className={styles.modules_diagram} src={liquidEnhancements} />
+        </div>
+      ),
+      heading: t('announcements.header', { pd: PD }),
+      message: (
+        <>
+          <p>
+            {t('announcements.liquidColorEnhancements.body1', {
+              opd: OPENTRONS_PD,
+            })}
+          </p>
+          <p>
+            <Trans
+              t={t}
+              i18nKey={'announcements.liquidColorEnhancements.body2'}
+              components={{ strong: <strong /> }}
+              values={{ app: APP }}
+            />
+          </p>
+        </>
+      ),
+    },
+    {
+      announcementKey: 'flexSupport7.0',
+      image: (
+        <Flex justifyContent={JUSTIFY_CENTER}>
+          <img height="240" width="240" src={opentronsFlex} />
+        </Flex>
+      ),
+      heading: t('announcements.header', { pd: PD }),
+      message: (
+        <>
+          <p>
+            {t('announcements.flexSupport.body1', {
+              pd: PD,
+              flex: 'Opentrons Flex',
+            })}
+          </p>
+          <p>
+            <Trans
+              t={t}
+              i18nKey={'announcements.flexSupport.body2'}
+              components={{ strong: <strong /> }}
+              values={{ app: APP }}
+            />
+          </p>
+        </>
+      ),
+    },
+    {
+      announcementKey: 'deckConfigAnd96Channel8.0',
+      image: (
+        <Flex justifyContent={JUSTIFY_CENTER} paddingTop={SPACING.spacing8}>
+          <img width="340" src={deckConfigutation} />
+        </Flex>
+      ),
+      heading: t('announcements.header', { pd: PD }),
+      message: (
+        <>
+          <p>{t('announcements.deckConfigAnd96Channel.body1', { pd: PD })}</p>
+          <p>
+            <Trans
+              t={t}
+              i18nKey={'announcements.deckConfigAnd96Channel.body2'}
+              components={{ strong: <strong /> }}
+              values={{ app: APP }}
+            />
+          </p>
+        </>
+      ),
+    },
+    {
+      announcementKey: 'customParamsAndMultiTipAndModule8.1',
+      image: <Flex />,
+      heading: t('announcements.header', { pd: PD }),
+      message: (
+        <>
+          <p>
+            {t('announcements.customParamsAndMultiTipAndModule.body1', {
+              pd: PD,
+            })}
+          </p>
+          <ul>
+            <li>{t('announcements.customParamsAndMultiTipAndModule.body2')}</li>
+            <li>
+              <Trans
+                t={t}
+                i18nKey={'announcements.customParamsAndMultiTipAndModule.body3'}
+                components={{ i: <em /> }}
+              />
+            </li>
+            <li>{t('announcements.customParamsAndMultiTipAndModule.body4')}</li>
+            <li>{t('announcements.customParamsAndMultiTipAndModule.body5')}</li>
+          </ul>
+          <p>
+            <Trans
+              t={t}
+              i18nKey={'announcements.customParamsAndMultiTipAndModule.body6'}
+              components={{ strong: <strong /> }}
+              values={{ app: APP }}
+            />
+          </p>
+        </>
+      ),
+    },
+  ]
+}

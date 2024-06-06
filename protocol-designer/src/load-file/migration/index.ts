@@ -1,7 +1,6 @@
 import flow from 'lodash/flow'
 import takeRightWhile from 'lodash/takeRightWhile'
 import semver from 'semver'
-import { PDProtocolFile } from '../../file-types'
 import { migrateFile as migrateFileOne } from './1_1_0'
 import { migrateFile as migrateFileThree } from './3_0_0'
 import { migrateFile as migrateFileFour } from './4_0_0'
@@ -11,6 +10,8 @@ import { migrateFile as migrateFileFiveTwo } from './5_2_0'
 import { migrateFile as migrateFileSix } from './6_0_0'
 import { migrateFile as migrateFileSeven } from './7_0_0'
 import { migrateFile as migrateFileEight } from './8_0_0'
+import { migrateFile as migrateFileEightOne } from './8_1_0'
+import type { PDProtocolFile } from '../../file-types'
 
 export const OLDEST_MIGRATEABLE_VERSION = '1.0.0'
 type Version = string
@@ -26,7 +27,11 @@ export const getMigrationVersionsToRunFromVersion = (
   const allSortedVersions = Object.keys(migrationsByVersion).sort(
     semver.compare
   )
-  return takeRightWhile(allSortedVersions, v => semver.gt(v, version))
+
+  return takeRightWhile(
+    allSortedVersions,
+    v => semver.gt(v, version) && !version.includes(v)
+  )
 }
 
 const allMigrationsByVersion: MigrationsByVersion = {
@@ -40,10 +45,12 @@ const allMigrationsByVersion: MigrationsByVersion = {
   '5.2.0': migrateFileFiveTwo,
   // @ts-expect-error fix MigrationsByVersion type (and the function signatures of the older migration functions above)
   '6.0.0': migrateFileSix,
-  // @ts-expect-error
+  // @ts-expect-error fix MigrationsByVersion type (and the function signatures of the older migration functions above)
   '7.0.0': migrateFileSeven,
-  // @ts-expect-error
+  // @ts-expect-error fix MigrationsByVersion type (and the function signatures of the older migration functions above)
   '8.0.0': migrateFileEight,
+  // @ts-expect-error
+  '8.1.0': migrateFileEightOne,
 }
 export const migration = (
   file: any

@@ -1,0 +1,43 @@
+{
+  "name": "opentrons-ai-client",
+  "type": "module",
+  "version": "0.0.0-dev",
+  "description": "Opentrons AI application UI",
+  "source": "src/index.tsx",
+  "types": "lib/index.d.ts",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Opentrons/opentrons.git"
+  },
+  "author": {
+    "name": "Opentrons Labworks",
+    "email": "engineering@opentrons.com"
+  },
+  "license": "Apache-2.0",
+  "bugs": {
+    "url": "https://github.com/Opentrons/opentrons/issues"
+  },
+  "homepage": "https://github.com/Opentrons/opentrons",
+  "dependencies": {
+    "@auth0/auth0-react": "2.2.4",
+    "@fontsource/public-sans": "5.0.3",
+    "@opentrons/components": "link:../components",
+    "axios": "^0.21.1",
+    "i18next": "^19.8.3",
+    "jotai": "2.8.0",
+    "react": "18.2.0",
+    "react-dom": "18.2.0",
+    "react-error-boundary": "^4.0.10",
+    "react-hook-form": "7.50.1",
+    "react-i18next": "13.5.0",
+    "react-markdown": "9.0.1",
+    "styled-components": "5.3.6"
+  },
+  "engines": {
+    "node": ">=18.19.0"
+  },
+  "devDependencies": {
+    "@types/styled-components": "^5.1.26",
+    "axios-mock-adapter": "1.22.0"
+  }
+}

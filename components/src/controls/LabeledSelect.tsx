@@ -2,7 +2,7 @@ import * as React from 'react'
 
 import { DropdownField } from '../forms'
 import { LabeledControl } from './LabeledControl'
-import styles from './styles.css'
+import styles from './styles.module.css'
 
 import type { DropdownFieldProps } from '../forms'
 

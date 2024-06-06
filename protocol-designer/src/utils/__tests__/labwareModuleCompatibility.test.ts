@@ -1,17 +1,18 @@
-import { LabwareDefinition2 } from '@opentrons/shared-data'
-import fixture_96_plate_def from '@opentrons/shared-data/labware/fixtures/2/fixture_96_plate.json'
+import { describe, it, expect } from 'vitest'
+import { fixture_96_plate } from '@opentrons/shared-data/labware/fixtures/2'
 import { getLabwareIsCustom } from '../labwareModuleCompatibility'
+import type { LabwareDefinition2 } from '@opentrons/shared-data'
 describe('labwareModuleCompatibility', () => {
   describe('getLabwareIsCustom', () => {
     const labwareOnDeck = {
       labwareDefURI: 'fixture/fixture_96_plate',
       id: 'abcef123',
       slot: '3',
-      def: fixture_96_plate_def as LabwareDefinition2,
+      def: fixture_96_plate as LabwareDefinition2,
     }
     it('returns true when labware is inside custom labwares obj', () => {
       const customLabwares = {
-        'fixture/fixture_96_plate': fixture_96_plate_def as LabwareDefinition2,
+        'fixture/fixture_96_plate': fixture_96_plate as LabwareDefinition2,
       }
       const labwareIsCustom = getLabwareIsCustom(customLabwares, labwareOnDeck)
       expect(labwareIsCustom).toEqual(true)

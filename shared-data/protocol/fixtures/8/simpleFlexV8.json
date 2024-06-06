@@ -1220,8 +1220,8 @@
     {
       "commandType": "loadModule",
       "params": {
-        "moduleId": "magneticModuleId",
-        "model": "magneticModuleV2",
+        "moduleId": "magneticBlockId",
+        "model": "magneticBlockV1",
         "location": { "slotName": "3" }
       }
     },
@@ -1254,7 +1254,7 @@
         "namespace": "opentrons",
         "version": 1,
         "location": {
-          "moduleId": "magneticModuleId"
+          "moduleId": "magneticBlockId"
         },
         "displayName": "Sample Collection Plate"
       }

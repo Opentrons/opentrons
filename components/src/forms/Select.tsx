@@ -1,20 +1,18 @@
 import * as React from 'react'
-import ReactSelect, {
-  components as reactSelectComponents,
-  DropdownIndicatorProps,
-} from 'react-select'
+import ReactSelect, { components as reactSelectComponents } from 'react-select'
+
 import cx from 'classnames'
 
 import { Icon } from '../icons'
-import { POSITION_ABSOLUTE, POSITION_FIXED } from '../styles'
-import styles from './Select.css'
-
+import styles from './Select.module.css'
 import type {
+  DropdownIndicatorProps,
   Props as ReactSelectProps,
   MenuProps,
   StylesConfig,
   CSSObjectWithLabel,
 } from 'react-select'
+import type { POSITION_ABSOLUTE, POSITION_FIXED } from '../styles'
 
 export { reactSelectComponents }
 
@@ -118,7 +116,10 @@ function DropdownIndicator(
           [styles.flipped]: props.selectProps.menuIsOpen,
         })}
       >
-        <Icon name="menu-down" className={cx(styles.dropdown_indicator_icon)} />
+        <Icon
+          name="menu-down-pd"
+          className={cx(styles.dropdown_indicator_icon)}
+        />
       </div>
     </reactSelectComponents.DropdownIndicator>
   )

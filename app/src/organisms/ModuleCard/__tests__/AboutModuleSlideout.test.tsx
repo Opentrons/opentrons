@@ -1,13 +1,15 @@
 import * as React from 'react'
-import { renderWithProviders } from '@opentrons/components'
-import { fireEvent } from '@testing-library/react'
+import { fireEvent, screen } from '@testing-library/react'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+
 import {
   RUN_STATUS_IDLE,
   RUN_STATUS_RUNNING,
   RUN_STATUS_FINISHING,
 } from '@opentrons/api-client'
+
+import { renderWithProviders } from '../../../__testing-utils__'
 import { i18n } from '../../../i18n'
-import { useCurrentRunStatus } from '../../RunTimeControl/hooks'
 import {
   mockMagneticModule,
   mockMagneticModuleGen2,
@@ -15,13 +17,10 @@ import {
   mockTemperatureModuleGen2,
   mockThermocycler,
 } from '../../../redux/modules/__fixtures__'
+import { useCurrentRunStatus } from '../../RunTimeControl/hooks'
 import { AboutModuleSlideout } from '../AboutModuleSlideout'
 
-jest.mock('../../RunTimeControl/hooks')
-
-const mockUseCurrentRunStatus = useCurrentRunStatus as jest.MockedFunction<
-  typeof useCurrentRunStatus
->
+vi.mock('../../RunTimeControl/hooks')
 
 const render = (props: React.ComponentProps<typeof AboutModuleSlideout>) => {
   return renderWithProviders(<AboutModuleSlideout {...props} />, {
@@ -35,119 +34,119 @@ describe('AboutModuleSlideout', () => {
     props = {
       module: mockMagneticModule,
       isExpanded: true,
-      onCloseClick: jest.fn(),
-      firmwareUpdateClick: jest.fn(),
+      onCloseClick: vi.fn(),
+      firmwareUpdateClick: vi.fn(),
     }
-    mockUseCurrentRunStatus.mockReturnValue(RUN_STATUS_IDLE)
+    vi.mocked(useCurrentRunStatus).mockReturnValue(RUN_STATUS_IDLE)
   })
   afterEach(() => {
-    jest.resetAllMocks()
+    vi.resetAllMocks()
   })
 
   it('renders correct info when module is a magnetic module  GEN1 and exit button works correctly', () => {
-    const { getByText, getByRole } = render(props)
+    render(props)
 
-    getByText('About Magnetic Module GEN1')
-    getByText('def456')
-    getByText('SERIAL NUMBER')
-    getByText('CURRENT VERSION')
-    getByText('v2.0.0')
-    const button = getByRole('button', { name: /exit/i })
+    screen.getByText('About Magnetic Module GEN1')
+    screen.getByText('def456')
+    screen.getByText('SERIAL NUMBER')
+    screen.getByText('CURRENT VERSION')
+    screen.getByText('v2.0.0')
+    const button = screen.getByRole('button', { name: /exit/i })
     fireEvent.click(button)
     expect(props.onCloseClick).toHaveBeenCalled()
   })
 
   it('renders no banner when run is running', () => {
-    mockUseCurrentRunStatus.mockReturnValue(RUN_STATUS_RUNNING)
-    const { getByText } = render(props)
+    vi.mocked(useCurrentRunStatus).mockReturnValue(RUN_STATUS_RUNNING)
+    render(props)
 
-    getByText('About Magnetic Module GEN1')
-    getByText('def456')
-    getByText('SERIAL NUMBER')
-    getByText('CURRENT VERSION')
-    getByText('v2.0.0')
+    screen.getByText('About Magnetic Module GEN1')
+    screen.getByText('def456')
+    screen.getByText('SERIAL NUMBER')
+    screen.getByText('CURRENT VERSION')
+    screen.getByText('v2.0.0')
   })
 
   it('renders no banner when run is finishing', () => {
-    mockUseCurrentRunStatus.mockReturnValue(RUN_STATUS_FINISHING)
-    const { getByText } = render(props)
+    vi.mocked(useCurrentRunStatus).mockReturnValue(RUN_STATUS_FINISHING)
+    render(props)
 
-    getByText('About Magnetic Module GEN1')
-    getByText('def456')
-    getByText('SERIAL NUMBER')
-    getByText('CURRENT VERSION')
-    getByText('v2.0.0')
+    screen.getByText('About Magnetic Module GEN1')
+    screen.getByText('def456')
+    screen.getByText('SERIAL NUMBER')
+    screen.getByText('CURRENT VERSION')
+    screen.getByText('v2.0.0')
   })
 
   it('renders correct info when module is a magnetic module GEN2', () => {
     props = {
       module: mockMagneticModuleGen2,
       isExpanded: true,
-      onCloseClick: jest.fn(),
-      firmwareUpdateClick: jest.fn(),
+      onCloseClick: vi.fn(),
+      firmwareUpdateClick: vi.fn(),
     }
-    const { getByText } = render(props)
+    render(props)
 
-    getByText('About Magnetic Module GEN2')
-    getByText('def456')
-    getByText('SERIAL NUMBER')
-    getByText('CURRENT VERSION')
-    getByText('v2.0.0')
+    screen.getByText('About Magnetic Module GEN2')
+    screen.getByText('def456')
+    screen.getByText('SERIAL NUMBER')
+    screen.getByText('CURRENT VERSION')
+    screen.getByText('v2.0.0')
   })
 
   it('renders correct info when module is a temperature module GEN2', () => {
     props = {
       module: mockTemperatureModuleGen2,
       isExpanded: true,
-      onCloseClick: jest.fn(),
-      firmwareUpdateClick: jest.fn(),
+      onCloseClick: vi.fn(),
+      firmwareUpdateClick: vi.fn(),
     }
-    const { getByText } = render(props)
+    render(props)
 
-    getByText('About Temperature Module GEN2')
-    getByText('abc123')
-    getByText('SERIAL NUMBER')
-    getByText('CURRENT VERSION')
-    getByText('v2.0.0')
+    screen.getByText('About Temperature Module GEN2')
+    screen.getByText('abc123')
+    screen.getByText('SERIAL NUMBER')
+    screen.getByText('CURRENT VERSION')
+    screen.getByText('v2.0.0')
   })
 
   it('renders correct info when module is a temperature module GEN1', () => {
     props = {
       module: mockTemperatureModule,
       isExpanded: true,
-      onCloseClick: jest.fn(),
-      firmwareUpdateClick: jest.fn(),
+      onCloseClick: vi.fn(),
+      firmwareUpdateClick: vi.fn(),
     }
-    const { getByText } = render(props)
+    render(props)
 
-    getByText('About Temperature Module GEN1')
-    getByText('abc123')
-    getByText('SERIAL NUMBER')
-    getByText('CURRENT VERSION')
-    getByText('v2.0.0')
+    screen.getByText('About Temperature Module GEN1')
+    screen.getByText('abc123')
+    screen.getByText('SERIAL NUMBER')
+    screen.getByText('CURRENT VERSION')
+    screen.getByText('v2.0.0')
   })
 
   it('renders correct info when module is a thermocycler module with an update available', () => {
     props = {
       module: mockThermocycler,
       isExpanded: true,
-      onCloseClick: jest.fn(),
-      firmwareUpdateClick: jest.fn(),
+      onCloseClick: vi.fn(),
+      firmwareUpdateClick: vi.fn(),
     }
-    const { getByText, getByRole, getByLabelText } = render(props)
+    render(props)
 
-    getByText('About Thermocycler Module GEN1')
-    getByText('ghi789')
-    getByText('SERIAL NUMBER')
-    getByText('CURRENT VERSION')
-    getByText('v2.0.0')
-    getByText('Firmware update available.')
-    const viewUpdate = getByRole('button', { name: 'Update now' })
+    screen.getByText('About Thermocycler Module GEN1')
+    screen.getByText('ghi789')
+    screen.getByText('SERIAL NUMBER')
+    screen.getByText('CURRENT VERSION')
+    screen.getByText('v2.0.0')
+    screen.getByText('Firmware update available.')
+    const viewUpdate = screen.getByRole('button', { name: 'Update now' })
     fireEvent.click(viewUpdate)
     expect(props.firmwareUpdateClick).toHaveBeenCalled()
     expect(props.onCloseClick).toHaveBeenCalled()
     expect(viewUpdate).toBeEnabled()
-    const exit = getByLabelText('close_icon')
+    const exit = screen.getByLabelText('close_icon')
     fireEvent.click(exit)
     expect(exit).not.toBeVisible()
   })
@@ -156,17 +155,17 @@ describe('AboutModuleSlideout', () => {
     props = {
       module: mockTemperatureModule,
       isExpanded: true,
-      onCloseClick: jest.fn(),
-      firmwareUpdateClick: jest.fn(),
+      onCloseClick: vi.fn(),
+      firmwareUpdateClick: vi.fn(),
     }
-    const { getByText, getByRole } = render(props)
+    render(props)
 
-    getByText('About Temperature Module GEN1')
-    getByText('abc123')
-    getByText('SERIAL NUMBER')
-    getByText('CURRENT VERSION')
-    getByText('v2.0.0')
-    const button = getByRole('button', { name: 'close' })
+    screen.getByText('About Temperature Module GEN1')
+    screen.getByText('abc123')
+    screen.getByText('SERIAL NUMBER')
+    screen.getByText('CURRENT VERSION')
+    screen.getByText('v2.0.0')
+    const button = screen.getByRole('button', { name: 'close' })
     fireEvent.click(button)
     expect(props.onCloseClick).toHaveBeenCalled()
   })

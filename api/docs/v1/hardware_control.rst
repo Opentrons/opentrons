@@ -22,16 +22,16 @@ The robot module can be thought of as the parent for all aspects of the Opentron
     '''
     from opentrons import robot, labware, instruments
 
-    plate = labware.load('96-flat', 'B1', 'my-plate')
-    tiprack = labware.load('opentrons_96_tiprack_300ul', 'A1', 'my-rack')
+    plate = labware.load("96-flat", "B1", "my-plate")
+    tiprack = labware.load("opentrons_96_tiprack_300ul", "A1", "my-rack")
 
-    pipette = instruments.P300_Single(mount='left', tip_racks=[tiprack])
+    pipette = instruments.P300_Single(mount="left", tip_racks=[tiprack])
 
 
 User-Specified Pause
 ====================
 
-This will pause your protocol at a specific step. You can resume by pressing 'resume' in your OT App.
+This will pause your protocol at a specific step. You can resume by pressing "resume" in your OT App.
 
 .. code-block:: python
 
@@ -42,7 +42,7 @@ Head Speed
 
 The speed of the robot's motors can be set using ``robot.head_speed()``. The units are all millimeters-per-second (mm/sec). The ``x``, ``y``, ``z``, ``a``, ``b``, ``c`` parameters set the maximum speed of the corresponding axis on Smoothie.
 
-'x': lateral motion, 'y': front to back motion, 'z': vertical motion of the left mount, 'a': vertical motion of the right mount, 'b': plunger motor for the left pipette, 'c': plunger motor for the right pipette.
+"x": lateral motion, "y": front to back motion, "z": vertical motion of the left mount, "a": vertical motion of the right mount, "b": plunger motor for the left pipette, "c": plunger motor for the right pipette.
 
 The ``combined_speed`` parameter sets the speed across all axes to either the specified value or the axis max, whichever is lower. Defaults are specified by ``DEFAULT_MAX_SPEEDS`` in `robot_configs.py`__.
 
@@ -51,7 +51,7 @@ __ https://github.com/Opentrons/opentrons/blob/edge/api/src/opentrons/config/rob
 .. code-block:: python
 
     max_speed_per_axis = {
-        'x': 600, 'y': 400, 'z': 125, 'a': 125, 'b': 50, 'c': 50}
+        "x": 600, "y": 400, "z": 125, "a": 125, "b": 50, "c": 50}
     robot.head_speed(
         combined_speed=max(max_speed_per_axis.values()),
         **max_speed_per_axis)
@@ -65,7 +65,7 @@ You can `home` the robot by calling ``home()``. You can also specify axes. The r
 .. code-block:: python
 
     robot.home()           # home the robot on all axis
-    robot.home('z')        # home the Z axis only
+    robot.home("z")        # home the Z axis only
 
 Commands
 ========
@@ -76,8 +76,8 @@ __ https://docs.python.org/3.5/tutorial/datastructures.html#more-on-lists
 
 .. code-block:: python
 
-    pipette.pick_up_tip(tiprack.wells('A1'))
-    pipette.drop_tip(tiprack.wells('A1'))
+    pipette.pick_up_tip(tiprack.wells("A1"))
+    pipette.drop_tip(tiprack.wells("A1"))
 
     for c in robot.commands():
         print(c)
@@ -97,11 +97,11 @@ We can erase the robot command history by calling ``robot.clear_commands()``. An
 .. code-block:: python
 
     robot.clear_commands()
-    pipette.pick_up_tip(tiprack['A1'])
-    print('There is', len(robot.commands()), 'command')
+    pipette.pick_up_tip(tiprack["A1"])
+    print("There is", len(robot.commands()), "command")
 
     robot.clear_commands()
-    print('There are now', len(robot.commands()), 'commands')
+    print("There are now", len(robot.commands()), "commands")
 
 will print out...
 
@@ -119,10 +119,10 @@ You can add a custom message to the list of command descriptions you see when ru
 
     robot.clear_commands()
 
-    pipette.pick_up_tip(tiprack['A1'])
+    pipette.pick_up_tip(tiprack["A1"])
     robot.comment("Hello, just picked up tip A1")
 
-    pipette.pick_up_tip(tiprack['A1'])
+    pipette.pick_up_tip(tiprack["A1"])
     robot.comment("Goodbye, just dropped tip A1")
 
     for c in robot.commands():

@@ -1,6 +1,9 @@
 """In-memory storage of ProtocolEngine instances."""
-from typing import List, NamedTuple, Optional
+import asyncio
+import logging
+from typing import List, Optional, Callable
 
+from opentrons.protocol_engine.errors.exceptions import EStopActivatedError
 from opentrons.protocol_engine.types import PostRunHardwareState
 from opentrons_shared_data.robot.dev_types import RobotType
 from opentrons_shared_data.robot.dev_types import RobotTypeEnum
@@ -20,7 +23,7 @@ from opentrons.protocol_runner import (
     JsonRunner,
     PythonAndLegacyRunner,
     RunResult,
-    create_protocol_runner,
+    RunOrchestrator,
 )
 from opentrons.protocol_engine import (
     Config as ProtocolEngineConfig,
@@ -31,7 +34,14 @@ from opentrons.protocol_engine import (
     create_protocol_engine,
 )
 
-from robot_server.protocols import ProtocolResource
+from robot_server.protocols.protocol_store import ProtocolResource
+from opentrons.protocol_engine.types import (
+    DeckConfigurationType,
+    RunTimeParamValuesType,
+)
+
+
+_log = logging.getLogger(__name__)
 
 
 class EngineConflictError(RuntimeError):
@@ -42,34 +52,55 @@ class EngineConflictError(RuntimeError):
     """
 
 
-class NoRunnerEnginePairError(RuntimeError):
+class NoRunnerEngineError(RuntimeError):
     """Raised if you try to get the current engine or runner while there is none."""
 
 
-class RunnerEnginePair(NamedTuple):
-    """A stored Runner/ProtocolEngine pair."""
+async def handle_estop_event(engine_store: "EngineStore", event: HardwareEvent) -> None:
+    """Handle an E-stop event from the hardware API.
 
-    run_id: str
-    runner: AnyRunner
-    engine: ProtocolEngine
+    This is meant to run in the engine's thread and asyncio event loop.
 
-
-def get_estop_listener(engine_store: "EngineStore") -> HardwareEventHandler:
-    """Create a callback for estop events."""
-
-    def _callback(event: HardwareEvent) -> None:
+    This is a public function for unit-testing purposes, but it's an implementation
+    detail of the store.
+    """
+    try:
         if isinstance(event, EstopStateNotification):
             if event.new_state is not EstopState.PHYSICALLY_ENGAGED:
                 return
             if engine_store.current_run_id is None:
                 return
-            engine_store.engine.estop(maintenance_run=False)
+            # todo(mm, 2024-04-17): This estop teardown sequencing belongs in the
+            # runner layer.
+            engine_store.engine.estop()
+            await engine_store.engine.finish(error=EStopActivatedError())
+    except Exception:
+        # This is a background task kicked off by a hardware event,
+        # so there's no one to propagate this exception to.
+        _log.exception("Exception handling E-stop event.")
 
-    return _callback
+
+def _get_estop_listener(engine_store: "EngineStore") -> HardwareEventHandler:
+    """Create a callback for estop events.
+
+    The returned callback is meant to run in the hardware API's thread.
+    """
+    engine_loop = asyncio.get_running_loop()
+
+    def run_handler_in_engine_thread_from_hardware_thread(
+        event: HardwareEvent,
+    ) -> None:
+        asyncio.run_coroutine_threadsafe(
+            handle_estop_event(engine_store, event), engine_loop
+        )
+
+    return run_handler_in_engine_thread_from_hardware_thread
 
 
 class EngineStore:
     """Factory and in-memory storage for ProtocolEngine."""
+
+    _run_orchestrator: Optional[RunOrchestrator] = None
 
     def __init__(
         self,
@@ -89,32 +120,32 @@ class EngineStore:
         self._robot_type = robot_type
         self._deck_type = deck_type
         self._default_engine: Optional[ProtocolEngine] = None
-        self._runner_engine_pair: Optional[RunnerEnginePair] = None
-        hardware_api.register_callback(get_estop_listener(self))
+        hardware_api.register_callback(_get_estop_listener(self))
 
     @property
     def engine(self) -> ProtocolEngine:
         """Get the "current" persisted ProtocolEngine."""
-        if self._runner_engine_pair is None:
-            raise NoRunnerEnginePairError()
-        return self._runner_engine_pair.engine
+        if self._run_orchestrator is None:
+            raise NoRunnerEngineError()
+        return self._run_orchestrator.engine
 
     @property
     def runner(self) -> AnyRunner:
         """Get the "current" persisted ProtocolRunner."""
-        if self._runner_engine_pair is None:
-            raise NoRunnerEnginePairError()
-        return self._runner_engine_pair.runner
+        if self._run_orchestrator is None:
+            raise NoRunnerEngineError()
+        return self._run_orchestrator.runner
 
     @property
     def current_run_id(self) -> Optional[str]:
         """Get the run identifier associated with the current engine/runner pair."""
         return (
-            self._runner_engine_pair.run_id
-            if self._runner_engine_pair is not None
+            self._run_orchestrator.run_id
+            if self._run_orchestrator is not None
             else None
         )
 
+    # TODO(tz, 2024-5-14): remove this once its all redirected via orchestrator
     # TODO(mc, 2022-03-21): this resource locking is insufficient;
     # come up with something more sophisticated without race condition holes.
     async def get_default_engine(self) -> ProtocolEngine:
@@ -124,14 +155,13 @@ class EngineStore:
             EngineConflictError: if a run-specific engine is active.
         """
         if (
-            self._runner_engine_pair is not None
+            self._run_orchestrator is not None
             and self.engine.state_view.commands.has_been_played()
             and not self.engine.state_view.commands.get_is_stopped()
         ):
             raise EngineConflictError("An engine for a run is currently active")
 
         engine = self._default_engine
-
         if engine is None:
             # TODO(mc, 2022-03-21): potential race condition
             engine = await create_protocol_engine(
@@ -143,21 +173,26 @@ class EngineStore:
                 ),
             )
             self._default_engine = engine
-
         return engine
 
     async def create(
         self,
         run_id: str,
         labware_offsets: List[LabwareOffsetCreate],
+        deck_configuration: DeckConfigurationType,
+        notify_publishers: Callable[[], None],
         protocol: Optional[ProtocolResource],
+        run_time_param_values: Optional[RunTimeParamValuesType] = None,
     ) -> StateSummary:
         """Create and store a ProtocolRunner and ProtocolEngine for a given Run.
 
         Args:
             run_id: The run resource the engine is assigned to.
             labware_offsets: Labware offsets to create the engine with.
+            deck_configuration: A mapping of fixtures to cutout fixtures the deck will be loaded with.
+            notify_publishers: Utilized by the engine to notify publishers of state changes.
             protocol: The protocol to load the runner with, if any.
+            run_time_param_values: Any runtime parameter values to set.
 
         Returns:
             The initial equipment and status summary of the engine.
@@ -181,47 +216,51 @@ class EngineStore:
                 ),
             ),
             load_fixed_trash=load_fixed_trash,
+            deck_configuration=deck_configuration,
+            notify_publishers=notify_publishers,
         )
-        runner = create_protocol_runner(
+
+        post_run_hardware_state = PostRunHardwareState.HOME_AND_STAY_ENGAGED
+        drop_tips_after_run = True
+
+        if self._run_orchestrator is not None:
+            raise EngineConflictError("Another run is currently active.")
+
+        self._run_orchestrator = RunOrchestrator.build_orchestrator(
+            run_id=run_id,
             protocol_engine=engine,
             hardware_api=self._hardware_api,
             protocol_config=protocol.source.config if protocol else None,
+            post_run_hardware_state=post_run_hardware_state,
+            drop_tips_after_run=drop_tips_after_run,
         )
-
-        if self._runner_engine_pair is not None:
-            raise EngineConflictError("Another run is currently active.")
 
         # FIXME(mm, 2022-12-21): These `await runner.load()`s introduce a
         # concurrency hazard. If two requests simultaneously call this method,
         # they will both "succeed" (with undefined results) instead of one
         # raising EngineConflictError.
-        if isinstance(runner, PythonAndLegacyRunner):
+        if isinstance(self.runner, PythonAndLegacyRunner):
             assert (
                 protocol is not None
             ), "A Python protocol should have a protocol source file."
-            await runner.load(
+            await self.runner.load(
                 protocol.source,
                 # Conservatively assume that we're re-running a protocol that
                 # was uploaded before we added stricter validation, and that
                 # doesn't conform to the new rules.
                 python_parse_mode=PythonParseMode.ALLOW_LEGACY_METADATA_AND_REQUIREMENTS,
+                run_time_param_values=run_time_param_values,
             )
-        elif isinstance(runner, JsonRunner):
+        elif isinstance(self.runner, JsonRunner):
             assert (
                 protocol is not None
             ), "A JSON protocol should have a protocol source file."
-            await runner.load(protocol.source)
+            await self.runner.load(protocol.source)
         else:
-            runner.prepare()
+            self.runner.prepare()
 
         for offset in labware_offsets:
             engine.add_labware_offset(offset)
-
-        self._runner_engine_pair = RunnerEnginePair(
-            run_id=run_id,
-            runner=runner,
-            engine=engine,
-        )
 
         return engine.state_view.get_summary()
 
@@ -233,9 +272,8 @@ class EngineStore:
             they cannot be cleared.
         """
         engine = self.engine
-        state_view = engine.state_view
-
-        if state_view.commands.get_is_okay_to_clear():
+        runner = self.runner
+        if engine.state_view.commands.get_is_okay_to_clear():
             await engine.finish(
                 drop_tips_after_run=False,
                 set_run_status=False,
@@ -244,8 +282,12 @@ class EngineStore:
         else:
             raise EngineConflictError("Current run is not idle or stopped.")
 
-        run_data = state_view.get_summary()
-        commands = state_view.commands.get_all()
-        self._runner_engine_pair = None
+        run_data = engine.state_view.get_summary()
+        commands = engine.state_view.commands.get_all()
+        run_time_parameters = runner.run_time_parameters if runner else []
 
-        return RunResult(state_summary=run_data, commands=commands)
+        self._run_orchestrator = None
+
+        return RunResult(
+            state_summary=run_data, commands=commands, parameters=run_time_parameters
+        )

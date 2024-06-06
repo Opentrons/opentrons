@@ -1,5 +1,6 @@
 import fse from 'fs-extra'
 import electron from 'electron'
+import { describe, it, vi, expect, beforeEach, afterEach } from 'vitest'
 import * as Cfg from '../../config'
 import * as Dialogs from '../../dialogs'
 import * as Defs from '../definitions'
@@ -10,57 +11,16 @@ import { uiInitialized } from '@opentrons/app/src/redux/shell/actions'
 import * as CustomLabware from '@opentrons/app/src/redux/custom-labware'
 import * as CustomLabwareFixtures from '@opentrons/app/src/redux/custom-labware/__fixtures__'
 
+import type { Mock } from 'vitest'
 import type { Config } from '@opentrons/app/src/redux/config/types'
 import type { Dispatch } from '../../types'
 
-jest.mock('fs-extra')
-jest.mock('electron')
-jest.mock('../../config')
-jest.mock('../../dialogs')
-jest.mock('../definitions')
-jest.mock('../validation')
-
-const ensureDir = fse.ensureDir as jest.MockedFunction<typeof fse.ensureDir>
-
-const getFullConfig = Cfg.getFullConfig as jest.MockedFunction<
-  typeof Cfg.getFullConfig
->
-
-const handleConfigChange = Cfg.handleConfigChange as jest.MockedFunction<
-  typeof Cfg.handleConfigChange
->
-
-const showOpenDirectoryDialog = Dialogs.showOpenDirectoryDialog as jest.MockedFunction<
-  typeof Dialogs.showOpenDirectoryDialog
->
-
-const showOpenFileDialog = Dialogs.showOpenFileDialog as jest.MockedFunction<
-  typeof Dialogs.showOpenFileDialog
->
-
-const readLabwareDirectory = Defs.readLabwareDirectory as jest.MockedFunction<
-  typeof Defs.readLabwareDirectory
->
-
-const parseLabwareFiles = Defs.parseLabwareFiles as jest.MockedFunction<
-  typeof Defs.parseLabwareFiles
->
-
-const addLabwareFile = Defs.addLabwareFile as jest.MockedFunction<
-  typeof Defs.addLabwareFile
->
-
-const removeLabwareFile = Defs.removeLabwareFile as jest.MockedFunction<
-  typeof Defs.removeLabwareFile
->
-
-const validateLabwareFiles = Val.validateLabwareFiles as jest.MockedFunction<
-  typeof Val.validateLabwareFiles
->
-
-const validateNewLabwareFile = Val.validateNewLabwareFile as jest.MockedFunction<
-  typeof Val.validateNewLabwareFile
->
+vi.mock('fs-extra')
+vi.mock('electron')
+vi.mock('../../config')
+vi.mock('../../dialogs')
+vi.mock('../definitions')
+vi.mock('../validation')
 
 // wait a few ticks to let the mock Promises clear
 const flush = (): Promise<void> =>
@@ -71,41 +31,43 @@ describe('labware module dispatches', () => {
   const mockMainWindow = ({
     browserWindow: true,
   } as unknown) as electron.BrowserWindow
-  let dispatch: jest.MockedFunction<Dispatch>
+  let dispatch: Mock
   let handleAction: Dispatch
 
   beforeEach(() => {
-    getFullConfig.mockReturnValue({
+    vi.mocked(Cfg.getFullConfig).mockReturnValue({
       labware: { directory: labwareDir },
     } as Config)
-    ensureDir.mockResolvedValue(undefined as never)
-    addLabwareFile.mockResolvedValue()
-    removeLabwareFile.mockResolvedValue()
-    readLabwareDirectory.mockResolvedValue([])
-    parseLabwareFiles.mockResolvedValue([])
-    validateLabwareFiles.mockReturnValue([])
+    vi.mocked(fse.ensureDir).mockResolvedValue(undefined as never)
+    vi.mocked(Defs.addLabwareFile).mockResolvedValue()
+    vi.mocked(Defs.removeLabwareFile).mockResolvedValue()
+    vi.mocked(Defs.readLabwareDirectory).mockResolvedValue([])
+    vi.mocked(Defs.parseLabwareFiles).mockResolvedValue([])
+    vi.mocked(Val.validateLabwareFiles).mockReturnValue([])
 
-    showOpenDirectoryDialog.mockResolvedValue([])
-    showOpenFileDialog.mockResolvedValue([])
+    vi.mocked(Dialogs.showOpenDirectoryDialog).mockResolvedValue([])
+    vi.mocked(Dialogs.showOpenFileDialog).mockResolvedValue([])
 
-    dispatch = jest.fn()
+    dispatch = vi.fn()
     handleAction = registerLabware(dispatch, mockMainWindow)
   })
 
   afterEach(() => {
-    jest.resetAllMocks()
+    vi.resetAllMocks()
   })
 
   it('ensures labware directory exists on FETCH_CUSTOM_LABWARE', () => {
     handleAction(CustomLabware.fetchCustomLabware())
-    expect(ensureDir).toHaveBeenCalledWith(labwareDir)
+    expect(vi.mocked(fse.ensureDir)).toHaveBeenCalledWith(labwareDir)
   })
 
   it('reads labware directory on FETCH_CUSTOM_LABWARE', () => {
     handleAction(CustomLabware.fetchCustomLabware())
 
     return flush().then(() =>
-      expect(readLabwareDirectory).toHaveBeenCalledWith(labwareDir)
+      expect(vi.mocked(Defs.readLabwareDirectory)).toHaveBeenCalledWith(
+        labwareDir
+      )
     )
   })
 
@@ -113,7 +75,9 @@ describe('labware module dispatches', () => {
     handleAction(uiInitialized())
 
     return flush().then(() =>
-      expect(readLabwareDirectory).toHaveBeenCalledWith(labwareDir)
+      expect(vi.mocked(Defs.readLabwareDirectory)).toHaveBeenCalledWith(
+        labwareDir
+      )
     )
   })
 
@@ -126,14 +90,20 @@ describe('labware module dispatches', () => {
       { filename: 'd.json', modified: 3, data: {} },
     ]
 
-    readLabwareDirectory.mockResolvedValueOnce(mockDirectoryListing)
-    parseLabwareFiles.mockResolvedValueOnce(mockParsedFiles)
+    vi.mocked(Defs.readLabwareDirectory).mockResolvedValueOnce(
+      mockDirectoryListing
+    )
+    vi.mocked(Defs.parseLabwareFiles).mockResolvedValueOnce(mockParsedFiles)
 
     handleAction(CustomLabware.fetchCustomLabware())
 
     return flush().then(() => {
-      expect(parseLabwareFiles).toHaveBeenCalledWith(mockDirectoryListing)
-      expect(validateLabwareFiles).toHaveBeenCalledWith(mockParsedFiles)
+      expect(vi.mocked(Defs.parseLabwareFiles)).toHaveBeenCalledWith(
+        mockDirectoryListing
+      )
+      expect(vi.mocked(Val.validateLabwareFiles)).toHaveBeenCalledWith(
+        mockParsedFiles
+      )
     })
   })
 
@@ -144,7 +114,7 @@ describe('labware module dispatches', () => {
       CustomLabwareFixtures.mockValidLabware,
     ]
 
-    validateLabwareFiles.mockReturnValueOnce(mockValidatedFiles)
+    vi.mocked(Val.validateLabwareFiles).mockReturnValueOnce(mockValidatedFiles)
 
     handleAction(CustomLabware.fetchCustomLabware())
 
@@ -156,7 +126,7 @@ describe('labware module dispatches', () => {
   })
 
   it('dispatches CUSTOM_LABWARE_LIST_FAILURE if read fails', () => {
-    readLabwareDirectory.mockRejectedValue(new Error('AH'))
+    vi.mocked(Defs.readLabwareDirectory).mockRejectedValue(new Error('AH'))
 
     handleAction(CustomLabware.fetchCustomLabware())
 
@@ -171,15 +141,20 @@ describe('labware module dispatches', () => {
     handleAction(CustomLabware.changeCustomLabwareDirectory())
 
     return flush().then(() => {
-      expect(showOpenDirectoryDialog).toHaveBeenCalledWith(mockMainWindow, {
-        defaultPath: labwareDir,
-      })
+      expect(vi.mocked(Dialogs.showOpenDirectoryDialog)).toHaveBeenCalledWith(
+        mockMainWindow,
+        {
+          defaultPath: labwareDir,
+        }
+      )
       expect(dispatch).not.toHaveBeenCalled()
     })
   })
 
   it('dispatches config:UPDATE on labware dir selection', () => {
-    showOpenDirectoryDialog.mockResolvedValue(['/path/to/labware'])
+    vi.mocked(Dialogs.showOpenDirectoryDialog).mockResolvedValue([
+      '/path/to/labware',
+    ])
 
     handleAction(CustomLabware.changeCustomLabwareDirectory())
 
@@ -193,16 +168,18 @@ describe('labware module dispatches', () => {
   })
 
   it('reads labware directory on config change', () => {
-    expect(handleConfigChange).toHaveBeenCalledWith(
+    expect(vi.mocked(Cfg.handleConfigChange)).toHaveBeenCalledWith(
       'labware.directory',
       expect.any(Function)
     )
-    const changeHandler = handleConfigChange.mock.calls[0][1]
+    const changeHandler = vi.mocked(Cfg.handleConfigChange).mock.calls[0][1]
 
     changeHandler('old', 'new')
 
     return flush().then(() => {
-      expect(readLabwareDirectory).toHaveBeenCalledWith(labwareDir)
+      expect(vi.mocked(Defs.readLabwareDirectory)).toHaveBeenCalledWith(
+        labwareDir
+      )
       expect(dispatch).toHaveBeenCalledWith(
         CustomLabware.customLabwareList([], 'changeDirectory')
       )
@@ -210,13 +187,15 @@ describe('labware module dispatches', () => {
   })
 
   it('dispatches labware directory list error on config change', () => {
-    const changeHandler = handleConfigChange.mock.calls[0][1]
+    const changeHandler = vi.mocked(Cfg.handleConfigChange).mock.calls[0][1]
 
-    readLabwareDirectory.mockRejectedValue(new Error('AH'))
+    vi.mocked(Defs.readLabwareDirectory).mockRejectedValue(new Error('AH'))
     changeHandler('old', 'new')
 
     return flush().then(() => {
-      expect(readLabwareDirectory).toHaveBeenCalledWith(labwareDir)
+      expect(vi.mocked(Defs.readLabwareDirectory)).toHaveBeenCalledWith(
+        labwareDir
+      )
       expect(dispatch).toHaveBeenCalledWith(
         CustomLabware.customLabwareListFailure('AH', 'changeDirectory')
       )
@@ -227,16 +206,19 @@ describe('labware module dispatches', () => {
     handleAction(CustomLabware.addCustomLabware())
 
     return flush().then(() => {
-      expect(showOpenFileDialog).toHaveBeenCalledWith(mockMainWindow, {
-        defaultPath: '__mock-app-path__',
-        filters: [
-          {
-            name: 'JSON Labware Definitions',
-            extensions: ['json'],
-          },
-        ],
-        properties: ['multiSelections'],
-      })
+      expect(vi.mocked(Dialogs.showOpenFileDialog)).toHaveBeenCalledWith(
+        mockMainWindow,
+        {
+          defaultPath: '__mock-app-path__',
+          filters: [
+            {
+              name: 'JSON Labware Definitions',
+              extensions: ['json'],
+            },
+          ],
+          properties: ['multiSelections'],
+        }
+      )
       expect(dispatch).not.toHaveBeenCalled()
     })
   })
@@ -250,20 +232,24 @@ describe('labware module dispatches', () => {
       data: {},
     }
 
-    showOpenFileDialog.mockResolvedValue(['/path/to/labware.json'])
+    vi.mocked(Dialogs.showOpenFileDialog).mockResolvedValue([
+      '/path/to/labware.json',
+    ])
     // validation of existing definitions
-    validateLabwareFiles.mockReturnValueOnce(mockValidatedFiles)
+    vi.mocked(Val.validateLabwareFiles).mockReturnValueOnce(mockValidatedFiles)
     // existing files mock return
-    parseLabwareFiles.mockResolvedValue([])
+    vi.mocked(Defs.parseLabwareFiles).mockResolvedValue([])
     // new file mock return
-    parseLabwareFiles.mockResolvedValue([mockNewUncheckedFile])
+    vi.mocked(Defs.parseLabwareFiles).mockResolvedValue([mockNewUncheckedFile])
     // new file (not needed for this test except to prevent a type error)
-    validateNewLabwareFile.mockReturnValueOnce(mockValidatedFiles[0])
+    vi.mocked(Val.validateNewLabwareFile).mockReturnValueOnce(
+      mockValidatedFiles[0]
+    )
 
     handleAction(CustomLabware.addCustomLabware())
 
     return flush().then(() => {
-      expect(validateNewLabwareFile).toHaveBeenCalledWith(
+      expect(vi.mocked(Val.validateNewLabwareFile)).toHaveBeenCalledWith(
         mockValidatedFiles,
         mockNewUncheckedFile
       )
@@ -276,8 +262,8 @@ describe('labware module dispatches', () => {
       mockInvalidFile
     )
 
-    showOpenFileDialog.mockResolvedValue(['c.json'])
-    validateNewLabwareFile.mockReturnValueOnce(mockInvalidFile)
+    vi.mocked(Dialogs.showOpenFileDialog).mockResolvedValue(['c.json'])
+    vi.mocked(Val.validateNewLabwareFile).mockReturnValueOnce(mockInvalidFile)
 
     handleAction(CustomLabware.addCustomLabware())
 
@@ -293,18 +279,20 @@ describe('labware module dispatches', () => {
       'addLabware'
     )
 
-    showOpenFileDialog.mockResolvedValue([mockValidFile.filename])
-    validateNewLabwareFile.mockReturnValueOnce(mockValidFile)
+    vi.mocked(Dialogs.showOpenFileDialog).mockResolvedValue([
+      mockValidFile.filename,
+    ])
+    vi.mocked(Val.validateNewLabwareFile).mockReturnValueOnce(mockValidFile)
 
     // initial read
-    validateLabwareFiles.mockReturnValueOnce([])
+    vi.mocked(Val.validateLabwareFiles).mockReturnValueOnce([])
     // read after add
-    validateLabwareFiles.mockReturnValueOnce([mockValidFile])
+    vi.mocked(Val.validateLabwareFiles).mockReturnValueOnce([mockValidFile])
 
     handleAction(CustomLabware.addCustomLabware())
 
     return flush().then(() => {
-      expect(addLabwareFile).toHaveBeenCalledWith(
+      expect(vi.mocked(Defs.addLabwareFile)).toHaveBeenCalledWith(
         mockValidFile.filename,
         labwareDir
       )
@@ -316,10 +304,10 @@ describe('labware module dispatches', () => {
     const mockValidFile = CustomLabwareFixtures.mockValidLabware
     const expectedAction = CustomLabware.addCustomLabwareFailure(null, 'AH')
 
-    showOpenFileDialog.mockResolvedValue(['a.json'])
-    validateNewLabwareFile.mockReturnValueOnce(mockValidFile)
-    validateLabwareFiles.mockReturnValueOnce([])
-    addLabwareFile.mockRejectedValue(new Error('AH'))
+    vi.mocked(Dialogs.showOpenFileDialog).mockResolvedValue(['a.json'])
+    vi.mocked(Val.validateNewLabwareFile).mockReturnValueOnce(mockValidFile)
+    vi.mocked(Val.validateLabwareFiles).mockReturnValueOnce([])
+    vi.mocked(Defs.addLabwareFile).mockRejectedValue(new Error('AH'))
 
     handleAction(CustomLabware.addCustomLabware())
 
@@ -341,16 +329,20 @@ describe('labware module dispatches', () => {
     )
 
     // validation of existing definitions
-    validateLabwareFiles.mockReturnValueOnce(mockExisting)
+    vi.mocked(Val.validateLabwareFiles).mockReturnValueOnce(mockExisting)
     // validation after deletes
-    validateLabwareFiles.mockReturnValueOnce(mockAfterDeletes)
+    vi.mocked(Val.validateLabwareFiles).mockReturnValueOnce(mockAfterDeletes)
 
     handleAction(CustomLabware.addCustomLabware(duplicate))
 
     return flush().then(() => {
-      expect(removeLabwareFile).toHaveBeenCalledWith('/duplicate1.json')
-      expect(removeLabwareFile).toHaveBeenCalledWith('/duplicate2.json')
-      expect(addLabwareFile).toHaveBeenCalledWith(
+      expect(vi.mocked(Defs.removeLabwareFile)).toHaveBeenCalledWith(
+        '/duplicate1.json'
+      )
+      expect(vi.mocked(Defs.removeLabwareFile)).toHaveBeenCalledWith(
+        '/duplicate2.json'
+      )
+      expect(vi.mocked(Defs.addLabwareFile)).toHaveBeenCalledWith(
         duplicate.filename,
         labwareDir
       )
@@ -366,8 +358,8 @@ describe('labware module dispatches', () => {
     ]
     const expectedAction = CustomLabware.addCustomLabwareFailure(null, 'AH')
 
-    validateLabwareFiles.mockReturnValueOnce(mockExisting)
-    removeLabwareFile.mockRejectedValue(new Error('AH'))
+    vi.mocked(Val.validateLabwareFiles).mockReturnValueOnce(mockExisting)
+    vi.mocked(Defs.removeLabwareFile).mockRejectedValue(new Error('AH'))
 
     handleAction(CustomLabware.addCustomLabware(duplicate))
 

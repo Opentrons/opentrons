@@ -3,7 +3,6 @@ import { useFormikContext } from 'formik'
 import capitalize from 'lodash/capitalize'
 import { makeMaskToDecimal } from '../../fieldMasks'
 import { displayAsTube, getLabwareName } from '../../utils'
-import { LabwareFields } from '../../fields'
 import { FormAlerts } from '../alerts/FormAlerts'
 import { wellShapeOptionsWithIcons } from '../optionsWithImages'
 import { TextField } from '../TextField'
@@ -11,7 +10,8 @@ import { RadioField } from '../RadioField'
 import { WellXYImg } from '../diagrams'
 import { SectionBody } from './SectionBody'
 
-import styles from '../../styles.css'
+import styles from '../../styles.module.css'
+import type { LabwareFields } from '../../fields'
 
 const maskTo2Decimal = makeMaskToDecimal(2)
 

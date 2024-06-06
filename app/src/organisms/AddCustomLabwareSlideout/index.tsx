@@ -2,19 +2,19 @@ import * as React from 'react'
 import { useDispatch } from 'react-redux'
 import { useTranslation, Trans } from 'react-i18next'
 import {
+  ALIGN_CENTER,
+  COLORS,
+  DIRECTION_COLUMN,
   Flex,
   Link,
-  COLORS,
   SPACING,
-  DIRECTION_COLUMN,
-  ALIGN_CENTER,
+  StyledText,
 } from '@opentrons/components'
 import {
   addCustomLabwareFile,
   addCustomLabware,
 } from '../../redux/custom-labware'
 import { Slideout } from '../../atoms/Slideout'
-import { StyledText } from '../../atoms/text'
 import {
   useTrackEvent,
   ANALYTICS_ADD_CUSTOM_LABWARE,
@@ -65,7 +65,7 @@ export function AddCustomLabwareSlideout(
                 components={{
                   a: (
                     <Link
-                      color={COLORS.blueEnabled}
+                      color={COLORS.blue50}
                       onClick={() => dispatch(addCustomLabware())}
                       role="button"
                     />

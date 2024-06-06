@@ -3,7 +3,13 @@
 from .state import State, StateStore, StateView
 from .state_summary import StateSummary
 from .config import Config
-from .commands import CommandState, CommandView, CommandSlice, CurrentCommand
+from .commands import (
+    CommandState,
+    CommandView,
+    CommandSlice,
+    CommandPointer,
+)
+from .command_history import CommandEntry
 from .labware import LabwareState, LabwareView
 from .pipettes import PipetteState, PipetteView, HardwarePipette
 from .modules import ModuleState, ModuleView, HardwareModule
@@ -33,7 +39,8 @@ __all__ = [
     "CommandState",
     "CommandView",
     "CommandSlice",
-    "CurrentCommand",
+    "CommandPointer",
+    "CommandEntry",
     # labware state and values
     "LabwareState",
     "LabwareView",

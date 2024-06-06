@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { DeprecatedPrimaryButton, Icon } from '@opentrons/components'
-import styles from './importLabware.css'
+import styles from './importLabware.module.css'
 
 interface Props {
   onUpload: React.DragEventHandler<HTMLLabelElement> &
@@ -21,7 +21,9 @@ export function ImportLabware(props: Props): JSX.Element {
   )
 }
 
-const stopEvent = (e: React.SyntheticEvent): void => e.preventDefault()
+const stopEvent = (e: React.SyntheticEvent): void => {
+  e.preventDefault()
+}
 
 function UploadInput(props: UploadInputProps): JSX.Element {
   const { isButton, onUpload } = props

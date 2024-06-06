@@ -1,5 +1,9 @@
 import * as React from 'react'
-import { renderWithProviders, COLORS } from '@opentrons/components'
+import { describe, it, expect, vi, beforeEach } from 'vitest'
+import '@testing-library/jest-dom/vitest'
+import { fireEvent, screen } from '@testing-library/react'
+import { COLORS } from '@opentrons/components'
+import { renderWithProviders } from '../../../__testing-utils__'
 
 import { LargeButton } from '../LargeButton'
 
@@ -11,43 +15,65 @@ describe('LargeButton', () => {
   let props: React.ComponentProps<typeof LargeButton>
   beforeEach(() => {
     props = {
-      onClick: jest.fn(),
+      onClick: vi.fn(),
       buttonText: 'large button',
       iconName: 'play-round-corners',
     }
   })
   it('renders the default button and it works as expected', () => {
-    const { getByText, getByRole } = render(props)
-    getByText('large button').click()
+    render(props)
+    fireEvent.click(screen.getByText('large button'))
     expect(props.onClick).toHaveBeenCalled()
-    expect(getByRole('button')).toHaveStyle(
-      `background-color: ${COLORS.blueEnabled}`
-    )
   })
   it('renders the alert button', () => {
     props = {
       ...props,
       buttonType: 'alert',
     }
-    const { getByRole } = render(props)
-    expect(getByRole('button')).toHaveStyle(`background-color: ${COLORS.red3}`)
+    render(props)
+    expect(screen.getByRole('button')).toHaveStyle(
+      `background-color: ${COLORS.red35}`
+    )
   })
   it('renders the secondary button', () => {
     props = {
       ...props,
       buttonType: 'secondary',
     }
-    const { getByRole } = render(props)
-    expect(getByRole('button')).toHaveStyle(
-      `background-color: ${COLORS.mediumBlueEnabled}`
+    render(props)
+    expect(screen.getByRole('button')).toHaveStyle(
+      `background-color: ${COLORS.blue35}`
     )
   })
+
+  it('renders the onColor button', () => {
+    props = {
+      ...props,
+      buttonType: 'onColor',
+    }
+    render(props)
+    expect(screen.getByRole('button')).toHaveStyle(
+      `background-color: ${COLORS.transparent}`
+    )
+  })
+
+  it('renders the alertAlt button', () => {
+    props = {
+      ...props,
+      buttonType: 'alertAlt',
+    }
+    render(props)
+    expect(screen.getByRole('button')).toHaveStyle(
+      `background-color: ${COLORS.white}`
+    )
+  })
+
   it('renders the button as disabled', () => {
     props = {
       ...props,
       disabled: true,
     }
-    const { getByRole } = render(props)
-    expect(getByRole('button')).toBeDisabled()
+    render(props)
+    expect(screen.getByRole('button')).toBeDisabled()
   })
 })

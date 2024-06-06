@@ -25,7 +25,8 @@ from opentrons_hardware.firmware_bindings.constants import NodeId
 from opentrons_hardware.hardware_control.constants import interrupts_per_sec
 
 if TYPE_CHECKING:
-    import matplotlib.pyplot as pp  # type: ignore
+    import matplotlib.pyplot as pp  # noqa: F401
+    from matplotlib.figure import Figure
 
 
 class IgnoredMessage(BaseException):
@@ -583,9 +584,9 @@ class PlotParams:
                 yield record
 
 
-def plot_one(plot: PlotParams) -> "pp.Figure":  # noqa: C901
+def plot_one(plot: PlotParams) -> "Figure":  # noqa: C901
     """Plot a single figure. Requires pyplot."""
-    import matplotlib.pyplot as pp
+    import matplotlib.pyplot as pp  # noqa: F811
 
     time_offsets: List[float] = []
     absolute_encoder: List[float] = []
@@ -703,7 +704,7 @@ def plot_one(plot: PlotParams) -> "pp.Figure":  # noqa: C901
 
 def plot_position_errors(plots: List[PlotParams]) -> None:
     """Plot more than one axis worth of data. Requires pyplot."""
-    import matplotlib.pyplot as pp
+    import matplotlib.pyplot as pp  # noqa: F811
 
     for plot in plots:
         try:

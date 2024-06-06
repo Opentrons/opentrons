@@ -4,8 +4,13 @@ import {
   SINGLE_MOUNT_PIPETTES,
   WEIGHT_OF_96_CHANNEL,
 } from '@opentrons/shared-data'
-import { Flex, JUSTIFY_CENTER, SPACING, SIZE_1 } from '@opentrons/components'
-import { StyledText } from '../../atoms/text'
+import {
+  Flex,
+  JUSTIFY_CENTER,
+  SIZE_1,
+  SPACING,
+  StyledText,
+} from '@opentrons/components'
 import { Banner } from '../../atoms/Banner'
 import { GenericWizardTile } from '../../molecules/GenericWizardTile'
 import { Skeleton } from '../../atoms/Skeleton'
@@ -55,6 +60,11 @@ export const MountPipette = (props: MountPipetteProps): JSX.Element => {
   } else {
     bodyText = (
       <>
+        <StyledText css={BODY_STYLE}>
+          {isSingleMountPipette
+            ? t('align_the_connector')
+            : t('hold_pipette_carefully')}
+        </StyledText>
         {!isSingleMountPipette ? (
           <Banner
             type="warning"
@@ -64,11 +74,6 @@ export const MountPipette = (props: MountPipetteProps): JSX.Element => {
             {t('pipette_heavy', { weight: WEIGHT_OF_96_CHANNEL })}
           </Banner>
         ) : null}
-        <StyledText css={BODY_STYLE}>
-          {isSingleMountPipette
-            ? t('align_the_connector')
-            : t('hold_pipette_carefully')}
-        </StyledText>
       </>
     )
   }

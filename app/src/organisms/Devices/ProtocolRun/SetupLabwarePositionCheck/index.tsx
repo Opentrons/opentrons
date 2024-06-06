@@ -1,19 +1,21 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import {
-  Flex,
-  SPACING,
-  JUSTIFY_CENTER,
-  DIRECTION_COLUMN,
   ALIGN_CENTER,
-  TYPOGRAPHY,
-  TOOLTIP_LEFT,
-  useHoverTooltip,
-  SecondaryButton,
-  PrimaryButton,
+  BORDERS,
   COLORS,
+  DIRECTION_COLUMN,
+  Flex,
+  JUSTIFY_CENTER,
+  PrimaryButton,
+  SecondaryButton,
+  SPACING,
+  StyledText,
+  TOOLTIP_LEFT,
+  TYPOGRAPHY,
+  useHoverTooltip,
 } from '@opentrons/components'
-import { useRunQuery, useProtocolQuery } from '@opentrons/react-api-client'
+import { useProtocolQuery } from '@opentrons/react-api-client'
 import { useMostRecentCompletedAnalysis } from '../../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import { useLPCSuccessToast } from '../../hooks/useLPCSuccessToast'
 import { Tooltip } from '../../../../atoms/Tooltip'
@@ -24,9 +26,10 @@ import {
 } from '../../hooks'
 import { CurrentOffsetsTable } from './CurrentOffsetsTable'
 import { useLaunchLPC } from '../../../LabwarePositionCheck/useLaunchLPC'
-import { StyledText } from '../../../../atoms/text'
-import type { LabwareOffset } from '@opentrons/api-client'
 import { getLatestCurrentOffsets } from './utils'
+import { useNotifyRunQuery } from '../../../../resources/runs'
+
+import type { LabwareOffset } from '@opentrons/api-client'
 
 interface SetupLabwarePositionCheckProps {
   expandLabwareStep: () => void
@@ -41,7 +44,7 @@ export function SetupLabwarePositionCheck(
   const { t, i18n } = useTranslation('protocol_setup')
 
   const robotType = useRobotType(robotName)
-  const { data: runRecord } = useRunQuery(runId, { staleTime: Infinity })
+  const { data: runRecord } = useNotifyRunQuery(runId, { staleTime: Infinity })
   const { data: protocolRecord } = useProtocolQuery(
     runRecord?.data.protocolId ?? null,
     {
@@ -99,9 +102,10 @@ export function SetupLabwarePositionCheck(
         <Flex
           paddingY={SPACING.spacing8}
           marginY={SPACING.spacing24}
-          backgroundColor={COLORS.fundamentalsBackground}
+          backgroundColor={COLORS.grey10}
           alignItems={ALIGN_CENTER}
           justifyContent={JUSTIFY_CENTER}
+          borderRadius={BORDERS.borderRadius8}
         >
           <StyledText as="p">
             {i18n.format(t('no_labware_offset_data'), 'capitalize')}

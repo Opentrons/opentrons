@@ -1,11 +1,12 @@
+import { describe, it, expect } from 'vitest'
 import { THERMOCYCLER_PROFILE, THERMOCYCLER_STATE } from '../../../../constants'
 import { getDefaultsForStepType } from '../../getDefaultsForStepType'
 import { thermocyclerFormToArgs } from '../thermocyclerFormToArgs'
-import { FormData } from '../../../../form-types'
 import type {
   ThermocyclerStateStepArgs,
   ThermocyclerProfileStepArgs,
 } from '@opentrons/step-generation'
+import type { FormData } from '../../../../form-types'
 const tcModuleId = 'tcModuleId'
 
 describe('thermocyclerFormToArgs', () => {

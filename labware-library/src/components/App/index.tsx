@@ -1,6 +1,5 @@
 // main application wrapper component
 import * as React from 'react'
-import { hot } from 'react-hot-loader/root'
 import cx from 'classnames'
 
 import { DefinitionRoute } from '../../definitions'
@@ -10,7 +9,7 @@ import { Sidebar } from '../Sidebar'
 import { Page } from './Page'
 import { LabwareList } from '../LabwareList'
 import { LabwareDetails } from '../LabwareDetails'
-import styles from './styles.css'
+import styles from './styles.module.css'
 
 import type { DefinitionRouteRenderProps } from '../../definitions'
 
@@ -49,8 +48,6 @@ export function AppComponent(props: DefinitionRouteRenderProps): JSX.Element {
   )
 }
 
-export function AppWithRoute(): JSX.Element {
+export function App(): JSX.Element {
   return <DefinitionRoute render={props => <AppComponent {...props} />} />
 }
-
-export const App = hot(AppWithRoute)

@@ -3,27 +3,27 @@ import styled from 'styled-components'
 import flatMap from 'lodash/flatMap'
 import { animated, useSpring, easings } from '@react-spring/web'
 import {
-  LabwareWell,
-  LoadedModule,
   getDeckDefFromRobotType,
   getModuleDef2,
   getPositionFromSlotId,
-  LoadedLabware,
 } from '@opentrons/shared-data'
 
-import { COLORS } from '../../ui-style-constants'
+import { COLORS } from '../../helix-design-system'
 import { IDENTITY_AFFINE_TRANSFORM, multiplyMatrices } from '../utils'
-import { StyledDeck } from './StyledDeck'
+import { BaseDeck } from '../BaseDeck'
 
 import type {
+  LoadedLabware,
+  LabwareWell,
+  LoadedModule,
   Coordinates,
   LabwareDefinition2,
   LabwareLocation,
   RobotType,
   DeckDefinition,
+  DeckConfiguration,
 } from '@opentrons/shared-data'
 import type { StyleProps } from '../../primitives'
-import type { TrashCutoutId } from './FlexTrash'
 
 const getModulePosition = (
   deckDef: DeckDefinition,
@@ -137,9 +137,9 @@ interface MoveLabwareOnDeckProps extends StyleProps {
   finalLabwareLocation: LabwareLocation
   loadedModules: LoadedModule[]
   loadedLabware: LoadedLabware[]
+  deckConfig: DeckConfiguration
   backgroundItems?: React.ReactNode
   deckFill?: string
-  trashCutoutId?: TrashCutoutId
 }
 export function MoveLabwareOnDeck(
   props: MoveLabwareOnDeckProps
@@ -151,9 +151,8 @@ export function MoveLabwareOnDeck(
     initialLabwareLocation,
     finalLabwareLocation,
     loadedModules,
+    deckConfig,
     backgroundItems = null,
-    deckFill = '#e6e6e6',
-    trashCutoutId,
     ...styleProps
   } = props
   const deckDef = React.useMemo(() => getDeckDefFromRobotType(robotType), [
@@ -215,27 +214,16 @@ export function MoveLabwareOnDeck(
 
   if (deckDef == null) return null
 
-  const [viewBoxOriginX, viewBoxOriginY] = deckDef.cornerOffsetFromOrigin
-  const [deckXDimension, deckYDimension] = deckDef.dimensions
-  const wholeDeckViewBox = `${viewBoxOriginX} ${viewBoxOriginY} ${deckXDimension} ${deckYDimension}`
-
   return (
-    <AnimatedSvg
-      viewBox={wholeDeckViewBox}
-      opacity="1"
-      style={{ opacity: springProps.deckOpacity }}
-      transform="scale(1, -1)" // reflect horizontally about the center
-      {...styleProps}
+    <BaseDeck
+      deckConfig={deckConfig}
+      robotType={robotType}
+      svgProps={{
+        style: { opacity: springProps.deckOpacity },
+        ...styleProps,
+      }}
+      animatedSVG
     >
-      {deckDef != null && (
-        // TODO(bh, 2023-11-06): change reference to BaseDeck, pass in deck config as prop, render animation as children
-        <StyledDeck
-          deckFill={deckFill}
-          layerBlocklist={[]}
-          robotType={robotType}
-          trashCutoutId={trashCutoutId}
-        />
-      )}
       {backgroundItems}
       <AnimatedG style={{ x: springProps.x, y: springProps.y }}>
         <g
@@ -245,7 +233,7 @@ export function MoveLabwareOnDeck(
             x={OUTLINE_THICKNESS_MM}
             y={OUTLINE_THICKNESS_MM}
             strokeWidth={OUTLINE_THICKNESS_MM}
-            stroke={COLORS.blueEnabled}
+            stroke={COLORS.blue50}
             fill={COLORS.white}
             width={
               movedLabwareDef.dimensions.xDimension - 2 * OUTLINE_THICKNESS_MM
@@ -268,7 +256,7 @@ export function MoveLabwareOnDeck(
           <AnimatedG style={{ opacity: springProps.splashOpacity }}>
             <path
               d="M158.027 111.537L154.651 108.186M145.875 113L145.875 109.253M161 99.3038L156.864 99.3038M11.9733 10.461L15.3495 13.8128M24.1255 9L24.1254 12.747M9 22.6962L13.1357 22.6962"
-              stroke={COLORS.blueEnabled}
+              stroke={COLORS.blue50}
               strokeWidth="3.57"
               strokeLinecap="round"
               transform="scale(.97, -1) translate(-19, -104)"
@@ -276,15 +264,14 @@ export function MoveLabwareOnDeck(
           </AnimatedG>
         </g>
       </AnimatedG>
-    </AnimatedSvg>
+    </BaseDeck>
   )
 }
 
 /**
  * These animated components needs to be split out because react-spring and styled-components don't play nice
  * @see https://github.com/pmndrs/react-spring/issues/1515 */
-const AnimatedG = styled(animated.g)<any>``
-const AnimatedSvg = styled(animated.svg)<any>``
+const AnimatedG = styled(animated.g as any)``
 
 interface WellProps {
   wellDef: LabwareWell
@@ -296,7 +283,7 @@ function Well(props: WellProps): JSX.Element {
   return wellDef.shape === 'rectangular' ? (
     <rect
       fill={COLORS.white}
-      stroke={COLORS.black}
+      stroke={COLORS.black90}
       x={x - wellDef.xDimension / 2}
       y={y - wellDef.yDimension / 2}
       width={wellDef.xDimension}
@@ -305,7 +292,7 @@ function Well(props: WellProps): JSX.Element {
   ) : (
     <circle
       fill={COLORS.white}
-      stroke={COLORS.black}
+      stroke={COLORS.black90}
       cx={x}
       cy={y}
       r={wellDef.diameter / 2}

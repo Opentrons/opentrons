@@ -1,3 +1,5 @@
+import { describe, it, expect } from 'vitest'
+
 import {
   setupEpicTestMocks,
   runEpicTest,
@@ -12,10 +14,6 @@ const makeTriggerActionAllCalibrations = (robotName: string) =>
   Actions.fetchTipLengthCalibrations(robotName)
 
 describe('fetch pipette offset calibration epics', () => {
-  afterEach(() => {
-    jest.resetAllMocks()
-  })
-
   it('calls GET /calibrations/tip_length', () => {
     const mocks = setupEpicTestMocks(
       makeTriggerActionAllCalibrations,

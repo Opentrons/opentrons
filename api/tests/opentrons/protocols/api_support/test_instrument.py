@@ -1,6 +1,11 @@
 import pytest
+import logging
+from typing import Optional
 from opentrons.protocol_api import ProtocolContext
-from opentrons.protocols.api_support.instrument import validate_takes_liquid
+from opentrons.protocols.api_support.instrument import (
+    validate_takes_liquid,
+    validate_tiprack,
+)
 from opentrons.types import Location, Point
 
 
@@ -125,3 +130,32 @@ def test_validate_takes_liquid_adapter(ctx):
             reject_module=False,
             reject_adapter=True,
         )
+
+
+@pytest.mark.parametrize(
+    argnames=["pipette_name", "log_value"],
+    argvalues=[
+        ["p1000_96", None],
+        [
+            "p50_single_flex",
+            "The pipette p50_single_flex and its tip rack opentrons_flex_96_tiprack_200ul appear to be mismatched. Please check your protocol.",
+        ],
+        [
+            "p20_single_gen2",
+            "The pipette p20_single_gen2 and its tip rack opentrons_flex_96_tiprack_200ul appear to be mismatched. Please check your protocol.",
+        ],
+    ],
+)
+def test_validate_tiprack(
+    ctx: ProtocolContext, caplog, pipette_name: str, log_value: Optional[str]
+):
+    tip_rack = ctx.load_labware("opentrons_flex_96_tiprack_200ul", 2)
+
+    with caplog.at_level(logging.WARNING):
+        log = logging.getLogger(__name__)
+        validate_tiprack(pipette_name, tip_rack, log=log)
+
+    if log_value:
+        assert caplog.messages[0] == log_value
+    else:
+        assert caplog.records == []

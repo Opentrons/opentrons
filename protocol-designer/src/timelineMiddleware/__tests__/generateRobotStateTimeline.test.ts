@@ -1,3 +1,4 @@
+import { describe, it, expect, vi } from 'vitest'
 import {
   getInitialRobotStateStandard,
   makeContext,
@@ -7,9 +8,13 @@ import {
   DEST_LABWARE,
   FIXED_TRASH_ID,
 } from '@opentrons/step-generation'
-import { StepArgsAndErrorsById } from '../../steplist'
+import { fixtureTiprack300ul, getLabwareDefURI } from '@opentrons/shared-data'
 import { generateRobotStateTimeline } from '../generateRobotStateTimeline'
-jest.mock('../../labware-defs/utils')
+import type { LabwareDefinition2 } from '@opentrons/shared-data'
+import type { StepArgsAndErrorsById } from '../../steplist'
+
+vi.mock('../../labware-defs/utils')
+
 describe('generateRobotStateTimeline', () => {
   it('performs eager tip dropping', () => {
     const allStepArgsAndErrors: StepArgsAndErrorsById = {
@@ -45,6 +50,12 @@ describe('generateRobotStateTimeline', () => {
           destWells: ['A12', 'A12'],
           mixBeforeAspirate: null,
           description: null,
+          nozzles: null,
+          tipRack: getLabwareDefURI(fixtureTiprack300ul as LabwareDefinition2),
+          aspirateXOffset: 0,
+          aspirateYOffset: 0,
+          dispenseXOffset: 0,
+          dispenseYOffset: 0,
         },
       },
       b: {
@@ -79,6 +90,12 @@ describe('generateRobotStateTimeline', () => {
           destWells: ['A12'],
           mixBeforeAspirate: null,
           description: null,
+          nozzles: null,
+          tipRack: getLabwareDefURI(fixtureTiprack300ul as LabwareDefinition2),
+          aspirateXOffset: 0,
+          aspirateYOffset: 0,
+          dispenseXOffset: 0,
+          dispenseYOffset: 0,
         },
       },
       c: {
@@ -105,6 +122,12 @@ describe('generateRobotStateTimeline', () => {
           blowoutOffsetFromTopMm: 0,
           aspirateDelaySeconds: null,
           dispenseDelaySeconds: null,
+          nozzles: null,
+          tipRack: getLabwareDefURI(fixtureTiprack300ul as LabwareDefinition2),
+          aspirateXOffset: 0,
+          aspirateYOffset: 0,
+          dispenseXOffset: 0,
+          dispenseYOffset: 0,
         },
       },
     }
@@ -124,34 +147,38 @@ describe('generateRobotStateTimeline', () => {
     )
     // NOTE: if you update this snapshot, make sure this it exhibits eager tip dropping
     expect(commandOverview).toMatchInlineSnapshot(`
-      Array [
-        Array [
+      [
+        [
           "pickUpTip",
           "aspirate",
           "dispense",
           "aspirate",
           "dispense",
-          "dropTip",
+          "moveToAddressableAreaForDropTip",
+          "dropTipInPlace",
         ],
-        Array [
+        [
           "pickUpTip",
           "aspirate",
           "dispense",
-          "dropTip",
+          "moveToAddressableAreaForDropTip",
+          "dropTipInPlace",
         ],
-        Array [
+        [
           "pickUpTip",
           "aspirate",
           "dispense",
           "aspirate",
           "dispense",
-          "dropTip",
+          "moveToAddressableAreaForDropTip",
+          "dropTipInPlace",
           "pickUpTip",
           "aspirate",
           "dispense",
           "aspirate",
           "dispense",
-          "dropTip",
+          "moveToAddressableAreaForDropTip",
+          "dropTipInPlace",
         ],
       ]
     `)

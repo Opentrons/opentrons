@@ -1,8 +1,5 @@
 import semver from 'semver'
-import {
-  UI_INITIALIZED,
-  UPDATE_BRIGHTNESS,
-} from '@opentrons/app/src/redux/shell/actions'
+import { UI_INITIALIZED, UPDATE_BRIGHTNESS } from './constants'
 import { createLogger } from './log'
 import { getConfig } from './config'
 import {
@@ -17,11 +14,15 @@ import type { ReleaseSetUrls } from './system-update/types'
 
 const log = createLogger('update')
 
-export const FLEX_MANIFEST_URL = _OPENTRONS_PROJECT_.includes('robot-stack')
-  ? 'https://builds.opentrons.com/ot3-oe/releases.json'
-  : 'https://ot3-development.builds.opentrons.com/ot3-oe/releases.json'
+const OPENTRONS_PROJECT: string = _OPENTRONS_PROJECT_
 
-let LATEST_OT_SYSTEM_VERSION = _PKG_VERSION_
+export const FLEX_MANIFEST_URL =
+  OPENTRONS_PROJECT && OPENTRONS_PROJECT.includes('robot-stack')
+    ? 'https://builds.opentrons.com/ot3-oe/releases.json'
+    : 'https://ot3-development.builds.opentrons.com/ot3-oe/releases.json'
+
+const PKG_VERSION = _PKG_VERSION_
+let LATEST_OT_SYSTEM_VERSION = PKG_VERSION
 
 const channelFinder = (version: string, channel: string): boolean => {
   // return the latest alpha/beta if a user subscribes to alpha/beta updates
@@ -59,7 +60,7 @@ export const updateLatestVersion = (): Promise<string> => {
         })
         .find(verson => channelFinder(verson, channel))
       const changed = LATEST_OT_SYSTEM_VERSION !== latestAvailableVersion
-      LATEST_OT_SYSTEM_VERSION = latestAvailableVersion ?? _PKG_VERSION_
+      LATEST_OT_SYSTEM_VERSION = latestAvailableVersion ?? PKG_VERSION
       if (changed) {
         log.info(
           `Update: latest version available from ${FLEX_MANIFEST_URL} is ${latestAvailableVersion}`
@@ -79,7 +80,7 @@ export const getLatestVersion = (): string => {
   return LATEST_OT_SYSTEM_VERSION
 }
 
-export const getCurrentVersion = (): string => _PKG_VERSION_
+export const getCurrentVersion = (): string => PKG_VERSION
 
 export const isUpdateAvailable = (): boolean =>
   getLatestVersion() !== getCurrentVersion()

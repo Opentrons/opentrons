@@ -1,25 +1,29 @@
 import * as React from 'react'
+import { createPortal } from 'react-dom'
 import round from 'lodash/round'
+import { useTranslation } from 'react-i18next'
 import {
   AlertModal,
   FormGroup,
   RadioGroup,
   InputField,
+  Flex,
+  useHoverTooltip,
+  Tooltip,
 } from '@opentrons/components'
-import { i18n } from '../../../../localization'
-import { Portal } from '../../../portals/MainPageModalPortal'
-import modalStyles from '../../../modals/modal.css'
-import stepFormStyles from '../../StepEditForm.css'
-import styles from './FlowRateInput.css'
-import { FieldProps } from '../../types'
+import { getMainPagePortalEl } from '../../../portals/MainPageModalPortal'
+import type { FieldProps } from '../../types'
 
-const DEFAULT_LABEL = i18n.t('form.step_edit_form.field.flow_rate.label')
+import modalStyles from '../../../modals/modal.module.css'
+import stepFormStyles from '../../StepEditForm.module.css'
+import styles from './FlowRateInput.module.css'
+
 const DECIMALS_ALLOWED = 1
 
 /** When flow rate is falsey (including 0), it means 'use default' */
 export interface FlowRateInputProps extends FieldProps {
   defaultFlowRate?: number | null
-  flowRateType: 'aspirate' | 'dispense'
+  flowRateType: 'aspirate' | 'dispense' | 'blowout'
   label?: string | null
   minFlowRate: number
   maxFlowRate: number
@@ -46,7 +50,11 @@ export const FlowRateInput = (props: FlowRateInputProps): JSX.Element => {
     minFlowRate,
     name,
     pipetteDisplayName,
+    tooltipContent,
   } = props
+  const [targetProps, tooltipProps] = useHoverTooltip()
+  const { t } = useTranslation(['form', 'application', 'shared'])
+  const DEFAULT_LABEL = t('step_edit_form.field.flow_rate.label')
 
   const initialState: State = {
     isPristine: true,
@@ -110,7 +118,10 @@ export const FlowRateInput = (props: FlowRateInputProps): JSX.Element => {
 
   // show 0.1 not 0 as minimum, since bottom of range is non-inclusive
   const displayMinFlowRate = minFlowRate || Math.pow(10, -DECIMALS_ALLOWED)
-  const rangeDescription = `between ${displayMinFlowRate} and ${maxFlowRate}`
+  const rangeDescription = t('step_edit_form.field.flow_rate.range', {
+    min: displayMinFlowRate,
+    max: maxFlowRate,
+  })
   const outOfBounds =
     modalFlowRateNum === 0 ||
     minFlowRate > modalFlowRateNum ||
@@ -124,11 +135,14 @@ export const FlowRateInput = (props: FlowRateInputProps): JSX.Element => {
   // and pristinity only masks the outOfBounds error, not the correctDecimals error
   if (!modalUseDefault) {
     if (!Number.isNaN(modalFlowRateNum) && !correctDecimals) {
-      errorMessage = `a max of ${DECIMALS_ALLOWED} decimal place${
-        DECIMALS_ALLOWED > 1 ? 's' : ''
-      } is allowed`
+      errorMessage = t('step_edit_form.field.flow_rate.error_decimals', {
+        decimals: `${DECIMALS_ALLOWED}`,
+      })
     } else if (!isPristine && outOfBounds) {
-      errorMessage = `accepted range is ${displayMinFlowRate} to ${maxFlowRate}`
+      errorMessage = t('step_edit_form.field.flow_rate.error_out_of_bounds', {
+        min: displayMinFlowRate,
+        max: maxFlowRate,
+      })
     }
   }
 
@@ -140,33 +154,35 @@ export const FlowRateInput = (props: FlowRateInputProps): JSX.Element => {
       isIndeterminate={isIndeterminate && modalFlowRate === null}
       name={`${name}_customFlowRate`}
       onChange={handleChangeNumber}
-      units={i18n.t('application.units.microliterPerSec')}
+      units={t('application:units.microliterPerSec')}
       value={`${modalFlowRate || ''}`}
     />
   )
 
-  const FlowRateModal = pipetteDisplayName && (
-    <Portal>
+  const FlowRateModal =
+    pipetteDisplayName &&
+    createPortal(
       <AlertModal
         alertOverlay
         className={modalStyles.modal}
         buttons={[
           {
-            children: 'Cancel',
+            children: t('shared:cancel'),
             onClick: cancelModal,
           },
           {
-            children: 'Done',
+            children: t('shared:done'),
             onClick: makeSaveModal(allowSave),
             disabled: isPristine ? false : !allowSave,
           },
         ]}
       >
-        <h3 className={styles.header}>Flow Rate</h3>
+        <h3 className={styles.header}>{DEFAULT_LABEL}</h3>
 
         <div className={styles.description}>
-          {`Our default aspirate speed is optimal for a ${pipetteDisplayName}
-            aspirating liquids with a viscosity similar to water`}
+          {t('step_edit_form.field.flow_rate.default_text', {
+            displayName: pipetteDisplayName,
+          })}
         </div>
 
         <div className={styles.flow_rate_type_label}>
@@ -179,8 +195,8 @@ export const FlowRateInput = (props: FlowRateInputProps): JSX.Element => {
           onChange={handleChangeRadio}
           options={[
             {
-              name: `${defaultFlowRate || '?'} ${i18n.t(
-                'application.units.microliterPerSec'
+              name: `${defaultFlowRate || '?'} ${t(
+                'application:units.microliterPerSec'
               )} (default)`,
               value: 'default',
             },
@@ -191,26 +207,42 @@ export const FlowRateInput = (props: FlowRateInputProps): JSX.Element => {
             },
           ]}
         />
-      </AlertModal>
-    </Portal>
-  )
+      </AlertModal>,
+      getMainPagePortalEl()
+    )
 
   return (
-    <React.Fragment>
-      <FormGroup label={label || DEFAULT_LABEL} disabled={disabled}>
-        <InputField
-          className={className || stepFormStyles.small_field}
-          disabled={disabled}
-          isIndeterminate={isIndeterminate}
-          name={name}
-          onClick={openModal}
-          readOnly
-          units={i18n.t('application.units.microliterPerSec')}
-          value={props.value ? String(props.value) : 'default'}
-        />
-      </FormGroup>
+    <>
+      {flowRateType === 'blowout' ? (
+        <Flex {...targetProps}>
+          <InputField
+            className={className || stepFormStyles.small_field}
+            disabled={disabled}
+            isIndeterminate={isIndeterminate}
+            name={name}
+            onClick={openModal}
+            readOnly
+            units={t('application:units.microliterPerSec')}
+            value={props.value ? String(props.value) : 'default'}
+          />
+          <Tooltip {...tooltipProps}>{tooltipContent}</Tooltip>
+        </Flex>
+      ) : (
+        <FormGroup label={label || DEFAULT_LABEL} disabled={disabled}>
+          <InputField
+            className={className || stepFormStyles.small_field}
+            disabled={disabled}
+            isIndeterminate={isIndeterminate}
+            name={name}
+            onClick={openModal}
+            readOnly
+            units={t('application:units.microliterPerSec')}
+            value={props.value ? String(props.value) : 'default'}
+          />
+        </FormGroup>
+      )}
 
       {showModal && FlowRateModal}
-    </React.Fragment>
+    </>
   )
 }

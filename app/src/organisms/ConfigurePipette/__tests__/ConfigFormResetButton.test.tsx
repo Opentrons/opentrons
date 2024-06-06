@@ -1,6 +1,8 @@
 import * as React from 'react'
-import { fireEvent } from '@testing-library/react'
-import { renderWithProviders } from '@opentrons/components'
+import { fireEvent, screen } from '@testing-library/react'
+import { vi, it, expect, describe, beforeEach } from 'vitest'
+
+import { renderWithProviders } from '../../../__testing-utils__'
 import { i18n } from '../../../i18n'
 import { ConfigFormResetButton } from '../ConfigFormResetButton'
 
@@ -14,21 +16,18 @@ describe('ConfigFormResetButton', () => {
   let props: React.ComponentProps<typeof ConfigFormResetButton>
   beforeEach(() => {
     props = {
-      onClick: jest.fn(),
+      onClick: vi.fn(),
       disabled: false,
     }
   })
-  afterEach(() => {
-    jest.resetAllMocks()
-  })
 
   it('renders text and not disabled', () => {
-    const { getByRole, getByText } = render(props)
-    const button = getByRole('button', { name: 'Reset all' })
-    getByText(
+    render(props)
+    const button = screen.getByRole('button', { name: 'Reset all' })
+    screen.getByText(
       'These are advanced settings. Please do not attempt to adjust without assistance from Opentrons Support. Changing these settings may affect the lifespan of your pipette.'
     )
-    getByText(
+    screen.getByText(
       'These settings do not override any pipette settings defined in protocols.'
     )
     fireEvent.click(button)
@@ -36,11 +35,11 @@ describe('ConfigFormResetButton', () => {
   })
   it('renders button text and is disabled', () => {
     props = {
-      onClick: jest.fn(),
+      onClick: vi.fn(),
       disabled: true,
     }
-    const { getByRole } = render(props)
-    const button = getByRole('button', { name: 'Reset all' })
+    render(props)
+    const button = screen.getByRole('button', { name: 'Reset all' })
     expect(button).toBeDisabled()
   })
 })

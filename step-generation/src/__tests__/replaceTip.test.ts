@@ -1,4 +1,11 @@
+import { beforeEach, describe, it, expect } from 'vitest'
 import merge from 'lodash/merge'
+import {
+  COLUMN,
+  fixtureTiprack1000ul,
+  fixtureTiprack300ul,
+  getLabwareDefURI,
+} from '@opentrons/shared-data'
 import {
   getInitialRobotStateStandard,
   makeContext,
@@ -10,15 +17,19 @@ import {
   dropTipInPlaceHelper,
   moveToAddressableAreaHelper,
   DEFAULT_PIPETTE,
+  PIPETTE_96,
 } from '../fixtures'
-import { FIXED_TRASH_ID } from '..'
 import { replaceTip } from '../commandCreators/atomic/replaceTip'
+import { FIXED_TRASH_ID } from '../constants'
+import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import type { InvariantContext, RobotState } from '../types'
 
 const tiprack1Id = 'tiprack1Id'
 const tiprack2Id = 'tiprack2Id'
 const tiprack4Id = 'tiprack4Id'
 const tiprack5Id = 'tiprack5Id'
+const tiprackURI1 = getLabwareDefURI(fixtureTiprack300ul as LabwareDefinition2)
+const tiprackURI2 = getLabwareDefURI(fixtureTiprack1000ul as LabwareDefinition2)
 const p300SingleId = DEFAULT_PIPETTE
 const p300MultiId = 'p300MultiId'
 const p100096Id = 'p100096Id'
@@ -36,6 +47,7 @@ describe('replaceTip', () => {
         {
           pipette: p300SingleId,
           dropTipLocation: FIXED_TRASH_ID,
+          tipRack: tiprackURI1,
         },
         invariantContext,
         initialRobotState
@@ -48,6 +60,7 @@ describe('replaceTip', () => {
         {
           pipette: p300SingleId,
           dropTipLocation: FIXED_TRASH_ID,
+          tipRack: tiprackURI1,
         },
         invariantContext,
         merge({}, initialRobotState, {
@@ -81,6 +94,7 @@ describe('replaceTip', () => {
         {
           pipette: p300SingleId,
           dropTipLocation: FIXED_TRASH_ID,
+          tipRack: tiprackURI1,
         },
         invariantContext,
         initialTestRobotState
@@ -105,12 +119,59 @@ describe('replaceTip', () => {
         {
           pipette: p300SingleId,
           dropTipLocation: FIXED_TRASH_ID,
+          tipRack: tiprackURI1,
         },
         invariantContext,
         initialTestRobotState
       )
       const res = getSuccessResult(result)
-      expect(res.commands).toEqual([dropTipHelper('A1'), pickUpTipHelper('B1')])
+      expect(res.commands).toEqual([
+        ...dropTipHelper(p300SingleId),
+        pickUpTipHelper('B1'),
+      ])
+    })
+    it('96-channel full tip and emits the configure nozzle layout command before picking up tip', () => {
+      const initialTestRobotState = merge({}, initialRobotState, {
+        tipState: {
+          tipracks: {
+            [tiprack1Id]: {
+              A1: false,
+            },
+          },
+          pipettes: {
+            [PIPETTE_96]: true,
+          },
+        },
+        pipettes: {
+          [PIPETTE_96]: { nozzles: 'ALL' },
+        },
+      })
+      const result = replaceTip(
+        {
+          pipette: PIPETTE_96,
+          dropTipLocation: FIXED_TRASH_ID,
+          tipRack: tiprackURI1,
+          nozzles: COLUMN,
+        },
+        invariantContext,
+        initialTestRobotState
+      )
+      const res = getSuccessResult(result)
+      expect(res.commands).toEqual([
+        ...dropTipHelper(PIPETTE_96),
+        {
+          commandType: 'configureNozzleLayout',
+          key: expect.any(String),
+          params: {
+            pipetteId: PIPETTE_96,
+            configurationParams: {
+              primaryNozzle: 'A12',
+              style: COLUMN,
+            },
+          },
+        },
+        pickUpTipHelper('A2', { pipetteId: PIPETTE_96 }),
+      ])
     })
     it('Single-channel: used all tips in first rack, move to second rack', () => {
       const initialTestRobotState = merge({}, initialRobotState, {
@@ -127,6 +188,7 @@ describe('replaceTip', () => {
         {
           pipette: p300SingleId,
           dropTipLocation: FIXED_TRASH_ID,
+          tipRack: tiprackURI1,
         },
         invariantContext,
         initialTestRobotState
@@ -165,6 +227,7 @@ describe('replaceTip', () => {
         {
           pipette: p300SingleId,
           dropTipLocation: 'wasteChuteId',
+          tipRack: tiprackURI1,
         },
         invariantContext,
         initialTestRobotState
@@ -183,6 +246,7 @@ describe('replaceTip', () => {
         {
           pipette: p300MultiId,
           dropTipLocation: FIXED_TRASH_ID,
+          tipRack: tiprackURI1,
         },
         invariantContext,
         initialRobotState
@@ -209,6 +273,7 @@ describe('replaceTip', () => {
         {
           pipette: p300MultiId,
           dropTipLocation: FIXED_TRASH_ID,
+          tipRack: tiprackURI1,
         },
         invariantContext,
         robotStateWithTipA1Missing
@@ -234,15 +299,14 @@ describe('replaceTip', () => {
         {
           pipette: p300MultiId,
           dropTipLocation: FIXED_TRASH_ID,
+          tipRack: tiprackURI1,
         },
         invariantContext,
         robotStateWithTipsOnMulti
       )
       const res = getSuccessResult(result)
       expect(res.commands).toEqual([
-        dropTipHelper('A1', {
-          pipetteId: p300MultiId,
-        }),
+        ...dropTipHelper(p300MultiId),
         pickUpTipHelper('A1', {
           pipetteId: p300MultiId,
         }),
@@ -250,9 +314,10 @@ describe('replaceTip', () => {
     })
   })
   describe('replaceTip: 96-channel', () => {
-    it('96-channel, dropping tips in waste chute', () => {
+    it('96-channel, dropping 1 column of tips in waste chute', () => {
       invariantContext = {
         ...invariantContext,
+
         additionalEquipmentEntities: {
           wasteChuteId: {
             name: 'wasteChute',
@@ -261,7 +326,9 @@ describe('replaceTip', () => {
           },
         },
       }
-      const initialTestRobotState = merge({}, initialRobotState, {
+      initialRobotState = {
+        ...initialRobotState,
+        pipettes: { p100096Id: { mount: 'left', nozzles: COLUMN } },
         tipState: {
           tipracks: {
             [tiprack4Id]: getTiprackTipstate(false),
@@ -271,14 +338,17 @@ describe('replaceTip', () => {
             p100096Id: true,
           },
         },
-      })
+      }
+
       const result = replaceTip(
         {
           pipette: p100096Id,
           dropTipLocation: 'wasteChuteId',
+          tipRack: tiprackURI2,
+          nozzles: COLUMN,
         },
         invariantContext,
-        initialTestRobotState
+        initialRobotState
       )
       const res = getSuccessResult(result)
       expect(res.commands).toEqual([

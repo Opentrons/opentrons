@@ -1,71 +1,79 @@
 import * as React from 'react'
-import { renderWithProviders } from '@opentrons/components'
+import { it, expect, describe } from 'vitest'
+import { screen } from '@testing-library/react'
+
 import {
-  AspirateInPlaceRunTimeCommand,
-  BlowoutInPlaceRunTimeCommand,
-  DispenseInPlaceRunTimeCommand,
-  DropTipInPlaceRunTimeCommand,
   FLEX_ROBOT_TYPE,
-  MoveToAddressableAreaRunTimeCommand,
-  PrepareToAspirateRunTimeCommand,
+  OT2_ROBOT_TYPE,
+  GRIPPER_WASTE_CHUTE_ADDRESSABLE_AREA,
 } from '@opentrons/shared-data'
+import { renderWithProviders } from '../../../__testing-utils__'
 import { i18n } from '../../../i18n'
 import { CommandText } from '../'
-import { mockRobotSideAnalysis } from '../__fixtures__'
+import { mockCommandTextData } from '../__fixtures__'
+import { getCommandTextData } from '../utils/getCommandTextData'
 
 import type {
+  AspirateInPlaceRunTimeCommand,
+  BlowoutInPlaceRunTimeCommand,
   BlowoutRunTimeCommand,
+  CompletedProtocolAnalysis,
   ConfigureForVolumeRunTimeCommand,
+  DispenseInPlaceRunTimeCommand,
   DispenseRunTimeCommand,
+  DropTipInPlaceRunTimeCommand,
   DropTipRunTimeCommand,
   LabwareDefinition2,
   LoadLabwareRunTimeCommand,
   LoadLiquidRunTimeCommand,
+  MoveToAddressableAreaRunTimeCommand,
   MoveToWellRunTimeCommand,
+  PrepareToAspirateRunTimeCommand,
   RunTimeCommand,
+  MoveToAddressableAreaForDropTipRunTimeCommand,
 } from '@opentrons/shared-data'
 
 describe('CommandText', () => {
   it('renders correct text for aspirate', () => {
-    const command = mockRobotSideAnalysis.commands.find(
+    const command = mockCommandTextData.commands.find(
       c => c.commandType === 'aspirate'
     )
     expect(command).not.toBeUndefined()
     if (command != null) {
-      const { getByText } = renderWithProviders(
+      renderWithProviders(
         <CommandText
-          robotSideAnalysis={mockRobotSideAnalysis}
+          commandTextData={mockCommandTextData}
           robotType={FLEX_ROBOT_TYPE}
           command={command}
         />,
         { i18nInstance: i18n }
-      )[0]
-      getByText(
+      )
+      screen.getByText(
         'Aspirating 100 µL from well A1 of NEST 1 Well Reservoir 195 mL in Slot 5 at 150 µL/sec'
       )
     }
   })
   it('renders correct text for dispense without pushOut', () => {
-    const command = mockRobotSideAnalysis.commands.find(
+    const command = mockCommandTextData.commands.find(
       c => c.commandType === 'dispense'
     )
     expect(command).not.toBeUndefined()
     if (command != null) {
-      const { getByText } = renderWithProviders(
+      renderWithProviders(
         <CommandText
-          robotSideAnalysis={mockRobotSideAnalysis}
+          commandTextData={mockCommandTextData}
           robotType={FLEX_ROBOT_TYPE}
           command={command}
         />,
         { i18nInstance: i18n }
-      )[0]
-      getByText(
+      )
+      screen.getByText(
         'Dispensing 100 µL into well A1 of NEST 96 Well Plate 100 µL PCR Full Skirt (1) in Magnetic Module GEN2 in Slot 1 at 300 µL/sec'
       )
     }
   })
   it('renders correct text for dispense with pushOut', () => {
-    const command = mockRobotSideAnalysis.commands.find(
+    const command = mockCommandTextData.commands.find(
       c => c.commandType === 'dispense'
     )
     const pushOutDispenseCommand = {
@@ -77,23 +85,23 @@ describe('CommandText', () => {
     } as DispenseRunTimeCommand
     expect(pushOutDispenseCommand).not.toBeUndefined()
     if (pushOutDispenseCommand != null) {
-      const { getByText } = renderWithProviders(
+      renderWithProviders(
         <CommandText
-          robotSideAnalysis={mockRobotSideAnalysis}
+          commandTextData={mockCommandTextData}
           robotType={FLEX_ROBOT_TYPE}
           command={pushOutDispenseCommand}
         />,
         { i18nInstance: i18n }
-      )[0]
-      getByText(
+      )
+      screen.getByText(
         'Dispensing 100 µL into well A1 of NEST 96 Well Plate 100 µL PCR Full Skirt (1) in Magnetic Module GEN2 in Slot 1 at 300 µL/sec and pushing out 10 µL'
       )
     }
   })
   it('renders correct text for dispenseInPlace', () => {
-    const { getByText } = renderWithProviders(
+    renderWithProviders(
       <CommandText
-        robotSideAnalysis={mockRobotSideAnalysis}
+        commandTextData={mockCommandTextData}
         robotType={FLEX_ROBOT_TYPE}
         command={
           {
@@ -107,11 +115,11 @@ describe('CommandText', () => {
         }
       />,
       { i18nInstance: i18n }
-    )[0]
-    getByText('Dispensing 50 µL in place at 300 µL/sec')
+    )
+    screen.getByText('Dispensing 50 µL in place at 300 µL/sec')
   })
   it('renders correct text for blowout', () => {
-    const dispenseCommand = mockRobotSideAnalysis.commands.find(
+    const dispenseCommand = mockCommandTextData.commands.find(
       c => c.commandType === 'dispense'
     )
     const blowoutCommand = {
@@ -120,23 +128,23 @@ describe('CommandText', () => {
     } as BlowoutRunTimeCommand
     expect(blowoutCommand).not.toBeUndefined()
     if (blowoutCommand != null) {
-      const { getByText } = renderWithProviders(
+      renderWithProviders(
         <CommandText
-          robotSideAnalysis={mockRobotSideAnalysis}
+          commandTextData={mockCommandTextData}
           robotType={FLEX_ROBOT_TYPE}
           command={blowoutCommand}
         />,
         { i18nInstance: i18n }
-      )[0]
-      getByText(
+      )
+      screen.getByText(
         'Blowing out at well A1 of NEST 96 Well Plate 100 µL PCR Full Skirt (1) in Magnetic Module GEN2 in Slot 1 at 300 µL/sec'
       )
     }
   })
   it('renders correct text for blowOutInPlace', () => {
-    const { getByText } = renderWithProviders(
+    renderWithProviders(
       <CommandText
-        robotSideAnalysis={mockRobotSideAnalysis}
+        commandTextData={mockCommandTextData}
         robotType={FLEX_ROBOT_TYPE}
         command={
           {
@@ -149,13 +157,13 @@ describe('CommandText', () => {
         }
       />,
       { i18nInstance: i18n }
-    )[0]
-    getByText('Blowing out in place at 300 µL/sec')
+    )
+    screen.getByText('Blowing out in place at 300 µL/sec')
   })
   it('renders correct text for aspirateInPlace', () => {
-    const { getByText } = renderWithProviders(
+    renderWithProviders(
       <CommandText
-        robotSideAnalysis={mockRobotSideAnalysis}
+        commandTextData={mockCommandTextData}
         robotType={FLEX_ROBOT_TYPE}
         command={
           {
@@ -169,11 +177,11 @@ describe('CommandText', () => {
         }
       />,
       { i18nInstance: i18n }
-    )[0]
-    getByText('Aspirating 10 µL in place at 300 µL/sec')
+    )
+    screen.getByText('Aspirating 10 µL in place at 300 µL/sec')
   })
   it('renders correct text for moveToWell', () => {
-    const dispenseCommand = mockRobotSideAnalysis.commands.find(
+    const dispenseCommand = mockCommandTextData.commands.find(
       c => c.commandType === 'aspirate'
     )
     const moveToWellCommand = {
@@ -182,37 +190,148 @@ describe('CommandText', () => {
     } as MoveToWellRunTimeCommand
     expect(moveToWellCommand).not.toBeUndefined()
     if (moveToWellCommand != null) {
-      const { getByText } = renderWithProviders(
+      renderWithProviders(
         <CommandText
-          robotSideAnalysis={mockRobotSideAnalysis}
+          commandTextData={mockCommandTextData}
           robotType={FLEX_ROBOT_TYPE}
           command={moveToWellCommand}
         />,
         { i18nInstance: i18n }
-      )[0]
-      getByText('Moving to well A1 of NEST 1 Well Reservoir 195 mL in Slot 5')
+      )
+      screen.getByText(
+        'Moving to well A1 of NEST 1 Well Reservoir 195 mL in Slot 5'
+      )
     }
   })
-  it('renders correct text for moveToAddressableArea', () => {
-    const { getByText } = renderWithProviders(
+  it('renders correct text for labware involving an addressable area slot', () => {
+    renderWithProviders(
       <CommandText
-        robotSideAnalysis={mockRobotSideAnalysis}
+        command={{
+          commandType: 'moveLabware',
+          params: {
+            strategy: 'usingGripper',
+            labwareId: mockCommandTextData.labware[2].id,
+            newLocation: { addressableAreaName: '5' },
+          },
+          id: 'def456',
+          result: { offsetId: 'fake_offset_id' },
+          status: 'queued',
+          error: null,
+          createdAt: 'fake_timestamp',
+          startedAt: null,
+          completedAt: null,
+        }}
+        commandTextData={mockCommandTextData}
+        robotType={FLEX_ROBOT_TYPE}
+      />,
+      {
+        i18nInstance: i18n,
+      }
+    )
+    screen.getByText(
+      'Moving Opentrons 96 Tip Rack 300 µL using gripper from Slot 9 to Slot 5'
+    )
+  })
+  it('renders correct text for moveToAddressableArea for Waste Chutes', () => {
+    renderWithProviders(
+      <CommandText
+        commandTextData={mockCommandTextData}
         robotType={FLEX_ROBOT_TYPE}
         command={
           {
+            id: 'aca688ed-4916-496d-aae8-ca0e6e56c47b',
             commandType: 'moveToAddressableArea',
             params: {
               pipetteId: 'f6d1c83c-9d1b-4d0d-9de3-e6d649739cfb',
-              addressableAreaName: 'D3',
-              speed: 200,
-              minimumZHeight: 100,
+              addressableAreaName: '1ChannelWasteChute',
             },
           } as MoveToAddressableAreaRunTimeCommand
         }
       />,
       { i18nInstance: i18n }
-    )[0]
-    getByText('Moving to D3 at 200 mm/s at 100 mm high')
+    )
+    screen.getByText('Moving to Waste Chute')
+  })
+  it('renders correct text for moveToAddressableArea for Fixed Trash', () => {
+    renderWithProviders(
+      <CommandText
+        commandTextData={mockCommandTextData}
+        robotType={OT2_ROBOT_TYPE}
+        command={
+          {
+            id: 'aca688ed-4916-496d-aae8-ca0e6e56c47c',
+            commandType: 'moveToAddressableArea',
+            params: {
+              pipetteId: 'f6d1c83c-9d1b-4d0d-9de3-e6d649739cfb',
+              addressableAreaName: 'fixedTrash',
+            },
+          } as MoveToAddressableAreaRunTimeCommand
+        }
+      />,
+      { i18nInstance: i18n }
+    )
+    screen.getByText('Moving to Fixed Trash')
+  })
+  it('renders correct text for moveToAddressableArea for Trash Bins', () => {
+    renderWithProviders(
+      <CommandText
+        commandTextData={mockCommandTextData}
+        robotType={OT2_ROBOT_TYPE}
+        command={
+          {
+            id: 'aca688ed-4916-496d-aae8-ca0e6e56c47d',
+            commandType: 'moveToAddressableArea',
+            params: {
+              pipetteId: 'f6d1c83c-9d1b-4d0d-9de3-e6d649739cfb',
+              addressableAreaName: 'movableTrashD3',
+            },
+          } as MoveToAddressableAreaRunTimeCommand
+        }
+      />,
+      { i18nInstance: i18n }
+    )
+    screen.getByText('Moving to Trash Bin in D3')
+  })
+  it('renders correct text for moveToAddressableAreaForDropTip for Trash Bin', () => {
+    renderWithProviders(
+      <CommandText
+        commandTextData={mockCommandTextData}
+        robotType={OT2_ROBOT_TYPE}
+        command={
+          {
+            id: 'aca688ed-4916-496d-aae8-ca0e6e56c47d',
+            commandType: 'moveToAddressableAreaForDropTip',
+            params: {
+              pipetteId: 'f6d1c83c-9d1b-4d0d-9de3-e6d649739cfb',
+              addressableAreaName: 'movableTrashD3',
+              alternateDropLocation: true,
+            },
+          } as MoveToAddressableAreaForDropTipRunTimeCommand
+        }
+      />,
+      { i18nInstance: i18n }
+    )
+    screen.getByText('Moving to Trash Bin in D3')
+  })
+  it('renders correct text for moveToAddressableArea for slots', () => {
+    renderWithProviders(
+      <CommandText
+        commandTextData={mockCommandTextData}
+        robotType={OT2_ROBOT_TYPE}
+        command={
+          {
+            id: 'aca688ed-4916-496d-aae8-ca0e6e56c47e',
+            commandType: 'moveToAddressableArea',
+            params: {
+              pipetteId: 'f6d1c83c-9d1b-4d0d-9de3-e6d649739cfb',
+              addressableAreaName: 'D3',
+            },
+          } as MoveToAddressableAreaRunTimeCommand
+        }
+      />,
+      { i18nInstance: i18n }
+    )
+    screen.getByText('Moving to D3')
   })
   it('renders correct text for configureForVolume', () => {
     const command = {
@@ -223,15 +342,15 @@ describe('CommandText', () => {
       },
     } as ConfigureForVolumeRunTimeCommand
 
-    const { getByText } = renderWithProviders(
+    renderWithProviders(
       <CommandText
-        robotSideAnalysis={mockRobotSideAnalysis}
+        commandTextData={mockCommandTextData}
         robotType={FLEX_ROBOT_TYPE}
         command={command}
       />,
       { i18nInstance: i18n }
-    )[0]
-    getByText('Configure P300 Single-Channel GEN1 to aspirate 1 µL')
+    )
+    screen.getByText('Configure P300 Single-Channel GEN1 to aspirate 1 µL')
   })
   it('renders correct text for prepareToAspirate', () => {
     const command = {
@@ -241,37 +360,37 @@ describe('CommandText', () => {
       },
     } as PrepareToAspirateRunTimeCommand
 
-    const { getByText } = renderWithProviders(
+    renderWithProviders(
       <CommandText
-        robotSideAnalysis={mockRobotSideAnalysis}
+        commandTextData={mockCommandTextData}
         robotType={FLEX_ROBOT_TYPE}
         command={command}
       />,
       { i18nInstance: i18n }
-    )[0]
-    getByText('Preparing P300 Single-Channel GEN1 to aspirate')
+    )
+    screen.getByText('Preparing P300 Single-Channel GEN1 to aspirate')
   })
   it('renders correct text for dropTip', () => {
-    const command = mockRobotSideAnalysis.commands.find(
+    const command = mockCommandTextData.commands.find(
       c => c.commandType === 'dropTip'
     )
     expect(command).not.toBeUndefined()
     if (command != null) {
-      const { getByText } = renderWithProviders(
+      renderWithProviders(
         <CommandText
-          robotSideAnalysis={mockRobotSideAnalysis}
+          commandTextData={mockCommandTextData}
           robotType={FLEX_ROBOT_TYPE}
           command={command}
         />,
         { i18nInstance: i18n }
-      )[0]
-      getByText('Dropping tip in A1 of Fixed Trash')
+      )
+      screen.getByText('Dropping tip in A1 of Fixed Trash')
     }
   })
   it('renders correct text for dropTip into a labware', () => {
-    const { getByText } = renderWithProviders(
+    renderWithProviders(
       <CommandText
-        robotSideAnalysis={mockRobotSideAnalysis}
+        commandTextData={mockCommandTextData}
         robotType={FLEX_ROBOT_TYPE}
         command={
           {
@@ -286,13 +405,15 @@ describe('CommandText', () => {
         }
       />,
       { i18nInstance: i18n }
-    )[0]
-    getByText('Returning tip to A1 of Opentrons 96 Tip Rack 300 µL in Slot 9')
+    )
+    screen.getByText(
+      'Returning tip to A1 of Opentrons 96 Tip Rack 300 µL in Slot 9'
+    )
   })
   it('renders correct text for dropTipInPlace', () => {
-    const { getByText } = renderWithProviders(
+    renderWithProviders(
       <CommandText
-        robotSideAnalysis={mockRobotSideAnalysis}
+        commandTextData={mockCommandTextData}
         robotType={FLEX_ROBOT_TYPE}
         command={
           {
@@ -304,111 +425,111 @@ describe('CommandText', () => {
         }
       />,
       { i18nInstance: i18n }
-    )[0]
-    getByText('Dropping tip in place')
+    )
+    screen.getByText('Dropping tip in place')
   })
   it('renders correct text for pickUpTip', () => {
-    const command = mockRobotSideAnalysis.commands.find(
+    const command = mockCommandTextData.commands.find(
       c => c.commandType === 'pickUpTip'
     )
     expect(command).not.toBeUndefined()
     if (command != null) {
-      const { getByText } = renderWithProviders(
+      renderWithProviders(
         <CommandText
-          robotSideAnalysis={mockRobotSideAnalysis}
+          commandTextData={mockCommandTextData}
           robotType={FLEX_ROBOT_TYPE}
           command={command}
         />,
         { i18nInstance: i18n }
-      )[0]
-      getByText(
+      )
+      screen.getByText(
         'Picking up tip(s) from A1 of Opentrons 96 Tip Rack 300 µL in Slot 9'
       )
     }
   })
   it('renders correct text for loadPipette', () => {
-    const command = mockRobotSideAnalysis.commands.find(
+    const command = mockCommandTextData.commands.find(
       c => c.commandType === 'loadPipette'
     )
     expect(command).not.toBeNull()
     if (command != null) {
-      const { getByText } = renderWithProviders(
+      renderWithProviders(
         <CommandText
-          robotSideAnalysis={mockRobotSideAnalysis}
+          commandTextData={mockCommandTextData}
           robotType={FLEX_ROBOT_TYPE}
           command={command}
         />,
         { i18nInstance: i18n }
-      )[0]
-      getByText('Load P300 Single-Channel GEN1 in Left Mount')
+      )
+      screen.getByText('Load P300 Single-Channel GEN1 in Left Mount')
     }
   })
   it('renders correct text for loadModule', () => {
-    const command = mockRobotSideAnalysis.commands.find(
+    const command = mockCommandTextData.commands.find(
       c => c.commandType === 'loadModule'
     )
     expect(command).not.toBeNull()
     if (command != null) {
-      const { getByText } = renderWithProviders(
+      renderWithProviders(
         <CommandText
-          robotSideAnalysis={mockRobotSideAnalysis}
+          commandTextData={mockCommandTextData}
           robotType={FLEX_ROBOT_TYPE}
           command={command}
         />,
         { i18nInstance: i18n }
-      )[0]
-      getByText('Load Magnetic Module GEN2 in Slot 1')
+      )
+      screen.getByText('Load Magnetic Module GEN2 in Slot 1')
     }
   })
   it('renders correct text for loadLabware that is category adapter in slot', () => {
-    const loadLabwareCommands = mockRobotSideAnalysis.commands.filter(
+    const loadLabwareCommands = mockCommandTextData.commands.filter(
       c => c.commandType === 'loadLabware'
     )
     const loadLabwareCommand = loadLabwareCommands[0]
-    const { getByText } = renderWithProviders(
+    renderWithProviders(
       <CommandText
-        robotSideAnalysis={mockRobotSideAnalysis}
+        commandTextData={mockCommandTextData}
         robotType={FLEX_ROBOT_TYPE}
         command={loadLabwareCommand}
       />,
       { i18nInstance: i18n }
-    )[0]
-    getByText('Load Opentrons 96 Flat Bottom Adapter in Slot 2')
+    )
+    screen.getByText('Load Opentrons 96 Flat Bottom Adapter in Slot 2')
   })
   it('renders correct text for loadLabware in slot', () => {
-    const loadLabwareCommands = mockRobotSideAnalysis.commands.filter(
+    const loadLabwareCommands = mockCommandTextData.commands.filter(
       c => c.commandType === 'loadLabware'
     )
     const loadTipRackCommand = loadLabwareCommands[2]
-    const { getByText } = renderWithProviders(
+    renderWithProviders(
       <CommandText
-        robotSideAnalysis={mockRobotSideAnalysis}
+        commandTextData={mockCommandTextData}
         robotType={FLEX_ROBOT_TYPE}
         command={loadTipRackCommand}
       />,
       { i18nInstance: i18n }
-    )[0]
-    getByText('Load Opentrons 96 Tip Rack 300 µL in Slot 9')
+    )
+    screen.getByText('Load Opentrons 96 Tip Rack 300 µL in Slot 9')
   })
   it('renders correct text for loadLabware in module', () => {
-    const loadLabwareCommands = mockRobotSideAnalysis.commands.filter(
+    const loadLabwareCommands = mockCommandTextData.commands.filter(
       c => c.commandType === 'loadLabware'
     )
     const loadOnModuleCommand = loadLabwareCommands[3]
-    const { getByText } = renderWithProviders(
+    renderWithProviders(
       <CommandText
-        robotSideAnalysis={mockRobotSideAnalysis}
+        commandTextData={mockCommandTextData}
         robotType={FLEX_ROBOT_TYPE}
         command={loadOnModuleCommand}
       />,
       { i18nInstance: i18n }
-    )[0]
-    getByText(
+    )
+    screen.getByText(
       'Load NEST 96 Well Plate 100 µL PCR Full Skirt in Magnetic Module GEN2 in Slot 1'
     )
   })
   it('renders correct text for loadLabware in adapter', () => {
-    const { getByText } = renderWithProviders(
+    renderWithProviders(
       <CommandText
         command={{
           commandType: 'loadLabware',
@@ -435,19 +556,19 @@ describe('CommandText', () => {
           startedAt: null,
           completedAt: null,
         }}
-        robotSideAnalysis={mockRobotSideAnalysis}
+        commandTextData={mockCommandTextData}
         robotType={FLEX_ROBOT_TYPE}
       />,
       {
         i18nInstance: i18n,
       }
-    )[0]
-    getByText(
+    )
+    screen.getByText(
       'Load mock displayName in Opentrons 96 Flat Bottom Adapter in Slot 2'
     )
   })
   it('renders correct text for loadLabware off deck', () => {
-    const loadLabwareCommands = mockRobotSideAnalysis.commands.filter(
+    const loadLabwareCommands = mockCommandTextData.commands.filter(
       c => c.commandType === 'loadLabware'
     )
     const loadOffDeckCommand = {
@@ -457,18 +578,18 @@ describe('CommandText', () => {
         location: 'offDeck',
       },
     } as LoadLabwareRunTimeCommand
-    const { getByText } = renderWithProviders(
+    renderWithProviders(
       <CommandText
-        robotSideAnalysis={mockRobotSideAnalysis}
+        commandTextData={mockCommandTextData}
         robotType={FLEX_ROBOT_TYPE}
         command={loadOffDeckCommand}
       />,
       { i18nInstance: i18n }
-    )[0]
-    getByText('Load NEST 96 Well Plate 100 µL PCR Full Skirt off deck')
+    )
+    screen.getByText('Load NEST 96 Well Plate 100 µL PCR Full Skirt off deck')
   })
   it('renders correct text for loadLiquid', () => {
-    const loadLabwareCommands = mockRobotSideAnalysis.commands.filter(
+    const loadLabwareCommands = mockCommandTextData.commands.filter(
       c => c.commandType === 'loadLabware'
     )
     const liquidId = 'zxcvbn'
@@ -479,7 +600,7 @@ describe('CommandText', () => {
       params: { liquidId, labwareId },
     } as LoadLiquidRunTimeCommand
     const analysisWithLiquids = {
-      ...mockRobotSideAnalysis,
+      ...mockCommandTextData,
       liquids: [
         {
           id: 'zxcvbn',
@@ -498,19 +619,21 @@ describe('CommandText', () => {
         },
       ],
     }
-    const { getByText } = renderWithProviders(
+    renderWithProviders(
       <CommandText
-        robotSideAnalysis={analysisWithLiquids}
+        commandTextData={getCommandTextData(
+          analysisWithLiquids as CompletedProtocolAnalysis
+        )}
         robotType={FLEX_ROBOT_TYPE}
         command={loadLiquidCommand}
       />,
       { i18nInstance: i18n }
-    )[0]
-    getByText('Load Water into fakeDisplayName')
+    )
+    screen.getByText('Load Water into fakeDisplayName')
   })
   it('renders correct text for temperatureModule/setTargetTemperature', () => {
     const mockTemp = 20
-    const { getByText } = renderWithProviders(
+    renderWithProviders(
       <CommandText
         command={{
           commandType: 'temperatureModule/setTargetTemperature',
@@ -523,18 +646,20 @@ describe('CommandText', () => {
           startedAt: null,
           completedAt: null,
         }}
-        robotSideAnalysis={mockRobotSideAnalysis}
+        commandTextData={mockCommandTextData}
         robotType={FLEX_ROBOT_TYPE}
       />,
       {
         i18nInstance: i18n,
       }
-    )[0]
-    getByText('Setting Temperature Module to 20°C (rounded to nearest integer)')
+    )
+    screen.getByText(
+      'Setting Temperature Module to 20°C (rounded to nearest integer)'
+    )
   })
   it('renders correct text for temperatureModule/waitForTemperature with target temp', () => {
     const mockTemp = 20
-    const { getByText } = renderWithProviders(
+    renderWithProviders(
       <CommandText
         command={{
           commandType: 'temperatureModule/waitForTemperature',
@@ -547,17 +672,17 @@ describe('CommandText', () => {
           startedAt: null,
           completedAt: null,
         }}
-        robotSideAnalysis={mockRobotSideAnalysis}
+        commandTextData={mockCommandTextData}
         robotType={FLEX_ROBOT_TYPE}
       />,
       {
         i18nInstance: i18n,
       }
-    )[0]
-    getByText('Waiting for Temperature Module to reach 20°C')
+    )
+    screen.getByText('Waiting for Temperature Module to reach 20°C')
   })
   it('renders correct text for temperatureModule/waitForTemperature with no specified temp', () => {
-    const { getByText } = renderWithProviders(
+    renderWithProviders(
       <CommandText
         command={{
           commandType: 'temperatureModule/waitForTemperature',
@@ -570,18 +695,20 @@ describe('CommandText', () => {
           startedAt: null,
           completedAt: null,
         }}
-        robotSideAnalysis={mockRobotSideAnalysis}
+        commandTextData={mockCommandTextData}
         robotType={FLEX_ROBOT_TYPE}
       />,
       {
         i18nInstance: i18n,
       }
-    )[0]
-    getByText('Waiting for Temperature Module to reach target temperature')
+    )
+    screen.getByText(
+      'Waiting for Temperature Module to reach target temperature'
+    )
   })
   it('renders correct text for thermocycler/setTargetBlockTemperature', () => {
     const mockTemp = 20
-    const { getByText } = renderWithProviders(
+    renderWithProviders(
       <CommandText
         command={{
           commandType: 'thermocycler/setTargetBlockTemperature',
@@ -594,20 +721,20 @@ describe('CommandText', () => {
           startedAt: null,
           completedAt: null,
         }}
-        robotSideAnalysis={mockRobotSideAnalysis}
+        commandTextData={mockCommandTextData}
         robotType={FLEX_ROBOT_TYPE}
       />,
       {
         i18nInstance: i18n,
       }
-    )[0]
-    getByText(
+    )
+    screen.getByText(
       'Setting Thermocycler block temperature to 20°C with hold time of 0 seconds after target reached'
     )
   })
   it('renders correct text for thermocycler/setTargetLidTemperature', () => {
     const mockTemp = 20
-    const { getByText } = renderWithProviders(
+    renderWithProviders(
       <CommandText
         command={{
           commandType: 'thermocycler/setTargetLidTemperature',
@@ -620,18 +747,18 @@ describe('CommandText', () => {
           startedAt: null,
           completedAt: null,
         }}
-        robotSideAnalysis={mockRobotSideAnalysis}
+        commandTextData={mockCommandTextData}
         robotType={FLEX_ROBOT_TYPE}
       />,
       {
         i18nInstance: i18n,
       }
-    )[0]
-    getByText('Setting Thermocycler lid temperature to 20°C')
+    )
+    screen.getByText('Setting Thermocycler lid temperature to 20°C')
   })
   it('renders correct text for heaterShaker/setTargetTemperature', () => {
     const mockTemp = 20
-    const { getByText } = renderWithProviders(
+    renderWithProviders(
       <CommandText
         command={{
           commandType: 'heaterShaker/setTargetTemperature',
@@ -644,21 +771,21 @@ describe('CommandText', () => {
           startedAt: null,
           completedAt: null,
         }}
-        robotSideAnalysis={mockRobotSideAnalysis}
+        commandTextData={mockCommandTextData}
         robotType={FLEX_ROBOT_TYPE}
       />,
       {
         i18nInstance: i18n,
       }
-    )[0]
-    getByText('Setting Target Temperature of Heater-Shaker to 20°C')
+    )
+    screen.getByText('Setting Target Temperature of Heater-Shaker to 20°C')
   })
-  it('renders correct text for thermocycler/runProfile', () => {
+  it('renders correct text for thermocycler/runProfile on Desktop', () => {
     const mockProfileSteps = [
       { holdSeconds: 10, celsius: 20 },
       { holdSeconds: 30, celsius: 40 },
     ]
-    const { getByText } = renderWithProviders(
+    renderWithProviders(
       <CommandText
         command={{
           commandType: 'thermocycler/runProfile',
@@ -671,21 +798,55 @@ describe('CommandText', () => {
           startedAt: null,
           completedAt: null,
         }}
-        robotSideAnalysis={mockRobotSideAnalysis}
+        commandTextData={mockCommandTextData}
         robotType={FLEX_ROBOT_TYPE}
       />,
       {
         i18nInstance: i18n,
       }
-    )[0]
-    getByText(
+    )
+    screen.getByText(
       'Thermocycler starting 2 repetitions of cycle composed of the following steps:'
     )
-    getByText('temperature: 20°C, seconds: 10')
-    getByText('temperature: 40°C, seconds: 30')
+    screen.getByText('temperature: 20°C, seconds: 10')
+    screen.getByText('temperature: 40°C, seconds: 30')
+  })
+  it('renders correct text for thermocycler/runProfile on ODD', () => {
+    const mockProfileSteps = [
+      { holdSeconds: 10, celsius: 20 },
+      { holdSeconds: 30, celsius: 40 },
+    ]
+    renderWithProviders(
+      <CommandText
+        command={{
+          commandType: 'thermocycler/runProfile',
+          params: { profile: mockProfileSteps, moduleId: 'abc123' },
+          id: 'def456',
+          result: {},
+          status: 'queued',
+          error: null,
+          createdAt: 'fake_timestamp',
+          startedAt: null,
+          completedAt: null,
+        }}
+        commandTextData={mockCommandTextData}
+        robotType={FLEX_ROBOT_TYPE}
+        isOnDevice={true}
+      />,
+      {
+        i18nInstance: i18n,
+      }
+    )
+    screen.getByText(
+      'Thermocycler starting 2 repetitions of cycle composed of the following steps:'
+    )
+    screen.getByText('temperature: 20°C, seconds: 10')
+    expect(
+      screen.queryByText('temperature: 40°C, seconds: 30')
+    ).not.toBeInTheDocument()
   })
   it('renders correct text for heaterShaker/setAndWaitForShakeSpeed', () => {
-    const { getByText } = renderWithProviders(
+    renderWithProviders(
       <CommandText
         command={{
           commandType: 'heaterShaker/setAndWaitForShakeSpeed',
@@ -698,19 +859,19 @@ describe('CommandText', () => {
           startedAt: null,
           completedAt: null,
         }}
-        robotSideAnalysis={mockRobotSideAnalysis}
+        commandTextData={mockCommandTextData}
         robotType={FLEX_ROBOT_TYPE}
       />,
       {
         i18nInstance: i18n,
       }
-    )[0]
-    getByText(
+    )
+    screen.getByText(
       'Setting Heater-Shaker to shake at 1000 rpm and waiting until reached'
     )
   })
   it('renders correct text for moveToSlot', () => {
-    const { getByText } = renderWithProviders(
+    renderWithProviders(
       <CommandText
         command={{
           commandType: 'moveToSlot',
@@ -723,17 +884,17 @@ describe('CommandText', () => {
           startedAt: null,
           completedAt: null,
         }}
-        robotSideAnalysis={mockRobotSideAnalysis}
+        commandTextData={mockCommandTextData}
         robotType={FLEX_ROBOT_TYPE}
       />,
       {
         i18nInstance: i18n,
       }
-    )[0]
-    getByText('Moving to Slot 1')
+    )
+    screen.getByText('Moving to Slot 1')
   })
   it('renders correct text for moveRelative', () => {
-    const { getByText } = renderWithProviders(
+    renderWithProviders(
       <CommandText
         command={{
           commandType: 'moveRelative',
@@ -746,17 +907,17 @@ describe('CommandText', () => {
           startedAt: null,
           completedAt: null,
         }}
-        robotSideAnalysis={mockRobotSideAnalysis}
+        commandTextData={mockCommandTextData}
         robotType={FLEX_ROBOT_TYPE}
       />,
       {
         i18nInstance: i18n,
       }
-    )[0]
-    getByText('Moving 10 mm along x axis')
+    )
+    screen.getByText('Moving 10 mm along x axis')
   })
   it('renders correct text for moveToCoordinates', () => {
-    const { getByText } = renderWithProviders(
+    renderWithProviders(
       <CommandText
         command={{
           commandType: 'moveToCoordinates',
@@ -769,14 +930,14 @@ describe('CommandText', () => {
           startedAt: null,
           completedAt: null,
         }}
-        robotSideAnalysis={mockRobotSideAnalysis}
+        commandTextData={mockCommandTextData}
         robotType={FLEX_ROBOT_TYPE}
       />,
       {
         i18nInstance: i18n,
       }
-    )[0]
-    getByText('Moving to (X: 1, Y: 2, Z: 3)')
+    )
+    screen.getByText('Moving to (X: 1, Y: 2, Z: 3)')
   })
   it('renders correct text for commands with no parsed params', () => {
     const expectedCopyByCommandType: {
@@ -807,7 +968,7 @@ describe('CommandText', () => {
     } as const
     Object.entries(expectedCopyByCommandType).forEach(
       ([commandType, expectedCopy]) => {
-        const { getByText } = renderWithProviders(
+        renderWithProviders(
           <CommandText
             command={
               {
@@ -822,20 +983,20 @@ describe('CommandText', () => {
                 completedAt: null,
               } as RunTimeCommand
             }
-            robotSideAnalysis={mockRobotSideAnalysis}
+            commandTextData={mockCommandTextData}
             robotType={FLEX_ROBOT_TYPE}
           />,
           {
             i18nInstance: i18n,
           }
-        )[0]
+        )
         expect(expectedCopy).not.toBeUndefined()
-        if (expectedCopy != null) getByText(expectedCopy)
+        if (expectedCopy != null) screen.getByText(expectedCopy)
       }
     )
   })
   it('renders correct text for waitForDuration', () => {
-    const { getByText } = renderWithProviders(
+    renderWithProviders(
       <CommandText
         command={{
           commandType: 'waitForDuration',
@@ -848,17 +1009,17 @@ describe('CommandText', () => {
           startedAt: null,
           completedAt: null,
         }}
-        robotSideAnalysis={mockRobotSideAnalysis}
+        commandTextData={mockCommandTextData}
         robotType={FLEX_ROBOT_TYPE}
       />,
       {
         i18nInstance: i18n,
       }
-    )[0]
-    getByText('Pausing for 42 seconds. THIS IS A MESSAGE')
+    )
+    screen.getByText('Pausing for 42 seconds. THIS IS A MESSAGE')
   })
   it('renders correct text for legacy pause with message', () => {
-    const { getByText } = renderWithProviders(
+    renderWithProviders(
       <CommandText
         command={{
           commandType: 'pause',
@@ -871,17 +1032,17 @@ describe('CommandText', () => {
           startedAt: null,
           completedAt: null,
         }}
-        robotSideAnalysis={mockRobotSideAnalysis}
+        commandTextData={mockCommandTextData}
         robotType={FLEX_ROBOT_TYPE}
       />,
       {
         i18nInstance: i18n,
       }
-    )[0]
-    getByText('THIS IS A MESSAGE')
+    )
+    screen.getByText('THIS IS A MESSAGE')
   })
   it('renders correct text for legacy pause without message', () => {
-    const { getByText } = renderWithProviders(
+    renderWithProviders(
       <CommandText
         command={{
           commandType: 'pause',
@@ -894,17 +1055,17 @@ describe('CommandText', () => {
           startedAt: null,
           completedAt: null,
         }}
-        robotSideAnalysis={mockRobotSideAnalysis}
+        commandTextData={mockCommandTextData}
         robotType={FLEX_ROBOT_TYPE}
       />,
       {
         i18nInstance: i18n,
       }
-    )[0]
-    getByText('Pausing protocol')
+    )
+    screen.getByText('Pausing protocol')
   })
   it('renders correct text for waitForResume with message', () => {
-    const { getByText } = renderWithProviders(
+    renderWithProviders(
       <CommandText
         command={{
           commandType: 'waitForResume',
@@ -917,17 +1078,17 @@ describe('CommandText', () => {
           startedAt: null,
           completedAt: null,
         }}
-        robotSideAnalysis={mockRobotSideAnalysis}
+        commandTextData={mockCommandTextData}
         robotType={FLEX_ROBOT_TYPE}
       />,
       {
         i18nInstance: i18n,
       }
-    )[0]
-    getByText('THIS IS A MESSAGE')
+    )
+    screen.getByText('THIS IS A MESSAGE')
   })
   it('renders correct text for waitForResume without message', () => {
-    const { getByText } = renderWithProviders(
+    renderWithProviders(
       <CommandText
         command={{
           commandType: 'waitForResume',
@@ -940,17 +1101,17 @@ describe('CommandText', () => {
           startedAt: null,
           completedAt: null,
         }}
-        robotSideAnalysis={mockRobotSideAnalysis}
+        commandTextData={mockCommandTextData}
         robotType={FLEX_ROBOT_TYPE}
       />,
       {
         i18nInstance: i18n,
       }
-    )[0]
-    getByText('Pausing protocol')
+    )
+    screen.getByText('Pausing protocol')
   })
   it('renders correct text for legacy delay with time', () => {
-    const { getByText } = renderWithProviders(
+    renderWithProviders(
       <CommandText
         command={{
           commandType: 'delay',
@@ -963,17 +1124,17 @@ describe('CommandText', () => {
           startedAt: null,
           completedAt: null,
         }}
-        robotSideAnalysis={mockRobotSideAnalysis}
+        commandTextData={mockCommandTextData}
         robotType={FLEX_ROBOT_TYPE}
       />,
       {
         i18nInstance: i18n,
       }
-    )[0]
-    getByText('Pausing for 42 seconds. THIS IS A MESSAGE')
+    )
+    screen.getByText('Pausing for 42 seconds. THIS IS A MESSAGE')
   })
   it('renders correct text for legacy delay wait for resume with message', () => {
-    const { getByText } = renderWithProviders(
+    renderWithProviders(
       <CommandText
         command={{
           commandType: 'delay',
@@ -986,17 +1147,17 @@ describe('CommandText', () => {
           startedAt: null,
           completedAt: null,
         }}
-        robotSideAnalysis={mockRobotSideAnalysis}
+        commandTextData={mockCommandTextData}
         robotType={FLEX_ROBOT_TYPE}
       />,
       {
         i18nInstance: i18n,
       }
-    )[0]
-    getByText('THIS IS A MESSAGE')
+    )
+    screen.getByText('THIS IS A MESSAGE')
   })
   it('renders correct text for legacy delay wait for resume without message', () => {
-    const { getByText } = renderWithProviders(
+    renderWithProviders(
       <CommandText
         command={{
           commandType: 'delay',
@@ -1009,17 +1170,17 @@ describe('CommandText', () => {
           startedAt: null,
           completedAt: null,
         }}
-        robotSideAnalysis={mockRobotSideAnalysis}
+        commandTextData={mockCommandTextData}
         robotType={FLEX_ROBOT_TYPE}
       />,
       {
         i18nInstance: i18n,
       }
-    )[0]
-    getByText('Pausing protocol')
+    )
+    screen.getByText('Pausing protocol')
   })
   it('renders correct text for custom command type with legacy command text', () => {
-    const { getByText } = renderWithProviders(
+    renderWithProviders(
       <CommandText
         command={{
           commandType: 'custom',
@@ -1032,17 +1193,17 @@ describe('CommandText', () => {
           startedAt: null,
           completedAt: null,
         }}
-        robotSideAnalysis={mockRobotSideAnalysis}
+        commandTextData={mockCommandTextData}
         robotType={FLEX_ROBOT_TYPE}
       />,
       {
         i18nInstance: i18n,
       }
-    )[0]
-    getByText('SOME LEGACY COMMAND')
+    )
+    screen.getByText('SOME LEGACY COMMAND')
   })
   it('renders correct text for custom command type with arbitrary params', () => {
-    const { getByText } = renderWithProviders(
+    renderWithProviders(
       <CommandText
         command={{
           commandType: 'custom',
@@ -1059,25 +1220,25 @@ describe('CommandText', () => {
           startedAt: null,
           completedAt: null,
         }}
-        robotSideAnalysis={mockRobotSideAnalysis}
+        commandTextData={mockCommandTextData}
         robotType={FLEX_ROBOT_TYPE}
       />,
       {
         i18nInstance: i18n,
       }
-    )[0]
-    getByText(
+    )
+    screen.getByText(
       'custom: {"thunderBolts":true,"lightning":"yup","veryVeryFrightening":1}'
     )
   })
   it('renders correct text for move labware manually off deck', () => {
-    const { getByText } = renderWithProviders(
+    renderWithProviders(
       <CommandText
         command={{
           commandType: 'moveLabware',
           params: {
             strategy: 'manualMoveWithPause',
-            labwareId: mockRobotSideAnalysis.labware[2].id,
+            labwareId: mockCommandTextData.labware[2].id,
             newLocation: 'offDeck',
           },
           id: 'def456',
@@ -1088,25 +1249,25 @@ describe('CommandText', () => {
           startedAt: null,
           completedAt: null,
         }}
-        robotSideAnalysis={mockRobotSideAnalysis}
+        commandTextData={mockCommandTextData}
         robotType={FLEX_ROBOT_TYPE}
       />,
       {
         i18nInstance: i18n,
       }
-    )[0]
-    getByText(
+    )
+    screen.getByText(
       'Manually move Opentrons 96 Tip Rack 300 µL from Slot 9 to off deck'
     )
   })
   it('renders correct text for move labware manually to module', () => {
-    const { getByText } = renderWithProviders(
+    renderWithProviders(
       <CommandText
         command={{
           commandType: 'moveLabware',
           params: {
             strategy: 'manualMoveWithPause',
-            labwareId: mockRobotSideAnalysis.labware[3].id,
+            labwareId: mockCommandTextData.labware[3].id,
             newLocation: { slotName: 'A3' },
           },
           id: 'def456',
@@ -1117,25 +1278,25 @@ describe('CommandText', () => {
           startedAt: null,
           completedAt: null,
         }}
-        robotSideAnalysis={mockRobotSideAnalysis}
+        commandTextData={mockCommandTextData}
         robotType={FLEX_ROBOT_TYPE}
       />,
       {
         i18nInstance: i18n,
       }
-    )[0]
-    getByText(
+    )
+    screen.getByText(
       'Manually move NEST 96 Well Plate 100 µL PCR Full Skirt (1) from Magnetic Module GEN2 in Slot 1 to Slot A3'
     )
   })
   it('renders correct text for move labware with gripper off deck', () => {
-    const { getByText } = renderWithProviders(
+    renderWithProviders(
       <CommandText
         command={{
           commandType: 'moveLabware',
           params: {
             strategy: 'usingGripper',
-            labwareId: mockRobotSideAnalysis.labware[2].id,
+            labwareId: mockCommandTextData.labware[2].id,
             newLocation: 'offDeck',
           },
           id: 'def456',
@@ -1146,26 +1307,28 @@ describe('CommandText', () => {
           startedAt: null,
           completedAt: null,
         }}
-        robotSideAnalysis={mockRobotSideAnalysis}
+        commandTextData={mockCommandTextData}
         robotType={FLEX_ROBOT_TYPE}
       />,
       {
         i18nInstance: i18n,
       }
-    )[0]
-    getByText(
+    )
+    screen.getByText(
       'Moving Opentrons 96 Tip Rack 300 µL using gripper from Slot 9 to off deck'
     )
   })
-  it('renders correct text for move labware with gripper to module', () => {
-    const { getByText } = renderWithProviders(
+  it('renders correct text for move labware with gripper to waste chute', () => {
+    renderWithProviders(
       <CommandText
         command={{
           commandType: 'moveLabware',
           params: {
             strategy: 'usingGripper',
-            labwareId: mockRobotSideAnalysis.labware[3].id,
-            newLocation: { moduleId: mockRobotSideAnalysis.modules[0].id },
+            labwareId: mockCommandTextData.labware[2].id,
+            newLocation: {
+              addressableAreaName: GRIPPER_WASTE_CHUTE_ADDRESSABLE_AREA,
+            },
           },
           id: 'def456',
           result: { offsetId: 'fake_offset_id' },
@@ -1175,14 +1338,43 @@ describe('CommandText', () => {
           startedAt: null,
           completedAt: null,
         }}
-        robotSideAnalysis={mockRobotSideAnalysis}
+        commandTextData={mockCommandTextData}
         robotType={FLEX_ROBOT_TYPE}
       />,
       {
         i18nInstance: i18n,
       }
-    )[0]
-    getByText(
+    )
+    screen.getByText(
+      'Moving Opentrons 96 Tip Rack 300 µL using gripper from Slot 9 to Waste Chute'
+    )
+  })
+  it('renders correct text for move labware with gripper to module', () => {
+    renderWithProviders(
+      <CommandText
+        command={{
+          commandType: 'moveLabware',
+          params: {
+            strategy: 'usingGripper',
+            labwareId: mockCommandTextData.labware[3].id,
+            newLocation: { moduleId: mockCommandTextData.modules[0].id },
+          },
+          id: 'def456',
+          result: { offsetId: 'fake_offset_id' },
+          status: 'queued',
+          error: null,
+          createdAt: 'fake_timestamp',
+          startedAt: null,
+          completedAt: null,
+        }}
+        commandTextData={mockCommandTextData}
+        robotType={FLEX_ROBOT_TYPE}
+      />,
+      {
+        i18nInstance: i18n,
+      }
+    )
+    screen.getByText(
       'Moving NEST 96 Well Plate 100 µL PCR Full Skirt (1) using gripper from Magnetic Module GEN2 in Slot 1 to Magnetic Module GEN2 in Slot 1'
     )
   })

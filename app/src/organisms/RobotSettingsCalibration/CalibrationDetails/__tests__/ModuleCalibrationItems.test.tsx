@@ -1,8 +1,8 @@
 import * as React from 'react'
-
-import { renderWithProviders } from '@opentrons/components'
-
+import { screen } from '@testing-library/react'
+import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { i18n } from '../../../../i18n'
+import { renderWithProviders } from '../../../../__testing-utils__'
 import { mockFetchModulesSuccessActionPayloadModules } from '../../../../redux/modules/__fixtures__'
 import { ModuleCalibrationOverflowMenu } from '../ModuleCalibrationOverflowMenu'
 import { formatLastCalibrated } from '../utils'
@@ -10,11 +10,7 @@ import { ModuleCalibrationItems } from '../ModuleCalibrationItems'
 
 import type { AttachedModule } from '@opentrons/api-client'
 
-jest.mock('../ModuleCalibrationOverflowMenu')
-
-const mockModuleCalibrationOverflowMenu = ModuleCalibrationOverflowMenu as jest.MockedFunction<
-  typeof ModuleCalibrationOverflowMenu
->
+vi.mock('../ModuleCalibrationOverflowMenu')
 
 const mockCalibratedModule = {
   id: '1436cd6085f18e5c315d65bd835d899a631cc2ba',
@@ -55,6 +51,8 @@ const mockCalibratedModule = {
   },
 }
 
+const ROBOT_NAME = 'mockRobot'
+
 const render = (
   props: React.ComponentProps<typeof ModuleCalibrationItems>
 ): ReturnType<typeof renderWithProviders> => {
@@ -69,27 +67,30 @@ describe('ModuleCalibrationItems', () => {
   beforeEach(() => {
     props = {
       attachedModules: mockFetchModulesSuccessActionPayloadModules,
-      updateRobotStatus: jest.fn(),
+      updateRobotStatus: vi.fn(),
       formattedPipetteOffsetCalibrations: [],
+      robotName: ROBOT_NAME,
     }
-    mockModuleCalibrationOverflowMenu.mockReturnValue(
+    vi.mocked(ModuleCalibrationOverflowMenu).mockReturnValue(
       <div>mock ModuleCalibrationOverflowMenu</div>
     )
   })
 
   it('should render module information and overflow menu', () => {
-    const [{ getByText, getAllByText }] = render(props)
-    getByText('Module')
-    getByText('Serial')
-    getByText('Last Calibrated')
-    getByText('Magnetic Module GEN1')
-    getByText('def456')
-    getByText('Temperature Module GEN1')
-    getByText('abc123')
-    getByText('Thermocycler Module GEN1')
-    getByText('ghi789')
-    expect(getAllByText('Not calibrated').length).toBe(3)
-    expect(getAllByText('mock ModuleCalibrationOverflowMenu').length).toBe(3)
+    render(props)
+    screen.getByText('Module')
+    screen.getByText('Serial')
+    screen.getByText('Last Calibrated')
+    screen.getByText('Magnetic Module GEN1')
+    screen.getByText('def456')
+    screen.getByText('Temperature Module GEN1')
+    screen.getByText('abc123')
+    screen.getByText('Thermocycler Module GEN1')
+    screen.getByText('ghi789')
+    expect(screen.getAllByText('Not calibrated').length).toBe(3)
+    expect(
+      screen.getAllByText('mock ModuleCalibrationOverflowMenu').length
+    ).toBe(3)
   })
 
   it('should display last calibrated time if a module is calibrated', () => {
@@ -97,7 +98,7 @@ describe('ModuleCalibrationItems', () => {
       ...props,
       attachedModules: [mockCalibratedModule] as AttachedModule[],
     }
-    const [{ getByText }] = render(props)
-    getByText(formatLastCalibrated('2023-06-01T14:42:20.131798+00:00'))
+    render(props)
+    screen.getByText(formatLastCalibrated('2023-06-01T14:42:20.131798+00:00'))
   })
 })

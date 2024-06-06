@@ -4,7 +4,7 @@ import cx from 'classnames'
 import { Icon } from '../icons'
 import { FlatButton } from './FlatButton'
 
-import styles from './buttons.css'
+import styles from './buttons.module.css'
 
 import type { IconProps } from '../icons'
 import type { ButtonProps } from './Button'

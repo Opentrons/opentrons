@@ -7,7 +7,8 @@ from pydantic import BaseModel
 from typing import List
 
 from robot_server.constants import V1_TAG
-from robot_server.errors import ApiError, exception_handlers
+from robot_server.errors.error_responses import ApiError
+from robot_server.errors.exception_handlers import exception_handlers
 
 
 class Item(BaseModel):

@@ -12,14 +12,10 @@ from opentrons_shared_data.labware.labware_definition import (
     LabwareDefinition,
     WellDefinition,
 )
-from opentrons_shared_data.deck.deck_definitions import (
-    DeckDefinitionV4,
-)
 from .json_protocol import Model as JsonProtocol
 
 __all__ = [
     "LabwareDefinition",
     "WellDefinition",
-    "DeckDefinitionV4",
     "JsonProtocol",
 ]

@@ -1,4 +1,4 @@
-import {
+import type {
   DECK_CAL_STATUS_OK,
   DECK_CAL_STATUS_IDENTITY,
   DECK_CAL_STATUS_BAD_CALIBRATION,
@@ -11,7 +11,7 @@ import {
   CALIBRATION_SOURCE_LEGACY,
 } from './constants'
 
-import type { Mount } from '@opentrons/components'
+import type { PipetteMount as Mount } from '@opentrons/shared-data'
 
 export type DeckCalibrationStatus =
   | typeof DECK_CAL_STATUS_OK
@@ -128,7 +128,7 @@ export interface TipLengthCalibration {
   source: CalibrationSource
   status: IndividualCalibrationStatus
   id: string
-  uri?: string | null
+  uri: string
 }
 
 export interface AllTipLengthCalibrations {

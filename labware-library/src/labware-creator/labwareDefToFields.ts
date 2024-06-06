@@ -130,8 +130,5 @@ export function labwareDefToFields(
     // NOTE: intentionally null these fields, do not import them
     loadName: null,
     displayName: null,
-
-    // fields for test protocol
-    pipetteName: null,
   }
 }

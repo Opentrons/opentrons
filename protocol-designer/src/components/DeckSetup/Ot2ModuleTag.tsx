@@ -8,11 +8,13 @@ import {
 } from '@opentrons/components'
 import {
   getModuleDisplayName,
+  THERMOCYCLER_MODULE_V1,
+  THERMOCYCLER_MODULE_V2,
+} from '@opentrons/shared-data'
+import type {
   ModuleDefinition,
   ModuleModel,
   ModuleOrientation,
-  THERMOCYCLER_MODULE_V1,
-  THERMOCYCLER_MODULE_V2,
 } from '@opentrons/shared-data'
 
 interface Ot2ModuleTagProps {
@@ -43,7 +45,7 @@ export function Ot2ModuleTag(props: Ot2ModuleTagProps): JSX.Element {
       y={isThermocyclerModel ? -22 : 0}
       x={isThermocyclerModel ? 0 : xCoordinateForOtherMods}
       innerDivProps={{
-        backgroundColor: COLORS.darkGreyEnabled,
+        backgroundColor: COLORS.grey50,
         padding: SPACING.spacing4,
         height: '100%',
         color: COLORS.white,

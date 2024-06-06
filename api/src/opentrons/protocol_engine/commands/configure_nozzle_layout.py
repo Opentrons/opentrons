@@ -1,22 +1,19 @@
 """Configure nozzle layout command request, result, and implementation models."""
 from __future__ import annotations
 from pydantic import BaseModel
-from typing import TYPE_CHECKING, Optional, Type, Tuple, Union
+from typing import TYPE_CHECKING, Optional, Type, Union
 from typing_extensions import Literal
 
 from .pipetting_common import (
     PipetteIdMixin,
 )
-from .command import (
-    AbstractCommandWithPrivateResultImpl,
-    BaseCommand,
-    BaseCommandCreate,
-)
+from .command import AbstractCommandImpl, BaseCommand, BaseCommandCreate, SuccessData
+from ..errors.error_occurrence import ErrorOccurrence
 from .configuring_common import (
     PipetteNozzleLayoutResultMixin,
 )
 from ..types import (
-    EmptyNozzleLayoutConfiguration,
+    AllNozzleLayoutConfiguration,
     SingleNozzleLayoutConfiguration,
     RowNozzleLayoutConfiguration,
     ColumnNozzleLayoutConfiguration,
@@ -33,8 +30,8 @@ ConfigureNozzleLayoutCommandType = Literal["configureNozzleLayout"]
 class ConfigureNozzleLayoutParams(PipetteIdMixin):
     """Parameters required to configure the nozzle layout for a specific pipette."""
 
-    configuration_params: Union[
-        EmptyNozzleLayoutConfiguration,
+    configurationParams: Union[
+        AllNozzleLayoutConfiguration,
         SingleNozzleLayoutConfiguration,
         RowNozzleLayoutConfiguration,
         ColumnNozzleLayoutConfiguration,
@@ -55,10 +52,9 @@ class ConfigureNozzleLayoutResult(BaseModel):
 
 
 class ConfigureNozzleLayoutImplementation(
-    AbstractCommandWithPrivateResultImpl[
+    AbstractCommandImpl[
         ConfigureNozzleLayoutParams,
-        ConfigureNozzleLayoutResult,
-        ConfigureNozzleLayoutPrivateResult,
+        SuccessData[ConfigureNozzleLayoutResult, ConfigureNozzleLayoutPrivateResult],
     ]
 ):
     """Configure nozzle layout command implementation."""
@@ -71,10 +67,15 @@ class ConfigureNozzleLayoutImplementation(
 
     async def execute(
         self, params: ConfigureNozzleLayoutParams
-    ) -> Tuple[ConfigureNozzleLayoutResult, ConfigureNozzleLayoutPrivateResult]:
+    ) -> SuccessData[ConfigureNozzleLayoutResult, ConfigureNozzleLayoutPrivateResult]:
         """Check that requested pipette can support the requested nozzle layout."""
+        primary_nozzle = params.configurationParams.dict().get("primaryNozzle")
+        front_right_nozzle = params.configurationParams.dict().get("frontRightNozzle")
         nozzle_params = await self._tip_handler.available_for_nozzle_layout(
-            pipette_id=params.pipetteId, **params.configuration_params.dict()
+            pipette_id=params.pipetteId,
+            style=params.configurationParams.style,
+            primary_nozzle=primary_nozzle,
+            front_right_nozzle=front_right_nozzle,
         )
 
         nozzle_map = await self._equipment.configure_nozzle_layout(
@@ -82,14 +83,19 @@ class ConfigureNozzleLayoutImplementation(
             **nozzle_params,
         )
 
-        return ConfigureNozzleLayoutResult(), ConfigureNozzleLayoutPrivateResult(
-            pipette_id=params.pipetteId,
-            nozzle_map=nozzle_map,
+        return SuccessData(
+            public=ConfigureNozzleLayoutResult(),
+            private=ConfigureNozzleLayoutPrivateResult(
+                pipette_id=params.pipetteId,
+                nozzle_map=nozzle_map,
+            ),
         )
 
 
 class ConfigureNozzleLayout(
-    BaseCommand[ConfigureNozzleLayoutParams, ConfigureNozzleLayoutResult]
+    BaseCommand[
+        ConfigureNozzleLayoutParams, ConfigureNozzleLayoutResult, ErrorOccurrence
+    ]
 ):
     """Configure nozzle layout command model."""
 

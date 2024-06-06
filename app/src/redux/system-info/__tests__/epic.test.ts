@@ -1,3 +1,4 @@
+import { vi, describe, it, expect, beforeEach } from 'vitest'
 import { TestScheduler } from 'rxjs/testing'
 
 import * as Alerts from '../../alerts'
@@ -8,13 +9,9 @@ import { systemInfoEpic } from '../epic'
 import type { Action, State } from '../../types'
 import type { DriverStatus } from '../types'
 
-jest.mock('../selectors')
+vi.mock('../selectors')
 
 const MOCK_STATE: State = { mockState: true } as any
-
-const getU2EWindowsDriverStatus = Selectors.getU2EWindowsDriverStatus as jest.MockedFunction<
-  typeof Selectors.getU2EWindowsDriverStatus
->
 
 describe('system info epic', () => {
   let testScheduler: TestScheduler
@@ -25,10 +22,12 @@ describe('system info epic', () => {
     expectedValues?: unknown
   ): void => {
     statusValues.forEach(status => {
-      getU2EWindowsDriverStatus.mockImplementationOnce(s => {
-        expect(s).toEqual(MOCK_STATE)
-        return status
-      })
+      vi.mocked(Selectors.getU2EWindowsDriverStatus).mockImplementationOnce(
+        s => {
+          expect(s).toEqual(MOCK_STATE)
+          return status
+        }
+      )
     })
 
     testScheduler.run(({ hot, expectObservable }) => {
@@ -41,17 +40,13 @@ describe('system info epic', () => {
   }
 
   beforeEach(() => {
-    getU2EWindowsDriverStatus.mockImplementation(s => {
+    vi.mocked(Selectors.getU2EWindowsDriverStatus).mockImplementation(s => {
       expect(s).toEqual(MOCK_STATE)
       return NOT_APPLICABLE
     })
     testScheduler = new TestScheduler((actual, expected) => {
       expect(actual).toEqual(expected)
     })
-  })
-
-  afterEach(() => {
-    jest.resetAllMocks()
   })
 
   it('should not trigger an alert if driver status never changes', () => {

@@ -23,12 +23,13 @@ from typing import (
 from typing_extensions import TypedDict
 
 import pytest
+from _pytest.fixtures import SubRequest
 from decoy import Decoy
 
 from opentrons.protocol_engine.types import PostRunHardwareState
 
 try:
-    import aionotify  # type: ignore[import]
+    import aionotify  # type: ignore[import-untyped]
 except (OSError, ModuleNotFoundError):
     aionotify = None
 
@@ -39,7 +40,7 @@ from opentrons_shared_data.module.dev_types import ModuleDefinitionV3
 from opentrons_shared_data.deck.dev_types import (
     RobotModel,
     DeckDefinitionV3,
-    DeckDefinitionV4,
+    DeckDefinitionV5,
 )
 from opentrons_shared_data.deck import (
     load as load_deck,
@@ -88,7 +89,7 @@ class Bundle(TypedDict):
     filelike: io.BytesIO
     binary_zipfile: bytes
     metadata: Dict[str, str]
-    bundled_data: Dict[str, str]
+    bundled_data: Dict[str, bytes]
     bundled_labware: Dict[str, LabwareDefinition]
     bundled_python: Dict[str, Any]
 
@@ -156,11 +157,11 @@ def virtual_smoothie_env(monkeypatch: pytest.MonkeyPatch) -> None:
 
 @pytest.fixture(params=["ot2", "ot3"])
 async def machine_variant_ffs(
-    request: pytest.FixtureRequest,
+    request: SubRequest,
     decoy: Decoy,
     mock_feature_flags: None,
 ) -> None:
-    device_param = request.param  # type: ignore[attr-defined]
+    device_param = request.param
 
     if request.node.get_closest_marker("ot3_only") and device_param == "ot2":
         pytest.skip()
@@ -229,7 +230,7 @@ async def robot_model(
     mock_feature_flags: None,
     virtual_smoothie_env: None,
 ) -> AsyncGenerator[RobotModel, None]:
-    which_machine = cast(RobotModel, request.param)  # type: ignore[attr-defined]
+    which_machine = cast(RobotModel, request.param)
     if request.node.get_closest_marker("ot2_only") and which_machine == "OT-3 Standard":
         pytest.skip("test requests only ot-2")
     if request.node.get_closest_marker("ot3_only") and which_machine == "OT-2 Standard":
@@ -255,7 +256,7 @@ def deck_definition_name(robot_model: RobotModel) -> str:
 
 
 @pytest.fixture
-def deck_definition(deck_definition_name: str) -> DeckDefinitionV4:
+def deck_definition(deck_definition_name: str) -> DeckDefinitionV5:
     return load_deck(deck_definition_name, DEFAULT_DECK_DEFINITION_VERSION)
 
 
@@ -266,7 +267,7 @@ def legacy_deck_definition(deck_definition_name: str) -> DeckDefinitionV3:
 
 @pytest.fixture()
 async def hardware(
-    request: pytest.FixtureRequest,
+    request: SubRequest,
     decoy: Decoy,
     mock_feature_flags: None,
     virtual_smoothie_env: None,
@@ -498,7 +499,7 @@ def get_bundle_fixture() -> Callable[[str], Bundle]:
         if fixture_name == "simple_bundle":
             with open(fixture_dir / "protocol.py", "r") as f:
                 result["contents"] = f.read()
-            with open(fixture_dir / "data.txt", "rb") as f:  # type: ignore[assignment]
+            with open(fixture_dir / "data.txt", "rb") as f:
                 result["bundled_data"] = {"data.txt": f.read()}
             with open(fixture_dir / "custom_labware.json", "r") as f:
                 custom_labware = json.load(f)

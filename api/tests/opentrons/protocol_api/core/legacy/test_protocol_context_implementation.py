@@ -9,7 +9,7 @@ from opentrons_shared_data.labware.dev_types import LabwareDefinition as Labware
 from opentrons_shared_data.pipette.dev_types import PipetteNameType
 from opentrons_shared_data.module.dev_types import ModuleDefinitionV3
 
-from opentrons.types import DeckSlotName, Location, Mount, Point
+from opentrons.types import DeckSlotName, StagingSlotName, Location, Mount, Point
 from opentrons.util.broker import Broker
 
 from opentrons.hardware_control import SyncHardwareAPI
@@ -173,6 +173,20 @@ def test_load_labware_off_deck_raises(
         subject.load_labware(
             load_name="cool load name",
             location=OFF_DECK,
+            label="cool label",
+            namespace="cool namespace",
+            version=1337,
+        )
+
+
+def test_load_labware_on_staging_slot_raises(
+    subject: LegacyProtocolCore,
+) -> None:
+    """It should raise an api error when loading onto a staging slot."""
+    with pytest.raises(APIVersionError):
+        subject.load_labware(
+            load_name="cool load name",
+            location=StagingSlotName.SLOT_B4,
             label="cool label",
             namespace="cool namespace",
             version=1337,

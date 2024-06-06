@@ -11,7 +11,7 @@ import {
   SPAN7_8_10_11_SLOT,
   MAGNETIC_BLOCK_TYPE,
 } from '../constants'
-import { ModuleType, ModuleOrientation } from '../types'
+import type { ModuleType, ModuleOrientation } from '../types'
 // NOTE: all dims are in 'left' orientation. Rotate & transform to obtain 'right' orientation.
 
 export interface ModuleVizDims {

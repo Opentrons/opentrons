@@ -18,9 +18,8 @@ import {
   MIN_Y_DIMENSION,
   REQUIRED_FIELD_ERROR,
   MUST_BE_A_NUMBER_ERROR,
-  LabwareFields,
 } from './fields'
-import type { ProcessedLabwareFields } from './fields'
+import type { LabwareFields, ProcessedLabwareFields } from './fields'
 
 // global overrides for Yup's default error messages.
 Yup.setLocale({
@@ -291,7 +290,6 @@ export const labwareFormSchemaBaseObject = Yup.object({
         originalValue: string | null | undefined
       ) => (currentValue == null ? currentValue : currentValue.trim())
     ),
-  pipetteName: requiredString(LABELS.pipetteName),
 })
 
 // @ts-expect-error(IL, 2021-03-25): something(s) about this schema don't match the flow type (labwareType: string problem??)

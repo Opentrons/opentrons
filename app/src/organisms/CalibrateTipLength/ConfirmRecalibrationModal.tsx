@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { createPortal } from 'react-dom'
 
 import {
   AlertModal,
@@ -11,9 +12,9 @@ import {
   Text,
 } from '@opentrons/components'
 
-import { Portal } from '../../App/portal'
+import { getModalPortalEl } from '../../App/portal'
 
-import styles from './styles.css'
+import styles from './styles.module.css'
 
 const TITLE = 'Are you sure you want to continue?'
 
@@ -41,44 +42,43 @@ interface Props {
 export function ConfirmRecalibrationModal(props: Props): JSX.Element {
   const { confirm, cancel, tiprackDisplayName } = props
 
-  return (
-    <Portal>
-      <AlertModal
-        className={styles.alert_modal_padding}
-        iconName={null}
-        heading={TITLE}
-        alertOverlay
-      >
-        <Box>
-          <Text>
-            {TIP_LENGTH_DATA_EXISTS}
-            &nbsp;
-            {`"${tiprackDisplayName}".`}
-            <br />
-            <br />
-            {RECOMMEND_RECALIBRATING_IF}
-            &nbsp;
-            {`"${tiprackDisplayName}"`}
-            &nbsp;
-            {INACCURATE}
-            &nbsp;
-            {VIEW}
-            &nbsp;
-            <Link href={CALIBRATION_URL} external>
-              {THIS_LINK}
-            </Link>
-            &nbsp;
-            {TO_LEARN_MORE}
-          </Text>
-        </Box>
+  return createPortal(
+    <AlertModal
+      className={styles.alert_modal_padding}
+      iconName={null}
+      heading={TITLE}
+      alertOverlay
+    >
+      <Box>
+        <Text>
+          {TIP_LENGTH_DATA_EXISTS}
+          &nbsp;
+          {`"${tiprackDisplayName}".`}
+          <br />
+          <br />
+          {RECOMMEND_RECALIBRATING_IF}
+          &nbsp;
+          {`"${tiprackDisplayName}"`}
+          &nbsp;
+          {INACCURATE}
+          &nbsp;
+          {VIEW}
+          &nbsp;
+          <Link href={CALIBRATION_URL} external>
+            {THIS_LINK}
+          </Link>
+          &nbsp;
+          {TO_LEARN_MORE}
+        </Text>
+      </Box>
 
-        <Flex marginY={SPACING_3} justifyContent={JUSTIFY_FLEX_END}>
-          <SecondaryBtn onClick={confirm} marginRight={SPACING_3}>
-            {CONTINUE}
-          </SecondaryBtn>
-          <SecondaryBtn onClick={cancel}>{CANCEL}</SecondaryBtn>
-        </Flex>
-      </AlertModal>
-    </Portal>
+      <Flex marginY={SPACING_3} justifyContent={JUSTIFY_FLEX_END}>
+        <SecondaryBtn onClick={confirm} marginRight={SPACING_3}>
+          {CONTINUE}
+        </SecondaryBtn>
+        <SecondaryBtn onClick={cancel}>{CANCEL}</SecondaryBtn>
+      </Flex>
+    </AlertModal>,
+    getModalPortalEl()
   )
 }

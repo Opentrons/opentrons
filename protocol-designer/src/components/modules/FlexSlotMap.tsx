@@ -16,8 +16,6 @@ import {
   SPACING,
 } from '@opentrons/components'
 
-import type { Cutout } from '@opentrons/shared-data'
-
 const X_ADJUSTMENT_LEFT_SIDE = -101.5
 const X_ADJUSTMENT = -17
 const X_DIMENSION_MIDDLE_SLOTS = 160.3
@@ -33,15 +31,14 @@ export function FlexSlotMap(props: FlexSlotMapProps): JSX.Element {
   const slotFill = (
     <Flex
       alignItems={ALIGN_CENTER}
-      backgroundColor={COLORS.grey2}
-      borderRadius={BORDERS.radiusSoftCorners}
+      backgroundColor={COLORS.grey50}
+      borderRadius={BORDERS.borderRadius4}
       color={COLORS.white}
       gridGap={SPACING.spacing8}
       justifyContent={JUSTIFY_CENTER}
       width="100%"
     />
   )
-
   return (
     <RobotCoordinateSpace
       height="100px"
@@ -50,10 +47,10 @@ export function FlexSlotMap(props: FlexSlotMapProps): JSX.Element {
       {deckDef.locations.cutouts.map(cutout => (
         <SingleSlotFixture
           key={cutout.id}
-          cutoutId={cutout.id as Cutout}
+          cutoutId={cutout.id}
           deckDefinition={deckDef}
           slotClipColor={COLORS.transparent}
-          fixtureBaseColor={COLORS.light1}
+          fixtureBaseColor={COLORS.grey35}
         />
       ))}
       {selectedSlots.map((selectedSlot, index) => {
@@ -63,14 +60,15 @@ export function FlexSlotMap(props: FlexSlotMapProps): JSX.Element {
           getPositionFromSlotId(slotFromCutout, deckDef) ?? []
 
         const isLeftSideofDeck =
-          selectedSlot === 'A1' ||
-          selectedSlot === 'B1' ||
-          selectedSlot === 'C1' ||
-          selectedSlot === 'D1'
+          slotFromCutout === 'A1' ||
+          slotFromCutout === 'B1' ||
+          slotFromCutout === 'C1' ||
+          slotFromCutout === 'D1'
         const xAdjustment = isLeftSideofDeck
           ? X_ADJUSTMENT_LEFT_SIDE
           : X_ADJUSTMENT
         const x = xSlotPosition + xAdjustment
+
         const yAdjustment = -10
         const y = ySlotPosition + yAdjustment
 

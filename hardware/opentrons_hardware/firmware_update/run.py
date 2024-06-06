@@ -250,7 +250,6 @@ class RunUpdate:
             kwargs: Dict[str, Any] = {
                 "stdout": asyncio.subprocess.PIPE,
                 "stderr": asyncio.subprocess.PIPE,
-                "loop": asyncio.get_running_loop(),
             }
             success, msg = await upload_via_dfu(dfu_dev_serial, update_file, kwargs)
             if success:

@@ -1,45 +1,46 @@
 import * as React from 'react'
+import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
 import { useCreateLiveCommandMutation } from '@opentrons/react-api-client'
 import {
-  Flex,
-  TYPOGRAPHY,
-  SPACING,
+  ALIGN_CENTER,
+  ALIGN_FLEX_START,
+  BORDERS,
   COLORS,
   DIRECTION_COLUMN,
-  Icon,
   DIRECTION_ROW,
-  SIZE_AUTO,
-  ALIGN_FLEX_START,
+  Flex,
+  Icon,
   Link,
-  useHoverTooltip,
-  ALIGN_CENTER,
-  useConditionalConfirm,
   PrimaryButton,
-  BORDERS,
+  SIZE_AUTO,
+  SPACING,
+  StyledText,
+  TYPOGRAPHY,
+  useConditionalConfirm,
+  useHoverTooltip,
 } from '@opentrons/components'
 import { getIsHeaterShakerAttached } from '../../redux/config'
 import {
-  CreateCommand,
   getModuleDisplayName,
   HS_RPM_MAX,
   HS_RPM_MIN,
   RPM,
 } from '@opentrons/shared-data'
-import { Portal } from '../../App/portal'
+import { getTopPortalEl } from '../../App/portal'
 import { Slideout } from '../../atoms/Slideout'
 import { TertiaryButton } from '../../atoms/buttons'
 import { Divider } from '../../atoms/structure'
 import { InputField } from '../../atoms/InputField'
 import { Tooltip } from '../../atoms/Tooltip'
-import { StyledText } from '../../atoms/text'
 import { ConfirmAttachmentModal } from './ConfirmAttachmentModal'
 import { useLatchControls } from './hooks'
 import { ModuleSetupModal } from './ModuleSetupModal'
 
 import type { HeaterShakerModule, LatchStatus } from '../../redux/modules/types'
 import type {
+  CreateCommand,
   HeaterShakerCloseLatchCreateCommand,
   HeaterShakerDeactivateShakerCreateCommand,
   HeaterShakerSetAndWaitForShakeSpeedCreateCommand,
@@ -156,26 +157,27 @@ export const TestShakeSlideout = (
         </PrimaryButton>
       }
     >
-      {showConfirmationModal && (
-        <Portal level="top">
-          <ConfirmAttachmentModal
-            onCloseClick={cancelExit}
-            isProceedToRunModal={false}
-            onConfirmClick={sendCommands}
-          />
-        </Portal>
-      )}
+      {showConfirmationModal
+        ? createPortal(
+            <ConfirmAttachmentModal
+              onCloseClick={cancelExit}
+              isProceedToRunModal={false}
+              onConfirmClick={sendCommands}
+            />,
+            getTopPortalEl()
+          )
+        : null}
       <Flex
-        borderRadius={BORDERS.radiusSoftCorners}
+        borderRadius={BORDERS.borderRadius4}
         marginBottom={SPACING.spacing8}
-        backgroundColor={COLORS.fundamentalsBackground}
+        backgroundColor={COLORS.blue30}
         paddingY={SPACING.spacing16}
         paddingLeft={SPACING.spacing4}
         paddingRight={SPACING.spacing16}
         flexDirection={DIRECTION_ROW}
         data-testid="test_shake_slideout_banner_info"
       >
-        <Flex color={COLORS.darkGreyEnabled}>
+        <Flex color={COLORS.blue60}>
           <Icon
             name="information"
             size={SPACING.spacing32}
@@ -192,7 +194,7 @@ export const TestShakeSlideout = (
       <Flex
         flexDirection={DIRECTION_COLUMN}
         fontWeight={TYPOGRAPHY.fontWeightRegular}
-        padding={`${SPACING.spacing16} ${SPACING.spacing20} ${SPACING.spacing20} ${SPACING.spacing16}`}
+        paddingBottom={SPACING.spacing24}
         width="100%"
       >
         <Flex
@@ -235,7 +237,7 @@ export const TestShakeSlideout = (
             </Tooltip>
           ) : null}
         </Flex>
-        <Divider color={COLORS.medGreyEnabled} />
+        <Divider color={COLORS.grey30} />
         <StyledText
           fontSize={TYPOGRAPHY.fontSizeLabel}
           fontWeight={TYPOGRAPHY.fontWeightSemiBold}
@@ -254,7 +256,9 @@ export const TestShakeSlideout = (
               autoFocus
               units={RPM}
               value={shakeValue != null ? Math.round(shakeValue) : null}
-              onChange={e => setShakeValue(e.target.valueAsNumber)}
+              onChange={e => {
+                setShakeValue(e.target.valueAsNumber)
+              }}
               type="number"
               caption={t('min_max_rpm', {
                 min: HS_RPM_MIN,
@@ -264,7 +268,7 @@ export const TestShakeSlideout = (
               disabled={isShaking}
             />
             <StyledText
-              color={COLORS.darkGreyEnabled}
+              color={COLORS.grey50}
               fontSize={TYPOGRAPHY.fontSizeCaption}
             ></StyledText>
           </Flex>
@@ -291,7 +295,9 @@ export const TestShakeSlideout = (
       </Flex>
       {showModuleSetupModal && (
         <ModuleSetupModal
-          close={() => setShowModuleSetupModal(false)}
+          close={() => {
+            setShowModuleSetupModal(false)
+          }}
           moduleDisplayName={getModuleDisplayName(module.moduleModel)}
         />
       )}
@@ -300,7 +306,9 @@ export const TestShakeSlideout = (
         marginTop={SPACING.spacing4}
         css={TYPOGRAPHY.linkPSemiBold}
         id="HeaterShaker_Attachment_Instructions"
-        onClick={() => setShowModuleSetupModal(true)}
+        onClick={() => {
+          setShowModuleSetupModal(true)
+        }}
       >
         {t('show_attachment_instructions')}
       </Link>

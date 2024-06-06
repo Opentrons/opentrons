@@ -1,7 +1,9 @@
 import * as React from 'react'
 import { MemoryRouter } from 'react-router-dom'
-import { fireEvent, waitFor } from '@testing-library/react'
-import { renderWithProviders } from '@opentrons/components'
+import { fireEvent, screen, waitFor } from '@testing-library/react'
+import { describe, it, vi, expect, beforeEach } from 'vitest'
+import '@testing-library/jest-dom/vitest'
+import { renderWithProviders } from '../../../../../../__testing-utils__'
 import { i18n } from '../../../../../../i18n'
 import {
   useTrackEvent,
@@ -10,6 +12,7 @@ import {
 import {
   getConnectableRobots,
   getReachableRobots,
+  getUnreachableRobots,
 } from '../../../../../../redux/discovery'
 import {
   mockConnectableRobot,
@@ -19,23 +22,19 @@ import {
 import { RenameRobotSlideout } from '../RenameRobotSlideout'
 import { useIsFlex } from '../../../../hooks'
 
-jest.mock('../../../../../../redux/discovery/selectors')
-jest.mock('../../../../../../redux/analytics')
-jest.mock('../../../../hooks')
+vi.mock('../../../../../../redux/discovery/selectors')
+vi.mock('../../../../../../redux/analytics')
+vi.mock('../../../../hooks')
+vi.mock('../../../../../../redux/discovery', async importOriginal => {
+  const actual = await importOriginal<typeof getUnreachableRobots>()
+  return {
+    ...actual,
+    getUnreachableRobots: vi.fn(),
+  }
+})
 
-const mockGetConnectableRobots = getConnectableRobots as jest.MockedFunction<
-  typeof getConnectableRobots
->
-const mockGetReachableRobots = getReachableRobots as jest.MockedFunction<
-  typeof getReachableRobots
->
-const mockUseTrackEvent = useTrackEvent as jest.MockedFunction<
-  typeof useTrackEvent
->
-const mockUseIsFlex = useIsFlex as jest.MockedFunction<typeof useIsFlex>
-
-const mockOnCloseClick = jest.fn()
-let mockTrackEvent: jest.Mock
+const mockOnCloseClick = vi.fn()
+let mockTrackEvent: any
 
 const render = () => {
   return renderWithProviders(
@@ -52,67 +51,68 @@ const render = () => {
 
 describe('RobotSettings RenameRobotSlideout', () => {
   beforeEach(() => {
-    mockTrackEvent = jest.fn()
-    mockUseTrackEvent.mockReturnValue(mockTrackEvent)
+    mockTrackEvent = vi.fn()
+    vi.mocked(useTrackEvent).mockReturnValue(mockTrackEvent)
     mockConnectableRobot.name = 'connectableOtie'
     mockReachableRobot.name = 'reachableOtie'
-    mockGetConnectableRobots.mockReturnValue([mockConnectableRobot])
-    mockGetReachableRobots.mockReturnValue([mockReachableRobot])
-    mockUseIsFlex.mockReturnValue(false)
-  })
-
-  afterEach(() => {
-    jest.resetAllMocks()
+    vi.mocked(getConnectableRobots).mockReturnValue([mockConnectableRobot])
+    vi.mocked(getReachableRobots).mockReturnValue([mockReachableRobot])
+    vi.mocked(useIsFlex).mockReturnValue(false)
+    vi.mocked(getUnreachableRobots).mockReturnValue([])
   })
 
   it('should render title, description, label, input, and button', () => {
-    const [{ getByText, getByRole }] = render()
+    render()
 
-    getByText('Rename Robot')
-    getByText(
+    screen.getByText('Rename Robot')
+    screen.getByText(
       'To ensure reliable renaming of your robot, please connect to it via USB.'
     )
-    getByText(
+    screen.getByText(
       'Please enter 17 characters max using valid inputs: letters and numbers.'
     )
-    getByText('Robot Name')
-    getByText('17 characters max')
-    getByRole('textbox')
-    const renameButton = getByRole('button', { name: 'Rename robot' })
+    screen.getByText('Robot Name')
+    screen.getByText('17 characters max')
+    screen.getByRole('textbox')
+    const renameButton = screen.getByRole('button', { name: 'Rename robot' })
     expect(renameButton).toBeInTheDocument()
     expect(renameButton).toBeDisabled()
   })
 
   it('should render title, description, label, input, and button for flex', () => {
-    mockUseIsFlex.mockReturnValue(true)
-    const [{ getByText, getByRole, queryByText }] = render()
-    getByText('Rename Robot')
+    vi.mocked(useIsFlex).mockReturnValue(true)
+    render()
+    screen.getByText('Rename Robot')
     expect(
-      queryByText(
+      screen.queryByText(
         'To ensure reliable renaming of your robot, please connect to it via USB.'
       )
     ).not.toBeInTheDocument()
-    getByText(
+    screen.getByText(
       'Please enter 17 characters max using valid inputs: letters and numbers.'
     )
-    getByText('Robot Name')
-    getByText('17 characters max')
-    getByRole('textbox')
-    const renameButton = getByRole('button', { name: 'Rename robot' })
+    screen.getByText('Robot Name')
+    screen.getByText('17 characters max')
+    screen.getByRole('textbox')
+    const renameButton = screen.getByRole('button', { name: 'Rename robot' })
     expect(renameButton).toBeInTheDocument()
     expect(renameButton).toBeDisabled()
   })
 
   it('should be disabled false when a user typing allowed characters', async () => {
-    const [{ getByRole }] = render()
-    const input = getByRole('textbox')
+    render()
+    const input = screen.getByRole('textbox')
     fireEvent.change(input, { target: { value: 'mockInput' } })
 
     await waitFor(() => {
       expect(input).toHaveValue('mockInput')
-      const renameButton = getByRole('button', { name: 'Rename robot' })
+    })
+    const renameButton = screen.getByRole('button', { name: 'Rename robot' })
+    await waitFor(() => {
       expect(renameButton).not.toBeDisabled()
-      fireEvent.click(renameButton)
+    })
+    fireEvent.click(renameButton)
+    await waitFor(() => {
       expect(mockTrackEvent).toHaveBeenCalledWith({
         name: ANALYTICS_RENAME_ROBOT,
         properties: { newRobotName: 'mockInput', previousRobotName: 'otie' },
@@ -121,100 +121,112 @@ describe('RobotSettings RenameRobotSlideout', () => {
   })
 
   it('button should be disabled and render the error message when a user types invalid character/characters', async () => {
-    const [{ getByRole, findByText }] = render()
-    const input = getByRole('textbox')
+    render()
+    const input = screen.getByRole('textbox')
     fireEvent.change(input, { target: { value: 'mockInput@@@' } })
     expect(input).toHaveValue('mockInput@@@')
-    const renameButton = getByRole('button', { name: 'Rename robot' })
-    const error = await findByText(
+    const renameButton = screen.getByRole('button', { name: 'Rename robot' })
+    const error = await screen.findByText(
       'Oops! Robot name must follow the character count and limitations.'
     )
     await waitFor(() => {
       expect(renameButton).toBeDisabled()
+    })
+    await waitFor(() => {
       expect(error).toBeInTheDocument()
     })
   })
 
   it('button should be disabled and render the error message when a user types more than 17 characters', async () => {
-    const [{ getByRole, findByText }] = render()
-    const input = getByRole('textbox')
+    render()
+    const input = screen.getByRole('textbox')
     fireEvent.change(input, {
       target: { value: 'aaaaaaaaaaaaaaaaaa' },
     })
     expect(input).toHaveValue('aaaaaaaaaaaaaaaaaa')
-    const renameButton = getByRole('button', { name: 'Rename robot' })
-    const error = await findByText(
+    const renameButton = screen.getByRole('button', { name: 'Rename robot' })
+    const error = await screen.findByText(
       'Oops! Robot name must follow the character count and limitations.'
     )
     await waitFor(() => {
       expect(renameButton).toBeDisabled()
+    })
+    await waitFor(() => {
       expect(error).toBeInTheDocument()
     })
   })
 
   it('button should be disabled and render the error message when a user tries to use space', async () => {
-    const [{ getByRole, findByText }] = render()
-    const input = getByRole('textbox')
+    render()
+    const input = screen.getByRole('textbox')
     fireEvent.change(input, {
       target: { value: 'Hello world123' },
     })
     expect(input).toHaveValue('Hello world123')
-    const renameButton = getByRole('button', { name: 'Rename robot' })
-    const error = await findByText(
+    const renameButton = screen.getByRole('button', { name: 'Rename robot' })
+    const error = await screen.findByText(
       'Oops! Robot name must follow the character count and limitations.'
     )
     await waitFor(() => {
       expect(renameButton).toBeDisabled()
+    })
+    await waitFor(() => {
       expect(error).toBeInTheDocument()
     })
   })
 
   it('button should be disabled and render the error message when a user tries to use space as the first letter', async () => {
-    const [{ getByRole, findByText }] = render()
-    const input = getByRole('textbox')
+    render()
+    const input = screen.getByRole('textbox')
     fireEvent.change(input, {
       target: { value: ' ' },
     })
     expect(input).toHaveValue(' ')
-    const renameButton = getByRole('button', { name: 'Rename robot' })
-    const error = await findByText(
+    const renameButton = screen.getByRole('button', { name: 'Rename robot' })
+    const error = await screen.findByText(
       'Oops! Robot name must follow the character count and limitations.'
     )
     await waitFor(() => {
       expect(renameButton).toBeDisabled()
+    })
+    await waitFor(() => {
       expect(error).toBeInTheDocument()
     })
   })
 
   it('button should be disabled and render the error message when a user rename a robot to a name that used by a connectable robot', async () => {
-    const [{ getByRole, findByText }] = render()
-    const input = getByRole('textbox')
+    render()
+    const input = screen.getByRole('textbox')
     fireEvent.change(input, {
       target: { value: 'connectableOtie' },
     })
     expect(input).toHaveValue('connectableOtie')
-    const renameButton = getByRole('button', { name: 'Rename robot' })
-    const error = await findByText(
+    const renameButton = screen.getByRole('button', { name: 'Rename robot' })
+    const error = await screen.findByText(
       'Oops! Name is already in use. Choose a different name.'
     )
     await waitFor(() => {
       expect(renameButton).toBeDisabled()
+    })
+    await waitFor(() => {
       expect(error).toBeInTheDocument()
     })
   })
   it('button should be disabled and render the error message when a user rename a robot to a name that used by a reachable robot', async () => {
-    const [{ getByRole, findByText }] = render()
-    const input = getByRole('textbox')
+    render()
+    const input = screen.getByRole('textbox')
     fireEvent.change(input, {
       target: { value: 'reachableOtie' },
     })
     expect(input).toHaveValue('reachableOtie')
-    const renameButton = getByRole('button', { name: 'Rename robot' })
-    const error = await findByText(
+    const renameButton = screen.getByRole('button', { name: 'Rename robot' })
+    const error = await screen.findByText(
       'Oops! Name is already in use. Choose a different name.'
     )
     await waitFor(() => {
       expect(renameButton).toBeDisabled()
+    })
+    await waitFor(() => {
       expect(error).toBeInTheDocument()
     })
   })

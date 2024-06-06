@@ -1,11 +1,12 @@
 import * as React from 'react'
+import { createPortal } from 'react-dom'
 import { useDispatch, useSelector } from 'react-redux'
 import last from 'lodash/last'
 
 import { useWifiList } from '../../../resources/networking/hooks'
 import * as RobotApi from '../../../redux/robot-api'
 import * as Networking from '../../../redux/networking'
-import { Portal } from '../../../App/portal'
+import { getModalPortalEl } from '../../../App/portal'
 import { SelectSsid } from './ConnectNetwork/SelectSsid'
 import { ConnectModal } from './ConnectNetwork/ConnectModal'
 import { ResultModal } from './ConnectNetwork/ResultModal'
@@ -18,7 +19,7 @@ import type {
   NetworkChangeState,
 } from './ConnectNetwork/types'
 
-interface TempSelectNetworkProps {
+interface SelectNetworkProps {
   robotName: string
   isRobotBusy: boolean
 }
@@ -26,7 +27,7 @@ interface TempSelectNetworkProps {
 export const SelectNetwork = ({
   robotName,
   isRobotBusy,
-}: TempSelectNetworkProps): JSX.Element => {
+}: SelectNetworkProps): JSX.Element => {
   const list = useWifiList(robotName)
   const keys = useSelector((state: State) =>
     Networking.getWifiKeys(state, robotName)
@@ -98,9 +99,9 @@ export const SelectNetwork = ({
         onJoinOther={handleSelectJoinOther}
         isRobotBusy={isRobotBusy}
       />
-      {changeState.type != null && (
-        <Portal>
-          {requestState != null ? (
+      {changeState.type != null &&
+        createPortal(
+          requestState != null ? (
             <ResultModal
               type={changeState.type}
               ssid={changeState.ssid}
@@ -128,9 +129,9 @@ export const SelectNetwork = ({
               onConnect={handleConnect}
               onCancel={handleDone}
             />
-          )}
-        </Portal>
-      )}
+          ),
+          getModalPortalEl()
+        )}
     </>
   )
 }

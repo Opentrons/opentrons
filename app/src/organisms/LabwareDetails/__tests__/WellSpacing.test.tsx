@@ -1,5 +1,7 @@
 import * as React from 'react'
-import { renderWithProviders } from '@opentrons/components'
+import { screen } from '@testing-library/react'
+import { describe, it, beforeEach, expect } from 'vitest'
+import { renderWithProviders } from '../../../__testing-utils__'
 import { i18n } from '../../../i18n'
 import { mockCircularLabwareWellGroupProperties } from '../../../redux/custom-labware/__fixtures__'
 import { WellSpacing } from '../WellSpacing'
@@ -24,18 +26,18 @@ describe('WellSpacing', () => {
       xSpacing: 2.22227,
       ySpacing: 2.22227,
     }
-    const [{ getAllByText }] = render(props)
-    expect(getAllByText('2.22')).toHaveLength(2)
+    render(props)
+    expect(screen.getAllByText('2.22')).toHaveLength(2)
   })
 
   it('renders correct labels when xSpacing and ySpacing have values', () => {
-    const [{ getAllByText, getByRole }] = render(props)
+    render(props)
 
-    getByRole('heading', { name: 'x-offset' })
-    getByRole('heading', { name: 'y-offset' })
-    getByRole('heading', { name: 'x-spacing' })
-    getByRole('heading', { name: 'y-spacing' })
-    expect(getAllByText('1.00')).toHaveLength(4)
+    screen.getByRole('heading', { name: 'x-offset' })
+    screen.getByRole('heading', { name: 'y-offset' })
+    screen.getByRole('heading', { name: 'x-spacing' })
+    screen.getByRole('heading', { name: 'y-spacing' })
+    expect(screen.getAllByText('1.00')).toHaveLength(4)
   })
 
   it('renders correct labels when xSpacing and ySpacing are null', () => {
@@ -44,9 +46,9 @@ describe('WellSpacing', () => {
       xSpacing: null,
       ySpacing: null,
     }
-    const [{ getAllByText }] = render(props)
+    render(props)
 
-    expect(getAllByText('1.00')).toHaveLength(2)
-    expect(getAllByText('various')).toHaveLength(2)
+    expect(screen.getAllByText('1.00')).toHaveLength(2)
+    expect(screen.getAllByText('various')).toHaveLength(2)
   })
 })

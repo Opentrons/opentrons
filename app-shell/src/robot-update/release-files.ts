@@ -7,13 +7,12 @@ import { move, readdir, remove, readFile } from 'fs-extra'
 import StreamZip from 'node-stream-zip'
 import getStream from 'get-stream'
 
-import { RobotUpdateTarget } from '@opentrons/app/src/redux/robot-update/types'
-
 import { createLogger } from '../log'
 import { fetchToFile } from '../http'
-import { Dispatch } from '../types'
 import { CURRENT_VERSION } from '../update'
 
+import type { RobotUpdateTarget } from '@opentrons/app/src/redux/robot-update/types'
+import type { Dispatch } from '../types'
 import type { DownloadProgress } from '../http'
 import type { ReleaseSetUrls, ReleaseSetFilepaths, UserFileInfo } from './types'
 
@@ -94,16 +93,16 @@ export function downloadAndNotify(
     return move(tempPath, path, { overwrite: true })
       .then(() => {
         if (isReleaseNotesDownload) {
-          return readFile(path, 'utf8').then(releaseNotes =>
+          return readFile(path, 'utf8').then(releaseNotes => {
             dispatch({
               type: 'robotUpdate:UPDATE_INFO',
               payload: { releaseNotes, target, version: CURRENT_VERSION },
             })
-          )
+          })
         }
         // This action will only have an effect if the user is actively waiting for the download to complete.
         else {
-          return dispatch({
+          dispatch({
             type: 'robotUpdate:DOWNLOAD_DONE',
             payload: target,
           })
@@ -151,7 +150,9 @@ export function readUpdateFileInfo(systemFile: string): Promise<UserFileInfo> {
         versionInfo,
       }))
 
-    result.finally(() => zip.close())
+    result.finally(() => {
+      zip.close()
+    })
 
     return result
   })

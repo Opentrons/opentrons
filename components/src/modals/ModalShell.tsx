@@ -1,7 +1,8 @@
 import * as React from 'react'
 import styled from 'styled-components'
-import { BORDERS, COLORS, RESPONSIVENESS, SPACING } from '../ui-style-constants'
-import { StyleProps, styleProps } from '../primitives'
+import { SPACING } from '../ui-style-constants'
+import { BORDERS, COLORS } from '../helix-design-system'
+import { styleProps } from '../primitives'
 import {
   POSITION_FIXED,
   POSITION_ABSOLUTE,
@@ -11,6 +12,8 @@ import {
   JUSTIFY_CENTER,
   OVERFLOW_AUTO,
 } from '../styles'
+
+import type { StyleProps } from '../primitives'
 export interface ModalShellProps extends StyleProps {
   /** Modal content */
   children: React.ReactNode
@@ -77,13 +80,10 @@ const Overlay = styled.div`
   top: 0;
   bottom: 0;
   z-index: 1;
-  background-color: ${COLORS.backgroundOverlay};
+  background-color: ${COLORS.black90}${COLORS.opacity60HexCode};
   cursor: default;
-
-  @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
-    background-color: ${COLORS.darkBlack60};
-  }
 `
+
 const ContentArea = styled.div<{ zIndex: string | number }>`
   display: flex;
   position: ${POSITION_ABSOLUTE};
@@ -106,7 +106,7 @@ const ModalArea = styled.div<
   overflow-y: ${OVERFLOW_AUTO};
   max-height: 100%;
   width: 100%;
-  border-radius: ${BORDERS.radiusSoftCorners};
+  border-radius: ${BORDERS.borderRadius8};
   box-shadow: ${BORDERS.smallDropShadow};
   height: ${({ isFullPage }) => (isFullPage ? '100%' : 'auto')};
   background-color: ${COLORS.white};

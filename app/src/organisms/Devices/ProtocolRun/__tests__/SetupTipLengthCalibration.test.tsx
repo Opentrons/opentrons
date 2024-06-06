@@ -1,8 +1,9 @@
 import * as React from 'react'
-import { when, resetAllWhenMocks } from 'jest-when'
+import { when } from 'vitest-when'
+import { describe, it, beforeEach, vi, afterEach, expect } from 'vitest'
+import { screen } from '@testing-library/react'
 
-import { renderWithProviders } from '@opentrons/components'
-
+import { renderWithProviders } from '../../../../__testing-utils__'
 import { i18n } from '../../../../i18n'
 import { mockTipRackDefinition } from '../../../../redux/custom-labware/__fixtures__'
 import { useRunPipetteInfoByMount } from '../../hooks'
@@ -11,20 +12,12 @@ import { SetupTipLengthCalibration } from '../SetupTipLengthCalibration'
 
 import type { PipetteInfo } from '../../hooks'
 
-jest.mock('../../../../redux/config')
-jest.mock('../../hooks')
-jest.mock('../SetupTipLengthCalibrationButton')
-
-const mockUseRunPipetteInfoByMount = useRunPipetteInfoByMount as jest.MockedFunction<
-  typeof useRunPipetteInfoByMount
->
-const mockSetupTipLengthCalibrationButton = SetupTipLengthCalibrationButton as jest.MockedFunction<
-  typeof SetupTipLengthCalibrationButton
->
+vi.mock('../../../../redux/config')
+vi.mock('../../hooks')
+vi.mock('../SetupTipLengthCalibrationButton')
 
 const ROBOT_NAME = 'otie'
 const RUN_ID = '1'
-
 const PIPETTE_INFO = {
   requestedPipetteMatch: 'incompatible',
   pipetteCalDate: null,
@@ -51,52 +44,60 @@ const render = () => {
 
 describe('SetupTipLengthCalibration', () => {
   beforeEach(() => {
-    when(mockUseRunPipetteInfoByMount).calledWith(RUN_ID).mockReturnValue({
+    when(vi.mocked(useRunPipetteInfoByMount)).calledWith(RUN_ID).thenReturn({
       left: PIPETTE_INFO,
       right: null,
     })
-    when(mockSetupTipLengthCalibrationButton).mockReturnValue(
+    vi.mocked(SetupTipLengthCalibrationButton).mockReturnValue(
       <div>Mock SetupTipLengthCalibrationButton</div>
     )
   })
   afterEach(() => {
-    resetAllWhenMocks()
+    vi.resetAllMocks()
   })
 
   it('renders required tip length calibrations title', () => {
-    const { getByText } = render()
-    getByText('Required Tip Length Calibrations')
+    render()
+    screen.getByText('Required Tip Length Calibrations')
   })
   it('renders the pipette and tip rack name', () => {
-    const { getAllByText, queryByText } = render()
+    render()
 
-    expect(getAllByText('pipette 1')).toHaveLength(1)
-    expect(getAllByText('Mock TipRack Definition')).toHaveLength(1)
-    expect(getAllByText('Mock SetupTipLengthCalibrationButton')).toHaveLength(1)
+    expect(screen.getAllByText('pipette 1')).toHaveLength(1)
+    expect(screen.getAllByText('Mock TipRack Definition')).toHaveLength(1)
     expect(
-      getAllByText('Attach pipette to see tip length calibration information')
+      screen.getAllByText('Mock SetupTipLengthCalibrationButton')
     ).toHaveLength(1)
-    expect(queryByText('Last calibrated:')).toBeFalsy()
+    expect(
+      screen.getAllByText(
+        'Attach pipette to see tip length calibration information'
+      )
+    ).toHaveLength(1)
+    expect(screen.queryByText('Last calibrated:')).toBeFalsy()
   })
   it('renders two tip length calibrations when protocol run requires two pipettes', () => {
-    when(mockUseRunPipetteInfoByMount).calledWith(RUN_ID).mockReturnValue({
+    when(vi.mocked(useRunPipetteInfoByMount)).calledWith(RUN_ID).thenReturn({
       left: PIPETTE_INFO,
       right: PIPETTE_INFO,
     })
-    const { getAllByText, queryByText } = render()
+    render()
 
-    expect(getAllByText('pipette 1')).toHaveLength(2)
-    expect(getAllByText('Mock TipRack Definition')).toHaveLength(2)
-    expect(getAllByText('Mock SetupTipLengthCalibrationButton')).toHaveLength(2)
+    expect(screen.getAllByText('pipette 1')).toHaveLength(2)
+    expect(screen.getAllByText('Mock TipRack Definition')).toHaveLength(2)
     expect(
-      getAllByText('Attach pipette to see tip length calibration information')
+      screen.getAllByText('Mock SetupTipLengthCalibrationButton')
     ).toHaveLength(2)
-    expect(queryByText('Last calibrated:')).toBeFalsy()
+    expect(
+      screen.getAllByText(
+        'Attach pipette to see tip length calibration information'
+      )
+    ).toHaveLength(2)
+    expect(screen.queryByText('Last calibrated:')).toBeFalsy()
   })
   it('renders last calibrated date when available', () => {
-    when(mockUseRunPipetteInfoByMount)
+    when(vi.mocked(useRunPipetteInfoByMount))
       .calledWith(RUN_ID)
-      .mockReturnValue({
+      .thenReturn({
         left: {
           ...PIPETTE_INFO,
           requestedPipetteMatch: 'match',
@@ -111,20 +112,20 @@ describe('SetupTipLengthCalibration', () => {
         right: null,
       })
 
-    const { getAllByText } = render()
-    expect(getAllByText('Last calibrated: yesterday')).toHaveLength(1)
+    render()
+    expect(screen.getAllByText('Last calibrated: yesterday')).toHaveLength(1)
   })
   it('renders not calibrated yet when not calibrated', () => {
-    when(mockUseRunPipetteInfoByMount)
+    when(vi.mocked(useRunPipetteInfoByMount))
       .calledWith(RUN_ID)
-      .mockReturnValue({
+      .thenReturn({
         left: {
           ...PIPETTE_INFO,
           requestedPipetteMatch: 'match',
         },
         right: null,
       })
-    const { getAllByText } = render()
-    expect(getAllByText('Not calibrated yet')).toHaveLength(1)
+    render()
+    expect(screen.getAllByText('Not calibrated yet')).toHaveLength(1)
   })
 })

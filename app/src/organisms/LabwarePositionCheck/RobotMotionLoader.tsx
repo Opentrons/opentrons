@@ -1,18 +1,18 @@
 import * as React from 'react'
 import styled from 'styled-components'
 import {
-  Icon,
-  Flex,
-  COLORS,
-  RESPONSIVENESS,
-  TYPOGRAPHY,
-  SIZE_4,
-  JUSTIFY_CENTER,
   ALIGN_CENTER,
+  COLORS,
   DIRECTION_COLUMN,
+  Flex,
+  Icon,
+  JUSTIFY_CENTER,
+  RESPONSIVENESS,
+  SIZE_4,
   SPACING,
+  StyledText,
+  TYPOGRAPHY,
 } from '@opentrons/components'
-import { StyledText } from '../../atoms/text'
 
 interface RobotMotionLoaderProps {
   header?: string
@@ -29,12 +29,7 @@ export function RobotMotionLoader(props: RobotMotionLoaderProps): JSX.Element {
       minHeight="29.5rem"
       gridGap={SPACING.spacing24}
     >
-      <Icon
-        name="ot-spinner"
-        spin
-        size={SIZE_4}
-        color={COLORS.darkGreyEnabled}
-      />
+      <Icon name="ot-spinner" spin size={SIZE_4} color={COLORS.grey50} />
       {header != null ? <LoadingText>{header}</LoadingText> : null}
       {body != null ? <StyledText as="p">{body}</StyledText> : null}
     </Flex>

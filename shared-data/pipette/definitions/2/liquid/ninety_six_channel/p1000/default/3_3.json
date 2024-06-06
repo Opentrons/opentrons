@@ -2,6 +2,7 @@
   "$otSharedSchema": "#/pipette/schemas/2/pipetteLiquidPropertiesSchema.json",
   "supportedTips": {
     "t50": {
+      "uiMaxFlowRate": 189.1,
       "defaultAspirateFlowRate": {
         "default": 6,
         "valuesByApiLevel": { "2.14": 6 }
@@ -56,6 +57,7 @@
       "defaultPushOutVolume": 7
     },
     "t200": {
+      "uiMaxFlowRate": 185.1,
       "defaultAspirateFlowRate": {
         "default": 80,
         "valuesByApiLevel": { "2.14": 80 }
@@ -108,6 +110,7 @@
       "defaultPushOutVolume": 5
     },
     "t1000": {
+      "uiMaxFlowRate": 184.8,
       "defaultAspirateFlowRate": {
         "default": 160,
         "valuesByApiLevel": { "2.14": 160 }
@@ -176,13 +179,19 @@
     "default": 10.5,
     "opentrons/opentrons_flex_96_tiprack_50ul/1": 10.5,
     "opentrons/opentrons_flex_96_tiprack_1000ul/1": 10.5,
-    "opentrons/opentrons_flex_96_tiprack_200ul/1": 10.5
+    "opentrons/opentrons_flex_96_tiprack_200ul/1": 10.5,
+    "opentrons/opentrons_flex_96_filtertiprack_1000ul/1": 10.5,
+    "opentrons/opentrons_flex_96_filtertiprack_200ul/1": 10.5,
+    "opentrons/opentrons_flex_96_filtertiprack_50ul/1": 10.5
   },
   "maxVolume": 1000,
   "minVolume": 5,
   "defaultTipracks": [
     "opentrons/opentrons_flex_96_tiprack_1000ul/1",
     "opentrons/opentrons_flex_96_tiprack_200ul/1",
-    "opentrons/opentrons_flex_96_tiprack_50ul/1"
+    "opentrons/opentrons_flex_96_tiprack_50ul/1",
+    "opentrons/opentrons_flex_96_filtertiprack_1000ul/1",
+    "opentrons/opentrons_flex_96_filtertiprack_200ul/1",
+    "opentrons/opentrons_flex_96_filtertiprack_50ul/1"
   ]
 }

@@ -1,21 +1,22 @@
 import * as React from 'react'
 import {
-  Flex,
-  Icon,
-  SPACING,
   ALIGN_CENTER,
-  TYPOGRAPHY,
   BORDERS,
   COLORS,
   DIRECTION_COLUMN,
+  Flex,
+  Icon,
   SIZE_1,
+  SPACING,
+  StyledText,
+  TYPOGRAPHY,
 } from '@opentrons/components'
-import { StyledText } from '../../atoms/text'
 
-import type { StyleProps } from '@opentrons/components'
 import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
 import { getIsOnDevice } from '../../redux/config'
+
+import type { StyleProps } from '@opentrons/components'
 
 interface OffsetVectorProps extends StyleProps {
   x: number
@@ -47,8 +48,8 @@ export function LiveOffsetValue(props: OffsetVectorProps): JSX.Element {
       </StyledText>
       <Flex
         alignItems={ALIGN_CENTER}
-        border={`${BORDERS.styleSolid} 1px ${COLORS.lightGreyHover}`}
-        borderRadius={BORDERS.radiusSoftCorners}
+        border={`${BORDERS.styleSolid} 1px ${COLORS.grey30}`}
+        borderRadius={BORDERS.borderRadius4}
         padding={SPACING.spacing8}
         {...styleProps}
       >

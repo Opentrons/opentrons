@@ -8,7 +8,7 @@ marks:
 stages:
   - name: Create the session
     request:
-      url: "{ot2_server_base_url}/sessions"
+      url: '{ot2_server_base_url}/sessions'
       method: POST
       json:
         data:
@@ -24,16 +24,16 @@ stages:
           session_id: data.id
   - name: Get the session
     request:
-      url: "{ot2_server_base_url}/sessions/{session_id}"
+      url: '{ot2_server_base_url}/sessions/{session_id}'
       method: GET
     response:
       status_code: 200
       json:
         links: !anydict
         data:
-          id: "{session_id}"
+          id: '{session_id}'
           sessionType: tipLengthCalibration
-          createdAt: !re_search "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+\\+\\d{2}:\\d{2}$"
+          createdAt: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"
           details: &session_data_attribute_details
             currentStep: sessionStarted
             instrument: !anydict
@@ -48,7 +48,7 @@ stages:
 
   - name: Load labware
     request:
-      url: "{ot2_server_base_url}/sessions/{session_id}/commands/execute"
+      url: '{ot2_server_base_url}/sessions/{session_id}/commands/execute'
       method: POST
       json:
         data:
@@ -62,8 +62,7 @@ stages:
           id: !anystr
           status: executed
           command: calibration.loadLabware
-          createdAt: &dt
-            !re_match "\\d+-\\d+-\\d+T"
+          createdAt: !re_match &dt "\\d+-\\d+-\\d+T"
           startedAt: *dt
           completedAt: *dt
           data:
@@ -72,7 +71,7 @@ stages:
 
   - name: Attempt conflicting command
     request:
-      url: "{ot2_server_base_url}/sessions/{session_id}/commands/execute"
+      url: '{ot2_server_base_url}/sessions/{session_id}/commands/execute'
       method: POST
       json:
         data:
@@ -83,14 +82,14 @@ stages:
 
   - name: Delete the session
     request:
-      url: "{ot2_server_base_url}/sessions/{session_id}"
+      url: '{ot2_server_base_url}/sessions/{session_id}'
       method: DELETE
     response:
       status_code: 200
 
   - name: There are no sessions
     request:
-      url: "{ot2_server_base_url}/sessions"
+      url: '{ot2_server_base_url}/sessions'
       method: GET
     response:
       status_code: 200

@@ -1,0 +1,16 @@
+@import '@opentrons/components/styles';
+
+.disabled {
+  color: var(--c-font-disabled);
+}
+
+.field_wrapper {
+  margin: 1rem 0;
+}
+
+.field_label {
+  margin-bottom: 0.375rem;
+  font-weight: var(--fw-semibold);
+  font-size: var(--fs-body-1);
+  line-height: var(--lh-copy);
+}

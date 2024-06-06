@@ -2,7 +2,7 @@ import pytest
 from typing import AsyncIterator, Dict
 from decoy import Decoy
 
-from opentrons.hardware_control.types import OT3Mount, TipStateType
+from opentrons.hardware_control.types import OT3Mount, TipStateType, InstrumentProbeType
 from opentrons.hardware_control.backends.tip_presence_manager import TipPresenceManager
 from opentrons_hardware.hardware_control.tip_presence import (
     TipDetector,
@@ -108,6 +108,51 @@ async def test_get_tip_status_for_high_throughput(
 
     result = await subject.get_tip_status(mount)
     result == expected_type
+
+
+@pytest.mark.parametrize(
+    "tip_presence,expected_type,sensor_to_look_at",
+    [
+        (
+            {SensorId.S0: False, SensorId.S1: False},
+            TipStateType.ABSENT,
+            InstrumentProbeType.PRIMARY,
+        ),
+        (
+            {SensorId.S0: True, SensorId.S1: True},
+            TipStateType.PRESENT,
+            InstrumentProbeType.SECONDARY,
+        ),
+        (
+            {SensorId.S0: False, SensorId.S1: True},
+            TipStateType.ABSENT,
+            InstrumentProbeType.PRIMARY,
+        ),
+        (
+            {SensorId.S0: False, SensorId.S1: True},
+            TipStateType.PRESENT,
+            InstrumentProbeType.SECONDARY,
+        ),
+    ],
+)
+async def test_allow_different_tip_states_ht(
+    subject: TipPresenceManager,
+    tip_detector_controller: TipDetectorController,
+    tip_presence: Dict[SensorId, bool],
+    expected_type: TipStateType,
+    sensor_to_look_at: InstrumentProbeType,
+) -> None:
+    mount = OT3Mount.LEFT
+    await tip_detector_controller.retrieve_tip_status_highthroughput(tip_presence)
+
+    result = await subject.get_tip_status(mount, sensor_to_look_at)
+    result == expected_type
+
+    # if sensor_to_look_at is not used, different tip states
+    # should result in an UnmatchedTipStates error
+    if len(set(tip_presence[t] for t in tip_presence)) > 1:
+        with pytest.raises(UnmatchedTipPresenceStates):
+            result = await subject.get_tip_status(mount)
 
 
 @pytest.mark.parametrize(

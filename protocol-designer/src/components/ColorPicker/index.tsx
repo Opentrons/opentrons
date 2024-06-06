@@ -1,9 +1,10 @@
 import * as React from 'react'
 import cx from 'classnames'
-import { ColorResult, TwitterPicker } from 'react-color'
-import { COLORS } from '@opentrons/components'
+import { TwitterPicker } from 'react-color'
+import { DEFAULT_LIQUID_COLORS } from '@opentrons/shared-data'
+import type { ColorResult } from 'react-color'
 
-import styles from './ColorPicker.css'
+import styles from './ColorPicker.module.css'
 
 interface ColorPickerProps {
   value: string
@@ -11,6 +12,7 @@ interface ColorPickerProps {
 }
 
 export function ColorPicker(props: ColorPickerProps): JSX.Element {
+  const { value, onChange } = props
   const [showColorPicker, setShowColorPicker] = React.useState<boolean>(false)
 
   return (
@@ -20,14 +22,14 @@ export function ColorPicker(props: ColorPickerProps): JSX.Element {
           className={cx(styles.swatch, {
             [styles.swatch_enabled]: showColorPicker,
           })}
-          onClick={() =>
+          onClick={() => {
             setShowColorPicker(showColorPicker => !showColorPicker)
-          }
+          }}
         >
           <div
             className={styles.color}
             style={{
-              backgroundColor: props.value,
+              backgroundColor: value,
             }}
           />
         </div>
@@ -35,13 +37,15 @@ export function ColorPicker(props: ColorPickerProps): JSX.Element {
           <div className={styles.popover}>
             <div
               className={styles.cover}
-              onClick={() => setShowColorPicker(false)}
+              onClick={() => {
+                setShowColorPicker(false)
+              }}
             />
             <TwitterPicker
-              colors={COLORS.liquidColors}
-              color={props.value}
+              colors={DEFAULT_LIQUID_COLORS}
+              color={value}
               onChange={(color, event) => {
-                props.onChange(color.hex)
+                onChange(color.hex)
               }}
             />
           </div>

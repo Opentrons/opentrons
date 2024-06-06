@@ -1,7 +1,7 @@
 """Abstract base classes for the sensor drivers."""
 from abc import ABC, abstractmethod
 
-from typing import Optional, AsyncIterator
+from typing import Optional, AsyncIterator, Sequence
 from opentrons_hardware.drivers.can_bus.can_messenger import CanMessenger
 
 from opentrons_hardware.sensors.sensor_types import BaseSensorType, ThresholdSensorType
@@ -88,7 +88,7 @@ class AbstractSensorDriver(ABC):
         self,
         can_messenger: CanMessenger,
         sensor: BaseSensorType,
-        binding: SensorOutputBinding = SensorOutputBinding.sync,
+        binding: Optional[Sequence[SensorOutputBinding]],
     ) -> AsyncIterator[None]:
         """Send a BindSensorOutputRequest."""
         yield

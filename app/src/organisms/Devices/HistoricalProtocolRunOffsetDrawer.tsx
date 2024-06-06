@@ -2,13 +2,17 @@ import * as React from 'react'
 import isEqual from 'lodash/isEqual'
 import { useTranslation } from 'react-i18next'
 import {
-  Flex,
+  ALIGN_CENTER,
+  ALIGN_END,
+  BORDERS,
   Box,
-  SPACING,
   COLORS,
-  TYPOGRAPHY,
-  JUSTIFY_FLEX_START,
   DIRECTION_COLUMN,
+  Flex,
+  JUSTIFY_FLEX_START,
+  SPACING,
+  StyledText,
+  TYPOGRAPHY,
 } from '@opentrons/components'
 import {
   getLabwareDefURI,
@@ -16,7 +20,6 @@ import {
   getLoadedLabwareDefinitionsByUri,
   getModuleDisplayName,
 } from '@opentrons/shared-data'
-import { StyledText } from '../../atoms/text'
 import { Banner } from '../../atoms/Banner'
 import { useMostRecentCompletedAnalysis } from '../LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import { useDeckCalibrationData } from './hooks'
@@ -59,13 +62,14 @@ export function HistoricalProtocolRunOffsetDrawer(
   if (uniqueLabwareOffsets == null || uniqueLabwareOffsets.length === 0) {
     return (
       <Box
-        backgroundColor={COLORS.fundamentalsBackground}
+        backgroundColor={COLORS.grey20}
         width="100%"
-        padding={`${SPACING.spacing16} ${SPACING.spacing8} ${SPACING.spacing16} ${SPACING.spacing48}`}
+        padding={SPACING.spacing16}
+        borderRadius={BORDERS.borderRadius4}
       >
         <Box
           backgroundColor={COLORS.white}
-          padding={SPACING.spacing24}
+          padding={`${SPACING.spacing24} ${SPACING.spacing8}`}
           textAlign="center"
         >
           <StyledText as="label">{t('no_offsets_available')}</StyledText>
@@ -82,12 +86,17 @@ export function HistoricalProtocolRunOffsetDrawer(
 
   return (
     <Box
-      backgroundColor={COLORS.fundamentalsBackground}
+      backgroundColor={COLORS.grey20}
       width="100%"
-      padding={`${SPACING.spacing16} ${SPACING.spacing8} ${SPACING.spacing16} ${SPACING.spacing48}`}
+      padding={SPACING.spacing16}
+      borderRadius={BORDERS.borderRadius4}
     >
       {isOutOfDate ? (
-        <Banner type="warning" marginTop={SPACING.spacing8}>
+        <Banner
+          type="warning"
+          marginTop={SPACING.spacing8}
+          iconMarginLeft={SPACING.spacing4}
+        >
           <Flex flexDirection={DIRECTION_COLUMN}>
             <StyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
               {t('data_out_of_date')}
@@ -96,34 +105,40 @@ export function HistoricalProtocolRunOffsetDrawer(
           </Flex>
         </Banner>
       ) : null}
-      <Flex justifyContent={JUSTIFY_FLEX_START}>
-        <StyledText
-          width="24%"
-          as="label"
-          fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-          textTransform={TYPOGRAPHY.textTransformCapitalize}
-          datatest-id="RecentProtocolRun_OffsetDrawer_locationTitle"
+      <Flex justifyContent={JUSTIFY_FLEX_START} alignItems={ALIGN_END}>
+        <Box
+          width="25.25%"
+          padding={`${SPACING.spacing4} ${SPACING.spacing8} ${SPACING.spacing4} ${SPACING.spacing4}`}
         >
-          {t('location')}
-        </StyledText>
-        <StyledText
-          as="label"
-          width="33%"
-          fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-          textTransform={TYPOGRAPHY.textTransformCapitalize}
-          datatest-id="RecentProtocolRun_OffsetDrawer_labwareTitle"
-        >
-          {t('labware')}
-        </StyledText>
-        <StyledText
-          as="label"
-          width="40%"
-          fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-          textTransform={TYPOGRAPHY.textTransformCapitalize}
-          datatest-id="RecentProtocolRun_OffsetDrawer_labwareOffsetDataTitle"
-        >
-          {t('labware_offset_data')}
-        </StyledText>
+          <StyledText
+            as="label"
+            fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+            textTransform={TYPOGRAPHY.textTransformCapitalize}
+            datatest-id="RecentProtocolRun_OffstDrawer_locationTitle"
+          >
+            {t('location')}
+          </StyledText>
+        </Box>
+        <Box width="39.75%" padding={`${SPACING.spacing4} ${SPACING.spacing8}`}>
+          <StyledText
+            as="label"
+            fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+            textTransform={TYPOGRAPHY.textTransformCapitalize}
+            datatest-id="RecentProtocolRun_OffsetDrawer_labwareTitle"
+          >
+            {t('labware')}
+          </StyledText>
+        </Box>
+        <Box width="34%" padding={`${SPACING.spacing4} ${SPACING.spacing8}`}>
+          <StyledText
+            as="label"
+            fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+            textTransform={TYPOGRAPHY.textTransformCapitalize}
+            datatest-id="RecentProtocolRun_OffsetDrawer_labwareOffsetDataTitle"
+          >
+            {t('labware_offset_data')}
+          </StyledText>
+        </Box>
       </Flex>
       {uniqueLabwareOffsets.map((offset, index) => {
         const labwareDefinitions =
@@ -142,32 +157,32 @@ export function HistoricalProtocolRunOffsetDrawer(
           <Flex
             key={index}
             justifyContent={JUSTIFY_FLEX_START}
+            alignItems={ALIGN_CENTER}
             padding={SPACING.spacing8}
             backgroundColor={COLORS.white}
-            marginY={SPACING.spacing8}
+            marginY={SPACING.spacing4}
+            borderRadius={BORDERS.borderRadius4}
+            gridGap={SPACING.spacing24}
           >
-            <StyledText width="23.5%" as="label">
-              {t('slot', { slotName: offset.location.slotName })}
-              {offset.location.moduleModel != null &&
-                ` - ${String(
-                  getModuleDisplayName(offset.location.moduleModel)
-                )}`}
-            </StyledText>
-            <StyledText
-              as="label"
-              width="34%"
-              overflow="hidden"
-              textOverflow="ellipsis"
-              title={labwareName}
-            >
-              {labwareName}
-            </StyledText>
-            <OffsetVector
-              {...offset.vector}
-              width="40%"
-              fontSize={TYPOGRAPHY.fontSizeLabel}
-              as="label"
-            />
+            <Box width="23.25%">
+              <StyledText as="label">
+                {t('slot', { slotName: offset.location.slotName })}
+                {offset.location.moduleModel != null &&
+                  ` - ${getModuleDisplayName(offset.location.moduleModel)}`}
+              </StyledText>
+            </Box>
+            <Box width="38%">
+              <StyledText as="label" title={labwareName}>
+                {labwareName}
+              </StyledText>
+            </Box>
+            <Box width="33%">
+              <OffsetVector
+                {...offset.vector}
+                fontSize={TYPOGRAPHY.fontSizeLabel}
+                as="label"
+              />
+            </Box>
           </Flex>
         )
       })}

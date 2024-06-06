@@ -9,16 +9,16 @@ import {
   Flex,
   JUSTIFY_SPACE_BETWEEN,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
-import { StyledText } from '../../atoms/text'
 import { MediumButton } from '../../atoms/buttons'
 import { ChildNavigation } from '../../organisms/ChildNavigation'
 import { RobotSystemVersionModal } from './RobotSystemVersionModal'
 
 import type { RobotUpdateInfo } from '../../redux/robot-update/types'
-import type { SetSettingOption } from '../../pages/OnDeviceDisplay/RobotSettingsDashboard'
+import type { SetSettingOption } from '../../pages/RobotSettingsDashboard'
 
 const GITHUB_URL = 'https://github.com/Opentrons/opentrons/releases'
 
@@ -40,6 +40,7 @@ export function RobotSystemVersion({
     'shared',
     'device_details',
     'app_settings',
+    'branded',
   ])
   const [showModal, setShowModal] = React.useState<boolean>(isUpdateAvailable)
 
@@ -66,7 +67,9 @@ export function RobotSystemVersion({
                 }
               : undefined
           }
-          onClickBack={() => setCurrentOption(null)}
+          onClickBack={() => {
+            setCurrentOption(null)
+          }}
         />
         <Flex
           gridGap="16rem"
@@ -76,14 +79,14 @@ export function RobotSystemVersion({
         >
           <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing24}>
             <StyledText as="p">
-              {t('view_latest_release_notes_at', { url: GITHUB_URL })}
+              {t('branded:view_latest_release_notes_at', { url: GITHUB_URL })}
             </StyledText>
             <Flex
-              backgroundColor={COLORS.light1}
+              backgroundColor={COLORS.grey35}
               flexDirection={DIRECTION_ROW}
               padding={`${SPACING.spacing16} ${SPACING.spacing24}`}
               justifyContent={JUSTIFY_SPACE_BETWEEN}
-              borderRadius={BORDERS.borderRadiusSize3}
+              borderRadius={BORDERS.borderRadius8}
             >
               <StyledText
                 as="p"
@@ -97,7 +100,9 @@ export function RobotSystemVersion({
               <MediumButton
                 flex="1"
                 buttonText={t('view_update')}
-                onClick={() => setShowModal(true)}
+                onClick={() => {
+                  setShowModal(true)
+                }}
               />
             ) : null}
           </Flex>

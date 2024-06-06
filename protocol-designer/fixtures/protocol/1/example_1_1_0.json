@@ -175,7 +175,7 @@
           "mix_wellOrder_first": "t2b",
           "mix_wellOrder_second": "l2r",
           "blowout_checkbox": true,
-          "blowout_location": "dest_well",
+          "blowout_location": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
           "mix_mmFromBottom": 0.5,
           "pipette": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
           "volume": "5.5",

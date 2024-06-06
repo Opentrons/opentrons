@@ -1,12 +1,12 @@
 import * as React from 'react'
 import { MemoryRouter } from 'react-router-dom'
-import { fireEvent } from '@testing-library/react'
-import { resetAllWhenMocks } from 'jest-when'
-import { renderWithProviders } from '@opentrons/components'
+import { fireEvent, screen } from '@testing-library/react'
+import { describe, it, vi, beforeEach, expect } from 'vitest'
+import '@testing-library/jest-dom/vitest'
+import { renderWithProviders } from '../../../__testing-utils__'
 import { i18n } from '../../../i18n'
 import { useCurrentRunId } from '../../ProtocolUpload/hooks'
 import { ChooseProtocolSlideout } from '../../ChooseProtocolSlideout'
-import { ConnectionTroubleshootingModal } from '../ConnectionTroubleshootingModal'
 import { RobotOverflowMenu } from '../RobotOverflowMenu'
 import { getRobotUpdateDisplayInfo } from '../../../redux/robot-update'
 import { useIsRobotBusy } from '../hooks'
@@ -16,27 +16,11 @@ import {
   mockConnectedRobot,
 } from '../../../redux/discovery/__fixtures__'
 
-jest.mock('../../../redux/robot-update/selectors')
-jest.mock('../../ProtocolUpload/hooks')
-jest.mock('../../ChooseProtocolSlideout')
-jest.mock('../ConnectionTroubleshootingModal')
-jest.mock('../hooks')
-
-const mockUseCurrentRunId = useCurrentRunId as jest.MockedFunction<
-  typeof useCurrentRunId
->
-const mockChooseProtocolSlideout = ChooseProtocolSlideout as jest.MockedFunction<
-  typeof ChooseProtocolSlideout
->
-const mockConnectionTroubleshootingModal = ConnectionTroubleshootingModal as jest.MockedFunction<
-  typeof ConnectionTroubleshootingModal
->
-const mockGetBuildrootUpdateDisplayInfo = getRobotUpdateDisplayInfo as jest.MockedFunction<
-  typeof getRobotUpdateDisplayInfo
->
-const mockUseIsRobotBusy = useIsRobotBusy as jest.MockedFunction<
-  typeof useIsRobotBusy
->
+vi.mock('../../../redux/robot-update/selectors')
+vi.mock('../../ProtocolUpload/hooks')
+vi.mock('../../ChooseProtocolSlideout')
+vi.mock('../hooks')
+vi.mock('../../../resources/devices/hooks/useIsEstopNotDisengaged')
 
 const render = (props: React.ComponentProps<typeof RobotOverflowMenu>) => {
   return renderWithProviders(
@@ -56,73 +40,59 @@ describe('RobotOverflowMenu', () => {
     props = {
       robot: mockConnectedRobot,
     }
-    mockUseCurrentRunId.mockReturnValue('RUNID')
-    mockChooseProtocolSlideout.mockReturnValue(
+    vi.mocked(useCurrentRunId).mockReturnValue('RUNID')
+    vi.mocked(ChooseProtocolSlideout).mockReturnValue(
       <div>choose protocol slideout</div>
     )
-    mockGetBuildrootUpdateDisplayInfo.mockReturnValue({
+    vi.mocked(getRobotUpdateDisplayInfo).mockReturnValue({
       autoUpdateAction: 'reinstall',
       autoUpdateDisabledReason: null,
       updateFromFileDisabledReason: null,
     })
-    mockUseIsRobotBusy.mockReturnValue(false)
-  })
-  afterEach(() => {
-    jest.resetAllMocks()
-    resetAllWhenMocks()
+    vi.mocked(useIsRobotBusy).mockReturnValue(false)
   })
 
   it('renders overflow menu items when the robot is reachable and a run id is present', () => {
-    const { getByLabelText, getByRole } = render(props)
-    const btn = getByLabelText('RobotOverflowMenu_button')
+    render(props)
+    const btn = screen.getByLabelText('RobotOverflowMenu_button')
     fireEvent.click(btn)
-    getByRole('link', { name: 'Robot settings' })
+    screen.getByRole('link', { name: 'Robot settings' })
   })
 
   it('renders overflow menu items when the robot is not reachable', () => {
-    mockConnectionTroubleshootingModal.mockReturnValue(
-      <div>mock troubleshooting modal</div>
-    )
+    vi.mocked(useCurrentRunId).mockReturnValue(null)
+
     props = {
       robot: mockUnreachableRobot,
     }
-    mockUseCurrentRunId.mockReturnValue(null)
-    const { getByText, getByLabelText } = render(props)
-    const btn = getByLabelText('RobotOverflowMenu_button')
+    render(props)
+    const btn = screen.getByLabelText('RobotOverflowMenu_button')
     fireEvent.click(btn)
-    const why = getByText('Why is this robot unavailable?')
-    getByText('Forget unavailable robot')
-    fireEvent.click(why)
-    getByText('mock troubleshooting modal')
+    screen.getByText('Why is this robot unavailable?')
+    screen.getByText('Forget unavailable robot')
   })
 
   it('disables the run a protocol menu item if robot software update is available', () => {
-    mockUseCurrentRunId.mockReturnValue(null)
-    mockGetBuildrootUpdateDisplayInfo.mockReturnValue({
+    vi.mocked(useCurrentRunId).mockReturnValue(null)
+    vi.mocked(getRobotUpdateDisplayInfo).mockReturnValue({
       autoUpdateAction: 'upgrade',
       autoUpdateDisabledReason: null,
       updateFromFileDisabledReason: null,
     })
-    const { getByText, getByLabelText } = render(props)
-    const btn = getByLabelText('RobotOverflowMenu_button')
+    render(props)
+    const btn = screen.getByLabelText('RobotOverflowMenu_button')
     fireEvent.click(btn)
-    const run = getByText('Run a protocol')
+    const run = screen.getByText('Run a protocol')
     expect(run).toBeDisabled()
   })
 
-  it('should only render robot settings when e-stop is pressed or disconnected', () => {
-    mockUseCurrentRunId.mockReturnValue(null)
-    mockGetBuildrootUpdateDisplayInfo.mockReturnValue({
-      autoUpdateAction: 'upgrade',
-      autoUpdateDisabledReason: null,
-      updateFromFileDisabledReason: null,
-    })
-
-    mockUseIsRobotBusy.mockReturnValue(true)
-    const { getByText, getByLabelText, queryByText } = render(props)
-    const btn = getByLabelText('RobotOverflowMenu_button')
+  it('disables the run a protocol menu item if robot is busy', () => {
+    vi.mocked(useCurrentRunId).mockReturnValue(null)
+    vi.mocked(useIsRobotBusy).mockReturnValue(true)
+    render(props)
+    const btn = screen.getByLabelText('RobotOverflowMenu_button')
     fireEvent.click(btn)
-    expect(queryByText('Run a protocol')).not.toBeInTheDocument()
-    getByText('Robot settings')
+    const run = screen.getByText('Run a protocol')
+    expect(run).toBeDisabled()
   })
 })

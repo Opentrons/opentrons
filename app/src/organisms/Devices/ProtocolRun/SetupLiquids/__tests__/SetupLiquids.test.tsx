@@ -1,25 +1,17 @@
 import * as React from 'react'
+import { describe, it, beforeEach, vi } from 'vitest'
+import { screen, fireEvent } from '@testing-library/react'
+
+import { renderWithProviders } from '../../../../../__testing-utils__'
 import { i18n } from '../../../../../i18n'
-import { renderWithProviders } from '@opentrons/components'
 import { SetupLiquids } from '../index'
 import { SetupLiquidsList } from '../SetupLiquidsList'
 import { SetupLiquidsMap } from '../SetupLiquidsMap'
 import { BackToTopButton } from '../../BackToTopButton'
-import { fireEvent } from '@testing-library/react'
 
-jest.mock('../SetupLiquidsList')
-jest.mock('../SetupLiquidsMap')
-jest.mock('../../BackToTopButton')
-
-const mockSetupLiquidsList = SetupLiquidsList as jest.MockedFunction<
-  typeof SetupLiquidsList
->
-const mockSetupLiquidsMap = SetupLiquidsMap as jest.MockedFunction<
-  typeof SetupLiquidsMap
->
-const mockBackToTopButton = BackToTopButton as jest.MockedFunction<
-  typeof BackToTopButton
->
+vi.mock('../SetupLiquidsList')
+vi.mock('../SetupLiquidsMap')
+vi.mock('../../BackToTopButton')
 
 const render = (props: React.ComponentProps<typeof SetupLiquids>) => {
   return renderWithProviders(
@@ -38,27 +30,33 @@ const render = (props: React.ComponentProps<typeof SetupLiquids>) => {
 describe('SetupLiquids', () => {
   let props: React.ComponentProps<typeof SetupLiquids>
   beforeEach(() => {
-    mockSetupLiquidsList.mockReturnValue(<div>Mock setup liquids list</div>)
-    mockSetupLiquidsMap.mockReturnValue(<div>Mock setup liquids map</div>)
-    mockBackToTopButton.mockReturnValue(<button>Mock BackToTopButton</button>)
+    vi.mocked(SetupLiquidsList).mockReturnValue(
+      <div>Mock setup liquids list</div>
+    )
+    vi.mocked(SetupLiquidsMap).mockReturnValue(
+      <div>Mock setup liquids map</div>
+    )
+    vi.mocked(BackToTopButton).mockReturnValue(
+      <button>Mock BackToTopButton</button>
+    )
   })
 
   it('renders the list and map view buttons and proceed button', () => {
-    const [{ getByRole }] = render(props)
-    getByRole('button', { name: 'List View' })
-    getByRole('button', { name: 'Map View' })
-    getByRole('button', { name: 'Mock BackToTopButton' })
+    render(props)
+    screen.getByRole('button', { name: 'List View' })
+    screen.getByRole('button', { name: 'Map View' })
+    screen.getByRole('button', { name: 'Mock BackToTopButton' })
   })
   it('renders the map view when you press that toggle button', () => {
-    const [{ getByRole, getByText }] = render(props)
-    const mapViewButton = getByRole('button', { name: 'Map View' })
+    render(props)
+    const mapViewButton = screen.getByRole('button', { name: 'Map View' })
     fireEvent.click(mapViewButton)
-    getByText('Mock setup liquids map')
+    screen.getByText('Mock setup liquids map')
   })
   it('renders the list view when you press that toggle button', () => {
-    const [{ getByRole, getByText }] = render(props)
-    const mapViewButton = getByRole('button', { name: 'List View' })
+    render(props)
+    const mapViewButton = screen.getByRole('button', { name: 'List View' })
     fireEvent.click(mapViewButton)
-    getByText('Mock setup liquids list')
+    screen.getByText('Mock setup liquids list')
   })
 })

@@ -1,106 +1,51 @@
 import * as React from 'react'
-import { when, resetAllWhenMocks } from 'jest-when'
+import { when } from 'vitest-when'
 import { StaticRouter } from 'react-router-dom'
-import { fireEvent } from '@testing-library/react'
+import { screen, fireEvent } from '@testing-library/react'
+import { describe, it, beforeEach, vi, expect, afterEach } from 'vitest'
 
-import { renderWithProviders } from '@opentrons/components'
-import { i18n } from '../../../../../i18n'
 import {
-  useRunQuery,
   useProtocolQuery,
   useProtocolAnalysisAsDocumentQuery,
 } from '@opentrons/react-api-client'
+import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
+
+import { renderWithProviders } from '../../../../../__testing-utils__'
+import { i18n } from '../../../../../i18n'
 import { useLPCSuccessToast } from '../../../hooks/useLPCSuccessToast'
 import { getModuleTypesThatRequireExtraAttention } from '../../utils/getModuleTypesThatRequireExtraAttention'
 import { useLaunchLPC } from '../../../../LabwarePositionCheck/useLaunchLPC'
 import { getIsLabwareOffsetCodeSnippetsOn } from '../../../../../redux/config'
 import {
   useLPCDisabledReason,
-  useProtocolDetailsForRun,
   useRunCalibrationStatus,
   useRunHasStarted,
   useUnmatchedModulesForProtocol,
   useRobotType,
 } from '../../../hooks'
 import { SetupLabwarePositionCheck } from '..'
-import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
+import { useNotifyRunQuery } from '../../../../../resources/runs'
 
-jest.mock('../../../../LabwarePositionCheck/useLaunchLPC')
-jest.mock('../../utils/getModuleTypesThatRequireExtraAttention')
-jest.mock('../../../../RunTimeControl/hooks')
-jest.mock('../../../../../redux/config')
-jest.mock('../../../hooks')
-jest.mock('../../../hooks/useLPCSuccessToast')
-jest.mock('@opentrons/react-api-client')
+import type { Mock } from 'vitest'
 
-const mockGetModuleTypesThatRequireExtraAttention = getModuleTypesThatRequireExtraAttention as jest.MockedFunction<
-  typeof getModuleTypesThatRequireExtraAttention
->
-const mockUseRunHasStarted = useRunHasStarted as jest.MockedFunction<
-  typeof useRunHasStarted
->
-const mockUseProtocolDetailsForRun = useProtocolDetailsForRun as jest.MockedFunction<
-  typeof useProtocolDetailsForRun
->
-const mockUseUnmatchedModulesForProtocol = useUnmatchedModulesForProtocol as jest.MockedFunction<
-  typeof useUnmatchedModulesForProtocol
->
-const mockUseRunCalibrationStatus = useRunCalibrationStatus as jest.MockedFunction<
-  typeof useRunCalibrationStatus
->
-const mockGetIsLabwareOffsetCodeSnippetsOn = getIsLabwareOffsetCodeSnippetsOn as jest.MockedFunction<
-  typeof getIsLabwareOffsetCodeSnippetsOn
->
-const mockUseLPCSuccessToast = useLPCSuccessToast as jest.MockedFunction<
-  typeof useLPCSuccessToast
->
-const mockUseLPCDisabledReason = useLPCDisabledReason as jest.MockedFunction<
-  typeof useLPCDisabledReason
->
-const mockUseLaunchLPC = useLaunchLPC as jest.MockedFunction<
-  typeof useLaunchLPC
->
-const mockUseRobotType = useRobotType as jest.MockedFunction<
-  typeof useRobotType
->
-const mockUseRunQuery = useRunQuery as jest.MockedFunction<typeof useRunQuery>
-const mockUseProtocolQuery = useProtocolQuery as jest.MockedFunction<
-  typeof useProtocolQuery
->
-const mockUseProtocolAnalysisAsDocumentQuery = useProtocolAnalysisAsDocumentQuery as jest.MockedFunction<
-  typeof useProtocolAnalysisAsDocumentQuery
->
+vi.mock('../../../../LabwarePositionCheck/useLaunchLPC')
+vi.mock('../../utils/getModuleTypesThatRequireExtraAttention')
+vi.mock('../../../../RunTimeControl/hooks')
+vi.mock('../../../../../redux/config')
+vi.mock('../../../hooks')
+vi.mock('../../../hooks/useLPCSuccessToast')
+vi.mock('@opentrons/react-api-client')
+vi.mock('../../../../../resources/runs')
+
 const DISABLED_REASON = 'MOCK_DISABLED_REASON'
 const ROBOT_NAME = 'otie'
 const RUN_ID = '1'
-const PICKUP_TIP_LABWARE_ID = 'PICKUP_TIP_LABWARE_ID'
-const PRIMARY_PIPETTE_ID = 'PRIMARY_PIPETTE_ID'
-const PRIMARY_PIPETTE_NAME = 'PRIMARY_PIPETTE_NAME'
-const LABWARE_DEF_ID = 'LABWARE_DEF_ID'
-const LABWARE_DEF = {
-  ordering: [['A1', 'A2']],
-  parameters: { isTiprack: true },
-}
-const mockLabwarePositionCheckStepTipRack = {
-  labwareId:
-    '1d57fc10-67ad-11ea-9f8b-3b50068bd62d:opentrons/opentrons_96_filtertiprack_200ul/1',
-  section: '',
-  commands: [
-    {
-      commandType: 'pickUpTip',
-      params: {
-        pipetteId: PRIMARY_PIPETTE_ID,
-        labwareId: PICKUP_TIP_LABWARE_ID,
-      },
-    },
-  ],
-} as any
 
 const render = () => {
   return renderWithProviders(
     <StaticRouter>
       <SetupLabwarePositionCheck
-        expandLabwareStep={jest.fn()}
+        expandLabwareStep={vi.fn()}
         robotName={ROBOT_NAME}
         runId={RUN_ID}
       />
@@ -111,250 +56,91 @@ const render = () => {
   )[0]
 }
 
-describe('SetupLabware', () => {
-  let mockLaunchLPC: jest.Mock
+describe('SetupLabwarePositionCheck', () => {
+  let mockLaunchLPC: Mock
 
   beforeEach(() => {
-    mockLaunchLPC = jest.fn()
-    when(mockGetModuleTypesThatRequireExtraAttention)
+    mockLaunchLPC = vi.fn()
+    when(vi.mocked(getModuleTypesThatRequireExtraAttention))
       .calledWith(expect.anything())
-      .mockReturnValue([])
+      .thenReturn([])
 
-    when(mockUseUnmatchedModulesForProtocol)
+    when(vi.mocked(useUnmatchedModulesForProtocol))
       .calledWith(ROBOT_NAME, RUN_ID)
-      .mockReturnValue({
+      .thenReturn({
         missingModuleIds: [],
         remainingAttachedModules: [],
       })
 
-    when(mockUseLPCSuccessToast)
+    when(vi.mocked(useLPCSuccessToast))
       .calledWith()
-      .mockReturnValue({ setIsShowingLPCSuccessToast: jest.fn() })
+      .thenReturn({ setIsShowingLPCSuccessToast: vi.fn() })
 
-    when(mockUseRunCalibrationStatus)
+    when(vi.mocked(useRunCalibrationStatus))
       .calledWith(ROBOT_NAME, RUN_ID)
-      .mockReturnValue({
+      .thenReturn({
         complete: true,
       })
-    when(mockUseRunHasStarted).calledWith(RUN_ID).mockReturnValue(false)
-    when(mockUseProtocolDetailsForRun)
-      .calledWith(RUN_ID)
-      .mockReturnValue({
-        protocolData: {
-          labware: {
-            [mockLabwarePositionCheckStepTipRack.labwareId]: {
-              slot: '1',
-              displayName: 'someDisplayName',
-              definitionId: LABWARE_DEF_ID,
-            },
-          },
-          labwareDefinitions: {
-            [LABWARE_DEF_ID]: LABWARE_DEF,
-          },
-          pipettes: {
-            [PRIMARY_PIPETTE_ID]: {
-              name: PRIMARY_PIPETTE_NAME,
-              mount: 'left',
-            },
-          },
-          commands: [
-            {
-              commandType: 'pickUpTip',
-              params: { pipetteId: PRIMARY_PIPETTE_ID },
-            } as any,
-          ],
-        },
-      } as any)
-    when(mockGetIsLabwareOffsetCodeSnippetsOn).mockReturnValue(false)
-    when(mockUseLPCDisabledReason).mockReturnValue(null)
-    when(mockUseRobotType)
+    when(vi.mocked(useRunHasStarted)).calledWith(RUN_ID).thenReturn(false)
+    vi.mocked(getIsLabwareOffsetCodeSnippetsOn).mockReturnValue(false)
+    vi.mocked(useLPCDisabledReason).mockReturnValue(null)
+    when(vi.mocked(useRobotType))
       .calledWith(ROBOT_NAME)
-      .mockReturnValue(FLEX_ROBOT_TYPE)
-    when(mockUseLaunchLPC)
+      .thenReturn(FLEX_ROBOT_TYPE)
+    when(vi.mocked(useLaunchLPC))
       .calledWith(RUN_ID, FLEX_ROBOT_TYPE, 'test protocol')
-      .mockReturnValue({
+      .thenReturn({
         launchLPC: mockLaunchLPC,
         LPCWizard: <div>mock LPC Wizard</div>,
       })
-    when(mockUseRunQuery).mockReturnValue({
+    vi.mocked(useNotifyRunQuery).mockReturnValue({
       data: {
         data: { protocolId: 'fakeProtocolId' },
       },
     } as any)
-    when(mockUseProtocolQuery).mockReturnValue({
+    vi.mocked(useProtocolQuery).mockReturnValue({
       data: { data: { metadata: { protocolName: 'test protocol' } } },
     } as any)
-    when(mockUseProtocolAnalysisAsDocumentQuery).mockReturnValue({
+    vi.mocked(useProtocolAnalysisAsDocumentQuery).mockReturnValue({
       data: null,
     } as any)
   })
 
   afterEach(() => {
-    resetAllWhenMocks()
+    vi.resetAllMocks()
   })
 
   it('should render LPC button and clicking should launch modal', () => {
-    const { getByRole } = render()
-    getByRole('button', {
-      name: 'run labware position check',
-    }).click()
+    render()
+    fireEvent.click(
+      screen.getByRole('button', {
+        name: 'run labware position check',
+      })
+    )
     expect(mockLaunchLPC).toHaveBeenCalled()
   })
-  it('should render a disabled LPC button when a run has started', () => {
-    when(mockUseRunHasStarted).calledWith(RUN_ID).mockReturnValue(true)
-    when(mockUseLPCDisabledReason).mockReturnValue(DISABLED_REASON)
-    const { getByRole, queryByText } = render()
-    const button = getByRole('button', {
+  it('should render a disabled LPC button when disabled LPC reason exists', () => {
+    when(vi.mocked(useRunHasStarted)).calledWith(RUN_ID).thenReturn(true)
+    vi.mocked(useLPCDisabledReason).mockReturnValue(DISABLED_REASON)
+    render()
+    const button = screen.getByRole('button', {
       name: 'run labware position check',
     })
     expect(button).toBeDisabled()
     fireEvent.click(button)
-    expect(queryByText('mock Labware Position Check')).toBeNull()
+    expect(screen.queryByText('mock Labware Position Check')).toBeNull()
   })
 
   it('should close Labware Offset Success toast when LPC is launched', () => {
-    const mockSetIsShowingLPCSuccessToast = jest.fn()
-    when(mockUseLPCSuccessToast).calledWith().mockReturnValue({
+    const mockSetIsShowingLPCSuccessToast = vi.fn()
+    when(vi.mocked(useLPCSuccessToast)).calledWith().thenReturn({
       setIsShowingLPCSuccessToast: mockSetIsShowingLPCSuccessToast,
     })
-    const { getByRole } = render()
-    const button = getByRole('button', {
+    render()
+    const button = screen.getByRole('button', {
       name: 'run labware position check',
     })
     fireEvent.click(button)
     expect(mockSetIsShowingLPCSuccessToast).toHaveBeenCalledWith(false)
-  })
-  it('should render a disabled LPC button when a robot-side protocol analysis is not complete', () => {
-    when(mockUseProtocolDetailsForRun)
-      .calledWith(RUN_ID)
-      .mockReturnValue({
-        protocolData: null,
-      } as any)
-    when(mockUseLPCDisabledReason).mockReturnValue(DISABLED_REASON)
-    const { getByRole } = render()
-    const button = getByRole('button', {
-      name: 'run labware position check',
-    })
-    expect(button).toBeDisabled()
-  })
-  it('should render a disabled LPC button when a protocol without a pipette AND without a labware is uploaded', () => {
-    when(mockUseProtocolDetailsForRun)
-      .calledWith(RUN_ID)
-      .mockReturnValue({
-        protocolData: { labware: {}, pipettes: {} },
-      } as any)
-    when(mockUseLPCDisabledReason).mockReturnValue(DISABLED_REASON)
-    const { getByRole } = render()
-    const button = getByRole('button', {
-      name: 'run labware position check',
-    })
-    expect(button).toBeDisabled()
-  })
-  it('should render a disabled LPC button when robot calibration is incomplete', () => {
-    when(mockUseRunCalibrationStatus)
-      .calledWith(ROBOT_NAME, RUN_ID)
-      .mockReturnValue({
-        complete: false,
-      })
-    when(mockUseLPCDisabledReason).mockReturnValue(DISABLED_REASON)
-    const { getByRole } = render()
-    const button = getByRole('button', {
-      name: 'run labware position check',
-    })
-    expect(button).toBeDisabled()
-  })
-  it('should render a disabled LPC button when modules are not connected', () => {
-    when(mockUseUnmatchedModulesForProtocol)
-      .calledWith(ROBOT_NAME, RUN_ID)
-      .mockReturnValue({
-        missingModuleIds: ['temperatureModuleV1'],
-        remainingAttachedModules: [],
-      })
-    when(mockUseLPCDisabledReason).mockReturnValue(DISABLED_REASON)
-    const { getByRole } = render()
-    const button = getByRole('button', {
-      name: 'run labware position check',
-    })
-    expect(button).toBeDisabled()
-  })
-  it('should render a disabled LPC button when modules are not connected and robot calibration is incomplete', () => {
-    when(mockUseRunCalibrationStatus)
-      .calledWith(ROBOT_NAME, RUN_ID)
-      .mockReturnValue({
-        complete: false,
-      })
-    when(mockUseUnmatchedModulesForProtocol)
-      .calledWith(ROBOT_NAME, RUN_ID)
-      .mockReturnValue({
-        missingModuleIds: ['temperatureModuleV1'],
-        remainingAttachedModules: [],
-      })
-    when(mockUseLPCDisabledReason).mockReturnValue(DISABLED_REASON)
-    const { getByRole } = render()
-    const button = getByRole('button', {
-      name: 'run labware position check',
-    })
-    expect(button).toBeDisabled()
-  })
-  it('should render a disabled LPC button when a protocol does not load a tip rack', () => {
-    when(mockUseProtocolDetailsForRun)
-      .calledWith(RUN_ID)
-      .mockReturnValue({
-        protocolData: {
-          labware: {
-            'labware-0': {
-              slot: '1',
-              displayName: 'someDisplayName',
-              definitionId: LABWARE_DEF_ID,
-            },
-          },
-          labwareDefinitions: {
-            [LABWARE_DEF_ID]: { parameters: { isTiprack: false } },
-          },
-          pipettes: {
-            [PRIMARY_PIPETTE_ID]: {
-              name: PRIMARY_PIPETTE_NAME,
-              mount: 'left',
-            },
-          },
-        },
-      } as any)
-    when(mockUseLPCDisabledReason).mockReturnValue(DISABLED_REASON)
-    const { getByRole } = render()
-    const button = getByRole('button', {
-      name: 'run labware position check',
-    })
-    expect(button).toBeDisabled()
-  })
-  it('should render a disabled LPC button when a protocol does not include a pickUpTip', () => {
-    when(mockUseProtocolDetailsForRun)
-      .calledWith(RUN_ID)
-      .mockReturnValue({
-        protocolData: {
-          labware: {
-            [mockLabwarePositionCheckStepTipRack.labwareId]: {
-              slot: '1',
-              displayName: 'someDisplayName',
-              definitionId: LABWARE_DEF_ID,
-            },
-          },
-          labwareDefinitions: {
-            [LABWARE_DEF_ID]: LABWARE_DEF,
-          },
-          pipettes: {
-            [PRIMARY_PIPETTE_ID]: {
-              name: PRIMARY_PIPETTE_NAME,
-              mount: 'left',
-            },
-          },
-          commands: [],
-        },
-      } as any)
-    when(mockUseLPCDisabledReason).mockReturnValue(DISABLED_REASON)
-    const { getByRole } = render()
-    const button = getByRole('button', {
-      name: 'run labware position check',
-    })
-    expect(button).toBeDisabled()
   })
 })

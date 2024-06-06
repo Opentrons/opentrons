@@ -1,12 +1,14 @@
 import * as React from 'react'
+import { screen } from '@testing-library/react'
 import { MemoryRouter } from 'react-router-dom'
-import { when, resetAllWhenMocks } from 'jest-when'
+import { when } from 'vitest-when'
+import { describe, it, vi, beforeEach, expect, afterEach } from 'vitest'
+import '@testing-library/jest-dom/vitest'
 
-import { renderWithProviders } from '@opentrons/components'
-
+import { renderWithProviders } from '../../../../__testing-utils__'
 import { i18n } from '../../../../i18n'
 import { getShellUpdateState } from '../../../../redux/shell'
-import { useIsFlex } from '../../hooks'
+import { useIsFlex, useIsRobotBusy } from '../../hooks'
 import {
   DeviceReset,
   DisplayRobotName,
@@ -21,81 +23,37 @@ import {
   UpdateRobotSoftware,
   UsageSettings,
   UseOlderAspirateBehavior,
-  UseOlderProtocol,
 } from '../AdvancedTab'
 import { RobotSettingsAdvanced } from '../RobotSettingsAdvanced'
 
-import { ShellUpdateState } from '../../../../redux/shell/types'
+import type { ShellUpdateState } from '../../../../redux/shell/types'
+import type * as ShellUpdate from '../../../../redux/shell/update'
 
-jest.mock('../../../../redux/robot-settings/selectors')
-jest.mock('../../../../redux/discovery/selectors')
-jest.mock('../../../../redux/shell/update', () => ({
-  ...jest.requireActual<{}>('../../../../redux/shell/update'),
-  getShellUpdateState: jest.fn(),
-}))
-jest.mock('../../hooks/useIsFlex')
-jest.mock('../AdvancedTab/DeviceReset')
-jest.mock('../AdvancedTab/DisplayRobotName')
-jest.mock('../AdvancedTab/EnableStatusLight')
-jest.mock('../AdvancedTab/GantryHoming')
-jest.mock('../AdvancedTab/LegacySettings')
-jest.mock('../AdvancedTab/OpenJupyterControl')
-jest.mock('../AdvancedTab/RobotInformation')
-jest.mock('../AdvancedTab/RobotServerVersion')
-jest.mock('../AdvancedTab/ShortTrashBin')
-jest.mock('../AdvancedTab/Troubleshooting')
-jest.mock('../AdvancedTab/UpdateRobotSoftware')
-jest.mock('../AdvancedTab/UsageSettings')
-jest.mock('../AdvancedTab/UseOlderAspirateBehavior')
-jest.mock('../AdvancedTab/UseOlderProtocol')
+vi.mock('../../../../redux/robot-settings/selectors')
+vi.mock('../../../../redux/discovery/selectors')
+vi.mock('../../../../redux/shell/update', async importOriginal => {
+  const actual = await importOriginal<typeof ShellUpdate>()
+  return {
+    ...actual,
+    getShellUpdateState: vi.fn(),
+  }
+})
+vi.mock('../../hooks')
+vi.mock('../AdvancedTab/DeviceReset')
+vi.mock('../AdvancedTab/DisplayRobotName')
+vi.mock('../AdvancedTab/EnableStatusLight')
+vi.mock('../AdvancedTab/GantryHoming')
+vi.mock('../AdvancedTab/LegacySettings')
+vi.mock('../AdvancedTab/OpenJupyterControl')
+vi.mock('../AdvancedTab/RobotInformation')
+vi.mock('../AdvancedTab/RobotServerVersion')
+vi.mock('../AdvancedTab/ShortTrashBin')
+vi.mock('../AdvancedTab/Troubleshooting')
+vi.mock('../AdvancedTab/UpdateRobotSoftware')
+vi.mock('../AdvancedTab/UsageSettings')
+vi.mock('../AdvancedTab/UseOlderAspirateBehavior')
 
-const mockGetShellUpdateState = getShellUpdateState as jest.MockedFunction<
-  typeof getShellUpdateState
->
-
-const mockAboutRobotName = DisplayRobotName as jest.MockedFunction<
-  typeof DisplayRobotName
->
-const mockGantryHoming = GantryHoming as jest.MockedFunction<
-  typeof GantryHoming
->
-const mockDeviceReset = DeviceReset as jest.MockedFunction<typeof DeviceReset>
-const mockLegacySettings = LegacySettings as jest.MockedFunction<
-  typeof LegacySettings
->
-const mockOpenJupyterControl = OpenJupyterControl as jest.MockedFunction<
-  typeof OpenJupyterControl
->
-const mockRobotInformation = RobotInformation as jest.MockedFunction<
-  typeof RobotInformation
->
-const mockRobotServerVersion = RobotServerVersion as jest.MockedFunction<
-  typeof RobotServerVersion
->
-const mockShortTrashBin = ShortTrashBin as jest.MockedFunction<
-  typeof ShortTrashBin
->
-const mockTroubleshooting = Troubleshooting as jest.MockedFunction<
-  typeof Troubleshooting
->
-const mockUpdateRobotSoftware = UpdateRobotSoftware as jest.MockedFunction<
-  typeof UpdateRobotSoftware
->
-const mockUsageSettings = UsageSettings as jest.MockedFunction<
-  typeof UsageSettings
->
-const mockUseOlderAspirateBehavior = UseOlderAspirateBehavior as jest.MockedFunction<
-  typeof UseOlderAspirateBehavior
->
-const mockUseOlderProtocol = UseOlderProtocol as jest.MockedFunction<
-  typeof UseOlderProtocol
->
-const mockEnableStatusLight = EnableStatusLight as jest.MockedFunction<
-  typeof EnableStatusLight
->
-const mockUseIsFlex = useIsFlex as jest.MockedFunction<typeof useIsFlex>
-
-const mockUpdateRobotStatus = jest.fn()
+const mockUpdateRobotStatus = vi.fn()
 
 const render = () => {
   return renderWithProviders(
@@ -113,146 +71,148 @@ const render = () => {
 
 describe('RobotSettings Advanced tab', () => {
   beforeEach(() => {
-    mockGetShellUpdateState.mockReturnValue({
+    vi.mocked(getShellUpdateState).mockReturnValue({
       downloading: true,
     } as ShellUpdateState)
-    mockAboutRobotName.mockReturnValue(<div>Mock AboutRobotName Section</div>)
-    mockGantryHoming.mockReturnValue(<div>Mock GantryHoming Section</div>)
-    mockDeviceReset.mockReturnValue(<div>Mock DeviceReset Section</div>)
-    mockLegacySettings.mockReturnValue(<div>Mock LegacySettings Section</div>)
-    mockOpenJupyterControl.mockReturnValue(
+    vi.mocked(DisplayRobotName).mockReturnValue(
+      <div>Mock AboutRobotName Section</div>
+    )
+    vi.mocked(GantryHoming).mockReturnValue(
+      <div>Mock GantryHoming Section</div>
+    )
+    vi.mocked(DeviceReset).mockReturnValue(<div>Mock DeviceReset Section</div>)
+    vi.mocked(LegacySettings).mockReturnValue(
+      <div>Mock LegacySettings Section</div>
+    )
+    vi.mocked(OpenJupyterControl).mockReturnValue(
       <div>Mock OpenJupyterControl Section</div>
     )
-    mockRobotInformation.mockReturnValue(
+    vi.mocked(RobotInformation).mockReturnValue(
       <div>Mock RobotInformation Section</div>
     )
-    mockRobotServerVersion.mockReturnValue(
+    vi.mocked(RobotServerVersion).mockReturnValue(
       <div>Mock RobotServerVersion Section</div>
     )
-    mockShortTrashBin.mockReturnValue(<div>Mock ShortTrashBin Section</div>)
-    mockTroubleshooting.mockReturnValue(<div>Mock Troubleshooting Section</div>)
-    mockUpdateRobotSoftware.mockReturnValue(
+    vi.mocked(ShortTrashBin).mockReturnValue(
+      <div>Mock ShortTrashBin Section</div>
+    )
+    vi.mocked(Troubleshooting).mockReturnValue(
+      <div>Mock Troubleshooting Section</div>
+    )
+    vi.mocked(UpdateRobotSoftware).mockReturnValue(
       <div>Mock UpdateRobotSoftware Section</div>
     )
-    mockUsageSettings.mockReturnValue(<div>Mock UsageSettings Section</div>)
-    mockUseOlderAspirateBehavior.mockReturnValue(
+    vi.mocked(UsageSettings).mockReturnValue(
+      <div>Mock UsageSettings Section</div>
+    )
+    vi.mocked(UseOlderAspirateBehavior).mockReturnValue(
       <div>Mock UseOlderAspirateBehavior Section</div>
     )
-    mockUseOlderProtocol.mockReturnValue(
-      <div>Mock UseOlderProtocol Section</div>
+    when(useIsFlex).calledWith('otie').thenReturn(false)
+    vi.mocked(EnableStatusLight).mockReturnValue(
+      <div>mock EnableStatusLight</div>
     )
-    when(mockUseIsFlex).calledWith('otie').mockReturnValue(false)
-    mockEnableStatusLight.mockReturnValue(<div>mock EnableStatusLight</div>)
+    vi.mocked(useIsRobotBusy).mockReturnValue(false)
   })
 
-  afterAll(() => {
-    jest.resetAllMocks()
-    resetAllWhenMocks()
+  afterEach(() => {
+    vi.clearAllMocks()
   })
 
   it('should render AboutRobotName section', () => {
-    const [{ getByText }] = render()
-    getByText('Mock AboutRobotName Section')
+    render()
+    screen.getByText('Mock AboutRobotName Section')
   })
 
   it('should render GantryHoming section', () => {
-    const [{ getByText }] = render()
-    getByText('Mock GantryHoming Section')
+    render()
+    screen.getByText('Mock GantryHoming Section')
   })
 
   it('should render DeviceReset section', () => {
-    const [{ getByText }] = render()
-    getByText('Mock DeviceReset Section')
+    render()
+    screen.getByText('Mock DeviceReset Section')
   })
 
   it('should render LegacySettings section for OT-2', () => {
-    const [{ getByText }] = render()
-    getByText('Mock LegacySettings Section')
+    render()
+    screen.getByText('Mock LegacySettings Section')
   })
 
   it('should not render LegacySettings section for Flex', () => {
-    when(mockUseIsFlex).calledWith('otie').mockReturnValue(true)
-    const [{ queryByText }] = render()
-    expect(queryByText('Mock LegacySettings Section')).toBeNull()
+    when(useIsFlex).calledWith('otie').thenReturn(true)
+    render()
+    expect(screen.queryByText('Mock LegacySettings Section')).toBeNull()
   })
 
   it('should render OpenJupyterControl section', () => {
-    const [{ getByText }] = render()
-    getByText('Mock OpenJupyterControl Section')
+    render()
+    screen.getByText('Mock OpenJupyterControl Section')
   })
 
   it('should render RobotInformation section', () => {
-    const [{ getByText }] = render()
-    getByText('Mock RobotInformation Section')
+    render()
+    screen.getByText('Mock RobotInformation Section')
   })
 
   it('should render RobotServerVersion section', () => {
-    const [{ getByText }] = render()
-    getByText('Mock RobotServerVersion Section')
+    render()
+    screen.getByText('Mock RobotServerVersion Section')
   })
 
   it('should render ShortTrashBin section for OT-2', () => {
-    const [{ getByText }] = render()
-    getByText('Mock ShortTrashBin Section')
+    render()
+    screen.getByText('Mock ShortTrashBin Section')
   })
 
   it('should not render ShortTrashBin section for Flex', () => {
-    when(mockUseIsFlex).calledWith('otie').mockReturnValue(true)
-    const [{ queryByText }] = render()
-    expect(queryByText('Mock ShortTrashBin Section')).toBeNull()
+    when(useIsFlex).calledWith('otie').thenReturn(true)
+    render()
+    expect(screen.queryByText('Mock ShortTrashBin Section')).toBeNull()
   })
 
   it('should render Troubleshooting section', () => {
-    const [{ getByText }] = render()
-    getByText('Mock Troubleshooting Section')
+    render()
+    screen.getByText('Mock Troubleshooting Section')
   })
 
   it('should render UpdateRobotSoftware section', () => {
-    const [{ getByText }] = render()
-    getByText('Mock UpdateRobotSoftware Section')
+    render()
+    screen.getByText('Mock UpdateRobotSoftware Section')
   })
 
   it('should render UsageSettings section', () => {
-    const [{ getByText }] = render()
-    getByText('Mock UsageSettings Section')
+    render()
+    screen.getByText('Mock UsageSettings Section')
   })
 
   it('should not render UsageSettings for Flex', () => {
-    when(mockUseIsFlex).calledWith('otie').mockReturnValue(true)
-    const [{ queryByText }] = render()
-    expect(queryByText('Mock UsageSettings Section')).toBeNull()
+    when(useIsFlex).calledWith('otie').thenReturn(true)
+    render()
+    expect(screen.queryByText('Mock UsageSettings Section')).toBeNull()
   })
 
   it('should render UseOlderAspirateBehavior section for OT-2', () => {
-    const [{ getByText }] = render()
-    getByText('Mock UseOlderAspirateBehavior Section')
+    render()
+    screen.getByText('Mock UseOlderAspirateBehavior Section')
   })
 
   it('should not render UseOlderAspirateBehavior section for Flex', () => {
-    when(mockUseIsFlex).calledWith('otie').mockReturnValue(true)
-    const [{ queryByText }] = render()
-    expect(queryByText('Mock UseOlderAspirateBehavior Section')).toBeNull()
-  })
-
-  it('should render UseOlderProtocol section for OT-2', () => {
-    const [{ getByText }] = render()
-    getByText('Mock UseOlderProtocol Section')
-  })
-
-  it('should not render UseOlderProtocol section for Flex', () => {
-    when(mockUseIsFlex).calledWith('otie').mockReturnValue(true)
-    const [{ queryByText }] = render()
-    expect(queryByText('Mock UseOlderProtocol Section')).toBeNull()
+    when(useIsFlex).calledWith('otie').thenReturn(true)
+    render()
+    expect(
+      screen.queryByText('Mock UseOlderAspirateBehavior Section')
+    ).toBeNull()
   })
 
   it('should not render EnableStatusLight section for OT-2', () => {
-    const [{ queryByText }] = render()
-    expect(queryByText('mock EnableStatusLight')).not.toBeInTheDocument()
+    render()
+    expect(screen.queryByText('mock EnableStatusLight')).not.toBeInTheDocument()
   })
 
   it('should render EnableStatusLight section for Flex', () => {
-    when(mockUseIsFlex).calledWith('otie').mockReturnValue(true)
-    const [{ getByText }] = render()
-    getByText('mock EnableStatusLight')
+    when(useIsFlex).calledWith('otie').thenReturn(true)
+    render()
+    screen.getByText('mock EnableStatusLight')
   })
 })

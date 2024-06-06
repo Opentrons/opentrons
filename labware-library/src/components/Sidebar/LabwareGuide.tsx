@@ -10,7 +10,7 @@ import {
   LABWARE_CREATOR,
 } from '../../localization'
 import { getPublicPath } from '../../public-path'
-import styles from './styles.css'
+import styles from './styles.module.css'
 
 const LINKS = [
   {

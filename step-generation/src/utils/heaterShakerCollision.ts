@@ -1,13 +1,17 @@
 import some from 'lodash/some'
 import {
+  getAreFlexSlotsAdjacent,
   getAreSlotsAdjacent,
   getAreSlotsHorizontallyAdjacent,
   getAreSlotsVerticallyAdjacent,
   getIsLabwareAboveHeight,
   HEATERSHAKER_MODULE_TYPE,
   MAX_LABWARE_HEIGHT_EAST_WEST_HEATER_SHAKER_MM,
-  PipetteNameSpecs,
+  OT2_ROBOT_TYPE,
 } from '@opentrons/shared-data'
+
+import type { PipetteV2Specs, RobotType } from '@opentrons/shared-data'
+
 import type {
   LabwareEntities,
   RobotState,
@@ -30,7 +34,7 @@ export const getIsHeaterShakerEastWestWithLatchOpen = (
 export const getIsHeaterShakerEastWestMultiChannelPipette = (
   hwModules: RobotState['modules'],
   slot: DeckSlot,
-  pipetteSpecs: PipetteNameSpecs
+  pipetteSpecs: PipetteV2Specs
 ): boolean =>
   pipetteSpecs.channels !== 1 &&
   some(
@@ -43,7 +47,7 @@ export const getIsHeaterShakerEastWestMultiChannelPipette = (
 export const getIsHeaterShakerNorthSouthOfNonTiprackWithMultiChannelPipette = (
   hwModules: RobotState['modules'],
   slot: DeckSlot,
-  pipetteSpecs: PipetteNameSpecs,
+  pipetteSpecs: PipetteV2Specs,
   labwareEntity: LabwareEntity
 ): boolean =>
   pipetteSpecs.channels !== 1 &&
@@ -98,16 +102,20 @@ export const pipetteIntoHeaterShakerLatchOpen = (
 
 export const pipetteAdjacentHeaterShakerWhileShaking = (
   hwModules: RobotState['modules'],
-  slot: DeckSlot
-): boolean =>
-  some(
+  slot: DeckSlot,
+  robotType: RobotType
+): boolean => {
+  return some(
     hwModules,
     hwModule =>
       hwModule.moduleState.type === HEATERSHAKER_MODULE_TYPE &&
       hwModule.moduleState.targetSpeed != null &&
       hwModule.moduleState.targetSpeed > 0 &&
-      getAreSlotsAdjacent(hwModule.slot, slot)
+      (robotType === OT2_ROBOT_TYPE
+        ? getAreSlotsAdjacent(hwModule.slot, slot)
+        : getAreFlexSlotsAdjacent(hwModule.slot, slot))
   )
+}
 
 export const pipetteIntoHeaterShakerWhileShaking = (
   modules: RobotState['modules'],

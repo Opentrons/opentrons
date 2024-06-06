@@ -13,7 +13,7 @@ class PipetteOffsetCalibrationSessionStatus(BaseModel):
     )
     labware: List[RequiredLabware]
     shouldPerformTipLength: bool = Field(
-        None,
+        ...,
         description="Does tip length calibration data exist for "
         "this pipette and tip rack combination",
     )

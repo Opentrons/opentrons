@@ -6,11 +6,11 @@ import {
   RobotWorkSpace,
 } from '@opentrons/components'
 import {
-  LabwareDefinition2,
   SLOT_LENGTH_MM as DEFAULT_X_DIMENSION,
   SLOT_WIDTH_MM as DEFAULT_Y_DIMENSION,
 } from '@opentrons/shared-data'
-import styles from './ConditionalLabwareRender.css'
+import styles from './ConditionalLabwareRender.module.css'
+import type { LabwareDefinition2 } from '@opentrons/shared-data'
 
 interface Props {
   definition: LabwareDefinition2 | null

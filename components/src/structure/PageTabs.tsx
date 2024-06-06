@@ -4,7 +4,7 @@ import * as React from 'react'
 import classnames from 'classnames'
 import { Link } from 'react-router-dom'
 
-import styles from './structure.css'
+import styles from './structure.module.css'
 
 // TODO(bc, 2021-03-29): this component is only used in RA
 // reconsider whether it belongs in components library

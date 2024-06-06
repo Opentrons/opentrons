@@ -10,6 +10,7 @@ from opentrons.protocol_engine.commands.aspirate import (
     AspirateResult,
     AspirateImplementation,
 )
+from opentrons.protocol_engine.commands.command import SuccessData
 
 from opentrons.protocol_engine.state import StateView
 
@@ -19,6 +20,7 @@ from opentrons.protocol_engine.execution import (
 )
 from opentrons.protocol_engine.types import CurrentWell, LoadedPipette
 from opentrons.hardware_control import HardwareControlAPI
+from opentrons.protocol_engine.notes import CommandNoteAdder
 
 
 @pytest.fixture
@@ -27,6 +29,7 @@ def subject(
     hardware_api: HardwareControlAPI,
     movement: MovementHandler,
     pipetting: PipettingHandler,
+    mock_command_note_adder: CommandNoteAdder,
 ) -> AspirateImplementation:
     """Get the implementation subject."""
     return AspirateImplementation(
@@ -34,6 +37,7 @@ def subject(
         state_view=state_view,
         movement=movement,
         hardware_api=hardware_api,
+        command_note_adder=mock_command_note_adder,
     )
 
 
@@ -44,6 +48,7 @@ async def test_aspirate_implementation_no_prep(
     movement: MovementHandler,
     pipetting: PipettingHandler,
     subject: AspirateImplementation,
+    mock_command_note_adder: CommandNoteAdder,
 ) -> None:
     """An Aspirate should have an execution implementation without preparing to aspirate."""
     location = WellLocation(origin=WellOrigin.BOTTOM, offset=WellOffset(x=0, y=0, z=1))
@@ -70,12 +75,20 @@ async def test_aspirate_implementation_no_prep(
     ).then_return(Point(x=1, y=2, z=3))
 
     decoy.when(
-        await pipetting.aspirate_in_place(pipette_id="abc", volume=50, flow_rate=1.23),
+        await pipetting.aspirate_in_place(
+            pipette_id="abc",
+            volume=50,
+            flow_rate=1.23,
+            command_note_adder=mock_command_note_adder,
+        ),
     ).then_return(50)
 
     result = await subject.execute(data)
 
-    assert result == AspirateResult(volume=50, position=DeckPoint(x=1, y=2, z=3))
+    assert result == SuccessData(
+        public=AspirateResult(volume=50, position=DeckPoint(x=1, y=2, z=3)),
+        private=None,
+    )
 
 
 async def test_aspirate_implementation_with_prep(
@@ -84,6 +97,7 @@ async def test_aspirate_implementation_with_prep(
     hardware_api: HardwareControlAPI,
     movement: MovementHandler,
     pipetting: PipettingHandler,
+    mock_command_note_adder: CommandNoteAdder,
     subject: AspirateImplementation,
 ) -> None:
     """An Aspirate should have an execution implementation with preparing to aspirate."""
@@ -120,12 +134,20 @@ async def test_aspirate_implementation_with_prep(
     ).then_return(Point(x=1, y=2, z=3))
 
     decoy.when(
-        await pipetting.aspirate_in_place(pipette_id="abc", volume=50, flow_rate=1.23),
+        await pipetting.aspirate_in_place(
+            pipette_id="abc",
+            volume=50,
+            flow_rate=1.23,
+            command_note_adder=mock_command_note_adder,
+        ),
     ).then_return(50)
 
     result = await subject.execute(data)
 
-    assert result == AspirateResult(volume=50, position=DeckPoint(x=1, y=2, z=3))
+    assert result == SuccessData(
+        public=AspirateResult(volume=50, position=DeckPoint(x=1, y=2, z=3)),
+        private=None,
+    )
 
     decoy.verify(
         await movement.move_to_well(
@@ -139,7 +161,10 @@ async def test_aspirate_implementation_with_prep(
 
 
 async def test_aspirate_raises_volume_error(
-    decoy: Decoy, pipetting: PipettingHandler, subject: AspirateImplementation
+    decoy: Decoy,
+    pipetting: PipettingHandler,
+    mock_command_note_adder: CommandNoteAdder,
+    subject: AspirateImplementation,
 ) -> None:
     """Should raise an assertion error for volume larger than working volume."""
     location = WellLocation(origin=WellOrigin.BOTTOM, offset=WellOffset(x=0, y=0, z=1))
@@ -156,7 +181,12 @@ async def test_aspirate_raises_volume_error(
     decoy.when(pipetting.get_is_ready_to_aspirate(pipette_id="abc")).then_return(True)
 
     decoy.when(
-        await pipetting.aspirate_in_place(pipette_id="abc", volume=50, flow_rate=1.23)
+        await pipetting.aspirate_in_place(
+            pipette_id="abc",
+            volume=50,
+            flow_rate=1.23,
+            command_note_adder=mock_command_note_adder,
+        )
     ).then_raise(AssertionError("blah blah"))
 
     with pytest.raises(AssertionError):

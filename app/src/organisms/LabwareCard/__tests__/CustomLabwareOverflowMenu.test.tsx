@@ -1,15 +1,34 @@
 import * as React from 'react'
-import { fireEvent } from '@testing-library/react'
-import { useTrackEvent } from '../../../redux/analytics'
-import {
-  renderWithProviders,
-  useConditionalConfirm,
-} from '@opentrons/components'
+import { fireEvent, screen } from '@testing-library/react'
+import { describe, it, vi, expect, beforeEach, afterEach } from 'vitest'
+
+import { useConditionalConfirm } from '@opentrons/components'
+
+import { renderWithProviders } from '../../../__testing-utils__'
 import { i18n } from '../../../i18n'
+import { useTrackEvent } from '../../../redux/analytics'
 import { CustomLabwareOverflowMenu } from '../CustomLabwareOverflowMenu'
 
-jest.mock('../../../redux/analytics')
-jest.mock('@opentrons/components/src/hooks')
+import type { Mock } from 'vitest'
+import type * as OpentronsComponents from '@opentrons/components'
+
+vi.mock('../../../redux/analytics')
+
+const mockConfirm = vi.fn()
+const mockCancel = vi.fn()
+let mockTrackEvent: Mock
+
+vi.mock('@opentrons/components', async importOriginal => {
+  const actual = await importOriginal<typeof OpentronsComponents>()
+  return {
+    ...actual,
+    useConditionalConfirm: vi.fn(() => ({
+      confirm: mockConfirm,
+      showConfirmation: true,
+      cancel: mockCancel,
+    })),
+  }
+})
 
 const render = (
   props: React.ComponentProps<typeof CustomLabwareOverflowMenu>
@@ -19,58 +38,62 @@ const render = (
   })
 }
 
-const mockUseConditionalConfirm = useConditionalConfirm as jest.MockedFunction<
-  typeof useConditionalConfirm
->
-const mockUseTrackEvent = useTrackEvent as jest.MockedFunction<
-  typeof useTrackEvent
->
-
-const mockConfirm = jest.fn()
-const mockCancel = jest.fn()
-let mockTrackEvent: jest.Mock
-
 describe('CustomLabwareOverflowMenu', () => {
   let props: React.ComponentProps<typeof CustomLabwareOverflowMenu>
 
   beforeEach(() => {
     props = {
       filename: 'name',
-      onDelete: jest.fn(),
+      onDelete: vi.fn(),
     }
-    mockUseConditionalConfirm.mockReturnValue({
+    vi.mocked(useConditionalConfirm).mockReturnValue({
       confirm: mockConfirm,
       showConfirmation: true,
       cancel: mockCancel,
     })
-    mockTrackEvent = jest.fn()
-    mockUseTrackEvent.mockReturnValue(mockTrackEvent)
+    mockTrackEvent = vi.fn()
+    vi.mocked(useTrackEvent).mockReturnValue(mockTrackEvent)
   })
 
   afterEach(() => {
-    jest.resetAllMocks()
+    vi.resetAllMocks()
   })
 
   it('should render correct button texts and they are clickable', () => {
-    const [{ getByText, getByRole, getByLabelText }] = render(props)
-    const button = getByLabelText('CustomLabwareOverflowMenu_button')
-    fireEvent.click(button)
-    getByRole('button', { name: 'Show in folder' })
-    getByRole('button', { name: 'Open Labware Creator' })
-    const deleteBtn = getByRole('button', { name: 'Delete' })
-    fireEvent.click(deleteBtn)
-    getByText('Delete this labware definition?')
-    getByText(
+    render(props)
+    fireEvent.click(screen.getByLabelText('CustomLabwareOverflowMenu_button'))
+    screen.getByRole('button', { name: 'Show in folder' })
+    screen.getByRole('button', { name: 'Open Labware Creator' })
+    screen.getByRole('button', { name: 'Delete' })
+  })
+
+  it('should call a mock function when canceling delete a labware definition', async () => {
+    render(props)
+    fireEvent.click(screen.getByLabelText('CustomLabwareOverflowMenu_button'))
+    fireEvent.click(screen.getByRole('button', { name: 'Delete' }))
+    screen.getByText('Delete this labware definition?')
+    screen.getByText(
       'This labware definition will be moved to this computer’s trash and may be unrecoverable.'
     )
-    getByText(
+    screen.getByText(
       'Robots cannot run Python protocols with missing labware definitions.'
     )
-    const cancelBtn = getByText('cancel')
-    fireEvent.click(cancelBtn)
+    fireEvent.click(screen.getByText('cancel'))
     expect(mockCancel).toHaveBeenCalled()
-    const deleteConfirm = getByText('Yes, delete definition')
-    fireEvent.click(deleteConfirm)
+  })
+
+  it('should call a mock function when deleting a labware definition', async () => {
+    render(props)
+    fireEvent.click(screen.getByLabelText('CustomLabwareOverflowMenu_button'))
+    fireEvent.click(screen.getByRole('button', { name: 'Delete' }))
+    screen.getByText('Delete this labware definition?')
+    screen.getByText(
+      'This labware definition will be moved to this computer’s trash and may be unrecoverable.'
+    )
+    screen.getByText(
+      'Robots cannot run Python protocols with missing labware definitions.'
+    )
+    fireEvent.click(screen.getByText('Yes, delete definition'))
     expect(mockConfirm).toHaveBeenCalled()
   })
 })

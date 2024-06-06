@@ -1,12 +1,13 @@
 import {
-  LabwareDefinition2,
   SLOT_LENGTH_MM as DEFAULT_X_DIMENSION,
   SLOT_WIDTH_MM as DEFAULT_Y_DIMENSION,
 } from '@opentrons/shared-data'
 import pick from 'lodash/pick'
-import { LabwareFields, ProcessedLabwareFields } from './fields'
 import { labwareFormSchema } from './labwareFormSchema'
 import { fieldsToLabware } from './fieldsToLabware'
+
+import type { LabwareDefinition2 } from '@opentrons/shared-data'
+import type { LabwareFields, ProcessedLabwareFields } from './fields'
 
 // Fill arbitrary values in to any missing fields that aren't needed for this render,
 // eg some required definition data like well volume, height, and bottom shape don't affect the render.
@@ -33,7 +34,6 @@ export const DEFAULTED_DEF_PATCH: Readonly<Partial<LabwareFields>> = {
   homogeneousWells: 'true',
   regularRowSpacing: 'true',
   regularColumnSpacing: 'true',
-  pipetteName: 'whatever',
 }
 
 export const getDefaultedDefPatch = (

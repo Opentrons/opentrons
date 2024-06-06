@@ -1,24 +1,23 @@
 import * as React from 'react'
 import { Trans, useTranslation } from 'react-i18next'
 import isEqual from 'lodash/isEqual'
-import { DIRECTION_COLUMN, Flex, TYPOGRAPHY } from '@opentrons/components'
-import { StyledText } from '../../atoms/text'
-import { RobotMotionLoader } from './RobotMotionLoader'
-import { PrepareSpace } from './PrepareSpace'
-import { JogToWell } from './JogToWell'
 import {
-  CompletedProtocolAnalysis,
-  CreateCommand,
+  DIRECTION_COLUMN,
+  Flex,
+  StyledText,
+  TYPOGRAPHY,
+} from '@opentrons/components'
+import {
   getLabwareDefURI,
   getLabwareDisplayName,
   getModuleType,
   getVectorDifference,
   HEATERSHAKER_MODULE_TYPE,
   IDENTITY_VECTOR,
-  MoveLabwareCreateCommand,
-  RobotType,
 } from '@opentrons/shared-data'
-import { useChainRunCommands } from '../../resources/runs/hooks'
+import { RobotMotionLoader } from './RobotMotionLoader'
+import { PrepareSpace } from './PrepareSpace'
+import { JogToWell } from './JogToWell'
 import { UnorderedList } from '../../molecules/UnorderedList'
 import { getCurrentOffsetForLabwareInLocation } from '../Devices/ProtocolRun/utils/getCurrentOffsetForLabwareInLocation'
 import { TipConfirmation } from './TipConfirmation'
@@ -28,6 +27,13 @@ import {
 } from './utils/labware'
 import { getDisplayLocation } from './utils/getDisplayLocation'
 
+import type {
+  CompletedProtocolAnalysis,
+  CreateCommand,
+  MoveLabwareCreateCommand,
+  RobotType,
+} from '@opentrons/shared-data'
+import type { useChainRunCommands } from '../../resources/runs'
 import type { Jog } from '../../molecules/JogControls/types'
 import type {
   PickUpTipStep,
@@ -239,7 +245,9 @@ export const PickUpTip = (props: PickUpTipProps): JSX.Element | null => {
             ],
             false
           )
-            .then(() => setShowTipConfirmation(true))
+            .then(() => {
+              setShowTipConfirmation(true)
+            })
             .catch((e: Error) => {
               setFatalError(
                 `PickUpTip failed to move from final position with message: ${e.message}`
@@ -306,7 +314,9 @@ export const PickUpTip = (props: PickUpTipProps): JSX.Element | null => {
       ],
       false
     )
-      .then(() => proceed())
+      .then(() => {
+        proceed()
+      })
       .catch((e: Error) => {
         setFatalError(
           `PickUpTip failed to move to safe location after tip pick up with message: ${e.message}`

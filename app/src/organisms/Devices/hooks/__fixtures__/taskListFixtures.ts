@@ -1,4 +1,6 @@
+import { vi } from 'vitest'
 import { formatTimestamp } from '../../utils'
+import type { Mock } from 'vitest'
 
 import type {
   TipLengthCalibration,
@@ -91,6 +93,7 @@ export const mockBadTipLengthCalibrations: TipLengthCalibration[] = [
     source: 'user',
     status: { markedBad: true, source: null, markedAt: null },
     id: 'test-tip-length-id-1',
+    uri: 'test-uri',
   },
   {
     tipLength: 0,
@@ -100,6 +103,7 @@ export const mockBadTipLengthCalibrations: TipLengthCalibration[] = [
     source: 'user',
     status: { markedBad: true, source: null, markedAt: null },
     id: 'test-tip-length-id-2',
+    uri: 'test-uri-2',
   },
 ]
 
@@ -112,6 +116,7 @@ export const mockCompleteTipLengthCalibrations: TipLengthCalibration[] = [
     source: 'user',
     status: { markedBad: false, source: null, markedAt: null },
     id: 'test-tip-length-id-1',
+    uri: 'test-uri',
   },
   {
     tipLength: 0,
@@ -121,6 +126,7 @@ export const mockCompleteTipLengthCalibrations: TipLengthCalibration[] = [
     source: 'user',
     status: { markedBad: false, source: null, markedAt: null },
     id: 'test-tip-length-id-2',
+    uri: 'test-uri-2',
   },
 ]
 
@@ -133,6 +139,7 @@ export const mockIncompleteTipLengthCalibrations: TipLengthCalibration[] = [
     source: 'user',
     status: { markedBad: false, source: null, markedAt: null },
     id: 'test-tip-length-id-2',
+    uri: 'test-uri-2',
   },
 ]
 
@@ -211,9 +218,9 @@ export const mockIncompletePipetteOffsetCalibrations: PipetteOffsetCalibration[]
   },
 ]
 
-export const mockDeckCalLauncher = jest.fn()
-export const mockTipLengthCalLauncher = jest.fn()
-export const mockPipOffsetCalLauncher = jest.fn()
+export const mockDeckCalLauncher: Mock = vi.fn()
+export const mockTipLengthCalLauncher: Mock = vi.fn()
+export const mockPipOffsetCalLauncher: Mock = vi.fn()
 
 export const expectedTaskList: TaskListProps = {
   activeIndex: null,

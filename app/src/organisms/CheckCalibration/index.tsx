@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
 
 import { getPipetteModelSpecs } from '@opentrons/shared-data'
@@ -19,7 +20,7 @@ import {
 } from '../../organisms/CalibrationPanels'
 import { LegacyModalShell } from '../../molecules/LegacyModal'
 import { WizardHeader } from '../../molecules/WizardHeader'
-import { Portal } from '../../App/portal'
+import { getTopPortalEl } from '../../App/portal'
 import { ReturnTip } from './ReturnTip'
 import { ResultsSummary } from './ResultsSummary'
 
@@ -173,53 +174,52 @@ export function CheckCalibration(
     currentStep != null && currentStep in PANEL_BY_STEP
       ? PANEL_BY_STEP[currentStep]
       : null
-  return (
-    <Portal level="top">
-      <LegacyModalShell
-        width="47rem"
-        header={
-          <WizardHeader
-            title={ROBOT_CALIBRATION_CHECK_SUBTITLE}
-            currentStep={stepIndex}
-            totalSteps={
-              checkBothPipettes
-                ? STEPS_IN_ORDER_BOTH_PIPETTES.length - 1
-                : STEPS_IN_ORDER_ONE_PIPETTE.length - 1
-            }
-            onExit={confirmExit}
-          />
-        }
-      >
-        {showSpinner || currentStep == null || Panel == null ? (
-          <LoadingState />
-        ) : showConfirmExit ? (
-          <ConfirmExit
-            exit={confirmExit}
-            back={cancelExit}
-            heading={t('progress_will_be_lost', {
-              sessionType: t('calibration_health_check'),
-            })}
-            body={t('confirm_exit_before_completion', {
-              sessionType: t('calibration_health_check'),
-            })}
-          />
-        ) : (
-          <Panel
-            sendCommands={sendCommands}
-            cleanUpAndExit={cleanUpAndExit}
-            tipRack={activeTipRack}
-            calBlock={calBlock}
-            isMulti={isMulti}
-            mount={activePipette?.mount.toLowerCase() as Mount}
-            currentStep={currentStep}
-            sessionType={session.sessionType}
-            checkBothPipettes={checkBothPipettes}
-            instruments={instruments}
-            comparisonsByPipette={comparisonsByPipette}
-            activePipette={activePipette}
-          />
-        )}
-      </LegacyModalShell>
-    </Portal>
+  return createPortal(
+    <LegacyModalShell
+      width="47rem"
+      header={
+        <WizardHeader
+          title={ROBOT_CALIBRATION_CHECK_SUBTITLE}
+          currentStep={stepIndex}
+          totalSteps={
+            checkBothPipettes
+              ? STEPS_IN_ORDER_BOTH_PIPETTES.length - 1
+              : STEPS_IN_ORDER_ONE_PIPETTE.length - 1
+          }
+          onExit={confirmExit}
+        />
+      }
+    >
+      {showSpinner || currentStep == null || Panel == null ? (
+        <LoadingState />
+      ) : showConfirmExit ? (
+        <ConfirmExit
+          exit={confirmExit}
+          back={cancelExit}
+          heading={t('progress_will_be_lost', {
+            sessionType: t('calibration_health_check'),
+          })}
+          body={t('confirm_exit_before_completion', {
+            sessionType: t('calibration_health_check'),
+          })}
+        />
+      ) : (
+        <Panel
+          sendCommands={sendCommands}
+          cleanUpAndExit={cleanUpAndExit}
+          tipRack={activeTipRack}
+          calBlock={calBlock}
+          isMulti={isMulti}
+          mount={activePipette?.mount.toLowerCase() as Mount}
+          currentStep={currentStep}
+          sessionType={session.sessionType}
+          checkBothPipettes={checkBothPipettes}
+          instruments={instruments}
+          comparisonsByPipette={comparisonsByPipette}
+          activePipette={activePipette}
+        />
+      )}
+    </LegacyModalShell>,
+    getTopPortalEl()
   )
 }

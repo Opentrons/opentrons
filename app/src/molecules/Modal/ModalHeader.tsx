@@ -8,9 +8,9 @@ import {
   Icon,
   JUSTIFY_SPACE_BETWEEN,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
-import { StyledText } from '../../atoms/text'
 import type { ModalHeaderBaseProps } from '../Modal/types'
 
 export function ModalHeader(props: ModalHeaderBaseProps): JSX.Element {
@@ -25,14 +25,14 @@ export function ModalHeader(props: ModalHeaderBaseProps): JSX.Element {
   return (
     <Flex
       backgroundColor={COLORS.white}
-      color={COLORS.black}
+      color={COLORS.black90}
       height="6.25rem"
       width="100%"
       padding={SPACING.spacing32}
       flexDirection={DIRECTION_ROW}
       justifyContent={JUSTIFY_SPACE_BETWEEN}
       alignItems={ALIGN_CENTER}
-      borderRadius={`${BORDERS.borderRadiusSize3} ${BORDERS.borderRadiusSize3} 0px 0px`}
+      borderRadius={`${BORDERS.borderRadius12} ${BORDERS.borderRadius12} 0px 0px`}
       {...styleProps}
     >
       <Flex flexDirection={DIRECTION_ROW}>

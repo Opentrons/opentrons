@@ -1,13 +1,14 @@
 import {
-  LabwareDefinition2,
-  ModuleDefinition,
   SPAN7_8_10_11_SLOT,
+  THERMOCYCLER_MODULE_V1,
+  getModuleDef2,
 } from '@opentrons/shared-data'
-import thermocyclerModuleV1 from '@opentrons/shared-data/module/definitions/3/thermocyclerModuleV1.json'
 
 import type { RunData } from '@opentrons/api-client'
 import type {
   LabwareDefinitionsByUri,
+  LabwareDefinition2,
+  Liquid,
   LoadedLabware,
   LoadedModule,
 } from '@opentrons/shared-data'
@@ -176,6 +177,12 @@ export const mockThermocyclerModule: LoadedModule = {
   serialNumber: 'dummySerialTC',
 }
 
+export const mockLiquid: Liquid = {
+  id: 'mockLiquid',
+  displayName: 'mock liquid',
+  description: 'this is my mock liquid description',
+}
+
 export const mockRunData: RunData = {
   id: 'mockRunData',
   createdAt: '',
@@ -188,6 +195,8 @@ export const mockRunData: RunData = {
   pipettes: [],
   labware: [mockLabwareOnModule, mockLabwareOnSlot, mockLabwareOffDeck],
   modules: [mockModule],
+  liquids: [mockLiquid],
+  runTimeParameters: [],
 }
 
 export const mockLabwareRenderInfo = [
@@ -204,7 +213,7 @@ export const mockModuleRenderInfoWithLabware = [
     moduleId: 'mockTCModuleID',
     x: 100,
     y: 100,
-    moduleDef: (thermocyclerModuleV1 as unknown) as ModuleDefinition,
+    moduleDef: getModuleDef2(THERMOCYCLER_MODULE_V1),
     nestedLabwareDef: mockLabwareDefinition,
     nestedLabwareId: 'mockLabwareID',
   },
@@ -215,7 +224,7 @@ export const mockModuleRenderInfoWithoutLabware = [
     moduleId: 'mockTCModuleID',
     x: 100,
     y: 100,
-    moduleDef: (thermocyclerModuleV1 as unknown) as ModuleDefinition,
+    moduleDef: getModuleDef2(THERMOCYCLER_MODULE_V1),
     nestedLabwareDef: null,
     nestedLabwareId: null,
   },

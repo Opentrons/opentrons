@@ -1,7 +1,12 @@
 import * as React from 'react'
-import { TYPOGRAPHY, PrimaryBtn, COLORS, SPACING } from '@opentrons/components'
+import {
+  COLORS,
+  PrimaryBtn,
+  SPACING,
+  StyledText,
+  TYPOGRAPHY,
+} from '@opentrons/components'
 import { Slideout } from './index'
-import { StyledText } from '../text'
 
 import type { Story, Meta } from '@storybook/react'
 
@@ -26,7 +31,7 @@ const Children = (
     </StyledText>
 
     <PrimaryBtn
-      backgroundColor={COLORS.blueEnabled}
+      backgroundColor={COLORS.blue50}
       marginTop="28rem"
       textTransform={TYPOGRAPHY.textTransformNone}
     >

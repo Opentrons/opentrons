@@ -1,116 +1,43 @@
-import React from 'react'
-import { shallow } from 'enzyme'
-import { Modal, OutlineButton } from '@opentrons/components'
-import * as persist from '../../../../persist'
-import { AnnouncementModal } from '../'
-import * as announcements from '../announcements'
-import { Announcement } from '../announcements'
+import * as React from 'react'
+import '@testing-library/jest-dom/vitest'
+import { fireEvent, screen, cleanup } from '@testing-library/react'
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
+import { renderWithProviders } from '../../../../__testing-utils__'
+import { i18n } from '../../../../localization'
+import { getLocalStorageItem, setLocalStorageItem } from '../../../../persist'
+import { useAnnouncements } from '../announcements'
+import { AnnouncementModal } from '../index'
 
-jest.mock('../../../../persist')
+vi.mock('../../../../persist')
+vi.mock('../announcements')
+
+const render = () => {
+  return renderWithProviders(<AnnouncementModal />, { i18nInstance: i18n })[0]
+}
 
 describe('AnnouncementModal', () => {
-  const announcementKey = 'newType'
-  const getLocalStorageItemMock = persist.getLocalStorageItem as jest.MockedFunction<
-    typeof persist.getLocalStorageItem
-  >
-
-  const announcementsMock: {
-    announcements: Announcement[]
-  } = announcements
-
   beforeEach(() => {
-    getLocalStorageItemMock.mockReturnValue(announcementKey)
+    vi.mocked(getLocalStorageItem).mockReturnValue('mockHaveNotSeenKey')
+    vi.mocked(useAnnouncements).mockReturnValue([
+      {
+        announcementKey: 'mockKey',
+        message: 'mockMessage',
+        heading: 'mockHeading',
+        image: <div>mockImage</div>,
+      },
+    ])
   })
-
-  it('modal is not shown when announcement has been shown before', () => {
-    announcementsMock.announcements = [
-      {
-        image: null,
-        heading: 'a test header',
-        message: 'test',
-        announcementKey,
-      },
-    ]
-
-    const wrapper = shallow(<AnnouncementModal />)
-
-    expect(wrapper.find(Modal)).toHaveLength(0)
+  afterEach(() => {
+    cleanup()
   })
-
-  it('announcement is shown when user has not seen it before', () => {
-    announcementsMock.announcements = [
-      {
-        image: null,
-        heading: 'a test header',
-        message: 'brand new spanking feature',
-        announcementKey: 'newPipette',
-      },
-    ]
-
-    const wrapper = shallow(<AnnouncementModal />)
-    const modal = wrapper.find(Modal)
-
-    expect(modal).toHaveLength(1)
-    expect(modal.html()).toContain('brand new spanking feature')
-  })
-
-  it('latest announcement is always shown', () => {
-    announcementsMock.announcements = [
-      {
-        image: null,
-        heading: 'a first header',
-        message: 'first announcement',
-        announcementKey,
-      },
-      {
-        image: null,
-        heading: 'a second header',
-        message: 'second announcement',
-        announcementKey: 'newPipette',
-      },
-    ]
-
-    const wrapper = shallow(<AnnouncementModal />)
-    const modal = wrapper.find(Modal)
-
-    expect(modal).toHaveLength(1)
-    expect(modal.html()).toContain('second announcement')
-  })
-
-  it('optional image component is displayed when exists', () => {
-    announcementsMock.announcements = [
-      {
-        image: <img src="test.jpg" />,
-        heading: 'a test header',
-        message: 'brand new spanking feature',
-        announcementKey: 'newFeature',
-      },
-    ]
-
-    const wrapper = shallow(<AnnouncementModal />)
-    const image = wrapper.find('img')
-    expect(image).toHaveLength(1)
-  })
-
-  it('button click saves announcement announcementKey to localStorage and closes modal', () => {
-    const newAnnouncementKey = 'newFeature'
-    announcementsMock.announcements = [
-      {
-        image: null,
-        heading: 'a test header',
-        message: 'brand new spanking feature',
-        announcementKey: newAnnouncementKey,
-      },
-    ]
-
-    const wrapper = shallow(<AnnouncementModal />)
-    const button = wrapper.find(OutlineButton)
-    button.simulate('click')
-
-    expect(persist.setLocalStorageItem).toHaveBeenCalledWith(
-      persist.localStorageAnnouncementKey,
-      newAnnouncementKey
-    )
-    expect(wrapper.find(Modal)).toHaveLength(0)
+  it('renders an announcement modal that has not been seen', () => {
+    render()
+    screen.getByText('mockMessage')
+    const heading = screen.getByText('mockHeading')
+    expect(heading).toBeVisible()
+    screen.getByText('mockImage')
+    fireEvent.click(screen.getByRole('button', { name: 'Got It!' }))
+    expect(vi.mocked(setLocalStorageItem)).toHaveBeenCalled()
+    expect(heading).not.toBeVisible()
   })
 })

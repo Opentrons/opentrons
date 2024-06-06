@@ -3,21 +3,20 @@
 
 from datetime import datetime
 import logging
+from typing import List, Union
 
 import pytest
 from decoy import Decoy
 
 from robot_server.deletion_planner import RunDeletionPlanner
 from robot_server.runs.run_auto_deleter import RunAutoDeleter
-from robot_server.runs.run_store import (
-    RunStore,
-    RunResource,
-)
+from robot_server.runs.run_store import RunStore, RunResource, BadRunResource
 
 
 def _make_dummy_run_resource(run_id: str) -> RunResource:
     """Return a RunResource with the given ID."""
     return RunResource(
+        ok=True,
         run_id=run_id,
         protocol_id=None,
         created_at=datetime.min,
@@ -35,7 +34,7 @@ def test_make_room_for_new_run(decoy: Decoy, caplog: pytest.LogCaptureFixture) -
         deletion_planner=mock_deletion_planner,
     )
 
-    run_resources = [
+    run_resources: List[Union[RunResource, BadRunResource]] = [
         _make_dummy_run_resource("run-id-1"),
         _make_dummy_run_resource("run-id-2"),
         _make_dummy_run_resource("run-id-3"),

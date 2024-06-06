@@ -2,7 +2,7 @@ import * as React from 'react'
 import cx from 'classnames'
 
 import { Icon } from '..'
-import styles from './forms.css'
+import styles from './forms.module.css'
 
 export interface DropdownOption {
   name: string
@@ -95,7 +95,7 @@ export function DropdownField(props: DropdownFieldProps): JSX.Element {
         </select>
 
         <div className={styles.dropdown_icon}>
-          <Icon name="menu-down" width="100%" />
+          <Icon name="menu-down-pd" width="100%" />
         </div>
       </div>
       <div className={styles.input_caption}>

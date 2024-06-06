@@ -3,8 +3,9 @@ import styled, { css } from 'styled-components'
 import * as Styles from '../styles'
 import { styleProps, isntStyleProp } from './style-props'
 
-import type { PrimitiveComponent } from './types'
 import { RESPONSIVENESS } from '../ui-style-constants'
+import type { StyledComponent } from 'styled-components'
+import type { StyleProps } from './types'
 
 export const BUTTON_TYPE_SUBMIT: 'submit' = 'submit'
 export const BUTTON_TYPE_RESET: 'reset' = 'reset'
@@ -43,14 +44,17 @@ const BUTTON_VARIANT_STYLE = css`
   text-transform: ${Styles.TEXT_TRANSFORM_UPPERCASE};
 `
 
-type BtnComponent = PrimitiveComponent<'button'>
-
 /**
  * Button primitive
  *
  * @component
  */
-export const Btn: BtnComponent = styled.button
+export const Btn: StyledComponent<
+  'button',
+  any,
+  StyleProps,
+  any
+> = styled.button
   .withConfig({
     shouldForwardProp: isntStyleProp,
   })
@@ -66,7 +70,7 @@ export const Btn: BtnComponent = styled.button
  *
  * @component
  */
-export const PrimaryBtn: BtnComponent = styled(Btn)`
+export const PrimaryBtn = styled(Btn)`
   ${BUTTON_VARIANT_STYLE}
   background-color: ${Styles.C_DARK_GRAY};
   color: ${Styles.C_WHITE};
@@ -96,7 +100,7 @@ export const PrimaryBtn: BtnComponent = styled(Btn)`
  *
  * @component
  */
-export const SecondaryBtn: BtnComponent = styled(Btn)`
+export const SecondaryBtn = styled(Btn)`
   ${BUTTON_VARIANT_STYLE}
   background-color: ${Styles.C_WHITE};
   border-width: ${Styles.BORDER_WIDTH_DEFAULT};
@@ -125,7 +129,7 @@ export const SecondaryBtn: BtnComponent = styled(Btn)`
  *
  * @component
  */
-export const NewPrimaryBtn: BtnComponent = styled(PrimaryBtn)`
+export const NewPrimaryBtn = styled(PrimaryBtn)`
   background-color: ${Styles.C_BLUE};
   color: ${Styles.C_WHITE};
 
@@ -155,7 +159,7 @@ export const NewPrimaryBtn: BtnComponent = styled(PrimaryBtn)`
  *
  * @component
  */
-export const NewSecondaryBtn: BtnComponent = styled(SecondaryBtn)`
+export const NewSecondaryBtn = styled(SecondaryBtn)`
   background-color: ${Styles.C_WHITE};
   color: ${Styles.C_BLUE};
 
@@ -190,7 +194,7 @@ export const NewSecondaryBtn: BtnComponent = styled(SecondaryBtn)`
  *
  * @component
  */
-export const NewAlertPrimaryBtn: BtnComponent = styled(NewPrimaryBtn)`
+export const NewAlertPrimaryBtn = styled(NewPrimaryBtn)`
   background-color: ${Styles.C_ERROR_DARK};
 
   &:hover,
@@ -210,7 +214,7 @@ export const NewAlertPrimaryBtn: BtnComponent = styled(NewPrimaryBtn)`
  *
  * @component
  */
-export const NewAlertSecondaryBtn: BtnComponent = styled(NewSecondaryBtn)`
+export const NewAlertSecondaryBtn = styled(NewSecondaryBtn)`
   color: ${Styles.C_ERROR_DARK};
 
   &:hover,
@@ -230,7 +234,7 @@ export const NewAlertSecondaryBtn: BtnComponent = styled(NewSecondaryBtn)`
  *
  * @component
  */
-export const LightSecondaryBtn: BtnComponent = styled(SecondaryBtn)`
+export const LightSecondaryBtn = styled(SecondaryBtn)`
   background-color: ${Styles.C_TRANSPARENT};
   color: ${Styles.C_WHITE};
 
@@ -257,6 +261,6 @@ export const LightSecondaryBtn: BtnComponent = styled(SecondaryBtn)`
  *
  * @component
  */
-export const TertiaryBtn: BtnComponent = styled(LightSecondaryBtn)`
+export const TertiaryBtn = styled(LightSecondaryBtn)`
   border-width: 0;
 `

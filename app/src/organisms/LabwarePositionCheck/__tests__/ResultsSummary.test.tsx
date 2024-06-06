@@ -1,7 +1,8 @@
 import * as React from 'react'
-import { resetAllWhenMocks } from 'jest-when'
-import { renderWithProviders } from '@opentrons/components'
+import { describe, it, beforeEach, afterEach, expect, vi } from 'vitest'
+import { fireEvent, screen } from '@testing-library/react'
 import { i18n } from '../../../i18n'
+import { renderWithProviders } from '../../../__testing-utils__'
 import { getIsLabwareOffsetCodeSnippetsOn } from '../../../redux/config'
 import { ResultsSummary } from '../ResultsSummary'
 import { SECTIONS } from '../constants'
@@ -12,11 +13,7 @@ import {
   mockWorkingOffsets,
 } from '../__fixtures__'
 
-jest.mock('../../../redux/config')
-
-const mockGetIsLabwareOffsetCodeSnippetsOn = getIsLabwareOffsetCodeSnippetsOn as jest.MockedFunction<
-  typeof getIsLabwareOffsetCodeSnippetsOn
->
+vi.mock('../../../redux/config')
 
 const render = (props: React.ComponentProps<typeof ResultsSummary>) => {
   return renderWithProviders(<ResultsSummary {...props} />, {
@@ -35,61 +32,60 @@ describe('ResultsSummary', () => {
       existingOffsets: mockExistingOffsets,
       isApplyingOffsets: false,
       isDeletingMaintenanceRun: false,
-      handleApplyOffsets: jest.fn(),
+      handleApplyOffsets: vi.fn(),
     }
   })
   afterEach(() => {
-    resetAllWhenMocks()
-    jest.restoreAllMocks()
+    vi.restoreAllMocks()
   })
   it('renders correct copy', () => {
-    const { getByText, getByRole } = render(props)
-    getByText('New labware offset data')
-    getByRole('button', { name: 'Apply offsets' })
-    getByRole('link', { name: 'Need help?' })
-    getByRole('columnheader', { name: 'location' })
-    getByRole('columnheader', { name: 'labware' })
-    getByRole('columnheader', { name: 'labware offset data' })
+    render(props)
+    screen.getByText('New labware offset data')
+    screen.getByRole('button', { name: 'Apply offsets' })
+    screen.getByRole('link', { name: 'Need help?' })
+    screen.getByRole('columnheader', { name: 'location' })
+    screen.getByRole('columnheader', { name: 'labware' })
+    screen.getByRole('columnheader', { name: 'labware offset data' })
   })
   it('calls handle apply offsets function when button is clicked', () => {
-    const { getByRole } = render(props)
-    getByRole('button', { name: 'Apply offsets' }).click()
+    render(props)
+    fireEvent.click(screen.getByRole('button', { name: 'Apply offsets' }))
     expect(props.handleApplyOffsets).toHaveBeenCalled()
   })
   it('does disables the CTA to apply offsets when offsets are already being applied', () => {
     props.isApplyingOffsets = true
-    const { getByRole } = render(props)
-    const button = getByRole('button', { name: 'Apply offsets' })
+    render(props)
+    const button = screen.getByRole('button', { name: 'Apply offsets' })
     expect(button).toBeDisabled()
-    button.click()
+    fireEvent.click(button)
     expect(props.handleApplyOffsets).not.toHaveBeenCalled()
   })
   it('does disables the CTA to apply offsets when the maintenance run is being deleted', () => {
     props.isDeletingMaintenanceRun = true
-    const { getByRole } = render(props)
-    const button = getByRole('button', { name: 'Apply offsets' })
+    render(props)
+    const button = screen.getByRole('button', { name: 'Apply offsets' })
     expect(button).toBeDisabled()
-    button.click()
+    fireEvent.click(button)
     expect(props.handleApplyOffsets).not.toHaveBeenCalled()
   })
   it('renders a row per offset to apply', () => {
-    const { getByRole, queryAllByRole } = render(props)
+    render(props)
     expect(
-      queryAllByRole('cell', {
+      screen.queryAllByRole('cell', {
         name: mockTipRackDefinition.metadata.displayName,
       })
     ).toHaveLength(2)
-    getByRole('cell', { name: 'Slot 1' })
-    getByRole('cell', { name: 'Slot 3' })
-    getByRole('cell', { name: 'X 1.0 Y 1.0 Z 1.0' })
-    getByRole('cell', { name: 'X 3.0 Y 3.0 Z 3.0' })
+    screen.getByRole('cell', { name: 'Slot 1' })
+    screen.getByRole('cell', { name: 'Slot 3' })
+    screen.getByRole('cell', { name: 'X 1.0 Y 1.0 Z 1.0' })
+    screen.getByRole('cell', { name: 'X 3.0 Y 3.0 Z 3.0' })
   })
 
   it('renders tabbed offset data with snippets when config option is selected', () => {
-    mockGetIsLabwareOffsetCodeSnippetsOn.mockReturnValue(true)
-    const { getByText } = render(props)
-    expect(getByText('Table View')).toBeTruthy()
-    expect(getByText('Jupyter Notebook')).toBeTruthy()
-    expect(getByText('Command Line Interface (SSH)')).toBeTruthy()
+    vi.mocked(getIsLabwareOffsetCodeSnippetsOn).mockReturnValue(true)
+    render(props)
+    expect(screen.getByText('Table View')).toBeTruthy()
+    expect(screen.getByText('Jupyter Notebook')).toBeTruthy()
+    expect(screen.getByText('Command Line Interface (SSH)')).toBeTruthy()
   })
 })

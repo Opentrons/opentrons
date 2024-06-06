@@ -93,6 +93,32 @@ class PipetteNotAttachedError(ProtocolEngineError):
         super().__init__(ErrorCodes.PIPETTE_NOT_PRESENT, message, details, wrapping)
 
 
+class InvalidLoadPipetteSpecsError(ProtocolEngineError):
+    """Raised when a loadPipette uses invalid specifications."""
+
+    def __init__(
+        self,
+        message: Optional[str] = None,
+        details: Optional[Dict[str, Any]] = None,
+        wrapping: Optional[Sequence[EnumeratedError]] = None,
+    ) -> None:
+        """Build an InvalidLoadPipetteSpecsError."""
+        super().__init__(ErrorCodes.GENERAL_ERROR, message, details, wrapping)
+
+
+class InvalidSpecificationForRobotTypeError(ProtocolEngineError):
+    """Raised when a command provides invalid specs for the given robot type."""
+
+    def __init__(
+        self,
+        message: Optional[str] = None,
+        details: Optional[Dict[str, Any]] = None,
+        wrapping: Optional[Sequence[EnumeratedError]] = None,
+    ) -> None:
+        """Build an InvalidSpecificationForRobotTypeError."""
+        super().__init__(ErrorCodes.GENERAL_ERROR, message, details, wrapping)
+
+
 class TipNotAttachedError(ProtocolEngineError):
     """Raised when an operation's required pipette tip is not attached."""
 
@@ -479,6 +505,32 @@ class MustHomeError(ProtocolEngineError):
         super().__init__(ErrorCodes.POSITION_UNKNOWN, message, details, wrapping)
 
 
+class CommandNotAllowedError(ProtocolEngineError):
+    """Raised when adding a command with bad data."""
+
+    def __init__(
+        self,
+        message: Optional[str] = None,
+        details: Optional[Dict[str, Any]] = None,
+        wrapping: Optional[Sequence[EnumeratedError]] = None,
+    ) -> None:
+        """Build a CommandNotAllowedError."""
+        super().__init__(ErrorCodes.GENERAL_ERROR, message, details, wrapping)
+
+
+class FixitCommandNotAllowedError(ProtocolEngineError):
+    """Raised when adding a fixit command to a non-recoverable engine."""
+
+    def __init__(
+        self,
+        message: Optional[str] = None,
+        details: Optional[Dict[str, Any]] = None,
+        wrapping: Optional[Sequence[EnumeratedError]] = None,
+    ) -> None:
+        """Build a SetupCommandNotAllowedError."""
+        super().__init__(ErrorCodes.GENERAL_ERROR, message, details, wrapping)
+
+
 class SetupCommandNotAllowedError(ProtocolEngineError):
     """Raised when adding a setup command to a non-idle/non-paused engine."""
 
@@ -489,6 +541,19 @@ class SetupCommandNotAllowedError(ProtocolEngineError):
         wrapping: Optional[Sequence[EnumeratedError]] = None,
     ) -> None:
         """Build a SetupCommandNotAllowedError."""
+        super().__init__(ErrorCodes.GENERAL_ERROR, message, details, wrapping)
+
+
+class ResumeFromRecoveryNotAllowedError(ProtocolEngineError):
+    """Raised when attempting to resume a run from recovery that has a fixit command in the queue."""
+
+    def __init__(
+        self,
+        message: Optional[str] = None,
+        details: Optional[Dict[str, Any]] = None,
+        wrapping: Optional[Sequence[EnumeratedError]] = None,
+    ) -> None:
+        """Build a ResumeFromRecoveryNotAllowedError."""
         super().__init__(ErrorCodes.GENERAL_ERROR, message, details, wrapping)
 
 
@@ -806,6 +871,32 @@ class LocationIsOccupiedError(ProtocolEngineError):
         super().__init__(ErrorCodes.GENERAL_ERROR, message, details, wrapping)
 
 
+class LocationNotAccessibleByPipetteError(ProtocolEngineError):
+    """Raised when attempting to move pipette to an inaccessible location."""
+
+    def __init__(
+        self,
+        message: Optional[str] = None,
+        details: Optional[Dict[str, Any]] = None,
+        wrapping: Optional[Sequence[EnumeratedError]] = None,
+    ) -> None:
+        """Build a LocationNotAccessibleByPipetteError."""
+        super().__init__(ErrorCodes.GENERAL_ERROR, message, details, wrapping)
+
+
+class LocationIsStagingSlotError(ProtocolEngineError):
+    """Raised when referencing a labware on a staging slot when trying to get standard deck slot."""
+
+    def __init__(
+        self,
+        message: Optional[str] = None,
+        details: Optional[Dict[str, Any]] = None,
+        wrapping: Optional[Sequence[EnumeratedError]] = None,
+    ) -> None:
+        """Build a LocationIsStagingSlotError."""
+        super().__init__(ErrorCodes.GENERAL_ERROR, message, details, wrapping)
+
+
 class FirmwareUpdateRequired(ProtocolEngineError):
     """Raised when the firmware needs to be updated."""
 
@@ -834,29 +925,28 @@ class PipetteNotReadyToAspirateError(ProtocolEngineError):
         super().__init__(ErrorCodes.GENERAL_ERROR, message, details, wrapping)
 
 
-class InvalidPipettingVolumeError(ProtocolEngineError):
+class InvalidAspirateVolumeError(ProtocolEngineError):
     """Raised when pipetting a volume larger than the pipette volume."""
 
     def __init__(
         self,
-        message: Optional[str] = None,
-        details: Optional[Dict[str, Any]] = None,
+        attempted_aspirate_volume: float,
+        available_volume: float,
+        max_pipette_volume: float,
+        max_tip_volume: Optional[float],  # None if there's no tip.
         wrapping: Optional[Sequence[EnumeratedError]] = None,
     ) -> None:
         """Build a InvalidPipettingVolumeError."""
-        super().__init__(ErrorCodes.GENERAL_ERROR, message, details, wrapping)
-
-
-class InvalidPushOutVolumeError(ProtocolEngineError):
-    """Raised when attempting to use an invalid volume for dispense push_out."""
-
-    def __init__(
-        self,
-        message: Optional[str] = None,
-        details: Optional[Dict[str, Any]] = None,
-        wrapping: Optional[Sequence[EnumeratedError]] = None,
-    ) -> None:
-        """Build a InvalidPushOutVolumeError."""
+        message = (
+            f"Cannot aspirate {attempted_aspirate_volume} µL when only"
+            f" {available_volume} is available."
+        )
+        details = {
+            "attempted_aspirate_volume": attempted_aspirate_volume,
+            "available_volume": available_volume,
+            "max_pipette_volume": max_pipette_volume,
+            "max_tip_volume": max_tip_volume,
+        }
         super().__init__(ErrorCodes.GENERAL_ERROR, message, details, wrapping)
 
 
@@ -870,6 +960,19 @@ class InvalidDispenseVolumeError(ProtocolEngineError):
         wrapping: Optional[Sequence[EnumeratedError]] = None,
     ) -> None:
         """Build a InvalidDispenseVolumeError."""
+        super().__init__(ErrorCodes.GENERAL_ERROR, message, details, wrapping)
+
+
+class InvalidPushOutVolumeError(ProtocolEngineError):
+    """Raised when attempting to use an invalid volume for dispense push_out."""
+
+    def __init__(
+        self,
+        message: Optional[str] = None,
+        details: Optional[Dict[str, Any]] = None,
+        wrapping: Optional[Sequence[EnumeratedError]] = None,
+    ) -> None:
+        """Build a InvalidPushOutVolumeError."""
         super().__init__(ErrorCodes.GENERAL_ERROR, message, details, wrapping)
 
 
@@ -887,16 +990,18 @@ class InvalidAxisForRobotType(ProtocolEngineError):
 
 
 class EStopActivatedError(ProtocolEngineError):
-    """Raised when an operation's required pipette tip is not attached."""
+    """Represents an E-stop event."""
 
     def __init__(
         self,
-        message: Optional[str] = None,
-        details: Optional[Dict[str, Any]] = None,
         wrapping: Optional[Sequence[EnumeratedError]] = None,
     ) -> None:
         """Build an EStopActivatedError."""
-        super().__init__(ErrorCodes.E_STOP_ACTIVATED, message, details, wrapping)
+        super().__init__(
+            code=ErrorCodes.E_STOP_ACTIVATED,
+            message="E-stop activated.",
+            wrapping=wrapping,
+        )
 
 
 class NotSupportedOnRobotType(ProtocolEngineError):

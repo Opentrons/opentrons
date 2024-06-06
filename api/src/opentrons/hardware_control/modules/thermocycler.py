@@ -63,6 +63,7 @@ class Thermocycler(mod_abc.AbstractModule):
         poll_interval_seconds: Optional[float] = None,
         simulating: bool = False,
         sim_model: Optional[str] = None,
+        sim_serial_number: Optional[str] = None,
     ) -> "Thermocycler":
         """
         Build and connect to a Thermocycler
@@ -87,7 +88,7 @@ class Thermocycler(mod_abc.AbstractModule):
             )
             poll_interval_seconds = poll_interval_seconds or POLLING_FREQUENCY_SEC
         else:
-            driver = SimulatingDriver(model=sim_model)
+            driver = SimulatingDriver(model=sim_model, serial_number=sim_serial_number)
             poll_interval_seconds = poll_interval_seconds or SIM_POLLING_FREQUENCY_SEC
 
         reader = ThermocyclerReader(driver=driver)

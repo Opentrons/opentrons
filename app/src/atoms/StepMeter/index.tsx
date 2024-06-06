@@ -27,7 +27,7 @@ export const StepMeter = (props: StepMeterProps): JSX.Element => {
   const StepMeterContainer = css`
     position: ${POSITION_RELATIVE};
     height: ${SPACING.spacing4};
-    background-color: ${COLORS.medGreyEnabled};
+    background-color: ${COLORS.grey30};
     @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
       height: ${SPACING.spacing12};
     }
@@ -44,7 +44,7 @@ export const StepMeter = (props: StepMeterProps): JSX.Element => {
     position: ${POSITION_ABSOLUTE};
     top: 0;
     height: 100%;
-    background-color: ${COLORS.blueEnabled};
+    background-color: ${COLORS.blue50};
     width: ${percentComplete}%;
     transform: translateX(0);
     transition: ${prevPercentComplete.current <= percentComplete

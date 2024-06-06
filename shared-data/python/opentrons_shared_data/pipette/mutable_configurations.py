@@ -3,6 +3,7 @@ import json
 import re
 from pathlib import Path
 from typing import Optional, List, Dict, Any, cast
+from enum import Enum
 
 from .pipette_definition import PipetteConfigurations, PipetteModelVersionType
 from .model_constants import (
@@ -165,14 +166,14 @@ def _get_default_value_for(config: Dict[str, Any], keypath: List[str]) -> Any:
             rest = keypath[1:]
             if first == "##EACHTIP##":
                 tip_list = list(remaining_config.keys())
-                tip_list.sort(key=lambda o: o.value)
+                tip_list.sort(key=lambda o: o.value if isinstance(o, Enum) else o)
                 return _do_get_default_value_for(remaining_config[tip_list[-1]], rest)
             else:
                 return _do_get_default_value_for(remaining_config[first], rest)
         else:
-            if first == "###EACHTIP##":
+            if first == "##EACHTIP##":
                 tip_list = list(remaining_config.keys())
-                tip_list.sort(key=lambda o: o.value)
+                tip_list.sort(key=lambda o: o.value if isinstance(o, Enum) else o)
                 return remaining_config[tip_list[-1]]
             elif first == "currentByTipCount":
                 # return the value for the most tips at a time
@@ -189,10 +190,16 @@ def _find_default(name: str, configs: Dict[str, Any]) -> MutableConfig:
     keypath = _MAP_KEY_TO_V2[name]
     nested_name = keypath[-1]
 
-    if name == "pickUpCurrent":
-        min_max_dict = _MIN_MAX_LOOKUP["current"]
-        type_lookup = _TYPE_LOOKUP["current"]
-        units_lookup = _UNITS_LOOKUP["current"]
+    name_to_lookup_key_map = {
+        "pickUpCurrent": "current",
+        "pickUpDistance": "distance",
+        "pickUpSpeed": "speed",
+    }
+    if name in name_to_lookup_key_map.keys():
+        lookup_key = name_to_lookup_key_map[name]
+        min_max_dict = _MIN_MAX_LOOKUP[lookup_key]
+        type_lookup = _TYPE_LOOKUP[lookup_key]
+        units_lookup = _UNITS_LOOKUP[lookup_key]
     else:
         min_max_dict = _MIN_MAX_LOOKUP[nested_name]
         type_lookup = _TYPE_LOOKUP[nested_name]
@@ -303,6 +310,7 @@ def load_with_mutable_configurations(
 
     :param str pipette_model: The pipette model name (i.e. "p10_single_v1.3")
                               for which to load configuration
+    :param pipette_override_path: The path to the on-disk file which has the config overrides.
     :param pipette_serial_number: An (optional) unique ID for the pipette to locate
                        config overrides. If the ID is not specified, the system
                        assumes this is a simulated pipette and does not
@@ -330,9 +338,15 @@ def load_with_mutable_configurations(
         except FileNotFoundError:
             pass
         else:
-            base_configurations = _migrate_to_v2_configurations(
-                base_configurations, override
-            )
+            try:
+                base_configurations = _migrate_to_v2_configurations(
+                    base_configurations, override
+                )
+            except BaseException:
+                log.exception(
+                    "Failed to migrate mutable configurations. Please report this as it is a bug."
+                )
+
     # the ulPerMm functions are structured in pipetteModelSpecs.json as
     # a list sorted from oldest to newest. That means the latest functions
     # are always the last element and, as of right now, the older ones are

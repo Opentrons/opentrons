@@ -50,10 +50,10 @@ async def _motion_settings(
     speed: float,
 ) -> None:
     pip_ax = Axis.of_main_tool_actuator(mount)
-    helpers_ot3.set_gantry_load_per_axis_current_settings_ot3(
+    await helpers_ot3.set_gantry_load_per_axis_current_settings_ot3(
         api, axis=pip_ax, hold_current=DEFAULT_HOLD_CURRENT, run_current=current
     )
-    helpers_ot3.set_gantry_load_per_axis_motion_settings_ot3(
+    await helpers_ot3.set_gantry_load_per_axis_motion_settings_ot3(
         api,
         axis=pip_ax,
         acceleration=acceleration,

@@ -12,7 +12,7 @@ import type {
 import type { PipetteOffsetCalibrationsAction } from './pipette-offset/types'
 import type { TipLengthCalibrationsAction } from './tip-length/types'
 
-import {
+import type {
   FETCH_CALIBRATION_STATUS,
   FETCH_CALIBRATION_STATUS_SUCCESS,
   FETCH_CALIBRATION_STATUS_FAILURE,

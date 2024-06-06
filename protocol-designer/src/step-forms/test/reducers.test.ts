@@ -1,3 +1,5 @@
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
+
 import {
   MAGNETIC_MODULE_TYPE,
   TEMPERATURE_MODULE_TYPE,
@@ -5,6 +7,7 @@ import {
   MAGNETIC_MODULE_V1,
   MAGNETIC_MODULE_V2,
 } from '@opentrons/shared-data'
+
 import {
   orderedStepIds,
   labwareInvariantProperties,
@@ -13,11 +16,6 @@ import {
   savedStepForms,
   unsavedForm,
   batchEditFormChanges,
-  SavedStepFormsActions,
-  UnsavedFormActions,
-  RootState,
-  PresavedStepFormState,
-  PresavedStepFormAction,
 } from '../reducers'
 import {
   _getPipetteEntitiesRootState,
@@ -31,43 +29,17 @@ import {
   SPAN7_8_10_11_SLOT,
   PAUSE_UNTIL_TEMP,
 } from '../../constants'
-import {
-  FormData,
-  PROFILE_CYCLE,
-  PROFILE_STEP,
-  StepType,
-} from '../../form-types'
 import { PRESAVED_STEP_ID } from '../../steplist/types'
 import { createPresavedStepForm } from '../utils/createPresavedStepForm'
 import { createInitialProfileCycle } from '../utils/createInitialProfileItems'
 import { getLabwareIsCompatible } from '../../utils/labwareModuleCompatibility'
 import { uuid } from '../../utils'
-import { DeckSlot } from '../../types'
-import { DeleteContainerAction } from '../../labware-ingred/actions/actions'
-import {
-  DeletePipettesAction,
-  SubstituteStepFormPipettesAction,
-} from '../actions/pipettes'
-import {
-  CreateModuleAction,
-  DeleteModuleAction,
-  EditModuleAction,
-} from '../actions/modules'
-import { ModuleEntity } from '@opentrons/step-generation'
-import {
-  AddStepAction,
-  DuplicateMultipleStepsAction,
-  DuplicateStepAction,
-  SelectMultipleStepsAction,
-  SelectStepAction,
-  SelectTerminalItemAction,
-} from '../../ui/steps'
-import {
-  ChangeBatchEditFieldAction,
-  SaveStepFormsMultiAction,
-  ResetBatchEditFieldChangesAction,
-} from '../actions'
-import {
+import { PROFILE_CYCLE, PROFILE_STEP } from '../../form-types'
+
+import type { ModuleEntity } from '@opentrons/step-generation'
+import type { DeckSlot } from '../../types'
+import type { DeleteContainerAction } from '../../labware-ingred/actions/actions'
+import type {
   AddProfileCycleAction,
   AddProfileStepAction,
   ChangeFormInputAction,
@@ -77,34 +49,46 @@ import {
   EditProfileCycleAction,
   EditProfileStepAction,
 } from '../../steplist/actions'
+import type { FormData, StepType } from '../../form-types'
+import type {
+  SavedStepFormsActions,
+  UnsavedFormActions,
+  RootState,
+  PresavedStepFormState,
+  PresavedStepFormAction,
+} from '../reducers'
+import type {
+  DeletePipettesAction,
+  SubstituteStepFormPipettesAction,
+} from '../actions/pipettes'
+import type {
+  CreateModuleAction,
+  DeleteModuleAction,
+  EditModuleAction,
+} from '../actions/modules'
+import type {
+  AddStepAction,
+  DuplicateMultipleStepsAction,
+  DuplicateStepAction,
+  SelectMultipleStepsAction,
+  SelectStepAction,
+  SelectTerminalItemAction,
+} from '../../ui/steps'
+import type {
+  ChangeBatchEditFieldAction,
+  SaveStepFormsMultiAction,
+  ResetBatchEditFieldChangesAction,
+} from '../actions'
 
-jest.mock('../../labware-defs/utils')
-jest.mock('../selectors')
-jest.mock('../../steplist/formLevel/handleFormChange')
-jest.mock('../utils/createPresavedStepForm')
-jest.mock('../../utils/labwareModuleCompatibility')
-jest.mock('../../utils')
-const mockUuid = uuid as jest.MockedFunction<typeof uuid>
-const mockCreatePresavedStepForm = createPresavedStepForm as jest.MockedFunction<
-  typeof createPresavedStepForm
->
-const handleFormChangeMock = handleFormChange as jest.MockedFunction<
-  typeof handleFormChange
->
-const getLabwareIsCompatibleMock = getLabwareIsCompatible as jest.MockedFunction<
-  typeof getLabwareIsCompatible
->
-const mock_getPipetteEntitiesRootState = _getPipetteEntitiesRootState as jest.MockedFunction<
-  typeof _getPipetteEntitiesRootState
->
-const mock_getLabwareEntitiesRootState = _getLabwareEntitiesRootState as jest.MockedFunction<
-  typeof _getLabwareEntitiesRootState
->
-const mock_getInitialDeckSetupRootState = _getInitialDeckSetupRootState as jest.MockedFunction<
-  typeof _getInitialDeckSetupRootState
->
+vi.mock('../../labware-defs/utils')
+vi.mock('../selectors')
+vi.mock('../../steplist/formLevel/handleFormChange')
+vi.mock('../utils/createPresavedStepForm')
+vi.mock('../../utils/labwareModuleCompatibility')
+vi.mock('../../utils')
+
 afterEach(() => {
-  jest.clearAllMocks()
+  vi.clearAllMocks()
 })
 describe('orderedStepIds reducer', () => {
   it('should add a saved step when that step is new', () => {
@@ -811,8 +795,8 @@ describe('savedStepForms reducer: initial deck setup step', () => {
         expectedModuleLocations,
       }) => {
         it(testName, () => {
-          mock_getInitialDeckSetupRootState.mockReturnValue(deckSetup)
-          getLabwareIsCompatibleMock.mockReturnValue(
+          vi.mocked(_getInitialDeckSetupRootState).mockReturnValue(deckSetup)
+          vi.mocked(getLabwareIsCompatible).mockReturnValue(
             labwareIsCompatible as boolean
           )
           const prevRootState = makePrevRootState(makeStateArgs)
@@ -1394,7 +1378,7 @@ describe('savedStepForms reducer: initial deck setup step', () => {
   })
   describe('EDIT_MODULE', () => {
     it('should set engageHeight to null for all Magnet > Engage steps when a magnet module has its model changed, unless height matches default', () => {
-      mock_getInitialDeckSetupRootState.mockReturnValue({
+      vi.mocked(_getInitialDeckSetupRootState).mockReturnValue({
         labware: {
           magPlateId: {
             id: 'magPlateId',
@@ -1560,21 +1544,25 @@ describe('unsavedForm reducer', () => {
         },
       },
     }
-    handleFormChangeMock.mockReturnValue({
+    vi.mocked(handleFormChange).mockReturnValue({
       someField: 42,
     })
-    mock_getPipetteEntitiesRootState.mockReturnValue(
+    vi.mocked(_getPipetteEntitiesRootState).mockReturnValue(
       // @ts-expect-error(sa, 2021-6-14): not a valid PipetteEntities Type
       'pipetteEntitiesPlaceholder'
     )
-    mock_getLabwareEntitiesRootState.mockReturnValue(
+    vi.mocked(_getLabwareEntitiesRootState).mockReturnValue(
       // @ts-expect-error(sa, 2021-6-14): not a valid LabwareEntities Type
       'labwareEntitiesPlaceholder'
     )
     const result = unsavedForm(rootState, action)
-    expect(mock_getPipetteEntitiesRootState.mock.calls).toEqual([[rootState]])
-    expect(mock_getLabwareEntitiesRootState.mock.calls).toEqual([[rootState]])
-    expect(handleFormChangeMock.mock.calls).toEqual([
+    expect(vi.mocked(_getPipetteEntitiesRootState).mock.calls).toEqual([
+      [rootState],
+    ])
+    expect(vi.mocked(_getLabwareEntitiesRootState).mock.calls).toEqual([
+      [rootState],
+    ])
+    expect(vi.mocked(handleFormChange).mock.calls).toEqual([
       [
         action.payload.update,
         rootState.unsavedForm,
@@ -1607,21 +1595,25 @@ describe('unsavedForm reducer', () => {
         otherField: 'blah',
       },
     }
-    handleFormChangeMock.mockReturnValue({
+    vi.mocked(handleFormChange).mockReturnValue({
       pipette: 'newPipetteId',
     })
-    mock_getPipetteEntitiesRootState.mockReturnValue(
+    vi.mocked(_getPipetteEntitiesRootState).mockReturnValue(
       // @ts-expect-error(sa, 2021-6-14): not a valid PipetteEntities Type
       'pipetteEntitiesPlaceholder'
     )
-    mock_getLabwareEntitiesRootState.mockReturnValue(
+    vi.mocked(_getLabwareEntitiesRootState).mockReturnValue(
       // @ts-expect-error(sa, 2021-6-14): not a valid LabwareEntities Type
       'labwareEntitiesPlaceholder'
     )
     const result = unsavedForm(rootState, action)
-    expect(mock_getPipetteEntitiesRootState.mock.calls).toEqual([[rootState]])
-    expect(mock_getLabwareEntitiesRootState.mock.calls).toEqual([[rootState]])
-    expect(handleFormChangeMock.mock.calls).toEqual([
+    expect(vi.mocked(_getPipetteEntitiesRootState).mock.calls).toEqual([
+      [rootState],
+    ])
+    expect(vi.mocked(_getLabwareEntitiesRootState).mock.calls).toEqual([
+      [rootState],
+    ])
+    expect(vi.mocked(handleFormChange).mock.calls).toEqual([
       [
         {
           pipette: 'newPipetteId',
@@ -1658,12 +1650,14 @@ describe('unsavedForm reducer', () => {
     })
   })
   it('should return the result createPresavedStepForm util upon ADD_STEP action', () => {
-    mockCreatePresavedStepForm.mockReturnValue(
+    vi.mocked(createPresavedStepForm).mockReturnValue(
       // @ts-expect-error(sa, 2021-6-14): not a valid FormData Type
       'createPresavedStepFormMockResult'
     )
-    // @ts-expect-error(sa, 2021-6-14): not valid InitialDeckSetup state
-    mock_getInitialDeckSetupRootState.mockReturnValue('initalDeckSetupValue')
+    vi.mocked(_getInitialDeckSetupRootState).mockReturnValue(
+      // @ts-expect-error(sa, 2021-6-14): not valid InitialDeckSetup state
+      'initalDeckSetupValue'
+    )
     const stateMock: RootState = {
       // @ts-expect-error(sa, 2021-6-14): not valid savedStepForms state
       savedStepForms: 'savedStepFormsValue',
@@ -1682,7 +1676,7 @@ describe('unsavedForm reducer', () => {
       },
     })
     expect(result).toEqual('createPresavedStepFormMockResult')
-    expect(mockCreatePresavedStepForm.mock.calls).toEqual([
+    expect(vi.mocked(createPresavedStepForm).mock.calls).toEqual([
       [
         {
           stepId: 'stepId123',
@@ -1707,8 +1701,8 @@ describe('unsavedForm reducer', () => {
     // NOTE: because we're using uuid() to create multiple different ids,
     // this test is sensitive to the order that uuid is called in and
     // assumes it's first for cycle id, then next for profile step id
-    mockUuid.mockReturnValueOnce(id)
-    mockUuid.mockReturnValueOnce(profileStepId)
+    vi.mocked(uuid).mockReturnValueOnce(id)
+    vi.mocked(uuid).mockReturnValueOnce(profileStepId)
     const state: RootState = {
       // @ts-expect-error(sa, 2021-6-14): add id to fixture
       unsavedForm: {
@@ -1735,7 +1729,7 @@ describe('unsavedForm reducer', () => {
         cycleId,
       },
     }
-    mockUuid.mockReturnValue(stepId)
+    vi.mocked(uuid).mockReturnValue(stepId)
     const state: RootState = {
       // @ts-expect-error(sa, 2021-6-14): add id to fixture
       unsavedForm: {

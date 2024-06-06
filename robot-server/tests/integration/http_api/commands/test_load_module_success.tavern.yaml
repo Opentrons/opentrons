@@ -49,7 +49,7 @@ stages:
           params:
             model: '{model}'
             location:
-              slotName: '10'
+              slotName: '7'
     response:
       strict:
         - json:off

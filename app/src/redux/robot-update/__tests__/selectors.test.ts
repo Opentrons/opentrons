@@ -1,3 +1,5 @@
+import { vi, describe, it, expect, beforeEach } from 'vitest'
+
 import * as selectors from '../selectors'
 import * as Constants from '../constants'
 import { mockReachableRobot } from '../../discovery/__fixtures__'
@@ -6,31 +8,17 @@ import * as discoSelectors from '../../discovery/selectors'
 
 import type { State } from '../../types'
 
-jest.mock('../../discovery/selectors')
-
-const getViewableRobots = discoSelectors.getViewableRobots as jest.MockedFunction<
-  typeof discoSelectors.getViewableRobots
->
-const getRobotApiVersion = discoSelectors.getRobotApiVersion as jest.MockedFunction<
-  typeof discoSelectors.getRobotApiVersion
->
-const getRobotByName = discoSelectors.getRobotByName as jest.MockedFunction<
-  typeof discoSelectors.getRobotByName
->
+vi.mock('../../discovery/selectors')
 
 describe('robot update selectors', () => {
   beforeEach(() => {
-    getViewableRobots.mockReturnValue([])
-    getRobotApiVersion.mockReturnValue(null)
-    getRobotByName.mockReturnValue(null)
-  })
-
-  afterEach(() => {
-    jest.resetAllMocks()
+    vi.mocked(discoSelectors.getViewableRobots).mockReturnValue([])
+    vi.mocked(discoSelectors.getRobotApiVersion).mockReturnValue(null)
+    vi.mocked(discoSelectors.getRobotByName).mockReturnValue(null)
   })
 
   it('should get robot update info for an ot2', () => {
-    getRobotByName.mockReturnValue({
+    vi.mocked(discoSelectors.getRobotByName).mockReturnValue({
       serverHealth: { robotModel: 'OT-2 Standard' },
     } as any)
     const state: State = {
@@ -48,7 +36,7 @@ describe('robot update selectors', () => {
   })
 
   it('should get robot update info for an flex', () => {
-    getRobotByName.mockReturnValue({
+    vi.mocked(discoSelectors.getRobotByName).mockReturnValue({
       serverHealth: { robotModel: 'OT-3 Standard' },
     } as any)
     const state: State = {
@@ -67,7 +55,7 @@ describe('robot update selectors', () => {
 
   it('should get the update version from the auto-downloaded file for a flex', () => {
     const state: State = { robotUpdate: { flex: { version: '1.0.0' } } } as any
-    getRobotByName.mockReturnValue({
+    vi.mocked(discoSelectors.getRobotByName).mockReturnValue({
       serverHealth: { robotModel: 'OT-3 Standard' },
     } as any)
     const result = selectors.getRobotUpdateTargetVersion(state, 'some-flex')
@@ -77,7 +65,7 @@ describe('robot update selectors', () => {
 
   it('should get the update version from the auto-downloaded file for an ot2', () => {
     const state: State = { robotUpdate: { ot2: { version: '1.0.0' } } } as any
-    getRobotByName.mockReturnValue({
+    vi.mocked(discoSelectors.getRobotByName).mockReturnValue({
       serverHealth: { robotModel: 'OT-2 Standard' },
     } as any)
     const result = selectors.getRobotUpdateTargetVersion(state, 'some-ot2')
@@ -92,7 +80,7 @@ describe('robot update selectors', () => {
         session: { fileInfo: { version: '1.0.1' } },
       },
     } as any
-    getRobotByName.mockReturnValue({
+    vi.mocked(discoSelectors.getRobotByName).mockReturnValue({
       serverHealth: { robotModel: 'OT-3 Standard' },
     } as any)
     const result = selectors.getRobotUpdateTargetVersion(state, 'some-flex')
@@ -107,7 +95,7 @@ describe('robot update selectors', () => {
         session: { fileInfo: { version: '1.0.1' } },
       },
     } as any
-    getRobotByName.mockReturnValue({
+    vi.mocked(discoSelectors.getRobotByName).mockReturnValue({
       serverHealth: { robotModel: 'OT-2 Standard' },
     } as any)
     const result = selectors.getRobotUpdateTargetVersion(state, 'some-ot2')
@@ -119,7 +107,7 @@ describe('robot update selectors', () => {
     const state: State = {
       robotUpdate: { flex: { downloadError: 'error with download' } },
     } as any
-    getRobotByName.mockReturnValue({
+    vi.mocked(discoSelectors.getRobotByName).mockReturnValue({
       serverHealth: { robotModel: 'OT-3 Standard' },
     } as any)
     const result = selectors.getRobotUpdateDownloadError(state, 'some-flex')
@@ -131,7 +119,7 @@ describe('robot update selectors', () => {
     const state: State = {
       robotUpdate: { ot2: { downloadError: 'error with download' } },
     } as any
-    getRobotByName.mockReturnValue({
+    vi.mocked(discoSelectors.getRobotByName).mockReturnValue({
       serverHealth: { robotModel: 'OT-2 Standard' },
     } as any)
     const result = selectors.getRobotUpdateDownloadError(state, 'some-ot2')
@@ -143,7 +131,7 @@ describe('robot update selectors', () => {
     const state: State = {
       robotUpdate: { ot2: { downloadProgress: 10 } },
     } as any
-    getRobotByName.mockReturnValue({
+    vi.mocked(discoSelectors.getRobotByName).mockReturnValue({
       serverHealth: { robotModel: 'OT-2 Standard' },
     } as any)
     const result = selectors.getRobotUpdateDownloadProgress(state, 'some-ot2')
@@ -155,7 +143,7 @@ describe('robot update selectors', () => {
     const state: State = {
       robotUpdate: { flex: { downloadProgress: 10 } },
     } as any
-    getRobotByName.mockReturnValue({
+    vi.mocked(discoSelectors.getRobotByName).mockReturnValue({
       serverHealth: { robotModel: 'OT-3 Standard' },
     } as any)
     const result = selectors.getRobotUpdateDownloadProgress(state, 'flex')
@@ -164,16 +152,18 @@ describe('robot update selectors', () => {
   })
 
   it('should return "upgrade" update type when an ot2 is behind the update', () => {
-    getRobotByName.mockReturnValue({
+    vi.mocked(discoSelectors.getRobotByName).mockReturnValue({
       serverHealth: { robotModel: 'OT-2 Standard' },
     } as any)
     const state: State = { robotUpdate: { ot2: { version: '1.0.0' } } } as any
     const robot = { name: 'robot-name' } as any
 
-    getRobotApiVersion.mockImplementation(inputRobot => {
-      expect(inputRobot).toBe(robot)
-      return '0.9.9'
-    })
+    vi.mocked(discoSelectors.getRobotApiVersion).mockImplementation(
+      inputRobot => {
+        expect(inputRobot).toBe(robot)
+        return '0.9.9'
+      }
+    )
 
     const result = selectors.getRobotUpdateAvailable(state, robot)
 
@@ -181,16 +171,18 @@ describe('robot update selectors', () => {
   })
 
   it('should return "upgrade" update type when a flex is behind the update', () => {
-    getRobotByName.mockReturnValue({
+    vi.mocked(discoSelectors.getRobotByName).mockReturnValue({
       serverHealth: { robotModel: 'OT-3 Standard' },
     } as any)
     const state: State = { robotUpdate: { flex: { version: '1.0.0' } } } as any
     const robot = { name: 'robot-name' } as any
 
-    getRobotApiVersion.mockImplementation(inputRobot => {
-      expect(inputRobot).toBe(robot)
-      return '0.9.9'
-    })
+    vi.mocked(discoSelectors.getRobotApiVersion).mockImplementation(
+      inputRobot => {
+        expect(inputRobot).toBe(robot)
+        return '0.9.9'
+      }
+    )
 
     const result = selectors.getRobotUpdateAvailable(state, robot)
 
@@ -198,13 +190,13 @@ describe('robot update selectors', () => {
   })
 
   it('should return "downgrade" update type when an ot2 is ahead of the update', () => {
-    getRobotByName.mockReturnValue({
+    vi.mocked(discoSelectors.getRobotByName).mockReturnValue({
       serverHealth: { robotModel: 'OT-2 Standard' },
     } as any)
     const state: State = { robotUpdate: { ot2: { version: '1.0.0' } } } as any
     const robot = { name: 'robot-name' } as any
 
-    getRobotApiVersion.mockReturnValue('1.0.1')
+    vi.mocked(discoSelectors.getRobotApiVersion).mockReturnValue('1.0.1')
 
     const result = selectors.getRobotUpdateAvailable(state, robot)
 
@@ -212,13 +204,13 @@ describe('robot update selectors', () => {
   })
 
   it('should return "downgrade" update type when a flex is ahead of the update', () => {
-    getRobotByName.mockReturnValue({
+    vi.mocked(discoSelectors.getRobotByName).mockReturnValue({
       serverHealth: { robotModel: 'OT-3 Standard' },
     } as any)
     const state: State = { robotUpdate: { flex: { version: '1.0.0' } } } as any
     const robot = { name: 'robot-name' } as any
 
-    getRobotApiVersion.mockReturnValue('1.0.1')
+    vi.mocked(discoSelectors.getRobotApiVersion).mockReturnValue('1.0.1')
 
     const result = selectors.getRobotUpdateAvailable(state, robot)
 
@@ -226,13 +218,13 @@ describe('robot update selectors', () => {
   })
 
   it('should get "reinstall" update type when ot-2 matches the update', () => {
-    getRobotByName.mockReturnValue({
+    vi.mocked(discoSelectors.getRobotByName).mockReturnValue({
       serverHealth: { robotModel: 'OT-2 Standard' },
     } as any)
     const state: State = { robotUpdate: { ot2: { version: '1.0.0' } } } as any
     const robot = { name: 'robot-name' } as any
 
-    getRobotApiVersion.mockReturnValue('1.0.0')
+    vi.mocked(discoSelectors.getRobotApiVersion).mockReturnValue('1.0.0')
 
     const result = selectors.getRobotUpdateAvailable(state, robot)
 
@@ -240,13 +232,13 @@ describe('robot update selectors', () => {
   })
 
   it('should get "reinstall" update type when flex matches the update', () => {
-    getRobotByName.mockReturnValue({
+    vi.mocked(discoSelectors.getRobotByName).mockReturnValue({
       serverHealth: { robotModel: 'OT-3 Standard' },
     } as any)
     const state: State = { robotUpdate: { flex: { version: '1.0.0' } } } as any
     const robot = { name: 'robot-name' } as any
 
-    getRobotApiVersion.mockReturnValue('1.0.0')
+    vi.mocked(discoSelectors.getRobotApiVersion).mockReturnValue('1.0.0')
 
     const result = selectors.getRobotUpdateAvailable(state, robot)
 
@@ -254,13 +246,13 @@ describe('robot update selectors', () => {
   })
 
   it('should return null update type when no update available for an ot2', () => {
-    getRobotByName.mockReturnValue({
+    vi.mocked(discoSelectors.getRobotByName).mockReturnValue({
       serverHealth: { robotModel: 'OT-2 Standard' },
     } as any)
     const state: State = { robotUpdate: { ot2: { version: null } } } as any
     const robot = { name: 'robot-name' } as any
 
-    getRobotApiVersion.mockReturnValue('1.0.0')
+    vi.mocked(discoSelectors.getRobotApiVersion).mockReturnValue('1.0.0')
 
     const result = selectors.getRobotUpdateAvailable(state, robot)
 
@@ -268,13 +260,13 @@ describe('robot update selectors', () => {
   })
 
   it('should return null update type when no update available for a flex', () => {
-    getRobotByName.mockReturnValue({
+    vi.mocked(discoSelectors.getRobotByName).mockReturnValue({
       serverHealth: { robotModel: 'OT-3 Standard' },
     } as any)
     const state: State = { robotUpdate: { flex: { version: null } } } as any
     const robot = { name: 'robot-name' } as any
 
-    getRobotApiVersion.mockReturnValue('1.0.0')
+    vi.mocked(discoSelectors.getRobotApiVersion).mockReturnValue('1.0.0')
 
     const result = selectors.getRobotUpdateAvailable(state, robot)
 
@@ -282,13 +274,13 @@ describe('robot update selectors', () => {
   })
 
   it('should return null update type when no robot version available for ot2', () => {
-    getRobotByName.mockReturnValue({
+    vi.mocked(discoSelectors.getRobotByName).mockReturnValue({
       serverHealth: { robotModel: 'OT-2 Standard' },
     } as any)
     const state: State = { robotUpdate: { ot2: { version: '1.0.0' } } } as any
     const robot = { name: 'robot-name' } as any
 
-    getRobotApiVersion.mockReturnValue(null)
+    vi.mocked(discoSelectors.getRobotApiVersion).mockReturnValue(null)
 
     const result = selectors.getRobotUpdateAvailable(state, robot)
 
@@ -296,13 +288,13 @@ describe('robot update selectors', () => {
   })
 
   it('should return null update type when no robot version available for flex', () => {
-    getRobotByName.mockReturnValue({
+    vi.mocked(discoSelectors.getRobotByName).mockReturnValue({
       serverHealth: { robotModel: 'OT-3 Standard' },
     } as any)
     const state: State = { robotUpdate: { flex: { version: '1.0.0' } } } as any
     const robot = { name: 'robot-name' } as any
 
-    getRobotApiVersion.mockReturnValue(null)
+    vi.mocked(discoSelectors.getRobotApiVersion).mockReturnValue(null)
 
     const result = selectors.getRobotUpdateAvailable(state, robot)
 
@@ -342,14 +334,16 @@ describe('robot update selectors', () => {
       },
     } as any
 
-    getViewableRobots.mockImplementation(inputState => {
-      expect(inputState).toBe(state)
-      return [
-        { name: 'other-robot-name', host: '10.10.0.1', port: 31950 },
-        { name: 'robot-name', host: '10.10.0.0', port: 31950 },
-        { name: 'another-robot-name', host: '10.10.0.2', port: 31950 },
-      ] as any
-    })
+    vi.mocked(discoSelectors.getViewableRobots).mockImplementation(
+      inputState => {
+        expect(inputState).toBe(state)
+        return [
+          { name: 'other-robot-name', host: '10.10.0.1', port: 31950 },
+          { name: 'robot-name', host: '10.10.0.0', port: 31950 },
+          { name: 'another-robot-name', host: '10.10.0.2', port: 31950 },
+        ] as any
+      }
+    )
 
     const result = selectors.getRobotUpdateRobot(state)
     expect(result).toEqual({
@@ -377,7 +371,7 @@ describe('robot update selectors', () => {
       },
     } as any
 
-    getViewableRobots.mockReturnValue([
+    vi.mocked(discoSelectors.getViewableRobots).mockReturnValue([
       { name: 'other-robot-name', host: '10.10.0.1', port: 31950 },
       {
         name: 'robot-name',
@@ -405,7 +399,7 @@ describe('robot update selectors', () => {
       serverHealth: { capabilities: { buildrootUpdate: '/' } },
     } as any
 
-    getViewableRobots.mockReturnValue([
+    vi.mocked(discoSelectors.getViewableRobots).mockReturnValue([
       { name: 'other-robot-name', host: '10.10.0.1', port: 31950 },
       robot,
       { name: 'another-robot-name', host: '10.10.0.2', port: 31950 },
@@ -468,11 +462,13 @@ describe('robot update selectors', () => {
     const state: State = { robotUpdate: {} } as any
     const robotName = 'robot-name'
 
-    getRobotByName.mockImplementation((inputState, inputName) => {
-      expect(inputState).toBe(state)
-      expect(inputName).toBe(robotName)
-      return null
-    })
+    vi.mocked(discoSelectors.getRobotByName).mockImplementation(
+      (inputState, inputName) => {
+        expect(inputState).toBe(state)
+        expect(inputName).toBe(robotName)
+        return null
+      }
+    )
 
     const result = selectors.getRobotUpdateDisplayInfo(state, robotName)
 
@@ -490,7 +486,7 @@ describe('robot update selectors', () => {
     const state: State = { robotUpdate: {} } as any
     const robotName = 'robot-name'
 
-    getRobotByName.mockReturnValue({
+    vi.mocked(discoSelectors.getRobotByName).mockReturnValue({
       ...mockReachableRobot,
       serverHealthStatus: HEALTH_STATUS_NOT_OK,
     })
@@ -515,12 +511,17 @@ describe('robot update selectors', () => {
     const robot = { ...mockReachableRobot, name: robotName }
     const otherRobot = { ...mockReachableRobot, name: 'other-name' }
 
-    getRobotByName.mockReturnValue(robot)
-    getViewableRobots.mockReturnValue([robot, otherRobot])
-    getRobotApiVersion.mockImplementation(inputRobot => {
-      expect(inputRobot).toBe(robot)
-      return '1.0.0'
-    })
+    vi.mocked(discoSelectors.getRobotByName).mockReturnValue(robot)
+    vi.mocked(discoSelectors.getViewableRobots).mockReturnValue([
+      robot,
+      otherRobot,
+    ])
+    vi.mocked(discoSelectors.getRobotApiVersion).mockImplementation(
+      inputRobot => {
+        expect(inputRobot).toBe(robot)
+        return '1.0.0'
+      }
+    )
 
     const result = selectors.getRobotUpdateDisplayInfo(state, robotName)
 
@@ -539,8 +540,8 @@ describe('robot update selectors', () => {
     const robotName = 'robot-name'
     const robot = { ...mockReachableRobot, name: robotName }
 
-    getRobotByName.mockReturnValue(robot)
-    getRobotApiVersion.mockReturnValue('1.0.0')
+    vi.mocked(discoSelectors.getRobotByName).mockReturnValue(robot)
+    vi.mocked(discoSelectors.getRobotApiVersion).mockReturnValue('1.0.0')
 
     const result = selectors.getRobotUpdateDisplayInfo(state, robotName)
 
@@ -565,8 +566,8 @@ describe('robot update selectors', () => {
       },
     } as any
 
-    getRobotByName.mockReturnValue(robot)
-    getRobotApiVersion.mockReturnValue('0.9.9')
+    vi.mocked(discoSelectors.getRobotByName).mockReturnValue(robot)
+    vi.mocked(discoSelectors.getRobotApiVersion).mockReturnValue('0.9.9')
 
     const result = selectors.getRobotUpdateDisplayInfo(state, robotName)
 
@@ -589,8 +590,8 @@ describe('robot update selectors', () => {
       },
     }
 
-    getRobotByName.mockReturnValue(robot as any)
-    getRobotApiVersion.mockReturnValue('0.9.9')
+    vi.mocked(discoSelectors.getRobotByName).mockReturnValue(robot as any)
+    vi.mocked(discoSelectors.getRobotApiVersion).mockReturnValue('0.9.9')
 
     const result = selectors.getRobotUpdateDisplayInfo(state, robotName)
 

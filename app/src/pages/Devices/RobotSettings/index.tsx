@@ -3,13 +3,14 @@ import { useTranslation } from 'react-i18next'
 import { Redirect, useParams } from 'react-router-dom'
 
 import {
-  Box,
-  Flex,
-  DIRECTION_COLUMN,
-  SIZE_6,
   BORDERS,
+  Box,
   COLORS,
+  DIRECTION_COLUMN,
+  Flex,
+  SIZE_6,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { ApiHostProvider } from '@opentrons/react-api-client'
@@ -24,7 +25,6 @@ import {
 import { appShellRequestor } from '../../../redux/shell/remote'
 import { getRobotUpdateSession } from '../../../redux/robot-update'
 import { getDevtoolsEnabled } from '../../../redux/config'
-import { StyledText } from '../../../atoms/text'
 import { Banner } from '../../../atoms/Banner'
 import { useRobot } from '../../../organisms/Devices/hooks'
 import { Line } from '../../../atoms/structure'
@@ -107,8 +107,7 @@ export function RobotSettings(): JSX.Element | null {
     <Box minWidth={SIZE_6} height="max-content" padding={SPACING.spacing16}>
       <Flex
         backgroundColor={COLORS.white}
-        border={BORDERS.lineBorder}
-        borderRadius={BORDERS.radiusSoftCorners}
+        borderRadius={BORDERS.borderRadius8}
         flexDirection={DIRECTION_COLUMN}
         marginBottom={SPACING.spacing16}
         minHeight="calc(100vh - 3.5rem)"
@@ -116,7 +115,7 @@ export function RobotSettings(): JSX.Element | null {
       >
         <Box paddingX={SPACING.spacing16}>
           <Box
-            color={COLORS.black}
+            color={COLORS.black90}
             css={TYPOGRAPHY.h1Default}
             padding={`${SPACING.spacing24} 0`}
           >

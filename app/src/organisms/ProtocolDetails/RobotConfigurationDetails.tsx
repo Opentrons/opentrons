@@ -10,6 +10,7 @@ import {
   ModuleIcon,
   SIZE_1,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import {
@@ -18,23 +19,25 @@ import {
   getModuleDisplayName,
   getModuleType,
   getPipetteNameSpecs,
+  MAGNETIC_BLOCK_TYPE,
+  MAGNETIC_BLOCK_FIXTURES,
   SINGLE_SLOT_FIXTURES,
   THERMOCYCLER_MODULE_TYPE,
+  FLEX_USB_MODULE_FIXTURES,
 } from '@opentrons/shared-data'
 
 import { InstrumentContainer } from '../../atoms/InstrumentContainer'
 import { Divider } from '../../atoms/structure'
-import { StyledText } from '../../atoms/text'
 import { getRobotTypeDisplayName } from '../ProtocolsLanding/utils'
 import { getSlotsForThermocycler } from './utils'
 
 import type {
+  CutoutConfigProtocolSpec,
   LoadModuleRunTimeCommand,
   PipetteName,
   RobotType,
   SingleSlotCutoutFixtureId,
 } from '@opentrons/shared-data'
-import type { CutoutConfigProtocolSpec } from '../../resources/deck_configuration/utils'
 
 interface RobotConfigurationDetailsProps {
   leftMountPipetteName: PipetteName | null
@@ -67,25 +70,7 @@ export const RobotConfigurationDetails = (
     </StyledText>
   )
 
-  // TODO(bh, 2022-10-18): insert 96-channel display name
-  // const leftAndRightMountsPipetteDisplayName = 'P20 96-Channel GEN1'
-  const leftAndRightMountsPipetteDisplayName = null
-  const leftAndRightMountsItem =
-    leftAndRightMountsPipetteDisplayName != null ? (
-      <RobotConfigurationDetailsItem
-        label={t('left_and_right_mounts')}
-        item={
-          isLoading ? (
-            loadingText
-          ) : (
-            <InstrumentContainer
-              displayName={leftAndRightMountsPipetteDisplayName}
-            />
-          )
-        }
-      />
-    ) : null
-
+  const is96PipetteUsed = leftMountPipetteName === 'p1000_96'
   const leftMountPipetteDisplayName =
     getPipetteNameSpecs(leftMountPipetteName as PipetteName)?.displayName ??
     null
@@ -113,16 +98,17 @@ export const RobotConfigurationDetails = (
       emptyText
     )
 
-  // filter out single slot fixtures
+  // filter out single slot fixtures as they're implicit
+  // also filter out usb module fixtures as they're handled by required modules
   const nonStandardRequiredFixtureDetails = requiredFixtureDetails.filter(
     fixture =>
-      !SINGLE_SLOT_FIXTURES.includes(
+      ![...SINGLE_SLOT_FIXTURES, ...FLEX_USB_MODULE_FIXTURES].includes(
         fixture.cutoutFixtureId as SingleSlotCutoutFixtureId
       )
   )
 
   return (
-    <Flex flexDirection={DIRECTION_COLUMN} paddingBottom={SPACING.spacing24}>
+    <Flex flexDirection={DIRECTION_COLUMN}>
       <RobotConfigurationDetailsItem
         label={t('robot')}
         item={
@@ -134,12 +120,12 @@ export const RobotConfigurationDetails = (
         }
       />
       <Divider marginY={SPACING.spacing12} width="100%" />
-      {leftAndRightMountsItem ?? (
+      <RobotConfigurationDetailsItem
+        label={is96PipetteUsed ? t('both_mounts') : t('left_mount')}
+        item={isLoading ? loadingText : leftMountItem}
+      />
+      {!is96PipetteUsed && (
         <>
-          <RobotConfigurationDetailsItem
-            label={t('left_mount')}
-            item={isLoading ? loadingText : leftMountItem}
-          />
           <Divider marginY={SPACING.spacing12} width="100%" />
           <RobotConfigurationDetailsItem
             label={t('right_mount')}
@@ -173,7 +159,7 @@ export const RobotConfigurationDetails = (
                     moduleType={getModuleType(module.params.model)}
                     marginRight={SPACING.spacing4}
                     alignSelf={ALIGN_CENTER}
-                    color={COLORS.darkGreyEnabled}
+                    color={COLORS.grey50}
                     height={SIZE_1}
                     minWidth={SIZE_1}
                     minHeight={SIZE_1}
@@ -194,9 +180,23 @@ export const RobotConfigurationDetails = (
             <RobotConfigurationDetailsItem
               label={getCutoutDisplayName(fixture.cutoutId)}
               item={
-                <StyledText as="p">
-                  {getFixtureDisplayName(fixture.cutoutFixtureId)}
-                </StyledText>
+                <>
+                  {MAGNETIC_BLOCK_FIXTURES.includes(fixture.cutoutFixtureId) ? (
+                    <ModuleIcon
+                      key={index}
+                      moduleType={MAGNETIC_BLOCK_TYPE}
+                      marginRight={SPACING.spacing4}
+                      alignSelf={ALIGN_CENTER}
+                      color={COLORS.grey50}
+                      height={SIZE_1}
+                      minWidth={SIZE_1}
+                      minHeight={SIZE_1}
+                    />
+                  ) : null}
+                  <StyledText as="p">
+                    {getFixtureDisplayName(fixture.cutoutFixtureId)}
+                  </StyledText>
+                </>
               }
             />
           </React.Fragment>
@@ -226,7 +226,7 @@ export const RobotConfigurationDetailsItem = (
         flex="0 0 auto"
         fontWeight={TYPOGRAPHY.fontWeightSemiBold}
         marginRight={SPACING.spacing16}
-        color={COLORS.darkGreyEnabled}
+        color={COLORS.grey60}
         textTransform={TYPOGRAPHY.textTransformCapitalize}
         width="4.625rem"
       >

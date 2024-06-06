@@ -1,6 +1,9 @@
 import * as React from 'react'
-
-import { renderWithProviders, COLORS } from '@opentrons/components'
+import { describe, it, expect } from 'vitest'
+import '@testing-library/jest-dom/vitest'
+import { screen } from '@testing-library/react'
+import { COLORS } from '@opentrons/components'
+import { renderWithProviders } from '../../../__testing-utils__'
 
 import { SleepScreen } from '..'
 
@@ -10,10 +13,10 @@ const render = () => {
 
 describe('SleepScreen', () => {
   it('should render empty screen', () => {
-    const [{ getByTestId }] = render()
-    const touchScreen = getByTestId('Touchscreen_SleepScreen')
+    render()
+    const touchScreen = screen.getByTestId('Touchscreen_SleepScreen')
     expect(touchScreen).toHaveStyle('width: 100vw')
     expect(touchScreen).toHaveStyle('height: 100vh')
-    expect(touchScreen).toHaveStyle(`background-color: ${COLORS.black}`)
+    expect(touchScreen).toHaveStyle(`background-color: ${COLORS.black90}`)
   })
 })

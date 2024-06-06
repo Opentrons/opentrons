@@ -1,0 +1,45 @@
+@import '@opentrons/components/styles';
+
+.pipette_group {
+  margin: 0 auto;
+  max-width: 46rem;
+  padding-bottom: 2rem;
+  display: grid;
+  grid-template-columns: 50% 50%;
+  grid-template-areas: 'left right';
+}
+
+.right {
+  grid-area: right;
+  grid-template-columns: 40% 80%;
+  grid-template-areas: 'img info';
+}
+
+.pipette_info {
+  grid-area: info;
+  min-height: 8rem;
+}
+
+.flipped_image {
+  transform: scaleX(-1);
+  filter: FlipH;
+}
+
+.pipette_icon {
+  grid-area: img;
+  text-align: center;
+}
+
+.title {
+  font-size: var(--fs-body-2);
+  font-weight: var(--fw-semibold);
+  color: var(--c-font-dark);
+  text-transform: capitalize;
+  margin: 2rem 0 0.25rem;
+}
+
+.value {
+  font-size: var(--fs-body-2); /* from legacy --font-body-2-dark */
+  font-weight: var(--fw-regular); /* from legacy --font-body-2-dark */
+  color: var(--c-font-dark); /* from legacy --font-body-2-dark */
+}

@@ -13,7 +13,7 @@ import {
 import { SLEEP_NEVER_MS } from '../../App/constants'
 
 import type { Dispatch } from '../../redux/types'
-import type { SetSettingOption } from '../../pages/OnDeviceDisplay/RobotSettingsDashboard'
+import type { SetSettingOption } from '../../pages/RobotSettingsDashboard'
 
 const SLEEP_TIME_MS = 60 * 1000 // 1 min
 
@@ -57,7 +57,9 @@ export function TouchScreenSleep({
     <Flex flexDirection={DIRECTION_COLUMN} ref={screenRef}>
       <ChildNavigation
         header={t('touchscreen_sleep')}
-        onClickBack={() => setCurrentOption(null)}
+        onClickBack={() => {
+          setCurrentOption(null)
+        }}
       />
       <Flex
         flexDirection={DIRECTION_COLUMN}

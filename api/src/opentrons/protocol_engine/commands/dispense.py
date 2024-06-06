@@ -8,13 +8,14 @@ from pydantic import Field
 from ..types import DeckPoint
 from .pipetting_common import (
     PipetteIdMixin,
-    VolumeMixin,
+    DispenseVolumeMixin,
     FlowRateMixin,
     WellLocationMixin,
     BaseLiquidHandlingResult,
     DestinationPositionResult,
 )
-from .command import AbstractCommandImpl, BaseCommand, BaseCommandCreate
+from .command import AbstractCommandImpl, BaseCommand, BaseCommandCreate, SuccessData
+from ..errors.error_occurrence import ErrorOccurrence
 
 if TYPE_CHECKING:
     from ..execution import MovementHandler, PipettingHandler
@@ -23,7 +24,9 @@ if TYPE_CHECKING:
 DispenseCommandType = Literal["dispense"]
 
 
-class DispenseParams(PipetteIdMixin, VolumeMixin, FlowRateMixin, WellLocationMixin):
+class DispenseParams(
+    PipetteIdMixin, DispenseVolumeMixin, FlowRateMixin, WellLocationMixin
+):
     """Payload required to dispense to a specific well."""
 
     pushOut: Optional[float] = Field(
@@ -38,7 +41,9 @@ class DispenseResult(BaseLiquidHandlingResult, DestinationPositionResult):
     pass
 
 
-class DispenseImplementation(AbstractCommandImpl[DispenseParams, DispenseResult]):
+class DispenseImplementation(
+    AbstractCommandImpl[DispenseParams, SuccessData[DispenseResult, None]]
+):
     """Dispense command implementation."""
 
     def __init__(
@@ -47,7 +52,9 @@ class DispenseImplementation(AbstractCommandImpl[DispenseParams, DispenseResult]
         self._movement = movement
         self._pipetting = pipetting
 
-    async def execute(self, params: DispenseParams) -> DispenseResult:
+    async def execute(
+        self, params: DispenseParams
+    ) -> SuccessData[DispenseResult, None]:
         """Move to and dispense to the requested well."""
         position = await self._movement.move_to_well(
             pipette_id=params.pipetteId,
@@ -62,13 +69,16 @@ class DispenseImplementation(AbstractCommandImpl[DispenseParams, DispenseResult]
             push_out=params.pushOut,
         )
 
-        return DispenseResult(
-            volume=volume,
-            position=DeckPoint(x=position.x, y=position.y, z=position.z),
+        return SuccessData(
+            public=DispenseResult(
+                volume=volume,
+                position=DeckPoint(x=position.x, y=position.y, z=position.z),
+            ),
+            private=None,
         )
 
 
-class Dispense(BaseCommand[DispenseParams, DispenseResult]):
+class Dispense(BaseCommand[DispenseParams, DispenseResult, ErrorOccurrence]):
     """Dispense command model."""
 
     commandType: DispenseCommandType = "dispense"

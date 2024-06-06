@@ -1,8 +1,12 @@
-import { Reducer, combineReducers } from 'redux'
+import { combineReducers } from 'redux'
 import { handleActions } from 'redux-actions'
-import { BaseState, Action } from '../../types'
-import { NavigateToPageAction, ToggleNewProtocolModalAction } from '../actions'
-import { Page } from '../types'
+import type { Reducer } from 'redux'
+import type { BaseState, Action } from '../../types'
+import type {
+  NavigateToPageAction,
+  ToggleNewProtocolModalAction,
+} from '../actions'
+import type { Page } from '../types'
 const page: Reducer<Page, any> = handleActions(
   {
     LOAD_FILE: (): Page => 'file-detail',
@@ -13,7 +17,7 @@ const page: Reducer<Page, any> = handleActions(
   },
   'file-splash'
 )
-// @ts-expect-error(sa, 2021-6-21): TS thinks this will only return false, even though TOGGLE_NEW_PROTOCOL_MODAL might yield true
+
 const newProtocolModal: Reducer<boolean, any> = handleActions(
   {
     // @ts-expect-error(sa, 2021-6-21): cannot use string literals as action type

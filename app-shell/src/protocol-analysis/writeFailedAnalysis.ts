@@ -1,7 +1,7 @@
 import { writeFile } from 'fs/promises'
 import uuid from 'uuid/v4'
 
-import { ProtocolAnalysisOutput } from '@opentrons/shared-data'
+import type { ProtocolAnalysisOutput } from '@opentrons/shared-data'
 
 const UNEXPECTED_ERROR_TYPE = 'UnexpectedAnalysisError'
 
@@ -27,6 +27,7 @@ export function createFailedAnalysis(
     pipettes: [],
     modules: [],
     liquids: [],
+    runTimeParameters: [],
     // TODO(mc, 2022-05-04): this field does not make sense for an
     // analysis that was unable to complete, but is required by
     // ProtocolAnalysisOutput

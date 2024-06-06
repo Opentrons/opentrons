@@ -1,5 +1,10 @@
 import * as React from 'react'
-import { renderWithProviders, COLORS, TYPOGRAPHY } from '@opentrons/components'
+import { it, describe, expect, beforeEach } from 'vitest'
+import { screen } from '@testing-library/react'
+
+import { COLORS, TYPOGRAPHY } from '@opentrons/components'
+
+import { renderWithProviders } from '../../../../__testing-utils__'
 import { i18n } from '../../../../i18n'
 import { CalibrationHealthCheckResults } from '../CalibrationHealthCheckResults'
 
@@ -20,26 +25,26 @@ describe('CalibrationHealthCheckResults', () => {
   })
 
   it('should render title and success StatusLabel when all calibration is good', () => {
-    const { getByText, getByTestId } = render(props)
-    getByText('Calibration Health Check Results')
-    const statusLabel = getByText('Calibration complete')
-    expect(statusLabel).toHaveStyle(`color: ${String(COLORS.darkBlackEnabled)}`)
+    render(props)
+    screen.getByText('Calibration Health Check Results')
+    const statusLabel = screen.getByText('Calibration complete')
+    expect(statusLabel).toHaveStyle(`color: ${String(COLORS.black90)}`)
     expect(statusLabel).toHaveStyle(
       `font-weight: ${String(TYPOGRAPHY.fontWeightSemiBold)}`
     )
-    expect(getByTestId('status_circle')).toHaveStyle(
-      `color: ${String(COLORS.successEnabled)}`
+    expect(screen.getByTestId('status_circle')).toHaveStyle(
+      `color: ${String(COLORS.green50)}`
     )
-    expect(getByTestId('status_circle')).toHaveStyle(`height: 0.3125rem`)
-    expect(getByTestId('status_circle')).toHaveStyle(`width: 0.3125rem`)
+    expect(screen.getByTestId('status_circle')).toHaveStyle(`height: 0.3125rem`)
+    expect(screen.getByTestId('status_circle')).toHaveStyle(`width: 0.3125rem`)
   })
 
   it('should render title and warning StatusLabel when calibration results includes bad', () => {
     props.isCalibrationRecommended = true
-    const { getByText, getByTestId } = render(props)
-    getByText('Calibration recommended')
-    expect(getByTestId('status_circle')).toHaveStyle(
-      `color: ${String(COLORS.warningEnabled)}`
+    render(props)
+    screen.getByText('Calibration recommended')
+    expect(screen.getByTestId('status_circle')).toHaveStyle(
+      `color: ${String(COLORS.yellow50)}`
     )
   })
 })

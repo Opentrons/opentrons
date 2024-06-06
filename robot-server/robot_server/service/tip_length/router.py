@@ -1,17 +1,18 @@
 from starlette import status
-from fastapi import APIRouter, Depends
-from typing import Optional
+from fastapi import APIRouter, Depends, Query
+from typing import Optional, cast
 
 from opentrons.calibration_storage import types as cal_types
 from opentrons.calibration_storage.ot2 import tip_length, models
 
 from robot_server.hardware import get_ot2_hardware
-from robot_server.errors import ErrorBody
+from robot_server.errors.error_responses import ErrorBody
 from robot_server.service.tip_length import models as tl_models
 from robot_server.service.errors import RobotServerError, CommonErrorDef
 from robot_server.service.shared_models import calibration as cal_model
 
 from opentrons.hardware_control import API
+from opentrons_shared_data.pipette.dev_types import LabwareUri
 
 
 router = APIRouter()
@@ -48,9 +49,23 @@ def _format_calibration(
     response_model=tl_models.MultipleCalibrationsResponse,
 )
 async def get_all_tip_length_calibrations(
-    tiprack_hash: Optional[str] = None,
-    pipette_id: Optional[str] = None,
-    tiprack_uri: Optional[str] = None,
+    tiprack_hash: Optional[str] = Query(
+        None,
+        description=(
+            "Filter results by their `tiprack` field."
+            " This is deprecated because it was prone to bugs where semantically identical"
+            " definitions had different hashes."
+            " Use `tiprack_uri` instead."
+        ),
+        deprecated=True,
+    ),
+    pipette_id: Optional[str] = Query(
+        None, description="Filter results by their `pipette` field."
+    ),
+    tiprack_uri: Optional[str] = Query(
+        None,
+        description="Filter results by their `uri` field.",
+    ),
     _: API = Depends(get_ot2_hardware),
 ) -> tl_models.MultipleCalibrationsResponse:
     all_calibrations = tip_length.get_all_tip_length_calibrations()
@@ -80,17 +95,55 @@ async def get_all_tip_length_calibrations(
 @router.delete(
     "/calibration/tip_length",
     description="Delete one specific tip length calibration by pipette "
-    "serial and tiprack hash",
+    "serial and tiprack uri",
     responses={status.HTTP_404_NOT_FOUND: {"model": ErrorBody}},
 )
 async def delete_specific_tip_length_calibration(
-    tiprack_hash: str, pipette_id: str, _: API = Depends(get_ot2_hardware)
+    pipette_id: str = Query(
+        ...,
+        description=(
+            "The `pipette` field value of the calibration you want to delete."
+            " (See `GET /calibration/tip_length`.)"
+        ),
+    ),
+    tiprack_hash: Optional[str] = Query(
+        None,
+        description=(
+            "The `tiprack` field value of the calibration you want to delete."
+            " (See `GET /calibration/tip_length`.)"
+            "\n\n"
+            " This is deprecated because it was prone to bugs where semantically identical"
+            " definitions had different hashes."
+            " Use `tiprack_uri` instead."
+            "\n\n"
+            "You must supply either this or `tiprack_uri`."
+        ),
+        deprecated=True,
+    ),
+    tiprack_uri: Optional[str] = Query(
+        None,
+        description=(
+            "The `uri` field value of the calibration you want to delete."
+            " (See `GET /calibration/tip_length`.)"
+            "\n\n"
+            " You must supply either this or `tiprack_hash`."
+        ),
+    ),
+    _: API = Depends(get_ot2_hardware),
 ):
     try:
-        tip_length.delete_tip_length_calibration(tiprack_hash, pipette_id)
+        tip_length.delete_tip_length_calibration(
+            pipette_id,
+            # TODO(mm, 2024-03-06): This is a dangerous cast if, for example, the client
+            # supplies an invalid URI without slashes, and something internal tries to
+            # split it on slashes. We should have a custom Pydantic type so FastAPI can
+            # return a 422 error.
+            tiprack_uri=cast(LabwareUri, tiprack_uri),
+            tiprack_hash=tiprack_hash,
+        )
     except cal_types.TipLengthCalNotFound:
         raise RobotServerError(
             definition=CommonErrorDef.RESOURCE_NOT_FOUND,
             resource="TipLengthCalibration",
-            id=f"{tiprack_hash}&{pipette_id}",
+            id=f"{tiprack_uri}&{pipette_id}",
         )

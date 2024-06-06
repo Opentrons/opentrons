@@ -1,3 +1,4 @@
+import { describe, it, expect } from 'vitest'
 import { removePairs } from '../utils/removePairs'
 
 const twoThenThree = (

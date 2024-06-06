@@ -1,5 +1,4 @@
-import { AIR, createTipLiquidState } from '../utils/misc'
-import { makeImmutableStateUpdater } from '../__utils__'
+import { beforeEach, describe, it, expect } from 'vitest'
 import {
   makeContext,
   getInitialRobotStateStandard,
@@ -7,11 +6,16 @@ import {
   SOURCE_LABWARE,
   TROUGH_LABWARE,
 } from '../fixtures'
-
+import { AIR, createTipLiquidState } from '../utils/misc'
+import { makeImmutableStateUpdater } from '../__utils__'
 import { forAspirate as _forAspirate } from '../getNextRobotStateAndWarnings/forAspirate'
 import * as warningCreators from '../warningCreators'
-import { CommandCreatorWarning, InvariantContext, RobotState } from '../types'
-import { AspDispAirgapParams } from '@opentrons/shared-data/lib/protocol/types/schemaV6/command/pipetting'
+import type {
+  CommandCreatorWarning,
+  InvariantContext,
+  RobotState,
+} from '../types'
+import type { AspDispAirgapParams } from '@opentrons/shared-data/lib/protocol/types/schemaV6/command/pipetting'
 
 const forAspirate = makeImmutableStateUpdater(_forAspirate)
 
@@ -44,6 +48,27 @@ describe('...single-channel pipette', () => {
   })
   describe('...fresh tip', () => {
     it('aspirate from single-ingredient well', () => {
+      robotState = {
+        ...robotState,
+        liquidState: {
+          labware: {
+            [labwareId]: {
+              A1: {
+                ingred1: {
+                  volume: 200,
+                },
+              },
+              A2: {},
+            },
+          },
+          pipettes: {
+            p300SingleId: {
+              '0': { ingred1: { volume: 0 } },
+            },
+          },
+          additionalEquipment: {} as any,
+        },
+      }
       robotState.liquidState.labware[labwareId].A1 = {
         ingred1: {
           volume: 200,
@@ -69,6 +94,7 @@ describe('...single-channel pipette', () => {
             A2: {},
           },
         },
+        additionalEquipment: {},
       })
     })
 

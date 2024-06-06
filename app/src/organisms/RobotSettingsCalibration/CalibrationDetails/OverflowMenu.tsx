@@ -1,15 +1,16 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { saveAs } from 'file-saver'
+import { css } from 'styled-components'
 
 import {
   Flex,
+  BORDERS,
   COLORS,
   POSITION_ABSOLUTE,
   DIRECTION_COLUMN,
   POSITION_RELATIVE,
   ALIGN_FLEX_END,
-  Mount,
   useOnClickOutside,
 } from '@opentrons/components'
 import { isFlexPipette, SINGLE_MOUNT_PIPETTES } from '@opentrons/shared-data'
@@ -33,7 +34,9 @@ import {
 } from '../../../organisms/Devices/hooks'
 import { PipetteWizardFlows } from '../../PipetteWizardFlows'
 import { FLOWS } from '../../PipetteWizardFlows/constants'
+import { useIsEstopNotDisengaged } from '../../../resources/devices/hooks/useIsEstopNotDisengaged'
 
+import type { Mount } from '@opentrons/components'
 import type { PipetteName } from '@opentrons/shared-data'
 import type { DeleteCalRequestParams } from '@opentrons/api-client'
 import type { SelectablePipettes } from '../../PipetteWizardFlows/types'
@@ -71,7 +74,9 @@ export function OverflowMenu({
   } = useMenuHandleClickOutside()
 
   const calsOverflowWrapperRef = useOnClickOutside<HTMLDivElement>({
-    onClickOutside: () => setShowOverflowMenu(false),
+    onClickOutside: () => {
+      setShowOverflowMenu(false)
+    },
   })
   const pipetteOffsetCalibrations = useAllPipetteOffsetCalibrationsQuery().data
     ?.data
@@ -82,6 +87,7 @@ export function OverflowMenu({
     showPipetteWizardFlows,
     setShowPipetteWizardFlows,
   ] = React.useState<boolean>(false)
+  const isEstopNotDisengaged = useIsEstopNotDisengaged(robotName)
   const isPipetteForFlex = isFlexPipette(pipetteName as PipetteName)
   const ot3PipCal =
     useAttachedPipettesFromInstrumentsQuery()[mount]?.data?.calibratedOffset
@@ -158,7 +164,7 @@ export function OverflowMenu({
       if (applicableTipLengthCal == null) return
       params = {
         calType,
-        tiprack_hash: applicableTipLengthCal.tiprack,
+        tiprack_uri: applicableTipLengthCal.uri,
         pipette_id: applicableTipLengthCal.pipette,
       }
     }
@@ -174,12 +180,15 @@ export function OverflowMenu({
         alignSelf={ALIGN_FLEX_END}
         aria-label={`CalibrationOverflowMenu_button_${calType}`}
         onClick={handleOverflowClick}
+        disabled={isEstopNotDisengaged}
       />
       {showPipetteWizardFlows ? (
         <PipetteWizardFlows
           flowType={FLOWS.CALIBRATE}
           mount={mount}
-          closeFlow={() => setShowPipetteWizardFlows(false)}
+          closeFlow={() => {
+            setShowPipetteWizardFlows(false)
+          }}
           selectedPipette={selectedPipette}
           onComplete={() => {
             setSelectedPipette(SINGLE_MOUNT_PIPETTES)
@@ -191,7 +200,7 @@ export function OverflowMenu({
           ref={calsOverflowWrapperRef}
           whiteSpace="nowrap"
           zIndex={10}
-          borderRadius="4px 4px 0px 0px"
+          borderRadius={BORDERS.borderRadius8}
           boxShadow="0px 1px 3px rgba(0, 0, 0, 0.2)"
           position={POSITION_ABSOLUTE}
           backgroundColor={COLORS.white}
@@ -200,7 +209,12 @@ export function OverflowMenu({
           flexDirection={DIRECTION_COLUMN}
         >
           {isPipetteForFlex ? (
-            <MenuItem onClick={handleRecalibrate}>
+            <MenuItem
+              onClick={handleRecalibrate}
+              css={css`
+                border-radius: ${BORDERS.borderRadius8};
+              `}
+            >
               {t(
                 ot3PipCal == null
                   ? 'robot_calibration:calibrate_pipette'
@@ -209,13 +223,24 @@ export function OverflowMenu({
             </MenuItem>
           ) : (
             <>
-              <MenuItem onClick={handleDownload} disabled={!calibrationPresent}>
+              <MenuItem
+                onClick={handleDownload}
+                disabled={!calibrationPresent}
+                css={css`
+                  border-radius: ${BORDERS.borderRadius8}
+                    ${BORDERS.borderRadius8} 0 0;
+                `}
+              >
                 {t('download_calibration_data')}
               </MenuItem>
               <Divider />
               <MenuItem
                 onClick={handleDeleteCalibration}
                 disabled={!calibrationPresent}
+                css={css`
+                  border-radius: 0 0 ${BORDERS.borderRadius8}
+                    ${BORDERS.borderRadius8};
+                `}
               >
                 {t('robot_calibration:delete_calibration_data')}
               </MenuItem>

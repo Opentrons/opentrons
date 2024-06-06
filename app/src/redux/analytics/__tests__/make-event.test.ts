@@ -1,23 +1,17 @@
-// events map tests
+import { vi, describe, it, expect, beforeEach } from 'vitest'
+
 import { makeEvent } from '../make-event'
 import * as selectors from '../selectors'
 
-jest.mock('../selectors')
-jest.mock('../../sessions/selectors')
-jest.mock('../../discovery/selectors')
-jest.mock('../../pipettes/selectors')
-jest.mock('../../calibration/selectors')
-
-const getAnalyticsSessionExitDetails = selectors.getAnalyticsSessionExitDetails as jest.MockedFunction<
-  typeof selectors.getAnalyticsSessionExitDetails
->
-const getSessionInstrumentAnalyticsData = selectors.getSessionInstrumentAnalyticsData as jest.MockedFunction<
-  typeof selectors.getSessionInstrumentAnalyticsData
->
+vi.mock('../selectors')
+vi.mock('../../sessions/selectors')
+vi.mock('../../discovery/selectors')
+vi.mock('../../pipettes/selectors')
+vi.mock('../../calibration/selectors')
 
 describe('analytics events map', () => {
   beforeEach(() => {
-    jest.resetAllMocks()
+    vi.resetAllMocks()
   })
 
   describe('events with protocol data', () => {
@@ -85,7 +79,7 @@ describe('analytics events map', () => {
           command: { command: 'calibration.exitSession' },
         },
       } as any
-      getAnalyticsSessionExitDetails.mockReturnValue({
+      vi.mocked(selectors.getAnalyticsSessionExitDetails).mockReturnValue({
         sessionType: 'my-session-type',
         step: 'session-step',
       })
@@ -113,7 +107,7 @@ describe('analytics events map', () => {
           },
         },
       } as any
-      getSessionInstrumentAnalyticsData.mockReturnValue({
+      vi.mocked(selectors.getSessionInstrumentAnalyticsData).mockReturnValue({
         sessionType: 'my-session-type',
         pipetteModel: 'my-pipette-model',
       })

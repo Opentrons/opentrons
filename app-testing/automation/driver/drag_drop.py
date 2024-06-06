@@ -1,4 +1,5 @@
 """Inject javascript to utilize drag and drop functionality."""
+
 from pathlib import Path
 
 from selenium.webdriver.chrome.webdriver import WebDriver

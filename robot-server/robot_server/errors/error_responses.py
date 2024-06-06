@@ -60,7 +60,7 @@ class ErrorDetails(BaseErrorBody):
     Example:
         from fastapi import status
         from typing_extensions import Literal
-        from robot_server.errors import ErrorResponse, ErrorDetails
+        from robot_server.errors.error_responses import ErrorResponse, ErrorDetails
 
         class BadRequest(ErrorDetails):
             id: Literal["BadRequest"] = "BadRequest"

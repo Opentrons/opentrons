@@ -1,15 +1,11 @@
 import React from 'react'
-import { FormikConfig } from 'formik'
+import { vi, describe, it, expect, beforeEach, afterEach } from 'vitest'
 import { render, screen } from '@testing-library/react'
-import {
-  getDefaultFormState,
-  getInitialStatus,
-  LabwareFields,
-} from '../../../fields'
-
+import { getDefaultFormState, getInitialStatus } from '../../../fields'
 import { CustomTiprackWarning } from '../../sections/CustomTiprackWarning'
-
 import { wrapInFormik } from '../../utils/wrapInFormik'
+import type { FormikConfig } from 'formik'
+import type { LabwareFields } from '../../../fields'
 
 let formikConfig: FormikConfig<LabwareFields>
 
@@ -18,12 +14,12 @@ describe('CustomTiprackWarning', () => {
     formikConfig = {
       initialValues: getDefaultFormState(),
       initialStatus: getInitialStatus(),
-      onSubmit: jest.fn(),
+      onSubmit: vi.fn(),
     }
   })
 
   afterEach(() => {
-    jest.restoreAllMocks()
+    vi.restoreAllMocks()
   })
   it('should not render when no labware type selected', () => {
     const { container } = render(

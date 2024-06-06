@@ -1,24 +1,25 @@
 import * as React from 'react'
 
 import {
-  Box,
-  Flex,
-  InstrumentDiagram,
   ALIGN_FLEX_START,
+  ALIGN_CENTER,
   BORDERS,
+  Box,
   COLORS,
   DIRECTION_COLUMN,
+  Flex,
+  InstrumentDiagram,
   JUSTIFY_CENTER,
   POSITION_ABSOLUTE,
   POSITION_RELATIVE,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import flexGripper from '../../assets/images/flex_gripper.png'
 
 import { useMenuHandleClickOutside } from '../../atoms/MenuList/hooks'
 import { OverflowBtn } from '../../atoms/MenuList/OverflowBtn'
-import { StyledText } from '../../atoms/text'
 import { MenuOverlay } from './MenuOverlay'
 
 import type { InstrumentDiagramProps, StyleProps } from '@opentrons/components'
@@ -33,6 +34,7 @@ interface InstrumentCardProps extends StyleProps {
   // special casing the gripper at least for now
   isGripperAttached?: boolean
   banner?: React.ReactNode
+  isEstopNotDisengaged: boolean
 }
 
 /**
@@ -48,6 +50,7 @@ export function InstrumentCard(props: InstrumentCardProps): JSX.Element {
     label,
     menuOverlayItems,
     banner,
+    isEstopNotDisengaged,
     ...styleProps
   } = props
 
@@ -61,8 +64,8 @@ export function InstrumentCard(props: InstrumentCardProps): JSX.Element {
   return (
     <Flex
       alignItems={ALIGN_FLEX_START}
-      backgroundColor={COLORS.fundamentalsBackground}
-      borderRadius={BORDERS.radiusSoftCorners}
+      backgroundColor={COLORS.grey10}
+      borderRadius={BORDERS.borderRadius8}
       gridGap={SPACING.spacing8}
       padding={SPACING.spacing16}
       position={POSITION_RELATIVE}
@@ -73,19 +76,24 @@ export function InstrumentCard(props: InstrumentCardProps): JSX.Element {
           <img
             src={flexGripper}
             alt="Flex Gripper"
-            max-width="100%"
-            max-height="100%"
+            style={{ maxWidth: '100%', maxHeight: '100%' }}
           />
         </Flex>
       ) : null}
       {instrumentDiagramProps?.pipetteSpecs != null ? (
-        <InstrumentDiagram
-          pipetteSpecs={instrumentDiagramProps.pipetteSpecs}
-          mount={instrumentDiagramProps.mount}
-          transform="scale(0.3)"
-          size="3.125rem"
-          transformOrigin="20% -10%"
-        />
+        <Flex
+          alignItems={ALIGN_CENTER}
+          width="3.75rem"
+          height="3.375rem"
+          paddingRight={SPACING.spacing8}
+        >
+          <InstrumentDiagram
+            pipetteSpecs={instrumentDiagramProps.pipetteSpecs}
+            mount={instrumentDiagramProps.mount}
+            transform="scale(0.3)"
+            transformOrigin={'-5% 52%'}
+          />
+        </Flex>
       ) : null}
       <Flex
         alignItems={ALIGN_FLEX_START}
@@ -97,15 +105,13 @@ export function InstrumentCard(props: InstrumentCardProps): JSX.Element {
         {banner}
         <StyledText
           textTransform={TYPOGRAPHY.textTransformUppercase}
-          color={COLORS.darkGreyEnabled}
+          color={COLORS.grey50}
           fontWeight={TYPOGRAPHY.fontWeightSemiBold}
           fontSize={TYPOGRAPHY.fontSizeH6}
         >
           {label}
         </StyledText>
-        <StyledText as="p" textTransform={TYPOGRAPHY.textTransformCapitalize}>
-          {description}
-        </StyledText>
+        <StyledText as="p">{description}</StyledText>
       </Flex>
       {menuOverlayItems != null && (
         <Box
@@ -116,6 +122,7 @@ export function InstrumentCard(props: InstrumentCardProps): JSX.Element {
           <OverflowBtn
             onClick={handleOverflowClick}
             aria-label="InstrumentCard_overflowMenu"
+            disabled={isEstopNotDisengaged}
           />
           {menuOverlay}
           {showOverflowMenu ? (

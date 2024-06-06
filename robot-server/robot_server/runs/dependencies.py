@@ -17,13 +17,17 @@ from robot_server.hardware import (
     get_deck_type,
     get_robot_type,
 )
-from robot_server.persistence import get_sql_engine
+from robot_server.persistence.fastapi_dependencies import get_sql_engine
 from robot_server.service.task_runner import get_task_runner, TaskRunner
 from robot_server.settings import get_settings
 from robot_server.deletion_planner import RunDeletionPlanner
+from robot_server.service.notifications import (
+    get_runs_publisher,
+    RunsPublisher,
+)
 
 from .run_auto_deleter import RunAutoDeleter
-from .engine_store import EngineStore, NoRunnerEnginePairError
+from .engine_store import EngineStore, NoRunnerEngineError
 from .run_store import RunStore
 from .run_data_manager import RunDataManager
 from robot_server.errors.robot_errors import (
@@ -127,7 +131,7 @@ async def get_is_okay_to_create_maintenance_run(
     """Whether a maintenance run can be created if a protocol run already exists."""
     try:
         protocol_run_state = engine_store.engine.state_view
-    except NoRunnerEnginePairError:
+    except NoRunnerEngineError:
         return True
     return (
         not protocol_run_state.commands.has_been_played()
@@ -139,12 +143,14 @@ async def get_run_data_manager(
     task_runner: TaskRunner = Depends(get_task_runner),
     engine_store: EngineStore = Depends(get_engine_store),
     run_store: RunStore = Depends(get_run_store),
+    runs_publisher: RunsPublisher = Depends(get_runs_publisher),
 ) -> RunDataManager:
     """Get a run data manager to keep track of current/historical run data."""
     return RunDataManager(
         task_runner=task_runner,
         engine_store=engine_store,
         run_store=run_store,
+        runs_publisher=runs_publisher,
     )
 
 

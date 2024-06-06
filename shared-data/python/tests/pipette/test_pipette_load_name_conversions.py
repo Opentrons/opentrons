@@ -103,7 +103,7 @@ def test_convert_pipette_model_provided_version(
             pc.PipetteModelVersionType(
                 PipetteModelType.p1000,
                 PipetteChannelType.EIGHT_CHANNEL,
-                PipetteVersionType(3, 0),
+                PipetteVersionType(3, 5),
             ),
         ],
         [
@@ -111,7 +111,7 @@ def test_convert_pipette_model_provided_version(
             pc.PipetteModelVersionType(
                 PipetteModelType.p1000,
                 PipetteChannelType.NINETY_SIX_CHANNEL,
-                PipetteVersionType(1, 0),
+                PipetteVersionType(3, 6),
             ),
         ],
     ],

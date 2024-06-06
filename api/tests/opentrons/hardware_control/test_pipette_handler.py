@@ -114,9 +114,13 @@ def test_plan_check_pick_up_tip_with_presses_argument(
     decoy.when(mock_pipette.pick_up_configurations.press_fit.presses).then_return(
         expected_array_length
     )
-    decoy.when(mock_pipette.pick_up_configurations.press_fit.distance).then_return(5)
+    decoy.when(
+        mock_pipette.pick_up_configurations.press_fit.distance_by_tip_count
+    ).then_return({1: 5})
     decoy.when(mock_pipette.pick_up_configurations.press_fit.increment).then_return(0)
-    decoy.when(mock_pipette.pick_up_configurations.press_fit.speed).then_return(10)
+    decoy.when(
+        mock_pipette.pick_up_configurations.press_fit.speed_by_tip_count
+    ).then_return({1: 10})
     decoy.when(mock_pipette.config.end_tip_action_retract_distance_mm).then_return(0)
     decoy.when(
         mock_pipette.pick_up_configurations.press_fit.current_by_tip_count
@@ -171,8 +175,8 @@ def test_plan_check_pick_up_tip_with_presses_argument_ot3(
         else PressFitPickUpTipConfiguration(
             presses=2,
             increment=increment,
-            distance=10,
-            speed=5.5,
+            distanceByTipCount={channels: 10},
+            speedByTipCount={channels: 5.5},
             currentByTipCount={channels: 1.0},
         )
     )

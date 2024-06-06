@@ -29,10 +29,11 @@ import { useRunControls } from '../../organisms/RunTimeControl/hooks'
 import {
   useTrackEvent,
   ANALYTICS_PROTOCOL_PROCEED_TO_RUN,
-  ANALYTICS_PROTOCOL_RUN_AGAIN,
+  ANALYTICS_PROTOCOL_RUN_ACTION,
 } from '../../redux/analytics'
 import { getRobotUpdateDisplayInfo } from '../../redux/robot-update'
-import { useDownloadRunLog, useTrackProtocolRunEvent } from './hooks'
+import { useDownloadRunLog, useTrackProtocolRunEvent, useRobot } from './hooks'
+import { useIsEstopNotDisengaged } from '../../resources/devices/hooks/useIsEstopNotDisengaged'
 
 import type { Run } from '@opentrons/api-client'
 import type { State } from '../../redux/types'
@@ -46,7 +47,7 @@ export interface HistoricalProtocolRunOverflowMenuProps {
 export function HistoricalProtocolRunOverflowMenu(
   props: HistoricalProtocolRunOverflowMenuProps
 ): JSX.Element {
-  const { runId } = props
+  const { runId, robotName } = props
   const {
     menuOverlay,
     handleOverflowClick,
@@ -54,12 +55,15 @@ export function HistoricalProtocolRunOverflowMenu(
     setShowOverflowMenu,
   } = useMenuHandleClickOutside()
   const protocolRunOverflowWrapperRef = useOnClickOutside<HTMLDivElement>({
-    onClickOutside: () => setShowOverflowMenu(false),
+    onClickOutside: () => {
+      setShowOverflowMenu(false)
+    },
   })
   const { downloadRunLog, isRunLogLoading } = useDownloadRunLog(
-    props.robotName,
+    robotName,
     runId
   )
+  const isEstopNotDisengaged = useIsEstopNotDisengaged(robotName)
 
   return (
     <Flex
@@ -67,7 +71,11 @@ export function HistoricalProtocolRunOverflowMenu(
       position={POSITION_RELATIVE}
       data-testid="HistoricalProtocolRunOverflowMenu_OverflowMenu"
     >
-      <OverflowBtn alignSelf={ALIGN_FLEX_END} onClick={handleOverflowClick} />
+      <OverflowBtn
+        alignSelf={ALIGN_FLEX_END}
+        onClick={handleOverflowClick}
+        disabled={isEstopNotDisengaged}
+      />
       {showOverflowMenu ? (
         <>
           <Box
@@ -112,10 +120,11 @@ function MenuDropdown(props: MenuDropdownProps): JSX.Element {
     })?.autoUpdateAction
   )
   const [targetProps, tooltipProps] = useHoverTooltip()
-  const onResetSuccess = (createRunResponse: Run): void =>
+  const onResetSuccess = (createRunResponse: Run): void => {
     history.push(
       `/devices/${robotName}/protocol-runs/${createRunResponse.data.id}/run-preview`
     )
+  }
   const onDownloadClick: React.MouseEventHandler<HTMLButtonElement> = e => {
     e.preventDefault()
     e.stopPropagation()
@@ -123,9 +132,12 @@ function MenuDropdown(props: MenuDropdownProps): JSX.Element {
     closeOverflowMenu(e)
   }
   const trackEvent = useTrackEvent()
-  const { trackProtocolRunEvent } = useTrackProtocolRunEvent(runId)
+  const { trackProtocolRunEvent } = useTrackProtocolRunEvent(runId, robotName)
   const { reset } = useRunControls(runId, onResetSuccess)
   const { deleteRun } = useDeleteRunMutation()
+  const robot = useRobot(robotName)
+  const robotSerialNumber =
+    robot?.health?.robot_serial ?? robot?.serverHealth?.serialNumber ?? null
 
   const handleResetClick: React.MouseEventHandler<HTMLButtonElement> = (
     e
@@ -136,9 +148,12 @@ function MenuDropdown(props: MenuDropdownProps): JSX.Element {
     reset()
     trackEvent({
       name: ANALYTICS_PROTOCOL_PROCEED_TO_RUN,
-      properties: { sourceLocation: 'HistoricalProtocolRun' },
+      properties: {
+        sourceLocation: 'HistoricalProtocolRun',
+        robotSerialNumber,
+      },
     })
-    trackProtocolRunEvent({ name: ANALYTICS_PROTOCOL_RUN_AGAIN })
+    trackProtocolRunEvent({ name: ANALYTICS_PROTOCOL_RUN_ACTION.AGAIN })
   }
 
   const handleDeleteClick: React.MouseEventHandler<HTMLButtonElement> = e => {
@@ -189,7 +204,7 @@ function MenuDropdown(props: MenuDropdownProps): JSX.Element {
             <Icon
               name="ot-spinner"
               size={SIZE_1}
-              color={COLORS.darkGreyEnabled}
+              color={COLORS.grey50}
               aria-label="spinner"
               spin
             />

@@ -9,16 +9,17 @@ import {
   getLoadedLabwareDefinitionsByUri,
 } from '@opentrons/shared-data'
 import {
-  Flex,
-  DIRECTION_COLUMN,
-  SPACING,
-  TYPOGRAPHY,
+  BORDERS,
   COLORS,
+  DIRECTION_COLUMN,
+  Flex,
   JUSTIFY_SPACE_BETWEEN,
+  SPACING,
+  StyledText,
+  TYPOGRAPHY,
 } from '@opentrons/components'
 
 import { getIsLabwareOffsetCodeSnippetsOn } from '../../../../redux/config'
-import { StyledText } from '../../../../atoms/text'
 import { LabwareOffsetTabs } from '../../../LabwareOffsetTabs'
 import { OffsetVector } from '../../../../molecules/OffsetVector'
 import { PythonLabwareOffsetSnippet } from '../../../../molecules/PythonLabwareOffsetSnippet'
@@ -45,7 +46,7 @@ const OffsetTableHeader = styled('th')`
   padding: ${SPACING.spacing4};
 `
 const OffsetTableRow = styled('tr')`
-  background-color: ${COLORS.fundamentalsBackground};
+  background-color: ${COLORS.grey10};
   padding: ${SPACING.spacing8};
 `
 
@@ -88,7 +89,12 @@ export function CurrentOffsetsTable(
               : offset.definitionUri
           return (
             <OffsetTableRow key={offset.id}>
-              <OffsetTableDatum>
+              <OffsetTableDatum
+                css={`
+                  border-radius: ${BORDERS.borderRadius8} 0 0
+                    ${BORDERS.borderRadius8};
+                `}
+              >
                 {getDisplayLocation(
                   offset.location,
                   getLabwareDefinitionsFromCommands(commands),
@@ -97,7 +103,12 @@ export function CurrentOffsetsTable(
                 )}
               </OffsetTableDatum>
               <OffsetTableDatum>{labwareDisplayName}</OffsetTableDatum>
-              <OffsetTableDatum>
+              <OffsetTableDatum
+                css={`
+                  border-radius: 0 ${BORDERS.borderRadius8}
+                    ${BORDERS.borderRadius8} 0;
+                `}
+              >
                 <OffsetVector {...offset.vector} />
               </OffsetTableDatum>
             </OffsetTableRow>
@@ -133,7 +144,6 @@ export function CurrentOffsetsTable(
     <Flex
       flexDirection={DIRECTION_COLUMN}
       justifyContent={JUSTIFY_SPACE_BETWEEN}
-      padding={SPACING.spacing16}
     >
       <StyledText as="label">
         {i18n.format(t('applied_offset_data'), 'upperCase')}

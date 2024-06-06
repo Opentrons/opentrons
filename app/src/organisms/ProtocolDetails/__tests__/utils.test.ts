@@ -1,3 +1,4 @@
+import { describe, it, expect } from 'vitest'
 import {
   TC_MODULE_LOCATION_OT2,
   TC_MODULE_LOCATION_OT3,

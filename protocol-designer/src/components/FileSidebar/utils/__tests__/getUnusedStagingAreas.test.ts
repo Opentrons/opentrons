@@ -1,3 +1,4 @@
+import { describe, expect, it } from 'vitest'
 import { getUnusedStagingAreas } from '../getUnusedStagingAreas'
 import type { CreateCommand } from '@opentrons/shared-data'
 import type { AdditionalEquipment } from '../../FileSidebar'
@@ -45,17 +46,15 @@ describe('getUnusedStagingAreas', () => {
         location: 'cutoutA3',
       },
     } as AdditionalEquipment
-    const mockCommand = ([
+    const mockCommand = [
       {
-        stagingArea: {
-          commandType: 'loadLabware',
-          params: { location: { slotName: 'A4' } },
-        },
+        commandType: 'loadLabware',
+        params: { location: { addressableAreaName: 'A4' } },
       },
-    ] as unknown) as CreateCommand[]
+    ] as CreateCommand[]
 
-    expect(
-      getUnusedStagingAreas(mockAdditionalEquipment, mockCommand)
-    ).toEqual(['A4'])
+    expect(getUnusedStagingAreas(mockAdditionalEquipment, mockCommand)).toEqual(
+      []
+    )
   })
 })

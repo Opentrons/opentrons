@@ -1,6 +1,7 @@
 import path from 'path'
 import glob from 'glob'
 import Ajv from 'ajv'
+import { describe, expect, it, beforeAll, test } from 'vitest'
 
 import schema from '../../labware/schemas/2.json'
 import type { LabwareDefinition2, LabwareWell } from '../types'
@@ -167,7 +168,6 @@ const expectGroupsFollowConvention = (
 
     if (noGroupsMetadataAllowed) {
       labwareDef.groups.forEach(group => {
-        /* eslint-disable jest/no-conditional-expect */
         expect(group.brand).toBe(undefined)
         expect(group.metadata.displayName).toBe(undefined)
         expect(group.metadata.displayCategory).toBe(undefined)

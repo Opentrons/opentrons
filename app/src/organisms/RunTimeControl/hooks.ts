@@ -12,15 +12,19 @@ import {
   RUN_STATUS_SUCCEEDED,
   RUN_ACTION_TYPE_STOP,
   RUN_STATUS_STOP_REQUESTED,
+  RUN_STATUSES_TERMINAL,
 } from '@opentrons/api-client'
-import { useRunQuery, useRunActionMutations } from '@opentrons/react-api-client'
+import { useRunActionMutations } from '@opentrons/react-api-client'
 
 import {
   useCloneRun,
   useCurrentRunId,
   useRunCommands,
 } from '../ProtocolUpload/hooks'
-import { UseQueryOptions } from 'react-query'
+import { useNotifyRunQuery } from '../../resources/runs'
+import { useMostRecentCompletedAnalysis } from '../LabwarePositionCheck/useMostRecentCompletedAnalysis'
+
+import type { UseQueryOptions } from 'react-query'
 import type { RunAction, RunStatus, Run, RunData } from '@opentrons/api-client'
 
 export interface RunControls {
@@ -28,9 +32,11 @@ export interface RunControls {
   pause: () => void
   stop: () => void
   reset: () => void
+  resumeFromRecovery: () => void
   isPlayRunActionLoading: boolean
   isPauseRunActionLoading: boolean
   isStopRunActionLoading: boolean
+  isResumeRunFromRecoveryActionLoading: boolean
   isResetRunLoading: boolean
 }
 
@@ -42,14 +48,17 @@ export function useRunControls(
     playRun,
     pauseRun,
     stopRun,
+    resumeRunFromRecovery,
     isPlayRunActionLoading,
     isPauseRunActionLoading,
     isStopRunActionLoading,
+    isResumeRunFromRecoveryActionLoading,
   } = useRunActionMutations(runId as string)
 
   const { cloneRun, isLoading: isResetRunLoading } = useCloneRun(
     runId ?? null,
-    onCloneRunSuccess
+    onCloneRunSuccess,
+    true
   )
 
   return {
@@ -57,9 +66,11 @@ export function useRunControls(
     pause: pauseRun,
     stop: stopRun,
     reset: cloneRun,
+    resumeFromRecovery: resumeRunFromRecovery,
     isPlayRunActionLoading,
     isPauseRunActionLoading,
     isStopRunActionLoading,
+    isResumeRunFromRecoveryActionLoading,
     isResetRunLoading,
   }
 }
@@ -71,15 +82,11 @@ export function useRunStatus(
 ): RunStatus | null {
   const lastRunStatus = React.useRef<RunStatus | null>(null)
 
-  const { data } = useRunQuery(runId ?? null, {
+  const { data } = useNotifyRunQuery(runId ?? null, {
     refetchInterval: DEFAULT_STATUS_REFETCH_INTERVAL,
     enabled:
       lastRunStatus.current == null ||
-      !([
-        RUN_STATUS_STOP_REQUESTED,
-        RUN_STATUS_FAILED,
-        RUN_STATUS_SUCCEEDED,
-      ] as RunStatus[]).includes(lastRunStatus.current),
+      !(RUN_STATUSES_TERMINAL as RunStatus[]).includes(lastRunStatus.current),
     onSuccess: data => (lastRunStatus.current = data?.data?.status ?? null),
     ...options,
   })
@@ -120,7 +127,7 @@ const DEFAULT_RUN_QUERY_REFETCH_INTERVAL = 5000
 export function useRunTimestamps(runId: string | null): RunTimestamps {
   const runStatus = useRunStatus(runId)
   const { actions = [], errors = [] } =
-    useRunQuery(runId, {
+    useNotifyRunQuery(runId, {
       refetchInterval: DEFAULT_RUN_QUERY_REFETCH_INTERVAL,
     })?.data?.data ?? {}
   const runCommands =
@@ -175,9 +182,15 @@ export function useRunTimestamps(runId: string | null): RunTimestamps {
 }
 
 export function useRunErrors(runId: string | null): RunData['errors'] {
-  const { data: runRecord } = useRunQuery(runId, {
+  const { data: runRecord } = useNotifyRunQuery(runId, {
     refetchInterval: DEFAULT_RUN_QUERY_REFETCH_INTERVAL,
   })
 
   return runRecord?.data?.errors ?? []
+}
+
+export function useProtocolHasRunTimeParameters(runId: string | null): boolean {
+  const mostRecentAnalysis = useMostRecentCompletedAnalysis(runId)
+  const runTimeParameters = mostRecentAnalysis?.runTimeParameters ?? []
+  return runTimeParameters.length > 0
 }

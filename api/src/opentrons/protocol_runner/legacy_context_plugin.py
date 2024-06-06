@@ -3,14 +3,14 @@ from __future__ import annotations
 
 from asyncio import create_task, Task
 from contextlib import ExitStack
-from typing import Optional
+from typing import List, Optional
 
-from opentrons.commands.types import CommandMessage as LegacyCommand
+from opentrons.legacy_commands.types import CommandMessage as LegacyCommand
 from opentrons.legacy_broker import LegacyBroker
+from opentrons.protocol_api.core.legacy.load_info import LoadInfo
 from opentrons.protocol_engine import AbstractPlugin, actions as pe_actions
 from opentrons.util.broker import ReadOnlyBroker
 
-from .legacy_wrappers import LegacyLoadInfo
 from .legacy_command_mapper import LegacyCommandMapper
 from .thread_async_queue import ThreadAsyncQueue
 
@@ -37,7 +37,7 @@ class LegacyContextPlugin(AbstractPlugin):
     def __init__(
         self,
         broker: LegacyBroker,
-        equipment_broker: ReadOnlyBroker[LegacyLoadInfo],
+        equipment_broker: ReadOnlyBroker[LoadInfo],
         legacy_command_mapper: Optional[LegacyCommandMapper] = None,
     ) -> None:
         """Initialize the plugin with its dependencies."""
@@ -55,7 +55,15 @@ class LegacyContextPlugin(AbstractPlugin):
         # So if the protocol had to wait for the event loop to be free
         # every time it reported some activity,
         # it could visibly stall for a moment, making its motion jittery.
-        self._actions_to_dispatch = ThreadAsyncQueue[pe_actions.Action]()
+        #
+        # TODO(mm, 2024-03-22): See if we can remove this non-blockingness now.
+        # It was one of several band-aids introduced in ~v5.0.0 to mitigate performance
+        # problems. v6.3.0 started running some Python protocols directly through
+        # Protocol Engine, without this plugin, and without any non-blocking queue.
+        # If performance is sufficient for those, that probably means the
+        # performance problems have been resolved in better ways elsewhere
+        # and we don't need this anymore.
+        self._actions_to_dispatch = ThreadAsyncQueue[List[pe_actions.Action]]()
         self._action_dispatching_task: Optional[Task[None]] = None
 
         self._subscription_exit_stack: Optional[ExitStack] = None
@@ -114,25 +122,20 @@ class LegacyContextPlugin(AbstractPlugin):
         pass
 
     def _handle_legacy_command(self, command: LegacyCommand) -> None:
-        """Handle a command reported by the APIv2 protocol.
+        """Handle a command reported by the legacy APIv2 protocol.
 
         Used as a broker callback, so this will run in the APIv2 protocol's thread.
         """
         pe_actions = self._legacy_command_mapper.map_command(command=command)
-        for pe_action in pe_actions:
-            self._actions_to_dispatch.put(pe_action)
+        self._actions_to_dispatch.put(pe_actions)
 
-    def _handle_equipment_loaded(self, load_info: LegacyLoadInfo) -> None:
-        (
-            pe_command,
-            pe_private_result,
-        ) = self._legacy_command_mapper.map_equipment_load(load_info=load_info)
+    def _handle_equipment_loaded(self, load_info: LoadInfo) -> None:
+        """Handle an equipment load reported by the legacy APIv2 protocol.
 
-        self._actions_to_dispatch.put(
-            pe_actions.UpdateCommandAction(
-                command=pe_command, private_result=pe_private_result
-            )
-        )
+        Used as a broker callback, so this will run in the APIv2 protocol's thread.
+        """
+        pe_actions = self._legacy_command_mapper.map_equipment_load(load_info=load_info)
+        self._actions_to_dispatch.put(pe_actions)
 
     async def _dispatch_all_actions(self) -> None:
         """Dispatch all actions to the `ProtocolEngine`.
@@ -140,5 +143,18 @@ class LegacyContextPlugin(AbstractPlugin):
         Exits only when `self._actions_to_dispatch` is closed
         (or an unexpected exception is raised).
         """
-        async for action in self._actions_to_dispatch.get_async_until_closed():
-            self.dispatch(action)
+        async for action_batch in self._actions_to_dispatch.get_async_until_closed():
+            # It's critical that we dispatch this batch of actions as one atomic
+            # sequence, without yielding to the event loop.
+            # Although this plugin only means to use the ProtocolEngine as a way of
+            # passively exposing the protocol's progress, the ProtocolEngine is still
+            # theoretically active, which means it's constantly watching in the
+            # background to execute any commands that it finds `queued`.
+            #
+            # For example, one of these action batches will often want to
+            # instantaneously create a running command by having a queue action
+            # immediately followed by a run action. We cannot let the
+            # ProtocolEngine's background task see the command in the `queued` state,
+            # or it will try to execute it, which the legacy protocol is already doing.
+            for action in action_batch:
+                self.dispatch(action)

@@ -5,7 +5,7 @@ import logging
 from typing import Callable, Dict, List
 from typing_extensions import Literal
 
-from opentrons.commands import types
+from opentrons.legacy_commands import types
 
 
 MODULE_LOG = logging.getLogger(__name__)
@@ -16,7 +16,7 @@ class LegacyBroker:
 
     Deprecated:
         Use the newer, more generic `opentrons.utils.Broker` class instead.
-        This class is coupled to old types from `opentrons.commands`.
+        This class is coupled to old types from `opentrons.legacy_commands`.
         https://opentrons.atlassian.net/browse/RSS-270
     """
 

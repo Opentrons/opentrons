@@ -10,14 +10,14 @@ import {
   COLORS,
   BORDERS,
   SPACING,
+  StyledText,
 } from '@opentrons/components'
 
-import { StyledText } from '../../../atoms/text'
 import { RenderResult } from './RenderResult'
 
 export const RESULT_SUMMARY_STYLE = css`
-  border: 1px solid ${COLORS.medGreyEnabled};
-  border-radius: ${BORDERS.radiusSoftCorners};
+  border: 1px solid ${COLORS.grey30};
+  border-radius: ${BORDERS.borderRadius4};
 `
 
 type CalibrationType = 'deck' | 'pipetteOffset' | 'tipLength'

@@ -26,20 +26,14 @@ import type {
   CustomLabwareState,
   CustomLabwareAction,
 } from './custom-labware/types'
-
 import type {
   RobotSettingsState,
   RobotSettingsAction,
 } from './robot-settings/types'
-
 import type { CalibrationState, CalibrationAction } from './calibration/types'
-
 import type { SystemInfoState, SystemInfoAction } from './system-info/types'
-
 import type { AlertsState, AlertsAction } from './alerts/types'
-
 import type { SessionState, SessionsAction } from './sessions/types'
-
 import type { AnalyticsTriggerAction } from './analytics/types'
 
 export interface State {

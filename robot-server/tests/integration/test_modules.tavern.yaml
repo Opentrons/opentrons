@@ -1,5 +1,5 @@
 ---
-test_name: Get modules
+test_name: Get modules OT2
 marks:
   - usefixtures:
       - ot2_server_base_url
@@ -19,7 +19,7 @@ stages:
             moduleModel: thermocyclerModuleV1
             port: !anystr
             usbPort: !anydict
-            serial: !anystr
+            serial: therm-123
             model: !anystr
             revision: !anystr
             fwVersion: !anystr
@@ -42,7 +42,7 @@ stages:
             moduleModel: heaterShakerModuleV1
             port: !anystr
             usbPort: !anydict
-            serial: !anystr
+            serial: hs-123
             model: !anystr
             revision: !anystr
             fwVersion: !anystr
@@ -62,7 +62,7 @@ stages:
             moduleModel: temperatureModuleV1
             port: !anystr
             usbPort: !anydict
-            serial: !anystr
+            serial: temp-123
             model: !anystr
             revision: !anystr
             fwVersion: !anystr
@@ -73,10 +73,24 @@ stages:
               targetTemp: !anyfloat
           - name: magdeck
             displayName: magdeck
+            moduleModel: magneticModuleV2
+            port: !anystr
+            usbPort: !anydict
+            serial: mag-123
+            model: !anystr
+            revision: !anystr
+            fwVersion: !anystr
+            hasAvailableUpdate: !anybool
+            status: !anystr
+            data:
+              height: !anyfloat
+              engaged: !anybool
+          - name: magdeck
+            displayName: magdeck
             moduleModel: magneticModuleV1
             port: !anystr
             usbPort: !anydict
-            serial: !anystr
+            serial: mag-1234
             model: !anystr
             revision: !anystr
             fwVersion: !anystr
@@ -95,12 +109,122 @@ stages:
         meta: !anydict
         data:
           - id: !anystr
+            serialNumber: therm-123
+            firmwareVersion: !anystr
+            hardwareRevision: !anystr
+            hasAvailableUpdate: !anybool
+            compatibleWithRobot: true
+            moduleType: thermocyclerModuleType
+            moduleModel: thermocyclerModuleV1
+            usbPort:
+              port: !anyint
+              hub: !anybool
+              portGroup: !anystr
+              path: !anystr
+            data:
+              status: !anystr
+              lidStatus: !anystr
+              lidTemperatureStatus: !anystr
+              lidTargetTemperature: !anyfloat
+              lidTemperature: !anyfloat
+              currentTemperature: !anyfloat
+              targetTemperature: !anyfloat
+              holdTime: !anyfloat
+          - id: !anystr
+            serialNumber: hs-123
+            firmwareVersion: !anystr
+            hardwareRevision: !anystr
+            hasAvailableUpdate: !anybool
+            compatibleWithRobot: true
+            moduleType: heaterShakerModuleType
+            moduleModel: heaterShakerModuleV1
+            usbPort:
+              port: !anyint
+              hub: !anybool
+              portGroup: !anystr
+              path: !anystr
+            data:
+              status: !anystr
+              labwareLatchStatus: !anystr
+              speedStatus: !anystr
+              temperatureStatus: !anystr
+              currentSpeed: !anyint
+              currentTemperature: !anyfloat
+          - id: !anystr
+            serialNumber: temp-123
+            firmwareVersion: !anystr
+            hardwareRevision: !anystr
+            hasAvailableUpdate: !anybool
+            compatibleWithRobot: true
+            moduleType: temperatureModuleType
+            moduleModel: temperatureModuleV1
+            usbPort:
+              port: !anyint
+              hub: !anybool
+              portGroup: !anystr
+              path: !anystr
+            data:
+              status: !anystr
+              currentTemperature: !anyfloat
+              targetTemperature: !anyfloat
+          - id: !anystr
+            serialNumber: mag-123
+            firmwareVersion: !anystr
+            hardwareRevision: !anystr
+            hasAvailableUpdate: !anybool
+            compatibleWithRobot: true
+            moduleType: magneticModuleType
+            moduleModel: magneticModuleV2
+            usbPort:
+              port: !anyint
+              hub: !anybool
+              portGroup: !anystr
+              path: !anystr
+            data:
+              status: !anystr
+              height: !anyfloat
+              engaged: !anybool
+          - id: !anystr
+            serialNumber: mag-1234
+            firmwareVersion: !anystr
+            hardwareRevision: !anystr
+            hasAvailableUpdate: !anybool
+            compatibleWithRobot: true
+            moduleType: magneticModuleType
+            moduleModel: magneticModuleV1
+            usbPort:
+              port: !anyint
+              hub: !anybool
+              portGroup: !anystr
+              path: !anystr
+            data:
+              status: !anystr
+              height: !anyfloat
+              engaged: !anybool
+
+---
+test_name: Get modules on Flex
+marks:
+  - usefixtures:
+      - ot3_server_base_url
+stages:
+  - name: Get all the modules
+    request:
+      url: '{ot3_server_base_url}/modules'
+      method: GET
+    response:
+      status_code: 200
+      json:
+        meta: !anydict
+        data:
+          - id: !anystr
             serialNumber: !anystr
             firmwareVersion: !anystr
             hardwareRevision: !anystr
             hasAvailableUpdate: !anybool
+            compatibleWithRobot: true
             moduleType: thermocyclerModuleType
-            moduleModel: thermocyclerModuleV1
+            moduleModel: thermocyclerModuleV2
             usbPort:
               port: !anyint
               hub: !anybool
@@ -120,6 +244,7 @@ stages:
             firmwareVersion: !anystr
             hardwareRevision: !anystr
             hasAvailableUpdate: !anybool
+            compatibleWithRobot: true
             moduleType: heaterShakerModuleType
             moduleModel: heaterShakerModuleV1
             usbPort:
@@ -139,8 +264,9 @@ stages:
             firmwareVersion: !anystr
             hardwareRevision: !anystr
             hasAvailableUpdate: !anybool
+            compatibleWithRobot: true
             moduleType: temperatureModuleType
-            moduleModel: temperatureModuleV1
+            moduleModel: temperatureModuleV2
             usbPort:
               port: !anyint
               hub: !anybool
@@ -155,8 +281,9 @@ stages:
             firmwareVersion: !anystr
             hardwareRevision: !anystr
             hasAvailableUpdate: !anybool
-            moduleType: magneticModuleType
-            moduleModel: magneticModuleV1
+            compatibleWithRobot: true
+            moduleType: temperatureModuleType
+            moduleModel: temperatureModuleV2
             usbPort:
               port: !anyint
               hub: !anybool
@@ -164,5 +291,5 @@ stages:
               path: !anystr
             data:
               status: !anystr
-              height: !anyfloat
-              engaged: !anybool
+              currentTemperature: !anyfloat
+              targetTemperature: !anyfloat

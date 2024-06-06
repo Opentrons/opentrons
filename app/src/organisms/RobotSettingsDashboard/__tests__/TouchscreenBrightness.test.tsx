@@ -1,25 +1,18 @@
 import * as React from 'react'
-import { fireEvent } from '@testing-library/react'
-
-import { renderWithProviders } from '@opentrons/components'
+import { fireEvent, screen } from '@testing-library/react'
+import { describe, it, expect, vi, beforeEach } from 'vitest'
 
 import { i18n } from '../../../i18n'
 import {
   getOnDeviceDisplaySettings,
   updateConfigValue,
 } from '../../../redux/config'
+import { renderWithProviders } from '../../../__testing-utils__'
 import { TouchscreenBrightness } from '../TouchscreenBrightness'
 
-jest.mock('../../../redux/config')
+vi.mock('../../../redux/config')
 
-const mockFunc = jest.fn()
-
-const mockGetOnDeviceDisplaySettings = getOnDeviceDisplaySettings as jest.MockedFunction<
-  typeof getOnDeviceDisplaySettings
->
-const mockUpdateConfigValue = updateConfigValue as jest.MockedFunction<
-  typeof updateConfigValue
->
+const mockFunc = vi.fn()
 
 const render = (props: React.ComponentProps<typeof TouchscreenBrightness>) => {
   return renderWithProviders(<TouchscreenBrightness {...props} />, {
@@ -34,57 +27,53 @@ describe('TouchscreenBrightness', () => {
     props = {
       setCurrentOption: mockFunc,
     }
-    mockGetOnDeviceDisplaySettings.mockReturnValue({
+    vi.mocked(getOnDeviceDisplaySettings).mockReturnValue({
       sleepMS: 1,
       brightness: 4,
       textSize: 1,
     } as any)
   })
 
-  afterEach(() => {
-    jest.clearAllMocks()
-  })
-
   it('should render text and buttons', () => {
-    const [{ getByText, getByTestId }] = render(props)
-    getByText('Touchscreen Brightness')
-    getByTestId('TouchscreenBrightness_decrease')
-    getByTestId('TouchscreenBrightness_increase')
+    render(props)
+    screen.getByText('Touchscreen Brightness')
+    screen.getByTestId('TouchscreenBrightness_decrease')
+    screen.getByTestId('TouchscreenBrightness_increase')
   })
 
   it('plus button should be disabled when brightness max(1)', () => {
-    mockGetOnDeviceDisplaySettings.mockReturnValue({
+    vi.mocked(getOnDeviceDisplaySettings).mockReturnValue({
       sleepMS: 1,
       brightness: 1,
       textSize: 1,
     } as any)
-    const [{ getByTestId }] = render(props)
-    const button = getByTestId('TouchscreenBrightness_increase')
+    render(props)
+    const button = screen.getByTestId('TouchscreenBrightness_increase')
     expect(button).toBeDisabled()
   })
 
   it('plus button should be disabled when brightness min(6)', () => {
-    mockGetOnDeviceDisplaySettings.mockReturnValue({
+    vi.mocked(getOnDeviceDisplaySettings).mockReturnValue({
       sleepMS: 1,
       brightness: 6,
       textSize: 1,
     } as any)
-    const [{ getByTestId }] = render(props)
-    const button = getByTestId('TouchscreenBrightness_decrease')
+    render(props)
+    const button = screen.getByTestId('TouchscreenBrightness_decrease')
     expect(button).toBeDisabled()
   })
 
   it('should call mock function when tapping plus button', () => {
-    const [{ getByTestId }] = render(props)
-    const button = getByTestId('TouchscreenBrightness_increase')
+    render(props)
+    const button = screen.getByTestId('TouchscreenBrightness_increase')
     fireEvent.click(button)
-    expect(mockUpdateConfigValue).toHaveBeenCalled()
+    expect(updateConfigValue).toHaveBeenCalled()
   })
 
   it('should call mock function when tapping minus button', () => {
-    const [{ getByTestId }] = render(props)
-    const button = getByTestId('TouchscreenBrightness_decrease')
+    render(props)
+    const button = screen.getByTestId('TouchscreenBrightness_decrease')
     fireEvent.click(button)
-    expect(mockUpdateConfigValue).toHaveBeenCalled()
+    expect(updateConfigValue).toHaveBeenCalled()
   })
 })

@@ -2,15 +2,12 @@ import * as React from 'react'
 import { useSelector } from 'react-redux'
 import { css } from 'styled-components'
 import cx from 'classnames'
-import {
-  FLEX_ROBOT_TYPE,
-  getPipetteNameSpecs,
-  PipetteName,
-} from '@opentrons/shared-data'
+import { FLEX_ROBOT_TYPE, getPipetteSpecsV2 } from '@opentrons/shared-data'
 import { InstrumentDiagram } from '@opentrons/components'
-import { FormPipette } from '../../../step-forms/types'
 import { getRobotType } from '../../../file-data/selectors'
-import styles from './FilePipettesModal.css'
+import styles from './FilePipettesModal.module.css'
+import type { PipetteName } from '@opentrons/shared-data'
+import type { FormPipette } from '../../../step-forms/types'
 
 interface Props {
   leftPipette?: FormPipette['pipetteName']
@@ -32,10 +29,10 @@ export function PipetteDiagram(props: Props): JSX.Element {
 function PipetteGroup(props: Props): JSX.Element {
   const { leftPipette, rightPipette } = props
   const robotType = useSelector(getRobotType)
-  const leftSpecs =
-    leftPipette && getPipetteNameSpecs(leftPipette as PipetteName)
+  const leftSpecs = leftPipette && getPipetteSpecsV2(leftPipette as PipetteName)
+  const has96Channel = leftPipette === 'p1000_96'
   const rightSpecs =
-    rightPipette && getPipetteNameSpecs(rightPipette as PipetteName)
+    rightPipette && getPipetteSpecsV2(rightPipette as PipetteName)
   return (
     <>
       {leftPipette && leftSpecs ? (
@@ -52,9 +49,14 @@ function PipetteGroup(props: Props): JSX.Element {
           }
         />
       ) : (
-        <div className={styles.left_pipette} />
+        <div
+          className={styles.left_pipette}
+          style={{
+            marginLeft: robotType === FLEX_ROBOT_TYPE ? '7rem' : '0rem',
+          }}
+        />
       )}
-      {rightPipette && rightSpecs ? (
+      {rightPipette && rightSpecs && !has96Channel ? (
         <InstrumentDiagram
           pipetteSpecs={rightSpecs}
           className={styles.right_pipette}
@@ -62,7 +64,7 @@ function PipetteGroup(props: Props): JSX.Element {
           imageStyle={
             robotType === FLEX_ROBOT_TYPE
               ? css`
-                  right: -1.5rem;
+                  right: -5rem;
                   position: absolute;
                 `
               : undefined

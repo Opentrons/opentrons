@@ -1,3 +1,4 @@
+import { beforeEach, describe, it, expect } from 'vitest'
 import {
   TEMPERATURE_AT_TARGET,
   TEMPERATURE_APPROACHING_TARGET,
@@ -8,7 +9,11 @@ import {
   getStateAndContextTempTCModules,
   robotWithStatusAndTemp,
 } from '../fixtures'
-import { WaitForTemperatureArgs, InvariantContext, RobotState } from '../types'
+import type {
+  WaitForTemperatureArgs,
+  InvariantContext,
+  RobotState,
+} from '../types'
 
 describe('waitForTemperature', () => {
   const temperatureModuleId = 'temperatureModuleId'

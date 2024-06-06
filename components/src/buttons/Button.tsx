@@ -3,14 +3,11 @@ import cx from 'classnames'
 import omit from 'lodash/omit'
 
 import { Icon } from '../icons'
-import styles from './buttons.css'
+import styles from './buttons.module.css'
 
-import {
-  BUTTON_TYPE_SUBMIT,
-  BUTTON_TYPE_RESET,
-  BUTTON_TYPE_BUTTON,
-} from '../primitives'
+import { BUTTON_TYPE_BUTTON } from '../primitives'
 
+import type { BUTTON_TYPE_SUBMIT, BUTTON_TYPE_RESET } from '../primitives'
 import type { IconName } from '../icons'
 import type { UseHoverTooltipTargetProps } from '../tooltips'
 

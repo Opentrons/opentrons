@@ -1,10 +1,11 @@
+import { describe, it, expect } from 'vitest'
 import {
   PAUSE_UNTIL_TEMP,
   PAUSE_UNTIL_RESUME,
   PAUSE_UNTIL_TIME,
 } from '../../../../constants'
-import { FormData } from '../../../../form-types'
 import { pauseFormToArgs } from '../pauseFormToArgs'
+import type { FormData } from '../../../../form-types'
 
 describe('pauseFormToArgs', () => {
   it('returns waitForTemperature command creator when form specifies pause until temp', () => {

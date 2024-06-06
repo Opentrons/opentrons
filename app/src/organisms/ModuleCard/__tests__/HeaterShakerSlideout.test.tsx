@@ -1,16 +1,15 @@
 import * as React from 'react'
-import { renderWithProviders } from '@opentrons/components'
+import { fireEvent, screen } from '@testing-library/react'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+
 import { useCreateLiveCommandMutation } from '@opentrons/react-api-client'
-import { fireEvent } from '@testing-library/react'
+
+import { renderWithProviders } from '../../../__testing-utils__'
 import { i18n } from '../../../i18n'
 import { mockHeaterShaker } from '../../../redux/modules/__fixtures__'
 import { HeaterShakerSlideout } from '../HeaterShakerSlideout'
 
-jest.mock('@opentrons/react-api-client')
-
-const mockUseLiveCommandMutation = useCreateLiveCommandMutation as jest.MockedFunction<
-  typeof useCreateLiveCommandMutation
->
+vi.mock('@opentrons/react-api-client')
 
 const render = (props: React.ComponentProps<typeof HeaterShakerSlideout>) => {
   return renderWithProviders(<HeaterShakerSlideout {...props} />, {
@@ -20,44 +19,44 @@ const render = (props: React.ComponentProps<typeof HeaterShakerSlideout>) => {
 
 describe('HeaterShakerSlideout', () => {
   let props: React.ComponentProps<typeof HeaterShakerSlideout>
-  let mockCreateLiveCommand = jest.fn()
+  let mockCreateLiveCommand = vi.fn()
 
   beforeEach(() => {
-    mockCreateLiveCommand = jest.fn()
+    mockCreateLiveCommand = vi.fn()
     mockCreateLiveCommand.mockResolvedValue(null)
-    mockUseLiveCommandMutation.mockReturnValue({
+    vi.mocked(useCreateLiveCommandMutation).mockReturnValue({
       createLiveCommand: mockCreateLiveCommand,
     } as any)
   })
 
   afterEach(() => {
-    jest.resetAllMocks()
+    vi.resetAllMocks()
   })
 
   it('renders correct title and body for heatershaker set temperature', () => {
     props = {
       module: mockHeaterShaker,
       isExpanded: true,
-      onCloseClick: jest.fn(),
+      onCloseClick: vi.fn(),
     }
-    const { getByText } = render(props)
+    render(props)
 
-    getByText('Set Temperature for Heater-Shaker Module GEN1')
-    getByText(
+    screen.getByText('Set Temperature for Heater-Shaker Module GEN1')
+    screen.getByText(
       'Set target temperature. This module actively heats but cools passively to room temperature.'
     )
-    getByText('Confirm')
+    screen.getByText('Confirm')
   })
 
   it('renders the button and it is not clickable until there is something in form field for set temp', () => {
     props = {
       module: mockHeaterShaker,
       isExpanded: true,
-      onCloseClick: jest.fn(),
+      onCloseClick: vi.fn(),
     }
-    const { getByRole, getByTestId } = render(props)
-    const button = getByRole('button', { name: 'Confirm' })
-    const input = getByTestId('heaterShakerModuleV1_setTemp')
+    render(props)
+    const button = screen.getByRole('button', { name: 'Confirm' })
+    const input = screen.getByTestId('heaterShakerModuleV1_setTemp')
     fireEvent.change(input, { target: { value: '40' } })
     expect(button).toBeEnabled()
     fireEvent.click(button)
@@ -78,11 +77,11 @@ describe('HeaterShakerSlideout', () => {
     props = {
       module: mockHeaterShaker,
       isExpanded: true,
-      onCloseClick: jest.fn(),
+      onCloseClick: vi.fn(),
     }
-    const { getByLabelText, getByTestId } = render(props)
-    const button = getByLabelText('exit')
-    const input = getByTestId('heaterShakerModuleV1_setTemp')
+    render(props)
+    const button = screen.getByLabelText('exit')
+    const input = screen.getByTestId('heaterShakerModuleV1_setTemp')
     fireEvent.change(input, { target: { value: '40' } })
     fireEvent.click(button)
 

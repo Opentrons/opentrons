@@ -1,36 +1,31 @@
 import * as React from 'react'
 import { MemoryRouter } from 'react-router-dom'
+import { fireEvent, screen } from '@testing-library/react'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
-import { renderWithProviders } from '@opentrons/components'
-
+import { renderWithProviders } from '../../../__testing-utils__'
 import { i18n } from '../../../i18n'
 import { useWifiList } from '../../../resources/networking/hooks'
-import * as Networking from '../../../redux/networking'
+import { getNetworkInterfaces, INTERFACE_WIFI } from '../../../redux/networking'
 import * as Fixtures from '../../../redux/networking/__fixtures__'
 import { NetworkDetailsModal } from '../../RobotSettingsDashboard/NetworkSettings/NetworkDetailsModal'
 import { WifiConnectionDetails } from '../WifiConnectionDetails'
 
-jest.mock('../../../resources/networking/hooks')
-jest.mock('../../../redux/networking')
-jest.mock('../../../redux/discovery/selectors')
-jest.mock('../../RobotSettingsDashboard/NetworkSettings/NetworkDetailsModal')
+import type { useHistory } from 'react-router-dom'
 
-const mockPush = jest.fn()
-jest.mock('react-router-dom', () => {
-  const reactRouterDom = jest.requireActual('react-router-dom')
+vi.mock('../../../resources/networking/hooks')
+vi.mock('../../../redux/networking')
+vi.mock('../../../redux/discovery/selectors')
+vi.mock('../../RobotSettingsDashboard/NetworkSettings/NetworkDetailsModal')
+
+const mockPush = vi.fn()
+vi.mock('react-router-dom', async importOriginal => {
+  const actual = await importOriginal<typeof useHistory>()
   return {
-    ...reactRouterDom,
+    ...actual,
     useHistory: () => ({ push: mockPush } as any),
   }
 })
-
-const mockGetNetworkInterfaces = Networking.getNetworkInterfaces as jest.MockedFunction<
-  typeof Networking.getNetworkInterfaces
->
-const mockUseWifiList = useWifiList as jest.MockedFunction<typeof useWifiList>
-const mokcNetworkDetailsModal = NetworkDetailsModal as jest.MockedFunction<
-  typeof NetworkDetailsModal
->
 
 const render = (props: React.ComponentProps<typeof WifiConnectionDetails>) => {
   return renderWithProviders(
@@ -47,7 +42,7 @@ const initialMockWifi = {
   ipAddress: '127.0.0.100',
   subnetMask: '255.255.255.230',
   macAddress: 'WI:FI:00:00:00:00',
-  type: Networking.INTERFACE_WIFI,
+  type: INTERFACE_WIFI,
 }
 
 const mockWifiList = [
@@ -62,35 +57,37 @@ describe('WifiConnectionDetails', () => {
       ssid: 'mockWifi',
       authType: 'wpa-psk',
     }
-    mockGetNetworkInterfaces.mockReturnValue({
+    vi.mocked(getNetworkInterfaces).mockReturnValue({
       wifi: initialMockWifi,
       ethernet: null,
     })
-    mockUseWifiList.mockReturnValue(mockWifiList)
-    mokcNetworkDetailsModal.mockReturnValue(<div>mock NetworkDetailsModal</div>)
+    vi.mocked(useWifiList).mockReturnValue(mockWifiList)
+    vi.mocked(NetworkDetailsModal).mockReturnValue(
+      <div>mock NetworkDetailsModal</div>
+    )
   })
 
   afterEach(() => {
-    jest.resetAllMocks()
+    vi.resetAllMocks()
   })
 
   it('should render title and description', () => {
-    const [{ getByText }] = render(props)
-    getByText('Wi-Fi')
-    getByText('Successfully connected to mockWifi!')
-    getByText('View network details')
-    getByText('Continue')
+    render(props)
+    screen.getByText('Wi-Fi')
+    screen.getByText('Successfully connected to mockWifi!')
+    screen.getByText('View network details')
+    screen.getByText('Continue')
   })
 
   it('should render network details when tapping view network details', () => {
-    const [{ getByText }] = render(props)
-    getByText('View network details').click()
-    getByText('mock NetworkDetailsModal')
+    render(props)
+    fireEvent.click(screen.getByText('View network details'))
+    screen.getByText('mock NetworkDetailsModal')
   })
 
   it('when clicking Check for updates button, should call mock function', () => {
-    const [{ getByText }] = render(props)
-    getByText('Continue').click()
+    render(props)
+    fireEvent.click(screen.getByText('Continue'))
     expect(mockPush).toHaveBeenCalledWith(
       '/robot-settings/update-robot-during-onboarding'
     )

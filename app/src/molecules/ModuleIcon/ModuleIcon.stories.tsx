@@ -1,14 +1,14 @@
 import * as React from 'react'
 
 import {
+  DIRECTION_COLUMN,
+  DIRECTION_ROW,
   Flex,
   SPACING,
-  DIRECTION_ROW,
-  DIRECTION_COLUMN,
+  StyledText,
 } from '@opentrons/components'
 
 import { ModuleIcon } from './index'
-import { StyledText } from '../../atoms/text'
 
 import type { Story, Meta } from '@storybook/react'
 import type { AttachedModule } from '../../redux/modules/types'

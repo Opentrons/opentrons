@@ -24,20 +24,19 @@ export const getUnusedStagingAreas = (
 
   const stagingAreaCommandSlots: string[] = stagingAreaAddressableAreaNames.filter(
     location =>
-      commands?.filter(
+      (commands ?? [])?.some(
         command =>
           (command.commandType === 'loadLabware' &&
             command.params.location !== 'offDeck' &&
-            'slotName' in command.params.location &&
-            command.params.location.slotName === location) ||
+            'addressableAreaName' in command.params.location &&
+            command.params.location.addressableAreaName === location) ||
           (command.commandType === 'moveLabware' &&
             command.params.newLocation !== 'offDeck' &&
-            'slotName' in command.params.newLocation &&
-            command.params.newLocation.slotName === location)
+            'addressableAreaName' in command.params.newLocation &&
+            command.params.newLocation.addressableAreaName === location)
       )
-        ? location
-        : null
+        ? null
+        : location
   )
-
   return stagingAreaCommandSlots
 }

@@ -1,5 +1,6 @@
+import { describe, it, expect } from 'vitest'
 import { _castForm } from '../index'
-import { FormData } from '../../../../form-types'
+import type { FormData } from '../../../../form-types'
 
 // NOTE(IL, 2020-09-24): I think the real solution to validating the
 // output of hydration/casting is static typing as per #3161

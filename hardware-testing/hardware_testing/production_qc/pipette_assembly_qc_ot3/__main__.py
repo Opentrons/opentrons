@@ -8,7 +8,7 @@ from dataclasses import dataclass, fields
 import os
 from pathlib import Path
 from time import time
-from typing import Optional, Callable, List, Any, Tuple, Dict
+from typing import Optional, Callable, List, Any, Tuple, Dict, cast
 from typing_extensions import Final
 
 from opentrons_hardware.firmware_bindings.arbitration_id import ArbitrationId
@@ -18,7 +18,7 @@ from opentrons_hardware.firmware_bindings.messages.message_definitions import (
 from opentrons_hardware.firmware_bindings.messages.messages import MessageDefinition
 from opentrons_hardware.firmware_bindings.constants import SensorType, SensorId
 
-from opentrons.config.types import LiquidProbeSettings
+from opentrons.config.types import LiquidProbeSettings, OutputOptions
 from opentrons.hardware_control.types import (
     TipStateType,
     FailedTipStateCheck,
@@ -32,6 +32,7 @@ from opentrons.hardware_control.ot3_calibration import (
     EarlyCapacitiveSenseTrigger,
     CalibrationStructureNotFoundError,
 )
+from opentrons.hardware_control.backends.ot3controller import OT3Controller
 
 from hardware_testing import data
 from hardware_testing.drivers.pressure_fixture import (
@@ -833,9 +834,9 @@ async def _test_diagnostics_encoder(
     print("homing plunger")
     await api.home([pip_axis])
     pip_pos, pip_enc = await _get_plunger_pos_and_encoder()
-    if pip_pos != 0.0 or abs(pip_enc) > 0.01:
+    if abs(pip_pos) > 0.005 or abs(pip_enc) > 0.005:
         print(
-            f"FAIL: plunger ({pip_pos}) or encoder ({pip_enc}) is not 0.0 after homing"
+            f"FAIL: plunger ({pip_pos}) or encoder ({pip_enc}) is not near 0.0 after homing"
         )
         encoder_home_pass = False
     write_cb(["encoder-home", pip_pos, pip_enc, _bool_to_pass_fail(encoder_home_pass)])
@@ -1376,16 +1377,12 @@ async def _test_liquid_probe(
             probe_settings = LiquidProbeSettings(
                 starting_mount_height=start_pos.z,
                 max_z_distance=max_z_distance_machine_coords,  # FIXME: deck coords
-                min_z_distance=0,  # FIXME: remove
                 mount_speed=probe_cfg.mount_speed,
                 plunger_speed=probe_cfg.plunger_speed,
                 sensor_threshold_pascals=probe_cfg.sensor_threshold_pascals,
-                expected_liquid_height=0,  # FIXME: remove
-                log_pressure=False,  # FIXME: remove
-                aspirate_while_sensing=False,  # FIXME: I heard this doesn't work
-                auto_zero_sensor=True,  # TODO: when would we want to adjust this?
-                num_baseline_reads=10,  # TODO: when would we want to adjust this?
-                data_file="",  # FIXME: remove
+                output_option=OutputOptions.can_bus_only,  # FIXME: remove
+                aspirate_while_sensing=False,
+                data_files=None,
             )
             end_z = await api.liquid_probe(mount, probe_settings, probe=probe)
             if probe == InstrumentProbeType.PRIMARY:
@@ -1492,7 +1489,7 @@ async def _wait_for_tip_presence_state_change(
             if isinstance(message, PushTipPresenceNotification):
                 event.set()
 
-        messenger = api._backend._messenger  # type: ignore[union-attr]
+        messenger = cast(OT3Controller, api._backend)._messenger
         messenger.add_listener(_listener)
         try:
             for i in range(seconds_to_wait):

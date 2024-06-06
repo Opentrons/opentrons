@@ -7,6 +7,11 @@ import { LABEL_ADD_NEW_KEY } from '../i18n'
 import { useConnectFormField } from './form-state'
 
 import type { WifiKey } from '../types'
+import type {
+  ControllerFieldState,
+  ControllerRenderProps,
+  FieldValues,
+} from 'react-hook-form'
 
 export interface KeyFileFieldProps {
   id: string
@@ -15,6 +20,8 @@ export interface KeyFileFieldProps {
   placeholder: string
   robotName: string
   wifiKeys: WifiKey[]
+  field: ControllerRenderProps<FieldValues, any>
+  fieldState: ControllerFieldState
   className?: string
 }
 
@@ -31,8 +38,20 @@ const makeKeyOptions = (
 })
 
 export const KeyFileField = (props: KeyFileFieldProps): JSX.Element => {
-  const { id, name, label, placeholder, robotName, wifiKeys } = props
-  const { value, error, setValue, setTouched } = useConnectFormField(name)
+  const {
+    id,
+    name,
+    label,
+    placeholder,
+    robotName,
+    wifiKeys,
+    field,
+    fieldState,
+  } = props
+  const { value, error, setValue, setTouched } = useConnectFormField(
+    field,
+    fieldState
+  )
   const options = [makeKeyOptions(wifiKeys), ADD_NEW_KEY_OPTION_GROUP]
   const uploadKeyRef = React.useRef<HTMLInputElement>(null)
 

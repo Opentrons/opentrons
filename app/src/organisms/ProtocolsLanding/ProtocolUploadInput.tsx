@@ -2,14 +2,14 @@ import * as React from 'react'
 import { useTranslation, Trans } from 'react-i18next'
 import { useDispatch } from 'react-redux'
 import {
-  Flex,
-  DIRECTION_COLUMN,
   ALIGN_CENTER,
-  Link,
   COLORS,
+  DIRECTION_COLUMN,
+  Flex,
+  Link,
   SPACING,
+  StyledText,
 } from '@opentrons/components'
-import { StyledText } from '../../atoms/text'
 import { UploadInput } from '../../molecules/UploadInput'
 import { addProtocol } from '../../redux/protocol-storage'
 import {
@@ -29,7 +29,7 @@ export function ProtocolUploadInput(
 ): JSX.Element | null {
   const { t } = useTranslation(['protocol_info', 'shared'])
   const dispatch = useDispatch<Dispatch>()
-  const logger = useLogger(__filename)
+  const logger = useLogger(new URL('', import.meta.url).pathname)
   const trackEvent = useTrackEvent()
 
   const handleUpload = (file: File): void => {
@@ -51,7 +51,9 @@ export function ProtocolUploadInput(
       marginY={SPACING.spacing20}
     >
       <UploadInput
-        onUpload={(file: File) => handleUpload(file)}
+        onUpload={(file: File) => {
+          handleUpload(file)
+        }}
         uploadText={t('valid_file_types')}
         dragAndDropText={
           <StyledText as="p">
@@ -59,7 +61,7 @@ export function ProtocolUploadInput(
               t={t}
               i18nKey="shared:drag_and_drop"
               components={{
-                a: <Link color={COLORS.blueHover} role="button" />,
+                a: <Link color={COLORS.blue55} role="button" />,
               }}
             />
           </StyledText>

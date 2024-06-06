@@ -1,9 +1,10 @@
 """Gripper-to-Adapter Tolerance."""
 import argparse
 import asyncio
-from typing import List
+from typing import List, cast
 
 from opentrons_hardware.hardware_control.gripper_settings import set_error_tolerance
+from opentrons.hardware_control.backends.ot3controller import OT3Controller
 
 from opentrons.hardware_control.ot3api import OT3API
 
@@ -152,7 +153,7 @@ async def _main(
     #       so disable gripper collision detection.
     if not api.is_simulator:
         await set_error_tolerance(
-            api._backend._messenger,  # type: ignore[union-attr]
+            cast(OT3Controller, api._backend)._messenger,
             max_pos_error=0.1,
             max_unwanted_movement=50.0,  # much bigger than gripper's jaw width
         )

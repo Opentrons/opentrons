@@ -43,10 +43,10 @@ You can use these standalone adapter definitions to load Opentrons verified or c
 For example, these commands load a PCR plate on top of the 96-well block::
 
     temp_adapter = temp_mod.load_adapter(
-        'opentrons_96_well_aluminum_block'
+        "opentrons_96_well_aluminum_block"
     )
     temp_plate = temp_adapter.load_labware(
-        'nest_96_wellplate_100ul_pcr_full_skirt'
+        "nest_96_wellplate_100ul_pcr_full_skirt"
     )
 
 .. versionadded:: 2.15
@@ -81,7 +81,7 @@ You can use these combination labware definitions to load various types of tubes
 For example, this command loads the 24-well block with generic 2 mL tubes::
 
     temp_tubes = temp_mod.load_labware(
-        'opentrons_24_aluminumblock_generic_2ml_screwcap'
+        "opentrons_24_aluminumblock_generic_2ml_screwcap"
     )
 
 .. versionadded:: 2.0
@@ -137,9 +137,9 @@ If you need to confirm in software whether the Temperature Module is holding at 
 .. code-block:: python
 
     temp_mod.set_temperature(celsius=90)
-    temp_mod.status  # 'holding at target'
+    temp_mod.status  # "holding at target"
     temp_mod.deactivate()
-    temp_mod.status  # 'idle'
+    temp_mod.status  # "idle"
     
 If you don't need to use the status value in your code, and you have physical access to the module, you can read its status and temperature from the LED and display on the module.
     

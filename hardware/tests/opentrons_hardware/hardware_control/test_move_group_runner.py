@@ -17,6 +17,7 @@ from opentrons_hardware.firmware_bindings.constants import (
     ErrorSeverity,
     PipetteTipActionType,
     MoveAckId,
+    MotorDriverErrorCode,
 )
 from opentrons_hardware.drivers.can_bus.can_messenger import (
     MessageListenerCallback,
@@ -34,6 +35,7 @@ from opentrons_hardware.firmware_bindings.messages.payloads import (
     ExecuteMoveGroupRequestPayload,
     HomeRequestPayload,
     ErrorMessagePayload,
+    ReadMotorDriverErrorStatusResponsePayload,
 )
 from opentrons_hardware.firmware_bindings.messages.fields import (
     MotorPositionFlagsField,
@@ -1418,3 +1420,83 @@ async def test_moves_removed_on_stall_detected(
     mock_can_messenger.ensure_send.side_effect = mock_sender.mock_ensure_send
     mock_can_messenger.send.side_effect = mock_sender.mock_send
     await subject.run(can_messenger=mock_can_messenger)
+
+
+class MockSendMoveDriverErrorCompleter:
+    """Side effect mock of CanMessenger.send that immediately sends an error."""
+
+    def __init__(
+        self,
+        move_groups: MoveGroups,
+        listener: MessageListenerCallback,
+        start_at_index: int = 0,
+    ) -> None:
+        """Constructor."""
+        self._move_groups = move_groups
+        self._listener = listener
+        self._start_at_index = start_at_index
+        self.call_count = 0
+
+    @property
+    def groups(self) -> MoveGroups:
+        """Retrieve the groups, for instance from a child class."""
+        return self._move_groups
+
+    async def mock_send(
+        self,
+        node_id: NodeId,
+        message: MessageDefinition,
+    ) -> None:
+        """Mock send function."""
+        if isinstance(message, md.ExecuteMoveGroupRequest):
+            # Iterate through each move in each sequence and send a move
+            # completed for it.
+            payload = EmptyPayload()
+            payload.message_index = message.payload.message_index
+            arbitration_id = ArbitrationId(
+                parts=ArbitrationIdParts(originating_node_id=node_id)
+            )
+            self._listener(md.Acknowledgement(payload=payload), arbitration_id)
+            for seq_id, moves in enumerate(
+                self._move_groups[message.payload.group_id.value - self._start_at_index]
+            ):
+                for node, move in moves.items():
+                    assert isinstance(move, MoveGroupSingleAxisStep)
+                    code = MotorDriverErrorCode.over_temperature
+                    payload = ReadMotorDriverErrorStatusResponsePayload(
+                        reg_addr=UInt8Field(111),
+                        data=UInt32Field(code),
+                    )
+                    payload.message_index = message.payload.message_index
+                    arbitration_id = ArbitrationId(
+                        parts=ArbitrationIdParts(originating_node_id=node)
+                    )
+                    self.call_count += 1
+                    self._listener(
+                        md.ReadMotorDriverErrorStatusResponse(payload=payload),
+                        arbitration_id,
+                    )
+
+    async def mock_ensure_send(
+        self,
+        node_id: NodeId,
+        message: MessageDefinition,
+        timeout: float = 3,
+        expected_nodes: List[NodeId] = [],
+    ) -> ErrorCode:
+        """Mock ensure_send function."""
+        await self.mock_send(node_id, message)
+        return ErrorCode.ok
+
+
+async def test_single_move_driver_error(
+    mock_can_messenger: AsyncMock, move_group_single: MoveGroups
+) -> None:
+    """It should send a start group command."""
+    subject = MoveScheduler(move_groups=move_group_single)
+    mock_sender = MockSendMoveDriverErrorCompleter(move_group_single, subject)
+    mock_can_messenger.ensure_send.side_effect = mock_sender.mock_ensure_send
+    mock_can_messenger.send.side_effect = mock_sender.mock_send
+    with pytest.raises(MotionFailedError):
+        await subject.run(can_messenger=mock_can_messenger)
+    assert mock_sender.call_count == 1

@@ -1,24 +1,27 @@
-import * as React from 'react'
 import { Link } from './Link'
 
-import type { Story, Meta } from '@storybook/react'
+import type { Meta, StoryObj } from '@storybook/react'
 
-export default {
+const meta: Meta<typeof Link> = {
   title: 'Library/Atoms/Link',
-} as Meta
-
-const Template: Story<React.ComponentProps<typeof Link>> = args => (
-  <Link {...args} />
-)
-export const Basic = Template.bind({})
-Basic.args = {
-  children: 'hello anchor',
-  href: '#',
+  component: Link,
 }
 
-export const External = Template.bind({})
-External.args = {
-  children: 'hello opentrons',
-  external: true,
-  href: 'https://www.opentrons.com',
+export default meta
+
+type Story = StoryObj<typeof Link>
+
+export const Basic: Story = {
+  args: {
+    children: 'hello anchor',
+    href: '#',
+  },
+}
+
+export const External: Story = {
+  args: {
+    children: 'hello opentrons',
+    external: true,
+    href: 'https://www.opentrons.com',
+  },
 }

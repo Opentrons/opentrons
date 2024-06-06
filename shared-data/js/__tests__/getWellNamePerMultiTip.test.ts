@@ -1,8 +1,9 @@
-import fixture_trash from '@opentrons/shared-data/labware/fixtures/2/fixture_trash.json'
-import fixture_96_plate from '@opentrons/shared-data/labware/fixtures/2/fixture_96_plate.json'
-import fixture_384_plate from '@opentrons/shared-data/labware/fixtures/2/fixture_384_plate.json'
-import fixture_12_trough from '@opentrons/shared-data/labware/fixtures/2/fixture_12_trough.json'
-import fixture_24_tuberack from '@opentrons/shared-data/labware/fixtures/2/fixture_24_tuberack.json'
+import { describe, expect, it } from 'vitest'
+import fixture_trash from '../../labware/fixtures/2/fixture_trash.json'
+import fixture_96_plate from '../../labware/fixtures/2/fixture_96_plate.json'
+import fixture_384_plate from '../../labware/fixtures/2/fixture_384_plate.json'
+import fixture_12_trough from '../../labware/fixtures/2/fixture_12_trough.json'
+import fixture_24_tuberack from '../../labware/fixtures/2/fixture_24_tuberack.json'
 
 import { getWellNamePerMultiTip } from '../helpers/getWellNamePerMultiTip'
 

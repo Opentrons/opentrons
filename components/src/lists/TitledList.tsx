@@ -2,9 +2,12 @@
 import * as React from 'react'
 import cx from 'classnames'
 
-import styles from './lists.css'
 import { Icon } from '../icons'
+import { StyledText } from '../atoms'
+import { COLORS } from '../helix-design-system'
 import type { IconName, IconProps } from '../icons'
+
+import styles from './lists.module.css'
 
 // TODO(bc, 2021-03-31): reconsider whether this belongs in components library
 // it is bloated with application specific functionality
@@ -98,6 +101,15 @@ export function TitledList(props: TitledListProps): JSX.Element {
     iconProps && iconProps.className
   )
 
+  let textColor = ''
+  if (disabled) {
+    //  the below hex code is for our legacy --c-font-disabled to match other text colors
+    textColor = '#9c9c9c'
+  } else if (props.selected && !disabled) {
+    //  the below hex code is for our legacy --c-highlight to match other text colors
+    textColor = '#5fd8ee'
+  }
+
   return (
     <div
       id={id}
@@ -109,14 +121,9 @@ export function TitledList(props: TitledListProps): JSX.Element {
         {iconName && (
           <Icon {...iconProps} className={iconClass} name={iconName} />
         )}
-        <h3
-          className={cx(styles.title, {
-            [styles.title_enabled]: !(disabled || inert),
-            [styles.title_disabled]: disabled || inert,
-          })}
-        >
+        <StyledText as="h3" backgroundColor={COLORS.white} color={textColor}>
           {props.title}
-        </h3>
+        </StyledText>
         {collapsible && (
           <div
             onClick={handleCollapseToggle}

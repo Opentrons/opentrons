@@ -3,18 +3,18 @@ import { useTranslation } from 'react-i18next'
 import styled from 'styled-components'
 import {
   ALIGN_CENTER,
-  Flex,
-  SPACING,
-  TEXT_TRANSFORM_CAPITALIZE,
-  TYPOGRAPHY,
-  COLORS,
-  JUSTIFY_SPACE_BETWEEN,
-  Icon,
-  DIRECTION_COLUMN,
   ALIGN_FLEX_START,
   BORDERS,
+  COLORS,
+  DIRECTION_COLUMN,
+  Flex,
+  Icon,
+  JUSTIFY_SPACE_BETWEEN,
+  SPACING,
+  StyledText,
+  TEXT_TRANSFORM_CAPITALIZE,
+  TYPOGRAPHY,
 } from '@opentrons/components'
-import { StyledText } from '../../atoms/text'
 import type { Mount } from '../../redux/pipettes/types'
 
 const MountButton = styled.button<{ isAttached: boolean }>`
@@ -23,12 +23,12 @@ const MountButton = styled.button<{ isAttached: boolean }>`
   flex-direction: ${DIRECTION_COLUMN};
   align-items: ${ALIGN_FLEX_START};
   padding: ${SPACING.spacing24};
-  border-radius: ${BORDERS.borderRadiusSize3};
+  border-radius: ${BORDERS.borderRadius12};
   background-color: ${({ isAttached }) =>
-    isAttached ? COLORS.green3 : COLORS.light1};
+    isAttached ? COLORS.green35 : COLORS.grey35};
   &:active {
     background-color: ${({ isAttached }) =>
-      isAttached ? COLORS.green3Pressed : COLORS.light1Pressed};
+      isAttached ? COLORS.green40 : COLORS.grey40};
   }
 `
 interface LabeledMountProps {
@@ -40,7 +40,7 @@ interface LabeledMountProps {
 export function LabeledMount(props: LabeledMountProps): JSX.Element {
   const { t } = useTranslation('device_details')
   const { mount, instrumentName, handleClick } = props
-  const ninetySixDisplayName = 'Flex 96-Channel 1000 μL'
+  const isNinetySixChannel = instrumentName?.includes('96-Channel') ?? false
 
   return (
     <MountButton onClick={handleClick} isAttached={instrumentName != null}>
@@ -62,14 +62,12 @@ export function LabeledMount(props: LabeledMountProps): JSX.Element {
             fontSize={TYPOGRAPHY.fontSize28}
             width="15.625rem"
           >
-            {instrumentName === ninetySixDisplayName
-              ? t('left_right')
-              : t('mount', { side: mount })}
+            {isNinetySixChannel ? t('left_right') : t('mount', { side: mount })}
           </StyledText>
           <StyledText
             flex="5"
             as="h4"
-            color={COLORS.darkBlack70}
+            color={COLORS.grey60}
             textAlign={TYPOGRAPHY.textAlignLeft}
             fontWeight={TYPOGRAPHY.fontWeightRegular}
             fontSize={TYPOGRAPHY.fontSize28}

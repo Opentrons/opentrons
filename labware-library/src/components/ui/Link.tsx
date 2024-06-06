@@ -22,4 +22,9 @@ export function WrappedLink(props: LinkProps): JSX.Element {
   )
 }
 
-export const Link = withRouter(WrappedLink)
+// @ts-expect-error react router type not portable
+export const Link: (props: {
+  to: string
+  children?: React.ReactNode
+  className?: string
+}) => JSX.Element = withRouter(WrappedLink)

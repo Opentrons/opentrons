@@ -1,3 +1,4 @@
+import type { IpcMainEvent } from 'electron'
 import type { Error } from '../types'
 import type { RobotSystemAction } from './is-ready/types'
 
@@ -5,8 +6,30 @@ export interface Remote {
   ipcRenderer: {
     invoke: (channel: string, ...args: unknown[]) => Promise<any>
     send: (channel: string, ...args: unknown[]) => void
+    on: (channel: string, listener: IpcListener) => void
+    off: (channel: string, listener: IpcListener) => void
   }
 }
+
+export type IpcListener = (
+  event: IpcMainEvent,
+  hostname: string,
+  topic: NotifyTopic,
+  message: NotifyResponseData | NotifyNetworkError,
+  ...args: unknown[]
+) => void
+
+export interface NotifyRefetchData {
+  refetch: boolean
+}
+
+export interface NotifyUnsubscribeData {
+  unsubscribe: boolean
+}
+
+export type NotifyBrokerResponses = NotifyRefetchData | NotifyUnsubscribeData
+export type NotifyNetworkError = 'ECONNFAILED' | 'ECONNREFUSED'
+export type NotifyResponseData = NotifyBrokerResponses | NotifyNetworkError
 
 interface File {
   sha512: string
@@ -63,6 +86,14 @@ export interface AppRestartAction {
   meta: { shell: true }
 }
 
+export interface ReloadUiAction {
+  type: 'shell:RELOAD_UI'
+  payload: {
+    message: string
+  }
+  meta: { shell: true }
+}
+
 export interface SendLogAction {
   type: 'shell:SEND_LOG'
   payload: {
@@ -104,14 +135,49 @@ export interface RobotMassStorageDeviceRemoved {
   meta: { shell: true }
 }
 
+export type NotifyTopic =
+  | 'ALL_TOPICS'
+  | 'robot-server/maintenance_runs/current_run'
+  | 'robot-server/runs/commands_links'
+  | 'robot-server/runs'
+  | `robot-server/runs/${string}`
+  | 'robot-server/deck_configuration'
+  | `robot-server/runs/pre_serialized_commands/${string}`
+
+export interface NotifySubscribeAction {
+  type: 'shell:NOTIFY_SUBSCRIBE'
+  payload: {
+    hostname: string
+    topic: NotifyTopic
+  }
+  meta: { shell: true }
+}
+
 export type ShellAction =
   | UiInitializedAction
   | ShellUpdateAction
   | RobotSystemAction
   | UsbRequestsAction
   | AppRestartAction
+  | ReloadUiAction
   | SendLogAction
   | UpdateBrightnessAction
   | RobotMassStorageDeviceAdded
   | RobotMassStorageDeviceEnumerated
   | RobotMassStorageDeviceRemoved
+  | NotifySubscribeAction
+
+export type IPCSafeFormDataEntry =
+  | {
+      type: 'string'
+      name: string
+      value: string
+    }
+  | {
+      type: 'file'
+      name: string
+      value: ArrayBuffer
+      filename: string
+    }
+
+export type IPCSafeFormData = IPCSafeFormDataEntry[]

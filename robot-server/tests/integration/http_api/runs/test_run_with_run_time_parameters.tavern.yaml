@@ -1,0 +1,203 @@
+test_name: Test the run endpoints with run time parameters
+
+marks:
+  - usefixtures:
+      - ot2_server_base_url
+
+stages:
+  - name: Upload a protocol
+    request:
+      url: '{ot2_server_base_url}/protocols'
+      method: POST
+      files:
+        files: 'tests/integration/protocols/basic_transfer_with_run_time_parameters.py'
+    response:
+      status_code: 201
+      save:
+        json:
+          protocol_id: data.id
+
+  - name: Create run from protocol
+    request:
+      url: '{ot2_server_base_url}/runs'
+      method: POST
+      json:
+        data:
+          protocolId: '{protocol_id}'
+          runTimeParameterValues:
+            sample_count: 4
+            volume: 10.23
+            dry_run: True
+            pipette: flex_8channel_50
+    response:
+      status_code: 201
+      save:
+        json:
+          run_id: data.id
+      json:
+        data:
+          id: !anystr
+          ok: True
+          createdAt: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"
+          status: idle
+          current: True
+          actions: []
+          errors: []
+          pipettes: []
+          modules: []
+          labware: []
+          labwareOffsets: []
+          runTimeParameters: []
+          liquids: []
+          protocolId: '{protocol_id}'
+
+  - name: Play the run
+    request:
+      url: '{ot2_server_base_url}/runs/{run_id}/actions'
+      method: POST
+      json:
+        data:
+          actionType: play
+    response:
+      status_code: 201
+      json:
+        data:
+          id: !anystr
+          actionType: play
+          createdAt: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"
+
+  - name: Wait for the protocol to complete
+    max_retries: 10
+    delay_after: 0.1
+    request:
+      url: '{ot2_server_base_url}/runs/{run_id}'
+      method: GET
+    response:
+      status_code: 200
+      strict:
+        - json:off
+      json:
+        data:
+          status: succeeded
+
+  - name: Verify the run contains the set run time parameters
+    request:
+      url: '{ot2_server_base_url}/runs/{run_id}'
+      method: GET
+    response:
+      status_code: 200
+      strict:
+        - json:off
+      json:
+        data:
+          id: !anystr
+          ok: True
+          createdAt: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"
+          status: succeeded
+          current: True
+          runTimeParameters:
+            - displayName: Sample count
+              variableName: sample_count
+              type: int
+              default: 6.0
+              min: 1.0
+              max: 12.0
+              value: 4.0
+              description: How many samples to process.
+            - displayName: Pipette volume
+              variableName: volume
+              type: float
+              default: 20.1
+              choices:
+                - displayName: Low Volume
+                  value: 10.23
+                - displayName: Medium Volume
+                  value: 20.1
+                - displayName: High Volume
+                  value: 50.5
+              value: 10.23
+              description: How many microliters to pipette of each sample.
+            - displayName: Dry Run
+              variableName: dry_run
+              type: bool
+              default: false
+              value: true
+              description: Skip aspirate and dispense steps.
+            - displayName: Pipette Name
+              variableName: pipette
+              type: str
+              choices:
+                - displayName: Single channel 50µL
+                  value: flex_1channel_50
+                - displayName: Eight Channel 50µL
+                  value: flex_8channel_50
+              default: flex_1channel_50
+              value: flex_8channel_50
+              description: What pipette to use during the protocol.
+          protocolId: '{protocol_id}'
+
+  - name: Mark the run as not-current
+    request:
+      url: '{ot2_server_base_url}/runs/{run_id}'
+      method: PATCH
+      json:
+        data:
+          current: False
+    response:
+      status_code: 200
+
+  - name: Verify the archived run still contains the set run time parameters
+    request:
+      url: '{ot2_server_base_url}/runs/{run_id}'
+      method: GET
+    response:
+      status_code: 200
+      strict:
+        - json:off
+      json:
+        data:
+          id: !anystr
+          ok: True
+          createdAt: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"
+          status: succeeded
+          current: False
+          runTimeParameters:
+            - displayName: Sample count
+              variableName: sample_count
+              type: int
+              default: 6.0
+              min: 1.0
+              max: 12.0
+              value: 4.0
+              description: How many samples to process.
+            - displayName: Pipette volume
+              variableName: volume
+              type: float
+              default: 20.1
+              choices:
+                - displayName: Low Volume
+                  value: 10.23
+                - displayName: Medium Volume
+                  value: 20.1
+                - displayName: High Volume
+                  value: 50.5
+              value: 10.23
+              description: How many microliters to pipette of each sample.
+            - displayName: Dry Run
+              variableName: dry_run
+              type: bool
+              default: false
+              value: true
+              description: Skip aspirate and dispense steps.
+            - displayName: Pipette Name
+              variableName: pipette
+              type: str
+              choices:
+                - displayName: Single channel 50µL
+                  value: flex_1channel_50
+                - displayName: Eight Channel 50µL
+                  value: flex_8channel_50
+              default: flex_1channel_50
+              value: flex_8channel_50
+              description: What pipette to use during the protocol.
+          protocolId: '{protocol_id}'

@@ -5,7 +5,7 @@ import { LabelText, Value, LABEL_LEFT } from '../ui'
 
 import { CATEGORY, CATEGORY_LABELS_BY_CATEGORY } from '../../localization'
 
-import styles from './styles.css'
+import styles from './styles.module.css'
 
 import type { LabwareDefinition } from '../../types'
 

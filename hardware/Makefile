@@ -7,7 +7,7 @@ SHX := npx shx
 
 ot_project := $(OPENTRONS_PROJECT)
 project_rs_default = $(if $(ot_project),$(ot_project),robot-stack)
-project_ot3_default = $(if $(ot_project),$(ot_project),ot3)
+project_ir_default = $(if $(ot_project),$(ot_project),ot3)
 
 # Find the version of the wheel from git using a helper script. We
 # use python here so we can use the same version normalization that will be
@@ -18,10 +18,10 @@ wheel_file = dist/$(call python_get_wheelname,hardware,$(project_rs_default),ope
 # Find the version of the sdist from git using a helper script. We
 # use python here so we can use the same version normalization that will be
 # used to create the sdist.
-sdist_file = dist/$(call python_get_sdistname,hardware,$(project_ot3_default),opentrons_hardware)
+sdist_file = dist/$(call python_get_sdistname,hardware,$(project_rs_default),opentrons_hardware)
 
 # Find the branch, sha, version that will be used to update the VERSION.json file
-version_file = $(call python_get_git_version,hardware,$(project_ot3_default),opentrons_hardware)
+version_file = $(call python_get_git_version,hardware,$(project_rs_default),opentrons_hardware)
 
 # These variables can be overriden when make is invoked to customize the
 # behavior of pytest. For instance,
@@ -53,7 +53,8 @@ ot_sources := $(ot_py_sources)
 
 # Defined separately than the clean target so the wheel file doesn’t have to
 # depend on a PHONY target
-clean_cmd = $(SHX) rm -rf build dist .coverage coverage.xml '*.egg-info' '**/__pycache__' '**/*.pyc' '**/.mypy_cache'
+clean_cmd = $(SHX) rm -rf build dist .coverage coverage.xml '*.egg-info'
+clean_cache_cmd = $(SHX) rm -rf '**/__pycache__' '**/*.pyc' '**/.mypy_cache'
 
 .PHONY: all
 all: clean wheel
@@ -69,7 +70,8 @@ teardown:
 
 .PHONY: clean
 clean:
-	-$(clean_cmd)
+	$(clean_cmd)
+	$(clean_cache_cmd)
 
 dist/opentrons_hardware-%-py2.py3-none-any.whl: export OPENTRONS_PROJECT=$(project_rs_default)
 dist/opentrons_hardware-%-py2.py3-none-any.whl: setup.py $(ot_sources)
@@ -79,7 +81,7 @@ dist/opentrons_hardware-%-py2.py3-none-any.whl: setup.py $(ot_sources)
 
 wheel: $(wheel_file)
 
-$(sdist_file): export OPENTRONS_PROJECT=$(project_ot3_default)
+$(sdist_file): export OPENTRONS_PROJECT=$(project_rs_default)
 $(sdist_file): setup.py $(ot_sources)
 	$(python) setup.py sdist
 	$(SHX) rm -rf build
@@ -144,5 +146,5 @@ emulator:
 	echo "Nothing here yet"
 
 .PHONY: deploy
-deploy: wheel
-	$(call python_upload_package,$(twine_auth_args),$(twine_repository_url),$(wheel_file))
+deploy: wheel sdist
+	$(call python_upload_package,$(twine_auth_args),$(twine_repository_url),$(wheel_file),$(sdist_file))

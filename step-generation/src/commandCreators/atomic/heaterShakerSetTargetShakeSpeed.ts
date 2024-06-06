@@ -10,7 +10,7 @@ export const heaterShakerSetTargetShakeSpeed: CommandCreator<SetShakeSpeedArgs> 
 ) => {
   const { moduleId, rpm } = args
 
-  if (module === null) {
+  if (moduleId === null) {
     return {
       errors: [errorCreators.missingModuleError()],
     }

@@ -15,4 +15,4 @@ runs:
   steps:
     - shell: bash
       run: |
-        aws s3 sync ${{ inputs.distPath }} s3://sandbox.${{ inputs.domain }}/${{ inputs.destPrefix }} --acl=public-read
+        aws s3 sync ${{ inputs.distPath }} s3://sandbox.${{ inputs.domain }}/${{ inputs.destPrefix }}

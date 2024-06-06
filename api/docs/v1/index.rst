@@ -36,7 +36,7 @@ Overview
 How it Looks
 ++++++++++++
 
-The design goal of the Opentrons API is to make code readable and easy to understand. For example, below is a short set of instruction to transfer from well ``'A1'`` to well ``'B1'`` that even a computer could understand:
+The design goal of the Opentrons API is to make code readable and easy to understand. For example, below is a short set of instruction to transfer from well ``"A1"`` to well ``"B1"`` that even a computer could understand:
 
 .. code-block:: none
 
@@ -44,12 +44,12 @@ The design goal of the Opentrons API is to make code readable and easy to unders
 
     This protocol is by me; it’s called Opentrons Protocol Tutorial and is used for demonstrating the Opentrons API
 
-    Add a 96 well plate, and place it in slot '2' of the robot deck
-    Add a 200uL tip rack, and place it in slot '1' of the robot deck
+    Add a 96 well plate, and place it in slot "2" of the robot deck
+    Add a 200uL tip rack, and place it in slot "1" of the robot deck
 
     Add a single-channel 300uL pipette to the left mount, and tell it to use that tip rack
 
-    Transfer 100uL from the plate's 'A1' well to it's 'B2' well
+    Transfer 100uL from the plate's "A1" well to it's "B2" well
 
 If we were to rewrite this with the Opentrons API, it would look like the following:
 
@@ -60,20 +60,20 @@ If we were to rewrite this with the Opentrons API, it would look like the follow
 
     # metadata
     metadata = {
-        'protocolName': 'My Protocol',
-        'author': 'Name <email@address.com>',
-        'description': 'Simple protocol to get started using OT2',
+        "protocolName": "My Protocol",
+        "author": "Name <email@address.com>",
+        "description": "Simple protocol to get started using OT2",
     }
 
     # labware
-    plate = labware.load('96-flat', '2')
-    tiprack = labware.load('opentrons_96_tiprack_300ul', '1')
+    plate = labware.load("96-flat", "2")
+    tiprack = labware.load("opentrons_96_tiprack_300ul", "1")
 
     # pipettes
-    pipette = instruments.P300_Single(mount='left', tip_racks=[tiprack])
+    pipette = instruments.P300_Single(mount="left", tip_racks=[tiprack])
 
     # commands
-    pipette.transfer(100, plate.wells('A1'), plate.wells('B2'))
+    pipette.transfer(100, plate.wells("A1"), plate.wells("B2"))
 
 
 How it's Organized
@@ -118,21 +118,21 @@ Labware
 
 While the imports section is usually the same across protocols, the labware section is different depending on the tip racks, well plates, troughs, or tubes you're using on the robot.
 
-Each labware is given a type (ex: ``'96-flat'``), and the slot on the robot it will be placed (ex: ``'2'``).
+Each labware is given a type (ex: ``"96-flat"``), and the slot on the robot it will be placed (ex: ``"2"``).
 
 From the example above, the "labware" section looked like:
 
 .. code-block:: python
 
-    plate = labware.load('96-flat', '2')
-    tiprack = labware.load('opentrons_96_tiprack_300ul', '1')
+    plate = labware.load("96-flat", "2")
+    tiprack = labware.load("opentrons_96_tiprack_300ul", "1")
 
 .. _index-pipettes:
 
 Pipettes
 ^^^^^^^^
 
-Next, pipettes are created and attached to a specific mount on the OT-2 (``'left'`` or ``'right'``).
+Next, pipettes are created and attached to a specific mount on the OT-2 (``"left"`` or ``"right"``).
 
 There are other parameters for pipettes, but the most important are the tip rack(s) it will use during the protocol.
 
@@ -140,7 +140,7 @@ From the example above, the "pipettes" section looked like:
 
 .. code-block:: python
 
-    pipette = instruments.P300_Single(mount='left', tip_racks=[tiprack])
+    pipette = instruments.P300_Single(mount="left", tip_racks=[tiprack])
 
 .. _index-commands:
 
@@ -155,7 +155,7 @@ From the example above, the "commands" section looked like:
 
 .. code-block:: python
 
-    pipette.transfer(100, plate.wells('A1'), plate.wells('B1'))
+    pipette.transfer(100, plate.wells("A1"), plate.wells("B1"))
 
 
 ******************

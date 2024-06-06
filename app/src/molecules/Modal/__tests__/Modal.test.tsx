@@ -1,11 +1,14 @@
 import * as React from 'react'
-import { renderWithProviders } from '@opentrons/components'
+import { fireEvent, screen } from '@testing-library/react'
+import '@testing-library/jest-dom/vitest'
+import { describe, it, expect, vi, beforeEach } from 'vitest'
+
+import { renderWithProviders } from '../../../__testing-utils__'
 import { ModalHeader } from '../ModalHeader'
 import { Modal } from '../Modal'
 
-jest.mock('../ModalHeader')
+vi.mock('../ModalHeader')
 
-const mockModalHeader = ModalHeader as jest.MockedFunction<typeof ModalHeader>
 const render = (props: React.ComponentProps<typeof Modal>) => {
   return renderWithProviders(<Modal {...props} />)[0]
 }
@@ -14,16 +17,16 @@ describe('Modal', () => {
   let props: React.ComponentProps<typeof Modal>
   beforeEach(() => {
     props = {
-      onOutsideClick: jest.fn(),
+      onOutsideClick: vi.fn(),
       children: <div>children</div>,
     }
-    mockModalHeader.mockReturnValue(<div>mock Modal Header</div>)
+    vi.mocked(ModalHeader).mockReturnValue(<div>mock Modal Header</div>)
   })
   it('should render the modal with no header', () => {
-    const { getByText, getByLabelText, queryByText } = render(props)
-    getByText('children')
-    getByLabelText('modal_medium')
-    expect(queryByText('mock Modal Header')).not.toBeInTheDocument()
+    render(props)
+    screen.getByText('children')
+    screen.getByLabelText('modal_medium')
+    expect(screen.queryByText('mock Modal Header')).not.toBeInTheDocument()
   })
   it('should render the modal with header and large modal size', () => {
     props = {
@@ -31,23 +34,23 @@ describe('Modal', () => {
       modalSize: 'large',
       header: { title: 'title' },
     }
-    const { getByText, getByLabelText } = render(props)
-    getByText('children')
-    getByLabelText('modal_large')
-    getByText('mock Modal Header')
+    render(props)
+    screen.getByText('children')
+    screen.getByLabelText('modal_large')
+    screen.getByText('mock Modal Header')
   })
   it('should render the modal with small modal size', () => {
     props = {
       ...props,
       modalSize: 'small',
     }
-    const { getByText, getByLabelText } = render(props)
-    getByText('children')
-    getByLabelText('modal_small')
+    render(props)
+    screen.getByText('children')
+    screen.getByLabelText('modal_small')
   })
   it('presses the background overlay and calls onoutsideClick', () => {
-    const { getByLabelText } = render(props)
-    getByLabelText('BackgroundOverlay').click()
+    render(props)
+    fireEvent.click(screen.getByLabelText('BackgroundOverlay'))
     expect(props.onOutsideClick).toHaveBeenCalled()
   })
 })

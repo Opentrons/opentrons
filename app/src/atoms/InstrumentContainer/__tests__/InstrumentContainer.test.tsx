@@ -1,5 +1,7 @@
 import * as React from 'react'
-import { renderWithProviders } from '@opentrons/components'
+import { describe, it } from 'vitest'
+import { screen } from '@testing-library/react'
+import { renderWithProviders } from '../../../__testing-utils__'
 import { InstrumentContainer } from '..'
 
 const render = (props: React.ComponentProps<typeof InstrumentContainer>) => {
@@ -13,7 +15,7 @@ describe('InstrumentContainer', () => {
     props = {
       displayName: 'P300 8-Channel GEN2',
     }
-    const { getByText } = render(props)
-    getByText('P300 8-Channel GEN2')
+    render(props)
+    screen.getByText('P300 8-Channel GEN2')
   })
 })

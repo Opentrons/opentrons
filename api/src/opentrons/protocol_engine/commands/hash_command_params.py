@@ -9,7 +9,7 @@ from .command_unions import CommandCreate
 # TODO(mm, 2023-04-28):
 # This implementation will not notice that commands are different if they have different params
 # but share the same commandType. We should also hash command params. (Jira RCORE-326.)
-def hash_command_params(
+def hash_protocol_command_params(
     create: CommandCreate, last_hash: Optional[str]
 ) -> Optional[str]:
     """Given a command create object, return a hash.
@@ -28,12 +28,11 @@ def hash_command_params(
         The command hash, if the command is a protocol command.
         `None` if the command is a setup command.
     """
-    if create.intent == CommandIntent.SETUP:
+    if create.intent in [CommandIntent.SETUP, CommandIntent.FIXIT]:
         return None
-    else:
-        # We avoid Python's built-in hash() function because it's not stable across
-        # runs of the Python interpreter. (Jira RSS-215.)
-        last_contribution = b"" if last_hash is None else last_hash.encode("ascii")
-        this_contribution = md5(create.commandType.encode("ascii")).digest()
-        to_hash = last_contribution + this_contribution
-        return md5(to_hash).hexdigest()
+    # We avoid Python's built-in hash() function because it's not stable across
+    # runs of the Python interpreter. (Jira RSS-215.)
+    last_contribution = b"" if last_hash is None else last_hash.encode("ascii")
+    this_contribution = md5(create.commandType.encode("ascii")).digest()
+    to_hash = last_contribution + this_contribution
+    return md5(to_hash).hexdigest()

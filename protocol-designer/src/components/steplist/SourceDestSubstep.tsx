@@ -3,9 +3,9 @@ import cx from 'classnames'
 
 import { MultiChannelSubstep } from './MultiChannelSubstep'
 import { SubstepRow } from './SubstepRow'
-import styles from './StepItem.css'
+import styles from './StepItem.module.css'
 
-import {
+import type {
   SourceDestSubstepItem,
   SubstepIdentifier,
   WellIngredientNames,

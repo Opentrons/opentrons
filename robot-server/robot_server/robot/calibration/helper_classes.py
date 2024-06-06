@@ -94,21 +94,25 @@ class SupportedCommands:
 class AttachedPipette(BaseModel):
     """Pipette (if any) attached to the mount"""
 
-    model: str = Field(
+    model: typing.Optional[str] = Field(
         None,
         description="The model of the attached pipette. These are snake "
         "case as in the Protocol API. This includes the full"
         " version string",
     )
-    name: str = Field(
+    name: typing.Optional[str] = Field(
         None, description="Short name of pipette model without" "generation version"
     )
-    tipLength: float = Field(
+    tipLength: typing.Optional[float] = Field(
         None, description="The default tip length for this pipette"
     )
-    mount: str = Field(None, description="The mount this pipette attached to")
-    serial: str = Field(None, description="The serial number of the attached pipette")
-    defaultTipracks: typing.List[typing.Dict[str, typing.Any]] = Field(
+    mount: typing.Optional[str] = Field(
+        None, description="The mount this pipette attached to"
+    )
+    serial: typing.Optional[str] = Field(
+        None, description="The serial number of the attached pipette"
+    )
+    defaultTipracks: typing.Optional[typing.List[typing.Dict[str, typing.Any]]] = Field(
         None, description="A list of default tipracks for this pipette"
     )
 

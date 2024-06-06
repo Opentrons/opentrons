@@ -1,64 +1,60 @@
-import assert from 'assert'
 import isEqual from 'lodash/isEqual'
 import mapValues from 'lodash/mapValues'
 import reduce from 'lodash/reduce'
 import isEmpty from 'lodash/isEmpty'
-import { createSelector, Selector } from 'reselect'
+import { createSelector } from 'reselect'
 import {
-  getPipetteNameSpecs,
   getLabwareDisplayName,
   getLabwareDefURI,
   MAGNETIC_MODULE_TYPE,
   TEMPERATURE_MODULE_TYPE,
   THERMOCYCLER_MODULE_TYPE,
   HEATERSHAKER_MODULE_TYPE,
-  PipetteName,
   MAGNETIC_BLOCK_TYPE,
+  getPipetteSpecsV2,
 } from '@opentrons/shared-data'
-import {
-  AdditionalEquipmentEntities,
-  NormalizedAdditionalEquipmentById,
-  TEMPERATURE_DEACTIVATED,
-} from '@opentrons/step-generation'
+import { TEMPERATURE_DEACTIVATED } from '@opentrons/step-generation'
+
 import { INITIAL_DECK_SETUP_STEP_ID } from '../../constants'
 import {
   getFormWarnings,
   getFormErrors,
   stepFormToArgs,
 } from '../../steplist/formLevel'
-import {
-  ProfileFormError,
-  getProfileFormErrors,
-} from '../../steplist/formLevel/profileErrors'
+import { getProfileFormErrors } from '../../steplist/formLevel/profileErrors'
 import { getMoveLabwareFormErrors } from '../../steplist/formLevel/moveLabwareFormErrors'
-import { hydrateField, getFieldErrors } from '../../steplist/fieldLevel'
+import { getFieldErrors } from '../../steplist/fieldLevel'
 import { getProfileItemsHaveErrors } from '../utils/getProfileItemsHaveErrors'
 import * as featureFlagSelectors from '../../feature-flags/selectors'
-import { denormalizePipetteEntities } from '../utils'
-import {
-  selectors as labwareDefSelectors,
-  LabwareDefByDefURI,
-} from '../../labware-defs'
-import { i18n } from '../../localization'
-import { InstrumentGroup } from '@opentrons/components'
+import { denormalizePipetteEntities, getHydratedForm } from '../utils'
+import { selectors as labwareDefSelectors } from '../../labware-defs'
+import type { Selector } from 'reselect'
 import type {
-  DropdownOption,
-  Mount,
-  InstrumentInfoProps,
-} from '@opentrons/components'
-import type {
+  AdditionalEquipmentEntities,
+  NormalizedAdditionalEquipmentById,
   InvariantContext,
   LabwareEntity,
   LabwareEntities,
   ModuleEntities,
-  ModuleEntity,
   PipetteEntities,
 } from '@opentrons/step-generation'
+import type { PipetteName, LabwareDefinition2 } from '@opentrons/shared-data'
+import type {
+  InstrumentGroup,
+  DropdownOption,
+  Mount,
+  InstrumentInfoProps,
+} from '@opentrons/components'
+import type { ProfileFormError } from '../../steplist/formLevel/profileErrors'
+import type { LabwareDefByDefURI } from '../../labware-defs'
 import type { FormWarning } from '../../steplist/formLevel'
-import { BaseState, DeckSlot } from '../../types'
-import { FormData, StepIdType } from '../../form-types'
-import { StepArgsAndErrorsById, StepFormErrors } from '../../steplist/types'
-import {
+import type { BaseState, DeckSlot } from '../../types'
+import type { FormData, StepIdType } from '../../form-types'
+import type {
+  StepArgsAndErrorsById,
+  StepFormErrors,
+} from '../../steplist/types'
+import type {
   InitialDeckSetup,
   NormalizedLabwareById,
   NormalizedLabware,
@@ -73,7 +69,7 @@ import {
   HeaterShakerModuleState,
   MagneticBlockState,
 } from '../types'
-import {
+import type {
   PresavedStepFormState,
   RootState,
   SavedStepFormState,
@@ -107,7 +103,7 @@ function _hydrateLabwareEntity(
   defsByURI: LabwareDefByDefURI
 ): LabwareEntity {
   const def = defsByURI[l.labwareDefURI]
-  assert(
+  console.assert(
     def,
     `could not hydrate labware ${labwareId}, missing def for URI ${l.labwareDefURI}`
   )
@@ -217,7 +213,7 @@ const _getInitialDeckSetup = (
   moduleEntities: ModuleEntities,
   additionalEquipmentEntities: AdditionalEquipmentEntities
 ): InitialDeckSetup => {
-  assert(
+  console.assert(
     initialSetupStep && initialSetupStep.stepType === 'manualIntervention',
     'expected initial deck setup step to be "manualIntervention" step'
   )
@@ -230,11 +226,15 @@ const _getInitialDeckSetup = (
     (initialSetupStep && initialSetupStep.pipetteLocationUpdate) || {}
 
   // filtering only the additionalEquipmentEntities that are rendered on the deck
-  // which for now is wasteChute and stagingArea
+  // which for now is wasteChute, trashBin, and stagingArea
   const additionalEquipmentEntitiesOnDeck = Object.values(
     additionalEquipmentEntities
   ).reduce((aeEntities: AdditionalEquipmentEntities, ae) => {
-    if (ae.name === 'wasteChute' || ae.name === 'stagingArea') {
+    if (
+      ae.name === 'wasteChute' ||
+      ae.name === 'stagingArea' ||
+      ae.name === 'trashBin'
+    ) {
       aeEntities[ae.id] = ae
     }
     return aeEntities
@@ -338,14 +338,14 @@ export const getPermittedTipracks: Selector<
   reduce(
     initialDeckSetup.pipettes,
     (acc: string[], pipette: PipetteOnDeck) => {
-      return pipette.tiprackDefURI ? [...acc, pipette.tiprackDefURI] : acc
+      return pipette.tiprackDefURI ? [...acc, ...pipette.tiprackDefURI] : acc
     },
     []
   )
 )
 
 function _getPipetteDisplayName(name: PipetteName): string {
-  const pipetteSpecs = getPipetteNameSpecs(name)
+  const pipetteSpecs = getPipetteSpecsV2(name)
   if (!pipetteSpecs) return 'Unknown Pipette'
   return pipetteSpecs.displayName
 }
@@ -373,7 +373,7 @@ export const getEquippedPipetteOptions: Selector<
   return reduce(
     pipettes,
     (acc: DropdownOption[], pipette: PipetteOnDeck, id: string) => {
-      const mountLabel = i18n.t(`form.pipette_mount_label.${pipette.mount}`)
+      const mountLabel = pipette.mount === 'left' ? '(L)' : '(R)'
       const nextOption = {
         name: pipettesSame
           ? `${_getPipetteDisplayName(pipette.name)} ${mountLabel}`
@@ -399,13 +399,14 @@ export const getPipettesForInstrumentGroup: Selector<
       pipetteId
     ) => {
       const pipetteSpec = pipetteOnDeck.spec
-      const tiprackDef = pipetteOnDeck.tiprackLabwareDef
+      const tiprackDefs = pipetteOnDeck.tiprackLabwareDef
       const pipetteForInstrumentGroup: InstrumentInfoProps = {
         mount: pipetteOnDeck.mount,
         pipetteSpecs: pipetteSpec,
         description: _getPipetteDisplayName(pipetteOnDeck.name),
-        isDisabled: false,
-        tiprackModel: getLabwareDisplayName(tiprackDef),
+        tiprackModels: tiprackDefs?.map((def: LabwareDefinition2) =>
+          getLabwareDisplayName(def)
+        ),
       }
       acc[pipetteOnDeck.mount] = pipetteForInstrumentGroup
       return acc
@@ -421,11 +422,13 @@ export const getPipettesForEditPipetteForm: Selector<
     initialDeckSetup.pipettes,
     (acc, pipetteOnDeck: PipetteOnDeck, id) => {
       const pipetteSpec = pipetteOnDeck.spec
-      const tiprackDef = pipetteOnDeck.tiprackLabwareDef
-      if (!pipetteSpec || !tiprackDef) return acc
+      const tiprackDefs = pipetteOnDeck.tiprackLabwareDef
+      if (!pipetteSpec || !tiprackDefs) return acc
       const pipetteForInstrumentGroup = {
         pipetteName: pipetteOnDeck.name,
-        tiprackDefURI: getLabwareDefURI(tiprackDef),
+        tiprackDefURI: tiprackDefs.map((def: LabwareDefinition2) =>
+          getLabwareDefURI(def)
+        ),
       }
       acc[pipetteOnDeck.mount] = pipetteForInstrumentGroup
       return acc
@@ -449,7 +452,10 @@ export const getModulesForEditModulesCard: Selector<
   reduce<InitialDeckSetup['modules'], ModulesForEditModulesCard>(
     initialDeckSetup.modules,
     (acc, moduleOnDeck: ModuleOnDeck, id) => {
-      acc[moduleOnDeck.type] = moduleOnDeck
+      if (!acc[moduleOnDeck.type]) {
+        acc[moduleOnDeck.type] = []
+      }
+      acc[moduleOnDeck.type]?.push(moduleOnDeck)
       return acc
     },
     {
@@ -507,38 +513,6 @@ export const getBatchEditFormHasUnsavedChanges: Selector<
   BaseState,
   boolean
 > = createSelector(getBatchEditFieldChanges, changes => !isEmpty(changes))
-
-const getModuleEntity = (state: InvariantContext, id: string): ModuleEntity => {
-  return state.moduleEntities[id]
-}
-
-// TODO: Ian 2019-01-25 type with hydrated form type, see #3161
-function _getHydratedForm(
-  rawForm: FormData,
-  invariantContext: InvariantContext
-): FormData {
-  const hydratedForm = mapValues(rawForm, (value, name) =>
-    hydrateField(invariantContext, name, value)
-  )
-  // TODO(IL, 2020-03-23): separate hydrated/denormalized fields from the other fields.
-  // It's confusing that pipette is an ID string before this,
-  // but a PipetteEntity object after this.
-  // For `moduleId` field, it would be surprising to be a ModuleEntity!
-  // Consider nesting all additional fields under 'meta' key,
-  // following what we're doing with 'module'.
-  // See #3161
-  hydratedForm.meta = {}
-
-  if (rawForm?.moduleId != null) {
-    // @ts-expect-error(sa, 2021-6-14): type this properly in #3161
-    hydratedForm.meta.module = getModuleEntity(
-      invariantContext,
-      rawForm.moduleId
-    )
-  }
-  // @ts-expect-error(sa, 2021-6-14):type this properly in #3161
-  return hydratedForm
-}
 
 // TODO type with hydrated form type
 const _formLevelErrors = (hydratedForm: FormData): StepFormErrors => {
@@ -653,7 +627,7 @@ export const getHydratedUnsavedForm: Selector<
   (unsavedForm, invariantContext) => {
     if (unsavedForm == null) return null
 
-    const hydratedForm = _getHydratedForm(unsavedForm, invariantContext)
+    const hydratedForm = getHydratedForm(unsavedForm, invariantContext)
 
     return hydratedForm ?? null
   }
@@ -699,7 +673,7 @@ export const getArgsAndErrorsByStepId: Selector<
     return reduce(
       stepForms,
       (acc, stepForm) => {
-        const hydratedForm = _getHydratedForm(stepForm, contextualState)
+        const hydratedForm = getHydratedForm(stepForm, contextualState)
 
         const errors = _formHasErrors(hydratedForm, contextualState)
         const nextStepData = !errors
@@ -753,7 +727,7 @@ export const getFormLevelWarningsForUnsavedForm: Selector<
   (unsavedForm, contextualState) => {
     if (!unsavedForm) return []
 
-    const hydratedForm = _getHydratedForm(unsavedForm, contextualState)
+    const hydratedForm = getHydratedForm(unsavedForm, contextualState)
 
     return getFormWarnings(unsavedForm.stepType, hydratedForm)
   }
@@ -768,7 +742,7 @@ export const getFormLevelWarningsPerStep: Selector<
     mapValues(forms, (form, stepId) => {
       if (!form) return []
 
-      const hydratedForm = _getHydratedForm(form, contextualState)
+      const hydratedForm = getHydratedForm(form, contextualState)
 
       return getFormWarnings(form.stepType, hydratedForm)
     })

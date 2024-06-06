@@ -1,4 +1,4 @@
-import { Mount } from '../pipettes'
+import type { Mount } from '../pipettes'
 
 export interface PipOffsetDeletionParams {
   calType: 'pipetteOffset'
@@ -8,7 +8,7 @@ export interface PipOffsetDeletionParams {
 
 export interface TipLengthDeletionParams {
   calType: 'tipLength'
-  tiprack_hash: string
+  tiprack_uri: string
   pipette_id: string
 }
 export type DeleteCalRequestParams =
@@ -93,7 +93,7 @@ export interface TipLengthCalibration {
   source: CalibrationSourceType
   status: IndividualCalibrationHealthStatus
   id: string
-  uri?: string | null
+  uri: string
 }
 
 export interface AllTipLengthCalibrations {

@@ -4,14 +4,132 @@ log][]. For a list of currently known issues, please see the [Opentrons issue tr
 [technical change log]: https://github.com/Opentrons/opentrons/releases
 [opentrons issue tracker]: https://github.com/Opentrons/opentrons/issues?q=is%3Aopen+is%3Aissue+label%3Abug
 
+---
 
-## Opentrons Robot Software Changes in 7.0.2
+## Opentrons Robot Software Changes in 7.3.0
 
-The 7.0.2 hotfix release does not contain any changes to the robot software
+Welcome to the v7.3.0 release of the Opentrons robot software!
+
+### New Features
+
+- Runtime parameters: read, write, and use parameters in Python protocol runs.
+
+### Improved Features
+
+- Automatic tip tracking is now available for all nozzle configurations.
+- Flex no longer shows unnecessary pipette calibration warnings.
+- Python protocols can once again set labware offsets outside of Labware Position Check.
+
+### Changed Features
+
+- Calling `GET /runs/{id}/commands` for a JSON protocol no longer returns a full list of queued commands. Use protocol analysis to get a full list of commands.
+
+### Bug Fixes
+
+- Fixed an edge case where capitalizing part of a labware load name could cause unexpected behavior or collisions.
+- Fixed Python packages installed  on the OT-2 with `pip` not being found by `import` statements.
+
+---
+
+## Opentrons Robot Software Changes in 7.2.2
+
+Welcome to the v7.2.2 release of the Opentrons robot software!
+
+### Improved Features
+
+- Improved the low-volume performance of recently produced Flex 96-Channel Pipettes.
+
+### Bug Fixes
+
+- Restores the ability to use the speaker and camera on OT-2.
+- Restores the ability to use the camera on Flex.
+
+---
+
+## Opentrons Robot Software Changes in 7.2.1
+
+Welcome to the v7.2.1 release of the Opentrons robot software!
+
+### Bug Fixes
+
+- Fixed an issue where OT-2 tip length calibrations created before v4.1.0 would cause a "missing calibration data" error that you could only resolve by resetting calibration.
+- Fixed collision prediction being too conservative in certain conditions on Flex, leading to errors even when collisions wouldn't take place.
+- Flex now properly homes after an instrument collision.
+- `opentrons_simulate` now outputs entries for commands that drop tips in the default trash container in protocols that specify Python API version 2.16 or newer.
+
+---
+
+## Opentrons Robot Software Changes in 7.2.0
+
+Welcome to the v7.2.0 release of the Opentrons robot software!
+
+This update may take longer than usual if your robot has a lot of long protocols and runs stored on it. Allow *approximately 20 minutes* for your robot to restart. This delay will only happen once.
+
+If you don't care about preserving your labware offsets and run history, you can avoid the delay by clearing your runs and protocols before starting this update. Go to **Robot Settings** > **Device Reset** and select **Clear protocol run history**.
+
+### Improved Features
+
+- The robot software now runs Python 3.10. Many built-in Python packages were updated to match. If you have installed your own Python packages on the robot, re-install them to ensure compatibility.
+- Added error handling when dispensing. The `/runs/commands`, `/maintenance_runs/commands`, and `/protocols` HTTP API endpoints now return an error if you try to dispense more than you've aspirated.
+- Improved performance of the `/runs/commands` endpoints. They are now significantly faster when requesting a small number of commands from a stored run.
+
+### Bug Fixes
+
+- The OT-2 now consistently applies tip length calibration. There used to be a height discrepancy between Labware Position Check and protocol runs. If you previously compensated for the inconsistent pipette height with labware offsets, re-run Labware Position Check to avoid pipette crashes.
+- The OT-2 now accurately calculates the position of the Thermocycler. If you previously compensated for the incorrect position with labware offsets, re-run Labware Position Check to avoid pipette crashes.
+- The Flex Gripper will no longer pick up large labware that could collide with tips held by an adjoining pipette.
+- Flex now properly configures itself when connected by Ethernet directly to a computer.
+
+### Removals
+
+- Removed the `notify_server` Python package and `/notifications/subscribe` WebSocket endpoint, as they were never fully used. (See pull request [#14280](https://github.com/Opentrons/opentrons/pull/14280) for details.)
 
 ### Known Issues
 
-JSON protocols created or modified with Protocol Designer v6.0.0 or higher can't be simulated with the `opentrons_simulate` command-line tool
+- Downgrading an OT-2 to an earlier software version will delete tip length calibrations created with version 7.2.0. If you need to downgrade, re-run all pipette calibrations afterward.
+
+---
+
+## Opentrons Robot Software Changes in 7.1.1
+
+Welcome to the v7.1.1 release of the Opentrons robot software!
+
+### Bug Fixes
+
+- Fixed an issue with the pipette definition for Flex 1-Channel 1000 µL pipettes.
+
+---
+
+## Opentrons Robot Software Changes in 7.1.0
+
+Welcome to the v7.1.0 release of the Opentrons robot software! This release includes support for deck configuration on Opentrons Flex, partial tip pickup with the Flex 96-Channel Pipette, and other improvements.
+
+### New Features
+
+- Pick up either a column of 8 tips or all 96 tips with the Flex 96-Channel Pipette.
+- Specify the deck configuration of Flex, including the movable trash bin, waste chute, and staging area slots.
+- Use the Flex Gripper to drop labware into the waste chute, or use Flex pipettes to dispense liquid or drop tips into the waste chute.
+- Manually prepare a pipette for aspiration, when required for your application.
+
+### Improved Features
+
+- The Ethernet port on Flex now supports direct connection to a computer.
+- Improves aspirate, dispense, and mix behavior with volumes set to zero.
+- The `opentrons_simulate` command-line tool now works with all Python API versions.
+
+### Known Issues
+
+JSON protocols created or modified with Protocol Designer v6.0.0 or higher can't be simulated with `opentrons_simulate`.
+
+---
+
+## Opentrons Robot Software Changes in 7.0.2
+
+The 7.0.2 hotfix release does not contain any changes to the robot software.
+
+### Known Issues
+
+JSON protocols created or modified with Protocol Designer v6.0.0 or higher can't be simulated with the `opentrons_simulate` command-line tool.
 
 ---
 

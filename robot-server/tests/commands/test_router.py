@@ -6,14 +6,19 @@ from decoy import Decoy
 from opentrons.protocol_engine import (
     ProtocolEngine,
     CommandSlice,
-    CurrentCommand,
+    CommandPointer,
     commands as pe_commands,
 )
 from opentrons.protocol_engine.errors import CommandDoesNotExistError
 
-from robot_server.service.json_api import RequestModel, MultiBodyMeta
-from robot_server.errors import ApiError
-from robot_server.commands.router import create_command, get_commands_list, get_command
+from robot_server.service.json_api import MultiBodyMeta
+from robot_server.errors.error_responses import ApiError
+from robot_server.commands.router import (
+    RequestModelWithStatelessCommandCreate,
+    create_command,
+    get_commands_list,
+    get_command,
+)
 
 
 @pytest.fixture()
@@ -53,7 +58,7 @@ async def test_create_command(
     ).then_do(_stub_queued_command_state)
 
     result = await create_command(
-        RequestModel(data=command_create),
+        RequestModelWithStatelessCommandCreate(data=command_create),
         waitUntilComplete=False,
         timeout=42,
         engine=protocol_engine,
@@ -111,7 +116,7 @@ async def test_create_command_wait_for_complete(
     )
 
     result = await create_command(
-        RequestModel(data=command_create),
+        RequestModelWithStatelessCommandCreate(data=command_create),
         waitUntilComplete=True,
         timeout=42,
         engine=protocol_engine,
@@ -142,7 +147,7 @@ async def test_get_commands_list(
     )
 
     decoy.when(protocol_engine.state_view.commands.get_current()).then_return(
-        CurrentCommand(
+        CommandPointer(
             command_id="abc123",
             command_key="command-key-1",
             created_at=datetime(year=2021, month=1, day=1),

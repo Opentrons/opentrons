@@ -1,10 +1,12 @@
+import { describe, it, expect } from 'vitest'
 import { validateLabwareFiles, validateNewLabwareFile } from '../validation'
 
-import uncheckedLabwareA from '@opentrons/shared-data/labware/fixtures/2/fixture_96_plate.json'
-import uncheckedLabwareB from '@opentrons/shared-data/labware/fixtures/2/fixture_12_trough.json'
+import {
+  fixture96Plate as uncheckedLabwareA,
+  fixture12Trough as uncheckedLabwareB,
+} from '@opentrons/shared-data'
 
 import type { CheckedLabwareFile } from '@opentrons/app/src/redux/custom-labware/types'
-
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
 
 const validLabwareA = uncheckedLabwareA as LabwareDefinition2

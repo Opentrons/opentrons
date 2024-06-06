@@ -1,7 +1,9 @@
 import * as React from 'react'
 import { MemoryRouter } from 'react-router-dom'
-import { fireEvent } from '@testing-library/react'
-import { renderWithProviders } from '@opentrons/components'
+import { fireEvent, screen } from '@testing-library/react'
+import { describe, it, vi, beforeEach, expect } from 'vitest'
+import '@testing-library/jest-dom/vitest'
+import { renderWithProviders } from '../../../../../__testing-utils__'
 import { i18n } from '../../../../../i18n'
 import {
   useTrackEvent,
@@ -9,60 +11,75 @@ import {
 } from '../../../../../redux/analytics'
 import { OpenJupyterControl } from '../OpenJupyterControl'
 
-jest.mock('../../../../../redux/analytics')
-
-const mockUseTrackEvent = useTrackEvent as jest.Mock<typeof useTrackEvent>
+vi.mock('../../../../../redux/analytics')
 
 const mockIpAddress = '1.1.1.1'
 const mockLink = `http://${mockIpAddress}:48888`
-const trackEvent = jest.fn()
+const trackEvent = vi.fn()
 
-const render = () => {
+global.window = Object.create(window)
+Object.defineProperty(window, 'open', { writable: true, configurable: true })
+window.open = vi.fn()
+
+const render = (props: React.ComponentProps<typeof OpenJupyterControl>) => {
   return renderWithProviders(
     <MemoryRouter>
-      <OpenJupyterControl robotIp={mockIpAddress} />
+      <OpenJupyterControl {...props} />
     </MemoryRouter>,
     { i18nInstance: i18n }
   )
 }
 
 describe('RobotSettings OpenJupyterControl', () => {
+  let props: React.ComponentProps<typeof OpenJupyterControl>
   beforeEach(() => {
-    mockUseTrackEvent.mockReturnValue(trackEvent)
-  })
-
-  afterEach(() => {
-    jest.resetAllMocks()
+    props = {
+      robotIp: mockIpAddress,
+      isEstopNotDisengaged: false,
+    }
+    vi.mocked(useTrackEvent).mockReturnValue(trackEvent)
   })
 
   it('should render title, description and button', () => {
-    const [{ getByText, getByRole }] = render()
-    getByText('Jupyter Notebook')
-    getByText(
+    render(props)
+    screen.getByText('Jupyter Notebook')
+    screen.getByText(
       'Open the Jupyter Notebook running on this robot in the web browser. This is an experimental feature.'
     )
-    getByText('Learn more about using Jupyter notebook')
-    getByText('Launch Jupyter Notebook')
+    screen.getByText('Learn more about using Jupyter notebook')
+    screen.getByText('Launch Jupyter Notebook')
     expect(
-      getByRole('link', { name: 'Launch Jupyter Notebook' })
+      screen.getByRole('button', { name: 'Launch Jupyter Notebook' })
     ).toBeInTheDocument()
   })
 
-  it('should render jupyter notebook link', () => {
-    const [{ getByText }] = render()
-    const link = getByText('Launch Jupyter Notebook')
-    expect(link.closest('a')).toHaveAttribute('href', mockLink)
-    expect(link.closest('a')).toHaveAttribute('target', '_blank')
-    expect(link.closest('a')).toHaveAttribute('rel', 'noopener noreferrer')
+  it('should render jupyter notebook button', () => {
+    render(props)
+    const button = screen.getByRole('button', {
+      name: 'Launch Jupyter Notebook',
+    })
+    fireEvent.click(button)
+    expect(window.open).toHaveBeenCalledWith(mockLink, '_blank')
   })
 
-  it('should send and analytics event on link click', () => {
-    const [{ getByRole }] = render()
-    const button = getByRole('link', { name: 'Launch Jupyter Notebook' })
+  it('should send and analytics event on button click', () => {
+    render(props)
+    const button = screen.getByRole('button', {
+      name: 'Launch Jupyter Notebook',
+    })
     fireEvent.click(button)
     expect(trackEvent).toHaveBeenCalledWith({
       name: ANALYTICS_JUPYTER_OPEN,
       properties: {},
     })
+  })
+
+  it('should render disabled button when e-stop button is pressed', () => {
+    props = { ...props, isEstopNotDisengaged: true }
+    render(props)
+    const button = screen.getByRole('button', {
+      name: 'Launch Jupyter Notebook',
+    })
+    expect(button).toBeDisabled()
   })
 })

@@ -1,16 +1,15 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import {
-  Flex,
-  DIRECTION_COLUMN,
-  SPACING,
+  BORDERS,
   Box,
   COLORS,
-  BORDERS,
+  DIRECTION_COLUMN,
+  Flex,
   RoundTab,
+  SPACING,
+  StyledText,
 } from '@opentrons/components'
-
-import { StyledText } from '../../atoms/text'
 
 import type { StyleProps } from '@opentrons/components'
 
@@ -43,22 +42,28 @@ export function LabwareOffsetTabs({
       flexDirection={DIRECTION_COLUMN}
       {...styleProps}
     >
-      <Flex>
+      <Flex gridGap={SPACING.spacing4} marginY={SPACING.spacing8}>
         <RoundTab
           isCurrent={currentTab === 'table'}
-          onClick={() => setCurrentTab('table')}
+          onClick={() => {
+            setCurrentTab('table')
+          }}
         >
           <StyledText>{t('table_view')}</StyledText>
         </RoundTab>
         <RoundTab
           isCurrent={currentTab === 'jupyter'}
-          onClick={() => setCurrentTab('jupyter')}
+          onClick={() => {
+            setCurrentTab('jupyter')
+          }}
         >
           <StyledText>{t('jupyter_notebook')}</StyledText>
         </RoundTab>
         <RoundTab
           isCurrent={currentTab === 'cli'}
-          onClick={() => setCurrentTab('cli')}
+          onClick={() => {
+            setCurrentTab('cli')
+          }}
         >
           <StyledText>{t('cli_ssh')}</StyledText>
         </RoundTab>
@@ -68,9 +73,9 @@ export function LabwareOffsetTabs({
         border={BORDERS.lineBorder}
         // remove left upper corner border radius when first tab is active
         borderRadius={`${
-          currentTab === 'table' ? '0' : BORDERS.radiusSoftCorners
-        } ${BORDERS.radiusSoftCorners} ${BORDERS.radiusSoftCorners} ${
-          BORDERS.radiusSoftCorners
+          currentTab === 'table' ? '0' : BORDERS.borderRadius4
+        } ${BORDERS.borderRadius4} ${BORDERS.borderRadius4} ${
+          BORDERS.borderRadius4
         }`}
         paddingX={SPACING.spacing16}
       >

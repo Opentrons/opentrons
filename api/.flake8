@@ -14,6 +14,9 @@ extend-ignore =
     ANN102
     # do not require docstring for __init__, put them on the class
     D107,
+    # Don't forbid the function signature from being mentioned in the first line of the
+    # docstring. It tends to raise false positives when referring to other functions.
+    D402,
 
 # configure flake8-docstrings
 # https://pypi.org/project/flake8-docstrings/
@@ -30,7 +33,7 @@ per-file-ignores =
     src/opentrons/simulate.py:ANN,D
     src/opentrons/types.py:ANN,D
     src/opentrons/calibration_storage/*:ANN,D
-    src/opentrons/commands/*:D
+    src/opentrons/legacy_commands/*:D
     src/opentrons/config/*:ANN,D
     src/opentrons/drivers/*:ANN,D
     src/opentrons/hardware_control/*:ANN,D
@@ -48,7 +51,7 @@ per-file-ignores =
     tests/opentrons/test_types.py:ANN,D
     tests/opentrons/conftest.py:ANN,D
     tests/opentrons/calibration_storage/*:ANN,D
-    tests/opentrons/commands/*:ANN,D
+    tests/opentrons/legacy_commands/*:ANN,D
     tests/opentrons/config/*:ANN,D
     tests/opentrons/data/*:ANN,D
     tests/opentrons/drivers/*:ANN,D

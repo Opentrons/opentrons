@@ -1,19 +1,16 @@
 import * as React from 'react'
-import { when, resetAllWhenMocks } from 'jest-when'
+import { when } from 'vitest-when'
 import { MemoryRouter } from 'react-router-dom'
+import { describe, it, beforeEach, afterEach, vi, expect } from 'vitest'
+import { screen } from '@testing-library/react'
 
-import { renderWithProviders } from '@opentrons/components'
-
+import { renderWithProviders } from '../../../../__testing-utils__'
 import { i18n } from '../../../../i18n'
 import { mockDeckCalData } from '../../../../redux/calibration/__fixtures__'
 import { useDeckCalibrationData } from '../../hooks'
 import { SetupDeckCalibration } from '../SetupDeckCalibration'
 
-jest.mock('../../hooks')
-
-const mockUseDeckCalibrationData = useDeckCalibrationData as jest.MockedFunction<
-  typeof useDeckCalibrationData
->
+vi.mock('../../hooks')
 
 const ROBOT_NAME = 'otie'
 const RUN_ID = '1'
@@ -31,32 +28,34 @@ const render = () => {
 
 describe('SetupDeckCalibration', () => {
   beforeEach(() => {
-    when(mockUseDeckCalibrationData).calledWith(ROBOT_NAME).mockReturnValue({
+    when(vi.mocked(useDeckCalibrationData)).calledWith(ROBOT_NAME).thenReturn({
       deckCalibrationData: mockDeckCalData,
       isDeckCalibrated: true,
     })
   })
   afterEach(() => {
-    resetAllWhenMocks()
+    vi.resetAllMocks()
   })
 
   it('renders last calibrated content when deck is calibrated', () => {
-    const { getByText, queryByText } = render()
-    getByText('Deck Calibration')
-    queryByText('Last calibrated:')
+    render()
+    screen.getByText('Deck Calibration')
+    screen.queryByText('Last calibrated:')
   })
   it('renders a link to the calibration dashboard if deck is not calibrated', () => {
-    when(mockUseDeckCalibrationData).calledWith(ROBOT_NAME).mockReturnValue({
+    when(vi.mocked(useDeckCalibrationData)).calledWith(ROBOT_NAME).thenReturn({
       deckCalibrationData: null,
       isDeckCalibrated: false,
     })
-    const { getByRole, getByText } = render()
+    render()
 
-    getByText('Not calibrated yet')
+    screen.getByText('Not calibrated yet')
     expect(
-      getByRole('link', {
-        name: 'Calibrate now',
-      }).getAttribute('href')
+      screen
+        .getByRole('link', {
+          name: 'Calibrate now',
+        })
+        .getAttribute('href')
     ).toBe('/devices/otie/robot-settings/calibration/dashboard')
   })
 })

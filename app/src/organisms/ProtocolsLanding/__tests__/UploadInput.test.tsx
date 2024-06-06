@@ -1,8 +1,8 @@
 import * as React from 'react'
-import '@testing-library/jest-dom'
-import { fireEvent } from '@testing-library/react'
+import { fireEvent, screen } from '@testing-library/react'
 import { BrowserRouter } from 'react-router-dom'
-import { renderWithProviders } from '@opentrons/components'
+import { describe, it, vi, beforeEach, afterEach, expect } from 'vitest'
+import { renderWithProviders } from '../../../__testing-utils__'
 import { i18n } from '../../../i18n'
 import {
   useTrackEvent,
@@ -10,57 +10,56 @@ import {
 } from '../../../redux/analytics'
 import { ProtocolUploadInput } from '../ProtocolUploadInput'
 
-jest.mock('../../../redux/analytics')
+import type { Mock } from 'vitest'
 
-const mockUseTrackEvent = useTrackEvent as jest.Mock<typeof useTrackEvent>
+vi.mock('../../../redux/analytics')
 
 describe('ProtocolUploadInput', () => {
-  let onUpload: jest.MockedFunction<() => {}>
-  let trackEvent: jest.MockedFunction<any>
-  let render: () => ReturnType<typeof renderWithProviders>[0]
+  let onUpload: Mock
+  let trackEvent: Mock
+  const render = () => {
+    return renderWithProviders(
+      <BrowserRouter>
+        <ProtocolUploadInput onUpload={onUpload} />
+      </BrowserRouter>,
+      {
+        i18nInstance: i18n,
+      }
+    )
+  }
 
   beforeEach(() => {
-    onUpload = jest.fn()
-    trackEvent = jest.fn()
-    mockUseTrackEvent.mockReturnValue(trackEvent)
-    render = () => {
-      return renderWithProviders(
-        <BrowserRouter>
-          <ProtocolUploadInput onUpload={onUpload} />
-        </BrowserRouter>,
-        {
-          i18nInstance: i18n,
-        }
-      )[0]
-    }
+    onUpload = vi.fn()
+    trackEvent = vi.fn()
+    vi.mocked(useTrackEvent).mockReturnValue(trackEvent)
   })
   afterEach(() => {
-    jest.resetAllMocks()
+    vi.resetAllMocks()
   })
 
   it('renders correct contents for empty state', () => {
-    const { findByText, getByRole } = render()
+    render()
 
-    getByRole('button', { name: 'Upload' })
-    findByText('Drag and drop or')
-    findByText('your files')
-    findByText(
+    screen.getByRole('button', { name: 'Upload' })
+    screen.getByText(/Drag and drop or/i)
+    screen.getByText(/your files/i)
+    screen.getByText(
       'Valid file types: Python files (.py) or Protocol Designer files (.json)'
     )
-    getByRole('button', { name: 'browse' })
+    screen.getByRole('button', { name: 'browse' })
   })
 
   it('opens file select on button click', () => {
-    const { getByRole, getByTestId } = render()
-    const button = getByRole('button', { name: 'Upload' })
-    const input = getByTestId('file_input')
-    input.click = jest.fn()
+    render()
+    const button = screen.getByRole('button', { name: 'Upload' })
+    const input = screen.getByTestId('file_input')
+    input.click = vi.fn()
     fireEvent.click(button)
     expect(input.click).toHaveBeenCalled()
   })
   it('calls onUpload callback on choose file and trigger analytics event', () => {
-    const { getByTestId } = render()
-    const input = getByTestId('file_input')
+    render()
+    const input = screen.getByTestId('file_input')
     fireEvent.change(input, {
       target: { files: [{ path: 'dummyFile', name: 'dummyName' }] },
     })

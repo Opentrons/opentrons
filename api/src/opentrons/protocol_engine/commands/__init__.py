@@ -19,7 +19,7 @@ from . import temperature_module
 from . import thermocycler
 from . import calibration
 
-from .hash_command_params import hash_command_params
+from .hash_command_params import hash_protocol_command_params
 from .generate_command_schema import generate_command_schema
 
 from .command import (
@@ -37,6 +37,7 @@ from .command_unions import (
     CommandResult,
     CommandType,
     CommandPrivateResult,
+    CommandDefinedErrorData,
 )
 
 from .aspirate import (
@@ -119,6 +120,14 @@ from .load_labware import (
     LoadLabwareCommandType,
 )
 
+from .reload_labware import (
+    ReloadLabware,
+    ReloadLabwareParams,
+    ReloadLabwareCreate,
+    ReloadLabwareResult,
+    ReloadLabwareCommandType,
+)
+
 from .load_liquid import (
     LoadLiquid,
     LoadLiquidParams,
@@ -183,6 +192,14 @@ from .move_to_addressable_area import (
     MoveToAddressableAreaCreate,
     MoveToAddressableAreaResult,
     MoveToAddressableAreaCommandType,
+)
+
+from .move_to_addressable_area_for_drop_tip import (
+    MoveToAddressableAreaForDropTip,
+    MoveToAddressableAreaForDropTipParams,
+    MoveToAddressableAreaForDropTipCreate,
+    MoveToAddressableAreaForDropTipResult,
+    MoveToAddressableAreaForDropTipCommandType,
 )
 
 from .wait_for_resume import (
@@ -287,7 +304,24 @@ from .configure_nozzle_layout import (
     ConfigureNozzleLayoutCreate,
     ConfigureNozzleLayoutParams,
     ConfigureNozzleLayoutResult,
+    ConfigureNozzleLayoutPrivateResult,
     ConfigureNozzleLayoutCommandType,
+)
+
+from .get_tip_presence import (
+    GetTipPresence,
+    GetTipPresenceCreate,
+    GetTipPresenceParams,
+    GetTipPresenceResult,
+    GetTipPresenceCommandType,
+)
+
+from .verify_tip_presence import (
+    VerifyTipPresence,
+    VerifyTipPresenceCreate,
+    VerifyTipPresenceParams,
+    VerifyTipPresenceResult,
+    VerifyTipPresenceCommandType,
 )
 
 __all__ = [
@@ -298,15 +332,15 @@ __all__ = [
     "CommandResult",
     "CommandType",
     "CommandPrivateResult",
+    "CommandDefinedErrorData",
     # base interfaces
     "AbstractCommandImpl",
-    "AbstractCommandWithPrivateResultImpl",
     "BaseCommand",
     "BaseCommandCreate",
     "CommandStatus",
     "CommandIntent",
     # command parameter hashing
-    "hash_command_params",
+    "hash_protocol_command_params",
     # command schema generation
     "generate_command_schema",
     # aspirate command models
@@ -375,6 +409,12 @@ __all__ = [
     "LoadLabwareParams",
     "LoadLabwareResult",
     "LoadLabwareCommandType",
+    # reload labware command models
+    "ReloadLabware",
+    "ReloadLabwareCreate",
+    "ReloadLabwareParams",
+    "ReloadLabwareResult",
+    "ReloadLabwareCommandType",
     # load module command models
     "LoadModule",
     "LoadModuleCreate",
@@ -418,6 +458,12 @@ __all__ = [
     "MoveToAddressableAreaCreate",
     "MoveToAddressableAreaResult",
     "MoveToAddressableAreaCommandType",
+    # move to addressable area for drop tip command models
+    "MoveToAddressableAreaForDropTip",
+    "MoveToAddressableAreaForDropTipParams",
+    "MoveToAddressableAreaForDropTipCreate",
+    "MoveToAddressableAreaForDropTipResult",
+    "MoveToAddressableAreaForDropTipCommandType",
     # wait for resume command models
     "WaitForResume",
     "WaitForResumeParams",
@@ -505,4 +551,17 @@ __all__ = [
     "ConfigureNozzleLayoutParams",
     "ConfigureNozzleLayoutResult",
     "ConfigureNozzleLayoutCommandType",
+    "ConfigureNozzleLayoutPrivateResult",
+    # get pipette tip presence bundle
+    "GetTipPresence",
+    "GetTipPresenceCreate",
+    "GetTipPresenceParams",
+    "GetTipPresenceResult",
+    "GetTipPresenceCommandType",
+    # verify pipette tip presence bundle
+    "VerifyTipPresence",
+    "VerifyTipPresenceCreate",
+    "VerifyTipPresenceParams",
+    "VerifyTipPresenceResult",
+    "VerifyTipPresenceCommandType",
 ]

@@ -7,7 +7,12 @@ from starlette import status as status_codes
 
 from opentrons_shared_data.errors import ErrorCodes
 
-from robot_server.errors import ApiError, ErrorSource, ErrorDetails, ErrorBody
+from robot_server.errors.error_responses import (
+    ApiError,
+    ErrorSource,
+    ErrorDetails,
+    ErrorBody,
+)
 from robot_server.service.json_api import ResourceLinks
 
 

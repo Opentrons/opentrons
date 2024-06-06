@@ -1,0 +1,114 @@
+/* TitleBar styles */
+@import '../index.module.css';
+
+.title_bar {
+  display: flex;
+  align-items: center;
+  height: 3rem;
+  text-transform: uppercase;
+  background-color: var(--c-dark-gray);
+}
+
+.title_bar,
+.title_bar a {
+  color: white;
+}
+
+.title,
+.subtitle,
+.separator {
+  font-size: var(--fs-header);
+  margin: 0;
+}
+
+.title,
+.separator {
+  font-weight: var(--fw-semibold);
+}
+
+.title {
+  white-space: nowrap; /* from legacy --truncate */
+  overflow: hidden; /* from legacy --truncate */
+  text-overflow: ellipsis; /* from legacy --truncate */
+  min-width: 0; /* from legacy --truncate */
+  padding: 0 1.5rem;
+}
+
+.subtitle {
+  padding: 0 1.5rem;
+  font-weight: normal;
+}
+
+.title.right {
+  margin-left: auto;
+}
+
+.title_button {
+  flex: none;
+}
+
+.page_tabs {
+  width: 100%;
+  text-align: center;
+}
+
+.tab_link {
+  display: inline-block;
+  width: 50%;
+  padding: 0.25rem 0;
+  font-size: var(--fs-huge);
+  opacity: 0.2;
+  background-color: var(--c-med-gray);
+  color: white;
+  text-transform: uppercase;
+}
+
+.active_tab_link {
+  opacity: 1;
+}
+
+.tab_title {
+  font-weight: normal;
+}
+
+.active_tab_link .tab_title {
+  font-weight: var(--fw-bold);
+}
+
+.disabled {
+  pointer-events: none;
+  background-color: transparent;
+
+  & * {
+    color: var(--c-font-disabled);
+    fill: var(--c-font-disabled);
+    background-color: transparent;
+  }
+}
+
+.labeled_value {
+  font-size: var(--fs-body-1); /* from legacy --font-body-1-dark */
+  font-weight: var(--fw-regular); /* from legacy --font-body-1-dark */
+  color: var(--c-font-dark); /* from legacy --font-body-1-dark */
+  line-height: 1.5;
+
+  & svg {
+    height: var(--fs-body-2);
+  }
+}
+
+.labeled_value_label {
+  font-weight: var(--fw-semibold);
+  margin-top: 0;
+  margin-bottom: 0.25rem;
+}
+
+.labeled_value_value {
+  margin: 0;
+}
+
+.right_node {
+  display: flex;
+  justify-content: flex-end;
+  margin-left: auto;
+}

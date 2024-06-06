@@ -13,7 +13,7 @@ import type {
   ResponseToActionMapper,
 } from '../../robot-api/operators'
 import type { Action, Epic } from '../../types'
-import {
+import type {
   PostWifiConfigureAction,
   PostWifiConfigureSuccessAction,
 } from '../types'

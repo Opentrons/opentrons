@@ -1,9 +1,14 @@
-import _protocolWithMagTempTC from '@opentrons/shared-data/protocol/fixtures/6/transferSettings.json'
+import { describe, it, expect } from 'vitest'
+import '@testing-library/jest-dom/vitest'
+import { transfer_settings } from '@opentrons/shared-data'
 import { createSnippet } from '../createSnippet'
-import { ModuleModel, CompletedProtocolAnalysis } from '@opentrons/shared-data'
+import type {
+  ModuleModel,
+  CompletedProtocolAnalysis,
+} from '@opentrons/shared-data'
 
 const protocolWithMagTempTC = ({
-  ..._protocolWithMagTempTC,
+  ...transfer_settings,
   labware: [
     {
       id: 'fixedTrash',

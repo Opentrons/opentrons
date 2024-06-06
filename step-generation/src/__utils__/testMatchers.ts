@@ -1,4 +1,5 @@
-import { CommandCreatorError } from '../types'
+import { expect } from 'vitest'
+import type { CommandCreatorError } from '../types'
 
 // error of type exists somewhere in timeline errors
 export function expectTimelineError(

@@ -1,11 +1,12 @@
 import * as React from 'react'
 import {
-  Flex,
-  DIRECTION_ROW,
   DIRECTION_COLUMN,
-  SPACING,
-  useLongPress,
+  DIRECTION_ROW,
+  Flex,
   PrimaryButton,
+  SPACING,
+  StyledText,
+  useLongPress,
 } from '@opentrons/components'
 import {
   TertiaryButton,
@@ -13,7 +14,6 @@ import {
   SubmitPrimaryButton,
   ToggleButton,
 } from './index'
-import { StyledText } from '../text'
 import type { Story, Meta } from '@storybook/react'
 
 export default {

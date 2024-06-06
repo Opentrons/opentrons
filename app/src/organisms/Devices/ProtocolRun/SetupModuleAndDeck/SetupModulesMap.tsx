@@ -10,17 +10,19 @@ import {
 import {
   FLEX_ROBOT_TYPE,
   getDeckDefFromRobotType,
+  getSimplestDeckConfigForProtocol,
 } from '@opentrons/shared-data'
 
-import { getSimplestDeckConfigForProtocolCommands } from '../../../../resources/deck_configuration/utils'
 import { useMostRecentCompletedAnalysis } from '../../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import { getAttachedProtocolModuleMatches } from '../../../ProtocolSetupModulesAndDeck/utils'
 import { ModuleInfo } from '../../ModuleInfo'
 import { useAttachedModules, useStoredProtocolAnalysis } from '../../hooks'
 import { getProtocolModulesInfo } from '../utils/getProtocolModulesInfo'
 import { getStandardDeckViewLayerBlockList } from '../utils/getStandardDeckViewLayerBlockList'
+import { useNotifyDeckConfigurationQuery } from '../../../../resources/deck_configuration'
 
 const ATTACHED_MODULE_POLL_MS = 5000
+const DECK_CONFIG_POLL_MS = 5000
 
 interface SetupModulesMapProps {
   runId: string
@@ -33,7 +35,9 @@ export const SetupModulesMap = ({
   const robotProtocolAnalysis = useMostRecentCompletedAnalysis(runId)
   const storedProtocolAnalysis = useStoredProtocolAnalysis(runId)
   const protocolAnalysis = robotProtocolAnalysis ?? storedProtocolAnalysis
-
+  const { data: actualDeckConfig = [] } = useNotifyDeckConfigurationQuery({
+    refetchInterval: DECK_CONFIG_POLL_MS,
+  })
   const attachedModules =
     useAttachedModules({
       refetchInterval: ATTACHED_MODULE_POLL_MS,
@@ -44,14 +48,17 @@ export const SetupModulesMap = ({
 
   const robotType = protocolAnalysis.robotType ?? FLEX_ROBOT_TYPE
   const deckDef = getDeckDefFromRobotType(robotType)
+
   const protocolModulesInfo = getProtocolModulesInfo(protocolAnalysis, deckDef)
 
   const attachedProtocolModuleMatches = getAttachedProtocolModuleMatches(
     attachedModules,
-    protocolModulesInfo
+    protocolModulesInfo,
+    actualDeckConfig,
+    robotType
   )
 
-  const moduleLocations = attachedProtocolModuleMatches.map(module => ({
+  const modulesOnDeck = attachedProtocolModuleMatches.map(module => ({
     moduleModel: module.moduleDef.model,
     moduleLocation: { slotName: module.slotName },
     moduleChildren: (
@@ -64,8 +71,8 @@ export const SetupModulesMap = ({
     ),
   }))
 
-  const deckConfig = getSimplestDeckConfigForProtocolCommands(
-    protocolAnalysis.commands
+  const simplestProtocolDeckConfig = getSimplestDeckConfigForProtocol(
+    protocolAnalysis
   )
 
   return (
@@ -77,14 +84,16 @@ export const SetupModulesMap = ({
     >
       <Box margin="0 auto" maxWidth="46.25rem" width="100%">
         <BaseDeck
-          deckConfig={deckConfig.map(({ cutoutId, cutoutFixtureId }) => ({
-            cutoutId,
-            cutoutFixtureId,
-          }))}
+          deckConfig={simplestProtocolDeckConfig.map(
+            ({ cutoutId, cutoutFixtureId }) => ({
+              cutoutId,
+              cutoutFixtureId,
+            })
+          )}
           deckLayerBlocklist={getStandardDeckViewLayerBlockList(robotType)}
           robotType={robotType}
-          labwareLocations={[]}
-          moduleLocations={moduleLocations}
+          labwareOnDeck={[]}
+          modulesOnDeck={modulesOnDeck}
         />
       </Box>
     </Flex>

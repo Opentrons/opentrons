@@ -1,3 +1,5 @@
+from opentrons.config.types import OutputOptions
+
 ot3_dummy_settings = {
     "name": "Marie Curie",
     "model": "OT-3 Standard",
@@ -109,7 +111,6 @@ ot3_dummy_settings = {
         },
     },
     "log_level": "NADA",
-    "z_retract_distance": 10,
     "safe_home_distance": 5,
     "deck_transform": [[-0.5, 0, 1], [0.1, -2, 4], [0, 0, -1]],
     "carriage_offset": (1, 2, 3),
@@ -119,16 +120,12 @@ ot3_dummy_settings = {
     "liquid_sense": {
         "starting_mount_height": 80,
         "max_z_distance": 20,
-        "min_z_distance": 3,
         "mount_speed": 10,
         "plunger_speed": 10,
         "sensor_threshold_pascals": 17,
-        "expected_liquid_height": 90,
-        "log_pressure": True,
+        "output_option": OutputOptions.stream_to_csv,
         "aspirate_while_sensing": False,
-        "auto_zero_sensor": True,
-        "num_baseline_reads": 10,
-        "data_file": "/var/pressure_sensor_data.csv",
+        "data_files": {"PRIMARY": "/data/pressure_sensor_data.csv"},
     },
     "calibration": {
         "z_offset": {
@@ -137,6 +134,8 @@ ot3_dummy_settings = {
                 "max_overrun_distance_mm": 2,
                 "speed_mm_per_s": 3,
                 "sensor_threshold_pf": 4,
+                "output_option": OutputOptions.sync_only,
+                "data_files": None,
             },
         },
         "edge_sense": {
@@ -147,6 +146,8 @@ ot3_dummy_settings = {
                 "max_overrun_distance_mm": 5,
                 "speed_mm_per_s": 6,
                 "sensor_threshold_pf": 7,
+                "output_option": OutputOptions.sync_only,
+                "data_files": None,
             },
             "search_initial_tolerance_mm": 18,
             "search_iteration_limit": 3,

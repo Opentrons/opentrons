@@ -1,14 +1,16 @@
 import * as React from 'react'
 import { MemoryRouter } from 'react-router-dom'
-import { when, resetAllWhenMocks } from 'jest-when'
-
-import { renderWithProviders } from '@opentrons/components'
+import { when } from 'vitest-when'
+import { screen } from '@testing-library/react'
+import { describe, it, vi, beforeEach, expect } from 'vitest'
+import '@testing-library/jest-dom/vitest'
+import { renderWithProviders } from '../../../__testing-utils__'
 import {
   mockOT2HealthResponse,
   mockOT2ServerHealthResponse,
   mockOT3HealthResponse,
   mockOT3ServerHealthResponse,
-} from '@opentrons/discovery-client/src/__fixtures__'
+} from '../../../../../discovery-client/src/fixtures'
 
 import { i18n } from '../../../i18n'
 import { mockFetchModulesSuccessActionPayloadModules } from '../../../redux/modules/__fixtures__'
@@ -32,16 +34,16 @@ import { RobotCard } from '../RobotCard'
 
 import type { State } from '../../../redux/types'
 
-jest.mock('../../../redux/robot-update/selectors')
-jest.mock('../../../redux/discovery/selectors')
-jest.mock('../hooks')
-jest.mock('../../UpdateRobotBanner')
-jest.mock('../../../redux/config')
-jest.mock('../RobotOverflowMenu')
-jest.mock('../RobotStatusHeader')
+vi.mock('../../../redux/robot-update/selectors')
+vi.mock('../../../redux/discovery/selectors')
+vi.mock('../hooks')
+vi.mock('../../UpdateRobotBanner')
+vi.mock('../../../redux/config')
+vi.mock('../RobotOverflowMenu')
+vi.mock('../RobotStatusHeader')
 
-const OT2_PNG_FILE_NAME = 'OT2-R_HERO.png'
-const FLEX_PNG_FILE_NAME = 'FLEX.png'
+const OT2_PNG_FILE_NAME = '/app/src/assets/images/OT2-R_HERO.png'
+const FLEX_PNG_FILE_NAME = '/app/src/assets/images/FLEX.png'
 const MOCK_STATE: State = {
   discovery: {
     robot: { connection: { connectedTo: null } },
@@ -84,28 +86,6 @@ const MOCK_STATE: State = {
   },
 } as any
 
-const mockUseAttachedModules = useAttachedModules as jest.MockedFunction<
-  typeof useAttachedModules
->
-const mockUseAttachedPipettes = useAttachedPipettes as jest.MockedFunction<
-  typeof useAttachedPipettes
->
-const mockUpdateRobotBanner = UpdateRobotBanner as jest.MockedFunction<
-  typeof UpdateRobotBanner
->
-const mockRobotOverflowMenu = RobotOverflowMenu as jest.MockedFunction<
-  typeof RobotOverflowMenu
->
-const mockRobotStatusHeader = RobotStatusHeader as jest.MockedFunction<
-  typeof RobotStatusHeader
->
-const mockGetBuildrootUpdateDisplayInfo = getRobotUpdateDisplayInfo as jest.MockedFunction<
-  typeof getRobotUpdateDisplayInfo
->
-const mockGetRobotModelByName = getRobotModelByName as jest.MockedFunction<
-  typeof getRobotModelByName
->
-
 const render = (props: React.ComponentProps<typeof RobotCard>) => {
   return renderWithProviders(
     <MemoryRouter>
@@ -123,60 +103,62 @@ describe('RobotCard', () => {
 
   beforeEach(() => {
     props = { robot: mockConnectableRobot }
-    mockUseAttachedModules.mockReturnValue(
+    vi.mocked(useAttachedModules).mockReturnValue(
       mockFetchModulesSuccessActionPayloadModules
     )
-    mockUseAttachedPipettes.mockReturnValue({
+    vi.mocked(useAttachedPipettes).mockReturnValue({
       left: mockLeftProtoPipette,
       right: mockRightProtoPipette,
     })
-    mockUpdateRobotBanner.mockReturnValue(<div>Mock UpdateRobotBanner</div>)
-    mockRobotOverflowMenu.mockReturnValue(<div>Mock RobotOverflowMenu</div>)
-    mockRobotStatusHeader.mockReturnValue(<div>Mock RobotStatusHeader</div>)
-    mockGetBuildrootUpdateDisplayInfo.mockReturnValue({
+    vi.mocked(UpdateRobotBanner).mockReturnValue(
+      <div>Mock UpdateRobotBanner</div>
+    )
+    vi.mocked(RobotOverflowMenu).mockReturnValue(
+      <div>Mock RobotOverflowMenu</div>
+    )
+    vi.mocked(RobotStatusHeader).mockReturnValue(
+      <div>Mock RobotStatusHeader</div>
+    )
+    vi.mocked(getRobotUpdateDisplayInfo).mockReturnValue({
       autoUpdateAction: 'reinstall',
       autoUpdateDisabledReason: null,
       updateFromFileDisabledReason: null,
     })
-    when(mockGetRobotModelByName)
+    when(getRobotModelByName)
       .calledWith(MOCK_STATE, mockConnectableRobot.name)
-      .mockReturnValue('OT-2')
-  })
-  afterEach(() => {
-    jest.resetAllMocks()
-    resetAllWhenMocks()
+      .thenReturn('OT-2')
   })
 
   it('renders an OT-2 image when robot model is OT-2', () => {
-    const [{ getByRole }] = render(props)
-    const image = getByRole('img')
+    render(props)
+    const image = screen.getByRole('img')
 
     expect(image.getAttribute('src')).toEqual(OT2_PNG_FILE_NAME)
   })
 
-  it('renders an OT-3 image when robot model is OT-3', () => {
+  it('renders a Flex image when robot model is OT-3', () => {
     props = { robot: { ...mockConnectableRobot, name: 'buzz' } }
-    when(mockGetRobotModelByName)
+    when(getRobotModelByName)
       .calledWith(MOCK_STATE, 'buzz')
-      .mockReturnValue('Opentrons Flex')
-    const [{ getByRole }] = render(props)
-    const image = getByRole('img')
+      .thenReturn('Opentrons Flex')
+    render(props)
+    const image = screen.getByRole('img')
 
     expect(image.getAttribute('src')).toEqual(FLEX_PNG_FILE_NAME)
   })
 
   it('renders a UpdateRobotBanner component', () => {
-    const [{ getByText }] = render(props)
-    getByText('Mock UpdateRobotBanner')
+    render(props)
+    screen.getByText('Mock UpdateRobotBanner')
   })
 
   it('renders a RobotOverflowMenu component', () => {
-    const [{ getByText }] = render(props)
-    getByText('Mock RobotOverflowMenu')
+    render(props)
+    screen.getByText('Mock RobotOverflowMenu')
   })
 
   it('renders a RobotStatusHeader component', () => {
-    const [{ getByText }] = render(props)
-    getByText('Mock RobotStatusHeader')
+    render(props)
+    screen.getByText('Mock RobotStatusHeader')
   })
 })

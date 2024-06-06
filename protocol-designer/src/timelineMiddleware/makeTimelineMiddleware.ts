@@ -1,3 +1,4 @@
+import isEqual from 'lodash/isEqual'
 import {
   getArgsAndErrorsByStepId,
   getOrderedStepIds,
@@ -7,13 +8,13 @@ import { getInitialRobotState } from '../file-data/selectors'
 import {
   computeRobotStateTimelineRequest,
   computeRobotStateTimelineSuccess,
-  ComputeRobotStateTimelineSuccessAction,
 } from '../file-data/actions'
 import { getLabwareNamesByModuleId } from '../ui/modules/selectors'
-import { Middleware } from 'redux'
-import { BaseState } from '../types'
-import { GenerateRobotStateTimelineArgs } from './generateRobotStateTimeline'
-import { SubstepsArgsNoTimeline } from './types'
+import type { ComputeRobotStateTimelineSuccessAction } from '../file-data/actions'
+import type { Middleware } from 'redux'
+import type { BaseState } from '../types'
+import type { GenerateRobotStateTimelineArgs } from './generateRobotStateTimeline'
+import type { SubstepsArgsNoTimeline } from './types'
 
 const hasChanged = (
   nextValues: { [key in any]?: any },
@@ -21,7 +22,7 @@ const hasChanged = (
 ): boolean =>
   Object.keys(nextValues).some(
     (selectorKey: string) =>
-      nextValues[selectorKey] !== memoizedValues?.[selectorKey]
+      !isEqual(nextValues[selectorKey], memoizedValues?.[selectorKey])
   )
 
 const getTimelineArgs = (state: BaseState): GenerateRobotStateTimelineArgs => ({
@@ -41,9 +42,10 @@ const getSubstepsArgs = (state: BaseState): SubstepsArgsNoTimeline => ({
 
 // TODO(IL, 2020-06-15): once we create an Action union for PD, use that instead of `any` for Middleware<S, A>
 export const makeTimelineMiddleware: () => Middleware<BaseState, any> = () => {
-  const worker: Worker = new Worker('./worker', {
+  const worker = new Worker(new URL('./worker', import.meta.url), {
     type: 'module',
-  }) as any
+  })
+
   let prevTimelineArgs: GenerateRobotStateTimelineArgs | null = null // caches results of dependent selectors, eg {[selectorIndex]: lastCachedSelectorValue}
 
   let prevSubstepsArgs: SubstepsArgsNoTimeline | null = null

@@ -1,9 +1,11 @@
 """Response models for protocol analysis."""
 # TODO(mc, 2021-08-25): add modules to simulation result
 from enum import Enum
+
+from opentrons.protocol_engine.types import RunTimeParameter, RunTimeParamValuesType
 from opentrons_shared_data.robot.dev_types import RobotType
 from pydantic import BaseModel, Field
-from typing import List, Optional, Union
+from typing import List, Optional, Union, NamedTuple
 from typing_extensions import Literal
 
 from opentrons.protocol_engine import (
@@ -36,6 +38,18 @@ class AnalysisResult(str, Enum):
 
     OK = "ok"
     NOT_OK = "not-ok"
+
+
+class AnalysisRequest(BaseModel):
+    """Model for analysis request body."""
+
+    runTimeParameterValues: RunTimeParamValuesType = Field(
+        default={},
+        description="Key-value pairs of run-time parameters defined in a protocol.",
+    )
+    forceReAnalyze: bool = Field(
+        False, description="Whether to force start a new analysis."
+    )
 
 
 class AnalysisSummary(BaseModel):
@@ -82,7 +96,7 @@ class CompletedAnalysis(BaseModel):
     # Fields that are currently unique to robot-server, missing from local analysis:
     id: str = Field(..., description="Unique identifier of this analysis resource")
     status: Literal[AnalysisStatus.COMPLETED] = Field(
-        AnalysisStatus.COMPLETED,
+        ...,
         description="Status marking the analysis as completed",
     )
     result: AnalysisResult = Field(
@@ -100,6 +114,16 @@ class CompletedAnalysis(BaseModel):
             "The type of robot that this protocol can run on."
             " This field was added in v7.1.0. It will be `null` or omitted"
             " in analyses that were originally created on older versions."
+        ),
+    )
+    runTimeParameters: List[RunTimeParameter] = Field(
+        default_factory=list,
+        description=(
+            "Run time parameters used during analysis."
+            " These are the parameters that are defined in the protocol, with values"
+            " specified either in the protocol creation request or reanalysis request"
+            " (whichever started this analysis), or default values from the protocol"
+            " if none are specified in the request."
         ),
     )
     commands: List[Command] = Field(
@@ -136,6 +160,13 @@ class CompletedAnalysis(BaseModel):
             " but it won't have more than one element."
         ),
     )
+
+
+class RunTimeParameterAnalysisData(NamedTuple):
+    """Data from analysis of a run-time parameter."""
+
+    value: Union[float, bool, str]
+    default: Union[float, bool, str]
 
 
 ProtocolAnalysis = Union[PendingAnalysis, CompletedAnalysis]

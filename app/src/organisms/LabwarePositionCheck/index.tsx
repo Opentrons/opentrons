@@ -3,6 +3,7 @@ import { useLogger } from '../../logger'
 import { LabwarePositionCheckComponent } from './LabwarePositionCheckComponent'
 import { FatalErrorModal } from './FatalErrorModal'
 
+import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
 import type {
   CompletedProtocolAnalysis,
   RobotType,
@@ -29,11 +30,12 @@ interface LabwarePositionCheckModalProps {
 export const LabwarePositionCheck = (
   props: LabwarePositionCheckModalProps
 ): JSX.Element => {
-  const logger = useLogger(__filename)
+  const logger = useLogger(new URL('', import.meta.url).pathname)
   return (
     <ErrorBoundary
       logger={logger}
       ErrorComponent={FatalErrorModal}
+      shouldUseMetalProbe={props.robotType === FLEX_ROBOT_TYPE}
       onClose={props.onCloseClick}
     >
       <LabwarePositionCheckComponent {...props} />
@@ -44,9 +46,11 @@ export const LabwarePositionCheck = (
 interface ErrorBoundaryProps {
   children: React.ReactNode
   onClose: () => void
+  shouldUseMetalProbe: boolean
   logger: ReturnType<typeof useLogger>
   ErrorComponent: (props: {
     errorMessage: string
+    shouldUseMetalProbe: boolean
     onClose: () => void
   }) => JSX.Element
 }
@@ -70,12 +74,13 @@ class ErrorBoundary extends React.Component<
   }
 
   render(): ErrorBoundaryProps['children'] | JSX.Element {
-    const { ErrorComponent, children } = this.props
+    const { ErrorComponent, children, shouldUseMetalProbe } = this.props
     const { error } = this.state
     if (error != null)
       return (
         <ErrorComponent
           errorMessage={error.message}
+          shouldUseMetalProbe={shouldUseMetalProbe}
           onClose={this.props.onClose}
         />
       )

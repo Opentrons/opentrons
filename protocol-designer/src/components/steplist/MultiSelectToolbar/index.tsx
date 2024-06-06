@@ -16,7 +16,6 @@ import {
   C_DARK_GRAY,
   BORDER_SOLID_MEDIUM,
   POSITION_STICKY,
-  IconName,
   SPACING,
 } from '@opentrons/components'
 import { selectors as stepFormSelectors } from '../../../step-forms'
@@ -31,6 +30,9 @@ import {
   ConfirmDeleteModal,
   DELETE_MULTIPLE_STEP_FORMS,
 } from '../../modals/ConfirmDeleteModal'
+import type { IconName } from '@opentrons/components'
+import type { ThunkDispatch } from 'redux-thunk'
+import type { BaseState } from '../../../types'
 
 export interface ClickableIconProps {
   id?: string
@@ -101,7 +103,7 @@ export const Accordion = (props: AccordionProps): JSX.Element => {
 }
 
 export const MultiSelectToolbar = (props: Props): JSX.Element => {
-  const dispatch = useDispatch()
+  const dispatch = useDispatch<ThunkDispatch<BaseState, any, any>>()
   const [isExpandState, setIsExpandState] = React.useState<boolean>(true)
   const stepCount = useSelector(stepFormSelectors.getOrderedStepIds).length
   const selectedStepCount = useSelector(getMultiSelectItemIds)?.length
@@ -157,7 +159,7 @@ export const MultiSelectToolbar = (props: Props): JSX.Element => {
   } = useConditionalConfirm(onDeleteClickAction, true)
 
   const selectProps: ClickableIconProps = {
-    iconName: isAllStepsSelected ? 'checkbox-marked' : 'minus-box',
+    iconName: isAllStepsSelected ? 'ot-checkbox' : 'minus-box',
     tooltipText: isAllStepsSelected ? 'Deselect All' : 'Select All',
     onClick: confirmSelect,
   }

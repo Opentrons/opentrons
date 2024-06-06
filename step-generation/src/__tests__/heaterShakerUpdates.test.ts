@@ -1,3 +1,4 @@
+import { beforeEach, describe, it, expect } from 'vitest'
 import merge from 'lodash/merge'
 import {
   HEATERSHAKER_MODULE_TYPE,

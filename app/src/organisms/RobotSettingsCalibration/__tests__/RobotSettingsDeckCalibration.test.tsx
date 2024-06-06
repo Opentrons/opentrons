@@ -1,6 +1,6 @@
 import * as React from 'react'
-
-import { renderWithProviders } from '@opentrons/components'
+import { screen } from '@testing-library/react'
+import { describe, it, vi, beforeEach } from 'vitest'
 
 import { i18n } from '../../../i18n'
 import * as RobotApi from '../../../redux/robot-api'
@@ -15,29 +15,20 @@ import {
   useRobot,
   useAttachedPipettes,
 } from '../../../organisms/Devices/hooks'
+import { renderWithProviders } from '../../../__testing-utils__'
 
 import { RobotSettingsDeckCalibration } from '../RobotSettingsDeckCalibration'
 
 import type { AttachedPipettesByMount } from '../../../redux/pipettes/types'
 
-jest.mock('../../../organisms/CalibrationStatusCard')
-jest.mock('../../../redux/robot-api/selectors')
-jest.mock('../../../organisms/Devices/hooks')
+vi.mock('../../../organisms/CalibrationStatusCard')
+vi.mock('../../../redux/robot-api/selectors')
+vi.mock('../../../organisms/Devices/hooks')
 
 const mockAttachedPipettes: AttachedPipettesByMount = {
   left: mockAttachedPipette,
   right: mockAttachedPipette,
 } as any
-const mockUseDeckCalibrationData = useDeckCalibrationData as jest.MockedFunction<
-  typeof useDeckCalibrationData
->
-const mockUseRobot = useRobot as jest.MockedFunction<typeof useRobot>
-const mockUseAttachedPipettes = useAttachedPipettes as jest.MockedFunction<
-  typeof useAttachedPipettes
->
-const mockGetRequestById = RobotApi.getRequestById as jest.MockedFunction<
-  typeof RobotApi.getRequestById
->
 
 const render = (
   props?: Partial<React.ComponentProps<typeof RobotSettingsDeckCalibration>>
@@ -49,46 +40,43 @@ const render = (
     }
   )
 }
+const getRequestById = RobotApi.getRequestById
 
 describe('RobotSettingsDeckCalibration', () => {
   beforeEach(() => {
-    mockUseDeckCalibrationData.mockReturnValue({
+    vi.mocked(useDeckCalibrationData).mockReturnValue({
       deckCalibrationData: mockDeckCalData,
       isDeckCalibrated: true,
     })
-    mockUseRobot.mockReturnValue(mockConnectableRobot)
-    mockUseAttachedPipettes.mockReturnValue(mockAttachedPipettes)
-    mockGetRequestById.mockReturnValue(null)
-  })
-
-  afterEach(() => {
-    jest.resetAllMocks()
+    vi.mocked(useRobot).mockReturnValue(mockConnectableRobot)
+    vi.mocked(useAttachedPipettes).mockReturnValue(mockAttachedPipettes)
+    vi.mocked(getRequestById).mockReturnValue(null)
   })
 
   it('renders a title description and button', () => {
-    const [{ getByText }] = render()
-    getByText('Deck Calibration')
-    getByText(
+    render()
+    screen.getByText('Deck Calibration')
+    screen.getByText(
       'Calibrating the deck is required for new robots or after you relocate your robot. Recalibrating the deck will require you to also recalibrate pipette offsets.'
     )
-    getByText('Last calibrated: September 15, 2021 00:00')
+    screen.getByText('Last calibrated: September 15, 2021 00:00')
   })
 
   it('renders empty state if yet not calibrated', () => {
-    mockUseDeckCalibrationData.mockReturnValue({
+    vi.mocked(useDeckCalibrationData).mockReturnValue({
       deckCalibrationData: null,
       isDeckCalibrated: false,
     })
-    const [{ getByText }] = render()
-    getByText('Not calibrated yet')
+    render()
+    screen.getByText('Not calibrated yet')
   })
 
   it('renders the last calibrated when deck calibration is not good', () => {
-    mockUseDeckCalibrationData.mockReturnValue({
+    vi.mocked(useDeckCalibrationData).mockReturnValue({
       deckCalibrationData: mockWarningDeckCalData,
       isDeckCalibrated: true,
     })
-    const [{ getByText }] = render()
-    getByText('Last calibrated: September 22, 2222 00:00')
+    render()
+    screen.getByText('Last calibrated: September 22, 2222 00:00')
   })
 })

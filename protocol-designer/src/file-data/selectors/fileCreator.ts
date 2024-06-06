@@ -12,21 +12,16 @@ import {
   FLEX_STANDARD_DECKID,
   SPAN7_8_10_11_SLOT,
 } from '@opentrons/shared-data'
+
+import { COLUMN_4_SLOTS } from '@opentrons/step-generation'
 import { selectors as dismissSelectors } from '../../dismiss'
-import {
-  selectors as labwareDefSelectors,
-  LabwareDefByDefURI,
-} from '../../labware-defs'
+import { selectors as labwareDefSelectors } from '../../labware-defs'
 import { uuid } from '../../utils'
 import { selectors as ingredSelectors } from '../../labware-ingred/selectors'
 import { selectors as stepFormSelectors } from '../../step-forms'
 import { selectors as uiLabwareSelectors } from '../../ui/labware'
-import {
-  DesignerApplicationData,
-  getLoadLiquidCommands,
-} from '../../load-file/migration/utils/getLoadLiquidCommands'
+import { getLoadLiquidCommands } from '../../load-file/migration/utils/getLoadLiquidCommands'
 import { swatchColors } from '../../components/swatchColors'
-import { getAdditionalEquipmentEntities } from '../../step-forms/selectors'
 import {
   DEFAULT_MM_FROM_BOTTOM_ASPIRATE,
   DEFAULT_MM_FROM_BOTTOM_DISPENSE,
@@ -43,6 +38,8 @@ import type {
   RobotState,
 } from '@opentrons/step-generation'
 import type {
+  LabwareLocation,
+  AddressableAreaName,
   CommandAnnotationV1Mixin,
   CommandV8Mixin,
   CreateCommand,
@@ -57,10 +54,12 @@ import type {
   ProtocolBase,
   ProtocolFile,
 } from '@opentrons/shared-data'
+import type { LabwareDefByDefURI } from '../../labware-defs'
 import type { Selector } from '../../types'
+import type { DesignerApplicationData } from '../../load-file/migration/utils/getLoadLiquidCommands'
 
 // TODO: BC: 2018-02-21 uncomment this assert, causes test failures
-// assert(!isEmpty(process.env.OT_PD_VERSION), 'Could not find application version!')
+// console.assert(!isEmpty(process.env.OT_PD_VERSION), 'Could not find application version!')
 if (isEmpty(process.env.OT_PD_VERSION))
   console.warn('Could not find application version!')
 const applicationVersion: string = process.env.OT_PD_VERSION || ''
@@ -82,11 +81,12 @@ export const getLabwareDefinitionsInUse = (
   )
   const tiprackDefURIsInUse: string[] = Object.keys(pipettes)
     .map(id => pipettes[id])
-    .map((pipetteEntity: PipetteEntity) => pipetteEntity.tiprackDefURI)
+    .flatMap((pipetteEntity: PipetteEntity) => pipetteEntity.tiprackDefURI)
   const labwareDefURIsInUse = uniq([
     ...tiprackDefURIsInUse,
     ...labwareDefURIsOnDeck,
   ])
+
   return labwareDefURIsInUse.reduce<LabwareDefByDefURI>(
     (acc, labwareDefURI: string) => ({
       ...acc,
@@ -111,8 +111,6 @@ export const createFile: Selector<ProtocolFile> = createSelector(
   stepFormSelectors.getPipetteEntities,
   uiLabwareSelectors.getLabwareNicknamesById,
   labwareDefSelectors.getLabwareDefsByURI,
-  getAdditionalEquipmentEntities,
-
   (
     fileMetadata,
     initialRobotState,
@@ -127,8 +125,7 @@ export const createFile: Selector<ProtocolFile> = createSelector(
     moduleEntities,
     pipetteEntities,
     labwareNicknamesById,
-    labwareDefsByURI,
-    additionalEquipmentEntities
+    labwareDefsByURI
   ) => {
     const { author, description, created } = fileMetadata
     const name = fileMetadata.protocolName || 'untitled'
@@ -155,9 +152,8 @@ export const createFile: Selector<ProtocolFile> = createSelector(
         },
         pipetteTiprackAssignments: mapValues(
           pipetteEntities,
-          (
-            p: typeof pipetteEntities[keyof typeof pipetteEntities]
-          ): string | null | undefined => p.tiprackDefURI
+          (p: typeof pipetteEntities[keyof typeof pipetteEntities]): string[] =>
+            p.tiprackDefURI
         ),
         dismissedWarnings,
         ingredients,
@@ -265,7 +261,7 @@ export const createFile: Selector<ProtocolFile> = createSelector(
       ): LoadLabwareCreateCommand[] => {
         const { def } = labwareEntities[labwareId]
         const isAdapter = def.allowedRoles?.includes('adapter')
-        if (isAdapter) return acc
+        if (isAdapter || def.metadata.displayCategory === 'trash') return acc
         const isOnTopOfModule = labware.slot in initialRobotState.modules
         const isOnAdapter =
           loadAdapterCommands.find(
@@ -274,6 +270,22 @@ export const createFile: Selector<ProtocolFile> = createSelector(
         const namespace = def.namespace
         const loadName = def.parameters.loadName
         const version = def.version
+        const isAddressableAreaName = COLUMN_4_SLOTS.includes(labware.slot)
+
+        let location: LabwareLocation = { slotName: labware.slot }
+        if (isOnTopOfModule) {
+          location = { moduleId: labware.slot }
+        } else if (isOnAdapter) {
+          location = { labwareId: labware.slot }
+        } else if (isAddressableAreaName) {
+          // TODO(bh, 2024-01-02): check slots against addressable areas via the deck definition
+          location = {
+            addressableAreaName: labware.slot as AddressableAreaName,
+          }
+        } else if (labware.slot === 'offDeck') {
+          location = 'offDeck'
+        }
+
         const loadLabwareCommands = {
           key: uuid(),
           commandType: 'loadLabware' as const,
@@ -284,11 +296,7 @@ export const createFile: Selector<ProtocolFile> = createSelector(
             loadName,
             namespace: namespace,
             version: version,
-            location: isOnTopOfModule
-              ? { moduleId: labware.slot }
-              : isOnAdapter
-              ? { labwareId: labware.slot }
-              : { slotName: labware.slot },
+            location,
           },
         }
 

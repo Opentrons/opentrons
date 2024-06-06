@@ -1,18 +1,18 @@
 import * as React from 'react'
 import { Trans, useTranslation } from 'react-i18next'
-import { DIRECTION_COLUMN, Flex, TYPOGRAPHY } from '@opentrons/components'
 import {
-  CompletedProtocolAnalysis,
-  CreateCommand,
+  DIRECTION_COLUMN,
+  Flex,
+  StyledText,
+  TYPOGRAPHY,
+} from '@opentrons/components'
+
+import {
   getLabwareDisplayName,
   getModuleType,
   HEATERSHAKER_MODULE_TYPE,
-  MoveLabwareCreateCommand,
-  RobotType,
 } from '@opentrons/shared-data'
-import { StyledText } from '../../atoms/text'
 import { UnorderedList } from '../../molecules/UnorderedList'
-import { useChainRunCommands } from '../../resources/runs/hooks'
 import {
   getLabwareDef,
   getLabwareDefinitionsFromCommands,
@@ -23,7 +23,14 @@ import { PrepareSpace } from './PrepareSpace'
 import { useSelector } from 'react-redux'
 import { getIsOnDevice } from '../../redux/config'
 
+import type {
+  CompletedProtocolAnalysis,
+  CreateCommand,
+  RobotType,
+  MoveLabwareCreateCommand,
+} from '@opentrons/shared-data'
 import type { VectorOffset } from '@opentrons/api-client'
+import type { useChainRunCommands } from '../../resources/runs'
 import type { ReturnTipStep } from './types'
 
 interface ReturnTipProps extends ReturnTipStep {

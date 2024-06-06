@@ -1,21 +1,16 @@
 import last from 'lodash/last'
-import {
-  analyticsEvent,
-  AnalyticsEventAction,
-} from '../../../analytics/actions'
-import {
-  PRESAVED_STEP_ID,
-  TerminalItemId,
-  SubstepIdentifier,
-} from '../../../steplist/types'
+import { analyticsEvent } from '../../../analytics/actions'
+import { PRESAVED_STEP_ID } from '../../../steplist/types'
 import { selectors as stepFormSelectors } from '../../../step-forms'
 import { getMultiSelectLastSelected } from '../selectors'
 import { resetScrollElements } from '../utils'
-import { Timeline } from '@opentrons/step-generation'
-import { StepIdType, StepType } from '../../../form-types'
-import { GetState, ThunkAction, ThunkDispatch } from '../../../types'
-import { AnalyticsEvent } from '../../../analytics/mixpanel'
-import {
+import type { Timeline } from '@opentrons/step-generation'
+import type { StepIdType, StepType } from '../../../form-types'
+import type { GetState, ThunkAction, ThunkDispatch } from '../../../types'
+import type { AnalyticsEvent } from '../../../analytics/mixpanel'
+import type { AnalyticsEventAction } from '../../../analytics/actions'
+import type { TerminalItemId, SubstepIdentifier } from '../../../steplist/types'
+import type {
   AddStepAction,
   ExpandAddStepButtonAction,
   ToggleStepCollapsedAction,
@@ -151,7 +146,7 @@ export const selectAllSteps = (): ThunkAction<
     type: 'SELECT_MULTIPLE_STEPS',
     payload: {
       stepIds: allStepIds,
-      // @ts-expect-error(sa, 2021-6-15): find could return undefined, need to null check PipetteNameSpecs
+      // @ts-expect-error(sa, 2021-6-15): find could return undefined, need to null check PipetteSpecsV2
       lastSelected: last(allStepIds),
     },
   }

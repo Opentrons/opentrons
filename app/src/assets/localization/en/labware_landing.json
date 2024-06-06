@@ -22,8 +22,6 @@
   "labware": "labware",
   "last_updated": "Last updated",
   "open_labware_creator": "Open Labware Creator",
-  "opentrons_def": "Opentrons Definition",
-  "opentrons_labware_def": "Opentrons labware definition",
   "show_in_folder": "Show in folder",
   "unable_to_upload": "Unable to upload file",
   "yes_delete_def": "Yes, delete definition"

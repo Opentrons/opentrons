@@ -4,16 +4,13 @@
   "description": "Opentrons robot API client for Node.js and the browser",
   "version": "0.0.0-dev",
   "license": "Apache-2.0",
-  "main": "dist/api-client.js",
-  "module": "dist/api-client.mjs",
+  "main": "src/index.ts",
   "types": "lib/index.d.ts",
   "source": "src/index.ts",
-  "browser": {
-    "./dist/api-client.js": "./dist/api-client.browser.js",
-    "./dist/api-client.mjs": "./dist/api-client.browser.mjs"
-  },
   "dependencies": {
     "@opentrons/shared-data": "link:../shared-data",
-    "axios": "^0.21.1"
+    "@types/lodash": "^4.14.191",
+    "axios": "^0.21.1",
+    "lodash": "4.17.21"
   }
 }

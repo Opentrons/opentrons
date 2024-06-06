@@ -1,3 +1,5 @@
+import { describe, expect, it } from 'vitest'
+
 import type { Agent } from 'http'
 
 import {
@@ -5,7 +7,7 @@ import {
   mockLegacyServerHealthResponse,
   mockHealthErrorJsonResponse,
   mockHealthFetchErrorResponse,
-} from '../../__fixtures__/health'
+} from '../../fixtures/health'
 
 import {
   HEALTH_STATUS_OK,

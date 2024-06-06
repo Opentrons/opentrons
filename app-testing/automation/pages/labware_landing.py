@@ -1,4 +1,5 @@
 """Model for the Labware Landing page that displays labware info for the app."""
+
 from typing import Optional
 
 from rich.console import Console

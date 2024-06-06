@@ -1,34 +1,31 @@
 import * as React from 'react'
-import { resetAllWhenMocks } from 'jest-when'
-import { renderWithProviders } from '@opentrons/components'
+import { fireEvent, screen } from '@testing-library/react'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
+import { renderWithProviders } from '../../../__testing-utils__'
 import { i18n } from '../../../i18n'
 import { home } from '../../../redux/robot-controls'
 import { useLights } from '../../Devices/hooks'
 import { RestartRobotConfirmationModal } from '../RestartRobotConfirmationModal'
 import { NavigationMenu } from '../NavigationMenu'
 
-jest.mock('../../../redux/robot-admin')
-jest.mock('../../../redux/robot-controls')
-jest.mock('../../Devices/hooks')
-jest.mock('../RestartRobotConfirmationModal')
+import type { useHistory } from 'react-router-dom'
 
-const mockPush = jest.fn()
-jest.mock('react-router-dom', () => {
-  const reactRouterDom = jest.requireActual('react-router-dom')
+vi.mock('../../../redux/robot-admin')
+vi.mock('../../../redux/robot-controls')
+vi.mock('../../Devices/hooks')
+vi.mock('../RestartRobotConfirmationModal')
+
+const mockPush = vi.fn()
+vi.mock('react-router-dom', async importOriginal => {
+  const actual = await importOriginal<typeof useHistory>()
   return {
-    ...reactRouterDom,
+    ...actual,
     useHistory: () => ({ push: mockPush } as any),
   }
 })
 
-const mockUseLights = useLights as jest.MockedFunction<typeof useLights>
-const mockHome = home as jest.MockedFunction<typeof home>
-const mockToggleLights = jest.fn()
-
-const mockRestartRobotConfirmationModal = RestartRobotConfirmationModal as jest.MockedFunction<
-  typeof RestartRobotConfirmationModal
->
+const mockToggleLights = vi.fn()
 
 const render = (props: React.ComponentProps<typeof NavigationMenu>) => {
   return renderWithProviders(<NavigationMenu {...props} />, {
@@ -40,66 +37,66 @@ describe('NavigationMenu', () => {
   let props: React.ComponentProps<typeof NavigationMenu>
   beforeEach(() => {
     props = {
-      onClick: jest.fn(),
+      onClick: vi.fn(),
       robotName: 'otie',
-      setShowNavMenu: jest.fn(),
+      setShowNavMenu: vi.fn(),
     }
-    mockUseLights.mockReturnValue({
+    vi.mocked(useLights).mockReturnValue({
       lightsOn: false,
       toggleLights: mockToggleLights,
     })
-    mockRestartRobotConfirmationModal.mockReturnValue(
+    vi.mocked(RestartRobotConfirmationModal).mockReturnValue(
       <div>mock RestartRobotConfirmationModal</div>
     )
   })
 
   afterEach(() => {
-    resetAllWhenMocks()
+    vi.resetAllMocks()
   })
   it('should render the home menu item and clicking home gantry, dispatches home and call a mock function', () => {
-    const { getByText, getByLabelText } = render(props)
-    getByLabelText('BackgroundOverlay_ModalShell').click()
+    render(props)
+    fireEvent.click(screen.getByLabelText('BackgroundOverlay_ModalShell'))
     expect(props.onClick).toHaveBeenCalled()
-    getByLabelText('reset-position_icon')
-    getByText('Home gantry').click()
-    expect(mockHome).toHaveBeenCalled()
+    screen.getByLabelText('reset-position_icon')
+    fireEvent.click(screen.getByText('Home gantry'))
+    expect(vi.mocked(home)).toHaveBeenCalled()
     expect(props.setShowNavMenu).toHaveBeenCalled()
   })
 
   it('should render the restart robot menu item and clicking it, dispatches restart robot', () => {
-    const { getByText, getByLabelText } = render(props)
-    const restart = getByText('Restart robot')
-    getByLabelText('restart_icon')
-    restart.click()
-    getByText('mock RestartRobotConfirmationModal')
+    render(props)
+    const restart = screen.getByText('Restart robot')
+    screen.getByLabelText('restart_icon')
+    fireEvent.click(restart)
+    screen.getByText('mock RestartRobotConfirmationModal')
   })
 
   it('should render the lights menu item with lights off and clicking it, calls useLights', () => {
-    const { getByText, getByLabelText } = render(props)
-    const lights = getByText('Lights on')
-    getByLabelText('light_icon')
-    lights.click()
+    render(props)
+    const lights = screen.getByText('Lights on')
+    screen.getByLabelText('light_icon')
+    fireEvent.click(lights)
     expect(mockToggleLights).toHaveBeenCalled()
   })
 
   it('should render the lights menu item with lights on', () => {
-    mockUseLights.mockReturnValue({
+    vi.mocked(useLights).mockReturnValue({
       lightsOn: true,
       toggleLights: mockToggleLights,
     })
-    const { getByText } = render(props)
-    getByText('Lights off')
+    render(props)
+    screen.getByText('Lights off')
   })
 
   it('should render the deck configuration menu item', () => {
-    const { getByText, getByLabelText } = render(props)
-    getByText('Deck configuration')
-    getByLabelText('deck-map_icon')
+    render(props)
+    screen.getByText('Deck configuration')
+    screen.getByLabelText('deck-map_icon')
   })
 
   it('should call a mock function when tapping deck configuration', () => {
-    const { getByText } = render(props)
-    getByText('Deck configuration').click()
+    render(props)
+    fireEvent.click(screen.getByText('Deck configuration'))
     expect(mockPush).toHaveBeenCalledWith('/deck-configuration')
   })
 })

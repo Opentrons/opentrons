@@ -4,7 +4,7 @@ import omit from 'lodash/omit'
 
 import { AlertModal } from '@opentrons/components'
 import { BottomButtonBar } from './BottomButtonBar'
-import styles from './styles.css'
+import styles from './styles.module.css'
 
 type Props = React.ComponentProps<typeof AlertModal>
 

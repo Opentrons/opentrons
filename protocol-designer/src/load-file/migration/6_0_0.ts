@@ -3,11 +3,7 @@ import mapKeys from 'lodash/mapKeys'
 import mapValues from 'lodash/mapValues'
 import omit from 'lodash/omit'
 import reduce from 'lodash/reduce'
-import {
-  OT2_STANDARD_DECKID,
-  OT2_STANDARD_MODEL,
-  ProtocolFileV5,
-} from '@opentrons/shared-data'
+import { OT2_STANDARD_DECKID, OT2_STANDARD_MODEL } from '@opentrons/shared-data'
 import { uuid } from '../../utils'
 import { FIXED_TRASH_ID, INITIAL_DECK_SETUP_STEP_ID } from '../../constants'
 // NOTE: this migration bump adds load commands (loadLiquid, loadModule, loadPipette, loadLabware), modifies both pipette
@@ -15,6 +11,7 @@ import { FIXED_TRASH_ID, INITIAL_DECK_SETUP_STEP_ID } from '../../constants'
 //  and module keys such as slot, mount
 //  and renames well to wellName
 import { getLoadLiquidCommands } from './utils/getLoadLiquidCommands'
+import type { ProtocolFileV5 } from '@opentrons/shared-data'
 import type {
   LoadPipetteCreateCommand,
   LoadModuleCreateCommand,

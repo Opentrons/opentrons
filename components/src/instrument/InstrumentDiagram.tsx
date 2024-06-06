@@ -1,22 +1,22 @@
 import * as React from 'react'
-import { FlattenSimpleInterpolation } from 'styled-components'
 import { Flex } from '../primitives'
 import { ALIGN_CENTER, JUSTIFY_CENTER } from '../styles'
-import singleSrc from '@opentrons/components/src/instrument/single_channel_GEN1_800px.png'
-import multiSrc from '@opentrons/components/src/instrument/multi-channel_GEN1_800px.png'
-import singleGEN2Src from '@opentrons/components/src/instrument/single-channel_GEN2_800px.png'
-import multiGEN2Src from '@opentrons/components/src/instrument/multi-channel_GEN2_800px.png'
-import singleFlexSrc from '@opentrons/components/src/instrument/single-channel-flex.png'
-import eightChannelFlexSrc from '@opentrons/components/src/instrument/eight-channel-flex.png'
-import ninetySixSrc from '@opentrons/components/src/instrument/ninety-six-channel-gen1.png'
+import singleSrc from './single_channel_GEN1_800px.png'
+import multiSrc from './multi-channel_GEN1_800px.png'
+import singleGEN2Src from './single-channel_GEN2_800px.png'
+import multiGEN2Src from './multi-channel_GEN2_800px.png'
+import singleFlexSrc from './single-channel-flex.png'
+import eightChannelFlexSrc from './eight-channel-flex.png'
+import ninetySixSrc from './ninety-six-channel-gen1.png'
 
-import type { PipetteNameSpecs } from '@opentrons/shared-data'
+import type { FlattenSimpleInterpolation } from 'styled-components'
+import type { PipetteV2Specs } from '@opentrons/shared-data'
 import type { Mount } from '../robot-types'
 import type { StyleProps } from '..'
 
 export interface InstrumentDiagramProps extends StyleProps {
   mount: Mount
-  pipetteSpecs?: Pick<PipetteNameSpecs, 'displayCategory' | 'channels'> | null
+  pipetteSpecs?: Pick<PipetteV2Specs, 'displayCategory' | 'channels'> | null
   className?: string
   imageStyle?: FlattenSimpleInterpolation
 }

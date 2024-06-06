@@ -12,28 +12,29 @@ import {
   POSITION_FIXED,
   RESPONSIVENESS,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { ODD_FOCUS_VISIBLE } from '../../atoms/buttons/constants'
 
 import { SmallButton } from '../../atoms/buttons'
 import { InlineNotification } from '../../atoms/InlineNotification'
-import { StyledText } from '../../atoms/text'
 
-import type { IconName } from '@opentrons/components'
+import type { IconName, StyleProps } from '@opentrons/components'
 import type { InlineNotificationProps } from '../../atoms/InlineNotification'
 import type {
   IconPlacement,
   SmallButtonTypes,
 } from '../../atoms/buttons/SmallButton'
 
-interface ChildNavigationProps {
+interface ChildNavigationProps extends StyleProps {
   header: string
-  onClickBack: React.MouseEventHandler
+  onClickBack?: React.MouseEventHandler
   buttonText?: React.ReactNode
   inlineNotification?: InlineNotificationProps
   onClickButton?: React.MouseEventHandler
   buttonType?: SmallButtonTypes
+  buttonIsDisabled?: boolean
   iconName?: IconName
   iconPlacement?: IconPlacement
   secondaryButtonProps?: React.ComponentProps<typeof SmallButton>
@@ -49,6 +50,8 @@ export function ChildNavigation({
   iconName,
   iconPlacement,
   secondaryButtonProps,
+  buttonIsDisabled,
+  ...styleProps
 }: ChildNavigationProps): JSX.Element {
   return (
     <Flex
@@ -62,14 +65,17 @@ export function ChildNavigation({
       left="0"
       width="100%"
       backgroundColor={COLORS.white}
+      {...styleProps}
     >
       <Flex gridGap={SPACING.spacing16} justifyContent={JUSTIFY_FLEX_START}>
-        <IconButton
-          onClick={onClickBack}
-          data-testid="ChildNavigation_Back_Button"
-        >
-          <Icon name="back" size="3rem" color={COLORS.darkBlack100} />
-        </IconButton>
+        {onClickBack != null ? (
+          <IconButton
+            onClick={onClickBack}
+            data-testid="ChildNavigation_Back_Button"
+          >
+            <Icon name="back" size="3rem" color={COLORS.black90} />
+          </IconButton>
+        ) : null}
         <StyledText as="h2" fontWeight={TYPOGRAPHY.fontWeightBold}>
           {header}
         </StyledText>
@@ -77,7 +83,10 @@ export function ChildNavigation({
       {onClickButton != null && buttonText != null ? (
         <Flex flexDirection={DIRECTION_ROW} gridGap={SPACING.spacing8}>
           {secondaryButtonProps != null ? (
-            <SmallButton {...secondaryButtonProps} />
+            <SmallButton
+              data-testid="ChildNavigation_Secondary_Button"
+              {...secondaryButtonProps}
+            />
           ) : null}
 
           <SmallButton
@@ -87,6 +96,8 @@ export function ChildNavigation({
             onClick={onClickButton}
             iconName={iconName}
             iconPlacement={iconPlacement}
+            disabled={buttonIsDisabled}
+            data-testid="ChildNavigation_Primary_Button"
           />
         </Flex>
       ) : null}
@@ -108,7 +119,7 @@ const IconButton = styled('button')`
 
   &:focus-visible {
     box-shadow: ${ODD_FOCUS_VISIBLE};
-    background-color: ${COLORS.darkBlack20};
+    background-color: ${COLORS.grey35};
   }
   &:disabled {
     background-color: transparent;

@@ -1,9 +1,9 @@
 import pytest
-from pytest_lazyfixture import lazy_fixture  # type: ignore[import]
-from typing import Any, Dict, Generator, Optional, Tuple
+from pytest_lazyfixture import lazy_fixture  # type: ignore[import-untyped]
+from typing import Dict, Generator, Optional
 from unittest.mock import MagicMock, patch
 
-from opentrons.config import advanced_settings, ARCHITECTURE, CONFIG
+from opentrons.config import advanced_settings, CONFIG
 from opentrons_shared_data.robot.dev_types import RobotTypeEnum
 
 
@@ -35,6 +35,15 @@ def mock_settings_values_flex() -> Dict[str, Optional[bool]]:
 
 
 @pytest.fixture
+def mock_settings_values_flex_all() -> Dict[str, Optional[bool]]:
+    return {
+        s.id: False
+        for s in advanced_settings.settings
+        if RobotTypeEnum.FLEX in s.robot_type
+    }
+
+
+@pytest.fixture
 def mock_settings_values_empty() -> Dict[str, Optional[bool]]:
     return {s.id: None for s in advanced_settings.settings}
 
@@ -57,12 +66,12 @@ def mock_settings(
 
 @pytest.fixture
 def mock_read_settings_file_ot2(
-    mock_settings_values_ot2: Dict[str, Optional[bool]],
+    mock_settings_values_ot2_all: Dict[str, Optional[bool]],
     mock_settings_version: int,
 ) -> Generator[MagicMock, None, None]:
     with patch("opentrons.config.advanced_settings._read_settings_file") as p:
         p.return_value = advanced_settings.SettingsData(
-            settings_map=mock_settings_values_ot2,
+            settings_map=mock_settings_values_ot2_all,
             version=mock_settings_version,
         )
         yield p
@@ -70,12 +79,12 @@ def mock_read_settings_file_ot2(
 
 @pytest.fixture
 def mock_read_settings_file_flex(
-    mock_settings_values_flex: Dict[str, Optional[bool]],
+    mock_settings_values_flex_all: Dict[str, Optional[bool]],
     mock_settings_version: int,
 ) -> Generator[MagicMock, None, None]:
     with patch("opentrons.config.advanced_settings._read_settings_file") as p:
         p.return_value = advanced_settings.SettingsData(
-            settings_map=mock_settings_values_flex,
+            settings_map=mock_settings_values_flex_all,
             version=mock_settings_version,
         )
         yield p
@@ -168,19 +177,19 @@ def test_get_all_adv_settings_empty(
 
 async def test_set_adv_setting(
     mock_read_settings_file_ot2: MagicMock,
-    mock_settings_values_ot2: MagicMock,
+    mock_settings_values_ot2_all: MagicMock,
     mock_write_settings_file: MagicMock,
     mock_settings_version: int,
     restore_restart_required: None,
 ) -> None:
-    for k, v in mock_settings_values_ot2.items():
+    for k, v in mock_settings_values_ot2_all.items():
         # Toggle the advanced setting
         await advanced_settings.set_adv_setting(k, not v)
         mock_write_settings_file.assert_called_with(
             # Only the current key is toggled
             {
                 nk: nv if nk != k else not v
-                for nk, nv in mock_settings_values_ot2.items()
+                for nk, nv in mock_settings_values_ot2_all.items()
             },
             mock_settings_version,
             CONFIG["feature_flags_file"],
@@ -251,47 +260,6 @@ async def test_restart_required(
             assert advanced_settings.is_restart_required() is False
             await advanced_settings.set_adv_setting(_id, True)
             assert advanced_settings.is_restart_required() is True
-
-
-@pytest.mark.parametrize(
-    argnames=["v", "expected_level"],
-    argvalues=[
-        [True, "emerg"],
-        [False, "info"],
-    ],
-)
-async def test_disable_log_integration_side_effect(
-    v: bool, expected_level: str
-) -> None:
-    with patch("opentrons.config.advanced_settings.log_control") as mock_log_control:
-
-        async def set_syslog_level(level: Any) -> Tuple[int, str, str]:
-            return 0, "", ""
-
-        mock_log_control.set_syslog_level.side_effect = set_syslog_level
-        with patch(
-            "opentrons.config.advanced_settings.ARCHITECTURE",
-            new=ARCHITECTURE.BUILDROOT,
-        ):
-            s = advanced_settings.DisableLogIntegrationSettingDefinition()
-            await s.on_change(v)
-            mock_log_control.set_syslog_level.assert_called_once_with(expected_level)
-
-
-async def test_disable_log_integration_side_effect_error() -> None:
-    with patch("opentrons.config.advanced_settings.log_control") as mock_log_control:
-
-        async def set_syslog_level(level: Any) -> Tuple[int, str, str]:
-            return 1, "", ""
-
-        mock_log_control.set_syslog_level.side_effect = set_syslog_level
-        with patch(
-            "opentrons.config.advanced_settings.ARCHITECTURE",
-            new=ARCHITECTURE.BUILDROOT,
-        ):
-            s = advanced_settings.DisableLogIntegrationSettingDefinition()
-            with pytest.raises(advanced_settings.SettingException):
-                await s.on_change(True)
 
 
 def test_per_robot_true_defaults(mock_read_settings_file_empty: MagicMock) -> None:

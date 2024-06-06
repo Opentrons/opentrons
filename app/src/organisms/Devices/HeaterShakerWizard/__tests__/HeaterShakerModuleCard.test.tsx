@@ -1,15 +1,14 @@
 import * as React from 'react'
-import { renderWithProviders } from '@opentrons/components'
+import { screen } from '@testing-library/react'
+import { describe, it, vi, beforeEach } from 'vitest'
+import '@testing-library/jest-dom/vitest'
+import { renderWithProviders } from '../../../../__testing-utils__'
 import { i18n } from '../../../../i18n'
 import { HeaterShakerModuleCard } from '../HeaterShakerModuleCard'
 import { HeaterShakerModuleData } from '../../../ModuleCard/HeaterShakerModuleData'
 import { mockHeaterShaker } from '../../../../redux/modules/__fixtures__'
 
-jest.mock('../../../ModuleCard/HeaterShakerModuleData')
-
-const mockHeaterShakerModuleData = HeaterShakerModuleData as jest.MockedFunction<
-  typeof HeaterShakerModuleData
->
+vi.mock('../../../ModuleCard/HeaterShakerModuleData')
 
 const render = (props: React.ComponentProps<typeof HeaterShakerModuleCard>) => {
   return renderWithProviders(<HeaterShakerModuleCard {...props} />, {
@@ -23,17 +22,17 @@ describe('HeaterShakerModuleCard', () => {
     props = {
       module: mockHeaterShaker,
     }
-    mockHeaterShakerModuleData.mockReturnValue(
+    vi.mocked(HeaterShakerModuleData).mockReturnValue(
       <div>mock heater shaker module data</div>
     )
   })
 
   it('renders the correct info', () => {
-    const { getByText, getByAltText, getByLabelText } = render(props)
-    getByText('usb-1')
-    getByText('Heater-Shaker Module GEN1')
-    getByText('mock heater shaker module data')
-    getByAltText('Heater-Shaker')
-    getByLabelText('heater-shaker')
+    render(props)
+    screen.getByText('usb-1')
+    screen.getByText('Heater-Shaker Module GEN1')
+    screen.getByText('mock heater shaker module data')
+    screen.getByAltText('Heater-Shaker')
+    screen.getByLabelText('heater-shaker')
   })
 })

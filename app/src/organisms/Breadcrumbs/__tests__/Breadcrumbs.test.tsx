@@ -1,8 +1,9 @@
 import * as React from 'react'
 import { MemoryRouter, Route, Switch } from 'react-router-dom'
-import { when } from 'jest-when'
+import { when } from 'vitest-when'
+import { describe, it, expect, beforeEach, vi } from 'vitest'
 
-import { renderWithProviders } from '@opentrons/components'
+import { fireEvent, screen } from '@testing-library/react'
 
 import { i18n } from '../../../i18n'
 import {
@@ -11,6 +12,7 @@ import {
 } from '../../../organisms/Devices/hooks'
 import { getProtocolDisplayName } from '../../../organisms/ProtocolsLanding/utils'
 import { getIsOnDevice } from '../../../redux/config'
+import { renderWithProviders } from '../../../__testing-utils__'
 import { mockConnectableRobot } from '../../../redux/discovery/__fixtures__'
 import { getStoredProtocol } from '../../../redux/protocol-storage'
 import { storedProtocolData as storedProtocolDataFixture } from '../../../redux/protocol-storage/__fixtures__'
@@ -18,24 +20,10 @@ import { Breadcrumbs } from '..'
 
 import type { State } from '../../../redux/types'
 
-jest.mock('../../../organisms/Devices/hooks')
-jest.mock('../../../organisms/ProtocolsLanding/utils')
-jest.mock('../../../redux/config')
-jest.mock('../../../redux/protocol-storage')
-
-const mockUseRobot = useRobot as jest.MockedFunction<typeof useRobot>
-const mockUseRunCreatedAtTimestamp = useRunCreatedAtTimestamp as jest.MockedFunction<
-  typeof useRunCreatedAtTimestamp
->
-const mockGetStoredProtocol = getStoredProtocol as jest.MockedFunction<
-  typeof getStoredProtocol
->
-const mockGetIsOnDevice = getIsOnDevice as jest.MockedFunction<
-  typeof getIsOnDevice
->
-const mockGetProtocolDisplayName = getProtocolDisplayName as jest.MockedFunction<
-  typeof getProtocolDisplayName
->
+vi.mock('../../../organisms/Devices/hooks')
+vi.mock('../../../organisms/ProtocolsLanding/utils')
+vi.mock('../../../redux/config')
+vi.mock('../../../redux/protocol-storage')
 
 const ROBOT_NAME = 'otie'
 const RUN_ID = '95e67900-bc9f-4fbf-92c6-cc4d7226a51b'
@@ -69,64 +57,50 @@ const render = (path = '/') => {
 
 describe('Breadcrumbs', () => {
   beforeEach(() => {
-    when(mockUseRobot)
-      .calledWith(ROBOT_NAME)
-      .mockReturnValue(mockConnectableRobot)
-    when(mockUseRunCreatedAtTimestamp)
-      .calledWith(RUN_ID)
-      .mockReturnValue(CREATED_AT)
-    when(mockGetStoredProtocol)
+    when(useRobot).calledWith(ROBOT_NAME).thenReturn(mockConnectableRobot)
+    when(useRunCreatedAtTimestamp).calledWith(RUN_ID).thenReturn(CREATED_AT)
+    when(getStoredProtocol)
       .calledWith({} as State, PROTOCOL_KEY)
-      .mockReturnValue(storedProtocolDataFixture)
-    when(mockGetIsOnDevice)
+      .thenReturn(storedProtocolDataFixture)
+    when(getIsOnDevice)
       .calledWith({} as State)
-      .mockReturnValue(false)
-    when(mockGetProtocolDisplayName)
+      .thenReturn(false)
+    when(getProtocolDisplayName)
       .calledWith(
         storedProtocolDataFixture.protocolKey,
         storedProtocolDataFixture.srcFileNames,
         storedProtocolDataFixture.mostRecentAnalysis
       )
-      .mockReturnValue(PROTOCOL_NAME)
+      .thenReturn(PROTOCOL_NAME)
   })
   it('renders an array of device breadcrumbs', () => {
-    const [{ getByText }] = render(
-      `/devices/${ROBOT_NAME}/protocol-runs/${RUN_ID}`
-    )
-
-    getByText('Devices')
-    getByText('otie')
-    getByText(CREATED_AT)
+    render(`/devices/${ROBOT_NAME}/protocol-runs/${RUN_ID}`)
+    screen.getByText('Devices')
+    screen.getByText('otie')
+    screen.getByText(CREATED_AT)
   })
 
   it('renders an array of protocol breadcrumbs', () => {
-    const [{ getByText }] = render(`/protocols/${PROTOCOL_KEY}`)
-
-    getByText('Protocols')
-    getByText(PROTOCOL_NAME)
+    render(`/protocols/${PROTOCOL_KEY}`)
+    screen.getByText('Protocols')
+    screen.getByText(PROTOCOL_NAME)
   })
 
   it('does not render devices breadcrumb when in on device mode', () => {
-    when(mockGetIsOnDevice)
+    when(getIsOnDevice)
       .calledWith({} as State)
-      .mockReturnValue(true)
-    const [{ getByText, queryByText }] = render(
-      `/devices/${ROBOT_NAME}/protocol-runs/${RUN_ID}`
-    )
-
-    expect(queryByText('Devices')).toBeNull()
-    getByText('otie')
-    getByText(CREATED_AT)
+      .thenReturn(true)
+    render(`/devices/${ROBOT_NAME}/protocol-runs/${RUN_ID}`)
+    expect(screen.queryByText('Devices')).toBeNull()
+    screen.getByText('otie')
+    screen.getByText(CREATED_AT)
   })
 
   it('goes to the correct path when an inactive breadcrumb is clicked', () => {
-    const [{ getByText }] = render(
-      `/devices/${ROBOT_NAME}/protocol-runs/${RUN_ID}`
-    )
-
-    getByText('protocol run details path matched')
-    const otieBreadcrumb = getByText('otie')
-    otieBreadcrumb.click()
-    getByText('device details path matched')
+    render(`/devices/${ROBOT_NAME}/protocol-runs/${RUN_ID}`)
+    screen.getByText('protocol run details path matched')
+    const otieBreadcrumb = screen.getByText('otie')
+    fireEvent.click(otieBreadcrumb)
+    screen.getByText('device details path matched')
   })
 })

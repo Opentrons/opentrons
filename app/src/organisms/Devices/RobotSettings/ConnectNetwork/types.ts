@@ -1,12 +1,11 @@
-import type { FormikErrors } from 'formik'
-
+import type { FieldError } from 'react-hook-form'
 import type {
   WifiNetwork,
   EapOption,
   WifiKey,
 } from '../../../../redux/networking/types'
 
-import {
+import type {
   CONNECT,
   DISCONNECT,
   JOIN_OTHER,
@@ -46,7 +45,7 @@ export type ConnectFormValues = Partial<{
   }
 }>
 
-export type ConnectFormErrors = Partial<FormikErrors<ConnectFormValues>>
+export type ConnectFormErrors = ConnectFormValues & FieldError
 
 interface ConnectFormFieldCommon {
   name: string

@@ -1,5 +1,7 @@
 import * as React from 'react'
-import { renderWithProviders } from '@opentrons/components'
+import { describe, it, expect, vi, beforeEach } from 'vitest'
+import { fireEvent, screen } from '@testing-library/react'
+import { renderWithProviders } from '../../../__testing-utils__'
 import { MenuList } from '..'
 
 const render = (props: React.ComponentProps<typeof MenuList>) => {
@@ -17,17 +19,17 @@ describe('MenuList', () => {
   })
 
   it('renders a child not on device', () => {
-    const { getByText } = render(props)
-    getByText('mockBtn')
+    render(props)
+    screen.getByText('mockBtn')
   })
   it('renders isOnDevice child, clicking background overlay calls onClick', () => {
     props = {
       ...props,
       isOnDevice: true,
-      onClick: jest.fn(),
+      onClick: vi.fn(),
     }
-    const { getByLabelText } = render(props)
-    getByLabelText('BackgroundOverlay_ModalShell').click()
+    render(props)
+    fireEvent.click(screen.getByLabelText('BackgroundOverlay_ModalShell'))
     expect(props.onClick).toHaveBeenCalled()
   })
 })

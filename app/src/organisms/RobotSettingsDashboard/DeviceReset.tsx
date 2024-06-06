@@ -4,17 +4,17 @@ import { useTranslation } from 'react-i18next'
 import styled from 'styled-components'
 
 import {
-  Flex,
-  DIRECTION_COLUMN,
-  TYPOGRAPHY,
-  COLORS,
-  SPACING,
   BORDERS,
-  useConditionalConfirm,
+  COLORS,
+  DIRECTION_COLUMN,
   DIRECTION_ROW,
+  Flex,
+  SPACING,
+  StyledText,
+  TYPOGRAPHY,
+  useConditionalConfirm,
 } from '@opentrons/components'
 
-import { StyledText } from '../../atoms/text'
 import { MediumButton, SmallButton } from '../../atoms/buttons'
 import { Modal } from '../../molecules/Modal'
 import { ChildNavigation } from '../../organisms/ChildNavigation'
@@ -27,7 +27,7 @@ import { useDispatchApiRequest } from '../../redux/robot-api'
 
 import type { Dispatch, State } from '../../redux/types'
 import type { ResetConfigRequest } from '../../redux/robot-admin/types'
-import type { SetSettingOption } from '../../pages/OnDeviceDisplay/RobotSettingsDashboard'
+import type { SetSettingOption } from '../../pages/RobotSettingsDashboard'
 import type { ModalHeaderBaseProps } from '../../molecules/Modal/types'
 
 interface LabelProps {
@@ -40,11 +40,11 @@ const OptionButton = styled.input`
 
 const OptionLabel = styled.label<LabelProps>`
   padding: ${SPACING.spacing16} ${SPACING.spacing24};
-  border-radius: ${BORDERS.borderRadiusSize4};
+  border-radius: ${BORDERS.borderRadius16};
   color: ${({ isSelected }) =>
-    isSelected === true ? COLORS.white : COLORS.darkBlack100};
+    isSelected === true ? COLORS.white : COLORS.black90};
   background: ${({ isSelected }) =>
-    isSelected === true ? COLORS.blueEnabled : COLORS.mediumBlueEnabled};
+    isSelected === true ? COLORS.blue50 : COLORS.blue35};
 `
 
 interface DeviceResetProps {
@@ -73,7 +73,10 @@ export function DeviceReset({
   const availableOptions = options
     // filtering out ODD setting because this gets implicitly cleared if all settings are selected
     // filtering out boot scripts since product doesn't want this exposed to ODD users
-    .filter(({ id }) => !['onDeviceDisplay', 'bootScripts'].includes(id))
+    .filter(
+      ({ id }) =>
+        !['onDeviceDisplay', 'bootScripts', 'deckConfiguration'].includes(id)
+    )
     .sort(
       (a, b) =>
         targetOptionsOrder.indexOf(a.id) - targetOptionsOrder.indexOf(b.id)
@@ -145,12 +148,15 @@ export function DeviceReset({
   React.useEffect(() => {
     if (
       isEveryOptionSelected(resetOptions) &&
-      (!resetOptions.authorizedKeys || !resetOptions.onDeviceDisplay)
+      (!resetOptions.authorizedKeys ||
+        !resetOptions.onDeviceDisplay ||
+        !resetOptions.deckConfiguration)
     ) {
       setResetOptions({
         ...resetOptions,
         authorizedKeys: true,
         onDeviceDisplay: true,
+        deckConfiguration: true,
       })
     }
   }, [resetOptions])
@@ -159,12 +165,14 @@ export function DeviceReset({
     if (
       !isEveryOptionSelected(resetOptions) &&
       resetOptions.authorizedKeys &&
-      resetOptions.onDeviceDisplay
+      resetOptions.onDeviceDisplay &&
+      resetOptions.deckConfiguration
     ) {
       setResetOptions({
         ...resetOptions,
         authorizedKeys: false,
         onDeviceDisplay: false,
+        deckConfiguration: false,
       })
     }
   }, [resetOptions])
@@ -183,7 +191,9 @@ export function DeviceReset({
           heading: t('device_resets_cannot_be_undone'),
           type: 'alert',
         }}
-        onClickBack={() => setCurrentOption(null)}
+        onClickBack={() => {
+          setCurrentOption(null)
+        }}
       />
       <Flex
         gridGap={SPACING.spacing24}
@@ -200,12 +210,12 @@ export function DeviceReset({
                   id={option.id}
                   type="checkbox"
                   value={option.id}
-                  onChange={() =>
+                  onChange={() => {
                     setResetOptions({
                       ...resetOptions,
                       [option.id]: !(resetOptions[option.id] ?? false),
                     })
-                  }
+                  }}
                 />
                 <OptionLabel
                   htmlFor={option.id}
@@ -224,7 +234,7 @@ export function DeviceReset({
                         color={
                           resetOptions[option.id] ?? false
                             ? COLORS.white
-                            : COLORS.darkBlack70
+                            : COLORS.grey60
                         }
                       >
                         {subText}
@@ -276,7 +286,7 @@ export function DeviceReset({
                     (resetOptions.onDeviceDisplay ?? false)) ||
                   isEveryOptionSelected(resetOptions)
                     ? COLORS.white
-                    : COLORS.darkBlack70
+                    : COLORS.grey60
                 }
               >
                 {t('clear_all_stored_data_description')}
@@ -317,7 +327,7 @@ export const ConfirmClearDataModal = ({
     title: t('confirm_device_reset_heading'),
     hasExitIcon: false,
     iconName: 'ot-alert',
-    iconColor: COLORS.yellow2,
+    iconColor: COLORS.yellow50,
   }
   return (
     <Modal

@@ -1,5 +1,4 @@
 import { useEffect, useRef } from 'react'
-import assert from 'assert'
 
 import type { RefObject } from 'react'
 
@@ -17,7 +16,7 @@ export const useOnClickOutside = <E extends Element>(
     const handleClickOutside = (event: MouseEvent): void => {
       const clickedElem = event.target
 
-      assert(
+      console.assert(
         clickedElem instanceof Node,
         'expected clicked element to be Node - something went wrong in onClickOutside hook'
       )

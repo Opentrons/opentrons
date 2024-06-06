@@ -1,6 +1,6 @@
-import { when, resetAllWhenMocks } from 'jest-when'
+import { describe, it, vi, beforeEach } from 'vitest'
+import { when } from 'vitest-when'
 
-import { useDeckConfigurationQuery } from '@opentrons/react-api-client'
 import {
   SINGLE_LEFT_SLOT_FIXTURE,
   SINGLE_RIGHT_SLOT_FIXTURE,
@@ -9,14 +9,12 @@ import {
   WASTE_CHUTE_RIGHT_ADAPTER_COVERED_FIXTURE,
 } from '@opentrons/shared-data'
 
+import { useNotifyDeckConfigurationQuery } from '../useNotifyDeckConfigurationQuery'
+
 import type { UseQueryResult } from 'react-query'
 import type { DeckConfiguration } from '@opentrons/shared-data'
 
-jest.mock('@opentrons/react-api-client')
-
-const mockUseDeckConfigurationQuery = useDeckConfigurationQuery as jest.MockedFunction<
-  typeof useDeckConfigurationQuery
->
+vi.mock('../useNotifyDeckConfigurationQuery')
 
 const MOCK_DECK_CONFIG: DeckConfiguration = [
   {
@@ -55,13 +53,12 @@ const MOCK_DECK_CONFIG: DeckConfiguration = [
 
 describe('useDeckConfigurationCompatibility', () => {
   beforeEach(() => {
-    when(mockUseDeckConfigurationQuery)
+    when(useNotifyDeckConfigurationQuery)
       .calledWith()
-      .mockReturnValue({
+      .thenReturn({
         data: MOCK_DECK_CONFIG,
       } as UseQueryResult<DeckConfiguration>)
   })
-  afterEach(() => resetAllWhenMocks())
 
   it('returns configured status if fixture is configured at location', () => {})
 })

@@ -1,23 +1,36 @@
+import {
+  ALL,
+  COLUMN,
+  FLEX_ROBOT_TYPE,
+  OT2_ROBOT_TYPE,
+} from '@opentrons/shared-data'
 import { getNextTiprack } from '../../robotStateSelectors'
 import * as errorCreators from '../../errorCreators'
 import { COLUMN_4_SLOTS } from '../../constants'
-import { dropTip } from './dropTip'
+import { movableTrashCommandsUtil } from '../../utils/movableTrashCommandsUtil'
 import {
   curryCommandCreator,
-  getLabwareSlot,
-  reduceCommandCreators,
-  modulePipetteCollision,
-  uuid,
-  pipetteAdjacentHeaterShakerWhileShaking,
-  getIsHeaterShakerEastWestWithLatchOpen,
   getIsHeaterShakerEastWestMultiChannelPipette,
+  getIsHeaterShakerEastWestWithLatchOpen,
+  getIsSafePipetteMovement,
+  getLabwareSlot,
+  modulePipetteCollision,
+  pipetteAdjacentHeaterShakerWhileShaking,
+  reduceCommandCreators,
+  uuid,
   wasteChuteCommandsUtil,
+  getWasteChuteAddressableAreaNamePip,
 } from '../../utils'
+import { dropTip } from './dropTip'
+import { configureNozzleLayout } from './configureNozzleLayout'
+
+import type { NozzleConfigurationStyle } from '@opentrons/shared-data'
 import type {
+  CommandCreator,
   CommandCreatorError,
   CurriedCommandCreator,
-  CommandCreator,
 } from '../../types'
+
 interface PickUpTipArgs {
   pipette: string
   tiprack: string
@@ -31,18 +44,17 @@ const _pickUpTip: CommandCreator<PickUpTipArgs> = (
 ) => {
   const errors: CommandCreatorError[] = []
   const tiprackSlot = prevRobotState.labware[args.tiprack].slot
-  const pipetteName = invariantContext.pipetteEntities[args.pipette].name
-  const adapterId =
-    invariantContext.labwareEntities[tiprackSlot] != null
-      ? invariantContext.labwareEntities[tiprackSlot]
-      : null
-  if (adapterId == null && pipetteName === 'p1000_96') {
-    errors.push(errorCreators.missingAdapter())
-  }
   if (COLUMN_4_SLOTS.includes(tiprackSlot)) {
     errors.push(
       errorCreators.pipettingIntoColumn4({ typeOfStep: 'pick up tip' })
     )
+  } else if (prevRobotState.labware[tiprackSlot] != null) {
+    const adapterSlot = prevRobotState.labware[tiprackSlot].slot
+    if (COLUMN_4_SLOTS.includes(adapterSlot)) {
+      errors.push(
+        errorCreators.pipettingIntoColumn4({ typeOfStep: 'pick up tip' })
+      )
+    }
   }
 
   if (errors.length > 0) {
@@ -66,6 +78,8 @@ const _pickUpTip: CommandCreator<PickUpTipArgs> = (
 interface ReplaceTipArgs {
   pipette: string
   dropTipLocation: string
+  tipRack: string | null
+  nozzles?: NozzleConfigurationStyle
 }
 
 /**
@@ -78,8 +92,39 @@ export const replaceTip: CommandCreator<ReplaceTipArgs> = (
   invariantContext,
   prevRobotState
 ) => {
-  const { pipette, dropTipLocation } = args
-  const nextTiprack = getNextTiprack(pipette, invariantContext, prevRobotState)
+  const { pipette, dropTipLocation, nozzles, tipRack } = args
+  const stateNozzles = prevRobotState.pipettes[pipette].nozzles
+  if (tipRack == null) {
+    return {
+      errors: [errorCreators.noTipSelected()],
+    }
+  }
+  const { nextTiprack, tipracks } = getNextTiprack(
+    pipette,
+    tipRack,
+    invariantContext,
+    prevRobotState,
+    nozzles
+  )
+  const pipetteSpec = invariantContext.pipetteEntities[pipette]?.spec
+  const channels = pipetteSpec?.channels
+
+  const hasMoreTipracksOnDeck =
+    tipracks?.totalTipracks > tipracks?.filteredTipracks
+
+  const is96ChannelTipracksAvailable =
+    nextTiprack == null && channels === 96 && hasMoreTipracksOnDeck
+  if (nozzles === ALL && is96ChannelTipracksAvailable) {
+    return {
+      errors: [errorCreators.missingAdapter()],
+    }
+  }
+
+  if (nozzles === COLUMN && is96ChannelTipracksAvailable) {
+    return {
+      errors: [errorCreators.removeAdapter()],
+    }
+  }
 
   if (nextTiprack == null) {
     // no valid next tip / tiprack, bail out
@@ -88,10 +133,8 @@ export const replaceTip: CommandCreator<ReplaceTipArgs> = (
     }
   }
 
-  const pipetteSpec = invariantContext.pipetteEntities[pipette]?.spec
   const isFlexPipette =
-    (pipetteSpec?.displayCategory === 'FLEX' || pipetteSpec?.channels === 96) ??
-    false
+    (pipetteSpec?.displayCategory === 'FLEX' || channels === 96) ?? false
 
   if (!pipetteSpec)
     return {
@@ -106,7 +149,14 @@ export const replaceTip: CommandCreator<ReplaceTipArgs> = (
     invariantContext.labwareEntities[nextTiprack.tiprackId]?.def
 
   const isWasteChute =
-    invariantContext.additionalEquipmentEntities[dropTipLocation] != null
+    invariantContext.additionalEquipmentEntities[dropTipLocation] != null &&
+    invariantContext.additionalEquipmentEntities[dropTipLocation].name ===
+      'wasteChute'
+
+  const isTrashBin =
+    invariantContext.additionalEquipmentEntities[dropTipLocation] != null &&
+    invariantContext.additionalEquipmentEntities[dropTipLocation].name ===
+      'trashBin'
 
   if (!labwareDef) {
     return {
@@ -119,11 +169,29 @@ export const replaceTip: CommandCreator<ReplaceTipArgs> = (
     }
   }
   if (
-    !invariantContext.labwareEntities[args.dropTipLocation] &&
+    !args.dropTipLocation ||
     !invariantContext.additionalEquipmentEntities[args.dropTipLocation]
   ) {
     return { errors: [errorCreators.dropTipLocationDoesNotExist()] }
   }
+  if (
+    channels === 96 &&
+    nozzles === COLUMN &&
+    !getIsSafePipetteMovement(
+      prevRobotState,
+      invariantContext,
+      nextTiprack.tiprackId,
+      pipette,
+      tipRack,
+      //  we don't adjust the offset when moving to the tiprack
+      { x: 0, y: 0 }
+    )
+  ) {
+    return {
+      errors: [errorCreators.possiblePipetteCollision()],
+    }
+  }
+
   if (
     modulePipetteCollision({
       pipette,
@@ -142,13 +210,18 @@ export const replaceTip: CommandCreator<ReplaceTipArgs> = (
     prevRobotState.labware,
     prevRobotState.modules
   )
-
-  if (!isFlexPipette) {
-    if (
-      pipetteAdjacentHeaterShakerWhileShaking(prevRobotState.modules, slotName)
-    ) {
-      return { errors: [errorCreators.heaterShakerNorthSouthEastWestShaking()] }
+  if (
+    pipetteAdjacentHeaterShakerWhileShaking(
+      prevRobotState.modules,
+      slotName,
+      isFlexPipette ? FLEX_ROBOT_TYPE : OT2_ROBOT_TYPE
+    )
+  ) {
+    return {
+      errors: [errorCreators.heaterShakerNorthSouthEastWestShaking()],
     }
+  }
+  if (!isFlexPipette) {
     if (
       getIsHeaterShakerEastWestWithLatchOpen(prevRobotState.modules, slotName)
     ) {
@@ -168,35 +241,65 @@ export const replaceTip: CommandCreator<ReplaceTipArgs> = (
     }
   }
 
-  const addressableAreaName =
-    pipetteSpec.channels === 96
-      ? '96ChannelWasteChute'
-      : '1and8ChannelWasteChute'
+  const addressableAreaNameWasteChute = getWasteChuteAddressableAreaNamePip(
+    channels
+  )
 
-  const commandCreators: CurriedCommandCreator[] = isWasteChute
-    ? [
-        curryCommandCreator(wasteChuteCommandsUtil, {
-          type: 'dropTip',
-          pipetteId: pipette,
-          addressableAreaName,
-        }),
-        curryCommandCreator(_pickUpTip, {
-          pipette,
-          tiprack: nextTiprack.tiprackId,
-          well: nextTiprack.well,
-        }),
-      ]
-    : [
-        curryCommandCreator(dropTip, {
-          pipette,
-          dropTipLocation,
-        }),
-        curryCommandCreator(_pickUpTip, {
-          pipette,
-          tiprack: nextTiprack.tiprackId,
-          well: nextTiprack.well,
-        }),
-      ]
+  const configureNozzleLayoutCommand: CurriedCommandCreator[] =
+    //  only emit the command if previous nozzle state is different
+    channels === 96 && args.nozzles != null && args.nozzles !== stateNozzles
+      ? [
+          curryCommandCreator(configureNozzleLayout, {
+            nozzles: args.nozzles,
+            pipetteId: args.pipette,
+          }),
+        ]
+      : []
+
+  let commandCreators: CurriedCommandCreator[] = [
+    curryCommandCreator(dropTip, {
+      pipette,
+      dropTipLocation,
+    }),
+    ...configureNozzleLayoutCommand,
+    curryCommandCreator(_pickUpTip, {
+      pipette,
+      tiprack: nextTiprack.tiprackId,
+      well: nextTiprack.well,
+    }),
+  ]
+  if (isWasteChute) {
+    commandCreators = [
+      ...wasteChuteCommandsUtil({
+        type: 'dropTip',
+        pipetteId: pipette,
+        addressableAreaName: addressableAreaNameWasteChute,
+        prevRobotState,
+      }),
+      ...configureNozzleLayoutCommand,
+      curryCommandCreator(_pickUpTip, {
+        pipette,
+        tiprack: nextTiprack.tiprackId,
+        well: nextTiprack.well,
+      }),
+    ]
+  }
+  if (isTrashBin) {
+    commandCreators = [
+      ...movableTrashCommandsUtil({
+        type: 'dropTip',
+        pipetteId: pipette,
+        prevRobotState,
+        invariantContext,
+      }),
+      ...configureNozzleLayoutCommand,
+      curryCommandCreator(_pickUpTip, {
+        pipette,
+        tiprack: nextTiprack.tiprackId,
+        well: nextTiprack.well,
+      }),
+    ]
+  }
 
   return reduceCommandCreators(
     commandCreators,

@@ -51,7 +51,7 @@ stages:
       json:
         data:
           id: '{protocol_id}'
-          createdAt: !anystr
+          createdAt: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"
           files:
             - name: simpleV8.json
               role: main
@@ -68,7 +68,7 @@ stages:
           analysisSummaries:
             - id: '{analysis_id}'
               status: completed
-        links: 
+        links:
           referencingRuns: []
   - name: Get protocol analysis by ID
     request:
@@ -85,6 +85,7 @@ stages:
             status: completed
             result: ok
             robotType: OT-2 Standard
+            runTimeParameters: []
             pipettes:
               - id: pipetteId
                 pipetteName: p10_single
@@ -128,16 +129,17 @@ stages:
             commands:
               # Initial home
               - id: !anystr
-                createdAt: !anystr
+                createdAt: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"
                 commandType: home
                 key: !anystr
                 status: succeeded
-                params: { }
-                result: { }
-                startedAt: !anystr
-                completedAt: !anystr
+                params: {}
+                result: {}
+                notes: []
+                startedAt: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"
+                completedAt: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"
               - id: !anystr
-                createdAt: !anystr
+                createdAt: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"
                 commandType: loadPipette
                 key: !anystr
                 status: succeeded
@@ -147,10 +149,11 @@ stages:
                   pipetteId: pipetteId
                 result:
                   pipetteId: pipetteId
-                startedAt: !anystr
-                completedAt: !anystr
+                notes: []
+                startedAt: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"
+                completedAt: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"
               - id: !anystr
-                createdAt: !anystr
+                createdAt: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"
                 commandType: loadModule
                 key: !anystr
                 status: succeeded
@@ -164,10 +167,11 @@ stages:
                   definition: !anydict
                   model: magneticModuleV2
                   serialNumber: !anystr
-                startedAt: !anystr
-                completedAt: !anystr
+                notes: []
+                startedAt: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"
+                completedAt: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"
               - id: !anystr
-                createdAt: !anystr
+                createdAt: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"
                 commandType: loadModule
                 key: !anystr
                 status: succeeded
@@ -181,10 +185,11 @@ stages:
                   definition: !anydict
                   model: temperatureModuleV2
                   serialNumber: !anystr
-                startedAt: !anystr
-                completedAt: !anystr
+                notes: []
+                startedAt: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"
+                completedAt: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"
               - id: !anystr
-                createdAt: !anystr
+                createdAt: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"
                 commandType: loadLabware
                 key: !anystr
                 status: succeeded
@@ -199,10 +204,11 @@ stages:
                 result:
                   labwareId: sourcePlateId
                   definition: !anydict
-                startedAt: !anystr
-                completedAt: !anystr
+                notes: []
+                startedAt: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"
+                completedAt: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"
               - id: !anystr
-                createdAt: !anystr
+                createdAt: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"
                 commandType: loadLabware
                 key: !anystr
                 status: succeeded
@@ -217,10 +223,11 @@ stages:
                 result:
                   labwareId: destPlateId
                   definition: !anydict
-                startedAt: !anystr
-                completedAt: !anystr
+                notes: []
+                startedAt: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"
+                completedAt: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"
               - id: !anystr
-                createdAt: !anystr
+                createdAt: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"
                 commandType: loadLabware
                 key: !anystr
                 status: succeeded
@@ -235,10 +242,11 @@ stages:
                 result:
                   labwareId: tipRackId
                   definition: !anydict
-                startedAt: !anystr
-                completedAt: !anystr
+                notes: []
+                startedAt: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"
+                completedAt: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"
               - id: !anystr
-                createdAt: !anystr
+                createdAt: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"
                 commandType: loadLabware
                 key: !anystr
                 status: succeeded
@@ -253,10 +261,11 @@ stages:
                 result:
                   labwareId: fixedTrash
                   definition: !anydict
-                startedAt: !anystr
-                completedAt: !anystr
+                notes: []
+                startedAt: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"
+                completedAt: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"
               - id: !anystr
-                createdAt: !anystr
+                createdAt: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"
                 commandType: loadLiquid
                 key: !anystr
                 status: succeeded
@@ -267,19 +276,21 @@ stages:
                     A1: 100.0
                     B1: 100.0
                 result: {}
-                startedAt: !anystr
-                completedAt: !anystr
+                notes: []
+                startedAt: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"
+                completedAt: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"
               - id: !anystr
-                createdAt: !anystr
+                createdAt: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"
                 commandType: home
                 key: !anystr
                 status: succeeded
                 params: {}
                 result: {}
-                startedAt: !anystr
-                completedAt: !anystr
+                notes: []
+                startedAt: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"
+                completedAt: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"
               - id: !anystr
-                createdAt: !anystr
+                createdAt: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"
                 commandType: pickUpTip
                 key: !anystr
                 status: succeeded
@@ -298,10 +309,11 @@ stages:
                   tipVolume: 10.0
                   tipLength: 35.910000000000004
                   tipDiameter: 3.27
-                startedAt: !anystr
-                completedAt: !anystr
+                notes: []
+                startedAt: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"
+                completedAt: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"
               - id: !anystr
-                createdAt: !anystr
+                createdAt: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"
                 commandType: aspirate
                 key: !anystr
                 status: succeeded
@@ -318,22 +330,29 @@ stages:
                   volume: 5.0
                   flowRate: 3.0
                 result:
-                  position: { 'x': 12.930000000000001, 'y': 74.08999999999999, 'z': 83.14 }
+                  position:
+                    {
+                      'x': 12.930000000000001,
+                      'y': 74.08999999999999,
+                      'z': 83.14,
+                    }
                   volume: 5.0
-                startedAt: !anystr
-                completedAt: !anystr
+                notes: []
+                startedAt: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"
+                completedAt: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"
               - id: !anystr
-                createdAt: !anystr
+                createdAt: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"
                 commandType: waitForDuration
                 key: !anystr
                 status: succeeded
                 params:
                   seconds: 42.0
                 result: {}
-                startedAt: !anystr
-                completedAt: !anystr
+                notes: []
+                startedAt: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"
+                completedAt: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"
               - id: !anystr
-                createdAt: !anystr
+                createdAt: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"
                 commandType: dispense
                 key: !anystr
                 status: succeeded
@@ -352,10 +371,11 @@ stages:
                 result:
                   position: { 'x': 280.805, 'y': 65.115, 'z': 84.3 }
                   volume: 4.5
-                startedAt: !anystr
-                completedAt: !anystr
+                notes: []
+                startedAt: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"
+                completedAt: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"
               - id: !anystr
-                createdAt: !anystr
+                createdAt: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"
                 commandType: touchTip
                 key: !anystr
                 status: succeeded
@@ -372,10 +392,11 @@ stages:
                   radius: 1.0
                 result:
                   position: { 'x': 280.805, 'y': 65.115, 'z': 94.3 }
-                startedAt: !anystr
-                completedAt: !anystr
+                notes: []
+                startedAt: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"
+                completedAt: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"
               - id: !anystr
-                createdAt: !anystr
+                createdAt: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"
                 commandType: blowout
                 key: !anystr
                 status: succeeded
@@ -392,10 +413,11 @@ stages:
                   flowRate: 2.0
                 result:
                   position: { 'x': 280.805, 'y': 65.115, 'z': 95.3 }
-                startedAt: !anystr
-                completedAt: !anystr
+                notes: []
+                startedAt: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"
+                completedAt: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"
               - id: !anystr
-                createdAt: !anystr
+                createdAt: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"
                 commandType: moveToCoordinates
                 key: !anystr
                 status: succeeded
@@ -407,11 +429,12 @@ stages:
                     z: 100.0
                   forceDirect: false
                 result:
-                  position: {'x': 100.0, 'y': 100.0, 'z': 100.0}
-                startedAt: !anystr
-                completedAt: !anystr
+                  position: { 'x': 100.0, 'y': 100.0, 'z': 100.0 }
+                notes: []
+                startedAt: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"
+                completedAt: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"
               - id: !anystr
-                createdAt: !anystr
+                createdAt: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"
                 commandType: moveToWell
                 key: !anystr
                 status: succeeded
@@ -427,12 +450,12 @@ stages:
                       z: 0
                   forceDirect: false
                 result:
-                  position:
-                    { 'x': 289.805, 'y': 65.115, 'z': 98.25 }
-                startedAt: !anystr
-                completedAt: !anystr
+                  position: { 'x': 289.805, 'y': 65.115, 'z': 98.25 }
+                notes: []
+                startedAt: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"
+                completedAt: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"
               - id: !anystr
-                createdAt: !anystr
+                createdAt: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"
                 commandType: moveToWell
                 key: !anystr
                 status: succeeded
@@ -449,12 +472,12 @@ stages:
                   minimumZHeight: 35.0
                   forceDirect: true
                 result:
-                  position:
-                    { 'x': 291.805, 'y': 68.115, 'z': 93.3 }
-                startedAt: !anystr
-                completedAt: !anystr
+                  position: { 'x': 291.805, 'y': 68.115, 'z': 93.3 }
+                notes: []
+                startedAt: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"
+                completedAt: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"
               - id: !anystr
-                createdAt: !anystr
+                createdAt: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"
                 commandType: dropTip
                 key: !anystr
                 status: succeeded
@@ -471,20 +494,22 @@ stages:
                   alternateDropLocation: false
                 result:
                   position: { 'x': 347.84000000000003, 'y': 325.06, 'z': 82.0 }
-                startedAt: !anystr
-                completedAt: !anystr
+                notes: []
+                startedAt: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"
+                completedAt: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"
               - id: !anystr
-                createdAt: !anystr
+                createdAt: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"
                 commandType: waitForResume
                 key: !anystr
                 status: succeeded
                 params:
                   message: pause command
                 result: {}
-                startedAt: !anystr
-                completedAt: !anystr
+                notes: []
+                startedAt: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"
+                completedAt: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"
               - id: !anystr
-                createdAt: !anystr
+                createdAt: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"
                 commandType: moveToCoordinates
                 key: !anystr
                 status: succeeded
@@ -498,10 +523,11 @@ stages:
                   forceDirect: true
                 result:
                   position: { 'x': 0.0, 'y': 0.0, 'z': 0.0 }
-                startedAt: !anystr
-                completedAt: !anystr
+                notes: []
+                startedAt: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"
+                completedAt: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"
               - id: !anystr
-                createdAt: !anystr
+                createdAt: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"
                 commandType: moveRelative
                 key: !anystr
                 status: succeeded
@@ -514,10 +540,11 @@ stages:
                     x: !anyfloat
                     y: !anyfloat
                     z: !anyfloat
-                startedAt: !anystr
-                completedAt: !anystr
+                notes: []
+                startedAt: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"
+                completedAt: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"
               - id: !anystr
-                createdAt: !anystr
+                createdAt: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"
                 commandType: moveRelative
                 key: !anystr
                 status: succeeded
@@ -530,25 +557,28 @@ stages:
                     x: !anyfloat
                     y: !anyfloat
                     z: !anyfloat
-                startedAt: !anystr
-                completedAt: !anystr
+                notes: []
+                startedAt: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"
+                completedAt: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"
               - id: !anystr
-                createdAt: !anystr
+                createdAt: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"
                 commandType: savePosition
                 key: !anystr
                 status: succeeded
                 params:
                   pipetteId: pipetteId
+                  failOnNotHomed: true
                 result:
                   positionId: !anystr
                   position:
                     x: !anyfloat
                     y: !anyfloat
                     z: !anyfloat
-                startedAt: !anystr
-                completedAt: !anystr
+                notes: []
+                startedAt: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"
+                completedAt: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"
               - id: !anystr
-                createdAt: !anystr
+                createdAt: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"
                 commandType: moveRelative
                 key: !anystr
                 status: succeeded
@@ -561,24 +591,27 @@ stages:
                     x: !anyfloat
                     y: !anyfloat
                     z: !anyfloat
-                startedAt: !anystr
-                completedAt: !anystr
+                notes: []
+                startedAt: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"
+                completedAt: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"
               - id: !anystr
-                createdAt: !anystr
+                createdAt: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"
                 commandType: savePosition
                 key: !anystr
                 status: succeeded
                 params:
                   pipetteId: pipetteId
                   positionId: positionId
+                  failOnNotHomed: true
                 result:
                   positionId: positionId
                   position:
                     x: !anyfloat
                     y: !anyfloat
                     z: !anyfloat
-                startedAt: !anystr
-                completedAt: !anystr
+                notes: []
+                startedAt: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"
+                completedAt: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"
             errors: []
             liquids:
               - id: waterId

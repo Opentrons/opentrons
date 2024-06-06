@@ -2,22 +2,23 @@ import * as React from 'react'
 import cx from 'classnames'
 import { RobotCoordsForeignDiv } from '@opentrons/components'
 
-import { START_TERMINAL_ITEM_ID, TerminalItemId } from '../../../steplist'
-import { LabwareOnDeck } from '../../../step-forms'
+import { START_TERMINAL_ITEM_ID } from '../../../steplist'
 import { BlockedSlot } from './BlockedSlot'
 import { BrowseLabware } from './BrowseLabware'
 import { EditLabware } from './EditLabware'
 import { LabwareName } from './LabwareName'
 import { LabwareHighlight } from './LabwareHighlight'
-import styles from './LabwareOverlays.css'
+import styles from './LabwareOverlays.module.css'
 
 import type { CoordinateTuple } from '@opentrons/shared-data'
+import type { TerminalItemId } from '../../../steplist'
+import type { LabwareOnDeck } from '../../../step-forms'
 
 interface LabwareControlsProps {
   labwareOnDeck: LabwareOnDeck
   slotPosition: CoordinateTuple
-  setHoveredLabware: (labware?: LabwareOnDeck | null) => unknown
-  setDraggedLabware: (labware?: LabwareOnDeck | null) => unknown
+  setHoveredLabware: (labware?: LabwareOnDeck | null) => void
+  setDraggedLabware: (labware?: LabwareOnDeck | null) => void
   swapBlocked: boolean
   selectedTerminalItemId?: TerminalItemId | null
 }
@@ -48,7 +49,6 @@ export const LabwareControls = (props: LabwareControlsProps): JSX.Element => {
       >
         <LabwareHighlight labwareOnDeck={labwareOnDeck} />
         {canEdit ? (
-          // @ts-expect-error(sa, 2021-6-21): react dnd type mismatch
           <EditLabware
             labwareOnDeck={labwareOnDeck}
             setHoveredLabware={setHoveredLabware}

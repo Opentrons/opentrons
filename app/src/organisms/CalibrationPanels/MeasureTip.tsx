@@ -2,15 +2,15 @@ import * as React from 'react'
 import { css } from 'styled-components'
 import { useTranslation } from 'react-i18next'
 import {
-  Box,
-  Flex,
-  ALIGN_STRETCH,
   ALIGN_FLEX_END,
-  JUSTIFY_SPACE_BETWEEN,
+  ALIGN_STRETCH,
+  Box,
   DIRECTION_COLUMN,
-  SPACING,
-  Mount,
+  Flex,
+  JUSTIFY_SPACE_BETWEEN,
   PrimaryButton,
+  SPACING,
+  StyledText,
 } from '@opentrons/components'
 
 import * as Sessions from '../../redux/sessions'
@@ -19,7 +19,6 @@ import {
   MEDIUM_STEP_SIZE_MM,
   SMALL_STEP_SIZE_MM,
 } from '../../molecules/JogControls'
-import { StyledText } from '../../atoms/text'
 import { NeedHelpLink } from './NeedHelpLink'
 import { useConfirmCrashRecovery } from './useConfirmCrashRecovery'
 import { formatJogVector } from './utils'
@@ -37,6 +36,7 @@ import rightMultiBlockAssetHealth from '../../assets/videos/health-check/Right_M
 import leftSingleBlockAssetHealth from '../../assets/videos/health-check/Left_Single_CalBlock_WITH_TIP_(330x260)REV2.webm'
 import rightSingleBlockAssetHealth from '../../assets/videos/health-check/Right_Single_CalBlock_WITH_TIP_(330x260)REV2.webm'
 
+import type { Mount } from '@opentrons/components'
 import type { Axis, Sign, StepSize } from '../../molecules/JogControls/types'
 import type { CalibrationPanelProps } from './types'
 

@@ -11,7 +11,7 @@ benchmark_output := $(shell node -e 'console.log(new Date());')
 # These variables can be overriden when make is invoked to customize the
 # behavior of jest
 tests ?=
-cov_opts ?= --coverage=true --ci=true --collectCoverageFrom='protocol-designer/src/**/*.(js|ts|tsx)'
+cov_opts ?= --coverage=true
 test_opts ?=
 
 # standard targets
@@ -34,7 +34,7 @@ clean:
 .PHONY: build
 build: export NODE_ENV := production
 build:
-	webpack --profile
+	vite build
 	git rev-parse HEAD > dist/.commit
 
 # development
@@ -50,7 +50,7 @@ benchmarks:
 .PHONY: dev
 dev: export NODE_ENV := development
 dev:
-	webpack-dev-server --hot
+	vite serve
 
 # production assets server
 .PHONY: serve
@@ -62,7 +62,7 @@ serve: all
 test-e2e:
 	concurrently --no-color --kill-others --success first --names "protocol-designer-server,protocol-designer-tests" \
 	"$(MAKE) dev CYPRESS=1" \
-	"wait-on http://localhost:8080/ && cypress run --browser chrome --headless --record false"
+	"wait-on http://localhost:5178/ && cypress run --browser chrome --headless --record false"
 
 .PHONY: test
 test:

@@ -1,8 +1,8 @@
 import isEqual from 'lodash/isEqual'
 import { getLoadedLabwareDefinitionsByUri } from '@opentrons/shared-data'
 import { getLabwareDefinitionUri } from '../../organisms/Devices/ProtocolRun/utils/getLabwareDefinitionUri'
-import { LabwareOffset } from '@opentrons/api-client'
 import { getLabwareOffsetLocation } from '../../organisms/Devices/ProtocolRun/utils/getLabwareOffsetLocation'
+import type { LabwareOffset } from '@opentrons/api-client'
 import type {
   LoadedLabware,
   LoadedModule,

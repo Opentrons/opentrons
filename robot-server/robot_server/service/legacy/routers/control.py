@@ -13,7 +13,7 @@ from opentrons.hardware_control import HardwareControlAPI
 
 from opentrons.types import Mount, Point
 
-from robot_server.errors import LegacyErrorResponse
+from robot_server.errors.error_responses import LegacyErrorResponse
 from robot_server.service.dependencies import get_motion_lock
 from robot_server.hardware import get_hardware
 from robot_server.service.legacy.models import V1BasicResponse
@@ -24,7 +24,8 @@ router = APIRouter()
 
 @router.post(
     "/identify",
-    description="Blink the OT-2's gantry lights so you can pick it " "out of a crowd",
+    summary="Blink the lights",
+    description="Blink the gantry lights so you can pick it out of a crowd",
 )
 async def post_identify(
     seconds: int = Query(..., description="Time to blink the lights for"),
@@ -37,8 +38,15 @@ async def post_identify(
 
 @router.get(
     "/robot/positions",
-    description="Get a list of useful positions",
+    summary="Get robot positions",
+    description=(
+        "Get a list of useful positions."
+        "\n\n"
+        "**Deprecated:** This data only makes sense for OT-2 robots, not Flex robots."
+        " There is currently no public way to get these positions for Flex robots."
+    ),
     response_model=control.RobotPositionsResponse,
+    deprecated=True,
 )
 async def get_robot_positions() -> control.RobotPositionsResponse:
     """
@@ -60,14 +68,20 @@ async def get_robot_positions() -> control.RobotPositionsResponse:
 
 @router.post(
     path="/robot/move",
+    summary="Move the robot",
     description=(
         "Move the robot's gantry to a position (usually to a "
-        "position retrieved from GET /robot/positions)"
+        "position retrieved from `GET /robot/positions`)."
+        "\n\n"
+        "**Deprecated:**"
+        " Run a `moveToCoordinates` command in a maintenance run instead."
+        " See the `/maintenance_runs` endpoints."
     ),
     response_model=V1BasicResponse,
     responses={
         status.HTTP_403_FORBIDDEN: {"model": LegacyErrorResponse},
     },
+    deprecated=True,
 )
 async def post_move_robot(
     robot_move_target: control.RobotMoveTarget,
@@ -85,7 +99,8 @@ async def post_move_robot(
 
 @router.post(
     path="/robot/home",
-    description="Home the robot",
+    summary="Home the robot",
+    description="Home the robot.",
     response_model=V1BasicResponse,
     responses={
         status.HTTP_400_BAD_REQUEST: {"model": LegacyErrorResponse},
@@ -126,7 +141,8 @@ async def post_home_robot(
 
 @router.get(
     "/robot/lights",
-    description="Get the current status of the OT-2's rail lights",
+    summary="Get whether the lights are on",
+    description="Get the current status of the robot's rail lights",
     response_model=control.RobotLightState,
 )
 async def get_robot_light_state(
@@ -138,6 +154,7 @@ async def get_robot_light_state(
 
 @router.post(
     "/robot/lights",
+    summary="Turn the lights on or off",
     description="Turn the rail lights on or off",
     response_model=control.RobotLightState,
 )

@@ -1,4 +1,5 @@
 """Model for the App page that displays info and settings for the app."""
+
 from typing import Optional
 
 from rich.console import Console

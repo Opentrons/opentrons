@@ -1,6 +1,8 @@
 import * as React from 'react'
-import { fireEvent } from '@testing-library/react'
-import { renderWithProviders } from '@opentrons/components'
+import { fireEvent, screen } from '@testing-library/react'
+import { describe, it, beforeEach, expect, vi } from 'vitest'
+
+import { renderWithProviders } from '../../../../__testing-utils__'
 import { i18n } from '../../../../i18n'
 import { ProtocolAnalysisErrorModal } from '../ProtocolAnalysisErrorModal'
 
@@ -19,7 +21,7 @@ describe('ProtocolAnalysisErrorModal', () => {
     props = {
       displayName: 'test_protocol',
       robotName: 'test_robot',
-      onClose: jest.fn(),
+      onClose: vi.fn(),
       errors: [
         {
           id: 'error_id',
@@ -31,13 +33,13 @@ describe('ProtocolAnalysisErrorModal', () => {
     }
   })
   it('renders error modal', () => {
-    const { getByText, getByLabelText } = render(props)
-    getByText('protocol analysis error')
-    getByLabelText('close_analysis_error_modal')
+    render(props)
+    screen.getByText('protocol analysis error')
+    screen.getByLabelText('close_analysis_error_modal')
   })
   it('calls onClose when close button clicked', () => {
-    const { getByLabelText } = render(props)
-    const btn = getByLabelText('close_analysis_error_modal')
+    render(props)
+    const btn = screen.getByLabelText('close_analysis_error_modal')
     fireEvent.click(btn)
     expect(props.onClose).toHaveBeenCalled()
   })

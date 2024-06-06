@@ -12,13 +12,13 @@ interface SkeletonProps {
 export const Skeleton = (props: SkeletonProps): JSX.Element => {
   const { width, height, backgroundSize, borderRadius } = props
   const SKELETON_STYLE = css`
-    border-radius: ${borderRadius ?? BORDERS.radiusSoftCorners};
+    border-radius: ${borderRadius ?? BORDERS.borderRadius8};
     animation: shimmer 2s infinite linear;
     background: linear-gradient(
       to right,
-      ${COLORS.medGreyEnabled} 1%,
+      ${COLORS.grey30} 1%,
       #e3e3e366 25%,
-      ${COLORS.medGreyEnabled} 40%
+      ${COLORS.grey30} 40%
     );
     background-size: ${backgroundSize};
     width: ${width};

@@ -3,7 +3,7 @@
 import Ajv from 'ajv'
 import path from 'path'
 import glob from 'glob'
-
+import { describe, expect, it } from 'vitest'
 import deckSchema from '../../deck/schemas/3.json'
 import deckSchemaV4 from '../../deck/schemas/4.json'
 

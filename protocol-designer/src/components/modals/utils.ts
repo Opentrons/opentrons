@@ -1,10 +1,10 @@
 import {
   getLabwareDefURI,
   getLabwareDisplayName,
-  getPipetteNameSpecs,
-  PipetteName,
+  getPipetteSpecsV2,
 } from '@opentrons/shared-data'
-import { LabwareDefByDefURI } from '../../labware-defs'
+import type { PipetteName } from '@opentrons/shared-data'
+import type { LabwareDefByDefURI } from '../../labware-defs'
 
 export interface TiprackOption {
   name: string
@@ -20,12 +20,12 @@ export function getTiprackOptions(props: TiprackOptionsProps): TiprackOption[] {
   const { allLabware, allowAllTipracks, selectedPipetteName } = props
   const selectedPipetteDefaultTipracks =
     selectedPipetteName != null
-      ? getPipetteNameSpecs(selectedPipetteName as PipetteName)
-          ?.defaultTipracks ?? []
+      ? getPipetteSpecsV2(selectedPipetteName as PipetteName)?.liquids.default
+          .defaultTipracks ?? []
       : []
   const selectedPipetteDisplayCategory =
     selectedPipetteName != null
-      ? getPipetteNameSpecs(selectedPipetteName as PipetteName)
+      ? getPipetteSpecsV2(selectedPipetteName as PipetteName)
           ?.displayCategory ?? []
       : []
 

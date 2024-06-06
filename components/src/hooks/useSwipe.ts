@@ -1,11 +1,6 @@
-import {
-  useState,
-  useEffect,
-  useRef,
-  MutableRefObject,
-  CSSProperties,
-} from 'react'
+import { useState, useEffect, useRef } from 'react'
 import interact from 'interactjs'
+import type { MutableRefObject, CSSProperties } from 'react'
 
 interface UseSwipeResult {
   ref: MutableRefObject<null>
@@ -31,9 +26,9 @@ export const useSwipe = (): UseSwipeResult => {
         .on('dragend', event => {
           if (!event.swipe) return
 
-          swipeDirs.forEach(
-            dir => event.swipe[dir] && setSwipeType(`${str}-${dir}`)
-          )
+          swipeDirs.forEach(dir => {
+            if (event.swipe[dir] != null) setSwipeType(`${str}-${dir}`)
+          })
         })
     }
   }
@@ -61,7 +56,11 @@ export const useSwipe = (): UseSwipeResult => {
     isEnabled,
     setSwipeType,
     swipeType,
-    enable: () => setIsEnabled(true),
-    disable: () => setIsEnabled(false),
+    enable: () => {
+      setIsEnabled(true)
+    },
+    disable: () => {
+      setIsEnabled(false)
+    },
   }
 }

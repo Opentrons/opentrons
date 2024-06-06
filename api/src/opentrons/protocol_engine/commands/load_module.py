@@ -4,10 +4,20 @@ from typing import TYPE_CHECKING, Optional, Type
 from typing_extensions import Literal
 from pydantic import BaseModel, Field
 
-from .command import AbstractCommandImpl, BaseCommand, BaseCommandCreate
-from ..types import DeckSlotLocation, ModuleModel, ModuleDefinition
+from .command import AbstractCommandImpl, BaseCommand, BaseCommandCreate, SuccessData
+from ..errors.error_occurrence import ErrorOccurrence
+from ..types import (
+    DeckSlotLocation,
+    ModuleType,
+    ModuleModel,
+    ModuleDefinition,
+)
+from opentrons.types import DeckSlotName
+
+from opentrons.protocol_engine.resources import deck_configuration_provider
 
 if TYPE_CHECKING:
+    from ..state import StateView
     from ..execution import EquipmentHandler
 
 
@@ -86,42 +96,97 @@ class LoadModuleResult(BaseModel):
     )
 
     serialNumber: Optional[str] = Field(
-        ...,
+        None,
         description="Hardware serial number of the connected module. "
         "Will be `None` if a module is not electrically connected to the robot (like the Magnetic Block).",
     )
 
 
-class LoadModuleImplementation(AbstractCommandImpl[LoadModuleParams, LoadModuleResult]):
+class LoadModuleImplementation(
+    AbstractCommandImpl[LoadModuleParams, SuccessData[LoadModuleResult, None]]
+):
     """The implementation of the load module command."""
 
-    def __init__(self, equipment: EquipmentHandler, **kwargs: object) -> None:
+    def __init__(
+        self, equipment: EquipmentHandler, state_view: StateView, **kwargs: object
+    ) -> None:
         self._equipment = equipment
+        self._state_view = state_view
 
-    async def execute(self, params: LoadModuleParams) -> LoadModuleResult:
+    async def execute(
+        self, params: LoadModuleParams
+    ) -> SuccessData[LoadModuleResult, None]:
         """Check that the requested module is attached and assign its identifier."""
+        module_type = params.model.as_type()
+        self._ensure_module_location(params.location.slotName, module_type)
+
+        if self._state_view.config.robot_type == "OT-2 Standard":
+            self._state_view.addressable_areas.raise_if_area_not_in_deck_configuration(
+                params.location.slotName.id
+            )
+        else:
+            addressable_area = self._state_view.geometry._modules.ensure_and_convert_module_fixture_location(
+                deck_slot=params.location.slotName,
+                deck_type=self._state_view.config.deck_type,
+                model=params.model,
+            )
+            self._state_view.addressable_areas.raise_if_area_not_in_deck_configuration(
+                addressable_area
+            )
+
+        verified_location = self._state_view.geometry.ensure_location_not_occupied(
+            params.location
+        )
+
         if params.model == ModuleModel.MAGNETIC_BLOCK_V1:
             loaded_module = await self._equipment.load_magnetic_block(
                 model=params.model,
-                location=params.location,
+                location=verified_location,
                 module_id=params.moduleId,
             )
         else:
             loaded_module = await self._equipment.load_module(
                 model=params.model,
-                location=params.location,
+                location=verified_location,
                 module_id=params.moduleId,
             )
 
-        return LoadModuleResult(
-            moduleId=loaded_module.module_id,
-            serialNumber=loaded_module.serial_number,
-            model=loaded_module.definition.model,
-            definition=loaded_module.definition,
+        return SuccessData(
+            public=LoadModuleResult(
+                moduleId=loaded_module.module_id,
+                serialNumber=loaded_module.serial_number,
+                model=loaded_module.definition.model,
+                definition=loaded_module.definition,
+            ),
+            private=None,
         )
 
+    def _ensure_module_location(
+        self, slot: DeckSlotName, module_type: ModuleType
+    ) -> None:
+        if self._state_view.config.robot_type == "OT-2 Standard":
+            slot_def = self._state_view.addressable_areas.get_slot_definition(slot.id)
+            compatible_modules = slot_def["compatibleModuleTypes"]
+            if module_type.value not in compatible_modules:
+                raise ValueError(
+                    f"A {module_type.value} cannot be loaded into slot {slot}"
+                )
+        else:
+            cutout_fixture_id = ModuleType.to_module_fixture_id(module_type)
+            module_fixture = deck_configuration_provider.get_cutout_fixture(
+                cutout_fixture_id,
+                self._state_view.addressable_areas.state.deck_definition,
+            )
+            cutout_id = (
+                self._state_view.addressable_areas.get_cutout_id_by_deck_slot_name(slot)
+            )
+            if cutout_id not in module_fixture["mayMountTo"]:
+                raise ValueError(
+                    f"A {module_type.value} cannot be loaded into slot {slot}"
+                )
 
-class LoadModule(BaseCommand[LoadModuleParams, LoadModuleResult]):
+
+class LoadModule(BaseCommand[LoadModuleParams, LoadModuleResult, ErrorOccurrence]):
     """The model for a load module command."""
 
     commandType: LoadModuleCommandType = "loadModule"

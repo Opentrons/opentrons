@@ -3,7 +3,7 @@ import cx from 'classnames'
 import find from 'lodash/find'
 
 import { Select } from './Select'
-import styles from './SelectField.css'
+import styles from './SelectField.module.css'
 
 import type { SelectProps } from './Select'
 import type { ActionMeta, MultiValue, SingleValue } from 'react-select'
@@ -84,9 +84,11 @@ export function SelectField(props: SelectFieldProps): JSX.Element {
           const value = (opt as SelectOption).value
           onValueChange?.(name, value, e)
         }}
-        onBlur={() => onLoseFocus && onLoseFocus(name)}
+        onBlur={() => {
+          if (onLoseFocus != null) onLoseFocus(name)
+        }}
       />
-      {caption && <p className={captionCx}>{caption}</p>}
+      {caption != null ? <p className={captionCx}>{caption}</p> : null}
     </div>
   )
 }

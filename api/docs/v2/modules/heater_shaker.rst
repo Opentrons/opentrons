@@ -101,8 +101,8 @@ You can use these standalone adapter definitions to load Opentrons verified or c
 
 For example, these commands load a well plate on top of the flat bottom adapter::
 
-    hs_adapter = hs_mod.load_adapter('opentrons_96_flat_bottom_adapter')
-    hs_plate = hs_adapter.load_labware('nest_96_wellplate_200ul_flat')
+    hs_adapter = hs_mod.load_adapter("opentrons_96_flat_bottom_adapter")
+    hs_plate = hs_adapter.load_labware("nest_96_wellplate_200ul_flat")
 
 .. versionadded:: 2.15
     The ``load_adapter()`` method.
@@ -183,8 +183,8 @@ To pipette while the Heater-Shaker is heating, use :py:meth:`~.HeaterShakerConte
 
     hs_mod.set_target_temperature(75)
     pipette.pick_up_tip()   
-    pipette.aspirate(50, plate['A1'])
-    pipette.dispense(50, plate['B1'])
+    pipette.aspirate(50, plate["A1"])
+    pipette.dispense(50, plate["B1"])
     pipette.drop_tip()
     hs_mod.wait_for_temperature()
     protocol.delay(minutes=1)
@@ -199,8 +199,8 @@ Additionally, if you want to pipette while the module holds a temperature for a 
     hs_mod.set_and_wait_for_temperature(75)
     start_time = time.monotonic()  # set reference time
     pipette.pick_up_tip()   
-    pipette.aspirate(50, plate['A1'])
-    pipette.dispense(50, plate['B1'])
+    pipette.aspirate(50, plate["A1"])
+    pipette.dispense(50, plate["B1"])
     pipette.drop_tip()
     # delay for the difference between now and 60 seconds after the reference time
     protocol.delay(max(0, start_time+60 - time.monotonic()))

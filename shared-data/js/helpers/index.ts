@@ -1,9 +1,8 @@
-import assert from 'assert'
 import uniq from 'lodash/uniq'
 
 import { OPENTRONS_LABWARE_NAMESPACE } from '../constants'
-import standardOt2DeckDef from '../../deck/definitions/4/ot2_standard.json'
-import standardFlexDeckDef from '../../deck/definitions/4/ot3_standard.json'
+import standardOt2DeckDef from '../../deck/definitions/5/ot2_standard.json'
+import standardFlexDeckDef from '../../deck/definitions/5/ot3_standard.json'
 import type {
   DeckDefinition,
   LabwareDefinition2,
@@ -17,16 +16,25 @@ export { getWellTotalVolume } from './getWellTotalVolume'
 export { wellIsRect } from './wellIsRect'
 export { orderWells } from './orderWells'
 export { get96Channel384WellPlateWells } from './get96Channel384WellPlateWells'
+export { getTipTypeFromTipRackDefinition } from './getTipTypeFromTipRackDefinition'
 
 export * from './parseProtocolData'
 export * from './volume'
 export * from './wellSets'
+export * from './getAreFlexSlotsAdjacent'
 export * from './getModuleVizDims'
 export * from './getVectorDifference'
 export * from './getVectorSum'
 export * from './getLoadedLabwareDefinitionsByUri'
 export * from './getOccludedSlotCountForModule'
 export * from './labwareInference'
+export * from './getAddressableAreasInProtocol'
+export * from './getFlexSurroundingSlots'
+export * from './getSimplestFlexDeckConfig'
+export * from './formatRunTimeParameterDefaultValue'
+export * from './formatRunTimeParameterValue'
+export * from './formatRunTimeParameterMinMax'
+export * from './orderRuntimeParameterRangeOptions'
 
 export const getLabwareDefIsStandard = (def: LabwareDefinition2): boolean =>
   def?.namespace === OPENTRONS_LABWARE_NAMESPACE
@@ -80,7 +88,7 @@ export const getLabwareDisplayName = (
 }
 
 export const getTiprackVolume = (labwareDef: LabwareDefinition2): number => {
-  assert(
+  console.assert(
     labwareDef.parameters.isTiprack,
     `getTiprackVolume expected a tiprack labware ${getLabwareDefURI(
       labwareDef
@@ -88,7 +96,7 @@ export const getTiprackVolume = (labwareDef: LabwareDefinition2): number => {
   )
   // NOTE: Ian 2019-04-16 assuming all tips are the same volume across the rack
   const volume = labwareDef.wells.A1.totalLiquidVolume
-  assert(
+  console.assert(
     volume >= 0,
     `getTiprackVolume expected tip volume to be at least 0, got ${volume}`
   )
@@ -196,6 +204,23 @@ export const getWellsDepth = (
     )
   }
 
+  return offsets[0]
+}
+
+export const getWellDimension = (
+  labwareDef: LabwareDefinition2,
+  wells: string[],
+  position: 'x' | 'y'
+): number => {
+  const offsets = wells.map(well => {
+    const labwareWell = labwareDef.wells[well]
+    const shape = labwareWell.shape
+    if (shape === 'circular') {
+      return labwareWell.diameter
+    } else {
+      return position === 'x' ? labwareWell.xDimension : labwareWell.yDimension
+    }
+  })
   return offsets[0]
 }
 
@@ -337,16 +362,6 @@ export const getCalibrationAdapterLoadName = (
 }
 
 export const getDeckDefFromRobotType = (
-  robotType: RobotType
-): DeckDefinition => {
-  // @ts-expect-error imported JSON not playing nice with TS. see https://github.com/microsoft/TypeScript/issues/32063
-  return robotType === 'OT-3 Standard'
-    ? standardFlexDeckDef
-    : standardOt2DeckDef
-}
-
-// TODO(bh, 2023-11-09): delete this function
-export const getDeckDefFromRobotTypeV4 = (
   robotType: RobotType
 ): DeckDefinition => {
   // @ts-expect-error imported JSON not playing nice with TS. see https://github.com/microsoft/TypeScript/issues/32063

@@ -2,13 +2,16 @@ import * as React from 'react'
 import omit from 'lodash/omit'
 import isEqual from 'lodash/isEqual'
 import { Trans, useTranslation } from 'react-i18next'
-import { DIRECTION_COLUMN, Flex, TYPOGRAPHY } from '@opentrons/components'
-import { StyledText } from '../../atoms/text'
+import {
+  DIRECTION_COLUMN,
+  Flex,
+  StyledText,
+  TYPOGRAPHY,
+} from '@opentrons/components'
 import { RobotMotionLoader } from './RobotMotionLoader'
 import { PrepareSpace } from './PrepareSpace'
 import { JogToWell } from './JogToWell'
 import {
-  CreateCommand,
   FLEX_ROBOT_TYPE,
   getIsTiprack,
   getLabwareDefURI,
@@ -16,9 +19,6 @@ import {
   getModuleType,
   HEATERSHAKER_MODULE_TYPE,
   IDENTITY_VECTOR,
-  LabwareLocation,
-  MoveLabwareCreateCommand,
-  RobotType,
   THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
 import { useSelector } from 'react-redux'
@@ -28,12 +28,18 @@ import {
 } from './utils/labware'
 import { UnorderedList } from '../../molecules/UnorderedList'
 import { getCurrentOffsetForLabwareInLocation } from '../Devices/ProtocolRun/utils/getCurrentOffsetForLabwareInLocation'
-import { useChainRunCommands } from '../../resources/runs/hooks'
 import { getIsOnDevice } from '../../redux/config'
 import { getDisplayLocation } from './utils/getDisplayLocation'
 
 import type { LabwareOffset } from '@opentrons/api-client'
-import type { CompletedProtocolAnalysis } from '@opentrons/shared-data'
+import type {
+  CompletedProtocolAnalysis,
+  CreateCommand,
+  LabwareLocation,
+  MoveLabwareCreateCommand,
+  RobotType,
+} from '@opentrons/shared-data'
+import type { useChainRunCommands } from '../../resources/runs'
 import type {
   CheckLabwareStep,
   RegisterPositionAction,

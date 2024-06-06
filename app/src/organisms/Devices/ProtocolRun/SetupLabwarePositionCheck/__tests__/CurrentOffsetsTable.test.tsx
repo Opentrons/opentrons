@@ -1,49 +1,42 @@
 import * as React from 'react'
-import { renderWithProviders } from '@opentrons/components'
-import _uncastedProtocolWithTC from '@opentrons/shared-data/protocol/fixtures/6/multipleTipracksWithTC.json'
-import { getLoadedLabwareDefinitionsByUri } from '@opentrons/shared-data'
+import { describe, it, beforeEach, vi, expect, afterEach } from 'vitest'
+import { screen } from '@testing-library/react'
+
+import {
+  getLoadedLabwareDefinitionsByUri,
+  multiple_tipacks_with_tc,
+} from '@opentrons/shared-data'
+
+import { renderWithProviders } from '../../../../../__testing-utils__'
 import { i18n } from '../../../../../i18n'
 import { getIsLabwareOffsetCodeSnippetsOn } from '../../../../../redux/config'
 import { LabwarePositionCheck } from '../../../../LabwarePositionCheck'
 import { useLPCDisabledReason } from '../../../hooks'
-import { CurrentOffsetsTable } from '../CurrentOffsetsTable'
 import { getLatestCurrentOffsets } from '../utils'
+import { CurrentOffsetsTable } from '../CurrentOffsetsTable'
+
 import type { CompletedProtocolAnalysis } from '@opentrons/shared-data'
 import type { LabwareOffset } from '@opentrons/api-client'
 
-jest.mock('../../../hooks')
-jest.mock('../../../../LabwarePositionCheck')
-jest.mock('../../../../../redux/config')
-jest.mock('../utils')
-jest.mock('@opentrons/shared-data', () => {
-  const actualComponents = jest.requireActual('@opentrons/shared-data')
+vi.mock('../../../hooks')
+vi.mock('../../../../LabwarePositionCheck')
+vi.mock('../../../../../redux/config')
+vi.mock('../utils')
+
+vi.mock('@opentrons/shared-data', async importOriginal => {
+  const actual = await importOriginal<typeof getLoadedLabwareDefinitionsByUri>()
   return {
-    ...actualComponents,
-    getLoadedLabwareDefinitionsByUri: jest.fn(),
+    ...actual,
+    getLoadedLabwareDefinitionsByUri: vi.fn(), // or whatever you want to override the export with
   }
 })
-const mockGetLoadedLabwareDefinitionsByUri = getLoadedLabwareDefinitionsByUri as jest.MockedFunction<
-  typeof getLoadedLabwareDefinitionsByUri
->
-const mockGetIsLabwareOffsetCodeSnippetsOn = getIsLabwareOffsetCodeSnippetsOn as jest.MockedFunction<
-  typeof getIsLabwareOffsetCodeSnippetsOn
->
-const mockGetLatestCurrentOffsets = getLatestCurrentOffsets as jest.MockedFunction<
-  typeof getLatestCurrentOffsets
->
-const mockLabwarePositionCheck = LabwarePositionCheck as jest.MockedFunction<
-  typeof LabwarePositionCheck
->
-const mockUseLPCDisabledReason = useLPCDisabledReason as jest.MockedFunction<
-  typeof useLPCDisabledReason
->
 
 const render = (props: React.ComponentProps<typeof CurrentOffsetsTable>) => {
   return renderWithProviders(<CurrentOffsetsTable {...props} />, {
     i18nInstance: i18n,
   })[0]
 }
-const protocolWithTC = (_uncastedProtocolWithTC as unknown) as CompletedProtocolAnalysis
+const protocolWithTC = (multiple_tipacks_with_tc as unknown) as CompletedProtocolAnalysis
 const mockCurrentOffsets: LabwareOffset[] = [
   {
     createdAt: '2022-12-20T14:06:23.562082+00:00',
@@ -95,8 +88,8 @@ describe('CurrentOffsetsTable', () => {
         },
       ],
     }
-    mockUseLPCDisabledReason.mockReturnValue(null)
-    mockGetLoadedLabwareDefinitionsByUri.mockReturnValue({
+    vi.mocked(useLPCDisabledReason).mockReturnValue(null)
+    vi.mocked(getLoadedLabwareDefinitionsByUri).mockReturnValue({
       fixedTrash: {
         displayName: 'Trash',
         definitionId: 'opentrons/opentrons_1_trash_1100ml_fixed/1',
@@ -118,11 +111,11 @@ describe('CurrentOffsetsTable', () => {
         definitionId: 'opentrons/nest_96_wellplate_100ul_pcr_full_skirt/1',
       },
     } as any)
-    mockLabwarePositionCheck.mockReturnValue(
+    vi.mocked(LabwarePositionCheck).mockReturnValue(
       <div>mock labware position check</div>
     )
-    mockGetIsLabwareOffsetCodeSnippetsOn.mockReturnValue(false)
-    mockGetLatestCurrentOffsets.mockReturnValue([
+    vi.mocked(getIsLabwareOffsetCodeSnippetsOn).mockReturnValue(false)
+    vi.mocked(getLatestCurrentOffsets).mockReturnValue([
       {
         createdAt: '2022-12-20T14:06:23.562082+00:00',
         definitionUri: 'opentrons/opentrons_96_tiprack_10ul/1',
@@ -132,25 +125,30 @@ describe('CurrentOffsetsTable', () => {
       },
     ])
   })
+
+  afterEach(() => {
+    vi.resetAllMocks()
+  })
+
   it('renders the correct text', () => {
-    const { getByText } = render(props)
-    getByText('APPLIED LABWARE OFFSET DATA')
-    getByText('location')
-    getByText('labware')
-    getByText('labware offset data')
+    render(props)
+    screen.getByText('APPLIED LABWARE OFFSET DATA')
+    screen.getByText('location')
+    screen.getByText('labware')
+    screen.getByText('labware offset data')
   })
 
   it('renders 1 offset with the correct information', () => {
-    const { getByText } = render(props)
-    getByText('opentrons/opentrons_96_tiprack_10ul/1')
-    getByText('Slot 2')
+    render(props)
+    screen.getByText('opentrons/opentrons_96_tiprack_10ul/1')
+    screen.getByText('Slot 2')
   })
 
   it('renders tabbed offset data with snippets when config option is selected', () => {
-    mockGetIsLabwareOffsetCodeSnippetsOn.mockReturnValue(true)
-    const { getByText } = render(props)
-    expect(getByText('Table View')).toBeTruthy()
-    expect(getByText('Jupyter Notebook')).toBeTruthy()
-    expect(getByText('Command Line Interface (SSH)')).toBeTruthy()
+    vi.mocked(getIsLabwareOffsetCodeSnippetsOn).mockReturnValue(true)
+    render(props)
+    expect(screen.getByText('Table View')).toBeTruthy()
+    expect(screen.getByText('Jupyter Notebook')).toBeTruthy()
+    expect(screen.getByText('Command Line Interface (SSH)')).toBeTruthy()
   })
 })

@@ -3,30 +3,26 @@ import { useTranslation } from 'react-i18next'
 import { css } from 'styled-components'
 
 import {
-  Flex,
   ALIGN_CENTER,
-  Icon,
-  SPACING,
-  COLORS,
-  DIRECTION_COLUMN,
-  TYPOGRAPHY,
   BORDERS,
   Box,
-  MoveLabwareOnDeck,
-  Module,
+  COLORS,
+  DIRECTION_COLUMN,
+  DISPLAY_NONE,
+  Flex,
+  Icon,
   LabwareRender,
   LocationIcon,
-  DISPLAY_NONE,
+  Module,
+  MoveLabwareOnDeck,
   RESPONSIVENESS,
+  SPACING,
+  StyledText,
   TEXT_TRANSFORM_UPPERCASE,
+  TYPOGRAPHY,
 } from '@opentrons/components'
 import {
-  CompletedProtocolAnalysis,
-  LabwareDefinitionsByUri,
-  LabwareLocation,
-  MoveLabwareRunTimeCommand,
   OT2_ROBOT_TYPE,
-  RobotType,
   getDeckDefFromRobotType,
   getLabwareDisplayName,
   getLoadedLabwareDefinitionsByUri,
@@ -34,6 +30,7 @@ import {
   getModuleType,
   getOccludedSlotCountForModule,
 } from '@opentrons/shared-data'
+
 import {
   getRunLabwareRenderInfo,
   getRunModuleRenderInfo,
@@ -41,23 +38,31 @@ import {
   getModuleModelFromRunData,
   getModuleDisplayLocationFromRunData,
 } from './utils'
-import { StyledText } from '../../atoms/text'
 import { Divider } from '../../atoms/structure'
 import {
   getLoadedLabware,
   getLoadedModule,
 } from '../CommandText/utils/accessors'
+import { useNotifyDeckConfigurationQuery } from '../../resources/deck_configuration'
+
+import type {
+  CompletedProtocolAnalysis,
+  LabwareDefinitionsByUri,
+  LabwareLocation,
+  MoveLabwareRunTimeCommand,
+  RobotType,
+} from '@opentrons/shared-data'
 import type { RunData } from '@opentrons/api-client'
 
 const LABWARE_DESCRIPTION_STYLE = css`
   flex-direction: ${DIRECTION_COLUMN};
   grid-gap: ${SPACING.spacing8};
   padding: ${SPACING.spacing16};
-  background-color: ${COLORS.fundamentalsBackground};
-  border-radius: ${BORDERS.radiusSoftCorners};
+  background-color: ${COLORS.grey20};
+  border-radius: ${BORDERS.borderRadius4};
   @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
-    background-color: ${COLORS.light1};
-    border-radius: ${BORDERS.borderRadiusSize3};
+    background-color: ${COLORS.grey35};
+    border-radius: ${BORDERS.borderRadius8};
   }
 `
 
@@ -69,10 +74,10 @@ const LABWARE_NAME_TITLE_STYLE = css`
 `
 
 const LABWARE_NAME_STYLE = css`
-  color: ${COLORS.errorDisabled};
+  color: ${COLORS.grey60};
   @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
     ${TYPOGRAPHY.bodyTextBold}
-    color: ${COLORS.darkBlack100};
+    color: ${COLORS.black90};
   }
 `
 
@@ -118,6 +123,7 @@ export function MoveLabwareInterventionContent({
   const analysisCommands = analysis?.commands ?? []
   const labwareDefsByUri = getLoadedLabwareDefinitionsByUri(analysisCommands)
   const deckDef = getDeckDefFromRobotType(robotType)
+  const deckConfig = useNotifyDeckConfigurationQuery().data ?? []
 
   const moduleRenderInfo = getRunModuleRenderInfo(
     run,
@@ -190,16 +196,13 @@ export function MoveLabwareInterventionContent({
             <MoveLabwareOnDeck
               key={command.id} // important so that back to back move labware commands bust the cache
               robotType={robotType}
-              deckFill={isOnDevice ? COLORS.light1 : '#e6e6e6'}
+              deckFill={isOnDevice ? COLORS.grey35 : '#e6e6e6'}
               initialLabwareLocation={oldLabwareLocation}
               finalLabwareLocation={command.params.newLocation}
               movedLabwareDef={movedLabwareDef}
               loadedModules={run.modules}
               loadedLabware={run.labware}
-              // TODO(bh, 2023-07-19): remove when StyledDeck removed from MoveLabwareOnDeck
-              trashCutoutId={
-                robotType === 'OT-3 Standard' ? 'cutoutA3' : undefined
-              }
+              deckConfig={deckConfig}
               backgroundItems={
                 <>
                   {moduleRenderInfo.map(
@@ -256,6 +259,8 @@ function LabwareDisplayLocation(
     displayLocation = <LocationIcon slotName={String(t('offdeck'))} />
   } else if ('slotName' in location) {
     displayLocation = <LocationIcon slotName={location.slotName} />
+  } else if ('addressableAreaName' in location) {
+    displayLocation = <LocationIcon slotName={location.addressableAreaName} />
   } else if ('moduleId' in location) {
     const moduleModel = getModuleModelFromRunData(
       protocolData,
@@ -293,6 +298,11 @@ function LabwareDisplayLocation(
       displayLocation = t('adapter_in_slot', {
         adapter: adapterDisplayName,
         slot_name: adapter.location.slotName,
+      })
+    } else if ('addressableAreaName' in adapter.location) {
+      return t('adapter_in_slot', {
+        adapter: adapterDisplayName,
+        slot: adapter.location.addressableAreaName,
       })
     } else if ('moduleId' in adapter.location) {
       const moduleIdUnderAdapter = adapter.location.moduleId

@@ -24,7 +24,7 @@ jobs:
           fetch-depth: 0
       - uses: 'actions/setup-node@v3'
         with:
-          node-version: '16'
+          node-version: '18.19.0'
       - name: 'cache yarn cache'
         uses: actions/cache@v3
         with:
@@ -37,6 +37,7 @@ jobs:
           npm config set cache ${{ github.workspace }}/.npm-cache
           yarn config set cache-folder ${{ github.workspace }}/.yarn-cache
           yarn install
+
       - name: 'create release'
         run: |
           node ./scripts/deploy/create-release.js ${{ github.token }} ${{ github.ref_name }} --deploy

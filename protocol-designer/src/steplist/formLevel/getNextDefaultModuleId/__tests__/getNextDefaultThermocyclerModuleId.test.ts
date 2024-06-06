@@ -1,3 +1,4 @@
+import { it, describe, expect } from 'vitest'
 import {
   MAGNETIC_MODULE_TYPE,
   TEMPERATURE_MODULE_TYPE,
@@ -7,8 +8,8 @@ import {
   THERMOCYCLER_MODULE_V1,
 } from '@opentrons/shared-data'
 import { TEMPERATURE_DEACTIVATED } from '@opentrons/step-generation'
-import { ModuleOnDeck } from '../../../../step-forms'
 import { getNextDefaultThermocyclerModuleId } from '../getNextDefaultThermocyclerModuleId'
+import type { ModuleOnDeck } from '../../../../step-forms'
 
 const getThermocycler = () => ({
   id: 'tcId',

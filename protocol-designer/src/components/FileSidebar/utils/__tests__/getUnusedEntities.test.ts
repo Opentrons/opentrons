@@ -1,8 +1,9 @@
+import { describe, expect, it } from 'vitest'
 import {
   fixtureP10Single,
   fixtureP300Single,
 } from '@opentrons/shared-data/pipette/fixtures/name'
-import fixture_tiprack_10_ul from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_10_ul.json'
+import { fixture_tiprack_10_ul } from '@opentrons/shared-data/labware/fixtures/2'
 import {
   MAGNETIC_MODULE_TYPE,
   TEMPERATURE_MODULE_TYPE,
@@ -12,8 +13,8 @@ import {
   MAGNETIC_BLOCK_V1,
 } from '@opentrons/shared-data'
 import { TEMPERATURE_DEACTIVATED } from '@opentrons/step-generation'
-import { SavedStepFormState } from '../../../../step-forms'
 import { getUnusedEntities } from '../getUnusedEntities'
+import type { SavedStepFormState } from '../../../../step-forms'
 
 describe('getUnusedEntities', () => {
   it('pipette entities not used in steps are returned', () => {

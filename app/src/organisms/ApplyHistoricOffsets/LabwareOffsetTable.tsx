@@ -1,11 +1,11 @@
 import * as React from 'react'
 import styled from 'styled-components'
 import { useTranslation } from 'react-i18next'
-import { LabwareDefinition2 } from '@opentrons/shared-data'
 import { SPACING, TYPOGRAPHY, COLORS } from '@opentrons/components'
 import { OffsetVector } from '../../molecules/OffsetVector'
 import { formatTimestamp } from '../Devices/utils'
 import { getDisplayLocation } from '../LabwarePositionCheck/utils/getDisplayLocation'
+import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import type { OffsetCandidate } from './hooks/useOffsetCandidatesForAnalysis'
 
 const OffsetTable = styled('table')`
@@ -21,7 +21,7 @@ const OffsetTableHeader = styled('th')`
   padding: ${SPACING.spacing4};
 `
 const OffsetTableRow = styled('tr')`
-  background-color: ${COLORS.fundamentalsBackground};
+  background-color: ${COLORS.grey10};
   padding: ${SPACING.spacing8};
 `
 

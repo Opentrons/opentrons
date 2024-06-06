@@ -1,12 +1,13 @@
 """Deck configuration resource provider."""
-from typing import List, Set, Tuple, Optional
+from typing import List, Set, Tuple
 
-from opentrons_shared_data.deck.dev_types import DeckDefinitionV4, CutoutFixture
+from opentrons_shared_data.deck.dev_types import DeckDefinitionV5, CutoutFixture
 
-from opentrons.types import Point
+from opentrons.types import DeckSlotName
 
 from ..types import (
     AddressableArea,
+    AreaType,
     PotentialCutoutFixture,
     DeckPoint,
     Dimensions,
@@ -16,11 +17,10 @@ from ..errors import (
     CutoutDoesNotExistError,
     FixtureDoesNotExistError,
     AddressableAreaDoesNotExistError,
-    FixtureDoesNotProvideAreasError,
 )
 
 
-def get_cutout_position(cutout_id: str, deck_definition: DeckDefinitionV4) -> DeckPoint:
+def get_cutout_position(cutout_id: str, deck_definition: DeckDefinitionV5) -> DeckPoint:
     """Get the base position of a cutout on the deck."""
     for cutout in deck_definition["locations"]["cutouts"]:
         if cutout_id == cutout["id"]:
@@ -31,7 +31,7 @@ def get_cutout_position(cutout_id: str, deck_definition: DeckDefinitionV4) -> De
 
 
 def get_cutout_fixture(
-    cutout_fixture_id: str, deck_definition: DeckDefinitionV4
+    cutout_fixture_id: str, deck_definition: DeckDefinitionV5
 ) -> CutoutFixture:
     """Gets cutout fixture from deck that matches the cutout fixture ID provided."""
     for cutout_fixture in deck_definition["cutoutFixtures"]:
@@ -43,20 +43,30 @@ def get_cutout_fixture(
 
 
 def get_provided_addressable_area_names(
-    cutout_fixture_id: str, cutout_id: str, deck_definition: DeckDefinitionV4
+    cutout_fixture_id: str, cutout_id: str, deck_definition: DeckDefinitionV5
 ) -> List[str]:
     """Gets a list of the addressable areas provided by the cutout fixture on the cutout."""
     cutout_fixture = get_cutout_fixture(cutout_fixture_id, deck_definition)
     try:
         return cutout_fixture["providesAddressableAreas"][cutout_id]
-    except KeyError as exception:
-        raise FixtureDoesNotProvideAreasError(
-            f"Cutout fixture {cutout_fixture['id']} does not provide addressable areas for {cutout_id}"
-        ) from exception
+    except KeyError:
+        return []
+
+
+def get_addressable_area_display_name(
+    addressable_area_name: str, deck_definition: DeckDefinitionV5
+) -> str:
+    """Get the display name for an addressable area name."""
+    for addressable_area in deck_definition["locations"]["addressableAreas"]:
+        if addressable_area["id"] == addressable_area_name:
+            return addressable_area["displayName"]
+    raise AddressableAreaDoesNotExistError(
+        f"Could not find addressable area with name {addressable_area_name}"
+    )
 
 
 def get_potential_cutout_fixtures(
-    addressable_area_name: str, deck_definition: DeckDefinitionV4
+    addressable_area_name: str, deck_definition: DeckDefinitionV5
 ) -> Tuple[str, Set[PotentialCutoutFixture]]:
     """Given an addressable area name, gets the cutout ID associated with it and a set of potential fixtures."""
     potential_fixtures = []
@@ -69,14 +79,17 @@ def get_potential_cutout_fixtures(
                     PotentialCutoutFixture(
                         cutout_id=cutout_id,
                         cutout_fixture_id=cutout_fixture["id"],
+                        provided_addressable_areas=frozenset(provided_areas),
                     )
                 )
     # This following logic is making the assumption that every addressable area can only go on one cutout, though
     # it may have multiple cutout fixtures that supply it on that cutout. If this assumption changes, some of the
     # following logic will have to be readjusted
-    assert (
-        potential_fixtures
-    ), f"No potential fixtures for addressable area {addressable_area_name}"
+    if not potential_fixtures:
+        raise AddressableAreaDoesNotExistError(
+            f"{addressable_area_name} is not provided by any cutout fixtures"
+            f" in deck definition {deck_definition['otId']}"
+        )
     cutout_id = potential_fixtures[0].cutout_id
     assert all(cutout_id == fixture.cutout_id for fixture in potential_fixtures)
     return cutout_id, set(potential_fixtures)
@@ -85,7 +98,8 @@ def get_potential_cutout_fixtures(
 def get_addressable_area_from_name(
     addressable_area_name: str,
     cutout_position: DeckPoint,
-    deck_definition: DeckDefinitionV4,
+    base_slot: DeckSlotName,
+    deck_definition: DeckDefinitionV5,
 ) -> AddressableArea:
     """Given a name and a cutout position, get an addressable area on the deck."""
     for addressable_area in deck_definition["locations"]["addressableAreas"]:
@@ -101,38 +115,17 @@ def get_addressable_area_from_name(
                 y=addressable_area["boundingBox"]["yDimension"],
                 z=addressable_area["boundingBox"]["zDimension"],
             )
-            drop_tips_deck_offset = addressable_area.get("dropTipsOffset")
-            drop_tip_location: Optional[Point]
-            if drop_tips_deck_offset:
-                drop_tip_location = Point(
-                    x=drop_tips_deck_offset[0] + cutout_position.x,
-                    y=drop_tips_deck_offset[1] + cutout_position.y,
-                    z=drop_tips_deck_offset[2] + cutout_position.z,
-                )
-            else:
-                drop_tip_location = None
-
-            drop_labware_deck_offset = addressable_area.get("dropLabwareOffset")
-            drop_labware_location: Optional[Point]
-            if drop_labware_deck_offset:
-                drop_labware_location = Point(
-                    x=drop_labware_deck_offset[0] + cutout_position.x,
-                    y=drop_labware_deck_offset[1] + cutout_position.y,
-                    z=drop_labware_deck_offset[2] + cutout_position.z,
-                )
-            else:
-                drop_labware_location = None
 
             return AddressableArea(
                 area_name=addressable_area["id"],
+                area_type=AreaType(addressable_area["areaType"]),
+                base_slot=base_slot,
                 display_name=addressable_area["displayName"],
                 bounding_box=bounding_box,
                 position=position,
                 compatible_module_types=addressable_area.get(
                     "compatibleModuleTypes", []
                 ),
-                drop_tip_location=drop_tip_location,
-                drop_labware_location=drop_labware_location,
             )
     raise AddressableAreaDoesNotExistError(
         f"Could not find addressable area with name {addressable_area_name}"

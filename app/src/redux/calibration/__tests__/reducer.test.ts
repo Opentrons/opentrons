@@ -1,3 +1,5 @@
+import { describe, it, expect } from 'vitest'
+
 import * as Fixtures from '../__fixtures__'
 import * as PipetteOffset from '../pipette-offset'
 import * as PipetteOffsetFixtures from '../pipette-offset/__fixtures__'

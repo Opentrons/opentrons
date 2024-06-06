@@ -102,4 +102,10 @@ class Protocol(ResourceModel):
         ),
     )
 
-    key: Optional[str] = None
+    key: Optional[str] = Field(
+        None,
+        description=(
+            "An arbitrary client-defined string, set when this protocol was uploaded."
+            " See `POST /protocols`."
+        ),
+    )

@@ -80,6 +80,7 @@ SUBSYSTEM_NODEID: Dict[SubSystem, NodeId] = {
     SubSystem.pipette_left: NodeId.pipette_left,
     SubSystem.pipette_right: NodeId.pipette_right,
     SubSystem.gripper: NodeId.gripper,
+    SubSystem.hepa_uv: NodeId.hepa_uv,
 }
 
 NODEID_SUBSYSTEM = {node: subsystem for subsystem, node in SUBSYSTEM_NODEID.items()}
@@ -105,16 +106,7 @@ def axis_nodes() -> List["NodeId"]:
 
 
 def node_axes() -> List[Axis]:
-    return [
-        Axis.X,
-        Axis.Y,
-        Axis.Z_L,
-        Axis.Z_R,
-        Axis.P_L,
-        Axis.P_R,
-        Axis.Z_G,
-        Axis.G,
-    ]
+    return Axis.node_axes()
 
 
 def home_axes() -> List[Axis]:
@@ -359,8 +351,13 @@ def motor_nodes(devices: Set[FirmwareTarget]) -> Set[NodeId]:
         NodeId.head_bootloader,
         NodeId.gripper_bootloader,
     }
+    hepa_uv_nodes = {
+        NodeId.hepa_uv,
+        NodeId.hepa_uv_bootloader,
+    }
     # remove any bootloader nodes
     motor_nodes -= bootloader_nodes
+    motor_nodes -= hepa_uv_nodes
     # filter out usb nodes
     return {NodeId(target) for target in motor_nodes if target in NodeId}
 
@@ -501,6 +498,20 @@ def create_gripper_jaw_hold_group(encoder_position_um: int) -> MoveGroup:
     return move_group
 
 
+def moving_pipettes_in_move_group(group: MoveGroup) -> List[NodeId]:
+    """Utility function to get which pipette nodes are moving either in z or their plunger."""
+    all_nodes = [node for step in group for node, _ in step.items()]
+    moving_nodes = moving_axes_in_move_group(group)
+    pipettes_moving: List[NodeId] = [
+        k for k in moving_nodes if k in [NodeId.pipette_left, NodeId.pipette_right]
+    ]
+    if NodeId.head_l in moving_nodes and NodeId.pipette_left in all_nodes:
+        pipettes_moving.append(NodeId.pipette_left)
+    if NodeId.head_r in moving_nodes and NodeId.pipette_right in all_nodes:
+        pipettes_moving.append(NodeId.pipette_right)
+    return pipettes_moving
+
+
 def moving_axes_in_move_group(group: MoveGroup) -> Set[NodeId]:
     """Utility function to get only the moving nodes in a move group."""
     ret: Set[NodeId] = set()
@@ -547,6 +558,7 @@ def sensor_node_for_pipette(mount: OT3Mount) -> PipetteProbeTarget:
 _instr_sensor_id_lookup: Dict[InstrumentProbeType, SensorId] = {
     InstrumentProbeType.PRIMARY: SensorId.S0,
     InstrumentProbeType.SECONDARY: SensorId.S1,
+    InstrumentProbeType.BOTH: SensorId.BOTH,
 }
 
 

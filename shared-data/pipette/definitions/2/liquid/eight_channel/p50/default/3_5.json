@@ -2,6 +2,7 @@
   "$otSharedSchema": "#/pipette/schemas/2/pipetteLiquidPropertiesSchema.json",
   "supportedTips": {
     "t50": {
+      "uiMaxFlowRate": 57,
       "defaultAspirateFlowRate": {
         "default": 35,
         "valuesByApiLevel": { "2.14": 35 }
@@ -87,5 +88,8 @@
   },
   "maxVolume": 50,
   "minVolume": 5,
-  "defaultTipracks": ["opentrons/opentrons_flex_96_tiprack_50ul/1"]
+  "defaultTipracks": [
+    "opentrons/opentrons_flex_96_tiprack_50ul/1",
+    "opentrons/opentrons_flex_96_filtertiprack_50ul/1"
+  ]
 }

@@ -8,10 +8,10 @@ import {
   Flex,
   JUSTIFY_CENTER,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
-import { StyledText } from '../../atoms/text'
 import { SmallButton } from '../../atoms/buttons'
 import { Modal } from '../../molecules/Modal'
 
@@ -26,7 +26,7 @@ interface AlternativeSecurityTypeModalProps {
 export function AlternativeSecurityTypeModal({
   setShowAlternativeSecurityTypeModal,
 }: AlternativeSecurityTypeModalProps): JSX.Element {
-  const { t } = useTranslation('device_settings')
+  const { t } = useTranslation(['device_settings', 'branded'])
   const history = useHistory()
   const modalHeader: ModalHeaderBaseProps = {
     title: t('alternative_security_types'),
@@ -56,9 +56,9 @@ export function AlternativeSecurityTypeModal({
           <StyledText
             as="p"
             fontWeight={TYPOGRAPHY.fontWeightRegular}
-            color={COLORS.darkBlack90}
+            color={COLORS.grey60}
           >
-            {t('alternative_security_types_description')}
+            {t('branded:alternative_security_types_description')}
           </StyledText>
         </Flex>
         <SmallButton

@@ -1,7 +1,8 @@
 import * as React from 'react'
-import { when, resetAllWhenMocks } from 'jest-when'
+import { vi, it, expect, describe, beforeEach, afterEach } from 'vitest'
+import { when } from 'vitest-when'
 import { QueryClient, QueryClientProvider } from 'react-query'
-import { renderHook } from '@testing-library/react-hooks'
+import { renderHook } from '@testing-library/react'
 import { useAllTipLengthCalibrationsQuery } from '@opentrons/react-api-client'
 import {
   mockTipLengthCalibration1,
@@ -10,33 +11,28 @@ import {
 } from '../../../../redux/calibration/tip-length/__fixtures__'
 import { useTipLengthCalibrations } from '..'
 
-jest.mock('@opentrons/react-api-client')
-
-const mockUseAllTipLengthCalibrationsQuery = useAllTipLengthCalibrationsQuery as jest.MockedFunction<
-  typeof useAllTipLengthCalibrationsQuery
->
+vi.mock('@opentrons/react-api-client')
 
 const CALIBRATIONS_FETCH_MS = 5000
 
 describe('useTipLengthCalibrations hook', () => {
-  let wrapper: React.FunctionComponent<{}>
+  let wrapper: React.FunctionComponent<{ children: React.ReactNode }>
   beforeEach(() => {
     const queryClient = new QueryClient()
     wrapper = ({ children }) => (
       <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
     )
     afterEach(() => {
-      resetAllWhenMocks()
-      jest.resetAllMocks()
+      vi.resetAllMocks()
     })
   })
 
   it('returns an empty array when no tip length calibrations found', () => {
-    when(mockUseAllTipLengthCalibrationsQuery)
+    when(vi.mocked(useAllTipLengthCalibrationsQuery))
       .calledWith({
         refetchInterval: CALIBRATIONS_FETCH_MS,
       })
-      .mockReturnValue(null as any)
+      .thenReturn(null as any)
 
     const { result } = renderHook(() => useTipLengthCalibrations(), {
       wrapper,
@@ -46,11 +42,11 @@ describe('useTipLengthCalibrations hook', () => {
   })
 
   it('returns tip length calibrations when found', () => {
-    when(mockUseAllTipLengthCalibrationsQuery)
+    when(vi.mocked(useAllTipLengthCalibrationsQuery))
       .calledWith({
         refetchInterval: CALIBRATIONS_FETCH_MS,
       })
-      .mockReturnValue({
+      .thenReturn({
         data: {
           data: [
             mockTipLengthCalibration1,

@@ -10,7 +10,9 @@ from opentrons.protocol_engine.commands.aspirate_in_place import (
     AspirateInPlaceResult,
     AspirateInPlaceImplementation,
 )
+from opentrons.protocol_engine.commands.command import SuccessData
 from opentrons.protocol_engine.errors.exceptions import PipetteNotReadyToAspirateError
+from opentrons.protocol_engine.notes import CommandNoteAdder
 
 from opentrons.protocol_engine.state import (
     StateStore,
@@ -40,12 +42,14 @@ def subject(
     pipetting: PipettingHandler,
     state_store: StateStore,
     hardware_api: HardwareAPI,
+    mock_command_note_adder: CommandNoteAdder,
 ) -> AspirateInPlaceImplementation:
     """Get the impelementation subject."""
     return AspirateInPlaceImplementation(
         pipetting=pipetting,
         hardware_api=hardware_api,
         state_view=state_store,
+        command_note_adder=mock_command_note_adder,
     )
 
 
@@ -54,6 +58,7 @@ async def test_aspirate_in_place_implementation(
     pipetting: PipettingHandler,
     state_store: StateStore,
     hardware_api: HardwareAPI,
+    mock_command_note_adder: CommandNoteAdder,
     subject: AspirateInPlaceImplementation,
 ) -> None:
     """It should aspirate in place."""
@@ -71,13 +76,16 @@ async def test_aspirate_in_place_implementation(
 
     decoy.when(
         await pipetting.aspirate_in_place(
-            pipette_id="pipette-id-abc", volume=123, flow_rate=1.234
+            pipette_id="pipette-id-abc",
+            volume=123,
+            flow_rate=1.234,
+            command_note_adder=mock_command_note_adder,
         )
     ).then_return(123)
 
     result = await subject.execute(params=data)
 
-    assert result == AspirateInPlaceResult(volume=123)
+    assert result == SuccessData(public=AspirateInPlaceResult(volume=123), private=None)
 
 
 async def test_handle_aspirate_in_place_request_not_ready_to_aspirate(
@@ -110,7 +118,10 @@ async def test_handle_aspirate_in_place_request_not_ready_to_aspirate(
 
 
 async def test_aspirate_raises_volume_error(
-    decoy: Decoy, pipetting: PipettingHandler, subject: AspirateInPlaceImplementation
+    decoy: Decoy,
+    pipetting: PipettingHandler,
+    subject: AspirateInPlaceImplementation,
+    mock_command_note_adder: CommandNoteAdder,
 ) -> None:
     """Should raise an assertion error for volume larger than working volume."""
     data = AspirateInPlaceParams(
@@ -122,7 +133,12 @@ async def test_aspirate_raises_volume_error(
     decoy.when(pipetting.get_is_ready_to_aspirate(pipette_id="abc")).then_return(True)
 
     decoy.when(
-        await pipetting.aspirate_in_place(pipette_id="abc", volume=50, flow_rate=1.23)
+        await pipetting.aspirate_in_place(
+            pipette_id="abc",
+            volume=50,
+            flow_rate=1.23,
+            command_note_adder=mock_command_note_adder,
+        )
     ).then_raise(AssertionError("blah blah"))
 
     with pytest.raises(AssertionError):

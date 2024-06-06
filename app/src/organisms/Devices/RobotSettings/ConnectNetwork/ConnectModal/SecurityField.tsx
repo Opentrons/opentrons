@@ -7,6 +7,11 @@ import { useConnectFormField } from './form-state'
 import { FormRow } from './FormRow'
 
 import type { EapOption } from '../types'
+import type {
+  ControllerFieldState,
+  ControllerRenderProps,
+  FieldValues,
+} from 'react-hook-form'
 
 export interface SecurityFieldProps {
   id: string
@@ -15,6 +20,8 @@ export interface SecurityFieldProps {
   label: string
   showAllOptions: boolean
   eapOptions: EapOption[]
+  field: ControllerRenderProps<FieldValues, any>
+  fieldState: ControllerFieldState
   className?: string
 }
 
@@ -41,9 +48,14 @@ export const SecurityField = (props: SecurityFieldProps): JSX.Element => {
     showAllOptions,
     eapOptions,
     className,
+    field,
+    fieldState,
   } = props
 
-  const { value, error, setValue, setTouched } = useConnectFormField(name)
+  const { value, error, setValue, setTouched } = useConnectFormField(
+    field,
+    fieldState
+  )
 
   const options = [
     ...(showAllOptions ? ALL_SECURITY_OPTIONS : []),

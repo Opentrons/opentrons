@@ -1,5 +1,5 @@
 """A collection of motions that define a single move."""
-from typing import List, Dict, Iterable, Union
+from typing import List, Dict, Iterable, Union, Optional
 from dataclasses import dataclass
 import numpy as np
 from logging import getLogger
@@ -8,6 +8,8 @@ from opentrons_hardware.firmware_bindings.constants import (
     NodeId,
     PipetteTipActionType,
     MoveStopCondition as MoveStopCondition,
+    SensorType,
+    SensorId,
 )
 
 LOG = getLogger(__name__)
@@ -24,6 +26,7 @@ class MoveType(int, Enum):
     home = 0x1
     calibration = 0x2
     grip = 0x3
+    sensor = 0x4
 
     @classmethod
     def get_move_type(cls, condition: MoveStopCondition) -> "MoveType":
@@ -36,6 +39,7 @@ class MoveType(int, Enum):
             MoveStopCondition.gripper_force: cls.grip,
             MoveStopCondition.stall: cls.linear,
             MoveStopCondition.limit_switch_backoff: cls.linear,
+            MoveStopCondition.sensor_report: cls.sensor,
         }
         return mapping[condition]
 
@@ -50,6 +54,8 @@ class MoveGroupSingleAxisStep:
     acceleration_mm_sec_sq: np.float64 = np.float64(0)
     stop_condition: MoveStopCondition = MoveStopCondition.none
     move_type: MoveType = MoveType.linear
+    sensor_type: Optional[SensorType] = None
+    sensor_id: Optional[SensorId] = None
 
     def is_moving_step(self) -> bool:
         """Check if this step involves any actual movement."""
@@ -129,6 +135,8 @@ def create_step(
     duration: np.float64,
     present_nodes: Iterable[NodeId],
     stop_condition: MoveStopCondition = MoveStopCondition.none,
+    sensor_type_pass: Optional[SensorType] = None,
+    sensor_id_pass: Optional[SensorId] = None,
 ) -> MoveGroupStep:
     """Create a move from a block.
 
@@ -155,6 +163,8 @@ def create_step(
             duration_sec=duration,
             stop_condition=stop_condition,
             move_type=MoveType.get_move_type(stop_condition),
+            sensor_type=sensor_type_pass,
+            sensor_id=sensor_id_pass,
         )
     return step
 

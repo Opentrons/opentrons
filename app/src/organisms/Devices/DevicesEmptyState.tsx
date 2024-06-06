@@ -3,24 +3,24 @@ import { useTranslation } from 'react-i18next'
 import { useDispatch } from 'react-redux'
 
 import {
-  Box,
-  Flex,
-  Icon,
-  Link,
   ALIGN_CENTER,
+  Box,
   DIRECTION_COLUMN,
-  FONT_WEIGHT_REGULAR,
-  SPACING_5,
-  JUSTIFY_SPACE_BETWEEN,
-  TYPOGRAPHY,
-  SPACING,
-  PrimaryButton,
-  POSITION_ABSOLUTE,
   DISPLAY_FLEX,
+  Flex,
+  FONT_WEIGHT_REGULAR,
+  Icon,
+  JUSTIFY_SPACE_BETWEEN,
+  Link,
+  POSITION_ABSOLUTE,
+  PrimaryButton,
+  SPACING_5,
+  SPACING,
+  StyledText,
+  TYPOGRAPHY,
 } from '@opentrons/components'
 
 import { startDiscovery } from '../../redux/discovery'
-import { StyledText } from '../../atoms/text'
 
 export const TROUBLESHOOTING_CONNECTION_PROBLEMS_URL =
   'https://support.opentrons.com/s/article/Troubleshooting-connection-problems'

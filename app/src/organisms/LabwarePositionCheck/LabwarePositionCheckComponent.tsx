@@ -1,21 +1,17 @@
 import * as React from 'react'
+import { createPortal } from 'react-dom'
 import isEqual from 'lodash/isEqual'
 import { useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
+
 import { useConditionalConfirm } from '@opentrons/components'
-import { LabwareOffsetCreateData } from '@opentrons/api-client'
 import {
   useCreateLabwareOffsetMutation,
   useCreateMaintenanceCommandMutation,
-  useCurrentMaintenanceRun,
 } from '@opentrons/react-api-client'
-import {
-  CompletedProtocolAnalysis,
-  Coordinates,
-  FIXED_TRASH_ID,
-  FLEX_ROBOT_TYPE,
-} from '@opentrons/shared-data'
-import { Portal } from '../../App/portal'
+import { FIXED_TRASH_ID, FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
+
+import { getTopPortalEl } from '../../App/portal'
 // import { useTrackEvent } from '../../redux/analytics'
 import { IntroScreen } from './IntroScreen'
 import { ExitConfirmation } from './ExitConfirmation'
@@ -28,16 +24,24 @@ import { DetachProbe } from './DetachProbe'
 import { PickUpTip } from './PickUpTip'
 import { ReturnTip } from './ReturnTip'
 import { ResultsSummary } from './ResultsSummary'
-import { useChainMaintenanceCommands } from '../../resources/runs/hooks'
+import { useChainMaintenanceCommands } from '../../resources/runs'
 import { FatalErrorModal } from './FatalErrorModal'
 import { RobotMotionLoader } from './RobotMotionLoader'
+import { useNotifyCurrentMaintenanceRun } from '../../resources/maintenance_runs'
 import { getLabwarePositionCheckSteps } from './getLabwarePositionCheckSteps'
-import type { LabwareOffset, CommandData } from '@opentrons/api-client'
+
 import type {
+  CompletedProtocolAnalysis,
+  Coordinates,
   CreateCommand,
   DropTipCreateCommand,
   RobotType,
 } from '@opentrons/shared-data'
+import type {
+  LabwareOffsetCreateData,
+  LabwareOffset,
+  CommandData,
+} from '@opentrons/api-client'
 import type { Axis, Sign, StepSize } from '../../molecules/JogControls/types'
 import type { RegisterPositionAction, WorkingOffset } from './types'
 
@@ -82,7 +86,7 @@ export const LabwarePositionCheckComponent = (
     setMonitorMaintenanceRunForDeletion,
   ] = React.useState<boolean>(false)
 
-  const { data: maintenanceRunData } = useCurrentMaintenanceRun({
+  const { data: maintenanceRunData } = useNotifyCurrentMaintenanceRun({
     refetchInterval: RUN_REFETCH_INTERVAL,
     enabled: maintenanceRunId != null,
   })
@@ -330,6 +334,7 @@ export const LabwarePositionCheckComponent = (
     modalContent = (
       <FatalErrorModal
         errorMessage={fatalError}
+        shouldUseMetalProbe={shouldUseMetalProbe}
         onClose={handleCleanUpAndClose}
       />
     )
@@ -422,18 +427,17 @@ export const LabwarePositionCheckComponent = (
       }
     />
   )
-  return (
-    <Portal level="top">
-      {isOnDevice ? (
-        <LegacyModalShell fullPage>
-          {wizardHeader}
-          {modalContent}
-        </LegacyModalShell>
-      ) : (
-        <LegacyModalShell width="47rem" header={wizardHeader}>
-          {modalContent}
-        </LegacyModalShell>
-      )}
-    </Portal>
+  return createPortal(
+    isOnDevice ? (
+      <LegacyModalShell fullPage>
+        {wizardHeader}
+        {modalContent}
+      </LegacyModalShell>
+    ) : (
+      <LegacyModalShell width="47rem" header={wizardHeader}>
+        {modalContent}
+      </LegacyModalShell>
+    ),
+    getTopPortalEl()
   )
 }

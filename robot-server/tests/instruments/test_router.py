@@ -26,6 +26,7 @@ from opentrons_shared_data.gripper.gripper_definition import (
     GripperModel,
 )
 from opentrons_shared_data.pipette.dev_types import PipetteName, PipetteModel
+from opentrons.hardware_control.protocols.types import FlexRobotType, OT2RobotType
 
 from robot_server.instruments.instrument_models import (
     Gripper,
@@ -50,7 +51,9 @@ if TYPE_CHECKING:
 @pytest.fixture
 def ot2_hardware_api(decoy: Decoy) -> HardwareControlAPI:
     """Get a mock hardware control API."""
-    return decoy.mock(cls=API)
+    mock = decoy.mock(cls=API)
+    decoy.when(mock.get_robot_type()).then_return(OT2RobotType)
+    return mock
 
 
 def get_sample_pipette_dict(
@@ -77,7 +80,9 @@ def ot3_hardware_api(decoy: Decoy) -> HardwareControlAPI:
     try:
         from opentrons.hardware_control.ot3api import OT3API
 
-        return decoy.mock(cls=OT3API)
+        mock = decoy.mock(cls=OT3API)
+        decoy.when(mock.get_robot_type()).then_return(FlexRobotType)
+        return mock
     except ImportError:
         return None  # type: ignore[return-value]
 
@@ -116,7 +121,7 @@ async def test_get_all_attached_instruments(
         subsystem=SubSystem.pipette_right,
     )
 
-    async def rehearse_instrument_retrievals() -> None:
+    async def rehearse_instrument_retrievals(skip_if_would_block: bool = False) -> None:
         decoy.when(ot3_hardware_api.attached_gripper).then_return(
             cast(
                 GripperDict,
@@ -183,9 +188,9 @@ async def test_get_all_attached_instruments(
 
     # We use this convoluted way of testing to verify the important point that
     # cache_instruments is called before fetching attached pipette and gripper data.
-    decoy.when(await ot3_hardware_api.cache_instruments()).then_do(
-        rehearse_instrument_retrievals
-    )
+    decoy.when(
+        await ot3_hardware_api.cache_instruments(skip_if_would_block=True)
+    ).then_do(rehearse_instrument_retrievals)
     decoy.when(ot3_hardware_api.get_instrument_offset(mount=OT3Mount.LEFT)).then_return(
         PipetteOffsetSummary(
             offset=Point(1, 2, 3),

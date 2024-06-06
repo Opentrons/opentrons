@@ -1,23 +1,21 @@
-import { UseQueryResult } from 'react-query'
+import { vi, it, expect, describe, beforeEach, afterEach } from 'vitest'
 import { useAllSessionsQuery } from '@opentrons/react-api-client'
 import { useIsLegacySessionInProgress } from '../useIsLegacySessionInProgress'
 
+import type { UseQueryResult } from 'react-query'
 import type { Sessions } from '@opentrons/api-client'
 
-jest.mock('@opentrons/react-api-client')
+vi.mock('@opentrons/react-api-client')
 
-const mockUseAllSessionsQuery = useAllSessionsQuery as jest.MockedFunction<
-  typeof useAllSessionsQuery
->
 describe('useIsLegacySessionInProgress', () => {
   beforeEach(() => {
-    mockUseAllSessionsQuery.mockReturnValue(({
+    vi.mocked(useAllSessionsQuery).mockReturnValue(({
       data: [],
       links: null,
     } as unknown) as UseQueryResult<Sessions, Error>)
   })
   afterEach(() => {
-    jest.resetAllMocks()
+    vi.resetAllMocks()
   })
 
   it('returns false when sessions are empty', () => {
@@ -26,7 +24,7 @@ describe('useIsLegacySessionInProgress', () => {
   })
 
   it('returns  true when sessions are not empty', () => {
-    mockUseAllSessionsQuery.mockReturnValue(({
+    vi.mocked(useAllSessionsQuery).mockReturnValue(({
       data: {
         data: {
           id: 'id',

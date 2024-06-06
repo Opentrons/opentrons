@@ -4,6 +4,7 @@ import path from 'path'
 import fs from 'fs-extra'
 import tempy from 'tempy'
 import Electron from 'electron'
+import { describe, it, expect, afterAll, vi } from 'vitest'
 
 import {
   readLabwareDirectory,
@@ -12,11 +13,7 @@ import {
   removeLabwareFile,
 } from '../definitions'
 
-jest.mock('electron')
-
-const trashItem = Electron.shell.trashItem as jest.MockedFunction<
-  typeof Electron.shell.trashItem
->
+vi.mock('electron')
 
 describe('labware directory utilities', () => {
   const tempDirs: string[] = []
@@ -26,7 +23,7 @@ describe('labware directory utilities', () => {
     return dir
   }
 
-  afterAll(() => {
+  afterAll((): any => {
     return Promise.all(tempDirs.map(d => fs.remove(d)))
   })
 
@@ -217,7 +214,7 @@ describe('labware directory utilities', () => {
       const dir = makeEmptyDir()
       const filename = path.join(dir, 'foo.json')
 
-      trashItem.mockResolvedValue()
+      vi.mocked(Electron.shell.trashItem).mockResolvedValue()
 
       return removeLabwareFile(filename).then(() => {
         expect(Electron.shell.trashItem).toHaveBeenCalledWith(filename)
@@ -229,7 +226,9 @@ describe('labware directory utilities', () => {
       const filename = path.join(dir, 'foo.json')
       const setup = fs.writeJson(filename, { name: 'a' })
 
-      trashItem.mockRejectedValue(Error('something went wrong'))
+      vi.mocked(Electron.shell.trashItem).mockRejectedValue(
+        Error('something went wrong')
+      )
 
       return setup
         .then(() => removeLabwareFile(filename))

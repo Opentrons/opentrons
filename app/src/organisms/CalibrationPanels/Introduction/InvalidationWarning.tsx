@@ -1,8 +1,7 @@
-import { Flex, SPACING, TYPOGRAPHY } from '@opentrons/components'
 import * as React from 'react'
+import { Flex, SPACING, TYPOGRAPHY, StyledText } from '@opentrons/components'
 import { useTranslation } from 'react-i18next'
 import { Banner } from '../../../atoms/Banner'
-import { StyledText } from '../../../atoms/text'
 import * as Sessions from '../../../redux/sessions'
 
 interface InvalidationWarningProps {

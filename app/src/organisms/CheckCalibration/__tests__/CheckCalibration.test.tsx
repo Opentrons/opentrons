@@ -1,8 +1,11 @@
 import * as React from 'react'
-import { when, resetAllWhenMocks } from 'jest-when'
+import { fireEvent, screen } from '@testing-library/react'
+import { when } from 'vitest-when'
+import { vi, it, describe, expect, beforeEach, afterEach } from 'vitest'
 
-import { renderWithProviders } from '@opentrons/components'
-import { getDeckDefinitions } from '@opentrons/components/src/hardware-sim/Deck/getDeckDefinitions'
+import { getDeckDefinitions } from '@opentrons/shared-data'
+
+import { renderWithProviders } from '../../../__testing-utils__'
 import { i18n } from '../../../i18n'
 import * as Sessions from '../../../redux/sessions'
 import { mockCalibrationCheckSessionAttributes } from '../../../redux/sessions/__fixtures__'
@@ -10,27 +13,47 @@ import { mockCalibrationCheckSessionAttributes } from '../../../redux/sessions/_
 import { CheckCalibration } from '../index'
 import type { RobotCalibrationCheckStep } from '../../../redux/sessions/types'
 
-jest.mock('@opentrons/components/src/hardware-sim/Deck/getDeckDefinitions')
-jest.mock('../../../redux/calibration/selectors')
-jest.mock('../../../redux/config')
+vi.mock('../../../redux/calibration/selectors')
+vi.mock('../../../redux/config')
+vi.mock('@opentrons/shared-data', async importOriginal => {
+  const actual = await importOriginal<typeof getDeckDefinitions>()
+  return {
+    ...actual,
+    getDeckDefinitions: vi.fn(),
+  }
+})
 
 interface CheckCalibrationSpec {
   heading: string
   currentStep: RobotCalibrationCheckStep
 }
 
-const mockGetDeckDefinitions = getDeckDefinitions as jest.MockedFunction<
-  typeof getDeckDefinitions
->
-
 describe('CheckCalibration', () => {
-  let render: (
-    props?: Partial<React.ComponentProps<typeof CheckCalibration>>
-  ) => ReturnType<typeof renderWithProviders>
-  let dispatchRequests: jest.MockedFunction<any>
+  const dispatchRequests = vi.fn()
   const mockCalibrationCheckSession: Sessions.CalibrationCheckSession = {
     id: 'fake_check_session_id',
     ...mockCalibrationCheckSessionAttributes,
+  }
+
+  const render = (
+    props: Partial<React.ComponentProps<typeof CheckCalibration>> = {}
+  ) => {
+    const {
+      showSpinner = false,
+      isJogging = false,
+      session = mockCalibrationCheckSession,
+    } = props
+    return renderWithProviders<React.ComponentType<typeof CheckCalibration>>(
+      <CheckCalibration
+        robotName="robot-name"
+        session={session}
+        dispatchRequests={dispatchRequests}
+        showSpinner={showSpinner}
+        hasBlock={false}
+        isJogging={isJogging}
+      />,
+      { i18nInstance: i18n }
+    )
   }
 
   const SPECS: CheckCalibrationSpec[] = [
@@ -65,39 +88,16 @@ describe('CheckCalibration', () => {
   ]
 
   beforeEach(() => {
-    when(mockGetDeckDefinitions).calledWith().mockReturnValue({})
-
-    dispatchRequests = jest.fn()
-
-    render = (
-      props: Partial<React.ComponentProps<typeof CheckCalibration>> = {}
-    ) => {
-      const {
-        showSpinner = false,
-        isJogging = false,
-        session = mockCalibrationCheckSession,
-      } = props
-      return renderWithProviders<React.ComponentType<typeof CheckCalibration>>(
-        <CheckCalibration
-          robotName="robot-name"
-          session={session}
-          dispatchRequests={dispatchRequests}
-          showSpinner={showSpinner}
-          hasBlock={false}
-          isJogging={isJogging}
-        />,
-        { i18nInstance: i18n }
-      )
-    }
+    when(vi.mocked(getDeckDefinitions)).calledWith().thenReturn({})
   })
 
   afterEach(() => {
-    resetAllWhenMocks()
+    vi.clearAllMocks()
   })
 
   SPECS.forEach(spec => {
     it(`renders correct contents when currentStep is ${spec.currentStep}`, () => {
-      const { getByRole, queryByRole } = render({
+      render({
         session: {
           ...mockCalibrationCheckSession,
           details: {
@@ -105,38 +105,38 @@ describe('CheckCalibration', () => {
             currentStep: spec.currentStep,
           },
         },
-      })[0]
+      })
 
       SPECS.forEach(({ currentStep, heading }) => {
         if (currentStep === spec.currentStep) {
           expect(
-            getByRole('heading', { name: spec.heading })
+            screen.getByRole('heading', { name: spec.heading })
           ).toBeInTheDocument()
         } else {
-          expect(queryByRole('heading', { name: heading })).toBeNull()
+          expect(screen.queryByRole('heading', { name: heading })).toBeNull()
         }
       })
     })
   })
 
   it('renders confirm exit on exit click', () => {
-    const { getByRole, queryByRole } = render()[0]
-
+    render()
     expect(
-      queryByRole('heading', {
+      screen.queryByRole('heading', {
         name: 'Calibration Health Check progress will be lost',
       })
     ).toBeNull()
-    getByRole('button', { name: 'Exit' }).click()
+    const button = screen.getByRole('button', { name: 'Exit' })
+    fireEvent.click(button)
     expect(
-      getByRole('heading', {
+      screen.getByRole('heading', {
         name: 'Calibration Health Check progress will be lost',
       })
     ).toBeInTheDocument()
   })
 
   it('does not render contents when showSpinner is true', () => {
-    const { queryByRole } = render({
+    render({
       showSpinner: true,
       session: {
         ...mockCalibrationCheckSession,
@@ -145,8 +145,10 @@ describe('CheckCalibration', () => {
           currentStep: 'sessionStarted',
         },
       },
-    })[0]
-    expect(queryByRole('heading', { name: 'Before you begin' })).toBeNull()
+    })
+    expect(
+      screen.queryByRole('heading', { name: 'Before you begin' })
+    ).toBeNull()
   })
 
   it('does dispatch jog requests when not isJogging', () => {
@@ -158,8 +160,9 @@ describe('CheckCalibration', () => {
         currentStep: Sessions.DECK_STEP_PREPARING_PIPETTE,
       },
     }
-    const { getByRole } = render({ isJogging: false, session })[0]
-    getByRole('button', { name: 'forward' }).click()
+    render({ isJogging: false, session })
+    const button = screen.getByRole('button', { name: 'forward' })
+    fireEvent.click(button)
     expect(dispatchRequests).toHaveBeenCalledWith(
       Sessions.createSessionCommand('robot-name', session.id, {
         command: Sessions.sharedCalCommands.JOG,
@@ -177,8 +180,9 @@ describe('CheckCalibration', () => {
         currentStep: Sessions.DECK_STEP_PREPARING_PIPETTE,
       },
     }
-    const { getByRole } = render({ isJogging: true, session })[0]
-    getByRole('button', { name: 'forward' }).click()
+    render({ isJogging: true, session })
+    const button = screen.getByRole('button', { name: 'forward' })
+    fireEvent.click(button)
     expect(dispatchRequests).not.toHaveBeenCalledWith(
       Sessions.createSessionCommand('robot-name', session.id, {
         command: Sessions.sharedCalCommands.JOG,

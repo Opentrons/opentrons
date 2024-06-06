@@ -1,7 +1,7 @@
 import * as React from 'react'
 import cx from 'classnames'
 import { Icon } from '../icons'
-import styles from './forms.css'
+import styles from './forms.module.css'
 
 export const INPUT_TYPE_TEXT: 'text' = 'text'
 export const INPUT_TYPE_PASSWORD: 'password' = 'password'

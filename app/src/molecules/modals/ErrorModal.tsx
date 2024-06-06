@@ -1,9 +1,10 @@
 import * as React from 'react'
+import { createPortal } from 'react-dom'
 import { Link } from 'react-router-dom'
 import { AlertModal } from '@opentrons/components'
-import { Portal } from '../../App/portal'
+import { getModalPortalEl } from '../../App/portal'
 
-import styles from './styles.css'
+import styles from './styles.module.css'
 import type { ButtonProps } from '@opentrons/components'
 
 interface Props {
@@ -33,19 +34,17 @@ export function ErrorModal(props: Props): JSX.Element {
     }
   }
 
-  return (
-    <Portal>
-      <AlertModal heading={heading} buttons={[closeButtonProps]} alertOverlay>
-        <p className={styles.error_modal_message}>
-          {error?.message ?? AN_UNKNOWN_ERROR_OCCURRED}
-        </p>
-        <p>{description}</p>
-        <p>
-          If you keep getting this message, try restarting your app and/or
-          robot. If this does not resolve the issue please contact Opentrons
-          Support.
-        </p>
-      </AlertModal>
-    </Portal>
+  return createPortal(
+    <AlertModal heading={heading} buttons={[closeButtonProps]} alertOverlay>
+      <p className={styles.error_modal_message}>
+        {error?.message ?? AN_UNKNOWN_ERROR_OCCURRED}
+      </p>
+      <p>{description}</p>
+      <p>
+        If you keep getting this message, try restarting your app and/or robot.
+        If this does not resolve the issue please contact Opentrons Support.
+      </p>
+    </AlertModal>,
+    getModalPortalEl()
   )
 }

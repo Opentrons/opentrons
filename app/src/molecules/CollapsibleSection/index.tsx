@@ -2,24 +2,24 @@ import * as React from 'react'
 import { css } from 'styled-components'
 
 import {
+  Btn,
+  COLORS,
   DIRECTION_COLUMN,
   Flex,
-  Btn,
   Icon,
   JUSTIFY_SPACE_BETWEEN,
-  StyleProps,
-  COLORS,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
-import { StyledText } from '../../atoms/text'
+import type { StyleProps } from '@opentrons/components'
 
 const ACCORDION_STYLE = css`
   border-radius: 50%;
   &:hover {
-    background: ${COLORS.lightGreyHover};
+    background: ${COLORS.grey30};
   }
   &:active {
-    background: ${COLORS.lightGreyPressed};
+    background: ${COLORS.grey35};
   }
 `
 
@@ -38,7 +38,9 @@ export function CollapsibleSection(
     <Flex flexDirection={DIRECTION_COLUMN} {...styleProps}>
       <Flex
         justifyContent={JUSTIFY_SPACE_BETWEEN}
-        onClick={() => setIsExpanded(!isExpanded)}
+        onClick={() => {
+          setIsExpanded(!isExpanded)
+        }}
         css={{
           cursor: 'pointer',
         }}
@@ -47,7 +49,9 @@ export function CollapsibleSection(
           {title}
         </StyledText>
         <Btn
-          onClick={() => setIsExpanded(!isExpanded)}
+          onClick={() => {
+            setIsExpanded(!isExpanded)
+          }}
           data-testid={
             isExpanded
               ? `CollapsibleSection_collapse_${title}`

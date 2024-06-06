@@ -1,3 +1,4 @@
+import { describe, expect, it } from 'vitest'
 import * as Actions from '../actions'
 import { reducer, manualAddressesReducer } from '../reducer'
 import type { Action } from '../types'

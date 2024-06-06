@@ -2,6 +2,7 @@ import * as React from 'react'
 import { css } from 'styled-components'
 import { useTranslation } from 'react-i18next'
 import {
+  ALIGN_FLEX_START,
   BORDERS,
   Box,
   Btn,
@@ -12,92 +13,80 @@ import {
   JUSTIFY_CENTER,
   JUSTIFY_SPACE_BETWEEN,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import {
+  FLEX_ROBOT_TYPE,
+  FLEX_USB_MODULE_ADDRESSABLE_AREAS,
   SINGLE_SLOT_FIXTURES,
   getCutoutDisplayName,
+  getDeckDefFromRobotType,
   getFixtureDisplayName,
 } from '@opentrons/shared-data'
-import { StyledText } from '../../../../atoms/text'
 import { StatusLabel } from '../../../../atoms/StatusLabel'
 import { TertiaryButton } from '../../../../atoms/buttons/TertiaryButton'
 import { LocationConflictModal } from './LocationConflictModal'
 import { NotConfiguredModal } from './NotConfiguredModal'
 import { getFixtureImage } from './utils'
+import { DeckFixtureSetupInstructionsModal } from '../../../DeviceDetailsDeckConfiguration/DeckFixtureSetupInstructionsModal'
 
+import type { DeckDefinition } from '@opentrons/shared-data'
 import type { CutoutConfigAndCompatibility } from '../../../../resources/deck_configuration/hooks'
 
 interface SetupFixtureListProps {
   deckConfigCompatibility: CutoutConfigAndCompatibility[]
+  robotName: string
 }
 
+/**
+ * List items of all "non-module" fixtures e.g. staging slot, waste chute, trash bin...
+ * @param props
+ * @returns JSX.Element
+ */
 export const SetupFixtureList = (props: SetupFixtureListProps): JSX.Element => {
-  const { deckConfigCompatibility } = props
-  const { t, i18n } = useTranslation('protocol_setup')
+  const { deckConfigCompatibility, robotName } = props
+  const deckDef = getDeckDefFromRobotType(FLEX_ROBOT_TYPE)
   return (
     <>
-      <Flex
-        flexDirection={DIRECTION_ROW}
-        justifyContent={JUSTIFY_SPACE_BETWEEN}
-        marginTop={SPACING.spacing16}
-        marginLeft={SPACING.spacing20}
-        marginBottom={SPACING.spacing4}
-      >
-        <StyledText
-          css={TYPOGRAPHY.labelSemiBold}
-          marginBottom={SPACING.spacing8}
-          width="45%"
-        >
-          {i18n.format(t('fixture_name'), 'capitalize')}
-        </StyledText>
-        <StyledText
-          css={TYPOGRAPHY.labelSemiBold}
-          marginRight={SPACING.spacing16}
-          width="15%"
-        >
-          {t('location')}
-        </StyledText>
-        <StyledText
-          css={TYPOGRAPHY.labelSemiBold}
-          marginRight={SPACING.spacing16}
-          width="15%"
-        >
-          {t('status')}
-        </StyledText>
-      </Flex>
-      <Flex
-        flexDirection={DIRECTION_COLUMN}
-        width="100%"
-        overflowY="auto"
-        gridGap={SPACING.spacing4}
-        marginBottom={SPACING.spacing24}
-      >
-        {deckConfigCompatibility.map(cutoutConfigAndCompatibility => {
-          return (
-            <FixtureListItem
-              key={cutoutConfigAndCompatibility.cutoutId}
-              {...cutoutConfigAndCompatibility}
-            />
-          )
-        })}
-      </Flex>
+      {deckConfigCompatibility.map(cutoutConfigAndCompatibility => {
+        // filter out all fixtures that only provide usb module addressable areas
+        // (i.e. everything but MagBlockV1 and StagingAreaWithMagBlockV1)
+        // as they're handled in the Modules Table
+        return cutoutConfigAndCompatibility.requiredAddressableAreas.every(
+          raa => FLEX_USB_MODULE_ADDRESSABLE_AREAS.includes(raa)
+        ) ? null : (
+          <FixtureListItem
+            key={cutoutConfigAndCompatibility.cutoutId}
+            deckDef={deckDef}
+            robotName={robotName}
+            {...cutoutConfigAndCompatibility}
+          />
+        )
+      })}
     </>
   )
 }
 
-interface FixtureListItemProps extends CutoutConfigAndCompatibility {}
+interface FixtureListItemProps extends CutoutConfigAndCompatibility {
+  deckDef: DeckDefinition
+  robotName: string
+}
 
 export function FixtureListItem({
   cutoutId,
   cutoutFixtureId,
   compatibleCutoutFixtureIds,
+  missingLabwareDisplayName,
+  deckDef,
+  robotName,
 }: FixtureListItemProps): JSX.Element {
   const { t } = useTranslation('protocol_setup')
 
   const isCurrentFixtureCompatible =
     cutoutFixtureId != null &&
     compatibleCutoutFixtureIds.includes(cutoutFixtureId)
+  const isRequiredSingleSlotMissing = missingLabwareDisplayName != null
   const isConflictingFixtureConfigured =
     cutoutFixtureId != null && !SINGLE_SLOT_FIXTURES.includes(cutoutFixtureId)
   let statusLabel
@@ -109,18 +98,18 @@ export function FixtureListItem({
             ? t('location_conflict')
             : t('not_configured')
         }
-        backgroundColor={COLORS.warningBackgroundLight}
-        iconColor={COLORS.warningEnabled}
-        textColor={COLORS.warningText}
+        backgroundColor={COLORS.yellow30}
+        iconColor={COLORS.yellow60}
+        textColor={COLORS.yellow60}
       />
     )
   } else {
     statusLabel = (
       <StatusLabel
         status={t('configured')}
-        backgroundColor={COLORS.successBackgroundLight}
-        iconColor={COLORS.successEnabled}
-        textColor={COLORS.successText}
+        backgroundColor={COLORS.green30}
+        iconColor={COLORS.green60}
+        textColor={COLORS.green60}
       />
     )
   }
@@ -134,27 +123,44 @@ export function FixtureListItem({
     setShowNotConfiguredModal,
   ] = React.useState<boolean>(false)
 
+  const [
+    showSetupInstructionsModal,
+    setShowSetupInstructionsModal,
+  ] = React.useState<boolean>(false)
+
   return (
     <>
-      {showNotConfiguredModal && cutoutFixtureId != null ? (
+      {showNotConfiguredModal ? (
         <NotConfiguredModal
-          onCloseClick={() => setShowNotConfiguredModal(false)}
+          onCloseClick={() => {
+            setShowNotConfiguredModal(false)
+          }}
           cutoutId={cutoutId}
           requiredFixtureId={compatibleCutoutFixtureIds[0]}
         />
       ) : null}
-      {showLocationConflictModal && cutoutFixtureId != null ? (
+      {showLocationConflictModal ? (
         <LocationConflictModal
-          onCloseClick={() => setShowLocationConflictModal(false)}
+          onCloseClick={() => {
+            setShowLocationConflictModal(false)
+          }}
           cutoutId={cutoutId}
+          deckDef={deckDef}
+          missingLabwareDisplayName={missingLabwareDisplayName}
           requiredFixtureId={compatibleCutoutFixtureIds[0]}
+          robotName={robotName}
+        />
+      ) : null}
+      {showSetupInstructionsModal ? (
+        <DeckFixtureSetupInstructionsModal
+          setShowSetupInstructionsModal={setShowSetupInstructionsModal}
         />
       ) : null}
       <Box
         border={BORDERS.styleSolid}
-        borderColor={COLORS.medGreyEnabled}
+        borderColor={COLORS.grey30}
         borderWidth="1px"
-        borderRadius={BORDERS.radiusSoftCorners}
+        borderRadius={BORDERS.borderRadius4}
         padding={SPACING.spacing16}
         backgroundColor={COLORS.white}
       >
@@ -168,28 +174,39 @@ export function FixtureListItem({
               <img
                 width="60px"
                 height="54px"
-                src={getFixtureImage(cutoutFixtureId)}
+                src={
+                  // show the current fixture for a missing single slot
+                  isCurrentFixtureCompatible || isRequiredSingleSlotMissing
+                    ? getFixtureImage(cutoutFixtureId)
+                    : getFixtureImage(compatibleCutoutFixtureIds?.[0])
+                }
               />
             ) : null}
-            <Flex flexDirection={DIRECTION_COLUMN}>
+            <Flex
+              flexDirection={DIRECTION_COLUMN}
+              alignItems={ALIGN_FLEX_START}
+            >
               <StyledText
                 css={TYPOGRAPHY.pSemiBold}
                 marginLeft={SPACING.spacing20}
               >
-                {getFixtureDisplayName(cutoutFixtureId)}
+                {isCurrentFixtureCompatible || isRequiredSingleSlotMissing
+                  ? getFixtureDisplayName(cutoutFixtureId)
+                  : getFixtureDisplayName(compatibleCutoutFixtureIds?.[0])}
               </StyledText>
               <Btn
                 marginLeft={SPACING.spacing16}
                 css={css`
-                  color: ${COLORS.blueEnabled};
+                  color: ${COLORS.blue50};
 
                   &:hover {
-                    color: ${COLORS.blueHover};
+                    color: ${COLORS.blue55};
                   }
                 `}
                 marginTop={SPACING.spacing4}
-                //  TODO(jr, 10/4/23): wire up the instructions modal
-                onClick={() => console.log('wire this up')}
+                onClick={() => {
+                  setShowSetupInstructionsModal(true)
+                }}
               >
                 <StyledText marginLeft={SPACING.spacing4} as="p">
                   {t('view_setup_instructions')}
@@ -209,14 +226,14 @@ export function FixtureListItem({
             {!isCurrentFixtureCompatible ? (
               <TertiaryButton
                 width="max-content"
-                onClick={() =>
+                onClick={() => {
                   isConflictingFixtureConfigured
                     ? setShowLocationConflictModal(true)
                     : setShowNotConfiguredModal(true)
-                }
+                }}
               >
                 <StyledText as="label" cursor="pointer">
-                  {t('update_deck')}
+                  {t('resolve')}
                 </StyledText>
               </TertiaryButton>
             ) : null}

@@ -84,3 +84,22 @@ stages:
         # We need to make sure we get the Content-Type right because FastAPI won't do it for us.
         Content-Type: application/json
       json: !force_format_include '{analysis_data}'
+
+
+  - name: Check that a new analysis is started with forceReAnalyze
+    request:
+      url: '{ot2_server_base_url}/protocols/{protocol_id}/analyses'
+      method: POST
+      json:
+        data:
+          forceReAnalyze: true
+    response:
+      strict:
+        - json:off
+      status_code: 201
+      json:
+        data:
+          - id: '{analysis_id}'
+            status: completed
+          - id: !anystr
+            status: pending

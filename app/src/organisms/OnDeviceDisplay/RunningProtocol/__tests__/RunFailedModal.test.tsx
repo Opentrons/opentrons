@@ -1,22 +1,26 @@
 import * as React from 'react'
 import { MemoryRouter } from 'react-router-dom'
-import { fireEvent } from '@testing-library/react'
+import { fireEvent, screen } from '@testing-library/react'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 
-import { renderWithProviders } from '@opentrons/components'
 import { useStopRunMutation } from '@opentrons/react-api-client'
 
+import { renderWithProviders } from '../../../../__testing-utils__'
 import { i18n } from '../../../../i18n'
 import { RunFailedModal } from '../RunFailedModal'
 
-jest.mock('@opentrons/react-api-client')
+import type { useHistory } from 'react-router-dom'
+
+vi.mock('@opentrons/react-api-client')
 
 const RUN_ID = 'mock_runID'
-const mockFn = jest.fn()
-const mockPush = jest.fn()
+const mockFn = vi.fn()
+const mockPush = vi.fn()
 const mockErrors = [
   {
     id: 'd0245210-dfb9-4f1c-8ad0-3416b603a7ba',
     errorType: 'generalError',
+    isDefined: false,
     createdAt: '2023-04-09T21:41:51.333171+00:00',
     detail: 'Error with code 4000 (lowest priority)',
     errorInfo: {},
@@ -25,6 +29,7 @@ const mockErrors = [
       {
         id: 'd0245210-dfb9-4f1c-8ad0-3416b603a7ba',
         errorType: 'roboticsInteractionError',
+        isDefined: false,
         createdAt: '2023-04-09T21:41:51.333171+00:00',
         detail: 'Error with code 3000 (second lowest priortiy)',
         errorInfo: {},
@@ -34,6 +39,7 @@ const mockErrors = [
       {
         id: 'd0245210-dfb9-4f1c-8ad0-3416b603a7ba',
         errorType: 'roboticsControlError',
+        isDefined: false,
         createdAt: '2023-04-09T21:41:51.333171+00:00',
         detail: 'Error with code 2000 (second highest priority)',
         errorInfo: {},
@@ -42,6 +48,7 @@ const mockErrors = [
           {
             id: 'd0245210-dfb9-4f1c-8ad0-3416b603a7ba',
             errorType: 'hardwareCommunicationError',
+            isDefined: false,
             createdAt: '2023-04-09T21:41:51.333171+00:00',
             detail: 'Error with code 1000 (highest priority)',
             errorInfo: {},
@@ -55,6 +62,7 @@ const mockErrors = [
   {
     id: 'd0245210-dfb9-4f1c-8ad0-3416b603a7ba',
     errorType: 'roboticsInteractionError',
+    isDefined: false,
     createdAt: '2023-04-09T21:41:51.333171+00:00',
     detail: 'Error with code 2001 (second highest priortiy)',
     errorInfo: {},
@@ -63,19 +71,15 @@ const mockErrors = [
   },
 ]
 
-let mockStopRun: jest.Mock
+const mockStopRun = vi.fn((_runId, opts) => opts.onSuccess())
 
-jest.mock('react-router-dom', () => {
-  const reactRouterDom = jest.requireActual('react-router-dom')
+vi.mock('react-router-dom', async importOriginal => {
+  const actual = await importOriginal<typeof useHistory>()
   return {
-    ...reactRouterDom,
+    ...actual,
     useHistory: () => ({ push: mockPush } as any),
   }
 })
-
-const mockUseStopRunMutation = useStopRunMutation as jest.MockedFunction<
-  typeof useStopRunMutation
->
 
 const render = (props: React.ComponentProps<typeof RunFailedModal>) => {
   return renderWithProviders(
@@ -97,24 +101,26 @@ describe('RunFailedModal', () => {
       setShowRunFailedModal: mockFn,
       errors: mockErrors,
     }
-    mockStopRun = jest.fn((_runId, opts) => opts.onSuccess())
-    mockUseStopRunMutation.mockReturnValue({ stopRun: mockStopRun } as any)
+
+    vi.mocked(useStopRunMutation).mockReturnValue({
+      stopRun: mockStopRun,
+    } as any)
   })
 
   it('should render the highest priority error', () => {
-    const [{ getByText }] = render(props)
-    getByText('Run failed')
-    getByText('Error 1000: hardwareCommunicationError')
-    getByText('Error with code 1000 (highest priority)')
-    getByText(
+    render(props)
+    screen.getByText('Run failed')
+    screen.getByText('Error 1000: hardwareCommunicationError')
+    screen.getByText('Error with code 1000 (highest priority)')
+    screen.getByText(
       'Download the robot logs from the Opentrons App and send it to support@opentrons.com for assistance.'
     )
-    getByText('Close')
+    screen.getByText('Close')
   })
 
   it('when tapping close, call mock functions', () => {
-    const [{ getByText }] = render(props)
-    const button = getByText('Close')
+    render(props)
+    const button = screen.getByText('Close')
     fireEvent.click(button)
     expect(mockStopRun).toHaveBeenCalled()
     expect(mockPush).toHaveBeenCalledWith('/dashboard')

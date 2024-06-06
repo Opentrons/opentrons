@@ -1,35 +1,78 @@
-import * as React from 'react'
-import { touchScreenViewport } from '../../DesignTokens/constants'
+import { ICON_DATA_BY_NAME, VIEWPORT } from '@opentrons/components'
 import { LargeButton } from './'
-import type { Story, Meta } from '@storybook/react'
 
-export default {
+import type { Meta, StoryObj } from '@storybook/react'
+
+const meta: Meta<typeof LargeButton> = {
   title: 'ODD/Atoms/Buttons/LargeButton',
-  argTypes: { onClick: { action: 'clicked' } },
-  parameters: touchScreenViewport,
-} as Meta
-
-const LargeButtonTemplate: Story<
-  React.ComponentProps<typeof LargeButton>
-> = args => <LargeButton {...args} />
-
-export const PrimaryLargeButton = LargeButtonTemplate.bind({})
-PrimaryLargeButton.args = {
-  buttonText: 'Button text',
-  disabled: false,
-  iconName: 'play-round-corners',
+  component: LargeButton,
+  argTypes: {
+    onClick: { action: 'clicked' },
+    iconName: {
+      control: {
+        type: 'select',
+      },
+      options: Object.keys(ICON_DATA_BY_NAME),
+    },
+  },
+  parameters: VIEWPORT.touchScreenViewport,
 }
-export const SecondaryLargeButton = LargeButtonTemplate.bind({})
-SecondaryLargeButton.args = {
-  buttonText: 'Button text',
-  buttonType: 'secondary',
-  disabled: false,
-  iconName: 'build',
+
+export default meta
+
+type Story = StoryObj<typeof LargeButton>
+
+export const Primary: Story = {
+  args: {
+    buttonText: 'Button text',
+    disabled: false,
+    iconName: 'play-round-corners',
+  },
 }
-export const AlertLargeButton = LargeButtonTemplate.bind({})
-AlertLargeButton.args = {
-  buttonText: 'Button text',
-  buttonType: 'alert',
-  disabled: false,
-  iconName: 'reset',
+export const Secondary: Story = {
+  args: {
+    buttonText: 'Button text',
+    buttonType: 'secondary',
+    disabled: false,
+    iconName: 'build',
+  },
+}
+export const Alert: Story = {
+  args: {
+    buttonText: 'Button text',
+    buttonType: 'alert',
+    disabled: false,
+    iconName: 'reset',
+  },
+}
+export const PrimaryNoIcon: Story = {
+  args: {
+    buttonText: 'Button text',
+    disabled: false,
+  },
+}
+export const PrimaryWithSubtext: Story = {
+  args: {
+    buttonText: 'Button text',
+    disabled: false,
+    subtext: 'Button subtext',
+  },
+}
+
+export const OnColor: Story = {
+  args: {
+    buttonType: 'onColor',
+    buttonText: 'Button text',
+    disabled: false,
+    subtext: 'Button subtext',
+  },
+}
+
+export const AlertAlt: Story = {
+  args: {
+    buttonType: 'alertAlt',
+    buttonText: 'Button text',
+    disabled: false,
+    subtext: 'Button subtext',
+  },
 }

@@ -1,4 +1,4 @@
-// analytics epics tests
+import { vi, describe, it, expect, beforeEach, afterEach } from 'vitest'
 import { TestScheduler } from 'rxjs/testing'
 
 import * as Cfg from '../../config'
@@ -12,10 +12,8 @@ import { analyticsEpic } from '../epic'
 
 import type { Action, State } from '../../types'
 
-jest.mock('../make-event')
-jest.mock('../mixpanel')
-
-const makeEventMock = makeEvent as jest.MockedFunction<typeof makeEvent>
+vi.mock('../make-event')
+vi.mock('../mixpanel')
 
 describe('analytics epics', () => {
   let testScheduler: TestScheduler
@@ -26,7 +24,7 @@ describe('analytics epics', () => {
     })
   })
   afterEach(() => {
-    jest.resetAllMocks()
+    vi.resetAllMocks()
   })
 
   describe('initializeAnalyticsEpic', () => {
@@ -60,7 +58,7 @@ describe('analytics epics', () => {
       const event = { name: 'fooEvent', properties: {} }
 
       testScheduler.run(({ hot, expectObservable, flush }) => {
-        makeEventMock.mockReturnValueOnce([event] as any)
+        vi.mocked(makeEvent).mockReturnValueOnce([event] as any)
 
         const action$ = hot<Action>('-a', { a: action } as any)
         const state$ = hot<State>('s-', { s: state } as any)
@@ -77,7 +75,7 @@ describe('analytics epics', () => {
       const state = { config: { analytics: { optedIn: true } } }
 
       testScheduler.run(({ hot, expectObservable, flush }) => {
-        makeEventMock.mockReturnValueOnce([null] as any)
+        vi.mocked(makeEvent).mockReturnValueOnce([null] as any)
 
         const action$ = hot<Action>('-a', { a: action } as any)
         const state$ = hot<State>('s-', { s: state } as any)
@@ -94,7 +92,7 @@ describe('analytics epics', () => {
       const state = { config: null }
 
       testScheduler.run(({ hot, expectObservable, flush }) => {
-        makeEventMock.mockReturnValueOnce([null] as any)
+        vi.mocked(makeEvent).mockReturnValueOnce([null] as any)
 
         const action$ = hot<Action>('-a', { a: action } as any)
         const state$ = hot<State>('s-', { s: state } as any)

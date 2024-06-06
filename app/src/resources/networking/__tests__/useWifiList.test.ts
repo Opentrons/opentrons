@@ -1,18 +1,14 @@
-import { when, resetAllWhenMocks } from 'jest-when'
-import { SECURITY_WPA_EAP, WifiNetwork } from '@opentrons/api-client'
+import { when } from 'vitest-when'
+import { describe, it, expect, vi, beforeEach } from 'vitest'
+import { SECURITY_WPA_EAP } from '@opentrons/api-client'
 import { useWifiQuery } from '@opentrons/react-api-client'
 import { useRobot } from '../../../organisms/Devices/hooks'
 import { useWifiList } from '../hooks'
-import type { WifiListResponse } from '@opentrons/api-client'
 import type { UseQueryResult } from 'react-query'
+import type { WifiNetwork, WifiListResponse } from '@opentrons/api-client'
 
-jest.mock('@opentrons/react-api-client')
-jest.mock('../../../organisms/Devices/hooks')
-
-const mockUseWifiQuery = useWifiQuery as jest.MockedFunction<
-  typeof useWifiQuery
->
-const mockUseRobot = useRobot as jest.MockedFunction<typeof useRobot>
+vi.mock('@opentrons/react-api-client')
+vi.mock('../../../organisms/Devices/hooks')
 
 const mockWifiNetwork: WifiNetwork = {
   ssid: 'linksys',
@@ -24,41 +20,40 @@ const mockWifiNetwork: WifiNetwork = {
 
 describe('useWifiList', () => {
   beforeEach(() => {
-    when(mockUseRobot).calledWith(null).mockReturnValue(null)
+    when(useRobot).calledWith(null).thenReturn(null)
   })
-  afterEach(() => resetAllWhenMocks())
 
   it('returns empty list if unavailable', () => {
-    when(mockUseWifiQuery)
+    when(useWifiQuery)
       .calledWith(expect.anything(), null)
-      .mockReturnValue({
+      .thenReturn({
         data: {},
       } as UseQueryResult<WifiListResponse>)
     const wifiList = useWifiList()
     expect(wifiList).toEqual([])
   })
   it('getWifiList returns wifiList from state', () => {
-    when(mockUseWifiQuery)
+    when(useWifiQuery)
       .calledWith(expect.anything(), null)
-      .mockReturnValue(({
+      .thenReturn(({
         data: { list: [mockWifiNetwork] },
       } as unknown) as UseQueryResult<WifiListResponse>)
     const wifiList = useWifiList()
     expect(wifiList).toEqual([mockWifiNetwork])
   })
   it('getWifiList dedupes duplicate SSIDs', () => {
-    when(mockUseWifiQuery)
+    when(useWifiQuery)
       .calledWith(expect.anything(), null)
-      .mockReturnValue(({
+      .thenReturn(({
         data: { list: [mockWifiNetwork, mockWifiNetwork] },
       } as unknown) as UseQueryResult<WifiListResponse>)
     const wifiList = useWifiList()
     expect(wifiList).toEqual([mockWifiNetwork])
   })
   it('getWifiList sorts by active then ssid', () => {
-    when(mockUseWifiQuery)
+    when(useWifiQuery)
       .calledWith(expect.anything(), null)
-      .mockReturnValue(({
+      .thenReturn(({
         data: {
           list: [
             { ...mockWifiNetwork, ssid: 'bbb' },
@@ -75,9 +70,9 @@ describe('useWifiList', () => {
     ])
   })
   it('getWifiList sorts by active then ssid then dedupes', () => {
-    when(mockUseWifiQuery)
+    when(useWifiQuery)
       .calledWith(expect.anything(), null)
-      .mockReturnValue(({
+      .thenReturn(({
         data: {
           list: [
             { ...mockWifiNetwork, ssid: 'bbb' },

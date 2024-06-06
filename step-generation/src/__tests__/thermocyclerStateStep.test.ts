@@ -1,6 +1,9 @@
-import { thermocyclerStateDiff, Diff } from '../utils/thermocyclerStateDiff'
+import { describe, it, expect, vi, afterEach } from 'vitest'
+import { thermocyclerStateDiff as actualThermocyclerStateDiff } from '../utils/thermocyclerStateDiff'
 import { thermocyclerStateStep } from '../commandCreators/compound/thermocyclerStateStep'
 import { getStateAndContextTempTCModules, getSuccessResult } from '../fixtures'
+
+import type { Diff } from '../utils/thermocyclerStateDiff'
 import type { CreateCommand } from '@opentrons/shared-data'
 import type {
   InvariantContext,
@@ -8,11 +11,7 @@ import type {
   ThermocyclerStateStepArgs,
 } from '../types'
 
-jest.mock('../utils/thermocyclerStateDiff')
-
-const mockThermocyclerStateDiff = thermocyclerStateDiff as jest.MockedFunction<
-  typeof thermocyclerStateDiff
->
+vi.mock('../utils/thermocyclerStateDiff')
 
 const getInitialDiff = (): Diff => ({
   lidOpen: false,
@@ -27,7 +26,7 @@ const temperatureModuleId = 'temperatureModuleId'
 const thermocyclerId = 'thermocyclerId'
 describe('thermocyclerStateStep', () => {
   afterEach(() => {
-    jest.resetAllMocks()
+    vi.resetAllMocks()
   })
   const testCases: Array<{
     expected: CreateCommand[]
@@ -361,11 +360,15 @@ describe('thermocyclerStateStep', () => {
       expected,
     }) => {
       it(testMsg, () => {
-        mockThermocyclerStateDiff.mockImplementationOnce((state, args) => {
-          expect(state).toEqual(robotState.modules[thermocyclerId].moduleState)
-          expect(args).toEqual(thermocyclerStateArgs)
-          return thermocyclerStateDiff
-        })
+        vi.mocked(actualThermocyclerStateDiff).mockImplementationOnce(
+          (state: any, args: any) => {
+            expect(state).toEqual(
+              robotState.modules[thermocyclerId].moduleState
+            )
+            expect(args).toEqual(thermocyclerStateArgs)
+            return thermocyclerStateDiff
+          }
+        )
         const result = thermocyclerStateStep(
           thermocyclerStateArgs,
           invariantContext,

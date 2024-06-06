@@ -68,7 +68,7 @@ async def test_event_forwarding(
 ) -> None:
     """It should forward events that come from a different thread."""
     handler_captor = matchers.Captor()
-    unsubscribe_callback = decoy.mock()
+    unsubscribe_callback = decoy.mock(name="unsubscribe_callback")
     decoy.when(hardware_control_api.register_callback(handler_captor)).then_return(
         unsubscribe_callback
     )
@@ -104,8 +104,8 @@ async def test_one_subscribe_one_unsubscribe(
     subject: DoorWatcher,
 ) -> None:
     """Multiple start()s and stop()s should be collapsed."""
-    unsubscribe = decoy.mock()
-    wrong_unsubscribe = decoy.mock()
+    unsubscribe = decoy.mock(name="unsubscribe_callback")
+    wrong_unsubscribe = decoy.mock(name="wrong_unsubscribe")
 
     decoy.when(hardware_control_api.register_callback(matchers.Anything())).then_return(
         unsubscribe, wrong_unsubscribe

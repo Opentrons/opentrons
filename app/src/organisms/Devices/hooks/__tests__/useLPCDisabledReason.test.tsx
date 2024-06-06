@@ -1,10 +1,13 @@
 import * as React from 'react'
-import { renderHook } from '@testing-library/react-hooks'
+import { renderHook } from '@testing-library/react'
 import { Provider } from 'react-redux'
 import { I18nextProvider } from 'react-i18next'
 import { createStore } from 'redux'
-import { getLoadedLabwareDefinitionsByUri } from '@opentrons/shared-data'
-import _uncastedSimpleV6Protocol from '@opentrons/shared-data/protocol/fixtures/6/simpleV6.json'
+import { vi, it, expect, describe, beforeEach, afterEach } from 'vitest'
+import {
+  getLoadedLabwareDefinitionsByUri,
+  simple_v6 as _uncastedSimpleV6Protocol,
+} from '@opentrons/shared-data'
 import { i18n } from '../../../../i18n'
 import { RUN_ID_1 } from '../../../RunTimeControl/__fixtures__'
 import { useLPCDisabledReason } from '../useLPCDisabledReason'
@@ -16,64 +19,50 @@ import {
 } from '..'
 import { useMostRecentCompletedAnalysis } from '../../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import type { Store } from 'redux'
-import type { ProtocolAnalysisOutput } from '@opentrons/shared-data'
+import type * as SharedData from '@opentrons/shared-data'
 import type { State } from '../../../../redux/types'
 
-jest.mock('..')
-jest.mock('../../../LabwarePositionCheck/useMostRecentCompletedAnalysis')
-jest.mock('@opentrons/shared-data', () => {
-  const actualSharedData = jest.requireActual('@opentrons/shared-data')
+vi.mock('..')
+vi.mock('../../../LabwarePositionCheck/useMostRecentCompletedAnalysis')
+vi.mock('@opentrons/shared-data', async importOriginal => {
+  const actualSharedData = await importOriginal<typeof SharedData>()
   return {
     ...actualSharedData,
-    getLoadedLabwareDefinitionsByUri: jest.fn(),
+    getLoadedLabwareDefinitionsByUri: vi.fn(),
   }
 })
 
-const mockUseMostRecentCompletedAnalysis = useMostRecentCompletedAnalysis as jest.MockedFunction<
-  typeof useMostRecentCompletedAnalysis
->
-const mockUseStoredProtocolAnalysis = useStoredProtocolAnalysis as jest.MockedFunction<
-  typeof useStoredProtocolAnalysis
->
-const mockUseRunHasStarted = useRunHasStarted as jest.MockedFunction<
-  typeof useRunHasStarted
->
-const mockUseRunCalibrationStatus = useRunCalibrationStatus as jest.MockedFunction<
-  typeof useRunCalibrationStatus
->
-const mockUseUnmatchedModulesForProtocol = useUnmatchedModulesForProtocol as jest.MockedFunction<
-  typeof useUnmatchedModulesForProtocol
->
-const mockGetLoadedLabwareDefinitionsByUri = getLoadedLabwareDefinitionsByUri as jest.MockedFunction<
-  typeof getLoadedLabwareDefinitionsByUri
->
-const simpleV6Protocol = (_uncastedSimpleV6Protocol as unknown) as ProtocolAnalysisOutput
+const simpleV6Protocol = (_uncastedSimpleV6Protocol as unknown) as SharedData.ProtocolAnalysisOutput
 
 describe('useLPCDisabledReason', () => {
-  const store: Store<State> = createStore(jest.fn(), {})
-  const wrapper: React.FunctionComponent<{}> = ({ children }) => (
+  const store: Store<State> = createStore(vi.fn(), {})
+  const wrapper: React.FunctionComponent<{ children: React.ReactNode }> = ({
+    children,
+  }) => (
     <I18nextProvider i18n={i18n}>
       <Provider store={store}>{children}</Provider>
     </I18nextProvider>
   )
   beforeEach(() => {
-    store.dispatch = jest.fn()
-    mockUseMostRecentCompletedAnalysis.mockReturnValue(simpleV6Protocol as any)
-    mockUseStoredProtocolAnalysis.mockReturnValue(
-      (simpleV6Protocol as unknown) as ProtocolAnalysisOutput
+    store.dispatch = vi.fn()
+    vi.mocked(useMostRecentCompletedAnalysis).mockReturnValue(
+      simpleV6Protocol as any
     )
-    mockUseRunHasStarted.mockReturnValue(false)
-    mockUseRunCalibrationStatus.mockReturnValue({ complete: true })
-    mockUseUnmatchedModulesForProtocol.mockReturnValue({
+    vi.mocked(useStoredProtocolAnalysis).mockReturnValue(
+      (simpleV6Protocol as unknown) as SharedData.ProtocolAnalysisOutput
+    )
+    vi.mocked(useRunHasStarted).mockReturnValue(false)
+    vi.mocked(useRunCalibrationStatus).mockReturnValue({ complete: true })
+    vi.mocked(useUnmatchedModulesForProtocol).mockReturnValue({
       missingModuleIds: [],
       remainingAttachedModules: [],
     })
-    mockGetLoadedLabwareDefinitionsByUri.mockReturnValue(
+    vi.mocked(getLoadedLabwareDefinitionsByUri).mockReturnValue(
       _uncastedSimpleV6Protocol.labwareDefinitions as {}
     )
   })
   afterEach(() => {
-    jest.resetAllMocks()
+    vi.resetAllMocks()
   })
   it('renders no disabled reason', () => {
     const { result } = renderHook(
@@ -109,11 +98,11 @@ describe('useLPCDisabledReason', () => {
     )
   })
   it('renders disabled reason for module and calibration incomponent', () => {
-    mockUseUnmatchedModulesForProtocol.mockReturnValue({
+    vi.mocked(useUnmatchedModulesForProtocol).mockReturnValue({
       missingModuleIds: ['mockId'],
       remainingAttachedModules: [],
     })
-    mockUseRunCalibrationStatus.mockReturnValue({ complete: false })
+    vi.mocked(useRunCalibrationStatus).mockReturnValue({ complete: false })
     const { result } = renderHook(
       () => useLPCDisabledReason({ robotName: 'otie', runId: RUN_ID_1 }),
       { wrapper }
@@ -135,7 +124,7 @@ describe('useLPCDisabledReason', () => {
     expect(result.current).toStrictEqual('Calibrate pipettes first')
   })
   it('renders disabled reason for calibration incomponent', () => {
-    mockUseRunCalibrationStatus.mockReturnValue({ complete: false })
+    vi.mocked(useRunCalibrationStatus).mockReturnValue({ complete: false })
     const { result } = renderHook(
       () => useLPCDisabledReason({ robotName: 'otie', runId: RUN_ID_1 }),
       { wrapper }
@@ -157,7 +146,7 @@ describe('useLPCDisabledReason', () => {
     expect(result.current).toStrictEqual('Connect all modules first')
   })
   it('renders disabled reason for missing modules', () => {
-    mockUseUnmatchedModulesForProtocol.mockReturnValue({
+    vi.mocked(useUnmatchedModulesForProtocol).mockReturnValue({
       missingModuleIds: ['mockId'],
       remainingAttachedModules: [],
     })
@@ -170,7 +159,7 @@ describe('useLPCDisabledReason', () => {
     )
   })
   it('renders disabled reason for run has started for odd', () => {
-    mockUseRunHasStarted.mockReturnValue(true)
+    vi.mocked(useRunHasStarted).mockReturnValue(true)
 
     const { result } = renderHook(
       () =>
@@ -184,7 +173,7 @@ describe('useLPCDisabledReason', () => {
     expect(result.current).toStrictEqual('Robot is busy')
   })
   it('renders disabled reason for run has started', () => {
-    mockUseRunHasStarted.mockReturnValue(true)
+    vi.mocked(useRunHasStarted).mockReturnValue(true)
 
     const { result } = renderHook(
       () => useLPCDisabledReason({ robotName: 'otie', runId: RUN_ID_1 }),
@@ -195,7 +184,7 @@ describe('useLPCDisabledReason', () => {
     )
   })
   it('renders disabled reason if robot protocol anaylsis is null for odd', () => {
-    mockUseMostRecentCompletedAnalysis.mockReturnValue(null as any)
+    vi.mocked(useMostRecentCompletedAnalysis).mockReturnValue(null as any)
     const { result } = renderHook(
       () =>
         useLPCDisabledReason({
@@ -208,7 +197,7 @@ describe('useLPCDisabledReason', () => {
     expect(result.current).toStrictEqual('Robot is analyzing')
   })
   it('renders disabled reason if robot protocol anaylsis is null', () => {
-    mockUseMostRecentCompletedAnalysis.mockReturnValue(null as any)
+    vi.mocked(useMostRecentCompletedAnalysis).mockReturnValue(null as any)
     const { result } = renderHook(
       () => useLPCDisabledReason({ robotName: 'otie', runId: RUN_ID_1 }),
       { wrapper }
@@ -218,7 +207,7 @@ describe('useLPCDisabledReason', () => {
     )
   })
   it('renders disabled reason if no pipettes in protocol for odd', () => {
-    mockUseMostRecentCompletedAnalysis.mockReturnValue({
+    vi.mocked(useMostRecentCompletedAnalysis).mockReturnValue({
       ...simpleV6Protocol,
       pipettes: {},
     } as any)
@@ -236,7 +225,7 @@ describe('useLPCDisabledReason', () => {
     )
   })
   it('renders disabled reason if no pipettes in protocol', () => {
-    mockUseMostRecentCompletedAnalysis.mockReturnValue({
+    vi.mocked(useMostRecentCompletedAnalysis).mockReturnValue({
       ...simpleV6Protocol,
       pipettes: {},
     } as any)
@@ -249,7 +238,7 @@ describe('useLPCDisabledReason', () => {
     )
   })
   it('renders disabled reason if no tipracks in protocols for odd', () => {
-    mockGetLoadedLabwareDefinitionsByUri.mockReturnValue({})
+    vi.mocked(getLoadedLabwareDefinitionsByUri).mockReturnValue({})
 
     const { result } = renderHook(
       () =>
@@ -263,7 +252,7 @@ describe('useLPCDisabledReason', () => {
     expect(result.current).toStrictEqual('Protocol must load a tip rack')
   })
   it('renders disabled reason if no tipracks in protocols', () => {
-    mockGetLoadedLabwareDefinitionsByUri.mockReturnValue({})
+    vi.mocked(getLoadedLabwareDefinitionsByUri).mockReturnValue({})
 
     const { result } = renderHook(
       () => useLPCDisabledReason({ robotName: 'otie', runId: RUN_ID_1 }),
@@ -274,7 +263,7 @@ describe('useLPCDisabledReason', () => {
     )
   })
   it('renders disabled reason if no tips are being used in the protocols for odd', () => {
-    mockUseMostRecentCompletedAnalysis.mockReturnValue({
+    vi.mocked(useMostRecentCompletedAnalysis).mockReturnValue({
       ...simpleV6Protocol,
       commands: {},
     } as any)
@@ -290,7 +279,7 @@ describe('useLPCDisabledReason', () => {
     expect(result.current).toStrictEqual('Protocol must pick up a tip')
   })
   it('renders disabled reason if no tips are being used in the protocols', () => {
-    mockUseMostRecentCompletedAnalysis.mockReturnValue({
+    vi.mocked(useMostRecentCompletedAnalysis).mockReturnValue({
       ...simpleV6Protocol,
       commands: {},
     } as any)

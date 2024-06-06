@@ -32,6 +32,14 @@
       "description": "The path to a valid Opentrons shared schema relative to the shared-data directory, without its extension. For instance, #/pipette/schemas/2/pipetteGeometrySchema.json is a reference to this schema."
     },
     "nozzleOffset": { "$ref": "#/definitions/xyzArray" },
+    "pipetteBoundingBoxOffsets": {
+      "description": "Offsets from the pipette mount position to the back-left & front-right corners of the pipette's bounding box which includes the outer casing and all nozzles.",
+      "type": "object",
+      "properties": {
+        "backLeftCorner": { "$ref": "#/definitions/xyzArray" },
+        "frontRightCorner": { "$ref": "#/definitions/xyzArray" }
+      }
+    },
     "pathTo3D": {
       "description": "path to the gltf file representing the 3D pipette model",
       "type": "string",

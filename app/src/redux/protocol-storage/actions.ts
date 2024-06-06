@@ -1,4 +1,4 @@
-import * as Types from './types'
+import type * as Types from './types'
 
 // action type literals
 

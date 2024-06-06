@@ -3,7 +3,7 @@ import * as React from 'react'
 import cx from 'classnames'
 import { LabelText, LABEL_LEFT } from './LabelText'
 import { ClickableIcon } from './ClickableIcon'
-import styles from './styles.css'
+import styles from './styles.module.css'
 
 interface TableTitleProps {
   label: React.ReactNode
@@ -12,7 +12,9 @@ interface TableTitleProps {
 
 export function TableTitle(props: TableTitleProps): JSX.Element {
   const [guideVisible, setGuideVisible] = React.useState<boolean>(false)
-  const toggleGuide = (): void => setGuideVisible(!guideVisible)
+  const toggleGuide = (): void => {
+    setGuideVisible(!guideVisible)
+  }
   const { label, diagram } = props
 
   const iconClassName = cx(styles.info_button, {

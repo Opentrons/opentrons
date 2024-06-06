@@ -6331,6 +6331,66 @@
       "result": {},
       "startedAt": "2023-01-31T21:53:14.615361+00:00",
       "completedAt": "2023-01-31T21:53:14.616757+00:00"
+    },
+    {
+      "id": "aca688ed-4916-496d-aae8-ca0e6e56c47b",
+      "key": "e4be36b4-500c-45dd-8405-73115c80aa4c",
+      "commandType": "moveToAddressableArea",
+      "createdAt": "2023-11-29T20:31:00.780650+00:00",
+      "startedAt": "2023-11-29T20:31:29.248207+00:00",
+      "completedAt": "2023-11-29T20:31:33.972466+00:00",
+      "status": "succeeded",
+      "params": {
+        "forceDirect": false,
+        "pipetteId": "c51ddc01-2d21-4e8a-9b10-2cef033488e8",
+        "addressableAreaName": "1ChannelWasteChute",
+        "offset": { "x": 0, "y": 0, "z": 0 }
+      }
+    },
+    {
+      "id": "aca688ed-4916-496d-aae8-ca0e6e56c47c",
+      "key": "e4be36b4-500c-45dd-8405-73115c80aa44",
+      "commandType": "moveToAddressableArea",
+      "createdAt": "2023-11-29T20:31:00.780650+00:00",
+      "startedAt": "2023-11-29T20:31:29.248207+00:00",
+      "completedAt": "2023-11-29T20:31:33.972466+00:00",
+      "status": "succeeded",
+      "params": {
+        "forceDirect": false,
+        "pipetteId": "c51ddc01-2d21-4e8a-9b10-2cef033488e8",
+        "addressableAreaName": "fixedTrash",
+        "offset": { "x": 0, "y": 0, "z": 0 }
+      }
+    },
+    {
+      "id": "aca688ed-4916-496d-aae8-ca0e6e56c47d",
+      "key": "e4be36b4-500c-45dd-8405-73115c80aa4z",
+      "commandType": "moveToAddressableArea",
+      "createdAt": "2023-11-29T20:31:00.780650+00:00",
+      "startedAt": "2023-11-29T20:31:29.248207+00:00",
+      "completedAt": "2023-11-29T20:31:33.972466+00:00",
+      "status": "succeeded",
+      "params": {
+        "forceDirect": false,
+        "pipetteId": "c51ddc01-2d21-4e8a-9b10-2cef033488e8",
+        "addressableAreaName": "movableTrashD3",
+        "offset": { "x": 0, "y": 0, "z": 0 }
+      }
+    },
+    {
+      "id": "aca688ed-4916-496d-aae8-ca0e6e56c47e",
+      "key": "e4be36b4-500c-45dd-8405-73115c80aa4x",
+      "commandType": "moveToAddressableArea",
+      "createdAt": "2023-11-29T20:31:00.780650+00:00",
+      "startedAt": "2023-11-29T20:31:29.248207+00:00",
+      "completedAt": "2023-11-29T20:31:33.972466+00:00",
+      "status": "succeeded",
+      "params": {
+        "forceDirect": false,
+        "pipetteId": "c51ddc01-2d21-4e8a-9b10-2cef033488e8",
+        "addressableAreaName": "D3",
+        "offset": { "x": 0, "y": 0, "z": 0 }
+      }
     }
   ],
   "errors": [],

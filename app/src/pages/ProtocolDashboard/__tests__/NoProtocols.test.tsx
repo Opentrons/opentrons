@@ -1,23 +1,24 @@
 import * as React from 'react'
-
-import { renderWithProviders } from '@opentrons/components'
-
+import { describe, it, expect } from 'vitest'
+import { renderWithProviders } from '../../../__testing-utils__'
 import { i18n } from '../../../i18n'
 
 import { NoProtocols } from '../NoProtocols'
+import { screen } from '@testing-library/react'
 
 const render = () => {
   return renderWithProviders(<NoProtocols />, { i18nInstance: i18n })
 }
 
-const NO_PROTOCOLS_PNG_FINE_NAME = 'empty_protocol_dashboard.png'
+const NO_PROTOCOLS_PNG_FINE_NAME =
+  '/app/src/assets/images/on-device-display/empty_protocol_dashboard.png'
 
 describe('NoProtocols', () => {
   it('should render text and image', () => {
-    const [{ getByText, getByRole }] = render()
-    getByText('No protocols to show!')
-    getByText('Send a protocol from the Opentrons App to get started.')
-    const image = getByRole('img')
+    render()
+    screen.getByText('No protocols to show!')
+    screen.getByText('Send a protocol from the Opentrons App to get started.')
+    const image = screen.getByRole('img')
     expect(image.getAttribute('src')).toEqual(NO_PROTOCOLS_PNG_FINE_NAME)
   })
 })

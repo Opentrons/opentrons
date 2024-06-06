@@ -1,21 +1,23 @@
 import * as React from 'react'
-import { RunTimeCommand } from '@opentrons/shared-data'
+import { useTranslation } from 'react-i18next'
+import { createPortal } from 'react-dom'
 import {
+  ALIGN_CENTER,
+  COLORS,
+  DIRECTION_COLUMN,
   Flex,
   Icon,
-  useHoverTooltip,
-  ALIGN_CENTER,
   JUSTIFY_CENTER,
-  COLORS,
   SPACING,
-  DIRECTION_COLUMN,
+  StyledText,
+  useHoverTooltip,
 } from '@opentrons/components'
 
 import { Tooltip } from '../../atoms/Tooltip'
-import { Portal } from '../../App/portal'
-import { StyledText } from '../../atoms/text'
-import { useTranslation } from 'react-i18next'
+import { getModalPortalEl } from '../../App/portal'
+
 import type { IconName } from '@opentrons/components'
+import type { RunTimeCommand } from '@opentrons/shared-data'
 
 interface TickProps {
   index: number
@@ -71,7 +73,7 @@ export function Tick(props: TickProps): JSX.Element {
       backgroundColor={COLORS.white}
       fontSize="9px"
       borderRadius="4px"
-      border={`${COLORS.blueEnabled} 1px solid`}
+      border={`${COLORS.blue50} 1px solid`}
       alignItems={ALIGN_CENTER}
       justifyContent={JUSTIFY_CENTER}
       height="0.75rem"
@@ -82,7 +84,7 @@ export function Tick(props: TickProps): JSX.Element {
       transform={`translateX(-${percent}%)`}
     >
       <StyledText as="h6">{isAggregatedTick ? count : null}</StyledText>
-      <Portal>
+      {createPortal(
         <Tooltip tooltipProps={tooltipProps}>
           <Flex
             padding={SPACING.spacing2}
@@ -108,8 +110,9 @@ export function Tick(props: TickProps): JSX.Element {
               ) : null}
             </Flex>
           </Flex>
-        </Tooltip>
-      </Portal>
+        </Tooltip>,
+        getModalPortalEl()
+      )}
     </Flex>
   )
 }

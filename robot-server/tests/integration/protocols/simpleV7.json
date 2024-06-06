@@ -1274,20 +1274,6 @@
       }
     },
     {
-      "commandType": "loadLabware",
-      "id": "6abc123",
-      "params": {
-        "labwareId": "fixedTrash",
-        "location": {
-          "slotName": "12"
-        },
-        "loadName": "opentrons_1_trash_1100ml_fixed",
-        "namespace": "opentrons",
-        "version": 1,
-        "displayName": "Trash"
-      }
-    },
-    {
       "commandType": "loadLiquid",
       "params": {
         "liquidId": "waterId",
@@ -1380,7 +1366,6 @@
         "3abc123",
         "4abc123",
         "5abc123",
-        "6abc123",
         "7abc123"
       ],
       "annotationType": "initialSetup"

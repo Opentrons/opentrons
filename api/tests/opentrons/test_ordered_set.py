@@ -126,14 +126,13 @@ def test_clear() -> None:
 def test_head() -> None:
     """It should return the head of the set."""
     subject = OrderedSet([1, 2])
-
     assert subject.head() == 1
+
     subject.remove(1)
-
     assert subject.head() == 2
-    subject.remove(2)
 
-    with pytest.raises(IndexError):
+    subject.remove(2)
+    with pytest.raises(IndexError, match="Set is empty"):
         subject.head()
 
     assert subject.head(default_value=42) == 42
@@ -145,3 +144,13 @@ def test_difference() -> None:
     b = {1, 9}
 
     assert (a - OrderedSet(b)) == (a - b) == OrderedSet([3, 4, 5, 2, 6, 5, 3, 5, 8, 7])
+
+
+def test_repr() -> None:
+    """It should return a meaningful repr string."""
+    subject = OrderedSet([1, 2, 3])
+    result = repr(subject)
+    assert "OrderedSet" in result
+    assert "1" in result
+    assert "2" in result
+    assert "3" in result

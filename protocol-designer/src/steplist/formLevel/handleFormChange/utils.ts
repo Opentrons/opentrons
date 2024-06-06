@@ -1,12 +1,17 @@
-import assert from 'assert'
 import round from 'lodash/round'
 import uniq from 'lodash/uniq'
 import { getWellSetForMultichannel, canPipetteUseLabware } from '../../../utils'
 import { getPipetteCapacity } from '../../../pipettes/pipetteData'
-import { LabwareDefinition2, PipetteChannels } from '@opentrons/shared-data'
-import { LabwareEntities, PipetteEntities } from '@opentrons/step-generation'
-import { FormPatch } from '../../actions/types'
-import { FormData, PathOption, StepFieldName } from '../../../form-types'
+import type {
+  LabwareDefinition2,
+  PipetteChannels,
+} from '@opentrons/shared-data'
+import type {
+  LabwareEntities,
+  PipetteEntities,
+} from '@opentrons/step-generation'
+import type { FormPatch } from '../../actions/types'
+import type { FormData, PathOption, StepFieldName } from '../../../form-types'
 export function chainPatchUpdaters(
   initialPatch: FormPatch,
   fns: Array<(arg0: FormPatch) => FormPatch>
@@ -58,18 +63,24 @@ export function getMaxDisposalVolumeForMultidispense(
     path: PathOption
     pipette: string | null
     volume: string | null
+    tipRack?: string | null
   },
-  pipetteEntities: PipetteEntities
+  pipetteEntities: PipetteEntities,
+  labwareEntities: LabwareEntities
 ): number | null | undefined {
   // calculate max disposal volume for given volume & pipette. Might be negative!
   const pipetteId = values?.pipette
   if (!values || !pipetteId) return null
-  assert(
+  console.assert(
     values.path === 'multiDispense',
     `getMaxDisposalVolumeForMultidispense expected multiDispense, got path ${values.path}`
   )
   const pipetteEntity = pipetteEntities[pipetteId]
-  const pipetteCapacity = getPipetteCapacity(pipetteEntity)
+  const pipetteCapacity = getPipetteCapacity(
+    pipetteEntity,
+    labwareEntities,
+    values.tipRack
+  )
   const volume = Number(values.volume)
   const airGapChecked = values.aspirate_airGap_checkbox
   let airGapVolume = airGapChecked ? Number(values.aspirate_airGap_volume) : 0
@@ -81,14 +92,17 @@ export function getMaxDisposalVolumeForMultidispense(
 // is responsibility of dependentFieldsUpdateMoveLiquid's clamp fn
 export function volumeInCapacityForMulti(
   rawForm: FormData,
-  pipetteEntities: PipetteEntities
+  pipetteEntities: PipetteEntities,
+  labwareEntities: LabwareEntities
 ): boolean {
-  assert(
+  console.assert(
     rawForm.pipette in pipetteEntities,
     `volumeInCapacityForMulti expected pipette ${rawForm.pipette} to be in pipetteEntities`
   )
   const pipetteEntity = pipetteEntities[rawForm.pipette]
-  const pipetteCapacity = pipetteEntity && getPipetteCapacity(pipetteEntity)
+  const pipetteCapacity =
+    pipetteEntity &&
+    getPipetteCapacity(pipetteEntity, labwareEntities, rawForm.tipRack)
   const volume = Number(rawForm.volume)
   const airGapChecked = rawForm.aspirate_airGap_checkbox
   let airGapVolume = airGapChecked ? Number(rawForm.aspirate_airGap_volume) : 0
@@ -155,7 +169,7 @@ export function getDefaultWells(args: GetDefaultWellsArgs): string[] {
 
   if (isSingleWellLabware) {
     const well = labwareDef.ordering[0][0]
-    assert(
+    console.assert(
       well === 'A1',
       `sanity check: expected single-well labware ${labwareId} to have only the well 'A1'`
     )

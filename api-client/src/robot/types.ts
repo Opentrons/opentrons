@@ -27,3 +27,23 @@ export interface Lights {
 export interface SetLightsData {
   on: boolean
 }
+
+export interface RobotSettingsField {
+  id: string
+  title: string
+  description: string
+  value: boolean | null
+  restart_required?: boolean
+}
+
+export type RobotSettings = RobotSettingsField[]
+
+export interface UpdateRobotSettingRequest {
+  id: string
+  value: boolean | null
+}
+
+export interface RobotSettingsResponse {
+  settings: RobotSettings
+  links?: { restart?: string }
+}

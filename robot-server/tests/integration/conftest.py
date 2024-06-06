@@ -41,21 +41,6 @@ def pytest_tavern_beta_after_every_response(
 
 
 @pytest.fixture
-def ot2_server_set_disable_fast_analysis(
-    ot2_server_base_url: str,
-) -> Generator[None, None, None]:
-    """For integration tests that need to set then clear the
-    disableFastProtocolUpload feature flag"""
-    url = f"{ot2_server_base_url}/settings"
-    data = {"id": "disableFastProtocolUpload", "value": True}
-    with _requests_session() as requests_session:
-        requests_session.post(url, json=data)
-        yield None
-        data["value"] = None
-        requests.post(url, json=data)
-
-
-@pytest.fixture
 def ot2_server_base_url(_ot2_session_server: str) -> Generator[str, None, None]:
     """Return the URL for a running dev server.
 
@@ -133,7 +118,6 @@ def _wait_until_ready(base_url: str) -> None:
             time.sleep(0.1)
 
 
-# TODO(mm, 2023-11-02): This should also restore the server's original deck configuration.
 def _clean_server_state(base_url: str) -> None:
     async def _clean_server_state_async() -> None:
         async with RobotClient.make(base_url=base_url, version="*") as robot_client:
@@ -142,6 +126,8 @@ def _clean_server_state(base_url: str) -> None:
             await _delete_all_protocols(robot_client)
 
             await _delete_all_sessions(robot_client)
+
+            await _reset_deck_configuration(robot_client)
 
     asyncio.run(_clean_server_state_async())
 
@@ -167,3 +153,7 @@ async def _delete_all_sessions(robot_client: RobotClient) -> None:
     session_ids = [s["id"] for s in all_sessions_response.json()["data"]]
     for session_id in session_ids:
         await robot_client.delete_session(session_id)
+
+
+async def _reset_deck_configuration(robot_client: RobotClient) -> None:
+    await robot_client.post_setting_reset_options({"deckConfiguration": True})

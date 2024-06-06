@@ -1,8 +1,9 @@
 import * as React from 'react'
-import { fireEvent } from '@testing-library/react'
-
-import { renderWithProviders } from '@opentrons/components'
+import { fireEvent, screen } from '@testing-library/react'
+import { describe, it, expect, vi, beforeEach } from 'vitest'
+import '@testing-library/jest-dom/vitest'
 import { i18n } from '../../../i18n'
+import { renderWithProviders } from '../../../__testing-utils__'
 import { getResetConfigOptions, resetConfig } from '../../../redux/robot-admin'
 import { useDispatchApiRequest } from '../../../redux/robot-api'
 
@@ -10,8 +11,8 @@ import { DeviceReset } from '../DeviceReset'
 
 import type { DispatchApiRequestType } from '../../../redux/robot-api'
 
-jest.mock('../../../redux/robot-admin')
-jest.mock('../../../redux/robot-api')
+vi.mock('../../../redux/robot-admin')
+vi.mock('../../../redux/robot-api')
 
 const mockResetConfigOptions = [
   {
@@ -46,14 +47,6 @@ const mockResetConfigOptions = [
   },
 ]
 
-const mockGetResetConfigOptions = getResetConfigOptions as jest.MockedFunction<
-  typeof getResetConfigOptions
->
-const mockUseDispatchApiRequest = useDispatchApiRequest as jest.MockedFunction<
-  typeof useDispatchApiRequest
->
-const mockResetConfig = resetConfig as jest.MockedFunction<typeof resetConfig>
-
 const render = (props: React.ComponentProps<typeof DeviceReset>) => {
   return renderWithProviders(
     <DeviceReset {...props} />,
@@ -69,36 +62,36 @@ describe('DeviceReset', () => {
   beforeEach(() => {
     props = {
       robotName: 'mockRobot',
-      setCurrentOption: jest.fn(),
+      setCurrentOption: vi.fn(),
     }
-    mockGetResetConfigOptions.mockReturnValue(mockResetConfigOptions)
-    dispatchApiRequest = jest.fn()
-    mockUseDispatchApiRequest.mockReturnValue([dispatchApiRequest, []])
-  })
-
-  afterEach(() => {
-    jest.resetAllMocks()
+    vi.mocked(getResetConfigOptions).mockReturnValue(mockResetConfigOptions)
+    dispatchApiRequest = vi.fn()
+    vi.mocked(useDispatchApiRequest).mockReturnValue([dispatchApiRequest, []])
   })
 
   it('should render text and button', () => {
-    const [{ getByText, getByTestId, queryByText }] = render(props)
-    getByText('Clear pipette calibration')
-    getByText('Clear gripper calibration')
-    getByText('Clear module calibration')
-    getByText('Clear protocol run history')
-    getByText('Clears information about past runs of all protocols.')
-    getByText('Clear all stored data')
-    getByText(
-      'Resets all settings. You’ll have to redo initial setup before using the robot again.'
+    render(props)
+    screen.getByText('Clear pipette calibration')
+    screen.getByText('Clear gripper calibration')
+    screen.getByText('Clear module calibration')
+    screen.getByText('Clear protocol run history')
+    screen.getByText('Clears information about past runs of all protocols.')
+    screen.getByText('Clear all stored data')
+    screen.getByText(
+      'Clears calibrations, protocols, and all settings except robot name and network settings.'
     )
-    expect(queryByText('Clear the ssh authorized keys')).not.toBeInTheDocument()
-    expect(getByTestId('DeviceReset_clear_data_button')).toBeDisabled()
+    expect(
+      screen.queryByText('Clear the ssh authorized keys')
+    ).not.toBeInTheDocument()
+    expect(screen.getByTestId('DeviceReset_clear_data_button')).toBeDisabled()
   })
 
   it('when tapping a option button, the clear button is enabled', () => {
-    const [{ getByText, getByTestId }] = render(props)
-    fireEvent.click(getByText('Clear pipette calibration'))
-    expect(getByTestId('DeviceReset_clear_data_button')).not.toBeDisabled()
+    render(props)
+    fireEvent.click(screen.getByText('Clear pipette calibration'))
+    expect(
+      screen.getByTestId('DeviceReset_clear_data_button')
+    ).not.toBeDisabled()
   })
 
   it('when tapping a option button and tapping the clear button, a mock function is called', () => {
@@ -107,16 +100,16 @@ describe('DeviceReset', () => {
       moduleCalibration: true,
       runsHistory: true,
     }
-    const [{ getByText }] = render(props)
-    fireEvent.click(getByText('Clear pipette calibration'))
-    fireEvent.click(getByText('Clear protocol run history'))
-    fireEvent.click(getByText('Clear module calibration'))
-    const clearButton = getByText('Clear data and restart robot')
+    render(props)
+    fireEvent.click(screen.getByText('Clear pipette calibration'))
+    fireEvent.click(screen.getByText('Clear protocol run history'))
+    fireEvent.click(screen.getByText('Clear module calibration'))
+    const clearButton = screen.getByText('Clear data and restart robot')
     fireEvent.click(clearButton)
-    getByText('Are you sure you want to reset your device?')
-    fireEvent.click(getByText('Confirm'))
+    screen.getByText('Are you sure you want to reset your device?')
+    fireEvent.click(screen.getByText('Confirm'))
     expect(dispatchApiRequest).toBeCalledWith(
-      mockResetConfig('mockRobot', clearMockResetOptions)
+      resetConfig('mockRobot', clearMockResetOptions)
     )
   })
 
@@ -128,16 +121,17 @@ describe('DeviceReset', () => {
       gripperOffsetCalibrations: true,
       authorizedKeys: true,
       onDeviceDisplay: true,
+      deckConfiguration: true,
     }
 
-    const [{ getByText }] = render(props)
-    getByText('Clear all stored data').click()
-    const clearButton = getByText('Clear data and restart robot')
+    render(props)
+    fireEvent.click(screen.getByText('Clear all stored data'))
+    const clearButton = screen.getByText('Clear data and restart robot')
     fireEvent.click(clearButton)
-    getByText('Are you sure you want to reset your device?')
-    fireEvent.click(getByText('Confirm'))
+    screen.getByText('Are you sure you want to reset your device?')
+    fireEvent.click(screen.getByText('Confirm'))
     expect(dispatchApiRequest).toBeCalledWith(
-      mockResetConfig('mockRobot', clearMockResetOptions)
+      resetConfig('mockRobot', clearMockResetOptions)
     )
   })
 
@@ -149,19 +143,20 @@ describe('DeviceReset', () => {
       gripperOffsetCalibrations: true,
       authorizedKeys: true,
       onDeviceDisplay: true,
+      deckConfiguration: true,
     }
 
-    const [{ getByText }] = render(props)
-    getByText('Clear pipette calibration').click()
-    getByText('Clear gripper calibration').click()
-    getByText('Clear module calibration').click()
-    getByText('Clear protocol run history').click()
-    const clearButton = getByText('Clear data and restart robot')
+    render(props)
+    fireEvent.click(screen.getByText('Clear pipette calibration'))
+    fireEvent.click(screen.getByText('Clear gripper calibration'))
+    fireEvent.click(screen.getByText('Clear module calibration'))
+    fireEvent.click(screen.getByText('Clear protocol run history'))
+    const clearButton = screen.getByText('Clear data and restart robot')
     fireEvent.click(clearButton)
-    getByText('Are you sure you want to reset your device?')
-    fireEvent.click(getByText('Confirm'))
+    screen.getByText('Are you sure you want to reset your device?')
+    fireEvent.click(screen.getByText('Confirm'))
     expect(dispatchApiRequest).toBeCalledWith(
-      mockResetConfig('mockRobot', clearMockResetOptions)
+      resetConfig('mockRobot', clearMockResetOptions)
     )
   })
 
@@ -173,17 +168,18 @@ describe('DeviceReset', () => {
       gripperOffsetCalibrations: true,
       authorizedKeys: false,
       onDeviceDisplay: false,
+      deckConfiguration: false,
     }
 
-    const [{ getByText }] = render(props)
-    getByText('Clear all stored data').click()
-    getByText('Clear pipette calibration').click()
-    const clearButton = getByText('Clear data and restart robot')
+    render(props)
+    fireEvent.click(screen.getByText('Clear all stored data'))
+    fireEvent.click(screen.getByText('Clear pipette calibration'))
+    const clearButton = screen.getByText('Clear data and restart robot')
     fireEvent.click(clearButton)
-    getByText('Are you sure you want to reset your device?')
-    fireEvent.click(getByText('Confirm'))
+    screen.getByText('Are you sure you want to reset your device?')
+    fireEvent.click(screen.getByText('Confirm'))
     expect(dispatchApiRequest).toBeCalledWith(
-      mockResetConfig('mockRobot', clearMockResetOptions)
+      resetConfig('mockRobot', clearMockResetOptions)
     )
   })
 })

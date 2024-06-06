@@ -184,7 +184,7 @@ CONFIG_ELEMENTS = (
         "Deck Calibration",
         Path("deck_calibration.json"),
         ConfigElementType.FILE,
-        "The file storing the deck calibration",
+        "The file storing the deck calibration. Superseded in v4 by robot_calibration_dir.",
     ),
     ConfigElement(
         "log_dir",
@@ -283,6 +283,13 @@ CONFIG_ELEMENTS = (
         Path("robot") / "modules",
         ConfigElementType.DIR,
         "The dir where module calibration is stored",
+    ),
+    ConfigElement(
+        "performance_metrics_dir",
+        "Performance Metrics Directory",
+        Path("performance_metrics_data"),
+        ConfigElementType.DIR,
+        "The dir where performance metrics are stored",
     ),
 )
 #: The available configuration file elements to modify. All of these can be
@@ -602,3 +609,7 @@ def get_tip_length_cal_path() -> Path:
 
 def get_custom_tiprack_def_path() -> Path:
     return get_opentrons_path("custom_tiprack_dir")
+
+
+def get_performance_metrics_data_dir() -> Path:
+    return get_opentrons_path("performance_metrics_dir")

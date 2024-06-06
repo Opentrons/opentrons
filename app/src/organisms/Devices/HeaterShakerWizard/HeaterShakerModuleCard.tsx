@@ -1,18 +1,18 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import {
+  ALIGN_FLEX_START,
+  COLORS,
+  DIRECTION_COLUMN,
+  DIRECTION_ROW,
   Flex,
   Icon,
   SIZE_1,
-  TYPOGRAPHY,
-  DIRECTION_ROW,
-  DIRECTION_COLUMN,
   SPACING,
-  ALIGN_FLEX_START,
-  COLORS,
+  StyledText,
+  TYPOGRAPHY,
 } from '@opentrons/components'
 import { getModuleDisplayName } from '@opentrons/shared-data'
-import { StyledText } from '../../../atoms/text'
 import heaterShakerModule from '../../../assets/images/heater_shaker_module_transparent.png'
 import { HeaterShakerModuleData } from '../../ModuleCard/HeaterShakerModuleData'
 
@@ -30,7 +30,7 @@ export const HeaterShakerModuleCard = (
 
   return (
     <Flex
-      backgroundColor={COLORS.fundamentalsBackground}
+      backgroundColor={COLORS.grey10}
       borderRadius={SPACING.spacing4}
       marginBottom={SPACING.spacing8}
       padding={`${SPACING.spacing16} ${SPACING.spacing8} ${SPACING.spacing16} ${SPACING.spacing8}`}
@@ -45,7 +45,7 @@ export const HeaterShakerModuleCard = (
         <Flex flexDirection={DIRECTION_COLUMN} paddingLeft={SPACING.spacing8}>
           <StyledText
             textTransform={TYPOGRAPHY.textTransformUppercase}
-            color={COLORS.darkGreyEnabled}
+            color={COLORS.grey50}
             fontWeight={TYPOGRAPHY.fontWeightRegular}
             fontSize={TYPOGRAPHY.fontSizeCaption}
             paddingBottom={SPACING.spacing4}
@@ -62,7 +62,7 @@ export const HeaterShakerModuleCard = (
               aria-label="heater-shaker"
               size={SIZE_1}
               marginRight={SPACING.spacing4}
-              color={COLORS.darkGreyEnabled}
+              color={COLORS.grey50}
             />
             <StyledText fontSize={TYPOGRAPHY.fontSizeP}>
               {getModuleDisplayName(module.moduleModel)}

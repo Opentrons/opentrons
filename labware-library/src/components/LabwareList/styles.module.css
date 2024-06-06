@@ -1,0 +1,200 @@
+/* LabwareList styles */
+@import '@opentrons/components/styles';
+@import '../../styles/breakpoints.module.css';
+@import '../../styles/shadows.module.css';
+@import '../../styles/spacing.module.css';
+
+:root {
+  --link-btn: {
+    display: block;
+    width: 100%;
+    margin: 1.5rem 0 0.5rem;
+    padding: 1rem;
+    border-radius: 3px;
+    font-size: var(--fs-body-2);
+    text-align: center;
+    font-family: 'AkkoPro-Regular', 'Ropa Sans', 'Open Sans', sans-serif;
+    text-transform: uppercase;
+    cursor: pointer;
+  }
+}
+
+.card {
+  display: block;
+  width: 100%;
+  margin: 0 auto var(--spacing-7) auto;
+  box-shadow: var(--shadow-1);
+}
+
+.top_bar {
+  font-size: var(--fs-body-2); /* from legacy --font-body-2-dark */
+  font-weight: var(--fw-regular); /* from legacy --font-body-2-dark */
+  color: var(--c-font-dark); /* from legacy --font-body-2-dark */
+  padding: var(--spacing-2);
+  line-height: var(--lh-copy);
+  text-align: right;
+  background-color: var(--c-lightest-gray);
+}
+
+.title {
+  display: flex;
+  align-items: center;
+  margin-bottom: var(--spacing-3);
+  padding: var(--spacing-3) var(--spacing-5);
+  color: var(--c-blue);
+  background-color: var(--c-white);
+
+  &:hover {
+    background-color: var(--c-light-gray);
+  }
+}
+
+.title_text {
+  display: block;
+  line-height: var(--lh-title);
+  font-size: var(--fs-default);
+  font-weight: var(--fw-semibold);
+  max-height: calc(2 * (var(--lh-title) * var(--fs-default)));
+  overflow: hidden;
+  word-wrap: break-word;
+  text-overflow: ellipsis;
+  min-width: 0;
+
+  /*
+   * non-standard, but works on all webkit browsers, Edge, and Firefox >= 68
+   * it turns out CSS ellipses for multiline blocks are hard
+   */
+  display: -webkit-box; /* stylelint-disable-line declaration-block-no-duplicate-properties, value-no-vendor-prefix */
+  -webkit-line-clamp: 2; /* stylelint-disable-line value-no-vendor-prefix */
+  -webkit-box-orient: vertical; /* stylelint-disable-line property-no-vendor-prefix */
+}
+
+.title_icon {
+  flex: none;
+  height: 1.5rem;
+}
+
+.card_contents {
+  width: 100%;
+  padding: 0 var(--spacing-5) var(--spacing-5);
+}
+
+.well_count,
+.well_properties {
+  margin-top: var(--spacing-5);
+}
+
+.well_count {
+  display: flex;
+
+  /* from legacy --flex-between */
+  justify-content: space-between;
+
+  /* from legacy --flex-between */
+  align-items: center;
+
+  /* from legacy --flex-between */
+}
+
+.well_group_properties {
+  margin-top: var(--spacing-5);
+  padding: var(--spacing-5);
+  border: var(--bd-light);
+}
+
+.custom_labware_card {
+  display: block;
+  width: 100%;
+  margin: 0 auto var(--spacing-7) auto;
+  padding: var(--spacing-5);
+}
+
+.custom_labware_text {
+  font-size: var(--fs-header);
+  color: var(--c-blue);
+  font-weight: var(--fw-semibold);
+}
+
+.btn_blue {
+  /* from legacy --linkb-tn */
+  display: block;
+  width: 100%;
+  margin: 1.5rem 0 0.5rem;
+  padding: 1rem;
+  border-radius: 3px;
+  font-size: var(--fs-body-2);
+  text-align: center;
+  font-family: 'AkkoPro-Regular', 'Ropa Sans', 'Open Sans', sans-serif;
+  text-transform: uppercase;
+  cursor: pointer;
+  background-color: var(--c-blue);
+  color: white;
+
+  &:visited {
+    color: white;
+  }
+
+  &:hover {
+    background-color: #00f;
+    color: white;
+  }
+}
+
+.btn_white {
+  /* from legacy --linkb-tn */
+  display: block;
+  width: 100%;
+  margin: 1.5rem 0 0.5rem;
+  padding: 1rem;
+  border-radius: 3px;
+  font-size: var(--fs-body-2);
+  text-align: center;
+  font-family: 'AkkoPro-Regular', 'Ropa Sans', 'Open Sans', sans-serif;
+  text-transform: uppercase;
+  cursor: pointer;
+  border: 1px solid var(--c-blue);
+  color: var(--c-blue);
+
+  &:visited {
+    color: var(--c-blue);
+  }
+}
+
+@media (--small) {
+  .gallery_container {
+    display: inline-block;
+    width: var(--size-50p);
+  }
+
+  .stats {
+    display: inline-block;
+    width: var(--size-50p);
+    padding-left: var(--spacing-5);
+    vertical-align: top;
+  }
+}
+
+@media (--medium) {
+  .list {
+    margin: 0 auto;
+  }
+
+  .card {
+    margin-top: 0;
+  }
+}
+
+@media (--large) {
+  .card,
+  .custom_labware_card {
+    display: inline-block;
+    vertical-align: top;
+    width: calc(50% - 0.5 * var(--spacing-7));
+    margin-right: var(--spacing-7);
+    margin-bottom: var(--spacing-7);
+
+    &:nth-child(even) {
+      margin-right: 0;
+    }
+  }
+}

@@ -1,14 +1,16 @@
 import React from 'react'
-import { FormikConfig } from 'formik'
+import { vi, describe, it, expect } from 'vitest'
 import { render, fireEvent } from '@testing-library/react'
-import '@testing-library/jest-dom'
-import { getDefaultFormState, LabwareFields } from '../../../fields'
+import '@testing-library/jest-dom/vitest'
+import { getDefaultFormState } from '../../../fields'
 import { wrapInFormik } from '../../utils/wrapInFormik'
 import { CreateNewDefinition } from '../../sections/CreateNewDefinition'
+import type { FormikConfig } from 'formik'
+import type { LabwareFields } from '../../../fields'
 
 const formikConfig: FormikConfig<LabwareFields> = {
   initialValues: getDefaultFormState(),
-  onSubmit: jest.fn(),
+  onSubmit: vi.fn(),
 }
 
 describe('CreateNewDefinition', () => {

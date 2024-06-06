@@ -139,18 +139,17 @@ class _UpdateProcess:
         created_at: datetime,
         update_id: str,
         complete_callback: Callable[[], Awaitable[None]],
+        status_cache: Optional[UpdateProgress] = None,
     ) -> None:
         """Build an _UpdateProcess. Should only be done by the manager."""
         self._status_queue = Queue()
         self._hw_handle = hw_handle
         self._subsystem = subsystem
-        self._status_cache = None
+        self._status_cache = status_cache
         self._status_cache_lock = Lock()
         self._created_at = created_at
         self._update_id = update_id
-        # mypy thinks this is assignment to a method, which it is not. that means
-        # it's ok to assign this and it's also okay to not take a self argument
-        self._complete_callback = complete_callback  # type: ignore[assignment,misc]
+        self._complete_callback = complete_callback
 
     @property
     def status_cache(self) -> UpdateProgress:
@@ -206,9 +205,7 @@ class _UpdateProcess:
                 UpdateProgress(UpdateState.failed, last_progress, be)
             )
         finally:
-            # mypy continues to think this is a method but it is a function stored in an
-            # attribute and therefore does not need a self argument
-            await self._complete_callback()  # type: ignore[misc]
+            await self._complete_callback()
 
     def get_handle(self) -> "UpdateProcessHandle":
         """Get a public handle for the task that is usable elsewhere.
@@ -350,7 +347,12 @@ class FirmwareUpdateManager:
                     log.exception(f"Double pop for update on {subsystem}")
 
         self._all_updates_by_id[update_id] = _UpdateProcess(
-            self._hardware_handle, hw_subsystem, creation_time, update_id, _complete
+            self._hardware_handle,
+            hw_subsystem,
+            creation_time,
+            update_id,
+            _complete,
+            UpdateProgress(UpdateState.queued, 0, None),
         )
         self._running_updates_by_subsystem[hw_subsystem] = self._all_updates_by_id[
             update_id

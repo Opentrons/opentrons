@@ -2,25 +2,25 @@ import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { useCreateLiveCommandMutation } from '@opentrons/react-api-client'
 import {
-  Icon,
-  COLORS,
-  Flex,
   Box,
+  COLORS,
   DIRECTION_ROW,
-  SPACING,
-  TYPOGRAPHY,
+  Flex,
+  Icon,
   JUSTIFY_FLEX_END,
   PrimaryButton,
   SecondaryButton,
+  SPACING,
+  StyledText,
+  TYPOGRAPHY,
 } from '@opentrons/components'
 import { useAttachedModules } from '../hooks'
 import { LegacyModal } from '../../../molecules/LegacyModal'
-import { StyledText } from '../../../atoms/text'
-import { HeaterShakerModule } from '../../../redux/modules/types'
 import { HeaterShakerModuleCard } from '../HeaterShakerWizard/HeaterShakerModuleCard'
 import { HEATERSHAKER_MODULE_TYPE } from '@opentrons/shared-data'
 
 import type { HeaterShakerDeactivateShakerCreateCommand } from '@opentrons/shared-data'
+import type { HeaterShakerModule } from '../../../redux/modules/types'
 
 interface HeaterShakerIsRunningModalProps {
   closeModal: () => void
@@ -50,7 +50,7 @@ export const HeaterShakerIsRunningModal = (
         name="alert-circle"
         marginX={SPACING.spacing8}
         size={SPACING.spacing20}
-        color={COLORS.warningEnabled}
+        color={COLORS.yellow50}
         data-testid="HeaterShakerIsRunning_warning_icon"
       />
       {t('heater_shaker_is_shaking')}

@@ -7,11 +7,11 @@ class NozzleLayout(enum.Enum):
     SINGLE = "SINGLE"
     ROW = "ROW"
     QUADRANT = "QUADRANT"
-    EMPTY = "EMPTY"
+    ALL = "ALL"
 
 
 COLUMN: Final = NozzleLayout.COLUMN
-EMPTY: Final = NozzleLayout.EMPTY
+ALL: Final = NozzleLayout.ALL
 
 # Set __doc__ manually as a workaround. When this docstring is written the normal way, right after
 # the constant definition, Sphinx has trouble picking it up.
@@ -20,8 +20,8 @@ A special nozzle configuration type indicating a full single column pick up. Pre
 
 See <ADD REFERENCE HERE> for details on using ``COLUMN`` with :py:obj:`InstrumentContext.configure_nozzle_layout()`.
 """
-EMPTY.__doc__ = """\
+ALL.__doc__ = """\
 A special nozzle configuration type indicating a reset back to default where the pipette will pick up its max capacity of tips.
 
-See <ADD REFERENCE HERE> for details on using ``RESET`` with :py:obj:`InstrumentContext.configure_nozzle_layout()`.
+See <ADD REFERENCE HERE> for details on using ``ALL`` with :py:obj:`InstrumentContext.configure_nozzle_layout()`.
 """

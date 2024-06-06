@@ -1,5 +1,7 @@
 import * as React from 'react'
-import { renderWithProviders } from '@opentrons/components'
+import { vi, it, describe } from 'vitest'
+import { screen } from '@testing-library/react'
+import { renderWithProviders } from '../../../../__testing-utils__'
 
 import { ProtocolsEmptyState } from '../../../../organisms/ProtocolsLanding/ProtocolsEmptyState'
 import { getStoredProtocols } from '../../../../redux/protocol-storage'
@@ -7,19 +9,9 @@ import { storedProtocolData } from '../../../../redux/protocol-storage/__fixture
 import { ProtocolList } from '../../../../organisms/ProtocolsLanding/ProtocolList'
 import { ProtocolsLanding } from '..'
 
-jest.mock('../../../../redux/protocol-storage')
-jest.mock('../../../../organisms/ProtocolsLanding/ProtocolsEmptyState')
-jest.mock('../../../../organisms/ProtocolsLanding/ProtocolList')
-
-const mockGetStoredProtocols = getStoredProtocols as jest.MockedFunction<
-  typeof getStoredProtocols
->
-const mockProtocolList = ProtocolList as jest.MockedFunction<
-  typeof ProtocolList
->
-const mockProtocolsEmptyState = ProtocolsEmptyState as jest.MockedFunction<
-  typeof ProtocolsEmptyState
->
+vi.mock('../../../../redux/protocol-storage')
+vi.mock('../../../../organisms/ProtocolsLanding/ProtocolsEmptyState')
+vi.mock('../../../../organisms/ProtocolsLanding/ProtocolList')
 
 const render = () => {
   return renderWithProviders(<ProtocolsLanding />)[0]
@@ -27,15 +19,15 @@ const render = () => {
 
 describe('ProtocolsLanding', () => {
   it('renders the protocol list component', () => {
-    mockGetStoredProtocols.mockReturnValue([storedProtocolData])
-    mockProtocolList.mockReturnValue(<div>mock protocol list</div>)
-    const { getByText } = render()
-    getByText('mock protocol list')
+    vi.mocked(getStoredProtocols).mockReturnValue([storedProtocolData])
+    vi.mocked(ProtocolList).mockReturnValue(<div>mock protocol list</div>)
+    render()
+    screen.getByText('mock protocol list')
   })
   it('renders the empty state component', () => {
-    mockGetStoredProtocols.mockReturnValue([])
-    mockProtocolsEmptyState.mockReturnValue(<div>mock empty state</div>)
-    const { getByText } = render()
-    getByText('mock empty state')
+    vi.mocked(getStoredProtocols).mockReturnValue([])
+    vi.mocked(ProtocolsEmptyState).mockReturnValue(<div>mock empty state</div>)
+    render()
+    screen.getByText('mock empty state')
   })
 })

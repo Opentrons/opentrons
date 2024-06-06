@@ -4,6 +4,8 @@ import type { UpdateManifestUrls } from './types'
 import type { RobotUpdateTarget } from '@opentrons/app/src/redux/robot-update/types'
 import { CURRENT_VERSION } from '../update'
 
+const OPENTRONS_PROJECT: string = _OPENTRONS_PROJECT_
+
 const UPDATE_MANIFEST_URLS_RELEASE = {
   ot2: 'https://builds.opentrons.com/ot2-br/releases.json',
   flex: 'https://builds.opentrons.com/ot3-oe/releases.json',
@@ -15,7 +17,7 @@ const UPDATE_MANIFEST_URLS_INTERNAL_RELEASE = {
 }
 
 export const getUpdateManifestUrls = (): UpdateManifestUrls =>
-  _OPENTRONS_PROJECT_.includes('robot-stack')
+  OPENTRONS_PROJECT.includes('robot-stack')
     ? UPDATE_MANIFEST_URLS_RELEASE
     : UPDATE_MANIFEST_URLS_INTERNAL_RELEASE
 

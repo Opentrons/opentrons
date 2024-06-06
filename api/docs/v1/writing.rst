@@ -115,7 +115,7 @@ This also provides an entrypoint to use the Opentrons simulation package from ot
 
    from opentrons.simulate import simulate, format_runlog
    # read the file
-   protocol_file = open('/path/to/protocol.py')
+   protocol_file = open("/path/to/protocol.py")
    # simulate() the protocol, keeping the runlog
    runlog, _bundle = simulate(protocol_file)
    # print the runlog

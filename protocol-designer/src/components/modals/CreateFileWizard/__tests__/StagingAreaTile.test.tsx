@@ -1,39 +1,42 @@
 import * as React from 'react'
-import i18n from 'i18next'
+import { screen } from '@testing-library/react'
+import '@testing-library/jest-dom/vitest'
+import { vi, describe, beforeEach, expect, it } from 'vitest'
 import { FLEX_ROBOT_TYPE, OT2_ROBOT_TYPE } from '@opentrons/shared-data'
-import { DeckConfigurator, renderWithProviders } from '@opentrons/components'
-import { getEnableDeckModification } from '../../../../feature-flags/selectors'
+import { renderWithProviders } from '../../../../__testing-utils__'
+import { i18n } from '../../../../localization'
 import { StagingAreaTile } from '../StagingAreaTile'
 
+import type * as Components from '@opentrons/components'
 import type { FormState, WizardTileProps } from '../types'
 
-jest.mock('../../../../feature-flags/selectors')
-jest.mock('@opentrons/components/src/hardware-sim/DeckConfigurator/index')
+vi.mock('@opentrons/components', async importOriginal => {
+  const actual = await importOriginal<typeof Components>()
+  return {
+    ...actual,
+    DeckConfigurator: () => <div>mock deck configurator</div>,
+  }
+})
 
-const mockGetEnableDeckModification = getEnableDeckModification as jest.MockedFunction<
-  typeof getEnableDeckModification
->
-const mockDeckConfigurator = DeckConfigurator as jest.MockedFunction<
-  typeof DeckConfigurator
->
 const render = (props: React.ComponentProps<typeof StagingAreaTile>) => {
   return renderWithProviders(<StagingAreaTile {...props} />, {
     i18nInstance: i18n,
   })[0]
 }
 
+const values = {
+  fields: {
+    robotType: OT2_ROBOT_TYPE,
+  },
+  additionalEquipment: ['gripper'],
+} as FormState
+
 const mockWizardTileProps: Partial<WizardTileProps> = {
-  handleChange: jest.fn(),
-  handleBlur: jest.fn(),
-  goBack: jest.fn(),
-  proceed: jest.fn(),
-  setFieldValue: jest.fn(),
-  values: {
-    fields: {
-      robotType: OT2_ROBOT_TYPE,
-    },
-    additionalEquipment: ['gripper'],
-  } as FormState,
+  goBack: vi.fn(),
+  proceed: vi.fn(),
+  setValue: vi.fn(),
+  watch: vi.fn((name: keyof typeof values) => values[name]) as any,
+  getValues: vi.fn(() => values) as any,
 }
 
 describe('StagingAreaTile', () => {
@@ -44,17 +47,33 @@ describe('StagingAreaTile', () => {
       ...props,
       ...mockWizardTileProps,
     } as WizardTileProps
-    mockGetEnableDeckModification.mockReturnValue(true)
-    mockDeckConfigurator.mockReturnValue(<div>mock deck configurator</div>)
   })
   it('renders null when robot type is ot-2', () => {
-    const { container } = render(props)
-    expect(container.firstChild).toBeNull()
+    render(props)
+    expect(screen.queryByText('Staging area slots')).not.toBeInTheDocument()
   })
   it('renders header and deck configurator', () => {
-    props.values.fields.robotType = FLEX_ROBOT_TYPE
-    const { getByText } = render(props)
-    getByText('Staging area slots')
-    getByText('mock deck configurator')
+    const values = {
+      fields: {
+        robotType: FLEX_ROBOT_TYPE,
+      },
+      additionalEquipment: ['gripper'],
+    } as FormState
+
+    const mockWizardTileProps: Partial<WizardTileProps> = {
+      goBack: vi.fn(),
+      proceed: vi.fn(),
+      setValue: vi.fn(),
+      watch: vi.fn((name: keyof typeof values) => values[name]) as any,
+      getValues: vi.fn(() => values) as any,
+    }
+
+    props = {
+      ...props,
+      ...mockWizardTileProps,
+    } as WizardTileProps
+    render(props)
+    screen.getByText('Staging area slots')
+    screen.getByText('mock deck configurator')
   })
 })

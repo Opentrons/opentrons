@@ -1,14 +1,16 @@
 import * as React from 'react'
+import { screen } from '@testing-library/react'
+import { beforeEach, describe, it, vi } from 'vitest'
 
-import { renderWithProviders } from '@opentrons/components'
-import { useAllRunsQuery } from '@opentrons/react-api-client'
-
+import { renderWithProviders } from '../../../../__testing-utils__'
+import { useNotifyAllRunsQuery } from '../../../../resources/runs'
 import { RecentRunProtocolCard, RecentRunProtocolCarousel } from '..'
 
 import type { RunData } from '@opentrons/api-client'
 
-jest.mock('@opentrons/react-api-client')
-jest.mock('../RecentRunProtocolCard')
+vi.mock('@opentrons/react-api-client')
+vi.mock('../RecentRunProtocolCard')
+vi.mock('../../../../resources/runs')
 
 const mockRun = {
   actions: [],
@@ -24,14 +26,8 @@ const mockRun = {
   pipettes: [],
   protocolId: 'mockSortedProtocolID',
   status: 'stopped',
+  runTimeParameters: [],
 }
-
-const mockRecentRunProtocolCard = RecentRunProtocolCard as jest.MockedFunction<
-  typeof RecentRunProtocolCard
->
-const mockUseAllRunsQuery = useAllRunsQuery as jest.MockedFunction<
-  typeof useAllRunsQuery
->
 
 const render = (
   props: React.ComponentProps<typeof RecentRunProtocolCarousel>
@@ -46,15 +42,17 @@ describe('RecentRunProtocolCarousel', () => {
     props = {
       recentRunsOfUniqueProtocols: [mockRun as RunData],
     }
-    mockRecentRunProtocolCard.mockReturnValue(
+    vi.mocked(RecentRunProtocolCard).mockReturnValue(
       <div>mock RecentRunProtocolCard</div>
     )
-    mockUseAllRunsQuery.mockReturnValue({ data: { data: [mockRun] } } as any)
+    vi.mocked(useNotifyAllRunsQuery).mockReturnValue({
+      data: { data: [mockRun] },
+    } as any)
   })
 
   it('should render RecentRunProtocolCard', () => {
-    const [{ getByText }] = render(props)
-    getByText('mock RecentRunProtocolCard')
+    render(props)
+    screen.getByText('mock RecentRunProtocolCard')
   })
 
   // Note(kj:04/14/2023) still looking for a way to test swipe gesture in a unit test

@@ -1,49 +1,89 @@
 import * as React from 'react'
-import '@testing-library/jest-dom'
-import { fireEvent } from '@testing-library/react'
+import { describe, it, expect, vi, beforeEach } from 'vitest'
+import '@testing-library/jest-dom/vitest'
+import { fireEvent, screen } from '@testing-library/react'
 import { BrowserRouter } from 'react-router-dom'
-import { renderWithProviders } from '@opentrons/components'
+import {
+  DIRECTION_ROW,
+  Flex,
+  Icon,
+  SPACING,
+  StyledText,
+} from '@opentrons/components'
 import { i18n } from '../../../i18n'
 import { UploadInput } from '..'
+import { renderWithProviders } from '../../../__testing-utils__'
 
 describe('UploadInput', () => {
-  let onUpload: jest.MockedFunction<() => {}>
-  let render: () => ReturnType<typeof renderWithProviders>[0]
+  let onUpload: any
 
   beforeEach(() => {
-    onUpload = jest.fn()
-    render = () => {
-      return renderWithProviders(
-        <BrowserRouter>
-          <UploadInput onUpload={onUpload} />
-        </BrowserRouter>,
-        {
-          i18nInstance: i18n,
-        }
-      )[0]
-    }
+    onUpload = vi.fn()
   })
-  afterEach(() => {
-    jest.resetAllMocks()
-  })
-
   it('renders correct contents for empty state', () => {
-    const { getByRole } = render()
+    renderWithProviders(
+      <BrowserRouter>
+        <UploadInput onUpload={onUpload} />
+      </BrowserRouter>,
+      {
+        i18nInstance: i18n,
+      }
+    )
 
-    expect(getByRole('button', { name: 'Upload' })).toBeTruthy()
+    expect(screen.getByRole('button', { name: 'Upload' })).toBeTruthy()
+  })
+
+  it('renders text when passing them as props', () => {
+    const mockUploadText = (
+      <Flex flexDirection={DIRECTION_ROW} gridGap={SPACING.spacing8}>
+        <StyledText>{'CSV file'}</StyledText>
+        <Icon name="information" size="0.75rem" data-testid="mockIcon" />
+      </Flex>
+    )
+
+    renderWithProviders(
+      <BrowserRouter>
+        <UploadInput
+          onUpload={onUpload}
+          uploadButtonText="Choose file"
+          uploadText={mockUploadText}
+        />
+      </BrowserRouter>,
+      {
+        i18nInstance: i18n,
+      }
+    )
+
+    screen.getByText('CSV file')
+    screen.getByTestId('mockIcon')
+    screen.getByText('Choose file')
   })
 
   it('opens file select on button click', () => {
-    const { getByRole, getByTestId } = render()
-    const button = getByRole('button', { name: 'Upload' })
-    const input = getByTestId('file_input')
-    input.click = jest.fn()
+    renderWithProviders(
+      <BrowserRouter>
+        <UploadInput onUpload={onUpload} />
+      </BrowserRouter>,
+      {
+        i18nInstance: i18n,
+      }
+    )
+    const button = screen.getByRole('button', { name: 'Upload' })
+    const input = screen.getByTestId('file_input')
+    input.click = vi.fn()
     fireEvent.click(button)
     expect(input.click).toHaveBeenCalled()
   })
   it('calls create session on choose file', () => {
-    const { getByTestId } = render()
-    const input = getByTestId('file_input')
+    renderWithProviders(
+      <BrowserRouter>
+        <UploadInput onUpload={onUpload} />
+      </BrowserRouter>,
+      {
+        i18nInstance: i18n,
+      }
+    )
+    const input = screen.getByTestId('file_input')
     fireEvent.change(input, { target: { files: ['dummyFile'] } })
     expect(onUpload).toHaveBeenCalledWith('dummyFile')
   })

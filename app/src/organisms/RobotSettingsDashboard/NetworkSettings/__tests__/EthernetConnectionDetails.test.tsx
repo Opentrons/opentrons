@@ -1,29 +1,19 @@
 import * as React from 'react'
-import { when } from 'jest-when'
-
-import { renderWithProviders } from '@opentrons/components'
-import { fireEvent } from '@testing-library/react'
+import { fireEvent, screen } from '@testing-library/react'
+import { describe, it, expect, vi, beforeEach } from 'vitest'
+import '@testing-library/jest-dom/vitest'
 
 import { i18n } from '../../../../i18n'
-import * as Networking from '../../../../redux/networking'
+import { INTERFACE_ETHERNET } from '../../../../redux/networking'
+import { getNetworkInterfaces } from '../../../../redux/networking/selectors'
+import { renderWithProviders } from '../../../../__testing-utils__'
 import { getLocalRobot } from '../../../../redux/discovery'
 import { mockConnectedRobot } from '../../../../redux/discovery/__fixtures__'
 import { EthernetConnectionDetails } from '../EthernetConnectionDetails'
 
-import type { State } from '../../../../redux/types'
-
-jest.mock('../../../../redux/networking')
-jest.mock('../../../../redux/discovery')
-jest.mock('../../../../redux/discovery/selectors')
-
-const mockGetNetworkInterfaces = Networking.getNetworkInterfaces as jest.MockedFunction<
-  typeof Networking.getNetworkInterfaces
->
-const mockGetLocalRobot = getLocalRobot as jest.MockedFunction<
-  typeof getLocalRobot
->
-
-const ROBOT_NAME = 'opentrons-robot-name'
+vi.mock('../../../../redux/discovery')
+vi.mock('../../../../redux/discovery/selectors')
+vi.mock('../../../../redux/networking/selectors')
 
 const render = (
   props: React.ComponentProps<typeof EthernetConnectionDetails>
@@ -37,38 +27,32 @@ const mockEthernet = {
   ipAddress: '127.0.0.100',
   subnetMask: '255.255.255.230',
   macAddress: 'ET:NT:00:00:00:00',
-  type: Networking.INTERFACE_ETHERNET,
+  type: INTERFACE_ETHERNET,
 }
 
 describe('EthernetConnectionDetails', () => {
   let props: React.ComponentProps<typeof EthernetConnectionDetails>
   beforeEach(() => {
     props = {
-      handleGoBack: jest.fn(),
+      handleGoBack: vi.fn(),
     }
-    mockGetLocalRobot.mockReturnValue(mockConnectedRobot)
-    when(mockGetNetworkInterfaces)
-      .calledWith({} as State, ROBOT_NAME)
-      .mockReturnValue({
-        wifi: null,
-        ethernet: mockEthernet,
-      })
-  })
-
-  afterEach(() => {
-    jest.resetAllMocks()
+    vi.mocked(getLocalRobot).mockReturnValue(mockConnectedRobot)
+    vi.mocked(getNetworkInterfaces).mockReturnValue({
+      wifi: null,
+      ethernet: mockEthernet,
+    })
   })
 
   it('should render ip address, subnet mask, mac address, text and button when ethernet is connected', () => {
-    const [{ getByText, queryByText }] = render(props)
-    getByText('IP Address')
-    getByText('Subnet Mask')
-    getByText('MAC Address')
-    getByText('127.0.0.100')
-    getByText('255.255.255.230')
-    getByText('ET:NT:00:00:00:00')
+    render(props)
+    screen.getByText('IP Address')
+    screen.getByText('Subnet Mask')
+    screen.getByText('MAC Address')
+    screen.getByText('127.0.0.100')
+    screen.getByText('255.255.255.230')
+    screen.getByText('ET:NT:00:00:00:00')
     expect(
-      queryByText(
+      screen.queryByText(
         'Connect an Ethernet cable to the back of the robot and a network switch or hub.'
       )
     ).not.toBeInTheDocument()
@@ -79,28 +63,26 @@ describe('EthernetConnectionDetails', () => {
       ipAddress: null,
       subnetMask: null,
       macAddress: 'ET:NT:00:00:00:11',
-      type: Networking.INTERFACE_ETHERNET,
+      type: INTERFACE_ETHERNET,
     }
-    when(mockGetNetworkInterfaces)
-      .calledWith({} as State, ROBOT_NAME)
-      .mockReturnValue({
-        wifi: null,
-        ethernet: notConnectedMockEthernet,
-      })
-    const [{ getByText, getAllByText }] = render(props)
-    getByText('IP Address')
-    getByText('Subnet Mask')
-    getByText('MAC Address')
-    expect(getAllByText('No data').length).toBe(2)
-    getByText('ET:NT:00:00:00:11')
-    getByText(
+    vi.mocked(getNetworkInterfaces).mockReturnValue({
+      wifi: null,
+      ethernet: notConnectedMockEthernet,
+    })
+    render(props)
+    screen.getByText('IP Address')
+    screen.getByText('Subnet Mask')
+    screen.getByText('MAC Address')
+    expect(screen.getAllByText('No data').length).toBe(2)
+    screen.getByText('ET:NT:00:00:00:11')
+    screen.getByText(
       'Connect an Ethernet cable to the back of the robot and a network switch or hub.'
     )
   })
 
   it('should call handleGoBack when pressing back', () => {
-    const [{ getByRole }] = render(props)
-    const backButton = getByRole('button')
+    render(props)
+    const backButton = screen.getByRole('button')
     fireEvent.click(backButton)
     expect(props.handleGoBack).toHaveBeenCalled()
   })

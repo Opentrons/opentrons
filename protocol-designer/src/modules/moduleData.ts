@@ -1,14 +1,27 @@
-import { SPAN7_8_10_11_SLOT } from '../constants'
+import { COLUMN_4_SLOTS } from '@opentrons/step-generation'
 import {
   MAGNETIC_MODULE_TYPE,
   TEMPERATURE_MODULE_TYPE,
   THERMOCYCLER_MODULE_TYPE,
   HEATERSHAKER_MODULE_TYPE,
-  ModuleType,
   MAGNETIC_BLOCK_TYPE,
-  RobotType,
+  MOVABLE_TRASH_ADDRESSABLE_AREAS,
+  WASTE_CHUTE_ADDRESSABLE_AREAS,
+  FIXED_TRASH_ID,
 } from '@opentrons/shared-data'
-import { DropdownOption } from '@opentrons/components'
+import { SPAN7_8_10_11_SLOT } from '../constants'
+import { getStagingAreaAddressableAreas } from '../utils'
+import { getSlotIsEmpty } from '../step-forms'
+import type {
+  ModuleType,
+  RobotType,
+  CutoutId,
+  AddressableAreaName,
+} from '@opentrons/shared-data'
+import type { DropdownOption } from '@opentrons/components'
+import type { InitialDeckSetup } from '../step-forms'
+import type { DeckSlot } from '../types'
+
 export const SUPPORTED_MODULE_TYPES: ModuleType[] = [
   HEATERSHAKER_MODULE_TYPE,
   MAGNETIC_BLOCK_TYPE,
@@ -269,4 +282,33 @@ export function getAllModuleSlotsByType(
     }
   }
   return slot
+}
+
+const FLEX_MODULE_SLOTS = ['D1', 'D3', 'C1', 'C3', 'B1', 'B3', 'A1', 'A3']
+
+export function getNextAvailableModuleSlot(
+  initialDeckSetup: InitialDeckSetup
+): DeckSlot | undefined {
+  return FLEX_MODULE_SLOTS.find(slot => {
+    const cutoutIds = Object.values(initialDeckSetup.additionalEquipmentOnDeck)
+      .filter(ae => ae.name === 'stagingArea')
+      .map(ae => ae.location as CutoutId)
+    const stagingAreaAddressableAreaNames = getStagingAreaAddressableAreas(
+      cutoutIds
+    )
+    const addressableAreaName = stagingAreaAddressableAreaNames.find(
+      aa => aa === slot
+    )
+    let isSlotEmpty: boolean = getSlotIsEmpty(initialDeckSetup, slot, true)
+    if (addressableAreaName == null && COLUMN_4_SLOTS.includes(slot)) {
+      isSlotEmpty = false
+    } else if (
+      MOVABLE_TRASH_ADDRESSABLE_AREAS.includes(slot as AddressableAreaName) ||
+      WASTE_CHUTE_ADDRESSABLE_AREAS.includes(slot as AddressableAreaName) ||
+      slot === FIXED_TRASH_ID
+    ) {
+      isSlotEmpty = false
+    }
+    return isSlotEmpty
+  })
 }

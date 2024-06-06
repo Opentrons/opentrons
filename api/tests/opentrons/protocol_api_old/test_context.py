@@ -21,6 +21,7 @@ from opentrons.types import Mount, Point, Location, TransferTipPolicy
 from opentrons.hardware_control import API, ThreadManagedHardware
 from opentrons.hardware_control.instruments.ot2.pipette import Pipette
 from opentrons.hardware_control.types import Axis
+from opentrons.hardware_control.modules import SimulatingModule
 from opentrons.protocols.advanced_control import transfers as tf
 from opentrons.protocols.api_support import instrument as instrument_support
 from opentrons.protocols.api_support.types import APIVersion
@@ -85,7 +86,7 @@ async def test_motion(ctx, hardware):
     old_pos[Axis.X] = 0.0
     old_pos[Axis.Y] = 0.0
     old_pos[Axis.A] = 0.0
-    old_pos[Axis.C] = 2.0
+    old_pos[Axis.C] = 2.5
     assert await hardware.current_position(instr._core.get_mount()) == pytest.approx(
         old_pos
     )
@@ -876,46 +877,47 @@ def test_transfer_options(ctx, monkeypatch):
 
 
 def test_flow_rate(ctx, monkeypatch):
-    old_sfm = ctx._core.get_hardware()
+    instr = ctx.load_instrument("p300_single", Mount.RIGHT)
+    old_sfm = instr._core.set_flow_rate
 
-    def pass_on(mount, aspirate=None, dispense=None, blow_out=None):
-        old_sfm(mount, aspirate=None, dispense=None, blow_out=None)
+    def pass_on(aspirate=None, dispense=None, blow_out=None):
+        old_sfm(aspirate=aspirate, dispense=dispense, blow_out=blow_out)
 
     set_flow_rate = mock.Mock(side_effect=pass_on)
-    monkeypatch.setattr(ctx._core.get_hardware(), "set_flow_rate", set_flow_rate)
-    instr = ctx.load_instrument("p300_single", Mount.RIGHT)
+    monkeypatch.setattr(instr._core, "set_flow_rate", set_flow_rate)
 
     ctx.home()
     instr.flow_rate.aspirate = 1
-    assert set_flow_rate.called_once_with(Mount.RIGHT, aspirate=1)
+    set_flow_rate.assert_called_once_with(aspirate=1)
     set_flow_rate.reset_mock()
     instr.flow_rate.dispense = 10
-    assert set_flow_rate.called_once_with(Mount.RIGHT, dispense=10)
+    set_flow_rate.assert_called_once_with(dispense=10)
     set_flow_rate.reset_mock()
     instr.flow_rate.blow_out = 2
-    assert set_flow_rate.called_once_with(Mount.RIGHT, blow_out=2)
+    set_flow_rate.assert_called_once_with(blow_out=2)
     assert instr.flow_rate.aspirate == 1
     assert instr.flow_rate.dispense == 10
     assert instr.flow_rate.blow_out == 2
 
 
 def test_pipette_speed(ctx, monkeypatch):
-    old_sfm = ctx._core.get_hardware()
+    instr = ctx.load_instrument("p300_single", Mount.RIGHT)
+    old_sfm = instr._core.set_pipette_speed
 
-    def pass_on(mount, aspirate=None, dispense=None, blow_out=None):
-        old_sfm(aspirate=None, dispense=None, blow_out=None)
+    def pass_on(aspirate=None, dispense=None, blow_out=None):
+        old_sfm(aspirate=aspirate, dispense=dispense, blow_out=blow_out)
 
     set_speed = mock.Mock(side_effect=pass_on)
-    monkeypatch.setattr(ctx._core.get_hardware(), "set_pipette_speed", set_speed)
-    instr = ctx.load_instrument("p300_single", Mount.RIGHT)
-
+    monkeypatch.setattr(instr._core, "set_pipette_speed", set_speed)
     ctx.home()
     instr.speed.aspirate = 1
-    assert set_speed.called_once_with(Mount.RIGHT, dispense=1)
+    set_speed.assert_called_once_with(aspirate=1)
+    set_speed.reset_mock()
     instr.speed.dispense = 10
+    set_speed.assert_called_once_with(dispense=10)
+    set_speed.reset_mock()
     instr.speed.blow_out = 2
-    assert set_speed.called_with(Mount.RIGHT, dispense=10)
-    assert set_speed.called_with(Mount.RIGHT, blow_out=2)
+    set_speed.assert_called_once_with(blow_out=2)
     assert instr.speed.aspirate == 1
     assert instr.speed.dispense == 10
     assert instr.speed.blow_out == 2
@@ -958,7 +960,15 @@ def test_order_of_module_load():
     import opentrons.hardware_control as hardware_control
     import opentrons.protocol_api as protocol_api
 
-    mods = ["tempdeck", "thermocycler", "tempdeck"]
+    mods = {
+        "tempdeck": [
+            SimulatingModule(serial_number="111", model="temperatureModuleV1"),
+            SimulatingModule(serial_number="333", model="temperatureModuleV2"),
+        ],
+        "thermocycler": [
+            SimulatingModule(serial_number="222", model="thermocyclerModuleV2")
+        ],
+    }
     thread_manager = hardware_control.ThreadManager(
         hardware_control.API.build_hardware_simulator, attached_modules=mods
     )
@@ -966,7 +976,7 @@ def test_order_of_module_load():
 
     attached_modules = fake_hardware.attached_modules
     hw_temp1 = attached_modules[0]
-    hw_temp2 = attached_modules[2]
+    hw_temp2 = attached_modules[1]
 
     ctx1 = protocol_api.create_protocol_context(
         api_version=APIVersion(2, 13),
@@ -1187,11 +1197,11 @@ def test_move_to_with_thermocycler(
     mod = ctx.load_module("thermocycler")
 
     assert isinstance(mod, ThermocyclerContext)
-    mod._core.flag_unsafe_move = mock.MagicMock(side_effect=raiser)  # type: ignore[attr-defined, assignment]
+    mod._core.flag_unsafe_move = mock.MagicMock(side_effect=raiser)  # type: ignore[attr-defined]
     instr = ctx.load_instrument("p1000_single", "left")
     with pytest.raises(RuntimeError, match="Cannot"):
         instr.move_to(Location(Point(0, 0, 0), None))
-    mod._core.flag_unsafe_move.assert_called_once_with(  # type: ignore[attr-defined]
+    mod._core.flag_unsafe_move.assert_called_once_with(  # type: ignore[attr-defined]  # type: ignore[attr-defined]
         to_loc=Location(Point(0, 0, 0), None), from_loc=Location(Point(0, 0, 0), None)
     )
 

@@ -1,18 +1,12 @@
 """Configure for volume command request, result, and implementation models."""
 from __future__ import annotations
-from pydantic import BaseModel
-from typing import TYPE_CHECKING, Optional, Type, Tuple
+from pydantic import BaseModel, Field
+from typing import TYPE_CHECKING, Optional, Type
 from typing_extensions import Literal
 
-from .pipetting_common import (
-    PipetteIdMixin,
-    VolumeMixin,
-)
-from .command import (
-    AbstractCommandWithPrivateResultImpl,
-    BaseCommand,
-    BaseCommandCreate,
-)
+from .pipetting_common import PipetteIdMixin
+from .command import AbstractCommandImpl, BaseCommand, BaseCommandCreate, SuccessData
+from ..errors.error_occurrence import ErrorOccurrence
 from .configuring_common import PipetteConfigUpdateResultMixin
 
 if TYPE_CHECKING:
@@ -22,10 +16,15 @@ if TYPE_CHECKING:
 ConfigureForVolumeCommandType = Literal["configureForVolume"]
 
 
-class ConfigureForVolumeParams(PipetteIdMixin, VolumeMixin):
+class ConfigureForVolumeParams(PipetteIdMixin):
     """Parameters required to configure volume for a specific pipette."""
 
-    pass
+    volume: float = Field(
+        ...,
+        description="Amount of liquid in uL. Must be at least 0 and no greater "
+        "than a pipette-specific maximum volume.",
+        ge=0,
+    )
 
 
 class ConfigureForVolumePrivateResult(PipetteConfigUpdateResultMixin):
@@ -41,10 +40,9 @@ class ConfigureForVolumeResult(BaseModel):
 
 
 class ConfigureForVolumeImplementation(
-    AbstractCommandWithPrivateResultImpl[
+    AbstractCommandImpl[
         ConfigureForVolumeParams,
-        ConfigureForVolumeResult,
-        ConfigureForVolumePrivateResult,
+        SuccessData[ConfigureForVolumeResult, ConfigureForVolumePrivateResult],
     ]
 ):
     """Configure for volume command implementation."""
@@ -54,22 +52,25 @@ class ConfigureForVolumeImplementation(
 
     async def execute(
         self, params: ConfigureForVolumeParams
-    ) -> Tuple[ConfigureForVolumeResult, ConfigureForVolumePrivateResult]:
+    ) -> SuccessData[ConfigureForVolumeResult, ConfigureForVolumePrivateResult]:
         """Check that requested pipette can be configured for the given volume."""
         pipette_result = await self._equipment.configure_for_volume(
             pipette_id=params.pipetteId,
             volume=params.volume,
         )
 
-        return ConfigureForVolumeResult(), ConfigureForVolumePrivateResult(
-            pipette_id=pipette_result.pipette_id,
-            serial_number=pipette_result.serial_number,
-            config=pipette_result.static_config,
+        return SuccessData(
+            public=ConfigureForVolumeResult(),
+            private=ConfigureForVolumePrivateResult(
+                pipette_id=pipette_result.pipette_id,
+                serial_number=pipette_result.serial_number,
+                config=pipette_result.static_config,
+            ),
         )
 
 
 class ConfigureForVolume(
-    BaseCommand[ConfigureForVolumeParams, ConfigureForVolumeResult]
+    BaseCommand[ConfigureForVolumeParams, ConfigureForVolumeResult, ErrorOccurrence]
 ):
     """Configure for volume command model."""
 

@@ -21,13 +21,18 @@ Attached.args = {
   menuOverlayItems: [
     {
       label: 'menu option 1',
-      onClick: () => console.log('item click 1'),
+      onClick: () => {
+        console.log('item click 1')
+      },
     },
     {
       label: 'menu option 2',
-      onClick: () => console.log('item click 2'),
+      onClick: () => {
+        console.log('item click 2')
+      },
     },
   ],
+  isEstopNotDisengaged: false,
 }
 
 export const Divider = Template.bind({})
@@ -40,13 +45,18 @@ Divider.args = {
   menuOverlayItems: [
     {
       label: 'menu option 1',
-      onClick: () => console.log('item click 1'),
+      onClick: () => {
+        console.log('item click 1')
+      },
     },
     {
       label: 'menu option 2',
-      onClick: () => console.log('item click 2'),
+      onClick: () => {
+        console.log('item click 2')
+      },
     },
   ],
+  isEstopNotDisengaged: false,
 }
 
 export const Empty = Template.bind({})
@@ -59,12 +69,17 @@ Empty.args = {
     {
       label: 'menu option 1',
       disabled: true,
-      onClick: () => console.log('item click 1'),
+      onClick: () => {
+        console.log('item click 1')
+      },
     },
     {
       label: 'menu option 2',
       disabled: true,
-      onClick: () => console.log('item click 2'),
+      onClick: () => {
+        console.log('item click 2')
+      },
     },
   ],
+  isEstopNotDisengaged: false,
 }

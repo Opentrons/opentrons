@@ -6,7 +6,7 @@ import { getIsHidden } from '../formSelectors'
 import { getLabel } from '../fields'
 import type { LabwareFields } from '../fields'
 import type { RadioGroupProps } from '@opentrons/components'
-import fieldStyles from './fieldStyles.css'
+import fieldStyles from './fieldStyles.module.css'
 
 interface Props {
   name: keyof LabwareFields

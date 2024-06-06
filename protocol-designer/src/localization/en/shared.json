@@ -1,5 +1,9 @@
 {
   "add": "add",
+  "amount": "Amount:",
+  "cancel": "Cancel",
+  "confirm_reorder": "Are you sure you want to reorder these steps, it may cause errors?",
+  "done": "Done",
   "edit": "edit",
   "exit": "exit",
   "go_back": "go back",

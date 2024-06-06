@@ -84,7 +84,7 @@ def test_modify_module_list(revision: BoardRevision, usb_bus: USBBus):
     # TODO(mc, 2022-03-01): partial patching the class under test creates
     # a contaminated test subject that reduces the value of these tests
     # https://github.com/testdouble/contributing-tests/wiki/Partial-Mock
-    usb_bus._read_symlink = MagicMock(return_value="ttyACM1")  # type: ignore[assignment]
+    usb_bus._read_symlink = MagicMock(return_value="ttyACM1")  # type: ignore[method-assign]
     mod_at_port_list = [
         ModuleAtPort(
             name="temperature module", port="dev/ot_module_temperature_module"
@@ -123,7 +123,7 @@ def test_modify_module_list(revision: BoardRevision, usb_bus: USBBus):
             hub_port=None,
         )
 
-    usb_bus._read_symlink = MagicMock(return_value="ttyACM2")  # type: ignore[assignment]
+    usb_bus._read_symlink = MagicMock(return_value="ttyACM2")  # type: ignore[method-assign]
     mod_at_port_list = [
         ModuleAtPort(name="magnetic module", port="dev/ot_module_magnetic_module"),
     ]
@@ -161,7 +161,7 @@ def test_modify_module_list(revision: BoardRevision, usb_bus: USBBus):
         )
 
     if revision == BoardRevision.FLEX_B2:
-        usb_bus._read_symlink = MagicMock(return_value="ttyACM4")  # type: ignore[assignment]
+        usb_bus._read_symlink = MagicMock(return_value="ttyACM4")  # type: ignore[method-assign]
         mod_at_port_list = [
             ModuleAtPort(
                 name="heater-shaker module", port="dev/ot_module_heater_shaker_module"
@@ -178,7 +178,7 @@ def test_modify_module_list(revision: BoardRevision, usb_bus: USBBus):
             hub_port=None,
         )
 
-        usb_bus._read_symlink = MagicMock(return_value="ttyACM5")  # type: ignore[assignment]
+        usb_bus._read_symlink = MagicMock(return_value="ttyACM5")  # type: ignore[method-assign]
         mod_at_port_list = [
             ModuleAtPort(
                 name="thermocycler module", port="dev/ot_module_thermocycler_module"

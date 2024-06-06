@@ -1,5 +1,6 @@
 import * as React from 'react'
-import { Formik, FormikConfig } from 'formik'
+import { Formik } from 'formik'
+import type { FormikConfig } from 'formik'
 
 /**
  * Wraps a component in <Formik /> so it can be unit tested in isolation
@@ -10,4 +11,5 @@ import { Formik, FormikConfig } from 'formik'
 export const wrapInFormik = <Values,>(
   component: JSX.Element,
   formikConfig: FormikConfig<Values>
+  // @ts-expect-error
 ): JSX.Element => <Formik {...formikConfig}>{() => component}</Formik>

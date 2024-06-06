@@ -32,4 +32,7 @@ const Template: Story<
 export const EstopMissing = Template.bind({})
 EstopMissing.args = {
   robotName: 'Flexy',
+  closeModal: () => {},
+  isDismissedModal: false,
+  setIsDismissedModal: () => {},
 }

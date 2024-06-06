@@ -1,9 +1,9 @@
 import * as React from 'react'
-import { when, resetAllWhenMocks } from 'jest-when'
-import { fireEvent } from '@testing-library/react'
+import { when } from 'vitest-when'
+import { fireEvent, screen } from '@testing-library/react'
+import { describe, it, beforeEach, vi, afterEach, expect } from 'vitest'
 
-import { renderWithProviders } from '@opentrons/components'
-
+import { renderWithProviders } from '../../../../__testing-utils__'
 import { i18n } from '../../../../i18n'
 import {
   useTrackEvent,
@@ -20,38 +20,18 @@ import { SetupInstrumentCalibration } from '../SetupInstrumentCalibration'
 import { SetupTipLengthCalibration } from '../SetupTipLengthCalibration'
 import { SetupRobotCalibration } from '../SetupRobotCalibration'
 
-jest.mock('../../../../redux/analytics')
-jest.mock('../../hooks')
-jest.mock('../SetupDeckCalibration')
-jest.mock('../SetupInstrumentCalibration')
-jest.mock('../SetupTipLengthCalibration')
-
-const mockUseTrackEvent = useTrackEvent as jest.MockedFunction<
-  typeof useTrackEvent
->
-const mockSetupDeckCalibration = SetupDeckCalibration as jest.MockedFunction<
-  typeof SetupDeckCalibration
->
-const mockSetupInstrumentCalibration = SetupInstrumentCalibration as jest.MockedFunction<
-  typeof SetupInstrumentCalibration
->
-const mockSetupTipLengthCalibration = SetupTipLengthCalibration as jest.MockedFunction<
-  typeof SetupTipLengthCalibration
->
-const mockUseDeckCalibrationData = useDeckCalibrationData as jest.MockedFunction<
-  typeof useDeckCalibrationData
->
-const mockUseRunHasStarted = useRunHasStarted as jest.MockedFunction<
-  typeof useRunHasStarted
->
-const mockUseIsFlex = useIsFlex as jest.MockedFunction<typeof useIsFlex>
+vi.mock('../../../../redux/analytics')
+vi.mock('../../hooks')
+vi.mock('../SetupDeckCalibration')
+vi.mock('../SetupInstrumentCalibration')
+vi.mock('../SetupTipLengthCalibration')
 
 const ROBOT_NAME = 'otie'
 const RUN_ID = '1'
 
 describe('SetupRobotCalibration', () => {
-  const mockExpandStep = jest.fn()
-  const mockTrackEvent = jest.fn()
+  const mockExpandStep = vi.fn()
+  const mockTrackEvent = vi.fn()
 
   const render = ({
     robotName = ROBOT_NAME,
@@ -75,55 +55,50 @@ describe('SetupRobotCalibration', () => {
   }
 
   beforeEach(() => {
-    when(mockUseTrackEvent).calledWith().mockReturnValue(mockTrackEvent)
-    when(mockSetupDeckCalibration).mockReturnValue(
+    when(vi.mocked(useTrackEvent)).calledWith().thenReturn(mockTrackEvent)
+    vi.mocked(SetupDeckCalibration).mockReturnValue(
       <div>Mock SetupDeckCalibration</div>
     )
-    when(mockSetupInstrumentCalibration).mockReturnValue(
+    vi.mocked(SetupInstrumentCalibration).mockReturnValue(
       <div>Mock SetupInstrumentCalibration</div>
     )
-    when(mockSetupTipLengthCalibration).mockReturnValue(
+    vi.mocked(SetupTipLengthCalibration).mockReturnValue(
       <div>Mock SetupTipLengthCalibration</div>
     )
-    when(mockUseDeckCalibrationData).calledWith(ROBOT_NAME).mockReturnValue({
+    when(vi.mocked(useDeckCalibrationData)).calledWith(ROBOT_NAME).thenReturn({
       deckCalibrationData: mockDeckCalData,
       isDeckCalibrated: true,
     })
-    when(mockUseRunHasStarted).calledWith(RUN_ID).mockReturnValue(false)
-    when(mockUseIsFlex).calledWith(ROBOT_NAME).mockReturnValue(false)
+    when(vi.mocked(useRunHasStarted)).calledWith(RUN_ID).thenReturn(false)
+    when(vi.mocked(useIsFlex)).calledWith(ROBOT_NAME).thenReturn(false)
   })
   afterEach(() => {
-    jest.resetAllMocks()
-    resetAllWhenMocks()
+    vi.resetAllMocks()
   })
 
   it('renders deck, pipette, and tip length calibration components', () => {
-    const { getByText } = render()[0]
-
-    getByText('Mock SetupDeckCalibration')
-    getByText('Mock SetupInstrumentCalibration')
-    getByText('Mock SetupTipLengthCalibration')
+    render()
+    screen.getByText('Mock SetupDeckCalibration')
+    screen.getByText('Mock SetupInstrumentCalibration')
+    screen.getByText('Mock SetupTipLengthCalibration')
   })
 
-  it('renders only pipette calibration component for OT-3', () => {
-    when(mockUseIsFlex).calledWith(ROBOT_NAME).mockReturnValue(true)
-    const { getByText, queryByText } = render()[0]
-
-    expect(queryByText('Mock SetupDeckCalibration')).toBeNull()
-    getByText('Mock SetupInstrumentCalibration')
-    expect(queryByText('Mock SetupTipLengthCalibration')).toBeNull()
+  it('renders only pipette calibration component for Flex', () => {
+    when(vi.mocked(useIsFlex)).calledWith(ROBOT_NAME).thenReturn(true)
+    render()
+    expect(screen.queryByText('Mock SetupDeckCalibration')).toBeNull()
+    screen.getByText('Mock SetupInstrumentCalibration')
+    expect(screen.queryByText('Mock SetupTipLengthCalibration')).toBeNull()
   })
 
   it('changes Proceed CTA copy based on next step', () => {
-    const { getByRole } = render({ nextStep: 'labware_setup_step' })[0]
-
-    getByRole('button', { name: 'Proceed to labware' })
+    render({ nextStep: 'labware_setup_step' })
+    screen.getByRole('button', { name: 'Proceed to labware' })
   })
 
   it('calls the expandStep function and tracks the analytics event on click', () => {
-    const { getByRole } = render()[0]
-
-    fireEvent.click(getByRole('button', { name: 'Proceed to modules' }))
+    render()
+    fireEvent.click(screen.getByRole('button', { name: 'Proceed to modules' }))
     expect(mockExpandStep).toHaveBeenCalled()
     expect(mockTrackEvent).toHaveBeenCalledWith({
       name: ANALYTICS_PROCEED_TO_MODULE_SETUP_STEP,
@@ -132,19 +107,17 @@ describe('SetupRobotCalibration', () => {
   })
 
   it('does not call the expandStep function on click if calibration is not complete', () => {
-    const { getByRole } = render({ calibrationStatus: { complete: false } })[0]
-
-    const button = getByRole('button', { name: 'Proceed to modules' })
+    render({ calibrationStatus: { complete: false } })
+    const button = screen.getByRole('button', { name: 'Proceed to modules' })
     expect(button).toBeDisabled()
     fireEvent.click(button)
     expect(mockExpandStep).not.toHaveBeenCalled()
   })
 
   it('does not call the expandStep function on click if run has started', () => {
-    when(mockUseRunHasStarted).calledWith(RUN_ID).mockReturnValue(true)
-    const { getByRole } = render()[0]
-
-    const button = getByRole('button', { name: 'Proceed to modules' })
+    when(vi.mocked(useRunHasStarted)).calledWith(RUN_ID).thenReturn(true)
+    render()
+    const button = screen.getByRole('button', { name: 'Proceed to modules' })
     expect(button).toBeDisabled()
     fireEvent.click(button)
     expect(mockExpandStep).not.toHaveBeenCalled()

@@ -1,13 +1,8 @@
 import { useTranslation } from 'react-i18next'
 import capitalize from 'lodash/capitalize'
-import {
-  LEFT,
-  LoadedPipette,
-  PipetteMount,
-  RIGHT,
-  SINGLE_MOUNT_PIPETTES,
-} from '@opentrons/shared-data'
+import { LEFT, RIGHT, SINGLE_MOUNT_PIPETTES } from '@opentrons/shared-data'
 import { FLOWS } from './constants'
+import type { LoadedPipette, PipetteMount } from '@opentrons/shared-data'
 import type { AttachedPipettesFromInstrumentsQuery } from '../Devices/hooks'
 import type { PipetteWizardFlow, SelectablePipettes } from './types'
 

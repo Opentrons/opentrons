@@ -1,3 +1,4 @@
+import { describe, it, vi, expect, beforeEach, afterEach } from 'vitest'
 import {
   mockLegacyHealthResponse,
   mockLegacyServerHealthResponse,
@@ -5,68 +6,67 @@ import {
   mockOT2ServerHealthResponse,
   mockOT3HealthResponse,
   mockOT3ServerHealthResponse,
-} from '../__fixtures__'
+} from '../fixtures'
 import { HEALTH_STATUS_OK } from '../constants'
 import * as HealthPollerModule from '../health-poller'
 import * as MdnsBrowserModule from '../mdns-browser'
 import { createDiscoveryClient } from '..'
 
-import type { HealthPoller, HealthPollerResult, Logger } from '../types'
-import type { MdnsBrowser, MdnsBrowserService } from '../mdns-browser'
+import type { HealthPollerResult, Logger } from '../types'
+import type { MdnsBrowserService } from '../mdns-browser'
 
-jest.mock('../health-poller')
-jest.mock('../mdns-browser')
+vi.mock('../health-poller')
+vi.mock('../mdns-browser')
 
-const createHealthPoller = HealthPollerModule.createHealthPoller as jest.MockedFunction<
-  typeof HealthPollerModule.createHealthPoller
->
-
-const createMdnsBrowser = MdnsBrowserModule.createMdnsBrowser as jest.MockedFunction<
-  typeof MdnsBrowserModule.createMdnsBrowser
->
-
+const createHealthPoller = HealthPollerModule.createHealthPoller
+const createMdnsBrowser = MdnsBrowserModule.createMdnsBrowser
 const logger = ({} as unknown) as Logger
 
 describe('discovery client', () => {
-  const onListChange = jest.fn()
+  const onListChange = vi.fn()
 
   const healthPoller: {
-    start: jest.MockedFunction<HealthPoller['start']>
-    stop: jest.MockedFunction<HealthPoller['stop']>
+    start: any
+    stop: any
   } = {
-    start: jest.fn(),
-    stop: jest.fn(),
+    start: vi.fn(),
+    stop: vi.fn(),
   }
 
   const mdnsBrowser: {
-    start: jest.MockedFunction<MdnsBrowser['start']>
-    stop: jest.MockedFunction<MdnsBrowser['stop']>
+    start: any
+    stop: any
   } = {
-    start: jest.fn(),
-    stop: jest.fn(),
+    start: vi.fn(),
+    stop: vi.fn(),
   }
 
   const emitPollResult = (result: HealthPollerResult): void => {
+    //  @ts-expect-error: mock doesn't exist on type
     const { onPollResult } = createHealthPoller.mock.calls[
+      //  @ts-expect-error: mock doesn't exist on type
       createHealthPoller.mock.calls.length - 1
     ][0]
     onPollResult(result)
   }
 
   const emitService = (service: MdnsBrowserService): void => {
+    //  @ts-expect-error: mock doesn't exist on type
     const { onService } = createMdnsBrowser.mock.calls[
+      //  @ts-expect-error: mock doesn't exist on type
+
       createMdnsBrowser.mock.calls.length - 1
     ][0]
     onService(service)
   }
 
   beforeEach(() => {
-    createHealthPoller.mockReturnValue(healthPoller)
-    createMdnsBrowser.mockReturnValue(mdnsBrowser)
+    vi.mocked(createHealthPoller).mockReturnValue(healthPoller)
+    vi.mocked(createMdnsBrowser).mockReturnValue(mdnsBrowser)
   })
 
   afterEach(() => {
-    jest.resetAllMocks()
+    vi.resetAllMocks()
   })
 
   it('should create an mDNS browser and health poller', () => {

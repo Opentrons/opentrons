@@ -1,5 +1,7 @@
 import * as React from 'react'
-import { renderWithProviders } from '@opentrons/components'
+import { screen } from '@testing-library/react'
+import { describe, it, beforeEach, expect } from 'vitest'
+import { renderWithProviders } from '../../../__testing-utils__'
 import { i18n } from '../../../i18n'
 import {
   mockDefinition,
@@ -27,35 +29,35 @@ describe('WellDimensions', () => {
   })
 
   it('renders correct label and headings for circular well', () => {
-    const [{ getByText, getByRole }] = render(props)
+    render(props)
 
-    getByText('mockLabel Measurements (mm) mockSuffix')
-    getByRole('heading', { name: 'depth' })
-    getByRole('heading', { name: 'diameter' })
+    screen.getByText('mockLabel Measurements (mm) mockSuffix')
+    screen.getByRole('heading', { name: 'depth' })
+    screen.getByRole('heading', { name: 'diameter' })
   })
 
   it('renders correct label and headings for rectangular well', () => {
     props.wellProperties = mockRectangularLabwareWellGroupProperties
-    const [{ getByText, getByRole }] = render(props)
+    render(props)
 
-    getByText('mockLabel Measurements (mm) mockSuffix')
-    getByRole('heading', { name: 'depth' })
-    getByRole('heading', { name: 'x-size' })
-    getByRole('heading', { name: 'y-size' })
+    screen.getByText('mockLabel Measurements (mm) mockSuffix')
+    screen.getByRole('heading', { name: 'depth' })
+    screen.getByRole('heading', { name: 'x-size' })
+    screen.getByRole('heading', { name: 'y-size' })
   })
 
   it('does not render total length heading when isTipRack is false', () => {
-    const [{ queryByRole }] = render(props)
+    render(props)
 
     expect(
-      queryByRole('heading', { name: 'total length' })
+      screen.queryByRole('heading', { name: 'total length' })
     ).not.toBeInTheDocument()
   })
 
   it('renders correct heading when isTipRack is true', () => {
     props.labwareParams.isTiprack = true
-    const [{ getByRole }] = render(props)
+    render(props)
 
-    getByRole('heading', { name: 'total length' })
+    screen.getByRole('heading', { name: 'total length' })
   })
 })

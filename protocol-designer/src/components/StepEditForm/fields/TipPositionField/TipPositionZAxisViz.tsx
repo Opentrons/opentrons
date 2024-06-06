@@ -4,29 +4,34 @@ import round from 'lodash/round'
 import PIPETTE_TIP_IMAGE from '../../../../images/pipette_tip.svg'
 import WELL_CROSS_SECTION_IMAGE from '../../../../images/well_cross_section.svg'
 
-import styles from './TipPositionInput.css'
+import styles from './TipPositionInput.module.css'
 
 const WELL_HEIGHT_PIXELS = 145
+const TIP_X_OFFSET_PIXELS = 22
 const PIXEL_DECIMALS = 2
-interface Props {
-  mmFromBottom: number
+interface TipPositionZAxisVizProps {
   wellDepthMm: number
+  mmFromBottom?: number
+  mmFromTop?: number
 }
 
-export const TipPositionZAxisViz = (props: Props): JSX.Element => {
-  const fractionOfWellHeight = props.mmFromBottom / props.wellDepthMm
+export function TipPositionZAxisViz(
+  props: TipPositionZAxisVizProps
+): JSX.Element {
+  const { mmFromBottom, mmFromTop, wellDepthMm } = props
+  const positionInTube = mmFromBottom ?? mmFromTop ?? 0
+  const fractionOfWellHeight = positionInTube / wellDepthMm
   const pixelsFromBottom =
-    Number(fractionOfWellHeight) * WELL_HEIGHT_PIXELS - WELL_HEIGHT_PIXELS
-  const roundedPixelsFromBottom = round(pixelsFromBottom, PIXEL_DECIMALS)
-  const bottomPx = props.wellDepthMm
-    ? roundedPixelsFromBottom
-    : props.mmFromBottom - WELL_HEIGHT_PIXELS
+    fractionOfWellHeight * WELL_HEIGHT_PIXELS -
+    (mmFromBottom != null ? WELL_HEIGHT_PIXELS : 0)
+  const bottomPx = round(pixelsFromBottom, PIXEL_DECIMALS)
+
   return (
     <div className={styles.viz_wrapper}>
       <img
         src={PIPETTE_TIP_IMAGE}
         className={styles.pipette_tip_image}
-        style={{ bottom: `${bottomPx}px` }}
+        style={{ bottom: `${bottomPx}px`, right: `${TIP_X_OFFSET_PIXELS}px` }}
       />
       {props.wellDepthMm !== null && (
         <span className={styles.well_height_label}>{props.wellDepthMm}mm</span>

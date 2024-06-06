@@ -14,7 +14,8 @@ from pydantic import BaseModel, Extra
 from typing import Optional, Type
 from typing_extensions import Literal
 
-from .command import AbstractCommandImpl, BaseCommand, BaseCommandCreate
+from .command import AbstractCommandImpl, BaseCommand, BaseCommandCreate, SuccessData
+from ..errors.error_occurrence import ErrorOccurrence
 
 
 CustomCommandType = Literal["custom"]
@@ -38,18 +39,20 @@ class CustomResult(BaseModel):
         extra = Extra.allow
 
 
-class CustomImplementation(AbstractCommandImpl[CustomParams, CustomResult]):
+class CustomImplementation(
+    AbstractCommandImpl[CustomParams, SuccessData[CustomResult, None]]
+):
     """Custom command implementation."""
 
     # TODO(mm, 2022-11-09): figure out how a plugin can specify a custom command
     # implementation. For now, always no-op, so we can use custom commands as containers
     # for legacy RPC (pre-ProtocolEngine) payloads.
-    async def execute(self, params: CustomParams) -> CustomResult:
+    async def execute(self, params: CustomParams) -> SuccessData[CustomResult, None]:
         """A custom command does nothing when executed directly."""
-        return CustomResult.construct()
+        return SuccessData(public=CustomResult.construct(), private=None)
 
 
-class Custom(BaseCommand[CustomParams, CustomResult]):
+class Custom(BaseCommand[CustomParams, CustomResult, ErrorOccurrence]):
     """Custom command model."""
 
     commandType: CustomCommandType = "custom"

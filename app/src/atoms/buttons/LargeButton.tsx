@@ -1,26 +1,33 @@
 import * as React from 'react'
 import { css } from 'styled-components'
 import {
-  TYPOGRAPHY,
-  COLORS,
-  SPACING,
   BORDERS,
   Btn,
-  Icon,
+  COLORS,
   DIRECTION_COLUMN,
-  JUSTIFY_SPACE_BETWEEN,
   DISPLAY_FLEX,
+  Icon,
+  Flex,
+  JUSTIFY_SPACE_BETWEEN,
+  SPACING,
+  StyledText,
+  TYPOGRAPHY,
 } from '@opentrons/components'
-import { StyledText } from '../text'
 import { ODD_FOCUS_VISIBLE } from './constants'
 import type { IconName, StyleProps } from '@opentrons/components'
 
-type LargeButtonTypes = 'primary' | 'secondary' | 'alert'
+type LargeButtonTypes =
+  | 'primary'
+  | 'secondary'
+  | 'alert'
+  | 'onColor'
+  | 'alertAlt'
 interface LargeButtonProps extends StyleProps {
   onClick: () => void
   buttonType?: LargeButtonTypes
   buttonText: React.ReactNode
-  iconName: IconName
+  iconName?: IconName
+  subtext?: string
   disabled?: boolean
 }
 
@@ -29,6 +36,7 @@ export function LargeButton(props: LargeButtonProps): JSX.Element {
     buttonType = 'primary',
     buttonText,
     iconName,
+    subtext,
     disabled = false,
     ...buttonProps
   } = props
@@ -38,27 +46,61 @@ export function LargeButton(props: LargeButtonProps): JSX.Element {
     {
       defaultBackgroundColor: string
       activeBackgroundColor: string
+      disabledBackgroundColor: string
       defaultColor: string
+      disabledColor: string
       iconColor: string
+      disabledIconColor: string
+      border?: string
+      disabledBorder?: string
     }
   > = {
     secondary: {
-      defaultColor: COLORS.darkBlackEnabled,
-      defaultBackgroundColor: COLORS.mediumBlueEnabled,
-      activeBackgroundColor: COLORS.mediumBluePressed,
-      iconColor: COLORS.blueEnabled,
+      defaultColor: COLORS.black90,
+      disabledColor: COLORS.grey50,
+      defaultBackgroundColor: COLORS.blue35,
+      activeBackgroundColor: COLORS.blue40,
+      disabledBackgroundColor: COLORS.grey35,
+      iconColor: COLORS.blue50,
+      disabledIconColor: COLORS.grey50,
     },
     alert: {
-      defaultColor: COLORS.red1,
-      defaultBackgroundColor: COLORS.red3,
-      activeBackgroundColor: COLORS.red3Pressed,
-      iconColor: COLORS.red1,
+      defaultColor: COLORS.red60,
+      disabledColor: COLORS.grey50,
+      defaultBackgroundColor: COLORS.red35,
+      activeBackgroundColor: COLORS.red40,
+      disabledBackgroundColor: COLORS.grey35,
+      iconColor: COLORS.red60,
+      disabledIconColor: COLORS.grey50,
     },
     primary: {
       defaultColor: COLORS.white,
-      defaultBackgroundColor: COLORS.blueEnabled,
-      activeBackgroundColor: COLORS.bluePressed,
+      disabledColor: COLORS.grey50,
+      defaultBackgroundColor: COLORS.blue50,
+      activeBackgroundColor: COLORS.blue60,
+      disabledBackgroundColor: COLORS.grey35,
       iconColor: COLORS.white,
+      disabledIconColor: COLORS.grey50,
+    },
+    onColor: {
+      defaultColor: COLORS.white,
+      disabledColor: COLORS.grey40,
+      defaultBackgroundColor: COLORS.transparent,
+      activeBackgroundColor: COLORS.transparent,
+      disabledBackgroundColor: COLORS.transparent,
+      iconColor: COLORS.white,
+      disabledIconColor: COLORS.grey40,
+      border: `${BORDERS.borderRadius4} solid ${COLORS.white}`,
+      disabledBorder: `${BORDERS.borderRadius4} solid ${COLORS.grey35}`,
+    },
+    alertAlt: {
+      defaultColor: COLORS.red50,
+      disabledColor: COLORS.grey50,
+      defaultBackgroundColor: COLORS.white,
+      activeBackgroundColor: COLORS.white,
+      disabledBackgroundColor: COLORS.grey35,
+      iconColor: COLORS.red50,
+      disabledIconColor: COLORS.grey50,
     },
   }
 
@@ -68,10 +110,11 @@ export function LargeButton(props: LargeButtonProps): JSX.Element {
     background-color: ${LARGE_BUTTON_PROPS_BY_TYPE[buttonType]
       .defaultBackgroundColor};
     cursor: default;
-    border-radius: ${BORDERS.borderRadiusSize4};
+    border-radius: ${BORDERS.borderRadius16};
     box-shadow: none;
     padding: ${SPACING.spacing24};
     line-height: ${TYPOGRAPHY.lineHeight20};
+    border: ${LARGE_BUTTON_PROPS_BY_TYPE[buttonType].border};
     ${TYPOGRAPHY.pSemiBold}
 
     &:focus {
@@ -80,7 +123,7 @@ export function LargeButton(props: LargeButtonProps): JSX.Element {
       box-shadow: none;
     }
     &:hover {
-      border: none;
+      border: ${LARGE_BUTTON_PROPS_BY_TYPE[buttonType].border};
       box-shadow: none;
       background-color: ${LARGE_BUTTON_PROPS_BY_TYPE[buttonType]
         .defaultBackgroundColor};
@@ -97,37 +140,42 @@ export function LargeButton(props: LargeButtonProps): JSX.Element {
     }
 
     &:disabled {
-      background-color: ${COLORS.darkBlack20};
-      color: ${COLORS.darkBlack60};
+      color: ${LARGE_BUTTON_PROPS_BY_TYPE[buttonType].disabledColor};
+      background-color: ${LARGE_BUTTON_PROPS_BY_TYPE[buttonType]
+        .disabledBackgroundColor};
     }
   `
   return (
     <Btn
       display={DISPLAY_FLEX}
       css={LARGE_BUTTON_STYLE}
-      aria-label={`LargeButton_${buttonType}`}
       flexDirection={DIRECTION_COLUMN}
       justifyContent={JUSTIFY_SPACE_BETWEEN}
       disabled={disabled}
       {...buttonProps}
     >
-      <StyledText
-        fontSize="2rem"
-        fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-        lineHeight="2.625rem"
-      >
-        {buttonText}
-      </StyledText>
-      <Icon
-        name={iconName}
-        aria-label={`LargeButton_${iconName}`}
-        color={
-          disabled
-            ? COLORS.darkBlack60
-            : LARGE_BUTTON_PROPS_BY_TYPE[buttonType].iconColor
-        }
-        size="5rem"
-      />
+      <Flex flexDirection={DIRECTION_COLUMN}>
+        <StyledText css={TYPOGRAPHY.level3HeaderSemiBold}>
+          {buttonText}
+        </StyledText>
+        {subtext ? (
+          <StyledText css={TYPOGRAPHY.level3HeaderRegular}>
+            {subtext}
+          </StyledText>
+        ) : null}
+      </Flex>
+      {iconName ? (
+        <Icon
+          name={iconName}
+          aria-label={`${iconName} icon`}
+          color={
+            disabled
+              ? LARGE_BUTTON_PROPS_BY_TYPE[buttonType].disabledIconColor
+              : LARGE_BUTTON_PROPS_BY_TYPE[buttonType].iconColor
+          }
+          size="5rem"
+        />
+      ) : null}
     </Btn>
   )
 }

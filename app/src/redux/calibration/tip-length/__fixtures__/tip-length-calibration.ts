@@ -23,6 +23,7 @@ export const mockTipLengthCalibration1: TipLengthCalibration = {
     markedAt: '',
   },
   id: 'someID',
+  uri: 'test-uri',
 }
 
 export const mockTipLengthCalibration2: TipLengthCalibration = {
@@ -37,6 +38,7 @@ export const mockTipLengthCalibration2: TipLengthCalibration = {
     markedAt: '',
   },
   id: 'someID',
+  uri: 'test-uri',
 }
 
 export const mockTipLengthCalibration3: TipLengthCalibration = {
@@ -51,6 +53,7 @@ export const mockTipLengthCalibration3: TipLengthCalibration = {
     markedAt: '',
   },
   id: 'someID',
+  uri: 'test-uri',
 }
 
 export const mockPipetteMatchTipLengthCalibration: AllTipLengthCalibrations = {

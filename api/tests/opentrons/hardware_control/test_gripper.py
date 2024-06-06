@@ -7,6 +7,7 @@ from opentrons.hardware_control.instruments.ot3 import gripper, instrument_calib
 from opentrons.hardware_control.types import CriticalPoint
 from opentrons.config import gripper_config
 from opentrons_shared_data.gripper import GripperModel
+from opentrons_shared_data.errors.exceptions import MotionFailedError
 
 if TYPE_CHECKING:
     from opentrons.hardware_control.instruments.ot3.instrument_calibration import (
@@ -73,6 +74,7 @@ def test_reload_instrument_cal_ot3(fake_offset: "GripperCalibrationOffset") -> N
         fake_gripper_conf,
         fake_offset,
         "fakeid123",
+        jaw_max_offset=15,
     )
     # if only calibration is changed
     new_cal = instrument_calibration.GripperCalibrationOffset(
@@ -86,5 +88,53 @@ def test_reload_instrument_cal_ot3(fake_offset: "GripperCalibrationOffset") -> N
 
     # it's the same gripper
     assert new_gripper == old_gripper
+    # jaw offset should persists as well
+    assert new_gripper._jaw_max_offset == old_gripper._jaw_max_offset
     # we said upstream could skip
     assert skip
+
+
+@pytest.mark.ot3_only
+def test_reload_instrument_cal_ot3_conf_changed(
+    fake_offset: "GripperCalibrationOffset",
+) -> None:
+    old_gripper = gripper.Gripper(
+        fake_gripper_conf,
+        fake_offset,
+        "fakeid123",
+        jaw_max_offset=15,
+    )
+    new_conf = fake_gripper_conf.copy(
+        update={"grip_force_profile": {"default_grip_force": 1}}
+    )
+    assert new_conf != old_gripper.config
+
+    new_gripper, skip = gripper._reload_gripper(new_conf, old_gripper, fake_offset)
+
+    # it's not the same gripper
+    assert new_gripper != old_gripper
+    # do not pass in the old jaw max offse
+    assert not new_gripper._jaw_max_offset
+    # we said upstream could skip
+    assert not skip
+
+
+@pytest.mark.ot3_only
+def test_jaw_calibration_error_checking() -> None:
+    subject = gripper.Gripper(fake_gripper_conf, fake_offset, "fakeid123")
+    with pytest.raises(MotionFailedError):
+        subject.update_jaw_open_position_from_closed_position(0)
+
+
+@pytest.mark.ot3_only
+def test_jaw_calibration() -> None:
+    subject = gripper.Gripper(fake_gripper_conf, fake_offset, "fakeid123")
+    subject.update_jaw_open_position_from_closed_position(
+        (
+            fake_gripper_conf.geometry.jaw_width["max"]
+            - fake_gripper_conf.geometry.jaw_width["min"]
+            + 2
+        )
+        / 2
+    )
+    assert subject.max_jaw_width == fake_gripper_conf.geometry.jaw_width["max"] + 2

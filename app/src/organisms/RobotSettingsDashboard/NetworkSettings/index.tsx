@@ -3,26 +3,25 @@ import { css } from 'styled-components'
 import { useTranslation } from 'react-i18next'
 
 import {
-  Flex,
-  SPACING,
-  COLORS,
-  Icon,
-  Btn,
-  DIRECTION_ROW,
-  DIRECTION_COLUMN,
   ALIGN_CENTER,
-  TYPOGRAPHY,
   BORDERS,
+  Btn,
+  Chip,
+  COLORS,
+  DIRECTION_COLUMN,
+  DIRECTION_ROW,
+  Flex,
+  Icon,
+  SPACING,
+  StyledText,
+  TYPOGRAPHY,
 } from '@opentrons/components'
 
-import { StyledText } from '../../../atoms/text'
-import { Chip } from '../../../atoms/Chip'
 import { ChildNavigation } from '../../../organisms/ChildNavigation'
 
-import type { IconName } from '@opentrons/components'
-import type { NetworkConnection } from '../../../pages/OnDeviceDisplay/hooks'
-import type { ChipType } from '../../../atoms/Chip'
-import type { SetSettingOption } from '../../../pages/OnDeviceDisplay/RobotSettingsDashboard'
+import type { IconName, ChipType } from '@opentrons/components'
+import type { NetworkConnection } from '../../../resources/networking/hooks/useNetworkConnection'
+import type { SetSettingOption } from '../../../pages/RobotSettingsDashboard'
 
 export type ConnectionType = 'wifi' | 'ethernet' | 'usb'
 
@@ -43,7 +42,7 @@ export function NetworkSettings({
   }
 
   const handleButtonBackgroundColor = (isConnected: boolean): string =>
-    isConnected ? COLORS.green3 : COLORS.light1
+    isConnected ? COLORS.green35 : COLORS.grey35
 
   const handleChipText = (isConnected: boolean): string =>
     isConnected ? t('connected') : t('not_connected')
@@ -52,7 +51,9 @@ export function NetworkSettings({
     <Flex flexDirection={DIRECTION_COLUMN}>
       <ChildNavigation
         header={t('network_settings')}
-        onClickBack={() => setCurrentOption(null)}
+        onClickBack={() => {
+          setCurrentOption(null)
+        }}
       />
       <Flex
         marginTop="7.75rem"
@@ -67,7 +68,9 @@ export function NetworkSettings({
           chipType={handleChipType(isWifiConnected)}
           chipText={handleChipText(isWifiConnected)}
           networkName={activeSsid}
-          onClick={() => setCurrentOption('RobotSettingsWifi')}
+          onClick={() => {
+            setCurrentOption('RobotSettingsWifi')
+          }}
         />
         <NetworkSettingButton
           buttonTitle={t('ethernet')}
@@ -75,7 +78,9 @@ export function NetworkSettings({
           iconName="ethernet"
           chipType={handleChipType(isEthernetConnected)}
           chipText={handleChipText(isEthernetConnected)}
-          onClick={() => setCurrentOption('EthernetConnectionDetails')}
+          onClick={() => {
+            setCurrentOption('EthernetConnectionDetails')
+          }}
         />
       </Flex>
     </Flex>
@@ -102,8 +107,8 @@ function NetworkSettingButton({
   const PUSHED_STATE_STYLE = css`
     &:active {
       background-color: ${chipType === 'success'
-        ? COLORS.green3Pressed
-        : COLORS.darkBlack40};
+        ? COLORS.green40
+        : COLORS.grey50};
     }
   `
 
@@ -113,7 +118,7 @@ function NetworkSettingButton({
       paddingX={SPACING.spacing24}
       paddingY={SPACING.spacing20}
       backgroundColor={backgroundColor}
-      borderRadius={BORDERS.borderRadiusSize3}
+      borderRadius={BORDERS.borderRadius12}
       css={PUSHED_STATE_STYLE}
       onClick={onClick}
     >
@@ -135,7 +140,7 @@ function NetworkSettingButton({
                   fontSize={TYPOGRAPHY.fontSize28}
                   lineHeight={TYPOGRAPHY.lineHeight36}
                   fontWeight={TYPOGRAPHY.fontWeightRegular}
-                  color={COLORS.darkBlack70}
+                  color={COLORS.grey60}
                 >
                   {networkName}
                 </StyledText>
@@ -152,7 +157,11 @@ function NetworkSettingButton({
           />
         </Flex>
         <Flex justifyContent="flex-end" alignSelf="stretch">
-          <Btn onClick={() => console.log('setup')}>
+          <Btn
+            onClick={() => {
+              console.log('setup')
+            }}
+          >
             <Icon name="chevron-right" size="3rem" />
           </Btn>
         </Flex>

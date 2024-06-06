@@ -24,6 +24,8 @@ from opentrons.protocol_api import TemperatureModuleContext
 
 from opentrons.types import Point
 
+from . import versions_at_or_below, versions_at_or_above, versions_between
+
 
 @pytest.fixture(autouse=True)
 def _mock_well_grid_module(decoy: Decoy, monkeypatch: pytest.MonkeyPatch) -> None:
@@ -317,7 +319,7 @@ def test_child(
     assert subject.child == mock_labware
 
 
-@pytest.mark.parametrize("api_version", [APIVersion(2, 13)])
+@pytest.mark.parametrize("api_version", versions_at_or_below(APIVersion(2, 13)))
 def test_set_offset_succeeds_on_low_api_version(
     decoy: Decoy,
     subject: Labware,
@@ -328,8 +330,13 @@ def test_set_offset_succeeds_on_low_api_version(
     decoy.verify(mock_labware_core.set_calibration(Point(1, 2, 3)))
 
 
-@pytest.mark.parametrize("api_version", [APIVersion(2, 14)])
-def test_set_offset_raises_on_high_api_version(
+@pytest.mark.parametrize(
+    "api_version",
+    versions_between(
+        low_inclusive_bound=APIVersion(2, 14), high_inclusive_bound=APIVersion(2, 17)
+    ),
+)
+def test_set_offset_raises_on_intermediate_api_version(
     decoy: Decoy,
     subject: Labware,
     mock_labware_core: LabwareCore,
@@ -339,7 +346,16 @@ def test_set_offset_raises_on_high_api_version(
         subject.set_offset(1, 2, 3)
 
 
-@pytest.mark.parametrize("api_version", [APIVersion(2, 14)])
+@pytest.mark.parametrize("api_version", versions_at_or_above(APIVersion(2, 18)))
+def test_set_offset_succeeds_on_high_api_version(
+    decoy: Decoy, subject: Labware, mock_labware_core: LabwareCore
+) -> None:
+    """It should not raise an API version error on the most recent versions."""
+    subject.set_offset(1, 2, 3)
+    decoy.verify(mock_labware_core.set_calibration(Point(1, 2, 3)))
+
+
+@pytest.mark.parametrize("api_version", versions_at_or_above(APIVersion(2, 14)))
 def test_separate_calibration_raises_on_high_api_version(
     decoy: Decoy,
     subject: Labware,

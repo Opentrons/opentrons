@@ -9,7 +9,7 @@ SHELL := bash
 PATH := $(shell cd .. && yarn bin):$(PATH)
 
 # dev server port
-PORT ?= 8090
+PORT ?= 3000
 
 # dep directories for production build
 # TODO(mc, 2018-08-07): figure out a better way to do this
@@ -31,7 +31,7 @@ publish_dir := dist/publish
 # make test tests=src/__tests__/http.test.ts would run only the
 # specified test
 tests ?= $(SRC_PATH)/src
-cov_opts ?= --coverage=true --ci=true --collectCoverageFrom='app-shell/src/**/*.(js|ts|tsx)'
+cov_opts ?= --coverage=true
 test_opts ?=
 
 # Other SSH args for robot
@@ -59,7 +59,7 @@ no_python_bundle ?=
 
 builder := yarn electron-builder \
 	--config electron-builder.config.js \
-	--config.electronVersion=21.3.1 \
+	--config.electronVersion=27.0.0 \
 	--publish never
 
 
@@ -89,7 +89,7 @@ setup:
 
 .PHONY: clean
 clean:
-	shx rm -rf lib dist python
+	yarn shx rm -rf lib dist python
 
 # artifacts
 #####################################################################
@@ -97,7 +97,7 @@ clean:
 .PHONY: lib
 lib: export NODE_ENV := production
 lib:
-	webpack --profile
+	vite build
 
 .PHONY: deps
 deps:
@@ -109,6 +109,7 @@ package-deps: clean lib deps
 package dist-posix dist-osx dist-linux dist-win: export NODE_ENV := production
 package dist-posix dist-osx dist-linux dist-win: export BUILD_ID := $(build_id)
 package dist-posix dist-osx dist-linux dist-win: export NO_PYTHON := $(if $(no_python_bundle),true,false)
+package dist-posix dist-osx dist-linux dist-win: export USE_HARD_LINKS := false
 
 .PHONY: package
 package: package-deps
@@ -170,19 +171,17 @@ _dist-collect-artifacts:
 # development
 #####################################################################
 
-.PHONY: clean-dev-autoupdate
-clean-dev-autoupdate:
-	rm -f ./dev-app-update.yml
 
-dev-app-update.yml:
+.PHONY: dev-app-update-file
+dev-app-update-file:
 	cp ./dev-app-update-$(OPENTRONS_PROJECT).yml ./dev-app-update.yml
 
 
 .PHONY: dev
 dev: export NODE_ENV := development
 dev: export OPENTRONS_PROJECT := $(OPENTRONS_PROJECT)
-dev: clean-dev-autoupdate ./dev-app-update.yml
-	webpack
+dev: dev-app-update-file
+	vite build
 	$(electron)
 
 .PHONY: test

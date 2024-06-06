@@ -4,7 +4,7 @@ import pytest
 import mock
 
 import select
-import serial  # type: ignore[import]
+import serial  # type: ignore[import-untyped]
 from queue import Queue
 
 from ot3usb import usb_config, tcp_conn, usb_monitor, listener

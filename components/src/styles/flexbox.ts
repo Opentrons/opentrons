@@ -1,6 +1,7 @@
 export const FLEX_NONE = 'none'
 export const FLEX_AUTO = 'auto'
 export const FLEX_MIN_CONTENT = 'min-content'
+export const FLEX_MAX_CONTENT = 'max-content'
 
 export const ALIGN_NORMAL = 'normal'
 export const ALIGN_START = 'start'

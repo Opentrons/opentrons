@@ -23,14 +23,10 @@ async def test_protocols_and_analyses_persist(
     async with RobotClient.make(
         base_url=f"http://localhost:{port}", version="*"
     ) as robot_client:
-        assert (
-            await robot_client.wait_until_dead()
-        ), "Dev Robot is running and must not be."
+        assert await robot_client.dead(), "Dev Robot is running and must not be."
         with DevServer(port=port) as server:
             server.start()
-            assert (
-                await robot_client.wait_until_alive()
-            ), "Dev Robot never became available."
+            await robot_client.wait_until_ready()
 
             # Must not be so high that the server runs out of room and starts
             # auto-deleting old protocols.
@@ -52,12 +48,10 @@ async def test_protocols_and_analyses_persist(
             analyses_before_restart = await _get_all_analyses(robot_client)
 
             server.stop()
-            assert await robot_client.wait_until_dead(), "Dev Robot did not stop."
+            assert await robot_client.dead(), "Dev Robot did not stop."
 
             server.start()
-            assert (
-                await robot_client.wait_until_alive()
-            ), "Dev Robot never became available."
+            await robot_client.wait_until_ready()
 
             protocols_after_restart = (await robot_client.get_protocols()).json()[
                 "data"
@@ -89,14 +83,10 @@ async def test_protocol_labware_files_persist() -> None:
     async with RobotClient.make(
         base_url=f"http://localhost:{port}", version="*"
     ) as robot_client:
-        assert (
-            await robot_client.wait_until_dead()
-        ), "Dev Robot is running and must not be."
+        assert await robot_client.dead(), "Dev Robot is running and must not be."
         with DevServer(port=port) as server:
             server.start()
-            assert (
-                await robot_client.wait_until_alive()
-            ), "Dev Robot never became available."
+            await robot_client.wait_until_ready()
 
             protocol = await robot_client.post_protocol(
                 [
@@ -117,11 +107,9 @@ async def test_protocol_labware_files_persist() -> None:
             del protocol_detail["analysisSummaries"]
 
             server.stop()
-            assert await robot_client.wait_until_dead(), "Dev Robot did not stop."
+            assert await robot_client.dead(), "Dev Robot did not stop."
             server.start()
-            assert (
-                await robot_client.wait_until_alive()
-            ), "Dev Robot never became available."
+            await robot_client.wait_until_ready()
 
             result = await robot_client.get_protocol(protocol_id)
             restarted_protocol_detail = result.json()["data"]
@@ -132,10 +120,10 @@ async def test_protocol_labware_files_persist() -> None:
             assert restarted_protocol_detail == protocol_detail
 
             four_tuberack = Path(
-                f"{server.persistence_directory}/protocols/{protocol_id}/cpx_4_tuberack_100ul.json"
+                f"{server.persistence_directory}/4/protocols/{protocol_id}/cpx_4_tuberack_100ul.json"
             )
             six_tuberack = Path(
-                f"{server.persistence_directory}/protocols/{protocol_id}/cpx_6_tuberack_100ul.json"
+                f"{server.persistence_directory}/4/protocols/{protocol_id}/cpx_6_tuberack_100ul.json"
             )
             assert four_tuberack.is_file()
             assert six_tuberack.is_file()

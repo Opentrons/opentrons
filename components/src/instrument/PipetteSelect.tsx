@@ -9,7 +9,7 @@ import {
 } from '@opentrons/shared-data'
 import { Flex } from '../primitives'
 import { Select, CONTEXT_VALUE } from '../forms'
-import styles from './PipetteSelect.css'
+import styles from './PipetteSelect.module.css'
 import type { PipetteNameSpecs } from '@opentrons/shared-data'
 import type { ActionMeta, SingleValue, MultiValue } from 'react-select'
 import type { SelectOption } from '../forms'
@@ -142,7 +142,9 @@ const PipetteNameItem = (props: PipetteNameSpecs): JSX.Element => {
     >
       <div className={styles.pipette_volume_class}>{volumeClass}</div>
       <div className={styles.pipette_channels}>{displayChannels}</div>
-      <div className={styles.pipette_category}>{displayCategory}</div>
+      <div className={styles.pipette_category}>
+        {channels === 96 ? 'FLEX' : displayCategory}
+      </div>
     </Flex>
   )
 }

@@ -1,8 +1,5 @@
-import { FormikProps } from 'formik'
-import type {
-  FormPipettesByMount,
-  FormModulesByType,
-} from '../../../step-forms'
+import type { UseFormReturn } from 'react-hook-form'
+import type { FormPipettesByMount, FormModules } from '../../../step-forms'
 
 import type { NewProtocolFields } from '../../../load-file'
 
@@ -17,11 +14,11 @@ export type AdditionalEquipment =
 export interface FormState {
   fields: NewProtocolFields
   pipettesByMount: FormPipettesByMount
-  modulesByType: FormModulesByType
+  modules: FormModules | null
   additionalEquipment: AdditionalEquipment[]
 }
 
-export interface WizardTileProps extends FormikProps<FormState> {
+export interface WizardTileProps extends UseFormReturn<FormState> {
   proceed: (stepsForward?: number) => void
   goBack: (stepsBack?: number) => void
 }

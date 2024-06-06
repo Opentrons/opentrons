@@ -1,40 +1,41 @@
+import { vi, describe, beforeEach, expect, afterEach, it } from 'vitest'
 // call a function on an interval with variable time
 import { repeatCall } from '../repeat-call'
 
 describe('repeat call', () => {
-  const handler = jest.fn()
+  const handler = vi.fn()
 
   beforeEach(() => {
-    jest.useFakeTimers()
+    vi.useFakeTimers({ shouldAdvanceTime: true })
   })
 
   afterEach(() => {
-    jest.clearAllTimers()
-    jest.useRealTimers()
-    jest.clearAllMocks()
+    vi.clearAllTimers()
+    vi.useRealTimers()
+    vi.clearAllMocks()
   })
 
   it('should call a handler on a given interval', () => {
     repeatCall({ handler, interval: 100 })
 
-    jest.advanceTimersByTime(101)
+    vi.advanceTimersByTime(101)
     expect(handler).toHaveBeenCalledTimes(1)
 
-    jest.advanceTimersByTime(100)
+    vi.advanceTimersByTime(100)
     expect(handler).toHaveBeenCalledTimes(2)
 
-    jest.advanceTimersByTime(100)
+    vi.advanceTimersByTime(100)
     expect(handler).toHaveBeenCalledTimes(3)
   })
 
   it('should allow the interval to be cancelled', () => {
     const { cancel } = repeatCall({ handler, interval: 100 })
 
-    jest.advanceTimersByTime(101)
+    vi.advanceTimersByTime(101)
     expect(handler).toHaveBeenCalledTimes(1)
     cancel()
 
-    jest.advanceTimersByTime(100)
+    vi.advanceTimersByTime(100)
     expect(handler).toHaveBeenCalledTimes(1)
   })
 
@@ -43,24 +44,24 @@ describe('repeat call', () => {
 
     expect(handler).toHaveBeenCalledTimes(1)
 
-    jest.advanceTimersByTime(101)
+    vi.advanceTimersByTime(101)
     expect(handler).toHaveBeenCalledTimes(2)
   })
 
   it('should allow an interval range to be called immediately', () => {
     repeatCall({ handler, interval: [100, 200, 300] })
 
-    jest.advanceTimersByTime(101)
+    vi.advanceTimersByTime(101)
     expect(handler).toHaveBeenCalledTimes(1)
 
-    jest.advanceTimersByTime(200)
+    vi.advanceTimersByTime(200)
     expect(handler).toHaveBeenCalledTimes(2)
 
-    jest.advanceTimersByTime(300)
+    vi.advanceTimersByTime(300)
     expect(handler).toHaveBeenCalledTimes(3)
 
     // latch in last value
-    jest.advanceTimersByTime(300)
+    vi.advanceTimersByTime(300)
     expect(handler).toHaveBeenCalledTimes(4)
   })
 })

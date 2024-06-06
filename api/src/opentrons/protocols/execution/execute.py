@@ -1,7 +1,9 @@
 import logging
+from typing import Optional
 
 from opentrons.protocol_api import ProtocolContext
-from opentrons.protocols.execution.execute_python import run_python
+from opentrons.protocol_api._parameters import Parameters
+from opentrons.protocols.execution.execute_python import exec_run
 from opentrons.protocols.execution.json_dispatchers import (
     pipette_command_map,
     temperature_module_command_map,
@@ -16,15 +18,26 @@ from opentrons.protocols.api_support.types import APIVersion
 MODULE_LOG = logging.getLogger(__name__)
 
 
-def run_protocol(protocol: Protocol, context: ProtocolContext) -> None:
+def run_protocol(
+    protocol: Protocol,
+    context: ProtocolContext,
+    run_time_parameters_with_overrides: Optional[Parameters] = None,
+) -> None:
     """Run a protocol.
 
     :param protocol: The :py:class:`.protocols.types.Protocol` to execute
-    :param context: The context to use.
+    :param context: The protocol context to use.
+    :param run_time_parameters_with_overrides: Run time parameters defined in the protocol,
+        updated with the run's RTP override values. When we are running either simulate
+        or execute, this will be None (until RTP is supported in cli commands)
     """
     if isinstance(protocol, PythonProtocol):
         if protocol.api_level >= APIVersion(2, 0):
-            run_python(protocol, context)
+            exec_run(
+                proto=protocol,
+                context=context,
+                run_time_parameters_with_overrides=run_time_parameters_with_overrides,
+            )
         else:
             raise RuntimeError(f"Unsupported python API version: {protocol.api_level}")
     else:

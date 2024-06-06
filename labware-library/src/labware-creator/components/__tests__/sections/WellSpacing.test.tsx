@@ -1,26 +1,16 @@
 import React from 'react'
-import { FormikConfig } from 'formik'
-import { when, resetAllWhenMocks } from 'jest-when'
+import { vi, describe, it, expect, beforeEach, afterEach } from 'vitest'
+import { when } from 'vitest-when'
 import { render, screen } from '@testing-library/react'
-import { nestedTextMatcher } from '@opentrons/components'
-import {
-  getDefaultFormState,
-  getInitialStatus,
-  LabwareFields,
-} from '../../../fields'
+import { nestedTextMatcher } from '../../__testUtils__/nestedTextMatcher'
+import { getDefaultFormState, getInitialStatus } from '../../../fields'
 import { isEveryFieldHidden, getLabwareName } from '../../../utils'
 import { WellSpacing } from '../../sections/WellSpacing'
 import { wrapInFormik } from '../../utils/wrapInFormik'
+import type { FormikConfig } from 'formik'
+import type { LabwareFields } from '../../../fields'
 
-jest.mock('../../../utils')
-
-const isEveryFieldHiddenMock = isEveryFieldHidden as jest.MockedFunction<
-  typeof isEveryFieldHidden
->
-
-const getLabwareNameMock = getLabwareName as jest.MockedFunction<
-  typeof getLabwareName
->
+vi.mock('../../../utils')
 
 let formikConfig: FormikConfig<LabwareFields>
 
@@ -29,27 +19,26 @@ describe('WellSpacing', () => {
     formikConfig = {
       initialValues: getDefaultFormState(),
       initialStatus: getInitialStatus(),
-      onSubmit: jest.fn(),
+      onSubmit: vi.fn(),
     }
 
-    when(isEveryFieldHiddenMock)
+    when(vi.mocked(isEveryFieldHidden))
       .calledWith(['gridSpacingX', 'gridSpacingY'], expect.any(Object))
-      .mockReturnValue(false)
+      .thenReturn(false)
   })
 
   afterEach(() => {
-    jest.restoreAllMocks()
-    resetAllWhenMocks()
+    vi.restoreAllMocks()
   })
 
   it('should render when fields are visible', () => {
     formikConfig.initialValues.labwareType = 'wellPlate'
-    when(getLabwareNameMock)
+    when(vi.mocked(getLabwareName))
       .calledWith(formikConfig.initialValues, false)
-      .mockReturnValue('FAKE LABWARE NAME SINGULAR')
-    when(getLabwareNameMock)
+      .thenReturn('FAKE LABWARE NAME SINGULAR')
+    when(vi.mocked(getLabwareName))
       .calledWith(formikConfig.initialValues, true)
-      .mockReturnValue('FAKE LABWARE NAME PLURAL')
+      .thenReturn('FAKE LABWARE NAME PLURAL')
 
     render(wrapInFormik(<WellSpacing />, formikConfig))
 
@@ -85,9 +74,9 @@ describe('WellSpacing', () => {
   })
 
   it('should not render when all fields are hidden', () => {
-    when(isEveryFieldHiddenMock)
+    when(vi.mocked(isEveryFieldHidden))
       .calledWith(['gridSpacingX', 'gridSpacingY'], formikConfig.initialValues)
-      .mockReturnValue(true)
+      .thenReturn(true)
     const { container } = render(wrapInFormik(<WellSpacing />, formikConfig))
     expect(container.firstChild).toBe(null)
   })

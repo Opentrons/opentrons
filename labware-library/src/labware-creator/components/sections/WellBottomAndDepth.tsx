@@ -2,7 +2,6 @@ import * as React from 'react'
 import capitalize from 'lodash/capitalize'
 import { useFormikContext } from 'formik'
 import { makeMaskToDecimal } from '../../fieldMasks'
-import { LabwareFields } from '../../fields'
 import { FormAlerts } from '../alerts/FormAlerts'
 import { TextField } from '../TextField'
 import { RadioField } from '../RadioField'
@@ -10,8 +9,9 @@ import { DepthImg } from '../diagrams'
 import { SectionBody } from './SectionBody'
 import { wellBottomShapeOptionsWithIcons } from '../optionsWithImages'
 
-import styles from '../../styles.css'
+import styles from '../../styles.module.css'
 import { getLabwareName } from '../../utils'
+import type { LabwareFields } from '../../fields'
 
 const maskTo2Decimal = makeMaskToDecimal(2)
 

@@ -1,0 +1,22 @@
+:root {
+  --c-font-dark: #4a4a4a;
+  --c-font-icon: #6f6f6f;
+  --c-font-light: white;
+  --c-font-disabled: #9c9c9c;
+  --fs-huge: 3rem;
+  --fs-header: 1.125rem;
+  --fs-default: 1rem;
+  --fs-body-2: 0.875rem;
+  --fs-body-1: 0.75rem;
+  --fs-caption: 0.625rem;
+  --fs-tiny: 0.325rem;
+  --fs-micro: 0.2rem;
+  --fw-bold: 800;
+  --fw-semibold: 600;
+  --fw-regular: 400;
+  --fw-light: 300;
+  --ff-code: Consolas, monaco, monospace;
+  --lh-solid: 1;
+  --lh-title: 1.25;
+  --lh-copy: 1.5;
+}

@@ -1,6 +1,7 @@
 import asyncio
 import os
 from pathlib import Path
+
 from opentrons.config import ARCHITECTURE, SystemArchitecture
 from opentrons_shared_data.errors.exceptions import CommunicationError
 from opentrons_shared_data.errors.codes import ErrorCodes
@@ -29,7 +30,7 @@ async def take_picture(filename: Path) -> None:
         pass
 
     if ARCHITECTURE == SystemArchitecture.YOCTO:
-        cmd = f"v4l2-ctl --device /dev/video0 --set-fmt-video=width=1280,height=720,pixelformat=MJPG --stream-mmap --stream-to={str(filename)} --stream-count=1"
+        cmd = f"v4l2-ctl --device /dev/video2 --set-fmt-video=width=1280,height=720,pixelformat=MJPG --stream-mmap --stream-to={str(filename)} --stream-count=1"
     elif ARCHITECTURE == SystemArchitecture.BUILDROOT:
         cmd = f"ffmpeg -f video4linux2 -s 640x480 -i /dev/video0 -ss 0:0:1 -frames 1 {str(filename)}"
     else:  # HOST

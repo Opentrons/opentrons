@@ -1,5 +1,6 @@
+import { describe, it, expect, vi } from 'vitest'
 import { containers } from '../reducers'
-jest.mock('../../labware-defs/utils')
+vi.mock('../../labware-defs/utils')
 
 const containersInitialState = {}
 

@@ -8,6 +8,7 @@ from opentrons.protocol_api.labware import Well
 
 from hardware_testing.opentrons_api.types import OT3AxisKind
 from hardware_testing.gravimetric import config
+from hardware_testing.gravimetric.workarounds import get_sync_hw_api
 from hardware_testing.gravimetric.liquid_height.height import LiquidTracker
 from hardware_testing.opentrons_api.types import OT3Mount, Point
 from hardware_testing.opentrons_api.helpers_ot3 import clear_pipette_ul_per_mm
@@ -177,7 +178,7 @@ def _pipette_with_liquid_settings(  # noqa: C901
 ) -> None:
     """Run a pipette given some Pipetting Liquid Settings."""
     # FIXME: stop using hwapi, and get those functions into core software
-    hw_api = ctx._core.get_hardware()
+    hw_api = get_sync_hw_api(ctx)
     hw_mount = OT3Mount.LEFT if pipette.mount == "left" else OT3Mount.RIGHT
     hw_pipette = hw_api.hardware_pipettes[hw_mount.to_mount()]
     _check_aspirate_dispense_args(mix, aspirate, dispense)
@@ -188,20 +189,6 @@ def _pipette_with_liquid_settings(  # noqa: C901
         bottom = hw_pipette.plunger_positions.bottom
         blow_out = hw_pipette.plunger_positions.blow_out
         return (blow_out - bottom) * blow_out_ul_per_mm
-
-    def _dispense_with_added_blow_out() -> None:
-        # dispense all liquid, plus some air
-        # FIXME: push-out is not supported in Legacy core, so here
-        #        we again use the hardware controller
-        hw_api = ctx._core.get_hardware()
-        hw_mount = OT3Mount.LEFT if pipette.mount == "left" else OT3Mount.RIGHT
-        push_out = min(liquid_class.dispense.blow_out_submerged, _get_max_blow_out_ul())
-        hw_api.dispense(hw_mount, push_out=push_out)
-
-    def _blow_out_remaining_air() -> None:
-        # FIXME: using the HW-API to specify that we want to blow-out the full
-        #        available blow-out volume
-        hw_api.blow_out(hw_mount, _get_max_blow_out_ul())
 
     # ASPIRATE/DISPENSE SEQUENCE HAS THREE PHASES:
     #  1. APPROACH
@@ -237,16 +224,17 @@ def _pipette_with_liquid_settings(  # noqa: C901
                 "WARNING: removing trailing air-gap from pipette, "
                 "this should only happen during blank trials"
             )
-            hw_api.dispense(hw_mount)
+            pipette.dispense(volume=pipette.current_volume)
         if mode:
             # NOTE: increment test requires the plunger's "bottom" position
             #       does not change during the entire test run
             hw_api.set_liquid_class(hw_mount, mode)
         else:
-            hw_api.configure_for_volume(hw_mount, aspirate if aspirate else dispense)
+            cfg_volume: float = aspirate if aspirate else dispense  # type: ignore[assignment]
+            pipette.configure_for_volume(cfg_volume)
         if clear_accuracy_function:
             clear_pipette_ul_per_mm(hw_api, hw_mount)  # type: ignore[arg-type]
-        hw_api.prepare_for_aspirate(hw_mount)
+        pipette.prepare_to_aspirate()
         if liquid_class.aspirate.leading_air_gap > 0:
             pipette.aspirate(liquid_class.aspirate.leading_air_gap)
 
@@ -260,14 +248,18 @@ def _pipette_with_liquid_settings(  # noqa: C901
             if i < _num_mixes - 1:
                 pipette.dispense(mix)
             else:
-                _dispense_with_added_blow_out()
+                if added_blow_out:
+                    push_out = min(
+                        liquid_class.dispense.blow_out_submerged, _get_max_blow_out_ul()
+                    )
+                pipette.dispense(dispense, push_out=push_out)
             ctx.delay(liquid_class.dispense.delay)
         # don't go all the way up to retract position, but instead just above liquid
         _retract(
             ctx, pipette, well, channel_offset, approach_mm, retract_speed, _z_disc
         )
-        _blow_out_remaining_air()
-        hw_api.prepare_for_aspirate(hw_mount)
+        pipette.blow_out()
+        pipette.prepare_to_aspirate()
         assert pipette.current_volume == 0
 
     def _aspirate_on_submerge() -> None:
@@ -283,18 +275,22 @@ def _pipette_with_liquid_settings(  # noqa: C901
 
     def _aspirate_on_retract() -> None:
         # add trailing-air-gap
-        pipette.aspirate(liquid_class.aspirate.trailing_air_gap)
+        if not blank:
+            pipette.air_gap(liquid_class.aspirate.trailing_air_gap, height=0)
 
     def _dispense_on_approach() -> None:
         # remove trailing-air-gap
-        pipette.dispense(liquid_class.aspirate.trailing_air_gap)
+        if not blank:
+            pipette.dispense(liquid_class.aspirate.trailing_air_gap)
 
     def _dispense_on_submerge() -> None:
         callbacks.on_dispensing()
+        push_out = None
         if added_blow_out:
-            _dispense_with_added_blow_out()
-        else:
-            pipette.dispense(dispense)
+            push_out = min(
+                liquid_class.dispense.blow_out_submerged, _get_max_blow_out_ul()
+            )
+        pipette.dispense(dispense, push_out=push_out)
         # update liquid-height tracker
         liquid_tracker.update_affected_wells(
             well, dispense=dispense, channels=channel_count
@@ -306,13 +302,13 @@ def _pipette_with_liquid_settings(  # noqa: C901
         if pipette.current_volume <= 0 and added_blow_out:
             # blow-out any remaining air in pipette (any reason why not?)
             callbacks.on_blowing_out()
-            _blow_out_remaining_air()
-            hw_api.prepare_for_aspirate(hw_mount)
+            pipette.blow_out()
+            pipette.prepare_to_aspirate()
         if touch_tip:
             pipette.touch_tip(speed=config.TOUCH_TIP_SPEED)
         # NOTE: always do a trailing-air-gap, regardless of if tip is empty or not
         #       to avoid droplets from forming and falling off the tip
-        pipette.aspirate(liquid_class.aspirate.trailing_air_gap)
+        pipette.air_gap(liquid_class.aspirate.trailing_air_gap, height=0)
 
     # PHASE 1: APPROACH
     pipette.flow_rate.aspirate = liquid_class.aspirate.plunger_flow_rate
@@ -337,7 +333,7 @@ def _pipette_with_liquid_settings(  # noqa: C901
 
     # EXIT
     callbacks.on_exiting()
-    hw_api.retract(hw_mount)
+    pipette._retract()
 
 
 def mix_with_liquid_class(

@@ -1,9 +1,7 @@
 import * as React from 'react'
 import styled from 'styled-components'
 import {
-  StyleProps,
   COLORS,
-  POSITION_FIXED,
   POSITION_ABSOLUTE,
   ALIGN_CENTER,
   JUSTIFY_CENTER,
@@ -15,6 +13,7 @@ import {
   styleProps,
   SPACING,
 } from '@opentrons/components'
+import type { StyleProps } from '@opentrons/components'
 export interface LegacyModalShellProps extends StyleProps {
   /** Modal content */
   children: React.ReactNode
@@ -52,7 +51,7 @@ export function LegacyModalShell(props: LegacyModalShellProps): JSX.Element {
   return (
     <Overlay
       aria-label="BackgroundOverlay_ModalShell"
-      onClick={e => {
+      onClick={(e: React.MouseEvent) => {
         e.stopPropagation()
         if (onOutsideClick != null) onOutsideClick(e)
       }}
@@ -61,7 +60,7 @@ export function LegacyModalShell(props: LegacyModalShellProps): JSX.Element {
         <ModalArea
           aria-label="ModalShell_ModalArea"
           isFullPage={fullPage}
-          onClick={e => {
+          onClick={(e: React.MouseEvent) => {
             e.stopPropagation()
           }}
           {...styleProps}
@@ -76,18 +75,14 @@ export function LegacyModalShell(props: LegacyModalShellProps): JSX.Element {
 }
 
 const Overlay = styled.div`
-  position: ${POSITION_FIXED};
+  position: ${POSITION_ABSOLUTE};
   left: 0;
   right: 0;
   top: 0;
   bottom: 0;
   z-index: 1;
-  background-color: ${COLORS.backgroundOverlay};
+  background-color: ${COLORS.black90}${COLORS.opacity40HexCode};
   cursor: default;
-
-  @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
-    background-color: ${COLORS.darkBlack60};
-  }
 `
 const ContentArea = styled.div<{ zIndex: string | number }>`
   display: flex;
@@ -111,12 +106,12 @@ const ModalArea = styled.div<
   overflow-y: ${OVERFLOW_AUTO};
   max-height: 100%;
   width: 100%;
-  border-radius: ${BORDERS.radiusSoftCorners};
+  border-radius: ${BORDERS.borderRadius8};
   box-shadow: ${BORDERS.smallDropShadow};
   height: ${({ isFullPage }) => (isFullPage ? '100%' : 'auto')};
   background-color: ${COLORS.white};
   @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
-    border-radius: ${BORDERS.borderRadiusSize4};
+    border-radius: ${BORDERS.borderRadius16};
   }
   ${styleProps};
 `

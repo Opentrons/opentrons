@@ -19,7 +19,7 @@ from dataclasses import dataclass
 import logging
 import os
 import time
-import serial  # type: ignore[import]
+import serial  # type: ignore[import-untyped]
 import typing
 
 LOG = logging.getLogger(__name__)

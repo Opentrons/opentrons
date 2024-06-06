@@ -1,7 +1,9 @@
 import * as React from 'react'
-import { fireEvent } from '@testing-library/react'
+import { fireEvent, screen } from '@testing-library/react'
 import { MemoryRouter } from 'react-router-dom'
-import { renderWithProviders } from '@opentrons/components'
+import { describe, it, vi, beforeEach, expect } from 'vitest'
+import '@testing-library/jest-dom/vitest'
+import { renderWithProviders } from '../../../../../__testing-utils__'
 import { i18n } from '../../../../../i18n'
 import { getRobotApiVersion } from '../../../../../redux/discovery'
 import { getRobotUpdateDisplayInfo } from '../../../../../redux/robot-update'
@@ -10,23 +12,10 @@ import { useRobot } from '../../../hooks'
 import { handleUpdateBuildroot } from '../../UpdateBuildroot'
 import { RobotServerVersion } from '../RobotServerVersion'
 
-jest.mock('../../../hooks')
-jest.mock('../../../../../redux/robot-update/selectors')
-jest.mock('../../../../../redux/discovery/selectors')
-jest.mock('../../UpdateBuildroot')
-
-const mockGetRobotApiVersion = getRobotApiVersion as jest.MockedFunction<
-  typeof getRobotApiVersion
->
-const mockGetBuildrootUpdateDisplayInfo = getRobotUpdateDisplayInfo as jest.MockedFunction<
-  typeof getRobotUpdateDisplayInfo
->
-
-const mockUseRobot = useRobot as jest.MockedFunction<typeof useRobot>
-
-const mockUpdateBuildroot = handleUpdateBuildroot as jest.MockedFunction<
-  typeof handleUpdateBuildroot
->
+vi.mock('../../../hooks')
+vi.mock('../../../../../redux/robot-update/selectors')
+vi.mock('../../../../../redux/discovery/selectors')
+vi.mock('../../UpdateBuildroot')
 
 const MOCK_ROBOT_VERSION = '7.7.7'
 const render = () => {
@@ -40,69 +29,65 @@ const render = () => {
 
 describe('RobotSettings RobotServerVersion', () => {
   beforeEach(() => {
-    mockUseRobot.mockReturnValue(mockConnectableRobot)
-    mockGetBuildrootUpdateDisplayInfo.mockReturnValue({
+    vi.mocked(useRobot).mockReturnValue(mockConnectableRobot)
+    vi.mocked(getRobotUpdateDisplayInfo).mockReturnValue({
       autoUpdateAction: 'reinstall',
       autoUpdateDisabledReason: null,
       updateFromFileDisabledReason: null,
     })
-    mockGetRobotApiVersion.mockReturnValue(MOCK_ROBOT_VERSION)
-  })
-
-  afterEach(() => {
-    jest.resetAllMocks()
+    vi.mocked(getRobotApiVersion).mockReturnValue(MOCK_ROBOT_VERSION)
   })
 
   it('should render title and description', () => {
-    const [{ getByText }] = render()
-    getByText('Robot Server Version')
-    getByText('View latest release notes on')
-    getByText('v7.7.7')
+    render()
+    screen.getByText('Robot Server Version')
+    screen.getByText('View latest release notes on')
+    screen.getByText('v7.7.7')
   })
 
   it('should render the message, up to date, if the robot server version is the same as the latest version', () => {
-    const [{ getByText, getByRole }] = render()
-    getByText('up to date')
-    const reinstall = getByRole('button', { name: 'reinstall' })
+    render()
+    screen.getByText('up to date')
+    const reinstall = screen.getByRole('button', { name: 'reinstall' })
     fireEvent.click(reinstall)
-    expect(mockUpdateBuildroot).toHaveBeenCalled()
+    expect(handleUpdateBuildroot).toHaveBeenCalled()
   })
 
   it('should render the warning message if the robot server version needs to upgrade', () => {
-    mockGetBuildrootUpdateDisplayInfo.mockReturnValue({
+    vi.mocked(getRobotUpdateDisplayInfo).mockReturnValue({
       autoUpdateAction: 'upgrade',
       autoUpdateDisabledReason: null,
       updateFromFileDisabledReason: null,
     })
-    const [{ getByText }] = render()
-    getByText(
+    render()
+    screen.getByText(
       'A robot software update is required to run protocols with this version of the Opentrons App.'
     )
-    const btn = getByText('View update')
+    const btn = screen.getByText('View update')
     fireEvent.click(btn)
-    expect(mockUpdateBuildroot).toHaveBeenCalled()
+    expect(handleUpdateBuildroot).toHaveBeenCalled()
   })
 
   it('should render the warning message if the robot server version needs to downgrade', () => {
-    mockGetBuildrootUpdateDisplayInfo.mockReturnValue({
+    vi.mocked(getRobotUpdateDisplayInfo).mockReturnValue({
       autoUpdateAction: 'downgrade',
       autoUpdateDisabledReason: null,
       updateFromFileDisabledReason: null,
     })
-    const [{ getByText }] = render()
-    getByText(
+    render()
+    screen.getByText(
       'A robot software update is required to run protocols with this version of the Opentrons App.'
     )
-    const btn = getByText('View update')
+    const btn = screen.getByText('View update')
     fireEvent.click(btn)
-    expect(mockUpdateBuildroot).toHaveBeenCalled()
+    expect(handleUpdateBuildroot).toHaveBeenCalled()
   })
 
   it('the link should have the correct href', () => {
-    const [{ getByText }] = render()
+    render()
     const GITHUB_LINK =
       'https://github.com/Opentrons/opentrons/blob/edge/app-shell/build/release-notes.md'
-    const githubLink = getByText('GitHub')
+    const githubLink = screen.getByText('GitHub')
     expect(githubLink.getAttribute('href')).toBe(GITHUB_LINK)
   })
 })

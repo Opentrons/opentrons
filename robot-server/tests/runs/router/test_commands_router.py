@@ -6,26 +6,27 @@ from decoy import Decoy, matchers
 
 from opentrons.protocol_engine import (
     CommandSlice,
-    CurrentCommand,
+    CommandPointer,
     ProtocolEngine,
+    CommandNote,
     commands as pe_commands,
     errors as pe_errors,
 )
 
-from robot_server.errors import ApiError
-from robot_server.service.json_api import (
-    RequestModel,
-    MultiBodyMeta,
-)
+from robot_server.errors.error_responses import ApiError
+from robot_server.service.json_api import MultiBodyMeta
 
+from robot_server.runs.command_models import (
+    RequestModelWithCommandCreate,
+    CommandCollectionLinks,
+    CommandLink,
+    CommandLinkMeta,
+)
 from robot_server.runs.run_store import RunStore, CommandNotFoundError
 from robot_server.runs.engine_store import EngineStore
 from robot_server.runs.run_data_manager import RunDataManager
 from robot_server.runs.run_models import RunCommandSummary, RunNotFoundError
 from robot_server.runs.router.commands_router import (
-    CommandCollectionLinks,
-    CommandLink,
-    CommandLinkMeta,
     create_run_command,
     get_run_command,
     get_run_commands,
@@ -115,22 +116,51 @@ async def test_create_run_command(
 
     decoy.when(
         mock_protocol_engine.add_command(
-            pe_commands.WaitForResumeCreate(
+            request=pe_commands.WaitForResumeCreate(
                 params=pe_commands.WaitForResumeParams(message="Hello"),
                 intent=pe_commands.CommandIntent.SETUP,
-            )
+            ),
+            failed_command_id=None,
         )
     ).then_do(_stub_queued_command_state)
 
     result = await create_run_command(
-        request_body=RequestModel(data=command_request),
+        request_body=RequestModelWithCommandCreate(data=command_request),
         waitUntilComplete=False,
         protocol_engine=mock_protocol_engine,
+        failedCommandId=None,
     )
 
     assert result.content.data == command_once_added
     assert result.status_code == 201
     decoy.verify(await mock_protocol_engine.wait_for_command("command-id"), times=0)
+
+
+async def test_create_command_with_failed_command_raises(
+    decoy: Decoy,
+    mock_protocol_engine: ProtocolEngine,
+) -> None:
+    """It should return 400 bad request."""
+    command_create = pe_commands.HomeCreate(params=pe_commands.HomeParams())
+
+    decoy.when(
+        mock_protocol_engine.add_command(
+            pe_commands.HomeCreate(
+                params=pe_commands.HomeParams(),
+                intent=pe_commands.CommandIntent.SETUP,
+            ),
+            failed_command_id="123",
+        )
+    ).then_raise(pe_errors.CommandNotAllowedError())
+
+    with pytest.raises(ApiError):
+        await create_run_command(
+            RequestModelWithCommandCreate(data=command_create),
+            waitUntilComplete=False,
+            timeout=42,
+            protocol_engine=mock_protocol_engine,
+            failedCommandId="123",
+        )
 
 
 async def test_create_run_command_blocking_completion(
@@ -172,7 +202,7 @@ async def test_create_run_command_blocking_completion(
             mock_protocol_engine.state_view.commands.get("command-id")
         ).then_return(command_once_completed)
 
-    decoy.when(mock_protocol_engine.add_command(command_request)).then_do(
+    decoy.when(mock_protocol_engine.add_command(command_request, None)).then_do(
         _stub_queued_command_state
     )
 
@@ -181,10 +211,11 @@ async def test_create_run_command_blocking_completion(
     )
 
     result = await create_run_command(
-        request_body=RequestModel(data=command_request),
+        request_body=RequestModelWithCommandCreate(data=command_request),
         waitUntilComplete=True,
         timeout=999,
         protocol_engine=mock_protocol_engine,
+        failedCommandId=None,
     )
 
     assert result.content.data == command_once_completed
@@ -201,15 +232,16 @@ async def test_add_conflicting_setup_command(
         intent=pe_commands.CommandIntent.SETUP,
     )
 
-    decoy.when(mock_protocol_engine.add_command(command_request)).then_raise(
+    decoy.when(mock_protocol_engine.add_command(command_request, None)).then_raise(
         pe_errors.SetupCommandNotAllowedError("oh no")
     )
 
     with pytest.raises(ApiError) as exc_info:
         await create_run_command(
-            request_body=RequestModel(data=command_request),
+            request_body=RequestModelWithCommandCreate(data=command_request),
             waitUntilComplete=False,
             protocol_engine=mock_protocol_engine,
+            failedCommandId=None,
         )
 
     assert exc_info.value.status_code == 409
@@ -229,15 +261,16 @@ async def test_add_command_to_stopped_engine(
         intent=pe_commands.CommandIntent.SETUP,
     )
 
-    decoy.when(mock_protocol_engine.add_command(command_request)).then_raise(
+    decoy.when(mock_protocol_engine.add_command(command_request, None)).then_raise(
         pe_errors.RunStoppedError("oh no")
     )
 
     with pytest.raises(ApiError) as exc_info:
         await create_run_command(
-            request_body=RequestModel(data=command_request),
+            request_body=RequestModelWithCommandCreate(data=command_request),
             waitUntilComplete=False,
             protocol_engine=mock_protocol_engine,
+            failedCommandId=None,
         )
 
     assert exc_info.value.status_code == 409
@@ -251,6 +284,24 @@ async def test_get_run_commands(
     decoy: Decoy, mock_run_data_manager: RunDataManager
 ) -> None:
     """It should return a list of all commands in a run."""
+    long_note = CommandNote(
+        noteKind="warning",
+        shortMessage="this is a warning.",
+        longMessage="""
+            hello, friends. I bring a warning....
+
+
+
+            FROM THE FUTURE!
+            """,
+        source="test",
+    )
+    unenumed_note = CommandNote(
+        noteKind="lahsdlasd",
+        shortMessage="Oh no",
+        longMessage="its a notekind not in the enum",
+        source="test2",
+    )
     command = pe_commands.WaitForResume(
         id="command-id",
         key="command-key",
@@ -266,14 +317,23 @@ async def test_get_run_commands(
             createdAt=datetime(year=2024, month=4, day=4),
             detail="Things are not looking good.",
         ),
+        notes=[long_note, unenumed_note],
     )
 
     decoy.when(mock_run_data_manager.get_current_command("run-id")).then_return(
-        CurrentCommand(
+        CommandPointer(
             command_id="current-command-id",
             command_key="current-command-key",
             created_at=datetime(year=2024, month=4, day=4),
             index=101,
+        )
+    )
+    decoy.when(mock_run_data_manager.get_recovery_target_command("run-id")).then_return(
+        CommandPointer(
+            command_id="recovery-target-command-id",
+            command_key="recovery-target-command-key",
+            created_at=datetime(year=2025, month=5, day=5),
+            index=202,
         )
     )
     decoy.when(
@@ -308,6 +368,7 @@ async def test_get_run_commands(
                 createdAt=datetime(year=2024, month=4, day=4),
                 detail="Things are not looking good.",
             ),
+            notes=[long_note, unenumed_note],
         )
     ]
     assert result.content.meta == MultiBodyMeta(cursor=1, totalLength=3)
@@ -321,7 +382,17 @@ async def test_get_run_commands(
                 createdAt=datetime(year=2024, month=4, day=4),
                 index=101,
             ),
-        )
+        ),
+        currentlyRecoveringFrom=CommandLink(
+            href="/runs/run-id/commands/recovery-target-command-id",
+            meta=CommandLinkMeta(
+                runId="run-id",
+                commandId="recovery-target-command-id",
+                key="recovery-target-command-key",
+                createdAt=datetime(year=2025, month=5, day=5),
+                index=202,
+            ),
+        ),
     )
     assert result.status_code == 200
 

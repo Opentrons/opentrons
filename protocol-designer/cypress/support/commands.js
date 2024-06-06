@@ -34,14 +34,17 @@ Cypress.Commands.add('closeAnnouncementModal', () => {
   cy.get('[data-test="ComputingSpinner"]', { timeout: 30000 }).should(
     'not.exist'
   )
-  cy.get('button').contains('Got It!').should('be.visible').click()
+  cy.get('button')
+    .contains('Got It!')
+    .should('be.visible')
+    .click({ force: true })
 })
 
 //
 // File Page Actions
 //
 Cypress.Commands.add('openFilePage', () => {
-  cy.get('button[class*="navbar__tab__"]').contains('FILE').click()
+  cy.get('button[id="NavTab_file"]').contains('FILE').click()
 })
 
 //
@@ -87,7 +90,7 @@ Cypress.Commands.add(
 // Design Page Actions
 //
 Cypress.Commands.add('openDesignPage', () => {
-  cy.get('button[class*="navbar__tab__"]').contains('DESIGN').parent().click()
+  cy.get('button[id="NavTab_design"]').contains('DESIGN').parent().click()
 })
 Cypress.Commands.add('addStep', stepName => {
   cy.get('button').contains('Add Step').click()
@@ -98,7 +101,7 @@ Cypress.Commands.add('addStep', stepName => {
 // Settings Page Actions
 //
 Cypress.Commands.add('openSettingsPage', () => {
-  cy.get('button[class*="navbar__tab__"]').contains('Settings').click()
+  cy.get('button').contains('Settings').click()
 })
 
 // Advance Settings for Transfer Steps

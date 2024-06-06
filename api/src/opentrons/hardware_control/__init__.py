@@ -13,27 +13,33 @@ from .adapters import SynchronousAdapter
 from .api import API
 from .pause_manager import PauseManager
 from .backends import Controller, Simulator
-from .types import CriticalPoint, ExecutionState
+from .types import CriticalPoint, ExecutionState, OT3Mount
 from .constants import DROP_TIP_RELEASE_DISTANCE
 from .thread_manager import ThreadManager
 from .execution_manager import ExecutionManager
 from .threaded_async_lock import ThreadedAsyncLock, ThreadedAsyncForbidden
-from .protocols import HardwareControlInterface
+from .protocols import HardwareControlInterface, FlexHardwareControlInterface
 from .instruments import AbstractInstrument, Gripper
 from typing import Union
 from .ot3_calibration import OT3Transforms
 from .robot_calibration import RobotCalibration
+from opentrons.config.types import RobotConfig, OT3Config
+
+from opentrons.types import Mount
 
 # TODO (lc 12-05-2022) We should 1. figure out if we need
 # to globally export a class that is strictly used in the hardware controller
 # and 2. how to properly export an ot2 and ot3 pipette.
 from .instruments.ot2.pipette import Pipette
 
-OT2HardwareControlAPI = HardwareControlInterface[RobotCalibration]
-OT3HardwareControlAPI = HardwareControlInterface[OT3Transforms]
+OT2HardwareControlAPI = HardwareControlInterface[RobotCalibration, Mount, RobotConfig]
+OT3HardwareControlAPI = FlexHardwareControlInterface[
+    OT3Transforms, Union[Mount, OT3Mount], OT3Config
+]
 HardwareControlAPI = Union[OT2HardwareControlAPI, OT3HardwareControlAPI]
 
-ThreadManagedHardware = ThreadManager[HardwareControlAPI]
+# this type ignore is because of https://github.com/python/mypy/issues/13437
+ThreadManagedHardware = ThreadManager[HardwareControlAPI]  # type: ignore[misc]
 SyncHardwareAPI = SynchronousAdapter[HardwareControlAPI]
 
 __all__ = [
@@ -55,4 +61,6 @@ __all__ = [
     "ThreadedAsyncForbidden",
     "ThreadManagedHardware",
     "SyncHardwareAPI",
+    "OT2HardwareControlAPI",
+    "OT3HardwareControlAPI",
 ]

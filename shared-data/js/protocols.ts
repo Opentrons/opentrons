@@ -17,7 +17,6 @@ import protocolSchema5 from '../protocol/schemas/5.json'
 import protocolSchema4 from '../protocol/schemas/4.json'
 import protocolSchema3 from '../protocol/schemas/3.json'
 import protocolSchema1 from '../protocol/schemas/1.json'
-
 import type * as ProtocolSchemas from '../protocol'
 import type { CreateCommand } from '../command/types'
 import type { CommandAnnotation } from '../commandAnnotation/types'
@@ -288,3 +287,5 @@ export function validate(
       })
   }
 }
+
+export * from '../protocol/fixtures/index'

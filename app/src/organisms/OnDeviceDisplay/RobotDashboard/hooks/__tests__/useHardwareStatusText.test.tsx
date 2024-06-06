@@ -1,24 +1,22 @@
 import * as React from 'react'
 import { I18nextProvider } from 'react-i18next'
-import { renderHook } from '@testing-library/react-hooks'
+import { renderHook } from '@testing-library/react'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+
 import { i18n } from '../../../../../i18n'
 import { useFeatureFlag } from '../../../../../redux/config'
 import { useHardwareStatusText } from '..'
 
-jest.mock('../../../../../redux/config')
-
-const mockUseFeatureFlag = useFeatureFlag as jest.MockedFunction<
-  typeof useFeatureFlag
->
+vi.mock('../../../../../redux/config')
 
 describe('useHardwareStatusText', () => {
-  let wrapper: React.FunctionComponent<{}>
+  let wrapper: React.FunctionComponent<{ children: React.ReactNode }>
   beforeEach(() => {
     wrapper = ({ children }) => (
       <I18nextProvider i18n={i18n}>{children}</I18nextProvider>
     )
 
-    mockUseFeatureFlag.mockReturnValue(true)
+    vi.mocked(useFeatureFlag).mockReturnValue(true)
   })
   it('should return string for ready', () => {
     const { result } = renderHook(() => useHardwareStatusText([], []), {

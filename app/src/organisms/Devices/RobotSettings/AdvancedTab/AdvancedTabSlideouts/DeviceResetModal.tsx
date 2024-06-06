@@ -5,17 +5,17 @@ import last from 'lodash/last'
 import { useHistory } from 'react-router-dom'
 
 import {
-  Flex,
-  DIRECTION_COLUMN,
-  JUSTIFY_FLEX_END,
   AlertPrimaryButton,
-  SPACING,
-  Link,
-  TYPOGRAPHY,
   ALIGN_CENTER,
+  DIRECTION_COLUMN,
+  Flex,
+  JUSTIFY_FLEX_END,
+  Link,
   PrimaryButton,
+  SPACING,
+  StyledText,
+  TYPOGRAPHY,
 } from '@opentrons/components'
-import { StyledText } from '../../../../../atoms/text'
 import { LegacyModal } from '../../../../../molecules/LegacyModal'
 import {
   useDispatchApiRequest,
@@ -45,7 +45,7 @@ export function DeviceResetModal({
   robotName,
   resetOptions,
 }: DeviceResetModalProps): JSX.Element {
-  const { t } = useTranslation(['device_settings', 'shared'])
+  const { t } = useTranslation(['device_settings', 'shared', 'branded'])
   const history = useHistory()
   const [dispatchRequest, requestIds] = useDispatchApiRequest()
   const isFlex = useIsFlex(robotName)
@@ -132,7 +132,7 @@ export function DeviceResetModal({
             marginBottom={SPACING.spacing24}
             paddingBottom={SPACING.spacing24}
           >
-            {t('connection_lost_description')}
+            {t('branded:connection_lost_description')}
           </StyledText>
           <Flex justifyContent={JUSTIFY_FLEX_END}>
             <PrimaryButton

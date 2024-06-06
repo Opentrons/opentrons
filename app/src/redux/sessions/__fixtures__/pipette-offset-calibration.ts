@@ -1,4 +1,4 @@
-import tipRackFixture from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_300_ul.json'
+import { fixtureTiprack300ul } from '@opentrons/shared-data'
 import type {
   PipetteOffsetCalibrationSessionDetails,
   CalibrationLabware,
@@ -11,7 +11,7 @@ export const mockPipetteOffsetTipRack: CalibrationLabware = {
   namespace: 'opentrons',
   version: 1,
   isTiprack: true,
-  definition: tipRackFixture as CalibrationLabware['definition'],
+  definition: fixtureTiprack300ul as CalibrationLabware['definition'],
 }
 
 export const mockPipetteOffsetCalibrationSessionDetails: PipetteOffsetCalibrationSessionDetails = {

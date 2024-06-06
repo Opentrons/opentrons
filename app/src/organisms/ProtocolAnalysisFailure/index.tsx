@@ -1,26 +1,27 @@
 import * as React from 'react'
+import { createPortal } from 'react-dom'
 import { useDispatch } from 'react-redux'
 import { useTranslation, Trans } from 'react-i18next'
 
 import {
-  Flex,
-  SPACING,
-  JUSTIFY_SPACE_BETWEEN,
   ALIGN_CENTER,
   Btn,
+  Flex,
   JUSTIFY_FLEX_END,
-  TYPOGRAPHY,
+  JUSTIFY_SPACE_BETWEEN,
   PrimaryButton,
+  SPACING,
+  StyledText,
+  TYPOGRAPHY,
   WRAP_REVERSE,
 } from '@opentrons/components'
 
-import { StyledText } from '../../atoms/text'
+import { analyzeProtocol } from '../../redux/protocol-storage'
 import { Banner } from '../../atoms/Banner'
-import { Portal } from '../../App/portal'
+import { getTopPortalEl } from '../../App/portal'
 import { LegacyModal } from '../../molecules/LegacyModal'
 
 import type { Dispatch } from '../../redux/types'
-import { analyzeProtocol } from '../../redux/protocol-storage'
 interface ProtocolAnalysisFailureProps {
   errors: string[]
   protocolKey: string
@@ -85,30 +86,31 @@ export function ProtocolAnalysisFailure(
           />
         </StyledText>
       </Flex>
-      {showErrorDetails ? (
-        <Portal level="top">
-          <LegacyModal
-            type="error"
-            title={t('protocol_analysis_failure')}
-            onClose={handleClickHideDetails}
-          >
-            {errors.map((error, index) => (
-              <StyledText key={index} as="p">
-                {error}
-              </StyledText>
-            ))}
-            <Flex justifyContent={JUSTIFY_FLEX_END}>
-              <PrimaryButton
-                onClick={handleClickHideDetails}
-                textTransform={TYPOGRAPHY.textTransformCapitalize}
-                marginTop={SPACING.spacing16}
-              >
-                {t('shared:close')}
-              </PrimaryButton>
-            </Flex>
-          </LegacyModal>
-        </Portal>
-      ) : null}
+      {showErrorDetails
+        ? createPortal(
+            <LegacyModal
+              type="error"
+              title={t('protocol_analysis_failure')}
+              onClose={handleClickHideDetails}
+            >
+              {errors.map((error, index) => (
+                <StyledText key={index} as="p">
+                  {error}
+                </StyledText>
+              ))}
+              <Flex justifyContent={JUSTIFY_FLEX_END}>
+                <PrimaryButton
+                  onClick={handleClickHideDetails}
+                  textTransform={TYPOGRAPHY.textTransformCapitalize}
+                  marginTop={SPACING.spacing16}
+                >
+                  {t('shared:close')}
+                </PrimaryButton>
+              </Flex>
+            </LegacyModal>,
+            getTopPortalEl()
+          )
+        : null}
     </Banner>
   )
 }

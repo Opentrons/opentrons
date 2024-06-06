@@ -1,3 +1,4 @@
+import { beforeEach, describe, it, expect } from 'vitest'
 import {
   TEMPERATURE_DEACTIVATED,
   TEMPERATURE_APPROACHING_TARGET,
@@ -13,7 +14,7 @@ import {
   getStateAndContextTempTCModules,
   robotWithStatusAndTemp,
 } from '../fixtures/robotStateFixtures'
-import { InvariantContext, RobotState } from '../types'
+import type { InvariantContext, RobotState } from '../types'
 
 const forSetTemperature = makeImmutableStateUpdater(_forSetTemperature)
 const forDeactivateTemperature = makeImmutableStateUpdater(

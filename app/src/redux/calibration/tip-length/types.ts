@@ -5,7 +5,7 @@ import type {
 
 import type { AllTipLengthCalibrations } from '../api-types'
 
-import {
+import type {
   FETCH_TIP_LENGTH_CALIBRATIONS,
   FETCH_TIP_LENGTH_CALIBRATIONS_SUCCESS,
   FETCH_TIP_LENGTH_CALIBRATIONS_FAILURE,

@@ -2,18 +2,18 @@ import * as React from 'react'
 import { css } from 'styled-components'
 import { Trans, useTranslation } from 'react-i18next'
 import {
-  Box,
-  Flex,
-  SPACING,
+  ALIGN_FLEX_END,
   ALIGN_STRETCH,
+  Box,
   DIRECTION_COLUMN,
+  Flex,
   JUSTIFY_SPACE_BETWEEN,
   PrimaryButton,
-  ALIGN_FLEX_END,
+  SPACING,
+  StyledText,
 } from '@opentrons/components'
 
 import * as Sessions from '../../redux/sessions'
-import { StyledText } from '../../atoms/text'
 import {
   JogControls,
   MEDIUM_STEP_SIZE_MM,

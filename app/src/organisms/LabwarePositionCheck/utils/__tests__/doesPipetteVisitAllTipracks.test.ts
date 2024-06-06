@@ -1,6 +1,6 @@
+import { describe, it, expect } from 'vitest'
 import { doesPipetteVisitAllTipracks } from '../doesPipetteVisitAllTipracks'
-import _uncastedProtocolMultipleTipracks from '@opentrons/shared-data/protocol/fixtures/6/multipleTipracks.json'
-import _uncastedProtocolOneTiprack from '@opentrons/shared-data/protocol/fixtures/6/oneTiprack.json'
+import { multiple_tipracks, one_tiprack } from '@opentrons/shared-data'
 import type {
   LoadedLabware,
   ProtocolAnalysisOutput,
@@ -8,10 +8,10 @@ import type {
 } from '@opentrons/shared-data'
 
 // TODO: update these fixtures to be v6 protocols
-const protocolMultipleTipracks = (_uncastedProtocolMultipleTipracks as unknown) as ProtocolAnalysisOutput
-const labwareDefinitionsMultipleTipracks = _uncastedProtocolMultipleTipracks.labwareDefinitions as {}
-const protocolOneTiprack = (_uncastedProtocolOneTiprack as unknown) as ProtocolAnalysisOutput
-const labwareDefinitionsOneTiprack = _uncastedProtocolOneTiprack.labwareDefinitions as {}
+const protocolMultipleTipracks = (multiple_tipracks as unknown) as ProtocolAnalysisOutput
+const labwareDefinitionsMultipleTipracks = multiple_tipracks.labwareDefinitions as {}
+const protocolOneTiprack = (one_tiprack as unknown) as ProtocolAnalysisOutput
+const labwareDefinitionsOneTiprack = one_tiprack.labwareDefinitions as {}
 const labwareWithDefinitionUri = [
   {
     id: 'fixedTrash',

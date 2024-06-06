@@ -1,3 +1,4 @@
+import { FLEX_ROBOT_TYPE, OT2_ROBOT_TYPE } from '@opentrons/shared-data'
 import * as errorCreators from '../../errorCreators'
 import { getPipetteWithTipMaxVol } from '../../robotStateSelectors'
 import {
@@ -17,8 +18,13 @@ import type { CreateCommand } from '@opentrons/shared-data'
 import type { AspirateParams } from '@opentrons/shared-data/protocol/types/schemaV3'
 import type { CommandCreator, CommandCreatorError } from '../../types'
 
+export interface ExtendedAspirateParams extends AspirateParams {
+  xOffset: number
+  yOffset: number
+  tipRack: string
+}
 /** Aspirate with given args. Requires tip. */
-export const aspirate: CommandCreator<AspirateParams> = (
+export const aspirate: CommandCreator<ExtendedAspirateParams> = (
   args,
   invariantContext,
   prevRobotState
@@ -31,8 +37,12 @@ export const aspirate: CommandCreator<AspirateParams> = (
     offsetFromBottomMm,
     flowRate,
     isAirGap,
+    tipRack,
+    xOffset,
+    yOffset,
   } = args
   const actionName = 'aspirate'
+  const labwareState = prevRobotState.labware
   const errors: CommandCreatorError[] = []
   const pipetteSpec = invariantContext.pipetteEntities[pipette]?.spec
   const isFlexPipette =
@@ -67,6 +77,13 @@ export const aspirate: CommandCreator<AspirateParams> = (
 
   if (COLUMN_4_SLOTS.includes(slotName)) {
     errors.push(errorCreators.pipettingIntoColumn4({ typeOfStep: actionName }))
+  } else if (labwareState[slotName] != null) {
+    const adapterSlot = labwareState[slotName].slot
+    if (COLUMN_4_SLOTS.includes(adapterSlot)) {
+      errors.push(
+        errorCreators.pipettingIntoColumn4({ typeOfStep: actionName })
+      )
+    }
   }
 
   if (
@@ -120,12 +137,17 @@ export const aspirate: CommandCreator<AspirateParams> = (
   ) {
     errors.push(errorCreators.heaterShakerIsShaking())
   }
+  if (
+    pipetteAdjacentHeaterShakerWhileShaking(
+      prevRobotState.modules,
+      slotName,
+      isFlexPipette ? FLEX_ROBOT_TYPE : OT2_ROBOT_TYPE
+    )
+  ) {
+    errors.push(errorCreators.heaterShakerNorthSouthEastWestShaking())
+  }
+
   if (!isFlexPipette) {
-    if (
-      pipetteAdjacentHeaterShakerWhileShaking(prevRobotState.modules, slotName)
-    ) {
-      errors.push(errorCreators.heaterShakerNorthSouthEastWestShaking())
-    }
     if (
       getIsHeaterShakerEastWestWithLatchOpen(prevRobotState.modules, slotName)
     ) {
@@ -154,19 +176,26 @@ export const aspirate: CommandCreator<AspirateParams> = (
       )
     }
   }
-  if (errors.length === 0 && pipetteSpec && pipetteSpec.maxVolume < volume) {
+  if (
+    errors.length === 0 &&
+    pipetteSpec &&
+    pipetteSpec.liquids.default.maxVolume < volume
+  ) {
     errors.push(
       errorCreators.pipetteVolumeExceeded({
         actionName,
         volume,
-        maxVolume: pipetteSpec.maxVolume,
+        maxVolume: pipetteSpec.liquids.default.maxVolume,
       })
     )
   }
 
   if (errors.length === 0 && pipetteSpec) {
-    const tipMaxVolume = getPipetteWithTipMaxVol(pipette, invariantContext)
-
+    const tipMaxVolume = getPipetteWithTipMaxVol(
+      pipette,
+      invariantContext,
+      tipRack
+    )
     if (tipMaxVolume < volume) {
       errors.push(
         errorCreators.tipVolumeExceeded({
@@ -197,6 +226,8 @@ export const aspirate: CommandCreator<AspirateParams> = (
           origin: 'bottom',
           offset: {
             z: offsetFromBottomMm,
+            x: xOffset,
+            y: yOffset,
           },
         },
         flowRate,

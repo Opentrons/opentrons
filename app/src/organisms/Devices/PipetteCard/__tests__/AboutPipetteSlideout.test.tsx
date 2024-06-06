@@ -1,17 +1,13 @@
 import * as React from 'react'
-import { renderWithProviders } from '@opentrons/components'
-import { useInstrumentsQuery } from '@opentrons/react-api-client'
-import { fireEvent } from '@testing-library/react'
+import { describe, it, vi, beforeEach, expect } from 'vitest'
+import '@testing-library/jest-dom/vitest'
+import { renderWithProviders } from '../../../../__testing-utils__'
+import { fireEvent, screen } from '@testing-library/react'
 import { i18n } from '../../../../i18n'
 import { AboutPipetteSlideout } from '../AboutPipetteSlideout'
 import { mockLeftSpecs } from '../../../../redux/pipettes/__fixtures__'
-import { LEFT } from '../../../../redux/pipettes'
 
-jest.mock('@opentrons/react-api-client')
-
-const mockUseInstrumentsQuery = useInstrumentsQuery as jest.MockedFunction<
-  typeof useInstrumentsQuery
->
+vi.mock('@opentrons/react-api-client')
 
 const render = (props: React.ComponentProps<typeof AboutPipetteSlideout>) => {
   return renderWithProviders(<AboutPipetteSlideout {...props} />, {
@@ -25,45 +21,32 @@ describe('AboutPipetteSlideout', () => {
     props = {
       pipetteId: '123',
       pipetteName: mockLeftSpecs.displayName,
-      mount: LEFT,
       isExpanded: true,
-      onCloseClick: jest.fn(),
+      onCloseClick: vi.fn(),
     }
-    mockUseInstrumentsQuery.mockReturnValue({
-      data: { data: [] },
-    } as any)
-  })
-  afterEach(() => {
-    jest.resetAllMocks()
   })
 
   it('renders correct info', () => {
-    const { getByText, getByRole } = render(props)
+    render(props)
 
-    getByText('About Left Pipette Pipette')
-    getByText('123')
-    getByText('SERIAL NUMBER')
-    const button = getByRole('button', { name: /exit/i })
+    screen.getByText('About Left Pipette Pipette')
+    screen.getByText('123')
+    screen.getByText('SERIAL NUMBER')
+    const button = screen.getByRole('button', { name: /exit/i })
     fireEvent.click(button)
     expect(props.onCloseClick).toHaveBeenCalled()
   })
   it('renders the firmware version if it exists', () => {
-    mockUseInstrumentsQuery.mockReturnValue({
-      data: {
-        data: [
-          {
-            instrumentType: 'pipette',
-            mount: LEFT,
-            ok: true,
-            firmwareVersion: 12,
-          } as any,
-        ],
-      },
-    } as any)
+    props = {
+      pipetteId: '123',
+      pipetteName: mockLeftSpecs.displayName,
+      isExpanded: true,
+      firmwareVersion: '12',
+      onCloseClick: vi.fn(),
+    }
+    render(props)
 
-    const { getByText } = render(props)
-
-    getByText('CURRENT VERSION')
-    getByText('12')
+    screen.getByText('CURRENT VERSION')
+    screen.getByText('12')
   })
 })

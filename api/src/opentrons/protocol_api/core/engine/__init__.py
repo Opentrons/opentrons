@@ -10,6 +10,7 @@ from .module_core import ModuleCore
 from .well import WellCore
 
 ENGINE_CORE_API_VERSION: Final = APIVersion(2, 14)
+SET_OFFSET_RESTORED_API_VERSION: Final = APIVersion(2, 18)
 
 __all__ = [
     "ENGINE_CORE_API_VERSION",

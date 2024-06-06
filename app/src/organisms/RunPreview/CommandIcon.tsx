@@ -1,7 +1,7 @@
 import * as React from 'react'
-import { SPACING, Icon, IconName } from '@opentrons/components'
-import { RunTimeCommand } from '@opentrons/shared-data'
-import type { StyleProps } from '@opentrons/components'
+import { Icon } from '@opentrons/components'
+import type { IconName, StyleProps } from '@opentrons/components'
+import type { RunTimeCommand } from '@opentrons/shared-data'
 
 const ICON_BY_COMMAND_TYPE: { [commandType: string]: IconName } = {
   delay: 'pause-circle',
@@ -11,9 +11,10 @@ const ICON_BY_COMMAND_TYPE: { [commandType: string]: IconName } = {
 }
 interface CommandIconProps extends StyleProps {
   command: RunTimeCommand
+  size?: string | number
 }
 export function CommandIcon(props: CommandIconProps): JSX.Element | null {
-  const { command, ...styleProps } = props
+  const { command, size = '1rem', ...styleProps } = props
   let iconName = null
   if (
     command.commandType === 'moveLabware' &&
@@ -30,11 +31,6 @@ export function CommandIcon(props: CommandIconProps): JSX.Element | null {
   }
 
   return iconName != null ? (
-    <Icon
-      {...styleProps}
-      name={iconName}
-      size={SPACING.spacing20}
-      flex="0 0 auto"
-    />
+    <Icon {...styleProps} size={size} name={iconName} flex="0 0 auto" />
   ) : null
 }

@@ -3,12 +3,12 @@ import { Trans, useTranslation } from 'react-i18next'
 import {
   DIRECTION_COLUMN,
   Flex,
-  SPACING,
   JUSTIFY_FLEX_END,
-  TYPOGRAPHY,
   PrimaryButton,
+  SPACING,
+  StyledText,
+  TYPOGRAPHY,
 } from '@opentrons/components'
-import { StyledText } from '../../atoms/text'
 
 export interface ClearDeckModalProps {
   onContinueClick: () => void

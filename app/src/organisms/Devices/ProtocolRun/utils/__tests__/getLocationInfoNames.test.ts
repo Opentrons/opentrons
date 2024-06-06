@@ -1,5 +1,7 @@
-import { getLabwareDisplayName, ModuleModel } from '@opentrons/shared-data'
+import { describe, it, vi, expect, beforeEach } from 'vitest'
+import { getLabwareDisplayName } from '@opentrons/shared-data'
 import { getLocationInfoNames } from '../getLocationInfoNames'
+import type { ModuleModel } from '@opentrons/shared-data'
 
 const ADAPTER_DISPLAY_NAME = 'Opentrons 96 Flat Bottom Adapter'
 const LABWARE_DISPLAY_NAME = 'Corning 24 Well Plate 3.4 mL Flat'
@@ -118,14 +120,11 @@ const MOCK_ADAPTER_COMMANDS = [
   },
 ]
 
-jest.mock('@opentrons/shared-data')
-const mockGetLabwareDisplayName = getLabwareDisplayName as jest.MockedFunction<
-  typeof getLabwareDisplayName
->
+vi.mock('@opentrons/shared-data')
 
 describe('getLocationInfoNames', () => {
   beforeEach(() => {
-    mockGetLabwareDisplayName.mockReturnValue(LABWARE_DISPLAY_NAME)
+    vi.mocked(getLabwareDisplayName).mockReturnValue(LABWARE_DISPLAY_NAME)
   })
   it('returns labware name and slot number for labware id on the deck', () => {
     const expected = {

@@ -51,7 +51,7 @@ export function RobotSystemVersionModal({
         >
           <InlineNotification
             type="neutral"
-            heading={t('updating_robot_system')}
+            heading={t('update_requires_restarting_robot')}
             hug
           />
           <ReleaseNotes source={releaseNotes} />
@@ -59,13 +59,17 @@ export function RobotSystemVersionModal({
         <Flex flexDirection={DIRECTION_ROW} gridGap={SPACING.spacing8}>
           <SmallButton
             flex="1"
-            onClick={() => setShowModal(false)}
+            onClick={() => {
+              setShowModal(false)
+            }}
             buttonText={t('not_now')}
             buttonType="secondary"
           />
           <SmallButton
             flex="1"
-            onClick={() => history.push('/robot-settings/update-robot')}
+            onClick={() => {
+              history.push('/robot-settings/update-robot')
+            }}
             buttonText={t('shared:update')}
           />
         </Flex>

@@ -1,105 +1,91 @@
 import * as React from 'react'
+import { createPortal } from 'react-dom'
 import cx from 'classnames'
-import round from 'lodash/round'
+import { useTranslation } from 'react-i18next'
 import {
   AlertModal,
+  DIRECTION_COLUMN,
   Flex,
-  HandleKeypress,
-  Icon,
   InputField,
-  OutlineButton,
   RadioGroup,
+  SPACING,
+  StyledText,
+  Tooltip,
+  useHoverTooltip,
 } from '@opentrons/components'
-import { i18n } from '../../../../localization'
-import { Portal } from '../../../portals/MainPageModalPortal'
-import modalStyles from '../../../modals/modal.css'
-import { TipPositionZAxisViz } from './TipPositionZAxisViz'
-
-import styles from './TipPositionInput.css'
+import { getMainPagePortalEl } from '../../../portals/MainPageModalPortal'
+import { getIsTouchTipField } from '../../../../form-types'
+import { PDAlert } from '../../../alerts/PDAlert'
+import { TOO_MANY_DECIMALS, PERCENT_RANGE_TO_SHOW_WARNING } from './constants'
+import { TipPositionAllViz } from './TipPositionAllViz'
 import * as utils from './utils'
-import { getIsTouchTipField, StepFieldName } from '../../../../form-types'
 
-const SMALL_STEP_MM = 1
-const LARGE_STEP_MM = 10
-const DECIMALS_ALLOWED = 1
+import styles from './TipPositionInput.module.css'
+import modalStyles from '../../../modals/modal.module.css'
 
-interface Props {
-  closeModal: () => unknown
-  isIndeterminate?: boolean
-  mmFromBottom: number | null
+import type { StepFieldName } from '../../../../form-types'
+
+type Offset = 'x' | 'y' | 'z'
+interface PositionSpec {
   name: StepFieldName
-  updateValue: (val: number | null | undefined) => unknown
+  value: number | null
+  updateValue: (val?: number | null) => void
+}
+export type PositionSpecs = Record<Offset, PositionSpec>
+
+interface TipPositionModalProps {
+  closeModal: () => void
+  specs: PositionSpecs
   wellDepthMm: number
+  wellXWidthMm: number
+  wellYWidthMm: number
+  isIndeterminate?: boolean
 }
 
-const roundValue = (value: number | string | null): number => {
-  return round(Number(value), DECIMALS_ALLOWED)
-}
+export const TipPositionModal = (
+  props: TipPositionModalProps
+): JSX.Element | null => {
+  const {
+    isIndeterminate,
+    specs,
+    wellDepthMm,
+    wellXWidthMm,
+    wellYWidthMm,
+    closeModal,
+  } = props
+  const [targetProps, tooltipProps] = useHoverTooltip()
+  const zSpec = specs.z
+  const ySpec = specs.y
+  const xSpec = specs.x
 
-const TOO_MANY_DECIMALS: 'TOO_MANY_DECIMALS' = 'TOO_MANY_DECIMALS'
-const OUT_OF_BOUNDS: 'OUT_OF_BOUNDS' = 'OUT_OF_BOUNDS'
-type Error = typeof TOO_MANY_DECIMALS | typeof OUT_OF_BOUNDS
+  const { t } = useTranslation(['modal', 'button', 'tooltip'])
 
-const getErrorText = (args: {
-  errors: Error[]
-  maxMmFromBottom: number
-  minMmFromBottom: number
-  isPristine: boolean
-}): string | null => {
-  const { errors, minMmFromBottom, maxMmFromBottom, isPristine } = args
-
-  if (errors.includes(TOO_MANY_DECIMALS)) {
-    return i18n.t('modal.tip_position.errors.TOO_MANY_DECIMALS')
-  } else if (!isPristine && errors.includes(OUT_OF_BOUNDS)) {
-    return i18n.t('modal.tip_position.errors.OUT_OF_BOUNDS', {
-      minMmFromBottom,
-      maxMmFromBottom,
-    })
-  } else {
-    return null
+  if (zSpec == null || xSpec == null || ySpec == null) {
+    console.error(
+      'expected to find specs for one of the positions but could not'
+    )
   }
-}
-
-const getErrors = (args: {
-  isDefault: boolean
-  value: string | null
-  maxMmFromBottom: number
-  minMmFromBottom: number
-}): Error[] => {
-  const { isDefault, value, maxMmFromBottom, minMmFromBottom } = args
-  const errors: Error[] = []
-  if (isDefault) return errors
-
-  const v = Number(value)
-  if (value === null || Number.isNaN(v)) {
-    // blank or otherwise invalid should show this error as a fallback
-    return [OUT_OF_BOUNDS]
-  }
-  const correctDecimals = round(v, DECIMALS_ALLOWED) === v
-  const outOfBounds = v > maxMmFromBottom || v < minMmFromBottom
-
-  if (!correctDecimals) {
-    errors.push(TOO_MANY_DECIMALS)
-  }
-  if (outOfBounds) {
-    errors.push(OUT_OF_BOUNDS)
-  }
-  return errors
-}
-
-export const TipPositionModal = (props: Props): JSX.Element => {
-  const { isIndeterminate, name, wellDepthMm } = props
 
   const defaultMmFromBottom = utils.getDefaultMmFromBottom({
-    name,
+    name: zSpec.name,
     wellDepthMm,
   })
 
-  const [value, setValue] = React.useState<string | null>(
-    props.mmFromBottom === null ? null : String(props.mmFromBottom)
+  const [zValue, setZValue] = React.useState<string | null>(
+    zSpec?.value == null ? String(defaultMmFromBottom) : String(zSpec?.value)
   )
+  const [yValue, setYValue] = React.useState<string | null>(
+    ySpec?.value == null ? null : String(ySpec?.value)
+  )
+  const [xValue, setXValue] = React.useState<string | null>(
+    xSpec?.value == null ? null : String(xSpec?.value)
+  )
+
   const [isDefault, setIsDefault] = React.useState<boolean>(
-    !isIndeterminate && props.mmFromBottom === null
+    !isIndeterminate &&
+      zSpec.value === null &&
+      ySpec.value === 0 &&
+      xSpec.value === 0
   )
   // in this modal, pristinity hides the OUT_OF_BOUNDS error only.
   const [isPristine, setPristine] = React.useState<boolean>(true)
@@ -108,53 +94,83 @@ export const TipPositionModal = (props: Props): JSX.Element => {
     maxMmFromBottom: number
     minMmFromBottom: number
   } => {
-    if (getIsTouchTipField(name)) {
+    if (getIsTouchTipField(zSpec?.name ?? '')) {
       return {
-        maxMmFromBottom: roundValue(wellDepthMm),
-        minMmFromBottom: roundValue(wellDepthMm / 2),
+        maxMmFromBottom: utils.roundValue(wellDepthMm, 'up'),
+        minMmFromBottom: utils.roundValue(wellDepthMm / 2, 'up'),
       }
     }
     return {
-      maxMmFromBottom: roundValue(wellDepthMm * 2),
+      maxMmFromBottom: utils.roundValue(wellDepthMm * 2, 'up'),
       minMmFromBottom: 0,
     }
   }
+
   const { maxMmFromBottom, minMmFromBottom } = getMinMaxMmFromBottom()
-  const errors = getErrors({
-    isDefault,
-    minMmFromBottom,
-    maxMmFromBottom,
-    value,
-  })
-  const hasErrors = errors.length > 0
+  const { minValue: yMinWidth, maxValue: yMaxWidth } = utils.getMinMaxWidth(
+    wellYWidthMm
+  )
+  const { minValue: xMinWidth, maxValue: xMaxWidth } = utils.getMinMaxWidth(
+    wellXWidthMm
+  )
+
+  const createErrors = (
+    value: string | null,
+    min: number,
+    max: number
+  ): utils.Error[] => {
+    return utils.getErrors({ isDefault, minMm: min, maxMm: max, value })
+  }
+  const zErrors = createErrors(zValue, minMmFromBottom, maxMmFromBottom)
+  const xErrors = createErrors(xValue, xMinWidth, xMaxWidth)
+  const yErrors = createErrors(yValue, yMinWidth, yMaxWidth)
+
+  const hasErrors =
+    zErrors.length > 0 || xErrors.length > 0 || yErrors.length > 0
   const hasVisibleErrors = isPristine
-    ? errors.includes(TOO_MANY_DECIMALS)
+    ? zErrors.includes(TOO_MANY_DECIMALS) ||
+      xErrors.includes(TOO_MANY_DECIMALS) ||
+      yErrors.includes(TOO_MANY_DECIMALS)
     : hasErrors
-  const errorText = getErrorText({
-    errors,
-    maxMmFromBottom,
-    minMmFromBottom,
-    isPristine,
-  })
+
+  const createErrorText = (
+    errors: utils.Error[],
+    min: number,
+    max: number
+  ): string | null => {
+    return utils.getErrorText({ errors, minMm: min, maxMm: max, isPristine, t })
+  }
+
+  const roundedXMin = utils.roundValue(xMinWidth, 'up')
+  const roundedYMin = utils.roundValue(yMinWidth, 'up')
+  const roundedXMax = utils.roundValue(xMaxWidth, 'down')
+  const roundedYMax = utils.roundValue(yMaxWidth, 'down')
+
+  const zErrorText = createErrorText(zErrors, minMmFromBottom, maxMmFromBottom)
+  const xErrorText = createErrorText(xErrors, roundedXMin, roundedXMax)
+  const yErrorText = createErrorText(yErrors, roundedYMin, roundedYMax)
 
   const handleDone = (): void => {
     setPristine(false)
-
     if (!hasErrors) {
       if (isDefault) {
-        props.updateValue(null)
+        zSpec?.updateValue(null)
+        xSpec?.updateValue(0)
+        ySpec?.updateValue(0)
       } else {
-        props.updateValue(value === null ? null : Number(value))
+        zSpec?.updateValue(zValue === null ? null : Number(zValue))
+        xSpec?.updateValue(xValue === null ? null : Number(xValue))
+        ySpec?.updateValue(yValue === null ? null : Number(yValue))
       }
-      props.closeModal()
+      closeModal()
     }
   }
 
   const handleCancel = (): void => {
-    props.closeModal()
+    closeModal()
   }
 
-  const handleChange = (newValueRaw: string | number): void => {
+  const handleZChange = (newValueRaw: string | number): void => {
     // if string, strip non-number characters from string and cast to number
     const newValue =
       typeof newValueRaw === 'string'
@@ -162,148 +178,204 @@ export const TipPositionModal = (props: Props): JSX.Element => {
         : String(newValueRaw)
 
     if (newValue === '.') {
-      setValue('0.')
+      setZValue('0.')
     } else {
-      setValue(Number(newValue) >= 0 ? newValue : '0')
+      setZValue(Number(newValue) >= 0 ? newValue : '0')
     }
   }
 
-  const handleInputFieldChange = (
+  const handleZInputFieldChange = (
     e: React.ChangeEvent<HTMLInputElement>
   ): void => {
-    handleChange(e.currentTarget.value)
+    handleZChange(e.currentTarget.value)
   }
 
-  const handleIncrementDecrement = (delta: number): void => {
-    const prevValue = value === null ? defaultMmFromBottom : Number(value)
-    setIsDefault(false)
-    handleChange(roundValue(prevValue + delta))
+  const handleXChange = (newValueRaw: string | number): void => {
+    // if string, strip non-number characters from string and cast to number
+    const newValue =
+      typeof newValueRaw === 'string'
+        ? newValueRaw.replace(/[^-.0-9]/g, '')
+        : String(newValueRaw)
+
+    if (newValue === '.') {
+      setXValue('0.')
+    } else {
+      setXValue(newValue)
+    }
   }
 
-  const makeHandleIncrement = (step: number): (() => void) => () => {
-    handleIncrementDecrement(step)
+  const handleXInputFieldChange = (
+    e: React.ChangeEvent<HTMLInputElement>
+  ): void => {
+    handleXChange(e.currentTarget.value)
   }
 
-  const makeHandleDecrement = (step: number): (() => void) => () => {
-    handleIncrementDecrement(step * -1)
+  const handleYChange = (newValueRaw: string | number): void => {
+    // if string, strip non-number characters from string and cast to number
+    const newValue =
+      typeof newValueRaw === 'string'
+        ? newValueRaw.replace(/[^-.0-9]/g, '')
+        : String(newValueRaw)
+
+    if (newValue === '.') {
+      setYValue('0.')
+    } else {
+      setYValue(newValue)
+    }
   }
 
-  const TipPositionInputField = !isDefault && (
-    <InputField
-      caption={`between ${minMmFromBottom} and ${maxMmFromBottom}`}
-      className={styles.position_from_bottom_input}
-      error={errorText}
-      id={'TipPositionModal_custom_input'}
-      isIndeterminate={value === null && isIndeterminate}
-      onChange={handleInputFieldChange}
-      units="mm"
-      value={value !== null ? String(value) : ''}
-    />
-  )
+  const handleYInputFieldChange = (
+    e: React.ChangeEvent<HTMLInputElement>
+  ): void => {
+    handleYChange(e.currentTarget.value)
+  }
+  const isXValueNearEdge =
+    xValue != null &&
+    (parseInt(xValue) > PERCENT_RANGE_TO_SHOW_WARNING * xMaxWidth ||
+      parseInt(xValue) < PERCENT_RANGE_TO_SHOW_WARNING * xMinWidth)
+  const isYValueNearEdge =
+    yValue != null &&
+    (parseInt(yValue) > PERCENT_RANGE_TO_SHOW_WARNING * yMaxWidth ||
+      parseInt(yValue) < PERCENT_RANGE_TO_SHOW_WARNING * yMinWidth)
+  const isZValueAtBottom = zValue != null && zValue === '0'
+
+  const TipPositionInputField = !isDefault ? (
+    <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing8}>
+      <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
+        <StyledText as="label" paddingLeft={SPACING.spacing24}>
+          {t('tip_position.field_titles.x_position')}
+        </StyledText>
+        <InputField
+          caption={t('tip_position.caption', {
+            min: roundedXMin,
+            max: roundedXMax,
+          })}
+          error={xErrorText}
+          className={styles.position_from_bottom_input}
+          id="TipPositionModal_x_custom_input"
+          onChange={handleXInputFieldChange}
+          units="mm"
+          value={xValue ?? ''}
+        />
+      </Flex>
+      <Flex
+        flexDirection={DIRECTION_COLUMN}
+        gridGap={SPACING.spacing4}
+        width="max-content"
+        {...targetProps}
+      >
+        <StyledText as="label" paddingLeft={SPACING.spacing24}>
+          {t('tip_position.field_titles.y_position')}
+        </StyledText>
+        <InputField
+          caption={t('tip_position.caption', {
+            min: roundedYMin,
+            max: roundedYMax,
+          })}
+          error={yErrorText}
+          className={styles.position_from_bottom_input}
+          id="TipPositionModal_y_custom_input"
+          onChange={handleYInputFieldChange}
+          units="mm"
+          value={yValue ?? ''}
+        />
+        <Tooltip {...tooltipProps}>{t('tooltip:y_position_value')}</Tooltip>
+      </Flex>
+      <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
+        <StyledText as="label" paddingLeft={SPACING.spacing24}>
+          {t('tip_position.field_titles.z_position')}
+        </StyledText>
+        <InputField
+          caption={t('tip_position.caption', {
+            min: minMmFromBottom,
+            max: maxMmFromBottom,
+          })}
+          error={zErrorText}
+          className={styles.position_from_bottom_input}
+          id="TipPositionModal_z_custom_input"
+          isIndeterminate={zValue === null && isIndeterminate}
+          onChange={handleZInputFieldChange}
+          units="mm"
+          value={zValue !== null ? zValue : ''}
+        />
+      </Flex>
+    </Flex>
+  ) : null
 
   // Mix Form's asp/disp tip position field has different default value text
-  const isMixAspDispField = name === 'mix_mmFromBottom'
+  const isMixAspDispField = zSpec?.name === 'mix_mmFromBottom'
 
-  return (
-    <Portal>
-      <HandleKeypress
-        preventDefault
-        handlers={[
-          {
-            key: 'ArrowUp',
-            shiftKey: false,
-            onPress: makeHandleIncrement(SMALL_STEP_MM),
-          },
-          {
-            key: 'ArrowUp',
-            shiftKey: true,
-            onPress: makeHandleIncrement(LARGE_STEP_MM),
-          },
-          {
-            key: 'ArrowDown',
-            shiftKey: false,
-            onPress: makeHandleDecrement(SMALL_STEP_MM),
-          },
-          {
-            key: 'ArrowDown',
-            shiftKey: true,
-            onPress: makeHandleDecrement(LARGE_STEP_MM),
-          },
-        ]}
-      >
-        <AlertModal
-          alertOverlay
-          buttons={[
-            { onClick: handleCancel, children: i18n.t('button.cancel') },
-            {
-              onClick: handleDone,
-              children: i18n.t('button.done'),
-              disabled: hasVisibleErrors,
-            },
-          ]}
-          className={modalStyles.modal}
-          contentsClassName={cx(modalStyles.modal_contents)}
-          onCloseClick={handleCancel}
-        >
-          <div className={styles.modal_header}>
-            <h4>{i18n.t('modal.tip_position.title')}</h4>
-            <p>{i18n.t(`modal.tip_position.body.${name}`)}</p>
-          </div>
-          <div className={styles.main_row}>
-            <Flex alignItems="flex-start">
-              <div>
-                <RadioGroup
-                  value={isDefault ? 'default' : 'custom'}
-                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-                    setIsDefault(e.currentTarget.value === 'default')
-                  }}
-                  options={[
-                    {
-                      name: isMixAspDispField
-                        ? `Aspirate 1mm, Dispense 0.5mm from the bottom (default)`
-                        : `${defaultMmFromBottom} mm from the bottom (default)`,
-                      value: 'default',
-                    },
-                    {
-                      name: 'Custom',
-                      value: 'custom',
-                    },
-                  ]}
-                  name="TipPositionOptions"
-                />
-                {TipPositionInputField}
-              </div>
+  return createPortal(
+    <AlertModal
+      alertOverlay
+      buttons={[
+        { onClick: handleCancel, children: t('button:cancel') },
+        {
+          onClick: handleDone,
+          children: t('button:done'),
+          disabled: hasVisibleErrors,
+        },
+      ]}
+      className={modalStyles.modal}
+      contentsClassName={cx(modalStyles.modal_contents)}
+      onCloseClick={handleCancel}
+    >
+      <div className={styles.modal_header}>
+        <h4>{t('tip_position.title')}</h4>
+        <p>{t(`tip_position.body.${zSpec?.name}`)}</p>
+      </div>
 
-              <div className={styles.viz_group}>
-                {!isDefault && (
-                  <div className={styles.adjustment_buttons}>
-                    <OutlineButton
-                      id="Increment_tipPosition"
-                      className={styles.adjustment_button}
-                      onClick={makeHandleIncrement(SMALL_STEP_MM)}
-                    >
-                      <Icon name="plus" />
-                    </OutlineButton>
-                    <OutlineButton
-                      id="Decrement_tipPosition"
-                      className={styles.adjustment_button}
-                      onClick={makeHandleDecrement(SMALL_STEP_MM)}
-                    >
-                      <Icon name="minus" />
-                    </OutlineButton>
-                  </div>
-                )}
-                <TipPositionZAxisViz
-                  mmFromBottom={
-                    value !== null ? Number(value) : defaultMmFromBottom
-                  }
-                  wellDepthMm={wellDepthMm}
-                />
-              </div>
-            </Flex>
+      {(isXValueNearEdge || isYValueNearEdge || isZValueAtBottom) &&
+      !isDefault ? (
+        <Flex marginTop={SPACING.spacing8}>
+          <PDAlert
+            alertType="warning"
+            title=""
+            description={t('tip_position.warning')}
+          />
+        </Flex>
+      ) : null}
+
+      <div className={styles.main_row}>
+        <Flex alignItems="flex-start">
+          <Flex flexDirection={DIRECTION_COLUMN}>
+            <RadioGroup
+              value={isDefault ? 'default' : 'custom'}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                setIsDefault(e.currentTarget.value === 'default')
+              }}
+              options={[
+                {
+                  name: isMixAspDispField
+                    ? t('tip_position.radio_button.mix')
+                    : t('tip_position.radio_button.default', {
+                        defaultMmFromBottom,
+                      }),
+                  value: 'default',
+                },
+                {
+                  name: t('tip_position.radio_button.custom'),
+                  value: 'custom',
+                },
+              ]}
+              name="TipPositionOptions"
+            />
+            {TipPositionInputField}
+          </Flex>
+
+          <div className={styles.viz_group}>
+            <TipPositionAllViz
+              mmFromBottom={
+                zValue !== null ? Number(zValue) : defaultMmFromBottom
+              }
+              wellDepthMm={wellDepthMm}
+              xPosition={parseInt(xValue ?? '0')}
+              xWidthMm={wellXWidthMm}
+            />
           </div>
-        </AlertModal>
-      </HandleKeypress>
-    </Portal>
+        </Flex>
+      </div>
+    </AlertModal>,
+    getMainPagePortalEl()
   )
 }

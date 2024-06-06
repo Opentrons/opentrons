@@ -1,7 +1,12 @@
 """Multi-Channel Tips."""
 from typing import List, Dict
 
-from opentrons.protocol_api import ProtocolContext, Well, Labware, InstrumentContext
+from opentrons.protocol_api import (
+    ProtocolContext,
+    Well,
+    Labware,
+    InstrumentContext,
+)
 
 # Rows by Channel:
 #  - Rear Racks (slot-row=C)
@@ -55,18 +60,18 @@ CHANNEL_TO_TIP_ROW_LOOKUP_BACK = {  # zero indexed
     7: "A",
 }
 CHANNEL_TO_TIP_ROW_LOOKUP_BY_SLOT = {
-    "1": CHANNEL_TO_TIP_ROW_LOOKUP,
-    "2": CHANNEL_TO_TIP_ROW_LOOKUP,
-    "3": CHANNEL_TO_TIP_ROW_LOOKUP,
-    "4": CHANNEL_TO_TIP_ROW_LOOKUP,
-    "5": CHANNEL_TO_TIP_ROW_LOOKUP,
-    "6": CHANNEL_TO_TIP_ROW_LOOKUP,
-    "7": CHANNEL_TO_TIP_ROW_LOOKUP,
-    "8": CHANNEL_TO_TIP_ROW_LOOKUP,
-    "9": CHANNEL_TO_TIP_ROW_LOOKUP,
-    "10": CHANNEL_TO_TIP_ROW_LOOKUP_BACK,
-    "11": CHANNEL_TO_TIP_ROW_LOOKUP_BACK,
-    "12": CHANNEL_TO_TIP_ROW_LOOKUP_BACK,
+    "D1": CHANNEL_TO_TIP_ROW_LOOKUP,
+    "D2": CHANNEL_TO_TIP_ROW_LOOKUP,
+    "D3": CHANNEL_TO_TIP_ROW_LOOKUP,
+    "C1": CHANNEL_TO_TIP_ROW_LOOKUP,
+    "C2": CHANNEL_TO_TIP_ROW_LOOKUP,
+    "C3": CHANNEL_TO_TIP_ROW_LOOKUP,
+    "B1": CHANNEL_TO_TIP_ROW_LOOKUP,
+    "B2": CHANNEL_TO_TIP_ROW_LOOKUP,
+    "B3": CHANNEL_TO_TIP_ROW_LOOKUP,
+    "A1": CHANNEL_TO_TIP_ROW_LOOKUP_BACK,
+    "A2": CHANNEL_TO_TIP_ROW_LOOKUP_BACK,
+    "A3": CHANNEL_TO_TIP_ROW_LOOKUP_BACK,
 }
 REAR_CHANNELS = [0, 1, 2, 3]
 FRONT_CHANNELS = [4, 5, 6, 7]
@@ -100,34 +105,47 @@ def _get_racks(ctx: ProtocolContext) -> Dict[int, Labware]:
     }
 
 
-def _unused_tips_for_racks(racks: List[Labware]) -> List[Well]:
+def _unused_tips_for_racks(
+    ctx: ProtocolContext, pipette_mount: str, racks: List[Labware]
+) -> List[Well]:
     wells: List[Well] = []
     rows = "ABCDEFGH"
     for rack in racks:
         for col in range(1, 13):
             for row in rows:
                 wellname = f"{row}{col}"
-                next_well = rack.next_tip(1, rack[wellname])
+                next_well = rack.next_tip(
+                    1,
+                    rack[wellname],
+                )
                 if next_well is not None and wellname == next_well.well_name:
                     wells.append(rack[wellname])
     return wells
 
 
-def get_unused_tips(ctx: ProtocolContext, tip_volume: int) -> List[Well]:
+def get_unused_tips(
+    ctx: ProtocolContext, tip_volume: int, pipette_mount: str
+) -> List[Well]:
     """Use the labware's tip tracker to get a list of all unused tips for a given tip volume."""
     racks = [
         r for r in _get_racks(ctx).values() if r.wells()[0].max_volume == tip_volume
     ]
-    return _unused_tips_for_racks(racks)
+    return _unused_tips_for_racks(ctx, pipette_mount, racks)
 
 
-def get_tips_for_single(ctx: ProtocolContext, tip_volume: int) -> List[Well]:
+def get_tips_for_single(
+    ctx: ProtocolContext, tip_volume: int, pipette_mount: str
+) -> List[Well]:
     """Get tips for single channel."""
-    return get_unused_tips(ctx, tip_volume)
+    return get_unused_tips(ctx, tip_volume, pipette_mount)
 
 
 def get_tips_for_individual_channel_on_multi(
-    ctx: ProtocolContext, channel: int, tip_volume: int, pipette_volume: int
+    ctx: ProtocolContext,
+    channel: int,
+    tip_volume: int,
+    pipette_volume: int,
+    pipette_mount: str,
 ) -> List[Well]:
     """Get tips for a multi's channel."""
     print(f"getting {tip_volume} tips for channel {channel}")
@@ -140,7 +158,7 @@ def get_tips_for_individual_channel_on_multi(
     specific_racks: List[Labware] = []
     for slot in slots:
         specific_racks.append(all_racks[slot])
-    unused_tips = _unused_tips_for_racks(specific_racks)
+    unused_tips = _unused_tips_for_racks(ctx, pipette_mount, specific_racks)
     tips = [
         tip
         for tip in unused_tips
@@ -171,14 +189,14 @@ def get_tips(
 ) -> Dict[int, List[Well]]:
     """Get tips."""
     if pipette.channels == 1:
-        return {0: get_tips_for_single(ctx, tip_volume)}
+        return {0: get_tips_for_single(ctx, tip_volume, pipette.mount)}
     elif pipette.channels == 8:
         if all_channels:
             return {0: get_tips_for_all_channels_on_multi(ctx, tip_volume)}
         else:
             return {
                 channel: get_tips_for_individual_channel_on_multi(
-                    ctx, channel, tip_volume, int(pipette.max_volume)
+                    ctx, channel, tip_volume, int(pipette.max_volume), pipette.mount
                 )
                 for channel in range(pipette.channels)
             }

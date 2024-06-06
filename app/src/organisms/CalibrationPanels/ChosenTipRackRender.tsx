@@ -1,13 +1,13 @@
 import * as React from 'react'
 import { css } from 'styled-components'
 import {
-  Box,
-  Flex,
   ALIGN_CENTER,
+  Box,
   DIRECTION_ROW,
+  Flex,
   SPACING,
+  StyledText,
 } from '@opentrons/components'
-import { StyledText } from '../../atoms/text'
 import { labwareImages } from './labwareImages'
 
 import type { SelectOption } from '@opentrons/components'

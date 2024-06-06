@@ -9,9 +9,9 @@ import {
   DIRECTION_ROW,
   JUSTIFY_SPACE_BETWEEN,
   DIRECTION_COLUMN,
+  StyledText,
 } from '@opentrons/components'
 import { getDisplayVolume } from '@opentrons/shared-data'
-import { StyledText } from '../../atoms/text'
 
 import type {
   LabwareDefinition,

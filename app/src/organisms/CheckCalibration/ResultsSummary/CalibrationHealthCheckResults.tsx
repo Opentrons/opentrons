@@ -2,14 +2,14 @@ import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 
 import {
-  Flex,
-  DIRECTION_ROW,
-  JUSTIFY_SPACE_BETWEEN,
-  TYPOGRAPHY,
   COLORS,
+  DIRECTION_ROW,
+  Flex,
+  JUSTIFY_SPACE_BETWEEN,
+  StyledText,
+  TYPOGRAPHY,
 } from '@opentrons/components'
 
-import { StyledText } from '../../../atoms/text'
 import { StatusLabel } from '../../../atoms/StatusLabel'
 
 interface CalibrationHealthCheckResultsProps {
@@ -30,16 +30,10 @@ export const CalibrationHealthCheckResults = ({
             : t('calibration_complete')
         }
         backgroundColor={
-          isCalibrationRecommended
-            ? COLORS.warningBackgroundLight
-            : COLORS.successBackgroundLight
+          isCalibrationRecommended ? COLORS.yellow20 : COLORS.green20
         }
-        iconColor={
-          isCalibrationRecommended
-            ? COLORS.warningEnabled
-            : COLORS.successEnabled
-        }
-        textColor={COLORS.darkBlackEnabled}
+        iconColor={isCalibrationRecommended ? COLORS.yellow50 : COLORS.green50}
+        textColor={COLORS.black90}
         fontWeight={TYPOGRAPHY.fontWeightSemiBold}
         iconSize="0.3125rem"
       ></StatusLabel>

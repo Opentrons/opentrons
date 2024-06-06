@@ -1,41 +1,44 @@
+import { describe, it, vi, afterEach, expect } from 'vitest'
+
+import { fixtureTiprack10ul, fixtureTiprack300ul } from '@opentrons/shared-data'
+
 import { getLatestLabwareDef } from '../getLabware'
 import { findLabwareDefWithCustom } from '../findLabware'
+
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
-import fixture_tiprack_10_ul from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_10_ul.json'
-import fixture_tiprack_300_ul from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_300_ul.json'
 
-jest.mock('../getLabware', () => ({
-  getLatestLabwareDef: jest.fn(),
-}))
+vi.mock('../getLabware', async importOriginal => {
+  const actual = await importOriginal<typeof getLatestLabwareDef>()
+  return {
+    ...actual,
+    getLatestLabwareDef: vi.fn(),
+  }
+})
 
-const mockGetLabware = getLatestLabwareDef as jest.MockedFunction<
-  typeof getLatestLabwareDef
->
-
-const fixtureTipRack10ul = fixture_tiprack_10_ul as LabwareDefinition2
+const fixtureTipRack10ul = fixtureTiprack10ul as LabwareDefinition2
 
 const fixtureTipRack10ulCustomBeta = {
-  ...fixture_tiprack_10_ul,
+  ...fixtureTiprack10ul,
   namespace: 'custom_beta',
 } as LabwareDefinition2
 
 const fixtureTipRack10ulVersion2 = {
-  ...fixture_tiprack_10_ul,
+  ...fixtureTiprack10ul,
   version: 2,
 } as LabwareDefinition2
 
 const fixtureTipRack300ulOpentrons = {
-  ...fixture_tiprack_300_ul,
+  ...fixtureTiprack300ul,
   namespace: 'opentrons',
 } as LabwareDefinition2
 
 describe('findLabwareDefWithCustom', () => {
   afterEach(() => {
-    jest.resetAllMocks()
+    vi.resetAllMocks()
   })
 
   it('finds standard labware with namesearch', () => {
-    mockGetLabware.mockReturnValue(fixtureTipRack300ulOpentrons)
+    vi.mocked(getLatestLabwareDef).mockReturnValue(fixtureTipRack300ulOpentrons)
 
     expect(
       findLabwareDefWithCustom(
@@ -46,7 +49,9 @@ describe('findLabwareDefWithCustom', () => {
       )
     ).toEqual(fixtureTipRack300ulOpentrons)
 
-    expect(mockGetLabware).toHaveBeenCalledWith('opentrons_96_tiprack_300ul')
+    expect(vi.mocked(getLatestLabwareDef)).toHaveBeenCalledWith(
+      'opentrons_96_tiprack_300ul'
+    )
   })
 
   it('handles no-custom-labware', () => {
@@ -63,7 +68,7 @@ describe('findLabwareDefWithCustom', () => {
   const SPECS = [
     {
       should: 'find nothing with no specs',
-      customLabware: [fixture_tiprack_10_ul, fixture_tiprack_300_ul],
+      customLabware: [fixtureTiprack10ul, fixtureTiprack300ul],
       expect: null,
       namespace: null,
       loadName: null,
@@ -71,8 +76,8 @@ describe('findLabwareDefWithCustom', () => {
     },
     {
       should: 'find the first item with only namespace',
-      customLabware: [fixture_tiprack_10_ul, fixture_tiprack_300_ul],
-      expect: fixture_tiprack_10_ul,
+      customLabware: [fixtureTiprack10ul, fixtureTiprack300ul],
+      expect: fixtureTiprack10ul,
       namespace: 'fixture',
       loadName: null,
       version: null,
@@ -92,7 +97,7 @@ describe('findLabwareDefWithCustom', () => {
     {
       should: 'find the right item with loadName and namespace',
       customLabware: [
-        fixture_tiprack_10_ul,
+        fixtureTiprack10ul,
         fixtureTipRack10ulCustomBeta,
         fixtureTipRack10ulVersion2,
       ],
@@ -118,7 +123,6 @@ describe('findLabwareDefWithCustom', () => {
   SPECS.forEach(spec => {
     // TODO(mc, 2021-05-19): these tests are failing due to bug in code under test
     // see: https://github.com/Opentrons/opentrons/issues/7823
-    // eslint-disable-next-line jest/no-disabled-tests
     it.skip(`should ${spec.should}`, () => {
       expect(
         findLabwareDefWithCustom(

@@ -3,7 +3,7 @@ import {
   PAUSE_UNTIL_TEMP,
   PAUSE_UNTIL_RESUME,
 } from '../../../constants'
-import { FormData } from '../../../form-types'
+import type { FormData } from '../../../form-types'
 import type {
   WaitForTemperatureArgs,
   PauseArgs,

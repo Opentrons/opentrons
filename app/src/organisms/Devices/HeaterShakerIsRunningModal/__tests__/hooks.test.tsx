@@ -1,7 +1,9 @@
 import * as React from 'react'
 import { Provider } from 'react-redux'
+import { describe, it, vi, beforeEach, expect } from 'vitest'
+import '@testing-library/jest-dom/vitest'
 import { createStore } from 'redux'
-import { renderHook } from '@testing-library/react-hooks'
+import { renderHook } from '@testing-library/react'
 import { HEATERSHAKER_MODULE_V1 } from '@opentrons/shared-data'
 import { useMostRecentCompletedAnalysis } from '../../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import { useHeaterShakerModuleIdsFromRun } from '../hooks'
@@ -10,26 +12,18 @@ import { RUN_ID_1 } from '../../../RunTimeControl/__fixtures__'
 import type { Store } from 'redux'
 import type { State } from '../../../../redux/types'
 
-jest.mock('../../hooks')
-jest.mock('../../../LabwarePositionCheck/useMostRecentCompletedAnalysis')
-
-const mockUseMostRecentCompletedAnalysis = useMostRecentCompletedAnalysis as jest.MockedFunction<
-  typeof useMostRecentCompletedAnalysis
->
+vi.mock('../../hooks')
+vi.mock('../../../LabwarePositionCheck/useMostRecentCompletedAnalysis')
 
 describe('useHeaterShakerModuleIdsFromRun', () => {
-  const store: Store<State> = createStore(jest.fn(), {})
+  const store: Store<State> = createStore(vi.fn(), {})
 
   beforeEach(() => {
-    store.dispatch = jest.fn()
-  })
-
-  afterEach(() => {
-    jest.restoreAllMocks()
+    store.dispatch = vi.fn()
   })
 
   it('should return a heater shaker module id from protocol analysis load command result', () => {
-    mockUseMostRecentCompletedAnalysis.mockReturnValue({
+    vi.mocked(useMostRecentCompletedAnalysis).mockReturnValue({
       pipettes: {},
       labware: {},
       modules: {
@@ -63,9 +57,9 @@ describe('useHeaterShakerModuleIdsFromRun', () => {
         },
       ],
     } as any)
-    const wrapper: React.FunctionComponent<{}> = ({ children }) => (
-      <Provider store={store}>{children}</Provider>
-    )
+    const wrapper: React.FunctionComponent<{ children: React.ReactNode }> = ({
+      children,
+    }) => <Provider store={store}>{children}</Provider>
     const { result } = renderHook(
       () => useHeaterShakerModuleIdsFromRun(RUN_ID_1),
       { wrapper }
@@ -76,7 +70,7 @@ describe('useHeaterShakerModuleIdsFromRun', () => {
   })
 
   it('should return two heater shaker module ids if two modules are loaded in the protocol', () => {
-    mockUseMostRecentCompletedAnalysis.mockReturnValue({
+    vi.mocked(useMostRecentCompletedAnalysis).mockReturnValue({
       pipettes: {},
       labware: {},
       modules: {
@@ -133,9 +127,9 @@ describe('useHeaterShakerModuleIdsFromRun', () => {
       ],
     } as any)
 
-    const wrapper: React.FunctionComponent<{}> = ({ children }) => (
-      <Provider store={store}>{children}</Provider>
-    )
+    const wrapper: React.FunctionComponent<{ children: React.ReactNode }> = ({
+      children,
+    }) => <Provider store={store}>{children}</Provider>
     const { result } = renderHook(
       () => useHeaterShakerModuleIdsFromRun(RUN_ID_1),
       { wrapper }

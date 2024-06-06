@@ -1,7 +1,8 @@
 import * as React from 'react'
-import { renderWithProviders } from '@opentrons/components'
-import { fireEvent } from '@testing-library/react'
+import { fireEvent, screen } from '@testing-library/react'
+import { vi, it, describe, expect, beforeEach, afterEach } from 'vitest'
 
+import { renderWithProviders } from '../../../../__testing-utils__'
 import { i18n } from '../../../../i18n'
 import { DevicesEmptyState } from '../../../../organisms/Devices/DevicesEmptyState'
 import { RobotCard } from '../../../../organisms/Devices/RobotCard'
@@ -18,24 +19,9 @@ import {
 } from '../../../../redux/discovery/__fixtures__'
 import { DevicesLanding } from '..'
 
-jest.mock('../../../../organisms/Devices/DevicesEmptyState')
-jest.mock('../../../../organisms/Devices/RobotCard')
-jest.mock('../../../../redux/discovery')
-
-const mockGetScanning = getScanning as jest.MockedFunction<typeof getScanning>
-const mockRobotCard = RobotCard as jest.MockedFunction<typeof RobotCard>
-const mockDevicesEmptyState = DevicesEmptyState as jest.MockedFunction<
-  typeof DevicesEmptyState
->
-const mockGetConnectableRobots = getConnectableRobots as jest.MockedFunction<
-  typeof getConnectableRobots
->
-const mockGetReachableRobots = getReachableRobots as jest.MockedFunction<
-  typeof getReachableRobots
->
-const mockGetUnreachableRobots = getUnreachableRobots as jest.MockedFunction<
-  typeof getUnreachableRobots
->
+vi.mock('../../../../organisms/Devices/DevicesEmptyState')
+vi.mock('../../../../organisms/Devices/RobotCard')
+vi.mock('../../../../redux/discovery')
 
 const render = () => {
   return renderWithProviders(<DevicesLanding />, {
@@ -45,85 +31,87 @@ const render = () => {
 
 describe('DevicesLanding', () => {
   beforeEach(() => {
-    mockGetScanning.mockReturnValue(false)
-    mockRobotCard.mockImplementation(({ robot: { name } }) => (
+    vi.mocked(getScanning).mockReturnValue(false)
+    vi.mocked(RobotCard).mockImplementation(({ robot: { name } }) => (
       <div>Mock Robot {name}</div>
     ))
-    mockDevicesEmptyState.mockReturnValue(<div>Mock DevicesEmptyState</div>)
-    mockGetConnectableRobots.mockReturnValue([
+    vi.mocked(DevicesEmptyState).mockReturnValue(
+      <div>Mock DevicesEmptyState</div>
+    )
+    vi.mocked(getConnectableRobots).mockReturnValue([
       { ...mockConnectableRobot, name: 'connectableRobot' },
     ])
-    mockGetReachableRobots.mockReturnValue([
+    vi.mocked(getReachableRobots).mockReturnValue([
       { ...mockReachableRobot, name: 'reachableRobot' },
     ])
-    mockGetUnreachableRobots.mockReturnValue([
+    vi.mocked(getUnreachableRobots).mockReturnValue([
       { ...mockUnreachableRobot, name: 'unreachableRobot' },
     ])
   })
   afterEach(() => {
-    jest.resetAllMocks()
+    vi.resetAllMocks()
   })
 
   it('renders a Devices title', () => {
-    const [{ getByText }] = render()
+    render()
 
-    getByText('Devices')
+    screen.getByText('Devices')
   })
 
   it('renders the DevicesEmptyState when no robots are found', () => {
-    mockGetConnectableRobots.mockReturnValue([])
-    mockGetReachableRobots.mockReturnValue([])
-    mockGetUnreachableRobots.mockReturnValue([])
-    const [{ getByText }] = render()
+    vi.mocked(getConnectableRobots).mockReturnValue([])
+    vi.mocked(getReachableRobots).mockReturnValue([])
+    vi.mocked(getUnreachableRobots).mockReturnValue([])
+    render()
 
-    getByText('Mock DevicesEmptyState')
+    screen.getByText('Mock DevicesEmptyState')
   })
 
   it('renders the Looking for robots copy when scanning is true and there are no devices', () => {
-    mockGetScanning.mockReturnValue(true)
-    mockGetConnectableRobots.mockReturnValue([])
-    mockGetReachableRobots.mockReturnValue([])
-    mockGetUnreachableRobots.mockReturnValue([])
-    const [{ getByText }] = render()
+    vi.mocked(getScanning).mockReturnValue(true)
+    vi.mocked(getConnectableRobots).mockReturnValue([])
+    vi.mocked(getReachableRobots).mockReturnValue([])
+    vi.mocked(getUnreachableRobots).mockReturnValue([])
+    render()
 
-    getByText('Looking for robots')
+    screen.getByText('Looking for robots')
   })
 
   it('renders the Icon when scanning is true and there are no devices', () => {
-    mockGetScanning.mockReturnValue(true)
-    mockGetConnectableRobots.mockReturnValue([])
-    mockGetReachableRobots.mockReturnValue([])
-    mockGetUnreachableRobots.mockReturnValue([])
-    const [{ getByLabelText }] = render()
+    vi.mocked(getScanning).mockReturnValue(true)
+    vi.mocked(getConnectableRobots).mockReturnValue([])
+    vi.mocked(getReachableRobots).mockReturnValue([])
+    vi.mocked(getUnreachableRobots).mockReturnValue([])
+    render()
 
-    getByLabelText('ot-spinner')
+    screen.getByLabelText('ot-spinner')
   })
 
   it('renders available and not available sections when both are present', () => {
-    const [{ getByText, getByTestId, queryByText }] = render()
+    render()
 
-    getByText('Mock Robot connectableRobot')
-    getByText('Available (1)')
-    getByText('Not available (2)')
+    screen.getByText('Mock Robot connectableRobot')
+    screen.getByText('Available (1)')
+    screen.getByText('Not available (2)')
 
-    expect(queryByText('Mock Robot unreachableRobot')).toBeNull()
-    expect(queryByText('Mock Robot reachableRobot')).toBeNull()
+    expect(screen.queryByText('Mock Robot unreachableRobot')).toBeNull()
+    expect(screen.queryByText('Mock Robot reachableRobot')).toBeNull()
 
-    const expandButton = getByTestId(
+    const expandButton = screen.getByTestId(
       'CollapsibleSection_expand_Not available (2)'
     )
     fireEvent.click(expandButton)
 
-    getByText('Mock Robot unreachableRobot')
-    getByText('Mock Robot reachableRobot')
+    screen.getByText('Mock Robot unreachableRobot')
+    screen.getByText('Mock Robot reachableRobot')
   })
   it('does not render available or not available sections when none are present', () => {
-    mockGetConnectableRobots.mockReturnValue([])
-    mockGetReachableRobots.mockReturnValue([])
-    mockGetUnreachableRobots.mockReturnValue([])
-    const [{ queryByText }] = render()
+    vi.mocked(getConnectableRobots).mockReturnValue([])
+    vi.mocked(getReachableRobots).mockReturnValue([])
+    vi.mocked(getUnreachableRobots).mockReturnValue([])
+    render()
 
-    expect(queryByText('Available')).toBeNull()
-    expect(queryByText('Not available')).toBeNull()
+    expect(screen.queryByText('Available')).toBeNull()
+    expect(screen.queryByText('Not available')).toBeNull()
   })
 })

@@ -22,7 +22,7 @@ BUILD_NUMBER ?=
 
 ot_project := $(OPENTRONS_PROJECT)
 project_rs_default = $(if $(ot_project),$(ot_project),robot-stack)
-project_ot3_default = $(if $(ot_project),$(ot_project),ot3)
+project_ir_default = $(if $(ot_project),$(ot_project),ot3)
 
 # this may be set as an environment variable to select the version of
 # python to run if pyenv is not available. it should always be set to
@@ -33,7 +33,7 @@ BUILD_DIR := dist
 
 
 wheel_file = $(BUILD_DIR)/$(call python_get_wheelname,shared-data,$(project_rs_default),opentrons_shared_data,$(BUILD_NUMBER),../../scripts/python_build_utils.py)
-sdist_file = $(BUILD_DIR)/$(call python_get_sdistname,shared-data,$(project_ot3_default),opentrons_shared_data,,../../scripts/python_build_utils.py)
+sdist_file = $(BUILD_DIR)/$(call python_get_sdistname,shared-data,$(project_rs_default),opentrons_shared_data,,../../scripts/python_build_utils.py)
 
 py_sources = $(filter %.py,$(shell $(SHX) find opentrons_shared_data)) opentrons_shared_data/py.typed
 deck_sources = $(wildcard ../deck/definitions/*/*.json) $(wildcard ../deck/schemas/*.json)
@@ -50,7 +50,8 @@ tests ?= tests
 twine_auth_args := --username $(pypi_username) --password $(pypi_password)
 twine_repository_url ?= $(pypi_test_upload_url)
 
-clean_cmd = $(SHX) rm -rf build $(BUILD_DIR) .coverage coverage.xml '*.egg-info' ' **/__pycache__' '**/*.pyc' 'opentrons_shared_data/**/.mypy_cache'
+clean_cmd = $(SHX) rm -rf build $(BUILD_DIR) .coverage coverage.xml '*.egg-info'
+clean_cache_cmd	 = $(SHX) rm -rf '**/__pycache__' '**/*.pyc' '**/.mypy_cache'
 
 .PHONY: all
 all: clean sdist wheel
@@ -74,6 +75,7 @@ teardown-py:
 .PHONY: clean
 clean:
 	$(clean_cmd)
+	$(clean_cache_cmd)
 
 .PHONY: wheel
 wheel: export OPENTRONS_PROJECT=$(project_rs_default)
@@ -84,7 +86,7 @@ wheel: setup.py $(py_sources) $(json_sources)
 
 
 .PHONY: sdist
-sdist: export OPENTRONS_PROJECT=$(project_ot3_default)
+sdist: export OPENTRONS_PROJECT=$(project_rs_default)
 sdist: setup.py $(py_sources) $(json_sources)
 	$(SHX) mkdir -p build
 	$(python) setup.py sdist
@@ -118,8 +120,8 @@ push-ot3: push-no-restart-ot3
 	$(call restart-server,$(host),$(ssh_key),$(ssh_opts),opentrons-robot-server)
 
 .PHONY: deploy
-deploy: wheel
-	$(call python_upload_package,$(twine_auth_args),$(twine_repository_url),$(wheel_file))
+deploy: wheel sdist
+	$(call python_upload_package,$(twine_auth_args),$(twine_repository_url),$(wheel_file),$(sdist_file))
 
 .PHONY: test
 test:

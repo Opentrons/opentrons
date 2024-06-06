@@ -9,10 +9,10 @@ import {
   Flex,
   Icon,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
-import { StyledText } from '../../atoms/text'
 import { MenuList } from '../../atoms/MenuList'
 import { MenuItem } from '../../atoms/MenuList/MenuItem'
 import { home, ROBOT } from '../../redux/robot-controls'
@@ -82,7 +82,7 @@ export function NavigationMenu(props: NavigationMenuProps): JSX.Element {
             <Icon
               name="restart"
               size="2.5rem"
-              color={COLORS.black}
+              color={COLORS.black90}
               aria-label="restart_icon"
             />
             <StyledText
@@ -96,7 +96,9 @@ export function NavigationMenu(props: NavigationMenuProps): JSX.Element {
         </MenuItem>
         <MenuItem
           key="deck-configuration"
-          onClick={() => history.push('/deck-configuration')}
+          onClick={() => {
+            history.push('/deck-configuration')
+          }}
         >
           <Flex alignItems={ALIGN_CENTER}>
             <Icon name="deck-map" aria-label="deck-map_icon" size="2.5rem" />
@@ -114,7 +116,7 @@ export function NavigationMenu(props: NavigationMenuProps): JSX.Element {
             <Icon
               name="light"
               size="2.5rem"
-              color={COLORS.black}
+              color={COLORS.black90}
               aria-label="light_icon"
             />
             <StyledText

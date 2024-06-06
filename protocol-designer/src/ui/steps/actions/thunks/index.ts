@@ -1,4 +1,3 @@
-import assert from 'assert'
 import last from 'lodash/last'
 import {
   getUnsavedForm,
@@ -19,9 +18,9 @@ import {
 } from '../../../../tutorial'
 import * as uiModuleSelectors from '../../../../ui/modules/selectors'
 import * as fileDataSelectors from '../../../../file-data/selectors'
-import { StepType, StepIdType, FormData } from '../../../../form-types'
-import { ThunkAction } from '../../../../types'
-import {
+import type { StepType, StepIdType, FormData } from '../../../../form-types'
+import type { ThunkAction } from '../../../../types'
+import type {
   DuplicateStepAction,
   DuplicateMultipleStepsAction,
   SelectMultipleStepsAction,
@@ -41,34 +40,46 @@ export const addAndSelectStepWithHints: (arg: {
   const magnetModuleHasLabware = uiModuleSelectors.getMagnetModuleHasLabware(
     state
   )
-  const temperatureModuleHasLabware = uiModuleSelectors.getTemperatureModuleHasLabware(
+  const temperatureModulesHaveLabware = uiModuleSelectors.getTemperatureModulesHaveLabware(
     state
   )
   const thermocyclerModuleHasLabware = uiModuleSelectors.getThermocyclerModuleHasLabware(
     state
   )
-  const temperatureModuleOnDeck = uiModuleSelectors.getSingleTemperatureModuleId(
+  const temperatureModuleOnDeck = uiModuleSelectors.getTemperatureModuleIds(
     state
   )
-  const thermocyclerModuleOnDeck = uiModuleSelectors.getSingleThermocyclerModuleId(
+  const heaterShakerModuleHasLabware = uiModuleSelectors.getHeaterShakerModuleHasLabware(
     state
+  )
+
+  const tempHasNoLabware = temperatureModulesHaveLabware.some(
+    module => !module.hasLabware
   )
   // TODO: Ian 2019-01-17 move out to centralized step info file - see #2926
   const stepNeedsLiquid = ['mix', 'moveLiquid'].includes(payload.stepType)
   const stepMagnetNeedsLabware = ['magnet'].includes(payload.stepType)
   const stepTemperatureNeedsLabware = ['temperature'].includes(payload.stepType)
+  const stepThermocyclerNeedsLabware = ['thermocycler'].includes(
+    payload.stepType
+  )
+  const stepHeaterShakerNeedsLabware = ['heaterShaker'].includes(
+    payload.stepType
+  )
+
   const stepModuleMissingLabware =
     (stepMagnetNeedsLabware && !magnetModuleHasLabware) ||
-    (stepTemperatureNeedsLabware &&
-      ((temperatureModuleOnDeck && !temperatureModuleHasLabware) ||
-        (thermocyclerModuleOnDeck && !thermocyclerModuleHasLabware)))
+    (stepThermocyclerNeedsLabware && !thermocyclerModuleHasLabware) ||
+    (temperatureModuleOnDeck?.length === 0 && stepTemperatureNeedsLabware) ||
+    (stepHeaterShakerNeedsLabware && !heaterShakerModuleHasLabware)
 
   if (stepNeedsLiquid && !deckHasLiquid) {
     dispatch(tutorialActions.addHint('add_liquids_and_labware'))
   }
-
   if (stepModuleMissingLabware) {
     dispatch(tutorialActions.addHint('module_without_labware'))
+  } else if (temperatureModuleOnDeck != null && tempHasNoLabware) {
+    dispatch(tutorialActions.addHint('multiple_modules_without_labware'))
   }
 }
 export interface ReorderSelectedStepAction {
@@ -167,7 +178,7 @@ export const saveStepForm: () => ThunkAction<any> = () => (
 
   // this check is only for Flow. At this point, unsavedForm should always be populated
   if (!unsavedForm) {
-    assert(
+    console.assert(
       false,
       'Tried to saveStepForm with falsey unsavedForm. This should never be able to happen.'
     )
@@ -204,7 +215,7 @@ export const saveSetTempFormWithAddedPauseUntilTemp: () => ThunkAction<any> = ()
 
   // this check is only for Flow. At this point, unsavedForm should always be populated
   if (!unsavedSetTemperatureForm) {
-    assert(
+    console.assert(
       false,
       'Tried to saveSetTempFormWithAddedPauseUntilTemp with falsey unsavedForm. This should never be able to happen.'
     )
@@ -215,7 +226,7 @@ export const saveSetTempFormWithAddedPauseUntilTemp: () => ThunkAction<any> = ()
 
   if (!isPristineSetTempForm) {
     // this check should happen upstream (before dispatching saveSetTempFormWithAddedPauseUntilTemp in the first place)
-    assert(
+    console.assert(
       false,
       `tried to saveSetTempFormWithAddedPauseUntilTemp but form ${id} is not a pristine set temp form`
     )
@@ -224,7 +235,7 @@ export const saveSetTempFormWithAddedPauseUntilTemp: () => ThunkAction<any> = ()
 
   const temperature = unsavedSetTemperatureForm?.targetTemperature
 
-  assert(
+  console.assert(
     temperature != null && temperature !== '',
     `tried to auto-add a pause until temp, but targetTemperature is missing: ${temperature}`
   )
@@ -268,7 +279,10 @@ export const saveSetTempFormWithAddedPauseUntilTemp: () => ThunkAction<any> = ()
   if (unsavedPauseForm != null) {
     dispatch(_saveStepForm(unsavedPauseForm))
   } else {
-    assert(false, 'could not auto-save pause form, getUnsavedForm returned')
+    console.assert(
+      false,
+      'could not auto-save pause form, getUnsavedForm returned'
+    )
   }
 }
 
@@ -283,7 +297,7 @@ export const saveHeaterShakerFormWithAddedPauseUntilTemp: () => ThunkAction<any>
   )
 
   if (!unsavedHeaterShakerForm) {
-    assert(
+    console.assert(
       false,
       'Tried to saveSetHeaterShakerTempFormWithAddedPauseUntilTemp with falsey unsavedForm. This should never be able to happen.'
     )
@@ -293,7 +307,7 @@ export const saveHeaterShakerFormWithAddedPauseUntilTemp: () => ThunkAction<any>
   const { id } = unsavedHeaterShakerForm
 
   if (!isPristineSetHeaterShakerTempForm) {
-    assert(
+    console.assert(
       false,
       `tried to saveSetHeaterShakerTempFormWithAddedPauseUntilTemp but form ${id} is not a pristine set heater shaker temp form`
     )
@@ -302,7 +316,7 @@ export const saveHeaterShakerFormWithAddedPauseUntilTemp: () => ThunkAction<any>
 
   const temperature = unsavedHeaterShakerForm?.targetHeaterShakerTemperature
 
-  assert(
+  console.assert(
     temperature != null && temperature !== '',
     `tried to auto-add a pause until temp, but targetHeaterShakerTemperature is missing: ${temperature}`
   )
@@ -341,6 +355,9 @@ export const saveHeaterShakerFormWithAddedPauseUntilTemp: () => ThunkAction<any>
   if (unsavedPauseForm != null) {
     dispatch(_saveStepForm(unsavedPauseForm))
   } else {
-    assert(false, 'could not auto-save pause form, getUnsavedForm returned')
+    console.assert(
+      false,
+      'could not auto-save pause form, getUnsavedForm returned'
+    )
   }
 }
