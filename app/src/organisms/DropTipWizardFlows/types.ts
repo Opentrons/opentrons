@@ -13,10 +13,15 @@ export interface ErrorDetails {
 
 export type IssuedCommandsType = 'setup' | 'fixit'
 
+interface CopyOverrides {
+  tipDropCompleteBtn: 'proceed_to_cancel' | 'proceed_to_tip_selection'
+}
+
 export interface FixitCommandTypeUtils {
   runId: string
   failedCommandId: string
-  onCloseFlow: () => void
+  onCloseFlow: () => Promise<void>
+  copyOverrides: CopyOverrides
 }
 
 export type DropTipWizardContainerProps = DropTipWizardProps & {

@@ -50,6 +50,7 @@ export type DropTipWizardProps = DropTipWizardFlowsProps &
 export function DropTipWizard(props: DropTipWizardProps): JSX.Element {
   const {
     issuedCommandsType,
+    fixitCommandTypeUtils,
     activeMaintenanceRunId,
     proceed,
     goBack,
@@ -81,9 +82,15 @@ export function DropTipWizard(props: DropTipWizardProps): JSX.Element {
       return Promise.reject(new Error('No active maintenance run.'))
     }
   }
+
+  // Either proceed to drop tip if blowout or execute the close flow routine, accounting for the commands type.
   const proceedWithConditionalClose = (): Promise<void> => {
     if (isFinalWizardStep) {
-      return dropTipCommands.handleCleanUpAndClose()
+      if (fixitCommandTypeUtils != null) {
+        return fixitCommandTypeUtils.onCloseFlow()
+      } else {
+        return dropTipCommands.handleCleanUpAndClose()
+      }
     } else {
       return proceed()
     }
@@ -160,7 +167,6 @@ export function DropTipWizardSetupType(
   )
 }
 
-// TOME: You can probably clean up a lot of these props by just passing them directly itno components.
 export const DropTipWizardContent = (
   props: DropTipWizardContainerProps
 ): JSX.Element => {
@@ -170,6 +176,7 @@ export const DropTipWizardContent = (
     currentStep,
     errorDetails,
     isCommandInProgress,
+    fixitCommandTypeUtils,
     isExiting,
     proceed,
     proceedToRoute,
@@ -289,6 +296,18 @@ export const DropTipWizardContent = (
       }
     }
 
+    const buildProceedText = (): string => {
+      if (fixitCommandTypeUtils != null) {
+        const btnText = fixitCommandTypeUtils.copyOverrides.tipDropCompleteBtn
+
+        return t(`drop_tip_wizard::${btnText}`)
+      } else {
+        return currentStep === BLOWOUT_SUCCESS
+          ? i18n.format(t('shared:continue'), 'capitalize')
+          : i18n.format(t('shared:exit'), 'capitalize')
+      }
+    }
+
     return (
       <Success
         {...props}
@@ -298,11 +317,7 @@ export const DropTipWizardContent = (
             : t('drop_tip_complete')
         }
         handleProceed={handleProceed}
-        proceedText={
-          currentStep === BLOWOUT_SUCCESS
-            ? i18n.format(t('shared:continue'), 'capitalize')
-            : i18n.format(t('shared:exit'), 'capitalize')
-        }
+        proceedText={buildProceedText()}
       />
     )
   }
