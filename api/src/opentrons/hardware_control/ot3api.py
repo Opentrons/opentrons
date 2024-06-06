@@ -2626,7 +2626,6 @@ class OT3API(
         probe_start_pos = pos._replace(z=probe_settings.starting_mount_height)
         await self.move_to(mount, probe_start_pos)
         total_z_travel = probe_settings.max_z_distance
-        found = False
         z_travels = self._get_probe_distances(
             checked_mount,
             total_z_travel,
@@ -2634,44 +2633,39 @@ class OT3API(
             probe_settings.mount_speed,
         )
         error: Optional[LiquidNotFoundError] = None
-        while len(z_travels) > 0 and not found:
-            try:
-                if probe_settings.aspirate_while_sensing:
-                    await self._move_to_plunger_bottom(mount, rate=1.0)
-                else:
-                    # find the ideal travel distance by multiplying the plunger speed
-                    # by the time it will take to complete the z move.
-                    ideal_travel = probe_settings.plunger_speed * (
-                        z_travels[0] / probe_settings.mount_speed
-                    )
-                    assert (
-                        instrument.plunger_positions.bottom - ideal_travel
-                        >= instrument.plunger_positions.top
-                    )
-                    target_point = instrument.plunger_positions.bottom - ideal_travel
-                    target_pos = target_position_from_plunger(
-                        checked_mount, target_point, self._current_position
-                    )
-                    max_speeds = self.config.motion_settings.default_max_speed
-                    speed = max_speeds[self.gantry_load][OT3AxisKind.P]
-                    await self._move(target_pos, speed=speed, acquire_lock=True)
+        for z_travel in z_travels:
 
+            if probe_settings.aspirate_while_sensing:
+                await self._move_to_plunger_bottom(mount, rate=1.0)
+            else:
+                # find the ideal travel distance by multiplying the plunger speed
+                # by the time it will take to complete the z move.
+                ideal_travel = probe_settings.plunger_speed * (
+                    z_travel / probe_settings.mount_speed
+                )
+                assert (
+                    instrument.plunger_positions.bottom - ideal_travel
+                    >= instrument.plunger_positions.top
+                )
+                target_point = instrument.plunger_positions.bottom - ideal_travel
+                target_pos = target_position_from_plunger(
+                    checked_mount, target_point, self._current_position
+                )
+                max_speeds = self.config.motion_settings.default_max_speed
+                speed = max_speeds[self.gantry_load][OT3AxisKind.P]
+                await self._move(target_pos, speed=speed, acquire_lock=True)
+            try:
                 height = await self._liquid_probe_pass(
                     mount,
                     probe_settings,
                     probe if probe else InstrumentProbeType.PRIMARY,
-                    z_travels[0],
+                    z_travel,
                 )
                 # if we made it here without an error we found the liquid
-                found = True
+                error = None
+                break
             except LiquidNotFoundError as lnfe:
-                z_travels.pop(0)
-                if len(z_travels) == 0:
-                    # we have no more distance to go so stash the error so we can raise it after moving out of the well
-                    error = lnfe
-            except Exception as e:
-                # Unexpected error occured, raise it up
-                raise e
+                error = lnfe
         await self.move_to(mount, probe_start_pos)
         if error is not None:
             # if we never found an liquid raise an error
