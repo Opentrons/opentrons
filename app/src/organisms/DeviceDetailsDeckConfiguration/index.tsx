@@ -167,7 +167,9 @@ export function DeviceDetailsDeckConfiguration({
           <Link
             role="button"
             css={TYPOGRAPHY.linkPSemiBold}
-            onClick={() => setShowSetupInstructionsModal(true)}
+            onClick={() => {
+              setShowSetupInstructionsModal(true)
+            }}
           >
             {t('setup_instructions')}
           </Link>

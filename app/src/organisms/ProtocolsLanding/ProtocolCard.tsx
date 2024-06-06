@@ -99,7 +99,9 @@ export function ProtocolCard(props: ProtocolCardProps): JSX.Element | null {
       minWidth="36rem"
       padding={SPACING.spacing16}
       position="relative"
-      onClick={() => history.push(`/protocols/${protocolKey}`)}
+      onClick={() => {
+        history.push(`/protocols/${protocolKey}`)
+      }}
     >
       <ErrorBoundary fallback={UnknownAttachmentError}>
         <AnalysisInfo

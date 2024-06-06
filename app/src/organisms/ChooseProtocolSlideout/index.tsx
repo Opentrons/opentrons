@@ -265,8 +265,12 @@ export function ChooseProtocolSlideoutComponent(
             caption={`${runtimeParam.min}-${runtimeParam.max}`}
             id={id}
             error={error}
-            onBlur={() => setIsInputFocused(false)}
-            onFocus={() => setIsInputFocused(true)}
+            onBlur={() => {
+              setIsInputFocused(false)
+            }}
+            onFocus={() => {
+              setIsInputFocused(true)
+            }}
             onChange={e => {
               const clone = runTimeParametersOverrides.map((parameter, i) => {
                 if (i === index) {
@@ -362,10 +366,9 @@ export function ChooseProtocolSlideoutComponent(
               resetRunTimeParameters?.()
             } else {
               setShowRestoreValuesTooltip(true)
-              setTimeout(
-                () => setShowRestoreValuesTooltip(false),
-                TOOLTIP_DELAY_MS
-              )
+              setTimeout(() => {
+                setShowRestoreValuesTooltip(false)
+              }, TOOLTIP_DELAY_MS)
             }
           }}
           paddingBottom={SPACING.spacing10}
@@ -410,7 +413,9 @@ export function ChooseProtocolSlideoutComponent(
   const multiPageFooter =
     currentPage === 1 ? (
       <PrimaryButton
-        onClick={() => setCurrentPage(2)}
+        onClick={() => {
+          setCurrentPage(2)
+        }}
         width="100%"
         disabled={isCreatingRun || selectedProtocol == null}
       >
@@ -418,7 +423,12 @@ export function ChooseProtocolSlideoutComponent(
       </PrimaryButton>
     ) : (
       <Flex gridGap={SPACING.spacing8} flexDirection={DIRECTION_ROW}>
-        <SecondaryButton onClick={() => setCurrentPage(1)} width="51%">
+        <SecondaryButton
+          onClick={() => {
+            setCurrentPage(1)
+          }}
+          width="51%"
+        >
           {t('shared:change_protocol')}
         </SecondaryButton>
         <PrimaryButton
@@ -550,7 +560,9 @@ function StoredProtocolList(props: StoredProtocolListProps): JSX.Element {
                 isSelected={isSelected}
                 isError={runCreationError != null}
                 isWarning={missingAnalysisData}
-                onClick={() => handleSelectProtocol(storedProtocol)}
+                onClick={() => {
+                  handleSelectProtocol(storedProtocol)
+                }}
               >
                 <Box
                   display="grid"

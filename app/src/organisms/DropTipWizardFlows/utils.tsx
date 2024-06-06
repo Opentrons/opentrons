@@ -174,7 +174,9 @@ export function useWizardExitHeader({
     return () => null
   }
   function buildNoHomeCleanUpAndClose(): () => void {
-    return () => handleCleanUpAndClose(false)
+    return () => {
+      handleCleanUpAndClose(false)
+    }
   }
   function buildHandleCleanUpAndClose(): () => void {
     return handleCleanUpAndClose

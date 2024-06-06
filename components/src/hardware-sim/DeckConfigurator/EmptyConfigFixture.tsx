@@ -84,7 +84,9 @@ export function EmptyConfigFixture(
     >
       <Btn
         css={EMPTY_CONFIG_STYLE}
-        onClick={() => handleClickAdd(fixtureLocation)}
+        onClick={() => {
+          handleClickAdd(fixtureLocation)
+        }}
       >
         <Icon name="add" color={COLORS.blue50} size="2rem" />
       </Btn>

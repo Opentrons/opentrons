@@ -127,12 +127,16 @@ export function ProtocolSetupModulesAndDeck({
       )}
       <ChildNavigation
         header={t('deck_hardware')}
-        onClickBack={() => setSetupScreen('prepare to run')}
+        onClickBack={() => {
+          setSetupScreen('prepare to run')
+        }}
         buttonText={i18n.format(t('setup_instructions'), 'titleCase')}
         buttonType="tertiaryLowLight"
         iconName="information"
         iconPlacement="startIcon"
-        onClickButton={() => setShowSetupInstructionsModal(true)}
+        onClickButton={() => {
+          setShowSetupInstructionsModal(true)
+        }}
       />
       <Flex
         flexDirection={DIRECTION_COLUMN}
@@ -184,7 +188,11 @@ export function ProtocolSetupModulesAndDeck({
           </Flex>
         </Flex>
       </Flex>
-      <FloatingActionButton onClick={() => setShowDeckMapModal(true)} />
+      <FloatingActionButton
+        onClick={() => {
+          setShowDeckMapModal(true)
+        }}
+      />
     </>
   )
 }

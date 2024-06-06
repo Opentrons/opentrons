@@ -42,7 +42,9 @@ export function AnalysisFailedModal({
   return (
     <Modal
       header={modalHeader}
-      onOutsideClick={() => setShowAnalysisFailedModal(false)}
+      onOutsideClick={() => {
+        setShowAnalysisFailedModal(false)
+      }}
     >
       <Flex
         flexDirection={DIRECTION_COLUMN}

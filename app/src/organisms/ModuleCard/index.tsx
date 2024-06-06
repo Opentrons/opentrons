@@ -110,7 +110,9 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
     setShowOverflowMenu,
   } = useMenuHandleClickOutside()
   const moduleOverflowWrapperRef = useOnClickOutside<HTMLDivElement>({
-    onClickOutside: () => setShowOverflowMenu(false),
+    onClickOutside: () => {
+      setShowOverflowMenu(false)
+    },
   })
   const [showSlideout, setShowSlideout] = React.useState(false)
   const [hasSecondary, setHasSecondary] = React.useState(false)
@@ -258,7 +260,9 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
       {showCalModal ? (
         <ModuleWizardFlows
           attachedModule={module}
-          closeFlow={() => setShowCalModal(false)}
+          closeFlow={() => {
+            setShowCalModal(false)
+          }}
           isPrepCommandLoading={isCommandMutationLoading}
           prepCommandErrorMessage={
             prepCommandErrorMessage === '' ? undefined : prepCommandErrorMessage
@@ -267,7 +271,9 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
       ) : null}
       {showHSWizard && module.moduleType === HEATERSHAKER_MODULE_TYPE && (
         <ModuleSetupModal
-          close={() => setShowHSWizard(false)}
+          close={() => {
+            setShowHSWizard(false)
+          }}
           moduleDisplayName={getModuleDisplayName(module.moduleModel)}
         />
       )}
@@ -276,14 +282,18 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
           module={module}
           isSecondary={hasSecondary}
           showSlideout={showSlideout}
-          onCloseClick={() => setShowSlideout(false)}
+          onCloseClick={() => {
+            setShowSlideout(false)
+          }}
         />
       )}
       {showAboutModule && (
         <AboutModuleSlideout
           module={module}
           isExpanded={showAboutModule}
-          onCloseClick={() => setShowAboutModule(false)}
+          onCloseClick={() => {
+            setShowAboutModule(false)
+          }}
           firmwareUpdateClick={handleFirmwareUpdateClick}
         />
       )}
@@ -291,7 +301,9 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
         <TestShakeSlideout
           module={module as HeaterShakerModule}
           isExpanded={showTestShake}
-          onCloseClick={() => setShowTestShake(false)}
+          onCloseClick={() => {
+            setShowTestShake(false)
+          }}
         />
       )}
       <Box padding={SPACING.spacing16} width="100%">
@@ -454,7 +466,9 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
           <Box
             ref={moduleOverflowWrapperRef}
             data-testid={`ModuleCard_overflow_menu_${module.serialNumber}`}
-            onClick={() => setShowOverflowMenu(false)}
+            onClick={() => {
+              setShowOverflowMenu(false)
+            }}
           >
             <ModuleOverflowMenu
               handleAboutClick={handleAboutClick}

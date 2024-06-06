@@ -32,7 +32,7 @@ describe('PromptGuide', () => {
       'Liquid locations: Describe where liquids should go in the labware.'
     )
     screen.getByText(
-      "Commands: List the protocol's steps, specifying quantities in microliters (mL) and giving exact source and destination locations."
+      "Commands: List the protocol's steps, specifying quantities in microliters (uL) and giving exact source and destination locations."
     )
     screen.getByText('A few important things to note:')
     screen.getByText(

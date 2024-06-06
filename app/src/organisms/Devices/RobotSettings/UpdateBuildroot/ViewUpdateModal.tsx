@@ -59,7 +59,11 @@ export function ViewUpdateModal(
 
   if (availableAppUpdateVersion && showAppUpdateModal)
     return createPortal(
-      <UpdateAppModal closeModal={() => setShowAppUpdateModal(false)} />,
+      <UpdateAppModal
+        closeModal={() => {
+          setShowAppUpdateModal(false)
+        }}
+      />,
       getTopPortalEl()
     )
 
@@ -68,7 +72,9 @@ export function ViewUpdateModal(
       <MigrationWarningModal
         notNowButton={notNowButton}
         updateType={robotUpdateType}
-        proceed={() => setShowMigrationWarning(false)}
+        proceed={() => {
+          setShowMigrationWarning(false)
+        }}
       />
     )
   }

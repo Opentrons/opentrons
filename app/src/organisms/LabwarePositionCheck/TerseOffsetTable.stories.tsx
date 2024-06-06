@@ -47,7 +47,9 @@ const Template: Story<React.ComponentProps<typeof TerseOffsetTable>> = ({
       </Flex>
       <SmallButton
         alignSelf={ALIGN_FLEX_END}
-        onClick={() => console.log('FAKE BUTTON')}
+        onClick={() => {
+          console.log('FAKE BUTTON')
+        }}
         buttonText="Apply offsets"
       />
     </Flex>

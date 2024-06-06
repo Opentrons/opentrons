@@ -102,7 +102,9 @@ export function RobotSettingsNetworking({
       {showDisconnectModal
         ? createPortal(
             <DisconnectModal
-              onCancel={() => setShowDisconnectModal(false)}
+              onCancel={() => {
+                setShowDisconnectModal(false)
+              }}
               robotName={robotName}
             />,
             getModalPortalEl()
@@ -146,7 +148,9 @@ export function RobotSettingsNetworking({
                 </Flex>
                 {canDisconnect && !isRobotBusy ? (
                   <SecondaryButton
-                    onClick={() => setShowDisconnectModal(true)}
+                    onClick={() => {
+                      setShowDisconnectModal(true)
+                    }}
                     disabled={isEstopNotDisengaged}
                   >
                     {t('disconnect_from_wifi')}
