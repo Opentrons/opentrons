@@ -9,6 +9,7 @@ import { useMostRecentCompletedAnalysis } from '../../../LabwarePositionCheck/us
 import { useRunStatus } from '../../../RunTimeControl/hooks'
 import { useNotifyRunQuery } from '../../../../resources/runs'
 import { mockSucceededRun } from '../../../RunTimeControl/__fixtures__'
+import { useFeatureFlag } from '../../../../redux/config'
 import { ProtocolRunRuntimeParameters } from '../ProtocolRunRunTimeParameters'
 import type { UseQueryResult } from 'react-query'
 import type { Run } from '@opentrons/api-client'
@@ -27,6 +28,7 @@ vi.mock('@opentrons/components', async importOriginal => {
 vi.mock('../../../LabwarePositionCheck/useMostRecentCompletedAnalysis')
 vi.mock('../../../RunTimeControl/hooks')
 vi.mock('../../../../resources/runs')
+vi.mock('../../../../redux/config')
 
 const RUN_ID = 'mockId'
 
@@ -108,6 +110,7 @@ describe('ProtocolRunRuntimeParameters', () => {
     vi.mocked(useNotifyRunQuery).mockReturnValue(({
       data: { data: mockSucceededRun },
     } as unknown) as UseQueryResult<Run>)
+    vi.mocked(useFeatureFlag).mockReturnValue(false)
   })
 
   afterEach(() => {
@@ -169,6 +172,13 @@ describe('ProtocolRunRuntimeParameters', () => {
     expect(screen.queryByText('Parameters')).not.toBeInTheDocument()
     expect(screen.queryByText('Default values')).not.toBeInTheDocument()
     screen.getByText('mock InfoScreen')
+  })
+
+  it('should render csv row if a protocol requires a csv', () => {
+    vi.mocked(useFeatureFlag).mockReturnValue(true)
+    render(props)
+    screen.getByText('CSV File')
+    screen.getByText('temp_hardcoded.csv') // ToDo (kk:06/06/2024) this part will be updated
   })
 
   // ToDo Additional test will be implemented when chip component is added

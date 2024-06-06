@@ -30,6 +30,7 @@ import { Tooltip } from '../../../atoms/Tooltip'
 import { useMostRecentCompletedAnalysis } from '../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import { useRunStatus } from '../../RunTimeControl/hooks'
 import { useNotifyRunQuery } from '../../../resources/runs'
+import { useFeatureFlag } from '../../../redux/config'
 
 import type { RunTimeParameter } from '@opentrons/shared-data'
 import type { RunStatus } from '@opentrons/api-client'
@@ -43,6 +44,8 @@ export function ProtocolRunRuntimeParameters({
   const { t } = useTranslation('protocol_setup')
   const mostRecentAnalysis = useMostRecentCompletedAnalysis(runId)
   const runStatus = useRunStatus(runId)
+  const enableCsvFile = useFeatureFlag('enableCsvFile')
+
   const isRunTerminal =
     runStatus == null
       ? false
@@ -126,6 +129,39 @@ export function ProtocolRunRuntimeParameters({
                 <StyledTableHeader>{t('value')}</StyledTableHeader>
               </StyledTableHeaderContainer>
               <tbody>
+                <>
+                  {/* ToDo (kk: 06/06/2024) the condition that checks need csv or not */}
+                  {enableCsvFile ? (
+                    <StyledTableRow isLast={false}>
+                      <StyledTableCell display="span">
+                        <StyledText
+                          as="p"
+                          css={css`
+                            display: inline;
+                            padding-right: 8px;
+                          `}
+                        >
+                          {t('csv_file')}
+                        </StyledText>
+                      </StyledTableCell>
+                      <StyledTableCell>
+                        <Flex
+                          flexDirection={DIRECTION_ROW}
+                          gridGap={SPACING.spacing16}
+                        >
+                          <StyledText as="p">{'temp_hardcoded.csv'}</StyledText>
+                          {/* ToDo (kk: 06/06/2024) need a conditional statement */}
+                          <Chip
+                            text={t('updated')}
+                            type="success"
+                            hasIcon={false}
+                            chipSize="small"
+                          />
+                        </Flex>
+                      </StyledTableCell>
+                    </StyledTableRow>
+                  ) : null}
+                </>
                 {runTimeParameters.map(
                   (parameter: RunTimeParameter, index: number) => (
                     <StyledTableRowComponent
