@@ -199,9 +199,9 @@ export function LiquidEditForm(props: LiquidEditFormProps): JSX.Element {
                 name="serialize"
                 label={t('liquid_edit.serialize')}
                 value={field.value}
-                onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                   field.onChange(e)
-                }
+                }}
               />
             )}
           />

@@ -9,7 +9,9 @@ import { DesktopApp } from './DesktopApp'
 import { OnDeviceDisplayApp } from './OnDeviceDisplayApp'
 import { TopPortalRoot } from './portal'
 
-const stopEvent = (event: React.MouseEvent): void => event.preventDefault()
+const stopEvent = (event: React.MouseEvent): void => {
+  event.preventDefault()
+}
 
 export const App = (): JSX.Element | null => {
   const hasConfigLoaded = useSelector(getConfig) != null

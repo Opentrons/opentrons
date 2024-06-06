@@ -143,10 +143,9 @@ export const DeckSetupContents = (props: ContentsProps): JSX.Element => {
     customLabwareDefs,
   })
 
-  const handleHoverEmptySlot = React.useCallback(
-    () => setHoveredLabware(null),
-    []
-  )
+  const handleHoverEmptySlot = React.useCallback(() => {
+    setHoveredLabware(null)
+  }, [])
 
   const slotIdsBlockedBySpanning = getSlotIdsBlockedBySpanning(activeDeckSetup)
 

@@ -106,7 +106,11 @@ export const ChooseLocation = (
           css={ALIGN_BUTTONS}
           gridGap={SPACING.spacing8}
         >
-          <Btn onClick={() => handleGoBack()}>
+          <Btn
+            onClick={() => {
+              handleGoBack()
+            }}
+          >
             <StyledText css={GO_BACK_BUTTON_STYLE}>
               {t('shared:go_back')}
             </StyledText>
@@ -131,7 +135,11 @@ export const ChooseLocation = (
               justifyContent={JUSTIFY_SPACE_BETWEEN}
               gridGap={SPACING.spacing8}
             >
-              <Btn onClick={() => handleGoBack()}>
+              <Btn
+                onClick={() => {
+                  handleGoBack()
+                }}
+              >
                 <StyledText css={GO_BACK_BUTTON_STYLE}>
                   {t('shared:go_back')}
                 </StyledText>

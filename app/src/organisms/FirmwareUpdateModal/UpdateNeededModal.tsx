@@ -114,7 +114,9 @@ export function UpdateNeededModal(props: UpdateNeededModalProps): JSX.Element {
         instrument={instrument}
         isSuccess={updateError === undefined}
         onClose={() => {
-          refetchInstruments().catch(error => console.error(error))
+          refetchInstruments().catch(error => {
+            console.error(error)
+          })
           onClose()
         }}
         shouldExit={shouldExit}

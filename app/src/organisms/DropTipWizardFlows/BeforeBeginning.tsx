@@ -68,7 +68,9 @@ export const BeforeBeginning = (
             <MediumButton
               buttonType={flowType === 'blowout' ? 'primary' : 'secondary'}
               flex="1"
-              onClick={() => setFlowType('blowout')}
+              onClick={() => {
+                setFlowType('blowout')
+              }}
               buttonText={i18n.format(t('yes_blow_out_liquid'), 'capitalize')}
               justifyContent={JUSTIFY_FLEX_START}
               paddingLeft={SPACING.spacing24}
@@ -133,7 +135,9 @@ export const BeforeBeginning = (
             <StyledText as="h3">{t('yes_blow_out_liquid')}</StyledText>
           </Flex>
           <Flex
-            onClick={() => setFlowType('drop_tips')}
+            onClick={() => {
+              setFlowType('drop_tips')
+            }}
             css={
               flowType === 'drop_tips'
                 ? SELECTED_OPTIONS_STYLE

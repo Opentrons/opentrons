@@ -67,8 +67,12 @@ export function useDropTipCommands({
   const [hasSeenClose, setHasSeenClose] = React.useState(false)
 
   const { deleteMaintenanceRun } = useDeleteMaintenanceRunMutation({
-    onSuccess: () => closeFlow(),
-    onError: () => closeFlow(),
+    onSuccess: () => {
+      closeFlow()
+    },
+    onError: () => {
+      closeFlow()
+    },
   })
   const deckConfig = useNotifyDeckConfigurationQuery().data ?? []
 
@@ -91,7 +95,9 @@ export function useDropTipCommands({
               .catch((error: Error) => {
                 console.error(error.message)
               })
-              .finally(() => deleteMaintenanceRun(activeMaintenanceRunId))
+              .finally(() => {
+                deleteMaintenanceRun(activeMaintenanceRunId)
+              })
           }
         }
       }
@@ -123,11 +129,11 @@ export function useDropTipCommands({
             }
           })
           .then(resolve)
-          .catch(error =>
+          .catch(error => {
             reject(
               new Error(`Error issuing move to addressable area: ${error}`)
             )
-          )
+          })
       } else {
         setErrorDetails({
           message: `Error moving to position: invalid addressable area.`,
@@ -147,7 +153,9 @@ export function useDropTipCommands({
         waitUntilComplete: true,
         timeout: JOG_COMMAND_TIMEOUT_MS,
       })
-        .then(() => resolve())
+        .then(() => {
+          resolve()
+        })
         .catch((error: Error) => {
           setErrorDetails({
             message: `Error issuing jog command: ${error.message}`,

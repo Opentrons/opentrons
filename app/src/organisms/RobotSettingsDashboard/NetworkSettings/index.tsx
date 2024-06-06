@@ -51,7 +51,9 @@ export function NetworkSettings({
     <Flex flexDirection={DIRECTION_COLUMN}>
       <ChildNavigation
         header={t('network_settings')}
-        onClickBack={() => setCurrentOption(null)}
+        onClickBack={() => {
+          setCurrentOption(null)
+        }}
       />
       <Flex
         marginTop="7.75rem"
@@ -66,7 +68,9 @@ export function NetworkSettings({
           chipType={handleChipType(isWifiConnected)}
           chipText={handleChipText(isWifiConnected)}
           networkName={activeSsid}
-          onClick={() => setCurrentOption('RobotSettingsWifi')}
+          onClick={() => {
+            setCurrentOption('RobotSettingsWifi')
+          }}
         />
         <NetworkSettingButton
           buttonTitle={t('ethernet')}
@@ -74,7 +78,9 @@ export function NetworkSettings({
           iconName="ethernet"
           chipType={handleChipType(isEthernetConnected)}
           chipText={handleChipText(isEthernetConnected)}
-          onClick={() => setCurrentOption('EthernetConnectionDetails')}
+          onClick={() => {
+            setCurrentOption('EthernetConnectionDetails')
+          }}
         />
       </Flex>
     </Flex>
@@ -151,7 +157,11 @@ function NetworkSettingButton({
           />
         </Flex>
         <Flex justifyContent="flex-end" alignSelf="stretch">
-          <Btn onClick={() => console.log('setup')}>
+          <Btn
+            onClick={() => {
+              console.log('setup')
+            }}
+          >
             <Icon name="chevron-right" size="3rem" />
           </Btn>
         </Flex>

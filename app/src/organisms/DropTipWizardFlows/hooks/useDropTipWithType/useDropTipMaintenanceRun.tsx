@@ -90,7 +90,9 @@ function useCreateDropTipMaintenanceRun({
         })
         .catch((error: Error) => error)
     },
-    onError: (error: Error) => setErrorDetails({ message: error.message }),
+    onError: (error: Error) => {
+      setErrorDetails({ message: error.message })
+    },
   })
 
   React.useEffect(() => {

@@ -84,7 +84,7 @@ describe('useTipAttachmentStatus', () => {
 
     await act(async () => {
       await result.current.determineTipStatus()
-      await result.current.resetTipStatus()
+      result.current.resetTipStatus()
     })
 
     expect(result.current.areTipsAttached).toBe(false)

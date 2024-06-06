@@ -75,6 +75,7 @@ from opentrons_hardware.firmware_bindings.messages.fields import (
     PipetteTipActionTypeField,
     MoveStopConditionField,
     SensorIdField,
+    SensorTypeField,
 )
 from opentrons_hardware.hardware_control.motion import MoveStopCondition
 from opentrons_hardware.hardware_control.motor_position_status import (
@@ -307,6 +308,7 @@ class MoveGroupRunner:
             return HomeRequest(payload=home_payload)
         elif step.move_type == MoveType.sensor:
             # stop_condition = step.stop_condition.value
+            assert step.sensor_type is not None
             assert step.sensor_id is not None
             stop_condition = MoveStopCondition.sync_line
             sensor_move_payload = AddSensorLinearMoveBasePayload(
@@ -328,6 +330,7 @@ class MoveGroupRunner:
                 velocity_mm=Int32Field(
                     int((step.velocity_mm_sec / interrupts_per_sec) * (2**31))
                 ),
+                sensor_type=SensorTypeField(step.sensor_type),
                 sensor_id=SensorIdField(step.sensor_id),
             )
             return AddSensorLinearMoveRequest(payload=sensor_move_payload)

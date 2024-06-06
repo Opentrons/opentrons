@@ -53,7 +53,9 @@ export function ProtocolSetupInstruments({
     >
       <ODDBackButton
         label={t('instruments')}
-        onClick={() => setSetupScreen('prepare to run')}
+        onClick={() => {
+          setSetupScreen('prepare to run')
+        }}
       />
       {getShowPipetteCalibrationWarning(attachedInstruments) && (
         <Flex paddingBottom={SPACING.spacing16}>

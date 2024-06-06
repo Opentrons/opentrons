@@ -98,7 +98,9 @@ export function EmergencyStop(): JSX.Element {
           flex="1"
           buttonText={i18n.format(t('shared:continue'), 'capitalize')}
           disabled={!isEstopConnected}
-          onClick={() => history.push('/robot-settings/rename-robot')}
+          onClick={() => {
+            history.push('/robot-settings/rename-robot')
+          }}
         />
       </Flex>
     </>

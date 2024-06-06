@@ -24,7 +24,9 @@ export function useCloseCurrentRun(): {
     if (currentRunId != null) {
       dismissCurrentRun(currentRunId, {
         ...options,
-        onError: () => console.warn('failed to dismiss current'),
+        onError: () => {
+          console.warn('failed to dismiss current')
+        },
       })
     }
   }

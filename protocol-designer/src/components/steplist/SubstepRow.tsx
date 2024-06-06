@@ -136,13 +136,15 @@ function SubstepRowComponent(props: SubstepRowProps): JSX.Element {
       <PDListItem
         border
         className={props.className}
-        onMouseEnter={() =>
+        onMouseEnter={() => {
           selectSubstep({
             stepId: props.stepId,
             substepIndex: props.substepIndex,
           })
-        }
-        onMouseLeave={() => selectSubstep(null)}
+        }}
+        onMouseLeave={() => {
+          selectSubstep(null)
+        }}
       >
         <IngredPill
           targetProps={sourceTargetProps}

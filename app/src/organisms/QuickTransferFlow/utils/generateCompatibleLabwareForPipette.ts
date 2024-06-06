@@ -12,7 +12,12 @@ export function generateCompatibleLabwareForPipette(
 
   const compatibleDefUriList = allLabwareDefinitions.reduce<string[]>(
     (acc, definition) => {
-      if (pipetteSpecs.channels === 1) {
+      if (
+        definition.allowedRoles != null &&
+        definition.allowedRoles.includes('adapter')
+      ) {
+        return acc
+      } else if (pipetteSpecs.channels === 1) {
         return [...acc, getLabwareDefURI(definition)]
       } else {
         const isCompatible = canPipetteUseLabware(pipetteSpecs, definition)

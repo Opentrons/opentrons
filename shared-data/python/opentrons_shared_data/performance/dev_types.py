@@ -1,20 +1,30 @@
 """Type definitions for performance tracking."""
+import typing
 from dataclasses import dataclass
-from typing import Protocol, Tuple, TypeVar, Callable, Any
 from pathlib import Path
 from enum import Enum
 
-F = TypeVar("F", bound=Callable[..., Any])
+
+UnderlyingFunctionParameters = typing.ParamSpec("UnderlyingFunctionParameters")
+UnderlyingFunctionReturn = typing.Any
+UnderlyingFunction = typing.TypeVar(
+    "UnderlyingFunction",
+    typing.Callable[..., UnderlyingFunctionReturn],
+    typing.Callable[..., typing.Awaitable[UnderlyingFunctionReturn]],
+)
 
 
-class SupportsTracking(Protocol):
+class SupportsTracking(typing.Protocol):
     """Protocol for classes that support tracking of robot context."""
 
     def __init__(self, storage_location: Path, should_track: bool) -> None:
         """Initialize the tracker."""
         ...
 
-    def track(self, state: "RobotContextState") -> Callable[[F], F]:
+    def track(
+        self,
+        state: "RobotContextState",
+    ) -> typing.Callable[[UnderlyingFunction], UnderlyingFunction]:
         """Decorator to track the given state for the decorated function."""
         ...
 
@@ -62,7 +72,7 @@ class MetricsMetadata:
 
     name: str
     storage_dir: Path
-    headers: Tuple[str, ...]
+    headers: typing.Tuple[str, ...]
 
     @property
     def data_file_location(self) -> Path:

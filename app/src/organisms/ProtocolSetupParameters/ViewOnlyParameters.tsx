@@ -41,7 +41,9 @@ export function ViewOnlyParameters({
     <>
       <ChildNavigation
         header={t('parameters')}
-        onClickBack={() => setSetupScreen('prepare to run')}
+        onClickBack={() => {
+          setSetupScreen('prepare to run')
+        }}
         inlineNotification={{
           type: 'neutral',
           heading: t('values_are_view_only'),

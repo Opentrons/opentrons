@@ -107,6 +107,7 @@ def fake_settings() -> CapacitivePassSettings:
         max_overrun_distance_mm=2,
         speed_mm_per_s=4,
         sensor_threshold_pf=1.0,
+        output_option=OutputOptions.sync_only,
     )
 
 
@@ -118,11 +119,8 @@ def fake_liquid_settings() -> LiquidProbeSettings:
         mount_speed=40,
         plunger_speed=10,
         sensor_threshold_pascals=15,
-        expected_liquid_height=109,
         output_option=OutputOptions.can_bus_only,
         aspirate_while_sensing=False,
-        auto_zero_sensor=False,
-        num_baseline_reads=10,
         data_files={InstrumentProbeType.PRIMARY: "fake_file_name"},
     )
 
@@ -485,6 +483,8 @@ def mock_backend_capacitive_probe(
             speed_mm_per_s: float,
             threshold_pf: float,
             probe: InstrumentProbeType,
+            output_option: OutputOptions = OutputOptions.sync_only,
+            data_file: Optional[str] = None,
         ) -> None:
             hardware_backend._position[moving] += distance_mm / 2
 
@@ -828,11 +828,8 @@ async def test_liquid_probe(
             mount_speed=40,
             plunger_speed=10,
             sensor_threshold_pascals=15,
-            expected_liquid_height=109,
             output_option=OutputOptions.can_bus_only,
             aspirate_while_sensing=True,
-            auto_zero_sensor=False,
-            num_baseline_reads=10,
             data_files={InstrumentProbeType.PRIMARY: "fake_file_name"},
         )
         await ot3_hardware.liquid_probe(mount, fake_settings_aspirate)
@@ -845,8 +842,6 @@ async def test_liquid_probe(
             fake_settings_aspirate.sensor_threshold_pascals,
             fake_settings_aspirate.output_option,
             fake_settings_aspirate.data_files,
-            fake_settings_aspirate.auto_zero_sensor,
-            fake_settings_aspirate.num_baseline_reads,
             probe=InstrumentProbeType.PRIMARY,
         )
 
@@ -889,7 +884,14 @@ async def test_capacitive_probe(
     # This is a negative probe because the current position is the home position
     # which is very large.
     mock_backend_capacitive_probe.assert_called_once_with(
-        mount, moving, 3, 4, 1.0, InstrumentProbeType.PRIMARY
+        mount,
+        moving,
+        3,
+        4,
+        1.0,
+        InstrumentProbeType.PRIMARY,
+        fake_settings.output_option,
+        fake_settings.data_files,
     )
 
     original = moving.set_in_point(here, 0)

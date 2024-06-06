@@ -47,9 +47,9 @@ const sendAnalyticsEventEpic: Epic = (action$, state$) => {
       const [maybeEvent, maybeConfig] = args
       return Boolean(maybeEvent && maybeConfig)
     }),
-    tap(([event, config]: [AnalyticsEvent, AnalyticsConfig]) =>
+    tap(([event, config]: [AnalyticsEvent, AnalyticsConfig]) => {
       trackEvent(event, config)
-    ),
+    }),
     ignoreElements()
   )
 }

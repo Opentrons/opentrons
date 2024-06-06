@@ -87,14 +87,16 @@ export function WifiConnectionDetails({
               flex="1"
               buttonType="secondary"
               buttonText={t('view_network_details')}
-              onClick={() => setShowNetworkDetailsModal(true)}
+              onClick={() => {
+                setShowNetworkDetailsModal(true)
+              }}
             />
             <MediumButton
               flex="1"
               buttonText={i18n.format(t('continue'), 'capitalize')}
-              onClick={() =>
+              onClick={() => {
                 history.push('/robot-settings/update-robot-during-onboarding')
-              }
+              }}
             />
           </Flex>
         </Flex>
