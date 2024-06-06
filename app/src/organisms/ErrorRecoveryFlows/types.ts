@@ -4,6 +4,7 @@ import type {
   UseRouteUpdateActionsResult,
   UseRecoveryCommandsResult,
 } from './utils'
+import { ErrorRecoveryWizardProps } from './ErrorRecoveryWizard'
 
 export type FailedCommand = RunCommandSummary
 export type InvalidStep = typeof INVALID
@@ -60,12 +61,7 @@ export interface IRecoveryMap {
   step: RouteStep
 }
 
-export interface RecoveryContentProps {
-  failedCommand: FailedCommand | null
+export type RecoveryContentProps = ErrorRecoveryWizardProps & {
   errorKind: ErrorKind
   isOnDevice: boolean
-  recoveryMap: IRecoveryMap
-  routeUpdateActions: UseRouteUpdateActionsResult
-  recoveryCommands: UseRecoveryCommandsResult
-  hasLaunchedRecovery: boolean
 }

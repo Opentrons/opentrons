@@ -12,6 +12,7 @@ import {
   useCurrentlyRecoveringFrom,
   useRouteUpdateActions,
   useRecoveryCommands,
+  useRecoveryTipStatus,
 } from './utils'
 import { RECOVERY_MAP } from './constants'
 
@@ -77,6 +78,8 @@ export function ErrorRecoveryFlows({
     step: RECOVERY_MAP.OPTION_SELECTION.STEPS.SELECT,
   })
 
+  const tipStatusUtils = useRecoveryTipStatus(runId)
+
   const routeUpdateActions = useRouteUpdateActions({
     hasLaunchedRecovery,
     recoveryMap,
@@ -102,6 +105,7 @@ export function ErrorRecoveryFlows({
           routeUpdateActions={routeUpdateActions}
           recoveryCommands={recoveryCommands}
           hasLaunchedRecovery={hasLaunchedRecovery}
+          tipStatusUtils={tipStatusUtils}
         />
       ) : null}
       {showSplash ? (

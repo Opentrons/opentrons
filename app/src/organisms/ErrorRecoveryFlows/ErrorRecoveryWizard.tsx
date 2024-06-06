@@ -20,6 +20,7 @@ import type {
   UseRouteUpdateActionsResult,
   useRecoveryCommands,
   UseRecoveryCommandsResult,
+  RecoveryTipStatusUtils,
 } from './utils'
 
 interface UseERWizardResult {
@@ -49,6 +50,7 @@ export interface ErrorRecoveryWizardProps {
   recoveryMap: IRecoveryMap
   routeUpdateActions: UseRouteUpdateActionsResult
   recoveryCommands: UseRecoveryCommandsResult
+  tipStatusUtils: RecoveryTipStatusUtils
   hasLaunchedRecovery: boolean
 }
 

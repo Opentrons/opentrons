@@ -3,8 +3,8 @@ import { useTranslation } from 'react-i18next'
 
 import {
   ALIGN_CENTER,
-  DIRECTION_COLUMN,
   COLORS,
+  DIRECTION_COLUMN,
   Flex,
   Icon,
   SPACING,
@@ -15,23 +15,28 @@ import { RECOVERY_MAP } from '../constants'
 import { RecoveryFooterButtons, RecoverySingleColumnContent } from '../shared'
 
 import type { RecoveryContentProps } from '../types'
+import type {
+  RecoveryTipStatusUtils,
+  UseRecoveryCommandsResult,
+  UseRouteUpdateActionsResult,
+} from '../utils'
 
 export function CancelRun({
   isOnDevice,
   routeUpdateActions,
   recoveryCommands,
+  tipStatusUtils,
 }: RecoveryContentProps): JSX.Element | null {
-  const { ROBOT_CANCELING } = RECOVERY_MAP
   const { t } = useTranslation('error_recovery')
 
-  const { cancelRun } = recoveryCommands
-  const { goBackPrevStep, setRobotInMotion } = routeUpdateActions
+  const { goBackPrevStep } = routeUpdateActions
 
-  const primaryBtnOnClick = (): Promise<void> => {
-    return setRobotInMotion(true, ROBOT_CANCELING.ROUTE).then(() => {
-      cancelRun()
-    })
-  }
+  // TODO(jh, 06-06-24): When design finalizes loading state, pass down showBtnLoadingState to primary btn.
+  const { handleCancelRunClick } = useOnCancelRun({
+    recoveryCommands,
+    routeUpdateActions,
+    tipStatusUtils,
+  })
 
   if (isOnDevice) {
     return (
@@ -61,7 +66,7 @@ export function CancelRun({
         </Flex>
         <RecoveryFooterButtons
           isOnDevice={isOnDevice}
-          primaryBtnOnClick={primaryBtnOnClick}
+          primaryBtnOnClick={handleCancelRunClick}
           secondaryBtnOnClick={goBackPrevStep}
           primaryBtnTextOverride={t('confirm')}
         />
@@ -70,4 +75,51 @@ export function CancelRun({
   } else {
     return null
   }
+}
+
+interface OnCancelRunProps {
+  tipStatusUtils: RecoveryTipStatusUtils
+  recoveryCommands: UseRecoveryCommandsResult
+  routeUpdateActions: UseRouteUpdateActionsResult
+}
+
+// Manages routing to cancel route or drop tip route, depending on tip attachment status.
+// Note that tip attachment status begins fetching in SelectRecoveryOption, but it may not finish
+// by the time a user clicks "cancel run".
+export function useOnCancelRun({
+  tipStatusUtils,
+  routeUpdateActions,
+  recoveryCommands,
+}: OnCancelRunProps): {
+  handleCancelRunClick: () => void
+  showBtnLoadingState: boolean
+} {
+  const { ROBOT_CANCELING, DROP_TIP_FLOWS } = RECOVERY_MAP
+  const { isLoadingTipStatus, areTipsAttached } = tipStatusUtils
+  const { setRobotInMotion, proceedToRoute } = routeUpdateActions
+  const { cancelRun } = recoveryCommands
+
+  const [hasUserClicked, setHasUserClicked] = React.useState(false)
+
+  const showBtnLoadingState = hasUserClicked && isLoadingTipStatus
+
+  React.useEffect(() => {
+    if (hasUserClicked) {
+      if (!isLoadingTipStatus) {
+        if (areTipsAttached) {
+          void proceedToRoute(DROP_TIP_FLOWS.ROUTE)
+        } else {
+          setRobotInMotion(true, ROBOT_CANCELING.ROUTE).then(() => {
+            cancelRun()
+          })
+        }
+      }
+    }
+  }, [hasUserClicked, isLoadingTipStatus, areTipsAttached])
+
+  const handleCancelRunClick = (): void => {
+    setHasUserClicked(true)
+  }
+
+  return { showBtnLoadingState, handleCancelRunClick }
 }
