@@ -115,7 +115,7 @@ jobs:
       - id: determine-build-type
         run: |
           echo "Determining build type for event ${{github.event_name}} and ref ${{github.ref}}"
-          if [ "${{ format('{0}', github.event_name == 'pull_request' }}" = "true" ] ;
+          if [ "${{ format('{0}', github.event_name == 'pull_request') }}" = "true" ] ;
             echo "No builds for pull requests"
             echo 'type=none' >> $GITHUB_OUTPUT
           elif [ "${{ format('{0}', startsWith(github.ref, 'refs/heads/') }}" = "true" ] ; then
