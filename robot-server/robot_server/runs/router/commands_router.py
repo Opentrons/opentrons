@@ -200,6 +200,7 @@ async def create_run_command(
         engine_store: The run's `EngineStore` on which the new
             command will be enqueued.
         check_estop: Dependency to verify the estop is in a valid state.
+        run_id: Run identification to attach command to.
     """
     # TODO(mc, 2022-05-26): increment the HTTP API version so that default
     # behavior is to pass through `command_intent` without overriding it

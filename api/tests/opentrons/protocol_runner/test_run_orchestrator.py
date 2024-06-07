@@ -3,6 +3,7 @@ from pathlib import Path
 
 import pytest
 from datetime import datetime
+
 from pytest_lazyfixture import lazy_fixture  # type: ignore[import-untyped]
 from decoy import Decoy
 from typing import Union
@@ -52,6 +53,12 @@ def mock_fixit_runner(decoy: Decoy) -> LiveRunner:
 
 
 @pytest.fixture
+def mock_protocol_live_runner(decoy: Decoy) -> LiveRunner:
+    """Get a mock of a LiveRunner for protocol commands."""
+    return decoy.mock(cls=LiveRunner)
+
+
+@pytest.fixture
 def mock_protocol_engine(decoy: Decoy) -> ProtocolEngine:
     """Get a mocked out ProtocolEngine dependency."""
     return decoy.mock(cls=ProtocolEngine)
@@ -70,6 +77,7 @@ def json_protocol_subject(
     mock_protocol_json_runner: JsonRunner,
     mock_fixit_runner: LiveRunner,
     mock_setup_runner: LiveRunner,
+    mock_protocol_live_runner: LiveRunner,
 ) -> RunOrchestrator:
     """Get a RunOrchestrator subject with a json runner."""
     return RunOrchestrator(
@@ -78,6 +86,7 @@ def json_protocol_subject(
         fixit_runner=mock_fixit_runner,
         setup_runner=mock_setup_runner,
         json_or_python_protocol_runner=mock_protocol_json_runner,
+        protocol_live_runner=mock_protocol_live_runner,
     )
 
 
@@ -88,6 +97,7 @@ def python_protocol_subject(
     mock_protocol_python_runner: PythonAndLegacyRunner,
     mock_fixit_runner: LiveRunner,
     mock_setup_runner: LiveRunner,
+    mock_protocol_live_runner: LiveRunner,
 ) -> RunOrchestrator:
     """Get a RunOrchestrator subject with a python runner."""
     return RunOrchestrator(
@@ -96,6 +106,7 @@ def python_protocol_subject(
         fixit_runner=mock_fixit_runner,
         setup_runner=mock_setup_runner,
         json_or_python_protocol_runner=mock_protocol_python_runner,
+        protocol_live_runner=mock_protocol_live_runner,
     )
 
 
@@ -105,6 +116,7 @@ def live_protocol_subject(
     mock_hardware_api: HardwareAPI,
     mock_fixit_runner: LiveRunner,
     mock_setup_runner: LiveRunner,
+    mock_protocol_live_runner: LiveRunner,
 ) -> RunOrchestrator:
     """Get a RunOrchestrator subject with a live runner."""
     return RunOrchestrator(
@@ -112,6 +124,7 @@ def live_protocol_subject(
         hardware_api=mock_hardware_api,
         fixit_runner=mock_fixit_runner,
         setup_runner=mock_setup_runner,
+        protocol_live_runner=mock_protocol_live_runner,
     )
 
 
@@ -360,6 +373,7 @@ def test_get_run_id(
     mock_hardware_api: HardwareAPI,
     mock_fixit_runner: LiveRunner,
     mock_setup_runner: LiveRunner,
+    mock_protocol_live_runner: LiveRunner,
 ) -> None:
     """Should get run_id if builder was created with a run id."""
     orchestrator = RunOrchestrator(
@@ -368,6 +382,7 @@ def test_get_run_id(
         hardware_api=mock_hardware_api,
         fixit_runner=mock_fixit_runner,
         setup_runner=mock_setup_runner,
+        protocol_live_runner=mock_protocol_live_runner,
     )
     assert orchestrator.run_id == "test-123"
 
@@ -377,6 +392,7 @@ def test_get_run_id_raises(
     mock_hardware_api: HardwareAPI,
     mock_fixit_runner: LiveRunner,
     mock_setup_runner: LiveRunner,
+    mock_protocol_live_runner: LiveRunner,
 ) -> None:
     """Should get run_id if builder was created with a run id."""
     orchestrator = RunOrchestrator(
@@ -384,6 +400,7 @@ def test_get_run_id_raises(
         hardware_api=mock_hardware_api,
         fixit_runner=mock_fixit_runner,
         setup_runner=mock_setup_runner,
+        protocol_live_runner=mock_protocol_live_runner,
     )
     with pytest.raises(NotImplementedError):
         orchestrator.run_id

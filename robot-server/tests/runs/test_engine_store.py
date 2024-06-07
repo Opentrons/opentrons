@@ -13,7 +13,6 @@ from opentrons.hardware_control.types import EstopStateNotification, EstopState
 from opentrons.protocol_engine import (
     StateSummary,
     types as pe_types,
-    commands as pe_commands,
 )
 from opentrons.protocol_runner import RunResult, RunOrchestrator
 from opentrons.protocol_reader import ProtocolReader, ProtocolSource
@@ -171,16 +170,8 @@ async def test_clear_engine_not_stopped_or_idle(
         protocol=None,
         notify_publishers=mock_notify_publishers,
     )
-    await subject._run_orchestrator.add_command_and_wait_for_interval(
-        pe_commands.HomeCreate.construct(params=pe_commands.HomeParams.construct()),
-        wait_until_complete=True,
-        timeout=999,
-    )
     assert subject._run_orchestrator is not None
-    print(subject._run_orchestrator.get_all_commands())
     subject._run_orchestrator.play(deck_configuration=[])
-    print(subject._run_orchestrator.get_all_commands())
-
     with pytest.raises(EngineConflictError):
         await subject.clear()
 
@@ -293,7 +284,7 @@ async def test_estop_callback(
     await handle_estop_event(engine_store, disengage_event)
     assert engine_store.run_orchestrator is not None
     decoy.verify(
-        engine_store._run_orchestrator.estop(),
+        engine_store.run_orchestrator.estop(),
         ignore_extra_args=True,
         times=0,
     )
