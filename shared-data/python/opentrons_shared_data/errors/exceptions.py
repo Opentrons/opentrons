@@ -992,7 +992,7 @@ class InvalidStoredData(GeneralError):
 
 
 class MissingConfigurationData(GeneralError):
-    """An error indicating that provided configurationd ata is missing or invalid.
+    """An error indicating that provided configuration data is missing or invalid.
 
     This will usually be because a pipette configuration does not match the ones provided by the pipette definition.
     """
