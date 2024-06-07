@@ -85,15 +85,17 @@ export function DisplayConnectionStatus({
           flex="1"
           buttonType={isConnected ? 'secondary' : 'primary'}
           buttonText={t('view_network_details')}
-          onClick={() => setShowNetworkDetailsModal(true)}
+          onClick={() => {
+            setShowNetworkDetailsModal(true)
+          }}
         />
         {isConnected ? (
           <MediumButton
             flex="1"
             buttonText={i18n.format(t('shared:continue'), 'capitalize')}
-            onClick={() =>
+            onClick={() => {
               history.push('/robot-settings/update-robot-during-onboarding')
-            }
+            }}
           />
         ) : null}
       </Flex>

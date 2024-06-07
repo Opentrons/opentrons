@@ -52,7 +52,9 @@ export function CustomLabwareOverflowMenu(
   const dispatch = useDispatch<Dispatch>()
   const [showOverflowMenu, setShowOverflowMenu] = React.useState<boolean>(false)
   const overflowMenuRef = useOnClickOutside<HTMLDivElement>({
-    onClickOutside: () => setShowOverflowMenu(false),
+    onClickOutside: () => {
+      setShowOverflowMenu(false)
+    },
   })
   const trackEvent = useTrackEvent()
 

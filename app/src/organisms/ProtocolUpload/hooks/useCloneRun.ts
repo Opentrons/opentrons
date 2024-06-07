@@ -32,9 +32,9 @@ export function useCloneRun(
         'protocols',
         protocolKey,
       ])
-      Promise.all([invalidateRuns, invalidateProtocols]).catch((e: Error) =>
+      Promise.all([invalidateRuns, invalidateProtocols]).catch((e: Error) => {
         console.error(`error invalidating runs query: ${e.message}`)
-      )
+      })
       if (onSuccessCallback != null) onSuccessCallback(response)
     },
   })

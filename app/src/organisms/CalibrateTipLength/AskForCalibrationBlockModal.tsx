@@ -106,9 +106,9 @@ export function AskForCalibrationBlockModal(props: Props): JSX.Element {
         >
           <Flex alignItems={ALIGN_CENTER}>
             <CheckboxField
-              onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                 setRememberPreference(e.currentTarget.checked)
-              }
+              }}
               value={rememberPreference}
             />
             <StyledText as="p" marginLeft={SPACING.spacing8}>

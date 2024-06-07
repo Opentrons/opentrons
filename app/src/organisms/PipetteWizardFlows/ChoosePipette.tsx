@@ -138,7 +138,13 @@ export const ChoosePipette = (props: ChoosePipetteProps): JSX.Element => {
       title={startCase(t('attach_pipette', { mount: mount }))}
       currentStep={0}
       totalSteps={3}
-      onExit={showExitConfirmation ? exit : () => setShowExitConfirmation(true)}
+      onExit={
+        showExitConfirmation
+          ? exit
+          : () => {
+              setShowExitConfirmation(true)
+            }
+      }
     />
   )
   return createPortal(
@@ -152,7 +158,9 @@ export const ChoosePipette = (props: ChoosePipetteProps): JSX.Element => {
         >
           {showExitConfirmation ? (
             <ExitModal
-              goBack={() => setShowExitConfirmation(false)}
+              goBack={() => {
+                setShowExitConfirmation(false)
+              }}
               proceed={exit}
               flowType={FLOWS.ATTACH}
               isOnDevice={isOnDevice}
@@ -174,7 +182,9 @@ export const ChoosePipette = (props: ChoosePipetteProps): JSX.Element => {
                 </StyledText>
                 <PipetteMountOption
                   isSelected={selectedPipette === SINGLE_MOUNT_PIPETTES}
-                  onClick={() => setSelectedPipette(SINGLE_MOUNT_PIPETTES)}
+                  onClick={() => {
+                    setSelectedPipette(SINGLE_MOUNT_PIPETTES)
+                  }}
                 >
                   <StyledText
                     as="h4"
@@ -185,7 +195,9 @@ export const ChoosePipette = (props: ChoosePipetteProps): JSX.Element => {
                 </PipetteMountOption>
                 <PipetteMountOption
                   isSelected={selectedPipette === NINETY_SIX_CHANNEL}
-                  onClick={() => setSelectedPipette(NINETY_SIX_CHANNEL)}
+                  onClick={() => {
+                    setSelectedPipette(NINETY_SIX_CHANNEL)
+                  }}
                 >
                   <StyledText
                     as="h4"
@@ -214,7 +226,9 @@ export const ChoosePipette = (props: ChoosePipetteProps): JSX.Element => {
       >
         {showExitConfirmation ? (
           <ExitModal
-            goBack={() => setShowExitConfirmation(false)}
+            goBack={() => {
+              setShowExitConfirmation(false)
+            }}
             proceed={exit}
             flowType={FLOWS.ATTACH}
             isOnDevice={isOnDevice}
@@ -233,7 +247,9 @@ export const ChoosePipette = (props: ChoosePipetteProps): JSX.Element => {
               >
                 <PipetteMountOption
                   isSelected={selectedPipette === SINGLE_MOUNT_PIPETTES}
-                  onClick={() => setSelectedPipette(SINGLE_MOUNT_PIPETTES)}
+                  onClick={() => {
+                    setSelectedPipette(SINGLE_MOUNT_PIPETTES)
+                  }}
                 >
                   <img
                     src={singleChannelAndEightChannel}
@@ -251,7 +267,9 @@ export const ChoosePipette = (props: ChoosePipetteProps): JSX.Element => {
                 </PipetteMountOption>
                 <PipetteMountOption
                   isSelected={selectedPipette === NINETY_SIX_CHANNEL}
-                  onClick={() => setSelectedPipette(NINETY_SIX_CHANNEL)}
+                  onClick={() => {
+                    setSelectedPipette(NINETY_SIX_CHANNEL)
+                  }}
                 >
                   <img
                     src={ninetySixChannel}

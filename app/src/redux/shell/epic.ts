@@ -25,9 +25,9 @@ const sendActionToShellEpic: Epic = action$ =>
   action$.pipe(
     // @ts-expect-error protect against absent meta key on action
     filter<Action>(a => a.meta != null && a.meta.shell != null && a.meta.shell),
-    tap<Action>((shellAction: Action) =>
+    tap<Action>((shellAction: Action) => {
       ipcRenderer.send('dispatch', shellAction)
-    ),
+    }),
     ignoreElements()
   )
 

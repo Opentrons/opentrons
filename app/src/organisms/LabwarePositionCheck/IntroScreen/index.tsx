@@ -73,7 +73,9 @@ export const IntroScreen = (props: {
   const handleClickStartLPC = (): void => {
     const prepCommands = getPrepCommands(protocolData)
     chainRunCommands(prepCommands, false)
-      .then(() => proceed())
+      .then(() => {
+        proceed()
+      })
       .catch((e: Error) => {
         setFatalError(
           `IntroScreen failed to issue prep commands with message: ${e.message}`
@@ -166,7 +168,9 @@ function ViewOffsets(props: ViewOffsetsProps): JSX.Element {
         display="flex"
         gridGap={SPACING.spacing8}
         alignItems={ALIGN_CENTER}
-        onClick={() => setShowOffsetsModal(true)}
+        onClick={() => {
+          setShowOffsetsModal(true)
+        }}
         css={VIEW_OFFSETS_BUTTON_STYLE}
         aria-label="show labware offsets"
       >
@@ -194,7 +198,9 @@ function ViewOffsets(props: ViewOffsetsProps): JSX.Element {
                   width="100%"
                   textTransform={TYPOGRAPHY.textTransformCapitalize}
                   buttonText={t('shared:close')}
-                  onClick={() => setShowOffsetsModal(false)}
+                  onClick={() => {
+                    setShowOffsetsModal(false)
+                  }}
                 />
               }
             >

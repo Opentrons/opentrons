@@ -55,7 +55,9 @@ export function BlowoutZOffsetField(
       <Tooltip {...tooltipProps}>{tooltipContent}</Tooltip>
       {isModalOpen ? (
         <ZTipPositionModal
-          closeModal={() => setModalOpen(false)}
+          closeModal={() => {
+            setModalOpen(false)
+          }}
           name={name}
           zValue={Number(value)}
           updateValue={updateValue}
@@ -64,7 +66,13 @@ export function BlowoutZOffsetField(
       ) : null}
       <Flex
         {...targetProps}
-        onClick={disabled ? undefined : () => setModalOpen(true)}
+        onClick={
+          disabled
+            ? undefined
+            : () => {
+                setModalOpen(true)
+              }
+        }
         id={`BlowoutZOffsetField_${name}`}
         data-testid={`BlowoutZOffsetField_${name}`}
       >

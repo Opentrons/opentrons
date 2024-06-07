@@ -162,7 +162,9 @@ function FixtureTableItem({
           }
           onClick={
             isConflictingFixtureConfigured
-              ? () => setShowLocationConflictModal(true)
+              ? () => {
+                  setShowLocationConflictModal(true)
+                }
               : () => {
                   setCutoutId(cutoutId)
                   setProvidedFixtureOptions(compatibleCutoutFixtureIds)
@@ -186,7 +188,9 @@ function FixtureTableItem({
     <React.Fragment key={cutoutId}>
       {showLocationConflictModal ? (
         <LocationConflictModal
-          onCloseClick={() => setShowLocationConflictModal(false)}
+          onCloseClick={() => {
+            setShowLocationConflictModal(false)
+          }}
           cutoutId={cutoutId}
           requiredFixtureId={compatibleCutoutFixtureIds[0]}
           isOnDevice={true}

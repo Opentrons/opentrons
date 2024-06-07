@@ -44,7 +44,9 @@ export function ProtocolSetupLiquids({
     <>
       <ODDBackButton
         label={t('liquids')}
-        onClick={() => setSetupScreen('prepare to run')}
+        onClick={() => {
+          setSetupScreen('prepare to run')
+        }}
       />
       <Flex
         flexDirection={DIRECTION_COLUMN}
@@ -89,7 +91,9 @@ export function LiquidsList(props: LiquidsListProps): JSX.Element {
         alignItems={ALIGN_CENTER}
         width="100%"
         gridGap={SPACING.spacing16}
-        onClick={() => setOpenItem(prevOpenItem => !prevOpenItem)}
+        onClick={() => {
+          setOpenItem(prevOpenItem => !prevOpenItem)
+        }}
         aria-label={`Liquids_${liquid.id}`}
       >
         <Flex

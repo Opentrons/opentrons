@@ -103,7 +103,6 @@ module.exports = {
         '@typescript-eslint/no-unnecessary-boolean-literal-compare': 'warn',
         '@typescript-eslint/no-unsafe-argument': 'warn',
         '@typescript-eslint/consistent-indexed-object-style': 'warn',
-        '@typescript-eslint/no-confusing-void-expression': 'warn',
         '@typescript-eslint/ban-types': 'warn',
         '@typescript-eslint/non-nullable-type-assertion-style': 'warn',
         '@typescript-eslint/await-thenable': 'warn',

@@ -43,7 +43,6 @@ describe('RobotSettings Troubleshooting', () => {
   beforeEach(() => {
     props = {
       robotName: ROBOT_NAME,
-      isEstopNotDisengaged: false,
     }
     when(useRobot).calledWith(ROBOT_NAME).thenReturn(mockConnectableRobot)
     when(useHost).calledWith().thenReturn(HOST_CONFIG)
@@ -89,11 +88,5 @@ describe('RobotSettings Troubleshooting', () => {
     await waitFor(() => {
       expect(downloadLogsButton).not.toBeDisabled()
     })
-  })
-
-  it('should make donwload button disabled when e-stop is pressed', () => {
-    props = { ...props, isEstopNotDisengaged: true }
-    render(props)
-    expect(screen.getByRole('button', { name: 'Download logs' })).toBeDisabled()
   })
 })

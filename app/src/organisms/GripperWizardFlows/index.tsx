@@ -129,8 +129,12 @@ export function GripperWizardFlows(
     deleteMaintenanceRun,
     isLoading: isDeleteLoading,
   } = useDeleteMaintenanceRunMutation({
-    onSuccess: () => closeFlow(),
-    onError: () => closeFlow(),
+    onSuccess: () => {
+      closeFlow()
+    },
+    onError: () => {
+      closeFlow()
+    },
   })
 
   const handleCleanUpAndClose = (): void => {

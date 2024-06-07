@@ -53,11 +53,11 @@ export function useUpdatePipetteSettingsMutation(
         .then(response => {
           queryClient
             .invalidateQueries([host, 'pipettes', 'settings'])
-            .catch((e: Error) =>
+            .catch((e: Error) => {
               console.error(
                 `error invalidating pipette settings query: ${e.message}`
               )
-            )
+            })
           return response.data
         })
         .catch(e => {

@@ -72,11 +72,9 @@ export function SummaryAndSettings(
   const { createRun } = useCreateRunMutation(
     {
       onSuccess: data => {
-        queryClient
-          .invalidateQueries([host, 'runs'])
-          .catch((e: Error) =>
-            console.error(`error invalidating runs query: ${e.message}`)
-          )
+        queryClient.invalidateQueries([host, 'runs']).catch((e: Error) => {
+          console.error(`error invalidating runs query: ${e.message}`)
+        })
         history.push(`/runs/${data.data.id}/setup`)
       },
     },
@@ -106,7 +104,9 @@ export function SummaryAndSettings(
       <ChildNavigation
         header={t('quick_transfer_volume', { volume: wizardFlowState.volume })}
         buttonText={t('create_transfer')}
-        onClickButton={() => setShowSaveOrRunModal(true)}
+        onClickButton={() => {
+          setShowSaveOrRunModal(true)
+        }}
         secondaryButtonProps={exitButtonProps}
       />
       <Flex
@@ -130,7 +130,9 @@ export function SummaryAndSettings(
               key={category}
               title={category}
               isSelected={category === selectedCategory}
-              onClick={() => setSelectedCategory(category)}
+              onClick={() => {
+                setSelectedCategory(category)
+              }}
               height={SPACING.spacing60}
             >
               {t(category)}

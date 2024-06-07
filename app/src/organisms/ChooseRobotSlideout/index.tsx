@@ -425,8 +425,12 @@ export function ChooseRobotSlideout(
             }
             id={id}
             error={error}
-            onBlur={() => setIsInputFocused(false)}
-            onFocus={() => setIsInputFocused(true)}
+            onBlur={() => {
+              setIsInputFocused(false)
+            }}
+            onFocus={() => {
+              setIsInputFocused(true)
+            }}
             onChange={e => {
               const clone = runTimeParametersOverrides.map((parameter, i) => {
                 if (i === index) {
@@ -523,10 +527,9 @@ export function ChooseRobotSlideout(
                 resetRunTimeParameters?.()
               } else {
                 setShowRestoreValuesTooltip(true)
-                setTimeout(
-                  () => setShowRestoreValuesTooltip(false),
-                  TOOLTIP_DELAY_MS
-                )
+                setTimeout(() => {
+                  setShowRestoreValuesTooltip(false)
+                }, TOOLTIP_DELAY_MS)
               }
             }}
             paddingBottom={SPACING.spacing10}

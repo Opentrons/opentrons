@@ -89,7 +89,9 @@ export function LabwareDetails(props: LabwareDetailsProps): JSX.Element {
   }
 
   React.useEffect(() => {
-    const timer = setTimeout(() => setShowToolTip(false), 2000)
+    const timer = setTimeout(() => {
+      setShowToolTip(false)
+    }, 2000)
     return () => {
       clearTimeout(timer)
     }
