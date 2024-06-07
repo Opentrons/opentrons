@@ -68,6 +68,7 @@ class RunOrchestrator:
             hardware_api: Hardware control API instance.
             fixit_runner: LiveRunner for fixit commands.
             setup_runner: LiveRunner for setup commands.
+            protocol_live_runner: LiveRunner for protocol commands.
             json_or_python_protocol_runner: JsonRunner/PythonAndLegacyRunner for protocol commands.
             run_id: run id if any, associated to the runner/engine.
         """
@@ -319,3 +320,4 @@ class RunOrchestrator:
         """Prepare live runner for a run."""
         self._setup_runner.prepare()
         self._fixit_runner.prepare()
+        self._protocol_live_runner.prepare()
