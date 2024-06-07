@@ -2,12 +2,19 @@
 
 import typing
 from pathlib import Path
-from .data_definitions import RobotContextState
 
 _UnderlyingFunctionParameters = typing.ParamSpec("_UnderlyingFunctionParameters")
 _UnderlyingFunctionReturn = typing.TypeVar("_UnderlyingFunctionReturn")
 _UnderlyingFunction = typing.Callable[
     _UnderlyingFunctionParameters, _UnderlyingFunctionReturn
+]
+
+RobotContextState = typing.Literal[
+    "ANALYZING_PROTOCOL",
+    "RUNNING_PROTOCOL",
+    "CALIBRATING",
+    "ROBOT_STARTING_UP",
+    "ROBOT_SHUTTING_DOWN",
 ]
 
 

@@ -4,8 +4,7 @@ import dataclasses
 import typing
 from pathlib import Path
 
-from .data_definitions import RobotContextState
-from .types import SupportsCSVStorage, StorableData
+from .types import SupportsCSVStorage, StorableData, RobotContextState
 
 
 @dataclasses.dataclass(frozen=True)
@@ -28,10 +27,10 @@ class RawContextData(SupportsCSVStorage):
         """Returns the headers for the raw context data."""
         return ("state_id", "function_start_time", "duration")
 
-    def csv_row(self) -> typing.Tuple[int, int, int]:
+    def csv_row(self) -> typing.Tuple[str, int, int]:
         """Returns the raw context data as a string."""
         return (
-            self.state.state_id,
+            self.state,
             self.func_start,
             self.duration,
         )
@@ -40,7 +39,7 @@ class RawContextData(SupportsCSVStorage):
     def from_csv_row(cls, row: typing.Sequence[StorableData]) -> SupportsCSVStorage:
         """Returns a RawContextData object from a CSV row."""
         return cls(
-            state=RobotContextState.from_id(int(row[0])),
+            state=typing.cast(RobotContextState, row[0]),
             func_start=int(row[1]),
             duration=int(row[2]),
         )

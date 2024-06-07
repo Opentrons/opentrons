@@ -26,7 +26,7 @@ _should_track = ff.enable_performance_metrics(
 )
 
 
-class StubbedTracker(SupportsTracking):
+class StubbedTracker:
     """A stubbed tracker that does nothing."""
 
     def __init__(self, storage_location: Path, should_track: bool) -> None:
@@ -59,7 +59,7 @@ class StubbedTracker(SupportsTracking):
         pass
 
 
-def _handle_package_import() -> typing.Type[SupportsTracking]:
+def _handle_package_import() -> typing.Type["SupportsTracking"]:
     """Handle the import of the performance_metrics package.
 
     If the package is not available, return a stubbed tracker.
@@ -73,7 +73,7 @@ def _handle_package_import() -> typing.Type[SupportsTracking]:
 
 
 package_to_use = _handle_package_import()
-_robot_context_tracker: SupportsTracking | None = None
+_robot_context_tracker: "SupportsTracking" | None = None
 
 
 # TODO: derek maggio (06-03-2024): investigate if _should_track should be
@@ -83,7 +83,7 @@ _robot_context_tracker: SupportsTracking | None = None
 # flag. The easiest way to test this is on a robot when that is working.
 
 
-def _get_robot_context_tracker() -> SupportsTracking:
+def _get_robot_context_tracker() -> "SupportsTracking":
     """Singleton for the robot context tracker."""
     global _robot_context_tracker
     if _robot_context_tracker is None:
@@ -98,8 +98,8 @@ def track_analysis(
 ) -> _UnderlyingFunction[_UnderlyingFunctionParameters, _UnderlyingFunctionReturn]:
     """Track the analysis of a protocol and store each run."""
     # TODO: derek maggio (06-03-2024): generalize creating wrapper functions for tracking different states
-    tracker: SupportsTracking = _get_robot_context_tracker()
-    wrapped = tracker.track(state=RobotContextState.ANALYZING_PROTOCOL)(func)
+    tracker: "SupportsTracking" = _get_robot_context_tracker()
+    wrapped = tracker.track(state="ANALYZING_PROTOCOL")(func)
 
     @functools.wraps(func)
     def wrapper(

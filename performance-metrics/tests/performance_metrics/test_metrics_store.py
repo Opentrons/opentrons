@@ -5,7 +5,6 @@ from time import sleep
 
 from performance_metrics.robot_context_tracker import RobotContextTracker
 from performance_metrics.data_shapes import RawContextData
-from performance_metrics.data_definitions import RobotContextState
 
 # Corrected times in seconds
 STARTING_TIME = 0.001
@@ -19,15 +18,15 @@ async def test_storing_to_file(tmp_path: Path) -> None:
     """Tests storing the tracked data to a file."""
     robot_context_tracker = RobotContextTracker(tmp_path, should_track=True)
 
-    @robot_context_tracker.track(RobotContextState.STARTING_UP)
+    @robot_context_tracker.track("ROBOT_STARTING_UP")
     def starting_robot() -> None:
         sleep(STARTING_TIME)
 
-    @robot_context_tracker.track(RobotContextState.CALIBRATING)
+    @robot_context_tracker.track("CALIBRATING")
     async def calibrating_robot() -> None:
         sleep(CALIBRATING_TIME)
 
-    @robot_context_tracker.track(RobotContextState.ANALYZING_PROTOCOL)
+    @robot_context_tracker.track("ANALYZING_PROTOCOL")
     def analyzing_protocol() -> None:
         sleep(ANALYZING_TIME)
 
