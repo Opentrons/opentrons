@@ -2,8 +2,8 @@
 
 import csv
 import typing
-from opentrons_shared_data.performance.dev_types import MetricsMetadata
-from performance_metrics.datashapes import SupportsCSVStorage
+from .data_shapes import MetricsMetadata
+from .types import SupportsCSVStorage
 
 T = typing.TypeVar("T", bound=SupportsCSVStorage)
 
