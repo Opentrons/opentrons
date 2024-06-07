@@ -31,7 +31,7 @@ class BaseErrorBody(BaseResponseBody):
         )
 
 
-class ErrorSource(BaseResponseBody):
+class ErrorSource(BaseModel):
     """An object containing references to the source of the error."""
 
     pointer: Optional[str] = Field(

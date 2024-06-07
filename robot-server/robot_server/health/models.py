@@ -1,11 +1,11 @@
 """HTTP request and response models for /health endpoints."""
 import typing
-from pydantic import Field
+from pydantic import BaseModel, Field
 from opentrons_shared_data.deck.dev_types import RobotModel
 from robot_server.service.json_api import BaseResponseBody
 
 
-class HealthLinks(BaseResponseBody):
+class HealthLinks(BaseModel):
     """Useful server links."""
 
     apiLog: str = Field(
