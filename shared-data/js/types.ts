@@ -620,13 +620,20 @@ interface BooleanParameter extends BaseRunTimeParameter {
   default: boolean
 }
 
+interface CsvFileParameter extends BaseRunTimeParameter {
+  type: CsvFileParameterType
+  default: string
+}
+
 type NumberParameterType = 'int' | 'float'
 type BooleanParameterType = 'bool'
 type StringParameterType = 'str'
+type CsvFileParameterType = 'csv'
 type RunTimeParameterType =
   | NumberParameter
   | BooleanParameterType
   | StringParameterType
+  | CsvFileParameterType
 
 interface BaseRunTimeParameter {
   displayName: string
@@ -640,6 +647,7 @@ export type RunTimeParameter =
   | BooleanParameter
   | ChoiceParameter
   | NumberParameter
+  | CsvFileParameter
 
 // TODO(BC, 10/25/2023): this type (and others in this file) probably belong in api-client, not here
 export interface CompletedProtocolAnalysis {

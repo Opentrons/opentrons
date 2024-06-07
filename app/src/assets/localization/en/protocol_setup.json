@@ -52,6 +52,7 @@
   "connect_modules_for_controls": "Connect modules to see controls",
   "connection_info_not_available": "Connection info not available once run has started",
   "connection_status": "Connection Status",
+  "csv_file": "CSV File",
   "currently_configured": "Currently configured",
   "currently_unavailable": "Currently unavailable",
   "custom_values": "Custom values",
