@@ -38,6 +38,7 @@ import { useFeatureFlag } from '../../../redux/config'
 import type { RunTimeParameter } from '@opentrons/shared-data'
 import type { RunStatus } from '@opentrons/api-client'
 
+// ToDo (kk:06/07/2024) this will be removed when be is ready
 const mockCsvFileParameter = {
   value: 'mock.csv',
   displayName: 'My CSV File',
