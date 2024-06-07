@@ -4,12 +4,16 @@ import * as React from 'react'
 import { useDropTipCommandErrors } from '../errors'
 import { useDropTipMaintenanceRun } from './useDropTipMaintenanceRun'
 import { useDropTipCreateCommands } from './useDropTipCreateCommands'
-import { useDropTipCommands } from './useDropTipCommands'
+import {
+  useDropTipCommands,
+  buildLoadPipetteCommand,
+} from './useDropTipCommands'
 
 import type { SetRobotErrorDetailsParams } from '../errors'
 import type { UseDropTipCommandsResult } from './useDropTipCommands'
 import type { ErrorDetails, IssuedCommandsType } from '../../types'
 import type { DropTipWizardFlowsProps } from '../..'
+import type { UseDropTipCreateCommandsResult } from './useDropTipCreateCommands'
 
 export type UseDTWithTypeParams = DropTipWizardFlowsProps & {
   issuedCommandsType: IssuedCommandsType
@@ -56,6 +60,8 @@ export function useDropTipWithType(
     toggleIsExiting,
   })
 
+  useRegisterPipetteFixitType({ ...params, ...dtCreateCommandUtils })
+
   return {
     activeMaintenanceRunId,
     errorDetails,
@@ -99,4 +105,22 @@ function useIsExitingDT(
   const isExitingIfNotFixit = issuedCommandsType === 'fixit' ? false : isExiting
 
   return { isExiting: isExitingIfNotFixit, toggleIsExiting }
+}
+
+type UseRegisterPipetteFixitType = UseDTWithTypeParams &
+  UseDropTipCreateCommandsResult
+
+// On mount, if fixit command type, load the managed pipette ID for use in DT Wiz.
+function useRegisterPipetteFixitType({
+  mount,
+  instrumentModelSpecs,
+  issuedCommandsType,
+  chainRunCommands,
+}: UseRegisterPipetteFixitType): void {
+  React.useEffect(() => {
+    if (issuedCommandsType === 'fixit') {
+      const command = buildLoadPipetteCommand(mount, instrumentModelSpecs.name)
+      void chainRunCommands([command], true)
+    }
+  }, [])
 }
