@@ -19,7 +19,12 @@ import { RecoveryInProgress } from './RecoveryInProgress'
 import { getErrorKind } from './utils'
 import { RECOVERY_MAP } from './constants'
 
-import type { FailedCommand, IRecoveryMap, RecoveryContentProps } from './types'
+import type {
+  FailedCommand,
+  IRecoveryMap,
+  RecoveryContentProps,
+  RecoveryRoute,
+} from './types'
 import type {
   useRouteUpdateActions,
   UseRouteUpdateActionsResult,
@@ -53,6 +58,7 @@ export function useERWizard(): UseERWizardResult {
 export interface ErrorRecoveryWizardProps {
   failedCommand: FailedCommand
   recoveryMap: IRecoveryMap
+  previousRoute: RecoveryRoute | null
   routeUpdateActions: UseRouteUpdateActionsResult
   recoveryCommands: UseRecoveryCommandsResult
   tipStatusUtils: RecoveryTipStatusUtils

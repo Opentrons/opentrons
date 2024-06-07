@@ -13,6 +13,7 @@ import {
   useRouteUpdateActions,
   useRecoveryCommands,
   useRecoveryTipStatus,
+  usePreviousRecoveryRoute,
 } from './utils'
 import { RECOVERY_MAP } from './constants'
 
@@ -77,6 +78,7 @@ export function ErrorRecoveryFlows({
     route: RECOVERY_MAP.OPTION_SELECTION.ROUTE,
     step: RECOVERY_MAP.OPTION_SELECTION.STEPS.SELECT,
   })
+  const previousRoute = usePreviousRecoveryRoute(recoveryMap.route)
 
   const tipStatusUtils = useRecoveryTipStatus(runId)
 
@@ -102,6 +104,7 @@ export function ErrorRecoveryFlows({
         <ErrorRecoveryWizard
           failedCommand={failedCommand as FailedCommand} // Safe, since can't enter flows from Splash unless truthy.
           recoveryMap={recoveryMap}
+          previousRoute={previousRoute}
           routeUpdateActions={routeUpdateActions}
           recoveryCommands={recoveryCommands}
           hasLaunchedRecovery={hasLaunchedRecovery}
