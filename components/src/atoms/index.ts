@@ -1,4 +1,5 @@
 export * from './buttons'
+export * from './Checkbox'
 export * from './CheckboxField'
 export * from './Chip'
 export * from './StepMeter'
