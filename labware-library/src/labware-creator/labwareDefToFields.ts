@@ -9,7 +9,8 @@ import type { LabwareFields, BooleanString } from './fields'
 const boolToBoolString = (b: boolean): BooleanString => (b ? 'true' : 'false')
 
 export function labwareDefToFields(
-  def: LabwareDefinition2
+  def: LabwareDefinition2,
+  adapterDefinitions: LabwareDefinition2[]
 ): LabwareFields | null {
   const allUniqueWellGroupProps = getUniqueWellProperties(def)
 
@@ -80,23 +81,28 @@ export function labwareDefToFields(
 
   const firstGroup: LabwareWellGroup | undefined = def.groups[0]
   const firstGroupBrand = firstGroup?.brand
-
+  const zDimension = def.dimensions.zDimension
   const compatibleAdapters: Record<string, number> =
     def.stackingOffsetWithLabware != null
       ? Object.entries(def.stackingOffsetWithLabware).reduce<
           Record<string, number>
         >((acc, [loadName, offset]) => {
-          acc[loadName] = offset.z
+          const adapterZDimension = Object.values(adapterDefinitions).find(
+            def => def.parameters.loadName === loadName
+          )?.dimensions.zDimension
+          if (adapterZDimension != null) {
+            acc[loadName] = adapterZDimension + zDimension - offset.z
+          }
+
           return acc
         }, {})
       : {}
-
   const compatibleModules: Record<string, number> =
     def.stackingOffsetWithModule != null
       ? Object.entries(def.stackingOffsetWithModule).reduce<
           Record<string, number>
         >((acc, [moduleModel, offset]) => {
-          acc[moduleModel] = offset.z
+          acc[moduleModel] = zDimension - offset.z
           return acc
         }, {})
       : {}

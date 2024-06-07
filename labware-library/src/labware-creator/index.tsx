@@ -227,7 +227,10 @@ export const LabwareCreator = (): JSX.Element => {
             })
             return
           }
-          const fields = labwareDefToFields(parsedLabwareDef)
+          const fields = labwareDefToFields(
+            parsedLabwareDef,
+            adapterDefinitions
+          )
           if (fields == null) {
             setImportError(
               { key: 'UNSUPPORTED_LABWARE_PROPERTIES' },

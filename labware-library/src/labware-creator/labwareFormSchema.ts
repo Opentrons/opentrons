@@ -94,7 +94,7 @@ export const labwareFormSchemaBaseObject = Yup.object({
       'Please make sure each module selected has a height',
       value => {
         for (const [, val] of Object.entries(value)) {
-          if (typeof val !== 'string' || typeof val !== 'number') {
+          if (typeof val !== 'string' && typeof val !== 'number') {
             return false
           }
         }
@@ -110,7 +110,7 @@ export const labwareFormSchemaBaseObject = Yup.object({
       'Please make sure each labware selected has a height',
       value => {
         for (const [, val] of Object.entries(value)) {
-          if (typeof val !== 'string' || typeof val !== 'number') {
+          if (typeof val !== 'string' && typeof val !== 'number') {
             return false
           }
         }

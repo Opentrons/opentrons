@@ -50,6 +50,7 @@ export const StackingOffsets = (): JSX.Element | null => {
     touched,
     setFieldValue,
   } = useFormikContext<LabwareFields>()
+
   if (isEveryFieldHidden(fieldList, values)) {
     return null
   }
