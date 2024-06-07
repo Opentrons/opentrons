@@ -20,7 +20,6 @@ interface CopyOverrides {
 export interface FixitCommandTypeUtils {
   runId: string
   failedCommandId: string
-  onCloseFlow: () => Promise<void>
   copyOverrides: CopyOverrides
 }
 

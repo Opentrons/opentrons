@@ -50,7 +50,7 @@ export type DropTipWizardProps = DropTipWizardFlowsProps &
 export function DropTipWizard(props: DropTipWizardProps): JSX.Element {
   const {
     issuedCommandsType,
-    fixitCommandTypeUtils,
+    closeFlow,
     activeMaintenanceRunId,
     proceed,
     goBack,
@@ -86,8 +86,9 @@ export function DropTipWizard(props: DropTipWizardProps): JSX.Element {
   // Either proceed to drop tip if blowout or execute the close flow routine, accounting for the commands type.
   const proceedWithConditionalClose = (): Promise<void> => {
     if (isFinalWizardStep) {
-      if (fixitCommandTypeUtils != null) {
-        return fixitCommandTypeUtils.onCloseFlow()
+      if (issuedCommandsType === 'fixit') {
+        closeFlow()
+        return Promise.resolve()
       } else {
         return dropTipCommands.handleCleanUpAndClose()
       }
