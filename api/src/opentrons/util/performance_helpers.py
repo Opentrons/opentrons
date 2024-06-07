@@ -2,13 +2,7 @@
 
 import functools
 from pathlib import Path
-from opentrons_shared_data.performance.dev_types import (
-    SupportsTracking,
-    UnderlyingFunction,
-    UnderlyingFunctionParameters,
-    UnderlyingFunctionReturn,
-    RobotContextState,
-)
+
 from opentrons_shared_data.robot.dev_types import RobotTypeEnum
 import typing
 from opentrons.config import (
@@ -16,6 +10,15 @@ from opentrons.config import (
     robot_configs,
     feature_flags as ff,
 )
+
+if typing.TYPE_CHECKING:
+    from performance_metrics import RobotContextState, SupportsTracking
+
+_UnderlyingFunctionParameters = typing.ParamSpec("_UnderlyingFunctionParameters")
+_UnderlyingFunctionReturn = typing.TypeVar("_UnderlyingFunctionReturn")
+_UnderlyingFunction = typing.Callable[
+    _UnderlyingFunctionParameters, _UnderlyingFunctionReturn
+]
 
 
 _should_track = ff.enable_performance_metrics(
@@ -33,10 +36,19 @@ class StubbedTracker(SupportsTracking):
     def track(
         self,
         state: "RobotContextState",
-    ) -> typing.Callable[[UnderlyingFunction], UnderlyingFunction]:
+    ) -> typing.Callable[
+        [_UnderlyingFunction[_UnderlyingFunctionParameters, _UnderlyingFunctionReturn]],
+        _UnderlyingFunction[_UnderlyingFunctionParameters, _UnderlyingFunctionReturn],
+    ]:
         """Return the original function."""
 
-        def inner_decorator(func: UnderlyingFunction) -> UnderlyingFunction:
+        def inner_decorator(
+            func: _UnderlyingFunction[
+                _UnderlyingFunctionParameters, _UnderlyingFunctionReturn
+            ]
+        ) -> _UnderlyingFunction[
+            _UnderlyingFunctionParameters, _UnderlyingFunctionReturn
+        ]:
             """Return the original function."""
             return func
 
@@ -81,7 +93,9 @@ def _get_robot_context_tracker() -> SupportsTracking:
     return _robot_context_tracker
 
 
-def track_analysis(func: UnderlyingFunction) -> UnderlyingFunction:
+def track_analysis(
+    func: _UnderlyingFunction[_UnderlyingFunctionParameters, _UnderlyingFunctionReturn]
+) -> _UnderlyingFunction[_UnderlyingFunctionParameters, _UnderlyingFunctionReturn]:
     """Track the analysis of a protocol and store each run."""
     # TODO: derek maggio (06-03-2024): generalize creating wrapper functions for tracking different states
     tracker: SupportsTracking = _get_robot_context_tracker()
@@ -89,9 +103,9 @@ def track_analysis(func: UnderlyingFunction) -> UnderlyingFunction:
 
     @functools.wraps(func)
     def wrapper(
-        *args: UnderlyingFunctionParameters.args,
-        **kwargs: UnderlyingFunctionParameters.kwargs
-    ) -> UnderlyingFunctionReturn:
+        *args: _UnderlyingFunctionParameters.args,
+        **kwargs: _UnderlyingFunctionParameters.kwargs
+    ) -> _UnderlyingFunctionReturn:
         try:
             return wrapped(*args, **kwargs)
         finally:

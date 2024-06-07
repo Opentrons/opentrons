@@ -1,7 +1,7 @@
 """Tests for performance_helpers."""
 
 from pathlib import Path
-from opentrons_shared_data.performance.dev_types import RobotContextState
+from performance_metrics import RobotContextState
 from opentrons.util.performance_helpers import (
     StubbedTracker,
     _get_robot_context_tracker,
