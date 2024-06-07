@@ -100,7 +100,7 @@ export function ErrorRecoveryFlows({
     <>
       {showERWizard ? (
         <ErrorRecoveryWizard
-          failedCommand={failedCommand}
+          failedCommand={failedCommand as FailedCommand} // Safe, since can't enter flows from Splash unless truthy.
           recoveryMap={recoveryMap}
           routeUpdateActions={routeUpdateActions}
           recoveryCommands={recoveryCommands}

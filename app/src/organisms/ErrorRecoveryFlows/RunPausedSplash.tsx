@@ -59,6 +59,9 @@ export function RunPausedSplash({
   // TODO(jh 05-22-24): The hardcoded Z-indexing is non-ideal but must be done to keep the splash page above
   // several components in the RunningProtocol page. Investigate why these components have seemingly arbitrary zIndex values
   // and devise a better solution to layering modals.
+
+  // TODO(jh 06-07-24): Although unlikely, it's possible that the server doesn't return a failedCommand. We disable
+  // the button, but showing tooltip text as to why it's disabled *might* be helpful.
   return (
     <Flex
       display={DISPLAY_FLEX}
@@ -96,6 +99,7 @@ export function RunPausedSplash({
           css={SHARED_BUTTON_STYLE}
           iconName={'recovery'}
           buttonType="onColor"
+          disabled={failedCommand == null}
         />
       </Flex>
     </Flex>

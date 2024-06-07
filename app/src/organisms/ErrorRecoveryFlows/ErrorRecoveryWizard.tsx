@@ -51,7 +51,7 @@ export function useERWizard(): UseERWizardResult {
 }
 
 export interface ErrorRecoveryWizardProps {
-  failedCommand: FailedCommand | null
+  failedCommand: FailedCommand
   recoveryMap: IRecoveryMap
   routeUpdateActions: UseRouteUpdateActionsResult
   recoveryCommands: UseRecoveryCommandsResult
@@ -68,7 +68,7 @@ export function ErrorRecoveryWizard(
     recoveryCommands,
     routeUpdateActions,
   } = props
-  const errorKind = getErrorKind(failedCommand?.error?.errorType)
+  const errorKind = getErrorKind(failedCommand.error?.errorType)
   const isOnDevice = useSelector(getIsOnDevice)
 
   useInitialPipetteHome({
