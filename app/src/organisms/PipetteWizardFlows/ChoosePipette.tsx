@@ -37,6 +37,7 @@ import { getTopPortalEl } from '../../App/portal'
 import { SmallButton } from '../../atoms/buttons'
 import { LegacyModalShell } from '../../molecules/LegacyModal'
 import { WizardHeader } from '../../molecules/WizardHeader'
+import { ModalContentOneColSimpleButtons } from '../../molecules/InterventionModal'
 import singleChannelAndEightChannel from '../../assets/images/change-pip/1_and_8_channel.png'
 import ninetySixChannel from '../../assets/images/change-pip/ninety-six-channel.png'
 import { useAttachedPipettesFromInstrumentsQuery } from '../Devices/hooks'
@@ -166,56 +167,28 @@ export const ChoosePipette = (props: ChoosePipetteProps): JSX.Element => {
               isOnDevice={isOnDevice}
             />
           ) : (
-            <Flex
-              flexDirection={DIRECTION_COLUMN}
-              padding={SPACING.spacing32}
-              justifyContent={JUSTIFY_SPACE_BETWEEN}
-              height="29.5rem"
-            >
-              <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing8}>
-                <StyledText
-                  as="h4"
-                  fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-                  marginBottom={SPACING.spacing4}
-                >
-                  {t('choose_pipette')}
-                </StyledText>
-                <PipetteMountOption
-                  isSelected={selectedPipette === SINGLE_MOUNT_PIPETTES}
-                  onClick={() => {
-                    setSelectedPipette(SINGLE_MOUNT_PIPETTES)
-                  }}
-                >
-                  <StyledText
-                    as="h4"
-                    fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-                  >
-                    {singleMount}
-                  </StyledText>
-                </PipetteMountOption>
-                <PipetteMountOption
-                  isSelected={selectedPipette === NINETY_SIX_CHANNEL}
-                  onClick={() => {
-                    setSelectedPipette(NINETY_SIX_CHANNEL)
-                  }}
-                >
-                  <StyledText
-                    as="h4"
-                    fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-                  >
-                    {bothMounts}
-                  </StyledText>
-                </PipetteMountOption>
-              </Flex>
-              <Flex justifyContent={JUSTIFY_FLEX_END}>
-                <SmallButton
-                  onClick={proceed}
-                  textTransform={TYPOGRAPHY.textTransformCapitalize}
-                  buttonText={i18n.format(t('shared:continue'), 'capitalize')}
-                />
-              </Flex>
-            </Flex>
+            <ModalContentOneColSimpleButtons
+              topText={t('choose_pipette')}
+              firstButton={{
+                label: singleMount,
+                value: SINGLE_MOUNT_PIPETTES,
+              }}
+              secondButton={{
+                label: bothMounts,
+                value: NINETY_SIX_CHANNEL,
+              }}
+              onSelect={event => {
+                setSelectedPipette(event.target.value as any)
+              }}
+            />
           )}
+          <Flex justifyContent={JUSTIFY_FLEX_END}>
+            <SmallButton
+              onClick={proceed}
+              textTransform={TYPOGRAPHY.textTransformCapitalize}
+              buttonText={i18n.format(t('shared:continue'), 'capitalize')}
+            />
+          </Flex>
         </Flex>
       </LegacyModalShell>
     ) : (
