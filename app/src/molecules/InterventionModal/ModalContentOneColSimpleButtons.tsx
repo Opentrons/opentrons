@@ -1,5 +1,11 @@
 import * as React from 'react'
-import { Flex, DIRECTION_COLUMN, SPACING } from '@opentrons/components'
+import {
+  Flex,
+  DIRECTION_COLUMN,
+  SPACING,
+  StyledText,
+  TYPOGRAPHY,
+} from '@opentrons/components'
 import { RadioButton } from '../../atoms/buttons/RadioButton'
 
 export interface ButtonProps {
@@ -9,6 +15,7 @@ export interface ButtonProps {
 }
 
 export interface ModalContentOneColSimpleButtonsProps {
+  topText: string
   firstButton: ButtonProps
   secondButton: ButtonProps
   furtherButtons?: ButtonProps[]
@@ -22,20 +29,29 @@ export function ModalContentOneColSimpleButtons(
   const furtherButtons = props.furtherButtons ?? []
   const buttons = [props.firstButton, props.secondButton, ...furtherButtons]
   return (
-    <Flex flexDirection={DIRECTION_COLUMN} gap={SPACING.spacing4}>
-      {buttons.map((buttonProps, idx) => (
-        <RadioButton
-          key={`button${idx}-${buttonProps.value}`}
-          buttonLabel={buttonProps.label}
-          buttonValue={buttonProps.value}
-          isSelected={selected === buttonProps.value}
-          onChange={event => {
-            setSelected(event.target.value)
-            buttonProps?.onChange && buttonProps.onChange(event)
-            props?.onSelect && props.onSelect(event)
-          }}
-        />
-      ))}
+    <Flex flexDirection={DIRECTION_COLUMN} gap={SPACING.spacing16}>
+      <StyledText
+        fontSize={TYPOGRAPHY.fontSize28}
+        fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+        lineHeight={TYPOGRAPHY.lineHeight36}
+      >
+        {props.topText}
+      </StyledText>
+      <Flex flexDirection={DIRECTION_COLUMN} gap={SPACING.spacing4}>
+        {buttons.map((buttonProps, idx) => (
+          <RadioButton
+            key={`button${idx}-${buttonProps.value}`}
+            buttonLabel={buttonProps.label}
+            buttonValue={buttonProps.value}
+            isSelected={selected === buttonProps.value}
+            onChange={event => {
+              setSelected(event.target.value)
+              buttonProps?.onChange && buttonProps.onChange(event)
+              props?.onSelect && props.onSelect(event)
+            }}
+          />
+        ))}
+      </Flex>
     </Flex>
   )
 }

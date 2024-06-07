@@ -14,9 +14,20 @@ const inputElForButtonFromButtonText = (text: string): HTMLInputElement =>
 /* eslint-enable testing-library/no-node-access */
 
 describe('InterventionModal', () => {
+  it('renders top text', () => {
+    render(
+      <ModalContentOneColSimpleButtons
+        topText={'top text'}
+        firstButton={{ label: 'first button', value: 'first' }}
+        secondButton={{ label: 'second button', value: 'second' }}
+      />
+    )
+    expect(screen.getByText('top text')).not.toBeNull()
+  })
   it('renders buttons', () => {
     render(
       <ModalContentOneColSimpleButtons
+        topText={'top text'}
         firstButton={{ label: 'first button', value: 'first' }}
         secondButton={{ label: 'second button', value: 'second' }}
         furtherButtons={[
@@ -33,6 +44,7 @@ describe('InterventionModal', () => {
   it('enforces single-item selection', () => {
     render(
       <ModalContentOneColSimpleButtons
+        topText={'top text'}
         firstButton={{ label: 'first button', value: 'first' }}
         secondButton={{ label: 'second button', value: 'second' }}
         furtherButtons={[{ label: 'third button', value: 'third' }]}
@@ -57,6 +69,7 @@ describe('InterventionModal', () => {
     const onChange = vi.fn()
     render(
       <ModalContentOneColSimpleButtons
+        topText={'top text'}
         firstButton={{
           label: 'first button',
           value: 'first',
@@ -82,6 +95,7 @@ describe('InterventionModal', () => {
     const onSelect = vi.fn()
     render(
       <ModalContentOneColSimpleButtons
+        topText={'top text'}
         firstButton={{ label: 'first button', value: 'first' }}
         secondButton={{ label: 'second button', value: 'second' }}
         furtherButtons={[{ label: 'third button', value: 'third' }]}
