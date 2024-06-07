@@ -56,38 +56,6 @@ export const StackingOffsets = (): JSX.Element | null => {
   }
 
   const label = `Stacking Offset (Optional)`
-  const handleCheckboxChangeAdapter = (key: string): void => {
-    const compatibleAdaptersCopy: Record<string, number> = Object.keys(
-      values.compatibleAdapters
-    ).reduce<Record<string, number>>((acc, adapterKey) => {
-      if (adapterKey !== key) {
-        acc[adapterKey] = values.compatibleAdapters[adapterKey]
-      }
-      return acc
-    }, {})
-
-    if (!values.compatibleAdapters[key]) {
-      compatibleAdaptersCopy[key] = 0
-    }
-
-    setFieldValue('compatibleAdapters', compatibleAdaptersCopy)
-  }
-
-  const handleCheckboxChangeModule = (module: string): void => {
-    const compatibleModulesCopy: Record<string, number> = Object.keys(
-      values.compatibleModules
-    ).reduce<Record<string, number>>((acc, key) => {
-      if (key !== module) {
-        acc[key] = values.compatibleModules[key]
-      }
-      return acc
-    }, {})
-    if (!values.compatibleModules[module]) {
-      compatibleModulesCopy[module] = 0
-    }
-
-    setFieldValue('compatibleModules', compatibleModulesCopy)
-  }
 
   const isTiprack = values.labwareType === 'tipRack'
   const isVBottom = values.wellBottomShape === 'v'
@@ -178,7 +146,29 @@ export const StackingOffsets = (): JSX.Element | null => {
                       name={fieldName}
                       value={isChecked}
                       label={definition.metadata.displayName}
-                      onChange={() => handleCheckboxChangeAdapter(key)}
+                      onChange={() => {
+                        const compatibleAdaptersCopy: Record<
+                          string,
+                          number
+                        > = Object.keys(values.compatibleAdapters).reduce<
+                          Record<string, number>
+                        >((acc, adapterKey) => {
+                          if (adapterKey !== key) {
+                            acc[adapterKey] =
+                              values.compatibleAdapters[adapterKey]
+                          }
+                          return acc
+                        }, {})
+
+                        if (!values.compatibleAdapters[key]) {
+                          compatibleAdaptersCopy[key] = 0
+                        }
+
+                        setFieldValue(
+                          'compatibleAdapters',
+                          compatibleAdaptersCopy
+                        )
+                      }}
                     />
                     <div className={styles.form_fields_column}>
                       {isChecked ? (
@@ -225,7 +215,28 @@ export const StackingOffsets = (): JSX.Element | null => {
                         name={fieldName}
                         value={isChecked}
                         label={getModuleDisplayName(model)}
-                        onChange={() => handleCheckboxChangeModule(model)}
+                        onChange={() => {
+                          const compatibleModulesCopy: Record<
+                            string,
+                            number
+                          > = Object.keys(values.compatibleModules).reduce<
+                            Record<string, number>
+                          >((acc, key) => {
+                            if (key !== model) {
+                              acc[key] = values.compatibleModules[key]
+                            }
+                            return acc
+                          }, {})
+
+                          if (!values.compatibleModules[model]) {
+                            compatibleModulesCopy[model] = 0
+                          }
+
+                          setFieldValue(
+                            'compatibleModules',
+                            compatibleModulesCopy
+                          )
+                        }}
                       />
                       <div className={styles.form_fields_column}>
                         {isChecked ? (
