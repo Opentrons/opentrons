@@ -155,42 +155,44 @@ export const StackingOffsets = (): JSX.Element | null => {
               highest part of the labware using a pair of calipers.
             </p>
           </div>
-          <Flex gridGap={SPACING.spacing4} flexDirection={DIRECTION_COLUMN}>
-            <StyledText as="h3" fontWeight={600}>
-              Adapters
-            </StyledText>
-            {modifiedAdapterDefinitions.map((definition, index) => {
-              const key = definition.parameters.loadName
-              const fieldName = `compatibleAdapters.${key}`
-              const isChecked = values.compatibleAdapters[key] !== undefined
+          {modifiedAdapterDefinitions.length === 0 ? null : (
+            <Flex gridGap={SPACING.spacing4} flexDirection={DIRECTION_COLUMN}>
+              <StyledText as="h3" fontWeight={600}>
+                Adapters
+              </StyledText>
+              {modifiedAdapterDefinitions.map((definition, index) => {
+                const key = definition.parameters.loadName
+                const fieldName = `compatibleAdapters.${key}`
+                const isChecked = values.compatibleAdapters[key] !== undefined
 
-              return (
-                <Flex
-                  key={index}
-                  justifyContent={JUSTIFY_SPACE_BETWEEN}
-                  alignItems={ALIGN_CENTER}
-                  flexDirection={DIRECTION_ROW}
-                  height="2rem"
-                >
-                  <CheckboxField
-                    name={fieldName}
-                    value={isChecked}
-                    label={definition.metadata.displayName}
-                    onChange={() => handleCheckboxChangeAdapter(key)}
-                  />
-                  <div className={styles.form_fields_column}>
-                    {isChecked ? (
-                      <TextField
-                        name={fieldName as any}
-                        inputMasks={[makeMaskToDecimal(2)]}
-                        units="mm"
-                      />
-                    ) : null}
-                  </div>
-                </Flex>
-              )
-            })}
-          </Flex>
+                return (
+                  <Flex
+                    key={index}
+                    justifyContent={JUSTIFY_SPACE_BETWEEN}
+                    alignItems={ALIGN_CENTER}
+                    flexDirection={DIRECTION_ROW}
+                    height="2rem"
+                  >
+                    <CheckboxField
+                      name={fieldName}
+                      value={isChecked}
+                      label={definition.metadata.displayName}
+                      onChange={() => handleCheckboxChangeAdapter(key)}
+                    />
+                    <div className={styles.form_fields_column}>
+                      {isChecked ? (
+                        <TextField
+                          name={fieldName as any}
+                          inputMasks={[makeMaskToDecimal(2)]}
+                          units="mm"
+                        />
+                      ) : null}
+                    </div>
+                  </Flex>
+                )
+              })}
+            </Flex>
+          )}
           {isTiprack ? null : (
             <>
               <Box
