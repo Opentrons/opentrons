@@ -8,14 +8,13 @@ import {
 } from '@opentrons/shared-data'
 import {
   ALIGN_CENTER,
-  Box,
-  COLORS,
   CheckboxField,
   DIRECTION_COLUMN,
   DIRECTION_ROW,
   Flex,
   JUSTIFY_SPACE_BETWEEN,
   SPACING,
+  TYPOGRAPHY,
   StyledText,
 } from '@opentrons/components'
 import { isEveryFieldHidden } from '../../utils'
@@ -28,14 +27,14 @@ import type { LabwareFields } from '../../fields'
 
 import styles from '../../styles.module.css'
 
-const ADAPTER_BLOCK_LIST = ['opentrons_96_deep_well_adapter']
+const HIGHEST_TC_COMPATIBLE_LABWARE_HEIGHT = 16.06
 const MODULE_MODELS_WITH_NO_ADAPTERS: ModuleModel[] = [
   MAGNETIC_BLOCK_V1,
   THERMOCYCLER_MODULE_V2,
 ]
 
-export const StackingOffsets = (): JSX.Element | null => {
-  const labwareDefinitions = getAllDefinitions(ADAPTER_BLOCK_LIST)
+export function StackingOffsets(): JSX.Element | null {
+  const labwareDefinitions = getAllDefinitions()
   const adapterDefinitions = Object.values(
     labwareDefinitions
   ).filter(definition => definition.allowedRoles?.includes('adapter'))
@@ -55,7 +54,7 @@ export const StackingOffsets = (): JSX.Element | null => {
     return null
   }
 
-  const label = `Stacking Offset (Optional)`
+  const label = 'Stacking Offset (Optional)'
 
   const isTiprack = values.labwareType === 'tipRack'
   const isVBottom = values.wellBottomShape === 'v'
@@ -67,7 +66,7 @@ export const StackingOffsets = (): JSX.Element | null => {
     values.gridColumns != null && parseInt(values.gridColumns) === 12
   const has8Rows = values.gridRows != null && parseInt(values.gridRows) === 8
   const has96Wells = has12Columns && has8Rows
-
+  console.log('adapters', adapterDefinitions)
   let modifiedAdapterDefinitions: LabwareDefinition2[] = []
   if (isTiprack) {
     modifiedAdapterDefinitions = adapterDefinitions.filter(
@@ -75,7 +74,7 @@ export const StackingOffsets = (): JSX.Element | null => {
         definition.parameters.loadName === 'opentrons_flex_96_tiprack_adapter'
     )
   }
-  if (isVBottom) {
+  if (isVBottom && values.labwareType !== 'reservoir') {
     modifiedAdapterDefinitions = adapterDefinitions.filter(
       definition =>
         definition.parameters.loadName === 'opentrons_96_pcr_adapter' ||
@@ -96,9 +95,17 @@ export const StackingOffsets = (): JSX.Element | null => {
         definition.parameters.loadName === 'opentrons_96_flat_bottom_adapter'
     )
   }
+  if (!isCircular && isVBottom && has96Wells) {
+    modifiedAdapterDefinitions = adapterDefinitions.filter(
+      definition =>
+        definition.parameters.loadName === 'opentrons_96_deep_well_adapter'
+    )
+  }
+
   let modifiedModuleModels = MODULE_MODELS_WITH_NO_ADAPTERS
   if (
-    (labwareHeight != null && parseInt(labwareHeight) > 16.06) ||
+    (labwareHeight != null &&
+      parseInt(labwareHeight) > HIGHEST_TC_COMPATIBLE_LABWARE_HEIGHT) ||
     !has96Wells ||
     !isCircular ||
     !isVBottom
@@ -107,6 +114,19 @@ export const StackingOffsets = (): JSX.Element | null => {
       module => module !== THERMOCYCLER_MODULE_V2
     )
   }
+  if (isFlatBottom || values.labwareType === 'reservoir') {
+    modifiedModuleModels = modifiedModuleModels.filter(
+      module => module !== MAGNETIC_BLOCK_V1
+    )
+  }
+
+  if (
+    values.labwareType === 'tubeRack' ||
+    values.labwareType === 'aluminumBlock'
+  ) {
+    return null
+  }
+
   return (
     <div className={styles.new_definition_section}>
       <SectionBody label={label} id="StackingOffsets">
@@ -119,6 +139,9 @@ export const StackingOffsets = (): JSX.Element | null => {
           />
           <div className={styles.instructions_column}>
             <p>
+              Select which adapters or modules this labware will be placed on.
+            </p>
+            <p>
               Stacking offset is required for labware to be placed on modules
               and adapters. Measure from the bottom of the adapter to the
               highest part of the labware using a pair of calipers.
@@ -126,7 +149,7 @@ export const StackingOffsets = (): JSX.Element | null => {
           </div>
           {modifiedAdapterDefinitions.length === 0 ? null : (
             <Flex gridGap={SPACING.spacing4} flexDirection={DIRECTION_COLUMN}>
-              <StyledText as="h3" fontWeight={600}>
+              <StyledText as="h3" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
                 Adapters
               </StyledText>
               {modifiedAdapterDefinitions.map((definition, index) => {
@@ -136,74 +159,9 @@ export const StackingOffsets = (): JSX.Element | null => {
 
                 return (
                   <Flex
-                    key={index}
-                    justifyContent={JUSTIFY_SPACE_BETWEEN}
-                    alignItems={ALIGN_CENTER}
-                    flexDirection={DIRECTION_ROW}
-                    height="2rem"
+                    flexDirection={DIRECTION_COLUMN}
+                    key={`${key}_${index}`}
                   >
-                    <CheckboxField
-                      name={fieldName}
-                      value={isChecked}
-                      label={definition.metadata.displayName}
-                      onChange={() => {
-                        const compatibleAdaptersCopy: Record<
-                          string,
-                          number
-                        > = Object.keys(values.compatibleAdapters).reduce<
-                          Record<string, number>
-                        >((acc, adapterKey) => {
-                          if (adapterKey !== key) {
-                            acc[adapterKey] =
-                              values.compatibleAdapters[adapterKey]
-                          }
-                          return acc
-                        }, {})
-
-                        if (!values.compatibleAdapters[key]) {
-                          compatibleAdaptersCopy[key] = 0
-                        }
-
-                        setFieldValue(
-                          'compatibleAdapters',
-                          compatibleAdaptersCopy
-                        )
-                      }}
-                    />
-                    <div className={styles.form_fields_column}>
-                      {isChecked ? (
-                        <TextField
-                          name={fieldName as any}
-                          inputMasks={[makeMaskToDecimal(2)]}
-                          units="mm"
-                        />
-                      ) : null}
-                    </div>
-                  </Flex>
-                )
-              })}
-            </Flex>
-          )}
-          {isTiprack ? null : (
-            <>
-              <Box
-                borderBottom={`1px solid ${COLORS.grey30}`}
-                marginY="1.5rem"
-              />
-              <Flex
-                gridGap={SPACING.spacing4}
-                flexDirection={DIRECTION_COLUMN}
-                marginTop={SPACING.spacing4}
-              >
-                <StyledText as="h3" fontWeight={600}>
-                  Module Models
-                </StyledText>
-                {modifiedModuleModels.map((model, index) => {
-                  const fieldName = `compatibleModules.${model}`
-                  const isChecked =
-                    values.compatibleModules[model] !== undefined
-
-                  return (
                     <Flex
                       key={index}
                       justifyContent={JUSTIFY_SPACE_BETWEEN}
@@ -214,28 +172,26 @@ export const StackingOffsets = (): JSX.Element | null => {
                       <CheckboxField
                         name={fieldName}
                         value={isChecked}
-                        label={getModuleDisplayName(model)}
+                        label={definition.metadata.displayName}
                         onChange={() => {
-                          const compatibleModulesCopy: Record<
-                            string,
-                            number
-                          > = Object.keys(values.compatibleModules).reduce<
-                            Record<string, number>
-                          >((acc, key) => {
-                            if (key !== model) {
-                              acc[key] = values.compatibleModules[key]
-                            }
-                            return acc
-                          }, {})
-
-                          if (!values.compatibleModules[model]) {
-                            compatibleModulesCopy[model] = 0
+                          const compatibleAdaptersCopy = {
+                            ...values.compatibleAdapters,
                           }
-
-                          setFieldValue(
-                            'compatibleModules',
-                            compatibleModulesCopy
-                          )
+                          if (isChecked) {
+                            const {
+                              [key]: _,
+                              ...newCompatibleAdapters
+                            } = compatibleAdaptersCopy
+                            setFieldValue(
+                              'compatibleAdapters',
+                              newCompatibleAdapters
+                            )
+                          } else {
+                            setFieldValue('compatibleAdapters', {
+                              ...compatibleAdaptersCopy,
+                              [key]: 0,
+                            })
+                          }
                         }}
                       />
                       <div className={styles.form_fields_column}>
@@ -248,10 +204,99 @@ export const StackingOffsets = (): JSX.Element | null => {
                         ) : null}
                       </div>
                     </Flex>
-                  )
-                })}
-              </Flex>
-            </>
+                    {key === 'opentrons_flex_96_tiprack_adapter' ? (
+                      //  NOTE(jr, 6/7/24): keeping the yucky classname + inline style to match other
+                      //  LC designs
+                      <div
+                        className={styles.instructions_column}
+                        style={{ marginTop: '-1rem' }}
+                      >
+                        <p>
+                          Measure from the bottom of the tip rack adapter to the
+                          top of the tip rack.
+                        </p>
+                      </div>
+                    ) : null}
+                  </Flex>
+                )
+              })}
+            </Flex>
+          )}
+          {isTiprack || modifiedModuleModels.length === 0 ? null : (
+            <Flex
+              flexDirection={DIRECTION_COLUMN}
+              marginTop={SPACING.spacing4}
+              gridGap={SPACING.spacing4}
+            >
+              <StyledText as="h3" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
+                Modules
+              </StyledText>
+              {modifiedModuleModels.map((model, index) => {
+                const fieldName = `compatibleModules.${model}`
+                const isChecked = values.compatibleModules[model] !== undefined
+
+                return (
+                  <Flex
+                    flexDirection={DIRECTION_COLUMN}
+                    key={`${model}_${index}`}
+                  >
+                    <Flex
+                      key={index}
+                      justifyContent={JUSTIFY_SPACE_BETWEEN}
+                      alignItems={ALIGN_CENTER}
+                      flexDirection={DIRECTION_ROW}
+                      height="2rem"
+                    >
+                      <CheckboxField
+                        name={fieldName}
+                        value={isChecked}
+                        label={getModuleDisplayName(model)}
+                        onChange={() => {
+                          const compatibleModulesCopy = {
+                            ...values.compatibleModules,
+                          }
+                          if (isChecked) {
+                            const {
+                              [model]: _,
+                              ...newCompatibleModules
+                            } = compatibleModulesCopy
+                            setFieldValue(
+                              'compatibleModules',
+                              newCompatibleModules
+                            )
+                          } else {
+                            setFieldValue('compatibleModules', {
+                              ...compatibleModulesCopy,
+                              [model]: 0,
+                            })
+                          }
+                        }}
+                      />
+                      <div className={styles.form_fields_column}>
+                        {isChecked ? (
+                          <TextField
+                            name={fieldName as any}
+                            inputMasks={[makeMaskToDecimal(2)]}
+                            units="mm"
+                          />
+                        ) : null}
+                      </div>
+                    </Flex>
+
+                    <div
+                      className={styles.instructions_column}
+                      style={{ marginTop: '-1rem' }}
+                    >
+                      <p>
+                        {model === MAGNETIC_BLOCK_V1
+                          ? 'Measure from the bottom of the Magnetic Block to the top of the labware.'
+                          : 'Measure the inside of the Thermocycler using the narrow side of a pair of calipers from the bottom of the block to the top of the labware.'}
+                      </p>
+                    </div>
+                  </Flex>
+                )
+              })}
+            </Flex>
           )}
         </>
       </SectionBody>

@@ -447,8 +447,8 @@ export const LabwareCreator = (): JSX.Element => {
                   <WellShapeAndSides />
                   <WellBottomAndDepth />
                   <WellSpacing />
-                  <StackingOffsets />
                   <GridOffset />
+                  <StackingOffsets />
                   <Preview />
                   <Description />
                   <File />

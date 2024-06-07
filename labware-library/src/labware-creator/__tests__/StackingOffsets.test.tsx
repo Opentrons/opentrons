@@ -2,15 +2,15 @@ import * as React from 'react'
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import '@testing-library/jest-dom/vitest'
 import { useFormikContext } from 'formik'
+import { fireEvent, screen, render } from '@testing-library/react'
 import {
   getAllDefinitions,
   fixtureTiprackAdapter,
   fixture96Plate,
 } from '@opentrons/shared-data'
-import { fireEvent, screen, render } from '@testing-library/react'
 import { StackingOffsets } from '../components/sections/StackingOffsets'
-import type * as SharedData from '@opentrons/shared-data'
 import type * as Formik from 'formik'
+import type * as SharedData from '@opentrons/shared-data'
 
 vi.mock('formik', async importOriginal => {
   const actual = await importOriginal<typeof Formik>()
@@ -61,6 +61,9 @@ describe('StackingOffsets', () => {
   it('renders main text and no modules if is tiprack is true', () => {
     render(<StackingOffsets />)
     screen.getByText(
+      'Select which adapters or modules this labware will be placed on.'
+    )
+    screen.getByText(
       'Stacking offset is required for labware to be placed on modules and adapters. Measure from the bottom of the adapter to the highest part of the labware using a pair of calipers.'
     )
     screen.getByText('Stacking Offset (Optional)')
@@ -92,7 +95,7 @@ describe('StackingOffsets', () => {
       setFieldValue: mockFieldValue,
     } as any)
     render(<StackingOffsets />)
-    screen.getByText('Module Models')
+    screen.getByText('Modules')
     screen.getByText('Magnetic Block GEN1')
     screen.getByText('Thermocycler Module GEN2')
     fireEvent.click(screen.getAllByRole('checkbox')[0])
