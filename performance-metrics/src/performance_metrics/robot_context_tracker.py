@@ -142,7 +142,6 @@ class RobotContextTracker(SupportsTracking):
 
                     return result
 
-                # Whereas this is evaluated correctly as _UnderlyingFunctionReturn
                 return wrapper
 
         return inner_decorator
