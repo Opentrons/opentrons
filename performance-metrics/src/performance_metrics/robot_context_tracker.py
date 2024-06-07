@@ -104,7 +104,6 @@ class RobotContextTracker(SupportsTracking):
                 ) -> _UnderlyingFunctionReturn:
                     function_start_time = timing_function()
                     duration_start_time = perf_counter_ns()
-
                     try:
                         result = await func_to_track(*args, **kwargs)
                     finally:
@@ -118,10 +117,9 @@ class RobotContextTracker(SupportsTracking):
                             )
                         )
 
-                    return result
+                    return result  # type: ignore
 
-                # Why does the type checker evaluate this as Any instead of _UnderlyingFunctionReturn?
-                return async_wrapper
+                return async_wrapper  # type: ignore
             else:
 
                 @wraps(func_to_track)
