@@ -6,6 +6,7 @@ export { useRecoveryCommands } from './useRecoveryCommands'
 export { useRouteUpdateActions } from './useRouteUpdateActions'
 export { useRecoveryTipStatus } from './useRecoveryTipStatus'
 export { usePreviousRecoveryRoute } from './usePreviousRecoveryRoute'
+export { useRecoveryRouting } from './useRecoveryRouting'
 
 export type { UseRouteUpdateActionsResult } from './useRouteUpdateActions'
 export type { UseRecoveryCommandsResult } from './useRecoveryCommands'

@@ -19,15 +19,9 @@ import { RecoveryInProgress } from './RecoveryInProgress'
 import { getErrorKind } from './utils'
 import { RECOVERY_MAP } from './constants'
 
-import type { IRecoveryMap, RecoveryContentProps, RecoveryRoute } from './types'
-import type {
-  useRouteUpdateActions,
-  UseRouteUpdateActionsResult,
-  useRecoveryCommands,
-  UseRecoveryCommandsResult,
-  RecoveryTipStatusUtils,
-} from './utils'
-import type { ErrorRecoveryFlowsProps } from '.'
+import type { RecoveryContentProps } from './types'
+import type { useRouteUpdateActions, useRecoveryCommands } from './utils'
+import type { ErrorRecoveryFlowsProps, ERUtilsResults } from '.'
 
 interface UseERWizardResult {
   hasLaunchedRecovery: boolean
@@ -51,14 +45,7 @@ export function useERWizard(): UseERWizardResult {
   return { showERWizard, toggleERWizard, hasLaunchedRecovery }
 }
 
-export type ErrorRecoveryWizardProps = ErrorRecoveryFlowsProps & {
-  recoveryMap: IRecoveryMap
-  previousRoute: RecoveryRoute | null
-  routeUpdateActions: UseRouteUpdateActionsResult
-  recoveryCommands: UseRecoveryCommandsResult
-  tipStatusUtils: RecoveryTipStatusUtils
-  hasLaunchedRecovery: boolean
-}
+export type ErrorRecoveryWizardProps = ErrorRecoveryFlowsProps & ERUtilsResults
 
 export function ErrorRecoveryWizard(
   props: ErrorRecoveryWizardProps

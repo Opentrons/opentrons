@@ -14,12 +14,16 @@ import {
   useRecoveryCommands,
   useRecoveryTipStatus,
   usePreviousRecoveryRoute,
+  useRecoveryRouting,
 } from './utils'
-import { RECOVERY_MAP } from './constants'
 
-import type { RobotType } from '@opentrons/shared-data'
 import type { RunStatus } from '@opentrons/api-client'
-import type { FailedCommand, IRecoveryMap } from './types'
+import type { FailedCommand, IRecoveryMap, RecoveryRoute } from './types'
+import type {
+  UseRouteUpdateActionsResult,
+  UseRecoveryCommandsResult,
+  RecoveryTipStatusUtils,
+} from './utils'
 
 const VALID_ER_RUN_STATUSES: RunStatus[] = [
   RUN_STATUS_AWAITING_RECOVERY,
@@ -72,29 +76,12 @@ export function ErrorRecoveryFlows(
   const { hasLaunchedRecovery, toggleERWizard, showERWizard } = useERWizard()
   const showSplash = useRunPausedSplash()
 
-  /**
-   * ER Wizard routing.
-   * Recovery Route: A logically-related collection of recovery steps or a single step if unrelated to any existing recovery route.
-   * Recovery Step: Analogous to a "step" in other wizard flows.
-   */
-  const [recoveryMap, setRecoveryMap] = React.useState<IRecoveryMap>({
-    route: RECOVERY_MAP.OPTION_SELECTION.ROUTE,
-    step: RECOVERY_MAP.OPTION_SELECTION.STEPS.SELECT,
-  })
-  const previousRoute = usePreviousRecoveryRoute(recoveryMap.route)
-
-  const tipStatusUtils = useRecoveryTipStatus(runId, isFlex)
-
-  const routeUpdateActions = useRouteUpdateActions({
-    hasLaunchedRecovery,
-    recoveryMap,
-    toggleERWizard,
-    setRecoveryMap,
-  })
-
-  const recoveryCommands = useRecoveryCommands({
-    runId,
+  const recoveryUtils = useERUtils({
+    isFlex,
     failedCommand,
+    runId,
+    toggleERWizard,
+    hasLaunchedRecovery,
   })
 
   if (!enableRunNotes) {
@@ -104,23 +91,63 @@ export function ErrorRecoveryFlows(
   return (
     <>
       {showERWizard ? (
-        <ErrorRecoveryWizard
-          {...props}
-          recoveryMap={recoveryMap}
-          previousRoute={previousRoute}
-          routeUpdateActions={routeUpdateActions}
-          recoveryCommands={recoveryCommands}
-          hasLaunchedRecovery={hasLaunchedRecovery}
-          tipStatusUtils={tipStatusUtils}
-        />
+        <ErrorRecoveryWizard {...props} {...recoveryUtils} />
       ) : null}
       {showSplash ? (
         <RunPausedSplash
           failedCommand={failedCommand}
           toggleERWiz={toggleERWizard}
-          routeUpdateActions={routeUpdateActions}
+          routeUpdateActions={recoveryUtils.routeUpdateActions}
         />
       ) : null}
     </>
   )
+}
+
+type ERUtilsProps = ErrorRecoveryFlowsProps & {
+  toggleERWizard: (launchER: boolean) => Promise<void>
+  hasLaunchedRecovery: boolean
+}
+
+export interface ERUtilsResults {
+  recoveryMap: IRecoveryMap
+  previousRoute: RecoveryRoute | null
+  routeUpdateActions: UseRouteUpdateActionsResult
+  recoveryCommands: UseRecoveryCommandsResult
+  tipStatusUtils: RecoveryTipStatusUtils
+  hasLaunchedRecovery: boolean
+  trackExternalStep: (step: string) => void
+}
+
+// Builds various Error Recovery hooks.
+function useERUtils({
+  isFlex,
+  failedCommand,
+  runId,
+  toggleERWizard,
+  hasLaunchedRecovery,
+}: ERUtilsProps): ERUtilsResults {
+  const { recoveryMap, setRM, trackExternalStep } = useRecoveryRouting()
+  const previousRoute = usePreviousRecoveryRoute(recoveryMap.route)
+  const tipStatusUtils = useRecoveryTipStatus(runId, isFlex)
+  const routeUpdateActions = useRouteUpdateActions({
+    hasLaunchedRecovery,
+    recoveryMap,
+    toggleERWizard,
+    setRecoveryMap: setRM,
+  })
+  const recoveryCommands = useRecoveryCommands({
+    runId,
+    failedCommand,
+  })
+
+  return {
+    recoveryMap,
+    trackExternalStep,
+    previousRoute,
+    routeUpdateActions,
+    recoveryCommands,
+    hasLaunchedRecovery,
+    tipStatusUtils,
+  }
 }
