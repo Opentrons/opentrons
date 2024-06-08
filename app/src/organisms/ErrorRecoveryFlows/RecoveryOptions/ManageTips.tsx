@@ -104,10 +104,8 @@ function BeginRemoval({
   }
 }
 
+// TODO(jh, 06-07-24): Ensure that ALL errors within DT Flows provide routing back to ER for proper error handling, EXEC-512.
 function DropTipFlowsContainer(props: RecoveryContentProps): JSX.Element {
-  // TOME: This is the big guy.
-  // You'll need to figure out what props to pass to DTWiz and how to ensure the routes are in-sync
-  // without copying the DT steps exactly, but if you have to, you can figure out a way to export them.
   const { tipStatusUtils, routeUpdateActions, recoveryCommands, isFlex } = props
   const { DROP_TIP_FLOWS, ROBOT_CANCELING } = RECOVERY_MAP
   const { proceedToRouteAndStep, setRobotInMotion } = routeUpdateActions
@@ -150,6 +148,7 @@ export function useDropTipFlowUtils({
   tipStatusUtils,
   failedCommand,
   previousRoute,
+  trackExternalMap,
 }: RecoveryContentProps): FixitCommandTypeUtils {
   const { t } = useTranslation('error_recovery')
   const { runId } = tipStatusUtils
@@ -169,5 +168,10 @@ export function useDropTipFlowUtils({
     }
   }
 
-  return { runId, failedCommandId, copyOverrides: buildCopyOverrides() }
+  return {
+    runId,
+    failedCommandId,
+    copyOverrides: buildCopyOverrides(),
+    trackCurrentMap: trackExternalMap,
+  }
 }

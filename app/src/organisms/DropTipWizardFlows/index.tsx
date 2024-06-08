@@ -42,16 +42,17 @@ export interface DropTipWizardFlowsProps {
 export function DropTipWizardFlows(
   props: DropTipWizardFlowsProps
 ): JSX.Element {
-  const issuedCommandsType: IssuedCommandsType = props.fixitCommandTypeUtils
-    ? 'fixit'
-    : 'setup'
+  const { fixitCommandTypeUtils } = props
+
+  const issuedCommandsType: IssuedCommandsType =
+    fixitCommandTypeUtils != null ? 'fixit' : 'setup'
 
   const dropTipWithTypeUtils = useDropTipWithType({
     ...props,
     issuedCommandsType,
   })
 
-  const dropTipRoutingUtils = useDropTipRouting()
+  const dropTipRoutingUtils = useDropTipRouting(fixitCommandTypeUtils)
 
   return (
     <DropTipWizard

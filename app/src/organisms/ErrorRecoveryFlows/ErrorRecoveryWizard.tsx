@@ -16,11 +16,15 @@ import {
   ManageTips,
 } from './RecoveryOptions'
 import { RecoveryInProgress } from './RecoveryInProgress'
-import { ERUtilsResults, getErrorKind } from './hooks'
+import { getErrorKind } from './hooks'
 import { RECOVERY_MAP } from './constants'
 
 import type { RecoveryContentProps } from './types'
-import type { useRouteUpdateActions, useRecoveryCommands } from './hooks'
+import type {
+  useRouteUpdateActions,
+  useRecoveryCommands,
+  ERUtilsResults,
+} from './hooks'
 import type { ErrorRecoveryFlowsProps } from '.'
 
 interface UseERWizardResult {

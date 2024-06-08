@@ -22,7 +22,7 @@ export interface ERUtilsResults {
   recoveryCommands: UseRecoveryCommandsResult
   tipStatusUtils: RecoveryTipStatusUtils
   hasLaunchedRecovery: boolean
-  trackExternalStep: (step: string) => void
+  trackExternalMap: (map: Record<string, any>) => void
 }
 
 // Builds various Error Recovery utilities.
@@ -33,7 +33,7 @@ export function useERUtils({
   toggleERWizard,
   hasLaunchedRecovery,
 }: ERUtilsProps): ERUtilsResults {
-  const { recoveryMap, setRM, trackExternalStep } = useRecoveryRouting()
+  const { recoveryMap, setRM, trackExternalMap } = useRecoveryRouting()
   const previousRoute = usePreviousRecoveryRoute(recoveryMap.route)
   const tipStatusUtils = useRecoveryTipStatus(runId, isFlex)
   const routeUpdateActions = useRouteUpdateActions({
@@ -49,7 +49,7 @@ export function useERUtils({
 
   return {
     recoveryMap,
-    trackExternalStep,
+    trackExternalMap,
     previousRoute,
     routeUpdateActions,
     recoveryCommands,
