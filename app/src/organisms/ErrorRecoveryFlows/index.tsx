@@ -15,7 +15,7 @@ import {
   useRecoveryTipStatus,
   usePreviousRecoveryRoute,
   useRecoveryRouting,
-} from './utils'
+} from './hooks'
 
 import type { RunStatus } from '@opentrons/api-client'
 import type { FailedCommand, IRecoveryMap, RecoveryRoute } from './types'
@@ -23,7 +23,7 @@ import type {
   UseRouteUpdateActionsResult,
   UseRecoveryCommandsResult,
   RecoveryTipStatusUtils,
-} from './utils'
+} from './hooks'
 
 const VALID_ER_RUN_STATUSES: RunStatus[] = [
   RUN_STATUS_AWAITING_RECOVERY,
