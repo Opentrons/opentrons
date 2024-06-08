@@ -57,11 +57,20 @@ const dragAndDropText = (
   </StyledText>
 )
 
-export const UploadInput: Story = {
+export const CSVFile: Story = {
   args: {
     onUpload: () => {},
     uploadText,
     uploadButtonText: 'Choose file',
+    dragAndDropText,
+  },
+}
+
+export const ProtocolFile: Story = {
+  args: {
+    onUpload: () => {},
+    uploadText:
+      'Valid file types: Python files (.py) or Protocol Designer files (.json)',
     dragAndDropText,
   },
 }
