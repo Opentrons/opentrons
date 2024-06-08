@@ -3,7 +3,6 @@ import * as React from 'react'
 import { useHost, useInstrumentsQuery } from '@opentrons/react-api-client'
 
 import { useTipAttachmentStatus } from '../../DropTipWizardFlows'
-import { useIsFlex } from '../../Devices/hooks'
 import { useNotifyRunQuery } from '../../../resources/runs'
 
 import type {
@@ -11,26 +10,24 @@ import type {
   PipetteWithTip,
 } from '../../DropTipWizardFlows'
 
-export interface RecoveryTipStatusUtils {
+export type RecoveryTipStatusUtils = TipAttachmentStatusResult & {
+  /* Whether the robot is currently determineTipStatus() */
   isLoadingTipStatus: boolean
-  areTipsAttached: boolean
-  determineTipStatus: () => Promise<PipetteWithTip[]>
-  pipettesWithTip: TipAttachmentStatusResult['pipettesWithTip']
+  runId: string
 }
 
-export function useRecoveryTipStatus(runId: string): RecoveryTipStatusUtils {
+// Wraps the tip attachment status utils with Error Recovery specific states and values.
+export function useRecoveryTipStatus(
+  runId: string,
+  isFlex: boolean
+): RecoveryTipStatusUtils {
   const [isLoadingTipStatus, setIsLoadingTipStatus] = React.useState(false)
   const host = useHost()
-  const isFlex = useIsFlex(host?.robotName ?? '') // Safe to return an empty string - tip presence sensors won't be used.
 
   const { data: runRecord } = useNotifyRunQuery(runId)
   const { data: attachedInstruments } = useInstrumentsQuery()
 
-  const {
-    determineTipStatus,
-    pipettesWithTip,
-    areTipsAttached,
-  } = useTipAttachmentStatus({
+  const tipAttachmentStatusUtils = useTipAttachmentStatus({
     runId,
     host,
     runRecord,
@@ -39,6 +36,7 @@ export function useRecoveryTipStatus(runId: string): RecoveryTipStatusUtils {
   })
 
   const determineTipStatusWithLoading = (): Promise<PipetteWithTip[]> => {
+    const { determineTipStatus } = tipAttachmentStatusUtils
     setIsLoadingTipStatus(true)
 
     return determineTipStatus().then(pipettesWithTips => {
@@ -49,9 +47,9 @@ export function useRecoveryTipStatus(runId: string): RecoveryTipStatusUtils {
   }
 
   return {
+    ...tipAttachmentStatusUtils,
     determineTipStatus: determineTipStatusWithLoading,
-    pipettesWithTip,
     isLoadingTipStatus,
-    areTipsAttached,
+    runId,
   }
 }

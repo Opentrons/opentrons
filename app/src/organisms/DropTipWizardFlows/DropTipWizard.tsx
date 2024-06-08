@@ -50,7 +50,6 @@ export type DropTipWizardProps = DropTipWizardFlowsProps &
 export function DropTipWizard(props: DropTipWizardProps): JSX.Element {
   const {
     issuedCommandsType,
-    closeFlow,
     activeMaintenanceRunId,
     proceed,
     goBack,
@@ -86,12 +85,7 @@ export function DropTipWizard(props: DropTipWizardProps): JSX.Element {
   // Either proceed to drop tip if blowout or execute the close flow routine, accounting for the commands type.
   const proceedWithConditionalClose = (): Promise<void> => {
     if (isFinalWizardStep) {
-      if (issuedCommandsType === 'fixit') {
-        closeFlow()
-        return Promise.resolve()
-      } else {
-        return dropTipCommands.handleCleanUpAndClose()
-      }
+      return dropTipCommands.handleCleanUpAndClose()
     } else {
       return proceed()
     }
@@ -168,6 +162,7 @@ export function DropTipWizardSetupType(
   )
 }
 
+// TODO(jh, 06-07-24): All content views could use refactoring and DQA.
 export const DropTipWizardContent = (
   props: DropTipWizardContainerProps
 ): JSX.Element => {
@@ -178,6 +173,7 @@ export const DropTipWizardContent = (
     errorDetails,
     isCommandInProgress,
     fixitCommandTypeUtils,
+    issuedCommandsType,
     isExiting,
     proceed,
     proceedToRoute,
@@ -299,9 +295,7 @@ export const DropTipWizardContent = (
 
     const buildProceedText = (): string => {
       if (fixitCommandTypeUtils != null) {
-        const btnText = fixitCommandTypeUtils.copyOverrides.tipDropCompleteBtn
-
-        return t(`drop_tip_wizard::${btnText}`)
+        return fixitCommandTypeUtils.copyOverrides.tipDropCompleteBtnCopy
       } else {
         return currentStep === BLOWOUT_SUCCESS
           ? i18n.format(t('shared:continue'), 'capitalize')
@@ -324,7 +318,7 @@ export const DropTipWizardContent = (
   }
 
   function buildModalContent(): JSX.Element {
-    if (activeMaintenanceRunId == null) {
+    if (activeMaintenanceRunId == null && issuedCommandsType === 'setup') {
       return buildGettingReady()
     } else if (isCommandInProgress || isExiting) {
       return buildRobotInMotion()

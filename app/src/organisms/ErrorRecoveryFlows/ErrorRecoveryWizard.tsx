@@ -19,12 +19,7 @@ import { RecoveryInProgress } from './RecoveryInProgress'
 import { getErrorKind } from './utils'
 import { RECOVERY_MAP } from './constants'
 
-import type {
-  FailedCommand,
-  IRecoveryMap,
-  RecoveryContentProps,
-  RecoveryRoute,
-} from './types'
+import type { IRecoveryMap, RecoveryContentProps, RecoveryRoute } from './types'
 import type {
   useRouteUpdateActions,
   UseRouteUpdateActionsResult,
@@ -32,6 +27,7 @@ import type {
   UseRecoveryCommandsResult,
   RecoveryTipStatusUtils,
 } from './utils'
+import type { ErrorRecoveryFlowsProps } from '.'
 
 interface UseERWizardResult {
   hasLaunchedRecovery: boolean
@@ -55,8 +51,7 @@ export function useERWizard(): UseERWizardResult {
   return { showERWizard, toggleERWizard, hasLaunchedRecovery }
 }
 
-export interface ErrorRecoveryWizardProps {
-  failedCommand: FailedCommand
+export type ErrorRecoveryWizardProps = ErrorRecoveryFlowsProps & {
   recoveryMap: IRecoveryMap
   previousRoute: RecoveryRoute | null
   routeUpdateActions: UseRouteUpdateActionsResult
@@ -74,7 +69,7 @@ export function ErrorRecoveryWizard(
     recoveryCommands,
     routeUpdateActions,
   } = props
-  const errorKind = getErrorKind(failedCommand.error?.errorType)
+  const errorKind = getErrorKind(failedCommand?.error?.errorType)
   const isOnDevice = useSelector(getIsOnDevice)
 
   useInitialPipetteHome({

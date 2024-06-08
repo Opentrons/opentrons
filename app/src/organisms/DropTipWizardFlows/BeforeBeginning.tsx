@@ -28,17 +28,14 @@ import { DT_ROUTES } from './constants'
 import blowoutVideo from '../../assets/videos/droptip-wizard/Blowout-Liquid.webm'
 import droptipVideo from '../../assets/videos/droptip-wizard/Drop-tip.webm'
 
-import type { UseDropTipRoutingResult } from './hooks'
+import type { DropTipWizardContainerProps } from './types'
 
-interface BeforeBeginningProps {
-  isOnDevice: boolean
-  proceedToRoute: UseDropTipRoutingResult['proceedToRoute']
-}
-
-export const BeforeBeginning = (
-  props: BeforeBeginningProps
-): JSX.Element | null => {
-  const { proceedToRoute, isOnDevice } = props
+export const BeforeBeginning = ({
+  proceedToRoute,
+  isOnDevice,
+  issuedCommandsType,
+  fixitCommandTypeUtils,
+}: DropTipWizardContainerProps): JSX.Element | null => {
   const { i18n, t } = useTranslation(['drop_tip_wizard', 'shared'])
   const [flowType, setFlowType] = React.useState<
     'blowout' | 'drop_tips' | null
@@ -52,6 +49,15 @@ export const BeforeBeginning = (
     }
   }
 
+  const buildTopText = (): string => {
+    if (issuedCommandsType === 'fixit') {
+      return fixitCommandTypeUtils?.copyOverrides
+        .tipDropCompleteBtnCopy as string
+    } else {
+      return t('before_you_begin_do_you_want_to_blowout')
+    }
+  }
+
   if (isOnDevice) {
     return (
       <Flex
@@ -61,9 +67,7 @@ export const BeforeBeginning = (
         height="100%"
       >
         <Flex flexDirection={DIRECTION_COLUMN}>
-          <Flex css={ODD_TITLE_STYLE}>
-            {t('before_you_begin_do_you_want_to_blowout')}
-          </Flex>
+          <Flex css={ODD_TITLE_STYLE}>{buildTopText()}</Flex>
           <Flex paddingBottom={SPACING.spacing8}>
             <MediumButton
               buttonType={flowType === 'blowout' ? 'primary' : 'secondary'}
@@ -74,6 +78,7 @@ export const BeforeBeginning = (
               buttonText={i18n.format(t('yes_blow_out_liquid'), 'capitalize')}
               justifyContent={JUSTIFY_FLEX_START}
               paddingLeft={SPACING.spacing24}
+              height="5.25rem"
             />
           </Flex>
           <Flex>
@@ -89,6 +94,7 @@ export const BeforeBeginning = (
               )}
               justifyContent={JUSTIFY_FLEX_START}
               paddingLeft={SPACING.spacing24}
+              height="5.25rem"
             />
           </Flex>
         </Flex>

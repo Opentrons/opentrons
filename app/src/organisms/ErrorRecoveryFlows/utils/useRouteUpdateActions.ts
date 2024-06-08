@@ -41,8 +41,8 @@ export function useRouteUpdateActions(
 ): UseRouteUpdateActionsResult {
   const { recoveryMap, setRecoveryMap } = routeUpdateActionsParams
   const { route: currentRoute, step: currentStep } = recoveryMap
-  const stashedMapRef = React.useRef<IRecoveryMap | null>(null)
   const { OPTION_SELECTION, ROBOT_IN_MOTION } = RECOVERY_MAP
+  const stashedMapRef = React.useRef<IRecoveryMap | null>(null)
 
   const goBackPrevStep = React.useCallback((): Promise<void> => {
     return new Promise((resolve, reject) => {

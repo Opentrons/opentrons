@@ -14,7 +14,8 @@ export interface ErrorDetails {
 export type IssuedCommandsType = 'setup' | 'fixit'
 
 interface CopyOverrides {
-  tipDropCompleteBtn: 'proceed_to_cancel' | 'proceed_to_tip_selection'
+  tipDropCompleteBtnCopy: string
+  beforeBeginningTopText: string
 }
 
 export interface FixitCommandTypeUtils {

@@ -17,6 +17,7 @@ import {
 } from './utils'
 import { RECOVERY_MAP } from './constants'
 
+import type { RobotType } from '@opentrons/shared-data'
 import type { RunStatus } from '@opentrons/api-client'
 import type { FailedCommand, IRecoveryMap } from './types'
 
@@ -27,6 +28,7 @@ const VALID_ER_RUN_STATUSES: RunStatus[] = [
 
 interface UseErrorRecoveryResult {
   isERActive: boolean
+  /* There is no FailedCommand if the run statis is not AWAITING_RECOVERY. */
   failedCommand: FailedCommand | null
 }
 
@@ -56,15 +58,16 @@ export function useErrorRecoveryFlows(
   }
 }
 
-interface ErrorRecoveryFlowsProps {
+export interface ErrorRecoveryFlowsProps {
   runId: string
   failedCommand: FailedCommand | null
+  isFlex: boolean
 }
 
-export function ErrorRecoveryFlows({
-  runId,
-  failedCommand,
-}: ErrorRecoveryFlowsProps): JSX.Element | null {
+export function ErrorRecoveryFlows(
+  props: ErrorRecoveryFlowsProps
+): JSX.Element | null {
+  const { runId, failedCommand, isFlex } = props
   const enableRunNotes = useFeatureFlag('enableRunNotes')
   const { hasLaunchedRecovery, toggleERWizard, showERWizard } = useERWizard()
   const showSplash = useRunPausedSplash()
@@ -80,7 +83,7 @@ export function ErrorRecoveryFlows({
   })
   const previousRoute = usePreviousRecoveryRoute(recoveryMap.route)
 
-  const tipStatusUtils = useRecoveryTipStatus(runId)
+  const tipStatusUtils = useRecoveryTipStatus(runId, isFlex)
 
   const routeUpdateActions = useRouteUpdateActions({
     hasLaunchedRecovery,
@@ -102,7 +105,7 @@ export function ErrorRecoveryFlows({
     <>
       {showERWizard ? (
         <ErrorRecoveryWizard
-          failedCommand={failedCommand as FailedCommand} // Safe, since can't enter flows from Splash unless truthy.
+          {...props}
           recoveryMap={recoveryMap}
           previousRoute={previousRoute}
           routeUpdateActions={routeUpdateActions}

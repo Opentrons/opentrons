@@ -130,7 +130,7 @@ describe('useRouteUpdateActions', () => {
   })
 
   it('routes to the route prior to motion after the motion completes', () => {
-    const { result } = renderHook(() =>
+    const { result, rerender } = renderHook(() =>
       useRouteUpdateActions(useRouteUpdateActionsParams)
     )
     const { setRobotInMotion } = result.current
@@ -142,6 +142,7 @@ describe('useRouteUpdateActions', () => {
     })
 
     setRobotInMotion(false)
+    rerender()
     expect(mockSetRecoveryMap).toHaveBeenCalledWith({
       route: RECOVERY_MAP.RETRY_FAILED_COMMAND.ROUTE,
       step: RECOVERY_MAP.RETRY_FAILED_COMMAND.STEPS.CONFIRM_RETRY,

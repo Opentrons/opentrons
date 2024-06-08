@@ -8,7 +8,7 @@ import { useDropTipRouting, useDropTipWithType } from './hooks'
 import { DropTipWizard } from './DropTipWizard'
 
 import type { PipetteModelSpecs, RobotType } from '@opentrons/shared-data'
-import type { PipetteData } from '@opentrons/api-client'
+import type { Mount, PipetteData } from '@opentrons/api-client'
 import type { FixitCommandTypeUtils, IssuedCommandsType } from './types'
 import type { GetPipettesWithTipAttached } from './getPipettesWithTipAttached'
 
@@ -64,7 +64,7 @@ export function DropTipWizardFlows(
 }
 
 export interface PipetteWithTip {
-  mount: 'left' | 'right'
+  mount: Mount
   specs: PipetteModelSpecs
 }
 
@@ -79,9 +79,13 @@ export interface TipAttachmentStatusResult {
   /** Resets the cached pipettes with tip statuses to null.  */
   resetTipStatus: () => void
   /** Removes the first element from the tip attached cache if present.
-   * @param {Function} onEmptyCache After skipping the pipette, if the attached tip cache is empty, invoke this callback.
+   * @param {Function} onEmptyCache After removing the pipette from the cache, if the attached tip cache is empty, invoke this callback.
+   * @param {Function} onTipsDetected After removing the pipette from the cache, if the attached tip cache is not empty, invoke this callback.
    * */
-  setTipStatusResolved: (onEmptyCache?: () => void) => Promise<PipetteWithTip[]>
+  setTipStatusResolved: (
+    onEmptyCache?: () => void,
+    onTipsDetected?: () => void
+  ) => Promise<PipetteWithTip[]>
   /** Relevant pipette information for those pipettes with tips attached. */
   pipettesWithTip: PipetteWithTip[]
 }
@@ -123,13 +127,16 @@ export function useTipAttachmentStatus(
   }
 
   const setTipStatusResolved = (
-    onEmptyCache?: () => void
+    onEmptyCache?: () => void,
+    onTipsDetected?: () => void
   ): Promise<PipetteWithTip[]> => {
     return new Promise<PipetteWithTip[]>(resolve => {
       setPipettesWithTip(prevPipettesWithTip => {
         const newState = [...prevPipettesWithTip.slice(1)]
         if (newState.length === 0) {
           onEmptyCache?.()
+        } else {
+          onTipsDetected?.()
         }
 
         resolve(newState)
