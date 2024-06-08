@@ -16,12 +16,12 @@ import {
   ManageTips,
 } from './RecoveryOptions'
 import { RecoveryInProgress } from './RecoveryInProgress'
-import { getErrorKind } from './hooks'
+import { ERUtilsResults, getErrorKind } from './hooks'
 import { RECOVERY_MAP } from './constants'
 
 import type { RecoveryContentProps } from './types'
 import type { useRouteUpdateActions, useRecoveryCommands } from './hooks'
-import type { ErrorRecoveryFlowsProps, ERUtilsResults } from '.'
+import type { ErrorRecoveryFlowsProps } from '.'
 
 interface UseERWizardResult {
   hasLaunchedRecovery: boolean
