@@ -52,9 +52,11 @@ export function watchForMassStorage(dispatch: Dispatch): () => void {
   console.log('watching for mass storage')
   let prevDirs: string[] = []
   const handleNewlyPresent = (path: string): Promise<string> => {
+    console.log('path', path)
     dispatch(robotMassStorageDeviceAdded(path))
     return enumerateMassStorage(path)
       .then(contents => {
+        console.log('contents', contents)
         dispatch(robotMassStorageDeviceEnumerated(path, contents))
       })
       .then(() => path)

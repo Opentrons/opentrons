@@ -21,6 +21,8 @@ import { ChildNavigation } from '../ChildNavigation'
 import { ResetValuesModal } from './ResetValuesModal'
 import { ChooseEnum } from './ChooseEnum'
 import { ChooseNumber } from './ChooseNumber'
+import { ChooseCsvFile } from './ChooseCsvFile'
+import { useFeatureFlag } from '../../redux/config'
 
 import type { NumberParameter, RunTimeParameter } from '@opentrons/shared-data'
 import type { LabwareOffsetCreateData } from '@opentrons/api-client'
@@ -48,6 +50,10 @@ export function ProtocolSetupParameters({
     showNumericalInputScreen,
     setShowNumericalInputScreen,
   ] = React.useState<NumberParameter | null>(null)
+  const [
+    chooseCsvFileScreen,
+    setChooseCsvFileScreen,
+  ] = React.useState<RunTimeParameter | null>(null)
   const [resetValuesModal, showResetValuesModal] = React.useState<boolean>(
     false
   )
@@ -61,6 +67,8 @@ export function ProtocolSetupParameters({
       return { ...param, value: param.default }
     })
   )
+
+  const enableCsvFile = useFeatureFlag('enableCsvFile')
 
   const updateParameters = (
     value: boolean | string | number,
@@ -131,6 +139,8 @@ export function ProtocolSetupParameters({
       updateParameters(!parameter.value, parameter.variableName)
     } else if (parameter.type === 'int' || parameter.type === 'float') {
       setShowNumericalInputScreen(parameter)
+    } else if (parameter.type === 'csv_file') {
+      setChooseCsvFileScreen(parameter)
     } else {
       // bad param
       console.log('error')
@@ -186,6 +196,19 @@ export function ProtocolSetupParameters({
       </Flex>
     </>
   )
+  // ToDo Update soon
+  // if (enableCsvFile && chooseCsvFileScreen != null) {
+  if (enableCsvFile) {
+    children = (
+      <ChooseCsvFile
+        handleGoBack={() => {
+          setChooseCsvFileScreen(null)
+        }}
+        parameter={chooseCsvFileScreen}
+        setParameter={updateParameters}
+      />
+    )
+  }
   if (chooseValueScreen != null) {
     children = (
       <ChooseEnum
