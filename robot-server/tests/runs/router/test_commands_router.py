@@ -21,7 +21,7 @@ from robot_server.runs.command_models import (
     CommandLink,
     CommandLinkMeta,
 )
-from robot_server.runs.run_store import CommandNotFoundError
+from robot_server.runs.run_store import CommandNotFoundError, RunStore
 from robot_server.runs.engine_store import EngineStore
 from robot_server.runs.run_data_manager import RunDataManager
 from robot_server.runs.run_models import RunCommandSummary, RunNotFoundError
@@ -29,64 +29,65 @@ from robot_server.runs.router.commands_router import (
     create_run_command,
     get_run_command,
     get_run_commands,
+    get_current_run_from_url,
 )
 
 
-# async def test_get_current_run_engine_from_url(
-#     decoy: Decoy,
-#     mock_engine_store: EngineStore,
-#     mock_run_store: RunStore,
-# ) -> None:
-#     """Should get an instance of a run protocol engine."""
-#     decoy.when(mock_run_store.has("run-id")).then_return(True)
-#     decoy.when(mock_engine_store.current_run_id).then_return("run-id")
-#
-#     result = await get_current_run_engine_from_url(
-#         runId="run-id",
-#         engine_store=mock_engine_store,
-#         run_store=mock_run_store,
-#     )
-#
-#     assert result is mock_engine_store.engine
+async def test_get_current_run_from_url(
+    decoy: Decoy,
+    mock_engine_store: EngineStore,
+    mock_run_store: RunStore,
+) -> None:
+    """Should get an instance of a run protocol engine."""
+    decoy.when(mock_run_store.has("run-id")).then_return(True)
+    decoy.when(mock_engine_store.current_run_id).then_return("run-id")
+
+    result = await get_current_run_from_url(
+        runId="run-id",
+        engine_store=mock_engine_store,
+        run_store=mock_run_store,
+    )
+
+    assert result == "run-id"
 
 
-# async def test_get_current_run_engine_no_run(
-#     decoy: Decoy,
-#     mock_engine_store: EngineStore,
-#     mock_run_store: RunStore,
-# ) -> None:
-#     """It should 404 if the run is not in the store."""
-#     decoy.when(mock_run_store.has("run-id")).then_return(False)
-#
-#     with pytest.raises(ApiError) as exc_info:
-#         await get_current_run_engine_from_url(
-#             runId="run-id",
-#             engine_store=mock_engine_store,
-#             run_store=mock_run_store,
-#         )
-#
-#     assert exc_info.value.status_code == 404
-#     assert exc_info.value.content["errors"][0]["id"] == "RunNotFound"
+async def test_get_current_run_no_run(
+    decoy: Decoy,
+    mock_engine_store: EngineStore,
+    mock_run_store: RunStore,
+) -> None:
+    """It should 404 if the run is not in the store."""
+    decoy.when(mock_run_store.has("run-id")).then_return(False)
+
+    with pytest.raises(ApiError) as exc_info:
+        await get_current_run_from_url(
+            runId="run-id",
+            engine_store=mock_engine_store,
+            run_store=mock_run_store,
+        )
+
+    assert exc_info.value.status_code == 404
+    assert exc_info.value.content["errors"][0]["id"] == "RunNotFound"
 
 
-# async def test_get_current_run_engine_from_url_not_current(
-#     decoy: Decoy,
-#     mock_engine_store: EngineStore,
-#     mock_run_store: RunStore,
-# ) -> None:
-#     """It should 409 if you try to add commands to non-current run."""
-#     decoy.when(mock_run_store.has("run-id")).then_return(True)
-#     decoy.when(mock_engine_store.current_run_id).then_return("some-other-run-id")
-#
-#     with pytest.raises(ApiError) as exc_info:
-#         await get_current_run_engine_from_url(
-#             runId="run-id",
-#             engine_store=mock_engine_store,
-#             run_store=mock_run_store,
-#         )
-#
-#     assert exc_info.value.status_code == 409
-#     assert exc_info.value.content["errors"][0]["id"] == "RunStopped"
+async def test_get_current_run_from_url_not_current(
+    decoy: Decoy,
+    mock_engine_store: EngineStore,
+    mock_run_store: RunStore,
+) -> None:
+    """It should 409 if you try to add commands to non-current run."""
+    decoy.when(mock_run_store.has("run-id")).then_return(True)
+    decoy.when(mock_engine_store.current_run_id).then_return("some-other-run-id")
+
+    with pytest.raises(ApiError) as exc_info:
+        await get_current_run_from_url(
+            runId="run-id",
+            engine_store=mock_engine_store,
+            run_store=mock_run_store,
+        )
+
+    assert exc_info.value.status_code == 409
+    assert exc_info.value.content["errors"][0]["id"] == "RunStopped"
 
 
 async def test_create_run_command(

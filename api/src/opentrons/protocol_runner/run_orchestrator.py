@@ -86,6 +86,9 @@ class RunOrchestrator:
         self._fixit_runner = fixit_runner
         self._protocol_live_runner = protocol_live_runner
 
+        self._fixit_runner.prepare()
+        self._setup_runner.prepare()
+
     @property
     def run_id(self) -> str:
         """Get the "current" persisted run_id."""
@@ -320,6 +323,4 @@ class RunOrchestrator:
 
     def prepare(self) -> None:
         """Prepare live runner for a run."""
-        self._setup_runner.prepare()
-        self._fixit_runner.prepare()
         self._protocol_live_runner.prepare()

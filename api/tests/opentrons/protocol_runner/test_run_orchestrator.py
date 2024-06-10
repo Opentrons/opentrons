@@ -463,13 +463,11 @@ def test_get_is_okay_to_clear(
 def test_prepare(
     decoy: Decoy,
     live_protocol_subject: RunOrchestrator,
-    mock_fixit_runner: LiveRunner,
-    mock_setup_runner: LiveRunner,
+    mock_protocol_live_runner: LiveRunner,
 ) -> None:
     """Verify prepare calls runner prepare."""
     live_protocol_subject.prepare()
-    decoy.verify(mock_fixit_runner.prepare())
-    decoy.verify(mock_setup_runner.prepare())
+    decoy.verify(mock_protocol_live_runner.prepare())
 
 
 async def test_stop(
