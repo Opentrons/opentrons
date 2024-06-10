@@ -1,9 +1,9 @@
 import capitalize from 'lodash/capitalize'
+import { displayAsTube, getLabwareName } from './utils'
 import type {
   LabwareDefinition2,
   WellBottomShape,
 } from '@opentrons/shared-data'
-import { displayAsTube, getLabwareName } from './utils'
 
 export const MAX_X_DIMENSION = 129
 export const MIN_X_DIMENSION = 127
@@ -144,6 +144,11 @@ export interface LabwareFields {
 
   loadName: string | null | undefined
   displayName: string | null | undefined
+
+  // used with adapters
+  compatibleAdapters: Record<string, number>
+  // used with modules
+  compatibleModules: Record<string, number>
 }
 
 // NOTE: these fields & types should be kept in sync with Yup schema `labwareFormSchema`.
@@ -193,6 +198,11 @@ export interface ProcessedLabwareFields {
   // if loadName or displayName are left blank, Yup schema generates them
   loadName: string
   displayName: string
+
+  // used with adapters
+  compatibleAdapters: Record<string, number>
+  // used with modules
+  compatibleModules: Record<string, number>
 }
 
 export const tubeRackInsertOptions: Options = [
@@ -410,6 +420,8 @@ export const getDefaultFormState = (): LabwareFields => ({
 
   loadName: null,
   displayName: null,
+  compatibleAdapters: {},
+  compatibleModules: {},
 })
 
 export const LABELS: Record<keyof LabwareFields, string> = {
@@ -443,6 +455,8 @@ export const LABELS: Record<keyof LabwareFields, string> = {
   groupBrandId: 'Manufacturer/Catalog #',
   displayName: 'Display Name',
   loadName: 'API Load Name',
+  compatibleAdapters: 'Is this labware compatible with an adapter?',
+  compatibleModules: 'Is this labware compatible with a module?',
 }
 
 export const getLabel = (
