@@ -173,7 +173,7 @@ function determineValidRoute(
 }
 
 // If an external flow is keeping track of the Drop tip flow map, update it when the drop tip flow map updates.
-function useExternalMapUpdates(
+export function useExternalMapUpdates(
   map: DropTipFlowsMap,
   fixitUtils?: FixitCommandTypeUtils
 ): void {

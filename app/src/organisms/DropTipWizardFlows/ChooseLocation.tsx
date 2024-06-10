@@ -19,11 +19,12 @@ import {
   TYPOGRAPHY,
   useDeckLocationSelect,
 } from '@opentrons/components'
-import {type AddressableAreaName, getDeckDefFromRobotType} from '@opentrons/shared-data'
+import { getDeckDefFromRobotType } from '@opentrons/shared-data'
 
 import { SmallButton } from '../../atoms/buttons'
 import { TwoUpTileLayout } from '../LabwarePositionCheck/TwoUpTileLayout'
 
+import type { AddressableAreaName } from '@opentrons/shared-data'
 import type { DropTipWizardContainerProps } from './types'
 
 // TODO: get help link article URL
@@ -47,7 +48,7 @@ export const ChooseLocation = (
     robotType,
     moveToAddressableArea,
     isOnDevice,
-      issuedCommandsType
+    issuedCommandsType,
   } = props
   const { i18n, t } = useTranslation(['drop_tip_wizard', 'shared'])
   const deckDef = getDeckDefFromRobotType(robotType)
@@ -69,13 +70,14 @@ export const ChooseLocation = (
 
   if (isOnDevice) {
     return (
-        <Flex flexDirection={DIRECTION_COLUMN}
-              gridGap={SPACING.spacing32}
-              padding={issuedCommandsType === 'fixit' ? `${SPACING.spacing32}` : undefined} >
-        <Flex
-          flexDirection={DIRECTION_ROW}
-          flex="1"
-        >
+      <Flex
+        flexDirection={DIRECTION_COLUMN}
+        gridGap={SPACING.spacing32}
+        padding={
+          issuedCommandsType === 'fixit' ? `${SPACING.spacing32}` : undefined
+        }
+      >
+        <Flex flexDirection={DIRECTION_ROW} flex="1">
           <Flex
             flexDirection={DIRECTION_COLUMN}
             gridGap={SPACING.spacing8}
@@ -95,28 +97,28 @@ export const ChooseLocation = (
             {DeckLocationSelect}
           </Flex>
         </Flex>
-         <Flex
+        <Flex
           width="100%"
           justifyContent={JUSTIFY_SPACE_BETWEEN}
           css={ALIGN_BUTTONS}
           gridGap={SPACING.spacing8}
           marginTop="auto"
-           >
-            <Btn
-              onClick={() => {
-                handleGoBack()
-              }}
-            >
-              <StyledText css={GO_BACK_BUTTON_STYLE}>
-                {t('shared:go_back')}
-              </StyledText>
-            </Btn>
-            <SmallButton
-              buttonText={i18n.format(t('move_to_slot'), 'capitalize')}
-              onClick={handleConfirmPosition}
-            />
-          </Flex>
+        >
+          <Btn
+            onClick={() => {
+              handleGoBack()
+            }}
+          >
+            <StyledText css={GO_BACK_BUTTON_STYLE}>
+              {t('shared:go_back')}
+            </StyledText>
+          </Btn>
+          <SmallButton
+            buttonText={i18n.format(t('move_to_slot'), 'capitalize')}
+            onClick={handleConfirmPosition}
+          />
         </Flex>
+      </Flex>
     )
   } else {
     return (

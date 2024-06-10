@@ -42,7 +42,7 @@ export function ManageTips(props: RecoveryContentProps): JSX.Element | null {
 
 type RemovalOptions = 'begin-removal' | 'skip'
 
-function BeginRemoval({
+export function BeginRemoval({
   isOnDevice,
   tipStatusUtils,
   routeUpdateActions,
@@ -131,7 +131,7 @@ function DropTipFlowsContainer(props: RecoveryContentProps): JSX.Element {
   }
 
   return (
-    <RecoverySingleColumnContent padding={0}>
+    <RecoverySingleColumnContent>
       <DropTipWizardFlows
         robotType={isFlex ? FLEX_ROBOT_TYPE : OT2_ROBOT_TYPE}
         closeFlow={onCloseFlow}

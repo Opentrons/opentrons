@@ -142,7 +142,7 @@ export function DropTipWizardSetupType(
     showConfirmExit,
   } = props
 
-  // TODO(jh: 07-10-24): This is not ideal. Refactor this alongside setup type DTWiz DQA.
+  // TODO(jh: 06-10-24): This is not ideal. Refactor this alongside setup type DTWiz DQA.
   const inMotion =
     isCommandInProgress || isExiting || activeMaintenanceRunId == null
   const simpleWizardPaddingOverrides = inMotion || showConfirmExit

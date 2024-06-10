@@ -1,5 +1,4 @@
 import * as React from 'react'
-import { css } from 'styled-components'
 import { useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
 
@@ -15,7 +14,6 @@ import {
 import { getIsOnDevice } from '../../redux/config'
 import { SimpleWizardBody } from '../../molecules/SimpleWizardBody'
 import { SmallButton } from '../../atoms/buttons'
-import { FIXIT_TYPE_STYLES } from './constants'
 
 import type { DropTipWizardContainerProps } from './types'
 
