@@ -7,19 +7,27 @@ import {
   TEXT_TRANSFORM_CAPITALIZE,
   JUSTIFY_FLEX_END,
   Flex,
+  SPACING,
 } from '@opentrons/components'
 
 import { SimpleWizardBody } from '../../molecules/SimpleWizardBody'
 import { SmallButton } from '../../atoms/buttons'
 
-interface SuccessProps {
+import type { DropTipWizardContainerProps } from './types'
+
+type SuccessProps = DropTipWizardContainerProps & {
   message: string
   proceedText: string
   handleProceed: () => void
-  isOnDevice: boolean
 }
 export const Success = (props: SuccessProps): JSX.Element => {
-  const { message, proceedText, handleProceed, isOnDevice } = props
+  const {
+    message,
+    proceedText,
+    handleProceed,
+    isOnDevice,
+    issuedCommandsType,
+  } = props
 
   const { i18n } = useTranslation(['drop_tip_wizard', 'shared'])
 
@@ -28,6 +36,10 @@ export const Success = (props: SuccessProps): JSX.Element => {
       iconColor={COLORS.green50}
       header={i18n.format(message, 'capitalize')}
       isSuccess
+      paddingX={SPACING.spacing32}
+      padding={
+        issuedCommandsType === 'fixit' ? `${SPACING.spacing32}` : undefined
+      }
     >
       {isOnDevice ? (
         <Flex justifyContent={JUSTIFY_FLEX_END} width="100%">

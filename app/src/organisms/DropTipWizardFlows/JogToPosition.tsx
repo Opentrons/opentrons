@@ -1,7 +1,7 @@
 import * as React from 'react'
-import styled from 'styled-components'
+import styled, { css } from 'styled-components'
 import { useTranslation } from 'react-i18next'
-import { POSITION_AND_BLOWOUT } from './constants'
+import { FIXIT_TYPE_STYLES, POSITION_AND_BLOWOUT } from './constants'
 import {
   ALIGN_CENTER,
   ALIGN_FLEX_END,
@@ -11,6 +11,7 @@ import {
   Flex,
   Icon,
   JUSTIFY_CENTER,
+  JUSTIFY_END,
   JUSTIFY_FLEX_END,
   JUSTIFY_SPACE_BETWEEN,
   PrimaryButton,
@@ -26,7 +27,9 @@ import { JogControls } from '../../molecules/JogControls'
 import { SmallButton } from '../../atoms/buttons'
 import { InProgressModal } from '../../molecules/InProgressModal/InProgressModal'
 import { SimpleWizardBody } from '../../molecules/SimpleWizardBody'
+
 import type { Jog } from '../../molecules/JogControls'
+import type { DropTipWizardContainerProps } from './types'
 
 // TODO: get help link article URL
 // const NEED_HELP_URL = ''
@@ -38,73 +41,80 @@ const Header = styled.h1`
   }
 `
 
-interface ConfirmPositionProps {
+type ConfirmPositionProps = DropTipWizardContainerProps & {
   handlePipetteAction: () => void
   handleGoBack: () => void
-  isOnDevice: boolean
-  currentStep: string
 }
 
 const ConfirmPosition = (props: ConfirmPositionProps): JSX.Element | null => {
-  const { handlePipetteAction, handleGoBack, isOnDevice, currentStep } = props
+  const {
+    handlePipetteAction,
+    handleGoBack,
+    isOnDevice,
+    currentStep,
+    issuedCommandsType,
+  } = props
   const { i18n, t } = useTranslation(['drop_tip_wizard', 'shared'])
   const flowTitle = t('drop_tips')
 
   if (isOnDevice) {
     return (
-      <Flex
-        padding={SPACING.spacing32}
-        gridGap={SPACING.spacing24}
-        flexDirection={DIRECTION_COLUMN}
-        height="100%"
-      >
+      <>
         <Flex
-          paddingX={SPACING.spacing40}
-          gridGap={SPACING.spacing24}
-          justifyContent={JUSTIFY_CENTER}
-          alignItems={ALIGN_CENTER}
-          textAlign={TEXT_ALIGN_CENTER}
+          padding={
+            issuedCommandsType === 'fixit' ? `${SPACING.spacing32}` : undefined
+          }
           flexDirection={DIRECTION_COLUMN}
-          width="100%"
-          height="20.25rem"
+          gridGap={SPACING.spacing32}
         >
-          <Flex gridGap={SPACING.spacing24}>
-            <Icon
-              name="ot-alert"
-              size="3.75rem"
-              color={COLORS.yellow50}
-              aria-label="ot-alert"
-            />
-          </Flex>
-          <StyledText
-            fontSize={TYPOGRAPHY.fontSize32}
-            fontWeight={TYPOGRAPHY.fontWeightBold}
+          <Flex
+            gridGap={SPACING.spacing24}
+            justifyContent={JUSTIFY_CENTER}
+            alignItems={ALIGN_CENTER}
+            textAlign={TEXT_ALIGN_CENTER}
+            flexDirection={DIRECTION_COLUMN}
+            width="100%"
+            height="20.25rem"
+            padding={SPACING.spacing40}
           >
-            {currentStep === POSITION_AND_BLOWOUT
-              ? t('confirm_blowout_location', { flow: flowTitle })
-              : t('confirm_drop_tip_location', { flow: flowTitle })}
-          </StyledText>
+            <Flex gridGap={SPACING.spacing24}>
+              <Icon
+                name="ot-alert"
+                size="3.75rem"
+                color={COLORS.yellow50}
+                aria-label="ot-alert"
+              />
+            </Flex>
+            <StyledText
+              fontSize={TYPOGRAPHY.fontSize32}
+              fontWeight={TYPOGRAPHY.fontWeightBold}
+            >
+              {currentStep === POSITION_AND_BLOWOUT
+                ? t('confirm_blowout_location', { flow: flowTitle })
+                : t('confirm_drop_tip_location', { flow: flowTitle })}
+            </StyledText>
+          </Flex>
+          <Flex width="100%" justifyContent={JUSTIFY_SPACE_BETWEEN}>
+            <Flex width="100%">
+              <SmallButton
+                buttonType="tertiaryLowLight"
+                buttonText={t('shared:go_back')}
+                onClick={handleGoBack}
+              />
+            </Flex>
+            <Flex width="100%" justifyContent={JUSTIFY_END}>
+              <SmallButton
+                buttonText={
+                  currentStep === POSITION_AND_BLOWOUT
+                    ? i18n.format(t('blowout_liquid'), 'capitalize')
+                    : i18n.format(t('drop_tips'), 'capitalize')
+                }
+                onClick={handlePipetteAction}
+              />
+            </Flex>
+          </Flex>
         </Flex>
-        <Flex
-          justifyContent={JUSTIFY_FLEX_END}
-          gridGap={SPACING.spacing8}
-          alignItems={ALIGN_FLEX_END}
-        >
-          <SmallButton
-            buttonType="secondary"
-            buttonText={t('shared:go_back')}
-            onClick={handleGoBack}
-          />
-          <SmallButton
-            buttonText={
-              currentStep === POSITION_AND_BLOWOUT
-                ? i18n.format(t('blowout_liquid'), 'capitalize')
-                : i18n.format(t('drop_tips'), 'capitalize')
-            }
-            onClick={handlePipetteAction}
-          />
-        </Flex>
-      </Flex>
+      </>
     )
   } else {
     return (
@@ -144,13 +154,11 @@ const ConfirmPosition = (props: ConfirmPositionProps): JSX.Element | null => {
   }
 }
 
-interface JogToPositionProps {
+type JogToPositionProps = DropTipWizardContainerProps & {
   handleGoBack: () => void
   handleJog: Jog
   handleProceed: () => void
   body: string
-  currentStep: string
-  isOnDevice: boolean
 }
 
 export const JogToPosition = (
@@ -163,6 +171,7 @@ export const JogToPosition = (
     body,
     currentStep,
     isOnDevice,
+    issuedCommandsType,
   } = props
   const { i18n, t } = useTranslation(['drop_tip_wizard', 'shared'])
   const [
@@ -189,6 +198,7 @@ export const JogToPosition = (
       />
     ) : (
       <ConfirmPosition
+        {...props}
         handlePipetteAction={() => {
           setIsRobotInMotion(true)
           handleProceed()
@@ -196,8 +206,6 @@ export const JogToPosition = (
         handleGoBack={() => {
           setShowPositionConfirmation(false)
         }}
-        isOnDevice={isOnDevice}
-        currentStep={currentStep}
       />
     )
   }
@@ -208,11 +216,14 @@ export const JogToPosition = (
         width="100%"
         alignItems={ALIGN_CENTER}
         flexDirection={DIRECTION_COLUMN}
-        gridGap={SPACING.spacing24}
-        padding={SPACING.spacing32}
+        height="100%"
+        gridGap={SPACING.spacing32}
+        padding={
+          issuedCommandsType === 'fixit' ? `${SPACING.spacing32}` : undefined
+        }
       >
         <JogControls jog={handleJog} isOnDevice={true} />
-        <Flex width="100%" gridGap={SPACING.spacing10}>
+        <Flex width="100%" justifyContent={JUSTIFY_SPACE_BETWEEN}>
           <Flex width="100%">
             <SmallButton
               buttonType="tertiaryLowLight"
@@ -220,7 +231,7 @@ export const JogToPosition = (
               onClick={onGoBack}
             />
           </Flex>
-          <Flex justifyContent={JUSTIFY_FLEX_END} width="100%">
+          <Flex width="100%" justifyContent={JUSTIFY_END}>
             <SmallButton
               buttonText={t('shared:confirm_position')}
               onClick={() => {

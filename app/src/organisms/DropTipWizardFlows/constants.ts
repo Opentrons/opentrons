@@ -1,3 +1,7 @@
+import { css } from 'styled-components'
+
+import { SPACING } from '@opentrons/components'
+
 // Routing
 
 export const BEFORE_BEGINNING = 'BEFORE_BEGINNING'
@@ -36,3 +40,9 @@ export const MANAGED_PIPETTE_ID = 'managedPipetteId'
 export const DROP_TIP_SPECIAL_ERROR_TYPES = {
   MUST_HOME_ERROR: 'MustHomeError',
 } as const
+
+// Fixit Styling
+export const FIXIT_TYPE_STYLES = css`
+  padding: ${SPACING.spacing32};
+  grid-gap: ${SPACING.spacing32};
+`

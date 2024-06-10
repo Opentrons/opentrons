@@ -19,23 +19,21 @@ import {
   TYPOGRAPHY,
   useDeckLocationSelect,
 } from '@opentrons/components'
-import { getDeckDefFromRobotType } from '@opentrons/shared-data'
+import {type AddressableAreaName, getDeckDefFromRobotType} from '@opentrons/shared-data'
 
 import { SmallButton } from '../../atoms/buttons'
 import { TwoUpTileLayout } from '../LabwarePositionCheck/TwoUpTileLayout'
 
-import type { AddressableAreaName, RobotType } from '@opentrons/shared-data'
+import type { DropTipWizardContainerProps } from './types'
 
 // TODO: get help link article URL
 
-interface ChooseLocationProps {
+type ChooseLocationProps = DropTipWizardContainerProps & {
   handleProceed: () => void
   handleGoBack: () => void
   title: string
   body: string | JSX.Element
-  robotType: RobotType
   moveToAddressableArea: (addressableArea: AddressableAreaName) => Promise<void>
-  isOnDevice: boolean
 }
 
 export const ChooseLocation = (
@@ -49,6 +47,7 @@ export const ChooseLocation = (
     robotType,
     moveToAddressableArea,
     isOnDevice,
+      issuedCommandsType
   } = props
   const { i18n, t } = useTranslation(['drop_tip_wizard', 'shared'])
   const deckDef = getDeckDefFromRobotType(robotType)
@@ -70,15 +69,11 @@ export const ChooseLocation = (
 
   if (isOnDevice) {
     return (
-      <Flex
-        padding={SPACING.spacing32}
-        flexDirection={DIRECTION_COLUMN}
-        justifyContent={JUSTIFY_SPACE_BETWEEN}
-        flex="1"
-      >
+        <Flex flexDirection={DIRECTION_COLUMN}
+              gridGap={SPACING.spacing32}
+              padding={issuedCommandsType === 'fixit' ? `${SPACING.spacing32}` : undefined} >
         <Flex
           flexDirection={DIRECTION_ROW}
-          gridGap={SPACING.spacing24}
           flex="1"
         >
           <Flex
@@ -100,27 +95,28 @@ export const ChooseLocation = (
             {DeckLocationSelect}
           </Flex>
         </Flex>
-        <Flex
+         <Flex
           width="100%"
           justifyContent={JUSTIFY_SPACE_BETWEEN}
           css={ALIGN_BUTTONS}
           gridGap={SPACING.spacing8}
-        >
-          <Btn
-            onClick={() => {
-              handleGoBack()
-            }}
-          >
-            <StyledText css={GO_BACK_BUTTON_STYLE}>
-              {t('shared:go_back')}
-            </StyledText>
-          </Btn>
-          <SmallButton
-            buttonText={i18n.format(t('move_to_slot'), 'capitalize')}
-            onClick={handleConfirmPosition}
-          />
+          marginTop="auto"
+           >
+            <Btn
+              onClick={() => {
+                handleGoBack()
+              }}
+            >
+              <StyledText css={GO_BACK_BUTTON_STYLE}>
+                {t('shared:go_back')}
+              </StyledText>
+            </Btn>
+            <SmallButton
+              buttonText={i18n.format(t('move_to_slot'), 'capitalize')}
+              onClick={handleConfirmPosition}
+            />
+          </Flex>
         </Flex>
-      </Flex>
     )
   } else {
     return (
@@ -174,7 +170,7 @@ const GO_BACK_BUTTON_STYLE = css`
   @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
     font-weight: ${TYPOGRAPHY.fontWeightSemiBold};
     font-size: ${TYPOGRAPHY.fontSize22};
-    padding-left: 0rem;
+    padding-left: 0;
     &:hover {
       opacity: 100%;
     }

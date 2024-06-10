@@ -23,7 +23,7 @@ import {
 } from '@opentrons/components'
 
 import { SmallButton, MediumButton } from '../../atoms/buttons'
-import { DT_ROUTES } from './constants'
+import { DT_ROUTES, FIXIT_TYPE_STYLES } from './constants'
 
 import blowoutVideo from '../../assets/videos/droptip-wizard/Blowout-Liquid.webm'
 import droptipVideo from '../../assets/videos/droptip-wizard/Drop-tip.webm'
@@ -60,13 +60,14 @@ export const BeforeBeginning = ({
 
   if (isOnDevice) {
     return (
-      <Flex
-        padding={SPACING.spacing32}
-        flexDirection={DIRECTION_COLUMN}
-        justifyContent={JUSTIFY_SPACE_BETWEEN}
-        height="100%"
-      >
-        <Flex flexDirection={DIRECTION_COLUMN}>
+      <>
+        <Flex
+          flexDirection={DIRECTION_COLUMN}
+          padding={
+            issuedCommandsType === 'fixit' ? `${SPACING.spacing32}` : undefined
+          }
+          height="100%"
+        >
           <Flex css={ODD_TITLE_STYLE}>{buildTopText()}</Flex>
           <Flex paddingBottom={SPACING.spacing8}>
             <MediumButton
@@ -97,15 +98,15 @@ export const BeforeBeginning = ({
               height="5.25rem"
             />
           </Flex>
+          <Flex justifyContent={JUSTIFY_FLEX_END} marginTop="auto">
+            <SmallButton
+              buttonText={i18n.format(t('shared:continue'), 'capitalize')}
+              onClick={handleProceed}
+              disabled={flowType == null}
+            />
+          </Flex>
         </Flex>
-        <Flex justifyContent={JUSTIFY_FLEX_END}>
-          <SmallButton
-            buttonText={i18n.format(t('shared:continue'), 'capitalize')}
-            onClick={handleProceed}
-            disabled={flowType == null}
-          />
-        </Flex>
-      </Flex>
+      </>
     )
   } else {
     return (

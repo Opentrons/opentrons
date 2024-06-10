@@ -9,7 +9,9 @@ import {
   DIRECTION_COLUMN,
   Flex,
   JUSTIFY_FLEX_END,
+  JUSTIFY_SPACE_BETWEEN,
   POSITION_ABSOLUTE,
+  SPACING,
   StyledText,
   useConditionalConfirm,
 } from '@opentrons/components'
@@ -40,6 +42,7 @@ import { DropTipWizardHeader } from './DropTipWizardHeader'
 import type { DropTipWizardFlowsProps } from '.'
 import type { DropTipWizardContainerProps, IssuedCommandsType } from './types'
 import type { UseDropTipRoutingResult, UseDropTipWithTypeResult } from './hooks'
+import { css } from 'styled-components'
 
 export type DropTipWizardProps = DropTipWizardFlowsProps &
   UseDropTipWithTypeResult &
@@ -107,6 +110,7 @@ export function DropTipWizard(props: DropTipWizardProps): JSX.Element {
   )
 }
 
+// TODO(jh, 06-07-24): All content views could use refactoring and DQA. Create shared components from designs.
 export function DropTipWizardContainer(
   props: DropTipWizardContainerProps
 ): JSX.Element {
@@ -132,6 +136,17 @@ export function DropTipWizardFixitType(
 export function DropTipWizardSetupType(
   props: DropTipWizardContainerProps
 ): JSX.Element {
+  const {
+    issuedCommandsType,
+    activeMaintenanceRunId,
+    isCommandInProgress,
+    isExiting,
+  } = props
+
+  const inMotionAndSetup =
+    issuedCommandsType === 'setup' &&
+    (isCommandInProgress || isExiting || activeMaintenanceRunId == null)
+
   return createPortal(
     props.isOnDevice ? (
       <Flex
@@ -147,7 +162,15 @@ export function DropTipWizardSetupType(
         backgroundColor={COLORS.white}
       >
         <DropTipWizardHeader {...props} />
-        <DropTipWizardContent {...props} />
+        <Flex
+          padding={inMotionAndSetup ? 0 : SPACING.spacing32}
+          flexDirection={DIRECTION_COLUMN}
+          justifyContent={JUSTIFY_SPACE_BETWEEN}
+          height="100%"
+          flex="1"
+        >
+          <DropTipWizardContent {...props} />
+        </Flex>
       </Flex>
     ) : (
       <LegacyModalShell
@@ -162,7 +185,6 @@ export function DropTipWizardSetupType(
   )
 }
 
-// TODO(jh, 06-07-24): All content views could use refactoring and DQA.
 export const DropTipWizardContent = (
   props: DropTipWizardContainerProps
 ): JSX.Element => {
@@ -200,6 +222,7 @@ export const DropTipWizardContent = (
   function buildShowExitConfirmation(): JSX.Element {
     return (
       <ExitConfirmation
+        {...props}
         handleGoBack={cancelExit}
         handleExit={() => {
           toggleExitInitiated()
@@ -294,7 +317,7 @@ export const DropTipWizardContent = (
     }
 
     const buildProceedText = (): string => {
-      if (fixitCommandTypeUtils != null) {
+      if (fixitCommandTypeUtils != null && currentStep === DROP_TIP_SUCCESS) {
         return fixitCommandTypeUtils.copyOverrides.tipDropCompleteBtnCopy
       } else {
         return currentStep === BLOWOUT_SUCCESS
@@ -318,7 +341,13 @@ export const DropTipWizardContent = (
   }
 
   function buildModalContent(): JSX.Element {
-    if (activeMaintenanceRunId == null && issuedCommandsType === 'setup') {
+    // Don't render the spinner screen for 1 render cycle on fixit commands.
+    if (currentStep === BEFORE_BEGINNING && issuedCommandsType === 'fixit') {
+      return buildBeforeBeginning()
+    } else if (
+      activeMaintenanceRunId == null &&
+      issuedCommandsType === 'setup'
+    ) {
       return buildGettingReady()
     } else if (isCommandInProgress || isExiting) {
       return buildRobotInMotion()
