@@ -142,7 +142,7 @@ class RunOrchestrator:
         self._protocol_engine.play(deck_configuration=deck_configuration)
 
     async def run(self, deck_configuration: DeckConfigurationType) -> RunResult:
-        """Start or resume the run."""
+        """Start the run."""
         if self._protocol_runner:
             return await self._protocol_runner.run(
                 deck_configuration=deck_configuration
@@ -216,12 +216,8 @@ class RunOrchestrator:
         """Get a slice of run commands.
 
         Args:
-            run_id: ID of the run.
             cursor: Requested index of first command in the returned slice.
             length: Length of slice to return.
-
-        Raises:
-            RunNotFoundError: The given run identifier was not found in the database.
         """
         return self._protocol_engine.state_view.commands.get_slice(
             cursor=cursor, length=length
