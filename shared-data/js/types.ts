@@ -630,7 +630,7 @@ interface CsvFileParameter extends BaseRunTimeParameter {
 type NumberParameterType = 'int' | 'float'
 type BooleanParameterType = 'bool'
 type StringParameterType = 'str'
-type CsvFileParameterType = 'csv'
+type CsvFileParameterType = 'csv_file'
 type RunTimeParameterType =
   | NumberParameter
   | BooleanParameterType
