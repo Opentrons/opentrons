@@ -39,6 +39,8 @@ export const formatRunTimeParameterValue = (
     case 'bool': {
       return Boolean(value) ? t('on') : t('off')
     }
+    case 'csv_file':
+      return value.toString()
     default:
       break
   }

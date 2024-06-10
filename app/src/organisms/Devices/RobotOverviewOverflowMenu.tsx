@@ -107,7 +107,9 @@ export const RobotOverviewOverflowMenu = (
       {showDisconnectModal
         ? createPortal(
             <DisconnectModal
-              onCancel={() => setShowDisconnectModal(false)}
+              onCancel={() => {
+                setShowDisconnectModal(false)
+              }}
               robotName={robot.name}
             />,
             getTopPortalEl()
@@ -133,7 +135,9 @@ export const RobotOverviewOverflowMenu = (
         >
           {isUpdateSoftwareItemVisible ? (
             <MenuItem
-              onClick={() => handleUpdateBuildroot(robot)}
+              onClick={() => {
+                handleUpdateBuildroot(robot)
+              }}
               data-testid={`RobotOverviewOverflowMenu_updateSoftware_${String(
                 robot.name
               )}`}
@@ -202,9 +206,9 @@ export const RobotOverviewOverflowMenu = (
           </MenuItem>
           <Divider marginY="0" />
           <MenuItem
-            onClick={() =>
+            onClick={() => {
               history.push(`/devices/${robot.name}/robot-settings`)
-            }
+            }}
             disabled={
               robot == null ||
               robot?.status === UNREACHABLE ||
@@ -227,7 +231,9 @@ export const RobotOverviewOverflowMenu = (
         <ChooseProtocolSlideout
           robot={robot}
           showSlideout={showChooseProtocolSlideout}
-          onCloseClick={() => setShowChooseProtocolSlideout(false)}
+          onCloseClick={() => {
+            setShowChooseProtocolSlideout(false)
+          }}
         />
       ) : null}
       {menuOverlay}

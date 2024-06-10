@@ -83,23 +83,23 @@ export function registerConfig(dispatch: Dispatch): (action: Action) => void {
         )
 
         if (path === 'devtools') {
-          systemd.setRemoteDevToolsEnabled(Boolean(nextValue)).catch(err =>
+          systemd.setRemoteDevToolsEnabled(Boolean(nextValue)).catch(err => {
             log().debug('Something wrong when setting remote dev tools', {
               err,
             })
-          )
+          })
         }
 
         // Note (kj:08/03/2023) change touchscreen brightness
         if (path === 'onDeviceDisplaySettings.brightness') {
-          systemd.updateBrightness(String(nextValue)).catch(err =>
+          systemd.updateBrightness(String(nextValue)).catch(err => {
             log().debug(
               'Something wrong when updating the touchscreen brightness',
               {
                 err,
               }
             )
-          )
+          })
         }
 
         log().debug('Updating config', { path, nextValue })

@@ -46,7 +46,9 @@ export function ConfirmAttachedModal({
             flex="1"
             buttonType="secondary"
             buttonText={i18n.format(t('shared:cancel'), 'capitalize')}
-            onClick={() => onCloseClick()}
+            onClick={() => {
+              onCloseClick()
+            }}
           />
           <SmallButton
             flex="1"

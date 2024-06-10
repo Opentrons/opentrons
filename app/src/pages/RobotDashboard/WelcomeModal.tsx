@@ -40,9 +40,9 @@ export function WelcomeModal({
     createLiveCommand({
       command: animationCommand,
       waitUntilComplete: false,
-    }).catch((e: Error) =>
+    }).catch((e: Error) => {
       console.warn(`cannot run status bar animation: ${e.message}`)
-    )
+    })
   }
 
   const handleCloseModal = (): void => {

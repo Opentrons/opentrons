@@ -6,7 +6,6 @@ context('Reservoirs', () => {
   before(() => {
     cy.visit('/create')
     cy.viewport('macbook-15')
-    cy.contains('NO').click({ force: true })
   })
 
   describe('Reservoir', () => {

@@ -51,7 +51,9 @@ export function DeckConfigurationDiscardChangesModal({
           <SmallButton
             width="100%"
             buttonText={t('continue_editing')}
-            onClick={() => setShowConfirmationModal(false)}
+            onClick={() => {
+              setShowConfirmationModal(false)
+            }}
           />
         </Flex>
       </Flex>

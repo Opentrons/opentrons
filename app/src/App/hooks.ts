@@ -103,16 +103,16 @@ export function useProtocolReceiptToast(): void {
         .then(() => {
           queryClient
             .invalidateQueries([host, 'protocols'])
-            .catch((e: Error) =>
+            .catch((e: Error) => {
               console.error(`error invalidating protocols query: ${e.message}`)
-            )
+            })
         })
         .then(() => {
           createLiveCommand({
             command: animationCommand,
-          }).catch((e: Error) =>
+          }).catch((e: Error) => {
             console.warn(`cannot run status bar animation: ${e.message}`)
-          )
+          })
         })
         .catch((e: Error) => {
           console.error(e)

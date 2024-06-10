@@ -103,7 +103,9 @@ export function ApplyHistoricOffsets(
         }
       />
       <Link
-        onClick={() => setShowOffsetDataModal(true)}
+        onClick={() => {
+          setShowOffsetDataModal(true)
+        }}
         css={TYPOGRAPHY.linkPSemiBold}
       >
         {t(noOffsetData ? 'learn_more' : 'view_data')}
@@ -119,7 +121,9 @@ export function ApplyHistoricOffsets(
                       ? 'what_is_labware_offset_data'
                       : 'stored_offset_data'
                   )}
-                  onClose={() => setShowOffsetDataModal(false)}
+                  onClose={() => {
+                    setShowOffsetDataModal(false)
+                  }}
                 />
               }
             >
