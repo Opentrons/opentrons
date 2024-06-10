@@ -255,7 +255,7 @@ class EngineStore:
         elif isinstance(runner, JsonRunner):
             assert (
                 protocol is not None
-            ), "A JSON protocol shouZld have a protocol source file."
+            ), "A JSON protocol should have a protocol source file."
             await self.run_orchestrator.load_json(protocol.source)
         else:
             self.run_orchestrator.prepare()
