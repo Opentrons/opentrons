@@ -17,7 +17,7 @@ from opentrons.hardware_control.types import (
     EstopStateNotification,
     HardwareEventHandler,
 )
-from opentrons.protocol_runner import LiveRunner, RunResult
+from opentrons.protocol_runner import LiveRunner, RunResult, RunOrchestrator
 from opentrons.protocol_engine import (
     Config as ProtocolEngineConfig,
     DeckType,
@@ -121,18 +121,11 @@ class MaintenanceEngineStore:
         hardware_api.register_callback(_get_estop_listener(self))
 
     @property
-    def engine(self) -> ProtocolEngine:
+    def orchestrator(self) -> RunOrchestrator:
         """Get the "current" ProtocolEngine."""
         if self._runner_engine_pair is None:
             raise NoRunnerEnginePairError()
         return self._runner_engine_pair.engine
-
-    @property
-    def runner(self) -> LiveRunner:
-        """Get the "current" ProtocolRunner."""
-        if self._runner_engine_pair is None:
-            raise NoRunnerEnginePairError()
-        return self._runner_engine_pair.runner
 
     @property
     def current_run_id(self) -> Optional[str]:
