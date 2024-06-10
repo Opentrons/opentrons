@@ -3,14 +3,14 @@ import * as React from 'react'
 import { RECOVERY_MAP } from '../constants'
 
 import type { IRecoveryMap } from '../types'
-import { ERUtilsResults } from './useERUtils'
+import type { ERUtilsResults } from './useERUtils'
 
 /**
  * ER Wizard routing. Also provides access to the routing of any other flow launched from ER.
  * Recovery Route: A logically-related collection of recovery steps or a single step if unrelated to any existing recovery route.
  * Recovery Step: Analogous to a "step" in other wizard flows.
  *
- * @return {trackExternalStep} Used to keep track of the current step in other flows launched from Error Recovery, ex. Drop Tip flows.
+ * @params {trackExternalStep} Used to keep track of the current step in other flows launched from Error Recovery, ex. Drop Tip flows.
  */
 
 export function useRecoveryRouting(): {

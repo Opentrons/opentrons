@@ -42,7 +42,6 @@ import { DropTipWizardHeader } from './DropTipWizardHeader'
 import type { DropTipWizardFlowsProps } from '.'
 import type { DropTipWizardContainerProps, IssuedCommandsType } from './types'
 import type { UseDropTipRoutingResult, UseDropTipWithTypeResult } from './hooks'
-import { css } from 'styled-components'
 
 export type DropTipWizardProps = DropTipWizardFlowsProps &
   UseDropTipWithTypeResult &
@@ -137,15 +136,16 @@ export function DropTipWizardSetupType(
   props: DropTipWizardContainerProps
 ): JSX.Element {
   const {
-    issuedCommandsType,
     activeMaintenanceRunId,
     isCommandInProgress,
     isExiting,
+    showConfirmExit,
   } = props
 
-  const inMotionAndSetup =
-    issuedCommandsType === 'setup' &&
-    (isCommandInProgress || isExiting || activeMaintenanceRunId == null)
+  // TODO(jh: 07-10-24): This is not ideal. Refactor this alongside setup type DTWiz DQA.
+  const inMotion =
+    isCommandInProgress || isExiting || activeMaintenanceRunId == null
+  const simpleWizardPaddingOverrides = inMotion || showConfirmExit
 
   return createPortal(
     props.isOnDevice ? (
@@ -163,7 +163,7 @@ export function DropTipWizardSetupType(
       >
         <DropTipWizardHeader {...props} />
         <Flex
-          padding={inMotionAndSetup ? 0 : SPACING.spacing32}
+          padding={simpleWizardPaddingOverrides ? 0 : SPACING.spacing32}
           flexDirection={DIRECTION_COLUMN}
           justifyContent={JUSTIFY_SPACE_BETWEEN}
           height="100%"

@@ -23,7 +23,7 @@ import {
 } from '@opentrons/components'
 
 import { SmallButton, MediumButton } from '../../atoms/buttons'
-import { DT_ROUTES, FIXIT_TYPE_STYLES } from './constants'
+import { DT_ROUTES } from './constants'
 
 import blowoutVideo from '../../assets/videos/droptip-wizard/Blowout-Liquid.webm'
 import droptipVideo from '../../assets/videos/droptip-wizard/Drop-tip.webm'

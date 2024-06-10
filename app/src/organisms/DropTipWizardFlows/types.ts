@@ -1,7 +1,7 @@
 import type { DT_ROUTES } from './constants'
 import type { DropTipErrorComponents } from './hooks'
 import type { DropTipWizardProps } from './DropTipWizard'
-import { ERUtilsResults } from '../ErrorRecoveryFlows/hooks'
+import type { ERUtilsResults } from '../ErrorRecoveryFlows/hooks'
 
 export type DropTipFlowsRoute = typeof DT_ROUTES[keyof typeof DT_ROUTES]
 export type DropTipFlowsStep = DropTipFlowsRoute[number]

@@ -1,10 +1,9 @@
 import * as React from 'react'
-import styled, { css } from 'styled-components'
+import styled from 'styled-components'
 import { useTranslation } from 'react-i18next'
-import { FIXIT_TYPE_STYLES, POSITION_AND_BLOWOUT } from './constants'
+import { POSITION_AND_BLOWOUT } from './constants'
 import {
   ALIGN_CENTER,
-  ALIGN_FLEX_END,
   ALIGN_FLEX_START,
   COLORS,
   DIRECTION_COLUMN,

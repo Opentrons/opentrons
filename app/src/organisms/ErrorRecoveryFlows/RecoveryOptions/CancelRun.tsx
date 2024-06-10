@@ -31,7 +31,6 @@ export function CancelRun({
 
   const { goBackPrevStep } = routeUpdateActions
 
-  // TODO(jh, 06-06-24): When design finalizes loading state, pass down showBtnLoadingState to primary btn.
   const { handleCancelRunClick, showBtnLoadingState } = useOnCancelRun({
     recoveryCommands,
     routeUpdateActions,
@@ -69,6 +68,7 @@ export function CancelRun({
           primaryBtnOnClick={handleCancelRunClick}
           secondaryBtnOnClick={goBackPrevStep}
           primaryBtnTextOverride={t('confirm')}
+          isLoadingPrimaryBtnAction={showBtnLoadingState}
         />
       </RecoverySingleColumnContent>
     )

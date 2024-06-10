@@ -25,7 +25,7 @@ type ExitConfirmationProps = DropTipWizardContainerProps & {
 }
 
 export function ExitConfirmation(props: ExitConfirmationProps): JSX.Element {
-  const { handleGoBack, handleExit, issuedCommandsType } = props
+  const { handleGoBack, handleExit } = props
   const { i18n, t } = useTranslation(['drop_tip_wizard', 'shared'])
 
   const flowTitle = t('drop_tips')
@@ -36,13 +36,6 @@ export function ExitConfirmation(props: ExitConfirmationProps): JSX.Element {
       iconColor={COLORS.yellow50}
       header={t('exit_screen_title', { flow: flowTitle })}
       isSuccess={false}
-      css={
-        issuedCommandsType === 'fixit'
-          ? FIXIT_TYPE_STYLES
-          : css`
-              padding: 0;
-            `
-      }
     >
       {isOnDevice ? (
         <Flex

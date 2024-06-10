@@ -85,6 +85,7 @@ describe('ErrorRecovery', () => {
     props = {
       failedCommand: mockFailedCommand,
       runId: 'MOCK_RUN_ID',
+      isFlex: true,
     }
     vi.mocked(ErrorRecoveryWizard).mockReturnValue(<div>MOCK WIZARD</div>)
     vi.mocked(RunPausedSplash).mockReturnValue(
