@@ -604,6 +604,7 @@ export interface NumberParameter extends BaseRunTimeParameter {
   min: number
   max: number
   default: number
+  value: number
 }
 
 export interface Choice {
@@ -615,16 +616,19 @@ interface ChoiceParameter extends BaseRunTimeParameter {
   type: RunTimeParameterType
   choices: Choice[]
   default: number | boolean | string
+  value: number | boolean | string
 }
 
 interface BooleanParameter extends BaseRunTimeParameter {
   type: BooleanParameterType
   default: boolean
+  value: boolean
 }
 
 interface CsvFileParameter extends BaseRunTimeParameter {
   type: CsvFileParameterType
-  default: string
+  default: File | null
+  value: File | null
 }
 
 type NumberParameterType = 'int' | 'float'
@@ -641,7 +645,6 @@ interface BaseRunTimeParameter {
   displayName: string
   variableName: string
   description: string
-  value: number | boolean | string
   suffix?: string
 }
 
