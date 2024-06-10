@@ -15,7 +15,7 @@ export const GlobalStyle = createGlobalStyle<{}>`
     box-sizing: border-box;
     margin: 0;
     padding: 0;
-    font-family: 'Public Sans, DejaVu Sans', sans-serif;
+    font-family: 'Public Sans', 'DejaVu Sans', sans-serif;
   }
 
   html,
