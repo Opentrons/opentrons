@@ -250,7 +250,7 @@ def process_csv_directory(  # noqa: C901
                     transposed_pressure_rows = list(map(list, zip(*pressure_rows)))
                     try:
                         google_sheet.batch_update_cells(
-                            sheet_name, transposed_pressure_rows, "H", 11, sheet_id
+                            transposed_pressure_rows, "H", 11, sheet_id
                         )
                     except google_sheets_tool.google_interaction_error:
                         ui.print_error("Did not write pressure data to google sheet.")
@@ -284,7 +284,7 @@ def process_google_sheet(
         test_info,
     ]
     num_of_trials = run_args.trials  # type: ignore[attr-defined]
-    google_sheet.batch_update_cells(sheet_name, test_parameters, "A", 1, sheet_id)
+    google_sheet.batch_update_cells(test_parameters, "A", 1, sheet_id)
     target_height = google_sheet.get_cell(sheet_name, "B9")
     ui.print_info(target_height)
     last_trial_row = 10 + num_of_trials
@@ -295,7 +295,7 @@ def process_google_sheet(
     normalized_height = [
         float(height) - float(target_height) for height in adjusted_height
     ]
-    google_sheet.batch_update_cells(sheet_name, [normalized_height], "F", 11, sheet_id)
+    google_sheet.batch_update_cells([normalized_height], "F", 11, sheet_id)
     # Find accuracy, precision, repeatability
     try:
         accuracy = statistics.mean(normalized_height)
@@ -307,7 +307,7 @@ def process_google_sheet(
             ["Accuracy (mm)", "Precision (+/- mm)", "Repeatability (%)"],
             [accuracy, precision, 100.0 - 100.0 * repeatability_error],
         ]
-        google_sheet.batch_update_cells(sheet_name, summary, "D", 2, sheet_id)
+        google_sheet.batch_update_cells(summary, "D", 2, sheet_id)
     except google_sheets_tool.google_interaction_error:
         ui.print_error("stats didn't work.")
 
