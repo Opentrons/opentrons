@@ -6,6 +6,8 @@ from anyio import move_on_after
 
 from opentrons_shared_data.labware.dev_types import LabwareUri
 from opentrons_shared_data.labware.labware_definition import LabwareDefinition
+from opentrons_shared_data.errors import GeneralError
+
 from . import protocol_runner, RunResult, JsonRunner, PythonAndLegacyRunner
 from ..hardware_control import HardwareControlAPI
 from ..hardware_control.modules import AbstractModule as HardwareModuleAPI
@@ -32,6 +34,10 @@ from ..protocols.parse import PythonParseMode
 
 class NoProtocolRunAvailable(RuntimeError):
     """An error raised if there is no protocol run available."""
+
+
+class RunNotFound(GeneralError):
+    """An error raised if there is no run associated."""
 
 
 class RunOrchestrator:
@@ -84,7 +90,7 @@ class RunOrchestrator:
     def run_id(self) -> str:
         """Get the "current" persisted ProtocolEngine."""
         if not self._run_id:
-            raise NotImplementedError("default orchestrator.")
+            raise RunNotFound()
         return self._run_id
 
     @classmethod

@@ -18,7 +18,7 @@ from opentrons.protocol_reader import (
     PythonProtocolConfig,
     ProtocolSource,
 )
-from opentrons.protocol_runner.run_orchestrator import RunOrchestrator
+from opentrons.protocol_runner.run_orchestrator import RunOrchestrator, RunNotFound
 from opentrons import protocol_runner
 from opentrons.protocol_runner.protocol_runner import (
     JsonRunner,
@@ -180,6 +180,39 @@ def test_build_run_orchestrator_provider(
     assert isinstance(result._setup_runner, LiveRunner)
     assert isinstance(result._fixit_runner, LiveRunner)
     assert isinstance(result._protocol_runner, (PythonAndLegacyRunner, JsonRunner))
+
+
+@pytest.mark.parametrize(
+    "subject, runner",
+    [
+        (
+            lazy_fixture("json_protocol_subject"),
+            lazy_fixture("mock_protocol_json_runner"),
+        ),
+        (
+            lazy_fixture("python_protocol_subject"),
+            lazy_fixture("mock_protocol_python_runner"),
+        ),
+    ],
+)
+async def test_run_calls_protocol_runner(
+    subject: RunOrchestrator,
+    runner: Union[JsonRunner, PythonAndLegacyRunner],
+    decoy: Decoy,
+) -> None:
+    """Should call protocol runner run method."""
+    await subject.run(deck_configuration=[])
+    decoy.verify(await runner.run(deck_configuration=[]))
+
+
+async def test_run_calls_protocol_live_runner(
+    live_protocol_subject: RunOrchestrator,
+    mock_protocol_live_runner: LiveRunner,
+    decoy: Decoy,
+) -> None:
+    """Should call protocol runner run method."""
+    await live_protocol_subject.run(deck_configuration=[])
+    decoy.verify(await mock_protocol_live_runner.run(deck_configuration=[]))
 
 
 def test_get_run_time_parameters_returns_an_empty_list_no_protocol(
@@ -402,7 +435,7 @@ def test_get_run_id_raises(
         setup_runner=mock_setup_runner,
         protocol_live_runner=mock_protocol_live_runner,
     )
-    with pytest.raises(NotImplementedError):
+    with pytest.raises(RunNotFound):
         orchestrator.run_id
 
 
