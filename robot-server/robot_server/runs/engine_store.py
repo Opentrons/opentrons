@@ -296,23 +296,23 @@ class EngineStore:
         self.run_orchestrator.play(deck_configuration=deck_configuration)
 
     async def run(self, deck_configuration: DeckConfigurationType) -> RunResult:
-        """Start or resume the run."""
+        """Start the run."""
         return await self.run_orchestrator.run(deck_configuration=deck_configuration)
 
     def pause(self) -> None:
-        """Start or resume the run."""
+        """Pause the run."""
         self.run_orchestrator.pause()
 
     async def stop(self) -> None:
-        """Start or resume the run."""
+        """Stop the run."""
         await self.run_orchestrator.stop()
 
     def resume_from_recovery(self) -> None:
-        """Start or resume the run."""
+        """Resume the run from recovery mode."""
         self.run_orchestrator.resume_from_recovery()
 
     async def finish(self, error: Optional[Exception]) -> None:
-        """Stop the run."""
+        """Finish the run."""
         await self.run_orchestrator.finish(error=error)
 
     def get_state_summary(self) -> StateSummary:
@@ -328,7 +328,7 @@ class EngineStore:
         return self.run_orchestrator.get_run_time_parameters()
 
     def get_current_command(self) -> Optional[CommandPointer]:
-        """Parameter definitions defined by protocol, if any. Will always be empty before execution."""
+        """Get the current running command."""
         return self.run_orchestrator.get_current_command()
 
     def get_command_slice(
@@ -339,12 +339,8 @@ class EngineStore:
         """Get a slice of run commands.
 
         Args:
-            run_id: ID of the run.
             cursor: Requested index of first command in the returned slice.
             length: Length of slice to return.
-
-        Raises:
-            RunNotFoundError: The given run identifier was not found in the database.
         """
         return self.run_orchestrator.get_command_slice(cursor=cursor, length=length)
 

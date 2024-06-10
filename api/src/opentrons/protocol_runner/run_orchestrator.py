@@ -88,7 +88,7 @@ class RunOrchestrator:
 
     @property
     def run_id(self) -> str:
-        """Get the "current" persisted ProtocolEngine."""
+        """Get the "current" persisted run_id."""
         if not self._run_id:
             raise RunNotFound()
         return self._run_id
@@ -155,11 +155,11 @@ class RunOrchestrator:
             return await self._setup_runner.run(deck_configuration=deck_configuration)
 
     def pause(self) -> None:
-        """Start or resume the run."""
+        """Pause the run."""
         self._protocol_engine.request_pause()
 
     async def stop(self) -> None:
-        """Start or resume the run."""
+        """Stop the run."""
         if self.run_has_started():
             await self._protocol_engine.request_stop()
         else:
@@ -170,7 +170,7 @@ class RunOrchestrator:
             )
 
     def resume_from_recovery(self) -> None:
-        """Start or resume the run."""
+        """Resume the run from recovery."""
         self._protocol_engine.resume_from_recovery()
 
     async def finish(
@@ -180,7 +180,7 @@ class RunOrchestrator:
         set_run_status: bool = True,
         post_run_hardware_state: PostRunHardwareState = PostRunHardwareState.HOME_AND_STAY_ENGAGED,
     ) -> None:
-        """Stop the run."""
+        """Finish the run."""
         await self._protocol_engine.finish(
             error=error,
             drop_tips_after_run=drop_tips_after_run,
@@ -205,7 +205,7 @@ class RunOrchestrator:
         )
 
     def get_current_command(self) -> Optional[CommandPointer]:
-        """Parameter definitions defined by protocol, if any. Will always be empty before execution."""
+        """Get the current running command."""
         return self._protocol_engine.state_view.commands.get_current()
 
     def get_command_slice(
@@ -315,7 +315,7 @@ class RunOrchestrator:
         )
 
     def get_is_okay_to_clear(self) -> bool:
-        """Get whether the engine is stopped or sitting idly so it could be removed."""
+        """Get whether the engine is stopped or sitting idly, so it could be removed."""
         return self._protocol_engine.state_view.commands.get_is_okay_to_clear()
 
     def prepare(self) -> None:
