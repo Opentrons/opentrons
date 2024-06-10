@@ -43,7 +43,7 @@ const uploadText = (
     alignItems={ALIGN_CENTER}
   >
     <StyledText>{'CSV file'}</StyledText>
-    <Icon name="information" size="0.75rem" data-testid="mockIcon" />
+    <Icon name="information" size="0.75rem" />
   </Flex>
 )
 
