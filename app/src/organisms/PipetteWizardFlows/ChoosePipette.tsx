@@ -154,6 +154,7 @@ export const ChoosePipette = (props: ChoosePipetteProps): JSX.Element => {
         <Flex
           flexDirection={DIRECTION_COLUMN}
           width="100%"
+          height="472px"
           position={POSITION_ABSOLUTE}
           backgroundColor={COLORS.white}
         >
@@ -167,28 +168,35 @@ export const ChoosePipette = (props: ChoosePipetteProps): JSX.Element => {
               isOnDevice={isOnDevice}
             />
           ) : (
-            <ModalContentOneColSimpleButtons
-              topText={t('choose_pipette')}
-              firstButton={{
-                label: singleMount,
-                value: SINGLE_MOUNT_PIPETTES,
-              }}
-              secondButton={{
-                label: bothMounts,
-                value: NINETY_SIX_CHANNEL,
-              }}
-              onSelect={event => {
-                setSelectedPipette(event.target.value as any)
-              }}
-            />
+            <Flex
+              margin={SPACING.spacing32}
+              flexDirection={DIRECTION_COLUMN}
+              height="100%"
+              justifyContent={JUSTIFY_SPACE_BETWEEN}
+            >
+              <ModalContentOneColSimpleButtons
+                topText={t('choose_pipette')}
+                firstButton={{
+                  label: singleMount,
+                  value: SINGLE_MOUNT_PIPETTES,
+                }}
+                secondButton={{
+                  label: bothMounts,
+                  value: NINETY_SIX_CHANNEL,
+                }}
+                onSelect={event => {
+                  setSelectedPipette(event.target.value as any)
+                }}
+              />
+              <Flex justifyContent={JUSTIFY_FLEX_END}>
+                <SmallButton
+                  onClick={proceed}
+                  textTransform={TYPOGRAPHY.textTransformCapitalize}
+                  buttonText={i18n.format(t('shared:continue'), 'capitalize')}
+                />
+              </Flex>
+            </Flex>
           )}
-          <Flex justifyContent={JUSTIFY_FLEX_END}>
-            <SmallButton
-              onClick={proceed}
-              textTransform={TYPOGRAPHY.textTransformCapitalize}
-              buttonText={i18n.format(t('shared:continue'), 'capitalize')}
-            />
-          </Flex>
         </Flex>
       </LegacyModalShell>
     ) : (
