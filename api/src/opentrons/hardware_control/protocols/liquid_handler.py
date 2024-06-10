@@ -171,3 +171,14 @@ class LiquidHandler(
                                 the ejector shroud after a drop.
         """
         ...
+
+    async def liquid_probe(
+        self,
+        mount: MountArgType,
+    ) -> float:
+        """Search for and return liquid level height using this pipette
+        at the current location.
+
+        mount : Mount.LEFT or Mount.RIGHT
+        """
+        ...

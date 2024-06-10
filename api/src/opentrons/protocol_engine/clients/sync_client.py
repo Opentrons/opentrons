@@ -874,10 +874,21 @@ class SyncClient:
         result = self._transport.execute_command(request=request)
         return cast(commands.LoadLiquidResult, result)
 
-    def liquid_probe(self, mount: MountType) -> commands.LiquidProbeResult:
+    def liquid_probe(
+        self,
+        pipette_id: str,
+        labware_id: str,
+        well_name: str,
+        well_location: WellLocation,
+    ) -> commands.LiquidProbeResult:
         """Execute the liquid_probe command and return the result."""
         request = commands.LiquidProbeCreate(
-            params=commands.LiquidProbeParams(mount=mount)
+            params=commands.LiquidProbeParams(
+                pipetteId=pipette_id,
+                labwareId=labware_id,
+                wellName=well_name,
+                wellLocation=well_location,
+            )
         )
         result = self._transport.execute_command(request=request)
         return cast(commands.LiquidProbeResult, result)

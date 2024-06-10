@@ -41,7 +41,6 @@ from opentrons.config.types import (
     OT3Config,
     GantryLoad,
     CapacitivePassSettings,
-    LiquidProbeSettings,
 )
 from opentrons.drivers.rpi_drivers.types import USBPort, PortGroup
 from opentrons.hardware_control.nozzle_manager import NozzleConfigurationType
@@ -2560,9 +2559,7 @@ class OT3API(
 
     async def liquid_probe(
         self,
-        mount: OT3Mount,
-        probe_settings: Optional[LiquidProbeSettings] = None,
-        probe: Optional[InstrumentProbeType] = None,
+        mount: Union[top_types.Mount, OT3Mount],
     ) -> float:
         """Search for and return liquid level height.
 
@@ -2585,15 +2582,14 @@ class OT3API(
             instrument, HardwareAction.LIQUID_PROBE, checked_mount
         )
 
-        if not probe_settings:
-            probe_settings = self.config.liquid_sense
+        probe_settings = self.config.liquid_sense
 
-        pos = await self.gantry_position(mount, refresh=True)
+        pos = await self.gantry_position(checked_mount, refresh=True)
         probe_start_pos = pos._replace(z=probe_settings.starting_mount_height)
-        await self.move_to(mount, probe_start_pos)
+        await self.move_to(checked_mount, probe_start_pos)
 
         if probe_settings.aspirate_while_sensing:
-            await self._move_to_plunger_bottom(mount, rate=1.0)
+            await self._move_to_plunger_bottom(checked_mount, rate=1.0)
         else:
             # find the ideal travel distance by multiplying the plunger speed
             # by the time it will take to complete the z move.
@@ -2617,7 +2613,7 @@ class OT3API(
 
         plunger_direction = -1 if probe_settings.aspirate_while_sensing else 1
         await self._backend.liquid_probe(
-            mount,
+            checked_mount,
             probe_settings.max_z_distance,
             probe_settings.mount_speed,
             (probe_settings.plunger_speed * plunger_direction),
@@ -2626,10 +2622,10 @@ class OT3API(
             probe_settings.data_files,
             probe_settings.auto_zero_sensor,
             probe_settings.num_baseline_reads,
-            probe=probe if probe else InstrumentProbeType.PRIMARY,
+            probe=InstrumentProbeType.PRIMARY,
         )
-        end_pos = await self.gantry_position(mount, refresh=True)
-        await self.move_to(mount, probe_start_pos)
+        end_pos = await self.gantry_position(checked_mount, refresh=True)
+        await self.move_to(checked_mount, probe_start_pos)
         return end_pos.z
 
     async def capacitive_probe(
