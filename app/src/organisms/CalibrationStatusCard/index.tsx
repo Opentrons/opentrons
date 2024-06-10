@@ -89,7 +89,9 @@ export function CalibrationStatusCard({
         <Link
           role="button"
           css={TYPOGRAPHY.darkLinkLabelSemiBold}
-          onClick={() => setShowHowCalibrationWorksModal(true)}
+          onClick={() => {
+            setShowHowCalibrationWorksModal(true)
+          }}
         >
           {t('see_how_robot_calibration_works')}
         </Link>

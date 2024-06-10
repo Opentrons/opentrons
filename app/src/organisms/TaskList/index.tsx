@@ -375,7 +375,9 @@ function Task({
           gridGap={SPACING.spacing24}
           // click to open the subtask drawer if subtasks are present
           cursor={hasSubTasks ? 'pointer' : ''}
-          onClick={() => (hasSubTasks ? setIsTaskOpen(!isTaskOpen) : null)}
+          onClick={() => {
+            if (hasSubTasks) setIsTaskOpen(!isTaskOpen)
+          }}
         >
           <Flex
             alignItems={ALIGN_FLEX_START}

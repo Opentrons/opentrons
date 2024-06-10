@@ -57,8 +57,12 @@ export function MultiChannelSubstep(
   }`
   return (
     <ol
-      onMouseEnter={() => selectSubstep({ stepId, substepIndex })}
-      onMouseLeave={() => selectSubstep(null)}
+      onMouseEnter={() => {
+        selectSubstep({ stepId, substepIndex })
+      }}
+      onMouseLeave={() => {
+        selectSubstep(null)
+      }}
       className={cx({ [styles.highlighted]: highlighted })}
     >
       {/* Header row */}

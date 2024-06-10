@@ -25,8 +25,8 @@ describe('FloatingActionButton', () => {
   })
 
   it('renders floating action button with text - active', () => {
-    const { getByRole } = render(props)
-    const button = getByRole('button')
+    render(props)
+    const button = screen.getByRole('button')
     expect(button).toHaveStyle(
       `padding: ${SPACING.spacing12} ${SPACING.spacing24}`
     )

@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { fireEvent, renderHook } from '@testing-library/react'
+import { fireEvent, renderHook, screen } from '@testing-library/react'
 import { I18nextProvider } from 'react-i18next'
 import { vi, it, describe, expect } from 'vitest'
 
@@ -43,11 +43,11 @@ describe('useConfirmCrashRecovery', () => {
     expect(link).not.toBeNull()
     expect(confirmation).toBeNull()
 
-    const { getByText, getByRole } = renderWithProviders(link, {
+    renderWithProviders(link, {
       i18nInstance: i18n,
-    })[0]
-    getByText('Jog too far or bend a tip?')
-    getByRole('button', { name: 'Start over' })
+    })
+    screen.getByText('Jog too far or bend a tip?')
+    screen.getByRole('button', { name: 'Start over' })
   })
 
   it('renders the modal with the right props when you click the link', () => {
@@ -65,26 +65,53 @@ describe('useConfirmCrashRecovery', () => {
     )
 
     // render returned confirmation if not null, otherwise render the link
-    const { getByRole, rerender } = renderWithProviders(
-      <div>{result.current[1] ?? result.current[0]}</div>,
-      { i18nInstance: i18n }
-    )[0]
+    renderWithProviders(<div>{result.current[1] ?? result.current[0]}</div>, {
+      i18nInstance: i18n,
+    })
     // click the link to launch the modal
-    fireEvent.click(getByRole('button', { name: 'Start over' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Start over' }))
     // the confirmation should now not be null
     expect(result.current[1]).not.toBeNull()
+  })
+
+  it('renders the modal with the right props when you click back', () => {
+    const { result } = renderHook(
+      () =>
+        useConfirmCrashRecovery({
+          ...mockProps,
+          sendCommands: mockSendCommands,
+        }),
+      {
+        wrapper: ({ children }) => (
+          <I18nextProvider i18n={i18n}>{children}</I18nextProvider>
+        ),
+      }
+    )
+
     // the explicitly rerender to incorporate newly non-null confirmation
+    const [{ rerender }] = renderWithProviders(
+      <div>{result.current[1] ?? result.current[0]}</div>,
+      {
+        i18nInstance: i18n,
+      }
+    )
+
+    // click the link to launch the modal
+    fireEvent.click(screen.getByRole('button', { name: 'Start over' }))
+
     rerender(<div>{result.current[1] ?? result.current[0]}</div>)
 
     // click the "back" link in the confirmation
-    const closeConfirmationButton = getByRole('button', { name: 'resume' })
+    const closeConfirmationButton = screen.getByRole('button', {
+      name: 'resume',
+    })
     fireEvent.click(closeConfirmationButton)
     // the confirmation should now be null once more
     expect(result.current[1]).toBeNull()
 
     // open the confirmation again and click the proceed to start over button
-    fireEvent.click(getByRole('button', { name: 'Start over' }))
-    const startOverButton = getByRole('button', { name: 'Start over' })
+    fireEvent.click(screen.getByRole('button', { name: 'Start over' }))
+    const startOverButton = screen.getByRole('button', { name: 'Start over' })
     fireEvent.click(startOverButton)
     expect(mockSendCommands).toHaveBeenCalledWith({
       command: sharedCalCommands.INVALIDATE_LAST_ACTION,

@@ -39,7 +39,9 @@ export function RobotSettingsJoinOtherNetwork({
       <ChildNavigation
         buttonText={i18n.format(t('continue'), 'capitalize')}
         header={t('join_other_network')}
-        onClickBack={() => setCurrentOption('RobotSettingsWifi')}
+        onClickBack={() => {
+          setCurrentOption('RobotSettingsWifi')
+        }}
         onClickButton={handleContinue}
       />
       <SetWifiSsid

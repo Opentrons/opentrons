@@ -79,7 +79,11 @@ export function SetupLabware(props: SetupLabwareProps): JSX.Element {
             sourceLocation="SetupLabware"
           />
         ) : (
-          <PrimaryButton onClick={() => expandStep(nextStep)}>
+          <PrimaryButton
+            onClick={() => {
+              expandStep(nextStep)
+            }}
+          >
             {t('proceed_to_liquid_setup_step')}
           </PrimaryButton>
         )}

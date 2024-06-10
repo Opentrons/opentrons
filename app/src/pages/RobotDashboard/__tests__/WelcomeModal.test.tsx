@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { vi, it, describe, expect, beforeEach } from 'vitest'
-import { fireEvent } from '@testing-library/react'
+import { fireEvent, screen } from '@testing-library/react'
 
 import { useCreateLiveCommandMutation } from '@opentrons/react-api-client'
 
@@ -39,19 +39,19 @@ describe('WelcomeModal', () => {
   })
 
   it('should render text and button', () => {
-    const [{ getByText, getByRole }] = render(props)
-    const image = getByRole('img')
+    render(props)
+    const image = screen.getByRole('img')
     const animationCommand: SetStatusBarCreateCommand = {
       commandType: 'setStatusBar',
       params: { animation: 'disco' },
     }
 
     expect(image.getAttribute('src')).toContain(WELCOME_MODAL_IMAGE_NAME)
-    getByText('Welcome to your dashboard!')
-    getByText(
+    screen.getByText('Welcome to your dashboard!')
+    screen.getByText(
       'A place to run protocols, manage your instruments, and view robot status.'
     )
-    getByText('Next')
+    screen.getByText('Next')
     expect(vi.mocked(useCreateLiveCommandMutation)).toBeCalledWith()
     expect(mockCreateLiveCommand).toBeCalledWith({
       command: animationCommand,
@@ -60,8 +60,8 @@ describe('WelcomeModal', () => {
   })
 
   it('should call a mock function when tapping next button', () => {
-    const [{ getByText }] = render(props)
-    fireEvent.click(getByText('Next'))
+    render(props)
+    fireEvent.click(screen.getByText('Next'))
     expect(props.setShowWelcomeModal).toHaveBeenCalled()
     expect(props.setShowAnalyticsOptInModal).toHaveBeenCalled()
   })

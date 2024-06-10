@@ -111,13 +111,17 @@ export function GeneralSettings(): JSX.Element {
           >
             <Banner
               type="warning"
-              onCloseClick={() => setShowUpdateBanner(false)}
+              onCloseClick={() => {
+                setShowUpdateBanner(false)
+              }}
             >
               {t('branded:opentrons_app_update_available_variation')}
               <Link
                 textDecoration={TYPOGRAPHY.textDecorationUnderline}
                 role="button"
-                onClick={() => setShowUpdateModal(true)}
+                onClick={() => {
+                  setShowUpdateModal(true)
+                }}
                 marginLeft={SPACING.spacing4}
               >
                 {t('view_update')}
@@ -135,7 +139,9 @@ export function GeneralSettings(): JSX.Element {
             {showConnectRobotSlideout && (
               <ConnectRobotSlideout
                 isExpanded={showConnectRobotSlideout}
-                onCloseClick={() => setShowConnectRobotSlideout(false)}
+                onCloseClick={() => {
+                  setShowConnectRobotSlideout(false)
+                }}
               />
             )}
             <Box width="65%">
@@ -166,7 +172,9 @@ export function GeneralSettings(): JSX.Element {
               <TertiaryButton
                 disabled={!updateAvailable}
                 marginLeft={SPACING_AUTO}
-                onClick={() => setShowUpdateModal(true)}
+                onClick={() => {
+                  setShowUpdateModal(true)
+                }}
                 id="GeneralSettings_softwareUpdate"
               >
                 {t('view_software_update')}
@@ -192,7 +200,9 @@ export function GeneralSettings(): JSX.Element {
               <Link
                 role="button"
                 css={TYPOGRAPHY.linkPSemiBold}
-                onClick={() => setShowPreviousVersionModal(true)}
+                onClick={() => {
+                  setShowPreviousVersionModal(true)
+                }}
                 id="GeneralSettings_previousVersionLink"
               >
                 {t('restore_previous')}
@@ -242,7 +252,9 @@ export function GeneralSettings(): JSX.Element {
           <TertiaryButton
             marginLeft={SPACING_AUTO}
             id="GeneralSettings_setUpConnection"
-            onClick={() => setShowConnectRobotSlideout(true)}
+            onClick={() => {
+              setShowConnectRobotSlideout(true)
+            }}
           >
             {t('setup_connection')}
           </TertiaryButton>
@@ -250,13 +262,19 @@ export function GeneralSettings(): JSX.Element {
       </Box>
       {showUpdateModal
         ? createPortal(
-            <UpdateAppModal closeModal={() => setShowUpdateModal(false)} />,
+            <UpdateAppModal
+              closeModal={() => {
+                setShowUpdateModal(false)
+              }}
+            />,
             getTopPortalEl()
           )
         : null}
       {showPreviousVersionModal ? (
         <PreviousVersionModal
-          closeModal={() => setShowPreviousVersionModal(false)}
+          closeModal={() => {
+            setShowPreviousVersionModal(false)
+          }}
         />
       ) : null}
     </>

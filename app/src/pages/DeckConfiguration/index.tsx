@@ -53,7 +53,9 @@ export function DeckConfigurationEditor(): JSX.Element {
   }
 
   const secondaryButtonProps: React.ComponentProps<typeof SmallButton> = {
-    onClick: () => setShowSetupInstructionsModal(true),
+    onClick: () => {
+      setShowSetupInstructionsModal(true)
+    },
     buttonText: i18n.format(t('setup_instructions'), 'titleCase'),
     buttonType: 'tertiaryLowLight',
     iconName: 'information',

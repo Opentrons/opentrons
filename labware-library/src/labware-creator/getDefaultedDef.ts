@@ -34,6 +34,8 @@ export const DEFAULTED_DEF_PATCH: Readonly<Partial<LabwareFields>> = {
   homogeneousWells: 'true',
   regularRowSpacing: 'true',
   regularColumnSpacing: 'true',
+  compatibleAdapters: {},
+  compatibleModules: {},
 }
 
 export const getDefaultedDefPatch = (

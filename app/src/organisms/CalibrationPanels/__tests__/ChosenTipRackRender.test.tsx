@@ -1,5 +1,6 @@
 import * as React from 'react'
 import { it, describe, beforeEach } from 'vitest'
+import { screen } from '@testing-library/react'
 
 import { i18n } from '../../../i18n'
 import { renderWithProviders } from '../../../__testing-utils__'
@@ -26,8 +27,8 @@ describe('ChosenTipRackRender', () => {
   })
 
   it('renders text and image alt text when tip rack is Opentrons 96 1000uL', () => {
-    const { getByText, getByAltText } = render(props)
-    getByText('Opentrons 96 tip rack 1000ul')
-    getByAltText('Opentrons 96 tip rack 1000ul image')
+    render(props)
+    screen.getByText('Opentrons 96 tip rack 1000ul')
+    screen.getByAltText('Opentrons 96 tip rack 1000ul image')
   })
 })

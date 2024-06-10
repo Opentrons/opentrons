@@ -24,7 +24,13 @@ export function BackButton({
       marginBottom="1rem"
       maxWidth="fit-content"
       // go back in the history stack if no click handler specified
-      onClick={onClick != null ? onClick : () => history.goBack()}
+      onClick={
+        onClick != null
+          ? onClick
+          : () => {
+              history.goBack()
+            }
+      }
     >
       <Flex alignItems={ALIGN_CENTER}>
         <Icon name="back" height="3rem" />

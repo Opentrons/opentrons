@@ -69,7 +69,9 @@ export function ProtocolList(props: ProtocolListProps): JSX.Element | null {
   ] = React.useState<boolean>(false)
   const sortBy = useSelector(getProtocolsDesktopSortKey) ?? 'alphabetical'
   const [showSortByMenu, setShowSortByMenu] = React.useState<boolean>(false)
-  const toggleSetShowSortByMenu = (): void => setShowSortByMenu(!showSortByMenu)
+  const toggleSetShowSortByMenu = (): void => {
+    setShowSortByMenu(!showSortByMenu)
+  }
   const { t } = useTranslation('protocol_info')
   const { storedProtocols } = props
   const [
@@ -134,14 +136,18 @@ export function ProtocolList(props: ProtocolListProps): JSX.Element | null {
         <>
           <ChooseRobotToRunProtocolSlideout
             key={`ChooseRobotToRunProtocolSlideout_${selectedProtocol.protocolKey}`}
-            onCloseClick={() => setShowChooseRobotToRunProtocolSlideout(false)}
+            onCloseClick={() => {
+              setShowChooseRobotToRunProtocolSlideout(false)
+            }}
             showSlideout={showChooseRobotToRunProtocolSlideout}
             storedProtocolData={selectedProtocol}
           />
           <SendProtocolToFlexSlideout
             key={`SendProtocolToFlexSlideout_${selectedProtocol.protocolKey}`}
             isExpanded={showSendProtocolToFlexSlideout}
-            onCloseClick={() => setShowSendProtocolToFlexSlideout(false)}
+            onCloseClick={() => {
+              setShowSendProtocolToFlexSlideout(false)
+            }}
             storedProtocolData={selectedProtocol}
           />
         </>
@@ -203,22 +209,46 @@ export function ProtocolList(props: ProtocolListProps): JSX.Element | null {
               right="7rem"
               flexDirection={DIRECTION_COLUMN}
             >
-              <MenuItem onClick={() => handleProtocolsSortKey('alphabetical')}>
+              <MenuItem
+                onClick={() => {
+                  handleProtocolsSortKey('alphabetical')
+                }}
+              >
                 {t('shared:alphabetical')}
               </MenuItem>
-              <MenuItem onClick={() => handleProtocolsSortKey('reverse')}>
+              <MenuItem
+                onClick={() => {
+                  handleProtocolsSortKey('reverse')
+                }}
+              >
                 {t('shared:reverse')}
               </MenuItem>
-              <MenuItem onClick={() => handleProtocolsSortKey('recent')}>
+              <MenuItem
+                onClick={() => {
+                  handleProtocolsSortKey('recent')
+                }}
+              >
                 {t('most_recent_updates')}
               </MenuItem>
-              <MenuItem onClick={() => handleProtocolsSortKey('oldest')}>
+              <MenuItem
+                onClick={() => {
+                  handleProtocolsSortKey('oldest')
+                }}
+              >
                 {t('oldest_updates')}
               </MenuItem>
-              <MenuItem onClick={() => handleProtocolsSortKey('flex')}>
+              <MenuItem
+                onClick={() => {
+                  handleProtocolsSortKey('flex')
+                }}
+              >
                 {t('robot_type_first', { robotType: FLEX })}
               </MenuItem>
-              <MenuItem onClick={() => handleProtocolsSortKey('ot2')}>
+              <MenuItem
+                onClick={() => {
+                  handleProtocolsSortKey('ot2')
+                }}
+              >
                 {t('robot_type_first', { robotType: OT2 })}
               </MenuItem>
             </Flex>
@@ -229,7 +259,11 @@ export function ProtocolList(props: ProtocolListProps): JSX.Element | null {
               backgroundColor={COLORS.transparent}
             />
           ) : null}
-          <SecondaryButton onClick={() => setShowImportProtocolSlideout(true)}>
+          <SecondaryButton
+            onClick={() => {
+              setShowImportProtocolSlideout(true)
+            }}
+          >
             {t('import')}
           </SecondaryButton>
         </Flex>
@@ -253,11 +287,15 @@ export function ProtocolList(props: ProtocolListProps): JSX.Element | null {
       <Slideout
         title={t('import_new_protocol')}
         isExpanded={showImportProtocolSlideout}
-        onCloseClick={() => setShowImportProtocolSlideout(false)}
+        onCloseClick={() => {
+          setShowImportProtocolSlideout(false)
+        }}
       >
         <Box marginTop={SPACING.spacing16}>
           <ProtocolUploadInput
-            onUpload={() => setShowImportProtocolSlideout(false)}
+            onUpload={() => {
+              setShowImportProtocolSlideout(false)
+            }}
           />
         </Box>
       </Slideout>

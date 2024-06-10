@@ -28,7 +28,9 @@ const Template: Story<React.ComponentProps<typeof RadioGroupComponent>> = ({
       <RadioGroupComponent
         {...args}
         value={controlledValue}
-        onChange={e => setControlledValue(e.target.value)}
+        onChange={e => {
+          setControlledValue(e.target.value)
+        }}
       />
     </Box>
   )

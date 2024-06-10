@@ -112,8 +112,18 @@ export function PipetteTypeTile(props: PipetteTypeTileProps): JSX.Element {
           justifyContent={JUSTIFY_SPACE_BETWEEN}
           width="100%"
         >
-          <GoBack onClick={() => goBack()} />
-          <PrimaryButton onClick={() => proceed()}>{t('next')}</PrimaryButton>
+          <GoBack
+            onClick={() => {
+              goBack()
+            }}
+          />
+          <PrimaryButton
+            onClick={() => {
+              proceed()
+            }}
+          >
+            {t('next')}
+          </PrimaryButton>
         </Flex>
       </Flex>
     </HandleEnter>
