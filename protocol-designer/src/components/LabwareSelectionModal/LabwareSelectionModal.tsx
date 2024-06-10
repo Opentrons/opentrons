@@ -103,6 +103,7 @@ const RECOMMENDED_LABWARE_BY_MODULE: { [K in ModuleType]: string[] } = {
     'opentrons_24_aluminumblock_nest_2ml_snapcap',
     'opentrons_24_aluminumblock_nest_0.5ml_screwcap',
     'opentrons_aluminum_flat_bottom_plate',
+    'opentrons_96_deep_well_temp_mod_adapter',
   ],
   [MAGNETIC_MODULE_TYPE]: [
     'nest_96_wellplate_100ul_pcr_full_skirt',
