@@ -44,7 +44,7 @@ const mockCsvFileParameter = {
   displayName: 'My CSV File',
   variableName: 'CSVFILE',
   description: 'CSV File for a protocol',
-  type: 'csv' as const,
+  type: 'csv_file' as const,
   default: 'mock.csv',
 }
 
@@ -189,7 +189,9 @@ const StyledTableRowComponent = (
             padding-right: 8px;
           `}
         >
-          {parameter.type === 'csv' ? t('csv_file') : parameter.displayName}
+          {parameter.type === 'csv_file'
+            ? t('csv_file')
+            : parameter.displayName}
         </StyledText>
         {parameter.description != null ? (
           <>
