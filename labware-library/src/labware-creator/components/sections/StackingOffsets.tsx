@@ -169,31 +169,33 @@ export function StackingOffsets(): JSX.Element | null {
                       flexDirection={DIRECTION_ROW}
                       height="2rem"
                     >
-                      <CheckboxField
-                        name={fieldName}
-                        value={isChecked}
-                        label={definition.metadata.displayName}
-                        onChange={() => {
-                          const compatibleAdaptersCopy = {
-                            ...values.compatibleAdapters,
-                          }
-                          if (isChecked) {
-                            const {
-                              [key]: _,
-                              ...newCompatibleAdapters
-                            } = compatibleAdaptersCopy
-                            setFieldValue(
-                              'compatibleAdapters',
-                              newCompatibleAdapters
-                            )
-                          } else {
-                            setFieldValue('compatibleAdapters', {
-                              ...compatibleAdaptersCopy,
-                              [key]: 0,
-                            })
-                          }
-                        }}
-                      />
+                      <Flex zIndex={2}>
+                        <CheckboxField
+                          name={fieldName}
+                          value={isChecked}
+                          label={definition.metadata.displayName}
+                          onChange={() => {
+                            const compatibleAdaptersCopy = {
+                              ...values.compatibleAdapters,
+                            }
+                            if (isChecked) {
+                              const {
+                                [key]: _,
+                                ...newCompatibleAdapters
+                              } = compatibleAdaptersCopy
+                              setFieldValue(
+                                'compatibleAdapters',
+                                newCompatibleAdapters
+                              )
+                            } else {
+                              setFieldValue('compatibleAdapters', {
+                                ...compatibleAdaptersCopy,
+                                [key]: 0,
+                              })
+                            }
+                          }}
+                        />
+                      </Flex>
                       <div className={styles.form_fields_column}>
                         {isChecked ? (
                           <TextField
@@ -247,31 +249,33 @@ export function StackingOffsets(): JSX.Element | null {
                       flexDirection={DIRECTION_ROW}
                       height="2rem"
                     >
-                      <CheckboxField
-                        name={fieldName}
-                        value={isChecked}
-                        label={getModuleDisplayName(model)}
-                        onChange={() => {
-                          const compatibleModulesCopy = {
-                            ...values.compatibleModules,
-                          }
-                          if (isChecked) {
-                            const {
-                              [model]: _,
-                              ...newCompatibleModules
-                            } = compatibleModulesCopy
-                            setFieldValue(
-                              'compatibleModules',
-                              newCompatibleModules
-                            )
-                          } else {
-                            setFieldValue('compatibleModules', {
-                              ...compatibleModulesCopy,
-                              [model]: 0,
-                            })
-                          }
-                        }}
-                      />
+                      <Flex zIndex={2}>
+                        <CheckboxField
+                          name={fieldName}
+                          value={isChecked}
+                          label={getModuleDisplayName(model)}
+                          onChange={() => {
+                            const compatibleModulesCopy = {
+                              ...values.compatibleModules,
+                            }
+                            if (isChecked) {
+                              const {
+                                [model]: _,
+                                ...newCompatibleModules
+                              } = compatibleModulesCopy
+                              setFieldValue(
+                                'compatibleModules',
+                                newCompatibleModules
+                              )
+                            } else {
+                              setFieldValue('compatibleModules', {
+                                ...compatibleModulesCopy,
+                                [model]: 0,
+                              })
+                            }
+                          }}
+                        />
+                      </Flex>
                       <div className={styles.form_fields_column}>
                         {isChecked ? (
                           <TextField
