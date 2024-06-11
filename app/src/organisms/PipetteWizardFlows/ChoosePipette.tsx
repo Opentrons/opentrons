@@ -175,7 +175,7 @@ export const ChoosePipette = (props: ChoosePipetteProps): JSX.Element => {
               justifyContent={JUSTIFY_SPACE_BETWEEN}
             >
               <ModalContentOneColSimpleButtons
-                topText={t('choose_pipette')}
+                headline={t('choose_pipette')}
                 firstButton={{
                   label: singleMount,
                   value: SINGLE_MOUNT_PIPETTES,
@@ -187,7 +187,7 @@ export const ChoosePipette = (props: ChoosePipetteProps): JSX.Element => {
                 onSelect={event => {
                   setSelectedPipette(event.target.value as any)
                 }}
-                initialSelected={SINGLE_MOUNT_PIPETTES}
+                initialSelected={selectedPipette}
               />
               <Flex justifyContent={JUSTIFY_FLEX_END}>
                 <SmallButton
