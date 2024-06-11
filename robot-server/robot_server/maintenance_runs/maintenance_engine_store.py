@@ -25,6 +25,9 @@ from opentrons.protocol_engine import (
     ProtocolEngine,
     StateSummary,
     create_protocol_engine,
+    CommandSlice,
+    CommandPointer,
+    Command,
 )
 
 from opentrons.protocol_engine.types import DeckConfigurationType
@@ -202,3 +205,32 @@ class MaintenanceEngineStore:
         self._run_orchestrator = None
 
         return RunResult(state_summary=run_data, commands=commands, parameters=[])
+
+    def get_command_slice(
+        self,
+        cursor: Optional[int],
+        length: int,
+    ) -> CommandSlice:
+        """Get a slice of run commands.
+
+        Args:
+            cursor: Requested index of first command in the returned slice.
+            length: Length of slice to return.
+        """
+        return self.run_orchestrator.get_command_slice(cursor=cursor, length=length)
+
+    def get_current_command(self) -> Optional[CommandPointer]:
+        """Get the current running command."""
+        return self.run_orchestrator.get_current_command()
+
+    def get_command_recovery_target(self) -> Optional[CommandPointer]:
+        """Get the current error recovery target."""
+        return self.run_orchestrator.get_command_recovery_target()
+
+    def get_command(self, command_id: str) -> Command:
+        """Get a run's command by ID."""
+        return self.run_orchestrator.get_command(command_id=command_id)
+
+    def get_state_summary(self) -> StateSummary:
+        """Get protocol run data."""
+        return self.run_orchestrator.get_state_summary()
