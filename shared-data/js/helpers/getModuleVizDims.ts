@@ -1,18 +1,7 @@
 // NOTE: Ian 2019-10-24 these are by-eye numbers that intentionally
 // ignore the real-life data to emphasize overhangs etc
-import {
-  ABSORBANCE_READER_TYPE,
-  MAGNETIC_MODULE_TYPE,
-  TEMPERATURE_MODULE_TYPE,
-  THERMOCYCLER_MODULE_TYPE,
-  HEATERSHAKER_MODULE_TYPE,
-  STD_SLOT_X_DIM as SLOT_X,
-  STD_SLOT_Y_DIM as SLOT_Y,
-  STD_SLOT_DIVIDER_WIDTH as DIVIDER,
-  SPAN7_8_10_11_SLOT,
-  MAGNETIC_BLOCK_TYPE,
-} from '../constants'
-import type { ModuleType, ModuleOrientation } from '../types'
+import { SPAN7_8_10_11_SLOT } from '../constants'
+import type { ModuleOrientation } from '../types'
 // NOTE: all dims are in 'left' orientation. Rotate & transform to obtain 'right' orientation.
 
 export interface ModuleVizDims {
