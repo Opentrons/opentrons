@@ -293,7 +293,7 @@ async def create_protocol(  # noqa: C901
         data = Protocol.construct(
             id=cached_protocol_id,
             createdAt=resource.created_at,
-            protocolKind=ProtocolKind(resource.protocol_kind),
+            protocolKind=ProtocolKind.from_string(resource.protocol_kind),
             protocolType=resource.source.config.protocol_type,
             robotType=resource.source.robot_type,
             metadata=Metadata.parse_obj(resource.source.metadata),
@@ -437,7 +437,7 @@ async def get_protocols(
         Protocol.construct(
             id=r.protocol_id,
             createdAt=r.created_at,
-            protocolKind=ProtocolKind(r.protocol_kind),
+            protocolKind=ProtocolKind.from_string(r.protocol_kind),
             protocolType=r.source.config.protocol_type,
             robotType=r.source.robot_type,
             metadata=Metadata.parse_obj(r.source.metadata),
@@ -517,7 +517,7 @@ async def get_protocol_by_id(
     data = Protocol.construct(
         id=protocolId,
         createdAt=resource.created_at,
-        protocolKind=ProtocolKind(resource.protocol_kind),
+        protocolKind=ProtocolKind.from_string(resource.protocol_kind),
         protocolType=resource.source.config.protocol_type,
         robotType=resource.source.robot_type,
         metadata=Metadata.parse_obj(resource.source.metadata),
