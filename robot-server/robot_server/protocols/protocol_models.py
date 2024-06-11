@@ -127,7 +127,7 @@ class Protocol(ResourceModel):
         ),
     )
 
-    protocolKind: Optional[str] = Field(
+    protocolKind: Optional[ProtocolKind] = Field(
         ...,
         description="The kind of protocol (standard or quick-transfer)."
         "The client provides this field when the protocol is uploaded."

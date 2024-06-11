@@ -172,7 +172,7 @@ async def test_get_protocols(
     expected_protocol_1 = Protocol(
         id="abc",
         createdAt=created_at_1,
-        protocolKind=ProtocolKind.STANDARD.value,
+        protocolKind=ProtocolKind.STANDARD,
         protocolType=ProtocolType.PYTHON,
         metadata=Metadata(),
         robotType="OT-2 Standard",
@@ -183,7 +183,7 @@ async def test_get_protocols(
     expected_protocol_2 = Protocol(
         id="123",
         createdAt=created_at_2,
-        protocolKind=ProtocolKind.STANDARD.value,
+        protocolKind=ProtocolKind.STANDARD,
         protocolType=ProtocolType.JSON,
         metadata=Metadata(),
         robotType="OT-3 Standard",
@@ -286,7 +286,7 @@ async def test_get_protocol_by_id(
     assert result.content.data == Protocol(
         id="protocol-id",
         createdAt=datetime(year=2021, month=1, day=1),
-        protocolKind=ProtocolKind.STANDARD.value,
+        protocolKind=ProtocolKind.STANDARD,
         protocolType=ProtocolType.PYTHON,
         metadata=Metadata(),
         robotType="OT-2 Standard",
@@ -408,7 +408,7 @@ async def test_create_existing_protocol(
     assert result.content.data == Protocol(
         id="the-og-proto-id",
         createdAt=datetime(year=2020, month=1, day=1),
-        protocolKind=ProtocolKind.STANDARD.value,
+        protocolKind=ProtocolKind.STANDARD,
         protocolType=ProtocolType.JSON,
         metadata=Metadata(this_is_fake_metadata=True),  # type: ignore[call-arg]
         robotType="OT-2 Standard",
@@ -512,7 +512,7 @@ async def test_create_protocol(
     assert result.content.data == Protocol(
         id="protocol-id",
         createdAt=datetime(year=2021, month=1, day=1),
-        protocolKind=ProtocolKind.STANDARD.value,
+        protocolKind=ProtocolKind.STANDARD,
         protocolType=ProtocolType.JSON,
         metadata=Metadata(this_is_fake_metadata=True),  # type: ignore[call-arg]
         robotType="OT-2 Standard",
@@ -734,7 +734,7 @@ async def test_create_existing_protocol_with_no_previous_analysis(
     assert result.content.data == Protocol(
         id="the-og-proto-id",
         createdAt=datetime(year=2020, month=1, day=1),
-        protocolKind=ProtocolKind.STANDARD.value,
+        protocolKind=ProtocolKind.STANDARD,
         protocolType=ProtocolType.JSON,
         metadata=Metadata(this_is_fake_metadata=True),  # type: ignore[call-arg]
         robotType="OT-2 Standard",
@@ -855,7 +855,7 @@ async def test_create_existing_protocol_with_different_run_time_params(
     assert result.content.data == Protocol(
         id="the-og-proto-id",
         createdAt=datetime(year=2020, month=1, day=1),
-        protocolKind=ProtocolKind.STANDARD.value,
+        protocolKind=ProtocolKind.STANDARD,
         protocolType=ProtocolType.JSON,
         metadata=Metadata(this_is_fake_metadata=True),  # type: ignore[call-arg]
         robotType="OT-2 Standard",
@@ -958,7 +958,7 @@ async def test_create_existing_protocol_with_same_run_time_params(
     assert result.content.data == Protocol(
         id="the-og-proto-id",
         createdAt=datetime(year=2020, month=1, day=1),
-        protocolKind=ProtocolKind.STANDARD.value,
+        protocolKind=ProtocolKind.STANDARD,
         protocolType=ProtocolType.JSON,
         metadata=Metadata(this_is_fake_metadata=True),  # type: ignore[call-arg]
         robotType="OT-2 Standard",
