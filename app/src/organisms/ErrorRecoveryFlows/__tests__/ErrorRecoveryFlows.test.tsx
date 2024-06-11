@@ -39,19 +39,19 @@ describe('useErrorRecoveryFlows', () => {
   })
 
   it('should toggle the value of isEREnabled properly when the run status is valid', () => {
-    const { result } = renderHook(() =>
-      useErrorRecoveryFlows('MOCK_ID', RUN_STATUS_AWAITING_RECOVERY)
+    const { result, rerender } = renderHook(
+      runStatus => useErrorRecoveryFlows('MOCK_ID', runStatus),
+      {
+        initialProps: RUN_STATUS_AWAITING_RECOVERY,
+      }
     )
 
     expect(result.current.isERActive).toBe(true)
 
-    const { result: resultStopRequested } = renderHook(() =>
-      useErrorRecoveryFlows('MOCK_ID', RUN_STATUS_STOP_REQUESTED)
-    )
+    rerender(RUN_STATUS_STOP_REQUESTED as any)
 
-    expect(resultStopRequested.current.isERActive).toBe(true)
+    expect(result.current.isERActive).toBe(true)
   })
-
   it('should disable error recovery when runStatus is not a valid ER run status', () => {
     const { result } = renderHook(
       (runStatus: RunStatus) => useErrorRecoveryFlows('MOCK_ID', runStatus),
@@ -69,6 +69,14 @@ describe('useErrorRecoveryFlows', () => {
     )
 
     expect(result.current.failedCommand).toEqual('mockCommand')
+  })
+
+  it(`should return isERActive false if the run status is ${RUN_STATUS_STOP_REQUESTED} before seeing ${RUN_STATUS_AWAITING_RECOVERY}`, () => {
+    const { result } = renderHook(() =>
+      useErrorRecoveryFlows('MOCK_ID', RUN_STATUS_RUNNING)
+    )
+
+    expect(result.current.isERActive).toEqual(false)
   })
 })
 
