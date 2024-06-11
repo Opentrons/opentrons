@@ -51,19 +51,13 @@ class LiquidProbeImplementation(
 
         Return the z-position of the found liquid.
         """
-        # LiquidNotFoundError exception raised in ot3controller
-        # account for labware (height)?
-        # make liquid_probe_in_place command
-
         position = await self._movement.move_to_well(
             pipette_id=params.pipetteId,
             labware_id=params.labwareId,
             well_name=params.wellName,
             well_location=params.wellLocation,
         )
-        z_pos = await self._pipetting.liquid_probe_in_place(
-            pipette_id=params.pipetteId
-        )  # pass probe (settings)?
+        z_pos = await self._pipetting.liquid_probe_in_place(pipette_id=params.pipetteId)
 
         return SuccessData(
             public=LiquidProbeResult(
