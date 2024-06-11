@@ -153,7 +153,7 @@ class InstrumentCore(AbstractInstrument[WellCore]):
                 well_name=well_name,
                 well_location=well_location,
             )
-            self._engine_client.aspirate(
+            self._engine_client.aspirate_wait_for_recovery(
                 pipette_id=self._pipette_id,
                 labware_id=labware_id,
                 well_name=well_name,

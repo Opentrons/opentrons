@@ -7,9 +7,7 @@ from opentrons.config import feature_flags as ff
 from opentrons.protocol_engine.commands import (
     Command,
     CommandDefinedErrorData,
-    PickUpTip,
 )
-from opentrons.protocol_engine.commands.pick_up_tip import TipPhysicallyMissingError
 
 
 class ErrorRecoveryType(enum.Enum):
@@ -65,22 +63,12 @@ def error_recovery_by_ff(
     """
     # todo(mm, 2024-03-18): Do we need to do anything explicit here to disable
     # error recovery on the OT-2?
-    if ff.enable_error_recovery_experiments() and _is_recoverable(
-        failed_command, defined_error_data
-    ):
+    error_is_defined = defined_error_data is not None
+    # If the error is defined, we're taking that to mean that we should
+    # WAIT_FOR_RECOVERY. This is not necessarily the right production logic--we might
+    # want to FAIL_RUN on certain defined errors and WAIT_FOR_RECOVERY on certain
+    # undefined errors--but this is convenient for development.
+    if ff.enable_error_recovery_experiments() and error_is_defined:
         return ErrorRecoveryType.WAIT_FOR_RECOVERY
     else:
         return ErrorRecoveryType.FAIL_RUN
-
-
-def _is_recoverable(
-    failed_command: Command, error_data: Optional[CommandDefinedErrorData]
-) -> bool:
-    if (
-        isinstance(failed_command, PickUpTip)
-        and error_data is not None
-        and isinstance(error_data.public, TipPhysicallyMissingError)
-    ):
-        return True
-    else:
-        return False

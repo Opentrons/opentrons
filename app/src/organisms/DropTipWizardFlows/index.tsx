@@ -1,14 +1,67 @@
 import * as React from 'react'
 import head from 'lodash/head'
 
-import { DropTipWizard } from './DropTipWizard'
-import { getPipettesWithTipAttached } from './getPipettesWithTipAttached'
-
 import { getPipetteModelSpecs } from '@opentrons/shared-data'
 
-import type { PipetteModelSpecs } from '@opentrons/shared-data'
+import { getPipettesWithTipAttached } from './getPipettesWithTipAttached'
+import { useDropTipRouting, useDropTipWithType } from './hooks'
+import { DropTipWizard } from './DropTipWizard'
+
+import type { PipetteModelSpecs, RobotType } from '@opentrons/shared-data'
+import type { PipetteData } from '@opentrons/api-client'
+import type { FixitCommandTypeUtils, IssuedCommandsType } from './types'
 import type { GetPipettesWithTipAttached } from './getPipettesWithTipAttached'
-import type { DropTipWizardProps } from './DropTipWizard'
+
+/** Provides the user toggle for rendering Drop Tip Wizard Flows.
+ *
+ * NOTE: Rendering these flows is independent of whether tips are actually attached. First use useTipAttachmentStatus
+ * to get tip attachment status.
+ */
+export function useDropTipWizardFlows(): {
+  showDTWiz: boolean
+  toggleDTWiz: () => void
+} {
+  const [showDTWiz, setShowDTWiz] = React.useState(false)
+
+  const toggleDTWiz = (): void => {
+    setShowDTWiz(!showDTWiz)
+  }
+
+  return { showDTWiz, toggleDTWiz }
+}
+
+export interface DropTipWizardFlowsProps {
+  robotType: RobotType
+  mount: PipetteData['mount']
+  instrumentModelSpecs: PipetteModelSpecs
+  closeFlow: () => void
+  /* Optional. If provided, DT will issue "fixit" commands and render alternate Error Recovery compatible views. */
+  fixitCommandTypeUtils?: FixitCommandTypeUtils
+}
+
+export function DropTipWizardFlows(
+  props: DropTipWizardFlowsProps
+): JSX.Element {
+  const issuedCommandsType: IssuedCommandsType = props.fixitCommandTypeUtils
+    ? 'fixit'
+    : 'setup'
+
+  const dropTipWithTypeUtils = useDropTipWithType({
+    ...props,
+    issuedCommandsType,
+  })
+
+  const dropTipRoutingUtils = useDropTipRouting()
+
+  return (
+    <DropTipWizard
+      {...props}
+      {...dropTipWithTypeUtils}
+      {...dropTipRoutingUtils}
+      issuedCommandsType={issuedCommandsType}
+    />
+  )
+}
 
 export interface PipetteWithTip {
   mount: 'left' | 'right'
@@ -88,25 +141,4 @@ export function useTipAttachmentStatus(
     pipettesWithTip,
     setTipStatusResolved,
   }
-}
-
-// Provides the user toggle for rendering Drop Tip Wizard Flows.
-//
-// NOTE: Rendering these flows is independent of whether tips are actually attached. First use useTipAttachmentStatus
-// to get tip attachment status.
-export function useDropTipWizardFlows(): {
-  showDTWiz: boolean
-  toggleDTWiz: () => void
-} {
-  const [showDTWiz, setShowDTWiz] = React.useState(false)
-
-  const toggleDTWiz = (): void => {
-    setShowDTWiz(!showDTWiz)
-  }
-
-  return { showDTWiz, toggleDTWiz }
-}
-
-export function DropTipWizardFlows(props: DropTipWizardProps): JSX.Element {
-  return <DropTipWizard {...props} />
 }

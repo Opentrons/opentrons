@@ -1,28 +1,10 @@
 """Defines the shape of stored data."""
 
 import dataclasses
-from typing import Sequence, Tuple, Protocol, Union
-from opentrons_shared_data.performance.dev_types import RobotContextState
+import typing
+from pathlib import Path
 
-StorableData = Union[int, float, str]
-
-
-class SupportsCSVStorage(Protocol):
-    """A protocol for classes that support CSV storage."""
-
-    @classmethod
-    def headers(self) -> Tuple[str, ...]:
-        """Returns the headers for the CSV data."""
-        ...
-
-    def csv_row(self) -> Tuple[StorableData, ...]:
-        """Returns the object as a CSV row."""
-        ...
-
-    @classmethod
-    def from_csv_row(cls, row: Tuple[StorableData, ...]) -> "SupportsCSVStorage":
-        """Returns an object from a CSV row."""
-        ...
+from .types import SupportsCSVStorage, StorableData, RobotContextState
 
 
 @dataclasses.dataclass(frozen=True)
@@ -41,23 +23,44 @@ class RawContextData(SupportsCSVStorage):
     duration: int
 
     @classmethod
-    def headers(self) -> Tuple[str, str, str]:
+    def headers(self) -> typing.Tuple[str, str, str]:
         """Returns the headers for the raw context data."""
         return ("state_id", "function_start_time", "duration")
 
-    def csv_row(self) -> Tuple[int, int, int]:
+    def csv_row(self) -> typing.Tuple[str, int, int]:
         """Returns the raw context data as a string."""
         return (
-            self.state.state_id,
+            self.state,
             self.func_start,
             self.duration,
         )
 
     @classmethod
-    def from_csv_row(cls, row: Sequence[StorableData]) -> SupportsCSVStorage:
+    def from_csv_row(cls, row: typing.Sequence[StorableData]) -> SupportsCSVStorage:
         """Returns a RawContextData object from a CSV row."""
         return cls(
-            state=RobotContextState.from_id(int(row[0])),
+            state=typing.cast(RobotContextState, row[0]),
             func_start=int(row[1]),
             duration=int(row[2]),
+        )
+
+
+@dataclasses.dataclass(frozen=True)
+class MetricsMetadata:
+    """Dataclass to store metadata about the metrics."""
+
+    name: str
+    storage_dir: Path
+    headers: typing.Tuple[str, ...]
+
+    @property
+    def data_file_location(self) -> Path:
+        """The location of the data file."""
+        return self.storage_dir / self.name
+
+    @property
+    def headers_file_location(self) -> Path:
+        """The location of the header file."""
+        return self.data_file_location.with_stem(
+            self.data_file_location.stem + "_headers"
         )

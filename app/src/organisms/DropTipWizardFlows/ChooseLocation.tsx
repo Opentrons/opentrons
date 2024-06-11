@@ -24,9 +24,7 @@ import { getDeckDefFromRobotType } from '@opentrons/shared-data'
 import { SmallButton } from '../../atoms/buttons'
 import { TwoUpTileLayout } from '../LabwarePositionCheck/TwoUpTileLayout'
 
-import type { CommandData } from '@opentrons/api-client'
 import type { AddressableAreaName, RobotType } from '@opentrons/shared-data'
-import type { ErrorDetails } from './utils'
 
 // TODO: get help link article URL
 
@@ -36,11 +34,8 @@ interface ChooseLocationProps {
   title: string
   body: string | JSX.Element
   robotType: RobotType
-  moveToAddressableArea: (
-    addressableArea: AddressableAreaName
-  ) => Promise<CommandData | null>
+  moveToAddressableArea: (addressableArea: AddressableAreaName) => Promise<void>
   isOnDevice: boolean
-  setErrorDetails: (errorDetails: ErrorDetails) => void
 }
 
 export const ChooseLocation = (
@@ -54,7 +49,6 @@ export const ChooseLocation = (
     robotType,
     moveToAddressableArea,
     isOnDevice,
-    setErrorDetails,
   } = props
   const { i18n, t } = useTranslation(['drop_tip_wizard', 'shared'])
   const deckDef = getDeckDefFromRobotType(robotType)
@@ -68,13 +62,9 @@ export const ChooseLocation = (
     )?.id
 
     if (deckSlot != null) {
-      moveToAddressableArea(deckSlot)
-        .then(() => {
-          handleProceed()
-        })
-        .catch(e => {
-          setErrorDetails({ message: `${e.message}` })
-        })
+      void moveToAddressableArea(deckSlot).then(() => {
+        handleProceed()
+      })
     }
   }
 

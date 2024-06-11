@@ -23,8 +23,9 @@ const render = () => {
 }
 
 describe('EmptyFile', () => {
-  it('should render text', () => {
+  it('should render icon and text', () => {
     render()
+    screen.getByTestId('EmptyFile_icon')
     screen.getByText('No files found')
   })
 
@@ -32,13 +33,14 @@ describe('EmptyFile', () => {
     render()
     const element = screen.getByTestId('EmptyFile')
     expect(element).toHaveStyle(`background-color: ${COLORS.grey35}`)
-    expect(element).toHaveStyle(`padding: ${SPACING.spacing24}`)
+    expect(element).toHaveStyle(
+      `padding: ${SPACING.spacing40} ${SPACING.spacing80}`
+    )
     expect(element).toHaveStyle(`justify-content: ${JUSTIFY_CENTER}`)
     expect(element).toHaveStyle(`align-items: ${ALIGN_CENTER}`)
     expect(element).toHaveStyle(`border-radius: ${BORDERS.borderRadius16}`)
 
     const text = screen.getByText('No files found')
-    expect(text).toHaveStyle(`color: ${COLORS.grey50}`)
     expect(text).toHaveStyle(`font-size: ${TYPOGRAPHY.fontSize28}`)
     expect(text).toHaveStyle(`line-height: ${TYPOGRAPHY.lineHeight36}`)
     expect(text).toHaveStyle(`font-weight: ${TYPOGRAPHY.fontWeightSemiBold}`)

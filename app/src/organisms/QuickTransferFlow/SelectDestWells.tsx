@@ -1,5 +1,6 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
+import without from 'lodash/without'
 import { Flex, POSITION_FIXED, SPACING } from '@opentrons/components'
 
 import { ChildNavigation } from '../ChildNavigation'
@@ -69,6 +70,16 @@ export function SelectDestWells(props: SelectDestWellsProps): JSX.Element {
             definition={
               state.destination === 'source' ? state.source : state.destination
             }
+            deselectWells={(wells: string[]) => {
+              setSelectedWells(prevWells =>
+                without(Object.keys(prevWells), ...wells).reduce(
+                  (acc, well) => {
+                    return { ...acc, [well]: null }
+                  },
+                  {}
+                )
+              )
+            }}
             selectedPrimaryWells={selectedWells}
             selectWells={wellGroup => {
               setSelectedWells(prevWells => ({ ...prevWells, ...wellGroup }))
