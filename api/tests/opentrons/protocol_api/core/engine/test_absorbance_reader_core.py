@@ -45,7 +45,7 @@ def test_create(
     mock_engine_client: EngineClient,
     mock_sync_module_hardware: SyncAbsorbanceReaderHardware,
 ) -> None:
-    """It should be able to create a heater shaker module core."""
+    """It should be able to create an absorbance plate reader module core."""
     result = AbsorbanceReaderCore(
         module_id="1234",
         engine_client=mock_engine_client,

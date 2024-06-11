@@ -370,7 +370,7 @@ class ModuleModel(str, Enum):
     def is_absorbance_reader(
         cls, model: ModuleModel
     ) -> TypeGuard[AbsorbanceReaderModel]:
-        """Whether a given model is a Magnetic block."""
+        """Whether a given model is an Absorbance Plate Reader."""
         return model == cls.ABSORBANCE_READER_V1
 
 

@@ -1259,7 +1259,12 @@ class ModuleView(HasState[ModuleState]):
             return "thermocyclerModuleV2"
         elif model == ModuleModel.ABSORBANCE_READER_V1:
             valid_slots = ["A3", "B3", "C3", "D3"]
-            return "absorbanceReaderV1D3"
+            addressable_areas = [
+                "absorbanceReaderV1A3",
+                "absorbanceReaderV1B3",
+                "absorbanceReaderV1C3",
+                "absorbanceReaderV1D3",
+            ]
         else:
             raise ValueError(
                 f"Unknown module {model.name} has no addressable areas to provide."

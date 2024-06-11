@@ -19,7 +19,7 @@ InitializeCommandType = Literal["absorbanceReader/initialize"]
 class InitializeParams(BaseModel):
     """Input parameters to initialize an absorbance reading."""
 
-    moduleId: str = Field(..., description="Unique ID of the Thermocycler.")
+    moduleId: str = Field(..., description="Unique ID of the absorbance reader.")
     sampleWavelength: int = Field(..., description="Sample wavelength in nm.")
 
 

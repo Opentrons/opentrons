@@ -158,7 +158,7 @@ async def test_load_module_implementation_abs_reader(
     state_view: StateView,
     abs_reader_v1_def: ModuleDefinition,
 ) -> None:
-    """A loadModule command for mag block should have an execution implementation."""
+    """A loadModule command for abs reader should have an execution implementation."""
     subject = LoadModuleImplementation(equipment=equipment, state_view=state_view)
 
     data = LoadModuleParams(
@@ -180,12 +180,12 @@ async def test_load_module_implementation_abs_reader(
         state_view.geometry.ensure_location_not_occupied(
             DeckSlotLocation(slotName=DeckSlotName.SLOT_D3)
         )
-    ).then_return(DeckSlotLocation(slotName=DeckSlotName.SLOT_3))
+    ).then_return(DeckSlotLocation(slotName=DeckSlotName.SLOT_D3))
 
     decoy.when(
         await equipment.load_module(
             model=ModuleModel.ABSORBANCE_READER_V1,
-            location=DeckSlotLocation(slotName=DeckSlotName.SLOT_3),
+            location=DeckSlotLocation(slotName=DeckSlotName.SLOT_D3),
             module_id="some-id",
         )
     ).then_return(

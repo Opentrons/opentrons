@@ -179,8 +179,7 @@ class AbsorbanceReader(mod_abc.AbstractModule):
 
     async def start_measure(self, wavelength: int) -> List[float]:
         """Initiate a single measurement."""
-        measurement = await self._driver.get_single_measurement(wavelength)
-        return measurement
+        return await self._driver.get_single_measurement(wavelength)
 
     async def setup(self) -> None:
         """Setup the Absorbance Reader."""
@@ -193,7 +192,7 @@ class AbsorbanceReader(mod_abc.AbstractModule):
         pass
 
 
-class AbsornanceReaderReader(Reader):
+class AbsorbanceReaderReader(Reader):
     device_state: AbsorbanceReaderDeviceState
     lid_status: AbsorbanceReaderLidStatus
     plate_presence: AbsorbanceReaderPlatePresence

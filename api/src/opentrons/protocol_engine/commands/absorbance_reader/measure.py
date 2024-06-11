@@ -19,7 +19,7 @@ MeasureAbsorbanceCommandType = Literal["absorbanceReader/measure"]
 class MeasureAbsorbanceParams(BaseModel):
     """Input parameters for a single absorbance reading."""
 
-    moduleId: str = Field(..., description="Unique ID of the Thermocycler.")
+    moduleId: str = Field(..., description="Unique ID of the Absorbance Reader.")
     sampleWavelength: int = Field(..., description="Sample wavelength in nm.")
 
 
@@ -37,7 +37,7 @@ class MeasureAbsorbanceImpl(
         MeasureAbsorbanceParams, SuccessData[MeasureAbsorbanceResult, None]
     ]
 ):
-    """Execution implementation of a Thermocycler's run profile command."""
+    """Execution implementation of an Absorbance Reader measurement."""
 
     def __init__(
         self,

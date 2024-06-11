@@ -3737,7 +3737,7 @@
       "properties": {
         "moduleId": {
           "title": "Moduleid",
-          "description": "Unique ID of the Thermocycler.",
+          "description": "Unique ID of the absorbance reader.",
           "type": "string"
         },
         "sampleWavelength": {
@@ -3785,7 +3785,7 @@
       "properties": {
         "moduleId": {
           "title": "Moduleid",
-          "description": "Unique ID of the Thermocycler.",
+          "description": "Unique ID of the Absorbance Reader.",
           "type": "string"
         },
         "sampleWavelength": {
