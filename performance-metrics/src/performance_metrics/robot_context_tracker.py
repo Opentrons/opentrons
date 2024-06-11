@@ -8,18 +8,15 @@ from functools import partial, wraps
 from time import perf_counter_ns
 import typing
 
-from performance_metrics.datashapes import (
-    RawContextData,
-)
-from performance_metrics.metrics_store import MetricsStore
-from opentrons_shared_data.performance.dev_types import (
-    RobotContextState,
-    SupportsTracking,
-    MetricsMetadata,
-    UnderlyingFunction,
-    UnderlyingFunctionReturn,
-    UnderlyingFunctionParameters,
-)
+from .metrics_store import MetricsStore
+from .data_shapes import RawContextData, MetricsMetadata
+from .types import SupportsTracking, RobotContextState
+
+_UnderlyingFunctionParameters = typing.ParamSpec("_UnderlyingFunctionParameters")
+_UnderlyingFunctionReturn = typing.TypeVar("_UnderlyingFunctionReturn")
+_UnderlyingFunction = typing.Callable[
+    _UnderlyingFunctionParameters, _UnderlyingFunctionReturn
+]
 
 
 def _get_timing_function() -> typing.Callable[[], int]:
@@ -66,7 +63,10 @@ class RobotContextTracker(SupportsTracking):
     def track(
         self,
         state: RobotContextState,
-    ) -> typing.Callable[[UnderlyingFunction], UnderlyingFunction]:
+    ) -> typing.Callable[
+        [_UnderlyingFunction[_UnderlyingFunctionParameters, _UnderlyingFunctionReturn]],
+        _UnderlyingFunction[_UnderlyingFunctionParameters, _UnderlyingFunctionReturn],
+    ]:
         """Tracks the given function and its execution duration.
 
         If tracking is disabled, the function is called immediately and its result is returned.
@@ -82,7 +82,13 @@ class RobotContextTracker(SupportsTracking):
             If the function raises an exception, the exception the function raised is raised.
         """
 
-        def inner_decorator(func_to_track: UnderlyingFunction) -> UnderlyingFunction:
+        def inner_decorator(
+            func_to_track: _UnderlyingFunction[
+                _UnderlyingFunctionParameters, _UnderlyingFunctionReturn
+            ]
+        ) -> _UnderlyingFunction[
+            _UnderlyingFunctionParameters, _UnderlyingFunctionReturn
+        ]:
             if not self._should_track:
                 return func_to_track
 
@@ -90,17 +96,13 @@ class RobotContextTracker(SupportsTracking):
 
                 @wraps(func_to_track)
                 async def async_wrapper(
-                    *args: UnderlyingFunctionParameters.args,
-                    **kwargs: UnderlyingFunctionParameters.kwargs
-                ) -> UnderlyingFunctionReturn:
+                    *args: _UnderlyingFunctionParameters.args,
+                    **kwargs: _UnderlyingFunctionParameters.kwargs
+                ) -> _UnderlyingFunctionReturn:
                     function_start_time = timing_function()
                     duration_start_time = perf_counter_ns()
-
                     try:
-                        result = typing.cast(
-                            UnderlyingFunctionReturn,
-                            await func_to_track(*args, **kwargs),
-                        )
+                        result = await func_to_track(*args, **kwargs)
                     finally:
                         duration_end_time = perf_counter_ns()
 
@@ -112,23 +114,21 @@ class RobotContextTracker(SupportsTracking):
                             )
                         )
 
-                    return result
+                    return result  # type: ignore
 
-                return async_wrapper
+                return async_wrapper  # type: ignore
             else:
 
                 @wraps(func_to_track)
                 def wrapper(
-                    *args: UnderlyingFunctionParameters.args,
-                    **kwargs: UnderlyingFunctionParameters.kwargs
-                ) -> UnderlyingFunctionReturn:
+                    *args: _UnderlyingFunctionParameters.args,
+                    **kwargs: _UnderlyingFunctionParameters.kwargs
+                ) -> _UnderlyingFunctionReturn:
                     function_start_time = timing_function()
                     duration_start_time = perf_counter_ns()
 
                     try:
-                        result = typing.cast(
-                            UnderlyingFunctionReturn, func_to_track(*args, **kwargs)
-                        )
+                        result = func_to_track(*args, **kwargs)
                     finally:
                         duration_end_time = perf_counter_ns()
 

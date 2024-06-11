@@ -40,7 +40,9 @@ describe('load and immediately save integrity test', () => {
   ]
   testCases.forEach(({ inputDef, extraFields }) => {
     it(inputDef.parameters.loadName, () => {
-      const initialRawFieldValues = labwareDefToFields(inputDef)
+      const initialRawFieldValues = labwareDefToFields(inputDef, [
+        fixture_12_trough,
+      ] as LabwareDefinition2[])
       // both name fields should be set to null upon import
       expect(initialRawFieldValues?.displayName).toBe(null)
       expect(initialRawFieldValues?.loadName).toBe(null)

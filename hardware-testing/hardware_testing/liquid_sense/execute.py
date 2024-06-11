@@ -341,7 +341,6 @@ def get_plunger_travel(run_args: RunArgs) -> float:
 
 def find_max_z_distances(
     run_args: RunArgs,
-    tip: int,
     well: Well,
     p_speed: float,
     starting_mount_height: float,
@@ -401,7 +400,7 @@ def _run_trial(
     start_height = starting_mount_height
     height = 2 * start_height
     z_distances: List[float] = find_max_z_distances(
-        run_args, tip, well, plunger_speed, starting_mount_height
+        run_args, well, plunger_speed, starting_mount_height
     )
     z_distances = z_distances[: run_args.multi_passes]
     for z_dist in z_distances:
