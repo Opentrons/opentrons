@@ -47,7 +47,7 @@
     },
     "configurationsByNozzleMap": {
       "type": "object",
-      "description": "Pipette configurations keyed by validated sets of nozzle layouts. Maps must be ordered form smallest to largest regarding nozzle count.",
+      "description": "Pipette configurations keyed by validated sets of nozzle layouts. Maps must be ordered from smallest to largest regarding nozzle count.",
       "items": {
         "type": "object",
         "description": "Tip types by which each set of configration values are differentiated.",
