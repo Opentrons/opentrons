@@ -5,7 +5,7 @@ from typing_extensions import Literal
 
 from pydantic import Field
 
-from ..types import DeckPoint
+from ..types import WellLocation, WellOrigin, CurrentWell, DeckPoint
 from .pipetting_common import (
     PipetteIdMixin,
     WellLocationMixin,
@@ -51,13 +51,36 @@ class LiquidProbeImplementation(
 
         Return the z-position of the found liquid.
         """
+        pipette_id = params.pipetteId
+        labware_id = params.labwareId
+        well_name = params.wellName
+
+        ready_to_probe = self._pipetting.get_is_ready_to_aspirate(pipette_id=pipette_id)
+
+        current_well = None
+
+        if not ready_to_probe:
+            await self._movement.move_to_well(
+                pipette_id=pipette_id,
+                labware_id=labware_id,
+                well_name=well_name,
+                well_location=WellLocation(origin=WellOrigin.TOP),
+            )
+
+            current_well = CurrentWell(
+                pipette_id=pipette_id,
+                labware_id=labware_id,
+                well_name=well_name,
+            )
+
         position = await self._movement.move_to_well(
-            pipette_id=params.pipetteId,
-            labware_id=params.labwareId,
-            well_name=params.wellName,
+            pipette_id=pipette_id,
+            labware_id=labware_id,
+            well_name=well_name,
             well_location=params.wellLocation,
+            current_well=current_well,
         )
-        z_pos = await self._pipetting.liquid_probe_in_place(pipette_id=params.pipetteId)
+        z_pos = await self._pipetting.liquid_probe_in_place(pipette_id=pipette_id)
 
         return SuccessData(
             public=LiquidProbeResult(
