@@ -145,7 +145,7 @@ export function ErrorRecoveryContent(props: RecoveryContentProps): JSX.Element {
       return buildManageTips()
     case RECOVERY_MAP.ROBOT_IN_MOTION.ROUTE:
     case RECOVERY_MAP.ROBOT_RESUMING.ROUTE:
-    case RECOVERY_MAP.ROBOT_RETRYING_COMMAND.ROUTE:
+    case RECOVERY_MAP.ROBOT_RETRYING_STEP.ROUTE:
     case RECOVERY_MAP.ROBOT_CANCELING.ROUTE:
       return buildRecoveryInProgress()
     default:
