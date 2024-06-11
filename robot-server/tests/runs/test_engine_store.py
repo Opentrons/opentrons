@@ -203,24 +203,24 @@ async def test_get_default_orchestrator_idempotent(subject: EngineStore) -> None
     assert repeated_result is result
 
 
-# @pytest.mark.parametrize("robot_type", ["OT-2 Standard", "OT-3 Standard"])
-# @pytest.mark.parametrize("deck_type", pe_types.DeckType)
-# async def test_get_default_orchestrator_robot_type(
-#     decoy: Decoy, robot_type: RobotType, deck_type: pe_types.DeckType
-# ) -> None:
-#     """It should create default ProtocolEngines with the given robot and deck type."""
-#     # TODO(mc, 2021-06-11): to make these test more effective and valuable, we
-#     # should pass in some sort of actual, valid HardwareAPI instead of a mock
-#     hardware_api = decoy.mock(cls=API)
-#     subject = EngineStore(
-#         hardware_api=hardware_api,
-#         robot_type=robot_type,
-#         deck_type=deck_type,
-#     )
-#
-#     result = await subject.get_default_orchestrator()
-#
-#     assert result.state_view.config.robot_type == robot_type
+@pytest.mark.parametrize("robot_type", ["OT-2 Standard", "OT-3 Standard"])
+@pytest.mark.parametrize("deck_type", pe_types.DeckType)
+async def test_get_default_orchestrator_robot_type(
+    decoy: Decoy, robot_type: RobotType, deck_type: pe_types.DeckType
+) -> None:
+    """It should create default ProtocolEngines with the given robot and deck type."""
+    # TODO(mc, 2021-06-11): to make these test more effective and valuable, we
+    # should pass in some sort of actual, valid HardwareAPI instead of a mock
+    hardware_api = decoy.mock(cls=API)
+    subject = EngineStore(
+        hardware_api=hardware_api,
+        robot_type=robot_type,
+        deck_type=deck_type,
+    )
+
+    result = await subject.get_default_orchestrator()
+
+    assert result.get_robot_type() == robot_type
 
 
 async def test_get_default_orchestrator_current_unstarted(subject: EngineStore) -> None:
