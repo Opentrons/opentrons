@@ -15,6 +15,7 @@ from opentrons.hardware_control.nozzle_manager import (
     NozzleConfigurationManager,
     NozzleMap,
 )
+from opentrons_shared_data.errors.exceptions import MissingConfigurationData
 
 from ..types import FlowRates
 from ...types import Point
@@ -181,8 +182,8 @@ class VirtualPipetteDataProvider:
                 ):
                     approved_map = map_key
             if approved_map is None:
-                raise ValueError(
-                    "Virtual Static Nozzle Configuration does not match any approved map layout for the current pipette."
+                raise MissingConfigurationData(
+                    message="Virtual Static Nozzle Configuration does not match any approved map layout for the current pipette."
                 )
 
             if configuration is not None:
