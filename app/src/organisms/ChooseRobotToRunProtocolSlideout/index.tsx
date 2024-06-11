@@ -227,7 +227,9 @@ export function ChooseRobotToRunProtocolSlideoutComponent(
               <>
                 {offsetsComponent}
                 <PrimaryButton
-                  onClick={() => setCurrentPage(2)}
+                  onClick={() => {
+                    setCurrentPage(2)
+                  }}
                   width="100%"
                   disabled={
                     isCreatingRun ||
@@ -240,7 +242,12 @@ export function ChooseRobotToRunProtocolSlideoutComponent(
               </>
             ) : (
               <Flex gridGap={SPACING.spacing8} flexDirection={DIRECTION_ROW}>
-                <SecondaryButton onClick={() => setCurrentPage(1)} width="50%">
+                <SecondaryButton
+                  onClick={() => {
+                    setCurrentPage(1)
+                  }}
+                  width="50%"
+                >
                   {t('shared:change_robot')}
                 </SecondaryButton>
                 <PrimaryButton

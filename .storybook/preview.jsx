@@ -29,7 +29,7 @@ export const parameters = {
 export const decorators = [
   Story => (
     <I18nextProvider i18n={i18n}>
-      <GlobalStyle isOnDevice={true} />
+      <GlobalStyle />
       <Story />
     </I18nextProvider>
   ),

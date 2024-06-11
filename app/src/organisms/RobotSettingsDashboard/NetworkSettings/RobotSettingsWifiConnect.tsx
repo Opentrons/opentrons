@@ -50,7 +50,9 @@ export function RobotSettingsWifiConnect({
       <Flex flexDirection={DIRECTION_COLUMN} height="100%">
         <ChildNavigation
           header={t('wifi')}
-          onClickBack={() => setCurrentOption('RobotSettingsWifi')}
+          onClickBack={() => {
+            setCurrentOption('RobotSettingsWifi')
+          }}
         />
         <Flex
           flex="1"
@@ -62,12 +64,14 @@ export function RobotSettingsWifiConnect({
             requestState={requestState}
             selectedSsid={selectedSsid}
             isInvalidPassword={isInvalidPassword}
-            handleTryAgain={() =>
+            handleTryAgain={() => {
               isInvalidPassword
                 ? setCurrentOption('RobotSettingsSetWifiCred')
                 : handleConnect()
-            }
-            handleChangeNetwork={() => setCurrentOption('RobotSettingsWifi')}
+            }}
+            handleChangeNetwork={() => {
+              setCurrentOption('RobotSettingsWifi')
+            }}
           />
         </Flex>
       </Flex>

@@ -153,7 +153,9 @@ export const PathField = (props: PathFieldProps): JSX.Element => {
               disabledPathMap !== null && option.name in disabledPathMap
             }
             subtitle={getSubtitle(option.name, disabledPathMap)}
-            onClick={() => updateValue(option.name)}
+            onClick={() => {
+              updateValue(option.name)
+            }}
           >
             <img src={option.image} className={styles.path_image} />
           </PathButton>

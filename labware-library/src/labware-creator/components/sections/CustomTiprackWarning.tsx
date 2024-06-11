@@ -18,8 +18,8 @@ export const CustomTiprackWarning = (): JSX.Element | null => {
           <div className={styles.flex_row}>
             <div className={styles.instructions_text}>
               <p>
-                Opentrons tip racks are recommended for use with the OT-2
-                because they are specifically designed and verified for
+                Opentrons tip racks are recommended for use with the OT-2 and
+                Flex because they are specifically designed and verified for
                 automation.
               </p>
               <p>

@@ -111,7 +111,9 @@ export const UnmountGripper = (
       >
         <Btn
           paddingLeft={isOnDevice ? 0 : SPACING.spacing32}
-          onClick={() => setShowGripperStillDetected(false)}
+          onClick={() => {
+            setShowGripperStillDetected(false)
+          }}
         >
           <StyledText css={GO_BACK_BUTTON_TEXT_STYLE}>
             {t('shared:go_back')}

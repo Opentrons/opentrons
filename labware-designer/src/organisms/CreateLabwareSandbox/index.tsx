@@ -168,7 +168,9 @@ export function CreateLabwareSandbox(): JSX.Element {
                 </Text>
                 <SlotSelect
                   defaultValue={labwareSlot}
-                  onChange={e => setLabwareSlot(e.target.value)}
+                  onChange={e => {
+                    setLabwareSlot(e.target.value)
+                  }}
                 >
                   {SLOT_OPTIONS.map(slot => (
                     <option key={slot} value={slot}>

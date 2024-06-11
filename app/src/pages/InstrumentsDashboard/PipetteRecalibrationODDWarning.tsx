@@ -44,7 +44,11 @@ export const PipetteRecalibrationODDWarning = (): JSX.Element | null => {
           />
         </StyledText>
       </Flex>
-      <Btn onClick={() => setShowBanner(false)}>
+      <Btn
+        onClick={() => {
+          setShowBanner(false)
+        }}
+      >
         <Icon
           width={SPACING.spacing32}
           height={SPACING.spacing32}

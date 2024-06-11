@@ -140,10 +140,10 @@ describe('RobotStatusHeader', () => {
   })
 
   it('does not render a running protocol banner when a protocol is not running', () => {
-    const [{ queryByText }] = render(props)
+    render(props)
 
-    expect(queryByText('fake protocol name;')).toBeFalsy()
-    expect(queryByText('Go to Run')).toBeFalsy()
+    expect(screen.queryByText('fake protocol name;')).toBeFalsy()
+    expect(screen.queryByText('Go to Run')).toBeFalsy()
   })
 
   it('renders a running protocol banner when a protocol is running', () => {
@@ -200,9 +200,8 @@ describe('RobotStatusHeader', () => {
   })
 
   it('renders a usb icon when only connected locally', () => {
-    const [{ getByLabelText }] = render(props)
-
-    getByLabelText('usb')
+    render(props)
+    screen.getByLabelText('usb')
   })
 
   it('does not render a wifi or ethernet icon when discovery client cannot find a healthy robot at its network connection ip addresses', () => {

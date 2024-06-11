@@ -21,7 +21,13 @@ export function RunTimer({
   style?: CSSProp
 }): JSX.Element {
   const [now, setNow] = React.useState(Date())
-  useInterval(() => setNow(Date()), 500, true)
+  useInterval(
+    () => {
+      setNow(Date())
+    },
+    500,
+    true
+  )
 
   const endTime =
     runStatus === RUN_STATUS_STOP_REQUESTED && stoppedAt != null

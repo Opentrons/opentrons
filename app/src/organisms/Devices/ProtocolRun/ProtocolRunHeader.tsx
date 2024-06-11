@@ -246,10 +246,11 @@ export function ProtocolRunHeader({
     completedAt != null ? formatTimestamp(completedAt) : EMPTY_TIMESTAMP
 
   // redirect to new run after successful reset
-  const onResetSuccess = (createRunResponse: Run): void =>
+  const onResetSuccess = (createRunResponse: Run): void => {
     history.push(
       `/devices/${robotName}/protocol-runs/${createRunResponse.data.id}/run-preview`
     )
+  }
 
   const { pause, play } = useRunControls(runId, onResetSuccess)
 
@@ -441,7 +442,9 @@ export function ProtocolRunHeader({
         />
         {showConfirmCancelModal ? (
           <ConfirmCancelModal
-            onClose={() => setShowConfirmCancelModal(false)}
+            onClose={() => {
+              setShowConfirmCancelModal(false)
+            }}
             runId={runId}
             robotName={robotName}
           />
@@ -451,7 +454,7 @@ export function ProtocolRunHeader({
             robotType={isFlex ? FLEX_ROBOT_TYPE : OT2_ROBOT_TYPE}
             mount={pipettesWithTip[0].mount}
             instrumentModelSpecs={pipettesWithTip[0].specs}
-            closeFlow={() => setTipStatusResolved().then(() => toggleDTWiz())}
+            closeFlow={() => setTipStatusResolved().then(toggleDTWiz)}
           />
         ) : null}
       </Flex>
@@ -569,9 +572,11 @@ function ActionButton(props: ActionButtonProps): JSX.Element {
     isResetRunLoading,
   } = useRunControls(runId, (createRunResponse: Run): void =>
     // redirect to new run after successful reset
-    history.push(
-      `/devices/${robotName}/protocol-runs/${createRunResponse.data.id}/run-preview`
-    )
+    {
+      history.push(
+        `/devices/${robotName}/protocol-runs/${createRunResponse.data.id}/run-preview`
+      )
+    }
   )
   isResetRunLoadingRef.current = isResetRunLoading
   const { missingModuleIds } = useUnmatchedModulesForProtocol(robotName, runId)
@@ -756,7 +761,9 @@ function ActionButton(props: ActionButtonProps): JSX.Element {
         isHeaterShakerInProtocol &&
         runId != null && (
           <HeaterShakerIsRunningModal
-            closeModal={() => setShowIsShakingModal(false)}
+            closeModal={() => {
+              setShowIsShakingModal(false)
+            }}
             module={activeHeaterShaker}
             startRun={play}
           />

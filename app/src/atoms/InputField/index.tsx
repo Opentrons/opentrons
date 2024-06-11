@@ -287,7 +287,9 @@ export const InputField = React.forwardRef<HTMLInputElement, InputFieldProps>(
                 data-testid={props.id}
                 value={value}
                 placeholder={placeHolder}
-                onWheel={event => event.currentTarget.blur()} // prevent value change with scrolling
+                onWheel={event => {
+                  event.currentTarget.blur()
+                }} // prevent value change with scrolling
                 type={props.type}
                 ref={ref}
               />

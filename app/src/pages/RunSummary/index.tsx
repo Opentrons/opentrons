@@ -163,9 +163,9 @@ export function RunSummary(): JSX.Element {
     routeCb: (pipettesWithTip: PipetteWithTip[]) => void
   ): (() => Promise<void>) => {
     return () =>
-      setTipStatusResolved().then(newPipettesWithTip =>
+      setTipStatusResolved().then(newPipettesWithTip => {
         routeCb(newPipettesWithTip)
-      )
+      })
   }
 
   const handleReturnToDash = (pipettesWithTip: PipetteWithTip[]): void => {
@@ -318,14 +318,18 @@ export function RunSummary(): JSX.Element {
               flex="1"
               iconName="arrow-left"
               buttonType="secondary"
-              onClick={() => handleReturnToDash(pipettesWithTip)}
+              onClick={() => {
+                handleReturnToDash(pipettesWithTip)
+              }}
               buttonText={t('return_to_dashboard')}
               height="17rem"
             />
             <LargeButton
               flex="1"
               iconName="play-round-corners"
-              onClick={() => handleRunAgain(pipettesWithTip)}
+              onClick={() => {
+                handleRunAgain(pipettesWithTip)
+              }}
               buttonText={
                 showRunAgainSpinner ? RUN_AGAIN_SPINNER_TEXT : t('run_again')
               }

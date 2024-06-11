@@ -78,7 +78,7 @@ class TipPhysicallyMissingError(ErrorOccurrence):
     detail: str = "No tip detected."
 
 
-@dataclass
+@dataclass(frozen=True)
 class TipPhysicallyMissingErrorInternalData:
     """Internal-to-ProtocolEngine data about a TipPhysicallyMissingError."""
 

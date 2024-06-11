@@ -99,7 +99,9 @@ const browse = (argv: Argv): void => {
   const log = createLogger(argv)
 
   createClient(argv, robots => {
-    robots.forEach(robot => log.info('%o\n\n', robot))
+    robots.forEach(robot => {
+      log.info('%o\n\n', robot)
+    })
   })
 
   log.warn('Browsing for services')

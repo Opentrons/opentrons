@@ -31,9 +31,9 @@ describe('SecureLabwareModal', () => {
     )
   })
   it('should render magnetic module type modal and call onCloseClick when button is pressed', () => {
-    const { getByRole } = render(props)
+    render(props)
     expect(props.onCloseClick).not.toHaveBeenCalled()
-    const closeButton = getByRole('button', { name: 'close' })
+    const closeButton = screen.getByRole('button', { name: 'close' })
     fireEvent.click(closeButton)
     expect(props.onCloseClick).toHaveBeenCalled()
   })

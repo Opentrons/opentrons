@@ -112,8 +112,8 @@ describe('UpdateRobotDuringOnboarding', () => {
   })
 
   it('should never render CheckUpdates if it already has an upgrade', () => {
-    const [{ queryByText }] = render()
-    const checkUpdates = queryByText('Checking for updates')
+    render()
+    const checkUpdates = screen.queryByText('Checking for updates')
     expect(checkUpdates).not.toBeInTheDocument()
   })
 

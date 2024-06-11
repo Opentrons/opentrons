@@ -115,7 +115,9 @@ export function SelectAuthenticationType({
             width="100%"
             alignItems={ALIGN_CENTER}
             justifyContent={JUSTIFY_CENTER}
-            onClick={() => setShowAlternativeSecurityTypeModal(true)}
+            onClick={() => {
+              setShowAlternativeSecurityTypeModal(true)
+            }}
             padding={`${SPACING.spacing16} ${SPACING.spacing24}`}
           >
             <StyledText

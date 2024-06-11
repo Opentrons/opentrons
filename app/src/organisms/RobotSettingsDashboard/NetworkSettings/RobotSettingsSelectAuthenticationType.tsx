@@ -32,7 +32,9 @@ export function RobotSettingsSelectAuthenticationType({
       <ChildNavigation
         buttonText={i18n.format(t('continue'), 'capitalize')}
         header={t('select_a_security_type')}
-        onClickBack={() => setCurrentOption('RobotSettingsWifi')}
+        onClickBack={() => {
+          setCurrentOption('RobotSettingsWifi')
+        }}
         onClickButton={() => {
           selectedAuthType !== 'none'
             ? setCurrentOption('RobotSettingsSetWifiCred')

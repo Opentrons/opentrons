@@ -103,7 +103,6 @@ module.exports = {
         '@typescript-eslint/no-unnecessary-boolean-literal-compare': 'warn',
         '@typescript-eslint/no-unsafe-argument': 'warn',
         '@typescript-eslint/consistent-indexed-object-style': 'warn',
-        '@typescript-eslint/no-confusing-void-expression': 'warn',
         '@typescript-eslint/ban-types': 'warn',
         '@typescript-eslint/non-nullable-type-assertion-style': 'warn',
         '@typescript-eslint/await-thenable': 'warn',
@@ -139,10 +138,6 @@ module.exports = {
     {
       files: ['**/__tests__/**test.tsx'],
       extends: ['plugin:testing-library/react'],
-      rules: {
-        'testing-library/no-manual-cleanup': 'off',
-        'testing-library/prefer-screen-queries': 'warn',
-      },
     },
     {
       files: ['**/*.stories.tsx'],
