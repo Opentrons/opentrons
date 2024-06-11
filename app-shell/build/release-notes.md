@@ -14,7 +14,7 @@ There are no changes to the Opentrons App in v7.3.1, but it is required for upda
 
 ### Known Issue
 
-- Robots that have completed a run won't appear as available until you clear the "Run complete" banner on the protocol run screen.
+- Robots that have completed a run won't appear as available until you clear the run completion notification. This appears as a banner on the protocol run screen in the app, or as a splash screen on the Flex touchscreen.
 
 ---
 
