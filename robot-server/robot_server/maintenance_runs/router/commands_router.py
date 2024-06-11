@@ -11,6 +11,7 @@ from opentrons.protocol_engine import (
     ProtocolEngine,
     commands as pe_commands,
 )
+from opentrons.protocol_runner import RunOrchestrator
 from opentrons.protocol_engine.errors import CommandDoesNotExistError
 
 from robot_server.errors.error_responses import ErrorDetails, ErrorBody
@@ -60,11 +61,11 @@ class CommandNotAllowed(ErrorDetails):
     title: str = "Setup Command Not Allowed"
 
 
-async def get_current_run_engine_from_url(
+async def get_current_run_from_url(
     runId: str,
     engine_store: MaintenanceEngineStore = Depends(get_maintenance_engine_store),
-) -> ProtocolEngine:
-    """Get current run protocol engine.
+) -> str:
+    """Get run from url.
 
     Args:
         runId: Run ID to associate the command with.
@@ -76,7 +77,7 @@ async def get_current_run_engine_from_url(
             f"Note that only one maintenance run can exist at a time."
         ).as_error(status.HTTP_404_NOT_FOUND)
 
-    return engine_store.engine
+    return runId
 
 
 @PydanticResponse.wrap_route(
@@ -110,6 +111,7 @@ async def create_run_command(
             " or when the timeout is reached. See the `timeout` query parameter."
         ),
     ),
+    engine_store: MaintenanceEngineStore = Depends(get_maintenance_engine_store),
     timeout: Optional[int] = Query(
         default=None,
         gt=0,
@@ -130,7 +132,7 @@ async def create_run_command(
             " the default was 30 seconds, not infinite."
         ),
     ),
-    protocol_engine: ProtocolEngine = Depends(get_current_run_engine_from_url),
+    runId: str = Depends(get_current_run_from_url),
     check_estop: bool = Depends(require_estop_in_good_state),
 ) -> PydanticResponse[SimpleBody[pe_commands.Command]]:
     """Enqueue a protocol command.
@@ -153,14 +155,11 @@ async def create_run_command(
 
     # TODO (spp): re-add `RunStoppedError` exception catching if/when maintenance runs
     #  have actions.
-    command = protocol_engine.add_command(command_create)
+    command = await engine_store.add_command_and_wait_for_interval(
+        request=command_create, wait_until_complete=waitUntilComplete, timeout=timeout
+    )
 
-    if waitUntilComplete:
-        timeout_sec = None if timeout is None else timeout / 1000.0
-        with move_on_after(timeout_sec):
-            await protocol_engine.wait_for_command(command.id)
-
-    response_data = protocol_engine.state_view.commands.get(command.id)
+    response_data = engine_store.get_command(command.id)
 
     return await PydanticResponse.create(
         content=SimpleBody.construct(data=response_data),

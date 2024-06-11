@@ -28,6 +28,7 @@ from opentrons.protocol_engine import (
     CommandSlice,
     CommandPointer,
     Command,
+    CommandCreate,
 )
 
 from opentrons.protocol_engine.types import DeckConfigurationType
@@ -234,3 +235,14 @@ class MaintenanceEngineStore:
     def get_state_summary(self) -> StateSummary:
         """Get protocol run data."""
         return self.run_orchestrator.get_state_summary()
+
+    async def add_command_and_wait_for_interval(
+        self,
+        request: CommandCreate,
+        wait_until_complete: bool = False,
+        timeout: Optional[int] = None,
+    ) -> Command:
+        """Add a new command to execute and wait for it to complete if needed."""
+        return await self.run_orchestrator.add_command_and_wait_for_interval(
+            command=request, wait_until_complete=wait_until_complete, timeout=timeout
+        )
