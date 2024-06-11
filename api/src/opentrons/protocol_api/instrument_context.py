@@ -865,6 +865,9 @@ class InstrumentContext(publisher.CommandPublisher):
             instead always prepare during :py:meth:`.aspirate`. Version 2.12 and earlier
             will raise an ``APIVersionError`` if a value is set for ``prep_after``.
 
+        .. versionchanged:: 2.19
+            Uses new values for how much a tip overlaps with the pipette nozzle.
+
         :returns: This instance.
         """
 
