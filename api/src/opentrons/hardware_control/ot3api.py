@@ -41,6 +41,7 @@ from opentrons.config.types import (
     OT3Config,
     GantryLoad,
     CapacitivePassSettings,
+    LiquidProbeSettings,
 )
 from opentrons.drivers.rpi_drivers.types import USBPort, PortGroup
 from opentrons.hardware_control.nozzle_manager import NozzleConfigurationType
@@ -2560,6 +2561,8 @@ class OT3API(
     async def liquid_probe(
         self,
         mount: Union[top_types.Mount, OT3Mount],
+        probe_settings: Optional[LiquidProbeSettings] = None,
+        probe: Optional[InstrumentProbeType] = None,
     ) -> float:
         """Search for and return liquid level height.
 
@@ -2582,7 +2585,8 @@ class OT3API(
             instrument, HardwareAction.LIQUID_PROBE, checked_mount
         )
 
-        probe_settings = self.config.liquid_sense
+        if not probe_settings:
+            probe_settings = self.config.liquid_sense
 
         pos = await self.gantry_position(checked_mount, refresh=True)
         probe_start_pos = pos._replace(z=probe_settings.starting_mount_height)
@@ -2622,7 +2626,7 @@ class OT3API(
             probe_settings.data_files,
             probe_settings.auto_zero_sensor,
             probe_settings.num_baseline_reads,
-            probe=InstrumentProbeType.PRIMARY,
+            probe=probe if probe else InstrumentProbeType.PRIMARY,
         )
         end_pos = await self.gantry_position(checked_mount, refresh=True)
         await self.move_to(checked_mount, probe_start_pos)

@@ -1,6 +1,8 @@
 """Liquid-probe command for OT3 hardware. request, result, and implementation models."""
+from __future__ import annotations
 from typing import TYPE_CHECKING, Optional, Type
 from typing_extensions import Literal
+
 from pydantic import Field
 
 from ..types import DeckPoint
