@@ -612,13 +612,15 @@ export const getInvariantContext: Selector<
   getAdditionalEquipmentEntities,
   featureFlagSelectors.getDisableModuleRestrictions,
   featureFlagSelectors.getAllowAllTipracks,
+  featureFlagSelectors.getEnableAbsorbanceReader,
   (
     labwareEntities,
     moduleEntities,
     pipetteEntities,
     additionalEquipmentEntities,
     disableModuleRestrictions,
-    allowAllTipracks
+    allowAllTipracks,
+    enableAbsorbanceReader
   ) => ({
     labwareEntities,
     moduleEntities,
@@ -627,6 +629,7 @@ export const getInvariantContext: Selector<
     config: {
       OT_PD_ALLOW_ALL_TIPRACKS: Boolean(allowAllTipracks),
       OT_PD_DISABLE_MODULE_RESTRICTIONS: Boolean(disableModuleRestrictions),
+      OT_PD_ENABLE_ABSORBANCE_READER: Boolean(enableAbsorbanceReader),
     },
   })
 )
