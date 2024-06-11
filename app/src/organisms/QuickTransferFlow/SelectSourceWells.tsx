@@ -1,6 +1,12 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
-import { Flex, POSITION_FIXED, SPACING } from '@opentrons/components'
+import without from 'lodash/without'
+import {
+  Flex,
+  JUSTIFY_CENTER,
+  POSITION_FIXED,
+  SPACING,
+} from '@opentrons/components'
 
 import { ChildNavigation } from '../../organisms/ChildNavigation'
 import { WellSelection } from '../../organisms/WellSelection'
@@ -57,6 +63,7 @@ export function SelectSourceWells(props: SelectSourceWellsProps): JSX.Element {
         top={SPACING.spacing8}
       />
       <Flex
+        justifyContent={JUSTIFY_CENTER}
         marginTop={SPACING.spacing120}
         padding={`${SPACING.spacing16} ${SPACING.spacing60} ${SPACING.spacing40} ${SPACING.spacing60}`}
         position={POSITION_FIXED}
@@ -67,6 +74,16 @@ export function SelectSourceWells(props: SelectSourceWellsProps): JSX.Element {
         {state.source != null ? (
           <WellSelection
             definition={state.source}
+            deselectWells={(wells: string[]) => {
+              setSelectedWells(prevWells =>
+                without(Object.keys(prevWells), ...wells).reduce(
+                  (acc, well) => {
+                    return { ...acc, [well]: null }
+                  },
+                  {}
+                )
+              )
+            }}
             selectedPrimaryWells={selectedWells}
             selectWells={wellGroup => {
               setSelectedWells(prevWells => ({ ...prevWells, ...wellGroup }))

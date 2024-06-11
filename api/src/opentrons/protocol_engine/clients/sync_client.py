@@ -433,6 +433,33 @@ class SyncClient:
 
         return cast(commands.AspirateResult, result)
 
+    def aspirate_wait_for_recovery(
+        self,
+        pipette_id: str,
+        labware_id: str,
+        well_name: str,
+        well_location: WellLocation,
+        volume: float,
+        flow_rate: float,
+    ) -> commands.Aspirate:
+        """Execute a Aspirate, wait for any error recovery, and return it.
+
+        Note that the returned command will not necessarily have a `result`.
+        """
+        request = commands.AspirateCreate(
+            params=commands.AspirateParams(
+                pipetteId=pipette_id,
+                labwareId=labware_id,
+                wellName=well_name,
+                wellLocation=well_location,
+                volume=volume,
+                flowRate=flow_rate,
+            )
+        )
+        command = self._transport.execute_command_wait_for_recovery(request=request)
+
+        return cast(commands.Aspirate, command)
+
     def aspirate_in_place(
         self,
         pipette_id: str,

@@ -81,7 +81,7 @@ function initializeMixpanelInstanceOnce(
     if (!hasBeenInitialized && MIXPANEL_ID) {
       hasBeenInitialized = true
       log.debug('Initializing Mixpanel', { config })
-      return mixpanel.init(MIXPANEL_ID, MIXPANEL_OPTS)
+      mixpanel.init(MIXPANEL_ID, MIXPANEL_OPTS)
     }
   }
 }

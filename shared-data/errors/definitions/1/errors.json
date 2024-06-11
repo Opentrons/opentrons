@@ -237,6 +237,10 @@
     "4008": {
       "detail": "Invalid stored data",
       "category": "generalError"
+    },
+    "4009": {
+      "detail": "Missing configuration data",
+      "category": "generalError"
     }
   }
 }

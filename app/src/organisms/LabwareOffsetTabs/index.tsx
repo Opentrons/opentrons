@@ -45,19 +45,25 @@ export function LabwareOffsetTabs({
       <Flex gridGap={SPACING.spacing4} marginY={SPACING.spacing8}>
         <RoundTab
           isCurrent={currentTab === 'table'}
-          onClick={() => setCurrentTab('table')}
+          onClick={() => {
+            setCurrentTab('table')
+          }}
         >
           <StyledText>{t('table_view')}</StyledText>
         </RoundTab>
         <RoundTab
           isCurrent={currentTab === 'jupyter'}
-          onClick={() => setCurrentTab('jupyter')}
+          onClick={() => {
+            setCurrentTab('jupyter')
+          }}
         >
           <StyledText>{t('jupyter_notebook')}</StyledText>
         </RoundTab>
         <RoundTab
           isCurrent={currentTab === 'cli'}
-          onClick={() => setCurrentTab('cli')}
+          onClick={() => {
+            setCurrentTab('cli')
+          }}
         >
           <StyledText>{t('cli_ssh')}</StyledText>
         </RoundTab>

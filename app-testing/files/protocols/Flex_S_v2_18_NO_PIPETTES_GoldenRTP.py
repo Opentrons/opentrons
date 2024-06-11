@@ -224,6 +224,38 @@ def add_parameters(parameters):
     )
 
 
+def ensure_type(value, expected_type):
+    if not isinstance(value, expected_type):
+        raise TypeError(f"Expected type {expected_type.__name__}, got {type(value).__name__}")
+
+
 def run(context):
     for variable_name, value in context.params.get_all().items():
         context.comment(f"variable {variable_name} has value {value}")
+
+    # Int parameters
+    ensure_type(context.params.min_max_all_fields, int)
+    ensure_type(context.params.int_min_max_without_unit, int)
+    ensure_type(context.params.int_min_max_without_description, int)
+    ensure_type(context.params.int_min_max_without_unit_and_description, int)
+    ensure_type(context.params.int_choices_all_fields, int)
+    ensure_type(context.params.int_choice_no_unit, int)
+    ensure_type(context.params.int_choice_no_unit_desc, int)
+
+    # Float parameters
+    ensure_type(context.params.float_min_max_all_fields, float)
+    ensure_type(context.params.float_min_max_no_unit, float)
+    ensure_type(context.params.float_min_max_no_unit_or_desc, float)
+    ensure_type(context.params.float_choices_all_fields, float)
+    ensure_type(context.params.float_choices_no_unit, float)
+    ensure_type(context.params.float_choices_no_description, float)
+    ensure_type(context.params.float_choices_no_unit_or_desc, float)
+
+    # Boolean parameters
+    ensure_type(context.params.bool_all_fields, bool)
+    ensure_type(context.params.bool_no_desc, bool)
+
+    # String parameters
+    ensure_type(context.params.str_choices_all_fields, str)
+    ensure_type(context.params.str_choices_all_many_fields, str)
+    ensure_type(context.params.str_choices_no_desc, str)

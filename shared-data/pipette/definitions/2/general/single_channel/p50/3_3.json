@@ -3,18 +3,30 @@
   "displayName": "Flex 1-Channel 50 μL",
   "model": "p50",
   "displayCategory": "FLEX",
+  "validNozzleMaps": {
+    "maps": {
+      "SingleA1": ["A1"]
+    }
+  },
   "pickUpTipConfigurations": {
     "pressFit": {
       "presses": 1,
-      "speedByTipCount": {
-        "1": 5
-      },
       "increment": 0.0,
-      "distanceByTipCount": {
-        "1": 13.0
-      },
-      "currentByTipCount": {
-        "1": 0.15
+      "configurationsByNozzleMap": {
+        "SingleA1": {
+          "default": {
+            "speed": 5.0,
+            "distance": 13.0,
+            "current": 0.15,
+            "tipOverlaps": {
+              "v0": {
+                "default": 10.5,
+                "opentrons/opentrons_flex_96_tiprack_50ul/1": 10.5,
+                "opentrons/opentrons_flex_96_filtertiprack_50ul/1": 10.5
+              }
+            }
+          }
+        }
       }
     }
   },

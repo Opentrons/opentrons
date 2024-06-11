@@ -135,7 +135,7 @@ class LightController:
             return None
         current_id = self._engine_store.current_run_id
         if current_id is not None:
-            return self._engine_store.engine.state_view.commands.get_status()
+            return self._engine_store.get_status()
 
         return None
 

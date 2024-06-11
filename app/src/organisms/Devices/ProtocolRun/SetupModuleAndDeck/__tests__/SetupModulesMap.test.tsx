@@ -233,9 +233,9 @@ describe('SetupModulesMap', () => {
       )
       .thenReturn(<div>mock module info {mockTCModule.model} </div>)
 
-    const { getByText } = render(props)
-    getByText('mock module info magneticModuleV2')
-    getByText('mock module info thermocyclerModuleV1')
+    render(props)
+    screen.getByText('mock module info magneticModuleV2')
+    screen.getByText('mock module info thermocyclerModuleV1')
   })
 
   it('renders Moam with the correct module in the correct slot', () => {

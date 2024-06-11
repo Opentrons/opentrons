@@ -50,7 +50,9 @@ export function TakeoverModal(props: TakeoverModalProps): JSX.Element {
           </StyledText>
           <Flex flex="1" gridGap={SPACING.spacing8}>
             <SmallButton
-              onClick={() => setShowConfirmTerminateModal(false)}
+              onClick={() => {
+                setShowConfirmTerminateModal(false)
+              }}
               buttonText={t('continue_activity')}
               width="50%"
             />
@@ -102,7 +104,9 @@ export function TakeoverModal(props: TakeoverModalProps): JSX.Element {
           <StyledText
             as="p"
             fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-            onClick={() => setShowConfirmTerminateModal(true)}
+            onClick={() => {
+              setShowConfirmTerminateModal(true)
+            }}
           >
             {t('terminate')}
           </StyledText>

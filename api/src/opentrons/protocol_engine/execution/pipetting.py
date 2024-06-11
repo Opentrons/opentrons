@@ -99,7 +99,11 @@ class HardwarePipettingHandler(PipettingHandler):
         flow_rate: float,
         command_note_adder: CommandNoteAdder,
     ) -> float:
-        """Set flow-rate and aspirate."""
+        """Set flow-rate and aspirate.
+
+        Raises:
+            PipetteOverpressureError, propagated as-is from the hardware controller.
+        """
         # get mount and config data from state and hardware controller
         adjusted_volume = _validate_aspirate_volume(
             state_view=self._state_view,

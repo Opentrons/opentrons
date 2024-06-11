@@ -34,6 +34,7 @@ stages:
           analysisSummaries:
             - id: !anystr
               status: pending
+              runTimeParameters: []
           key: protocol_key
   - name: Verify the key in GET /protocols
     request:

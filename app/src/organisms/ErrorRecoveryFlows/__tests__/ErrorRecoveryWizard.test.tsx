@@ -13,7 +13,12 @@ import {
 } from '../ErrorRecoveryWizard'
 import { RECOVERY_MAP } from '../constants'
 import { BeforeBeginning } from '../BeforeBeginning'
-import { SelectRecoveryOption, RetryStep } from '../RecoveryOptions'
+import {
+  SelectRecoveryOption,
+  RetryStep,
+  ManageTips,
+  CancelRun,
+} from '../RecoveryOptions'
 import { RecoveryInProgress } from '../RecoveryInProgress'
 
 import type { Mock } from 'vitest'
@@ -65,6 +70,8 @@ describe('ErrorRecoveryContent', () => {
     ROBOT_RESUMING,
     ROBOT_IN_MOTION,
     ROBOT_RETRYING_COMMAND,
+    CANCEL_RUN,
+    DROP_TIP_FLOWS,
   } = RECOVERY_MAP
 
   let props: React.ComponentProps<typeof ErrorRecoveryContent>
@@ -78,6 +85,8 @@ describe('ErrorRecoveryContent', () => {
     vi.mocked(BeforeBeginning).mockReturnValue(<div>MOCK_BEFORE_BEGINNING</div>)
     vi.mocked(RetryStep).mockReturnValue(<div>MOCK_RESUME_RUN</div>)
     vi.mocked(RecoveryInProgress).mockReturnValue(<div>MOCK_IN_PROGRESS</div>)
+    vi.mocked(CancelRun).mockReturnValue(<div>MOCK_CANCEL_RUN</div>)
+    vi.mocked(ManageTips).mockReturnValue(<div>MOCK_DROP_TIP_FLOWS</div>)
   })
 
   it(`returns SelectRecoveryOption when the route is ${OPTION_SELECTION.ROUTE}`, () => {
@@ -110,6 +119,32 @@ describe('ErrorRecoveryContent', () => {
     renderRecoveryContent(props)
 
     screen.getByText('MOCK_RESUME_RUN')
+  })
+
+  it(`returns ManageTips when the route is ${DROP_TIP_FLOWS.ROUTE}`, () => {
+    props = {
+      ...props,
+      recoveryMap: {
+        ...props.recoveryMap,
+        route: DROP_TIP_FLOWS.ROUTE,
+      },
+    }
+    renderRecoveryContent(props)
+
+    screen.getByText('MOCK_DROP_TIP_FLOWS')
+  })
+
+  it(`returns CancelRun when the route is ${CANCEL_RUN.ROUTE}`, () => {
+    props = {
+      ...props,
+      recoveryMap: {
+        ...props.recoveryMap,
+        route: CANCEL_RUN.ROUTE,
+      },
+    }
+    renderRecoveryContent(props)
+
+    screen.getByText('MOCK_CANCEL_RUN')
   })
 
   it(`returns RecoveryInProgressModal when the route is ${ROBOT_CANCELING.ROUTE}`, () => {

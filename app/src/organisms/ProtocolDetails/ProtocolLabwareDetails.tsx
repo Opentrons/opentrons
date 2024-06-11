@@ -201,7 +201,9 @@ export const LabwareDetailOverflowMenu = (
           {showLabwareDetailSlideout ? (
             <LabwareDetails
               labware={labware}
-              onClose={() => setShowLabwareDetailSlideout(false)}
+              onClose={() => {
+                setShowLabwareDetailSlideout(false)
+              }}
             />
           ) : null}
         </>,

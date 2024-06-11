@@ -2,6 +2,8 @@ import * as React from 'react'
 import { vi, describe, it, expect, beforeEach } from 'vitest'
 import { screen, fireEvent } from '@testing-library/react'
 
+import { COLORS } from '@opentrons/components'
+
 import { renderWithProviders } from '../../../../__testing-utils__'
 import { i18n } from '../../../../i18n'
 import { RecoveryFooterButtons } from '../RecoveryFooterButtons'
@@ -56,5 +58,17 @@ describe('RecoveryFooterButtons', () => {
     expect(
       screen.queryByRole('button', { name: 'Go back' })
     ).not.toBeInTheDocument()
+  })
+
+  it('renders correct loading state on the primary button if loading is true', () => {
+    props = { ...props, isLoadingPrimaryBtnAction: true }
+    render(props)
+
+    const primaryBtn = screen.getByRole('button', {
+      name: 'loading indicator Continue', // Icon on left of button text.
+    })
+
+    screen.getByLabelText('loading indicator')
+    expect(primaryBtn).toHaveStyle(`background-color: ${COLORS.blue60}`)
   })
 })

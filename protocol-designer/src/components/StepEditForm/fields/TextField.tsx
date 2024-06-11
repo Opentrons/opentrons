@@ -25,7 +25,9 @@ export const TextField = (props: TextFieldProps): JSX.Element => {
       error={errorToShow}
       onBlur={onFieldBlur}
       onFocus={onFieldFocus}
-      onChange={e => updateValue(e.currentTarget.value)}
+      onChange={e => {
+        updateValue(e.currentTarget.value)
+      }}
       value={value ? String(value) : null}
     />
   )

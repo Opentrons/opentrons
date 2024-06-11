@@ -26,7 +26,9 @@ CompletedTaskList.args = {
           description: 'this is the first subtask',
           cta: {
             label: 'do this',
-            onClick: () => console.log('click 1'),
+            onClick: () => {
+              console.log('click 1')
+            },
           },
         },
       ],
@@ -37,7 +39,9 @@ CompletedTaskList.args = {
         'the second task happens after the first, and has longer text so that we can see what it looks like with longer text',
       cta: {
         label: 'do the second thing',
-        onClick: () => console.log('click 2'),
+        onClick: () => {
+          console.log('click 2')
+        },
       },
       subTasks: [],
     },
@@ -50,7 +54,9 @@ CompletedTaskList.args = {
           description: 'this is the first subtask',
           cta: {
             label: 'do this',
-            onClick: () => console.log('click 1'),
+            onClick: () => {
+              console.log('click 1')
+            },
           },
         },
         {
@@ -58,7 +64,9 @@ CompletedTaskList.args = {
           description: 'this is the second subtask',
           cta: {
             label: 'calibrate this',
-            onClick: () => console.log('click 1'),
+            onClick: () => {
+              console.log('click 1')
+            },
           },
         },
         {
@@ -67,7 +75,9 @@ CompletedTaskList.args = {
           isComplete: true,
           cta: {
             label: 'calibrate this',
-            onClick: () => console.log('click 1'),
+            onClick: () => {
+              console.log('click 1')
+            },
           },
         },
       ],
@@ -81,7 +91,9 @@ CompletedTaskList.args = {
           description: 'this is the first subtask',
           cta: {
             label: 'do this',
-            onClick: () => console.log('click 1'),
+            onClick: () => {
+              console.log('click 1')
+            },
           },
         },
       ],
@@ -92,7 +104,9 @@ CompletedTaskList.args = {
       isComplete: true,
       cta: {
         label: 'redo',
-        onClick: () => console.log('redo'),
+        onClick: () => {
+          console.log('redo')
+        },
       },
       subTasks: [],
     },
@@ -113,7 +127,9 @@ CompletedTaskListWithFinalSubtask.args = {
           description: 'this is the first subtask',
           cta: {
             label: 'do this',
-            onClick: () => console.log('click 1'),
+            onClick: () => {
+              console.log('click 1')
+            },
           },
         },
       ],
@@ -124,7 +140,9 @@ CompletedTaskListWithFinalSubtask.args = {
         'the second task happens after the first, and has longer text so that we can see what it looks like with longer text',
       cta: {
         label: 'do the second thing',
-        onClick: () => console.log('click 2'),
+        onClick: () => {
+          console.log('click 2')
+        },
       },
       subTasks: [],
     },
@@ -137,7 +155,9 @@ CompletedTaskListWithFinalSubtask.args = {
           description: 'this is the first subtask',
           cta: {
             label: 'do this',
-            onClick: () => console.log('click 1'),
+            onClick: () => {
+              console.log('click 1')
+            },
           },
         },
       ],
@@ -148,7 +168,9 @@ CompletedTaskListWithFinalSubtask.args = {
       isComplete: true,
       cta: {
         label: 'redo',
-        onClick: () => console.log('redo'),
+        onClick: () => {
+          console.log('redo')
+        },
       },
       subTasks: [],
     },
@@ -161,7 +183,9 @@ CompletedTaskListWithFinalSubtask.args = {
           description: 'this is the first subtask',
           cta: {
             label: 'do this',
-            onClick: () => console.log('click 1'),
+            onClick: () => {
+              console.log('click 1')
+            },
           },
         },
         {
@@ -169,7 +193,9 @@ CompletedTaskListWithFinalSubtask.args = {
           description: 'this is the second subtask',
           cta: {
             label: 'calibrate this',
-            onClick: () => console.log('click 1'),
+            onClick: () => {
+              console.log('click 1')
+            },
           },
         },
         {
@@ -178,7 +204,9 @@ CompletedTaskListWithFinalSubtask.args = {
           isComplete: true,
           cta: {
             label: 'calibrate this',
-            onClick: () => console.log('click 1'),
+            onClick: () => {
+              console.log('click 1')
+            },
           },
         },
       ],
@@ -200,7 +228,9 @@ InProgressTaskList.args = {
           description: 'this is the first subtask',
           cta: {
             label: 'do this',
-            onClick: () => console.log('click 1'),
+            onClick: () => {
+              console.log('click 1')
+            },
           },
         },
       ],
@@ -211,7 +241,9 @@ InProgressTaskList.args = {
         'the second task happens after the first, and has longer text so that we can see what it looks like with longer text',
       cta: {
         label: 'do the second thing',
-        onClick: () => console.log('click 2'),
+        onClick: () => {
+          console.log('click 2')
+        },
       },
       subTasks: [],
     },
@@ -224,7 +256,9 @@ InProgressTaskList.args = {
           description: 'this is the first subtask',
           cta: {
             label: 'do this',
-            onClick: () => console.log('click 1'),
+            onClick: () => {
+              console.log('click 1')
+            },
           },
         },
         {
@@ -232,7 +266,9 @@ InProgressTaskList.args = {
           description: 'this is the second subtask',
           cta: {
             label: 'calibrate this',
-            onClick: () => console.log('click 1'),
+            onClick: () => {
+              console.log('click 1')
+            },
           },
         },
         {
@@ -241,7 +277,9 @@ InProgressTaskList.args = {
           isComplete: true,
           cta: {
             label: 'calibrate this',
-            onClick: () => console.log('click 1'),
+            onClick: () => {
+              console.log('click 1')
+            },
           },
         },
       ],
@@ -255,7 +293,9 @@ InProgressTaskList.args = {
           description: 'this is the first subtask',
           cta: {
             label: 'do this',
-            onClick: () => console.log('click 1'),
+            onClick: () => {
+              console.log('click 1')
+            },
           },
         },
       ],
@@ -266,7 +306,9 @@ InProgressTaskList.args = {
       isComplete: true,
       cta: {
         label: 'redo',
-        onClick: () => console.log('redo'),
+        onClick: () => {
+          console.log('redo')
+        },
       },
       subTasks: [],
     },
@@ -287,7 +329,9 @@ InProgressTaskListwithFinalSubtask.args = {
           description: 'this is the first subtask',
           cta: {
             label: 'do this',
-            onClick: () => console.log('click 1'),
+            onClick: () => {
+              console.log('click 1')
+            },
           },
         },
       ],
@@ -298,7 +342,9 @@ InProgressTaskListwithFinalSubtask.args = {
         'the second task happens after the first, and has longer text so that we can see what it looks like with longer text',
       cta: {
         label: 'do the second thing',
-        onClick: () => console.log('click 2'),
+        onClick: () => {
+          console.log('click 2')
+        },
       },
       subTasks: [],
     },
@@ -311,7 +357,9 @@ InProgressTaskListwithFinalSubtask.args = {
           description: 'this is the first subtask',
           cta: {
             label: 'do this',
-            onClick: () => console.log('click 1'),
+            onClick: () => {
+              console.log('click 1')
+            },
           },
         },
       ],
@@ -322,7 +370,9 @@ InProgressTaskListwithFinalSubtask.args = {
       isComplete: true,
       cta: {
         label: 'redo',
-        onClick: () => console.log('redo'),
+        onClick: () => {
+          console.log('redo')
+        },
       },
       subTasks: [],
     },
@@ -335,7 +385,9 @@ InProgressTaskListwithFinalSubtask.args = {
           description: 'this is the first subtask',
           cta: {
             label: 'do this',
-            onClick: () => console.log('click 1'),
+            onClick: () => {
+              console.log('click 1')
+            },
           },
         },
         {
@@ -343,7 +395,9 @@ InProgressTaskListwithFinalSubtask.args = {
           description: 'this is the second subtask',
           cta: {
             label: 'calibrate this',
-            onClick: () => console.log('click 1'),
+            onClick: () => {
+              console.log('click 1')
+            },
           },
         },
         {
@@ -352,7 +406,9 @@ InProgressTaskListwithFinalSubtask.args = {
           isComplete: true,
           cta: {
             label: 'calibrate this',
-            onClick: () => console.log('click 1'),
+            onClick: () => {
+              console.log('click 1')
+            },
           },
         },
       ],

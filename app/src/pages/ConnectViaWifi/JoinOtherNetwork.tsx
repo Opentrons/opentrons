@@ -36,7 +36,9 @@ export function JoinOtherNetwork({
       <RobotSetupHeader
         buttonText={i18n.format(t('continue'), 'capitalize')}
         header={t('join_other_network')}
-        onClickBack={() => setCurrentOption('WifiList')}
+        onClickBack={() => {
+          setCurrentOption('WifiList')
+        }}
         onClickButton={handleContinue}
       />
       <SetWifiSsid

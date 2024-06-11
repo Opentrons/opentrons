@@ -1,6 +1,7 @@
 import * as React from 'react'
 import { vi, it, describe, expect, beforeEach } from 'vitest'
 import { when } from 'vitest-when'
+import { screen } from '@testing-library/react'
 import { MemoryRouter, Route } from 'react-router-dom'
 
 import { renderWithProviders } from '../../../../__testing-utils__'
@@ -48,9 +49,9 @@ describe('DeviceDetails', () => {
   })
 
   it('redirects to devices page when a robot is not found and not scanning', () => {
-    const [{ getByText }] = render('/devices/otie')
+    render('/devices/otie')
 
-    getByText('devices page')
+    screen.getByText('devices page')
   })
 
   it('renders null when a robot is not found and discovery client is scanning', () => {

@@ -173,9 +173,9 @@ export const PauseForm = (props: StepFormProps): JSX.Element => {
               <textarea
                 className={styles.textarea_field}
                 value={propsForFields.pauseMessage.value as string}
-                onChange={(e: React.ChangeEvent<any>) =>
+                onChange={(e: React.ChangeEvent<any>) => {
                   propsForFields.pauseMessage.updateValue(e.currentTarget.value)
-                }
+                }}
               />
             </FormGroup>
           </div>

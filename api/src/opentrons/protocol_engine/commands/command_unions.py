@@ -6,6 +6,7 @@ from typing_extensions import Annotated
 from pydantic import Field
 
 from .command import DefinedErrorData
+from .pipetting_common import OverpressureError, OverpressureErrorInternalData
 
 from . import heater_shaker
 from . import magnetic_module
@@ -642,7 +643,7 @@ CommandPrivateResult = Union[
 ]
 
 # All `DefinedErrorData`s that implementations will actually return in practice.
-# There's just one right now, but this will eventually be a Union.
-CommandDefinedErrorData = DefinedErrorData[
-    TipPhysicallyMissingError, TipPhysicallyMissingErrorInternalData
+CommandDefinedErrorData = Union[
+    DefinedErrorData[TipPhysicallyMissingError, TipPhysicallyMissingErrorInternalData],
+    DefinedErrorData[OverpressureError, OverpressureErrorInternalData],
 ]

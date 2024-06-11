@@ -6,7 +6,7 @@ import {
   useCreateRunMutation,
 } from '@opentrons/react-api-client'
 import { useNotifyDeckConfigurationQuery } from '../../../resources/deck_configuration'
-import { createQuickTransferFile } from '../utils/createQuickTransferFile'
+import { createQuickTransferFile } from '../utils'
 import { renderWithProviders } from '../../../__testing-utils__'
 import { i18n } from '../../../i18n'
 import { SummaryAndSettings } from '../SummaryAndSettings'

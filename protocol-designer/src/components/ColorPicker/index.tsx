@@ -22,9 +22,9 @@ export function ColorPicker(props: ColorPickerProps): JSX.Element {
           className={cx(styles.swatch, {
             [styles.swatch_enabled]: showColorPicker,
           })}
-          onClick={() =>
+          onClick={() => {
             setShowColorPicker(showColorPicker => !showColorPicker)
-          }
+          }}
         >
           <div
             className={styles.color}
@@ -37,7 +37,9 @@ export function ColorPicker(props: ColorPickerProps): JSX.Element {
           <div className={styles.popover}>
             <div
               className={styles.cover}
-              onClick={() => setShowColorPicker(false)}
+              onClick={() => {
+                setShowColorPicker(false)
+              }}
             />
             <TwitterPicker
               colors={DEFAULT_LIQUID_COLORS}

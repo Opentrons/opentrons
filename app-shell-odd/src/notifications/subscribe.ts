@@ -51,7 +51,9 @@ export function subscribe(topic: NotifyTopic): Promise<void> {
         // The client is either already subscribed or the subscription is currently pending.
         else {
           void waitUntilActiveOrErrored('subscription', topic)
-            .then(() => sendDeserializedRefetch(topic))
+            .then(() => {
+              sendDeserializedRefetch(topic)
+            })
             .catch((error: Error) => {
               notifyLog.debug(error.message)
               sendDeserializedGenericError(topic)
