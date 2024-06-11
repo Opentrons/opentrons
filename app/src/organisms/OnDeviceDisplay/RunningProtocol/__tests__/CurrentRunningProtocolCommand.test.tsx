@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { fireEvent, screen } from '@testing-library/react'
+import { fireEvent, renderHook, screen } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { RUN_STATUS_RUNNING, RUN_STATUS_IDLE } from '@opentrons/api-client'
@@ -7,7 +7,10 @@ import { RUN_STATUS_RUNNING, RUN_STATUS_IDLE } from '@opentrons/api-client'
 import { renderWithProviders } from '../../../../__testing-utils__'
 import { i18n } from '../../../../i18n'
 import { mockRobotSideAnalysis } from '../../../CommandText/__fixtures__'
-import { CurrentRunningProtocolCommand } from '../CurrentRunningProtocolCommand'
+import {
+  useKnownCurrentCommand,
+  CurrentRunningProtocolCommand,
+} from '../CurrentRunningProtocolCommand'
 import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
 
 const mockPlayRun = vi.fn()
@@ -99,4 +102,34 @@ describe('CurrentRunningProtocolCommand', () => {
 
   // ToDo (kj:04/10/2023) once we fix the track event stuff, we can implement tests
   it.todo('when tapping play button, track event mock function is called')
+})
+
+describe('useKnownCurrentCommand', () => {
+  it('renders the current command if a valid currentRunCommandIndex is supplied', () => {
+    const { result } = renderHook(() =>
+      useKnownCurrentCommand(mockRobotSideAnalysis, null, 0)
+    )
+
+    expect(result.current.commandType).toEqual('loadPipette')
+  })
+
+  it('renders the last run command if an invalid currentRunCommandIndex is supplied but there was a last run command', () => {
+    const { result } = renderHook(() =>
+      useKnownCurrentCommand(
+        mockRobotSideAnalysis,
+        mockRobotSideAnalysis.commands[1],
+        undefined
+      )
+    )
+
+    expect(result.current.commandType).toEqual('loadModule')
+  })
+
+  it('renders the last known command if there is no last run command and there is no current command index', () => {
+    const { result } = renderHook(() =>
+      useKnownCurrentCommand(mockRobotSideAnalysis, null, undefined)
+    )
+
+    expect(result.current.commandType).toEqual('loadPipette')
+  })
 })

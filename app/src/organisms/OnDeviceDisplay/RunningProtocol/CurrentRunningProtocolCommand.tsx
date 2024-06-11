@@ -109,7 +109,7 @@ interface RunTimerInfo {
 
 interface CurrentRunningProtocolCommandProps {
   runStatus: RunStatus | null
-  robotSideAnalysis: CompletedProtocolAnalysis | null
+  robotSideAnalysis: CompletedProtocolAnalysis
   robotType: RobotType
   runTimerInfo: RunTimerInfo
   playRun: () => void
@@ -141,10 +141,11 @@ export function CurrentRunningProtocolCommand({
   updateLastAnimatedCommand,
 }: CurrentRunningProtocolCommandProps): JSX.Element | null {
   const { t } = useTranslation('run_details')
-  const currentCommand =
-    robotSideAnalysis?.commands.find(
-      (c: RunTimeCommand, index: number) => index === currentRunCommandIndex
-    ) ?? lastRunCommand
+  const currentCommand = useKnownCurrentCommand(
+    robotSideAnalysis,
+    lastRunCommand,
+    currentRunCommandIndex
+  )
 
   let shouldAnimate = true
   if (currentCommand?.key != null) {
@@ -242,4 +243,34 @@ export function CurrentRunningProtocolCommand({
       </Flex>
     </Flex>
   )
+}
+
+// Get the currently running command. If the current command cannot be validated given its index,
+// return the last run command. If there is not a last run command, return the last known command.
+export function useKnownCurrentCommand(
+  robotSideAnalysis: CompletedProtocolAnalysis,
+  lastRunCommand: RunCommandSummary | null,
+  currentRunCommandIndex?: number
+): RunTimeCommand {
+  const [knownCurrentCommandIdx, setKnownCurrentCommandIdx] = React.useState(0)
+
+  let currentCommand = robotSideAnalysis.commands.find(
+    (c: RunTimeCommand, index: number) => index === currentRunCommandIndex
+  )
+
+  React.useEffect(() => {
+    if (currentRunCommandIndex != null) {
+      setKnownCurrentCommandIdx(currentRunCommandIndex)
+    }
+  }, [currentRunCommandIndex])
+
+  if (currentCommand == null) {
+    if (lastRunCommand != null) {
+      currentCommand = lastRunCommand
+    } else {
+      currentCommand = robotSideAnalysis.commands[knownCurrentCommandIdx]
+    }
+  }
+
+  return currentCommand
 }
