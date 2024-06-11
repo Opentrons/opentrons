@@ -7,7 +7,7 @@ from anyio import move_on_after
 from opentrons_shared_data.labware.dev_types import LabwareUri
 from opentrons_shared_data.labware.labware_definition import LabwareDefinition
 from opentrons_shared_data.errors import GeneralError
-from opentrons_shared_data.robot import RobotType
+from opentrons_shared_data.robot.dev_types import RobotType
 
 from . import protocol_runner, RunResult, JsonRunner, PythonAndLegacyRunner
 from ..hardware_control import HardwareControlAPI
