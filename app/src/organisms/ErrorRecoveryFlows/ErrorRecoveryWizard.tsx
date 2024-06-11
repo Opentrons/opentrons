@@ -9,18 +9,23 @@ import { getIsOnDevice } from '../../redux/config'
 import { getTopPortalEl } from '../../App/portal'
 import { InterventionModal } from '../../molecules/InterventionModal'
 import { BeforeBeginning } from './BeforeBeginning'
-import { SelectRecoveryOption, RetryStep, CancelRun } from './RecoveryOptions'
+import {
+  SelectRecoveryOption,
+  RetryStep,
+  CancelRun,
+  ManageTips,
+} from './RecoveryOptions'
 import { RecoveryInProgress } from './RecoveryInProgress'
-import { getErrorKind } from './utils'
+import { getErrorKind } from './hooks'
 import { RECOVERY_MAP } from './constants'
 
-import type { FailedCommand, IRecoveryMap, RecoveryContentProps } from './types'
+import type { RecoveryContentProps } from './types'
 import type {
   useRouteUpdateActions,
-  UseRouteUpdateActionsResult,
   useRecoveryCommands,
-  UseRecoveryCommandsResult,
-} from './utils'
+  ERUtilsResults,
+} from './hooks'
+import type { ErrorRecoveryFlowsProps } from '.'
 
 interface UseERWizardResult {
   hasLaunchedRecovery: boolean
@@ -44,13 +49,7 @@ export function useERWizard(): UseERWizardResult {
   return { showERWizard, toggleERWizard, hasLaunchedRecovery }
 }
 
-export interface ErrorRecoveryWizardProps {
-  failedCommand: FailedCommand | null
-  recoveryMap: IRecoveryMap
-  routeUpdateActions: UseRouteUpdateActionsResult
-  recoveryCommands: UseRecoveryCommandsResult
-  hasLaunchedRecovery: boolean
-}
+export type ErrorRecoveryWizardProps = ErrorRecoveryFlowsProps & ERUtilsResults
 
 export function ErrorRecoveryWizard(
   props: ErrorRecoveryWizardProps
@@ -129,6 +128,10 @@ export function ErrorRecoveryContent(props: RecoveryContentProps): JSX.Element {
     return <CancelRun {...props} />
   }
 
+  const buildManageTips = (): JSX.Element => {
+    return <ManageTips {...props} />
+  }
+
   switch (props.recoveryMap.route) {
     case RECOVERY_MAP.BEFORE_BEGINNING.ROUTE:
       return buildBeforeBeginning()
@@ -138,6 +141,8 @@ export function ErrorRecoveryContent(props: RecoveryContentProps): JSX.Element {
       return buildResumeRun()
     case RECOVERY_MAP.CANCEL_RUN.ROUTE:
       return buildCancelRun()
+    case RECOVERY_MAP.DROP_TIP_FLOWS.ROUTE:
+      return buildManageTips()
     case RECOVERY_MAP.ROBOT_IN_MOTION.ROUTE:
     case RECOVERY_MAP.ROBOT_RESUMING.ROUTE:
     case RECOVERY_MAP.ROBOT_RETRYING_COMMAND.ROUTE:

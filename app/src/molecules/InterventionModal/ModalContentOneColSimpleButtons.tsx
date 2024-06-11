@@ -20,12 +20,15 @@ export interface ModalContentOneColSimpleButtonsProps {
   secondButton: ButtonProps
   furtherButtons?: ButtonProps[]
   onSelect?: React.ChangeEventHandler<HTMLInputElement>
+  initialSelected?: string
 }
 
 export function ModalContentOneColSimpleButtons(
   props: ModalContentOneColSimpleButtonsProps
 ): JSX.Element {
-  const [selected, setSelected] = React.useState<string | null>(null)
+  const [selected, setSelected] = React.useState<string | null>(
+    props.initialSelected ?? null
+  )
   const furtherButtons = props.furtherButtons ?? []
   const buttons = [props.firstButton, props.secondButton, ...furtherButtons]
   return (

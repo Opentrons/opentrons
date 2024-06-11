@@ -851,8 +851,8 @@ class CheckCalibrationUserFlow:
                 self.active_tiprack._core.get_definition(),
             ).tipLength
         except cal_types.TipLengthCalNotFound:
-            tip_overlap = self.hw_pipette.tip_overlap.get(
-                self.active_tiprack.uri, self.hw_pipette.tip_overlap["default"]
+            tip_overlap = self.hw_pipette.tip_overlap["v0"].get(
+                self.active_tiprack.uri, self.hw_pipette.tip_overlap["v0"]["default"]
             )
             tip_length = self.active_tiprack.tip_length
             return tip_length - tip_overlap

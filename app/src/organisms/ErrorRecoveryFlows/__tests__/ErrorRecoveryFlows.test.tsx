@@ -12,7 +12,7 @@ import { renderWithProviders } from '../../../__testing-utils__'
 import { i18n } from '../../../i18n'
 import { mockFailedCommand } from '../__fixtures__'
 import { ErrorRecoveryFlows, useErrorRecoveryFlows } from '..'
-import { useCurrentlyRecoveringFrom } from '../utils'
+import { useCurrentlyRecoveringFrom, useERUtils } from '../hooks'
 import { useFeatureFlag } from '../../../redux/config'
 import { useERWizard, ErrorRecoveryWizard } from '../ErrorRecoveryWizard'
 import { useRunPausedSplash, RunPausedSplash } from '../RunPausedSplash'
@@ -20,7 +20,7 @@ import { useRunPausedSplash, RunPausedSplash } from '../RunPausedSplash'
 import type { RunStatus } from '@opentrons/api-client'
 
 vi.mock('../ErrorRecoveryWizard')
-vi.mock('../utils')
+vi.mock('../hooks')
 vi.mock('../useRecoveryCommands')
 vi.mock('../../../redux/config')
 vi.mock('../RunPausedSplash')
@@ -93,6 +93,7 @@ describe('ErrorRecovery', () => {
     props = {
       failedCommand: mockFailedCommand,
       runId: 'MOCK_RUN_ID',
+      isFlex: true,
     }
     vi.mocked(ErrorRecoveryWizard).mockReturnValue(<div>MOCK WIZARD</div>)
     vi.mocked(RunPausedSplash).mockReturnValue(
@@ -105,6 +106,7 @@ describe('ErrorRecovery', () => {
       showERWizard: true,
     })
     vi.mocked(useRunPausedSplash).mockReturnValue(true)
+    vi.mocked(useERUtils).mockReturnValue({ routeUpdateActions: {} } as any)
   })
 
   it('renders the wizard when the wizard is toggled on', () => {

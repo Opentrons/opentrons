@@ -18,6 +18,7 @@ import { RadioButton } from '../../../atoms/buttons'
 import { RecoveryFooterButtons, RecoverySingleColumnContent } from '../shared'
 
 import type { ErrorKind, RecoveryContentProps, RecoveryRoute } from '../types'
+import type { PipetteWithTip } from '../../DropTipWizardFlows'
 
 // The "home" screen within Error Recovery. When a user completes a non-terminal flow or presses "Go back" enough
 // to escape the boundaries of a route, they will be redirected here.
@@ -25,19 +26,23 @@ export function SelectRecoveryOption({
   isOnDevice,
   errorKind,
   routeUpdateActions,
+  tipStatusUtils,
 }: RecoveryContentProps): JSX.Element | null {
   const { t } = useTranslation('error_recovery')
-  const { proceedToRoute } = routeUpdateActions
+  const { proceedToRouteAndStep } = routeUpdateActions
+  const { determineTipStatus } = tipStatusUtils
   const validRecoveryOptions = getRecoveryOptions(errorKind)
   const [selectedRoute, setSelectedRoute] = React.useState<RecoveryRoute>(
     head(validRecoveryOptions) as RecoveryRoute
   )
 
+  useCurrentTipStatus(determineTipStatus)
+
   if (isOnDevice) {
     return (
       <RecoverySingleColumnContent>
         <StyledText css={ODD_SECTION_TITLE_STYLE} as="h4SemiBold">
-          {t('how_do_you_want_to_proceed')}
+          {t('choose_a_recovery_action')}
         </StyledText>
         <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
           <RecoveryOptions
@@ -49,7 +54,7 @@ export function SelectRecoveryOption({
         <RecoveryFooterButtons
           isOnDevice={isOnDevice}
           primaryBtnOnClick={() =>
-            proceedToRoute(selectedRoute as RecoveryRoute)
+            proceedToRouteAndStep(selectedRoute as RecoveryRoute)
           }
         />
       </RecoverySingleColumnContent>
@@ -96,6 +101,15 @@ export function RecoveryOptions({
       />
     )
   })
+}
+
+// Pre-fetch tip attachment status. Users are not blocked from proceeding at this step.
+export function useCurrentTipStatus(
+  determineTipStatus: () => Promise<PipetteWithTip[]>
+): void {
+  React.useEffect(() => {
+    void determineTipStatus()
+  }, [])
 }
 
 export function getRecoveryOptions(errorKind: ErrorKind): RecoveryRoute[] {

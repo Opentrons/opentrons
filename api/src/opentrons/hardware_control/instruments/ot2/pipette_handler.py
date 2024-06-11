@@ -772,7 +772,7 @@ class PipetteHandlerProvider(Generic[MountType]):
         if instrument.has_tip:
             raise UnexpectedTipAttachError("pick_up_tip", instrument.name, mount.name)
         self._ihp_log.debug(f"Picking up tip on {mount.name}")
-        tip_count = instrument.nozzle_manager.current_configuration.tip_count
+
         if presses is None or presses < 0:
             checked_presses = instrument.pick_up_configurations.press_fit.presses
         else:
@@ -783,11 +783,12 @@ class PipetteHandlerProvider(Generic[MountType]):
         else:
             check_incr = increment
 
-        pick_up_speed = instrument.pick_up_configurations.press_fit.speed_by_tip_count[
-            tip_count
-        ]
-        pick_up_distance = (
-            instrument.pick_up_configurations.press_fit.distance_by_tip_count[tip_count]
+        pick_up_speed = instrument.get_pick_up_speed_by_configuration(
+            instrument.pick_up_configurations.press_fit
+        )
+
+        pick_up_distance = instrument.get_pick_up_distance_by_configuration(
+            instrument.pick_up_configurations.press_fit
         )
 
         def build_presses() -> Iterator[Tuple[float, float]]:
@@ -817,9 +818,9 @@ class PipetteHandlerProvider(Generic[MountType]):
                             current={
                                 Axis.by_mount(
                                     mount
-                                ): instrument.pick_up_configurations.press_fit.current_by_tip_count[
-                                    tip_count
-                                ]
+                                ): instrument.get_pick_up_current_by_configuration(
+                                    instrument.pick_up_configurations.press_fit
+                                )
                             },
                             speed=pick_up_speed,
                             relative_down=top_types.Point(0, 0, press_dist),
@@ -846,9 +847,9 @@ class PipetteHandlerProvider(Generic[MountType]):
                             current={
                                 Axis.by_mount(
                                     mount
-                                ): instrument.pick_up_configurations.press_fit.current_by_tip_count[
-                                    instrument.nozzle_manager.current_configuration.tip_count
-                                ]
+                                ): instrument.get_pick_up_current_by_configuration(
+                                    instrument.pick_up_configurations.press_fit
+                                )
                             },
                             speed=pick_up_speed,
                             relative_down=top_types.Point(0, 0, press_dist),

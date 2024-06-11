@@ -19,12 +19,12 @@ import {
 } from '@opentrons/components'
 
 import { getIsOnDevice } from '../../redux/config'
-import { getErrorKind, useErrorMessage, useErrorName } from './utils'
+import { getErrorKind, useErrorMessage, useErrorName } from './hooks'
 import { LargeButton } from '../../atoms/buttons'
 import { RECOVERY_MAP } from './constants'
 
 import type { FailedCommand } from './types'
-import type { UseRouteUpdateActionsResult } from './utils'
+import type { UseRouteUpdateActionsResult } from './hooks'
 
 export function useRunPausedSplash(): boolean {
   return useSelector(getIsOnDevice)
@@ -45,12 +45,12 @@ export function RunPausedSplash({
   const title = useErrorName(errorKind)
   const subText = useErrorMessage(errorKind)
 
-  const { proceedToRoute } = routeUpdateActions
+  const { proceedToRouteAndStep } = routeUpdateActions
 
   // Do not launch error recovery, but do utilize the wizard's cancel route.
   const onCancelClick = (): Promise<void> => {
     return toggleERWiz(false).then(() =>
-      proceedToRoute(RECOVERY_MAP.CANCEL_RUN.ROUTE)
+      proceedToRouteAndStep(RECOVERY_MAP.CANCEL_RUN.ROUTE)
     )
   }
 
@@ -59,6 +59,9 @@ export function RunPausedSplash({
   // TODO(jh 05-22-24): The hardcoded Z-indexing is non-ideal but must be done to keep the splash page above
   // several components in the RunningProtocol page. Investigate why these components have seemingly arbitrary zIndex values
   // and devise a better solution to layering modals.
+
+  // TODO(jh 06-07-24): Although unlikely, it's possible that the server doesn't return a failedCommand. Need to handle
+  // this here or within ER flows.
   return (
     <Flex
       display={DISPLAY_FLEX}
