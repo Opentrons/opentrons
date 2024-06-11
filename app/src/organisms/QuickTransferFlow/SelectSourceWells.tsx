@@ -58,7 +58,7 @@ export function SelectSourceWells(props: SelectSourceWellsProps): JSX.Element {
         onClickBack={onBack}
         buttonText={i18n.format(t('shared:continue'), 'capitalize')}
         onClickButton={handleClickNext}
-        buttonIsDisabled={false}
+        buttonIsDisabled={Object.keys(selectedWells).length === 0}
         secondaryButtonProps={resetButtonProps}
         top={SPACING.spacing8}
       />
