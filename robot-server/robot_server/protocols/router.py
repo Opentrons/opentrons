@@ -33,7 +33,6 @@ from opentrons_shared_data.robot.dev_types import RobotType
 
 from robot_server.errors.error_responses import ErrorDetails, ErrorBody
 from robot_server.hardware import get_robot_type
-from robot_server.service.task_runner import TaskRunner, get_task_runner
 from robot_server.service.dependencies import get_unique_id, get_current_time
 from robot_server.service.json_api import (
     Body,
@@ -44,10 +43,10 @@ from robot_server.service.json_api import (
     PydanticResponse,
     RequestModel,
 )
+from .analyses_manager import AnalysesManager
 
 from .protocol_auto_deleter import ProtocolAutoDeleter
 from .protocol_models import Protocol, ProtocolFile, Metadata, ProtocolKind
-from .protocol_analyzer import ProtocolAnalyzer
 from .analysis_store import AnalysisStore, AnalysisNotFoundError, AnalysisIsPendingError
 from .analysis_models import ProtocolAnalysis, AnalysisRequest, AnalysisSummary
 from .protocol_store import (
@@ -61,7 +60,7 @@ from .dependencies import (
     get_protocol_reader,
     get_protocol_store,
     get_analysis_store,
-    get_protocol_analyzer,
+    get_analyses_manager,
     get_protocol_directory,
     get_file_reader_writer,
     get_file_hasher,
@@ -221,8 +220,7 @@ async def create_protocol(  # noqa: C901
     file_reader_writer: FileReaderWriter = Depends(get_file_reader_writer),
     protocol_reader: ProtocolReader = Depends(get_protocol_reader),
     file_hasher: FileHasher = Depends(get_file_hasher),
-    protocol_analyzer: ProtocolAnalyzer = Depends(get_protocol_analyzer),
-    task_runner: TaskRunner = Depends(get_task_runner),
+    analyses_manager: AnalysesManager = Depends(get_analyses_manager),
     protocol_auto_deleter: ProtocolAutoDeleter = Depends(get_protocol_auto_deleter),
     robot_type: RobotType = Depends(get_robot_type),
     protocol_id: str = Depends(get_unique_id, use_cache=False),
@@ -242,8 +240,7 @@ async def create_protocol(  # noqa: C901
         file_hasher: File hashing interface.
         file_reader_writer: Input file reader/writer.
         protocol_reader: Protocol file reading interface.
-        protocol_analyzer: Protocol analysis interface.
-        task_runner: Background task runner.
+        analyses_manager: Protocol analysis managing interface.
         protocol_auto_deleter: An interface to delete old resources to make room for
             the new protocol.
         robot_type: The type of this robot. Protocols meant for other robot types
@@ -286,8 +283,7 @@ async def create_protocol(  # noqa: C901
                 force_reanalyze=False,
                 protocol_store=protocol_store,
                 analysis_store=analysis_store,
-                protocol_analyzer=protocol_analyzer,
-                task_runner=task_runner,
+                analyses_manager=analyses_manager,
             )
         except AnalysisIsPendingError as error:
             raise LastAnalysisPending(detail=str(error)).as_error(
@@ -351,15 +347,10 @@ async def create_protocol(  # noqa: C901
     protocol_auto_deleter.make_room_for_new_protocol()
     protocol_store.insert(protocol_resource)
 
-    task_runner.run(
-        protocol_analyzer.analyze,
+    new_analysis_summary = await analyses_manager.start_analysis(
+        analysis_id=analysis_id,
         protocol_resource=protocol_resource,
-        analysis_id=analysis_id,
         run_time_param_values=parsed_rtp,
-    )
-    pending_analysis = analysis_store.add_pending(
-        protocol_id=protocol_id,
-        analysis_id=analysis_id,
     )
 
     data = Protocol(
@@ -369,7 +360,7 @@ async def create_protocol(  # noqa: C901
         protocolType=source.config.protocol_type,
         robotType=source.robot_type,
         metadata=Metadata.parse_obj(source.metadata),
-        analysisSummaries=[pending_analysis],
+        analysisSummaries=[new_analysis_summary],
         key=key,
         files=[ProtocolFile(name=f.path.name, role=f.role) for f in source.files],
     )
@@ -389,8 +380,7 @@ async def _start_new_analysis_if_necessary(
     rtp_values: RunTimeParamValuesType,
     protocol_store: ProtocolStore,
     analysis_store: AnalysisStore,
-    protocol_analyzer: ProtocolAnalyzer,
-    task_runner: TaskRunner,
+    analyses_manager: AnalysesManager,
 ) -> Tuple[List[AnalysisSummary], bool]:
     """Check RTP values and start a new analysis if necessary.
 
@@ -413,19 +403,15 @@ async def _start_new_analysis_if_necessary(
             analysis_summary=analyses[-1], new_rtp_values=rtp_values
         )
     ):
-        task_runner.run(
-            protocol_analyzer.analyze,
-            protocol_resource=resource,
-            analysis_id=analysis_id,
-            run_time_param_values=rtp_values,
-        )
         started_new_analysis = True
         analyses.append(
-            analysis_store.add_pending(
-                protocol_id=protocol_id,
+            await analyses_manager.start_analysis(
                 analysis_id=analysis_id,
+                protocol_resource=resource,
+                run_time_param_values=rtp_values,
             )
         )
+
     return analyses, started_new_analysis
 
 
@@ -615,8 +601,7 @@ async def create_protocol_analysis(
     request_body: Optional[RequestModel[AnalysisRequest]] = None,
     protocol_store: ProtocolStore = Depends(get_protocol_store),
     analysis_store: AnalysisStore = Depends(get_analysis_store),
-    protocol_analyzer: ProtocolAnalyzer = Depends(get_protocol_analyzer),
-    task_runner: TaskRunner = Depends(get_task_runner),
+    analyses_manager: AnalysesManager = Depends(get_analyses_manager),
     analysis_id: str = Depends(get_unique_id, use_cache=False),
 ) -> PydanticResponse[SimpleMultiBody[AnalysisSummary]]:
     """Start a new analysis for the given existing protocol.
@@ -647,8 +632,7 @@ async def create_protocol_analysis(
             force_reanalyze=request_body.data.forceReAnalyze if request_body else False,
             protocol_store=protocol_store,
             analysis_store=analysis_store,
-            protocol_analyzer=protocol_analyzer,
-            task_runner=task_runner,
+            analyses_manager=analyses_manager,
         )
     except AnalysisIsPendingError as error:
         raise LastAnalysisPending(detail=str(error)).as_error(

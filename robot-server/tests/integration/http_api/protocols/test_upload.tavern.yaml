@@ -34,6 +34,7 @@ stages:
           analysisSummaries:
             - id: !anystr
               status: pending
+              runTimeParameters: []
   - name: Make sure the new protocol is present in GET /protocols
     request:
       url: '{ot2_server_base_url}/protocols'

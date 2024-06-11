@@ -1,6 +1,6 @@
 import * as React from 'react'
-import { describe, it, expect, beforeEach, afterEach } from 'vitest'
-import { cleanup, screen } from '@testing-library/react'
+import { describe, it, expect, beforeEach } from 'vitest'
+import { screen } from '@testing-library/react'
 import { CrashInfoBox } from '../CrashInfoBox'
 import { i18n } from '../../../localization'
 import { renderWithProviders } from '../../../__testing-utils__'
@@ -9,9 +9,6 @@ describe('CrashInfoBox', () => {
   let props: React.ComponentProps<typeof CrashInfoBox>
   beforeEach(() => {
     props = {}
-  })
-  afterEach(() => {
-    cleanup()
   })
   it('should render PipetteModuleCollisions, ModuleLabwareCollisions, and ModuleModuleCollisions when a heater shaker is on deck', () => {
     props = {

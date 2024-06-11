@@ -464,7 +464,9 @@ function CreateFileForm(props: CreateFileFormProps): JSX.Element {
             return (
               <ModulesAndOtherTile
                 {...formProps}
-                proceed={() => createProtocolFile(formProps.getValues())}
+                proceed={() => {
+                  createProtocolFile(formProps.getValues())
+                }}
                 goBack={goBack}
               />
             )

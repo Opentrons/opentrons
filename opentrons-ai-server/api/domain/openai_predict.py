@@ -85,7 +85,7 @@ class OpenAIPredict:
 
         program = OpenAIPydanticProgram.from_defaults(
             output_cls=atomic_descr,
-            prompt_template_str=prompt_template_str.format(protocol_description=protocol_description),
+            prompt_template_str=prompt_template_str,
             verbose=False,
             llm=li_OpenAI(model=self.settings.openai_model_name, api_key=self.settings.openai_api_key.get_secret_value()),
         )

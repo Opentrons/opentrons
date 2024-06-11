@@ -27,6 +27,7 @@ stages:
           analysisSummaries:
             - id: !anystr
               status: pending
+              runTimeParameters: []
   - name: Retry until analyses status is completed.
     max_retries: 10
     delay_after: 0.1
@@ -614,6 +615,7 @@ stages:
           analysisSummaries:
             - id: !anystr
               status: pending
+              runTimeParameters: []
   - name: Retry until analyses status is completed.
     max_retries: 10
     delay_after: 0.1

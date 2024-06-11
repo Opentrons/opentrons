@@ -61,9 +61,9 @@ export const InstrumentDetail = (): JSX.Element => {
             <Flex marginTop={`-${SPACING.spacing16}`}>
               <IconButton
                 aria-label="overflow menu button"
-                onClick={() =>
+                onClick={() => {
                   handleInstrumentDetailOverflowMenu(instrument, host)
-                }
+                }}
               >
                 <Icon
                   name="overflow-btn-touchscreen"

@@ -185,7 +185,9 @@ export const ResultsSummary = (
       {isOnDevice ? (
         <SmallButton
           alignSelf={ALIGN_FLEX_END}
-          onClick={() => handleApplyOffsets(offsetsToApply)}
+          onClick={() => {
+            handleApplyOffsets(offsetsToApply)
+          }}
           buttonText={i18n.format(t('apply_offsets'), 'capitalize')}
           iconName={isSubmittingAndClosing ? 'ot-spinner' : null}
           iconPlacement={isSubmittingAndClosing ? 'startIcon' : null}
@@ -200,7 +202,9 @@ export const ResultsSummary = (
         >
           <NeedHelpLink href={LPC_HELP_LINK_URL} />
           <PrimaryButton
-            onClick={() => handleApplyOffsets(offsetsToApply)}
+            onClick={() => {
+              handleApplyOffsets(offsetsToApply)
+            }}
             disabled={isSubmittingAndClosing}
           >
             <Flex>

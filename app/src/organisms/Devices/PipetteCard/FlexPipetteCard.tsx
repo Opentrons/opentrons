@@ -17,7 +17,10 @@ import { InstrumentCard } from '../../../molecules/InstrumentCard'
 import { ChoosePipette } from '../../PipetteWizardFlows/ChoosePipette'
 import { FLOWS } from '../../PipetteWizardFlows/constants'
 import { handlePipetteWizardFlows } from '../../PipetteWizardFlows'
-import { DropTipWizard } from '../../DropTipWizard'
+import {
+  DropTipWizardFlows,
+  useDropTipWizardFlows,
+} from '../../DropTipWizardFlows'
 
 import { AboutPipetteSlideout } from './AboutPipetteSlideout'
 
@@ -73,7 +76,6 @@ export function FlexPipetteCard({
     setShowAboutPipetteSlideout,
   ] = React.useState<boolean>(false)
   const [showChoosePipette, setShowChoosePipette] = React.useState(false)
-  const [showDropTipWizard, setShowDropTipWizard] = React.useState(false)
   const [
     selectedPipette,
     setSelectedPipette,
@@ -87,7 +89,11 @@ export function FlexPipetteCard({
     setSelectedPipette(SINGLE_MOUNT_PIPETTES)
   }
 
-  const handleLaunchPipetteWizardFlows = (flowType: PipetteWizardFlow): void =>
+  const { showDTWiz, toggleDTWiz } = useDropTipWizardFlows()
+
+  const handleLaunchPipetteWizardFlows = (
+    flowType: PipetteWizardFlow
+  ): void => {
     handlePipetteWizardFlows({
       flowType,
       mount,
@@ -95,6 +101,7 @@ export function FlexPipetteCard({
       selectedPipette: selectedPipetteForWizard,
       host,
     })
+  }
   const handleChoosePipette: React.MouseEventHandler<HTMLButtonElement> = () => {
     setShowChoosePipette(true)
   }
@@ -109,9 +116,6 @@ export function FlexPipetteCard({
 
   const handleCalibrate: React.MouseEventHandler<HTMLButtonElement> = () => {
     handleLaunchPipetteWizardFlows(FLOWS.CALIBRATE)
-  }
-  const handleDropTip = (): void => {
-    setShowDropTipWizard(true)
   }
 
   const [pollForSubsystemUpdate, setPollForSubsystemUpdate] = React.useState(
@@ -169,12 +173,16 @@ export function FlexPipetteCard({
           {
             label: t('about_pipette'),
             disabled: attachedPipette == null,
-            onClick: () => setShowAboutPipetteSlideout(true),
+            onClick: () => {
+              setShowAboutPipetteSlideout(true)
+            },
           },
           {
             label: i18n.format(t('drop_tips'), 'capitalize'),
             disabled: attachedPipette == null || isRunActive,
-            onClick: () => handleDropTip(),
+            onClick: () => {
+              toggleDTWiz()
+            },
           },
         ]
   return (
@@ -252,12 +260,12 @@ export function FlexPipetteCard({
           isEstopNotDisengaged={isEstopNotDisengaged}
         />
       ) : null}
-      {showDropTipWizard && pipetteModelSpecs != null ? (
-        <DropTipWizard
+      {showDTWiz && pipetteModelSpecs != null ? (
+        <DropTipWizardFlows
           robotType={FLEX_ROBOT_TYPE}
           mount={mount}
           instrumentModelSpecs={pipetteModelSpecs}
-          closeFlow={() => setShowDropTipWizard(false)}
+          closeFlow={toggleDTWiz}
         />
       ) : null}
       {attachedPipette?.ok && showAboutPipetteSlideout ? (
@@ -266,7 +274,9 @@ export function FlexPipetteCard({
           pipetteName={pipetteDisplayName ?? attachedPipette.instrumentName}
           firmwareVersion={attachedPipette.firmwareVersion}
           isExpanded={showAboutPipetteSlideout}
-          onCloseClick={() => setShowAboutPipetteSlideout(false)}
+          onCloseClick={() => {
+            setShowAboutPipetteSlideout(false)
+          }}
         />
       ) : null}
       {showChoosePipette ? (
@@ -274,7 +284,9 @@ export function FlexPipetteCard({
           proceed={handleAttach}
           setSelectedPipette={setSelectedPipette}
           selectedPipette={selectedPipette}
-          exit={() => setShowChoosePipette(false)}
+          exit={() => {
+            setShowChoosePipette(false)
+          }}
           mount={mount}
         />
       ) : null}

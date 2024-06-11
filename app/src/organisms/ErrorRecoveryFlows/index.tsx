@@ -33,10 +33,20 @@ export function useErrorRecoveryFlows(
   runStatus: RunStatus | null
 ): UseErrorRecoveryResult {
   const [isERActive, setIsERActive] = React.useState(false)
+  // If client accesses a valid ER runs status besides AWAITING_RECOVERY but accesses it outside of Error Recovery flows, don't show ER.
+  const [hasSeenAwaitingRecovery, setHasSeenAwaitingRecovery] = React.useState(
+    false
+  )
   const failedCommand = useCurrentlyRecoveringFrom(runId, runStatus)
 
+  if (!hasSeenAwaitingRecovery && runStatus === RUN_STATUS_AWAITING_RECOVERY) {
+    setHasSeenAwaitingRecovery(true)
+  }
+
   const isValidRunStatus =
-    runStatus != null && VALID_ER_RUN_STATUSES.includes(runStatus)
+    runStatus != null &&
+    VALID_ER_RUN_STATUSES.includes(runStatus) &&
+    hasSeenAwaitingRecovery
 
   if (!isERActive && isValidRunStatus) {
     setIsERActive(true)

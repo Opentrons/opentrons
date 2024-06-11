@@ -40,18 +40,20 @@ describe('DetachProbe', () => {
     vi.mocked(InProgressModal).mockReturnValue(<div>mock in progress</div>)
   })
   it('returns the correct information, buttons work as expected', () => {
-    const { getByText, getByTestId, getByRole, getByLabelText } = render(props)
-    getByText('Remove calibration probe')
-    getByText(
+    render(props)
+    screen.getByText('Remove calibration probe')
+    screen.getByText(
       'Unlock the calibration probe, remove it from the nozzle, and return it to its storage location.'
     )
-    getByTestId(
+    screen.getByTestId(
       '/app/src/assets/videos/pipette-wizard-flows/Pipette_Detach_Probe_1.webm'
     )
-    const proceedBtn = getByRole('button', { name: 'Complete calibration' })
+    const proceedBtn = screen.getByRole('button', {
+      name: 'Complete calibration',
+    })
     fireEvent.click(proceedBtn)
     expect(props.proceed).toHaveBeenCalled()
-    const backBtn = getByLabelText('back')
+    const backBtn = screen.getByLabelText('back')
     fireEvent.click(backBtn)
     expect(props.goBack).toHaveBeenCalled()
   })
@@ -60,23 +62,23 @@ describe('DetachProbe', () => {
       ...props,
       isRobotMoving: true,
     }
-    const { getByText } = render(props)
-    getByText('mock in progress')
+    render(props)
+    screen.getByText('mock in progress')
   })
   it('returns the correct information when there is an error message', () => {
     props = {
       ...props,
       errorMessage: 'error shmerror',
     }
-    const { getByText, getByTestId, getByRole } = render(props)
-    getByText('Remove calibration probe')
-    getByText(
+    render(props)
+    screen.getByText('Remove calibration probe')
+    screen.getByText(
       'Unlock the calibration probe, remove it from the nozzle, and return it to its storage location.'
     )
-    getByTestId(
+    screen.getByTestId(
       '/app/src/assets/videos/pipette-wizard-flows/Pipette_Detach_Probe_1.webm'
     )
-    const proceedBtn = getByRole('button', { name: 'Exit calibration' })
+    const proceedBtn = screen.getByRole('button', { name: 'Exit calibration' })
     fireEvent.click(proceedBtn)
     expect(props.proceed).toHaveBeenCalled()
     expect(screen.queryByLabelText('back')).not.toBeInTheDocument()

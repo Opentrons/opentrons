@@ -37,7 +37,9 @@ export function SetupInstructionsModal({
   return (
     <Modal
       header={modalHeader}
-      onOutsideClick={() => setShowSetupInstructionsModal(false)}
+      onOutsideClick={() => {
+        setShowSetupInstructionsModal(false)
+      }}
     >
       <Flex
         flexDirection={DIRECTION_ROW}

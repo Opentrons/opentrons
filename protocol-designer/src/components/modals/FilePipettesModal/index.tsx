@@ -535,7 +535,9 @@ export const FilePipettesModal = (props: Props): JSX.Element => {
 
           {showEditPipetteConfirmation ? (
             <StepChangesConfirmModal
-              onCancel={() => setShowEditPipetteConfirmation(false)}
+              onCancel={() => {
+                setShowEditPipetteConfirmation(false)
+              }}
               onConfirm={() => handleSubmit(handleFormSubmit)()}
             />
           ) : null}

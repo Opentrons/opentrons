@@ -493,6 +493,7 @@ class AddSensorLinearMoveBasePayload(AddLinearMoveRequestPayload):
     """A request to add a linear move that also requires sensor reading for its duration."""
 
     sensor_id: SensorIdField
+    sensor_type: SensorTypeField
 
 
 @dataclass(eq=False)
@@ -687,7 +688,8 @@ class GetHepaUVStatePayloadResponse(EmptyPayload):
 
 
 @dataclass(eq=False)
-class SendAccumulatedPressureDataPayload(EmptyPayload):
+class SendAccumulatedSensorDataPayload(EmptyPayload):
     """Send queued readings from a sensor."""
 
     sensor_id: SensorIdField
+    sensor_type: SensorTypeField

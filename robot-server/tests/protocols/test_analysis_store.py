@@ -108,17 +108,17 @@ async def test_add_pending(
     """It should add a pending analysis to the store."""
     protocol_store.insert(make_dummy_protocol_resource(protocol_id="protocol-id"))
 
-    expected_analysis = PendingAnalysis(id="analysis-id")
+    expected_analysis = PendingAnalysis(id="analysis-id", runTimeParameters=[])
     expected_summary = AnalysisSummary(
         id="analysis-id",
         status=AnalysisStatus.PENDING,
     )
 
     result = subject.add_pending(protocol_id="protocol-id", analysis_id="analysis-id")
+    assert result == expected_analysis
 
-    assert result == expected_summary
-
-    assert await subject.get("analysis-id") == expected_analysis
+    analysis_result = await subject.get("analysis-id")
+    assert analysis_result == expected_analysis
     assert await subject.get_by_protocol("protocol-id") == [expected_analysis]
     assert subject.get_summaries_by_protocol("protocol-id") == [expected_summary]
     with pytest.raises(AnalysisNotFoundError, match="analysis-id"):

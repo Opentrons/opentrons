@@ -89,7 +89,9 @@ export function ConfirmCancelRunModal({
     <Modal
       modalSize="medium"
       header={modalHeader}
-      onOutsideClick={() => setShowConfirmCancelRunModal(false)}
+      onOutsideClick={() => {
+        setShowConfirmCancelRunModal(false)
+      }}
     >
       <Flex flexDirection={DIRECTION_COLUMN}>
         <Flex
@@ -109,7 +111,9 @@ export function ConfirmCancelRunModal({
           <SmallButton
             flex="1"
             buttonText={t('shared:go_back')}
-            onClick={() => setShowConfirmCancelRunModal(false)}
+            onClick={() => {
+              setShowConfirmCancelRunModal(false)
+            }}
           />
           <SmallButton
             flex="1"

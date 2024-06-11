@@ -101,11 +101,11 @@ describe('LiquidsLabwareDetailsModal', () => {
     vi.resetAllMocks()
   })
   it('should render slot name and labware name', () => {
-    const [{ getByText, getAllByText, getByRole }] = render(props)
-    getByRole('heading', { name: 'Slot Number' })
-    getByText('5')
-    getByRole('heading', { name: 'Labware name' })
-    getAllByText('mock labware name')
+    render(props)
+    screen.getByRole('heading', { name: 'Slot Number' })
+    screen.getByText('5')
+    screen.getByRole('heading', { name: 'Labware name' })
+    screen.getAllByText('mock labware name')
   })
   it('should render LiquidDetailCard when correct props are passed', () => {
     render(props)
