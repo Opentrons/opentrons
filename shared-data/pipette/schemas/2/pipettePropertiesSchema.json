@@ -47,7 +47,7 @@
     },
     "configurationsByNozzleMap": {
       "type": "object",
-      "description": "Validated nozzle map key by which configurations are differentiated.",
+      "description": "Pipette configurations keyed by validated sets of nozzle layouts. Maps must be ordered form smallest to largest regarding nozzle count.",
       "items": {
         "type": "object",
         "description": "Tip types by which each set of configration values are differentiated.",
@@ -58,7 +58,7 @@
           "current": { "$ref": "#/definitions/currentRange" },
           "tipOverlaps": {
             "type": "object",
-            "description": "Map by version of tip overlap values with defaults",
+            "description": "Set of versioned tip overlap values with version 0 acting as the default",
             "required": ["v0"],
             "patternProperties": {
               "^v\\d+$": {

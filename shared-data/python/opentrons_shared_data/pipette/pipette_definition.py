@@ -199,7 +199,7 @@ class PressFitPickUpTipConfiguration(BaseModel):
         str, Dict[str, PressAndCamConfigurationValues]
     ] = Field(
         ...,
-        description="The speed, distance, current and overlap configurations for a given partial tip configuration by tip type.",
+        description="The speed, distance, current and tip overlap configurations for a given pipette configuration. Double dictionary is keyed by Valid Nozzle Map Key and Tip Type.",
         alias="configurationsByNozzleMap",
     )
 

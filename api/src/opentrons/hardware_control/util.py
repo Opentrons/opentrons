@@ -127,23 +127,27 @@ def ot2_axis_to_string(axis: Axis) -> str:
 
 def _get_press_and_cam_configuration_values(
     config: Union[CamActionPickUpTipConfiguration, PressFitPickUpTipConfiguration],
-    valid_map_key: str,
+    valid_nozzle_map_key: str,
     active_tip_type: PipetteTipType,
 ) -> PressAndCamConfigurationValues:
     try:
-        return config.configuration_by_nozzle_map[valid_map_key][active_tip_type.name]
+        return config.configuration_by_nozzle_map[valid_nozzle_map_key][
+            active_tip_type.name
+        ]
     except KeyError:
-        default = config.configuration_by_nozzle_map[valid_map_key].get("default")
+        default = config.configuration_by_nozzle_map[valid_nozzle_map_key].get(
+            "default"
+        )
         if default is not None:
             return default
         raise MissingConfigurationData(
-            message=f"Default tip type configuration values do not exist for Nozzle Map {valid_map_key}."
+            message=f"Default tip type configuration values do not exist for Nozzle Map {valid_nozzle_map_key}."
         )
 
 
 def pick_up_speed_by_configuration(
     config: Union[CamActionPickUpTipConfiguration, PressFitPickUpTipConfiguration],
-    valid_map_key: str,
+    valid_nozzle_map_key: str,
     active_tip_type: PipetteTipType,
 ) -> float:
     """
@@ -151,18 +155,18 @@ def pick_up_speed_by_configuration(
 
     Parameters:
         config: A PressFitPickUpTipConfiguration or a CamActionPickUpTipConfiguration (96ch Only) containing values for speed.
-        valid_map_key: The string key representing the current pre-validated map the pipette has been configured to use.
+        valid_nozzle_map_key: The string key representing the current pre-validated map of nozzles the pipette has been configured to use.
         active_tip_type: The PipetteTipType to be attached to the pipette.
     """
     configuration_values = _get_press_and_cam_configuration_values(
-        config, valid_map_key, active_tip_type
+        config, valid_nozzle_map_key, active_tip_type
     )
     return configuration_values.speed
 
 
 def pick_up_distance_by_configuration(
     config: Union[CamActionPickUpTipConfiguration, PressFitPickUpTipConfiguration],
-    valid_map_key: str,
+    valid_nozzle_map_key: str,
     active_tip_type: PipetteTipType,
 ) -> float:
     """
@@ -170,18 +174,18 @@ def pick_up_distance_by_configuration(
 
     Parameters:
         config: A PressFitPickUpTipConfiguration or a CamActionPickUpTipConfiguration (96ch Only) containing values for distance.
-        valid_map_key: The string key representing the current pre-validated map the pipette has been configured to use.
+        valid_nozzle_map_key: The string key representing the current pre-validated map of nozzles the pipette has been configured to use.
         active_tip_type: The PipetteTipType to be attached to the pipette.
     """
     configuration_values = _get_press_and_cam_configuration_values(
-        config, valid_map_key, active_tip_type
+        config, valid_nozzle_map_key, active_tip_type
     )
     return configuration_values.distance
 
 
 def pick_up_current_by_configuration(
     config: Union[CamActionPickUpTipConfiguration, PressFitPickUpTipConfiguration],
-    valid_map_key: str,
+    valid_nozzle_map_key: str,
     active_tip_type: PipetteTipType,
 ) -> float:
     """
@@ -189,18 +193,18 @@ def pick_up_current_by_configuration(
 
     Parameters:
         config: A PressFitPickUpTipConfiguration or a CamActionPickUpTipConfiguration (96ch Only) containing values for current.
-        valid_map_key: The string key representing the current pre-validated map the pipette has been configured to use.
+        valid_nozzle_map_key: The string key representing the current pre-validated map of nozzles the pipette has been configured to use.
         active_tip_type: The PipetteTipType to be attached to the pipette.
     """
     configuration_values = _get_press_and_cam_configuration_values(
-        config, valid_map_key, active_tip_type
+        config, valid_nozzle_map_key, active_tip_type
     )
     return configuration_values.current
 
 
 def nominal_tip_overlap_dictionary_by_configuration(
     configurations: PipetteConfigurations,
-    valid_map_key: str,
+    valid_nozzle_map_key: str,
     active_tip_type: PipetteTipType,
 ) -> Dict[str, Dict[str, float]]:
     """
@@ -208,7 +212,7 @@ def nominal_tip_overlap_dictionary_by_configuration(
 
     Parameters:
         configurations: The PipetterConfigurations of the pipette the tips will be attached to.
-        valid_map_key: The string key representing the current pre-validated map the pipette has been configured to use.
+        valid_nozzle_map_key: The string key representing the current pre-validated map of nozzles the pipette has been configured to use.
         active_tip_type: The PipetteTipType to be attached to the pipette.
     """
     for config in (
@@ -219,12 +223,12 @@ def nominal_tip_overlap_dictionary_by_configuration(
             continue
         try:
             configuration_values = _get_press_and_cam_configuration_values(
-                config, valid_map_key, active_tip_type
+                config, valid_nozzle_map_key, active_tip_type
             )
             return configuration_values.versioned_tip_overlap_dictionary
         except KeyError:
             # No valid key found for the approved nozzle map under this configuration - try the next
             continue
     raise MissingConfigurationData(
-        message=f"No valid tip overlap dictionaries identified for map {valid_map_key} using tip type {active_tip_type}."
+        message=f"No valid tip overlap dictionaries identified for map {valid_nozzle_map_key} using tip type {active_tip_type}."
     )
