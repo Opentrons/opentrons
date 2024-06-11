@@ -109,7 +109,7 @@ export function DropTipWizard(props: DropTipWizardProps): JSX.Element {
   )
 }
 
-// TODO(jh, 06-07-24): All content views could use refactoring and DQA. Create shared components from designs.
+// TODO(jh, 06-07-24): All content views could use refactoring and DQA. Create shared components from designs. EXEC-520.
 export function DropTipWizardContainer(
   props: DropTipWizardContainerProps
 ): JSX.Element {
@@ -140,12 +140,14 @@ export function DropTipWizardSetupType(
     isCommandInProgress,
     isExiting,
     showConfirmExit,
+    errorDetails,
   } = props
 
-  // TODO(jh: 06-10-24): This is not ideal. Refactor this alongside setup type DTWiz DQA.
+  // TODO(jh: 06-10-24): This is not ideal. See EXEC-520.
   const inMotion =
     isCommandInProgress || isExiting || activeMaintenanceRunId == null
-  const simpleWizardPaddingOverrides = inMotion || showConfirmExit
+  const simpleWizardPaddingOverrides =
+    inMotion || showConfirmExit || errorDetails
 
   return createPortal(
     props.isOnDevice ? (
@@ -242,6 +244,7 @@ export const DropTipWizardContent = (
         header={errorDetails?.header ?? t('error_dropping_tips')}
         subHeader={subHeader}
         justifyContentForOddButton={JUSTIFY_FLEX_END}
+        marginTop={`-${SPACING.spacing68}`} // See EXEC-520. This clearly isn't ideal.
       >
         {button}
       </SimpleWizardBody>
