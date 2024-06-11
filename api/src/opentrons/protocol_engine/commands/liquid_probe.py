@@ -80,7 +80,13 @@ class LiquidProbeImplementation(
             well_location=params.wellLocation,
             current_well=current_well,
         )
-        z_pos = await self._pipetting.liquid_probe_in_place(pipette_id=pipette_id)
+        well_def = self._movement._state_store.labware.get_well_definition(
+            labware_id, well_name
+        )
+        well_depth = well_def.depth
+        z_pos = await self._pipetting.liquid_probe_in_place(
+            pipette_id=pipette_id, max_z_dist=well_depth
+        )
 
         return SuccessData(
             public=LiquidProbeResult(

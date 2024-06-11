@@ -175,6 +175,7 @@ class LiquidHandler(
     async def liquid_probe(
         self,
         mount: MountArgType,
+        max_z_dist: float,
     ) -> float:
         """Search for and return liquid level height using this pipette
         at the current location.

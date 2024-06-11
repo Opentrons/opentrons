@@ -2561,6 +2561,7 @@ class OT3API(
     async def liquid_probe(
         self,
         mount: Union[top_types.Mount, OT3Mount],
+        max_z_dist: float, # use!
         probe_settings: Optional[LiquidProbeSettings] = None,
         probe: Optional[InstrumentProbeType] = None,
     ) -> float:

@@ -63,6 +63,7 @@ class PipettingHandler(TypingProtocol):
     async def liquid_probe_in_place(
         self,
         pipette_id: str,
+        max_z_dist: float,
     ) -> float:
         """Detect liquid level."""
 
@@ -161,13 +162,16 @@ class HardwarePipettingHandler(PipettingHandler):
     async def liquid_probe_in_place(
         self,
         pipette_id: str,
+        max_z_dist: float,
     ) -> float:
         """Detect liquid level."""
         hw_pipette = self._state_view.pipettes.get_hardware_pipette(
             pipette_id=pipette_id,
             attached_pipettes=self._hardware_api.attached_instruments,
         )
-        z_pos = await self._hardware_api.liquid_probe(mount=hw_pipette.mount)
+        z_pos = await self._hardware_api.liquid_probe(
+            mount=hw_pipette.mount, max_z_dist=max_z_dist
+        )
         return float(z_pos)
 
     @contextmanager
@@ -262,6 +266,7 @@ class VirtualPipettingHandler(PipettingHandler):
     async def liquid_probe_in_place(
         self,
         pipette_id: str,
+        max_z_dist: float,
     ) -> float:
         """Detect liquid level."""
         return 0.0  # fix
