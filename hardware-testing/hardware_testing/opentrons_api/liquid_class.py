@@ -284,7 +284,7 @@ class LiquidClassPipette(InstrumentContext):
 
 
 GLYCEROL_50_PERCENT: Dict[str, Dict[str, Liquid]] = {
-    "p1000_single_v3.6": {
+    "flex_1channel_1000": {
         "opentrons_flex_96_filtertiprack_50ul": Liquid(
             volume=Volume(
                 min=3.0,
