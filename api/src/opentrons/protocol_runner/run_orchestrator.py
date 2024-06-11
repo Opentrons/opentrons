@@ -19,6 +19,7 @@ from ..protocol_engine import (
     StateSummary,
     CommandPointer,
     CommandSlice,
+    DeckType
 )
 from ..protocol_engine.types import (
     PostRunHardwareState,
@@ -329,3 +330,7 @@ class RunOrchestrator:
     def get_robot_type(self) -> RobotType:
         """Get engine robot type."""
         return self._protocol_engine.state_view.config.robot_type
+
+    def get_deck_type(self) -> DeckType:
+        """Get engine deck type."""
+        return self._protocol_engine.state_view.config.deck_type
