@@ -55,7 +55,11 @@ export function SelectDestWells(props: SelectDestWellsProps): JSX.Element {
   const sourceWellCount = state.sourceWells?.length ?? 0
 
   const handleClickNext = (): void => {
-    if (selectedWellCount === 1 || selectedWellCount === sourceWellCount) {
+    if (
+      selectedWellCount === 1 ||
+      selectedWellCount === sourceWellCount ||
+      sourceWellCount === 1
+    ) {
       dispatch({
         type: 'SET_DEST_WELLS',
         wells: Object.keys(selectedWells),
