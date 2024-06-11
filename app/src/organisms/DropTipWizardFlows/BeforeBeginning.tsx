@@ -61,13 +61,7 @@ export const BeforeBeginning = ({
   if (isOnDevice) {
     return (
       <>
-        <Flex
-          flexDirection={DIRECTION_COLUMN}
-          padding={
-            issuedCommandsType === 'fixit' ? `${SPACING.spacing32}` : undefined
-          }
-          height="100%"
-        >
+        <Flex flexDirection={DIRECTION_COLUMN} height="100%">
           <Flex css={ODD_TITLE_STYLE}>{buildTopText()}</Flex>
           <Flex paddingBottom={SPACING.spacing8}>
             <MediumButton

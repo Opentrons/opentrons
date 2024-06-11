@@ -46,26 +46,14 @@ type ConfirmPositionProps = DropTipWizardContainerProps & {
 }
 
 const ConfirmPosition = (props: ConfirmPositionProps): JSX.Element | null => {
-  const {
-    handlePipetteAction,
-    handleGoBack,
-    isOnDevice,
-    currentStep,
-    issuedCommandsType,
-  } = props
+  const { handlePipetteAction, handleGoBack, isOnDevice, currentStep } = props
   const { i18n, t } = useTranslation(['drop_tip_wizard', 'shared'])
   const flowTitle = t('drop_tips')
 
   if (isOnDevice) {
     return (
       <>
-        <Flex
-          padding={
-            issuedCommandsType === 'fixit' ? `${SPACING.spacing32}` : undefined
-          }
-          flexDirection={DIRECTION_COLUMN}
-          gridGap={SPACING.spacing32}
-        >
+        <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing32}>
           <Flex
             gridGap={SPACING.spacing24}
             justifyContent={JUSTIFY_CENTER}
@@ -170,7 +158,6 @@ export const JogToPosition = (
     body,
     currentStep,
     isOnDevice,
-    issuedCommandsType,
   } = props
   const { i18n, t } = useTranslation(['drop_tip_wizard', 'shared'])
   const [
@@ -217,9 +204,6 @@ export const JogToPosition = (
         flexDirection={DIRECTION_COLUMN}
         height="100%"
         gridGap={SPACING.spacing32}
-        padding={
-          issuedCommandsType === 'fixit' ? `${SPACING.spacing32}` : undefined
-        }
       >
         <JogControls jog={handleJog} isOnDevice={true} />
         <Flex width="100%" justifyContent={JUSTIFY_SPACE_BETWEEN}>

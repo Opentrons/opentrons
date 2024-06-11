@@ -48,7 +48,6 @@ export const ChooseLocation = (
     robotType,
     moveToAddressableArea,
     isOnDevice,
-    issuedCommandsType,
   } = props
   const { i18n, t } = useTranslation(['drop_tip_wizard', 'shared'])
   const deckDef = getDeckDefFromRobotType(robotType)
@@ -70,13 +69,7 @@ export const ChooseLocation = (
 
   if (isOnDevice) {
     return (
-      <Flex
-        flexDirection={DIRECTION_COLUMN}
-        gridGap={SPACING.spacing32}
-        padding={
-          issuedCommandsType === 'fixit' ? `${SPACING.spacing32}` : undefined
-        }
-      >
+      <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing32}>
         <Flex flexDirection={DIRECTION_ROW} flex="1">
           <Flex
             flexDirection={DIRECTION_COLUMN}

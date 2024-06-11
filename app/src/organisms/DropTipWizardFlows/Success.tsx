@@ -21,13 +21,7 @@ type SuccessProps = DropTipWizardContainerProps & {
   handleProceed: () => void
 }
 export const Success = (props: SuccessProps): JSX.Element => {
-  const {
-    message,
-    proceedText,
-    handleProceed,
-    isOnDevice,
-    issuedCommandsType,
-  } = props
+  const { message, proceedText, handleProceed, isOnDevice } = props
 
   const { i18n } = useTranslation(['drop_tip_wizard', 'shared'])
 
@@ -37,9 +31,6 @@ export const Success = (props: SuccessProps): JSX.Element => {
       header={i18n.format(message, 'capitalize')}
       isSuccess
       paddingX={SPACING.spacing32}
-      padding={
-        issuedCommandsType === 'fixit' ? `${SPACING.spacing32}` : undefined
-      }
     >
       {isOnDevice ? (
         <Flex justifyContent={JUSTIFY_FLEX_END} width="100%">
