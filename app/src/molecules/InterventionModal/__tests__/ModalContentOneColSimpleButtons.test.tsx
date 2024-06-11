@@ -65,6 +65,21 @@ describe('InterventionModal', () => {
     expect(inputElForButtonFromButtonText('third button').checked).toBeTruthy()
   })
 
+  it('can start with a button selected', () => {
+    render(
+      <ModalContentOneColSimpleButtons
+        topText={'top text'}
+        firstButton={{ label: 'first button', value: 'first' }}
+        secondButton={{ label: 'second button', value: 'second' }}
+        furtherButtons={[{ label: 'third button', value: 'third' }]}
+        initialSelected={'second'}
+      />
+    )
+    expect(inputElForButtonFromButtonText('first button').checked).toBeFalsy()
+    expect(inputElForButtonFromButtonText('second button').checked).toBeTruthy()
+    expect(inputElForButtonFromButtonText('third button').checked).toBeFalsy()
+  })
+
   it('propagates individual button onChange', () => {
     const onChange = vi.fn()
     render(
