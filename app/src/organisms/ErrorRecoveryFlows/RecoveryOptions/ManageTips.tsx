@@ -11,7 +11,11 @@ import {
 import { FLEX_ROBOT_TYPE, OT2_ROBOT_TYPE } from '@opentrons/shared-data'
 
 import { RadioButton } from '../../../atoms/buttons'
-import { ODD_SECTION_TITLE_STYLE, RECOVERY_MAP } from '../constants'
+import {
+  ERROR_KINDS,
+  ODD_SECTION_TITLE_STYLE,
+  RECOVERY_MAP,
+} from '../constants'
 import { RecoveryFooterButtons, RecoverySingleColumnContent } from '../shared'
 import { DropTipWizardFlows } from '../../DropTipWizardFlows'
 
@@ -106,8 +110,14 @@ export function BeginRemoval({
 
 // TODO(jh, 06-07-24): Ensure that ALL errors within DT Flows provide routing back to ER for proper error handling, EXEC-512.
 function DropTipFlowsContainer(props: RecoveryContentProps): JSX.Element {
-  const { tipStatusUtils, routeUpdateActions, recoveryCommands, isFlex } = props
-  const { DROP_TIP_FLOWS, ROBOT_CANCELING } = RECOVERY_MAP
+  const {
+    tipStatusUtils,
+    routeUpdateActions,
+    recoveryCommands,
+    isFlex,
+    errorKind,
+  } = props
+  const { DROP_TIP_FLOWS, ROBOT_CANCELING, RETRY_NEW_TIPS } = RECOVERY_MAP
   const { proceedToRouteAndStep, setRobotInMotion } = routeUpdateActions
   const { setTipStatusResolved } = tipStatusUtils
   const { cancelRun } = recoveryCommands
@@ -117,7 +127,11 @@ function DropTipFlowsContainer(props: RecoveryContentProps): JSX.Element {
   ) as PipetteWithTip // Safe as we have to have tips to get to this point in the flow.
 
   const onCloseFlow = (): void => {
-    void setTipStatusResolved(onEmptyCache, onTipsDetected)
+    if (errorKind === ERROR_KINDS.OVERPERSSURE_WHILE_ASPIRATING) {
+      void proceedToRouteAndStep(RETRY_NEW_TIPS.ROUTE)
+    } else {
+      void setTipStatusResolved(onEmptyCache, onTipsDetected)
+    }
   }
 
   const onEmptyCache = (): void => {

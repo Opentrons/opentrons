@@ -69,7 +69,7 @@ describe('ErrorRecoveryContent', () => {
     ROBOT_CANCELING,
     ROBOT_RESUMING,
     ROBOT_IN_MOTION,
-    ROBOT_RETRYING_COMMAND,
+    ROBOT_RETRYING_STEP,
     CANCEL_RUN,
     DROP_TIP_FLOWS,
   } = RECOVERY_MAP
@@ -186,7 +186,7 @@ describe('ErrorRecoveryContent', () => {
     screen.getByText('MOCK_IN_PROGRESS')
   })
 
-  it(`returns RecoveryInProgressModal when the route is ${ROBOT_RETRYING_COMMAND.ROUTE}`, () => {
+  it(`returns RecoveryInProgressModal when the route is ${ROBOT_RETRYING_STEP.ROUTE}`, () => {
     props = {
       ...props,
       recoveryMap: {

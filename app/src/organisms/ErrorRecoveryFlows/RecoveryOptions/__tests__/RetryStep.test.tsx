@@ -17,7 +17,7 @@ const render = (props: React.ComponentProps<typeof RetryStep>) => {
 }
 
 describe('RecoveryFooterButtons', () => {
-  const { RETRY_FAILED_COMMAND, ROBOT_RETRYING_COMMAND } = RECOVERY_MAP
+  const { RETRY_FAILED_COMMAND, ROBOT_RETRYING_STEP } = RECOVERY_MAP
   let props: React.ComponentProps<typeof RetryStep>
   let mockGoBackPrevStep: Mock
 
@@ -79,7 +79,7 @@ describe('RecoveryFooterButtons', () => {
     await waitFor(() => {
       expect(setRobotInMotionMock).toHaveBeenCalledWith(
         true,
-        ROBOT_RETRYING_COMMAND.ROUTE
+        ROBOT_RETRYING_STEP.ROUTE
       )
     })
     await waitFor(() => {
