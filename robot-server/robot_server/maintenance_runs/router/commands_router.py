@@ -3,15 +3,12 @@ import textwrap
 from typing import Optional, Union
 from typing_extensions import Final, Literal
 
-from anyio import move_on_after
 from fastapi import APIRouter, Depends, Query, status
 
 from opentrons.protocol_engine import (
     CommandPointer,
-    ProtocolEngine,
     commands as pe_commands,
 )
-from opentrons.protocol_runner import RunOrchestrator
 from opentrons.protocol_engine.errors import CommandDoesNotExistError
 
 from robot_server.errors.error_responses import ErrorDetails, ErrorBody
@@ -132,7 +129,7 @@ async def create_run_command(
             " the default was 30 seconds, not infinite."
         ),
     ),
-    runId: str = Depends(get_current_run_from_url),
+    run_id: str = Depends(get_current_run_from_url),
     check_estop: bool = Depends(require_estop_in_good_state),
 ) -> PydanticResponse[SimpleBody[pe_commands.Command]]:
     """Enqueue a protocol command.
@@ -144,9 +141,10 @@ async def create_run_command(
             Else, return immediately. Comes from a query parameter in the URL.
         timeout: The maximum time, in seconds, to wait before returning.
             Comes from a query parameter in the URL.
-        protocol_engine: The run's `ProtocolEngine` on which the new
+        engine_store: The run's `EngineStore` on which the new
             command will be enqueued.
         check_estop: Dependency to verify the estop is in a valid state.
+        run_id: Run identification to attach command to.
     """
     # TODO(mc, 2022-05-26): increment the HTTP API version so that default
     # behavior is to pass through `command_intent` without overriding it

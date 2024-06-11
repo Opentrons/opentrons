@@ -5,11 +5,23 @@ from datetime import datetime
 from typing import List, Optional, Callable
 
 from opentrons.protocol_engine.errors.exceptions import EStopActivatedError
-from opentrons.protocol_engine.types import PostRunHardwareState
-from opentrons_shared_data.robot.dev_types import RobotType
-from opentrons_shared_data.robot.dev_types import RobotTypeEnum
+from opentrons.protocol_engine.types import PostRunHardwareState, DeckConfigurationType
+from opentrons.protocol_engine import (
+    Config as ProtocolEngineConfig,
+    DeckType,
+    LabwareOffsetCreate,
+    StateSummary,
+    create_protocol_engine,
+    CommandSlice,
+    CommandPointer,
+    Command,
+    CommandCreate,
+    LabwareOffset,
+)
+from opentrons.protocol_runner import RunResult, RunOrchestrator
 
 from opentrons.config import feature_flags
+
 from opentrons.hardware_control import HardwareControlAPI
 from opentrons.hardware_control.types import (
     EstopState,
@@ -17,22 +29,10 @@ from opentrons.hardware_control.types import (
     EstopStateNotification,
     HardwareEventHandler,
 )
-from opentrons.protocol_runner import LiveRunner, RunResult, RunOrchestrator
-from opentrons.protocol_engine import (
-    Config as ProtocolEngineConfig,
-    DeckType,
-    LabwareOffsetCreate,
-    ProtocolEngine,
-    StateSummary,
-    create_protocol_engine,
-    CommandSlice,
-    CommandPointer,
-    Command,
-    CommandCreate,
-)
 
-from opentrons.protocol_engine.types import DeckConfigurationType
-
+from opentrons_shared_data.robot.dev_types import RobotType, RobotTypeEnum
+from opentrons_shared_data.labware.dev_types import LabwareUri
+from opentrons_shared_data.labware.labware_definition import LabwareDefinition
 
 _log = logging.getLogger(__name__)
 
@@ -246,3 +246,11 @@ class MaintenanceEngineStore:
         return await self.run_orchestrator.add_command_and_wait_for_interval(
             command=request, wait_until_complete=wait_until_complete, timeout=timeout
         )
+
+    def add_labware_offset(self, request: LabwareOffsetCreate) -> LabwareOffset:
+        """Add a new labware offset to state."""
+        return self.run_orchestrator.add_labware_offset(request)
+
+    def add_labware_definition(self, definition: LabwareDefinition) -> LabwareUri:
+        """Add a new labware definition to state."""
+        return self.run_orchestrator.add_labware_definition(definition)

@@ -11,16 +11,14 @@ from opentrons.types import DeckSlotName
 from opentrons.hardware_control import API
 from opentrons.hardware_control.types import EstopStateNotification, EstopState
 from opentrons.protocol_engine import (
-    ProtocolEngine,
     StateSummary,
     types as pe_types,
 )
-from opentrons.protocol_runner import LiveRunner, RunResult
+from opentrons.protocol_runner import RunResult
 
 from robot_server.maintenance_runs.maintenance_engine_store import (
     MaintenanceEngineStore,
     EngineConflictError,
-    NoRunnerEnginePairError,
     handle_estop_event,
     NoRunOrchestrator,
 )

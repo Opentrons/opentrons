@@ -7,7 +7,6 @@ from decoy import Decoy, matchers
 from opentrons.protocol_engine import (
     CommandSlice,
     CommandPointer,
-    ProtocolEngine,
     commands as pe_commands,
     errors as pe_errors,
 )
