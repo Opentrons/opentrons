@@ -15,7 +15,7 @@ Before running any of these scripts, the release in question must be tagged and 
 
 **IMPORTANT**: All scripts will do a dryrun by default. **Always** do a dryrun before deploying for real. After you have inspected your dryrun, run the actual deploy by passing the optional `--deploy` flag.
 
-Additionally, the Promote Sandbox to Staging and Staging to Production scripts will prompt you to confirm that you are using the correct AWS profile. Press either `y` to confirm and proceed or `n` to cancel.
+Additionally, the `promote-to-staging` and `promote-to-production` scripts will confirm that you are using the correct AWS profile. At the prompt, enter either `y` to confirm and proceed or `n` to cancel.
 
 ### Cut a new version to sandbox
 
