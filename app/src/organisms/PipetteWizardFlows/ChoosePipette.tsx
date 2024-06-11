@@ -187,6 +187,7 @@ export const ChoosePipette = (props: ChoosePipetteProps): JSX.Element => {
                 onSelect={event => {
                   setSelectedPipette(event.target.value as any)
                 }}
+                initialSelected={SINGLE_MOUNT_PIPETTES}
               />
               <Flex justifyContent={JUSTIFY_FLEX_END}>
                 <SmallButton
