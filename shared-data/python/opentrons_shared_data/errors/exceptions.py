@@ -628,6 +628,22 @@ class LiquidNotFoundError(RoboticsControlError):
             wrapping,
         )
 
+class TipHitWellBottomError(RoboticsControlError):
+    """Error raised if tip hits bottom of well while trying to detect liquid level."""
+
+    def __init__(
+        self,
+        message: Optional[str] = None,
+        detail: Optional[Dict[str, str]] = None,
+        wrapping: Optional[Sequence[EnumeratedError]] = None,
+    ) -> None:
+        """Initialize TipHitWellBottomError."""
+        super().__init__(
+            ErrorCodes.TIP_HIT_WELL_BOTTOM,
+            message,
+            detail,
+            wrapping,
+        )
 
 class LabwareDroppedError(RoboticsInteractionError):
     """An error indicating that the gripper dropped labware it was holding."""
