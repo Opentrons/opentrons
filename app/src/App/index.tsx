@@ -20,7 +20,7 @@ export const App = (): JSX.Element | null => {
   // render null until getIsOnDevice returns the isOnDevice value from config
   return hasConfigLoaded ? (
     <>
-      <GlobalStyle isOnDevice={isOnDevice} />
+      <GlobalStyle />
       <Flex
         position={POSITION_FIXED}
         flexDirection={DIRECTION_ROW}
