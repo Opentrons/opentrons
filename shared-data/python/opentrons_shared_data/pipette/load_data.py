@@ -10,6 +10,7 @@ from .. import load_shared_data, get_shared_data_root
 from .pipette_definition import (
     PipetteConfigurations,
     PipetteLiquidPropertiesDefinition,
+    ValidNozzleMaps,
 )
 from .model_constants import MOUNT_CONFIG_LOOKUP_TABLE, _MAP_KEY_TO_V2
 from .types import (
@@ -259,3 +260,18 @@ def load_definition(
             "mount_configurations": mount_configs,
         }
     )
+
+
+def load_valid_nozzle_maps(
+    model: PipetteModelType,
+    channels: PipetteChannelType,
+    version: PipetteVersionType,
+) -> ValidNozzleMaps:
+    if (
+        version.major not in PipetteModelMajorVersion
+        or version.minor not in PipetteModelMinorVersion
+    ):
+        raise KeyError("Pipette version not found.")
+
+    physical_dict = _physical(channels, model, version)
+    return ValidNozzleMaps.parse_obj(physical_dict["validNozzleMaps"])
