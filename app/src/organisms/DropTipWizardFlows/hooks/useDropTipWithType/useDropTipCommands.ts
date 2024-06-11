@@ -11,13 +11,13 @@ import type {
   AddressableAreaName,
   PipetteModelSpecs,
 } from '@opentrons/shared-data'
-import type { CommandData } from '@opentrons/api-client'
+import type { CommandData, PipetteData } from '@opentrons/api-client'
 import type {
   Axis,
   Sign,
   StepSize,
 } from '../../../../molecules/JogControls/types'
-import type { DropTipFlowsStep, FixitCommandTypeUtils } from '../../types'
+import type { DropTipFlowsStep } from '../../types'
 import type { SetRobotErrorDetailsParams } from '../errors'
 import type { UseDTWithTypeParams } from '..'
 import type { RunCommandByCommandTypeParams } from './useDropTipCreateCommands'
@@ -50,7 +50,6 @@ export interface UseDropTipCommandsResult {
 // Returns setup commands used in Drop Tip Wizard.
 export function useDropTipCommands({
   issuedCommandsType,
-  fixitCommandTypeUtils,
   toggleIsExiting,
   activeMaintenanceRunId,
   runCommand,
@@ -75,8 +74,8 @@ export function useDropTipCommands({
   const handleCleanUpAndClose = (homeOnExit: boolean = true): Promise<void> => {
     return new Promise(() => {
       if (issuedCommandsType === 'fixit') {
-        const { onCloseFlow } = fixitCommandTypeUtils as FixitCommandTypeUtils
-        onCloseFlow()
+        closeFlow()
+        return Promise.resolve()
       } else {
         if (!hasSeenClose) {
           setHasSeenClose(true)
@@ -256,6 +255,20 @@ const buildMoveToAACommand = (
       stayAtHighestPossibleZ: true,
       addressableAreaName: addressableAreaFromConfig,
       offset: { x: 0, y: 0, z: 0 },
+    },
+  }
+}
+
+export const buildLoadPipetteCommand = (
+  mount: PipetteData['mount'],
+  pipetteName: PipetteModelSpecs['name']
+): CreateCommand => {
+  return {
+    commandType: 'loadPipette',
+    params: {
+      pipetteId: MANAGED_PIPETTE_ID,
+      mount,
+      pipetteName,
     },
   }
 }

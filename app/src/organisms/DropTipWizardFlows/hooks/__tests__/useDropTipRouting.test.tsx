@@ -1,4 +1,4 @@
-import { describe, it, expect } from 'vitest'
+import { describe, it, expect, vi } from 'vitest'
 import { renderHook, act } from '@testing-library/react'
 import head from 'lodash/head'
 
@@ -84,5 +84,35 @@ describe('useDropTipRouting', () => {
     expect(result.current.currentRoute).toBe(DT_ROUTES.BLOWOUT)
     expect(result.current.currentStep).toBe(head(DT_ROUTES.BLOWOUT))
     expect(result.current.currentStepIdx).toBe(0)
+  })
+})
+
+describe('useExternalMapUpdates', () => {
+  it('should call trackCurrentMap when the drop tip flow map updates', async () => {
+    const mockTrackCurrentMap = vi.fn()
+
+    const mockFixitUtils = {
+      trackCurrentMap: mockTrackCurrentMap,
+    } as any
+
+    const { result } = renderHook(() => useDropTipRouting(mockFixitUtils))
+
+    await act(async () => {
+      await result.current.proceedToRoute(DT_ROUTES.BLOWOUT)
+    })
+
+    expect(mockTrackCurrentMap).toHaveBeenCalledWith({
+      currentRoute: DT_ROUTES.BLOWOUT,
+      currentStep: expect.any(String),
+    })
+
+    await act(async () => {
+      await result.current.proceed()
+    })
+
+    expect(mockTrackCurrentMap).toHaveBeenCalledWith({
+      currentRoute: DT_ROUTES.BLOWOUT,
+      currentStep: expect.any(String),
+    })
   })
 })

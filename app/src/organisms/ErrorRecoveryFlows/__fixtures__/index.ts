@@ -43,4 +43,4 @@ export const mockRecoveryContentProps: RecoveryContentProps = {
   routeUpdateActions: {} as any,
   recoveryCommands: {} as any,
   hasLaunchedRecovery: true,
-}
+} as any
