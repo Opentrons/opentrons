@@ -19,7 +19,7 @@ from ..protocol_engine import (
     StateSummary,
     CommandPointer,
     CommandSlice,
-    DeckType
+    DeckType,
 )
 from ..protocol_engine.types import (
     PostRunHardwareState,
