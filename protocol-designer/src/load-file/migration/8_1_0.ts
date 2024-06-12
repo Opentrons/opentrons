@@ -148,7 +148,6 @@ export const migrateFile = (
         )
       : []
 
-      console.log(commands)
   return {
     ...appData,
     designerApplication: {
