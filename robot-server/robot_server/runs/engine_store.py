@@ -138,7 +138,7 @@ class EngineStore:
 
     @property
     def current_run_id(self) -> Optional[str]:
-        """Get the run identifier associated with the current engine/runner pair."""
+        """Get the run identifier associated with the current engine."""
         return (
             self.run_orchestrator.run_id if self._run_orchestrator is not None else None
         )
