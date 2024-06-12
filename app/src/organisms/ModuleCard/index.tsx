@@ -153,12 +153,12 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
   const [showFirmwareToast, setShowFirmwareToast] = React.useState(hasUpdated)
   const { makeToast } = useToaster()
   if (showFirmwareToast) {
-    makeToast(t('firmware_updated_successfully'), SUCCESS_TOAST)
+    makeToast(t('firmware_updated_successfully') as string, SUCCESS_TOAST)
     setShowFirmwareToast(false)
   }
 
   const handleFirmwareUpdateClick = (): void => {
-    robotName && handleModuleApiRequests(robotName, module.serialNumber)
+    robotName != null && handleModuleApiRequests(robotName, module.serialNumber)
   }
 
   const isEstopNotDisengaged = useIsEstopNotDisengaged(robotName)

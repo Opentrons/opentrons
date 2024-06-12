@@ -251,7 +251,7 @@ export function ChooseProtocolSlideoutComponent(
               })
             : null
         if (error != null) {
-          errors.push(error)
+          errors.push(error as string)
         }
         return (
           <InputField
@@ -314,7 +314,7 @@ export function ChooseProtocolSlideoutComponent(
                       if (i === index) {
                         return {
                           ...parameter,
-                          value: !parameter.value,
+                          value: !Boolean(parameter.value),
                         }
                       }
                       return parameter

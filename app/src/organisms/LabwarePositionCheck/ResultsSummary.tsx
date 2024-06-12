@@ -50,6 +50,7 @@ import type {
   LabwareOffsetCreateData,
 } from '@opentrons/api-client'
 import type { ResultsSummaryStep, WorkingOffset } from './types'
+import type { TFunction } from 'i18next'
 
 const LPC_HELP_LINK_URL =
   'https://support.opentrons.com/s/article/How-Labware-Offsets-work-on-the-OT-2'
@@ -298,7 +299,12 @@ const OffsetTable = (props: OffsetTableProps): JSX.Element => {
                   as="p"
                   textTransform={TYPOGRAPHY.textTransformCapitalize}
                 >
-                  {getDisplayLocation(location, labwareDefinitions, t, i18n)}
+                  {getDisplayLocation(
+                    location,
+                    labwareDefinitions,
+                    t as TFunction,
+                    i18n
+                  )}
                 </StyledText>
               </TableDatum>
               <TableDatum>

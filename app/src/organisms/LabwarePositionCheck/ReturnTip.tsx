@@ -32,6 +32,7 @@ import type {
 import type { VectorOffset } from '@opentrons/api-client'
 import type { useChainRunCommands } from '../../resources/runs'
 import type { ReturnTipStep } from './types'
+import type { TFunction } from 'i18next'
 
 interface ReturnTipProps extends ReturnTipStep {
   protocolData: CompletedProtocolAnalysis
@@ -65,7 +66,7 @@ export const ReturnTip = (props: ReturnTipProps): JSX.Element | null => {
   const displayLocation = getDisplayLocation(
     location,
     getLabwareDefinitionsFromCommands(protocolData.commands),
-    t,
+    t as TFunction,
     i18n
   )
   const labwareDisplayName = getLabwareDisplayName(labwareDef)
@@ -127,7 +128,7 @@ export const ReturnTip = (props: ReturnTipProps): JSX.Element | null => {
           {
             commandType: 'moveLabware' as const,
             params: {
-              labwareId: labwareId,
+              labwareId,
               newLocation: 'offDeck',
               strategy: 'manualMoveWithoutPause',
             },
@@ -145,7 +146,7 @@ export const ReturnTip = (props: ReturnTipProps): JSX.Element | null => {
           {
             commandType: 'moveLabware' as const,
             params: {
-              labwareId: labwareId,
+              labwareId,
               newLocation: 'offDeck',
               strategy: 'manualMoveWithoutPause',
             },
@@ -175,8 +176,8 @@ export const ReturnTip = (props: ReturnTipProps): JSX.Element | null => {
         {
           commandType: 'moveToWell' as const,
           params: {
-            pipetteId: pipetteId,
-            labwareId: labwareId,
+            pipetteId,
+            labwareId,
             wellName: 'A1',
             wellLocation: {
               origin: 'top' as const,
@@ -187,8 +188,8 @@ export const ReturnTip = (props: ReturnTipProps): JSX.Element | null => {
         {
           commandType: 'dropTip' as const,
           params: {
-            pipetteId: pipetteId,
-            labwareId: labwareId,
+            pipetteId,
+            labwareId,
             wellName: 'A1',
             wellLocation: {
               origin: 'default' as const,

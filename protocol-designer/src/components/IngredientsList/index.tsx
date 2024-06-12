@@ -87,10 +87,10 @@ const LiquidGroupCard = (props: LiquidGroupCardProps): JSX.Element | null => {
 
       {wellsWithIngred.map((well, i) => {
         const wellIngredForCard = labwareWellContents[well][groupId]
-        const volume = wellIngredForCard && wellIngredForCard.volume
+        const volume =
+          wellIngredForCard != null ? wellIngredForCard.volume : null
 
         if (volume == null) {
-          // TODO: Ian 2018-06-07 use assert
           console.warn(
             `Got null-ish volume for well: ${well}, ingred: ${groupId}`
           )
@@ -100,7 +100,7 @@ const LiquidGroupCard = (props: LiquidGroupCardProps): JSX.Element | null => {
         return (
           <IngredIndividual
             key={well}
-            name={showName ? `${ingredGroup.name || ''} ${i + 1}` : null}
+            name={showName ? `${ingredGroup.name ?? ''} ${i + 1}` : null}
             wellName={well}
             canDelete
             volume={volume}
@@ -137,15 +137,19 @@ function IngredIndividual(props: IndividProps): JSX.Element {
   return (
     <PDListItem border hoverable>
       <span>{wellName}</span>
-      <span>{volume ? volume + ` ${t('units.microliter')}` : '-'}</span>
-      {name && <span>{name}</span>}
+      <span>
+        {Boolean(volume) ? volume + ` ${t('units.microliter')}` : '-'}
+      </span>
+      {name != null ? <span>{name}</span> : null}
       {canDelete && (
         <IconButton
           className={styles.close_icon}
           name="close"
           onClick={() => {
             if (
-              window.confirm(t('are_you_sure_delete_well', { well: wellName }))
+              window.confirm(
+                t('are_you_sure_delete_well', { well: wellName }) as string
+              )
             )
               removeWellsContents({ liquidGroupId: groupId, wells: [wellName] })
           }}
@@ -173,7 +177,9 @@ export function IngredientsList(): JSX.Element {
   const dispatch = useDispatch<ThunkDispatch<any>>()
 
   const labwareWellContents =
-    (selectedLabwareId && allLabwareWellContents[selectedLabwareId]) || {}
+    (selectedLabwareId != null
+      ? allLabwareWellContents[selectedLabwareId]
+      : null) ?? {}
 
   return (
     <SidePanel title={t('nameAndLiquids')}>

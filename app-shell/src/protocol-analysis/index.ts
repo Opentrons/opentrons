@@ -30,7 +30,7 @@ export function registerProtocolAnalysis(
   selectPythonPath(pathToPythonOverride)
 
   handleConfigChange(CONFIG_PYTHON_PATH_TO_PYTHON_OVERRIDE, newValue => {
-    selectPythonPath(newValue)
+    selectPythonPath(newValue as string | null)
   })
 
   return function handleIncomingAction(action: Action): void {

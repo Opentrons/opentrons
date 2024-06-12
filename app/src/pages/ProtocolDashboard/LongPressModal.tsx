@@ -72,12 +72,12 @@ export function LongPressModal({
       } else {
         pinnedProtocolIds.push(protocolId)
         handlePinnedProtocolIds(pinnedProtocolIds)
-        makeSnackbar(t('pinned_protocol'))
+        makeSnackbar(t('pinned_protocol') as string)
       }
     } else {
       pinnedProtocolIds = pinnedProtocolIds.filter(p => p !== protocolId)
       handlePinnedProtocolIds(pinnedProtocolIds)
-      makeSnackbar(t('unpinned_protocol'))
+      makeSnackbar(t('unpinned_protocol') as string)
     }
   }
 

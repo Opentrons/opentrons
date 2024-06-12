@@ -26,6 +26,8 @@ import {
   getLabwareDefinitionsFromCommands,
 } from './utils/labware'
 import { getDisplayLocation } from './utils/getDisplayLocation'
+import { useSelector } from 'react-redux'
+import { getIsOnDevice } from '../../redux/config'
 
 import type {
   CompletedProtocolAnalysis,
@@ -41,8 +43,7 @@ import type {
   WorkingOffset,
 } from './types'
 import type { LabwareOffset } from '@opentrons/api-client'
-import { useSelector } from 'react-redux'
-import { getIsOnDevice } from '../../redux/config'
+import type { TFunction } from 'i18next'
 
 interface PickUpTipProps extends PickUpTipStep {
   protocolData: CompletedProtocolAnalysis
@@ -92,7 +93,7 @@ export const PickUpTip = (props: PickUpTipProps): JSX.Element | null => {
   const displayLocation = getDisplayLocation(
     location,
     getLabwareDefinitionsFromCommands(protocolData.commands),
-    t,
+    t as TFunction,
     i18n
   )
   const labwareDisplayName = getLabwareDisplayName(labwareDef)
@@ -180,8 +181,8 @@ export const PickUpTip = (props: PickUpTipProps): JSX.Element | null => {
         {
           commandType: 'moveToWell' as const,
           params: {
-            pipetteId: pipetteId,
-            labwareId: labwareId,
+            pipetteId,
+            labwareId,
             wellName: 'A1',
             wellLocation: { origin: 'top' as const },
           },
@@ -268,7 +269,7 @@ export const PickUpTip = (props: PickUpTipProps): JSX.Element | null => {
           {
             commandType: 'moveLabware' as const,
             params: {
-              labwareId: labwareId,
+              labwareId,
               newLocation: 'offDeck',
               strategy: 'manualMoveWithoutPause',
             },
@@ -286,7 +287,7 @@ export const PickUpTip = (props: PickUpTipProps): JSX.Element | null => {
           {
             commandType: 'moveLabware' as const,
             params: {
-              labwareId: labwareId,
+              labwareId,
               newLocation: 'offDeck',
               strategy: 'manualMoveWithoutPause',
             },
@@ -337,8 +338,8 @@ export const PickUpTip = (props: PickUpTipProps): JSX.Element | null => {
         {
           commandType: 'moveToWell' as const,
           params: {
-            pipetteId: pipetteId,
-            labwareId: labwareId,
+            pipetteId,
+            labwareId,
             wellName: 'A1',
             wellLocation: { origin: 'top' as const },
           },
@@ -366,7 +367,7 @@ export const PickUpTip = (props: PickUpTipProps): JSX.Element | null => {
         {
           commandType: 'moveLabware' as const,
           params: {
-            labwareId: labwareId,
+            labwareId,
             newLocation: 'offDeck',
             strategy: 'manualMoveWithoutPause',
           },

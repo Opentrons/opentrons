@@ -405,7 +405,7 @@ export function ChooseRobotSlideout(
               })
             : null
         if (error != null) {
-          errors.push(error)
+          errors.push(error as string)
         }
         return (
           <InputField

@@ -22,7 +22,7 @@ export const parseProtocolRunAnalyticsData = (
   robot: DiscoveredRobot | null
 ) => () => {
   const hashTasks = [
-    hash(protocolAnalysis?.metadata?.author) ?? '',
+    hash(protocolAnalysis?.metadata?.author as string) ?? '',
     hash(storedProtocol?.srcFiles?.toString() ?? '') ?? '',
   ]
 
@@ -94,7 +94,10 @@ export function useProtocolRunAnalyticsData(
   )
   const storedProtocolAnalysis = useStoredProtocolAnalysis(runId)
   const storedProtocol = useSelector((state: State) =>
-    getStoredProtocol(state, storedProtocolAnalysis?.metadata?.protocolKey)
+    getStoredProtocol(
+      state,
+      storedProtocolAnalysis?.metadata?.protocolKey as string | undefined
+    )
   )
   const protocolAnalysis =
     robotProtocolAnalysis != null && robotProtocolMetadata != null

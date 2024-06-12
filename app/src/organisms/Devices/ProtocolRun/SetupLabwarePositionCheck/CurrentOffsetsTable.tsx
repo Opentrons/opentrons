@@ -23,14 +23,15 @@ import { getIsLabwareOffsetCodeSnippetsOn } from '../../../../redux/config'
 import { LabwareOffsetTabs } from '../../../LabwareOffsetTabs'
 import { OffsetVector } from '../../../../molecules/OffsetVector'
 import { PythonLabwareOffsetSnippet } from '../../../../molecules/PythonLabwareOffsetSnippet'
+import { getDisplayLocation } from '../../../LabwarePositionCheck/utils/getDisplayLocation'
+import { getLabwareDefinitionsFromCommands } from '../../../LabwarePositionCheck/utils/labware'
 import type { LabwareOffset } from '@opentrons/api-client'
 import type {
   RunTimeCommand,
   LoadedLabware,
   LoadedModule,
 } from '@opentrons/shared-data'
-import { getDisplayLocation } from '../../../LabwarePositionCheck/utils/getDisplayLocation'
-import { getLabwareDefinitionsFromCommands } from '../../../LabwarePositionCheck/utils/labware'
+import type { TFunction } from 'i18next'
 
 const OffsetTable = styled('table')`
   ${TYPOGRAPHY.labelRegular}
@@ -98,7 +99,7 @@ export function CurrentOffsetsTable(
                 {getDisplayLocation(
                   offset.location,
                   getLabwareDefinitionsFromCommands(commands),
-                  t,
+                  t as TFunction,
                   i18n
                 )}
               </OffsetTableDatum>

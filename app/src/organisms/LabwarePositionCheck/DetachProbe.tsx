@@ -71,7 +71,7 @@ export const DetachProbe = (props: DetachProbeProps): JSX.Element | null => {
       ],
       false
     ).catch(error => {
-      setFatalError(error.message)
+      setFatalError(error.message as string)
     })
   }, [])
 

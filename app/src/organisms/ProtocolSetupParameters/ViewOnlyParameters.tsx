@@ -32,7 +32,7 @@ export function ViewOnlyParameters({
   const { makeSnackbar } = useToaster()
   const mostRecentAnalysis = useMostRecentCompletedAnalysis(runId)
   const handleOnClick = (): void => {
-    makeSnackbar(t('reset_setup'))
+    makeSnackbar(t('reset_setup') as string)
   }
 
   const parameters = mostRecentAnalysis?.runTimeParameters ?? []

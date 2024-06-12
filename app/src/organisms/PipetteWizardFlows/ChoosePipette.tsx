@@ -136,7 +136,7 @@ export const ChoosePipette = (props: ChoosePipetteProps): JSX.Element => {
   })
   const wizardHeader = (
     <WizardHeader
-      title={startCase(t('attach_pipette', { mount: mount }))}
+      title={startCase(t('attach_pipette', { mount }) as string)}
       currentStep={0}
       totalSteps={3}
       onExit={

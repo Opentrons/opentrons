@@ -387,11 +387,11 @@ export function ProtocolDetails(): JSX.Element | null {
         setShowMaxPinsAlert(true)
       } else {
         pinnedProtocolIds.push(protocolId)
-        makeSnackbar(t('protocol_info:pinned_protocol'))
+        makeSnackbar(t('protocol_info:pinned_protocol') as string)
       }
     } else {
       pinnedProtocolIds = pinnedProtocolIds.filter(p => p !== protocolId)
-      makeSnackbar(t('protocol_info:unpinned_protocol'))
+      makeSnackbar(t('protocol_info:unpinned_protocol') as string)
     }
     dispatch(
       updateConfigValue('protocols.pinnedProtocolIds', pinnedProtocolIds)

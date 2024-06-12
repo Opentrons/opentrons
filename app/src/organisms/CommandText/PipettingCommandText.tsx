@@ -16,6 +16,7 @@ import type {
   RobotType,
 } from '@opentrons/shared-data'
 import type { CommandTextData } from './types'
+import type { TFunction } from 'i18next'
 
 interface PipettingCommandTextProps {
   command: PipettingRunTimeCommand
@@ -47,7 +48,7 @@ export const PipettingCommandText = ({
       ? getLabwareDisplayLocation(
           commandTextData,
           labwareLocation,
-          t,
+          t as TFunction,
           robotType
         )
       : ''
@@ -58,18 +59,18 @@ export const PipettingCommandText = ({
         well_name: wellName,
         labware: getLabwareName(commandTextData, labwareId),
         labware_location: displayLocation,
-        volume: volume,
+        volume,
         flow_rate: flowRate,
       })
     }
     case 'dispense': {
       const { volume, flowRate, pushOut } = command.params
-      return pushOut
+      return pushOut != null
         ? t('dispense_push_out', {
             well_name: wellName,
             labware: getLabwareName(commandTextData, labwareId),
             labware_location: displayLocation,
-            volume: volume,
+            volume,
             flow_rate: flowRate,
             push_out_volume: pushOut,
           })
@@ -77,7 +78,7 @@ export const PipettingCommandText = ({
             well_name: wellName,
             labware: getLabwareName(commandTextData, labwareId),
             labware_location: displayLocation,
-            volume: volume,
+            volume,
             flow_rate: flowRate,
           })
     }
@@ -98,7 +99,7 @@ export const PipettingCommandText = ({
       const labwareDef = labwareDefinitions.find(
         lw => getLabwareDefURI(lw) === loadedLabware?.definitionUri
       )
-      return labwareDef?.parameters.isTiprack
+      return Boolean(labwareDef?.parameters.isTiprack)
         ? t('return_tip', {
             well_name: wellName,
             labware: getLabwareName(commandTextData, labwareId),
@@ -133,7 +134,7 @@ export const PipettingCommandText = ({
     }
     case 'dispenseInPlace': {
       const { volume, flowRate } = command.params
-      return t('dispense_in_place', { volume: volume, flow_rate: flowRate })
+      return t('dispense_in_place', { volume, flow_rate: flowRate })
     }
     case 'blowOutInPlace': {
       const { flowRate } = command.params
