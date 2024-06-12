@@ -54,8 +54,10 @@ const render = (props: React.ComponentProps<typeof RunPausedSplash>) => {
 describe('ConfirmCancelRunModal', () => {
   let props: React.ComponentProps<typeof RunPausedSplash>
   const mockToggleERWiz = vi.fn(() => Promise.resolve())
-  const mockProceedToRoute = vi.fn()
-  const mockRouteUpdateActions = { proceedToRoute: mockProceedToRoute } as any
+  const mockProceedToRouteAndStep = vi.fn()
+  const mockRouteUpdateActions = {
+    proceedToRouteAndStep: mockProceedToRouteAndStep,
+  } as any
 
   beforeEach(() => {
     props = {
@@ -105,11 +107,11 @@ describe('ConfirmCancelRunModal', () => {
       expect(mockToggleERWiz).toHaveBeenCalledWith(false)
     })
     await waitFor(() => {
-      expect(mockProceedToRoute).toHaveBeenCalledTimes(1)
+      expect(mockProceedToRouteAndStep).toHaveBeenCalledTimes(1)
     })
 
     expect(mockToggleERWiz.mock.invocationCallOrder[0]).toBeLessThan(
-      mockProceedToRoute.mock.invocationCallOrder[0]
+      mockProceedToRouteAndStep.mock.invocationCallOrder[0]
     )
 
     fireEvent.click(primaryBtn)

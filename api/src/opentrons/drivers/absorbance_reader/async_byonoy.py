@@ -5,13 +5,17 @@ import re
 from concurrent.futures.thread import ThreadPoolExecutor
 from functools import partial
 from typing import Optional, List, Dict
-import usb.core as usb_core  # type: ignore[import-untyped]
 
 
-from .hid_protocol import AbsorbanceHidInterface as AbsProtocol, ErrorCodeNames
+from .hid_protocol import (
+    AbsorbanceHidInterface as AbsProtocol,
+    ErrorCodeNames,
+    DeviceStateNames,
+)
 from opentrons.drivers.types import (
     AbsorbanceReaderLidStatus,
     AbsorbanceReaderPlatePresence,
+    AbsorbanceReaderDeviceState,
 )
 from opentrons.drivers.rpi_drivers.types import USBPort
 
@@ -36,6 +40,8 @@ class AsyncByonoy:
         """
         Get the serial number from a port using pyusb.
         """
+        import usb.core as usb_core  # type: ignore[import-untyped]
+
         port_numbers = tuple(int(s) for s in name.split("-")[1].split("."))
         device = usb_core.find(port_numbers=port_numbers)
         if device:
@@ -232,6 +238,7 @@ class AsyncByonoy:
         return {
             "serial": self._device.sn,
             "model": "ABS96",
+            "version": "1.0",
         }
 
     async def get_device_information(self) -> Dict[str, str]:
@@ -270,3 +277,22 @@ class AsyncByonoy:
 
     async def get_plate_presence(self) -> AbsorbanceReaderPlatePresence:
         return AbsorbanceReaderPlatePresence.UNKNOWN
+
+    async def get_device_status(self) -> AbsorbanceReaderDeviceState:
+        status = await self._loop.run_in_executor(
+            executor=self._executor,
+            func=self._get_device_status,
+        )
+        return self.convert_device_state(status.name)
+
+    @staticmethod
+    def convert_device_state(
+        device_state: DeviceStateNames,
+    ) -> AbsorbanceReaderDeviceState:
+        state_map: Dict[DeviceStateNames, AbsorbanceReaderDeviceState] = {
+            "BYONOY_DEVICE_STATE_UNKNOWN": AbsorbanceReaderDeviceState.UNKNOWN,
+            "BYONOY_DEVICE_STATE_OK": AbsorbanceReaderDeviceState.OK,
+            "BYONOY_DEVICE_STATE_BROKEN_FW": AbsorbanceReaderDeviceState.BROKEN_FW,
+            "BYONOY_DEVICE_STATE_ERROR": AbsorbanceReaderDeviceState.ERROR,
+        }
+        return state_map[device_state]

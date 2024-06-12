@@ -22,6 +22,7 @@ from .core.common import (
     ThermocyclerCore,
     HeaterShakerCore,
     MagneticBlockCore,
+    AbsorbanceReaderCore,
 )
 from .core.core_map import LoadedCoreMap
 from .core.engine import ENGINE_CORE_API_VERSION
@@ -955,3 +956,31 @@ class MagneticBlockContext(ModuleContext):
     """
 
     _core: MagneticBlockCore
+
+
+class AbsorbanceReaderContext(ModuleContext):
+    """An object representing a connected Absorbance Reader Module.
+
+    It should not be instantiated directly; instead, it should be
+    created through :py:meth:`.ProtocolContext.load_module`.
+
+    .. versionadded:: 2.18
+    """
+
+    _core: AbsorbanceReaderCore
+
+    @property
+    @requires_version(2, 18)
+    def serial_number(self) -> str:
+        """Get the module's unique hardware serial number."""
+        return self._core.get_serial_number()
+
+    @requires_version(2, 18)
+    def initialize(self, wavelength: int) -> None:
+        """Initialize the Absorbance Reader by taking zero reading."""
+        self._core.initialize(wavelength)
+
+    @requires_version(2, 18)
+    def initiate_read(self) -> None:
+        """Initiate read on the Absorbance Reader."""
+        self._core.initiate_read()

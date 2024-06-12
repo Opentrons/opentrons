@@ -4,7 +4,7 @@ from typing_extensions import Literal
 from fastapi import Depends, status
 
 from opentrons.hardware_control import HardwareControlAPI
-from opentrons.protocol_engine import ProtocolEngine
+from opentrons.protocol_runner import RunOrchestrator
 
 from opentrons_shared_data.errors import ErrorCodes
 
@@ -30,14 +30,14 @@ class RunActive(ErrorDetails):
     errorCode: str = ErrorCodes.ROBOT_IN_USE.value.code
 
 
-async def get_default_engine(
+async def get_default_orchestrator(
     engine_store: EngineStore = Depends(get_engine_store),
     hardware_api: HardwareControlAPI = Depends(get_hardware),
     module_identifier: ModuleIdentifier = Depends(ModuleIdentifier),
-) -> ProtocolEngine:
-    """Get the default engine with attached modules loaded."""
+) -> RunOrchestrator:
+    """Get the default run orchestrator with attached modules loaded."""
     try:
-        engine = await engine_store.get_default_engine()
+        orchestrator = await engine_store.get_default_orchestrator()
     except EngineConflictError as e:
         raise RunActive.from_exc(e).as_error(status.HTTP_409_CONFLICT) from e
 
@@ -47,6 +47,6 @@ async def get_default_engine(
         for mod in attached_modules
     }
 
-    await engine.use_attached_modules(attached_module_spec)
+    await orchestrator.use_attached_modules(attached_module_spec)
 
-    return engine
+    return orchestrator

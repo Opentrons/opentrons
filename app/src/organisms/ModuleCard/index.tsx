@@ -26,6 +26,7 @@ import {
   TEMPERATURE_MODULE_TYPE,
   THERMOCYCLER_MODULE_TYPE,
   MODULE_MODELS_OT2_ONLY,
+  ABSORBANCE_READER_TYPE,
 } from '@opentrons/shared-data'
 import { RUN_STATUS_FINISHING, RUN_STATUS_RUNNING } from '@opentrons/api-client'
 
@@ -74,6 +75,8 @@ import type {
 } from '../../redux/modules/types'
 import type { State, Dispatch } from '../../redux/types'
 import type { RequestState } from '../../redux/robot-api/types'
+import { AbsorbanceReaderData } from './AbsorbanceReaderData'
+import { AbsorbanceReaderSlideout } from './AbsorbanceReaderSlideout'
 
 interface ModuleCardProps {
   module: AttachedModule
@@ -210,6 +213,12 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
           showTemperatureData={true}
         />
       )
+      break
+    }
+
+    case 'absorbanceReaderType': {
+      moduleData = <AbsorbanceReaderData moduleData={module.data} />
+      break
     }
   }
 
@@ -521,6 +530,14 @@ const ModuleSlideout = (props: ModuleSlideoutProps): JSX.Element => {
   } else if (module.moduleType === TEMPERATURE_MODULE_TYPE) {
     return (
       <TemperatureModuleSlideout
+        module={module}
+        onCloseClick={onCloseClick}
+        isExpanded={showSlideout}
+      />
+    )
+  } else if (module.moduleType === ABSORBANCE_READER_TYPE) {
+    return (
+      <AbsorbanceReaderSlideout
         module={module}
         onCloseClick={onCloseClick}
         isExpanded={showSlideout}

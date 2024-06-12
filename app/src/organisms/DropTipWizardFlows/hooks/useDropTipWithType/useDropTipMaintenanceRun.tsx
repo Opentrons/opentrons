@@ -5,9 +5,9 @@ import {
   useCreateTargetedMaintenanceRunMutation,
   useChainMaintenanceCommands,
 } from '../../../../resources/runs'
-import { MANAGED_PIPETTE_ID } from '../../constants'
+import { buildLoadPipetteCommand } from './useDropTipCommands'
 
-import type { PipetteModelSpecs, CreateCommand } from '@opentrons/shared-data'
+import type { PipetteModelSpecs } from '@opentrons/shared-data'
 import type { PipetteData } from '@opentrons/api-client'
 import type { SetRobotErrorDetailsParams } from '../errors'
 import type { UseDTWithTypeParams } from '..'
@@ -147,18 +147,4 @@ function useMonitorMaintenanceRunForDeletion({
     activeMaintenanceRunId,
     closeFlow,
   ])
-}
-
-const buildLoadPipetteCommand = (
-  mount: PipetteData['mount'],
-  pipetteName: PipetteModelSpecs['name']
-): CreateCommand => {
-  return {
-    commandType: 'loadPipette',
-    params: {
-      pipetteId: MANAGED_PIPETTE_ID,
-      mount,
-      pipetteName,
-    },
-  }
 }

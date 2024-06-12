@@ -1367,7 +1367,7 @@ class OT3Controller(FlexBackend):
                 self._subsystem_manager.device_info[
                     SubSystem.of_mount(mount)
                 ].revision.tertiary
-                == "1"
+                != "1"
             ):
                 raise UnsupportedHardwareCommand(
                     "Liquid Probe not supported on this pipette firmware"

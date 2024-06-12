@@ -19,9 +19,16 @@ export interface GetRouteUpdateActionsParams {
 }
 
 export interface UseRouteUpdateActionsResult {
+  /* Redirect to the previous step for the current route if it exists, otherwise redirects to the option selection route. */
   goBackPrevStep: () => Promise<void>
+  /* Redirect to the next step for the current route if it exists, otherwise redirects to the option selection route. */
   proceedNextStep: () => Promise<void>
-  proceedToRoute: (route: RecoveryRoute) => Promise<void>
+  /* Redirect to a specific route. If a step is supplied, proceed to that step if valid, otherwise proceed to the first step. */
+  proceedToRouteAndStep: (
+    route: RecoveryRoute,
+    step?: RouteStep
+  ) => Promise<void>
+  /* Stashes the current map then sets the current map to robot in motion. Restores the map after motion completes. */
   setRobotInMotion: (
     inMotion: boolean,
     movingRoute?: RobotMovingRoute
@@ -34,10 +41,9 @@ export function useRouteUpdateActions(
 ): UseRouteUpdateActionsResult {
   const { recoveryMap, setRecoveryMap } = routeUpdateActionsParams
   const { route: currentRoute, step: currentStep } = recoveryMap
-  const stashedMapRef = React.useRef<IRecoveryMap | null>(null)
   const { OPTION_SELECTION, ROBOT_IN_MOTION } = RECOVERY_MAP
+  const stashedMapRef = React.useRef<IRecoveryMap | null>(null)
 
-  // Redirect to the previous step for the current route if it exists, otherwise redirects to the option selection route.
   const goBackPrevStep = React.useCallback((): Promise<void> => {
     return new Promise((resolve, reject) => {
       const { getPrevStep } = getRecoveryRouteNavigation(currentRoute)
@@ -53,7 +59,6 @@ export function useRouteUpdateActions(
     })
   }, [currentStep, currentRoute, routeUpdateActionsParams])
 
-  // Redirect to the next step for the current route if it exists, otherwise redirects to the option selection route.
   const proceedNextStep = React.useCallback((): Promise<void> => {
     return new Promise((resolve, reject) => {
       const { getNextStep } = getRecoveryRouteNavigation(currentRoute)
@@ -69,19 +74,21 @@ export function useRouteUpdateActions(
     })
   }, [currentStep, currentRoute, routeUpdateActionsParams])
 
-  // Redirect to a specific route.
-  const proceedToRoute = React.useCallback(
-    (route: RecoveryRoute): Promise<void> => {
+  const proceedToRouteAndStep = React.useCallback(
+    (route: RecoveryRoute, step?: RouteStep): Promise<void> => {
       return new Promise((resolve, reject) => {
         const newFlowSteps = STEP_ORDER[route]
-        setRecoveryMap({ route, step: head(newFlowSteps) as RouteStep })
+
+        let stepIdx = step != null ? newFlowSteps.indexOf(step) : 0
+        stepIdx = stepIdx === -1 ? 0 : stepIdx // Route to first step if the supplied step is invalid.
+
+        setRecoveryMap({ route, step: newFlowSteps[stepIdx] })
         resolve()
       })
     },
     []
   )
 
-  // Stashes the current map then sets the current map to robot in motion. Restores the map after motion completes.
   const setRobotInMotion = React.useCallback(
     (inMotion: boolean, robotMovingRoute?: RobotMovingRoute): Promise<void> => {
       return new Promise((resolve, reject) => {
@@ -114,7 +121,12 @@ export function useRouteUpdateActions(
     [currentRoute, currentStep]
   )
 
-  return { goBackPrevStep, proceedNextStep, proceedToRoute, setRobotInMotion }
+  return {
+    goBackPrevStep,
+    proceedNextStep,
+    proceedToRouteAndStep,
+    setRobotInMotion,
+  }
 }
 
 interface IRecoveryRouteNavigation {
