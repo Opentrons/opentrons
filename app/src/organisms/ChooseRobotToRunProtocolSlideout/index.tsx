@@ -17,6 +17,7 @@ import {
 import { getRobotUpdateDisplayInfo } from '../../redux/robot-update'
 import { OPENTRONS_USB } from '../../redux/discovery'
 import { appShellRequestor } from '../../redux/shell/remote'
+import { useFeatureFlag } from '../../redux/config'
 import { useTrackCreateProtocolRunEvent } from '../Devices/hooks'
 import { ApplyHistoricOffsets } from '../ApplyHistoricOffsets'
 import { useOffsetCandidatesForAnalysis } from '../ApplyHistoricOffsets/hooks/useOffsetCandidatesForAnalysis'
@@ -54,6 +55,7 @@ export function ChooseRobotToRunProtocolSlideoutComponent(
   } = storedProtocolData
   const [currentPage, setCurrentPage] = React.useState<number>(1)
   const [selectedRobot, setSelectedRobot] = React.useState<Robot | null>(null)
+  const enableCsvFile = useFeatureFlag('enableCsvFile')
   const { trackCreateProtocolRunEvent } = useTrackCreateProtocolRunEvent(
     storedProtocolData,
     selectedRobot?.name ?? ''
@@ -113,12 +115,10 @@ export function ChooseRobotToRunProtocolSlideoutComponent(
       default: 'none',
     },
     {
-      value: null,
       displayName: 'test csv file',
       variableName: 'csv_file_input',
       description: 'this is a test csv file upload',
       type: 'csv_file',
-      default: null,
     },
   ]
 
@@ -132,6 +132,15 @@ export function ChooseRobotToRunProtocolSlideoutComponent(
     mostRecentAnalysis,
     selectedRobot?.ip ?? null
   )
+
+  const dataFilesFromProtocol = runTimeParametersOverrides.reduce<File[]>(
+    (acc, parameter) =>
+      parameter.type === 'csv_file' && parameter.file != null
+        ? [...acc, parameter.file]
+        : acc,
+    []
+  )
+
   const {
     createRunFromProtocolSource,
     runCreationError,
@@ -172,13 +181,15 @@ export function ChooseRobotToRunProtocolSlideoutComponent(
           definitionUri,
         }))
       : [],
-    runTimeParametersOverrides.reduce(
-      (acc, param) =>
-        param.value !== param.default
+    runTimeParametersOverrides.reduce((acc, param) => {
+      if (param.type === 'csv_file') {
+        return { ...acc, [param.variableName]: 'uuid' }
+      } else {
+        return param.value !== param.default
           ? { ...acc, [param.variableName]: param.value }
-          : acc,
-      {}
-    )
+          : acc
+      }
+    }, {})
   )
   const handleProceed: React.MouseEventHandler<HTMLButtonElement> = () => {
     trackCreateProtocolRunEvent({ name: 'createProtocolRecordRequest' })
@@ -250,12 +261,12 @@ export function ChooseRobotToRunProtocolSlideoutComponent(
   )
 
   const resetRunTimeParameters = (): void => {
-    setRunTimeParametersOverrides(
-      runTimeParametersOverrides?.map(parameter => ({
-        ...parameter,
-        value: parameter.default,
-      }))
+    const clone = runTimeParametersOverrides.map(parameter =>
+      parameter.type === 'csv_file'
+        ? { ...parameter, file: null }
+        : { ...parameter, value: parameter.default }
     )
+    setRunTimeParametersOverrides(clone as RunTimeParameter[])
   }
 
   return (

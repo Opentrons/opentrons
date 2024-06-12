@@ -78,15 +78,30 @@ export function ParametersTable({
                 index={index}
               />
               <StyledTableCell isLast={index === runTimeParameters.length - 1}>
-                <StyledText as="p">
-                  {formatRunTimeParameterDefaultValue(parameter, t)}
-                </StyledText>
+                {parameter.type === 'csv_file' ? (
+                  <StyledText
+                    as="p"
+                    padding={`${SPACING.spacing4} ${SPACING.spacing8}`}
+                    backgroundColor={COLORS.yellow30}
+                    borderRadius={BORDERS.borderRadius4}
+                    fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+                    width="max-content"
+                  >
+                    {t('file_required')}
+                  </StyledText>
+                ) : (
+                  <StyledText as="p">
+                    {formatRunTimeParameterDefaultValue(parameter, t)}
+                  </StyledText>
+                )}
               </StyledTableCell>
               <StyledTableCell
                 isLast={index === runTimeParameters.length - 1}
                 paddingRight="0"
               >
-                <StyledText as="p">{formatRange(parameter)}</StyledText>
+                <StyledText as="p">
+                  {parameter.type === 'csv_file' ? '-' : formatRange(parameter)}
+                </StyledText>
               </StyledTableCell>
             </StyledTableRow>
           )

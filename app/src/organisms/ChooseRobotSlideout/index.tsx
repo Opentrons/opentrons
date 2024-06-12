@@ -18,7 +18,6 @@ import {
   JUSTIFY_CENTER,
   JUSTIFY_END,
   JUSTIFY_FLEX_START,
-  JUSTIFY_SPACE_BETWEEN,
   Link,
   OVERFLOW_WRAP_ANYWHERE,
   SIZE_1,
@@ -47,16 +46,20 @@ import { AvailableRobotOption } from './AvailableRobotOption'
 import { InputField } from '../../atoms/InputField'
 import { DropdownMenu } from '../../atoms/MenuList/DropdownMenu'
 import { Tooltip } from '../../atoms/Tooltip'
+import { FileCard } from './FileCard'
 
-import type { RobotType, RunTimeParameter } from '@opentrons/shared-data'
+import type {
+  CsvFileParameter,
+  RobotType,
+  RunTimeParameter,
+} from '@opentrons/shared-data'
 import type { SlideoutProps } from '../../atoms/Slideout'
 import type { UseCreateRun } from '../../organisms/ChooseRobotToRunProtocolSlideout/useCreateRunFromProtocol'
 import type { State, Dispatch } from '../../redux/types'
 import type { Robot } from '../../redux/discovery/types'
 import type { DropdownOption } from '../../atoms/MenuList/DropdownMenu'
-import { FileUpload } from '../../molecules/FileUpload'
 import { UploadInput } from '../../molecules/UploadInput'
-import { set } from 'lodash'
+import { useFeatureFlag } from '../../redux/config'
 
 export const CARD_OUTLINE_BORDER_STYLE = css`
   border-style: ${BORDERS.styleSolid};
@@ -149,6 +152,7 @@ export function ChooseRobotSlideout(
     setHasParamError,
     resetRunTimeParameters,
   } = props
+  const enableCsvFile = useFeatureFlag('enableCsvFile')
 
   const dispatch = useDispatch<Dispatch>()
   const isScanning = useSelector((state: State) => getScanning(state))
@@ -157,7 +161,6 @@ export function ChooseRobotSlideout(
     showRestoreValuesTooltip,
     setShowRestoreValuesTooltip,
   ] = React.useState<boolean>(false)
-  const [file, setFile] = React.useState<File | null>(null)
   const [isInputFocused, setIsInputFocused] = React.useState<boolean>(false)
 
   const hasRtpFile =
@@ -385,8 +388,11 @@ export function ChooseRobotSlideout(
                 }) ?? dropdownOptions[0]
               }
               onClick={choice => {
-                const clone = runTimeParametersOverrides.map((parameter, i) => {
-                  if (i === index) {
+                const clone = runTimeParametersOverrides.map(parameter => {
+                  if (
+                    runtimeParam.variableName === parameter.variableName &&
+                    'choices' in parameter
+                  ) {
                     return {
                       ...parameter,
                       value:
@@ -455,8 +461,11 @@ export function ChooseRobotSlideout(
                 setIsInputFocused(true)
               }}
               onChange={e => {
-                const clone = runTimeParametersOverrides.map((parameter, i) => {
-                  if (i === index) {
+                const clone = runTimeParametersOverrides.map(parameter => {
+                  if (
+                    runtimeParam.variableName === parameter.variableName &&
+                    (parameter.type === 'int' || parameter.type === 'float')
+                  ) {
                     return {
                       ...parameter,
                       value:
@@ -492,17 +501,18 @@ export function ChooseRobotSlideout(
                 <ToggleButton
                   toggledOn={runtimeParam.value as boolean}
                   onClick={() => {
-                    const clone = runTimeParametersOverrides.map(
-                      (parameter, i) => {
-                        if (i === index) {
-                          return {
-                            ...parameter,
-                            value: !parameter.value,
-                          }
+                    const clone = runTimeParametersOverrides.map(parameter => {
+                      if (
+                        runtimeParam.variableName === parameter.variableName &&
+                        parameter.type === 'bool'
+                      ) {
+                        return {
+                          ...parameter,
+                          value: !parameter.value,
                         }
-                        return parameter
                       }
-                    )
+                      return parameter
+                    })
                     setRunTimeParametersOverrides?.(clone)
                   }}
                   height="0.813rem"
@@ -520,14 +530,13 @@ export function ChooseRobotSlideout(
           )
         } else if (runtimeParam.type === 'csv_file') {
           const error =
-            runtimeParam.value == null ||
-            (runtimeParam.value as File).type === 'text/csv'
+            runtimeParam.file == null || runtimeParam.file.type === 'text/csv'
               ? null
-              : 'File must be .csv'
+              : t('file_must_be_csv')
           if (error != null) {
             errors.push(error)
           }
-          return (
+          return !enableCsvFile ? null : (
             <Flex
               flexDirection={DIRECTION_COLUMN}
               alignItems={ALIGN_CENTER}
@@ -544,21 +553,21 @@ export function ChooseRobotSlideout(
                 </StyledText>
                 <StyledText as="p">{t('csv_required')}</StyledText>
               </Flex>
-              {runtimeParam.value == null ? (
+              {runtimeParam.file == null ? (
                 <UploadInput
                   uploadButtonText={t('choose_file')}
                   onUpload={(file: File) => {
-                    const clone = runTimeParametersOverrides.map(
-                      (parameter, i) => {
-                        if (i === index) {
-                          return {
-                            ...parameter,
-                            value: file,
-                          }
+                    const clone = runTimeParametersOverrides.map(parameter => {
+                      if (
+                        runtimeParam.variableName === parameter.variableName
+                      ) {
+                        return {
+                          ...parameter,
+                          file: file,
                         }
-                        return parameter
                       }
-                    )
+                      return parameter
+                    })
                     setRunTimeParametersOverrides?.(clone)
                   }}
                   dragAndDropText={
@@ -574,64 +583,12 @@ export function ChooseRobotSlideout(
                   }
                 />
               ) : (
-                <Flex
-                  flexDirection={DIRECTION_COLUMN}
-                  gridGap={SPACING.spacing4}
-                  width="100%"
-                >
-                  <Flex
-                    height="2.75rem"
-                    padding={`${SPACING.spacing8} ${SPACING.spacing12}`}
-                    backgroundColor={
-                      error == null ? COLORS.grey20 : COLORS.red30
-                    }
-                    borderRadius={BORDERS.borderRadius4}
-                    justifyContent={JUSTIFY_SPACE_BETWEEN}
-                    alignItems={ALIGN_CENTER}
-                  >
-                    <StyledText as="p">
-                      {(runtimeParam.value as File).name}
-                    </StyledText>
-                    <Flex alignItems={ALIGN_CENTER}>
-                      <Btn
-                        size="1.5rem"
-                        onClick={() => {
-                          const clone = runTimeParametersOverrides.map(
-                            (parameter, i) => {
-                              if (i === index) {
-                                return {
-                                  ...parameter,
-                                  value: null,
-                                }
-                              }
-                              return parameter
-                            }
-                          )
-                          setRunTimeParametersOverrides?.(clone)
-                        }}
-                        aria-label="exit"
-                        data-testid={`Slideout_icon_close_${title}`}
-                      >
-                        <Icon
-                          name="close"
-                          css={css`
-                            border-radius: ${BORDERS.borderRadius4};
-                            &:hover {
-                              background: ${error == null
-                                ? COLORS.grey40
-                                : COLORS.red40};
-                            }
-                          `}
-                        />
-                      </Btn>
-                    </Flex>
-                  </Flex>
-                  {error != null ? (
-                    <StyledText as="label" color={COLORS.red50}>
-                      {t(error)}
-                    </StyledText>
-                  ) : null}
-                </Flex>
+                <FileCard
+                  error={error}
+                  fileRunTimeParameter={runtimeParam}
+                  runTimeParametersOverrides={runTimeParametersOverrides}
+                  setRunTimeParametersOverrides={setRunTimeParametersOverrides}
+                />
               )}
             </Flex>
           )
@@ -641,14 +598,16 @@ export function ChooseRobotSlideout(
   const hasEmptyRtpFile =
     runTimeParametersOverrides?.some(
       runtimeParam =>
-        runtimeParam.type === 'csv_file' && runtimeParam.value == null
+        runtimeParam.type === 'csv_file' && runtimeParam.file == null
     ) ?? false
   setHasParamError?.(errors.length > 0 || hasEmptyRtpFile)
 
   const isRestoreDefaultsLinkEnabled =
-    runTimeParametersOverrides?.some(
-      parameter => parameter.value !== parameter.default
-    ) ?? false
+    runTimeParametersOverrides?.some(parameter => {
+      return parameter.type === 'csv_file'
+        ? parameter.file != null
+        : parameter.value !== parameter.default
+    }) ?? false
 
   const pageTwoBody =
     runTimeParametersOverrides != null ? (
