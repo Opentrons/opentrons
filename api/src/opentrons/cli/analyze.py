@@ -211,15 +211,15 @@ def _get_return_code(analysis: RunResult) -> int:
     return 0
 
 
-class RunnerLoadError(EnumeratedError):
-    """Raised when attempting to load the runner."""
+class UnexpectedAnalysisError(EnumeratedError):
+    """An error raised while setting up the runner for analysis."""
 
     def __init__(
         self,
         message: Optional[str] = None,
         wrapping: Optional[Sequence[Union[EnumeratedError, Exception]]] = None,
     ) -> None:
-        """Build a RunnerLoadError exception."""
+        """Build a UnexpectedAnalysisError exception."""
 
         def _convert_exc() -> Iterator[EnumeratedError]:
             if not wrapping:
@@ -231,7 +231,7 @@ class RunnerLoadError(EnumeratedError):
                     yield PythonException(exc)
 
         super().__init__(
-            code=ErrorCodes.INVALID_PROTOCOL_DATA,
+            code=ErrorCodes.GENERAL_ERROR,
             message=message,
             wrapping=[e for e in _convert_exc()],
         )
@@ -251,14 +251,14 @@ async def _do_analyze(protocol_source: ProtocolSource) -> RunResult:
                 run_time_param_values=None,
             )
         except Exception as error:
-            err_id = "runner-load-error"
+            err_id = "analysis-setup-error"
             err_created_at = datetime.now(tz=timezone.utc)
             if isinstance(error, EnumeratedError):
                 error_occ = ErrorOccurrence.from_failed(
                     id=err_id, createdAt=err_created_at, error=error
                 )
             else:
-                enumerated_wrapper = RunnerLoadError(
+                enumerated_wrapper = UnexpectedAnalysisError(
                     message=str(error),
                     wrapping=[error],
                 )

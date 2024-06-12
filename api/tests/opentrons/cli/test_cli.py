@@ -309,3 +309,73 @@ def test_run_time_parameter_error(
         "TypeError [line 5]: ParameterContext.add_bool() missing 1"
         " required positional argument: 'default'"
     )
+
+
+@pytest.mark.parametrize("output", ["--json-output", "--human-json-output"])
+def test_unexpected_error(
+    tmp_path: Path,
+    output: str,
+) -> None:
+    """Test that an unexpected error raised from outside opentrons functions is handled correctly."""
+    python_protocol_source = textwrap.dedent(
+        # Raises an exception before runner load.
+        """\
+            requirements = {"robotType": "OT-2", "apiLevel": "2.18"}  # line 1
+            x + 1 = 0                                                 # line 2
+            def add_parameters(parameters):
+                parameters.add_bool()
+            def run(protocol):
+                pass
+        """
+    )
+    protocol_source_file = tmp_path / "protocol.py"
+    protocol_source_file.write_text(python_protocol_source, encoding="utf-8")
+    result = _get_analysis_result([protocol_source_file], output)
+
+    assert result.exit_code != 0
+    assert result.stdout_stderr == (
+        "Error: cannot assign to expression here."
+        " Maybe you meant '==' instead of '='? (protocol.py, line 2)\n"
+    )
+
+
+@pytest.mark.parametrize("output", ["--json-output", "--human-json-output"])
+def test_unexpected_runner_load_error(
+    tmp_path: Path,
+    output: str,
+) -> None:
+    """Test that an error raised during runner load is handled properly.
+
+    Also verify that analysis result contains all static data about the protocol.
+    """
+    python_protocol_source = textwrap.dedent(
+        # Raises an exception during runner load.
+        """\
+            requirements = {"apiLevel": "2.18"}     # line 1
+            call_a_non_existent_func()              # line 2
+
+            def add_parameters(parameters):         # line 4
+                parameters.add_bool()
+            def run(protocol):
+                pass
+        """
+    )
+    protocol_source_file = tmp_path / "protocol.py"
+    protocol_source_file.write_text(python_protocol_source, encoding="utf-8")
+    result = _get_analysis_result([protocol_source_file], output)
+
+    assert result.exit_code == 0
+
+    assert result.json_output is not None
+    assert result.json_output["robotType"] == "OT-2 Standard"
+    assert result.json_output["pipettes"] == []
+    assert result.json_output["commands"] == []
+    assert result.json_output["config"] == {
+        "apiVersion": [2, 18],
+        "protocolType": "python",
+    }
+    assert result.json_output["files"] == [{"name": "protocol.py", "role": "main"}]
+    [error] = result.json_output["errors"]
+    assert error["detail"] == "name 'call_a_non_existent_func' is not defined"
+    assert error["errorCode"] == "4000"
+    assert error["errorType"] == "UnexpectedAnalysisError"
