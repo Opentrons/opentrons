@@ -37,6 +37,7 @@ from opentrons.protocol_runner import (
     create_simulating_runner,
     RunResult,
     PythonAndLegacyRunner,
+    JsonRunner,
 )
 from opentrons.protocol_engine import (
     Command,
@@ -243,42 +244,45 @@ async def _do_analyze(protocol_source: ProtocolSource) -> RunResult:
     runner = await create_simulating_runner(
         robot_type=protocol_source.robot_type, protocol_config=protocol_source.config
     )
-    if isinstance(runner, PythonAndLegacyRunner):
-        try:
+
+    try:
+        if isinstance(runner, PythonAndLegacyRunner):
             await runner.load(
                 protocol_source=protocol_source,
                 python_parse_mode=PythonParseMode.NORMAL,
                 run_time_param_values=None,
             )
-        except Exception as error:
-            err_id = "analysis-setup-error"
-            err_created_at = datetime.now(tz=timezone.utc)
-            if isinstance(error, EnumeratedError):
-                error_occ = ErrorOccurrence.from_failed(
-                    id=err_id, createdAt=err_created_at, error=error
-                )
-            else:
-                enumerated_wrapper = UnexpectedAnalysisError(
-                    message=str(error),
-                    wrapping=[error],
-                )
-                error_occ = ErrorOccurrence.from_failed(
-                    id=err_id, createdAt=err_created_at, error=enumerated_wrapper
-                )
-            analysis = RunResult(
-                commands=[],
-                state_summary=StateSummary(
-                    errors=[error_occ],
-                    status=EngineStatus.IDLE,
-                    labware=[],
-                    pipettes=[],
-                    modules=[],
-                    labwareOffsets=[],
-                    liquids=[],
-                ),
-                parameters=[],
+        elif isinstance(runner, JsonRunner):
+            await runner.load(protocol_source=protocol_source)
+    except Exception as error:
+        err_id = "analysis-setup-error"
+        err_created_at = datetime.now(tz=timezone.utc)
+        if isinstance(error, EnumeratedError):
+            error_occ = ErrorOccurrence.from_failed(
+                id=err_id, createdAt=err_created_at, error=error
             )
-            return analysis
+        else:
+            enumerated_wrapper = UnexpectedAnalysisError(
+                message=str(error),
+                wrapping=[error],
+            )
+            error_occ = ErrorOccurrence.from_failed(
+                id=err_id, createdAt=err_created_at, error=enumerated_wrapper
+            )
+        analysis = RunResult(
+            commands=[],
+            state_summary=StateSummary(
+                errors=[error_occ],
+                status=EngineStatus.IDLE,
+                labware=[],
+                pipettes=[],
+                modules=[],
+                labwareOffsets=[],
+                liquids=[],
+            ),
+            parameters=[],
+        )
+        return analysis
     return await runner.run(deck_configuration=[])
 
 
