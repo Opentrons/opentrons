@@ -66,7 +66,7 @@ export const Dropdown = (props: DropdownProps): JSX.Element => {
             {/* @ts-expect-error(IL, 2021-03-24): formik types need cleanup w LabwareFields */}
             {({ field, form }) => (
               <Box {...styleProps}>
-                {getLabel(field.name, form.values)}
+                {getLabel(field.name as keyof LabwareFields, form.values as LabwareFields)}
                 <SelectField
                   disabled={disabled}
                   name={field.name}

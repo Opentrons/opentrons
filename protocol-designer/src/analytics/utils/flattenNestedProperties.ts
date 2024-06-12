@@ -29,5 +29,5 @@ const _innerFnFlattenNested = (innerProperties: Record<string, unknown>, prefix:
 // Note that non-nested properties are omitted from the result.
 // Also, the separator will not be escaped, so if you have a field already named '__foo__a'
 // and also have a {foo: {a: 123}}, they'll clash.
-export const flattenNestedProperties = (properties: Record<string, unknown>): any =>
+export const flattenNestedProperties = (properties: Record<string | number | symbol, unknown>): any =>
   _innerFnFlattenNested(properties, '')

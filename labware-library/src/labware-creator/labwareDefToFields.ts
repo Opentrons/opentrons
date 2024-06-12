@@ -1,5 +1,6 @@
 import { getUniqueWellProperties } from '@opentrons/shared-data'
 import type {
+  Coordinates,
   LabwareDefinition2,
   LabwareWellGroup,
 } from '@opentrons/shared-data'
@@ -84,7 +85,7 @@ export function labwareDefToFields(
   const zDimension = def.dimensions.zDimension
   const compatibleAdapters: Record<string, number> =
     def.stackingOffsetWithLabware != null
-      ? Object.entries(def.stackingOffsetWithLabware).reduce<
+      ? Object.entries(def.stackingOffsetWithLabware as Record<string, Coordinates>).reduce<
           Record<string, number>
         >((acc, [loadName, offset]) => {
           const adapterZDimension = Object.values(adapterDefinitions).find(
@@ -99,7 +100,7 @@ export function labwareDefToFields(
       : {}
   const compatibleModules: Record<string, number> =
     def.stackingOffsetWithModule != null
-      ? Object.entries(def.stackingOffsetWithModule).reduce<
+      ? Object.entries(def.stackingOffsetWithModule as Record<string, Coordinates>).reduce<
           Record<string, number>
         >((acc, [moduleModel, offset]) => {
           acc[moduleModel] = zDimension - offset.z
