@@ -51,7 +51,7 @@ export function getUniqueWellProperties(
 
     return {
       metadata: group.metadata,
-      brand: group.brand || null,
+      brand: group.brand ?? null,
       xSpacing: getSpacingIfUniform(wellProps, 'x'),
       ySpacing: getSpacingIfUniform(wellProps, 'y'),
       xOffsetFromLeft: xStart,

@@ -109,7 +109,7 @@ export function getLabwareHasQuirk(
   quirk: string
 ): boolean {
   const quirks = labwareDef.parameters.quirks
-  return quirks ? quirks.includes(quirk) : false
+  return quirks != null ? quirks.includes(quirk) : false
 }
 
 export const intToAlphabetLetter = (
@@ -127,14 +127,14 @@ export const toWellName = ({
 
 function _parseWell(well: string): [string, number] {
   const res = well.match(/([A-Z]+)(\d+)/)
-  const letters = res && res[1]
-  const number = res && parseInt(res[2])
+  const letters = res?.[1]
+  const number = res != null ? parseInt(res[2]) : null
 
-  if (!letters || number == null || Number.isNaN(number)) {
+  if (letters == null || number == null || Number.isNaN(number)) {
     console.warn(
       `Could not parse well ${well}. Got letters: "${
-        letters || 'void'
-      }", number: "${number || 'void'}"`
+        letters ?? 'void'
+      }", number: "${number ?? 'void'}"`
     )
     return ['', NaN]
   }

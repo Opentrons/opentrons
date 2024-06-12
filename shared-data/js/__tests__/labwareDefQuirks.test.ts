@@ -29,7 +29,7 @@ describe('check quirks for all labware defs', () => {
     it(`${defname} has valid quirks`, () => {
       const labwareDef = require(labwarePath)
 
-      const quirks = labwareDef.parameters.quirks || []
+      const quirks = labwareDef.parameters.quirks ?? []
       // we want to test that the quirks in the def are a subset of validQuirks,
       // whereas arrayContaining tests that the expected value is a subset of
       // the value under test. Unfortunately that means we have to do it backwards

@@ -20,9 +20,9 @@ interface JSONErrorBody {
 }
 
 export function getError(code: ErrorCodes): ErrorBody | null {
-  return errorDefinitions.codes[code]
+  return errorDefinitions.codes[code] != null
     ? {
-        code: code,
+        code,
         detail: errorDefinitions.codes[code].detail,
         category:
           errorDefinitions.categories[

@@ -63,9 +63,10 @@ export function getPipetteModelSpecs(
 ): PipetteModelSpecs | null {
   const modelSpecificFields = pipetteModelSpecs.config[model]
   const modelFields =
-    modelSpecificFields &&
-    getPipetteNameSpecs(modelSpecificFields.name as PipetteName)
-  return modelFields && { ...modelFields, ...modelSpecificFields, model }
+    modelSpecificFields != null
+      ? getPipetteNameSpecs(modelSpecificFields.name as PipetteName)
+      : null
+  return modelFields != null ? { ...modelFields, ...modelSpecificFields, model } : null
 }
 
 export function getAllPipetteNames(...sortBy: SortableProps[]): PipetteName[] {
@@ -134,7 +135,7 @@ const getChannelsFromString = (
       return 'ninety_six_channel'
     }
     default: {
-      console.error(`invalid number of channels from ${pipChannelString}`)
+      console.error(`invalid number of channels from ${pipChannelString as string}`)
       return null
     }
   }
@@ -236,8 +237,7 @@ export const getPipetteSpecsV2 = (
       )
       V2_DEFINITION_TYPES.forEach(type => {
         if (
-          `../pipette/definitions/2/${type}/${channels}/${pipetteModel}/${
-            version === '' ? highestVersion : version
+          `../pipette/definitions/2/${type}/${channels}/${pipetteModel}/${version === '' ? highestVersion : version
           }.json` === path
         ) {
           genericGeometricModules.push(module.default)
@@ -261,8 +261,7 @@ export const getPipetteSpecsV2 = (
       liquidTypes.push(type)
     }
     if (
-      `../pipette/definitions/2/liquid/${channels}/${pipetteModel}/${type}/${
-        version === '' ? highestVersion : version
+      `../pipette/definitions/2/liquid/${channels}/${pipetteModel}/${type}/${version === '' ? highestVersion : version
       }.json` === path
     ) {
       const index = liquidTypes.indexOf(type)

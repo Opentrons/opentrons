@@ -94,11 +94,11 @@ function validateDefinition(
 ): Definition {
   const valid = validate(definition)
 
-  if (!valid) {
+  if (!Boolean(valid)) {
     console.error('Definition:', definition)
     console.error('Validation Errors:', validate.errors)
 
-    if (strict) {
+    if (Boolean(strict)) {
       throw new Error(
         'Generated labware failed to validate, please check your inputs'
       )
@@ -155,7 +155,7 @@ function determineIrregularLayout(
   return grids.reduce<Layout>(
     (result, gridObj, gridIdx) => {
       const reverseRowIdx = range(gridObj.row - 1, -1)
-      const inputGroup = group[gridIdx] || {
+      const inputGroup = group[gridIdx] ?? {
         metadata: {},
       }
       const currentGroup: WellGroup = { ...inputGroup, wells: [] }
@@ -271,7 +271,7 @@ function calculateCoordinates(
 
 function ensureBrand(brand?: Brand): Brand {
   return (
-    brand || {
+    brand ?? {
       brand: DEFAULT_BRAND_NAME,
     }
   )
@@ -369,11 +369,11 @@ export function createRegularLabware(args: RegularLabwareProps): Definition {
     stackingOffsetWithModule,
   } = args
   const strict = args.strict
-  const version = args.version || 1
-  const namespace = args.namespace || DEFAULT_CUSTOM_NAMESPACE
+  const version = args.version ?? 1
+  const namespace = args.namespace ?? DEFAULT_CUSTOM_NAMESPACE
   const ordering = determineOrdering(grid)
   const brand = ensureBrand(args.brand)
-  const groupBase = args.group || {
+  const groupBase = args.group ?? {
     metadata: {},
   }
   const metadata = {
@@ -419,8 +419,8 @@ export function createIrregularLabware(
 ): Definition {
   const { offset, dimensions, grid, spacing, well, gridStart, group } = args
   const strict = args.strict
-  const namespace = args.namespace || DEFAULT_CUSTOM_NAMESPACE
-  const version = args.version || 1
+  const namespace = args.namespace ?? DEFAULT_CUSTOM_NAMESPACE
+  const version = args.version ?? 1
   const { wells, groups } = determineIrregularLayout(
     grid,
     spacing,

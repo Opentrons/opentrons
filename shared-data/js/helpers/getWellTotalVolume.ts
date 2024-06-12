@@ -5,7 +5,7 @@ export const getWellTotalVolume = (
 ): number | null | undefined => {
   const well = labwareDef.wells[wellName]
 
-  if (!well) {
+  if (well == null) {
     console.warn(
       `No well "${wellName}" found for labware ${labwareDef?.namespace}/${labwareDef?.parameters?.loadName}/${labwareDef?.version}"`
     )

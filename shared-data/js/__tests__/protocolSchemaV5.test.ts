@@ -31,7 +31,7 @@ describe('validate v5 protocol fixtures under JSON schema', () => {
       const valid = validateProtocol(protocol)
       const validationErrors = validateProtocol.errors
 
-      if (validationErrors) {
+      if (validationErrors != null) {
         console.log(JSON.stringify(validationErrors, null, 4))
       }
 

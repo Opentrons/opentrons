@@ -61,7 +61,7 @@ export function parseProtocolData(
     return null
   }
 
-  handleError && handleError('INVALID_FILE_TYPE')
+  handleError?.('INVALID_FILE_TYPE')
   return null
 }
 
@@ -85,14 +85,14 @@ export function validateJsonProtocolFileContents(
 ): JsonProtocolFile | null {
   try {
     if (typeof fileContents !== 'string') {
-      handleError && handleError('INVALID_FILE_TYPE')
+      handleError?.('INVALID_FILE_TYPE')
       return null
     } else {
       const ajv = new Ajv({ allErrors: true, jsonPointers: true })
       // protocol schema contains reference to v2 labware schema, so give AJV access to it
       ajv.addSchema(labwareV2Schema)
 
-      const parsedProtocol = JSON.parse(fileContents) as any
+      const parsedProtocol = JSON.parse(fileContents)
       let validateAgainstSchema
       if ('protocol-schema' in parsedProtocol) {
         // 'protocol-schema' key only present in V1
@@ -104,9 +104,8 @@ export function validateJsonProtocolFileContents(
         )
       }
 
-      if (!validateAgainstSchema(parsedProtocol)) {
-        handleError &&
-          handleError('INVALID_JSON_FILE', {
+      if (validateAgainstSchema(parsedProtocol) == null) {
+          handleError?.('INVALID_JSON_FILE', {
             schemaErrors: validateAgainstSchema.errors,
           })
         return null

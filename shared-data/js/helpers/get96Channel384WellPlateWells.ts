@@ -13,7 +13,7 @@ export function get96Channel384WellPlateWells(
       if (count < all384Wells.length) {
         const well = all384Wells[count]
         const numberFromWell = well.match(/\d+/)
-        if (numberFromWell) {
+        if (numberFromWell != null) {
           const number = parseInt(numberFromWell[0])
           if ((number % 2 === 1 && isOdd) || (number % 2 === 0 && !isOdd)) {
             filteredWells.push(well)

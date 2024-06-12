@@ -73,7 +73,7 @@ export const makeWellSetHelpers = (): WellSetHelpers => {
 
     // use cached version only if labwareDef is shallowly equal, in case
     // custom labware defs are changed without giving them a new URI
-    if (c && c.labwareDef === labwareDef) {
+    if (c != null && c.labwareDef === labwareDef) {
       return c.wellSetByPrimaryWell
     }
 

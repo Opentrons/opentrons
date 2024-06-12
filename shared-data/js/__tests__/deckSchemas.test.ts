@@ -26,7 +26,7 @@ describe('validate v3 deck defs and fixtures', () => {
       const valid = validateSchema(fixtureDef)
       const validationErrors = validateSchema.errors
 
-      if (validationErrors) {
+      if (validationErrors != null) {
         console.log(
           path.parse(fixturePath).base +
             ' ' +
@@ -48,7 +48,7 @@ describe('validate v3 deck defs and fixtures', () => {
       const valid = validateSchema(deckDef)
       const validationErrors = validateSchema.errors
 
-      if (validationErrors) {
+      if (validationErrors != null) {
         console.log(
           path.parse(defPath).base +
             ' ' +
@@ -72,7 +72,7 @@ describe('validate v4 deck defs', () => {
       const valid = validateSchemaV4(deckDef)
       const validationErrors = validateSchemaV4.errors
 
-      if (validationErrors) {
+      if (validationErrors != null) {
         console.log(
           path.parse(defPath).base +
             ' ' +

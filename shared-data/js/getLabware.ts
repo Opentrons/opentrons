@@ -97,7 +97,7 @@ export function getLabwareDefaultEngageHeight(
       : rawEngageHeight / 2 + ENGAGE_HEIGHT_OFFSET
   }
 
-  return rawEngageHeight == null ? null : rawEngageHeight
+  return rawEngageHeight ?? null 
 }
 
 /* Render Helpers */
@@ -124,7 +124,7 @@ const _getSvgYValueForWell = (
 export function getWellPropsForSVGLabwareV1(
   def: LabwareDefinition1
 ): Record<string, WellDefinition> {
-  const wellDefs = def && def.wells
+  const wellDefs = def?.wells
   // Most labware defs have a weird offset,
   // but tips are mostly OK.
   // This is a HACK to make the offset less "off"

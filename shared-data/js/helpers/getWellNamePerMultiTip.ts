@@ -41,7 +41,7 @@ export function getWellNamePerMultiTip(
   channels: 8 | 96
 ): string[] | null {
   const topWell = labwareDef.wells[topWellName]
-  if (!topWell) {
+  if (topWell == null) {
     console.warn(
       `well "${topWellName}" does not exist in labware ${labwareDef?.namespace}/${labwareDef?.parameters?.loadName}, cannot getWellNamePerMultiTip`
     )
@@ -64,7 +64,7 @@ export function getWellNamePerMultiTip(
   const wellsAccessed = offsetYTipPositions.reduce(
     (acc: string[] | null, tipPosY) => {
       const wellForTip = findWellAt(labwareDef, x, tipPosY)
-      if (acc === null || !wellForTip) {
+      if (acc === null || wellForTip == null) {
         return null
       }
       return acc.concat(wellForTip)

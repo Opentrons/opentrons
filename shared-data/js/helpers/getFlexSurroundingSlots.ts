@@ -35,7 +35,7 @@ export const getFlexSurroundingSlots = (
   // Handle staging area slots
   if (stagingAreaSlots.length > 0) {
     stagingAreaSlots.forEach((stagingSlot, index) => {
-      if (stagingSlot) {
+      if (stagingSlot != null) {
         FLEX_GRID[index].push(stagingSlot)
       }
     })

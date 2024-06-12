@@ -16,7 +16,7 @@ describe('validate pipette specs with JSON schemas', () => {
     const valid = validateNameSpecs(pipetteNameSpecs)
     const validationErrors = validateNameSpecs.errors
 
-    if (validationErrors) {
+    if (validationErrors != null) {
       console.log(JSON.stringify(validationErrors, null, 4))
     }
 
@@ -28,7 +28,7 @@ describe('validate pipette specs with JSON schemas', () => {
     const valid = validateModelSpecs(pipetteModelSpecs)
     const validationErrors = validateModelSpecs.errors
 
-    if (validationErrors) {
+    if (validationErrors != null) {
       console.log(JSON.stringify(validationErrors, null, 4))
     }
 
