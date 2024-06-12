@@ -11,8 +11,9 @@ import type { Action, Epic } from '../../types'
 import type {
   RobotApiRequestOptions,
   RobotApiResponse,
+  RobotApiV2ErrorResponseBody,
 } from '../../robot-api/types'
-import type { CreateSessionAction, EnsureSessionAction } from '../types'
+import type { CreateSessionAction, EnsureSessionAction, SessionResponse } from '../types'
 
 export const mapActionToRequest = (
   action: CreateSessionAction | EnsureSessionAction
@@ -34,8 +35,8 @@ export const mapResponseToAction = (
   const { host, body, ...responseMeta } = response
   const meta = { ...originalAction.meta, response: responseMeta }
   return response.ok
-    ? Actions.createSessionSuccess(host.name, body, meta)
-    : Actions.createSessionFailure(host.name, body, meta)
+    ? Actions.createSessionSuccess(host.name, body as SessionResponse, meta)
+    : Actions.createSessionFailure(host.name, body as RobotApiV2ErrorResponseBody, meta)
 }
 
 export const createSessionEpic: Epic = (action$, state$) => {
