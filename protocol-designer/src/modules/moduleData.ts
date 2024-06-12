@@ -13,8 +13,6 @@ import {
 import { SPAN7_8_10_11_SLOT } from '../constants'
 import { getStagingAreaAddressableAreas } from '../utils'
 import { getSlotIsEmpty } from '../step-forms'
-import { getEnableAbsorbanceReader } from '../feature-flags/selectors'
-import { useSelector } from 'react-redux'
 import type {
   ModuleType,
   RobotType,
