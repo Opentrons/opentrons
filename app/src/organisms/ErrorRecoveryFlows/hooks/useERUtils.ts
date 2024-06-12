@@ -1,14 +1,24 @@
+import { useInstrumentsQuery } from '@opentrons/react-api-client'
+
 import { useRouteUpdateActions } from './useRouteUpdateActions'
 import { useRecoveryCommands } from './useRecoveryCommands'
 import { useRecoveryTipStatus } from './useRecoveryTipStatus'
 import { useRecoveryRouting } from './useRecoveryRouting'
 import { usePreviousRecoveryRoute } from './usePreviousRecoveryRoute'
+import { useFailedLabwareUtils } from './useFailedLabwareUtils'
+import { useFailedCommandPipetteInfo } from './useFailedCommandPipetteInfo'
+import {
+  useNotifyAllCommandsQuery,
+  useNotifyRunQuery,
+} from '../../../resources/runs'
 
+import type { PipetteData } from '@opentrons/api-client'
 import type { IRecoveryMap, RecoveryRoute } from '../types'
 import type { ErrorRecoveryFlowsProps } from '..'
 import type { UseRouteUpdateActionsResult } from './useRouteUpdateActions'
 import type { UseRecoveryCommandsResult } from './useRecoveryCommands'
 import type { RecoveryTipStatusUtils } from './useRecoveryTipStatus'
+import type { UseFailedLabwareUtilsResult } from './useFailedLabwareUtils'
 
 type ERUtilsProps = ErrorRecoveryFlowsProps & {
   toggleERWizard: (launchER: boolean) => Promise<void>
@@ -21,6 +31,8 @@ export interface ERUtilsResults {
   routeUpdateActions: UseRouteUpdateActionsResult
   recoveryCommands: UseRecoveryCommandsResult
   tipStatusUtils: RecoveryTipStatusUtils
+  failedLabwareUtils: UseFailedLabwareUtilsResult
+  failedPipetteInfo: PipetteData | null
   hasLaunchedRecovery: boolean
   trackExternalMap: (map: Record<string, any>) => void
 }
@@ -32,10 +44,20 @@ export function useERUtils({
   runId,
   toggleERWizard,
   hasLaunchedRecovery,
+  protocolAnalysis,
 }: ERUtilsProps): ERUtilsResults {
+  const { data: attachedInstruments } = useInstrumentsQuery()
+  const { data: runRecord } = useNotifyRunQuery(runId)
+  const { data: runCommands } = useNotifyAllCommandsQuery(runId)
+
   const { recoveryMap, setRM, trackExternalMap } = useRecoveryRouting()
   const previousRoute = usePreviousRecoveryRoute(recoveryMap.route)
-  const tipStatusUtils = useRecoveryTipStatus(runId, isFlex)
+  const tipStatusUtils = useRecoveryTipStatus({
+    runId,
+    isFlex,
+    runRecord,
+    attachedInstruments,
+  })
   const routeUpdateActions = useRouteUpdateActions({
     hasLaunchedRecovery,
     recoveryMap,
@@ -47,6 +69,18 @@ export function useERUtils({
     failedCommand,
   })
 
+  const failedPipetteInfo = useFailedCommandPipetteInfo({
+    failedCommand,
+    runRecord,
+    attachedInstruments,
+  })
+
+  const failedLabwareUtils = useFailedLabwareUtils({
+    failedCommand,
+    protocolAnalysis,
+    runCommands,
+  })
+
   return {
     recoveryMap,
     trackExternalMap,
@@ -55,5 +89,7 @@ export function useERUtils({
     recoveryCommands,
     hasLaunchedRecovery,
     tipStatusUtils,
+    failedLabwareUtils,
+    failedPipetteInfo,
   }
 }

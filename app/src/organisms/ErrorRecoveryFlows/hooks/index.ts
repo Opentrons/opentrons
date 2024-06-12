@@ -5,6 +5,7 @@ export { useErrorName } from './useErrorName'
 export { useRecoveryCommands } from './useRecoveryCommands'
 export { useRouteUpdateActions } from './useRouteUpdateActions'
 export { useERUtils } from './useERUtils'
+export { useFailedLabwareUtils } from './useFailedLabwareUtils'
 
 export type { UseRouteUpdateActionsResult } from './useRouteUpdateActions'
 export type { UseRecoveryCommandsResult } from './useRecoveryCommands'
