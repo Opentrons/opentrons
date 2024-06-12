@@ -248,7 +248,7 @@ export const migrateFile = (
     if (!getIsAdapter(labwareId)) {
       const definitionId = labware[labwareId].definitionId
       const labId =
-        labwareId === 'fixedTrash' || labwareId.includes(definitionId)
+        labwareId.includes(definitionId) || labwareId === 'fixedTrash'
           ? labwareId
           : `${labwareId}:${definitionId}`
       acc[labId] = labwareLocationUpdate[labwareId]
