@@ -2595,7 +2595,7 @@ class OT3API(
     async def liquid_probe(
         self,
         mount: Union[top_types.Mount, OT3Mount],
-        max_z_dist: float, # use!
+        max_z_dist: float,
         probe_settings: Optional[LiquidProbeSettings] = None,
         probe: Optional[InstrumentProbeType] = None,
     ) -> float:
@@ -2626,7 +2626,7 @@ class OT3API(
         pos = await self.gantry_position(checked_mount, refresh=True)
         probe_start_pos = pos._replace(z=probe_settings.starting_mount_height)
         await self.move_to(checked_mount, probe_start_pos)
-        total_z_travel = probe_settings.max_z_distance
+        total_z_travel = max_z_dist
         z_travels = self._get_probe_distances(
             checked_mount,
             total_z_travel,

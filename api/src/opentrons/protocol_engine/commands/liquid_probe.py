@@ -73,6 +73,7 @@ class LiquidProbeImplementation(
                 well_name=well_name,
             )
 
+        # liquid_probe process start position
         position = await self._movement.move_to_well(
             pipette_id=pipette_id,
             labware_id=labware_id,
@@ -80,12 +81,9 @@ class LiquidProbeImplementation(
             well_location=params.wellLocation,
             current_well=current_well,
         )
-        well_def = self._movement._state_store.labware.get_well_definition(
-            labware_id, well_name
-        )
-        well_depth = well_def.depth
+
         z_pos = await self._pipetting.liquid_probe_in_place(
-            pipette_id=pipette_id, max_z_dist=well_depth
+            pipette_id=pipette_id, labware_id=labware_id, well_name=well_name
         )
 
         return SuccessData(
