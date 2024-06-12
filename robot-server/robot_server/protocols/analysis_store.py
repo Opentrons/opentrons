@@ -1,16 +1,17 @@
 """Protocol analysis storage."""
 from __future__ import annotations
 
-
+import sqlalchemy
 from logging import getLogger
 from typing import Dict, List, Optional
-
-from opentrons.protocol_engine.types import RunTimeParameter
 from typing_extensions import Final
+
 from opentrons_shared_data.robot.dev_types import RobotType
-
-import sqlalchemy
-
+from opentrons.protocol_engine.types import (
+    RunTimeParameter,
+    RunTimeParamValuesType,
+    CSVParameter,
+)
 from opentrons.protocol_engine import (
     Command,
     ErrorOccurrence,
@@ -19,7 +20,6 @@ from opentrons.protocol_engine import (
     LoadedModule,
     Liquid,
 )
-from opentrons.protocol_engine.types import RunTimeParamValuesType
 
 from .analysis_models import (
     AnalysisSummary,
@@ -29,6 +29,7 @@ from .analysis_models import (
     AnalysisResult,
     AnalysisStatus,
     RunTimeParameterAnalysisData,
+    AnalysisParameterType,
 )
 
 from .completed_analysis_store import CompletedAnalysisStore, CompletedAnalysisResource
@@ -116,7 +117,11 @@ class AnalysisStore:
             current_analyzer_version=_CURRENT_ANALYZER_VERSION,
         )
 
-    def add_pending(self, protocol_id: str, analysis_id: str) -> AnalysisSummary:
+    def add_pending(
+        self,
+        protocol_id: str,
+        analysis_id: str,
+    ) -> PendingAnalysis:
         """Add a new pending analysis to the store.
 
         Args:
@@ -129,10 +134,10 @@ class AnalysisStore:
         Returns:
             A summary of the just-added analysis.
         """
-        new_pending_analysis = self._pending_store.add(
-            protocol_id=protocol_id, analysis_id=analysis_id
+        return self._pending_store.add(
+            protocol_id=protocol_id,
+            analysis_id=analysis_id,
         )
-        return _summarize_pending(pending_analysis=new_pending_analysis)
 
     async def update(
         self,
@@ -243,6 +248,9 @@ class AnalysisStore:
         completed_analysis_ids = self._completed_store.get_ids_by_protocol(
             protocol_id=protocol_id
         )
+        # TODO (spp, 2024-06-05): populate runTimeParameters in the completed analysis summaries once
+        #  we start saving RTPs to their own table. Currently, fetching RTPs from a
+        #  completed analysis requires de-serializing the full analysis resource.
         completed_analysis_summaries = [
             AnalysisSummary.construct(id=analysis_id, status=AnalysisStatus.COMPLETED)
             for analysis_id in completed_analysis_ids
@@ -287,10 +295,19 @@ class AnalysisStore:
 
         rtp_values_and_defaults = {}
         for param_spec in rtp_list:
+            value: AnalysisParameterType
+            if isinstance(param_spec, CSVParameter):
+                default = None
+                value = param_spec.file.id if param_spec.file is not None else None
+            else:
+                default = param_spec.default
+                value = param_spec.value
+            # TODO(jbl 2024-06-04) we might want to add type here, since CSV files value is a str and right now the only
+            #   thing disambiguating that is that default for that will be None, if we ever want to discern type.
             rtp_values_and_defaults.update(
                 {
                     param_spec.variableName: RunTimeParameterAnalysisData(
-                        value=param_spec.value, default=param_spec.default
+                        value=value, default=default
                     )
                 }
             )
@@ -316,6 +333,11 @@ class AnalysisStore:
         parameters in the analysis use default values.
         """
         if analysis_summary.status == AnalysisStatus.PENDING:
+            # TODO: extract defaults and values from pending analysis now that they're available
+            #   If the pending analysis RTPs match the current RTPs, do nothing(?).
+            #   If the pending analysis RTPs DO NOT match the current RTPs, raise the
+            #   AnalysisIsPending error. Eventually, we might allow either canceling the
+            #   pending analysis or starting another analysis when there's already a pending one.
             raise AnalysisIsPendingError(analysis_summary.id)
 
         rtp_values_and_defaults_in_last_analysis = (
@@ -371,13 +393,19 @@ class _PendingAnalysisStore:
         self._analysis_ids_by_protocol_id: Dict[str, str] = {}
         self._protocol_ids_by_analysis_id: Dict[str, str] = {}
 
-    def add(self, protocol_id: str, analysis_id: str) -> PendingAnalysis:
+    def add(
+        self,
+        protocol_id: str,
+        analysis_id: str,
+    ) -> PendingAnalysis:
         """Add a new pending analysis and associate it with the given protocol."""
         assert (
             protocol_id not in self._analysis_ids_by_protocol_id
         ), "Protocol must not already have a pending analysis."
 
-        new_pending_analysis = PendingAnalysis.construct(id=analysis_id)
+        new_pending_analysis = PendingAnalysis.construct(
+            id=analysis_id,
+        )
 
         self._analyses_by_id[analysis_id] = new_pending_analysis
         self._analysis_ids_by_protocol_id[protocol_id] = analysis_id

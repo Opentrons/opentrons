@@ -219,4 +219,27 @@ describe('getPipettesWithTipAttached', () => {
     expect(result[0].mount).toEqual(LEFT)
     expect(result[1].mount).toEqual(RIGHT)
   })
+
+  it('does not return otherwise legitimate failed tip exchange commands if fixit intent tip commands are present and successful', async () => {
+    const mockCommandsWithFixit = mockCommands.data.push({
+      id: '0220242c-4fe4-4d0c-92d8-71fcc45e944e',
+      key: 'a3e946a0-9b93-45d4-8d22-d08815bab0ce',
+      intent: 'fixit',
+      commandType: 'dropTipInPlace',
+      status: 'succeeded',
+      params: {
+        pipetteId: 'testId1',
+      },
+    } as any)
+
+    vi.mocked(getCommands).mockResolvedValue({
+      data: { data: mockCommandsWithFixit, meta: { totalLength: 11 } },
+    } as any)
+
+    const result = await getPipettesWithTipAttached({
+      ...DEFAULT_PARAMS,
+      isFlex: false,
+    })
+    expect(result).toEqual([])
+  })
 })

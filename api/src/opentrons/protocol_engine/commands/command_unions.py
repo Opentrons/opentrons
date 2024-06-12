@@ -6,7 +6,9 @@ from typing_extensions import Annotated
 from pydantic import Field
 
 from .command import DefinedErrorData
+from .pipetting_common import OverpressureError, OverpressureErrorInternalData
 
+from . import absorbance_reader
 from . import heater_shaker
 from . import magnetic_module
 from . import temperature_module
@@ -357,6 +359,8 @@ Command = Annotated[
         thermocycler.OpenLid,
         thermocycler.CloseLid,
         thermocycler.RunProfile,
+        absorbance_reader.Initialize,
+        absorbance_reader.MeasureAbsorbance,
         calibration.CalibrateGripper,
         calibration.CalibratePipette,
         calibration.CalibrateModule,
@@ -423,6 +427,8 @@ CommandParams = Union[
     thermocycler.CloseLidParams,
     thermocycler.RunProfileParams,
     thermocycler.RunProfileStepParams,
+    absorbance_reader.InitializeParams,
+    absorbance_reader.MeasureAbsorbanceParams,
     calibration.CalibrateGripperParams,
     calibration.CalibratePipetteParams,
     calibration.CalibrateModuleParams,
@@ -486,6 +492,8 @@ CommandType = Union[
     thermocycler.OpenLidCommandType,
     thermocycler.CloseLidCommandType,
     thermocycler.RunProfileCommandType,
+    absorbance_reader.InitializeCommandType,
+    absorbance_reader.MeasureAbsorbanceCommandType,
     calibration.CalibrateGripperCommandType,
     calibration.CalibratePipetteCommandType,
     calibration.CalibrateModuleCommandType,
@@ -550,6 +558,8 @@ CommandCreate = Annotated[
         thermocycler.OpenLidCreate,
         thermocycler.CloseLidCreate,
         thermocycler.RunProfileCreate,
+        absorbance_reader.InitializeCreate,
+        absorbance_reader.MeasureAbsorbanceCreate,
         calibration.CalibrateGripperCreate,
         calibration.CalibratePipetteCreate,
         calibration.CalibrateModuleCreate,
@@ -615,6 +625,8 @@ CommandResult = Union[
     thermocycler.OpenLidResult,
     thermocycler.CloseLidResult,
     thermocycler.RunProfileResult,
+    absorbance_reader.InitializeResult,
+    absorbance_reader.MeasureAbsorbanceResult,
     calibration.CalibrateGripperResult,
     calibration.CalibratePipetteResult,
     calibration.CalibrateModuleResult,
@@ -629,7 +641,7 @@ CommandPrivateResult = Union[
 ]
 
 # All `DefinedErrorData`s that implementations will actually return in practice.
-# There's just one right now, but this will eventually be a Union.
-CommandDefinedErrorData = DefinedErrorData[
-    TipPhysicallyMissingError, TipPhysicallyMissingErrorInternalData
+CommandDefinedErrorData = Union[
+    DefinedErrorData[TipPhysicallyMissingError, TipPhysicallyMissingErrorInternalData],
+    DefinedErrorData[OverpressureError, OverpressureErrorInternalData],
 ]

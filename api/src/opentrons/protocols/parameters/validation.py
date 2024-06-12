@@ -2,7 +2,7 @@ import keyword
 from typing import List, Set, Optional, Union, Literal
 
 from .types import (
-    AllowedTypes,
+    PrimitiveAllowedTypes,
     ParamType,
     ParameterChoice,
     ParameterNameError,
@@ -83,7 +83,7 @@ def ensure_unit_string_length(unit: Optional[str]) -> Optional[str]:
 
 def ensure_value_type(
     value: Union[float, bool, str], parameter_type: type
-) -> AllowedTypes:
+) -> PrimitiveAllowedTypes:
     """Ensures that the value type coming in from the client matches the given type.
 
     This does not guarantee that the value will be the correct type for the given parameter, only that any data coming
@@ -94,7 +94,7 @@ def ensure_value_type(
     If something is labelled as a type but does not get converted here, that will be caught when it is attempted to be
     set as the parameter value and will raise the appropriate error there.
     """
-    validated_value: AllowedTypes = value
+    validated_value: PrimitiveAllowedTypes = value
     if isinstance(value, float):
         if parameter_type is bool and (value == 0 or value == 1):
             validated_value = bool(value)

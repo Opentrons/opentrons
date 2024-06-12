@@ -10,6 +10,7 @@ from opentrons_shared_data.labware.labware_definition import (
     Parameters as LabwareParameters,
 )
 from opentrons_shared_data.pipette import pipette_definition
+from opentrons_shared_data.pipette.pipette_definition import ValidNozzleMaps
 
 from opentrons.hardware_control.nozzle_manager import NozzleMap
 from opentrons.protocol_engine import actions, commands
@@ -966,6 +967,7 @@ def test_drop_tip(
                 starting_nozzle="A1",
                 back_left_nozzle="A1",
                 front_right_nozzle="A1",
+                valid_nozzle_maps=ValidNozzleMaps(maps={"A1": ["A1"]}),
             ),
             1,
         ),
@@ -977,6 +979,23 @@ def test_drop_tip(
                 starting_nozzle="A1",
                 back_left_nozzle="A1",
                 front_right_nozzle="H12",
+                valid_nozzle_maps=ValidNozzleMaps(
+                    maps={
+                        "Full": sum(
+                            [
+                                NINETY_SIX_ROWS["A"],
+                                NINETY_SIX_ROWS["B"],
+                                NINETY_SIX_ROWS["C"],
+                                NINETY_SIX_ROWS["D"],
+                                NINETY_SIX_ROWS["E"],
+                                NINETY_SIX_ROWS["F"],
+                                NINETY_SIX_ROWS["G"],
+                                NINETY_SIX_ROWS["H"],
+                            ],
+                            [],
+                        )
+                    }
+                ),
             ),
             96,
         ),
@@ -988,6 +1007,9 @@ def test_drop_tip(
                 starting_nozzle="A1",
                 back_left_nozzle="A1",
                 front_right_nozzle="E1",
+                valid_nozzle_maps=ValidNozzleMaps(
+                    maps={"A1_E1": ["A1", "B1", "C1", "D1", "E1"]}
+                ),
             ),
             5,
         ),
@@ -1111,6 +1133,11 @@ def test_next_tip_uses_active_channels(
             starting_nozzle="A12",
             back_left_nozzle="A12",
             front_right_nozzle="H12",
+            valid_nozzle_maps=ValidNozzleMaps(
+                maps={
+                    "A12_H12": ["A12", "B12", "C12", "D12", "E12", "F12", "G12", "H12"]
+                }
+            ),
         ),
     )
     subject.handle_action(
@@ -1217,6 +1244,54 @@ def test_next_tip_automatic_tip_tracking_with_partial_configurations(
                 starting_nozzle=start,
                 back_left_nozzle=back_l,
                 front_right_nozzle=front_r,
+                valid_nozzle_maps=ValidNozzleMaps(
+                    maps={
+                        "A1": ["A1"],
+                        "H1": ["H1"],
+                        "A12": ["A12"],
+                        "H12": ["H12"],
+                        "A1_H3": [
+                            "A1",
+                            "A2",
+                            "A3",
+                            "B1",
+                            "B2",
+                            "B3",
+                            "C1",
+                            "C2",
+                            "C3",
+                            "D1",
+                            "D2",
+                            "D3",
+                            "E1",
+                            "E2",
+                            "E3",
+                            "F1",
+                            "F2",
+                            "F3",
+                            "G1",
+                            "G2",
+                            "G3",
+                            "H1",
+                            "H2",
+                            "H3",
+                        ],
+                        "A1_F2": [
+                            "A1",
+                            "A2",
+                            "B1",
+                            "B2",
+                            "C1",
+                            "C2",
+                            "D1",
+                            "D2",
+                            "E1",
+                            "E2",
+                            "F1",
+                            "F2",
+                        ],
+                    }
+                ),
             ),
         )
         subject.handle_action(
@@ -1328,6 +1403,27 @@ def test_next_tip_automatic_tip_tracking_tiprack_limits(
                 starting_nozzle=start,
                 back_left_nozzle=back_l,
                 front_right_nozzle=front_r,
+                valid_nozzle_maps=ValidNozzleMaps(
+                    maps={
+                        "A1": ["A1"],
+                        "H1": ["H1"],
+                        "A12": ["A12"],
+                        "H12": ["H12"],
+                        "Full": sum(
+                            [
+                                NINETY_SIX_ROWS["A"],
+                                NINETY_SIX_ROWS["B"],
+                                NINETY_SIX_ROWS["C"],
+                                NINETY_SIX_ROWS["D"],
+                                NINETY_SIX_ROWS["E"],
+                                NINETY_SIX_ROWS["F"],
+                                NINETY_SIX_ROWS["G"],
+                                NINETY_SIX_ROWS["H"],
+                            ],
+                            [],
+                        ),
+                    }
+                ),
             ),
         )
         subject.handle_action(

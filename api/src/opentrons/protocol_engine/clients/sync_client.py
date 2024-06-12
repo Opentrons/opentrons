@@ -433,6 +433,33 @@ class SyncClient:
 
         return cast(commands.AspirateResult, result)
 
+    def aspirate_wait_for_recovery(
+        self,
+        pipette_id: str,
+        labware_id: str,
+        well_name: str,
+        well_location: WellLocation,
+        volume: float,
+        flow_rate: float,
+    ) -> commands.Aspirate:
+        """Execute a Aspirate, wait for any error recovery, and return it.
+
+        Note that the returned command will not necessarily have a `result`.
+        """
+        request = commands.AspirateCreate(
+            params=commands.AspirateParams(
+                pipetteId=pipette_id,
+                labwareId=labware_id,
+                wellName=well_name,
+                wellLocation=well_location,
+                volume=volume,
+                flowRate=flow_rate,
+            )
+        )
+        command = self._transport.execute_command_wait_for_recovery(request=request)
+
+        return cast(commands.Aspirate, command)
+
     def aspirate_in_place(
         self,
         pipette_id: str,
@@ -873,3 +900,31 @@ class SyncClient:
         )
         result = self._transport.execute_command(request=request)
         return cast(commands.LoadLiquidResult, result)
+
+    def absorbance_reader_initialize(
+        self,
+        module_id: str,
+        wavelength: int,
+    ) -> commands.absorbance_reader.InitializeResult:
+        """Execute a `absorbanceReader/initialize` command and return the result."""
+        request = commands.absorbance_reader.InitializeCreate(
+            params=commands.absorbance_reader.InitializeParams(
+                moduleId=module_id, sampleWavelength=wavelength
+            )
+        )
+        result = self._transport.execute_command(request=request)
+        return cast(commands.absorbance_reader.InitializeResult, result)
+
+    def absorbance_reader_measure(
+        self,
+        module_id: str,
+        wavelength: int,
+    ) -> commands.absorbance_reader.MeasureAbsorbanceResult:
+        """Execute a `absorbanceReader/measure` command and return the result."""
+        request = commands.absorbance_reader.MeasureAbsorbanceCreate(
+            params=commands.absorbance_reader.MeasureAbsorbanceParams(
+                moduleId=module_id, sampleWavelength=wavelength
+            )
+        )
+        result = self._transport.execute_command(request=request)
+        return cast(commands.absorbance_reader.MeasureAbsorbanceResult, result)

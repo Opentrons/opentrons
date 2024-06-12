@@ -61,6 +61,8 @@
       "thermocycler/openLid": "#/definitions/OpenLidCreate",
       "thermocycler/closeLid": "#/definitions/CloseLidCreate",
       "thermocycler/runProfile": "#/definitions/RunProfileCreate",
+      "absorbanceReader/initialize": "#/definitions/InitializeCreate",
+      "absorbanceReader/measure": "#/definitions/MeasureAbsorbanceCreate",
       "calibration/calibrateGripper": "#/definitions/CalibrateGripperCreate",
       "calibration/calibratePipette": "#/definitions/CalibratePipetteCreate",
       "calibration/calibrateModule": "#/definitions/CalibrateModuleCreate",
@@ -235,6 +237,12 @@
     },
     {
       "$ref": "#/definitions/RunProfileCreate"
+    },
+    {
+      "$ref": "#/definitions/InitializeCreate"
+    },
+    {
+      "$ref": "#/definitions/MeasureAbsorbanceCreate"
     },
     {
       "$ref": "#/definitions/CalibrateGripperCreate"
@@ -1521,7 +1529,8 @@
         "thermocyclerModuleV1",
         "thermocyclerModuleV2",
         "heaterShakerModuleV1",
-        "magneticBlockV1"
+        "magneticBlockV1",
+        "absorbanceReaderV1"
       ],
       "type": "string"
     },
@@ -3704,6 +3713,102 @@
         },
         "params": {
           "$ref": "#/definitions/RunProfileParams"
+        },
+        "intent": {
+          "description": "The reason the command was added. If not specified or `protocol`, the command will be treated as part of the protocol run itself, and added to the end of the existing command queue.\n\nIf `setup`, the command will be treated as part of run setup. A setup command may only be enqueued if the run has not started.\n\nUse setup commands for activities like pre-run calibration checks and module setup, like pre-heating.",
+          "allOf": [
+            {
+              "$ref": "#/definitions/CommandIntent"
+            }
+          ]
+        },
+        "key": {
+          "title": "Key",
+          "description": "A key value, unique in this run, that can be used to track the same logical command across multiple runs of the same protocol. If a value is not provided, one will be generated.",
+          "type": "string"
+        }
+      },
+      "required": ["params"]
+    },
+    "InitializeParams": {
+      "title": "InitializeParams",
+      "description": "Input parameters to initialize an absorbance reading.",
+      "type": "object",
+      "properties": {
+        "moduleId": {
+          "title": "Moduleid",
+          "description": "Unique ID of the absorbance reader.",
+          "type": "string"
+        },
+        "sampleWavelength": {
+          "title": "Samplewavelength",
+          "description": "Sample wavelength in nm.",
+          "type": "integer"
+        }
+      },
+      "required": ["moduleId", "sampleWavelength"]
+    },
+    "InitializeCreate": {
+      "title": "InitializeCreate",
+      "description": "A request to execute an Absorbance Reader measurement.",
+      "type": "object",
+      "properties": {
+        "commandType": {
+          "title": "Commandtype",
+          "default": "absorbanceReader/initialize",
+          "enum": ["absorbanceReader/initialize"],
+          "type": "string"
+        },
+        "params": {
+          "$ref": "#/definitions/InitializeParams"
+        },
+        "intent": {
+          "description": "The reason the command was added. If not specified or `protocol`, the command will be treated as part of the protocol run itself, and added to the end of the existing command queue.\n\nIf `setup`, the command will be treated as part of run setup. A setup command may only be enqueued if the run has not started.\n\nUse setup commands for activities like pre-run calibration checks and module setup, like pre-heating.",
+          "allOf": [
+            {
+              "$ref": "#/definitions/CommandIntent"
+            }
+          ]
+        },
+        "key": {
+          "title": "Key",
+          "description": "A key value, unique in this run, that can be used to track the same logical command across multiple runs of the same protocol. If a value is not provided, one will be generated.",
+          "type": "string"
+        }
+      },
+      "required": ["params"]
+    },
+    "MeasureAbsorbanceParams": {
+      "title": "MeasureAbsorbanceParams",
+      "description": "Input parameters for a single absorbance reading.",
+      "type": "object",
+      "properties": {
+        "moduleId": {
+          "title": "Moduleid",
+          "description": "Unique ID of the Absorbance Reader.",
+          "type": "string"
+        },
+        "sampleWavelength": {
+          "title": "Samplewavelength",
+          "description": "Sample wavelength in nm.",
+          "type": "integer"
+        }
+      },
+      "required": ["moduleId", "sampleWavelength"]
+    },
+    "MeasureAbsorbanceCreate": {
+      "title": "MeasureAbsorbanceCreate",
+      "description": "A request to execute an Absorbance Reader measurement.",
+      "type": "object",
+      "properties": {
+        "commandType": {
+          "title": "Commandtype",
+          "default": "absorbanceReader/measure",
+          "enum": ["absorbanceReader/measure"],
+          "type": "string"
+        },
+        "params": {
+          "$ref": "#/definitions/MeasureAbsorbanceParams"
         },
         "intent": {
           "description": "The reason the command was added. If not specified or `protocol`, the command will be treated as part of the protocol run itself, and added to the end of the existing command queue.\n\nIf `setup`, the command will be treated as part of run setup. A setup command may only be enqueued if the run has not started.\n\nUse setup commands for activities like pre-run calibration checks and module setup, like pre-heating.",

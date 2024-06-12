@@ -89,6 +89,7 @@ class ErrorCodes(Enum):
     INVALID_PROTOCOL_DATA = _code_from_dict_entry("4006")
     API_MISCONFIGURATION = _code_from_dict_entry("4007")
     INVALID_STORED_DATA = _code_from_dict_entry("4008")
+    MISSING_CONFIGURATION_DATA = _code_from_dict_entry("4009")
 
     @classmethod
     @lru_cache(25)

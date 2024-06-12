@@ -10,15 +10,12 @@ import '@fontsource/public-sans/700.css'
 // needed to display chemical formulae on the liquids page. I've added DejaVu Sans, which
 // does have the glyphs, as a fallback so subscripts will get displayed. Mel and the design
 // team will want to revisit the fonts we use at some point in the future.
-export const GlobalStyle = createGlobalStyle<{ isOnDevice?: boolean }>`
+export const GlobalStyle = createGlobalStyle<{}>`
   * {
     box-sizing: border-box;
     margin: 0;
     padding: 0;
-    font-family: ${props =>
-      props.isOnDevice ?? false
-        ? 'Public Sans, DejaVu Sans'
-        : 'Open Sans'}, sans-serif;
+    font-family: 'Public Sans', 'DejaVu Sans', sans-serif;
   }
 
   html,

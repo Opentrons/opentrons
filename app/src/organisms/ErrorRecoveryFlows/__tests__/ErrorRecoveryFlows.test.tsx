@@ -12,7 +12,7 @@ import { renderWithProviders } from '../../../__testing-utils__'
 import { i18n } from '../../../i18n'
 import { mockFailedCommand } from '../__fixtures__'
 import { ErrorRecoveryFlows, useErrorRecoveryFlows } from '..'
-import { useCurrentlyRecoveringFrom } from '../utils'
+import { useCurrentlyRecoveringFrom, useERUtils } from '../hooks'
 import { useFeatureFlag } from '../../../redux/config'
 import { useERWizard, ErrorRecoveryWizard } from '../ErrorRecoveryWizard'
 import { useRunPausedSplash, RunPausedSplash } from '../RunPausedSplash'
@@ -20,7 +20,7 @@ import { useRunPausedSplash, RunPausedSplash } from '../RunPausedSplash'
 import type { RunStatus } from '@opentrons/api-client'
 
 vi.mock('../ErrorRecoveryWizard')
-vi.mock('../utils')
+vi.mock('../hooks')
 vi.mock('../useRecoveryCommands')
 vi.mock('../../../redux/config')
 vi.mock('../RunPausedSplash')
@@ -39,19 +39,19 @@ describe('useErrorRecoveryFlows', () => {
   })
 
   it('should toggle the value of isEREnabled properly when the run status is valid', () => {
-    const { result } = renderHook(() =>
-      useErrorRecoveryFlows('MOCK_ID', RUN_STATUS_AWAITING_RECOVERY)
+    const { result, rerender } = renderHook(
+      runStatus => useErrorRecoveryFlows('MOCK_ID', runStatus),
+      {
+        initialProps: RUN_STATUS_AWAITING_RECOVERY,
+      }
     )
 
     expect(result.current.isERActive).toBe(true)
 
-    const { result: resultStopRequested } = renderHook(() =>
-      useErrorRecoveryFlows('MOCK_ID', RUN_STATUS_STOP_REQUESTED)
-    )
+    rerender(RUN_STATUS_STOP_REQUESTED as any)
 
-    expect(resultStopRequested.current.isERActive).toBe(true)
+    expect(result.current.isERActive).toBe(true)
   })
-
   it('should disable error recovery when runStatus is not a valid ER run status', () => {
     const { result } = renderHook(
       (runStatus: RunStatus) => useErrorRecoveryFlows('MOCK_ID', runStatus),
@@ -70,6 +70,14 @@ describe('useErrorRecoveryFlows', () => {
 
     expect(result.current.failedCommand).toEqual('mockCommand')
   })
+
+  it(`should return isERActive false if the run status is ${RUN_STATUS_STOP_REQUESTED} before seeing ${RUN_STATUS_AWAITING_RECOVERY}`, () => {
+    const { result } = renderHook(() =>
+      useErrorRecoveryFlows('MOCK_ID', RUN_STATUS_RUNNING)
+    )
+
+    expect(result.current.isERActive).toEqual(false)
+  })
 })
 
 const render = (props: React.ComponentProps<typeof ErrorRecoveryFlows>) => {
@@ -85,6 +93,7 @@ describe('ErrorRecovery', () => {
     props = {
       failedCommand: mockFailedCommand,
       runId: 'MOCK_RUN_ID',
+      isFlex: true,
     }
     vi.mocked(ErrorRecoveryWizard).mockReturnValue(<div>MOCK WIZARD</div>)
     vi.mocked(RunPausedSplash).mockReturnValue(
@@ -97,6 +106,7 @@ describe('ErrorRecovery', () => {
       showERWizard: true,
     })
     vi.mocked(useRunPausedSplash).mockReturnValue(true)
+    vi.mocked(useERUtils).mockReturnValue({ routeUpdateActions: {} } as any)
   })
 
   it('renders the wizard when the wizard is toggled on', () => {

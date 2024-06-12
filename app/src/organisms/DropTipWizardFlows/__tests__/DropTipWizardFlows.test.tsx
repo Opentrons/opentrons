@@ -2,6 +2,8 @@ import * as React from 'react'
 import { describe, it, beforeEach, afterEach, expect, vi } from 'vitest'
 import { screen, renderHook, act } from '@testing-library/react'
 
+import { renderWithProviders } from '../../../__testing-utils__'
+import { i18n } from '../../../i18n'
 import { mockPipetteInfo } from '../../../redux/pipettes/__fixtures__'
 import {
   useTipAttachmentStatus,
@@ -15,8 +17,6 @@ import { DropTipWizard } from '../DropTipWizard'
 import type { Mock } from 'vitest'
 import type { PipetteModelSpecs } from '@opentrons/shared-data'
 import type { PipetteWithTip } from '..'
-import { renderWithProviders } from '../../../__testing-utils__'
-import { i18n } from '../../../i18n'
 
 vi.mock('@opentrons/shared-data', async importOriginal => {
   const actual = await importOriginal<typeof getPipetteModelSpecs>()
@@ -27,6 +27,7 @@ vi.mock('@opentrons/shared-data', async importOriginal => {
 })
 vi.mock('../DropTipWizard')
 vi.mock('../getPipettesWithTipAttached')
+vi.mock('../hooks')
 
 const MOCK_ACTUAL_PIPETTE = {
   ...mockPipetteInfo.pipetteSpecs,

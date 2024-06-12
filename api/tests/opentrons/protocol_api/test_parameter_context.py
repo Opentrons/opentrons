@@ -9,6 +9,7 @@ from opentrons.protocol_api import (
     MAX_SUPPORTED_VERSION,
 )
 from opentrons.protocols.parameters import (
+    csv_parameter_definition as mock_csv_parameter_definition,
     parameter_definition as mock_parameter_definition,
     validation as mock_validation,
 )
@@ -24,6 +25,16 @@ def _mock_parameter_definition_creates(
 ) -> None:
     for name, func in inspect.getmembers(mock_parameter_definition, inspect.isfunction):
         monkeypatch.setattr(mock_parameter_definition, name, decoy.mock(func=func))
+
+
+@pytest.fixture(autouse=True)
+def _mock_csv_parameter_definition_creates(
+    decoy: Decoy, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    for name, func in inspect.getmembers(
+        mock_csv_parameter_definition, inspect.isfunction
+    ):
+        monkeypatch.setattr(mock_csv_parameter_definition, name, decoy.mock(func=func))
 
 
 @pytest.fixture(autouse=True)
@@ -177,6 +188,33 @@ def test_add_string(decoy: Decoy, subject: ParameterContext) -> None:
     )
 
     assert param_def is subject._parameters["my slightly less cool variable"]
+    decoy.verify(
+        mock_validation.validate_variable_name_unique("qwerty", {"other_param"})
+    )
+
+
+def test_add_csv(decoy: Decoy, subject: ParameterContext) -> None:
+    """It should create and add a CSV parameter definition."""
+    subject._parameters["other_param"] = decoy.mock(
+        cls=mock_csv_parameter_definition.CSVParameterDefinition
+    )
+    param_def = decoy.mock(cls=mock_csv_parameter_definition.CSVParameterDefinition)
+    decoy.when(param_def.variable_name).then_return("my potentially cool variable")
+    decoy.when(
+        mock_csv_parameter_definition.create_csv_parameter(
+            display_name="jkl",
+            variable_name="qwerty",
+            description="fee foo fum",
+        )
+    ).then_return(param_def)
+
+    subject.add_csv_file(
+        display_name="jkl",
+        variable_name="qwerty",
+        description="fee foo fum",
+    )
+
+    assert param_def is subject._parameters["my potentially cool variable"]
     decoy.verify(
         mock_validation.validate_variable_name_unique("qwerty", {"other_param"})
     )

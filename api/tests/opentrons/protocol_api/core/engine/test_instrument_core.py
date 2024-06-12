@@ -490,7 +490,7 @@ def test_aspirate_from_well(
                 origin=WellOrigin.TOP, offset=WellOffset(x=3, y=2, z=1)
             ),
         ),
-        mock_engine_client.aspirate(
+        mock_engine_client.aspirate_wait_for_recovery(
             pipette_id="abc123",
             labware_id="123abc",
             well_name="my cool well",

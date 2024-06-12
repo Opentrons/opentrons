@@ -57,7 +57,7 @@ async def test_get_current_status_ot2(
 ) -> None:
     """Test LightController.get_current_status."""
     decoy.when(engine_store.current_run_id).then_return("fake_id" if active else None)
-    decoy.when(engine_store.engine.state_view.commands.get_status()).then_return(status)
+    decoy.when(engine_store.get_status()).then_return(status)
     decoy.when(hardware_api.get_estop_state()).then_return(estop)
 
     expected = Status(
@@ -198,9 +198,7 @@ async def test_provide_engine_store(
     )
 
     decoy.when(engine_store.current_run_id).then_return("fake_id")
-    decoy.when(engine_store.engine.state_view.commands.get_status()).then_return(
-        EngineStatus.RUNNING
-    )
+    decoy.when(engine_store.get_status()).then_return(EngineStatus.RUNNING)
 
     subject.update_engine_store(engine_store=engine_store)
     assert subject.get_current_status() == Status(

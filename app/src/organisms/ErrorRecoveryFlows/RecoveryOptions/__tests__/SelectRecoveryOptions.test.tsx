@@ -34,11 +34,13 @@ const renderRecoveryOptions = (
 describe('SelectRecoveryOption', () => {
   const { RETRY_FAILED_COMMAND } = RECOVERY_MAP
   let props: React.ComponentProps<typeof SelectRecoveryOption>
-  let mockProceedToRoute: Mock
+  let mockProceedToRouteAndStep: Mock
 
   beforeEach(() => {
-    mockProceedToRoute = vi.fn()
-    const mockRouteUpdateActions = { proceedToRoute: mockProceedToRoute } as any
+    mockProceedToRouteAndStep = vi.fn()
+    const mockRouteUpdateActions = {
+      proceedToRouteAndStep: mockProceedToRouteAndStep,
+    } as any
 
     props = {
       ...mockRecoveryContentProps,
@@ -47,13 +49,14 @@ describe('SelectRecoveryOption', () => {
         route: RETRY_FAILED_COMMAND.ROUTE,
         step: RETRY_FAILED_COMMAND.STEPS.CONFIRM_RETRY,
       },
+      tipStatusUtils: { determineTipStatus: vi.fn() } as any,
     }
   })
 
   it('renders appropriate "General Error" copy and click behavior', () => {
     renderSelectRecoveryOption(props)
 
-    screen.getByText('How do you want to proceed?')
+    screen.getByText('Choose a recovery action')
 
     const retryStepOption = screen.getByRole('label', { name: 'Retry step' })
     const continueBtn = screen.getByRole('button', { name: 'Continue' })
@@ -64,7 +67,9 @@ describe('SelectRecoveryOption', () => {
     fireEvent.click(retryStepOption)
     fireEvent.click(continueBtn)
 
-    expect(mockProceedToRoute).toHaveBeenCalledWith(RETRY_FAILED_COMMAND.ROUTE)
+    expect(mockProceedToRouteAndStep).toHaveBeenCalledWith(
+      RETRY_FAILED_COMMAND.ROUTE
+    )
   })
 })
 
