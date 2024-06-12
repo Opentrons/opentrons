@@ -39,7 +39,7 @@ function StandInContent(): JSX.Element {
       borderRadius={BORDERS.borderRadius8}
       width="207px"
       height="104px"
-      backgroundColor="#A864FF0A"
+      backgroundColor="#A864FF19"
     />
   )
 }
@@ -278,7 +278,7 @@ export const ExampleTwoColumn: Story = {
     rightImageUrl: [SuccessIcon],
     rightNotificationHeading: undefined,
     rightNotificationMessage: undefined,
-    rightNotificationType: undefined,
+    rightNotificationType: 'neutral',
     containerWidth: 960,
     containerHeight: 432,
   },
