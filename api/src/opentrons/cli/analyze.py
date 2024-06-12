@@ -1,5 +1,8 @@
 """Opentrons analyze CLI."""
+from types import TracebackType
+
 import click
+import traceback
 
 from anyio import run
 from contextlib import contextmanager
@@ -23,7 +26,7 @@ from typing import (
 import logging
 import sys
 
-from opentrons.protocol_engine.types import RunTimeParameter
+from opentrons.protocol_engine.types import RunTimeParameter, EngineStatus
 from opentrons.protocols.api_support.types import APIVersion
 from opentrons.protocol_reader import (
     ProtocolReader,
@@ -33,7 +36,11 @@ from opentrons.protocol_reader import (
     ProtocolFilesInvalidError,
     ProtocolSource,
 )
-from opentrons.protocol_runner import create_simulating_runner, RunResult
+from opentrons.protocol_runner import (
+    create_simulating_runner,
+    RunResult,
+    PythonAndLegacyRunner,
+)
 from opentrons.protocol_engine import (
     Command,
     ErrorOccurrence,
@@ -41,9 +48,20 @@ from opentrons.protocol_engine import (
     LoadedPipette,
     LoadedModule,
     Liquid,
+    StateSummary,
 )
 
 from opentrons_shared_data.robot.dev_types import RobotType
+
+from opentrons_shared_data.errors import ErrorCodes
+from opentrons_shared_data.errors.exceptions import (
+    EnumeratedError,
+    PythonException,
+    GeneralError,
+)
+
+from opentrons.protocols.parse import PythonParseMode
+from opentrons.util.performance_helpers import track_analysis
 
 OutputKind = Literal["json", "human-json"]
 
@@ -197,12 +215,133 @@ def _get_return_code(analysis: RunResult) -> int:
     return 0
 
 
+class RunnerLoadError(EnumeratedError):
+    """Raised when attempting to load the runner."""
+
+    def __init__(
+        self,
+        message: Optional[str] = None,
+        wrapping: Optional[Sequence[Union[EnumeratedError, Exception]]] = None,
+    ) -> None:
+        """Build a RunnerLoadError exception."""
+
+        def _convert_exc() -> Iterator[EnumeratedError]:
+            if not wrapping:
+                return
+            for exc in wrapping:
+                if isinstance(exc, EnumeratedError):
+                    yield exc
+                else:
+                    yield PythonException(exc)
+
+        super().__init__(
+            code=ErrorCodes.INVALID_PROTOCOL_DATA,
+            message=message,
+            wrapping=[e for e in _convert_exc()],
+        )
+
+
+# class ExceptionDuringProtocolLoad(GeneralError):
+#     """This exception wraps an exception that was raised from a protocol
+#     for proper error message formatting by the rpc, since it's only here that
+#     we can properly figure out formatting
+#     """
+#
+#     def __init__(
+#         self,
+#         original_exc: Exception,
+#         original_tb: Optional[TracebackType],
+#         message: str,
+#         line: Optional[int],
+#     ) -> None:
+#         self.original_exc = original_exc
+#         self.original_tb = original_tb
+#         self.line = line
+#         super().__init__(
+#             wrapping=[original_exc],
+#             message=_build_message(
+#                 exception_class_name=self.original_exc.__class__.__name__,
+#                 line_number=self.line,
+#                 message=message,
+#             ),
+#         )
+#
+#     def __str__(self) -> str:
+#         return self.message
+#
+# def _build_message(
+#     exception_class_name: str, line_number: Optional[int], message: str
+# ) -> str:
+#     line_number_part = f" [line {line_number}]" if line_number is not None else ""
+#     return f"{exception_class_name}{line_number_part}: {message}"
+
+
+# def _find_protocol_error(tb, proto_name):
+#     """Return the FrameInfo for the lowest frame in the traceback from the
+#     protocol.
+#     """
+#     tb_info = traceback.extract_tb(tb)
+#     for frame in reversed(tb_info):
+#         if frame.filename == proto_name:
+#             return frame
+#     else:
+#         raise KeyError
+#
+# def _raise_pretty_protocol_error(exception: Exception, filename: str) -> None:
+#     exc_type, exc_value, tb = sys.exc_info()
+#     try:
+#         frame = _find_protocol_error(tb, filename)
+#     except KeyError:
+#         # No pretty names, just raise it
+#         raise exception
+#     raise ExceptionDuringProtocolLoad(
+#         exception, tb, str(exception), frame.lineno
+#     ) from exception
+
+
+@track_analysis
 async def _do_analyze(protocol_source: ProtocolSource) -> RunResult:
 
     runner = await create_simulating_runner(
         robot_type=protocol_source.robot_type, protocol_config=protocol_source.config
     )
-    return await runner.run(deck_configuration=[], protocol_source=protocol_source)
+    if isinstance(runner, PythonAndLegacyRunner):
+        try:
+            await runner.load(
+                protocol_source=protocol_source,
+                python_parse_mode=PythonParseMode.NORMAL,
+                run_time_param_values=None,
+            )
+        except Exception as error:
+            err_id = "runner-load-error"
+            err_created_at = datetime.now(tz=timezone.utc)
+            if isinstance(error, EnumeratedError):
+                error_occ = ErrorOccurrence.from_failed(
+                    id=err_id, createdAt=err_created_at, error=error
+                )
+            else:
+                enumerated_wrapper = RunnerLoadError(
+                    message=str(error),
+                    wrapping=[error],
+                )
+                error_occ = ErrorOccurrence.from_failed(
+                    id=err_id, createdAt=err_created_at, error=enumerated_wrapper
+                )
+            analysis = RunResult(
+                commands=[],
+                state_summary=StateSummary(
+                    errors=[error_occ],
+                    status=EngineStatus.IDLE,
+                    labware=[],
+                    pipettes=[],
+                    modules=[],
+                    labwareOffsets=[],
+                    liquids=[],
+                ),
+                parameters=[],
+            )
+            return analysis
+    return await runner.run(deck_configuration=[])
 
 
 async def _analyze(
