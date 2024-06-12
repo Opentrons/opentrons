@@ -379,3 +379,25 @@ def test_unexpected_runner_load_error(
     assert error["detail"] == "name 'call_a_non_existent_func' is not defined"
     assert error["errorCode"] == "4000"
     assert error["errorType"] == "UnexpectedAnalysisError"
+
+
+@pytest.mark.parametrize("output", ["--json-output", "--human-json-output"])
+def test_analyze_json_protocol(
+    tmp_path: Path,
+    output: str,
+) -> None:
+    """Test that a json protocol analyzes correctly."""
+    json_file = (
+        Path(__file__).parents[4]
+        / "shared-data"
+        / "protocol"
+        / "fixtures"
+        / "8"
+        / "simpleV8.json"
+    )
+    result = _get_analysis_result([json_file], output)
+
+    assert result.exit_code == 0
+    op = result.json_output
+    assert op is not None
+    assert len(op["commands"]) == 27
