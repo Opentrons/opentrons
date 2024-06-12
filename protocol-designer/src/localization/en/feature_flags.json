@@ -11,5 +11,9 @@
   "OT_PD_ALLOW_ALL_TIPRACKS": {
     "title": "Allow all tip rack options",
     "description": "Enable selection of all tip racks for each pipette."
+  },
+  "OT_PD_ENABLE_ABSORBANCE_READER": {
+    "title": "Enable absorbance plate reader",
+    "description": "Enable absorbance plate reader support."
   }
 }

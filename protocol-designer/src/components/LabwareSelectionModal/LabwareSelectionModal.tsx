@@ -23,6 +23,7 @@ import {
   getModuleType,
   THERMOCYCLER_MODULE_V2,
   getAreSlotsHorizontallyAdjacent,
+  ABSORBANCE_READER_TYPE,
 } from '@opentrons/shared-data'
 import {
   closeLabwareSelector,
@@ -125,6 +126,7 @@ const RECOMMENDED_LABWARE_BY_MODULE: { [K in ModuleType]: string[] } = {
     'nest_96_wellplate_2ml_deep',
     'opentrons_96_wellplate_200ul_pcr_full_skirt',
   ],
+  [ABSORBANCE_READER_TYPE]: [],
 }
 
 export const getLabwareIsRecommended = (
