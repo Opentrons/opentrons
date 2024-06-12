@@ -628,6 +628,7 @@ class LiquidNotFoundError(RoboticsControlError):
             wrapping,
         )
 
+
 class TipHitWellBottomError(RoboticsControlError):
     """Error raised if tip hits bottom of well while trying to detect liquid level."""
 
@@ -644,6 +645,7 @@ class TipHitWellBottomError(RoboticsControlError):
             detail,
             wrapping,
         )
+
 
 class LabwareDroppedError(RoboticsInteractionError):
     """An error indicating that the gripper dropped labware it was holding."""
