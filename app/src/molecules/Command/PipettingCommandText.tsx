@@ -2,7 +2,7 @@ import { useTranslation } from 'react-i18next'
 
 import { getLabwareDefURI } from '@opentrons/shared-data'
 
-import { getLabwareDefinitionsFromCommands } from '../LabwarePositionCheck/utils/labware'
+import { getLabwareDefinitionsFromCommands } from './utils'
 import { getLoadedLabware } from './utils/accessors'
 import {
   getLabwareName,

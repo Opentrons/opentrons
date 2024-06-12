@@ -21,10 +21,8 @@ import { JogToWell } from './JogToWell'
 import { UnorderedList } from '../../molecules/UnorderedList'
 import { getCurrentOffsetForLabwareInLocation } from '../Devices/ProtocolRun/utils/getCurrentOffsetForLabwareInLocation'
 import { TipConfirmation } from './TipConfirmation'
-import {
-  getLabwareDef,
-  getLabwareDefinitionsFromCommands,
-} from './utils/labware'
+import { getLabwareDef } from './utils/labware'
+import { getLabwareDefinitionsFromCommands } from '../../molecules/Command/utils/getLabwareDefinitionsFromCommands'
 import { getDisplayLocation } from './utils/getDisplayLocation'
 
 import type {

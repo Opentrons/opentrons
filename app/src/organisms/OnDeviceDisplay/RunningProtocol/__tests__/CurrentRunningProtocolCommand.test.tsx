@@ -6,7 +6,7 @@ import { RUN_STATUS_RUNNING, RUN_STATUS_IDLE } from '@opentrons/api-client'
 
 import { renderWithProviders } from '../../../../__testing-utils__'
 import { i18n } from '../../../../i18n'
-import { mockRobotSideAnalysis } from '../../../molecules/Command/__fixtures__'
+import { mockRobotSideAnalysis } from '../../../../molecules/Command/__fixtures__'
 import { CurrentRunningProtocolCommand } from '../CurrentRunningProtocolCommand'
 import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
 

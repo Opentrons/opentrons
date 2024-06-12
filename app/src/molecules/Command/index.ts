@@ -1,5 +1,5 @@
-import { CommandText } from './CommandText'
+import {CommandText} from './CommandText'
 import { Command } from './Command'
-import { CommandIcon } from './CommandIcon'
+import { CommandIcon} from './CommandIcon'
 export * from './utils'
 export { CommandText, Command, CommandIcon }
