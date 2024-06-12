@@ -237,8 +237,9 @@ export const DeckSetupContents = (props: ContentsProps): JSX.Element => {
           moduleOnDeck.slot
         )
 
-        const isAdapter =
-          labwareLoadedOnModule?.def.metadata.displayCategory === 'adapter'
+        const isAdapter = labwareLoadedOnModule?.def.allowedRoles?.includes(
+          'adapter'
+        )
         return (
           <Module
             key={moduleOnDeck.slot}
@@ -383,8 +384,7 @@ export const DeckSetupContents = (props: ContentsProps): JSX.Element => {
           console.warn(`no slot ${labware.slot} for labware ${labware.id}!`)
           return null
         }
-        const labwareIsAdapter =
-          labware.def.metadata.displayCategory === 'adapter'
+        const labwareIsAdapter = labware.def.allowedRoles?.includes('adapter')
         return (
           <React.Fragment key={labware.id}>
             <LabwareOnDeck

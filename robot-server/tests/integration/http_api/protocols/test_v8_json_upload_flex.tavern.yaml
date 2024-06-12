@@ -24,6 +24,7 @@ stages:
         data:
           id: !anystr
           protocolType: json
+          protocolKind: standard
           analysisSummaries:
             - id: !anystr
               status: pending
@@ -58,6 +59,7 @@ stages:
             - name: simpleFlexV8.json
               role: main
           protocolType: json
+          protocolKind: standard
           robotType: OT-3 Standard
           metadata:
             tags:

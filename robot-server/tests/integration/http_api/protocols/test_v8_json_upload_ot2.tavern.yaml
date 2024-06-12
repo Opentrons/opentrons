@@ -57,6 +57,7 @@ stages:
             - name: simpleV8.json
               role: main
           protocolType: json
+          protocolKind: standard
           robotType: OT-2 Standard
           metadata:
             tags:

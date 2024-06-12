@@ -94,10 +94,11 @@ function checkPipettesForAttachedTips(
   // Iterate backwards through commands, finding first tip exchange command for each pipette.
   // If there's a chance the tip is still attached, flag the pipette.
   for (let i = commands.length - 1; i >= 0; i--) {
-    if (pipettesWithUnknownTipStatus.length === 0) break
+    if (pipettesWithUnknownTipStatus.length === 0) {
+      break
+    }
 
     const commandType = commands[i].commandType
-
     const pipetteUsedInCommand = (commands[i] as PipettingRunTimeCommand).params
       .pipetteId
     const isTipExchangeCommand = TIP_EXCHANGE_COMMAND_TYPES.includes(
@@ -107,6 +108,17 @@ function checkPipettesForAttachedTips(
       pipettesWithUnknownTipStatus.find(
         pipette => pipette.id === pipetteUsedInCommand
       ) ?? null
+
+    // If the currently iterated command is a fixit command, we can safely assume the user
+    // had the option to fix pipettes with tips in this command and all commands
+    // earlier in the run, during Error Recovery flows.
+    if (
+      commands[i].intent === 'fixit' &&
+      isTipExchangeCommand &&
+      commands[i].status === 'succeeded'
+    ) {
+      break
+    }
 
     if (
       isTipExchangeCommand &&

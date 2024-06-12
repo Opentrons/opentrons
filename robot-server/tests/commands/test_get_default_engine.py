@@ -1,21 +1,21 @@
-"""Tests for robot_server.commands.get_default_engine."""
+"""Tests for robot_server.commands.get_default_orchestrator."""
 import pytest
 from decoy import Decoy
 
 from opentrons.hardware_control import HardwareControlAPI
 from opentrons.hardware_control.modules import MagDeck, TempDeck
-from opentrons.protocol_engine import ProtocolEngine
+from opentrons.protocol_runner import RunOrchestrator
 
 from robot_server.errors.error_responses import ApiError
 from robot_server.runs.engine_store import EngineStore, EngineConflictError
 from robot_server.modules.module_identifier import ModuleIdentifier, ModuleIdentity
-from robot_server.commands.get_default_engine import get_default_engine
+from robot_server.commands.get_default_orchestrator import get_default_orchestrator
 
 
 @pytest.fixture()
-def protocol_engine(decoy: Decoy) -> ProtocolEngine:
+def run_orchestrator(decoy: Decoy) -> RunOrchestrator:
     """Get a mocked out ProtocolEngine."""
-    return decoy.mock(cls=ProtocolEngine)
+    return decoy.mock(cls=RunOrchestrator)
 
 
 @pytest.fixture()
@@ -30,11 +30,11 @@ def module_identifier(decoy: Decoy) -> ModuleIdentifier:
     return decoy.mock(cls=ModuleIdentifier)
 
 
-async def test_get_default_engine(
+async def test_get_default_orchestrator(
     decoy: Decoy,
     engine_store: EngineStore,
     hardware_api: HardwareControlAPI,
-    protocol_engine: ProtocolEngine,
+    run_orchestrator: RunOrchestrator,
     module_identifier: ModuleIdentifier,
 ) -> None:
     """It should get a default engine with modules pre-loaded."""
@@ -63,30 +63,32 @@ async def test_get_default_engine(
 
     decoy.when(hardware_api.attached_modules).then_return([mod_1, mod_2])
 
-    decoy.when(await engine_store.get_default_engine()).then_return(protocol_engine)
+    decoy.when(await engine_store.get_default_orchestrator()).then_return(
+        run_orchestrator
+    )
 
-    result = await get_default_engine(
+    result = await get_default_orchestrator(
         engine_store=engine_store,
         hardware_api=hardware_api,
         module_identifier=module_identifier,
     )
 
-    assert result is protocol_engine
+    assert result is run_orchestrator
 
     decoy.verify(
-        await protocol_engine.use_attached_modules({"mod-1": mod_1, "mod-2": mod_2}),
+        await run_orchestrator.use_attached_modules({"mod-1": mod_1, "mod-2": mod_2}),
         times=1,
     )
 
 
 async def test_raises_conflict(decoy: Decoy, engine_store: EngineStore) -> None:
     """It should raise a 409 conflict if the default engine is not availble."""
-    decoy.when(await engine_store.get_default_engine()).then_raise(
+    decoy.when(await engine_store.get_default_orchestrator()).then_raise(
         EngineConflictError("oh no")
     )
 
     with pytest.raises(ApiError) as exc_info:
-        await get_default_engine(engine_store=engine_store)
+        await get_default_orchestrator(engine_store=engine_store)
 
     assert exc_info.value.status_code == 409
     assert exc_info.value.content["errors"][0]["id"] == "RunActive"

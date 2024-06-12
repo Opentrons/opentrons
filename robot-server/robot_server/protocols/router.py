@@ -1,4 +1,5 @@
 """Router for /protocols endpoints."""
+
 import json
 import logging
 from textwrap import dedent
@@ -10,7 +11,15 @@ from opentrons.protocol_engine.types import RunTimeParamValuesType
 from opentrons_shared_data.robot import user_facing_robot_type
 from typing_extensions import Literal
 
-from fastapi import APIRouter, Depends, File, UploadFile, status, Form
+from fastapi import (
+    APIRouter,
+    Depends,
+    File,
+    HTTPException,
+    UploadFile,
+    status,
+    Form,
+)
 from fastapi.responses import PlainTextResponse
 from pydantic import BaseModel, Field
 
@@ -37,7 +46,7 @@ from robot_server.service.json_api import (
 from .analyses_manager import AnalysesManager
 
 from .protocol_auto_deleter import ProtocolAutoDeleter
-from .protocol_models import Protocol, ProtocolFile, Metadata
+from .protocol_models import Protocol, ProtocolFile, Metadata, ProtocolKind
 from .analysis_store import AnalysisStore, AnalysisNotFoundError, AnalysisIsPendingError
 from .analysis_models import ProtocolAnalysis, AnalysisRequest, AnalysisSummary
 from .protocol_store import (
@@ -151,6 +160,18 @@ protocols_router = APIRouter()
         A new analysis is also started if the same protocol file is uploaded but with
         a different set of run-time parameter values than the most recent request.
         See the `/protocols/{id}/analyses/` endpoints for more details.
+
+        You can provide the kind of protocol with the `protocol_kind` form data
+        The protocol kind can be:
+
+        - `quick-transfer` for Quick Transfer protocols
+        - `standard`       for non Quick transfer protocols
+
+        if the `protocol_kind` is None it will be defaulted to `standard`.
+
+        Quick transfer protocols:
+        - Do not store any run history
+        - Do not get auto deleted, instead they have a fixed max count.
         """
     ),
     status_code=status.HTTP_201_CREATED,
@@ -163,7 +184,7 @@ protocols_router = APIRouter()
         status.HTTP_503_SERVICE_UNAVAILABLE: {"model": ErrorBody[LastAnalysisPending]},
     },
 )
-async def create_protocol(
+async def create_protocol(  # noqa: C901
     files: List[UploadFile] = File(...),
     # use Form because request is multipart/form-data
     # https://fastapi.tiangolo.com/tutorial/request-forms-and-files/
@@ -185,6 +206,14 @@ async def create_protocol(
         " always trigger an analysis (for now).",
         alias="runTimeParameterValues",
     ),
+    protocol_kind: Optional[str] = Form(
+        default=None,
+        description=(
+            "Whether this is a `standard` protocol or a `quick-transfer` protocol."
+            "if ommited, the protocol will be `standard` by default."
+        ),
+        alias="protocolKind",
+    ),
     protocol_directory: Path = Depends(get_protocol_directory),
     protocol_store: ProtocolStore = Depends(get_protocol_store),
     analysis_store: AnalysisStore = Depends(get_analysis_store),
@@ -202,8 +231,9 @@ async def create_protocol(
 
     Arguments:
         files: List of uploaded files, from form-data.
-        key: Optional key for client-side tracking
+        key: Optional key for cli-side tracking
         run_time_parameter_values: Key value pairs of run-time parameters defined in a protocol.
+        protocol_kind: Optional key representing the kind of protocol.
         protocol_directory: Location to store uploaded files.
         protocol_store: In-memory database of protocol resources.
         analysis_store: In-memory database of protocol analyses.
@@ -219,6 +249,13 @@ async def create_protocol(
         analysis_id: Unique identifier to attach to the analysis resource.
         created_at: Timestamp to attach to the new resource.
     """
+    kind = ProtocolKind.from_string(protocol_kind)
+    if isinstance(protocol_kind, str) and kind is None:
+        raise HTTPException(
+            status_code=400, detail=f"Invalid protocol_kind: {protocol_kind}"
+        )
+    kind = kind or ProtocolKind.STANDARD
+
     for file in files:
         # TODO(mm, 2024-02-07): Investigate whether the filename can actually be None.
         assert file.filename is not None
@@ -256,6 +293,7 @@ async def create_protocol(
         data = Protocol.construct(
             id=cached_protocol_id,
             createdAt=resource.created_at,
+            protocolKind=ProtocolKind.from_string(resource.protocol_kind),
             protocolType=resource.source.config.protocol_type,
             robotType=resource.source.robot_type,
             metadata=Metadata.parse_obj(resource.source.metadata),
@@ -303,6 +341,7 @@ async def create_protocol(
         created_at=created_at,
         source=source,
         protocol_key=key,
+        protocol_kind=kind.value,
     )
 
     protocol_auto_deleter.make_room_for_new_protocol()
@@ -317,6 +356,7 @@ async def create_protocol(
     data = Protocol(
         id=protocol_id,
         createdAt=created_at,
+        protocolKind=kind,
         protocolType=source.config.protocol_type,
         robotType=source.robot_type,
         metadata=Metadata.parse_obj(source.metadata),
@@ -397,6 +437,7 @@ async def get_protocols(
         Protocol.construct(
             id=r.protocol_id,
             createdAt=r.created_at,
+            protocolKind=ProtocolKind.from_string(r.protocol_kind),
             protocolType=r.source.config.protocol_type,
             robotType=r.source.robot_type,
             metadata=Metadata.parse_obj(r.source.metadata),
@@ -476,6 +517,7 @@ async def get_protocol_by_id(
     data = Protocol.construct(
         id=protocolId,
         createdAt=resource.created_at,
+        protocolKind=ProtocolKind.from_string(resource.protocol_kind),
         protocolType=resource.source.config.protocol_type,
         robotType=resource.source.robot_type,
         metadata=Metadata.parse_obj(resource.source.metadata),
@@ -601,9 +643,9 @@ async def create_protocol_analysis(
             data=analysis_summaries,
             meta=MultiBodyMeta(cursor=0, totalLength=len(analysis_summaries)),
         ),
-        status_code=status.HTTP_201_CREATED
-        if started_new_analysis
-        else status.HTTP_200_OK,
+        status_code=(
+            status.HTTP_201_CREATED if started_new_analysis else status.HTTP_200_OK
+        ),
     )
 
 

@@ -4,7 +4,11 @@ import last from 'lodash/last'
 
 import { DT_ROUTES, INVALID } from '../constants'
 
-import type { DropTipFlowsRoute, DropTipFlowsStep } from '../types'
+import type {
+  DropTipFlowsRoute,
+  DropTipFlowsStep,
+  FixitCommandTypeUtils,
+} from '../types'
 
 interface DropTipFlowsMap {
   currentRoute: DropTipFlowsRoute
@@ -35,7 +39,9 @@ export interface UseDropTipRoutingResult {
  * 2. Blowout - Contains steps related to pipette blowout, which typically precedes the drop tip route.
  * 3. Drop Tip - Contains steps related to dropping the pipette tip. DT flows typically end after this step.
  */
-export function useDropTipRouting(): UseDropTipRoutingResult {
+export function useDropTipRouting(
+  fixitUtils?: FixitCommandTypeUtils
+): UseDropTipRoutingResult {
   const [dropTipFlowsMap, setDropTipFlowsMap] = React.useState<DropTipFlowsMap>(
     {
       currentRoute: DT_ROUTES.BEFORE_BEGINNING,
@@ -43,6 +49,9 @@ export function useDropTipRouting(): UseDropTipRoutingResult {
       currentStepIdx: 0,
     }
   )
+
+  useExternalMapUpdates(dropTipFlowsMap, fixitUtils)
+
   const { currentStep, currentRoute } = dropTipFlowsMap
 
   const goBack = (): Promise<void> => {
@@ -161,4 +170,18 @@ function determineValidRoute(
       currentStep: updatedStep,
     }
   }
+}
+
+// If an external flow is keeping track of the Drop tip flow map, update it when the drop tip flow map updates.
+export function useExternalMapUpdates(
+  map: DropTipFlowsMap,
+  fixitUtils?: FixitCommandTypeUtils
+): void {
+  const { currentStep, currentRoute } = map
+
+  React.useEffect(() => {
+    if (fixitUtils != null) {
+      fixitUtils.trackCurrentMap({ currentRoute, currentStep })
+    }
+  }, [currentStep, currentRoute, fixitUtils])
 }

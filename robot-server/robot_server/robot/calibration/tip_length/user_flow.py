@@ -200,7 +200,8 @@ class TipCalibrationUserFlow:
     def _get_default_tip_length(self) -> float:
         tiprack: labware.Labware = self._deck[TIP_RACK_SLOT]  # type: ignore
         full_length = tiprack.tip_length
-        overlap_dict: Dict[str, float] = self._hw_pipette.tip_overlap
+        # add the versioned stuff here
+        overlap_dict: Dict[str, float] = self._hw_pipette.tip_overlap["v0"]
         overlap = overlap_dict.get(tiprack.uri, 0)
         return full_length - overlap
 
