@@ -27,7 +27,7 @@ import type { FixitCommandTypeUtils } from '../../DropTipWizardFlows/types'
 export function ManageTips(props: RecoveryContentProps): JSX.Element | null {
   const { recoveryMap } = props
 
-  const buildContent = (): JSX.Element => {
+  const buildContent = (): JSX.Element | null => {
     const { DROP_TIP_FLOWS } = RECOVERY_MAP
     const { step } = recoveryMap
 
@@ -51,12 +51,18 @@ export function BeginRemoval({
   tipStatusUtils,
   routeUpdateActions,
   recoveryCommands,
+  errorKind,
+  hasLaunchedRecovery,
 }: RecoveryContentProps): JSX.Element | null {
   const { t } = useTranslation('error_recovery')
   const { pipettesWithTip } = tipStatusUtils
-  const { proceedNextStep, setRobotInMotion } = routeUpdateActions
+  const {
+    proceedNextStep,
+    setRobotInMotion,
+    proceedToRouteAndStep,
+  } = routeUpdateActions
   const { cancelRun } = recoveryCommands
-  const { ROBOT_CANCELING } = RECOVERY_MAP
+  const { ROBOT_CANCELING, RETRY_NEW_TIPS } = RECOVERY_MAP
   const mount = head(pipettesWithTip)?.mount
 
   const [selected, setSelected] = React.useState<RemovalOptions>(
@@ -67,9 +73,18 @@ export function BeginRemoval({
     if (selected === 'begin-removal') {
       void proceedNextStep()
     } else {
-      void setRobotInMotion(true, ROBOT_CANCELING.ROUTE).then(() => {
-        cancelRun()
-      })
+      // TOME: This condition is fine for now but maybe problematic in the future.
+      // Then again, it may not given how drop tip works after ER.
+      if (
+        errorKind === ERROR_KINDS.OVERPERSSURE_WHILE_ASPIRATING &&
+        hasLaunchedRecovery
+      ) {
+        void proceedToRouteAndStep(RETRY_NEW_TIPS.ROUTE)
+      } else {
+        void setRobotInMotion(true, ROBOT_CANCELING.ROUTE).then(() => {
+          cancelRun()
+        })
+      }
     }
   }
 

@@ -107,7 +107,7 @@ export function RunPausedSplash({
 
 const SplashHeader = styled.h1`
   font-weight: ${TYPOGRAPHY.fontWeightBold};
-  text-align: ${TYPOGRAPHY.textAlignLeft};
+  text-align: ${TYPOGRAPHY.textAlignCenter};
   font-size: ${TYPOGRAPHY.fontSize80};
   line-height: ${TYPOGRAPHY.lineHeight96};
   color: ${COLORS.white};

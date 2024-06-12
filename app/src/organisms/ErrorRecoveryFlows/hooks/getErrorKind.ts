@@ -4,7 +4,7 @@ import type { ErrorKind } from '../types'
 
 export function getErrorKind(errorType?: string): ErrorKind {
   switch (errorType) {
-    case 'pipetteOverpressureError':
+    case 'overpressure':
       return ERROR_KINDS.OVERPERSSURE_WHILE_ASPIRATING
     default:
       return ERROR_KINDS.GENERAL_ERROR

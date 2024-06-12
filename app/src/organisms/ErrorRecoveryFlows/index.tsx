@@ -1,6 +1,5 @@
 import * as React from 'react'
 
-import type { RunStatus } from '@opentrons/api-client'
 import {
   RUN_STATUS_AWAITING_RECOVERY,
   RUN_STATUS_STOP_REQUESTED,
@@ -10,6 +9,9 @@ import { useFeatureFlag } from '../../redux/config'
 import { ErrorRecoveryWizard, useERWizard } from './ErrorRecoveryWizard'
 import { RunPausedSplash, useRunPausedSplash } from './RunPausedSplash'
 import { useCurrentlyRecoveringFrom, useERUtils } from './hooks'
+
+import type { RunStatus } from '@opentrons/api-client'
+import type { CompletedProtocolAnalysis } from '@opentrons/shared-data'
 import type { FailedCommand } from './types'
 
 const VALID_ER_RUN_STATUSES: RunStatus[] = [
@@ -63,22 +65,28 @@ export interface ErrorRecoveryFlowsProps {
   runId: string
   failedCommand: FailedCommand | null
   isFlex: boolean
+  protocolAnalysis: CompletedProtocolAnalysis | null
 }
 
 export function ErrorRecoveryFlows(
   props: ErrorRecoveryFlowsProps
 ): JSX.Element | null {
-  const { runId, failedCommand, isFlex } = props
+  const { failedCommand } = props
   const enableRunNotes = useFeatureFlag('enableRunNotes')
   const { hasLaunchedRecovery, toggleERWizard, showERWizard } = useERWizard()
   const showSplash = useRunPausedSplash()
 
+  // TOME: Remove this!
+  const updatedFailedCommand: FailedCommand = {
+    ...failedCommand,
+    error: { ...failedCommand?.error, errorType: 'overpressure' },
+  }
+  ///
+
   const recoveryUtils = useERUtils({
-    isFlex,
-    failedCommand,
-    runId,
-    toggleERWizard,
+    ...props,
     hasLaunchedRecovery,
+    toggleERWizard,
   })
 
   if (!enableRunNotes) {
@@ -88,11 +96,15 @@ export function ErrorRecoveryFlows(
   return (
     <>
       {showERWizard ? (
-        <ErrorRecoveryWizard {...props} {...recoveryUtils} />
+        <ErrorRecoveryWizard
+          {...props}
+          {...recoveryUtils}
+          failedCommand={updatedFailedCommand}
+        />
       ) : null}
       {showSplash ? (
         <RunPausedSplash
-          failedCommand={failedCommand}
+          failedCommand={updatedFailedCommand}
           toggleERWiz={toggleERWizard}
           routeUpdateActions={recoveryUtils.routeUpdateActions}
         />
