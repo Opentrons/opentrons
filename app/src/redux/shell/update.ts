@@ -3,7 +3,11 @@
 import { createSelector } from 'reselect'
 
 import type { State } from '../types'
-import type { ShellUpdateAction, ShellUpdateState } from './types'
+import type {
+  ShellUpdateAction,
+  ShellUpdateState,
+  RobotMassStorageDeviceEnumerated,
+} from './types'
 
 // command sent to app-shell via meta.shell === true
 export function checkShellUpdate(): ShellUpdateAction {
@@ -29,3 +33,13 @@ export const getAvailableShellUpdate: (
 ) => string | null = createSelector(getShellUpdateState, state =>
   state.available && state.info ? state.info.version : null
 )
+
+export function checkMassStorage(
+  state: State
+): RobotMassStorageDeviceEnumerated {
+  return {
+    type: 'shell: ROBOT_MASS_STORAGE_DEVICE_ENUMERATED',
+    payload,
+    meta: { shell: true },
+  }
+}

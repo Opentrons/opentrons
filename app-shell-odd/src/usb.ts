@@ -2,12 +2,18 @@ import * as fs from 'fs'
 import * as fsPromises from 'fs/promises'
 import { join } from 'path'
 import { flatten } from 'lodash'
-import type { Dispatch } from './types'
 import {
   robotMassStorageDeviceAdded,
   robotMassStorageDeviceEnumerated,
   robotMassStorageDeviceRemoved,
+  sendFilePaths,
 } from './actions'
+import {
+  ROBOT_MASS_STORAGE_DEVICE_ENUMERATED,
+  ROBOT_MASS_STORAGE_DEVICE_REMOVED,
+} from './constants'
+import type { Dispatch, Action } from './types'
+
 const FLEX_USB_MOUNT_DIR = '/media/'
 const FLEX_USB_DEVICE_DIR = '/dev/'
 const FLEX_USB_MOUNT_FILTER = /sd[a-z]+[0-9]+$/
@@ -52,11 +58,9 @@ export function watchForMassStorage(dispatch: Dispatch): () => void {
   console.log('watching for mass storage')
   let prevDirs: string[] = []
   const handleNewlyPresent = (path: string): Promise<string> => {
-    console.log('path', path)
     dispatch(robotMassStorageDeviceAdded(path))
     return enumerateMassStorage(path)
       .then(contents => {
-        console.log('contents', contents)
         dispatch(robotMassStorageDeviceEnumerated(path, contents))
       })
       .then(() => path)
@@ -164,5 +168,32 @@ export function watchForMassStorage(dispatch: Dispatch): () => void {
   return () => {
     mediaWatcher != null && mediaWatcher.close()
     devWatcher.close()
+  }
+}
+
+export function registerFilePath(
+  dispatch: Dispatch
+): (action: Action) => unknown {
+  return function handleAction(action: Action) {
+    switch (action.type) {
+      case ROBOT_MASS_STORAGE_DEVICE_ENUMERATED:
+        void enumerateMassStorage(action.payload.rootPath).then(contents => {
+          // Note (kk:06/12/2024) need to filter out resource fork files which starts ._
+          const regex = /._\w/gm
+          const csvFilePaths =
+            contents.filter(
+              path => !path.match(regex) && path.endsWith('.csv')
+            ) ?? []
+          dispatch(sendFilePaths(csvFilePaths))
+        })
+        break
+
+      case ROBOT_MASS_STORAGE_DEVICE_REMOVED:
+        dispatch(sendFilePaths([]))
+        break
+
+      default:
+        break
+    }
   }
 }

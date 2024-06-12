@@ -135,3 +135,9 @@ export interface RobotSystemAction {
   payload: { shellReady: boolean }
   meta: { shell: true }
 }
+
+export interface SendFilePathAction {
+  type: 'shell:SEND_FILE_PATH'
+  payload: { filePaths: string[] }
+  meta: { shell: true }
+}

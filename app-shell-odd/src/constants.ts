@@ -255,3 +255,5 @@ export const FAILURE_STATUSES = {
   ECONNREFUSED: 'ECONNREFUSED',
   ECONNFAILED: 'ECONNFAILED',
 } as const
+
+export const SEND_FILE_PATH: 'shell:SEND_FILE_PATH' = 'shell:SEND_FILE_PATH'

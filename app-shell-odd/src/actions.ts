@@ -83,6 +83,7 @@ import {
   DISCOVERY_START,
   DISCOVERY_FINISH,
   SEND_READY_STATUS,
+  SEND_FILE_PATH,
 } from './constants'
 import type {
   InitializedAction,
@@ -99,6 +100,7 @@ import type {
   StartDiscoveryAction,
   FinishDiscoveryAction,
   RobotSystemAction,
+  SendFilePathAction,
 } from './types'
 import type {
   AppRestartAction,
@@ -443,5 +445,11 @@ export function finishDiscovery(): FinishDiscoveryAction {
 export const sendReadyStatus = (status: boolean): RobotSystemAction => ({
   type: SEND_READY_STATUS,
   payload: { shellReady: status },
+  meta: { shell: true },
+})
+
+export const sendFilePaths = (filePaths: string[]): SendFilePathAction => ({
+  type: SEND_FILE_PATH,
+  payload: { filePaths },
   meta: { shell: true },
 })

@@ -22,7 +22,7 @@ import {
   ODD_DIR,
 } from './config'
 import systemd from './systemd'
-import { watchForMassStorage } from './usb'
+import { registerFilePath, watchForMassStorage } from './usb'
 import {
   registerNotify,
   establishBrokerConnection,
@@ -116,6 +116,7 @@ function startUp(): void {
     registerAppRestart(),
     registerUpdateBrightness(),
     registerNotify(dispatch, mainWindow),
+    registerFilePath(dispatch),
   ]
 
   ipcMain.on('dispatch', (_, action) => {

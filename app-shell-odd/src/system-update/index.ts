@@ -19,6 +19,7 @@ import {
 } from './release-files'
 import { uploadSystemFile } from './update'
 import { getSystemUpdateDir } from './directories'
+import { sendFilePaths } from '../actions'
 
 import type { DownloadProgress } from '../http'
 import type { Action, Dispatch } from '../types'
@@ -387,36 +388,3 @@ function cacheUpdateSet(
   systemUpdateSet = filepaths
   return getInfoFromUpdateSet(systemUpdateSet)
 }
-
-const dispatchCSVFileInfo = (filePaths: string[], dispatch: Dispatch): void => {
-  dispatch({
-    type: 'robotUpdate:UPDATE_INFO',
-    payload: { releaseNotes, version, force, target: 'flex' },
-  })
-  dispatch({
-    type: 'robotUpdate:UPDATE_VERSION',
-    payload: { version, force, target: 'flex' },
-  })
-}
-
-export const getLatestMassStorageCsvFiles = (
-  filePaths: string[],
-  dispatch: Dispatch
-): Promise<unknown> =>
-  Promise.all(
-    filePaths.map(
-      path =>
-        !path.endsWith('.csv') &&
-        new Promise<null>(resolve => {
-          resolve(null)
-        })
-    )
-  ).then(values => {
-    console.log(`found csv files on mass storage`)
-    const releaseNotes = fakeReleaseNotesForMassStorage(update.version)
-    massStorageUpdateSet = { system: update.path, releaseNotes }
-    dispatchUpdateInfo(
-      { version: update.version, releaseNotes, force: true },
-      dispatch
-    )
-  })

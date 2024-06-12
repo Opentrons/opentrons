@@ -34,6 +34,7 @@ import { SmallButton } from '../../atoms/buttons'
 import { Modal } from '../../molecules/Modal'
 import { LongPressModal } from './LongPressModal'
 import { formatTimeWithUtcLabel } from '../../resources/runs'
+import { useFeatureFlag } from '../../redux/config'
 
 import type { UseLongPressResult } from '@opentrons/components'
 import type { ProtocolResource } from '@opentrons/shared-data'
@@ -66,6 +67,8 @@ export function ProtocolCard(props: {
   const longpress = useLongPress()
   const queryClient = useQueryClient()
   const host = useHost()
+  // ToDo (kk:06/12/2024) remove later
+  const enableCsvFile = useFeatureFlag('enableCsvFile')
 
   const { id: protocolId, analysisSummaries } = protocol
   const {
@@ -99,6 +102,9 @@ export function ProtocolCard(props: {
       (analysisForProtocolCard.result === 'error' ||
         analysisForProtocolCard.result === 'not-ok')) ??
     false
+
+  // ToDo get status from analysis
+  const isRequiredCSV = enableCsvFile && true && protocolName.includes('RTP')
 
   const isPendingAnalysis = analysisForProtocolCard == null
 
@@ -168,14 +174,20 @@ export function ProtocolCard(props: {
         ? ''
         : isFailedAnalysis
         ? COLORS.red40
+        : isRequiredCSV
+        ? COLORS.yellow40
         : COLORS.grey50};
     }
   `
 
+  let protocolCardBackgroundColor = COLORS.grey35
+  if (isFailedAnalysis) protocolCardBackgroundColor = COLORS.red35
+  if (isRequiredCSV) protocolCardBackgroundColor = COLORS.yellow35
+
   return (
     <Flex
-      alignItems={isFailedAnalysis ? ALIGN_END : ALIGN_CENTER}
-      backgroundColor={isFailedAnalysis ? COLORS.red35 : COLORS.grey35}
+      alignItems={isFailedAnalysis || isRequiredCSV ? ALIGN_END : ALIGN_CENTER}
+      backgroundColor={protocolCardBackgroundColor}
       borderRadius={BORDERS.borderRadius16}
       marginBottom={SPACING.spacing8}
       gridGap={SPACING.spacing48}
@@ -215,6 +227,22 @@ export function ProtocolCard(props: {
             />
             <StyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
               {i18n.format(t('failed_analysis'), 'capitalize')}
+            </StyledText>
+          </Flex>
+        ) : null}
+        {isRequiredCSV ? (
+          <Flex
+            color={COLORS.yellow60}
+            flexDirection={DIRECTION_ROW}
+            gridGap={SPACING.spacing8}
+          >
+            <Icon
+              name="ot-alert"
+              size="1.5rem"
+              aria-label="failedAnalysis_icon"
+            />
+            <StyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
+              {t('requires_csv')}
             </StyledText>
           </Flex>
         ) : null}
