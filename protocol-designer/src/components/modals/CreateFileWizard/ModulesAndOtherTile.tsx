@@ -219,8 +219,8 @@ function FlexModuleFields(props: WizardTileProps): JSX.Element {
   }, [trashBinDisabled, setValue])
   return (
     <Flex flexWrap={WRAP} gridGap={SPACING.spacing4} alignSelf={ALIGN_CENTER}>
-      {FLEX_SUPPORTED_MODULE_MODELS.filter(moduleModle =>
-        enableAbsorbanceReader ? true : moduleModle !== 'absorbanceReaderV1'
+      {FLEX_SUPPORTED_MODULE_MODELS.filter(moduleModel =>
+        enableAbsorbanceReader ? true : moduleModel !== 'absorbanceReaderV1'
       ).map(moduleModel => {
         const moduleType = getModuleType(moduleModel)
         const isModuleOnDeck = moduleTypesOnDeck.includes(moduleType)
