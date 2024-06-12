@@ -12,19 +12,22 @@ interface StorybookArgs {
   commandIndex: number
 }
 
-const meta: Meta<React.ComponentProps<CommandTextComponent> & StorybookArgs> = {
-  title: 'App/Molecules/Command/CommandText',
-  component: CommandTextComponent,
-  render: args => (
+function Wrapper(props: StorybookArgs): JSX.Element {
+  return (
     <Box width="960px" height="532">
       <CommandTextComponent
-        command={Fixtures.mockCommandTextData.commands[args.commandIndex]}
+        command={Fixtures.mockCommandTextData.commands[props.commandIndex]}
         commandTextData={Fixtures.mockCommandTextData}
-        robotType={args.robotType}
-        isOnDevice={args.onDevice}
+        robotType={props.robotType}
+        isOnDevice={props.onDevice}
       />
     </Box>
-  ),
+  )
+}
+
+const meta: Meta<StorybookArgs> = {
+  title: 'App/Molecules/Command/CommandText',
+  component: Wrapper,
   argTypes: {
     onDevice: {
       control: {
