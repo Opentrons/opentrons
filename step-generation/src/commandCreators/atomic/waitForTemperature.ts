@@ -15,9 +15,9 @@ export const waitForTemperature: CommandCreator<WaitForTemperatureArgs> = (
   prevRobotState
 ) => {
   const { module, temperature } = args
-  const moduleState = module ? getModuleState(prevRobotState, module) : null
+  const moduleState = module != null ? getModuleState(prevRobotState, module) : null
 
-  if (module === null || !moduleState) {
+  if (module === null || moduleState == null) {
     return {
       errors: [errorCreators.missingModuleError()],
     }

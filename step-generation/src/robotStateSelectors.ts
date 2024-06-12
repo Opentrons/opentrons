@@ -62,7 +62,7 @@ export function _getNextTip(args: {
   const orderedWells = orderWells(tiprackDef.ordering, 't2b', 'l2r')
   if (pipetteChannels === 1) {
     const well = orderedWells.find(hasTip)
-    return well || null
+    return well ?? null
   }
 
   if (pipetteChannels === 8 || (pipetteChannels === 96 && nozzles === COLUMN)) {
@@ -103,7 +103,7 @@ export function getNextTiprack(
   */
   const pipetteEntity = invariantContext.pipetteEntities[pipetteId]
 
-  if (!pipetteEntity) {
+  if (pipetteEntity == null) {
     throw new Error(
       `cannot getNextTiprack, no pipette entity for pipette "${pipetteId}"`
     )
@@ -149,7 +149,7 @@ export function getNextTiprack(
   )
   // TODO Ian 2018-02-12: avoid calling _getNextTip twice
   const nextTip =
-    firstAvailableTiprack &&
+    firstAvailableTiprack != null &&
     _getNextTip({
       pipetteId,
       tiprackId: firstAvailableTiprack,
@@ -158,7 +158,7 @@ export function getNextTiprack(
       robotState,
     })
 
-  if (firstAvailableTiprack && nextTip) {
+  if (firstAvailableTiprack != null && nextTip != null && nextTip !== false) {
     return {
       nextTiprack: {
         tiprackId: firstAvailableTiprack,
@@ -200,7 +200,7 @@ export function getPipetteWithTipMaxVol(
   }
   const tiprackTipVol = getTiprackVolume(chosenTipRack ?? tiprackDef[0])
 
-  if (!pipetteMaxVol || !tiprackTipVol) {
+  if (pipetteMaxVol == null || tiprackTipVol == null) {
     console.assert(
       false,
       `getPipetteEffectiveMaxVol expected tiprackMaxVol and pipette maxVolume to be > 0, got',
@@ -228,7 +228,7 @@ export const thermocyclerStateGetter = (
   moduleId: string
 ): ThermocyclerModuleState | null => {
   const hardwareModule = robotState.modules[moduleId]?.moduleState
-  return hardwareModule && hardwareModule.type === THERMOCYCLER_MODULE_TYPE
+  return hardwareModule != null && hardwareModule.type === THERMOCYCLER_MODULE_TYPE
     ? hardwareModule
     : null
 }

@@ -85,7 +85,7 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
   const is96Channel =
     invariantContext.pipetteEntities[args.pipette]?.spec.channels === 96
 
-  if (!pipetteData) {
+  if (pipetteData == null) {
     // bail out before doing anything else
     return {
       errors: [
@@ -98,16 +98,16 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
   }
 
   if (
-    !args.destLabware ||
-    (!invariantContext.labwareEntities[args.destLabware] &&
-      !invariantContext.additionalEquipmentEntities[args.destLabware])
+    args.destLabware == null ||
+    (invariantContext.labwareEntities[args.destLabware] == null &&
+      invariantContext.additionalEquipmentEntities[args.destLabware] == null)
   ) {
     return { errors: [errorCreators.equipmentDoesNotExist()] }
   }
 
   if (
-    !args.dropTipLocation ||
-    !invariantContext.additionalEquipmentEntities[args.dropTipLocation]
+    args.dropTipLocation == null ||
+    invariantContext.additionalEquipmentEntities[args.dropTipLocation] == null
   ) {
     return { errors: [errorCreators.dropTipLocationDoesNotExist()] }
   }
@@ -146,7 +146,7 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
     }
   }
 
-  const aspirateAirGapVolume = args.aspirateAirGapVolume || 0
+  const aspirateAirGapVolume = args.aspirateAirGapVolume ?? 0
   const maxWellsPerChunk = Math.floor(
     getPipetteWithTipMaxVol(args.pipette, invariantContext, args.tipRack) /
       (args.volume + aspirateAirGapVolume)
@@ -202,7 +202,7 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
         (sourceWell: string, wellIndex: number): CurriedCommandCreator[] => {
           const airGapOffsetSourceWell =
             getWellDepth(sourceLabwareDef, sourceWell) + AIR_GAP_OFFSET_FROM_TOP
-          const airGapAfterAspirateCommands = aspirateAirGapVolume
+          const airGapAfterAspirateCommands = aspirateAirGapVolume != null
             ? [
                 curryCommandCreator(aspirate, {
                   pipette: args.pipette,
@@ -433,7 +433,7 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
 
       const willReuseTip = args.changeTip !== 'always' && !isLastChunk
       const airGapAfterDispenseCommands =
-        dispenseAirGapVolume && !willReuseTip
+        dispenseAirGapVolume != null && !willReuseTip
           ? [
               curryCommandCreator(airGapHelper, {
                 pipetteId: args.pipette,

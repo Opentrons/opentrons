@@ -15,7 +15,7 @@ export const touchTip: CommandCreator<TouchTipParams> = (
   const pipetteData = prevRobotState.pipettes[pipette]
   const errors: CommandCreatorError[] = []
 
-  if (!pipetteData) {
+  if (pipetteData == null) {
     errors.push(
       pipetteDoesNotExist({
         actionName,

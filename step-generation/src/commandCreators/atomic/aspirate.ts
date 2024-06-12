@@ -55,7 +55,7 @@ export const aspirate: CommandCreator<ExtendedAspirateParams> = (
     prevRobotState.modules
   )
 
-  if (!pipetteSpec) {
+  if (pipetteSpec == null) {
     errors.push(
       errorCreators.pipetteDoesNotExist({
         actionName,
@@ -64,7 +64,7 @@ export const aspirate: CommandCreator<ExtendedAspirateParams> = (
     )
   }
 
-  if (!labware || !prevRobotState.labware[labware]) {
+  if (labware == null || prevRobotState.labware[labware] == null) {
     errors.push(
       errorCreators.labwareDoesNotExist({
         actionName,
@@ -178,7 +178,7 @@ export const aspirate: CommandCreator<ExtendedAspirateParams> = (
   }
   if (
     errors.length === 0 &&
-    pipetteSpec &&
+    pipetteSpec != null &&
     pipetteSpec.liquids.default.maxVolume < volume
   ) {
     errors.push(
@@ -190,7 +190,7 @@ export const aspirate: CommandCreator<ExtendedAspirateParams> = (
     )
   }
 
-  if (errors.length === 0 && pipetteSpec) {
+  if (errors.length === 0 && pipetteSpec != null) {
     const tipMaxVolume = getPipetteWithTipMaxVol(
       pipette,
       invariantContext,
@@ -232,7 +232,7 @@ export const aspirate: CommandCreator<ExtendedAspirateParams> = (
         },
         flowRate,
       },
-      ...(isAirGap && { meta: { isAirGap } }),
+      ...(Boolean(isAirGap) && { meta: { isAirGap } }),
     },
   ]
   return {

@@ -19,14 +19,14 @@ export const modulePipetteCollision = (args: {
     return false
   }
 
-  const pipetteEntity: PipetteEntity | null | undefined = pipette
+  const pipetteEntity: PipetteEntity | null | undefined = pipette != null
     ? invariantContext.pipetteEntities[pipette]
     : null
-  const labwareSlot: DeckSlot | null | undefined = labware
+  const labwareSlot: DeckSlot | null | undefined = labware != null
     ? prevRobotState.labware[labware]?.slot
     : null
 
-  if (!pipette || !labware || !pipetteEntity || !labwareSlot) {
+  if (pipette == null || labware == null || pipetteEntity == null || labwareSlot == null) {
     return false
   }
 

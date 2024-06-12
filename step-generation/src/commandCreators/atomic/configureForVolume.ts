@@ -13,7 +13,7 @@ export const configureForVolume: CommandCreator<configureForVolumeArgs> = (
   const { pipetteId, volume } = args
 
   // No-op if there is no pipette
-  if (!invariantContext.pipetteEntities[pipetteId]) {
+  if (invariantContext.pipetteEntities[pipetteId] == null) {
     return {
       commands: [],
     }

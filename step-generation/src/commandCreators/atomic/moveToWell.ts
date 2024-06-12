@@ -41,7 +41,7 @@ export const moveToWell: CommandCreator<v5MoveToWellParams> = (
     prevRobotState.modules
   )
 
-  if (!pipetteSpec) {
+  if (pipetteSpec == null) {
     errors.push(
       errorCreators.pipetteDoesNotExist({
         actionName,
@@ -50,7 +50,7 @@ export const moveToWell: CommandCreator<v5MoveToWellParams> = (
     )
   }
 
-  if (!labware || !prevRobotState.labware[labware]) {
+  if (labware == null || prevRobotState.labware[labware] == null) {
     errors.push(
       errorCreators.labwareDoesNotExist({
         actionName,

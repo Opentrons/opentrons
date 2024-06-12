@@ -262,7 +262,7 @@ const getWillCollideWithThermocyclerLid = (
   if (
     Object.values(moduleEntities).find(
       module => module.type === THERMOCYCLER_MODULE_TYPE
-    )
+    ) != null
   ) {
     return (
       getHasOverlappingRectangles(

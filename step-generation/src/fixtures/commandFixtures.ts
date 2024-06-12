@@ -265,7 +265,7 @@ export const delayCommand = (seconds: number): CreateCommand => ({
   commandType: 'waitForDuration',
   key: expect.any(String),
   params: {
-    seconds: seconds,
+    seconds,
   },
 })
 export const delayWithOffset = (
@@ -286,7 +286,7 @@ export const delayWithOffset = (
         offset: {
           x: 0,
           y: 0,
-          z: zOffset || 14,
+          z: zOffset ?? 14,
         },
       },
     },

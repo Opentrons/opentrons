@@ -213,7 +213,7 @@ export function getWellsForTips(
   const wellsForTips =
     channels === 1 ? [well] : getWellNamePerMultiTip(labwareDef, well, channels)
 
-  if (!wellsForTips) {
+  if (wellsForTips == null) {
     console.warn(
       channels === 1
         ? `Invalid well: ${well}`
@@ -233,7 +233,7 @@ export function getWellsForTips(
   // NOTE Ian 2018-03-15: there is no support for a case where some but not all wells are shared.
   // Eg, some unusual labware that allows 2 tips to a well will not work with the implementation below.
   // Low-priority TODO.
-  const allWellsShared = wellsForTips.every(w => w && w === wellsForTips[0])
+  const allWellsShared = wellsForTips.every(w => w != null && w === wellsForTips[0])
   return {
     wellsForTips,
     allWellsShared,
@@ -266,7 +266,7 @@ export const blowoutUtil = (args: {
     invariantContext,
     prevRobotState,
   } = args
-  if (!blowoutLocation) return []
+  if (blowoutLocation == null) return []
   const channels = invariantContext.pipetteEntities[pipette].spec.channels
   const addressableAreaName = getWasteChuteAddressableAreaNamePip(channels)
 
@@ -423,7 +423,7 @@ export function makeInitialRobotState(args: {
       pipettes: reduce(
         pipetteLocations,
         (acc, pipetteTemporalProperties, id) =>
-          pipetteTemporalProperties.mount ? { ...acc, [id]: false } : acc,
+          pipetteTemporalProperties.mount != null ? { ...acc, [id]: false } : acc,
         {}
       ),
       tipracks: reduce(
@@ -456,7 +456,7 @@ export const getTiprackHasTips = (
 ): boolean => {
   return tipState.tipracks[labwareId] != null
     ? Object.values(tipState.tipracks[labwareId]).some(
-        tipState => tipState === true
+        tipState => tipState
       )
     : false
 }
@@ -652,7 +652,7 @@ export const airGapHelper: CommandCreator<AirGapArgs> = (
         sourceLabware: sourceId,
         destLabware: destinationId,
         sourceWell,
-        destWell: destWell,
+        destWell,
       })
 
       commands = [

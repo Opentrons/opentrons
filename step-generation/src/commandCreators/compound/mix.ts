@@ -61,7 +61,7 @@ export function mixUtil(args: {
   } = args
 
   const getDelayCommand = (seconds?: number | null): CurriedCommandCreator[] =>
-    seconds
+    seconds != null
       ? [
           curryCommandCreator(delay, {
             commandCreatorFnName: 'delay',
@@ -145,8 +145,8 @@ export const mix: CommandCreator<MixArgs> = (
 
   // Errors
   if (
-    !prevRobotState.pipettes[pipette] ||
-    !invariantContext.pipetteEntities[pipette]
+    prevRobotState.pipettes[pipette] == null ||
+    invariantContext.pipetteEntities[pipette] == null
   ) {
     // bail out before doing anything else
     return {
@@ -159,7 +159,7 @@ export const mix: CommandCreator<MixArgs> = (
     }
   }
 
-  if (!prevRobotState.labware[labware]) {
+  if (prevRobotState.labware[labware] == null) {
     return {
       errors: [
         errorCreators.labwareDoesNotExist({
@@ -171,8 +171,8 @@ export const mix: CommandCreator<MixArgs> = (
   }
 
   if (
-    !dropTipLocation ||
-    !invariantContext.additionalEquipmentEntities[dropTipLocation]
+    dropTipLocation == null ||
+    invariantContext.additionalEquipmentEntities[dropTipLocation] == null
   ) {
     return { errors: [errorCreators.dropTipLocationDoesNotExist()] }
   }
@@ -207,7 +207,7 @@ export const mix: CommandCreator<MixArgs> = (
     ? [
         curryCommandCreator(configureForVolume, {
           pipetteId: pipette,
-          volume: volume,
+          volume,
         }),
       ]
     : []

@@ -25,7 +25,7 @@ export function forPickUpTip(
   } else if (pipetteSpec.channels === 8 || nozzles === COLUMN) {
     const allWells = tiprackDef.ordering.find(col => col[0] === wellName)
 
-    if (!allWells) {
+    if (allWells == null) {
       // TODO Ian 2018-04-30 return {errors}, don't throw
       throw new Error('Invalid primary well for tip pickup: ' + wellName)
     }

@@ -24,7 +24,7 @@ export const blowout: CommandCreator<BlowoutParams> = (
   // TODO Ian 2018-04-30 this logic using command creator args + robotstate to push errors
   // is duplicated across several command creators (eg aspirate & blowout overlap).
   // You can probably make higher-level error creator util fns to be more DRY
-  if (!pipetteData) {
+  if (pipetteData == null) {
     errors.push(
       errorCreators.pipetteDoesNotExist({
         actionName,
@@ -44,7 +44,7 @@ export const blowout: CommandCreator<BlowoutParams> = (
     )
   }
 
-  if (!labwareId || !prevRobotState.labware[labwareId]) {
+  if (labwareId == null || prevRobotState.labware[labwareId] == null) {
     errors.push(
       errorCreators.labwareDoesNotExist({
         actionName,

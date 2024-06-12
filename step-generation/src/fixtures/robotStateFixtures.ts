@@ -211,7 +211,7 @@ export const makeState = (args: {
   const robotState = makeInitialRobotState({
     invariantContext,
     labwareLocations,
-    moduleLocations: moduleLocations || {},
+    moduleLocations: moduleLocations ?? {},
     pipetteLocations,
   })
   // overwrite tiprack tip state using tiprackSetting arg

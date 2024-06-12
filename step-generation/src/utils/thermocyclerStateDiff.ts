@@ -24,7 +24,7 @@ const getLidOpenDiff = (
   prevThermocyclerState: ThermocyclerModuleState,
   args: ThermocyclerStateStepArgs
 ): Partial<Diff> => {
-  if (!prevThermocyclerState.lidOpen && args.lidOpen) {
+  if (!Boolean(prevThermocyclerState.lidOpen) && args.lidOpen) {
     return {
       lidOpen: true,
     }
@@ -38,7 +38,7 @@ const getLidClosedDiff = (
   args: ThermocyclerStateStepArgs
 ): Partial<Diff> => {
   if (
-    (prevThermocyclerState.lidOpen && !args.lidOpen) ||
+    (Boolean(prevThermocyclerState.lidOpen) && !args.lidOpen) ||
     (prevThermocyclerState.lidOpen === null && !args.lidOpen)
   ) {
     return {

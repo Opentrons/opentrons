@@ -80,8 +80,8 @@ export const distribute: CommandCreator<DistributeArgs> = (
 
   // TODO: Ian 2019-04-19 revisit these pipetteDoesNotExist errors, how to do it DRY?
   if (
-    !prevRobotState.pipettes[args.pipette] ||
-    !invariantContext.pipetteEntities[args.pipette]
+    prevRobotState.pipettes[args.pipette] == null ||
+    invariantContext.pipetteEntities[args.pipette] == null
   ) {
     errors.push(
       errorCreators.pipetteDoesNotExist({
@@ -91,7 +91,7 @@ export const distribute: CommandCreator<DistributeArgs> = (
     )
   }
 
-  if (!args.sourceLabware || !prevRobotState.labware[args.sourceLabware]) {
+  if (args.sourceLabware == null || prevRobotState.labware[args.sourceLabware] == null) {
     errors.push(
       errorCreators.labwareDoesNotExist({
         actionName,
@@ -101,8 +101,8 @@ export const distribute: CommandCreator<DistributeArgs> = (
   }
 
   if (
-    !args.dropTipLocation ||
-    !invariantContext.additionalEquipmentEntities[args.dropTipLocation]
+    args.dropTipLocation == null ||
+    invariantContext.additionalEquipmentEntities[args.dropTipLocation] == null
   ) {
     errors.push(errorCreators.dropTipLocationDoesNotExist())
   }
@@ -142,11 +142,11 @@ export const distribute: CommandCreator<DistributeArgs> = (
       errors,
     }
 
-  const aspirateAirGapVolume = args.aspirateAirGapVolume || 0
-  const dispenseAirGapVolume = args.dispenseAirGapVolume || 0
+  const aspirateAirGapVolume = args.aspirateAirGapVolume ?? 0
+  const dispenseAirGapVolume = args.dispenseAirGapVolume ?? 0
   // TODO error on negative args.disposalVolume?
   const disposalVolume =
-    args.disposalVolume && args.disposalVolume > 0 ? args.disposalVolume : 0
+    args.disposalVolume != null && args.disposalVolume > 0 ? args.disposalVolume : 0
   const maxVolume =
     getPipetteWithTipMaxVol(args.pipette, invariantContext, args.tipRack) -
     aspirateAirGapVolume
@@ -195,7 +195,7 @@ export const distribute: CommandCreator<DistributeArgs> = (
         AIR_GAP_OFFSET_FROM_TOP
       const airGapOffsetDestWell =
         getWellDepth(destLabwareDef, firstDestWell) + AIR_GAP_OFFSET_FROM_TOP
-      const airGapAfterAspirateCommands = aspirateAirGapVolume
+      const airGapAfterAspirateCommands = aspirateAirGapVolume != null
         ? [
             curryCommandCreator(aspirate, {
               pipette: args.pipette,
@@ -326,7 +326,7 @@ export const distribute: CommandCreator<DistributeArgs> = (
       const isLastChunk = chunkIndex + 1 === destWellChunks.length
       const willReuseTip = args.changeTip !== 'always' && !isLastChunk
       const airGapAfterDispenseCommands =
-        dispenseAirGapVolume && !willReuseTip
+        dispenseAirGapVolume != null && !willReuseTip
           ? [
               curryCommandCreator(aspirate, {
                 pipette: args.pipette,
@@ -380,9 +380,9 @@ export const distribute: CommandCreator<DistributeArgs> = (
       // if using dispense > air gap, drop or change the tip at the end
       const dropTipAfterDispenseAirGap =
         airGapAfterDispenseCommands.length > 0 ? dropTipCommand : []
-      const blowoutCommands = disposalVolume
+      const blowoutCommands = disposalVolume != null
         ? blowoutUtil({
-            pipette: pipette,
+            pipette,
             sourceLabwareId: args.sourceLabware,
             sourceWell: args.sourceWell,
             destLabwareId: args.destLabware,

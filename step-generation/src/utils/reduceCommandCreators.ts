@@ -46,8 +46,8 @@ export const reduceCommandCreators = (
         robotState: updates.robotState,
         commands: allCommands,
         warnings: [
-          ...(prev.warnings || []),
-          ...(next.warnings || []),
+          ...(prev.warnings ?? []),
+          ...(next.warnings ?? []),
           ...updates.warnings,
         ],
       }

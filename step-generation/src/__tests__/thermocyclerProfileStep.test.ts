@@ -297,7 +297,7 @@ describe('thermocyclerProfileStep', () => {
           thermocyclerId,
         })
 
-        if (initialThermocyclerModuleState) {
+        if (initialThermocyclerModuleState != null) {
           robotState.modules[
             thermocyclerId
           ].moduleState = initialThermocyclerModuleState

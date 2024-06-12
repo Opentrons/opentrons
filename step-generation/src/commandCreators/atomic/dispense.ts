@@ -51,7 +51,7 @@ export const dispense: CommandCreator<ExtendedDispenseParams> = (
     prevRobotState.modules
   )
 
-  if (!pipetteSpec) {
+  if (pipetteSpec == null) {
     errors.push(
       errorCreators.pipetteDoesNotExist({
         actionName,
@@ -82,7 +82,7 @@ export const dispense: CommandCreator<ExtendedDispenseParams> = (
     )
   }
 
-  if (!labware || !prevRobotState.labware[labware]) {
+  if (labware == null || prevRobotState.labware[labware] == null) {
     errors.push(
       errorCreators.labwareDoesNotExist({
         actionName,
@@ -198,7 +198,7 @@ export const dispense: CommandCreator<ExtendedDispenseParams> = (
         //  pushOut will always be undefined in step-generation for now
         //  since there is no easy way to allow users to select a volume for it in PD
       },
-      ...(isAirGap && { meta: { isAirGap } }),
+      ...(Boolean(isAirGap) && { meta: { isAirGap } }),
     },
   ]
   return {

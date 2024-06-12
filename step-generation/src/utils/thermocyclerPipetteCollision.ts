@@ -7,15 +7,14 @@ export const thermocyclerPipetteCollision = (
 ): boolean => {
   const labwareSlot: string = labware[labwareId]?.slot
   const moduleUnderLabware: string | null | undefined =
-    modules &&
-    labwareSlot &&
-    Object.keys(modules).find((moduleId: string) => moduleId === labwareSlot)
-  const moduleState =
-    moduleUnderLabware && modules[moduleUnderLabware].moduleState
+    (modules != null && labwareSlot != null)
+      ? Object.keys(modules).find((moduleId: string) => moduleId === labwareSlot)
+      : null
+  const moduleState = moduleUnderLabware != null ? modules[moduleUnderLabware].moduleState : null
   const isTCLidClosed: boolean = Boolean(
-    moduleState &&
-      moduleState.type === THERMOCYCLER_MODULE_TYPE &&
-      moduleState.lidOpen !== true
+    moduleState != null &&
+    moduleState.type === THERMOCYCLER_MODULE_TYPE &&
+    moduleState.lidOpen !== true
   )
   return isTCLidClosed
 }

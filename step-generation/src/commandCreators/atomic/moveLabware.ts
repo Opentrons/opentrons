@@ -68,7 +68,7 @@ export const moveLabware: CommandCreator<MoveLabwareArgs> = (
     prevRobotState.modules
   ).find(module => module.slot === newLocationSlot)
 
-  if (!labware || !prevRobotState.labware[labware]) {
+  if (labware == null || prevRobotState.labware[labware] == null) {
     errors.push(
       errorCreators.labwareDoesNotExist({
         actionName,
@@ -79,7 +79,7 @@ export const moveLabware: CommandCreator<MoveLabwareArgs> = (
     errors.push(errorCreators.labwareOffDeck())
   } else if (
     multipleObjectsInSameSlotLabware ||
-    multipleObjectsInSameSlotModule
+    multipleObjectsInSameSlotModule != null
   ) {
     errors.push(errorCreators.multipleEntitiesOnSameSlotName())
   }
@@ -92,8 +92,8 @@ export const moveLabware: CommandCreator<MoveLabwareArgs> = (
   }
 
   if (
-    (newLocationInWasteChute && hasGripper && !useGripper) ||
-    (!hasGripper && useGripper)
+    (newLocationInWasteChute && Boolean(hasGripper) && !useGripper) ||
+    (!Boolean(hasGripper) && useGripper)
   ) {
     errors.push(errorCreators.gripperRequired())
   }
@@ -109,7 +109,7 @@ export const moveLabware: CommandCreator<MoveLabwareArgs> = (
   }
   const initialAdapterSlot = prevRobotState.labware[initialLabwareSlot]?.slot
   const initialSlot =
-    initialAdapterSlot != null ? initialAdapterSlot : initialLabwareSlot
+    initialAdapterSlot ?? initialLabwareSlot
 
   const initialModuleState =
     prevRobotState.modules[initialSlot]?.moduleState ?? null
@@ -139,10 +139,7 @@ export const moveLabware: CommandCreator<MoveLabwareArgs> = (
 
   const destModuleOrSlotUnderAdapterId =
     destAdapterId != null ? prevRobotState.labware[destAdapterId].slot : null
-  const destinationModuleIdOrSlot =
-    destModuleOrSlotUnderAdapterId != null
-      ? destModuleOrSlotUnderAdapterId
-      : destModuleId
+  const destinationModuleIdOrSlot = destModuleOrSlotUnderAdapterId ?? destModuleId
 
   if (newLocation === 'offDeck' && useGripper) {
     errors.push(errorCreators.labwareOffDeck())

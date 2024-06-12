@@ -61,9 +61,9 @@ function tripleMix(
     (acc, _) => [
       ...acc,
       aspirateHelper(wellName, volume, params),
-      ...(delayAfterAspirate ? [delayCommand(12)] : []),
+      ...(Boolean(delayAfterAspirate) ? [delayCommand(12)] : []),
       dispenseHelper(wellName, volume, params),
-      ...(delayAfterDispense ? [delayCommand(12)] : []),
+      ...(Boolean(delayAfterDispense) ? [delayCommand(12)] : []),
     ],
     []
   )

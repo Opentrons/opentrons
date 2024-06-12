@@ -136,7 +136,7 @@ export const replaceTip: CommandCreator<ReplaceTipArgs> = (
   const isFlexPipette =
     (pipetteSpec?.displayCategory === 'FLEX' || channels === 96) ?? false
 
-  if (!pipetteSpec)
+  if (pipetteSpec == null)
     return {
       errors: [
         errorCreators.pipetteDoesNotExist({
@@ -158,7 +158,7 @@ export const replaceTip: CommandCreator<ReplaceTipArgs> = (
     invariantContext.additionalEquipmentEntities[dropTipLocation].name ===
       'trashBin'
 
-  if (!labwareDef) {
+  if (labwareDef == null) {
     return {
       errors: [
         errorCreators.labwareDoesNotExist({
@@ -169,8 +169,8 @@ export const replaceTip: CommandCreator<ReplaceTipArgs> = (
     }
   }
   if (
-    !args.dropTipLocation ||
-    !invariantContext.additionalEquipmentEntities[args.dropTipLocation]
+    args.dropTipLocation == null ||
+    invariantContext.additionalEquipmentEntities[args.dropTipLocation] == null
   ) {
     return { errors: [errorCreators.dropTipLocationDoesNotExist()] }
   }
