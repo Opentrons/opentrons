@@ -53,6 +53,18 @@ export function SelectDestWells(props: SelectDestWellsProps): JSX.Element {
 
   const selectedWellCount = Object.keys(selectedWells).length
   const sourceWellCount = state.sourceWells?.length ?? 0
+  const channels = state.pipette?.channels ?? 1
+
+  let selectionUnit = t('well')
+  let selectionUnits = t('wells')
+
+  if (channels === 8) {
+    selectionUnit = t('column')
+    selectionUnits = t('columns')
+  } else if (channels === 96) {
+    selectionUnit = t('grid')
+    selectionUnits = t('grids')
+  }
 
   const handleClickNext = (): void => {
     if (
@@ -70,6 +82,7 @@ export function SelectDestWells(props: SelectDestWellsProps): JSX.Element {
       makeToast(
         t('number_wells_selected_error_message', {
           wellCount: sourceWellCount,
+          selectionUnits,
         }),
         'error',
         {
@@ -103,6 +116,8 @@ export function SelectDestWells(props: SelectDestWellsProps): JSX.Element {
               setShowNumberWellsSelectedErrorModal
             }
             wellCount={sourceWellCount}
+            selectionUnit={selectionUnit}
+            selectionUnits={selectionUnits}
           />
         ) : null,
         getTopPortalEl()
@@ -146,7 +161,7 @@ export function SelectDestWells(props: SelectDestWellsProps): JSX.Element {
                 setSelectedWells(prevWells => ({ ...prevWells, ...wellGroup }))
               }
             }}
-            channels={state.pipette?.channels ?? 1}
+            channels={channels}
           />
         ) : null}
       </Flex>
@@ -157,11 +172,15 @@ export function SelectDestWells(props: SelectDestWellsProps): JSX.Element {
 function NumberWellsSelectedErrorModal({
   setShowNumberWellsSelectedErrorModal,
   wellCount,
+  selectionUnit,
+  selectionUnits,
 }: {
   setShowNumberWellsSelectedErrorModal: React.Dispatch<
     React.SetStateAction<boolean>
   >
   wellCount: number
+  selectionUnit: string
+  selectionUnits: string
 }): JSX.Element {
   const { t } = useTranslation('quick_transfer')
   const modalHeader: ModalHeaderBaseProps = {
@@ -182,7 +201,11 @@ function NumberWellsSelectedErrorModal({
       }}
     >
       <StyledText as="p">
-        {t('number_wells_selected_error_learn_more', { wellCount })}
+        {t('number_wells_selected_error_learn_more', {
+          wellCount,
+          selectionUnit,
+          selectionUnits,
+        })}
       </StyledText>
     </Modal>
   )
