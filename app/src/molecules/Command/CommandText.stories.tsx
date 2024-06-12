@@ -16,8 +16,8 @@ function Wrapper(props: StorybookArgs): JSX.Element {
   return (
     <Box width="960px" height="532">
       <CommandTextComponent
-        command={Fixtures.mockCommandTextData.commands[props.commandIndex]}
-        commandTextData={Fixtures.mockCommandTextData}
+        command={Fixtures.mockDoItAllTextData.commands[props.commandIndex]}
+        commandTextData={Fixtures.mockDoItAllTextData}
         robotType={props.robotType}
         isOnDevice={props.onDevice}
       />
@@ -46,7 +46,7 @@ const meta: Meta<StorybookArgs> = {
       control: {
         type: 'range',
         min: 0,
-        max: Fixtures.mockCommandTextData.commands.length - 1,
+        max: Fixtures.mockDoItAllTextData.commands.length - 1,
       },
       defaultValue: 0,
     },
