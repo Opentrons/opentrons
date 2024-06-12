@@ -40,7 +40,7 @@ defaults:
 jobs:
   lint:
     name: 'system-server linting'
-    timeout-minutes: 10
+    timeout-minutes: 15
     runs-on: 'ubuntu-22.04'
     steps:
       - uses: 'actions/checkout@v3'
