@@ -80,7 +80,7 @@ const validateCommandAnnotations8 = (
         ])
     }
   }).then(
-    (schema) =>
+    schema =>
       new Promise((resolve, reject) => {
         const generatedSchema = {
           type: 'array',

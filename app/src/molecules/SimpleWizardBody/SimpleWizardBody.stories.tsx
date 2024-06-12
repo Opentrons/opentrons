@@ -21,7 +21,10 @@ const dummyConfig = {
   },
 } as any
 
-const store: Store<any> = createStore(configReducer, dummyConfig as StoreEnhancer)
+const store: Store<any> = createStore(
+  configReducer,
+  dummyConfig as StoreEnhancer
+)
 
 const Template: Story<React.ComponentProps<typeof SimpleWizardBody>> = args => (
   <Provider store={store}>

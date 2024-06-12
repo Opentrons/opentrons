@@ -15,7 +15,13 @@ import { rootReducer as stepFormsReducer } from './step-forms'
 import { rootReducer as tutorialReducer } from './tutorial'
 import { rootReducer as uiReducer } from './ui'
 import { rootReducer as wellSelectionReducer } from './well-selection/reducers'
-import type { Store, Reducer, CombinedState, StoreEnhancer, Middleware } from 'redux'
+import type {
+  Store,
+  Reducer,
+  CombinedState,
+  StoreEnhancer,
+  Middleware,
+} from 'redux'
 import type { BaseState, Action } from './types'
 
 const timelineMiddleware = makeTimelineMiddleware()
@@ -82,7 +88,11 @@ export function configureStore(): StoreType {
     reducer,
     /* preloadedState, */
     composeEnhancers(
-      applyMiddleware(trackEventMiddleware as Middleware<BaseState, Record<string, any>, any>, timelineMiddleware as Middleware<BaseState, Record<string, any>, any>, thunk)
+      applyMiddleware(
+        trackEventMiddleware as Middleware<BaseState, Record<string, any>, any>,
+        timelineMiddleware as Middleware<BaseState, Record<string, any>, any>,
+        thunk
+      )
     ) as StoreEnhancer<unknown, unknown>
   )
   // initial rehydration, and persistence subscriber

@@ -495,7 +495,7 @@ function PrepareToRun({
     incompleteInstrumentCount === 0 && areModulesReady && areFixturesReady
   const onPlay = (): void => {
     if (isDoorOpen) {
-      makeSnackbar(t('shared:close_robot_door'))
+      makeSnackbar(t('shared:close_robot_door') as string)
     } else {
       if (
         isHeaterShakerInProtocol &&
@@ -508,7 +508,7 @@ function PrepareToRun({
           play()
           trackProtocolRunEvent({
             name: ANALYTICS_PROTOCOL_RUN_ACTION.START,
-            properties: robotAnalyticsData != null ? robotAnalyticsData : {},
+            properties: robotAnalyticsData ?? {},
           })
         } else {
           makeSnackbar(

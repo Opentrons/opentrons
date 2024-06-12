@@ -135,7 +135,9 @@ export function LiquidEditForm(props: LiquidEditFormProps): JSX.Element {
                 render={({ field }) => (
                   <InputField
                     name="name"
-                    error={touchedFields.name != null ? errors.name?.message : null}
+                    error={
+                      touchedFields.name != null ? errors.name?.message : null
+                    }
                     value={name}
                     onChange={field.onChange}
                     onBlur={field.onBlur}

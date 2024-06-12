@@ -87,7 +87,8 @@ const LiquidGroupCard = (props: LiquidGroupCardProps): JSX.Element | null => {
 
       {wellsWithIngred.map((well, i) => {
         const wellIngredForCard = labwareWellContents[well][groupId]
-        const volume = wellIngredForCard != null ? wellIngredForCard.volume : null
+        const volume =
+          wellIngredForCard != null ? wellIngredForCard.volume : null
 
         if (volume == null) {
           console.warn(
@@ -136,7 +137,9 @@ function IngredIndividual(props: IndividProps): JSX.Element {
   return (
     <PDListItem border hoverable>
       <span>{wellName}</span>
-      <span>{Boolean(volume) ? volume + ` ${t('units.microliter')}` : '-'}</span>
+      <span>
+        {Boolean(volume) ? volume + ` ${t('units.microliter')}` : '-'}
+      </span>
       {name != null ? <span>{name}</span> : null}
       {canDelete && (
         <IconButton
@@ -144,7 +147,9 @@ function IngredIndividual(props: IndividProps): JSX.Element {
           name="close"
           onClick={() => {
             if (
-              window.confirm(t('are_you_sure_delete_well', { well: wellName }) as string)
+              window.confirm(
+                t('are_you_sure_delete_well', { well: wellName }) as string
+              )
             )
               removeWellsContents({ liquidGroupId: groupId, wells: [wellName] })
           }}
@@ -172,7 +177,9 @@ export function IngredientsList(): JSX.Element {
   const dispatch = useDispatch<ThunkDispatch<any>>()
 
   const labwareWellContents =
-    (selectedLabwareId != null ? allLabwareWellContents[selectedLabwareId] : null) ?? {}
+    (selectedLabwareId != null
+      ? allLabwareWellContents[selectedLabwareId]
+      : null) ?? {}
 
   return (
     <SidePanel title={t('nameAndLiquids')}>

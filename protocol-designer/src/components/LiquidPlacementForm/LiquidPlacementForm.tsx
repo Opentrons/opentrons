@@ -227,7 +227,13 @@ export const LiquidPlacementForm = (): JSX.Element | null => {
 
         <div className={styles.button_row}>
           <OutlineButton
-            disabled={!(labwareId != null && selectedWells != null && selectionHasLiquids)}
+            disabled={
+              !(
+                labwareId != null &&
+                selectedWells != null &&
+                selectionHasLiquids
+              )
+            }
             onClick={handleClearWells}
           >
             {t('button:clear_wells')}

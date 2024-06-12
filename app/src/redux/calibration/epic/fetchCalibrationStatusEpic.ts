@@ -26,8 +26,16 @@ const mapResponseToAction: ResponseToActionMapper<FetchCalibrationStatusAction> 
   const meta = { ...originalAction.meta, response: responseMeta }
 
   return response.ok
-    ? Actions.fetchCalibrationStatusSuccess(host.name, body as CalibrationStatus, meta)
-    : Actions.fetchCalibrationStatusFailure(host.name, body as RobotApiErrorResponse, meta)
+    ? Actions.fetchCalibrationStatusSuccess(
+        host.name,
+        body as CalibrationStatus,
+        meta
+      )
+    : Actions.fetchCalibrationStatusFailure(
+        host.name,
+        body as RobotApiErrorResponse,
+        meta
+      )
 }
 
 export const fetchCalibrationStatusEpic: Epic = (action$, state$) => {

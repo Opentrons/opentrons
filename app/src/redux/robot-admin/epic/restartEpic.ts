@@ -38,7 +38,11 @@ const mapResponseToAction: ResponseToActionMapper<RestartRobotAction> = (
 
   return response.ok
     ? Actions.restartRobotSuccess(host.name, meta)
-    : Actions.restartRobotFailure(host.name, body as Record<string, unknown>, meta)
+    : Actions.restartRobotFailure(
+        host.name,
+        body as Record<string, unknown>,
+        meta
+      )
 }
 
 export const restartEpic: Epic = (action$, state$) => {

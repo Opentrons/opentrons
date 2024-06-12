@@ -87,13 +87,19 @@ export const makeTimelineMiddleware: () => Middleware<BaseState, any> = () => {
     // call the next dispatch method in the middleware chain
     const returnValue = next(action)
     const nextState = getState()
-    const shouldRecomputeTimeline = timelineNeedsRecompute(nextState as BaseState)
-    const shouldRecomputeSubsteps = substepsNeedsRecompute(nextState as BaseState)
+    const shouldRecomputeTimeline = timelineNeedsRecompute(
+      nextState as BaseState
+    )
+    const shouldRecomputeSubsteps = substepsNeedsRecompute(
+      nextState as BaseState
+    )
 
     // TODO: how to stop re-assigning this event handler every middleware call? We need
     // the `next` fn, so we can't do it outside the middleware body
     worker.onmessage = e => {
-      prevSuccessAction = computeRobotStateTimelineSuccess(e.data as WorkerResponse)
+      prevSuccessAction = computeRobotStateTimelineSuccess(
+        e.data as WorkerResponse
+      )
       next(prevSuccessAction)
     }
 

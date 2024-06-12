@@ -53,7 +53,7 @@ const mapResponseToAction = (
 
   return response.ok
     ? Actions.moveSuccess(host.name, meta)
-    : Actions.moveFailure(host.name, body as {message: string}, meta)
+    : Actions.moveFailure(host.name, body as { message: string }, meta)
 }
 
 const fetchPositionsRequest = { method: GET, path: Constants.POSITIONS_PATH }
@@ -82,7 +82,11 @@ export const moveEpic: Epic = (action$, state$) => {
             return positionsResponse.ok
               ? fetchRobotApi(
                   host,
-                  mapActionToRequest(action, state, positionsResponse.body as PositionsResponse)
+                  mapActionToRequest(
+                    action,
+                    state,
+                    positionsResponse.body as PositionsResponse
+                  )
                 )
               : of(positionsResponse)
           }),

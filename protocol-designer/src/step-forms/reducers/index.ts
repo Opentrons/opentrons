@@ -370,8 +370,12 @@ export const unsavedForm = (
         unsavedFormState.orderedProfileItems.includes(id) &&
         unsavedFormState.profileItemsById[id].type === PROFILE_STEP
       const filteredItemsById = isTopLevelProfileStep
-        ? omitTopLevelSteps(unsavedFormState.profileItemsById as Record<string, ProfileItem>)
-        : omitCycleSteps(unsavedFormState.profileItemsById as Record<string, ProfileItem>)
+        ? omitTopLevelSteps(
+            unsavedFormState.profileItemsById as Record<string, ProfileItem>
+          )
+        : omitCycleSteps(
+            unsavedFormState.profileItemsById as Record<string, ProfileItem>
+          )
       const filteredOrderedProfileItems = isTopLevelProfileStep
         ? unsavedFormState.orderedProfileItems.filter(
             (itemId: string) => itemId !== id
@@ -649,7 +653,10 @@ export const savedStepForms = (
       const prevInitialDeckSetupStep =
         savedStepForms[INITIAL_DECK_SETUP_STEP_ID]
       const labwareOccupyingDestination = getDeckItemIdInSlot(
-        prevInitialDeckSetupStep.labwareLocationUpdate as Record<string, string>,
+        prevInitialDeckSetupStep.labwareLocationUpdate as Record<
+          string,
+          string
+        >,
         action.payload.slot
       )
       const moduleId = action.payload.id
@@ -1038,14 +1045,22 @@ export const savedStepForms = (
           let fieldsToUpdate = {}
 
           if (prevStepForm.stepType === 'moveLiquid') {
-            if (labwareIdsToDeselect.includes(prevStepForm.aspirate_labware as string)) {
+            if (
+              labwareIdsToDeselect.includes(
+                prevStepForm.aspirate_labware as string
+              )
+            ) {
               fieldsToUpdate = {
                 ...fieldsToUpdate,
                 aspirate_wells: defaults.aspirate_wells,
               }
             }
 
-            if (labwareIdsToDeselect.includes(prevStepForm.dispense_labware as string)) {
+            if (
+              labwareIdsToDeselect.includes(
+                prevStepForm.dispense_labware as string
+              )
+            ) {
               fieldsToUpdate = {
                 ...fieldsToUpdate,
                 dispense_wells: defaults.dispense_wells,
@@ -1357,7 +1372,8 @@ export const additionalEquipmentInvariantProperties = handleActions<NormalizedAd
             command.params.newLocation !== 'offDeck' &&
             'addressableAreaName' in command.params.newLocation &&
             WASTE_CHUTE_ADDRESSABLE_AREAS.includes(
-              command.params.newLocation.addressableAreaName as AddressableAreaName
+              command.params.newLocation
+                .addressableAreaName as AddressableAreaName
             ))
       )
       const getStagingAreaSlotNames = (
@@ -1371,7 +1387,8 @@ export const additionalEquipmentInvariantProperties = handleActions<NormalizedAd
               command.params[locationKey] !== 'offDeck' &&
               'addressableAreaName' in command.params[locationKey] &&
               COLUMN_4_SLOTS.includes(
-                command.params[locationKey].addressableAreaName as AddressableAreaName
+                command.params[locationKey]
+                  .addressableAreaName as AddressableAreaName
               )
           )
           .map(command => command.params[locationKey].addressableAreaName)
@@ -1806,7 +1823,10 @@ export const rootReducer: Reducer<RootState, any> = nestedCombineReducers(
       prevStateFallback.additionalEquipmentInvariantProperties,
       action as ReduxActionsAction<NormalizedAdditionalEquipmentById>
     ),
-    labwareDefs: labwareDefsRootReducer(prevStateFallback.labwareDefs, action as Action),
+    labwareDefs: labwareDefsRootReducer(
+      prevStateFallback.labwareDefs,
+      action as Action
+    ),
     // 'forms' reducers get full rootReducer state
     savedStepForms: savedStepForms(state, action as SavedStepFormsActions),
     unsavedForm: unsavedForm(state, action as UnsavedFormActions),
@@ -1817,6 +1837,6 @@ export const rootReducer: Reducer<RootState, any> = nestedCombineReducers(
     batchEditFormChanges: batchEditFormChanges(
       prevStateFallback.batchEditFormChanges,
       action as BatchEditFormActions
-    ), 
+    ),
   })
 )

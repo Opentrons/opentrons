@@ -14,7 +14,10 @@ const dummyConfig = {
     isOnDevice: false,
   },
 } as any
-const store: Store<any> = createStore(configReducer, dummyConfig as StoreEnhancer)
+const store: Store<any> = createStore(
+  configReducer,
+  dummyConfig as StoreEnhancer
+)
 
 const meta: Meta<typeof InterventionModalComponent> = {
   title: 'App/Molecules/InterventionModal',

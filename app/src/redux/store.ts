@@ -21,7 +21,10 @@ const middleware = applyMiddleware(
 const composeEnhancers =
   (window as any).__REDUX_DEVTOOLS_EXTENSION_COMPOSE__({ maxAge: 200 }) ??
   compose
-export const store = createStore(rootReducer, composeEnhancers(middleware) as StoreEnhancer)
+export const store = createStore(
+  rootReducer,
+  composeEnhancers(middleware) as StoreEnhancer
+)
 
 epicMiddleware.run(rootEpic)
 

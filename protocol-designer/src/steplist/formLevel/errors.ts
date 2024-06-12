@@ -153,7 +153,10 @@ export const incompatibleLabware = (
   const { labware, pipette } = fields
   if (!labware || !pipette) return null
   //  trashBin and wasteChute cannot mix into a labware
-  return !canPipetteUseLabware(pipette.spec as PipetteV2Specs, labware.def as LabwareDefinition2)
+  return !canPipetteUseLabware(
+    pipette.spec as PipetteV2Specs,
+    labware.def as LabwareDefinition2
+  )
     ? INCOMPATIBLE_LABWARE
     : null
 }
@@ -164,8 +167,10 @@ export const incompatibleDispenseLabware = (
   if (!dispense_labware || !pipette) return null
   return !canPipetteUseLabware(
     pipette.spec as PipetteV2Specs,
-    'def' in dispense_labware ? dispense_labware.def as LabwareDefinition2 : undefined,
-    'name' in dispense_labware ? dispense_labware.name as string : undefined
+    'def' in dispense_labware
+      ? (dispense_labware.def as LabwareDefinition2)
+      : undefined,
+    'name' in dispense_labware ? (dispense_labware.name as string) : undefined
   )
     ? INCOMPATIBLE_DISPENSE_LABWARE
     : null
@@ -176,7 +181,10 @@ export const incompatibleAspirateLabware = (
   const { aspirate_labware, pipette } = fields
   if (!aspirate_labware || !pipette) return null
   //  trashBin and wasteChute cannot aspirate into a labware
-  return !canPipetteUseLabware(pipette.spec as PipetteV2Specs, aspirate_labware.def as LabwareDefinition2)
+  return !canPipetteUseLabware(
+    pipette.spec as PipetteV2Specs,
+    aspirate_labware.def as LabwareDefinition2
+  )
     ? INCOMPATIBLE_ASPIRATE_LABWARE
     : null
 }
@@ -235,7 +243,11 @@ export const wellRatioMoveLiquid = (
     ? WELL_RATIO_MOVE_LIQUID_INTO_WASTE_CHUTE
     : WELL_RATIO_MOVE_LIQUID
 
-  return getWellRatio(aspirate_wells as string[], dispense_wells as string[], isDispensingIntoTrash) != null
+  return getWellRatio(
+    aspirate_wells as string[],
+    dispense_wells as string[],
+    isDispensingIntoTrash
+  ) != null
     ? null
     : wellRatioFormError
 }

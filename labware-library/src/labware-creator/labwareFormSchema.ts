@@ -19,7 +19,11 @@ import {
   REQUIRED_FIELD_ERROR,
   MUST_BE_A_NUMBER_ERROR,
 } from './fields'
-import type { LabwareFields, LabwareType, ProcessedLabwareFields } from './fields'
+import type {
+  LabwareFields,
+  LabwareType,
+  ProcessedLabwareFields,
+} from './fields'
 
 // global overrides for Yup's default error messages.
 Yup.setLocale({
@@ -312,9 +316,7 @@ export const labwareFormSchemaBaseObject = Yup.object({
       'displayNameDoesNotAlreadyExist',
       nameExistsError('display name'),
       (value: string | null | undefined) =>
-        !ALL_DISPLAY_NAMES.has(
-          (value ?? '').toLowerCase().trim()
-        ) // case-insensitive and trim-insensitive match
+        !ALL_DISPLAY_NAMES.has((value ?? '').toLowerCase().trim()) // case-insensitive and trim-insensitive match
     )
     .transform(
       (
@@ -347,7 +349,8 @@ export const labwareFormSchema: Yup.Schema<ProcessedLabwareFields> = labwareForm
         ? getDefaultDisplayName(nextValues as LabwareFields)
         : currentValue.displayName
 
-    const loadName = currentValue.loadName ?? getDefaultLoadName(nextValues as LabwareFields)
+    const loadName =
+      currentValue.loadName ?? getDefaultLoadName(nextValues as LabwareFields)
 
     return {
       ...currentValue,

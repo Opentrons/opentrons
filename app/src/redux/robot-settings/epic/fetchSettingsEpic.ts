@@ -31,10 +31,10 @@ const mapResponseToAction: ResponseToActionMapper<FetchSettingsAction> = (
     ? Actions.fetchSettingsSuccess(
         host.name,
         body.settings as RobotSettings,
-        body.links?.restart as string | null ?? null,
+        (body.links?.restart as string | null) ?? null,
         meta
       )
-    : Actions.fetchSettingsFailure(host.name, body as {message: string}, meta)
+    : Actions.fetchSettingsFailure(host.name, body as { message: string }, meta)
 }
 
 export const fetchSettingsEpic: Epic = (action$, state$) => {

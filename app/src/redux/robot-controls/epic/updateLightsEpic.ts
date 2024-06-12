@@ -34,7 +34,7 @@ const mapResponseToAction: ResponseToActionMapper<UpdateLightsAction> = (
 
   return response.ok
     ? Actions.updateLightsSuccess(host.name, body.on as boolean, meta)
-    : Actions.updateLightsFailure(host.name, body as {message: string}, meta)
+    : Actions.updateLightsFailure(host.name, body as { message: string }, meta)
 }
 
 export const updateLightsEpic: Epic = (action$, state$) => {

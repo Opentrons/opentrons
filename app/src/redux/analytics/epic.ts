@@ -50,7 +50,10 @@ const sendAnalyticsEventEpic: Epic = (action$, state$) => {
     tap(([event, config]: [AnalyticsEvent, AnalyticsConfig]) => {
       trackEvent(event, config)
     }),
-    ignoreElements() as OperatorFunction<[AnalyticsEvent, { appId: string; optedIn: boolean; seenOptIn: boolean; }], never>
+    ignoreElements() as OperatorFunction<
+      [AnalyticsEvent, { appId: string; optedIn: boolean; seenOptIn: boolean }],
+      never
+    >
   )
 }
 

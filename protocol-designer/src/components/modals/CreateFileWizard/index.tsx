@@ -165,7 +165,10 @@ export function CreateFileWizard(): JSX.Element | null {
     }
     const newProtocolFields = values.fields
 
-    if (!hasUnsavedChanges || window.confirm(t('alert:confirm_create_new') as string)) {
+    if (
+      !hasUnsavedChanges ||
+      window.confirm(t('alert:confirm_create_new') as string)
+    ) {
       dispatch(fileActions.createNewProtocol(newProtocolFields))
       const pipettesById: Record<string, PipetteOnDeck> = pipettes.reduce(
         (acc, pipette) => ({ ...acc, [uuid()]: pipette }),

@@ -28,8 +28,16 @@ const mapResponseToAction: ResponseToActionMapper<FetchPipetteSettingsAction> = 
   const meta = { ...originalAction.meta, response: responseMeta }
 
   return response.ok
-    ? Actions.fetchPipetteSettingsSuccess(host.name, body as Record<string, PipetteSettings>, meta)
-    : Actions.fetchPipetteSettingsFailure(host.name, body as Record<string, unknown>, meta)
+    ? Actions.fetchPipetteSettingsSuccess(
+        host.name,
+        body as Record<string, PipetteSettings>,
+        meta
+      )
+    : Actions.fetchPipetteSettingsFailure(
+        host.name,
+        body as Record<string, unknown>,
+        meta
+      )
 }
 
 export const fetchPipetteSettingsEpic: Epic = (action$, state$) => {

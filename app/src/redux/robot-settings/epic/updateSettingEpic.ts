@@ -32,10 +32,10 @@ const mapResponseToAction: ResponseToActionMapper<UpdateSettingAction> = (
     ? Actions.updateSettingSuccess(
         host.name,
         body.settings as RobotSettings,
-        body.links?.restart as string | null ?? null,
+        (body.links?.restart as string | null) ?? null,
         meta
       )
-    : Actions.updateSettingFailure(host.name, body as {message: string}, meta)
+    : Actions.updateSettingFailure(host.name, body as { message: string }, meta)
 }
 
 export const updateSettingEpic: Epic = (action$, state$) => {

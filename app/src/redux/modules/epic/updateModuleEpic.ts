@@ -30,8 +30,18 @@ const mapResponseToAction: ResponseToActionMapper<UpdateModuleAction> = (
   const meta = { ...originalAction.meta, response: responseMeta }
 
   return response.ok
-    ? Actions.updateModuleSuccess(host.name, moduleId, body.message as string, meta)
-    : Actions.updateModuleFailure(host.name, moduleId, body as RobotApiErrorResponse, meta)
+    ? Actions.updateModuleSuccess(
+        host.name,
+        moduleId,
+        body.message as string,
+        meta
+      )
+    : Actions.updateModuleFailure(
+        host.name,
+        moduleId,
+        body as RobotApiErrorResponse,
+        meta
+      )
 }
 
 export const updateModuleEpic: Epic = (action$, state$) => {

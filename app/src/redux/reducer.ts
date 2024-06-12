@@ -77,8 +77,7 @@ export const rootReducer: Reducer<State, Action> = combineReducers<
   sessions: sessionReducer,
   calibration: calibrationReducer,
   protocolStorage: protocolStorageReducer,
-  router: connectRouter<State['router']>(history as History<RouterState<unknown>>) as Reducer<
-    State['router'],
-    Action
-  >,
+  router: connectRouter<State['router']>(
+    history as History<RouterState<unknown>>
+  ) as Reducer<State['router'], Action>,
 })

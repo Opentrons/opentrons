@@ -20,9 +20,8 @@ const persistAnalyticsCookie = (cookies: AnalyticsState): void => {
 
 const getAnalyticsCookie = (): AnalyticsState => {
   const cookies = cookie.parse((global as any).document.cookie as string)
-  const analyticsCookie = cookies[COOKIE_KEY_NAME] != null
-    ? JSON.parse(cookies[COOKIE_KEY_NAME])
-    : {}
+  const analyticsCookie =
+    cookies[COOKIE_KEY_NAME] != null ? JSON.parse(cookies[COOKIE_KEY_NAME]) : {}
   return analyticsCookie
 }
 

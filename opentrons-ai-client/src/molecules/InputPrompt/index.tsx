@@ -99,7 +99,9 @@ export function InputPrompt(): JSX.Element {
         <SendButton
           disabled={userPrompt.length === 0}
           isLoading={isLoading}
-          handleClick={() => { handleClick() }}
+          handleClick={() => {
+            handleClick()
+          }}
         />
       </Flex>
     </StyledForm>

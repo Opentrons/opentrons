@@ -26,8 +26,16 @@ const mapResponseToAction: ResponseToActionMapper<FetchPipetteOffsetCalibrations
   const { host, body, ...responseMeta } = response
   const meta = { ...originalAction.meta, response: responseMeta }
   return response.ok
-    ? Actions.fetchPipetteOffsetCalibrationsSuccess(host.name, body as AllPipetteOffsetCalibrations, meta)
-    : Actions.fetchPipetteOffsetCalibrationsFailure(host.name, body as RobotApiErrorResponse, meta)
+    ? Actions.fetchPipetteOffsetCalibrationsSuccess(
+        host.name,
+        body as AllPipetteOffsetCalibrations,
+        meta
+      )
+    : Actions.fetchPipetteOffsetCalibrationsFailure(
+        host.name,
+        body as RobotApiErrorResponse,
+        meta
+      )
 }
 
 export const fetchPipetteOffsetCalibrationsEpic: Epic = (action$, state$) => {

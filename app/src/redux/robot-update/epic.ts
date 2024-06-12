@@ -186,7 +186,7 @@ export const startSessionAfterFileInfoEpic: Epic = (action$, state$) => {
       // otherwise robot is ready for migration or update, so get token
       // capabilities response has the correct request path to use
       const sessionPath =
-        capabilities?.buildrootUpdate ?? 
+        capabilities?.buildrootUpdate ??
         capabilities?.buildrootMigration ??
         capabilities?.systemUpdate
 
@@ -218,7 +218,9 @@ export const createSessionEpic: Epic = action$ => {
       const pathPrefix = path.replace('/begin', '')
 
       if (ok) {
-        return of(createSessionSuccess(host, resp.body.token as string, pathPrefix))
+        return of(
+          createSessionSuccess(host, resp.body.token as string, pathPrefix)
+        )
       }
 
       if (!ok && status === 409) {

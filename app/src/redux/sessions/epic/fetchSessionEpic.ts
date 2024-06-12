@@ -9,9 +9,16 @@ import * as Constants from '../constants'
 import type { Action, Epic } from '../../types'
 
 import type { ResponseToActionMapper } from '../../robot-api/operators'
-import type { RobotApiRequestOptions, RobotApiV2ErrorResponseBody } from '../../robot-api/types'
+import type {
+  RobotApiRequestOptions,
+  RobotApiV2ErrorResponseBody,
+} from '../../robot-api/types'
 
-import type { FetchSessionAction, CreateSessionCommandAction, SessionResponse } from '../types'
+import type {
+  FetchSessionAction,
+  CreateSessionCommandAction,
+  SessionResponse,
+} from '../types'
 
 export const mapActionToRequest = (
   action: FetchSessionAction | CreateSessionCommandAction

@@ -141,7 +141,8 @@ export const WellSelectionModal = (
   const pipetteEntities = useSelector(stepFormSelectors.getPipetteEntities)
 
   // selector-derived data
-  const labwareDef = (labwareId != null ? labwareEntities[labwareId]?.def : null) ?? null
+  const labwareDef =
+    (labwareId != null ? labwareEntities[labwareId]?.def : null) ?? null
   const pipette = pipetteId != null ? pipetteEntities[pipetteId] : null
 
   const initialSelectedPrimaryWells = Array.isArray(wellFieldData)

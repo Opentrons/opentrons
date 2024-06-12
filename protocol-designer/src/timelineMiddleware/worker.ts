@@ -5,10 +5,10 @@ import type { GenerateRobotStateTimelineArgs } from './generateRobotStateTimelin
 import type { GenerateSubstepsArgs } from './generateSubsteps'
 
 type TimelineMessageEvent = MessageEvent<{
-  needsTimeline: boolean,
+  needsTimeline: boolean
   timelineArgs: GenerateRobotStateTimelineArgs
   timeline: Timeline
-  substepsArgs: GenerateSubstepsArgs 
+  substepsArgs: GenerateSubstepsArgs
 }>
 
 addEventListener('message', (event: TimelineMessageEvent) => {

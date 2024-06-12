@@ -137,7 +137,9 @@ export const belowPipetteMinimumVolume = (
     'lowVolumeDefault' in liquidSpecs
       ? liquidSpecs.lowVolumeDefault.minVolume
       : liquidSpecs.default.minVolume
-  return volume < minVolume ? belowPipetteMinVolumeWarning(minVolume as number) : null
+  return volume < minVolume
+    ? belowPipetteMinVolumeWarning(minVolume as number)
+    : null
 }
 
 export const maxDispenseWellVolume = (

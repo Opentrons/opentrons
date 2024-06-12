@@ -28,7 +28,11 @@ const mapResponseToAction: ResponseToActionMapper<PostWifiDisconnectAction> = (
 
   return response.ok
     ? Actions.postWifiDisconnectSuccess(host.name, meta)
-    : Actions.postWifiDisconnectFailure(host.name, body as RobotApiErrorResponse, meta)
+    : Actions.postWifiDisconnectFailure(
+        host.name,
+        body as RobotApiErrorResponse,
+        meta
+      )
 }
 
 const postDisconnectEpic: Epic = (action$, state$) =>

@@ -281,8 +281,11 @@ const clampAspirateAirGapVolume = (
     const minAirGapVolume = 0 // NOTE: a form level warning will occur if the air gap volume is below the pipette min volume
 
     const maxAirGapVolume =
-      getPipetteCapacity(pipetteEntity, labwareEntities, tipRack as string | null | undefined) -
-      minPipetteVolume
+      getPipetteCapacity(
+        pipetteEntity,
+        labwareEntities,
+        tipRack as string | null | undefined
+      ) - minPipetteVolume
     const clampedAirGapVolume = clamp(
       Number(patchedAspirateAirgapVolume),
       minAirGapVolume,
@@ -307,10 +310,13 @@ const clampDispenseAirGapVolume = (
   // @ts-expect-error(sa, 2021-6-14): appliedPatch.pipette does not exist. Address in #3161
   const pipetteId: string = appliedPatch.pipette
   // @ts-expect-error(sa, 2021-6-14): appliedPatch.disposalVolume_checkbox does not exist. Address in #3161
-  const disposalVolume = appliedPatch.disposalVolume_checkbox != null
-    ? // @ts-expect-error(sa, 2021-6-14): appliedPatch.disposalVolume_volume does not exist. Address in #3161
-      isNaN(Number(appliedPatch.disposalVolume_volume)) ? 0 : Number(appliedPatch.disposalVolume_volume)
-    : 0
+  const disposalVolume =
+    appliedPatch.disposalVolume_checkbox != null
+      ? // @ts-expect-error(sa, 2021-6-14): appliedPatch.disposalVolume_volume does not exist. Address in #3161
+        isNaN(Number(appliedPatch.disposalVolume_volume))
+        ? 0
+        : Number(appliedPatch.disposalVolume_volume)
+      : 0
   // @ts-expect-error(sa, 2021-6-14): appliedPatch.volume does not exist. Address in #3161
   const transferVolume = Number(appliedPatch.volume)
   // @ts-expect-error(sa, 2021-6-14): appliedPatch.dispense_airGap_volume does not exist. Address in #3161
@@ -470,7 +476,12 @@ const updatePatchOnPipetteChannelChange = (
       ? getChannels(patch.pipette, pipetteEntities)
       : null
   const { id, stepType, ...stepData } = rawForm
-  const appliedPatch: FormPatch = { ...(stepData as FormPatch), ...patch, id, stepType }
+  const appliedPatch: FormPatch = {
+    ...(stepData as FormPatch),
+    ...patch,
+    id,
+    stepType,
+  }
   const singleToMulti =
     prevChannels === 1 && (nextChannels === 8 || nextChannels === 96)
   const multiToSingle =
@@ -510,7 +521,7 @@ const updatePatchOnPipetteChannelChange = (
     const destLabwareDef = destLabware.def
     update = {
       aspirate_wells: getAllWellsFromPrimaryWells(
-        appliedPatch.aspirate_wells as string[], 
+        appliedPatch.aspirate_wells as string[],
         sourceLabwareDef,
         channels as 8 | 96
       ),
@@ -592,7 +603,12 @@ export function updatePatchBlowoutFields(
   rawForm: FormData
 ): FormPatch {
   const { id, stepType, ...stepData } = rawForm
-  const appliedPatch: FormPatch = { ...(stepData as FormPatch), ...patch, id, stepType }
+  const appliedPatch: FormPatch = {
+    ...(stepData as FormPatch),
+    ...patch,
+    id,
+    stepType,
+  }
 
   if (fieldHasChanged(rawForm, patch, 'path')) {
     const { path, blowout_location } = appliedPatch

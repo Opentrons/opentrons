@@ -96,7 +96,7 @@ export const BeforeBeginning = (
         proceed()
       })
       .catch(error => {
-        setErrorMessage(error.message)
+        setErrorMessage(error.message as string)
       })
   }
 

@@ -26,8 +26,16 @@ const mapResponseToAction: ResponseToActionMapper<FetchTipLengthCalibrationsActi
   const { host, body, ...responseMeta } = response
   const meta = { ...originalAction.meta, response: responseMeta }
   return response.ok
-    ? Actions.fetchTipLengthCalibrationsSuccess(host.name, body as AllTipLengthCalibrations, meta)
-    : Actions.fetchTipLengthCalibrationsFailure(host.name, body as RobotApiErrorResponse, meta)
+    ? Actions.fetchTipLengthCalibrationsSuccess(
+        host.name,
+        body as AllTipLengthCalibrations,
+        meta
+      )
+    : Actions.fetchTipLengthCalibrationsFailure(
+        host.name,
+        body as RobotApiErrorResponse,
+        meta
+      )
 }
 
 export const fetchTipLengthCalibrationsEpic: Epic = (action$, state$) => {

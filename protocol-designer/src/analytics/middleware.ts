@@ -40,7 +40,9 @@ export const reduxActionToAnalyticsEvent = (
       // additional fields for analytics, eg descriptive name for pipettes
       // (these fields are prefixed with double underscore only to make sure they
       // never accidentally overlap with actual fields)
-      const additionalProperties = flattenNestedProperties((stepArgs as unknown) as Record<string, unknown>)
+      const additionalProperties = flattenNestedProperties(
+        (stepArgs as unknown) as Record<string, unknown>
+      )
 
       // Mixpanel wants YYYY-MM-DDTHH:MM:SS for Date type
       additionalProperties.__dateCreated =
@@ -50,7 +52,8 @@ export const reduxActionToAnalyticsEvent = (
 
       additionalProperties.__protocolName = fileMetadata.protocolName
       if ('pipette' in stepArgs && stepArgs.pipette != null) {
-        additionalProperties.__pipetteName = pipetteEntities[stepArgs?.pipette].name
+        additionalProperties.__pipetteName =
+          pipetteEntities[stepArgs?.pipette].name
       }
 
       return {
@@ -64,7 +67,9 @@ export const reduxActionToAnalyticsEvent = (
     const dateCreatedTimestamp = fileMetadata.created
 
     const { editedFields, stepIds } = action.payload
-    const additionalProperties = flattenNestedProperties(editedFields as Record<string, unknown>)
+    const additionalProperties = flattenNestedProperties(
+      editedFields as Record<string, unknown>
+    )
     const savedStepForms = getSavedStepForms(state)
     const batchEditedStepForms: FormData[] = stepIds.map(
       (id: StepIdType) => savedStepForms[id]

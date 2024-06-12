@@ -105,7 +105,9 @@ async function usbListener(
   // check for formDataProxy
   if (data?.proxiedFormData != null) {
     // reconstruct FormData
-    const formData = reconstructFormData(data.proxiedFormData as IPCSafeFormData)
+    const formData = reconstructFormData(
+      data.proxiedFormData as IPCSafeFormData
+    )
     formHeaders = formData.getHeaders()
     data = formData
   }

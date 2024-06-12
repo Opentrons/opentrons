@@ -7,7 +7,10 @@ import { withRobotHost } from '../../robot-api/operators'
 import * as Constants from '../constants'
 
 import type { Action, Epic } from '../../types'
-import type { RobotApiRequestOptions, RobotApiResponse } from '../../robot-api/types'
+import type {
+  RobotApiRequestOptions,
+  RobotApiResponse,
+} from '../../robot-api/types'
 import type { SyncSystemTimeAction } from '../types'
 import type { OperatorFunction } from 'rxjs'
 

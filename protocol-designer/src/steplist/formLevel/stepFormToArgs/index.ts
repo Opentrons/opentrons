@@ -9,7 +9,15 @@ import { heaterShakerFormToArgs } from './heaterShakerFormToArgs'
 import { moveLiquidFormToArgs } from './moveLiquidFormToArgs'
 import { moveLabwareFormToArgs } from './moveLabwareFormToArgs'
 import type { CommandCreatorArgs } from '@opentrons/step-generation'
-import type { FormData, HydratedHeaterShakerFormData, HydratedMagnetFormData, HydratedMixFormDataLegacy, HydratedMoveLabwareFormData, HydratedMoveLiquidFormData, HydratedTemperatureFormData } from '../../../form-types'
+import type {
+  FormData,
+  HydratedHeaterShakerFormData,
+  HydratedMagnetFormData,
+  HydratedMixFormDataLegacy,
+  HydratedMoveLabwareFormData,
+  HydratedMoveLiquidFormData,
+  HydratedTemperatureFormData,
+} from '../../../form-types'
 // NOTE: this acts as an adapter for the PD defined data shape of the step forms
 // to create arguments that the step generation service is expecting
 // in order to generate command creators
@@ -22,7 +30,10 @@ export const stepFormToArgs = (hydratedForm: FormData): StepArgs => {
   const castForm = _castForm(hydratedForm)
   switch (castForm.stepType) {
     case 'moveLiquid': {
-      const moveLiquidFormData: HydratedMoveLiquidFormData = { ...castForm, fields: castForm }
+      const moveLiquidFormData: HydratedMoveLiquidFormData = {
+        ...castForm,
+        fields: castForm,
+      }
       return moveLiquidFormToArgs(moveLiquidFormData)
     }
 
@@ -46,7 +57,10 @@ export const stepFormToArgs = (hydratedForm: FormData): StepArgs => {
       return heaterShakerFormToArgs(castForm as HydratedHeaterShakerFormData)
 
     case 'moveLabware': {
-      const moveLabwareFormData: HydratedMoveLabwareFormData = { ...castForm, fields: castForm }
+      const moveLabwareFormData: HydratedMoveLabwareFormData = {
+        ...castForm,
+        fields: castForm,
+      }
       return moveLabwareFormToArgs(moveLabwareFormData)
     }
 

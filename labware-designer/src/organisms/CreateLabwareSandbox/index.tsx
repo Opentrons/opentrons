@@ -27,7 +27,12 @@ import {
 
 import { IRREGULAR_OPTIONS, REGULAR_OPTIONS } from './fixtures'
 
-import type { DeckDefinition, IrregularLabwareProps, LabwareDefinition2, RegularLabwareProps } from '@opentrons/shared-data'
+import type {
+  DeckDefinition,
+  IrregularLabwareProps,
+  LabwareDefinition2,
+  RegularLabwareProps,
+} from '@opentrons/shared-data'
 
 const SLOT_OPTIONS = ot2StandardDeckV4.locations.addressableAreas.map(
   slot => slot.id
@@ -93,7 +98,12 @@ export function CreateLabwareSandbox(): JSX.Element {
       ? createRegularLabware
       : createIrregularLabware
     try {
-      setLabwareToRender(createLabware(JSON.parse(event.target.value) as IrregularLabwareProps & RegularLabwareProps))
+      setLabwareToRender(
+        createLabware(
+          JSON.parse(event.target.value) as IrregularLabwareProps &
+            RegularLabwareProps
+        )
+      )
     } catch (error) {
       console.log('Failed to parse options as JSON', error)
     }
