@@ -79,7 +79,7 @@ export const migrateFile = (
     .filter(labwareId => getIsAdapter(labwareId))
     .reduce((acc: LabwareIdMapping, labwareId: string): LabwareIdMapping => {
       const { labwareUri, adapterUri } = getAdapterAndLabwareSplitInfo(
-        labwareId
+        labware[labwareId].definitionId
       )
       const newLabwareId = `${uuid()}:${labwareUri}`
       const newAdapterId = `${uuid()}:${adapterUri}`
@@ -132,7 +132,9 @@ export const migrateFile = (
         labwareUri,
         adapterDisplayName,
         labwareDisplayName,
-      } = getAdapterAndLabwareSplitInfo(command.params.labwareId)
+      } = getAdapterAndLabwareSplitInfo(
+        labware[command.params.labwareId].definitionId
+      )
       const labwareLocation = command.params.location
       let adapterLocation: LabwareLocation = 'offDeck'
       if (labwareLocation === 'offDeck') {
@@ -228,6 +230,10 @@ export const migrateFile = (
         ...command,
         params: {
           ...command.params,
+          labwareId:
+            labwareId.includes(definitionId) || labwareId === 'fixedTrash'
+              ? labwareId
+              : `${labwareId}:${definitionId}`,
           loadName: parameters.loadName,
           namespace,
           version,
@@ -240,7 +246,12 @@ export const migrateFile = (
     labwareLocationUpdate
   ).reduce((acc: LabwareLocationUpdate, labwareId: string) => {
     if (!getIsAdapter(labwareId)) {
-      acc[labwareId] = labwareLocationUpdate[labwareId]
+      const definitionId = labware[labwareId].definitionId
+      const labId =
+        labwareId === 'fixedTrash' || labwareId.includes(definitionId)
+          ? labwareId
+          : `${labwareId}:${definitionId}`
+      acc[labId] = labwareLocationUpdate[labwareId]
     } else {
       const adapterAndLabwareLocationUpdate: LabwareLocationUpdate = Object.entries(
         loadAdapterAndLabwareCommands
@@ -288,7 +299,6 @@ export const migrateFile = (
     return updatedIngredLocations
   }
   const newLabwareIngreds = getNewLabwareIngreds(ingredLocations)
-
   const migrateSavedStepForms = (
     savedStepForms: Record<string, any>
   ): Record<string, any> => {
@@ -296,7 +306,7 @@ export const migrateFile = (
       if (stepForm.stepType === 'moveLiquid') {
         let newAspirateLabwareDefinition: LabwareDefinition2 | null = null
 
-        let aspirateLabware = stepForm.aspirate_labware
+        let aspirateLabware: string
         // aspirate labware is an adapter/labware split
         if (stepForm.aspirate_labware in mappedLabwareIds) {
           const newLabwareDefUri =
@@ -307,10 +317,15 @@ export const migrateFile = (
             mappedLabwareIds[stepForm.aspirate_labware].newLabwareId
           // aspirate labware is just a labware and doesn't need to be mapped
         } else {
+          const aspirateDefinitionId =
+            labware[stepForm.aspirate_labware].definitionId
           newAspirateLabwareDefinition =
-            newLabwareDefinitions[
-              labware[stepForm.aspirate_labware].definitionId
-            ]
+            newLabwareDefinitions[aspirateDefinitionId]
+          aspirateLabware =
+            stepForm.aspirate_labware.includes(aspirateDefinitionId) ||
+            stepForm.aspirate_labware === 'fixedTrash'
+              ? stepForm.aspirate_labware
+              : `${stepForm.aspirate_labware}:${aspirateDefinitionId}`
         }
         if (newAspirateLabwareDefinition == null) {
           console.error(
@@ -324,7 +339,7 @@ export const migrateFile = (
 
         let newDispenseLabwareDefinition: LabwareDefinition2 | null = null
 
-        let dispenseLabware = stepForm.dispense_labware
+        let dispenseLabware: string
         // dispense labware is an adapter/labware split
         if (stepForm.dispense_labware in mappedLabwareIds) {
           const labwareUri =
@@ -334,11 +349,17 @@ export const migrateFile = (
             mappedLabwareIds[stepForm.dispense_labware].newLabwareId
           // dispense labware is just a labware and doesn't need to be mapped
         } else {
+          const dispenseDefinitionId =
+            labware[stepForm.dispense_labware].definitionId
           newDispenseLabwareDefinition =
-            newLabwareDefinitions[
-              labware[stepForm.dispense_labware].definitionId
-            ]
+            newLabwareDefinitions[dispenseDefinitionId]
+          dispenseLabware =
+            stepForm.dispense_labware.includes(dispenseDefinitionId) ||
+            stepForm.dispense_labware === 'fixedTrash'
+              ? stepForm.dispense_labware
+              : `${stepForm.dispense_labware}:${dispenseDefinitionId}`
         }
+
         if (newDispenseLabwareDefinition == null) {
           console.error(
             `expected to find dispense labware definition with labwareId ${dispenseLabware} but could not`
@@ -367,7 +388,7 @@ export const migrateFile = (
       } else if (stepForm.stepType === 'mix') {
         let newMixLabwareDefinition: LabwareDefinition2 | null = null
 
-        let mixLabware = stepForm.labware
+        let mixLabware: string
         // mix labware is an adapter/labware split
         if (stepForm.labware in mappedLabwareIds) {
           const labwareUri =
@@ -376,8 +397,13 @@ export const migrateFile = (
           mixLabware = mappedLabwareIds[stepForm.labware].newLabwareId
           // mix labware is just a labware and doesn't need to be mapped
         } else {
-          newMixLabwareDefinition =
-            newLabwareDefinitions[labware[stepForm.labware].definitionId]
+          const mixDefinitionId = labware[stepForm.labware].definitionId
+          newMixLabwareDefinition = newLabwareDefinitions[mixDefinitionId]
+          mixLabware =
+            stepForm.labware.includes(mixDefinitionId) ||
+            stepForm.labware === 'fixedTrash'
+              ? stepForm.labware
+              : `${stepForm.labware}:${mixDefinitionId}`
         }
 
         if (newMixLabwareDefinition == null) {
