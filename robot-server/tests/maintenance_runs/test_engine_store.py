@@ -54,8 +54,15 @@ async def test_create_engine(subject: MaintenanceEngineStore) -> None:
     )
 
     assert subject.current_run_id == "run-id"
+    assert subject.current_run_created_at is not None
     assert isinstance(result, StateSummary)
     assert subject.run_orchestrator.get_protocol_runner() is None
+
+
+def test_run_created_at_raises(subject: MaintenanceEngineStore) -> None:
+    """Should raise that the run has not yet created."""
+    with pytest.raises(AssertionError):
+        subject.current_run_created_at
 
 
 @pytest.mark.parametrize("robot_type", ["OT-2 Standard", "OT-3 Standard"])
@@ -124,6 +131,7 @@ async def test_clear_engine(subject: MaintenanceEngineStore) -> None:
     result = await subject.clear()
 
     assert subject.current_run_id is None
+    assert subject._created_at is None
     assert isinstance(result, RunResult)
 
     with pytest.raises(NoRunOrchestrator):

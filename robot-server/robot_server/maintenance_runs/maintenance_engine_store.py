@@ -100,6 +100,7 @@ class MaintenanceEngineStore:
     """Factory and in-memory storage for ProtocolEngine."""
 
     _run_orchestrator: Optional[RunOrchestrator] = None
+    _created_at: Optional[datetime] = None
 
     def __init__(
         self,
@@ -137,7 +138,8 @@ class MaintenanceEngineStore:
     @property
     def current_run_created_at(self) -> datetime:
         """Get the run creation datetime."""
-        raise NotImplementedError("run created at not implemented.")
+        assert self._created_at is not None, "Run not yet created."
+        return self._created_at
 
     async def create(
         self,
@@ -183,6 +185,8 @@ class MaintenanceEngineStore:
             run_id=run_id, protocol_engine=engine, hardware_api=self._hardware_api
         )
 
+        self._created_at = created_at
+
         return self._run_orchestrator.get_state_summary()
 
     async def clear(self) -> RunResult:
@@ -204,6 +208,7 @@ class MaintenanceEngineStore:
         run_data = self.run_orchestrator.get_state_summary()
         commands = self.run_orchestrator.get_all_commands()
         self._run_orchestrator = None
+        self._created_at = None
 
         return RunResult(state_summary=run_data, commands=commands, parameters=[])
 
