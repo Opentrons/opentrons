@@ -10,6 +10,7 @@ from opentrons.protocol_reader import ProtocolSource, JsonProtocolConfig
 from opentrons_shared_data.robot.dev_types import RobotType
 
 from robot_server.protocols import protocol_analyzer
+from robot_server.protocols.protocol_models import ProtocolKind
 from robot_server.protocols.analyses_manager import AnalysesManager
 from robot_server.protocols.analysis_models import (
     AnalysisSummary,
@@ -78,6 +79,7 @@ async def test_start_analysis(
             content_hash="abc123",
         ),
         protocol_key="dummy-data-111",
+        protocol_kind=ProtocolKind.STANDARD.value,
     )
     bool_parameter = BooleanParameter(
         displayName="Foo", variableName="Bar", default=True, value=False
@@ -143,6 +145,7 @@ async def test_rtp_validation_error_in_start_analysis(
             content_hash="abc123",
         ),
         protocol_key="dummy-data-111",
+        protocol_kind=ProtocolKind.STANDARD.value,
     )
 
     runner_load_exception = Exception("Uh oh!")
