@@ -92,7 +92,7 @@ function LabwareBorder(props: LabwareBorderProps): JSX.Element {
       strokeWidth={2 * borderThickness}
       width={xDimension - 2 * borderThickness}
       height={yDimension - 2 * borderThickness}
-      rx={6 * borderThickness}
+      // rx={6 * borderThickness}
       {...svgProps}
     />
   )

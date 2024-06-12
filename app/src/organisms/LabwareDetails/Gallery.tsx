@@ -38,9 +38,20 @@ export function Gallery(props: GalleryProps): JSX.Element {
     <Box width="100%">
       <RobotWorkSpace
         key="center"
-        viewBox={`${cornerOffsetFromSlot.x} ${cornerOffsetFromSlot.y} ${xDimension} ${dims.yDimension}`}
+        viewBox={`${cornerOffsetFromSlot.x - 80} ${cornerOffsetFromSlot.y - 80} ${xDimension + 80} ${dims.yDimension + 130}`}
       >
-        {() => <LabwareRender definition={definition} />}
+        {() => (
+          <>
+            <g transform='translate(0,-60)'>
+              <LabwareRender definition={definition} />
+            </g>
+            <g transform='translate(0,-30)'>
+              <LabwareRender definition={definition} />
+            </g>
+            <LabwareRender definition={definition} />
+          </>
+        )
+        }
       </RobotWorkSpace>
     </Box>
   )

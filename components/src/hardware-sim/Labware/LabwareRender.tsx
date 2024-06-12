@@ -94,13 +94,16 @@ export const LabwareRender = (props: LabwareRenderProps): JSX.Element => {
       transform={`translate(${cornerOffsetFromSlot.x}, ${cornerOffsetFromSlot.y})`}
       ref={gRef}
     >
-      <StaticLabware
-        definition={props.definition}
-        onMouseEnterWell={props.onMouseEnterWell}
-        onMouseLeaveWell={props.onMouseLeaveWell}
-        onLabwareClick={props.onLabwareClick}
-        highlight={props.highlight}
-      />
+
+      <g transform='matrix(0.866,0.5,-0.866,0.5,0,0)'>
+        <StaticLabware
+          definition={props.definition}
+          onMouseEnterWell={props.onMouseEnterWell}
+          onMouseLeaveWell={props.onMouseLeaveWell}
+          onLabwareClick={props.onLabwareClick}
+          highlight={props.highlight}
+        />
+      </g>
       {props.wellStroke != null ? (
         <StrokedWells
           definition={props.definition}
@@ -115,13 +118,13 @@ export const LabwareRender = (props: LabwareRenderProps): JSX.Element => {
       ) : null}
       {props.disabledWells != null
         ? props.disabledWells.map((well, index) => (
-            <StyledWells
-              key={index}
-              wellContents="disabledWell"
-              definition={props.definition}
-              wells={well}
-            />
-          ))
+          <StyledWells
+            key={index}
+            wellContents="disabledWell"
+            definition={props.definition}
+            wells={well}
+          />
+        ))
         : null}
       {props.highlightedWells != null ? (
         <StyledWells
@@ -145,7 +148,7 @@ export const LabwareRender = (props: LabwareRenderProps): JSX.Element => {
         />
       ) : null}
       {props.wellLabelOption != null &&
-      props.definition.metadata.displayCategory !== 'adapter' ? (
+        props.definition.metadata.displayCategory !== 'adapter' ? (
         <WellLabels
           definition={props.definition}
           wellLabelOption={props.wellLabelOption}
@@ -153,6 +156,22 @@ export const LabwareRender = (props: LabwareRenderProps): JSX.Element => {
           highlightedWellLabels={props.highlightedWellLabels}
         />
       ) : null}
+      <path
+        d={`M0,0 h${definition.dimensions.xDimension} v${-definition.dimensions.zDimension} h${-definition.dimensions.xDimension} v${definition.dimensions.zDimension}`}
+        fill='red'
+        stroke="black"
+        strokeWidth='1'
+        opacity='0.5'
+        transform='matrix(0.866,0.5,0,1,0,0)'>
+      </path>
+      <path
+        d={`M0,0 h${-definition.dimensions.yDimension} v${-definition.dimensions.zDimension} h${definition.dimensions.yDimension} v${definition.dimensions.zDimension}`}
+        fill='teal'
+        stroke="black"
+        strokeWidth='1'
+        opacity='0.5'
+        transform='matrix(0.866,-0.5,0,1,0,0)'>
+      </path>
     </g>
   )
 }

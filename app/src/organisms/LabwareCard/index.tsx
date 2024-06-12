@@ -59,7 +59,8 @@ export function LabwareCard(props: LabwareCardProps): JSX.Element {
     >
       <Box id="LabwareCard_labwareImage" marginRight={SPACING.spacing24}>
         <RobotWorkSpace
-          viewBox={`${definition.cornerOffsetFromSlot.x} ${definition.cornerOffsetFromSlot.y} ${xDimensionOverride} ${definition.dimensions.yDimension}`}
+          // viewBox={`${definition.cornerOffsetFromSlot.x} ${definition.cornerOffsetFromSlot.y} ${xDimensionOverride} ${definition.dimensions.yDimension}`}
+          viewBox={`${definition.cornerOffsetFromSlot.x - 80} ${definition.cornerOffsetFromSlot.y-30} ${xDimensionOverride + 80} ${definition.dimensions.yDimension + 80}`}
         >
           {() => <LabwareRender definition={definition} />}
         </RobotWorkSpace>
