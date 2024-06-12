@@ -25,7 +25,7 @@ import {
   useNotifyAllCommandsAsPreSerializedList,
   useNotifyRunQuery,
 } from '../../resources/runs'
-import { CommandText } from '../CommandText'
+import { CommandText } from '../../molecules/Command'
 import { Divider } from '../../atoms/structure'
 import { NAV_BAR_WIDTH } from '../../App/constants'
 import { CommandIcon } from './CommandIcon'
