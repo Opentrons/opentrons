@@ -1,8 +1,5 @@
 """Opentrons analyze CLI."""
-from types import TracebackType
-
 import click
-import traceback
 
 from anyio import run
 from contextlib import contextmanager
@@ -57,7 +54,6 @@ from opentrons_shared_data.errors import ErrorCodes
 from opentrons_shared_data.errors.exceptions import (
     EnumeratedError,
     PythonException,
-    GeneralError,
 )
 
 from opentrons.protocols.parse import PythonParseMode
@@ -239,64 +235,6 @@ class RunnerLoadError(EnumeratedError):
             message=message,
             wrapping=[e for e in _convert_exc()],
         )
-
-
-# class ExceptionDuringProtocolLoad(GeneralError):
-#     """This exception wraps an exception that was raised from a protocol
-#     for proper error message formatting by the rpc, since it's only here that
-#     we can properly figure out formatting
-#     """
-#
-#     def __init__(
-#         self,
-#         original_exc: Exception,
-#         original_tb: Optional[TracebackType],
-#         message: str,
-#         line: Optional[int],
-#     ) -> None:
-#         self.original_exc = original_exc
-#         self.original_tb = original_tb
-#         self.line = line
-#         super().__init__(
-#             wrapping=[original_exc],
-#             message=_build_message(
-#                 exception_class_name=self.original_exc.__class__.__name__,
-#                 line_number=self.line,
-#                 message=message,
-#             ),
-#         )
-#
-#     def __str__(self) -> str:
-#         return self.message
-#
-# def _build_message(
-#     exception_class_name: str, line_number: Optional[int], message: str
-# ) -> str:
-#     line_number_part = f" [line {line_number}]" if line_number is not None else ""
-#     return f"{exception_class_name}{line_number_part}: {message}"
-
-
-# def _find_protocol_error(tb, proto_name):
-#     """Return the FrameInfo for the lowest frame in the traceback from the
-#     protocol.
-#     """
-#     tb_info = traceback.extract_tb(tb)
-#     for frame in reversed(tb_info):
-#         if frame.filename == proto_name:
-#             return frame
-#     else:
-#         raise KeyError
-#
-# def _raise_pretty_protocol_error(exception: Exception, filename: str) -> None:
-#     exc_type, exc_value, tb = sys.exc_info()
-#     try:
-#         frame = _find_protocol_error(tb, filename)
-#     except KeyError:
-#         # No pretty names, just raise it
-#         raise exception
-#     raise ExceptionDuringProtocolLoad(
-#         exception, tb, str(exception), frame.lineno
-#     ) from exception
 
 
 @track_analysis

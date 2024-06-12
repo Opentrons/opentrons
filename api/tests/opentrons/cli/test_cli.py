@@ -263,39 +263,29 @@ def test_python_error_line_numbers(
 
 
 @pytest.mark.parametrize("output", ["--json-output", "--human-json-output"])
-@pytest.mark.parametrize(
-    ("python_protocol_source", "expected_error"),
-    [
-        (
-            textwrap.dedent(
-                # Raises an exception during runner load.
-                """\
-                requirements = {"robotType": "OT-2", "apiLevel": "2.18"}  # line 1
-                                                                          # line 2
-                def add_parameters(parameters):                           # line 3
-                    # No default value specified                          # line 4
-                    parameters.add_bool(                                  # line 5
-                        display_name="Dry Run",
-                        variable_name="dry_run",
-                    )
-                def run(protocol):          
-                    pass
-                """
-            ),
-            "TypeError [line 5]: ParameterContext.add_bool() missing 1 required positional argument: 'default'",
-        ),
-    ],
-)
 def test_run_time_parameter_error(
     tmp_path: Path,
-    python_protocol_source: str,
-    expected_error: str,
     output: str,
 ) -> None:
-    """Test that the error message due to RTP error is correct.
+    """Test that an RTP validation error is shown correctly in analysis result.
 
-    Also verify that analysis result contains all static data.
+    Also verify that analysis result contains all static data about the protocol.
     """
+    python_protocol_source = textwrap.dedent(
+        # Raises an exception during runner load.
+        """\
+            requirements = {"robotType": "OT-2", "apiLevel": "2.18"}  # line 1
+                                                                      # line 2
+            def add_parameters(parameters):                           # line 3
+                # No default value specified                          # line 4
+                parameters.add_bool(                                  # line 5
+                    display_name="Dry Run",
+                    variable_name="dry_run",
+                )
+            def run(protocol):
+                pass
+        """
+    )
     protocol_source_file = tmp_path / "protocol.py"
     protocol_source_file.write_text(python_protocol_source, encoding="utf-8")
     result = _get_analysis_result([protocol_source_file], output)
@@ -303,10 +293,19 @@ def test_run_time_parameter_error(
     assert result.exit_code == 0
 
     assert result.json_output is not None
-    assert "robotType" in result.json_output
-    assert "pipettes" in result.json_output
-    assert "commands" in result.json_output
-    assert "labware" in result.json_output
-    assert "liquids" in result.json_output
-    assert "modules" in result.json_output
-    assert expected_error in result.json_output.get("errors")[0].get("detail")
+    assert result.json_output["robotType"] == "OT-2 Standard"
+    assert result.json_output["pipettes"] == []
+    assert result.json_output["commands"] == []
+    assert result.json_output["labware"] == []
+    assert result.json_output["liquids"] == []
+    assert result.json_output["modules"] == []
+    assert result.json_output["config"] == {
+        "apiVersion": [2, 18],
+        "protocolType": "python",
+    }
+    assert result.json_output["files"] == [{"name": "protocol.py", "role": "main"}]
+    [error] = result.json_output["errors"]
+    assert error["detail"] == (
+        "TypeError [line 5]: ParameterContext.add_bool() missing 1"
+        " required positional argument: 'default'"
+    )
