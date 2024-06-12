@@ -9,7 +9,7 @@ const meta: Meta<typeof ProtocolCommandComponent> = {
 
 export default meta
 
-type Story = Story<typeof ProtocolCommandComponent>
+type Story = StoryObj<typeof ProtocolCommandComponent>
 
 export const ProtocolCommand: Story = {
   args: {},
