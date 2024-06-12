@@ -143,8 +143,8 @@ export const trackEventMiddleware: Middleware<BaseState, any> = ({
   // NOTE: this is the Redux state AFTER the action has been fully dispatched
   const state = getState()
 
-  const optedIn = getHasOptedIn(state) || false
-  const event = reduxActionToAnalyticsEvent(state, action)
+  const optedIn = getHasOptedIn(state as BaseState) ?? false
+  const event = reduxActionToAnalyticsEvent(state as BaseState, action)
   if (event) {
     // actually report to analytics (trackEvent is responsible for using optedIn)
     trackEvent(event, optedIn)
