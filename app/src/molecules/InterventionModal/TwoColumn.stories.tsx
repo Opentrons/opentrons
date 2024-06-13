@@ -279,7 +279,7 @@ export const ExampleTwoColumn: Story = {
     rightNotificationHeading: undefined,
     rightNotificationMessage: undefined,
     rightNotificationType: 'neutral',
-    containerWidth: 960,
-    containerHeight: 432,
+    containerWidth: 452,
+    containerHeight: 104,
   },
 }
