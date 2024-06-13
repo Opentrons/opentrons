@@ -29,6 +29,7 @@
   "select_tip_pickup_location": "Select tip pick-up location",
   "skip": "Skip",
   "stand_back": "Stand back, robot is in motion",
+  "stand_back_picking_up_tips": "Stand back, picking up tips",
   "stand_back_resuming": "Stand back, resuming current step",
   "stand_back_retrying": "Stand back, retrying failed step",
   "tip_not_detected": "Tip not detected",
