@@ -22,6 +22,7 @@ import {
   GRIPPER_V1,
   GRIPPER_V1_1,
   GRIPPER_V1_2,
+  GRIPPER_V1_3,
   EXTENSION,
   MAGNETIC_BLOCK_V1,
 } from './constants'
@@ -221,6 +222,7 @@ export type GripperModel =
   | typeof GRIPPER_V1
   | typeof GRIPPER_V1_1
   | typeof GRIPPER_V1_2
+  | typeof GRIPPER_V1_3
 
 export type ModuleModelWithLegacy =
   | ModuleModel
