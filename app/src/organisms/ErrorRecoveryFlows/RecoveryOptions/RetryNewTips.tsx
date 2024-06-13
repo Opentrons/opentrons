@@ -3,10 +3,10 @@ import { useTranslation } from 'react-i18next'
 
 import {
   Flex,
-  Box,
   StyledText,
   SPACING,
   DIRECTION_COLUMN,
+  BaseDeck,
 } from '@opentrons/components'
 
 import { RECOVERY_MAP } from '../constants'
@@ -22,6 +22,10 @@ import type { RecoveryContentProps } from '../types'
 import type { ModalHeaderBaseProps } from '../../../molecules/Modal/types'
 import { createPortal } from 'react-dom'
 import { getTopPortalEl } from '../../../App/portal'
+import {
+  FLEX_ROBOT_TYPE,
+  getSimplestDeckConfigForProtocol,
+} from '@opentrons/shared-data'
 
 export function RetryNewTips(props: RecoveryContentProps): JSX.Element | null {
   const { recoveryMap } = props
@@ -45,7 +49,7 @@ export function RetryNewTips(props: RecoveryContentProps): JSX.Element | null {
   return buildContent()
 }
 
-//TOME: Ticket or solve not using the full row for multichannel.
+// TOME: Ticket or solve not using the full row for multichannel.
 export function ReplaceTips(props: RecoveryContentProps): JSX.Element | null {
   const {
     isOnDevice,
@@ -53,9 +57,9 @@ export function ReplaceTips(props: RecoveryContentProps): JSX.Element | null {
     failedPipetteInfo,
     failedLabwareUtils,
   } = props
-  const { t } = useTranslation('error_recovery')
+  const { relevantPickUpTipWellName } = failedLabwareUtils
   const { proceedNextStep } = routeUpdateActions
-  const { pickUpTipLabware } = failedLabwareUtils
+  const { t } = useTranslation('error_recovery')
 
   const primaryOnClick = (): void => {
     void proceedNextStep()
@@ -66,7 +70,7 @@ export function ReplaceTips(props: RecoveryContentProps): JSX.Element | null {
       return t('replace_with_new_tip_rack')
     } else {
       return t('replace_used_tips_in_rack_location', {
-        location: pickUpTipLabware?.location,
+        location: relevantPickUpTipWellName,
       })
     }
   }
@@ -76,9 +80,7 @@ export function ReplaceTips(props: RecoveryContentProps): JSX.Element | null {
       <RecoverySingleColumnContent>
         <TwoColumn>
           <LeftColumnTipInfo {...props} title={buildTitle()} />
-          <Flex gridGap={SPACING.spacing8} flexDirection={DIRECTION_COLUMN}>
-            PLACEHOLDER
-          </Flex>
+          <RecoveryDeckMap {...props} />
         </TwoColumn>
         <RecoveryFooterButtons
           isOnDevice={isOnDevice}
@@ -99,15 +101,14 @@ export function SelectTips(props: RecoveryContentProps): JSX.Element | null {
     recoveryCommands,
   } = props
   const { ROBOT_PICKING_UP_TIPS } = RECOVERY_MAP
-  const { t } = useTranslation('error_recovery')
-  const [showTipSelectModal, setShowTipSelectModal] = React.useState(false)
-
   const { pickUpTips } = recoveryCommands
   const {
     goBackPrevStep,
     setRobotInMotion,
     proceedNextStep,
   } = routeUpdateActions
+  const { t } = useTranslation('error_recovery')
+  const [showTipSelectModal, setShowTipSelectModal] = React.useState(false)
 
   const primaryBtnOnClick = (): Promise<void> => {
     return setRobotInMotion(true, ROBOT_PICKING_UP_TIPS.ROUTE)
@@ -203,15 +204,12 @@ function LeftColumnTipInfo({
   }
 }
 
-function RetryWithNewTips({
-  isOnDevice,
-  routeUpdateActions,
-  recoveryCommands,
-}: RecoveryContentProps): JSX.Element | null {
+function RetryWithNewTips(props: RecoveryContentProps): JSX.Element | null {
+  const { isOnDevice, routeUpdateActions, recoveryCommands } = props
   const { ROBOT_RETRYING_STEP } = RECOVERY_MAP
-  const { t } = useTranslation('error_recovery')
   const { goBackPrevStep, setRobotInMotion } = routeUpdateActions
   const { retryFailedCommand, resumeRun } = recoveryCommands
+  const { t } = useTranslation('error_recovery')
 
   const primaryBtnOnClick = (): Promise<void> => {
     return setRobotInMotion(true, ROBOT_RETRYING_STEP.ROUTE)
@@ -246,10 +244,25 @@ function RetryWithNewTips({
   }
 }
 
+// TODO(jh, 06-13-24): EXEC-536.
+function RecoveryDeckMap({
+  isOnDevice,
+  protocolAnalysis,
+}: RecoveryContentProps): JSX.Element | null {
+  const deckConfig = getSimplestDeckConfigForProtocol(protocolAnalysis)
+
+  if (isOnDevice) {
+    return <BaseDeck deckConfig={deckConfig} robotType={FLEX_ROBOT_TYPE} />
+  } else {
+    return null
+  }
+}
+
 type TipSelectionProps = RecoveryContentProps & {
   allowTipSelection: boolean
 }
 
+// TODO(jh, 06-13-24): EXEC-535.
 function TipSelection(props: TipSelectionProps): JSX.Element {
   const { failedLabwareUtils, failedPipetteInfo, allowTipSelection } = props
 

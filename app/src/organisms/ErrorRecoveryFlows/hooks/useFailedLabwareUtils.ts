@@ -8,7 +8,7 @@ import {
 } from '@opentrons/shared-data'
 
 import type { WellGroup } from '@opentrons/components'
-import type { CommandsData, Run } from '@opentrons/api-client'
+import type { CommandsData, PipetteData, Run } from '@opentrons/api-client'
 import type {
   LabwareDefinition2,
   LoadedLabware,
@@ -19,13 +19,18 @@ import type { ErrorRecoveryFlowsProps } from '..'
 interface UseFailedLabwareUtilsProps {
   failedCommand: ErrorRecoveryFlowsProps['failedCommand']
   protocolAnalysis: ErrorRecoveryFlowsProps['protocolAnalysis']
+  failedPipetteInfo: PipetteData | null
   runCommands?: CommandsData
   runRecord?: Run
 }
 
 export type UseFailedLabwareUtilsResult = UseTipSelectionUtilsResult & {
+  /* The name of the labware from which the tip(s) involved in the failed command were picked up.  */
   pickUpTipLabwareName: string | null
+  /* Info for the labware from which the tip(s) involved in the failed command were picked up. */
   pickUpTipLabware: LoadedLabware | null
+  /* The name of the well from which the tip(s) involved in the failed command were picked up. */
+  relevantPickUpTipWellName: string | null
 }
 
 // Utils for labware relating to the failedCommand.
@@ -39,6 +44,7 @@ export function useFailedLabwareUtils({
     () => getRecentRelevantPickUpTipCommand(failedCommand, runCommands),
     [failedCommand, runCommands]
   )
+
   const tipSelectionUtils = useTipSelectionUtils(recentRelevantPickUpTipCmd)
 
   const pickUpTipLabwareName = React.useMemo(
@@ -56,10 +62,14 @@ export function useFailedLabwareUtils({
     [recentRelevantPickUpTipCmd, runRecord]
   )
 
+  const relevantPickUpTipWellName =
+    recentRelevantPickUpTipCmd?.params.wellName ?? null
+
   return {
     ...tipSelectionUtils,
     pickUpTipLabwareName,
     pickUpTipLabware,
+    relevantPickUpTipWellName,
   }
 }
 
@@ -156,7 +166,6 @@ function useInitialSelectedLocationsFrom(
   return initialWells
 }
 
-// TODO(jh 06-12-24): See EXEC-525.
 // Get the name of the latest labware used by the failed command's pipette to pick up tips, if any.
 function getPickUpTipLabwareName(
   protocolAnalysis: ErrorRecoveryFlowsProps['protocolAnalysis'],

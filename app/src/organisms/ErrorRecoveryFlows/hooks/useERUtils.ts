@@ -80,6 +80,7 @@ export function useERUtils({
     protocolAnalysis,
     runCommands,
     runRecord,
+    failedPipetteInfo,
   })
 
   const recoveryCommands = useRecoveryCommands({
