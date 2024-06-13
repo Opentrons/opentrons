@@ -1,3 +1,5 @@
+"""Functions aiding in Liquid Level Detection."""
+
 from opentrons_shared_data.errors.exceptions import (
     TipHitWellBottomError,
     LiquidNotFoundError,
