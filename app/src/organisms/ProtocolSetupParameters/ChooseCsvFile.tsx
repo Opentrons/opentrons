@@ -19,7 +19,6 @@ import {
 import { ChildNavigation } from '../ChildNavigation'
 import { EmptyFile } from './EmptyFile'
 import { RadioButton } from '../../atoms/buttons'
-import { getLocalRobot } from '../../redux/discovery'
 import { getFilePaths } from '../../redux/shell'
 
 // import { Dispatch } from '../../redux/types'
@@ -46,8 +45,6 @@ export function ChooseCsvFile({
 }: // rawValue,
 ChooseCsvFileProps): JSX.Element {
   const { t } = useTranslation('protocol_setup')
-  const localRobot = useSelector(getLocalRobot)
-  const robotName = localRobot?.name != null ? localRobot.name : 'no name'
   const csvFilesOnUSB = useSelector(getFilePaths).payload.filePaths ?? []
 
   // console.log('csv files', csvFilesOnUSB)
@@ -80,7 +77,7 @@ ChooseCsvFileProps): JSX.Element {
         <Flex flexDirection={DIRECTION_ROW} gridGap={SPACING.spacing48}>
           <Flex css={CONTAINER_STYLE}>
             <StyledText css={HEADER_TEXT_STYLE}>
-              {t('csv_files_on_robot', { robotName })}
+              {t('csv_files_on_robot')}
             </StyledText>
             <Flex css={LIST_CONTAINER_STYLE}>
               {csvFilesOnRobot.length !== 0 ? (

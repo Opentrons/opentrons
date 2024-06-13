@@ -54,7 +54,7 @@
   "connect_modules_for_controls": "Connect modules to see controls",
   "connection_info_not_available": "Connection info not available once run has started",
   "connection_status": "Connection Status",
-  "csv_files_on_robot": "CSV files on {{robotName}}",
+  "csv_files_on_robot": "CSV files on robot",
   "csv_files_on_usb": "CSV files on USB",
   "currently_configured": "Currently configured",
   "currently_unavailable": "Currently unavailable",
