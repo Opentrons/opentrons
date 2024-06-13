@@ -185,7 +185,7 @@ export const ChoosePipette = (props: ChoosePipetteProps): JSX.Element => {
                   value: NINETY_SIX_CHANNEL,
                 }}
                 onSelect={event => {
-                  setSelectedPipette(event.target.value as any)
+                  setSelectedPipette(event.target.value as SelectablePipettes)
                 }}
                 initialSelected={SINGLE_MOUNT_PIPETTES}
               />

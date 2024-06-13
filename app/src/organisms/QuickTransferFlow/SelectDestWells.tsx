@@ -83,7 +83,7 @@ export function SelectDestWells(props: SelectDestWellsProps): JSX.Element {
         t('number_wells_selected_error_message', {
           wellCount: sourceWellCount,
           selectionUnits,
-        }),
+        }) as string,
         'error',
         {
           closeButton: true,
