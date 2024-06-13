@@ -93,6 +93,12 @@ class GripperOffsets(TypedDict):
     dropOffset: NamedOffset
 
 
+class ModulePeripherals(TypedDict):
+    loadName: str
+    namespace: str
+    version: int
+
+
 # TODO(mc, 2022-03-18): potentially move from typed-dict to Pydantic
 ModuleDefinitionV3 = TypedDict(
     "ModuleDefinitionV3",
@@ -112,6 +118,7 @@ ModuleDefinitionV3 = TypedDict(
         "incompatibleWithDecks": List[str],
         "twoDimensionalRendering": Dict[str, Any],
         "gripperOffsets": Dict[str, GripperOffsets],
+        "peripherals": List[ModulePeripherals],
     },
     total=False,
 )

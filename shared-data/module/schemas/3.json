@@ -160,6 +160,19 @@
       },
       "required": ["default"]
     },
+    "peripherals": {
+      "type": "array",
+      "description": "Module's peripheral labware objects to be loaded on the module",
+      "items": {
+        "type": "object",
+        "required": ["loadName", "namespace", "version"],
+        "properties": {
+          "loadName": { "type": "string" },
+          "namespace": { "type": "string" },
+          "version": { "type": "integer" }
+        }
+      }
+    },
     "displayName": { "type": "string" },
     "quirks": {
       "type": "array",
