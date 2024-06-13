@@ -1,4 +1,5 @@
 import pick from 'lodash/pick'
+import { getDefaultsForStepType } from '../getDefaultsForStepType'
 import {
   chainPatchUpdaters,
   fieldHasChanged,
@@ -6,7 +7,6 @@ import {
   getDefaultWells,
   getAllWellsFromPrimaryWells,
 } from './utils'
-import { getDefaultsForStepType } from '../getDefaultsForStepType'
 import type {
   LabwareEntities,
   PipetteEntities,
