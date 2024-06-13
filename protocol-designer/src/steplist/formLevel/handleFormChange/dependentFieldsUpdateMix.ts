@@ -33,7 +33,7 @@ const updatePatchOnLabwareChange = (
     ...getDefaultFields(
       'mix_mmFromBottom',
       'mix_touchTip_mmFromBottom',
-      'mix_touchTip_checkboxƒ'
+      'mix_touchTip_checkbox'
     ),
     wells: getDefaultWells({
       labwareId: appliedPatch.labware,
