@@ -21,6 +21,7 @@
       "errorCode": "4000",
       "errorInfo": {},
       "errorType": "ExceptionInProtocolError",
+      "isDefined": false,
       "wrappedErrors": [
         {
           "detail": "opentrons.protocol_api.validation.InvalidTrashBinLocationError: Invalid location for trash bin: C2.\nValid slots: Any slot in column 1 or 3.",
@@ -28,9 +29,10 @@
           "errorInfo": {
             "args": "('Invalid location for trash bin: C2.\\nValid slots: Any slot in column 1 or 3.',)",
             "class": "InvalidTrashBinLocationError",
-            "traceback": "  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocols/execution/execute_python.py\", line 124, in run_python\n    exec(\"run(__context)\", new_globs)\n\n  File \"<string>\", line 1, in <module>\n\n  File \"Flex_X_v2_16_NO_PIPETTES_TrashBinInCol2.py\", line 15, in run\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocols/api_support/util.py\", line 383, in _check_version_wrapper\n    return decorated_obj(*args, **kwargs)\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocol_api/protocol_context.py\", line 513, in load_trash_bin\n    addressable_area_name = validation.ensure_and_convert_trash_bin_location(\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocol_api/validation.py\", line 331, in ensure_and_convert_trash_bin_location\n    raise InvalidTrashBinLocationError(\n"
+            "traceback": "  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocols/execution/execute_python.py\", line 147, in exec_run\n    exec(\"run(__context)\", new_globs)\n\n  File \"<string>\", line 1, in <module>\n\n  File \"Flex_X_v2_16_NO_PIPETTES_TrashBinInCol2.py\", line 15, in run\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocols/api_support/util.py\", line 383, in _check_version_wrapper\n    return decorated_obj(*args, **kwargs)\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocol_api/protocol_context.py\", line 525, in load_trash_bin\n    addressable_area_name = validation.ensure_and_convert_trash_bin_location(\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocol_api/validation.py\", line 333, in ensure_and_convert_trash_bin_location\n    raise InvalidTrashBinLocationError(\n"
           },
           "errorType": "PythonException",
+          "isDefined": false,
           "wrappedErrors": []
         }
       ]
