@@ -6,7 +6,6 @@ import {
   StyledText,
   SPACING,
   DIRECTION_COLUMN,
-  Box,
 } from '@opentrons/components'
 
 import { RECOVERY_MAP } from '../constants'
@@ -15,10 +14,13 @@ import { WellSelection } from '../../WellSelection'
 import { TwoColumn } from '../../../molecules/InterventionModal'
 import { Move } from '../../../molecules/InterventionModal/InterventionStep'
 import { InlineNotification } from '../../../atoms/InlineNotification'
+import { Modal } from '../../../molecules/Modal'
 
 import type { WellGroup } from '@opentrons/components'
 import type { RecoveryContentProps } from '../types'
-import type { UseFailedLabwareUtilsResult } from '../hooks'
+import type { ModalHeaderBaseProps } from '../../../molecules/Modal/types'
+import { createPortal } from 'react-dom'
+import { getTopPortalEl } from '../../../App/portal'
 
 export function RetryNewTips(props: RecoveryContentProps): JSX.Element | null {
   const { recoveryMap } = props
@@ -91,19 +93,24 @@ export function SelectTips(props: RecoveryContentProps): JSX.Element | null {
       .then(() => proceedNextStep())
   }
 
-  const tertiaryBtnOnClick = (): void => {
+  const toggleModal = (): void => {
     setShowTipSelectModal(!showTipSelectModal)
   }
 
   if (isOnDevice) {
     return (
       <>
+        {showTipSelectModal && (
+          <TipSelectionModal
+            {...props}
+            allowTipSelection={true}
+            toggleModal={toggleModal}
+          />
+        )}
         <RecoverySingleColumnContent>
           <TwoColumn>
             <SelectPickUpLocation {...props} />
-            <Flex width="28.313rem">
-              <TipSelection {...props} allowTipSelection={false} />
-            </Flex>
+            <TipSelection {...props} allowTipSelection={false} />
           </TwoColumn>
           <RecoveryFooterButtons
             isOnDevice={isOnDevice}
@@ -111,7 +118,7 @@ export function SelectTips(props: RecoveryContentProps): JSX.Element | null {
             secondaryBtnOnClick={goBackPrevStep}
             primaryBtnTextOverride={t('pick_up_tips')}
             tertiaryBtnDisabled={failedPipetteInfo?.data.channels === 96}
-            tertiaryBtnOnClick={tertiaryBtnOnClick}
+            tertiaryBtnOnClick={toggleModal}
             tertiaryBtnText={t('change_location')}
           />
         </RecoverySingleColumnContent>
@@ -220,19 +227,15 @@ function TipSelection(props: TipSelectionProps): JSX.Element {
     deselectTips,
   } = failedLabwareUtils
 
-  const onSelectTips = (): UseFailedLabwareUtilsResult['selectTips'] => {
+  const onSelectTips = (tipGroup: WellGroup): void => {
     if (allowTipSelection) {
-      return selectTips
-    } else {
-      return () => null
+      selectTips(tipGroup)
     }
   }
 
-  const onDeselectTips = (): UseFailedLabwareUtilsResult['deselectTips'] => {
+  const onDeselectTips = (locations: string[]): void => {
     if (allowTipSelection) {
-      return deselectTips
-    } else {
-      return () => null
+      deselectTips(locations)
     }
   }
 
@@ -245,4 +248,29 @@ function TipSelection(props: TipSelectionProps): JSX.Element {
       channels={failedPipetteInfo?.data.channels ?? 1}
     />
   )
+}
+
+type TipSelectionModalProps = TipSelectionProps & {
+  toggleModal: () => void
+}
+
+function TipSelectionModal(props: TipSelectionModalProps): JSX.Element | null {
+  const { toggleModal } = props
+  const { t } = useTranslation('error_recovery')
+
+  const modalHeader: ModalHeaderBaseProps = {
+    title: t('change_tip_pickup_location'),
+    hasExitIcon: true,
+  }
+
+  if (props.isOnDevice) {
+    return createPortal(
+      <Modal header={modalHeader} onOutsideClick={toggleModal} zIndex={15}>
+        <TipSelection {...props} />
+      </Modal>,
+      getTopPortalEl()
+    )
+  } else {
+    return null
+  }
 }
