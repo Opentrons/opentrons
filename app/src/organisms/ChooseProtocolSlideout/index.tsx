@@ -29,7 +29,7 @@ import {
   useTooltip,
 } from '@opentrons/components'
 import { ApiHostProvider } from '@opentrons/react-api-client'
-import { sortRuntimeParameters, type RunTimeParameter } from '@opentrons/shared-data'
+import { sortRuntimeParameters } from '@opentrons/shared-data'
 
 import { useLogger } from '../../logger'
 import { useFeatureFlag } from '../../redux/config'
@@ -52,6 +52,7 @@ import { getRunTimeParameterValuesForRun } from '../Devices/utils'
 import { getAnalysisStatus } from '../ProtocolsLanding/utils'
 
 import type { DropdownOption } from '@opentrons/components'
+import type { RunTimeParameter } from '@opentrons/shared-data'
 import type { Robot } from '../../redux/discovery/types'
 import type { StoredProtocolData } from '../../redux/protocol-storage'
 import type { State } from '../../redux/types'
@@ -348,11 +349,17 @@ export function ChooseProtocolSlideoutComponent(
                         setRunTimeParametersOverrides?.(clone)
                       }}
                       height="0.813rem"
-                      label={runtimeParam.value ? t('protocol_details:on') : t('protocol_details:off')}
+                      label={
+                        runtimeParam.value
+                          ? t('protocol_details:on')
+                          : t('protocol_details:off')
+                      }
                       paddingTop={SPACING.spacing2} // manual alignment of SVG with value label
                     />
                     <StyledText as="p">
-                      {runtimeParam.value ? t('protocol_details:on') : t('protocol_details:off')}
+                      {runtimeParam.value
+                        ? t('protocol_details:on')
+                        : t('protocol_details:off')}
                     </StyledText>
                   </Flex>
                   <StyledText as="label" paddingTop={SPACING.spacing8}>
@@ -386,7 +393,9 @@ export function ChooseProtocolSlideoutComponent(
                     >
                       {t('protocol_details:csv_file')}
                     </StyledText>
-                    <StyledText as="p">{t('protocol_details:csv_required')}</StyledText>
+                    <StyledText as="p">
+                      {t('protocol_details:csv_required')}
+                    </StyledText>
                   </Flex>
                   {runtimeParam.file == null ? (
                     <UploadInput
