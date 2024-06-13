@@ -58,7 +58,6 @@ from opentrons_shared_data.errors.exceptions import (
 )
 
 from opentrons.protocols.parse import PythonParseMode
-from opentrons.util.performance_helpers import track_analysis
 
 OutputKind = Literal["json", "human-json"]
 
@@ -238,7 +237,6 @@ class UnexpectedAnalysisError(EnumeratedError):
         )
 
 
-@track_analysis
 async def _do_analyze(protocol_source: ProtocolSource) -> RunResult:
 
     runner = await create_simulating_runner(
