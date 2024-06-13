@@ -2,6 +2,7 @@ import * as React from 'react'
 
 import {
   RUN_STATUS_AWAITING_RECOVERY,
+  RUN_STATUS_BLOCKED_BY_OPEN_DOOR,
   RUN_STATUS_FAILED,
   RUN_STATUS_IDLE,
   RUN_STATUS_PAUSED,
@@ -22,6 +23,7 @@ import type { FailedCommand } from './types'
 const VALID_ER_RUN_STATUSES: RunStatus[] = [
   RUN_STATUS_AWAITING_RECOVERY,
   RUN_STATUS_STOP_REQUESTED,
+  RUN_STATUS_BLOCKED_BY_OPEN_DOOR,
 ]
 
 const INVALID_ER_RUN_STATUSES: RunStatus[] = [
