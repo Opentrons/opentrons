@@ -167,6 +167,7 @@ class MaintenanceEngineStore:
         ), "There is an active maintenance run that was not cleared correctly."
         engine = await create_protocol_engine(
             hardware_api=self._hardware_api,
+            command_generator=RunOrchestrator.command_generator,
             config=ProtocolEngineConfig(
                 robot_type=self._robot_type,
                 deck_type=self._deck_type,
