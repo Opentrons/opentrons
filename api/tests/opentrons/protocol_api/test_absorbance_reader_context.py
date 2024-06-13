@@ -36,7 +36,7 @@ def mock_broker(decoy: Decoy) -> LegacyBroker:
 @pytest.fixture
 def api_version() -> APIVersion:
     """Get an API version to apply to the interface."""
-    return MAX_SUPPORTED_VERSION
+    return APIVersion(2, 21)
 
 
 @pytest.fixture
