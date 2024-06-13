@@ -97,7 +97,7 @@ export function getRunTimeParameterValuesForRun(
 ): RunTimeParameterCreateData {
   return runTimeParameters.reduce((acc, param) => {
     if (param.type === 'csv_file') {
-      return { ...acc, [param.variableName]: param.file?.id }
+      return { ...acc, [param.variableName]: { id: param.file?.id } }
     } else {
       return param.value !== param.default
         ? { ...acc, [param.variableName]: param.value }

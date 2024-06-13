@@ -11,11 +11,11 @@ import {
 import { RadioButton } from '../../atoms/buttons'
 import { useToaster } from '../ToasterOven'
 import { ChildNavigation } from '../ChildNavigation'
-import type { RunTimeParameter } from '@opentrons/shared-data'
+import type { ChoiceParameter } from '@opentrons/shared-data'
 
 interface ChooseEnumProps {
   handleGoBack: () => void
-  parameter: RunTimeParameter
+  parameter: ChoiceParameter
   setParameter: (value: boolean | string | number, variableName: string) => void
   rawValue: number | string | boolean
 }
@@ -32,9 +32,6 @@ export function ChooseEnum({
   const options = 'choices' in parameter ? parameter.choices : null
   const handleOnClick = (newValue: string | number | boolean): void => {
     setParameter(newValue, parameter.variableName)
-  }
-  if (!('default' in parameter)) {
-    return null
   }
   const resetValueDisabled = parameter.default === rawValue
 

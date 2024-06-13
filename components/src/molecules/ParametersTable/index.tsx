@@ -7,6 +7,7 @@ import {
 } from '@opentrons/shared-data'
 import { BORDERS, COLORS } from '../../helix-design-system'
 import { SPACING, TYPOGRAPHY } from '../../ui-style-constants/index'
+import { Chip } from '../../atoms/Chip'
 import { StyledText } from '../../atoms/StyledText'
 import { Tooltip, useHoverTooltip } from '../../tooltips'
 import { Icon } from '../../icons'
@@ -14,7 +15,6 @@ import { Flex } from '../../primitives'
 import { DISPLAY_INLINE, FLEX_MAX_CONTENT } from '../../styles'
 
 import type { RunTimeParameter } from '@opentrons/shared-data'
-import { Chip } from '../../atoms'
 
 interface ProtocolParameterItemsProps {
   runTimeParameters: RunTimeParameter[]
