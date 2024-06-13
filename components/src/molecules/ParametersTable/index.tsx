@@ -71,23 +71,19 @@ export function ParametersTable({
             a.type === 'csv_file' && b.type !== 'csv_file' ? -1 : 0
           )
           .map((parameter: RunTimeParameter, index: number) => {
+            const isLast = index === runTimeParameters.length - 1
             return (
-              <StyledTableRow
-                isLast={index === runTimeParameters.length - 1}
-                key={`runTimeParameter-${index}`}
-              >
+              <StyledTableRow isLast={isLast} key={`runTimeParameter-${index}`}>
                 <ParameterName
                   displayName={parameter.displayName}
                   description={parameter.description}
-                  isLast={index === runTimeParameters.length - 1}
+                  isLast={isLast}
                   index={index}
                 />
-                <StyledTableCell
-                  isLast={index === runTimeParameters.length - 1}
-                >
+                <StyledTableCell isLast={isLast}>
                   {parameter.type === 'csv_file' ? (
                     <Chip
-                      text={t('requires_upload')}
+                      text={t('protocol_details:requires_upload')}
                       type="warning"
                       hasIcon={false}
                       width={FLEX_MAX_CONTENT}
@@ -98,10 +94,7 @@ export function ParametersTable({
                     </StyledText>
                   )}
                 </StyledTableCell>
-                <StyledTableCell
-                  isLast={index === runTimeParameters.length - 1}
-                  paddingRight="0"
-                >
+                <StyledTableCell isLast={isLast} paddingRight="0">
                   <StyledText as="p">
                     {parameter.type === 'csv_file'
                       ? t('n_a')

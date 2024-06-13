@@ -37,7 +37,7 @@
   "location": "location",
   "modules": "modules",
   "name": "Name",
-  "n_a": "N/A",
+  "n_a": "—",
   "no_available_robots_found": "No available robots found",
   "no_custom_values": "No custom values specified",
   "no_parameters": "No parameters specified in this protocol",

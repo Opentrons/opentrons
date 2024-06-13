@@ -11,6 +11,7 @@ import {
   JUSTIFY_SPACE_BETWEEN,
   SPACING,
   StyledText,
+  truncateString,
 } from '@opentrons/components'
 import type { CsvFileParameter, RunTimeParameter } from '@opentrons/shared-data'
 
@@ -18,10 +19,10 @@ interface FileCardProps {
   error: string | null
   fileRunTimeParameter: CsvFileParameter
   runTimeParametersOverrides: RunTimeParameter[]
-  setRunTimeParametersOverrides?: (_: RunTimeParameter[]) => void
+  setRunTimeParametersOverrides?: (rtpOverrides: RunTimeParameter[]) => void
 }
 
-export const FileCard = (props: FileCardProps): JSX.Element => {
+export function FileCard(props: FileCardProps): JSX.Element {
   const {
     error,
     fileRunTimeParameter,
@@ -46,12 +47,11 @@ export const FileCard = (props: FileCardProps): JSX.Element => {
         <StyledText
           as="p"
           css={css`
-            text-overflow: ellipsis;
-            white-space: nowrap;
             overflow: hidden;
+            white-space: nowrap;
           `}
         >
-          {fileRunTimeParameter?.file?.file?.name}
+          {truncateString(fileRunTimeParameter?.file?.file?.name ?? '', 30, 15)}
         </StyledText>
         <Flex alignItems={ALIGN_CENTER}>
           <Btn
