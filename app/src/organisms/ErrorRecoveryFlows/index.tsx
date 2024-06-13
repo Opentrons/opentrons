@@ -71,17 +71,9 @@ export interface ErrorRecoveryFlowsProps {
 export function ErrorRecoveryFlows(
   props: ErrorRecoveryFlowsProps
 ): JSX.Element | null {
-  const { failedCommand } = props
   const enableRunNotes = useFeatureFlag('enableRunNotes')
   const { hasLaunchedRecovery, toggleERWizard, showERWizard } = useERWizard()
   const showSplash = useRunPausedSplash()
-
-  // TOME: Remove this!
-  const updatedFailedCommand: FailedCommand = {
-    ...failedCommand,
-    error: { ...failedCommand?.error, errorType: 'overpressure' },
-  }
-  ///
 
   const recoveryUtils = useERUtils({
     ...props,
@@ -96,15 +88,11 @@ export function ErrorRecoveryFlows(
   return (
     <>
       {showERWizard ? (
-        <ErrorRecoveryWizard
-          {...props}
-          {...recoveryUtils}
-          failedCommand={updatedFailedCommand}
-        />
+        <ErrorRecoveryWizard {...props} {...recoveryUtils} />
       ) : null}
       {showSplash ? (
         <RunPausedSplash
-          failedCommand={updatedFailedCommand}
+          failedCommand={props.failedCommand}
           toggleERWiz={toggleERWizard}
           routeUpdateActions={recoveryUtils.routeUpdateActions}
         />
