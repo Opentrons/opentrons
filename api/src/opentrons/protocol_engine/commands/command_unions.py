@@ -6,7 +6,12 @@ from typing_extensions import Annotated
 from pydantic import Field
 
 from .command import DefinedErrorData
-from .pipetting_common import OverpressureError, OverpressureErrorInternalData
+from .pipetting_common import (
+    OverpressureError,
+    OverpressureErrorInternalData,
+    LiquidNotFoundError,
+    LiquidNotFoundErrorInternalData,
+)
 
 from . import absorbance_reader
 from . import heater_shaker
@@ -657,4 +662,5 @@ CommandPrivateResult = Union[
 CommandDefinedErrorData = Union[
     DefinedErrorData[TipPhysicallyMissingError, TipPhysicallyMissingErrorInternalData],
     DefinedErrorData[OverpressureError, OverpressureErrorInternalData],
+    DefinedErrorData[LiquidNotFoundError, LiquidNotFoundErrorInternalData],
 ]

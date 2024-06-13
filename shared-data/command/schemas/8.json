@@ -2752,7 +2752,7 @@
     },
     "LiquidProbeParams": {
       "title": "LiquidProbeParams",
-      "description": "Payload required to liquid probe.",
+      "description": "Parameters required to liquid probe a specific well.",
       "type": "object",
       "properties": {
         "labwareId": {
@@ -2784,7 +2784,7 @@
     },
     "LiquidProbeCreate": {
       "title": "LiquidProbeCreate",
-      "description": "A request to create a `liquidProbe` command.",
+      "description": "Create LiquidProbe command request model.",
       "type": "object",
       "properties": {
         "commandType": {

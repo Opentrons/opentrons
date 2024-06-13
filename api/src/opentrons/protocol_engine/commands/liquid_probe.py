@@ -1,28 +1,38 @@
 """Liquid-probe command for OT3 hardware. request, result, and implementation models."""
 from __future__ import annotations
-from typing import TYPE_CHECKING, Optional, Type
+from typing import TYPE_CHECKING, Optional, Type, Union
+from opentrons_shared_data.errors.exceptions import PipetteLiquidNotFoundError
 from typing_extensions import Literal
 
 from pydantic import Field
 
 from ..types import WellLocation, WellOrigin, CurrentWell, DeckPoint
 from .pipetting_common import (
+    LiquidNotFoundError,
+    LiquidNotFoundErrorInternalData,
     PipetteIdMixin,
     WellLocationMixin,
     DestinationPositionResult,
 )
-from .command import AbstractCommandImpl, BaseCommand, BaseCommandCreate, SuccessData
+from .command import (
+    AbstractCommandImpl,
+    BaseCommand,
+    BaseCommandCreate,
+    DefinedErrorData,
+    SuccessData,
+)
 from ..errors.error_occurrence import ErrorOccurrence
 
 if TYPE_CHECKING:
     from ..execution import MovementHandler, PipettingHandler
+    from ..resources import ModelUtils
 
 
 LiquidProbeCommandType = Literal["liquidProbe"]
 
 
 class LiquidProbeParams(PipetteIdMixin, WellLocationMixin):
-    """Payload required to liquid probe."""
+    """Parameters required to liquid probe a specific well."""
 
     pass
 
@@ -33,23 +43,33 @@ class LiquidProbeResult(DestinationPositionResult):
     z_position: float = Field(..., description="Z position of the found liquid.")
 
 
-class LiquidProbeImplementation(
-    AbstractCommandImpl[LiquidProbeParams, SuccessData[LiquidProbeResult, None]]
-):
+_ExecuteReturn = Union[
+    SuccessData[LiquidProbeResult, None],
+    DefinedErrorData[LiquidNotFoundError, LiquidNotFoundErrorInternalData],
+]
+
+
+class LiquidProbeImplementation(AbstractCommandImpl[LiquidProbeParams, _ExecuteReturn]):
     """The implementation of a `liquidProbe` command."""
 
     def __init__(
-        self, movement: MovementHandler, pipetting: PipettingHandler, **kwargs: object
+        self,
+        movement: MovementHandler,
+        pipetting: PipettingHandler,
+        model_utils: ModelUtils,
+        **kwargs: object,
     ) -> None:
         self._movement = movement
         self._pipetting = pipetting
+        self._model_utils = model_utils
 
-    async def execute(
-        self, params: LiquidProbeParams
-    ) -> SuccessData[LiquidProbeResult, None]:
-        """Execute a `liquidProbe` command.
+    async def execute(self, params: LiquidProbeParams) -> _ExecuteReturn:
+        """Move to and liquid probe the requested well.
 
         Return the z-position of the found liquid.
+
+        Raises:
+            LiquidNotFoundError: if liquid is not found during the probe process.
         """
         pipette_id = params.pipetteId
         labware_id = params.labwareId
@@ -82,21 +102,39 @@ class LiquidProbeImplementation(
             current_well=current_well,
         )
 
-        z_pos = await self._pipetting.liquid_probe_in_place(
-            pipette_id=pipette_id, labware_id=labware_id, well_name=well_name
-        )
-
-        return SuccessData(
-            public=LiquidProbeResult(
-                z_position=z_pos,
-                position=DeckPoint(x=position.x, y=position.y, z=position.z),
-            ),
-            private=None,
-        )
+        try:
+            z_pos = await self._pipetting.liquid_probe_in_place(
+                pipette_id=pipette_id, labware_id=labware_id, well_name=well_name
+            )
+        except PipetteLiquidNotFoundError as e:
+            return DefinedErrorData(
+                public=LiquidNotFoundError(
+                    id=self._model_utils.generate_id(),
+                    createdAt=self._model_utils.get_timestamp(),
+                    wrappedErrors=[
+                        ErrorOccurrence.from_failed(
+                            id=self._model_utils.generate_id(),
+                            createdAt=self._model_utils.get_timestamp(),
+                            error=e,
+                        )
+                    ],
+                ),
+                private=LiquidNotFoundErrorInternalData(
+                    position=DeckPoint(x=position.x, y=position.y, z=position.z)
+                ),
+            )
+        else:
+            return SuccessData(
+                public=LiquidProbeResult(
+                    z_position=z_pos,
+                    position=DeckPoint(x=position.x, y=position.y, z=position.z),
+                ),
+                private=None,
+            )
 
 
 class LiquidProbe(BaseCommand[LiquidProbeParams, LiquidProbeResult, ErrorOccurrence]):
-    """A `liquidProbe` command."""
+    """LiquidProbe command model."""
 
     commandType: LiquidProbeCommandType = "liquidProbe"
     params: LiquidProbeParams
@@ -106,7 +144,7 @@ class LiquidProbe(BaseCommand[LiquidProbeParams, LiquidProbeResult, ErrorOccurre
 
 
 class LiquidProbeCreate(BaseCommandCreate[LiquidProbeParams]):
-    """A request to create a `liquidProbe` command."""
+    """Create LiquidProbe command request model."""
 
     commandType: LiquidProbeCommandType = "liquidProbe"
     params: LiquidProbeParams

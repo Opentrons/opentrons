@@ -52,7 +52,7 @@ from opentrons_shared_data.errors.exceptions import (
     GripperNotPresentError,
     InvalidActuator,
     FirmwareUpdateFailedError,
-    LiquidNotFoundError,
+    PipetteLiquidNotFoundError,
 )
 
 from .util import use_or_initialize_loop, check_motion_bounds
@@ -2606,7 +2606,7 @@ class OT3API(
         reading from the pressure sensor.
 
         If the move is completed without the specified threshold being triggered, a
-        LiquidNotFoundError error will be thrown.
+        PipetteLiquidNotFoundError error will be thrown.
 
         Otherwise, the function will stop moving once the threshold is triggered,
         and return the position of the
@@ -2633,7 +2633,7 @@ class OT3API(
             probe_settings.plunger_speed,
             probe_settings.mount_speed,
         )
-        error: Optional[LiquidNotFoundError] = None
+        error: Optional[PipetteLiquidNotFoundError] = None
         for z_travel in z_travels:
 
             if probe_settings.aspirate_while_sensing:
@@ -2665,7 +2665,7 @@ class OT3API(
                 # if we made it here without an error we found the liquid
                 error = None
                 break
-            except LiquidNotFoundError as lnfe:
+            except PipetteLiquidNotFoundError as lnfe:
                 error = lnfe
         await self.move_to(checked_mount, probe_start_pos)
         if error is not None:

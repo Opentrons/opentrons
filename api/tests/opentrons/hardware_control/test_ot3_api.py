@@ -74,7 +74,7 @@ from opentrons_shared_data.errors.exceptions import (
     GripperNotPresentError,
     CommandPreconditionViolated,
     CommandParameterLimitViolated,
-    LiquidNotFoundError,
+    PipetteLiquidNotFoundError,
 )
 from opentrons_shared_data.gripper.gripper_definition import GripperModel
 from opentrons_shared_data.pipette.types import (
@@ -884,7 +884,11 @@ async def test_multi_liquid_probe(
             NodeId.gantry_y: 0,
             NodeId.pipette_left: 0,
         }
-        side_effects = [LiquidNotFoundError(), LiquidNotFoundError(), return_dict]
+        side_effects = [
+            PipetteLiquidNotFoundError(),
+            PipetteLiquidNotFoundError(),
+            return_dict,
+        ]
 
         # make sure aspirate while sensing reverses direction
         mock_liquid_probe.side_effect = side_effects
@@ -950,9 +954,9 @@ async def test_liquid_not_found(
             NodeId.pipette_left: 0,
         }
         side_effects = [
-            LiquidNotFoundError(),
-            LiquidNotFoundError(),
-            LiquidNotFoundError(),
+            PipetteLiquidNotFoundError(),
+            PipetteLiquidNotFoundError(),
+            PipetteLiquidNotFoundError(),
         ]
 
         # make sure aspirate while sensing reverses direction
@@ -968,7 +972,7 @@ async def test_liquid_not_found(
             data_files={InstrumentProbeType.PRIMARY: "fake_file_name"},
         )
         fake_max_z_dist = 3.0
-        with pytest.raises(LiquidNotFoundError):
+        with pytest.raises(PipetteLiquidNotFoundError):
             await ot3_hardware.liquid_probe(
                 OT3Mount.LEFT, fake_max_z_dist, fake_settings_aspirate
             )

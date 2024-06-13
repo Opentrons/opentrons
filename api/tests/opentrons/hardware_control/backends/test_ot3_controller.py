@@ -95,7 +95,7 @@ from opentrons_shared_data.errors.exceptions import (
     EStopNotPresentError,
     FirmwareUpdateRequiredError,
     FailedGripperPickupError,
-    LiquidNotFoundError,
+    PipetteLiquidNotFoundError,
 )
 
 from opentrons_hardware.hardware_control.move_group_runner import MoveGroupRunner
@@ -721,7 +721,7 @@ async def test_liquid_probe(
             threshold_pascals=fake_liquid_settings.sensor_threshold_pascals,
             output_option=fake_liquid_settings.output_option,
         )
-    except LiquidNotFoundError:
+    except PipetteLiquidNotFoundError:
         # the move raises a liquid not found now since we don't call the move group and it doesn't
         # get any positions back
         pass
