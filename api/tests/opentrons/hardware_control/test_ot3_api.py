@@ -967,7 +967,7 @@ async def test_liquid_not_found(
             aspirate_while_sensing=True,
             data_files={InstrumentProbeType.PRIMARY: "fake_file_name"},
         )
-        fake_max_z_dist = 10.0
+        fake_max_z_dist = 3.0
         with pytest.raises(LiquidNotFoundError):
             await ot3_hardware.liquid_probe(
                 OT3Mount.LEFT, fake_max_z_dist, fake_settings_aspirate
