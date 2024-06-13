@@ -82,6 +82,8 @@ capacitive_output_file_heading = [
 # FIXME we should organize all of these functions to use the sensor drivers.
 # FIXME we should restrict some of these functions by instrument type.
 
+Z_SOLO_MOVE_DISTANCE = 0.5
+PLUNGER_SOLO_MOVE_TIME = 0.15
 
 def _fix_pass_step_for_buffer(
     move_group: MoveGroupStep,
@@ -409,8 +411,24 @@ async def liquid_probe(
             sensor_id=sensor_id,
             stop_condition=MoveStopCondition.sync_line,
         )
+    
+    raise_z_axis = create_step(
+        distance={head_node: -Z_SOLO_MOVE_DISTANCE},
+        velocity={head_node: -mount_speed},
+        acceleration={},
+        duration=float64(abs(-Z_SOLO_MOVE_DISTANCE) / (mount_speed)),
+        present_nodes=head_node,
+    )
+    
+    lower_plunger = create_step(
+        distance={tool: PLUNGER_SOLO_MOVE_TIME * plunger_speed},
+        velocity={tool: plunger_speed},
+        acceleration={},
+        duration=PLUNGER_SOLO_MOVE_TIME,
+        present_nodes=tool
+    )
 
-    sensor_runner = MoveGroupRunner(move_groups=[[sensor_group]])
+    sensor_runner = MoveGroupRunner(move_groups=[[raise_z_axis], [lower_plunger], [sensor_group]])
     if csv_output:
         return await run_stream_output_to_csv(
             messenger,
