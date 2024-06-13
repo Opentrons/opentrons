@@ -68,12 +68,13 @@ export function SelectTips(props: RecoveryContentProps): JSX.Element | null {
     routeUpdateActions,
     recoveryCommands,
   } = props
+  const { ROBOT_PICKING_UP_TIPS } = RECOVERY_MAP
   const { t } = useTranslation('error_recovery')
 
   const { goBackPrevStep, setRobotInMotion } = routeUpdateActions
 
   const primaryBtnOnClick = (): Promise<void> => {
-    return setRobotInMotion(true)
+    return setRobotInMotion(true, ROBOT_PICKING_UP_TIPS.ROUTE)
   }
 
   return (

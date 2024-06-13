@@ -10,6 +10,7 @@ export type RobotMovingRoute =
   | typeof RECOVERY_MAP['ROBOT_RESUMING']['ROUTE']
   | typeof RECOVERY_MAP['ROBOT_RETRYING_STEP']['ROUTE']
   | typeof RECOVERY_MAP['ROBOT_CANCELING']['ROUTE']
+  | typeof RECOVERY_MAP['ROBOT_PICKING_UP_TIPS']['ROUTE']
 export type ErrorKind = typeof ERROR_KINDS[keyof typeof ERROR_KINDS]
 
 interface RecoveryMapDetails {
