@@ -68,10 +68,6 @@ export function useERUtils({
     toggleERWizard,
     setRecoveryMap: setRM,
   })
-  const recoveryCommands = useRecoveryCommands({
-    runId,
-    failedCommand,
-  })
 
   const failedPipetteInfo = useFailedCommandPipetteInfo({
     failedCommand,
@@ -84,6 +80,13 @@ export function useERUtils({
     protocolAnalysis,
     runCommands,
     runRecord,
+  })
+
+  const recoveryCommands = useRecoveryCommands({
+    runId,
+    failedCommand,
+    failedLabwareUtils,
+    failedPipetteInfo,
   })
 
   return {

@@ -6,6 +6,7 @@ import {
   StyledText,
   SPACING,
   DIRECTION_COLUMN,
+  Box,
 } from '@opentrons/components'
 
 import { RECOVERY_MAP } from '../constants'
@@ -32,6 +33,7 @@ export function RetryNewTips(props: RecoveryContentProps): JSX.Element | null {
       case RETRY_NEW_TIPS.STEPS.SELECT_TIPS:
         return <SelectTips {...props} />
       case RETRY_NEW_TIPS.STEPS.RETRY:
+        return <RetryWithNewTips {...props} />
       default:
         return <ReplaceTips {...props} />
     }
@@ -50,15 +52,19 @@ export function ReplaceTips({
     void proceedNextStep()
   }
 
-  return (
-    <RecoverySingleColumnContent>
-      {'PLACEHOLDER'}
-      <RecoveryFooterButtons
-        isOnDevice={isOnDevice}
-        primaryBtnOnClick={primaryOnClick}
-      />
-    </RecoverySingleColumnContent>
-  )
+  if (isOnDevice) {
+    return (
+      <RecoverySingleColumnContent>
+        {'PLACEHOLDER'}
+        <RecoveryFooterButtons
+          isOnDevice={isOnDevice}
+          primaryBtnOnClick={primaryOnClick}
+        />
+      </RecoverySingleColumnContent>
+    )
+  } else {
+    return null
+  }
 }
 
 export function SelectTips(props: RecoveryContentProps): JSX.Element | null {
@@ -70,30 +76,50 @@ export function SelectTips(props: RecoveryContentProps): JSX.Element | null {
   } = props
   const { ROBOT_PICKING_UP_TIPS } = RECOVERY_MAP
   const { t } = useTranslation('error_recovery')
+  const [showTipSelectModal, setShowTipSelectModal] = React.useState(false)
 
-  const { goBackPrevStep, setRobotInMotion } = routeUpdateActions
+  const { pickUpTips } = recoveryCommands
+  const {
+    goBackPrevStep,
+    setRobotInMotion,
+    proceedNextStep,
+  } = routeUpdateActions
 
   const primaryBtnOnClick = (): Promise<void> => {
     return setRobotInMotion(true, ROBOT_PICKING_UP_TIPS.ROUTE)
+      .then(() => pickUpTips())
+      .then(() => proceedNextStep())
   }
 
-  return (
-    <RecoverySingleColumnContent>
-      <TwoColumn>
-        <SelectPickUpLocation {...props} />
-        <TipSelection {...props} allowTipSelection={false} />
-      </TwoColumn>
-      <RecoveryFooterButtons
-        isOnDevice={isOnDevice}
-        primaryBtnOnClick={() => null}
-        secondaryBtnOnClick={goBackPrevStep}
-        primaryBtnTextOverride={t('pick_up_tips')}
-        tertiaryBtnDisabled={failedPipetteInfo?.data.channels === 96}
-        tertiaryBtnOnClick={() => null}
-        tertiaryBtnText={t('change_location')}
-      />
-    </RecoverySingleColumnContent>
-  )
+  const tertiaryBtnOnClick = (): void => {
+    setShowTipSelectModal(!showTipSelectModal)
+  }
+
+  if (isOnDevice) {
+    return (
+      <>
+        <RecoverySingleColumnContent>
+          <TwoColumn>
+            <SelectPickUpLocation {...props} />
+            <Flex width="28.313rem">
+              <TipSelection {...props} allowTipSelection={false} />
+            </Flex>
+          </TwoColumn>
+          <RecoveryFooterButtons
+            isOnDevice={isOnDevice}
+            primaryBtnOnClick={primaryBtnOnClick}
+            secondaryBtnOnClick={goBackPrevStep}
+            primaryBtnTextOverride={t('pick_up_tips')}
+            tertiaryBtnDisabled={failedPipetteInfo?.data.channels === 96}
+            tertiaryBtnOnClick={tertiaryBtnOnClick}
+            tertiaryBtnText={t('change_location')}
+          />
+        </RecoverySingleColumnContent>
+      </>
+    )
+  } else {
+    return null
+  }
 }
 
 // TODO(jh, 06-12-24): EXEC-500.
@@ -134,6 +160,50 @@ function SelectPickUpLocation({
       ></InlineNotification>
     </Flex>
   )
+}
+
+function RetryWithNewTips({
+  isOnDevice,
+  routeUpdateActions,
+  recoveryCommands,
+}: RecoveryContentProps): JSX.Element | null {
+  const { ROBOT_RETRYING_STEP } = RECOVERY_MAP
+  const { t } = useTranslation('error_recovery')
+
+  const { goBackPrevStep, setRobotInMotion } = routeUpdateActions
+  const { retryFailedCommand, resumeRun } = recoveryCommands
+
+  const primaryBtnOnClick = (): Promise<void> => {
+    return setRobotInMotion(true, ROBOT_RETRYING_STEP.ROUTE)
+      .then(() => retryFailedCommand())
+      .then(() => {
+        resumeRun()
+      })
+  }
+
+  if (isOnDevice) {
+    return (
+      <RecoverySingleColumnContent>
+        <TwoColumn>
+          <Flex gridGap={SPACING.spacing8} flexDirection={DIRECTION_COLUMN}>
+            <StyledText as="h4SemiBold">{t('retry_with_new_tips')}</StyledText>
+            <StyledText as="p">{t('robot_will_retry_with_tips')}</StyledText>
+          </Flex>
+          <Flex gridGap={SPACING.spacing8} flexDirection={DIRECTION_COLUMN}>
+            PLACEHOLDER
+          </Flex>
+        </TwoColumn>
+        <RecoveryFooterButtons
+          isOnDevice={isOnDevice}
+          primaryBtnOnClick={primaryBtnOnClick}
+          primaryBtnTextOverride={t('retry_now')}
+          secondaryBtnOnClick={goBackPrevStep}
+        />
+      </RecoverySingleColumnContent>
+    )
+  } else {
+    return null
+  }
 }
 
 type TipSelectionProps = RecoveryContentProps & {
