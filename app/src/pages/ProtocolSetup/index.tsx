@@ -115,9 +115,11 @@ interface ProtocolSetupStepProps {
   // display the reason the setup step is disabled
   disabledReason?: string | null
   //  optional description
-  description?: string
-  //  optional removal of the icon
-  hasIcon?: boolean
+  description?: string | null
+  //  optional removal of the left icon
+  hasLeftIcon?: boolean
+  //  optional removal of the right icon
+  hasRightIcon?: boolean
   //  optional enlarge the font size
   fontSize?: string
 }
@@ -131,7 +133,8 @@ export function ProtocolSetupStep({
   disabled = false,
   disabledReason,
   description,
-  hasIcon = true,
+  hasRightIcon = true,
+  hasLeftIcon = true,
   fontSize = 'p',
 }: ProtocolSetupStepProps): JSX.Element {
   const backgroundColorByStepStatus = {
@@ -193,7 +196,8 @@ export function ProtocolSetupStep({
         {status !== 'general' &&
         !disabled &&
         status !== 'inform' &&
-        !disabled ? (
+        !disabled &&
+        hasLeftIcon ? (
           <Icon
             color={status === 'ready' ? COLORS.green50 : COLORS.yellow50}
             size="2rem"
@@ -211,13 +215,15 @@ export function ProtocolSetupStep({
           >
             {title}
           </StyledText>
-          <StyledText
-            as="h4"
-            color={disabled ? COLORS.grey50 : COLORS.grey60}
-            maxWidth="35rem"
-          >
-            {description}
-          </StyledText>
+          {description != null ? (
+            <StyledText
+              as="h4"
+              color={disabled ? COLORS.grey50 : COLORS.grey60}
+              maxWidth="35rem"
+            >
+              {description}
+            </StyledText>
+          ) : null}
         </Flex>
         <Flex
           flex="1"
@@ -237,7 +243,7 @@ export function ProtocolSetupStep({
             {subDetail}
           </StyledText>
         </Flex>
-        {disabled || !hasIcon ? null : (
+        {disabled || !hasRightIcon ? null : (
           <Icon
             marginLeft={SPACING.spacing8}
             name="more"
@@ -380,7 +386,8 @@ function PrepareToRun({
   const runTimeParameters = mostRecentAnalysis?.runTimeParameters ?? []
   const hasRunTimeParameters = runTimeParameters.length > 0
   const hasCustomRunTimeParameters = runTimeParameters.some(
-    parameter => parameter.value !== parameter.default
+    parameter =>
+      parameter.type === 'csv_file' || parameter.value !== parameter.default
   )
 
   const [

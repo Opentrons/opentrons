@@ -227,6 +227,7 @@ describe('ChooseRobotSlideout', () => {
       })
 
       screen.getByText(param.displayName)
+      if (!('choices' in param)) {
       if (param.type === 'bool') {
         screen.getByText(param.description)
       }
@@ -235,7 +236,7 @@ describe('ChooseRobotSlideout', () => {
       }
       if (param.type === 'float') {
         screen.getByText(`${param.min.toFixed(1)}-${param.max.toFixed(1)}`)
-      }
+      }}
     })
   })
 

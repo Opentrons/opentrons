@@ -11,9 +11,10 @@ import { StyledText } from '../../atoms/StyledText'
 import { Tooltip, useHoverTooltip } from '../../tooltips'
 import { Icon } from '../../icons'
 import { Flex } from '../../primitives'
-import { DISPLAY_INLINE } from '../../styles'
+import { DISPLAY_INLINE, FLEX_MAX_CONTENT } from '../../styles'
 
 import type { RunTimeParameter } from '@opentrons/shared-data'
+import { Chip } from '../../atoms'
 
 interface ProtocolParameterItemsProps {
   runTimeParameters: RunTimeParameter[]
@@ -65,47 +66,51 @@ export function ParametersTable({
         </StyledTableHeader>
       </thead>
       <tbody>
-        {runTimeParameters.map((parameter: RunTimeParameter, index: number) => {
-          return (
-            <StyledTableRow
-              isLast={index === runTimeParameters.length - 1}
-              key={`runTimeParameter-${index}`}
-            >
-              <ParameterName
-                displayName={parameter.displayName}
-                description={parameter.description}
-                isLast={index === runTimeParameters.length - 1}
-                index={index}
-              />
-              <StyledTableCell isLast={index === runTimeParameters.length - 1}>
-                {parameter.type === 'csv_file' ? (
-                  <StyledText
-                    as="p"
-                    padding={`${SPACING.spacing4} ${SPACING.spacing8}`}
-                    backgroundColor={COLORS.yellow30}
-                    borderRadius={BORDERS.borderRadius4}
-                    fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-                    width="max-content"
-                  >
-                    {t('file_required')}
-                  </StyledText>
-                ) : (
-                  <StyledText as="p">
-                    {formatRunTimeParameterDefaultValue(parameter, t)}
-                  </StyledText>
-                )}
-              </StyledTableCell>
-              <StyledTableCell
-                isLast={index === runTimeParameters.length - 1}
-                paddingRight="0"
-              >
-                <StyledText as="p">
-                  {parameter.type === 'csv_file' ? '-' : formatRange(parameter)}
-                </StyledText>
-              </StyledTableCell>
-            </StyledTableRow>
+        {runTimeParameters
+          .sort((a, b) =>
+            a.type === 'csv_file' && b.type !== 'csv_file' ? -1 : 0
           )
-        })}
+          .map((parameter: RunTimeParameter, index: number) => {
+            return (
+              <StyledTableRow
+                isLast={index === runTimeParameters.length - 1}
+                key={`runTimeParameter-${index}`}
+              >
+                <ParameterName
+                  displayName={parameter.displayName}
+                  description={parameter.description}
+                  isLast={index === runTimeParameters.length - 1}
+                  index={index}
+                />
+                <StyledTableCell
+                  isLast={index === runTimeParameters.length - 1}
+                >
+                  {parameter.type === 'csv_file' ? (
+                    <Chip
+                      text={t('requires_upload')}
+                      type="warning"
+                      hasIcon={false}
+                      width={FLEX_MAX_CONTENT}
+                    />
+                  ) : (
+                    <StyledText as="p">
+                      {formatRunTimeParameterDefaultValue(parameter, t)}
+                    </StyledText>
+                  )}
+                </StyledTableCell>
+                <StyledTableCell
+                  isLast={index === runTimeParameters.length - 1}
+                  paddingRight="0"
+                >
+                  <StyledText as="p">
+                    {parameter.type === 'csv_file'
+                      ? t('n_a')
+                      : formatRange(parameter)}
+                  </StyledText>
+                </StyledTableCell>
+              </StyledTableRow>
+            )
+          })}
       </tbody>
     </StyledTable>
   )

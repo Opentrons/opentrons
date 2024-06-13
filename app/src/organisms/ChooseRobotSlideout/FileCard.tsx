@@ -1,3 +1,4 @@
+import React from 'react'
 import { css } from 'styled-components'
 import {
   ALIGN_CENTER,
@@ -8,10 +9,8 @@ import {
   Flex,
   Icon,
   JUSTIFY_SPACE_BETWEEN,
-  OVERFLOW_HIDDEN,
   SPACING,
   StyledText,
-  truncateString,
 } from '@opentrons/components'
 import type { CsvFileParameter, RunTimeParameter } from '@opentrons/shared-data'
 
@@ -52,8 +51,7 @@ export const FileCard = (props: FileCardProps): JSX.Element => {
             overflow: hidden;
           `}
         >
-          {/* {truncateString(fileRunTimeParameter?.file?.name ?? '', 33)} */}
-          {fileRunTimeParameter?.file?.name}
+          {fileRunTimeParameter?.file?.file?.name}
         </StyledText>
         <Flex alignItems={ALIGN_CENTER}>
           <Btn
