@@ -85,12 +85,12 @@ class Dispense(_PipettingMove):
 
 @dataclass
 class Liquid:
-    volume: Volume
     submerge: Submerge
     aspirate: Aspirate
     dispense: Dispense
     retract: Retract
-    touch: Touch
+    touch: Optional[Touch]  # nice-to-have (could be through a separate command)
+    volume: Optional[Volume]  # nice-to-have (requires HW testing)
 
 
 class LiquidClassPipette(InstrumentContext):
@@ -187,21 +187,21 @@ class LiquidClassPipette(InstrumentContext):
         rate: float = 1.0,
         liquid: Optional[Liquid] = None,
     ) -> "LiquidClassPipette":
-        if liquid:
-            delay = 0
-            if liquid.aspirate:
-                if liquid.aspirate.z_tracking:
-                    raise NotImplementedError("z-tracking not yet supported")
-                if liquid.aspirate.flow_rate is not None:
-                    self.flow_rate.aspirate = liquid.aspirate.flow_rate
-                if liquid.aspirate.delay is not None:
-                    delay = liquid.aspirate.delay
-            self.Move_to(location, liquid=liquid)
-            self.aspirate(volume, None, rate)  # in-place
-            if delay:
-                self.delay(seconds=delay)
-        else:
+        if not liquid:
             self.aspirate(volume, location, rate)
+            return self
+        delay = 0
+        if liquid.aspirate:
+            if liquid.aspirate.z_tracking:
+                raise NotImplementedError("z-tracking not yet supported")
+            if liquid.aspirate.flow_rate is not None:
+                self.flow_rate.aspirate = liquid.aspirate.flow_rate
+            if liquid.aspirate.delay is not None:
+                delay = liquid.aspirate.delay
+        self.Move_to(location, liquid=liquid)
+        self.aspirate(volume, None, rate)  # in-place
+        if delay:
+            self.delay(seconds=delay)
         return self
 
     def Dispense(
@@ -250,14 +250,13 @@ class LiquidClassPipette(InstrumentContext):
         liquid: Optional[Liquid] = None,
         **kwargs,
     ) -> "LiquidClassPipette":
-        """Public facing move command. """
-        if liquid:
-            if self._need_to_retract(location, liquid):
-                self._retract_from_well(liquid, self._last_well, speed=speed)
-            if self._need_to_submerge(location, liquid):
-                self._submerge_into_well(liquid, location, speed=speed)
-        else:
+        if not liquid:
             self.move_to(location, speed=speed, **kwargs)
+            return self
+        if self._need_to_retract(location, liquid):
+            self._retract_from_well(liquid, self._last_well, speed=speed)
+        if self._need_to_submerge(location, liquid):
+            self._submerge_into_well(liquid, location, speed=speed)
         return self
 
     def Touch_tip(
@@ -286,41 +285,41 @@ class LiquidClassPipette(InstrumentContext):
 GLYCEROL_50_PERCENT: Dict[str, Dict[str, Liquid]] = {
     "flex_1channel_1000": {
         "opentrons_flex_96_filtertiprack_50ul": Liquid(
-            volume=Volume(
-                min=3.0,
-                max=35.0,
-                adjustment=[(4.1, 3.04), (39.0, 35.78)]
-            ),
-            submerge=Submerge(
+            submerge=Submerge(  # required
                 speed=60,
-                height=None,
+                height=Height(1, HeightRef.WELL_BOTTOM),
                 delay=None,
             ),
-            aspirate=Aspirate(
+            aspirate=Aspirate(  # required
                 flow_rate=50.0,
                 height=Height(1, HeightRef.WELL_BOTTOM),
                 z_tracking=False,
                 delay=0.5,
             ),
-            dispense=Dispense(
+            dispense=Dispense(  # required
                 flow_rate=50.0,
                 height=Height(1, HeightRef.WELL_BOTTOM),
                 z_tracking=False,
                 delay=0.5,
                 push_out=7.0,
             ),
-            retract=Retract(
+            retract=Retract(  # required
                 speed=60,
                 height=Height(1.0, HeightRef.WELL_TOP),
                 delay=0,
                 air_gap=5.0,
                 blow_out=True,
             ),
-            touch=Touch(
+            touch=Touch(  # nice-to-have (could be through a separate command)
                 speed=30.0,
                 height=Height(-1, HeightRef.WELL_TOP),
                 delay=None,
                 strategy=TouchStrategy.FOUR_SIDES,
+            ),
+            volume=Volume(  # nice-to-have (requires HW testing)
+                min=3.0,
+                max=35.0,
+                adjustment=[(4.1, 3.04), (39.0, 35.78)]
             ),
         )
     }
