@@ -3595,12 +3595,14 @@
       "errorCode": "4000",
       "errorInfo": {},
       "errorType": "ExceptionInProtocolError",
+      "isDefined": false,
       "wrappedErrors": [
         {
           "detail": "Cannot return tip to a tiprack while the pipette is configured for partial tip.",
           "errorCode": "4000",
           "errorInfo": {},
           "errorType": "UnexpectedProtocolError",
+          "isDefined": false,
           "wrappedErrors": []
         }
       ]

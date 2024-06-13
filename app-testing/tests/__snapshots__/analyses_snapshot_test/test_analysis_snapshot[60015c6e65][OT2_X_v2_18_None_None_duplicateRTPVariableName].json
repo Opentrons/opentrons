@@ -1,13 +1,5 @@
 {
-  "commands": [
-    {
-      "commandType": "home",
-      "notes": [],
-      "params": {},
-      "result": {},
-      "status": "succeeded"
-    }
-  ],
+  "commands": [],
   "config": {
     "apiVersion": [
       2,
@@ -21,6 +13,7 @@
       "errorCode": "4000",
       "errorInfo": {},
       "errorType": "ExceptionInProtocolError",
+      "isDefined": false,
       "wrappedErrors": [
         {
           "detail": "opentrons.protocols.parameters.types.ParameterNameError: \"variable_a\" is already defined as a variable name for another parameter. All variable names must be unique.",
@@ -28,9 +21,10 @@
           "errorInfo": {
             "args": "('\"variable_a\" is already defined as a variable name for another parameter. All variable names must be unique.',)",
             "class": "ParameterNameError",
-            "traceback": "  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocols/execution/execute_python.py\", line 80, in _parse_and_set_parameters\n    exec(\"add_parameters(__param_context)\", new_globs)\n\n  File \"<string>\", line 1, in <module>\n\n  File \"OT2_X_v2_18_None_None_duplicateRTPVariableName.py\", line 28, in add_parameters\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocol_api/_parameter_context.py\", line 55, in add_int\n    validation.validate_variable_name_unique(variable_name, set(self._parameters))\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocols/parameters/validation.py\", line 24, in validate_variable_name_unique\n    raise ParameterNameError(\n"
+            "traceback": "  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocols/execution/execute_python.py\", line 80, in _parse_and_set_parameters\n    exec(\"add_parameters(__param_context)\", new_globs)\n\n  File \"<string>\", line 1, in <module>\n\n  File \"OT2_X_v2_18_None_None_duplicateRTPVariableName.py\", line 28, in add_parameters\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocol_api/_parameter_context.py\", line 60, in add_int\n    validation.validate_variable_name_unique(variable_name, set(self._parameters))\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocols/parameters/validation.py\", line 24, in validate_variable_name_unique\n    raise ParameterNameError(\n"
           },
           "errorType": "PythonException",
+          "isDefined": false,
           "wrappedErrors": []
         }
       ]
@@ -70,26 +64,5 @@
   "modules": [],
   "pipettes": [],
   "robotType": "OT-2 Standard",
-  "runTimeParameters": [
-    {
-      "default": 1.0,
-      "description": "This is a description",
-      "displayName": "int 1",
-      "max": 3.0,
-      "min": 1.0,
-      "type": "int",
-      "value": 1.0,
-      "variableName": "variable_a"
-    },
-    {
-      "default": 1.0,
-      "description": "This is a description",
-      "displayName": "int 2",
-      "max": 3.0,
-      "min": 1.0,
-      "type": "int",
-      "value": 1.0,
-      "variableName": "variable_b"
-    }
-  ]
+  "runTimeParameters": []
 }

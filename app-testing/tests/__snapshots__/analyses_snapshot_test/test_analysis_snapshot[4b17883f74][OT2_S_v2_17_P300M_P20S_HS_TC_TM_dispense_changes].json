@@ -2935,6 +2935,7 @@
         "errorCode": "4000",
         "errorInfo": {},
         "errorType": "InvalidDispenseVolumeError",
+        "isDefined": false,
         "wrappedErrors": []
       },
       "notes": [],
@@ -2967,18 +2968,21 @@
       "errorCode": "4000",
       "errorInfo": {},
       "errorType": "ExceptionInProtocolError",
+      "isDefined": false,
       "wrappedErrors": [
         {
           "detail": "InvalidDispenseVolumeError: Cannot dispense 21.0 µL when only 20.0 µL has been aspirated.",
           "errorCode": "4000",
           "errorInfo": {},
           "errorType": "ProtocolCommandFailedError",
+          "isDefined": false,
           "wrappedErrors": [
             {
               "detail": "Cannot dispense 21.0 µL when only 20.0 µL has been aspirated.",
               "errorCode": "4000",
               "errorInfo": {},
               "errorType": "InvalidDispenseVolumeError",
+              "isDefined": false,
               "wrappedErrors": []
             }
           ]
