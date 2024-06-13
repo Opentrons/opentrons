@@ -262,6 +262,8 @@ export const TwoColumnWithStandins: Story = {
     rightNotificationHeading: undefined,
     rightNotificationMessage: undefined,
     rightNotificationType: 'alert',
+    containerWidth: 452,
+    containerHeight: 104,
   },
 }
 
