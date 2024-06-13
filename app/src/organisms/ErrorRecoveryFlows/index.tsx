@@ -2,7 +2,12 @@ import * as React from 'react'
 
 import {
   RUN_STATUS_AWAITING_RECOVERY,
+  RUN_STATUS_FAILED,
+  RUN_STATUS_IDLE,
+  RUN_STATUS_PAUSED,
+  RUN_STATUS_RUNNING,
   RUN_STATUS_STOP_REQUESTED,
+  RUN_STATUS_SUCCEEDED,
 } from '@opentrons/api-client'
 
 import { useFeatureFlag } from '../../redux/config'
@@ -17,6 +22,14 @@ import type { FailedCommand } from './types'
 const VALID_ER_RUN_STATUSES: RunStatus[] = [
   RUN_STATUS_AWAITING_RECOVERY,
   RUN_STATUS_STOP_REQUESTED,
+]
+
+const INVALID_ER_RUN_STATUSES: RunStatus[] = [
+  RUN_STATUS_RUNNING,
+  RUN_STATUS_PAUSED,
+  RUN_STATUS_FAILED,
+  RUN_STATUS_SUCCEEDED,
+  RUN_STATUS_IDLE,
 ]
 
 interface UseErrorRecoveryResult {
@@ -38,6 +51,14 @@ export function useErrorRecoveryFlows(
 
   if (!hasSeenAwaitingRecovery && runStatus === RUN_STATUS_AWAITING_RECOVERY) {
     setHasSeenAwaitingRecovery(true)
+  }
+  // Reset recovery mode after the client has exited recovery.
+  else if (
+    hasSeenAwaitingRecovery &&
+    runStatus != null &&
+    INVALID_ER_RUN_STATUSES.includes(runStatus)
+  ) {
+    setHasSeenAwaitingRecovery(false)
   }
 
   const isValidRunStatus =
