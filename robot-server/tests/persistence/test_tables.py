@@ -98,7 +98,7 @@ EXPECTED_STATEMENTS_LATEST = [
         created_at DATETIME NOT NULL,
         PRIMARY KEY (id)
     )
-    """
+    """,
 ]
 
 EXPECTED_STATEMENTS_V5 = EXPECTED_STATEMENTS_LATEST
