@@ -91,6 +91,7 @@ class ErrorCodes(Enum):
     API_MISCONFIGURATION = _code_from_dict_entry("4007")
     INVALID_STORED_DATA = _code_from_dict_entry("4008")
     MISSING_CONFIGURATION_DATA = _code_from_dict_entry("4009")
+    FILE_PARAMETER_REQUIRED = _code_from_dict_entry("4010")
 
     @classmethod
     @lru_cache(25)

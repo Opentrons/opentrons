@@ -245,6 +245,10 @@
     "4009": {
       "detail": "Missing configuration data",
       "category": "generalError"
+    },
+    "4010": {
+      "detail": "File Parameter Required",
+      "category": "generalError"
     }
   }
 }

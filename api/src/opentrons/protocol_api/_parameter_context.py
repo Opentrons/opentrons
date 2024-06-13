@@ -11,6 +11,7 @@ from opentrons.protocols.parameters import (
 from opentrons.protocols.parameters.types import (
     ParameterChoice,
     ParameterDefinitionError,
+    UserFacingTypes,
 )
 from opentrons.protocol_engine.types import (
     RunTimeParameter,
@@ -225,11 +226,12 @@ class ParameterContext:
 
         This is intended for Opentrons internal use only and is not a guaranteed API.
         """
-        return Parameters(
-            # TODO(jbl 2024-06-04) potentially raise an error if a CSV parameter is None here
-            parameters={
-                parameter.variable_name: parameter.value
-                for parameter in self._parameters.values()
-                if parameter.value is not None
-            }
-        )
+        parameters_for_protocol: Dict[str, UserFacingTypes] = {}
+        for parameter in self._parameters.values():
+            value: UserFacingTypes
+            if isinstance(parameter, csv_parameter_definition.CSVParameterDefinition):
+                value = parameter.as_csv_parameter_interface()
+            else:
+                value = parameter.value
+            parameters_for_protocol[parameter.variable_name] = value
+        return Parameters(parameters=parameters_for_protocol)

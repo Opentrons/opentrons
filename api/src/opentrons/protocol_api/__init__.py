@@ -9,6 +9,9 @@ from opentrons.protocols.api_support.definitions import (
     MIN_SUPPORTED_VERSION,
     MIN_SUPPORTED_VERSION_FOR_FLEX,
 )
+from opentrons.protocols.parameters.types import (
+    FileParameterRequired as FileParameterRequiredError,
+)
 
 from .protocol_context import ProtocolContext
 from .deck import Deck
@@ -62,6 +65,7 @@ __all__ = [
     "COLUMN",
     "ALL",
     "OFF_DECK",
+    "FileParameterRequiredError",
     # For internal Opentrons use only:
     "create_protocol_context",
     "ProtocolEngineCoreRequiredError",
