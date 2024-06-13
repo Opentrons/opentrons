@@ -797,3 +797,30 @@ async def test_air_gap(tmp_path: Path) -> None:
     # TODO(mm, 2024-04-23): This commands.Custom looks wrong. This should be a commands.MoveToWell.
     assert isinstance(move_to_well, commands.Custom)
     assert isinstance(air_gap_aspirate, commands.Aspirate)
+
+
+async def test_comment(tmp_path: Path) -> None:
+    """A `ProtocolContext.comment()` should be mapped to a `comment` command."""
+    path = tmp_path / "protocol.py"
+    path.write_text(
+        dedent(
+            """\
+            metadata = {"apiLevel": "2.13"}
+            def run(protocol):
+                protocol.comment("oy.")
+            """
+        )
+    )
+    result_commands = await simulate_and_get_commands(path)
+    [initial_home, comment] = result_commands
+    assert comment == commands.Comment.construct(
+        status=commands.CommandStatus.SUCCEEDED,
+        params=commands.CommentParams(message="oy."),
+        notes=[],
+        result=commands.CommentResult(),
+        createdAt=matchers.Anything(),
+        startedAt=matchers.Anything(),
+        completedAt=matchers.Anything(),
+        id=matchers.Anything(),
+        key=matchers.Anything(),
+    )
