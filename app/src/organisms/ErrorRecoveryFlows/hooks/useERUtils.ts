@@ -48,7 +48,11 @@ export function useERUtils({
 }: ERUtilsProps): ERUtilsResults {
   const { data: attachedInstruments } = useInstrumentsQuery()
   const { data: runRecord } = useNotifyRunQuery(runId)
-  const { data: runCommands } = useNotifyAllCommandsQuery(runId)
+  // TOME: Discuss this with EXEC!
+  const { data: runCommands } = useNotifyAllCommandsQuery(runId, {
+    cursor: 0,
+    pageLength: 999,
+  })
 
   const { recoveryMap, setRM, trackExternalMap } = useRecoveryRouting()
   const previousRoute = usePreviousRecoveryRoute(recoveryMap.route)
@@ -79,6 +83,7 @@ export function useERUtils({
     failedCommand,
     protocolAnalysis,
     runCommands,
+    runRecord,
   })
 
   return {
