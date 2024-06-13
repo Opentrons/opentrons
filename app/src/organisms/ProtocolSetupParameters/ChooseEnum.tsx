@@ -11,11 +11,11 @@ import {
 import { RadioButton } from '../../atoms/buttons'
 import { useToaster } from '../ToasterOven'
 import { ChildNavigation } from '../ChildNavigation'
-import type { RunTimeParameter } from '@opentrons/shared-data'
+import type { ChoiceParameter } from '@opentrons/shared-data'
 
 interface ChooseEnumProps {
   handleGoBack: () => void
-  parameter: RunTimeParameter
+  parameter: ChoiceParameter
   setParameter: (value: boolean | string | number, variableName: string) => void
   rawValue: number | string | boolean
 }
@@ -25,7 +25,7 @@ export function ChooseEnum({
   parameter,
   setParameter,
   rawValue,
-}: ChooseEnumProps): JSX.Element {
+}: ChooseEnumProps): JSX.Element | null {
   const { makeSnackbar } = useToaster()
 
   const { t } = useTranslation(['protocol_setup', 'shared'])
