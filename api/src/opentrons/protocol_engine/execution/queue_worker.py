@@ -1,10 +1,9 @@
 """Command queue execution worker module."""
 import asyncio
 from logging import getLogger
-from typing import Optional, AsyncGenerator, Callable, Awaitable, Any
+from typing import Optional, AsyncGenerator, Callable
 
 from ..state import StateStore
-from ..errors import RunStoppedError
 from .command_executor import CommandExecutor
 from ...protocol_runner import RunOrchestrator
 
