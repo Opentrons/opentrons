@@ -15,6 +15,7 @@ opentrons-shared-data = {editable = true, path = "./../shared-data/python"}
 opentrons-hardware = {editable = true, path = "./../hardware", extras=['FLEX']}
 opentrons = {editable = true, path = "./../api", extras=['flex-hardware']}
 slackclient = "*"
+slack-sdk = "*"
 
 [dev-packages]
 atomicwrites = "==1.4.1"
