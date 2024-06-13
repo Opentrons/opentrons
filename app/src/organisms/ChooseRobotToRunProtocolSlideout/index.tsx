@@ -17,7 +17,6 @@ import {
 import { getRobotUpdateDisplayInfo } from '../../redux/robot-update'
 import { OPENTRONS_USB } from '../../redux/discovery'
 import { appShellRequestor } from '../../redux/shell/remote'
-import { useFeatureFlag } from '../../redux/config'
 import { useTrackCreateProtocolRunEvent } from '../Devices/hooks'
 import { getRunTimeParameterValuesForRun } from '../Devices/utils'
 import { ApplyHistoricOffsets } from '../ApplyHistoricOffsets'
@@ -56,7 +55,6 @@ export function ChooseRobotToRunProtocolSlideoutComponent(
   } = storedProtocolData
   const [currentPage, setCurrentPage] = React.useState<number>(1)
   const [selectedRobot, setSelectedRobot] = React.useState<Robot | null>(null)
-  const enableCsvFile = useFeatureFlag('enableCsvFile')
   const { trackCreateProtocolRunEvent } = useTrackCreateProtocolRunEvent(
     storedProtocolData,
     selectedRobot?.name ?? ''
@@ -76,13 +74,13 @@ export function ChooseRobotToRunProtocolSlideoutComponent(
   )
 
   // TODO (nd: 06/13/2024): send these data files to robot and use returned IDs in RTP overrides
-  const dataFilesForProtocol = runTimeParametersOverrides.reduce<File[]>(
-    (acc, parameter) =>
-      parameter.type === 'csv_file' && parameter.file?.file != null
-        ? [...acc, parameter.file.file]
-        : acc,
-    []
-  )
+  // const dataFilesForProtocol = runTimeParametersOverrides.reduce<File[]>(
+  //   (acc, parameter) =>
+  //     parameter.type === 'csv_file' && parameter.file?.file != null
+  //       ? [...acc, parameter.file.file]
+  //       : acc,
+  //   []
+  // )
 
   const {
     createRunFromProtocolSource,
