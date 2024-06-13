@@ -192,7 +192,8 @@ const updatePatchOnLabwareChange = (
     ? {
         ...getDefaultFields(
           'aspirate_mmFromBottom',
-          'aspirate_touchTip_mmFromBottom'
+          'aspirate_touchTip_mmFromBottom',
+          'aspirate_touchTip_checkbox'
         ),
         aspirate_wells: getDefaultWells({
           // @ts-expect-error(sa, 2021-6-14): appliedPatch.pipette is type ?unknown. Address in #3161
@@ -207,7 +208,8 @@ const updatePatchOnLabwareChange = (
     ? {
         ...getDefaultFields(
           'dispense_mmFromBottom',
-          'dispense_touchTip_mmFromBottom'
+          'dispense_touchTip_mmFromBottom',
+          'dispense_touchTip_checkbox'
         ),
         dispense_wells: getDefaultWells({
           // @ts-expect-error(sa, 2021-6-14): appliedPatch.pipette is type ?unknown. Address in #3161
@@ -218,6 +220,8 @@ const updatePatchOnLabwareChange = (
         }),
       }
     : {}
+
+  console.log('destLabwarePatch', destLabwarePatch)
   return { ...sourceLabwarePatch, ...destLabwarePatch }
 }
 
