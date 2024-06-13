@@ -803,15 +803,20 @@ class InstrumentContext(publisher.CommandPublisher):
         :py:meth:`.Labware.wells`. To adjust where the sequence starts, use
         :py:obj:`.starting_tip`.
 
-        The exact position for tip pickup accounts for the length of the tip and how much the tip overlaps with the pipette nozzle. These measurements are fixed values on Flex,
-        and are based on the results of tip length calibration on OT-2.
+        The exact position for tip pickup accounts for the length of the tip and how
+        much the tip overlaps with the pipette nozzle. These measurements are fixed
+        values on Flex, and are based on the results of tip length calibration on OT-2.
 
         .. note::
-            API version 2.19 updates the tip overlap values for Flex. When updating a protocol from 2.18 (or lower) to 2.19 (or higher), pipette performance should improve without additional changes to your protocol. Nevertheless, it is good practice after updating to do the following:
+            API version 2.19 updates the tip overlap values for Flex. When updating a
+            protocol from 2.18 (or lower) to 2.19 (or higher), pipette performance
+            should improve without additional changes to your protocol. Nevertheless, it
+            is good practice after updating to do the following:
 
             - Run Labware Position Check.
             - Perform a dry run of your protocol.
-            - If tip position is slightly higher than expected, adjust the ``location`` parameter of pipetting actions to achieve the desired result.
+            - If tip position is slightly higher than expected, adjust the ``location``
+              parameter of pipetting actions to achieve the desired result.
 
         :param location: The location from which to pick up a tip. The ``location``
                          argument can be specified in several ways:
