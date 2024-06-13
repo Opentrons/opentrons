@@ -16,6 +16,7 @@ import {
   useOnClickOutside,
   POSITION_RELATIVE,
   useHoverTooltip,
+  OVERFLOW_AUTO,
 } from '@opentrons/components'
 import { Tooltip } from '../Tooltip'
 import { MenuItem } from './MenuItem'
@@ -151,7 +152,11 @@ export function DropdownMenu(props: DropdownMenuProps): JSX.Element {
   `
 
   return (
-    <Flex flexDirection={DIRECTION_COLUMN} ref={dropDownMenuWrapperRef}>
+    <Flex
+      flexDirection={DIRECTION_COLUMN}
+      ref={dropDownMenuWrapperRef}
+      backgroundColor="red"
+    >
       {title !== null ? (
         <Flex gridGap={SPACING.spacing8}>
           <StyledText
@@ -175,7 +180,11 @@ export function DropdownMenu(props: DropdownMenuProps): JSX.Element {
           ) : null}
         </Flex>
       ) : null}
-      <Flex flexDirection={DIRECTION_COLUMN} position={POSITION_RELATIVE}>
+      <Flex
+        flexDirection={DIRECTION_COLUMN}
+        position={POSITION_RELATIVE}
+        backgroundColor="red"
+      >
         <Flex
           onClick={(e: MouseEvent) => {
             e.preventDefault()
@@ -204,15 +213,18 @@ export function DropdownMenu(props: DropdownMenuProps): JSX.Element {
         </Flex>
         {showDropdownMenu && (
           <Flex
-            zIndex={2}
+            tabIndex={tabIndex}
+            zIndex={3}
             borderRadius={BORDERS.borderRadius8}
             boxShadow={BORDERS.tinyDropShadow}
-            position={POSITION_ABSOLUTE}
-            backgroundColor={COLORS.white}
+            // position={POSITION_ABSOLUTE}
+            backgroundColor="yellow"
             flexDirection={DIRECTION_COLUMN}
             width={width}
             top={dropdownPosition === 'bottom' ? '2.5rem' : undefined}
             bottom={dropdownPosition === 'top' ? '2.5rem' : undefined}
+            overflowY={OVERFLOW_AUTO}
+            maxHeight="350px" // Change this val
           >
             {filterOptions.map((option, index) => (
               <MenuItem
