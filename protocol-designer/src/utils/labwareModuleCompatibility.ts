@@ -5,6 +5,7 @@ import {
   THERMOCYCLER_MODULE_TYPE,
   HEATERSHAKER_MODULE_TYPE,
   MAGNETIC_BLOCK_TYPE,
+  ABSORBANCE_READER_TYPE,
 } from '@opentrons/shared-data'
 import type { LabwareDefByDefURI } from '../labware-defs'
 import type { LabwareOnDeck } from '../step-forms'
@@ -66,6 +67,7 @@ export const COMPATIBLE_LABWARE_ALLOWLIST_BY_MODULE_TYPE: Record<
     'armadillo_96_wellplate_200ul_pcr_full_skirt',
     'biorad_96_wellplate_200ul_pcr',
   ],
+  [ABSORBANCE_READER_TYPE]: [],
 }
 export const getLabwareIsCompatible = (
   def: LabwareDefinition2,

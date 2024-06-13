@@ -8,6 +8,7 @@
   "aspirate_volume_µL": "Aspirate volume per well (µL)",
   "both_mounts": "Left + Right Mount",
   "change_tip": "Change tip",
+  "column": "column",
   "columns": "columns",
   "create_new_transfer": "Create new quick transfer",
   "create_transfer": "Create transfer",
@@ -16,8 +17,13 @@
   "dispense_volume": "Dispense volume per well",
   "dispense_volume_µL": "Dispense volume per well (µL)",
   "exit_quick_transfer": "Exit quick transfer?",
+  "grid": "grid",
+  "grids": "grids",
+  "learn_more": "Learn more",
   "left_mount": "Left Mount",
   "lose_all_progress": "You will lose all progress on this quick transfer.",
+  "number_wells_selected_error_learn_more": "Quick transfers with multiple source {{selectionUnits}} can either be one-to-one (select {{wellCount}} destination {{selectionUnits}} for this transfer) or consolidate (select 1 destination {{selectionUnit}}).",
+  "number_wells_selected_error_message": "Select 1 or {{wellCount}} {{selectionUnits}} to make this transfer.",
   "once": "Once at the start of the transfer",
   "overview": "Overview",
   "perDest": "Per destination well",
@@ -62,5 +68,6 @@
   "wellPlate": "Well plates",
   "well_selection": "Well selection",
   "well_ratio": "Quick transfers with multiple source wells can either be one-to-one (select {{wells}} for this transfer) or consolidate (select 1 destination well).",
+  "well": "well",
   "wells": "wells"
 }
