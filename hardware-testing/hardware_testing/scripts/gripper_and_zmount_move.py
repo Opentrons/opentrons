@@ -25,7 +25,7 @@ async def _main() -> None:
     if mount is not OT3Mount.GRIPPER:
         await wait_for_instrument_presence(hw_api, mount, presence=True)
     timeout_start = time.time()
-    timeout = 60 * 60
+    timeout = args.time_min * 60
     count = 0
     x_offset = 80
     y_offset = 44
