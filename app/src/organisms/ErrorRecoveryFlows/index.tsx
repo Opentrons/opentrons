@@ -52,7 +52,7 @@ export function useErrorRecoveryFlows(
   if (!hasSeenAwaitingRecovery && runStatus === RUN_STATUS_AWAITING_RECOVERY) {
     setHasSeenAwaitingRecovery(true)
   }
-  // Reset recovery mode after the client has exited recovery.
+  // Reset recovery mode after the client has exited recovery, otherwise "cancel run" will trigger ER after the first recovery.
   else if (
     hasSeenAwaitingRecovery &&
     runStatus != null &&
@@ -66,12 +66,13 @@ export function useErrorRecoveryFlows(
     VALID_ER_RUN_STATUSES.includes(runStatus) &&
     hasSeenAwaitingRecovery
 
-  if (!isERActive && isValidRunStatus) {
+  if (!isERActive && isValidRunStatus && failedCommand != null) {
     setIsERActive(true)
   }
   // Because multiple ER flows may occur per run, disable ER when the status is not "awaiting-recovery" or a
   // terminating run status in which we want to persist ER flows. Specific recovery commands cause run status to change.
   // See a specific command's docstring for details.
+  // ER handles a null failedCommand outside the splash screen, so we shouldn't set it false here.
   else if (isERActive && !isValidRunStatus) {
     setIsERActive(false)
   }
