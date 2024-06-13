@@ -215,6 +215,7 @@ async def test_create_with_options(
         created_at=datetime(year=2022, month=2, day=2),
         source=None,  # type: ignore[arg-type]
         protocol_key=None,
+        protocol_kind="standard",
     )
 
     labware_offset = pe_types.LabwareOffsetCreate(
@@ -324,10 +325,8 @@ async def test_get_current_run(
 
     decoy.when(mock_run_store.get(run_id=run_id)).then_return(run_resource)
     decoy.when(mock_engine_store.current_run_id).then_return(run_id)
-    decoy.when(mock_engine_store.engine.state_view.get_summary()).then_return(
-        engine_state_summary
-    )
-    decoy.when(mock_engine_store.runner.run_time_parameters).then_return(
+    decoy.when(mock_engine_store.get_state_summary()).then_return(engine_state_summary)
+    decoy.when(mock_engine_store.get_run_time_parameters()).then_return(
         run_time_parameters
     )
 
@@ -493,10 +492,8 @@ async def test_get_all_runs(
     )
 
     decoy.when(mock_engine_store.current_run_id).then_return("current-run")
-    decoy.when(mock_engine_store.engine.state_view.get_summary()).then_return(
-        current_run_data
-    )
-    decoy.when(mock_engine_store.runner.run_time_parameters).then_return(
+    decoy.when(mock_engine_store.get_state_summary()).then_return(current_run_data)
+    decoy.when(mock_engine_store.get_run_time_parameters()).then_return(
         current_run_time_parameters
     )
     decoy.when(mock_run_store.get_state_summary("historical-run")).then_return(
@@ -649,10 +646,8 @@ async def test_update_current_noop(
     """It should noop on current=None and current=True."""
     run_id = "hello world"
     decoy.when(mock_engine_store.current_run_id).then_return(run_id)
-    decoy.when(mock_engine_store.engine.state_view.get_summary()).then_return(
-        engine_state_summary
-    )
-    decoy.when(mock_engine_store.runner.run_time_parameters).then_return(
+    decoy.when(mock_engine_store.get_state_summary()).then_return(engine_state_summary)
+    decoy.when(mock_engine_store.get_run_time_parameters()).then_return(
         run_time_parameters
     )
     decoy.when(mock_run_store.get(run_id=run_id)).then_return(run_resource)
@@ -819,9 +814,9 @@ def test_get_commands_slice_current_run(
         commands=expected_commands_result, cursor=1, total_length=3
     )
     decoy.when(mock_engine_store.current_run_id).then_return("run-id")
-    decoy.when(
-        mock_engine_store.engine.state_view.commands.get_slice(1, 2)
-    ).then_return(expected_command_slice)
+    decoy.when(mock_engine_store.get_command_slice(1, 2)).then_return(
+        expected_command_slice
+    )
 
     result = subject.get_commands_slice("run-id", 1, 2)
 
@@ -854,9 +849,7 @@ def test_get_current_command(
         index=0,
     )
     decoy.when(mock_engine_store.current_run_id).then_return("run-id")
-    decoy.when(mock_engine_store.engine.state_view.commands.get_current()).then_return(
-        expected_current
-    )
+    decoy.when(mock_engine_store.get_current_command()).then_return(expected_current)
     result = subject.get_current_command("run-id")
 
     assert result == expected_current
@@ -884,9 +877,7 @@ def test_get_command_from_engine(
 ) -> None:
     """Should get command by id from engine store."""
     decoy.when(mock_engine_store.current_run_id).then_return("run-id")
-    decoy.when(
-        mock_engine_store.engine.state_view.commands.get("command-id")
-    ).then_return(run_command)
+    decoy.when(mock_engine_store.get_command("command-id")).then_return(run_command)
     result = subject.get_command("run-id", "command-id")
 
     assert result == run_command
@@ -968,9 +959,7 @@ def test_get_all_commands_as_preserialized_list_errors_for_active_runs(
 ) -> None:
     """It should raise an error when fetching pre-serialized commands list while run is active."""
     decoy.when(mock_engine_store.current_run_id).then_return("current-run-id")
-    decoy.when(
-        mock_engine_store.engine.state_view.commands.get_is_terminal()
-    ).then_return(False)
+    decoy.when(mock_engine_store.get_is_run_terminal()).then_return(False)
     with pytest.raises(PreSerializedCommandsNotAvailableError):
         subject.get_all_commands_as_preserialized_list("current-run-id")
 
@@ -984,9 +973,7 @@ async def test_get_current_run_labware_definition(
 ) -> None:
     """It should get the current run labware definition from the engine."""
     decoy.when(mock_engine_store.current_run_id).then_return("run-id")
-    decoy.when(
-        mock_engine_store.engine.state_view.labware.get_loaded_labware_definitions()
-    ).then_return(
+    decoy.when(mock_engine_store.get_loaded_labware_definitions()).then_return(
         [
             LabwareDefinition.construct(namespace="test_1"),  # type: ignore[call-arg]
             LabwareDefinition.construct(namespace="test_2"),  # type: ignore[call-arg]

@@ -26,6 +26,7 @@ from opentrons.protocol_reader import (
 import opentrons.util.helpers as datetime_helper
 
 from robot_server.protocols.analysis_store import AnalysisStore
+from robot_server.protocols.protocol_models import ProtocolKind
 from robot_server.protocols.protocol_store import ProtocolResource
 from robot_server.protocols.protocol_analyzer import ProtocolAnalyzer
 import robot_server.errors.error_mappers as em
@@ -84,6 +85,7 @@ async def test_load_runner(
         created_at=datetime(year=2021, month=1, day=1),
         source=protocol_source,
         protocol_key="dummy-data-111",
+        protocol_kind=ProtocolKind.STANDARD.value,
     )
 
     subject = ProtocolAnalyzer(
@@ -129,6 +131,7 @@ async def test_analyze(
             content_hash="abc123",
         ),
         protocol_key="dummy-data-111",
+        protocol_kind=ProtocolKind.STANDARD.value,
     )
 
     analysis_command = pe_commands.WaitForResume(
@@ -218,6 +221,7 @@ async def test_analyze_updates_pending_on_error(
             content_hash="abc123",
         ),
         protocol_key="dummy-data-111",
+        protocol_kind=ProtocolKind.STANDARD.value,
     )
 
     raised_exception = Exception("You got me!!")

@@ -34,6 +34,7 @@ from ..module import (
     AbstractThermocyclerCore,
     AbstractHeaterShakerCore,
     AbstractMagneticBlockCore,
+    AbstractAbsorbanceReaderCore,
 )
 from .exceptions import InvalidMagnetEngageHeightError
 
@@ -516,3 +517,29 @@ class HeaterShakerModuleCore(ModuleCore, AbstractHeaterShakerCore):
 
 class MagneticBlockCore(NonConnectedModuleCore, AbstractMagneticBlockCore):
     """Magnetic Block control interface via a ProtocolEngine."""
+
+
+class AbsorbanceReaderCore(ModuleCore, AbstractAbsorbanceReaderCore):
+    """Absorbance Reader core logic implementation for Python protocols."""
+
+    _sync_module_hardware: SynchronousAdapter[hw_modules.AbsorbanceReader]
+    _initialized_value: Optional[int] = None
+
+    def initialize(self, wavelength: int) -> None:
+        """Initialize the Absorbance Reader by taking zero reading."""
+        self._engine_client.execute_command(
+            cmd.absorbance_reader.InitializeParams(
+                moduleId=self.module_id,
+                sampleWavelength=wavelength,
+            ),
+        )
+        self._initialized_value = wavelength
+
+    def initiate_read(self) -> None:
+        """Initiate read on the Absorbance Reader."""
+        if self._initialized_value:
+            self._engine_client.execute_command(
+                cmd.absorbance_reader.MeasureAbsorbanceParams(
+                    moduleId=self.module_id, sampleWavelength=self._initialized_value
+                )
+            )

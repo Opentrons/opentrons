@@ -24,18 +24,17 @@ import { getDeckDefFromRobotType } from '@opentrons/shared-data'
 import { SmallButton } from '../../atoms/buttons'
 import { TwoUpTileLayout } from '../LabwarePositionCheck/TwoUpTileLayout'
 
-import type { AddressableAreaName, RobotType } from '@opentrons/shared-data'
+import type { AddressableAreaName } from '@opentrons/shared-data'
+import type { DropTipWizardContainerProps } from './types'
 
 // TODO: get help link article URL
 
-interface ChooseLocationProps {
+type ChooseLocationProps = DropTipWizardContainerProps & {
   handleProceed: () => void
   handleGoBack: () => void
   title: string
   body: string | JSX.Element
-  robotType: RobotType
   moveToAddressableArea: (addressableArea: AddressableAreaName) => Promise<void>
-  isOnDevice: boolean
 }
 
 export const ChooseLocation = (
@@ -70,17 +69,8 @@ export const ChooseLocation = (
 
   if (isOnDevice) {
     return (
-      <Flex
-        padding={SPACING.spacing32}
-        flexDirection={DIRECTION_COLUMN}
-        justifyContent={JUSTIFY_SPACE_BETWEEN}
-        flex="1"
-      >
-        <Flex
-          flexDirection={DIRECTION_ROW}
-          gridGap={SPACING.spacing24}
-          flex="1"
-        >
+      <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing32}>
+        <Flex flexDirection={DIRECTION_ROW} flex="1">
           <Flex
             flexDirection={DIRECTION_COLUMN}
             gridGap={SPACING.spacing8}
@@ -105,6 +95,7 @@ export const ChooseLocation = (
           justifyContent={JUSTIFY_SPACE_BETWEEN}
           css={ALIGN_BUTTONS}
           gridGap={SPACING.spacing8}
+          marginTop="auto"
         >
           <Btn
             onClick={() => {
@@ -174,7 +165,7 @@ const GO_BACK_BUTTON_STYLE = css`
   @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
     font-weight: ${TYPOGRAPHY.fontWeightSemiBold};
     font-size: ${TYPOGRAPHY.fontSize22};
-    padding-left: 0rem;
+    padding-left: 0;
     &:hover {
       opacity: 100%;
     }

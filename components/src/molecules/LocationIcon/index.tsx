@@ -23,7 +23,7 @@ interface HardwareIconProps extends StyleProps {
 }
 
 // type union requires one of slotName or iconName, but not both
-type LocationIconProps = SlotLocationProps | HardwareIconProps
+export type LocationIconProps = SlotLocationProps | HardwareIconProps
 
 const LOCATION_ICON_STYLE = css<{
   slotName?: string

@@ -65,6 +65,7 @@ from .module_core import (
     HeaterShakerModuleCore,
     NonConnectedModuleCore,
     MagneticBlockCore,
+    AbsorbanceReaderCore,
 )
 from .exceptions import InvalidModuleLocationError
 from . import load_labware_params
@@ -464,6 +465,7 @@ class ProtocolCore(
             ModuleType.MAGNETIC: MagneticModuleCore,
             ModuleType.THERMOCYCLER: ThermocyclerModuleCore,
             ModuleType.HEATER_SHAKER: HeaterShakerModuleCore,
+            ModuleType.ABSORBANCE_READER: AbsorbanceReaderCore,
         }
 
         module_type = load_module_result.model.as_type()

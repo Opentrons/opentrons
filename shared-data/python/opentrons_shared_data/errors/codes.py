@@ -61,6 +61,7 @@ class ErrorCodes(Enum):
     FAILED_GRIPPER_PICKUP_ERROR = _code_from_dict_entry("2015")
     MOTOR_DRIVER_ERROR = _code_from_dict_entry("2016")
     LIQUID_NOT_FOUND = _code_from_dict_entry("2017")
+    TIP_HIT_WELL_BOTTOM = _code_from_dict_entry("2018")
     ROBOTICS_INTERACTION_ERROR = _code_from_dict_entry("3000")
     LABWARE_DROPPED = _code_from_dict_entry("3001")
     LABWARE_NOT_PICKED_UP = _code_from_dict_entry("3002")
@@ -89,6 +90,7 @@ class ErrorCodes(Enum):
     INVALID_PROTOCOL_DATA = _code_from_dict_entry("4006")
     API_MISCONFIGURATION = _code_from_dict_entry("4007")
     INVALID_STORED_DATA = _code_from_dict_entry("4008")
+    MISSING_CONFIGURATION_DATA = _code_from_dict_entry("4009")
 
     @classmethod
     @lru_cache(25)

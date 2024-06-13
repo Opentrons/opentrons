@@ -6,6 +6,7 @@ from typing import cast, Dict, List, Optional, Tuple, NamedTuple
 
 from opentrons_shared_data.pipette.dev_types import PipetteNameType
 from opentrons_shared_data.pipette import pipette_definition
+from opentrons_shared_data.pipette.pipette_definition import ValidNozzleMaps
 
 from opentrons.config.defaults_ot2 import Z_RETRACT_DISTANCE
 from opentrons.types import MountType, Mount as HwMount, Point
@@ -562,6 +563,7 @@ def test_nozzle_configuration_getters() -> None:
         starting_nozzle="A1",
         back_left_nozzle="A1",
         front_right_nozzle="A1",
+        valid_nozzle_maps=ValidNozzleMaps(maps={"A1": ["A1"]}),
     )
     subject = get_pipette_view(nozzle_layout_by_id={"pipette-id": nozzle_map})
     assert subject.get_nozzle_layout_type("pipette-id") == NozzleConfigurationType.FULL
@@ -592,6 +594,7 @@ _pipette_spec_cases = [
             starting_nozzle="A1",
             back_left_nozzle="A1",
             front_right_nozzle="H1",
+            valid_nozzle_maps=ValidNozzleMaps(maps={"Full": EIGHT_CHANNEL_COLS["1"]}),
         ),
         destination_position=Point(100, 200, 300),
         nozzle_bounds_result=(
@@ -617,6 +620,7 @@ _pipette_spec_cases = [
             starting_nozzle="H1",
             back_left_nozzle="H1",
             front_right_nozzle="H1",
+            valid_nozzle_maps=ValidNozzleMaps(maps={"H1": ["H1"]}),
         ),
         destination_position=Point(100, 200, 300),
         nozzle_bounds_result=(
@@ -642,6 +646,23 @@ _pipette_spec_cases = [
             starting_nozzle="A1",
             back_left_nozzle="A1",
             front_right_nozzle="H12",
+            valid_nozzle_maps=ValidNozzleMaps(
+                maps={
+                    "Full": sum(
+                        [
+                            NINETY_SIX_ROWS["A"],
+                            NINETY_SIX_ROWS["B"],
+                            NINETY_SIX_ROWS["C"],
+                            NINETY_SIX_ROWS["D"],
+                            NINETY_SIX_ROWS["E"],
+                            NINETY_SIX_ROWS["F"],
+                            NINETY_SIX_ROWS["G"],
+                            NINETY_SIX_ROWS["H"],
+                        ],
+                        [],
+                    )
+                }
+            ),
         ),
         destination_position=Point(100, 200, 300),
         nozzle_bounds_result=(
@@ -667,6 +688,7 @@ _pipette_spec_cases = [
             starting_nozzle="A1",
             back_left_nozzle="A1",
             front_right_nozzle="H1",
+            valid_nozzle_maps=ValidNozzleMaps(maps={"Column1": NINETY_SIX_COLS["1"]}),
         ),
         destination_position=Point(100, 200, 300),
         nozzle_bounds_result=(
@@ -690,6 +712,7 @@ _pipette_spec_cases = [
             starting_nozzle="A12",
             back_left_nozzle="A12",
             front_right_nozzle="H12",
+            valid_nozzle_maps=ValidNozzleMaps(maps={"Column12": NINETY_SIX_COLS["12"]}),
         ),
         destination_position=Point(100, 200, 300),
         nozzle_bounds_result=(
@@ -713,6 +736,7 @@ _pipette_spec_cases = [
             starting_nozzle="A1",
             back_left_nozzle="A1",
             front_right_nozzle="A12",
+            valid_nozzle_maps=ValidNozzleMaps(maps={"RowA": NINETY_SIX_ROWS["A"]}),
         ),
         destination_position=Point(100, 200, 300),
         nozzle_bounds_result=(

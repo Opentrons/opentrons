@@ -1,6 +1,7 @@
 import * as React from 'react'
 import { useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
+
 import {
   Flex,
   COLORS,
@@ -9,11 +10,14 @@ import {
   SecondaryButton,
   JUSTIFY_FLEX_END,
 } from '@opentrons/components'
+
 import { getIsOnDevice } from '../../redux/config'
 import { SimpleWizardBody } from '../../molecules/SimpleWizardBody'
 import { SmallButton } from '../../atoms/buttons'
 
-interface ExitConfirmationProps {
+import type { DropTipWizardContainerProps } from './types'
+
+type ExitConfirmationProps = DropTipWizardContainerProps & {
   handleExit: () => void
   handleGoBack: () => void
 }

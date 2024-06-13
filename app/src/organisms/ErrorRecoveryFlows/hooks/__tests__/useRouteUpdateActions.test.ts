@@ -94,9 +94,9 @@ describe('useRouteUpdateActions', () => {
     const { result } = renderHook(() =>
       useRouteUpdateActions(useRouteUpdateActionsParams)
     )
-    const { proceedToRoute } = result.current
+    const { proceedToRouteAndStep } = result.current
 
-    proceedToRoute(RECOVERY_MAP.ROBOT_IN_MOTION.ROUTE)
+    proceedToRouteAndStep(RECOVERY_MAP.ROBOT_IN_MOTION.ROUTE)
     expect(mockSetRecoveryMap).toHaveBeenCalledWith({
       route: RECOVERY_MAP.ROBOT_IN_MOTION.ROUTE,
       step: RECOVERY_MAP.ROBOT_IN_MOTION.STEPS.IN_MOTION,
@@ -130,7 +130,7 @@ describe('useRouteUpdateActions', () => {
   })
 
   it('routes to the route prior to motion after the motion completes', () => {
-    const { result } = renderHook(() =>
+    const { result, rerender } = renderHook(() =>
       useRouteUpdateActions(useRouteUpdateActionsParams)
     )
     const { setRobotInMotion } = result.current
@@ -142,9 +142,52 @@ describe('useRouteUpdateActions', () => {
     })
 
     setRobotInMotion(false)
+    rerender()
     expect(mockSetRecoveryMap).toHaveBeenCalledWith({
       route: RECOVERY_MAP.RETRY_FAILED_COMMAND.ROUTE,
       step: RECOVERY_MAP.RETRY_FAILED_COMMAND.STEPS.CONFIRM_RETRY,
+    })
+  })
+
+  it('routes to the first step of the supplied route when proceedToRouteAndStep is called without a step', () => {
+    const { result } = renderHook(() =>
+      useRouteUpdateActions(useRouteUpdateActionsParams)
+    )
+    const { proceedToRouteAndStep } = result.current
+
+    proceedToRouteAndStep(RECOVERY_MAP.ROBOT_IN_MOTION.ROUTE)
+    expect(mockSetRecoveryMap).toHaveBeenCalledWith({
+      route: RECOVERY_MAP.ROBOT_IN_MOTION.ROUTE,
+      step: RECOVERY_MAP.ROBOT_IN_MOTION.STEPS.IN_MOTION,
+    })
+  })
+
+  it('routes to the specified step of the supplied route when proceedToRouteAndStep is called with a valid step', () => {
+    const { result } = renderHook(() =>
+      useRouteUpdateActions(useRouteUpdateActionsParams)
+    )
+    const { proceedToRouteAndStep } = result.current
+
+    proceedToRouteAndStep(
+      RECOVERY_MAP.RETRY_FAILED_COMMAND.ROUTE,
+      RECOVERY_MAP.RETRY_FAILED_COMMAND.STEPS.CONFIRM_RETRY
+    )
+    expect(mockSetRecoveryMap).toHaveBeenCalledWith({
+      route: RECOVERY_MAP.RETRY_FAILED_COMMAND.ROUTE,
+      step: RECOVERY_MAP.RETRY_FAILED_COMMAND.STEPS.CONFIRM_RETRY,
+    })
+  })
+
+  it('routes to the first step of the supplied route when proceedToRouteAndStep is called with an invalid step', () => {
+    const { result } = renderHook(() =>
+      useRouteUpdateActions(useRouteUpdateActionsParams)
+    )
+    const { proceedToRouteAndStep } = result.current
+
+    proceedToRouteAndStep(RECOVERY_MAP.ROBOT_IN_MOTION.ROUTE, 'invalid-step')
+    expect(mockSetRecoveryMap).toHaveBeenCalledWith({
+      route: RECOVERY_MAP.ROBOT_IN_MOTION.ROUTE,
+      step: RECOVERY_MAP.ROBOT_IN_MOTION.STEPS.IN_MOTION,
     })
   })
 })

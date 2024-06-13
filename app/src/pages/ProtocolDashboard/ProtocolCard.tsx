@@ -227,7 +227,7 @@ export function ProtocolCard(props: {
         </StyledText>
       </Flex>
       <Flex width="9.25rem">
-        <StyledText as="p" color={COLORS.grey60}>
+        <StyledText as="p" color={COLORS.grey60} whiteSpace="nowrap">
           {lastRun != null
             ? formatDistance(new Date(lastRun), new Date(), {
                 addSuffix: true,
