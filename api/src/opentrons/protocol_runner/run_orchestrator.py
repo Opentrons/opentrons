@@ -1,6 +1,6 @@
 """Engine/Runner provider."""
 from __future__ import annotations
-from typing import Optional, Union, List, Dict, Iterator, AsyncGenerator
+from typing import Optional, Union, List, Dict, AsyncGenerator
 
 from anyio import move_on_after
 
@@ -336,7 +336,7 @@ class RunOrchestrator:
         """Get engine deck type."""
         return self._protocol_engine.state_view.config.deck_type
 
-    async def command_generator(self) -> AsyncGenerator[str]:
+    async def command_generator(self) -> AsyncGenerator[str, None]:
         while True:
             try:
                 command_id = await self._protocol_engine._state_store.wait_for(
