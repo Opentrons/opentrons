@@ -4,8 +4,8 @@ import { describe, it, expect, afterEach, vi, beforeEach } from 'vitest'
 
 import { renderWithProviders } from '../../../__testing-utils__'
 import { i18n } from '../../../i18n'
-import { InputField } from '../../../atoms/InputField'
 import { NameQuickTransfer } from '../NameQuickTransfer'
+import type { InputField } from '../../../atoms/InputField'
 
 vi.mock('../utils')
 

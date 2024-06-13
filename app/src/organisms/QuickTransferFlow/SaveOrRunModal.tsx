@@ -46,7 +46,9 @@ export const SaveOrRunModal = (props: SaveOrRunModalProps): JSX.Element => {
           <SmallButton
             width="50%"
             buttonText={t('save_for_later')}
-            onClick={() => setShowNameTransfer(true)}
+            onClick={() => {
+              setShowNameTransfer(true)
+            }}
             buttonType="secondary"
           />
           <SmallButton

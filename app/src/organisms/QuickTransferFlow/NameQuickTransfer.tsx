@@ -36,7 +36,9 @@ export function NameQuickTransfer(props: NameQuickTransferProps): JSX.Element {
       <ChildNavigation
         header={t('name_your_transfer')}
         buttonText={t('save')}
-        onClickButton={() => onSave(name)}
+        onClickButton={() => {
+          onSave(name)
+        }}
         buttonIsDisabled={name === '' || error != null}
       />
       <Flex
@@ -69,7 +71,9 @@ export function NameQuickTransfer(props: NameQuickTransferProps): JSX.Element {
         </StyledText>
         <Flex width="100%" position={POSITION_FIXED} left="0" bottom="0">
           <AlphanumericKeyboard
-            onChange={(input: string) => setName(input)}
+            onChange={(input: string) => {
+              setName(input)
+            }}
             keyboardRef={keyboardRef}
           />
         </Flex>
