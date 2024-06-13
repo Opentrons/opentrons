@@ -221,7 +221,6 @@ const updatePatchOnLabwareChange = (
       }
     : {}
 
-  console.log('destLabwarePatch', destLabwarePatch)
   return { ...sourceLabwarePatch, ...destLabwarePatch }
 }
 
