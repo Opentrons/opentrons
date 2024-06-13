@@ -7,13 +7,13 @@ import {
   COLORS,
   BORDERS,
   TYPOGRAPHY,
-  SPACING
+  SPACING,
 } from '@opentrons/components'
 import type { RobotType, RunTimeCommand } from '@opentrons/shared-data'
 import { CommandText, CommandIcon } from '.'
 import type { CommandTextData } from './types'
 import { Skeleton } from '../../atoms/Skeleton'
-import type {StyleProps} from '@opentrons/components'
+import type { StyleProps } from '@opentrons/components'
 
 export type CommandState = NonSkeletonCommandState | 'loading'
 type NonSkeletonCommandState = 'current' | 'failed' | 'future'
@@ -40,66 +40,56 @@ export type CommandProps = SkeletonCommandProps | NonSkeletonCommandProps
 
 export function Command(props: CommandProps): JSX.Element {
   return props.state === 'loading' ? (
-    <Skeleton width='100%' height='2rem' backgroundSize='47rem'/>
+    <Skeleton width="100%" height="2rem" backgroundSize="47rem" />
+  ) : props.aligned === 'left' ? (
+    <LeftAlignedCommand {...props} />
   ) : (
-    props.aligned === 'left' ? (
-      <LeftAlignedCommand {...props} />
-    ) : (
-      <CenteredCommand {...props} />
-  ))
+    <CenteredCommand {...props} />
+  )
 }
 
+const ICON_SIZE = SPACING.spacing32 as const
 const UNIVERSAL_CONTAINER_STYLES = {
   borderRadius: BORDERS.borderRadius8,
-  gap: SPACING.spacing12,
-  minHeight: SPACING.spacing40
+  paddingX: SPACING.spacing24,
+  paddingY: SPACING.spacing12,
 } as const
 
 const UNIVERSAL_ICON_STYLES = {
-  size: SPACING.spacing32
+  size: ICON_SIZE,
+  marginRight: SPACING.spacing12,
 } as const
 
-const UNIVERSAL_TEXT_STYLES = {
-  fontSize: TYPOGRAPHY.fontSize22,
-  fontWeight: TYPOGRAPHY.fontWeightRegular,
-} as const
-
-const PROPS_BY_STATE: Record<NonSkeletonState, {container: StyleProps, icon: StyleProps, text: StyleProps}> = {
+const PROPS_BY_STATE: Record<
+  NonSkeletonState,
+  { container: StyleProps; icon: StyleProps }
+> = {
   current: {
     container: {
       backgroundColor: COLORS.blue35,
-      ...UNIVERSAL_CONTAINER_STYLES
+      ...UNIVERSAL_CONTAINER_STYLES,
     },
     icon: {
-      ...UNIVERSAL_ICON_STYLES
+      ...UNIVERSAL_ICON_STYLES,
     },
-    text: {
-      ...UNIVERSAL_TEXT_STYLES
-    }
   },
   failed: {
     container: {
       backgroundColor: COLORS.red35,
-      ...UNIVERSAL_CONTAINER_STYLES
+      ...UNIVERSAL_CONTAINER_STYLES,
     },
     icon: {
-      ...UNIVERSAL_ICON_STYLES
+      ...UNIVERSAL_ICON_STYLES,
     },
-    text: {
-      ...UNIVERSAL_TEXT_STYLES
-    }
   },
   future: {
     container: {
       backgroundColor: COLORS.grey35,
-      ...UNIVERSAL_CONTAINER_STYLES
+      ...UNIVERSAL_CONTAINER_STYLES,
     },
     icon: {
-      ...UNIVERSAL_ICON_STYLES
+      ...UNIVERSAL_ICON_STYLES,
     },
-    font: {
-      ...UNIVERSAL_TEXT_STYLES
-    }
   },
 }
 
@@ -112,8 +102,13 @@ export function CenteredCommand(
       alignItems={ALIGN_CENTER}
       {...PROPS_BY_STATE[props.state].container}
     >
-      <CommandIcon command={props.command} {...PROPS_BY_STATE[props.state].icon} />
-      <CommandText {...props} {...PROPS_BY_STATE[props.state].text} />
+      <CommandIcon
+        command={props.command}
+        {...PROPS_BY_STATE[props.state].icon}
+      />
+      <Flex minHeight={ICON_SIZE} alignItems={ALIGN_CENTER}>
+        <CommandText {...props} />
+      </Flex>
     </Flex>
   )
 }
@@ -127,8 +122,13 @@ export function LeftAlignedCommand(
       alignItems={ALIGN_CENTER}
       {...PROPS_BY_STATE[props.state].container}
     >
-      <CommandIcon command={props.command} {...PROPS_BY_STATE[props.state].icon}/>
-      <CommandText {...props} {...PROPS_BY_STATE[props.state].text}/>
+      <CommandIcon
+        command={props.command}
+        {...PROPS_BY_STATE[props.state].icon}
+      />
+      <Flex minHeight={ICON_SIZE} alignItems={ALIGN_CENTER}>
+        <CommandText {...props} />
+      </Flex>
     </Flex>
   )
 }
