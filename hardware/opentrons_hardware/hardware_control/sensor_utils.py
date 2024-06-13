@@ -12,7 +12,7 @@ import numpy as np
 def did_tip_hit_liquid(
     pressure_readings: list[float], liquid_solid_threshold: float
 ) -> bool:
-
+    """Detects if tip has hit liquid or solid based on given pressure data."""
     if len(pressure_readings) < 5:
         raise LiquidNotFoundError(
             "Liquid not found. Not enough data to calculate pressure change",
