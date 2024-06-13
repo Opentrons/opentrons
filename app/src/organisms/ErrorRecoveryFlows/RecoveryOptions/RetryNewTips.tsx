@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next'
 
 import {
   Flex,
+  Box,
   StyledText,
   SPACING,
   DIRECTION_COLUMN,
@@ -44,20 +45,41 @@ export function RetryNewTips(props: RecoveryContentProps): JSX.Element | null {
   return buildContent()
 }
 
-export function ReplaceTips({
-  isOnDevice,
-  routeUpdateActions,
-}: RecoveryContentProps): JSX.Element | null {
+//TOME: Ticket or solve not using the full row for multichannel.
+export function ReplaceTips(props: RecoveryContentProps): JSX.Element | null {
+  const {
+    isOnDevice,
+    routeUpdateActions,
+    failedPipetteInfo,
+    failedLabwareUtils,
+  } = props
+  const { t } = useTranslation('error_recovery')
   const { proceedNextStep } = routeUpdateActions
+  const { pickUpTipLabware } = failedLabwareUtils
 
   const primaryOnClick = (): void => {
     void proceedNextStep()
   }
 
+  const buildTitle = (): string => {
+    if (failedPipetteInfo?.data.channels === 96) {
+      return t('replace_with_new_tip_rack')
+    } else {
+      return t('replace_used_tips_in_rack_location', {
+        location: pickUpTipLabware?.location,
+      })
+    }
+  }
+
   if (isOnDevice) {
     return (
       <RecoverySingleColumnContent>
-        {'PLACEHOLDER'}
+        <TwoColumn>
+          <LeftColumnTipInfo {...props} title={buildTitle()} />
+          <Flex gridGap={SPACING.spacing8} flexDirection={DIRECTION_COLUMN}>
+            PLACEHOLDER
+          </Flex>
+        </TwoColumn>
         <RecoveryFooterButtons
           isOnDevice={isOnDevice}
           primaryBtnOnClick={primaryOnClick}
@@ -109,7 +131,10 @@ export function SelectTips(props: RecoveryContentProps): JSX.Element | null {
         )}
         <RecoverySingleColumnContent>
           <TwoColumn>
-            <SelectPickUpLocation {...props} />
+            <LeftColumnTipInfo
+              {...props}
+              title={t('select_tip_pickup_location')}
+            />
             <TipSelection {...props} allowTipSelection={false} />
           </TwoColumn>
           <RecoveryFooterButtons
@@ -129,10 +154,17 @@ export function SelectTips(props: RecoveryContentProps): JSX.Element | null {
   }
 }
 
-// TODO(jh, 06-12-24): EXEC-500.
-function SelectPickUpLocation({
+type LeftColumnTipInfoProps = RecoveryContentProps & {
+  title: string
+}
+
+// TODO(jh, 06-12-24): EXEC-500 & EXEC-501.
+// The left column component adjacent to RecoveryDeckMap/TipSelection.
+function LeftColumnTipInfo({
+  title,
   failedLabwareUtils,
-}: RecoveryContentProps): JSX.Element {
+  isOnDevice,
+}: LeftColumnTipInfoProps): JSX.Element | null {
   const { pickUpTipLabwareName, pickUpTipLabware } = failedLabwareUtils
   const { t } = useTranslation('error_recovery')
 
@@ -149,24 +181,26 @@ function SelectPickUpLocation({
     }
   }
 
-  return (
-    <Flex gridGap={SPACING.spacing24} flexDirection={DIRECTION_COLUMN}>
-      <Flex gridGap={SPACING.spacing8} flexDirection={DIRECTION_COLUMN}>
-        <StyledText as="h4SemiBold">
-          {t('select_tip_pickup_location')}
-        </StyledText>
-        <Move
-          type={'refill'}
-          labwareName={pickUpTipLabwareName ?? ''}
-          currentLocationProps={{ slotName: buildLabwareLocationSlotName() }}
-        />
+  if (isOnDevice) {
+    return (
+      <Flex gridGap={SPACING.spacing24} flexDirection={DIRECTION_COLUMN}>
+        <Flex gridGap={SPACING.spacing8} flexDirection={DIRECTION_COLUMN}>
+          <StyledText as="h4SemiBold">{title}</StyledText>
+          <Move
+            type={'refill'}
+            labwareName={pickUpTipLabwareName ?? ''}
+            currentLocationProps={{ slotName: buildLabwareLocationSlotName() }}
+          />
+        </Flex>
+        <InlineNotification
+          type="alert"
+          heading={t('replace_tips_and_select_location')}
+        ></InlineNotification>
       </Flex>
-      <InlineNotification
-        type="alert"
-        heading={t('replenish_tips_and_select_location')}
-      ></InlineNotification>
-    </Flex>
-  )
+    )
+  } else {
+    return null
+  }
 }
 
 function RetryWithNewTips({
@@ -176,7 +210,6 @@ function RetryWithNewTips({
 }: RecoveryContentProps): JSX.Element | null {
   const { ROBOT_RETRYING_STEP } = RECOVERY_MAP
   const { t } = useTranslation('error_recovery')
-
   const { goBackPrevStep, setRobotInMotion } = routeUpdateActions
   const { retryFailedCommand, resumeRun } = recoveryCommands
 
