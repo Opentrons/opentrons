@@ -1237,7 +1237,7 @@
             }
           ],
           "metadata": {
-            "displayCategory": "adapter",
+            "displayCategory": "aluminumBlock",
             "displayName": "Opentrons 96 Well Aluminum Block",
             "displayVolumeUnits": "µL",
             "tags": []

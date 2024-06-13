@@ -3004,6 +3004,690 @@
       "params": {},
       "result": {},
       "status": "succeeded"
+    },
+    {
+      "commandType": "pickUpTip",
+      "notes": [],
+      "params": {
+        "wellLocation": {
+          "offset": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0
+          },
+          "origin": "top"
+        },
+        "wellName": "A1"
+      },
+      "result": {
+        "position": {
+          "x": 178.38,
+          "y": 181.38,
+          "z": 99.0
+        },
+        "tipDiameter": 5.47,
+        "tipLength": 85.1,
+        "tipVolume": 1000.0
+      },
+      "status": "succeeded"
+    },
+    {
+      "commandType": "moveToAddressableAreaForDropTip",
+      "notes": [],
+      "params": {
+        "addressableAreaName": "movableTrashA3",
+        "alternateDropLocation": true,
+        "forceDirect": false,
+        "ignoreTipConfiguration": true,
+        "offset": {
+          "x": 0.0,
+          "y": 0.0,
+          "z": 0.0
+        }
+      },
+      "result": {
+        "position": {
+          "x": 466.25,
+          "y": 364.0,
+          "z": 40.0
+        }
+      },
+      "status": "succeeded"
+    },
+    {
+      "commandType": "dropTipInPlace",
+      "notes": [],
+      "params": {},
+      "result": {},
+      "status": "succeeded"
+    },
+    {
+      "commandType": "configureNozzleLayout",
+      "notes": [],
+      "params": {
+        "configurationParams": {
+          "primaryNozzle": "A1",
+          "style": "COLUMN"
+        }
+      },
+      "result": {},
+      "status": "succeeded"
+    },
+    {
+      "commandType": "pickUpTip",
+      "notes": [],
+      "params": {
+        "wellLocation": {
+          "offset": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0
+          },
+          "origin": "top"
+        },
+        "wellName": "A12"
+      },
+      "result": {
+        "position": {
+          "x": 277.38,
+          "y": 181.38,
+          "z": 99.0
+        },
+        "tipDiameter": 5.47,
+        "tipLength": 85.1,
+        "tipVolume": 1000.0
+      },
+      "status": "succeeded"
+    },
+    {
+      "commandType": "moveToAddressableAreaForDropTip",
+      "notes": [],
+      "params": {
+        "addressableAreaName": "movableTrashA3",
+        "alternateDropLocation": true,
+        "forceDirect": false,
+        "ignoreTipConfiguration": true,
+        "offset": {
+          "x": 0.0,
+          "y": 0.0,
+          "z": 0.0
+        }
+      },
+      "result": {
+        "position": {
+          "x": 402.25,
+          "y": 364.0,
+          "z": 40.0
+        }
+      },
+      "status": "succeeded"
+    },
+    {
+      "commandType": "dropTipInPlace",
+      "notes": [],
+      "params": {},
+      "result": {},
+      "status": "succeeded"
+    },
+    {
+      "commandType": "pickUpTip",
+      "notes": [],
+      "params": {
+        "wellLocation": {
+          "offset": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0
+          },
+          "origin": "top"
+        },
+        "wellName": "A11"
+      },
+      "result": {
+        "position": {
+          "x": 268.38,
+          "y": 181.38,
+          "z": 99.0
+        },
+        "tipDiameter": 5.47,
+        "tipLength": 85.1,
+        "tipVolume": 1000.0
+      },
+      "status": "succeeded"
+    },
+    {
+      "commandType": "moveToAddressableAreaForDropTip",
+      "notes": [],
+      "params": {
+        "addressableAreaName": "movableTrashA3",
+        "alternateDropLocation": true,
+        "forceDirect": false,
+        "ignoreTipConfiguration": true,
+        "offset": {
+          "x": 0.0,
+          "y": 0.0,
+          "z": 0.0
+        }
+      },
+      "result": {
+        "position": {
+          "x": 466.25,
+          "y": 364.0,
+          "z": 40.0
+        }
+      },
+      "status": "succeeded"
+    },
+    {
+      "commandType": "dropTipInPlace",
+      "notes": [],
+      "params": {},
+      "result": {},
+      "status": "succeeded"
+    },
+    {
+      "commandType": "pickUpTip",
+      "notes": [],
+      "params": {
+        "wellLocation": {
+          "offset": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0
+          },
+          "origin": "top"
+        },
+        "wellName": "A10"
+      },
+      "result": {
+        "position": {
+          "x": 259.38,
+          "y": 181.38,
+          "z": 99.0
+        },
+        "tipDiameter": 5.47,
+        "tipLength": 85.1,
+        "tipVolume": 1000.0
+      },
+      "status": "succeeded"
+    },
+    {
+      "commandType": "moveToAddressableAreaForDropTip",
+      "notes": [],
+      "params": {
+        "addressableAreaName": "movableTrashA3",
+        "alternateDropLocation": true,
+        "forceDirect": false,
+        "ignoreTipConfiguration": true,
+        "offset": {
+          "x": 0.0,
+          "y": 0.0,
+          "z": 0.0
+        }
+      },
+      "result": {
+        "position": {
+          "x": 402.25,
+          "y": 364.0,
+          "z": 40.0
+        }
+      },
+      "status": "succeeded"
+    },
+    {
+      "commandType": "dropTipInPlace",
+      "notes": [],
+      "params": {},
+      "result": {},
+      "status": "succeeded"
+    },
+    {
+      "commandType": "pickUpTip",
+      "notes": [],
+      "params": {
+        "wellLocation": {
+          "offset": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0
+          },
+          "origin": "top"
+        },
+        "wellName": "A9"
+      },
+      "result": {
+        "position": {
+          "x": 250.38,
+          "y": 181.38,
+          "z": 99.0
+        },
+        "tipDiameter": 5.47,
+        "tipLength": 85.1,
+        "tipVolume": 1000.0
+      },
+      "status": "succeeded"
+    },
+    {
+      "commandType": "moveToAddressableAreaForDropTip",
+      "notes": [],
+      "params": {
+        "addressableAreaName": "movableTrashA3",
+        "alternateDropLocation": true,
+        "forceDirect": false,
+        "ignoreTipConfiguration": true,
+        "offset": {
+          "x": 0.0,
+          "y": 0.0,
+          "z": 0.0
+        }
+      },
+      "result": {
+        "position": {
+          "x": 466.25,
+          "y": 364.0,
+          "z": 40.0
+        }
+      },
+      "status": "succeeded"
+    },
+    {
+      "commandType": "dropTipInPlace",
+      "notes": [],
+      "params": {},
+      "result": {},
+      "status": "succeeded"
+    },
+    {
+      "commandType": "pickUpTip",
+      "notes": [],
+      "params": {
+        "wellLocation": {
+          "offset": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0
+          },
+          "origin": "top"
+        },
+        "wellName": "A8"
+      },
+      "result": {
+        "position": {
+          "x": 241.38,
+          "y": 181.38,
+          "z": 99.0
+        },
+        "tipDiameter": 5.47,
+        "tipLength": 85.1,
+        "tipVolume": 1000.0
+      },
+      "status": "succeeded"
+    },
+    {
+      "commandType": "moveToAddressableAreaForDropTip",
+      "notes": [],
+      "params": {
+        "addressableAreaName": "movableTrashA3",
+        "alternateDropLocation": true,
+        "forceDirect": false,
+        "ignoreTipConfiguration": true,
+        "offset": {
+          "x": 0.0,
+          "y": 0.0,
+          "z": 0.0
+        }
+      },
+      "result": {
+        "position": {
+          "x": 402.25,
+          "y": 364.0,
+          "z": 40.0
+        }
+      },
+      "status": "succeeded"
+    },
+    {
+      "commandType": "dropTipInPlace",
+      "notes": [],
+      "params": {},
+      "result": {},
+      "status": "succeeded"
+    },
+    {
+      "commandType": "pickUpTip",
+      "notes": [],
+      "params": {
+        "wellLocation": {
+          "offset": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0
+          },
+          "origin": "top"
+        },
+        "wellName": "A7"
+      },
+      "result": {
+        "position": {
+          "x": 232.38,
+          "y": 181.38,
+          "z": 99.0
+        },
+        "tipDiameter": 5.47,
+        "tipLength": 85.1,
+        "tipVolume": 1000.0
+      },
+      "status": "succeeded"
+    },
+    {
+      "commandType": "moveToAddressableAreaForDropTip",
+      "notes": [],
+      "params": {
+        "addressableAreaName": "movableTrashA3",
+        "alternateDropLocation": true,
+        "forceDirect": false,
+        "ignoreTipConfiguration": true,
+        "offset": {
+          "x": 0.0,
+          "y": 0.0,
+          "z": 0.0
+        }
+      },
+      "result": {
+        "position": {
+          "x": 466.25,
+          "y": 364.0,
+          "z": 40.0
+        }
+      },
+      "status": "succeeded"
+    },
+    {
+      "commandType": "dropTipInPlace",
+      "notes": [],
+      "params": {},
+      "result": {},
+      "status": "succeeded"
+    },
+    {
+      "commandType": "pickUpTip",
+      "notes": [],
+      "params": {
+        "wellLocation": {
+          "offset": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0
+          },
+          "origin": "top"
+        },
+        "wellName": "A6"
+      },
+      "result": {
+        "position": {
+          "x": 223.38,
+          "y": 181.38,
+          "z": 99.0
+        },
+        "tipDiameter": 5.47,
+        "tipLength": 85.1,
+        "tipVolume": 1000.0
+      },
+      "status": "succeeded"
+    },
+    {
+      "commandType": "moveToAddressableAreaForDropTip",
+      "notes": [],
+      "params": {
+        "addressableAreaName": "movableTrashA3",
+        "alternateDropLocation": true,
+        "forceDirect": false,
+        "ignoreTipConfiguration": true,
+        "offset": {
+          "x": 0.0,
+          "y": 0.0,
+          "z": 0.0
+        }
+      },
+      "result": {
+        "position": {
+          "x": 402.25,
+          "y": 364.0,
+          "z": 40.0
+        }
+      },
+      "status": "succeeded"
+    },
+    {
+      "commandType": "dropTipInPlace",
+      "notes": [],
+      "params": {},
+      "result": {},
+      "status": "succeeded"
+    },
+    {
+      "commandType": "pickUpTip",
+      "notes": [],
+      "params": {
+        "wellLocation": {
+          "offset": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0
+          },
+          "origin": "top"
+        },
+        "wellName": "A5"
+      },
+      "result": {
+        "position": {
+          "x": 214.38,
+          "y": 181.38,
+          "z": 99.0
+        },
+        "tipDiameter": 5.47,
+        "tipLength": 85.1,
+        "tipVolume": 1000.0
+      },
+      "status": "succeeded"
+    },
+    {
+      "commandType": "moveToAddressableAreaForDropTip",
+      "notes": [],
+      "params": {
+        "addressableAreaName": "movableTrashA3",
+        "alternateDropLocation": true,
+        "forceDirect": false,
+        "ignoreTipConfiguration": true,
+        "offset": {
+          "x": 0.0,
+          "y": 0.0,
+          "z": 0.0
+        }
+      },
+      "result": {
+        "position": {
+          "x": 466.25,
+          "y": 364.0,
+          "z": 40.0
+        }
+      },
+      "status": "succeeded"
+    },
+    {
+      "commandType": "dropTipInPlace",
+      "notes": [],
+      "params": {},
+      "result": {},
+      "status": "succeeded"
+    },
+    {
+      "commandType": "pickUpTip",
+      "notes": [],
+      "params": {
+        "wellLocation": {
+          "offset": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0
+          },
+          "origin": "top"
+        },
+        "wellName": "A4"
+      },
+      "result": {
+        "position": {
+          "x": 205.38,
+          "y": 181.38,
+          "z": 99.0
+        },
+        "tipDiameter": 5.47,
+        "tipLength": 85.1,
+        "tipVolume": 1000.0
+      },
+      "status": "succeeded"
+    },
+    {
+      "commandType": "moveToAddressableAreaForDropTip",
+      "notes": [],
+      "params": {
+        "addressableAreaName": "movableTrashA3",
+        "alternateDropLocation": true,
+        "forceDirect": false,
+        "ignoreTipConfiguration": true,
+        "offset": {
+          "x": 0.0,
+          "y": 0.0,
+          "z": 0.0
+        }
+      },
+      "result": {
+        "position": {
+          "x": 402.25,
+          "y": 364.0,
+          "z": 40.0
+        }
+      },
+      "status": "succeeded"
+    },
+    {
+      "commandType": "dropTipInPlace",
+      "notes": [],
+      "params": {},
+      "result": {},
+      "status": "succeeded"
+    },
+    {
+      "commandType": "pickUpTip",
+      "notes": [],
+      "params": {
+        "wellLocation": {
+          "offset": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0
+          },
+          "origin": "top"
+        },
+        "wellName": "A3"
+      },
+      "result": {
+        "position": {
+          "x": 196.38,
+          "y": 181.38,
+          "z": 99.0
+        },
+        "tipDiameter": 5.47,
+        "tipLength": 85.1,
+        "tipVolume": 1000.0
+      },
+      "status": "succeeded"
+    },
+    {
+      "commandType": "moveToAddressableAreaForDropTip",
+      "notes": [],
+      "params": {
+        "addressableAreaName": "movableTrashA3",
+        "alternateDropLocation": true,
+        "forceDirect": false,
+        "ignoreTipConfiguration": true,
+        "offset": {
+          "x": 0.0,
+          "y": 0.0,
+          "z": 0.0
+        }
+      },
+      "result": {
+        "position": {
+          "x": 466.25,
+          "y": 364.0,
+          "z": 40.0
+        }
+      },
+      "status": "succeeded"
+    },
+    {
+      "commandType": "dropTipInPlace",
+      "notes": [],
+      "params": {},
+      "result": {},
+      "status": "succeeded"
+    },
+    {
+      "commandType": "pickUpTip",
+      "notes": [],
+      "params": {
+        "wellLocation": {
+          "offset": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0
+          },
+          "origin": "top"
+        },
+        "wellName": "A2"
+      },
+      "result": {
+        "position": {
+          "x": 187.38,
+          "y": 181.38,
+          "z": 99.0
+        },
+        "tipDiameter": 5.47,
+        "tipLength": 85.1,
+        "tipVolume": 1000.0
+      },
+      "status": "succeeded"
+    },
+    {
+      "commandType": "moveToAddressableAreaForDropTip",
+      "notes": [],
+      "params": {
+        "addressableAreaName": "movableTrashA3",
+        "alternateDropLocation": true,
+        "forceDirect": false,
+        "ignoreTipConfiguration": true,
+        "offset": {
+          "x": 0.0,
+          "y": 0.0,
+          "z": 0.0
+        }
+      },
+      "result": {
+        "position": {
+          "x": 402.25,
+          "y": 364.0,
+          "z": 40.0
+        }
+      },
+      "status": "succeeded"
+    },
+    {
+      "commandType": "dropTipInPlace",
+      "notes": [],
+      "params": {},
+      "result": {},
+      "status": "succeeded"
     }
   ],
   "config": {
@@ -3013,27 +3697,7 @@
     ],
     "protocolType": "python"
   },
-  "errors": [
-    {
-      "detail": "IndexError [line 25]: list index out of range",
-      "errorCode": "4000",
-      "errorInfo": {},
-      "errorType": "ExceptionInProtocolError",
-      "wrappedErrors": [
-        {
-          "detail": "IndexError: list index out of range",
-          "errorCode": "4000",
-          "errorInfo": {
-            "args": "('list index out of range',)",
-            "class": "IndexError",
-            "traceback": "  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocols/execution/execute_python.py\", line 124, in run_python\n    exec(\"run(__context)\", new_globs)\n\n  File \"<string>\", line 1, in <module>\n\n  File \"Flex_S_v2_18_P1000_96_TipTrackingBug.py\", line 25, in run\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocols/api_support/util.py\", line 383, in _check_version_wrapper\n    return decorated_obj(*args, **kwargs)\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocol_api/instrument_context.py\", line 918, in pick_up_tip\n    tip_rack, well = labware.next_available_tip(\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocol_api/labware.py\", line 1113, in next_available_tip\n    return select_tiprack_from_list(\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocol_api/labware.py\", line 1089, in select_tiprack_from_list\n    next_tip = first.next_tip(num_channels, first_well, nozzle_map=nozzle_map)\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocol_api/labware.py\", line 906, in next_tip\n    well_name = self._core.get_next_tip(\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocol_api/core/engine/labware.py\", line 156, in get_next_tip\n    return self._engine_client.state.tips.get_next_tip(\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocol_engine/state/tips.py\", line 413, in get_next_tip\n    return _cluster_search_H1(num_nozzle_cols, num_nozzle_rows)\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocol_engine/state/tips.py\", line 364, in _cluster_search_H1\n    critical_row = len(columns[critical_column]) - active_rows\n"
-          },
-          "errorType": "PythonException",
-          "wrappedErrors": []
-        }
-      ]
-    }
-  ],
+  "errors": [],
   "files": [
     {
       "name": "Flex_S_v2_18_P1000_96_TipTrackingBug.py",

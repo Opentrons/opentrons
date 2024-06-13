@@ -12244,6 +12244,7 @@
         "errorCode": "4000",
         "errorInfo": {},
         "errorType": "LabwareMovementNotAllowedError",
+        "isDefined": false,
         "wrappedErrors": []
       },
       "notes": [],
@@ -12264,6 +12265,7 @@
       "errorCode": "4000",
       "errorInfo": {},
       "errorType": "LabwareMovementNotAllowedError",
+      "isDefined": false,
       "wrappedErrors": []
     }
   ],

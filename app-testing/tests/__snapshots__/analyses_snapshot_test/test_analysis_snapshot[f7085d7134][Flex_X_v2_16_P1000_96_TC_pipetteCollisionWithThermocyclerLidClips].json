@@ -1311,12 +1311,14 @@
       "errorCode": "4000",
       "errorInfo": {},
       "errorType": "ExceptionInProtocolError",
+      "isDefined": false,
       "wrappedErrors": [
         {
           "detail": "Moving to Opentrons Flex 96 Tip Rack 200 µL in slot A2 with A12 nozzle partial configuration will result in collision with thermocycler lid in deck slot A1.",
           "errorCode": "2004",
           "errorInfo": {},
           "errorType": "PartialTipMovementNotAllowedError",
+          "isDefined": false,
           "wrappedErrors": []
         }
       ]

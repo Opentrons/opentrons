@@ -3505,6 +3505,7 @@
       "errorCode": "4000",
       "errorInfo": {},
       "errorType": "ExceptionInProtocolError",
+      "isDefined": false,
       "wrappedErrors": [
         {
           "detail": "ValueError: Nozzle layout configuration of style SINGLE is currently unsupported.",
@@ -3512,9 +3513,10 @@
           "errorInfo": {
             "args": "('Nozzle layout configuration of style SINGLE is currently unsupported.',)",
             "class": "ValueError",
-            "traceback": "  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocols/execution/execute_python.py\", line 124, in run_python\n    exec(\"run(__context)\", new_globs)\n\n  File \"<string>\", line 1, in <module>\n\n  File \"Flex_S_v2_16_P1000_96_TC_PartialTipPickupSingle.py\", line 16, in run\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocols/api_support/util.py\", line 383, in _check_version_wrapper\n    return decorated_obj(*args, **kwargs)\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocol_api/instrument_context.py\", line 1961, in configure_nozzle_layout\n    raise ValueError(\n"
+            "traceback": "  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocols/execution/execute_python.py\", line 147, in exec_run\n    exec(\"run(__context)\", new_globs)\n\n  File \"<string>\", line 1, in <module>\n\n  File \"Flex_S_v2_16_P1000_96_TC_PartialTipPickupSingle.py\", line 16, in run\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocols/api_support/util.py\", line 383, in _check_version_wrapper\n    return decorated_obj(*args, **kwargs)\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocol_api/instrument_context.py\", line 1988, in configure_nozzle_layout\n    raise ValueError(\n"
           },
           "errorType": "PythonException",
+          "isDefined": false,
           "wrappedErrors": []
         }
       ]

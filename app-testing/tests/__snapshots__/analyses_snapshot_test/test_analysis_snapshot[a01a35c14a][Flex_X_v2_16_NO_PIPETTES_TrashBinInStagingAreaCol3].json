@@ -108,12 +108,14 @@
       "errorCode": "4000",
       "errorInfo": {},
       "errorType": "ExceptionInProtocolError",
+      "isDefined": false,
       "wrappedErrors": [
         {
           "detail": "Cannot use Trash Bin in C3, not compatible with one or more of the following fixtures: Slot C4",
           "errorCode": "4000",
           "errorInfo": {},
           "errorType": "IncompatibleAddressableAreaError",
+          "isDefined": false,
           "wrappedErrors": []
         }
       ]
