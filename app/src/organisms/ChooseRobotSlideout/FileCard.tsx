@@ -38,7 +38,7 @@ export function FileCard(props: FileCardProps): JSX.Element {
     >
       <Flex
         height="2.75rem"
-        padding={`${SPACING.spacing8} ${SPACING.spacing12}`}
+        padding={SPACING.spacing8}
         backgroundColor={error == null ? COLORS.grey20 : COLORS.red30}
         borderRadius={BORDERS.borderRadius4}
         justifyContent={JUSTIFY_SPACE_BETWEEN}
@@ -51,7 +51,7 @@ export function FileCard(props: FileCardProps): JSX.Element {
             white-space: nowrap;
           `}
         >
-          {truncateString(fileRunTimeParameter?.file?.file?.name ?? '', 30, 15)}
+          {truncateString(fileRunTimeParameter?.file?.file?.name ?? '', 35, 18)}
         </StyledText>
         <Flex alignItems={ALIGN_CENTER}>
           <Btn
