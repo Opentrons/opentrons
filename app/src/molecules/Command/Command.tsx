@@ -52,6 +52,7 @@ export function Command(props: CommandProps): JSX.Element {
 const UNIVERSAL_CONTAINER_STYLES = {
   borderRadius: BORDERS.borderRadius8,
   gap: SPACING.spacing12,
+  minHeight: SPACING.spacing40
 } as const
 
 const UNIVERSAL_ICON_STYLES = {
