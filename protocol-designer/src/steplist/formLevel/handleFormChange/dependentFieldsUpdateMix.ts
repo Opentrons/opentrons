@@ -1,4 +1,5 @@
 import pick from 'lodash/pick'
+import { getDefaultsForStepType } from '../getDefaultsForStepType'
 import {
   chainPatchUpdaters,
   fieldHasChanged,
@@ -6,7 +7,6 @@ import {
   getDefaultWells,
   getAllWellsFromPrimaryWells,
 } from './utils'
-import { getDefaultsForStepType } from '../getDefaultsForStepType'
 import type {
   LabwareEntities,
   PipetteEntities,
@@ -30,7 +30,11 @@ const updatePatchOnLabwareChange = (
   const pipetteId = appliedPatch.pipette
   return {
     ...patch,
-    ...getDefaultFields('mix_mmFromBottom', 'mix_touchTip_mmFromBottom'),
+    ...getDefaultFields(
+      'mix_mmFromBottom',
+      'mix_touchTip_mmFromBottom',
+      'mix_touchTip_checkbox'
+    ),
     wells: getDefaultWells({
       labwareId: appliedPatch.labware,
       pipetteId,
