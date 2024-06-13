@@ -30,7 +30,11 @@ const updatePatchOnLabwareChange = (
   const pipetteId = appliedPatch.pipette
   return {
     ...patch,
-    ...getDefaultFields('mix_mmFromBottom', 'mix_touchTip_mmFromBottom'),
+    ...getDefaultFields(
+      'mix_mmFromBottom',
+      'mix_touchTip_mmFromBottom',
+      'mix_touchTip_checkboxƒ'
+    ),
     wells: getDefaultWells({
       labwareId: appliedPatch.labware,
       pipetteId,
