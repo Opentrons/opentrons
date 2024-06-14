@@ -94,9 +94,9 @@ export function ProtocolTimelineScrubber(
       : null
 
   return (
-    <Flex width="100%" height="95vh" flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing8}>
-      <Flex gridGap={SPACING.spacing8} flex="1 1 0">
-        <Flex flex="1 1 0">
+    <Flex  height="95vh" flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing8}>
+      <Flex  gridGap={SPACING.spacing8} flex="1 1 0">
+        <Flex flex="1 1 0" width="300px">
           <BaseDeck
             robotType={robotType}
             deckConfig={getSimplestDeckConfigForProtocol(analysis)}
@@ -144,7 +144,7 @@ export function ProtocolTimelineScrubber(
               }).filter((i): i is LabwareOnDeck => i != null)}
           />
         </Flex>
-        {/* <PipetteMountViz
+        <PipetteMountViz
           mount="left"
           pipetteId={leftPipetteId}
           pipetteEntity={leftPipetteEntity}
@@ -159,8 +159,8 @@ export function ProtocolTimelineScrubber(
           timelineFrame={frame}
           invariantContext={invariantContext}
           analysis={analysis}
-        /> */}
-        <Flex
+        />
+        {/* <Flex
           backgroundColor={COLORS.white}
           paddingX={SPACING.spacing4}
           flex="1 1 0"
@@ -168,9 +168,9 @@ export function ProtocolTimelineScrubber(
           <AnnotatedSteps
             analysis={analysis}
             currentCommandIndex={currentCommandIndex} />
-        </Flex>
+        </Flex> */}
       </Flex>
-      {/* <Flex
+      <Flex
         ref={wrapperRef}
         alignSelf={ALIGN_STRETCH}
         overflowY="scroll"
@@ -192,7 +192,7 @@ export function ProtocolTimelineScrubber(
             />
           )}
         </ViewportList>
-      </Flex> */}
+      </Flex>
       <StyledText as="label" marginY={SPACING.spacing8}>
         Jump to command
       </StyledText>
