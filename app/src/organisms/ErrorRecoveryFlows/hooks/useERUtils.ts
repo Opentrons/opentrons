@@ -7,10 +7,7 @@ import { useRecoveryRouting } from './useRecoveryRouting'
 import { usePreviousRecoveryRoute } from './usePreviousRecoveryRoute'
 import { useFailedLabwareUtils } from './useFailedLabwareUtils'
 import { useFailedCommandPipetteInfo } from './useFailedCommandPipetteInfo'
-import {
-  useNotifyAllCommandsQuery,
-  useNotifyRunQuery,
-} from '../../../resources/runs'
+import { useNotifyRunQuery } from '../../../resources/runs'
 
 import type { PipetteData } from '@opentrons/api-client'
 import type { IRecoveryMap, RecoveryRoute } from '../types'
@@ -48,11 +45,6 @@ export function useERUtils({
 }: ERUtilsProps): ERUtilsResults {
   const { data: attachedInstruments } = useInstrumentsQuery()
   const { data: runRecord } = useNotifyRunQuery(runId)
-  // TOME: Discuss this with EXEC!
-  const { data: runCommands } = useNotifyAllCommandsQuery(runId, {
-    cursor: 0,
-    pageLength: 999,
-  })
 
   const { recoveryMap, setRM, trackExternalMap } = useRecoveryRouting()
   const previousRoute = usePreviousRecoveryRoute(recoveryMap.route)
@@ -78,7 +70,6 @@ export function useERUtils({
   const failedLabwareUtils = useFailedLabwareUtils({
     failedCommand,
     protocolAnalysis,
-    runCommands,
     runRecord,
     failedPipetteInfo,
   })
