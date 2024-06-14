@@ -187,8 +187,8 @@ CAP_THRESH_SQUARE = {
 # THRESHOLDS: air-pressure sensor
 PRESSURE_ASPIRATE_VOL = {1: {50: 10.0, 1000: 20.0}, 8: {50: 10.0, 1000: 20.0}}
 PRESSURE_THRESH_OPEN_AIR = {1: {50:[-25, 25],1000:[-25,25]}, 8: {50:[-25, 25],1000:[-25,25]}}
-PRESSURE_THRESH_SEALED = {1: {50:[-100, 100],1000:[-100,100]}, 8: {50:[-120, 120],1000:[-120,120]}}
-PRESSURE_THRESH_COMPRESS = {1: {50:[-3150, -1150],1000:[-1550,-450]}, 8: {50:[-4200, -2100],1000:[-1900,-500]}}
+PRESSURE_THRESH_SEALED = {1: {50:[-100, 100],1000:[-100,100]}, 8: {50:[-100, 100],1000:[-100,100]}}
+PRESSURE_THRESH_COMPRESS = {1: {50:[-3250, -1050],1000:[-1550,-450]}, 8: {50:[-4300, -2100],1000:[-1900,-500]}}
 PRESSURE_THRESH_current = {1: {50:{1:0.2},1000:{1:0.2}}, 8: {50:{2:0.2,8:0.55},1000:{2:0.14,8:0.55}}}
 
 _trash_loc_counter = 0
@@ -1185,23 +1185,25 @@ async def _test_diagnostics_pressure(
     
     if "p50" in pipptype[OT3Mount.LEFT]['name']:
         CHTYPE_PIPPETE = 50
-        if "single" in pipptype[OT3Mount.LEFT]['name']:
-            movez = -155.5   
-            current_val = PRESSURE_THRESH_current[pip_channels][CHTYPE_PIPPETE][1]
-        elif "multi" in pipptype[OT3Mount.LEFT]['name']:
+        # if "single" in pipptype[OT3Mount.LEFT]['name']:
+        #     movez = -155.5   
+        #     current_val = PRESSURE_THRESH_current[pip_channels][CHTYPE_PIPPETE][1]
+        if "multi" in pipptype[OT3Mount.LEFT]['name']:
             movez = -154.8
             current_val = PRESSURE_THRESH_current[pip_channels][CHTYPE_PIPPETE][2]
+            print("current_val",current_val)
+            await helpers_ot3.update_pick_up_current(api,mount,current_val)
             
     elif "p1000" in pipptype[OT3Mount.LEFT]['name']:
         CHTYPE_PIPPETE = 1000
         movez = -117.86
 
-        if "single" in pipptype[OT3Mount.LEFT]['name']:  
-            current_val = PRESSURE_THRESH_current[pip_channels][CHTYPE_PIPPETE][1]
-        elif "multi" in pipptype[OT3Mount.LEFT]['name']:
+        # if "single" in pipptype[OT3Mount.LEFT]['name']:  
+        #     current_val = PRESSURE_THRESH_current[pip_channels][CHTYPE_PIPPETE][1]
+        if "multi" in pipptype[OT3Mount.LEFT]['name']:
             current_val = PRESSURE_THRESH_current[pip_channels][CHTYPE_PIPPETE][2]
-    print("current_val",current_val)
-    await helpers_ot3.update_pick_up_current(api,mount,current_val)
+            print("current_val",current_val)
+            await helpers_ot3.update_pick_up_current(api,mount,current_val)
         
 
     for sensor_id in sensor_ids:
@@ -2030,10 +2032,10 @@ async def _main(test_config: TestConfig) -> None:  # noqa: C901
                         current_val = PRESSURE_THRESH_current[PIP_CHANNELS_CURRENT][PIP_VOL_CURRENT][2]
                         LOG_GING.info(f"current_val:{current_val}")
                         await helpers_ot3.update_pick_up_current(api,mount,current_val)
-                    elif PIP_CHANNELS_CURRENT == 1:
-                        current_val = PRESSURE_THRESH_current[PIP_CHANNELS_CURRENT][PIP_VOL_CURRENT][1]
-                        LOG_GING.info(f"current_val:{current_val}")
-                        await helpers_ot3.update_pick_up_current(api,mount,current_val)
+                    # elif PIP_CHANNELS_CURRENT == 1:
+                    #     current_val = PRESSURE_THRESH_current[PIP_CHANNELS_CURRENT][PIP_VOL_CURRENT][1]
+                    #     LOG_GING.info(f"current_val:{current_val}")
+                    #     await helpers_ot3.update_pick_up_current(api,mount,current_val)
 
                     await _pick_up_tip_for_tip_volume(api, mount, tip_vol)
                     for probe in probes:
