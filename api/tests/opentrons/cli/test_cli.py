@@ -152,9 +152,15 @@ def test_analysis_deck_definition(
         "commands"
     ]
 
-    # todo(mm, 2023-05-12): When protocols emit true Protocol Engine comment commands instead
-    # of legacy commands, "legacyCommandText" should change to "message".
-    assert comment_command["params"]["legacyCommandText"] == expected_point
+    # ["params"]["message"] for Protocol Engine (PAPIv≥2.14),
+    # ["params"]["legacyCommandText"] for the legacy backend (PAPIv≤2.13).
+    # Eventually the legacy backend should change to match Protocol Engine.
+    comment_message = (
+        comment_command["params"]["message"]
+        if "message" in comment_command["params"]
+        else comment_command["params"]["legacyCommandText"]
+    )
+    assert comment_message == expected_point
 
 
 # TODO(mm, 2023-08-12): We can remove this test when we remove special handling for these
