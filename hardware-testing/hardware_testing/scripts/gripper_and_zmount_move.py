@@ -16,14 +16,12 @@ from hardware_testing.opentrons_api.helpers_ot3 import (
 )
 
 
-async def _main() -> None:
+async def _main(mount: OT3Mount, args, z_axis: Axis, distance: int) -> None:
     hw_api = await build_async_ot3_hardware_api(
         is_simulating=args.simulate, use_defaults=True
     )
     await asyncio.sleep(1)
     await hw_api.cache_instruments()
-    if mount is not OT3Mount.GRIPPER:
-        await wait_for_instrument_presence(hw_api, mount, presence=True)
     timeout_start = time.time()
     timeout = args.time_min * 60
     count = 0
@@ -57,33 +55,20 @@ async def _main() -> None:
         await hw_api.clean_up()
 
 
-if __name__ == "__main__":
-    slot_locs = [
-        "A1",
-        "A2",
-        "A3",
-        "B1",
-        "B2",
-        "B3:",
-        "C1",
-        "C2",
-        "C3",
-        "D1",
-        "D2",
-        "D3",
-    ]
+def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--simulate", action="store_true")
-    parser.add_argument("--time_min", default=60)
+    parser.add_argument("--time_min", type = int, default=60)
     parser.add_argument(
-        "--mount", type=str, choices=["left", "right", "gripper"], default="gripper"
+        "--mount", type=str, choices=["left", "right", "gripper"], default="left"
     )
     args = parser.parse_args()
+    print(args.mount)
     if args.mount == "left":
         mount = OT3Mount.LEFT
         z_axis = Axis.Z_L
         distance = 115
-    if args.mount == "gripper":
+    elif args.mount == "gripper":
         mount = OT3Mount.GRIPPER
         z_axis = Axis.Z_G
         distance = 190
@@ -91,4 +76,9 @@ if __name__ == "__main__":
         mount = OT3Mount.RIGHT
         z_axis = Axis.Z_R
         distance = 115
-    asyncio.run(_main())
+    print(f"Mount Testing: {mount}")
+    asyncio.run(_main(mount, args, z_axis, distance))
+    
+if __name__ == "__main__":
+    main()
+
