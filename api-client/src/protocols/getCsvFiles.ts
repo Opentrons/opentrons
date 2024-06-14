@@ -4,7 +4,7 @@ import { v4 as uuidv4 } from 'uuid'
 
 // import type { ResponsePromise } from '../request'
 import type { HostConfig } from '../types'
-import type { UploadCsvFilesResponse } from './types'
+import type { UploadCsvFilesResponse } from '../dataFiles/types'
 
 /**
 export function getCsvFiles(

@@ -6,6 +6,7 @@ export { createProtocol } from './createProtocol'
 export { createProtocolAnalysis } from './createProtocolAnalysis'
 export { getProtocols } from './getProtocols'
 export { getProtocolIds } from './getProtocolIds'
+export { getCsvFiles } from './getCsvFiles'
 
 export * from './types'
 export * from './utils'
