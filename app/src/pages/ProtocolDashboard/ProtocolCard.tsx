@@ -17,7 +17,6 @@ import {
   Icon,
   OVERFLOW_WRAP_ANYWHERE,
   OVERFLOW_WRAP_BREAK_WORD,
-  SIZE_2,
   SPACING,
   StyledText,
   TYPOGRAPHY,
@@ -42,19 +41,23 @@ import type { ModalHeaderBaseProps } from '../../molecules/Modal/types'
 
 const REFETCH_INTERVAL = 5000
 
-export function ProtocolCard(props: {
+interface ProtocolCardProps {
   protocol: ProtocolResource
   longPress: React.Dispatch<React.SetStateAction<boolean>>
   setShowDeleteConfirmationModal: (showDeleteConfirmationModal: boolean) => void
   setTargetProtocolId: (targetProtocolId: string) => void
   lastRun?: string
-}): JSX.Element {
+  setIsRequiredCSV: (isRequiredCSV: boolean) => void
+}
+
+export function ProtocolCard(props: ProtocolCardProps): JSX.Element {
   const {
     protocol,
     lastRun,
     longPress,
     setShowDeleteConfirmationModal,
     setTargetProtocolId,
+    setIsRequiredCSV,
   } = props
   const history = useHistory()
   const [showIcon, setShowIcon] = React.useState<boolean>(false)
@@ -123,8 +126,16 @@ export function ProtocolCard(props: {
     if (longpress.isLongPressed) {
       longPress(true)
       setTargetProtocolId(protocol.id)
+      setIsRequiredCSV(isRequiredCSV)
     }
-  }, [longpress.isLongPressed, longPress, protocol.id, setTargetProtocolId])
+  }, [
+    longpress.isLongPressed,
+    longPress,
+    protocol.id,
+    setTargetProtocolId,
+    isRequiredCSV,
+    setIsRequiredCSV,
+  ])
 
   const failedAnalysisHeader: ModalHeaderBaseProps = {
     title: i18n.format(t('protocol_analysis_failed'), 'capitalize'),
@@ -203,7 +214,7 @@ export function ProtocolCard(props: {
           name="ot-spinner"
           aria-label="Protocol is loading"
           spin
-          size={SIZE_2}
+          size="2rem"
           marginY={'-1.5rem'}
           opacity={0.7}
         />

@@ -52,9 +52,11 @@ ChooseCsvFileProps): JSX.Element {
   // return format: https://opentrons.atlassian.net/browse/AUTH-428
   const csvFilesOnRobot: any[] = []
 
-  const handleConfirmSelection = (): void => {
-    // set selected file's fileId or file full path
-    // setFileInfo('')
+  const handleConfirmSelection = async (): Promise<void> => {
+    // invoke
+    // const fileId = await remote.ipcRenderer.invoke('usb:postDataFile', {
+    //   filePath: fileInfo,
+    // })
   }
 
   return (

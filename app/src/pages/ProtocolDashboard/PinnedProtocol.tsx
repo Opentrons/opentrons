@@ -7,6 +7,7 @@ import styled, { css } from 'styled-components'
 import {
   ALIGN_FLEX_START,
   BORDERS,
+  Chip,
   COLORS,
   DIRECTION_COLUMN,
   DIRECTION_ROW,
@@ -14,9 +15,9 @@ import {
   JUSTIFY_SPACE_BETWEEN,
   OVERFLOW_WRAP_ANYWHERE,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
   useLongPress,
-  StyledText,
 } from '@opentrons/components'
 
 import { LongPressModal } from './LongPressModal'
@@ -43,36 +44,41 @@ const cardStyleBySize: {
     fontWeight: TYPOGRAPHY.fontWeightBold,
     width: '59rem',
   },
+  // Note (kk:06/13/2024) height has been updated from 10.75rem because of a protocol with RTP CSV file
   half: {
     fontSize: TYPOGRAPHY.fontSize28,
-    height: '10.75rem',
+    height: '11.375rem',
     lineHeight: TYPOGRAPHY.lineHeight36,
     fontWeight: TYPOGRAPHY.fontWeightSemiBold,
     width: '29.25rem',
   },
   regular: {
     fontSize: TYPOGRAPHY.fontSize28,
-    height: '10.75rem',
+    height: '11.375rem',
     lineHeight: TYPOGRAPHY.lineHeight36,
     fontWeight: TYPOGRAPHY.fontWeightSemiBold,
     width: '28.375rem',
   },
 }
 
-export function PinnedProtocol(props: {
+interface PinnedProtocolProps {
   protocol: ProtocolResource
   longPress: React.Dispatch<React.SetStateAction<boolean>>
   cardSize?: CardSizeType
   lastRun?: string
   setShowDeleteConfirmationModal: (showDeleteConfirmationModal: boolean) => void
   setTargetProtocolId: (targetProtocolId: string) => void
-}): JSX.Element {
+  isRequiredCSV?: boolean
+}
+
+export function PinnedProtocol(props: PinnedProtocolProps): JSX.Element {
   const {
     lastRun,
     protocol,
     longPress,
     setShowDeleteConfirmationModal,
     setTargetProtocolId,
+    isRequiredCSV = false,
   } = props
   const cardSize = props.cardSize ?? 'full'
   const history = useHistory()
@@ -96,14 +102,18 @@ export function PinnedProtocol(props: {
 
   const PUSHED_STATE_STYLE = css`
     &:active {
-      background-color: ${longpress.isLongPressed ? '' : COLORS.grey50};
+      background-color: ${longpress.isLongPressed
+        ? ''
+        : isRequiredCSV
+        ? COLORS.yellow40
+        : COLORS.grey50};
     }
   `
 
   return (
     <Flex
       alignItems={ALIGN_FLEX_START}
-      backgroundColor={COLORS.grey35}
+      backgroundColor={isRequiredCSV ? COLORS.yellow35 : COLORS.grey35}
       borderRadius={BORDERS.borderRadius16}
       css={PUSHED_STATE_STYLE}
       flexDirection={DIRECTION_COLUMN}
@@ -119,14 +129,24 @@ export function PinnedProtocol(props: {
       padding={SPACING.spacing24}
       ref={longpress.ref}
     >
-      <ProtocolNameText
-        cardSize={cardSize}
-        fontSize={cardStyleBySize[cardSize].fontSize}
-        fontWeight={cardStyleBySize[cardSize].fontWeight}
-        lineHeight={cardStyleBySize[cardSize].lineHeight}
-      >
-        {protocolName}
-      </ProtocolNameText>
+      <Flex gridGap={SPACING.spacing8} flexDirection={DIRECTION_COLUMN}>
+        {isRequiredCSV ? (
+          <Chip
+            type="warning"
+            iconName="ot-alert"
+            chipSize="small"
+            text={t('requires_csv')}
+          />
+        ) : null}
+        <ProtocolNameText
+          cardSize={cardSize}
+          fontSize={cardStyleBySize[cardSize].fontSize}
+          fontWeight={cardStyleBySize[cardSize].fontWeight}
+          lineHeight={cardStyleBySize[cardSize].lineHeight}
+        >
+          {protocolName}
+        </ProtocolNameText>
+      </Flex>
       <Flex
         flexDirection={DIRECTION_ROW}
         gridGap={SPACING.spacing8}
