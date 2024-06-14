@@ -58,7 +58,7 @@ async def _main(mount: OT3Mount, args, z_axis: Axis, distance: int) -> None:
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--simulate", action="store_true")
-    parser.add_argument("--time_min", type = int, default=60)
+    parser.add_argument("--time_min", type=int, default=60)
     parser.add_argument(
         "--mount", type=str, choices=["left", "right", "gripper"], default="left"
     )
@@ -78,7 +78,7 @@ def main():
         distance = 115
     print(f"Mount Testing: {mount}")
     asyncio.run(_main(mount, args, z_axis, distance))
-    
+
+
 if __name__ == "__main__":
     main()
-
