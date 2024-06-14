@@ -2,15 +2,10 @@
  * Represents the parameters for uploading a CSV file.
  *
  * @interface UploadCsvFileParams
- * @property {File} [file] - An optional File object for Desktop app
- * @property {string} [filePath] - An optional string for USB drive on ODD
+ * @property {File | string} [fileData] - File object for Desktop app and string for USB drive on ODD
  */
 
-export interface UploadCsvFileParams {
-  file?: File
-  filePath?: string
-  isStub?: boolean
-}
+export type FileData = File | string
 
 interface CsvFileData {
   id: string

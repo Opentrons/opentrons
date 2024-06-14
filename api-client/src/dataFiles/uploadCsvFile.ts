@@ -3,25 +3,27 @@ import { v4 as uuidv4 } from 'uuid'
 
 // import type { ResponsePromise } from '../request'
 import type { HostConfig } from '../types'
-import type { UploadCsvFileParams, UploadedCsvFileResponse } from './types'
+import type { FileData /** UploadedCsvFileResponse */ } from './types'
 
-/** 
- * 
- * When be is ready
- * 
-export function uploadCsvFile(
-  config: HostConfig,
-  params: UploadCsvFileParams
-): ResponsePromise<UploadCsvFileResponse> {
-  return request<UploadCsvFileResponse>(POST, '/dataFiles', null, config, params)
-}
-*/
+// export function uploadCsvFile(
+//   config: HostConfig,
+//   fileData: FileData
+// ): ResponsePromise<UploadedCsvFileResponse> {
+//   return request<UploadedCsvFileResponse>(
+//     POST,
+//     '/dataFiles',
+//     null,
+//     config,
+//     fileData
+//   )
+// }
 
 // ToDo (kk:06/14/2024) remove when activate the above code
 export function uploadCsvFile(
   config: HostConfig,
-  params: UploadCsvFileParams
-): Promise<UploadedCsvFileResponse> {
+  fileData: FileData
+  // Note (kk: 06/14/2024) temporary using any for useUploadCsvFileMutation
+): Promise<any> {
   const fileId = uuidv4()
   const stub = {
     data: {
