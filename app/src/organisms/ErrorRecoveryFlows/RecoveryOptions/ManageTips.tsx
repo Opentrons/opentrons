@@ -53,6 +53,7 @@ export function BeginRemoval({
   recoveryCommands,
   errorKind,
   hasLaunchedRecovery,
+  previousRoute,
 }: RecoveryContentProps): JSX.Element | null {
   const { t } = useTranslation('error_recovery')
   const { pipettesWithTip } = tipStatusUtils
@@ -62,7 +63,7 @@ export function BeginRemoval({
     proceedToRouteAndStep,
   } = routeUpdateActions
   const { cancelRun } = recoveryCommands
-  const { ROBOT_CANCELING, RETRY_NEW_TIPS } = RECOVERY_MAP
+  const { ROBOT_CANCELING, RETRY_NEW_TIPS, OPTION_SELECTION } = RECOVERY_MAP
   const mount = head(pipettesWithTip)?.mount
 
   const [selected, setSelected] = React.useState<RemovalOptions>(
@@ -75,7 +76,7 @@ export function BeginRemoval({
     } else {
       if (
         errorKind === ERROR_KINDS.OVERPERSSURE_WHILE_ASPIRATING &&
-        hasLaunchedRecovery
+        previousRoute === OPTION_SELECTION.ROUTE
       ) {
         void proceedToRouteAndStep(RETRY_NEW_TIPS.ROUTE)
       } else {
