@@ -12,18 +12,19 @@ from hardware_testing.opentrons_api.types import (
 )
 from hardware_testing.opentrons_api.helpers_ot3 import (
     build_async_ot3_hardware_api,
-    wait_for_instrument_presence,
 )
 
 
-async def _main(mount: OT3Mount, args, z_axis: Axis, distance: int) -> None:
+async def _main(
+    mount: OT3Mount, simulate: bool, time_min: int, z_axis: Axis, distance: int
+) -> None:
     hw_api = await build_async_ot3_hardware_api(
-        is_simulating=args.simulate, use_defaults=True
+        is_simulating=simulate, use_defaults=True
     )
     await asyncio.sleep(1)
     await hw_api.cache_instruments()
     timeout_start = time.time()
-    timeout = args.time_min * 60
+    timeout = time_min * 60
     count = 0
     x_offset = 80
     y_offset = 44
@@ -55,7 +56,8 @@ async def _main(mount: OT3Mount, args, z_axis: Axis, distance: int) -> None:
         await hw_api.clean_up()
 
 
-def main():
+def main() -> None:
+    """Run gripper and zmount move commands using arguments."""
     parser = argparse.ArgumentParser()
     parser.add_argument("--simulate", action="store_true")
     parser.add_argument("--time_min", type=int, default=60)
@@ -77,7 +79,7 @@ def main():
         z_axis = Axis.Z_R
         distance = 115
     print(f"Mount Testing: {mount}")
-    asyncio.run(_main(mount, args, z_axis, distance))
+    asyncio.run(_main(mount, args.simulate, args.time_min, z_axis, distance))
 
 
 if __name__ == "__main__":
