@@ -55,40 +55,6 @@ def _make_config(block_on_door_open: bool = False) -> Config:
     )
 
 
-@pytest.mark.parametrize(
-    ("is_door_open", "config", "expected_is_door_blocking"),
-    [
-        (False, _make_config(), False),
-        (True, _make_config(), False),
-        (False, _make_config(block_on_door_open=True), False),
-        (True, _make_config(block_on_door_open=True), True),
-    ],
-)
-def test_initial_state(
-    is_door_open: bool,
-    config: Config,
-    expected_is_door_blocking: bool,
-) -> None:
-    """It should set the initial state."""
-    subject = CommandStore(is_door_open=is_door_open, config=config)
-
-    assert subject.state == CommandState(
-        command_history=CommandHistory(),
-        queue_status=QueueStatus.SETUP,
-        run_completed_at=None,
-        run_started_at=None,
-        is_door_blocking=expected_is_door_blocking,
-        run_result=None,
-        run_error=None,
-        finish_error=None,
-        failed_command=None,
-        command_error_recovery_types={},
-        recovery_target_command_id=None,
-        latest_protocol_command_hash=None,
-        stopped_by_estop=False,
-    )
-
-
 class QueueCommandSpec(NamedTuple):
     """Test data for the QueueCommandAction."""
 
