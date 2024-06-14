@@ -4,7 +4,7 @@ import { v4 as uuidv4 } from 'uuid'
 
 // import type { ResponsePromise } from '../request'
 import type { HostConfig } from '../types'
-import type { UploadCsvFilesResponse } from '../dataFiles/types'
+import type { UploadedCsvFilesResponse } from '../dataFiles/types'
 
 /**
 export function getCsvFiles(
@@ -24,7 +24,7 @@ export function getCsvFiles(
 export function getCsvFiles(
   config: HostConfig,
   protocolId: string
-): Promise<UploadCsvFilesResponse> {
+): Promise<{ data: UploadedCsvFilesResponse }> {
   const fileIdOne = uuidv4()
   const fileIdTwo = uuidv4()
   const stub = {
@@ -43,5 +43,5 @@ export function getCsvFiles(
       ],
     },
   }
-  return Promise.resolve(stub)
+  return Promise.resolve({ data: stub })
 }

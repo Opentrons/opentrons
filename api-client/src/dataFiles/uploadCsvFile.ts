@@ -3,7 +3,7 @@ import { v4 as uuidv4 } from 'uuid'
 
 // import type { ResponsePromise } from '../request'
 import type { HostConfig } from '../types'
-import type { UploadCsvFileParams, UploadCsvFileResponse } from './types'
+import type { UploadCsvFileParams, UploadedCsvFileResponse } from './types'
 
 /** 
  * 
@@ -21,7 +21,7 @@ export function uploadCsvFile(
 export function uploadCsvFile(
   config: HostConfig,
   params: UploadCsvFileParams
-): Promise<UploadCsvFileResponse> {
+): Promise<UploadedCsvFileResponse> {
   const fileId = uuidv4()
   const stub = {
     data: {

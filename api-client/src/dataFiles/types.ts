@@ -18,11 +18,11 @@ interface CsvFileData {
   name: string
 }
 
-export interface UploadCsvFileResponse {
+export interface UploadedCsvFileResponse {
   data: CsvFileData
 }
 
-export interface UploadCsvFilesResponse {
+export interface UploadedCsvFilesResponse {
   data: {
     files: CsvFileData[]
   }
