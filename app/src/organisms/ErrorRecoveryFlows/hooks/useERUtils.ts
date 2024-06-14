@@ -4,7 +4,6 @@ import { useRouteUpdateActions } from './useRouteUpdateActions'
 import { useRecoveryCommands } from './useRecoveryCommands'
 import { useRecoveryTipStatus } from './useRecoveryTipStatus'
 import { useRecoveryRouting } from './useRecoveryRouting'
-import { usePreviousRecoveryRoute } from './usePreviousRecoveryRoute'
 import { useFailedLabwareUtils } from './useFailedLabwareUtils'
 import { useFailedCommandPipetteInfo } from './useFailedCommandPipetteInfo'
 import { useNotifyRunQuery } from '../../../resources/runs'
@@ -46,8 +45,12 @@ export function useERUtils({
   const { data: attachedInstruments } = useInstrumentsQuery()
   const { data: runRecord } = useNotifyRunQuery(runId)
 
-  const { recoveryMap, setRM, trackExternalMap } = useRecoveryRouting()
-  const previousRoute = usePreviousRecoveryRoute(recoveryMap.route)
+  const {
+    recoveryMap,
+    setRM,
+    trackExternalMap,
+    previousRoute,
+  } = useRecoveryRouting()
   const tipStatusUtils = useRecoveryTipStatus({
     runId,
     isFlex,
