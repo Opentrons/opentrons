@@ -68,7 +68,7 @@ describe('FileCard', () => {
       runTimeParametersOverrides: mockRunTimeParametersOverrides,
       setRunTimeParametersOverrides: mockSetRunTimeParametersOverrides,
     })
-    const xButton = screen.getByTestId('x_btn')
+    const xButton = screen.getByTestId('close_button')
     fireEvent.click(xButton)
     expect(mockSetRunTimeParametersOverrides).toBeCalledWith([
       {

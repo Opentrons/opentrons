@@ -55,7 +55,7 @@ export function FileCard(props: FileCardProps): JSX.Element {
         </StyledText>
         <Flex alignItems={ALIGN_CENTER}>
           <Btn
-            data-testid="x_btn"
+            data-testid="close_button"
             size="1.5625rem"
             onClick={() => {
               const clone = runTimeParametersOverrides.map((parameter, i) => {
