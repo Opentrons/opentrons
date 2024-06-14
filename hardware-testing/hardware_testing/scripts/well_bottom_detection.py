@@ -30,7 +30,7 @@ async def _main(
     tip_a1_pos = helpers_ot3.get_theoretical_a1_position(
         SLOT_TIP_RACK, f"opentrons_flex_96_tiprack_{tip}ul"
     )
-    plate_a1_pos = helpers_ot3.get_theoretical_a1_position(SLOT_TIP_RACK, LABWARE)
+    plate_a1_pos = helpers_ot3.get_theoretical_a1_position(SLOT_LABWARE, LABWARE)
     corning_a1_pos = helpers_ot3.get_theoretical_a1_position(
         SLOT_CORNING, "corning_96_wellplate_360ul_flat"
     )
@@ -38,10 +38,10 @@ async def _main(
         starting_mount_height=plate_a1_pos.z,
         max_z_distance=20,
         mount_speed=5.0,
-        plunger_speed=0.001,
+        plunger_speed=0.01,
         sensor_threshold_pascals=threshold,
         output_option=OutputOptions.sync_only,
-        aspirate_while_sensing=False,
+        aspirate_while_sensing=True,
         data_files=None,
     )
     xy_offsets_per_trial = [
