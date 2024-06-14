@@ -95,22 +95,19 @@ def print_test_results  (message: str,passval:bool) -> None:
 
 def print_results  (message: str,passval:bool) -> None:
     """"test results list"""
-    max_length = max(len(item) for item in message)
-
-    PRINT_HEADER_ASTERISK = "*" * PRINT_HEADER_NUM_SPACES
-    dashes = PRINT_HEADER_ASTERISK + ("*" * max_length) + PRINT_HEADER_ASTERISK
-
-    middle = [
-        f"|{PRINT_HEADER_SPACES}{item.center(max_length)}{PRINT_HEADER_SPACES}|"
-        for item in message
-    ]
-
     if passval:
-        print(f'\033[4;32m\n 测试结果PASS {dashes} ')
-        for line in middle:
-            print(line)
+        print(f'\033[4;32m\n 测试结果PASS  ')
         print(f'{dashes}\n\033[0m')
     else:
+        max_length = max(len(item) for item in message)
+
+        PRINT_HEADER_ASTERISK = "*" * PRINT_HEADER_NUM_SPACES
+        dashes = PRINT_HEADER_ASTERISK + ("*" * max_length) + PRINT_HEADER_ASTERISK
+
+        middle = [
+            f"|{PRINT_HEADER_SPACES}{item.center(max_length)}{PRINT_HEADER_SPACES}|"
+            for item in message
+        ]
         print(f'\033[1;31m\n 测试结果FAIL {dashes} ')
         for line in middle:
             print(line)

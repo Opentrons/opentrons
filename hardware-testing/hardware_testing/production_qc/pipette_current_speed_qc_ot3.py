@@ -286,55 +286,62 @@ async def _reset_gantry(api: OT3API) -> None:
 
 
 async def _main(is_simulating: bool, trials: int, continue_after_stall: bool) -> None:
-    api = await helpers_ot3.build_async_ot3_hardware_api(
-        is_simulating=is_simulating,
-        pipette_left="p1000_single_v3.4",
-        pipette_right="p1000_multi_v3.4",
-    )
-    # home and move to a safe position
-    await _reset_gantry(api)
-    pipptype = api.get_all_attached_instr()
-    print(f"pipette type: {pipptype[types.OT3Mount.LEFT]['name']}")
-    global MUST_PASS_CURRENT_TURE
-    if "single" in pipptype[types.OT3Mount.LEFT]['name']:
-        
-        MUST_PASS_CURRENT_TURE = 0.5
-    elif "multi" in pipptype[types.OT3Mount.LEFT]['name']:
-        MUST_PASS_CURRENT_TURE = 0.75
-    
-   
-
-    # test each attached pipette
-    while True:
-        mount = await _get_next_pipette_mount(api)
-        if not api.is_simulator and not ui.get_user_answer(f"QC {mount.name} pipette"):
-            continue
-
-        report = _build_csv_report(trials=trials)
-        dut = helpers_ot3.DeviceUnderTest.by_mount(mount)
-        helpers_ot3.set_csv_report_meta_data_ot3(api, report, dut)
-
-        await _test_plunger(
-            api, mount, report, trials=trials, continue_after_stall=continue_after_stall
+    try:
+        api = await helpers_ot3.build_async_ot3_hardware_api(
+            is_simulating=is_simulating,
+            pipette_left="p1000_single_v3.4",
+            pipette_right="p1000_multi_v3.4",
         )
-        ui.print_title("DONE")
-        report.save_to_disk()
-        report.print_results()
-
+        # home and move to a safe position
+        await _reset_gantry(api)
+        pipptype = api.get_all_attached_instr()
+        print(f"pipette type: {pipptype[types.OT3Mount.LEFT]['name']}")
+        global MUST_PASS_CURRENT_TURE
+        if "single" in pipptype[types.OT3Mount.LEFT]['name']:
+                
+            MUST_PASS_CURRENT_TURE = 0.5
+        elif "multi" in pipptype[types.OT3Mount.LEFT]['name']:
+            MUST_PASS_CURRENT_TURE = 0.75
         
-        if len(PASS_PRINT_LIST) > 0:
-            # ui.print_title("电流测试不通过(CURRENT SPEED TESTING FAIL)")
-            # printlist = list(set(PASS_PRINT_LIST))
-            # for printval in printlist:
-            #     print(" - ",printval)
 
-            ui.print_results(set(PASS_PRINT_LIST),False)
-        else:
-            ui.print_test_results("电流测试通过(CURRENT SPEED TESTING PASS)",True)
-            #ui.print_title("电流测试通过(CURRENT SPEED TESTING PASS)")
+        # test each attached pipette
+        while True:
+            mount = await _get_next_pipette_mount(api)
+            dut = helpers_ot3.DeviceUnderTest.by_mount(mount)
+            dut_str = helpers_ot3._get_serial_for_dut(api, dut)
+            print("dut_str:",dut_str)
+            if "multi" in pipptype[types.OT3Mount.LEFT]['name'] and str(dut_str).count("P") >=2:
+                MUST_PASS_CURRENT_TURE = 0.5
+            
+            if not api.is_simulator and not ui.get_user_answer(f"QC {mount.name} pipette"):
+                continue
 
-        if api.is_simulator:
-            break
+            report = _build_csv_report(trials=trials)
+            
+            helpers_ot3.set_csv_report_meta_data_ot3(api, report, dut)
+
+            await _test_plunger(
+                api, mount, report, trials=trials, continue_after_stall=continue_after_stall
+            )
+            ui.print_title("DONE")
+            report.save_to_disk()
+            report.print_results()
+
+            
+            if len(PASS_PRINT_LIST) > 0:
+                ui.print_results(set(PASS_PRINT_LIST),False)
+            else:
+                ui.print_test_results("电流测试通过(CURRENT SPEED TESTING PASS)",True)
+                #ui.print_title("电流测试通过(CURRENT SPEED TESTING PASS)")
+
+            if api.is_simulator:
+                break
+    except Exception as errrrr:
+        #print(f"system-error {errrrr}")
+        printsig = f"08-01-current-system-error:移液器不能达到测试标准,触发了系统错误,日志:{errrrr}"
+        ui.print_fail(printsig)
+        
+
 
 
 if __name__ == "__main__":

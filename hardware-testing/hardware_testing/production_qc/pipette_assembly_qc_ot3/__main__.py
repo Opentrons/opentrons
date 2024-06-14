@@ -187,8 +187,9 @@ CAP_THRESH_SQUARE = {
 # THRESHOLDS: air-pressure sensor
 PRESSURE_ASPIRATE_VOL = {1: {50: 10.0, 1000: 20.0}, 8: {50: 10.0, 1000: 20.0}}
 PRESSURE_THRESH_OPEN_AIR = {1: {50:[-25, 25],1000:[-25,25]}, 8: {50:[-25, 25],1000:[-25,25]}}
-PRESSURE_THRESH_SEALED = {1: {50:[-100, 100],1000:[-100,100]}, 8: {50:[-100, 100],1000:[-100,100]}}
-PRESSURE_THRESH_COMPRESS = {1: {50:[-3100, -1100],1000:[-1500,-500]}, 8: {50:[-4200, -2100],1000:[-1900,-500]}}
+PRESSURE_THRESH_SEALED = {1: {50:[-100, 100],1000:[-100,100]}, 8: {50:[-120, 120],1000:[-120,120]}}
+PRESSURE_THRESH_COMPRESS = {1: {50:[-3150, -1150],1000:[-1550,-450]}, 8: {50:[-4200, -2100],1000:[-1900,-500]}}
+PRESSURE_THRESH_current = {1: {50:{1:0.2},1000:{1:0.2}}, 8: {50:{2:0.2,8:0.55},1000:{2:0.14,8:0.55}}}
 
 _trash_loc_counter = 0
 TRASH_OFFSETS = [
@@ -752,6 +753,15 @@ async def _test_for_leak(
     accumulate_raw_data_cb: Optional[Callable],
     droplet_wait_seconds: int = 30,
 ) -> bool:
+
+    if PIP_CHANNELS_CURRENT == 8:
+        current_val = PRESSURE_THRESH_current[PIP_CHANNELS_CURRENT][PIP_VOL_CURRENT][8]
+        LOG_GING.info(f"current_val:{current_val}")
+        await helpers_ot3.update_pick_up_current(api,mount,current_val)
+    elif PIP_CHANNELS_CURRENT == 1:
+        current_val = PRESSURE_THRESH_current[PIP_CHANNELS_CURRENT][PIP_VOL_CURRENT][1]
+        LOG_GING.info(f"current_val:{current_val}")
+        await helpers_ot3.update_pick_up_current(api,mount,current_val)
     if fixture:
         await _pick_up_tip_for_tip_volume(api, mount, tip_volume=tip_volume)
         assert write_cb, "pressure fixture requires recording data to disk"
@@ -1172,14 +1182,27 @@ async def _test_diagnostics_pressure(
     
     global CHTYPE_PIPPETE 
     movez = -100
+    
     if "p50" in pipptype[OT3Mount.LEFT]['name']:
         CHTYPE_PIPPETE = 50
-        movez = -155.5
+        if "single" in pipptype[OT3Mount.LEFT]['name']:
+            movez = -155.5   
+            current_val = PRESSURE_THRESH_current[pip_channels][CHTYPE_PIPPETE][1]
+        elif "multi" in pipptype[OT3Mount.LEFT]['name']:
+            movez = -154.8
+            current_val = PRESSURE_THRESH_current[pip_channels][CHTYPE_PIPPETE][2]
+            
     elif "p1000" in pipptype[OT3Mount.LEFT]['name']:
         CHTYPE_PIPPETE = 1000
         movez = -117.86
-    
-    
+
+        if "single" in pipptype[OT3Mount.LEFT]['name']:  
+            current_val = PRESSURE_THRESH_current[pip_channels][CHTYPE_PIPPETE][1]
+        elif "multi" in pipptype[OT3Mount.LEFT]['name']:
+            current_val = PRESSURE_THRESH_current[pip_channels][CHTYPE_PIPPETE][2]
+    print("current_val",current_val)
+    await helpers_ot3.update_pick_up_current(api,mount,current_val)
+        
 
     for sensor_id in sensor_ids:
         pressure = await _read_pressure(sensor_id)
@@ -1389,7 +1412,7 @@ async def _jog_for_tip_state(
 
     async def _matches_state(_state: TipStateType) -> bool:
         try:
-            await asyncio.sleep(0.2)
+            await asyncio.sleep(0.5)
             await api.verify_tip_presence(mount, _state)
             return True
         except FailedTipStateCheck:
@@ -1413,6 +1436,10 @@ async def _jog_for_tip_state(
             return passed
     #print(f"ERROR: did not find {tip_state.name} displacement: {current_z}")
     LOG_GING.error(f"ERROR: did not find {tip_state.name} displacement: {current_z}")
+    printsig = f"06-03-tip-presence:光电传感器故障,在状态{tip_state.name} 位移最大值{current_z} 没触发光电开关"
+    ui.print_fail(printsig)
+    FINAL_TEST_FAIL_INFOR.append(printsig)
+    LOG_GING.error(printsig)
     return False
 
 
@@ -1783,349 +1810,384 @@ def _test_barcode(api: OT3API, pipette_sn: str) -> Tuple[str, bool]:
 
 
 async def _main(test_config: TestConfig) -> None:  # noqa: C901
-    global IDEAL_LABWARE_LOCATIONS
-    global CALIBRATED_LABWARE_LOCATIONS
-    global FINAL_TEST_RESULTS
-    global PRESSURE_DATA_CACHE
-    global FINAL_TEST_FAIL_INFOR
-    global LOG_GING
+    try:
 
-    FINAL_TEST_FAIL_INFOR = []
-    # connect to the pressure fixture (or simulate one)
-    fixture = connect_to_fixture(
-        test_config.simulate or test_config.skip_fixture, side=test_config.fixture_side
-    )
+        global IDEAL_LABWARE_LOCATIONS
+        global CALIBRATED_LABWARE_LOCATIONS
+        global FINAL_TEST_RESULTS
+        global PRESSURE_DATA_CACHE
+        global FINAL_TEST_FAIL_INFOR
+        global LOG_GING
+        global PIP_CURRENT
+        global PIP_CHANNELS_CURRENT #pip_channels_stecurrent
+        global PIP_VOL_CURRENT #pip_vol_setcurrent
 
-    global ENVIRONMENT_SENSOR
-    ENVIRONMENT_SENSOR = asair_sensor.BuildAsairSensor(False)
-    
-    # create API instance, and get Pipette serial number
-    api = await helpers_ot3.build_async_ot3_hardware_api(
-        is_simulating=test_config.simulate,
-        # pipette_left="p1000_single_v3.4",
-        pipette_right="p1000_multi_v3.4",
-    )
 
-    global pipptype
-    pipptype = api.get_all_attached_instr()
-    print(f"pipette type: {pipptype[OT3Mount.LEFT]['name']}")
-
-    # home and move to attach position
-    await api.home([Axis.X, Axis.Y, Axis.Z_L, Axis.Z_R])
-
-    attach_pos = helpers_ot3.get_slot_calibration_square_position_ot3(5)
-    current_pos = await api.gantry_position(OT3Mount.RIGHT)
-    await api.move_to(OT3Mount.RIGHT, attach_pos._replace(z=current_pos.z))
-
-    pips = {OT3Mount.from_mount(m): p for m, p in api.hardware_pipettes.items() if p}
-    assert pips, "no pipettes attached"
-    for mount, pipette in pips.items():
-        pipette_sn = helpers_ot3.get_pipette_serial_ot3(pipette)
-        print(f"Pipette: {pipette_sn} on the {mount.name} mount")
-        if not api.is_simulator and not _get_operator_answer_to_question(
-            "qc this pipette?"
-        ):
-            continue
-        _reset_available_tip()
-
-        # setup our labware locations
-        pipette_volume = int(pipette.working_volume)
-        pipette_channels = int(pipette.channels)
-        IDEAL_LABWARE_LOCATIONS = _get_ideal_labware_locations(
-            test_config, pipette_channels
-        )
-        CALIBRATED_LABWARE_LOCATIONS = LabwareLocations(
-            trash=None,
-            tip_rack_1000=None,
-            tip_rack_200=None,
-            tip_rack_50=None,
-            reservoir=None,
-            plate_primary=None,
-            plate_secondary=None,
-            fixture=None,
+        FINAL_TEST_FAIL_INFOR = []
+        # connect to the pressure fixture (or simulate one)
+        fixture = connect_to_fixture(
+            test_config.simulate or test_config.skip_fixture, side=test_config.fixture_side
         )
 
-        # callback function for writing new data to CSV file
-        FINAL_TEST_RESULTS = []
-        PRESSURE_DATA_CACHE = []
-        csv_props, csv_cb = _create_csv_and_get_callbacks(pipette_sn)
-        LOG_GING = _save_logging_print(pipette_sn)
-        LOG_GING.info(f"Starting QC for pipette {pipette_sn}")
-        # cache the pressure-data header
-        csv_cb.pressure(PRESSURE_DATA_HEADER, first_row_value="")
-
-        if api.is_simulator:
-            pcba_version = "C2"
-        else:
-            subsystem = SubSystem.of_mount(mount)
-            pcba_version = api.attached_subsystems[subsystem].pcba_revision
-
-        #print(f"PCBA version: {pcba_version}")
-        LOG_GING.info(f"PCBA version: {pcba_version}")
-        # add metadata to CSV
-        # FIXME: create a set of CSV helpers, such that you can define a test-report
-        #        schema/format/line-length/etc., before having to fill its contents.
-        #        This would be very helpful, because changes to CVS length/contents
-        #        will break the analysis done in our Sheets
-        csv_cb.write(["--------"])
-        csv_cb.write(["METADATA"])
-        csv_cb.write(["test-name", csv_props.name])
-        csv_cb.write(["operator-name", test_config.operator_name])
-        csv_cb.write(["date", csv_props.id])  # run-id includes a date/time string
-        csv_cb.write(["pipette", pipette_sn])
-        csv_cb.write(["simulating" if test_config.simulate else "live"])
-        csv_cb.write(["version", data.get_git_description()])
-        csv_cb.write(["firmware", api.fw_version])
-        csv_cb.write(["pcba-revision", pcba_version])
-        # add test configurations to CSV
-        csv_cb.write(["-------------------"])
-        csv_cb.write(["TEST-CONFIGURATIONS"])
-        for f in fields(test_config):
-            csv_cb.write([f.name, getattr(test_config, f.name)])
-        csv_cb.write(["-------------------"])
-        csv_cb.write(["TEST-THRESHOLDS"])
-        csv_cb.write(["temperature"] + [str(t) for t in TEMP_THRESH])
-        csv_cb.write(["humidity"] + [str(t) for t in HUMIDITY_THRESH])
-        csv_cb.write(
-            ["capacitive-open-air"]
-            + [str(t) for t in CAP_THRESH_OPEN_AIR[pipette_channels]]
+        global ENVIRONMENT_SENSOR
+        ENVIRONMENT_SENSOR = asair_sensor.BuildAsairSensor(False)
+        
+        # create API instance, and get Pipette serial number
+        api = await helpers_ot3.build_async_ot3_hardware_api(
+            is_simulating=test_config.simulate,
+            # pipette_left="p1000_single_v3.4",
+            pipette_right="p1000_multi_v3.4",
         )
-        csv_cb.write(
-            ["capacitive-probe"] + [str(t) for t in CAP_THRESH_PROBE[pipette_channels]]
-        )
-        csv_cb.write(
-            ["capacitive-square"]
-            + [str(t) for t in CAP_THRESH_SQUARE[pipette_channels]]
-        )
-        csv_cb.write(
-            [
-                "pressure-microliters-aspirated",
-                PRESSURE_ASPIRATE_VOL[pipette_channels][pipette_volume],
-            ]
-        )
-        csv_cb.write(
-            ["pressure-open-air"]
-            + [str(t) for t in PRESSURE_THRESH_OPEN_AIR[pipette_channels]]
-        )
-        csv_cb.write(
-            ["pressure-sealed"]
-            + [str(t) for t in PRESSURE_THRESH_SEALED[pipette_channels]]
-        )
-        csv_cb.write(
-            ["pressure-compressed"]
-            + [str(t) for t in PRESSURE_THRESH_COMPRESS[pipette_channels]]
-        )
-        csv_cb.write(["probe-deck", PROBING_DECK_PRECISION_MM])
-        csv_cb.write(
-            ["liquid-probe-precision", LIQUID_PROBE_ERROR_THRESHOLD_PRECISION_MM]
-        )
-        csv_cb.write(
-            ["liquid-probe-accuracy", LIQUID_PROBE_ERROR_THRESHOLD_ACCURACY_MM]
-        )
-        # add pressure thresholds to CSV
-        csv_cb.write(["-----------------------"])
-        csv_cb.write(["PRESSURE-CONFIGURATIONS"])
-        for t, config in PRESSURE_CFG.items():
-            for f in fields(config):
-                csv_cb.write([t.value, f.name, getattr(config, f.name)])
 
-        # run the test
-        csv_cb.write(["----"])
-        csv_cb.write(["TEST"])
+        
+        
 
-        #print("homing")
-        LOG_GING.info("homing")
-        await api.home([Axis.of_main_tool_actuator(mount)])
+        global pipptype
+        pipptype = api.get_all_attached_instr()
+        print(f"pipette type: {pipptype[OT3Mount.LEFT]['name']}")
 
-        barcode_sn, barcode_passed = _test_barcode(api, pipette_sn)
-        csv_cb.write(
-            [
-                "pipette-barcode",
-                pipette_sn,
-                barcode_sn,
-                _bool_to_pass_fail(barcode_passed),
-            ]
-        )
-        pos_slot_3 = helpers_ot3.get_slot_calibration_square_position_ot3(3)
-        current_pos = await api.gantry_position(mount)
-        hover_over_slot_3 = pos_slot_3._replace(z=current_pos.z)
+        # home and move to attach position
+        await api.home([Axis.X, Axis.Y, Axis.Z_L, Axis.Z_R])
 
-        if not test_config.skip_plunger or not test_config.skip_diagnostics:
-            
-            if not test_config.skip_diagnostics:
-                """fail code 01"""
-                LOG_GING.info("test-diagnostics")
-                await api.move_to(mount, hover_over_slot_3)
-                await api.move_rel(mount, Point(z=-20))
-                test_passed = await _test_diagnostics(api, mount, csv_cb.write)
-                await api.retract(mount)
-                csv_cb.results("diagnostics", test_passed)
-            if not test_config.skip_plunger:
-                """fail code 02"""
-                LOG_GING.info("test-diagnostics")
-                await api.move_to(mount, hover_over_slot_3)
-                await api.move_rel(mount, Point(z=-20))
-                test_passed = await _test_plunger_positions(api, mount, csv_cb.write)
-                csv_cb.results("plunger", test_passed)
-
-        if not test_config.skip_liquid_probe:
-            """fail code 03"""
-            LOG_GING.info("test-liquid_probe")
-            tip_vols = [50] if pipette_volume == 50 else [50, 200, 1000]
-            probes = [InstrumentProbeType.PRIMARY]
-            if pipette_channels > 1:
-                probes.append(InstrumentProbeType.SECONDARY)
-            test_passed = True
-            for tip_vol in tip_vols:
-                # force the operator to re-calibrate the liquid for each tip-type
-                CALIBRATED_LABWARE_LOCATIONS.plate_primary = None
-                CALIBRATED_LABWARE_LOCATIONS.plate_secondary = None
-                await _pick_up_tip_for_tip_volume(api, mount, tip_vol)
-                for probe in probes:
-                    await _move_to_plate_liquid(api, mount, probe=probe)
-                await _drop_tip_in_trash(api, mount)
-                probes_data = await _test_liquid_probe(
-                    api, mount, tip_volume=tip_vol, trials=3, probes=probes
-                )
-                for probe in probes:
-                    probe_data = probes_data[probe]
-                    for trial, found_height in enumerate(probe_data):
-                        csv_label = (
-                            f"liquid-probe-{tip_vol}-"
-                            f"tip-{probe.name.lower()}-probe-trial-{trial}"
-                        )
-                        csv_cb.write([csv_label, round(found_height, 2)])
-                    precision = abs(max(probe_data) - min(probe_data)) * 0.5
-                    accuracy = sum(probe_data) / len(probe_data)
-                    prec_tag = f"liquid-probe-{tip_vol}-tip-{probe.name.lower()}-probe-precision"
-                    acc_tag = f"liquid-probe-{tip_vol}-tip-{probe.name.lower()}-probe-accuracy"
-                    tip_tag = f"liquid-probe-{tip_vol}-tip-{probe.name.lower()}-probe"
-                    precision_passed = bool(
-                        precision < LIQUID_PROBE_ERROR_THRESHOLD_PRECISION_MM
-                    )
-                    accuracy_passed = bool(
-                        abs(accuracy) < LIQUID_PROBE_ERROR_THRESHOLD_ACCURACY_MM
-                    )
-                    tip_passed = precision_passed and accuracy_passed
-                    print(prec_tag, precision, _bool_to_pass_fail(precision_passed))
-                    print(acc_tag, accuracy, _bool_to_pass_fail(accuracy_passed))
-                    print(tip_tag, _bool_to_pass_fail(tip_passed))
-                    csv_cb.write(
-                        [prec_tag, precision, _bool_to_pass_fail(precision_passed)]
-                    )
-                    csv_cb.write(
-                        [acc_tag, accuracy, _bool_to_pass_fail(accuracy_passed)]
-                    )
-                    csv_cb.write([tip_tag, _bool_to_pass_fail(tip_passed)])
-                    if not tip_passed:
-                        test_passed = False
-
-                    if not precision_passed:
-                        prec_tag2 = f"03-01-liquid-probe:测试液体探测,{tip_vol}ul针管{probe.name.lower()}自动点水精度{precision}结果{_bool_to_pass_fail(precision_passed)} 阈值为(<{LIQUID_PROBE_ERROR_THRESHOLD_PRECISION_MM} mm)"
-                        ui.print_fail(prec_tag2)
-                        FINAL_TEST_FAIL_INFOR.append(prec_tag2)
-                        LOG_GING.error(prec_tag2)
-                    if not accuracy_passed:
-                        acc_tag2 = f"03-02-liquid-probe:测试液体探测,{tip_vol}ul针管{probe.name.lower()}自动点水准确度{accuracy}结果{_bool_to_pass_fail(accuracy_passed)} 阈值为(<{LIQUID_PROBE_ERROR_THRESHOLD_ACCURACY_MM} mm)"
-                        ui.print_fail(acc_tag2)
-                        FINAL_TEST_FAIL_INFOR.append(acc_tag2)
-                        LOG_GING.error(acc_tag2)
-                    if not tip_passed:
-                        tip_tag2 = f"03-03-liquid-probe:测试液体探测,{tip_vol}ul针管{probe.name.lower()}自动点水测试结果{tip_passed}"
-                        ui.print_fail(tip_tag2)
-                        FINAL_TEST_FAIL_INFOR.append(tip_tag2)
-                        LOG_GING.error(tip_tag2)
-
-            csv_cb.results("liquid-probe", test_passed)
-
-        if not test_config.skip_liquid:
-            """fail code 04"""
-            LOG_GING.info("test-skip_liquid")
-            for i in range(test_config.num_trials):
-                droplet_wait_seconds = test_config.droplet_wait_seconds * (i + 1)
-                test_passed = await _test_for_leak_by_eye(
-                    api,
-                    mount,
-                    test_config,
-                    tip_volume=pipette_volume,
-                    droplet_wait_time=droplet_wait_seconds,
-                )
-                if not test_passed:
-                    printsig = f"04-01-liquid:测试吸液保持,吸水后等待 {droplet_wait_seconds} 秒针管漏液"
-                    ui.print_fail(printsig)
-                    FINAL_TEST_FAIL_INFOR.append(printsig)
-                    LOG_GING.error(printsig)
-                    
-                csv_cb.results(f"droplets-{droplet_wait_seconds}", test_passed)
-
-        if not test_config.skip_fixture:
-            """fail code 05"""
-            LOG_GING.info("test-fixture")
-            test_passed = await _test_for_leak(
-                api,
-                mount,
-                test_config,
-                tip_volume=PRESSURE_FIXTURE_TIP_VOLUME,
-                fixture=fixture,
-                write_cb=csv_cb.write,
-                accumulate_raw_data_cb=csv_cb.pressure,
-            )
-            csv_cb.results("pressure", test_passed)
-
-        if not test_config.skip_tip_presence:
-            """fail code 06"""
-            LOG_GING.info("test-tip_presence")
-            test_passed = await _test_tip_presence_flag(api, mount, csv_cb.write)
-            print("tip-presence: ", _bool_to_pass_fail(test_passed))
-            csv_cb.results("tip-presence", test_passed)
-
-        print("test complete")
-        csv_cb.write(["-------------"])
-        csv_cb.write(["PRESSURE-DATA"])
-        for press_data in PRESSURE_DATA_CACHE:
-            csv_cb.write(press_data, first_row_value_included=True)
-
-        # put the top-line results at the top of the CSV file
-        # so here we cache each data line, then add them to the top
-        # of the file in reverse order
-        _results_csv_lines = list()
-        # add extra entries of black cells to the top of the CSV
-        # to help operators when the copy/paste
-        _results_csv_lines.append(
-            ["-------"] + ["---" for _ in range(len(PRESSURE_DATA_HEADER) - 1)]
-        )
-        _results_csv_lines.append(["RESULTS"])
-        print("final test results:")
-        for result in FINAL_TEST_RESULTS:
-            _results_csv_lines.append(result)
-            print(" - " + "\t".join(result))
-        _results_csv_lines.reverse()
-        for r in _results_csv_lines:
-            csv_cb.write(r, line_number=0, first_row_value="0.0")
-
-        # print the filepath again, to help debugging
-        print(f"CSV: {csv_props.name}")
-
-        # move to attach position
-        await api.retract(mount)
+        attach_pos = helpers_ot3.get_slot_calibration_square_position_ot3(5)
         current_pos = await api.gantry_position(OT3Mount.RIGHT)
         await api.move_to(OT3Mount.RIGHT, attach_pos._replace(z=current_pos.z))
 
-    setflag = 0
-    sensor_err = []
-    if len(FINAL_TEST_FAIL_INFOR) > 0:
-        for errval in FINAL_TEST_FAIL_INFOR:
-            if "07-" in FINAL_TEST_FAIL_INFOR:
-                sensor_err.append(errval)
-                setflag = 1
-        if setflag == 0:
-            ui.print_results(FINAL_TEST_FAIL_INFOR,False)
-        elif setflag == 1:
-            ui.print_results(sensor_err,False)
-    else:
-        ui.print_results(FINAL_TEST_FAIL_INFOR,True)
-    LOG_GING.info("done")
-    #print("done")
+        pips = {OT3Mount.from_mount(m): p for m, p in api.hardware_pipettes.items() if p}
+        assert pips, "no pipettes attached"
+        for mount, pipette in pips.items():
+            
+            PIP_CURRENT = api.hardware_pipettes[mount.to_mount()]
+            assert PIP_CURRENT
+            PIP_CHANNELS_CURRENT = int(PIP_CURRENT.channels)
+            PIP_VOL_CURRENT = int(PIP_CURRENT.working_volume)
+
+            pipette_sn = helpers_ot3.get_pipette_serial_ot3(pipette)
+            print(f"Pipette: {pipette_sn} on the {mount.name} mount")
+            if not api.is_simulator and not _get_operator_answer_to_question(
+                "qc this pipette?"
+            ):
+                continue
+            _reset_available_tip()
+
+            # setup our labware locations
+            pipette_volume = int(pipette.working_volume)
+            pipette_channels = int(pipette.channels)
+            IDEAL_LABWARE_LOCATIONS = _get_ideal_labware_locations(
+                test_config, pipette_channels
+            )
+            CALIBRATED_LABWARE_LOCATIONS = LabwareLocations(
+                trash=None,
+                tip_rack_1000=None,
+                tip_rack_200=None,
+                tip_rack_50=None,
+                reservoir=None,
+                plate_primary=None,
+                plate_secondary=None,
+                fixture=None,
+            )
+
+            # callback function for writing new data to CSV file
+            FINAL_TEST_RESULTS = []
+            PRESSURE_DATA_CACHE = []
+            csv_props, csv_cb = _create_csv_and_get_callbacks(pipette_sn)
+            LOG_GING = _save_logging_print(pipette_sn)
+            LOG_GING.info(f"Starting QC for pipette {pipette_sn}")
+            # cache the pressure-data header
+            csv_cb.pressure(PRESSURE_DATA_HEADER, first_row_value="")
+
+            if api.is_simulator:
+                pcba_version = "C2"
+            else:
+                subsystem = SubSystem.of_mount(mount)
+                pcba_version = api.attached_subsystems[subsystem].pcba_revision
+
+            #print(f"PCBA version: {pcba_version}")
+            LOG_GING.info(f"PCBA version: {pcba_version}")
+            # add metadata to CSV
+            # FIXME: create a set of CSV helpers, such that you can define a test-report
+            #        schema/format/line-length/etc., before having to fill its contents.
+            #        This would be very helpful, because changes to CVS length/contents
+            #        will break the analysis done in our Sheets
+            csv_cb.write(["--------"])
+            csv_cb.write(["METADATA"])
+            csv_cb.write(["test-name", csv_props.name])
+            csv_cb.write(["operator-name", test_config.operator_name])
+            csv_cb.write(["date", csv_props.id])  # run-id includes a date/time string
+            csv_cb.write(["pipette", pipette_sn])
+            csv_cb.write(["simulating" if test_config.simulate else "live"])
+            csv_cb.write(["version", data.get_git_description()])
+            csv_cb.write(["firmware", api.fw_version])
+            csv_cb.write(["pcba-revision", pcba_version])
+            # add test configurations to CSV
+            csv_cb.write(["-------------------"])
+            csv_cb.write(["TEST-CONFIGURATIONS"])
+            for f in fields(test_config):
+                csv_cb.write([f.name, getattr(test_config, f.name)])
+            csv_cb.write(["-------------------"])
+            csv_cb.write(["TEST-THRESHOLDS"])
+            csv_cb.write(["temperature"] + [str(t) for t in TEMP_THRESH])
+            csv_cb.write(["humidity"] + [str(t) for t in HUMIDITY_THRESH])
+            csv_cb.write(
+                ["capacitive-open-air"]
+                + [str(t) for t in CAP_THRESH_OPEN_AIR[pipette_channels]]
+            )
+            csv_cb.write(
+                ["capacitive-probe"] + [str(t) for t in CAP_THRESH_PROBE[pipette_channels]]
+            )
+            csv_cb.write(
+                ["capacitive-square"]
+                + [str(t) for t in CAP_THRESH_SQUARE[pipette_channels]]
+            )
+            csv_cb.write(
+                [
+                    "pressure-microliters-aspirated",
+                    PRESSURE_ASPIRATE_VOL[pipette_channels][pipette_volume],
+                ]
+            )
+            csv_cb.write(
+                ["pressure-open-air"]
+                + [str(t) for t in PRESSURE_THRESH_OPEN_AIR[pipette_channels]]
+            )
+            csv_cb.write(
+                ["pressure-sealed"]
+                + [str(t) for t in PRESSURE_THRESH_SEALED[pipette_channels]]
+            )
+            csv_cb.write(
+                ["pressure-compressed"]
+                + [str(t) for t in PRESSURE_THRESH_COMPRESS[pipette_channels]]
+            )
+            csv_cb.write(["probe-deck", PROBING_DECK_PRECISION_MM])
+            csv_cb.write(
+                ["liquid-probe-precision", LIQUID_PROBE_ERROR_THRESHOLD_PRECISION_MM]
+            )
+            csv_cb.write(
+                ["liquid-probe-accuracy", LIQUID_PROBE_ERROR_THRESHOLD_ACCURACY_MM]
+            )
+            # add pressure thresholds to CSV
+            csv_cb.write(["-----------------------"])
+            csv_cb.write(["PRESSURE-CONFIGURATIONS"])
+            for t, config in PRESSURE_CFG.items():
+                for f in fields(config):
+                    csv_cb.write([t.value, f.name, getattr(config, f.name)])
+
+            # run the test
+            csv_cb.write(["----"])
+            csv_cb.write(["TEST"])
+
+            #print("homing")
+            LOG_GING.info("homing")
+            await api.home([Axis.of_main_tool_actuator(mount)])
+
+            barcode_sn, barcode_passed = _test_barcode(api, pipette_sn)
+            csv_cb.write(
+                [
+                    "pipette-barcode",
+                    pipette_sn,
+                    barcode_sn,
+                    _bool_to_pass_fail(barcode_passed),
+                ]
+            )
+            pos_slot_3 = helpers_ot3.get_slot_calibration_square_position_ot3(3)
+            current_pos = await api.gantry_position(mount)
+            hover_over_slot_3 = pos_slot_3._replace(z=current_pos.z)
+
+            if not test_config.skip_plunger or not test_config.skip_diagnostics:
+                
+                if not test_config.skip_diagnostics:
+                    """fail code 01"""
+                    LOG_GING.info("test-diagnostics")
+                    await api.move_to(mount, hover_over_slot_3)
+                    await api.move_rel(mount, Point(z=-20))
+                    test_passed = await _test_diagnostics(api, mount, csv_cb.write)
+                    await api.retract(mount)
+                    csv_cb.results("diagnostics", test_passed)
+                if not test_config.skip_plunger:
+                    """fail code 02"""
+                    LOG_GING.info("test-diagnostics")
+                    await api.move_to(mount, hover_over_slot_3)
+                    await api.move_rel(mount, Point(z=-20))
+                    test_passed = await _test_plunger_positions(api, mount, csv_cb.write)
+                    csv_cb.results("plunger", test_passed)
+
+            if not test_config.skip_liquid_probe:
+                """fail code 03"""
+                LOG_GING.info("test-liquid_probe")
+                tip_vols = [50] if pipette_volume == 50 else [50, 200, 1000]
+                probes = [InstrumentProbeType.PRIMARY]
+                if pipette_channels > 1:
+                    probes.append(InstrumentProbeType.SECONDARY)
+                test_passed = True
+                for tip_vol in tip_vols:
+                    # force the operator to re-calibrate the liquid for each tip-type
+                    CALIBRATED_LABWARE_LOCATIONS.plate_primary = None
+                    CALIBRATED_LABWARE_LOCATIONS.plate_secondary = None
+                    
+                    # pip = api.hardware_pipettes[mount.to_mount()]
+                    # assert pip
+                    # pip_channels = int(pip.channels)
+                    # pip_vol = int(pip.working_volume)
+                    if PIP_CHANNELS_CURRENT == 8:
+                        current_val = PRESSURE_THRESH_current[PIP_CHANNELS_CURRENT][PIP_VOL_CURRENT][2]
+                        LOG_GING.info(f"current_val:{current_val}")
+                        await helpers_ot3.update_pick_up_current(api,mount,current_val)
+                    elif PIP_CHANNELS_CURRENT == 1:
+                        current_val = PRESSURE_THRESH_current[PIP_CHANNELS_CURRENT][PIP_VOL_CURRENT][1]
+                        LOG_GING.info(f"current_val:{current_val}")
+                        await helpers_ot3.update_pick_up_current(api,mount,current_val)
+
+                    await _pick_up_tip_for_tip_volume(api, mount, tip_vol)
+                    for probe in probes:
+                        await _move_to_plate_liquid(api, mount, probe=probe)
+                    await _drop_tip_in_trash(api, mount)
+                    probes_data = await _test_liquid_probe(
+                        api, mount, tip_volume=tip_vol, trials=3, probes=probes
+                    )
+                    for probe in probes:
+                        probe_data = probes_data[probe]
+                        for trial, found_height in enumerate(probe_data):
+                            csv_label = (
+                                f"liquid-probe-{tip_vol}-"
+                                f"tip-{probe.name.lower()}-probe-trial-{trial}"
+                            )
+                            csv_cb.write([csv_label, round(found_height, 2)])
+                        precision = abs(max(probe_data) - min(probe_data)) * 0.5
+                        accuracy = sum(probe_data) / len(probe_data)
+                        prec_tag = f"liquid-probe-{tip_vol}-tip-{probe.name.lower()}-probe-precision"
+                        acc_tag = f"liquid-probe-{tip_vol}-tip-{probe.name.lower()}-probe-accuracy"
+                        tip_tag = f"liquid-probe-{tip_vol}-tip-{probe.name.lower()}-probe"
+                        precision_passed = bool(
+                            precision < LIQUID_PROBE_ERROR_THRESHOLD_PRECISION_MM
+                        )
+                        accuracy_passed = bool(
+                            abs(accuracy) < LIQUID_PROBE_ERROR_THRESHOLD_ACCURACY_MM
+                        )
+                        tip_passed = precision_passed and accuracy_passed
+                        print(prec_tag, precision, _bool_to_pass_fail(precision_passed))
+                        print(acc_tag, accuracy, _bool_to_pass_fail(accuracy_passed))
+                        print(tip_tag, _bool_to_pass_fail(tip_passed))
+                        csv_cb.write(
+                            [prec_tag, precision, _bool_to_pass_fail(precision_passed)]
+                        )
+                        csv_cb.write(
+                            [acc_tag, accuracy, _bool_to_pass_fail(accuracy_passed)]
+                        )
+                        csv_cb.write([tip_tag, _bool_to_pass_fail(tip_passed)])
+                        if not tip_passed:
+                            test_passed = False
+
+                        if not precision_passed:
+                            prec_tag2 = f"03-01-liquid-probe:测试液体探测,{tip_vol}ul针管{probe.name.lower()}自动点水精度{precision}结果{_bool_to_pass_fail(precision_passed)} 阈值为(<{LIQUID_PROBE_ERROR_THRESHOLD_PRECISION_MM} mm)"
+                            ui.print_fail(prec_tag2)
+                            FINAL_TEST_FAIL_INFOR.append(prec_tag2)
+                            LOG_GING.error(prec_tag2)
+                        if not accuracy_passed:
+                            acc_tag2 = f"03-02-liquid-probe:测试液体探测,{tip_vol}ul针管{probe.name.lower()}自动点水准确度{accuracy}结果{_bool_to_pass_fail(accuracy_passed)} 阈值为(<{LIQUID_PROBE_ERROR_THRESHOLD_ACCURACY_MM} mm)"
+                            ui.print_fail(acc_tag2)
+                            FINAL_TEST_FAIL_INFOR.append(acc_tag2)
+                            LOG_GING.error(acc_tag2)
+                        if not tip_passed:
+                            tip_tag2 = f"03-03-liquid-probe:测试液体探测,{tip_vol}ul针管{probe.name.lower()}自动点水测试结果{tip_passed}"
+                            ui.print_fail(tip_tag2)
+                            FINAL_TEST_FAIL_INFOR.append(tip_tag2)
+                            LOG_GING.error(tip_tag2)
+
+                csv_cb.results("liquid-probe", test_passed)
+
+            if not test_config.skip_liquid:
+                """fail code 04"""
+                LOG_GING.info("test-skip_liquid")
+                for i in range(test_config.num_trials):
+                    droplet_wait_seconds = test_config.droplet_wait_seconds * (i + 1)
+                    test_passed = await _test_for_leak_by_eye(
+                        api,
+                        mount,
+                        test_config,
+                        tip_volume=pipette_volume,
+                        droplet_wait_time=droplet_wait_seconds,
+                    )
+                    if not test_passed:
+                        printsig = f"04-01-liquid:测试吸液保持,吸水后等待 {droplet_wait_seconds} 秒针管漏液"
+                        ui.print_fail(printsig)
+                        FINAL_TEST_FAIL_INFOR.append(printsig)
+                        LOG_GING.error(printsig)
+                        
+                    csv_cb.results(f"droplets-{droplet_wait_seconds}", test_passed)
+
+            if not test_config.skip_fixture:
+                """fail code 05"""
+                LOG_GING.info("test-fixture")
+                test_passed = await _test_for_leak(
+                    api,
+                    mount,
+                    test_config,
+                    tip_volume=PRESSURE_FIXTURE_TIP_VOLUME,
+                    fixture=fixture,
+                    write_cb=csv_cb.write,
+                    accumulate_raw_data_cb=csv_cb.pressure,
+                )
+                csv_cb.results("pressure", test_passed)
+
+            if not test_config.skip_tip_presence:
+                """fail code 06"""
+                LOG_GING.info("test-tip_presence")
+                test_passed = await _test_tip_presence_flag(api, mount, csv_cb.write)
+                print("tip-presence: ", _bool_to_pass_fail(test_passed))
+                csv_cb.results("tip-presence", test_passed)
+
+            print("test complete")
+            csv_cb.write(["-------------"])
+            csv_cb.write(["PRESSURE-DATA"])
+            for press_data in PRESSURE_DATA_CACHE:
+                csv_cb.write(press_data, first_row_value_included=True)
+
+            # put the top-line results at the top of the CSV file
+            # so here we cache each data line, then add them to the top
+            # of the file in reverse order
+            _results_csv_lines = list()
+            # add extra entries of black cells to the top of the CSV
+            # to help operators when the copy/paste
+            _results_csv_lines.append(
+                ["-------"] + ["---" for _ in range(len(PRESSURE_DATA_HEADER) - 1)]
+            )
+            _results_csv_lines.append(["RESULTS"])
+            print("final test results:")
+            for result in FINAL_TEST_RESULTS:
+                _results_csv_lines.append(result)
+                print(" - " + "\t".join(result))
+            _results_csv_lines.reverse()
+            for r in _results_csv_lines:
+                csv_cb.write(r, line_number=0, first_row_value="0.0")
+
+            # print the filepath again, to help debugging
+            print(f"CSV: {csv_props.name}")
+
+            # move to attach position
+            await api.retract(mount)
+            current_pos = await api.gantry_position(OT3Mount.RIGHT)
+            await api.move_to(OT3Mount.RIGHT, attach_pos._replace(z=current_pos.z))
+
+        setflag = 0
+        sensor_err = []
+        if len(FINAL_TEST_FAIL_INFOR) > 0:
+            for errval in FINAL_TEST_FAIL_INFOR:
+                if "07-" in FINAL_TEST_FAIL_INFOR:
+                    sensor_err.append(errval)
+                    setflag = 1
+            if setflag == 0:
+                ui.print_results(FINAL_TEST_FAIL_INFOR,False)
+            elif setflag == 1:
+                ui.print_results(sensor_err,False)
+        else:
+            ui.print_test_results("诊断测试通过(ASSEMBLY QC TESTING PASS)",True)
+        LOG_GING.info("done")
+        #print("done")
+    except Exception as err:
+        printsig = f"08-01-assembly-system-error:移液器不能达到测试标准,触发了系统错误,日志:{err}"
+        ui.print_fail(printsig)
+        LOG_GING.error(printsig)
+        LOG_GING.critical(err)
+
 
 
 if __name__ == "__main__":
