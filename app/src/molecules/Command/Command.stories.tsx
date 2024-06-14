@@ -152,11 +152,21 @@ export const TwoLineCommand: Story = {
     state: 'current',
   },
 }
-export const ManyLineCommand: Story = {
+export const ThermocyclerProfile: Story = {
   args: {
     selectCommandBy: 'command type',
     commandType: 'thermocycler/runProfile',
     commandTypeIndex: 0,
+    aligned: 'left',
+    state: 'current',
+  },
+}
+
+export const VeryLongCommand: Story = {
+  args: {
+    selectCommandBy: 'command type',
+    commandType: 'custom',
+    commandTypeIndex: 5,
     aligned: 'left',
     state: 'current',
   },
