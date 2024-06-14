@@ -2,7 +2,7 @@ import { describe, it, expect } from 'vitest'
 import { renderHook, act } from '@testing-library/react'
 
 import {
-  usePreviousRecoveryRoute,
+  useSelectedRecoveryOption,
   useRecoveryRouting,
 } from '../useRecoveryRouting'
 import { RECOVERY_MAP } from '../../constants'
@@ -40,7 +40,7 @@ const { BEFORE_BEGINNING, DROP_TIP_FLOWS, OPTION_SELECTION } = RECOVERY_MAP
 describe('usePreviousRecoveryRoute', () => {
   it('should initialize with null as the previous route', () => {
     const { result } = renderHook(() =>
-      usePreviousRecoveryRoute(BEFORE_BEGINNING.ROUTE)
+      useSelectedRecoveryOption(BEFORE_BEGINNING.ROUTE)
     )
 
     expect(result.current).toBeNull()
@@ -48,7 +48,7 @@ describe('usePreviousRecoveryRoute', () => {
 
   it('should update the previous route when the current route changes', () => {
     const { result, rerender } = renderHook(
-      route => usePreviousRecoveryRoute(route),
+      route => useSelectedRecoveryOption(route),
       {
         initialProps: BEFORE_BEGINNING.ROUTE as any,
       }
@@ -69,7 +69,7 @@ describe('usePreviousRecoveryRoute', () => {
 
   it('should not update the previous route if the current route remains the same', () => {
     const { result, rerender } = renderHook(
-      route => usePreviousRecoveryRoute(route),
+      route => useSelectedRecoveryOption(route),
       {
         initialProps: BEFORE_BEGINNING.ROUTE as any,
       }

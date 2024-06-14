@@ -47,7 +47,7 @@ export function BeginRemoval({
   tipStatusUtils,
   routeUpdateActions,
   recoveryCommands,
-  previousRoute,
+  currentRecoveryOptionUtils,
 }: RecoveryContentProps): JSX.Element | null {
   const { t } = useTranslation('error_recovery')
   const { pipettesWithTip } = tipStatusUtils
@@ -57,6 +57,7 @@ export function BeginRemoval({
     proceedToRouteAndStep,
   } = routeUpdateActions
   const { cancelRun } = recoveryCommands
+  const { selectedRecoveryOption } = currentRecoveryOptionUtils
   const { ROBOT_CANCELING, RETRY_NEW_TIPS } = RECOVERY_MAP
   const mount = head(pipettesWithTip)?.mount
 
@@ -68,7 +69,7 @@ export function BeginRemoval({
     if (selected === 'begin-removal') {
       void proceedNextStep()
     } else {
-      if (previousRoute === RETRY_NEW_TIPS.ROUTE) {
+      if (selectedRecoveryOption === RETRY_NEW_TIPS.ROUTE) {
         void proceedToRouteAndStep(
           RETRY_NEW_TIPS.ROUTE,
           RETRY_NEW_TIPS.STEPS.REPLACE_TIPS
@@ -123,10 +124,11 @@ function DropTipFlowsContainer(props: RecoveryContentProps): JSX.Element {
     routeUpdateActions,
     recoveryCommands,
     isFlex,
-    previousRoute,
+    currentRecoveryOptionUtils,
   } = props
   const { DROP_TIP_FLOWS, ROBOT_CANCELING, RETRY_NEW_TIPS } = RECOVERY_MAP
   const { proceedToRouteAndStep, setRobotInMotion } = routeUpdateActions
+  const { selectedRecoveryOption } = currentRecoveryOptionUtils
   const { setTipStatusResolved } = tipStatusUtils
   const { cancelRun } = recoveryCommands
 
@@ -135,7 +137,7 @@ function DropTipFlowsContainer(props: RecoveryContentProps): JSX.Element {
   ) as PipetteWithTip // Safe as we have to have tips to get to this point in the flow.
 
   const onCloseFlow = (): void => {
-    if (previousRoute === RETRY_NEW_TIPS.ROUTE) {
+    if (selectedRecoveryOption === RETRY_NEW_TIPS.ROUTE) {
       void proceedToRouteAndStep(
         RETRY_NEW_TIPS.ROUTE,
         RETRY_NEW_TIPS.STEPS.REPLACE_TIPS
@@ -172,17 +174,18 @@ function DropTipFlowsContainer(props: RecoveryContentProps): JSX.Element {
 export function useDropTipFlowUtils({
   tipStatusUtils,
   failedCommand,
-  previousRoute,
+  currentRecoveryOptionUtils,
   trackExternalMap,
 }: RecoveryContentProps): FixitCommandTypeUtils {
   const { t } = useTranslation('error_recovery')
   const { runId } = tipStatusUtils
+  const { selectedRecoveryOption } = currentRecoveryOptionUtils
   const failedCommandId = failedCommand?.id ?? '' // We should have a failed command here unless the run is not in AWAITING_RECOVERY.
 
   const buildTipDropCompleteBtn = (): string => {
     const { RETRY_NEW_TIPS } = RECOVERY_MAP
 
-    switch (previousRoute) {
+    switch (selectedRecoveryOption) {
       case RETRY_NEW_TIPS.ROUTE:
         return t('proceed_to_tip_selection')
       default:

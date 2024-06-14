@@ -27,10 +27,12 @@ export function SelectRecoveryOption({
   errorKind,
   routeUpdateActions,
   tipStatusUtils,
+  currentRecoveryOptionUtils,
 }: RecoveryContentProps): JSX.Element | null {
   const { t } = useTranslation('error_recovery')
   const { proceedToRouteAndStep } = routeUpdateActions
   const { determineTipStatus } = tipStatusUtils
+  const { setSelectedRecoveryOption } = currentRecoveryOptionUtils
   const validRecoveryOptions = getRecoveryOptions(errorKind)
   const [selectedRoute, setSelectedRoute] = React.useState<RecoveryRoute>(
     head(validRecoveryOptions) as RecoveryRoute
@@ -53,9 +55,10 @@ export function SelectRecoveryOption({
         </Flex>
         <RecoveryFooterButtons
           isOnDevice={isOnDevice}
-          primaryBtnOnClick={() =>
-            proceedToRouteAndStep(selectedRoute as RecoveryRoute)
-          }
+          primaryBtnOnClick={() => {
+            setSelectedRecoveryOption(selectedRoute)
+            void proceedToRouteAndStep(selectedRoute as RecoveryRoute)
+          }}
         />
       </RecoverySingleColumnContent>
     )

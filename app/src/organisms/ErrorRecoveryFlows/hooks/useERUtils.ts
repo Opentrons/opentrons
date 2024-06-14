@@ -12,12 +12,13 @@ import {
 } from '../../../resources/runs'
 
 import type { PipetteData } from '@opentrons/api-client'
-import type { IRecoveryMap, RecoveryRoute } from '../types'
+import type { IRecoveryMap } from '../types'
 import type { ErrorRecoveryFlowsProps } from '..'
 import type { UseRouteUpdateActionsResult } from './useRouteUpdateActions'
 import type { UseRecoveryCommandsResult } from './useRecoveryCommands'
 import type { RecoveryTipStatusUtils } from './useRecoveryTipStatus'
 import type { UseFailedLabwareUtilsResult } from './useFailedLabwareUtils'
+import type { CurrentRecoveryOptionUtils } from './useRecoveryRouting'
 
 type ERUtilsProps = ErrorRecoveryFlowsProps & {
   toggleERWizard: (launchER: boolean) => Promise<void>
@@ -26,7 +27,7 @@ type ERUtilsProps = ErrorRecoveryFlowsProps & {
 
 export interface ERUtilsResults {
   recoveryMap: IRecoveryMap
-  previousRoute: RecoveryRoute | null
+  currentRecoveryOptionUtils: CurrentRecoveryOptionUtils
   routeUpdateActions: UseRouteUpdateActionsResult
   recoveryCommands: UseRecoveryCommandsResult
   tipStatusUtils: RecoveryTipStatusUtils
@@ -58,7 +59,7 @@ export function useERUtils({
     recoveryMap,
     setRM,
     trackExternalMap,
-    previousRoute,
+    currentRecoveryOptionUtils,
   } = useRecoveryRouting()
   const tipStatusUtils = useRecoveryTipStatus({
     runId,
@@ -96,7 +97,7 @@ export function useERUtils({
   return {
     recoveryMap,
     trackExternalMap,
-    previousRoute,
+    currentRecoveryOptionUtils,
     routeUpdateActions,
     recoveryCommands,
     hasLaunchedRecovery,
