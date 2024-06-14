@@ -21,7 +21,7 @@ export interface MoveProps {
   currentLocationProps: LocationIconProps
   newLocationProps?: LocationIconProps
 }
-// TOME: Remove changes here, add them in separate PR.
+
 export function Move(props: MoveProps): JSX.Element {
   const content = buildContent(props)
 

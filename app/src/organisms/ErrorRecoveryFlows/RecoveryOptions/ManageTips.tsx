@@ -73,8 +73,6 @@ export function BeginRemoval({
     if (selected === 'begin-removal') {
       void proceedNextStep()
     } else {
-      // TOME: This condition is fine for now but maybe problematic in the future.
-      // Then again, it may not given how drop tip works after ER.
       if (
         errorKind === ERROR_KINDS.OVERPERSSURE_WHILE_ASPIRATING &&
         hasLaunchedRecovery
