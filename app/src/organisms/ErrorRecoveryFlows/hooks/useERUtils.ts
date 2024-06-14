@@ -6,7 +6,10 @@ import { useRecoveryTipStatus } from './useRecoveryTipStatus'
 import { useRecoveryRouting } from './useRecoveryRouting'
 import { useFailedLabwareUtils } from './useFailedLabwareUtils'
 import { useFailedCommandPipetteInfo } from './useFailedCommandPipetteInfo'
-import { useNotifyRunQuery } from '../../../resources/runs'
+import {
+  useNotifyAllCommandsQuery,
+  useNotifyRunQuery,
+} from '../../../resources/runs'
 
 import type { PipetteData } from '@opentrons/api-client'
 import type { IRecoveryMap, RecoveryRoute } from '../types'
@@ -44,6 +47,12 @@ export function useERUtils({
 }: ERUtilsProps): ERUtilsResults {
   const { data: attachedInstruments } = useInstrumentsQuery()
   const { data: runRecord } = useNotifyRunQuery(runId)
+  // TODO(jh, 06-04-24): Refactor the utilities that derive info
+  // from runCommands once the server yields that info directly on an existing/new endpoint.
+  const { data: runCommands } = useNotifyAllCommandsQuery(runId, {
+    cursor: 0,
+    pageLength: 999,
+  })
 
   const {
     recoveryMap,
@@ -73,15 +82,15 @@ export function useERUtils({
   const failedLabwareUtils = useFailedLabwareUtils({
     failedCommand,
     protocolAnalysis,
-    runRecord,
     failedPipetteInfo,
+    runRecord,
+    runCommands,
   })
 
   const recoveryCommands = useRecoveryCommands({
     runId,
     failedCommand,
     failedLabwareUtils,
-    failedPipetteInfo,
   })
 
   return {
