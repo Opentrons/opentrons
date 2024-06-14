@@ -163,7 +163,8 @@ class EngineStore:
             # TODO(mc, 2022-03-21): potential race condition
             engine = await create_protocol_engine(
                 hardware_api=self._hardware_api,
-                command_generator=RunOrchestrator.command_generator,
+                # TODO(tz, 6-14-2024): this should use default orchestrator or extract this to a different location.
+                command_generator=self.run_orchestrator.command_generator,
                 config=ProtocolEngineConfig(
                     robot_type=self._robot_type,
                     deck_type=self._deck_type,
@@ -209,7 +210,7 @@ class EngineStore:
 
         engine = await create_protocol_engine(
             hardware_api=self._hardware_api,
-            command_generator=RunOrchestrator.command_generator,
+            command_generator=self.run_orchestrator.command_generator,
             config=ProtocolEngineConfig(
                 robot_type=self._robot_type,
                 deck_type=self._deck_type,

@@ -1,7 +1,7 @@
 """ProtocolEngine class definition."""
 from contextlib import AsyncExitStack
 from logging import getLogger
-from typing import Dict, Optional, Union, AsyncGenerator
+from typing import Dict, Optional, Union, AsyncGenerator, Callable
 from opentrons.protocol_engine.actions.actions import ResumeFromRecoveryAction
 from opentrons.protocol_engine.error_recovery_policy import (
     ErrorRecoveryPolicy,
@@ -86,7 +86,7 @@ class ProtocolEngine:
         self,
         hardware_api: HardwareControlAPI,
         state_store: StateStore,
-        command_generator: AsyncGenerator[str, None],
+        command_generator: Callable[[], AsyncGenerator[str, None]],
         action_dispatcher: Optional[ActionDispatcher] = None,
         plugin_starter: Optional[PluginStarter] = None,
         queue_worker: Optional[QueueWorker] = None,

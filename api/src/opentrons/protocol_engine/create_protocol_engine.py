@@ -15,15 +15,12 @@ from .types import PostRunHardwareState, DeckConfigurationType
 
 # TODO(mm, 2023-06-16): Arguably, this not being a context manager makes us prone to forgetting to
 # clean it up properly, especially in tests. See e.g. https://opentrons.atlassian.net/browse/RSS-222
-from ..protocol_runner import RunOrchestrator
 
 
 async def create_protocol_engine(
     hardware_api: HardwareControlAPI,
     config: Config,
-    command_generator: typing.Callable[
-        [RunOrchestrator], typing.AsyncGenerator[str, None]
-    ],
+    command_generator: typing.Callable[[], typing.AsyncGenerator[str, None]],
     load_fixed_trash: bool = False,
     deck_configuration: typing.Optional[DeckConfigurationType] = None,
     notify_publishers: typing.Optional[typing.Callable[[], None]] = None,

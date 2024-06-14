@@ -5,7 +5,6 @@ from typing import Optional, AsyncGenerator, Callable
 
 from ..state import StateStore
 from .command_executor import CommandExecutor
-from ...protocol_runner import RunOrchestrator
 
 log = getLogger(__name__)
 
@@ -17,7 +16,7 @@ class QueueWorker:
         self,
         state_store: StateStore,
         command_executor: CommandExecutor,
-        command_generator: Callable[[RunOrchestrator], AsyncGenerator[str, None]],
+        command_generator: Callable[[], AsyncGenerator[str, None]],
     ) -> None:
         """Initialize the queue worker's dependencies and state.
 
