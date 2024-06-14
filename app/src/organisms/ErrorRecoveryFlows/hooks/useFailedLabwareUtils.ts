@@ -25,11 +25,11 @@ interface UseFailedLabwareUtilsProps {
 }
 
 export type UseFailedLabwareUtilsResult = UseTipSelectionUtilsResult & {
-  /* The name of the labware from which the tip(s) involved in the failed command were picked up.  */
+  /* The name of the labware from which the tip(s) involved in the failed command were picked up, if any.  */
   pickUpTipLabwareName: string | null
-  /* Info for the labware from which the tip(s) involved in the failed command were picked up. */
+  /* Info for the labware from which the tip(s) involved in the failed command were picked up, if any. */
   pickUpTipLabware: LoadedLabware | null
-  /* The name of the well from which the tip(s) involved in the failed command were picked up. */
+  /* The name of the well(s) from which the tip(s) involved in the failed command were picked up, if any. */
   relevantPickUpTipWellName: string | null
 }
 
@@ -39,6 +39,7 @@ export function useFailedLabwareUtils({
   runCommands,
   runRecord,
   protocolAnalysis,
+  failedPipetteInfo,
 }: UseFailedLabwareUtilsProps): UseFailedLabwareUtilsResult {
   const recentRelevantPickUpTipCmd = React.useMemo(
     () => getRecentRelevantPickUpTipCommand(failedCommand, runCommands),
@@ -62,8 +63,10 @@ export function useFailedLabwareUtils({
     [recentRelevantPickUpTipCmd, runRecord]
   )
 
-  const relevantPickUpTipWellName =
-    recentRelevantPickUpTipCmd?.params.wellName ?? null
+  const relevantPickUpTipWellName = getPickUpTipCommandWellName(
+    failedPipetteInfo,
+    recentRelevantPickUpTipCmd
+  )
 
   return {
     ...tipSelectionUtils,
@@ -77,7 +80,7 @@ export function useFailedLabwareUtils({
 function getRecentRelevantPickUpTipCommand(
   failedCommand: ErrorRecoveryFlowsProps['failedCommand'],
   runCommands?: CommandsData
-): Omit<PickUpTipRunTimeCommand, 'result'> | undefined {
+): Omit<PickUpTipRunTimeCommand, 'result'> | null {
   if (
     failedCommand != null &&
     runCommands != null &&
@@ -99,7 +102,13 @@ function getRecentRelevantPickUpTipCommand(
           command.params.pipetteId === failedCmdPipetteId
       )
 
-    return recentPickUpTipCmd as Omit<PickUpTipRunTimeCommand, 'result'>
+    if (recentPickUpTipCmd == null) {
+      return null
+    } else {
+      return recentPickUpTipCmd as Omit<PickUpTipRunTimeCommand, 'result'>
+    }
+  } else {
+    return null
   }
 }
 
@@ -112,7 +121,7 @@ interface UseTipSelectionUtilsResult {
 
 // Utils for initializing and interacting with the Tip Selector component.
 function useTipSelectionUtils(
-  recentRelevantPickUpTipCmd?: Omit<PickUpTipRunTimeCommand, 'result'>
+  recentRelevantPickUpTipCmd: Omit<PickUpTipRunTimeCommand, 'result'> | null
 ): UseTipSelectionUtilsResult {
   const [selectedLocs, setSelectedLocs] = React.useState<WellGroup | null>(null)
 
@@ -155,7 +164,7 @@ function useTipSelectionUtils(
 
 // Set the initial well selection to be the last pickup tip location for the pipette used in the failed command.
 function useInitialSelectedLocationsFrom(
-  recentRelevantPickUpTipCmd?: Omit<PickUpTipRunTimeCommand, 'result'>
+  recentRelevantPickUpTipCmd: Omit<PickUpTipRunTimeCommand, 'result'> | null
 ): WellGroup | null {
   const [initialWells, setInitialWells] = React.useState<WellGroup | null>(null)
 
@@ -169,7 +178,7 @@ function useInitialSelectedLocationsFrom(
 // Get the name of the latest labware used by the failed command's pipette to pick up tips, if any.
 function getPickUpTipLabwareName(
   protocolAnalysis: ErrorRecoveryFlowsProps['protocolAnalysis'],
-  recentRelevantPickUpTipCmd?: Omit<PickUpTipRunTimeCommand, 'result'>,
+  recentRelevantPickUpTipCmd: Omit<PickUpTipRunTimeCommand, 'result'> | null,
   runRecord?: Run
 ): string | null {
   const lwDefsByURI = getLoadedLabwareDefinitionsByUri(
@@ -188,7 +197,7 @@ function getPickUpTipLabwareName(
 
 // Get the latest labware used by the failed command's pipette to pick up tips, if any.
 function getPickUpTipLabware(
-  recentRelevantPickUpTipCmd?: Omit<PickUpTipRunTimeCommand, 'result'>,
+  recentRelevantPickUpTipCmd: Omit<PickUpTipRunTimeCommand, 'result'> | null,
   runRecord?: Run
 ): LoadedLabware | null {
   return (
@@ -196,4 +205,26 @@ function getPickUpTipLabware(
       lw => lw.id === recentRelevantPickUpTipCmd?.params.labwareId
     ) ?? null
   )
+}
+
+// Return the name of the well(s) from which the tip(s) involved in the failed command were picked up, if any.
+function getPickUpTipCommandWellName(
+  failedPipetteInfo: UseFailedLabwareUtilsProps['failedPipetteInfo'],
+  recentRelevantPickUpTipCmd: Omit<PickUpTipRunTimeCommand, 'result'> | null
+): string {
+  if (failedPipetteInfo == null || recentRelevantPickUpTipCmd == null) {
+    return ''
+  }
+
+  const channels = failedPipetteInfo.data.channels
+  const wellName = recentRelevantPickUpTipCmd.params.wellName
+  const wellNameNumber = wellName.slice(1)
+
+  if (channels === 8) {
+    return `A${wellNameNumber} - H${wellNameNumber}`
+  }
+  // Well names are not used for the 96-channel currently.
+  else {
+    return wellName
+  }
 }
