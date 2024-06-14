@@ -16,6 +16,8 @@ import {
   SPACING,
   TYPOGRAPHY,
   StyledText,
+  AlertItem,
+  Box,
 } from '@opentrons/components'
 import { isEveryFieldHidden } from '../../utils'
 import { makeMaskToDecimal } from '../../fieldMasks'
@@ -143,6 +145,22 @@ export function StackingOffsets(): JSX.Element | null {
     <div className={styles.new_definition_section}>
       <SectionBody label={label} id="StackingOffsets">
         <>
+          {Object.values(values.compatibleAdapters).length > 0 ||
+          Object.values(values.compatibleModules).length > 0 ? (
+            <Box
+              marginBottom={
+                errors.compatibleAdapters != null ||
+                errors.compatibleModules != null
+                  ? '0rem'
+                  : '-1rem'
+              }
+            >
+              <AlertItem
+                type="warning"
+                title="The stacking offset fields require App version 7.0.0 or higher"
+              />
+            </Box>
+          ) : null}
           <FormAlerts
             values={values}
             touched={touched}
@@ -221,8 +239,6 @@ export function StackingOffsets(): JSX.Element | null {
                       </Flex>
                       {key === 'opentrons_flex_96_tiprack_adapter' &&
                       isChecked ? (
-                        //  NOTE(jr, 6/7/24): keeping the yucky classname + inline style to match other
-                        //  LC designs
                         <div
                           style={{
                             marginTop: '-1.4rem',

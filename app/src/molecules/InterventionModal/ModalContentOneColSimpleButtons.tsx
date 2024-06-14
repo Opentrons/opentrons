@@ -15,7 +15,7 @@ export interface ButtonProps {
 }
 
 export interface ModalContentOneColSimpleButtonsProps {
-  topText: string
+  headline: string
   firstButton: ButtonProps
   secondButton: ButtonProps
   furtherButtons?: ButtonProps[]
@@ -38,7 +38,7 @@ export function ModalContentOneColSimpleButtons(
         fontWeight={TYPOGRAPHY.fontWeightSemiBold}
         lineHeight={TYPOGRAPHY.lineHeight36}
       >
-        {props.topText}
+        {props.headline}
       </StyledText>
       <Flex flexDirection={DIRECTION_COLUMN} gap={SPACING.spacing4}>
         {buttons.map((buttonProps, idx) => (

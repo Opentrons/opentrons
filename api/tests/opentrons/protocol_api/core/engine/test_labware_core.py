@@ -17,6 +17,7 @@ from opentrons_shared_data.labware.labware_definition import (
 )
 
 from opentrons.types import DeckSlotName, Point
+from opentrons.protocol_engine import commands as cmd
 from opentrons.protocol_engine.clients import SyncClient as EngineClient
 from opentrons.protocol_engine.errors import LabwareNotOnDeckError
 from opentrons.protocol_engine.types import (
@@ -115,8 +116,10 @@ def test_set_calibration_succeeds_in_ok_location(
                 vector=LabwareOffsetVector(x=1, y=2, z=3),
             )
         ),
-        mock_engine_client.reload_labware(
-            labware_id="cool-labware",
+        mock_engine_client.execute_command(
+            cmd.ReloadLabwareParams(
+                labwareId="cool-labware",
+            )
         ),
     )
 

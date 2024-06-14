@@ -61,6 +61,7 @@ class ErrorCodes(Enum):
     FAILED_GRIPPER_PICKUP_ERROR = _code_from_dict_entry("2015")
     MOTOR_DRIVER_ERROR = _code_from_dict_entry("2016")
     PIPETTE_LIQUID_NOT_FOUND = _code_from_dict_entry("2017")
+    TIP_HIT_WELL_BOTTOM = _code_from_dict_entry("2018")
     ROBOTICS_INTERACTION_ERROR = _code_from_dict_entry("3000")
     LABWARE_DROPPED = _code_from_dict_entry("3001")
     LABWARE_NOT_PICKED_UP = _code_from_dict_entry("3002")

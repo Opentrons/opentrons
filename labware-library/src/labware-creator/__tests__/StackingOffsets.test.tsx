@@ -103,4 +103,34 @@ describe('StackingOffsets', () => {
       magneticBlockV1: 0,
     })
   })
+  it('renders the stacking offset alert', () => {
+    vi.mocked(useFormikContext).mockReturnValue({
+      values: {
+        labwareType: 'wellPlate',
+        wellBottomShape: 'v',
+        wellShape: 'circular',
+        labwareXDimension: '10',
+        gridColumns: '12',
+        gridRows: '8',
+        compatibleAdapters: { adapter: 10 },
+        compatibleModules: {},
+      },
+      touched: {
+        labwareType: true,
+        wellBottomShape: true,
+        wellShape: true,
+        labwareXDimension: true,
+        gridColumns: true,
+        gridRows: true,
+        compatibleAdapters: {},
+        compatibleModules: {},
+      },
+      errors: {},
+      setFieldValue: vi.fn(),
+    } as any)
+    render(<StackingOffsets />)
+    screen.getByText(
+      'The stacking offset fields require App version 7.0.0 or higher'
+    )
+  })
 })

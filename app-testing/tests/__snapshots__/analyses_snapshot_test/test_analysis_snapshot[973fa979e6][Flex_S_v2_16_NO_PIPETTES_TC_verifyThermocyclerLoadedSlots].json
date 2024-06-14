@@ -130,6 +130,7 @@
       "errorCode": "4000",
       "errorInfo": {},
       "errorType": "ExceptionInProtocolError",
+      "isDefined": false,
       "wrappedErrors": [
         {
           "detail": "AssertionError",
@@ -137,9 +138,10 @@
           "errorInfo": {
             "args": "()",
             "class": "AssertionError",
-            "traceback": "  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocols/execution/execute_python.py\", line 124, in run_python\n    exec(\"run(__context)\", new_globs)\n\n  File \"<string>\", line 1, in <module>\n\n  File \"Flex_S_v2_16_NO_PIPETTES_TC_verifyThermocyclerLoadedSlots.py\", line 13, in run\n"
+            "traceback": "  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocols/execution/execute_python.py\", line 147, in exec_run\n    exec(\"run(__context)\", new_globs)\n\n  File \"<string>\", line 1, in <module>\n\n  File \"Flex_S_v2_16_NO_PIPETTES_TC_verifyThermocyclerLoadedSlots.py\", line 13, in run\n"
           },
           "errorType": "PythonException",
+          "isDefined": false,
           "wrappedErrors": []
         }
       ]

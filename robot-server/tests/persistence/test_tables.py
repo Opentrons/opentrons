@@ -90,6 +90,15 @@ EXPECTED_STATEMENTS_LATEST = [
     """
     CREATE UNIQUE INDEX ix_run_run_id_index_in_run ON run_command (run_id, index_in_run)
     """,
+    """
+    CREATE TABLE data_files (
+        id VARCHAR NOT NULL,
+        name VARCHAR NOT NULL,
+        file_hash VARCHAR NOT NULL,
+        created_at DATETIME NOT NULL,
+        PRIMARY KEY (id)
+    )
+    """,
 ]
 
 EXPECTED_STATEMENTS_V5 = EXPECTED_STATEMENTS_LATEST

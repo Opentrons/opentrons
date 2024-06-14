@@ -23,7 +23,7 @@ from typing import (
 import logging
 import sys
 
-from opentrons.protocol_engine.types import RunTimeParameter
+from opentrons.protocol_engine.types import RunTimeParameter, EngineStatus
 from opentrons.protocols.api_support.types import APIVersion
 from opentrons.protocol_reader import (
     ProtocolReader,
@@ -33,7 +33,12 @@ from opentrons.protocol_reader import (
     ProtocolFilesInvalidError,
     ProtocolSource,
 )
-from opentrons.protocol_runner import create_simulating_runner, RunResult
+from opentrons.protocol_runner import (
+    create_simulating_runner,
+    RunResult,
+    PythonAndLegacyRunner,
+    JsonRunner,
+)
 from opentrons.protocol_engine import (
     Command,
     ErrorOccurrence,
@@ -41,9 +46,18 @@ from opentrons.protocol_engine import (
     LoadedPipette,
     LoadedModule,
     Liquid,
+    StateSummary,
 )
 
 from opentrons_shared_data.robot.dev_types import RobotType
+
+from opentrons_shared_data.errors import ErrorCodes
+from opentrons_shared_data.errors.exceptions import (
+    EnumeratedError,
+    PythonException,
+)
+
+from opentrons.protocols.parse import PythonParseMode
 
 OutputKind = Literal["json", "human-json"]
 
@@ -197,12 +211,77 @@ def _get_return_code(analysis: RunResult) -> int:
     return 0
 
 
+class UnexpectedAnalysisError(EnumeratedError):
+    """An error raised while setting up the runner for analysis."""
+
+    def __init__(
+        self,
+        message: Optional[str] = None,
+        wrapping: Optional[Sequence[Union[EnumeratedError, Exception]]] = None,
+    ) -> None:
+        """Build a UnexpectedAnalysisError exception."""
+
+        def _convert_exc() -> Iterator[EnumeratedError]:
+            if not wrapping:
+                return
+            for exc in wrapping:
+                if isinstance(exc, EnumeratedError):
+                    yield exc
+                else:
+                    yield PythonException(exc)
+
+        super().__init__(
+            code=ErrorCodes.GENERAL_ERROR,
+            message=message,
+            wrapping=[e for e in _convert_exc()],
+        )
+
+
 async def _do_analyze(protocol_source: ProtocolSource) -> RunResult:
 
     runner = await create_simulating_runner(
         robot_type=protocol_source.robot_type, protocol_config=protocol_source.config
     )
-    return await runner.run(deck_configuration=[], protocol_source=protocol_source)
+
+    try:
+        if isinstance(runner, PythonAndLegacyRunner):
+            await runner.load(
+                protocol_source=protocol_source,
+                python_parse_mode=PythonParseMode.NORMAL,
+                run_time_param_values=None,
+            )
+        elif isinstance(runner, JsonRunner):
+            await runner.load(protocol_source=protocol_source)
+    except Exception as error:
+        err_id = "analysis-setup-error"
+        err_created_at = datetime.now(tz=timezone.utc)
+        if isinstance(error, EnumeratedError):
+            error_occ = ErrorOccurrence.from_failed(
+                id=err_id, createdAt=err_created_at, error=error
+            )
+        else:
+            enumerated_wrapper = UnexpectedAnalysisError(
+                message=str(error),
+                wrapping=[error],
+            )
+            error_occ = ErrorOccurrence.from_failed(
+                id=err_id, createdAt=err_created_at, error=enumerated_wrapper
+            )
+        analysis = RunResult(
+            commands=[],
+            state_summary=StateSummary(
+                errors=[error_occ],
+                status=EngineStatus.IDLE,
+                labware=[],
+                pipettes=[],
+                modules=[],
+                labwareOffsets=[],
+                liquids=[],
+            ),
+            parameters=[],
+        )
+        return analysis
+    return await runner.run(deck_configuration=[])
 
 
 async def _analyze(
