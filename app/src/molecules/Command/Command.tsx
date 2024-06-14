@@ -57,6 +57,7 @@ const UNIVERSAL_CONTAINER_STYLES = {
   borderRadius: BORDERS.borderRadius8,
   paddingX: SPACING.spacing24,
   paddingY: CONTAINER_Y_PADDING,
+  maxHeight: '65vh' // limit only intended for e.g. very long user comments
 } as const
 
 const UNIVERSAL_ICON_STYLES = {
