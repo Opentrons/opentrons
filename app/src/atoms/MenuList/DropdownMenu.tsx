@@ -70,6 +70,12 @@ export function DropdownMenu(props: DropdownMenuProps): JSX.Element {
     'top' | 'bottom'
   >('bottom')
 
+  const dropDownMenuWrapperRef = useOnClickOutside<HTMLDivElement>({
+    onClickOutside: () => {
+      setShowDropdownMenu(false)
+    },
+  })
+
   React.useEffect(() => {
     const handlePositionCalculation = (): void => {
       const dropdownRect = dropDownMenuWrapperRef.current?.getBoundingClientRect()
@@ -89,8 +95,9 @@ export function DropdownMenu(props: DropdownMenuProps): JSX.Element {
           scrollOffset = parentRect.top
         }
 
-        const dropdownBottom =
-          dropdownRect.bottom + (filterOptions.length + 1) * 34 - scrollOffset
+        const downSpace =
+          filterOptions.length + 1 > 10 ? 316 : (filterOptions.length + 1) * 34
+        const dropdownBottom = dropdownRect.bottom + downSpace - scrollOffset
 
         setDropdownPosition(dropdownBottom > availableHeight ? 'top' : 'bottom')
       }
@@ -104,16 +111,11 @@ export function DropdownMenu(props: DropdownMenuProps): JSX.Element {
       window.removeEventListener('resize', handlePositionCalculation)
       window.removeEventListener('scroll', handlePositionCalculation)
     }
-  }, [filterOptions.length, window.innerHeight])
+  }, [filterOptions.length, dropDownMenuWrapperRef])
 
   const toggleSetShowDropdownMenu = (): void => {
     setShowDropdownMenu(!showDropdownMenu)
   }
-  const dropDownMenuWrapperRef = useOnClickOutside<HTMLDivElement>({
-    onClickOutside: () => {
-      setShowDropdownMenu(false)
-    },
-  })
 
   const DROPDOWN_STYLE = css`
     flex-direction: ${DIRECTION_ROW};
@@ -152,11 +154,7 @@ export function DropdownMenu(props: DropdownMenuProps): JSX.Element {
   `
 
   return (
-    <Flex
-      flexDirection={DIRECTION_COLUMN}
-      ref={dropDownMenuWrapperRef}
-      backgroundColor="red"
-    >
+    <Flex flexDirection={DIRECTION_COLUMN} ref={dropDownMenuWrapperRef}>
       {title !== null ? (
         <Flex gridGap={SPACING.spacing8}>
           <StyledText
@@ -180,11 +178,7 @@ export function DropdownMenu(props: DropdownMenuProps): JSX.Element {
           ) : null}
         </Flex>
       ) : null}
-      <Flex
-        flexDirection={DIRECTION_COLUMN}
-        position={POSITION_RELATIVE}
-        backgroundColor="red"
-      >
+      <Flex flexDirection={DIRECTION_COLUMN} position={POSITION_RELATIVE}>
         <Flex
           onClick={(e: MouseEvent) => {
             e.preventDefault()
@@ -213,21 +207,21 @@ export function DropdownMenu(props: DropdownMenuProps): JSX.Element {
         </Flex>
         {showDropdownMenu && (
           <Flex
-            tabIndex={tabIndex}
             zIndex={3}
             borderRadius={BORDERS.borderRadius8}
             boxShadow={BORDERS.tinyDropShadow}
-            // position={POSITION_ABSOLUTE}
-            backgroundColor="yellow"
+            position={POSITION_ABSOLUTE}
+            backgroundColor={COLORS.white}
             flexDirection={DIRECTION_COLUMN}
             width={width}
             top={dropdownPosition === 'bottom' ? '2.5rem' : undefined}
             bottom={dropdownPosition === 'top' ? '2.5rem' : undefined}
             overflowY={OVERFLOW_AUTO}
-            maxHeight="350px" // Change this val
+            maxHeight="20rem" // Set the maximum display number to 10.
           >
             {filterOptions.map((option, index) => (
               <MenuItem
+                zIndex="3"
                 key={`${option.name}-${index}`}
                 onClick={() => {
                   onClick(option.value)
