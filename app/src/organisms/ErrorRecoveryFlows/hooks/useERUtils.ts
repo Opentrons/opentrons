@@ -24,7 +24,6 @@ type ERUtilsProps = ErrorRecoveryFlowsProps & {
 export interface ERUtilsResults {
   recoveryMap: IRecoveryMap
   previousRoute: RecoveryRoute | null
-  recentSelectedRecoveryRoute: RecoveryRoute | null
   routeUpdateActions: UseRouteUpdateActionsResult
   recoveryCommands: UseRecoveryCommandsResult
   tipStatusUtils: RecoveryTipStatusUtils
@@ -51,7 +50,6 @@ export function useERUtils({
     setRM,
     trackExternalMap,
     previousRoute,
-    recentSelectedRecoveryRoute,
   } = useRecoveryRouting()
   const tipStatusUtils = useRecoveryTipStatus({
     runId,
@@ -88,7 +86,6 @@ export function useERUtils({
 
   return {
     recoveryMap,
-    recentSelectedRecoveryRoute,
     trackExternalMap,
     previousRoute,
     routeUpdateActions,

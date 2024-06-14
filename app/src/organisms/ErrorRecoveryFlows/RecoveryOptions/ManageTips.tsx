@@ -51,7 +51,8 @@ export function BeginRemoval({
   tipStatusUtils,
   routeUpdateActions,
   recoveryCommands,
-  recentSelectedRecoveryRoute,
+  errorKind,
+  hasLaunchedRecovery,
 }: RecoveryContentProps): JSX.Element | null {
   const { t } = useTranslation('error_recovery')
   const { pipettesWithTip } = tipStatusUtils
@@ -72,7 +73,10 @@ export function BeginRemoval({
     if (selected === 'begin-removal') {
       void proceedNextStep()
     } else {
-      if (recentSelectedRecoveryRoute === RETRY_NEW_TIPS.ROUTE) {
+      if (
+        errorKind === ERROR_KINDS.OVERPERSSURE_WHILE_ASPIRATING &&
+        hasLaunchedRecovery
+      ) {
         void proceedToRouteAndStep(RETRY_NEW_TIPS.ROUTE)
       } else {
         void setRobotInMotion(true, ROBOT_CANCELING.ROUTE).then(() => {

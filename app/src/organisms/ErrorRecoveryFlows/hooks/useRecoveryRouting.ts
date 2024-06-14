@@ -1,6 +1,6 @@
 import * as React from 'react'
 
-import { RECOVERY_MAP, RECOVERY_OPTION_ROUTES } from '../constants'
+import { RECOVERY_MAP } from '../constants'
 
 import type { IRecoveryMap, RecoveryRoute } from '../types'
 import type { ERUtilsResults } from './useERUtils'
@@ -16,7 +16,6 @@ import type { ERUtilsResults } from './useERUtils'
 export function useRecoveryRouting(): {
   recoveryMap: IRecoveryMap
   previousRoute: RecoveryRoute | null
-  recentSelectedRecoveryRoute: RecoveryRoute | null
   setRM: (map: IRecoveryMap) => void
   trackExternalMap: ERUtilsResults['trackExternalMap']
 } {
@@ -29,14 +28,10 @@ export function useRecoveryRouting(): {
   const [, setSubMap] = React.useState<Record<string, any> | null>(null)
 
   const previousRoute = usePreviousRecoveryRoute(recoveryMap.route)
-  const recentSelectedRecoveryRoute = useRecentSelectedRecoveryOptionRoute(
-    recoveryMap.route
-  )
 
   return {
     recoveryMap,
     previousRoute,
-    recentSelectedRecoveryRoute,
     setRM: setRecoveryMap,
     trackExternalMap: setSubMap,
   }
@@ -55,22 +50,4 @@ export function usePreviousRecoveryRoute(
   }
 
   return prevRoute
-}
-
-// The route of the most recently selected recovery option, if any.
-export function useRecentSelectedRecoveryOptionRoute(
-  route: RecoveryRoute
-): RecoveryRoute | null {
-  const [
-    currentRecoveryOptionRoute,
-    setCurrentRecoveryOptionRoute,
-  ] = React.useState<RecoveryRoute | null>(null)
-
-  React.useEffect(() => {
-    if (RECOVERY_OPTION_ROUTES.some(option => option === route)) {
-      setCurrentRecoveryOptionRoute(route)
-    }
-  })
-
-  return currentRecoveryOptionRoute
 }
