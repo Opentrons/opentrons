@@ -1384,7 +1384,9 @@ async def _test_liquid_probe(
                 aspirate_while_sensing=False,
                 data_files=None,
             )
-            end_z = await api.liquid_probe(mount, probe_settings, probe=probe)
+            end_z = await api.liquid_probe(
+                mount, probe_settings.max_z_distance, probe_settings, probe=probe
+            )
             if probe == InstrumentProbeType.PRIMARY:
                 pz = CALIBRATED_LABWARE_LOCATIONS.plate_primary.z
             else:
