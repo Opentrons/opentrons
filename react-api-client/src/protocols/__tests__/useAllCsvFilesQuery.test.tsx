@@ -48,7 +48,7 @@ describe('useAllCsvFilesQuery', () => {
     wrapper = clientProvider
   })
 
-  it('should return no dta if no host', () => {
+  it('should return no data if no host', () => {
     vi.mocked(useHost).mockReturnValue(null)
 
     const { result } = renderHook(() => useAllCsvFilesQuery(PROTOCOL_ID), {
