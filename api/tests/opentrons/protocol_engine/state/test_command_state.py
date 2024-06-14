@@ -62,6 +62,41 @@ def test_queue_command_action() -> None:
     assert subject_view.get_all() == [expected_command]
 
 
+def test_latest_protocol_command_hash() -> None:
+    """It should return the latest protocol command's hash."""
+    subject = CommandStore(is_door_open=False, config=_make_config())
+    subject_view = CommandView(subject.state)
+
+    # The initial hash should be None.
+    assert subject_view.get_latest_protocol_command_hash() is None
+
+    # It should pick up the hash from an enqueued protocol command.
+    subject.handle_action(
+        actions.QueueCommandAction(
+            request=commands.CommentCreate(
+                params=commands.CommentParams(message="hello world"),
+            ),
+            request_hash="hash-1",
+            command_id="command-id-1",
+            created_at=datetime.now(),
+        )
+    )
+    assert subject_view.get_latest_protocol_command_hash() == "hash-1"
+
+    # It should pick up newer hashes as they come in.
+    subject.handle_action(
+        actions.QueueCommandAction(
+            request=commands.CommentCreate(
+                params=commands.CommentParams(message="hello world"),
+            ),
+            request_hash="hash-2",
+            command_id="command-id-2",
+            created_at=datetime.now(),
+        )
+    )
+    assert subject_view.get_latest_protocol_command_hash() == "hash-2"
+
+
 @pytest.mark.parametrize("error_recovery_type", ErrorRecoveryType)
 def test_command_failure(error_recovery_type: ErrorRecoveryType) -> None:
     """It should store an error and mark the command if it fails."""

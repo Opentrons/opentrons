@@ -52,37 +52,6 @@ def _make_config(block_on_door_open: bool = False) -> Config:
     )
 
 
-def test_command_queue_with_hash() -> None:
-    """It should queue a command with a command hash and no explicit key."""
-    create = commands.WaitForResumeCreate(
-        params=commands.WaitForResumeParams(message="hello world"),
-    )
-
-    subject = CommandStore(is_door_open=False, config=_make_config())
-    subject.handle_action(
-        QueueCommandAction(
-            request=create,
-            request_hash="abc123",
-            created_at=datetime(year=2021, month=1, day=1),
-            command_id="command-id-1",
-        )
-    )
-
-    assert subject.state.command_history.get("command-id-1").command.key == "abc123"
-    assert subject.state.latest_protocol_command_hash == "abc123"
-
-    subject.handle_action(
-        QueueCommandAction(
-            request=create,
-            request_hash="def456",
-            created_at=datetime(year=2021, month=1, day=1),
-            command_id="command-id-2",
-        )
-    )
-
-    assert subject.state.latest_protocol_command_hash == "def456"
-
-
 def test_command_queue_and_unqueue() -> None:
     """It should queue on QueueCommandAction and dequeue on RunCommandAction."""
     queue_1 = QueueCommandAction(
