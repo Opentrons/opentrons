@@ -1,21 +1,23 @@
-import * as React from 'react'
 import { VIEWPORT } from '@opentrons/components'
-import { TabbedButton } from './'
-import type { Story, Meta } from '@storybook/react'
+import { TabbedButton as TabbedButtonComponent } from './index'
+import type { Meta, StoryObj } from '@storybook/react'
 
-export default {
+const meta: Meta<typeof TabbedButtonComponent> = {
   title: 'ODD/Atoms/Buttons/TabbedButton',
+  component: TabbedButtonComponent,
   argTypes: { onClick: { action: 'clicked' } },
   parameters: VIEWPORT.touchScreenViewport,
-} as Meta
+}
 
-const TabbedButtonTemplate: Story<
-  React.ComponentProps<typeof TabbedButton>
-> = args => <TabbedButton {...args} />
-export const Tabbed = TabbedButtonTemplate.bind({})
-Tabbed.args = {
-  isSelected: true,
-  children: 'Button text',
-  disabled: false,
-  title: 'tabbed button',
+export default meta
+
+type Story = StoryObj<typeof TabbedButtonComponent>
+
+export const TabbedButton: Story = {
+  args: {
+    isSelected: true,
+    children: 'Button text',
+    disabled: false,
+    title: 'tabbed button',
+  },
 }

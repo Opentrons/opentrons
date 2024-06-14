@@ -136,3 +136,28 @@ run_command_table = sqlalchemy.Table(
         unique=True,
     ),
 )
+
+data_files_table = sqlalchemy.Table(
+    "data_files",
+    metadata,
+    sqlalchemy.Column(
+        "id",
+        sqlalchemy.String,
+        primary_key=True,
+    ),
+    sqlalchemy.Column(
+        "name",
+        sqlalchemy.String,
+        nullable=False,
+    ),
+    sqlalchemy.Column(
+        "file_hash",
+        sqlalchemy.String,
+        nullable=False,
+    ),
+    sqlalchemy.Column(
+        "created_at",
+        UTCDateTime,
+        nullable=False,
+    ),
+)

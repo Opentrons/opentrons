@@ -621,6 +621,7 @@ export interface NumberParameter extends BaseRunTimeParameter {
   min: number
   max: number
   default: number
+  value: number
 }
 
 export interface Choice {
@@ -628,39 +629,37 @@ export interface Choice {
   value: number | boolean | string
 }
 
-interface ChoiceParameter extends BaseRunTimeParameter {
-  type: RunTimeParameterType
+export interface ChoiceParameter extends BaseRunTimeParameter {
+  type: NumberParameterType | BooleanParameterType | StringParameterType
   choices: Choice[]
   default: number | boolean | string
+  value: number | boolean | string
 }
 
 interface BooleanParameter extends BaseRunTimeParameter {
   type: BooleanParameterType
   default: boolean
+  value: boolean
 }
 
-interface CsvFileParameter extends BaseRunTimeParameter {
+export interface CsvFileParameter extends BaseRunTimeParameter {
   type: CsvFileParameterType
-  default: string
+  file?: { id?: string; file?: File | null } | null
 }
 
 type NumberParameterType = 'int' | 'float'
 type BooleanParameterType = 'bool'
 type StringParameterType = 'str'
 type CsvFileParameterType = 'csv_file'
-type RunTimeParameterType =
-  | NumberParameter
-  | BooleanParameterType
-  | StringParameterType
-  | CsvFileParameterType
 
 interface BaseRunTimeParameter {
   displayName: string
   variableName: string
   description: string
-  value: number | boolean | string
   suffix?: string
 }
+
+export type ValueRunTimeParameter = Exclude<RunTimeParameter, CsvFileParameter>
 
 export type RunTimeParameter =
   | BooleanParameter

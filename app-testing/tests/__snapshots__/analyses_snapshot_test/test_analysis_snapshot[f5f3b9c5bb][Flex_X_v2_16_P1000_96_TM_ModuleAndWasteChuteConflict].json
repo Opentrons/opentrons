@@ -1227,6 +1227,7 @@
         "errorCode": "4000",
         "errorInfo": {},
         "errorType": "IncompatibleAddressableAreaError",
+        "isDefined": false,
         "wrappedErrors": []
       },
       "notes": [],
@@ -1252,18 +1253,21 @@
       "errorCode": "4000",
       "errorInfo": {},
       "errorType": "ExceptionInProtocolError",
+      "isDefined": false,
       "wrappedErrors": [
         {
           "detail": "IncompatibleAddressableAreaError: Cannot use Temperature Module in D3, not compatible with one or more of the following fixtures: Waste Chute",
           "errorCode": "4000",
           "errorInfo": {},
           "errorType": "ProtocolCommandFailedError",
+          "isDefined": false,
           "wrappedErrors": [
             {
               "detail": "Cannot use Temperature Module in D3, not compatible with one or more of the following fixtures: Waste Chute",
               "errorCode": "4000",
               "errorInfo": {},
               "errorType": "IncompatibleAddressableAreaError",
+              "isDefined": false,
               "wrappedErrors": []
             }
           ]
