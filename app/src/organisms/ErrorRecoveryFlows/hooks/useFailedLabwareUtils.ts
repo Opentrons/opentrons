@@ -8,7 +8,7 @@ import {
 } from '@opentrons/shared-data'
 
 import type { WellGroup } from '@opentrons/components'
-import type { PipetteData, Run } from '@opentrons/api-client'
+import type { CommandsData, PipetteData, Run } from '@opentrons/api-client'
 import type {
   LabwareDefinition2,
   LoadedLabware,
@@ -20,6 +20,7 @@ interface UseFailedLabwareUtilsProps {
   failedCommand: ErrorRecoveryFlowsProps['failedCommand']
   protocolAnalysis: ErrorRecoveryFlowsProps['protocolAnalysis']
   failedPipetteInfo: PipetteData | null
+  runCommands?: CommandsData
   runRecord?: Run
 }
 
@@ -35,13 +36,14 @@ export type UseFailedLabwareUtilsResult = UseTipSelectionUtilsResult & {
 // Utils for labware relating to the failedCommand.
 export function useFailedLabwareUtils({
   failedCommand,
-  runRecord,
   protocolAnalysis,
   failedPipetteInfo,
+  runCommands,
+  runRecord,
 }: UseFailedLabwareUtilsProps): UseFailedLabwareUtilsResult {
   const recentRelevantPickUpTipCmd = React.useMemo(
-    () => getRecentRelevantPickUpTipCommand(failedCommand, protocolAnalysis),
-    [failedCommand, protocolAnalysis]
+    () => getRecentRelevantPickUpTipCommand(failedCommand, runCommands),
+    [failedCommand, runCommands]
   )
 
   const tipSelectionUtils = useTipSelectionUtils(recentRelevantPickUpTipCmd)
@@ -77,36 +79,36 @@ export function useFailedLabwareUtils({
 // Returns the most recent pickUpTip command for the pipette used in the failed command, if any.
 function getRecentRelevantPickUpTipCommand(
   failedCommand: ErrorRecoveryFlowsProps['failedCommand'],
-  protocolAnalysis: UseFailedLabwareUtilsProps['protocolAnalysis']
+  runCommands?: CommandsData
 ): Omit<PickUpTipRunTimeCommand, 'result'> | null {
   if (
-    failedCommand != null &&
-    protocolAnalysis != null &&
-    'wellName' in failedCommand.params &&
-    'pipetteId' in failedCommand.params
+    failedCommand == null ||
+    runCommands == null ||
+    !('wellName' in failedCommand.params) ||
+    !('pipetteId' in failedCommand.params)
   ) {
-    const failedCmdPipetteId = failedCommand.params.pipetteId
+    return null
+  }
 
-    // Reverse iteration is faster as long as # recovery commands < # run commands.
-    const failedCommandIdx = protocolAnalysis.commands.findLastIndex(
-      command => command.key === failedCommand.key
+  const failedCmdPipetteId = failedCommand.params.pipetteId
+
+  // Reverse iteration is faster as long as # recovery commands < # run commands.
+  const failedCommandIdx = runCommands.data.findLastIndex(
+    command => command.key === failedCommand.key
+  )
+
+  const recentPickUpTipCmd = runCommands.data
+    .slice(0, failedCommandIdx)
+    .findLast(
+      command =>
+        command.commandType === 'pickUpTip' &&
+        command.params.pipetteId === failedCmdPipetteId
     )
 
-    const recentPickUpTipCmd = protocolAnalysis.commands
-      .slice(0, failedCommandIdx)
-      .findLast(
-        command =>
-          command.commandType === 'pickUpTip' &&
-          command.params.pipetteId === failedCmdPipetteId
-      )
-
-    if (recentPickUpTipCmd == null) {
-      return null
-    } else {
-      return recentPickUpTipCmd as Omit<PickUpTipRunTimeCommand, 'result'>
-    }
-  } else {
+  if (recentPickUpTipCmd == null) {
     return null
+  } else {
+    return recentPickUpTipCmd as Omit<PickUpTipRunTimeCommand, 'result'>
   }
 }
 
@@ -175,9 +177,9 @@ function useInitialSelectedLocationsFrom(
 
 // Get the name of the latest labware used by the failed command's pipette to pick up tips, if any.
 function getPickUpTipLabwareName(
-  protocolAnalysis: UseFailedLabwareUtilsProps['protocolAnalysis'],
+  protocolAnalysis: ErrorRecoveryFlowsProps['protocolAnalysis'],
   recentRelevantPickUpTipCmd: Omit<PickUpTipRunTimeCommand, 'result'> | null,
-  runRecord?: UseFailedLabwareUtilsProps['runRecord']
+  runRecord?: Run
 ): string | null {
   const lwDefsByURI = getLoadedLabwareDefinitionsByUri(
     protocolAnalysis?.commands ?? []
@@ -185,7 +187,6 @@ function getPickUpTipLabwareName(
   const pickUpTipLWURI = runRecord?.data.labware.find(
     labware => labware.id === recentRelevantPickUpTipCmd?.params.labwareId
   )?.definitionUri
-
   if (pickUpTipLWURI != null) {
     return getLabwareDisplayName(lwDefsByURI[pickUpTipLWURI])
   } else {
@@ -196,7 +197,7 @@ function getPickUpTipLabwareName(
 // Get the latest labware used by the failed command's pipette to pick up tips, if any.
 function getPickUpTipLabware(
   recentRelevantPickUpTipCmd: Omit<PickUpTipRunTimeCommand, 'result'> | null,
-  runRecord?: UseFailedLabwareUtilsProps['runRecord']
+  runRecord?: Run
 ): LoadedLabware | null {
   return (
     runRecord?.data.labware.find(

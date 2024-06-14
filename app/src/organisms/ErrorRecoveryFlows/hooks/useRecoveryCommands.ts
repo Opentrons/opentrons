@@ -9,7 +9,7 @@ import {
 import { useChainRunCommands } from '../../../resources/runs'
 
 import type { CreateCommand, LoadedLabware } from '@opentrons/shared-data'
-import type { CommandData, PipetteData } from '@opentrons/api-client'
+import type { CommandData } from '@opentrons/api-client'
 import type { WellGroup } from '@opentrons/components'
 import type { FailedCommand } from '../types'
 import type { UseFailedLabwareUtilsResult } from './useFailedLabwareUtils'
@@ -18,7 +18,6 @@ interface UseRecoveryCommandsParams {
   runId: string
   failedCommand: FailedCommand | null
   failedLabwareUtils: UseFailedLabwareUtilsResult
-  failedPipetteInfo: PipetteData | null
 }
 export interface UseRecoveryCommandsResult {
   /* A terminal recovery command that causes ER to exit as the run status becomes "running" */
@@ -36,7 +35,6 @@ export interface UseRecoveryCommandsResult {
 export function useRecoveryCommands({
   runId,
   failedCommand,
-  failedPipetteInfo,
   failedLabwareUtils,
 }: UseRecoveryCommandsParams): UseRecoveryCommandsResult {
   const { chainRunCommands } = useChainRunCommands(runId, failedCommand?.id)
