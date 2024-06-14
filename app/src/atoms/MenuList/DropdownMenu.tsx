@@ -21,6 +21,8 @@ import {
 import { Tooltip } from '../Tooltip'
 import { MenuItem } from './MenuItem'
 
+const MAX_HEIGHT = 316
+
 export interface DropdownOption {
   name: string
   value: string
@@ -96,7 +98,9 @@ export function DropdownMenu(props: DropdownMenuProps): JSX.Element {
         }
 
         const downSpace =
-          filterOptions.length + 1 > 10 ? 316 : (filterOptions.length + 1) * 34
+          filterOptions.length + 1 > 10
+            ? MAX_HEIGHT
+            : (filterOptions.length + 1) * 34
         const dropdownBottom = dropdownRect.bottom + downSpace - scrollOffset
 
         setDropdownPosition(dropdownBottom > availableHeight ? 'top' : 'bottom')
