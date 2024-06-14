@@ -4,20 +4,56 @@ import type { CommandState } from './Command'
 import * as Fixtures from './__fixtures__'
 import { customViewports } from '../../../../.storybook/preview'
 import type { Meta, StoryObj } from '@storybook/react'
+import type { RunTimeCommand } from '@opentrons/shared-data'
+import { uniq } from 'lodash'
+
+type CommandType = RunTimeCommand['commandType']
 
 interface StorybookArgs {
+  selectCommandBy: 'protocol index' | 'command type'
   commandIndex: number
+  commandType: CommandType
+  commandTypeIndex: number
   aligned: 'left' | 'center'
-  kind: 'odd' | 'desktop'
   state: CommandState
 }
 
+const availableCommandTypes = uniq(
+  Fixtures.mockQIASeqTextData.commands.map(command => command.commandType)
+)
+const commandsByType: Partial<Record<CommandType, RunTimeCommand[]>> = {}
+
+function commandsOfType(type: CommandType): RunTimeCommand[] {
+  if (type in commandsByType) {
+    return commandsByType[type]
+  }
+  commandsByType[type] = Fixtures.mockQIASeqTextData.commands.filter(
+    command => command.commandType === type
+  )
+  return commandsByType[type]
+}
+
+function safeCommandOfType(type: CommandType, index: number): RunTimeCommand {
+  const commands = commandsOfType(type)
+  if (index >= commands.length) {
+    return commands.at(-1)
+  }
+  return commands[index]
+}
+
 function Wrapper(props: StorybookArgs): JSX.Element {
-  const command = Fixtures.mockDoItAllTextData.commands[props.commandIndex]
-  return (
+  const command =
+    props.selectCommandBy === 'protocol index'
+      ? Fixtures.mockQIASeqTextData.commands[
+          props.commandIndex < Fixtures.mockQIASeqTextData.commands.length
+            ? props.commandIndex
+            : -1
+        ]
+      : safeCommandOfType(props.commandType, props.commandTypeIndex)
+  return command == null ? null : (
     <CommandComponent
       command={command}
-      commandTextData={Fixtures.mockDoItAllTextData}
+      commandTextData={Fixtures.mockQIASeqTextData}
       robotType="OT-3 Standard"
       state={props.state}
       aligned={props.aligned}
@@ -29,13 +65,38 @@ const meta: Meta<StorybookArgs> = {
   title: 'App/Molecules/Command/Command',
   component: Wrapper,
   argTypes: {
+    selectCommandBy: {
+      control: {
+        type: 'select',
+      },
+      options: ['protocol index', 'command type'],
+      defaultValue: 'command type',
+    },
+    commandType: {
+      control: {
+        type: 'select',
+      },
+      options: availableCommandTypes,
+      defaultValue: 'comment',
+      if: { arg: 'selectCommandBy', eq: 'command type' },
+    },
+    commandTypeIndex: {
+      control: {
+        type: 'range',
+        min: 0,
+        max: 100,
+      },
+      defaultValue: 0,
+      if: { arg: 'selectCommandBy', eq: 'command type' },
+    },
     commandIndex: {
       control: {
         type: 'range',
         min: 0,
-        max: Fixtures.mockDoItAllTextData.commands.length - 1,
+        max: Fixtures.mockQIASeqTextData.commands.length - 1,
       },
       defaultValue: 0,
+      if: { arg: 'selectCommandBy', eq: 'protocol index' },
     },
     aligned: {
       control: {
@@ -43,13 +104,6 @@ const meta: Meta<StorybookArgs> = {
       },
       options: ['left', 'center'],
       defaultValue: 'left',
-    },
-    kind: {
-      control: {
-        type: 'select',
-      },
-      options: ['odd', 'desktop'],
-      defaultValue: 'odd',
     },
     state: {
       control: {
@@ -71,21 +125,39 @@ export default meta
 
 type Story = StoryObj<typeof Wrapper>
 
-export const LeftCurrentPauseCommand: Story = {
-  args: { commandIndex: 55, aligned: 'left', kind: 'odd', state: 'current' },
+export const PauseCommand: Story = {
+  args: {
+    selectCommandBy: 'command type',
+    commandType: 'waitForResume',
+    commandTypeIndex: 0,
+    aligned: 'left',
+    state: 'current',
+  },
 }
-export const LeftFuturePauseCommand: Story = {
-  args: { commandIndex: 55, aligned: 'left', kind: 'odd', state: 'future' },
+export const OneLineCommand: Story = {
+  args: {
+    selectCommandBy: 'command type',
+    commandType: 'aspirate',
+    commandTypeIndex: 0,
+    aligned: 'left',
+    state: 'current',
+  },
 }
-export const LeftFailedPauseCommand: Story = {
-  args: { commandIndex: 55, aligned: 'left', kind: 'odd', state: 'failed' },
+export const TwoLineCommand: Story = {
+  args: {
+    selectCommandBy: 'command type',
+    commandType: 'moveLabware',
+    commandTypeIndex: 0,
+    aligned: 'left',
+    state: 'current',
+  },
 }
-export const CenterCurrentPauseCommand: Story = {
-  args: { commandIndex: 55, aligned: 'center', kind: 'odd', state: 'current' },
-}
-export const CenterFuturePauseCommand: Story = {
-  args: { commandIndex: 55, aligned: 'center', kind: 'odd', state: 'future' },
-}
-export const CenterFailedPauseCommand: Story = {
-  args: { commandIndex: 55, aligned: 'center', kind: 'odd', state: 'failed' },
+export const ThreeLineCommand: Story = {
+  args: {
+    selectCommandBy: 'command type',
+    commandType: 'thermocycler/runProfile',
+    commandTypeIndex: 0,
+    aligned: 'left',
+    state: 'current',
+  },
 }

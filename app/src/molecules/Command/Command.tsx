@@ -6,21 +6,21 @@ import {
   ALIGN_CENTER,
   COLORS,
   BORDERS,
-  TYPOGRAPHY,
   SPACING,
+  RESPONSIVENESS,
 } from '@opentrons/components'
 import type { RobotType, RunTimeCommand } from '@opentrons/shared-data'
 import { CommandText, CommandIcon } from '.'
 import type { CommandTextData } from './types'
 import { Skeleton } from '../../atoms/Skeleton'
 import type { StyleProps } from '@opentrons/components'
+import { omit } from 'lodash'
 
 export type CommandState = NonSkeletonCommandState | 'loading'
 type NonSkeletonCommandState = 'current' | 'failed' | 'future'
 
 interface FundamentalProps {
   robotType: RobotType
-  isOnDevice?: boolean
   aligned: 'left' | 'center'
 }
 
@@ -39,20 +39,24 @@ interface NonSkeletonCommandProps extends FundamentalProps {
 export type CommandProps = SkeletonCommandProps | NonSkeletonCommandProps
 
 export function Command(props: CommandProps): JSX.Element {
+  // This uses the dynamic function variant to work with storybook
+  const isOnDevice = RESPONSIVENESS.isTouchscreenDynamic()
   return props.state === 'loading' ? (
-    <Skeleton width="100%" height="2rem" backgroundSize="47rem" />
+    <Skeleton width="100%" height={SKELETON_HEIGHT} backgroundSize="47rem" />
   ) : props.aligned === 'left' ? (
-    <LeftAlignedCommand {...props} />
+    <LeftAlignedCommand {...props} isOnDevice={isOnDevice} />
   ) : (
-    <CenteredCommand {...props} />
+    <CenteredCommand {...props} isOnDevice={isOnDevice} />
   )
 }
 
-const ICON_SIZE = SPACING.spacing32 as const
+const ICON_SIZE = SPACING.spacing32
+const CONTAINER_Y_PADDING = SPACING.spacing12
+const SKELETON_HEIGHT = '3.5rem' // spacing32 + spacing12 + spacing12, not otherwise a constant
 const UNIVERSAL_CONTAINER_STYLES = {
   borderRadius: BORDERS.borderRadius8,
   paddingX: SPACING.spacing24,
-  paddingY: SPACING.spacing12,
+  paddingY: CONTAINER_Y_PADDING,
 } as const
 
 const UNIVERSAL_ICON_STYLES = {
@@ -61,7 +65,7 @@ const UNIVERSAL_ICON_STYLES = {
 } as const
 
 const PROPS_BY_STATE: Record<
-  NonSkeletonState,
+  NonSkeletonCommandState,
   { container: StyleProps; icon: StyleProps }
 > = {
   current: {
@@ -94,7 +98,7 @@ const PROPS_BY_STATE: Record<
 }
 
 export function CenteredCommand(
-  props: Omit<NonSkeletonCommandProps, 'aligned'>
+  props: Omit<NonSkeletonCommandProps, 'aligned'> & { isOnDevice: boolean }
 ): JSX.Element {
   return (
     <Flex
@@ -107,14 +111,21 @@ export function CenteredCommand(
         {...PROPS_BY_STATE[props.state].icon}
       />
       <Flex minHeight={ICON_SIZE} alignItems={ALIGN_CENTER}>
-        <CommandText {...props} />
+        <CommandText
+          {...props}
+          css={`
+            $media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
+              line-clamp: 2;
+            }
+          `}
+        />
       </Flex>
     </Flex>
   )
 }
 
 export function LeftAlignedCommand(
-  props: Omit<NonSkeletonCommandProps, 'aligned'>
+  props: Omit<NonSkeletonCommandProps, 'aligned'> & { isOnDevice: boolean }
 ): JSX.Element {
   return (
     <Flex
@@ -127,7 +138,10 @@ export function LeftAlignedCommand(
         {...PROPS_BY_STATE[props.state].icon}
       />
       <Flex minHeight={ICON_SIZE} alignItems={ALIGN_CENTER}>
-        <CommandText {...props} />
+        <CommandText
+          {...omit(props, ['isOnDevice'])}
+          propagateTextLimit={props.isOnDevice}
+        />
       </Flex>
     </Flex>
   )

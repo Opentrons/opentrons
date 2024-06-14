@@ -1,11 +1,12 @@
 import robotSideAnalysis from './mockRobotSideAnalysis.json'
 import doItAllAnalysis from './doItAllV8.json'
+import qiaseqAnalysis from './analysis_QIAseqFX24xv4_8.json'
 import type { CompletedProtocolAnalysis } from '@opentrons/shared-data'
 import type { CommandTextData } from '../types'
 
 export const mockRobotSideAnalysis: CompletedProtocolAnalysis = robotSideAnalysis as CompletedProtocolAnalysis
 export const mockDoItAllAnalysis: CompletedProtocolAnalysis = doItAllAnalysis as CompletedProtocolAnalysis
-
+export const mockQIASeqAnalysis: CompletedProtocolAnalysis = (qiaseqAnalysis as unknown) as CompletedProtocolAnalysis
 export const mockCommandTextData: CommandTextData = {
   commands: mockRobotSideAnalysis.commands,
   pipettes: mockRobotSideAnalysis.pipettes,
@@ -20,4 +21,12 @@ export const mockDoItAllTextData: CommandTextData = {
   labware: mockDoItAllAnalysis.labware,
   modules: mockDoItAllAnalysis.modules,
   liquids: mockDoItAllAnalysis.liquids,
+}
+
+export const mockQIASeqTextData: CommandTextData = {
+  commands: mockQIASeqAnalysis.commands,
+  pipettes: mockQIASeqAnalysis.pipettes,
+  labware: mockQIASeqAnalysis.labware,
+  modules: mockQIASeqAnalysis.modules,
+  liquids: mockQIASeqAnalysis.liquids,
 }
