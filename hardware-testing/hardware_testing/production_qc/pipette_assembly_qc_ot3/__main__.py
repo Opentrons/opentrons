@@ -449,7 +449,7 @@ async def _move_to_fixture(api: OT3API, mount: OT3Mount) -> None:
 
     #Z down 0.5
     if "single" in pipptype[OT3Mount.LEFT]['name']:
-        await api.move_rel(mount, Point(z=-0.3))
+        await api.move_rel(mount, Point(z=-0.4))
     elif "multi" in pipptype[OT3Mount.LEFT]['name']:
         await api.move_rel(mount, Point(z=3))
     CALIBRATED_LABWARE_LOCATIONS.fixture = await api.gantry_position(mount)
@@ -758,10 +758,10 @@ async def _test_for_leak(
         current_val = PRESSURE_THRESH_current[PIP_CHANNELS_CURRENT][PIP_VOL_CURRENT][8]
         LOG_GING.info(f"current_val:{current_val}")
         await helpers_ot3.update_pick_up_current(api,mount,current_val)
-    elif PIP_CHANNELS_CURRENT == 1:
-        current_val = PRESSURE_THRESH_current[PIP_CHANNELS_CURRENT][PIP_VOL_CURRENT][1]
-        LOG_GING.info(f"current_val:{current_val}")
-        await helpers_ot3.update_pick_up_current(api,mount,current_val)
+    # elif PIP_CHANNELS_CURRENT == 1:
+    #     current_val = PRESSURE_THRESH_current[PIP_CHANNELS_CURRENT][PIP_VOL_CURRENT][1]
+    #     LOG_GING.info(f"current_val:{current_val}")
+    #     await helpers_ot3.update_pick_up_current(api,mount,current_val)
     if fixture:
         await _pick_up_tip_for_tip_volume(api, mount, tip_volume=tip_volume)
         assert write_cb, "pressure fixture requires recording data to disk"
@@ -1429,7 +1429,7 @@ async def _jog_for_tip_state(
             #print(f"found {tip_state.name} displacement: {current_z} ({passed})")
             LOG_GING.info(f"found {tip_state.name} displacement: {current_z} ({passed})")
             if not passed:
-                printsig = f"06-02-tip-presence:测试光栅距离,针管状态{tip_state.name}移液轴头到触发光栅的距离为{current_z} 结果为{passed}阈值为{min(criteria)} ~ {max(criteria)}.触发观点开关的走的距离为{graval}"
+                printsig = f"06-02-tip-presence:测试光栅距离,针管状态{tip_state.name}移液轴头到触发光栅的距离为{current_z} 结果为{passed} 阈值为{min(criteria)} ~ {max(criteria)}.触发光电开关的走的距离为{graval}"
                 ui.print_fail(printsig)
                 FINAL_TEST_FAIL_INFOR.append(printsig)
                 LOG_GING.error(printsig)
@@ -2182,7 +2182,7 @@ async def _main(test_config: TestConfig) -> None:  # noqa: C901
         LOG_GING.info("done")
         #print("done")
     except Exception as err:
-        printsig = f"08-01-assembly-system-error:移液器不能达到测试标准,触发了系统错误,日志:{err}"
+        printsig = f"08-01-assembly-system-error:系统错误,日志:{err}"
         ui.print_fail(printsig)
         LOG_GING.error(printsig)
         LOG_GING.critical(err)

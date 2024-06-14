@@ -338,7 +338,7 @@ async def _main(is_simulating: bool, trials: int, continue_after_stall: bool) ->
                 break
     except Exception as errrrr:
         #print(f"system-error {errrrr}")
-        printsig = f"08-01-current-system-error:移液器不能达到测试标准,触发了系统错误,日志:{errrrr}"
+        printsig = f"08-01-current-system-error:系统错误,日志:{errrrr}"
         ui.print_fail(printsig)
         
 
