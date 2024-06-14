@@ -11,11 +11,7 @@ import {
 import { FLEX_ROBOT_TYPE, OT2_ROBOT_TYPE } from '@opentrons/shared-data'
 
 import { RadioButton } from '../../../atoms/buttons'
-import {
-  ERROR_KINDS,
-  ODD_SECTION_TITLE_STYLE,
-  RECOVERY_MAP,
-} from '../constants'
+import { ODD_SECTION_TITLE_STYLE, RECOVERY_MAP } from '../constants'
 import { RecoveryFooterButtons, RecoverySingleColumnContent } from '../shared'
 import { DropTipWizardFlows } from '../../DropTipWizardFlows'
 
@@ -51,8 +47,6 @@ export function BeginRemoval({
   tipStatusUtils,
   routeUpdateActions,
   recoveryCommands,
-  errorKind,
-  hasLaunchedRecovery,
   previousRoute,
 }: RecoveryContentProps): JSX.Element | null {
   const { t } = useTranslation('error_recovery')
@@ -63,7 +57,7 @@ export function BeginRemoval({
     proceedToRouteAndStep,
   } = routeUpdateActions
   const { cancelRun } = recoveryCommands
-  const { ROBOT_CANCELING, RETRY_NEW_TIPS, OPTION_SELECTION } = RECOVERY_MAP
+  const { ROBOT_CANCELING, RETRY_NEW_TIPS } = RECOVERY_MAP
   const mount = head(pipettesWithTip)?.mount
 
   const [selected, setSelected] = React.useState<RemovalOptions>(
@@ -74,11 +68,11 @@ export function BeginRemoval({
     if (selected === 'begin-removal') {
       void proceedNextStep()
     } else {
-      if (
-        errorKind === ERROR_KINDS.OVERPERSSURE_WHILE_ASPIRATING &&
-        previousRoute === OPTION_SELECTION.ROUTE
-      ) {
-        void proceedToRouteAndStep(RETRY_NEW_TIPS.ROUTE)
+      if (previousRoute === RETRY_NEW_TIPS.ROUTE) {
+        void proceedToRouteAndStep(
+          RETRY_NEW_TIPS.ROUTE,
+          RETRY_NEW_TIPS.STEPS.REPLACE_TIPS
+        )
       } else {
         void setRobotInMotion(true, ROBOT_CANCELING.ROUTE).then(() => {
           cancelRun()
@@ -129,7 +123,7 @@ function DropTipFlowsContainer(props: RecoveryContentProps): JSX.Element {
     routeUpdateActions,
     recoveryCommands,
     isFlex,
-    errorKind,
+    previousRoute,
   } = props
   const { DROP_TIP_FLOWS, ROBOT_CANCELING, RETRY_NEW_TIPS } = RECOVERY_MAP
   const { proceedToRouteAndStep, setRobotInMotion } = routeUpdateActions
@@ -141,8 +135,11 @@ function DropTipFlowsContainer(props: RecoveryContentProps): JSX.Element {
   ) as PipetteWithTip // Safe as we have to have tips to get to this point in the flow.
 
   const onCloseFlow = (): void => {
-    if (errorKind === ERROR_KINDS.OVERPERSSURE_WHILE_ASPIRATING) {
-      void proceedToRouteAndStep(RETRY_NEW_TIPS.ROUTE)
+    if (previousRoute === RETRY_NEW_TIPS.ROUTE) {
+      void proceedToRouteAndStep(
+        RETRY_NEW_TIPS.ROUTE,
+        RETRY_NEW_TIPS.STEPS.REPLACE_TIPS
+      )
     } else {
       void setTipStatusResolved(onEmptyCache, onTipsDetected)
     }
@@ -183,7 +180,11 @@ export function useDropTipFlowUtils({
   const failedCommandId = failedCommand?.id ?? '' // We should have a failed command here unless the run is not in AWAITING_RECOVERY.
 
   const buildTipDropCompleteBtn = (): string => {
+    const { RETRY_NEW_TIPS } = RECOVERY_MAP
+
     switch (previousRoute) {
+      case RETRY_NEW_TIPS.ROUTE:
+        return t('proceed_to_tip_selection')
       default:
         return t('proceed_to_cancel')
     }

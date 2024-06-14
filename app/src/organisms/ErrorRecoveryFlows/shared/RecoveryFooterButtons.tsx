@@ -5,7 +5,6 @@ import { css } from 'styled-components'
 import {
   ALIGN_CENTER,
   Flex,
-  JUSTIFY_FLEX_END,
   JUSTIFY_SPACE_BETWEEN,
   SPACING,
   COLORS,

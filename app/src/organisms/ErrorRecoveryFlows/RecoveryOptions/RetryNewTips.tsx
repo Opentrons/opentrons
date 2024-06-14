@@ -6,12 +6,17 @@ import { ReplaceTips, SelectTips, RetryWithNewTips } from '../shared'
 import type { RecoveryContentProps } from '../types'
 
 export function RetryNewTips(props: RecoveryContentProps): JSX.Element | null {
-  const { recoveryMap } = props
+  const { recoveryMap, routeUpdateActions } = props
+  const { step } = recoveryMap
+  const { RETRY_NEW_TIPS, DROP_TIP_FLOWS } = RECOVERY_MAP
+
+  // Do this instead of directly routing to DropTipFlows route first, so
+  // previous route correctly labels this route as the previous route.
+  if (step === RETRY_NEW_TIPS.STEPS.DROP_TIPS) {
+    void routeUpdateActions.proceedToRouteAndStep(DROP_TIP_FLOWS.ROUTE)
+  }
 
   const buildContent = (): JSX.Element | null => {
-    const { RETRY_NEW_TIPS } = RECOVERY_MAP
-    const { step } = recoveryMap
-
     switch (step) {
       case RETRY_NEW_TIPS.STEPS.REPLACE_TIPS:
         return <ReplaceTips {...props} />
