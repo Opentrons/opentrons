@@ -1,4 +1,6 @@
-import { ICON_DATA_BY_NAME } from '@opentrons/components'
+import * as React from 'react'
+
+import { Box, ICON_DATA_BY_NAME } from '@opentrons/components'
 
 import { Move } from './Move'
 
@@ -63,6 +65,11 @@ export const MoveBetweenSlots: Story = {
       slotName: 'B2',
     },
   },
+  render: args => (
+    <Box width="27rem">
+      <Move {...args} />
+    </Box>
+  ),
 }
 
 export const Refill: Story = {
@@ -73,6 +80,11 @@ export const Refill: Story = {
       slotName: 'A1',
     },
   },
+  render: args => (
+    <Box width="27rem">
+      <Move {...args} />
+    </Box>
+  ),
 }
 
 export const Select: Story = {
@@ -86,4 +98,9 @@ export const Select: Story = {
       slotName: 'B1',
     },
   },
+  render: args => (
+    <Box width="27rem">
+      <Move {...args} />
+    </Box>
+  ),
 }
