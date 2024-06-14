@@ -38,7 +38,7 @@ async def _main(
         starting_mount_height=plate_a1_pos.z,
         max_z_distance=20,
         mount_speed=5.0,
-        plunger_speed=0.0,
+        plunger_speed=0.001,
         sensor_threshold_pascals=threshold,
         output_option=OutputOptions.sync_only,
         aspirate_while_sensing=False,
@@ -77,12 +77,13 @@ async def _main(
         # move up some distance and aspirate
         print(f"moving up {mm_from_bottom} mm from bottom:")
         await api.move_rel(mount, Point(z=mm_from_bottom), speed=SPEED_IN_WELL)
-        print(f"aspirate {volume} uL")
+        print(f"aspirating {volume} uL")
         await api.aspirate(mount, volume)
         await api.move_to(mount, trial_plate_pos, speed=SPEED_IN_WELL)
         await api.move_to(mount, trial_plate_pos + Point(z=10))
 
         # move to the destination plate, and dispense
+        print(f"dispensing into corning plate")
         await helpers_ot3.move_to_arched_ot3(api, mount, trial_corning_pos)
         await api.move_rel(mount, Point(z=-6), speed=SPEED_IN_WELL)  # i just know
         await api.dispense(mount, push_out=7)
@@ -90,6 +91,7 @@ async def _main(
         await api.move_to(mount, trial_corning_pos + Point(z=10))
 
         # return the tip
+        print("returning tip to tip-rack")
         await helpers_ot3.move_to_arched_ot3(api, mount, trial_tip_pos)
         await api.move_rel(mount, Point(z=-20))
         await api.drop_tip(mount)
@@ -102,7 +104,7 @@ if __name__ == "__main__":
     parser.add_argument("--pipette", type=int, choices=[50, 1000], required=True)
     parser.add_argument("--tip", type=int, choices=[50, 200, 1000], required=True)
     parser.add_argument("--volume", type=float, required=True)
-    parser.add_argument("--trials", type=int, required=True)
+    parser.add_argument("--trials", type=int, default=1)
     parser.add_argument("--mm-from-bottom", type=float, default=0.25)
     parser.add_argument("--threshold", type=float, default=10.0)
     args = parser.parse_args()
