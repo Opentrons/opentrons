@@ -523,7 +523,7 @@ export function ChooseRobotSlideout(
               const error =
                 runtimeParam.file?.file?.type === 'text/csv'
                   ? null
-                  : t('file_must_be_csv')
+                  : t('csv_file_type_required')
               if (error != null) {
                 errors.push(error)
               }
