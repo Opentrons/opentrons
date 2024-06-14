@@ -9,7 +9,7 @@ export function getWellRatio(
   destWells?: string[] | null,
   isDispensingIntoTrash?: boolean
 ): WellRatio | null | undefined {
-  if (isDispensingIntoTrash) {
+  if (Boolean(isDispensingIntoTrash)) {
     if (!Array.isArray(sourceWells) || sourceWells.length === 0) {
       return null
     }
@@ -55,7 +55,7 @@ export const getNextNonTerminalItemId = (
   let nextStepId = orderedStepIds[highestDeletedIndex + 1]
   let attemptsLeft = orderedStepIds.length
 
-  while (!nextStepId && attemptsLeft > 0) {
+  while (nextStepId == null && attemptsLeft > 0) {
     attemptsLeft -= 1
     highestDeletedIndex -= 1
     const potentialNextStepId = orderedStepIds[highestDeletedIndex]

@@ -17,7 +17,7 @@ import type {
 
 const _getWellContents = (
   labwareDef: LabwareDefinition2,
-  __ingredientsForContainer: SingleLabwareLiquidState,
+  _ingredientsForContainer: SingleLabwareLiquidState,
   selectedWells: WellGroup | null | undefined,
   highlightedWells: WellGroup | null | undefined
 ): ContentsByWell => {
@@ -32,17 +32,17 @@ const _getWellContents = (
       wellName: string
     ): ContentsByWell => {
       const groupIds: string[] =
-        __ingredientsForContainer && __ingredientsForContainer[wellName]
-          ? Object.keys(__ingredientsForContainer[wellName])
+        _ingredientsForContainer?.[wellName] != null
+          ? Object.keys(_ingredientsForContainer[wellName])
           : []
       return {
         ...acc,
         [wellName]: {
-          highlighted: highlightedWells ? wellName in highlightedWells : false,
-          selected: selectedWells ? wellName in selectedWells : false,
+          highlighted: highlightedWells != null ? wellName in highlightedWells : false,
+          selected: selectedWells != null ? wellName in selectedWells : false,
           maxVolume: well.totalLiquidVolume,
           groupIds,
-          ingreds: __ingredientsForContainer?.[wellName] || {},
+          ingreds: _ingredientsForContainer?.[wellName] ?? {},
         },
       }
     },
@@ -80,7 +80,7 @@ export const getWellContentsAllLabware: Selector<WellContentsByLabware> = create
         )
 
         // Skip labware ids with no liquids
-        return wellContents ? { ...acc, [labwareId]: wellContents } : acc
+        return wellContents != null ? { ...acc, [labwareId]: wellContents } : acc
       },
       {}
     )

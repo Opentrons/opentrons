@@ -35,8 +35,7 @@ export const generateSubsteps = (args: GenerateSubstepsArgs): Substeps => {
     ...robotStateTimeline.timeline,
   ]
   return orderedStepIds.reduce((acc: Substeps, stepId, timelineIndex) => {
-    const robotState =
-      timeline[timelineIndex] && timeline[timelineIndex].robotState
+    const robotState = timeline[timelineIndex]?.robotState
     const substeps = generateSubstepItem(
       allStepArgsAndErrors[stepId],
       invariantContext,

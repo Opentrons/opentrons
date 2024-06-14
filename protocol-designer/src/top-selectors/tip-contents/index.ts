@@ -43,7 +43,7 @@ export const getMissingTipsByLabwareId: Selector<Record<
         robotState = lastValidRobotState
       } else {
         console.error(
-          `Invalid terminalId ${terminalId}, could not getMissingTipsByLabwareId`
+          `Invalid terminalId ${terminalId as string}, could not getMissingTipsByLabwareId`
         )
       }
     } else {
@@ -59,20 +59,19 @@ export const getMissingTipsByLabwareId: Selector<Record<
       }
 
       const prevFrame = timeline[timelineIdx - 1]
-      if (prevFrame) robotState = prevFrame.robotState
+      if (prevFrame != null) robotState = prevFrame.robotState
     }
 
     const missingTips =
-      robotState &&
-      robotState.tipState &&
-      mapValues(robotState.tipState.tipracks, tipMap =>
-        reduce(
-          tipMap,
-          (acc, hasTip, wellName): WellGroup =>
-            hasTip ? acc : { ...acc, [wellName]: null },
-          {}
-        )
-      )
+      robotState?.tipState != null ?
+        mapValues(robotState.tipState.tipracks, tipMap =>
+          reduce(
+            tipMap,
+            (acc, hasTip, wellName): WellGroup =>
+              Boolean(hasTip) ? acc : { ...acc, [wellName]: null },
+            {}
+          )
+        ) : null
     return missingTips
   }
 )

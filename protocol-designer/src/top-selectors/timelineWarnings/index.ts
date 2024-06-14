@@ -13,7 +13,7 @@ export const getTimelineWarningsForSelectedStep: Selector<
   getSelectedStepId,
   (dismissedWarningTypes, warningsPerStep, stepId) => {
     if (stepId == null) return []
-    return (warningsPerStep[stepId] || []).filter(
+    return (warningsPerStep[stepId] ?? []).filter(
       warning => !dismissedWarningTypes.includes(warning.type)
     )
   }
@@ -25,7 +25,7 @@ export const getHasTimelineWarningsPerStep: Selector<HasWarningsPerStep> = creat
   stepFormSelectors.getOrderedStepIds,
   (dismissedWarningTypes, warningsPerStep, orderedStepIds) => {
     return orderedStepIds.reduce((stepAcc: HasWarningsPerStep, stepId) => {
-      const warningTypesForStep = (warningsPerStep[stepId] || []).map(
+      const warningTypesForStep = (warningsPerStep[stepId] ?? []).map(
         w => w.type
       )
       const hasUndismissedWarnings =

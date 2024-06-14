@@ -23,7 +23,7 @@ export function useCommandQuery(
       ...options,
       enabled:
         options != null && 'enabled' in options
-          ? options.enabled && defaultEnabled
+          ? Boolean(options.enabled) && defaultEnabled
           : defaultEnabled,
     }
   )

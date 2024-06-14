@@ -29,7 +29,7 @@ export const getLabwareNicknamesById: Selector<
     mapValues(
       labwareEntities,
       (labwareEntity: LabwareEntity, id: string): string =>
-        displayLabware[id]?.nickname || getLabwareDisplayName(labwareEntity.def)
+        displayLabware[id]?.nickname ?? getLabwareDisplayName(labwareEntity.def)
     )
 )
 export const _sortLabwareDropdownOptions = (options: Options): Options =>
@@ -97,7 +97,7 @@ export const getMoveLabwareOptions: Selector<Options> = createSelector(
     unsavedForm
   ) => {
     const savedFormKeys = Object.keys(savedStepForms)
-    const previouslySavedFormDataIndex = unsavedForm
+    const previouslySavedFormDataIndex = unsavedForm != null
       ? savedFormKeys.indexOf(unsavedForm.id)
       : -1
     const filteredSavedStepFormIds =
@@ -194,7 +194,7 @@ export const getLabwareOptions: Selector<Options> = createSelector(
 
         return getIsTiprack(labwareEntity.def) ||
           isAdapter ||
-          isLabwareInWasteChute
+          isLabwareInWasteChute != null
           ? acc
           : [
               ...acc,

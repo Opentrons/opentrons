@@ -77,7 +77,7 @@ export const getIsMultiSelectMode: Selector<boolean> = createSelector(
 export const getMultiSelectItemIds: Selector<
   StepIdType[] | null
 > = createSelector(getSelectedItem, item => {
-  if (item && item.selectionType === MULTI_STEP_SELECTION_TYPE) {
+  if (item != null && item.selectionType === MULTI_STEP_SELECTION_TYPE) {
     return item.ids
   }
 
@@ -100,7 +100,7 @@ export const getHoveredItem: Selector<HoverableItem | null> = createSelector(
 export const getHoveredStepId: Selector<StepIdType | null> = createSelector(
   getHoveredItem,
   item =>
-    item && item.selectionType === SINGLE_STEP_SELECTION_TYPE ? item.id : null
+    item != null && item.selectionType === SINGLE_STEP_SELECTION_TYPE ? item.id : null
 )
 
 /** Array of labware (labwareId's) involved in hovered Step, or [] */
@@ -111,13 +111,13 @@ export const getHoveredStepLabware = createSelector(
   (allStepArgsAndErrors, hoveredStep, initialDeckState) => {
     const blank: string[] = []
 
-    if (!hoveredStep || !allStepArgsAndErrors[hoveredStep]) {
+    if (hoveredStep == null|| allStepArgsAndErrors[hoveredStep] == null) {
       return blank
     }
 
     const stepArgs = allStepArgsAndErrors[hoveredStep].stepArgs
 
-    if (!stepArgs) {
+    if (stepArgs == null) {
       return blank
     }
 
@@ -141,7 +141,7 @@ export const getHoveredStepLabware = createSelector(
         initialDeckState,
         stepArgs.module ?? ''
       )
-      return labware ? [labware.id] : []
+      return labware != null ? [labware.id] : []
     }
 
     if (stepArgs.commandCreatorFnName === 'moveLabware') {
@@ -164,7 +164,7 @@ export const getHoveredStepLabware = createSelector(
 export const getHoveredTerminalItemId: Selector<TerminalItemId | null> = createSelector(
   getHoveredItem,
   item =>
-    item && item.selectionType === TERMINAL_ITEM_SELECTION_TYPE ? item.id : null
+    item != null && item.selectionType === TERMINAL_ITEM_SELECTION_TYPE ? item.id : null
 )
 export const getHoveredSubstep: Selector<SubstepIdentifier> = createSelector(
   rootSelector,
@@ -233,7 +233,7 @@ export const _getSavedMultiSelectFieldValues: Selector<MultiselectFieldValues | 
   stepFormSelectors.getSavedStepForms,
   getMultiSelectItemIds,
   (savedStepForms, multiSelectItemIds) => {
-    if (!multiSelectItemIds) return null
+    if (multiSelectItemIds == null) return null
     const forms = multiSelectItemIds.map(id => savedStepForms[id])
     const stepTypes = uniq(forms.map(form => form.stepType))
 
@@ -300,7 +300,7 @@ export const getMultiSelectDisabledFields: Selector<DisabledFields | null> = cre
   stepFormSelectors.getSavedStepForms,
   getMultiSelectItemIds,
   (savedStepForms, multiSelectItemIds) => {
-    if (!multiSelectItemIds) return null
+    if (multiSelectItemIds == null) return null
     const forms: FormData[] = multiSelectItemIds.map(id => savedStepForms[id])
 
     if (forms.every(form => form.stepType === 'moveLiquid')) {
@@ -322,7 +322,7 @@ export const getCountPerStepType: Selector<CountPerStepType> = createSelector(
     const countPerStepType = steps.reduce<CountPerStepType>((acc, step) => {
       const { stepType } = step
       // @ts-expect-error(sa, 2021-6-15): cannot type narrow this way in TS
-      const newCount = acc[stepType] ? acc[stepType] + 1 : 1
+      const newCount = acc[stepType] != null ? acc[stepType] + 1 : 1
       acc[stepType] = newCount
       return acc
     }, {})

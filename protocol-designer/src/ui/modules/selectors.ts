@@ -29,7 +29,7 @@ export const getLabwareNamesByModuleId: Selector<LabwareNamesByModuleId> = creat
   (initialDeckSetup, nicknamesById) =>
     mapValues(initialDeckSetup.modules, (_, moduleId) => {
       const labware = getLabwareOnModule(initialDeckSetup, moduleId)
-      return labware
+      return labware != null
         ? {
             nickname: nicknamesById[labware.id],
             displayName: getLabwareDisplayName(labware.def),
@@ -85,7 +85,7 @@ export const getSingleMagneticModuleId: Selector<
 > = createSelector(
   getInitialDeckSetup,
   initialDeckSetup =>
-    getModuleOnDeckByType(initialDeckSetup, MAGNETIC_MODULE_TYPE)?.id || null
+    getModuleOnDeckByType(initialDeckSetup, MAGNETIC_MODULE_TYPE)?.id ?? null
 )
 
 /** Get all temperature modules */
@@ -96,7 +96,7 @@ export const getTemperatureModuleIds: Selector<
   initialDeckSetup =>
     getModulesOnDeckByType(initialDeckSetup, TEMPERATURE_MODULE_TYPE)?.map(
       module => module.id
-    ) || null
+    ) ?? null
 )
 
 /** Get single thermocycler module (assumes no multiples) */
@@ -105,7 +105,7 @@ export const getSingleThermocyclerModuleId: Selector<
 > = createSelector(
   getInitialDeckSetup,
   initialDeckSetup =>
-    getModuleOnDeckByType(initialDeckSetup, THERMOCYCLER_MODULE_TYPE)?.id ||
+    getModuleOnDeckByType(initialDeckSetup, THERMOCYCLER_MODULE_TYPE)?.id ??
     null
 )
 

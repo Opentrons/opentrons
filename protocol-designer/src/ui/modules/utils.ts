@@ -104,7 +104,7 @@ export function getModuleLabwareOptions(
   if (modulesOnDeck != null) {
     options = modulesOnDeck.map(moduleOnDeck => {
       const labware = getLabwareOnModule(initialDeckSetup, moduleOnDeck.id)
-      if (labware) {
+      if (labware != null) {
         const labwareOnAdapterId =
           labwares[labware.id] != null ? labwares[labware.id].id : null
         if (labwareOnAdapterId != null) {
@@ -139,7 +139,7 @@ export function getModuleHasLabware(
 ): boolean {
   const moduleOnDeck = getModuleOnDeckByType(initialDeckSetup, type)
   const labware =
-    moduleOnDeck && getLabwareOnModule(initialDeckSetup, moduleOnDeck.id)
+    moduleOnDeck != null && getLabwareOnModule(initialDeckSetup, moduleOnDeck.id)
   return Boolean(moduleOnDeck) && Boolean(labware)
 }
 
@@ -172,7 +172,7 @@ export const getMagnetLabwareEngageHeight = (
   if (magnetModuleId == null) return null
   const moduleModel = initialDeckSetup.modules[magnetModuleId]?.model
   const labware = getLabwareOnModule(initialDeckSetup, magnetModuleId)
-  const engageHeightMm = labware
+  const engageHeightMm = labware != null
     ? getLabwareDefaultEngageHeight(labware.def)
     : null
 

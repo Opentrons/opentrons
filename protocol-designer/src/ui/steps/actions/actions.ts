@@ -71,7 +71,7 @@ export const hoverOnSubstep = (
   payload: SubstepIdentifier
 ): HoverOnSubstepAction => ({
   type: 'HOVER_ON_SUBSTEP',
-  payload: payload,
+  payload,
 })
 export const selectTerminalItem = (
   terminalId: TerminalItemId
@@ -169,7 +169,7 @@ export const deselectAllSteps = (
 ) => {
   const lastSelectedStepId = getMultiSelectLastSelected(getState())
 
-  if (lastSelectedStepId) {
+  if (lastSelectedStepId != null) {
     const selectStepAction: SelectStepAction = {
       type: 'SELECT_STEP',
       payload: lastSelectedStepId,

@@ -16,7 +16,7 @@ const repeatIngreds = (
   colNum: string,
   _ingreds: Ingreds | null | undefined
 ): Ingreds | Ingreds[] => {
-  const ingreds = _ingreds || {}
+  const ingreds = _ingreds ?? {}
   return isMulti
     ? wellNamesForCol(true, colNum).reduce(
         (acc, wellName) => ({ ...acc, [wellName]: ingreds }),
@@ -29,7 +29,7 @@ const repeatIngreds = (
 const getFixtures = ({ isMulti }: { isMulti: boolean }) => {
   // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
   const makeIngreds = (volume: number | null, colNum: string) =>
-    repeatIngreds(isMulti, colNum, volume ? { [ingred1Id]: volume } : null)
+    repeatIngreds(isMulti, colNum, volume != null ? { [ingred1Id]: volume } : null)
   // NOTE: these cases do not cover dynamic behavior of `activeTips` key
   const activeTips = { labware: 'someTiprackId', well: 'A6' }
   return {

@@ -69,7 +69,7 @@ export const getRobotStateAtActiveItem: Selector<RobotState | null> = createSele
         robotState = lastValidRobotState
       } else {
         console.error(
-          `Invalid terminalId ${terminalId}, could not robotState of active item`
+          `Invalid terminalId ${terminalId as string}, could not robotState of active item`
         )
       }
     } else {
@@ -87,7 +87,7 @@ export const getRobotStateAtActiveItem: Selector<RobotState | null> = createSele
         robotState = initialRobotState
       } else {
         const prevFrame = timeline[timelineIdx - 1]
-        if (prevFrame) robotState = prevFrame.robotState
+        if (prevFrame != null) robotState = prevFrame.robotState
       }
     }
 

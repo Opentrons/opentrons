@@ -46,7 +46,7 @@ const dismissedHints: Reducer<DismissedHintReducerState, any> = handleActions(
       action: RehydratePersistedAction
     ) => {
       const persistedState = action.payload?.['tutorial.dismissedHints']
-      return persistedState !== undefined ? persistedState : state
+      return persistedState ?? state
     },
     REMOVE_HINT: (
       state: DismissedHintReducerState,
@@ -74,7 +74,7 @@ export const dismissedHintsPersist = (
   return pickBy(
     state,
     (h: DismissedHintReducerState[keyof DismissedHintReducerState]) =>
-      h && h.rememberDismissal
+      h != null && h.rememberDismissal
   )
 }
 const _allReducers = {

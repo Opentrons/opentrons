@@ -56,7 +56,7 @@ export const shouldShowCoolingHint: Selector<boolean> = createSelector(
     const prevModuleState =
       prevTimelineFrame.robotState.modules[moduleId]?.moduleState
 
-    if (prevModuleState && prevModuleState.type === THERMOCYCLER_MODULE_TYPE) {
+    if (prevModuleState != null && prevModuleState.type === THERMOCYCLER_MODULE_TYPE) {
       const prevLidTemp = prevModuleState.lidTargetTemp
       const nextLidTemp = unsavedForm.lidTargetTemp
       if (prevLidTemp === null || nextLidTemp === null) return false

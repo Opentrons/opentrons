@@ -40,7 +40,7 @@ function _wellsForPipette(
         channels
       )
 
-      return setOfWellsForMulti ? [...acc, ...setOfWellsForMulti] : acc // setOfWellsForMulti is null
+      return setOfWellsForMulti != null ? [...acc, ...setOfWellsForMulti] : acc // setOfWellsForMulti is null
     }, [])
   }
 
@@ -59,12 +59,12 @@ function _getSelectedWellsForStep(
   }
 
   const pipetteId = StepGeneration.getPipetteIdFromCCArgs(stepArgs)
-  const pipetteEntity = pipetteId
+  const pipetteEntity = pipetteId != null
     ? invariantContext.pipetteEntities[pipetteId]
     : null
   const labwareEntity = invariantContext.labwareEntities[labwareId]
 
-  if (!pipetteEntity || !labwareEntity) {
+  if (pipetteEntity == null || labwareEntity == null) {
     return []
   }
   const nozzles = 'nozzles' in stepArgs ? stepArgs.nozzles : null
@@ -110,7 +110,7 @@ function _getSelectedWellsForStep(
     if (c.commandType === 'pickUpTip' && c.params.labwareId === labwareId) {
       const pipetteId = c.params.pipetteId
       const pipetteSpec =
-        invariantContext.pipetteEntities[pipetteId]?.spec || {}
+        invariantContext.pipetteEntities[pipetteId]?.spec ?? {}
       let channels = 1
       if (
         stepArgs.commandCreatorFnName === 'mix' ||
@@ -134,12 +134,11 @@ function _getSelectedWellsForStep(
             invariantContext.labwareEntities[labwareId].def,
             commandWellName,
             channels
-          ) || []
+          ) ?? []
         wells.push(...wellSet)
       } else {
         console.error(
-          `Unexpected number of channels: ${
-            channels || '?'
+          `Unexpected number of channels: ${channels ?? '?'
           }. Could not get tip highlight state`
         )
       }
@@ -166,21 +165,18 @@ function _getSelectedWellsForSubstep(
     // TODO: Ian 2019-01-29 be more explicit about commandCreatorFnName,
     // don't rely so heavily on the fact that their well fields are the same now
     // @ts-expect-error(sa, 2021-6-22): type narrow
-    if (!substeps || substeps.commandCreatorFnName === 'delay') return []
-    // @ts-expect-error(sa, 2021-6-22): type narrow
-    if (substeps.rows && substeps.rows[substepIndex]) {
+    if (substeps == null || substeps.commandCreatorFnName === 'delay') return []
+    if ('rows' in substeps && substeps.rows?.[substepIndex] != null) {
       // single-channel
-      // @ts-expect-error(sa, 2021-6-22): type narrow
       const wellData = substeps.rows[substepIndex][wellField]
-      return wellData && wellData.well ? [wellData.well] : []
+      return wellData?.well != null ? [wellData.well] : []
     }
-    // @ts-expect-error(sa, 2021-6-22): type narrow
-    if (substeps.multiRows && substeps.multiRows[substepIndex]) {
+    if ('multiRows' in substeps && substeps.multiRows?.[substepIndex] != null) {
       // multi-channel
       // @ts-expect-error(sa, 2021-6-22): type narrow
       return substeps.multiRows[substepIndex].reduce((acc, multiRow) => {
         const wellData = multiRow[wellField]
-        return wellData && wellData.well ? [...acc, wellData.well] : acc
+        return wellData?.well != null ? [...acc, wellData.well] : acc
       }, [])
     }
 
@@ -192,7 +188,7 @@ function _getSelectedWellsForSubstep(
   // single-labware steps
   if (
     stepArgs.commandCreatorFnName === 'mix' &&
-    stepArgs.labware &&
+    stepArgs.labware != null &&
     stepArgs.labware === labwareId
   ) {
     return getWells('source')
@@ -216,7 +212,7 @@ function _getSelectedWellsForSubstep(
     wells.push(...getWells('dest'))
   }
 
-  if (substeps && substeps.substepType === 'sourceDest') {
+  if (substeps?.substepType === 'sourceDest') {
     let tipWellSet: string[] = []
     if ('pipette' in stepArgs) {
       if (substeps.multichannel) {
@@ -237,7 +233,7 @@ function _getSelectedWellsForSubstep(
         }
         // just use first multi row
         if (
-          activeTips &&
+          activeTips != null &&
           activeTips.labwareId === labwareId &&
           channels !== 1
         ) {
@@ -246,15 +242,15 @@ function _getSelectedWellsForSubstep(
             activeTips.wellName,
             channels
           )
-          if (multiTipWellSet) tipWellSet = multiTipWellSet
+          if (multiTipWellSet != null) tipWellSet = multiTipWellSet
         }
       } else {
         // single-channel
         const { activeTips } = substeps.rows[substepIndex]
         if (
-          activeTips &&
+          activeTips != null &&
           activeTips.labwareId === labwareId &&
-          activeTips.wellName
+          activeTips.wellName != null
         )
           tipWellSet = [activeTips.wellName]
       }
@@ -288,13 +284,12 @@ export const wellHighlightsByLabwareId: Selector<
     const stepId = hoveredStepId
     const timelineIndex = orderedStepIds.findIndex(i => i === stepId)
     const frame = timeline[timelineIndex]
-    const robotState = frame && frame.robotState
-    const stepArgs =
-      stepId != null &&
-      allStepArgsAndErrors[stepId] &&
-      allStepArgsAndErrors[stepId].stepArgs
+    const robotState = frame?.robotState
+    const stepArgs = stepId != null
+        ? allStepArgsAndErrors[stepId]?.stepArgs
+        : null
 
-    if (!robotState || stepId == null || !stepArgs) {
+    if (robotState == null || stepId == null || stepArgs == null) {
       // nothing hovered, or no stepArgs for step
       return {}
     }

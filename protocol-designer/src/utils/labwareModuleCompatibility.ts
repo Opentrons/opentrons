@@ -78,7 +78,7 @@ export const getLabwareIsCompatible = (
     `expected ${moduleType} in labware<>module compatibility allowlist`
   )
   const allowlist =
-    COMPATIBLE_LABWARE_ALLOWLIST_BY_MODULE_TYPE[moduleType] || []
+    COMPATIBLE_LABWARE_ALLOWLIST_BY_MODULE_TYPE[moduleType] ?? []
   return allowlist.includes(def.parameters.loadName)
 }
 

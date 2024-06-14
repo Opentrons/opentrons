@@ -30,8 +30,8 @@ function _wellContentsForWell(
   well: string
 ): WellContents {
   // TODO IMMEDIATELY Ian 2018-03-23 why is liquidVolState missing sometimes (eg first call with trashId)? Thus the liquidVolState || {}
-  const ingredGroupIdsWithContent = Object.keys(liquidVolState || {}).filter(
-    groupId => liquidVolState[groupId] && liquidVolState[groupId].volume > 0
+  const ingredGroupIdsWithContent = Object.keys(liquidVolState ?? {}).filter(
+    groupId => liquidVolState[groupId] != null && liquidVolState[groupId].volume > 0
   )
   return {
     wellName: well,
@@ -39,7 +39,7 @@ function _wellContentsForWell(
     // TODO: BC 2018-09-21 remove in favor of volumeByGroupId
     ingreds: omitBy(
       liquidVolState,
-      ingredData => !ingredData || ingredData.volume <= 0
+      ingredData => !Boolean(ingredData) || ingredData.volume <= 0
     ),
   }
 }
@@ -52,10 +52,10 @@ export function _wellContentsForLabware(
   return reduce(
     allWellsForContainer,
     (wellAcc, well: string): Record<string, WellContents> => {
-      const wellHasContents = labwareLiquids && labwareLiquids[well]
+      const wellHasContents = labwareLiquids?.[well]
       return {
         ...wellAcc,
-        [well]: wellHasContents
+        [well]: wellHasContents != null
           ? _wellContentsForWell(labwareLiquids[well], well)
           : {},
       }
@@ -92,9 +92,9 @@ export const getSelectedWellsMaxVolume: Selector<number> = createSelector(
   labwareIngredSelectors.getSelectedLabwareId,
   stepFormSelectors.getLabwareEntities,
   (selectedWells, selectedLabwareId, labwareEntities) => {
-    const def = selectedLabwareId && labwareEntities[selectedLabwareId].def
+    const def = selectedLabwareId != null ? labwareEntities[selectedLabwareId].def : null
 
-    if (!def) {
+    if (def == null) {
       console.warn('No container type selected, cannot get max volume')
       return Infinity
     }
@@ -120,13 +120,13 @@ export const getSelectedWellsCommonValues: Selector<CommonWellValues> = createSe
   labwareIngredSelectors.getSelectedLabwareId,
   labwareIngredSelectors.getLiquidsByLabwareId,
   (selectedWells, labwareId, allIngreds) => {
-    if (!labwareId)
+    if (labwareId == null)
       return {
         ingredientId: null,
         volume: null,
       }
     const ingredsInLabware = allIngreds[labwareId]
-    if (!ingredsInLabware || isEmpty(selectedWells))
+    if (ingredsInLabware == null || isEmpty(selectedWells))
       return {
         ingredientId: null,
         volume: null,
@@ -137,14 +137,14 @@ export const getSelectedWellsCommonValues: Selector<CommonWellValues> = createSe
       | undefined = ingredsInLabware[Object.keys(selectedWells)[0]]
     // TODO IMMEDIATELY why arbitrary 0th???
     const initialIngredId: string | null | undefined =
-      initialWellContents && Object.keys(initialWellContents)[0]
+      initialWellContents != null ? Object.keys(initialWellContents)[0] : null
     const hasCommonIngred = Object.keys(selectedWells).every((well: string) => {
-      if (!ingredsInLabware[well]) return null
+      if (ingredsInLabware[well] == null) return null
       const ingreds = Object.keys(ingredsInLabware[well])
       return ingreds.length === 1 && ingreds[0] === initialIngredId
     })
 
-    if (!hasCommonIngred || !initialIngredId || !initialWellContents) {
+    if (!hasCommonIngred || initialIngredId == null|| initialWellContents == null) {
       return {
         ingredientId: null,
         volume: null,
@@ -154,7 +154,7 @@ export const getSelectedWellsCommonValues: Selector<CommonWellValues> = createSe
         initialWellContents[initialIngredId].volume
       const hasCommonVolume = Object.keys(selectedWells).every(
         (well: string) => {
-          if (!ingredsInLabware[well] || !initialIngredId) return null
+          if (ingredsInLabware[well] == null || initialIngredId == null) return null
           return (
             ingredsInLabware[well][initialIngredId].volume === initialVolume
           )
@@ -171,11 +171,11 @@ export const getSelectedWellsCommonIngredId: Selector<
   string | null | undefined
 > = createSelector(
   getSelectedWellsCommonValues,
-  commonValues => commonValues.ingredientId || null
+  commonValues => commonValues.ingredientId ?? null
 )
 export const getSelectedWellsCommonVolume: Selector<
   number | null | undefined
 > = createSelector(
   getSelectedWellsCommonValues,
-  commonValues => commonValues.volume || null
+  commonValues => commonValues.volume ?? null
 )

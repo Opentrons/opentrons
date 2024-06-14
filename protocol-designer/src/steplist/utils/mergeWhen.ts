@@ -17,7 +17,7 @@ export function mergeWhen<T>(
     const next = array[i + 1]
 
     if (canMerge) {
-      if (predicate(current, next)) {
+      if (Boolean(predicate(current, next))) {
         result.push(merge(current, next))
         canMerge = false
       } else {

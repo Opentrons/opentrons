@@ -42,8 +42,9 @@ export function _getNewActiveTips(
   const newTipParams =
     (lastNewTipCommand != null &&
       lastNewTipCommand.commandType === 'pickUpTip' &&
-      lastNewTipCommand.params) ||
-    null
+      lastNewTipCommand.params != null)
+      ? lastNewTipCommand.params
+      : null
   return newTipParams
 }
 
@@ -72,17 +73,17 @@ const _createNextTimelineFrame = (args: {
 
   const newTimelineFrame =
     args.command.commandType === 'aspirate' ||
-    args.command.commandType === 'aspirateInPlace'
+      args.command.commandType === 'aspirateInPlace'
       ? {
-          ..._newTimelineFrameKeys,
-          source: args.wellInfo,
-          isAirGap: isAirGapCommand,
-        }
+        ..._newTimelineFrameKeys,
+        source: args.wellInfo,
+        isAirGap: isAirGapCommand,
+      }
       : {
-          ..._newTimelineFrameKeys,
-          dest: args.wellInfo,
-          isAirGap: isAirGapCommand,
-        }
+        ..._newTimelineFrameKeys,
+        dest: args.wellInfo,
+        isAirGap: isAirGapCommand,
+      }
   return newTimelineFrame
 }
 
@@ -97,11 +98,10 @@ export const substepTimelineSingleChannel = (
   initialRobotState: RobotState
 ): SubstepTimelineFrame[] => {
   const nextFrame = commandCreator(invariantContext, initialRobotState)
-  // @ts-expect-error(sa, 2021-6-14): type narrow using in operator
-  if (nextFrame.errors) return []
-  // @ts-expect-error(sa, 2021-6-14): after type narrowing this expect error should not be necessary
+  if ('errors' in nextFrame && nextFrame.errors != null) return []
+  if (!('commands' in nextFrame)) return []
   const timeline = nextFrame.commands.reduce<SubstepTimelineAcc>(
-    (acc: SubstepTimelineAcc, command: CreateCommand, index: number) => {
+    (acc, command, index) => {
       const nextRobotState = getNextRobotStateAndWarningsSingleCommand(
         command,
         invariantContext,
@@ -128,14 +128,13 @@ export const substepTimelineSingleChannel = (
             _createNextTimelineFrame({
               volume,
               index,
-              // @ts-expect-error(sa, 2021-6-14): after type narrowing (see comment above) this expect error should not be necessary
               nextFrame,
               command,
               wellInfo,
             }),
           ],
           prevRobotState: nextRobotState,
-        }
+        } as SubstepTimelineAcc
       } else if (
         command.commandType === 'dispenseInPlace' ||
         command.commandType === 'aspirateInPlace'
@@ -155,7 +154,7 @@ export const substepTimelineSingleChannel = (
         }
         const trashCutoutFixture =
           moveToAddressableAreaCommand?.params.addressableAreaName ===
-          'fixedTrash'
+            'fixedTrash'
             ? 'fixedTrashSlot'
             : 'trashBinAdapter'
 
@@ -188,11 +187,11 @@ export const substepTimelineSingleChannel = (
           wells: [],
           preIngreds:
             acc.prevRobotState.liquidState.additionalEquipment[
-              additionalEquipmentId ?? ''
+            additionalEquipmentId ?? ''
             ],
           postIngreds:
             nextRobotState.liquidState.additionalEquipment[
-              additionalEquipmentId ?? ''
+            additionalEquipmentId ?? ''
             ],
         }
 
@@ -203,7 +202,6 @@ export const substepTimelineSingleChannel = (
             _createNextTimelineFrame({
               volume,
               index,
-              // @ts-expect-error(sa, 2021-6-14): after type narrowing (see comment above) this expect error should not be necessary
               nextFrame,
               command,
               wellInfo,
@@ -269,9 +267,9 @@ export const substepTimelineMultiChannel = (
           wells: wellsForTips || [],
           preIngreds: wellsForTips
             ? pick(
-                acc.prevRobotState.liquidState.labware[labwareId],
-                wellsForTips
-              )
+              acc.prevRobotState.liquidState.labware[labwareId],
+              wellsForTips
+            )
             : {},
           postIngreds: wellsForTips
             ? pick(nextRobotState.liquidState.labware[labwareId], wellsForTips)
@@ -311,7 +309,7 @@ export const substepTimelineMultiChannel = (
         }
         const trashCutoutFixture =
           moveToAddressableAreaCommand?.params.addressableAreaName ===
-          'fixedTrash'
+            'fixedTrash'
             ? 'fixedTrashSlot'
             : 'trashBinAdapter'
 
@@ -319,7 +317,7 @@ export const substepTimelineMultiChannel = (
           wasteChuteddressableAreaNamesPipette.includes(
             moveToAddressableAreaCommand?.params.addressableAreaName ?? ''
           ) ||
-          moveToAddressableAreaCommand?.params.addressableAreaName ===
+            moveToAddressableAreaCommand?.params.addressableAreaName ===
             '96ChannelWasteChute'
             ? 'wasteChuteRightAdapterNoCover'
             : trashCutoutFixture
@@ -347,11 +345,11 @@ export const substepTimelineMultiChannel = (
           wells: [],
           preIngreds:
             acc.prevRobotState.liquidState.additionalEquipment[
-              additionalEquipmentId ?? ''
+            additionalEquipmentId ?? ''
             ],
           postIngreds:
             nextRobotState.liquidState.additionalEquipment[
-              additionalEquipmentId ?? ''
+            additionalEquipmentId ?? ''
             ],
         }
 

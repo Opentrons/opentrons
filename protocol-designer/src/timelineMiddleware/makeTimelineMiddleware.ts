@@ -119,7 +119,7 @@ export const makeTimelineMiddleware: () => Middleware<BaseState, any> = () => {
           'something weird happened, prevTimelineArgs and prevSubstepsArgs should never be null here'
         )
       }
-    } else if (shouldRecomputeSubsteps && prevSuccessAction) {
+    } else if (shouldRecomputeSubsteps && prevSuccessAction != null) {
       // Timeline did not change, but a substeps-specific selector did
       if (prevTimelineArgs !== null && prevSubstepsArgs !== null) {
         worker.postMessage({

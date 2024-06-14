@@ -130,7 +130,7 @@ export const duplicateMultipleSteps: (
   const indexOfLastSelected = orderedStepIds.indexOf(lastSelectedItemId)
   stepIds.sort((a, b) => orderedStepIds.indexOf(a) - orderedStepIds.indexOf(b))
   const duplicateIdsZipped = stepIds.map(stepId => ({
-    stepId: stepId,
+    stepId,
     duplicateStepId: uuid(),
   }))
   const duplicateIds = duplicateIdsZipped.map(
@@ -177,7 +177,7 @@ export const saveStepForm: () => ThunkAction<any> = () => (
   const unsavedForm = getUnsavedForm(initialState)
 
   // this check is only for Flow. At this point, unsavedForm should always be populated
-  if (!unsavedForm) {
+  if (unsavedForm == null) {
     console.assert(
       false,
       'Tried to saveStepForm with falsey unsavedForm. This should never be able to happen.'
@@ -214,7 +214,7 @@ export const saveSetTempFormWithAddedPauseUntilTemp: () => ThunkAction<any> = ()
   )
 
   // this check is only for Flow. At this point, unsavedForm should always be populated
-  if (!unsavedSetTemperatureForm) {
+  if (unsavedSetTemperatureForm == null) {
     console.assert(
       false,
       'Tried to saveSetTempFormWithAddedPauseUntilTemp with falsey unsavedForm. This should never be able to happen.'
@@ -296,7 +296,7 @@ export const saveHeaterShakerFormWithAddedPauseUntilTemp: () => ThunkAction<any>
     initialState
   )
 
-  if (!unsavedHeaterShakerForm) {
+  if (unsavedHeaterShakerForm == null) {
     console.assert(
       false,
       'Tried to saveSetHeaterShakerTempFormWithAddedPauseUntilTemp with falsey unsavedForm. This should never be able to happen.'
