@@ -1412,7 +1412,7 @@ async def _jog_for_tip_state(
 
     async def _matches_state(_state: TipStateType) -> bool:
         try:
-            await asyncio.sleep(0.5)
+            await asyncio.sleep(0.3)
             await api.verify_tip_presence(mount, _state)
             return True
         except FailedTipStateCheck:
@@ -1505,7 +1505,6 @@ async def _test_tip_presence_flag(
     )
     pick_up_pos = await api.gantry_position(mount)
     pick_up_pos_rel = round(pick_up_pos.z - nozzle_pos.z, 2)
-    input("回车")
     await api.move_to(mount, nozzle_pos + Point(z=-10.5))  # nominal tip depth
     drop_criteria = {
         1: (
