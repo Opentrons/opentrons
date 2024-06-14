@@ -1,2 +1,5 @@
 export { RecoveryFooterButtons } from './RecoveryFooterButtons'
 export { RecoverySingleColumnContent } from './RecoverySingleColumnContent'
+export { ReplaceTips } from './ReplaceTips'
+export { SelectTips } from './SelectTips'
+export { RetryWithNewTips } from './RetryWithNewTips'
