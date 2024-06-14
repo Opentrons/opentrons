@@ -33,12 +33,11 @@ export const _getIsAutofilled = (
   }
 
   if (labwareType === 'aluminumBlock' && aluminumBlockType != null) {
-    return (
-      // @ts-expect-error(IL, 2021-03-18): aluminumBlockType not strictly typed enough
-      Object.keys(
-        (aluminumBlockAutofills[aluminumBlockType] as string) ?? {}
-      ).includes(name)
-    )
+    return Object.keys(
+      (aluminumBlockAutofills as Record<string, Record<string, string>>)[
+        aluminumBlockType
+      ] ?? {}
+    ).includes(name)
   } else if (labwareType === 'tubeRack' && tubeRackInsertLoadName != null) {
     return Object.keys(
       tubeRackAutofills[tubeRackInsertLoadName] ?? {}

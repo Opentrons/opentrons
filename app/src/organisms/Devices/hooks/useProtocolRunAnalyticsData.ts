@@ -56,8 +56,8 @@ export const parseProtocolRunAnalyticsData = (
           ? protocolAnalysis?.runTimeParameters?.length > 0
           : false,
       protocolHasRunTimeParameterCustomValues:
-        protocolAnalysis?.runTimeParameters?.some(
-          param => param.value !== param.default
+        protocolAnalysis?.runTimeParameters?.some(param =>
+          param.type === 'csv_file' ? true : param.value !== param.default
         ) ?? false,
       robotType:
         protocolAnalysis?.robotType != null

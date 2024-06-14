@@ -92,7 +92,6 @@ const ICON_STYLE = css`
 const CARD_STYLE = css`
   flex-direction: ${DIRECTION_COLUMN};
   background-color: ${COLORS.grey35};
-  width: 26.75rem;
   padding: ${SPACING.spacing16};
   grid-gap: ${SPACING.spacing8};
   border-radius: ${BORDERS.borderRadius8};

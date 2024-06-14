@@ -33,20 +33,9 @@ import { Tooltip } from '../../../atoms/Tooltip'
 import { useMostRecentCompletedAnalysis } from '../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import { useRunStatus } from '../../RunTimeControl/hooks'
 import { useNotifyRunQuery } from '../../../resources/runs'
-import { useFeatureFlag } from '../../../redux/config'
 
 import type { RunTimeParameter } from '@opentrons/shared-data'
 import type { RunStatus } from '@opentrons/api-client'
-
-// ToDo (kk:06/07/2024) this will be removed when be is ready
-const mockCsvFileParameter = {
-  value: 'mock.csv',
-  displayName: 'My CSV File',
-  variableName: 'CSVFILE',
-  description: 'CSV File for a protocol',
-  type: 'csv_file' as const,
-  default: 'mock.csv',
-}
 
 interface ProtocolRunRuntimeParametersProps {
   runId: string
@@ -65,18 +54,13 @@ export function ProtocolRunRuntimeParameters({
   // because the most recent analysis may not reflect the selected run (e.g. cloning a run
   // from a historical protocol run from the device details page)
   const run = useNotifyRunQuery(runId).data
-  const enableCsvFile = useFeatureFlag('enableCsvFile')
   const runTimeParameters =
     (isRunTerminal
       ? run?.data?.runTimeParameters
       : mostRecentAnalysis?.runTimeParameters) ?? []
-  // ToDo (06/06/2024) this will be removed when be is ready
-  if (enableCsvFile && !runTimeParameters.includes(mockCsvFileParameter)) {
-    runTimeParameters.push(mockCsvFileParameter)
-  }
   const hasRunTimeParameters = runTimeParameters.length > 0
-  const hasCustomRunTimeParameterValues = runTimeParameters.some(
-    parameter => parameter.value !== parameter.default
+  const hasCustomRunTimeParameterValues = runTimeParameters.some(parameter =>
+    parameter.type !== 'csv_file' ? parameter.value !== parameter.default : true
   )
 
   const runActions = run?.data.actions
@@ -216,9 +200,12 @@ const StyledTableRowComponent = (
       <StyledTableCell>
         <Flex flexDirection={DIRECTION_ROW} gridGap={SPACING.spacing16}>
           <StyledText as="p">
-            {formatRunTimeParameterValue(parameter, t)}
+            {parameter.type === 'csv_file'
+              ? parameter.file?.file?.name ?? ''
+              : formatRunTimeParameterValue(parameter, t)}
           </StyledText>
-          {parameter.value !== parameter.default ? (
+          {parameter.type === 'csv_file' ||
+          parameter.default !== parameter.value ? (
             <Chip
               text={t('updated')}
               type="success"

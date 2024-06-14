@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest'
 import { sortRuntimeParameters } from '../sortRunTimeParameters'
 
-import type { RunTimeParameter } from '../..'
+import type { CsvFileParameter, RunTimeParameter } from '../..'
 
 const mockRunTimeParameters: RunTimeParameter[] = [
   {
@@ -57,13 +57,12 @@ const mockRunTimeParameters: RunTimeParameter[] = [
   },
 ]
 
-const mockCsvFileParameter: RunTimeParameter = {
-  value: 'mock.csv',
+const mockCsvFileParameter: CsvFileParameter = {
+  file: { id: 'test', file: { name: 'mock.csv' } as File },
   displayName: 'My CSV File',
   variableName: 'CSVFILE',
   description: 'CSV File for a protocol',
   type: 'csv_file' as const,
-  default: 'mock.csv',
 }
 
 describe('sortRuntimeParameters', () => {

@@ -309,13 +309,14 @@ const clampDispenseAirGapVolume = (
   const appliedPatch = { ...(stepData as FormPatch), ...patch, id, stepType }
   // @ts-expect-error(sa, 2021-6-14): appliedPatch.pipette does not exist. Address in #3161
   const pipetteId: string = appliedPatch.pipette
-  // @ts-expect-error(sa, 2021-6-14): appliedPatch.disposalVolume_checkbox does not exist. Address in #3161
   const disposalVolume =
+    // @ts-expect-error(sa, 2021-6-14): appliedPatch.disposalVolume_volume does not exist. Address in #3161
     appliedPatch.disposalVolume_checkbox != null
       ? // @ts-expect-error(sa, 2021-6-14): appliedPatch.disposalVolume_volume does not exist. Address in #3161
         isNaN(Number(appliedPatch.disposalVolume_volume))
         ? 0
-        : Number(appliedPatch.disposalVolume_volume)
+        : // @ts-expect-error(sa, 2021-6-14): appliedPatch.disposalVolume_volume does not exist. Address in #3161
+          Number(appliedPatch.disposalVolume_volume)
       : 0
   // @ts-expect-error(sa, 2021-6-14): appliedPatch.volume does not exist. Address in #3161
   const transferVolume = Number(appliedPatch.volume)

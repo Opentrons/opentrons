@@ -1,6 +1,9 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
-import { formatRunTimeParameterValue } from '@opentrons/shared-data'
+import {
+  formatRunTimeParameterValue,
+  sortRuntimeParameters,
+} from '@opentrons/shared-data'
 import {
   ALIGN_CENTER,
   BORDERS,
@@ -67,7 +70,7 @@ export function ViewOnlyParameters({
           </StyledText>
           <StyledText>{t('value')}</StyledText>
         </Flex>
-        {parameters.map((parameter, index) => {
+        {sortRuntimeParameters(parameters).map((parameter, index) => {
           return (
             <Flex
               onClick={handleOnClick}
@@ -93,7 +96,8 @@ export function ViewOnlyParameters({
                 <StyledText as="p" color={COLORS.grey60}>
                   {formatRunTimeParameterValue(parameter, t)}
                 </StyledText>
-                {parameter.value !== parameter.default ? (
+                {parameter.type === 'csv_file' ||
+                parameter.value !== parameter.default ? (
                   <Chip
                     data-testid={`Chip_${parameter.variableName}`}
                     type="success"

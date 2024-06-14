@@ -101,6 +101,7 @@
         "errorCode": "4000",
         "errorInfo": {},
         "errorType": "IncompatibleAddressableAreaError",
+        "isDefined": false,
         "wrappedErrors": []
       },
       "notes": [],
@@ -126,18 +127,21 @@
       "errorCode": "4000",
       "errorInfo": {},
       "errorType": "ExceptionInProtocolError",
+      "isDefined": false,
       "wrappedErrors": [
         {
           "detail": "IncompatibleAddressableAreaError: Cannot use Temperature Module in C3, not compatible with one or more of the following fixtures: Slot C4",
           "errorCode": "4000",
           "errorInfo": {},
           "errorType": "ProtocolCommandFailedError",
+          "isDefined": false,
           "wrappedErrors": [
             {
               "detail": "Cannot use Temperature Module in C3, not compatible with one or more of the following fixtures: Slot C4",
               "errorCode": "4000",
               "errorInfo": {},
               "errorType": "IncompatibleAddressableAreaError",
+              "isDefined": false,
               "wrappedErrors": []
             }
           ]
