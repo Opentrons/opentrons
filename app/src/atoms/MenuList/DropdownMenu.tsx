@@ -21,7 +21,11 @@ import {
 import { Tooltip } from '../Tooltip'
 import { MenuItem } from './MenuItem'
 
+/** this is the max height to display 10 items */
 const MAX_HEIGHT = 316
+
+/** this is for adjustment variable for the case that the space of the bottom and the space of the top are very close */
+const HEIGHT_ADJUSTMENT = 100
 
 export interface DropdownOption {
   name: string
@@ -103,7 +107,12 @@ export function DropdownMenu(props: DropdownMenuProps): JSX.Element {
             : (filterOptions.length + 1) * 34
         const dropdownBottom = dropdownRect.bottom + downSpace - scrollOffset
 
-        setDropdownPosition(dropdownBottom > availableHeight ? 'top' : 'bottom')
+        setDropdownPosition(
+          dropdownBottom > availableHeight &&
+            Math.abs(dropdownBottom - availableHeight) > HEIGHT_ADJUSTMENT
+            ? 'top'
+            : 'bottom'
+        )
       }
     }
 
