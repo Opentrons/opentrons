@@ -46,7 +46,6 @@ export function SelectRecoveryOption({
         </StyledText>
         <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
           <RecoveryOptions
-            errorKind={errorKind}
             validRecoveryOptions={validRecoveryOptions}
             setSelectedRoute={setSelectedRoute}
             selectedRoute={selectedRoute}
@@ -66,13 +65,11 @@ export function SelectRecoveryOption({
 }
 
 interface RecoveryOptionsProps {
-  errorKind: ErrorKind
   validRecoveryOptions: RecoveryRoute[]
   setSelectedRoute: (route: RecoveryRoute) => void
   selectedRoute?: RecoveryRoute
 }
 export function RecoveryOptions({
-  errorKind,
   validRecoveryOptions,
   selectedRoute,
   setSelectedRoute,
@@ -86,12 +83,8 @@ export function RecoveryOptions({
           return t('retry_step')
         case RECOVERY_MAP.CANCEL_RUN.ROUTE:
           return t('cancel_run')
-        case RECOVERY_MAP.DROP_TIP_FLOWS.ROUTE:
-          if (errorKind === ERROR_KINDS.OVERPERSSURE_WHILE_ASPIRATING) {
-            return t('retry_with_new_tips')
-          } else {
-            return 'INVALID_OPTION'
-          }
+        case RECOVERY_MAP.RETRY_NEW_TIPS.ROUTE:
+          return t('retry_with_new_tips')
         default:
           return 'INVALID_OPTION'
       }
@@ -136,6 +129,6 @@ export const GENERAL_ERROR_OPTIONS: RecoveryRoute[] = [
 ]
 
 export const OVERPRESSURE_WHILE_ASPIRATING_OPTIONS: RecoveryRoute[] = [
-  RECOVERY_MAP.DROP_TIP_FLOWS.ROUTE,
+  RECOVERY_MAP.RETRY_NEW_TIPS.ROUTE,
   RECOVERY_MAP.CANCEL_RUN.ROUTE,
 ]

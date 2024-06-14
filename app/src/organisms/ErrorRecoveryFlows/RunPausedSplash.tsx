@@ -72,7 +72,7 @@ export function RunPausedSplash({
       position={POSITION_ABSOLUTE}
       flexDirection={DIRECTION_COLUMN}
       gridGap={SPACING.spacing60}
-      padding={SPACING.spacing40}
+      paddingY={SPACING.spacing40}
       backgroundColor={COLORS.red50}
       zIndex={5}
     >
