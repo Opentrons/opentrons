@@ -116,6 +116,15 @@ export const STEP_ORDER: StepOrder = {
   [CANCEL_RUN.ROUTE]: [CANCEL_RUN.STEPS.CONFIRM_CANCEL],
 }
 
+// Routes of actual recovery options.
+export const RECOVERY_OPTION_ROUTES = [
+  RETRY_FAILED_COMMAND.ROUTE,
+  REFILL_AND_RESUME.ROUTE,
+  RETRY_NEW_TIPS.ROUTE,
+  IGNORE_AND_RESUME.ROUTE,
+  CANCEL_RUN.ROUTE,
+]
+
 export const INVALID = 'INVALID' as const
 
 /**
