@@ -8,11 +8,10 @@
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "THIS IS A DRY RUN",
-        "legacyCommandType": "command.COMMENT"
+        "message": "THIS IS A DRY RUN"
       },
       "result": {},
       "status": "succeeded"
