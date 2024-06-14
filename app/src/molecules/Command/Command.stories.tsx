@@ -152,7 +152,7 @@ export const TwoLineCommand: Story = {
     state: 'current',
   },
 }
-export const ThreeLineCommand: Story = {
+export const ManyLineCommand: Story = {
   args: {
     selectCommandBy: 'command type',
     commandType: 'thermocycler/runProfile',

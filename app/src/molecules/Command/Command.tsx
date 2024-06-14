@@ -1,6 +1,7 @@
 import * as React from 'react'
 import {
   Flex,
+  Box,
   JUSTIFY_CENTER,
   JUSTIFY_FLEX_START,
   ALIGN_CENTER,
@@ -57,7 +58,6 @@ const UNIVERSAL_CONTAINER_STYLES = {
   borderRadius: BORDERS.borderRadius8,
   paddingX: SPACING.spacing24,
   paddingY: CONTAINER_Y_PADDING,
-  maxHeight: '65vh' // limit only intended for e.g. very long user comments
 } as const
 
 const UNIVERSAL_ICON_STYLES = {
@@ -111,16 +111,25 @@ export function CenteredCommand(
         command={props.command}
         {...PROPS_BY_STATE[props.state].icon}
       />
-      <Flex minHeight={ICON_SIZE} alignItems={ALIGN_CENTER}>
+      <Box minHeight={ICON_SIZE} alignItems={ALIGN_CENTER} width="100%">
         <CommandText
           {...props}
           css={`
-            $media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
-              line-clamp: 2;
+            @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
+              display: -webkit-box;
+              -webkit-box-orient: vertical;
+              overflow: hidden;
+              text-overflow: ellipsis;
+              word-wrap: break-word;
+              -webkit-line-clamp: 2;
             }
+            @media not (${RESPONSIVENESS.touchscreenMediaQuerySpecs}) {
+              max-height: 240px;
+              overflow: auto;
+            } ;
           `}
         />
-      </Flex>
+      </Box>
     </Flex>
   )
 }
@@ -138,12 +147,24 @@ export function LeftAlignedCommand(
         command={props.command}
         {...PROPS_BY_STATE[props.state].icon}
       />
-      <Flex minHeight={ICON_SIZE} alignItems={ALIGN_CENTER}>
+      <Box minHeight={ICON_SIZE} alignItems={ALIGN_CENTER} width="100%">
         <CommandText
           {...omit(props, ['isOnDevice'])}
-          propagateTextLimit={props.isOnDevice}
+          css={`
+  @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 14;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  word-wrap: break-word;
+  };
+  @media not (${RESPONSIVENESS.touchscreenMediaQuerySpecs}) {
+  max-height: 240px;
+  overflow: auto;
+    `}
         />
-      </Flex>
+      </Box>
     </Flex>
   )
 }

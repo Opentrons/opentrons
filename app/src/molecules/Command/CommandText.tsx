@@ -7,6 +7,7 @@ import {
   Flex,
   SPACING,
   StyledText,
+  RESPONSIVENESS,
 } from '@opentrons/components'
 import { getPipetteNameSpecs } from '@opentrons/shared-data'
 import {
@@ -116,10 +117,23 @@ export function CommandText(props: Props): JSX.Element | null {
           }).trim()
       )
       return (
+        // TODO(sfoster): Command sometimes wraps this in a cascaded display: -webkit-box
+        // to achieve multiline text clipping with an automatically inserted ellipsis, which works
+        // everywhere except for here where it overrides this property in the flex since this is
+        // the only place where CommandText uses a flex.
+        // The right way to handle this is probably to take the css that's in Command and make it
+        // live here instead, but that should be done in a followup since it would touch everything.
+        // See also the margin-left on the <li>s, which is needed to prevent their bullets from
+        // clipping if a container set overflow: hidden.
         <Flex
           flexDirection={DIRECTION_COLUMN}
           {...styleProps}
           alignItems={shouldPropagateCenter ? ALIGN_CENTER : undefined}
+          css={`
+            @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
+              display: flex !important;
+            } ;
+          `}
         >
           <StyledText as="p" marginBottom={SPACING.spacing4} {...styleProps}>
             {t('tc_starting_profile', {
@@ -129,10 +143,24 @@ export function CommandText(props: Props): JSX.Element | null {
           <StyledText as="p" marginLeft={SPACING.spacing16}>
             <ul>
               {shouldPropagateTextLimit ? (
-                <li>{steps[0]}</li>
+                <li
+                  css={`
+                    margin-left: ${SPACING.spacing4};
+                  `}
+                >
+                  {steps[0]}
+                </li>
               ) : (
                 steps.map((step: string, index: number) => (
-                  <li key={index}> {step}</li>
+                  <li
+                    css={`
+                      margin-left: ${SPACING.spacing4};
+                    `}
+                    key={index}
+                  >
+                    {' '}
+                    {step}
+                  </li>
                 ))
               )}
             </ul>
