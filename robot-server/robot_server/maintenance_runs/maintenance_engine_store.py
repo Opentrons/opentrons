@@ -7,11 +7,9 @@ from typing import List, Optional, Callable
 from opentrons.protocol_engine.errors.exceptions import EStopActivatedError
 from opentrons.protocol_engine.types import PostRunHardwareState, DeckConfigurationType
 from opentrons.protocol_engine import (
-    Config as ProtocolEngineConfig,
     DeckType,
     LabwareOffsetCreate,
     StateSummary,
-    create_protocol_engine,
     CommandSlice,
     CommandPointer,
     Command,
@@ -165,26 +163,22 @@ class MaintenanceEngineStore:
         assert (
             self._run_orchestrator is None
         ), "There is an active maintenance run that was not cleared correctly."
-        engine = await create_protocol_engine(
+
+        self._run_orchestrator = RunOrchestrator.build_orchestrator(
+            run_id=run_id,
             hardware_api=self._hardware_api,
-            command_generator=self.run_orchestrator.command_generator,
-            config=ProtocolEngineConfig(
-                robot_type=self._robot_type,
-                deck_type=self._deck_type,
-                block_on_door_open=feature_flags.enable_door_safety_switch(
-                    RobotTypeEnum.robot_literal_to_enum(self._robot_type)
-                ),
+            robot_type=self._robot_type,
+            deck_type=self._deck_type,
+            block_on_door_open=feature_flags.enable_door_safety_switch(
+                RobotTypeEnum.robot_literal_to_enum(self._robot_type)
             ),
             deck_configuration=deck_configuration,
+            load_fixed_trash=False,
             notify_publishers=notify_publishers,
         )
 
         for offset in labware_offsets:
-            engine.add_labware_offset(offset)
-
-        self._run_orchestrator = RunOrchestrator.build_orchestrator(
-            run_id=run_id, protocol_engine=engine, hardware_api=self._hardware_api
-        )
+            self._run_orchestrator.add_labware_offset(offset)
 
         self._created_at = created_at
 

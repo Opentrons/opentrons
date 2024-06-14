@@ -1,6 +1,6 @@
 """Engine/Runner provider."""
 from __future__ import annotations
-from typing import Optional, Union, List, Dict, AsyncGenerator
+from typing import Optional, Union, List, Dict, AsyncGenerator, Callable
 
 from anyio import move_on_after
 
@@ -20,6 +20,8 @@ from ..protocol_engine import (
     CommandPointer,
     CommandSlice,
     DeckType,
+    create_protocol_engine,
+    Config as ProtocolEngineConfig,
 )
 from ..protocol_engine.errors import RunStoppedError
 from ..protocol_engine.types import (
@@ -102,8 +104,13 @@ class RunOrchestrator:
     @classmethod
     def build_orchestrator(
         cls,
-        protocol_engine: ProtocolEngine,
+        robot_type: RobotType,
+        deck_type: DeckType,
+        block_on_door_open: bool,
         hardware_api: HardwareControlAPI,
+        notify_publishers: Optional[Callable[[], None]] = None,
+        load_fixed_trash: bool = False,
+        deck_configuration: Optional[DeckConfigurationType] = None,
         protocol_config: Optional[
             Union[JsonProtocolConfig, PythonProtocolConfig]
         ] = None,
@@ -112,6 +119,18 @@ class RunOrchestrator:
         run_id: Optional[str] = None,
     ) -> "RunOrchestrator":
         """Build a RunOrchestrator provider."""
+        protocol_engine = await create_protocol_engine(
+            hardware_api=hardware_api,
+            command_generator=cls.command_generator,
+            config=ProtocolEngineConfig(
+                robot_type=robot_type,
+                deck_type=deck_type,
+                block_on_door_open=block_on_door_open,
+            ),
+            load_fixed_trash=load_fixed_trash,
+            deck_configuration=deck_configuration,
+            notify_publishers=notify_publishers,
+        )
         setup_runner = protocol_runner.LiveRunner(
             protocol_engine=protocol_engine,
             hardware_api=hardware_api,
@@ -335,3 +354,18 @@ class RunOrchestrator:
     def get_deck_type(self) -> DeckType:
         """Get engine deck type."""
         return self._protocol_engine.state_view.config.deck_type
+
+    async def command_generator(self) -> AsyncGenerator[str, None]:
+        while True:
+            try:
+                command_id = await self._protocol_engine._state_store.wait_for(
+                    condition=self._protocol_engine.state_view.commands.get_next_to_execute
+                )
+                # Assert for type hinting. This is valid because the wait_for() above
+                # only returns when the value is truthy.
+                assert command_id is not None
+                yield command_id
+            except RunStoppedError:
+                # There are no more commands that we should execute, either because the run has
+                # completed on its own, or because a client requested it to stop.
+                break

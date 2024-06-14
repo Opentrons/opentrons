@@ -11,6 +11,7 @@ from opentrons_shared_data.robot.dev_types import RobotType
 from opentrons_shared_data.robot.dev_types import RobotTypeEnum
 
 from opentrons.config import feature_flags
+
 from opentrons.hardware_control import HardwareControlAPI
 from opentrons.hardware_control.types import (
     EstopState,
@@ -27,11 +28,9 @@ from opentrons.protocol_runner import (
     RunOrchestrator,
 )
 from opentrons.protocol_engine import (
-    Config as ProtocolEngineConfig,
     DeckType,
     LabwareOffsetCreate,
     StateSummary,
-    create_protocol_engine,
     CommandSlice,
     CommandPointer,
     Command,
@@ -160,19 +159,12 @@ class EngineStore:
 
         default_orchestrator = self._default_run_orchestrator
         if default_orchestrator is None:
-            # TODO(mc, 2022-03-21): potential race condition
-            engine = await create_protocol_engine(
-                hardware_api=self._hardware_api,
-                # TODO(tz, 6-14-2024): this should use default orchestrator or extract this to a different location.
-                command_generator=self.run_orchestrator.command_generator,
-                config=ProtocolEngineConfig(
-                    robot_type=self._robot_type,
-                    deck_type=self._deck_type,
-                    block_on_door_open=False,
-                ),
-            )
             self._default_run_orchestrator = RunOrchestrator.build_orchestrator(
-                protocol_engine=engine, hardware_api=self._hardware_api
+                hardware_api=self._hardware_api,
+                deck_configuration=[],
+                robot_type=self._robot_type,
+                deck_type=self._deck_type,
+                block_on_door_open=False,
             )
             return self._default_run_orchestrator
         return default_orchestrator
@@ -208,21 +200,6 @@ class EngineStore:
         else:
             load_fixed_trash = False
 
-        engine = await create_protocol_engine(
-            hardware_api=self._hardware_api,
-            command_generator=self.run_orchestrator.command_generator,
-            config=ProtocolEngineConfig(
-                robot_type=self._robot_type,
-                deck_type=self._deck_type,
-                block_on_door_open=feature_flags.enable_door_safety_switch(
-                    RobotTypeEnum.robot_literal_to_enum(self._robot_type)
-                ),
-            ),
-            load_fixed_trash=load_fixed_trash,
-            deck_configuration=deck_configuration,
-            notify_publishers=notify_publishers,
-        )
-
         post_run_hardware_state = PostRunHardwareState.HOME_AND_STAY_ENGAGED
         drop_tips_after_run = True
 
@@ -231,7 +208,14 @@ class EngineStore:
 
         self._run_orchestrator = RunOrchestrator.build_orchestrator(
             run_id=run_id,
-            protocol_engine=engine,
+            load_fixed_trash=load_fixed_trash,
+            deck_configuration=deck_configuration,
+            notify_publishers=notify_publishers,
+            robot_type=self._robot_type,
+            deck_type=self._deck_type,
+            block_on_door_open=feature_flags.enable_door_safety_switch(
+                RobotTypeEnum.robot_literal_to_enum(self._robot_type)
+            ),
             hardware_api=self._hardware_api,
             protocol_config=protocol.source.config if protocol else None,
             post_run_hardware_state=post_run_hardware_state,
