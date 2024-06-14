@@ -49,7 +49,6 @@ export function RetryNewTips(props: RecoveryContentProps): JSX.Element | null {
   return buildContent()
 }
 
-// TOME: Ticket or solve not using the full row for multichannel.
 export function ReplaceTips(props: RecoveryContentProps): JSX.Element | null {
   const {
     isOnDevice,
