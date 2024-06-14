@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { vi, it, describe, expect, beforeEach } from 'vitest'
+import { vi, it, describe, expect } from 'vitest'
 
 import { StaticRouter } from 'react-router-dom'
 import { fireEvent, screen } from '@testing-library/react'
