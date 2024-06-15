@@ -61,12 +61,14 @@ export function useERUtils({
     trackExternalMap,
     currentRecoveryOptionUtils,
   } = useRecoveryRouting()
+
   const tipStatusUtils = useRecoveryTipStatus({
     runId,
     isFlex,
     runRecord,
     attachedInstruments,
   })
+
   const routeUpdateActions = useRouteUpdateActions({
     hasLaunchedRecovery,
     recoveryMap,
