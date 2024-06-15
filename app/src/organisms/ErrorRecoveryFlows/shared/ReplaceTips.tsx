@@ -1,5 +1,7 @@
 import * as React from 'react'
 
+import { ALIGN_FLEX_END, DIRECTION_COLUMN, Flex } from '@opentrons/components'
+
 import { useTranslation } from 'react-i18next'
 import { RecoverySingleColumnContent } from './RecoverySingleColumnContent'
 import { TwoColumn } from '../../../molecules/InterventionModal'
@@ -39,7 +41,9 @@ export function ReplaceTips(props: RecoveryContentProps): JSX.Element | null {
       <RecoverySingleColumnContent>
         <TwoColumn>
           <LeftColumnTipInfo {...props} title={buildTitle()} />
-          <RecoveryMap {...props} />
+          <Flex marginTop="1.742rem">
+            <RecoveryMap {...props} />
+          </Flex>
         </TwoColumn>
         <RecoveryFooterButtons
           isOnDevice={isOnDevice}

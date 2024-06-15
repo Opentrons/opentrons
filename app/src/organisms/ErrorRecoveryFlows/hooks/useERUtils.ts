@@ -6,6 +6,7 @@ import { useRecoveryTipStatus } from './useRecoveryTipStatus'
 import { useRecoveryRouting } from './useRecoveryRouting'
 import { useFailedLabwareUtils } from './useFailedLabwareUtils'
 import { useFailedCommandPipetteInfo } from './useFailedCommandPipetteInfo'
+import { getRecoveryMapUtils } from './getRecoveryMapUtils'
 import {
   useNotifyAllCommandsQuery,
   useNotifyRunQuery,
@@ -18,6 +19,7 @@ import type { UseRouteUpdateActionsResult } from './useRouteUpdateActions'
 import type { UseRecoveryCommandsResult } from './useRecoveryCommands'
 import type { RecoveryTipStatusUtils } from './useRecoveryTipStatus'
 import type { UseFailedLabwareUtilsResult } from './useFailedLabwareUtils'
+import type { GetRecoveryMapUtilsResult } from './getRecoveryMapUtils'
 import type { CurrentRecoveryOptionUtils } from './useRecoveryRouting'
 
 type ERUtilsProps = ErrorRecoveryFlowsProps & {
@@ -32,6 +34,7 @@ export interface ERUtilsResults {
   recoveryCommands: UseRecoveryCommandsResult
   tipStatusUtils: RecoveryTipStatusUtils
   failedLabwareUtils: UseFailedLabwareUtilsResult
+  recoveryMapUtils: GetRecoveryMapUtilsResult
   failedPipetteInfo: PipetteData | null
   hasLaunchedRecovery: boolean
   trackExternalMap: (map: Record<string, any>) => void
@@ -96,6 +99,13 @@ export function useERUtils({
     failedLabwareUtils,
   })
 
+  const recoveryMapUtils = getRecoveryMapUtils({
+    runId,
+    runRecord,
+    protocolAnalysis,
+    failedLabwareUtils,
+  })
+
   return {
     recoveryMap,
     trackExternalMap,
@@ -106,5 +116,6 @@ export function useERUtils({
     tipStatusUtils,
     failedLabwareUtils,
     failedPipetteInfo,
+    recoveryMapUtils,
   }
 }
