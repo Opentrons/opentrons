@@ -8,7 +8,7 @@ interface UseFailedCommandPipetteInfoProps {
 }
 
 // /instruments data for the pipette used in the failedCommand, if any.
-export function useFailedCommandPipetteInfo({
+export function getFailedCommandPipetteInfo({
   failedCommand,
   runRecord,
   attachedInstruments,

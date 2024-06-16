@@ -80,7 +80,6 @@ export function useRouteUpdateActions(
         const newFlowSteps = STEP_ORDER[route]
 
         let stepIdx = step != null ? newFlowSteps.indexOf(step) : 0
-
         stepIdx = stepIdx === -1 ? 0 : stepIdx // Route to first step if the supplied step is invalid.
 
         setRecoveryMap({ route, step: newFlowSteps[stepIdx] })

@@ -10,6 +10,7 @@ import {
   RUN_STATUS_STOP_REQUESTED,
   RUN_STATUS_SUCCEEDED,
 } from '@opentrons/api-client'
+import { OT2_ROBOT_TYPE } from '@opentrons/shared-data'
 
 import { useFeatureFlag } from '../../redux/config'
 import { ErrorRecoveryWizard, useERWizard } from './ErrorRecoveryWizard'
@@ -105,6 +106,9 @@ export function ErrorRecoveryFlows(
     toggleERWizard,
   })
 
+  const { protocolAnalysis, ...restProps } = props
+  const robotType = protocolAnalysis?.robotType ?? OT2_ROBOT_TYPE
+
   if (!enableRunNotes) {
     return null
   }
@@ -112,7 +116,11 @@ export function ErrorRecoveryFlows(
   return (
     <>
       {showERWizard ? (
-        <ErrorRecoveryWizard {...props} {...recoveryUtils} />
+        <ErrorRecoveryWizard
+          {...restProps}
+          {...recoveryUtils}
+          robotType={robotType}
+        />
       ) : null}
       {showSplash ? (
         <RunPausedSplash

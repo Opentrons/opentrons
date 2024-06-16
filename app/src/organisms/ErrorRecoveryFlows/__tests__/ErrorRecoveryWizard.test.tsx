@@ -16,8 +16,9 @@ import { BeforeBeginning } from '../BeforeBeginning'
 import {
   SelectRecoveryOption,
   RetryStep,
-  ManageTips,
+  RetryNewTips,
   CancelRun,
+  ManageTips,
 } from '../RecoveryOptions'
 import { RecoveryInProgress } from '../RecoveryInProgress'
 
@@ -70,6 +71,8 @@ describe('ErrorRecoveryContent', () => {
     ROBOT_RESUMING,
     ROBOT_IN_MOTION,
     ROBOT_RETRYING_STEP,
+    ROBOT_PICKING_UP_TIPS,
+    RETRY_NEW_TIPS,
     CANCEL_RUN,
     DROP_TIP_FLOWS,
   } = RECOVERY_MAP
@@ -87,6 +90,7 @@ describe('ErrorRecoveryContent', () => {
     vi.mocked(RecoveryInProgress).mockReturnValue(<div>MOCK_IN_PROGRESS</div>)
     vi.mocked(CancelRun).mockReturnValue(<div>MOCK_CANCEL_RUN</div>)
     vi.mocked(ManageTips).mockReturnValue(<div>MOCK_DROP_TIP_FLOWS</div>)
+    vi.mocked(RetryNewTips).mockReturnValue(<div>MOCK_RETRY_NEW_TIPS</div>)
   })
 
   it(`returns SelectRecoveryOption when the route is ${OPTION_SELECTION.ROUTE}`, () => {
@@ -147,6 +151,19 @@ describe('ErrorRecoveryContent', () => {
     screen.getByText('MOCK_CANCEL_RUN')
   })
 
+  it(`returns RetryNewTips when the route is ${RETRY_NEW_TIPS.ROUTE}`, () => {
+    props = {
+      ...props,
+      recoveryMap: {
+        ...props.recoveryMap,
+        route: RETRY_NEW_TIPS.ROUTE,
+      },
+    }
+    renderRecoveryContent(props)
+
+    screen.getByText('MOCK_RETRY_NEW_TIPS')
+  })
+
   it(`returns RecoveryInProgressModal when the route is ${ROBOT_CANCELING.ROUTE}`, () => {
     props = {
       ...props,
@@ -192,6 +209,19 @@ describe('ErrorRecoveryContent', () => {
       recoveryMap: {
         ...props.recoveryMap,
         route: ROBOT_IN_MOTION.ROUTE,
+      },
+    }
+    renderRecoveryContent(props)
+
+    screen.getByText('MOCK_IN_PROGRESS')
+  })
+
+  it(`returns RecoveryInProgressModal when the route is ${ROBOT_PICKING_UP_TIPS.ROUTE}`, () => {
+    props = {
+      ...props,
+      recoveryMap: {
+        ...props.recoveryMap,
+        route: ROBOT_PICKING_UP_TIPS.ROUTE,
       },
     }
     renderRecoveryContent(props)

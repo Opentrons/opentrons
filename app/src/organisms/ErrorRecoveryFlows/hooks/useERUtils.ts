@@ -5,8 +5,8 @@ import { useRecoveryCommands } from './useRecoveryCommands'
 import { useRecoveryTipStatus } from './useRecoveryTipStatus'
 import { useRecoveryRouting } from './useRecoveryRouting'
 import { useFailedLabwareUtils } from './useFailedLabwareUtils'
-import { useFailedCommandPipetteInfo } from './useFailedCommandPipetteInfo'
-import { getRecoveryMapUtils } from './getRecoveryMapUtils'
+import { getFailedCommandPipetteInfo } from './getFailedCommandPipetteInfo'
+import { useRecoveryMapUtils } from './useRecoveryMapUtils'
 import {
   useNotifyAllCommandsQuery,
   useNotifyRunQuery,
@@ -19,7 +19,7 @@ import type { UseRouteUpdateActionsResult } from './useRouteUpdateActions'
 import type { UseRecoveryCommandsResult } from './useRecoveryCommands'
 import type { RecoveryTipStatusUtils } from './useRecoveryTipStatus'
 import type { UseFailedLabwareUtilsResult } from './useFailedLabwareUtils'
-import type { GetRecoveryMapUtilsResult } from './getRecoveryMapUtils'
+import type { UseRecoveryMapUtilsResult } from './useRecoveryMapUtils'
 import type { CurrentRecoveryOptionUtils } from './useRecoveryRouting'
 
 type ERUtilsProps = ErrorRecoveryFlowsProps & {
@@ -34,7 +34,7 @@ export interface ERUtilsResults {
   recoveryCommands: UseRecoveryCommandsResult
   tipStatusUtils: RecoveryTipStatusUtils
   failedLabwareUtils: UseFailedLabwareUtilsResult
-  recoveryMapUtils: GetRecoveryMapUtilsResult
+  recoveryMapUtils: UseRecoveryMapUtilsResult
   failedPipetteInfo: PipetteData | null
   hasLaunchedRecovery: boolean
   trackExternalMap: (map: Record<string, any>) => void
@@ -79,7 +79,7 @@ export function useERUtils({
     setRecoveryMap: setRM,
   })
 
-  const failedPipetteInfo = useFailedCommandPipetteInfo({
+  const failedPipetteInfo = getFailedCommandPipetteInfo({
     failedCommand,
     runRecord,
     attachedInstruments,
@@ -99,7 +99,7 @@ export function useERUtils({
     failedLabwareUtils,
   })
 
-  const recoveryMapUtils = getRecoveryMapUtils({
+  const recoveryMapUtils = useRecoveryMapUtils({
     runId,
     runRecord,
     protocolAnalysis,

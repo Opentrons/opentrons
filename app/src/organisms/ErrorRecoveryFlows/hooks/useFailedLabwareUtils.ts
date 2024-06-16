@@ -176,7 +176,7 @@ function useInitialSelectedLocationsFrom(
 }
 
 // Get the name of the latest labware used by the failed command's pipette to pick up tips, if any.
-function getPickUpTipLabwareName(
+export function getPickUpTipLabwareName(
   protocolAnalysis: ErrorRecoveryFlowsProps['protocolAnalysis'],
   recentRelevantPickUpTipCmd: Omit<PickUpTipRunTimeCommand, 'result'> | null,
   runRecord?: Run
@@ -207,7 +207,7 @@ function getPickUpTipLabware(
 }
 
 // Return the name of the well(s) from which the tip(s) involved in the failed command were picked up, if any.
-function getPickUpTipCommandWellName(
+export function getPickUpTipCommandWellName(
   failedPipetteInfo: UseFailedLabwareUtilsProps['failedPipetteInfo'],
   recentRelevantPickUpTipCmd: Omit<PickUpTipRunTimeCommand, 'result'> | null
 ): string {

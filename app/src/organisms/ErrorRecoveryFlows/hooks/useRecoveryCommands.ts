@@ -108,7 +108,7 @@ export const HOME_PIPETTE_Z_AXES: CreateCommand = {
   intent: 'fixit',
 }
 
-const buildPickUpTips = (
+export const buildPickUpTips = (
   tipGroup: WellGroup | null,
   failedCommand: FailedCommand | null,
   labware: LoadedLabware | null

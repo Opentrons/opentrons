@@ -13,13 +13,14 @@ import {
   SelectRecoveryOption,
   RetryStep,
   CancelRun,
-  ManageTips,
   RetryNewTips,
+  ManageTips,
 } from './RecoveryOptions'
 import { RecoveryInProgress } from './RecoveryInProgress'
 import { getErrorKind } from './hooks'
 import { RECOVERY_MAP } from './constants'
 
+import type { RobotType } from '@opentrons/shared-data'
 import type { RecoveryContentProps } from './types'
 import type {
   useRouteUpdateActions,
@@ -50,7 +51,13 @@ export function useERWizard(): UseERWizardResult {
   return { showERWizard, toggleERWizard, hasLaunchedRecovery }
 }
 
-export type ErrorRecoveryWizardProps = ErrorRecoveryFlowsProps & ERUtilsResults
+export type ErrorRecoveryWizardProps = Omit<
+  ErrorRecoveryFlowsProps,
+  'protocolAnalysis'
+> &
+  ERUtilsResults & {
+    robotType: RobotType
+  }
 
 export function ErrorRecoveryWizard(
   props: ErrorRecoveryWizardProps

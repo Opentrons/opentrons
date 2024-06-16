@@ -10,6 +10,7 @@ import {
   RecoveryOptions,
   getRecoveryOptions,
   GENERAL_ERROR_OPTIONS,
+  OVERPRESSURE_WHILE_ASPIRATING_OPTIONS,
 } from '../SelectRecoveryOption'
 import { RECOVERY_MAP, ERROR_KINDS } from '../../constants'
 
@@ -32,12 +33,14 @@ const renderRecoveryOptions = (
 }
 
 describe('SelectRecoveryOption', () => {
-  const { RETRY_FAILED_COMMAND } = RECOVERY_MAP
+  const { RETRY_FAILED_COMMAND, RETRY_NEW_TIPS } = RECOVERY_MAP
   let props: React.ComponentProps<typeof SelectRecoveryOption>
   let mockProceedToRouteAndStep: Mock
+  let mockSetSelectedRecoveryOption: Mock
 
   beforeEach(() => {
     mockProceedToRouteAndStep = vi.fn()
+    mockSetSelectedRecoveryOption = vi.fn(() => Promise.resolve())
     const mockRouteUpdateActions = {
       proceedToRouteAndStep: mockProceedToRouteAndStep,
     } as any
@@ -50,7 +53,21 @@ describe('SelectRecoveryOption', () => {
         step: RETRY_FAILED_COMMAND.STEPS.CONFIRM_RETRY,
       },
       tipStatusUtils: { determineTipStatus: vi.fn() } as any,
+      currentRecoveryOptionUtils: {
+        setSelectedRecoveryOption: mockSetSelectedRecoveryOption,
+      } as any,
     }
+  })
+
+  it('sets the selected recovery option when clicking continue', () => {
+    renderSelectRecoveryOption(props)
+
+    const continueBtn = screen.getByRole('button', { name: 'Continue' })
+    fireEvent.click(continueBtn)
+
+    expect(mockSetSelectedRecoveryOption).toHaveBeenCalledWith(
+      RETRY_FAILED_COMMAND.ROUTE
+    )
   })
 
   it('renders appropriate "General Error" copy and click behavior', () => {
@@ -70,6 +87,30 @@ describe('SelectRecoveryOption', () => {
     expect(mockProceedToRouteAndStep).toHaveBeenCalledWith(
       RETRY_FAILED_COMMAND.ROUTE
     )
+  })
+
+  it('renders appropriate "Overpressure while aspirating" copy and click behavior', () => {
+    props = {
+      ...props,
+      errorKind: ERROR_KINDS.OVERPERSSURE_WHILE_ASPIRATING,
+    }
+
+    renderSelectRecoveryOption(props)
+
+    screen.getByText('Choose a recovery action')
+
+    const retryNewTips = screen.getByRole('label', {
+      name: 'Retry with new tips',
+    })
+    const continueBtn = screen.getByRole('button', { name: 'Continue' })
+    expect(
+      screen.queryByRole('button', { name: 'Go back' })
+    ).not.toBeInTheDocument()
+
+    fireEvent.click(retryNewTips)
+    fireEvent.click(continueBtn)
+
+    expect(mockProceedToRouteAndStep).toHaveBeenCalledWith(RETRY_NEW_TIPS.ROUTE)
   })
 })
 
@@ -94,6 +135,18 @@ describe('RecoveryOptions', () => {
     screen.getByRole('label', { name: 'Cancel run' })
   })
 
+  it(`renders valid recovery options for a ${ERROR_KINDS.OVERPERSSURE_WHILE_ASPIRATING} errorKind`, () => {
+    props = {
+      ...props,
+      validRecoveryOptions: OVERPRESSURE_WHILE_ASPIRATING_OPTIONS,
+    }
+
+    renderRecoveryOptions(props)
+
+    screen.getByRole('label', { name: 'Retry with new tips' })
+    screen.getByRole('label', { name: 'Cancel run' })
+  })
+
   it('updates the selectedRoute when a new option is selected', () => {
     renderRecoveryOptions(props)
 
@@ -106,8 +159,15 @@ describe('RecoveryOptions', () => {
 })
 
 describe('getRecoveryOptions', () => {
-  it(`returns general error options when the errorKind is ${ERROR_KINDS.GENERAL_ERROR}`, () => {
+  it(`returns valid options when the errorKind is ${ERROR_KINDS.GENERAL_ERROR}`, () => {
     const generalErrorOptions = getRecoveryOptions(ERROR_KINDS.GENERAL_ERROR)
     expect(generalErrorOptions).toBe(GENERAL_ERROR_OPTIONS)
+  })
+
+  it(`returns valid options when the errorKind is ${ERROR_KINDS.OVERPERSSURE_WHILE_ASPIRATING}`, () => {
+    const generalErrorOptions = getRecoveryOptions(
+      ERROR_KINDS.OVERPERSSURE_WHILE_ASPIRATING
+    )
+    expect(generalErrorOptions).toBe(OVERPRESSURE_WHILE_ASPIRATING_OPTIONS)
   })
 })

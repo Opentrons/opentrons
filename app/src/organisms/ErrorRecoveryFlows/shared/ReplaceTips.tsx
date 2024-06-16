@@ -1,6 +1,6 @@
 import * as React from 'react'
 
-import { ALIGN_FLEX_END, DIRECTION_COLUMN, Flex } from '@opentrons/components'
+import { Flex } from '@opentrons/components'
 
 import { useTranslation } from 'react-i18next'
 import { RecoverySingleColumnContent } from './RecoverySingleColumnContent'

@@ -10,10 +10,13 @@ export function RetryNewTips(props: RecoveryContentProps): JSX.Element | null {
   const { step } = recoveryMap
   const { RETRY_NEW_TIPS, DROP_TIP_FLOWS } = RECOVERY_MAP
 
-  // Do this instead of directly routing to DropTipFlows route first, so
-  // previous route correctly labels this route as the previous route.
+  // Do this instead of directly routing to DropTipFlows route first,
+  // so SelectRecoveryOptions labels this route as the selected recovery option.
   if (step === RETRY_NEW_TIPS.STEPS.DROP_TIPS) {
-    void routeUpdateActions.proceedToRouteAndStep(DROP_TIP_FLOWS.ROUTE)
+    void routeUpdateActions.proceedToRouteAndStep(
+      DROP_TIP_FLOWS.ROUTE,
+      DROP_TIP_FLOWS.STEPS.WIZARD
+    )
   }
 
   const buildContent = (): JSX.Element | null => {

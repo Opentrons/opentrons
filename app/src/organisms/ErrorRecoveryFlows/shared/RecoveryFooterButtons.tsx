@@ -64,9 +64,7 @@ function PrimaryButtonGroup(props: RecoveryFooterButtonProps): JSX.Element {
   const { tertiaryBtnDisabled, tertiaryBtnOnClick, tertiaryBtnText } = props
 
   const renderTertiaryBtn =
-    tertiaryBtnOnClick != null ||
-    tertiaryBtnDisabled != null ||
-    tertiaryBtnText != null
+    tertiaryBtnOnClick != null || tertiaryBtnText != null
 
   const tertiaryBtnDefaultOnClick = (): null => null
 
@@ -83,6 +81,7 @@ function PrimaryButtonGroup(props: RecoveryFooterButtonProps): JSX.Element {
           buttonType="secondary"
           onClick={tertiaryBtnOnClick ?? tertiaryBtnDefaultOnClick}
           buttonText={tertiaryBtnText}
+          disabled={tertiaryBtnDisabled}
         />
         <RecoveryPrimaryBtn {...props} />
       </Flex>
