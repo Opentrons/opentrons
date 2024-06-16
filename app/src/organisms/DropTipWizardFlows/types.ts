@@ -19,11 +19,19 @@ interface CopyOverrides {
   beforeBeginningTopText: string
 }
 
+interface ErrorOverrides {
+  blowoutFailedCb: () => Promise<void>
+  tipDropFailedCb: () => Promise<void>
+  generalFailureCb: () => Promise<void>
+}
+
 export interface FixitCommandTypeUtils {
   runId: string
   failedCommandId: string
   trackCurrentMap: ERUtilsResults['trackExternalMap']
   copyOverrides: CopyOverrides
+  errorOverrides: ErrorOverrides
+  routeOverride?: typeof DT_ROUTES[keyof typeof DT_ROUTES]
 }
 
 export type DropTipWizardContainerProps = DropTipWizardProps & {

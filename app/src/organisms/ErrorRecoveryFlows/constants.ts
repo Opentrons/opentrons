@@ -10,6 +10,7 @@ export const ERROR_KINDS = {
 } as const
 
 // TODO(jh, 05-09-24): Refactor to a directed graph. EXEC-430.
+// TODO(jh, 06-14-24): Consolidate motion routes to a single route with several steps.
 // Valid recovery routes and steps.
 export const RECOVERY_MAP = {
   BEFORE_BEGINNING: {
@@ -24,11 +25,21 @@ export const RECOVERY_MAP = {
   },
   DROP_TIP_FLOWS: {
     ROUTE: 'drop-tip',
-    STEPS: { BEGIN_REMOVAL: 'begin-removal', WIZARD: 'wizard' },
+    STEPS: {
+      BEGIN_REMOVAL: 'begin-removal',
+      WIZARD: 'wizard',
+      CHOOSE_TIP_DROP: 'choose-tip-drop',
+      CHOOSE_BLOWOUT: 'choose-blowout',
+    },
   },
   ERROR_WHILE_RECOVERING: {
     ROUTE: 'error',
-    STEPS: { ACTION_FAILED: 'action-failed' },
+    STEPS: {
+      RECOVERY_ACTION_FAILED: 'recovery-action-failed',
+      DROP_TIP_BLOWOUT_FAILED: 'drop-tip-blowout-failed',
+      DROP_TIP_TIP_DROP_FAILED: 'drop-tip-tip-drop-failed',
+      DROP_TIP_GENERAL_ERROR: 'drop-tip-general-error',
+    },
   },
   IGNORE_AND_RESUME: { ROUTE: 'ignore-and-resume', STEPS: {} },
   REFILL_AND_RESUME: { ROUTE: 'refill-and-resume', STEPS: {} },
@@ -117,11 +128,18 @@ export const STEP_ORDER: StepOrder = {
   [DROP_TIP_FLOWS.ROUTE]: [
     DROP_TIP_FLOWS.STEPS.BEGIN_REMOVAL,
     DROP_TIP_FLOWS.STEPS.WIZARD,
+    DROP_TIP_FLOWS.STEPS.CHOOSE_BLOWOUT,
+    DROP_TIP_FLOWS.STEPS.CHOOSE_TIP_DROP,
   ],
   [REFILL_AND_RESUME.ROUTE]: [],
   [IGNORE_AND_RESUME.ROUTE]: [],
   [CANCEL_RUN.ROUTE]: [CANCEL_RUN.STEPS.CONFIRM_CANCEL],
-  [ERROR_WHILE_RECOVERING.ROUTE]: [ERROR_WHILE_RECOVERING.STEPS.ACTION_FAILED],
+  [ERROR_WHILE_RECOVERING.ROUTE]: [
+    ERROR_WHILE_RECOVERING.STEPS.RECOVERY_ACTION_FAILED,
+    ERROR_WHILE_RECOVERING.STEPS.DROP_TIP_GENERAL_ERROR,
+    ERROR_WHILE_RECOVERING.STEPS.DROP_TIP_TIP_DROP_FAILED,
+    ERROR_WHILE_RECOVERING.STEPS.DROP_TIP_BLOWOUT_FAILED,
+  ],
 }
 
 export const INVALID = 'INVALID' as const
