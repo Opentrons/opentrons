@@ -11,6 +11,7 @@ import {
   useNotifyAllCommandsQuery,
   useNotifyRunQuery,
 } from '../../../resources/runs'
+import { useRecoveryOptionCopy } from './useRecoveryOptionCopy'
 
 import type { PipetteData } from '@opentrons/api-client'
 import type { IRecoveryMap } from '../types'
@@ -35,6 +36,7 @@ export interface ERUtilsResults {
   tipStatusUtils: RecoveryTipStatusUtils
   failedLabwareUtils: UseFailedLabwareUtilsResult
   recoveryMapUtils: UseRecoveryMapUtilsResult
+  getRecoveryOptionCopy: ReturnType<typeof useRecoveryOptionCopy>
   failedPipetteInfo: PipetteData | null
   hasLaunchedRecovery: boolean
   trackExternalMap: (map: Record<string, any>) => void
@@ -99,6 +101,7 @@ export function useERUtils({
     runId,
     failedCommand,
     failedLabwareUtils,
+    routeUpdateActions,
   })
 
   const recoveryMapUtils = useRecoveryMapUtils({
@@ -107,6 +110,10 @@ export function useERUtils({
     protocolAnalysis,
     failedLabwareUtils,
   })
+
+  // TODO(jh, 06-14-24): Ensure other string build utilities that are internal to ErrorRecoveryFlows are exported under
+  // one utility object in useERUtils.
+  const getRecoveryOptionCopy = useRecoveryOptionCopy()
 
   return {
     recoveryMap,
@@ -119,5 +126,6 @@ export function useERUtils({
     failedLabwareUtils,
     failedPipetteInfo,
     recoveryMapUtils,
+    getRecoveryOptionCopy,
   }
 }

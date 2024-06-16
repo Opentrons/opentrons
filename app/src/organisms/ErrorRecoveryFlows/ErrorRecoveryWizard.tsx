@@ -9,6 +9,7 @@ import { getIsOnDevice } from '../../redux/config'
 import { getTopPortalEl } from '../../App/portal'
 import { InterventionModal } from '../../molecules/InterventionModal'
 import { BeforeBeginning } from './BeforeBeginning'
+import { RecoveryError } from './RecoveryError'
 import {
   SelectRecoveryOption,
   RetryStep,
@@ -124,6 +125,10 @@ export function ErrorRecoveryContent(props: RecoveryContentProps): JSX.Element {
     return <SelectRecoveryOption {...props} />
   }
 
+  const buildRecoveryError = (): JSX.Element => {
+    return <RecoveryError {...props} />
+  }
+
   const buildRecoveryInProgress = (): JSX.Element => {
     return <RecoveryInProgress {...props} />
   }
@@ -149,6 +154,8 @@ export function ErrorRecoveryContent(props: RecoveryContentProps): JSX.Element {
       return buildBeforeBeginning()
     case RECOVERY_MAP.OPTION_SELECTION.ROUTE:
       return buildSelectRecoveryOption()
+    case RECOVERY_MAP.ERROR_WHILE_RECOVERING.ROUTE:
+      return buildRecoveryError()
     case RECOVERY_MAP.RETRY_FAILED_COMMAND.ROUTE:
       return buildResumeRun()
     case RECOVERY_MAP.CANCEL_RUN.ROUTE:

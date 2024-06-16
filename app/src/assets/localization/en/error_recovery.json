@@ -1,6 +1,7 @@
 {
   "are_you_sure_you_want_to_cancel": "Are you sure you want to cancel?",
   "are_you_sure_you_want_to_resume": "Are you sure you want to resume?",
+  "back_to_menu": "Back to menu",
   "before_you_begin": "Before you begin",
   "begin_removal": "Begin removal",
   "cancel_run": "Cancel run",
@@ -20,6 +21,7 @@
   "preserve_aspirated_liquid": "First, do you need to preserve aspirated liquid?",
   "proceed_to_cancel": "Proceed to cancel",
   "proceed_to_tip_selection": "Proceed to tip selection",
+  "recovery_action_failed": "{{action}} failed",
   "recovery_mode": "Recovery Mode",
   "recovery_mode_explanation": "<block>Recovery Mode provides you with guided and manual controls for handling errors at runtime.</block><br/><block>You can make changes to ensure the step in progress when the error occurred can be completed or choose to cancel the protocol. When changes are made and no subsequent errors are detected, the method completes. Depending on the conditions that caused the error, you will only be provided with appropriate options.</block>",
   "replace_tips_and_select_location": "It's best to replace tips and select the last location used for tip pickup.",
@@ -28,6 +30,7 @@
   "retry_now": "Retry now",
   "retry_step": "Retry step",
   "retry_with_new_tips": "Retry with new tips",
+  "return_to_the_menu": "Return to the menu to choose how to proceed.",
   "robot_will_retry_with_tips": "The robot will retry the failed step with new tips.",
   "run_paused": "Run paused",
   "run_will_resume": "The run will resume from the point at which the error occurred. Take any necessary actions to correct the problem first. If the step is completed successfully, the protocol continues.",

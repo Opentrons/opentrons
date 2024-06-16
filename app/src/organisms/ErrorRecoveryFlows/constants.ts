@@ -26,6 +26,10 @@ export const RECOVERY_MAP = {
     ROUTE: 'drop-tip',
     STEPS: { BEGIN_REMOVAL: 'begin-removal', WIZARD: 'wizard' },
   },
+  ERROR_WHILE_RECOVERING: {
+    ROUTE: 'error',
+    STEPS: { ACTION_FAILED: 'action-failed' },
+  },
   IGNORE_AND_RESUME: { ROUTE: 'ignore-and-resume', STEPS: {} },
   REFILL_AND_RESUME: { ROUTE: 'refill-and-resume', STEPS: {} },
   RETRY_FAILED_COMMAND: {
@@ -91,6 +95,7 @@ const {
   IGNORE_AND_RESUME,
   CANCEL_RUN,
   RETRY_NEW_TIPS,
+  ERROR_WHILE_RECOVERING,
 } = RECOVERY_MAP
 
 // The deterministic ordering of steps for a given route.
@@ -116,6 +121,7 @@ export const STEP_ORDER: StepOrder = {
   [REFILL_AND_RESUME.ROUTE]: [],
   [IGNORE_AND_RESUME.ROUTE]: [],
   [CANCEL_RUN.ROUTE]: [CANCEL_RUN.STEPS.CONFIRM_CANCEL],
+  [ERROR_WHILE_RECOVERING.ROUTE]: [ERROR_WHILE_RECOVERING.STEPS.ACTION_FAILED],
 }
 
 export const INVALID = 'INVALID' as const
