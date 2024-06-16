@@ -122,10 +122,13 @@ describe('ManageTips', () => {
     )
   })
 
-  it(`renders the Drop Tip flows when the route is ${DROP_TIP_FLOWS.STEPS.WIZARD}`, () => {
+  it(`renders the Drop Tip flows when the route is ${DROP_TIP_FLOWS.STEPS.BEFORE_BEGINNING}`, () => {
     render({
       ...props,
-      recoveryMap: { ...props.recoveryMap, step: DROP_TIP_FLOWS.STEPS.WIZARD },
+      recoveryMap: {
+        ...props.recoveryMap,
+        step: DROP_TIP_FLOWS.STEPS.BEFORE_BEGINNING,
+      },
     })
 
     screen.getByText('MOCK DROP TIP FLOWS')

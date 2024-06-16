@@ -27,7 +27,7 @@ export const RECOVERY_MAP = {
     ROUTE: 'drop-tip',
     STEPS: {
       BEGIN_REMOVAL: 'begin-removal',
-      WIZARD: 'wizard',
+      BEFORE_BEGINNING: 'before-beginning',
       CHOOSE_TIP_DROP: 'choose-tip-drop',
       CHOOSE_BLOWOUT: 'choose-blowout',
     },
@@ -127,7 +127,7 @@ export const STEP_ORDER: StepOrder = {
   [ROBOT_RETRYING_STEP.ROUTE]: [ROBOT_RETRYING_STEP.STEPS.RETRYING],
   [DROP_TIP_FLOWS.ROUTE]: [
     DROP_TIP_FLOWS.STEPS.BEGIN_REMOVAL,
-    DROP_TIP_FLOWS.STEPS.WIZARD,
+    DROP_TIP_FLOWS.STEPS.BEFORE_BEGINNING,
     DROP_TIP_FLOWS.STEPS.CHOOSE_BLOWOUT,
     DROP_TIP_FLOWS.STEPS.CHOOSE_TIP_DROP,
   ],

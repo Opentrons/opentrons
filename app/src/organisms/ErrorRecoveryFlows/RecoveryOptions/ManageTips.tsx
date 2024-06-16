@@ -31,7 +31,7 @@ export function ManageTips(props: RecoveryContentProps): JSX.Element | null {
     switch (step) {
       case DROP_TIP_FLOWS.STEPS.BEGIN_REMOVAL:
         return <BeginRemoval {...props} />
-      case DROP_TIP_FLOWS.STEPS.WIZARD:
+      case DROP_TIP_FLOWS.STEPS.BEFORE_BEGINNING:
       case DROP_TIP_FLOWS.STEPS.CHOOSE_BLOWOUT:
       case DROP_TIP_FLOWS.STEPS.CHOOSE_TIP_DROP:
         return <DropTipFlowsContainer {...props} />
