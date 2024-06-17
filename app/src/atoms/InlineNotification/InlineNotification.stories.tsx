@@ -4,7 +4,7 @@ import { InlineNotification } from '.'
 import type { Story, Meta } from '@storybook/react'
 
 export default {
-  title: 'ODD/Atoms/InlineNotification',
+  title: 'App/Atoms/InlineNotification',
   argTypes: {
     hug: {
       control: {

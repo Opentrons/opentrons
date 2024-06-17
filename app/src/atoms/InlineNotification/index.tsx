@@ -1,7 +1,9 @@
 import * as React from 'react'
+import { css } from 'styled-components'
 import {
   ALIGN_CENTER,
   BORDERS,
+  Box,
   Btn,
   COLORS,
   DIRECTION_ROW,
@@ -9,8 +11,9 @@ import {
   Icon,
   JUSTIFY_SPACE_BETWEEN,
   SPACING,
-  LegacyStyledText,
+  StyledText,
   TYPOGRAPHY,
+  RESPONSIVENESS,
 } from '@opentrons/components'
 
 import type { IconProps, StyleProps } from '@opentrons/components'
@@ -64,8 +67,8 @@ export function InlineNotification(
   const inlineNotificationProps = INLINE_NOTIFICATION_PROPS_BY_TYPE[type]
   const iconProps = {
     ...inlineNotificationProps.icon,
-    size: '1.75rem',
     color: INLINE_NOTIFICATION_PROPS_BY_TYPE[type].color,
+    size: '100%',
   }
   return (
     <Flex
@@ -79,12 +82,22 @@ export function InlineNotification(
       padding={`${SPACING.spacing12} ${SPACING.spacing16}`}
       width={hug ? 'max-content' : '100%'}
     >
-      <Icon {...iconProps} aria-label={`icon_${type}`} />
+      <Box
+        css={css`
+          width: ${SPACING.spacing16};
+          height: ${SPACING.spacing16};
+          @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
+            width: 1.75rem;
+            height: 1.75rem;
+          }
+        `}
+      >
+        <Icon {...iconProps} aria-label={`icon_${type}`} />
+      </Box>
       <Flex flex="1" alignItems={ALIGN_CENTER}>
-        <LegacyStyledText
-          fontSize={TYPOGRAPHY.fontSize22}
-          fontWeight={TYPOGRAPHY.fontWeightRegular}
-          lineHeight={TYPOGRAPHY.lineHeight28}
+        <StyledText
+          oddStyle="bodyTextRegular"
+          desktopStyle="bodyDefaultRegular"
         >
           <span
             css={`
@@ -93,8 +106,17 @@ export function InlineNotification(
           >
             {fullHeading}
           </span>
+          {/* this break is because the desktop wants this on two lines, but also wants/
+            inline text layout on ODD. Soooo here you go*/}
+          <br
+            css={`
+              @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
+                display: none;
+              }
+            `}
+          />
           {message != null && fullmessage}
-        </LegacyStyledText>
+        </StyledText>
       </Flex>
       {onCloseClick && (
         <Btn
