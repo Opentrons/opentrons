@@ -16,6 +16,8 @@ on:
   pull_request:
     paths:
       - 'api/**'
+      - 'shared-data/**/*'
+      - '!shared-data/js/**'
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
