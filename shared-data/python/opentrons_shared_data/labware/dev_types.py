@@ -140,8 +140,3 @@ class LabwareDefinition(_RequiredLabwareDefinition, total=False):
     gripperOffsets: Dict[str, GripperOffsets]
     gripForce: float
     gripHeightFromLabwareBottom: float
-
-
-class LiquidProbeParameters(TypedDict):
-    minimumHeight: float
-    minimumWellVolume: float
