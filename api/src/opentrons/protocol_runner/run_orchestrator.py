@@ -90,9 +90,9 @@ class RunOrchestrator:
         self._setup_runner = setup_runner
         self._fixit_runner = fixit_runner
         self._protocol_live_runner = protocol_live_runner
-
         self._fixit_runner.prepare()
         self._setup_runner.prepare()
+        self._protocol_engine.set_command_generator(self.command_generator)
 
     @property
     def run_id(self) -> str:
@@ -102,7 +102,7 @@ class RunOrchestrator:
         return self._run_id
 
     @classmethod
-    def build_orchestrator(
+    async def build_orchestrator(
         cls,
         robot_type: RobotType,
         deck_type: DeckType,
@@ -121,7 +121,6 @@ class RunOrchestrator:
         """Build a RunOrchestrator provider."""
         protocol_engine = await create_protocol_engine(
             hardware_api=hardware_api,
-            command_generator=RunOrchestrator.command_generator(cls),
             config=ProtocolEngineConfig(
                 robot_type=robot_type,
                 deck_type=deck_type,
@@ -355,12 +354,11 @@ class RunOrchestrator:
         """Get engine deck type."""
         return self._protocol_engine.state_view.config.deck_type
 
-    @classmethod
-    async def command_generator(cls) -> AsyncGenerator[str, None]:
+    async def command_generator(self) -> AsyncGenerator[str, None]:
         while True:
             try:
-                command_id = await cls._protocol_engine._state_store.wait_for(
-                    condition=cls._protocol_engine.state_view.commands.get_next_to_execute
+                command_id = await self._protocol_engine._state_store.wait_for(
+                    condition=self._protocol_engine.state_view.commands.get_next_to_execute
                 )
                 # Assert for type hinting. This is valid because the wait_for() above
                 # only returns when the value is truthy.

@@ -20,7 +20,7 @@ from .types import PostRunHardwareState, DeckConfigurationType
 async def create_protocol_engine(
     hardware_api: HardwareControlAPI,
     config: Config,
-    command_generator: typing.Callable[[], typing.AsyncGenerator[str, None]],
+    # command_generator: typing.Callable[[], typing.AsyncGenerator[str, None]],
     load_fixed_trash: bool = False,
     deck_configuration: typing.Optional[DeckConfigurationType] = None,
     notify_publishers: typing.Optional[typing.Callable[[], None]] = None,
@@ -56,7 +56,7 @@ async def create_protocol_engine(
     return ProtocolEngine(
         state_store=state_store,
         hardware_api=hardware_api,
-        command_generator=command_generator,
+        # command_generator=command_generator,
     )
 
 
