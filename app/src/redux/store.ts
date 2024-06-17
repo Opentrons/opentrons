@@ -18,9 +18,8 @@ const middleware = applyMiddleware(
   routerMiddleware(history) as Middleware
 )
 
-const composeEnhancers =
-  (window as any).__REDUX_DEVTOOLS_EXTENSION_COMPOSE__({ maxAge: 200 }) ??
-  compose
+const composeEnhancers = (window as any)?.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__?.({ maxAge: 200 }) ?? compose
+
 export const store = createStore(
   rootReducer,
   composeEnhancers(middleware) as StoreEnhancer
