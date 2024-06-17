@@ -131,6 +131,7 @@
   "status_stopped": "Canceled",
   "status_succeeded": "Completed",
   "status": "Status",
+  "step": "Step",
   "step_failed": "Step failed",
   "step_number": "Step {{step_number}}:",
   "steps_total": "{{count}} steps total",
