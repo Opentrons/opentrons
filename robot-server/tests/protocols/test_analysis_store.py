@@ -12,6 +12,7 @@ from opentrons.protocol_engine.types import RunTimeParamValuesType
 from sqlalchemy.engine import Engine as SQLEngine
 
 from opentrons_shared_data.pipette.dev_types import PipetteNameType
+from opentrons_shared_data.errors import ErrorCodes
 
 from opentrons.types import MountType, DeckSlotName
 from opentrons.protocol_engine import (
@@ -360,6 +361,19 @@ analysis_result_specs: List[AnalysisResultSpec] = [
             )
         ],
         expected_result=AnalysisResult.NOT_OK,
+    ),
+    AnalysisResultSpec(
+        commands=[],
+        errors=[
+            pe_errors.ErrorOccurrence(
+                id="error-id",
+                createdAt=datetime(year=2021, month=1, day=1, tzinfo=timezone.utc),
+                errorType="FakeFileError",
+                errorCode=ErrorCodes.FILE_PARAMETER_REQUIRED.value.code,
+                detail="oh no",
+            )
+        ],
+        expected_result=AnalysisResult.FILE_REQUIRED,
     ),
 ]
 

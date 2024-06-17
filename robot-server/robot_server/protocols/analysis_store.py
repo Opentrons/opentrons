@@ -7,6 +7,7 @@ from typing import Dict, List, Optional
 from typing_extensions import Final
 
 from opentrons_shared_data.robot.dev_types import RobotType
+from opentrons_shared_data.errors import ErrorCodes
 from opentrons.protocol_engine.types import (
     RunTimeParameter,
     RunTimeParamValuesType,
@@ -20,6 +21,7 @@ from opentrons.protocol_engine import (
     LoadedModule,
     Liquid,
 )
+from opentrons.protocol_engine.protocol_engine import code_in_error_tree
 
 from .analysis_models import (
     AnalysisSummary,
@@ -175,7 +177,15 @@ class AnalysisStore:
         ), "Analysis ID to update must be for a valid pending analysis."
 
         if len(errors) > 0:
-            result = AnalysisResult.NOT_OK
+            if any(
+                code_in_error_tree(
+                    root_error=error, code=ErrorCodes.FILE_PARAMETER_REQUIRED
+                )
+                for error in errors
+            ):
+                result = AnalysisResult.FILE_REQUIRED
+            else:
+                result = AnalysisResult.NOT_OK
         else:
             result = AnalysisResult.OK
 

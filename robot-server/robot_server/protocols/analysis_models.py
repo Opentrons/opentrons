@@ -34,10 +34,13 @@ class AnalysisResult(str, Enum):
         OK: No problems were found during protocol analysis.
         NOT_OK: Problems were found during protocol analysis. Inspect
             `analysis.errors` for error occurrences.
+        FILE_REQUIRED: A file is required for a file parameter for full
+                        analysis to be possible.
     """
 
     OK = "ok"
     NOT_OK = "not-ok"
+    FILE_REQUIRED = "file-required"
 
 
 class AnalysisRequest(BaseModel):
