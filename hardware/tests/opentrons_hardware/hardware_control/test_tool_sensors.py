@@ -1,10 +1,11 @@
 """Test the tool-sensor coordination code."""
+import asyncio
 import logging
 from mock import patch, AsyncMock, call
 import os
 import pytest
 from contextlib import asynccontextmanager
-from typing import Iterator, List, Tuple, AsyncIterator, Any, Dict
+from typing import Iterator, List, Tuple, AsyncIterator, Any, Dict, Type, Callable
 from opentrons_hardware.firmware_bindings.messages.message_definitions import (
     AddLinearMoveRequest,
     ExecuteMoveGroupRequest,
@@ -34,7 +35,7 @@ from opentrons_hardware.firmware_bindings.messages.fields import (
 )
 
 
-from tests.conftest import CanLoopback
+from tests.conftest import CanLoopback, MockCanMessageNotifier
 
 from opentrons_hardware.hardware_control.tool_sensors import (
     capacitive_probe,
@@ -133,43 +134,99 @@ async def test_liquid_probe(
         sensor_type=SensorType.pressure, sensor_id=SensorId.S0, node_id=target_node
     )
 
+    def check_first_move(
+        node_id: NodeId, message: MessageDefinition
+    ) -> List[Tuple[NodeId, MessageDefinition, NodeId]]:
+        return [
+            (
+                NodeId.host,
+                MoveCompleted(
+                    payload=MoveCompletedPayload(
+                        group_id=UInt8Field(0),
+                        seq_id=UInt8Field(0),
+                        current_position_um=UInt32Field(14000),
+                        encoder_position_um=Int32Field(14000),
+                        position_flags=MotorPositionFlagsField(0),
+                        ack_id=UInt8Field(1),
+                    )
+                ),
+                motor_node,
+            )
+        ]
+
+    def check_second_move(
+        node_id: NodeId, message: MessageDefinition
+    ) -> List[Tuple[NodeId, MessageDefinition, NodeId]]:
+        return [
+            (
+                NodeId.host,
+                MoveCompleted(
+                    payload=MoveCompletedPayload(
+                        group_id=UInt8Field(1),
+                        seq_id=UInt8Field(0),
+                        current_position_um=UInt32Field(14000),
+                        encoder_position_um=Int32Field(14000),
+                        position_flags=MotorPositionFlagsField(0),
+                        ack_id=UInt8Field(1),
+                    )
+                ),
+                target_node,
+            )
+        ]
+
+    def check_third_move(
+        node_id: NodeId, message: MessageDefinition
+    ) -> List[Tuple[NodeId, MessageDefinition, NodeId]]:
+        return [
+            (
+                NodeId.host,
+                MoveCompleted(
+                    payload=MoveCompletedPayload(
+                        group_id=UInt8Field(2),
+                        seq_id=UInt8Field(0),
+                        current_position_um=UInt32Field(14000),
+                        encoder_position_um=Int32Field(14000),
+                        position_flags=MotorPositionFlagsField(0),
+                        ack_id=UInt8Field(2),
+                    )
+                ),
+                motor_node,
+            ),
+            (
+                NodeId.host,
+                MoveCompleted(
+                    payload=MoveCompletedPayload(
+                        group_id=UInt8Field(2),
+                        seq_id=UInt8Field(0),
+                        current_position_um=UInt32Field(14000),
+                        encoder_position_um=Int32Field(14000),
+                        position_flags=MotorPositionFlagsField(0),
+                        ack_id=UInt8Field(2),
+                    )
+                ),
+                target_node,
+            ),
+        ]
+
+    # def get_responder()->Iterator[Type[check_first_move]]:
+    def get_responder() -> Iterator[
+        Callable[
+            [NodeId, MessageDefinition], List[Tuple[NodeId, MessageDefinition, NodeId]]
+        ]
+    ]:
+        yield check_first_move
+        yield check_second_move
+        yield check_third_move
+
+    responder_getter = get_responder()
+
     def move_responder(
         node_id: NodeId, message: MessageDefinition
     ) -> List[Tuple[NodeId, MessageDefinition, NodeId]]:
         message.payload.serialize()
         if isinstance(message, ExecuteMoveGroupRequest):
-            ack_payload = EmptyPayload()
-            ack_payload.message_index = message.payload.message_index
-            return [
-                (
-                    NodeId.host,
-                    MoveCompleted(
-                        payload=MoveCompletedPayload(
-                            group_id=UInt8Field(0),
-                            seq_id=UInt8Field(0),
-                            current_position_um=UInt32Field(14000),
-                            encoder_position_um=Int32Field(14000),
-                            position_flags=MotorPositionFlagsField(0),
-                            ack_id=UInt8Field(2),
-                        )
-                    ),
-                    motor_node,
-                ),
-                (
-                    NodeId.host,
-                    MoveCompleted(
-                        payload=MoveCompletedPayload(
-                            group_id=UInt8Field(0),
-                            seq_id=UInt8Field(0),
-                            current_position_um=UInt32Field(14000),
-                            encoder_position_um=Int32Field(14000),
-                            position_flags=MotorPositionFlagsField(0),
-                            ack_id=UInt8Field(2),
-                        )
-                    ),
-                    target_node,
-                ),
-            ]
+            responder = next(responder_getter)
+            return responder(node_id, message)
         else:
             return []
 
