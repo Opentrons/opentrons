@@ -6,7 +6,7 @@ from datetime import datetime
 
 from pytest_lazyfixture import lazy_fixture  # type: ignore[import-untyped]
 from decoy import Decoy
-from typing import Union, Generator
+from typing import Union
 
 from opentrons.protocols.api_support.types import APIVersion
 from opentrons.protocol_engine import ProtocolEngine
