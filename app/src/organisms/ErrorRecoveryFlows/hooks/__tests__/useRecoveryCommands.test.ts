@@ -10,6 +10,7 @@ import { useChainRunCommands } from '../../../../resources/runs'
 import {
   useRecoveryCommands,
   HOME_PIPETTE_Z_AXES,
+  buildPickUpTips,
 } from '../useRecoveryCommands'
 
 vi.mock('@opentrons/react-api-client')
@@ -21,6 +22,10 @@ const mockFailedCommand = {
   params: { test: 'mock_param' },
 } as any
 const mockRunId = '123'
+const mockFailedLabwareUtils = {
+  selectedTipLocations: { A1: null },
+  pickUpTipLabware: { id: 'MOCK_LW_ID' },
+} as any
 
 describe('useRecoveryCommands', () => {
   const mockResumeRunFromRecovery = vi.fn()
@@ -44,6 +49,7 @@ describe('useRecoveryCommands', () => {
       useRecoveryCommands({
         runId: mockRunId,
         failedCommand: mockFailedCommand,
+        failedLabwareUtils: mockFailedLabwareUtils,
       })
     )
 
@@ -67,6 +73,7 @@ describe('useRecoveryCommands', () => {
       useRecoveryCommands({
         runId: mockRunId,
         failedCommand: mockFailedCommand,
+        failedLabwareUtils: mockFailedLabwareUtils,
       })
     )
 
@@ -85,6 +92,7 @@ describe('useRecoveryCommands', () => {
       useRecoveryCommands({
         runId: mockRunId,
         failedCommand: mockFailedCommand,
+        failedLabwareUtils: mockFailedLabwareUtils,
       })
     )
 
@@ -98,6 +106,7 @@ describe('useRecoveryCommands', () => {
       useRecoveryCommands({
         runId: mockRunId,
         failedCommand: mockFailedCommand,
+        failedLabwareUtils: mockFailedLabwareUtils,
       })
     )
 
@@ -111,6 +120,7 @@ describe('useRecoveryCommands', () => {
       useRecoveryCommands({
         runId: mockRunId,
         failedCommand: mockFailedCommand,
+        failedLabwareUtils: mockFailedLabwareUtils,
       })
     )
 
@@ -120,6 +130,36 @@ describe('useRecoveryCommands', () => {
 
     expect(mockChainRunCommands).toHaveBeenCalledWith(
       [HOME_PIPETTE_Z_AXES],
+      true
+    )
+  })
+
+  it('should call pickUpTips with the appropriate command', async () => {
+    const mockFailedCmdWithPipetteId = {
+      ...mockFailedCommand,
+      params: { ...mockFailedCommand.params, pipetteId: 'MOCK_ID' },
+    }
+
+    const buildPickUpTipsCmd = buildPickUpTips(
+      mockFailedLabwareUtils.selectedTipLocations,
+      mockFailedCmdWithPipetteId,
+      mockFailedLabwareUtils.pickUpTipLabware
+    )
+
+    const { result } = renderHook(() =>
+      useRecoveryCommands({
+        runId: mockRunId,
+        failedCommand: mockFailedCmdWithPipetteId,
+        failedLabwareUtils: mockFailedLabwareUtils,
+      })
+    )
+
+    await act(async () => {
+      await result.current.pickUpTips()
+    })
+
+    expect(mockChainRunCommands).toHaveBeenCalledWith(
+      [buildPickUpTipsCmd],
       true
     )
   })

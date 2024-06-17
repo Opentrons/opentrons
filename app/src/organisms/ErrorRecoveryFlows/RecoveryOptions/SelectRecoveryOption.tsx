@@ -27,10 +27,12 @@ export function SelectRecoveryOption({
   errorKind,
   routeUpdateActions,
   tipStatusUtils,
+  currentRecoveryOptionUtils,
 }: RecoveryContentProps): JSX.Element | null {
   const { t } = useTranslation('error_recovery')
   const { proceedToRouteAndStep } = routeUpdateActions
   const { determineTipStatus } = tipStatusUtils
+  const { setSelectedRecoveryOption } = currentRecoveryOptionUtils
   const validRecoveryOptions = getRecoveryOptions(errorKind)
   const [selectedRoute, setSelectedRoute] = React.useState<RecoveryRoute>(
     head(validRecoveryOptions) as RecoveryRoute
@@ -53,9 +55,10 @@ export function SelectRecoveryOption({
         </Flex>
         <RecoveryFooterButtons
           isOnDevice={isOnDevice}
-          primaryBtnOnClick={() =>
-            proceedToRouteAndStep(selectedRoute as RecoveryRoute)
-          }
+          primaryBtnOnClick={() => {
+            setSelectedRecoveryOption(selectedRoute)
+            void proceedToRouteAndStep(selectedRoute as RecoveryRoute)
+          }}
         />
       </RecoverySingleColumnContent>
     )
@@ -83,6 +86,8 @@ export function RecoveryOptions({
           return t('retry_step')
         case RECOVERY_MAP.CANCEL_RUN.ROUTE:
           return t('cancel_run')
+        case RECOVERY_MAP.RETRY_NEW_TIPS.ROUTE:
+          return t('retry_with_new_tips')
         default:
           return 'INVALID_OPTION'
       }
@@ -114,6 +119,8 @@ export function useCurrentTipStatus(
 
 export function getRecoveryOptions(errorKind: ErrorKind): RecoveryRoute[] {
   switch (errorKind) {
+    case ERROR_KINDS.OVERPRESSURE_WHILE_ASPIRATING:
+      return OVERPRESSURE_WHILE_ASPIRATING_OPTIONS
     case ERROR_KINDS.GENERAL_ERROR:
       return GENERAL_ERROR_OPTIONS
   }
@@ -121,5 +128,10 @@ export function getRecoveryOptions(errorKind: ErrorKind): RecoveryRoute[] {
 
 export const GENERAL_ERROR_OPTIONS: RecoveryRoute[] = [
   RECOVERY_MAP.RETRY_FAILED_COMMAND.ROUTE,
+  RECOVERY_MAP.CANCEL_RUN.ROUTE,
+]
+
+export const OVERPRESSURE_WHILE_ASPIRATING_OPTIONS: RecoveryRoute[] = [
+  RECOVERY_MAP.RETRY_NEW_TIPS.ROUTE,
   RECOVERY_MAP.CANCEL_RUN.ROUTE,
 ]

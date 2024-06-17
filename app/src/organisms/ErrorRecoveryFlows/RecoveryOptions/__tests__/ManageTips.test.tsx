@@ -20,7 +20,7 @@ import type { PipetteModelSpecs } from '@opentrons/shared-data'
 
 vi.mock('../../../DropTipWizardFlows')
 
-const { DROP_TIP_FLOWS } = RECOVERY_MAP
+const { DROP_TIP_FLOWS, RETRY_NEW_TIPS } = RECOVERY_MAP
 
 const MOCK_ACTUAL_PIPETTE = {
   ...mockPipetteInfo.pipetteSpecs,
@@ -39,10 +39,12 @@ const render = (props: React.ComponentProps<typeof ManageTips>) => {
 describe('ManageTips', () => {
   let props: React.ComponentProps<typeof ManageTips>
   let mockProceedNextStep: Mock
+  let mockProceedToRouteAndStep: Mock
   let mockSetRobotInMotion: Mock
 
   beforeEach(() => {
     mockProceedNextStep = vi.fn()
+    mockProceedToRouteAndStep = vi.fn(() => Promise.resolve())
     mockSetRobotInMotion = vi.fn(() => Promise.resolve())
 
     props = {
@@ -57,8 +59,12 @@ describe('ManageTips', () => {
       routeUpdateActions: {
         proceedNextStep: mockProceedNextStep,
         setRobotInMotion: mockSetRobotInMotion,
+        proceedToRouteAndStep: mockProceedToRouteAndStep,
       } as any,
       recoveryCommands: { cancelRun: vi.fn() } as any,
+      currentRecoveryOptionUtils: {
+        selectedRecoveryOption: null,
+      } as any,
     }
 
     vi.mocked(DropTipWizardFlows).mockReturnValue(
@@ -95,6 +101,27 @@ describe('ManageTips', () => {
     expect(mockSetRobotInMotion).toHaveBeenCalled()
   })
 
+  it(`handles special routing for ${RETRY_NEW_TIPS.ROUTE} when skipping tip drop`, () => {
+    props = {
+      ...props,
+      currentRecoveryOptionUtils: {
+        selectedRecoveryOption: RETRY_NEW_TIPS.ROUTE,
+      } as any,
+    }
+    render(props)
+
+    const skipBtn = screen.getByText('Skip')
+    const continueBtn = screen.getByRole('button', { name: 'Continue' })
+
+    fireEvent.click(skipBtn)
+    fireEvent.click(continueBtn)
+
+    expect(mockProceedToRouteAndStep).toHaveBeenCalledWith(
+      RETRY_NEW_TIPS.ROUTE,
+      RETRY_NEW_TIPS.STEPS.REPLACE_TIPS
+    )
+  })
+
   it(`renders the Drop Tip flows when the route is ${DROP_TIP_FLOWS.STEPS.WIZARD}`, () => {
     render({
       ...props,
@@ -114,6 +141,9 @@ describe('useDropTipFlowUtils', () => {
     failedCommand: null,
     previousRoute: null,
     trackExternalMap: vi.fn(),
+    currentRecoveryOptionUtils: {
+      selectedRecoveryOption: null,
+    } as any,
   } as any
 
   it('should return the correct runId', () => {

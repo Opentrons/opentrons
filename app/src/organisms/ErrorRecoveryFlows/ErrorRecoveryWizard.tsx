@@ -13,12 +13,14 @@ import {
   SelectRecoveryOption,
   RetryStep,
   CancelRun,
+  RetryNewTips,
   ManageTips,
 } from './RecoveryOptions'
 import { RecoveryInProgress } from './RecoveryInProgress'
 import { getErrorKind } from './hooks'
 import { RECOVERY_MAP } from './constants'
 
+import type { RobotType } from '@opentrons/shared-data'
 import type { RecoveryContentProps } from './types'
 import type {
   useRouteUpdateActions,
@@ -49,7 +51,13 @@ export function useERWizard(): UseERWizardResult {
   return { showERWizard, toggleERWizard, hasLaunchedRecovery }
 }
 
-export type ErrorRecoveryWizardProps = ErrorRecoveryFlowsProps & ERUtilsResults
+export type ErrorRecoveryWizardProps = Omit<
+  ErrorRecoveryFlowsProps,
+  'protocolAnalysis'
+> &
+  ERUtilsResults & {
+    robotType: RobotType
+  }
 
 export function ErrorRecoveryWizard(
   props: ErrorRecoveryWizardProps
@@ -132,6 +140,10 @@ export function ErrorRecoveryContent(props: RecoveryContentProps): JSX.Element {
     return <ManageTips {...props} />
   }
 
+  const buildRetryNewTips = (): JSX.Element => {
+    return <RetryNewTips {...props} />
+  }
+
   switch (props.recoveryMap.route) {
     case RECOVERY_MAP.BEFORE_BEGINNING.ROUTE:
       return buildBeforeBeginning()
@@ -143,10 +155,13 @@ export function ErrorRecoveryContent(props: RecoveryContentProps): JSX.Element {
       return buildCancelRun()
     case RECOVERY_MAP.DROP_TIP_FLOWS.ROUTE:
       return buildManageTips()
+    case RECOVERY_MAP.RETRY_NEW_TIPS.ROUTE:
+      return buildRetryNewTips()
     case RECOVERY_MAP.ROBOT_IN_MOTION.ROUTE:
     case RECOVERY_MAP.ROBOT_RESUMING.ROUTE:
-    case RECOVERY_MAP.ROBOT_RETRYING_COMMAND.ROUTE:
+    case RECOVERY_MAP.ROBOT_RETRYING_STEP.ROUTE:
     case RECOVERY_MAP.ROBOT_CANCELING.ROUTE:
+    case RECOVERY_MAP.ROBOT_PICKING_UP_TIPS.ROUTE:
       return buildRecoveryInProgress()
     default:
       return buildSelectRecoveryOption()

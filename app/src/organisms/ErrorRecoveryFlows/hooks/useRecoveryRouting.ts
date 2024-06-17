@@ -2,7 +2,7 @@ import * as React from 'react'
 
 import { RECOVERY_MAP } from '../constants'
 
-import type { IRecoveryMap } from '../types'
+import type { IRecoveryMap, RecoveryRoute } from '../types'
 import type { ERUtilsResults } from './useERUtils'
 
 /**
@@ -15,6 +15,7 @@ import type { ERUtilsResults } from './useERUtils'
 
 export function useRecoveryRouting(): {
   recoveryMap: IRecoveryMap
+  currentRecoveryOptionUtils: CurrentRecoveryOptionUtils
   setRM: (map: IRecoveryMap) => void
   trackExternalMap: ERUtilsResults['trackExternalMap']
 } {
@@ -26,9 +27,30 @@ export function useRecoveryRouting(): {
   // If we do multi-app routing, concat the sub-step to the error recovery routing.
   const [, setSubMap] = React.useState<Record<string, any> | null>(null)
 
+  const currentRecoveryOptionUtils = useSelectedRecoveryOption()
+
   return {
     recoveryMap,
+    currentRecoveryOptionUtils,
     setRM: setRecoveryMap,
     trackExternalMap: setSubMap,
+  }
+}
+
+export interface CurrentRecoveryOptionUtils {
+  selectedRecoveryOption: RecoveryRoute | null
+  setSelectedRecoveryOption: (option: RecoveryRoute) => void
+}
+
+// The most recently selected recovery option, if any.
+export function useSelectedRecoveryOption(): CurrentRecoveryOptionUtils {
+  const [
+    selectedRecoveryOption,
+    setSelectedRecoveryOption,
+  ] = React.useState<RecoveryRoute | null>(null)
+
+  return {
+    selectedRecoveryOption,
+    setSelectedRecoveryOption,
   }
 }

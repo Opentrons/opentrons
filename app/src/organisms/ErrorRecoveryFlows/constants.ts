@@ -6,6 +6,7 @@ import type { StepOrder } from './types'
 
 export const ERROR_KINDS = {
   GENERAL_ERROR: 'GENERAL_ERROR',
+  OVERPRESSURE_WHILE_ASPIRATING: 'OVERPRESSURE_WHILE_ASPIRATING',
 } as const
 
 // TODO(jh, 05-09-24): Refactor to a directed graph. EXEC-430.
@@ -31,6 +32,15 @@ export const RECOVERY_MAP = {
     ROUTE: 'retry-failed-command',
     STEPS: { CONFIRM_RETRY: 'confirm-retry' },
   },
+  RETRY_NEW_TIPS: {
+    ROUTE: 'retry-new-tips',
+    STEPS: {
+      DROP_TIPS: 'drop-tips',
+      REPLACE_TIPS: 'replace-tips',
+      SELECT_TIPS: 'select-tips',
+      RETRY: 'retry',
+    },
+  },
   ROBOT_CANCELING: {
     ROUTE: 'robot-cancel-run',
     STEPS: {
@@ -43,14 +53,20 @@ export const RECOVERY_MAP = {
       IN_MOTION: 'in-motion',
     },
   },
+  ROBOT_PICKING_UP_TIPS: {
+    ROUTE: 'robot-picking-up-tips',
+    STEPS: {
+      PICKING_UP_TIPS: 'picking-up-tips',
+    },
+  },
   ROBOT_RESUMING: {
     ROUTE: 'robot-resuming',
     STEPS: {
       RESUMING: 'resuming',
     },
   },
-  ROBOT_RETRYING_COMMAND: {
-    ROUTE: 'robot-retrying-command',
+  ROBOT_RETRYING_STEP: {
+    ROUTE: 'robot-retrying-step',
     STEPS: {
       RETRYING: 'retrying',
     },
@@ -66,13 +82,15 @@ const {
   OPTION_SELECTION,
   RETRY_FAILED_COMMAND,
   ROBOT_CANCELING,
+  ROBOT_PICKING_UP_TIPS,
   ROBOT_RESUMING,
   ROBOT_IN_MOTION,
-  ROBOT_RETRYING_COMMAND,
+  ROBOT_RETRYING_STEP,
   DROP_TIP_FLOWS,
   REFILL_AND_RESUME,
   IGNORE_AND_RESUME,
   CANCEL_RUN,
+  RETRY_NEW_TIPS,
 } = RECOVERY_MAP
 
 // The deterministic ordering of steps for a given route.
@@ -80,10 +98,17 @@ export const STEP_ORDER: StepOrder = {
   [BEFORE_BEGINNING.ROUTE]: [BEFORE_BEGINNING.STEPS.RECOVERY_DESCRIPTION],
   [OPTION_SELECTION.ROUTE]: [OPTION_SELECTION.STEPS.SELECT],
   [RETRY_FAILED_COMMAND.ROUTE]: [RETRY_FAILED_COMMAND.STEPS.CONFIRM_RETRY],
+  [RETRY_NEW_TIPS.ROUTE]: [
+    RETRY_NEW_TIPS.STEPS.DROP_TIPS,
+    RETRY_NEW_TIPS.STEPS.REPLACE_TIPS,
+    RETRY_NEW_TIPS.STEPS.SELECT_TIPS,
+    RETRY_NEW_TIPS.STEPS.RETRY,
+  ],
   [ROBOT_CANCELING.ROUTE]: [ROBOT_CANCELING.STEPS.CANCELING],
   [ROBOT_IN_MOTION.ROUTE]: [ROBOT_IN_MOTION.STEPS.IN_MOTION],
+  [ROBOT_PICKING_UP_TIPS.ROUTE]: [ROBOT_PICKING_UP_TIPS.STEPS.PICKING_UP_TIPS],
   [ROBOT_RESUMING.ROUTE]: [ROBOT_RESUMING.STEPS.RESUMING],
-  [ROBOT_RETRYING_COMMAND.ROUTE]: [ROBOT_RETRYING_COMMAND.STEPS.RETRYING],
+  [ROBOT_RETRYING_STEP.ROUTE]: [ROBOT_RETRYING_STEP.STEPS.RETRYING],
   [DROP_TIP_FLOWS.ROUTE]: [
     DROP_TIP_FLOWS.STEPS.BEGIN_REMOVAL,
     DROP_TIP_FLOWS.STEPS.WIZARD,
