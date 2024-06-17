@@ -92,7 +92,7 @@ describe('SelectRecoveryOption', () => {
   it('renders appropriate "Overpressure while aspirating" copy and click behavior', () => {
     props = {
       ...props,
-      errorKind: ERROR_KINDS.OVERPERSSURE_WHILE_ASPIRATING,
+      errorKind: ERROR_KINDS.OVERPRESSURE_WHILE_ASPIRATING,
     }
 
     renderSelectRecoveryOption(props)
@@ -135,7 +135,7 @@ describe('RecoveryOptions', () => {
     screen.getByRole('label', { name: 'Cancel run' })
   })
 
-  it(`renders valid recovery options for a ${ERROR_KINDS.OVERPERSSURE_WHILE_ASPIRATING} errorKind`, () => {
+  it(`renders valid recovery options for a ${ERROR_KINDS.OVERPRESSURE_WHILE_ASPIRATING} errorKind`, () => {
     props = {
       ...props,
       validRecoveryOptions: OVERPRESSURE_WHILE_ASPIRATING_OPTIONS,
@@ -164,9 +164,9 @@ describe('getRecoveryOptions', () => {
     expect(generalErrorOptions).toBe(GENERAL_ERROR_OPTIONS)
   })
 
-  it(`returns valid options when the errorKind is ${ERROR_KINDS.OVERPERSSURE_WHILE_ASPIRATING}`, () => {
+  it(`returns valid options when the errorKind is ${ERROR_KINDS.OVERPRESSURE_WHILE_ASPIRATING}`, () => {
     const generalErrorOptions = getRecoveryOptions(
-      ERROR_KINDS.OVERPERSSURE_WHILE_ASPIRATING
+      ERROR_KINDS.OVERPRESSURE_WHILE_ASPIRATING
     )
     expect(generalErrorOptions).toBe(OVERPRESSURE_WHILE_ASPIRATING_OPTIONS)
   })

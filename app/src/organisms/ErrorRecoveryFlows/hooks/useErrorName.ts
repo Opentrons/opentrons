@@ -9,7 +9,7 @@ export function useErrorName(errorKind: ErrorKind): string {
   const { t } = useTranslation('error_recovery')
 
   switch (errorKind) {
-    case ERROR_KINDS.OVERPERSSURE_WHILE_ASPIRATING:
+    case ERROR_KINDS.OVERPRESSURE_WHILE_ASPIRATING:
       return t('pipette_overpressure')
     default:
       return t('general_error')

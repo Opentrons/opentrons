@@ -53,6 +53,8 @@ export function useERUtils({
   const { data: runRecord } = useNotifyRunQuery(runId)
   // TODO(jh, 06-04-24): Refactor the utilities that derive info
   // from runCommands once the server yields that info directly on an existing/new endpoint.
+  // Note that pageLength: 999 is ok only because we fetch this on mount. We use 999 because it should hopefully
+  // provide the commands necessary for ER without taxing the server too heavily. This is NOT intended for produciton!
   const { data: runCommands } = useNotifyAllCommandsQuery(runId, {
     cursor: 0,
     pageLength: 999,

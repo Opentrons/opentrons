@@ -119,7 +119,7 @@ export function useCurrentTipStatus(
 
 export function getRecoveryOptions(errorKind: ErrorKind): RecoveryRoute[] {
   switch (errorKind) {
-    case ERROR_KINDS.OVERPERSSURE_WHILE_ASPIRATING:
+    case ERROR_KINDS.OVERPRESSURE_WHILE_ASPIRATING:
       return OVERPRESSURE_WHILE_ASPIRATING_OPTIONS
     case ERROR_KINDS.GENERAL_ERROR:
       return GENERAL_ERROR_OPTIONS

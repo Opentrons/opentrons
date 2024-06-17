@@ -6,7 +6,7 @@ import type { StepOrder } from './types'
 
 export const ERROR_KINDS = {
   GENERAL_ERROR: 'GENERAL_ERROR',
-  OVERPERSSURE_WHILE_ASPIRATING: 'OVERPRESSURE_WHILE_ASPIRATING',
+  OVERPRESSURE_WHILE_ASPIRATING: 'OVERPRESSURE_WHILE_ASPIRATING',
 } as const
 
 // TODO(jh, 05-09-24): Refactor to a directed graph. EXEC-430.
