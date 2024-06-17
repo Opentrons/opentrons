@@ -10,9 +10,9 @@ from opentrons.protocols.parameters import (
 )
 from opentrons.protocols.parameters.types import (
     ParameterChoice,
-    ParameterDefinitionError,
     UserFacingTypes,
 )
+from opentrons.protocols.parameters.exceptions import ParameterDefinitionError
 from opentrons.protocol_engine.types import (
     RunTimeParameter,
     RunTimeParamValuesType,

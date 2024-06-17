@@ -1,6 +1,7 @@
 from typing import Dict, Optional, Any
 
-from opentrons.protocols.parameters.types import UserFacingTypes, ParameterNameError
+from opentrons.protocols.parameters.types import UserFacingTypes
+from opentrons.protocols.parameters.exceptions import ParameterNameError
 
 
 class Parameters:

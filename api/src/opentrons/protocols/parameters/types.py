@@ -1,21 +1,7 @@
 import csv
-from typing import TypeVar, Union, TypedDict, TextIO, Optional, List, Sequence, Dict
+from typing import TypeVar, Union, TypedDict, TextIO, Optional, List
 
-from opentrons_shared_data.errors.codes import ErrorCodes
-from opentrons_shared_data.errors.exceptions import GeneralError, EnumeratedError
-
-
-class FileParameterRequired(GeneralError):
-    """Insert real error text here"""
-
-    def __init__(
-        self,
-        message: Optional[str] = None,
-        detail: Optional[Dict[str, str]] = None,
-        wrapping: Optional[Sequence[EnumeratedError]] = None,
-    ) -> None:
-        """Build an InvalidStoredData."""
-        super().__init__(ErrorCodes.FILE_PARAMETER_REQUIRED, message, detail, wrapping)
+from .exceptions import FileParameterRequired
 
 
 class CSVParameter:
@@ -30,12 +16,16 @@ class CSVParameter:
     @property
     def file(self) -> TextIO:
         if self._file is None:
-            raise FileParameterRequired("CSV Parameter needs to be set to a file for full analysis.")
+            raise FileParameterRequired(
+                "CSV Parameter needs to be set to a file for full analysis."
+            )
         return self._file
 
     def rows(self) -> List[List[str]]:
         if self._file is None:
-            raise FileParameterRequired("CSV Parameter needs to be set to a file for full analysis.")
+            raise FileParameterRequired(
+                "CSV Parameter needs to be set to a file for full analysis."
+            )
         return self._rows
 
 
@@ -51,15 +41,3 @@ class ParameterChoice(TypedDict):
 
     display_name: str
     value: PrimitiveAllowedTypes
-
-
-class ParameterValueError(ValueError):
-    """An error raised when a parameter value is not valid."""
-
-
-class ParameterDefinitionError(ValueError):
-    """An error raised when a parameter definition value is not valid."""
-
-
-class ParameterNameError(ValueError):
-    """An error raised when a parameter name or description is not valid."""

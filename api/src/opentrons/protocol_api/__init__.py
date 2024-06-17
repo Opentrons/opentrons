@@ -9,7 +9,7 @@ from opentrons.protocols.api_support.definitions import (
     MIN_SUPPORTED_VERSION,
     MIN_SUPPORTED_VERSION_FOR_FLEX,
 )
-from opentrons.protocols.parameters.types import (
+from opentrons.protocols.parameters.exceptions import (
     FileParameterRequired as FileParameterRequiredError,
 )
 

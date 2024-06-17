@@ -8,8 +8,9 @@ from opentrons.protocol_engine.types import (
 )
 
 from . import validation
+from .exceptions import ParameterDefinitionError
 from .parameter_definition import AbstractParameterDefinition
-from .types import ParameterDefinitionError, CSVParameter
+from .types import CSVParameter
 
 
 class CSVParameterDefinition(AbstractParameterDefinition[Optional[TextIO]]):

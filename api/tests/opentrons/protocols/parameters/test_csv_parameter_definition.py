@@ -11,7 +11,7 @@ from opentrons.protocols.parameters.csv_parameter_definition import (
     create_csv_parameter,
     CSVParameterDefinition,
 )
-from opentrons.protocols.parameters.types import ParameterDefinitionError
+from opentrons.protocols.parameters.exceptions import ParameterDefinitionError
 
 
 @pytest.fixture(autouse=True)
