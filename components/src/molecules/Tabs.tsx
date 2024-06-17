@@ -53,7 +53,7 @@ export function Tabs(props: TabsProps): JSX.Element {
 
     const [activeTab, setActiveTab] = React.useState<number | null>(null);
 
-    const handleClick = (index: number) => {
+    const handleClick = (index: number) : void => {
         setActiveTab(index)
     }
 
