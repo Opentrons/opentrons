@@ -26,11 +26,15 @@ def command_executor(decoy: Decoy) -> CommandExecutor:
 
 
 @pytest.fixture
-async def command_generator(decoy: Decoy) -> AsyncGenerator[str, None]:
+def command_generator(decoy: Decoy) -> Callable[[], AsyncGenerator[str, None]]:
     """Get a mocked out CommandExecutor."""
-    yield "command-id-1"
-    yield "command-id-2"
-    yield "command-id-3"
+
+    async def generator() -> AsyncGenerator[str, None]:
+        yield "command-id-1"
+        yield "command-id-2"
+        yield "command-id-3"
+
+    return generator
 
 
 @pytest.fixture
