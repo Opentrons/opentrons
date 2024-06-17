@@ -207,7 +207,6 @@ async def test_liquid_probe(
             ),
         ]
 
-    # def get_responder()->Iterator[Type[check_first_move]]:
     def get_responder() -> Iterator[
         Callable[
             [NodeId, MessageDefinition], List[Tuple[NodeId, MessageDefinition, NodeId]]
