@@ -229,8 +229,8 @@ if __name__ == "__main__":
     except requests.exceptions.InvalidURL:
         print("Invalid IP address.")
         sys.exit()
-    one_run = error_runs[-1]  # Most recent run with error.
     if len(run_or_other) < 1:
+        one_run = error_runs[-1]  # Most recent run with error.
         (
             summary,
             robot,
@@ -252,7 +252,7 @@ if __name__ == "__main__":
         ip, storage_directory
     )
     file_paths = read_robot_logs.get_logs(storage_directory, ip)
-    print(f"Making ticket for run: {one_run} on robot {robot}.")
+    print(f"Making ticket for {summary}.")
     # TODO: make argument or see if I can get rid of with using board_id.
     project_key = "RABR"
     parent_key = project_key + "-" + robot[-1]
