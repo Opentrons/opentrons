@@ -15,7 +15,7 @@ export function RetryNewTips(props: RecoveryContentProps): JSX.Element | null {
   if (step === RETRY_NEW_TIPS.STEPS.DROP_TIPS) {
     void routeUpdateActions.proceedToRouteAndStep(
       DROP_TIP_FLOWS.ROUTE,
-      DROP_TIP_FLOWS.STEPS.WIZARD
+      DROP_TIP_FLOWS.STEPS.BEFORE_BEGINNING
     )
   }
 

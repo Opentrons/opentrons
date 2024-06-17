@@ -2,7 +2,7 @@ import { describe, it, expect, vi } from 'vitest'
 import { renderHook, act } from '@testing-library/react'
 import head from 'lodash/head'
 
-import { useDropTipRouting } from '../useDropTipRouting'
+import { getInitialRouteAndStep, useDropTipRouting } from '../useDropTipRouting'
 import { DT_ROUTES } from '../../constants'
 
 describe('useDropTipRouting', () => {
@@ -114,5 +114,36 @@ describe('useExternalMapUpdates', () => {
       currentRoute: DT_ROUTES.BLOWOUT,
       currentStep: expect.any(String),
     })
+  })
+})
+
+describe('getInitialRouteAndStep', () => {
+  it('should return the default initial route and step when fixitUtils is not provided', () => {
+    const [initialRoute, initialStep] = getInitialRouteAndStep()
+
+    expect(initialRoute).toBe(DT_ROUTES.BEFORE_BEGINNING)
+    expect(initialStep).toBe(DT_ROUTES.BEFORE_BEGINNING[0])
+  })
+
+  it('should return the default initial route and step when fixitUtils.routeOverride is not provided', () => {
+    const fixitUtils = {
+      routeOverride: undefined,
+    } as any
+
+    const [initialRoute, initialStep] = getInitialRouteAndStep(fixitUtils)
+
+    expect(initialRoute).toBe(DT_ROUTES.BEFORE_BEGINNING)
+    expect(initialStep).toBe(DT_ROUTES.BEFORE_BEGINNING[0])
+  })
+
+  it('should return the overridden route and step when fixitUtils.routeOverride is provided', () => {
+    const fixitUtils = {
+      routeOverride: DT_ROUTES.DROP_TIP,
+    } as any
+
+    const [initialRoute, initialStep] = getInitialRouteAndStep(fixitUtils)
+
+    expect(initialRoute).toBe(DT_ROUTES.DROP_TIP)
+    expect(initialStep).toBe(DT_ROUTES.DROP_TIP[0])
   })
 })

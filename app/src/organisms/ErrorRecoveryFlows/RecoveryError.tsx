@@ -73,6 +73,7 @@ export function RecoveryDropTipFlowErrors({
   isOnDevice,
   currentRecoveryOptionUtils,
   routeUpdateActions,
+  getRecoveryOptionCopy,
 }: RecoveryContentProps): JSX.Element | null {
   const { t } = useTranslation('error_recovery')
   const { step } = recoveryMap
@@ -84,10 +85,12 @@ export function RecoveryDropTipFlowErrors({
   const { selectedRecoveryOption } = currentRecoveryOptionUtils
   const { proceedToRouteAndStep } = routeUpdateActions
 
+  const userRecoveryOptionCopy = getRecoveryOptionCopy(selectedRecoveryOption)
+
   const buildTitle = (): string => {
     switch (step) {
       case ERROR_WHILE_RECOVERING.STEPS.DROP_TIP_GENERAL_ERROR:
-        return t('recovery_action_failed', { action: selectedRecoveryOption })
+        return t('recovery_action_failed', { action: userRecoveryOptionCopy })
       case ERROR_WHILE_RECOVERING.STEPS.DROP_TIP_TIP_DROP_FAILED:
         return t('tip_drop_failed')
       case ERROR_WHILE_RECOVERING.STEPS.DROP_TIP_BLOWOUT_FAILED:
