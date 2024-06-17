@@ -21,7 +21,7 @@ const meta: Meta<typeof TagComponent> = {
       },
     },
     iconPosition: {
-      options: ['left', 'right'],
+      options: ['left', 'right', undefined],
       control: {
         type: 'select',
       },
@@ -45,6 +45,6 @@ export const Tag: Story = {
   args: {
     type: 'default',
     text: 'Text',
-    iconPosition: 'left',
+    iconPosition: undefined,
   },
 }
