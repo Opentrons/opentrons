@@ -45,7 +45,7 @@ import {
   useNotifyAllCommandsQuery,
 } from '../../resources/runs'
 import { getCommandTextData } from '../../molecules/Command/utils/getCommandTextData'
-import { useRunningStepCounts } from '../../resources/protocols/hooks/useRunningStepCounts'
+import { useRunningStepCounts } from '../../resources/protocols/hooks'
 
 import type { RunStatus } from '@opentrons/api-client'
 
