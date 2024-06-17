@@ -2,10 +2,10 @@ import * as React from 'react'
 import { css } from 'styled-components'
 import { BORDERS, COLORS } from '../../helix-design-system'
 import { Flex } from '../../primitives'
-import { StyledText } from '../StyledText'
 import { ALIGN_CENTER, DIRECTION_ROW } from '../../styles'
 import { RESPONSIVENESS, SPACING, TYPOGRAPHY } from '../../ui-style-constants'
 import { Icon } from '../../icons'
+import { StyledText } from '../StyledText'
 
 import type { IconName } from '../../icons'
 import type { StyleProps } from '../../primitives'
@@ -47,11 +47,11 @@ export function Tag(props: TagProps): JSX.Element {
   const { iconName, type, text, iconPosition, ...styleProps } = props
 
   const DEFAULT_CONTAINER_STYLE = css`
-    padding: 2px 8px;
+    padding: ${SPACING.spacing2} ${SPACING.spacing8};
     border-radius: ${BORDERS.borderRadius4};
     @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
       border-radius: ${BORDERS.borderRadius8};
-      padding: 8px 12px;
+      padding: ${SPACING.spacing8} ${SPACING.spacing12};
     }
   `
 
@@ -98,11 +98,19 @@ export function Tag(props: TagProps): JSX.Element {
       {...styleProps}
     >
       {iconName != null && iconPosition === 'left' ? (
-        <Icon name={iconName} aria-label={`icon_${text}`} css={ICON_STYLE} />
+        <Icon
+          name={iconName}
+          aria-label={`icon_left_${text}`}
+          css={ICON_STYLE}
+        />
       ) : null}
       <StyledText css={TEXT_STYLE}>{text}</StyledText>
       {iconName != null && iconPosition === 'right' ? (
-        <Icon name={iconName} aria-label={`icon_${text}`} css={ICON_STYLE} />
+        <Icon
+          name={iconName}
+          aria-label={`icon_right_${text}`}
+          css={ICON_STYLE}
+        />
       ) : null}
     </Flex>
   )
