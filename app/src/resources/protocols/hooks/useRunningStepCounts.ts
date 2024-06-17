@@ -1,12 +1,8 @@
-import last from 'lodash/last'
-
-import { useCommandQuery } from '@opentrons/react-api-client'
-
 import { useMostRecentCompletedAnalysis } from '../../../organisms/LabwarePositionCheck/useMostRecentCompletedAnalysis'
 
-import type { CommandsData, RunCommandSummary } from '@opentrons/api-client'
+import { useLastRunCommandNoFixit } from './useLastRunCommandNoFixit'
 
-// TOME: Handle fixit commands.
+import type { CommandsData } from '@opentrons/api-client'
 
 export interface StepCounts {
   /* Excludes "fixit" commands. Returns -1 if the step is not found. */
@@ -15,8 +11,6 @@ export interface StepCounts {
   totalStepCount: number | null
   /* Returns whether the run is deterministic. */
   isDeterministicRun: boolean
-  /* The last run command, excluding "fixit" commands. */
-  lastRunCommandNoFixit: RunCommandSummary | null
 }
 
 /**
@@ -62,31 +56,5 @@ export function useRunningStepCounts(
     currentStepNumber,
     totalStepCount,
     isDeterministicRun,
-    lastRunCommandNoFixit,
   }
-}
-
-// Return the last run command is not a "fixit" command. If it is a "fixit" command,
-// return the command that failed (ie, the last run command without a fixit intent).
-export function useLastRunCommandNoFixit(
-  runId: string,
-  commandsData: CommandsData | null
-): RunCommandSummary | null {
-  const lastRunCommand = last(commandsData?.data) ?? null
-
-  const isFixitIntent =
-    lastRunCommand != null && lastRunCommand.intent === 'fixit'
-
-  // Get the failed command from the fixit command.
-  const lastRunCommandActual = useCommandQuery(
-    runId,
-    lastRunCommand?.failedCommandId ?? null,
-    {
-      enabled: isFixitIntent,
-    }
-  )
-
-  return isFixitIntent
-    ? lastRunCommandActual.data?.data ?? null
-    : lastRunCommand ?? null
 }
