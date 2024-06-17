@@ -11,7 +11,8 @@ import {
   RESPONSIVENESS,
 } from '@opentrons/components'
 import type { RobotType, RunTimeCommand } from '@opentrons/shared-data'
-import { CommandText, CommandIcon } from '.'
+import { CommandText } from './CommandText'
+import { CommandIcon } from './CommandIcon'
 import type { CommandTextData } from './types'
 import { Skeleton } from '../../atoms/Skeleton'
 import type { StyleProps } from '@opentrons/components'
@@ -151,18 +152,19 @@ export function LeftAlignedCommand(
         <CommandText
           {...omit(props, ['isOnDevice'])}
           css={`
-  @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
-  display: -webkit-box;
-  -webkit-box-orient: vertical;
-  -webkit-line-clamp: 14;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  word-wrap: break-word;
-  };
-  @media not (${RESPONSIVENESS.touchscreenMediaQuerySpecs}) {
-  max-height: 240px;
-  overflow: auto;
-    `}
+            @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
+              display: -webkit-box;
+              -webkit-box-orient: vertical;
+              -webkit-line-clamp: 14;
+              overflow: hidden;
+              text-overflow: ellipsis;
+              word-wrap: break-word;
+            }
+            @media not (${RESPONSIVENESS.touchscreenMediaQuerySpecs}) {
+              max-height: 240px;
+              overflow: auto;
+            } ;
+          `}
         />
       </Box>
     </Flex>

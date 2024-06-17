@@ -15,6 +15,7 @@ import type { OffsetCandidate } from '../hooks/useOffsetCandidatesForAnalysis'
 
 vi.mock('../../../redux/config')
 vi.mock('../../LabwarePositionCheck/utils/labware')
+vi.mock('../../../molecules/Command/utils/getLabwareDefinitionsFromCommands')
 
 const mockLabwareDef = fixture96Plate as LabwareDefinition2
 const mockAdapterDef = opentrons96PcrAdapterV1 as LabwareDefinition2

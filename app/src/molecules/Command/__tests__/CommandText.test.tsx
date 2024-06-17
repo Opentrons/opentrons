@@ -9,7 +9,7 @@ import {
 } from '@opentrons/shared-data'
 import { renderWithProviders } from '../../../__testing-utils__'
 import { i18n } from '../../../i18n'
-import { CommandText } from '../'
+import { CommandText } from '../CommandText'
 import { mockCommandTextData } from '../__fixtures__'
 import { getCommandTextData } from '../utils/getCommandTextData'
 
