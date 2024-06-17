@@ -1124,7 +1124,41 @@
         "cutoutA3": ["absorbanceReaderV1A3", "absorbanceReaderV1LidDockA4"]
       },
       "fixtureGroup": {},
-      "height": 10.65
+      "height": 10.65,
+      "peripherals": {
+        "cutoutD3": [
+          {
+            "id": "absorbanceReaderV1LidD",
+            "displayName": "Absorbance Reader Lid",
+            "loadName": "opentrons_flex_lid_absorbance_plate_reader_module",
+            "location": "absorbanceReaderV1LidDockD4"
+          }
+        ],
+        "cutoutC3": [
+          {
+            "id": "absorbanceReaderV1LidC",
+            "displayName": "Absorbance Reader Lid",
+            "loadName": "opentrons_flex_lid_absorbance_plate_reader_module",
+            "location": "absorbanceReaderV1LidDockC4"
+          }
+        ],
+        "cutoutB3": [
+          {
+            "id": "absorbanceReaderV1LidB",
+            "displayName": "Absorbance Reader Lid",
+            "loadName": "opentrons_flex_lid_absorbance_plate_reader_module",
+            "location": "absorbanceReaderV1LidDockB4"
+          }
+        ],
+        "cutoutA3": [
+          {
+            "id": "absorbanceReaderV1LidA",
+            "displayName": "Absorbance Reader Lid",
+            "loadName": "opentrons_flex_lid_absorbance_plate_reader_module",
+            "location": "absorbanceReaderV1LidDockA4"
+          }
+        ]
+      }
     }
   ],
   "gripperOffsets": {

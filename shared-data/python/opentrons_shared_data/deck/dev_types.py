@@ -89,6 +89,13 @@ class FixedVolumeByPosition(TypedDict):
     position: List[float]
 
 
+class CutoutFixturePeripheral(TypedDict):
+    id: str
+    displayName: str
+    loadName: str
+    location: str
+
+
 class _RequiredAddressableArea(TypedDict):
     id: str
     areaType: str
@@ -110,7 +117,7 @@ class Cutout(TypedDict):
     displayName: str
 
 
-class CutoutFixture(TypedDict):
+class _RequiredCutoutFixture(TypedDict):
     id: str
     expectOpentronsModuleSerialNumber: bool
     mayMountTo: List[str]
@@ -118,6 +125,9 @@ class CutoutFixture(TypedDict):
     providesAddressableAreas: Dict[str, List[str]]
     fixtureGroup: Dict[str, List[Dict[str, str]]]
     height: float
+
+class CutoutFixture(_RequiredCutoutFixture, total=False):
+    peripherals: Dict[str, List[CutoutFixturePeripheral]]
 
 
 Fixture = Union[

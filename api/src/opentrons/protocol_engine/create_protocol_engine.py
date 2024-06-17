@@ -33,10 +33,8 @@ async def create_protocol_engine(
     """
     deck_data = DeckDataProvider(config.deck_type)
     deck_definition = await deck_data.get_deck_definition()
-    deck_fixed_labware = (
-        await deck_data.get_deck_fixed_labware(deck_definition)
-        if load_fixed_trash
-        else []
+    deck_fixed_labware = await deck_data.get_all_deck_labware(
+        deck_definition, deck_configuration, load_fixed_trash
     )
     module_calibration_offsets = ModuleDataProvider.load_module_calibrations()
 
