@@ -7,7 +7,7 @@ import {
 } from '@opentrons/shared-data'
 import { getModuleDisplayLocation } from './getModuleDisplayLocation'
 import { getModuleModel } from './getModuleModel'
-import { getLabwareDefinitionsFromCommands } from '../../LabwarePositionCheck/utils/labware'
+import { getLabwareDefinitionsFromCommands } from './getLabwareDefinitionsFromCommands'
 import type { RobotType, LabwareLocation } from '@opentrons/shared-data'
 import type { TFunction } from 'i18next'
 import type { CommandTextData } from '../types'

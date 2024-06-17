@@ -1,7 +1,7 @@
 import { getLoadedLabware } from './accessors'
 
 import { getLabwareDefURI, getLabwareDisplayName } from '@opentrons/shared-data'
-import { getLabwareDefinitionsFromCommands } from '../../LabwarePositionCheck/utils/labware'
+import { getLabwareDefinitionsFromCommands } from './getLabwareDefinitionsFromCommands'
 import type { CommandTextData } from '../types'
 
 const FIXED_TRASH_DEF_URIS = [
