@@ -1,6 +1,15 @@
 import * as React from 'react'
 
-import { StyledText, Box, BORDERS } from '@opentrons/components'
+import {
+  StyledText,
+  Box,
+  Flex,
+  BORDERS,
+  RESPONSIVENESS,
+  SPACING,
+  ALIGN_CENTER,
+  JUSTIFY_CENTER,
+} from '@opentrons/components'
 
 import { OneColumn as OneColumnComponent } from './'
 
@@ -8,15 +17,19 @@ import type { Meta, StoryObj } from '@storybook/react'
 
 function StandInContent(): JSX.Element {
   return (
-    <Box
+    <Flex
       border={'4px dashed #A864FFFF'}
       borderRadius={BORDERS.borderRadius8}
       margin={SPACING.spacing16}
       height="104px"
       backgroundColor="#A864FF19"
+      alignItems={ALIGN_CENTER}
+      justifyContent={JUSTIFY_CENTER}
     >
-      <StyledText as="p">This is a standin for some other component</StyledText>
-    </Box>
+      <StyledText as="h1">
+        This is a standin for some other component
+      </StyledText>
+    </Flex>
   )
 }
 
