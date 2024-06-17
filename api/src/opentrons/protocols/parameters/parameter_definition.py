@@ -115,7 +115,7 @@ class ParameterDefinition(AbstractParameterDefinition[PrimitiveAllowedTypes]):
         validation.validate_type(new_value, self._type)
         if self._allowed_values is not None and new_value not in self._allowed_values:
             raise ParameterValueError(
-                f"Parameter must be set to one of the allowed values of {self._allowed_values}."
+                f"Parameter must be set to one of the allowed values of {sorted(self._allowed_values)}."
             )
         elif (
             isinstance(self._minimum, (int, float))
