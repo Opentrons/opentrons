@@ -35,6 +35,7 @@ export function StepInfo({
   const currentCopy = currentStepNumber ?? '?'
   const totalCopy = totalStepCount ?? '?'
 
+  // TODO(jh 06-17-24): Once design decides what to do with CommandText, update it here.
   return (
     <Flex display={DISPLAY_INLINE} {...styleProps}>
       <StyledText as={as} display={DISPLAY_INLINE}>
