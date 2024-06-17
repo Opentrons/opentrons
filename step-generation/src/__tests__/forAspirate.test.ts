@@ -399,6 +399,43 @@ describe('8-channel trough', () => {
   )
 
   it.todo('aspirate from 384 plate starting from B row') // TODO
+})
+describe('96-channel pipetting', () => {
+  let aspirate96ChFromA1Args: AspDispAirgapParams
+  const labwareId = SOURCE_LABWARE
+  const pipId = 'p100096Id'
 
-  it.todo('aspirating from a full 96-channel and a reservoir labware')
+  it.only('shows correct liquid state when aspirating from a 96-channel full channel and 96 well plate', () => {
+    robotState = {
+      ...robotState,
+      pipettes: {
+        [pipId]: {
+          mount: 'left',
+          nozzles: 'ALL',
+        },
+      },
+    }
+
+    aspirate96ChFromA1Args = {
+      ...flowRatesAndOffsets,
+      labwareId,
+      pipetteId: pipId,
+      volume: 50,
+      wellName: 'A1',
+    }
+    const result = forAspirate(
+      aspirate96ChFromA1Args,
+      invariantContext,
+      robotState
+    )
+
+    const pipetteResult: Record<string, { __air__: { volume: number } }> = {}
+    for (let i = 0; i <= 95; i++) {
+      pipetteResult[i] = { [AIR]: { volume: 50 } }
+    }
+
+    expect(result.robotState.liquidState.pipettes).toMatchObject({
+      [pipId]: pipetteResult,
+    })
+  })
 })

@@ -20,6 +20,7 @@ export function forAspirate(
   const { pipetteId, volume, labwareId } = params
   const { robotState, warnings } = robotStateAndWarnings
   const { liquidState } = robotState
+  console.log(robotState.liquidState.labware[labwareId])
   const nozzles = robotState.pipettes[pipetteId].nozzles
   const pipetteSpec = invariantContext.pipetteEntities[pipetteId].spec
   const labwareDef = invariantContext.labwareEntities[labwareId].def
