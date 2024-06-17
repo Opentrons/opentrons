@@ -7,7 +7,12 @@ from opentrons_shared_data.deck.dev_types import DeckDefinitionV5
 from opentrons.protocols.models import LabwareDefinition
 from opentrons.types import DeckSlotName
 
-from opentrons.protocol_engine.types import DeckSlotLocation, DeckType
+from opentrons.protocol_engine.types import (
+    DeckSlotLocation,
+    DeckType,
+    DeckConfigurationType,
+    AddressableAreaLocation,
+)
 from opentrons.protocol_engine.resources import (
     LabwareDataProvider,
     DeckDataProvider,
@@ -129,4 +134,67 @@ async def test_get_deck_labware_fixtures_ot3_standard(
             location=DeckSlotLocation(slotName=DeckSlotName.SLOT_A3),
             definition=ot3_fixed_trash_def,
         )
+    ]
+
+
+async def test_get_fixture_peripheral_labware_ot3_standard(
+    decoy: Decoy,
+    ot3_standard_deck_def: DeckDefinitionV5,
+    mock_labware_data_provider: LabwareDataProvider,
+    ot3_absorbance_reader_lid: LabwareDefinition,
+):
+    """It should be able to get a list of prepopulated labware on the deck."""
+    subject = DeckDataProvider(
+        deck_type=DeckType.OT3_STANDARD, labware_data=mock_labware_data_provider
+    )
+
+    deck_configuration: DeckConfigurationType = [
+        ("cutoutD3", "absorbanceReaderV1", None),
+        ("cutoutC3", "absorbanceReaderV1", None),
+        ("cutoutB3", "absorbanceReaderV1", None),
+        ("cutoutA3", "absorbanceReaderV1", None),
+    ]
+
+    decoy.when(
+        await mock_labware_data_provider.get_labware_definition(
+            load_name="opentrons_flex_lid_absorbance_plate_reader_module",
+            namespace="opentrons",
+            version=1,
+        )
+    ).then_return(ot3_absorbance_reader_lid)
+
+    result = await subject.get_fixture_peripherals(
+        ot3_standard_deck_def, deck_configuration
+    )
+
+    assert len(result) == 4
+    assert result == [
+        DeckFixedLabware(
+            labware_id="absorbanceReaderV1LidD",
+            location=AddressableAreaLocation(
+                addressableAreaName="absorbanceReaderV1LidDockD4"
+            ),
+            definition=ot3_absorbance_reader_lid,
+        ),
+        DeckFixedLabware(
+            labware_id="absorbanceReaderV1LidC",
+            location=AddressableAreaLocation(
+                addressableAreaName="absorbanceReaderV1LidDockC4"
+            ),
+            definition=ot3_absorbance_reader_lid,
+        ),
+        DeckFixedLabware(
+            labware_id="absorbanceReaderV1LidB",
+            location=AddressableAreaLocation(
+                addressableAreaName="absorbanceReaderV1LidDockB4"
+            ),
+            definition=ot3_absorbance_reader_lid,
+        ),
+        DeckFixedLabware(
+            labware_id="absorbanceReaderV1LidA",
+            location=AddressableAreaLocation(
+                addressableAreaName="absorbanceReaderV1LidDockA4"
+            ),
+            definition=ot3_absorbance_reader_lid,
+        ),
     ]

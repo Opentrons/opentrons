@@ -5,7 +5,10 @@ import pytest
 from pytest_lazyfixture import lazy_fixture  # type: ignore[import-untyped]
 
 from opentrons_shared_data.deck import load as load_deck
-from opentrons_shared_data.deck.dev_types import DeckDefinitionV5
+from opentrons_shared_data.deck.dev_types import (
+    DeckDefinitionV5,
+    CutoutFixturePeripheral,
+)
 
 from opentrons.types import DeckSlotName
 
@@ -332,3 +335,86 @@ def test_get_addressable_area_from_name_raises(
             DeckSlotName.SLOT_A1,
             ot3_standard_deck_def,
         )
+
+
+@pytest.mark.parametrize(
+    ("cutout_id", "expected_peripherals"),
+    [
+        (
+            "cutoutD3",
+            [
+                CutoutFixturePeripheral(
+                    id="absorbanceReaderV1LidD",
+                    displayName="Absorbance Reader Lid",
+                    loadName="opentrons_flex_lid_absorbance_plate_reader_module",
+                    location="absorbanceReaderV1LidDockD4",
+                )
+            ],
+        ),
+        (
+            "cutoutC3",
+            [
+                CutoutFixturePeripheral(
+                    id="absorbanceReaderV1LidC",
+                    displayName="Absorbance Reader Lid",
+                    loadName="opentrons_flex_lid_absorbance_plate_reader_module",
+                    location="absorbanceReaderV1LidDockC4",
+                )
+            ],
+        ),
+        (
+            "cutoutB3",
+            [
+                CutoutFixturePeripheral(
+                    id="absorbanceReaderV1LidB",
+                    displayName="Absorbance Reader Lid",
+                    loadName="opentrons_flex_lid_absorbance_plate_reader_module",
+                    location="absorbanceReaderV1LidDockB4",
+                )
+            ],
+        ),
+        (
+            "cutoutA3",
+            [
+                CutoutFixturePeripheral(
+                    id="absorbanceReaderV1LidA",
+                    displayName="Absorbance Reader Lid",
+                    loadName="opentrons_flex_lid_absorbance_plate_reader_module",
+                    location="absorbanceReaderV1LidDockA4",
+                )
+            ],
+        ),
+    ],
+)
+@pytest.mark.parametrize("deck_def", [lazy_fixture("ot3_standard_deck_def")])
+def test_get_absorbance_reader_fixture_peripherals(
+    cutout_id: str,
+    expected_peripherals: List[CutoutFixturePeripheral],
+    deck_def: DeckDefinitionV5,
+) -> None:
+    peripherals = subject.get_peripherals_from_fixture(
+        cutout_id, "absorbanceReaderV1", deck_def
+    )
+
+    assert peripherals == expected_peripherals
+
+
+@pytest.mark.parametrize(
+    ("cutout_id", "cutout_fixture_id"),
+    [
+        ("cutoutD3", "stagingAreaSlotWithMagneticBlockV1"),
+        ("cutoutC3", "magneticBlockV1"),
+        ("cutoutB3", "temperatureModuleV2"),
+        ("cutoutA3", "heaterShakerModuleV1"),
+    ],
+)
+@pytest.mark.parametrize("deck_def", [lazy_fixture("ot3_standard_deck_def")])
+def test_get_nonexistent_fixture_peripherals(
+    cutout_id: str,
+    cutout_fixture_id: str,
+    deck_def: DeckDefinitionV5,
+) -> None:
+    peripherals = subject.get_peripherals_from_fixture(
+        cutout_id, cutout_fixture_id, deck_def
+    )
+    assert peripherals == []

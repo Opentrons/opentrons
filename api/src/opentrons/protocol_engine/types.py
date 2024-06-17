@@ -790,6 +790,17 @@ class AreaType(Enum):
 
 
 @dataclass(frozen=True)
+class FixturePeripheral:
+    """Peripherals associated with a given cutout Fixture."""
+
+    id: str
+    loadName: str
+    namespace: str
+    version: int
+    locations: Dict[str, str]
+
+
+@dataclass(frozen=True)
 class AddressableArea:
     """Addressable area that has been loaded."""
 

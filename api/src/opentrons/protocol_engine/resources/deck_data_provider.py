@@ -1,6 +1,6 @@
 """Deck data resource provider."""
 from dataclasses import dataclass
-from typing import List, Optional, cast
+from typing import List, Optional, cast, Union
 from typing_extensions import final
 
 import anyio
@@ -13,8 +13,14 @@ from opentrons_shared_data.deck.dev_types import DeckDefinitionV5
 from opentrons.protocols.models import LabwareDefinition
 from opentrons.types import DeckSlotName
 
-from ..types import DeckSlotLocation, DeckType
+from ..types import (
+    DeckSlotLocation,
+    DeckType,
+    DeckConfigurationType,
+    AddressableAreaLocation,
+)
 from .labware_data_provider import LabwareDataProvider
+from . import deck_configuration_provider
 
 
 @final
@@ -23,7 +29,7 @@ class DeckFixedLabware:
     """A labware fixture that is always present on a deck."""
 
     labware_id: str
-    location: DeckSlotLocation
+    location: Union[DeckSlotLocation, AddressableAreaLocation]
     definition: LabwareDefinition
 
 
@@ -78,3 +84,47 @@ class DeckDataProvider:
                 )
 
         return labware
+
+    async def get_fixture_peripherals(
+        self, deck_definition: DeckDefinitionV5, deck_config: DeckConfigurationType
+    ) -> List[DeckFixedLabware]:
+        """Get a list of all peripheral labware from a given deck configuration."""
+        labware: List[DeckFixedLabware] = []
+        for cutout_id, cutout_fixture_id, _ in deck_config:
+            peripherals = deck_configuration_provider.get_peripherals_from_fixture(
+                cutout_id, cutout_fixture_id, deck_definition
+            )
+            for p in peripherals:
+                location = AddressableAreaLocation(addressableAreaName=p["location"])
+                definition = await self._labware_data.get_labware_definition(
+                    load_name=p["loadName"],
+                    namespace="opentrons",
+                    version=1,
+                )
+                labware.append(
+                    DeckFixedLabware(
+                        labware_id=p["id"],
+                        definition=definition,
+                        location=location,
+                    )
+                )
+        return labware
+
+    async def get_all_deck_labware(
+        self,
+        deck_definition: DeckDefinitionV5,
+        deck_config: Optional[DeckConfigurationType],
+        load_fixed_trash: bool,
+    ) -> List[DeckFixedLabware]:
+        """Get a list of all fixed and peripheral labware."""
+        fixed_labware = (
+            await self.get_deck_fixed_labware(deck_definition)
+            if load_fixed_trash
+            else []
+        )
+        peripheral_labware = (
+            await self.get_fixture_peripherals(deck_definition, deck_config)
+            if deck_config
+            else []
+        )
+        return fixed_labware + peripheral_labware

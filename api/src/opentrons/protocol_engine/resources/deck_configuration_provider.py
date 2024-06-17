@@ -1,7 +1,11 @@
 """Deck configuration resource provider."""
 from typing import List, Set, Tuple
 
-from opentrons_shared_data.deck.dev_types import DeckDefinitionV5, CutoutFixture
+from opentrons_shared_data.deck.dev_types import (
+    DeckDefinitionV5,
+    CutoutFixture,
+    CutoutFixturePeripheral,
+)
 
 from opentrons.types import DeckSlotName
 
@@ -130,3 +134,17 @@ def get_addressable_area_from_name(
     raise AddressableAreaDoesNotExistError(
         f"Could not find addressable area with name {addressable_area_name}"
     )
+
+
+def get_peripherals_from_fixture(
+    cutout_id: str,
+    cutout_fixture_id: str,
+    deck_definition: DeckDefinitionV5,
+) -> List[CutoutFixturePeripheral]:
+    """Get the peripherals provided by a cutout fixture on a cutout."""
+    cutout_fixture = get_cutout_fixture(cutout_fixture_id, deck_definition)
+    try:
+        peripherals = cutout_fixture.get("peripherals", {})
+        return peripherals.get(cutout_id, [])
+    except KeyError:
+        return []
