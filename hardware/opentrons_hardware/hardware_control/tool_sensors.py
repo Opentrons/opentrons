@@ -83,7 +83,7 @@ capacitive_output_file_heading = [
 # FIXME we should restrict some of these functions by instrument type.
 
 Z_SOLO_MOVE_DISTANCE = 0.5
-PLUNGER_SOLO_MOVE_TIME = 0.15
+PLUNGER_SOLO_MOVE_TIME = 0.2
 
 
 def _fix_pass_step_for_buffer(
