@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { vi, it, describe, expect, beforeEach, afterEach } from 'vitest'
 import { StaticRouter } from 'react-router-dom'
-import { fireEvent, screen } from '@testing-library/react'
+import { fireEvent, screen, waitFor } from '@testing-library/react'
 import { when } from 'vitest-when'
 
 import { renderWithProviders } from '../../../__testing-utils__'
@@ -427,7 +427,7 @@ describe('ChooseRobotToRunProtocolSlideout', () => {
     )
   })
 
-  it('Disables confirm values button if file parameter missing', () => {
+  it('Disables confirm values button if file parameter missing', async () => {
     vi.mocked(useOffsetCandidatesForAnalysis).mockReturnValue([])
     render({
       storedProtocolData: storedProtocolDataWithCsvRunTimeParameter,
@@ -439,10 +439,9 @@ describe('ChooseRobotToRunProtocolSlideout', () => {
     })
     fireEvent.click(proceedButton)
     const confirm = screen.getByRole('button', { name: 'Confirm values' })
-    fireEvent.mouseOver(confirm)
-    setTimeout(
-      () => screen.getByText('Add the required CSV file to continue.'),
-      200 // for tooltip to show up
+    fireEvent.pointerEnter(confirm)
+    await waitFor(() =>
+      screen.getByText('Add the required CSV file to continue.')
     )
   })
 })
