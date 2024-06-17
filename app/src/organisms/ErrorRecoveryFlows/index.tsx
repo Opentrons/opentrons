@@ -106,7 +106,7 @@ export function ErrorRecoveryFlows(
     toggleERWizard,
   })
 
-  const { protocolAnalysis, ...restProps } = props
+  const { protocolAnalysis } = props
   const robotType = protocolAnalysis?.robotType ?? OT2_ROBOT_TYPE
 
   if (!enableRunNotes) {
@@ -117,16 +117,17 @@ export function ErrorRecoveryFlows(
     <>
       {showERWizard ? (
         <ErrorRecoveryWizard
-          {...restProps}
+          {...props}
           {...recoveryUtils}
           robotType={robotType}
         />
       ) : null}
       {showSplash ? (
         <RunPausedSplash
-          failedCommand={props.failedCommand}
+          {...props}
+          {...recoveryUtils}
+          robotType={robotType}
           toggleERWiz={toggleERWizard}
-          routeUpdateActions={recoveryUtils.routeUpdateActions}
         />
       ) : null}
     </>
