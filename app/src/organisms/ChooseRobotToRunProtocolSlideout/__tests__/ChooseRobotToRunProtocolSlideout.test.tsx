@@ -441,7 +441,7 @@ describe('ChooseRobotToRunProtocolSlideout', () => {
     const confirm = screen.getByRole('button', { name: 'Confirm values' })
     fireEvent.pointerEnter(confirm)
     await waitFor(() =>
-      screen.getByText('Add the required CSV file to continue.')
+      screen.findByText('Add the required CSV file to continue.')
     )
   })
 })
