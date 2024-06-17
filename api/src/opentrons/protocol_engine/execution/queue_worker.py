@@ -67,9 +67,6 @@ class QueueWorker:
                 raise e
 
     async def _run_commands(self) -> None:
-        gen = self._command_generator
-        async for command in gen:
+        for command in self._command_generator:
             await self._command_executor.execute(command_id=command)
-            # Yield to the event loop in case we're executing a long sequence of commands
-            # that never yields internally. For example, a long sequence of comment commands.
             await asyncio.sleep(0)

@@ -1,5 +1,5 @@
 """Tests for the command QueueWorker in opentrons.protocol_engine."""
-from typing import Generator
+from typing import Generator, AsyncGenerator, Callable
 
 import pytest
 from decoy import Decoy, matchers
@@ -26,12 +26,25 @@ def command_executor(decoy: Decoy) -> CommandExecutor:
 
 
 @pytest.fixture
+async def command_generator(decoy: Decoy) -> AsyncGenerator[str, None]:
+    """Get a mocked out CommandExecutor."""
+    yield "command-id-1"
+    yield "command-id-2"
+    yield "command-id-3"
+
+
+@pytest.fixture
 def subject(
     state_store: StateStore,
     command_executor: CommandExecutor,
+    command_generator: Callable[[], AsyncGenerator[str, None]],
 ) -> QueueWorker:
     """Get a QueueWorker instance."""
-    return QueueWorker(state_store=state_store, command_executor=command_executor)
+    return QueueWorker(
+        state_store=state_store,
+        command_executor=command_executor,
+        command_generator=command_generator,
+    )
 
 
 @pytest.fixture(autouse=True)

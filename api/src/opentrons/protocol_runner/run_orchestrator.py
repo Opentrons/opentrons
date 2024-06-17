@@ -92,7 +92,7 @@ class RunOrchestrator:
         self._protocol_live_runner = protocol_live_runner
         self._fixit_runner.prepare()
         self._setup_runner.prepare()
-        self._protocol_engine.set_command_generator(self.command_generator)
+        self._protocol_engine.set_queue_worker_command_generator(self.command_generator)
 
     @property
     def run_id(self) -> str:

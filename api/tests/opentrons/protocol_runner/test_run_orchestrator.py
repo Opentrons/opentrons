@@ -10,7 +10,7 @@ from typing import Union, Generator
 
 from opentrons.protocols.api_support.types import APIVersion
 from opentrons.protocol_engine import ProtocolEngine
-from opentrons.protocol_engine.types import PostRunHardwareState
+from opentrons.protocol_engine.types import PostRunHardwareState, DeckType
 from opentrons.protocol_engine import commands as pe_commands
 from opentrons.hardware_control import API as HardwareAPI
 from opentrons.protocol_reader import (
@@ -26,6 +26,7 @@ from opentrons.protocol_runner.protocol_runner import (
     LiveRunner,
 )
 from opentrons.protocols.parse import PythonParseMode
+from opentrons_shared_data.robot.dev_types import RobotType
 
 
 @pytest.fixture
@@ -171,9 +172,11 @@ def test_build_run_orchestrator_provider(
     ).then_return(mock_protocol_runner)
 
     result = subject.build_orchestrator(
-        protocol_engine=mock_protocol_engine,
         hardware_api=mock_hardware_api,
         protocol_config=input_protocol_config,
+        deck_type=DeckType.OT3_STANDARD,
+        robot_type="OT-3 Standard",
+        block_on_door_open=False,
     )
 
     assert isinstance(result, RunOrchestrator)
