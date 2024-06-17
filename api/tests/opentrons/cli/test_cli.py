@@ -11,7 +11,7 @@ from pathlib import Path
 
 import pytest
 from click.testing import CliRunner
-from opentrons.cli.analyze import analyze
+from opentrons.cli.analyze import analyze, AnalysisResult
 
 
 def _list_fixtures(version: int) -> Iterator[Path]:
@@ -79,6 +79,7 @@ def test_analyze(
     assert "labware" in result.json_output
     assert "liquids" in result.json_output
     assert "modules" in result.json_output
+    assert "result" in result.json_output
 
 
 _DECK_DEFINITION_TEST_SLOT = 2
@@ -258,6 +259,7 @@ def test_python_error_line_numbers(
     else:
         assert result.exit_code == 0
     assert result.json_output is not None
+    assert result.json_output["result"] == AnalysisResult.NOT_OK.value
     [error] = result.json_output["errors"]
     assert error["detail"] == expected_detail
 
@@ -294,6 +296,7 @@ def test_run_time_parameter_error(
 
     assert result.json_output is not None
     assert result.json_output["robotType"] == "OT-2 Standard"
+    assert result.json_output["result"] == AnalysisResult.NOT_OK.value
     assert result.json_output["pipettes"] == []
     assert result.json_output["commands"] == []
     assert result.json_output["labware"] == []
@@ -309,6 +312,51 @@ def test_run_time_parameter_error(
         "TypeError [line 5]: ParameterContext.add_bool() missing 1"
         " required positional argument: 'default'"
     )
+
+
+@pytest.mark.parametrize("output", ["--json-output", "--human-json-output"])
+def test_file_required_error(
+    tmp_path: Path,
+    output: str,
+) -> None:
+    """Test that a FileParameterRequired error gets caught and changes the result to FILE_REQUIRED.
+
+    Also verify that analysis result contains all static data about the protocol.
+    """
+    python_protocol_source = textwrap.dedent(
+        # Raises an exception during runner load.
+        """\
+            requirements = {"robotType": "OT-2", "apiLevel": "2.18"}
+
+            def add_parameters(parameters):
+                parameters.add_csv_file(
+                    display_name="CSV File",
+                    variable_name="csv_file",
+                )
+            def run(protocol):
+                protocol.params.csv_file.file
+        """
+    )
+    protocol_source_file = tmp_path / "protocol.py"
+    protocol_source_file.write_text(python_protocol_source, encoding="utf-8")
+    result = _get_analysis_result([protocol_source_file], output)
+
+    assert result.exit_code == 0
+
+    assert result.json_output is not None
+    assert result.json_output["robotType"] == "OT-2 Standard"
+    assert result.json_output["result"] == AnalysisResult.FILE_REQUIRED.value
+    assert result.json_output["pipettes"] == []
+    assert result.json_output["commands"]  # There should be a home command
+    assert result.json_output["labware"] == []
+    assert result.json_output["liquids"] == []
+    assert result.json_output["modules"] == []
+    assert result.json_output["config"] == {
+        "apiVersion": [2, 18],
+        "protocolType": "python",
+    }
+    assert result.json_output["files"] == [{"name": "protocol.py", "role": "main"}]
+    assert result.json_output["errors"]
 
 
 @pytest.mark.parametrize("output", ["--json-output", "--human-json-output"])
@@ -401,3 +449,4 @@ def test_analyze_json_protocol(
     op = result.json_output
     assert op is not None
     assert len(op["commands"]) == 27
+    assert op["result"] == AnalysisResult.OK.value

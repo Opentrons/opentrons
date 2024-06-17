@@ -1,5 +1,6 @@
 """Tests for the CSV Parameter Definitions."""
 import inspect
+import tempfile
 from io import TextIOWrapper
 
 import pytest
@@ -11,7 +12,10 @@ from opentrons.protocols.parameters.csv_parameter_definition import (
     create_csv_parameter,
     CSVParameterDefinition,
 )
-from opentrons.protocols.parameters.exceptions import ParameterDefinitionError
+from opentrons.protocols.parameters.exceptions import (
+    ParameterDefinitionError,
+    FileParameterRequired,
+)
 
 
 @pytest.fixture(autouse=True)
@@ -93,3 +97,17 @@ def test_csv_parameter_as_protocol_engine_type(
         description="Comma Separated Value",
         file=FileId(id="123abc"),
     )
+
+
+def test_csv_parameter_as_csv_parameter_interface(
+    csv_parameter_subject: CSVParameterDefinition,
+) -> None:
+    """It should return the CSV parameter interface for use in a protocol run context."""
+    result = csv_parameter_subject.as_csv_parameter_interface()
+    with pytest.raises(FileParameterRequired):
+        result.file
+
+    mock_file = tempfile.NamedTemporaryFile(mode="r", suffix=".csv")
+    csv_parameter_subject.value = mock_file  # type: ignore[assignment]
+    result = csv_parameter_subject.as_csv_parameter_interface()
+    assert result.file is mock_file  # type: ignore[comparison-overlap]
