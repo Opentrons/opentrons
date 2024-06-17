@@ -1,11 +1,10 @@
 """Test the tool-sensor coordination code."""
-import asyncio
 import logging
 from mock import patch, AsyncMock, call
 import os
 import pytest
 from contextlib import asynccontextmanager
-from typing import Iterator, List, Tuple, AsyncIterator, Any, Dict, Type, Callable
+from typing import Iterator, List, Tuple, AsyncIterator, Any, Dict, Callable
 from opentrons_hardware.firmware_bindings.messages.message_definitions import (
     AddLinearMoveRequest,
     ExecuteMoveGroupRequest,
@@ -35,7 +34,7 @@ from opentrons_hardware.firmware_bindings.messages.fields import (
 )
 
 
-from tests.conftest import CanLoopback, MockCanMessageNotifier
+from tests.conftest import CanLoopback
 
 from opentrons_hardware.hardware_control.tool_sensors import (
     capacitive_probe,
