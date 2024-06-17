@@ -1108,7 +1108,9 @@
     "quirks": ["gripperIncompatible"],
     "isTiprack": false,
     "isMagneticModuleCompatible": false,
-    "loadName": "opentrons_96_deep_well_adapter_nest_wellplate_2ml_deep"
+    "loadName": "opentrons_96_deep_well_adapter_nest_wellplate_2ml_deep",
+    "minimumHeight": 0.5,
+    "minimumWellVolume": 0
   },
   "namespace": "opentrons",
   "version": 1,

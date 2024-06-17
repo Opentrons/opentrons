@@ -43,7 +43,9 @@
     "isTiprack": false,
     "isMagneticModuleCompatible": false,
     "loadName": "axygen_1_reservoir_90ml",
-    "quirks": ["centerMultichannelOnWells", "touchTipDisabled"]
+    "quirks": ["centerMultichannelOnWells", "touchTipDisabled"],
+    "minimumHeight": 0.5,
+    "minimumWellVolume": 0
   },
   "namespace": "opentrons",
   "version": 1,

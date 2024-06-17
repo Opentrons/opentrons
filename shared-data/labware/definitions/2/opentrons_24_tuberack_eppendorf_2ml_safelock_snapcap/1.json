@@ -25,7 +25,9 @@
     "format": "irregular",
     "isTiprack": false,
     "loadName": "opentrons_24_tuberack_eppendorf_2ml_safelock_snapcap",
-    "isMagneticModuleCompatible": false
+    "isMagneticModuleCompatible": false,
+    "minimumHeight": 0.5,
+    "minimumWellVolume": 0
   },
   "wells": {
     "D1": {

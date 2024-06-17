@@ -32,7 +32,9 @@
     "quirks": ["gripperIncompatible"],
     "isTiprack": false,
     "isMagneticModuleCompatible": false,
-    "loadName": "opentrons_96_aluminumblock_biorad_wellplate_200ul"
+    "loadName": "opentrons_96_aluminumblock_biorad_wellplate_200ul",
+    "minimumHeight": 0.5,
+    "minimumWellVolume": 0
   },
   "wells": {
     "H1": {

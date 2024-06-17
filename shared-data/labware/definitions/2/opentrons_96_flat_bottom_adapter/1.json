@@ -27,7 +27,9 @@
     "quirks": [],
     "isTiprack": false,
     "isMagneticModuleCompatible": false,
-    "loadName": "opentrons_96_flat_bottom_adapter"
+    "loadName": "opentrons_96_flat_bottom_adapter",
+    "minimumHeight": 0.5,
+    "minimumWellVolume": 0
   },
   "namespace": "opentrons",
   "version": 1,

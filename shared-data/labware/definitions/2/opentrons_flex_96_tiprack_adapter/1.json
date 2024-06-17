@@ -27,7 +27,9 @@
     "quirks": ["tiprackAdapterFor96Channel"],
     "isTiprack": false,
     "isMagneticModuleCompatible": false,
-    "loadName": "opentrons_flex_96_tiprack_adapter"
+    "loadName": "opentrons_flex_96_tiprack_adapter",
+    "minimumHeight": 0.5,
+    "minimumWellVolume": 0
   },
   "namespace": "opentrons",
   "version": 1,

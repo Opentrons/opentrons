@@ -23,7 +23,9 @@
     "format": "irregular",
     "isTiprack": false,
     "isMagneticModuleCompatible": false,
-    "loadName": "opentrons_10_tuberack_falcon_4x50ml_6x15ml_conical"
+    "loadName": "opentrons_10_tuberack_falcon_4x50ml_6x15ml_conical",
+    "minimumHeight": 0.5,
+    "minimumWellVolume": 0
   },
   "wells": {
     "A1": {

@@ -97,7 +97,9 @@
     "format": "irregular",
     "isTiprack": false,
     "isMagneticModuleCompatible": false,
-    "loadName": "opentrons_6_tuberack_nest_50ml_conical"
+    "loadName": "opentrons_6_tuberack_nest_50ml_conical",
+    "minimumHeight": 0.5,
+    "minimumWellVolume": 0
   },
   "namespace": "opentrons",
   "version": 1,

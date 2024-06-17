@@ -4318,7 +4318,9 @@
     "quirks": [],
     "isTiprack": false,
     "isMagneticModuleCompatible": false,
-    "loadName": "biorad_384_wellplate_50ul"
+    "loadName": "biorad_384_wellplate_50ul",
+    "minimumHeight": 0.5,
+    "minimumWellVolume": 0
   },
   "namespace": "opentrons",
   "version": 2,

@@ -19,7 +19,9 @@
     "isTiprack": false,
     "loadName": "opentrons_1_trash_3200ml_fixed",
     "isMagneticModuleCompatible": false,
-    "quirks": ["fixedTrash", "centerMultichannelOnWells", "touchTipDisabled"]
+    "quirks": ["fixedTrash", "centerMultichannelOnWells", "touchTipDisabled"],
+    "minimumHeight": 0.5,
+    "minimumWellVolume": 0
   },
   "wells": {
     "A1": {

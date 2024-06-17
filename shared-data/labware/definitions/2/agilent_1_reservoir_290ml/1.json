@@ -41,7 +41,9 @@
     "isTiprack": false,
     "isMagneticModuleCompatible": false,
     "loadName": "agilent_1_reservoir_290ml",
-    "quirks": ["centerMultichannelOnWells", "touchTipDisabled"]
+    "quirks": ["centerMultichannelOnWells", "touchTipDisabled"],
+    "minimumHeight": 0.5,
+    "minimumWellVolume": 0
   },
   "namespace": "opentrons",
   "version": 1,

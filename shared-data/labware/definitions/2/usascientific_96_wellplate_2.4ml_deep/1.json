@@ -1103,7 +1103,9 @@
     "isTiprack": false,
     "isMagneticModuleCompatible": true,
     "magneticModuleEngageHeight": 14.94,
-    "loadName": "usascientific_96_wellplate_2.4ml_deep"
+    "loadName": "usascientific_96_wellplate_2.4ml_deep",
+    "minimumHeight": 0.5,
+    "minimumWellVolume": 0
   },
   "namespace": "opentrons",
   "version": 1,

@@ -41,7 +41,9 @@
     "isTiprack": false,
     "isMagneticModuleCompatible": false,
     "quirks": ["centerMultichannelOnWells", "touchTipDisabled"],
-    "loadName": "nest_1_reservoir_195ml"
+    "loadName": "nest_1_reservoir_195ml",
+    "minimumHeight": 0.5,
+    "minimumWellVolume": 0
   },
   "namespace": "opentrons",
   "version": 1,

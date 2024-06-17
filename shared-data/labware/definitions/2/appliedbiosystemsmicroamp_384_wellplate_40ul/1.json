@@ -4307,7 +4307,9 @@
     "quirks": [],
     "isTiprack": false,
     "isMagneticModuleCompatible": false,
-    "loadName": "appliedbiosystemsmicroamp_384_wellplate_40ul"
+    "loadName": "appliedbiosystemsmicroamp_384_wellplate_40ul",
+    "minimumHeight": 0.5,
+    "minimumWellVolume": 0
   },
   "namespace": "opentrons",
   "version": 1,

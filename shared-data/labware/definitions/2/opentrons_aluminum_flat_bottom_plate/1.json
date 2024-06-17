@@ -27,7 +27,9 @@
     "quirks": [],
     "isTiprack": false,
     "isMagneticModuleCompatible": false,
-    "loadName": "opentrons_aluminum_flat_bottom_plate"
+    "loadName": "opentrons_aluminum_flat_bottom_plate",
+    "minimumHeight": 0.5,
+    "minimumWellVolume": 0
   },
   "namespace": "opentrons",
   "version": 1,

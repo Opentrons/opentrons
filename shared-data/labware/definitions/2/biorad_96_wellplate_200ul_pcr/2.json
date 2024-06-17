@@ -32,7 +32,9 @@
     "isTiprack": false,
     "loadName": "biorad_96_wellplate_200ul_pcr",
     "isMagneticModuleCompatible": true,
-    "magneticModuleEngageHeight": 18
+    "magneticModuleEngageHeight": 18,
+    "minimumHeight": 0.5,
+    "minimumWellVolume": 0
   },
   "gripForce": 15,
   "gripHeightFromLabwareBottom": 10.14,

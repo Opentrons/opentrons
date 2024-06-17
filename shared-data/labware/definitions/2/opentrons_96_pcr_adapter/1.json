@@ -1004,7 +1004,9 @@
     "quirks": [],
     "isTiprack": false,
     "isMagneticModuleCompatible": false,
-    "loadName": "opentrons_96_pcr_adapter"
+    "loadName": "opentrons_96_pcr_adapter",
+    "minimumHeight": 0.5,
+    "minimumWellVolume": 0
   },
   "namespace": "opentrons",
   "version": 1,

@@ -49,7 +49,9 @@
     "quirks": [],
     "isTiprack": false,
     "isMagneticModuleCompatible": false,
-    "loadName": "opentrons_calibration_adapter_heatershaker_module"
+    "loadName": "opentrons_calibration_adapter_heatershaker_module",
+    "minimumHeight": 0.5,
+    "minimumWellVolume": 0
   },
   "namespace": "opentrons",
   "version": 1,

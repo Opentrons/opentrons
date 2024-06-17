@@ -1012,7 +1012,9 @@
     "quirks": ["gripperIncompatible"],
     "isTiprack": false,
     "isMagneticModuleCompatible": false,
-    "loadName": "opentrons_96_pcr_adapter_nest_wellplate_100ul_pcr_full_skirt"
+    "loadName": "opentrons_96_pcr_adapter_nest_wellplate_100ul_pcr_full_skirt",
+    "minimumHeight": 0.5,
+    "minimumWellVolume": 0
   },
   "namespace": "opentrons",
   "version": 1,

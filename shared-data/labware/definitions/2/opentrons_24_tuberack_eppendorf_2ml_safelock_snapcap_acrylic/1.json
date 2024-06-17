@@ -245,7 +245,9 @@
     "format": "irregular",
     "isTiprack": false,
     "isMagneticModuleCompatible": false,
-    "loadName": "opentrons_24_tuberack_eppendorf_2ml_safelock_snapcap_acrylic"
+    "loadName": "opentrons_24_tuberack_eppendorf_2ml_safelock_snapcap_acrylic",
+    "minimumHeight": 0.5,
+    "minimumWellVolume": 0
   },
   "groups": [
     {

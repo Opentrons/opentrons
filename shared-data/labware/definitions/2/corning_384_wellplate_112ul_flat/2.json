@@ -451,7 +451,9 @@
     "format": "384Standard",
     "isTiprack": false,
     "isMagneticModuleCompatible": false,
-    "loadName": "corning_384_wellplate_112ul_flat"
+    "loadName": "corning_384_wellplate_112ul_flat",
+    "minimumHeight": 0.5,
+    "minimumWellVolume": 0
   },
   "gripForce": 15,
   "gripHeightFromLabwareBottom": 12.4,
