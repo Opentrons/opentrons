@@ -67,6 +67,6 @@ class QueueWorker:
                 raise e
 
     async def _run_commands(self) -> None:
-        for command in self._command_generator:
+        async for command in self._command_generator():
             await self._command_executor.execute(command_id=command)
             await asyncio.sleep(0)
