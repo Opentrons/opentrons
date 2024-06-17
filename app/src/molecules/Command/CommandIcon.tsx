@@ -3,7 +3,9 @@ import { Icon } from '@opentrons/components'
 import type { IconName, StyleProps } from '@opentrons/components'
 import type { RunTimeCommand } from '@opentrons/shared-data'
 
-const ICON_BY_COMMAND_TYPE: { [commandType: string]: IconName } = {
+type CommandType = RunTimeCommand['commandType']
+const ICON_BY_COMMAND_TYPE: Partial<Record<CommandType, IconName>> = {
+  comment: 'comment',
   delay: 'pause-circle',
   pause: 'pause-circle',
   waitForDuration: 'pause-circle',

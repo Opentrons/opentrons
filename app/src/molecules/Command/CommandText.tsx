@@ -7,6 +7,7 @@ import {
   Flex,
   SPACING,
   StyledText,
+  RESPONSIVENESS,
 } from '@opentrons/components'
 import { getPipetteNameSpecs } from '@opentrons/shared-data'
 import {
@@ -52,16 +53,22 @@ interface Props extends StyleProps {
   commandTextData: CommandTextData
   robotType: RobotType
   isOnDevice?: boolean
+  propagateCenter?: boolean
+  propagateTextLimit?: boolean
 }
 export function CommandText(props: Props): JSX.Element | null {
   const {
     command,
     commandTextData,
     robotType,
-    isOnDevice = false,
+    propagateCenter = false,
+    propagateTextLimit = false,
     ...styleProps
   } = props
   const { t } = useTranslation('protocol_command_text')
+  const shouldPropagateCenter = props.isOnDevice === true || propagateCenter
+  const shouldPropagateTextLimit =
+    props.isOnDevice === true || propagateTextLimit
 
   switch (command.commandType) {
     case 'aspirate':
@@ -110,10 +117,23 @@ export function CommandText(props: Props): JSX.Element | null {
           }).trim()
       )
       return (
+        // TODO(sfoster): Command sometimes wraps this in a cascaded display: -webkit-box
+        // to achieve multiline text clipping with an automatically inserted ellipsis, which works
+        // everywhere except for here where it overrides this property in the flex since this is
+        // the only place where CommandText uses a flex.
+        // The right way to handle this is probably to take the css that's in Command and make it
+        // live here instead, but that should be done in a followup since it would touch everything.
+        // See also the margin-left on the <li>s, which is needed to prevent their bullets from
+        // clipping if a container set overflow: hidden.
         <Flex
           flexDirection={DIRECTION_COLUMN}
           {...styleProps}
-          alignItems={isOnDevice ? ALIGN_CENTER : undefined}
+          alignItems={shouldPropagateCenter ? ALIGN_CENTER : undefined}
+          css={`
+            @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
+              display: flex !important;
+            } ;
+          `}
         >
           <StyledText as="p" marginBottom={SPACING.spacing4} {...styleProps}>
             {t('tc_starting_profile', {
@@ -122,11 +142,25 @@ export function CommandText(props: Props): JSX.Element | null {
           </StyledText>
           <StyledText as="p" marginLeft={SPACING.spacing16}>
             <ul>
-              {isOnDevice ? (
-                <li>{steps[0]}</li>
+              {shouldPropagateTextLimit ? (
+                <li
+                  css={`
+                    margin-left: ${SPACING.spacing4};
+                  `}
+                >
+                  {steps[0]}
+                </li>
               ) : (
                 steps.map((step: string, index: number) => (
-                  <li key={index}> {step}</li>
+                  <li
+                    css={`
+                      margin-left: ${SPACING.spacing4};
+                    `}
+                    key={index}
+                  >
+                    {' '}
+                    {step}
+                  </li>
                 ))
               )}
             </ul>
@@ -352,6 +386,14 @@ export function CommandText(props: Props): JSX.Element | null {
           </StyledText>
         )
       }
+    }
+    case 'comment': {
+      const { message } = command.params
+      return (
+        <StyledText as="p" {...styleProps}>
+          {message}
+        </StyledText>
+      )
     }
     case 'custom': {
       const { legacyCommandText } = command.params ?? {}

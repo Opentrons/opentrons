@@ -18,6 +18,7 @@ import { getRobotUpdateDisplayInfo } from '../../redux/robot-update'
 import { OPENTRONS_USB } from '../../redux/discovery'
 import { appShellRequestor } from '../../redux/shell/remote'
 import { useTrackCreateProtocolRunEvent } from '../Devices/hooks'
+import { getRunTimeParameterValuesForRun } from '../Devices/utils'
 import { ApplyHistoricOffsets } from '../ApplyHistoricOffsets'
 import { useOffsetCandidatesForAnalysis } from '../ApplyHistoricOffsets/hooks/useOffsetCandidatesForAnalysis'
 import { ChooseRobotSlideout } from '../ChooseRobotSlideout'
@@ -60,6 +61,7 @@ export function ChooseRobotToRunProtocolSlideoutComponent(
   )
   const runTimeParameters =
     storedProtocolData.mostRecentAnalysis?.runTimeParameters ?? []
+
   const [
     runTimeParametersOverrides,
     setRunTimeParametersOverrides,
@@ -70,6 +72,16 @@ export function ChooseRobotToRunProtocolSlideoutComponent(
     mostRecentAnalysis,
     selectedRobot?.ip ?? null
   )
+
+  // TODO (nd: 06/13/2024): send these data files to robot and use returned IDs in RTP overrides
+  // const dataFilesForProtocol = runTimeParametersOverrides.reduce<File[]>(
+  //   (acc, parameter) =>
+  //     parameter.type === 'csv_file' && parameter.file?.file != null
+  //       ? [...acc, parameter.file.file]
+  //       : acc,
+  //   []
+  // )
+
   const {
     createRunFromProtocolSource,
     runCreationError,
@@ -110,13 +122,7 @@ export function ChooseRobotToRunProtocolSlideoutComponent(
           definitionUri,
         }))
       : [],
-    runTimeParametersOverrides.reduce(
-      (acc, param) =>
-        param.value !== param.default
-          ? { ...acc, [param.variableName]: param.value }
-          : acc,
-      {}
-    )
+    getRunTimeParameterValuesForRun(runTimeParametersOverrides)
   )
   const handleProceed: React.MouseEventHandler<HTMLButtonElement> = () => {
     trackCreateProtocolRunEvent({ name: 'createProtocolRecordRequest' })
@@ -188,12 +194,12 @@ export function ChooseRobotToRunProtocolSlideoutComponent(
   )
 
   const resetRunTimeParameters = (): void => {
-    setRunTimeParametersOverrides(
-      runTimeParametersOverrides?.map(parameter => ({
-        ...parameter,
-        value: parameter.default,
-      }))
+    const clone = runTimeParametersOverrides.map(parameter =>
+      parameter.type === 'csv_file'
+        ? { ...parameter, file: null }
+        : { ...parameter, value: parameter.default }
     )
+    setRunTimeParametersOverrides(clone as RunTimeParameter[])
   }
 
   return (

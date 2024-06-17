@@ -2,6 +2,7 @@
 from __future__ import annotations
 from typing import Dict, Optional, Type, Union, List, Tuple, TYPE_CHECKING
 
+from opentrons.protocol_engine import commands as cmd
 from opentrons.protocol_engine.commands import LoadModuleResult
 from opentrons_shared_data.deck.dev_types import DeckDefinitionV5, SlotDefV3
 from opentrons_shared_data.labware.labware_definition import LabwareDefinition
@@ -211,12 +212,14 @@ class ProtocolCore(
             load_name, namespace, version, custom_labware_params
         )
 
-        load_result = self._engine_client.load_labware(
-            load_name=load_name,
-            location=load_location,
-            namespace=namespace,
-            version=version,
-            display_name=label,
+        load_result = self._engine_client.execute_command_without_recovery(
+            cmd.LoadLabwareParams(
+                loadName=load_name,
+                location=load_location,
+                namespace=namespace,
+                version=version,
+                displayName=label,
+            )
         )
         # FIXME(jbl, 2023-08-14) validating after loading the object issue
         validation.ensure_definition_is_labware(load_result.definition)
@@ -276,11 +279,13 @@ class ProtocolCore(
         namespace, version = load_labware_params.resolve(
             load_name, namespace, version, custom_labware_params
         )
-        load_result = self._engine_client.load_labware(
-            load_name=load_name,
-            location=load_location,
-            namespace=namespace,
-            version=version,
+        load_result = self._engine_client.execute_command_without_recovery(
+            cmd.LoadLabwareParams(
+                loadName=load_name,
+                location=load_location,
+                namespace=namespace,
+                version=version,
+            )
         )
         # FIXME(jbl, 2023-08-14) validating after loading the object issue
         validation.ensure_definition_is_adapter(load_result.definition)
@@ -348,12 +353,14 @@ class ProtocolCore(
 
         to_location = self._convert_labware_location(location=new_location)
 
-        self._engine_client.move_labware(
-            labware_id=labware_core.labware_id,
-            new_location=to_location,
-            strategy=strategy,
-            pick_up_offset=_pick_up_offset,
-            drop_offset=_drop_offset,
+        self._engine_client.execute_command(
+            cmd.MoveLabwareParams(
+                labwareId=labware_core.labware_id,
+                newLocation=to_location,
+                strategy=strategy,
+                pickUpOffset=_pick_up_offset,
+                dropOffset=_drop_offset,
+            )
         )
 
         if strategy == LabwareMovementStrategy.USING_GRIPPER:
@@ -411,9 +418,11 @@ class ProtocolCore(
         robot_type = self._engine_client.state.config.robot_type
         normalized_deck_slot = deck_slot.to_equivalent_for_robot_type(robot_type)
 
-        result = self._engine_client.load_module(
-            model=EngineModuleModel(model),
-            location=DeckSlotLocation(slotName=normalized_deck_slot),
+        result = self._engine_client.execute_command_without_recovery(
+            cmd.LoadModuleParams(
+                model=EngineModuleModel(model),
+                location=DeckSlotLocation(slotName=normalized_deck_slot),
+            )
         )
 
         module_core = self._get_module_core(load_module_result=result, model=model)
@@ -500,7 +509,9 @@ class ProtocolCore(
             An instrument core configured to use the requested instrument.
         """
         engine_mount = MountType[mount.name]
-        load_result = self._engine_client.load_pipette(instrument_name, engine_mount)
+        load_result = self._engine_client.execute_command_without_recovery(
+            cmd.LoadPipetteParams(pipetteName=instrument_name, mount=engine_mount)
+        )
 
         return InstrumentCore(
             pipette_id=load_result.pipetteId,
@@ -558,23 +569,25 @@ class ProtocolCore(
 
     def pause(self, msg: Optional[str]) -> None:
         """Pause the protocol."""
-        self._engine_client.wait_for_resume(message=msg)
+        self._engine_client.execute_command(cmd.WaitForResumeParams(message=msg))
 
     def comment(self, msg: str) -> None:
         """Create a comment in the protocol to be shown in the log."""
-        self._engine_client.comment(message=msg)
+        self._engine_client.execute_command(cmd.CommentParams(message=msg))
 
     def delay(self, seconds: float, msg: Optional[str]) -> None:
         """Wait for a period of time before proceeding."""
-        self._engine_client.wait_for_duration(seconds=seconds, message=msg)
+        self._engine_client.execute_command(
+            cmd.WaitForDurationParams(seconds=seconds, message=msg)
+        )
 
     def home(self) -> None:
         """Move all axes to their home positions."""
-        self._engine_client.home(axes=None)
+        self._engine_client.execute_command(cmd.HomeParams(axes=None))
 
     def set_rail_lights(self, on: bool) -> None:
         """Set the device's rail lights."""
-        self._engine_client.set_rail_lights(on=on)
+        self._engine_client.execute_command(cmd.SetRailLightsParams(on=on))
 
     def get_rail_lights_on(self) -> bool:
         """Get whether the device's rail lights are on."""

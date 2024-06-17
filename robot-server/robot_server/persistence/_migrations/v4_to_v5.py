@@ -3,6 +3,7 @@
 Summary of changes from schema 4:
 
 - Adds a new "protocol_kind" column to protocols table
+- Adds a new "data_files" table
 """
 
 from pathlib import Path

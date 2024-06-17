@@ -1,6 +1,6 @@
 """Parameter definition and associated validators."""
 from abc import abstractmethod, ABC
-from typing import Generic, Optional, List, Set, Union, get_args
+from typing import Generic, Optional, List, Set, Union
 
 from opentrons.protocols.parameters.types import (
     ParamType,
@@ -19,6 +19,7 @@ from opentrons.protocol_engine.types import (
     EnumParameter,
     EnumChoice,
 )
+from opentrons.util.get_union_elements import get_union_elements
 
 
 class AbstractParameterDefinition(ABC, Generic[ParamType]):
@@ -81,7 +82,7 @@ class ParameterDefinition(AbstractParameterDefinition[PrimitiveAllowedTypes]):
         self._description = validation.ensure_description(description)
         self._unit = validation.ensure_unit_string_length(unit)
 
-        if parameter_type not in get_args(PrimitiveAllowedTypes):
+        if parameter_type not in get_union_elements(PrimitiveAllowedTypes):
             raise ParameterDefinitionError(
                 "Parameters can only be of type int, float, str, or bool."
             )

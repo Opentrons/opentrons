@@ -17,41 +17,37 @@
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "Let there be light! True 🌠🌠🌠",
-        "legacyCommandType": "command.COMMENT"
+        "message": "Let there be light! True 🌠🌠🌠"
       },
       "result": {},
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "Is the door is closed? True 🚪🚪🚪",
-        "legacyCommandType": "command.COMMENT"
+        "message": "Is the door is closed? True 🚪🚪🚪"
       },
       "result": {},
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "Is this a simulation? True 🔮🔮🔮",
-        "legacyCommandType": "command.COMMENT"
+        "message": "Is this a simulation? True 🔮🔮🔮"
       },
       "result": {},
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "Running against API Version: 2.16",
-        "legacyCommandType": "command.COMMENT"
+        "message": "Running against API Version: 2.16"
       },
       "result": {},
       "status": "succeeded"

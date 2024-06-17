@@ -14,7 +14,7 @@ import {
 import { renderWithProviders } from '../../../__testing-utils__'
 import { i18n } from '../../../i18n'
 import { useChainLiveCommands } from '../../../resources/runs'
-import { mockRobotSideAnalysis } from '../../CommandText/__fixtures__'
+import { mockRobotSideAnalysis } from '../../../molecules/Command/__fixtures__'
 import {
   useAttachedModules,
   useRunCalibrationStatus,

@@ -2563,11 +2563,10 @@
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "one comment",
-        "legacyCommandType": "command.COMMENT"
+        "message": "one comment"
       },
       "result": {},
       "status": "succeeded"

@@ -32,7 +32,7 @@ import { useCommandQuery } from '@opentrons/react-api-client'
 import { useMostRecentCompletedAnalysis } from '../LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import { getTopPortalEl } from '../../App/portal'
 import { Tooltip } from '../../atoms/Tooltip'
-import { CommandText } from '../CommandText'
+import { CommandText } from '../../molecules/Command'
 import { useRunStatus } from '../RunTimeControl/hooks'
 import { InterventionModal } from '../InterventionModal'
 import { ProgressBar } from '../../atoms/ProgressBar'
@@ -43,7 +43,7 @@ import {
   useNotifyRunQuery,
   useNotifyAllCommandsQuery,
 } from '../../resources/runs'
-import { getCommandTextData } from '../CommandText/utils/getCommandTextData'
+import { getCommandTextData } from '../../molecules/Command/utils/getCommandTextData'
 
 import type { RunStatus } from '@opentrons/api-client'
 
