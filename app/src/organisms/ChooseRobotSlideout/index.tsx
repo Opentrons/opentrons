@@ -123,6 +123,7 @@ interface ChooseRobotSlideoutProps
   multiSlideout?: { currentPage: number } | null
   setHasParamError?: (isError: boolean) => void
   resetRunTimeParameters?: () => void
+  setHasMissingFileParam?: (isMissing: boolean) => void
 }
 
 export function ChooseRobotSlideout(
@@ -150,6 +151,7 @@ export function ChooseRobotSlideout(
     setRunTimeParametersOverrides,
     setHasParamError,
     resetRunTimeParameters,
+    setHasMissingFileParam,
   } = props
   const enableCsvFile = useFeatureFlag('enableCsvFile')
 
@@ -520,6 +522,9 @@ export function ChooseRobotSlideout(
                 </Flex>
               )
             } else if (runtimeParam.type === 'csv_file') {
+              if (runtimeParam.file?.file != null) {
+                setHasMissingFileParam?.(false)
+              }
               const error =
                 runtimeParam.file?.file?.type === 'text/csv'
                   ? null

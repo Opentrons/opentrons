@@ -27,7 +27,10 @@ import {
   mockUnreachableRobot,
 } from '../../../redux/discovery/__fixtures__'
 import { getNetworkInterfaces } from '../../../redux/networking'
-import { storedProtocolData as storedProtocolDataFixture } from '../../../redux/protocol-storage/__fixtures__'
+import {
+  storedProtocolData as storedProtocolDataFixture,
+  storedProtocolDataWithCsvRunTimeParameter,
+} from '../../../redux/protocol-storage/__fixtures__'
 import { useCreateRunFromProtocol } from '../useCreateRunFromProtocol'
 import { useOffsetCandidatesForAnalysis } from '../../ApplyHistoricOffsets/hooks/useOffsetCandidatesForAnalysis'
 import { ChooseRobotToRunProtocolSlideout } from '../'
@@ -122,6 +125,12 @@ describe('ChooseRobotToRunProtocolSlideout', () => {
     when(vi.mocked(useOffsetCandidatesForAnalysis))
       .calledWith(
         storedProtocolDataFixture.mostRecentAnalysis,
+        expect.any(String)
+      )
+      .thenReturn([])
+    when(vi.mocked(useOffsetCandidatesForAnalysis))
+      .calledWith(
+        storedProtocolDataWithCsvRunTimeParameter.mostRecentAnalysis,
         expect.any(String)
       )
       .thenReturn([])
@@ -415,6 +424,25 @@ describe('ChooseRobotToRunProtocolSlideout', () => {
     fireEvent.click(learnMoreLink)
     screen.getByText(
       'Labware offset data references previous protocol run labware locations to save you time. If all the labware in this protocol have been checked in previous runs, that data will be applied to this run.'
+    )
+  })
+
+  it('Disables confirm values button if file parameter missing', () => {
+    vi.mocked(useOffsetCandidatesForAnalysis).mockReturnValue([])
+    render({
+      storedProtocolData: storedProtocolDataWithCsvRunTimeParameter,
+      onCloseClick: vi.fn(),
+      showSlideout: true,
+    })
+    const proceedButton = screen.getByRole('button', {
+      name: 'Continue to parameters',
+    })
+    fireEvent.click(proceedButton)
+    const confirm = screen.getByRole('button', { name: 'Confirm values' })
+    fireEvent.mouseOver(confirm)
+    setTimeout(
+      () => screen.getByText('Add the required CSV file to continue.'),
+      200 // for tooltip to show up
     )
   })
 })

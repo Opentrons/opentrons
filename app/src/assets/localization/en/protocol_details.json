@@ -1,5 +1,6 @@
 {
   "author": "author",
+  "add_required_csv_file": "Add the required CSV file to continue.",
   "both_mounts": "Both Mounts",
   "choices": "{{count}} choices",
   "choose_robot_to_run": "Choose Robot to Run\n{{protocol_name}}",
