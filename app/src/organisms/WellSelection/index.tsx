@@ -7,7 +7,7 @@ import {
   getCollidingWells,
   getWellSetForMultichannel,
 } from './utils'
-import { Selection384Wells } from './Selection384Wells'
+import { HighWellCountSelection } from './HighWellCountSelection'
 import { SelectionRect } from './SelectionRect'
 
 import type { WellFill, WellGroup, WellStroke } from '@opentrons/components'
@@ -24,6 +24,9 @@ interface WellSelectionProps {
   selectWells: (wellGroup: WellGroup) => unknown
   channels: PipetteChannels
 }
+
+const WELL_COUNT_384 = 384
+const WELL_COUNT_96 = 96
 
 export function WellSelection(props: WellSelectionProps): JSX.Element {
   const {
@@ -141,14 +144,20 @@ export function WellSelection(props: WellSelectionProps): JSX.Element {
       />
     </RobotCoordinateSpace>
   )
-  return definition.parameters.format === '384Standard' ? (
-    <Selection384Wells
+  return definition.parameters.format === '384Standard' ||
+    definition.parameters.format === '96Standard' ? (
+    <HighWellCountSelection
       allSelectedWells={allSelectedWells}
       channels={channels}
       definition={definition}
       deselectWells={deselectWells}
       labwareRender={labwareRender}
       selectWells={selectWells}
+      wellCount={
+        definition.parameters.format === '96Standard'
+          ? WELL_COUNT_96
+          : WELL_COUNT_384
+      }
     />
   ) : (
     <SelectionRect

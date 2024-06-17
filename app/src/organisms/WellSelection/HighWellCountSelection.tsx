@@ -22,28 +22,33 @@ import type {
   PipetteChannels,
 } from '@opentrons/shared-data'
 
-interface Selection384WellsProps {
+interface HighWellCountSelectionProps {
   allSelectedWells: WellGroup
   channels: PipetteChannels
   definition: LabwareDefinition2
   deselectWells: (wells: string[]) => void
   labwareRender: React.ReactNode
   selectWells: (wellGroup: WellGroup) => unknown
+  wellCount: number
 }
 
 // magic numbers for 384 well plates
-const WELL_COUNT_384 = 384
 const COLUMN_COUNT_384 = 24
 const ROW_COUNT_384 = 16
 
-export function Selection384Wells({
+// magic numbers for 96 well plates
+const COLUMN_COUNT_96 = 12
+const ROW_COUNT_96 = 8
+
+export function HighWellCountSelection({
   allSelectedWells,
   channels,
   definition,
   deselectWells,
   labwareRender,
   selectWells,
-}: Selection384WellsProps): JSX.Element {
+  wellCount,
+}: HighWellCountSelectionProps): JSX.Element {
   const [selectBy, setSelectBy] = React.useState<'columns' | 'wells'>('columns')
 
   const [lastSelectedIndex, setLastSelectedIndex] = React.useState<
@@ -148,8 +153,10 @@ export function Selection384Wells({
             selectBy={selectBy}
             setSelectBy={setSelectBy}
             setLastSelectedIndex={setLastSelectedIndex}
+            wellCount={wellCount}
           />
-        ) : (
+        ) : null}
+        {channels !== 1 && !(channels === 8 && wellCount === 96) ? (
           <StartingWell
             channels={channels}
             columns={columns}
@@ -157,14 +164,16 @@ export function Selection384Wells({
             selectWells={selectWells}
             startingWellState={startingWellState}
             setStartingWellState={setStartingWellState}
+            wellCount={wellCount}
           />
-        )}
+        ) : null}
         <ButtonControls
           channels={channels}
           handleMinus={handleMinus}
           handlePlus={handlePlus}
           lastSelectedIndex={lastSelectedIndex}
           selectBy={selectBy}
+          wellCount={wellCount}
         />
       </Flex>
     </Flex>
@@ -175,14 +184,17 @@ interface SelectByProps {
   selectBy: 'columns' | 'wells'
   setSelectBy: React.Dispatch<React.SetStateAction<'columns' | 'wells'>>
   setLastSelectedIndex: React.Dispatch<React.SetStateAction<number | null>>
+  wellCount: number
 }
 
 function SelectBy({
   selectBy,
   setSelectBy,
   setLastSelectedIndex,
+  wellCount,
 }: SelectByProps): JSX.Element {
   const { t, i18n } = useTranslation('quick_transfer')
+  const rowCount = wellCount === 96 ? ROW_COUNT_96 : ROW_COUNT_384
 
   return (
     <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing16}>
@@ -211,7 +223,7 @@ function SelectBy({
           setSelectBy('wells')
           setLastSelectedIndex(lastSelectedIndex =>
             lastSelectedIndex != null
-              ? (lastSelectedIndex + 1) * ROW_COUNT_384 - 1
+              ? (lastSelectedIndex + 1) * rowCount - 1
               : lastSelectedIndex
           )
         }}
@@ -230,6 +242,7 @@ function StartingWell({
   selectWells,
   startingWellState,
   setStartingWellState,
+  wellCount,
 }: {
   channels: PipetteChannels
   columns: string[][]
@@ -239,11 +252,16 @@ function StartingWell({
   setStartingWellState: React.Dispatch<
     React.SetStateAction<Record<StartingWellOption, boolean>>
   >
+  wellCount: number
 }): JSX.Element {
   const { t, i18n } = useTranslation('quick_transfer')
-
-  const checkboxWellOptions: StartingWellOption[] =
-    channels === 8 ? ['A1', 'B1'] : ['A1', 'A2', 'B1', 'B2']
+  let checkboxWellOptions: StartingWellOption[] = []
+  if (wellCount === 96) {
+    checkboxWellOptions = ['A1']
+  } else {
+    checkboxWellOptions =
+      channels === 8 ? ['A1', 'B1'] : ['A1', 'A2', 'B1', 'B2']
+  }
 
   // for 96-channel: even/odd columns to be used based on labware column label, not index
   const oddColumns = columns.filter((_column, i) => i % 2 === 0)
@@ -329,6 +347,7 @@ interface ButtonControlsProps {
   handlePlus: () => void
   lastSelectedIndex: number | null
   selectBy: 'columns' | 'wells'
+  wellCount: number
 }
 
 function ButtonControls(props: ButtonControlsProps): JSX.Element {
@@ -338,9 +357,10 @@ function ButtonControls(props: ButtonControlsProps): JSX.Element {
     handlePlus,
     lastSelectedIndex,
     selectBy,
+    wellCount,
   } = props
   const { t, i18n } = useTranslation('quick_transfer')
-
+  const columnCount = wellCount === 96 ? COLUMN_COUNT_96 : COLUMN_COUNT_384
   const addOrRemoveButtons =
     channels !== 96 ? (
       <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing16}>
@@ -361,8 +381,8 @@ function ButtonControls(props: ButtonControlsProps): JSX.Element {
           <IconButton
             disabled={
               selectBy === 'columns'
-                ? lastSelectedIndex === COLUMN_COUNT_384 - 1
-                : lastSelectedIndex === WELL_COUNT_384 - 1
+                ? lastSelectedIndex === columnCount - 1
+                : lastSelectedIndex === wellCount - 1
             }
             onClick={handlePlus}
             iconName="plus"
