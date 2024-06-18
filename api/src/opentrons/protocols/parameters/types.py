@@ -17,14 +17,14 @@ class CSVParameter:
     def file(self) -> TextIO:
         if self._file is None:
             raise RuntimeParameterRequired(
-                "CSV Parameter needs to be set to a file for full analysis."
+                "CSV parameter needs to be set to a file for full analysis or run."
             )
         return self._file
 
     def rows(self) -> List[List[str]]:
         if self._file is None:
             raise RuntimeParameterRequired(
-                "CSV Parameter needs to be set to a file for full analysis."
+                "CSV parameter needs to be set to a file for full analysis or run."
             )
         return self._rows
 
