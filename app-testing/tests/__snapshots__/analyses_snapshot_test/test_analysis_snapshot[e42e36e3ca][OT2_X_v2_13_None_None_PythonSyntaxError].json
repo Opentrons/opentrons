@@ -24,7 +24,7 @@
             "msg": "No module named 'superspecialmagic'",
             "name": "superspecialmagic",
             "path": "None",
-            "traceback": "  File \"/usr/local/lib/python3.10/site-packages/opentrons/cli/analyze.py\", line 248, in _do_analyze\n    await runner.load(\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocol_runner/protocol_runner.py\", line 200, in load\n    self._protocol_executor.extract_run_parameters(\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocol_runner/python_protocol_wrappers.py\", line 167, in extract_run_parameters\n    return exec_add_parameters(\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocols/execution/execute_python.py\", line 111, in exec_add_parameters\n    exec(protocol.contents, new_globs)\n\n  File \"OT2_X_v2_13_None_None_PythonSyntaxError.py\", line 4, in <module>\n"
+            "traceback": "  File \"/usr/local/lib/python3.10/site-packages/opentrons/cli/analyze.py\", line 250, in _do_analyze\n    await runner.load(\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocol_runner/protocol_runner.py\", line 200, in load\n    self._protocol_executor.extract_run_parameters(\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocol_runner/python_protocol_wrappers.py\", line 167, in extract_run_parameters\n    return exec_add_parameters(\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocols/execution/execute_python.py\", line 111, in exec_add_parameters\n    exec(protocol.contents, new_globs)\n\n  File \"OT2_X_v2_13_None_None_PythonSyntaxError.py\", line 4, in <module>\n"
           },
           "errorType": "PythonException",
           "isDefined": false,
@@ -70,6 +70,7 @@
   },
   "modules": [],
   "pipettes": [],
+  "result": "not-ok",
   "robotType": "OT-2 Standard",
   "runTimeParameters": []
 }
