@@ -459,7 +459,6 @@ export const distribute: CommandCreator<DistributeArgs> = (
             }),
           ]
         : []
-      console.log('tipcommands', ...tipCommands)
 
       return [
         ...tipCommands,
