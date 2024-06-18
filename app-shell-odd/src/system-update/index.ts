@@ -19,7 +19,6 @@ import {
 } from './release-files'
 import { uploadSystemFile } from './update'
 import { getSystemUpdateDir } from './directories'
-import { sendFilePaths } from '../actions'
 
 import type { DownloadProgress } from '../http'
 import type { Action, Dispatch } from '../types'

@@ -47,14 +47,14 @@ const cardStyleBySize: {
   // Note (kk:06/13/2024) height has been updated from 10.75rem because of a protocol with RTP CSV file
   half: {
     fontSize: TYPOGRAPHY.fontSize28,
-    height: '11.375rem',
+    height: '13.25rem',
     lineHeight: TYPOGRAPHY.lineHeight36,
     fontWeight: TYPOGRAPHY.fontWeightSemiBold,
     width: '29.25rem',
   },
   regular: {
     fontSize: TYPOGRAPHY.fontSize28,
-    height: '11.375rem',
+    height: '13.25rem',
     lineHeight: TYPOGRAPHY.lineHeight36,
     fontWeight: TYPOGRAPHY.fontWeightSemiBold,
     width: '28.375rem',
@@ -64,23 +64,24 @@ const cardStyleBySize: {
 interface PinnedProtocolProps {
   protocol: ProtocolResource
   longPress: React.Dispatch<React.SetStateAction<boolean>>
-  cardSize?: CardSizeType
-  lastRun?: string
   setShowDeleteConfirmationModal: (showDeleteConfirmationModal: boolean) => void
   setTargetProtocolId: (targetProtocolId: string) => void
+  cardSize?: CardSizeType
+  lastRun?: string
   isRequiredCSV?: boolean
 }
 
 export function PinnedProtocol(props: PinnedProtocolProps): JSX.Element {
   const {
-    lastRun,
     protocol,
     longPress,
     setShowDeleteConfirmationModal,
     setTargetProtocolId,
+    lastRun,
+    cardSize: size,
     isRequiredCSV = false,
   } = props
-  const cardSize = props.cardSize ?? 'full'
+  const cardSize = size ?? 'full'
   const history = useHistory()
   const longpress = useLongPress()
   const protocolName = protocol.metadata.protocolName ?? protocol.files[0].name
@@ -128,6 +129,7 @@ export function PinnedProtocol(props: PinnedProtocolProps): JSX.Element {
       overflowWrap={OVERFLOW_WRAP_ANYWHERE}
       padding={SPACING.spacing24}
       ref={longpress.ref}
+      data-testid={`${cardSize}_pinned_protocol_card`}
     >
       <Flex gridGap={SPACING.spacing8} flexDirection={DIRECTION_COLUMN}>
         {isRequiredCSV ? (
