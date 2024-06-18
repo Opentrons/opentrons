@@ -12,6 +12,7 @@ import {
   useNotifyRunQuery,
 } from '../../../resources/runs'
 import { useRecoveryOptionCopy } from './useRecoveryOptionCopy'
+import { useRunningStepCounts } from '../../../resources/protocols/hooks'
 
 import type { PipetteData } from '@opentrons/api-client'
 import type { IRecoveryMap } from '../types'
@@ -22,6 +23,7 @@ import type { RecoveryTipStatusUtils } from './useRecoveryTipStatus'
 import type { UseFailedLabwareUtilsResult } from './useFailedLabwareUtils'
 import type { UseRecoveryMapUtilsResult } from './useRecoveryMapUtils'
 import type { CurrentRecoveryOptionUtils } from './useRecoveryRouting'
+import type { StepCounts } from '../../../resources/protocols/hooks'
 
 type ERUtilsProps = ErrorRecoveryFlowsProps & {
   toggleERWizard: (launchER: boolean) => Promise<void>
@@ -40,6 +42,7 @@ export interface ERUtilsResults {
   failedPipetteInfo: PipetteData | null
   hasLaunchedRecovery: boolean
   trackExternalMap: (map: Record<string, any>) => void
+  stepCounts: StepCounts
 }
 
 // Builds various Error Recovery utilities.
@@ -54,7 +57,8 @@ export function useERUtils({
   const { data: attachedInstruments } = useInstrumentsQuery()
   const { data: runRecord } = useNotifyRunQuery(runId)
   // TODO(jh, 06-04-24): Refactor the utilities that derive info
-  // from runCommands once the server yields that info directly on an existing/new endpoint.
+  // from runCommands once the server yields that info directly on an existing/new endpoint. We'll still need this with a
+  // pageLength of 1 though for stepCount things.
   // Note that pageLength: 999 is ok only because we fetch this on mount. We use 999 because it should hopefully
   // provide the commands necessary for ER without taxing the server too heavily. This is NOT intended for produciton!
   const { data: runCommands } = useNotifyAllCommandsQuery(runId, {
@@ -111,6 +115,8 @@ export function useERUtils({
     failedLabwareUtils,
   })
 
+  const stepCounts = useRunningStepCounts(runId, runCommands)
+
   // TODO(jh, 06-14-24): Ensure other string build utilities that are internal to ErrorRecoveryFlows are exported under
   // one utility object in useERUtils.
   const getRecoveryOptionCopy = useRecoveryOptionCopy()
@@ -127,5 +133,6 @@ export function useERUtils({
     failedPipetteInfo,
     recoveryMapUtils,
     getRecoveryOptionCopy,
+    stepCounts,
   }
 }

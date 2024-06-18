@@ -214,6 +214,7 @@ export function RunningProtocol(): JSX.Element {
           {robotSideAnalysis != null ? (
             currentOption === 'CurrentRunningProtocolCommand' ? (
               <CurrentRunningProtocolCommand
+                runId={runId}
                 playRun={playRun}
                 pauseRun={pauseRun}
                 setShowConfirmCancelRunModal={setShowConfirmCancelRunModal}

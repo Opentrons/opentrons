@@ -52,10 +52,7 @@ export function useERWizard(): UseERWizardResult {
   return { showERWizard, toggleERWizard, hasLaunchedRecovery }
 }
 
-export type ErrorRecoveryWizardProps = Omit<
-  ErrorRecoveryFlowsProps,
-  'protocolAnalysis'
-> &
+export type ErrorRecoveryWizardProps = ErrorRecoveryFlowsProps &
   ERUtilsResults & {
     robotType: RobotType
   }

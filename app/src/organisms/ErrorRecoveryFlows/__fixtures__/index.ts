@@ -68,6 +68,8 @@ export const mockRecoveryContentProps: RecoveryContentProps = {
   failedLabwareUtils: { pickUpTipLabware: mockPickUpTipLabware } as any,
   failedPipetteInfo: {} as any,
   recoveryMapUtils: {} as any,
+  stepCounts: {} as any,
+  protocolAnalysis: { commands: [mockFailedCommand] } as any,
   trackExternalMap: () => null,
   hasLaunchedRecovery: true,
   getRecoveryOptionCopy: () => 'MOCK_COPY',
