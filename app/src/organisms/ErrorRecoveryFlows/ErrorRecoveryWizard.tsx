@@ -18,7 +18,7 @@ import {
   ManageTips,
 } from './RecoveryOptions'
 import { RecoveryInProgress } from './RecoveryInProgress'
-import { getErrorKind } from './hooks'
+import { getErrorKind } from './utils'
 import { RECOVERY_MAP } from './constants'
 
 import type { RobotType } from '@opentrons/shared-data'
