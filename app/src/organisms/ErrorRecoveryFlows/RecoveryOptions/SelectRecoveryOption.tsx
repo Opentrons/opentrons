@@ -27,10 +27,13 @@ export function SelectRecoveryOption({
   errorKind,
   routeUpdateActions,
   tipStatusUtils,
+  currentRecoveryOptionUtils,
+  getRecoveryOptionCopy,
 }: RecoveryContentProps): JSX.Element | null {
   const { t } = useTranslation('error_recovery')
   const { proceedToRouteAndStep } = routeUpdateActions
   const { determineTipStatus } = tipStatusUtils
+  const { setSelectedRecoveryOption } = currentRecoveryOptionUtils
   const validRecoveryOptions = getRecoveryOptions(errorKind)
   const [selectedRoute, setSelectedRoute] = React.useState<RecoveryRoute>(
     head(validRecoveryOptions) as RecoveryRoute
@@ -49,13 +52,15 @@ export function SelectRecoveryOption({
             validRecoveryOptions={validRecoveryOptions}
             setSelectedRoute={setSelectedRoute}
             selectedRoute={selectedRoute}
+            getRecoveryOptionCopy={getRecoveryOptionCopy}
           />
         </Flex>
         <RecoveryFooterButtons
           isOnDevice={isOnDevice}
-          primaryBtnOnClick={() =>
-            proceedToRouteAndStep(selectedRoute as RecoveryRoute)
-          }
+          primaryBtnOnClick={() => {
+            setSelectedRecoveryOption(selectedRoute)
+            void proceedToRouteAndStep(selectedRoute as RecoveryRoute)
+          }}
         />
       </RecoverySingleColumnContent>
     )
@@ -67,27 +72,17 @@ export function SelectRecoveryOption({
 interface RecoveryOptionsProps {
   validRecoveryOptions: RecoveryRoute[]
   setSelectedRoute: (route: RecoveryRoute) => void
+  getRecoveryOptionCopy: RecoveryContentProps['getRecoveryOptionCopy']
   selectedRoute?: RecoveryRoute
 }
 export function RecoveryOptions({
   validRecoveryOptions,
   selectedRoute,
   setSelectedRoute,
+  getRecoveryOptionCopy,
 }: RecoveryOptionsProps): JSX.Element[] {
-  const { t } = useTranslation('error_recovery')
-
   return validRecoveryOptions.map((recoveryOption: RecoveryRoute) => {
-    const buildOptionName = (): string => {
-      switch (recoveryOption) {
-        case RECOVERY_MAP.RETRY_FAILED_COMMAND.ROUTE:
-          return t('retry_step')
-        case RECOVERY_MAP.CANCEL_RUN.ROUTE:
-          return t('cancel_run')
-        default:
-          return 'INVALID_OPTION'
-      }
-    }
-    const optionName = buildOptionName()
+    const optionName = getRecoveryOptionCopy(recoveryOption)
 
     return (
       <RadioButton
@@ -114,6 +109,8 @@ export function useCurrentTipStatus(
 
 export function getRecoveryOptions(errorKind: ErrorKind): RecoveryRoute[] {
   switch (errorKind) {
+    case ERROR_KINDS.OVERPRESSURE_WHILE_ASPIRATING:
+      return OVERPRESSURE_WHILE_ASPIRATING_OPTIONS
     case ERROR_KINDS.GENERAL_ERROR:
       return GENERAL_ERROR_OPTIONS
   }
@@ -121,5 +118,10 @@ export function getRecoveryOptions(errorKind: ErrorKind): RecoveryRoute[] {
 
 export const GENERAL_ERROR_OPTIONS: RecoveryRoute[] = [
   RECOVERY_MAP.RETRY_FAILED_COMMAND.ROUTE,
+  RECOVERY_MAP.CANCEL_RUN.ROUTE,
+]
+
+export const OVERPRESSURE_WHILE_ASPIRATING_OPTIONS: RecoveryRoute[] = [
+  RECOVERY_MAP.RETRY_NEW_TIPS.ROUTE,
   RECOVERY_MAP.CANCEL_RUN.ROUTE,
 ]

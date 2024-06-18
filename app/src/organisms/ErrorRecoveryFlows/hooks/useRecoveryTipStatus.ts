@@ -1,14 +1,21 @@
 import * as React from 'react'
 
-import { useHost, useInstrumentsQuery } from '@opentrons/react-api-client'
+import { useHost } from '@opentrons/react-api-client'
 
 import { useTipAttachmentStatus } from '../../DropTipWizardFlows'
-import { useNotifyRunQuery } from '../../../resources/runs'
 
+import type { Run, Instruments } from '@opentrons/api-client'
 import type {
   TipAttachmentStatusResult,
   PipetteWithTip,
 } from '../../DropTipWizardFlows'
+
+interface UseRecoveryTipStatusProps {
+  runId: string
+  isFlex: boolean
+  attachedInstruments?: Instruments
+  runRecord?: Run
+}
 
 export type RecoveryTipStatusUtils = TipAttachmentStatusResult & {
   /* Whether the robot is currently determineTipStatus() */
@@ -18,21 +25,14 @@ export type RecoveryTipStatusUtils = TipAttachmentStatusResult & {
 
 // Wraps the tip attachment status utils with Error Recovery specific states and values.
 export function useRecoveryTipStatus(
-  runId: string,
-  isFlex: boolean
+  props: UseRecoveryTipStatusProps
 ): RecoveryTipStatusUtils {
   const [isLoadingTipStatus, setIsLoadingTipStatus] = React.useState(false)
   const host = useHost()
 
-  const { data: runRecord } = useNotifyRunQuery(runId)
-  const { data: attachedInstruments } = useInstrumentsQuery()
-
   const tipAttachmentStatusUtils = useTipAttachmentStatus({
-    runId,
+    ...props,
     host,
-    runRecord,
-    attachedInstruments,
-    isFlex,
   })
 
   const determineTipStatusWithLoading = (): Promise<PipetteWithTip[]> => {
@@ -50,6 +50,6 @@ export function useRecoveryTipStatus(
     ...tipAttachmentStatusUtils,
     determineTipStatus: determineTipStatusWithLoading,
     isLoadingTipStatus,
-    runId,
+    runId: props.runId,
   }
 }

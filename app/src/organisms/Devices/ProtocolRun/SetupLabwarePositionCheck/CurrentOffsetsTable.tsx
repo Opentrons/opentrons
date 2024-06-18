@@ -30,7 +30,7 @@ import type {
   LoadedModule,
 } from '@opentrons/shared-data'
 import { getDisplayLocation } from '../../../LabwarePositionCheck/utils/getDisplayLocation'
-import { getLabwareDefinitionsFromCommands } from '../../../LabwarePositionCheck/utils/labware'
+import { getLabwareDefinitionsFromCommands } from '../../../../molecules/Command/utils/getLabwareDefinitionsFromCommands'
 
 const OffsetTable = styled('table')`
   ${TYPOGRAPHY.labelRegular}

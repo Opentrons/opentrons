@@ -1,5 +1,12 @@
+import {
+  FLEX_ROBOT_TYPE,
+  getLabwareDefURI,
+  opentrons96PcrAdapterV1,
+} from '@opentrons/shared-data'
+
 import { RECOVERY_MAP } from '../constants'
 
+import type { LoadedLabware, LabwareDefinition2 } from '@opentrons/shared-data'
 import type { FailedCommand, RecoveryContentProps } from '../types'
 
 export const mockFailedCommand: FailedCommand = {
@@ -32,9 +39,23 @@ export const mockFailedCommand: FailedCommand = {
   notes: [],
 }
 
+const mockAdapterDef = opentrons96PcrAdapterV1 as LabwareDefinition2
+
+export const mockPickUpTipLabware: LoadedLabware = {
+  id: 'MOCK_PickUpTipLabware_ID',
+  location: { slotName: 'A1' },
+  definitionUri: getLabwareDefURI(mockAdapterDef),
+  loadName: mockAdapterDef.parameters.loadName,
+  displayName: 'MOCK_PickUpTipLabware_NAME',
+}
+
+// TOME: Add the mock labware and pipette, etc. as you end up using it elsewhere to here.
 export const mockRecoveryContentProps: RecoveryContentProps = {
   failedCommand: mockFailedCommand,
   errorKind: 'GENERAL_ERROR',
+  robotType: FLEX_ROBOT_TYPE,
+  runId: 'MOCK_RUN_ID',
+  isFlex: true,
   isOnDevice: true,
   recoveryMap: {
     route: RECOVERY_MAP.OPTION_SELECTION.ROUTE,
@@ -42,5 +63,14 @@ export const mockRecoveryContentProps: RecoveryContentProps = {
   },
   routeUpdateActions: {} as any,
   recoveryCommands: {} as any,
+  tipStatusUtils: {} as any,
+  currentRecoveryOptionUtils: {} as any,
+  failedLabwareUtils: { pickUpTipLabware: mockPickUpTipLabware } as any,
+  failedPipetteInfo: {} as any,
+  recoveryMapUtils: {} as any,
+  stepCounts: {} as any,
+  protocolAnalysis: { commands: [mockFailedCommand] } as any,
+  trackExternalMap: () => null,
   hasLaunchedRecovery: true,
-} as any
+  getRecoveryOptionCopy: () => 'MOCK_COPY',
+}

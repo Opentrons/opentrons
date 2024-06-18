@@ -17,7 +17,7 @@ import {
 } from '@opentrons/react-api-client'
 
 import { renderWithProviders } from '../../../__testing-utils__'
-import { mockRobotSideAnalysis } from '../../../organisms/CommandText/__fixtures__'
+import { mockRobotSideAnalysis } from '../../../molecules/Command/__fixtures__'
 import {
   CurrentRunningProtocolCommand,
   RunningProtocolSkeleton,

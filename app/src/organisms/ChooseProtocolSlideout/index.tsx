@@ -27,6 +27,7 @@ import {
   StyledText,
   TYPOGRAPHY,
   useTooltip,
+  useHoverTooltip,
 } from '@opentrons/components'
 import { ApiHostProvider } from '@opentrons/react-api-client'
 import { sortRuntimeParameters } from '@opentrons/shared-data'
@@ -85,6 +86,7 @@ export function ChooseProtocolSlideoutComponent(
   const history = useHistory()
   const logger = useLogger(new URL('', import.meta.url).pathname)
   const [targetProps, tooltipProps] = useTooltip()
+  const [targetPropsHover, tooltipPropsHover] = useHoverTooltip()
   const [
     showRestoreValuesTooltip,
     setShowRestoreValuesTooltip,
@@ -103,6 +105,11 @@ export function ChooseProtocolSlideoutComponent(
   ] = React.useState<RunTimeParameter[]>([])
   const [currentPage, setCurrentPage] = React.useState<number>(1)
   const [hasParamError, setHasParamError] = React.useState<boolean>(false)
+  const [hasMissingFileParam, setHasMissingFileParam] = React.useState<boolean>(
+    runTimeParametersOverrides?.some(
+      parameter => parameter.type === 'csv_file'
+    ) ?? false
+  )
   const [isInputFocused, setIsInputFocused] = React.useState<boolean>(false)
   const enableCsvFile = useFeatureFlag('enableCsvFile')
 
@@ -113,6 +120,12 @@ export function ChooseProtocolSlideoutComponent(
   }, [selectedProtocol])
   React.useEffect(() => {
     setHasParamError(errors.length > 0)
+    setHasMissingFileParam(
+      runTimeParametersOverrides.some(
+        parameter =>
+          parameter.type === 'csv_file' && parameter.file?.file == null
+      )
+    )
   }, [runTimeParametersOverrides])
 
   const runTimeParametersFromAnalysis =
@@ -194,7 +207,7 @@ export function ChooseProtocolSlideoutComponent(
   const isRestoreDefaultsLinkEnabled =
     runTimeParametersOverrides?.some(parameter =>
       parameter.type === 'csv_file'
-        ? true
+        ? parameter.file != null
         : parameter.value !== parameter.default
     ) ?? false
 
@@ -369,7 +382,7 @@ export function ChooseProtocolSlideoutComponent(
               const error =
                 runtimeParam.file?.file?.type === 'text/csv'
                   ? null
-                  : t('protocol_details:file_must_be_csv')
+                  : t('protocol_details:csv_file_type_required')
               if (error != null) {
                 errors.push(error)
               }
@@ -541,6 +554,7 @@ export function ChooseProtocolSlideoutComponent(
           width="49%"
           onClick={handleProceed}
           disabled={hasParamError}
+          {...targetPropsHover}
         >
           {isCreatingRun ? (
             <Icon name="ot-spinner" spin size="1rem" />
@@ -548,6 +562,11 @@ export function ChooseProtocolSlideoutComponent(
             t('shared:confirm_values')
           )}
         </PrimaryButton>
+        {hasMissingFileParam ? (
+          <Tooltip tooltipProps={tooltipPropsHover}>
+            {t('protocol_details:add_required_csv_file')}
+          </Tooltip>
+        ) : null}
       </Flex>
     )
 

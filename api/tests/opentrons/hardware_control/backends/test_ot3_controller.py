@@ -725,12 +725,14 @@ async def test_liquid_probe(
         # the move raises a liquid not found now since we don't call the move group and it doesn't
         # get any positions back
         pass
-    move_groups = (mock_move_group_run.call_args_list[0][0][0]._move_groups)[0][0]
+    move_groups = mock_move_group_run.call_args_list[0][0][0]._move_groups
     head_node = axis_to_node(Axis.by_mount(mount))
     tool_node = sensor_node_for_mount(mount)
-    assert move_groups[head_node].stop_condition == MoveStopCondition.sync_line
-    assert len(move_groups) == 2
-    assert move_groups[head_node], move_groups[tool_node]
+    assert move_groups[0][0][head_node].stop_condition == MoveStopCondition.none
+    assert len(move_groups) == 3
+    assert move_groups[0][0][head_node]
+    assert move_groups[1][0][tool_node]
+    assert move_groups[2][0][head_node], move_groups[2][0][tool_node]
 
 
 async def test_tip_action(
