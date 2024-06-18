@@ -343,7 +343,7 @@ def test_file_required_error(
 
     assert result.json_output is not None
     assert result.json_output["robotType"] == "OT-2 Standard"
-    assert result.json_output["result"] == AnalysisResult.FILE_REQUIRED.value
+    assert result.json_output["result"] == AnalysisResult.PARAMETER_VALUE_REQUIRED.value
     assert result.json_output["pipettes"] == []
     assert result.json_output["commands"]  # There should be a home command
     assert result.json_output["labware"] == []

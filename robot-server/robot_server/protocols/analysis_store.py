@@ -183,7 +183,7 @@ class AnalysisStore:
                 )
                 for error in errors
             ):
-                result = AnalysisResult.FILE_REQUIRED
+                result = AnalysisResult.PARAMETER_VALUE_REQUIRED
             else:
                 result = AnalysisResult.NOT_OK
         else:

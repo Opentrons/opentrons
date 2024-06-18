@@ -373,7 +373,7 @@ analysis_result_specs: List[AnalysisResultSpec] = [
                 detail="oh no",
             )
         ],
-        expected_result=AnalysisResult.FILE_REQUIRED,
+        expected_result=AnalysisResult.PARAMETER_VALUE_REQUIRED,
     ),
 ]
 

@@ -311,7 +311,7 @@ async def _analyze(
             )
             for error in analysis.state_summary.errors
         ):
-            result = AnalysisResult.FILE_REQUIRED
+            result = AnalysisResult.PARAMETER_VALUE_REQUIRED
         else:
             result = AnalysisResult.NOT_OK
     else:
@@ -390,13 +390,13 @@ class AnalysisResult(str, Enum):
         OK: No problems were found during protocol analysis.
         NOT_OK: Problems were found during protocol analysis. Inspect
             `analysis.errors` for error occurrences.
-        FILE_REQUIRED: A file is required for a file parameter for full
-                        analysis to be possible.
+        PARAMETER_VALUE_REQUIRED: A value is required to be set for a parameter
+            in order for the protocol to be analyzed/run
     """
 
     OK = "ok"
     NOT_OK = "not-ok"
-    FILE_REQUIRED = "file-required"
+    PARAMETER_VALUE_REQUIRED = "parameter-value-required"
 
 
 class AnalyzeResults(BaseModel):
