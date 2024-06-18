@@ -6,7 +6,7 @@ import { Tag as TagComponent } from './index'
 import type { Meta, StoryObj } from '@storybook/react'
 
 const meta: Meta<typeof TagComponent> = {
-  title: 'Library/Atoms/Chip',
+  title: 'Library/Atoms/Tag',
   argTypes: {
     type: {
       options: ['default', 'interactive', 'branded'],
@@ -14,16 +14,16 @@ const meta: Meta<typeof TagComponent> = {
         type: 'select',
       },
     },
+    //  TODO(jr, 6/18/24): make iconName and iconPosition selectable when we have real examples
+    //  used in the app
     iconName: {
-      options: ['info', 'ot-alert'],
-      control: {
-        type: 'select',
+      table: {
+        disable: true,
       },
     },
     iconPosition: {
-      options: ['left', 'right', undefined],
-      control: {
-        type: 'select',
+      table: {
+        disable: true,
       },
     },
   },

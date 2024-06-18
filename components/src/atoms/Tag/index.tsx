@@ -8,11 +8,10 @@ import { Icon } from '../../icons'
 import { StyledText } from '../StyledText'
 
 import type { IconName } from '../../icons'
-import type { StyleProps } from '../../primitives'
 
 export type TagType = 'default' | 'interactive' | 'branded'
 
-interface TagProps extends StyleProps {
+interface TagProps {
   /** Tag content */
   text: string
   /** name constant of the text color and the icon color to display */
@@ -44,7 +43,7 @@ const TAG_PROPS_BY_TYPE: Record<
 }
 
 export function Tag(props: TagProps): JSX.Element {
-  const { iconName, type, text, iconPosition, ...styleProps } = props
+  const { iconName, type, text, iconPosition } = props
 
   const DEFAULT_CONTAINER_STYLE = css`
     padding: ${SPACING.spacing2} ${SPACING.spacing8};
@@ -61,8 +60,8 @@ export function Tag(props: TagProps): JSX.Element {
       background-color: ${COLORS.black90}${COLORS.opacity40HexCode};
     }
     &:focus-visible {
-      background-color: ${COLORS.black90}${COLORS.opacity40HexCode};
       box-shadow: 0 0 0 3px ${COLORS.blue50};
+      outline: none;
     }
   `
 
@@ -95,7 +94,6 @@ export function Tag(props: TagProps): JSX.Element {
       }
       gridGap={SPACING.spacing4}
       data-testid={`Tag_${type}`}
-      {...styleProps}
     >
       {iconName != null && iconPosition === 'left' ? (
         <Icon
