@@ -30,7 +30,7 @@ import { LegacyModalShell } from '../../../molecules/LegacyModal'
 import { SmallButton } from '../../../atoms/buttons'
 import { CALIBRATION_PROBE } from '../../PipetteWizardFlows/constants'
 import { TerseOffsetTable } from '../ResultsSummary'
-import { getLabwareDefinitionsFromCommands } from '../utils/labware'
+import { getLabwareDefinitionsFromCommands } from '../../../molecules/Command/utils/getLabwareDefinitionsFromCommands'
 
 import type { LabwareOffset } from '@opentrons/api-client'
 import type {

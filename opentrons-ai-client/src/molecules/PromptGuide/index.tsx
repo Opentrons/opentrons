@@ -57,6 +57,9 @@ export function PromptGuide(): JSX.Element {
               />
             </li>
             <li>
+              <StyledText>{t('pipettes')}</StyledText>
+            </li>
+            <li>
               <StyledText>{t('liquid_locations')}</StyledText>
             </li>
             <li>

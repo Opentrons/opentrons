@@ -33,7 +33,6 @@ from opentrons.protocol_engine.resources.pipette_data_provider import (
 from opentrons.protocol_runner.legacy_command_mapper import (
     LegacyContextCommandError,
     LegacyCommandMapper,
-    LegacyCommandParams,
 )
 from opentrons_shared_data.labware.dev_types import LabwareDefinition
 from opentrons_shared_data.module.dev_types import ModuleDefinitionV3
@@ -73,11 +72,10 @@ def test_map_before_command() -> None:
         pe_actions.QueueCommandAction(
             command_id="command.COMMENT-0",
             created_at=matchers.IsA(datetime),
-            request=pe_commands.CustomCreate(
+            request=pe_commands.CommentCreate(
                 key="command.COMMENT-0",
-                params=LegacyCommandParams(
-                    legacyCommandType="command.COMMENT",
-                    legacyCommandText="hello world",
+                params=pe_commands.CommentParams(
+                    message="hello world",
                 ),
             ),
             request_hash=None,
@@ -114,18 +112,17 @@ def test_map_after_command() -> None:
     assert result == [
         pe_actions.SucceedCommandAction(
             private_result=None,
-            command=pe_commands.Custom.construct(
+            command=pe_commands.Comment.construct(
                 id="command.COMMENT-0",
                 key="command.COMMENT-0",
                 status=pe_commands.CommandStatus.SUCCEEDED,
                 createdAt=matchers.IsA(datetime),
                 startedAt=matchers.IsA(datetime),
                 completedAt=matchers.IsA(datetime),
-                params=LegacyCommandParams(
-                    legacyCommandType="command.COMMENT",
-                    legacyCommandText="hello world",
+                params=pe_commands.CommentParams(
+                    message="hello world",
                 ),
-                result=pe_commands.CustomResult(),
+                result=pe_commands.CommentResult(),
                 notes=[],
             ),
         )
@@ -212,11 +209,10 @@ def test_command_stack() -> None:
         pe_actions.QueueCommandAction(
             command_id="command.COMMENT-0",
             created_at=matchers.IsA(datetime),
-            request=pe_commands.CustomCreate(
+            request=pe_commands.CommentCreate(
                 key="command.COMMENT-0",
-                params=LegacyCommandParams(
-                    legacyCommandType="command.COMMENT",
-                    legacyCommandText="hello",
+                params=pe_commands.CommentParams(
+                    message="hello",
                 ),
             ),
             request_hash=None,
@@ -227,11 +223,10 @@ def test_command_stack() -> None:
         pe_actions.QueueCommandAction(
             command_id="command.COMMENT-1",
             created_at=matchers.IsA(datetime),
-            request=pe_commands.CustomCreate(
+            request=pe_commands.CommentCreate(
                 key="command.COMMENT-1",
-                params=LegacyCommandParams(
-                    legacyCommandType="command.COMMENT",
-                    legacyCommandText="goodbye",
+                params=pe_commands.CommentParams(
+                    message="goodbye",
                 ),
             ),
             request_hash=None,
@@ -241,18 +236,17 @@ def test_command_stack() -> None:
         ),
         pe_actions.SucceedCommandAction(
             private_result=None,
-            command=pe_commands.Custom.construct(
+            command=pe_commands.Comment.construct(
                 id="command.COMMENT-0",
                 key="command.COMMENT-0",
                 status=pe_commands.CommandStatus.SUCCEEDED,
                 createdAt=matchers.IsA(datetime),
                 startedAt=matchers.IsA(datetime),
                 completedAt=matchers.IsA(datetime),
-                params=LegacyCommandParams(
-                    legacyCommandType="command.COMMENT",
-                    legacyCommandText="hello",
+                params=pe_commands.CommentParams(
+                    message="hello",
                 ),
-                result=pe_commands.CustomResult(),
+                result=pe_commands.CommentResult(),
                 notes=[],
             ),
         ),

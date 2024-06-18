@@ -17,7 +17,7 @@ import type {
   Sign,
   StepSize,
 } from '../../../../molecules/JogControls/types'
-import type { DropTipFlowsStep } from '../../types'
+import type { DropTipFlowsStep, FixitCommandTypeUtils } from '../../types'
 import type { SetRobotErrorDetailsParams } from '../errors'
 import type { UseDTWithTypeParams } from '..'
 import type { RunCommandByCommandTypeParams } from './useDropTipCreateCommands'
@@ -33,6 +33,7 @@ type UseDropTipSetupCommandsParams = UseDTWithTypeParams & {
   runCommand: (params: RunCommandByCommandTypeParams) => Promise<CommandData>
   setErrorDetails: (errorDetails: SetRobotErrorDetailsParams) => void
   toggleIsExiting: () => void
+  fixitCommandTypeUtils?: FixitCommandTypeUtils
 }
 
 export interface UseDropTipCommandsResult {
@@ -58,6 +59,7 @@ export function useDropTipCommands({
   setErrorDetails,
   instrumentModelSpecs,
   robotType,
+  fixitCommandTypeUtils,
 }: UseDropTipSetupCommandsParams): UseDropTipCommandsResult {
   const [hasSeenClose, setHasSeenClose] = React.useState(false)
 
@@ -125,6 +127,13 @@ export function useDropTipCommands({
           })
           .then(resolve)
           .catch(error => {
+            if (
+              fixitCommandTypeUtils != null &&
+              issuedCommandsType === 'fixit'
+            ) {
+              fixitCommandTypeUtils.errorOverrides.generalFailure()
+            }
+
             reject(
               new Error(`Error issuing move to addressable area: ${error}`)
             )
@@ -151,6 +160,10 @@ export function useDropTipCommands({
           resolve()
         })
         .catch((error: Error) => {
+          if (fixitCommandTypeUtils != null && issuedCommandsType === 'fixit') {
+            fixitCommandTypeUtils.errorOverrides.generalFailure()
+          }
+
           setErrorDetails({
             message: `Error issuing jog command: ${error.message}`,
           })
@@ -173,6 +186,17 @@ export function useDropTipCommands({
         .then((commandData: CommandData[]) => {
           const error = commandData[0].data.error
           if (error != null) {
+            if (
+              fixitCommandTypeUtils != null &&
+              issuedCommandsType === 'fixit'
+            ) {
+              if (currentStep === POSITION_AND_BLOWOUT) {
+                fixitCommandTypeUtils.errorOverrides.blowoutFailed()
+              } else {
+                fixitCommandTypeUtils.errorOverrides.tipDropFailed()
+              }
+            }
+
             setErrorDetails({
               runCommandError: error,
               message: `Error moving to position: ${error.detail}`,
@@ -183,6 +207,14 @@ export function useDropTipCommands({
           }
         })
         .catch((error: Error) => {
+          if (fixitCommandTypeUtils != null && issuedCommandsType === 'fixit') {
+            if (currentStep === POSITION_AND_BLOWOUT) {
+              fixitCommandTypeUtils.errorOverrides.blowoutFailed()
+            } else {
+              fixitCommandTypeUtils.errorOverrides.tipDropFailed()
+            }
+          }
+
           setErrorDetails({
             message: `Error issuing ${
               currentStep === POSITION_AND_BLOWOUT ? 'blowout' : 'drop tip'
