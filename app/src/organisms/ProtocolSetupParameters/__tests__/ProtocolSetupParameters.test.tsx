@@ -101,6 +101,24 @@ describe('ProtocolSetupParameters', () => {
     expect(screen.getAllByText('On')).toHaveLength(3)
   })
 
+  it('renders the other setting when int param', () => {
+    render(props)
+    screen.getByText('4 mL')
+    screen.getByText('Columns of Samples')
+  })
+
+  it('renders the other setting when float param', () => {
+    render(props)
+    screen.getByText('6.5')
+    screen.getByText('EtoH Volume')
+  })
+
+  it('renders the other setting when csv param', () => {
+    vi.mocked(useFeatureFlag).mockReturnValue(true)
+    render(props)
+    screen.getByText('CSV File')
+  })
+
   it('renders the back icon and calls useHistory', () => {
     render(props)
     fireEvent.click(screen.getAllByRole('button')[0])
