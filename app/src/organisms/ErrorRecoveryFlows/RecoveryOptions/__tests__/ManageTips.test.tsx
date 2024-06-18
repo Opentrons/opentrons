@@ -231,21 +231,21 @@ describe('useDropTipFlowUtils', () => {
   it('should return the correct error overrides', () => {
     const { result } = renderHook(() => useDropTipFlowUtils(mockProps))
 
-    result.current.errorOverrides.tipDropFailedCb()
+    result.current.errorOverrides.tipDropFailed()
 
     expect(mockProceedToRouteAndStep).toHaveBeenCalledWith(
       ERROR_WHILE_RECOVERING.ROUTE,
       ERROR_WHILE_RECOVERING.STEPS.DROP_TIP_TIP_DROP_FAILED
     )
 
-    result.current.errorOverrides.blowoutFailedCb()
+    result.current.errorOverrides.blowoutFailed()
 
     expect(mockProceedToRouteAndStep).toHaveBeenCalledWith(
       ERROR_WHILE_RECOVERING.ROUTE,
       ERROR_WHILE_RECOVERING.STEPS.DROP_TIP_BLOWOUT_FAILED
     )
 
-    result.current.errorOverrides.generalFailureCb()
+    result.current.errorOverrides.generalFailure()
 
     expect(mockProceedToRouteAndStep).toHaveBeenCalledWith(
       ERROR_WHILE_RECOVERING.ROUTE,

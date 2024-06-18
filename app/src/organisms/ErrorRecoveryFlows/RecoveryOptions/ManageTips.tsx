@@ -211,19 +211,19 @@ export function useDropTipFlowUtils({
 
   const buildErrorOverrides = (): FixitCommandTypeUtils['errorOverrides'] => {
     return {
-      tipDropFailedCb: () => {
+      tipDropFailed: () => {
         return proceedToRouteAndStep(
           ERROR_WHILE_RECOVERING.ROUTE,
           ERROR_WHILE_RECOVERING.STEPS.DROP_TIP_TIP_DROP_FAILED
         )
       },
-      blowoutFailedCb: () => {
+      blowoutFailed: () => {
         return proceedToRouteAndStep(
           ERROR_WHILE_RECOVERING.ROUTE,
           ERROR_WHILE_RECOVERING.STEPS.DROP_TIP_BLOWOUT_FAILED
         )
       },
-      generalFailureCb: () =>
+      generalFailure: () =>
         proceedToRouteAndStep(
           ERROR_WHILE_RECOVERING.ROUTE,
           ERROR_WHILE_RECOVERING.STEPS.DROP_TIP_GENERAL_ERROR

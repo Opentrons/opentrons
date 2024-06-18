@@ -131,7 +131,7 @@ export function useDropTipCommands({
               fixitCommandTypeUtils != null &&
               issuedCommandsType === 'fixit'
             ) {
-              void fixitCommandTypeUtils.errorOverrides.generalFailureCb()
+              fixitCommandTypeUtils.errorOverrides.generalFailure()
             }
 
             reject(
@@ -161,7 +161,7 @@ export function useDropTipCommands({
         })
         .catch((error: Error) => {
           if (fixitCommandTypeUtils != null && issuedCommandsType === 'fixit') {
-            void fixitCommandTypeUtils.errorOverrides.generalFailureCb()
+            fixitCommandTypeUtils.errorOverrides.generalFailure()
           }
 
           setErrorDetails({
@@ -191,9 +191,9 @@ export function useDropTipCommands({
               issuedCommandsType === 'fixit'
             ) {
               if (currentStep === POSITION_AND_BLOWOUT) {
-                void fixitCommandTypeUtils.errorOverrides.blowoutFailedCb()
+                fixitCommandTypeUtils.errorOverrides.blowoutFailed()
               } else {
-                void fixitCommandTypeUtils.errorOverrides.tipDropFailedCb()
+                fixitCommandTypeUtils.errorOverrides.tipDropFailed()
               }
             }
 
@@ -209,9 +209,9 @@ export function useDropTipCommands({
         .catch((error: Error) => {
           if (fixitCommandTypeUtils != null && issuedCommandsType === 'fixit') {
             if (currentStep === POSITION_AND_BLOWOUT) {
-              void fixitCommandTypeUtils.errorOverrides.blowoutFailedCb()
+              fixitCommandTypeUtils.errorOverrides.blowoutFailed()
             } else {
-              void fixitCommandTypeUtils.errorOverrides.tipDropFailedCb()
+              fixitCommandTypeUtils.errorOverrides.tipDropFailed()
             }
           }
 

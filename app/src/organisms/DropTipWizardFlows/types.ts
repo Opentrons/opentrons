@@ -20,9 +20,9 @@ interface CopyOverrides {
 }
 
 interface ErrorOverrides {
-  blowoutFailedCb: () => Promise<void>
-  tipDropFailedCb: () => Promise<void>
-  generalFailureCb: () => Promise<void>
+  blowoutFailed: () => void
+  tipDropFailed: () => void
+  generalFailure: () => void
 }
 
 export interface FixitCommandTypeUtils {
