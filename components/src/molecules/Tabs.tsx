@@ -5,7 +5,7 @@ import { COLORS, BORDERS } from '../helix-design-system'
 import { POSITION_RELATIVE, DIRECTION_COLUMN, DIRECTION_ROW } from '../styles'
 import { Flex } from '../primitives'
 
-const defaultTabStyle = css`
+const DEFAULT_TAB_STYLE = css`
   ${TYPOGRAPHY.pSemiBold}
   color: ${COLORS.black90};
   background-color: ${COLORS.purple30};
@@ -28,8 +28,8 @@ const defaultTabStyle = css`
     color: ${COLORS.grey40};
   }
 `
-const currentTabStyle = css`
-  ${defaultTabStyle}
+const CURRENT_TAB_STYLE = css`
+  ${DEFAULT_TAB_STYLE}
   color: ${COLORS.white};
   background-color: ${COLORS.purple50};
 
@@ -39,7 +39,7 @@ const currentTabStyle = css`
 `
 
 export interface TabsProps {
-  buttons: Array<{
+  tabs: Array<{
     text: string
     onClick: () => void
     isActive?: boolean
@@ -48,7 +48,7 @@ export interface TabsProps {
 }
 
 export function Tabs(props: TabsProps): JSX.Element {
-  const { buttons } = props
+  const { tabs } = props
 
   return (
     <Flex
@@ -57,16 +57,16 @@ export function Tabs(props: TabsProps): JSX.Element {
       padding={SPACING.spacing16}
     >
       <Flex flexDirection={DIRECTION_ROW} gridGap={SPACING.spacing4}>
-        {buttons.map((button, index) => (
+        {tabs.map((tab, index) => (
           <button
             key={index}
             onClick={() => {
-              button.onClick()
+              tab.onClick()
             }}
-            css={button.isActive === true ? currentTabStyle : defaultTabStyle}
-            disabled={button.disabled}
+            css={tab.isActive === true ? CURRENT_TAB_STYLE : DEFAULT_TAB_STYLE}
+            disabled={tab.disabled}
           >
-            {button.text}
+            {tab.text}
           </button>
         ))}
       </Flex>

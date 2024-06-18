@@ -8,7 +8,7 @@ const meta: Meta<typeof TabComponent> = {
   component: TabComponent,
 
   argTypes: {
-    buttons: {
+    tabs: {
       control: {
         type: 'array',
       },
@@ -22,7 +22,7 @@ type Story = StoryObj<typeof TabComponent>
 
 export const Tabs: Story = {
   args: {
-    buttons: [
+    tabs: [
       {
         text: 'Setup',
         isActive: false,
@@ -52,21 +52,21 @@ export const Tabs: Story = {
   render: function TabsStory() {
     const [args, setArgs] = useArgs<React.ComponentProps<typeof TabComponent>>()
 
-    const modifiedButtons = args.buttons.map((button, index) => {
+    const modifiedButtons = args.tabs.map((button, index) => {
       const modifiedButton = {
         ...button,
         onClick: () => {
-          const updatedButtons = args.buttons.map((btn, i) => ({
+          const updatedButtons = args.tabs.map((btn, i) => ({
             ...btn,
             isActive: i === index,
           }))
-          setArgs({ ...args, buttons: updatedButtons })
+          setArgs({ ...args, tabs: updatedButtons })
           button.onClick()
         },
       }
       return modifiedButton
     })
 
-    return <TabComponent buttons={modifiedButtons} />
+    return <TabComponent tabs={modifiedButtons} />
   },
 }
