@@ -70,7 +70,7 @@ export function ProtocolCard(props: ProtocolCardProps): JSX.Element {
   const longpress = useLongPress()
   const queryClient = useQueryClient()
   const host = useHost()
-  // ToDo (kk:06/12/2024) remove later
+  // ToDo (kk:06/12/2024) this will be removed when we freeze the code
   const enableCsvFile = useFeatureFlag('enableCsvFile')
 
   const { id: protocolId, analysisSummaries } = protocol
@@ -106,8 +106,9 @@ export function ProtocolCard(props: ProtocolCardProps): JSX.Element {
         analysisForProtocolCard.result === 'not-ok')) ??
     false
 
-  // ToDo get status from analysis
-  const isRequiredCSV = enableCsvFile && true && protocolName.includes('RTP')
+  // ToDo (kk:06/18/2024) this part will be updated when Nick's PR is merged into edge
+  // https://github.com/Opentrons/opentrons/pull/15440
+  const isRequiredCSV = enableCsvFile && protocolName.includes('RTP')
 
   const isPendingAnalysis = analysisForProtocolCard == null
 
@@ -208,6 +209,7 @@ export function ProtocolCard(props: ProtocolCardProps): JSX.Element {
       padding={SPACING.spacing24}
       ref={longpress.ref}
       css={PUSHED_STATE_STYLE}
+      data-testid="protocol_card"
     >
       {isPendingAnalysis ? (
         <Icon
@@ -250,7 +252,7 @@ export function ProtocolCard(props: ProtocolCardProps): JSX.Element {
             <Icon
               name="ot-alert"
               size="1.5rem"
-              aria-label="failedAnalysis_icon"
+              aria-label="requiresCsv_file_icon"
             />
             <StyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
               {t('requires_csv')}

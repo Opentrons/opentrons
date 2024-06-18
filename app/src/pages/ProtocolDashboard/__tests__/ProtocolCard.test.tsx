@@ -2,6 +2,8 @@ import * as React from 'react'
 import { vi, it, describe, expect, beforeEach } from 'vitest'
 import { act, fireEvent, screen } from '@testing-library/react'
 import { MemoryRouter } from 'react-router-dom'
+
+import { COLORS } from '@opentrons/components'
 import {
   useMostRecentSuccessfulAnalysisAsDocumentQuery,
   useProtocolAnalysisAsDocumentQuery,
@@ -9,6 +11,7 @@ import {
 
 import { renderWithProviders } from '../../../__testing-utils__'
 import { i18n } from '../../../i18n'
+import { useFeatureFlag } from '../../../redux/config'
 import { ProtocolCard } from '../ProtocolCard'
 
 import type * as ReactRouterDom from 'react-router-dom'
@@ -28,6 +31,7 @@ vi.mock('react-router-dom', async importOriginal => {
   }
 })
 vi.mock('@opentrons/react-api-client')
+vi.mock('../../../redux/config')
 
 const mockProtocol: ProtocolResource = {
   id: 'mockProtocol1',
@@ -46,16 +50,24 @@ const mockProtocol: ProtocolResource = {
   key: '26ed5a82-502f-4074-8981-57cdda1d066d',
 }
 
-const props = {
-  protocol: mockProtocol,
-  longPress: vi.fn(),
-  setTargetProtocol: vi.fn(),
-  setShowDeleteConfirmationModal: vi.fn(),
-  setTargetProtocolId: vi.fn(),
-  setIsRequiredCSV: vi.fn(),
+const mockProtocolWithCSV: ProtocolResource = {
+  id: 'mockProtocol2',
+  createdAt: '2022-05-03T21:36:12.494778+00:00',
+  protocolType: 'json',
+  robotType: 'OT-3 Standard',
+  metadata: {
+    protocolName: 'yay mock RTP protocol',
+    author: 'engineering',
+    description: 'A short mock protocol',
+    created: 1606853851893,
+    tags: ['unitTest'],
+  },
+  analysisSummaries: [],
+  files: [],
+  key: '26ed5a82-502f-4074-8981-57cdda1d066d',
 }
 
-const render = () => {
+const render = (props: React.ComponentProps<typeof ProtocolCard>) => {
   return renderWithProviders(
     <MemoryRouter>
       <ProtocolCard {...props} />
@@ -67,19 +79,31 @@ const render = () => {
 }
 
 describe('ProtocolCard', () => {
+  let props: React.ComponentProps<typeof ProtocolCard>
   vi.useFakeTimers()
 
   beforeEach(() => {
+    props = {
+      protocol: mockProtocol,
+      longPress: vi.fn(),
+      setShowDeleteConfirmationModal: vi.fn(),
+      setTargetProtocolId: vi.fn(),
+      setIsRequiredCSV: vi.fn(),
+    }
     vi.mocked(useProtocolAnalysisAsDocumentQuery).mockReturnValue({
       data: { result: 'ok' } as any,
     } as UseQueryResult<CompletedProtocolAnalysis>)
     vi.mocked(useMostRecentSuccessfulAnalysisAsDocumentQuery).mockReturnValue({
       data: { result: 'ok' } as any,
     } as UseQueryResult<CompletedProtocolAnalysis>)
+    vi.mocked(useFeatureFlag).mockReturnValue(false)
   })
+
   it('should redirect to protocol details after short click', () => {
-    render()
+    render(props)
     const name = screen.getByText('yay mock protocol')
+    const card = screen.getByTestId('protocol_card')
+    expect(card).toHaveStyle(`background-color: ${COLORS.grey35}`)
     fireEvent.click(name)
     expect(mockPush).toHaveBeenCalledWith('/protocols/mockProtocol1')
   })
@@ -91,7 +115,8 @@ describe('ProtocolCard', () => {
     vi.mocked(useMostRecentSuccessfulAnalysisAsDocumentQuery).mockReturnValue({
       data: { result: 'not-ok', errors: ['some analysis error'] } as any,
     } as UseQueryResult<CompletedProtocolAnalysis>)
-    render()
+    render(props)
+
     screen.getByLabelText('failedAnalysis_icon')
     screen.getByText('Failed analysis')
     fireEvent.click(screen.getByText('yay mock protocol'))
@@ -108,7 +133,8 @@ describe('ProtocolCard', () => {
 
   it('should display modal after long click', async () => {
     vi.useFakeTimers()
-    render()
+    render(props)
+
     const name = screen.getByText('yay mock protocol')
     fireEvent.mouseDown(name)
     act(() => {
@@ -128,7 +154,8 @@ describe('ProtocolCard', () => {
     vi.mocked(useMostRecentSuccessfulAnalysisAsDocumentQuery).mockReturnValue({
       data: { result: 'not-ok', errors: ['some analysis error'] } as any,
     } as UseQueryResult<CompletedProtocolAnalysis>)
-    render()
+
+    render(props)
     const name = screen.getByText('yay mock protocol')
     fireEvent.mouseDown(name)
     act(() => {
@@ -137,6 +164,8 @@ describe('ProtocolCard', () => {
     expect(props.longPress).toHaveBeenCalled()
     screen.getByLabelText('failedAnalysis_icon')
     screen.getByText('Failed analysis')
+    const card = screen.getByTestId('protocol_card')
+    expect(card).toHaveStyle(`background-color: ${COLORS.red35}`)
     fireEvent.click(screen.getByText('yay mock protocol'))
     screen.getByText('Protocol analysis failed')
     screen.getByText(
@@ -152,7 +181,8 @@ describe('ProtocolCard', () => {
     vi.mocked(useMostRecentSuccessfulAnalysisAsDocumentQuery).mockReturnValue({
       data: null as any,
     } as UseQueryResult<CompletedProtocolAnalysis>)
-    render()
+
+    render(props)
     const name = screen.getByText('yay mock protocol')
     fireEvent.mouseDown(name)
     act(() => {
@@ -161,5 +191,15 @@ describe('ProtocolCard', () => {
     expect(props.longPress).toHaveBeenCalled()
     screen.getByLabelText('Protocol is loading')
     fireEvent.click(screen.getByText('yay mock protocol'))
+  })
+
+  // ToDO (kk:06/18/2024)this test case will be updated
+  it('should render text, yellow background color, and icon when a protocol requires a csv file', () => {
+    vi.mocked(useFeatureFlag).mockReturnValue(true)
+    render({ ...props, protocol: mockProtocolWithCSV })
+    screen.getByLabelText('requiresCsv_file_icon')
+    screen.getByText('Requires CSV')
+    const card = screen.getByTestId('protocol_card')
+    expect(card).toHaveStyle(`background-color: ${COLORS.yellow35}`)
   })
 })

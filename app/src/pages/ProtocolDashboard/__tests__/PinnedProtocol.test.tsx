@@ -7,6 +7,7 @@ import { COLORS, TYPOGRAPHY } from '@opentrons/components'
 
 import { renderWithProviders } from '../../../__testing-utils__'
 import { i18n } from '../../../i18n'
+import { useFeatureFlag } from '../../../redux/config'
 import { PinnedProtocol } from '../PinnedProtocol'
 
 import type { Chip } from '@opentrons/components'
@@ -29,6 +30,7 @@ vi.mock('@opentrons/components', async importOriginal => {
     Chip: () => <div>mock Chip</div>,
   }
 })
+vi.mock('../../../redux/config')
 
 const mockProtocol: ProtocolResource = {
   id: 'mockProtocol1',
@@ -69,7 +71,7 @@ describe('Pinned Protocol', () => {
       setShowDeleteConfirmationModal: vi.fn(),
       setTargetProtocolId: vi.fn(),
     }
-    // vi.mocked(Chip).mockReturnValue(<div>mock chip</div>)
+    vi.mocked(useFeatureFlag).mockReturnValue(false)
   })
 
   it('should display text - full', () => {
@@ -136,6 +138,7 @@ describe('Pinned Protocol', () => {
   })
 
   it('should render yellow background and a chip when a protocol requires a csv file', () => {
+    vi.mocked(useFeatureFlag).mockReturnValue(true)
     props = { ...props, isRequiredCSV: true }
     render(props)
     const pinnedProtocolCard = screen.getByTestId('full_pinned_protocol_card')
