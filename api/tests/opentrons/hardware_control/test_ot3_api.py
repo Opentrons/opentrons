@@ -116,7 +116,6 @@ def fake_settings() -> CapacitivePassSettings:
 def fake_liquid_settings() -> LiquidProbeSettings:
     return LiquidProbeSettings(
         starting_mount_height=100,
-        max_z_distance=15,
         mount_speed=40,
         plunger_speed=10,
         sensor_threshold_pascals=15,
@@ -825,7 +824,6 @@ async def test_liquid_probe(
         mock_liquid_probe.return_value = return_dict
         fake_settings_aspirate = LiquidProbeSettings(
             starting_mount_height=100,
-            max_z_distance=15,
             mount_speed=40,
             plunger_speed=10,
             sensor_threshold_pascals=15,
@@ -894,7 +892,6 @@ async def test_multi_liquid_probe(
         mock_liquid_probe.side_effect = side_effects
         fake_settings_aspirate = LiquidProbeSettings(
             starting_mount_height=100,
-            max_z_distance=3,
             mount_speed=1,
             plunger_speed=71.5,
             sensor_threshold_pascals=15,
@@ -963,7 +960,6 @@ async def test_liquid_not_found(
         mock_liquid_probe.side_effect = side_effects
         fake_settings_aspirate = LiquidProbeSettings(
             starting_mount_height=100,
-            max_z_distance=3,
             mount_speed=1,
             plunger_speed=71.5,
             sensor_threshold_pascals=15,
