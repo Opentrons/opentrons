@@ -1,9 +1,10 @@
 """Union types of concrete command definitions."""
 
-from typing import Union
-from typing_extensions import Annotated
+from typing import Annotated, Iterable, Type, Union, get_type_hints
 
 from pydantic import Field
+
+from opentrons.util.get_union_elements import get_union_elements
 
 from .command import DefinedErrorData
 from .pipetting_common import OverpressureError, OverpressureErrorInternalData
@@ -426,7 +427,6 @@ CommandParams = Union[
     thermocycler.OpenLidParams,
     thermocycler.CloseLidParams,
     thermocycler.RunProfileParams,
-    thermocycler.RunProfileStepParams,
     absorbance_reader.InitializeParams,
     absorbance_reader.MeasureAbsorbanceParams,
     calibration.CalibrateGripperParams,
@@ -633,6 +633,10 @@ CommandResult = Union[
     calibration.MoveToMaintenancePositionResult,
 ]
 
+# todo(mm, 2024-06-12): Ideally, command return types would have specific
+# CommandPrivateResults paired with specific CommandResults. For example,
+# a TouchTipResult can never be paired with a LoadPipettePrivateResult in practice,
+# and ideally our types would reflect that.
 CommandPrivateResult = Union[
     None,
     LoadPipettePrivateResult,
@@ -645,3 +649,18 @@ CommandDefinedErrorData = Union[
     DefinedErrorData[TipPhysicallyMissingError, TipPhysicallyMissingErrorInternalData],
     DefinedErrorData[OverpressureError, OverpressureErrorInternalData],
 ]
+
+
+def _map_create_types_by_params_type(
+    create_types: Iterable[Type[CommandCreate]],
+) -> dict[Type[CommandParams], Type[CommandCreate]]:
+    def get_params_type(create_type: Type[CommandCreate]) -> Type[CommandParams]:
+        return get_type_hints(create_type)["params"]  # type: ignore[no-any-return]
+
+    return {get_params_type(create_type): create_type for create_type in create_types}
+
+
+CREATE_TYPES_BY_PARAMS_TYPE = _map_create_types_by_params_type(
+    get_union_elements(CommandCreate)
+)
+"""A "reverse" mapping from each CommandParams type to its parent CommandCreate type."""

@@ -17,6 +17,7 @@ from opentrons.drivers.types import (
     ThermocyclerLidStatus,
 )
 from opentrons.types import DeckSlotName
+from opentrons.protocol_engine import commands as cmd
 from opentrons.protocol_engine.clients import SyncClient as ProtocolEngineClient
 from opentrons.protocol_engine.errors.exceptions import (
     LabwareNotLoadedOnModuleError,
@@ -150,8 +151,10 @@ class TemperatureModuleCore(ModuleCore, AbstractTemperatureModuleCore):
 
     def set_target_temperature(self, celsius: float) -> None:
         """Set the Temperature Module's target temperature in °C."""
-        self._engine_client.temperature_module_set_target_temperature(
-            module_id=self.module_id, celsius=celsius
+        self._engine_client.execute_command(
+            cmd.temperature_module.SetTargetTemperatureParams(
+                moduleId=self.module_id, celsius=celsius
+            )
         )
 
     def wait_for_target_temperature(self, celsius: Optional[float] = None) -> None:
@@ -159,13 +162,17 @@ class TemperatureModuleCore(ModuleCore, AbstractTemperatureModuleCore):
         Specifying a value for ``celsius`` that is different than
         the module's current target temperature may behave unpredictably.
         """
-        self._engine_client.temperature_module_wait_for_target_temperature(
-            module_id=self.module_id, celsius=celsius
+        self._engine_client.execute_command(
+            cmd.temperature_module.WaitForTemperatureParams(
+                moduleId=self.module_id, celsius=celsius
+            )
         )
 
     def deactivate(self) -> None:
         """Deactivate the Temperature Module."""
-        self._engine_client.temperature_module_deactivate(module_id=self.module_id)
+        self._engine_client.execute_command(
+            cmd.temperature_module.DeactivateTemperatureParams(moduleId=self.module_id)
+        )
 
     def get_current_temperature(self) -> float:
         """Get the module's current temperature in °C."""
@@ -207,8 +214,10 @@ class MagneticModuleCore(ModuleCore, AbstractMagneticModuleCore):
             height_from_base is not None
         ), "Expected engage height to be specified from base."
 
-        self._engine_client.magnetic_module_engage(
-            module_id=self._module_id, engage_height=height_from_base
+        self._engine_client.execute_command(
+            cmd.magnetic_module.EngageParams(
+                moduleId=self._module_id, height=height_from_base
+            )
         )
 
     def engage_to_labware(
@@ -241,13 +250,17 @@ class MagneticModuleCore(ModuleCore, AbstractMagneticModuleCore):
                 " with the `height_from_base` parameter."
             )
 
-        self._engine_client.magnetic_module_engage(
-            module_id=self.module_id, engage_height=default_height
+        self._engine_client.execute_command(
+            cmd.magnetic_module.EngageParams(
+                moduleId=self.module_id, height=default_height
+            )
         )
 
     def disengage(self) -> None:
         """Lower the magnets back into the module."""
-        self._engine_client.magnetic_module_disengage(module_id=self.module_id)
+        self._engine_client.execute_command(
+            cmd.magnetic_module.DisengageParams(moduleId=self.module_id)
+        )
 
     def get_status(self) -> MagneticStatus:
         """Get the module's current magnet status."""
@@ -263,12 +276,16 @@ class ThermocyclerModuleCore(ModuleCore, AbstractThermocyclerCore):
 
     def open_lid(self) -> ThermocyclerLidStatus:
         """Open the Thermocycler's lid."""
-        self._engine_client.thermocycler_open_lid(module_id=self.module_id)
+        self._engine_client.execute_command(
+            cmd.thermocycler.OpenLidParams(moduleId=self.module_id)
+        )
         return ThermocyclerLidStatus.OPEN
 
     def close_lid(self) -> ThermocyclerLidStatus:
         """Close the Thermocycler's lid."""
-        self._engine_client.thermocycler_close_lid(module_id=self.module_id)
+        self._engine_client.execute_command(
+            cmd.thermocycler.CloseLidParams(moduleId=self.module_id)
+        )
         return ThermocyclerLidStatus.CLOSED
 
     def set_target_block_temperature(
@@ -278,29 +295,33 @@ class ThermocyclerModuleCore(ModuleCore, AbstractThermocyclerCore):
         block_max_volume: Optional[float] = None,
     ) -> None:
         """Set the target temperature for the well block, in °C."""
-        self._engine_client.thermocycler_set_target_block_temperature(
-            module_id=self.module_id,
-            celsius=celsius,
-            block_max_volume=block_max_volume,
-            hold_time_seconds=hold_time_seconds,
+        self._engine_client.execute_command(
+            cmd.thermocycler.SetTargetBlockTemperatureParams(
+                moduleId=self.module_id,
+                celsius=celsius,
+                blockMaxVolumeUl=block_max_volume,
+                holdTimeSeconds=hold_time_seconds,
+            )
         )
 
     def wait_for_block_temperature(self) -> None:
         """Wait for target block temperature to be reached."""
-        self._engine_client.thermocycler_wait_for_block_temperature(
-            module_id=self.module_id
+        self._engine_client.execute_command(
+            cmd.thermocycler.WaitForBlockTemperatureParams(moduleId=self.module_id)
         )
 
     def set_target_lid_temperature(self, celsius: float) -> None:
         """Set the target temperature for the heated lid, in °C."""
-        self._engine_client.thermocycler_set_target_lid_temperature(
-            module_id=self.module_id, celsius=celsius
+        self._engine_client.execute_command(
+            cmd.thermocycler.SetTargetLidTemperatureParams(
+                moduleId=self.module_id, celsius=celsius
+            )
         )
 
     def wait_for_lid_temperature(self) -> None:
         """Wait for target lid temperature to be reached."""
-        self._engine_client.thermocycler_wait_for_lid_temperature(
-            module_id=self.module_id
+        self._engine_client.execute_command(
+            cmd.thermocycler.WaitForLidTemperatureParams(moduleId=self.module_id)
         )
 
     def execute_profile(
@@ -312,20 +333,34 @@ class ThermocyclerModuleCore(ModuleCore, AbstractThermocyclerCore):
         """Execute a Thermocycler Profile."""
         self._repetitions = repetitions
         self._step_count = len(steps)
-        self._engine_client.thermocycler_run_profile(
-            module_id=self.module_id,
-            steps=steps * repetitions,
-            block_max_volume=block_max_volume,
+        engine_steps = [
+            cmd.thermocycler.RunProfileStepParams(
+                celsius=step["temperature"],
+                holdSeconds=step["hold_time_seconds"],
+            )
+            for step in steps
+        ]
+        repeated_engine_steps = engine_steps * repetitions
+        self._engine_client.execute_command(
+            cmd.thermocycler.RunProfileParams(
+                moduleId=self.module_id,
+                profile=repeated_engine_steps,
+                blockMaxVolumeUl=block_max_volume,
+            )
         )
 
     def deactivate_lid(self) -> None:
         """Turn off the heated lid."""
-        self._engine_client.thermocycler_deactivate_lid(module_id=self.module_id)
+        self._engine_client.execute_command(
+            cmd.thermocycler.DeactivateLidParams(moduleId=self.module_id)
+        )
 
     def deactivate_block(self) -> None:
         """Turn off the well block temperature controller"""
         self._clear_cycle_counters()
-        self._engine_client.thermocycler_deactivate_block(module_id=self.module_id)
+        self._engine_client.execute_command(
+            cmd.thermocycler.DeactivateBlockParams(moduleId=self.module_id)
+        )
 
     def deactivate(self) -> None:
         """Turn off the well block temperature controller, and heated lid"""
@@ -407,35 +442,49 @@ class HeaterShakerModuleCore(ModuleCore, AbstractHeaterShakerCore):
 
     def set_target_temperature(self, celsius: float) -> None:
         """Set the labware plate's target temperature in °C."""
-        self._engine_client.heater_shaker_set_target_temperature(
-            module_id=self.module_id, celsius=celsius
+        self._engine_client.execute_command(
+            cmd.heater_shaker.SetTargetTemperatureParams(
+                moduleId=self.module_id, celsius=celsius
+            )
         )
 
     def wait_for_target_temperature(self) -> None:
         """Wait for the labware plate's target temperature to be reached."""
-        self._engine_client.heater_shaker_wait_for_temperature(module_id=self.module_id)
+        self._engine_client.execute_command(
+            cmd.heater_shaker.WaitForTemperatureParams(moduleId=self.module_id)
+        )
 
     def set_and_wait_for_shake_speed(self, rpm: int) -> None:
         """Set the shaker's target shake speed and wait for it to spin up."""
-        self._engine_client.heater_shaker_set_and_wait_for_shake_speed(
-            module_id=self.module_id, rpm=rpm
+        self._engine_client.execute_command(
+            cmd.heater_shaker.SetAndWaitForShakeSpeedParams(
+                moduleId=self.module_id, rpm=rpm
+            )
         )
 
     def open_labware_latch(self) -> None:
         """Open the labware latch."""
-        self._engine_client.heater_shaker_open_labware_latch(module_id=self.module_id)
+        self._engine_client.execute_command(
+            cmd.heater_shaker.OpenLabwareLatchParams(moduleId=self.module_id)
+        )
 
     def close_labware_latch(self) -> None:
         """Close the labware latch."""
-        self._engine_client.heater_shaker_close_labware_latch(module_id=self.module_id)
+        self._engine_client.execute_command(
+            cmd.heater_shaker.CloseLabwareLatchParams(moduleId=self.module_id)
+        )
 
     def deactivate_shaker(self) -> None:
         """Stop shaking."""
-        self._engine_client.heater_shaker_deactivate_shaker(module_id=self.module_id)
+        self._engine_client.execute_command(
+            cmd.heater_shaker.DeactivateShakerParams(moduleId=self.module_id)
+        )
 
     def deactivate_heater(self) -> None:
         """Stop heating."""
-        self._engine_client.heater_shaker_deactivate_heater(module_id=self.module_id)
+        self._engine_client.execute_command(
+            cmd.heater_shaker.DeactivateHeaterParams(moduleId=self.module_id)
+        )
 
     def get_current_temperature(self) -> float:
         """Get the labware plate's current temperature in °C."""
@@ -478,14 +527,19 @@ class AbsorbanceReaderCore(ModuleCore, AbstractAbsorbanceReaderCore):
 
     def initialize(self, wavelength: int) -> None:
         """Initialize the Absorbance Reader by taking zero reading."""
-        self._engine_client.absorbance_reader_initialize(
-            module_id=self.module_id, wavelength=wavelength
+        self._engine_client.execute_command(
+            cmd.absorbance_reader.InitializeParams(
+                moduleId=self.module_id,
+                sampleWavelength=wavelength,
+            ),
         )
         self._initialized_value = wavelength
 
     def initiate_read(self) -> None:
         """Initiate read on the Absorbance Reader."""
         if self._initialized_value:
-            self._engine_client.absorbance_reader_measure(
-                module_id=self.module_id, wavelength=self._initialized_value
+            self._engine_client.execute_command(
+                cmd.absorbance_reader.MeasureAbsorbanceParams(
+                    moduleId=self.module_id, sampleWavelength=self._initialized_value
+                )
             )

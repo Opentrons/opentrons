@@ -2,13 +2,13 @@ import { useTranslation } from 'react-i18next'
 
 import { getLabwareDefURI } from '@opentrons/shared-data'
 
-import { getLabwareDefinitionsFromCommands } from '../LabwarePositionCheck/utils/labware'
 import { getLoadedLabware } from './utils/accessors'
 import {
   getLabwareName,
   getLabwareDisplayLocation,
   getFinalLabwareLocation,
   getWellRange,
+  getLabwareDefinitionsFromCommands,
 } from './utils'
 import type {
   PipetteName,

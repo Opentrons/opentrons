@@ -13,10 +13,8 @@ import {
   HEATERSHAKER_MODULE_TYPE,
 } from '@opentrons/shared-data'
 import { UnorderedList } from '../../molecules/UnorderedList'
-import {
-  getLabwareDef,
-  getLabwareDefinitionsFromCommands,
-} from './utils/labware'
+import { getLabwareDef } from './utils/labware'
+import { getLabwareDefinitionsFromCommands } from '../../molecules/Command/utils/getLabwareDefinitionsFromCommands'
 import { getDisplayLocation } from './utils/getDisplayLocation'
 import { RobotMotionLoader } from './RobotMotionLoader'
 import { PrepareSpace } from './PrepareSpace'
