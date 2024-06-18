@@ -3,9 +3,9 @@ import { renderHook } from '@testing-library/react'
 
 import { useMostRecentCompletedAnalysis } from '../../../../organisms/LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import { useRunningStepCounts } from '../useRunningStepCounts'
-import { useLastRunCommandNoFixit } from '../useLastRunCommandNoFixit'
+import { useLastRunProtocolCommand } from '../useLastRunProtocolCommand'
 
-vi.mock('../useLastRunCommandNoFixit')
+vi.mock('../useLastRunProtocolCommand')
 vi.mock(
   '../../../../organisms/LabwarePositionCheck/useMostRecentCompletedAnalysis'
 )
@@ -25,7 +25,7 @@ describe('useRunningStepCounts', () => {
       commands: [{ key: 'key1' }, { key: 'key2' }, { key: 'key3' }],
     } as any
     vi.mocked(useMostRecentCompletedAnalysis).mockReturnValue(mockAnalysis)
-    vi.mocked(useLastRunCommandNoFixit).mockReturnValue({ key: 'key2' } as any)
+    vi.mocked(useLastRunProtocolCommand).mockReturnValue({ key: 'key2' } as any)
 
     const { result } = renderHook(() =>
       useRunningStepCounts(mockRunId, mockCommandsData)
@@ -40,7 +40,7 @@ describe('useRunningStepCounts', () => {
 
   it('returns current step number and null total step count for a non-deterministic run', () => {
     vi.mocked(useMostRecentCompletedAnalysis).mockReturnValue(null)
-    vi.mocked(useLastRunCommandNoFixit).mockReturnValue(null)
+    vi.mocked(useLastRunProtocolCommand).mockReturnValue(null)
 
     const { result } = renderHook(() =>
       useRunningStepCounts(mockRunId, mockCommandsData)
@@ -55,7 +55,7 @@ describe('useRunningStepCounts', () => {
 
   it('returns null current step number and total step count when analysis and run command data are not available', () => {
     vi.mocked(useMostRecentCompletedAnalysis).mockReturnValue(null)
-    vi.mocked(useLastRunCommandNoFixit).mockReturnValue(null)
+    vi.mocked(useLastRunProtocolCommand).mockReturnValue(null)
 
     const { result } = renderHook(() =>
       useRunningStepCounts(mockRunId, undefined)

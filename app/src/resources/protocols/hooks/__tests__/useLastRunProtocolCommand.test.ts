@@ -3,15 +3,15 @@ import { describe, expect, it, vi } from 'vitest'
 
 import { useCommandQuery } from '@opentrons/react-api-client'
 
-import { useLastRunCommandNoFixit } from '../useLastRunCommandNoFixit'
+import { useLastRunProtocolCommand } from '../useLastRunProtocolCommand'
 
 vi.mock('@opentrons/react-api-client')
 
 const mockRunId = 'mock-run-id'
 const mockCommandsData = {
   data: [
-    { id: 'cmd1', key: 'key1' },
-    { id: 'cmd2', key: 'key2' },
+    { id: 'cmd1', key: 'key1', intent: 'protocol' },
+    { id: 'cmd2', key: 'key2', intent: 'protocol' },
   ],
   meta: { totalLength: 2 },
 } as any
@@ -21,10 +21,14 @@ describe('useLastRunCommandNoFixit', () => {
     vi.mocked(useCommandQuery).mockReturnValue({ data: null } as any)
 
     const { result } = renderHook(() =>
-      useLastRunCommandNoFixit(mockRunId, mockCommandsData)
+      useLastRunProtocolCommand(mockRunId, mockCommandsData)
     )
 
-    expect(result.current).toEqual({ id: 'cmd2', key: 'key2' })
+    expect(result.current).toEqual({
+      id: 'cmd2',
+      key: 'key2',
+      intent: 'protocol',
+    })
   })
 
   it('returns the failed command when the last run command is a fixit command', () => {
@@ -39,7 +43,7 @@ describe('useLastRunCommandNoFixit', () => {
     } as any)
 
     const { result } = renderHook(() =>
-      useLastRunCommandNoFixit(mockRunId, {
+      useLastRunProtocolCommand(mockRunId, {
         data: [mockFixitCommand],
         meta: { totalLength: 1 },
       } as any)
@@ -50,7 +54,7 @@ describe('useLastRunCommandNoFixit', () => {
 
   it('returns null when there are no run commands', () => {
     const { result } = renderHook(() =>
-      useLastRunCommandNoFixit(mockRunId, null)
+      useLastRunProtocolCommand(mockRunId, null)
     )
 
     expect(result.current).toBeNull()

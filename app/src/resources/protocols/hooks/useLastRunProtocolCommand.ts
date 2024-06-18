@@ -4,27 +4,26 @@ import { useCommandQuery } from '@opentrons/react-api-client'
 
 import type { CommandsData, RunCommandSummary } from '@opentrons/api-client'
 
-// Return the last run command is not a "fixit" command. If it is a "fixit" command,
-// return the command that failed (ie, the last run command without a fixit intent).
-export function useLastRunCommandNoFixit(
+// Return the last command with a "protocol" intent. If the command does not have "protocol" intent,
+// return the last command with "protocol" intent.
+export function useLastRunProtocolCommand(
   runId: string,
   commandsData: CommandsData | null
 ): RunCommandSummary | null {
   const lastRunCommand = last(commandsData?.data) ?? null
 
-  const isFixitIntent =
-    lastRunCommand != null && lastRunCommand.intent === 'fixit'
+  const isProtocolIntent = lastRunCommand?.intent === 'protocol'
 
   // Get the failed command from the fixit command.
   const lastRunCommandActual = useCommandQuery(
     runId,
     lastRunCommand?.failedCommandId ?? null,
     {
-      enabled: isFixitIntent,
+      enabled: !isProtocolIntent && lastRunCommand != null,
     }
   )
 
-  return isFixitIntent
+  return !isProtocolIntent && lastRunCommand != null
     ? lastRunCommandActual.data?.data ?? null
     : lastRunCommand ?? null
 }

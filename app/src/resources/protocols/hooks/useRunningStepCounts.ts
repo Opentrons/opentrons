@@ -1,13 +1,13 @@
 import { useMostRecentCompletedAnalysis } from '../../../organisms/LabwarePositionCheck/useMostRecentCompletedAnalysis'
 
-import { useLastRunCommandNoFixit } from './useLastRunCommandNoFixit'
+import { useLastRunProtocolCommand } from './useLastRunProtocolCommand'
 
 import type { CommandsData } from '@opentrons/api-client'
 
 export interface StepCounts {
-  /* Excludes "fixit" commands. Returns -1 if the step is not found. */
+  /* Excludes "fixit" commands. Returns null if the step is not found. */
   currentStepNumber: number | null
-  /* Returns null if the run is non-deterministic or the total command count is not found. */
+  /* Returns null if the run has diverged or the total command count is not found. */
   totalStepCount: number | null
   /* Returns whether the run has diverged from analysis. */
   hasRunDiverged: boolean
@@ -30,7 +30,7 @@ export function useRunningStepCounts(
 ): StepCounts {
   const analysis = useMostRecentCompletedAnalysis(runId)
   const analysisCommands = analysis?.commands ?? []
-  const lastRunCommandNoFixit = useLastRunCommandNoFixit(
+  const lastRunCommandNoFixit = useLastRunProtocolCommand(
     runId,
     commandsData ?? null
   )
