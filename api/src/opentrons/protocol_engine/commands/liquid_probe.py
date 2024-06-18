@@ -40,7 +40,9 @@ class LiquidProbeParams(PipetteIdMixin, WellLocationMixin):
 class LiquidProbeResult(DestinationPositionResult):
     """Result data from the execution of a liquid-probe command."""
 
-    z_position: float = Field(..., description="The Z coordinate, in mm, of the found liquid in deck space.")
+    z_position: float = Field(
+        ..., description="The Z coordinate, in mm, of the found liquid in deck space."
+    )
 
 
 _ExecuteReturn = Union[
