@@ -3,8 +3,8 @@ from typing import Optional, Dict, Sequence
 from opentrons_shared_data.errors import GeneralError, EnumeratedError, ErrorCodes
 
 
-class FileParameterRequired(GeneralError):
-    """An error raised when a file parameter is required to be set for full analysis."""
+class RuntimeParameterRequired(GeneralError):
+    """An error raised when a parameter is required to be set for full analysis."""
 
     def __init__(
         self,
@@ -12,8 +12,10 @@ class FileParameterRequired(GeneralError):
         detail: Optional[Dict[str, str]] = None,
         wrapping: Optional[Sequence[EnumeratedError]] = None,
     ) -> None:
-        """Build an FileParameterRequired."""
-        super().__init__(ErrorCodes.FILE_PARAMETER_REQUIRED, message, detail, wrapping)
+        """Build an RuntimeParameterRequired."""
+        super().__init__(
+            ErrorCodes.RUNTIME_PARAMETER_VALUE_REQUIRED, message, detail, wrapping
+        )
 
 
 class ParameterValueError(ValueError):

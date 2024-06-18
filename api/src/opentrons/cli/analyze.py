@@ -307,7 +307,7 @@ async def _analyze(
     if len(analysis.state_summary.errors) > 0:
         if any(
             code_in_error_tree(
-                root_error=error, code=ErrorCodes.FILE_PARAMETER_REQUIRED
+                root_error=error, code=ErrorCodes.RUNTIME_PARAMETER_VALUE_REQUIRED
             )
             for error in analysis.state_summary.errors
         ):

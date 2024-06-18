@@ -14,7 +14,7 @@ from opentrons.protocols.parameters.csv_parameter_definition import (
 )
 from opentrons.protocols.parameters.exceptions import (
     ParameterDefinitionError,
-    FileParameterRequired,
+    RuntimeParameterRequired,
 )
 
 
@@ -104,7 +104,7 @@ def test_csv_parameter_as_csv_parameter_interface(
 ) -> None:
     """It should return the CSV parameter interface for use in a protocol run context."""
     result = csv_parameter_subject.as_csv_parameter_interface()
-    with pytest.raises(FileParameterRequired):
+    with pytest.raises(RuntimeParameterRequired):
         result.file
 
     mock_file = tempfile.NamedTemporaryFile(mode="r", suffix=".csv")

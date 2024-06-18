@@ -369,7 +369,7 @@ analysis_result_specs: List[AnalysisResultSpec] = [
                 id="error-id",
                 createdAt=datetime(year=2021, month=1, day=1, tzinfo=timezone.utc),
                 errorType="FakeFileError",
-                errorCode=ErrorCodes.FILE_PARAMETER_REQUIRED.value.code,
+                errorCode=ErrorCodes.RUNTIME_PARAMETER_VALUE_REQUIRED.value.code,
                 detail="oh no",
             )
         ],

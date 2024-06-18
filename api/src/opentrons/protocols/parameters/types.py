@@ -1,7 +1,7 @@
 import csv
 from typing import TypeVar, Union, TypedDict, TextIO, Optional, List
 
-from .exceptions import FileParameterRequired
+from .exceptions import RuntimeParameterRequired
 
 
 class CSVParameter:
@@ -16,14 +16,14 @@ class CSVParameter:
     @property
     def file(self) -> TextIO:
         if self._file is None:
-            raise FileParameterRequired(
+            raise RuntimeParameterRequired(
                 "CSV Parameter needs to be set to a file for full analysis."
             )
         return self._file
 
     def rows(self) -> List[List[str]]:
         if self._file is None:
-            raise FileParameterRequired(
+            raise RuntimeParameterRequired(
                 "CSV Parameter needs to be set to a file for full analysis."
             )
         return self._rows
