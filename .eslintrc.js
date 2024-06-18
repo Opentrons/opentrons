@@ -100,7 +100,6 @@ module.exports = {
         '@typescript-eslint/no-floating-promises': 'warn',
         '@typescript-eslint/no-unnecessary-type-assertion': 'warn',
         '@typescript-eslint/no-unnecessary-boolean-literal-compare': 'warn',
-        '@typescript-eslint/consistent-indexed-object-style': 'warn',
         '@typescript-eslint/ban-types': 'warn',
         '@typescript-eslint/non-nullable-type-assertion-style': 'warn',
         '@typescript-eslint/await-thenable': 'warn',
@@ -108,6 +107,7 @@ module.exports = {
         '@typescript-eslint/unbound-method': 'warn',
         '@typescript-eslint/consistent-generic-constructors': 'warn',
         '@typescript-eslint/no-misused-promises': 'warn',
+        '@typescript-eslint/consistent-indexed-object-style': 'off', // allow both index signatures and records
         // need this to be able to pass in css prop into raw elements (babel adds this at build time for styled-components)
         'react/no-unknown-property': [
           'error',
