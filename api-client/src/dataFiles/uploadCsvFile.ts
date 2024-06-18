@@ -7,21 +7,21 @@ import type { FileData /** UploadedCsvFileResponse */ } from './types'
 
 // export function uploadCsvFile(
 //   config: HostConfig,
-//   fileData: FileData
+//   data FileData
 // ): ResponsePromise<UploadedCsvFileResponse> {
 //   return request<UploadedCsvFileResponse>(
 //     POST,
 //     '/dataFiles',
 //     null,
 //     config,
-//     fileData
+//     data
 //   )
 // }
 
 // ToDo (kk:06/14/2024) remove when activate the above code
 export function uploadCsvFile(
   config: HostConfig,
-  fileData: FileData
+  data: FileData
   // Note (kk: 06/14/2024) temporary using any for useUploadCsvFileMutation
 ): Promise<any> {
   const fileId = uuidv4()
