@@ -7,7 +7,7 @@ import type { FileData /** UploadedCsvFileResponse */ } from './types'
 
 // export function uploadCsvFile(
 //   config: HostConfig,
-//   data: FileData
+//   data FileData
 // ): ResponsePromise<UploadedCsvFileResponse> {
 //   return request<UploadedCsvFileResponse>(
 //     POST,
