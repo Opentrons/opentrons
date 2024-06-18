@@ -181,5 +181,6 @@ class LiquidHandler(
         at the current location.
 
         mount : Mount.LEFT or Mount.RIGHT
+        max_z_dist : maximum depth to probe for liquid
         """
         ...

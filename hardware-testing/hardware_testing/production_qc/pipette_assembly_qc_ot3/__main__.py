@@ -1363,7 +1363,7 @@ async def _test_liquid_probe(
     }
     hover_mm = 3
     max_submerge_mm = -3
-    max_z_distance_machine_coords = hover_mm - max_submerge_mm
+    max_z_distance_machine_coords = hover_mm - max_submerge_mm  # FIXME: deck coords
     assert CALIBRATED_LABWARE_LOCATIONS.plate_primary is not None
     if InstrumentProbeType.SECONDARY in probes:
         assert CALIBRATED_LABWARE_LOCATIONS.plate_secondary is not None
@@ -1376,7 +1376,6 @@ async def _test_liquid_probe(
             probe_cfg = PROBE_SETTINGS[pip_vol][tip_volume]
             probe_settings = LiquidProbeSettings(
                 starting_mount_height=start_pos.z,
-                max_z_distance=max_z_distance_machine_coords,  # FIXME: deck coords
                 mount_speed=probe_cfg.mount_speed,
                 plunger_speed=probe_cfg.plunger_speed,
                 sensor_threshold_pascals=probe_cfg.sensor_threshold_pascals,
@@ -1385,7 +1384,7 @@ async def _test_liquid_probe(
                 data_files=None,
             )
             end_z = await api.liquid_probe(
-                mount, probe_settings.max_z_distance, probe_settings, probe=probe
+                mount, max_z_distance_machine_coords, probe_settings, probe=probe
             )
             if probe == InstrumentProbeType.PRIMARY:
                 pz = CALIBRATED_LABWARE_LOCATIONS.plate_primary.z

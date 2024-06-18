@@ -278,7 +278,8 @@ class VirtualPipettingHandler(PipettingHandler):
         well_name: str,
     ) -> float:
         """Detect liquid level."""
-        return 0.0  # fix
+        # TODO (pm, 6-18-24): return a value of worth if needed
+        return 0.0
 
     def _validate_tip_attached(self, pipette_id: str, command_name: str) -> None:
         """Validate if there is a tip attached."""
