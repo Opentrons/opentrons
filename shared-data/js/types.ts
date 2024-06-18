@@ -122,6 +122,8 @@ export interface LabwareParameters {
   isMagneticModuleCompatible: boolean
   magneticModuleEngageHeight?: number
   quirks?: string[]
+  minimumHeight?: number
+  minimumWellVolume?: number
 }
 
 export interface LabwareBrand {
