@@ -508,6 +508,8 @@
             "isTiprack": false,
             "loadName": "nest_96_wellplate_2ml_deep",
             "magneticModuleEngageHeight": 6.8,
+            "minimumHeight": 0.5,
+            "minimumWellVolume": 0,
             "quirks": []
           },
           "schemaVersion": 2,
@@ -2212,6 +2214,8 @@
             "isMagneticModuleCompatible": false,
             "isTiprack": false,
             "loadName": "opentrons_96_aluminumblock_nest_wellplate_100ul",
+            "minimumHeight": 0.5,
+            "minimumWellVolume": 0,
             "quirks": [
               "gripperIncompatible"
             ]
@@ -3152,6 +3156,8 @@
             "isMagneticModuleCompatible": false,
             "isTiprack": false,
             "loadName": "nest_1_reservoir_195ml",
+            "minimumHeight": 0.5,
+            "minimumWellVolume": 0,
             "quirks": [
               "centerMultichannelOnWells",
               "touchTipDisabled"
@@ -3283,6 +3289,8 @@
             "isMagneticModuleCompatible": false,
             "isTiprack": false,
             "loadName": "nest_12_reservoir_15ml",
+            "minimumHeight": 0.5,
+            "minimumWellVolume": 0,
             "quirks": [
               "centerMultichannelOnWells",
               "touchTipDisabled"
@@ -3524,6 +3532,8 @@
             "isMagneticModuleCompatible": false,
             "isTiprack": false,
             "loadName": "nest_12_reservoir_15ml",
+            "minimumHeight": 0.5,
+            "minimumWellVolume": 0,
             "quirks": [
               "centerMultichannelOnWells",
               "touchTipDisabled"

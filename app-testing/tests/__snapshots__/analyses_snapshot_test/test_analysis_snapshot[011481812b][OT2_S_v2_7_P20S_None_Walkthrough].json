@@ -279,7 +279,9 @@
             "format": "96Standard",
             "isMagneticModuleCompatible": false,
             "isTiprack": false,
-            "loadName": "nest_96_wellplate_200ul_flat"
+            "loadName": "nest_96_wellplate_200ul_flat",
+            "minimumHeight": 0.5,
+            "minimumWellVolume": 0
           },
           "schemaVersion": 2,
           "stackingOffsetWithLabware": {},

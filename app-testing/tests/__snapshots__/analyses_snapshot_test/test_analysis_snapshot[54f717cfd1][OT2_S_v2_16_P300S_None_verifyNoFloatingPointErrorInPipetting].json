@@ -1286,7 +1286,9 @@
             "format": "irregular",
             "isMagneticModuleCompatible": false,
             "isTiprack": false,
-            "loadName": "opentrons_24_tuberack_eppendorf_1.5ml_safelock_snapcap"
+            "loadName": "opentrons_24_tuberack_eppendorf_1.5ml_safelock_snapcap",
+            "minimumHeight": 0.5,
+            "minimumWellVolume": 0
           },
           "schemaVersion": 2,
           "stackingOffsetWithLabware": {},

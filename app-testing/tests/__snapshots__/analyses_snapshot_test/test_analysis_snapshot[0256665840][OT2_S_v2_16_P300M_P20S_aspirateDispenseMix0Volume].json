@@ -2436,6 +2436,8 @@
             "isMagneticModuleCompatible": false,
             "isTiprack": false,
             "loadName": "nest_12_reservoir_15ml",
+            "minimumHeight": 0.5,
+            "minimumWellVolume": 0,
             "quirks": [
               "centerMultichannelOnWells",
               "touchTipDisabled"

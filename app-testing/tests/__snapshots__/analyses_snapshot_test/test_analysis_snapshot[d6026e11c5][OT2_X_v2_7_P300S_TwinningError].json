@@ -1258,6 +1258,8 @@
             "isMagneticModuleCompatible": false,
             "isTiprack": false,
             "loadName": "usascientific_12_reservoir_22ml",
+            "minimumHeight": 0.5,
+            "minimumWellVolume": 0,
             "quirks": [
               "centerMultichannelOnWells",
               "touchTipDisabled"
@@ -1693,7 +1695,9 @@
             "format": "96Standard",
             "isMagneticModuleCompatible": false,
             "isTiprack": false,
-            "loadName": "corning_96_wellplate_360ul_flat"
+            "loadName": "corning_96_wellplate_360ul_flat",
+            "minimumHeight": 0.5,
+            "minimumWellVolume": 0
           },
           "schemaVersion": 2,
           "stackingOffsetWithLabware": {},

@@ -69,6 +69,8 @@
             "isMagneticModuleCompatible": false,
             "isTiprack": false,
             "loadName": "nest_1_reservoir_290ml",
+            "minimumHeight": 0.5,
+            "minimumWellVolume": 0,
             "quirks": [
               "centerMultichannelOnWells",
               "touchTipDisabled"
@@ -144,6 +146,8 @@
             "isMagneticModuleCompatible": false,
             "isTiprack": false,
             "loadName": "opentrons_flex_96_tiprack_adapter",
+            "minimumHeight": 0.5,
+            "minimumWellVolume": 0,
             "quirks": [
               "tiprackAdapterFor96Channel"
             ]

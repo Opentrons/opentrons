@@ -1370,6 +1370,8 @@
             "isMagneticModuleCompatible": false,
             "isTiprack": false,
             "loadName": "opentrons_96_well_aluminum_block",
+            "minimumHeight": 0.5,
+            "minimumWellVolume": 0,
             "quirks": []
           },
           "schemaVersion": 2,
@@ -2527,6 +2529,8 @@
             "isMagneticModuleCompatible": false,
             "isTiprack": false,
             "loadName": "opentrons_96_pcr_adapter",
+            "minimumHeight": 0.5,
+            "minimumWellVolume": 0,
             "quirks": []
           },
           "schemaVersion": 2,
@@ -3686,6 +3690,8 @@
             "isTiprack": false,
             "loadName": "nest_96_wellplate_2ml_deep",
             "magneticModuleEngageHeight": 6.8,
+            "minimumHeight": 0.5,
+            "minimumWellVolume": 0,
             "quirks": []
           },
           "schemaVersion": 2,
@@ -4950,7 +4956,9 @@
             "isMagneticModuleCompatible": true,
             "isTiprack": false,
             "loadName": "nest_96_wellplate_100ul_pcr_full_skirt",
-            "magneticModuleEngageHeight": 20
+            "magneticModuleEngageHeight": 20,
+            "minimumHeight": 0.5,
+            "minimumWellVolume": 0
           },
           "schemaVersion": 2,
           "stackingOffsetWithLabware": {
@@ -5893,6 +5901,8 @@
             "isMagneticModuleCompatible": false,
             "isTiprack": false,
             "loadName": "opentrons_flex_96_tiprack_adapter",
+            "minimumHeight": 0.5,
+            "minimumWellVolume": 0,
             "quirks": [
               "tiprackAdapterFor96Channel"
             ]

@@ -3649,6 +3649,8 @@
             "isMagneticModuleCompatible": false,
             "isTiprack": false,
             "loadName": "opentrons_96_aluminumblock_nest_wellplate_100ul",
+            "minimumHeight": 0.5,
+            "minimumWellVolume": 0,
             "quirks": [
               "gripperIncompatible"
             ]
@@ -4805,6 +4807,8 @@
             "isMagneticModuleCompatible": false,
             "isTiprack": false,
             "loadName": "opentrons_96_pcr_adapter_nest_wellplate_100ul_pcr_full_skirt",
+            "minimumHeight": 0.5,
+            "minimumWellVolume": 0,
             "quirks": [
               "gripperIncompatible"
             ]
@@ -5954,7 +5958,9 @@
             "isMagneticModuleCompatible": true,
             "isTiprack": false,
             "loadName": "nest_96_wellplate_100ul_pcr_full_skirt",
-            "magneticModuleEngageHeight": 20
+            "magneticModuleEngageHeight": 20,
+            "minimumHeight": 0.5,
+            "minimumWellVolume": 0
           },
           "schemaVersion": 2,
           "stackingOffsetWithLabware": {},
@@ -7222,7 +7228,9 @@
             "isMagneticModuleCompatible": true,
             "isTiprack": false,
             "loadName": "nest_96_wellplate_100ul_pcr_full_skirt",
-            "magneticModuleEngageHeight": 20
+            "magneticModuleEngageHeight": 20,
+            "minimumHeight": 0.5,
+            "minimumWellVolume": 0
           },
           "schemaVersion": 2,
           "stackingOffsetWithLabware": {},
@@ -8204,6 +8212,8 @@
             "isMagneticModuleCompatible": false,
             "isTiprack": false,
             "loadName": "nest_12_reservoir_15ml",
+            "minimumHeight": 0.5,
+            "minimumWellVolume": 0,
             "quirks": [
               "centerMultichannelOnWells",
               "touchTipDisabled"
