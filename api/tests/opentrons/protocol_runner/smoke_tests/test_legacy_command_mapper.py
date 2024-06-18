@@ -20,7 +20,7 @@ from opentrons.protocol_engine import (
     DeckPoint,
 )
 from opentrons.protocol_reader import ProtocolReader
-from opentrons.protocol_runner import create_simulating_runner
+from opentrons.protocol_runner import create_simulating_orchestrator
 from opentrons.protocol_runner.legacy_command_mapper import LegacyCommandParams
 from opentrons.types import MountType, DeckSlotName
 from opentrons_shared_data.pipette.dev_types import PipetteNameType
@@ -33,9 +33,8 @@ async def simulate_and_get_commands(protocol_file: Path) -> List[commands.Comman
         files=[protocol_file],
         directory=None,
     )
-    subject = await create_simulating_runner(
-        robot_type="OT-2 Standard",
-        protocol_config=protocol_source.config,
+    subject = await create_simulating_orchestrator(
+        robot_type="OT-2 Standard", protocol_config=protocol_source.config
     )
     result = await subject.run(deck_configuration=[], protocol_source=protocol_source)
     assert result.state_summary.errors == []

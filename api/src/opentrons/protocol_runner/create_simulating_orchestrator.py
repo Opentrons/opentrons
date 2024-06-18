@@ -17,10 +17,10 @@ from .run_orchestrator import RunOrchestrator
 from .protocol_runner import create_protocol_runner, LiveRunner
 
 
-async def create_simulating_runner(
+async def create_simulating_orchestrator(
     robot_type: RobotType, protocol_config: ProtocolConfig
 ) -> RunOrchestrator:
-    """Create a AbstractRunner wired to a simulating HardwareControlAPI.
+    """Create a RunOrchestrator wired to a simulating HardwareControlAPI.
 
     Example:
         ```python
@@ -31,15 +31,15 @@ async def create_simulating_runner(
             ProtocolType,
             ProtocolFile,
             AbstractRunner,
-            create_simulating_runner,
+            create_simulating_orchestrator,
         )
 
         protocol = ProtocolFile(
             protocol_type=ProtocolType.PYTHON,
             files=[Path("/path/to/protocol.py")],
         )
-        runner: AbstractRunner = await create_simulating_runner()
-        commands: List[Command] = await runner.run(protocol)
+        orchestrator: RunOrchestrator = await create_simulating_orchestrator()
+        commands: List[Command] = await orchestrator.run(protocol)
         ```
     """
     simulating_hardware_api = await _build_hardware_simulator_for_robot_type(

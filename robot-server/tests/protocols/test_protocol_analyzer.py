@@ -51,12 +51,12 @@ def patch_mock_get_utc_datetime(decoy: Decoy, monkeypatch: pytest.MonkeyPatch) -
 
 
 @pytest.fixture(autouse=True)
-def patch_mock_create_simulating_runner(
+def patch_mock_create_simulating_orchestrator(
     decoy: Decoy, monkeypatch: pytest.MonkeyPatch
 ) -> None:
     """Replace protocol_runner.check() with a mock."""
-    mock = decoy.mock(func=protocol_runner.create_simulating_runner)
-    monkeypatch.setattr(protocol_runner, "create_simulating_runner", mock)
+    mock = decoy.mock(func=protocol_runner.create_simulating_orchestrator)
+    monkeypatch.setattr(protocol_runner, "create_simulating_orchestrator", mock)
 
 
 @pytest.fixture
@@ -92,17 +92,19 @@ async def test_load_runner(
         analysis_store=analysis_store, protocol_resource=protocol_resource
     )
 
+    run_orchestrator = decoy.mock(cls=protocol_runner.RunOrchestrator)
     python_runner = decoy.mock(cls=protocol_runner.PythonAndLegacyRunner)
+    decoy.when(run_orchestrator.get_protocol_runner()).then_return(python_runner)
     decoy.when(
-        await protocol_runner.create_simulating_runner(
+        await protocol_runner.create_simulating_orchestrator(
             robot_type=robot_type,
             protocol_config=PythonProtocolConfig(api_version=APIVersion(100, 200)),
         )
-    ).then_return(python_runner)
+    ).then_return(run_orchestrator)
     runner = await subject.load_runner(run_time_param_values={"rtp_var": 123})
-    assert runner == python_runner
+    assert runner == run_orchestrator.get_protocol_runner()
     decoy.verify(
-        await python_runner.load(
+        await run_orchestrator.load_python(
             protocol_source=protocol_source,
             python_parse_mode=PythonParseMode.NORMAL,
             run_time_param_values={"rtp_var": 123},

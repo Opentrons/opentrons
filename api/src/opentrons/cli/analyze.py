@@ -33,7 +33,7 @@ from opentrons.protocol_reader import (
     ProtocolFilesInvalidError,
     ProtocolSource,
 )
-from opentrons.protocol_runner import create_simulating_runner, RunResult
+from opentrons.protocol_runner import create_simulating_orchestrator, RunResult
 from opentrons.protocol_engine import (
     Command,
     ErrorOccurrence,
@@ -199,7 +199,7 @@ def _get_return_code(analysis: RunResult) -> int:
 
 async def _do_analyze(protocol_source: ProtocolSource) -> RunResult:
 
-    orchestrator = await create_simulating_runner(
+    orchestrator = await create_simulating_orchestrator(
         robot_type=protocol_source.robot_type, protocol_config=protocol_source.config
     )
     return await orchestrator.run(

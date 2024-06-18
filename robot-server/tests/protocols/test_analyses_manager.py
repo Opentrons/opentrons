@@ -44,12 +44,12 @@ def patch_mock_create_protocol_analyzer(
 
 
 @pytest.fixture(autouse=True)
-def patch_mock_create_simulating_runner(
+def patch_mock_create_simulating_orchestrator(
     decoy: Decoy, monkeypatch: pytest.MonkeyPatch
 ) -> None:
     """Replace protocol_runner.check() with a mock."""
-    mock = decoy.mock(func=protocol_runner.create_simulating_runner)
-    monkeypatch.setattr(protocol_runner, "create_simulating_runner", mock)
+    mock = decoy.mock(func=protocol_runner.create_simulating_orchestrator)
+    monkeypatch.setattr(protocol_runner, "create_simulating_orchestrator", mock)
 
 
 @pytest.fixture

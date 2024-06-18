@@ -39,19 +39,20 @@ class ProtocolAnalyzer:
 
         Returns: The Runner instance.
         """
-        runner = await protocol_runner.create_simulating_runner(
+        orchestrator = await protocol_runner.create_simulating_orchestrator(
             robot_type=self._protocol_resource.source.robot_type,
             protocol_config=self._protocol_resource.source.config,
         )
+        runner = orchestrator.get_protocol_runner()
         if isinstance(runner, PythonAndLegacyRunner):
-            await runner.load(
+            await orchestrator.load_python(
                 protocol_source=self._protocol_resource.source,
                 python_parse_mode=PythonParseMode.NORMAL,
                 run_time_param_values=run_time_param_values,
             )
         else:
             assert isinstance(runner, JsonRunner), "Unexpected runner type."
-            await runner.load(protocol_source=self._protocol_resource.source)
+            await orchestrator.load_json(protocol_source=self._protocol_resource.source)
 
         return runner
 

@@ -26,7 +26,7 @@ from opentrons.protocol_engine import (
     EngineStatus,
 )
 from opentrons.protocol_reader import ProtocolReader
-from opentrons.protocol_runner import create_simulating_runner
+from opentrons.protocol_runner import create_simulating_orchestrator
 
 
 async def test_runner_with_python(
@@ -40,9 +40,8 @@ async def test_runner_with_python(
         directory=None,
     )
 
-    subject = await create_simulating_runner(
-        robot_type="OT-2 Standard",
-        protocol_config=protocol_source.config,
+    subject = await create_simulating_orchestrator(
+        robot_type="OT-2 Standard", protocol_config=protocol_source.config
     )
     result = await subject.run(
         deck_configuration=[],
@@ -117,7 +116,7 @@ async def test_runner_with_json(json_protocol_file: Path) -> None:
         directory=None,
     )
 
-    subject = await create_simulating_runner(
+    subject = await create_simulating_orchestrator(
         robot_type="OT-2 Standard", protocol_config=protocol_source.config
     )
     result = await subject.run(deck_configuration=[], protocol_source=protocol_source)
@@ -179,9 +178,8 @@ async def test_runner_with_legacy_python(legacy_python_protocol_file: Path) -> N
         directory=None,
     )
 
-    subject = await create_simulating_runner(
-        robot_type="OT-2 Standard",
-        protocol_config=protocol_source.config,
+    subject = await create_simulating_orchestrator(
+        robot_type="OT-2 Standard", protocol_config=protocol_source.config
     )
     result = await subject.run(
         deck_configuration=[],
@@ -244,7 +242,7 @@ async def test_runner_with_legacy_json(legacy_json_protocol_file: Path) -> None:
         directory=None,
     )
 
-    subject = await create_simulating_runner(
+    subject = await create_simulating_orchestrator(
         robot_type="OT-2 Standard", protocol_config=protocol_source.config
     )
     result = await subject.run(
@@ -311,9 +309,8 @@ async def test_runner_with_python_and_run_time_parameters(
         directory=None,
     )
 
-    subject = await create_simulating_runner(
-        robot_type="OT-2 Standard",
-        protocol_config=protocol_source.config,
+    subject = await create_simulating_orchestrator(
+        robot_type="OT-2 Standard", protocol_config=protocol_source.config
     )
     result = await subject.run(
         deck_configuration=[],
