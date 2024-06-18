@@ -86,6 +86,7 @@ export function ProtocolSetupParameters({
   const initialFileInfo = csvFileParameter?.file?.id ?? ''
   const [csvFileInfo, setCSVFileInfo] = React.useState<string>(initialFileInfo)
 
+  // ToDo (kk:06/18/2024) this will be removed when we freeze the code
   const enableCsvFile = useFeatureFlag('enableCsvFile')
 
   const updateParameters = (
@@ -226,8 +227,8 @@ export function ProtocolSetupParameters({
     </>
   )
   // ToDo Update soon
-  // if (enableCsvFile && chooseCsvFileScreen != null) {
-  if (enableCsvFile) {
+  if (enableCsvFile && chooseCsvFileScreen != null) {
+    // if (enableCsvFile) {
     children = (
       <ChooseCsvFile
         handleGoBack={() => {

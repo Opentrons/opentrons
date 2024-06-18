@@ -41,17 +41,12 @@ export function ChooseCsvFile({
   const { t } = useTranslation('protocol_setup')
   const csvFilesOnUSB = useSelector(getFilePaths).payload.filePaths ?? []
 
-  // console.log('csv files', csvFilesOnUSB)
   // ToDo (kk:06/12/2024) get files from the endpoint: GET /protocols/{protocolId}/dataFiles/
   // return format: https://opentrons.atlassian.net/browse/AUTH-428
   const csvFilesOnRobot: any[] = []
 
   const handleConfirmSelection = (): void => {
-    // invoke
-    // call react-api-client
-    // const fileId = await remote.ipcRenderer.invoke('usb:postDataFile', {
-    //   filePath: fileInfo,
-    // })
+    // ToDo (kk:06/18/2024) wire up later
   }
 
   return (
