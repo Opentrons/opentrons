@@ -34,7 +34,7 @@ describe('useRunningStepCounts', () => {
     expect(result.current).toEqual({
       currentStepNumber: 2,
       totalStepCount: 3,
-      isDeterministicRun: true,
+      hasRunDiverged: false,
     })
   })
 
@@ -49,7 +49,7 @@ describe('useRunningStepCounts', () => {
     expect(result.current).toEqual({
       currentStepNumber: 2,
       totalStepCount: null,
-      isDeterministicRun: false,
+      hasRunDiverged: true,
     })
   })
 
@@ -64,7 +64,7 @@ describe('useRunningStepCounts', () => {
     expect(result.current).toEqual({
       currentStepNumber: null,
       totalStepCount: null,
-      isDeterministicRun: false,
+      hasRunDiverged: true,
     })
   })
 })

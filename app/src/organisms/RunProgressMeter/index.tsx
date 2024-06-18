@@ -94,7 +94,7 @@ export function RunProgressMeter(props: RunProgressMeterProps): JSX.Element {
   const {
     currentStepNumber,
     totalStepCount,
-    isDeterministicRun,
+    hasRunDiverged,
   } = useRunningStepCounts(runId, mostRecentCommandData)
 
   const downloadIsDisabled =
@@ -116,7 +116,7 @@ export function RunProgressMeter(props: RunProgressMeterProps): JSX.Element {
     currentStepContents = (
       <StyledText as="h2">{t('not_started_yet')}</StyledText>
     )
-  } else if (analysis != null && isDeterministicRun) {
+  } else if (analysis != null && !hasRunDiverged) {
     currentStepContents = (
       <CommandText
         commandTextData={getCommandTextData(analysis)}
@@ -124,11 +124,7 @@ export function RunProgressMeter(props: RunProgressMeterProps): JSX.Element {
         robotType={robotType}
       />
     )
-  } else if (
-    analysis != null &&
-    !isDeterministicRun &&
-    runCommandDetails != null
-  ) {
+  } else if (analysis != null && hasRunDiverged && runCommandDetails != null) {
     currentStepContents = (
       <CommandText
         commandTextData={getCommandTextData(analysis)}
@@ -225,7 +221,7 @@ export function RunProgressMeter(props: RunProgressMeterProps): JSX.Element {
             </Tooltip>
           ) : null}
         </Flex>
-        {isDeterministicRun ? (
+        {!hasRunDiverged ? (
           <ProgressBar
             percentComplete={
               runHasNotBeenStarted

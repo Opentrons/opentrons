@@ -9,8 +9,8 @@ export interface StepCounts {
   currentStepNumber: number | null
   /* Returns null if the run is non-deterministic or the total command count is not found. */
   totalStepCount: number | null
-  /* Returns whether the run is deterministic. */
-  isDeterministicRun: boolean
+  /* Returns whether the run has diverged from analysis. */
+  hasRunDiverged: boolean
 }
 
 /**
@@ -43,18 +43,18 @@ export function useRunningStepCounts(
     lastRunAnalysisCommandIndex === -1 ? null : lastRunAnalysisCommandIndex + 1
   const currentStepNumberByRun = commandsData?.meta.totalLength ?? null
 
-  const isDeterministicRun =
-    lastRunCommandNoFixit?.key != null && currentStepNumberByAnalysis != null
+  const hasRunDiverged =
+    lastRunCommandNoFixit?.key == null || currentStepNumberByAnalysis == null
 
-  const currentStepNumber = isDeterministicRun
+  const currentStepNumber = !hasRunDiverged
     ? currentStepNumberByAnalysis
     : currentStepNumberByRun
 
-  const totalStepCount = isDeterministicRun ? analysisCommands.length : null
+  const totalStepCount = !hasRunDiverged ? analysisCommands.length : null
 
   return {
     currentStepNumber,
     totalStepCount,
-    isDeterministicRun,
+    hasRunDiverged,
   }
 }
