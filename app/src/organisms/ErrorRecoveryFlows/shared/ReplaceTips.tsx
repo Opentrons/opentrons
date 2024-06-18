@@ -18,7 +18,7 @@ export function ReplaceTips(props: RecoveryContentProps): JSX.Element | null {
     failedPipetteInfo,
     failedLabwareUtils,
   } = props
-  const { relevantPickUpTipWellName } = failedLabwareUtils
+  const { relevantWellName } = failedLabwareUtils
   const { proceedNextStep } = routeUpdateActions
   const { t } = useTranslation('error_recovery')
 
@@ -31,7 +31,7 @@ export function ReplaceTips(props: RecoveryContentProps): JSX.Element | null {
       return t('replace_with_new_tip_rack')
     } else {
       return t('replace_used_tips_in_rack_location', {
-        location: relevantPickUpTipWellName,
+        location: relevantWellName,
       })
     }
   }

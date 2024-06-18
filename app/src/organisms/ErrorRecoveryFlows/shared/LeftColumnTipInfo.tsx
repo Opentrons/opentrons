@@ -23,11 +23,11 @@ export function LeftColumnTipInfo({
   failedLabwareUtils,
   isOnDevice,
 }: LeftColumnTipInfoProps): JSX.Element | null {
-  const { pickUpTipLabwareName, pickUpTipLabware } = failedLabwareUtils
+  const { failedLabwareName, failedLabware } = failedLabwareUtils
   const { t } = useTranslation('error_recovery')
 
   const buildLabwareLocationSlotName = (): string => {
-    const location = pickUpTipLabware?.location
+    const location = failedLabware?.location
     if (
       location != null &&
       typeof location === 'object' &&
@@ -46,7 +46,7 @@ export function LeftColumnTipInfo({
           <StyledText as="h4SemiBold">{title}</StyledText>
           <Move
             type={'refill'}
-            labwareName={pickUpTipLabwareName ?? ''}
+            labwareName={failedLabwareName ?? ''}
             currentLocationProps={{ slotName: buildLabwareLocationSlotName() }}
           />
         </Flex>

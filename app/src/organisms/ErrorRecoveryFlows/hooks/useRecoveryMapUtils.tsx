@@ -112,13 +112,13 @@ export function getRunCurrentModulesOnDeck({
   failedLabwareUtils: UseRecoveryMapUtilsProps['failedLabwareUtils']
   currentModulesInfo: RunCurrentModuleInfo[]
 }): RunCurrentModulesOnDeck[] {
-  const { pickUpTipLabware } = failedLabwareUtils
+  const { failedLabware } = failedLabwareUtils
 
   return currentModulesInfo.map(
     ({ moduleDef, slotName, nestedLabwareDef, nestedLabwareSlotName }) => {
       const isLabwareMatch = getIsLabwareMatch(
         nestedLabwareSlotName,
-        pickUpTipLabware
+        failedLabware
       )
 
       return {
@@ -152,10 +152,10 @@ export function getRunCurrentLabwareOnDeck({
   failedLabwareUtils: UseRecoveryMapUtilsProps['failedLabwareUtils']
   currentLabwareInfo: RunCurrentLabwareInfo[]
 }): RunCurrentLabwareOnDeck[] {
-  const { pickUpTipLabware } = failedLabwareUtils
+  const { failedLabware } = failedLabwareUtils
 
   return currentLabwareInfo.map(({ slotName, labwareDef, labwareLocation }) => {
-    const isLabwareMatch = getIsLabwareMatch(slotName, pickUpTipLabware)
+    const isLabwareMatch = getIsLabwareMatch(slotName, failedLabware)
 
     return {
       labwareLocation,

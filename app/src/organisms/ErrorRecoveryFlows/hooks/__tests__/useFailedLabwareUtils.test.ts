@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest'
 
-import { getPickUpTipCommandWellName } from '../useFailedLabwareUtils'
+import { getRelevantWellName } from '../useFailedLabwareUtils'
 
 describe('getPickUpTipCommandWellName', () => {
   const failedPipetteInfo = {
@@ -18,17 +18,17 @@ describe('getPickUpTipCommandWellName', () => {
   } as any
 
   it('should return an empty string if failedPipetteInfo is null', () => {
-    const result = getPickUpTipCommandWellName(null, recentRelevantPickUpTipCmd)
+    const result = getRelevantWellName(null, recentRelevantPickUpTipCmd)
     expect(result).toBe('')
   })
 
   it('should return an empty string if recentRelevantPickUpTipCmd is null', () => {
-    const result = getPickUpTipCommandWellName(failedPipetteInfo, null)
+    const result = getRelevantWellName(failedPipetteInfo, null)
     expect(result).toBe('')
   })
 
   it('should return the wellName if the pipette has 1 channel', () => {
-    const result = getPickUpTipCommandWellName(
+    const result = getRelevantWellName(
       { ...failedPipetteInfo, data: { channels: 1 } },
       recentRelevantPickUpTipCmd
     )
@@ -36,7 +36,7 @@ describe('getPickUpTipCommandWellName', () => {
   })
 
   it('should return a range of well names if the pipette has 8 channels', () => {
-    const result = getPickUpTipCommandWellName(
+    const result = getRelevantWellName(
       failedPipetteInfo,
       recentRelevantPickUpTipCmd
     )
@@ -44,7 +44,7 @@ describe('getPickUpTipCommandWellName', () => {
   })
 
   it('should return the wellName if the pipette has 96 channels', () => {
-    const result = getPickUpTipCommandWellName(
+    const result = getRelevantWellName(
       { ...failedPipetteInfo, data: { channels: 96 } },
       recentRelevantPickUpTipCmd
     )
@@ -52,7 +52,7 @@ describe('getPickUpTipCommandWellName', () => {
   })
 
   it('should handle different wellName formats correctly', () => {
-    const result = getPickUpTipCommandWellName(failedPipetteInfo, {
+    const result = getRelevantWellName(failedPipetteInfo, {
       ...recentRelevantPickUpTipCmd,
       params: { ...recentRelevantPickUpTipCmd.params, wellName: 'B12' },
     })

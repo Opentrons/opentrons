@@ -150,7 +150,7 @@ describe('getRunCurrentLabwareOnDeck', () => {
     const result = getRunCurrentLabwareOnDeck({
       failedLabwareUtils: {
         ...mockFailedLabwareUtils,
-        pickUpTipLabware: {
+        failedLabware: {
           ...mockPickUpTipLabware,
           location: { slotName: 'B1' },
         },
