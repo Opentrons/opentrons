@@ -8,18 +8,18 @@ import {
   mockRecoveryContentProps,
 } from '../../__fixtures__'
 import { i18n } from '../../../../i18n'
-import { LeftColumnTipInfo } from '../LeftColumnTipInfo'
+import { LeftColumnLabwareInfo } from '../LeftColumnLabwareInfo'
 
-const render = (props: React.ComponentProps<typeof LeftColumnTipInfo>) => {
-  return renderWithProviders(<LeftColumnTipInfo {...props} />, {
+const render = (props: React.ComponentProps<typeof LeftColumnLabwareInfo>) => {
+  return renderWithProviders(<LeftColumnLabwareInfo {...props} />, {
     i18nInstance: i18n,
   })[0]
 }
 
 const mockTile = 'MOCK_TITLE'
 
-describe('LeftColumnTipInfo', () => {
-  let props: React.ComponentProps<typeof LeftColumnTipInfo>
+describe('LeftColumnLabwareInfo', () => {
+  let props: React.ComponentProps<typeof LeftColumnLabwareInfo>
   let mockFailedLabwareUtils: any
 
   beforeEach(() => {
@@ -32,6 +32,7 @@ describe('LeftColumnTipInfo', () => {
       ...mockRecoveryContentProps,
       title: mockTile,
       failedLabwareUtils: mockFailedLabwareUtils,
+      moveType: 'refill',
     }
   })
 

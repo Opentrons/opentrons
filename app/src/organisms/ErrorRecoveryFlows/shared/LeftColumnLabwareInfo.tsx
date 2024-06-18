@@ -13,18 +13,22 @@ import { InlineNotification } from '../../../atoms/InlineNotification'
 
 import type { RecoveryContentProps } from '../types'
 
-type LeftColumnTipInfoProps = RecoveryContentProps & {
+type LeftColumnLabwareInfoProps = RecoveryContentProps & {
   title: string
+  moveType: React.ComponentProps<typeof Move>['type']
+  /* Renders a warning InlineNotification if provided. */
+  bannerText?: string
 }
 // TODO(jh, 06-12-24): EXEC-500 & EXEC-501.
 // The left column component adjacent to RecoveryDeckMap/TipSelection.
-export function LeftColumnTipInfo({
+export function LeftColumnLabwareInfo({
   title,
   failedLabwareUtils,
   isOnDevice,
-}: LeftColumnTipInfoProps): JSX.Element | null {
+  moveType,
+  bannerText,
+}: LeftColumnLabwareInfoProps): JSX.Element | null {
   const { failedLabwareName, failedLabware } = failedLabwareUtils
-  const { t } = useTranslation('error_recovery')
 
   const buildLabwareLocationSlotName = (): string => {
     const location = failedLabware?.location
@@ -45,15 +49,17 @@ export function LeftColumnTipInfo({
         <Flex gridGap={SPACING.spacing8} flexDirection={DIRECTION_COLUMN}>
           <StyledText as="h4SemiBold">{title}</StyledText>
           <Move
-            type={'refill'}
+            type={moveType}
             labwareName={failedLabwareName ?? ''}
             currentLocationProps={{ slotName: buildLabwareLocationSlotName() }}
           />
         </Flex>
-        <InlineNotification
-          type="alert"
-          heading={t('replace_tips_and_select_location')}
-        ></InlineNotification>
+        {bannerText != null ? (
+          <InlineNotification
+            type="alert"
+            heading={bannerText}
+          ></InlineNotification>
+        ) : null}
       </Flex>
     )
   } else {

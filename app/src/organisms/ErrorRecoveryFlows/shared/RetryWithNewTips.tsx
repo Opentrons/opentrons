@@ -15,7 +15,6 @@ import { RecoveryFooterButtons } from './RecoveryFooterButtons'
 
 import type { RecoveryContentProps } from '../types'
 
-// TODO(jh, 06-14-24): Add testing when design finalizes this component.
 export function RetryWithNewTips(
   props: RecoveryContentProps
 ): JSX.Element | null {

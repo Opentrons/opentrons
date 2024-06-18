@@ -22,10 +22,6 @@ export const RECOVERY_MAP = {
       RECOVERY_DESCRIPTION: 'recovery-description',
     },
   },
-  CANCEL_RUN: {
-    ROUTE: 'cancel-run',
-    STEPS: { CONFIRM_CANCEL: 'confirm-cancel' },
-  },
   DROP_TIP_FLOWS: {
     ROUTE: 'drop-tip',
     STEPS: {
@@ -42,21 +38,6 @@ export const RECOVERY_MAP = {
       DROP_TIP_BLOWOUT_FAILED: 'drop-tip-blowout-failed',
       DROP_TIP_TIP_DROP_FAILED: 'drop-tip-tip-drop-failed',
       DROP_TIP_GENERAL_ERROR: 'drop-tip-general-error',
-    },
-  },
-  IGNORE_AND_RESUME: { ROUTE: 'ignore-and-resume', STEPS: {} },
-  REFILL_AND_RESUME: { ROUTE: 'refill-and-resume', STEPS: {} },
-  RETRY_FAILED_COMMAND: {
-    ROUTE: 'retry-failed-command',
-    STEPS: { CONFIRM_RETRY: 'confirm-retry' },
-  },
-  RETRY_NEW_TIPS: {
-    ROUTE: 'retry-new-tips',
-    STEPS: {
-      DROP_TIPS: 'drop-tips',
-      REPLACE_TIPS: 'replace-tips',
-      SELECT_TIPS: 'select-tips',
-      RETRY: 'retry',
     },
   },
   ROBOT_CANCELING: {
@@ -89,9 +70,42 @@ export const RECOVERY_MAP = {
       RETRYING: 'retrying',
     },
   },
+  ROBOT_SKIPPING_STEP: {
+    ROUTE: 'robot-skipping-to-next-step',
+    STEPS: {
+      SKIPPING: 'skipping',
+    },
+  },
+  // Recovery options below
   OPTION_SELECTION: {
     ROUTE: 'option-selection',
     STEPS: { SELECT: 'select' },
+  },
+  CANCEL_RUN: {
+    ROUTE: 'cancel-run',
+    STEPS: { CONFIRM_CANCEL: 'confirm-cancel' },
+  },
+  IGNORE_AND_SKIP: {
+    ROUTE: 'ignore-and-skip-step',
+    STEPS: { SELECT_IGNORE_KIND: 'select-ignore' },
+  },
+  FILL_MANUALLY_AND_SKIP: {
+    ROUTE: 'manually-fill-well-and-skip',
+    STEPS: { MANUALLY_FILL: 'manually-fill', SKIP_RUN_STEP: 'skip-run-step' },
+  },
+  REFILL_AND_RESUME: { ROUTE: 'refill-and-resume', STEPS: {} },
+  RETRY_FAILED_COMMAND: {
+    ROUTE: 'retry-failed-command',
+    STEPS: { CONFIRM_RETRY: 'confirm-retry' },
+  },
+  RETRY_NEW_TIPS: {
+    ROUTE: 'retry-new-tips',
+    STEPS: {
+      DROP_TIPS: 'drop-tips',
+      REPLACE_TIPS: 'replace-tips',
+      SELECT_TIPS: 'select-tips',
+      RETRY: 'retry',
+    },
   },
 } as const
 
@@ -104,12 +118,14 @@ const {
   ROBOT_RESUMING,
   ROBOT_IN_MOTION,
   ROBOT_RETRYING_STEP,
+  ROBOT_SKIPPING_STEP,
   DROP_TIP_FLOWS,
   REFILL_AND_RESUME,
-  IGNORE_AND_RESUME,
+  IGNORE_AND_SKIP,
   CANCEL_RUN,
   RETRY_NEW_TIPS,
   ERROR_WHILE_RECOVERING,
+  FILL_MANUALLY_AND_SKIP,
 } = RECOVERY_MAP
 
 // The deterministic ordering of steps for a given route.
@@ -128,6 +144,7 @@ export const STEP_ORDER: StepOrder = {
   [ROBOT_PICKING_UP_TIPS.ROUTE]: [ROBOT_PICKING_UP_TIPS.STEPS.PICKING_UP_TIPS],
   [ROBOT_RESUMING.ROUTE]: [ROBOT_RESUMING.STEPS.RESUMING],
   [ROBOT_RETRYING_STEP.ROUTE]: [ROBOT_RETRYING_STEP.STEPS.RETRYING],
+  [ROBOT_SKIPPING_STEP.ROUTE]: [ROBOT_SKIPPING_STEP.STEPS.SKIPPING],
   [DROP_TIP_FLOWS.ROUTE]: [
     DROP_TIP_FLOWS.STEPS.BEGIN_REMOVAL,
     DROP_TIP_FLOWS.STEPS.BEFORE_BEGINNING,
@@ -135,8 +152,12 @@ export const STEP_ORDER: StepOrder = {
     DROP_TIP_FLOWS.STEPS.CHOOSE_TIP_DROP,
   ],
   [REFILL_AND_RESUME.ROUTE]: [],
-  [IGNORE_AND_RESUME.ROUTE]: [],
+  [IGNORE_AND_SKIP.ROUTE]: [IGNORE_AND_SKIP.STEPS.SELECT_IGNORE_KIND],
   [CANCEL_RUN.ROUTE]: [CANCEL_RUN.STEPS.CONFIRM_CANCEL],
+  [FILL_MANUALLY_AND_SKIP.ROUTE]: [
+    FILL_MANUALLY_AND_SKIP.STEPS.MANUALLY_FILL,
+    FILL_MANUALLY_AND_SKIP.STEPS.SKIP_RUN_STEP,
+  ],
   [ERROR_WHILE_RECOVERING.ROUTE]: [
     ERROR_WHILE_RECOVERING.STEPS.RECOVERY_ACTION_FAILED,
     ERROR_WHILE_RECOVERING.STEPS.DROP_TIP_GENERAL_ERROR,

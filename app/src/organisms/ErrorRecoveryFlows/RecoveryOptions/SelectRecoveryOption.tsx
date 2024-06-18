@@ -109,6 +109,8 @@ export function useCurrentTipStatus(
 
 export function getRecoveryOptions(errorKind: ErrorKind): RecoveryRoute[] {
   switch (errorKind) {
+    case ERROR_KINDS.NO_LIQUID_DETECTED:
+      return NO_LIQUID_DETECTED_OPTIONS
     case ERROR_KINDS.OVERPRESSURE_WHILE_ASPIRATING:
       return OVERPRESSURE_WHILE_ASPIRATING_OPTIONS
     case ERROR_KINDS.GENERAL_ERROR:
@@ -116,12 +118,18 @@ export function getRecoveryOptions(errorKind: ErrorKind): RecoveryRoute[] {
   }
 }
 
-export const GENERAL_ERROR_OPTIONS: RecoveryRoute[] = [
-  RECOVERY_MAP.RETRY_FAILED_COMMAND.ROUTE,
+export const NO_LIQUID_DETECTED_OPTIONS: RecoveryRoute[] = [
+  RECOVERY_MAP.FILL_MANUALLY_AND_SKIP.ROUTE,
+  RECOVERY_MAP.IGNORE_AND_SKIP.ROUTE,
   RECOVERY_MAP.CANCEL_RUN.ROUTE,
 ]
 
 export const OVERPRESSURE_WHILE_ASPIRATING_OPTIONS: RecoveryRoute[] = [
   RECOVERY_MAP.RETRY_NEW_TIPS.ROUTE,
+  RECOVERY_MAP.CANCEL_RUN.ROUTE,
+]
+
+export const GENERAL_ERROR_OPTIONS: RecoveryRoute[] = [
+  RECOVERY_MAP.RETRY_FAILED_COMMAND.ROUTE,
   RECOVERY_MAP.CANCEL_RUN.ROUTE,
 ]

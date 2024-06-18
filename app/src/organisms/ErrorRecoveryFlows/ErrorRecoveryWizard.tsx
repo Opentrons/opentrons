@@ -16,6 +16,7 @@ import {
   CancelRun,
   RetryNewTips,
   ManageTips,
+  FillWellAndSkip,
 } from './RecoveryOptions'
 import { RecoveryInProgress } from './RecoveryInProgress'
 import { getErrorKind } from './utils'
@@ -146,6 +147,10 @@ export function ErrorRecoveryContent(props: RecoveryContentProps): JSX.Element {
     return <RetryNewTips {...props} />
   }
 
+  const buildFillWellAndSkip = (): JSX.Element => {
+    return <FillWellAndSkip {...props} />
+  }
+
   switch (props.recoveryMap.route) {
     case RECOVERY_MAP.BEFORE_BEGINNING.ROUTE:
       return buildBeforeBeginning()
@@ -161,11 +166,14 @@ export function ErrorRecoveryContent(props: RecoveryContentProps): JSX.Element {
       return buildManageTips()
     case RECOVERY_MAP.RETRY_NEW_TIPS.ROUTE:
       return buildRetryNewTips()
+    case RECOVERY_MAP.FILL_MANUALLY_AND_SKIP.ROUTE:
+      return buildFillWellAndSkip()
     case RECOVERY_MAP.ROBOT_IN_MOTION.ROUTE:
     case RECOVERY_MAP.ROBOT_RESUMING.ROUTE:
     case RECOVERY_MAP.ROBOT_RETRYING_STEP.ROUTE:
     case RECOVERY_MAP.ROBOT_CANCELING.ROUTE:
     case RECOVERY_MAP.ROBOT_PICKING_UP_TIPS.ROUTE:
+    case RECOVERY_MAP.ROBOT_SKIPPING_STEP.ROUTE:
       return buildRecoveryInProgress()
     default:
       return buildSelectRecoveryOption()

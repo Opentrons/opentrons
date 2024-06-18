@@ -6,7 +6,7 @@ import { useTranslation } from 'react-i18next'
 import { RecoverySingleColumnContent } from './RecoverySingleColumnContent'
 import { TwoColumn } from '../../../molecules/InterventionModal'
 import { RecoveryFooterButtons } from './RecoveryFooterButtons'
-import { LeftColumnTipInfo } from './LeftColumnTipInfo'
+import { LeftColumnLabwareInfo } from './LeftColumnLabwareInfo'
 import { RecoveryMap } from './RecoveryMap'
 
 import type { RecoveryContentProps } from '../types'
@@ -40,7 +40,12 @@ export function ReplaceTips(props: RecoveryContentProps): JSX.Element | null {
     return (
       <RecoverySingleColumnContent>
         <TwoColumn>
-          <LeftColumnTipInfo {...props} title={buildTitle()} />
+          <LeftColumnLabwareInfo
+            {...props}
+            title={buildTitle()}
+            moveType="refill"
+            bannerText={t('replace_tips_and_select_location')}
+          />
           <Flex marginTop="1.742rem">
             <RecoveryMap {...props} />
           </Flex>
