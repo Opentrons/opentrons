@@ -74,7 +74,7 @@ from opentrons_shared_data.errors.exceptions import (
     GripperNotPresentError,
     CommandPreconditionViolated,
     CommandParameterLimitViolated,
-    LiquidNotFoundError,
+    PipetteLiquidNotFoundError,
 )
 from opentrons_shared_data.gripper.gripper_definition import GripperModel
 from opentrons_shared_data.pipette.types import (
@@ -116,7 +116,6 @@ def fake_settings() -> CapacitivePassSettings:
 def fake_liquid_settings() -> LiquidProbeSettings:
     return LiquidProbeSettings(
         starting_mount_height=100,
-        max_z_distance=15,
         mount_speed=40,
         plunger_speed=10,
         sensor_threshold_pascals=15,
@@ -825,7 +824,6 @@ async def test_liquid_probe(
         mock_liquid_probe.return_value = return_dict
         fake_settings_aspirate = LiquidProbeSettings(
             starting_mount_height=100,
-            max_z_distance=15,
             mount_speed=40,
             plunger_speed=10,
             sensor_threshold_pascals=15,
@@ -833,11 +831,12 @@ async def test_liquid_probe(
             aspirate_while_sensing=True,
             data_files={InstrumentProbeType.PRIMARY: "fake_file_name"},
         )
-        await ot3_hardware.liquid_probe(mount, fake_settings_aspirate)
+        fake_max_z_dist = 10.0
+        await ot3_hardware.liquid_probe(mount, fake_max_z_dist, fake_settings_aspirate)
         mock_move_to_plunger_bottom.assert_called_once()
         mock_liquid_probe.assert_called_once_with(
             mount,
-            fake_settings_aspirate.max_z_distance,
+            fake_max_z_dist,
             fake_settings_aspirate.mount_speed,
             (fake_settings_aspirate.plunger_speed * -1),
             fake_settings_aspirate.sensor_threshold_pascals,
@@ -849,7 +848,7 @@ async def test_liquid_probe(
         return_dict[head_node], return_dict[pipette_node] = 142, 142
         mock_liquid_probe.return_value = return_dict
         await ot3_hardware.liquid_probe(
-            mount, fake_liquid_settings
+            mount, fake_max_z_dist, fake_liquid_settings
         )  # should raise no exceptions
 
 
@@ -883,13 +882,16 @@ async def test_multi_liquid_probe(
             NodeId.gantry_y: 0,
             NodeId.pipette_left: 0,
         }
-        side_effects = [LiquidNotFoundError(), LiquidNotFoundError(), return_dict]
+        side_effects = [
+            PipetteLiquidNotFoundError(),
+            PipetteLiquidNotFoundError(),
+            return_dict,
+        ]
 
         # make sure aspirate while sensing reverses direction
         mock_liquid_probe.side_effect = side_effects
         fake_settings_aspirate = LiquidProbeSettings(
             starting_mount_height=100,
-            max_z_distance=3,
             mount_speed=1,
             plunger_speed=71.5,
             sensor_threshold_pascals=15,
@@ -897,7 +899,10 @@ async def test_multi_liquid_probe(
             aspirate_while_sensing=True,
             data_files={InstrumentProbeType.PRIMARY: "fake_file_name"},
         )
-        await ot3_hardware.liquid_probe(OT3Mount.LEFT, fake_settings_aspirate)
+        fake_max_z_dist = 10.0
+        await ot3_hardware.liquid_probe(
+            OT3Mount.LEFT, fake_max_z_dist, fake_settings_aspirate
+        )
         assert mock_move_to_plunger_bottom.call_count == 3
         mock_liquid_probe.assert_called_with(
             OT3Mount.LEFT,
@@ -946,16 +951,15 @@ async def test_liquid_not_found(
             NodeId.pipette_left: 0,
         }
         side_effects = [
-            LiquidNotFoundError(),
-            LiquidNotFoundError(),
-            LiquidNotFoundError(),
+            PipetteLiquidNotFoundError(),
+            PipetteLiquidNotFoundError(),
+            PipetteLiquidNotFoundError(),
         ]
 
         # make sure aspirate while sensing reverses direction
         mock_liquid_probe.side_effect = side_effects
         fake_settings_aspirate = LiquidProbeSettings(
             starting_mount_height=100,
-            max_z_distance=3,
             mount_speed=1,
             plunger_speed=71.5,
             sensor_threshold_pascals=15,
@@ -963,8 +967,11 @@ async def test_liquid_not_found(
             aspirate_while_sensing=True,
             data_files={InstrumentProbeType.PRIMARY: "fake_file_name"},
         )
-        with pytest.raises(LiquidNotFoundError):
-            await ot3_hardware.liquid_probe(OT3Mount.LEFT, fake_settings_aspirate)
+        fake_max_z_dist = 3.0
+        with pytest.raises(PipetteLiquidNotFoundError):
+            await ot3_hardware.liquid_probe(
+                OT3Mount.LEFT, fake_max_z_dist, fake_settings_aspirate
+            )
         assert mock_move_to_plunger_bottom.call_count == 3
         mock_liquid_probe.assert_called_with(
             OT3Mount.LEFT,
