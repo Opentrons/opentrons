@@ -42,8 +42,7 @@ export function ChooseCsvFile({
   setParameter,
   fileInfo,
   setFileInfo,
-}: // rawValue,
-ChooseCsvFileProps): JSX.Element {
+}: ChooseCsvFileProps): JSX.Element {
   const { t } = useTranslation('protocol_setup')
   const csvFilesOnUSB = useSelector(getFilePaths).payload.filePaths ?? []
 

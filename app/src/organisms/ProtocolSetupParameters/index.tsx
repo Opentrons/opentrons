@@ -79,10 +79,8 @@ export function ProtocolSetupParameters({
     )
   )
 
-  // ToDo (kk:06/12/2024) the initial value is fileId if there is a csv file
-
   const [fileInfo, setFileInfo] = React.useState<string>(
-    runTimeParameters.find(param => param.type === 'csv_file')?.value ?? ''
+    runTimeParameters.find(param => param.type === 'csv_file')?.file?.id ?? ''
   )
 
   const enableCsvFile = useFeatureFlag('enableCsvFile')
