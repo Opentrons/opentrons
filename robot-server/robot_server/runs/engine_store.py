@@ -159,7 +159,7 @@ class EngineStore:
 
         default_orchestrator = self._default_run_orchestrator
         if default_orchestrator is None:
-            self._default_run_orchestrator = RunOrchestrator.build_orchestrator(
+            self._default_run_orchestrator = await RunOrchestrator.build_orchestrator(
                 hardware_api=self._hardware_api,
                 deck_configuration=[],
                 robot_type=self._robot_type,
@@ -206,7 +206,7 @@ class EngineStore:
         if self._run_orchestrator is not None:
             raise EngineConflictError("Another run is currently active.")
 
-        self._run_orchestrator = RunOrchestrator.build_orchestrator(
+        self._run_orchestrator = await RunOrchestrator.build_orchestrator(
             run_id=run_id,
             load_fixed_trash=load_fixed_trash,
             deck_configuration=deck_configuration,

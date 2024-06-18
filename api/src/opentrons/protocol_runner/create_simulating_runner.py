@@ -13,12 +13,13 @@ from opentrons.protocol_reader.protocol_source import ProtocolConfig
 from opentrons_shared_data.robot.dev_types import RobotType
 
 from .python_protocol_wrappers import SimulatingContextCreator
-from .protocol_runner import create_protocol_runner, AbstractRunner
+from .run_orchestrator import RunOrchestrator
+from .protocol_runner import create_protocol_runner, LiveRunner
 
 
 async def create_simulating_runner(
     robot_type: RobotType, protocol_config: ProtocolConfig
-) -> AbstractRunner:
+) -> RunOrchestrator:
     """Create a AbstractRunner wired to a simulating HardwareControlAPI.
 
     Example:
@@ -67,11 +68,35 @@ async def create_simulating_runner(
         protocol_engine=protocol_engine,
     )
 
-    return create_protocol_runner(
+    runner = create_protocol_runner(
         protocol_config=protocol_config,
         protocol_engine=protocol_engine,
         hardware_api=simulating_hardware_api,
         protocol_context_creator=simulating_context_creator,
+    )
+
+    setup_runner = LiveRunner(
+        protocol_engine=protocol_engine,
+        hardware_api=simulating_hardware_api,
+    )
+
+    fixit_runner = LiveRunner(
+        protocol_engine=protocol_engine,
+        hardware_api=simulating_hardware_api,
+    )
+
+    protocol_live_runner = LiveRunner(
+        protocol_engine=protocol_engine,
+        hardware_api=simulating_hardware_api,
+    )
+
+    return RunOrchestrator(
+        hardware_api=simulating_hardware_api,
+        json_or_python_protocol_runner=runner,
+        protocol_engine=protocol_engine,
+        setup_runner=setup_runner,
+        fixit_runner=fixit_runner,
+        protocol_live_runner=protocol_live_runner,
     )
 
 

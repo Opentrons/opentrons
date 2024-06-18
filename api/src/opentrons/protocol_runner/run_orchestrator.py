@@ -165,11 +165,18 @@ class RunOrchestrator:
         """Start or resume the run."""
         self._protocol_engine.play(deck_configuration=deck_configuration)
 
-    async def run(self, deck_configuration: DeckConfigurationType) -> RunResult:
+    async def run(
+        self,
+        deck_configuration: DeckConfigurationType,
+        protocol_source: Optional[ProtocolSource] = None,
+        run_time_param_values: Optional[RunTimeParamValuesType] = None,
+    ) -> RunResult:
         """Start the run."""
         if self._protocol_runner:
             return await self._protocol_runner.run(
-                deck_configuration=deck_configuration
+                deck_configuration=deck_configuration,
+                protocol_source=protocol_source,
+                run_time_param_values=run_time_param_values,
             )
         elif self._protocol_live_runner:
             return await self._protocol_live_runner.run(

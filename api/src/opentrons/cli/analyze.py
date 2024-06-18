@@ -199,10 +199,12 @@ def _get_return_code(analysis: RunResult) -> int:
 
 async def _do_analyze(protocol_source: ProtocolSource) -> RunResult:
 
-    runner = await create_simulating_runner(
+    orchestrator = await create_simulating_runner(
         robot_type=protocol_source.robot_type, protocol_config=protocol_source.config
     )
-    return await runner.run(deck_configuration=[], protocol_source=protocol_source)
+    return await orchestrator.run(
+        deck_configuration=[], protocol_source=protocol_source
+    )
 
 
 async def _analyze(

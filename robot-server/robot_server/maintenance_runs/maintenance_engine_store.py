@@ -164,7 +164,7 @@ class MaintenanceEngineStore:
             self._run_orchestrator is None
         ), "There is an active maintenance run that was not cleared correctly."
 
-        self._run_orchestrator = RunOrchestrator.build_orchestrator(
+        self._run_orchestrator = await RunOrchestrator.build_orchestrator(
             run_id=run_id,
             hardware_api=self._hardware_api,
             robot_type=self._robot_type,

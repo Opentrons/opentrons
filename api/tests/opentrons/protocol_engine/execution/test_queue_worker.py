@@ -81,7 +81,7 @@ async def test_start_processes_commands(
     subject.start()
 
     decoy.verify(
-        await command_executor.execute(command_id=matchers.Anything()),
+        await command_executor.execute(command_id="command-id-1"),
         times=0,
     )
 
