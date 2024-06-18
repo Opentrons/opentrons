@@ -22,6 +22,11 @@ const defaultTabStyle = css`
     outline-offset: 2px;
     outline: 2px ${BORDERS.styleSolid} ${COLORS.blue50};
   }
+
+  &:disabled {
+    background-color: ${COLORS.grey30};
+    color: ${COLORS.grey40};
+  }
 `
 const currentTabStyle = css`
   ${defaultTabStyle}
@@ -31,11 +36,6 @@ const currentTabStyle = css`
   &:hover {
     background-color: ${COLORS.purple55};
   }
-`
-const disabledTabStyle = css`
-  ${defaultTabStyle}
-  background-color: ${COLORS.grey30};
-  color: ${COLORS.grey40};
 `
 
 export interface TabsProps {
@@ -51,12 +51,6 @@ export function Tabs(props: TabsProps): JSX.Element {
 
     const { buttons } = props
 
-    const [activeTab, setActiveTab] = React.useState<number | null>(null);
-
-    const handleClick = (index: number) : void => {
-        setActiveTab(index)
-    }
-
     return (
         <Flex
             flexDirection={DIRECTION_COLUMN} 
@@ -65,18 +59,15 @@ export function Tabs(props: TabsProps): JSX.Element {
         >
             <Flex flexDirection={DIRECTION_ROW} gridGap={SPACING.spacing4}>
                 {buttons.map((button, index) => (
-                    <button
+                    <button 
                         key={index}
                         onClick={() => {
-                            handleClick(index)
                             button.onClick()  
                         }}
-                        className={index === activeTab ? 'active' : ''}
+                        css={button.isActive === true ? currentTabStyle : defaultTabStyle}
                         disabled={button.disabled}
-                        
-                        css={index === activeTab || button.isActive === true ? currentTabStyle : button.disabled === true ? disabledTabStyle : defaultTabStyle}
                     >
-                        {button.text}
+                        {button.text}   
                     </button>
                 ))}
             </Flex>
