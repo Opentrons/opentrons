@@ -47,6 +47,7 @@ export function StepInfo({
           commandTextData={protocolAnalysis}
           robotType={robotType}
           display={DISPLAY_INLINE}
+          as={as}
         />
       ) : null}
     </Flex>
