@@ -172,12 +172,20 @@ class HardwareTipHandler(TipHandler):
             nominal_fallback=nominal_tip_geometry.length,
         )
 
-        await self._hardware_api.pick_up_tip(
-            mount=hw_mount,
-            tip_length=actual_tip_length,
-            presses=None,
-            increment=None,
-        )
+        if self._state_view.config.robot_type == "OT-3 Standard":
+            await self._hardware_api.tip_pickup_moves(
+                mount=hw_mount,
+                presses=None,
+                increment=None,
+            )
+        else:
+            await self._hardware_api.pick_up_tip(
+                mount=hw_mount,
+                tip_length=actual_tip_length,
+                presses=None,
+                increment=None,
+            )
+
         await self.verify_tip_presence(pipette_id, TipPresenceStatus.PRESENT)
 
         self._hardware_api.set_current_tiprack_diameter(

@@ -1152,7 +1152,7 @@ class API(
                 mount, back_left_nozzle, front_right_nozzle, starting_nozzle
             )
 
-    async def tip_pickup_moves(
+    async def _tip_pickup_moves(
         self,
         mount: top_types.Mount,
         spec: PickUpTipSpec,
@@ -1200,7 +1200,7 @@ class API(
             home_flagged_axes=False,
         )
 
-        await self.tip_pickup_moves(mount, spec)
+        await self._tip_pickup_moves(mount, spec)
         _add_tip_to_instrs()
 
         if prep_after:

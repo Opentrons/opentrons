@@ -1799,7 +1799,7 @@ class OT3API(
 
     async def tip_pickup_moves(
         self,
-        mount: OT3Mount,
+        mount: Union[top_types.Mount, OT3Mount],
         presses: Optional[int] = None,
         increment: Optional[float] = None,
     ) -> None:
@@ -2209,7 +2209,7 @@ class OT3API(
 
         await self._move_to_plunger_bottom(realmount, rate=1.0)
 
-        await self.tip_pickup_moves(realmount, presses, increment)
+        await self.tip_pickup_moves(mount, presses, increment)
 
         add_tip_to_instr()
 
