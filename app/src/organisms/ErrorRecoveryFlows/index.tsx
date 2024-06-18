@@ -15,7 +15,7 @@ import { OT2_ROBOT_TYPE } from '@opentrons/shared-data'
 import { useFeatureFlag } from '../../redux/config'
 import { ErrorRecoveryWizard, useERWizard } from './ErrorRecoveryWizard'
 import { RunPausedSplash, useRunPausedSplash } from './RunPausedSplash'
-import { useCurrentlyRecoveringFrom, useERUtils } from './hooks'
+import { useCurrentlyRecoveringFrom, useERUtils } from './utils'
 
 import type { RunStatus } from '@opentrons/api-client'
 import type { CompletedProtocolAnalysis } from '@opentrons/shared-data'

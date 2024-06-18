@@ -12,7 +12,7 @@ import { renderWithProviders } from '../../../__testing-utils__'
 import { i18n } from '../../../i18n'
 import { mockFailedCommand } from '../__fixtures__'
 import { ErrorRecoveryFlows, useErrorRecoveryFlows } from '..'
-import { useCurrentlyRecoveringFrom, useERUtils } from '../hooks'
+import { useCurrentlyRecoveringFrom, useERUtils } from '../utils'
 import { useFeatureFlag } from '../../../redux/config'
 import { useERWizard, ErrorRecoveryWizard } from '../ErrorRecoveryWizard'
 import { useRunPausedSplash, RunPausedSplash } from '../RunPausedSplash'
@@ -20,7 +20,7 @@ import { useRunPausedSplash, RunPausedSplash } from '../RunPausedSplash'
 import type { RunStatus } from '@opentrons/api-client'
 
 vi.mock('../ErrorRecoveryWizard')
-vi.mock('../hooks')
+vi.mock('../utils')
 vi.mock('../useRecoveryCommands')
 vi.mock('../../../redux/config')
 vi.mock('../RunPausedSplash')

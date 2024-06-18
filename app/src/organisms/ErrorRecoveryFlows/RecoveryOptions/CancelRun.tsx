@@ -19,7 +19,7 @@ import type {
   RecoveryTipStatusUtils,
   UseRecoveryCommandsResult,
   UseRouteUpdateActionsResult,
-} from '../hooks'
+} from '../utils'
 
 export function CancelRun({
   isOnDevice,

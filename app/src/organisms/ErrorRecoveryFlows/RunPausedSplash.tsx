@@ -19,12 +19,12 @@ import {
 } from '@opentrons/components'
 
 import { getIsOnDevice } from '../../redux/config'
-import { getErrorKind, useErrorMessage, useErrorName } from './hooks'
+import { getErrorKind, useErrorMessage, useErrorName } from './utils'
 import { LargeButton } from '../../atoms/buttons'
 import { RECOVERY_MAP } from './constants'
 
 import type { FailedCommand } from './types'
-import type { UseRouteUpdateActionsResult } from './hooks'
+import type { UseRouteUpdateActionsResult } from './utils'
 
 export function useRunPausedSplash(): boolean {
   return useSelector(getIsOnDevice)
