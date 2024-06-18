@@ -46,7 +46,7 @@ export function ChooseCsvFile({
   // return format: https://opentrons.atlassian.net/browse/AUTH-428
   const csvFilesOnRobot: any[] = []
 
-  const handleConfirmSelection = async (): Promise<void> => {
+  const handleConfirmSelection = (): void => {
     // invoke
     // call react-api-client
     // const fileId = await remote.ipcRenderer.invoke('usb:postDataFile', {

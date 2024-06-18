@@ -7,17 +7,37 @@ import { renderWithProviders } from '../../../__testing-utils__'
 import { EmptyFile } from '../EmptyFile'
 import { mockConnectedRobot } from '../../../redux/discovery/__fixtures__'
 import { getLocalRobot } from '../../../redux/discovery'
+import { getFilePaths } from '../../../redux/shell'
 import { ChooseCsvFile } from '../ChooseCsvFile'
 
 import type { RunTimeParameter } from '@opentrons/shared-data'
 
 vi.mock('../../../redux/discovery')
+vi.mock('../../../redux/shell')
 vi.mock('../EmptyFile')
 
 const mockHandleGoBack = vi.fn()
 const mockSetParameter = vi.fn()
 const mockParameter: RunTimeParameter = {} as any
 const mockSetFileInfo = vi.fn()
+const mockUsbData = {
+  type: 'shell:SEND_FILE_PATH',
+  payload: {
+    filePaths: [
+      '/media/mock-usb-drive/mock-file1.csv',
+      '/media/mock-usb-drive/mock-file2.csv',
+      '/media/mock-usb-drive/mock-file3.csv',
+    ],
+  },
+  meta: { shell: true },
+} as any
+
+const mockEmptyUsbData = {
+  ...mockUsbData,
+  payload: {
+    filePaths: [],
+  },
+} as any
 
 const render = (props: React.ComponentProps<typeof ChooseCsvFile>) => {
   return renderWithProviders(<ChooseCsvFile {...props} />, {
@@ -37,13 +57,17 @@ describe('ChooseCsvFile', () => {
     }
     vi.mocked(getLocalRobot).mockReturnValue(mockConnectedRobot)
     vi.mocked(EmptyFile).mockReturnValue(<div>mock EmptyFile</div>)
+    vi.mocked(getFilePaths).mockReturnValue(mockUsbData)
   })
   it('should render text and buttons', () => {
     render(props)
-    screen.getByText('CSV file')
-    screen.getByText('CSV files on opentrons-robot-name')
+    screen.getByText('Choose CSV file')
+    screen.getByText('CSV files on robot')
     screen.getByText('CSV files on USB')
     screen.getByText('Confirm selection')
+    screen.getByText('mock-file1.csv')
+    screen.getByText('mock-file2.csv')
+    screen.getByText('mock-file3.csv')
   })
 
   it('should call a mock function when tapping back button', () => {
@@ -52,7 +76,11 @@ describe('ChooseCsvFile', () => {
     expect(mockHandleGoBack).toHaveBeenCalled()
   })
 
-  it('should call a mock function when tapping a csv file', () => {})
+  it.todo('should call a mock function when tapping a csv file')
 
-  it('should render mock empty file component when there is no csv file', () => {})
+  it('should render mock empty file component when there is no csv file', () => {
+    vi.mocked(getFilePaths).mockReturnValue(mockEmptyUsbData)
+    render(props)
+    expect(screen.getAllByText('mock EmptyFile').length).toBe(2)
+  })
 })
