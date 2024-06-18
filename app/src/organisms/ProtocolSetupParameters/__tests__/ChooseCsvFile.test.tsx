@@ -32,8 +32,8 @@ describe('ChooseCsvFile', () => {
       handleGoBack: mockHandleGoBack,
       parameter: mockParameter,
       setParameter: mockSetParameter,
-      fileInfo: 'mockFileId',
-      setFileInfo: mockSetFileInfo,
+      csvFileInfo: 'mockFileId',
+      setCsvFileInfo: mockSetFileInfo,
     }
     vi.mocked(getLocalRobot).mockReturnValue(mockConnectedRobot)
     vi.mocked(EmptyFile).mockReturnValue(<div>mock EmptyFile</div>)

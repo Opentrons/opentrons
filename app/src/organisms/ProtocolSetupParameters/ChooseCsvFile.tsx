@@ -1,7 +1,6 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
-// import { useDispatch } from 'react-redux'
 import { css } from 'styled-components'
 import { last } from 'lodash'
 
@@ -15,13 +14,10 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 
-// import { RadioButton } from '../../atoms/buttons'
 import { ChildNavigation } from '../ChildNavigation'
 import { EmptyFile } from './EmptyFile'
 import { RadioButton } from '../../atoms/buttons'
 import { getFilePaths } from '../../redux/shell'
-
-// import { Dispatch } from '../../redux/types'
 
 import type { RunTimeParameter } from '@opentrons/shared-data'
 
@@ -30,18 +26,17 @@ interface ChooseCsvFileProps {
   parameter: RunTimeParameter | null
   setParameter: (value: boolean | string | number, variableName: string) => void
   /** if files on robot has the same id, the file name is highlighted */
-  fileInfo: string
+  csvFileInfo: string
   /** If a user chooses a file on robot, store fileId. If a user chooses a file on usb, store full file path.  */
-  setFileInfo: (fileInfo: string) => void
-  // rawValue: number | string | boolean
+  setCsvFileInfo: (fileInfo: string) => void
 }
 
 export function ChooseCsvFile({
   handleGoBack,
   parameter,
   setParameter,
-  fileInfo,
-  setFileInfo,
+  csvFileInfo,
+  setCsvFileInfo,
 }: ChooseCsvFileProps): JSX.Element {
   const { t } = useTranslation('protocol_setup')
   const csvFilesOnUSB = useSelector(getFilePaths).payload.filePaths ?? []
@@ -53,6 +48,7 @@ export function ChooseCsvFile({
 
   const handleConfirmSelection = async (): Promise<void> => {
     // invoke
+    // call react-api-client
     // const fileId = await remote.ipcRenderer.invoke('usb:postDataFile', {
     //   filePath: fileInfo,
     // })
@@ -113,7 +109,7 @@ export function ChooseCsvFile({
                         onChange={() => {
                           // set the file full path
                           // unselect radio button in robot
-                          setFileInfo(csv)
+                          setCsvFileInfo(csv)
                         }}
                       />
                     ) : null}

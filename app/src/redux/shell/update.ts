@@ -39,7 +39,10 @@ export function checkMassStorage(
 ): RobotMassStorageDeviceEnumerated {
   return {
     type: 'shell: ROBOT_MASS_STORAGE_DEVICE_ENUMERATED',
-    payload,
+    payload: {
+      rootPath: '',
+      filePaths: state.shell.filePaths,
+    },
     meta: { shell: true },
   }
 }

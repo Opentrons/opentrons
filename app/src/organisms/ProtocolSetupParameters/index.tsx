@@ -29,6 +29,7 @@ import { useFeatureFlag } from '../../redux/config'
 
 import type {
   ChoiceParameter,
+  CsvFileParameter,
   NumberParameter,
   RunTimeParameter,
   ValueRunTimeParameter,
@@ -61,7 +62,7 @@ export function ProtocolSetupParameters({
   const [
     chooseCsvFileScreen,
     setChooseCsvFileScreen,
-  ] = React.useState<RunTimeParameter | null>(null)
+  ] = React.useState<CsvFileParameter | null>(null)
   const [resetValuesModal, showResetValuesModal] = React.useState<boolean>(
     false
   )
@@ -79,9 +80,11 @@ export function ProtocolSetupParameters({
     )
   )
 
-  const [fileInfo, setFileInfo] = React.useState<string>(
-    runTimeParameters.find(param => param.type === 'csv_file')?.file?.id ?? ''
+  const csvFileParameter = runTimeParameters.find(
+    (param): param is CsvFileParameter => param.type === 'csv_file'
   )
+  const initialFileInfo = csvFileParameter?.file?.id ?? ''
+  const [csvFileInfo, setCSVFileInfo] = React.useState<string>(initialFileInfo)
 
   const enableCsvFile = useFeatureFlag('enableCsvFile')
 
@@ -232,8 +235,8 @@ export function ProtocolSetupParameters({
         }}
         parameter={chooseCsvFileScreen}
         setParameter={updateParameters}
-        fileInfo={fileInfo}
-        setFileInfo={setFileInfo}
+        csvFileInfo={csvFileInfo}
+        setCsvFileInfo={setCSVFileInfo}
       />
     )
   }

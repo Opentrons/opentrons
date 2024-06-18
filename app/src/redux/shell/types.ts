@@ -120,7 +120,9 @@ export interface RobotMassStorageDeviceAdded {
 }
 
 export interface RobotMassStorageDeviceEnumerated {
-  type: 'shell:ROBOT_MASS_STORAGE_DEVICE_ENUMERATED'
+  type:
+    | 'shell:ROBOT_MASS_STORAGE_DEVICE_ENUMERATED'
+    | 'shell: ROBOT_MASS_STORAGE_DEVICE_ENUMERATED'
   payload: {
     rootPath: string
     filePaths: string[]
