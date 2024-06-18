@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { useTranslation } from 'react-i18next'
+import { Trans, useTranslation } from 'react-i18next'
 
 import {
   DIRECTION_COLUMN,
@@ -14,6 +14,7 @@ import { RECOVERY_MAP } from '../constants'
 import { RecoveryFooterButtons } from './RecoveryFooterButtons'
 
 import type { RecoveryContentProps } from '../types'
+import { FailedStepNextStep } from './FailedStepNextStep'
 
 export function RetryWithNewTips(
   props: RecoveryContentProps
@@ -38,16 +39,19 @@ export function RetryWithNewTips(
         <TwoColumn>
           <Flex gridGap={SPACING.spacing8} flexDirection={DIRECTION_COLUMN}>
             <StyledText as="h4SemiBold">{t('retry_with_new_tips')}</StyledText>
-            <StyledText as="p">{t('robot_will_retry_with_tips')}</StyledText>
+            <Trans
+              t={t}
+              i18nKey="robot_will_retry_with_new_tips"
+              components={{
+                block: <StyledText as="p" />,
+              }}
+            />
           </Flex>
-          <Flex gridGap={SPACING.spacing8} flexDirection={DIRECTION_COLUMN}>
-            PLACEHOLDER
-          </Flex>
+          <FailedStepNextStep {...props} />
         </TwoColumn>
         <RecoveryFooterButtons
           isOnDevice={isOnDevice}
           primaryBtnOnClick={primaryBtnOnClick}
-          primaryBtnTextOverride={t('retry_now')}
           secondaryBtnOnClick={goBackPrevStep}
         />
       </RecoverySingleColumnContent>

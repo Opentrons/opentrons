@@ -48,6 +48,7 @@
   "skip": "Skip",
   "skip_to_next_step": "Skip to next step",
   "robot_will_not_check_for_liquid": "<block>The robot will not check for liquid again. The run will continue from the next step.</block><block>Close the robot door before proceeding.</block>",
+  "robot_will_retry_with_new_tips": "<block>The robot will retry the failed step with the new tips.</block><block>Close the robot door before proceeding.</block>",
   "stand_back": "Stand back, robot is in motion",
   "stand_back_picking_up_tips": "Stand back, picking up tips",
   "stand_back_resuming": "Stand back, resuming current step",

@@ -63,6 +63,9 @@ export function RunPausedSplash(props: RunPausedSplashProps): JSX.Element {
 
   // TODO(jh 06-07-24): Although unlikely, it's possible that the server doesn't return a failedCommand. Need to handle
   // this here or within ER flows.
+
+  // TODO(jh 06-18-24): Instead of passing stepCount internally, we probably want to
+  // pass it in as a prop to ErrorRecoveryFlows to ameliorate blippy "step = ? -> step = 24" behavior.
   return (
     <Flex
       display={DISPLAY_FLEX}
