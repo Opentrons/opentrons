@@ -54,7 +54,7 @@ describe('RetryNewTips', () => {
 
     expect(mockProceedToRouteAndStep).toHaveBeenCalledWith(
       DROP_TIP_FLOWS.ROUTE,
-      DROP_TIP_FLOWS.STEPS.WIZARD
+      DROP_TIP_FLOWS.STEPS.BEFORE_BEGINNING
     )
   })
 

@@ -28,6 +28,7 @@ export function SelectRecoveryOption({
   routeUpdateActions,
   tipStatusUtils,
   currentRecoveryOptionUtils,
+  getRecoveryOptionCopy,
 }: RecoveryContentProps): JSX.Element | null {
   const { t } = useTranslation('error_recovery')
   const { proceedToRouteAndStep } = routeUpdateActions
@@ -51,6 +52,7 @@ export function SelectRecoveryOption({
             validRecoveryOptions={validRecoveryOptions}
             setSelectedRoute={setSelectedRoute}
             selectedRoute={selectedRoute}
+            getRecoveryOptionCopy={getRecoveryOptionCopy}
           />
         </Flex>
         <RecoveryFooterButtons
@@ -70,29 +72,17 @@ export function SelectRecoveryOption({
 interface RecoveryOptionsProps {
   validRecoveryOptions: RecoveryRoute[]
   setSelectedRoute: (route: RecoveryRoute) => void
+  getRecoveryOptionCopy: RecoveryContentProps['getRecoveryOptionCopy']
   selectedRoute?: RecoveryRoute
 }
 export function RecoveryOptions({
   validRecoveryOptions,
   selectedRoute,
   setSelectedRoute,
+  getRecoveryOptionCopy,
 }: RecoveryOptionsProps): JSX.Element[] {
-  const { t } = useTranslation('error_recovery')
-
   return validRecoveryOptions.map((recoveryOption: RecoveryRoute) => {
-    const buildOptionName = (): string => {
-      switch (recoveryOption) {
-        case RECOVERY_MAP.RETRY_FAILED_COMMAND.ROUTE:
-          return t('retry_step')
-        case RECOVERY_MAP.CANCEL_RUN.ROUTE:
-          return t('cancel_run')
-        case RECOVERY_MAP.RETRY_NEW_TIPS.ROUTE:
-          return t('retry_with_new_tips')
-        default:
-          return 'INVALID_OPTION'
-      }
-    }
-    const optionName = buildOptionName()
+    const optionName = getRecoveryOptionCopy(recoveryOption)
 
     return (
       <RadioButton

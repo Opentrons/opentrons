@@ -1,6 +1,7 @@
 import * as React from 'react'
 import { vi, describe, it, expect, beforeEach } from 'vitest'
 import { screen, fireEvent } from '@testing-library/react'
+import { when } from 'vitest-when'
 
 import { renderWithProviders } from '../../../../__testing-utils__'
 import { i18n } from '../../../../i18n'
@@ -37,10 +38,12 @@ describe('SelectRecoveryOption', () => {
   let props: React.ComponentProps<typeof SelectRecoveryOption>
   let mockProceedToRouteAndStep: Mock
   let mockSetSelectedRecoveryOption: Mock
+  let mockGetRecoveryOptionCopy: Mock
 
   beforeEach(() => {
     mockProceedToRouteAndStep = vi.fn()
     mockSetSelectedRecoveryOption = vi.fn(() => Promise.resolve())
+    mockGetRecoveryOptionCopy = vi.fn()
     const mockRouteUpdateActions = {
       proceedToRouteAndStep: mockProceedToRouteAndStep,
     } as any
@@ -56,7 +59,18 @@ describe('SelectRecoveryOption', () => {
       currentRecoveryOptionUtils: {
         setSelectedRecoveryOption: mockSetSelectedRecoveryOption,
       } as any,
+      getRecoveryOptionCopy: mockGetRecoveryOptionCopy,
     }
+
+    when(mockGetRecoveryOptionCopy)
+      .calledWith(RECOVERY_MAP.RETRY_FAILED_COMMAND.ROUTE)
+      .thenReturn('Retry step')
+    when(mockGetRecoveryOptionCopy)
+      .calledWith(RECOVERY_MAP.CANCEL_RUN.ROUTE)
+      .thenReturn('Cancel run')
+    when(mockGetRecoveryOptionCopy)
+      .calledWith(RECOVERY_MAP.RETRY_NEW_TIPS.ROUTE)
+      .thenReturn('Retry with new tips')
   })
 
   it('sets the selected recovery option when clicking continue', () => {
@@ -117,15 +131,28 @@ describe('SelectRecoveryOption', () => {
 describe('RecoveryOptions', () => {
   let props: React.ComponentProps<typeof RecoveryOptions>
   let mockSetSelectedRoute: Mock
+  let mockGetRecoveryOptionCopy: Mock
 
   beforeEach(() => {
     mockSetSelectedRoute = vi.fn()
+    mockGetRecoveryOptionCopy = vi.fn()
     const generalRecoveryOptions = getRecoveryOptions(ERROR_KINDS.GENERAL_ERROR)
 
     props = {
       validRecoveryOptions: generalRecoveryOptions,
       setSelectedRoute: mockSetSelectedRoute,
+      getRecoveryOptionCopy: mockGetRecoveryOptionCopy,
     }
+
+    when(mockGetRecoveryOptionCopy)
+      .calledWith(RECOVERY_MAP.RETRY_FAILED_COMMAND.ROUTE)
+      .thenReturn('Retry step')
+    when(mockGetRecoveryOptionCopy)
+      .calledWith(RECOVERY_MAP.CANCEL_RUN.ROUTE)
+      .thenReturn('Cancel run')
+    when(mockGetRecoveryOptionCopy)
+      .calledWith(RECOVERY_MAP.RETRY_NEW_TIPS.ROUTE)
+      .thenReturn('Retry with new tips')
   })
 
   it('renders valid recovery options for a general error errorKind', () => {

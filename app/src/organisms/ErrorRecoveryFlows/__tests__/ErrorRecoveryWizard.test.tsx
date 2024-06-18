@@ -21,12 +21,14 @@ import {
   ManageTips,
 } from '../RecoveryOptions'
 import { RecoveryInProgress } from '../RecoveryInProgress'
+import { RecoveryError } from '../RecoveryError'
 
 import type { Mock } from 'vitest'
 
 vi.mock('../BeforeBeginning')
 vi.mock('../RecoveryOptions')
 vi.mock('../RecoveryInProgress')
+vi.mock('../RecoveryError')
 
 describe('useERWizard', () => {
   it('has correct initial values', () => {
@@ -75,6 +77,7 @@ describe('ErrorRecoveryContent', () => {
     RETRY_NEW_TIPS,
     CANCEL_RUN,
     DROP_TIP_FLOWS,
+    ERROR_WHILE_RECOVERING,
   } = RECOVERY_MAP
 
   let props: React.ComponentProps<typeof ErrorRecoveryContent>
@@ -91,6 +94,7 @@ describe('ErrorRecoveryContent', () => {
     vi.mocked(CancelRun).mockReturnValue(<div>MOCK_CANCEL_RUN</div>)
     vi.mocked(ManageTips).mockReturnValue(<div>MOCK_DROP_TIP_FLOWS</div>)
     vi.mocked(RetryNewTips).mockReturnValue(<div>MOCK_RETRY_NEW_TIPS</div>)
+    vi.mocked(RecoveryError).mockReturnValue(<div>MOCK_RECOVERY_ERROR</div>)
   })
 
   it(`returns SelectRecoveryOption when the route is ${OPTION_SELECTION.ROUTE}`, () => {
@@ -162,6 +166,19 @@ describe('ErrorRecoveryContent', () => {
     renderRecoveryContent(props)
 
     screen.getByText('MOCK_RETRY_NEW_TIPS')
+  })
+
+  it(`returns RecoveryError when the route is ${ERROR_WHILE_RECOVERING.ROUTE}`, () => {
+    props = {
+      ...props,
+      recoveryMap: {
+        ...props.recoveryMap,
+        route: ERROR_WHILE_RECOVERING.ROUTE,
+      },
+    }
+    renderRecoveryContent(props)
+
+    screen.getByText('MOCK_RECOVERY_ERROR')
   })
 
   it(`returns RecoveryInProgressModal when the route is ${ROBOT_CANCELING.ROUTE}`, () => {

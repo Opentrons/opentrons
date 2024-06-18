@@ -73,7 +73,7 @@ describe('ConfirmCancelRunModal', () => {
 
   it('should render a generic paused screen if there is no handled errorType', () => {
     render(props)
-    screen.getByText('General error')
+    screen.getByText('Error')
     screen.getByText('<Placeholder>')
   })
 

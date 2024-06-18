@@ -7,17 +7,20 @@ import {
 } from '@opentrons/react-api-client'
 
 import { useChainRunCommands } from '../../../resources/runs'
+import { RECOVERY_MAP } from '../constants'
 
 import type { CreateCommand, LoadedLabware } from '@opentrons/shared-data'
 import type { CommandData } from '@opentrons/api-client'
 import type { WellGroup } from '@opentrons/components'
 import type { FailedCommand } from '../types'
 import type { UseFailedLabwareUtilsResult } from './useFailedLabwareUtils'
+import type { UseRouteUpdateActionsResult } from './useRouteUpdateActions'
 
 interface UseRecoveryCommandsParams {
   runId: string
   failedCommand: FailedCommand | null
   failedLabwareUtils: UseFailedLabwareUtilsResult
+  routeUpdateActions: UseRouteUpdateActionsResult
 }
 export interface UseRecoveryCommandsResult {
   /* A terminal recovery command that causes ER to exit as the run status becomes "running" */
@@ -36,7 +39,9 @@ export function useRecoveryCommands({
   runId,
   failedCommand,
   failedLabwareUtils,
+  routeUpdateActions,
 }: UseRecoveryCommandsParams): UseRecoveryCommandsResult {
+  const { proceedToRouteAndStep } = routeUpdateActions
   const { chainRunCommands } = useChainRunCommands(runId, failedCommand?.id)
   const { resumeRunFromRecovery } = useResumeRunFromRecoveryMutation()
   const { stopRun } = useStopRunMutation()
@@ -44,11 +49,12 @@ export function useRecoveryCommands({
   const chainRunRecoveryCommands = React.useCallback(
     (
       commands: CreateCommand[],
-      continuePastFailure: boolean = true
+      continuePastFailure: boolean = false
     ): Promise<CommandData[]> =>
       chainRunCommands(commands, continuePastFailure).catch(e => {
         // the catch never occurs if continuePastCommandFailure is "true"
-        return Promise.reject(new Error(`placeholder error ${e}`))
+        void proceedToRouteAndStep(RECOVERY_MAP.ERROR_WHILE_RECOVERING.ROUTE)
+        return Promise.reject(new Error(`Could not execute command: ${e}`))
       }),
     [chainRunCommands]
   )
@@ -67,6 +73,7 @@ export function useRecoveryCommands({
   }, [chainRunRecoveryCommands])
 
   // Pick up the user-selected tips
+  // TODO(jh, 06-14-24): Do not ignore pickUpTip errors once Pipettes can support tip pick up.
   const pickUpTips = React.useCallback((): Promise<CommandData[]> => {
     const { selectedTipLocations, pickUpTipLabware } = failedLabwareUtils
 
@@ -81,7 +88,7 @@ export function useRecoveryCommands({
         new Error('Placeholder error: Invalid use of pickUpTips command')
       )
     } else {
-      return chainRunRecoveryCommands([pickUpTipCmd])
+      return chainRunRecoveryCommands([pickUpTipCmd], true)
     }
   }, [chainRunRecoveryCommands, failedCommand, failedLabwareUtils])
 

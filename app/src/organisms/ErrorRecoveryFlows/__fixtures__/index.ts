@@ -70,4 +70,5 @@ export const mockRecoveryContentProps: RecoveryContentProps = {
   recoveryMapUtils: {} as any,
   trackExternalMap: () => null,
   hasLaunchedRecovery: true,
+  getRecoveryOptionCopy: () => 'MOCK_COPY',
 }
