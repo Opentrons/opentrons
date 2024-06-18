@@ -12,9 +12,15 @@ export function useLastRunProtocolCommand(
 ): RunCommandSummary | null {
   const lastRunCommand = last(commandsData?.data) ?? null
 
-  const isProtocolIntent = lastRunCommand?.intent === 'protocol'
+  // Not all protocol commands specify a protocol intent.
+  // If intent is undefined during a run, we can assume the intent is protocol.
+  const isProtocolIntent =
+    lastRunCommand != null &&
+    (lastRunCommand.intent != null
+      ? lastRunCommand.intent === 'protocol'
+      : true)
 
-  // Get the failed command from the fixit command.
+  // Get the failed command from the non-protocol command.
   const lastRunCommandActual = useCommandQuery(
     runId,
     lastRunCommand?.failedCommandId ?? null,
