@@ -241,8 +241,8 @@ export function StackingOffsets(): JSX.Element | null {
                       isChecked ? (
                         <div
                           style={{
-                            marginTop: '-1.4rem',
-                            height: '2.2rem',
+                            marginTop: '-1.2rem',
+                            height: '2.0rem',
                             fontSize: '0.75rem',
                           }}
                         >
@@ -261,6 +261,7 @@ export function StackingOffsets(): JSX.Element | null {
               <Flex
                 flexDirection={DIRECTION_COLUMN}
                 marginTop={SPACING.spacing4}
+                gridGap={SPACING.spacing4}
               >
                 <StyledText as="h3" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
                   Modules
@@ -322,8 +323,8 @@ export function StackingOffsets(): JSX.Element | null {
                       {isChecked ? (
                         <div
                           style={{
-                            marginTop: '-1.4rem',
-                            height: '2.2rem',
+                            marginTop: '-1.2rem',
+                            height: '2.0rem',
                             fontSize: '0.75rem',
                           }}
                         >

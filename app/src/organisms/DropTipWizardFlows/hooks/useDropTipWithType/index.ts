@@ -58,6 +58,7 @@ export function useDropTipWithType(
     activeMaintenanceRunId,
     setErrorDetails,
     toggleIsExiting,
+    fixitCommandTypeUtils,
   })
 
   useRegisterPipetteFixitType({ ...params, ...dtCreateCommandUtils })

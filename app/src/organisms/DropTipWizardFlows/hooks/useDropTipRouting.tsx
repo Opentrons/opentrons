@@ -38,14 +38,21 @@ export interface UseDropTipRoutingResult {
  * 1. Before Beginning - The primary user entry point from which other routes are selected.
  * 2. Blowout - Contains steps related to pipette blowout, which typically precedes the drop tip route.
  * 3. Drop Tip - Contains steps related to dropping the pipette tip. DT flows typically end after this step.
+ *
+ * Note: Fixit commands have optional routing overrides for Drop Tip Wizard flows.
  */
 export function useDropTipRouting(
   fixitUtils?: FixitCommandTypeUtils
 ): UseDropTipRoutingResult {
+  const [initialRoute, initialStep] = React.useMemo(
+    () => getInitialRouteAndStep(fixitUtils),
+    [fixitUtils]
+  )
+
   const [dropTipFlowsMap, setDropTipFlowsMap] = React.useState<DropTipFlowsMap>(
     {
-      currentRoute: DT_ROUTES.BEFORE_BEGINNING,
-      currentStep: head(DT_ROUTES.BEFORE_BEGINNING) as DropTipFlowsStep,
+      currentRoute: initialRoute as DropTipFlowsRoute,
+      currentStep: initialStep,
       currentStepIdx: 0,
     }
   )
@@ -184,4 +191,15 @@ export function useExternalMapUpdates(
       fixitUtils.trackCurrentMap({ currentRoute, currentStep })
     }
   }, [currentStep, currentRoute, fixitUtils])
+}
+
+// If present, return fixit route overrides for setting the initial Drop Tip Wizard route.
+export function getInitialRouteAndStep(
+  fixitUtils?: FixitCommandTypeUtils
+): [DropTipFlowsRoute, DropTipFlowsStep] {
+  const routeOverride = fixitUtils?.routeOverride
+  const initialRoute = routeOverride ?? DT_ROUTES.BEFORE_BEGINNING
+  const initialStep = head(routeOverride) ?? head(DT_ROUTES.BEFORE_BEGINNING)
+
+  return [initialRoute as DropTipFlowsRoute, initialStep as DropTipFlowsStep]
 }

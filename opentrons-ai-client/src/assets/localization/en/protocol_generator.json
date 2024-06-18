@@ -19,6 +19,7 @@
   "ot2_pipettes": "OT-2 pipettes: Include volume, number of channels, and generation.",
   "pcr_flex": "PCR (Flex)",
   "pcr": "PCR",
+  "pipettes": "Pipettes: Specify your pipettes, including the volume, number of channels, and whether they’re mounted on the left or right.",
   "reagent_transfer_flex": "Reagent Transfer (Flex)",
   "reagent_transfer": "Reagent Transfer",
   "reload_page": "To start over and create a new protocol, simply reload the page.",

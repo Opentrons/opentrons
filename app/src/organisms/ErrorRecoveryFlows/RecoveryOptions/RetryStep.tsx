@@ -20,14 +20,14 @@ export function RetryStep({
   routeUpdateActions,
   recoveryCommands,
 }: RecoveryContentProps): JSX.Element | null {
-  const { ROBOT_RETRYING_COMMAND } = RECOVERY_MAP
+  const { ROBOT_RETRYING_STEP } = RECOVERY_MAP
   const { t } = useTranslation('error_recovery')
 
   const { retryFailedCommand, resumeRun } = recoveryCommands
   const { goBackPrevStep, setRobotInMotion } = routeUpdateActions
 
   const primaryBtnOnClick = (): Promise<void> => {
-    return setRobotInMotion(true, ROBOT_RETRYING_COMMAND.ROUTE)
+    return setRobotInMotion(true, ROBOT_RETRYING_STEP.ROUTE)
       .then(() => retryFailedCommand())
       .then(() => {
         resumeRun()
