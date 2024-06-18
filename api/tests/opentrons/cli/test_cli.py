@@ -152,9 +152,7 @@ def test_analysis_deck_definition(
         "commands"
     ]
 
-    # todo(mm, 2023-05-12): When protocols emit true Protocol Engine comment commands instead
-    # of legacy commands, "legacyCommandText" should change to "message".
-    assert comment_command["params"]["legacyCommandText"] == expected_point
+    assert comment_command["params"]["message"] == expected_point
 
 
 # TODO(mm, 2023-08-12): We can remove this test when we remove special handling for these

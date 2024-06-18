@@ -14,13 +14,14 @@ import { i18n } from '../../../../i18n'
 import { ManageTips, useDropTipFlowUtils } from '../ManageTips'
 import { RECOVERY_MAP } from '../../constants'
 import { DropTipWizardFlows } from '../../../DropTipWizardFlows'
+import { DT_ROUTES } from '../../../DropTipWizardFlows/constants'
 
 import type { Mock } from 'vitest'
 import type { PipetteModelSpecs } from '@opentrons/shared-data'
 
 vi.mock('../../../DropTipWizardFlows')
 
-const { DROP_TIP_FLOWS } = RECOVERY_MAP
+const { DROP_TIP_FLOWS, RETRY_NEW_TIPS } = RECOVERY_MAP
 
 const MOCK_ACTUAL_PIPETTE = {
   ...mockPipetteInfo.pipetteSpecs,
@@ -39,10 +40,12 @@ const render = (props: React.ComponentProps<typeof ManageTips>) => {
 describe('ManageTips', () => {
   let props: React.ComponentProps<typeof ManageTips>
   let mockProceedNextStep: Mock
+  let mockProceedToRouteAndStep: Mock
   let mockSetRobotInMotion: Mock
 
   beforeEach(() => {
     mockProceedNextStep = vi.fn()
+    mockProceedToRouteAndStep = vi.fn(() => Promise.resolve())
     mockSetRobotInMotion = vi.fn(() => Promise.resolve())
 
     props = {
@@ -57,8 +60,12 @@ describe('ManageTips', () => {
       routeUpdateActions: {
         proceedNextStep: mockProceedNextStep,
         setRobotInMotion: mockSetRobotInMotion,
+        proceedToRouteAndStep: mockProceedToRouteAndStep,
       } as any,
       recoveryCommands: { cancelRun: vi.fn() } as any,
+      currentRecoveryOptionUtils: {
+        selectedRecoveryOption: null,
+      } as any,
     }
 
     vi.mocked(DropTipWizardFlows).mockReturnValue(
@@ -95,10 +102,58 @@ describe('ManageTips', () => {
     expect(mockSetRobotInMotion).toHaveBeenCalled()
   })
 
-  it(`renders the Drop Tip flows when the route is ${DROP_TIP_FLOWS.STEPS.WIZARD}`, () => {
+  it(`handles special routing for ${RETRY_NEW_TIPS.ROUTE} when skipping tip drop`, () => {
+    props = {
+      ...props,
+      currentRecoveryOptionUtils: {
+        selectedRecoveryOption: RETRY_NEW_TIPS.ROUTE,
+      } as any,
+    }
+    render(props)
+
+    const skipBtn = screen.getByText('Skip')
+    const continueBtn = screen.getByRole('button', { name: 'Continue' })
+
+    fireEvent.click(skipBtn)
+    fireEvent.click(continueBtn)
+
+    expect(mockProceedToRouteAndStep).toHaveBeenCalledWith(
+      RETRY_NEW_TIPS.ROUTE,
+      RETRY_NEW_TIPS.STEPS.REPLACE_TIPS
+    )
+  })
+
+  it(`renders the Drop Tip flows when the route is ${DROP_TIP_FLOWS.STEPS.BEFORE_BEGINNING}`, () => {
     render({
       ...props,
-      recoveryMap: { ...props.recoveryMap, step: DROP_TIP_FLOWS.STEPS.WIZARD },
+      recoveryMap: {
+        ...props.recoveryMap,
+        step: DROP_TIP_FLOWS.STEPS.BEFORE_BEGINNING,
+      },
+    })
+
+    screen.getByText('MOCK DROP TIP FLOWS')
+  })
+
+  it(`renders the Drop Tip flows when the route is ${DROP_TIP_FLOWS.STEPS.CHOOSE_BLOWOUT}`, () => {
+    render({
+      ...props,
+      recoveryMap: {
+        ...props.recoveryMap,
+        step: DROP_TIP_FLOWS.STEPS.CHOOSE_BLOWOUT,
+      },
+    })
+
+    screen.getByText('MOCK DROP TIP FLOWS')
+  })
+
+  it(`renders the Drop Tip flows when the route is ${DROP_TIP_FLOWS.STEPS.CHOOSE_TIP_DROP}`, () => {
+    render({
+      ...props,
+      recoveryMap: {
+        ...props.recoveryMap,
+        step: DROP_TIP_FLOWS.STEPS.CHOOSE_TIP_DROP,
+      },
     })
 
     screen.getByText('MOCK DROP TIP FLOWS')
@@ -108,12 +163,19 @@ describe('ManageTips', () => {
 describe('useDropTipFlowUtils', () => {
   const mockRunId = 'MOCK_RUN_ID'
   const mockTipStatusUtils = { runId: mockRunId }
+  const mockProceedToRouteAndStep = vi.fn()
+  const { ERROR_WHILE_RECOVERING, DROP_TIP_FLOWS } = RECOVERY_MAP
 
   const mockProps = {
     tipStatusUtils: mockTipStatusUtils,
     failedCommand: null,
     previousRoute: null,
     trackExternalMap: vi.fn(),
+    currentRecoveryOptionUtils: {
+      selectedRecoveryOption: null,
+    } as any,
+    routeUpdateActions: { proceedToRouteAndStep: mockProceedToRouteAndStep },
+    recoveryMap: { step: DROP_TIP_FLOWS.STEPS.CHOOSE_TIP_DROP },
   } as any
 
   it('should return the correct runId', () => {
@@ -164,5 +226,46 @@ describe('useDropTipFlowUtils', () => {
     result.current.trackCurrentMap(currentMap)
 
     expect(mockTrackExternalMap).toHaveBeenCalledWith(currentMap)
+  })
+
+  it('should return the correct error overrides', () => {
+    const { result } = renderHook(() => useDropTipFlowUtils(mockProps))
+
+    result.current.errorOverrides.tipDropFailed()
+
+    expect(mockProceedToRouteAndStep).toHaveBeenCalledWith(
+      ERROR_WHILE_RECOVERING.ROUTE,
+      ERROR_WHILE_RECOVERING.STEPS.DROP_TIP_TIP_DROP_FAILED
+    )
+
+    result.current.errorOverrides.blowoutFailed()
+
+    expect(mockProceedToRouteAndStep).toHaveBeenCalledWith(
+      ERROR_WHILE_RECOVERING.ROUTE,
+      ERROR_WHILE_RECOVERING.STEPS.DROP_TIP_BLOWOUT_FAILED
+    )
+
+    result.current.errorOverrides.generalFailure()
+
+    expect(mockProceedToRouteAndStep).toHaveBeenCalledWith(
+      ERROR_WHILE_RECOVERING.ROUTE,
+      ERROR_WHILE_RECOVERING.STEPS.DROP_TIP_GENERAL_ERROR
+    )
+  })
+
+  it(`should return correct route overrides when the route is ${DROP_TIP_FLOWS.STEPS.CHOOSE_TIP_DROP}`, () => {
+    const { result } = renderHook(() => useDropTipFlowUtils(mockProps))
+
+    expect(result.current.routeOverride).toEqual(DT_ROUTES.DROP_TIP)
+  })
+
+  it(`should return correct route overrides when the route is ${DROP_TIP_FLOWS.STEPS.CHOOSE_BLOWOUT}`, () => {
+    const mockPropsBlowout = {
+      ...mockProps,
+      recoveryMap: { step: DROP_TIP_FLOWS.STEPS.CHOOSE_BLOWOUT },
+    }
+    const { result } = renderHook(() => useDropTipFlowUtils(mockPropsBlowout))
+
+    expect(result.current.routeOverride).toEqual(DT_ROUTES.BLOWOUT)
   })
 })

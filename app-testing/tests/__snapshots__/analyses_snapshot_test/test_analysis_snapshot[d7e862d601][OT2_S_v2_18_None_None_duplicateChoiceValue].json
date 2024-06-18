@@ -8,11 +8,10 @@
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "variable pipette has value flex_1channel_50",
-        "legacyCommandType": "command.COMMENT"
+        "message": "variable pipette has value flex_1channel_50"
       },
       "result": {},
       "status": "succeeded"

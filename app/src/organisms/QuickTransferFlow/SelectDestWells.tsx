@@ -140,29 +140,36 @@ export function SelectDestWells(props: SelectDestWellsProps): JSX.Element {
         width="100%"
       >
         {state.destination != null && state.source != null ? (
-          <WellSelection
-            definition={
-              state.destination === 'source' ? state.source : state.destination
-            }
-            deselectWells={(wells: string[]) => {
-              setSelectedWells(prevWells =>
-                without(Object.keys(prevWells), ...wells).reduce(
-                  (acc, well) => {
-                    return { ...acc, [well]: null }
-                  },
-                  {}
-                )
-              )
-            }}
-            selectedPrimaryWells={selectedWells}
-            selectWells={wellGroup => {
-              if (Object.keys(wellGroup).length > 0) {
-                setIsNumberWellsSelectedError(false)
-                setSelectedWells(prevWells => ({ ...prevWells, ...wellGroup }))
+          <Flex width="75%">
+            <WellSelection
+              definition={
+                state.destination === 'source'
+                  ? state.source
+                  : state.destination
               }
-            }}
-            channels={channels}
-          />
+              deselectWells={(wells: string[]) => {
+                setSelectedWells(prevWells =>
+                  without(Object.keys(prevWells), ...wells).reduce(
+                    (acc, well) => {
+                      return { ...acc, [well]: null }
+                    },
+                    {}
+                  )
+                )
+              }}
+              selectedPrimaryWells={selectedWells}
+              selectWells={wellGroup => {
+                if (Object.keys(wellGroup).length > 0) {
+                  setIsNumberWellsSelectedError(false)
+                  setSelectedWells(prevWells => ({
+                    ...prevWells,
+                    ...wellGroup,
+                  }))
+                }
+              }}
+              channels={channels}
+            />
+          </Flex>
         ) : null}
       </Flex>
     </>

@@ -22,10 +22,8 @@ import {
   THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
 import { useSelector } from 'react-redux'
-import {
-  getLabwareDef,
-  getLabwareDefinitionsFromCommands,
-} from './utils/labware'
+import { getLabwareDef } from './utils/labware'
+import { getLabwareDefinitionsFromCommands } from '../../molecules/Command/utils/getLabwareDefinitionsFromCommands'
 import { UnorderedList } from '../../molecules/UnorderedList'
 import { getCurrentOffsetForLabwareInLocation } from '../Devices/ProtocolRun/utils/getCurrentOffsetForLabwareInLocation'
 import { getIsOnDevice } from '../../redux/config'

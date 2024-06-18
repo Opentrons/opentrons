@@ -7,7 +7,7 @@ import { RUN_STATUS_RUNNING, RUN_STATUS_IDLE } from '@opentrons/api-client'
 
 import { renderWithProviders } from '../../../../__testing-utils__'
 import { i18n } from '../../../../i18n'
-import { mockRobotSideAnalysis } from '../../../CommandText/__fixtures__'
+import { mockRobotSideAnalysis } from '../../../../molecules/Command/__fixtures__'
 import { RunningProtocolCommandList } from '../RunningProtocolCommandList'
 
 const mockPlayRun = vi.fn()

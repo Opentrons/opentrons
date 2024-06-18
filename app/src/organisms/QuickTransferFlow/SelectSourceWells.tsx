@@ -72,24 +72,26 @@ export function SelectSourceWells(props: SelectSourceWellsProps): JSX.Element {
         width="100%"
       >
         {state.source != null ? (
-          <WellSelection
-            definition={state.source}
-            deselectWells={(wells: string[]) => {
-              setSelectedWells(prevWells =>
-                without(Object.keys(prevWells), ...wells).reduce(
-                  (acc, well) => {
-                    return { ...acc, [well]: null }
-                  },
-                  {}
+          <Flex width="75%">
+            <WellSelection
+              definition={state.source}
+              deselectWells={(wells: string[]) => {
+                setSelectedWells(prevWells =>
+                  without(Object.keys(prevWells), ...wells).reduce(
+                    (acc, well) => {
+                      return { ...acc, [well]: null }
+                    },
+                    {}
+                  )
                 )
-              )
-            }}
-            selectedPrimaryWells={selectedWells}
-            selectWells={wellGroup => {
-              setSelectedWells(prevWells => ({ ...prevWells, ...wellGroup }))
-            }}
-            channels={state.pipette?.channels ?? 1}
-          />
+              }}
+              selectedPrimaryWells={selectedWells}
+              selectWells={wellGroup => {
+                setSelectedWells(prevWells => ({ ...prevWells, ...wellGroup }))
+              }}
+              channels={state.pipette?.channels ?? 1}
+            />
+          </Flex>
         ) : null}
       </Flex>
     </>

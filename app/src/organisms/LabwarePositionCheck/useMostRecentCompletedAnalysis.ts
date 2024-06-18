@@ -8,6 +8,7 @@ import { useNotifyRunQuery } from '../../resources/runs'
 
 import type { CompletedProtocolAnalysis } from '@opentrons/shared-data'
 
+// TODO(jh, 06-17-24): This is used elsewhere in the app and should probably live in something like resources.
 export function useMostRecentCompletedAnalysis(
   runId: string | null
 ): CompletedProtocolAnalysis | null {

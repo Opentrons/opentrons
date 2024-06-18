@@ -9,7 +9,7 @@ import {
 } from '@opentrons/shared-data'
 import { renderWithProviders } from '../../../__testing-utils__'
 import { i18n } from '../../../i18n'
-import { CommandText } from '../'
+import { CommandText } from '../CommandText'
 import { mockCommandTextData } from '../__fixtures__'
 import { getCommandTextData } from '../utils/getCommandTextData'
 
@@ -1178,6 +1178,29 @@ describe('CommandText', () => {
       }
     )
     screen.getByText('Pausing protocol')
+  })
+  it('renders correct text for comment', () => {
+    renderWithProviders(
+      <CommandText
+        command={{
+          commandType: 'comment',
+          params: { message: 'THIS IS A MESSAGE' },
+          id: 'def456',
+          result: {},
+          status: 'queued',
+          error: null,
+          createdAt: 'fake_timestamp',
+          startedAt: null,
+          completedAt: null,
+        }}
+        commandTextData={mockCommandTextData}
+        robotType={FLEX_ROBOT_TYPE}
+      />,
+      {
+        i18nInstance: i18n,
+      }
+    )
+    screen.getByText('THIS IS A MESSAGE')
   })
   it('renders correct text for custom command type with legacy command text', () => {
     renderWithProviders(
