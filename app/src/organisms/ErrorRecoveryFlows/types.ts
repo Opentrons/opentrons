@@ -1,9 +1,6 @@
 import type { RunCommandSummary } from '@opentrons/api-client'
 import type { ERROR_KINDS, RECOVERY_MAP, INVALID } from './constants'
-import type {
-  UseRouteUpdateActionsResult,
-  UseRecoveryCommandsResult,
-} from './utils'
+import type { ErrorRecoveryWizardProps } from './ErrorRecoveryWizard'
 
 export type FailedCommand = RunCommandSummary
 export type InvalidStep = typeof INVALID
@@ -11,9 +8,10 @@ export type RecoveryRoute = typeof RECOVERY_MAP[keyof typeof RECOVERY_MAP]['ROUT
 export type RobotMovingRoute =
   | typeof RECOVERY_MAP['ROBOT_IN_MOTION']['ROUTE']
   | typeof RECOVERY_MAP['ROBOT_RESUMING']['ROUTE']
-  | typeof RECOVERY_MAP['ROBOT_RETRYING_COMMAND']['ROUTE']
+  | typeof RECOVERY_MAP['ROBOT_RETRYING_STEP']['ROUTE']
   | typeof RECOVERY_MAP['ROBOT_CANCELING']['ROUTE']
-export type ErrorKind = keyof typeof ERROR_KINDS
+  | typeof RECOVERY_MAP['ROBOT_PICKING_UP_TIPS']['ROUTE']
+export type ErrorKind = typeof ERROR_KINDS[keyof typeof ERROR_KINDS]
 
 interface RecoveryMapDetails {
   ROUTE: string
@@ -60,12 +58,7 @@ export interface IRecoveryMap {
   step: RouteStep
 }
 
-export interface RecoveryContentProps {
-  failedCommand: FailedCommand | null
+export type RecoveryContentProps = ErrorRecoveryWizardProps & {
   errorKind: ErrorKind
   isOnDevice: boolean
-  recoveryMap: IRecoveryMap
-  routeUpdateActions: UseRouteUpdateActionsResult
-  recoveryCommands: UseRecoveryCommandsResult
-  hasLaunchedRecovery: boolean
 }

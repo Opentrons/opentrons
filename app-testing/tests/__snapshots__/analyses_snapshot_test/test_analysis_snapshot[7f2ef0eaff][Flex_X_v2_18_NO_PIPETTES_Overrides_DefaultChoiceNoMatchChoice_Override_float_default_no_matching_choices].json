@@ -1,13 +1,5 @@
 {
-  "commands": [
-    {
-      "commandType": "home",
-      "notes": [],
-      "params": {},
-      "result": {},
-      "status": "succeeded"
-    }
-  ],
+  "commands": [],
   "config": {
     "apiVersion": [
       2,
@@ -17,20 +9,22 @@
   },
   "errors": [
     {
-      "detail": "ParameterValueError [line 36]: Parameter must be set to one of the allowed values of {160.0, 100.0, 200.0}.",
+      "detail": "ParameterValueError [line 36]: Parameter must be set to one of the allowed values of [100.0, 160.0, 200.0].",
       "errorCode": "4000",
       "errorInfo": {},
       "errorType": "ExceptionInProtocolError",
+      "isDefined": false,
       "wrappedErrors": [
         {
-          "detail": "opentrons.protocols.parameters.types.ParameterValueError: Parameter must be set to one of the allowed values of {160.0, 100.0, 200.0}.",
+          "detail": "opentrons.protocols.parameters.types.ParameterValueError: Parameter must be set to one of the allowed values of [100.0, 160.0, 200.0].",
           "errorCode": "4000",
           "errorInfo": {
-            "args": "('Parameter must be set to one of the allowed values of {160.0, 100.0, 200.0}.',)",
+            "args": "('Parameter must be set to one of the allowed values of [100.0, 160.0, 200.0].',)",
             "class": "ParameterValueError",
-            "traceback": "  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocols/execution/execute_python.py\", line 80, in _parse_and_set_parameters\n    exec(\"add_parameters(__param_context)\", new_globs)\n\n  File \"<string>\", line 1, in <module>\n\n  File \"Flex_X_v2_18_NO_PIPETTES_Overrides_DefaultChoiceNoMatchChoice_Override_float_default_no_matching_choices.py\", line 36, in add_parameters\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocol_api/_parameter_context.py\", line 93, in add_float\n    parameter = parameter_definition.create_float_parameter(\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocols/parameters/parameter_definition.py\", line 202, in create_float_parameter\n    return ParameterDefinition(\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocols/parameters/parameter_definition.py\", line 84, in __init__\n    self.value: ParamType = default\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocols/parameters/parameter_definition.py\", line 95, in value\n    raise ParameterValueError(\n"
+            "traceback": "  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocols/execution/execute_python.py\", line 80, in _parse_and_set_parameters\n    exec(\"add_parameters(__param_context)\", new_globs)\n\n  File \"<string>\", line 1, in <module>\n\n  File \"Flex_X_v2_18_NO_PIPETTES_Overrides_DefaultChoiceNoMatchChoice_Override_float_default_no_matching_choices.py\", line 36, in add_parameters\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocol_api/_parameter_context.py\", line 98, in add_float\n    parameter = parameter_definition.create_float_parameter(\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocols/parameters/parameter_definition.py\", line 224, in create_float_parameter\n    return ParameterDefinition(\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocols/parameters/parameter_definition.py\", line 106, in __init__\n    self.value: PrimitiveAllowedTypes = default\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocols/parameters/parameter_definition.py\", line 117, in value\n    raise ParameterValueError(\n"
           },
           "errorType": "PythonException",
+          "isDefined": false,
           "wrappedErrors": []
         }
       ]

@@ -17,41 +17,37 @@
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "Let there be light! True 🌠🌠🌠",
-        "legacyCommandType": "command.COMMENT"
+        "message": "Let there be light! True 🌠🌠🌠"
       },
       "result": {},
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "Is the door is closed? True 🚪🚪🚪",
-        "legacyCommandType": "command.COMMENT"
+        "message": "Is the door is closed? True 🚪🚪🚪"
       },
       "result": {},
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "Is this a simulation? True 🔮🔮🔮",
-        "legacyCommandType": "command.COMMENT"
+        "message": "Is this a simulation? True 🔮🔮🔮"
       },
       "result": {},
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "Running against API Version: 2.14",
-        "legacyCommandType": "command.COMMENT"
+        "message": "Running against API Version: 2.14"
       },
       "result": {},
       "status": "succeeded"
@@ -4685,7 +4681,7 @@
             }
           ],
           "metadata": {
-            "displayCategory": "aluminumBlock",
+            "displayCategory": "adapter",
             "displayName": "Opentrons 96 PCR Heater-Shaker Adapter with NEST Well Plate 100 µl",
             "displayVolumeUnits": "µL",
             "tags": []

@@ -144,12 +144,11 @@ describe('utils-formatRunTimeParameterDefaultValue', () => {
 
   it('should return value when type is csv', () => {
     const mockData = {
-      value: 'mock.csv',
+      file: { id: 'test', file: { name: 'mock.csv' } as File },
       displayName: 'My CSV File',
       variableName: 'CSVFILE',
       description: 'CSV File for a protocol',
       type: 'csv_file' as const,
-      default: 'mock.csv',
     } as RunTimeParameter
     const result = formatRunTimeParameterValue(mockData, mockTFunction)
     expect(result).toEqual('mock.csv')

@@ -27,7 +27,12 @@ import {
   useTooltip,
 } from '@opentrons/components'
 
-import { FLEX_ROBOT_TYPE, OT2_ROBOT_TYPE } from '@opentrons/shared-data'
+import {
+  FLEX_ROBOT_TYPE,
+  OT2_ROBOT_TYPE,
+  sortRuntimeParameters,
+} from '@opentrons/shared-data'
+import { useFeatureFlag } from '../../redux/config'
 import {
   getConnectableRobots,
   getReachableRobots,
@@ -45,6 +50,8 @@ import { AvailableRobotOption } from './AvailableRobotOption'
 import { InputField } from '../../atoms/InputField'
 import { DropdownMenu } from '../../atoms/MenuList/DropdownMenu'
 import { Tooltip } from '../../atoms/Tooltip'
+import { UploadInput } from '../../molecules/UploadInput'
+import { FileCard } from './FileCard'
 
 import type { RobotType, RunTimeParameter } from '@opentrons/shared-data'
 import type { SlideoutProps } from '../../atoms/Slideout'
@@ -116,6 +123,7 @@ interface ChooseRobotSlideoutProps
   multiSlideout?: { currentPage: number } | null
   setHasParamError?: (isError: boolean) => void
   resetRunTimeParameters?: () => void
+  setHasMissingFileParam?: (isMissing: boolean) => void
 }
 
 export function ChooseRobotSlideout(
@@ -143,7 +151,9 @@ export function ChooseRobotSlideout(
     setRunTimeParametersOverrides,
     setHasParamError,
     resetRunTimeParameters,
+    setHasMissingFileParam,
   } = props
+  const enableCsvFile = useFeatureFlag('enableCsvFile')
 
   const dispatch = useDispatch<Dispatch>()
   const isScanning = useSelector((state: State) => getScanning(state))
@@ -350,166 +360,260 @@ export function ChooseRobotSlideout(
 
   const errors: string[] = []
   const runTimeParameters =
-    runTimeParametersOverrides?.map((runtimeParam, index) => {
-      if ('choices' in runtimeParam) {
-        const dropdownOptions = runtimeParam.choices.map(choice => {
-          return { name: choice.displayName, value: choice.value }
-        }) as DropdownOption[]
-        return (
-          <DropdownMenu
-            key={runtimeParam.variableName}
-            filterOptions={dropdownOptions}
-            currentOption={
-              dropdownOptions.find(choice => {
-                return choice.value === runtimeParam.value
-              }) ?? dropdownOptions[0]
-            }
-            onClick={choice => {
-              const clone = runTimeParametersOverrides.map((parameter, i) => {
-                if (i === index) {
-                  return {
-                    ...parameter,
-                    value:
-                      dropdownOptions.find(option => option.value === choice)
-                        ?.value ?? parameter.default,
+    runTimeParametersOverrides != null
+      ? sortRuntimeParameters(runTimeParametersOverrides).map(
+          (runtimeParam, index) => {
+            if ('choices' in runtimeParam) {
+              const dropdownOptions = runtimeParam.choices.map(choice => {
+                return { name: choice.displayName, value: choice.value }
+              }) as DropdownOption[]
+              return (
+                <DropdownMenu
+                  key={runtimeParam.variableName}
+                  filterOptions={dropdownOptions}
+                  currentOption={
+                    dropdownOptions.find(choice => {
+                      return choice.value === runtimeParam.value
+                    }) ?? dropdownOptions[0]
                   }
-                }
-                return parameter
-              })
-              if (setRunTimeParametersOverrides != null) {
-                setRunTimeParametersOverrides(clone)
-              }
-            }}
-            title={runtimeParam.displayName}
-            width="100%"
-            dropdownType="neutral"
-            tooltipText={runtimeParam.description}
-          />
-        )
-      } else if (runtimeParam.type === 'int' || runtimeParam.type === 'float') {
-        const value = runtimeParam.value as number
-        const id = `InputField_${runtimeParam.variableName}_${index.toString()}`
-        const error =
-          (Number.isNaN(value) && !isInputFocused) ||
-          value < runtimeParam.min ||
-          value > runtimeParam.max
-            ? t(`value_out_of_range`, {
-                min:
-                  runtimeParam.type === 'int'
-                    ? runtimeParam.min
-                    : runtimeParam.min.toFixed(1),
-                max:
-                  runtimeParam.type === 'int'
-                    ? runtimeParam.max
-                    : runtimeParam.max.toFixed(1),
-              })
-            : null
-        if (error != null) {
-          errors.push(error)
-        }
-        return (
-          <InputField
-            key={runtimeParam.variableName}
-            type="number"
-            units={runtimeParam.suffix}
-            placeholder={runtimeParam.default.toString()}
-            value={value}
-            title={runtimeParam.displayName}
-            tooltipText={runtimeParam.description}
-            caption={
-              runtimeParam.type === 'int'
-                ? `${runtimeParam.min}-${runtimeParam.max}`
-                : `${runtimeParam.min.toFixed(1)}-${runtimeParam.max.toFixed(
-                    1
-                  )}`
-            }
-            id={id}
-            error={error}
-            onBlur={() => {
-              setIsInputFocused(false)
-            }}
-            onFocus={() => {
-              setIsInputFocused(true)
-            }}
-            onChange={e => {
-              const clone = runTimeParametersOverrides.map((parameter, i) => {
-                if (i === index) {
-                  return {
-                    ...parameter,
-                    value:
-                      runtimeParam.type === 'int'
-                        ? Math.round(e.target.valueAsNumber)
-                        : e.target.valueAsNumber,
-                  }
-                }
-                return parameter
-              })
-              if (setRunTimeParametersOverrides != null) {
-                setRunTimeParametersOverrides(clone)
-              }
-            }}
-          />
-        )
-      } else if (runtimeParam.type === 'bool') {
-        return (
-          <Flex
-            flexDirection={DIRECTION_COLUMN}
-            key={runtimeParam.variableName}
-          >
-            <StyledText
-              as="label"
-              fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-              paddingBottom={SPACING.spacing8}
-            >
-              {runtimeParam.displayName}
-            </StyledText>
-            <Flex
-              gridGap={SPACING.spacing8}
-              justifyContent={JUSTIFY_FLEX_START}
-              width="max-content"
-            >
-              <ToggleButton
-                toggledOn={runtimeParam.value as boolean}
-                onClick={() => {
-                  const clone = runTimeParametersOverrides.map(
-                    (parameter, i) => {
-                      if (i === index) {
+                  onClick={choice => {
+                    const clone = runTimeParametersOverrides.map(parameter => {
+                      if (
+                        runtimeParam.variableName === parameter.variableName &&
+                        'choices' in parameter
+                      ) {
                         return {
                           ...parameter,
-                          value: !parameter.value,
+                          value:
+                            dropdownOptions.find(
+                              option => option.value === choice
+                            )?.value ?? parameter.default,
                         }
                       }
                       return parameter
-                    }
-                  )
-                  if (setRunTimeParametersOverrides != null) {
-                    setRunTimeParametersOverrides(clone)
+                    })
+                    setRunTimeParametersOverrides?.(clone)
+                  }}
+                  title={runtimeParam.displayName}
+                  width="100%"
+                  dropdownType="neutral"
+                  tooltipText={runtimeParam.description}
+                />
+              )
+            } else if (
+              runtimeParam.type === 'int' ||
+              runtimeParam.type === 'float'
+            ) {
+              const value = runtimeParam.value as number
+              const id = `InputField_${
+                runtimeParam.variableName
+              }_${index.toString()}`
+              const error =
+                (Number.isNaN(value) && !isInputFocused) ||
+                value < runtimeParam.min ||
+                value > runtimeParam.max
+                  ? t(`value_out_of_range`, {
+                      min:
+                        runtimeParam.type === 'int'
+                          ? runtimeParam.min
+                          : runtimeParam.min.toFixed(1),
+                      max:
+                        runtimeParam.type === 'int'
+                          ? runtimeParam.max
+                          : runtimeParam.max.toFixed(1),
+                    })
+                  : null
+              if (error != null) {
+                errors.push(error)
+              }
+              return (
+                <InputField
+                  key={runtimeParam.variableName}
+                  type="number"
+                  units={runtimeParam.suffix}
+                  placeholder={runtimeParam.default.toString()}
+                  value={value}
+                  title={runtimeParam.displayName}
+                  tooltipText={runtimeParam.description}
+                  caption={
+                    runtimeParam.type === 'int'
+                      ? `${runtimeParam.min}-${runtimeParam.max}`
+                      : `${runtimeParam.min.toFixed(
+                          1
+                        )}-${runtimeParam.max.toFixed(1)}`
                   }
-                }}
-                height="0.813rem"
-                label={runtimeParam.value ? t('on') : t('off')}
-                paddingTop={SPACING.spacing2} // manual alignment of SVG with value label
-              />
-              <StyledText as="p">
-                {runtimeParam.value ? t('on') : t('off')}
-              </StyledText>
-            </Flex>
-            <StyledText as="label" paddingTop={SPACING.spacing8}>
-              {runtimeParam.description}
-            </StyledText>
-          </Flex>
+                  id={id}
+                  error={error}
+                  onBlur={() => {
+                    setIsInputFocused(false)
+                  }}
+                  onFocus={() => {
+                    setIsInputFocused(true)
+                  }}
+                  onChange={e => {
+                    const clone = runTimeParametersOverrides.map(parameter => {
+                      if (
+                        runtimeParam.variableName === parameter.variableName &&
+                        (parameter.type === 'int' || parameter.type === 'float')
+                      ) {
+                        return {
+                          ...parameter,
+                          value:
+                            runtimeParam.type === 'int'
+                              ? Math.round(e.target.valueAsNumber)
+                              : e.target.valueAsNumber,
+                        }
+                      }
+                      return parameter
+                    })
+                    setRunTimeParametersOverrides?.(clone)
+                  }}
+                />
+              )
+            } else if (runtimeParam.type === 'bool') {
+              return (
+                <Flex
+                  flexDirection={DIRECTION_COLUMN}
+                  key={runtimeParam.variableName}
+                >
+                  <StyledText
+                    as="label"
+                    fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+                    paddingBottom={SPACING.spacing8}
+                  >
+                    {runtimeParam.displayName}
+                  </StyledText>
+                  <Flex
+                    gridGap={SPACING.spacing8}
+                    justifyContent={JUSTIFY_FLEX_START}
+                    width="max-content"
+                  >
+                    <ToggleButton
+                      toggledOn={runtimeParam.value as boolean}
+                      onClick={() => {
+                        const clone = runTimeParametersOverrides.map(
+                          parameter => {
+                            if (
+                              runtimeParam.variableName ===
+                                parameter.variableName &&
+                              parameter.type === 'bool'
+                            ) {
+                              return {
+                                ...parameter,
+                                value: !parameter.value,
+                              }
+                            }
+                            return parameter
+                          }
+                        )
+                        setRunTimeParametersOverrides?.(clone)
+                      }}
+                      height="0.813rem"
+                      label={runtimeParam.value ? t('on') : t('off')}
+                      paddingTop={SPACING.spacing2} // manual alignment of SVG with value label
+                    />
+                    <StyledText as="p">
+                      {runtimeParam.value ? t('on') : t('off')}
+                    </StyledText>
+                  </Flex>
+                  <StyledText as="label" paddingTop={SPACING.spacing8}>
+                    {runtimeParam.description}
+                  </StyledText>
+                </Flex>
+              )
+            } else if (runtimeParam.type === 'csv_file') {
+              if (runtimeParam.file?.file != null) {
+                setHasMissingFileParam?.(false)
+              }
+              const error =
+                runtimeParam.file?.file?.type === 'text/csv'
+                  ? null
+                  : t('csv_file_type_required')
+              if (error != null) {
+                errors.push(error)
+              }
+              return !enableCsvFile ? null : (
+                <Flex
+                  flexDirection={DIRECTION_COLUMN}
+                  alignItems={ALIGN_CENTER}
+                  gridgap={SPACING.spacing8}
+                >
+                  <Flex
+                    flexDirection={DIRECTION_COLUMN}
+                    gridGap={SPACING.spacing8}
+                    width="100%"
+                    marginBottom={SPACING.spacing16}
+                  >
+                    <StyledText
+                      as="h3"
+                      fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+                    >
+                      {t('csv_file')}
+                    </StyledText>
+                    <StyledText as="p">{t('csv_required')}</StyledText>
+                  </Flex>
+                  {runtimeParam.file == null ? (
+                    <UploadInput
+                      uploadButtonText={t('choose_file')}
+                      onUpload={(file: File) => {
+                        const clone = runTimeParametersOverrides.map(
+                          parameter => {
+                            if (
+                              runtimeParam.variableName ===
+                              parameter.variableName
+                            ) {
+                              return {
+                                ...parameter,
+                                file: { file: file },
+                              }
+                            }
+                            return parameter
+                          }
+                        )
+                        setRunTimeParametersOverrides?.(clone)
+                      }}
+                      dragAndDropText={
+                        <StyledText as="p">
+                          <Trans
+                            t={t}
+                            i18nKey="shared:drag_and_drop"
+                            components={{
+                              a: <Link color={COLORS.blue55} role="button" />,
+                            }}
+                          />
+                        </StyledText>
+                      }
+                    />
+                  ) : (
+                    <FileCard
+                      error={error}
+                      fileRunTimeParameter={runtimeParam}
+                      runTimeParametersOverrides={runTimeParametersOverrides}
+                      setRunTimeParametersOverrides={
+                        setRunTimeParametersOverrides
+                      }
+                    />
+                  )}
+                </Flex>
+              )
+            }
+          }
         )
-      }
-    }) ?? null
+      : null
 
-  if (setHasParamError != null) {
-    setHasParamError(errors.length > 0)
-  }
+  const hasEmptyRtpFile =
+    runTimeParametersOverrides?.some(
+      runtimeParam =>
+        runtimeParam.type === 'csv_file' && runtimeParam.file == null
+    ) ?? false
+  setHasParamError?.(errors.length > 0 || hasEmptyRtpFile)
 
   const isRestoreDefaultsLinkEnabled =
-    runTimeParametersOverrides?.some(
-      parameter => parameter.value !== parameter.default
-    ) ?? false
+    runTimeParametersOverrides?.some(parameter => {
+      return parameter.type === 'csv_file'
+        ? parameter.file != null
+        : parameter.value !== parameter.default
+    }) ?? false
 
   const pageTwoBody =
     runTimeParametersOverrides != null ? (

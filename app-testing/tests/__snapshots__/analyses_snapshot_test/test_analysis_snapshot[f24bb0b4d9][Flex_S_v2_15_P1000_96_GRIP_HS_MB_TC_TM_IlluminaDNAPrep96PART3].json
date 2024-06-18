@@ -8,11 +8,10 @@
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "THIS IS A DRY RUN",
-        "legacyCommandType": "command.COMMENT"
+        "message": "THIS IS A DRY RUN"
       },
       "result": {},
       "status": "succeeded"
@@ -4743,6 +4742,11 @@
               "x": 0,
               "y": 0,
               "z": 16.3
+            },
+            "opentrons_96_deep_well_temp_mod_adapter": {
+              "x": 0,
+              "y": 0,
+              "z": 16.1
             }
           },
           "stackingOffsetWithModule": {
@@ -5726,6 +5730,7 @@
         "errorCode": "4000",
         "errorInfo": {},
         "errorType": "LocationIsOccupiedError",
+        "isDefined": false,
         "wrappedErrors": []
       },
       "notes": [],
@@ -5753,18 +5758,21 @@
       "errorCode": "4000",
       "errorInfo": {},
       "errorType": "ExceptionInProtocolError",
+      "isDefined": false,
       "wrappedErrors": [
         {
           "detail": "LocationIsOccupiedError: Labware nest_96_wellplate_2ml_deep is already present at slotName=<DeckSlotName.SLOT_C2: 'C2'>.",
           "errorCode": "4000",
           "errorInfo": {},
           "errorType": "ProtocolCommandFailedError",
+          "isDefined": false,
           "wrappedErrors": [
             {
               "detail": "Labware nest_96_wellplate_2ml_deep is already present at slotName=<DeckSlotName.SLOT_C2: 'C2'>.",
               "errorCode": "4000",
               "errorInfo": {},
               "errorType": "LocationIsOccupiedError",
+              "isDefined": false,
               "wrappedErrors": []
             }
           ]

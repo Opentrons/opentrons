@@ -12,12 +12,15 @@ import {
   DIRECTION_ROW,
   SecondaryButton,
   SPACING,
+  useHoverTooltip,
 } from '@opentrons/components'
 
+import { Tooltip } from '../../atoms/Tooltip'
 import { getRobotUpdateDisplayInfo } from '../../redux/robot-update'
 import { OPENTRONS_USB } from '../../redux/discovery'
 import { appShellRequestor } from '../../redux/shell/remote'
 import { useTrackCreateProtocolRunEvent } from '../Devices/hooks'
+import { getRunTimeParameterValuesForRun } from '../Devices/utils'
 import { ApplyHistoricOffsets } from '../ApplyHistoricOffsets'
 import { useOffsetCandidatesForAnalysis } from '../ApplyHistoricOffsets/hooks/useOffsetCandidatesForAnalysis'
 import { ChooseRobotSlideout } from '../ChooseRobotSlideout'
@@ -60,16 +63,32 @@ export function ChooseRobotToRunProtocolSlideoutComponent(
   )
   const runTimeParameters =
     storedProtocolData.mostRecentAnalysis?.runTimeParameters ?? []
+
   const [
     runTimeParametersOverrides,
     setRunTimeParametersOverrides,
   ] = React.useState<RunTimeParameter[]>(runTimeParameters)
   const [hasParamError, setHasParamError] = React.useState<boolean>(false)
+  const [hasMissingFileParam, setHasMissingFileParam] = React.useState<boolean>(
+    runTimeParameters?.some(parameter => parameter.type === 'csv_file') ?? false
+  )
+
+  const [targetProps, tooltipProps] = useHoverTooltip()
 
   const offsetCandidates = useOffsetCandidatesForAnalysis(
     mostRecentAnalysis,
     selectedRobot?.ip ?? null
   )
+
+  // TODO (nd: 06/13/2024): send these data files to robot and use returned IDs in RTP overrides
+  // const dataFilesForProtocol = runTimeParametersOverrides.reduce<File[]>(
+  //   (acc, parameter) =>
+  //     parameter.type === 'csv_file' && parameter.file?.file != null
+  //       ? [...acc, parameter.file.file]
+  //       : acc,
+  //   []
+  // )
+
   const {
     createRunFromProtocolSource,
     runCreationError,
@@ -110,13 +129,7 @@ export function ChooseRobotToRunProtocolSlideoutComponent(
           definitionUri,
         }))
       : [],
-    runTimeParametersOverrides.reduce(
-      (acc, param) =>
-        param.value !== param.default
-          ? { ...acc, [param.variableName]: param.value }
-          : acc,
-      {}
-    )
+    getRunTimeParameterValuesForRun(runTimeParametersOverrides)
   )
   const handleProceed: React.MouseEventHandler<HTMLButtonElement> = () => {
     trackCreateProtocolRunEvent({ name: 'createProtocolRecordRequest' })
@@ -187,13 +200,71 @@ export function ChooseRobotToRunProtocolSlideoutComponent(
     />
   )
 
+  const footer = (
+    <Flex flexDirection={DIRECTION_COLUMN}>
+      {hasRunTimeParameters ? (
+        currentPage === 1 ? (
+          <>
+            {offsetsComponent}
+            <PrimaryButton
+              onClick={() => {
+                setCurrentPage(2)
+              }}
+              width="100%"
+              disabled={
+                isCreatingRun ||
+                selectedRobot == null ||
+                isSelectedRobotOnDifferentSoftwareVersion
+              }
+            >
+              {t('shared:continue_to_param')}
+            </PrimaryButton>
+          </>
+        ) : (
+          <Flex gridGap={SPACING.spacing8} flexDirection={DIRECTION_ROW}>
+            <SecondaryButton
+              onClick={() => {
+                setCurrentPage(1)
+              }}
+              width="50%"
+            >
+              {t('shared:change_robot')}
+            </SecondaryButton>
+            <PrimaryButton
+              width="50%"
+              onClick={handleProceed}
+              disabled={hasParamError || hasMissingFileParam}
+              {...targetProps}
+            >
+              {isCreatingRun ? (
+                <Icon name="ot-spinner" spin size="1rem" />
+              ) : (
+                t('shared:confirm_values')
+              )}
+            </PrimaryButton>
+            {hasMissingFileParam ? (
+              <Tooltip tooltipProps={tooltipProps}>
+                {t('add_required_csv_file')}
+              </Tooltip>
+            ) : null}
+          </Flex>
+        )
+      ) : (
+        <>
+          {offsetsComponent}
+          {singlePageButton}
+        </>
+      )}
+    </Flex>
+  )
+
   const resetRunTimeParameters = (): void => {
-    setRunTimeParametersOverrides(
-      runTimeParametersOverrides?.map(parameter => ({
-        ...parameter,
-        value: parameter.default,
-      }))
+    const clone = runTimeParametersOverrides.map(parameter =>
+      parameter.type === 'csv_file'
+        ? { ...parameter, file: null }
+        : { ...parameter, value: parameter.default }
     )
+    setRunTimeParametersOverrides(clone as RunTimeParameter[])
   }
 
   return (
@@ -220,57 +291,7 @@ export function ChooseRobotToRunProtocolSlideoutComponent(
       }
       runTimeParametersOverrides={runTimeParametersOverrides}
       setRunTimeParametersOverrides={setRunTimeParametersOverrides}
-      footer={
-        <Flex flexDirection={DIRECTION_COLUMN}>
-          {hasRunTimeParameters ? (
-            currentPage === 1 ? (
-              <>
-                {offsetsComponent}
-                <PrimaryButton
-                  onClick={() => {
-                    setCurrentPage(2)
-                  }}
-                  width="100%"
-                  disabled={
-                    isCreatingRun ||
-                    selectedRobot == null ||
-                    isSelectedRobotOnDifferentSoftwareVersion
-                  }
-                >
-                  {t('shared:continue_to_param')}
-                </PrimaryButton>
-              </>
-            ) : (
-              <Flex gridGap={SPACING.spacing8} flexDirection={DIRECTION_ROW}>
-                <SecondaryButton
-                  onClick={() => {
-                    setCurrentPage(1)
-                  }}
-                  width="50%"
-                >
-                  {t('shared:change_robot')}
-                </SecondaryButton>
-                <PrimaryButton
-                  width="50%"
-                  onClick={handleProceed}
-                  disabled={hasParamError}
-                >
-                  {isCreatingRun ? (
-                    <Icon name="ot-spinner" spin size="1rem" />
-                  ) : (
-                    t('shared:confirm_values')
-                  )}
-                </PrimaryButton>
-              </Flex>
-            )
-          ) : (
-            <>
-              {offsetsComponent}
-              {singlePageButton}
-            </>
-          )}
-        </Flex>
-      }
+      footer={footer}
       selectedRobot={selectedRobot}
       setSelectedRobot={setSelectedRobot}
       robotType={robotType}
@@ -281,6 +302,7 @@ export function ChooseRobotToRunProtocolSlideoutComponent(
       showIdleOnly
       setHasParamError={setHasParamError}
       resetRunTimeParameters={resetRunTimeParameters}
+      setHasMissingFileParam={setHasMissingFileParam}
     />
   )
 }

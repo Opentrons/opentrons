@@ -70,7 +70,7 @@ async def test_add_labware_offset(
     )
 
     decoy.when(
-        mock_engine_store.engine.add_labware_offset(labware_offset_request)
+        mock_engine_store.add_labware_offset(labware_offset_request)
     ).then_return(labware_offset)
 
     result = await add_labware_offset(
@@ -118,7 +118,7 @@ async def test_add_labware_definition(
     uri = pe_types.LabwareUri("some/definition/uri")
 
     decoy.when(
-        mock_engine_store.engine.add_labware_definition(labware_definition)
+        mock_engine_store.add_labware_definition(labware_definition)
     ).then_return(uri)
 
     result = await add_labware_definition(

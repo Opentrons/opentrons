@@ -11,7 +11,7 @@ import type {
   AddressableAreaName,
   PipetteModelSpecs,
 } from '@opentrons/shared-data'
-import type { CommandData } from '@opentrons/api-client'
+import type { CommandData, PipetteData } from '@opentrons/api-client'
 import type {
   Axis,
   Sign,
@@ -33,6 +33,7 @@ type UseDropTipSetupCommandsParams = UseDTWithTypeParams & {
   runCommand: (params: RunCommandByCommandTypeParams) => Promise<CommandData>
   setErrorDetails: (errorDetails: SetRobotErrorDetailsParams) => void
   toggleIsExiting: () => void
+  fixitCommandTypeUtils?: FixitCommandTypeUtils
 }
 
 export interface UseDropTipCommandsResult {
@@ -50,7 +51,6 @@ export interface UseDropTipCommandsResult {
 // Returns setup commands used in Drop Tip Wizard.
 export function useDropTipCommands({
   issuedCommandsType,
-  fixitCommandTypeUtils,
   toggleIsExiting,
   activeMaintenanceRunId,
   runCommand,
@@ -59,6 +59,7 @@ export function useDropTipCommands({
   setErrorDetails,
   instrumentModelSpecs,
   robotType,
+  fixitCommandTypeUtils,
 }: UseDropTipSetupCommandsParams): UseDropTipCommandsResult {
   const [hasSeenClose, setHasSeenClose] = React.useState(false)
 
@@ -75,8 +76,8 @@ export function useDropTipCommands({
   const handleCleanUpAndClose = (homeOnExit: boolean = true): Promise<void> => {
     return new Promise(() => {
       if (issuedCommandsType === 'fixit') {
-        const { onCloseFlow } = fixitCommandTypeUtils as FixitCommandTypeUtils
-        onCloseFlow()
+        closeFlow()
+        return Promise.resolve()
       } else {
         if (!hasSeenClose) {
           setHasSeenClose(true)
@@ -126,6 +127,13 @@ export function useDropTipCommands({
           })
           .then(resolve)
           .catch(error => {
+            if (
+              fixitCommandTypeUtils != null &&
+              issuedCommandsType === 'fixit'
+            ) {
+              fixitCommandTypeUtils.errorOverrides.generalFailure()
+            }
+
             reject(
               new Error(`Error issuing move to addressable area: ${error}`)
             )
@@ -152,6 +160,10 @@ export function useDropTipCommands({
           resolve()
         })
         .catch((error: Error) => {
+          if (fixitCommandTypeUtils != null && issuedCommandsType === 'fixit') {
+            fixitCommandTypeUtils.errorOverrides.generalFailure()
+          }
+
           setErrorDetails({
             message: `Error issuing jog command: ${error.message}`,
           })
@@ -174,6 +186,17 @@ export function useDropTipCommands({
         .then((commandData: CommandData[]) => {
           const error = commandData[0].data.error
           if (error != null) {
+            if (
+              fixitCommandTypeUtils != null &&
+              issuedCommandsType === 'fixit'
+            ) {
+              if (currentStep === POSITION_AND_BLOWOUT) {
+                fixitCommandTypeUtils.errorOverrides.blowoutFailed()
+              } else {
+                fixitCommandTypeUtils.errorOverrides.tipDropFailed()
+              }
+            }
+
             setErrorDetails({
               runCommandError: error,
               message: `Error moving to position: ${error.detail}`,
@@ -184,6 +207,14 @@ export function useDropTipCommands({
           }
         })
         .catch((error: Error) => {
+          if (fixitCommandTypeUtils != null && issuedCommandsType === 'fixit') {
+            if (currentStep === POSITION_AND_BLOWOUT) {
+              fixitCommandTypeUtils.errorOverrides.blowoutFailed()
+            } else {
+              fixitCommandTypeUtils.errorOverrides.tipDropFailed()
+            }
+          }
+
           setErrorDetails({
             message: `Error issuing ${
               currentStep === POSITION_AND_BLOWOUT ? 'blowout' : 'drop tip'
@@ -256,6 +287,20 @@ const buildMoveToAACommand = (
       stayAtHighestPossibleZ: true,
       addressableAreaName: addressableAreaFromConfig,
       offset: { x: 0, y: 0, z: 0 },
+    },
+  }
+}
+
+export const buildLoadPipetteCommand = (
+  mount: PipetteData['mount'],
+  pipetteName: PipetteModelSpecs['name']
+): CreateCommand => {
+  return {
+    commandType: 'loadPipette',
+    params: {
+      pipetteId: MANAGED_PIPETTE_ID,
+      mount,
+      pipetteName,
     },
   }
 }

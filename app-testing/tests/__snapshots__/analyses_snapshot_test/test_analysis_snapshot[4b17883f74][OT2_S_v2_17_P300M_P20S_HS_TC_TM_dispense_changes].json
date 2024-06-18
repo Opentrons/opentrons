@@ -17,41 +17,37 @@
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "Let there be light! True 🌠🌠🌠",
-        "legacyCommandType": "command.COMMENT"
+        "message": "Let there be light! True 🌠🌠🌠"
       },
       "result": {},
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "Is the door is closed? True 🚪🚪🚪",
-        "legacyCommandType": "command.COMMENT"
+        "message": "Is the door is closed? True 🚪🚪🚪"
       },
       "result": {},
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "Is this a simulation? True 🔮🔮🔮",
-        "legacyCommandType": "command.COMMENT"
+        "message": "Is this a simulation? True 🔮🔮🔮"
       },
       "result": {},
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "Running against API Version: 2.17",
-        "legacyCommandType": "command.COMMENT"
+        "message": "Running against API Version: 2.17"
       },
       "result": {},
       "status": "succeeded"
@@ -2935,6 +2931,7 @@
         "errorCode": "4000",
         "errorInfo": {},
         "errorType": "InvalidDispenseVolumeError",
+        "isDefined": false,
         "wrappedErrors": []
       },
       "notes": [],
@@ -2967,18 +2964,21 @@
       "errorCode": "4000",
       "errorInfo": {},
       "errorType": "ExceptionInProtocolError",
+      "isDefined": false,
       "wrappedErrors": [
         {
           "detail": "InvalidDispenseVolumeError: Cannot dispense 21.0 µL when only 20.0 µL has been aspirated.",
           "errorCode": "4000",
           "errorInfo": {},
           "errorType": "ProtocolCommandFailedError",
+          "isDefined": false,
           "wrappedErrors": [
             {
               "detail": "Cannot dispense 21.0 µL when only 20.0 µL has been aspirated.",
               "errorCode": "4000",
               "errorInfo": {},
               "errorType": "InvalidDispenseVolumeError",
+              "isDefined": false,
               "wrappedErrors": []
             }
           ]

@@ -126,6 +126,10 @@
       "detail": "Liquid Not Found",
       "category": "roboticsControlError"
     },
+    "2018": {
+      "detail": "Tip Hit Well Bottom",
+      "category": "roboticsControlError"
+    },
     "3000": {
       "detail": "A robotics interaction error occurred.",
       "category": "roboticsInteractionError"
@@ -236,6 +240,10 @@
     },
     "4008": {
       "detail": "Invalid stored data",
+      "category": "generalError"
+    },
+    "4009": {
+      "detail": "Missing configuration data",
       "category": "generalError"
     }
   }

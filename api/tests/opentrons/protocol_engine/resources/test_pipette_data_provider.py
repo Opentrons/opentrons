@@ -147,13 +147,13 @@ def test_load_virtual_pipette_nozzle_layout(
 ) -> None:
     """It should return a NozzleMap object."""
     subject_instance.configure_virtual_pipette_nozzle_layout(
-        "my-pipette", "p300_multi_v2.1", "A1", "E1", "A1"
+        "my-pipette", "p300_multi_v2.1", "D1", "H1", "H1"
     )
     result = subject_instance.get_nozzle_layout_for_pipette("my-pipette")
     assert result.configuration.value == "COLUMN"
-    assert result.starting_nozzle == "A1"
-    assert result.front_right == "E1"
-    assert result.back_left == "A1"
+    assert result.starting_nozzle == "H1"
+    assert result.front_right == "H1"
+    assert result.back_left == "D1"
 
     subject_instance.configure_virtual_pipette_nozzle_layout(
         "my-pipette", "p300_multi_v2.1"

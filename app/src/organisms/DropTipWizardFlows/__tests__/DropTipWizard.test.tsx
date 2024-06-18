@@ -178,15 +178,13 @@ describe('DropTipWizardContent', () => {
       ...props,
       currentStep: DROP_TIP_SUCCESS,
       fixitCommandTypeUtils: {
-        copyOverrides: { tipDropCompleteBtn: 'proceed_to_tip_selection' },
+        copyOverrides: { tipDropCompleteBtnCopy: 'proceed_to_tip_selection' },
       } as any,
     })
 
     expect(vi.mocked(Success)).toHaveBeenCalledWith(
-      // This "false" in front of the text is caused by how renderWithProviders
-      // implements i18n. This is hacky and should be revisited.
       expect.objectContaining({
-        proceedText: 'falseproceed_to_tip_selection',
+        proceedText: 'proceed_to_tip_selection',
       }),
       expect.anything()
     )

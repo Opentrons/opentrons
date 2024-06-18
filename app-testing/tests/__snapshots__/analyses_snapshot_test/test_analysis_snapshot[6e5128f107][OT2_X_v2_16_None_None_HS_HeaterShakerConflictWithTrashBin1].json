@@ -471,6 +471,7 @@
       "errorCode": "4000",
       "errorInfo": {},
       "errorType": "ExceptionInProtocolError",
+      "isDefined": false,
       "wrappedErrors": [
         {
           "detail": "opentrons.motion_planning.deck_conflict.DeckConflictError: trash bin in slot 12 prevents heaterShakerModuleV1 from using slot 11.",
@@ -478,9 +479,10 @@
           "errorInfo": {
             "args": "('trash bin in slot 12 prevents heaterShakerModuleV1 from using slot 11.',)",
             "class": "DeckConflictError",
-            "traceback": "  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocols/execution/execute_python.py\", line 124, in run_python\n    exec(\"run(__context)\", new_globs)\n\n  File \"<string>\", line 1, in <module>\n\n  File \"OT2_X_v2_16_None_None_HS_HeaterShakerConflictWithTrashBin1.py\", line 11, in run\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocols/api_support/util.py\", line 383, in _check_version_wrapper\n    return decorated_obj(*args, **kwargs)\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocol_api/protocol_context.py\", line 814, in load_module\n    module_core = self._core.load_module(\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocol_api/core/engine/protocol.py\", line 423, in load_module\n    deck_conflict.check(\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocol_api/core/engine/deck_conflict.py\", line 203, in check\n    wrapped_deck_conflict.check(\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/motion_planning/deck_conflict.py\", line 223, in check\n    raise DeckConflictError(\n"
+            "traceback": "  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocols/execution/execute_python.py\", line 147, in exec_run\n    exec(\"run(__context)\", new_globs)\n\n  File \"<string>\", line 1, in <module>\n\n  File \"OT2_X_v2_16_None_None_HS_HeaterShakerConflictWithTrashBin1.py\", line 11, in run\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocols/api_support/util.py\", line 383, in _check_version_wrapper\n    return decorated_obj(*args, **kwargs)\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocol_api/protocol_context.py\", line 826, in load_module\n    module_core = self._core.load_module(\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocol_api/core/engine/protocol.py\", line 433, in load_module\n    deck_conflict.check(\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocol_api/core/engine/deck_conflict.py\", line 203, in check\n    wrapped_deck_conflict.check(\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/motion_planning/deck_conflict.py\", line 223, in check\n    raise DeckConflictError(\n"
           },
           "errorType": "PythonException",
+          "isDefined": false,
           "wrappedErrors": []
         }
       ]

@@ -13,7 +13,10 @@ import {
   Flex,
   SPACING,
 } from '@opentrons/components'
-import { formatRunTimeParameterValue } from '@opentrons/shared-data'
+import {
+  formatRunTimeParameterValue,
+  sortRuntimeParameters,
+} from '@opentrons/shared-data'
 
 import { ProtocolSetupStep } from '../../pages/ProtocolSetup'
 import { getRunTimeParameterValuesForRun } from '../Devices/utils'
@@ -24,7 +27,12 @@ import { ChooseNumber } from './ChooseNumber'
 import { ChooseCsvFile } from './ChooseCsvFile'
 import { useFeatureFlag } from '../../redux/config'
 
-import type { NumberParameter, RunTimeParameter } from '@opentrons/shared-data'
+import type {
+  ChoiceParameter,
+  NumberParameter,
+  RunTimeParameter,
+  ValueRunTimeParameter,
+} from '@opentrons/shared-data'
 import type { LabwareOffsetCreateData } from '@opentrons/api-client'
 
 interface ProtocolSetupParametersProps {
@@ -45,7 +53,7 @@ export function ProtocolSetupParameters({
   const [
     chooseValueScreen,
     setChooseValueScreen,
-  ] = React.useState<RunTimeParameter | null>(null)
+  ] = React.useState<ChoiceParameter | null>(null)
   const [
     showNumericalInputScreen,
     setShowNumericalInputScreen,
@@ -62,10 +70,13 @@ export function ProtocolSetupParameters({
     runTimeParametersOverrides,
     setRunTimeParametersOverrides,
   ] = React.useState<RunTimeParameter[]>(
-    // present defaults rather than last-set value
-    runTimeParameters.map(param => {
-      return { ...param, value: param.default }
-    })
+    runTimeParameters.map(parameter =>
+      parameter.type === 'csv_file'
+        ? { ...parameter, file: null }
+        : // TODO (nd: 06/13/2024) create individual ChoiceParameter types for correct narrowing
+          // eslint-disable-next-line
+          ({ ...parameter, value: parameter.default } as ValueRunTimeParameter)
+    )
   )
 
   // ToDo (kk:06/12/2024) the initial value is fileId if there is a csv file
@@ -86,13 +97,13 @@ export function ProtocolSetupParameters({
       }
       return parameter
     })
-    setRunTimeParametersOverrides(updatedParameters)
+    setRunTimeParametersOverrides(updatedParameters as RunTimeParameter[])
     if (chooseValueScreen && chooseValueScreen.variableName === variableName) {
       const updatedParameter = updatedParameters.find(
         parameter => parameter.variableName === variableName
       )
-      if (updatedParameter != null) {
-        setChooseValueScreen(updatedParameter)
+      if (updatedParameter != null && 'choices' in updatedParameter) {
+        setChooseValueScreen(updatedParameter as ChoiceParameter)
       }
     }
     if (
@@ -181,24 +192,35 @@ export function ProtocolSetupParameters({
         paddingX={SPACING.spacing40}
         paddingBottom={SPACING.spacing40}
       >
-        {runTimeParametersOverrides.map((parameter, index) => {
-          return (
-            <React.Fragment key={`${parameter.displayName}_${index}`}>
-              <ProtocolSetupStep
-                hasIcon={!(parameter.type === 'bool')}
-                status="inform"
-                title={parameter.displayName}
-                onClickSetupStep={() => {
-                  handleSetParameter(parameter)
-                }}
-                detail={formatRunTimeParameterValue(parameter, t)}
-                description={parameter.description}
-                fontSize="h4"
-                disabled={startSetup}
-              />
-            </React.Fragment>
-          )
-        })}
+        {sortRuntimeParameters(runTimeParametersOverrides).map(
+          (parameter, index) => {
+            return (
+              <React.Fragment key={`${parameter.displayName}_${index}`}>
+                <ProtocolSetupStep
+                  hasRightIcon={!(parameter.type === 'bool')}
+                  hasLeftIcon={false}
+                  status={
+                    parameter.type === 'csv_file' ? 'not ready' : 'inform'
+                  }
+                  title={parameter.displayName}
+                  onClickSetupStep={() => {
+                    handleSetParameter(parameter)
+                  }}
+                  detail={
+                    parameter.type === 'csv_file'
+                      ? t('required')
+                      : formatRunTimeParameterValue(parameter, t)
+                  }
+                  description={
+                    parameter.type === 'csv_file' ? null : parameter.description
+                  }
+                  fontSize="h4"
+                  disabled={startSetup}
+                />
+              </React.Fragment>
+            )
+          }
+        )}
       </Flex>
     </>
   )

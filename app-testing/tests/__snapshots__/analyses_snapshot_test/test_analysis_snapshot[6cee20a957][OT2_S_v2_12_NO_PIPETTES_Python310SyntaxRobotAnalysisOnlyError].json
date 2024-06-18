@@ -8,41 +8,37 @@
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "Where is the point? (0,0) Origin is the point's location.",
-        "legacyCommandType": "command.COMMENT"
+        "message": "Where is the point? (0,0) Origin is the point's location."
       },
       "result": {},
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "Where is the point? (0,1) Y=1 and the point is on the y-axis.",
-        "legacyCommandType": "command.COMMENT"
+        "message": "Where is the point? (0,1) Y=1 and the point is on the y-axis."
       },
       "result": {},
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "Where is the point? (1,0) X=1 and the point is on the x-axis.",
-        "legacyCommandType": "command.COMMENT"
+        "message": "Where is the point? (1,0) X=1 and the point is on the x-axis."
       },
       "result": {},
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "Where is the point? (1,1) The point is located somewhere else on the plane.",
-        "legacyCommandType": "command.COMMENT"
+        "message": "Where is the point? (1,1) The point is located somewhere else on the plane."
       },
       "result": {},
       "status": "succeeded"

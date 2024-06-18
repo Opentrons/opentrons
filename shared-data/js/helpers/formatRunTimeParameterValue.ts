@@ -3,7 +3,7 @@ import type { RunTimeParameter } from '../types'
 /**
  * Formats the runtime parameter value.
  *
- * @param {RunTimeParameter} runTimeParameter - The runtime parameter to be formatted.
+ * @param {ValueRunTimeParameter} runTimeParameter - The value runtime parameter to be formatted.
  * @param {Function} t - A function for localization.
  *
  * @returns {string} The formatted runtime parameter value.
@@ -14,7 +14,11 @@ export const formatRunTimeParameterValue = (
   runTimeParameter: RunTimeParameter,
   t: any
 ): string => {
-  const { type, value } = runTimeParameter
+  const { type } = runTimeParameter
+  const value =
+    runTimeParameter.type === 'csv_file'
+      ? runTimeParameter.file?.file?.name ?? ''
+      : runTimeParameter.value
   const suffix =
     'suffix' in runTimeParameter && runTimeParameter.suffix != null
       ? runTimeParameter.suffix

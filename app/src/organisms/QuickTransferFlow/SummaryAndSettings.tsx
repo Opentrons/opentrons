@@ -81,8 +81,12 @@ export function SummaryAndSettings(
     host
   )
 
-  const handleClickSave = (): void => {
-    const protocolFile = createQuickTransferFile(state, deckConfig)
+  const handleClickSave = (protocolName: string): void => {
+    const protocolFile = createQuickTransferFile(
+      state,
+      deckConfig,
+      protocolName
+    )
     createProtocolAsync({ files: [protocolFile] }).then(data => {
       history.push(`protocols/${data.data.id}`)
     })

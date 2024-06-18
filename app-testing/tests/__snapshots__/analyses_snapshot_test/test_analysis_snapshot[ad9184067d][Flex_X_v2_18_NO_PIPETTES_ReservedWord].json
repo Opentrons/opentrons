@@ -1,13 +1,5 @@
 {
-  "commands": [
-    {
-      "commandType": "home",
-      "notes": [],
-      "params": {},
-      "result": {},
-      "status": "succeeded"
-    }
-  ],
+  "commands": [],
   "config": {
     "apiVersion": [
       2,
@@ -17,10 +9,11 @@
   },
   "errors": [
     {
-      "detail": "ParameterNameError [line 14]: Variable name cannot be a reserved Python keyword.",
+      "detail": "ParameterNameError [line 13]: Variable name cannot be a reserved Python keyword.",
       "errorCode": "4000",
       "errorInfo": {},
       "errorType": "ExceptionInProtocolError",
+      "isDefined": false,
       "wrappedErrors": [
         {
           "detail": "opentrons.protocols.parameters.types.ParameterNameError: Variable name cannot be a reserved Python keyword.",
@@ -28,9 +21,10 @@
           "errorInfo": {
             "args": "('Variable name cannot be a reserved Python keyword.',)",
             "class": "ParameterNameError",
-            "traceback": "  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocols/execution/execute_python.py\", line 80, in _parse_and_set_parameters\n    exec(\"add_parameters(__param_context)\", new_globs)\n\n  File \"<string>\", line 1, in <module>\n\n  File \"Flex_X_v2_18_NO_PIPETTES_ReservedWord.py\", line 14, in add_parameters\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocol_api/_parameter_context.py\", line 56, in add_int\n    parameter = parameter_definition.create_int_parameter(\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocols/parameters/parameter_definition.py\", line 178, in create_int_parameter\n    return ParameterDefinition(\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocols/parameters/parameter_definition.py\", line 57, in __init__\n    self._variable_name = validation.ensure_variable_name(variable_name)\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocols/parameters/validation.py\", line 52, in ensure_variable_name\n    raise ParameterNameError(\"Variable name cannot be a reserved Python keyword.\")\n"
+            "traceback": "  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocols/execution/execute_python.py\", line 80, in _parse_and_set_parameters\n    exec(\"add_parameters(__param_context)\", new_globs)\n\n  File \"<string>\", line 1, in <module>\n\n  File \"Flex_X_v2_18_NO_PIPETTES_ReservedWord.py\", line 13, in add_parameters\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocol_api/_parameter_context.py\", line 61, in add_int\n    parameter = parameter_definition.create_int_parameter(\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocols/parameters/parameter_definition.py\", line 200, in create_int_parameter\n    return ParameterDefinition(\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocols/parameters/parameter_definition.py\", line 79, in __init__\n    self._variable_name = validation.ensure_variable_name(variable_name)\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocols/parameters/validation.py\", line 52, in ensure_variable_name\n    raise ParameterNameError(\"Variable name cannot be a reserved Python keyword.\")\n"
           },
           "errorType": "PythonException",
+          "isDefined": false,
           "wrappedErrors": []
         }
       ]

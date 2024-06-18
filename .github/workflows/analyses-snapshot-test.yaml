@@ -13,14 +13,23 @@ on:
         default: 'edge'
   schedule:
     - cron:  '26 7 * * *' # 7:26 AM UTC
+  pull_request:
+    paths:
+      - 'api/**'
+      - 'shared-data/**/*'
+      - '!shared-data/js/**'
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
 
 jobs:
   build-and-test:
     timeout-minutes: 15
     runs-on: ubuntu-latest
     env:
-      TARGET: ${{ github.event.inputs.TARGET || 'edge' }}
-      TEST_SOURCE: ${{ github.event.inputs.TEST_SOURCE || 'edge' }}
+      TARGET: ${{ github.event.inputs.TARGET || github.head_ref || 'edge' }}
+      TEST_SOURCE: ${{ github.event.inputs.TEST_SOURCE || github.head_ref || 'edge' }}
 
     steps:
     - name: Checkout Repository
@@ -61,6 +70,7 @@ jobs:
       run: make snapshot-test-update
 
     - name: Create Snapshot update Request
+      id: create-pull-request
       if: failure()
       uses: peter-evans/create-pull-request@v5
       with:
@@ -70,3 +80,15 @@ jobs:
           branch: 'app-testing/${{ env.TARGET }}-from-${{ env.TEST_SOURCE}}'
           base: ${{ env.TEST_SOURCE}}
 
+    - name: Comment on PR
+      if: failure() && github.event_name == 'pull_request'
+      uses: actions/github-script@v7
+      with:
+        script: |
+          const message = 'A PR has been opened to address analyses snapshot changes. Please review the changes here: https://github.com/${{ github.repository }}/pull/${{ steps.create-pull-request.outputs.pull-request-number }}';
+          github.rest.issues.createComment({
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            issue_number: context.issue.number,
+            body: message
+          });

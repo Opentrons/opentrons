@@ -47,7 +47,7 @@ async def add_labware_offset(
         engine_store: Engine storage interface.
         run: Run response data by ID from URL; ensures 404 if run not found.
     """
-    added_offset = engine_store.engine.add_labware_offset(request_body.data)
+    added_offset = engine_store.add_labware_offset(request_body.data)
     log.info(f'Added labware offset "{added_offset.id}"' f' to run "{run.id}".')
 
     return await PydanticResponse.create(
@@ -84,7 +84,7 @@ async def add_labware_definition(
         engine_store: Engine storage interface.
         run: Run response data by ID from URL; ensures 404 if run not found.
     """
-    uri = engine_store.engine.add_labware_definition(request_body.data)
+    uri = engine_store.add_labware_definition(request_body.data)
     log.info(f'Added labware definition "{uri}"' f' to run "{run.id}".')
 
     return PydanticResponse(

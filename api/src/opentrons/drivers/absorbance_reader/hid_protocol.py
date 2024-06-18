@@ -4,7 +4,6 @@ from typing import (
     List,
     Literal,
     Tuple,
-    ClassVar,
     runtime_checkable,
     TypeVar,
 )
@@ -36,6 +35,20 @@ ErrorCodeNames = Literal[
     "BYONOY_ERROR_INTERNAL",
 ]
 
+SlotStateNames = Literal[
+    "BYONOY_SLOT_UNKNOWN",
+    "BYONOY_SLOT_EMPTY",
+    "BYONOY_SLOT_OCCUPIED",
+    "BYONOY_SLOT_UNDETERMINED",
+]
+
+DeviceStateNames = Literal[
+    "BYONOY_DEVICE_STATE_UNKNOWN",
+    "BYONOY_DEVICE_STATE_OK",
+    "BYONOY_DEVICE_STATE_BROKEN_FW",
+    "BYONOY_DEVICE_STATE_ERROR",
+]
+
 
 @runtime_checkable
 class AbsorbanceHidInterface(Protocol):
@@ -51,7 +64,9 @@ class AbsorbanceHidInterface(Protocol):
 
     @runtime_checkable
     class SlotState(Protocol):
-        __members__: ClassVar[Dict[str, int]]
+        __members__: Dict[SlotStateNames, int]
+        name: SlotStateNames
+        value: int
 
     @runtime_checkable
     class MeasurementConfig(Protocol):
@@ -65,7 +80,9 @@ class AbsorbanceHidInterface(Protocol):
 
     @runtime_checkable
     class DeviceState(Protocol):
-        __members__: ClassVar[Dict[str, int]]
+        __members__: Dict[DeviceStateNames, int]
+        name: DeviceStateNames
+        value: int
 
     def ByonoyAbs96SingleMeasurementConfig(self) -> MeasurementConfig:
         ...

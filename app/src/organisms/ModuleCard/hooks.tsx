@@ -349,6 +349,7 @@ export function useModuleOverflowMenu(
               },
       },
     ],
+    absorbanceReaderType: [],
   }
 
   return {

@@ -57,6 +57,16 @@ class AnalysisSummary(BaseModel):
 
     id: str = Field(..., description="Unique identifier of this analysis resource")
     status: AnalysisStatus = Field(..., description="Status of the analysis")
+    runTimeParameters: Optional[List[RunTimeParameter]] = Field(
+        default=None,
+        description=(
+            "Run time parameters used during analysis."
+            " These are the parameters that are defined in the protocol, with values"
+            " specified either in the protocol creation request or reanalysis request"
+            " (whichever started this analysis), or default values from the protocol"
+            " if none are specified in the request."
+        ),
+    )
 
 
 class PendingAnalysis(BaseModel):
@@ -66,6 +76,16 @@ class PendingAnalysis(BaseModel):
     status: Literal[AnalysisStatus.PENDING] = Field(
         AnalysisStatus.PENDING,
         description="Status marking the analysis as pending",
+    )
+    runTimeParameters: List[RunTimeParameter] = Field(
+        default_factory=list,
+        description=(
+            "Run time parameters used during analysis."
+            " These are the parameters that are defined in the protocol, with values"
+            " specified either in the protocol creation request or reanalysis request"
+            " (whichever started this analysis), or default values from the protocol"
+            " if none are specified in the request."
+        ),
     )
 
 
@@ -162,11 +182,14 @@ class CompletedAnalysis(BaseModel):
     )
 
 
+AnalysisParameterType = Union[float, bool, str, None]
+
+
 class RunTimeParameterAnalysisData(NamedTuple):
     """Data from analysis of a run-time parameter."""
 
-    value: Union[float, bool, str]
-    default: Union[float, bool, str]
+    value: AnalysisParameterType
+    default: AnalysisParameterType
 
 
 ProtocolAnalysis = Union[PendingAnalysis, CompletedAnalysis]

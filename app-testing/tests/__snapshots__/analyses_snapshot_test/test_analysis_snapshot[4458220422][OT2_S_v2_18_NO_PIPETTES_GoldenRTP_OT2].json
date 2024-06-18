@@ -8,191 +8,172 @@
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "variable min_max_all_fields has value 6",
-        "legacyCommandType": "command.COMMENT"
+        "message": "variable min_max_all_fields has value 6"
       },
       "result": {},
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "variable int_min_max_without_unit has value 1",
-        "legacyCommandType": "command.COMMENT"
+        "message": "variable int_min_max_without_unit has value 1"
       },
       "result": {},
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "variable int_min_max_without_description has value 1",
-        "legacyCommandType": "command.COMMENT"
+        "message": "variable int_min_max_without_description has value 1"
       },
       "result": {},
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "variable int_min_max_without_unit_and_description has value 1",
-        "legacyCommandType": "command.COMMENT"
+        "message": "variable int_min_max_without_unit_and_description has value 1"
       },
       "result": {},
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "variable int_choices_all_fields has value 20",
-        "legacyCommandType": "command.COMMENT"
+        "message": "variable int_choices_all_fields has value 20"
       },
       "result": {},
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "variable int_choice_no_unit has value 6",
-        "legacyCommandType": "command.COMMENT"
+        "message": "variable int_choice_no_unit has value 6"
       },
       "result": {},
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "variable int_choice_no_unit_desc has value 10",
-        "legacyCommandType": "command.COMMENT"
+        "message": "variable int_choice_no_unit_desc has value 10"
       },
       "result": {},
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "variable float_min_max_all_fields has value 30.0",
-        "legacyCommandType": "command.COMMENT"
+        "message": "variable float_min_max_all_fields has value 30.0"
       },
       "result": {},
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "variable float_min_max_no_unit has value 1.8",
-        "legacyCommandType": "command.COMMENT"
+        "message": "variable float_min_max_no_unit has value 1.8"
       },
       "result": {},
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "variable float_min_max_no_unit_or_desc has value 1.8",
-        "legacyCommandType": "command.COMMENT"
+        "message": "variable float_min_max_no_unit_or_desc has value 1.8"
       },
       "result": {},
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "variable float_choices_all_fields has value 20.0",
-        "legacyCommandType": "command.COMMENT"
+        "message": "variable float_choices_all_fields has value 20.0"
       },
       "result": {},
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "variable float_choices_no_unit has value 10.0",
-        "legacyCommandType": "command.COMMENT"
+        "message": "variable float_choices_no_unit has value 10.0"
       },
       "result": {},
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "variable float_choices_no_description has value 20.0",
-        "legacyCommandType": "command.COMMENT"
+        "message": "variable float_choices_no_description has value 20.0"
       },
       "result": {},
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "variable float_choices_no_unit_or_desc has value 20.0",
-        "legacyCommandType": "command.COMMENT"
+        "message": "variable float_choices_no_unit_or_desc has value 20.0"
       },
       "result": {},
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "variable bool_all_fields has value False",
-        "legacyCommandType": "command.COMMENT"
+        "message": "variable bool_all_fields has value False"
       },
       "result": {},
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "variable bool_no_desc has value False",
-        "legacyCommandType": "command.COMMENT"
+        "message": "variable bool_no_desc has value False"
       },
       "result": {},
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "variable str_choices_all_fields has value flex_1channel_50",
-        "legacyCommandType": "command.COMMENT"
+        "message": "variable str_choices_all_fields has value flex_1channel_50"
       },
       "result": {},
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "variable str_choices_all_many_fields has value E",
-        "legacyCommandType": "command.COMMENT"
+        "message": "variable str_choices_all_many_fields has value E"
       },
       "result": {},
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "variable str_choices_no_desc has value flex_1channel_50",
-        "legacyCommandType": "command.COMMENT"
+        "message": "variable str_choices_no_desc has value flex_1channel_50"
       },
       "result": {},
       "status": "succeeded"
@@ -285,53 +266,53 @@
       "choices": [
         {
           "displayName": "20",
-          "value": 20.0
+          "value": 20
         },
         {
           "displayName": "16",
-          "value": 16.0
+          "value": 16
         }
       ],
-      "default": 20.0,
+      "default": 20,
       "description": "Reused description for all parameters.",
       "displayName": "int choices all",
       "type": "int",
-      "value": 20.0,
+      "value": 20,
       "variableName": "int_choices_all_fields"
     },
     {
       "choices": [
         {
           "displayName": "1X",
-          "value": 6.0
+          "value": 6
         },
         {
           "displayName": "2X",
-          "value": 12.0
+          "value": 12
         }
       ],
-      "default": 6.0,
+      "default": 6,
       "description": "Reused description for all parameters.",
       "displayName": "int choice no unit",
       "type": "int",
-      "value": 6.0,
+      "value": 6,
       "variableName": "int_choice_no_unit"
     },
     {
       "choices": [
         {
           "displayName": "10X",
-          "value": 10.0
+          "value": 10
         },
         {
           "displayName": "100X",
-          "value": 100.0
+          "value": 100
         }
       ],
-      "default": 10.0,
+      "default": 10,
       "displayName": "int choice no unit, desc",
       "type": "int",
-      "value": 10.0,
+      "value": 10,
       "variableName": "int_choice_no_unit_desc"
     },
     {

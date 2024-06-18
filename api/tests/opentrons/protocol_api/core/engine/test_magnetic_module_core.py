@@ -6,6 +6,7 @@ from opentrons.hardware_control import SynchronousAdapter
 from opentrons.hardware_control.modules import MagDeck
 from opentrons.hardware_control.modules.types import MagneticStatus, ModuleType
 
+from opentrons.protocol_engine import commands as cmd
 from opentrons.protocol_engine.clients import SyncClient as EngineClient
 from opentrons.protocol_engine.types import ModuleModel
 
@@ -80,7 +81,9 @@ def test_engage_from_base(
     subject.engage(height_from_base=7.0)
 
     decoy.verify(
-        mock_engine_client.magnetic_module_engage(module_id="1234", engage_height=7.0),
+        mock_engine_client.execute_command(
+            cmd.magnetic_module.EngageParams(moduleId="1234", height=7.0)
+        ),
         times=1,
     )
 
@@ -102,7 +105,9 @@ def test_engage_to_labware(
     subject.engage_to_labware(offset=2.0)
 
     decoy.verify(
-        mock_engine_client.magnetic_module_engage(module_id="1234", engage_height=6.0),
+        mock_engine_client.execute_command(
+            cmd.magnetic_module.EngageParams(moduleId="1234", height=6.0)
+        ),
         times=1,
     )
 
@@ -148,7 +153,10 @@ def test_disengage(
     subject.disengage()
 
     decoy.verify(
-        mock_engine_client.magnetic_module_disengage(module_id="1234"), times=1
+        mock_engine_client.execute_command(
+            cmd.magnetic_module.DisengageParams(moduleId="1234")
+        ),
+        times=1,
     )
 
 

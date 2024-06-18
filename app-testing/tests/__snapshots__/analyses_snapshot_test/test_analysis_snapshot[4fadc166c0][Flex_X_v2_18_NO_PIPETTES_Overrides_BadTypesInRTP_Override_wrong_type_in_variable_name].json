@@ -1,13 +1,5 @@
 {
-  "commands": [
-    {
-      "commandType": "home",
-      "notes": [],
-      "params": {},
-      "result": {},
-      "status": "succeeded"
-    }
-  ],
+  "commands": [],
   "config": {
     "apiVersion": [
       2,
@@ -21,6 +13,7 @@
       "errorCode": "4000",
       "errorInfo": {},
       "errorType": "ExceptionInProtocolError",
+      "isDefined": false,
       "wrappedErrors": [
         {
           "detail": "opentrons.protocols.parameters.types.ParameterNameError: Variable name must be a string.",
@@ -28,9 +21,10 @@
           "errorInfo": {
             "args": "('Variable name must be a string.',)",
             "class": "ParameterNameError",
-            "traceback": "  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocols/execution/execute_python.py\", line 80, in _parse_and_set_parameters\n    exec(\"add_parameters(__param_context)\", new_globs)\n\n  File \"<string>\", line 1, in <module>\n\n  File \"Flex_X_v2_18_NO_PIPETTES_Overrides_BadTypesInRTP_Override_wrong_type_in_variable_name.py\", line 39, in add_parameters\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocol_api/_parameter_context.py\", line 93, in add_float\n    parameter = parameter_definition.create_float_parameter(\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocols/parameters/parameter_definition.py\", line 202, in create_float_parameter\n    return ParameterDefinition(\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocols/parameters/parameter_definition.py\", line 57, in __init__\n    self._variable_name = validation.ensure_variable_name(variable_name)\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocols/parameters/validation.py\", line 46, in ensure_variable_name\n    raise ParameterNameError(\"Variable name must be a string.\")\n"
+            "traceback": "  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocols/execution/execute_python.py\", line 80, in _parse_and_set_parameters\n    exec(\"add_parameters(__param_context)\", new_globs)\n\n  File \"<string>\", line 1, in <module>\n\n  File \"Flex_X_v2_18_NO_PIPETTES_Overrides_BadTypesInRTP_Override_wrong_type_in_variable_name.py\", line 39, in add_parameters\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocol_api/_parameter_context.py\", line 98, in add_float\n    parameter = parameter_definition.create_float_parameter(\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocols/parameters/parameter_definition.py\", line 224, in create_float_parameter\n    return ParameterDefinition(\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocols/parameters/parameter_definition.py\", line 79, in __init__\n    self._variable_name = validation.ensure_variable_name(variable_name)\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocols/parameters/validation.py\", line 46, in ensure_variable_name\n    raise ParameterNameError(\"Variable name must be a string.\")\n"
           },
           "errorType": "PythonException",
+          "isDefined": false,
           "wrappedErrors": []
         }
       ]

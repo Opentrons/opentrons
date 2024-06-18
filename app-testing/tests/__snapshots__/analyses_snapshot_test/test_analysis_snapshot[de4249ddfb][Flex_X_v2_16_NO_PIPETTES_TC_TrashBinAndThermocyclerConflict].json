@@ -130,6 +130,7 @@
       "errorCode": "4000",
       "errorInfo": {},
       "errorType": "ExceptionInProtocolError",
+      "isDefined": false,
       "wrappedErrors": [
         {
           "detail": "opentrons.motion_planning.deck_conflict.DeckConflictError: thermocyclerModuleV2 in slot B1 prevents trash bin from using slot A1.",
@@ -137,9 +138,10 @@
           "errorInfo": {
             "args": "('thermocyclerModuleV2 in slot B1 prevents trash bin from using slot A1.',)",
             "class": "DeckConflictError",
-            "traceback": "  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocols/execution/execute_python.py\", line 124, in run_python\n    exec(\"run(__context)\", new_globs)\n\n  File \"<string>\", line 1, in <module>\n\n  File \"Flex_X_v2_16_NO_PIPETTES_TC_TrashBinAndThermocyclerConflict.py\", line 13, in run\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocols/api_support/util.py\", line 383, in _check_version_wrapper\n    return decorated_obj(*args, **kwargs)\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocol_api/protocol_context.py\", line 518, in load_trash_bin\n    trash_bin = self._core.load_trash_bin(slot_name, addressable_area_name)\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocol_api/core/engine/protocol.py\", line 528, in load_trash_bin\n    self._add_disposal_location_to_engine(trash_bin)\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocol_api/core/engine/protocol.py\", line 148, in _add_disposal_location_to_engine\n    deck_conflict.check(\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocol_api/core/engine/deck_conflict.py\", line 203, in check\n    wrapped_deck_conflict.check(\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/motion_planning/deck_conflict.py\", line 210, in check\n    raise DeckConflictError(\n"
+            "traceback": "  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocols/execution/execute_python.py\", line 147, in exec_run\n    exec(\"run(__context)\", new_globs)\n\n  File \"<string>\", line 1, in <module>\n\n  File \"Flex_X_v2_16_NO_PIPETTES_TC_TrashBinAndThermocyclerConflict.py\", line 13, in run\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocols/api_support/util.py\", line 383, in _check_version_wrapper\n    return decorated_obj(*args, **kwargs)\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocol_api/protocol_context.py\", line 530, in load_trash_bin\n    trash_bin = self._core.load_trash_bin(slot_name, addressable_area_name)\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocol_api/core/engine/protocol.py\", line 541, in load_trash_bin\n    self._add_disposal_location_to_engine(trash_bin)\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocol_api/core/engine/protocol.py\", line 150, in _add_disposal_location_to_engine\n    deck_conflict.check(\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocol_api/core/engine/deck_conflict.py\", line 203, in check\n    wrapped_deck_conflict.check(\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/motion_planning/deck_conflict.py\", line 210, in check\n    raise DeckConflictError(\n"
           },
           "errorType": "PythonException",
+          "isDefined": false,
           "wrappedErrors": []
         }
       ]

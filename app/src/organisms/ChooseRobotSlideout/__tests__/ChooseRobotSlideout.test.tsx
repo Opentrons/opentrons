@@ -227,14 +227,16 @@ describe('ChooseRobotSlideout', () => {
       })
 
       screen.getByText(param.displayName)
-      if (param.type === 'bool') {
-        screen.getByText(param.description)
-      }
-      if (param.type === 'int') {
-        screen.getByText(`${param.min}-${param.max}`)
-      }
-      if (param.type === 'float') {
-        screen.getByText(`${param.min.toFixed(1)}-${param.max.toFixed(1)}`)
+      if (!('choices' in param)) {
+        if (param.type === 'bool') {
+          screen.getByText(param.description)
+        }
+        if (param.type === 'int') {
+          screen.getByText(`${param.min}-${param.max}`)
+        }
+        if (param.type === 'float') {
+          screen.getByText(`${param.min.toFixed(1)}-${param.max.toFixed(1)}`)
+        }
       }
     })
   })
