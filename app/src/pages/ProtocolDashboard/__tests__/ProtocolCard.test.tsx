@@ -10,6 +10,7 @@ import {
 import { renderWithProviders } from '../../../__testing-utils__'
 import { i18n } from '../../../i18n'
 import { ProtocolCard } from '../ProtocolCard'
+
 import type * as ReactRouterDom from 'react-router-dom'
 import type { UseQueryResult } from 'react-query'
 import type {
@@ -51,6 +52,7 @@ const props = {
   setTargetProtocol: vi.fn(),
   setShowDeleteConfirmationModal: vi.fn(),
   setTargetProtocolId: vi.fn(),
+  setIsRequiredCSV: vi.fn(),
 }
 
 const render = () => {

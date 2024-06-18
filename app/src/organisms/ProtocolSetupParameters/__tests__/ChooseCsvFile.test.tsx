@@ -17,6 +17,7 @@ vi.mock('../EmptyFile')
 const mockHandleGoBack = vi.fn()
 const mockSetParameter = vi.fn()
 const mockParameter: RunTimeParameter = {} as any
+const mockSetFileInfo = vi.fn()
 
 const render = (props: React.ComponentProps<typeof ChooseCsvFile>) => {
   return renderWithProviders(<ChooseCsvFile {...props} />, {
@@ -31,6 +32,8 @@ describe('ChooseCsvFile', () => {
       handleGoBack: mockHandleGoBack,
       parameter: mockParameter,
       setParameter: mockSetParameter,
+      fileInfo: 'mockFileId',
+      setFileInfo: mockSetFileInfo,
     }
     vi.mocked(getLocalRobot).mockReturnValue(mockConnectedRobot)
     vi.mocked(EmptyFile).mockReturnValue(<div>mock EmptyFile</div>)
