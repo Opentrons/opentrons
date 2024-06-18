@@ -39,42 +39,37 @@ const currentTabStyle = css`
 `
 
 export interface TabsProps {
-    buttons: Array<{
-        text: string
-        isActive?: boolean
-        disabled?: boolean
-        onClick: () => void
-    }>
+  buttons: Array<{
+    text: string
+    onClick: () => void
+    isActive?: boolean
+    disabled?: boolean
+  }>
 }
 
 export function Tabs(props: TabsProps): JSX.Element {
+  const { buttons } = props
 
-    const { buttons } = props
-
-    return (
-        <Flex
-            flexDirection={DIRECTION_COLUMN} 
-            gridGap={SPACING.spacing16}
-            padding={SPACING.spacing16}
-        >
-            <Flex flexDirection={DIRECTION_ROW} gridGap={SPACING.spacing4}>
-                {buttons.map((button, index) => (
-                    <button 
-                        key={index}
-                        onClick={() => {
-                            button.onClick()  
-                        }}
-                        css={button.isActive === true ? currentTabStyle : defaultTabStyle}
-                        disabled={button.disabled}
-                    >
-                        {button.text}   
-                    </button>
-                ))}
-            </Flex>
-        </Flex>
-    )
+  return (
+    <Flex
+      flexDirection={DIRECTION_COLUMN}
+      gridGap={SPACING.spacing16}
+      padding={SPACING.spacing16}
+    >
+      <Flex flexDirection={DIRECTION_ROW} gridGap={SPACING.spacing4}>
+        {buttons.map((button, index) => (
+          <button
+            key={index}
+            onClick={() => {
+              button.onClick()
+            }}
+            css={button.isActive === true ? currentTabStyle : defaultTabStyle}
+            disabled={button.disabled}
+          >
+            {button.text}
+          </button>
+        ))}
+      </Flex>
+    </Flex>
+  )
 }
-
-
-
-
