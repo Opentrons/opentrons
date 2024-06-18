@@ -40,7 +40,7 @@ const cardStyleBySize: {
 } = {
   full: {
     fontSize: TYPOGRAPHY.fontSize32,
-    height: '8.875rem',
+    height: '11.75rem',
     lineHeight: TYPOGRAPHY.lineHeight42,
     fontWeight: TYPOGRAPHY.fontWeightBold,
     width: '59rem',

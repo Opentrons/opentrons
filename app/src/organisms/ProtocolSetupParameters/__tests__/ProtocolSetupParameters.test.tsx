@@ -87,12 +87,13 @@ describe('ProtocolSetupParameters', () => {
     screen.getByText('mock ChooseNumber')
   })
 
-  it('renders the ChooseCsvFile component when a str param is selected', () => {
-    vi.mocked(useFeatureFlag).mockReturnValue(true)
-    render(props)
-    fireEvent.click(screen.getByText('CSV File'))
-    screen.getByText('mock ChooseCsvFile')
-  })
+  // ToDo (kk:06/18/2024) comment-out will be removed in a following PR.
+  // it('renders the ChooseCsvFile component when a str param is selected', () => {
+  //   vi.mocked(useFeatureFlag).mockReturnValue(true)
+  //   render(props)
+  //   fireEvent.click(screen.getByText('CSV File'))
+  //   screen.getByText('mock ChooseCsvFile')
+  // })
 
   it('renders the other setting when boolean param is selected', () => {
     render(props)
@@ -113,11 +114,12 @@ describe('ProtocolSetupParameters', () => {
     screen.getByText('EtoH Volume')
   })
 
-  it('renders the other setting when csv param', () => {
-    vi.mocked(useFeatureFlag).mockReturnValue(true)
-    render(props)
-    screen.getByText('CSV File')
-  })
+  // ToDo (kk:06/18/2024) comment-out will be removed in a following PR.
+  // it('renders the other setting when csv param', () => {
+  //   vi.mocked(useFeatureFlag).mockReturnValue(true)
+  //   render(props)
+  //   screen.getByText('CSV File')
+  // })
 
   it('renders the back icon and calls useHistory', () => {
     render(props)

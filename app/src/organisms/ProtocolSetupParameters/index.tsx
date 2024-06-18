@@ -226,9 +226,10 @@ export function ProtocolSetupParameters({
       </Flex>
     </>
   )
-  // ToDo Update soon
-  if (enableCsvFile && chooseCsvFileScreen != null) {
-    // if (enableCsvFile) {
+  // ToDo (kk:06/18/2024) this will be updated in a following PR
+  // this code is to display ChooseCsvFile component
+  // if (enableCsvFile && chooseCsvFileScreen != null) {
+  if (enableCsvFile) {
     children = (
       <ChooseCsvFile
         handleGoBack={() => {

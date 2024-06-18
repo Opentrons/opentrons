@@ -78,7 +78,7 @@ describe('Pinned Protocol', () => {
     render(props)
     const pinnedProtocolCard = screen.getByTestId('full_pinned_protocol_card')
     expect(pinnedProtocolCard).toHaveStyle('max-width: 59rem')
-    expect(pinnedProtocolCard).toHaveStyle('height: 8.875rem')
+    expect(pinnedProtocolCard).toHaveStyle('height: 11.75rem')
     expect(pinnedProtocolCard).toHaveStyle(`background-color: ${COLORS.grey35}`)
     const text = screen.getByText('yay mock protocol')
     expect(text).toHaveStyle(`font-size: ${TYPOGRAPHY.fontSize32}`)
