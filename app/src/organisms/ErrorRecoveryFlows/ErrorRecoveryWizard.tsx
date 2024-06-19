@@ -1,11 +1,9 @@
 import * as React from 'react'
 import { createPortal } from 'react-dom'
-import { useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
 
 import { StyledText } from '@opentrons/components'
 
-import { getIsOnDevice } from '../../redux/config'
 import { getTopPortalEl } from '../../App/portal'
 import { InterventionModal } from '../../molecules/InterventionModal'
 import { BeforeBeginning } from './BeforeBeginning'
@@ -60,6 +58,7 @@ export function useERWizard(): UseERWizardResult {
 export type ErrorRecoveryWizardProps = ErrorRecoveryFlowsProps &
   ERUtilsResults & {
     robotType: RobotType
+    isOnDevice: boolean
   }
 
 export function ErrorRecoveryWizard(
@@ -72,7 +71,6 @@ export function ErrorRecoveryWizard(
     routeUpdateActions,
   } = props
   const errorKind = getErrorKind(failedCommand?.error?.errorType)
-  const isOnDevice = useSelector(getIsOnDevice)
 
   useInitialPipetteHome({
     hasLaunchedRecovery,
@@ -80,18 +78,12 @@ export function ErrorRecoveryWizard(
     routeUpdateActions,
   })
 
-  return (
-    <ErrorRecoveryComponent
-      errorKind={errorKind}
-      isOnDevice={isOnDevice}
-      {...props}
-    />
-  )
+  return <ErrorRecoveryComponent errorKind={errorKind} {...props} />
 }
 
 export function ErrorRecoveryComponent(
   props: RecoveryContentProps
-): JSX.Element {
+): JSX.Element | null {
   const { t } = useTranslation('error_recovery')
 
   const buildTitleHeading = (): JSX.Element => {
@@ -105,17 +97,21 @@ export function ErrorRecoveryComponent(
     <StyledText as="pSemiBold">{t('view_error_details')}</StyledText>
   )
 
-  return createPortal(
-    <InterventionModal
-      iconName="information"
-      iconHeading={buildIconHeading()}
-      titleHeading={buildTitleHeading()}
-      type="error"
-    >
-      <ErrorRecoveryContent {...props} />
-    </InterventionModal>,
-    getTopPortalEl()
-  )
+  if (props.isOnDevice) {
+    return createPortal(
+      <InterventionModal
+        iconName="information"
+        iconHeading={buildIconHeading()}
+        titleHeading={buildTitleHeading()}
+        type="error"
+      >
+        <ErrorRecoveryContent {...props} />
+      </InterventionModal>,
+      getTopPortalEl()
+    )
+  } else {
+    return null
+  }
 }
 
 export function ErrorRecoveryContent(props: RecoveryContentProps): JSX.Element {

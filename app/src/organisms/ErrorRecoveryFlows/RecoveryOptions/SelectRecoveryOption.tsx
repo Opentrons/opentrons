@@ -92,6 +92,7 @@ interface RecoveryOptionsProps {
   getRecoveryOptionCopy: RecoveryContentProps['getRecoveryOptionCopy']
   selectedRoute?: RecoveryRoute
 }
+// For ODD use only.
 export function RecoveryOptions({
   validRecoveryOptions,
   selectedRoute,

@@ -22,9 +22,7 @@ import { SelectRecoveryOption } from './SelectRecoveryOption'
 
 import type { RecoveryContentProps } from '../types'
 
-export function FillWellAndSkip(
-  props: RecoveryContentProps
-): JSX.Element | null {
+export function FillWellAndSkip(props: RecoveryContentProps): JSX.Element {
   const { recoveryMap } = props
   const { step, route } = recoveryMap
   const { FILL_MANUALLY_AND_SKIP, CANCEL_RUN } = RECOVERY_MAP

@@ -13,7 +13,7 @@ import { SelectRecoveryOption } from './SelectRecoveryOption'
 
 import type { RecoveryContentProps } from '../types'
 
-export function RetryNewTips(props: RecoveryContentProps): JSX.Element | null {
+export function RetryNewTips(props: RecoveryContentProps): JSX.Element {
   const { recoveryMap, routeUpdateActions } = props
   const { step, route } = recoveryMap
   const { RETRY_NEW_TIPS, DROP_TIP_FLOWS } = RECOVERY_MAP
@@ -27,7 +27,7 @@ export function RetryNewTips(props: RecoveryContentProps): JSX.Element | null {
     )
   }
 
-  const buildContent = (): JSX.Element | null => {
+  const buildContent = (): JSX.Element => {
     switch (step) {
       case RETRY_NEW_TIPS.STEPS.REPLACE_TIPS:
         return <ReplaceTips {...props} />
@@ -44,9 +44,7 @@ export function RetryNewTips(props: RecoveryContentProps): JSX.Element | null {
   return buildContent()
 }
 
-export function RetryWithNewTips(
-  props: RecoveryContentProps
-): JSX.Element | null {
+export function RetryWithNewTips(props: RecoveryContentProps): JSX.Element {
   const { recoveryCommands, routeUpdateActions } = props
   const { retryFailedCommand, resumeRun } = recoveryCommands
   const { setRobotInMotion } = routeUpdateActions

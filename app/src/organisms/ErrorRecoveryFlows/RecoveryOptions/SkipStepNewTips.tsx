@@ -29,7 +29,7 @@ export function SkipStepNewTips(
     )
   }
 
-  const buildContent = (): JSX.Element | null => {
+  const buildContent = (): JSX.Element => {
     switch (step) {
       case SKIP_STEP_WITH_NEW_TIPS.STEPS.REPLACE_TIPS:
         return <ReplaceTips {...props} />
@@ -46,9 +46,7 @@ export function SkipStepNewTips(
   return buildContent()
 }
 
-export function SkipStepWithNewTips(
-  props: RecoveryContentProps
-): JSX.Element | null {
+export function SkipStepWithNewTips(props: RecoveryContentProps): JSX.Element {
   const { recoveryCommands, routeUpdateActions } = props
   const { skipFailedCommand, resumeRun } = recoveryCommands
   const { setRobotInMotion } = routeUpdateActions

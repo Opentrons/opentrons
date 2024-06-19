@@ -12,7 +12,7 @@ import {
 } from '@opentrons/api-client'
 import { OT2_ROBOT_TYPE } from '@opentrons/shared-data'
 
-import { useFeatureFlag } from '../../redux/config'
+import { getIsOnDevice, useFeatureFlag } from '../../redux/config'
 import { ErrorRecoveryWizard, useERWizard } from './ErrorRecoveryWizard'
 import { RunPausedSplash, useRunPausedSplash } from './RunPausedSplash'
 import { useCurrentlyRecoveringFrom, useERUtils } from './hooks'
@@ -20,6 +20,7 @@ import { useCurrentlyRecoveringFrom, useERUtils } from './hooks'
 import type { RunStatus } from '@opentrons/api-client'
 import type { CompletedProtocolAnalysis } from '@opentrons/shared-data'
 import type { FailedCommand } from './types'
+import { useSelector } from 'react-redux'
 
 const VALID_ER_RUN_STATUSES: RunStatus[] = [
   RUN_STATUS_AWAITING_RECOVERY,
@@ -108,6 +109,7 @@ export function ErrorRecoveryFlows(
 
   const { protocolAnalysis } = props
   const robotType = protocolAnalysis?.robotType ?? OT2_ROBOT_TYPE
+  const isOnDevice = useSelector(getIsOnDevice)
 
   if (!enableRunNotes) {
     return null
@@ -120,6 +122,7 @@ export function ErrorRecoveryFlows(
           {...props}
           {...recoveryUtils}
           robotType={robotType}
+          isOnDevice={isOnDevice}
         />
       ) : null}
       {showSplash ? (
@@ -127,6 +130,7 @@ export function ErrorRecoveryFlows(
           {...props}
           {...recoveryUtils}
           robotType={robotType}
+          isOnDevice={isOnDevice}
           toggleERWiz={toggleERWizard}
         />
       ) : null}

@@ -109,6 +109,7 @@ interface IgnoreOptionsProps {
   selectedOption?: IgnoreOption
 }
 
+// For ODD use only.
 export function IgnoreOptions({
   setSelectedOption,
   ignoreOptions,

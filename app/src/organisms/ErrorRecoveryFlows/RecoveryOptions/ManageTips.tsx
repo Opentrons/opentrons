@@ -22,10 +22,10 @@ import type { RecoveryContentProps } from '../types'
 import type { FixitCommandTypeUtils } from '../../DropTipWizardFlows/types'
 
 // The Drop Tip flow entry point. Includes entry from SelectRecoveryOption and CancelRun.
-export function ManageTips(props: RecoveryContentProps): JSX.Element | null {
+export function ManageTips(props: RecoveryContentProps): JSX.Element {
   const { recoveryMap } = props
 
-  const buildContent = (): JSX.Element | null => {
+  const buildContent = (): JSX.Element => {
     const { DROP_TIP_FLOWS } = RECOVERY_MAP
     const { step, route } = recoveryMap
 
@@ -122,13 +122,16 @@ export function BeginRemoval({
   }
 }
 
-function DropTipFlowsContainer(props: RecoveryContentProps): JSX.Element {
+function DropTipFlowsContainer(
+  props: RecoveryContentProps
+): JSX.Element | null {
   const {
     tipStatusUtils,
     routeUpdateActions,
     recoveryCommands,
     isFlex,
     currentRecoveryOptionUtils,
+    isOnDevice,
   } = props
   const { DROP_TIP_FLOWS, ROBOT_CANCELING, RETRY_NEW_TIPS } = RECOVERY_MAP
   const { proceedToRouteAndStep, setRobotInMotion } = routeUpdateActions
@@ -161,17 +164,23 @@ function DropTipFlowsContainer(props: RecoveryContentProps): JSX.Element {
     void proceedToRouteAndStep(DROP_TIP_FLOWS.ROUTE)
   }
 
-  return (
-    <RecoverySingleColumnContent>
-      <DropTipWizardFlows
-        robotType={isFlex ? FLEX_ROBOT_TYPE : OT2_ROBOT_TYPE}
-        closeFlow={onCloseFlow}
-        mount={mount}
-        instrumentModelSpecs={specs}
-        fixitCommandTypeUtils={useDropTipFlowUtils(props)}
-      />
-    </RecoverySingleColumnContent>
-  )
+  const fixitCommandTypeUtils = useDropTipFlowUtils(props)
+
+  if (isOnDevice) {
+    return (
+      <RecoverySingleColumnContent>
+        <DropTipWizardFlows
+          robotType={isFlex ? FLEX_ROBOT_TYPE : OT2_ROBOT_TYPE}
+          closeFlow={onCloseFlow}
+          mount={mount}
+          instrumentModelSpecs={specs}
+          fixitCommandTypeUtils={fixitCommandTypeUtils}
+        />
+      </RecoverySingleColumnContent>
+    )
+  } else {
+    return null
+  }
 }
 
 // Builds the overrides injected into DT Wiz.
