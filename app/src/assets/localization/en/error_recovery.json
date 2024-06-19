@@ -1,6 +1,5 @@
 {
   "are_you_sure_you_want_to_cancel": "Are you sure you want to cancel?",
-  "are_you_sure_you_want_to_resume": "Are you sure you want to resume?",
   "at_step": "At step",
   "back_to_menu": "Back to menu",
   "before_you_begin": "Before you begin",
@@ -41,6 +40,7 @@
   "replace_tips_and_select_location": "It's best to replace tips and select the last location used for tip pickup.",
   "replace_used_tips_in_rack_location": "Replace used tips in rack location {{location}}",
   "replace_with_new_tip_rack": "Replace with new tip rack",
+  "first_take_any_necessary_actions": "<block>First, take any necessary actions to prepare the robot to retry the failed step.</block><block>Then, close the robot door before proceeding.</block>",
   "retry_now": "Retry now",
   "retry_step": "Retry step",
   "retry_with_new_tips": "Retry with new tips",
@@ -52,7 +52,6 @@
   "robot_will_retry_with_same_tips": "<block>The robot will retry the failed step with the same tips.</block><block>Close the robot door before proceeding.</block>",
   "robot_will_retry_with_tips": "The robot will retry the failed step with new tips.",
   "run_paused": "Run paused",
-  "run_will_resume": "The run will resume from the point at which the error occurred. Take any necessary actions to correct the problem first. If the step is completed successfully, the protocol continues.",
   "select_tip_pickup_location": "Select tip pick-up location",
   "skip": "Skip",
   "skip_to_next_step": "Skip to next step",
