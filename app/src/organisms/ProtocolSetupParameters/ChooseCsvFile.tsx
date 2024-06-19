@@ -19,11 +19,12 @@ import { EmptyFile } from './EmptyFile'
 import { RadioButton } from '../../atoms/buttons'
 import { getFilePaths } from '../../redux/shell'
 
-import type { RunTimeParameter } from '@opentrons/shared-data'
+import type { CsvFileParameter } from '@opentrons/shared-data'
 
 interface ChooseCsvFileProps {
   handleGoBack: () => void
-  parameter: RunTimeParameter | null
+  // ToDo (kk:06/18/2024) null will be removed when implemented required part
+  parameter: CsvFileParameter | null
   setParameter: (value: boolean | string | number, variableName: string) => void
   /** if files on robot has the same id, the file name is highlighted */
   csvFileInfo: string
@@ -44,6 +45,10 @@ export function ChooseCsvFile({
   // ToDo (kk:06/12/2024) get files from the endpoint: GET /protocols/{protocolId}/dataFiles/
   // return format: https://opentrons.atlassian.net/browse/AUTH-428
   const csvFilesOnRobot: any[] = []
+
+  const handleOnChange = (newValue: string | number | boolean): void => {
+    setParameter(newValue, parameter?.variableName ?? 'csvFileId')
+  }
 
   const handleConfirmSelection = (): void => {
     // ToDo (kk:06/18/2024) wire up later
@@ -104,6 +109,7 @@ export function ChooseCsvFile({
                         onChange={() => {
                           // set the file full path
                           // unselect radio button in robot
+                          handleOnChange(option.value)
                           setCsvFileInfo(csv)
                         }}
                       />

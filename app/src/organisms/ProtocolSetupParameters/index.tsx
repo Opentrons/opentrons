@@ -119,6 +119,17 @@ export function ProtocolSetupParameters({
         setShowNumericalInputScreen(updatedParameter as NumberParameter)
       }
     }
+    if (
+      chooseCsvFileScreen &&
+      chooseCsvFileScreen.variableName === variableName
+    ) {
+      const updatedParameter = updatedParameters.find(
+        parameter => parameter.variableName === variableName
+      )
+      if (updatedParameter != null && updatedParameter.type === 'csv_file') {
+        setChooseCsvFileScreen(updatedParameter as CsvFileParameter)
+      }
+    }
   }
 
   const runTimeParameterValues = getRunTimeParameterValuesForRun(
@@ -166,6 +177,24 @@ export function ProtocolSetupParameters({
     }
   }
 
+  // ToDo (kk:06/18/2024)
+  // This mock variable will be removed when be is ready
+  const mockCsvRtp = {
+    displayName: 'CSV File',
+    variableName: 'csv_file_var',
+    description: '',
+    type: 'csv_file',
+    file: {
+      id: 'mockFileId',
+      file: new File([], 'mock.csv'),
+    },
+  }
+
+  const runTimeParametersOverridesWithMockCSV = [
+    ...runTimeParametersOverrides,
+    mockCsvRtp,
+  ] as RunTimeParameter[]
+
   let children = (
     <>
       <ChildNavigation
@@ -194,45 +223,45 @@ export function ProtocolSetupParameters({
         paddingX={SPACING.spacing40}
         paddingBottom={SPACING.spacing40}
       >
-        {sortRuntimeParameters(runTimeParametersOverrides).map(
-          (parameter, index) => {
-            return (
-              <React.Fragment key={`${parameter.displayName}_${index}`}>
-                <ProtocolSetupStep
-                  hasRightIcon={!(parameter.type === 'bool')}
-                  hasLeftIcon={false}
-                  status={
-                    parameter.type === 'csv_file' ? 'not ready' : 'inform'
-                  }
-                  title={parameter.displayName}
-                  onClickSetupStep={() => {
-                    handleSetParameter(parameter)
-                  }}
-                  detail={
-                    parameter.type === 'csv_file'
-                      ? t('required')
-                      : formatRunTimeParameterValue(parameter, t)
-                  }
-                  description={
-                    parameter.type === 'csv_file' ? null : parameter.description
-                  }
-                  fontSize="h4"
-                  disabled={startSetup}
-                />
-              </React.Fragment>
-            )
-          }
-        )}
+        {sortRuntimeParameters(
+          enableCsvFile
+            ? runTimeParametersOverridesWithMockCSV
+            : runTimeParametersOverrides
+        ).map((parameter, index) => {
+          return (
+            <React.Fragment key={`${parameter.displayName}_${index}`}>
+              <ProtocolSetupStep
+                hasRightIcon={!(parameter.type === 'bool')}
+                hasLeftIcon={false}
+                status={parameter.type === 'csv_file' ? 'not ready' : 'inform'}
+                title={parameter.displayName}
+                onClickSetupStep={() => {
+                  handleSetParameter(parameter)
+                }}
+                detail={
+                  parameter.type === 'csv_file'
+                    ? t('required')
+                    : formatRunTimeParameterValue(parameter, t)
+                }
+                description={
+                  parameter.type === 'csv_file' ? null : parameter.description
+                }
+                fontSize="h4"
+                disabled={startSetup}
+              />
+            </React.Fragment>
+          )
+        })}
       </Flex>
     </>
   )
-  // ToDo (kk:06/18/2024) this will be updated in a following PR
-  // this code is to display ChooseCsvFile component
-  // if (enableCsvFile && chooseCsvFileScreen != null) {
-  if (enableCsvFile) {
+
+  // ToDo (kk:06/18/2024) ff will be removed when we freeze the code
+  if (enableCsvFile && chooseCsvFileScreen != null) {
     children = (
       <ChooseCsvFile
         handleGoBack={() => {
+          console.log('clicked go back csv')
           setChooseCsvFileScreen(null)
         }}
         parameter={chooseCsvFileScreen}
