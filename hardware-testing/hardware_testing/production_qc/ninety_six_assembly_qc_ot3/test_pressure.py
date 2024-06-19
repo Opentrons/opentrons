@@ -10,9 +10,11 @@ from opentrons.hardware_control.ot3api import OT3API
 from opentrons.hardware_control.backends.ot3utils import sensor_id_for_instrument
 from opentrons.hardware_control.types import InstrumentProbeType
 
+from opentrons.hardware_control.motion_utilities import target_position_from_relative
+
 from hardware_testing.data import ui
 from hardware_testing.opentrons_api import helpers_ot3
-from hardware_testing.opentrons_api.types import OT3Mount, Point
+from hardware_testing.opentrons_api.types import OT3Mount, Point, Axis
 from hardware_testing.data.csv_report import (
     CSVReport,
     CSVResult,
@@ -32,6 +34,12 @@ NUM_PRESSURE_READINGS = 10
 TIP_VOLUME = 50
 ASPIRATE_VOLUME = 2
 PRESSURE_READINGS = ["open-pa", "sealed-pa", "aspirate-pa", "dispense-pa"]
+
+SLOT_FOR_PICK_UP_TIP = 5
+TIP_RACK_FOR_PICK_UP_TIP = f"opentrons_flex_96_tiprack_{TIP_VOLUME}ul"
+A1_OFFSET = Point(x=9 * 11, y=-9 * 7)
+H12_OFFSET = Point(x=-9*11, y=9*7)
+OFFSET_FOR_1_WELL_LABWARE = Point(x=9 * -11 * 0.5, y=9 * 7 * 0.5)
 
 THRESHOLDS = {
     "open-pa": (
@@ -124,8 +132,34 @@ async def calibrate_to_pressue_fixture(api: OT3API, sensor:SealedPressureDriver,
             REACHED_PRESSURE = sensor.get_pressure()
             ui.print_info(f"Reaching force is {REACHED_PRESSURE}, exit calibration.")
             break
-        
 
+
+async def _partial_pick_up_z_motion(
+    api: OT3API, current: float, distance: float, speed: float
+) -> None:
+    async with api._backend.motor_current(run_currents={Axis.Z_L: current}):
+        target_down = target_position_from_relative(
+            OT3Mount.LEFT, Point(z=-distance), api._current_position
+        )
+        await api._move(target_down, speed=speed)
+    target_up = target_position_from_relative(
+        OT3Mount.LEFT, Point(z=distance), api._current_position
+    )
+    await api._move(target_up)
+    await api._update_position_estimation([Axis.Z_L])
+
+
+async def _partial_pick_up(api: OT3API, position: Point, current: float) -> None:
+    await helpers_ot3.move_to_arched_ot3(
+        api,
+        OT3Mount.LEFT,
+        position,
+        safe_height=position.z + 10,
+    )
+    await _partial_pick_up_z_motion(api, current=current, distance=13, speed=5)
+    await api.add_tip(OT3Mount.LEFT, helpers_ot3.get_default_tip_length(TIP_VOLUME))
+    await api.prepare_for_aspirate(OT3Mount.LEFT)
+    await api.home_z(OT3Mount.LEFT)
 
 async def run(api: OT3API, report: CSVReport, section: str) -> None:
     """Run."""
@@ -133,13 +167,22 @@ async def run(api: OT3API, report: CSVReport, section: str) -> None:
     slot_5 = helpers_ot3.get_slot_calibration_square_position_ot3(5)
     home_pos = await api.gantry_position(OT3Mount.LEFT)
     await api.move_to(OT3Mount.LEFT, slot_5._replace(z=home_pos.z))
-
     if USE_SEALED_FIXTURE:
         # init driver
         pressure_sensor = SealedPressureDriver()
         pressure_sensor.init(9600)
+
+    # move to slot 
+    ui.get_user_ready(f"Place tip tack 50ul at slot - {SLOT_FOR_PICK_UP_TIP}")
+    #await api.add_tip(OT3Mount.LEFT, helpers_ot3.get_default_tip_length(TIP_VOLUME))
+
+    tip_rack_pos = helpers_ot3.get_theoretical_a1_position(SLOT_FOR_PICK_UP_TIP, TIP_RACK_FOR_PICK_UP_TIP)
+    await helpers_ot3.move_to_arched_ot3(api, OT3Mount.LEFT, tip_rack_pos + Point(z=30))
+    await helpers_ot3.jog_mount_ot3(api, OT3Mount.LEFT)
+    tip_rack_actual_pos = await api.gantry_position(OT3Mount.LEFT)
     
     for probe in InstrumentProbeType:
+        await helpers_ot3.move_to_arched_ot3(api, OT3Mount.LEFT, tip_rack_pos + Point(z=50))
         sensor_id = sensor_id_for_instrument(probe)
         ui.print_header(f"Sensor: {probe}")
 
@@ -157,20 +200,26 @@ async def run(api: OT3API, report: CSVReport, section: str) -> None:
 
         # SEALED-Pa
         sealed_pa = 0.0
-        await api.add_tip(OT3Mount.LEFT, helpers_ot3.get_default_tip_length(TIP_VOLUME))
-        await api.prepare_for_aspirate(OT3Mount.LEFT)
         if not api.is_simulator:
-            ui.get_user_ready(f"attach {TIP_VOLUME} uL TIP to {probe.name} sensor")
+
+            # ui.get_user_ready(f"attach {TIP_VOLUME} uL TIP to {probe.name} sensor")
+            if probe == InstrumentProbeType.PRIMARY:
+                offset_pos = A1_OFFSET
+                fixture_pos = PRIMARY_SEALED_PRESSURE_FIXTURE_POS
+            elif probe == InstrumentProbeType.SECONDARY:
+                offset_pos = H12_OFFSET
+                fixture_pos = SECOND_SEALED_PRESSURE_FIXTURE_POS
+            else:
+                raise NameError("offset position miss")
+
+            tip_pos = tip_rack_actual_pos + offset_pos
+            print(f"Tip pos: {tip_pos}")
+            ui.get_user_ready("Pick up tip")
+            await _partial_pick_up(api, tip_pos, current=0.1)
+            await api.prepare_for_aspirate(OT3Mount.LEFT)
             if not (USE_SEALED_FIXTURE or USE_SEALED_BLOCK):
                  ui.get_user_ready("SEAL tip using your FINGER")
             else:
-                if probe == InstrumentProbeType.PRIMARY:
-                    fixture_pos = PRIMARY_SEALED_PRESSURE_FIXTURE_POS
-                elif probe == InstrumentProbeType.SECONDARY:
-                    fixture_pos = SECOND_SEALED_PRESSURE_FIXTURE_POS
-                else:
-                    raise KeyError("Couldn't find key for InstrumentProbeTybe")
-
                 await helpers_ot3.move_to_arched_ot3(api, OT3Mount.LEFT, fixture_pos._replace(z=fixture_pos.z + 50))
                 ui.get_user_ready("Ready for moving to sealed fixture")
                 if USE_SEALED_FIXTURE:
@@ -227,4 +276,12 @@ async def run(api: OT3API, report: CSVReport, section: str) -> None:
         if not api.is_simulator:
             ui.get_user_ready("REMOVE tip")
         
+        trash_nominal = helpers_ot3.get_slot_calibration_square_position_ot3(12) + Point(z=40)
+        # center the 96ch of the 1-well labware
+        trash_nominal += OFFSET_FOR_1_WELL_LABWARE
+        await helpers_ot3.move_to_arched_ot3(api, OT3Mount.LEFT, trash_nominal + Point(z=20))
+        await api.move_to(OT3Mount.LEFT, trash_nominal)
+        await api.drop_tip(OT3Mount.LEFT)
         await api.remove_tip(OT3Mount.LEFT)
+        await api.home_z(OT3Mount.LEFT)
+
