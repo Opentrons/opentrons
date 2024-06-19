@@ -6,7 +6,11 @@ import { renderWithProviders } from '../../../../__testing-utils__'
 import { i18n } from '../../../../i18n'
 import { mockRecoveryContentProps } from '../../__fixtures__'
 import { RetryNewTips } from '../RetryNewTips'
-import { ReplaceTips, SelectTips, RetryWithNewTips } from '../../shared'
+import {
+  ReplaceTips,
+  SelectTips,
+  TwoColTextAndFailedStepNextStep,
+} from '../../shared'
 import { RECOVERY_MAP } from '../../constants'
 
 import type { Mock } from 'vitest'
@@ -40,7 +44,9 @@ describe('RetryNewTips', () => {
 
     vi.mocked(ReplaceTips).mockReturnValue(<div>MOCK_REPLACE_TIPS</div>)
     vi.mocked(SelectTips).mockReturnValue(<div>MOCK_SELECT_TIPS</div>)
-    vi.mocked(RetryWithNewTips).mockReturnValue(<div>MOCK_RETRY_NEW_TIPS</div>)
+    vi.mocked(TwoColTextAndFailedStepNextStep).mockReturnValue(
+      <div>MOCK_RETRY_NEW_TIPS</div>
+    )
   })
 
   it(`routes to Drop Tip flows if the step is ${RETRY_NEW_TIPS.STEPS.DROP_TIPS}`, () => {

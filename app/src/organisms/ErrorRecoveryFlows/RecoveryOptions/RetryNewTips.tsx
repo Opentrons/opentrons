@@ -1,7 +1,14 @@
 import * as React from 'react'
+import { Trans, useTranslation } from 'react-i18next'
+
+import { StyledText } from '@opentrons/components'
 
 import { RECOVERY_MAP } from '../constants'
-import { ReplaceTips, SelectTips, RetryWithNewTips } from '../shared'
+import {
+  ReplaceTips,
+  SelectTips,
+  TwoColTextAndFailedStepNextStep,
+} from '../shared'
 
 import type { RecoveryContentProps } from '../types'
 
@@ -33,4 +40,44 @@ export function RetryNewTips(props: RecoveryContentProps): JSX.Element | null {
   }
 
   return buildContent()
+}
+
+export function RetryWithNewTips(
+  props: RecoveryContentProps
+): JSX.Element | null {
+  const { recoveryCommands, routeUpdateActions } = props
+  const { retryFailedCommand, resumeRun } = recoveryCommands
+  const { setRobotInMotion } = routeUpdateActions
+  const { ROBOT_RETRYING_STEP } = RECOVERY_MAP
+  const { t } = useTranslation('error_recovery')
+
+  const primaryBtnOnClick = (): Promise<void> => {
+    return setRobotInMotion(true, ROBOT_RETRYING_STEP.ROUTE)
+      .then(() => retryFailedCommand())
+      .then(() => {
+        resumeRun()
+      })
+  }
+
+  const buildBodyText = (): JSX.Element => {
+    return (
+      <Trans
+        t={t}
+        i18nKey="robot_will_retry_with_new_tips"
+        components={{
+          block: <StyledText as="p" />,
+        }}
+      />
+    )
+  }
+
+  return (
+    <TwoColTextAndFailedStepNextStep
+      {...props}
+      leftColTitle={t('retry_with_new_tips')}
+      leftColBodyText={buildBodyText()}
+      primaryBtnCopy={t('retry_now')}
+      primaryBtnOnClick={primaryBtnOnClick}
+    />
+  )
 }

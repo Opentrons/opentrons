@@ -8,6 +8,7 @@ import {
   LeftColumnLabwareInfo,
   RecoveryMap,
   FailedStepNextStep,
+  TwoColTextAndFailedStepNextStep,
 } from '../shared'
 
 import type { RecoveryContentProps } from '../types'
@@ -78,8 +79,8 @@ function FillWell(props: RecoveryContentProps): JSX.Element | null {
 }
 
 function SkipToNextStep(props: RecoveryContentProps): JSX.Element | null {
-  const { isOnDevice, routeUpdateActions, recoveryCommands } = props
-  const { goBackPrevStep, setRobotInMotion } = routeUpdateActions
+  const { routeUpdateActions, recoveryCommands } = props
+  const { setRobotInMotion } = routeUpdateActions
   const { skipFailedCommand, resumeRun } = recoveryCommands
   const { ROBOT_SKIPPING_STEP } = RECOVERY_MAP
   const { t } = useTranslation('error_recovery')
@@ -92,31 +93,25 @@ function SkipToNextStep(props: RecoveryContentProps): JSX.Element | null {
       })
   }
 
-  if (isOnDevice) {
+  const buildBodyText = (): JSX.Element => {
     return (
-      <RecoverySingleColumnContent>
-        <TwoColumn>
-          <Flex gridGap={SPACING.spacing8} flexDirection={DIRECTION_COLUMN}>
-            <StyledText as="h4SemiBold">{t('skip_to_next_step')}</StyledText>
-            <Trans
-              t={t}
-              i18nKey="robot_will_not_check_for_liquid"
-              components={{
-                block: <StyledText as="p" />,
-              }}
-            />
-          </Flex>
-          <FailedStepNextStep {...props} />
-        </TwoColumn>
-        <RecoveryFooterButtons
-          isOnDevice={isOnDevice}
-          primaryBtnOnClick={primaryBtnOnClick}
-          secondaryBtnOnClick={goBackPrevStep}
-          primaryBtnTextOverride={t('continue_run_now')}
-        />
-      </RecoverySingleColumnContent>
+      <Trans
+        t={t}
+        i18nKey="robot_will_not_check_for_liquid"
+        components={{
+          block: <StyledText as="p" />,
+        }}
+      />
     )
-  } else {
-    return null
   }
+
+  return (
+    <TwoColTextAndFailedStepNextStep
+      {...props}
+      leftColTitle={t('skip_to_next_step')}
+      leftColBodyText={buildBodyText()}
+      primaryBtnCopy={t('continue_run_now')}
+      primaryBtnOnClick={primaryBtnOnClick}
+    />
+  )
 }
