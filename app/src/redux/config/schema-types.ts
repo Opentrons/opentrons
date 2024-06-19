@@ -14,6 +14,7 @@ export type DevInternalFlag =
   | 'enableQuickTransfer'
   | 'protocolTimeline'
   | 'enableCsvFile'
+  | 'enableLabwareCreator'
 
 export type FeatureFlags = Partial<Record<DevInternalFlag, boolean | undefined>>
 

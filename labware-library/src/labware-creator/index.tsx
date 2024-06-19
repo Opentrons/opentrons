@@ -5,7 +5,7 @@ import { Formik } from 'formik'
 import { saveAs } from 'file-saver'
 import { reportEvent } from '../analytics'
 import { reportErrors } from './analyticsUtils'
-import { AlertModal } from '@opentrons/components'
+import { AlertModal, PrimaryBtn } from '@opentrons/components'
 import {
   getAllDefinitions,
   labwareSchemaV2 as labwareSchema,
@@ -66,7 +66,16 @@ import type {
 const ajv = new Ajv()
 const validateLabwareSchema = ajv.compile(labwareSchema)
 
-export const LabwareCreator = (): JSX.Element => {
+interface LabwareCreatorProps {
+  isOnRunApp?: boolean
+  /** only for Run App usage */
+  goBack?: () => void
+  /** only for Run App usage */
+  save?: (fileContent: any) => void
+}
+
+export const LabwareCreator = (props: LabwareCreatorProps): JSX.Element => {
+  const { save, goBack, isOnRunApp = false } = props
   const [
     showExportErrorModal,
     _setShowExportErrorModal,
@@ -265,8 +274,8 @@ export const LabwareCreator = (): JSX.Element => {
     }
   })
 
-  return (
-    <LabwareCreatorComponent>
+  const body = (
+    <>
       {importError != null ? (
         <ImportErrorModal
           onClose={() => {
@@ -295,6 +304,9 @@ export const LabwareCreator = (): JSX.Element => {
           definition
         </AlertModal>
       )}
+      {goBack != null ? (
+        <PrimaryBtn onClick={goBack}>go back</PrimaryBtn>
+      ) : null}
       <Formik
         initialValues={lastUploaded ?? getDefaultFormState()}
         enableReinitialize
@@ -311,7 +323,17 @@ export const LabwareCreator = (): JSX.Element => {
           const blob = new Blob([JSON.stringify(def, null, 4)], {
             type: 'text/plain;charset=utf-8',
           })
-          saveAs(blob, `${loadName}.json`)
+          if (save != null) {
+            const fileReader = new FileReader()
+            fileReader.onload = function (event) {
+              const fileContent =
+                event.target != null ? event.target.result : null
+              save(fileContent)
+            }
+            fileReader.readAsText(blob)
+          } else {
+            saveAs(blob, `${loadName}.json`)
+          }
 
           reportEvent({
             name: 'labwareCreatorFileExport',
@@ -356,6 +378,9 @@ export const LabwareCreator = (): JSX.Element => {
               setShowExportErrorModal(true, values)
             }
             handleSubmit()
+            if (goBack != null) {
+              goBack()
+            }
           }
 
           // @ts-expect-error(IL, 2021-03-24): values/errors/touched not typed for reportErrors to be happy
@@ -452,13 +477,22 @@ export const LabwareCreator = (): JSX.Element => {
                   <Preview />
                   <Description />
                   <File />
-                  <Export onExportClick={onExportClick} />
+                  <Export
+                    onExportClick={onExportClick}
+                    isOnRunApp={isOnRunApp}
+                  />
                 </>
               )}
             </div>
           )
         }}
       </Formik>
-    </LabwareCreatorComponent>
+    </>
+  )
+
+  return goBack != null ? (
+    body
+  ) : (
+    <LabwareCreatorComponent>{body}</LabwareCreatorComponent>
   )
 }

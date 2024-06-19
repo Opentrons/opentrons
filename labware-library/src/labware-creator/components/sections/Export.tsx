@@ -4,6 +4,7 @@ import styles from '../../styles.module.css'
 
 interface ExportProps {
   onExportClick: (e: React.MouseEvent) => unknown
+  isOnRunApp: boolean
 }
 
 export const Export = (props: ExportProps): JSX.Element | null => {
@@ -14,7 +15,7 @@ export const Export = (props: ExportProps): JSX.Element | null => {
           className={styles.export_button}
           onClick={props.onExportClick}
         >
-          EXPORT FILE
+          {props.isOnRunApp ? 'SAVE' : 'EXPORT FILE'}
         </PrimaryButton>
       </div>
     </div>

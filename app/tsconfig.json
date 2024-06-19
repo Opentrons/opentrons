@@ -24,7 +24,10 @@
     },
     {
       "path": "../react-api-client"
-    }
+    },
+    {
+      "path": "../labware-library"
+    },
   ],
   "compilerOptions": {
     "composite": true,
