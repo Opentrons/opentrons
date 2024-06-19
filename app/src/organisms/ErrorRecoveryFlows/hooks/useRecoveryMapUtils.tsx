@@ -10,7 +10,7 @@ import {
   THERMOCYCLER_MODULE_V1,
 } from '@opentrons/shared-data'
 
-import { LabwareHighlight } from '../shared/RecoveryMap'
+import { LabwareHighlight } from '../shared'
 
 import type { Run } from '@opentrons/api-client'
 import type {

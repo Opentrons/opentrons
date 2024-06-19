@@ -2,7 +2,13 @@ import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { createPortal } from 'react-dom'
 
-import { Flex, SPACING, COLORS, BORDERS } from '@opentrons/components'
+import {
+  Flex,
+  SPACING,
+  COLORS,
+  BORDERS,
+  DIRECTION_COLUMN,
+} from '@opentrons/components'
 
 import { useErrorName } from '../hooks'
 import { Modal } from '../../../molecules/Modal'
@@ -78,7 +84,7 @@ export function ErrorDetailsModalODD(
       zIndex={15}
       gridGap={SPACING.spacing32}
     >
-      <Flex gridGap={SPACING.spacing24}>
+      <Flex gridGap={SPACING.spacing24} flexDirection={DIRECTION_COLUMN}>
         {getIsOverpressureErrorKind() ? (
           <OverpressureBanner isOnDevice={isOnDevice} />
         ) : null}

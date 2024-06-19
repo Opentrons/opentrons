@@ -79,11 +79,29 @@ function FillWell(props: RecoveryContentProps): JSX.Element | null {
 }
 
 function SkipToNextStep(props: RecoveryContentProps): JSX.Element | null {
-  const { routeUpdateActions, recoveryCommands } = props
-  const { setRobotInMotion } = routeUpdateActions
+  const {
+    routeUpdateActions,
+    recoveryCommands,
+    currentRecoveryOptionUtils,
+  } = props
+  const {
+    setRobotInMotion,
+    goBackPrevStep,
+    proceedToRouteAndStep,
+  } = routeUpdateActions
+  const { selectedRecoveryOption } = currentRecoveryOptionUtils
   const { skipFailedCommand, resumeRun } = recoveryCommands
-  const { ROBOT_SKIPPING_STEP } = RECOVERY_MAP
+  const { ROBOT_SKIPPING_STEP, IGNORE_AND_SKIP } = RECOVERY_MAP
   const { t } = useTranslation('error_recovery')
+
+  // TODO(jh, 06-18-24): EXEC-569
+  const secondaryBtnOnClick = (): void => {
+    if (selectedRecoveryOption === IGNORE_AND_SKIP.ROUTE) {
+      void proceedToRouteAndStep(IGNORE_AND_SKIP.ROUTE)
+    } else {
+      void goBackPrevStep()
+    }
+  }
 
   const primaryBtnOnClick = (): Promise<void> => {
     return setRobotInMotion(true, ROBOT_SKIPPING_STEP.ROUTE)
@@ -112,6 +130,7 @@ function SkipToNextStep(props: RecoveryContentProps): JSX.Element | null {
       leftColBodyText={buildBodyText()}
       primaryBtnCopy={t('continue_run_now')}
       primaryBtnOnClick={primaryBtnOnClick}
+      secondaryBtnOnClickOverride={secondaryBtnOnClick}
     />
   )
 }
