@@ -20,6 +20,7 @@ import {
   RetrySameTips,
   SkipStepSameTips,
   SkipStepNewTips,
+  IgnoreErrorSkipStep,
 } from './RecoveryOptions'
 import { RecoveryInProgress } from './RecoveryInProgress'
 import { getErrorKind } from './utils'
@@ -166,6 +167,10 @@ export function ErrorRecoveryContent(props: RecoveryContentProps): JSX.Element {
     return <SkipStepNewTips {...props} />
   }
 
+  const buildIgnoreErrorSkipStep = (): JSX.Element => {
+    return <IgnoreErrorSkipStep {...props} />
+  }
+
   switch (props.recoveryMap.route) {
     case RECOVERY_MAP.BEFORE_BEGINNING.ROUTE:
       return buildBeforeBeginning()
@@ -189,6 +194,8 @@ export function ErrorRecoveryContent(props: RecoveryContentProps): JSX.Element {
       return buildSkipStepSameTips()
     case RECOVERY_MAP.SKIP_STEP_WITH_NEW_TIPS.ROUTE:
       return buildSkipStepNewTips()
+    case RECOVERY_MAP.IGNORE_AND_SKIP.ROUTE:
+      return buildIgnoreErrorSkipStep()
     case RECOVERY_MAP.ROBOT_IN_MOTION.ROUTE:
     case RECOVERY_MAP.ROBOT_RESUMING.ROUTE:
     case RECOVERY_MAP.ROBOT_RETRYING_STEP.ROUTE:

@@ -7,10 +7,19 @@ import { Trans, useTranslation } from 'react-i18next'
 import { StyledText } from '@opentrons/components'
 
 export function SkipStepSameTips(props: RecoveryContentProps): JSX.Element {
-  const { routeUpdateActions, recoveryCommands } = props
+  const {
+    routeUpdateActions,
+    recoveryCommands,
+    currentRecoveryOptionUtils,
+  } = props
   const { skipFailedCommand, resumeRun } = recoveryCommands
-  const { setRobotInMotion } = routeUpdateActions
-  const { ROBOT_SKIPPING_STEP } = RECOVERY_MAP
+  const {
+    setRobotInMotion,
+    proceedToRouteAndStep,
+    goBackPrevStep,
+  } = routeUpdateActions
+  const { selectedRecoveryOption } = currentRecoveryOptionUtils
+  const { ROBOT_SKIPPING_STEP, IGNORE_AND_SKIP } = RECOVERY_MAP
   const { t } = useTranslation('error_recovery')
 
   const primaryBtnOnClick = (): Promise<void> => {
@@ -19,6 +28,15 @@ export function SkipStepSameTips(props: RecoveryContentProps): JSX.Element {
       .then(() => {
         resumeRun()
       })
+  }
+
+  // TODO(jh, 06-18-24): EXEC-569
+  const secondaryBtnOnClick = (): void => {
+    if (selectedRecoveryOption === IGNORE_AND_SKIP.ROUTE) {
+      void proceedToRouteAndStep(IGNORE_AND_SKIP.ROUTE)
+    } else {
+      void goBackPrevStep()
+    }
   }
 
   const buildBodyText = (): JSX.Element => {
@@ -40,6 +58,7 @@ export function SkipStepSameTips(props: RecoveryContentProps): JSX.Element {
       leftColBodyText={buildBodyText()}
       primaryBtnOnClick={primaryBtnOnClick}
       primaryBtnCopy={t('continue_run_now')}
+      secondaryBtnOnClickOverride={secondaryBtnOnClick}
     />
   )
 }

@@ -29,8 +29,8 @@ export interface UseRecoveryCommandsResult {
   cancelRun: () => void
   /* A non-terminal recovery command, but should generally be chained with a resumeRun. */
   skipFailedCommand: () => Promise<void>
-  /* A non-terminal recovery command */
-  ignoreFailedCommandErrorType: () => Promise<void>
+  /* A non-terminal recovery command. Ignore this errorKind for the rest of this run. */
+  ignoreErrorKindThisRun: () => Promise<void>
   /* A non-terminal recovery command */
   retryFailedCommand: () => Promise<CommandData[]>
   /* A non-terminal recovery command */
@@ -115,8 +115,8 @@ export function useRecoveryCommands({
     })
   }, [])
 
-  const ignoreFailedCommandErrorType = React.useCallback((): Promise<void> => {
-    console.log('IGNORING ERROR')
+  const ignoreErrorKindThisRun = React.useCallback((): Promise<void> => {
+    console.log('IGNORING ALL ERRORS OF THIS KIND THIS RUN')
     return Promise.resolve()
   }, [])
 
@@ -127,7 +127,7 @@ export function useRecoveryCommands({
     homePipetteZAxes,
     pickUpTips,
     skipFailedCommand,
-    ignoreFailedCommandErrorType,
+    ignoreErrorKindThisRun,
   }
 }
 
