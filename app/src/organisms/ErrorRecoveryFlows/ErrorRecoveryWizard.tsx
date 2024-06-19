@@ -20,6 +20,7 @@ import {
   SkipStepNewTips,
   IgnoreErrorSkipStep,
 } from './RecoveryOptions'
+import { useErrorDetailsModal, ErrorDetailsModal } from './shared'
 import { RecoveryInProgress } from './RecoveryInProgress'
 import { getErrorKind } from './utils'
 import { RECOVERY_MAP } from './constants'
@@ -85,6 +86,7 @@ export function ErrorRecoveryComponent(
   props: RecoveryContentProps
 ): JSX.Element | null {
   const { t } = useTranslation('error_recovery')
+  const { showModal, toggleModal } = useErrorDetailsModal()
 
   const buildTitleHeading = (): JSX.Element => {
     const titleText = props.hasLaunchedRecovery
@@ -103,8 +105,12 @@ export function ErrorRecoveryComponent(
         iconName="information"
         iconHeading={buildIconHeading()}
         titleHeading={buildTitleHeading()}
+        iconHeadingOnClick={toggleModal}
         type="error"
       >
+        {showModal ? (
+          <ErrorDetailsModal {...props} toggleModal={toggleModal} />
+        ) : null}
         <ErrorRecoveryContent {...props} />
       </InterventionModal>,
       getTopPortalEl()
