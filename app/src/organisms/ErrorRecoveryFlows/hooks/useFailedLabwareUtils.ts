@@ -107,6 +107,7 @@ function getRelevantFailedLabwareCmdFrom({
   switch (errorKind) {
     case ERROR_KINDS.NO_LIQUID_DETECTED:
       return failedCommand as Omit<AspirateRunTimeCommand, 'result'>
+    case ERROR_KINDS.OVERPRESSURE_PREPARE_TO_ASPIRATE:
     case ERROR_KINDS.OVERPRESSURE_WHILE_ASPIRATING:
       return getRelevantPickUpTipCommand(failedCommand, runCommands)
     case ERROR_KINDS.GENERAL_ERROR:

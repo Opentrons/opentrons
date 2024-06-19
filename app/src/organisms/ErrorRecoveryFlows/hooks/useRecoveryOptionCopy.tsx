@@ -20,6 +20,8 @@ export function useRecoveryOptionCopy(): (
         return t('cancel_run')
       case RECOVERY_MAP.RETRY_NEW_TIPS.ROUTE:
         return t('retry_with_new_tips')
+      case RECOVERY_MAP.RETRY_SAME_TIPS.ROUTE:
+        return t('retry_with_same_tips')
       case RECOVERY_MAP.FILL_MANUALLY_AND_SKIP.ROUTE:
         return t('manually_fill_well_and_skip')
       case RECOVERY_MAP.IGNORE_AND_SKIP.ROUTE:

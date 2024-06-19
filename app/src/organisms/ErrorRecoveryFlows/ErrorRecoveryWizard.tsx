@@ -30,6 +30,7 @@ import type {
   ERUtilsResults,
 } from './hooks'
 import type { ErrorRecoveryFlowsProps } from '.'
+import { RetrySameTips } from './RecoveryOptions/RetrySameTips'
 
 interface UseERWizardResult {
   hasLaunchedRecovery: boolean
@@ -147,6 +148,10 @@ export function ErrorRecoveryContent(props: RecoveryContentProps): JSX.Element {
     return <RetryNewTips {...props} />
   }
 
+  const buildRetrySameTips = (): JSX.Element => {
+    return <RetrySameTips {...props} />
+  }
+
   const buildFillWellAndSkip = (): JSX.Element => {
     return <FillWellAndSkip {...props} />
   }
@@ -166,6 +171,8 @@ export function ErrorRecoveryContent(props: RecoveryContentProps): JSX.Element {
       return buildManageTips()
     case RECOVERY_MAP.RETRY_NEW_TIPS.ROUTE:
       return buildRetryNewTips()
+    case RECOVERY_MAP.RETRY_SAME_TIPS.ROUTE:
+      return buildRetrySameTips()
     case RECOVERY_MAP.FILL_MANUALLY_AND_SKIP.ROUTE:
       return buildFillWellAndSkip()
     case RECOVERY_MAP.ROBOT_IN_MOTION.ROUTE:
