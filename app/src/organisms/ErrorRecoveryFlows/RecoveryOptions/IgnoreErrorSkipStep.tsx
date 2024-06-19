@@ -18,13 +18,15 @@ import type { RecoveryContentProps } from '../types'
 
 export function IgnoreErrorSkipStep(props: RecoveryContentProps): JSX.Element {
   const { recoveryMap } = props
+  const { step, route } = recoveryMap
   const { IGNORE_AND_SKIP } = RECOVERY_MAP
 
   const buildContent = (): JSX.Element => {
-    switch (recoveryMap.step) {
+    switch (step) {
       case IGNORE_AND_SKIP.STEPS.SELECT_IGNORE_KIND:
         return <IgnoreErrorStepHome {...props} />
       default:
+        console.warn(`${step} in ${route} not explicitly handled. Rerouting.`)
         return <SelectRecoveryOption {...props} />
     }
   }

@@ -9,6 +9,7 @@ import {
   SelectTips,
   TwoColTextAndFailedStepNextStep,
 } from '../shared'
+import { SelectRecoveryOption } from './SelectRecoveryOption'
 
 import type { RecoveryContentProps } from '../types'
 
@@ -16,7 +17,7 @@ export function SkipStepNewTips(
   props: RecoveryContentProps
 ): JSX.Element | null {
   const { recoveryMap, routeUpdateActions } = props
-  const { step } = recoveryMap
+  const { step, route } = recoveryMap
   const { SKIP_STEP_WITH_NEW_TIPS, DROP_TIP_FLOWS } = RECOVERY_MAP
 
   // Do this instead of directly routing to DropTipFlows route first,
@@ -37,7 +38,8 @@ export function SkipStepNewTips(
       case SKIP_STEP_WITH_NEW_TIPS.STEPS.SKIP:
         return <SkipStepWithNewTips {...props} />
       default:
-        return <ReplaceTips {...props} />
+        console.warn(`${step} in ${route} not explicitly handled. Rerouting.`)
+        return <SelectRecoveryOption {...props} />
     }
   }
 

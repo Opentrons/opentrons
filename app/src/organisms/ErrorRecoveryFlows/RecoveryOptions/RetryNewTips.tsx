@@ -9,12 +9,13 @@ import {
   SelectTips,
   TwoColTextAndFailedStepNextStep,
 } from '../shared'
+import { SelectRecoveryOption } from './SelectRecoveryOption'
 
 import type { RecoveryContentProps } from '../types'
 
 export function RetryNewTips(props: RecoveryContentProps): JSX.Element | null {
   const { recoveryMap, routeUpdateActions } = props
-  const { step } = recoveryMap
+  const { step, route } = recoveryMap
   const { RETRY_NEW_TIPS, DROP_TIP_FLOWS } = RECOVERY_MAP
 
   // Do this instead of directly routing to DropTipFlows route first,
@@ -35,7 +36,8 @@ export function RetryNewTips(props: RecoveryContentProps): JSX.Element | null {
       case RETRY_NEW_TIPS.STEPS.RETRY:
         return <RetryWithNewTips {...props} />
       default:
-        return <ReplaceTips {...props} />
+        console.warn(`${step} in ${route} not explicitly handled. Rerouting.`)
+        return <SelectRecoveryOption {...props} />
     }
   }
 

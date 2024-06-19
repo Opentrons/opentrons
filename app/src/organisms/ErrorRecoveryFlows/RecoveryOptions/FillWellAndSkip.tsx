@@ -1,4 +1,12 @@
 import * as React from 'react'
+import { Trans, useTranslation } from 'react-i18next'
+
+import {
+  DIRECTION_COLUMN,
+  Flex,
+  SPACING,
+  StyledText,
+} from '@opentrons/components'
 
 import { RECOVERY_MAP } from '../constants'
 import { CancelRun } from './CancelRun'
@@ -7,28 +15,21 @@ import {
   RecoverySingleColumnContent,
   LeftColumnLabwareInfo,
   RecoveryMap,
-  FailedStepNextStep,
   TwoColTextAndFailedStepNextStep,
 } from '../shared'
+import { TwoColumn } from '../../../molecules/InterventionModal'
+import { SelectRecoveryOption } from './SelectRecoveryOption'
 
 import type { RecoveryContentProps } from '../types'
-import { TwoColumn } from '../../../molecules/InterventionModal'
-import {
-  DIRECTION_COLUMN,
-  Flex,
-  SPACING,
-  StyledText,
-} from '@opentrons/components'
-import { Trans, useTranslation } from 'react-i18next'
 
 export function FillWellAndSkip(
   props: RecoveryContentProps
 ): JSX.Element | null {
   const { recoveryMap } = props
-  const { step } = recoveryMap
+  const { step, route } = recoveryMap
   const { FILL_MANUALLY_AND_SKIP, CANCEL_RUN } = RECOVERY_MAP
 
-  const buildContent = (): JSX.Element | null => {
+  const buildContent = (): JSX.Element => {
     switch (step) {
       case FILL_MANUALLY_AND_SKIP.STEPS.MANUALLY_FILL:
         return <FillWell {...props} />
@@ -37,7 +38,8 @@ export function FillWellAndSkip(
       case CANCEL_RUN.STEPS.CONFIRM_CANCEL:
         return <CancelRun {...props} />
       default:
-        return <FillWell {...props} />
+        console.warn(`${step} in ${route} not explicitly handled. Rerouting.`)
+        return <SelectRecoveryOption {...props} />
     }
   }
 

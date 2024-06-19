@@ -15,6 +15,7 @@ import { ODD_SECTION_TITLE_STYLE, RECOVERY_MAP } from '../constants'
 import { RecoveryFooterButtons, RecoverySingleColumnContent } from '../shared'
 import { DropTipWizardFlows } from '../../DropTipWizardFlows'
 import { DT_ROUTES } from '../../DropTipWizardFlows/constants'
+import { SelectRecoveryOption } from './SelectRecoveryOption'
 
 import type { PipetteWithTip } from '../../DropTipWizardFlows'
 import type { RecoveryContentProps } from '../types'
@@ -26,7 +27,7 @@ export function ManageTips(props: RecoveryContentProps): JSX.Element | null {
 
   const buildContent = (): JSX.Element | null => {
     const { DROP_TIP_FLOWS } = RECOVERY_MAP
-    const { step } = recoveryMap
+    const { step, route } = recoveryMap
 
     switch (step) {
       case DROP_TIP_FLOWS.STEPS.BEGIN_REMOVAL:
@@ -36,7 +37,8 @@ export function ManageTips(props: RecoveryContentProps): JSX.Element | null {
       case DROP_TIP_FLOWS.STEPS.CHOOSE_TIP_DROP:
         return <DropTipFlowsContainer {...props} />
       default:
-        return <DropTipFlowsContainer {...props} />
+        console.warn(`${step} in ${route} not explicitly handled. Rerouting.`)
+        return <SelectRecoveryOption {...props} />
     }
   }
 

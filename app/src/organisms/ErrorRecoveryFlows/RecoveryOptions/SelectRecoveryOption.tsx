@@ -20,9 +20,26 @@ import { RecoveryFooterButtons, RecoverySingleColumnContent } from '../shared'
 import type { ErrorKind, RecoveryContentProps, RecoveryRoute } from '../types'
 import type { PipetteWithTip } from '../../DropTipWizardFlows'
 
-// The "home" screen within Error Recovery. When a user completes a non-terminal flow or presses "Go back" enough
-// to escape the boundaries of a route, they will be redirected here.
-export function SelectRecoveryOption({
+// The "home" route within Error Recovery. When a user completes a non-terminal flow or presses "Go back" enough
+// to escape the boundaries of any route, they will be redirected here.
+export function SelectRecoveryOption(props: RecoveryContentProps): JSX.Element {
+  const { recoveryMap } = props
+  const { step } = recoveryMap
+  const { OPTION_SELECTION } = RECOVERY_MAP
+
+  const buildContent = (): JSX.Element => {
+    switch (step) {
+      case OPTION_SELECTION.STEPS.SELECT:
+        return <SelectRecoveryOptionHome {...props} />
+      default:
+        return <SelectRecoveryOptionHome {...props} />
+    }
+  }
+
+  return buildContent()
+}
+
+export function SelectRecoveryOptionHome({
   isOnDevice,
   errorKind,
   routeUpdateActions,
