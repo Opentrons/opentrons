@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { useSelector } from 'react-redux'
 
 import {
   RUN_STATUS_AWAITING_RECOVERY,
@@ -20,7 +21,6 @@ import { useCurrentlyRecoveringFrom, useERUtils } from './hooks'
 import type { RunStatus } from '@opentrons/api-client'
 import type { CompletedProtocolAnalysis } from '@opentrons/shared-data'
 import type { FailedCommand } from './types'
-import { useSelector } from 'react-redux'
 
 const VALID_ER_RUN_STATUSES: RunStatus[] = [
   RUN_STATUS_AWAITING_RECOVERY,

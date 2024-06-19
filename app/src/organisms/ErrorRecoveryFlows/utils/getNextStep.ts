@@ -11,10 +11,9 @@ export function getNextStep(
       command => command.key === failedCommand.key
     )
 
-    const nextCommand = protocolAnalysis.commands[failedCommandAnalysisIdx + 1]
-
-    // Ensure the next command actually exists.
-    return nextCommand ?? null
+    return failedCommandAnalysisIdx !== -1
+      ? protocolAnalysis.commands[failedCommandAnalysisIdx + 1] ?? null
+      : null
   } else {
     return null
   }

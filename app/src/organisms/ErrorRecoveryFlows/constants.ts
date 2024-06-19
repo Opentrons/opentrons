@@ -4,6 +4,15 @@ import { SPACING, TYPOGRAPHY } from '@opentrons/components'
 
 import type { StepOrder } from './types'
 
+// TODO(jh, 06-18-24): Add the correct errorTypes for these errors when they are available.
+// Error types of "defined" errors, those handled explicitly by Error Recovery.
+export const DEFINED_ERROR_TYPES = {
+  NO_LIQUID_DETECTED: 'NO_FLUIDS_OH_NO',
+  PIPETTE_COLLISION: 'AAAAAHHHHHHHHH',
+  OVERPRESSURE_ASPIRATION: 'overpressure',
+  OVERPRESSURE_DISPENSING: 'OVERPRESSURE_DISPENSING',
+}
+
 export const ERROR_KINDS = {
   GENERAL_ERROR: 'GENERAL_ERROR',
   NO_LIQUID_DETECTED: 'NO_LIQUID_DETECTED',
@@ -203,38 +212,6 @@ export const INVALID = 'INVALID' as const
 /**
  * Styling
  */
-
-// These colors are temp and will be removed as design does design things.
-export const NON_DESIGN_SANCTIONED_COLOR_1 = '#56FF00'
-export const NON_DESIGN_SANCTIONED_COLOR_2 = '#FF00EF'
-
-export const NON_SANCTIONED_RECOVERY_COLOR_STYLE_PRIMARY = css`
-  background-color: ${NON_DESIGN_SANCTIONED_COLOR_1};
-
-  &:active {
-    background-color: ${NON_DESIGN_SANCTIONED_COLOR_2};
-  }
-  &:hover {
-    background-color: ${NON_DESIGN_SANCTIONED_COLOR_1};
-  }
-  &:focus {
-    background-color: ${NON_DESIGN_SANCTIONED_COLOR_2};
-  }
-`
-
-export const NON_SANCTIONED_RECOVERY_COLOR_STYLE_SECONDARY = css`
-  background-color: ${NON_DESIGN_SANCTIONED_COLOR_2};
-
-  &:active {
-    background-color: ${NON_DESIGN_SANCTIONED_COLOR_2};
-  }
-  &:hover {
-    background-color: ${NON_DESIGN_SANCTIONED_COLOR_1};
-  }
-  &:focus {
-    background-color: ${NON_DESIGN_SANCTIONED_COLOR_2};
-  }
-`
 
 export const BODY_TEXT_STYLE = css`
   ${TYPOGRAPHY.bodyTextRegular};

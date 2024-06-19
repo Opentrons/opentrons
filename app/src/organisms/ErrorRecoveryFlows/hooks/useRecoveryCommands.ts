@@ -56,6 +56,7 @@ export function useRecoveryCommands({
       continuePastFailure: boolean = false
     ): Promise<CommandData[]> =>
       chainRunCommands(commands, continuePastFailure).catch(e => {
+        console.warn(`Error executing "fixit" command: ${e}`)
         // the catch never occurs if continuePastCommandFailure is "true"
         void proceedToRouteAndStep(RECOVERY_MAP.ERROR_WHILE_RECOVERING.ROUTE)
         return Promise.reject(new Error(`Could not execute command: ${e}`))
@@ -88,9 +89,7 @@ export function useRecoveryCommands({
     )
 
     if (pickUpTipCmd == null) {
-      return Promise.reject(
-        new Error('Placeholder error: Invalid use of pickUpTips command')
-      )
+      return Promise.reject(new Error('Invalid use of pickUpTips command'))
     } else {
       return chainRunRecoveryCommands([pickUpTipCmd], true)
     }

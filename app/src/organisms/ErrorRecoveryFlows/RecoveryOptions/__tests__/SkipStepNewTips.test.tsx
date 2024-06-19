@@ -5,7 +5,7 @@ import { screen, fireEvent, waitFor } from '@testing-library/react'
 import { mockRecoveryContentProps } from '../../__fixtures__'
 import { renderWithProviders } from '../../../../__testing-utils__'
 import { i18n } from '../../../../i18n'
-import { RetryNewTips, RetryWithNewTips } from '../RetryNewTips'
+import { SkipStepNewTips, SkipStepWithNewTips } from '../SkipStepNewTips'
 import { RECOVERY_MAP } from '../../constants'
 import { SelectRecoveryOption } from '../SelectRecoveryOption'
 
@@ -22,22 +22,22 @@ vi.mock('../../shared', async () => {
   }
 })
 
-const render = (props: React.ComponentProps<typeof RetryNewTips>) => {
-  return renderWithProviders(<RetryNewTips {...props} />, {
+const render = (props: React.ComponentProps<typeof SkipStepNewTips>) => {
+  return renderWithProviders(<SkipStepNewTips {...props} />, {
     i18nInstance: i18n,
   })[0]
 }
 
-const renderRetryWithNewTips = (
-  props: React.ComponentProps<typeof RetryWithNewTips>
+const renderSkipStepWithNewTips = (
+  props: React.ComponentProps<typeof SkipStepWithNewTips>
 ) => {
-  return renderWithProviders(<RetryWithNewTips {...props} />, {
+  return renderWithProviders(<SkipStepWithNewTips {...props} />, {
     i18nInstance: i18n,
   })[0]
 }
 
-describe('RetryNewTips', () => {
-  let props: React.ComponentProps<typeof RetryNewTips>
+describe('SkipStepNewTips', () => {
+  let props: React.ComponentProps<typeof SkipStepNewTips>
   let mockProceedToRouteAndStep: Mock
 
   beforeEach(() => {
@@ -55,40 +55,40 @@ describe('RetryNewTips', () => {
     )
   })
 
-  it(`renders ReplaceTips when step is ${RECOVERY_MAP.RETRY_NEW_TIPS.STEPS.REPLACE_TIPS}`, () => {
+  it(`renders ReplaceTips when step is ${RECOVERY_MAP.SKIP_STEP_WITH_NEW_TIPS.STEPS.REPLACE_TIPS}`, () => {
     props = {
       ...props,
       recoveryMap: {
         ...props.recoveryMap,
-        step: RECOVERY_MAP.RETRY_NEW_TIPS.STEPS.REPLACE_TIPS,
+        step: RECOVERY_MAP.SKIP_STEP_WITH_NEW_TIPS.STEPS.REPLACE_TIPS,
       },
     }
     render(props)
     screen.getByText('MOCK_REPLACE_TIPS')
   })
 
-  it(`renders SelectTips when step is ${RECOVERY_MAP.RETRY_NEW_TIPS.STEPS.SELECT_TIPS}`, () => {
+  it(`renders SelectTips when step is ${RECOVERY_MAP.SKIP_STEP_WITH_NEW_TIPS.STEPS.SELECT_TIPS}`, () => {
     props = {
       ...props,
       recoveryMap: {
         ...props.recoveryMap,
-        step: RECOVERY_MAP.RETRY_NEW_TIPS.STEPS.SELECT_TIPS,
+        step: RECOVERY_MAP.SKIP_STEP_WITH_NEW_TIPS.STEPS.SELECT_TIPS,
       },
     }
     render(props)
     screen.getByText('MOCK_SELECT_TIPS')
   })
 
-  it(`renders RetryWithNewTips when step is ${RECOVERY_MAP.RETRY_NEW_TIPS.STEPS.RETRY}`, () => {
+  it(`renders SkipStepWithNewTips when step is ${RECOVERY_MAP.SKIP_STEP_WITH_NEW_TIPS.STEPS.SKIP}`, () => {
     props = {
       ...props,
       recoveryMap: {
         ...props.recoveryMap,
-        step: RECOVERY_MAP.RETRY_NEW_TIPS.STEPS.RETRY,
+        step: RECOVERY_MAP.SKIP_STEP_WITH_NEW_TIPS.STEPS.SKIP,
       },
     }
     render(props)
-    screen.getByText('Retry with new tips')
+    screen.getByText('Skip to next step with new tips')
   })
 
   it('renders SelectRecoveryOption as a fallback', () => {
@@ -103,12 +103,12 @@ describe('RetryNewTips', () => {
     screen.getByText('MOCK_SELECT_RECOVERY_OPTION')
   })
 
-  it(`proceeds to ${RECOVERY_MAP.DROP_TIP_FLOWS.ROUTE} route and ${RECOVERY_MAP.DROP_TIP_FLOWS.STEPS.BEFORE_BEGINNING} step when step is ${RECOVERY_MAP.RETRY_NEW_TIPS.STEPS.DROP_TIPS}`, () => {
+  it(`proceeds to ${RECOVERY_MAP.DROP_TIP_FLOWS.ROUTE} route and ${RECOVERY_MAP.DROP_TIP_FLOWS.STEPS.BEFORE_BEGINNING} step when step is ${RECOVERY_MAP.SKIP_STEP_WITH_NEW_TIPS.STEPS.DROP_TIPS}`, () => {
     props = {
       ...props,
       recoveryMap: {
         ...props.recoveryMap,
-        step: RECOVERY_MAP.RETRY_NEW_TIPS.STEPS.DROP_TIPS,
+        step: RECOVERY_MAP.SKIP_STEP_WITH_NEW_TIPS.STEPS.DROP_TIPS,
       },
     }
     render(props)
@@ -119,15 +119,15 @@ describe('RetryNewTips', () => {
   })
 })
 
-describe('RetryWithNewTips', () => {
-  let props: React.ComponentProps<typeof RetryWithNewTips>
+describe('SkipStepWithNewTips', () => {
+  let props: React.ComponentProps<typeof SkipStepWithNewTips>
   let mockSetRobotInMotion: Mock
-  let mockRetryFailedCommand: Mock
+  let mockSkipFailedCommand: Mock
   let mockResumeRun: Mock
 
   beforeEach(() => {
     mockSetRobotInMotion = vi.fn(() => Promise.resolve())
-    mockRetryFailedCommand = vi.fn(() => Promise.resolve())
+    mockSkipFailedCommand = vi.fn(() => Promise.resolve())
     mockResumeRun = vi.fn()
 
     props = {
@@ -136,7 +136,7 @@ describe('RetryWithNewTips', () => {
         setRobotInMotion: mockSetRobotInMotion,
       } as any,
       recoveryCommands: {
-        retryFailedCommand: mockRetryFailedCommand,
+        skipFailedCommand: mockSkipFailedCommand,
         resumeRun: mockResumeRun,
       } as any,
     }
@@ -147,33 +147,35 @@ describe('RetryWithNewTips', () => {
   })
 
   it('renders the component with the correct text', () => {
-    renderRetryWithNewTips(props)
-    screen.getByText('Retry with new tips')
-    screen.queryByText('The robot will retry the step with the new tips.')
+    renderSkipStepWithNewTips(props)
+    screen.getByText('Skip to next step with new tips')
+    screen.queryByText(
+      'The failed dispense step will not be completed. The run will continue from the next step.'
+    )
     screen.queryByText('Close the robot door before proceeding.')
   })
 
   it('calls the correct routeUpdateActions and recoveryCommands in the correct order when the primary button is clicked', async () => {
-    renderRetryWithNewTips(props)
-    fireEvent.click(screen.getByRole('button', { name: 'Retry now' }))
+    renderSkipStepWithNewTips(props)
+    fireEvent.click(screen.getByRole('button', { name: 'Continue run now' }))
 
     await waitFor(() => {
       expect(mockSetRobotInMotion).toHaveBeenCalledWith(
         true,
-        RECOVERY_MAP.ROBOT_RETRYING_STEP.ROUTE
+        RECOVERY_MAP.ROBOT_SKIPPING_STEP.ROUTE
       )
     })
     await waitFor(() => {
-      expect(mockRetryFailedCommand).toHaveBeenCalled()
+      expect(mockSkipFailedCommand).toHaveBeenCalled()
     })
     await waitFor(() => {
       expect(mockResumeRun).toHaveBeenCalled()
     })
 
     expect(mockSetRobotInMotion.mock.invocationCallOrder[0]).toBeLessThan(
-      mockRetryFailedCommand.mock.invocationCallOrder[0]
+      mockSkipFailedCommand.mock.invocationCallOrder[0]
     )
-    expect(mockRetryFailedCommand.mock.invocationCallOrder[0]).toBeLessThan(
+    expect(mockSkipFailedCommand.mock.invocationCallOrder[0]).toBeLessThan(
       mockResumeRun.mock.invocationCallOrder[0]
     )
   })

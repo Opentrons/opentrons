@@ -27,7 +27,7 @@ export function RetrySameTips(props: RecoveryContentProps): JSX.Element {
   return buildContent()
 }
 
-function RetrySameTipsInfo(props: RecoveryContentProps): JSX.Element {
+export function RetrySameTipsInfo(props: RecoveryContentProps): JSX.Element {
   const { routeUpdateActions, recoveryCommands } = props
   const { retryFailedCommand, resumeRun } = recoveryCommands
   const { setRobotInMotion } = routeUpdateActions

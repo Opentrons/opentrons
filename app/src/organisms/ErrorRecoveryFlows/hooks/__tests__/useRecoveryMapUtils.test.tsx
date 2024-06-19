@@ -42,7 +42,7 @@ describe('getRunCurrentModulesOnDeck', () => {
     },
   }
   const mockFailedLabwareUtils = {
-    pickUpTipLabware: mockPickUpTipLabware,
+    failedLabware: mockPickUpTipLabware,
   } as any
   const mockModuleDef = { model: 'MOCK_MODEL' } as any
   const mockCurrentModulesInfo = [
@@ -61,7 +61,7 @@ describe('getRunCurrentModulesOnDeck', () => {
 
   it('should return an array of RunCurrentModulesOnDeck objects', () => {
     const mockPickUpTipLabwareSameSlot = {
-      pickUpTipLabware: {
+      failedLabware: {
         ...mockPickUpTipLabware,
         location: { moduleId: 'MOCK_MODULE_ID' },
       },
@@ -126,7 +126,7 @@ describe('getRunCurrentLabwareOnDeck', () => {
     slotName: 'A1',
   }
   const mockFailedLabwareUtils = {
-    pickUpTipLabware: { ...mockPickUpTipLabware, location: { slotName: 'A1' } },
+    failedLabware: { ...mockPickUpTipLabware, location: { slotName: 'A1' } },
   } as any
 
   it('should return a valid RunCurrentLabwareOnDeck with a labware highlight if the labware is the pickUpTipLabware', () => {

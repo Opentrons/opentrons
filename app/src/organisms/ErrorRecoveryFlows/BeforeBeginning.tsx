@@ -9,11 +9,7 @@ import {
 } from '@opentrons/components'
 
 import { SmallButton } from '../../atoms/buttons'
-import {
-  NON_SANCTIONED_RECOVERY_COLOR_STYLE_PRIMARY,
-  BODY_TEXT_STYLE,
-  ODD_SECTION_TITLE_STYLE,
-} from './constants'
+import { BODY_TEXT_STYLE, ODD_SECTION_TITLE_STYLE } from './constants'
 import { RecoverySingleColumnContent } from './shared'
 
 import type { RecoveryContentProps } from './types'
@@ -39,7 +35,6 @@ export function BeforeBeginning({
           />
           <SmallButton
             buttonType="primary"
-            css={NON_SANCTIONED_RECOVERY_COLOR_STYLE_PRIMARY}
             buttonText={t('view_recovery_options')}
             justifyContent={JUSTIFY_CENTER}
             onClick={proceedNextStep}

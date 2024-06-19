@@ -27,7 +27,7 @@ export function RetryStep(props: RecoveryContentProps): JSX.Element {
   return buildContent()
 }
 
-function RetryStepInfo(props: RecoveryContentProps): JSX.Element {
+export function RetryStepInfo(props: RecoveryContentProps): JSX.Element {
   const { routeUpdateActions, recoveryCommands } = props
   const { ROBOT_RETRYING_STEP } = RECOVERY_MAP
   const { t } = useTranslation('error_recovery')

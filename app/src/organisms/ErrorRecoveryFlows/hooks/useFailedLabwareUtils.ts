@@ -98,7 +98,7 @@ interface RelevantFailedLabwareCmd {
 }
 
 // Return the actual command that contains the info relating to the relevant labware.
-function getRelevantFailedLabwareCmdFrom({
+export function getRelevantFailedLabwareCmdFrom({
   failedCommand,
   runCommands,
 }: RelevantFailedLabwareCmd): FailedCommandRelevantLabware {
