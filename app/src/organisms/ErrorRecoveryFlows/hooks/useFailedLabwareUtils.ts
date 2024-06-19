@@ -109,6 +109,7 @@ function getRelevantFailedLabwareCmdFrom({
       return failedCommand as Omit<AspirateRunTimeCommand, 'result'>
     case ERROR_KINDS.OVERPRESSURE_PREPARE_TO_ASPIRATE:
     case ERROR_KINDS.OVERPRESSURE_WHILE_ASPIRATING:
+    case ERROR_KINDS.OVERPRESSURE_WHILE_DISPENSING:
       return getRelevantPickUpTipCommand(failedCommand, runCommands)
     case ERROR_KINDS.GENERAL_ERROR:
       return null

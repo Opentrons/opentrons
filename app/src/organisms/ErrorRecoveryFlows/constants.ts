@@ -91,7 +91,7 @@ export const RECOVERY_MAP = {
   },
   FILL_MANUALLY_AND_SKIP: {
     ROUTE: 'manually-fill-well-and-skip',
-    STEPS: { MANUALLY_FILL: 'manually-fill', SKIP_RUN_STEP: 'skip-run-step' },
+    STEPS: { MANUALLY_FILL: 'manually-fill', SKIP: 'skip' },
   },
   REFILL_AND_RESUME: { ROUTE: 'refill-and-resume', STEPS: {} },
   RETRY_FAILED_COMMAND: {
@@ -111,6 +111,21 @@ export const RECOVERY_MAP = {
     ROUTE: 'retry-same-tips',
     STEPS: {
       RETRY: 'retry',
+    },
+  },
+  SKIP_STEP_WITH_NEW_TIPS: {
+    ROUTE: 'skip-to-next-step-new-tips',
+    STEPS: {
+      DROP_TIPS: 'drop-tips',
+      REPLACE_TIPS: 'replace-tips',
+      SELECT_TIPS: 'select-tips',
+      SKIP: 'skip',
+    },
+  },
+  SKIP_STEP_WITH_SAME_TIPS: {
+    ROUTE: 'skip-to-next-step-same-tips',
+    STEPS: {
+      SKIP: 'skip',
     },
   },
 } as const
@@ -133,6 +148,8 @@ const {
   RETRY_SAME_TIPS,
   ERROR_WHILE_RECOVERING,
   FILL_MANUALLY_AND_SKIP,
+  SKIP_STEP_WITH_NEW_TIPS,
+  SKIP_STEP_WITH_SAME_TIPS,
 } = RECOVERY_MAP
 
 // The deterministic ordering of steps for a given route.
@@ -147,6 +164,13 @@ export const STEP_ORDER: StepOrder = {
     RETRY_NEW_TIPS.STEPS.RETRY,
   ],
   [RETRY_SAME_TIPS.ROUTE]: [RETRY_SAME_TIPS.STEPS.RETRY],
+  [SKIP_STEP_WITH_NEW_TIPS.ROUTE]: [
+    SKIP_STEP_WITH_NEW_TIPS.STEPS.DROP_TIPS,
+    SKIP_STEP_WITH_NEW_TIPS.STEPS.REPLACE_TIPS,
+    SKIP_STEP_WITH_NEW_TIPS.STEPS.SELECT_TIPS,
+    SKIP_STEP_WITH_NEW_TIPS.STEPS.SKIP,
+  ],
+  [SKIP_STEP_WITH_SAME_TIPS.ROUTE]: [SKIP_STEP_WITH_SAME_TIPS.STEPS.SKIP],
   [ROBOT_CANCELING.ROUTE]: [ROBOT_CANCELING.STEPS.CANCELING],
   [ROBOT_IN_MOTION.ROUTE]: [ROBOT_IN_MOTION.STEPS.IN_MOTION],
   [ROBOT_PICKING_UP_TIPS.ROUTE]: [ROBOT_PICKING_UP_TIPS.STEPS.PICKING_UP_TIPS],
@@ -164,7 +188,7 @@ export const STEP_ORDER: StepOrder = {
   [CANCEL_RUN.ROUTE]: [CANCEL_RUN.STEPS.CONFIRM_CANCEL],
   [FILL_MANUALLY_AND_SKIP.ROUTE]: [
     FILL_MANUALLY_AND_SKIP.STEPS.MANUALLY_FILL,
-    FILL_MANUALLY_AND_SKIP.STEPS.SKIP_RUN_STEP,
+    FILL_MANUALLY_AND_SKIP.STEPS.SKIP,
   ],
   [ERROR_WHILE_RECOVERING.ROUTE]: [
     ERROR_WHILE_RECOVERING.STEPS.RECOVERY_ACTION_FAILED,

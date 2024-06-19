@@ -32,7 +32,7 @@ export function FillWellAndSkip(
     switch (step) {
       case FILL_MANUALLY_AND_SKIP.STEPS.MANUALLY_FILL:
         return <FillWell {...props} />
-      case FILL_MANUALLY_AND_SKIP.STEPS.SKIP_RUN_STEP:
+      case FILL_MANUALLY_AND_SKIP.STEPS.SKIP:
         return <SkipToNextStep {...props} />
       case CANCEL_RUN.STEPS.CONFIRM_CANCEL:
         return <CancelRun {...props} />

@@ -26,6 +26,10 @@ export function useRecoveryOptionCopy(): (
         return t('manually_fill_well_and_skip')
       case RECOVERY_MAP.IGNORE_AND_SKIP.ROUTE:
         return t('ignore_error_and_skip')
+      case RECOVERY_MAP.SKIP_STEP_WITH_NEW_TIPS.ROUTE:
+        return t('skip_to_next_step_new_tips')
+      case RECOVERY_MAP.SKIP_STEP_WITH_SAME_TIPS.ROUTE:
+        return t('skip_to_next_step_same_tips')
       default:
         return 'Unknown action'
     }

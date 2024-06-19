@@ -17,6 +17,9 @@ import {
   RetryNewTips,
   ManageTips,
   FillWellAndSkip,
+  RetrySameTips,
+  SkipStepSameTips,
+  SkipStepNewTips,
 } from './RecoveryOptions'
 import { RecoveryInProgress } from './RecoveryInProgress'
 import { getErrorKind } from './utils'
@@ -30,7 +33,6 @@ import type {
   ERUtilsResults,
 } from './hooks'
 import type { ErrorRecoveryFlowsProps } from '.'
-import { RetrySameTips } from './RecoveryOptions/RetrySameTips'
 
 interface UseERWizardResult {
   hasLaunchedRecovery: boolean
@@ -156,6 +158,14 @@ export function ErrorRecoveryContent(props: RecoveryContentProps): JSX.Element {
     return <FillWellAndSkip {...props} />
   }
 
+  const buildSkipStepSameTips = (): JSX.Element => {
+    return <SkipStepSameTips {...props} />
+  }
+
+  const buildSkipStepNewTips = (): JSX.Element => {
+    return <SkipStepNewTips {...props} />
+  }
+
   switch (props.recoveryMap.route) {
     case RECOVERY_MAP.BEFORE_BEGINNING.ROUTE:
       return buildBeforeBeginning()
@@ -175,6 +185,10 @@ export function ErrorRecoveryContent(props: RecoveryContentProps): JSX.Element {
       return buildRetrySameTips()
     case RECOVERY_MAP.FILL_MANUALLY_AND_SKIP.ROUTE:
       return buildFillWellAndSkip()
+    case RECOVERY_MAP.SKIP_STEP_WITH_SAME_TIPS.ROUTE:
+      return buildSkipStepSameTips()
+    case RECOVERY_MAP.SKIP_STEP_WITH_NEW_TIPS.ROUTE:
+      return buildSkipStepNewTips()
     case RECOVERY_MAP.ROBOT_IN_MOTION.ROUTE:
     case RECOVERY_MAP.ROBOT_RESUMING.ROUTE:
     case RECOVERY_MAP.ROBOT_RETRYING_STEP.ROUTE:
