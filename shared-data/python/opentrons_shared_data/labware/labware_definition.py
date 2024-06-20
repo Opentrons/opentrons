@@ -6,7 +6,7 @@ shared-data. It's been modified by hand to be more friendly.
 from __future__ import annotations
 
 from enum import Enum
-from typing import TYPE_CHECKING, Dict, List, Optional, Tuple, TypedDict, Union
+from typing import TYPE_CHECKING, Dict, List, Optional, TypedDict, Union
 
 from pydantic import (
     BaseModel,

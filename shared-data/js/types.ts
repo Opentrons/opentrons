@@ -30,7 +30,6 @@ import type {
 import type { RunTimeCommand, LabwareLocation } from '../command/types'
 import type { AddressableAreaName, CutoutFixtureId, CutoutId } from '../deck'
 import type { PipetteName } from './pipettes'
-import { List } from 'lodash'
 
 export type RobotType = 'OT-2 Standard' | 'OT-3 Standard'
 
@@ -174,8 +173,8 @@ export interface LabwareWellGroup {
 }
 
 export interface LiquidProbeParameters {
-  minimumHeight: List<{"value": number, "applicableWells": string[]}>
-  minimumWellVolume: List<{"value": number, "applicableWells": string[]}>
+  minimumHeight: {"value": number, "applicableWells": string[]}[]
+  minimumWellVolume: {"value": number, "applicableWells": string[]}[]
 }
 
 export type LabwareRoles = 'labware' | 'adapter' | 'fixture' | 'maintenance'
