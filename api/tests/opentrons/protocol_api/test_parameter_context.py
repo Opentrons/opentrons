@@ -13,7 +13,7 @@ from opentrons.protocols.parameters import (
     parameter_definition as mock_parameter_definition,
     validation as mock_validation,
 )
-from opentrons.protocols.parameters.types import ParameterDefinitionError
+from opentrons.protocols.parameters.exceptions import ParameterDefinitionError
 from opentrons.protocol_engine.types import BooleanParameter
 
 from opentrons.protocol_api._parameter_context import ParameterContext

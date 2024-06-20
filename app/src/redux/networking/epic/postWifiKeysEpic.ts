@@ -12,6 +12,7 @@ import type {
 } from '../../robot-api/operators'
 import type { Action, Epic } from '../../types'
 import type { PostWifiKeysAction, WifiKey } from '../types'
+import type { RobotApiErrorResponse } from '../../robot-api/types'
 
 const mapActionToRequest: ActionToRequestMapper<PostWifiKeysAction> = action => {
   const { keyFile } = action.payload
@@ -30,7 +31,7 @@ const mapResponseToAction: ResponseToActionMapper<PostWifiKeysAction> = (
 
   return response.ok
     ? postWifiKeysSuccess(host.name, omit(body, 'message') as WifiKey, meta)
-    : postWifiKeysFailure(host.name, body, meta)
+    : postWifiKeysFailure(host.name, body as RobotApiErrorResponse, meta)
 }
 
 export const postWifiKeysEpic: Epic = (action$, state$) => {

@@ -6,8 +6,10 @@ from opentrons.protocols.parameters.types import (
     ParamType,
     ParameterChoice,
     PrimitiveAllowedTypes,
-    ParameterDefinitionError,
+)
+from opentrons.protocols.parameters.exceptions import (
     ParameterValueError,
+    ParameterDefinitionError,
 )
 from opentrons.protocols.parameters import validation
 from opentrons.protocol_engine.types import (

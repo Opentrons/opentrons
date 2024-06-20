@@ -8,10 +8,10 @@ import type { BaseState } from '../types'
 export type AnalyticsEvent =
   | {
       name: string
-      properties: { [key: string]: unknown }
-      superProperties?: { [key: string]: unknown }
+      properties: Record<string, unknown>
+      superProperties?: Record<string, unknown>
     }
-  | { superProperties: { [key: string]: unknown } }
+  | { superProperties: Record<string, unknown> }
 
 // pulled in from environment at build time
 const MIXPANEL_ID = getIsProduction()
@@ -24,8 +24,8 @@ const MIXPANEL_OPTS = {
 }
 
 export function initializeMixpanel(state: BaseState): void {
-  const optedIn = getHasOptedIn(state) || false
-  if (MIXPANEL_ID) {
+  const optedIn = getHasOptedIn(state) ?? false
+  if (MIXPANEL_ID != null) {
     console.debug('Initializing Mixpanel', { optedIn })
 
     mixpanel.init(MIXPANEL_ID, MIXPANEL_OPTS)
@@ -39,20 +39,18 @@ export function initializeMixpanel(state: BaseState): void {
 // NOTE: Do not use directly. Used in analytics Redux middleware: trackEventMiddleware.
 export function trackEvent(event: AnalyticsEvent, optedIn: boolean): void {
   console.debug('Trackable event', { event, optedIn })
-  if (MIXPANEL_ID && optedIn) {
-    if (event.superProperties) {
+  if (MIXPANEL_ID != null && optedIn) {
+    if ('superProperties' in event && event.superProperties != null) {
       mixpanel.register(event.superProperties)
     }
-    // @ts-expect-error not a valid way to type narrow
-    if (event.name) {
-      // @ts-expect-error not a valid way to type narrow
+    if ('name' in event && event.name != null) {
       mixpanel.track(event.name, event.properties)
     }
   }
 }
 
 export function setMixpanelTracking(optedIn: boolean): void {
-  if (MIXPANEL_ID) {
+  if (MIXPANEL_ID != null) {
     if (optedIn) {
       console.debug('User has opted into analytics; tracking with Mixpanel')
       mixpanel.opt_in_tracking()

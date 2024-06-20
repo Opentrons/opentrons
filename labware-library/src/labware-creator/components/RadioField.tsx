@@ -18,10 +18,10 @@ export const RadioField = (props: Props): JSX.Element => (
   <Field name={props.name}>
     {/* @ts-expect-error(IL, 2021-03-24): formik types need cleanup w LabwareFields */}
     {({ form, field }) =>
-      getIsHidden(props.name, form.values) ? null : (
+      getIsHidden(props.name, form.values as LabwareFields) ? null : (
         <div className={fieldStyles.field_wrapper}>
           <div className={fieldStyles.field_label}>
-            {getLabel(props.name, form.values)}
+            {getLabel(props.name, form.values as LabwareFields)}
           </div>
           <RadioGroup
             name={field.name}

@@ -424,7 +424,7 @@ export function ChooseRobotSlideout(
                     })
                   : null
               if (error != null) {
-                errors.push(error)
+                errors.push(error as string)
               }
               return (
                 <InputField
@@ -500,7 +500,7 @@ export function ChooseRobotSlideout(
                             ) {
                               return {
                                 ...parameter,
-                                value: !parameter.value,
+                                value: !Boolean(parameter.value),
                               }
                             }
                             return parameter
@@ -509,11 +509,11 @@ export function ChooseRobotSlideout(
                         setRunTimeParametersOverrides?.(clone)
                       }}
                       height="0.813rem"
-                      label={runtimeParam.value ? t('on') : t('off')}
+                      label={Boolean(runtimeParam.value) ? t('on') : t('off')}
                       paddingTop={SPACING.spacing2} // manual alignment of SVG with value label
                     />
                     <StyledText as="p">
-                      {runtimeParam.value ? t('on') : t('off')}
+                      {Boolean(runtimeParam.value) ? t('on') : t('off')}
                     </StyledText>
                   </Flex>
                   <StyledText as="label" paddingTop={SPACING.spacing8}>
@@ -530,7 +530,7 @@ export function ChooseRobotSlideout(
                   ? null
                   : t('csv_file_type_required')
               if (error != null) {
-                errors.push(error)
+                errors.push(error as string)
               }
               return !enableCsvFile ? null : (
                 <Flex
@@ -564,7 +564,7 @@ export function ChooseRobotSlideout(
                             ) {
                               return {
                                 ...parameter,
-                                file: { file: file },
+                                file: { file },
                               }
                             }
                             return parameter

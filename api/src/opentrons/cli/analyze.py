@@ -5,6 +5,7 @@ from anyio import run
 from contextlib import contextmanager
 from dataclasses import dataclass
 from datetime import datetime, timezone
+from enum import Enum
 from pathlib import Path
 from pydantic import BaseModel
 from typing import (
@@ -48,6 +49,7 @@ from opentrons.protocol_engine import (
     Liquid,
     StateSummary,
 )
+from opentrons.protocol_engine.protocol_engine import code_in_error_tree
 
 from opentrons_shared_data.robot.dev_types import RobotType
 
@@ -302,6 +304,19 @@ async def _analyze(
     if not outputs:
         return return_code
 
+    if len(analysis.state_summary.errors) > 0:
+        if any(
+            code_in_error_tree(
+                root_error=error, code=ErrorCodes.RUNTIME_PARAMETER_VALUE_REQUIRED
+            )
+            for error in analysis.state_summary.errors
+        ):
+            result = AnalysisResult.PARAMETER_VALUE_REQUIRED
+        else:
+            result = AnalysisResult.NOT_OK
+    else:
+        result = AnalysisResult.OK
+
     results = AnalyzeResults.construct(
         createdAt=datetime.now(tz=timezone.utc),
         files=[
@@ -313,6 +328,7 @@ async def _analyze(
             if isinstance(protocol_source.config, JsonProtocolConfig)
             else PythonConfig.construct(apiVersion=protocol_source.config.api_version)
         ),
+        result=result,
         metadata=protocol_source.metadata,
         robotType=protocol_source.robot_type,
         runTimeParameters=analysis.parameters,
@@ -365,6 +381,26 @@ class PythonConfig(BaseModel):
     apiVersion: APIVersion
 
 
+class AnalysisResult(str, Enum):
+    """Result of a completed protocol analysis.
+
+    The result indicates whether the protocol is expected to run successfully.
+
+    Properties:
+        OK: No problems were found during protocol analysis.
+        NOT_OK: Problems were found during protocol analysis. Inspect
+            `analysis.errors` for error occurrences.
+        PARAMETER_VALUE_REQUIRED: A value is required to be set for a parameter
+            in order for the protocol to be analyzed/run. The absence of this does not
+            inherently mean there are no parameters, as there may be defaults for all
+            or unset parameters are not referenced or handled via try/except clauses.
+    """
+
+    OK = "ok"
+    NOT_OK = "not-ok"
+    PARAMETER_VALUE_REQUIRED = "parameter-value-required"
+
+
 class AnalyzeResults(BaseModel):
     """Results of a protocol analysis.
 
@@ -381,6 +417,7 @@ class AnalyzeResults(BaseModel):
     metadata: Dict[str, Any]
 
     # Fields that should match robot-server:
+    result: AnalysisResult
     robotType: RobotType
     runTimeParameters: List[RunTimeParameter]
     commands: List[Command]

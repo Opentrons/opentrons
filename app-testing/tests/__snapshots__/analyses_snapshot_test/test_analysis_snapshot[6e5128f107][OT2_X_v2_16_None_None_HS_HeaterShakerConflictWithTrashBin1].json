@@ -528,6 +528,7 @@
     }
   ],
   "pipettes": [],
+  "result": "not-ok",
   "robotType": "OT-2 Standard",
   "runTimeParameters": []
 }
