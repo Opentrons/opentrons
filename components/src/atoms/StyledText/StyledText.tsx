@@ -31,11 +31,11 @@ const helixProductStyleMap = {
       }
     `,
   },
-  headingMediumMedium: {
+  headingMediumSemiBold: {
     as: 'h3',
     style: css`
       @media not (${RESPONSIVENESS.touchscreenMediaQuerySpecs}) {
-        font: ${HELIX_TYPOGRAPHY.fontStyleHeadingMediumMedium};
+        font: ${HELIX_TYPOGRAPHY.fontStyleHeadingMediumSemiBold};
       }
     `,
   },
@@ -55,11 +55,11 @@ const helixProductStyleMap = {
       }
     `,
   },
-  bodyLargeMedium: {
+  bodyLargeSemiBold: {
     as: 'p',
     style: css`
       @media not (${RESPONSIVENESS.touchscreenMediaQuerySpecs}) {
-        font: ${HELIX_TYPOGRAPHY.fontStyleBodyLargeMedium};
+        font: ${HELIX_TYPOGRAPHY.fontStyleBodyLargeSemiBold};
       }
     `,
   },
@@ -71,11 +71,11 @@ const helixProductStyleMap = {
       }
     `,
   },
-  bodyDefaultMedium: {
+  bodyDefaultSemiBold: {
     as: 'p',
     style: css`
       @media not (${RESPONSIVENESS.touchscreenMediaQuerySpecs}) {
-        font: ${HELIX_TYPOGRAPHY.fontStyleBodyDefaultMedium};
+        font: ${HELIX_TYPOGRAPHY.fontStyleBodyDefaultSemiBold};
       }
     `,
   },
@@ -87,11 +87,11 @@ const helixProductStyleMap = {
       }
     `,
   },
-  captionMedium: {
+  captionSemiBold: {
     as: 'label',
     style: css`
       @media not (${RESPONSIVENESS.touchscreenMediaQuerySpecs}) {
-        font: ${HELIX_TYPOGRAPHY.fontStyleCaptionMedium};
+        font: ${HELIX_TYPOGRAPHY.fontStyleCaptionSemiBold};
       }
     `,
   },
@@ -250,17 +250,17 @@ export interface Props extends React.ComponentProps<typeof Text> {
 }
 export const ODD_STYLES = Object.keys(ODDStyleMap)
 export const HELIX_STYLES = Object.keys(helixProductStyleMap)
-export type HelixStyles = typeof HELIX_STYLES
-export type ODDStyles = typeof ODD_STYLES
+export type HelixStyles = keyof typeof helixProductStyleMap
+export type ODDStyles = keyof typeof ODDStyleMap
 
 function styleForDesktopName(
-  name?: keyof typeof helixProductStyleMap
+  name?: HelixStyles
 ): FlattenSimpleInterpolation {
   return name ? helixProductStyleMap[name].style : css``
 }
 
 function styleForODDName(
-  name?: keyof typeof ODDStyleMap
+  name?: ODDStyles
 ): FlattenSimpleInterpolation {
   return name ? ODDStyleMap[name].style : css``
 }
