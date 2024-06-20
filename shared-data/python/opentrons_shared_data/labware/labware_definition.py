@@ -6,7 +6,7 @@ shared-data. It's been modified by hand to be more friendly.
 from __future__ import annotations
 
 from enum import Enum
-from typing import TYPE_CHECKING, Dict, List, Optional, Union, Tuple
+from typing import TYPE_CHECKING, Dict, List, Optional, Union
 
 from pydantic import (
     BaseModel,
@@ -336,6 +336,6 @@ class LabwareDefinition(BaseModel):
         description="Force, in Newtons, with which the gripper should grip the labware.",
     )
     liquidProbeSettings: Optional[minimumLiquidProbeRequirements] = Field(
-        default_factory=dict,
+        default_factory=None,
         description="Minimum height/volume requirements for a liquid probe to work properly",
     )
