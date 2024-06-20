@@ -67,6 +67,7 @@ async def test_upload_new_data_file(
         name="abc.csv",
         createdAt=datetime(year=2024, month=6, day=18),
     )
+    assert result.status_code == 201
     decoy.verify(
         await file_reader_writer.write(
             directory=data_files_directory / "data-file-id", files=[buffered_file]
@@ -119,7 +120,7 @@ async def test_upload_existing_data_file(
         file_id="data-file-id",
         created_at=datetime(year=2024, month=6, day=18),
     )
-
+    assert result.status_code == 200
     assert result.content.data == DataFile(
         id="existing-file-id",
         name="abc.csv",
@@ -154,7 +155,7 @@ async def test_upload_new_data_file_path(
         file_id="data-file-id",
         created_at=datetime(year=2024, month=6, day=18),
     )
-
+    assert result.status_code == 201
     assert result.content.data == DataFile(
         id="data-file-id",
         name="abc.csv",
