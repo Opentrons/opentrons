@@ -146160,6 +146160,7 @@
       "pipetteName": "p1000_multi_flex"
     }
   ],
+  "result": "ok",
   "robotType": "OT-3 Standard",
   "runTimeParameters": []
 }
