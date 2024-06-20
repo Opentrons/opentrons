@@ -12,7 +12,7 @@ import {
   DIRECTION_COLUMN,
   Flex,
   Icon,
-  JUSTIFY_CENTER,
+  InfoScreen,
   JUSTIFY_FLEX_START,
   Link,
   SPACING,
@@ -40,7 +40,7 @@ interface HistoricalProtocolRunDrawerProps {
 export function HistoricalProtocolRunDrawer(
   props: HistoricalProtocolRunDrawerProps
 ): JSX.Element | null {
-  const { t } = useTranslation('run_details')
+  const { i18n, t } = useTranslation('run_details')
   const { run, robotName } = props
   const allLabwareOffsets = run.labwareOffsets?.sort(
     (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
@@ -70,6 +70,7 @@ export function HistoricalProtocolRunDrawer(
   const isOutOfDate =
     typeof lastModifiedDeckCal === 'string' &&
     uniqueLabwareOffsets != null &&
+    uniqueLabwareOffsets.length > 0 &&
     new Date(lastModifiedDeckCal).getTime() >
       new Date(
         uniqueLabwareOffsets[uniqueLabwareOffsets?.length - 1].createdAt
@@ -91,7 +92,7 @@ export function HistoricalProtocolRunDrawer(
 
   const protocolFilesData =
     allProtocolDataFiles.length === 0 ? (
-      <NoData text={t('no_files_included')} />
+      <InfoScreen contentType="noFiles" t={t} backgroundColor={COLORS.grey35} />
     ) : (
       <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
         <StyledText>{t('protocol_files')}</StyledText>
@@ -106,7 +107,6 @@ export function HistoricalProtocolRunDrawer(
           <Box width="33%">
             <StyledText
               as="p"
-              textTransform={TYPOGRAPHY.textTransformCapitalize}
               datatest-id="RecentProtocolRun_Drawer_fileNameTitle"
             >
               {t('name')}
@@ -115,7 +115,6 @@ export function HistoricalProtocolRunDrawer(
           <Box width="33%">
             <StyledText
               as="p"
-              textTransform={TYPOGRAPHY.textTransformCapitalize}
               datatest-id="RecentProtocolRun_Drawer_fileDateTitle"
             >
               {t('date')}
@@ -124,7 +123,6 @@ export function HistoricalProtocolRunDrawer(
           <Box width="34%">
             <StyledText
               as="p"
-              textTransform={TYPOGRAPHY.textTransformCapitalize}
               datatest-id="RecentProtocolRun_Drawer_fileDownloadTitle"
             >
               {t('download')}
@@ -162,7 +160,7 @@ export function HistoricalProtocolRunDrawer(
                     css={TYPOGRAPHY.linkPSemiBold}
                     onClick={() => {}} // TODO (nd: 06/18/2024) get file and download
                   >
-                    <StyledText as="p" textTransform="capitalize">
+                    <StyledText as="p">
                       {t('download')}
                       <Icon
                         name="download"
@@ -181,12 +179,17 @@ export function HistoricalProtocolRunDrawer(
 
   const labwareOffsets =
     uniqueLabwareOffsets == null || uniqueLabwareOffsets.length === 0 ? (
-      <NoData text={t('no_offsets_available')} />
+      <InfoScreen
+        contentType="noLabwareOffsetData"
+        t={t}
+        backgroundColor={COLORS.grey35}
+      />
     ) : (
+      // <InfoScreen contentType="noLabwareOffsetData" />
       <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
         {outOfDateBanner}
-        <StyledText textTransform="capitalize">
-          {t('labware_offset_data')}
+        <StyledText>
+          {i18n.format(t('labware_offset_data'), 'capitalize')}
         </StyledText>
         <Flex
           direction={DIRECTION_COLUMN}
@@ -202,28 +205,25 @@ export function HistoricalProtocolRunDrawer(
           >
             <StyledText
               as="p"
-              textTransform={TYPOGRAPHY.textTransformCapitalize}
               datatest-id="RecentProtocolRun_Drawer_locationTitle"
             >
-              {t('location')}
+              {i18n.format(t('location'), 'capitalize')}
             </StyledText>
           </Box>
           <Box width="33%" padding={`${SPACING.spacing4} ${SPACING.spacing8}`}>
             <StyledText
               as="p"
-              textTransform={TYPOGRAPHY.textTransformCapitalize}
               datatest-id="RecentProtocolRun_Drawer_labwareTitle"
             >
-              {t('labware')}
+              {i18n.format(t('labware'), 'capitalize')}
             </StyledText>
           </Box>
           <Box width="34%" padding={`${SPACING.spacing4} ${SPACING.spacing8}`}>
             <StyledText
               as="p"
-              textTransform={TYPOGRAPHY.textTransformCapitalize}
               datatest-id="RecentProtocolRun_Drawer_labwareOffsetDataTitle"
             >
-              {t('labware_offset_data')}
+              {i18n.format(t('labware_offset_data'), 'sentenceCase')}
             </StyledText>
           </Box>
         </Flex>
@@ -256,9 +256,10 @@ export function HistoricalProtocolRunDrawer(
                   gridGap={SPACING.spacing4}
                   alignItems={ALIGN_CENTER}
                 >
+                  {/* TODO (nd: 06/20/2024) finalize small version of LocationIcon w/ Design and implement below */}
                   <StyledText
                     as="label"
-                    fontWeight="semiBold"
+                    fontWeight={TYPOGRAPHY.fontWeightSemiBold}
                     borderRadius="6px"
                     padding="3px"
                     minWidth="max-content"
@@ -303,31 +304,6 @@ export function HistoricalProtocolRunDrawer(
     >
       {protocolFilesData}
       {labwareOffsets}
-    </Flex>
-  )
-}
-
-interface NoDataProps {
-  text: string
-}
-
-function NoData(props: NoDataProps): JSX.Element {
-  const { text } = props
-  return (
-    <Flex
-      backgroundColor={COLORS.grey35}
-      padding={`${SPACING.spacing24} ${SPACING.spacing8}`}
-      alignItems={ALIGN_CENTER}
-      justifyContent={JUSTIFY_CENTER}
-      height="8.25rem"
-      borderRadius={BORDERS.borderRadius8}
-      flexDirection={DIRECTION_COLUMN}
-      gridGap={SPACING.spacing12}
-    >
-      <Icon name="alert-circle" size="1.5rem" color={COLORS.grey60}></Icon>
-      <StyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
-        {text}
-      </StyledText>
     </Flex>
   )
 }

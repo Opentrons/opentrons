@@ -10,6 +10,7 @@ import {
   Flex,
   Icon,
   JUSTIFY_SPACE_BETWEEN,
+  OVERFLOW_HIDDEN,
   SPACING,
   StyledText,
 } from '@opentrons/components'
@@ -19,12 +20,12 @@ import { formatInterval } from '../RunTimeControl/utils'
 import { formatTimestamp } from './utils'
 import { EMPTY_TIMESTAMP } from './constants'
 import { HistoricalProtocolRunOverflowMenu as OverflowMenu } from './HistoricalProtocolRunOverflowMenu'
-import { HistoricalProtocolRunDrawer as Drawer } from './HistoricalProtocolRunOffsetDrawer'
+import { HistoricalProtocolRunDrawer as Drawer } from './HistoricalProtocolRunDrawer'
 import type { RunData } from '@opentrons/api-client'
 import type { State } from '../../redux/types'
 
 const PROTOCOL_NAME_STYLE = css`
-  overflow: hidden;
+  overflow: ${OVERFLOW_HIDDEN};
   white-space: nowrap;
   text-overflow: ellipsis;
 `
@@ -42,7 +43,7 @@ export function HistoricalProtocolRun(
 ): JSX.Element | null {
   const { t } = useTranslation('run_details')
   const { run, protocolName, robotIsBusy, robotName, protocolKey } = props
-  const [drawer, setDrawerOpen] = React.useState(false)
+  const [drawerOpen, setDrawerOpen] = React.useState(false)
   const storedProtocols = useSelector((state: State) =>
     getStoredProtocols(state)
   )
@@ -59,9 +60,6 @@ export function HistoricalProtocolRun(
       duration = formatInterval(run.startedAt, new Date().toString())
     }
   }
-  const protocolKeyInStoredKeys = storedProtocols.find(
-    ({ protocolKey: key }) => protocolKey === key
-  )
 
   return (
     <>
@@ -75,53 +73,39 @@ export function HistoricalProtocolRun(
         }
         width="100%"
         onClick={() => {
-          setDrawerOpen(!drawer)
+          setDrawerOpen(!drawerOpen)
         }}
-        css={css`
-          cursor: pointer;
-        `}
+        cursor="pointer"
       >
         <Flex width="88%" gridGap={SPACING.spacing20}>
           <StyledText
             as="p"
             width="25%"
-            data-testid={`RecentProtocolRuns_Run_${String(protocolKey)}`}
+            data-testid={`RecentProtocolRuns_Run_${protocolKey}`}
           >
             {runDisplayName}
           </StyledText>
-          {protocolKeyInStoredKeys != null ? (
-            <StyledText
-              as="p"
-              width="27%"
-              data-testid={`RecentProtocolRuns_Protocol_${String(protocolKey)}`}
-              css={PROTOCOL_NAME_STYLE}
-            >
-              {protocolName}
-            </StyledText>
-          ) : (
-            <StyledText
-              as="p"
-              width="27%"
-              data-testid={`RecentProtocolRuns_Protocol_${String(protocolKey)}`}
-              css={PROTOCOL_NAME_STYLE}
-            >
-              {protocolName}
-            </StyledText>
-          )}
+          <StyledText
+            as="p"
+            width="27%"
+            data-testid={`RecentProtocolRuns_Protocol_${protocolKey}`}
+            css={PROTOCOL_NAME_STYLE}
+          >
+            {protocolName}
+          </StyledText>
           <StyledText
             as="p"
             width="5%"
-            data-testid={`RecentProtocolRuns_Files_${String(protocolKey)}`}
+            data-testid={`RecentProtocolRuns_Files_${protocolKey}`}
           >
             {allProtocolDataFiles.length}
           </StyledText>
           <StyledText
             as="p"
             width="14%"
-            textTransform="capitalize"
-            data-testid={`RecentProtocolRuns_Status_${String(protocolKey)}`}
+            data-testid={`RecentProtocolRuns_Status_${protocolKey}`}
           >
-            {runStatus === 'running' && (
+            {runStatus === 'running' ? (
               <Icon
                 name="circle"
                 color={COLORS.blue50}
@@ -129,8 +113,8 @@ export function HistoricalProtocolRun(
                 marginX={SPACING.spacing4}
                 marginBottom={SPACING.spacing4}
               />
-            )}
-            {runStatus != null ? t(`status_${String(runStatus)}`) : ''}
+            ) : null}
+            {runStatus != null ? t(`status_${runStatus}`) : ''}
           </StyledText>
           <StyledText
             as="p"
@@ -143,7 +127,7 @@ export function HistoricalProtocolRun(
         <Flex alignItems={ALIGN_CENTER} gridGap={SPACING.spacing8}>
           <Box>
             <Icon
-              name={drawer ? 'chevron-up' : 'chevron-down'}
+              name={drawerOpen ? 'chevron-up' : 'chevron-down'}
               size="1.25rem"
               css={{ cursor: 'pointer' }}
             />
@@ -155,7 +139,7 @@ export function HistoricalProtocolRun(
           />
         </Flex>
       </Flex>
-      {drawer ? <Drawer run={run} robotName={robotName} /> : null}
+      {drawerOpen ? <Drawer run={run} robotName={robotName} /> : null}
     </>
   )
 }
