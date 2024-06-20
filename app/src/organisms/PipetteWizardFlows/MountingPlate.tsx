@@ -43,12 +43,12 @@ export const MountingPlate = (
         proceed()
       })
       .catch(error => {
-        setShowErrorMessage(error.message)
+        setShowErrorMessage(error.message as string)
       })
   }
 
   if (isRobotMoving) return <InProgressModal description={t('stand_back')} />
-  return errorMessage ? (
+  return errorMessage != null ? (
     <SimpleWizardBody
       iconColor={COLORS.red50}
       header={t('shared:error_encountered')}
@@ -64,7 +64,7 @@ export const MountingPlate = (
       )}
       rightHandBody={getPipetteAnimations96({
         section: SECTIONS.MOUNTING_PLATE,
-        flowType: flowType,
+        flowType,
       })}
       bodyText={
         flowType === FLOWS.ATTACH ? (

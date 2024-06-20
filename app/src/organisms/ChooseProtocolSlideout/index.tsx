@@ -275,7 +275,7 @@ export function ChooseProtocolSlideoutComponent(
                     })
                   : null
               if (error != null) {
-                errors.push(error)
+                errors.push(error as string)
               }
               return (
                 <InputField
@@ -351,7 +351,7 @@ export function ChooseProtocolSlideoutComponent(
                             ) {
                               return {
                                 ...parameter,
-                                value: !parameter.value,
+                                value: !Boolean(parameter.value),
                               }
                             }
                             return parameter
@@ -361,14 +361,14 @@ export function ChooseProtocolSlideoutComponent(
                       }}
                       height="0.813rem"
                       label={
-                        runtimeParam.value
+                        Boolean(runtimeParam.value)
                           ? t('protocol_details:on')
                           : t('protocol_details:off')
                       }
                       paddingTop={SPACING.spacing2} // manual alignment of SVG with value label
                     />
                     <StyledText as="p">
-                      {runtimeParam.value
+                      {Boolean(runtimeParam.value)
                         ? t('protocol_details:on')
                         : t('protocol_details:off')}
                     </StyledText>
@@ -384,7 +384,7 @@ export function ChooseProtocolSlideoutComponent(
                   ? null
                   : t('protocol_details:csv_file_type_required')
               if (error != null) {
-                errors.push(error)
+                errors.push(error as string)
               }
               return !enableCsvFile ? null : (
                 <Flex
@@ -420,7 +420,7 @@ export function ChooseProtocolSlideoutComponent(
                             ) {
                               return {
                                 ...parameter,
-                                file: { file: file },
+                                file: { file },
                               }
                             }
                             return parameter

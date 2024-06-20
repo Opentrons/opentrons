@@ -13,7 +13,7 @@ import type {
   ResponseToActionMapper,
 } from '../../robot-api/operators'
 
-import type { UpdateSettingAction } from '../types'
+import type { RobotSettings, UpdateSettingAction } from '../types'
 
 const mapActionToRequest: ActionToRequestMapper<UpdateSettingAction> = action => ({
   method: POST,
@@ -31,11 +31,11 @@ const mapResponseToAction: ResponseToActionMapper<UpdateSettingAction> = (
   return response.ok
     ? Actions.updateSettingSuccess(
         host.name,
-        body.settings,
-        body.links?.restart || null,
+        body.settings as RobotSettings,
+        (body.links?.restart as string | null) ?? null,
         meta
       )
-    : Actions.updateSettingFailure(host.name, body, meta)
+    : Actions.updateSettingFailure(host.name, body as { message: string }, meta)
 }
 
 export const updateSettingEpic: Epic = (action$, state$) => {

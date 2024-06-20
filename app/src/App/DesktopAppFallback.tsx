@@ -34,7 +34,7 @@ export function DesktopAppFallback({ error }: FallbackProps): JSX.Element {
     })
     // route to the root page and initiate an electron browser window reload via app-shell
     history.push('/')
-    dispatch(reloadUi(error.message))
+    dispatch(reloadUi(error.message as string))
   }
 
   return (

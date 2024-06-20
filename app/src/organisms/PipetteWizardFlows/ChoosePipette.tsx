@@ -136,7 +136,7 @@ export const ChoosePipette = (props: ChoosePipetteProps): JSX.Element => {
   })
   const wizardHeader = (
     <WizardHeader
-      title={startCase(t('attach_pipette', { mount: mount }))}
+      title={startCase(t('attach_pipette', { mount }) as string)}
       currentStep={0}
       totalSteps={3}
       onExit={
@@ -185,7 +185,7 @@ export const ChoosePipette = (props: ChoosePipetteProps): JSX.Element => {
                   value: NINETY_SIX_CHANNEL,
                 }}
                 onSelect={event => {
-                  setSelectedPipette(event.target.value as any)
+                  setSelectedPipette(event.target.value as SelectablePipettes)
                 }}
                 initialSelected={selectedPipette}
               />
