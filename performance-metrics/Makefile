@@ -84,6 +84,29 @@ push-no-restart-ot3: sdist
 push-ot3: push-no-restart-ot3
 	$(call restart-server,$(host),$(ssh_key),$(ssh_opts),"opentrons-robot-server")
 
+.PHONY: update-robot-version
+update-robot-version:
+	$(eval update_dict := '{"opentrons_api_version": "$(version)", "update_server_version": "$(version)", "robot_server_version": "$(version)", "server_utils_version": "$(version)", "opentrons_hardware_version": "$(version)"}')
+	$(call sync-version-file,$(host),$(ssh_key),$(ssh_opts),'$(update_dict)')
+	$(call restart-service,$(host),$(ssh_key),$(ssh_opts),"opentrons-robot-server")
+
+
+.PHONY: set-performance-metrics-ff
+set-performance-metrics-ff:
+	@curl \
+    -H "opentrons-version: *" \
+    -X POST $(host):31950/settings \
+    -H "content-type: application/json" \
+    -d '{"id": "enablePerformanceMetrics", "value": true}'
+
+.PHONY: unset-performance-metrics-ff
+unset-performance-metrics-ff:
+	@curl \
+	-H "opentrons-version: *" \
+	-X POST $(host):31950/settings \
+	-H "content-type: application/json" \
+	-d '{"id": "enablePerformanceMetrics", "value": false}'
+
 .PHONY: test
 test:
 	$(pytest) tests
