@@ -46,15 +46,11 @@ async def get_data_files_directory(
 async def get_data_files_store(
     app_state: AppState = Depends(get_app_state),
     sql_engine: SQLEngine = Depends(get_sql_engine),
-    data_files_directory: Path = Depends(get_data_files_directory),
 ) -> DataFilesStore:
     """Get a singleton DataFilesStore to keep track of uploaded data files."""
     async with _data_files_store_init_lock:
         data_files_store = _data_files_store_accessor.get_from(app_state)
         if data_files_store is None:
-            data_files_store = await DataFilesStore.rehydrate(
-                sql_engine=sql_engine,
-                files_directory=data_files_directory,
-            )
+            data_files_store = DataFilesStore(sql_engine)
             _data_files_store_accessor.set_on(app_state, data_files_store)
         return data_files_store
