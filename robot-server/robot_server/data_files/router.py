@@ -108,5 +108,6 @@ async def upload_data_file(
                 name=file_info.name,
                 createdAt=created_at,
             )
-        )
+        ),
+        status_code=status.HTTP_201_CREATED,
     )
