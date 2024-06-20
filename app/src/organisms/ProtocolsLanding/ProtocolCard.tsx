@@ -41,6 +41,7 @@ import { getIsProtocolAnalysisInProgress } from '../../redux/protocol-storage'
 import { InstrumentContainer } from '../../atoms/InstrumentContainer'
 import { ProtocolOverflowMenu } from './ProtocolOverflowMenu'
 import { ProtocolAnalysisFailure } from '../ProtocolAnalysisFailure'
+import { ProtocolStatusBanner } from '../ProtocolStatusBanner'
 import { getProtocolUsesGripper } from '../ProtocolSetupInstruments/utils'
 import { ProtocolAnalysisStale } from '../ProtocolAnalysisFailure/ProtocolAnalysisStale'
 import {
@@ -216,6 +217,9 @@ function AnalysisInfo(props: AnalysisInfoProps): JSX.Element {
       >
         {/* error and protocol name section */}
         <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing8}>
+          {mostRecentAnalysis?.result === 'file-required' ? (
+            <ProtocolStatusBanner />
+          ) : null}
           {analysisStatus === 'error' ? (
             <ProtocolAnalysisFailure
               protocolKey={protocolKey}

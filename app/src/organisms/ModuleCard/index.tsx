@@ -140,9 +140,9 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
     !MODULE_MODELS_OT2_ONLY.some(modModel => modModel === module.moduleModel) &&
     module.moduleOffset?.last_modified == null
   const isPipetteReady =
-    (!attachPipetteRequired ?? false) &&
-    (!calibratePipetteRequired ?? false) &&
-    (!updatePipetteFWRequired ?? false)
+    !Boolean(attachPipetteRequired) &&
+    !Boolean(calibratePipetteRequired) &&
+    !Boolean(updatePipetteFWRequired)
 
   const latestRequest = useSelector<State, RequestState | null>(state =>
     latestRequestId != null ? getRequestById(state, latestRequestId) : null

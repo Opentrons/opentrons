@@ -64,6 +64,7 @@ import { useFeatureFlag } from '../../redux/config'
 import { ChooseRobotToRunProtocolSlideout } from '../ChooseRobotToRunProtocolSlideout'
 import { SendProtocolToFlexSlideout } from '../SendProtocolToFlexSlideout'
 import { ProtocolAnalysisFailure } from '../ProtocolAnalysisFailure'
+import { ProtocolStatusBanner } from '../ProtocolStatusBanner'
 import {
   getAnalysisStatus,
   getProtocolDisplayName,
@@ -427,6 +428,10 @@ export function ProtocolDetails(
               padding={`${SPACING.spacing16} 0 ${SPACING.spacing16} ${SPACING.spacing16}`}
               width="100%"
             >
+              {analysisStatus !== 'loading' &&
+              mostRecentAnalysis?.result === 'file-required' ? (
+                <ProtocolStatusBanner />
+              ) : null}
               {analysisStatus !== 'loading' &&
               mostRecentAnalysis != null &&
               mostRecentAnalysis.errors.length > 0 ? (

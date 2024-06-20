@@ -73,6 +73,12 @@ class RunCommandSummary(ResourceModel):
         None,
         description="Notes pertaining to this command.",
     )
+    failedCommandId: Optional[str] = Field(
+        None,
+        description=(
+            "FIXIT command use only. Reference of the failed command id we are trying to fix."
+        ),
+    )
 
 
 class Run(ResourceModel):

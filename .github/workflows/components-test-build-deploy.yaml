@@ -169,6 +169,10 @@ jobs:
           AWS_DEFAULT_REGION: us-east-2
         run: |
           aws s3 sync ./dist s3://opentrons-components/${{ env.OT_BRANCH}} --acl public-read
+      - name: 'Set generated URL'
+        run: |
+          echo 'Created component storybook for [${{ env.OT_BRANCH }}](https://s3-us-west-2.amazonaws.com/opentrons-components/${{ env.OT_BRANCH }}/index.html?path=/)' >> $GITHUB_STEP_SUMMARY
+          echo 'Created component storybook for https://s3-us-west-2.amazonaws.com/opentrons-components/${{ env.OT_BRANCH }}/index.html?path=/'
 
   publish-components:
     name: 'publish components package to npm'

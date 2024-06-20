@@ -3,6 +3,15 @@ import { I18nextProvider } from 'react-i18next'
 import { GlobalStyle } from '../app/src/atoms/GlobalStyle'
 import { i18n } from '../app/src/i18n'
 
+global.APP_SHELL_REMOTE = {
+  ipcRenderer: {
+    on: (topic, cb) => {},
+    invoke: (callname, args) => {},
+    send:  (message, payload) => {}
+  },
+}
+global._PKG_VERSION_ = '0.0.0-storybook'
+
 export const customViewports = {
   onDeviceDisplay: {
     name: 'Touchscreen',

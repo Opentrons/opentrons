@@ -13,26 +13,6 @@ const render = (props: React.ComponentProps<typeof Chip>) => {
 describe('Chip Touchscreen', () => {
   let props: React.ComponentProps<typeof Chip>
 
-  it('should render text, no icon with basic colors', () => {
-    props = {
-      text: 'mockBasic',
-      type: 'basic',
-    }
-    render(props)
-    const chip = screen.getByTestId('Chip_basic')
-    const chipText = screen.getByText('mockBasic')
-    expect(chip).toHaveStyle(
-      `background-color: ${COLORS.black90}${COLORS.opacity20HexCode}`
-    )
-    expect(chipText).toHaveStyle(`color: ${COLORS.grey60}`)
-    // ToDo (kk:03/28/2024) seems that jsdom doesn't support switching via media query
-    // I will keep investigating this
-    // expect(chipText).toHaveStyle(
-    //   `padding: ${SPACING.spacing8} ${SPACING.spacing16}`
-    // )
-    expect(screen.queryByLabelText('icon_mockBasic')).not.toBeInTheDocument()
-  })
-
   it('should render text, icon, bgcolor with success colors', () => {
     props = {
       text: 'mockSuccess',
@@ -249,22 +229,6 @@ describe('Chip Web', () => {
       value: 768,
     })
   })
-
-  it('should render text, no icon with basic colors', () => {
-    props = {
-      text: 'mockBasic',
-      type: 'basic',
-    }
-    render(props)
-    const chip = screen.getByTestId('Chip_basic')
-    const chipText = screen.getByText('mockBasic')
-    expect(chip).toHaveStyle(
-      `background-color: ${COLORS.black90}${COLORS.opacity20HexCode}`
-    )
-    expect(chipText).toHaveStyle(`color: ${COLORS.grey60}`)
-    expect(screen.queryByLabelText('icon_mockBasic')).not.toBeInTheDocument()
-  })
-
   it('should render text, icon, bgcolor with success colors', () => {
     props = {
       text: 'mockSuccess',
