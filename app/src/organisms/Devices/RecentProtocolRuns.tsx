@@ -9,7 +9,7 @@ import {
   DIRECTION_COLUMN,
   DISPLAY_FLEX,
   Flex,
-  JUSTIFY_SPACE_AROUND,
+  JUSTIFY_FLEX_START,
   SIZE_4,
   SPACING,
   StyledText,
@@ -68,42 +68,44 @@ export function RecentProtocolRuns({
         {isRobotViewable && runs && runs.length > 0 && (
           <>
             <Flex
-              justifyContent={JUSTIFY_SPACE_AROUND}
+              justifyContent={JUSTIFY_FLEX_START}
               padding={SPACING.spacing8}
-              width="100%"
+              width="88%"
+              marginRight="12%"
+              gridGap={SPACING.spacing20}
+              color={COLORS.grey60}
             >
               <StyledText
-                marginLeft={SPACING.spacing24}
+                as="p"
                 width="25%"
-                as="label"
-                fontWeight={TYPOGRAPHY.fontWeightSemiBold}
                 data-testid="RecentProtocolRuns_RunTitle"
               >
                 {t('run')}
               </StyledText>
-
               <StyledText
-                as="label"
-                width="35%"
-                fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+                as="p"
+                width="27%"
                 data-testid="RecentProtocolRuns_ProtocolTitle"
               >
                 {t('protocol')}
               </StyledText>
-
               <StyledText
-                as="label"
-                width="20%"
-                fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+                as="p"
+                width="5%"
+                data-testid="RecentProtocolRuns_FilesTitle"
+              >
+                {t('files')}
+              </StyledText>
+              <StyledText
+                as="p"
+                width="14%"
                 data-testid="RecentProtocolRuns_StatusTitle"
               >
                 {t('status')}
               </StyledText>
               <StyledText
-                as="label"
-                width="20%"
-                marginRight="20px"
-                fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+                as="p"
+                width="14%"
                 data-testid="RecentProtocolRuns_DurationTitle"
               >
                 {t('run_duration')}
