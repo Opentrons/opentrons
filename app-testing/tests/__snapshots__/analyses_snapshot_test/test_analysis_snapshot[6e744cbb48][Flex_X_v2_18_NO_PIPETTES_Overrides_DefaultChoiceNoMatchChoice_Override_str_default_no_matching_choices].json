@@ -9,7 +9,6 @@
   },
   "errors": [
     {
-
       "detail": "ParameterValueError [line 48]: Parameter must be set to one of the allowed values of ['flex_1channel_50', 'flex_8channel_50'].",
       "errorCode": "4000",
       "errorInfo": {},

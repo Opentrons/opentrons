@@ -161,7 +161,6 @@
               ]
             }
           ],
-          "liquidProbeSettings": {},
           "metadata": {
             "displayCategory": "tipRack",
             "displayName": "Opentrons 96 Filter Tip Rack 20 µL",
@@ -1309,7 +1308,6 @@
               ]
             }
           ],
-          "liquidProbeSettings": {},
           "metadata": {
             "displayCategory": "tipRack",
             "displayName": "Opentrons 96 Tip Rack 300 µL",
@@ -2389,7 +2387,6 @@
               ]
             }
           ],
-          "liquidProbeSettings": {},
           "metadata": {
             "displayCategory": "tubeRack",
             "displayName": "Opentrons 15 Tube Rack with NEST 15 mL Conical",
@@ -2715,7 +2712,6 @@
               ]
             }
           ],
-          "liquidProbeSettings": {},
           "metadata": {
             "displayCategory": "wellPlate",
             "displayName": "Bio-Rad 96 Well Plate 200 µL PCR",
@@ -3812,7 +3808,6 @@
               ]
             }
           ],
-          "liquidProbeSettings": {},
           "metadata": {
             "displayCategory": "tubeRack",
             "displayName": "Opentrons 10 Tube Rack with Falcon 4x50 mL, 6x15 mL Conical",

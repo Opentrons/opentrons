@@ -52,7 +52,7 @@
               ]
             }
           ],
-          "liquidProbeSettings": {
+          "liquidProbeParameters": {
             "minimumHeight": [
               {
                 "applicableWells": [],
@@ -62,7 +62,7 @@
             "minimumWellVolume": [
               {
                 "applicableWells": [],
-                "value": 0
+                "value": 0.0
               }
             ]
           },
@@ -145,7 +145,7 @@
               "wells": []
             }
           ],
-          "liquidProbeSettings": {
+          "liquidProbeParameters": {
             "minimumHeight": [
               {
                 "applicableWells": [],
@@ -155,7 +155,7 @@
             "minimumWellVolume": [
               {
                 "applicableWells": [],
-                "value": 0
+                "value": 0.0
               }
             ]
           },
@@ -317,7 +317,6 @@
               ]
             }
           ],
-          "liquidProbeSettings": {},
           "metadata": {
             "displayCategory": "tipRack",
             "displayName": "Opentrons Flex 96 Tip Rack 1000 µL",

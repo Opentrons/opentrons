@@ -52,7 +52,7 @@
               ]
             }
           ],
-          "liquidProbeSettings": {
+          "liquidProbeParameters": {
             "minimumHeight": [
               {
                 "applicableWells": [],
@@ -62,7 +62,7 @@
             "minimumWellVolume": [
               {
                 "applicableWells": [],
-                "value": 0
+                "value": 0.0
               }
             ]
           },
