@@ -178,6 +178,13 @@ class JiraTicket:
             print("JSON decoding error occurred.")
         return file_path
 
+    def get_project_components(self, project_id: str) -> List[Dict[str, str]]:
+        """Get list of components on JIRA board."""
+        component_url = f"{self.url}/rest/api/3/project/{project_id}/components"
+        response = requests.get(component_url, headers=self.headers, auth=self.auth)
+        components_list = response.json()
+        return components_list
+
 
 if __name__ == "__main__":
     """Create ticket for specified robot."""

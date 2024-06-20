@@ -8,15 +8,17 @@ import { COLORS } from '@opentrons/components'
 
 import { renderWithProviders } from '../../../__testing-utils__'
 import { i18n } from '../../../i18n'
-import { mockFailedCommand } from '../__fixtures__'
+import { mockRecoveryContentProps } from '../__fixtures__'
 import { getIsOnDevice } from '../../../redux/config'
 import { useRunPausedSplash, RunPausedSplash } from '../RunPausedSplash'
+import { StepInfo } from '../shared'
 
 import type { Store } from 'redux'
 import { QueryClient, QueryClientProvider } from 'react-query'
 import { Provider } from 'react-redux'
 
 vi.mock('../../../redux/config')
+vi.mock('../shared')
 
 const store: Store<any> = createStore(vi.fn(), {})
 
@@ -51,7 +53,7 @@ const render = (props: React.ComponentProps<typeof RunPausedSplash>) => {
   )
 }
 
-describe('ConfirmCancelRunModal', () => {
+describe('RunPausedSplash', () => {
   let props: React.ComponentProps<typeof RunPausedSplash>
   const mockToggleERWiz = vi.fn(() => Promise.resolve())
   const mockProceedToRouteAndStep = vi.fn()
@@ -61,10 +63,12 @@ describe('ConfirmCancelRunModal', () => {
 
   beforeEach(() => {
     props = {
+      ...mockRecoveryContentProps,
       toggleERWiz: mockToggleERWiz,
       routeUpdateActions: mockRouteUpdateActions,
-      failedCommand: mockFailedCommand,
     }
+
+    vi.mocked(StepInfo).mockReturnValue(<div>MOCK STEP INFO</div>)
   })
 
   afterEach(() => {
@@ -73,8 +77,21 @@ describe('ConfirmCancelRunModal', () => {
 
   it('should render a generic paused screen if there is no handled errorType', () => {
     render(props)
-    screen.getByText('General error')
-    screen.getByText('<Placeholder>')
+    screen.getByText('Error')
+    screen.getByText('MOCK STEP INFO')
+  })
+
+  it('should render an overpressure error type if the errorType is overpressure', () => {
+    props = {
+      ...props,
+      failedCommand: {
+        ...props.failedCommand,
+        error: { errorType: 'overpressure' },
+      } as any,
+    }
+    render(props)
+    screen.getByText('Pipette overpressure')
+    screen.getByText('MOCK STEP INFO')
   })
 
   it('should contain buttons with expected appearance and behavior', async () => {
