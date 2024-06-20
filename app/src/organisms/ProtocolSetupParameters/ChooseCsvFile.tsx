@@ -46,9 +46,10 @@ export function ChooseCsvFile({
   // return format: https://opentrons.atlassian.net/browse/AUTH-428
   const csvFilesOnRobot: any[] = []
 
-  const handleOnChange = (newValue: string | number | boolean): void => {
-    setParameter(newValue, parameter?.variableName ?? 'csvFileId')
-  }
+  // ToDo (06/20/2024) this will removed when working on AUTH-521
+  // const handleOnChange = (newValue: string | number | boolean): void => {
+  //   setParameter(newValue, parameter?.variableName ?? 'csvFileId')
+  // }
 
   const handleConfirmSelection = (): void => {
     // ToDo (kk:06/18/2024) wire up later
