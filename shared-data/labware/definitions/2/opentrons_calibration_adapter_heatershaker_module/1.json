@@ -59,7 +59,7 @@
     "y": 5.5,
     "z": 0
   },
-  "liquidProbeSettings": {
+  "liquidProbeParameters": {
     "minimumHeight": [
       {
         "value": 0.5,

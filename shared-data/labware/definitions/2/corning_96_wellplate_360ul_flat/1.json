@@ -1046,7 +1046,7 @@
   "namespace": "opentrons",
   "version": 1,
   "schemaVersion": 2,
-  "liquidProbeSettings": {
+  "liquidProbeParameters": {
     "minimumHeight": [
       {
         "value": 0.5,

@@ -73,7 +73,10 @@
           "type": "number"
         },
         "applicableWells": {
-          "type": "array"
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
         }
       }
     }
@@ -380,7 +383,7 @@
       "type": "number",
       "description": "Recommended Z-height, from labware bottom to the center of gripper pads, when gripping the labware."
     },
-    "liquidProbeSettings": {
+    "liquidProbeParameters": {
       "type": "object",
       "description": "Minimum measurements for a liquid probe to work properly",
       "additionalProperties": false,

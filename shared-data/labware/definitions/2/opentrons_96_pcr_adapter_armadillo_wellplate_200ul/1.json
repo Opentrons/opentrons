@@ -1024,7 +1024,7 @@
       ]
     }
   ],
-  "liquidProbeSettings": {
+  "liquidProbeParameters": {
     "minimumHeight": [
       {
         "value": 0.5,

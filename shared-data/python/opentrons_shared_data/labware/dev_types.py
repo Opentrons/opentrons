@@ -3,7 +3,7 @@
 types in this file by and large require the use of typing_extensions.
 this module shouldn't be imported unless typing.TYPE_CHECKING is true.
 """
-from typing import Dict, List, NewType, Union
+from typing import Dict, List, NewType, Tuple, Union
 from typing_extensions import Literal, TypedDict
 
 
@@ -117,9 +117,9 @@ class WellGroup(TypedDict, total=False):
     brand: LabwareBrandData
 
 
-class LiquidProbeSettings(TypedDict, total=False):
-    minimumHeight: Dict[float, List[str]]
-    minimumWellVolume: Dict[float, List[str]]
+class LiquidProbeParameters(TypedDict, total=False):
+    minimumHeight: List[Tuple[float, List[str]]]
+    minimumWellVolume: List[Tuple[float, List[str]]]
 
 
 class _RequiredLabwareDefinition(TypedDict):
@@ -143,4 +143,4 @@ class LabwareDefinition(_RequiredLabwareDefinition, total=False):
     gripperOffsets: Dict[str, GripperOffsets]
     gripForce: float
     gripHeightFromLabwareBottom: float
-    liquidProbeSettings: LiquidProbeSettings
+    liquidProbeParameters: LiquidProbeParameters

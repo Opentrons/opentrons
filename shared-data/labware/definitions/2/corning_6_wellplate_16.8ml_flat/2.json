@@ -107,7 +107,7 @@
       "z": 4.5
     }
   },
-  "liquidProbeSettings": {
+  "liquidProbeParameters": {
     "minimumHeight": [
       {
         "value": 0.5,

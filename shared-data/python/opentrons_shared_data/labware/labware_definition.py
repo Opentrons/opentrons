@@ -6,7 +6,7 @@ shared-data. It's been modified by hand to be more friendly.
 from __future__ import annotations
 
 from enum import Enum
-from typing import TYPE_CHECKING, Dict, List, Optional, Union
+from typing import TYPE_CHECKING, Dict, List, Optional, Tuple, Union
 
 from pydantic import (
     BaseModel,
@@ -54,13 +54,13 @@ class CornerOffsetFromSlot(BaseModel):
     z: _Number
 
 
-class minimumLiquidProbeRequirements(BaseModel):
+class LiquidProbeParameters(BaseModel):
     """
     Required height/volume of liquid in a well for liquid probe to work correctly.
     """
-
-    minimumHeight: Dict[_Number, List[str]]
-    minimumWellVolume: Dict[_Number, List[str]]
+    
+    minimumHeight: List[Tuple[_Number, List[str]]]
+    minimumWellVolume: List[Tuple[_Number, List[str]]]
 
 
 class OverlapOffset(BaseModel):
@@ -335,7 +335,7 @@ class LabwareDefinition(BaseModel):
         default_factory=None,
         description="Force, in Newtons, with which the gripper should grip the labware.",
     )
-    liquidProbeSettings: Optional[minimumLiquidProbeRequirements] = Field(
+    liquidProbeParameters: Optional[LiquidProbeParameters] = Field(
         default_factory=None,
         description="Minimum height/volume requirements for a liquid probe to work properly",
     )
