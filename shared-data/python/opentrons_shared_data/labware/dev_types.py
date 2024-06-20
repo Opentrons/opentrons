@@ -117,9 +117,16 @@ class WellGroup(TypedDict, total=False):
     brand: LabwareBrandData
 
 
-class LiquidProbeParameters(TypedDict, total=False):
-    minimumHeight: List[Tuple[float, List[str]]]
-    minimumWellVolume: List[Tuple[float, List[str]]]
+class singleProbeParameter(TypedDict, total=True):
+    value: float
+    applicableWells: List[str]
+
+
+class LiquidProbeParameters(TypedDict, total=True):
+    # minimumHeight: List[Dict[float, List[str]]]
+    # minimumWellVolume: List[Tuple[float, List[str]]]
+    minimumHeight: List[singleProbeParameter]
+    minimumWellVolume: List[singleProbeParameter]
 
 
 class _RequiredLabwareDefinition(TypedDict):
