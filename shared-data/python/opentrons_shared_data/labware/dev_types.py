@@ -115,10 +115,11 @@ class WellGroup(TypedDict, total=False):
     wells: List[str]
     metadata: WellGroupMetadata
     brand: LabwareBrandData
-    
+
+
 class LiquidProbeSettings(TypedDict, total=False):
     minimumHeight: Dict[float, List[str]]
-    minimumWellVolume: Dict[float, List[str]] 
+    minimumWellVolume: Dict[float, List[str]]
 
 
 class _RequiredLabwareDefinition(TypedDict):

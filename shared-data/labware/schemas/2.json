@@ -382,7 +382,7 @@
     },
     "liquidProbeSettings": {
       "type": "object",
-      "description": "Minimum measurements for a liquid probe to work properly"    ,
+      "description": "Minimum measurements for a liquid probe to work properly",
       "additionalProperties": false,
       "properties": {
         "minimumHeight": {
