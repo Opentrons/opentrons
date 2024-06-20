@@ -57,6 +57,7 @@ import { Hardware } from './Hardware'
 import { Labware } from './Labware'
 import { Liquids } from './Liquids'
 import { formatTimeWithUtcLabel } from '../../resources/runs'
+import { useFeatureFlag } from '../../redux/config'
 
 import type { Protocol } from '@opentrons/api-client'
 import type { ModalHeaderBaseProps } from '../../molecules/Modal/types'
@@ -311,15 +312,14 @@ export function ProtocolDetails(): JSX.Element | null {
     'protocol_info',
     'shared',
   ])
+  const enableCsvFile = useFeatureFlag('enableCsvFile')
   const { protocolId } = useParams<OnDeviceRouteParams>()
   const {
     missingProtocolHardware,
     conflictedSlots,
   } = useMissingProtocolHardware(protocolId)
-  const chipText = useHardwareStatusText(
-    missingProtocolHardware,
-    conflictedSlots
-  )
+  let chipText = useHardwareStatusText(missingProtocolHardware, conflictedSlots)
+
   const runTimeParameters = useRunTimeParameters(protocolId)
   const dispatch = useDispatch<Dispatch>()
   const history = useHistory()
@@ -380,6 +380,15 @@ export function ProtocolDetails(): JSX.Element | null {
       })
     },
   })
+
+  const isRequiredCsv = mostRecentAnalysis?.result === 'file-required'
+  if (enableCsvFile && isRequiredCsv) {
+    if (chipText === 'Ready to run') {
+      chipText = i18n.format(t('requires_csv'), 'capitalize')
+    } else {
+      chipText = `${chipText} & ${t('requires_csv')}`
+    }
+  }
 
   const handlePinClick = (): void => {
     if (!pinned) {
