@@ -173,8 +173,8 @@ export interface LabwareWellGroup {
 }
 
 export interface LiquidProbeParameters {
-  minimumHeight: {"value": number, "applicableWells": string[]}[]
-  minimumWellVolume: {"value": number, "applicableWells": string[]}[]
+  minimumHeight: Array<{"value": number, "applicableWells": string[]}>
+  minimumWellVolume: Array<{"value": number, "applicableWells": string[]}>
 }
 
 export type LabwareRoles = 'labware' | 'adapter' | 'fixture' | 'maintenance'
