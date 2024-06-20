@@ -35,7 +35,9 @@ class AnalysisResult(str, Enum):
         NOT_OK: Problems were found during protocol analysis. Inspect
             `analysis.errors` for error occurrences.
         PARAMETER_VALUE_REQUIRED: A value is required to be set for a parameter
-            in order for the protocol to be analyzed/run
+            in order for the protocol to be analyzed/run. The absence of this does not
+            inherently mean there are no parameters, as there may be defaults for all
+            or unset parameters are not referenced or handled via try/except clauses.
     """
 
     OK = "ok"
