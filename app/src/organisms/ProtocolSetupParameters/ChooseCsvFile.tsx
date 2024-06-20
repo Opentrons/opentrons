@@ -107,9 +107,8 @@ export function ChooseCsvFile({
                         buttonLabel={last(csv.split('/')) ?? 'default'}
                         buttonValue={csv}
                         onChange={() => {
-                          // set the file full path
-                          // unselect radio button in robot
-                          handleOnChange(option.value)
+                          // ToDO this will be implemented AUTH-521
+                          // handleOnChange(option.value)
                           setCsvFileInfo(csv)
                         }}
                       />

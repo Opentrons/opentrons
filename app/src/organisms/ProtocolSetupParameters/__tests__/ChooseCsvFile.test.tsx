@@ -10,7 +10,7 @@ import { getLocalRobot } from '../../../redux/discovery'
 import { getFilePaths } from '../../../redux/shell'
 import { ChooseCsvFile } from '../ChooseCsvFile'
 
-import type { RunTimeParameter } from '@opentrons/shared-data'
+import type { CsvFileParameter } from '@opentrons/shared-data'
 
 vi.mock('../../../redux/discovery')
 vi.mock('../../../redux/shell')
@@ -18,7 +18,7 @@ vi.mock('../EmptyFile')
 
 const mockHandleGoBack = vi.fn()
 const mockSetParameter = vi.fn()
-const mockParameter: RunTimeParameter = {} as any
+const mockParameter: CsvFileParameter = {} as any
 const mockSetFileInfo = vi.fn()
 const mockUsbData = {
   type: 'shell:SEND_FILE_PATH',
