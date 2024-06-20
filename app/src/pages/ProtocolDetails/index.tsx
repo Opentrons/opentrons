@@ -381,7 +381,8 @@ export function ProtocolDetails(): JSX.Element | null {
     },
   })
 
-  const isRequiredCsv = mostRecentAnalysis?.result === 'file-required'
+  const isRequiredCsv =
+    mostRecentAnalysis?.result === 'parameter-value-required'
   if (enableCsvFile && isRequiredCsv) {
     if (chipText === 'Ready to run') {
       chipText = i18n.format(t('requires_csv'), 'capitalize')
