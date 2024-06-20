@@ -54,6 +54,7 @@
               ]
             }
           ],
+          "liquidProbeSettings": {},
           "metadata": {
             "displayCategory": "trash",
             "displayName": "Opentrons Fixed Trash",
@@ -233,6 +234,7 @@
               ]
             }
           ],
+          "liquidProbeSettings": {},
           "metadata": {
             "displayCategory": "tipRack",
             "displayName": "Opentrons 96 Tip Rack 10 µL",
@@ -1289,6 +1291,7 @@
               ]
             }
           ],
+          "liquidProbeSettings": {},
           "metadata": {
             "displayCategory": "reservoir",
             "displayName": "NEST 1 Well Reservoir 195 mL",
@@ -1471,6 +1474,7 @@
               ]
             }
           ],
+          "liquidProbeSettings": {},
           "metadata": {
             "displayCategory": "wellPlate",
             "displayName": "USA Scientific 96 Deep Well Plate 2.4 mL",
@@ -2713,6 +2717,7 @@
               ]
             }
           ],
+          "liquidProbeSettings": {},
           "metadata": {
             "displayCategory": "tipRack",
             "displayName": "Opentrons 96 Tip Rack 300 µL",

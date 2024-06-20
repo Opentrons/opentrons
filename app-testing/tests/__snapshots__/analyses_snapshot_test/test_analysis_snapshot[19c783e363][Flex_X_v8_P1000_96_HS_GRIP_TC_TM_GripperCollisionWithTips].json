@@ -1066,6 +1066,7 @@
               "wells": []
             }
           ],
+          "liquidProbeSettings": {},
           "metadata": {
             "displayCategory": "adapter",
             "displayName": "Opentrons Flex 96 Tip Rack Adapter",
@@ -1128,6 +1129,7 @@
               "wells": []
             }
           ],
+          "liquidProbeSettings": {},
           "metadata": {
             "displayCategory": "adapter",
             "displayName": "Opentrons Flex 96 Tip Rack Adapter",
@@ -1190,6 +1192,7 @@
               "wells": []
             }
           ],
+          "liquidProbeSettings": {},
           "metadata": {
             "displayCategory": "adapter",
             "displayName": "Opentrons Flex 96 Tip Rack Adapter",
@@ -1362,6 +1365,7 @@
               ]
             }
           ],
+          "liquidProbeSettings": {},
           "metadata": {
             "displayCategory": "adapter",
             "displayName": "Opentrons 96 PCR Heater-Shaker Adapter",
@@ -2520,6 +2524,7 @@
               ]
             }
           ],
+          "liquidProbeSettings": {},
           "metadata": {
             "displayCategory": "adapter",
             "displayName": "Opentrons 96 Well Aluminum Block",
@@ -3663,6 +3668,7 @@
               ]
             }
           ],
+          "liquidProbeSettings": {},
           "metadata": {
             "displayCategory": "tipRack",
             "displayName": "Opentrons Flex 96 Tip Rack 200 µL",
@@ -4727,6 +4733,7 @@
               ]
             }
           ],
+          "liquidProbeSettings": {},
           "metadata": {
             "displayCategory": "reservoir",
             "displayName": "NEST 1 Well Reservoir 290 mL",
@@ -4814,6 +4821,7 @@
               ]
             }
           ],
+          "liquidProbeSettings": {},
           "metadata": {
             "displayCategory": "reservoir",
             "displayName": "Agilent 1 Well Reservoir 290 mL",
@@ -4989,6 +4997,7 @@
               ]
             }
           ],
+          "liquidProbeSettings": {},
           "metadata": {
             "displayCategory": "tipRack",
             "displayName": "Opentrons Flex 96 Tip Rack 200 µL",
@@ -6140,6 +6149,7 @@
               ]
             }
           ],
+          "liquidProbeSettings": {},
           "metadata": {
             "displayCategory": "tipRack",
             "displayName": "Opentrons Flex 96 Tip Rack 200 µL",
@@ -7300,6 +7310,7 @@
               ]
             }
           ],
+          "liquidProbeSettings": {},
           "metadata": {
             "displayCategory": "wellPlate",
             "displayName": "Opentrons Tough 96 Well Plate 200 µL PCR Full Skirt",
@@ -8473,6 +8484,7 @@
               ]
             }
           ],
+          "liquidProbeSettings": {},
           "metadata": {
             "displayCategory": "wellPlate",
             "displayName": "Bio-Rad 96 Well Plate 200 µL PCR",
@@ -9640,6 +9652,7 @@
               ]
             }
           ],
+          "liquidProbeSettings": {},
           "metadata": {
             "displayCategory": "tipRack",
             "displayName": "Opentrons Flex 96 Tip Rack 200 µL",
@@ -10793,6 +10806,7 @@
               ]
             }
           ],
+          "liquidProbeSettings": {},
           "metadata": {
             "displayCategory": "tipRack",
             "displayName": "Opentrons Flex 96 Tip Rack 200 µL",

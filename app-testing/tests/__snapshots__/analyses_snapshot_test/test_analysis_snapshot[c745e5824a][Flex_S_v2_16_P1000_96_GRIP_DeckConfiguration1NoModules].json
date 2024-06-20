@@ -148,6 +148,20 @@
               ]
             }
           ],
+          "liquidProbeSettings": {
+            "minimumHeight": [
+              {
+                "applicableWells": [],
+                "value": 0.5
+              }
+            ],
+            "minimumWellVolume": [
+              {
+                "applicableWells": [],
+                "value": 0
+              }
+            ]
+          },
           "metadata": {
             "displayCategory": "wellPlate",
             "displayName": "NEST 96 Well Plate 100 µL PCR Full Skirt",
@@ -1316,6 +1330,20 @@
               ]
             }
           ],
+          "liquidProbeSettings": {
+            "minimumHeight": [
+              {
+                "applicableWells": [],
+                "value": 0.5
+              }
+            ],
+            "minimumWellVolume": [
+              {
+                "applicableWells": [],
+                "value": 0
+              }
+            ]
+          },
           "metadata": {
             "displayCategory": "wellPlate",
             "displayName": "NEST 96 Well Plate 100 µL PCR Full Skirt",
@@ -2380,6 +2408,20 @@
               "wells": []
             }
           ],
+          "liquidProbeSettings": {
+            "minimumHeight": [
+              {
+                "applicableWells": [],
+                "value": 0.5
+              }
+            ],
+            "minimumWellVolume": [
+              {
+                "applicableWells": [],
+                "value": 0
+              }
+            ]
+          },
           "metadata": {
             "displayCategory": "adapter",
             "displayName": "Opentrons Flex 96 Tip Rack Adapter",
@@ -2538,6 +2580,7 @@
               ]
             }
           ],
+          "liquidProbeSettings": {},
           "metadata": {
             "displayCategory": "tipRack",
             "displayName": "Opentrons Flex 96 Tip Rack 1000 µL",
@@ -3593,6 +3636,20 @@
               "wells": []
             }
           ],
+          "liquidProbeSettings": {
+            "minimumHeight": [
+              {
+                "applicableWells": [],
+                "value": 0.5
+              }
+            ],
+            "minimumWellVolume": [
+              {
+                "applicableWells": [],
+                "value": 0
+              }
+            ]
+          },
           "metadata": {
             "displayCategory": "adapter",
             "displayName": "Opentrons Flex 96 Tip Rack Adapter",
@@ -3751,6 +3808,7 @@
               ]
             }
           ],
+          "liquidProbeSettings": {},
           "metadata": {
             "displayCategory": "tipRack",
             "displayName": "Opentrons Flex 96 Tip Rack 1000 µL",
@@ -4901,6 +4959,7 @@
               ]
             }
           ],
+          "liquidProbeSettings": {},
           "metadata": {
             "displayCategory": "tipRack",
             "displayName": "Opentrons Flex 96 Tip Rack 1000 µL",
@@ -6051,6 +6110,7 @@
               ]
             }
           ],
+          "liquidProbeSettings": {},
           "metadata": {
             "displayCategory": "tipRack",
             "displayName": "Opentrons Flex 96 Tip Rack 1000 µL",
@@ -7203,6 +7263,7 @@
               ]
             }
           ],
+          "liquidProbeSettings": {},
           "metadata": {
             "displayCategory": "tipRack",
             "displayName": "Opentrons Flex 96 Tip Rack 1000 µL",
@@ -8355,6 +8416,7 @@
               ]
             }
           ],
+          "liquidProbeSettings": {},
           "metadata": {
             "displayCategory": "tipRack",
             "displayName": "Opentrons Flex 96 Tip Rack 1000 µL",

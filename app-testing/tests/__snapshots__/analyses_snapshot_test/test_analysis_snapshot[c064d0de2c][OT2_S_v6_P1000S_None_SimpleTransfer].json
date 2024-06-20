@@ -153,6 +153,7 @@
               ]
             }
           ],
+          "liquidProbeSettings": {},
           "metadata": {
             "displayCategory": "tipRack",
             "displayName": "Opentrons 96 Tip Rack 1000 µL",
@@ -1209,6 +1210,7 @@
               ]
             }
           ],
+          "liquidProbeSettings": {},
           "metadata": {
             "displayCategory": "reservoir",
             "displayName": "Axygen 1 Well Reservoir 90 mL",
@@ -1307,6 +1309,7 @@
               ]
             }
           ],
+          "liquidProbeSettings": {},
           "metadata": {
             "displayCategory": "reservoir",
             "displayName": "NEST 12 Well Reservoir 15 mL",
@@ -1545,6 +1548,7 @@
               ]
             }
           ],
+          "liquidProbeSettings": {},
           "metadata": {
             "displayCategory": "wellPlate",
             "displayName": "Corning 6 Well Plate 16.8 mL Flat",

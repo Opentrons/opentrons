@@ -161,6 +161,7 @@
               ]
             }
           ],
+          "liquidProbeSettings": {},
           "metadata": {
             "displayCategory": "tipRack",
             "displayName": "Opentrons 96 Filter Tip Rack 20 µL",
@@ -1308,6 +1309,7 @@
               ]
             }
           ],
+          "liquidProbeSettings": {},
           "metadata": {
             "displayCategory": "tipRack",
             "displayName": "Opentrons 96 Tip Rack 300 µL",
@@ -2364,6 +2366,7 @@
               ]
             }
           ],
+          "liquidProbeSettings": {},
           "metadata": {
             "displayCategory": "reservoir",
             "displayName": "Agilent 1 Well Reservoir 290 mL",
@@ -2451,6 +2454,7 @@
               ]
             }
           ],
+          "liquidProbeSettings": {},
           "metadata": {
             "displayCategory": "reservoir",
             "displayName": "Agilent 1 Well Reservoir 290 mL",
@@ -2538,6 +2542,7 @@
               ]
             }
           ],
+          "liquidProbeSettings": {},
           "metadata": {
             "displayCategory": "reservoir",
             "displayName": "Agilent 1 Well Reservoir 290 mL",
@@ -2636,6 +2641,7 @@
               ]
             }
           ],
+          "liquidProbeSettings": {},
           "metadata": {
             "displayCategory": "reservoir",
             "displayName": "NEST 12 Well Reservoir 15 mL",
@@ -2866,6 +2872,7 @@
               ]
             }
           ],
+          "liquidProbeSettings": {},
           "metadata": {
             "displayCategory": "reservoir",
             "displayName": "Agilent 1 Well Reservoir 290 mL",
@@ -2964,6 +2971,7 @@
               ]
             }
           ],
+          "liquidProbeSettings": {},
           "metadata": {
             "displayCategory": "reservoir",
             "displayName": "NEST 12 Well Reservoir 15 mL",

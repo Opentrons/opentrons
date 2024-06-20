@@ -391,6 +391,7 @@
               ]
             }
           ],
+          "liquidProbeSettings": {},
           "metadata": {
             "displayCategory": "tipRack",
             "displayName": "Opentrons OT-2 96 Tip Rack 300 µL",
