@@ -122,8 +122,6 @@ export interface LabwareParameters {
   isMagneticModuleCompatible: boolean
   magneticModuleEngageHeight?: number
   quirks?: string[]
-  minimumHeight?: number
-  minimumWellVolume?: number
 }
 
 export interface LabwareBrand {
@@ -174,6 +172,11 @@ export interface LabwareWellGroup {
   brand?: LabwareBrand
 }
 
+export interface LiquidProbeSettings {
+  minimumHeight: Record<number, string[]>
+  minimumWellVolume: Record<number, string[]>
+}
+
 export type LabwareRoles = 'labware' | 'adapter' | 'fixture' | 'maintenance'
 
 // NOTE: must be synced with shared-data/labware/schemas/2.json
@@ -192,6 +195,7 @@ export interface LabwareDefinition2 {
   allowedRoles?: LabwareRoles[]
   stackingOffsetWithLabware?: Record<string, LabwareOffset>
   stackingOffsetWithModule?: Record<string, LabwareOffset>
+  liquidProbeSettings?: LiquidProbeSettings
 }
 
 export interface LabwareDefByDefURI {
