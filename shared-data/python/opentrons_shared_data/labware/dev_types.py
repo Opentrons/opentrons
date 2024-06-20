@@ -60,8 +60,6 @@ class LabwareParameters(TypedDict, total=False):
     tipLength: float
     tipOverlap: float
     magneticModuleEngageHeight: float
-    minimumHeight: float
-    minimumWellVolume: float
 
 
 class LabwareBrandData(TypedDict, total=False):
@@ -117,6 +115,10 @@ class WellGroup(TypedDict, total=False):
     wells: List[str]
     metadata: WellGroupMetadata
     brand: LabwareBrandData
+    
+class LiquidProbeSettings(TypedDict, total=False):
+    minimumHeight: Dict[float, List[str]]
+    minimumWellVolume: Dict[float, List[str]] 
 
 
 class _RequiredLabwareDefinition(TypedDict):
@@ -140,3 +142,4 @@ class LabwareDefinition(_RequiredLabwareDefinition, total=False):
     gripperOffsets: Dict[str, GripperOffsets]
     gripForce: float
     gripHeightFromLabwareBottom: float
+    liquidProbeSettings: LiquidProbeSettings

@@ -7,9 +7,7 @@
     "quirks": ["gripperIncompatible"],
     "format": "96Standard",
     "isTiprack": false,
-    "isMagneticModuleCompatible": false,
-    "minimumHeight": 0.5,
-    "minimumWellVolume": 0
+    "isMagneticModuleCompatible": false
   },
   "metadata": {
     "displayName": "Opentrons 96 PCR Heater-Shaker Adapter with Armadillo Well Plate 200 µl",
@@ -1025,5 +1023,19 @@
         "H12"
       ]
     }
-  ]
+  ],
+  "liquidProbeSettings": {
+    "minimumHeight": [
+      {
+        "value": 0.5,
+        "applicableWells": []
+      }
+    ],
+    "minimumWellVolume": [
+      {
+        "value": 0,
+        "applicableWells": []
+      }
+    ]
+  }
 }

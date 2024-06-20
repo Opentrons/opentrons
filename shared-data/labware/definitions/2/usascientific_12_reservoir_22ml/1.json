@@ -32,9 +32,7 @@
     "isTiprack": false,
     "isMagneticModuleCompatible": false,
     "loadName": "usascientific_12_reservoir_22ml",
-    "quirks": ["centerMultichannelOnWells", "touchTipDisabled"],
-    "minimumHeight": 0.5,
-    "minimumWellVolume": 0
+    "quirks": ["centerMultichannelOnWells", "touchTipDisabled"]
   },
   "wells": {
     "A1": {
@@ -190,5 +188,19 @@
     "x": 0,
     "y": 0,
     "z": 0
+  },
+  "liquidProbeSettings": {
+    "minimumHeight": [
+      {
+        "value": 0.5,
+        "applicableWells": []
+      }
+    ],
+    "minimumWellVolume": [
+      {
+        "value": 0,
+        "applicableWells": []
+      }
+    ]
   }
 }

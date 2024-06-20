@@ -64,6 +64,18 @@
           "type": "number"
         }
       }
+    },
+    "minRequirements": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "value": {
+          "type": "number"
+        },
+        "applicableWells": {
+          "type": "array"
+        }
+      }
     }
   },
   "type": "object",
@@ -172,14 +184,6 @@
         },
         "magneticModuleEngageHeight": {
           "description": "Distance to move magnetic module magnets to engage",
-          "$ref": "#/definitions/positiveNumber"
-        },
-        "minimumHeight:": {
-          "description": "Minimum height from bottom that a liquid probe will work properly",
-          "$ref": "#/definitions/positiveNumber"
-        },
-        "minimumWellVolume": {
-          "description": "Minimum liquid volume in labware for a liquid probe to work properly",
           "$ref": "#/definitions/positiveNumber"
         }
       }
@@ -375,6 +379,25 @@
     "gripHeightFromLabwareBottom": {
       "type": "number",
       "description": "Recommended Z-height, from labware bottom to the center of gripper pads, when gripping the labware."
+    },
+    "liquidProbeSettings": {
+      "type": "object",
+      "description": "Minimum measurements for a liquid probe to work properly"    ,
+      "additionalProperties": false,
+      "properties": {
+        "minimumHeight": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/minRequirements"
+          }
+        },
+        "minimumWellVolume": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/minRequirements"
+          }
+        }
+      }
     }
   }
 }

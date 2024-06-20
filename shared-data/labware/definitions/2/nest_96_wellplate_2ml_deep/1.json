@@ -1108,9 +1108,7 @@
     "isTiprack": false,
     "isMagneticModuleCompatible": true,
     "loadName": "nest_96_wellplate_2ml_deep",
-    "magneticModuleEngageHeight": 6.8,
-    "minimumHeight": 0.5,
-    "minimumWellVolume": 0
+    "magneticModuleEngageHeight": 6.8
   },
   "namespace": "opentrons",
   "version": 1,
@@ -1119,5 +1117,19 @@
     "x": 0,
     "y": 0,
     "z": 0
+  },
+  "liquidProbeSettings": {
+    "minimumHeight": [
+      {
+        "value": 0.5,
+        "applicableWells": []
+      }
+    ],
+    "minimumWellVolume": [
+      {
+        "value": 0,
+        "applicableWells": []
+      }
+    ]
   }
 }

@@ -245,9 +245,7 @@
     "format": "irregular",
     "isTiprack": false,
     "isMagneticModuleCompatible": false,
-    "loadName": "opentrons_24_tuberack_generic_0.75ml_snapcap_acrylic",
-    "minimumHeight": 0.5,
-    "minimumWellVolume": 0
+    "loadName": "opentrons_24_tuberack_generic_0.75ml_snapcap_acrylic"
   },
   "groups": [
     {
@@ -296,5 +294,19 @@
     "x": 0,
     "y": 0,
     "z": 0
+  },
+  "liquidProbeSettings": {
+    "minimumHeight": [
+      {
+        "value": 0.5,
+        "applicableWells": []
+      }
+    ],
+    "minimumWellVolume": [
+      {
+        "value": 0,
+        "applicableWells": []
+      }
+    ]
   }
 }

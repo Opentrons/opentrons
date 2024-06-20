@@ -170,14 +170,6 @@ class Parameters(BaseModel):
     magneticModuleEngageHeight: Optional[_NonNegativeNumber] = Field(
         None, description="Distance to move magnetic module magnets to engage"
     )
-    minimumHeight: Optional[_NonNegativeNumber] = Field(
-        None,
-        description="Minimum height from bottom that a liquid probe will work properly",
-    )
-    minimumWellVolume: Optional[_NonNegativeNumber] = Field(
-        None,
-        description="Minimum liquid volume in labware for a liquid probe to work properly",
-    )
 
 
 class Dimensions(BaseModel):
@@ -333,4 +325,8 @@ class LabwareDefinition(BaseModel):
     gripForce: Optional[float] = Field(
         default_factory=None,
         description="Force, in Newtons, with which the gripper should grip the labware.",
+    )
+    liquidProbeSettings: Optional[Dict] = Field(
+        default_factory=dict,
+        description="Minimum height/volume requirements for a liquid probe to work properly"
     )

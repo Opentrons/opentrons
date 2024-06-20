@@ -1108,9 +1108,7 @@
     "quirks": ["gripperIncompatible"],
     "isTiprack": false,
     "isMagneticModuleCompatible": false,
-    "loadName": "opentrons_96_deep_well_adapter_nest_wellplate_2ml_deep",
-    "minimumHeight": 0.5,
-    "minimumWellVolume": 0
+    "loadName": "opentrons_96_deep_well_adapter_nest_wellplate_2ml_deep"
   },
   "namespace": "opentrons",
   "version": 1,
@@ -1119,5 +1117,19 @@
     "x": 0,
     "y": 0,
     "z": 0
+  },
+  "liquidProbeSettings": {
+    "minimumHeight": [
+      {
+        "value": 0.5,
+        "applicableWells": []
+      }
+    ],
+    "minimumWellVolume": [
+      {
+        "value": 0,
+        "applicableWells": []
+      }
+    ]
   }
 }

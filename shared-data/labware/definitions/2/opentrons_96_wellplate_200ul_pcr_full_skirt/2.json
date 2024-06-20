@@ -6,9 +6,7 @@
     "loadName": "opentrons_96_wellplate_200ul_pcr_full_skirt",
     "format": "96Standard",
     "isTiprack": false,
-    "isMagneticModuleCompatible": true,
-    "minimumHeight": 0.5,
-    "minimumWellVolume": 0
+    "isMagneticModuleCompatible": true
   },
   "metadata": {
     "displayName": "Opentrons Tough 96 Well Plate 200 µL PCR Full Skirt",
@@ -1043,5 +1041,19 @@
         "H12"
       ]
     }
-  ]
+  ],
+  "liquidProbeSettings": {
+    "minimumHeight": [
+      {
+        "value": 0.5,
+        "applicableWells": []
+      }
+    ],
+    "minimumWellVolume": [
+      {
+        "value": 0,
+        "applicableWells": []
+      }
+    ]
+  }
 }

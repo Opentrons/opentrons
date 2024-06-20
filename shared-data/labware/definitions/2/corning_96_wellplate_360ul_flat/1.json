@@ -1041,11 +1041,23 @@
     "format": "96Standard",
     "isTiprack": false,
     "isMagneticModuleCompatible": false,
-    "loadName": "corning_96_wellplate_360ul_flat",
-    "minimumHeight": 0.5,
-    "minimumWellVolume": 0
+    "loadName": "corning_96_wellplate_360ul_flat"
   },
   "namespace": "opentrons",
   "version": 1,
-  "schemaVersion": 2
+  "schemaVersion": 2,
+  "liquidProbeSettings": {
+    "minimumHeight": [
+      {
+        "value": 0.5,
+        "applicableWells": []
+      }
+    ],
+    "minimumWellVolume": [
+      {
+        "value": 0,
+        "applicableWells": []
+      }
+    ]
+  }
 }

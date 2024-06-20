@@ -27,9 +27,7 @@
     "quirks": ["tiprackAdapterFor96Channel"],
     "isTiprack": false,
     "isMagneticModuleCompatible": false,
-    "loadName": "opentrons_flex_96_tiprack_adapter",
-    "minimumHeight": 0.5,
-    "minimumWellVolume": 0
+    "loadName": "opentrons_flex_96_tiprack_adapter"
   },
   "namespace": "opentrons",
   "version": 1,
@@ -39,5 +37,19 @@
     "x": -14.25,
     "y": -3.5,
     "z": 0
+  },
+  "liquidProbeSettings": {
+    "minimumHeight": [
+      {
+        "value": 0.5,
+        "applicableWells": []
+      }
+    ],
+    "minimumWellVolume": [
+      {
+        "value": 0,
+        "applicableWells": []
+      }
+    ]
   }
 }

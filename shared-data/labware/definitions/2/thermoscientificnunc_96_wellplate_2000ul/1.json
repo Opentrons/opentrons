@@ -1006,9 +1006,7 @@
     "isTiprack": false,
     "isMagneticModuleCompatible": true,
     "magneticModuleEngageHeight": 6,
-    "loadName": "thermoscientificnunc_96_wellplate_2000ul",
-    "minimumHeight": 0.5,
-    "minimumWellVolume": 0
+    "loadName": "thermoscientificnunc_96_wellplate_2000ul"
   },
   "namespace": "opentrons",
   "version": 1,
@@ -1017,5 +1015,19 @@
     "x": 0,
     "y": 0,
     "z": 0
+  },
+  "liquidProbeSettings": {
+    "minimumHeight": [
+      {
+        "value": 0.5,
+        "applicableWells": []
+      }
+    ],
+    "minimumWellVolume": [
+      {
+        "value": 0,
+        "applicableWells": []
+      }
+    ]
   }
 }

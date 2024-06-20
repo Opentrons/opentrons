@@ -168,9 +168,7 @@
     "format": "irregular",
     "isTiprack": false,
     "isMagneticModuleCompatible": false,
-    "loadName": "opentrons_15_tuberack_falcon_15ml_conical",
-    "minimumHeight": 0.5,
-    "minimumWellVolume": 0
+    "loadName": "opentrons_15_tuberack_falcon_15ml_conical"
   },
   "groups": [
     {
@@ -209,5 +207,19 @@
     "x": 0,
     "y": 0,
     "z": 0
+  },
+  "liquidProbeSettings": {
+    "minimumHeight": [
+      {
+        "value": 0.5,
+        "applicableWells": []
+      }
+    ],
+    "minimumWellVolume": [
+      {
+        "value": 0,
+        "applicableWells": []
+      }
+    ]
   }
 }

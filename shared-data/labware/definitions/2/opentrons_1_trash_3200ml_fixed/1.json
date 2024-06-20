@@ -19,9 +19,7 @@
     "isTiprack": false,
     "loadName": "opentrons_1_trash_3200ml_fixed",
     "isMagneticModuleCompatible": false,
-    "quirks": ["fixedTrash", "centerMultichannelOnWells", "touchTipDisabled"],
-    "minimumHeight": 0.5,
-    "minimumWellVolume": 0
+    "quirks": ["fixedTrash", "centerMultichannelOnWells", "touchTipDisabled"]
   },
   "wells": {
     "A1": {
@@ -48,5 +46,19 @@
     "x": -17,
     "y": -2.75,
     "z": 0
+  },
+  "liquidProbeSettings": {
+    "minimumHeight": [
+      {
+        "value": 0.5,
+        "applicableWells": []
+      }
+    ],
+    "minimumWellVolume": [
+      {
+        "value": 0,
+        "applicableWells": []
+      }
+    ]
   }
 }

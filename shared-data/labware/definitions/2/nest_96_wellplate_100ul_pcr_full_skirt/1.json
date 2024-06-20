@@ -1005,9 +1005,7 @@
     "isTiprack": false,
     "isMagneticModuleCompatible": true,
     "magneticModuleEngageHeight": 20,
-    "loadName": "nest_96_wellplate_100ul_pcr_full_skirt",
-    "minimumHeight": 0.5,
-    "minimumWellVolume": 0
+    "loadName": "nest_96_wellplate_100ul_pcr_full_skirt"
   },
   "namespace": "opentrons",
   "version": 1,
@@ -1016,5 +1014,19 @@
     "x": 0,
     "y": 0,
     "z": 0
+  },
+  "liquidProbeSettings": {
+    "minimumHeight": [
+      {
+        "value": 0.5,
+        "applicableWells": []
+      }
+    ],
+    "minimumWellVolume": [
+      {
+        "value": 0,
+        "applicableWells": []
+      }
+    ]
   }
 }
