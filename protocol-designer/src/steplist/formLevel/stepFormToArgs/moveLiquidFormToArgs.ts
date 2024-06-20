@@ -45,7 +45,7 @@ export function getMixData(
   const times = hydratedFormData[timesField]
 
   if (
-    checkbox &&
+    Boolean(checkbox) &&
     typeof volume === 'number' &&
     volume > 0 &&
     typeof times === 'number' &&
@@ -134,12 +134,12 @@ export const moveLiquidFormToArgs = (
     : null
   const touchTipAfterAspirate = Boolean(fields.aspirate_touchTip_checkbox)
   const touchTipAfterAspirateOffsetMmFromBottom =
-    fields.aspirate_touchTip_mmFromBottom ||
+    fields.aspirate_touchTip_mmFromBottom ?? 
     getWellsDepth(fields.aspirate_labware.def, sourceWells) +
       DEFAULT_MM_TOUCH_TIP_OFFSET_FROM_TOP
   const touchTipAfterDispense = Boolean(fields.dispense_touchTip_checkbox)
   const touchTipAfterDispenseOffsetMmFromBottom =
-    fields.dispense_touchTip_mmFromBottom ||
+    fields.dispense_touchTip_mmFromBottom ?? 
     wellDepth + DEFAULT_MM_TOUCH_TIP_OFFSET_FROM_TOP
   const mixBeforeAspirate = getMixData(
     fields,
@@ -166,7 +166,7 @@ export const moveLiquidFormToArgs = (
     'dispense_delay_mmFromBottom'
   )
   const blowoutLocation =
-    (fields.blowout_checkbox && fields.blowout_location) || null
+    (fields.blowout_checkbox && fields.blowout_location) != null ? fields.blowout_location : null
   const blowoutOffsetFromTopMm =
     blowoutLocation != null
       ? blowout_z_offset ?? DEFAULT_MM_BLOWOUT_OFFSET_FROM_TOP
@@ -191,19 +191,19 @@ export const moveLiquidFormToArgs = (
     volume,
     sourceLabware: sourceLabware.id,
     destLabware: destLabware.id,
-    tipRack: tipRack,
+    tipRack,
     aspirateFlowRateUlSec:
-      fields.aspirate_flowRate ||
+      fields.aspirate_flowRate ?? 
       matchingTipLiquidSpecs.defaultAspirateFlowRate.default,
     dispenseFlowRateUlSec:
-      fields.dispense_flowRate ||
+      fields.dispense_flowRate ?? 
       matchingTipLiquidSpecs.defaultDispenseFlowRate.default,
     aspirateOffsetFromBottomMm:
-      fields.aspirate_mmFromBottom || DEFAULT_MM_FROM_BOTTOM_ASPIRATE,
+      fields.aspirate_mmFromBottom ?? DEFAULT_MM_FROM_BOTTOM_ASPIRATE,
     dispenseOffsetFromBottomMm:
-      fields.dispense_mmFromBottom || DEFAULT_MM_FROM_BOTTOM_DISPENSE,
+      fields.dispense_mmFromBottom ?? DEFAULT_MM_FROM_BOTTOM_DISPENSE,
     blowoutFlowRateUlSec:
-      fields.blowout_flowRate ||
+      fields.blowout_flowRate ?? 
       matchingTipLiquidSpecs.defaultBlowOutFlowRate.default,
     blowoutOffsetFromTopMm,
     changeTip: fields.changeTip,
@@ -292,7 +292,7 @@ export const moveLiquidFormToArgs = (
     default: {
       console.assert(
         false,
-        `moveLiquidFormToArgs got unexpected "path" field value: ${path}`
+        `moveLiquidFormToArgs got unexpected "path" field value: ${path as string}`
       )
       return null
     }

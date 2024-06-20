@@ -134,7 +134,7 @@ export const substepTimelineSingleChannel = (
             }),
           ],
           prevRobotState: nextRobotState,
-        } as SubstepTimelineAcc
+        }
       } else if (
         command.commandType === 'dispenseInPlace' ||
         command.commandType === 'aspirateInPlace'
@@ -230,10 +230,8 @@ export const substepTimelineMultiChannel = (
   nozzles: NozzleConfigurationStyle | null
 ): SubstepTimelineFrame[] => {
   const nextFrame = commandCreator(invariantContext, initialRobotState)
-  // @ts-expect-error(sa, 2021-6-14): type narrow using in operator
-  if (nextFrame.errors) return []
-  // @ts-expect-error(sa, 2021-6-14): after type narrowing this expect error should not be necessary
-  const timeline = nextFrame.commands.reduce<SubstepTimelineAcc>(
+  if ('errors' in nextFrame && Boolean(nextFrame.errors)) return []
+  const timeline = 'commands' in nextFrame ? nextFrame.commands.reduce<SubstepTimelineAcc>(
     (acc: SubstepTimelineAcc, command: CreateCommand, index: number) => {
       const nextRobotState = getNextRobotStateAndWarningsSingleCommand(
         command,
@@ -257,21 +255,20 @@ export const substepTimelineMultiChannel = (
         } else if (nozzles === COLUMN) {
           numChannels = 8
         }
-        const wellsForTips =
-          numChannels &&
-          labwareDef &&
-          getWellsForTips(numChannels, labwareDef, wellName).wellsForTips
+        const wellsForTips = (numChannels != null && labwareDef != null)
+          ? getWellsForTips(numChannels, labwareDef, wellName).wellsForTips
+          : null
 
         const wellInfo = {
           labwareId,
-          wells: wellsForTips || [],
-          preIngreds: wellsForTips
+          wells: wellsForTips ?? [],
+          preIngreds: wellsForTips != null
             ? pick(
               acc.prevRobotState.liquidState.labware[labwareId],
               wellsForTips
             )
             : {},
-          postIngreds: wellsForTips
+          postIngreds: wellsForTips != null
             ? pick(nextRobotState.liquidState.labware[labwareId], wellsForTips)
             : {},
         }
@@ -282,7 +279,6 @@ export const substepTimelineMultiChannel = (
             _createNextTimelineFrame({
               volume,
               index,
-              // @ts-expect-error(sa, 2021-6-14): after type narrowing (see comment above) this expect error should not be necessary
               nextFrame,
               command,
               wellInfo,
@@ -360,7 +356,6 @@ export const substepTimelineMultiChannel = (
             _createNextTimelineFrame({
               volume,
               index,
-              // @ts-expect-error(sa, 2021-6-14): after type narrowing (see comment above) this expect error should not be necessary
               nextFrame,
               command,
               wellInfo,
@@ -377,7 +372,11 @@ export const substepTimelineMultiChannel = (
       errors: null,
       prevRobotState: initialRobotState,
     }
-  )
+  ) : {
+    timeline: [],
+    errors: null,
+    prevRobotState: initialRobotState,
+  }
   return timeline.timeline
 }
 export const substepTimeline = (

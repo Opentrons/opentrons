@@ -19,8 +19,8 @@ const _flattenProfileSteps = (args: {
   const steps: FlatProfileSteps = []
 
   const addStep = (step: ProfileStepItem): void => {
-    const durationMinutes = Number(step.durationMinutes) || 0
-    const durationSeconds = Number(step.durationSeconds) || 0
+    const durationMinutes = isNaN(Number(step.durationMinutes)) ? 0 : Number(step.durationMinutes)
+    const durationSeconds = isNaN(Number(step.durationSeconds)) ? 0 : Number(step.durationSeconds)
     steps.push({
       temperature: Number(step.temperature),
       holdTime: durationMinutes * 60 + durationSeconds,
@@ -57,11 +57,11 @@ export const thermocyclerFormToArgs = (
         module: formData.moduleId,
         commandCreatorFnName: THERMOCYCLER_STATE,
         blockTargetTemp:
-          formData.blockIsActive && formData.blockTargetTemp !== null
+          Boolean(formData.blockIsActive) && formData.blockTargetTemp !== null
             ? Number(formData.blockTargetTemp)
             : null,
         lidTargetTemp:
-          formData.lidIsActive && formData.lidTargetTemp !== null
+          Boolean(formData.lidIsActive) && formData.lidTargetTemp !== null
             ? Number(formData.lidTargetTemp)
             : null,
         lidOpen: formData.lidOpen,
@@ -78,12 +78,12 @@ export const thermocyclerFormToArgs = (
         module: formData.moduleId,
         commandCreatorFnName: THERMOCYCLER_PROFILE,
         blockTargetTempHold:
-          formData.blockIsActiveHold && formData.blockTargetTempHold !== null
+          Boolean(formData.blockIsActiveHold) && formData.blockTargetTempHold !== null
             ? Number(formData.blockTargetTempHold)
             : null,
         lidOpenHold: formData.lidOpenHold,
         lidTargetTempHold:
-          formData.lidIsActiveHold && formData.lidTargetTempHold !== null
+          Boolean(formData.lidIsActiveHold) && formData.lidTargetTempHold !== null
             ? Number(formData.lidTargetTempHold)
             : null,
         meta: {

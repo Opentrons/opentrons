@@ -1,11 +1,12 @@
-import * as sharedData from '@opentrons/shared-data'
+// import * as sharedData from '@opentrons/shared-data'
 
 import React from 'react'
 import ReactDOM from 'react-dom/client'
 import { App } from './App'
 
-window.sharedData = sharedData
-console.log('Functions are available under global "sharedData":', sharedData)
+// window.sharedData = sharedData
+// window.APP_SHELL_REMOTE = {ipcRenderer: {}}
+// console.log('Functions are available under global "sharedData":', sharedData)
 
 const container = document.getElementById('root')
 

@@ -131,7 +131,7 @@ export const belowPipetteMinimumVolume = (
   fields: HydratedFormData
 ): FormWarning | null => {
   const { pipette, volume } = fields
-  if (!(pipette && pipette.spec)) return null
+  if (!Boolean(pipette?.spec)) return null
   const liquidSpecs = pipette.spec.liquids
   const minVolume =
     'lowVolumeDefault' in liquidSpecs
@@ -146,7 +146,7 @@ export const maxDispenseWellVolume = (
   fields: HydratedFormData
 ): FormWarning | null => {
   const { dispense_labware, dispense_wells, volume } = fields
-  if (!dispense_labware || !dispense_wells) return null
+  if (!Boolean(dispense_labware) || !Boolean(dispense_wells)) return null
   const hasExceeded = dispense_wells.some((well: string) => {
     const maximum =
       'name' in dispense_labware &&
@@ -154,9 +154,9 @@ export const maxDispenseWellVolume = (
         dispense_labware.name === 'trashBin')
         ? Infinity // some randomly selected high number since waste chute is huge
         : getWellTotalVolume(dispense_labware.def as LabwareDefinition2, well)
-    return maximum && volume > maximum
+    return maximum != null && volume > maximum
   })
-  return hasExceeded ? overMaxWellVolumeWarning() : null
+  return Boolean(hasExceeded) ? overMaxWellVolumeWarning() : null
 }
 
 export const minDisposalVolume = (
@@ -168,8 +168,8 @@ export const minDisposalVolume = (
     pipette,
     path,
   } = fields
-  if (!(pipette && pipette.spec) || path !== 'multiDispense') return null
-  const isUnselected = !disposalVolume_checkbox || !disposalVolume_volume
+  if (!Boolean(pipette?.spec) || path !== 'multiDispense') return null
+  const isUnselected = !Boolean(disposalVolume_checkbox) || !Boolean(disposalVolume_volume)
   const liquidSpecs = pipette.spec.liquids
   const minVolume =
     'lowVolumeDefault' in liquidSpecs
@@ -190,7 +190,7 @@ export const _minAirGapVolume = (
   const checkboxValue = fields[checkboxField]
   const volumeValue = fields[volumeField]
   const { pipette } = fields
-  if (!checkboxValue || !volumeValue || !pipette || !pipette.spec) {
+  if (!Boolean(checkboxValue) || !Boolean(volumeValue) || !Boolean(pipette?.spec)) {
     return null
   }
   const liquidSpecs = pipette.spec.liquids
@@ -228,5 +228,5 @@ export const composeWarnings: ComposeWarnings = (
 ) => formData =>
   warningCheckers.reduce<FormWarning[]>((acc, checker) => {
     const possibleWarning = checker(formData)
-    return possibleWarning ? [...acc, possibleWarning] : acc
+    return possibleWarning != null ? [...acc, possibleWarning] : acc
   }, [])
