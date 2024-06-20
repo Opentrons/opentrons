@@ -253,7 +253,7 @@ describe('ODDProtocolDetails', () => {
       data: {
         id: 'mockAnalysisId',
         status: 'completed',
-        result: 'file-required',
+        result: 'parameter-value-required',
       },
     } as any)
     render()
