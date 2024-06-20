@@ -25,11 +25,14 @@ interface ColorsStorybookProps {
 const Template: Story<ColorsStorybookProps> = args => {
   const targetColors = args.colors
   const colorCategories = targetColors.reduce((acc, color) => {
-    const category = color[0].match(/[a-zA-Z]+/)[0]
-    if (!acc[category]) {
-      acc[category] = []
+    const match = color[0].match(/[a-zA-Z]+/)
+    const category = match?.[0]
+    if (category) {
+      if (!acc[category]) {
+        acc[category] = []
+      }
+      acc[category].push(color)
     }
-    acc[category].push(color)
     return acc
   }, {})
 
@@ -76,7 +79,7 @@ const Template: Story<ColorsStorybookProps> = args => {
               }}
             >
               <StyledText
-                color={invertColor(color[1])}
+                color={invertColor(color[1] as string)}
                 fontSize={TYPOGRAPHY.fontSizeP}
                 fontWeight={TYPOGRAPHY.fontWeightBold}
               >
@@ -84,7 +87,7 @@ const Template: Story<ColorsStorybookProps> = args => {
               </StyledText>
               <StyledText
                 fontSize={TYPOGRAPHY.fontSizeP}
-                color={invertColor(color[1])}
+                color={invertColor(color[1] as string)}
                 fontWeight={TYPOGRAPHY.fontWeightRegular}
               >
                 {color[1]}
@@ -118,8 +121,10 @@ const filteredColors = Object.entries(COLORS).filter(([key]) =>
 const sortedColors = filteredColors.sort((a, b) => {
   const aOrder = order.findIndex(color => a[0].toLowerCase().includes(color))
   const bOrder = order.findIndex(color => b[0].toLowerCase().includes(color))
-  const aNumber = parseInt(a[0].match(/\d+/), 10)
-  const bNumber = parseInt(b[0].match(/\d+/), 10)
+  const aMatch = a[0].match(/\d+/)
+  const bMatch = b[0].match(/\d+/)
+  const aNumber = aMatch ? parseInt(aMatch[0], 10) : 0
+  const bNumber = bMatch ? parseInt(bMatch[0], 10) : 0
   return aOrder - bOrder || bNumber - aNumber
 })
 
