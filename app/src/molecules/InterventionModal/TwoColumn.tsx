@@ -11,7 +11,7 @@ export function TwoColumn({
 }: TwoColumnProps): JSX.Element {
   return (
     <Flex flexDirection={DIRECTION_ROW} gap={SPACING.spacing40} flexWrap={WRAP}>
-      <Box flex="1" minWidth="275px">
+      <Box flex="1" minWidth="17.1875rem">
         {leftElement}
       </Box>
       <Box flex="1" minWidth="275px">
