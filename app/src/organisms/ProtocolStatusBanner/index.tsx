@@ -13,8 +13,8 @@ export function ProtocolStatusBanner(): JSX.Element {
     <Banner
       type="warning"
       icon={alertIcon}
-      width="100%"
       iconMarginLeft={SPACING.spacing4}
+      marginRight={SPACING.spacing24}
     >
       <StyledText>{t('csv_file_required')}</StyledText>
     </Banner>

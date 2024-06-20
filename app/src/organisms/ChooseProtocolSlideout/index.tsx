@@ -678,13 +678,15 @@ function StoredProtocolList(props: StoredProtocolListProps): JSX.Element {
         )
         const missingAnalysisData =
           analysisStatus === 'error' || analysisStatus === 'stale'
+        const requiresCsvRunTimeParameter =
+          storedProtocol.mostRecentAnalysis?.result === 'file-required'
         return (
           <React.Fragment key={storedProtocol.protocolKey}>
             <Flex flexDirection={DIRECTION_COLUMN}>
               <MiniCard
                 isSelected={isSelected}
                 isError={runCreationError != null}
-                isWarning={missingAnalysisData}
+                isWarning={missingAnalysisData || requiresCsvRunTimeParameter}
                 onClick={() => {
                   handleSelectProtocol(storedProtocol)
                 }}
@@ -694,7 +696,7 @@ function StoredProtocolList(props: StoredProtocolListProps): JSX.Element {
                   gridTemplateColumns="1fr 3fr"
                   marginRight={SPACING.spacing16}
                 >
-                  {!missingAnalysisData ? (
+                  {!missingAnalysisData && !requiresCsvRunTimeParameter ? (
                     <Box
                       marginY={SPACING.spacingAuto}
                       backgroundColor={isSelected ? COLORS.white : 'inherit'}
@@ -726,7 +728,9 @@ function StoredProtocolList(props: StoredProtocolListProps): JSX.Element {
                       storedProtocol.protocolKey}
                   </StyledText>
                 </Box>
-                {(runCreationError != null || missingAnalysisData) &&
+                {(runCreationError != null ||
+                  missingAnalysisData ||
+                  requiresCsvRunTimeParameter) &&
                 isSelected ? (
                   <>
                     <Box flex="1 1 auto" />
@@ -771,6 +775,18 @@ function StoredProtocolList(props: StoredProtocolListProps): JSX.Element {
                 ) : (
                   runCreationError
                 )}
+              </StyledText>
+            ) : null}
+            {requiresCsvRunTimeParameter && isSelected ? (
+              <StyledText
+                as="label"
+                color={COLORS.yellow60}
+                overflowWrap="anywhere"
+                display={DISPLAY_BLOCK}
+                marginTop={`-${SPACING.spacing8}`}
+                marginBottom={SPACING.spacing8}
+              >
+                {t('csv_required_for_analysis')}
               </StyledText>
             ) : null}
             {missingAnalysisData && isSelected ? (

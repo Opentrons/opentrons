@@ -671,7 +671,7 @@ export type RunTimeParameter =
 export interface CompletedProtocolAnalysis {
   id: string
   status?: 'completed'
-  result: 'ok' | 'not-ok' | 'error'
+  result: 'ok' | 'not-ok' | 'error' | 'file-required'
   pipettes: LoadedPipette[]
   labware: LoadedLabware[]
   modules: LoadedModule[]
