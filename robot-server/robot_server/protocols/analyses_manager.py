@@ -35,10 +35,10 @@ class AnalysesManager:
             analysis_id=analysis_id,
         )
         try:
-            protocol_runner = await analyzer.load_runner(
+            orchestrator = await analyzer.load_runner(
                 run_time_param_values=run_time_param_values
             )
-            pending.runTimeParameters = protocol_runner.run_time_parameters
+            pending.runTimeParameters = orchestrator.get_run_time_parameters()
         except BaseException as error:
             await analyzer.update_to_failed_analysis(
                 analysis_id=analysis_id,
@@ -53,9 +53,9 @@ class AnalysesManager:
 
         self._task_runner.run(
             analyzer.analyze,
-            runner=protocol_runner,
+            runner=orchestrator.get_protocol_runner(),
             analysis_id=analysis_id,
-            run_time_parameters=protocol_runner.run_time_parameters,
+            run_time_parameters=orchestrator.get_run_time_parameters(),
         )
         return AnalysisSummary(
             id=analysis_id,

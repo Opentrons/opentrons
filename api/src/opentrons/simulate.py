@@ -48,7 +48,8 @@ from opentrons.protocol_engine.create_protocol_engine import (
 from opentrons.protocol_engine.state.config import Config
 from opentrons.protocol_engine.types import DeckType, EngineStatus, PostRunHardwareState
 from opentrons.protocol_reader.protocol_source import ProtocolSource
-from opentrons.protocol_runner.protocol_runner import create_protocol_runner
+from opentrons.protocol_runner.protocol_runner import create_protocol_runner, LiveRunner
+from opentrons.protocol_runner import RunOrchestrator
 from opentrons.protocols.duration import DurationEstimator
 from opentrons.protocols.execution import execute
 from opentrons.legacy_broker import LegacyBroker
@@ -797,11 +798,11 @@ def _create_live_context_pe(
 ) -> ProtocolContext:
     """Return a live ProtocolContext that controls the robot through ProtocolEngine."""
     assert api_version >= ENGINE_CORE_API_VERSION
-
+    hardware_api_wrapped = hardware_api.wrapped()
     global _LIVE_PROTOCOL_ENGINE_CONTEXTS
     pe, loop = _LIVE_PROTOCOL_ENGINE_CONTEXTS.enter_context(
         create_protocol_engine_in_thread(
-            hardware_api=hardware_api.wrapped(),
+            hardware_api=hardware_api_wrapped,
             config=_get_protocol_engine_config(
                 robot_type, virtual=use_virtual_hardware
             ),
@@ -813,12 +814,29 @@ def _create_live_context_pe(
         )
     )
 
+    orchestrator = RunOrchestrator(
+        hardware_api=hardware_api_wrapped,
+        protocol_engine=pe,
+        setup_runner=LiveRunner(
+            protocol_engine=pe,
+            hardware_api=hardware_api_wrapped,
+        ),
+        fixit_runner=LiveRunner(
+            protocol_engine=pe,
+            hardware_api=hardware_api_wrapped,
+        ),
+        protocol_live_runner=LiveRunner(
+            protocol_engine=pe,
+            hardware_api=hardware_api_wrapped,
+        ),
+    )
+
     # `async def` so we can use loop.run_coroutine_threadsafe() to wait for its completion.
     # Non-async would use call_soon_threadsafe(), which makes the waiting harder.
     async def add_all_extra_labware() -> None:
         for labware_definition_dict in extra_labware.values():
             labware_definition = LabwareDefinition.parse_obj(labware_definition_dict)
-            pe.add_labware_definition(labware_definition)
+            orchestrator.add_labware_definition(labware_definition)
 
     # Add extra_labware to ProtocolEngine, being careful not to modify ProtocolEngine from this
     # thread. See concurrency notes in ProtocolEngine docstring.
@@ -905,8 +923,9 @@ def _run_file_pe(
     """Run a protocol file with Protocol Engine."""
 
     async def run(protocol_source: ProtocolSource) -> _SimulateResult:
+        hardware_api_wrapped = hardware_api.wrapped()
         protocol_engine = await create_protocol_engine(
-            hardware_api=hardware_api.wrapped(),
+            hardware_api=hardware_api_wrapped,
             config=_get_protocol_engine_config(robot_type, virtual=True),
             load_fixed_trash=should_load_fixed_trash(protocol_source.config),
         )
@@ -914,12 +933,27 @@ def _run_file_pe(
         protocol_runner = create_protocol_runner(
             protocol_config=protocol_source.config,
             protocol_engine=protocol_engine,
-            hardware_api=hardware_api.wrapped(),
+            hardware_api=hardware_api_wrapped,
+        )
+
+        orchestrator = RunOrchestrator(
+            hardware_api=hardware_api_wrapped,
+            protocol_engine=protocol_engine,
+            json_or_python_protocol_runner=protocol_runner,
+            fixit_runner=LiveRunner(
+                protocol_engine=protocol_engine, hardware_api=hardware_api_wrapped
+            ),
+            setup_runner=LiveRunner(
+                protocol_engine=protocol_engine, hardware_api=hardware_api_wrapped
+            ),
+            protocol_live_runner=LiveRunner(
+                protocol_engine=protocol_engine, hardware_api=hardware_api_wrapped
+            ),
         )
 
         scraper = _CommandScraper(stack_logger, log_level, protocol_runner.broker)
         with scraper.scrape():
-            result = await protocol_runner.run(
+            result = await orchestrator.run(
                 # deck_configuration=[] is a placeholder value, ignored because
                 # the Protocol Engine config specifies use_simulated_deck_config=True.
                 deck_configuration=[],

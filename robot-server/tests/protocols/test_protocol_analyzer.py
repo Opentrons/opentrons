@@ -102,7 +102,7 @@ async def test_load_runner(
         )
     ).then_return(run_orchestrator)
     runner = await subject.load_runner(run_time_param_values={"rtp_var": 123})
-    assert runner == run_orchestrator.get_protocol_runner()
+    assert runner.get_protocol_runner() == run_orchestrator.get_protocol_runner()
     decoy.verify(
         await run_orchestrator.load_python(
             protocol_source=protocol_source,
@@ -162,12 +162,13 @@ async def test_analyze(
         displayName="Foo", variableName="Bar", default=True, value=False
     )
 
-    json_runner = decoy.mock(cls=protocol_runner.JsonRunner)
+    # json_runner = decoy.mock(cls=protocol_runner.JsonRunner)
+    orchestrator = decoy.mock(cls=protocol_runner.RunOrchestrator)
     subject = ProtocolAnalyzer(
         analysis_store=analysis_store, protocol_resource=protocol_resource
     )
 
-    decoy.when(await json_runner.run(deck_configuration=[],)).then_return(
+    decoy.when(await orchestrator.run(deck_configuration=[],)).then_return(
         protocol_runner.RunResult(
             commands=[analysis_command],
             state_summary=StateSummary(
@@ -185,7 +186,7 @@ async def test_analyze(
 
     await subject.analyze(
         analysis_id="analysis-id",
-        runner=json_runner,
+        orchestrator=orchestrator,
         run_time_parameters=[bool_parameter],
     )
     decoy.verify(
@@ -240,13 +241,14 @@ async def test_analyze_updates_pending_on_error(
         message="You got me!!",
     )
 
-    json_runner = decoy.mock(cls=protocol_runner.JsonRunner)
+    # json_runner = decoy.mock(cls=protocol_runner.JsonRunner)
+    orchestrator = decoy.mock(cls=protocol_runner.RunOrchestrator)
     subject = ProtocolAnalyzer(
         analysis_store=analysis_store, protocol_resource=protocol_resource
     )
 
     decoy.when(
-        await json_runner.run(
+        await orchestrator.run(
             deck_configuration=[],
         )
     ).then_raise(raised_exception)
@@ -260,7 +262,7 @@ async def test_analyze_updates_pending_on_error(
     )
 
     await subject.analyze(
-        runner=json_runner,
+        orchestrator=orchestrator,
         analysis_id="analysis-id",
     )
 

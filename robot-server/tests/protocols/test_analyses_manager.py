@@ -86,7 +86,7 @@ async def test_start_analysis(
     )
     pending_analysis = PendingAnalysis(id="analysis-id")
     analyzer = decoy.mock(cls=protocol_analyzer.ProtocolAnalyzer)
-    runner = decoy.mock(cls=protocol_runner.JsonRunner)
+    orchestrator = decoy.mock(cls=protocol_runner.RunOrchestrator)
     decoy.when(
         protocol_analyzer.create_protocol_analyzer(
             analysis_store=analysis_store,
@@ -101,8 +101,8 @@ async def test_start_analysis(
     ).then_return(pending_analysis)
     decoy.when(
         await analyzer.load_runner(run_time_param_values={"baz": True})
-    ).then_return(runner)
-    decoy.when(runner.run_time_parameters).then_return([bool_parameter])
+    ).then_return(orchestrator)
+    decoy.when(orchestrator.get_run_time_parameters()).then_return([bool_parameter])
     analysis_summary_result = await subject.start_analysis(
         analysis_id="analysis-id",
         protocol_resource=protocol_resource,
@@ -117,7 +117,7 @@ async def test_start_analysis(
     decoy.verify(
         task_runner.run(
             analyzer.analyze,
-            runner=runner,
+            runner=orchestrator.get_protocol_runner(),
             analysis_id="analysis-id",
             run_time_parameters=[bool_parameter],
         )

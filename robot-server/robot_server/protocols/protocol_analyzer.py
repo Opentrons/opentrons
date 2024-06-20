@@ -8,7 +8,11 @@ from opentrons import protocol_runner
 from opentrons.protocol_engine.errors import ErrorOccurrence
 from opentrons.protocol_engine.types import RunTimeParamValuesType, RunTimeParameter
 import opentrons.util.helpers as datetime_helper
-from opentrons.protocol_runner import AbstractRunner, PythonAndLegacyRunner, JsonRunner
+from opentrons.protocol_runner import (
+    PythonAndLegacyRunner,
+    JsonRunner,
+    RunOrchestrator,
+)
 from opentrons.protocols.parse import PythonParseMode
 
 import robot_server.errors.error_mappers as em
@@ -34,10 +38,10 @@ class ProtocolAnalyzer:
     async def load_runner(
         self,
         run_time_param_values: Optional[RunTimeParamValuesType],
-    ) -> AbstractRunner:
+    ) -> RunOrchestrator:
         """Load runner with the protocol and run time parameter values.
 
-        Returns: The Runner instance.
+        Returns: The RunOrchestrator instance.
         """
         orchestrator = await protocol_runner.create_simulating_orchestrator(
             robot_type=self._protocol_resource.source.robot_type,
@@ -54,18 +58,18 @@ class ProtocolAnalyzer:
             assert isinstance(runner, JsonRunner), "Unexpected runner type."
             await orchestrator.load_json(protocol_source=self._protocol_resource.source)
 
-        return runner
+        return orchestrator
 
     async def analyze(
         self,
-        runner: AbstractRunner,
+        orchestrator: RunOrchestrator,
         analysis_id: str,
         run_time_parameters: Optional[List[RunTimeParameter]] = None,
     ) -> None:
         """Analyze a given protocol, storing the analysis when complete."""
         assert self._protocol_resource is not None
         try:
-            result = await runner.run(
+            result = await orchestrator.run(
                 deck_configuration=[],
             )
         except BaseException as error:
