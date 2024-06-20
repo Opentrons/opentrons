@@ -1,7 +1,7 @@
 import * as React from 'react'
 
 import {
-  StyledText,
+  LegacyStyledText,
   Box,
   Flex,
   BORDERS,
@@ -26,9 +26,9 @@ function StandInContent(): JSX.Element {
       alignItems={ALIGN_CENTER}
       justifyContent={JUSTIFY_CENTER}
     >
-      <StyledText as="h1">
+      <LegacyStyledText as="h1">
         This is a standin for some other component
-      </StyledText>
+      </LegacyStyledText>
     </Flex>
   )
 }

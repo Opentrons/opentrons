@@ -779,7 +779,7 @@ function StoredProtocolList(props: StoredProtocolListProps): JSX.Element {
               </LegacyStyledText>
             ) : null}
             {requiresCsvRunTimeParameter && isSelected ? (
-              <StyledText
+              <LegacyStyledText
                 as="label"
                 color={COLORS.yellow60}
                 overflowWrap="anywhere"
@@ -788,7 +788,7 @@ function StoredProtocolList(props: StoredProtocolListProps): JSX.Element {
                 marginBottom={SPACING.spacing8}
               >
                 {t('csv_required_for_analysis')}
-              </StyledText>
+              </LegacyStyledText>
             ) : null}
             {missingAnalysisData && isSelected ? (
               <LegacyStyledText

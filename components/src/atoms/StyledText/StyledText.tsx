@@ -253,15 +253,11 @@ export const HELIX_STYLES = Object.keys(helixProductStyleMap)
 export type HelixStyles = keyof typeof helixProductStyleMap
 export type ODDStyles = keyof typeof ODDStyleMap
 
-function styleForDesktopName(
-  name?: HelixStyles
-): FlattenSimpleInterpolation {
+function styleForDesktopName(name?: HelixStyles): FlattenSimpleInterpolation {
   return name ? helixProductStyleMap[name].style : css``
 }
 
-function styleForODDName(
-  name?: ODDStyles
-): FlattenSimpleInterpolation {
+function styleForODDName(name?: ODDStyles): FlattenSimpleInterpolation {
   return name ? ODDStyleMap[name].style : css``
 }
 
