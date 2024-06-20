@@ -126,7 +126,7 @@ export const fontStyleCaptionSemiBold = `${fontWeightCaptionSemiBold} ${fontSize
 export const fontSizeCaptionRegular = fontSizeCaption
 export const lineHeightCaptionRegular = lineHeightCaption
 export const fontFamilyCaptionRegular = fontFamilyCaption
-export const fontWeightCaptionRegular = '400'
+export const fontWeightCaptionRegular = fontWeightRegular
 export const fontStyleCaptionRegular = `${fontWeightCaptionRegular} ${fontSizeCaptionRegular}/${lineHeightCaptionRegular} ${fontFamilyCaptionRegular}`
 
 // Code
