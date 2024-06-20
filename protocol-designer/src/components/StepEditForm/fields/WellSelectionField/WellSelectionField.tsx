@@ -41,6 +41,7 @@ export const WellSelectionField = (props: Props): JSX.Element => {
   const stepId = useSelector(getSelectedStepId)
   const pipetteEntities = useSelector(stepFormSelectors.getPipetteEntities)
   const wellSelectionLabwareKey = useSelector(getWellSelectionLabwareKey)
+  const labwareEntities = useSelector(stepFormSelectors.getLabwareEntities)
   const primaryWellCount =
     Array.isArray(selectedWells) && selectedWells.length > 0
       ? selectedWells.length.toString()
@@ -84,15 +85,26 @@ export const WellSelectionField = (props: Props): JSX.Element => {
 
   const modalKey = getModalKey()
   const label =
-    nozzleType === '8-channel' || nozzleType === COLUMN
+    nozzleType === '8-channel' || nozzleType === COLUMN || nozzleType === ALL
       ? t('step_edit_form.wellSelectionLabel.columns')
       : t('step_edit_form.wellSelectionLabel.wells')
+
+  const labwareDef = labwareId != null ? labwareEntities[labwareId] : null
+  const numColumns = labwareDef != null ? labwareDef.def.ordering.length : null
+  const wellCountDisplay =
+    primaryWellCount != null &&
+    labwareDef != null &&
+    nozzleType === ALL &&
+    numColumns != null &&
+    Array.isArray(selectedWells)
+      ? (selectedWells.length * Math.min(12, numColumns)).toString()
+      : primaryWellCount
   return (
     <FormGroup label={label} disabled={disabled} className={styles.small_field}>
       <InputField
         readOnly
         name={name}
-        value={primaryWellCount ?? null}
+        value={wellCountDisplay}
         onClick={handleOpen}
         error={errorToShow}
       />
