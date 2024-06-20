@@ -35,7 +35,7 @@ function StandInContent(): JSX.Element {
     <Box
       border={'4px dashed #A864FFFF'}
       borderRadius={BORDERS.borderRadius8}
-      width="207px"
+      margin={SPACING.spacing16}
       height="104px"
       backgroundColor="#A864FF19"
     />
