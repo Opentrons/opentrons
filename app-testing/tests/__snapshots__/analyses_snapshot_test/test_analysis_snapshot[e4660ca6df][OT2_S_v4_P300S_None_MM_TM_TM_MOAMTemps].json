@@ -1169,6 +1169,7 @@
               ]
             }
           ],
+          "liquidProbeSettings": {},
           "metadata": {
             "displayCategory": "trash",
             "displayName": "Opentrons Fixed Trash",
@@ -1348,6 +1349,7 @@
               ]
             }
           ],
+          "liquidProbeSettings": {},
           "metadata": {
             "displayCategory": "tipRack",
             "displayName": "Opentrons 96 Tip Rack 300 µL",

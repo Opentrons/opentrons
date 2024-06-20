@@ -52,6 +52,20 @@
               ]
             }
           ],
+          "liquidProbeSettings": {
+            "minimumHeight": [
+              {
+                "applicableWells": [],
+                "value": 0.5
+              }
+            ],
+            "minimumWellVolume": [
+              {
+                "applicableWells": [],
+                "value": 0
+              }
+            ]
+          },
           "metadata": {
             "displayCategory": "reservoir",
             "displayName": "NEST 1 Well Reservoir 290 mL",
@@ -131,6 +145,20 @@
               "wells": []
             }
           ],
+          "liquidProbeSettings": {
+            "minimumHeight": [
+              {
+                "applicableWells": [],
+                "value": 0.5
+              }
+            ],
+            "minimumWellVolume": [
+              {
+                "applicableWells": [],
+                "value": 0
+              }
+            ]
+          },
           "metadata": {
             "displayCategory": "adapter",
             "displayName": "Opentrons Flex 96 Tip Rack Adapter",
@@ -289,6 +317,7 @@
               ]
             }
           ],
+          "liquidProbeSettings": {},
           "metadata": {
             "displayCategory": "tipRack",
             "displayName": "Opentrons Flex 96 Tip Rack 1000 µL",

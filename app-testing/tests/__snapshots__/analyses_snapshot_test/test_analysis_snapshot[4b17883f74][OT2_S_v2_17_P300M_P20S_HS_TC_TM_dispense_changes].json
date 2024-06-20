@@ -188,6 +188,7 @@
               ]
             }
           ],
+          "liquidProbeSettings": {},
           "metadata": {
             "displayCategory": "tipRack",
             "displayName": "Opentrons OT-2 96 Tip Rack 300 µL",
@@ -1335,6 +1336,7 @@
               ]
             }
           ],
+          "liquidProbeSettings": {},
           "metadata": {
             "displayCategory": "tipRack",
             "displayName": "Opentrons OT-2 96 Tip Rack 20 µL",
@@ -2421,6 +2423,20 @@
               ]
             }
           ],
+          "liquidProbeSettings": {
+            "minimumHeight": [
+              {
+                "applicableWells": [],
+                "value": 0.5
+              }
+            ],
+            "minimumWellVolume": [
+              {
+                "applicableWells": [],
+                "value": 0
+              }
+            ]
+          },
           "metadata": {
             "displayCategory": "reservoir",
             "displayName": "NEST 12 Well Reservoir 15 mL",
@@ -2661,6 +2677,20 @@
               ]
             }
           ],
+          "liquidProbeSettings": {
+            "minimumHeight": [
+              {
+                "applicableWells": [],
+                "value": 0.5
+              }
+            ],
+            "minimumWellVolume": [
+              {
+                "applicableWells": [],
+                "value": 0
+              }
+            ]
+          },
           "metadata": {
             "displayCategory": "reservoir",
             "displayName": "NEST 12 Well Reservoir 15 mL",

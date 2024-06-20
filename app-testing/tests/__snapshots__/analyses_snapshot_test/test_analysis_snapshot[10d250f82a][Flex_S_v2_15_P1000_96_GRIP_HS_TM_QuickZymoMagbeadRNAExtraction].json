@@ -602,6 +602,20 @@
               ]
             }
           ],
+          "liquidProbeSettings": {
+            "minimumHeight": [
+              {
+                "applicableWells": [],
+                "value": 0.5
+              }
+            ],
+            "minimumWellVolume": [
+              {
+                "applicableWells": [],
+                "value": 0
+              }
+            ]
+          },
           "metadata": {
             "displayCategory": "adapter",
             "displayName": "Opentrons 96 Deep Well Heater-Shaker Adapter with NEST Deep Well Plate 2 mL",
@@ -2368,6 +2382,20 @@
               ]
             }
           ],
+          "liquidProbeSettings": {
+            "minimumHeight": [
+              {
+                "applicableWells": [],
+                "value": 0.5
+              }
+            ],
+            "minimumWellVolume": [
+              {
+                "applicableWells": [],
+                "value": 0
+              }
+            ]
+          },
           "metadata": {
             "displayCategory": "aluminumBlock",
             "displayName": "Opentrons 96 PCR Heater-Shaker Adapter with Armadillo Well Plate 200 µl",
@@ -3528,6 +3556,20 @@
               ]
             }
           ],
+          "liquidProbeSettings": {
+            "minimumHeight": [
+              {
+                "applicableWells": [],
+                "value": 0.5
+              }
+            ],
+            "minimumWellVolume": [
+              {
+                "applicableWells": [],
+                "value": 0
+              }
+            ]
+          },
           "metadata": {
             "displayCategory": "wellPlate",
             "displayName": "NEST 96 Deep Well Plate 2mL",
@@ -4800,6 +4842,20 @@
               ]
             }
           ],
+          "liquidProbeSettings": {
+            "minimumHeight": [
+              {
+                "applicableWells": [],
+                "value": 0.5
+              }
+            ],
+            "minimumWellVolume": [
+              {
+                "applicableWells": [],
+                "value": 0
+              }
+            ]
+          },
           "metadata": {
             "displayCategory": "wellPlate",
             "displayName": "NEST 96 Deep Well Plate 2mL",
@@ -6072,6 +6128,20 @@
               ]
             }
           ],
+          "liquidProbeSettings": {
+            "minimumHeight": [
+              {
+                "applicableWells": [],
+                "value": 0.5
+              }
+            ],
+            "minimumWellVolume": [
+              {
+                "applicableWells": [],
+                "value": 0
+              }
+            ]
+          },
           "metadata": {
             "displayCategory": "wellPlate",
             "displayName": "NEST 96 Deep Well Plate 2mL",
@@ -7344,6 +7414,20 @@
               ]
             }
           ],
+          "liquidProbeSettings": {
+            "minimumHeight": [
+              {
+                "applicableWells": [],
+                "value": 0.5
+              }
+            ],
+            "minimumWellVolume": [
+              {
+                "applicableWells": [],
+                "value": 0
+              }
+            ]
+          },
           "metadata": {
             "displayCategory": "wellPlate",
             "displayName": "NEST 96 Deep Well Plate 2mL",
@@ -8609,6 +8693,20 @@
               ]
             }
           ],
+          "liquidProbeSettings": {
+            "minimumHeight": [
+              {
+                "applicableWells": [],
+                "value": 0.5
+              }
+            ],
+            "minimumWellVolume": [
+              {
+                "applicableWells": [],
+                "value": 0
+              }
+            ]
+          },
           "metadata": {
             "displayCategory": "wellPlate",
             "displayName": "Armadillo 96 Well Plate 200 µL PCR Full Skirt",
@@ -9788,6 +9886,20 @@
               ]
             }
           ],
+          "liquidProbeSettings": {
+            "minimumHeight": [
+              {
+                "applicableWells": [],
+                "value": 0.5
+              }
+            ],
+            "minimumWellVolume": [
+              {
+                "applicableWells": [],
+                "value": 0
+              }
+            ]
+          },
           "metadata": {
             "displayCategory": "wellPlate",
             "displayName": "NEST 96 Deep Well Plate 2mL",
@@ -11046,6 +11158,7 @@
               ]
             }
           ],
+          "liquidProbeSettings": {},
           "metadata": {
             "displayCategory": "tipRack",
             "displayName": "Opentrons Flex 96 Tip Rack 1000 µL with adapter",
@@ -12192,6 +12305,7 @@
               ]
             }
           ],
+          "liquidProbeSettings": {},
           "metadata": {
             "displayCategory": "tipRack",
             "displayName": "Opentrons Flex 96 Tip Rack 1000 µL with adapter",

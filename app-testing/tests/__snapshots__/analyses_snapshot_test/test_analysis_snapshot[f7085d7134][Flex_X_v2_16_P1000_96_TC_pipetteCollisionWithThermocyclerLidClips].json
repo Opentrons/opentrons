@@ -250,6 +250,7 @@
               ]
             }
           ],
+          "liquidProbeSettings": {},
           "metadata": {
             "displayCategory": "tipRack",
             "displayName": "Opentrons Flex 96 Tip Rack 200 µL",
