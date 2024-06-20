@@ -178,6 +178,14 @@ class HardwareTipHandler(TipHandler):
                 presses=None,
                 increment=None,
             )
+            try:
+                await self.verify_tip_presence(pipette_id, TipPresenceStatus.PRESENT)
+            except PythonException:
+                raise
+            else:
+                self._hardware_api.cache_tip(hw_mount, actual_tip_length)
+
+            await self._hardware_api.prepare_for_aspirate(hw_mount)
         else:
             await self._hardware_api.pick_up_tip(
                 mount=hw_mount,
@@ -186,7 +194,7 @@ class HardwareTipHandler(TipHandler):
                 increment=None,
             )
 
-        await self.verify_tip_presence(pipette_id, TipPresenceStatus.PRESENT)
+            await self.verify_tip_presence(pipette_id, TipPresenceStatus.PRESENT)
 
         self._hardware_api.set_current_tiprack_diameter(
             mount=hw_mount,
