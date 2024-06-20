@@ -46,11 +46,12 @@ const lineHeightHeadingMedium = '1.75rem' // 28px
 const fontFamilyHeadingMedium = fontFamily
 
 // Heading-Medium-Regular
-export const fontSizeHeadingMediumMedium = fontSizeHeadingMedium
-export const lineHeightHeadingMediumMedium = lineHeightHeadingMedium
-export const fontFamilyHeadingMediumMedium = fontFamilyHeadingMedium
-export const fontWeightHeadingMediumMedium = fontWeightSemiBold
-export const fontStyleHeadingMediumMedium = `${fontWeightHeadingMediumMedium} ${fontSizeHeadingMediumMedium}/${lineHeightHeadingMediumMedium} ${fontFamilyHeadingMediumMedium}`
+export const fontSizeHeadingMediumSemiBold = fontSizeHeadingMedium
+export const lineHeightHeadingMediumSemiBold = lineHeightHeadingMedium
+
+export const fontFamilyHeadingMediumSemiBold = fontFamilyHeadingMedium
+export const fontWeightHeadingMediumSemiBold = fontWeightSemiBold
+export const fontStyleHeadingMediumSemiBold = `${fontWeightHeadingMediumSemiBold} ${fontSizeHeadingMediumSemiBold}/${lineHeightHeadingMediumSemiBold} ${fontFamilyHeadingMediumSemiBold}`
 
 // Heading-Small
 const fontSizeHeadingSmall = '1.125rem' // 18px
@@ -77,11 +78,11 @@ const lineHeightBodyLarge = '1.5rem' // 24px
 const fontFamilyBodyLarge = fontFamily
 
 // Body-Large-Medium
-export const fontSizeBodyLargeMedium = fontSizeBodyLarge
-export const lineHeightBodyLargeMedium = lineHeightBodyLarge
-export const fontFamilyBodyLargeMedium = fontFamilyBodyLarge
-export const fontWeightBodyLargeMedium = fontWeightSemiBold
-export const fontStyleBodyLargeMedium = `${fontWeightBodyLargeMedium} ${fontSizeBodyLargeMedium}/${lineHeightBodyLargeMedium} ${fontFamilyBodyLargeMedium}`
+export const fontSizeBodyLargeSemiBold = fontSizeBodyLarge
+export const lineHeightBodyLargeSemiBold = lineHeightBodyLarge
+export const fontFamilyBodyLargeSemiBold = fontFamilyBodyLarge
+export const fontWeightBodyLargeSemiBold = fontWeightSemiBold
+export const fontStyleBodyLargeSemiBold = `${fontWeightBodyLargeSemiBold} ${fontSizeBodyLargeSemiBold}/${lineHeightBodyLargeSemiBold} ${fontFamilyBodyLargeSemiBold}`
 
 // Body-Large-Regular
 export const fontSizeBodyLargeRegular = fontSizeBodyLarge
@@ -96,11 +97,11 @@ const lineHeightBodyDefault = '1.25rem' // 20px
 const fontFamilyBodyDefault = fontFamily
 
 // Body-Default-Medium
-export const fontSizeBodyDefaultMedium = fontSizeBodyDefault
-export const lineHeightBodyDefaultMedium = lineHeightBodyDefault
-export const fontFamilyBodyDefaultMedium = fontFamilyBodyDefault
-export const fontWeightBodyDefaultMedium = fontWeightSemiBold
-export const fontStyleBodyDefaultMedium = `${fontWeightBodyDefaultMedium} ${fontSizeBodyDefaultMedium}/${lineHeightBodyDefaultMedium} ${fontFamilyBodyDefaultMedium}`
+export const fontSizeBodyDefaultSemiBold = fontSizeBodyDefault
+export const lineHeightBodyDefaultSemiBold = lineHeightBodyDefault
+export const fontFamilyBodyDefaultSemiBold = fontFamilyBodyDefault
+export const fontWeightBodyDefaultSemiBold = fontWeightSemiBold
+export const fontStyleBodyDefaultSemiBold = `${fontWeightBodyDefaultSemiBold} ${fontSizeBodyDefaultSemiBold}/${lineHeightBodyDefaultSemiBold} ${fontFamilyBodyDefaultSemiBold}`
 
 // Body-Default-Regular
 export const fontSizeBodyDefaultRegular = fontSizeBodyDefault
@@ -112,14 +113,14 @@ export const fontStyleBodyDefaultRegular = `${fontWeightBodyDefaultRegular} ${fo
 // Caption
 const fontSizeCaption = '0.8125rem' // 13px
 const lineHeightCaption = '1rem' // 16px
-const fontFamilyCaption = 'Public Sans'
+const fontFamilyCaption = fontFamily
 
 // Caption-Medium
-export const fontSizeCaptionMedium = fontSizeCaption
-export const lineHeightCaptionMedium = lineHeightCaption
-export const fontFamilyCaptionMedium = fontFamilyCaption
-export const fontWeightCaptionMedium = '500'
-export const fontStyleCaptionMedium = `${fontWeightCaptionMedium} ${fontSizeCaptionMedium}/${lineHeightCaptionMedium} ${fontFamilyCaptionMedium}`
+export const fontSizeCaptionSemiBold = fontSizeCaption
+export const lineHeightCaptionSemiBold = lineHeightCaption
+export const fontFamilyCaptionSemiBold = fontFamilyCaption
+export const fontWeightCaptionSemiBold = '500'
+export const fontStyleCaptionSemiBold = `${fontWeightCaptionSemiBold} ${fontSizeCaptionSemiBold}/${lineHeightCaptionSemiBold} ${fontFamilyCaptionSemiBold}`
 
 // Caption-Regular
 export const fontSizeCaptionRegular = fontSizeCaption
