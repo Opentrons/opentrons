@@ -88,6 +88,13 @@ class QueueStatus(enum.Enum):
     New fixup commands may be enqueued and will execute immediately.
     """
 
+    AWAITING_RECOVERY_PAUSED = enum.auto()
+    """Execution of fixit commands has been paused.
+
+    New protocol and fixit commands may be enqueued, but will wait to execute.
+    New setup commands may not be enqueued.
+    """
+
 
 class RunResult(str, enum.Enum):
     """Result of the run."""
@@ -349,11 +356,11 @@ class CommandStore(HasState[CommandState], HandlesActions):
                 self._state.run_started_at = (
                     self._state.run_started_at or action.requested_at
                 )
-                if self._state.is_door_blocking:
-                    # Always inactivate queue when door is blocking
-                    self._state.queue_status = QueueStatus.PAUSED
-                else:
-                    self._state.queue_status = QueueStatus.RUNNING
+                self._state.queue_status = (
+                    QueueStatus.AWAITING_RECOVERY
+                    if self._state.queue_status == QueueStatus.AWAITING_RECOVERY_PAUSED
+                    else QueueStatus.RUNNING
+                )
 
         elif isinstance(action, PauseAction):
             self._state.queue_status = QueueStatus.PAUSED
@@ -423,10 +430,12 @@ class CommandStore(HasState[CommandState], HandlesActions):
             if self._config.block_on_door_open:
                 if action.door_state == DoorState.OPEN:
                     self._state.is_door_blocking = True
-                    # todo(mm, 2024-03-19): It's unclear how the door should interact
-                    # with error recovery (QueueStatus.AWAITING_RECOVERY).
                     if self._state.queue_status != QueueStatus.SETUP:
-                        self._state.queue_status = QueueStatus.PAUSED
+                        self._state.queue_status = (
+                            QueueStatus.AWAITING_RECOVERY_PAUSED
+                            if self._state.queue_status == QueueStatus.AWAITING_RECOVERY
+                            else QueueStatus.PAUSED
+                        )
                 elif action.door_state == DoorState.CLOSED:
                     self._state.is_door_blocking = False
 
@@ -851,8 +860,12 @@ class CommandView(HasState[CommandState]):
         if self._state.run_result is not None:
             raise RunStoppedError("The run has already stopped.")
 
+        # todo(mm, 2024-06-20): Address all NotImplementedErrors in this method.
         elif isinstance(action, PlayAction):
-            if self.get_status() == EngineStatus.BLOCKED_BY_OPEN_DOOR:
+            if self.get_status() in (
+                EngineStatus.BLOCKED_BY_OPEN_DOOR,
+                EngineStatus.AWAITING_RECOVERY_BLOCKED_BY_OPEN_DOOR,
+            ):
                 raise RobotDoorOpenError("Front door or top window is currently open.")
             elif self.get_status() == EngineStatus.AWAITING_RECOVERY:
                 raise NotImplementedError()
@@ -940,6 +953,12 @@ class CommandView(HasState[CommandState]):
                 return EngineStatus.BLOCKED_BY_OPEN_DOOR
             else:
                 return EngineStatus.PAUSED
+
+        elif self._state.queue_status == QueueStatus.AWAITING_RECOVERY_PAUSED:
+            if self._state.is_door_blocking:
+                return EngineStatus.AWAITING_RECOVERY_BLOCKED_BY_OPEN_DOOR
+            else:
+                return EngineStatus.AWAITING_RECOVERY_PAUSED
 
         elif self._state.queue_status == QueueStatus.AWAITING_RECOVERY:
             return EngineStatus.AWAITING_RECOVERY
