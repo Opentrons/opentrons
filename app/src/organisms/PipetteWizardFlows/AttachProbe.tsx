@@ -6,7 +6,7 @@ import {
   Flex,
   RESPONSIVENESS,
   SPACING,
-  StyledText,
+  LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { LEFT, WASTE_CHUTE_CUTOUT } from '@opentrons/shared-data'
@@ -168,9 +168,9 @@ export const AttachProbe = (props: AttachProbeProps): JSX.Element | null => {
       >
         {isExiting ? undefined : (
           <Flex marginX={Boolean(isOnDevice) ? '4.5rem' : '8.5625rem'}>
-            <StyledText css={IN_PROGRESS_STYLE}>
+            <LegacyStyledText css={IN_PROGRESS_STYLE}>
               {t('calibration_probe_touching', { slotNumber: calSlotNum })}
-            </StyledText>
+            </LegacyStyledText>
           </Flex>
         )}
       </InProgressModal>
@@ -195,9 +195,12 @@ export const AttachProbe = (props: AttachProbeProps): JSX.Element | null => {
           i18nKey={'return_probe_error'}
           values={{ error: errorMessage }}
           components={{
-            block: <StyledText as="p" />,
+            block: <LegacyStyledText as="p" />,
             bold: (
-              <StyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold} />
+              <LegacyStyledText
+                as="p"
+                fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+              />
             ),
           }}
         />
@@ -212,7 +215,7 @@ export const AttachProbe = (props: AttachProbeProps): JSX.Element | null => {
       })}
       bodyText={
         <>
-          <StyledText css={BODY_STYLE}>
+          <LegacyStyledText css={BODY_STYLE}>
             <Trans
               t={t}
               i18nKey={'install_probe'}
@@ -221,7 +224,7 @@ export const AttachProbe = (props: AttachProbeProps): JSX.Element | null => {
                 bold: <strong />,
               }}
             />
-          </StyledText>
+          </LegacyStyledText>
           {is96Channel && (
             <Banner
               type={Boolean(isWasteChuteOnDeck) ? 'error' : 'warning'}

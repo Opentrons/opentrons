@@ -5,7 +5,7 @@ import {
   DIRECTION_COLUMN,
   Flex,
   SPACING,
-  StyledText,
+  LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { useInstrumentsQuery } from '@opentrons/react-api-client'
@@ -61,13 +61,15 @@ export function RobotSettingsPipetteOffsetCalibration({
       paddingY={SPACING.spacing24}
       gridGap={SPACING.spacing8}
     >
-      <StyledText as="h3" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
+      <LegacyStyledText as="h3" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
         {isFlex
           ? t('pipette_calibrations_title')
           : t('pipette_offset_calibrations_title')}
-      </StyledText>
+      </LegacyStyledText>
       {isFlex ? (
-        <StyledText as="p">{t('pipette_calibrations_description')}</StyledText>
+        <LegacyStyledText as="p">
+          {t('pipette_calibrations_description')}
+        </LegacyStyledText>
       ) : null}
       {getShowPipetteCalibrationWarning(instrumentsData) && (
         <PipetteRecalibrationWarning />
@@ -81,9 +83,9 @@ export function RobotSettingsPipetteOffsetCalibration({
           updateRobotStatus={updateRobotStatus}
         />
       ) : (
-        <StyledText as="label" marginTop={SPACING.spacing8}>
+        <LegacyStyledText as="label" marginTop={SPACING.spacing8}>
           {t('no_pipette_attached')}
-        </StyledText>
+        </LegacyStyledText>
       )}
     </Flex>
   )

@@ -10,7 +10,7 @@ import {
   JUSTIFY_CENTER,
   RESPONSIVENESS,
   SPACING,
-  StyledText,
+  LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { getIsOnDevice } from '../../redux/config'
@@ -89,9 +89,13 @@ export function InProgressModal(props: Props): JSX.Element {
         alignItems={ALIGN_CENTER}
       >
         {description != null && (
-          <StyledText css={DESCRIPTION_STYLE}>{description}</StyledText>
+          <LegacyStyledText css={DESCRIPTION_STYLE}>
+            {description}
+          </LegacyStyledText>
         )}
-        {body != null && <StyledText css={BODY_STYLE}>{body}</StyledText>}
+        {body != null && (
+          <LegacyStyledText css={BODY_STYLE}>{body}</LegacyStyledText>
+        )}
       </Flex>
       {children}
     </Flex>

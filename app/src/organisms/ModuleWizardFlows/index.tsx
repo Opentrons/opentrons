@@ -3,7 +3,7 @@ import { createPortal } from 'react-dom'
 import { useSelector } from 'react-redux'
 import { Trans, useTranslation } from 'react-i18next'
 import { useDeleteMaintenanceRunMutation } from '@opentrons/react-api-client'
-import { COLORS, StyledText } from '@opentrons/components'
+import { COLORS, LegacyStyledText } from '@opentrons/components'
 import {
   getModuleType,
   getModuleDisplayName,
@@ -288,7 +288,7 @@ export const ModuleWizardFlows = (
               i18nKey={'branded:module_calibration_failed'}
               values={{ error: errorMessage }}
               components={{
-                block: <StyledText as="p" />,
+                block: <LegacyStyledText as="p" />,
               }}
             />
           )

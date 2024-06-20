@@ -4,7 +4,7 @@ import {
   DIRECTION_COLUMN,
   Flex,
   SPACING,
-  StyledText,
+  LegacyStyledText,
 } from '@opentrons/components'
 
 import { Move } from '../../../molecules/InterventionModal/InterventionStep'
@@ -46,7 +46,7 @@ export function LeftColumnLabwareInfo({
     return (
       <Flex gridGap={SPACING.spacing24} flexDirection={DIRECTION_COLUMN}>
         <Flex gridGap={SPACING.spacing8} flexDirection={DIRECTION_COLUMN}>
-          <StyledText as="h4SemiBold">{title}</StyledText>
+          <LegacyStyledText as="h4SemiBold">{title}</LegacyStyledText>
           <Move
             type={moveType}
             labwareName={failedLabwareName ?? ''}

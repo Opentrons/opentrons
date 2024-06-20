@@ -5,7 +5,7 @@ import {
   DIRECTION_COLUMN,
   Flex,
   SPACING,
-  StyledText,
+  LegacyStyledText,
 } from '@opentrons/components'
 
 import { SmallButton } from '../../atoms/buttons'
@@ -38,9 +38,9 @@ export function ConfirmAttachedModal({
   return (
     <Modal header={modalHeader} onOutsideClick={onCloseClick}>
       <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing32}>
-        <StyledText as="p">
+        <LegacyStyledText as="p">
           {t('confirm_heater_shaker_module_modal_description')}
-        </StyledText>
+        </LegacyStyledText>
         <Flex gridGap={SPACING.spacing8}>
           <SmallButton
             flex="1"

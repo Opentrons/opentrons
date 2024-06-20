@@ -10,7 +10,7 @@ import {
   Flex,
   JUSTIFY_SPACE_BETWEEN,
   SPACING,
-  StyledText,
+  LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
@@ -46,13 +46,13 @@ export function SetupDeckCalibration({
         alignItems={ALIGN_CENTER}
         justifyContent={JUSTIFY_SPACE_BETWEEN}
       >
-        <StyledText
+        <LegacyStyledText
           color={COLORS.black90}
           css={TYPOGRAPHY.pSemiBold}
           id="DeckCalibration_deckCalibrationTitle"
         >
           {t('deck_calibration_title')}
-        </StyledText>
+        </LegacyStyledText>
       </Flex>
       <SetupCalibrationItem
         calibratedDate={

@@ -91,7 +91,7 @@ export function InputPrompt(): JSX.Element {
   return (
     <StyledForm id="User_Prompt">
       <Flex css={CONTAINER_STYLE}>
-        <StyledTextarea
+        <LegacyStyledTextarea
           rows={calcTextAreaHeight(userPrompt as string)}
           placeholder={t('type_your_prompt')}
           {...register('userPrompt')}
@@ -127,7 +127,7 @@ const CONTAINER_STYLE = css`
   }
 `
 
-const StyledTextarea = styled.textarea`
+const LegacyStyledTextarea = styled.textarea`
   resize: none;
   min-height: 3.75rem;
   max-height: 17.25rem;

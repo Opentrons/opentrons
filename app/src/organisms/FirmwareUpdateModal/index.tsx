@@ -9,7 +9,7 @@ import {
   JUSTIFY_CENTER,
   RESPONSIVENESS,
   SPACING,
-  StyledText,
+  LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import {
@@ -150,9 +150,9 @@ export const FirmwareUpdateModal = (
           color={COLORS.green60}
         />
       )}
-      <StyledText css={DESCRIPTION_STYLE}>
+      <LegacyStyledText css={DESCRIPTION_STYLE}>
         {firmwareText ?? 'Checking for updates...'}
-      </StyledText>
+      </LegacyStyledText>
     </Flex>
   )
 }

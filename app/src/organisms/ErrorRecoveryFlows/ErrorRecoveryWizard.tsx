@@ -2,7 +2,7 @@ import * as React from 'react'
 import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
 
-import { StyledText } from '@opentrons/components'
+import { LegacyStyledText } from '@opentrons/components'
 
 import { getTopPortalEl } from '../../App/portal'
 import { InterventionModal } from '../../molecules/InterventionModal'
@@ -92,11 +92,13 @@ export function ErrorRecoveryComponent(
     const titleText = props.hasLaunchedRecovery
       ? t('recovery_mode')
       : t('cancel_run')
-    return <StyledText as="h4Bold">{titleText}</StyledText>
+    return <LegacyStyledText as="h4Bold">{titleText}</LegacyStyledText>
   }
 
   const buildIconHeading = (): JSX.Element => (
-    <StyledText as="pSemiBold">{t('view_error_details')}</StyledText>
+    <LegacyStyledText as="pSemiBold">
+      {t('view_error_details')}
+    </LegacyStyledText>
   )
 
   if (props.isOnDevice) {

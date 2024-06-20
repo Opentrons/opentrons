@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next'
 import {
   Flex,
   SPACING,
-  StyledText,
+  LegacyStyledText,
   TYPOGRAPHY,
   DIRECTION_COLUMN,
 } from '@opentrons/components'
@@ -82,12 +82,12 @@ export function SelectPipette(props: SelectPipetteProps): JSX.Element {
         padding={`${SPACING.spacing16} ${SPACING.spacing60} ${SPACING.spacing40} ${SPACING.spacing60}`}
         gridGap={SPACING.spacing4}
       >
-        <StyledText
+        <LegacyStyledText
           css={TYPOGRAPHY.level4HeaderRegular}
           paddingBottom={SPACING.spacing8}
         >
           {t('pipette_currently_attached')}
-        </StyledText>
+        </LegacyStyledText>
         {leftPipetteSpecs != null ? (
           <LargeButton
             buttonType={selectedPipette === LEFT ? 'primary' : 'secondary'}

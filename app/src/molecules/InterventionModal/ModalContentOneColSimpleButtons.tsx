@@ -3,7 +3,7 @@ import {
   Flex,
   DIRECTION_COLUMN,
   SPACING,
-  StyledText,
+  LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { OneColumn } from './OneColumn'
@@ -35,13 +35,13 @@ export function ModalContentOneColSimpleButtons(
   return (
     <OneColumn>
       <Flex flexDirection={DIRECTION_COLUMN} gap={SPACING.spacing16}>
-        <StyledText
+        <LegacyStyledText
           fontSize={TYPOGRAPHY.fontSize28}
           fontWeight={TYPOGRAPHY.fontWeightSemiBold}
           lineHeight={TYPOGRAPHY.lineHeight36}
         >
           {props.headline}
-        </StyledText>
+        </LegacyStyledText>
         <Flex flexDirection={DIRECTION_COLUMN} gap={SPACING.spacing4}>
           {buttons.map((buttonProps, idx) => (
             <RadioButton

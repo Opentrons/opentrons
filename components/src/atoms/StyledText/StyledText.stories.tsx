@@ -2,12 +2,12 @@
 import * as React from 'react'
 import { SPACING, TYPOGRAPHY } from '../../ui-style-constants'
 import { Flex } from '../../primitives'
-import { StyledText } from './index'
+import { LegacyStyledText } from './index'
 import type { Meta, StoryObj } from '@storybook/react'
 
-const meta: Meta<typeof StyledText> = {
+const meta: Meta<typeof LegacyStyledText> = {
   title: 'Library/Atoms/StyledText',
-  component: StyledText,
+  component: LegacyStyledText,
   decorators: [
     Story => (
       <Flex padding={SPACING.spacing16}>
@@ -19,7 +19,7 @@ const meta: Meta<typeof StyledText> = {
 
 export default meta
 
-type Story = StoryObj<typeof StyledText>
+type Story = StoryObj<typeof LegacyStyledText>
 
 const dummyText =
   'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Purus sapien nunc dolor, aliquet nibh placerat et nisl, arcu. Pellentesque blandit sollicitudin vitae morbi morbi vulputate cursus tellus. Amet proin donec proin id aliquet in nullam.'

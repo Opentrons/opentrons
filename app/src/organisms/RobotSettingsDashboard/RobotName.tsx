@@ -7,7 +7,7 @@ import {
   Flex,
   Icon,
   JUSTIFY_FLEX_START,
-  StyledText,
+  LegacyStyledText,
 } from '@opentrons/components'
 
 import type { SetSettingOption } from '../../pages/RobotSettingsDashboard'
@@ -29,9 +29,9 @@ export function RobotName({ setCurrentOption }: RobotNameProps): JSX.Element {
           <Icon name="chevron-left" size="2.5rem" />
         </Btn>
       </Flex>
-      <StyledText fontSize="2rem" textAlign="center">
+      <LegacyStyledText fontSize="2rem" textAlign="center">
         {t('robot_name')}
-      </StyledText>
+      </LegacyStyledText>
     </Flex>
   )
 }

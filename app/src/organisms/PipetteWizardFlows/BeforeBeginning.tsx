@@ -5,7 +5,7 @@ import {
   DIRECTION_COLUMN,
   Flex,
   SPACING,
-  StyledText,
+  LegacyStyledText,
 } from '@opentrons/components'
 import {
   NINETY_SIX_CHANNEL,
@@ -251,15 +251,15 @@ export const BeforeBeginning = (
               t={t}
               i18nKey={bodyTranslationKey}
               components={{
-                block: <StyledText css={BODY_STYLE} />,
+                block: <LegacyStyledText css={BODY_STYLE} />,
               }}
             />
             {selectedPipette === NINETY_SIX_CHANNEL &&
               flowType === FLOWS.ATTACH &&
               !Boolean(isOnDevice) && (
-                <StyledText css={BODY_STYLE}>
+                <LegacyStyledText css={BODY_STYLE}>
                   {t('pipette_heavy', { weight: WEIGHT_OF_96_CHANNEL })}
-                </StyledText>
+                </LegacyStyledText>
               )}
           </Flex>
           {selectedPipette === NINETY_SIX_CHANNEL &&

@@ -6,7 +6,7 @@ import {
   Flex,
   PrimaryButton,
   SPACING,
-  StyledText,
+  LegacyStyledText,
 } from '@opentrons/components'
 import { Skeleton } from '../../atoms/Skeleton'
 import { LegacyModalShell } from '../LegacyModal'
@@ -44,20 +44,20 @@ const Template: Story<
   </Provider>
 )
 const body = (
-  <StyledText as="p">
+  <LegacyStyledText as="p">
     {
       'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.'
     }
-  </StyledText>
+  </LegacyStyledText>
 )
 const rightHandBody = (
   <Flex flexDirection={DIRECTION_COLUMN}>
-    <StyledText as="h1">{'You will need:'}</StyledText>
-    <StyledText as="p" marginTop={SPACING.spacing16}>
+    <LegacyStyledText as="h1">{'You will need:'}</LegacyStyledText>
+    <LegacyStyledText as="p" marginTop={SPACING.spacing16}>
       {'this'}
-    </StyledText>
-    <StyledText as="p">{'and this'}</StyledText>
-    <StyledText as="p">{'and this'}</StyledText>
+    </LegacyStyledText>
+    <LegacyStyledText as="p">{'and this'}</LegacyStyledText>
+    <LegacyStyledText as="p">{'and this'}</LegacyStyledText>
   </Flex>
 )
 const skeleton = (

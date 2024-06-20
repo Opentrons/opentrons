@@ -41,7 +41,7 @@ import {
   SecondaryButton,
   SIZE_1,
   SPACING,
-  StyledText,
+  LegacyStyledText,
   TYPOGRAPHY,
   useConditionalConfirm,
   useHoverTooltip,
@@ -318,18 +318,21 @@ export function ProtocolRunHeader({
         <Flex>
           {protocolKey != null ? (
             <Link to={`/protocols/${protocolKey}`}>
-              <StyledText
+              <LegacyStyledText
                 as="h2"
                 fontWeight={TYPOGRAPHY.fontWeightSemiBold}
                 color={COLORS.blue50}
               >
                 {displayName}
-              </StyledText>
+              </LegacyStyledText>
             </Link>
           ) : (
-            <StyledText as="h2" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
+            <LegacyStyledText
+              as="h2"
+              fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+            >
               {displayName}
-            </StyledText>
+            </LegacyStyledText>
           )}
         </Flex>
         {analysisErrors != null && analysisErrors.length > 0 && (
@@ -470,11 +473,11 @@ interface LabeledValueProps {
 function LabeledValue(props: LabeledValueProps): JSX.Element {
   return (
     <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
-      <StyledText as="h6" color={COLORS.grey60}>
+      <LegacyStyledText as="h6" color={COLORS.grey60}>
         {props.label}
-      </StyledText>
+      </LegacyStyledText>
       {typeof props.value === 'string' ? (
-        <StyledText as="p">{props.value}</StyledText>
+        <LegacyStyledText as="p">{props.value}</LegacyStyledText>
       ) : (
         props.value
       )}
@@ -507,9 +510,9 @@ function DisplayRunStatus(props: DisplayRunStatusProps): JSX.Element {
           />
         </Icon>
       ) : null}
-      <StyledText as="p">
+      <LegacyStyledText as="p">
         {props.runStatus != null ? t(`status_${String(props.runStatus)}`) : ''}
-      </StyledText>
+      </LegacyStyledText>
     </Flex>
   )
 }
@@ -749,7 +752,9 @@ function ActionButton(props: ActionButtonProps): JSX.Element {
             }
           />
         ) : null}
-        <StyledText css={TYPOGRAPHY.pSemiBold}>{buttonText}</StyledText>
+        <LegacyStyledText css={TYPOGRAPHY.pSemiBold}>
+          {buttonText}
+        </LegacyStyledText>
       </PrimaryButton>
       {disableReason != null && (
         <Tooltip tooltipProps={tooltipProps} width="auto" maxWidth="8rem">
@@ -829,12 +834,12 @@ function TerminalRunBanner(props: TerminalRunProps): JSX.Element | null {
     return (
       <Banner type="error" iconMarginLeft={SPACING.spacing4}>
         <Flex justifyContent={JUSTIFY_SPACE_BETWEEN} width="100%">
-          <StyledText>
+          <LegacyStyledText>
             {t('error_info', {
               errorType: highestPriorityError?.errorType,
               errorCode: highestPriorityError?.errorCode,
             })}
-          </StyledText>
+          </LegacyStyledText>
 
           <LinkButton
             onClick={handleFailedRunClick}

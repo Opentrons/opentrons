@@ -24,7 +24,7 @@ import {
   ProtocolDeck,
   SPACING,
   SecondaryButton,
-  StyledText,
+  LegacyStyledText,
   TYPOGRAPHY,
   useTooltip,
   useHoverTooltip,
@@ -327,13 +327,13 @@ export function ChooseProtocolSlideoutComponent(
                   flexDirection={DIRECTION_COLUMN}
                   key={runtimeParam.variableName}
                 >
-                  <StyledText
+                  <LegacyStyledText
                     as="label"
                     fontWeight={TYPOGRAPHY.fontWeightSemiBold}
                     paddingBottom={SPACING.spacing8}
                   >
                     {runtimeParam.displayName}
-                  </StyledText>
+                  </LegacyStyledText>
                   <Flex
                     gridGap={SPACING.spacing8}
                     justifyContent={JUSTIFY_FLEX_START}
@@ -367,15 +367,15 @@ export function ChooseProtocolSlideoutComponent(
                       }
                       paddingTop={SPACING.spacing2} // manual alignment of SVG with value label
                     />
-                    <StyledText as="p">
+                    <LegacyStyledText as="p">
                       {Boolean(runtimeParam.value)
                         ? t('protocol_details:on')
                         : t('protocol_details:off')}
-                    </StyledText>
+                    </LegacyStyledText>
                   </Flex>
-                  <StyledText as="label" paddingTop={SPACING.spacing8}>
+                  <LegacyStyledText as="label" paddingTop={SPACING.spacing8}>
                     {runtimeParam.description}
-                  </StyledText>
+                  </LegacyStyledText>
                 </Flex>
               )
             } else if (runtimeParam.type === 'csv_file') {
@@ -398,15 +398,15 @@ export function ChooseProtocolSlideoutComponent(
                     width="100%"
                     marginBottom={SPACING.spacing16}
                   >
-                    <StyledText
+                    <LegacyStyledText
                       as="h3"
                       fontWeight={TYPOGRAPHY.fontWeightSemiBold}
                     >
                       {t('protocol_details:csv_file')}
-                    </StyledText>
-                    <StyledText as="p">
+                    </LegacyStyledText>
+                    <LegacyStyledText as="p">
                       {t('protocol_details:csv_required')}
-                    </StyledText>
+                    </LegacyStyledText>
                   </Flex>
                   {runtimeParam.file == null ? (
                     <UploadInput
@@ -429,7 +429,7 @@ export function ChooseProtocolSlideoutComponent(
                         setRunTimeParametersOverrides?.(clone)
                       }}
                       dragAndDropText={
-                        <StyledText as="p">
+                        <LegacyStyledText as="p">
                           <Trans
                             t={t}
                             i18nKey="shared:drag_and_drop"
@@ -443,7 +443,7 @@ export function ChooseProtocolSlideoutComponent(
                               ),
                             }}
                           />
-                        </StyledText>
+                        </LegacyStyledText>
                       }
                     />
                   ) : (
@@ -718,7 +718,7 @@ function StoredProtocolList(props: StoredProtocolListProps): JSX.Element {
                       borderRadius={SPACING.spacing8}
                     />
                   )}
-                  <StyledText
+                  <LegacyStyledText
                     as="p"
                     fontWeight={TYPOGRAPHY.fontWeightSemiBold}
                     overflowWrap={OVERFLOW_WRAP_ANYWHERE}
@@ -727,7 +727,7 @@ function StoredProtocolList(props: StoredProtocolListProps): JSX.Element {
                       ?.protocolName ??
                       first(storedProtocol.srcFileNames) ??
                       storedProtocol.protocolKey}
-                  </StyledText>
+                  </LegacyStyledText>
                 </Box>
                 {(runCreationError != null ||
                   missingAnalysisData ||
@@ -749,7 +749,7 @@ function StoredProtocolList(props: StoredProtocolListProps): JSX.Element {
               </MiniCard>
             </Flex>
             {runCreationError != null && isSelected ? (
-              <StyledText
+              <LegacyStyledText
                 as="label"
                 color={COLORS.red60}
                 overflowWrap={OVERFLOW_WRAP_ANYWHERE}
@@ -776,7 +776,7 @@ function StoredProtocolList(props: StoredProtocolListProps): JSX.Element {
                 ) : (
                   runCreationError
                 )}
-              </StyledText>
+              </LegacyStyledText>
             ) : null}
             {requiresCsvRunTimeParameter && isSelected ? (
               <StyledText
@@ -791,7 +791,7 @@ function StoredProtocolList(props: StoredProtocolListProps): JSX.Element {
               </StyledText>
             ) : null}
             {missingAnalysisData && isSelected ? (
-              <StyledText
+              <LegacyStyledText
                 as="label"
                 color={COLORS.yellow60}
                 overflowWrap="anywhere"
@@ -819,7 +819,7 @@ function StoredProtocolList(props: StoredProtocolListProps): JSX.Element {
                     }}
                   />
                 }
-              </StyledText>
+              </LegacyStyledText>
             ) : null}
           </React.Fragment>
         )
@@ -841,15 +841,15 @@ function StoredProtocolList(props: StoredProtocolListProps): JSX.Element {
       `}
     >
       <Icon size="1.25rem" name="alert-circle" color={COLORS.grey30} />
-      <StyledText
+      <LegacyStyledText
         as="p"
         fontWeight={TYPOGRAPHY.fontWeightSemiBold}
         marginTop={SPACING.spacing8}
         role="heading"
       >
         {t('no_protocols_found')}
-      </StyledText>
-      <StyledText
+      </LegacyStyledText>
+      <LegacyStyledText
         as="p"
         marginTop={SPACING.spacing8}
         textAlign={TYPOGRAPHY.textAlignCenter}
@@ -861,7 +861,7 @@ function StoredProtocolList(props: StoredProtocolListProps): JSX.Element {
             navlink: <Link to="/protocols" css={TYPOGRAPHY.linkPSemiBold} />,
           }}
         />
-      </StyledText>
+      </LegacyStyledText>
     </Flex>
   )
 }
