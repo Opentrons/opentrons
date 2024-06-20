@@ -1,7 +1,7 @@
 import assert from 'assert'
 import Ajv from 'ajv'
 import * as React from 'react'
-import { Formik, FormikErrors } from 'formik'
+import { Formik } from 'formik'
 import { saveAs } from 'file-saver'
 import { reportEvent } from '../analytics'
 import { reportErrors } from './analyticsUtils'
@@ -63,9 +63,9 @@ import { WellSpacing } from './components/sections/WellSpacing'
 import { getDefaultedDef } from './getDefaultedDef'
 import { getIsXYGeometryChanged } from './utils/getIsXYGeometryChanged'
 import { StackingOffsets } from './components/sections/StackingOffsets'
+import { WizardHeader } from './WizardHeader'
 
-import styles from './styles.module.css'
-
+import type { FormikErrors } from 'formik'
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import type { LabwareCreatorErrors } from './formLevelValidation'
 import type {
@@ -74,7 +74,8 @@ import type {
   LabwareFields,
   ProcessedLabwareFields,
 } from './fields'
-import { WizardHeader } from './WizardHeader'
+
+import styles from './styles.module.css'
 
 const ajv = new Ajv()
 const validateLabwareSchema = ajv.compile(labwareSchema)

@@ -9,7 +9,6 @@ import {
   TYPOGRAPHY,
   COLORS,
   SPACING,
-  RESPONSIVENESS,
   Text,
   StepMeter,
 } from '@opentrons/components'

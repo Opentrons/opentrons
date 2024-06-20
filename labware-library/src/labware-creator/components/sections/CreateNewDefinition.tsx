@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { useFormikContext } from 'formik'
 import cx from 'classnames'
-import { PrimaryBtn, PrimaryButton } from '@opentrons/components'
+import { PrimaryButton } from '@opentrons/components'
 import { Dropdown } from '../../components/Dropdown'
 import { isEveryFieldHidden, makeAutofillOnChange } from '../../utils'
 import { labwareTypeOptions, labwareTypeAutofills } from '../../fields'
