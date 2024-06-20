@@ -8,11 +8,10 @@
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "variable dilutions has value 1",
-        "legacyCommandType": "command.COMMENT"
+        "message": "variable dilutions has value 1"
       },
       "result": {},
       "status": "succeeded"
