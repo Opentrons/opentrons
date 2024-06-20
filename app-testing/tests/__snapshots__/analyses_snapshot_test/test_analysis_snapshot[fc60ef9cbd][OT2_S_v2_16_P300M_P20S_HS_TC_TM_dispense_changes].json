@@ -188,7 +188,6 @@
               ]
             }
           ],
-          "liquidProbeSettings": {},
           "metadata": {
             "displayCategory": "tipRack",
             "displayName": "Opentrons OT-2 96 Tip Rack 300 µL",
@@ -1336,7 +1335,6 @@
               ]
             }
           ],
-          "liquidProbeSettings": {},
           "metadata": {
             "displayCategory": "tipRack",
             "displayName": "Opentrons OT-2 96 Tip Rack 20 µL",
@@ -2423,7 +2421,7 @@
               ]
             }
           ],
-          "liquidProbeSettings": {
+          "liquidProbeParameters": {
             "minimumHeight": [
               {
                 "applicableWells": [],
@@ -2433,7 +2431,7 @@
             "minimumWellVolume": [
               {
                 "applicableWells": [],
-                "value": 0
+                "value": 0.0
               }
             ]
           },
@@ -2677,7 +2675,7 @@
               ]
             }
           ],
-          "liquidProbeSettings": {
+          "liquidProbeParameters": {
             "minimumHeight": [
               {
                 "applicableWells": [],
@@ -2687,7 +2685,7 @@
             "minimumWellVolume": [
               {
                 "applicableWells": [],
-                "value": 0
+                "value": 0.0
               }
             ]
           },

@@ -613,7 +613,6 @@
               ]
             }
           ],
-          "liquidProbeSettings": {},
           "metadata": {
             "displayCategory": "tipRack",
             "displayName": "Opentrons 96 Tip Rack 300 µL",
@@ -1771,7 +1770,6 @@
               ]
             }
           ],
-          "liquidProbeSettings": {},
           "metadata": {
             "displayCategory": "aluminumBlock",
             "displayName": "Opentrons 96 Deep Well Adapter with NEST Deep Well Plate 2 mL",
@@ -2951,7 +2949,6 @@
               ]
             }
           ],
-          "liquidProbeSettings": {},
           "metadata": {
             "displayCategory": "aluminumBlock",
             "displayName": "Opentrons 24 Well Aluminum Block with Generic 2 mL Screwcap",
@@ -3369,7 +3366,6 @@
               ]
             }
           ],
-          "liquidProbeSettings": {},
           "metadata": {
             "displayCategory": "wellPlate",
             "displayName": "Bio-Rad 96 Well Plate 200 µL PCR",
@@ -4425,7 +4421,6 @@
               ]
             }
           ],
-          "liquidProbeSettings": {},
           "metadata": {
             "displayCategory": "reservoir",
             "displayName": "Agilent 1 Well Reservoir 290 mL",
