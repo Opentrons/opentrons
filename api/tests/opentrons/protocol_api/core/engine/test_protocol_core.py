@@ -246,7 +246,9 @@ def test_load_instrument(
     decoy.when(
         mock_engine_client.execute_command_without_recovery(
             cmd.LoadPipetteParams(
-                pipetteName=PipetteNameType.P300_SINGLE, mount=MountType.LEFT
+                pipetteName=PipetteNameType.P300_SINGLE,
+                mount=MountType.LEFT,
+                liquidPresenceDetection=False,
             )
         )
     ).then_return(commands.LoadPipetteResult(pipetteId="cool-pipette"))

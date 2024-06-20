@@ -49,6 +49,10 @@ class LoadPipetteParams(BaseModel):
         description="An optional ID to assign to this pipette. If None, an ID "
         "will be generated.",
     )
+    liquidPresenceDetection: Optional[bool] = Field(
+        None,
+        description="Enable liquid presence detection for this pipette. Defaults to False.",
+    )
 
 
 class LoadPipetteResult(BaseModel):

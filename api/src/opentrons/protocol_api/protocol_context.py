@@ -870,6 +870,7 @@ class ProtocolContext(CommandPublisher):
         mount: Union[Mount, str, None] = None,
         tip_racks: Optional[List[Labware]] = None,
         replace: bool = False,
+        liquid_presence_detection: bool = False,
     ) -> InstrumentContext:
         """Load a specific instrument for use in the protocol.
 
@@ -897,6 +898,7 @@ class ProtocolContext(CommandPublisher):
                              control <advanced-control>` applications. You cannot
                              replace an instrument in the middle of a protocol being run
                              from the Opentrons App or touchscreen.
+        :param bool liquid_presence_detection: If ``True``, enable liquid presence detection for instrument.
         """
         instrument_name = validation.ensure_lowercase_name(instrument_name)
         checked_instrument_name = validation.ensure_pipette_name(instrument_name)
@@ -931,6 +933,7 @@ class ProtocolContext(CommandPublisher):
         instrument_core = self._core.load_instrument(
             instrument_name=checked_instrument_name,
             mount=checked_mount,
+            liquid_presence_detection=liquid_presence_detection,
         )
 
         for tip_rack in tip_racks:

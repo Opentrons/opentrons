@@ -1647,6 +1647,11 @@
           "title": "Pipetteid",
           "description": "An optional ID to assign to this pipette. If None, an ID will be generated.",
           "type": "string"
+        },
+        "liquidPresenceDetection": {
+          "title": "Liquidpresencedetection",
+          "description": "Enable liquid presence detection for this pipette. Defaults to False.",
+          "type": "boolean"
         }
       },
       "required": ["pipetteName", "mount"]

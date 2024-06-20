@@ -133,6 +133,7 @@ class PipetteState:
     static_config_by_id: Dict[str, StaticPipetteConfig]
     flow_rates_by_id: Dict[str, FlowRates]
     nozzle_configuration_by_id: Dict[str, Optional[NozzleMap]]
+    liquid_presence_detection_by_id: Dict[str, Optional[bool]]
 
 
 class PipetteStore(HasState[PipetteState], HandlesActions):
@@ -152,6 +153,7 @@ class PipetteStore(HasState[PipetteState], HandlesActions):
             static_config_by_id={},
             flow_rates_by_id={},
             nozzle_configuration_by_id={},
+            liquid_presence_detection_by_id={},
         )
 
     def handle_action(self, action: Action) -> None:
@@ -215,6 +217,9 @@ class PipetteStore(HasState[PipetteState], HandlesActions):
                 pipetteName=command.params.pipetteName,
                 mount=command.params.mount,
             )
+            self._state.liquid_presence_detection_by_id[
+                pipette_id
+            ] = command.params.liquidPresenceDetection
             self._state.aspirated_volume_by_id[pipette_id] = None
             self._state.movement_speed_by_id[pipette_id] = None
             self._state.attached_tip_by_id[pipette_id] = None
@@ -801,3 +806,12 @@ class PipetteView(HasState[PipetteState]):
             pip_back_right_bound,
             pip_front_left_bound,
         )
+
+    def get_liquid_presence_detection(self, pipette_id: str) -> Optional[bool]:
+        """Determine if liquid presence detection is enabled for this pipette."""
+        try:
+            return self._state.liquid_presence_detection_by_id[pipette_id]
+        except KeyError as e:
+            raise errors.PipetteNotLoadedError(
+                f"Pipette {pipette_id} not found; unable to determine if pipette liquid presence detection enabled."
+            ) from e

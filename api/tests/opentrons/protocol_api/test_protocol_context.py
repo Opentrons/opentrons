@@ -201,6 +201,7 @@ def test_load_instrument(
         mock_core.load_instrument(
             instrument_name=PipetteNameType.P300_SINGLE,
             mount=Mount.LEFT,
+            liquid_presence_detection=False,
         )
     ).then_return(mock_instrument_core)
 
@@ -253,6 +254,7 @@ def test_load_instrument_replace(
         mock_core.load_instrument(
             instrument_name=matchers.IsA(PipetteNameType),
             mount=matchers.IsA(Mount),
+            liquid_presence_detection=False,
         )
     ).then_return(mock_instrument_core)
     decoy.when(mock_instrument_core.get_pipette_name()).then_return("Ada Lovelace")
@@ -296,6 +298,7 @@ def test_96_channel_pipette_raises_if_another_pipette_attached(
         mock_core.load_instrument(
             instrument_name=PipetteNameType.P300_SINGLE,
             mount=Mount.RIGHT,
+            liquid_presence_detection=False,
         )
     ).then_return(mock_instrument_core)
 
