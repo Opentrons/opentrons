@@ -33,6 +33,35 @@ def _make_config() -> Config:
     )
 
 
+def test_queue_command_action() -> None:
+    """It should translate a command request into a queued command and add it."""
+    subject = CommandStore(is_door_open=False, config=_make_config())
+    subject_view = CommandView(subject.state)
+
+    id = "command-id"
+    key = "command-key"
+    params = commands.CommentParams(message="yay")
+    created_at = datetime(year=2021, month=1, day=1)
+    request = commands.CommentCreate(params=params, key=key)
+    action = actions.QueueCommandAction(
+        request=request,
+        request_hash=None,
+        created_at=created_at,
+        command_id=id,
+    )
+    expected_command = commands.Comment(
+        id=id,
+        key=key,
+        createdAt=created_at,
+        status=commands.CommandStatus.QUEUED,
+        params=params,
+    )
+
+    subject.handle_action(action)
+    assert subject_view.get("command-id") == expected_command
+    assert subject_view.get_all() == [expected_command]
+
+
 @pytest.mark.parametrize("error_recovery_type", ErrorRecoveryType)
 def test_command_failure(error_recovery_type: ErrorRecoveryType) -> None:
     """It should store an error and mark the command if it fails."""

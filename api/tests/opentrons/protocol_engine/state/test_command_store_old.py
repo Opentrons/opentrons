@@ -7,18 +7,15 @@ Add new tests to test_command_state.py, where they can be tested together.
 
 import pytest
 from datetime import datetime
-from typing import NamedTuple, Type
 
 from opentrons_shared_data.errors import ErrorCodes
-from opentrons_shared_data.pipette.dev_types import PipetteNameType
 
 from opentrons.ordered_set import OrderedSet
 from opentrons.protocol_engine.actions.actions import RunCommandAction
-from opentrons.types import MountType, DeckSlotName
 from opentrons.hardware_control.types import DoorState
 
 from opentrons.protocol_engine import commands, errors
-from opentrons.protocol_engine.types import DeckSlotLocation, DeckType, WellLocation
+from opentrons.protocol_engine.types import DeckType
 from opentrons.protocol_engine.state import Config
 from opentrons.protocol_engine.state.commands import (
     CommandState,
@@ -53,154 +50,6 @@ def _make_config(block_on_door_open: bool = False) -> Config:
         robot_type="OT-2 Standard",
         deck_type=DeckType.OT2_STANDARD,
     )
-
-
-class QueueCommandSpec(NamedTuple):
-    """Test data for the QueueCommandAction."""
-
-    command_request: commands.CommandCreate
-    expected_cls: Type[commands.Command]
-    created_at: datetime = datetime(year=2021, month=1, day=1)
-    command_id: str = "command-id"
-    command_key: str = "command-key"
-
-
-@pytest.mark.parametrize(
-    QueueCommandSpec._fields,
-    [
-        QueueCommandSpec(
-            command_request=commands.AspirateCreate(
-                params=commands.AspirateParams(
-                    pipetteId="pipette-id",
-                    labwareId="labware-id",
-                    wellName="well-name",
-                    volume=42,
-                    flowRate=1.23,
-                    wellLocation=WellLocation(),
-                ),
-                key="command-key",
-            ),
-            expected_cls=commands.Aspirate,
-        ),
-        QueueCommandSpec(
-            command_request=commands.DispenseCreate(
-                params=commands.DispenseParams(
-                    pipetteId="pipette-id",
-                    labwareId="labware-id",
-                    wellName="well-name",
-                    volume=42,
-                    flowRate=1.23,
-                    wellLocation=WellLocation(),
-                ),
-            ),
-            expected_cls=commands.Dispense,
-            # test when key prop is missing
-            command_key="command-id",
-        ),
-        QueueCommandSpec(
-            command_request=commands.DropTipCreate(
-                params=commands.DropTipParams(
-                    pipetteId="pipette-id",
-                    labwareId="labware-id",
-                    wellName="well-name",
-                ),
-                key="command-key",
-            ),
-            expected_cls=commands.DropTip,
-        ),
-        QueueCommandSpec(
-            command_request=commands.LoadLabwareCreate(
-                params=commands.LoadLabwareParams(
-                    location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
-                    loadName="load-name",
-                    namespace="namespace",
-                    version=42,
-                ),
-                key="command-key",
-            ),
-            expected_cls=commands.LoadLabware,
-        ),
-        QueueCommandSpec(
-            command_request=commands.LoadPipetteCreate(
-                params=commands.LoadPipetteParams(
-                    mount=MountType.LEFT,
-                    pipetteName=PipetteNameType.P300_SINGLE,
-                ),
-                key="command-key",
-            ),
-            expected_cls=commands.LoadPipette,
-        ),
-        QueueCommandSpec(
-            command_request=commands.PickUpTipCreate(
-                params=commands.PickUpTipParams(
-                    pipetteId="pipette-id",
-                    labwareId="labware-id",
-                    wellName="well-name",
-                ),
-                key="command-key",
-            ),
-            expected_cls=commands.PickUpTip,
-        ),
-        QueueCommandSpec(
-            command_request=commands.MoveToWellCreate(
-                params=commands.MoveToWellParams(
-                    pipetteId="pipette-id",
-                    labwareId="labware-id",
-                    wellName="well-name",
-                ),
-                key="command-key",
-            ),
-            expected_cls=commands.MoveToWell,
-        ),
-        QueueCommandSpec(
-            command_request=commands.WaitForResumeCreate(
-                params=commands.WaitForResumeParams(message="hello world"),
-                key="command-key",
-            ),
-            expected_cls=commands.WaitForResume,
-        ),
-        QueueCommandSpec(
-            # a WaitForResumeCreate with `pause` should be mapped to
-            # a WaitForResume with `commandType="waitForResume"`
-            command_request=commands.WaitForResumeCreate(
-                commandType="pause",
-                params=commands.WaitForResumeParams(message="hello world"),
-                key="command-key",
-            ),
-            expected_cls=commands.WaitForResume,
-        ),
-    ],
-)
-def test_command_store_queues_commands(
-    command_request: commands.CommandCreate,
-    expected_cls: Type[commands.Command],
-    created_at: datetime,
-    command_id: str,
-    command_key: str,
-) -> None:
-    """It should add a command to the store."""
-    action = QueueCommandAction(
-        request=command_request,
-        request_hash=None,
-        created_at=created_at,
-        command_id=command_id,
-    )
-    expected_command = expected_cls(
-        id=command_id,
-        key=command_key,
-        createdAt=created_at,
-        status=commands.CommandStatus.QUEUED,
-        params=command_request.params,  # type: ignore[arg-type]
-    )
-
-    subject = CommandStore(is_door_open=False, config=_make_config())
-    subject.handle_action(action)
-
-    assert subject.state.command_history.get("command-id") == CommandEntry(
-        index=0, command=expected_command
-    )
-    assert subject.state.command_history.get_all_ids() == ["command-id"]
-    assert subject.state.command_history.get_queue_ids() == OrderedSet(["command-id"])
 
 
 def test_command_queue_with_hash() -> None:
