@@ -107,7 +107,7 @@ export function HistoricalProtocolRunDrawer(
             <StyledText
               as="p"
               textTransform={TYPOGRAPHY.textTransformCapitalize}
-              datatest-id="RecentProtocolRun_OffsetDrawer_fileNameTitle"
+              datatest-id="RecentProtocolRun_Drawer_fileNameTitle"
             >
               {t('name')}
             </StyledText>
@@ -116,7 +116,7 @@ export function HistoricalProtocolRunDrawer(
             <StyledText
               as="p"
               textTransform={TYPOGRAPHY.textTransformCapitalize}
-              datatest-id="RecentProtocolRun_OffsetDrawer_fileDateTitle"
+              datatest-id="RecentProtocolRun_Drawer_fileDateTitle"
             >
               {t('date')}
             </StyledText>
@@ -125,7 +125,7 @@ export function HistoricalProtocolRunDrawer(
             <StyledText
               as="p"
               textTransform={TYPOGRAPHY.textTransformCapitalize}
-              datatest-id="RecentProtocolRun_OffsetDrawer_fileDownloadTitle"
+              datatest-id="RecentProtocolRun_Drawer_fileDownloadTitle"
             >
               {t('download')}
             </StyledText>
@@ -203,7 +203,7 @@ export function HistoricalProtocolRunDrawer(
             <StyledText
               as="p"
               textTransform={TYPOGRAPHY.textTransformCapitalize}
-              datatest-id="RecentProtocolRun_OffstDrawer_locationTitle"
+              datatest-id="RecentProtocolRun_Drawer_locationTitle"
             >
               {t('location')}
             </StyledText>
@@ -212,7 +212,7 @@ export function HistoricalProtocolRunDrawer(
             <StyledText
               as="p"
               textTransform={TYPOGRAPHY.textTransformCapitalize}
-              datatest-id="RecentProtocolRun_OffsetDrawer_labwareTitle"
+              datatest-id="RecentProtocolRun_Drawer_labwareTitle"
             >
               {t('labware')}
             </StyledText>
@@ -221,7 +221,7 @@ export function HistoricalProtocolRunDrawer(
             <StyledText
               as="p"
               textTransform={TYPOGRAPHY.textTransformCapitalize}
-              datatest-id="RecentProtocolRun_OffsetDrawer_labwareOffsetDataTitle"
+              datatest-id="RecentProtocolRun_Drawer_labwareOffsetDataTitle"
             >
               {t('labware_offset_data')}
             </StyledText>
