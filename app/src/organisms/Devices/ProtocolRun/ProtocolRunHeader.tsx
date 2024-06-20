@@ -103,6 +103,10 @@ import { useDeckConfigurationCompatibility } from '../../../resources/deck_confi
 import { useMostRecentCompletedAnalysis } from '../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import { useMostRecentRunId } from '../../ProtocolUpload/hooks/useMostRecentRunId'
 import { useNotifyRunQuery } from '../../../resources/runs'
+import {
+  useErrorRecoveryFlows,
+  ErrorRecoveryFlows,
+} from '../../ErrorRecoveryFlows'
 
 import type { Run, RunError, RunStatus } from '@opentrons/api-client'
 import type { IconName } from '@opentrons/components'
@@ -173,6 +177,7 @@ export function ProtocolRunHeader({
     robotProtocolAnalysis
   )
   const isFixtureMismatch = getIsFixtureMismatch(deckConfigCompatibility)
+  const { isERActive, failedCommand } = useErrorRecoveryFlows(runId, runStatus)
 
   const doorSafetySetting = robotSettings.find(
     setting => setting.id === 'enableDoorSafetySwitch'
@@ -288,6 +293,14 @@ export function ProtocolRunHeader({
 
   return (
     <>
+      {isERActive ? (
+        <ErrorRecoveryFlows
+          isFlex={true}
+          runId={runId}
+          failedCommand={failedCommand}
+          protocolAnalysis={robotProtocolAnalysis}
+        />
+      ) : null}
       {showRunFailedModal ? (
         <RunFailedModal
           robotName={robotName}
