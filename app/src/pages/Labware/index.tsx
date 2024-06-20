@@ -127,18 +127,19 @@ export function Labware(): JSX.Element {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [labwareFailureMessage, newLabwareName])
 
-  return showLC ? (
-    <LabwareCreator
-      goBack={() => {
-        setShowLC(false)
-      }}
-      save={(file: any) => {
-        dispatch(addCustomLabwareFileFromCreator(file))
-      }}
-      isOnRunApp
-    />
-  ) : (
+  return (
     <>
+      {showLC ? (
+        <LabwareCreator
+          goBack={() => {
+            setShowLC(false)
+          }}
+          save={(file: any) => {
+            dispatch(addCustomLabwareFileFromCreator(file))
+          }}
+          isOnRunApp
+        />
+      ) : null}
       <Box paddingX={SPACING.spacing16} paddingY={SPACING.spacing16}>
         <Flex
           flexDirection={DIRECTION_ROW}

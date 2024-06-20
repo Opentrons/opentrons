@@ -15,7 +15,6 @@ import {
   Flex,
   JUSTIFY_SPACE_BETWEEN,
   ModalShell,
-  PrimaryBtn,
   PrimaryButton,
 } from '@opentrons/components'
 import {
@@ -130,12 +129,6 @@ export const LabwareCreator = (props: LabwareCreatorProps): JSX.Element => {
     WIZARD_STEPS
   )
   const [currentStepIndex, setCurrentStepIndex] = React.useState<number>(0)
-  // React.useEffect(() => {
-  //   // re-initialize wizard step count when modal is closed
-  //   if (!showWizard && currentStepIndex > 0) {
-  //     setCurrentStepIndex(0)
-  //   }
-  // }, [showWizard])
 
   const setShowExportErrorModal = React.useMemo(
     () => (v: boolean, fieldValues?: LabwareFields) => {
@@ -381,9 +374,6 @@ export const LabwareCreator = (props: LabwareCreatorProps): JSX.Element => {
           definition
         </AlertModal>
       )}
-      {goBack != null ? (
-        <PrimaryBtn onClick={goBack}>go back</PrimaryBtn>
-      ) : null}
       <Formik
         initialValues={lastUploaded ?? getDefaultFormState()}
         enableReinitialize
