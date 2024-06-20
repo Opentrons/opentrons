@@ -1,9 +1,9 @@
 import * as React from 'react'
 import { css } from 'styled-components'
-import { TYPOGRAPHY, SPACING } from '../ui-style-constants'
+import { TYPOGRAPHY, SPACING, RESPONSIVENESS } from '../ui-style-constants'
 import { COLORS, BORDERS } from '../helix-design-system'
 import { POSITION_RELATIVE, DIRECTION_COLUMN, DIRECTION_ROW } from '../styles'
-import { Flex } from '../primitives'
+import { Btn, Flex } from '../primitives'
 
 const DEFAULT_TAB_STYLE = css`
   ${TYPOGRAPHY.pSemiBold}
@@ -27,6 +27,21 @@ const DEFAULT_TAB_STYLE = css`
     background-color: ${COLORS.grey30};
     color: ${COLORS.grey40};
   }
+
+  @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
+    border-radius: ${BORDERS.borderRadius16};
+    box-shadow: none;
+    font-size: ${TYPOGRAPHY.fontSize22};
+    font-weight: ${TYPOGRAPHY.fontWeightSemiBold};
+    line-height: ${TYPOGRAPHY.lineHeight28};
+    padding: ${SPACING.spacing16} ${SPACING.spacing24};
+    text-transform: ${TYPOGRAPHY.textTransformNone};
+
+    &:focus-visible {
+      outline-offset: 3px;
+      outline: 2px ${BORDERS.styleSolid} ${COLORS.blue50};
+    }
+  }
 `
 const CURRENT_TAB_STYLE = css`
   ${DEFAULT_TAB_STYLE}
@@ -35,6 +50,12 @@ const CURRENT_TAB_STYLE = css`
 
   &:hover {
     background-color: ${COLORS.purple55};
+  }
+`
+const INNER_CONTAINER_STYLE = css`
+  grid-gap: ${SPACING.spacing4};
+  @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
+    grid-gap: ${SPACING.spacing8};
   }
 `
 
@@ -56,9 +77,9 @@ export function Tabs(props: TabsProps): JSX.Element {
       gridGap={SPACING.spacing16}
       padding={SPACING.spacing16}
     >
-      <Flex flexDirection={DIRECTION_ROW} gridGap={SPACING.spacing4}>
+      <Flex flexDirection={DIRECTION_ROW} css={INNER_CONTAINER_STYLE}>
         {tabs.map((tab, index) => (
-          <button
+          <Btn
             key={index}
             onClick={() => {
               tab.onClick()
@@ -67,7 +88,7 @@ export function Tabs(props: TabsProps): JSX.Element {
             disabled={tab.disabled}
           >
             {tab.text}
-          </button>
+          </Btn>
         ))}
       </Flex>
     </Flex>
