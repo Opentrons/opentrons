@@ -65,7 +65,7 @@ const _createNextTimelineFrame = (args: {
   // and keep TS happy about computed properties?
   const _newTimelineFrameKeys = {
     volume: args.volume,
-    activeTips: _getNewActiveTips(args.nextFrame.commands.slice(0, args.index)),
+    activeTips: _getNewActiveTips(args.nextFrame.commands.slice(0, args.index) as CreateCommand[]),
   }
   const command = args.command
   const isAirGapCommand =

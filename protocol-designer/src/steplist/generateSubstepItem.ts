@@ -115,39 +115,39 @@ export const mergeSubstepRowsSingleChannel = (args: {
   //  TODO(jr, 5/2/24): filtering out air gap steps for now since a refactor would be required
   //  to figure out if the air gap is for the aspirate or dispense labware. Otherwise, a white screen
   //  was happening with an air gap step trying to happen in an aspirate labware well that did not exist
-  const filteredSubstepRows = substepRows.filter(row => !row.isAirGap)
+  const filteredSubstepRows = substepRows.filter(row => !Boolean(row.isAirGap))
   return steplistUtils.mergeWhen(
     filteredSubstepRows,
     (
       currentRow,
       nextRow // NOTE: if aspirate then dispense rows are adjacent, collapse them into one row
-    ) => currentRow.source && nextRow.dest,
+    ) => Boolean(currentRow.source) && nextRow.dest,
     (currentRow, nextRow) => ({
       ...currentRow,
       source: {
-        well: currentRow.source && currentRow.source.wells[0],
-        preIngreds: currentRow.source && currentRow.source.preIngreds,
-        postIngreds: currentRow.source && currentRow.source.postIngreds,
+        well: currentRow?.source?.wells?.[0],
+        preIngreds: currentRow?.source?.preIngreds,
+        postIngreds: currentRow?.source?.postIngreds,
       },
       ...nextRow,
       dest: {
-        well: nextRow.dest && nextRow.dest.wells[0],
-        preIngreds: nextRow.dest && nextRow.dest.preIngreds,
-        postIngreds: nextRow.dest && nextRow.dest.postIngreds,
+        well: nextRow?.dest?.wells?.[0],
+        preIngreds: nextRow?.dest?.preIngreds,
+        postIngreds: nextRow?.dest?.postIngreds,
       },
       volume: showDispenseVol ? nextRow.volume : currentRow.volume,
     }),
     currentRow => {
-      const source = currentRow.source && {
+      const source = currentRow.source != null ? {
         well: currentRow.source.wells[0],
         preIngreds: currentRow.source.preIngreds,
         postIngreds: currentRow.source.postIngreds,
-      }
-      const dest = currentRow.dest && {
+      } : undefined
+      const dest = currentRow.dest != null ? {
         well: currentRow.dest.wells[0],
         preIngreds: currentRow.dest.preIngreds,
         postIngreds: currentRow.dest.postIngreds,
-      }
+      } : undefined
       return {
         activeTips: currentRow.activeTips,
         source,
@@ -167,7 +167,7 @@ export const mergeSubstepRowsMultiChannel = (args: {
   //  TODO(jr, 5/2/24): filtering out air gap steps for now since a refactor would be required
   //  to figure out if the air gap is for the aspirate or dispense labware. Otherwise, a white screen
   //  was happening with an air gap step trying to happen in an aspirate labware well that did not exist
-  const filteredSubstepRows = substepRows.filter(row => !row.isAirGap)
+  const filteredSubstepRows = substepRows.filter(row => !Boolean(row.isAirGap))
   return steplistUtils.mergeWhen(
     filteredSubstepRows,
     (
@@ -177,30 +177,27 @@ export const mergeSubstepRowsMultiChannel = (args: {
       // aspirate then dispense multirows adjacent
       // (inferring from first channel row in each multirow)
       return (
-        currentMultiRow &&
-        currentMultiRow.source &&
-        nextMultiRow &&
-        nextMultiRow.dest
+        Boolean(currentMultiRow?.source) &&
+        Boolean(nextMultiRow?.dest)
       )
     }, // Merge each channel row together when predicate true
     (currentMultiRow, nextMultiRow) => {
       return range(channels).map(channelIndex => {
         const sourceChannelWell =
-          currentMultiRow.source && currentMultiRow.source.wells[channelIndex]
-        const destChannelWell =
-          nextMultiRow.dest && nextMultiRow.dest.wells[channelIndex]
-        const source = currentMultiRow.source &&
-          sourceChannelWell && {
-            well: sourceChannelWell,
-            preIngreds: currentMultiRow.source.preIngreds[sourceChannelWell],
-            postIngreds: currentMultiRow.source.postIngreds[sourceChannelWell],
-          }
-        const dest = nextMultiRow.dest &&
-          destChannelWell && {
-            well: destChannelWell,
-            preIngreds: nextMultiRow.dest.preIngreds[destChannelWell],
-            postIngreds: nextMultiRow.dest.postIngreds[destChannelWell],
-          }
+          currentMultiRow?.source?.wells?.[channelIndex]
+        const destChannelWell = nextMultiRow?.dest?.wells?.[channelIndex]
+        const source = (currentMultiRow.source != null &&
+          sourceChannelWell != null) ? {
+          well: sourceChannelWell,
+          preIngreds: currentMultiRow.source.preIngreds[sourceChannelWell],
+          postIngreds: currentMultiRow.source.postIngreds[sourceChannelWell],
+        } : undefined
+        const dest = (nextMultiRow.dest != null &&
+          destChannelWell != null) ? {
+          well: destChannelWell,
+          preIngreds: nextMultiRow.dest.preIngreds[destChannelWell],
+          postIngreds: nextMultiRow.dest.postIngreds[destChannelWell],
+        } : null
         const activeTips = currentMultiRow.activeTips
         return {
           activeTips,
@@ -215,28 +212,28 @@ export const mergeSubstepRowsMultiChannel = (args: {
     },
     currentMultiRow =>
       range(channels).map(channelIndex => {
-        const source = currentMultiRow.source && {
+        const source = currentMultiRow.source != null ? {
           well: currentMultiRow.source.wells[channelIndex],
           preIngreds:
             currentMultiRow.source.preIngreds[
-              currentMultiRow.source.wells[channelIndex]
+            currentMultiRow.source.wells[channelIndex]
             ],
           postIngreds:
             currentMultiRow.source.postIngreds[
-              currentMultiRow.source.wells[channelIndex]
+            currentMultiRow.source.wells[channelIndex]
             ],
-        }
-        const dest = currentMultiRow.dest && {
+        } : undefined
+        const dest = currentMultiRow.dest != null ? {
           well: currentMultiRow.dest.wells[channelIndex],
           preIngreds:
             currentMultiRow.dest.preIngreds[
-              currentMultiRow.dest.wells[channelIndex]
+            currentMultiRow.dest.wells[channelIndex]
             ],
           postIngreds:
             currentMultiRow.dest.postIngreds[
-              currentMultiRow.dest.wells[channelIndex]
+            currentMultiRow.dest.wells[channelIndex]
             ],
-        }
+        } : undefined
         const activeTips = currentMultiRow.activeTips
         return {
           activeTips,
@@ -264,7 +261,7 @@ function transferLikeSubsteps(args: {
   const pipetteSpec = invariantContext.pipetteEntities[pipetteId]?.spec
 
   // TODO Ian 2018-04-06 use assert here
-  if (!pipetteSpec) {
+  if (!Boolean(pipetteSpec)) {
     console.assert(
       false,
       `Pipette "${pipetteId}" does not exist, step ${stepId} can't determine channels`
@@ -280,7 +277,7 @@ function transferLikeSubsteps(args: {
     stepArgs
   )
 
-  if (!substepCommandCreator) {
+  if (substepCommandCreator == null) {
     console.assert(
       false,
       `transferLikeSubsteps could not make a command creator`
@@ -342,10 +339,10 @@ export function generateSubstepItem(
   stepId: string,
   labwareNamesByModuleId: LabwareNamesByModuleId
 ): SubstepItemData | null | undefined {
-  if (!robotState) {
+  if (robotState == null) {
     console.info(
       `No robot state, could not generate substeps for step ${stepId}.` +
-        `There was probably an upstream error.`
+      `There was probably an upstream error.`
     )
     return null
   }
@@ -353,8 +350,7 @@ export function generateSubstepItem(
   // TODO: BC: 2018-08-21 replace old error check with new logic in field, form, and timeline level
   // Don't try to render with form errors. TODO LATER: presentational error state of substeps?
   if (
-    !stepArgsAndErrors ||
-    !stepArgsAndErrors.stepArgs ||
+    stepArgsAndErrors?.stepArgs == null ||
     !isEmpty(stepArgsAndErrors.errors)
   ) {
     return null
@@ -390,7 +386,7 @@ export function generateSubstepItem(
     })
   }
 
-  const labwareNames = stepArgs.module
+  const labwareNames = stepArgs.module != null
     ? labwareNamesByModuleId[stepArgs.module]
     : null
 
@@ -416,7 +412,7 @@ export function generateSubstepItem(
         : null
     return {
       substepType: 'temperature',
-      temperature: temperature,
+      temperature,
       labwareNickname: labwareNames?.nickname,
       message: stepArgs.message,
       moduleId: stepArgs.module,
