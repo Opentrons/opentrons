@@ -30,7 +30,6 @@ import { Parameters } from '../Parameters'
 import { mockRunTimeParameterData } from '../fixtures'
 
 import type { HostConfig } from '@opentrons/api-client'
-import { result } from 'lodash'
 
 // Mock IntersectionObserver
 class IntersectionObserver {

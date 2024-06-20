@@ -44,6 +44,7 @@ import {
   getApplyHistoricOffsets,
   getPinnedProtocolIds,
   updateConfigValue,
+  useFeatureFlag,
 } from '../../redux/config'
 import { useOffsetCandidatesForAnalysis } from '../../organisms/ApplyHistoricOffsets/hooks/useOffsetCandidatesForAnalysis'
 import {
@@ -57,7 +58,6 @@ import { Hardware } from './Hardware'
 import { Labware } from './Labware'
 import { Liquids } from './Liquids'
 import { formatTimeWithUtcLabel } from '../../resources/runs'
-import { useFeatureFlag } from '../../redux/config'
 
 import type { Protocol } from '@opentrons/api-client'
 import type { ModalHeaderBaseProps } from '../../molecules/Modal/types'
