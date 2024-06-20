@@ -1,7 +1,6 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { css } from 'styled-components'
-import { useSelector } from 'react-redux'
 import {
   ALIGN_CENTER,
   BORDERS,
@@ -15,14 +14,12 @@ import {
   StyledText,
 } from '@opentrons/components'
 import { useAllCsvFilesQuery } from '@opentrons/react-api-client'
-import { getStoredProtocols } from '../../redux/protocol-storage'
 import { formatInterval } from '../RunTimeControl/utils'
 import { formatTimestamp } from './utils'
 import { EMPTY_TIMESTAMP } from './constants'
 import { HistoricalProtocolRunOverflowMenu as OverflowMenu } from './HistoricalProtocolRunOverflowMenu'
 import { HistoricalProtocolRunDrawer as Drawer } from './HistoricalProtocolRunDrawer'
 import type { RunData } from '@opentrons/api-client'
-import type { State } from '../../redux/types'
 
 const PROTOCOL_NAME_STYLE = css`
   overflow: ${OVERFLOW_HIDDEN};
@@ -44,9 +41,6 @@ export function HistoricalProtocolRun(
   const { t } = useTranslation('run_details')
   const { run, protocolName, robotIsBusy, robotName, protocolKey } = props
   const [drawerOpen, setDrawerOpen] = React.useState(false)
-  const storedProtocols = useSelector((state: State) =>
-    getStoredProtocols(state)
-  )
   const { data: protocolFileData } = useAllCsvFilesQuery(run.protocolId ?? '')
   const allProtocolDataFiles =
     protocolFileData != null ? protocolFileData.data.files : []
