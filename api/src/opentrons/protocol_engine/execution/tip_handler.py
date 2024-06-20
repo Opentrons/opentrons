@@ -180,7 +180,7 @@ class HardwareTipHandler(TipHandler):
             )
             try:
                 await self.verify_tip_presence(pipette_id, TipPresenceStatus.PRESENT)
-            except PythonException:
+            except TipNotAttachedError:
                 raise
             else:
                 self._hardware_api.cache_tip(hw_mount, actual_tip_length)

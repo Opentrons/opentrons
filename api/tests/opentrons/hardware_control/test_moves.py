@@ -292,7 +292,7 @@ async def test_tip_pickup_routine(hardware_api, monkeypatch):
     spec, _ = hardware_api.plan_check_pick_up_tip(
         mount=mount, tip_length=40.0, presses=None, increment=None
     )
-    await hardware_api.tip_pickup_moves(mount, spec)
+    await hardware_api._tip_pickup_moves(mount, spec)
 
     tip_motor_routine_num_moves = 2 * len(spec.presses)
 
