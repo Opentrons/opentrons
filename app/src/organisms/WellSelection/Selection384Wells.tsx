@@ -97,20 +97,29 @@ export function Selection384Wells({
     const nextIndex = lastSelectedIndex == null ? 0 : lastSelectedIndex + 1
 
     if (selectBy === 'columns') {
-      // for 8-channel, select all rows unless only one starting well option is selected
-      if (startingWellState.A1 === startingWellState.B1) {
-        selectWells({
-          [columns[nextIndex][0]]: null,
-          [columns[nextIndex][1]]: null,
-        })
-      } else if (startingWellState.A1) {
-        selectWells({
-          [columns[nextIndex][0]]: null,
-        })
-      } else if (startingWellState.B1) {
-        selectWells({
-          [columns[nextIndex][1]]: null,
-        })
+      if (channels === 8) {
+        // for 8-channel, select first and second member of column (all rows) unless only one starting well option is selected
+        if (startingWellState.A1 === startingWellState.B1) {
+          selectWells({
+            [columns[nextIndex][0]]: null,
+            [columns[nextIndex][1]]: null,
+          })
+        } else if (startingWellState.A1) {
+          selectWells({
+            [columns[nextIndex][0]]: null,
+          })
+        } else if (startingWellState.B1) {
+          selectWells({
+            [columns[nextIndex][1]]: null,
+          })
+        }
+      } else {
+        // for single channel, select all members of column
+        selectWells(
+          columns[nextIndex].reduce((acc, well) => {
+            return { ...acc, [well]: null }
+          }, {})
+        )
       }
     } else if (selectBy === 'wells') {
       selectWells({
