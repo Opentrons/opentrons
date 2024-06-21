@@ -22,11 +22,11 @@ export function getLabwareDisplayLocation(
   if (location === 'offDeck') {
     return t('off_deck')
   } else if ('slotName' in location) {
-    return isOnDevice === true
+    return isOnDevice
       ? location.slotName
       : t('slot', { slot_name: location.slotName })
   } else if ('addressableAreaName' in location) {
-    return isOnDevice === true
+    return isOnDevice
       ? location.addressableAreaName
       : t('slot', { slot_name: location.addressableAreaName })
   } else if ('moduleId' in location) {
@@ -39,7 +39,7 @@ export function getLabwareDisplayLocation(
         commandTextData,
         location.moduleId
       )
-      return isOnDevice === true
+      return isOnDevice
         ? `${getModuleDisplayName(moduleModel)}, ${slotName}`
         : t('module_in_slot', {
             count: getOccludedSlotCountForModule(

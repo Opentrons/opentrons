@@ -3,7 +3,6 @@ import { GRIPPER_WASTE_CHUTE_ADDRESSABLE_AREA } from '@opentrons/shared-data'
 import { getLabwareName } from './utils'
 import { getLabwareDisplayLocation } from './utils/getLabwareDisplayLocation'
 import { getFinalLabwareLocation } from './utils/getFinalLabwareLocation'
-
 import type {
   MoveLabwareRunTimeCommand,
   RobotType,
