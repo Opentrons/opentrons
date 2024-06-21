@@ -18,8 +18,8 @@ import {
   TYPOGRAPHY,
   StyledText,
   BaseDeck,
-  getLabwareInfoByLiquidId, 
-  BORDERS
+  getLabwareInfoByLiquidId,
+  BORDERS,
 } from '@opentrons/components'
 import { getResultingTimelineFrameFromRunCommands } from '@opentrons/step-generation'
 import {
@@ -27,7 +27,12 @@ import {
   getSimplestDeckConfigForProtocol,
 } from '@opentrons/shared-data'
 
-import type { CompletedProtocolAnalysis, ProtocolAnalysisOutput, RobotType, RunTimeCommand } from '@opentrons/shared-data'
+import type {
+  CompletedProtocolAnalysis,
+  ProtocolAnalysisOutput,
+  RobotType,
+  RunTimeCommand,
+} from '@opentrons/shared-data'
 import type {
   InvariantContext,
   LocationLiquidState,
@@ -40,7 +45,7 @@ import { getWellFillFromLabwareId } from '../Devices/ProtocolRun/SetupLiquids/ut
 import { CommandText } from '../../molecules/Command'
 
 import type { ViewportListRef } from 'react-viewport-list'
-import type {LabwareOnDeck } from '@opentrons/components'
+import type { LabwareOnDeck } from '@opentrons/components'
 import { getCommandTextData } from '../../molecules/Command/utils/getCommandTextData'
 
 const COMMAND_WIDTH_PX = 240
@@ -76,7 +81,9 @@ export function ProtocolTimelineScrubber(
   )
 
   const currentCommandsSlice = commands.slice(0, currentCommandIndex + 1)
-  const { frame, invariantContext } = getResultingTimelineFrameFromRunCommands( currentCommandsSlice)
+  const { frame, invariantContext } = getResultingTimelineFrameFromRunCommands(
+    currentCommandsSlice
+  )
   const { robotState, command } = frame
 
   const [leftPipetteId] = Object.entries(robotState.pipettes).find(
@@ -96,8 +103,12 @@ export function ProtocolTimelineScrubber(
       : null
 
   return (
-    <Flex  height="95vh" flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing8}>
-      <Flex  gridGap={SPACING.spacing8} flex="1 1 0">
+    <Flex
+      height="95vh"
+      flexDirection={DIRECTION_COLUMN}
+      gridGap={SPACING.spacing8}
+    >
+      <Flex gridGap={SPACING.spacing8} flex="1 1 0">
         <Flex flex="1 1 0" width="300px">
           <BaseDeck
             robotType={robotType}
@@ -107,27 +118,33 @@ export function ProtocolTimelineScrubber(
                 Object.entries(robotState.labware).find(
                   ([labwareId, labware]) => labware.slot === moduleId
                 )?.[0] ?? null
-              
+
               return {
                 moduleModel: invariantContext.moduleEntities[moduleId].model,
                 moduleLocation: { slotName: module.slot },
-                nestedLabwareDef: invariantContext.labwareEntities[labwareInModuleId]?.def,
-                nestedLabwareWellFill: labwareInModuleId != null ? getWellFillFromLabwareId(labwareInModuleId, analysis.liquids, getLabwareInfoByLiquidId(currentCommandsSlice)): undefined,
-                innerProps: {} // TODO: wire up module state
+                nestedLabwareDef:
+                  invariantContext.labwareEntities[labwareInModuleId]?.def,
+                nestedLabwareWellFill:
+                  labwareInModuleId != null
+                    ? getWellFillFromLabwareId(
+                        labwareInModuleId,
+                        analysis.liquids,
+                        getLabwareInfoByLiquidId(currentCommandsSlice)
+                      )
+                    : undefined,
+                innerProps: {}, // TODO: wire up module state
               }
             })}
-            labwareOnDeck={
-              map(robotState.labware, (labware, labwareId) => {
-                if (
-                  labware.slot in robotState.modules ||
-                  labwareId === 'fixedTrash'
-                )
-                  return null
-                const definition =
-                  invariantContext.labwareEntities[labwareId].def
+            labwareOnDeck={map(robotState.labware, (labware, labwareId) => {
+              if (
+                labware.slot in robotState.modules ||
+                labwareId === 'fixedTrash'
+              )
+                return null
+              const definition = invariantContext.labwareEntities[labwareId].def
 
-                const missingTips = definition.parameters.isTiprack
-                  ? reduce(
+              const missingTips = definition.parameters.isTiprack
+                ? reduce(
                     robotState.tipState.tipracks[labwareId],
                     (acc, hasTip, wellName) => {
                       if (!hasTip) return { ...acc, [wellName]: null }
@@ -135,15 +152,19 @@ export function ProtocolTimelineScrubber(
                     },
                     {}
                   )
-                  : {}
-                
-                return {
-                  labwareLocation: { slotName: labware.slot } ,
-                  definition,
-                  wellFill: getWellFillFromLabwareId(labwareId, analysis.liquids, getLabwareInfoByLiquidId(currentCommandsSlice)),
-                  missingTips,
-                }
-              }).filter((i): i is LabwareOnDeck => i != null)}
+                : {}
+
+              return {
+                labwareLocation: { slotName: labware.slot },
+                definition,
+                wellFill: getWellFillFromLabwareId(
+                  labwareId,
+                  analysis.liquids,
+                  getLabwareInfoByLiquidId(currentCommandsSlice)
+                ),
+                missingTips,
+              }
+            }).filter((i): i is LabwareOnDeck => i != null)}
           />
         </Flex>
         <PipetteMountViz
@@ -176,7 +197,8 @@ export function ProtocolTimelineScrubber(
         ref={wrapperRef}
         alignSelf={ALIGN_STRETCH}
         overflowY="scroll"
-        width="100%">
+        width="100%"
+      >
         <ViewportList
           viewportRef={wrapperRef}
           ref={commandListRef}
@@ -217,23 +239,20 @@ export function ProtocolTimelineScrubber(
           {commands.length}
         </Text>
       </Flex>
-      {
-        currentCommandIndex !== 0 &&
-          currentCommandIndex !== commands.length - 1 ? (
-          <Text
-            as="p"
-            fontSize="0.5rem"
-            marginLeft={
-              (currentCommandIndex / (commands.length - 1)) *
-              886
-              // (wrapperRef.current?.getBoundingClientRect()?.width - 6 ?? 0)
-            }
-          >
-            {currentCommandIndex + 1}
-          </Text>
-        ) : null
-      }
-    </Flex >
+      {currentCommandIndex !== 0 &&
+      currentCommandIndex !== commands.length - 1 ? (
+        <Text
+          as="p"
+          fontSize="0.5rem"
+          marginLeft={
+            (currentCommandIndex / (commands.length - 1)) * 886
+            // (wrapperRef.current?.getBoundingClientRect()?.width - 6 ?? 0)
+          }
+        >
+          {currentCommandIndex + 1}
+        </Text>
+      ) : null}
+    </Flex>
   )
 }
 interface PipetteMountVizProps {
@@ -251,7 +270,7 @@ function PipetteMountViz(props: PipetteMountVizProps): JSX.Element | null {
     pipetteId,
     timelineFrame,
     invariantContext,
-    analysis
+    analysis,
   } = props
   const { robotState } = timelineFrame
   const [showPipetteDetails, setShowPipetteDetails] = React.useState(false)
@@ -259,25 +278,33 @@ function PipetteMountViz(props: PipetteMountVizProps): JSX.Element | null {
   const maxVolume = (Object.entries(
     invariantContext.pipetteEntities[pipetteId]?.tiprackLabwareDef?.wells ?? {}
   ).find(([_wellName, { totalLiquidVolume }]) => totalLiquidVolume != null) ?? [
-      null,
-      { totalLiquidVolume: 0 },
-    ])[1].totalLiquidVolume
-
+    null,
+    { totalLiquidVolume: 0 },
+  ])[1].totalLiquidVolume
 
   return (
-    <Flex alignItems={ALIGN_CENTER} flexDirection={DIRECTION_COLUMN} maxWidth="4rem">
+    <Flex
+      alignItems={ALIGN_CENTER}
+      flexDirection={DIRECTION_COLUMN}
+      maxWidth="4rem"
+    >
       <StyledText
         as="h1"
         textTransform={TEXT_TRANSFORM_UPPERCASE}
         cursor="pointer"
-        onClick={() => setShowPipetteDetails(!showPipetteDetails)}>
+        onClick={() => setShowPipetteDetails(!showPipetteDetails)}
+      >
         {mount}
       </StyledText>
-      {showPipetteDetails ?
-        <StyledText as="p" fontSize={TYPOGRAPHY.fontSizeCaption} marginY={SPACING.spacing8}>
+      {showPipetteDetails ? (
+        <StyledText
+          as="p"
+          fontSize={TYPOGRAPHY.fontSizeCaption}
+          marginY={SPACING.spacing8}
+        >
           {pipetteEntity?.spec?.displayName ?? 'none'}
         </StyledText>
-        : null}
+      ) : null}
       {pipetteEntity != null && pipetteId != null ? (
         <PipetteSideView
           allNozzlesHaveTips={robotState.tipState.pipettes[pipetteId]}
@@ -305,7 +332,7 @@ function PipetteSideView({
   liquidEntities,
   maxVolume,
   allNozzlesHaveTips,
-  analysis
+  analysis,
 }: SideViewProps): JSX.Element {
   const channelCount = Math.min(Object.keys(allNozzleTipContents).length, 8)
   return (
@@ -335,27 +362,30 @@ function PipetteSideView({
           <rect x="30" y="0" height="40" width="40" stroke="#000" />
           <path d="M30,40 L10,85 H90 L70,40 H30z" stroke="#000" />
           <rect x="10" y="85" height="45" width="80" stroke="#000" />
-          {Object.values(allNozzleTipContents).slice(0, 8).map((tipContents, index) => {
-            const x = index * 10 + 10
-            return allNozzlesHaveTips ? (
-              <TipSideView
-                x={x}
-                y={130}
-                key={index}
-                tipContents={tipContents}
-                liquidEntities={liquidEntities}
-                maxVolume={maxVolume}
-                analysis={analysis}
-              />
-            ) : (
-              <path
-                d={`M${x + 2},130 L${x + 4},140 H${x + 6} L${x + 8},130 H${x + 2
+          {Object.values(allNozzleTipContents)
+            .slice(0, 8)
+            .map((tipContents, index) => {
+              const x = index * 10 + 10
+              return allNozzlesHaveTips ? (
+                <TipSideView
+                  x={x}
+                  y={130}
+                  key={index}
+                  tipContents={tipContents}
+                  liquidEntities={liquidEntities}
+                  maxVolume={maxVolume}
+                  analysis={analysis}
+                />
+              ) : (
+                <path
+                  d={`M${x + 2},130 L${x + 4},140 H${x + 6} L${x + 8},130 H${
+                    x + 2
                   }z`}
-                stroke="#000"
-                fill="#000"
-              />
-            )
-          })}
+                  stroke="#000"
+                  fill="#000"
+                />
+              )
+            })}
         </>
       )}
     </svg>
@@ -376,7 +406,7 @@ function TipSideView({
   maxVolume,
   x,
   y,
-  analysis
+  analysis,
 }: TipSideViewProps): JSX.Element {
   const emptyVolumeLeft =
     maxVolume -
@@ -391,7 +421,8 @@ function TipSideView({
       <rect x={x} y={y} height={yOfFirstLiquid} width="10" fill="#FFF" />
       {Object.entries(tipContents).map(([liquidId, { volume }]) => {
         if (liquidId === '__air__') return null
-        const displayColor = analysis.liquids.find(l => l.id === liquidId)?.displayColor
+        const displayColor = analysis.liquids.find(l => l.id === liquidId)
+          ?.displayColor
         return (
           <rect
             key={liquidId}
@@ -404,14 +435,16 @@ function TipSideView({
         )
       })}
       <path
-        d={`M${x},130 V150 L${x + 2},170 L${x + 4},180 H${x + 6} L${x + 8
-          },170 L${x + 10},150 V130 H${x}z`}
+        d={`M${x},130 V150 L${x + 2},170 L${x + 4},180 H${x + 6} L${
+          x + 8
+        },170 L${x + 10},150 V130 H${x}z`}
         stroke="#000"
         fill="none"
       />
       <path
-        d={`M${x - 1},129 V150 L${x + 2},170 L${x + 4},180 H${x + 6} L${x + 8
-          },170 L${x + 10},150 V130 H${x + 11} V181 H${x - 1} V129z`}
+        d={`M${x - 1},129 V150 L${x + 2},170 L${x + 4},180 H${x + 6} L${
+          x + 8
+        },170 L${x + 10},150 V130 H${x + 11} V181 H${x - 1} V129z`}
         fill="#FFF"
         stroke="none"
       />
@@ -429,7 +462,14 @@ interface CommandItemProps {
 }
 function CommandItem(props: CommandItemProps): JSX.Element {
   const [showDetails, setShowDetails] = React.useState(false)
-  const { index, command, currentCommandIndex, setCurrentCommandIndex, analysis, robotType } = props
+  const {
+    index,
+    command,
+    currentCommandIndex,
+    setCurrentCommandIndex,
+    analysis,
+    robotType,
+  } = props
   return (
     <Flex
       key={index}
@@ -437,8 +477,8 @@ function CommandItem(props: CommandItemProps): JSX.Element {
         index === currentCommandIndex
           ? COLORS.blue35
           : index < currentCommandIndex
-            ? '#00002222'
-            : '#fff'
+          ? '#00002222'
+          : '#fff'
       }
       border={
         index === currentCommandIndex
@@ -459,42 +499,49 @@ function CommandItem(props: CommandItemProps): JSX.Element {
         onClick={() => setShowDetails(!showDetails)}
         as="p"
         fontSize="0.5rem"
-        alignSelf={ALIGN_FLEX_END}>
+        alignSelf={ALIGN_FLEX_END}
+      >
         {index + 1}
       </Text>
-      <CommandText command={command} commandTextData={getCommandTextData(analysis)} robotType={robotType} />
-      {showDetails ? Object.entries(command.params ?? {}).map(([key, value]) => (
-        <Flex
-          key={key}
-          flexDirection={DIRECTION_COLUMN}
-          marginBottom={SPACING.spacing2}
-          paddingLeft={SPACING.spacing2}
-        >
-          <Text as="label" fontSize="0.6rem" marginRight={SPACING.spacing2}>
-            {key}:
-          </Text>
-          {value != null && typeof value === 'object' ? (
-            Object.entries(value).map(([innerKey, innerValue]) => (
-              <Flex key={innerKey}>
-                <Text
-                  as="label"
-                  fontSize="0.6rem"
-                  marginRight={SPACING.spacing2}
-                >
-                  {key}:
+      <CommandText
+        command={command}
+        commandTextData={getCommandTextData(analysis)}
+        robotType={robotType}
+      />
+      {showDetails
+        ? Object.entries(command.params ?? {}).map(([key, value]) => (
+            <Flex
+              key={key}
+              flexDirection={DIRECTION_COLUMN}
+              marginBottom={SPACING.spacing2}
+              paddingLeft={SPACING.spacing2}
+            >
+              <Text as="label" fontSize="0.6rem" marginRight={SPACING.spacing2}>
+                {key}:
+              </Text>
+              {value != null && typeof value === 'object' ? (
+                Object.entries(value).map(([innerKey, innerValue]) => (
+                  <Flex key={innerKey}>
+                    <Text
+                      as="label"
+                      fontSize="0.6rem"
+                      marginRight={SPACING.spacing2}
+                    >
+                      {key}:
+                    </Text>
+                    <Text as="p" fontSize="0.6rem" title={String(innerValue)}>
+                      {String(innerValue)}
+                    </Text>
+                  </Flex>
+                ))
+              ) : (
+                <Text as="p" fontSize="0.6rem" title={String(value)}>
+                  {String(value)}
                 </Text>
-                <Text as="p" fontSize="0.6rem" title={String(innerValue)}>
-                  {String(innerValue)}
-                </Text>
-              </Flex>
-            ))
-          ) : (
-            <Text as="p" fontSize="0.6rem" title={String(value)}>
-              {String(value)}
-            </Text>
-          )}
-        </Flex>
-      )) : null}
+              )}
+            </Flex>
+          ))
+        : null}
     </Flex>
   )
 }

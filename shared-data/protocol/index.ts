@@ -34,7 +34,7 @@ export type {
   ProtocolFileV4,
   ProtocolFileV5,
   ProtocolFileV6,
-  ProtocolFileV7
+  ProtocolFileV7,
 }
 export type JsonProtocolFile =
   | Readonly<ProtocolFileV1<{}>>

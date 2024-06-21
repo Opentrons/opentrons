@@ -182,7 +182,7 @@ export function ProtocolOverflowMenu(
           >
             {t('show_in_folder')}
           </MenuItem>
-          <MenuItem onClick={handleClickEdit} >
+          <MenuItem onClick={handleClickEdit}>
             {i18n.format(t('edit'), 'capitalize')}
           </MenuItem>
           <MenuItem

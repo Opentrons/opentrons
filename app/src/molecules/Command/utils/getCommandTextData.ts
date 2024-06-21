@@ -7,7 +7,10 @@ import type {
 import type { CommandTextData } from '../types'
 
 export function getCommandTextData(
-  protocolData: CompletedProtocolAnalysis | LegacyGoodRunData | ProtocolAnalysisOutput,
+  protocolData:
+    | CompletedProtocolAnalysis
+    | LegacyGoodRunData
+    | ProtocolAnalysisOutput,
   protocolCommands?: RunTimeCommand[]
 ): CommandTextData {
   const { pipettes, labware, modules, liquids } = protocolData
