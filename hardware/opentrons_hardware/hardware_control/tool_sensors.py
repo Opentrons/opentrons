@@ -196,27 +196,18 @@ async def run_sync_buffer_to_csv(
         )
         async with sensor_capturer:
             messenger.add_listener(sensor_capturer, None)
-            await messenger.send(
-                node_id=tool,
-                message=SendAccumulatedSensorDataRequest(
+            request = SendAccumulatedSensorDataRequest(
                     payload=SendAccumulatedSensorDataPayload(
                         sensor_id=SensorIdField(sensor_id),
                         sensor_type=SensorTypeField(sensor_type),
                     )
-                ),
-            )
-            await sensor_capturer.wait_for_complete()
-            messenger.remove_listener(sensor_capturer)
-        await messenger.send(
-            node_id=tool,
-            message=BindSensorOutputRequest(
-                payload=BindSensorOutputRequestPayload(
-                    sensor=SensorTypeField(sensor_type),
-                    sensor_id=SensorIdField(sensor_id),
-                    binding=SensorOutputBindingField(SensorOutputBinding.none),
                 )
-            ),
-        )
+            await messenger.send(
+                node_id=tool,
+                message=request,
+            )
+            await sensor_capturer.wait_for_complete(message_index=request.payload.message_index.value)
+            messenger.remove_listener(sensor_capturer)
     return positions
 
 
