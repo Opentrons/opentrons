@@ -86,10 +86,19 @@ export function ModalContentMixed(props: ModalContentMixedProps): JSX.Element {
         `}
       >
         {props.headline != null ? (
-          <StyledText as="h3Bold">{props.headline}</StyledText>
+          <StyledText
+            oddStyle="level3HeaderBold"
+            desktopStyle="headingSmallBold"
+          >
+            {props.headline}
+          </StyledText>
         ) : null}
         {props.subText != null ? (
-          <StyledText as="h4" color={COLORS.grey60}>
+          <StyledText
+            oddStyle="level4HeaderRegular"
+            desktopStyle="bodyDefaultRegular"
+            color={COLORS.grey60}
+          >
             {props.subText}
           </StyledText>
         ) : null}
