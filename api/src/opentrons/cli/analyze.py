@@ -426,4 +426,3 @@ class AnalyzeResults(BaseModel):
     modules: List[LoadedModule]
     liquids: List[Liquid]
     errors: List[ErrorOccurrence]
-    commandAnnotations: List[Any]
