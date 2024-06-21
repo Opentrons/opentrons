@@ -36,6 +36,8 @@ from opentrons.protocol_engine import (
     Command,
     CommandCreate,
     LabwareOffset,
+    create_protocol_engine,
+    Config as ProtocolEngineConfig,
 )
 
 from robot_server.protocols.protocol_store import ProtocolResource
@@ -159,12 +161,16 @@ class EngineStore:
 
         default_orchestrator = self._default_run_orchestrator
         if default_orchestrator is None:
-            self._default_run_orchestrator = await RunOrchestrator.build_orchestrator(
+            engine = await create_protocol_engine(
                 hardware_api=self._hardware_api,
-                deck_configuration=[],
-                robot_type=self._robot_type,
-                deck_type=self._deck_type,
-                block_on_door_open=False,
+                config=ProtocolEngineConfig(
+                    robot_type=self._robot_type,
+                    deck_type=self._deck_type,
+                    block_on_door_open=False,
+                ),
+            )
+            self._default_run_orchestrator = RunOrchestrator.build_orchestrator(
+                protocol_engine=engine, hardware_api=self._hardware_api
             )
             return self._default_run_orchestrator
         return default_orchestrator
@@ -205,17 +211,23 @@ class EngineStore:
 
         if self._run_orchestrator is not None:
             raise EngineConflictError("Another run is currently active.")
-
-        self._run_orchestrator = await RunOrchestrator.build_orchestrator(
-            run_id=run_id,
+        engine = await create_protocol_engine(
+            hardware_api=self._hardware_api,
+            config=ProtocolEngineConfig(
+                robot_type=self._robot_type,
+                deck_type=self._deck_type,
+                block_on_door_open=feature_flags.enable_door_safety_switch(
+                    RobotTypeEnum.robot_literal_to_enum(self._robot_type)
+                ),
+            ),
             load_fixed_trash=load_fixed_trash,
             deck_configuration=deck_configuration,
             notify_publishers=notify_publishers,
-            robot_type=self._robot_type,
-            deck_type=self._deck_type,
-            block_on_door_open=feature_flags.enable_door_safety_switch(
-                RobotTypeEnum.robot_literal_to_enum(self._robot_type)
-            ),
+        )
+
+        self._run_orchestrator = RunOrchestrator.build_orchestrator(
+            run_id=run_id,
+            protocol_engine=engine,
             hardware_api=self._hardware_api,
             protocol_config=protocol.source.config if protocol else None,
             post_run_hardware_state=post_run_hardware_state,

@@ -172,11 +172,9 @@ def test_build_run_orchestrator_provider(
     ).then_return(mock_protocol_runner)
 
     result = subject.build_orchestrator(
+        protocol_engine=mock_protocol_engine,
         hardware_api=mock_hardware_api,
         protocol_config=input_protocol_config,
-        deck_type=DeckType.OT3_STANDARD,
-        robot_type="OT-3 Standard",
-        block_on_door_open=False,
     )
 
     assert isinstance(result, RunOrchestrator)

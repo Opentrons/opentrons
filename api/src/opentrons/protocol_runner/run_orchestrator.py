@@ -100,7 +100,7 @@ class RunOrchestrator:
         return self._run_id
 
     @classmethod
-    async def build_orchestrator(
+    def build_orchestrator(
         cls,
         hardware_api: HardwareControlAPI,
         protocol_engine: ProtocolEngine,

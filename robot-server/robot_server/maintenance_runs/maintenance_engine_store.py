@@ -15,6 +15,8 @@ from opentrons.protocol_engine import (
     Command,
     CommandCreate,
     LabwareOffset,
+    create_protocol_engine,
+    Config as ProtocolEngineConfig,
 )
 from opentrons.protocol_runner import RunResult, RunOrchestrator
 
@@ -164,17 +166,22 @@ class MaintenanceEngineStore:
             self._run_orchestrator is None
         ), "There is an active maintenance run that was not cleared correctly."
 
-        self._run_orchestrator = await RunOrchestrator.build_orchestrator(
-            run_id=run_id,
+        engine = await create_protocol_engine(
             hardware_api=self._hardware_api,
-            robot_type=self._robot_type,
-            deck_type=self._deck_type,
-            block_on_door_open=feature_flags.enable_door_safety_switch(
-                RobotTypeEnum.robot_literal_to_enum(self._robot_type)
+            config=ProtocolEngineConfig(
+                robot_type=self._robot_type,
+                deck_type=self._deck_type,
+                block_on_door_open=feature_flags.enable_door_safety_switch(
+                    RobotTypeEnum.robot_literal_to_enum(self._robot_type)
+                ),
             ),
             deck_configuration=deck_configuration,
-            load_fixed_trash=False,
             notify_publishers=notify_publishers,
+        )
+        self._run_orchestrator = RunOrchestrator.build_orchestrator(
+            run_id=run_id,
+            hardware_api=self._hardware_api,
+            protocol_engine=engine,
         )
 
         for offset in labware_offsets:
