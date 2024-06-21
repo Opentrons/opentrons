@@ -1,7 +1,4 @@
 import { selectors as loadFileSelectors } from './load-file'
-import { loadFileAction } from './load-file/actions'
-import { remote } from './shell/remote'
-import type { PDProtocolFile } from './file-types'
 import type { BaseState } from './types'
 
 //  TODO(Jr, 1/18/24): use i18n here!
@@ -16,10 +13,4 @@ export const initialize = (store: Record<string, any>): void => {
         : undefined
     }
   }
-  remote.ipcRenderer.on(
-    'open-protocol-in-designer',
-    (_ipcEvent, protocolSource) => {
-      store.dispatch(loadFileAction(protocolSource as PDProtocolFile, true))
-    }
-  )
 }
