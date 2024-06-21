@@ -32,7 +32,7 @@ context('Tubes and Block', () => {
       .contains(/^Tubes$/)
       .click()
 
-    cy.contains('start creating labware').click({ force: true })
+    cy.contains('Start creating labware').click({ force: true })
   })
   describe('96 Well', () => {
     describe('Tubes', () => {
