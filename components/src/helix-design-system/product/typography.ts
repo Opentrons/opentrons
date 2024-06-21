@@ -119,7 +119,7 @@ const fontFamilyCaption = fontFamily
 export const fontSizeCaptionSemiBold = fontSizeCaption
 export const lineHeightCaptionSemiBold = lineHeightCaption
 export const fontFamilyCaptionSemiBold = fontFamilyCaption
-export const fontWeightCaptionSemiBold = '500'
+export const fontWeightCaptionSemiBold = fontWeightSemiBold
 export const fontStyleCaptionSemiBold = `${fontWeightCaptionSemiBold} ${fontSizeCaptionSemiBold}/${lineHeightCaptionSemiBold} ${fontFamilyCaptionSemiBold}`
 
 // Caption-Regular
@@ -130,7 +130,7 @@ export const fontWeightCaptionRegular = fontWeightRegular
 export const fontStyleCaptionRegular = `${fontWeightCaptionRegular} ${fontSizeCaptionRegular}/${lineHeightCaptionRegular} ${fontFamilyCaptionRegular}`
 
 // Code
-const fontSizeCode = '0.75rem' // 12px
+const fontSizeCode = '0.8125rem' // 12px
 const lineHeightCode = '1.25rem' // 20px
 const fontFamilyCode = 'Reddit Mono'
 
