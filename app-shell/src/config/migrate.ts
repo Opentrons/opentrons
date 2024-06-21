@@ -25,7 +25,6 @@ import type {
   ConfigV19,
   ConfigV20,
   ConfigV21,
-  ConfigV22,
 } from '@opentrons/app/src/redux/config/types'
 // format
 // base config v0 defaults
@@ -384,30 +383,13 @@ const toVersion21 = (prevConfig: ConfigV20): ConfigV21 => {
       ...prevConfig.onDeviceDisplaySettings,
       unfinishedUnboxingFlowRoute:
         prevConfig.onDeviceDisplaySettings.unfinishedUnboxingFlowRoute ===
-          '/dashboard'
+        '/dashboard'
           ? null
           : prevConfig.onDeviceDisplaySettings.unfinishedUnboxingFlowRoute,
     },
   }
 }
-const toVersion22 = (prevConfig: ConfigV21): ConfigV22 => {
-  return {
-    ...prevConfig,
-    version: 22 as const,
-    protocolEditorUi: {
-      width: 1300,
-      minWidth: 600,
-      height: 768,
-      url: {
-        protocol: 'file:',
-        path: 'ui/index.html',
-      },
-      webPreferences: {
-        webSecurity: true,
-      },
-    },
-  }
-}
+
 const MIGRATIONS: [
   (prevConfig: ConfigV0) => ConfigV1,
   (prevConfig: ConfigV1) => ConfigV2,
@@ -429,32 +411,30 @@ const MIGRATIONS: [
   (prevConfig: ConfigV17) => ConfigV18,
   (prevConfig: ConfigV18) => ConfigV19,
   (prevConfig: ConfigV19) => ConfigV20,
-  (prevConfig: ConfigV20) => ConfigV21,
-  (prevConfig: ConfigV21) => ConfigV22
+  (prevConfig: ConfigV20) => ConfigV21
 ] = [
-    toVersion1,
-    toVersion2,
-    toVersion3,
-    toVersion4,
-    toVersion5,
-    toVersion6,
-    toVersion7,
-    toVersion8,
-    toVersion9,
-    toVersion10,
-    toVersion11,
-    toVersion12,
-    toVersion13,
-    toVersion14,
-    toVersion15,
-    toVersion16,
-    toVersion17,
-    toVersion18,
-    toVersion19,
-    toVersion20,
-    toVersion21,
-    toVersion22,
-  ]
+  toVersion1,
+  toVersion2,
+  toVersion3,
+  toVersion4,
+  toVersion5,
+  toVersion6,
+  toVersion7,
+  toVersion8,
+  toVersion9,
+  toVersion10,
+  toVersion11,
+  toVersion12,
+  toVersion13,
+  toVersion14,
+  toVersion15,
+  toVersion16,
+  toVersion17,
+  toVersion18,
+  toVersion19,
+  toVersion20,
+  toVersion21,
+]
 
 export const DEFAULTS: Config = migrate(DEFAULTS_V0)
 
@@ -482,7 +462,6 @@ export function migrate(
     | ConfigV19
     | ConfigV20
     | ConfigV21
-    | ConfigV22
 ): Config {
   const prevVersion = prevConfig.version
   let result = prevConfig

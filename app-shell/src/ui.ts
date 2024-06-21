@@ -8,23 +8,23 @@ import { createLogger } from './log'
 
 import type { Action } from './types'
 
-const uiConfig = getConfig('ui')
+const config = getConfig('ui')
 const log = createLogger('ui')
 
 const urlPath =
-  uiConfig.url.protocol === 'file:'
-    ? path.join(app.getAppPath(), uiConfig.url.path)
-    : uiConfig.url.path
+  config.url.protocol === 'file:'
+    ? path.join(app.getAppPath(), config.url.path)
+    : config.url.path
 
-const url = `${uiConfig.url.protocol}//${urlPath}`
+const url = `${config.url.protocol}//${urlPath}`
 
 const WINDOW_OPTS = {
   show: false,
   useContentSize: true,
-  width: uiConfig.width,
-  minWidth: uiConfig.minWidth,
-  height: uiConfig.height,
-  // allow webPreferences to be set at launchtime from uiConfig
+  width: config.width,
+  minWidth: config.minWidth,
+  height: config.height,
+  // allow webPreferences to be set at launchtime from config
   webPreferences: Object.assign(
     {
       // NOTE: __dirname refers to output directory
@@ -36,7 +36,7 @@ const WINDOW_OPTS = {
       // as of electron 12, contextIsolation defaults to true.
       contextIsolation: false,
     },
-    uiConfig.webPreferences
+    config.webPreferences
   ),
 }
 

@@ -5,7 +5,6 @@ import { shell } from 'electron'
 import {
   ADD_PROTOCOL,
   ANALYZE_PROTOCOL,
-  EDIT_PROTOCOL,
   FETCH_PROTOCOLS,
   INITIAL,
   OPEN_PROTOCOL_DIRECTORY,
@@ -24,10 +23,10 @@ import {
 } from '../config/actions'
 import * as FileSystem from './file-system'
 import { createFailedAnalysis } from '../protocol-analysis/writeFailedAnalysis'
+
 import type { ProtocolAnalysisOutput } from '@opentrons/shared-data'
 import type { ProtocolListActionSource as ListSource } from '@opentrons/app/src/redux/protocol-storage/types'
 import type { Action, Dispatch } from '../types'
-import { createProtocolEditorUi } from '../protocol-editor-ui'
 
 const ensureDir: (dir: string) => Promise<void> = fse.ensureDir
 
@@ -213,16 +212,6 @@ export function registerProtocolStorage(dispatch: Dispatch): Dispatch {
           action.payload.protocolKey,
           FileSystem.PROTOCOLS_DIRECTORY_PATH
         )
-        break
-      }
-
-      case EDIT_PROTOCOL: {
-        FileSystem.getProtocolSourceFiles(
-          action.payload.protocolKey,
-          FileSystem.PROTOCOLS_DIRECTORY_PATH
-        ).then((srcFiles) => {
-          createProtocolEditorUi(srcFiles[0])
-        }).catch(e => { console.error(e) })
         break
       }
 

@@ -104,10 +104,6 @@ export function parseProtocolDirs(
   return Promise.all(tasks)
 }
 
-export function getProtocolSourceJSON(protocolSrcFilePath: string): Promise<any> {
-  return fs.readJSON(protocolSrcFilePath)
-}
-
 export function addProtocolFile(
   mainFileSourcePath: string,
   protocolsDirPath: string
@@ -174,26 +170,3 @@ export function viewProtocolSourceFolder(
   const srcDirPath = path.join(protocolDirPath, PROTOCOL_SRC_DIRECTORY_NAME)
   shell.openPath(srcDirPath)
 }
-
-export function getProtocolSourceFiles(
-  protocolKey: string,
-  protocolsDirPath: string
-): Promise<string[]> {
-  const protocolDirPath = path.join(protocolsDirPath, protocolKey)
-  const srcDirPath = path.join(protocolDirPath, PROTOCOL_SRC_DIRECTORY_NAME)
-  const srcFilePathsPromise = readFilesWithinDirectory(srcDirPath)
-  return srcFilePathsPromise
-}
-
-export function overwriteProtocol(
-  protocolSrcPath: string,
-  newFileName: string,
-  protocolData: string
-): Promise<void> {
-  const newSrcFilePath = path.join(path.dirname(protocolSrcPath), newFileName)
-  return fs.remove(protocolSrcPath).then(() => {
-    return fs.writeFile(newSrcFilePath, JSON.stringify(protocolData))
-  }).catch(e => { console.error(e) })
-}
-
-
