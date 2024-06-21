@@ -14,6 +14,7 @@ from opentrons_shared_data.errors import ErrorCodes, PythonException
 from opentrons.hardware_control.types import DoorState
 from opentrons.ordered_set import OrderedSet
 from opentrons.protocol_engine import actions, commands, errors
+from opentrons.protocol_engine.actions.actions import PlayAction
 from opentrons.protocol_engine.commands.command import CommandIntent
 from opentrons.protocol_engine.error_recovery_policy import ErrorRecoveryType
 from opentrons.protocol_engine.errors.error_occurrence import ErrorOccurrence
@@ -366,8 +367,89 @@ def test_nonfatal_command_failure() -> None:
     assert subject_view.get_running_command_id() is None
 
 
+def test_door_during_setup_phase() -> None:
+    """Test behavior when the door is opened during the setup phase."""
+    subject = CommandStore(
+        is_door_open=False,
+        config=Config(
+            block_on_door_open=True,
+            # Choice of robot and deck type are arbitrary.
+            robot_type="OT-2 Standard",
+            deck_type=DeckType.OT2_STANDARD,
+        ),
+    )
+    subject_view = CommandView(subject.state)
+
+    queue_setup_command = actions.QueueCommandAction(
+        request=commands.CommentCreate(
+            params=commands.CommentParams(message=""),
+            key="setup-command-key",
+            intent=commands.CommandIntent.SETUP,
+        ),
+        request_hash=None,
+        created_at=datetime(year=2021, month=1, day=1),
+        command_id="setup-command-id",
+    )
+    subject.handle_action(queue_setup_command)
+
+    subject.handle_action(actions.DoorChangeAction(DoorState.OPEN))
+
+    assert subject_view.get_status() == EngineStatus.IDLE
+    # The door being open should not block the setup command from executing.
+    assert subject_view.get_next_to_execute() == "setup-command-id"
+
+
+def test_door_during_protocol_phase() -> None:
+    """Test behavior when the door is opened during the main protocol phase."""
+    subject = CommandStore(
+        is_door_open=False,
+        config=Config(
+            block_on_door_open=True,
+            # Choice of robot and deck type are arbitrary.
+            robot_type="OT-2 Standard",
+            deck_type=DeckType.OT2_STANDARD,
+        ),
+    )
+    subject_view = CommandView(subject.state)
+
+    queue_protocol_command = actions.QueueCommandAction(
+        request=commands.CommentCreate(
+            params=commands.CommentParams(message=""),
+            key="command-key",
+        ),
+        request_hash=None,
+        created_at=datetime(year=2021, month=1, day=1),
+        command_id="command-id",
+    )
+    subject.handle_action(queue_protocol_command)
+
+    subject.handle_action(
+        actions.PlayAction(requested_at=datetime.now(), deck_configuration=None)
+    )
+
+    play = PlayAction(requested_at=datetime.now(), deck_configuration=None)
+
+    # Test state after we open the door:
+    subject.handle_action(actions.DoorChangeAction(DoorState.OPEN))
+    assert subject_view.get_status() == EngineStatus.BLOCKED_BY_OPEN_DOOR
+    assert subject_view.get_next_to_execute() is None
+    with pytest.raises(RobotDoorOpenError):
+        subject_view.validate_action_allowed(play)
+
+    # Test state after we close the door:
+    subject.handle_action(actions.DoorChangeAction(DoorState.CLOSED))
+    assert subject_view.get_status() == EngineStatus.PAUSED
+    assert subject_view.get_next_to_execute() is None
+    subject_view.validate_action_allowed(play)  # Should not raise.
+
+    # Test state when we resume:
+    subject.handle_action(play)
+    assert subject_view.get_status() == EngineStatus.RUNNING
+    assert subject_view.get_next_to_execute() == "command-id"
+
+
 def test_door_during_error_recovery() -> None:
-    """Test the blocked-by-open-door behavior's interaction with error recovery."""
+    """Test behavior when the door is opened during error recovery."""
     subject = CommandStore(
         is_door_open=False,
         config=Config(
@@ -440,12 +522,41 @@ def test_door_during_error_recovery() -> None:
     subject.handle_action(actions.DoorChangeAction(DoorState.CLOSED))
     assert subject_view.get_status() == EngineStatus.AWAITING_RECOVERY_PAUSED
     assert subject_view.get_next_to_execute() is None
+    subject_view.validate_action_allowed(play)  # Should not raise.
 
     # Test state when we resume recovery mode:
-    subject_view.validate_action_allowed(play)  # Should not raise.
     subject.handle_action(play)
     assert subject_view.get_status() == EngineStatus.AWAITING_RECOVERY
     assert subject_view.get_next_to_execute() == "command-id-2"
+
+
+@pytest.mark.parametrize(
+    ("door_initially_open", "expected_engine_status_after_play"),
+    [
+        (False, EngineStatus.RUNNING),
+        (True, EngineStatus.BLOCKED_BY_OPEN_DOOR),
+    ],
+)
+def test_door_initially_open(
+    door_initially_open: bool, expected_engine_status_after_play: EngineStatus
+) -> None:
+    """Test open-door blocking behavior given different initial door states."""
+    subject = CommandStore(
+        is_door_open=door_initially_open,
+        config=Config(
+            block_on_door_open=True,
+            # Choice of robot and deck type are arbitrary.
+            robot_type="OT-2 Standard",
+            deck_type=DeckType.OT2_STANDARD,
+        ),
+    )
+    subject_view = CommandView(subject.state)
+
+    assert subject_view.get_status() == EngineStatus.IDLE
+    play = actions.PlayAction(requested_at=datetime.now(), deck_configuration=None)
+    subject_view.validate_action_allowed(play)  # Should not raise.
+    subject.handle_action(play)
+    assert subject_view.get_status() == expected_engine_status_after_play
 
 
 def test_error_recovery_type_tracking() -> None:
