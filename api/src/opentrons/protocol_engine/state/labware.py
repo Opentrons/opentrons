@@ -412,10 +412,8 @@ class LabwareView(HasState[LabwareState]):
             len(self.get_definition(labware_id).wells) == 1
             or len(self.get_definition(labware_id).wells) >= 96
         )
-        
-    def get_well_min_height(
-        self, labware_id: str, well_name: str
-    ) -> float:
+
+    def get_well_min_height(self, labware_id: str, well_name: str) -> float:
         """Get's the minimum distance that a liquid probe must stop
         away from the bottom of a well.
 
@@ -427,27 +425,23 @@ class LabwareView(HasState[LabwareState]):
             A single float representing the distance, in millimeters.
         """
         well_definition = self.get_definition(labware_id)
+        default_val = 0
         try:
             height_reqs = well_definition.liquidProbeParameters.minimumHeight
             if len(height_reqs) == 0:
-                #TODO: find out what to actually do here
-                return 0.5
+                return default_val
             if len(height_reqs) == 1:
                 return height_reqs[0].value
-            default_val = 0.5
             for entry in height_reqs:
                 if well_name in entry.applicableWells:
                     return entry.value
-                if entry.applicableWells == []:
+                if (
+                    entry.applicableWells == []
+                ):  # A "custom" default value will have "applicableWells" set to []
                     default_val = entry.value
-            #No explicit height for this well, return default
             return default_val
-        except AttributeError as e: #No liquidProbeParameters defined for this labware
-            #TODO: find out what to actually do here
-            return 0
-            # raise errors.HardwareNotSupportedError(
-            #     f"Labware {labware_id} does not have specifications for minimum height."
-            # ) from e
+        except AttributeError as e:  # will occur when well does not have liquidProbeParameters
+            return default_val
 
     def get_well_definition(
         self,
