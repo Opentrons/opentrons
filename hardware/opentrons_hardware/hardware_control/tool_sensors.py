@@ -173,6 +173,20 @@ async def run_sync_buffer_to_csv(
     """Runs the sensor pass move group and creates a csv file with the results."""
     sensor_metadata = [0, 0, mount_speed, plunger_speed, threshold]
     positions = await move_group.run(can_messenger=messenger)
+    #wait a little to see the dropoff curve
+    await asyncio.sleep(0.15)
+    for sensor_id in log_files.keys():
+        await messenger.ensure_send(
+            node_id=tool,
+            message=BindSensorOutputRequest(
+                payload=BindSensorOutputRequestPayload(
+                    sensor=SensorTypeField(sensor_type),
+                    sensor_id=SensorIdField(sensor_id),
+                    binding=SensorOutputBindingField(SensorOutputBinding.none),
+                )
+            ),
+            expected_nodes=[tool],
+        )
     for sensor_id in log_files.keys():
         sensor_capturer = LogListener(
             mount=head_node,
