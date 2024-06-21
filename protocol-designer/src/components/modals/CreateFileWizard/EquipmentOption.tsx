@@ -17,7 +17,7 @@ import {
   Tooltip,
   DIRECTION_COLUMN,
   Box,
-  StyledText,
+  LegacyStyledText,
 } from '@opentrons/components'
 import type { StyleProps } from '@opentrons/components'
 import type { RobotType } from '@opentrons/shared-data'
@@ -241,7 +241,7 @@ export function EquipmentOption(props: EquipmentOptionProps): JSX.Element {
           {image}
         </Flex>
         <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
-          <StyledText
+          <LegacyStyledText
             css={css`
               user-select: none;
             `}
@@ -249,7 +249,7 @@ export function EquipmentOption(props: EquipmentOptionProps): JSX.Element {
             color={disabled ? COLORS.grey50 : COLORS.black90}
           >
             {text}
-          </StyledText>
+          </LegacyStyledText>
           {multiples != null ? (
             <>
               <Box borderBottom={BORDERS.lineBorder} data-testid="line" />

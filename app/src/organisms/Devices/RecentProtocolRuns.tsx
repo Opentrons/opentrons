@@ -12,7 +12,7 @@ import {
   JUSTIFY_SPACE_AROUND,
   SIZE_4,
   SPACING,
-  StyledText,
+  LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
@@ -48,7 +48,7 @@ export function RecentProtocolRuns({
       width="100%"
       marginBottom="6rem"
     >
-      <StyledText
+      <LegacyStyledText
         as="h3"
         fontWeight={TYPOGRAPHY.fontWeightSemiBold}
         borderBottom={BORDERS.lineBorder}
@@ -57,7 +57,7 @@ export function RecentProtocolRuns({
         id="RecentProtocolRuns_title"
       >
         {t('recent_protocol_runs')}
-      </StyledText>
+      </LegacyStyledText>
       <Flex
         alignItems={ALIGN_CENTER}
         flexDirection={DIRECTION_COLUMN}
@@ -72,7 +72,7 @@ export function RecentProtocolRuns({
               padding={SPACING.spacing8}
               width="100%"
             >
-              <StyledText
+              <LegacyStyledText
                 marginLeft={SPACING.spacing24}
                 width="25%"
                 as="label"
@@ -80,26 +80,26 @@ export function RecentProtocolRuns({
                 data-testid="RecentProtocolRuns_RunTitle"
               >
                 {t('run')}
-              </StyledText>
+              </LegacyStyledText>
 
-              <StyledText
+              <LegacyStyledText
                 as="label"
                 width="35%"
                 fontWeight={TYPOGRAPHY.fontWeightSemiBold}
                 data-testid="RecentProtocolRuns_ProtocolTitle"
               >
                 {t('protocol')}
-              </StyledText>
+              </LegacyStyledText>
 
-              <StyledText
+              <LegacyStyledText
                 as="label"
                 width="20%"
                 fontWeight={TYPOGRAPHY.fontWeightSemiBold}
                 data-testid="RecentProtocolRuns_StatusTitle"
               >
                 {t('status')}
-              </StyledText>
-              <StyledText
+              </LegacyStyledText>
+              <LegacyStyledText
                 as="label"
                 width="20%"
                 marginRight="20px"
@@ -107,7 +107,7 @@ export function RecentProtocolRuns({
                 data-testid="RecentProtocolRuns_DurationTitle"
               >
                 {t('run_duration')}
-              </StyledText>
+              </LegacyStyledText>
             </Flex>
             {runs
               .sort(
@@ -140,7 +140,7 @@ export function RecentProtocolRuns({
           </>
         )}
         {!isRobotViewable && (
-          <StyledText
+          <LegacyStyledText
             as="p"
             alignItems={ALIGN_CENTER}
             color={COLORS.grey50}
@@ -149,10 +149,10 @@ export function RecentProtocolRuns({
             id="RecentProtocolRuns_offline"
           >
             {t('offline_recent_protocol_runs')}
-          </StyledText>
+          </LegacyStyledText>
         )}
         {isRobotViewable && (runs == null || runs.length === 0) && (
-          <StyledText
+          <LegacyStyledText
             as="p"
             alignItems={ALIGN_CENTER}
             display={DISPLAY_FLEX}
@@ -160,7 +160,7 @@ export function RecentProtocolRuns({
             id="RecentProtocolRuns_no_runs"
           >
             {t('no_protocol_runs')}
-          </StyledText>
+          </LegacyStyledText>
         )}
       </Flex>
     </Flex>

@@ -5,7 +5,7 @@ import {
   COLORS,
   PrimaryButton,
   SPACING,
-  StyledText,
+  LegacyStyledText,
 } from '@opentrons/components'
 import { SmallButton } from '../../atoms/buttons'
 import { GenericWizardTile } from '../../molecules/GenericWizardTile'
@@ -72,7 +72,10 @@ export const Carriage = (props: PipetteWizardStepProps): JSX.Element | null => {
           }
           components={{
             block: (
-              <StyledText css={BODY_STYLE} marginBottom={SPACING.spacing16} />
+              <LegacyStyledText
+                css={BODY_STYLE}
+                marginBottom={SPACING.spacing16}
+              />
             ),
           }}
         />

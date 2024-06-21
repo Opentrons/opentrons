@@ -11,7 +11,7 @@ import {
   PrimaryButton,
   SecondaryButton,
   SPACING,
-  StyledText,
+  LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { useAttachedModules } from '../hooks'
@@ -87,9 +87,9 @@ export const HeaterShakerIsRunningModal = (
       <Box>
         <HeaterShakerModuleCard module={module} />
       </Box>
-      <StyledText fontSize={TYPOGRAPHY.fontSizeP}>
+      <LegacyStyledText fontSize={TYPOGRAPHY.fontSizeP}>
         {t('continue_shaking_protocol_start_prompt')}
-      </StyledText>
+      </LegacyStyledText>
 
       <Flex justifyContent={JUSTIFY_FLEX_END}>
         <SecondaryButton

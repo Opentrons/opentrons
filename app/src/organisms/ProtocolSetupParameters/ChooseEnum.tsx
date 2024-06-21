@@ -5,7 +5,7 @@ import {
   DIRECTION_COLUMN,
   Flex,
   SPACING,
-  StyledText,
+  LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { RadioButton } from '../../atoms/buttons'
@@ -56,13 +56,13 @@ export function ChooseEnum({
         flexDirection={DIRECTION_COLUMN}
         paddingBottom={SPACING.spacing40}
       >
-        <StyledText
+        <LegacyStyledText
           as="h4"
           textAlign={TYPOGRAPHY.textAlignLeft}
           marginBottom={SPACING.spacing16}
         >
           {parameter.description}
-        </StyledText>
+        </LegacyStyledText>
 
         {options?.map(option => {
           return (

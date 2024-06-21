@@ -14,7 +14,7 @@ import {
   Link,
   SIZE_1,
   SPACING,
-  StyledText,
+  LegacyStyledText,
   TOOLTIP_LEFT,
   TYPOGRAPHY,
   useHoverTooltip,
@@ -114,7 +114,7 @@ export function RunProgressMeter(props: RunProgressMeterProps): JSX.Element {
   let currentStepContents: React.ReactNode = null
   if (runHasNotBeenStarted) {
     currentStepContents = (
-      <StyledText as="h2">{t('not_started_yet')}</StyledText>
+      <LegacyStyledText as="h2">{t('not_started_yet')}</LegacyStyledText>
     )
   } else if (analysis != null && !hasRunDiverged) {
     currentStepContents = (
@@ -181,7 +181,10 @@ export function RunProgressMeter(props: RunProgressMeterProps): JSX.Element {
       <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
         <Flex justifyContent={JUSTIFY_SPACE_BETWEEN}>
           <Flex gridGap={SPACING.spacing8}>
-            <StyledText as="h2" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>{`${
+            <LegacyStyledText
+              as="h2"
+              fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+            >{`${
               runStatus != null && TERMINAL_RUN_STATUSES.includes(runStatus)
                 ? t('final_step')
                 : t('current_step')
@@ -189,7 +192,7 @@ export function RunProgressMeter(props: RunProgressMeterProps): JSX.Element {
               runStatus === RUN_STATUS_IDLE
                 ? ':'
                 : ` ${stepCountStr}${currentStepContents != null ? ': ' : ''}`
-            }`}</StyledText>
+            }`}</LegacyStyledText>
 
             {currentStepContents}
           </Flex>

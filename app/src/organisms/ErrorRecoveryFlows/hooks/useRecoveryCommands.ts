@@ -27,6 +27,10 @@ export interface UseRecoveryCommandsResult {
   resumeRun: () => void
   /* A terminal recovery command that causes ER to exit as the run status becomes "stop-requested" */
   cancelRun: () => void
+  /* A non-terminal recovery command, but should generally be chained with a resumeRun. */
+  skipFailedCommand: () => Promise<void>
+  /* A non-terminal recovery command. Ignore this errorKind for the rest of this run. */
+  ignoreErrorKindThisRun: () => Promise<void>
   /* A non-terminal recovery command */
   retryFailedCommand: () => Promise<CommandData[]>
   /* A non-terminal recovery command */
@@ -52,6 +56,7 @@ export function useRecoveryCommands({
       continuePastFailure: boolean = false
     ): Promise<CommandData[]> =>
       chainRunCommands(commands, continuePastFailure).catch(e => {
+        console.warn(`Error executing "fixit" command: ${e}`)
         // the catch never occurs if continuePastCommandFailure is "true"
         void proceedToRouteAndStep(RECOVERY_MAP.ERROR_WHILE_RECOVERING.ROUTE)
         return Promise.reject(new Error(`Could not execute command: ${e}`))
@@ -75,18 +80,16 @@ export function useRecoveryCommands({
   // Pick up the user-selected tips
   // TODO(jh, 06-14-24): Do not ignore pickUpTip errors once Pipettes can support tip pick up.
   const pickUpTips = React.useCallback((): Promise<CommandData[]> => {
-    const { selectedTipLocations, pickUpTipLabware } = failedLabwareUtils
+    const { selectedTipLocations, failedLabware } = failedLabwareUtils
 
     const pickUpTipCmd = buildPickUpTips(
       selectedTipLocations,
       failedCommand,
-      pickUpTipLabware
+      failedLabware
     )
 
     if (pickUpTipCmd == null) {
-      return Promise.reject(
-        new Error('Placeholder error: Invalid use of pickUpTips command')
-      )
+      return Promise.reject(new Error('Invalid use of pickUpTips command'))
     } else {
       return chainRunRecoveryCommands([pickUpTipCmd], true)
     }
@@ -100,12 +103,30 @@ export function useRecoveryCommands({
     stopRun(runId)
   }, [runId])
 
+  // TODO(jh, 06-18-24): If this command is actually terminal for error recovery, remove the resumeRun currently promise
+  // chained where this is used. Also update docstring in iface.
+  const skipFailedCommand = React.useCallback((): Promise<void> => {
+    console.log('SKIPPING TO NEXT STEP')
+    return new Promise<void>(resolve => {
+      setTimeout(() => {
+        resolve()
+      }, 2000)
+    })
+  }, [])
+
+  const ignoreErrorKindThisRun = React.useCallback((): Promise<void> => {
+    console.log('IGNORING ALL ERRORS OF THIS KIND THIS RUN')
+    return Promise.resolve()
+  }, [])
+
   return {
     resumeRun,
     cancelRun,
     retryFailedCommand,
     homePipetteZAxes,
     pickUpTips,
+    skipFailedCommand,
+    ignoreErrorKindThisRun,
   }
 }
 

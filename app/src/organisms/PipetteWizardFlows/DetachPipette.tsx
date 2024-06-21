@@ -14,7 +14,7 @@ import {
   RESPONSIVENESS,
   SIZE_1,
   SPACING,
-  StyledText,
+  LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { Banner } from '../../atoms/Banner'
@@ -159,7 +159,9 @@ export const DetachPipette = (props: DetachPipetteProps): JSX.Element => {
   } else {
     bodyText = (
       <>
-        <StyledText css={BODY_STYLE}>{t('hold_and_loosen')}</StyledText>
+        <LegacyStyledText css={BODY_STYLE}>
+          {t('hold_and_loosen')}
+        </LegacyStyledText>
         {is96ChannelPipette && (
           <Banner
             type="warning"
@@ -193,9 +195,9 @@ export const DetachPipette = (props: DetachPipetteProps): JSX.Element => {
             }}
             marginLeft={SPACING.spacing32}
           >
-            <StyledText css={GO_BACK_BUTTON_TEXT_STYLE}>
+            <LegacyStyledText css={GO_BACK_BUTTON_TEXT_STYLE}>
               {t('shared:go_back')}
-            </StyledText>
+            </LegacyStyledText>
           </Btn>
           {Boolean(isOnDevice) ? (
             <SmallButton

@@ -21,7 +21,7 @@ import {
   PrimaryButton,
   RESPONSIVENESS,
   SPACING,
-  StyledText,
+  LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import {
@@ -222,7 +222,7 @@ export const ChoosePipette = (props: ChoosePipetteProps): JSX.Element => {
             justifyContent={JUSTIFY_SPACE_BETWEEN}
           >
             <Flex flexDirection={DIRECTION_COLUMN}>
-              <StyledText as="h1">{t('choose_pipette')}</StyledText>
+              <LegacyStyledText as="h1">{t('choose_pipette')}</LegacyStyledText>
               <Flex
                 margin={SPACING.spacing40}
                 justifyContent={JUSTIFY_SPACE_AROUND}
@@ -239,13 +239,13 @@ export const ChoosePipette = (props: ChoosePipetteProps): JSX.Element => {
                     height="160px"
                     alt={singleMount}
                   />
-                  <StyledText
+                  <LegacyStyledText
                     as="h3"
                     fontWeight={TYPOGRAPHY.fontWeightSemiBold}
                     textAlign={TYPOGRAPHY.textAlignCenter}
                   >
                     {singleMount}
-                  </StyledText>
+                  </LegacyStyledText>
                 </PipetteMountOption>
                 <PipetteMountOption
                   isSelected={selectedPipette === NINETY_SIX_CHANNEL}
@@ -259,13 +259,13 @@ export const ChoosePipette = (props: ChoosePipetteProps): JSX.Element => {
                     height="160px"
                     alt={bothMounts}
                   />
-                  <StyledText
+                  <LegacyStyledText
                     as="h3"
                     fontWeight={TYPOGRAPHY.fontWeightSemiBold}
                     textAlign={TYPOGRAPHY.textAlignCenter}
                   >
                     {bothMounts}
-                  </StyledText>
+                  </LegacyStyledText>
                 </PipetteMountOption>
               </Flex>
             </Flex>

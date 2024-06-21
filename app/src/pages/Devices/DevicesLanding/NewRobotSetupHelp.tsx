@@ -8,7 +8,7 @@ import {
   Link,
   PrimaryButton,
   SPACING,
-  StyledText,
+  LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
@@ -45,9 +45,9 @@ export function NewRobotSetupHelp(): JSX.Element {
               }}
             >
               <Flex flexDirection={DIRECTION_COLUMN}>
-                <StyledText as="p" marginBottom={SPACING.spacing16}>
+                <LegacyStyledText as="p" marginBottom={SPACING.spacing16}>
                   {t('use_usb_cable_for_new_robot')}
-                </StyledText>
+                </LegacyStyledText>
                 <ExternalLink href={NEW_ROBOT_SETUP_SUPPORT_ARTICLE_HREF}>
                   {t('learn_more_about_new_robot_setup')}
                 </ExternalLink>

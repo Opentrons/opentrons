@@ -14,7 +14,7 @@ import {
   JUSTIFY_SPACE_BETWEEN,
   Link,
   SPACING,
-  StyledText,
+  LegacyStyledText,
   TYPOGRAPHY,
   useHoverTooltip,
 } from '@opentrons/components'
@@ -94,7 +94,9 @@ function ProgressTrackerItem({
           width="1.25rem"
           borderRadius="0.625rem"
         >
-          <StyledText as="label">{(taskIndex + 1).toString()}</StyledText>
+          <LegacyStyledText as="label">
+            {(taskIndex + 1).toString()}
+          </LegacyStyledText>
         </Flex>
       )}
       {!hasSubTasks ? (
@@ -232,7 +234,7 @@ function SubTask({
         flexDirection={DIRECTION_COLUMN}
         gridGap={SPACING.spacing4}
       >
-        <StyledText as="h3" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
+        <LegacyStyledText as="h3" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
           <Flex
             alignItems={ALIGN_CENTER}
             flexDirection={DIRECTION_ROW}
@@ -240,10 +242,10 @@ function SubTask({
           >
             {title}
           </Flex>
-        </StyledText>
-        <StyledText as="p">{description}</StyledText>
+        </LegacyStyledText>
+        <LegacyStyledText as="p">{description}</LegacyStyledText>
         {footer != null ? (
-          <StyledText as="p" color={COLORS.grey60}>
+          <LegacyStyledText as="p" color={COLORS.grey60}>
             <Flex
               alignItems={ALIGN_CENTER}
               flexDirection={DIRECTION_ROW}
@@ -260,7 +262,7 @@ function SubTask({
               )}
               {footer}
             </Flex>
-          </StyledText>
+          </LegacyStyledText>
         ) : null}
       </Flex>
       {(isTaskListComplete || isPastSubTask) && cta != null ? (
@@ -384,7 +386,10 @@ function Task({
             flexDirection={DIRECTION_COLUMN}
             gridGap={SPACING.spacing4}
           >
-            <StyledText as="h3" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
+            <LegacyStyledText
+              as="h3"
+              fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+            >
               <Flex
                 alignItems={ALIGN_CENTER}
                 flexDirection={DIRECTION_ROW}
@@ -401,10 +406,10 @@ function Task({
                 )}
                 {title}
               </Flex>
-            </StyledText>
-            <StyledText as="p">{description}</StyledText>
+            </LegacyStyledText>
+            <LegacyStyledText as="p">{description}</LegacyStyledText>
             {footer != null ? (
-              <StyledText as="p" color={COLORS.grey50}>
+              <LegacyStyledText as="p" color={COLORS.grey50}>
                 <Flex
                   alignItems={ALIGN_CENTER}
                   flexDirection={DIRECTION_ROW}
@@ -412,7 +417,7 @@ function Task({
                 >
                   {footer}
                 </Flex>
-              </StyledText>
+              </LegacyStyledText>
             ) : null}
           </Flex>
           {/* if subtasks, caret, otherwise show cta as link or button */}

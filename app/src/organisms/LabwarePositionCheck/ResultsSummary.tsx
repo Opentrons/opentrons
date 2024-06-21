@@ -27,7 +27,7 @@ import {
   PrimaryButton,
   RESPONSIVENESS,
   SPACING,
-  StyledText,
+  LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { PythonLabwareOffsetSnippet } from '../../molecules/PythonLabwareOffsetSnippet'
@@ -217,9 +217,9 @@ export const ResultsSummary = (
                   marginRight={SPACING.spacing8}
                 />
               ) : null}
-              <StyledText>
+              <LegacyStyledText>
                 {i18n.format(t('apply_offsets'), 'capitalize')}
-              </StyledText>
+              </LegacyStyledText>
             </Flex>
           </PrimaryButton>
         </Flex>
@@ -295,7 +295,7 @@ const OffsetTable = (props: OffsetTableProps): JSX.Element => {
                     ${BORDERS.borderRadius4};
                 `}
               >
-                <StyledText
+                <LegacyStyledText
                   as="p"
                   textTransform={TYPOGRAPHY.textTransformCapitalize}
                 >
@@ -305,10 +305,10 @@ const OffsetTable = (props: OffsetTableProps): JSX.Element => {
                     t as TFunction,
                     i18n
                   )}
-                </StyledText>
+                </LegacyStyledText>
               </TableDatum>
               <TableDatum>
-                <StyledText as="p">{labwareDisplayName}</StyledText>
+                <LegacyStyledText as="p">{labwareDisplayName}</LegacyStyledText>
               </TableDatum>
               <TableDatum
                 css={`
@@ -317,20 +317,22 @@ const OffsetTable = (props: OffsetTableProps): JSX.Element => {
                 `}
               >
                 {isEqual(vector, IDENTITY_VECTOR) ? (
-                  <StyledText>{t('no_labware_offsets')}</StyledText>
+                  <LegacyStyledText>{t('no_labware_offsets')}</LegacyStyledText>
                 ) : (
                   <Flex>
                     {[vector.x, vector.y, vector.z].map((axis, index) => (
                       <React.Fragment key={index}>
-                        <StyledText
+                        <LegacyStyledText
                           as="p"
                           marginLeft={index > 0 ? SPACING.spacing8 : 0}
                           marginRight={SPACING.spacing4}
                           fontWeight={TYPOGRAPHY.fontWeightSemiBold}
                         >
                           {['X', 'Y', 'Z'][index]}
-                        </StyledText>
-                        <StyledText as="p">{axis.toFixed(1)}</StyledText>
+                        </LegacyStyledText>
+                        <LegacyStyledText as="p">
+                          {axis.toFixed(1)}
+                        </LegacyStyledText>
                       </React.Fragment>
                     ))}
                   </Flex>
@@ -383,21 +385,21 @@ export const TerseOffsetTable = (props: OffsetTableProps): JSX.Element => {
                 ) : null}
               </TerseTableDatum>
               <TerseTableDatum>
-                <StyledText
+                <LegacyStyledText
                   fontSize={TYPOGRAPHY.fontSize20}
                   lineHeight={TYPOGRAPHY.lineHeight24}
                 >
                   {labwareDisplayName}
-                </StyledText>
+                </LegacyStyledText>
               </TerseTableDatum>
               <TerseTableDatum>
                 {isEqual(vector, IDENTITY_VECTOR) ? (
-                  <StyledText>{t('no_labware_offsets')}</StyledText>
+                  <LegacyStyledText>{t('no_labware_offsets')}</LegacyStyledText>
                 ) : (
                   <Flex>
                     {[vector.x, vector.y, vector.z].map((axis, index) => (
                       <React.Fragment key={index}>
-                        <StyledText
+                        <LegacyStyledText
                           fontSize={TYPOGRAPHY.fontSize20}
                           lineHeight={TYPOGRAPHY.lineHeight24}
                           marginLeft={index > 0 ? SPACING.spacing8 : 0}
@@ -405,13 +407,13 @@ export const TerseOffsetTable = (props: OffsetTableProps): JSX.Element => {
                           fontWeight={TYPOGRAPHY.fontWeightSemiBold}
                         >
                           {['X', 'Y', 'Z'][index]}
-                        </StyledText>
-                        <StyledText
+                        </LegacyStyledText>
+                        <LegacyStyledText
                           fontSize={TYPOGRAPHY.fontSize20}
                           lineHeight={TYPOGRAPHY.lineHeight24}
                         >
                           {axis.toFixed(1)}
-                        </StyledText>
+                        </LegacyStyledText>
                       </React.Fragment>
                     ))}
                   </Flex>
