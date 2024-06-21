@@ -321,7 +321,7 @@ async def create_protocol(  # noqa: C901
                 status_code=status.HTTP_200_OK,
             )
 
-        await _get_cached_protocol_analysis()
+        return await _get_cached_protocol_analysis()
 
     try:
         source = await protocol_reader.save(
