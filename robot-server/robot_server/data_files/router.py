@@ -35,6 +35,13 @@ class NoDataFileSourceProvided(ErrorDetails):
     title: str = "No data file source provided"
 
 
+class FileNotFound(ErrorDetails):
+    """An error returned when specified file path was not found on the robot."""
+
+    id: Literal["FileNotFound"] = "FileNotFound"
+    title: str = "Specified file path not found on the robot"
+
+
 @PydanticResponse.wrap_route(
     datafiles_router.post,
     path="/dataFiles",
@@ -51,12 +58,15 @@ class NoDataFileSourceProvided(ErrorDetails):
         status.HTTP_422_UNPROCESSABLE_ENTITY: {
             "model": ErrorBody[Union[MultipleDataFileSources, NoDataFileSourceProvided]]
         },
+        status.HTTP_404_NOT_FOUND: {},
     },
 )
 async def upload_data_file(
     file: Optional[UploadFile] = File(default=None, description="Data file to upload"),
     file_path: Optional[str] = Form(
-        default=None, description="Absolute path to a file on the robot."
+        default=None,
+        description="Absolute path to a file on the robot.",
+        alias="filePath",
     ),
     data_files_directory: Path = Depends(get_data_files_directory),
     data_files_store: DataFilesStore = Depends(get_data_files_store),
@@ -74,7 +84,10 @@ async def upload_data_file(
         raise NoDataFileSourceProvided(
             detail="You must provide either a file or a file_path in the request."
         ).as_error(status.HTTP_422_UNPROCESSABLE_ENTITY)
-    buffered_file = await file_reader_writer.read(files=[file or Path(file_path)])  # type: ignore[arg-type, list-item]
+    try:
+        buffered_file = await file_reader_writer.read(files=[file or Path(file_path)])  # type: ignore[arg-type, list-item]
+    except FileNotFoundError as e:
+        raise FileNotFound(detail=str(e)).as_error(status.HTTP_404_NOT_FOUND) from e
     # TODO (spp, 2024-06-18): validate CSV file contents
     file_hash = await file_hasher.hash(buffered_file)
     existing_file_info = data_files_store.get_file_info_by_hash(file_hash)

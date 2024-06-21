@@ -11,6 +11,7 @@ from opentrons.protocol_reader import FileHasher, FileReaderWriter, BufferedFile
 from robot_server.data_files.data_files_store import DataFilesStore, DataFileInfo
 from robot_server.data_files.models import DataFile
 from robot_server.data_files.router import upload_data_file
+from robot_server.errors.error_responses import ApiError
 
 
 @pytest.fixture
@@ -174,3 +175,29 @@ async def test_upload_new_data_file_path(
             )
         ),
     )
+
+
+async def test_upload_non_existent_file_path(
+    decoy: Decoy,
+    data_files_store: DataFilesStore,
+    file_reader_writer: FileReaderWriter,
+    file_hasher: FileHasher,
+) -> None:
+    """It should store the data file from path to persistent storage & update the database."""
+    data_files_directory = Path("/dev/null")
+    decoy.when(
+        await file_reader_writer.read(files=[Path("/data/my_data_file.csv")])
+    ).then_raise(FileNotFoundError("Uh oh!"))
+
+    with pytest.raises(ApiError) as exc_info:
+        await upload_data_file(
+            file=None,
+            file_path="/data/my_data_file.csv",
+            data_files_directory=data_files_directory,
+            data_files_store=data_files_store,
+            file_reader_writer=file_reader_writer,
+            file_hasher=file_hasher,
+            file_id="data-file-id",
+            created_at=datetime(year=2024, month=6, day=18),
+        )
+    assert exc_info.value.status_code == 404

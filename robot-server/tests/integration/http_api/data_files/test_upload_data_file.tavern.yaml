@@ -10,7 +10,7 @@ stages:
       url: '{ot2_server_base_url}/dataFiles'
       method: POST
       files:
-        file: 'tests/integration/http_api/data_files/color_codes.csv'
+        file: 'tests/integration/data_files/color_codes.csv'
     response:
       save:
         json:
@@ -27,8 +27,25 @@ stages:
       url: '{ot2_server_base_url}/dataFiles'
       method: POST
       files:
-        file: 'tests/integration/http_api/data_files/color_codes.csv'
+        file: 'tests/integration/http_api/color_codes.csv'
     response:
       status_code: 200
       json:
         data: !force_original_structure '{file_info}'
+
+  - name: Upload color_codes_2.csv file using file path
+    request:
+      url: '{ot2_server_base_url}/dataFiles'
+      method: POST
+      data:
+        filePath: 'tests/integration/data_files/sample.csv'
+    response:
+      save:
+        json:
+          file_info: data
+      status_code: 201
+      json:
+        data:
+          id: !anystr
+          name: "sample.csv"
+          createdAt: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"
