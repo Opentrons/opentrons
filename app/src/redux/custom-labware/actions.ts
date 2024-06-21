@@ -100,7 +100,7 @@ export const addCustomLabwareFile = (
   meta: { shell: true },
 })
 
-export const addCustomLabwareFileFromCreator = (file: File): any => ({
+export const addCustomLabwareFileFromCreator = (file: string): any => ({
   type: ADD_CUSTOM_LABWARE_FILE_FROM_CREATOR,
   payload: { file },
   meta: { shell: true },

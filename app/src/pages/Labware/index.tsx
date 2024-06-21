@@ -134,7 +134,7 @@ export function Labware(): JSX.Element {
           goBack={() => {
             setShowLC(false)
           }}
-          save={(file: any) => {
+          save={(file: string) => {
             dispatch(addCustomLabwareFileFromCreator(file))
           }}
           isOnRunApp
