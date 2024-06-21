@@ -44,13 +44,12 @@ import type {
 } from '@opentrons/shared-data'
 import type { TrashCutoutId } from '../Deck/FlexTrash'
 import type { StagingAreaLocation } from './StagingAreaFixture'
-import type { WellFill, WellGroup } from '../Labware'
+import type { WellFill } from '../Labware'
 
 export interface LabwareOnDeck {
   labwareLocation: LabwareLocation
   definition: LabwareDefinition2
   wellFill?: WellFill
-  missingTips?: WellGroup
   /** generic prop to render self-positioned children for each labware */
   labwareChildren?: React.ReactNode
   onLabwareClick?: () => void
@@ -279,7 +278,6 @@ export function BaseDeck(props: BaseDeckProps): JSX.Element {
             definition,
             labwareChildren,
             wellFill,
-            missingTips,
             onLabwareClick,
           }) => {
             if (
@@ -307,7 +305,6 @@ export function BaseDeck(props: BaseDeckProps): JSX.Element {
                   definition={definition}
                   onLabwareClick={onLabwareClick}
                   wellFill={wellFill ?? undefined}
-                  missingTips={missingTips}
                 />
                 {labwareChildren}
               </g>
