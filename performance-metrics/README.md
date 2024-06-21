@@ -10,14 +10,6 @@ helper function used inside other projects
 It is assumed that you already have the other projects in the monorepo setup correctly.
 
 ```bash
-make -C app-shell dist-osx
-
-# Or a different OS
-# make -C app-shell dist-win
-# make -C app-shell dist-linux
-```
-
-```bash
 make -C performance-metrics setup
 ```
 
