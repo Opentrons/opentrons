@@ -25,7 +25,7 @@ import type { ProtocolAnalysisAction } from './protocol-analysis'
 import type {
   CustomLabwareState,
   CustomLabwareAction,
-  Test,
+  AddCustomLabwareFromCreatorAction,
 } from './custom-labware/types'
 import type {
   RobotSettingsState,
@@ -78,7 +78,7 @@ export type Action =
   | SessionsAction
   | CalibrationAction
   | AnalyticsTriggerAction
-  | Test
+  | AddCustomLabwareFromCreatorAction
 
 export type GetState = () => State
 
