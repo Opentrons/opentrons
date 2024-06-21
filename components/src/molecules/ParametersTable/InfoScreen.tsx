@@ -2,7 +2,7 @@ import * as React from 'react'
 
 import { BORDERS, COLORS } from '../../helix-design-system'
 import { SPACING, TYPOGRAPHY } from '../../ui-style-constants/index'
-import { StyledText } from '../../atoms/StyledText'
+import { LegacyStyledText } from '../../atoms/StyledText'
 import { Icon } from '../../icons'
 import { Flex } from '../../primitives'
 import { ALIGN_CENTER, DIRECTION_COLUMN } from '../../styles'
@@ -54,9 +54,9 @@ export function InfoScreen({ contentType, t }: InfoScreenProps): JSX.Element {
         color={COLORS.grey60}
         aria-label="alert"
       />
-      <StyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
+      <LegacyStyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
         {bodyText}
-      </StyledText>
+      </LegacyStyledText>
     </Flex>
   )
 }

@@ -11,7 +11,7 @@ import {
   Link,
   PrimaryButton,
   SPACING,
-  StyledText,
+  LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { LegacyModal } from '../../molecules/LegacyModal'
@@ -41,9 +41,9 @@ export const ModuleSetupModal = (props: ModuleSetupModalProps): JSX.Element => {
             marginRight="3.625rem"
             width="50%"
           >
-            <StyledText as="p" marginBottom={SPACING.spacing16}>
+            <LegacyStyledText as="p" marginBottom={SPACING.spacing16}>
               {t('branded:modal_instructions')}
-            </StyledText>
+            </LegacyStyledText>
             <Link
               external
               css={TYPOGRAPHY.linkPSemiBold}

@@ -4,7 +4,7 @@ import { useSelector, useDispatch } from 'react-redux'
 import { useHistory } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { getPipetteNameSpecs } from '@opentrons/shared-data'
-import { SPACING, TYPOGRAPHY, StyledText } from '@opentrons/components'
+import { SPACING, TYPOGRAPHY, LegacyStyledText } from '@opentrons/components'
 
 import {
   useDispatchApiRequests,
@@ -180,13 +180,13 @@ export function ChangePipette(props: Props): JSX.Element | null {
   if (movementStatus === MOVING) {
     contents = (
       <InProgressModal>
-        <StyledText
+        <LegacyStyledText
           css={TYPOGRAPHY.h1Default}
           marginTop={SPACING.spacing24}
           marginBottom={SPACING.spacing8}
         >
           {t('shared:stand_back_robot_is_in_motion')}
-        </StyledText>
+        </LegacyStyledText>
       </InProgressModal>
     )
   } else if (wizardStep === CLEAR_DECK) {

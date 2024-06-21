@@ -10,7 +10,7 @@ import {
   JUSTIFY_SPACE_BETWEEN,
   PrimaryButton,
   SPACING,
-  StyledText,
+  LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { getTopPortalEl } from '../../../../App/portal'
@@ -53,7 +53,7 @@ export const SecureLabwareModal = (
                 )}`}
                 components={{
                   block: (
-                    <StyledText
+                    <LegacyStyledText
                       as="p"
                       marginBottom={SPACING.spacing4}
                       marginRight="3.625rem"
@@ -75,9 +75,9 @@ export const SecureLabwareModal = (
             flexDirection={DIRECTION_ROW}
             justifyContent={JUSTIFY_SPACE_BETWEEN}
           >
-            <StyledText as="p" marginRight="3.625rem">
+            <LegacyStyledText as="p" marginRight="3.625rem">
               {t(`branded:secure_labware_explanation_${snakeCase(moduleName)}`)}
-            </StyledText>
+            </LegacyStyledText>
             <img
               src={secureTCLatchImage}
               width="288px"

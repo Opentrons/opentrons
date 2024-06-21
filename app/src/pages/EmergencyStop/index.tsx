@@ -11,7 +11,7 @@ import {
   Icon,
   JUSTIFY_CENTER,
   SPACING,
-  StyledText,
+  LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { useEstopQuery } from '@opentrons/react-api-client'
@@ -49,9 +49,9 @@ export function EmergencyStop(): JSX.Element {
           justifyContent={JUSTIFY_CENTER}
           alignItems={ALIGN_CENTER}
         >
-          <StyledText as="h2" fontWeight={TYPOGRAPHY.fontWeightBold}>
+          <LegacyStyledText as="h2" fontWeight={TYPOGRAPHY.fontWeightBold}>
             {t('install_e_stop')}
-          </StyledText>
+          </LegacyStyledText>
         </Flex>
         <Flex
           flexDirection={DIRECTION_COLUMN}
@@ -75,21 +75,24 @@ export function EmergencyStop(): JSX.Element {
                   color={COLORS.green50}
                   data-testid="EmergencyStop_connected_icon"
                 />
-                <StyledText as="h3" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
+                <LegacyStyledText
+                  as="h3"
+                  fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+                >
                   {t('e_stop_connected')}
-                </StyledText>
+                </LegacyStyledText>
               </>
             ) : (
               <>
                 <img src={estopImg} height="116px" alt="E-stop button" />
-                <StyledText
+                <LegacyStyledText
                   as="h3"
                   fontWeight={TYPOGRAPHY.fontWeightSemiBold}
                   color={COLORS.grey60}
                   textAlign={TYPOGRAPHY.textAlignCenter}
                 >
                   {t('e_stop_not_connected')}
-                </StyledText>
+                </LegacyStyledText>
               </>
             )}
           </Flex>

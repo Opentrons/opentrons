@@ -11,7 +11,7 @@ import {
   DIRECTION_ROW,
   Flex,
   SPACING,
-  StyledText,
+  LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
@@ -54,12 +54,12 @@ export function AppSettings(): JSX.Element {
         minHeight="95%"
       >
         <Box padding={SPACING.spacing16} paddingBottom="0">
-          <StyledText
+          <LegacyStyledText
             css={TYPOGRAPHY.h1Default}
             paddingBottom={SPACING.spacing24}
           >
             {t('app_settings')}
-          </StyledText>
+          </LegacyStyledText>
           <Flex
             alignItems={ALIGN_START}
             flexDirection={DIRECTION_ROW}

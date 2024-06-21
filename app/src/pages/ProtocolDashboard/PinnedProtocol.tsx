@@ -15,9 +15,9 @@ import {
   JUSTIFY_SPACE_BETWEEN,
   OVERFLOW_WRAP_ANYWHERE,
   SPACING,
-  StyledText,
   TYPOGRAPHY,
   useLongPress,
+  LegacyStyledText,
 } from '@opentrons/components'
 
 import { LongPressModal } from './LongPressModal'
@@ -162,16 +162,16 @@ export function PinnedProtocol(props: PinnedProtocolProps): JSX.Element {
         width="100%"
         color={COLORS.grey60}
       >
-        <StyledText as="p">
+        <LegacyStyledText as="p">
           {lastRun !== undefined
             ? `${formatDistance(new Date(lastRun), new Date(), {
                 addSuffix: true,
               }).replace('about ', '')}`
             : t('no_history')}
-        </StyledText>
-        <StyledText as="p">
+        </LegacyStyledText>
+        <LegacyStyledText as="p">
           {formatTimeWithUtcLabel(protocol.createdAt)}
-        </StyledText>
+        </LegacyStyledText>
       </Flex>
       {longpress.isLongPressed && (
         <LongPressModal
@@ -185,7 +185,7 @@ export function PinnedProtocol(props: PinnedProtocolProps): JSX.Element {
   )
 }
 
-const ProtocolNameText = styled(StyledText)`
+const ProtocolNameText = styled(LegacyStyledText)`
   display: -webkit-box;
   -webkit-box-orient: vertical;
   -webkit-line-clamp: ${(props: { cardSize: CardSizeType }) =>

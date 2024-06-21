@@ -18,7 +18,7 @@ import {
   OVERFLOW_WRAP_ANYWHERE,
   OVERFLOW_WRAP_BREAK_WORD,
   SPACING,
-  StyledText,
+  LegacyStyledText,
   TYPOGRAPHY,
   useLongPress,
 } from '@opentrons/components'
@@ -238,9 +238,9 @@ export function ProtocolCard(props: ProtocolCardProps): JSX.Element {
               size="1.5rem"
               aria-label="failedAnalysis_icon"
             />
-            <StyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
+            <LegacyStyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
               {i18n.format(t('failed_analysis'), 'capitalize')}
-            </StyledText>
+            </LegacyStyledText>
           </Flex>
         ) : null}
         {isRequiredCSV ? (
@@ -259,27 +259,27 @@ export function ProtocolCard(props: ProtocolCardProps): JSX.Element {
             </LegacyStyledText>
           </Flex>
         ) : null}
-        <StyledText
+        <LegacyStyledText
           as="p"
           fontWeight={TYPOGRAPHY.fontWeightSemiBold}
           opacity={isPendingAnalysis ? 0.7 : 1}
         >
           {protocolName}
-        </StyledText>
+        </LegacyStyledText>
       </Flex>
       <Flex width="9.25rem">
-        <StyledText as="p" color={COLORS.grey60} whiteSpace="nowrap">
+        <LegacyStyledText as="p" color={COLORS.grey60} whiteSpace="nowrap">
           {lastRun != null
             ? formatDistance(new Date(lastRun), new Date(), {
                 addSuffix: true,
               }).replace('about ', '')
             : t('no_history')}
-        </StyledText>
+        </LegacyStyledText>
       </Flex>
       <Flex width="12.5rem" whiteSpace="nowrap">
-        <StyledText as="p" color={COLORS.grey60}>
+        <LegacyStyledText as="p" color={COLORS.grey60}>
           {formatTimeWithUtcLabel(protocol.createdAt)}
-        </StyledText>
+        </LegacyStyledText>
         {longpress.isLongPressed && !isFailedAnalysis && (
           <LongPressModal
             longpress={longpress}
@@ -312,7 +312,7 @@ export function ProtocolCard(props: ProtocolCardProps): JSX.Element {
                   i18nKey={t('error_analyzing', { protocolName })}
                   components={{
                     block: (
-                      <StyledText
+                      <LegacyStyledText
                         as="p"
                         css={css`
                           display: -webkit-box;
@@ -328,9 +328,9 @@ export function ProtocolCard(props: ProtocolCardProps): JSX.Element {
                   }}
                 />
 
-                <StyledText as="p">
+                <LegacyStyledText as="p">
                   {t('branded:delete_protocol_from_app')}
-                </StyledText>
+                </LegacyStyledText>
               </Flex>
               <SmallButton
                 onClick={handleDeleteProtocol}

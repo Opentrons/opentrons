@@ -15,7 +15,7 @@ import {
   JUSTIFY_SPACE_BETWEEN,
   SPACING_AUTO,
   SPACING,
-  StyledText,
+  LegacyStyledText,
   TYPOGRAPHY,
   useConditionalConfirm,
 } from '@opentrons/components'
@@ -73,7 +73,9 @@ export function ClearUnavailableRobots(): JSX.Element {
               title={t('clear_unavailable_robots')}
               onClose={cancelExit}
             >
-              <StyledText as="p">{t('clearing_cannot_be_undone')}</StyledText>
+              <LegacyStyledText as="p">
+                {t('clearing_cannot_be_undone')}
+              </LegacyStyledText>
               <Flex
                 flexDirection={DIRECTION_ROW}
                 paddingTop={SPACING.spacing32}
@@ -109,14 +111,16 @@ export function ClearUnavailableRobots(): JSX.Element {
         gridGap={SPACING.spacing40}
       >
         <Box>
-          <StyledText
+          <LegacyStyledText
             css={TYPOGRAPHY.h3SemiBold}
             paddingBottom={SPACING.spacing8}
             id="AdvancedSettings_clearRobots"
           >
             {t('clear_unavail_robots')}
-          </StyledText>
-          <StyledText as="p">{t('clear_robots_description')}</StyledText>
+          </LegacyStyledText>
+          <LegacyStyledText as="p">
+            {t('clear_robots_description')}
+          </LegacyStyledText>
         </Box>
         <TertiaryButton
           marginLeft={SPACING_AUTO}

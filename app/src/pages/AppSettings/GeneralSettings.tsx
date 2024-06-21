@@ -16,7 +16,7 @@ import {
   Link,
   SPACING_AUTO,
   SPACING,
-  StyledText,
+  LegacyStyledText,
   TYPOGRAPHY,
   useMountEffect,
 } from '@opentrons/components'
@@ -145,20 +145,20 @@ export function GeneralSettings(): JSX.Element {
               />
             )}
             <Box width="65%">
-              <StyledText
+              <LegacyStyledText
                 css={TYPOGRAPHY.h3SemiBold}
                 paddingBottom={SPACING.spacing8}
               >
                 {t('software_version')}
-              </StyledText>
-              <StyledText
+              </LegacyStyledText>
+              <LegacyStyledText
                 as="p"
                 paddingBottom={SPACING.spacing8}
                 id="GeneralSettings_currentVersion"
               >
                 {CURRENT_VERSION}
-              </StyledText>
-              <StyledText as="p">
+              </LegacyStyledText>
+              <LegacyStyledText as="p">
                 {t('shared:view_latest_release_notes')}
                 <Link
                   external
@@ -166,7 +166,7 @@ export function GeneralSettings(): JSX.Element {
                   css={TYPOGRAPHY.linkPSemiBold}
                   id="GeneralSettings_GitHubLink"
                 >{` ${t('shared:github')}`}</Link>
-              </StyledText>
+              </LegacyStyledText>
             </Box>
             {updateAvailable ? (
               <TertiaryButton
@@ -180,20 +180,20 @@ export function GeneralSettings(): JSX.Element {
                 {t('view_software_update')}
               </TertiaryButton>
             ) : (
-              <StyledText
+              <LegacyStyledText
                 fontSize={TYPOGRAPHY.fontSizeLabel}
                 lineHeight={TYPOGRAPHY.lineHeight12}
                 color={COLORS.grey60}
                 paddingY={SPACING.spacing24}
               >
                 {t('up_to_date')}
-              </StyledText>
+              </LegacyStyledText>
             )}
           </Flex>
           <Box width="70%">
-            <StyledText as="p" paddingY={SPACING.spacing8}>
+            <LegacyStyledText as="p" paddingY={SPACING.spacing8}>
               {t('manage_versions')}
-            </StyledText>
+            </LegacyStyledText>
           </Box>
           <Box>
             <Flex flexDirection={DIRECTION_COLUMN}>
@@ -217,18 +217,20 @@ export function GeneralSettings(): JSX.Element {
           </Box>
         </Box>
         <Divider marginY={SPACING.spacing24} />
-        <StyledText
+        <LegacyStyledText
           css={TYPOGRAPHY.h3SemiBold}
           paddingBottom={SPACING.spacing8}
         >
           {t('update_alerts')}
-        </StyledText>
+        </LegacyStyledText>
         <Flex
           flexDirection={DIRECTION_ROW}
           alignItems={ALIGN_CENTER}
           justifyContent={JUSTIFY_SPACE_BETWEEN}
         >
-          <StyledText as="p">{t('branded:receive_alert')}</StyledText>
+          <LegacyStyledText as="p">
+            {t('branded:receive_alert')}
+          </LegacyStyledText>
           <ToggleButton
             label={ENABLE_APP_UPDATE_NOTIFICATIONS}
             marginRight={SPACING.spacing16}
@@ -243,12 +245,12 @@ export function GeneralSettings(): JSX.Element {
           flexDirection={DIRECTION_ROW}
           justifyContent={JUSTIFY_SPACE_BETWEEN}
         >
-          <StyledText
+          <LegacyStyledText
             css={TYPOGRAPHY.h3SemiBold}
             paddingBottom={SPACING.spacing8}
           >
             {t('connect_ip')}
-          </StyledText>
+          </LegacyStyledText>
           <TertiaryButton
             marginLeft={SPACING_AUTO}
             id="GeneralSettings_setUpConnection"

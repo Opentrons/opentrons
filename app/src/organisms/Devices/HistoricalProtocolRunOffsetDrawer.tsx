@@ -11,7 +11,7 @@ import {
   Flex,
   JUSTIFY_FLEX_START,
   SPACING,
-  StyledText,
+  LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import {
@@ -72,7 +72,9 @@ export function HistoricalProtocolRunOffsetDrawer(
           padding={`${SPACING.spacing24} ${SPACING.spacing8}`}
           textAlign="center"
         >
-          <StyledText as="label">{t('no_offsets_available')}</StyledText>
+          <LegacyStyledText as="label">
+            {t('no_offsets_available')}
+          </LegacyStyledText>
         </Box>
       </Box>
     )
@@ -98,10 +100,12 @@ export function HistoricalProtocolRunOffsetDrawer(
           iconMarginLeft={SPACING.spacing4}
         >
           <Flex flexDirection={DIRECTION_COLUMN}>
-            <StyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
+            <LegacyStyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
               {t('data_out_of_date')}
-            </StyledText>
-            <StyledText as="p">{t('robot_was_recalibrated')}</StyledText>
+            </LegacyStyledText>
+            <LegacyStyledText as="p">
+              {t('robot_was_recalibrated')}
+            </LegacyStyledText>
           </Flex>
         </Banner>
       ) : null}
@@ -110,34 +114,34 @@ export function HistoricalProtocolRunOffsetDrawer(
           width="25.25%"
           padding={`${SPACING.spacing4} ${SPACING.spacing8} ${SPACING.spacing4} ${SPACING.spacing4}`}
         >
-          <StyledText
+          <LegacyStyledText
             as="label"
             fontWeight={TYPOGRAPHY.fontWeightSemiBold}
             textTransform={TYPOGRAPHY.textTransformCapitalize}
             datatest-id="RecentProtocolRun_OffstDrawer_locationTitle"
           >
             {t('location')}
-          </StyledText>
+          </LegacyStyledText>
         </Box>
         <Box width="39.75%" padding={`${SPACING.spacing4} ${SPACING.spacing8}`}>
-          <StyledText
+          <LegacyStyledText
             as="label"
             fontWeight={TYPOGRAPHY.fontWeightSemiBold}
             textTransform={TYPOGRAPHY.textTransformCapitalize}
             datatest-id="RecentProtocolRun_OffsetDrawer_labwareTitle"
           >
             {t('labware')}
-          </StyledText>
+          </LegacyStyledText>
         </Box>
         <Box width="34%" padding={`${SPACING.spacing4} ${SPACING.spacing8}`}>
-          <StyledText
+          <LegacyStyledText
             as="label"
             fontWeight={TYPOGRAPHY.fontWeightSemiBold}
             textTransform={TYPOGRAPHY.textTransformCapitalize}
             datatest-id="RecentProtocolRun_OffsetDrawer_labwareOffsetDataTitle"
           >
             {t('labware_offset_data')}
-          </StyledText>
+          </LegacyStyledText>
         </Box>
       </Flex>
       {uniqueLabwareOffsets.map((offset, index) => {
@@ -165,16 +169,16 @@ export function HistoricalProtocolRunOffsetDrawer(
             gridGap={SPACING.spacing24}
           >
             <Box width="23.25%">
-              <StyledText as="label">
+              <LegacyStyledText as="label">
                 {t('slot', { slotName: offset.location.slotName })}
                 {offset.location.moduleModel != null &&
                   ` - ${getModuleDisplayName(offset.location.moduleModel)}`}
-              </StyledText>
+              </LegacyStyledText>
             </Box>
             <Box width="38%">
-              <StyledText as="label" title={labwareName}>
+              <LegacyStyledText as="label" title={labwareName}>
                 {labwareName}
-              </StyledText>
+              </LegacyStyledText>
             </Box>
             <Box width="33%">
               <OffsetVector

@@ -15,7 +15,7 @@ import {
   JUSTIFY_SPACE_BETWEEN,
   OVERFLOW_WRAP_ANYWHERE,
   SPACING,
-  StyledText,
+  LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { RUN_STATUS_RUNNING, RUN_STATUS_IDLE } from '@opentrons/api-client'
@@ -216,14 +216,16 @@ export function CurrentRunningProtocolCommand({
         height="6.75rem"
       >
         <Flex flexDirection={DIRECTION_COLUMN}>
-          <StyledText
+          <LegacyStyledText
             fontSize={TYPOGRAPHY.fontSize28}
             lineHeight={TYPOGRAPHY.lineHeight36}
             fontWeight={TYPOGRAPHY.fontWeightBold}
           >
             {currentRunStatus}
-          </StyledText>
-          <StyledText css={TITLE_TEXT_STYLE}>{protocolName}</StyledText>
+          </LegacyStyledText>
+          <LegacyStyledText css={TITLE_TEXT_STYLE}>
+            {protocolName}
+          </LegacyStyledText>
         </Flex>
         <Flex
           height="100%"
@@ -231,7 +233,7 @@ export function CurrentRunningProtocolCommand({
           flexDirection={DIRECTION_COLUMN}
         >
           <RunTimer {...runTimerInfo} style={RUN_TIMER_STYLE} />
-          <StyledText as="h4SemiBold">{stepCounterCopy}</StyledText>
+          <LegacyStyledText as="h4SemiBold">{stepCounterCopy}</LegacyStyledText>
         </Flex>
       </Flex>
 

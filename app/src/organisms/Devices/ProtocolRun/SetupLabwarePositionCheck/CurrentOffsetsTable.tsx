@@ -15,7 +15,7 @@ import {
   Flex,
   JUSTIFY_SPACE_BETWEEN,
   SPACING,
-  StyledText,
+  LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
@@ -146,9 +146,9 @@ export function CurrentOffsetsTable(
       flexDirection={DIRECTION_COLUMN}
       justifyContent={JUSTIFY_SPACE_BETWEEN}
     >
-      <StyledText as="label">
+      <LegacyStyledText as="label">
         {i18n.format(t('applied_offset_data'), 'upperCase')}
-      </StyledText>
+      </LegacyStyledText>
       {isLabwareOffsetCodeSnippetsOn ? (
         <LabwareOffsetTabs
           TableComponent={TableComponent}

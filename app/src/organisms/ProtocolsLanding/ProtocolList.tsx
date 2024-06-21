@@ -17,7 +17,7 @@ import {
   POSITION_ABSOLUTE,
   SecondaryButton,
   SPACING,
-  StyledText,
+  LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
@@ -157,20 +157,20 @@ export function ProtocolList(props: ProtocolListProps): JSX.Element | null {
         justifyContent={JUSTIFY_SPACE_BETWEEN}
         marginBottom={SPACING.spacing24}
       >
-        <StyledText as="h1">{t('protocols')}</StyledText>
+        <LegacyStyledText as="h1">{t('protocols')}</LegacyStyledText>
         <Flex flexDirection={DIRECTION_ROW}>
           <Flex
             flexDirection={DIRECTION_ROW}
             alignItems={ALIGN_CENTER}
             marginRight={SPACING.spacing16}
           >
-            <StyledText
+            <LegacyStyledText
               as="p"
               fontWeight={TYPOGRAPHY.fontWeightSemiBold}
               color={COLORS.grey60}
             >
               {t('shared:sort_by')}
-            </StyledText>
+            </LegacyStyledText>
             <Flex
               flexDirection={DIRECTION_ROW}
               alignItems={ALIGN_CENTER}
@@ -180,7 +180,7 @@ export function ProtocolList(props: ProtocolListProps): JSX.Element | null {
               onClick={toggleSetShowSortByMenu}
               data-testid="ProtocolList_SortByMenu"
             >
-              <StyledText
+              <LegacyStyledText
                 as="p"
                 fontWeight={TYPOGRAPHY.fontWeightSemiBold}
                 paddingLeft={SPACING.spacing8}
@@ -189,7 +189,7 @@ export function ProtocolList(props: ProtocolListProps): JSX.Element | null {
                 data-testid="sortBy-label"
               >
                 {sortByLabelType[sortBy].label}
-              </StyledText>
+              </LegacyStyledText>
               <Icon
                 paddingRight={SPACING.spacing8}
                 color={COLORS.black90}

@@ -14,7 +14,7 @@ import {
   JUSTIFY_SPACE_BETWEEN,
   PrimaryButton,
   SPACING,
-  StyledText,
+  LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { RobotMotionLoader } from '../RobotMotionLoader'
@@ -108,7 +108,7 @@ export const IntroScreen = (props: {
         <Trans
           t={t}
           i18nKey="labware_position_check_description"
-          components={{ block: <StyledText as="p" /> }}
+          components={{ block: <LegacyStyledText as="p" /> }}
         />
       }
       rightElement={
@@ -175,9 +175,9 @@ function ViewOffsets(props: ViewOffsetsProps): JSX.Element {
         aria-label="show labware offsets"
       >
         <Icon name="reticle" size="1.75rem" color={COLORS.black90} />
-        <StyledText as="p">
+        <LegacyStyledText as="p">
           {i18n.format(t('view_current_offsets'), 'capitalize')}
-        </StyledText>
+        </LegacyStyledText>
       </Btn>
       {showOffsetsTable
         ? createPortal(
@@ -189,9 +189,12 @@ function ViewOffsets(props: ViewOffsetsProps): JSX.Element {
               flexDirection={DIRECTION_COLUMN}
               justifyContent={JUSTIFY_SPACE_BETWEEN}
               header={
-                <StyledText as="h4" fontWeight={TYPOGRAPHY.fontWeightBold}>
+                <LegacyStyledText
+                  as="h4"
+                  fontWeight={TYPOGRAPHY.fontWeightBold}
+                >
                   {i18n.format(t('labware_offset_data'), 'capitalize')}
-                </StyledText>
+                </LegacyStyledText>
               }
               footer={
                 <SmallButton

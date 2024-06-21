@@ -6,7 +6,7 @@ import {
   DIRECTION_COLUMN,
   Flex,
   TYPOGRAPHY,
-  StyledText,
+  LegacyStyledText,
 } from '@opentrons/components'
 import { getPipetteModelSpecs } from '@opentrons/shared-data'
 
@@ -29,17 +29,20 @@ export const RenderMountInformation = ({
     pipette?.model
   return (
     <Flex flexDirection={DIRECTION_COLUMN}>
-      <StyledText
+      <LegacyStyledText
         css={TYPOGRAPHY.h6SemiBold}
         color={COLORS.grey50}
         textTransform={TYPOGRAPHY.textTransformUppercase}
-      >{`${mount} MOUNT`}</StyledText>
+      >{`${mount} MOUNT`}</LegacyStyledText>
       {pipette != null ? (
-        <StyledText as="p">{displayName}</StyledText>
+        <LegacyStyledText as="p">{displayName}</LegacyStyledText>
       ) : (
-        <StyledText as="p" textTransform={TYPOGRAPHY.textTransformCapitalize}>
+        <LegacyStyledText
+          as="p"
+          textTransform={TYPOGRAPHY.textTransformCapitalize}
+        >
           {t('empty')}
-        </StyledText>
+        </LegacyStyledText>
       )}
     </Flex>
   )

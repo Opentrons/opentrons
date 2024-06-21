@@ -8,7 +8,7 @@ import {
   Flex,
   JUSTIFY_SPACE_BETWEEN,
   SPACING,
-  StyledText,
+  LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
@@ -78,20 +78,20 @@ const Template: Story<ColorsStorybookProps> = args => {
                 border: `1px solid ${COLORS.grey20}`,
               }}
             >
-              <StyledText
+              <LegacyStyledText
                 color={invertColor(color[1] as string)}
                 fontSize={TYPOGRAPHY.fontSizeP}
                 fontWeight={TYPOGRAPHY.fontWeightBold}
               >
                 {color[0]}
-              </StyledText>
-              <StyledText
+              </LegacyStyledText>
+              <LegacyStyledText
                 fontSize={TYPOGRAPHY.fontSizeP}
                 color={invertColor(color[1] as string)}
                 fontWeight={TYPOGRAPHY.fontWeightRegular}
               >
                 {color[1]}
-              </StyledText>
+              </LegacyStyledText>
             </Flex>
           ))}
         </Flex>

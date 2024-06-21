@@ -10,7 +10,7 @@ import {
   JUSTIFY_FLEX_START,
   JUSTIFY_SPACE_BETWEEN,
   SPACING,
-  StyledText,
+  LegacyStyledText,
 } from '@opentrons/components'
 
 export const PipetteRecalibrationODDWarning = (): JSX.Element | null => {
@@ -36,13 +36,13 @@ export const PipetteRecalibrationODDWarning = (): JSX.Element | null => {
           marginRight={SPACING.spacing12}
           aria-label="alert-circle_icon"
         />
-        <StyledText as="p">
+        <LegacyStyledText as="p">
           <Trans
             t={t}
             i18nKey="pipette_calibrations_differ"
             components={{ bold: <strong /> }}
           />
-        </StyledText>
+        </LegacyStyledText>
       </Flex>
       <Btn
         onClick={() => {

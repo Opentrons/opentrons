@@ -13,7 +13,7 @@ import {
   POSITION_STATIC,
   POSITION_STICKY,
   SPACING,
-  StyledText,
+  LegacyStyledText,
 } from '@opentrons/components'
 import { useAllProtocolsQuery } from '@opentrons/react-api-client'
 
@@ -165,13 +165,13 @@ export function ProtocolDashboard(): JSX.Element {
               flexDirection={DIRECTION_COLUMN}
               marginBottom={SPACING.spacing32}
             >
-              <StyledText
+              <LegacyStyledText
                 as="p"
                 marginBottom={SPACING.spacing8}
                 color={COLORS.grey60}
               >
                 {t('pinned_protocols')}
-              </StyledText>
+              </LegacyStyledText>
               <PinnedProtocolCarousel
                 pinnedProtocols={pinnedProtocols}
                 longPress={setLongPressModalOpened}

@@ -1045,5 +1045,19 @@
   },
   "namespace": "opentrons",
   "version": 1,
-  "schemaVersion": 2
+  "schemaVersion": 2,
+  "liquidProbeParameters": {
+    "minimumHeight": [
+      {
+        "value": 0.5,
+        "applicableWells": []
+      }
+    ],
+    "minimumWellVolume": [
+      {
+        "value": 0,
+        "applicableWells": []
+      }
+    ]
+  }
 }

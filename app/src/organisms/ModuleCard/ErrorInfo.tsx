@@ -15,7 +15,7 @@ import {
   JUSTIFY_FLEX_END,
   PrimaryButton,
   SPACING,
-  StyledText,
+  LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { Banner } from '../../atoms/Banner'
@@ -60,9 +60,9 @@ export function ErrorInfo(props: ErrorInfoProps): JSX.Element | null {
         {t('module_error')}
 
         <Flex flexDirection={DIRECTION_ROW}>
-          <StyledText as="p" marginRight={SPACING.spacing4}>
+          <LegacyStyledText as="p" marginRight={SPACING.spacing4}>
             {t('view')}
-          </StyledText>
+          </LegacyStyledText>
           <Btn
             textAlign={ALIGN_START}
             fontSize={TYPOGRAPHY.fontSizeP}
@@ -71,12 +71,12 @@ export function ErrorInfo(props: ErrorInfoProps): JSX.Element | null {
             }}
             aria-label="view_error_details"
           >
-            <StyledText
+            <LegacyStyledText
               as="p"
               textDecoration={TYPOGRAPHY.textDecorationUnderline}
             >
               {t('error_details')}
-            </StyledText>
+            </LegacyStyledText>
           </Btn>
         </Flex>
       </Flex>
@@ -93,11 +93,11 @@ export function ErrorInfo(props: ErrorInfoProps): JSX.Element | null {
             >
               <Flex flexDirection={DIRECTION_COLUMN}>
                 {errorDetails != null ? (
-                  <StyledText as="p">{errorDetails}</StyledText>
+                  <LegacyStyledText as="p">{errorDetails}</LegacyStyledText>
                 ) : null}
-                <StyledText as="p" marginBottom={SPACING.spacing16}>
+                <LegacyStyledText as="p" marginBottom={SPACING.spacing16}>
                   {t('branded:module_error_contact_support')}
-                </StyledText>
+                </LegacyStyledText>
               </Flex>
               <Flex justifyContent={JUSTIFY_FLEX_END}>
                 <PrimaryButton

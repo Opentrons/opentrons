@@ -13,7 +13,7 @@ import {
   JUSTIFY_SPACE_AROUND,
   OVERFLOW_WRAP_ANYWHERE,
   SPACING,
-  StyledText,
+  LegacyStyledText,
 } from '@opentrons/components'
 import { getStoredProtocols } from '../../redux/protocol-storage'
 import { formatInterval } from '../RunTimeControl/utils'
@@ -86,7 +86,7 @@ export function HistoricalProtocolRun(
             css={{ cursor: 'pointer' }}
           />
         </Box>
-        <StyledText
+        <LegacyStyledText
           as="p"
           width="25%"
           data-testid={`RecentProtocolRuns_Run_${String(protocolKey)}`}
@@ -101,9 +101,9 @@ export function HistoricalProtocolRun(
           color={COLORS.grey60}
         >
           {runDisplayName}
-        </StyledText>
+        </LegacyStyledText>
         {protocolKeyInStoredKeys != null ? (
-          <StyledText
+          <LegacyStyledText
             as="p"
             width="35%"
             data-testid={`RecentProtocolRuns_Protocol_${String(protocolKey)}`}
@@ -115,9 +115,9 @@ export function HistoricalProtocolRun(
             color={COLORS.grey60}
           >
             {protocolName}
-          </StyledText>
+          </LegacyStyledText>
         ) : (
-          <StyledText
+          <LegacyStyledText
             as="p"
             width="35%"
             data-testid={`RecentProtocolRuns_Protocol_${String(protocolKey)}`}
@@ -126,9 +126,9 @@ export function HistoricalProtocolRun(
             color={COLORS.grey60}
           >
             {protocolName}
-          </StyledText>
+          </LegacyStyledText>
         )}
-        <StyledText
+        <LegacyStyledText
           as="p"
           width="20%"
           textTransform="capitalize"
@@ -145,14 +145,14 @@ export function HistoricalProtocolRun(
             />
           )}
           {runStatus != null ? t(`status_${String(runStatus)}`) : ''}
-        </StyledText>
-        <StyledText
+        </LegacyStyledText>
+        <LegacyStyledText
           as="p"
           width="20%"
           data-testid="RecentProtocolRuns_Duration"
         >
           {duration}
-        </StyledText>
+        </LegacyStyledText>
         <OverflowMenu
           runId={run.id}
           robotName={robotName}

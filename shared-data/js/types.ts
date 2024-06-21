@@ -172,6 +172,11 @@ export interface LabwareWellGroup {
   brand?: LabwareBrand
 }
 
+export interface LiquidProbeParameters {
+  minimumHeight: Array<{ value: number; applicableWells: string[] }>
+  minimumWellVolume: Array<{ value: number; applicableWells: string[] }>
+}
+
 export type LabwareRoles = 'labware' | 'adapter' | 'fixture' | 'maintenance'
 
 // NOTE: must be synced with shared-data/labware/schemas/2.json
@@ -190,6 +195,7 @@ export interface LabwareDefinition2 {
   allowedRoles?: LabwareRoles[]
   stackingOffsetWithLabware?: Record<string, LabwareOffset>
   stackingOffsetWithModule?: Record<string, LabwareOffset>
+  liquidProbeParameters?: LiquidProbeParameters
 }
 
 export interface LabwareDefByDefURI {
