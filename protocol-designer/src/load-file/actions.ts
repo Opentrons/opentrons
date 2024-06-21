@@ -28,11 +28,14 @@ export const dismissFileUploadMessage = (): DismissFileUploadMessageAction => ({
   type: 'DISMISS_FILE_UPLOAD_MESSAGE',
 })
 // expects valid, parsed JSON protocol.
-export const loadFileAction = (protocolFile: PDProtocolFile, hasFileSystemAccess: boolean = false): LoadFileAction => ({
+export const loadFileAction = (
+  protocolFile: PDProtocolFile,
+  hasFileSystemAccess: boolean = false
+): LoadFileAction => ({
   type: 'LOAD_FILE',
   payload: {
     ...migration(protocolFile),
-    hasFileSystemAccess
+    hasFileSystemAccess,
   },
 })
 // load file thunk, handles file loading errors
@@ -132,6 +135,9 @@ export const saveToFileSystem: () => ThunkAction<SaveToFileSystemAction> = () =>
   const protocolName =
     fileDataSelectors.getFileMetadata(state).protocolName || 'untitled'
   const fileName = `${protocolName}.json`
-  remote.ipcRenderer.send('save-protocol-file-to-filesystem', fileName, fileData)
+  remote.ipcRenderer.send(
+    'save-protocol-file-to-filesystem',
+    fileName,
+    fileData
+  )
 }
-

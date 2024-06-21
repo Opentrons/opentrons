@@ -4,7 +4,12 @@ import path from 'path'
 
 import { getConfig } from './config'
 import { createLogger } from './log'
-import { PROTOCOLS_DIRECTORY_PATH, analyzeProtocolByKey, getProtocolSourceJSON, overwriteProtocol } from './protocol-storage/file-system'
+import {
+  PROTOCOLS_DIRECTORY_PATH,
+  analyzeProtocolByKey,
+  getProtocolSourceJSON,
+  overwriteProtocol,
+} from './protocol-storage/file-system'
 
 const protocolEditorUiConfig = getConfig('protocolEditorUi')
 const log = createLogger('protocolEditorUi')
@@ -30,7 +35,6 @@ const WINDOW_OPTS = {
   ),
 }
 
-
 const protocolEditorPath =
   protocolEditorUiConfig.url.protocol === 'file:'
     ? path.join(app.getAppPath(), protocolEditorUiConfig.url.path)
@@ -39,13 +43,10 @@ const protocolEditorPath =
 export function createProtocolEditorUi(srcFilePath: string): BrowserWindow {
   log.debug('Creating protocol editor window', { options: WINDOW_OPTS })
 
-  const subWindow = new BrowserWindow(WINDOW_OPTS).once(
-    'ready-to-show',
-    () => {
-      log.debug('Protocol Editor window ready to show')
-      subWindow.show()
-    }
-  )
+  const subWindow = new BrowserWindow(WINDOW_OPTS).once('ready-to-show', () => {
+    log.debug('Protocol Editor window ready to show')
+    subWindow.show()
+  })
   const protocolEditorUrl = `${protocolEditorUiConfig.url.protocol}//${protocolEditorPath}`
 
   log.info(`Loading ${protocolEditorUrl}`)
@@ -65,17 +66,18 @@ export function createProtocolEditorUi(srcFilePath: string): BrowserWindow {
     const protocolSourceJSON = getProtocolSourceJSON(srcFilePath)
     protocolSourceJSON.then(json => {
       subWindow.webContents.send('open-protocol-in-designer', json)
-      ipcMain.once('save-protocol-file-to-filesystem', (_event, fileName, fileData) => {
-        overwriteProtocol(srcFilePath, fileName, fileData).then(() => {
-          const { protocolKey } = /.*\/(?<protocolKey>.*)\/src.*/.exec(srcFilePath)?.groups ?? {}
-          return analyzeProtocolByKey(
-            protocolKey,
-            PROTOCOLS_DIRECTORY_PATH
-          )
-        })
-      })
+      ipcMain.once(
+        'save-protocol-file-to-filesystem',
+        (_event, fileName, fileData) => {
+          overwriteProtocol(srcFilePath, fileName, fileData).then(() => {
+            const { protocolKey } =
+              /.*\/(?<protocolKey>.*)\/src.*/.exec(srcFilePath)?.groups ?? {}
+            return analyzeProtocolByKey(protocolKey, PROTOCOLS_DIRECTORY_PATH)
+          })
+        }
+      )
     })
-  });
+  })
 
   return subWindow
 }

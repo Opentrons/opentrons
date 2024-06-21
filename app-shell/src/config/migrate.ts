@@ -384,7 +384,7 @@ const toVersion21 = (prevConfig: ConfigV20): ConfigV21 => {
       ...prevConfig.onDeviceDisplaySettings,
       unfinishedUnboxingFlowRoute:
         prevConfig.onDeviceDisplaySettings.unfinishedUnboxingFlowRoute ===
-          '/dashboard'
+        '/dashboard'
           ? null
           : prevConfig.onDeviceDisplaySettings.unfinishedUnboxingFlowRoute,
     },
@@ -432,29 +432,29 @@ const MIGRATIONS: [
   (prevConfig: ConfigV20) => ConfigV21,
   (prevConfig: ConfigV21) => ConfigV22
 ] = [
-    toVersion1,
-    toVersion2,
-    toVersion3,
-    toVersion4,
-    toVersion5,
-    toVersion6,
-    toVersion7,
-    toVersion8,
-    toVersion9,
-    toVersion10,
-    toVersion11,
-    toVersion12,
-    toVersion13,
-    toVersion14,
-    toVersion15,
-    toVersion16,
-    toVersion17,
-    toVersion18,
-    toVersion19,
-    toVersion20,
-    toVersion21,
-    toVersion22,
-  ]
+  toVersion1,
+  toVersion2,
+  toVersion3,
+  toVersion4,
+  toVersion5,
+  toVersion6,
+  toVersion7,
+  toVersion8,
+  toVersion9,
+  toVersion10,
+  toVersion11,
+  toVersion12,
+  toVersion13,
+  toVersion14,
+  toVersion15,
+  toVersion16,
+  toVersion17,
+  toVersion18,
+  toVersion19,
+  toVersion20,
+  toVersion21,
+  toVersion22,
+]
 
 export const DEFAULTS: Config = migrate(DEFAULTS_V0)
 

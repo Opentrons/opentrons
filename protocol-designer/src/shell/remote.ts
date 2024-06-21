@@ -1,4 +1,3 @@
-
 import type { Remote } from './types'
 
 const emptyRemote: Remote = {} as any

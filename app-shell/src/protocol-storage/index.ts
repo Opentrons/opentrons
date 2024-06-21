@@ -220,9 +220,13 @@ export function registerProtocolStorage(dispatch: Dispatch): Dispatch {
         FileSystem.getProtocolSourceFiles(
           action.payload.protocolKey,
           FileSystem.PROTOCOLS_DIRECTORY_PATH
-        ).then((srcFiles) => {
-          createProtocolEditorUi(srcFiles[0])
-        }).catch(e => { console.error(e) })
+        )
+          .then(srcFiles => {
+            createProtocolEditorUi(srcFiles[0])
+          })
+          .catch(e => {
+            console.error(e)
+          })
         break
       }
 

@@ -297,7 +297,9 @@ export function FileSidebar(): JSX.Element {
   const savedStepForms = useSelector(stepFormSelectors.getSavedStepForms)
   const newProtocolModal = useSelector(selectors.getNewProtocolModal)
   const hasUnsavedChanges = useSelector(loadFileSelectors.getHasUnsavedChanges)
-  const hasNativeFileSystemAccess = useSelector(loadFileSelectors.getHasNativeFileSystemAccess)
+  const hasNativeFileSystemAccess = useSelector(
+    loadFileSelectors.getHasNativeFileSystemAccess
+  )
   const canCreateNew = !newProtocolModal
   const dispatch: ThunkDispatch<any> = useDispatch()
 
@@ -414,7 +416,6 @@ export function FileSidebar(): JSX.Element {
     },
   })
 
-
   const sidebarContents = hasNativeFileSystemAccess ? (
     <div className={styles.button}>
       <DeprecatedPrimaryButton
@@ -486,9 +487,7 @@ export function FileSidebar(): JSX.Element {
           getMainPagePortalEl()
         )}
       <SidePanel title="Protocol File">
-        <div className={styles.file_sidebar}>
-          {sidebarContents}
-        </div>
+        <div className={styles.file_sidebar}>{sidebarContents}</div>
       </SidePanel>
     </>
   )
