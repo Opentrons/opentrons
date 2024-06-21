@@ -1059,5 +1059,19 @@
       "y": 0,
       "z": 5.45
     }
+  },
+  "liquidProbeParameters": {
+    "minimumHeight": [
+      {
+        "value": 0.5,
+        "applicableWells": []
+      }
+    ],
+    "minimumWellVolume": [
+      {
+        "value": 0,
+        "applicableWells": []
+      }
+    ]
   }
 }
