@@ -53,7 +53,7 @@ export function ProtocolOverflowMenu(
     handleSendProtocolToFlex,
   } = props
   const { mostRecentAnalysis, protocolKey } = storedProtocolData
-  const { t } = useTranslation(['protocol_list', 'shared'])
+  const { t, i18n } = useTranslation(['protocol_list', 'shared'])
   const {
     menuOverlay,
     handleOverflowClick,
@@ -183,7 +183,7 @@ export function ProtocolOverflowMenu(
             {t('show_in_folder')}
           </MenuItem>
           <MenuItem onClick={handleClickEdit} >
-            {t('edit')}
+            {i18n.format(t('edit'), 'capitalize')}
           </MenuItem>
           <MenuItem
             onClick={handleClickDelete}

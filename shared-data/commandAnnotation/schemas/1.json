@@ -5,7 +5,6 @@
     "baseAnnotation": {
       "description": "Things all annotations have",
       "type": "object",
-      "required": ["type", "commandKeys"],
       "required": ["annotationType", "commandKeys"],
       "properties": {
         "commandKeys": {

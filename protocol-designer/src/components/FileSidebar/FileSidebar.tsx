@@ -232,7 +232,7 @@ function getWarningContent({
     return {
       content:
         (fixtureWithoutStep.trashBin && !fixtureWithoutStep.wasteChute) ||
-          (!fixtureWithoutStep.trashBin && fixtureWithoutStep.wasteChute) ? (
+        (!fixtureWithoutStep.trashBin && fixtureWithoutStep.wasteChute) ? (
           <p>
             {t('export_warnings.unused_trash.body', {
               name: fixtureWithoutStep.trashBin ? 'trash bin' : 'waste chute',
