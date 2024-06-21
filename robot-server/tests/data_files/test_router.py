@@ -201,3 +201,33 @@ async def test_upload_non_existent_file_path(
             created_at=datetime(year=2024, month=6, day=18),
         )
     assert exc_info.value.status_code == 404
+    assert exc_info.value.content["errors"][0]["id"] == "FileNotFound"
+
+
+async def test_upload_non_csv_file(
+    decoy: Decoy,
+    data_files_store: DataFilesStore,
+    file_reader_writer: FileReaderWriter,
+    file_hasher: FileHasher,
+) -> None:
+    """It should store the data file from path to persistent storage & update the database."""
+    data_files_directory = Path("/dev/null")
+    content = bytes("some_content", encoding="utf-8")
+    buffered_file = BufferedFile(name="abc.png", contents=content, path=None)
+
+    decoy.when(
+        await file_reader_writer.read(files=[Path("/data/my_data_file.csv")])
+    ).then_return([buffered_file])
+    with pytest.raises(ApiError) as exc_info:
+        await upload_data_file(
+            file=None,
+            file_path="/data/my_data_file.csv",
+            data_files_directory=data_files_directory,
+            data_files_store=data_files_store,
+            file_reader_writer=file_reader_writer,
+            file_hasher=file_hasher,
+            file_id="data-file-id",
+            created_at=datetime(year=2024, month=6, day=18),
+        )
+    assert exc_info.value.status_code == 422
+    assert exc_info.value.content["errors"][0]["id"] == "UnexpectedFileFormat"

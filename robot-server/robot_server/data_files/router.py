@@ -42,6 +42,13 @@ class FileNotFound(ErrorDetails):
     title: str = "Specified file path not found on the robot"
 
 
+class UnexpectedFileFormat(ErrorDetails):
+    """An error returned when specified file is not in expected format."""
+
+    id: Literal["UnexpectedFileFormat"] = "UnexpectedFileFormat"
+    title: str = "Unexpected file format"
+
+
 @PydanticResponse.wrap_route(
     datafiles_router.post,
     path="/dataFiles",
@@ -56,9 +63,15 @@ class FileNotFound(ErrorDetails):
         status.HTTP_200_OK: {"model": SimpleBody[DataFile]},
         status.HTTP_201_CREATED: {"model": SimpleBody[DataFile]},
         status.HTTP_422_UNPROCESSABLE_ENTITY: {
-            "model": ErrorBody[Union[MultipleDataFileSources, NoDataFileSourceProvided]]
+            "model": ErrorBody[
+                Union[
+                    MultipleDataFileSources,
+                    NoDataFileSourceProvided,
+                    UnexpectedFileFormat,
+                ]
+            ]
         },
-        status.HTTP_404_NOT_FOUND: {},
+        status.HTTP_404_NOT_FOUND: {"model": ErrorBody[FileNotFound]},
     },
 )
 async def upload_data_file(
@@ -85,11 +98,15 @@ async def upload_data_file(
             detail="You must provide either a file or a file_path in the request."
         ).as_error(status.HTTP_422_UNPROCESSABLE_ENTITY)
     try:
-        buffered_file = await file_reader_writer.read(files=[file or Path(file_path)])  # type: ignore[arg-type, list-item]
+        [buffered_file] = await file_reader_writer.read(files=[file or Path(file_path)])  # type: ignore[arg-type, list-item]
     except FileNotFoundError as e:
         raise FileNotFound(detail=str(e)).as_error(status.HTTP_404_NOT_FOUND) from e
-    # TODO (spp, 2024-06-18): validate CSV file contents
-    file_hash = await file_hasher.hash(buffered_file)
+    # TODO (spp, 2024-06-18): probably also validate CSV file *contents*
+    if not buffered_file.name.endswith(".csv"):
+        raise UnexpectedFileFormat(detail="Only CSV file format is accepted.").as_error(
+            status.HTTP_422_UNPROCESSABLE_ENTITY
+        )
+    file_hash = await file_hasher.hash([buffered_file])
     existing_file_info = data_files_store.get_file_info_by_hash(file_hash)
     if existing_file_info:
         return await PydanticResponse.create(
@@ -105,11 +122,11 @@ async def upload_data_file(
 
     # TODO (spp, 2024-06-18): auto delete data files if max exceeded
     await file_reader_writer.write(
-        directory=data_files_directory / file_id, files=buffered_file
+        directory=data_files_directory / file_id, files=[buffered_file]
     )
     file_info = DataFileInfo(
         id=file_id,
-        name=buffered_file[0].name,
+        name=buffered_file.name,
         file_hash=file_hash,
         created_at=created_at,
     )
