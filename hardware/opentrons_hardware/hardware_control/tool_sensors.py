@@ -236,7 +236,7 @@ async def run_stream_output_to_csv(
     binding_field = SensorOutputBindingField.from_flags(binding)
     for sensor_id in sensors.keys():
         sensor_info = sensors[sensor_id].sensor
-        await messenger.send(
+        await messenger.ensure_send(
             node_id=sensor_info.node_id,
             message=BindSensorOutputRequest(
                 payload=BindSensorOutputRequestPayload(
@@ -245,6 +245,7 @@ async def run_stream_output_to_csv(
                     binding=binding_field,
                 )
             ),
+            expected_nodes=[sensor_info.node_id],
         )
 
     messenger.add_listener(sensor_capturer, None)
@@ -254,7 +255,7 @@ async def run_stream_output_to_csv(
 
     for sensor_id in sensors.keys():
         sensor_info = sensors[sensor_id].sensor
-        await messenger.send(
+        await messenger.ensure_send(
             node_id=sensor_info.node_id,
             message=BindSensorOutputRequest(
                 payload=BindSensorOutputRequestPayload(
@@ -263,6 +264,7 @@ async def run_stream_output_to_csv(
                     binding=SensorOutputBindingField(SensorOutputBinding.none),
                 )
             ),
+            expected_nodes=[sensor_info.node_id],
         )
     return positions
 
@@ -342,7 +344,7 @@ async def _run_with_binding(
     binding_field = SensorOutputBindingField.from_flags(binding)
     for sensor_id in sensors.keys():
         sensor_info = sensors[sensor_id].sensor
-        await messenger.send(
+        await messenger.ensure_send(
             node_id=sensor_info.node_id,
             message=BindSensorOutputRequest(
                 payload=BindSensorOutputRequestPayload(
@@ -351,12 +353,13 @@ async def _run_with_binding(
                     binding=binding_field,
                 )
             ),
+            expected_nodes=[sensor_info.node_id],
         )
 
     result = await sensor_runner.run(can_messenger=messenger)
     for sensor_id in sensors.keys():
         sensor_info = sensors[sensor_id].sensor
-        await messenger.send(
+        await messenger.ensure_send(
             node_id=sensor_info.node_id,
             message=BindSensorOutputRequest(
                 payload=BindSensorOutputRequestPayload(
@@ -365,6 +368,7 @@ async def _run_with_binding(
                     binding=SensorOutputBindingField(SensorOutputBinding.none),
                 )
             ),
+            expected_nodes=[sensor_info.node_id],
         )
     return result
 
