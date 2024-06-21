@@ -217,7 +217,7 @@ function AnalysisInfo(props: AnalysisInfoProps): JSX.Element {
       >
         {/* error and protocol name section */}
         <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing8}>
-          {mostRecentAnalysis?.result === 'file-required' ? (
+          {mostRecentAnalysis?.result === 'parameter-value-required' ? (
             <ProtocolStatusBanner />
           ) : null}
           {analysisStatus === 'error' ? (

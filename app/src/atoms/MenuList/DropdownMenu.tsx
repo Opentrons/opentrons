@@ -234,7 +234,7 @@ export function DropdownMenu(props: DropdownMenuProps): JSX.Element {
           >
             {filterOptions.map((option, index) => (
               <MenuItem
-                zIndex="3"
+                zIndex={3}
                 key={`${option.name}-${index}`}
                 onClick={() => {
                   onClick(option.value)

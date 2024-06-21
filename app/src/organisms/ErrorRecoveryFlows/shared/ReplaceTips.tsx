@@ -6,7 +6,7 @@ import { useTranslation } from 'react-i18next'
 import { RecoverySingleColumnContent } from './RecoverySingleColumnContent'
 import { TwoColumn } from '../../../molecules/InterventionModal'
 import { RecoveryFooterButtons } from './RecoveryFooterButtons'
-import { LeftColumnTipInfo } from './LeftColumnTipInfo'
+import { LeftColumnLabwareInfo } from './LeftColumnLabwareInfo'
 import { RecoveryMap } from './RecoveryMap'
 
 import type { RecoveryContentProps } from '../types'
@@ -18,7 +18,7 @@ export function ReplaceTips(props: RecoveryContentProps): JSX.Element | null {
     failedPipetteInfo,
     failedLabwareUtils,
   } = props
-  const { relevantPickUpTipWellName } = failedLabwareUtils
+  const { relevantWellName } = failedLabwareUtils
   const { proceedNextStep } = routeUpdateActions
   const { t } = useTranslation('error_recovery')
 
@@ -31,7 +31,7 @@ export function ReplaceTips(props: RecoveryContentProps): JSX.Element | null {
       return t('replace_with_new_tip_rack')
     } else {
       return t('replace_used_tips_in_rack_location', {
-        location: relevantPickUpTipWellName,
+        location: relevantWellName,
       })
     }
   }
@@ -40,7 +40,12 @@ export function ReplaceTips(props: RecoveryContentProps): JSX.Element | null {
     return (
       <RecoverySingleColumnContent>
         <TwoColumn>
-          <LeftColumnTipInfo {...props} title={buildTitle()} />
+          <LeftColumnLabwareInfo
+            {...props}
+            title={buildTitle()}
+            moveType="refill"
+            bannerText={t('replace_tips_and_select_location')}
+          />
           <Flex marginTop="1.742rem">
             <RecoveryMap {...props} />
           </Flex>

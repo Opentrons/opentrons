@@ -35,12 +35,15 @@ export function useRunPausedSplash(): boolean {
 }
 
 type RunPausedSplashProps = ERUtilsResults & {
+  isOnDevice: boolean
   failedCommand: ErrorRecoveryFlowsProps['failedCommand']
   protocolAnalysis: ErrorRecoveryFlowsProps['protocolAnalysis']
   robotType: RobotType
   toggleERWiz: (launchER: boolean) => Promise<void>
 }
-export function RunPausedSplash(props: RunPausedSplashProps): JSX.Element {
+export function RunPausedSplash(
+  props: RunPausedSplashProps
+): JSX.Element | null {
   const { toggleERWiz, routeUpdateActions, failedCommand } = props
   const { t } = useTranslation('error_recovery')
   const errorKind = getErrorKind(failedCommand?.error?.errorType)
@@ -63,54 +66,64 @@ export function RunPausedSplash(props: RunPausedSplashProps): JSX.Element {
 
   // TODO(jh 06-07-24): Although unlikely, it's possible that the server doesn't return a failedCommand. Need to handle
   // this here or within ER flows.
-  return (
-    <Flex
-      display={DISPLAY_FLEX}
-      height="100vh"
-      width="100%"
-      justifyContent={JUSTIFY_CENTER}
-      alignItems={ALIGN_CENTER}
-      position={POSITION_ABSOLUTE}
-      flexDirection={DIRECTION_COLUMN}
-      gridGap={SPACING.spacing60}
-      paddingY={SPACING.spacing40}
-      backgroundColor={COLORS.red50}
-      zIndex={5}
-    >
-      <SplashFrame>
-        <Flex gridGap={SPACING.spacing32} alignItems={ALIGN_CENTER}>
-          <Icon name="ot-alert" size="4.5rem" color={COLORS.white} />
-          <SplashHeader>{title}</SplashHeader>
-        </Flex>
-        <Flex width="49rem" justifyContent={JUSTIFY_CENTER}>
-          <StepInfo
-            {...props}
-            as="h3Bold"
-            overflow="hidden"
-            overflowWrap={OVERFLOW_WRAP_BREAK_WORD}
-            color={COLORS.white}
-            textAlign={TEXT_ALIGN_CENTER}
+
+  // TODO(jh 06-18-24): Instead of passing stepCount internally, we probably want to
+  // pass it in as a prop to ErrorRecoveryFlows to ameliorate blippy "step = ? -> step = 24" behavior.
+  if (props.isOnDevice) {
+    return (
+      <Flex
+        display={DISPLAY_FLEX}
+        height="100vh"
+        width="100%"
+        justifyContent={JUSTIFY_CENTER}
+        alignItems={ALIGN_CENTER}
+        position={POSITION_ABSOLUTE}
+        flexDirection={DIRECTION_COLUMN}
+        gridGap={SPACING.spacing60}
+        paddingY={SPACING.spacing40}
+        backgroundColor={COLORS.red50}
+        zIndex={5}
+      >
+        <SplashFrame>
+          <Flex gridGap={SPACING.spacing32} alignItems={ALIGN_CENTER}>
+            <Icon name="ot-alert" size="4.5rem" color={COLORS.white} />
+            <SplashHeader>{title}</SplashHeader>
+          </Flex>
+          <Flex width="49rem" justifyContent={JUSTIFY_CENTER}>
+            <StepInfo
+              {...props}
+              as="h3Bold"
+              overflow="hidden"
+              overflowWrap={OVERFLOW_WRAP_BREAK_WORD}
+              color={COLORS.white}
+              textAlign={TEXT_ALIGN_CENTER}
+            />
+          </Flex>
+        </SplashFrame>
+        <Flex
+          justifyContent={JUSTIFY_SPACE_BETWEEN}
+          gridGap={SPACING.spacing16}
+        >
+          <LargeButton
+            onClick={onCancelClick}
+            buttonText={t('cancel_run')}
+            css={SHARED_BUTTON_STYLE}
+            iconName={'remove'}
+            buttonType="alertAlt"
+          />
+          <LargeButton
+            onClick={onLaunchERClick}
+            buttonText={t('launch_recovery_mode')}
+            css={SHARED_BUTTON_STYLE}
+            iconName={'recovery'}
+            buttonType="onColor"
           />
         </Flex>
-      </SplashFrame>
-      <Flex justifyContent={JUSTIFY_SPACE_BETWEEN} gridGap={SPACING.spacing16}>
-        <LargeButton
-          onClick={onCancelClick}
-          buttonText={t('cancel_run')}
-          css={SHARED_BUTTON_STYLE}
-          iconName={'remove'}
-          buttonType="alertAlt"
-        />
-        <LargeButton
-          onClick={onLaunchERClick}
-          buttonText={t('launch_recovery_mode')}
-          css={SHARED_BUTTON_STYLE}
-          iconName={'recovery'}
-          buttonType="onColor"
-        />
       </Flex>
-    </Flex>
-  )
+    )
+  } else {
+    return null
+  }
 }
 
 const SplashHeader = styled.h1`

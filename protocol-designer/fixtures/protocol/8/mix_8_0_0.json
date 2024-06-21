@@ -6,7 +6,7 @@
     "author": "",
     "description": "A test for 5.0.0 -> 5.1.0 migration",
     "created": 1600714068238,
-    "lastModified": 1714570500165,
+    "lastModified": 1718980476453,
     "category": null,
     "subcategory": null,
     "tags": []
@@ -15,7 +15,7 @@
     "name": "opentrons/protocol-designer",
     "version": "8.1.0",
     "data": {
-      "_internalAppBuildDate": "Wed, 01 May 2024 13:32:34 GMT",
+      "_internalAppBuildDate": "Fri, 21 Jun 2024 14:25:33 GMT",
       "defaultValues": {
         "aspirate_mmFromBottom": 1,
         "dispense_mmFromBottom": 1,
@@ -25,7 +25,10 @@
       "pipetteTiprackAssignments": {
         "pipetteId": ["opentrons/opentrons_96_tiprack_10ul/1"]
       },
-      "dismissedWarnings": { "form": [], "timeline": [] },
+      "dismissedWarnings": {
+        "form": [],
+        "timeline": []
+      },
       "ingredients": {},
       "ingredLocations": {},
       "savedStepForms": {
@@ -34,7 +37,9 @@
             "f1c677c0-fc3a-11ea-8809-e959e7d61d96:opentrons/opentrons_96_tiprack_10ul/1": "1",
             "fe572c50-fc3a-11ea-8809-e959e7d61d96:opentrons/biorad_96_wellplate_200ul_pcr/1": "7"
           },
-          "pipetteLocationUpdate": { "pipetteId": "left" },
+          "pipetteLocationUpdate": {
+            "pipetteId": "left"
+          },
           "moduleLocationUpdate": {},
           "stepType": "manualIntervention",
           "id": "__INITIAL_DECK_SETUP_STEP__"
@@ -91,7 +96,10 @@
       ]
     }
   },
-  "robot": { "model": "OT-2 Standard", "deckId": "ot2_standard" },
+  "robot": {
+    "model": "OT-2 Standard",
+    "deckId": "ot2_standard"
+  },
   "labwareDefinitionSchemaId": "opentronsLabwareSchemaV2",
   "labwareDefinitions": {
     "opentrons/opentrons_96_tiprack_10ul/1": {
@@ -1107,7 +1115,11 @@
       "namespace": "opentrons",
       "version": 1,
       "schemaVersion": 2,
-      "cornerOffsetFromSlot": { "x": 0, "y": 0, "z": 0 }
+      "cornerOffsetFromSlot": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      }
     },
     "opentrons/biorad_96_wellplate_200ul_pcr/1": {
       "ordering": [
@@ -2118,10 +2130,30 @@
             "G12",
             "H12"
           ],
-          "metadata": { "wellBottomShape": "v" }
+          "metadata": {
+            "wellBottomShape": "v"
+          }
         }
       ],
-      "cornerOffsetFromSlot": { "x": 0, "y": 0, "z": 0 }
+      "cornerOffsetFromSlot": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "liquidProbeParameters": {
+        "minimumHeight": [
+          {
+            "value": 0.5,
+            "applicableWells": []
+          }
+        ],
+        "minimumWellVolume": [
+          {
+            "value": 0,
+            "applicableWells": []
+          }
+        ]
+      }
     }
   },
   "liquidSchemaId": "opentronsLiquidSchemaV1",
@@ -2129,7 +2161,7 @@
   "commandSchemaId": "opentronsCommandSchemaV8",
   "commands": [
     {
-      "key": "d66aa1db-df76-492d-ab2c-533b982522aa",
+      "key": "dc011298-2ca2-4f00-b771-e3af80de9780",
       "commandType": "loadPipette",
       "params": {
         "pipetteName": "p20_single_gen2",
@@ -2138,7 +2170,7 @@
       }
     },
     {
-      "key": "78921c11-0ed3-49c6-b4c3-08fd71b68917",
+      "key": "8c8e144c-50cf-48d1-b1df-8dd802ca40a7",
       "commandType": "loadLabware",
       "params": {
         "displayName": "Opentrons OT-2 96 Tip Rack 10 µL",
@@ -2146,11 +2178,13 @@
         "loadName": "opentrons_96_tiprack_10ul",
         "namespace": "opentrons",
         "version": 1,
-        "location": { "slotName": "1" }
+        "location": {
+          "slotName": "1"
+        }
       }
     },
     {
-      "key": "f9f07c5b-a0dd-4c3c-8479-15a63ae0642e",
+      "key": "7e5bdd1e-36f7-4a13-8a96-7abaa499d273",
       "commandType": "loadLabware",
       "params": {
         "displayName": "Bio-Rad 96 Well Plate 200 µL PCR",
@@ -2158,13 +2192,18 @@
         "loadName": "biorad_96_wellplate_200ul_pcr",
         "namespace": "opentrons",
         "version": 1,
-        "location": { "slotName": "7" }
+        "location": {
+          "slotName": "7"
+        }
       }
     },
     {
       "commandType": "waitForDuration",
-      "key": "72be26a3-bb77-455d-bc32-f100e1a84a0b",
-      "params": { "seconds": 3723, "message": "" }
+      "key": "1a5dd364-45c5-4cb5-a2ad-233b1b5c53fd",
+      "params": {
+        "seconds": 3723,
+        "message": ""
+      }
     }
   ],
   "commandAnnotationSchemaId": "opentronsCommandAnnotationSchemaV1",
