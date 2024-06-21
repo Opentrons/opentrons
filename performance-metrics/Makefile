@@ -81,11 +81,11 @@ push: push-no-restart
 
 .PHONY: push-no-restart-ot3
 push-no-restart-ot3: sdist
-	$(call push-python-sdist,$(host),$(ssh_key),$(ssh_opts),$(sdist_file),"/opt/opentrons-robot-server","performance_metrics",,,$(version_file))
+	$(call push-python-sdist,$(host),$(ssh_key),$(ssh_opts),$(sdist_file),/opt/opentrons-robot-server,performance_metrics,src,,$(version_file))
 
 .PHONY: push-ot3
 push-ot3: push-no-restart-ot3
-	$(call restart-server,$(host),$(ssh_key),$(ssh_opts),"opentrons-robot-server")
+	$(call restart-service,$(host),$(ssh_key),$(ssh_opts),"opentrons-robot-server")
 
 .PHONY: update-robot-version
 update-robot-version:
