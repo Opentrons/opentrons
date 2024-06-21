@@ -74,21 +74,18 @@ export interface HeaterShakerModuleState {
 export interface MagneticBlockState {
   type: typeof MAGNETIC_BLOCK_TYPE
 }
-
 export interface AbsorbanceReaderState {
   type: typeof ABSORBANCE_READER_TYPE
 }
-
-export type ModuleState =
-  | MagneticModuleState
-  | TemperatureModuleState
-  | ThermocyclerModuleState
-  | HeaterShakerModuleState
-  | MagneticBlockState
-  | AbsorbanceReaderState
 export interface ModuleTemporalProperties {
   slot: DeckSlot
-  moduleState: ModuleState
+  moduleState:
+    | MagneticModuleState
+    | TemperatureModuleState
+    | ThermocyclerModuleState
+    | HeaterShakerModuleState
+    | MagneticBlockState
+    | AbsorbanceReaderState
 }
 
 export interface LabwareEntity {
@@ -144,16 +141,6 @@ export type PipetteEntity = NormalizedPipette & {
 export interface PipetteEntities {
   [pipetteId: string]: PipetteEntity
 }
-
-export interface LiquidEntity {
-  displayName: string
-  description: string
-  displayColor: string
-}
-export interface LiquidEntities {
-  [liquidId: string]: LiquidEntity
-}
-
 // ===== MIX-IN TYPES =====
 export type ChangeTipOptions =
   | 'always'
@@ -482,12 +469,12 @@ export interface InvariantContext {
   labwareEntities: LabwareEntities
   moduleEntities: ModuleEntities
   pipetteEntities: PipetteEntities
-  liquidEntities: LiquidEntities
   additionalEquipmentEntities: AdditionalEquipmentEntities
   config: Config
 }
 
-export interface TimelineFrame {
+// TODO Ian 2018-02-09 Rename this so it's less ambigious with what we call "robot state": `TimelineFrame`?
+export interface RobotState {
   pipettes: {
     [pipetteId: string]: PipetteTemporalProperties
   }
@@ -527,7 +514,6 @@ export interface TimelineFrame {
     }
   }
 }
-export type RobotState = TimelineFrame // legacy name alias
 
 export type ErrorType =
   | 'CANNOT_MOVE_WITH_GRIPPER'
