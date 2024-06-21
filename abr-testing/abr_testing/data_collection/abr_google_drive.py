@@ -115,6 +115,8 @@ def create_data_dictionary(
                 plate_measure = {
                     "Plate Measured": plate,
                     "End Volume Accuracy (%)": accuracy,
+                    "Average Temp (oC)": None,
+                    "Average RH(%)": None,
                 }
                 row_for_lpc = {**row, **all_modules, **notes}
                 row_2 = {
@@ -203,6 +205,7 @@ if __name__ == "__main__":
     ) = create_data_dictionary(missing_runs_from_gs, storage_directory, "", "", "")
 
     start_row = google_sheet.get_index_row() + 1
+    print(start_row)
     google_sheet.batch_update_cells(transposed_runs_and_robots, "A", start_row, "0")
 
     # Add LPC to google sheet

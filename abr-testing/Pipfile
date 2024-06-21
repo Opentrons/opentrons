@@ -16,6 +16,7 @@ opentrons-hardware = {editable = true, path = "./../hardware", extras=['FLEX']}
 opentrons = {editable = true, path = "./../api", extras=['flex-hardware']}
 slackclient = "*"
 slack-sdk = "*"
+scikit-learn = "*"
 
 [dev-packages]
 atomicwrites = "==1.4.1"

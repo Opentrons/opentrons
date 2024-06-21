@@ -8,7 +8,6 @@ import sys
 import os
 from typing import Dict, Tuple, Any, List
 from statistics import mean, StatisticsError
-from datetime import datetime
 
 
 def compare_run_to_temp_data(
@@ -66,7 +65,7 @@ def read_csv_as_dict(file_path: str) -> List[Dict[str, Any]]:
 
 def connect_and_download(
     sheets: Dict[str, str], storage_directory: str
-) -> Tuple[str, str, str]:
+) -> Tuple[List[str], str]:
     """Connect to google sheet and download."""
     try:
         credentials_path = os.path.join(storage_directory, "credentials.json")
@@ -80,14 +79,19 @@ def connect_and_download(
         print(f"Add credentials.json file to: {storage_directory}.")
         sys.exit()
     file_paths = []
-    for sheet in sheets.items():
-        file_name, file_id = sheet[0], sheet[1]
-        print(file_name)
-        file_path = google_drive.download_single_file(
-            storage_directory, file_id, file_name, "text/csv"
-        )
-        file_paths.append(file_path)
-    return file_paths[0], file_paths[1], credentials_path
+    try:
+        for sheet in sheets.items():
+            file_name, file_id = sheet[0], sheet[1]
+            print(file_name)
+            file_path = google_drive.download_single_file(
+                storage_directory, file_id, file_name, "text/csv"
+            )
+            file_paths.append(file_path)
+    except AttributeError:
+        file_paths = google_drive.download_single_file(
+                storage_directory, sheets[0], sheet[1], "text/csv"
+            )
+    return file_paths, credentials_path
 
 
 if __name__ == "__main__":
@@ -119,12 +123,12 @@ if __name__ == "__main__":
     }
     storage_directory = args.storage_directory
     # Download google sheets.
-    abr_data_path, temp_data_path, credentials_path = connect_and_download(
+    file_paths, credentials_path = connect_and_download(
         google_sheets_to_download, storage_directory
     )
     # TODO: read csvs.
-    abr_data = read_csv_as_dict(abr_data_path)
-    temp_data = read_csv_as_dict(temp_data_path)
+    abr_data = read_csv_as_dict(file_paths[0])
+    temp_data = read_csv_as_dict(file_paths[1])
     # TODO: compare robot and timestamps.
     abr_google_sheet = google_sheets_tool.google_sheet(
         credentials_path, "ABR-run-data", 0

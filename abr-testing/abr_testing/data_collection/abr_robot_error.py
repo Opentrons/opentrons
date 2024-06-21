@@ -237,7 +237,8 @@ if __name__ == "__main__":
     print(f"Making ticket for run: {one_run} on robot {robot}.")
     # TODO: make argument or see if I can get rid of with using board_id.
     project_key = "RABR"
-    parent_key = project_key + "-" + robot[-1]
+    print(robot)
+    parent_key = project_key + "-" + robot.split("ABR")[1]
     # TODO: read board to see if ticket for run id already exists.
     # CREATE TICKET
     issue_key = ticket.create_ticket(
