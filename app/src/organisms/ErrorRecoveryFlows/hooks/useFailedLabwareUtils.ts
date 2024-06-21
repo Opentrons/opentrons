@@ -7,12 +7,17 @@ import {
   getLoadedLabwareDefinitionsByUri,
 } from '@opentrons/shared-data'
 
+import { ERROR_KINDS } from '../constants'
+import { getErrorKind } from '../utils'
+
 import type { WellGroup } from '@opentrons/components'
 import type { CommandsData, PipetteData, Run } from '@opentrons/api-client'
 import type {
   LabwareDefinition2,
   LoadedLabware,
   PickUpTipRunTimeCommand,
+  AspirateRunTimeCommand,
+  DispenseRunTimeCommand,
 } from '@opentrons/shared-data'
 import type { ErrorRecoveryFlowsProps } from '..'
 
@@ -25,15 +30,20 @@ interface UseFailedLabwareUtilsProps {
 }
 
 export type UseFailedLabwareUtilsResult = UseTipSelectionUtilsResult & {
-  /* The name of the labware from which the tip(s) involved in the failed command were picked up, if any.  */
-  pickUpTipLabwareName: string | null
-  /* Info for the labware from which the tip(s) involved in the failed command were picked up, if any. */
-  pickUpTipLabware: LoadedLabware | null
-  /* The name of the well(s) from which the tip(s) involved in the failed command were picked up, if any. */
-  relevantPickUpTipWellName: string | null
+  /* The name of the labware relevant to the failed command, if any.  */
+  failedLabwareName: string | null
+  /* Info for the labware relevant to the failed command, if any. */
+  failedLabware: LoadedLabware | null
+  /* The name of the well(s) or tip location(s), if any. */
+  relevantWellName: string | null
 }
 
-// Utils for labware relating to the failedCommand.
+/** Utils for labware relating to the failedCommand.
+ *
+ * NOTE: What constitutes "relevant labware" varies depending on the errorKind.
+ * For overpressure errors, the relevant labware is the tip rack from which the pipette picked up the tip.
+ * For no liquid detected errors, the relevant labware is the well in which no liquid was detected.
+ */
 export function useFailedLabwareUtils({
   failedCommand,
   protocolAnalysis,
@@ -41,43 +51,78 @@ export function useFailedLabwareUtils({
   runCommands,
   runRecord,
 }: UseFailedLabwareUtilsProps): UseFailedLabwareUtilsResult {
-  const recentRelevantPickUpTipCmd = React.useMemo(
-    () => getRecentRelevantPickUpTipCommand(failedCommand, runCommands),
+  const recentRelevantFailedLabwareCmd = React.useMemo(
+    () => getRelevantFailedLabwareCmdFrom({ failedCommand, runCommands }),
     [failedCommand, runCommands]
   )
 
-  const tipSelectionUtils = useTipSelectionUtils(recentRelevantPickUpTipCmd)
+  const tipSelectionUtils = useTipSelectionUtils(recentRelevantFailedLabwareCmd)
 
-  const pickUpTipLabwareName = React.useMemo(
+  const failedLabwareName = React.useMemo(
     () =>
-      getPickUpTipLabwareName(
+      getFailedCmdRelevantLabware(
         protocolAnalysis,
-        recentRelevantPickUpTipCmd,
+        recentRelevantFailedLabwareCmd,
         runRecord
       ),
-    [protocolAnalysis, recentRelevantPickUpTipCmd, runRecord]
+    [protocolAnalysis, recentRelevantFailedLabwareCmd, runRecord]
   )
 
-  const pickUpTipLabware = React.useMemo(
-    () => getPickUpTipLabware(recentRelevantPickUpTipCmd, runRecord),
-    [recentRelevantPickUpTipCmd, runRecord]
+  const failedLabware = React.useMemo(
+    () => getFailedLabware(recentRelevantFailedLabwareCmd, runRecord),
+    [recentRelevantFailedLabwareCmd, runRecord]
   )
 
-  const relevantPickUpTipWellName = getPickUpTipCommandWellName(
+  const relevantWellName = getRelevantWellName(
     failedPipetteInfo,
-    recentRelevantPickUpTipCmd
+    recentRelevantFailedLabwareCmd
   )
 
   return {
     ...tipSelectionUtils,
-    pickUpTipLabwareName,
-    pickUpTipLabware,
-    relevantPickUpTipWellName,
+    failedLabwareName,
+    failedLabware,
+    relevantWellName,
+  }
+}
+
+type FailedCommandRelevantLabware =
+  | Omit<AspirateRunTimeCommand, 'result'>
+  | Omit<PickUpTipRunTimeCommand, 'result'>
+  | Omit<DispenseRunTimeCommand, 'result'>
+  | null
+
+interface RelevantFailedLabwareCmd {
+  failedCommand: ErrorRecoveryFlowsProps['failedCommand']
+  runCommands?: CommandsData
+}
+
+// Return the actual command that contains the info relating to the relevant labware.
+export function getRelevantFailedLabwareCmdFrom({
+  failedCommand,
+  runCommands,
+}: RelevantFailedLabwareCmd): FailedCommandRelevantLabware {
+  const errorKind = getErrorKind(failedCommand?.error?.errorType)
+
+  switch (errorKind) {
+    case ERROR_KINDS.NO_LIQUID_DETECTED:
+      return failedCommand as Omit<AspirateRunTimeCommand, 'result'>
+    case ERROR_KINDS.OVERPRESSURE_PREPARE_TO_ASPIRATE:
+    case ERROR_KINDS.OVERPRESSURE_WHILE_ASPIRATING:
+    case ERROR_KINDS.OVERPRESSURE_WHILE_DISPENSING:
+      return getRelevantPickUpTipCommand(failedCommand, runCommands)
+    case ERROR_KINDS.GENERAL_ERROR:
+      return null
+    default:
+      console.warn(
+        'No labware associated with failed command. Handle case explicitly.'
+      )
+      return null
   }
 }
 
 // Returns the most recent pickUpTip command for the pipette used in the failed command, if any.
-function getRecentRelevantPickUpTipCommand(
+function getRelevantPickUpTipCommand(
   failedCommand: ErrorRecoveryFlowsProps['failedCommand'],
   runCommands?: CommandsData
 ): Omit<PickUpTipRunTimeCommand, 'result'> | null {
@@ -113,20 +158,25 @@ function getRecentRelevantPickUpTipCommand(
 }
 
 interface UseTipSelectionUtilsResult {
+  /* Always returns null if the relevant labware is not relevant to tip pick up. */
   selectedTipLocations: WellGroup | null
   tipSelectorDef: LabwareDefinition2
   selectTips: (tipGroup: WellGroup) => void
   deselectTips: (locations: string[]) => void
 }
 
+// TODO(jh, 06-18-24): Enforce failure/warning when accessing tipSelectionUtils
+//  if used when the relevant labware
+// is NOT relevant to tip pick up.
+
 // Utils for initializing and interacting with the Tip Selector component.
 function useTipSelectionUtils(
-  recentRelevantPickUpTipCmd: Omit<PickUpTipRunTimeCommand, 'result'> | null
+  recentRelevantFailedLabwareCmd: FailedCommandRelevantLabware
 ): UseTipSelectionUtilsResult {
   const [selectedLocs, setSelectedLocs] = React.useState<WellGroup | null>(null)
 
   const initialLocs = useInitialSelectedLocationsFrom(
-    recentRelevantPickUpTipCmd
+    recentRelevantFailedLabwareCmd
   )
   // Set the initial locs when they first become available.
   if (selectedLocs == null && initialLocs != null) {
@@ -164,39 +214,45 @@ function useTipSelectionUtils(
 
 // Set the initial well selection to be the last pickup tip location for the pipette used in the failed command.
 function useInitialSelectedLocationsFrom(
-  recentRelevantPickUpTipCmd: Omit<PickUpTipRunTimeCommand, 'result'> | null
+  recentRelevantFailedLabwareCmd: FailedCommandRelevantLabware
 ): WellGroup | null {
   const [initialWells, setInitialWells] = React.useState<WellGroup | null>(null)
 
-  if (recentRelevantPickUpTipCmd != null && initialWells == null) {
-    setInitialWells({ [recentRelevantPickUpTipCmd.params.wellName]: null })
+  // Note that while other commands may have a wellName associated with them,
+  // we are only interested in wells for the purposes of tip picking up.
+  if (
+    recentRelevantFailedLabwareCmd != null &&
+    recentRelevantFailedLabwareCmd.commandType === 'pickUpTip' &&
+    initialWells == null
+  ) {
+    setInitialWells({ [recentRelevantFailedLabwareCmd.params.wellName]: null })
   }
 
   return initialWells
 }
 
-// Get the name of the latest labware used by the failed command's pipette to pick up tips, if any.
-export function getPickUpTipLabwareName(
+// Get the name of the relevant labware relevant to the failed command, if any.
+export function getFailedCmdRelevantLabware(
   protocolAnalysis: ErrorRecoveryFlowsProps['protocolAnalysis'],
-  recentRelevantPickUpTipCmd: Omit<PickUpTipRunTimeCommand, 'result'> | null,
+  recentRelevantFailedLabwareCmd: FailedCommandRelevantLabware,
   runRecord?: Run
 ): string | null {
   const lwDefsByURI = getLoadedLabwareDefinitionsByUri(
     protocolAnalysis?.commands ?? []
   )
-  const pickUpTipLWURI = runRecord?.data.labware.find(
-    labware => labware.id === recentRelevantPickUpTipCmd?.params.labwareId
+  const failedLWURI = runRecord?.data.labware.find(
+    labware => labware.id === recentRelevantFailedLabwareCmd?.params.labwareId
   )?.definitionUri
-  if (pickUpTipLWURI != null) {
-    return getLabwareDisplayName(lwDefsByURI[pickUpTipLWURI])
+  if (failedLWURI != null) {
+    return getLabwareDisplayName(lwDefsByURI[failedLWURI])
   } else {
     return null
   }
 }
 
-// Get the latest labware used by the failed command's pipette to pick up tips, if any.
-function getPickUpTipLabware(
-  recentRelevantPickUpTipCmd: Omit<PickUpTipRunTimeCommand, 'result'> | null,
+// Get the relevant labware related to the failed command, if any.
+function getFailedLabware(
+  recentRelevantPickUpTipCmd: FailedCommandRelevantLabware,
   runRecord?: Run
 ): LoadedLabware | null {
   return (
@@ -206,10 +262,10 @@ function getPickUpTipLabware(
   )
 }
 
-// Return the name of the well(s) from which the tip(s) involved in the failed command were picked up, if any.
-export function getPickUpTipCommandWellName(
+// Return the name of the well(s) related to the failed command, if any.
+export function getRelevantWellName(
   failedPipetteInfo: UseFailedLabwareUtilsProps['failedPipetteInfo'],
-  recentRelevantPickUpTipCmd: Omit<PickUpTipRunTimeCommand, 'result'> | null
+  recentRelevantPickUpTipCmd: FailedCommandRelevantLabware
 ): string {
   if (failedPipetteInfo == null || recentRelevantPickUpTipCmd == null) {
     return ''

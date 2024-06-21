@@ -3,21 +3,21 @@ import { Trans, useTranslation } from 'react-i18next'
 
 import { StyledText } from '@opentrons/components'
 
-import { RECOVERY_MAP } from '../constants'
 import { TwoColTextAndFailedStepNextStep } from '../shared'
+import { RECOVERY_MAP } from '../constants'
 import { SelectRecoveryOption } from './SelectRecoveryOption'
 
 import type { RecoveryContentProps } from '../types'
 
-export function RetryStep(props: RecoveryContentProps): JSX.Element {
+export function SkipStepSameTips(props: RecoveryContentProps): JSX.Element {
   const { recoveryMap } = props
   const { step, route } = recoveryMap
-  const { RETRY_FAILED_COMMAND } = RECOVERY_MAP
+  const { SKIP_STEP_WITH_SAME_TIPS } = RECOVERY_MAP
 
   const buildContent = (): JSX.Element => {
     switch (step) {
-      case RETRY_FAILED_COMMAND.STEPS.CONFIRM_RETRY:
-        return <RetryStepInfo {...props} />
+      case SKIP_STEP_WITH_SAME_TIPS.STEPS.SKIP:
+        return <SkipStepSameTipsInfo {...props} />
       default:
         console.warn(`${step} in ${route} not explicitly handled. Rerouting.`)
         return <SelectRecoveryOption {...props} />
@@ -27,17 +27,16 @@ export function RetryStep(props: RecoveryContentProps): JSX.Element {
   return buildContent()
 }
 
-export function RetryStepInfo(props: RecoveryContentProps): JSX.Element {
+export function SkipStepSameTipsInfo(props: RecoveryContentProps): JSX.Element {
   const { routeUpdateActions, recoveryCommands } = props
-  const { ROBOT_RETRYING_STEP } = RECOVERY_MAP
+  const { skipFailedCommand, resumeRun } = recoveryCommands
+  const { setRobotInMotion } = routeUpdateActions
+  const { ROBOT_SKIPPING_STEP } = RECOVERY_MAP
   const { t } = useTranslation('error_recovery')
 
-  const { retryFailedCommand, resumeRun } = recoveryCommands
-  const { setRobotInMotion } = routeUpdateActions
-
   const primaryBtnOnClick = (): Promise<void> => {
-    return setRobotInMotion(true, ROBOT_RETRYING_STEP.ROUTE)
-      .then(() => retryFailedCommand())
+    return setRobotInMotion(true, ROBOT_SKIPPING_STEP.ROUTE)
+      .then(() => skipFailedCommand())
       .then(() => {
         resumeRun()
       })
@@ -47,7 +46,7 @@ export function RetryStepInfo(props: RecoveryContentProps): JSX.Element {
     return (
       <Trans
         t={t}
-        i18nKey="first_take_any_necessary_actions"
+        i18nKey="failed_dispense_step_not_completed"
         components={{
           block: <StyledText as="p" />,
         }}
@@ -58,10 +57,10 @@ export function RetryStepInfo(props: RecoveryContentProps): JSX.Element {
   return (
     <TwoColTextAndFailedStepNextStep
       {...props}
-      leftColTitle={t('retry_step')}
+      leftColTitle={t('skip_to_next_step_same_tips')}
       leftColBodyText={buildBodyText()}
       primaryBtnOnClick={primaryBtnOnClick}
-      primaryBtnCopy={t('retry_now')}
+      primaryBtnCopy={t('continue_run_now')}
     />
   )
 }

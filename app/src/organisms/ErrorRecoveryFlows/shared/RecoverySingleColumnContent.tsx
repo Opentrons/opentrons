@@ -13,6 +13,8 @@ interface SingleColumnContentWrapperProps extends StyleProps {
   children: React.ReactNode
 }
 // For flex-direction: column recovery content with one column only.
+//
+// For ODD use only.
 export function RecoverySingleColumnContent({
   children,
   ...styleProps

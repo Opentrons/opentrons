@@ -5,7 +5,7 @@ import { screen, fireEvent, waitFor } from '@testing-library/react'
 import { mockRecoveryContentProps } from '../../__fixtures__'
 import { renderWithProviders } from '../../../../__testing-utils__'
 import { i18n } from '../../../../i18n'
-import { RetryStep, RetryStepInfo } from '../RetryStep'
+import { SkipStepSameTips, SkipStepSameTipsInfo } from '../SkipStepSameTips'
 import { RECOVERY_MAP } from '../../constants'
 import { SelectRecoveryOption } from '../SelectRecoveryOption'
 
@@ -14,22 +14,22 @@ import type { Mock } from 'vitest'
 vi.mock('../../../../molecules/Command')
 vi.mock('../SelectRecoveryOption')
 
-const render = (props: React.ComponentProps<typeof RetryStep>) => {
-  return renderWithProviders(<RetryStep {...props} />, {
+const render = (props: React.ComponentProps<typeof SkipStepSameTips>) => {
+  return renderWithProviders(<SkipStepSameTips {...props} />, {
     i18nInstance: i18n,
   })[0]
 }
 
-const renderRetryStepInfo = (
-  props: React.ComponentProps<typeof RetryStepInfo>
+const renderSkipStepSameTipsInfo = (
+  props: React.ComponentProps<typeof SkipStepSameTipsInfo>
 ) => {
-  return renderWithProviders(<RetryStepInfo {...props} />, {
+  return renderWithProviders(<SkipStepSameTipsInfo {...props} />, {
     i18nInstance: i18n,
   })[0]
 }
 
-describe('RetryStep', () => {
-  let props: React.ComponentProps<typeof RetryStep>
+describe('SkipStepSameTips', () => {
+  let props: React.ComponentProps<typeof SkipStepSameTips>
 
   beforeEach(() => {
     props = {
@@ -41,20 +41,16 @@ describe('RetryStep', () => {
     )
   })
 
-  afterEach(() => {
-    vi.resetAllMocks()
-  })
-
-  it(`renders RetryStepInfo when step is ${RECOVERY_MAP.RETRY_FAILED_COMMAND.STEPS.CONFIRM_RETRY}`, () => {
+  it(`renders SkipStepSameTipsInfo when step is ${RECOVERY_MAP.SKIP_STEP_WITH_SAME_TIPS.STEPS.SKIP}`, () => {
     props = {
       ...props,
       recoveryMap: {
         ...props.recoveryMap,
-        step: RECOVERY_MAP.RETRY_FAILED_COMMAND.STEPS.CONFIRM_RETRY,
+        step: RECOVERY_MAP.SKIP_STEP_WITH_SAME_TIPS.STEPS.SKIP,
       },
     }
     render(props)
-    screen.getByText('Retry step')
+    screen.getByText('Skip to next step with same tips')
   })
 
   it('renders SelectRecoveryOption as a fallback', () => {
@@ -70,15 +66,15 @@ describe('RetryStep', () => {
   })
 })
 
-describe('RetryStepInfo', () => {
-  let props: React.ComponentProps<typeof RetryStepInfo>
+describe('SkipStepSameTipsInfo', () => {
+  let props: React.ComponentProps<typeof SkipStepSameTipsInfo>
   let mockSetRobotInMotion: Mock
-  let mockRetryFailedCommand: Mock
+  let mockSkipFailedCommand: Mock
   let mockResumeRun: Mock
 
   beforeEach(() => {
     mockSetRobotInMotion = vi.fn(() => Promise.resolve())
-    mockRetryFailedCommand = vi.fn(() => Promise.resolve())
+    mockSkipFailedCommand = vi.fn(() => Promise.resolve())
     mockResumeRun = vi.fn()
 
     props = {
@@ -87,7 +83,7 @@ describe('RetryStepInfo', () => {
         setRobotInMotion: mockSetRobotInMotion,
       } as any,
       recoveryCommands: {
-        retryFailedCommand: mockRetryFailedCommand,
+        skipFailedCommand: mockSkipFailedCommand,
         resumeRun: mockResumeRun,
       } as any,
     }
@@ -98,35 +94,35 @@ describe('RetryStepInfo', () => {
   })
 
   it('renders the component with the correct text', () => {
-    renderRetryStepInfo(props)
-    screen.getByText('Retry step')
+    renderSkipStepSameTipsInfo(props)
+    screen.getByText('Skip to next step with same tips')
     screen.queryByText(
-      'First, take any necessary actions to prepare the robot to retry the failed step.'
+      'The failed dispense step will not be completed. The run will continue from the next step.'
     )
-    screen.queryByText('Then, close the robot door before proceeding.')
+    screen.queryByText('Close the robot door before proceeding.')
   })
 
   it('calls the correct routeUpdateActions and recoveryCommands in the correct order when the primary button is clicked', async () => {
-    renderRetryStepInfo(props)
-    fireEvent.click(screen.getByRole('button', { name: 'Retry now' }))
+    renderSkipStepSameTipsInfo(props)
+    fireEvent.click(screen.getByRole('button', { name: 'Continue run now' }))
 
     await waitFor(() => {
       expect(mockSetRobotInMotion).toHaveBeenCalledWith(
         true,
-        RECOVERY_MAP.ROBOT_RETRYING_STEP.ROUTE
+        RECOVERY_MAP.ROBOT_SKIPPING_STEP.ROUTE
       )
     })
     await waitFor(() => {
-      expect(mockRetryFailedCommand).toHaveBeenCalled()
+      expect(mockSkipFailedCommand).toHaveBeenCalled()
     })
     await waitFor(() => {
       expect(mockResumeRun).toHaveBeenCalled()
     })
 
     expect(mockSetRobotInMotion.mock.invocationCallOrder[0]).toBeLessThan(
-      mockRetryFailedCommand.mock.invocationCallOrder[0]
+      mockSkipFailedCommand.mock.invocationCallOrder[0]
     )
-    expect(mockRetryFailedCommand.mock.invocationCallOrder[0]).toBeLessThan(
+    expect(mockSkipFailedCommand.mock.invocationCallOrder[0]).toBeLessThan(
       mockResumeRun.mock.invocationCallOrder[0]
     )
   })
