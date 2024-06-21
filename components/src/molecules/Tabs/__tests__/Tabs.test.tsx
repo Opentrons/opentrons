@@ -5,7 +5,7 @@ import { BORDERS, COLORS } from '../../../helix-design-system'
 import { SPACING } from '../../../ui-style-constants'
 import { POSITION_RELATIVE } from '../../../styles'
 import { renderWithProviders } from '../../../testing/utils'
-import { Tabs } from '..'
+import { Tabs } from '../index'
 
 const render = (props: React.ComponentProps<typeof Tabs>) => {
   return renderWithProviders(<Tabs {...props} />)
@@ -30,7 +30,6 @@ describe('Tabs', () => {
     const tabTexts = ['set up', 'parameters', 'module controls']
     const tabStyles = {
       backgroundColor: COLORS.purple30,
-      border: `0px ${BORDERS.styleSolid} ${COLORS.purple30}`,
       borderRadius: BORDERS.borderRadius8,
       padding: `${SPACING.spacing8} ${SPACING.spacing16}`,
       position: POSITION_RELATIVE,

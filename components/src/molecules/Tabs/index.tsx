@@ -4,16 +4,13 @@ import { TYPOGRAPHY, SPACING, RESPONSIVENESS } from '../../ui-style-constants'
 import { COLORS, BORDERS } from '../../helix-design-system'
 import {
   POSITION_RELATIVE,
-  DIRECTION_COLUMN,
   DIRECTION_ROW,
 } from '../../styles'
 import { Btn, Flex } from '../../primitives'
 
 const DEFAULT_TAB_STYLE = css`
   ${TYPOGRAPHY.pSemiBold}
-  color: ${COLORS.black90};
   background-color: ${COLORS.purple30};
-  border: 0px ${BORDERS.styleSolid} ${COLORS.purple30};
   border-radius: ${BORDERS.borderRadius8};
   padding: ${SPACING.spacing8} ${SPACING.spacing16};
   position: ${POSITION_RELATIVE};
@@ -78,11 +75,6 @@ export function Tabs(props: TabsProps): JSX.Element {
   const { tabs } = props
 
   return (
-    <Flex
-      flexDirection={DIRECTION_COLUMN}
-      gridGap={SPACING.spacing16}
-      padding={SPACING.spacing16}
-    >
       <Flex flexDirection={DIRECTION_ROW} css={INNER_CONTAINER_STYLE}>
         {tabs.map((tab, index) => (
           <Btn
@@ -97,6 +89,5 @@ export function Tabs(props: TabsProps): JSX.Element {
           </Btn>
         ))}
       </Flex>
-    </Flex>
   )
 }

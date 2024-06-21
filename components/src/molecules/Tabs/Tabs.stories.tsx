@@ -1,11 +1,11 @@
 import * as React from 'react'
 import { useArgs } from '@storybook/preview-api'
-import { Tabs as TabComponent } from '.'
+import { Tabs as TabsComponent } from '.'
 import type { Meta, StoryObj } from '@storybook/react'
 
-const meta: Meta<typeof TabComponent> = {
+const meta: Meta<typeof TabsComponent> = {
   title: 'Library/Molecules/Tabs',
-  component: TabComponent,
+  component: TabsComponent,
 
   argTypes: {
     tabs: {
@@ -18,14 +18,14 @@ const meta: Meta<typeof TabComponent> = {
 
 export default meta
 
-type Story = StoryObj<typeof TabComponent>
+type Story = StoryObj<typeof TabsComponent>
 
 export const Tabs: Story = {
   args: {
     tabs: [
       {
         text: 'Setup',
-        isActive: false,
+        isActive: true,
         disabled: false,
         onClick: () => {},
       },
@@ -50,7 +50,7 @@ export const Tabs: Story = {
     ],
   },
   render: function TabsStory() {
-    const [args, setArgs] = useArgs<React.ComponentProps<typeof TabComponent>>()
+    const [args, setArgs] = useArgs<React.ComponentProps<typeof TabsComponent>>()
 
     const modifiedButtons = args.tabs.map((button, index) => {
       const modifiedButton = {
@@ -67,6 +67,6 @@ export const Tabs: Story = {
       return modifiedButton
     })
 
-    return <TabComponent tabs={modifiedButtons} />
+    return <TabsComponent tabs={modifiedButtons} />
   },
 }
