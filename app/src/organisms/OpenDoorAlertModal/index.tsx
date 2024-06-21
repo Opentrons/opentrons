@@ -10,7 +10,7 @@ import {
   Icon,
   JUSTIFY_CENTER,
   SPACING,
-  StyledText,
+  LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { getTopPortalEl } from '../../App/portal'
@@ -37,16 +37,16 @@ export function OpenDoorAlertModal(): JSX.Element {
           alignItems={ALIGN_CENTER}
           width="100%"
         >
-          <StyledText as="h4" fontWeight={TYPOGRAPHY.fontWeightBold}>
+          <LegacyStyledText as="h4" fontWeight={TYPOGRAPHY.fontWeightBold}>
             {t('door_is_open')}
-          </StyledText>
-          <StyledText
+          </LegacyStyledText>
+          <LegacyStyledText
             as="p"
             textAlign={TYPOGRAPHY.textAlignCenter}
             color={COLORS.grey60}
           >
             {t('close_door_to_resume')}
-          </StyledText>
+          </LegacyStyledText>
         </Flex>
       </Flex>
     </Modal>,

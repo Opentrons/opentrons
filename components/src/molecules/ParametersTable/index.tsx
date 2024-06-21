@@ -8,7 +8,7 @@ import {
 import { BORDERS, COLORS } from '../../helix-design-system'
 import { SPACING, TYPOGRAPHY } from '../../ui-style-constants/index'
 import { Chip } from '../../atoms/Chip'
-import { StyledText } from '../../atoms/StyledText'
+import { LegacyStyledText } from '../../atoms/StyledText'
 import { Tooltip, useHoverTooltip } from '../../tooltips'
 import { Icon } from '../../icons'
 import { Flex } from '../../primitives'
@@ -89,17 +89,17 @@ export function ParametersTable({
                       width={FLEX_MAX_CONTENT}
                     />
                   ) : (
-                    <StyledText as="p">
+                    <LegacyStyledText as="p">
                       {formatRunTimeParameterDefaultValue(parameter, t)}
-                    </StyledText>
+                    </LegacyStyledText>
                   )}
                 </StyledTableCell>
                 <StyledTableCell isLast={isLast} paddingRight="0">
-                  <StyledText as="p">
+                  <LegacyStyledText as="p">
                     {parameter.type === 'csv_file'
                       ? t('n_a')
                       : formatRange(parameter)}
-                  </StyledText>
+                  </LegacyStyledText>
                 </StyledTableCell>
               </StyledTableRow>
             )
@@ -122,7 +122,7 @@ const ParameterName = (props: ParameterNameProps): JSX.Element => {
 
   return (
     <StyledTableCell display="span" isLast={isLast}>
-      <StyledText
+      <LegacyStyledText
         as="p"
         css={css`
           display: ${DISPLAY_INLINE};
@@ -130,7 +130,7 @@ const ParameterName = (props: ParameterNameProps): JSX.Element => {
         `}
       >
         {displayName}
-      </StyledText>
+      </LegacyStyledText>
       {description != null ? (
         <>
           <Flex display={DISPLAY_INLINE} {...targetProps}>

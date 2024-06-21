@@ -9,7 +9,7 @@ import {
   Link,
   PrimaryButton,
   SPACING,
-  StyledText,
+  LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { LegacyModal } from '../../molecules/LegacyModal'
@@ -32,16 +32,16 @@ export function DeckCalibrationConfirmModal({
       onClose={cancel}
     >
       <Flex flexDirection={DIRECTION_COLUMN}>
-        <StyledText as="p" marginBottom={SPACING.spacing16}>
+        <LegacyStyledText as="p" marginBottom={SPACING.spacing16}>
           {t('deck_calibration_modal_description')}
-        </StyledText>
-        <StyledText
+        </LegacyStyledText>
+        <LegacyStyledText
           as="p"
           fontWeight={TYPOGRAPHY.fontWeightSemiBold}
           marginBottom={SPACING.spacing24}
         >
           {t('deck_calibration_modal_pipette_description')}
-        </StyledText>
+        </LegacyStyledText>
         <Flex justifyContent={JUSTIFY_FLEX_END} alignItems={ALIGN_CENTER}>
           <Link
             role="button"

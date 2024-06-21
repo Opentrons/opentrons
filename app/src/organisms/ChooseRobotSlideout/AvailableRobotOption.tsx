@@ -12,7 +12,7 @@ import {
   Icon,
   SIZE_1,
   SPACING,
-  StyledText,
+  LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
@@ -117,11 +117,11 @@ export function AvailableRobotOption(
           marginTop={SPACING.spacing8}
           marginBottom={SPACING.spacing16}
         >
-          <StyledText as="h6" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
+          <LegacyStyledText as="h6" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
             {robotModel}
-          </StyledText>
+          </LegacyStyledText>
           <Box maxWidth="9.5rem">
-            <StyledText
+            <LegacyStyledText
               as="p"
               overflowWrap="break-word"
               fontWeight={TYPOGRAPHY.fontWeightSemiBold}
@@ -134,7 +134,7 @@ export function AvailableRobotOption(
                 name={iconName ?? 'wifi'}
                 size={SIZE_1}
               />
-            </StyledText>
+            </LegacyStyledText>
           </Box>
         </Flex>
         {(isError || isSelectedRobotOnDifferentSoftwareVersion) &&
@@ -147,7 +147,7 @@ export function AvailableRobotOption(
       </MiniCard>
 
       {isSelectedRobotOnDifferentSoftwareVersion && isSelected ? (
-        <StyledText
+        <LegacyStyledText
           as="label"
           color={COLORS.red60}
           marginBottom={SPACING.spacing8}
@@ -165,7 +165,7 @@ export function AvailableRobotOption(
               robotLink: <NavLink to={`/devices/${robotName}`} />,
             }}
           />
-        </StyledText>
+        </LegacyStyledText>
       ) : null}
     </>
   )

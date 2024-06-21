@@ -6,7 +6,7 @@ import {
   DIRECTION_COLUMN,
   Flex,
   SPACING,
-  StyledText,
+  LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { InputPrompt } from '../InputPrompt'
@@ -21,7 +21,9 @@ export function ChatFooter(): JSX.Element {
       paddingBottom={SPACING.spacing24}
     >
       <InputPrompt />
-      <StyledText css={DISCLAIMER_TEXT_STYLE}>{t('disclaimer')}</StyledText>
+      <LegacyStyledText css={DISCLAIMER_TEXT_STYLE}>
+        {t('disclaimer')}
+      </LegacyStyledText>
     </Flex>
   )
 }

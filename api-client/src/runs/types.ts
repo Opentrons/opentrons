@@ -13,7 +13,6 @@ export * from './commands/types'
 
 export const RUN_STATUS_IDLE = 'idle' as const
 export const RUN_STATUS_RUNNING = 'running' as const
-export const RUN_STATUS_PAUSE_REQUESTED = 'pause-requested' as const
 export const RUN_STATUS_PAUSED = 'paused'
 export const RUN_STATUS_STOP_REQUESTED = 'stop-requested' as const
 export const RUN_STATUS_STOPPED = 'stopped' as const
@@ -26,7 +25,6 @@ export const RUN_STATUS_AWAITING_RECOVERY = 'awaiting-recovery' as const
 export type RunStatus =
   | typeof RUN_STATUS_IDLE
   | typeof RUN_STATUS_RUNNING
-  | typeof RUN_STATUS_PAUSE_REQUESTED
   | typeof RUN_STATUS_PAUSED
   | typeof RUN_STATUS_STOP_REQUESTED
   | typeof RUN_STATUS_STOPPED

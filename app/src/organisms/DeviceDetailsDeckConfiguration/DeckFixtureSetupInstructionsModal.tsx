@@ -8,7 +8,7 @@ import {
   Flex,
   PrimaryButton,
   SPACING,
-  StyledText,
+  LegacyStyledText,
 } from '@opentrons/components'
 import { ExternalLink } from '../../atoms/Link/ExternalLink'
 import { Modal } from '../../molecules/Modal'
@@ -64,12 +64,12 @@ export function DeckFixtureSetupInstructionsModal({
         >
           <Flex flexDirection={DIRECTION_ROW} gridGap={SPACING.spacing40}>
             <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing12}>
-              <StyledText as="p">
+              <LegacyStyledText as="p">
                 {t('deck_fixture_setup_modal_top_description')}
-              </StyledText>
-              <StyledText as="p">
+              </LegacyStyledText>
+              <LegacyStyledText as="p">
                 {t('branded:deck_fixture_setup_modal_bottom_description')}
-              </StyledText>
+              </LegacyStyledText>
             </Flex>
 
             <Flex>
@@ -89,12 +89,12 @@ export function DeckFixtureSetupInstructionsModal({
                   flexDirection={DIRECTION_COLUMN}
                   gridGap={SPACING.spacing16}
                 >
-                  <StyledText as="p">
+                  <LegacyStyledText as="p">
                     {t('deck_fixture_setup_modal_top_description')}
-                  </StyledText>
-                  <StyledText as="p">
+                  </LegacyStyledText>
+                  <LegacyStyledText as="p">
                     {t('deck_fixture_setup_modal_bottom_description_desktop')}
-                  </StyledText>
+                  </LegacyStyledText>
                 </Flex>
                 <ExternalLink href={SETUP_INSTRUCTION_URL}>
                   {t('deck_fixture_setup_instructions')}

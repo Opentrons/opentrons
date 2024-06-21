@@ -8,7 +8,7 @@ import {
   Flex,
   SPACING,
   TYPOGRAPHY,
-  StyledText,
+  LegacyStyledText,
 } from '@opentrons/components'
 
 import { formatLastModified } from '../../organisms/CalibrationPanels/utils'
@@ -58,13 +58,15 @@ export function RobotSettingsDeckCalibration({
       paddingY={SPACING.spacing24}
       gridGap={SPACING.spacing8}
     >
-      <StyledText as="h3" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
+      <LegacyStyledText as="h3" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
         {t('deck_calibration_title')}
-      </StyledText>
-      <StyledText as="p">{t('deck_calibration_description')}</StyledText>
-      <StyledText as="label" color={COLORS.grey60}>
+      </LegacyStyledText>
+      <LegacyStyledText as="p">
+        {t('deck_calibration_description')}
+      </LegacyStyledText>
+      <LegacyStyledText as="label" color={COLORS.grey60}>
         {deckLastModified}
-      </StyledText>
+      </LegacyStyledText>
     </Flex>
   )
 }

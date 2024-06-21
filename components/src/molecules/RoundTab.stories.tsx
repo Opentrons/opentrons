@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { SPACING, TYPOGRAPHY } from '../ui-style-constants'
 import { Flex } from '../primitives'
-import { StyledText } from '../atoms/StyledText'
+import { LegacyStyledText } from '../atoms/StyledText'
 import { DIRECTION_COLUMN, DIRECTION_ROW } from '../styles'
 import { RoundTab as RoundTabComponent } from './RoundTab'
 import type { Meta, StoryObj } from '@storybook/react'
@@ -32,9 +32,9 @@ const Tabs = (): JSX.Element => {
           }}
           tabName={'setup'}
         >
-          <StyledText textTransform={TYPOGRAPHY.textTransformCapitalize}>
+          <LegacyStyledText textTransform={TYPOGRAPHY.textTransformCapitalize}>
             {'Setup'}
-          </StyledText>
+          </LegacyStyledText>
         </RoundTabComponent>
 
         <RoundTabComponent
@@ -43,9 +43,9 @@ const Tabs = (): JSX.Element => {
             setStep('parameters')
           }}
         >
-          <StyledText textTransform={TYPOGRAPHY.textTransformCapitalize}>
+          <LegacyStyledText textTransform={TYPOGRAPHY.textTransformCapitalize}>
             {'Parameters'}
-          </StyledText>
+          </LegacyStyledText>
         </RoundTabComponent>
 
         <RoundTabComponent
@@ -54,9 +54,9 @@ const Tabs = (): JSX.Element => {
             setStep('module controls')
           }}
         >
-          <StyledText textTransform={TYPOGRAPHY.textTransformCapitalize}>
+          <LegacyStyledText textTransform={TYPOGRAPHY.textTransformCapitalize}>
             {'Module Controls'}
-          </StyledText>
+          </LegacyStyledText>
         </RoundTabComponent>
 
         <RoundTabComponent
@@ -65,18 +65,18 @@ const Tabs = (): JSX.Element => {
             setStep('run preview')
           }}
         >
-          <StyledText textTransform={TYPOGRAPHY.textTransformCapitalize}>
+          <LegacyStyledText textTransform={TYPOGRAPHY.textTransformCapitalize}>
             {'Run Preview'}
-          </StyledText>
+          </LegacyStyledText>
         </RoundTabComponent>
       </Flex>
-      <StyledText
+      <LegacyStyledText
         as="h3"
         fontWeight={TYPOGRAPHY.fontWeightSemiBold}
         textTransform={TYPOGRAPHY.textTransformCapitalize}
       >
         {step}
-      </StyledText>
+      </LegacyStyledText>
     </Flex>
   )
 }

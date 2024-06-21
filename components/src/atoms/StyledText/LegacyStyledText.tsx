@@ -5,7 +5,7 @@ import { TYPOGRAPHY, RESPONSIVENESS } from '../../ui-style-constants'
 import type * as React from 'react'
 import type { FlattenSimpleInterpolation } from 'styled-components'
 
-export interface Props extends React.ComponentProps<typeof Text> {
+export interface LegacyProps extends React.ComponentProps<typeof Text> {
   children?: React.ReactNode
 }
 
@@ -80,7 +80,9 @@ const styleMap: { [tag: string]: FlattenSimpleInterpolation } = {
   labelBold: TYPOGRAPHY.smallBodyTextBold,
 }
 
-export const StyledText: (props: Props) => JSX.Element = styled(Text)<Props>`
+export const LegacyStyledText: (props: LegacyProps) => JSX.Element = styled(
+  Text
+)<LegacyProps>`
   ${props => {
     let fontWeight = ''
     if (props.fontWeight === TYPOGRAPHY.fontWeightSemiBold) {

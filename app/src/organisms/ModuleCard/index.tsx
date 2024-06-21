@@ -14,7 +14,7 @@ import {
   Icon,
   ModuleIcon,
   SPACING,
-  StyledText,
+  LegacyStyledText,
   TYPOGRAPHY,
   useHoverTooltip,
   useOnClickOutside,
@@ -382,7 +382,9 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
                     i18nKey="hot_to_the_touch"
                     components={{
                       bold: <strong />,
-                      block: <StyledText fontSize={TYPOGRAPHY.fontSizeP} />,
+                      block: (
+                        <LegacyStyledText fontSize={TYPOGRAPHY.fontSizeP} />
+                      ),
                     }}
                   />
                 </Banner>
@@ -401,13 +403,13 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
                   aria-label="ot-spinner"
                   color={COLORS.grey60}
                 />
-                <StyledText marginLeft={SPACING.spacing8}>
+                <LegacyStyledText marginLeft={SPACING.spacing8}>
                   {t('updating_firmware')}
-                </StyledText>
+                </LegacyStyledText>
               </Flex>
             ) : (
               <>
-                <StyledText
+                <LegacyStyledText
                   textTransform={TYPOGRAPHY.textTransformUppercase}
                   color={COLORS.grey60}
                   fontWeight={TYPOGRAPHY.fontWeightSemiBold}
@@ -424,7 +426,7 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
                         port: module?.usbPort?.port,
                       })
                     : t('usb_port_not_connected')}
-                </StyledText>
+                </LegacyStyledText>
                 <Flex
                   paddingBottom={SPACING.spacing4}
                   data-testid={`ModuleCard_display_name_${module.serialNumber}`}
@@ -436,9 +438,9 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
                     marginRight={SPACING.spacing2}
                     color={COLORS.grey60}
                   />
-                  <StyledText>
+                  <LegacyStyledText>
                     {getModuleDisplayName(module.moduleModel)}
-                  </StyledText>
+                  </LegacyStyledText>
                 </Flex>
               </>
             )}

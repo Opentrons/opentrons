@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
-import { TYPOGRAPHY, StyledText } from '@opentrons/components'
+import { TYPOGRAPHY, LegacyStyledText } from '@opentrons/components'
 import type { AbsorbanceReaderModule } from '../../redux/modules/types'
 
 interface AbsorbanceReaderProps {
@@ -15,14 +15,14 @@ export const AbsorbanceReaderData = (
 
   return (
     <>
-      <StyledText
+      <LegacyStyledText
         fontSize={TYPOGRAPHY.fontSizeCaption}
         data-testid="abs_module_data"
       >
         {t('abs_reader_status', {
           status: moduleData.status,
         })}
-      </StyledText>
+      </LegacyStyledText>
     </>
   )
 }

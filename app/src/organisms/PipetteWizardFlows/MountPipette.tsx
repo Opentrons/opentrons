@@ -9,7 +9,7 @@ import {
   JUSTIFY_CENTER,
   SIZE_1,
   SPACING,
-  StyledText,
+  LegacyStyledText,
 } from '@opentrons/components'
 import { Banner } from '../../atoms/Banner'
 import { GenericWizardTile } from '../../molecules/GenericWizardTile'
@@ -60,11 +60,11 @@ export const MountPipette = (props: MountPipetteProps): JSX.Element => {
   } else {
     bodyText = (
       <>
-        <StyledText css={BODY_STYLE}>
+        <LegacyStyledText css={BODY_STYLE}>
           {isSingleMountPipette
             ? t('align_the_connector')
             : t('hold_pipette_carefully')}
-        </StyledText>
+        </LegacyStyledText>
         {!isSingleMountPipette ? (
           <Banner
             type="warning"

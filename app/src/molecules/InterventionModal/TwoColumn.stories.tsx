@@ -3,7 +3,7 @@ import * as React from 'react'
 import SuccessIcon from '../../assets/images/icon_success.png'
 
 import {
-  StyledText,
+  LegacyStyledText,
   Flex,
   DIRECTION_COLUMN,
   Box,
@@ -65,7 +65,7 @@ interface TextProps {
 }
 function Text({ text }: TextProps): JSX.Element | null {
   const hasComponent = text != null && text.length > 0
-  return hasComponent ? <StyledText>{text}</StyledText> : null
+  return hasComponent ? <LegacyStyledText>{text}</LegacyStyledText> : null
 }
 
 interface ImageProps {

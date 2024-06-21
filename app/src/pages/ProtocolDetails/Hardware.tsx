@@ -9,7 +9,7 @@ import {
   LocationIcon,
   ModuleIcon,
   SPACING,
-  StyledText,
+  LegacyStyledText,
   TYPOGRAPHY,
   WRAP,
 } from '@opentrons/components'
@@ -110,9 +110,9 @@ function HardwareItem({
   const hardwareName = useHardwareName(hardware)
 
   let location: JSX.Element = (
-    <StyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
+    <LegacyStyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
       {i18n.format(getHardwareLocation(hardware, t as TFunction), 'titleCase')}
-    </StyledText>
+    </LegacyStyledText>
   )
   if (hardware.hardwareType === 'module') {
     location = <LocationIcon slotName={hardware.slot} />
@@ -148,7 +148,7 @@ function HardwareItem({
               <ModuleIcon moduleType={iconModuleType} size="1.75rem" />
             </Flex>
           ) : null}
-          <StyledText as="p">{hardwareName}</StyledText>
+          <LegacyStyledText as="p">{hardwareName}</LegacyStyledText>
         </Flex>
       </TableDatum>
     </TableRow>
@@ -168,24 +168,24 @@ export const Hardware = (props: { protocolId: string }): JSX.Element => {
       <thead>
         <tr>
           <TableHeader>
-            <StyledText
+            <LegacyStyledText
               fontSize={TYPOGRAPHY.fontSize20}
               color={COLORS.grey60}
               fontWeight={TYPOGRAPHY.fontWeightSemiBold}
               paddingLeft={SPACING.spacing24}
             >
               {i18n.format(t('location'), 'capitalize')}
-            </StyledText>
+            </LegacyStyledText>
           </TableHeader>
           <TableHeader>
-            <StyledText
+            <LegacyStyledText
               fontSize={TYPOGRAPHY.fontSize20}
               color={COLORS.grey60}
               fontWeight={TYPOGRAPHY.fontWeightSemiBold}
               paddingLeft={SPACING.spacing24}
             >
               {i18n.format(t('hardware'), 'capitalize')}
-            </StyledText>
+            </LegacyStyledText>
           </TableHeader>
         </tr>
       </thead>

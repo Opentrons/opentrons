@@ -2,7 +2,7 @@ import * as React from 'react'
 import { css } from 'styled-components'
 import { BORDERS, COLORS } from '../../helix-design-system'
 import { Flex } from '../../primitives'
-import { StyledText } from '../StyledText'
+import { LegacyStyledText } from '../StyledText'
 import { ALIGN_CENTER, DIRECTION_ROW } from '../../styles'
 import { RESPONSIVENESS, SPACING, TYPOGRAPHY } from '../../ui-style-constants'
 import { Icon } from '../../icons'
@@ -146,9 +146,12 @@ export function Chip(props: ChipProps): JSX.Element {
           css={ICON_STYLE}
         />
       ) : null}
-      <StyledText css={TEXT_STYLE} color={CHIP_PROPS_BY_TYPE[type].textColor}>
+      <LegacyStyledText
+        css={TEXT_STYLE}
+        color={CHIP_PROPS_BY_TYPE[type].textColor}
+      >
         {text}
-      </StyledText>
+      </LegacyStyledText>
     </Flex>
   )
 }

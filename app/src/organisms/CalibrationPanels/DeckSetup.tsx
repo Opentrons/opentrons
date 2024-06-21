@@ -11,7 +11,7 @@ import {
   PrimaryButton,
   RobotWorkSpace,
   SPACING,
-  StyledText,
+  LegacyStyledText,
 } from '@opentrons/components'
 import {
   getDeckDefinitions,
@@ -57,33 +57,37 @@ export function DeckSetup(props: CalibrationPanelProps): JSX.Element {
     >
       <Flex>
         <Flex flex="1" flexDirection={DIRECTION_COLUMN}>
-          <StyledText as="h1" marginBottom={SPACING.spacing16}>
+          <LegacyStyledText as="h1" marginBottom={SPACING.spacing16}>
             {t('prepare_the_space')}
-          </StyledText>
+          </LegacyStyledText>
           {isHealthCheck ? (
-            <StyledText as="p">
+            <LegacyStyledText as="p">
               {t('to_check', { mount: activePipette?.mount })}
-            </StyledText>
+            </LegacyStyledText>
           ) : null}
           <Flex marginLeft={SPACING.spacing32}>
             <ul>
               <li>
-                <StyledText as="p">
+                <LegacyStyledText as="p">
                   {t('place_full_tip_rack', {
                     tip_rack: isHealthCheck
                       ? activePipette?.tipRackDisplay
                       : tipRackDisplayName,
                   })}
-                </StyledText>
+                </LegacyStyledText>
               </li>
               {calBlock != null ? (
                 <li>
-                  <StyledText as="p">{t('place_cal_block')}</StyledText>
+                  <LegacyStyledText as="p">
+                    {t('place_cal_block')}
+                  </LegacyStyledText>
                 </li>
               ) : null}
               {isHealthCheck ? (
                 <li>
-                  <StyledText as="p">{t('clear_other_slots')}</StyledText>
+                  <LegacyStyledText as="p">
+                    {t('clear_other_slots')}
+                  </LegacyStyledText>
                 </li>
               ) : null}
             </ul>

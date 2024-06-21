@@ -9,7 +9,7 @@ import {
   RESPONSIVENESS,
   SecondaryButton,
   SPACING,
-  StyledText,
+  LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { LEFT, RIGHT, NINETY_SIX_CHANNEL } from '@opentrons/shared-data'
@@ -274,9 +274,9 @@ export const Results = (props: ResultsProps): JSX.Element => {
       <>
         {Boolean(isOnDevice) ? (
           <Btn onClick={goBack} aria-label="back">
-            <StyledText css={GO_BACK_BUTTON_STYLE}>
+            <LegacyStyledText css={GO_BACK_BUTTON_STYLE}>
               {t('shared:go_back')}
-            </StyledText>
+            </LegacyStyledText>
           </Btn>
         ) : (
           <SecondaryButton

@@ -15,7 +15,7 @@ import {
   PrimaryButton,
   RESPONSIVENESS,
   SPACING,
-  StyledText,
+  LegacyStyledText,
   TYPOGRAPHY,
   useDeckLocationSelect,
 } from '@opentrons/components'
@@ -77,10 +77,13 @@ export const ChooseLocation = (
             width="100%"
             flex="1"
           >
-            <StyledText as="h4" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
+            <LegacyStyledText
+              as="h4"
+              fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+            >
               {title}
-            </StyledText>
-            <StyledText as="p">{body}</StyledText>
+            </LegacyStyledText>
+            <LegacyStyledText as="p">{body}</LegacyStyledText>
           </Flex>
           <Flex
             flex="1"
@@ -102,9 +105,9 @@ export const ChooseLocation = (
               handleGoBack()
             }}
           >
-            <StyledText css={GO_BACK_BUTTON_STYLE}>
+            <LegacyStyledText css={GO_BACK_BUTTON_STYLE}>
               {t('shared:go_back')}
-            </StyledText>
+            </LegacyStyledText>
           </Btn>
           <SmallButton
             buttonText={i18n.format(t('move_to_slot'), 'capitalize')}
@@ -131,9 +134,9 @@ export const ChooseLocation = (
                   handleGoBack()
                 }}
               >
-                <StyledText css={GO_BACK_BUTTON_STYLE}>
+                <LegacyStyledText css={GO_BACK_BUTTON_STYLE}>
                   {t('shared:go_back')}
-                </StyledText>
+                </LegacyStyledText>
               </Btn>
               <PrimaryButton onClick={handleConfirmPosition}>
                 {i18n.format(t('move_to_slot'), 'capitalize')}

@@ -5,7 +5,7 @@ import { useRecoveryCommands } from './useRecoveryCommands'
 import { useRecoveryTipStatus } from './useRecoveryTipStatus'
 import { useRecoveryRouting } from './useRecoveryRouting'
 import { useFailedLabwareUtils } from './useFailedLabwareUtils'
-import { getFailedCommandPipetteInfo } from '../utils'
+import { getFailedCommandPipetteInfo, getNextStep } from '../utils'
 import { useRecoveryMapUtils } from './useRecoveryMapUtils'
 import {
   useNotifyAllCommandsQuery,
@@ -43,6 +43,7 @@ export interface ERUtilsResults {
   hasLaunchedRecovery: boolean
   trackExternalMap: (map: Record<string, any>) => void
   stepCounts: StepCounts
+  commandAfterFailedCommand: ReturnType<typeof getNextStep>
 }
 
 // Builds various Error Recovery utilities.
@@ -116,6 +117,7 @@ export function useERUtils({
   })
 
   const stepCounts = useRunningStepCounts(runId, runCommands)
+  const commandAfterFailedCommand = getNextStep(failedCommand, protocolAnalysis)
 
   // TODO(jh, 06-14-24): Ensure other string build utilities that are internal to ErrorRecoveryFlows are exported under
   // one utility object in useERUtils.
@@ -134,5 +136,6 @@ export function useERUtils({
     recoveryMapUtils,
     getRecoveryOptionCopy,
     stepCounts,
+    commandAfterFailedCommand,
   }
 }

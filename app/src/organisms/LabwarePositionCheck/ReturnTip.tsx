@@ -3,7 +3,7 @@ import { Trans, useTranslation } from 'react-i18next'
 import {
   DIRECTION_COLUMN,
   Flex,
-  StyledText,
+  LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
@@ -78,7 +78,10 @@ export const ReturnTip = (props: ReturnTipProps): JSX.Element | null => {
       tOptions={{ tip_rack: labwareDisplayName, location: displayLocation }}
       components={{
         bold: (
-          <StyledText as="span" fontWeight={TYPOGRAPHY.fontWeightSemiBold} />
+          <LegacyStyledText
+            as="span"
+            fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+          />
         ),
       }}
     />,

@@ -6,7 +6,7 @@ import {
   DIRECTION_COLUMN,
   Flex,
   SPACING,
-  StyledText,
+  LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import {
@@ -77,7 +77,7 @@ export const TemperatureModuleSlideout = (
         />
       }
     >
-      <StyledText
+      <LegacyStyledText
         fontWeight={TYPOGRAPHY.fontWeightRegular}
         fontSize={TYPOGRAPHY.fontSizeP}
         paddingTop={SPACING.spacing4}
@@ -86,20 +86,20 @@ export const TemperatureModuleSlideout = (
         {t('tempdeck_slideout_body', {
           model: name,
         })}
-      </StyledText>
+      </LegacyStyledText>
       <Flex
         marginTop={SPACING.spacing16}
         flexDirection={DIRECTION_COLUMN}
         data-testid={`TemperatureSlideout_input_field_${module.serialNumber}`}
       >
-        <StyledText
+        <LegacyStyledText
           fontWeight={TYPOGRAPHY.fontWeightSemiBold}
           fontSize={TYPOGRAPHY.fontSizeH6}
           color={COLORS.black90}
           paddingBottom={SPACING.spacing8}
         >
           {t('set_temperature')}
-        </StyledText>
+        </LegacyStyledText>
         <form id="TemperatureModuleSlideout_submitValue">
           <InputField
             id={`${String(module.moduleModel)}`}

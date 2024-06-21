@@ -2,7 +2,7 @@ import * as React from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { useHistory } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import { Flex, Icon, SPACING, StyledText } from '@opentrons/components'
+import { Flex, Icon, SPACING, LegacyStyledText } from '@opentrons/components'
 import { useCreateRunMutation } from '@opentrons/react-api-client'
 
 import { MAXIMUM_PINNED_PROTOCOLS } from '../../App/constants'
@@ -109,25 +109,25 @@ export function LongPressModal({
           <MenuItem onClick={handleRunClick} key="play-circle">
             <Flex>
               <Icon name="play-circle" size="1.75rem" />
-              <StyledText marginLeft={SPACING.spacing24}>
+              <LegacyStyledText marginLeft={SPACING.spacing24}>
                 {t('run_protocol')}
-              </StyledText>
+              </LegacyStyledText>
             </Flex>
           </MenuItem>
           <MenuItem onClick={handlePinClick} key="pin">
             <Flex>
               <Icon name="pin" size="2.5rem" />
-              <StyledText marginLeft={SPACING.spacing24}>
+              <LegacyStyledText marginLeft={SPACING.spacing24}>
                 {pinned ? t('unpin_protocol') : t('pin_protocol')}
-              </StyledText>
+              </LegacyStyledText>
             </Flex>
           </MenuItem>
           <MenuItem onClick={handleDeleteClick} key="trash" isAlert={true}>
             <Flex>
               <Icon name="trash" size="2.5rem" />
-              <StyledText marginLeft={SPACING.spacing24}>
+              <LegacyStyledText marginLeft={SPACING.spacing24}>
                 {t('delete_protocol')}
-              </StyledText>
+              </LegacyStyledText>
             </Flex>
           </MenuItem>
         </MenuList>

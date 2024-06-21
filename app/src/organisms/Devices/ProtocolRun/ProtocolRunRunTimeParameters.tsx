@@ -22,7 +22,7 @@ import {
   Icon,
   InfoScreen,
   SPACING,
-  StyledText,
+  LegacyStyledText,
   TYPOGRAPHY,
   useHoverTooltip,
 } from '@opentrons/components'
@@ -85,16 +85,19 @@ export function ProtocolRunRuntimeParameters({
           alignItems={ALIGN_CENTER}
         >
           {hasRunTimeParameters ? (
-            <StyledText as="h3" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
+            <LegacyStyledText
+              as="h3"
+              fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+            >
               {t('parameters')}
-            </StyledText>
+            </LegacyStyledText>
           ) : null}
           {hasRunTimeParameters ? (
-            <StyledText as="label" color={COLORS.grey60}>
+            <LegacyStyledText as="label" color={COLORS.grey60}>
               {hasCustomRunTimeParameterValues
                 ? t('custom_values')
                 : t('default_values')}
-            </StyledText>
+            </LegacyStyledText>
           ) : null}
         </Flex>
         {hasRunTimeParameters ? (
@@ -104,10 +107,15 @@ export function ProtocolRunRuntimeParameters({
             iconMarginLeft={SPACING.spacing4}
           >
             <Flex flexDirection={DIRECTION_COLUMN}>
-              <StyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
+              <LegacyStyledText
+                as="p"
+                fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+              >
                 {t('values_are_view_only')}
-              </StyledText>
-              <StyledText as="p">{t('cancel_and_restart_to_edit')}</StyledText>
+              </LegacyStyledText>
+              <LegacyStyledText as="p">
+                {t('cancel_and_restart_to_edit')}
+              </LegacyStyledText>
             </Flex>
           </Banner>
         ) : null}
@@ -166,7 +174,7 @@ const StyledTableRowComponent = (
   return (
     <StyledTableRow isLast={isLast} key={`runTimeParameter-${index}`}>
       <StyledTableCell display="span">
-        <StyledText
+        <LegacyStyledText
           as="p"
           css={css`
             display: inline;
@@ -176,7 +184,7 @@ const StyledTableRowComponent = (
           {parameter.type === 'csv_file'
             ? t('csv_file')
             : parameter.displayName}
-        </StyledText>
+        </LegacyStyledText>
         {parameter.description != null ? (
           <>
             <Flex
@@ -199,11 +207,11 @@ const StyledTableRowComponent = (
       </StyledTableCell>
       <StyledTableCell>
         <Flex flexDirection={DIRECTION_ROW} gridGap={SPACING.spacing16}>
-          <StyledText as="p">
+          <LegacyStyledText as="p">
             {parameter.type === 'csv_file'
               ? parameter.file?.file?.name ?? ''
               : formatRunTimeParameterValue(parameter, t)}
-          </StyledText>
+          </LegacyStyledText>
           {parameter.type === 'csv_file' ||
           parameter.default !== parameter.value ? (
             <Chip
