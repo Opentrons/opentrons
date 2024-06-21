@@ -1,9 +1,13 @@
 import * as React from 'react'
 import { css } from 'styled-components'
-import { TYPOGRAPHY, SPACING, RESPONSIVENESS } from '../ui-style-constants'
-import { COLORS, BORDERS } from '../helix-design-system'
-import { POSITION_RELATIVE, DIRECTION_COLUMN, DIRECTION_ROW } from '../styles'
-import { Btn, Flex } from '../primitives'
+import { TYPOGRAPHY, SPACING, RESPONSIVENESS } from '../../ui-style-constants'
+import { COLORS, BORDERS } from '../../helix-design-system'
+import {
+  POSITION_RELATIVE,
+  DIRECTION_COLUMN,
+  DIRECTION_ROW,
+} from '../../styles'
+import { Btn, Flex } from '../../primitives'
 
 const DEFAULT_TAB_STYLE = css`
   ${TYPOGRAPHY.pSemiBold}
@@ -59,13 +63,15 @@ const INNER_CONTAINER_STYLE = css`
   }
 `
 
+export interface TabProps {
+  text: string
+  onClick: () => void
+  isActive?: boolean
+  disabled?: boolean
+}
+
 export interface TabsProps {
-  tabs: Array<{
-    text: string
-    onClick: () => void
-    isActive?: boolean
-    disabled?: boolean
-  }>
+  tabs: TabProps[]
 }
 
 export function Tabs(props: TabsProps): JSX.Element {

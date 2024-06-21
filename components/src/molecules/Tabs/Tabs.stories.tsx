@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { useArgs } from '@storybook/preview-api'
-import { Tabs as TabComponent } from './Tabs'
+import { Tabs as TabComponent } from '.'
 import type { Meta, StoryObj } from '@storybook/react'
 
 const meta: Meta<typeof TabComponent> = {
