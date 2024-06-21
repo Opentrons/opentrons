@@ -44,6 +44,9 @@ export default mergeConfig(
         '@opentrons/usb-bridge/node-client': path.resolve(
           './usb-bridge/node-client/src/index.ts'
         ),
+        '@opentrons/labware-library': path.resolve(
+          './labware-library/src/labware-creator/index.tsx'
+        ),
       },
     },
   })

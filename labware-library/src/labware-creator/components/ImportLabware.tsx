@@ -27,6 +27,13 @@ const stopEvent = (e: React.SyntheticEvent): void => {
 
 function UploadInput(props: UploadInputProps): JSX.Element {
   const { isButton, onUpload } = props
+  const fileInputRef = React.useRef<HTMLInputElement>(null)
+
+  const handleButtonClick = (): void => {
+    if (fileInputRef.current) {
+      fileInputRef.current.click()
+    }
+  }
 
   const Label = isButton ? PrimaryButton : 'label'
 
@@ -36,7 +43,7 @@ function UploadInput(props: UploadInputProps): JSX.Element {
 
   const labelProps = isButton
     ? {
-        Component: 'label' as const,
+        onClick: handleButtonClick,
         className: styles.upload_button,
       }
     : { onDrop: onUpload, className: styles.file_drop }
@@ -46,7 +53,13 @@ function UploadInput(props: UploadInputProps): JSX.Element {
       <Label {...labelProps}>
         {!isButton && <Icon name="upload" className={styles.file_drop_icon} />}
         <span className={styles.label_text}>{labelText}</span>
-        <input className={styles.file_input} type="file" onChange={onUpload} />
+        <input
+          className={styles.file_input}
+          type="file"
+          onChange={onUpload}
+          ref={fileInputRef}
+          style={{ display: isButton ? 'none' : 'block' }}
+        />
       </Label>
     </div>
   )
