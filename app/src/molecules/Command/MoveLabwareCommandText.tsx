@@ -7,7 +7,6 @@ import { getFinalLabwareLocation } from './utils/getFinalLabwareLocation'
 import type {
   MoveLabwareRunTimeCommand,
   RobotType,
-  ProtocolAnalysisOutput,
 } from '@opentrons/shared-data'
 import type { CommandTextData } from './types'
 import type { TFunction } from 'i18next'

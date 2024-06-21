@@ -96,8 +96,8 @@ export function configureStore(): StoreType {
     ) as StoreEnhancer<unknown, unknown>
   )
   // initial rehydration, and persistence subscriber
-  // store.dispatch(rehydratePersistedAction())
-  // store.subscribe(makePersistSubscriber(store))
+  store.dispatch(rehydratePersistedAction())
+  store.subscribe(makePersistSubscriber(store))
 
   global.enablePrereleaseMode = () => {
     store.dispatch({

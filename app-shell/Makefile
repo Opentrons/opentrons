@@ -11,7 +11,7 @@ PATH := $(shell cd .. && yarn bin):$(PATH)
 # dev server port
 PORT ?= 3000
 # protocol editor dev server port
-PD_PORT ?= 5174
+PD_PORT ?= 5178
 
 # dep directories for production build
 # TODO(mc, 2018-08-07): figure out a better way to do this

@@ -32,6 +32,7 @@ export const LoadCommandText = ({
   robotType,
 }: LoadCommandTextProps): JSX.Element | null => {
   const { t } = useTranslation('run_details')
+  
   switch (command.commandType) {
     case 'loadPipette': {
       const pipetteModel = getPipetteNameOnMount(

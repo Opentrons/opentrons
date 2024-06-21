@@ -9,7 +9,7 @@ PATH := $(shell cd .. && yarn bin):$(PATH)
 # app dev server port
 PORT ?= 5173
 # protocol editor dev server port
-PD_PORT ?= 5174
+PD_PORT ?= 5178
 
 # Path of source package
 SRC_PATH = app
