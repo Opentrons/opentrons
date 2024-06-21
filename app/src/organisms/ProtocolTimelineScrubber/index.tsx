@@ -34,12 +34,14 @@ import type {
   PipetteEntity,
   TimelineFrame,
 } from '@opentrons/step-generation'
-import ViewportList, { ViewportListRef } from 'react-viewport-list'
-import { CommandText } from '../CommandText'
+import ViewportList from 'react-viewport-list'
 import { AnnotatedSteps } from '../ProtocolDetails/AnnotatedSteps'
-
-import type {LabwareOnDeck } from '@opentrons/components'
 import { getWellFillFromLabwareId } from '../Devices/ProtocolRun/SetupLiquids/utils'
+import { CommandText } from '../../molecules/Command'
+
+import type { ViewportListRef } from 'react-viewport-list'
+import type {LabwareOnDeck } from '@opentrons/components'
+import { getCommandTextData } from '../../molecules/Command/utils/getCommandTextData'
 
 const COMMAND_WIDTH_PX = 240
 
@@ -460,7 +462,7 @@ function CommandItem(props: CommandItemProps): JSX.Element {
         alignSelf={ALIGN_FLEX_END}>
         {index + 1}
       </Text>
-      <CommandText command={command} analysis={analysis} robotType={robotType} />
+      <CommandText command={command} commandTextData={getCommandTextData(analysis)} robotType={robotType} />
       {showDetails ? Object.entries(command.params ?? {}).map(([key, value]) => (
         <Flex
           key={key}

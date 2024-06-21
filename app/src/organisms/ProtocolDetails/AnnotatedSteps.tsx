@@ -1,10 +1,10 @@
 import * as React from 'react'
 import { css } from 'styled-components'
+import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
 import { ALIGN_CENTER, ALIGN_FLEX_START, BORDERS, COLORS, DIRECTION_COLUMN, Flex, Icon, SPACING, StyledText, TYPOGRAPHY } from '@opentrons/components'
-import { CommandText } from '../CommandText'
-import { CommandIcon } from '../RunPreview/CommandIcon'
+import { CommandIcon, CommandText } from '../../molecules/Command'
 
-import { FLEX_ROBOT_TYPE, type CompletedProtocolAnalysis, type ProtocolAnalysisOutput, type RunTimeCommand } from '@opentrons/shared-data'
+import type { CompletedProtocolAnalysis, ProtocolAnalysisOutput, RunTimeCommand } from '@opentrons/shared-data'
 
 interface AnnotatedStepsProps {
   analysis: CompletedProtocolAnalysis | ProtocolAnalysisOutput

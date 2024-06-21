@@ -23,7 +23,6 @@
   "file_required": "File required",
   "go_to_labware_definition": "Go to labware definition",
   "go_to_timeline": "Go to timeline",
-  "gripper_pick_up_count": "Grip Count",
   "gripper_pick_up_count_description": "individual move labware commands that use the gripper.",
   "gripper_pick_up_count": "Grip Count",
   "hardware": "hardware",

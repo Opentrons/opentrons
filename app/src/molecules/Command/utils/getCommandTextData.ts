@@ -1,12 +1,13 @@
 import type { LegacyGoodRunData } from '@opentrons/api-client'
 import type {
   CompletedProtocolAnalysis,
+  ProtocolAnalysisOutput,
   RunTimeCommand,
 } from '@opentrons/shared-data'
 import type { CommandTextData } from '../types'
 
 export function getCommandTextData(
-  protocolData: CompletedProtocolAnalysis | LegacyGoodRunData,
+  protocolData: CompletedProtocolAnalysis | LegacyGoodRunData | ProtocolAnalysisOutput,
   protocolCommands?: RunTimeCommand[]
 ): CommandTextData {
   const { pipettes, labware, modules, liquids } = protocolData
