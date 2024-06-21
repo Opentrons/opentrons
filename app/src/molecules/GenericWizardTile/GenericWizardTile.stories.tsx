@@ -14,7 +14,7 @@ import { WizardHeader } from '../WizardHeader'
 import { configReducer } from '../../redux/config/reducer'
 import { GenericWizardTile } from './index'
 
-import type { Store } from 'redux'
+import type { Store, StoreEnhancer } from 'redux'
 import type { Story, Meta } from '@storybook/react'
 
 const dummyConfig = {
@@ -23,7 +23,10 @@ const dummyConfig = {
   },
 } as any
 
-const store: Store<any> = createStore(configReducer, dummyConfig)
+const store: Store<any> = createStore(
+  configReducer,
+  dummyConfig as StoreEnhancer
+)
 
 export default {
   title: 'App/Molecules/GenericWizardTile',
@@ -84,7 +87,9 @@ WithBackButton.args = {
   rightHandBody: rightHandBody,
   bodyText: body,
   header: 'example header',
-  back: () => console.log('back'),
+  back: () => {
+    console.log('back')
+  },
   proceedButtonText: 'Continue',
 }
 
@@ -95,7 +100,9 @@ WithSkeletons.args = {
   ),
   bodyText: skeletons,
   header: <Skeleton width="17rem" height="1.75rem" backgroundSize="47rem" />,
-  back: () => console.log('back'),
+  back: () => {
+    console.log('back')
+  },
   backIsDisabled: true,
   proceedButton: <PrimaryButton disabled={true}>{'Continue'}</PrimaryButton>,
 }

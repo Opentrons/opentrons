@@ -10,12 +10,12 @@ from opentrons_shared_data.pipette import (
     pipette_definition,
 )
 
-
 from opentrons.hardware_control.dev_types import PipetteDict
 from opentrons.hardware_control.nozzle_manager import (
     NozzleConfigurationManager,
     NozzleMap,
 )
+from opentrons_shared_data.errors.exceptions import MissingConfigurationData
 
 from ..types import FlowRates
 from ...types import Point
@@ -63,7 +63,15 @@ class VirtualPipetteDataProvider:
             config = self._get_virtual_pipette_full_config_by_model_string(
                 pipette_model_string
             )
-            new_nozzle_manager = NozzleConfigurationManager.build_from_config(config)
+
+            valid_nozzle_maps = load_pipette_data.load_valid_nozzle_maps(
+                config.pipette_type,
+                config.channels,
+                config.version,
+            )
+            new_nozzle_manager = NozzleConfigurationManager.build_from_config(
+                config, valid_nozzle_maps
+            )
             if back_left_nozzle and front_right_nozzle:
                 new_nozzle_manager.update_nozzle_configuration(
                     back_left_nozzle, front_right_nozzle, starting_nozzle
@@ -127,7 +135,7 @@ class VirtualPipetteDataProvider:
             pipette_model.pipette_version,
         )
 
-    def _get_virtual_pipette_static_config_by_model(
+    def _get_virtual_pipette_static_config_by_model(  # noqa: C901
         self, pipette_model: pipette_definition.PipetteModelVersionType, pipette_id: str
     ) -> LoadedStaticPipetteData:
         if pipette_id not in self._liquid_class_by_id:
@@ -150,8 +158,59 @@ class VirtualPipetteDataProvider:
         tip_configuration = config.liquid_properties[liquid_class].supported_tips[
             tip_type
         ]
+        valid_nozzle_maps = load_pipette_data.load_valid_nozzle_maps(
+            pipette_model.pipette_type,
+            pipette_model.pipette_channels,
+            pipette_model.pipette_version,
+        )
+        nozzle_manager = NozzleConfigurationManager.build_from_config(
+            config, valid_nozzle_maps
+        )
 
-        nozzle_manager = NozzleConfigurationManager.build_from_config(config)
+        tip_overlap_dict_for_tip_type = None
+        for configuration in (
+            config.pick_up_tip_configurations.press_fit,
+            config.pick_up_tip_configurations.cam_action,
+        ):
+            if not config:
+                continue
+
+            approved_map = None
+            for map_key in valid_nozzle_maps.maps.keys():
+                if valid_nozzle_maps.maps[map_key] == list(
+                    nozzle_manager.current_configuration.map_store.keys()
+                ):
+                    approved_map = map_key
+            if approved_map is None:
+                raise MissingConfigurationData(
+                    message="Virtual Static Nozzle Configuration does not match any approved map layout for the current pipette."
+                )
+
+            if configuration is not None:
+                try:
+                    tip_overlap_dict_for_tip_type = (
+                        configuration.configuration_by_nozzle_map[
+                            nozzle_manager.current_configuration.valid_map_key
+                        ][tip_type.name].versioned_tip_overlap_dictionary["v0"]
+                    )
+                    break
+                except KeyError:
+                    try:
+                        default = configuration.configuration_by_nozzle_map[
+                            nozzle_manager.current_configuration.valid_map_key
+                        ].get("default")
+                        if default is not None:
+                            tip_overlap_dict_for_tip_type = (
+                                default.versioned_tip_overlap_dictionary["v0"]
+                            )
+                            break
+                    except KeyError:
+                        tip_overlap_dict_for_tip_type = None
+        if tip_overlap_dict_for_tip_type is None:
+            raise ValueError(
+                "Virtual Static Nozzle Configuration does not have a valid pick up tip configuration."
+            )
+
         pip_back_left = config.pipette_bounding_box_offsets.back_left_corner
         pip_front_right = config.pipette_bounding_box_offsets.front_right_corner
         return LoadedStaticPipetteData(
@@ -173,9 +232,7 @@ class VirtualPipetteDataProvider:
                 default_aspirate=tip_configuration.default_aspirate_flowrate.values_by_api_level,
                 default_dispense=tip_configuration.default_dispense_flowrate.values_by_api_level,
             ),
-            nominal_tip_overlap=config.liquid_properties[
-                liquid_class
-            ].tip_overlap_dictionary,
+            nominal_tip_overlap=tip_overlap_dict_for_tip_type,
             nozzle_map=nozzle_manager.current_configuration,
             back_left_corner_offset=Point(
                 pip_back_left[0], pip_back_left[1], pip_back_left[2]

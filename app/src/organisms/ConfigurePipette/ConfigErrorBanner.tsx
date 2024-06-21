@@ -16,7 +16,9 @@ export function ConfigErrorBanner(props: Props): JSX.Element | null {
   return (
     <AlertItem
       type="warning"
-      onCloseClick={() => setDismissed(true)}
+      onCloseClick={() => {
+        setDismissed(true)
+      }}
       title={TITLE}
     >
       <p className={styles.config_submit_error}>

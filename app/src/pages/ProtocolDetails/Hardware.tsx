@@ -111,7 +111,7 @@ function HardwareItem({
 
   let location: JSX.Element = (
     <StyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
-      {i18n.format(getHardwareLocation(hardware, t), 'titleCase')}
+      {i18n.format(getHardwareLocation(hardware, t as TFunction), 'titleCase')}
     </StyledText>
   )
   if (hardware.hardwareType === 'module') {

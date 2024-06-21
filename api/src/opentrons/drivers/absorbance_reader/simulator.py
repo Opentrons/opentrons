@@ -1,7 +1,10 @@
 from typing import Dict, List, Optional
 from opentrons.util.async_helpers import ensure_yield
 
-from opentrons.drivers.types import AbsorbanceReaderLidStatus
+from opentrons.drivers.types import (
+    AbsorbanceReaderLidStatus,
+    AbsorbanceReaderDeviceState,
+)
 
 from .abstract import AbstractAbsorbanceReaderDriver
 
@@ -51,5 +54,5 @@ class SimulatingDriver(AbstractAbsorbanceReaderDriver):
         pass
 
     @ensure_yield
-    async def get_status(self) -> None:
-        pass
+    async def get_status(self) -> AbsorbanceReaderDeviceState:
+        return AbsorbanceReaderDeviceState.OK

@@ -23,10 +23,10 @@ describe('Module Update Banner', () => {
   })
 
   it('displays appropriate banner text', () => {
-    const { getByText, queryByText } = render(props)
-    getByText('Tips may be attached.')
-    queryByText('You may want to remove tips')
-    getByText('Remove tips')
+    render(props)
+    screen.getByText('Tips may be attached.')
+    screen.queryByText('You may want to remove tips')
+    screen.getByText('Remove tips')
   })
 
   it('launches the drop tip wizard when clicking on the appropriate banner text', () => {

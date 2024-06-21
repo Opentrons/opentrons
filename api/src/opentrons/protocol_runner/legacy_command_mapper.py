@@ -236,6 +236,15 @@ class LegacyCommandMapper:
                             "notes": [],
                         }
                     )
+                elif isinstance(running_command, pe_commands.Comment):
+                    completed_command = running_command.copy(
+                        update={
+                            "result": pe_commands.CommentResult.construct(),
+                            "status": pe_commands.CommandStatus.SUCCEEDED,
+                            "completedAt": now,
+                            "notes": [],
+                        }
+                    )
                 elif isinstance(running_command, pe_commands.Custom):
                     completed_command = running_command.copy(
                         update={
@@ -246,6 +255,9 @@ class LegacyCommandMapper:
                         }
                     )
                 else:
+                    # TODO(mm, 2024-06-13): This looks potentially wrong.
+                    # We're creating a `SUCCEEDED` command that does not have a `result`,
+                    # which is not normally possible.
                     completed_command = running_command.copy(
                         update={
                             "status": pe_commands.CommandStatus.SUCCEEDED,
@@ -332,6 +344,21 @@ class LegacyCommandMapper:
                 )
             )
             return wait_for_resume_create, wait_for_resume_running
+        elif command["name"] == legacy_command_types.COMMENT:
+            comment_running = pe_commands.Comment.construct(
+                id=command_id,
+                key=command_id,
+                status=pe_commands.CommandStatus.RUNNING,
+                createdAt=now,
+                startedAt=now,
+                params=pe_commands.CommentParams.construct(
+                    message=command["payload"]["text"],
+                ),
+            )
+            comment_create = pe_commands.CommentCreate.construct(
+                key=comment_running.key, params=comment_running.params
+            )
+            return comment_create, comment_running
         else:
             custom_running = pe_commands.Custom.construct(
                 id=command_id,

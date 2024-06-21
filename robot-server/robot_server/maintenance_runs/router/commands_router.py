@@ -3,12 +3,10 @@ import textwrap
 from typing import Optional, Union
 from typing_extensions import Final, Literal
 
-from anyio import move_on_after
 from fastapi import APIRouter, Depends, Query, status
 
 from opentrons.protocol_engine import (
     CommandPointer,
-    ProtocolEngine,
     commands as pe_commands,
 )
 from opentrons.protocol_engine.errors import CommandDoesNotExistError
@@ -27,11 +25,9 @@ from robot_server.runs.command_models import (
     CommandLink,
     CommandLinkMeta,
 )
+from robot_server.runs.run_models import RunCommandSummary
 
-from ..maintenance_run_models import (
-    MaintenanceRunCommandSummary,
-    MaintenanceRunNotFoundError,
-)
+from ..maintenance_run_models import MaintenanceRunNotFoundError
 from ..maintenance_run_data_manager import MaintenanceRunDataManager
 from ..maintenance_engine_store import MaintenanceEngineStore
 from ..dependencies import (
@@ -60,11 +56,11 @@ class CommandNotAllowed(ErrorDetails):
     title: str = "Setup Command Not Allowed"
 
 
-async def get_current_run_engine_from_url(
+async def get_current_run_from_url(
     runId: str,
     engine_store: MaintenanceEngineStore = Depends(get_maintenance_engine_store),
-) -> ProtocolEngine:
-    """Get current run protocol engine.
+) -> str:
+    """Get run from url.
 
     Args:
         runId: Run ID to associate the command with.
@@ -76,7 +72,7 @@ async def get_current_run_engine_from_url(
             f"Note that only one maintenance run can exist at a time."
         ).as_error(status.HTTP_404_NOT_FOUND)
 
-    return engine_store.engine
+    return runId
 
 
 @PydanticResponse.wrap_route(
@@ -110,6 +106,7 @@ async def create_run_command(
             " or when the timeout is reached. See the `timeout` query parameter."
         ),
     ),
+    engine_store: MaintenanceEngineStore = Depends(get_maintenance_engine_store),
     timeout: Optional[int] = Query(
         default=None,
         gt=0,
@@ -130,7 +127,7 @@ async def create_run_command(
             " the default was 30 seconds, not infinite."
         ),
     ),
-    protocol_engine: ProtocolEngine = Depends(get_current_run_engine_from_url),
+    run_id: str = Depends(get_current_run_from_url),
     check_estop: bool = Depends(require_estop_in_good_state),
 ) -> PydanticResponse[SimpleBody[pe_commands.Command]]:
     """Enqueue a protocol command.
@@ -142,9 +139,10 @@ async def create_run_command(
             Else, return immediately. Comes from a query parameter in the URL.
         timeout: The maximum time, in seconds, to wait before returning.
             Comes from a query parameter in the URL.
-        protocol_engine: The run's `ProtocolEngine` on which the new
+        engine_store: The run's `EngineStore` on which the new
             command will be enqueued.
         check_estop: Dependency to verify the estop is in a valid state.
+        run_id: Run identification to attach command to.
     """
     # TODO(mc, 2022-05-26): increment the HTTP API version so that default
     # behavior is to pass through `command_intent` without overriding it
@@ -153,14 +151,11 @@ async def create_run_command(
 
     # TODO (spp): re-add `RunStoppedError` exception catching if/when maintenance runs
     #  have actions.
-    command = protocol_engine.add_command(command_create)
+    command = await engine_store.add_command_and_wait_for_interval(
+        request=command_create, wait_until_complete=waitUntilComplete, timeout=timeout
+    )
 
-    if waitUntilComplete:
-        timeout_sec = None if timeout is None else timeout / 1000.0
-        with move_on_after(timeout_sec):
-            await protocol_engine.wait_for_command(command.id)
-
-    response_data = protocol_engine.state_view.commands.get(command.id)
+    response_data = engine_store.get_command(command.id)
 
     return await PydanticResponse.create(
         content=SimpleBody.construct(data=response_data),
@@ -180,7 +175,7 @@ async def create_run_command(
     ),
     responses={
         status.HTTP_200_OK: {
-            "model": MultiBody[MaintenanceRunCommandSummary, CommandCollectionLinks]
+            "model": MultiBody[RunCommandSummary, CommandCollectionLinks]
         },
         status.HTTP_404_NOT_FOUND: {"model": ErrorBody[RunNotFound]},
     },
@@ -202,7 +197,7 @@ async def get_run_commands(
     run_data_manager: MaintenanceRunDataManager = Depends(
         get_maintenance_run_data_manager
     ),
-) -> PydanticResponse[MultiBody[MaintenanceRunCommandSummary, CommandCollectionLinks]]:
+) -> PydanticResponse[MultiBody[RunCommandSummary, CommandCollectionLinks]]:
     """Get a summary of a set of commands in a run.
 
     Arguments:
@@ -224,7 +219,7 @@ async def get_run_commands(
     recovery_target_command = run_data_manager.get_recovery_target_command(run_id=runId)
 
     data = [
-        MaintenanceRunCommandSummary.construct(
+        RunCommandSummary.construct(
             id=c.id,
             key=c.key,
             commandType=c.commandType,
@@ -235,6 +230,7 @@ async def get_run_commands(
             completedAt=c.completedAt,
             params=c.params,
             error=c.error,
+            failedCommandId=c.failedCommandId,
         )
         for c in command_slice.commands
     ]

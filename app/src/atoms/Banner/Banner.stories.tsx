@@ -31,7 +31,9 @@ export const OverriddenExitIcon: Story = {
   args: {
     type: 'informing',
     children: 'Banner component',
-    onCloseClick: () => console.log('close'),
+    onCloseClick: () => {
+      console.log('close')
+    },
     closeButton: (
       <StyledText as="p" textDecoration={TYPOGRAPHY.textDecorationUnderline}>
         {'Exit'}

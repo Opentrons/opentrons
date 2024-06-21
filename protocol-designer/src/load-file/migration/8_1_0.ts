@@ -114,7 +114,7 @@ export const migrateFile = (
 
       const defaultBlowOutFlowRate = getDefaultBlowoutFlowRate(
         pipetteName as PipetteName,
-        item.volume,
+        item.volume as number,
         tipLength
       )
 

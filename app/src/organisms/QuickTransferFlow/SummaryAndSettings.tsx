@@ -21,9 +21,9 @@ import { useNotifyDeckConfigurationQuery } from '../../resources/deck_configurat
 import { TabbedButton } from '../../atoms/buttons'
 import { ChildNavigation } from '../ChildNavigation'
 import { Overview } from './Overview'
+import { TipManagement } from './TipManagement'
 import { SaveOrRunModal } from './SaveOrRunModal'
-import { getInitialSummaryState } from './utils'
-import { createQuickTransferFile } from './utils/createQuickTransferFile'
+import { getInitialSummaryState, createQuickTransferFile } from './utils'
 import { quickTransferSummaryReducer } from './reducers'
 
 import type { SmallButton } from '../../atoms/buttons'
@@ -56,10 +56,13 @@ export function SummaryAndSettings(
   )
   const deckConfig = useNotifyDeckConfigurationQuery().data ?? []
 
-  // @ts-expect-error TODO figure out how to make this type non-null as we know
-  // none of these values will be undefined
-  const initialSummaryState = getInitialSummaryState(wizardFlowState)
-  const [state] = React.useReducer(
+  const initialSummaryState = getInitialSummaryState({
+    // @ts-expect-error TODO figure out how to make this type non-null as we know
+    // none of these values will be undefined
+    state: wizardFlowState,
+    deckConfig,
+  })
+  const [state, dispatch] = React.useReducer(
     quickTransferSummaryReducer,
     initialSummaryState
   )
@@ -69,19 +72,21 @@ export function SummaryAndSettings(
   const { createRun } = useCreateRunMutation(
     {
       onSuccess: data => {
-        queryClient
-          .invalidateQueries([host, 'runs'])
-          .catch((e: Error) =>
-            console.error(`error invalidating runs query: ${e.message}`)
-          )
+        queryClient.invalidateQueries([host, 'runs']).catch((e: Error) => {
+          console.error(`error invalidating runs query: ${e.message}`)
+        })
         history.push(`/runs/${data.data.id}/setup`)
       },
     },
     host
   )
 
-  const handleClickSave = (): void => {
-    const protocolFile = createQuickTransferFile(state, deckConfig)
+  const handleClickSave = (protocolName: string): void => {
+    const protocolFile = createQuickTransferFile(
+      state,
+      deckConfig,
+      protocolName
+    )
     createProtocolAsync({ files: [protocolFile] }).then(data => {
       history.push(`protocols/${data.data.id}`)
     })
@@ -103,7 +108,9 @@ export function SummaryAndSettings(
       <ChildNavigation
         header={t('quick_transfer_volume', { volume: wizardFlowState.volume })}
         buttonText={t('create_transfer')}
-        onClickButton={() => setShowSaveOrRunModal(true)}
+        onClickButton={() => {
+          setShowSaveOrRunModal(true)
+        }}
         secondaryButtonProps={exitButtonProps}
       />
       <Flex
@@ -127,7 +134,9 @@ export function SummaryAndSettings(
               key={category}
               title={category}
               isSelected={category === selectedCategory}
-              onClick={() => setSelectedCategory(category)}
+              onClick={() => {
+                setSelectedCategory(category)
+              }}
               height={SPACING.spacing60}
             >
               {t(category)}
@@ -135,6 +144,9 @@ export function SummaryAndSettings(
           ))}
         </Flex>
         {selectedCategory === 'overview' ? <Overview state={state} /> : null}
+        {selectedCategory === 'tip_management' ? (
+          <TipManagement state={state} dispatch={dispatch} />
+        ) : null}
       </Flex>
     </Flex>
   )

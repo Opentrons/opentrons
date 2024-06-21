@@ -18,7 +18,7 @@ import { SendButton } from '../../atoms/SendButton'
 import { chatDataAtom, chatHistoryAtom, tokenAtom } from '../../resources/atoms'
 import { useApiCall } from '../../resources/hooks'
 import { calcTextAreaHeight } from '../../resources/utils/utils'
-import { END_POINT } from '../../resources/constants'
+import { STAGING_END_POINT, PROD_END_POINT } from '../../resources/constants'
 
 import type { AxiosRequestConfig } from 'axios'
 import type { ChatData } from '../../resources/types'
@@ -48,7 +48,10 @@ export function InputPrompt(): JSX.Element {
       }
 
       const config = {
-        url: END_POINT,
+        url:
+          process.env.NODE_ENV === 'production'
+            ? PROD_END_POINT
+            : STAGING_END_POINT,
         method: 'POST',
         headers,
         data: {
@@ -71,7 +74,7 @@ export function InputPrompt(): JSX.Element {
 
   React.useEffect(() => {
     if (submitted && data != null && !isLoading) {
-      const { role, reply } = data
+      const { role, reply } = data as ChatData
       const assistantResponse: ChatData = {
         role,
         reply,
@@ -89,14 +92,16 @@ export function InputPrompt(): JSX.Element {
     <StyledForm id="User_Prompt">
       <Flex css={CONTAINER_STYLE}>
         <StyledTextarea
-          rows={calcTextAreaHeight(userPrompt)}
+          rows={calcTextAreaHeight(userPrompt as string)}
           placeholder={t('type_your_prompt')}
           {...register('userPrompt')}
         />
         <SendButton
           disabled={userPrompt.length === 0}
           isLoading={isLoading}
-          handleClick={handleClick}
+          handleClick={() => {
+            handleClick()
+          }}
         />
       </Flex>
     </StyledForm>

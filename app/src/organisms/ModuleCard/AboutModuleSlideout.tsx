@@ -77,7 +77,9 @@ export const AboutModuleSlideout = (
             )}`}
             css={ALERT_ITEM_STYLE}
             type="warning"
-            onCloseClick={() => setShowBanner(false)}
+            onCloseClick={() => {
+              setShowBanner(false)
+            }}
           >
             {t('firmware_update_available')}
             <Btn

@@ -20,15 +20,19 @@ const Template: Story<React.ComponentProps<typeof RadioGroupComponent>> = ({
   onChange,
   ...args
 }) => {
-  const [controlledValue, setControlledValue] = React.useState(
-    args.options[0].value
+  const [controlledValue, setControlledValue] = React.useState<string>(
+    args?.options?.[0] != null ? args.options[0].value : ''
   )
   return (
     <Box width={SIZE_6}>
       <RadioGroupComponent
         {...args}
         value={controlledValue}
-        onChange={e => setControlledValue(e.target.value)}
+        onChange={e => {
+          setControlledValue(
+            'value' in e.target ? (e.target.value as string) : ''
+          )
+        }}
       />
     </Box>
   )

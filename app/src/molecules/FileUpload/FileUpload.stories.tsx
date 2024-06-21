@@ -5,7 +5,9 @@ import { FileUpload } from '.'
 import type { StoryFn, Meta } from '@storybook/react'
 
 const file = new File([testFile], 'a-file-to-test.png')
-const handleClick = (): void => console.log('clicked the file')
+const handleClick = (): void => {
+  console.log('clicked the file')
+}
 
 export default {
   title: 'App/Molecules/FileUpload',

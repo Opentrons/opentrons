@@ -6,7 +6,10 @@ import {
   RUN_STATUS_STOPPED,
   RUN_STATUSES_TERMINAL,
 } from '@opentrons/api-client'
-import { formatRunTimeParameterValue } from '@opentrons/shared-data'
+import {
+  formatRunTimeParameterValue,
+  sortRuntimeParameters,
+} from '@opentrons/shared-data'
 import {
   ALIGN_CENTER,
   BORDERS,
@@ -56,8 +59,8 @@ export function ProtocolRunRuntimeParameters({
       ? run?.data?.runTimeParameters
       : mostRecentAnalysis?.runTimeParameters) ?? []
   const hasRunTimeParameters = runTimeParameters.length > 0
-  const hasCustomRunTimeParameterValues = runTimeParameters.some(
-    parameter => parameter.value !== parameter.default
+  const hasCustomRunTimeParameterValues = runTimeParameters.some(parameter =>
+    parameter.type !== 'csv_file' ? parameter.value !== parameter.default : true
   )
 
   const runActions = run?.data.actions
@@ -66,6 +69,8 @@ export function ProtocolRunRuntimeParameters({
   )
   const isRunCancelledWithoutStarting =
     !hasRunStarted && runStatus === RUN_STATUS_STOPPED
+
+  const sortedRunTimeParameters = sortRuntimeParameters(runTimeParameters)
 
   return (
     <>
@@ -126,7 +131,7 @@ export function ProtocolRunRuntimeParameters({
                 <StyledTableHeader>{t('value')}</StyledTableHeader>
               </StyledTableHeaderContainer>
               <tbody>
-                {runTimeParameters.map(
+                {sortedRunTimeParameters.map(
                   (parameter: RunTimeParameter, index: number) => (
                     <StyledTableRowComponent
                       key={`${index}_${parameter.variableName}`}
@@ -168,7 +173,9 @@ const StyledTableRowComponent = (
             padding-right: 8px;
           `}
         >
-          {parameter.displayName}
+          {parameter.type === 'csv_file'
+            ? t('csv_file')
+            : parameter.displayName}
         </StyledText>
         {parameter.description != null ? (
           <>
@@ -193,9 +200,12 @@ const StyledTableRowComponent = (
       <StyledTableCell>
         <Flex flexDirection={DIRECTION_ROW} gridGap={SPACING.spacing16}>
           <StyledText as="p">
-            {formatRunTimeParameterValue(parameter, t)}
+            {parameter.type === 'csv_file'
+              ? parameter.file?.file?.name ?? ''
+              : formatRunTimeParameterValue(parameter, t)}
           </StyledText>
-          {parameter.value !== parameter.default ? (
+          {parameter.type === 'csv_file' ||
+          parameter.default !== parameter.value ? (
             <Chip
               text={t('updated')}
               type="success"

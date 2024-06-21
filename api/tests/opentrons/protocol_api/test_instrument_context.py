@@ -34,6 +34,7 @@ from opentrons.protocol_api.core.legacy.legacy_instrument_core import (
 from opentrons.hardware_control.nozzle_manager import NozzleMap
 from opentrons.protocol_api.disposal_locations import TrashBin, WasteChute
 from opentrons.protocol_api._nozzle_layout import NozzleLayout
+from opentrons_shared_data.pipette.pipette_definition import ValidNozzleMaps
 from opentrons.types import Location, Mount, Point
 
 from opentrons_shared_data.errors.exceptions import (
@@ -515,6 +516,7 @@ MOCK_MAP = NozzleMap.build(
     starting_nozzle="A1",
     back_left_nozzle="A1",
     front_right_nozzle="A1",
+    valid_nozzle_maps=ValidNozzleMaps(maps={"Full": ["A1"]}),
 )
 
 

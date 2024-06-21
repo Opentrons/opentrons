@@ -22,6 +22,9 @@ import {
 import {
   getCutoutDisplayName,
   getFixtureDisplayName,
+  ABSORBANCE_READER_CUTOUTS,
+  ABSORBANCE_READER_V1,
+  ABSORBANCE_READER_V1_FIXTURE,
   HEATER_SHAKER_CUTOUTS,
   HEATERSHAKER_MODULE_V1,
   HEATERSHAKER_MODULE_V1_FIXTURE,
@@ -227,6 +230,24 @@ export function AddFixtureModal({
           ...unconfiguredTemperatureModules,
         ]
       }
+      if (
+        ABSORBANCE_READER_CUTOUTS.includes(cutoutId) &&
+        unconfiguredMods.some(m => m.moduleModel === ABSORBANCE_READER_V1)
+      ) {
+        const unconfiguredAbsorbanceReaders = unconfiguredMods
+          .filter(mod => mod.moduleModel === ABSORBANCE_READER_V1)
+          .map(mod => [
+            {
+              cutoutId,
+              cutoutFixtureId: ABSORBANCE_READER_V1_FIXTURE,
+              opentronsModuleSerialNumber: mod.serialNumber,
+            },
+          ])
+        availableOptions = [
+          ...availableOptions,
+          ...unconfiguredAbsorbanceReaders,
+        ]
+      }
     }
   } else if (optionStage === 'wasteChuteOptions') {
     availableOptions = WASTE_CHUTE_FIXTURES.map(fixture => [
@@ -316,9 +337,9 @@ export function AddFixtureModal({
       {isOnDevice ? (
         <Modal
           header={modalHeader}
-          onOutsideClick={() =>
-            providedFixtureOptions != null ? null : closeModal()
-          }
+          onOutsideClick={() => {
+            if (providedFixtureOptions == null) closeModal()
+          }}
         >
           <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing32}>
             <StyledText as="p">{t('add_fixture_description')}</StyledText>

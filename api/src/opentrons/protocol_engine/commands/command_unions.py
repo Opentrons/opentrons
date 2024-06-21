@@ -1,12 +1,20 @@
 """Union types of concrete command definitions."""
 
-from typing import Union
-from typing_extensions import Annotated
+from typing import Annotated, Iterable, Type, Union, get_type_hints
 
 from pydantic import Field
 
-from .command import DefinedErrorData
+from opentrons.util.get_union_elements import get_union_elements
 
+from .command import DefinedErrorData
+from .pipetting_common import (
+    OverpressureError,
+    OverpressureErrorInternalData,
+    LiquidNotFoundError,
+    LiquidNotFoundErrorInternalData,
+)
+
+from . import absorbance_reader
 from . import heater_shaker
 from . import magnetic_module
 from . import temperature_module
@@ -299,6 +307,14 @@ from .get_tip_presence import (
     GetTipPresenceCommandType,
 )
 
+from .liquid_probe import (
+    LiquidProbe,
+    LiquidProbeParams,
+    LiquidProbeCreate,
+    LiquidProbeResult,
+    LiquidProbeCommandType,
+)
+
 Command = Annotated[
     Union[
         Aspirate,
@@ -336,6 +352,7 @@ Command = Annotated[
         SetStatusBar,
         VerifyTipPresence,
         GetTipPresence,
+        LiquidProbe,
         heater_shaker.WaitForTemperature,
         heater_shaker.SetTargetTemperature,
         heater_shaker.DeactivateHeater,
@@ -357,6 +374,8 @@ Command = Annotated[
         thermocycler.OpenLid,
         thermocycler.CloseLid,
         thermocycler.RunProfile,
+        absorbance_reader.Initialize,
+        absorbance_reader.MeasureAbsorbance,
         calibration.CalibrateGripper,
         calibration.CalibratePipette,
         calibration.CalibrateModule,
@@ -401,6 +420,7 @@ CommandParams = Union[
     SetStatusBarParams,
     VerifyTipPresenceParams,
     GetTipPresenceParams,
+    LiquidProbeParams,
     heater_shaker.WaitForTemperatureParams,
     heater_shaker.SetTargetTemperatureParams,
     heater_shaker.DeactivateHeaterParams,
@@ -422,7 +442,8 @@ CommandParams = Union[
     thermocycler.OpenLidParams,
     thermocycler.CloseLidParams,
     thermocycler.RunProfileParams,
-    thermocycler.RunProfileStepParams,
+    absorbance_reader.InitializeParams,
+    absorbance_reader.MeasureAbsorbanceParams,
     calibration.CalibrateGripperParams,
     calibration.CalibratePipetteParams,
     calibration.CalibrateModuleParams,
@@ -465,6 +486,7 @@ CommandType = Union[
     SetStatusBarCommandType,
     VerifyTipPresenceCommandType,
     GetTipPresenceCommandType,
+    LiquidProbeCommandType,
     heater_shaker.WaitForTemperatureCommandType,
     heater_shaker.SetTargetTemperatureCommandType,
     heater_shaker.DeactivateHeaterCommandType,
@@ -486,6 +508,8 @@ CommandType = Union[
     thermocycler.OpenLidCommandType,
     thermocycler.CloseLidCommandType,
     thermocycler.RunProfileCommandType,
+    absorbance_reader.InitializeCommandType,
+    absorbance_reader.MeasureAbsorbanceCommandType,
     calibration.CalibrateGripperCommandType,
     calibration.CalibratePipetteCommandType,
     calibration.CalibrateModuleCommandType,
@@ -529,6 +553,7 @@ CommandCreate = Annotated[
         SetStatusBarCreate,
         VerifyTipPresenceCreate,
         GetTipPresenceCreate,
+        LiquidProbeCreate,
         heater_shaker.WaitForTemperatureCreate,
         heater_shaker.SetTargetTemperatureCreate,
         heater_shaker.DeactivateHeaterCreate,
@@ -550,6 +575,8 @@ CommandCreate = Annotated[
         thermocycler.OpenLidCreate,
         thermocycler.CloseLidCreate,
         thermocycler.RunProfileCreate,
+        absorbance_reader.InitializeCreate,
+        absorbance_reader.MeasureAbsorbanceCreate,
         calibration.CalibrateGripperCreate,
         calibration.CalibratePipetteCreate,
         calibration.CalibrateModuleCreate,
@@ -594,6 +621,7 @@ CommandResult = Union[
     SetStatusBarResult,
     VerifyTipPresenceResult,
     GetTipPresenceResult,
+    LiquidProbeResult,
     heater_shaker.WaitForTemperatureResult,
     heater_shaker.SetTargetTemperatureResult,
     heater_shaker.DeactivateHeaterResult,
@@ -615,12 +643,18 @@ CommandResult = Union[
     thermocycler.OpenLidResult,
     thermocycler.CloseLidResult,
     thermocycler.RunProfileResult,
+    absorbance_reader.InitializeResult,
+    absorbance_reader.MeasureAbsorbanceResult,
     calibration.CalibrateGripperResult,
     calibration.CalibratePipetteResult,
     calibration.CalibrateModuleResult,
     calibration.MoveToMaintenancePositionResult,
 ]
 
+# todo(mm, 2024-06-12): Ideally, command return types would have specific
+# CommandPrivateResults paired with specific CommandResults. For example,
+# a TouchTipResult can never be paired with a LoadPipettePrivateResult in practice,
+# and ideally our types would reflect that.
 CommandPrivateResult = Union[
     None,
     LoadPipettePrivateResult,
@@ -629,7 +663,23 @@ CommandPrivateResult = Union[
 ]
 
 # All `DefinedErrorData`s that implementations will actually return in practice.
-# There's just one right now, but this will eventually be a Union.
-CommandDefinedErrorData = DefinedErrorData[
-    TipPhysicallyMissingError, TipPhysicallyMissingErrorInternalData
+CommandDefinedErrorData = Union[
+    DefinedErrorData[TipPhysicallyMissingError, TipPhysicallyMissingErrorInternalData],
+    DefinedErrorData[OverpressureError, OverpressureErrorInternalData],
+    DefinedErrorData[LiquidNotFoundError, LiquidNotFoundErrorInternalData],
 ]
+
+
+def _map_create_types_by_params_type(
+    create_types: Iterable[Type[CommandCreate]],
+) -> dict[Type[CommandParams], Type[CommandCreate]]:
+    def get_params_type(create_type: Type[CommandCreate]) -> Type[CommandParams]:
+        return get_type_hints(create_type)["params"]  # type: ignore[no-any-return]
+
+    return {get_params_type(create_type): create_type for create_type in create_types}
+
+
+CREATE_TYPES_BY_PARAMS_TYPE = _map_create_types_by_params_type(
+    get_union_elements(CommandCreate)
+)
+"""A "reverse" mapping from each CommandParams type to its parent CommandCreate type."""

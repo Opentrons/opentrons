@@ -15,11 +15,13 @@ import type {
   RobotApiRequestOptions,
   RobotHost,
   RobotApiResponse,
+  RobotApiV2ErrorResponseBody,
 } from '../../robot-api/types'
 import type {
   CreateSessionCommandAction,
   CreateSessionCommandFailureAction,
   CreateSessionCommandSuccessAction,
+  SessionResponse,
 } from '../types'
 
 const mapActionToRequest = (
@@ -48,13 +50,13 @@ const mapResponseToAction = (
     ? Actions.createSessionCommandSuccess(
         host.name,
         originalAction.payload.sessionId,
-        body,
+        body as SessionResponse,
         meta
       )
     : Actions.createSessionCommandFailure(
         host.name,
         originalAction.payload.sessionId,
-        body,
+        body as RobotApiV2ErrorResponseBody,
         meta
       )
 }

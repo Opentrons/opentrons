@@ -43,7 +43,7 @@ export const Carriage = (props: PipetteWizardStepProps): JSX.Element | null => {
         proceed()
       })
       .catch(error => {
-        setShowErrorMessage(error.message)
+        setShowErrorMessage(error.message as string)
       })
   }
 
@@ -62,7 +62,7 @@ export const Carriage = (props: PipetteWizardStepProps): JSX.Element | null => {
       )}
       rightHandBody={getPipetteAnimations96({
         section: SECTIONS.CARRIAGE,
-        flowType: flowType,
+        flowType,
       })}
       bodyText={
         <Trans
@@ -79,14 +79,14 @@ export const Carriage = (props: PipetteWizardStepProps): JSX.Element | null => {
       }
       back={flowType === FLOWS.ATTACH ? undefined : goBack}
       proceedButton={
-        isOnDevice ? (
+        Boolean(isOnDevice) ? (
           <SmallButton
             onClick={
               flowType === FLOWS.ATTACH
                 ? proceed
                 : handleReattachCarriageProceed
             }
-            buttonText={capitalize(t('shared:continue'))}
+            buttonText={capitalize(t('shared:continue') as string)}
           />
         ) : (
           <PrimaryButton
@@ -96,7 +96,7 @@ export const Carriage = (props: PipetteWizardStepProps): JSX.Element | null => {
                 : handleReattachCarriageProceed
             }
           >
-            {capitalize(t('shared:continue'))}
+            {capitalize(t('shared:continue') as string)}
           </PrimaryButton>
         )
       }

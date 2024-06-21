@@ -10,6 +10,7 @@ import type {
   LabwareDefinition2,
   LabwareDisplayCategory,
   LabwareWellProperties,
+  LabwareOffset,
 } from '@opentrons/shared-data'
 
 // TODO Ian 2019-07-29: move this constant to shared-data?
@@ -31,14 +32,14 @@ export const _getGroupMetadataDisplayCategory = (args: {
 }
 
 export function fieldsToLabware(
-  fields: ProcessedLabwareFields
+  fields: ProcessedLabwareFields,
+  adapterDefinitions?: LabwareDefinition2[]
 ): LabwareDefinition2 {
   // NOTE Ian 2019-07-27: only the 15-50-esque tube rack has multiple grids,
   // and it is not supported in labware creator. So all are regular.
   const isRegularLabware = true
-  const { displayName } = fields
+  const { displayName, compatibleAdapters, compatibleModules } = fields
   const displayCategory = fields.labwareType
-
   if (isRegularLabware) {
     const totalLiquidVolume = fields.wellVolume
     const commonWellProperties = {
@@ -103,6 +104,31 @@ export function fieldsToLabware(
 
     const isTiprack = fields.labwareType === 'tipRack'
 
+    const stackingOffsetWithLabware: Record<string, LabwareOffset> = {}
+    Object.entries(compatibleAdapters).forEach(([loadName, z]) => {
+      const adapterHeight =
+        adapterDefinitions != null
+          ? Object.values(adapterDefinitions).find(
+              definition => definition.parameters.loadName === loadName
+            )?.dimensions.zDimension ?? 0
+          : 0
+      return (stackingOffsetWithLabware[loadName] = {
+        x: 0,
+        y: 0,
+        //  ensure that z is a number!
+        z: fields.labwareZDimension + adapterHeight - parseFloat(String(z)),
+      })
+    })
+    const stackingOffsetWithModule: Record<string, LabwareOffset> = {}
+    Object.entries(compatibleModules).forEach(([moduleModel, z]) => {
+      return (stackingOffsetWithModule[moduleModel] = {
+        x: 0,
+        y: 0,
+        //  ensure that z is a number!
+        z: fields.labwareZDimension - parseFloat(String(z)),
+      })
+    })
+
     const def = createRegularLabware({
       strict: false,
       metadata: {
@@ -160,6 +186,14 @@ export function fieldsToLabware(
             : { displayCategory: groupMetadataDisplayCategory }),
         },
       },
+      stackingOffsetWithLabware:
+        Object.keys(stackingOffsetWithLabware).length > 0
+          ? stackingOffsetWithLabware
+          : undefined,
+      stackingOffsetWithModule:
+        Object.keys(stackingOffsetWithModule).length > 0
+          ? stackingOffsetWithModule
+          : undefined,
     })
 
     // overwrite loadName from createRegularLabware with ours

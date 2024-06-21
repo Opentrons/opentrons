@@ -11,11 +11,11 @@ import {
 import { RadioButton } from '../../atoms/buttons'
 import { useToaster } from '../ToasterOven'
 import { ChildNavigation } from '../ChildNavigation'
-import type { RunTimeParameter } from '@opentrons/shared-data'
+import type { ChoiceParameter } from '@opentrons/shared-data'
 
 interface ChooseEnumProps {
   handleGoBack: () => void
-  parameter: RunTimeParameter
+  parameter: ChoiceParameter
   setParameter: (value: boolean | string | number, variableName: string) => void
   rawValue: number | string | boolean
 }
@@ -25,7 +25,7 @@ export function ChooseEnum({
   parameter,
   setParameter,
   rawValue,
-}: ChooseEnumProps): JSX.Element {
+}: ChooseEnumProps): JSX.Element | null {
   const { makeSnackbar } = useToaster()
 
   const { t } = useTranslation(['protocol_setup', 'shared'])
@@ -42,11 +42,11 @@ export function ChooseEnum({
         onClickBack={handleGoBack}
         buttonType="tertiaryLowLight"
         buttonText={t('restore_default')}
-        onClickButton={() =>
+        onClickButton={() => {
           resetValueDisabled
-            ? makeSnackbar(t('no_custom_values'))
+            ? makeSnackbar(t('no_custom_values') as string)
             : setParameter(parameter.default, parameter.variableName)
-        }
+        }}
       />
       <Flex
         marginTop="7.75rem"
@@ -71,7 +71,9 @@ export function ChooseEnum({
               data-testid={`${option.value}`}
               buttonLabel={option.displayName}
               buttonValue={`${option.value}`}
-              onChange={() => handleOnClick(option.value)}
+              onChange={() => {
+                handleOnClick(option.value)
+              }}
               isSelected={option.value === rawValue}
             />
           )
