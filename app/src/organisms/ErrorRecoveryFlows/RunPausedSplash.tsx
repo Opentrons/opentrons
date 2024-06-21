@@ -20,7 +20,8 @@ import {
 } from '@opentrons/components'
 
 import { getIsOnDevice } from '../../redux/config'
-import { getErrorKind, useErrorName } from './hooks'
+import { useErrorName } from './hooks'
+import { getErrorKind } from './utils'
 import { LargeButton } from '../../atoms/buttons'
 import { RECOVERY_MAP } from './constants'
 import { StepInfo } from './shared'

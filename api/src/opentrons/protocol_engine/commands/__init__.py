@@ -325,6 +325,14 @@ from .verify_tip_presence import (
     VerifyTipPresenceCommandType,
 )
 
+from .liquid_probe import (
+    LiquidProbe,
+    LiquidProbeParams,
+    LiquidProbeCreate,
+    LiquidProbeResult,
+    LiquidProbeCommandType,
+)
+
 __all__ = [
     # command type unions
     "Command",
@@ -566,4 +574,10 @@ __all__ = [
     "VerifyTipPresenceParams",
     "VerifyTipPresenceResult",
     "VerifyTipPresenceCommandType",
+    # liquid probe command bundle
+    "LiquidProbe",
+    "LiquidProbeParams",
+    "LiquidProbeCreate",
+    "LiquidProbeResult",
+    "LiquidProbeCommandType",
 ]

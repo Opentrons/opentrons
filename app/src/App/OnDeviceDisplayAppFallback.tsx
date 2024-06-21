@@ -38,7 +38,7 @@ export function OnDeviceDisplayAppFallback({
       name: ANALYTICS_ODD_APP_ERROR,
       properties: { errorMessage: error.message, robotSerialNumber },
     })
-    dispatch(appRestart(error.message))
+    dispatch(appRestart(error.message as string))
   }
   const modalHeader: ModalHeaderBaseProps = {
     title: t('error_boundary_title'),

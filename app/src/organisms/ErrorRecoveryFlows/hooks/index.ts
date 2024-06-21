@@ -1,4 +1,3 @@
-export { getErrorKind } from './getErrorKind'
 export { useCurrentlyRecoveringFrom } from './useCurrentlyRecoveringFrom'
 export { useErrorMessage } from './useErrorMessage'
 export { useErrorName } from './useErrorName'

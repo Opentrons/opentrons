@@ -44,7 +44,7 @@ export function ChooseEnum({
         buttonText={t('restore_default')}
         onClickButton={() => {
           resetValueDisabled
-            ? makeSnackbar(t('no_custom_values'))
+            ? makeSnackbar(t('no_custom_values') as string)
             : setParameter(parameter.default, parameter.variableName)
         }}
       />

@@ -60,7 +60,7 @@ export const Parameters = (props: { protocolId: string }): JSX.Element => {
   const { t, i18n } = useTranslation('protocol_details')
 
   const makeSnack = (): void => {
-    makeSnackbar(t('start_setup_customize_values'))
+    makeSnackbar(t('start_setup_customize_values') as string)
   }
 
   const formatRange = (parameter: RunTimeParameter): string => {

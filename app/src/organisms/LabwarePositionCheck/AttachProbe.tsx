@@ -85,7 +85,7 @@ export const AttachProbe = (props: AttachProbeProps): JSX.Element | null => {
       ],
       false
     ).catch(error => {
-      setFatalError(error.message)
+      setFatalError(error.message as string)
     })
   }, [])
 
@@ -99,7 +99,7 @@ export const AttachProbe = (props: AttachProbeProps): JSX.Element | null => {
       {
         commandType: 'verifyTipPresence',
         params: {
-          pipetteId: pipetteId,
+          pipetteId,
           expectedState: 'present',
           followSingularSensor: 'primary',
         },

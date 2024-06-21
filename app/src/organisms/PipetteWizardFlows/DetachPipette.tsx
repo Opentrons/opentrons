@@ -115,7 +115,7 @@ export const DetachPipette = (props: DetachPipetteProps): JSX.Element => {
         proceed()
       })
       .catch(error => {
-        setShowErrorMessage(error.message)
+        setShowErrorMessage(error.message as string)
       })
   }
 
@@ -163,7 +163,7 @@ export const DetachPipette = (props: DetachPipetteProps): JSX.Element => {
         {is96ChannelPipette && (
           <Banner
             type="warning"
-            size={isOnDevice ? '1.5rem' : SIZE_1}
+            size={Boolean(isOnDevice) ? '1.5rem' : SIZE_1}
             marginY={SPACING.spacing4}
           >
             {t('pipette_heavy', { weight: WEIGHT_OF_96_CHANNEL })}
@@ -178,13 +178,13 @@ export const DetachPipette = (props: DetachPipetteProps): JSX.Element => {
     return (
       <SimpleWizardBody
         iconColor={COLORS.red50}
-        header={t('pipette_failed_to_detach', { pipetteName: pipetteName })}
+        header={t('pipette_failed_to_detach', { pipetteName })}
         isSuccess={false}
       >
         <Flex
           width="100%"
           justifyContent={JUSTIFY_SPACE_BETWEEN}
-          alignItems={isOnDevice ? ALIGN_CENTER : ALIGN_FLEX_END}
+          alignItems={Boolean(isOnDevice) ? ALIGN_CENTER : ALIGN_FLEX_END}
           gridGap={SPACING.spacing8}
         >
           <Btn
@@ -197,7 +197,7 @@ export const DetachPipette = (props: DetachPipetteProps): JSX.Element => {
               {t('shared:go_back')}
             </StyledText>
           </Btn>
-          {isOnDevice ? (
+          {Boolean(isOnDevice) ? (
             <SmallButton
               disabled={isFetching}
               buttonText={i18n.format(t('try_again'), 'capitalize')}
@@ -244,7 +244,7 @@ export const DetachPipette = (props: DetachPipetteProps): JSX.Element => {
         ) : is96ChannelPipette ? (
           getPipetteAnimations96({
             section: pipetteWizardStep.section,
-            flowType: flowType,
+            flowType,
           })
         ) : (
           getPipetteAnimations({ pipetteWizardStep, channel })

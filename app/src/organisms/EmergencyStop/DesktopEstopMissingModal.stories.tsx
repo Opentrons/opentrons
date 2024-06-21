@@ -5,7 +5,7 @@ import { createStore } from 'redux'
 import { configReducer } from '../../redux/config/reducer'
 import { EstopMissingModal } from '.'
 
-import type { Store } from 'redux'
+import type { Store, StoreEnhancer } from 'redux'
 import type { Story, Meta } from '@storybook/react'
 
 export default {
@@ -19,7 +19,10 @@ const dummyConfig = {
   },
 } as any
 
-const store: Store<any> = createStore(configReducer, dummyConfig)
+const store: Store<any> = createStore(
+  configReducer,
+  dummyConfig as StoreEnhancer
+)
 
 const Template: Story<
   React.ComponentProps<typeof EstopMissingModal>

@@ -26,7 +26,7 @@ from opentrons.protocol_api._types import OffDeckType
 
 from opentrons.protocol_api import ProtocolContext, Well, Labware
 
-from opentrons_shared_data.errors.exceptions import LiquidNotFoundError
+from opentrons_shared_data.errors.exceptions import PipetteLiquidNotFoundError
 
 try:
     from abr_testing.automation import google_sheets_tool
@@ -406,7 +406,6 @@ def _run_trial(
     for z_dist in z_distances:
         lps = LiquidProbeSettings(
             starting_mount_height=start_height,
-            max_z_distance=z_dist,
             mount_speed=run_args.z_speed,
             plunger_speed=plunger_speed,
             sensor_threshold_pascals=lqid_cfg["sensor_threshold_pascals"],
@@ -419,8 +418,8 @@ def _run_trial(
         run_args.recorder.set_sample_tag(f"trial-{trial}-{tip}ul")
         # TODO add in stuff for secondary probe
         try:
-            height = hw_api.liquid_probe(hw_mount, lps, probe_target)
-        except LiquidNotFoundError as lnf:
+            height = hw_api.liquid_probe(hw_mount, z_dist, lps, probe_target)
+        except PipetteLiquidNotFoundError as lnf:
             ui.print_info(f"Liquid not found current position {lnf.detail}")
             start_height -= z_dist
         else:

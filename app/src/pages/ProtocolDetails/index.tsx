@@ -44,6 +44,7 @@ import {
   getApplyHistoricOffsets,
   getPinnedProtocolIds,
   updateConfigValue,
+  useFeatureFlag,
 } from '../../redux/config'
 import { useOffsetCandidatesForAnalysis } from '../../organisms/ApplyHistoricOffsets/hooks/useOffsetCandidatesForAnalysis'
 import {
@@ -311,15 +312,14 @@ export function ProtocolDetails(): JSX.Element | null {
     'protocol_info',
     'shared',
   ])
+  const enableCsvFile = useFeatureFlag('enableCsvFile')
   const { protocolId } = useParams<OnDeviceRouteParams>()
   const {
     missingProtocolHardware,
     conflictedSlots,
   } = useMissingProtocolHardware(protocolId)
-  const chipText = useHardwareStatusText(
-    missingProtocolHardware,
-    conflictedSlots
-  )
+  let chipText = useHardwareStatusText(missingProtocolHardware, conflictedSlots)
+
   const runTimeParameters = useRunTimeParameters(protocolId)
   const dispatch = useDispatch<Dispatch>()
   const history = useHistory()
@@ -381,17 +381,27 @@ export function ProtocolDetails(): JSX.Element | null {
     },
   })
 
+  const isRequiredCsv =
+    mostRecentAnalysis?.result === 'parameter-value-required'
+  if (enableCsvFile && isRequiredCsv) {
+    if (chipText === 'Ready to run') {
+      chipText = i18n.format(t('requires_csv'), 'capitalize')
+    } else {
+      chipText = `${chipText} & ${t('requires_csv')}`
+    }
+  }
+
   const handlePinClick = (): void => {
     if (!pinned) {
       if (pinnedProtocolIds.length === MAXIMUM_PINNED_PROTOCOLS) {
         setShowMaxPinsAlert(true)
       } else {
         pinnedProtocolIds.push(protocolId)
-        makeSnackbar(t('protocol_info:pinned_protocol'))
+        makeSnackbar(t('protocol_info:pinned_protocol') as string)
       }
     } else {
       pinnedProtocolIds = pinnedProtocolIds.filter(p => p !== protocolId)
-      makeSnackbar(t('protocol_info:unpinned_protocol'))
+      makeSnackbar(t('protocol_info:unpinned_protocol') as string)
     }
     dispatch(
       updateConfigValue('protocols.pinnedProtocolIds', pinnedProtocolIds)

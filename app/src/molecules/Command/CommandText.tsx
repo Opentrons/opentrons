@@ -24,6 +24,7 @@ import { MoveLabwareCommandText } from './MoveLabwareCommandText'
 import type { RobotType, RunTimeCommand } from '@opentrons/shared-data'
 import type { StyleProps } from '@opentrons/components'
 import type { CommandTextData } from './types'
+import type { TFunction } from 'i18next'
 
 const SIMPLE_TRANSLATION_KEY_BY_COMMAND_TYPE: {
   [commandType in RunTimeCommand['commandType']]?: string
@@ -114,7 +115,7 @@ export function CommandText(props: Props): JSX.Element | null {
       const steps = profile.map(
         ({ holdSeconds, celsius }: { holdSeconds: number; celsius: number }) =>
           t('tc_run_profile_steps', {
-            celsius: celsius,
+            celsius,
             seconds: holdSeconds,
           }).trim()
       )
@@ -217,7 +218,7 @@ export function CommandText(props: Props): JSX.Element | null {
           ? getLabwareDisplayLocation(
               commandTextData,
               labwareLocation,
-              t,
+              t as TFunction,
               robotType
             )
           : ''
@@ -298,7 +299,7 @@ export function CommandText(props: Props): JSX.Element | null {
       const addressableAreaDisplayName = getAddressableAreaDisplayName(
         commandTextData,
         command.id,
-        t
+        t as TFunction
       )
 
       return (
@@ -313,7 +314,7 @@ export function CommandText(props: Props): JSX.Element | null {
       const addressableAreaDisplayName = getAddressableAreaDisplayName(
         commandTextData,
         command.id,
-        t
+        t as TFunction
       )
       return (
         <StyledText as={as} {...styleProps}>
@@ -361,7 +362,7 @@ export function CommandText(props: Props): JSX.Element | null {
     case 'waitForResume': {
       return (
         <StyledText as={as} {...styleProps}>
-          {command.params?.message && command.params.message !== ''
+          {command.params?.message != null && command.params.message !== ''
             ? command.params.message
             : t('wait_for_resume')}
         </StyledText>
@@ -373,7 +374,7 @@ export function CommandText(props: Props): JSX.Element | null {
       if ('waitForResume' in command.params) {
         return (
           <StyledText as={as} {...styleProps}>
-            {command.params?.message && command.params.message !== ''
+            {command.params?.message != null && command.params.message !== ''
               ? command.params.message
               : t('wait_for_resume')}
           </StyledText>

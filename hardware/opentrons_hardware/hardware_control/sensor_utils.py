@@ -2,7 +2,7 @@
 
 from opentrons_shared_data.errors.exceptions import (
     TipHitWellBottomError,
-    LiquidNotFoundError,
+    PipetteLiquidNotFoundError,
 )
 
 
@@ -14,7 +14,7 @@ def did_tip_hit_liquid(
 ) -> bool:
     """Detects if tip has hit liquid or solid based on given pressure data."""
     if len(pressure_readings) < 5:
-        raise LiquidNotFoundError(
+        raise PipetteLiquidNotFoundError(
             "Liquid not found. Not enough data to calculate pressure change",
         )
     pressure_difference = np.gradient(pressure_readings[-5:], 1)

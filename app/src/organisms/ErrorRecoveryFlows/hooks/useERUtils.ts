@@ -5,7 +5,7 @@ import { useRecoveryCommands } from './useRecoveryCommands'
 import { useRecoveryTipStatus } from './useRecoveryTipStatus'
 import { useRecoveryRouting } from './useRecoveryRouting'
 import { useFailedLabwareUtils } from './useFailedLabwareUtils'
-import { getFailedCommandPipetteInfo } from './getFailedCommandPipetteInfo'
+import { getFailedCommandPipetteInfo } from '../utils'
 import { useRecoveryMapUtils } from './useRecoveryMapUtils'
 import {
   useNotifyAllCommandsQuery,

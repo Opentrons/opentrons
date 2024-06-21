@@ -275,7 +275,7 @@ export function ChooseProtocolSlideoutComponent(
                     })
                   : null
               if (error != null) {
-                errors.push(error)
+                errors.push(error as string)
               }
               return (
                 <InputField
@@ -351,7 +351,7 @@ export function ChooseProtocolSlideoutComponent(
                             ) {
                               return {
                                 ...parameter,
-                                value: !parameter.value,
+                                value: !Boolean(parameter.value),
                               }
                             }
                             return parameter
@@ -361,14 +361,14 @@ export function ChooseProtocolSlideoutComponent(
                       }}
                       height="0.813rem"
                       label={
-                        runtimeParam.value
+                        Boolean(runtimeParam.value)
                           ? t('protocol_details:on')
                           : t('protocol_details:off')
                       }
                       paddingTop={SPACING.spacing2} // manual alignment of SVG with value label
                     />
                     <StyledText as="p">
-                      {runtimeParam.value
+                      {Boolean(runtimeParam.value)
                         ? t('protocol_details:on')
                         : t('protocol_details:off')}
                     </StyledText>
@@ -384,7 +384,7 @@ export function ChooseProtocolSlideoutComponent(
                   ? null
                   : t('protocol_details:csv_file_type_required')
               if (error != null) {
-                errors.push(error)
+                errors.push(error as string)
               }
               return !enableCsvFile ? null : (
                 <Flex
@@ -420,7 +420,7 @@ export function ChooseProtocolSlideoutComponent(
                             ) {
                               return {
                                 ...parameter,
-                                file: { file: file },
+                                file: { file },
                               }
                             }
                             return parameter
@@ -678,13 +678,16 @@ function StoredProtocolList(props: StoredProtocolListProps): JSX.Element {
         )
         const missingAnalysisData =
           analysisStatus === 'error' || analysisStatus === 'stale'
+        const requiresCsvRunTimeParameter =
+          storedProtocol.mostRecentAnalysis?.result ===
+          'parameter-value-required'
         return (
           <React.Fragment key={storedProtocol.protocolKey}>
             <Flex flexDirection={DIRECTION_COLUMN}>
               <MiniCard
                 isSelected={isSelected}
                 isError={runCreationError != null}
-                isWarning={missingAnalysisData}
+                isWarning={missingAnalysisData || requiresCsvRunTimeParameter}
                 onClick={() => {
                   handleSelectProtocol(storedProtocol)
                 }}
@@ -694,7 +697,7 @@ function StoredProtocolList(props: StoredProtocolListProps): JSX.Element {
                   gridTemplateColumns="1fr 3fr"
                   marginRight={SPACING.spacing16}
                 >
-                  {!missingAnalysisData ? (
+                  {!missingAnalysisData && !requiresCsvRunTimeParameter ? (
                     <Box
                       marginY={SPACING.spacingAuto}
                       backgroundColor={isSelected ? COLORS.white : 'inherit'}
@@ -726,7 +729,9 @@ function StoredProtocolList(props: StoredProtocolListProps): JSX.Element {
                       storedProtocol.protocolKey}
                   </StyledText>
                 </Box>
-                {(runCreationError != null || missingAnalysisData) &&
+                {(runCreationError != null ||
+                  missingAnalysisData ||
+                  requiresCsvRunTimeParameter) &&
                 isSelected ? (
                   <>
                     <Box flex="1 1 auto" />
@@ -771,6 +776,18 @@ function StoredProtocolList(props: StoredProtocolListProps): JSX.Element {
                 ) : (
                   runCreationError
                 )}
+              </StyledText>
+            ) : null}
+            {requiresCsvRunTimeParameter && isSelected ? (
+              <StyledText
+                as="label"
+                color={COLORS.yellow60}
+                overflowWrap="anywhere"
+                display={DISPLAY_BLOCK}
+                marginTop={`-${SPACING.spacing8}`}
+                marginBottom={SPACING.spacing8}
+              >
+                {t('csv_required_for_analysis')}
               </StyledText>
             ) : null}
             {missingAnalysisData && isSelected ? (

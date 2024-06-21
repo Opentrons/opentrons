@@ -10,14 +10,7 @@ import { Icon } from '../../icons'
 import type { IconName } from '../../icons'
 import type { StyleProps } from '../../primitives'
 
-// ToDo (kk:03/26/2024) basic will be removed when we add Tag component
-export type ChipType =
-  | 'basic'
-  | 'error'
-  | 'info'
-  | 'neutral'
-  | 'success'
-  | 'warning'
+export type ChipType = 'error' | 'info' | 'neutral' | 'success' | 'warning'
 
 type ChipSize = 'medium' | 'small'
 
@@ -46,12 +39,6 @@ const CHIP_PROPS_BY_TYPE: Record<
     textColor: string
   }
 > = {
-  // ToDo (kk:06/12/2024) basic will be replaced by a different component
-  basic: {
-    backgroundColor: `${COLORS.black90}${COLORS.opacity20HexCode}`,
-    borderRadius: BORDERS.borderRadius4,
-    textColor: COLORS.grey60,
-  },
   error: {
     backgroundColor: COLORS.red35,
     borderRadius: BORDERS.borderRadiusFull,
@@ -96,7 +83,7 @@ export function Chip(props: ChipProps): JSX.Element {
     ...styleProps
   } = props
   const backgroundColor =
-    background === false && type !== 'basic'
+    background === false
       ? COLORS.transparent
       : CHIP_PROPS_BY_TYPE[type].backgroundColor
   const icon = iconName ?? CHIP_PROPS_BY_TYPE[type].iconName ?? 'ot-alert'
@@ -151,7 +138,7 @@ export function Chip(props: ChipProps): JSX.Element {
       data-testid={`Chip_${type}`}
       {...styleProps}
     >
-      {type !== 'basic' && hasIcon ? (
+      {hasIcon ? (
         <Icon
           name={icon}
           color={CHIP_PROPS_BY_TYPE[type].iconColor}

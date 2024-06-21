@@ -74,7 +74,7 @@ export function DeleteProtocolConfirmationModal({
         .then(() => {
           setShowIcon(false)
           setShowDeleteConfirmationModal(false)
-          makeSnackbar(t('protocol_deleted'))
+          makeSnackbar(t('protocol_deleted') as string)
         })
         .catch((e: Error) => {
           console.error(`error deleting resources: ${e.message}`)

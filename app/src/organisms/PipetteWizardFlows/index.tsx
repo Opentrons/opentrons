@@ -88,7 +88,8 @@ export const PipetteWizardFlows = (
   )
   const host = useHost()
   const [currentStepIndex, setCurrentStepIndex] = React.useState<number>(0)
-  const totalStepCount = pipetteWizardSteps ? pipetteWizardSteps.length - 1 : 0
+  const totalStepCount =
+    pipetteWizardSteps != null ? pipetteWizardSteps.length - 1 : 0
   const currentStep = pipetteWizardSteps?.[currentStepIndex] ?? null
   const [isFetchingPipettes, setIsFetchingPipettes] = React.useState<boolean>(
     false
@@ -213,7 +214,7 @@ export const PipetteWizardFlows = (
         })
         .catch(error => {
           setIsExiting(true)
-          setShowErrorMessage(error.message)
+          setShowErrorMessage(error.message as string)
         })
     }
   }

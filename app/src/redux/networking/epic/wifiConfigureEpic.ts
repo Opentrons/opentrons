@@ -17,6 +17,7 @@ import type {
   PostWifiConfigureAction,
   PostWifiConfigureSuccessAction,
 } from '../types'
+import type { RobotApiErrorResponse } from '../../robot-api/types'
 
 const mapActionToRequest: ActionToRequestMapper<PostWifiConfigureAction> = action => ({
   method: POST,
@@ -32,8 +33,12 @@ const mapResponseToAction: ResponseToActionMapper<PostWifiConfigureAction> = (
   const meta = { ...originalAction.meta, response: responseMeta }
 
   return response.ok
-    ? Actions.postWifiConfigureSuccess(host.name, body.ssid, meta)
-    : Actions.postWifiConfigureFailure(host.name, body, meta)
+    ? Actions.postWifiConfigureSuccess(host.name, body.ssid as string, meta)
+    : Actions.postWifiConfigureFailure(
+        host.name,
+        body as RobotApiErrorResponse,
+        meta
+      )
 }
 
 const postWifiConfigureEpic: Epic = (action$, state$) => {

@@ -108,10 +108,14 @@ export function Labware(): JSX.Element {
       })
     } else if (newLabwareName != null) {
       setShowAddLabwareSlideout(false)
-      makeToast(t('imported', { filename: newLabwareName }), SUCCESS_TOAST, {
-        closeButton: true,
-        onClose: clearLabwareName,
-      })
+      makeToast(
+        t('imported', { filename: newLabwareName }) as string,
+        SUCCESS_TOAST,
+        {
+          closeButton: true,
+          onClose: clearLabwareName,
+        }
+      )
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [labwareFailureMessage, newLabwareName])

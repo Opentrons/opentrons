@@ -383,6 +383,9 @@ def get_error_info(file_results: Dict[str, Any]) -> Tuple[int, str, str, str, st
         error_str = 0
     if error_str > 1:
         error_type = run_command_error["error"].get("errorType", "")
+        if error_type == "PythonException":
+            # Reassign error_type to be more descriptive
+            error_type = run_command_error["detail"].split(":")[0]
         error_code = run_command_error["error"].get("errorCode", "")
         try:
             # Instrument Error
