@@ -355,11 +355,20 @@ class CommandStore(HasState[CommandState], HandlesActions):
                 self._state.run_started_at = (
                     self._state.run_started_at or action.requested_at
                 )
-                self._state.queue_status = (
-                    QueueStatus.AWAITING_RECOVERY
-                    if self._state.queue_status == QueueStatus.AWAITING_RECOVERY_PAUSED
-                    else QueueStatus.RUNNING
-                )
+                match self._state.queue_status:
+                    case QueueStatus.SETUP:
+                        self._state.queue_status = (
+                            QueueStatus.PAUSED
+                            if self._state.is_door_blocking
+                            else QueueStatus.RUNNING
+                        )
+                    case QueueStatus.AWAITING_RECOVERY_PAUSED:
+                        self._state.queue_status = QueueStatus.AWAITING_RECOVERY
+                    case QueueStatus.PAUSED | QueueStatus.RUNNING:
+                        self._state.queue_status = QueueStatus.RUNNING
+                    case QueueStatus.AWAITING_RECOVERY:
+                        # Should not be possible. See validate_action_allowed().
+                        pass
 
         elif isinstance(action, PauseAction):
             self._state.queue_status = QueueStatus.PAUSED
