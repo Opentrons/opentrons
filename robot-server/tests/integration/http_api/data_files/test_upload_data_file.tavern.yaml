@@ -26,7 +26,7 @@ stages:
       url: '{ot2_server_base_url}/dataFiles'
       method: POST
       files:
-        file: 'tests/integration/http_api/color_codes.csv'
+        file: 'tests/integration/data_files/color_codes.csv'
     response:
       status_code: 200
       json:
