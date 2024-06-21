@@ -62,7 +62,6 @@ import type {
   APP_RESTART_TYPE,
   RELOAD_UI_TYPE,
   SEND_LOG_TYPE,
-  EDIT_PROTOCOL_TYPE,
 } from './types'
 
 // these constants are all copied over from the app
@@ -176,9 +175,6 @@ export const ANALYZE_PROTOCOL_SUCCESS: ANALYZE_PROTOCOL_SUCCESS_TYPE =
 
 export const ANALYZE_PROTOCOL_FAILURE: ANALYZE_PROTOCOL_FAILURE_TYPE =
   'protocolStorage:ANALYZE_PROTOCOL_FAILURE'
-
-export const EDIT_PROTOCOL: EDIT_PROTOCOL_TYPE =
-  'protocolStorage:EDIT_PROTOCOL'
 
 export const VIEW_PROTOCOL_SOURCE_FOLDER: VIEW_PROTOCOL_SOURCE_FOLDER_TYPE =
   'protocolStorage:VIEW_PROTOCOL_SOURCE_FOLDER'

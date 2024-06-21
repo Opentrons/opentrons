@@ -10,8 +10,6 @@ PATH := $(shell cd .. && yarn bin):$(PATH)
 
 # dev server port
 PORT ?= 3000
-# protocol editor dev server port
-PD_PORT ?= 5178
 
 # dep directories for production build
 # TODO(mc, 2018-08-07): figure out a better way to do this
@@ -71,8 +69,6 @@ electron := yarn electron . \
 	--disable_ui.webPreferences.webSecurity \
 	--ui.url.protocol="http:" \
 	--ui.url.path="localhost:$(PORT)" \
-	--protocolEditorUi.url.protocol="http:" \
-	--protocolEditorUi.url.path="localhost:$(PD_PORT)" \
 	--python.pathToPythonOverride=$(shell cd ../api && pipenv --venv)
 
 # standard targets
