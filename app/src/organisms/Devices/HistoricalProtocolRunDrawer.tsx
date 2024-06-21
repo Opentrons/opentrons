@@ -15,6 +15,7 @@ import {
   InfoScreen,
   JUSTIFY_FLEX_START,
   Link,
+  OVERFLOW_HIDDEN,
   SPACING,
   StyledText,
   TYPOGRAPHY,
@@ -136,7 +137,7 @@ export function HistoricalProtocolRunDrawer(
             const { createdAt, name } = fileData
             return (
               <Flex
-                key={index}
+                key={`csv_file_${index}`}
                 justifyContent={JUSTIFY_FLEX_START}
                 alignItems={ALIGN_CENTER}
                 padding={SPACING.spacing12}
@@ -149,7 +150,15 @@ export function HistoricalProtocolRunDrawer(
                   gridGap={SPACING.spacing4}
                   alignItems={ALIGN_CENTER}
                 >
-                  <StyledText as="p">{name}</StyledText>
+                  <StyledText
+                    as="p"
+                    css={css`
+                      overflow: ${OVERFLOW_HIDDEN};
+                      text-overflow: ellipsis;
+                    `}
+                  >
+                    {name}
+                  </StyledText>
                 </Flex>
                 <Box width="33%">
                   <StyledText as="p">
@@ -162,14 +171,14 @@ export function HistoricalProtocolRunDrawer(
                     css={TYPOGRAPHY.linkPSemiBold}
                     onClick={() => {}} // TODO (nd: 06/18/2024) get file and download
                   >
-                    <StyledText as="p">
-                      {t('download')}
+                    <Flex alignItems={ALIGN_CENTER}>
+                      <StyledText as="p">{t('download')}</StyledText>
                       <Icon
                         name="download"
                         size="1rem"
                         marginLeft="0.4375rem"
                       />
-                    </StyledText>
+                    </Flex>
                   </Link>
                 </Box>
               </Flex>
@@ -245,7 +254,7 @@ export function HistoricalProtocolRunDrawer(
 
             return (
               <Flex
-                key={index}
+                key={`labware_offset_${index}`}
                 justifyContent={JUSTIFY_FLEX_START}
                 alignItems={ALIGN_CENTER}
                 padding={SPACING.spacing12}
