@@ -1,6 +1,5 @@
 test_name: Upload a data file to the server
 
-# TODO (spp, 2024-06-20): add a test for uploading file via filePath
 marks:
   - usefixtures:
       - ot2_server_base_url

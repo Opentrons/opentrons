@@ -17,7 +17,6 @@ class DevServer:
         persistence_directory: Optional[Path] = None,
         maximum_runs: Optional[int] = None,
         maximum_unused_protocols: Optional[int] = None,
-        user_data_dir: Optional[Path] = None,
     ) -> None:
         """Initialize a dev server."""
         self.port: str = port
@@ -32,9 +31,6 @@ class DevServer:
             persistence_directory
             if persistence_directory is not None
             else Path(tempfile.mkdtemp())
-        )
-        self.user_data_dir: Path = (
-            user_data_dir if user_data_dir is not None else Path(tempfile.mkdtemp())
         )
         self.maximum_runs = maximum_runs
         self.maximum_unused_protocols = maximum_unused_protocols
