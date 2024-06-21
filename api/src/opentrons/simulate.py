@@ -814,29 +814,12 @@ def _create_live_context_pe(
         )
     )
 
-    orchestrator = RunOrchestrator(
-        hardware_api=hardware_api_wrapped,
-        protocol_engine=pe,
-        setup_runner=LiveRunner(
-            protocol_engine=pe,
-            hardware_api=hardware_api_wrapped,
-        ),
-        fixit_runner=LiveRunner(
-            protocol_engine=pe,
-            hardware_api=hardware_api_wrapped,
-        ),
-        protocol_live_runner=LiveRunner(
-            protocol_engine=pe,
-            hardware_api=hardware_api_wrapped,
-        ),
-    )
-
     # `async def` so we can use loop.run_coroutine_threadsafe() to wait for its completion.
     # Non-async would use call_soon_threadsafe(), which makes the waiting harder.
     async def add_all_extra_labware() -> None:
         for labware_definition_dict in extra_labware.values():
             labware_definition = LabwareDefinition.parse_obj(labware_definition_dict)
-            orchestrator.add_labware_definition(labware_definition)
+            pe.add_labware_definition(labware_definition)
 
     # Add extra_labware to ProtocolEngine, being careful not to modify ProtocolEngine from this
     # thread. See concurrency notes in ProtocolEngine docstring.

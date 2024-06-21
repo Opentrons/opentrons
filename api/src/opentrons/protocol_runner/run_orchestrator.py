@@ -20,8 +20,6 @@ from ..protocol_engine import (
     CommandPointer,
     CommandSlice,
     DeckType,
-    create_protocol_engine,
-    Config as ProtocolEngineConfig,
 )
 from ..protocol_engine.errors import RunStoppedError
 from ..protocol_engine.types import (
@@ -104,13 +102,8 @@ class RunOrchestrator:
     @classmethod
     async def build_orchestrator(
         cls,
-        robot_type: RobotType,
-        deck_type: DeckType,
-        block_on_door_open: bool,
         hardware_api: HardwareControlAPI,
-        notify_publishers: Optional[Callable[[], None]] = None,
-        load_fixed_trash: bool = False,
-        deck_configuration: Optional[DeckConfigurationType] = None,
+        protocol_engine: ProtocolEngine,
         protocol_config: Optional[
             Union[JsonProtocolConfig, PythonProtocolConfig]
         ] = None,
@@ -119,17 +112,6 @@ class RunOrchestrator:
         run_id: Optional[str] = None,
     ) -> "RunOrchestrator":
         """Build a RunOrchestrator provider."""
-        protocol_engine = await create_protocol_engine(
-            hardware_api=hardware_api,
-            config=ProtocolEngineConfig(
-                robot_type=robot_type,
-                deck_type=deck_type,
-                block_on_door_open=block_on_door_open,
-            ),
-            load_fixed_trash=load_fixed_trash,
-            deck_configuration=deck_configuration,
-            notify_publishers=notify_publishers,
-        )
         setup_runner = protocol_runner.LiveRunner(
             protocol_engine=protocol_engine,
             hardware_api=hardware_api,

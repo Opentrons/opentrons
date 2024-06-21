@@ -633,3 +633,4 @@ class ProtocolEngine:
             error_recovery_policy=self._error_recovery_policy,
             command_generator=command_generator,
         )
+        self._queue_worker.start()
