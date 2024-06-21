@@ -13,7 +13,7 @@ import {
   Link,
   PrimaryButton,
   SPACING,
-  StyledText,
+  LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { LegacyModal } from '../../../../../molecules/LegacyModal'
@@ -98,9 +98,9 @@ export function DeviceResetModal({
           onClose={closeModal}
         >
           <Flex flexDirection={DIRECTION_COLUMN}>
-            <StyledText as="p" paddingBottom={SPACING.spacing24}>
+            <LegacyStyledText as="p" paddingBottom={SPACING.spacing24}>
               {t('factory_reset_modal_description')}
-            </StyledText>
+            </LegacyStyledText>
             <Flex justifyContent={JUSTIFY_FLEX_END} alignItems={ALIGN_CENTER}>
               <Link
                 role="button"
@@ -127,13 +127,13 @@ export function DeviceResetModal({
           title={t('connection_to_robot_lost')}
           onClose={closeModal}
         >
-          <StyledText
+          <LegacyStyledText
             as="p"
             marginBottom={SPACING.spacing24}
             paddingBottom={SPACING.spacing24}
           >
             {t('branded:connection_lost_description')}
-          </StyledText>
+          </LegacyStyledText>
           <Flex justifyContent={JUSTIFY_FLEX_END}>
             <PrimaryButton
               onClick={closeModal}

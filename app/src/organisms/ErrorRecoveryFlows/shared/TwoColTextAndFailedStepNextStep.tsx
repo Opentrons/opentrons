@@ -4,7 +4,7 @@ import {
   DIRECTION_COLUMN,
   Flex,
   SPACING,
-  StyledText,
+  LegacyStyledText,
 } from '@opentrons/components'
 
 import { RecoverySingleColumnContent } from './RecoverySingleColumnContent'
@@ -45,7 +45,7 @@ export function TwoColTextAndFailedStepNextStep({
       <RecoverySingleColumnContent>
         <TwoColumn>
           <Flex gridGap={SPACING.spacing8} flexDirection={DIRECTION_COLUMN}>
-            <StyledText as="h4SemiBold">{leftColTitle}</StyledText>
+            <LegacyStyledText as="h4SemiBold">{leftColTitle}</LegacyStyledText>
             {leftColBodyText}
           </Flex>
           <FailedStepNextStep

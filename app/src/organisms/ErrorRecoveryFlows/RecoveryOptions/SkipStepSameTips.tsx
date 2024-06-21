@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { Trans, useTranslation } from 'react-i18next'
 
-import { StyledText } from '@opentrons/components'
+import { LegacyStyledText } from '@opentrons/components'
 
 import { TwoColTextAndFailedStepNextStep } from '../shared'
 import { RECOVERY_MAP } from '../constants'
@@ -48,7 +48,7 @@ export function SkipStepSameTipsInfo(props: RecoveryContentProps): JSX.Element {
         t={t}
         i18nKey="failed_dispense_step_not_completed"
         components={{
-          block: <StyledText as="p" />,
+          block: <LegacyStyledText as="p" />,
         }}
       />
     )

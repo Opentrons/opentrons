@@ -3,7 +3,7 @@ import {
   COLORS,
   PrimaryBtn,
   SPACING,
-  StyledText,
+  LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { LegacyModal } from './index'
@@ -21,25 +21,25 @@ const Template: Story<React.ComponentProps<typeof LegacyModal>> = args => (
 
 const Children = (
   <React.Fragment>
-    <StyledText
+    <LegacyStyledText
       fontWeight={TYPOGRAPHY.fontWeightSemiBold}
       fontSize={TYPOGRAPHY.fontSizeP}
       paddingTop={SPACING.spacing4}
     >
       {'LegacyModal body goes here'}
-    </StyledText>
+    </LegacyStyledText>
 
     <PrimaryBtn
       backgroundColor={COLORS.blue50}
       marginTop="28rem"
       textTransform={TYPOGRAPHY.textTransformNone}
     >
-      <StyledText
+      <LegacyStyledText
         fontWeight={TYPOGRAPHY.fontWeightRegular}
         fontSize={TYPOGRAPHY.fontSizeP}
       >
         {'btn text'}
-      </StyledText>
+      </LegacyStyledText>
     </PrimaryBtn>
   </React.Fragment>
 )

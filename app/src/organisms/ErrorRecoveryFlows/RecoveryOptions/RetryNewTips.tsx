@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { Trans, useTranslation } from 'react-i18next'
 
-import { StyledText } from '@opentrons/components'
+import { LegacyStyledText } from '@opentrons/components'
 
 import { RECOVERY_MAP } from '../constants'
 import {
@@ -65,7 +65,7 @@ export function RetryWithNewTips(props: RecoveryContentProps): JSX.Element {
         t={t}
         i18nKey="robot_will_retry_with_new_tips"
         components={{
-          block: <StyledText as="p" />,
+          block: <LegacyStyledText as="p" />,
         }}
       />
     )

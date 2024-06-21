@@ -6,7 +6,7 @@ import {
   DIRECTION_COLUMN,
   Flex,
   Icon,
-  StyledText,
+  LegacyStyledText,
   SPACING,
   ALIGN_CENTER,
   JUSTIFY_END,
@@ -190,8 +190,8 @@ export function ErrorContent({
             alignItems={ALIGN_CENTER}
             textAlign={ALIGN_CENTER}
           >
-            <StyledText as="h3Bold">{title}</StyledText>
-            <StyledText as="h4">{subTitle}</StyledText>
+            <LegacyStyledText as="h3Bold">{title}</LegacyStyledText>
+            <LegacyStyledText as="h4">{subTitle}</LegacyStyledText>
           </Flex>
         </Flex>
         <Flex justifyContent={JUSTIFY_END}>

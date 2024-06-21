@@ -8,7 +8,7 @@ import {
   Flex,
   Icon,
   SPACING,
-  StyledText,
+  LegacyStyledText,
 } from '@opentrons/components'
 
 import { RECOVERY_MAP } from '../constants'
@@ -75,12 +75,16 @@ function CancelRunConfirmation({
             marginTop={SPACING.spacing24}
             color={COLORS.red50}
           />
-          <StyledText as="h3Bold">
+          <LegacyStyledText as="h3Bold">
             {t('are_you_sure_you_want_to_cancel')}
-          </StyledText>
-          <StyledText as="h4" color={COLORS.grey60} textAlign={ALIGN_CENTER}>
+          </LegacyStyledText>
+          <LegacyStyledText
+            as="h4"
+            color={COLORS.grey60}
+            textAlign={ALIGN_CENTER}
+          >
             {t('if_tips_are_attached')}
-          </StyledText>
+          </LegacyStyledText>
         </Flex>
         <RecoveryFooterButtons
           isOnDevice={isOnDevice}

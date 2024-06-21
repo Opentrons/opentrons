@@ -16,7 +16,7 @@ import {
   POSITION_FIXED,
   PrimaryButton,
   SPACING,
-  StyledText,
+  LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
@@ -106,9 +106,9 @@ export const RunPreviewComponent = (
   if (isRunCommandDataLoading || commands == null) {
     return (
       <Flex flexDirection={DIRECTION_COLUMN} padding={SPACING.spacing16}>
-        <StyledText alignSelf={ALIGN_CENTER} color={COLORS.grey50}>
+        <LegacyStyledText alignSelf={ALIGN_CENTER} color={COLORS.grey50}>
           {t('protocol_setup:loading_data')}
-        </StyledText>
+        </LegacyStyledText>
       </Flex>
     )
   }
@@ -128,16 +128,16 @@ export const RunPreviewComponent = (
     >
       <>
         <Flex gridGap={SPACING.spacing8} alignItems={ALIGN_CENTER}>
-          <StyledText as="h3" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
+          <LegacyStyledText as="h3" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
             {t('run_preview')}
-          </StyledText>
-          <StyledText as="label" color={COLORS.grey50}>
+          </LegacyStyledText>
+          <LegacyStyledText as="label" color={COLORS.grey50}>
             {t('steps_total', { count: commands.length })}
-          </StyledText>
+          </LegacyStyledText>
         </Flex>
-        <StyledText as="p" marginBottom={SPACING.spacing8}>
+        <LegacyStyledText as="p" marginBottom={SPACING.spacing8}>
           {t('preview_of_protocol_steps')}
-        </StyledText>
+        </LegacyStyledText>
         <Divider marginX={`calc(-1 * ${SPACING.spacing16})`} />
         <ViewportList
           viewportRef={viewPortRef}
@@ -166,12 +166,12 @@ export const RunPreviewComponent = (
                 alignItems={ALIGN_CENTER}
                 gridGap={SPACING.spacing8}
               >
-                <StyledText
+                <LegacyStyledText
                   minWidth={SPACING.spacing16}
                   fontSize={TYPOGRAPHY.fontSizeCaption}
                 >
                   {index + 1}
-                </StyledText>
+                </LegacyStyledText>
                 <Flex
                   flexDirection={DIRECTION_COLUMN}
                   gridGap={SPACING.spacing4}
@@ -216,9 +216,9 @@ export const RunPreviewComponent = (
           </PrimaryButton>
         ) : null}
         {currentRunCommandIndex === commands.length - 1 ? (
-          <StyledText as="h6" color={COLORS.grey60}>
+          <LegacyStyledText as="h6" color={COLORS.grey60}>
             {t('end_of_protocol')}
-          </StyledText>
+          </LegacyStyledText>
         ) : null}
       </>
     </Flex>

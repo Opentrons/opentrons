@@ -7,7 +7,7 @@ import {
   InfoScreen,
   ParametersTable,
   SPACING,
-  StyledText,
+  LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { Banner } from '../../../atoms/Banner'
@@ -37,12 +37,15 @@ export function ProtocolParameters({
             iconMarginLeft={SPACING.spacing4}
           >
             <Flex flexDirection={DIRECTION_COLUMN}>
-              <StyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
+              <LegacyStyledText
+                as="p"
+                fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+              >
                 {t('listed_values_are_view_only')}
-              </StyledText>
-              <StyledText as="p">
+              </LegacyStyledText>
+              <LegacyStyledText as="p">
                 {t('start_setup_customize_values')}
-              </StyledText>
+              </LegacyStyledText>
             </Flex>
           </Banner>
           <ParametersTable runTimeParameters={runTimeParameters} t={t} />

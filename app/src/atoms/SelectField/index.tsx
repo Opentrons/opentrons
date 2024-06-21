@@ -6,7 +6,7 @@ import {
   DIRECTION_COLUMN,
   Flex,
   SPACING,
-  StyledText,
+  LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { css } from 'styled-components'
@@ -87,13 +87,13 @@ export function SelectField(props: SelectFieldProps): JSX.Element {
   return (
     <Flex flexDirection={DIRECTION_COLUMN}>
       {title != null ? (
-        <StyledText
+        <LegacyStyledText
           as="label"
           fontWeight={TYPOGRAPHY.fontWeightSemiBold}
           paddingBottom={SPACING.spacing8}
         >
           {title}
-        </StyledText>
+        </LegacyStyledText>
       ) : null}
       <Select
         id={id}

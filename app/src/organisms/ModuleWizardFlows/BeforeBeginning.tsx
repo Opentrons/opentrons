@@ -7,7 +7,7 @@ import {
   THERMOCYCLER_MODULE_MODELS,
   getModuleDisplayName,
 } from '@opentrons/shared-data'
-import { StyledText } from '@opentrons/components'
+import { LegacyStyledText } from '@opentrons/components'
 import { GenericWizardTile } from '../../molecules/GenericWizardTile'
 import { WizardRequiredEquipmentList } from '../../molecules/WizardRequiredEquipmentList'
 
@@ -79,7 +79,7 @@ export const BeforeBeginning = (
           t={t}
           i18nKey={'branded:module_calibration_get_started'}
           values={{ module: moduleDisplayName }}
-          components={{ block: <StyledText as="p" /> }}
+          components={{ block: <LegacyStyledText as="p" /> }}
         />
       }
       proceedButtonText={t('start_setup')}

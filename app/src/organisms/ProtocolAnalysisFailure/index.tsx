@@ -11,7 +11,7 @@ import {
   JUSTIFY_SPACE_BETWEEN,
   PrimaryButton,
   SPACING,
-  StyledText,
+  LegacyStyledText,
   TYPOGRAPHY,
   WRAP_REVERSE,
 } from '@opentrons/components'
@@ -60,8 +60,10 @@ export function ProtocolAnalysisFailure(
         alignItems={ALIGN_CENTER}
         width="100%"
       >
-        <StyledText as="p">{t('protocol_analysis_failure')}</StyledText>
-        <StyledText as="p">
+        <LegacyStyledText as="p">
+          {t('protocol_analysis_failure')}
+        </LegacyStyledText>
+        <LegacyStyledText as="p">
           <Trans
             t={t}
             i18nKey="reanalyze_or_view_error"
@@ -84,7 +86,7 @@ export function ProtocolAnalysisFailure(
               ),
             }}
           />
-        </StyledText>
+        </LegacyStyledText>
       </Flex>
       {showErrorDetails
         ? createPortal(
@@ -94,9 +96,9 @@ export function ProtocolAnalysisFailure(
               onClose={handleClickHideDetails}
             >
               {errors.map((error, index) => (
-                <StyledText key={index} as="p">
+                <LegacyStyledText key={index} as="p">
                   {error}
-                </StyledText>
+                </LegacyStyledText>
               ))}
               <Flex justifyContent={JUSTIFY_FLEX_END}>
                 <PrimaryButton

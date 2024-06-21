@@ -18,7 +18,7 @@ import {
   PrimaryButton,
   RESPONSIVENESS,
   SPACING,
-  StyledText,
+  LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
@@ -133,7 +133,9 @@ export const BeforeBeginning = ({
             >
               <source src={blowoutVideo} />
             </video>
-            <StyledText as="h3">{t('yes_blow_out_liquid')}</StyledText>
+            <LegacyStyledText as="h3">
+              {t('yes_blow_out_liquid')}
+            </LegacyStyledText>
           </Flex>
           <Flex
             onClick={() => {
@@ -156,7 +158,9 @@ export const BeforeBeginning = ({
             >
               <source src={droptipVideo} />
             </video>
-            <StyledText as="h3">{t('no_proceed_to_drop_tip')}</StyledText>
+            <LegacyStyledText as="h3">
+              {t('no_proceed_to_drop_tip')}
+            </LegacyStyledText>
           </Flex>
         </Flex>
         <Flex flexDirection={DIRECTION_ROW} justifyContent={JUSTIFY_FLEX_END}>

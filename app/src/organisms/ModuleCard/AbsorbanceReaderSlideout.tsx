@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { getModuleDisplayName } from '@opentrons/shared-data'
-import { SPACING, StyledText, TYPOGRAPHY } from '@opentrons/components'
+import { SPACING, LegacyStyledText, TYPOGRAPHY } from '@opentrons/components'
 import { Slideout } from '../../atoms/Slideout'
 
 import type { AbsorbanceReaderModule } from '../../redux/modules/types'
@@ -31,14 +31,14 @@ export const AbsorbanceReaderSlideout = (
       onCloseClick={handleCloseSlideout}
       isExpanded={isExpanded}
     >
-      <StyledText
+      <LegacyStyledText
         fontWeight={TYPOGRAPHY.fontWeightRegular}
         fontSize={TYPOGRAPHY.fontSizeP}
         paddingTop={SPACING.spacing4}
         data-testid={`AbsorbanceReaderSlideout_title_${module.serialNumber}`}
       >
         {t('set_absorbance_reader')}
-      </StyledText>
+      </LegacyStyledText>
     </Slideout>
   )
 }

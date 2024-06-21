@@ -3,7 +3,7 @@ import {
   DIRECTION_COLUMN,
   Flex,
   SPACING,
-  StyledText,
+  LegacyStyledText,
   VIEWPORT,
 } from '@opentrons/components'
 import { ListItem as ListItemComponent } from '.'
@@ -32,15 +32,15 @@ export const ListItem: Story = {
     type: 'noActive',
     children: (
       <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
-        <StyledText as="p">
+        <LegacyStyledText as="p">
           Slot Component: Replace me using the component panel.
-        </StyledText>
-        <StyledText as="p">
+        </LegacyStyledText>
+        <LegacyStyledText as="p">
           Slot Component: Replace me using the component panel.
-        </StyledText>
-        <StyledText as="p">
+        </LegacyStyledText>
+        <LegacyStyledText as="p">
           Slot Component: Replace me using the component panel.
-        </StyledText>
+        </LegacyStyledText>
       </Flex>
     ),
   },

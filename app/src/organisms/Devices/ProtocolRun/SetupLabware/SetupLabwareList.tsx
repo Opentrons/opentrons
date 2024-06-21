@@ -5,7 +5,7 @@ import {
   DIRECTION_COLUMN,
   Flex,
   SPACING,
-  StyledText,
+  LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { getLabwareSetupItemGroups } from '../../../../pages/Protocols/utils'
@@ -43,15 +43,15 @@ export function SetupLabwareList(
       marginBottom={SPACING.spacing16}
     >
       <HeaderRow>
-        <StyledText as="label" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
+        <LegacyStyledText as="label" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
           {t('location')}
-        </StyledText>
-        <StyledText as="label" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
+        </LegacyStyledText>
+        <LegacyStyledText as="label" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
           {t('labware_name')}
-        </StyledText>
-        <StyledText as="label" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
+        </LegacyStyledText>
+        <LegacyStyledText as="label" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
           {t('placement')}
-        </StyledText>
+        </LegacyStyledText>
       </HeaderRow>
       {onDeckItems.map((labwareItem, index) => {
         const labwareOnAdapter = onDeckItems.find(

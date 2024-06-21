@@ -4,7 +4,7 @@ import isEqual from 'lodash/isEqual'
 import {
   DIRECTION_COLUMN,
   Flex,
-  StyledText,
+  LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import {
@@ -107,7 +107,10 @@ export const PickUpTip = (props: PickUpTipProps): JSX.Element | null => {
       tOptions={{ tip_rack: labwareDisplayName, location: displayLocation }}
       components={{
         bold: (
-          <StyledText as="span" fontWeight={TYPOGRAPHY.fontWeightSemiBold} />
+          <LegacyStyledText
+            as="span"
+            fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+          />
         ),
       }}
     />,
@@ -419,7 +422,10 @@ export const PickUpTip = (props: PickUpTipProps): JSX.Element | null => {
                   ? 'ensure_nozzle_position_odd'
                   : 'ensure_nozzle_position_desktop'
               }
-              components={{ block: <StyledText as="p" />, bold: <strong /> }}
+              components={{
+                block: <LegacyStyledText as="p" />,
+                bold: <strong />,
+              }}
               values={{
                 tip_type: t('pipette_nozzle'),
                 item_location: t('check_tip_location'),
