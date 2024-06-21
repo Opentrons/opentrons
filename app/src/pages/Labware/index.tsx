@@ -31,10 +31,7 @@ import {
   useTrackEvent,
   ANALYTICS_OPEN_LABWARE_CREATOR_FROM_BOTTOM_OF_LABWARE_LIBRARY_LIST,
 } from '../../redux/analytics'
-import {
-  addCustomLabwareFileFromCreator,
-  openCustomLabwareDirectory,
-} from '../../redux/custom-labware'
+import { addCustomLabwareFileFromCreator } from '../../redux/custom-labware'
 import { DropdownMenu } from '../../atoms/MenuList/DropdownMenu'
 import { LabwareCard } from '../../organisms/LabwareCard'
 import { AddCustomLabwareSlideout } from '../../organisms/AddCustomLabwareSlideout'
