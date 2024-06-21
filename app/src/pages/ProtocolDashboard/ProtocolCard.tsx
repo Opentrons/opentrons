@@ -254,9 +254,9 @@ export function ProtocolCard(props: ProtocolCardProps): JSX.Element {
               size="1.5rem"
               aria-label="requiresCsv_file_icon"
             />
-            <StyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
+            <LegacyStyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
               {t('requires_csv')}
-            </StyledText>
+            </LegacyStyledText>
           </Flex>
         ) : null}
         <StyledText
