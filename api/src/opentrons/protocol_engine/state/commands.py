@@ -923,7 +923,7 @@ class CommandView(HasState[CommandState]):
         else:
             assert_never(action)
 
-    def get_status(self) -> EngineStatus:
+    def get_status(self) -> EngineStatus:  # noqa: C901
         """Get the current execution status of the engine."""
         if self._state.run_result:
             # The main part of the run is over, or will be over soon.
