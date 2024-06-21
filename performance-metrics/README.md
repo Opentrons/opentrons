@@ -2,7 +2,7 @@
 
 Library to gather various performance metrics for the Opentrons Flex.
 
-Currently being imported inside of `opentrons.util.performance_helpers` which defines 
+Currently being imported inside of `opentrons.util.performance_helpers` which defines
 helper function used inside other projects
 
 ## Setup
@@ -20,7 +20,6 @@ make -C robot-server dev-ot2
 ```
 
 ### Testing against real OT-2
-
 
 To push development packages to OT-2 run the following command from the root directory of this repo (assumes you have the `host` environment variable set)
 
@@ -49,7 +48,7 @@ make -C robot-server push-ot3 host=<flex-ip>
 Once this is done you might need to hack getting your robot and app to think they are on the same version.
 Go to your app -> Settings -> General and find your app version
 
-Then run 
+Then run
 
 ```bash
 make -C performance-metrics update-robot-version version=<app-version> host=<robot-ip>
@@ -57,9 +56,9 @@ make -C performance-metrics update-robot-version version=<app-version> host=<rob
 
 ### Enabling performance-metrics feature flag
 
-Performance metrics usage is hidden behind a feature flag. To enable it run the following command (assumes you have the `host` environment variable set): 
+Performance metrics usage is hidden behind a feature flag. To enable it run the following command (assumes you have the `host` environment variable set):
 
-```bash 
+```bash
 make set-performance-metrics-ff host=<ip>
 ```
 
