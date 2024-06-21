@@ -189,7 +189,7 @@ push-no-restart-ot3: sdist
 
 .PHONY: push-ot3
 push-ot3: push-no-restart-ot3
-	$(call restart-server,$(host),$(host),$(ssh_opts),"opentrons-robot-server")
+	$(call restart-service,$(host),$(ssh_key),$(ssh_opts),"opentrons-robot-server")
 
 .PHONY: simulate
 simulate:
