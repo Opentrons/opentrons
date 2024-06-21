@@ -4,10 +4,10 @@ This script is used remotely from the host computer
 
 # Instructions
 
-From host computer run
+1. From host computer run
+   
+  `./flex-diagnostics.sh gather <robot-ip>`
 
-1. 
-`./flex-diagnostics.sh gather <robot-ip>`
-
-2. If succesful this will produce a tarball in the current host directory with name scheme
-`<flex-serial-number>_<datetime>_diag.tar.gz`
+2. If successful this will produce a tarball in the current host directory with name scheme
+   
+  `<flex-serial-number>_<datetime>_diag.tar.gz`
