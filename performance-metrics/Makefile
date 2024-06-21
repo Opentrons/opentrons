@@ -25,6 +25,9 @@ wheel_file = dist/$(call python_get_wheelname,performance-metrics,$(project_rs_d
 # Find the version of the sdist file from git using a helper script.
 sdist_file = dist/$(call python_get_sdistname,performance-metrics,$(project_rs_default),performance_metrics)
 
+# Find the branch, sha, version that will be used to update the VERSION.json file
+version_file = $(call python_get_git_version,performance-metrics,$(project_rs_default),performance_metrics)
+
 
 clean_cmd = $(SHX) rm -rf 'build' '**/*.egg-info' '**/__pycache__' **/*.pyc '.mypy_cache' '.pytest_cache'
 clean_wheel_cmd = $(clean_cmd) dist/*.whl
