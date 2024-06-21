@@ -2,10 +2,7 @@ import * as React from 'react'
 import { css } from 'styled-components'
 import { TYPOGRAPHY, SPACING, RESPONSIVENESS } from '../../ui-style-constants'
 import { COLORS, BORDERS } from '../../helix-design-system'
-import {
-  POSITION_RELATIVE,
-  DIRECTION_ROW,
-} from '../../styles'
+import { POSITION_RELATIVE, DIRECTION_ROW } from '../../styles'
 import { Btn, Flex } from '../../primitives'
 
 const DEFAULT_TAB_STYLE = css`
@@ -75,19 +72,19 @@ export function Tabs(props: TabsProps): JSX.Element {
   const { tabs } = props
 
   return (
-      <Flex flexDirection={DIRECTION_ROW} css={INNER_CONTAINER_STYLE}>
-        {tabs.map((tab, index) => (
-          <Btn
-            key={index}
-            onClick={() => {
-              tab.onClick()
-            }}
-            css={tab.isActive === true ? CURRENT_TAB_STYLE : DEFAULT_TAB_STYLE}
-            disabled={tab.disabled}
-          >
-            {tab.text}
-          </Btn>
-        ))}
-      </Flex>
+    <Flex flexDirection={DIRECTION_ROW} css={INNER_CONTAINER_STYLE}>
+      {tabs.map((tab, index) => (
+        <Btn
+          key={index}
+          onClick={() => {
+            tab.onClick()
+          }}
+          css={tab.isActive === true ? CURRENT_TAB_STYLE : DEFAULT_TAB_STYLE}
+          disabled={tab.disabled}
+        >
+          {tab.text}
+        </Btn>
+      ))}
+    </Flex>
   )
 }
