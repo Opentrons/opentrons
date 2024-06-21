@@ -250,7 +250,9 @@ class LogListener:
         """Close csv file."""
         self.data_file.close()
 
-    async def wait_for_complete(self, wait_time: float = 10, message_index: int = 0) -> None:
+    async def wait_for_complete(
+        self, wait_time: float = 10, message_index: int = 0
+    ) -> None:
         """Wait for the data to stop, only use this with a send_accumulated_data_request."""
         self.event = asyncio.Event()
         self.expected_ack = message_index
@@ -260,8 +262,7 @@ class LogListener:
             if self.event.is_set():
                 self.event.clear()
                 break
-            if (time.time() - start > wait_time):
-                print("Timed out waiting for sensor buffer response ack")
+            if time.time() - start > wait_time:
                 break
         self.event = None
 
@@ -279,5 +280,8 @@ class LogListener:
             current_time = round((time.time() - self.start_time), 3)
             self.csv_writer.writerow([current_time, data])  # type: ignore
         if isinstance(message, message_definitions.Acknowledgement):
-            if self.event is not None and message.payload.message_index.value == self.expected_ack:
+            if (
+                self.event is not None
+                and message.payload.message_index.value == self.expected_ack
+            ):
                 self.event.set()
