@@ -97,12 +97,12 @@ const styleForPairForHelix = (style: string, weight: string): string => {
   `
 }
 const fontSizeForPairForHelix = (style: string, weight: string): string => {
-  const fontSize = PRODUCT.TYPOGRAPHY[`fontSize${style}${weight}`]
+  const fontSize = PRODUCT.TYPOGRAPHY[`fontSize${style}${weight}`] as string
   const fontSizeInPx = convertToPx(fontSize)
   return `font-size: ${fontSize}/${fontSizeInPx}`
 }
 const lineHeightForPairForHelix = (style: string, weight: string): string => {
-  const lineHeight = PRODUCT.TYPOGRAPHY[`lineHeight${style}${weight}`]
+  const lineHeight = PRODUCT.TYPOGRAPHY[`lineHeight${style}${weight}`] as string
   const lineHeightInPx = convertToPx(lineHeight)
   return `line-height: ${lineHeight}/${lineHeightInPx}`
 }

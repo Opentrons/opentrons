@@ -261,6 +261,7 @@ function styleForODDName(name?: ODDStyles): FlattenSimpleInterpolation {
   return name ? ODDStyleMap[name].style : css``
 }
 
+// eslint-disable-next-line @typescript-eslint/no-unsafe-argument
 const DesktopStyledText: (props: Props) => JSX.Element = styled(Text)<Props>`
   ${props => styleForDesktopName(props.desktopStyle)}
 `
