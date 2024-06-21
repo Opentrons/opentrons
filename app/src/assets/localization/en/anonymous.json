@@ -25,6 +25,7 @@
   "gripper_successfully_calibrated": "Gripper successfully calibrated",
   "gripper_successfully_detached": "Gripper successfully detached",
   "gripper": "Gripper",
+  "help_us_improve_send_error_report": "Help us improve your experience by sending an error report to support",
   "ip_description_second": "Work with your network administrator to assign a static IP address to the robot.",
   "learn_uninstalling": "Learn more about uninstalling the app",
   "loosen_screws_and_detach": "Loosen screws and detach gripper",
@@ -66,6 +67,7 @@
   "update_robot_software_description": "Bypass the auto-update process and update the robot software manually.",
   "update_robot_software_link": "Launch software update page",
   "versions_sync": "Learn more about keeping the app and robot software in sync",
+  "view_latest_release_notes_at": "Please contact support for release notes.",
   "want_to_help_out": "Want to help out?",
   "welcome_title": "Welcome!",
   "why_use_lpc": "Labware Position Check is intended to correct for minor variances. Don't use Labware Position Check to compensate for large positional adjustments. Needing to set large labware offsets could indicate a problem with robot calibration."

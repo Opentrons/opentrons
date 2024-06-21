@@ -5,7 +5,7 @@ import {
   Flex,
   JUSTIFY_SPACE_BETWEEN,
   SPACING,
-  StyledText,
+  LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
@@ -25,13 +25,16 @@ const meta: Meta<typeof LineComponent> = {
           >
             <Box marginRight={SPACING.spacing32}>
               <Box marginBottom={SPACING.spacing8}>
-                <StyledText as="h3" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
+                <LegacyStyledText
+                  as="h3"
+                  fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+                >
                   {'About Calibration'}
-                </StyledText>
+                </LegacyStyledText>
               </Box>
-              <StyledText as="p" marginBottom={SPACING.spacing8}>
+              <LegacyStyledText as="p" marginBottom={SPACING.spacing8}>
                 {'This section is about calibration.'}
-              </StyledText>
+              </LegacyStyledText>
             </Box>
           </Flex>
         </Box>
@@ -43,13 +46,16 @@ const meta: Meta<typeof LineComponent> = {
           >
             <Box marginRight={SPACING.spacing32}>
               <Box marginBottom={SPACING.spacing8}>
-                <StyledText as="h3" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
+                <LegacyStyledText
+                  as="h3"
+                  fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+                >
                   {'Deck Calibration'}
-                </StyledText>
+                </LegacyStyledText>
               </Box>
-              <StyledText as="p" marginBottom={SPACING.spacing8}>
+              <LegacyStyledText as="p" marginBottom={SPACING.spacing8}>
                 {'This section is for deck calibration.'}
-              </StyledText>
+              </LegacyStyledText>
             </Box>
           </Flex>
         </Box>

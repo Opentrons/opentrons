@@ -10,13 +10,13 @@ import {
   SPACING,
   DIRECTION_COLUMN,
 } from '@opentrons/components'
-import { PipetteModelSpecs } from '@opentrons/shared-data'
 
 import { MenuItem } from '../../../atoms/MenuList/MenuItem'
 import { Divider } from '../../../atoms/structure'
 
-import type { Mount } from '../../../redux/pipettes/types'
+import type { PipetteModelSpecs } from '@opentrons/shared-data'
 import type { PipetteSettingsFieldsMap } from '@opentrons/api-client'
+import type { Mount } from '../../../redux/pipettes/types'
 
 interface PipetteOverflowMenuProps {
   pipetteSpecs: PipetteModelSpecs | null
@@ -62,7 +62,9 @@ export const PipetteOverflowMenu = (
       >
         {pipetteDisplayName === 'Empty' ? (
           <MenuItem
-            onClick={() => handleChangePipette()}
+            onClick={() => {
+              handleChangePipette()
+            }}
             disabled={isRunActive}
           >
             {t('attach_pipette')}
@@ -70,22 +72,35 @@ export const PipetteOverflowMenu = (
         ) : (
           <>
             <MenuItem
-              onClick={() => handleChangePipette()}
+              onClick={() => {
+                handleChangePipette()
+              }}
               disabled={isRunActive}
             >
               {t('detach_pipette')}
             </MenuItem>
-            <MenuItem onClick={() => handleAboutSlideout()}>
+            <MenuItem
+              onClick={() => {
+                handleAboutSlideout()
+              }}
+            >
               {t('about_pipette')}
             </MenuItem>
-            <MenuItem onClick={() => handleDropTip()} disabled={isRunActive}>
+            <MenuItem
+              onClick={() => {
+                handleDropTip()
+              }}
+              disabled={isRunActive}
+            >
               {i18n.format(t('drop_tips'), 'capitalize')}
             </MenuItem>
             <Divider marginY="0" />
             {pipetteSettings != null ? (
               <MenuItem
                 key={`${pipetteDisplayName}_${mount}_view_settings`}
-                onClick={() => handleSettingsSlideout()}
+                onClick={() => {
+                  handleSettingsSlideout()
+                }}
                 disabled={isRunActive}
               >
                 {t('view_pipette_setting')}

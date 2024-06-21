@@ -17,12 +17,10 @@ from opentrons.protocol_engine import (
 from opentrons.legacy_broker import LegacyBroker
 from opentrons.util.broker import ReadOnlyBroker
 
+from opentrons.protocol_api.core.legacy.load_info import LoadInfo, LabwareLoadInfo
+
 from opentrons.protocol_runner.legacy_command_mapper import LegacyCommandMapper
 from opentrons.protocol_runner.legacy_context_plugin import LegacyContextPlugin
-from opentrons.protocol_runner.legacy_wrappers import (
-    LegacyLoadInfo,
-    LegacyLabwareLoadInfo,
-)
 
 from opentrons.types import DeckSlotName
 
@@ -38,9 +36,9 @@ def mock_legacy_broker(decoy: Decoy) -> LegacyBroker:
 
 
 @pytest.fixture
-def mock_equipment_broker(decoy: Decoy) -> ReadOnlyBroker[LegacyLoadInfo]:
+def mock_equipment_broker(decoy: Decoy) -> ReadOnlyBroker[LoadInfo]:
     """Get a mocked out `equipment_broker: Broker` dependency."""
-    return decoy.mock(cls=ReadOnlyBroker[LegacyLoadInfo])
+    return decoy.mock(cls=ReadOnlyBroker[LoadInfo])
 
 
 @pytest.fixture
@@ -64,7 +62,7 @@ def mock_action_dispatcher(decoy: Decoy) -> pe_actions.ActionDispatcher:
 @pytest.fixture
 def subject(
     mock_legacy_broker: LegacyBroker,
-    mock_equipment_broker: ReadOnlyBroker[LegacyLoadInfo],
+    mock_equipment_broker: ReadOnlyBroker[LoadInfo],
     mock_legacy_command_mapper: LegacyCommandMapper,
     mock_state_view: StateView,
     mock_action_dispatcher: pe_actions.ActionDispatcher,
@@ -92,7 +90,7 @@ class _ContextManager:
 async def test_broker_subscribe_unsubscribe(
     decoy: Decoy,
     mock_legacy_broker: LegacyBroker,
-    mock_equipment_broker: ReadOnlyBroker[LegacyLoadInfo],
+    mock_equipment_broker: ReadOnlyBroker[LoadInfo],
     subject: LegacyContextPlugin,
 ) -> None:
     """It should subscribe to the brokers on setup and unsubscribe on teardown."""
@@ -125,7 +123,7 @@ async def test_broker_subscribe_unsubscribe(
 async def test_command_broker_messages(
     decoy: Decoy,
     mock_legacy_broker: LegacyBroker,
-    mock_equipment_broker: ReadOnlyBroker[LegacyLoadInfo],
+    mock_equipment_broker: ReadOnlyBroker[LoadInfo],
     mock_legacy_command_mapper: LegacyCommandMapper,
     mock_action_dispatcher: pe_actions.ActionDispatcher,
     subject: LegacyContextPlugin,
@@ -181,7 +179,7 @@ async def test_command_broker_messages(
 async def test_equipment_broker_messages(
     decoy: Decoy,
     mock_legacy_broker: LegacyBroker,
-    mock_equipment_broker: ReadOnlyBroker[LegacyLoadInfo],
+    mock_equipment_broker: ReadOnlyBroker[LoadInfo],
     mock_legacy_command_mapper: LegacyCommandMapper,
     mock_action_dispatcher: pe_actions.ActionDispatcher,
     subject: LegacyContextPlugin,
@@ -199,9 +197,9 @@ async def test_equipment_broker_messages(
 
     subject.setup()
 
-    handler: Callable[[LegacyLabwareLoadInfo], None] = labware_handler_captor.value
+    handler: Callable[[LabwareLoadInfo], None] = labware_handler_captor.value
 
-    load_info = LegacyLabwareLoadInfo(
+    load_info = LabwareLoadInfo(
         labware_definition=minimal_labware_def,
         labware_namespace="some_namespace",
         labware_load_name="some_load_name",

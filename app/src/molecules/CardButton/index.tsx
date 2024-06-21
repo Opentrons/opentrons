@@ -11,7 +11,7 @@ import {
   Icon,
   JUSTIFY_CENTER,
   SPACING,
-  StyledText,
+  LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { ODD_FOCUS_VISIBLE } from '../../atoms/buttons/constants'
@@ -80,7 +80,9 @@ export function CardButton(props: CardButtonProps): JSX.Element {
 
   return (
     <Btn
-      onClick={() => history.push(destinationPath)}
+      onClick={() => {
+        history.push(destinationPath)
+      }}
       width="100%"
       css={CARD_BUTTON_STYLE}
       backgroundColor={disabled ? COLORS.grey35 : COLORS.blue35}
@@ -93,28 +95,28 @@ export function CardButton(props: CardButtonProps): JSX.Element {
         color={disabled ? COLORS.grey50 : COLORS.blue50}
       />
       <Flex marginTop={SPACING.spacing16}>
-        <StyledText
+        <LegacyStyledText
           as="h4"
           fontWeight={TYPOGRAPHY.fontWeightBold}
           color={disabled ? COLORS.grey50 : COLORS.black90}
           textAlign={TYPOGRAPHY.textAlignCenter}
         >
           {title}
-        </StyledText>
+        </LegacyStyledText>
       </Flex>
       <Flex
         marginTop={SPACING.spacing4}
         width="100%"
         justifyContent={JUSTIFY_CENTER}
       >
-        <StyledText
+        <LegacyStyledText
           as="p"
           fontWeight={TYPOGRAPHY.fontWeightRegular}
           color={disabled ? COLORS.grey50 : COLORS.black90}
           css={CARD_BUTTON_TEXT_STYLE}
         >
           {description}
-        </StyledText>
+        </LegacyStyledText>
       </Flex>
     </Btn>
   )

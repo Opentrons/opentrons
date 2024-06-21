@@ -4,7 +4,7 @@ import { SPACING, TYPOGRAPHY } from '../../ui-style-constants'
 import { COLORS, BORDERS } from '../../helix-design-system'
 import { Flex, Box } from '../../primitives'
 import { Icon } from '../../icons'
-import { ALIGN_CENTER, JUSTIFY_CENTER, SIZE_1 } from '../../styles'
+import { ALIGN_CENTER, JUSTIFY_CENTER } from '../../styles'
 
 export interface CheckboxFieldProps {
   /** change handler */
@@ -130,7 +130,7 @@ export function CheckboxField(props: CheckboxFieldProps): JSX.Element {
           justifyContent={JUSTIFY_CENTER}
           borderRadius={BORDERS.borderRadius2}
           backgroundColor={COLORS.grey30}
-          size={SIZE_1}
+          size="1.25rem"
         >
           <Box
             height="1.5px"

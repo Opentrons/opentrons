@@ -7,6 +7,7 @@ from opentrons.protocol_engine.state import StateView
 from opentrons.protocol_engine.types import DeckPoint
 from opentrons.types import Point
 
+from opentrons.protocol_engine.commands.command import SuccessData
 from opentrons.protocol_engine.commands.move_to_coordinates import (
     MoveToCoordinatesParams,
     MoveToCoordinatesResult,
@@ -54,4 +55,7 @@ async def test_move_to_coordinates_implementation(
 
     result = await subject.execute(params=params)
 
-    assert result == MoveToCoordinatesResult(position=DeckPoint(x=4.44, y=5.55, z=6.66))
+    assert result == SuccessData(
+        public=MoveToCoordinatesResult(position=DeckPoint(x=4.44, y=5.55, z=6.66)),
+        private=None,
+    )

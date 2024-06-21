@@ -1,5 +1,6 @@
 import * as React from 'react'
 import { vi, it, describe, beforeEach } from 'vitest'
+import { screen } from '@testing-library/react'
 
 import { getPipetteModelSpecs } from '@opentrons/shared-data'
 
@@ -39,22 +40,22 @@ describe('RenderMountInformation', () => {
   })
 
   it('should render left mount with mock pipette', () => {
-    const { getByText } = render(props)
-    getByText('left MOUNT')
-    getByText('mock pipette display name')
+    render(props)
+    screen.getByText('left MOUNT')
+    screen.getByText('mock pipette display name')
   })
 
   it('should render right mount with mock pipette', () => {
     props.mount = RIGHT
-    const { getByText } = render(props)
-    getByText('right MOUNT')
-    getByText('mock pipette display name')
+    render(props)
+    screen.getByText('right MOUNT')
+    screen.getByText('mock pipette display name')
   })
 
   it('should render empty without pipette', () => {
     props.pipette = undefined
-    const { getByText } = render(props)
-    getByText('left MOUNT')
-    getByText('empty')
+    render(props)
+    screen.getByText('left MOUNT')
+    screen.getByText('empty')
   })
 })

@@ -58,10 +58,12 @@ async def test_with_magdeck(setup_klass: Type[simulator_setup.SimulatorSetup]) -
         attached_modules={
             "magdeck": [
                 simulator_setup.ModuleItem(
+                    model="magneticModuleV1",
                     serial_number="123",
                     calls=[simulator_setup.ModuleCall("engage", kwargs={"height": 3})],
                 ),
                 simulator_setup.ModuleItem(
+                    model="magneticModuleV2",
                     serial_number="1234",
                     calls=[simulator_setup.ModuleCall("engage", kwargs={"height": 5})],
                 ),
@@ -71,11 +73,13 @@ async def test_with_magdeck(setup_klass: Type[simulator_setup.SimulatorSetup]) -
     simulator = await simulator_setup.create_simulator(setup)
 
     assert isinstance(simulator.attached_modules[0], MagDeck)
+    assert simulator.attached_modules[0].model() == "magneticModuleV1"
     assert simulator.attached_modules[0].live_data == {
         "data": {"engaged": True, "height": 3},
         "status": "engaged",
     }
     assert simulator.attached_modules[0].device_info["serial"] == "123"
+    assert simulator.attached_modules[1].model() == "magneticModuleV2"
     assert simulator.attached_modules[1].live_data == {
         "data": {"engaged": True, "height": 5},
         "status": "engaged",
@@ -91,6 +95,7 @@ async def test_with_thermocycler(
         attached_modules={
             "thermocycler": [
                 simulator_setup.ModuleItem(
+                    model="thermocyclerModuleV2",
                     serial_number="123",
                     calls=[
                         simulator_setup.ModuleCall(
@@ -110,6 +115,7 @@ async def test_with_thermocycler(
     simulator = await simulator_setup.create_simulator(setup)
 
     assert isinstance(simulator.attached_modules[0], Thermocycler)
+    assert simulator.attached_modules[0].model() == "thermocyclerModuleV2"
     assert simulator.attached_modules[0].live_data == {
         "data": {
             "currentCycleIndex": None,
@@ -136,6 +142,7 @@ async def test_with_tempdeck(setup_klass: Type[simulator_setup.SimulatorSetup]) 
         attached_modules={
             "tempdeck": [
                 simulator_setup.ModuleItem(
+                    model="temperatureModuleV2",
                     serial_number="123",
                     calls=[
                         simulator_setup.ModuleCall(
@@ -152,6 +159,7 @@ async def test_with_tempdeck(setup_klass: Type[simulator_setup.SimulatorSetup]) 
     simulator = await simulator_setup.create_simulator(setup)
 
     assert isinstance(simulator.attached_modules[0], TempDeck)
+    assert simulator.attached_modules[0].model() == "temperatureModuleV2"
     assert simulator.attached_modules[0].live_data == {
         "data": {"currentTemp": 23, "targetTemp": 23},
         "status": "holding at target",
@@ -168,12 +176,14 @@ def test_persistence_ot2(tmpdir: str) -> None:
         attached_modules={
             "magdeck": [
                 simulator_setup.ModuleItem(
+                    model="magneticModuleV1",
                     serial_number="111",
                     calls=[simulator_setup.ModuleCall("engage", kwargs={"height": 3})],
                 )
             ],
             "tempdeck": [
                 simulator_setup.ModuleItem(
+                    model="temperatureModuleV2",
                     serial_number="111",
                     calls=[
                         simulator_setup.ModuleCall(
@@ -205,6 +215,7 @@ def test_persistence_ot3(tmpdir: str) -> None:
         attached_modules={
             "magdeck": [
                 simulator_setup.ModuleItem(
+                    model="magneticModuleV2",
                     serial_number="mag-1",
                     calls=[
                         simulator_setup.ModuleCall(
@@ -216,6 +227,7 @@ def test_persistence_ot3(tmpdir: str) -> None:
             ],
             "tempdeck": [
                 simulator_setup.ModuleItem(
+                    model="temperatureModuleV2",
                     serial_number="temp-1",
                     calls=[
                         simulator_setup.ModuleCall(
@@ -229,6 +241,7 @@ def test_persistence_ot3(tmpdir: str) -> None:
                     ],
                 ),
                 simulator_setup.ModuleItem(
+                    model="temperatureModuleV1",
                     serial_number="temp-2",
                     calls=[
                         simulator_setup.ModuleCall(

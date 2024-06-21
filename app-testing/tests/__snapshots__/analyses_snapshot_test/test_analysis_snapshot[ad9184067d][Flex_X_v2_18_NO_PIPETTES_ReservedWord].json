@@ -1,0 +1,69 @@
+{
+  "commands": [],
+  "config": {
+    "apiVersion": [
+      2,
+      18
+    ],
+    "protocolType": "python"
+  },
+  "errors": [
+    {
+      "detail": "ParameterNameError [line 13]: Variable name cannot be a reserved Python keyword.",
+      "errorCode": "4000",
+      "errorInfo": {},
+      "errorType": "ExceptionInProtocolError",
+      "isDefined": false,
+      "wrappedErrors": [
+        {
+          "detail": "opentrons.protocols.parameters.exceptions.ParameterNameError: Variable name cannot be a reserved Python keyword.",
+          "errorCode": "4000",
+          "errorInfo": {
+            "args": "('Variable name cannot be a reserved Python keyword.',)",
+            "class": "ParameterNameError",
+            "traceback": "  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocols/execution/execute_python.py\", line 80, in _parse_and_set_parameters\n    exec(\"add_parameters(__param_context)\", new_globs)\n\n  File \"<string>\", line 1, in <module>\n\n  File \"Flex_X_v2_18_NO_PIPETTES_ReservedWord.py\", line 13, in add_parameters\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocol_api/_parameter_context.py\", line 62, in add_int\n    parameter = parameter_definition.create_int_parameter(\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocols/parameters/parameter_definition.py\", line 202, in create_int_parameter\n    return ParameterDefinition(\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocols/parameters/parameter_definition.py\", line 81, in __init__\n    self._variable_name = validation.ensure_variable_name(variable_name)\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocols/parameters/validation.py\", line 53, in ensure_variable_name\n    raise ParameterNameError(\"Variable name cannot be a reserved Python keyword.\")\n"
+          },
+          "errorType": "PythonException",
+          "isDefined": false,
+          "wrappedErrors": []
+        }
+      ]
+    }
+  ],
+  "files": [
+    {
+      "name": "Flex_X_v2_18_NO_PIPETTES_ReservedWord.py",
+      "role": "main"
+    },
+    {
+      "name": "cpx_4_tuberack_100ul.json",
+      "role": "labware"
+    },
+    {
+      "name": "opentrons_ot3_96_tiprack_1000ul_rss.json",
+      "role": "labware"
+    },
+    {
+      "name": "opentrons_ot3_96_tiprack_200ul_rss.json",
+      "role": "labware"
+    },
+    {
+      "name": "opentrons_ot3_96_tiprack_50ul_rss.json",
+      "role": "labware"
+    },
+    {
+      "name": "sample_labware.json",
+      "role": "labware"
+    }
+  ],
+  "labware": [],
+  "liquids": [],
+  "metadata": {
+    "protocolName": "Default not in range"
+  },
+  "modules": [],
+  "pipettes": [],
+  "result": "not-ok",
+  "robotType": "OT-3 Standard",
+  "runTimeParameters": []
+}

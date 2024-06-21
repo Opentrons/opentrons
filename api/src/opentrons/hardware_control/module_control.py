@@ -29,9 +29,11 @@ if TYPE_CHECKING:
 log = logging.getLogger(__name__)
 
 MODULE_PORT_REGEX = re.compile(
+    # add a negative lookbehind to suppress matches on OT-2 tempfiles udev creates
+    r"(?<!\.#ot_module_)"
     # capture all modules by name using alternation
-    "(" + "|".join(modules.MODULE_TYPE_BY_NAME.keys()) + ")"
-    # add a negative lookahead to suppress matches on tempfiles udev creates
+    + "(" + "|".join(modules.MODULE_TYPE_BY_NAME.keys()) + ")"
+    # add a negative lookahead to suppress matches on Flex tempfiles udev creates
     + r"\d+(?!\.tmp-c\d+:\d+)",
     re.I,
 )
@@ -161,9 +163,14 @@ class AttachedModulesControl:
                 port=mod.port,
                 usb_port=mod.usb_port,
                 type=modules.MODULE_TYPE_BY_NAME[mod.name],
-                sim_serial_number=mod.serial_number
-                if isinstance(mod, SimulatingModuleAtPort)
-                else None,
+                sim_serial_number=(
+                    mod.serial_number
+                    if isinstance(mod, SimulatingModuleAtPort)
+                    else None
+                ),
+                sim_model=(
+                    mod.model if isinstance(mod, SimulatingModuleAtPort) else None
+                ),
             )
             self._available_modules.append(new_instance)
             log.info(

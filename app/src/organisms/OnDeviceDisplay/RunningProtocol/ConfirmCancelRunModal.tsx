@@ -10,7 +10,7 @@ import {
   DIRECTION_ROW,
   Flex,
   SPACING,
-  StyledText,
+  LegacyStyledText,
 } from '@opentrons/components'
 import {
   useStopRunMutation,
@@ -89,7 +89,9 @@ export function ConfirmCancelRunModal({
     <Modal
       modalSize="medium"
       header={modalHeader}
-      onOutsideClick={() => setShowConfirmCancelRunModal(false)}
+      onOutsideClick={() => {
+        setShowConfirmCancelRunModal(false)
+      }}
     >
       <Flex flexDirection={DIRECTION_COLUMN}>
         <Flex
@@ -98,8 +100,12 @@ export function ConfirmCancelRunModal({
           paddingBottom={SPACING.spacing32}
           paddingTop={`${isActiveRun ? SPACING.spacing32 : '0'}`}
         >
-          <StyledText as="p">{t('cancel_run_alert_info_flex')}</StyledText>
-          <StyledText as="p">{t('cancel_run_module_info')}</StyledText>
+          <LegacyStyledText as="p">
+            {t('cancel_run_alert_info_flex')}
+          </LegacyStyledText>
+          <LegacyStyledText as="p">
+            {t('cancel_run_module_info')}
+          </LegacyStyledText>
         </Flex>
         <Flex
           flexDirection={DIRECTION_ROW}
@@ -109,7 +115,9 @@ export function ConfirmCancelRunModal({
           <SmallButton
             flex="1"
             buttonText={t('shared:go_back')}
-            onClick={() => setShowConfirmCancelRunModal(false)}
+            onClick={() => {
+              setShowConfirmCancelRunModal(false)
+            }}
           />
           <SmallButton
             flex="1"

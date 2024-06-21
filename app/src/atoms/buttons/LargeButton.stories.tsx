@@ -58,3 +58,21 @@ export const PrimaryWithSubtext: Story = {
     subtext: 'Button subtext',
   },
 }
+
+export const OnColor: Story = {
+  args: {
+    buttonType: 'onColor',
+    buttonText: 'Button text',
+    disabled: false,
+    subtext: 'Button subtext',
+  },
+}
+
+export const AlertAlt: Story = {
+  args: {
+    buttonType: 'alertAlt',
+    buttonText: 'Button text',
+    disabled: false,
+    subtext: 'Button subtext',
+  },
+}

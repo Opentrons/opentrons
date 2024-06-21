@@ -1,7 +1,8 @@
 import get from 'lodash/get'
 
-import { Store } from 'redux'
 import { dismissedHintsPersist } from './tutorial/reducers'
+import type { Store } from 'redux'
+import type { DismissedHintReducerState } from './tutorial/reducers'
 export interface RehydratePersistedAction {
   type: 'REHYDRATE_PERSISTED'
   payload: {
@@ -65,7 +66,7 @@ function transformBeforePersist(
 ): Record<string, any> {
   switch (path) {
     case 'tutorial.dismissedHints':
-      return dismissedHintsPersist(reducerState)
+      return dismissedHintsPersist(reducerState as DismissedHintReducerState)
 
     default:
       return reducerState

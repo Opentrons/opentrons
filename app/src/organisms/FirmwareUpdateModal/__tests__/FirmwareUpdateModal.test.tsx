@@ -10,7 +10,7 @@ import {
 } from '@opentrons/react-api-client'
 import { i18n } from '../../../i18n'
 import { FirmwareUpdateModal } from '..'
-import {
+import type {
   BadPipette,
   PipetteData,
   SubsystemUpdateProgressData,
@@ -86,9 +86,9 @@ describe('FirmwareUpdateModal', () => {
         } as any,
       } as SubsystemUpdateProgressData,
     } as any)
-    const { getByText, getByLabelText } = render(props)
-    getByLabelText('spinner')
-    getByText('Checking for updates...')
+    render(props)
+    screen.getByLabelText('spinner')
+    screen.getByText('Checking for updates...')
   })
   it('calls proceed if no update is needed', async () => {
     vi.mocked(useInstrumentsQuery).mockReturnValue({

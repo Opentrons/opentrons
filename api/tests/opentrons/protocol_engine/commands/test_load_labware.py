@@ -20,6 +20,7 @@ from opentrons.protocol_engine.execution import LoadedLabwareData, EquipmentHand
 from opentrons.protocol_engine.resources import labware_validation
 from opentrons.protocol_engine.state import StateView
 
+from opentrons.protocol_engine.commands.command import SuccessData
 from opentrons.protocol_engine.commands.load_labware import (
     LoadLabwareParams,
     LoadLabwareResult,
@@ -80,10 +81,13 @@ async def test_load_labware_implementation(
 
     result = await subject.execute(data)
 
-    assert result == LoadLabwareResult(
-        labwareId="labware-id",
-        definition=well_plate_def,
-        offsetId="labware-offset-id",
+    assert result == SuccessData(
+        public=LoadLabwareResult(
+            labwareId="labware-id",
+            definition=well_plate_def,
+            offsetId="labware-offset-id",
+        ),
+        private=None,
     )
 
 
@@ -153,10 +157,13 @@ async def test_load_labware_on_labware(
 
     result = await subject.execute(data)
 
-    assert result == LoadLabwareResult(
-        labwareId="labware-id",
-        definition=well_plate_def,
-        offsetId="labware-offset-id",
+    assert result == SuccessData(
+        public=LoadLabwareResult(
+            labwareId="labware-id",
+            definition=well_plate_def,
+            offsetId="labware-offset-id",
+        ),
+        private=None,
     )
 
     decoy.verify(

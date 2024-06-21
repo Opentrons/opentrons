@@ -1,12 +1,7 @@
-import {
-  useState,
-  useEffect,
-  useRef,
-  CSSProperties,
-  MutableRefObject,
-} from 'react'
+import { useState, useEffect, useRef } from 'react'
 import interact from 'interactjs'
 import type PointerEvent from 'interactjs'
+import type { CSSProperties, MutableRefObject } from 'react'
 
 const HOLD_DURATION_MS = 1000
 
@@ -44,10 +39,10 @@ export const useLongPress = (): UseLongPressResult => {
         .pointerEvents({
           holdDuration: HOLD_DURATION_MS,
         })
-        .on('hold', (event: PointerEvent) => {
+        .on('hold', (_event: PointerEvent) => {
           setIsLongPressed(isLongPressed => !isLongPressed)
         })
-        .on('tap', (event: PointerEvent) => {
+        .on('tap', (_event: PointerEvent) => {
           setIsTapped(isTapped => !isTapped)
         })
     }
@@ -78,7 +73,11 @@ export const useLongPress = (): UseLongPressResult => {
     isTapped,
     setIsLongPressed,
     setIsTapped,
-    enable: () => setIsEnabled(true),
-    disable: () => setIsEnabled(false),
+    enable: () => {
+      setIsEnabled(true)
+    },
+    disable: () => {
+      setIsEnabled(false)
+    },
   }
 }

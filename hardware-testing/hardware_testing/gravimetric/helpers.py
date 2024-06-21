@@ -19,13 +19,13 @@ from opentrons.protocol_api._types import OffDeckType
 from opentrons.protocol_api._nozzle_layout import NozzleLayout
 from opentrons.protocols.types import APIVersion
 from opentrons.hardware_control.thread_manager import ThreadManager
-from opentrons.hardware_control.types import OT3Mount, Axis
+from opentrons.hardware_control.types import OT3Mount, Axis, HardwareFeatureFlags
 from opentrons.hardware_control.ot3api import OT3API
 from opentrons.hardware_control.instruments.ot3.pipette import Pipette
 
 from opentrons import execute, simulate
-from opentrons.types import Point, Location
-
+from opentrons.types import Point, Location, Mount
+from opentrons.config.types import OT3Config, RobotConfig
 from opentrons_shared_data.labware.dev_types import LabwareDefinition
 
 from hardware_testing.opentrons_api import helpers_ot3
@@ -81,7 +81,17 @@ def get_api_context(
     """Get api context."""
 
     async def _thread_manager_build_hw_api(
-        *args: Any, loop: asyncio.AbstractEventLoop, **kwargs: Any
+        attached_instruments: Optional[
+            Dict[Union[Mount, OT3Mount], Dict[str, Optional[str]]]
+        ] = None,
+        attached_modules: Optional[List[str]] = None,
+        config: Union[OT3Config, RobotConfig, None] = None,
+        loop: Optional[asyncio.AbstractEventLoop] = None,
+        strict_attached_instruments: bool = True,
+        use_usb_bus: bool = False,
+        update_firmware: bool = True,
+        status_bar_enabled: bool = True,
+        feature_flags: Optional[HardwareFeatureFlags] = None,
     ) -> OT3API:
         return await helpers_ot3.build_async_ot3_hardware_api(
             is_simulating=is_simulating,
@@ -190,11 +200,11 @@ def _sense_liquid_height(
     lps = config._get_liquid_probe_settings(cfg, well)
     # NOTE: very important that probing is done only 1x time,
     #       with a DRY tip, for reliability
-    probed_z = hwapi.liquid_probe(OT3Mount.LEFT, lps)
+    probed_z = hwapi.liquid_probe(OT3Mount.LEFT, well.depth, lps)
     if ctx.is_simulating():
         probed_z = well.top().point.z - 1
     liq_height = probed_z - well.bottom().point.z
-    if abs(liq_height - lps.max_z_distance) < 0.01:
+    if abs(liq_height - well.depth) < 0.01:
         raise RuntimeError("unable to probe liquid, reach max travel distance")
     return liq_height
 

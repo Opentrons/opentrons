@@ -5,12 +5,7 @@ import { when } from 'vitest-when'
 import { Route, MemoryRouter } from 'react-router-dom'
 import '@testing-library/jest-dom/vitest'
 import { renderWithProviders } from '../../../__testing-utils__'
-import {
-  deleteProtocol,
-  deleteRun,
-  getProtocol,
-  HostConfig,
-} from '@opentrons/api-client'
+import { deleteProtocol, deleteRun, getProtocol } from '@opentrons/api-client'
 import {
   useCreateRunMutation,
   useHost,
@@ -33,6 +28,8 @@ import { Hardware } from '../Hardware'
 import { Labware } from '../Labware'
 import { Parameters } from '../Parameters'
 import { mockRunTimeParameterData } from '../fixtures'
+
+import type { HostConfig } from '@opentrons/api-client'
 
 // Mock IntersectionObserver
 class IntersectionObserver {
@@ -97,7 +94,9 @@ const render = (path = '/protocols/fakeProtocolId') => {
 describe('ODDProtocolDetails', () => {
   beforeEach(() => {
     when(useRunTimeParameters).calledWith('fakeProtocolId').thenReturn([])
-    vi.mocked(useFeatureFlag).mockReturnValue(true)
+    when(vi.mocked(useFeatureFlag))
+      .calledWith('enableCsvFile')
+      .thenReturn(false)
     vi.mocked(useCreateRunMutation).mockReturnValue({
       createRun: mockCreateRun,
     } as any)
@@ -139,18 +138,22 @@ describe('ODDProtocolDetails', () => {
       'Nextera XT DNA Library Prep Kit Protocol: Part 1/4 - Tagment Genomic DNA and Amplify Libraries'
     )
   })
+
   it('renders the start setup button', () => {
     render()
     screen.getByText('Start setup')
   })
+
   it('renders the protocol author', () => {
     render()
     screen.getByText('engineering testing division')
   })
+
   it('renders the protocol description', () => {
     render()
     screen.getByText('A short mock protocol')
   })
+
   it('renders the protocol date added', () => {
     render()
     screen.getByText(
@@ -159,10 +162,12 @@ describe('ODDProtocolDetails', () => {
       )}`
     )
   })
+
   it('renders the pin protocol button', () => {
     render()
     screen.getByText('Pin protocol')
   })
+
   it('renders the delete protocol button', async () => {
     when(vi.mocked(getProtocol))
       .calledWith(MOCK_HOST_CONFIG, 'fakeProtocolId')
@@ -187,6 +192,7 @@ describe('ODDProtocolDetails', () => {
       )
     )
   })
+
   it('renders the navigation buttons', () => {
     vi.mocked(Hardware).mockReturnValue(<div>Mock Hardware</div>)
     vi.mocked(Labware).mockReturnValue(<div>Mock Labware</div>)
@@ -211,6 +217,7 @@ describe('ODDProtocolDetails', () => {
     fireEvent.click(summaryButton)
     screen.getByText('A short mock protocol')
   })
+
   it('should render a loading skeleton while awaiting a response from the server', () => {
     vi.mocked(useProtocolQuery).mockReturnValue({
       data: MOCK_DATA,
@@ -219,6 +226,7 @@ describe('ODDProtocolDetails', () => {
     render()
     expect(screen.getAllByTestId('Skeleton').length).toBeGreaterThan(0)
   })
+
   it('renders the parameters screen', () => {
     when(useRunTimeParameters)
       .calledWith('fakeProtocolId')
@@ -226,5 +234,29 @@ describe('ODDProtocolDetails', () => {
     render()
     fireEvent.click(screen.getByText('Start setup'))
     expect(vi.mocked(ProtocolSetupParameters)).toHaveBeenCalled()
+  })
+
+  it('render chip about modules when missing a hardware', () => {
+    vi.mocked(useProtocolAnalysisAsDocumentQuery).mockReturnValue({
+      data: {
+        id: 'mockAnalysisId',
+        status: 'completed',
+      },
+    } as any)
+    render()
+    screen.getByText('mock missing hardware chip text')
+  })
+
+  it('render requires csv text when a csv file is required', () => {
+    when(vi.mocked(useFeatureFlag)).calledWith('enableCsvFile').thenReturn(true)
+    vi.mocked(useProtocolAnalysisAsDocumentQuery).mockReturnValue({
+      data: {
+        id: 'mockAnalysisId',
+        status: 'completed',
+        result: 'parameter-value-required',
+      },
+    } as any)
+    render()
+    screen.getByText('mock missing hardware chip text & requires CSV')
   })
 })

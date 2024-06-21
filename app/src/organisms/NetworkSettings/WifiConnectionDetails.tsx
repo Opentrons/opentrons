@@ -13,7 +13,7 @@ import {
   Icon,
   JUSTIFY_CENTER,
   SPACING,
-  StyledText,
+  LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
@@ -87,14 +87,16 @@ export function WifiConnectionDetails({
               flex="1"
               buttonType="secondary"
               buttonText={t('view_network_details')}
-              onClick={() => setShowNetworkDetailsModal(true)}
+              onClick={() => {
+                setShowNetworkDetailsModal(true)
+              }}
             />
             <MediumButton
               flex="1"
               buttonText={i18n.format(t('continue'), 'capitalize')}
-              onClick={() =>
+              onClick={() => {
                 history.push('/robot-settings/update-robot-during-onboarding')
-              }
+              }}
             />
           </Flex>
         </Flex>
@@ -122,9 +124,9 @@ const DisplayConnectionStatus = ({
       justifyContent={JUSTIFY_CENTER}
     >
       <Icon size="3rem" name="ot-check" color={COLORS.green50} />
-      <StyledText as="h3" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
+      <LegacyStyledText as="h3" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
         {t('successfully_connected_to_network', { ssid })}
-      </StyledText>
+      </LegacyStyledText>
     </Flex>
   )
 }

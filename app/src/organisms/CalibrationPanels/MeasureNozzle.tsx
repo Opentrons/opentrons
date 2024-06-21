@@ -11,7 +11,7 @@ import {
   JUSTIFY_SPACE_BETWEEN,
   PrimaryButton,
   SPACING,
-  StyledText,
+  LegacyStyledText,
 } from '@opentrons/components'
 
 import {
@@ -138,14 +138,14 @@ export function MeasureNozzle(props: CalibrationPanelProps): JSX.Element {
           gridGap={SPACING.spacing8}
         >
           <Flex flexDirection={DIRECTION_COLUMN} flex="1">
-            <StyledText as="h1" marginBottom={SPACING.spacing16}>
+            <LegacyStyledText as="h1" marginBottom={SPACING.spacing16}>
               {titleText}
-            </StyledText>
-            <StyledText as="p">
+            </LegacyStyledText>
+            <LegacyStyledText as="p">
               {calBlock != null
                 ? t('jog_nozzle_to_block', { slotName: calBlock.slot })
                 : t('jog_nozzle_to_trash')}
-            </StyledText>
+            </LegacyStyledText>
           </Flex>
           <Box flex="1">
             <video

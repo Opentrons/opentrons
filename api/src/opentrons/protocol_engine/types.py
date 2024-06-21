@@ -4,7 +4,15 @@ import re
 from datetime import datetime
 from enum import Enum
 from dataclasses import dataclass
-from pydantic import BaseModel, Field, validator
+from pydantic import (
+    BaseModel,
+    Field,
+    StrictBool,
+    StrictFloat,
+    StrictInt,
+    StrictStr,
+    validator,
+)
 from typing import Optional, Union, List, Dict, Any, NamedTuple, Tuple, FrozenSet
 from typing_extensions import Literal, TypeGuard
 
@@ -306,6 +314,7 @@ class ModuleModel(str, Enum):
     THERMOCYCLER_MODULE_V2 = "thermocyclerModuleV2"
     HEATER_SHAKER_MODULE_V1 = "heaterShakerModuleV1"
     MAGNETIC_BLOCK_V1 = "magneticBlockV1"
+    ABSORBANCE_READER_V1 = "absorbanceReaderV1"
 
     def as_type(self) -> ModuleType:
         """Get the ModuleType of this model."""
@@ -319,6 +328,8 @@ class ModuleModel(str, Enum):
             return ModuleType.HEATER_SHAKER
         elif ModuleModel.is_magnetic_block(self):
             return ModuleType.MAGNETIC_BLOCK
+        elif ModuleModel.is_absorbance_reader(self):
+            return ModuleType.ABSORBANCE_READER
 
         assert False, f"Invalid ModuleModel {self}"
 
@@ -355,6 +366,13 @@ class ModuleModel(str, Enum):
         """Whether a given model is a Magnetic block."""
         return model == cls.MAGNETIC_BLOCK_V1
 
+    @classmethod
+    def is_absorbance_reader(
+        cls, model: ModuleModel
+    ) -> TypeGuard[AbsorbanceReaderModel]:
+        """Whether a given model is an Absorbance Plate Reader."""
+        return model == cls.ABSORBANCE_READER_V1
+
 
 TemperatureModuleModel = Literal[
     ModuleModel.TEMPERATURE_MODULE_V1, ModuleModel.TEMPERATURE_MODULE_V2
@@ -367,6 +385,7 @@ ThermocyclerModuleModel = Literal[
 ]
 HeaterShakerModuleModel = Literal[ModuleModel.HEATER_SHAKER_MODULE_V1]
 MagneticBlockModel = Literal[ModuleModel.MAGNETIC_BLOCK_V1]
+AbsorbanceReaderModel = Literal[ModuleModel.ABSORBANCE_READER_V1]
 
 
 class ModuleDimensions(BaseModel):
@@ -721,6 +740,7 @@ class AreaType(Enum):
     HEATER_SHAKER = "heaterShaker"
     TEMPERATURE = "temperatureModule"
     MAGNETICBLOCK = "magneticBlock"
+    ABSORBANCE_READER = "absorbanceReader"
 
 
 @dataclass(frozen=True)
@@ -877,12 +897,14 @@ class TipPresenceStatus(str, Enum):
 class RTPBase(BaseModel):
     """Parameters defined in a protocol."""
 
-    displayName: str = Field(..., description="Display string for the parameter.")
-    variableName: str = Field(..., description="Python variable name of the parameter.")
-    description: Optional[str] = Field(
+    displayName: StrictStr = Field(..., description="Display string for the parameter.")
+    variableName: StrictStr = Field(
+        ..., description="Python variable name of the parameter."
+    )
+    description: Optional[StrictStr] = Field(
         None, description="Detailed description of the parameter."
     )
-    suffix: Optional[str] = Field(
+    suffix: Optional[StrictStr] = Field(
         None,
         description="Units (like mL, mm/sec, etc) or a custom suffix for the parameter.",
     )
@@ -894,17 +916,17 @@ class NumberParameter(RTPBase):
     type: Literal["int", "float"] = Field(
         ..., description="String specifying whether the number is an int or float type."
     )
-    min: float = Field(
+    min: Union[StrictInt, StrictFloat] = Field(
         ..., description="Minimum value that the number param is allowed to have."
     )
-    max: float = Field(
+    max: Union[StrictInt, StrictFloat] = Field(
         ..., description="Maximum value that the number param is allowed to have."
     )
-    value: float = Field(
+    value: Union[StrictInt, StrictFloat] = Field(
         ...,
         description="The value assigned to the parameter; if not supplied by the client, will be assigned the default value.",
     )
-    default: float = Field(
+    default: Union[StrictInt, StrictFloat] = Field(
         ...,
         description="Default value of the parameter, to be used when there is no client-specified value.",
     )
@@ -916,11 +938,11 @@ class BooleanParameter(RTPBase):
     type: Literal["bool"] = Field(
         default="bool", description="String specifying the type of this parameter"
     )
-    value: bool = Field(
+    value: StrictBool = Field(
         ...,
         description="The value assigned to the parameter; if not supplied by the client, will be assigned the default value.",
     )
-    default: bool = Field(
+    default: StrictBool = Field(
         ...,
         description="Default value of the parameter, to be used when there is no client-specified value.",
     )
@@ -929,8 +951,10 @@ class BooleanParameter(RTPBase):
 class EnumChoice(BaseModel):
     """Components of choices used in RTP Enum Parameters."""
 
-    displayName: str = Field(..., description="Display string for the param's choice.")
-    value: Union[float, str] = Field(
+    displayName: StrictStr = Field(
+        ..., description="Display string for the param's choice."
+    )
+    value: Union[StrictInt, StrictFloat, StrictStr] = Field(
         ..., description="Enum value of the param's choice."
     )
 
@@ -945,18 +969,40 @@ class EnumParameter(RTPBase):
     choices: List[EnumChoice] = Field(
         ..., description="List of valid choices for this parameter."
     )
-    value: Union[float, str] = Field(
+    value: Union[StrictInt, StrictFloat, StrictStr] = Field(
         ...,
         description="The value assigned to the parameter; if not supplied by the client, will be assigned the default value.",
     )
-    default: Union[float, str] = Field(
+    default: Union[StrictInt, StrictFloat, StrictStr] = Field(
         ...,
         description="Default value of the parameter, to be used when there is no client-specified value.",
     )
 
 
-RunTimeParameter = Union[NumberParameter, EnumParameter, BooleanParameter]
+class FileId(BaseModel):
+    """A file UUID descriptor."""
+
+    id: str = Field(
+        ...,
+        description="The UUID identifier of the file stored on the robot.",
+    )
+
+
+class CSVParameter(RTPBase):
+    """A CSV file parameter defined in a protocol."""
+
+    type: Literal["csv_file"] = Field(
+        default="csv_file", description="String specifying the type of this parameter"
+    )
+    file: Optional[FileId] = Field(
+        ...,
+        description="The CSV file stored on the robot, to be used as the CSV RTP override value."
+        " For local analysis this will be empty.",
+    )
+
+
+RunTimeParameter = Union[NumberParameter, EnumParameter, BooleanParameter, CSVParameter]
 
 RunTimeParamValuesType = Dict[
-    str, Union[float, bool, str]
+    StrictStr, Union[StrictInt, StrictFloat, StrictBool, StrictStr]
 ]  # update value types as more RTP types are added

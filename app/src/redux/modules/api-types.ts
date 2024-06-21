@@ -1,15 +1,13 @@
-import {
+import type {
   TEMPDECK,
   MAGDECK,
   THERMOCYCLER,
   ModuleType,
-} from '@opentrons/shared-data'
-
-import type {
   MagneticModuleModel,
   TemperatureModuleModel,
   ThermocyclerModuleModel,
   HeaterShakerModuleModel,
+  AbsorbanceReaderModel,
   ModuleModel,
 } from '@opentrons/shared-data'
 
@@ -80,6 +78,12 @@ export interface HeaterShakerData {
   errorDetails: string | null
   status: HeaterShakerStatus
 }
+export interface AbsorbanceReaderData {
+  lidStatus: 'open' | 'closed' | 'unknown'
+  platePresence: 'present' | 'absent' | 'unknown'
+  sampleWavelength: number | null
+  status: AbsorbanceReaderStatus
+}
 
 export type TemperatureStatus =
   | 'idle'
@@ -112,6 +116,8 @@ export type LatchStatus =
   | 'idle_closed'
   | 'idle_unknown'
   | 'unknown'
+
+export type AbsorbanceReaderStatus = 'idle' | 'measuring' | 'error'
 
 export interface ApiTemperatureModule extends ApiBaseModule {
   moduleModel: TemperatureModuleModel
@@ -152,11 +158,17 @@ export interface ApiHeaterShakerModule extends ApiBaseModule {
   data: HeaterShakerData
 }
 
+export interface ApiAbsorbanceReaderModule extends ApiBaseModule {
+  moduleModel: AbsorbanceReaderModel
+  data: AbsorbanceReaderData
+}
+
 export type ApiAttachedModule =
   | ApiThermocyclerModule
   | ApiMagneticModule
   | ApiTemperatureModule
   | ApiHeaterShakerModule
+  | ApiAbsorbanceReaderModule
 
 export type ApiAttachedModuleLegacy =
   | ApiThermocyclerModuleLegacy

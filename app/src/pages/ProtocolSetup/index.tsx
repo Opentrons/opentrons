@@ -20,7 +20,7 @@ import {
   OVERFLOW_WRAP_ANYWHERE,
   POSITION_STICKY,
   SPACING,
-  StyledText,
+  LegacyStyledText,
   TEXT_ALIGN_RIGHT,
   truncateString,
   TYPOGRAPHY,
@@ -47,6 +47,7 @@ import {
   useAttachedModules,
   useLPCDisabledReason,
   useModuleCalibrationStatus,
+  useProtocolAnalysisErrors,
   useRobotAnalyticsData,
   useRobotType,
   useTrackProtocolRunEvent,
@@ -64,6 +65,7 @@ import { ProtocolSetupDeckConfiguration } from '../../organisms/ProtocolSetupDec
 import { useLaunchLPC } from '../../organisms/LabwarePositionCheck/useLaunchLPC'
 import { getUnmatchedModulesForProtocol } from '../../organisms/ProtocolSetupModulesAndDeck/utils'
 import { ConfirmCancelRunModal } from '../../organisms/OnDeviceDisplay/RunningProtocol'
+import { AnalysisFailedModal } from '../../organisms/ProtocolSetupParameters/AnalysisFailedModal'
 import {
   getIncompleteInstrumentCount,
   getProtocolUsesGripper,
@@ -90,6 +92,7 @@ import { getRequiredDeckConfig } from '../../resources/deck_configuration/utils'
 import { useNotifyRunQuery } from '../../resources/runs'
 import { ViewOnlyParameters } from '../../organisms/ProtocolSetupParameters/ViewOnlyParameters'
 
+import type { Run } from '@opentrons/api-client'
 import type { CutoutFixtureId, CutoutId } from '@opentrons/shared-data'
 import type { OnDeviceRouteParams } from '../../App/types'
 import type {
@@ -101,7 +104,7 @@ import type { ProtocolModuleInfo } from '../../organisms/Devices/ProtocolRun/uti
 const FETCH_DURATION_MS = 5000
 interface ProtocolSetupStepProps {
   onClickSetupStep: () => void
-  status: 'ready' | 'not ready' | 'general'
+  status: 'ready' | 'not ready' | 'general' | 'inform'
   title: string
   // first line of detail text
   detail?: string | null
@@ -112,9 +115,11 @@ interface ProtocolSetupStepProps {
   // display the reason the setup step is disabled
   disabledReason?: string | null
   //  optional description
-  description?: string
-  //  optional removal of the icon
-  hasIcon?: boolean
+  description?: string | null
+  //  optional removal of the left icon
+  hasLeftIcon?: boolean
+  //  optional removal of the right icon
+  hasRightIcon?: boolean
   //  optional enlarge the font size
   fontSize?: string
 }
@@ -128,13 +133,15 @@ export function ProtocolSetupStep({
   disabled = false,
   disabledReason,
   description,
-  hasIcon = true,
+  hasRightIcon = true,
+  hasLeftIcon = true,
   fontSize = 'p',
 }: ProtocolSetupStepProps): JSX.Element {
   const backgroundColorByStepStatus = {
     ready: COLORS.green35,
     'not ready': COLORS.yellow35,
     general: COLORS.grey35,
+    inform: COLORS.grey35,
   }
   const { makeSnackbar } = useToaster()
 
@@ -153,6 +160,9 @@ export function ProtocolSetupStep({
       case 'ready':
         backgroundColor = COLORS.green40
         break
+      case 'inform':
+        backgroundColor = COLORS.grey50
+        break
       default:
         backgroundColor = COLORS.yellow40
     }
@@ -168,9 +178,9 @@ export function ProtocolSetupStep({
 
   return (
     <Btn
-      onClick={() =>
+      onClick={() => {
         !disabled ? onClickSetupStep() : makeDisabledReasonSnackbar()
-      }
+      }}
       width="100%"
     >
       <Flex
@@ -183,7 +193,11 @@ export function ProtocolSetupStep({
         padding={`${SPACING.spacing20} ${SPACING.spacing24}`}
         css={PUSHED_STATE_STYLE}
       >
-        {status !== 'general' && !disabled ? (
+        {status !== 'general' &&
+        !disabled &&
+        status !== 'inform' &&
+        !disabled &&
+        hasLeftIcon ? (
           <Icon
             color={status === 'ready' ? COLORS.green50 : COLORS.yellow50}
             size="2rem"
@@ -194,16 +208,22 @@ export function ProtocolSetupStep({
           flexDirection={DIRECTION_COLUMN}
           textAlign={TYPOGRAPHY.textAlignLeft}
         >
-          <StyledText
+          <LegacyStyledText
             as="h4"
             fontWeight={TYPOGRAPHY.fontWeightSemiBold}
             color={disabled ? COLORS.grey50 : COLORS.black90}
           >
             {title}
-          </StyledText>
-          <StyledText as="h4" color={COLORS.grey50} maxWidth="35rem">
-            {description}
-          </StyledText>
+          </LegacyStyledText>
+          {description != null ? (
+            <LegacyStyledText
+              as="h4"
+              color={disabled ? COLORS.grey50 : COLORS.grey60}
+              maxWidth="35rem"
+            >
+              {description}
+            </LegacyStyledText>
+          ) : null}
         </Flex>
         <Flex
           flex="1"
@@ -212,7 +232,7 @@ export function ProtocolSetupStep({
             isToggle ? `${SPACING.spacing12} ${SPACING.spacing10}` : 'undefined'
           }
         >
-          <StyledText
+          <LegacyStyledText
             as={fontSize}
             textAlign={TEXT_ALIGN_RIGHT}
             color={disabled ? COLORS.grey50 : COLORS.black90}
@@ -221,9 +241,9 @@ export function ProtocolSetupStep({
             {detail}
             {subDetail != null && detail != null ? <br /> : null}
             {subDetail}
-          </StyledText>
+          </LegacyStyledText>
         </Flex>
-        {disabled || !hasIcon ? null : (
+        {disabled || !hasRightIcon ? null : (
           <Icon
             marginLeft={SPACING.spacing8}
             name="more"
@@ -244,6 +264,7 @@ interface PrepareToRunProps {
   confirmAttachment: () => void
   play: () => void
   robotName: string
+  runRecord: Run | null
 }
 
 function PrepareToRun({
@@ -252,6 +273,7 @@ function PrepareToRun({
   confirmAttachment,
   play,
   robotName,
+  runRecord,
 }: PrepareToRunProps): JSX.Element {
   const { t, i18n } = useTranslation(['protocol_setup', 'shared'])
   const history = useHistory()
@@ -265,7 +287,6 @@ function PrepareToRun({
     observer.observe(scrollRef.current)
   }
 
-  const { data: runRecord } = useNotifyRunQuery(runId, { staleTime: Infinity })
   const protocolId = runRecord?.data?.protocolId ?? null
   const { data: protocolRecord } = useProtocolQuery(protocolId, {
     staleTime: Infinity,
@@ -365,7 +386,8 @@ function PrepareToRun({
   const runTimeParameters = mostRecentAnalysis?.runTimeParameters ?? []
   const hasRunTimeParameters = runTimeParameters.length > 0
   const hasCustomRunTimeParameters = runTimeParameters.some(
-    parameter => parameter.value !== parameter.default
+    parameter =>
+      parameter.type === 'csv_file' || parameter.value !== parameter.default
   )
 
   const [
@@ -480,7 +502,7 @@ function PrepareToRun({
     incompleteInstrumentCount === 0 && areModulesReady && areFixturesReady
   const onPlay = (): void => {
     if (isDoorOpen) {
-      makeSnackbar(t('shared:close_robot_door'))
+      makeSnackbar(t('shared:close_robot_door') as string)
     } else {
       if (
         isHeaterShakerInProtocol &&
@@ -493,7 +515,7 @@ function PrepareToRun({
           play()
           trackProtocolRunEvent({
             name: ANALYTICS_PROTOCOL_RUN_ACTION.START,
-            properties: robotAnalyticsData != null ? robotAnalyticsData : {},
+            properties: robotAnalyticsData ?? {},
           })
         } else {
           makeSnackbar(
@@ -655,17 +677,20 @@ function PrepareToRun({
           >
             {!isLoading ? (
               <>
-                <StyledText as="h4" fontWeight={TYPOGRAPHY.fontWeightBold}>
+                <LegacyStyledText
+                  as="h4"
+                  fontWeight={TYPOGRAPHY.fontWeightBold}
+                >
                   {t('prepare_to_run')}
-                </StyledText>
-                <StyledText
+                </LegacyStyledText>
+                <LegacyStyledText
                   as="h4"
                   color={COLORS.grey50}
                   fontWeight={TYPOGRAPHY.fontWeightSemiBold}
                   overflowWrap={OVERFLOW_WRAP_ANYWHERE}
                 >
                   {truncateString(protocolName, 100)}
-                </StyledText>
+                </LegacyStyledText>
               </>
             ) : (
               <ProtocolSetupTitleSkeleton />
@@ -675,7 +700,9 @@ function PrepareToRun({
             <CloseButton
               onClose={
                 !isLoading
-                  ? () => setShowConfirmCancelModal(true)
+                  ? () => {
+                      setShowConfirmCancelModal(true)
+                    }
                   : onConfirmCancelClose
               }
             />
@@ -697,14 +724,18 @@ function PrepareToRun({
         {!isLoading ? (
           <>
             <ProtocolSetupStep
-              onClickSetupStep={() => setSetupScreen('instruments')}
+              onClickSetupStep={() => {
+                setSetupScreen('instruments')
+              }}
               title={t('instruments')}
               detail={instrumentsDetail}
               status={instrumentsStatus}
               disabled={speccedInstrumentCount === 0}
             />
             <ProtocolSetupStep
-              onClickSetupStep={() => setSetupScreen('modules')}
+              onClickSetupStep={() => {
+                setSetupScreen('modules')
+              }}
               title={t('deck_hardware')}
               detail={modulesDetail}
               subDetail={modulesSubDetail}
@@ -733,7 +764,9 @@ function PrepareToRun({
               disabledReason={lpcDisabledReason}
             />
             <ProtocolSetupStep
-              onClickSetupStep={() => setSetupScreen('view only parameters')}
+              onClickSetupStep={() => {
+                setSetupScreen('view only parameters')
+              }}
               title={t('parameters')}
               detail={parametersDetail}
               subDetail={null}
@@ -741,7 +774,9 @@ function PrepareToRun({
               disabled={!hasRunTimeParameters}
             />
             <ProtocolSetupStep
-              onClickSetupStep={() => setSetupScreen('labware')}
+              onClickSetupStep={() => {
+                setSetupScreen('labware')
+              }}
               title={t('labware')}
               detail={labwareDetail}
               subDetail={labwareSubDetail}
@@ -749,7 +784,9 @@ function PrepareToRun({
               disabled={labwareDetail == null}
             />
             <ProtocolSetupStep
-              onClickSetupStep={() => setSetupScreen('liquids')}
+              onClickSetupStep={() => {
+                setSetupScreen('liquids')
+              }}
               title={t('liquids')}
               status="general"
               detail={
@@ -790,11 +827,17 @@ export type SetupScreens =
 
 export function ProtocolSetup(): JSX.Element {
   const { runId } = useParams<OnDeviceRouteParams>()
+  const { data: runRecord } = useNotifyRunQuery(runId, { staleTime: Infinity })
+  const { analysisErrors } = useProtocolAnalysisErrors(runId)
   const localRobot = useSelector(getLocalRobot)
   const robotSerialNumber =
     localRobot?.status != null ? getRobotSerialNumber(localRobot) : null
   const trackEvent = useTrackEvent()
   const { play } = useRunControls(runId)
+  const [
+    showAnalysisFailedModal,
+    setShowAnalysisFailedModal,
+  ] = React.useState<boolean>(true)
 
   const handleProceedToRunClick = (): void => {
     trackEvent({
@@ -831,6 +874,7 @@ export function ProtocolSetup(): JSX.Element {
         confirmAttachment={confirmAttachment}
         play={play}
         robotName={localRobot?.name != null ? localRobot.name : 'no name'}
+        runRecord={runRecord ?? null}
       />
     ),
     instruments: (
@@ -865,6 +909,15 @@ export function ProtocolSetup(): JSX.Element {
 
   return (
     <>
+      {showAnalysisFailedModal &&
+      analysisErrors != null &&
+      analysisErrors?.length > 0 ? (
+        <AnalysisFailedModal
+          setShowAnalysisFailedModal={setShowAnalysisFailedModal}
+          protocolId={runRecord?.data.protocolId ?? null}
+          errors={analysisErrors.map(error => error.detail)}
+        />
+      ) : null}
       {showConfirmationModal ? (
         <ConfirmAttachedModal
           onCloseClick={cancelExit}

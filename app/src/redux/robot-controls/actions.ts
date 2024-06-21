@@ -1,5 +1,5 @@
 import * as Constants from './constants'
-import * as Types from './types'
+import type * as Types from './types'
 
 import type { RobotApiRequestMeta } from '../robot-api/types'
 import type { Mount } from '../pipettes/types'

@@ -14,7 +14,7 @@ import {
   JUSTIFY_SPACE_BETWEEN,
   SIZE_1,
   SPACING,
-  StyledText,
+  LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { MICRO_LITERS } from '@opentrons/shared-data'
@@ -99,7 +99,9 @@ export function LiquidDetailCard(props: LiquidDetailCardProps): JSX.Element {
       css={selectedValue === liquidId ? ACTIVE_STYLE : LIQUID_CARD_ODD_STYLE}
       borderRadius={BORDERS.borderRadius8}
       backgroundColor={COLORS.white}
-      onClick={() => setSelectedValue(liquidId)}
+      onClick={() => {
+        setSelectedValue(liquidId)
+      }}
       width="19.875rem"
       minHeight="max-content"
       aria-label="liquidBox_odd"
@@ -116,21 +118,21 @@ export function LiquidDetailCard(props: LiquidDetailCardProps): JSX.Element {
         >
           <Icon name="circle" color={displayColor} size="1.4rem" />
         </Flex>
-        <StyledText
+        <LegacyStyledText
           fontSize={TYPOGRAPHY.fontSize22}
           lineHeight={TYPOGRAPHY.lineHeight28}
           fontWeight={TYPOGRAPHY.fontWeightSemiBold}
           marginTop={SPACING.spacing12}
         >
           {displayName}
-        </StyledText>
-        <StyledText
+        </LegacyStyledText>
+        <LegacyStyledText
           fontSize={TYPOGRAPHY.fontSize22}
           lineHeight={TYPOGRAPHY.lineHeight28}
           color={COLORS.grey50}
         >
           {description != null ? description : null}
-        </StyledText>
+        </LegacyStyledText>
         <Flex
           backgroundColor={`${COLORS.black90}${COLORS.opacity20HexCode}`}
           borderRadius={BORDERS.borderRadius4}
@@ -140,7 +142,7 @@ export function LiquidDetailCard(props: LiquidDetailCardProps): JSX.Element {
           marginTop={SPACING.spacing16}
           width="max-content"
         >
-          <StyledText
+          <LegacyStyledText
             fontSize={TYPOGRAPHY.fontSize22}
             lineHeight={TYPOGRAPHY.lineHeight28}
             color={COLORS.black90}
@@ -149,7 +151,7 @@ export function LiquidDetailCard(props: LiquidDetailCardProps): JSX.Element {
               .reduce((prev, curr) => prev + curr, 0)
               .toFixed(1)}{' '}
             {MICRO_LITERS}
-          </StyledText>
+          </LegacyStyledText>
         </Flex>
       </Flex>
       {selectedValue === liquidId ? (
@@ -172,19 +174,19 @@ export function LiquidDetailCard(props: LiquidDetailCardProps): JSX.Element {
                       : '0'
                   }
                 >
-                  <StyledText
+                  <LegacyStyledText
                     lineHeight={TYPOGRAPHY.lineHeight28}
                     fontSize={TYPOGRAPHY.fontSize22}
                   >
                     {well.wellName}
-                  </StyledText>
-                  <StyledText
+                  </LegacyStyledText>
+                  <LegacyStyledText
                     lineHeight={TYPOGRAPHY.lineHeight28}
                     fontSize={TYPOGRAPHY.fontSize22}
                     color={COLORS.grey60}
                   >
                     {well.volume} {MICRO_LITERS}
-                  </StyledText>
+                  </LegacyStyledText>
                 </Flex>
               )
             })}
@@ -216,16 +218,16 @@ export function LiquidDetailCard(props: LiquidDetailCardProps): JSX.Element {
         >
           <Icon name="circle" color={displayColor} size={SIZE_1} />
         </Flex>
-        <StyledText
+        <LegacyStyledText
           as="h3"
           fontWeight={TYPOGRAPHY.fontWeightSemiBold}
           marginTop={SPACING.spacing8}
         >
           {displayName}
-        </StyledText>
-        <StyledText as="p" color={COLORS.grey50}>
+        </LegacyStyledText>
+        <LegacyStyledText as="p" color={COLORS.grey50}>
           {description != null ? description : null}
-        </StyledText>
+        </LegacyStyledText>
 
         <Flex
           backgroundColor={`${COLORS.black90}${COLORS.opacity20HexCode}`}
@@ -236,7 +238,7 @@ export function LiquidDetailCard(props: LiquidDetailCardProps): JSX.Element {
           paddingX={SPACING.spacing8}
           marginTop={SPACING.spacing8}
         >
-          <StyledText
+          <LegacyStyledText
             fontSize={TYPOGRAPHY.fontSizeH4}
             lineHeight={TYPOGRAPHY.lineHeight20}
           >
@@ -244,7 +246,7 @@ export function LiquidDetailCard(props: LiquidDetailCardProps): JSX.Element {
               .reduce((prev, curr) => prev + curr, 0)
               .toFixed(1)}{' '}
             {MICRO_LITERS}
-          </StyledText>
+          </LegacyStyledText>
         </Flex>
       </Flex>
       {selectedValue === liquidId ? (
@@ -266,16 +268,19 @@ export function LiquidDetailCard(props: LiquidDetailCardProps): JSX.Element {
                     : '0'
                 }
               >
-                <StyledText
+                <LegacyStyledText
                   as="p"
                   fontWeight={TYPOGRAPHY.fontWeightRegular}
                   marginRight={SPACING.spacing4}
                 >
                   {well.wellName}
-                </StyledText>
-                <StyledText as="p" fontWeight={TYPOGRAPHY.fontWeightRegular}>
+                </LegacyStyledText>
+                <LegacyStyledText
+                  as="p"
+                  fontWeight={TYPOGRAPHY.fontWeightRegular}
+                >
                   {well.volume.toFixed(1)} {MICRO_LITERS}
-                </StyledText>
+                </LegacyStyledText>
               </Flex>
             )
           })}

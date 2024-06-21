@@ -55,6 +55,7 @@ def create_hepa_uv_state_response(
     duration: int,
     remaining_time: int,
     uv_current: int,
+    safety_relay_active: bool,
 ) -> MessageDefinition:
     """Create a GetHepaUVStateResponse."""
     return md.GetHepaUVStateResponse(
@@ -63,6 +64,7 @@ def create_hepa_uv_state_response(
             uv_duration_s=UInt32Field(duration),
             remaining_time_s=UInt32Field(remaining_time),
             uv_current_ma=UInt16Field(uv_current),
+            safety_relay_active=UInt8Field(safety_relay_active),
         )
     )
 
@@ -162,12 +164,29 @@ async def test_get_hepa_fan_state(
     [
         (
             NodeId.host,
-            create_hepa_uv_state_response(True, 900, 300, 3300),
+            create_hepa_uv_state_response(True, 900, 300, 3300, True),
             NodeId.hepa_uv,
         ),
-        (NodeId.host, create_hepa_uv_state_response(True, 0, 0, 33000), NodeId.hepa_uv),
-        (NodeId.host, create_hepa_uv_state_response(False, 0, 0, 0), NodeId.hepa_uv),
-        (NodeId.host, create_hepa_uv_state_response(False, 900, 0, 0), NodeId.hepa_uv),
+        (
+            NodeId.host,
+            create_hepa_uv_state_response(True, 0, 0, 33000, True),
+            NodeId.hepa_uv,
+        ),
+        (
+            NodeId.host,
+            create_hepa_uv_state_response(True, 0, 0, 33000, False),
+            NodeId.hepa_uv,
+        ),
+        (
+            NodeId.host,
+            create_hepa_uv_state_response(False, 0, 0, 0, True),
+            NodeId.hepa_uv,
+        ),
+        (
+            NodeId.host,
+            create_hepa_uv_state_response(False, 900, 0, 0, False),
+            NodeId.hepa_uv,
+        ),
     ],
 )
 async def test_get_hepa_uv_state(
@@ -202,6 +221,7 @@ async def test_get_hepa_uv_state(
             int(payload.uv_duration_s.value),
             int(payload.remaining_time_s.value),
             int(payload.uv_current_ma.value),
+            bool(payload.safety_relay_active.value),
         )
         == res
     )

@@ -6,6 +6,7 @@ import type { GantryRunTimeCommand, GantryCreateCommand } from './gantry'
 import type { ModuleRunTimeCommand, ModuleCreateCommand } from './module'
 import type { SetupRunTimeCommand, SetupCreateCommand } from './setup'
 import type { TimingRunTimeCommand, TimingCreateCommand } from './timing'
+import type { CommandIntent } from '../../../../command'
 
 export * from './pipetting'
 export * from './gantry'
@@ -26,7 +27,7 @@ export interface CommonCommandRunTimeInfo {
   createdAt: string
   startedAt: string | null
   completedAt: string | null
-  intent?: 'protocol' | 'setup'
+  intent?: CommandIntent
 }
 export interface CommonCommandCreateInfo {
   key?: string

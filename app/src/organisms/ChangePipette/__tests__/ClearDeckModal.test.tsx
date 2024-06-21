@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { fireEvent } from '@testing-library/react'
+import { fireEvent, screen } from '@testing-library/react'
 import { vi, it, describe, expect, beforeEach } from 'vitest'
 
 import { renderWithProviders } from '../../../__testing-utils__'
@@ -19,20 +19,20 @@ describe('ClearDeckModal', () => {
     }
   })
   it('renders the correct information when pipette is not attached', () => {
-    const { getByText } = render(props)
-    getByText('Before you begin')
-    getByText(
+    render(props)
+    screen.getByText('Before you begin')
+    screen.getByText(
       'Before starting, remove all labware from the deck and all tips from pipettes. The gantry will move to the front of the robot.'
     )
   })
 
   it('renders the correct information when pipette is attached', () => {
-    const { getByText, getByRole } = render(props)
-    getByText('Before you begin')
-    getByText(
+    render(props)
+    screen.getByText('Before you begin')
+    screen.getByText(
       'Before starting, remove all labware from the deck and all tips from pipettes. The gantry will move to the front of the robot.'
     )
-    const cont = getByRole('button', { name: 'Get started' })
+    const cont = screen.getByRole('button', { name: 'Get started' })
     fireEvent.click(cont)
     expect(props.onContinueClick).toHaveBeenCalled()
   })

@@ -747,7 +747,7 @@ class OT3PipetteHandler:
             raise UnexpectedTipAttachError("pick_up_tip", instrument.name, mount.name)
         self._ihp_log.debug(f"Picking up tip on {mount.name}")
 
-        pick_up_config = instrument.get_pick_up_configuration_for_tip_count(tip_count)
+        pick_up_config = instrument.get_pick_up_configuration()
         if not isinstance(pick_up_config, CamActionPickUpTipConfiguration):
             raise CommandPreconditionViolated(
                 f"Low-throughput pick up tip got wrong config for {instrument.name} on {mount.name}"
@@ -755,11 +755,17 @@ class OT3PipetteHandler:
 
         tip_motor_moves = self._build_tip_motor_moves(
             prep_move_dist=pick_up_config.prep_move_distance,
-            clamp_move_dist=pick_up_config.distance,
+            clamp_move_dist=instrument.get_pick_up_distance_by_configuration(
+                pick_up_config
+            ),
             prep_move_speed=pick_up_config.prep_move_speed,
-            clamp_move_speed=pick_up_config.speed,
+            clamp_move_speed=instrument.get_pick_up_speed_by_configuration(
+                pick_up_config
+            ),
             plunger_current=instrument.plunger_motor_current.run,
-            tip_motor_current=pick_up_config.current_by_tip_count[tip_count],
+            tip_motor_current=instrument.get_pick_up_current_by_configuration(
+                pick_up_config
+            ),
         )
 
         return TipActionSpec(
@@ -782,7 +788,7 @@ class OT3PipetteHandler:
             raise UnexpectedTipAttachError("pick_up_tip", instrument.name, mount.name)
         self._ihp_log.debug(f"Picking up tip on {mount.name}")
 
-        pick_up_config = instrument.get_pick_up_configuration_for_tip_count(tip_count)
+        pick_up_config = instrument.get_pick_up_configuration()
         if not isinstance(pick_up_config, PressFitPickUpTipConfiguration):
             raise CommandPreconditionViolated(
                 f"Low-throughput pick up tip got wrong config for {instrument.name} on {mount.name}"
@@ -797,7 +803,7 @@ class OT3PipetteHandler:
         else:
             check_incr = increment
 
-        pick_up_speed = pick_up_config.speed_by_tip_count[tip_count]
+        pick_up_speed = instrument.get_pick_up_speed_by_configuration(pick_up_config)
 
         def build_presses() -> List[TipActionMoveSpec]:
             # Press the nozzle into the tip <presses> number of times,
@@ -806,7 +812,8 @@ class OT3PipetteHandler:
             for i in range(checked_presses):
                 # move nozzle down into the tip
                 press_dist = (
-                    -1.0 * pick_up_config.distance_by_tip_count[tip_count]
+                    -1.0
+                    * instrument.get_pick_up_distance_by_configuration(pick_up_config)
                     + -1.0 * check_incr * i
                 )
                 press_moves.append(
@@ -814,9 +821,11 @@ class OT3PipetteHandler:
                         distance=press_dist,
                         speed=pick_up_speed,
                         currents={
-                            Axis.by_mount(mount): pick_up_config.current_by_tip_count[
-                                tip_count
-                            ]
+                            Axis.by_mount(
+                                mount
+                            ): instrument.get_pick_up_current_by_configuration(
+                                pick_up_config
+                            )
                         },
                     )
                 )

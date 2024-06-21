@@ -35,15 +35,23 @@ class google_drive:
             print("Error! Get file: https://console.cloud.google.com/apis/credentials")
             sys.exit()
 
-    def list_folder(self, delete: Any = False) -> Set[str]:
+    def list_folder(self, delete: Any = False, folder: bool = False) -> Set[str]:
         """List folders and files in Google Drive."""
         file_names = set()
         page_token: str = ""
+        basic_query = f"'{self.parent_folder}' in parents and trashed=false"
+        folder_query = (
+            basic_query + " and mimeType='application/vnd.google-apps.folder'"
+        )
+        if folder is True:
+            query = folder_query
+        else:
+            query = basic_query
         while True:
             results = (
                 self.drive_service.files()
                 .list(
-                    q=f"'{self.parent_folder}' in parents and trashed=false"
+                    q=query
                     if self.parent_folder
                     else ""  # type: ignore
                     if self.parent_folder
@@ -69,6 +77,29 @@ class google_drive:
                 print("No folders or files found in Google Drive.")
         return file_names
 
+    def create_folder(self, new_folder_name: str) -> str:
+        """Create folder within defined folder."""
+        file_metadata = {
+            "name": new_folder_name,
+            "mimeType": "application/vnd.google-apps.folder",
+            "parents": [self.parent_folder],
+        }
+        list_of_current_folders = self.list_folder(folder=True)
+        if new_folder_name in list_of_current_folders:
+            print("Folder name already exists. Try new folder name or delete folder.")
+            return ""
+        else:
+            file = (
+                self.drive_service.files()
+                .create(body=file_metadata, fields="id")  # type: ignore
+                .execute()
+            )
+            folder_id = file.get("id", "")
+            self.share_permissions(folder_id)
+            # SHARE FOLDER WITH EMAIL
+            print(f'Folder ID: "{file.get("id")}".')
+            return file.get("id", "")
+
     def delete_files(self, file_or_folder_id: str) -> None:
         """Delete a file or folder in Google Drive by ID."""
         try:
@@ -78,12 +109,12 @@ class google_drive:
             print(f"Error deleting file/folder with ID: {file_or_folder_id}")
             print(f"Error details: {str(e)}")
 
-    def upload_file(self, file_path: str) -> str:
+    def upload_file(self, file_path: str, folder_name: str) -> str:
         """Upload file to Google Drive."""
         file_metadata = {
             "name": os.path.basename(file_path),
             "mimeType": str(mimetypes.guess_type(file_path)[0]),
-            "parents": [self.parent_folder],
+            "parents": [folder_name],
         }
         media = MediaFileUpload(file_path, resumable=True)
 
@@ -92,7 +123,12 @@ class google_drive:
             .create(body=file_metadata, media_body=media, fields="id")  # type: ignore
             .execute()
         )
-        return uploaded_file["id"]
+        uploaded_file_id = uploaded_file["id"]
+        try:
+            self.share_permissions(uploaded_file_id)
+        except googleapiclient.errors.HttpError:
+            print(f"File '{uploaded_file_id}' was not found after uploading.")
+        return uploaded_file_id
 
     def upload_missing_files(self, storage_directory: str) -> None:
         """Upload missing files to Google Drive."""
@@ -110,7 +146,7 @@ class google_drive:
         uploaded_files = []
         for file in missing_files:
             file_path = os.path.join(storage_directory, file)
-            uploaded_file_id = google_drive.upload_file(self, file_path)
+            uploaded_file_id = self.upload_file(file_path, self.parent_folder)
             uploaded_files.append(
                 {"name": os.path.basename(file_path), "id": uploaded_file_id}
             )

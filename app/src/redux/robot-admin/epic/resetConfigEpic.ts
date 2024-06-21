@@ -11,7 +11,7 @@ import type {
   ActionToRequestMapper,
   ResponseToActionMapper,
 } from '../../robot-api/operators'
-import {
+import type {
   ResetConfigAction,
   ResetConfigSuccessAction,
   RestartRobotAction,
@@ -32,7 +32,11 @@ const mapResponseToAction: ResponseToActionMapper<ResetConfigAction> = (
 
   return response.ok
     ? Actions.resetConfigSuccess(host.name, meta)
-    : Actions.resetConfigFailure(host.name, body, meta)
+    : Actions.resetConfigFailure(
+        host.name,
+        body as Record<string, unknown>,
+        meta
+      )
 }
 
 export const resetConfigEpic: Epic = (action$, state$) => {

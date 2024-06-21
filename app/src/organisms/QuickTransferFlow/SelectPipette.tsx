@@ -3,18 +3,19 @@ import { useTranslation } from 'react-i18next'
 import {
   Flex,
   SPACING,
-  StyledText,
+  LegacyStyledText,
   TYPOGRAPHY,
   DIRECTION_COLUMN,
 } from '@opentrons/components'
 import { useInstrumentsQuery } from '@opentrons/react-api-client'
 import { getPipetteSpecsV2, RIGHT, LEFT } from '@opentrons/shared-data'
-import { SmallButton, LargeButton } from '../../atoms/buttons'
+import { LargeButton } from '../../atoms/buttons'
 import { ChildNavigation } from '../ChildNavigation'
 
 import type { PipetteData, Mount } from '@opentrons/api-client'
+import type { SmallButton } from '../../atoms/buttons'
 import type {
-  QuickTransferSetupState,
+  QuickTransferWizardState,
   QuickTransferWizardAction,
 } from './types'
 
@@ -22,7 +23,7 @@ interface SelectPipetteProps {
   onNext: () => void
   onBack: () => void
   exitButtonProps: React.ComponentProps<typeof SmallButton>
-  state: QuickTransferSetupState
+  state: QuickTransferWizardState
   dispatch: React.Dispatch<QuickTransferWizardAction>
 }
 
@@ -81,12 +82,12 @@ export function SelectPipette(props: SelectPipetteProps): JSX.Element {
         padding={`${SPACING.spacing16} ${SPACING.spacing60} ${SPACING.spacing40} ${SPACING.spacing60}`}
         gridGap={SPACING.spacing4}
       >
-        <StyledText
+        <LegacyStyledText
           css={TYPOGRAPHY.level4HeaderRegular}
           paddingBottom={SPACING.spacing8}
         >
           {t('pipette_currently_attached')}
-        </StyledText>
+        </LegacyStyledText>
         {leftPipetteSpecs != null ? (
           <LargeButton
             buttonType={selectedPipette === LEFT ? 'primary' : 'secondary'}

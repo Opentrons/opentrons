@@ -14,7 +14,7 @@ import {
   Icon,
   Link,
   SPACING,
-  StyledText,
+  LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { FLEX_ROBOT_TYPE, OT2_ROBOT_TYPE } from '@opentrons/shared-data'
@@ -150,33 +150,24 @@ export function ProtocolRunSetup({
   if (robot == null) return null
 
   const liquids = protocolAnalysis?.liquids ?? []
-
   const liquidsInLoadOrder =
     protocolAnalysis != null
       ? parseLiquidsInLoadOrder(liquids, protocolAnalysis.commands)
       : []
-
   const hasLiquids = liquidsInLoadOrder.length > 0
-
   const hasModules = protocolAnalysis != null && modules.length > 0
-
   // need config compatibility (including check for single slot conflicts)
   const requiredDeckConfigCompatibility = getRequiredDeckConfig(
     deckConfigCompatibility
   )
-
   const hasFixtures = requiredDeckConfigCompatibility.length > 0
-
-  let moduleDescription: string = t(`${MODULE_SETUP_KEY}_description`, {
-    count: modules.length,
-  })
-  if (!hasModules && !isFlex) {
-    moduleDescription = i18n.format(t('no_modules_specified'), 'capitalize')
-  } else if (isFlex && (hasModules || hasFixtures)) {
-    moduleDescription = t('install_modules_and_fixtures')
-  } else if (isFlex && !hasModules && !hasFixtures) {
-    moduleDescription = t('no_modules_or_fixtures')
-  }
+  const flexDeckHardwareDescription =
+    hasModules || hasFixtures
+      ? t('install_modules_and_fixtures')
+      : t('no_deck_hardware_specified')
+  const ot2DeckHardwareDescription = hasModules
+    ? t('install_modules', { count: modules.length })
+    : t('no_deck_hardware_specified')
 
   const StepDetailMap: Record<
     StepKey,
@@ -206,20 +197,26 @@ export function ProtocolRunSetup({
     [MODULE_SETUP_KEY]: {
       stepInternals: (
         <SetupModuleAndDeck
-          expandLabwarePositionCheckStep={() => setExpandedStepKey(LPC_KEY)}
+          expandLabwarePositionCheckStep={() => {
+            setExpandedStepKey(LPC_KEY)
+          }}
           robotName={robotName}
           runId={runId}
           hasModules={hasModules}
           protocolAnalysis={protocolAnalysis}
         />
       ),
-      description: moduleDescription,
+      description: isFlex
+        ? flexDeckHardwareDescription
+        : ot2DeckHardwareDescription,
     },
     [LPC_KEY]: {
       stepInternals: (
         <SetupLabwarePositionCheck
           {...{ runId, robotName }}
-          expandLabwareStep={() => setExpandedStepKey(LABWARE_SETUP_KEY)}
+          expandLabwareStep={() => {
+            setExpandedStepKey(LABWARE_SETUP_KEY)
+          }}
         />
       ),
       description: t('labware_position_check_step_description'),
@@ -268,16 +265,12 @@ export function ProtocolRunSetup({
             <InfoMessage title={t('setup_is_view_only')} />
           ) : null}
           {analysisErrors != null && analysisErrors?.length > 0 ? (
-            <StyledText alignSelf={ALIGN_CENTER} color={COLORS.grey50}>
+            <LegacyStyledText alignSelf={ALIGN_CENTER} color={COLORS.grey50}>
               {t('protocol_analysis_failed')}
-            </StyledText>
+            </LegacyStyledText>
           ) : (
             stepsKeysInOrder.map((stepKey, index) => {
-              const setupStepTitle = t(
-                isFlex && stepKey === MODULE_SETUP_KEY
-                  ? `module_and_deck_setup`
-                  : `${stepKey}_title`
-              )
+              const setupStepTitle = t(`${stepKey}_title`)
               const showEmptySetupStep =
                 (stepKey === 'liquid_setup_step' && !hasLiquids) ||
                 (stepKey === 'module_setup_step' &&
@@ -297,11 +290,11 @@ export function ProtocolRunSetup({
                       label={t('step', { index: index + 1 })}
                       title={setupStepTitle}
                       description={StepDetailMap[stepKey].description}
-                      toggleExpanded={() =>
+                      toggleExpanded={() => {
                         stepKey === expandedStepKey
                           ? setExpandedStepKey(null)
                           : setExpandedStepKey(stepKey)
-                      }
+                      }}
                       rightElement={
                         <StepRightElement
                           {...{
@@ -330,9 +323,9 @@ export function ProtocolRunSetup({
           )}
         </>
       ) : (
-        <StyledText alignSelf={ALIGN_CENTER} color={COLORS.grey50}>
+        <LegacyStyledText alignSelf={ALIGN_CENTER} color={COLORS.grey50}>
           {t('loading_data')}
-        </StyledText>
+        </LegacyStyledText>
       )}
     </Flex>
   )
@@ -399,15 +392,16 @@ function StepRightElement(props: StepRightElementProps): JSX.Element | null {
           name={calibrationStatus?.complete ? 'ot-check' : 'alert-circle'}
           id="RunSetupCard_calibrationIcon"
         />
-        <StyledText
+        <LegacyStyledText
           color={COLORS.black90}
           css={TYPOGRAPHY.pSemiBold}
           marginRight={SPACING.spacing16}
           textTransform={TYPOGRAPHY.textTransformCapitalize}
           id="RunSetupCard_calibrationText"
+          whiteSpace="nowrap"
         >
           {statusText}
-        </StyledText>
+        </LegacyStyledText>
       </Flex>
     ) : null
   } else if (stepKey === LPC_KEY) {
@@ -425,6 +419,7 @@ function LearnAboutLPC(): JSX.Element {
       <Link
         css={TYPOGRAPHY.linkPSemiBold}
         marginRight={SPACING.spacing16}
+        whiteSpace="nowrap"
         onClick={(e: React.MouseEvent) => {
           // clicking link shouldn't toggle step expanded state
           e.preventDefault()
@@ -435,7 +430,11 @@ function LearnAboutLPC(): JSX.Element {
         {t('learn_how_it_works')}
       </Link>
       {showLPCHelpModal ? (
-        <HowLPCWorksModal onCloseClick={() => setShowLPCHelpModal(false)} />
+        <HowLPCWorksModal
+          onCloseClick={() => {
+            setShowLPCHelpModal(false)
+          }}
+        />
       ) : null}
     </>
   )

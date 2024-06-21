@@ -1,7 +1,6 @@
 import * as React from 'react'
 import cx from 'classnames'
 import get from 'lodash/get'
-import { StepFieldName } from '../../steplist/fieldLevel'
 import { MoreOptionsModal } from '../modals/MoreOptionsModal'
 import {
   MixForm,
@@ -17,8 +16,9 @@ import { Alerts } from '../alerts/Alerts'
 import { ButtonRow } from './ButtonRow'
 import formStyles from '../forms/forms.module.css'
 import styles from './StepEditForm.module.css'
-import { FormData, StepType } from '../../form-types'
-import { FieldPropsByName, FocusHandlers, StepFormProps } from './types'
+import type { StepFieldName } from '../../steplist/fieldLevel'
+import type { FormData, StepType } from '../../form-types'
+import type { FieldPropsByName, FocusHandlers, StepFormProps } from './types'
 
 type StepFormMap = {
   [K in StepType]?: React.ComponentType<StepFormProps> | null

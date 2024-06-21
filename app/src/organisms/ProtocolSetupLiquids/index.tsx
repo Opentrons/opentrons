@@ -9,18 +9,19 @@ import {
   Icon,
   JUSTIFY_FLEX_END,
   SPACING,
-  StyledText,
+  LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import {
   parseLiquidsInLoadOrder,
   parseLabwareInfoByLiquidId,
 } from '@opentrons/api-client'
-import { MICRO_LITERS, RunTimeCommand } from '@opentrons/shared-data'
+import { MICRO_LITERS } from '@opentrons/shared-data'
 import { ODDBackButton } from '../../molecules/ODDBackButton'
 import { useMostRecentCompletedAnalysis } from '../LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import { getTotalVolumePerLiquidId } from '../Devices/ProtocolRun/SetupLiquids/utils'
 import { LiquidDetails } from './LiquidDetails'
+import type { RunTimeCommand } from '@opentrons/shared-data'
 import type { ParsedLiquid } from '@opentrons/api-client'
 import type { SetupScreens } from '../../pages/ProtocolSetup'
 
@@ -43,7 +44,9 @@ export function ProtocolSetupLiquids({
     <>
       <ODDBackButton
         label={t('liquids')}
-        onClick={() => setSetupScreen('prepare to run')}
+        onClick={() => {
+          setSetupScreen('prepare to run')
+        }}
       />
       <Flex
         flexDirection={DIRECTION_COLUMN}
@@ -88,7 +91,9 @@ export function LiquidsList(props: LiquidsListProps): JSX.Element {
         alignItems={ALIGN_CENTER}
         width="100%"
         gridGap={SPACING.spacing16}
-        onClick={() => setOpenItem(prevOpenItem => !prevOpenItem)}
+        onClick={() => {
+          setOpenItem(prevOpenItem => !prevOpenItem)
+        }}
         aria-label={`Liquids_${liquid.id}`}
       >
         <Flex
@@ -109,9 +114,9 @@ export function LiquidsList(props: LiquidsListProps): JSX.Element {
           flexDirection={DIRECTION_COLUMN}
           alignItems={TYPOGRAPHY.textAlignCenter}
         >
-          <StyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
+          <LegacyStyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
             {liquid.displayName}
-          </StyledText>
+          </LegacyStyledText>
         </Flex>
         <Flex justifyContent={JUSTIFY_FLEX_END} flex="1">
           <Flex

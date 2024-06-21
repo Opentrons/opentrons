@@ -12,7 +12,7 @@ import {
   SPACING,
   TYPOGRAPHY,
   useInterval,
-  StyledText,
+  LegacyStyledText,
 } from '@opentrons/components'
 
 import { EMPTY_TIMESTAMP } from '../Devices/constants'
@@ -82,17 +82,23 @@ interface PauseHeaderProps {
 function PauseHeader({ startedAt }: PauseHeaderProps): JSX.Element {
   const { t, i18n } = useTranslation('run_details')
   const [now, setNow] = React.useState(Date())
-  useInterval(() => setNow(Date()), 500, true)
+  useInterval(
+    () => {
+      setNow(Date())
+    },
+    500,
+    true
+  )
 
   const runTime =
     startedAt != null ? formatInterval(startedAt, now) : EMPTY_TIMESTAMP
 
   return (
     <Flex css={PAUSE_HEADER_STYLE}>
-      <StyledText css={PAUSE_TEXT_STYLE}>
+      <LegacyStyledText css={PAUSE_TEXT_STYLE}>
         {i18n.format(t('paused_for'), 'capitalize')}
-      </StyledText>
-      <StyledText css={PAUSE_TIME_STYLE}>{runTime}</StyledText>
+      </LegacyStyledText>
+      <LegacyStyledText css={PAUSE_TIME_STYLE}>{runTime}</LegacyStyledText>
     </Flex>
   )
 }

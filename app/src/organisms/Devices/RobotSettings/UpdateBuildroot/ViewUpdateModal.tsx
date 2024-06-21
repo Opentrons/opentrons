@@ -10,7 +10,7 @@ import {
   getRobotUpdateAvailable,
 } from '../../../../redux/robot-update'
 import { getAvailableShellUpdate } from '../../../../redux/shell'
-import { getModalPortalEl } from '../../../../App/portal'
+import { getTopPortalEl } from '../../../../App/portal'
 import { UpdateAppModal } from '../../../../organisms/UpdateAppModal'
 import { MigrationWarningModal } from './MigrationWarningModal'
 import { UpdateRobotModal } from './UpdateRobotModal'
@@ -59,8 +59,12 @@ export function ViewUpdateModal(
 
   if (availableAppUpdateVersion && showAppUpdateModal)
     return createPortal(
-      <UpdateAppModal closeModal={() => setShowAppUpdateModal(false)} />,
-      getModalPortalEl()
+      <UpdateAppModal
+        closeModal={() => {
+          setShowAppUpdateModal(false)
+        }}
+      />,
+      getTopPortalEl()
     )
 
   if (showMigrationWarning) {
@@ -68,7 +72,9 @@ export function ViewUpdateModal(
       <MigrationWarningModal
         notNowButton={notNowButton}
         updateType={robotUpdateType}
-        proceed={() => setShowMigrationWarning(false)}
+        proceed={() => {
+          setShowMigrationWarning(false)
+        }}
       />
     )
   }

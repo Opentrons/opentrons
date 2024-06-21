@@ -6,7 +6,7 @@ import {
   TYPOGRAPHY,
   SPACING,
   Flex,
-  StyledText,
+  LegacyStyledText,
 } from '@opentrons/components'
 import { css } from 'styled-components'
 import { SimpleWizardBody } from '../../molecules/SimpleWizardBody'
@@ -96,7 +96,7 @@ export const MovePin = (props: MovePinProps): JSX.Element | null => {
                     setErrorMessage(data.error?.detail ?? null)
                   }
                   if (jaw === 'front' && data?.result?.jawOffset != null) {
-                    setFrontJawOffset(data.result.jawOffset)
+                    setFrontJawOffset(data.result.jawOffset as Coordinates)
                   }
                   createRunCommand({
                     maintenanceRunId,
@@ -114,13 +114,21 @@ export const MovePin = (props: MovePinProps): JSX.Element | null => {
                       }
                       proceed()
                     })
-                    .catch(error => setErrorMessage(error.message))
+                    .catch(error => {
+                      setErrorMessage(error.message as string)
+                    })
                 })
-                .catch(error => setErrorMessage(error.message))
+                .catch(error => {
+                  setErrorMessage(error.message as string)
+                })
             })
-            .catch(error => setErrorMessage(error.message))
+            .catch(error => {
+              setErrorMessage(error.message as string)
+            })
         })
-        .catch(error => setErrorMessage(error.message))
+        .catch(error => {
+          setErrorMessage(error.message as string)
+        })
     }
   }
   const infoByMovement: {
@@ -265,9 +273,12 @@ export const MovePin = (props: MovePinProps): JSX.Element | null => {
           i18nKey={'return_pin_error'}
           values={{ error: errorMessage }}
           components={{
-            block: <StyledText as="p" />,
+            block: <LegacyStyledText as="p" />,
             bold: (
-              <StyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold} />
+              <LegacyStyledText
+                as="p"
+                fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+              />
             ),
           }}
         />
@@ -277,7 +288,7 @@ export const MovePin = (props: MovePinProps): JSX.Element | null => {
     <GenericWizardTile
       header={header}
       rightHandBody={prepImage}
-      bodyText={<StyledText as="p">{body}</StyledText>}
+      bodyText={<LegacyStyledText as="p">{body}</LegacyStyledText>}
       proceedButtonText={buttonText}
       proceed={handleOnClick}
       proceedIsDisabled={maintenanceRunId == null}

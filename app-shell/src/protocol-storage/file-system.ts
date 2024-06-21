@@ -113,7 +113,7 @@ export function addProtocolFile(
   protocolsDirPath: string
 ): Promise<string> {
   const protocolKey = uuid()
-  const protocolDirPath = path.join(protocolsDirPath, protocolKey)
+  const protocolDirPath = path.join(protocolsDirPath, protocolKey as string)
 
   const srcDirPath = path.join(protocolDirPath, PROTOCOL_SRC_DIRECTORY_NAME)
   const analysisDirPath = path.join(

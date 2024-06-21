@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { StyledText, TYPOGRAPHY } from '@opentrons/components'
+import { LegacyStyledText, TYPOGRAPHY } from '@opentrons/components'
 import { Banner } from './index'
 import type { Meta, StoryObj } from '@storybook/react'
 
@@ -31,11 +31,16 @@ export const OverriddenExitIcon: Story = {
   args: {
     type: 'informing',
     children: 'Banner component',
-    onCloseClick: () => console.log('close'),
+    onCloseClick: () => {
+      console.log('close')
+    },
     closeButton: (
-      <StyledText as="p" textDecoration={TYPOGRAPHY.textDecorationUnderline}>
+      <LegacyStyledText
+        as="p"
+        textDecoration={TYPOGRAPHY.textDecorationUnderline}
+      >
         {'Exit'}
-      </StyledText>
+      </LegacyStyledText>
     ),
   },
 }

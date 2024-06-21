@@ -14,7 +14,7 @@ Protocols
 
 .. autoclass:: opentrons.protocol_api.ProtocolContext
    :members:
-   :exclude-members: location_cache, cleanup, clear_commands, params
+   :exclude-members: location_cache, cleanup, clear_commands
 
 Instruments
 ===========
@@ -35,8 +35,10 @@ Labware
    signatures, since users should never construct these directly.
 
 .. autoclass:: opentrons.protocol_api.TrashBin()
+   :members:
 
 .. autoclass:: opentrons.protocol_api.WasteChute()
+   :members:
 
 Wells and Liquids
 =================

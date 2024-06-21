@@ -6,7 +6,7 @@ import {
   DIRECTION_COLUMN,
   Flex,
   SPACING,
-  StyledText,
+  LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
@@ -49,7 +49,9 @@ export function Privacy({
     <Flex flexDirection={DIRECTION_COLUMN}>
       <ChildNavigation
         header={t('app_settings:privacy')}
-        onClickBack={() => setCurrentOption(null)}
+        onClickBack={() => {
+          setCurrentOption(null)
+        }}
       />
       <Flex
         flexDirection={DIRECTION_COLUMN}
@@ -57,13 +59,13 @@ export function Privacy({
         paddingX={SPACING.spacing40}
         marginTop="7.75rem"
       >
-        <StyledText
+        <LegacyStyledText
           fontSize={TYPOGRAPHY.fontSize28}
           lineHeight={TYPOGRAPHY.lineHeight36}
           fontWeight={TYPOGRAPHY.fontWeightRegular}
         >
           {t('branded:opentrons_cares_about_privacy')}
-        </StyledText>
+        </LegacyStyledText>
         <Flex flexDirection={DIRECTION_COLUMN}>
           <RobotSettingButton
             settingName={t('share_robot_logs')}

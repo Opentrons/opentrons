@@ -6,7 +6,7 @@ import {
   DIRECTION_COLUMN,
   Flex,
   SPACING,
-  StyledText,
+  LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
@@ -44,9 +44,9 @@ const Template: Story<SpacingsStorybookProps> = args => {
           width="100%"
           height="6rem"
         >
-          <StyledText as="h2" fontWeight={TYPOGRAPHY.fontWeightRegular}>
+          <LegacyStyledText as="h2" fontWeight={TYPOGRAPHY.fontWeightRegular}>
             {`${spacing[0]} - ${spacing[1]}: ${convertToPx(spacing[1])}`}
-          </StyledText>
+          </LegacyStyledText>
           <Box
             width={spacing[1]}
             height="2rem"

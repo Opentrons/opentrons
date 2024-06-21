@@ -25,6 +25,7 @@
   "gripper_successfully_calibrated": "Flex Gripper successfully calibrated",
   "gripper_successfully_detached": "Flex Gripper successfully detached",
   "gripper": "Flex Gripper",
+  "help_us_improve_send_error_report": "Help us improve your experience by sending an error report to {{support_email}}",
   "ip_description_second": "Opentrons recommends working with your network administrator to assign a static IP address to the robot.",
   "learn_uninstalling": "Learn more about uninstalling the Opentrons App",
   "loosen_screws_and_detach": "Loosen screws and detach Flex Gripper",
@@ -66,6 +67,7 @@
   "update_robot_software_description": "Bypass the Opentrons App auto-update process and update the robot software manually.",
   "update_robot_software_link": "Launch Opentrons software update page",
   "versions_sync": "Learn more about keeping the Opentrons App and robot software in sync",
+  "view_latest_release_notes_at": "View latest release notes at {{url}}",
   "want_to_help_out": "Want to help out Opentrons?",
   "welcome_title": "Welcome to your Opentrons Flex!",
   "why_use_lpc": "Labware Position Check is intended to correct for minor variances. Opentrons does not recommend using Labware Position Check to compensate for large positional adjustments. Needing to set large labware offsets could indicate a problem with robot calibration."

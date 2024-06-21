@@ -6,8 +6,6 @@ import {
   getSelectedTerminalItemId,
   getIsMultiSelectMode,
   actions as stepsActions,
-  SelectTerminalItemAction,
-  HoverOnTerminalItemAction,
 } from '../../../ui/steps'
 import {
   getCurrentFormIsPresaved,
@@ -19,7 +17,11 @@ import {
   CLOSE_UNSAVED_STEP_FORM,
 } from '../../modals/ConfirmDeleteModal'
 import { PDTitledList } from '../../lists'
-import { TerminalItemId } from '../../../steplist'
+import type {
+  SelectTerminalItemAction,
+  HoverOnTerminalItemAction,
+} from '../../../ui/steps'
+import type { TerminalItemId } from '../../../steplist'
 
 export { TerminalItemLink } from './TerminalItemLink'
 

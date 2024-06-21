@@ -3,7 +3,7 @@ import * as React from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import cx from 'classnames'
 import isEmpty from 'lodash/isEmpty'
-import { WellGroup, WELL_LABEL_OPTIONS } from '@opentrons/components'
+import { WELL_LABEL_OPTIONS } from '@opentrons/components'
 
 import {
   wellFillFromWellContents,
@@ -18,6 +18,7 @@ import { LiquidPlacementForm } from './LiquidPlacementForm/LiquidPlacementForm'
 import { WellSelectionInstructions } from './WellSelectionInstructions'
 
 import styles from './LiquidPlacementModal.module.css'
+import type { WellGroup } from '@opentrons/components'
 
 export function LiquidPlacementModal(): JSX.Element | null {
   const [highlightedWells, setHighlightedWells] = React.useState<
@@ -66,9 +67,9 @@ export function LiquidPlacementModal(): JSX.Element | null {
             selectedPrimaryWells={selectedWells}
             selectWells={(wells: WellGroup) => dispatch(selectWells(wells))}
             deselectWells={(wells: WellGroup) => dispatch(deselectWells(wells))}
-            updateHighlightedWells={(wells: WellGroup) =>
+            updateHighlightedWells={(wells: WellGroup) => {
               setHighlightedWells(wells)
-            }
+            }}
             ingredNames={liquidNamesById}
             wellContents={wellContents}
             nozzleType={null}

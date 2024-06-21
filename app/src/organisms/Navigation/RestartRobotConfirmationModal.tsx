@@ -8,7 +8,7 @@ import {
   DIRECTION_ROW,
   Flex,
   SPACING,
-  StyledText,
+  LegacyStyledText,
 } from '@opentrons/components'
 
 import { SmallButton } from '../../atoms/buttons'
@@ -50,7 +50,7 @@ export function RestartRobotConfirmationModal({
           components={{
             bold: <strong />,
             span: (
-              <StyledText
+              <LegacyStyledText
                 as="p"
                 data-testid="restart_robot_confirmation_description"
               />
@@ -61,7 +61,9 @@ export function RestartRobotConfirmationModal({
           <SmallButton
             flex="1"
             buttonText={t('shared:go_back')}
-            onClick={() => setShowRestartRobotConfirmationModal(false)}
+            onClick={() => {
+              setShowRestartRobotConfirmationModal(false)
+            }}
           />
           <SmallButton
             flex="1"

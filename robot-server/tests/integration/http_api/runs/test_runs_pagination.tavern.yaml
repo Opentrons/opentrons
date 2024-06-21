@@ -85,38 +85,38 @@ stages:
       json:
         data:
           - id: '{first_run_id}'
-            createdAt: !re_search "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+\\+\\d{2}:\\d{2}$"
+            createdAt: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"
             status: stopped
             current: False
-            actions: [ ]
-            errors: [ ]
-            pipettes: [ ]
-            modules: [ ]
-            labware: [ ]
-            labwareOffsets: [ ]
-            liquids: [ ]
+            actions: []
+            errors: []
+            pipettes: []
+            modules: []
+            labware: []
+            labwareOffsets: []
+            liquids: []
           - id: '{second_run_id}'
-            createdAt: !re_search "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+\\+\\d{2}:\\d{2}$"
+            createdAt: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"
             status: stopped
             current: False
-            actions: [ ]
-            errors: [ ]
-            pipettes: [ ]
-            modules: [ ]
-            labware: [ ]
-            labwareOffsets: [ ]
-            liquids: [ ]
+            actions: []
+            errors: []
+            pipettes: []
+            modules: []
+            labware: []
+            labwareOffsets: []
+            liquids: []
           - id: '{third_run_id}'
-            createdAt: !re_search "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+\\+\\d{2}:\\d{2}$"
+            createdAt: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"
             status: idle
             current: True
-            actions: [ ]
-            errors: [ ]
-            pipettes: [ ]
-            modules: [ ]
-            labware: [ ]
-            labwareOffsets: [ ]
-            liquids: [ ]
+            actions: []
+            errors: []
+            pipettes: []
+            modules: []
+            labware: []
+            labwareOffsets: []
+            liquids: []
         links:
           current:
             href: '/runs/{third_run_id}'
@@ -129,9 +129,7 @@ stages:
         - json:off
       status_code: 200
       json:
-        data:
-          []
+        data: []
         links:
           current:
             href: '/runs/{third_run_id}'
-

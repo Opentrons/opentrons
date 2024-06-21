@@ -7,7 +7,7 @@ import {
   Flex,
   JUSTIFY_CENTER,
   SPACING,
-  StyledText,
+  LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { useCreateLiveCommandMutation } from '@opentrons/react-api-client'
@@ -40,9 +40,9 @@ export function WelcomeModal({
     createLiveCommand({
       command: animationCommand,
       waitUntilComplete: false,
-    }).catch((e: Error) =>
+    }).catch((e: Error) => {
       console.warn(`cannot run status bar animation: ${e.message}`)
-    )
+    })
   }
 
   const handleCloseModal = (): void => {
@@ -67,21 +67,21 @@ export function WelcomeModal({
             width="454px"
             height="128px"
           />
-          <StyledText
+          <LegacyStyledText
             as="h4"
             fontWeight={TYPOGRAPHY.fontWeightBold}
             textAlign={TYPOGRAPHY.textAlignCenter}
           >
             {t('welcome_to_your_dashboard')}
-          </StyledText>
-          <StyledText
+          </LegacyStyledText>
+          <LegacyStyledText
             as="p"
             fontWeight={TYPOGRAPHY.fontWeightRegular}
             color={COLORS.grey60}
             textAlign={TYPOGRAPHY.textAlignCenter}
           >
             {t('welcome_modal_description')}
-          </StyledText>
+          </LegacyStyledText>
         </Flex>
         <SmallButton buttonText={t('shared:next')} onClick={handleCloseModal} />
       </Flex>

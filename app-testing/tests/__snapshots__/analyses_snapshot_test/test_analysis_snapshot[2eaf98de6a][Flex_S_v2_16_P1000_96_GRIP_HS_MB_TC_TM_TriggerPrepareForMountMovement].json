@@ -1236,8 +1236,22 @@
               ]
             }
           ],
+          "liquidProbeParameters": {
+            "minimumHeight": [
+              {
+                "applicableWells": [],
+                "value": 0.5
+              }
+            ],
+            "minimumWellVolume": [
+              {
+                "applicableWells": [],
+                "value": 0.0
+              }
+            ]
+          },
           "metadata": {
-            "displayCategory": "adapter",
+            "displayCategory": "aluminumBlock",
             "displayName": "Opentrons 96 Well Aluminum Block",
             "displayVolumeUnits": "µL",
             "tags": []
@@ -2393,6 +2407,20 @@
               ]
             }
           ],
+          "liquidProbeParameters": {
+            "minimumHeight": [
+              {
+                "applicableWells": [],
+                "value": 0.5
+              }
+            ],
+            "minimumWellVolume": [
+              {
+                "applicableWells": [],
+                "value": 0.0
+              }
+            ]
+          },
           "metadata": {
             "displayCategory": "adapter",
             "displayName": "Opentrons 96 PCR Heater-Shaker Adapter",
@@ -3551,6 +3579,20 @@
               ]
             }
           ],
+          "liquidProbeParameters": {
+            "minimumHeight": [
+              {
+                "applicableWells": [],
+                "value": 0.5
+              }
+            ],
+            "minimumWellVolume": [
+              {
+                "applicableWells": [],
+                "value": 0.0
+              }
+            ]
+          },
           "metadata": {
             "displayCategory": "wellPlate",
             "displayName": "NEST 96 Deep Well Plate 2mL",
@@ -3694,6 +3736,11 @@
               "x": 0,
               "y": 0,
               "z": 16.3
+            },
+            "opentrons_96_deep_well_temp_mod_adapter": {
+              "x": 0,
+              "y": 0,
+              "z": 16.1
             }
           },
           "stackingOffsetWithModule": {
@@ -4811,6 +4858,20 @@
               ]
             }
           ],
+          "liquidProbeParameters": {
+            "minimumHeight": [
+              {
+                "applicableWells": [],
+                "value": 0.5
+              }
+            ],
+            "minimumWellVolume": [
+              {
+                "applicableWells": [],
+                "value": 0.0
+              }
+            ]
+          },
           "metadata": {
             "displayCategory": "wellPlate",
             "displayName": "NEST 96 Well Plate 100 µL PCR Full Skirt",
@@ -5875,6 +5936,20 @@
               "wells": []
             }
           ],
+          "liquidProbeParameters": {
+            "minimumHeight": [
+              {
+                "applicableWells": [],
+                "value": 0.5
+              }
+            ],
+            "minimumWellVolume": [
+              {
+                "applicableWells": [],
+                "value": 0.0
+              }
+            ]
+          },
           "metadata": {
             "displayCategory": "adapter",
             "displayName": "Opentrons Flex 96 Tip Rack Adapter",
@@ -14597,6 +14672,7 @@
       "pipetteName": "p1000_96"
     }
   ],
+  "result": "ok",
   "robotType": "OT-3 Standard",
   "runTimeParameters": []
 }

@@ -1,34 +1,26 @@
-import * as React from 'react'
-
 import { useAllCommandsAsPreSerializedList } from '@opentrons/react-api-client'
 
-import { useNotifyService } from '../useNotifyService'
+import { useNotifyDataReady } from '../useNotifyDataReady'
 
 import type { UseQueryResult } from 'react-query'
 import type { AxiosError } from 'axios'
 import type { CommandsData, GetCommandsParams } from '@opentrons/api-client'
-import type {
-  QueryOptionsWithPolling,
-  HTTPRefetchFrequency,
-} from '../useNotifyService'
+import type { QueryOptionsWithPolling } from '../useNotifyDataReady'
 
 export function useNotifyAllCommandsAsPreSerializedList(
   runId: string | null,
   params?: GetCommandsParams | null,
   options: QueryOptionsWithPolling<CommandsData, AxiosError> = {}
 ): UseQueryResult<CommandsData, AxiosError> {
-  const [refetch, setRefetch] = React.useState<HTTPRefetchFrequency>(null)
-
-  useNotifyService<CommandsData, AxiosError>({
+  const { notifyOnSettled, shouldRefetch } = useNotifyDataReady({
     topic: `robot-server/runs/pre_serialized_commands/${runId}`,
-    setRefetch,
     options,
   })
 
   const httpResponse = useAllCommandsAsPreSerializedList(runId, params, {
     ...options,
-    enabled: options?.enabled !== false && refetch != null,
-    onSettled: refetch === 'once' ? () => setRefetch(null) : () => null,
+    enabled: options?.enabled !== false && shouldRefetch,
+    onSettled: notifyOnSettled,
   })
 
   return httpResponse

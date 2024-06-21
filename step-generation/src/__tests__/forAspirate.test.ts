@@ -10,8 +10,12 @@ import { AIR, createTipLiquidState } from '../utils/misc'
 import { makeImmutableStateUpdater } from '../__utils__'
 import { forAspirate as _forAspirate } from '../getNextRobotStateAndWarnings/forAspirate'
 import * as warningCreators from '../warningCreators'
-import { CommandCreatorWarning, InvariantContext, RobotState } from '../types'
-import { AspDispAirgapParams } from '@opentrons/shared-data/lib/protocol/types/schemaV6/command/pipetting'
+import type {
+  CommandCreatorWarning,
+  InvariantContext,
+  RobotState,
+} from '../types'
+import type { AspDispAirgapParams } from '@opentrons/shared-data/lib/protocol/types/schemaV6/command/pipetting'
 
 const forAspirate = makeImmutableStateUpdater(_forAspirate)
 
@@ -395,4 +399,6 @@ describe('8-channel trough', () => {
   )
 
   it.todo('aspirate from 384 plate starting from B row') // TODO
+
+  it.todo('aspirating from a full 96-channel and a reservoir labware')
 })

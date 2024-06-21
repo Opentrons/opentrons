@@ -4,7 +4,6 @@ import pick from 'lodash/pick'
 import { AlertItem } from '@opentrons/components'
 import {
   getLabel,
-  LabwareFields,
   IRREGULAR_LABWARE_ERROR,
   LABWARE_TOO_SMALL_ERROR,
   LABWARE_TOO_LARGE_ERROR,
@@ -17,6 +16,7 @@ import {
 import { LinkOut } from '../LinkOut'
 
 import type { FormikTouched, FormikErrors } from 'formik'
+import type { LabwareFields } from '../../fields'
 export interface Props {
   values: LabwareFields
   fieldList: Array<keyof LabwareFields>

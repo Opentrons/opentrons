@@ -24,7 +24,6 @@ import {
 import {
   aspirate,
   configureForVolume,
-  configureNozzleLayout,
   delay,
   dispense,
   dropTip,
@@ -274,17 +273,6 @@ export const transfer: CommandCreator<TransferArgs> = (
             changeTipNow =
               isInitialSubtransfer || destinationWell !== prevDestWell
           }
-          const stateNozzles = prevRobotState.pipettes[args.pipette].nozzles
-          const configureNozzleLayoutCommand: CurriedCommandCreator[] =
-            //  only emit the command if previous nozzle state is different
-            is96Channel && args.nozzles != null && args.nozzles !== stateNozzles
-              ? [
-                  curryCommandCreator(configureNozzleLayout, {
-                    nozzles: args.nozzles,
-                    pipetteId: args.pipette,
-                  }),
-                ]
-              : []
 
           const configureForVolumeCommand: CurriedCommandCreator[] = LOW_VOLUME_PIPETTES.includes(
             invariantContext.pipetteEntities[args.pipette].name
@@ -603,7 +591,6 @@ export const transfer: CommandCreator<TransferArgs> = (
               : []
 
           const nextCommands = [
-            ...configureNozzleLayoutCommand,
             ...tipCommands,
             ...preWetTipCommands,
             ...configureForVolumeCommand,

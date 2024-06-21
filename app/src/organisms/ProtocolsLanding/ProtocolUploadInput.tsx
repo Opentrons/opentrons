@@ -8,7 +8,7 @@ import {
   Flex,
   Link,
   SPACING,
-  StyledText,
+  LegacyStyledText,
 } from '@opentrons/components'
 import { UploadInput } from '../../molecules/UploadInput'
 import { addProtocol } from '../../redux/protocol-storage'
@@ -51,10 +51,12 @@ export function ProtocolUploadInput(
       marginY={SPACING.spacing20}
     >
       <UploadInput
-        onUpload={(file: File) => handleUpload(file)}
+        onUpload={(file: File) => {
+          handleUpload(file)
+        }}
         uploadText={t('valid_file_types')}
         dragAndDropText={
-          <StyledText as="p">
+          <LegacyStyledText as="p">
             <Trans
               t={t}
               i18nKey="shared:drag_and_drop"
@@ -62,7 +64,7 @@ export function ProtocolUploadInput(
                 a: <Link color={COLORS.blue55} role="button" />,
               }}
             />
-          </StyledText>
+          </LegacyStyledText>
         }
       />
     </Flex>

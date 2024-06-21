@@ -9,7 +9,7 @@ import {
   PrimaryButton,
   DIRECTION_ROW,
   JUSTIFY_SPACE_BETWEEN,
-  StyledText,
+  LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
@@ -52,8 +52,8 @@ export const SetupModuleAndDeck = ({
 }: SetupModuleAndDeckProps): JSX.Element => {
   const { t, i18n } = useTranslation('protocol_setup')
   const [selectedValue, toggleGroup] = useToggleGroup(
-    t('list_view'),
-    t('map_view')
+    t('list_view') as string,
+    t('map_view') as string
   )
 
   const robotType = useRobotType(robotName)
@@ -84,29 +84,25 @@ export const SetupModuleAndDeck = ({
               justifyContent={JUSTIFY_SPACE_BETWEEN}
               marginTop={SPACING.spacing16}
               marginLeft={SPACING.spacing20}
-              marginBottom={SPACING.spacing4}
+              marginBottom={SPACING.spacing12}
             >
-              <StyledText
-                css={TYPOGRAPHY.labelSemiBold}
-                marginBottom={SPACING.spacing8}
-                width="45%"
-              >
+              <LegacyStyledText css={TYPOGRAPHY.labelSemiBold} width="45%">
                 {i18n.format(t('deck_hardware'), 'capitalize')}
-              </StyledText>
-              <StyledText
+              </LegacyStyledText>
+              <LegacyStyledText
                 css={TYPOGRAPHY.labelSemiBold}
                 marginRight={SPACING.spacing16}
                 width="15%"
               >
                 {t('location')}
-              </StyledText>
-              <StyledText
+              </LegacyStyledText>
+              <LegacyStyledText
                 css={TYPOGRAPHY.labelSemiBold}
                 marginRight={SPACING.spacing16}
                 width="15%"
               >
                 {t('status')}
-              </StyledText>
+              </LegacyStyledText>
             </Flex>
             <Flex
               flexDirection={DIRECTION_COLUMN}

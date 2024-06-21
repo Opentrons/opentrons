@@ -1,6 +1,6 @@
 import { createSelector } from 'reselect'
-import { BaseState, Selector } from '../types'
-import { RootState } from './reducers'
+import type { BaseState, Selector } from '../types'
+import type { RootState } from './reducers'
 export const rootSelector = (state: BaseState): RootState => state.loadFile
 export const getFileUploadMessages: Selector<
   RootState['fileUploadMessage']

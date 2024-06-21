@@ -1,5 +1,4 @@
 import { handleActions } from 'redux-actions'
-import { Reducer } from 'redux'
 import mapValues from 'lodash/mapValues'
 import cloneDeep from 'lodash/cloneDeep'
 import merge from 'lodash/merge'
@@ -12,21 +11,12 @@ import {
   getLabwareDefaultEngageHeight,
   getLabwareDefURI,
   getModuleType,
-  LoadLabwareCreateCommand,
-  LoadModuleCreateCommand,
-  LoadPipetteCreateCommand,
-  MoveLabwareCreateCommand,
-  MoveToAddressableAreaCreateCommand,
-  MoveToAddressableAreaForDropTipCreateCommand,
   MAGNETIC_MODULE_TYPE,
   MAGNETIC_MODULE_V1,
-  PipetteName,
   THERMOCYCLER_MODULE_TYPE,
   WASTE_CHUTE_ADDRESSABLE_AREAS,
-  AddressableAreaName,
   MOVABLE_TRASH_ADDRESSABLE_AREAS,
 } from '@opentrons/shared-data'
-import type { RootState as LabwareDefsRootState } from '../../labware-defs'
 import { rootReducer as labwareDefsRootReducer } from '../../labware-defs'
 import { getCutoutIdByAddressableArea, uuid } from '../../utils'
 import { INITIAL_DECK_SETUP_STEP_ID, SPAN7_8_10_11_SLOT } from '../../constants'
@@ -44,14 +34,7 @@ import {
 import { getLabwareOnModule } from '../../ui/modules/utils'
 import { nestedCombineReducers } from './nestedCombineReducers'
 import { PROFILE_CYCLE, PROFILE_STEP } from '../../form-types'
-import {
-  COLUMN_4_SLOTS,
-  NormalizedAdditionalEquipmentById,
-  NormalizedPipetteById,
-} from '@opentrons/step-generation'
-import { LoadFileAction } from '../../load-file'
-import { SaveStepFormAction } from '../../ui/steps/actions/thunks'
-import { ReplaceCustomLabwareDef } from '../../labware-defs/actions'
+import { COLUMN_4_SLOTS } from '@opentrons/step-generation'
 import {
   _getPipetteEntitiesRootState,
   _getLabwareEntitiesRootState,
@@ -59,17 +42,37 @@ import {
   _getAdditionalEquipmentEntitiesRootState,
 } from '../selectors'
 import {
-  CreateDeckFixtureAction,
-  DeleteDeckFixtureAction,
-  ToggleIsGripperRequiredAction,
-} from '../actions/additionalItems'
-import {
   createPresavedStepForm,
   getDeckItemIdInSlot,
   getIdsInRange,
   getUnoccupiedSlotForMoveableTrash,
 } from '../utils'
 
+import type { Reducer } from 'redux'
+import type { Action as ReduxActionsAction } from 'redux-actions'
+import type {
+  NormalizedAdditionalEquipmentById,
+  NormalizedPipetteById,
+} from '@opentrons/step-generation'
+import type {
+  LoadLabwareCreateCommand,
+  LoadModuleCreateCommand,
+  LoadPipetteCreateCommand,
+  MoveLabwareCreateCommand,
+  MoveToAddressableAreaCreateCommand,
+  MoveToAddressableAreaForDropTipCreateCommand,
+  PipetteName,
+  AddressableAreaName,
+} from '@opentrons/shared-data'
+import type { RootState as LabwareDefsRootState } from '../../labware-defs'
+import type { LoadFileAction } from '../../load-file'
+import type { SaveStepFormAction } from '../../ui/steps/actions/thunks'
+import type { ReplaceCustomLabwareDef } from '../../labware-defs/actions'
+import type {
+  CreateDeckFixtureAction,
+  DeleteDeckFixtureAction,
+  ToggleIsGripperRequiredAction,
+} from '../actions/additionalItems'
 import type {
   CreateModuleAction,
   CreatePipettesAction,
@@ -121,6 +124,7 @@ import type {
   SelectTerminalItemAction,
   SelectMultipleStepsAction,
 } from '../../ui/steps/actions/types'
+import type { Action } from '../../types'
 import type {
   NormalizedLabware,
   NormalizedLabwareById,
@@ -366,8 +370,12 @@ export const unsavedForm = (
         unsavedFormState.orderedProfileItems.includes(id) &&
         unsavedFormState.profileItemsById[id].type === PROFILE_STEP
       const filteredItemsById = isTopLevelProfileStep
-        ? omitTopLevelSteps(unsavedFormState.profileItemsById)
-        : omitCycleSteps(unsavedFormState.profileItemsById)
+        ? omitTopLevelSteps(
+            unsavedFormState.profileItemsById as Record<string, ProfileItem>
+          )
+        : omitCycleSteps(
+            unsavedFormState.profileItemsById as Record<string, ProfileItem>
+          )
       const filteredOrderedProfileItems = isTopLevelProfileStep
         ? unsavedFormState.orderedProfileItems.filter(
             (itemId: string) => itemId !== id
@@ -432,7 +440,7 @@ export const unsavedForm = (
         // it's a step in a cycle. Get the cycle id, and the index of our edited step in that cycle's `steps` array
         let editedStepIndex = -1
         const cycleId: string | undefined = Object.keys(
-          unsavedFormState.profileItemsById
+          unsavedFormState.profileItemsById as Record<string, ProfileItem>
         ).find((itemId: string): boolean => {
           const item: ProfileItem = unsavedFormState.profileItemsById[itemId]
 
@@ -525,7 +533,7 @@ export const _editModuleFormUpdate = ({
     savedForm.moduleId === moduleId &&
     savedForm.magnetAction === 'engage'
   ) {
-    const prevEngageHeight = parseFloat(savedForm.engageHeight)
+    const prevEngageHeight = parseFloat(savedForm.engageHeight as string)
 
     if (Number.isFinite(prevEngageHeight)) {
       const initialDeckSetup = _getInitialDeckSetupRootState(rootState)
@@ -645,7 +653,10 @@ export const savedStepForms = (
       const prevInitialDeckSetupStep =
         savedStepForms[INITIAL_DECK_SETUP_STEP_ID]
       const labwareOccupyingDestination = getDeckItemIdInSlot(
-        prevInitialDeckSetupStep.labwareLocationUpdate,
+        prevInitialDeckSetupStep.labwareLocationUpdate as Record<
+          string,
+          string
+        >,
         action.payload.slot
       )
       const moduleId = action.payload.id
@@ -715,19 +726,19 @@ export const savedStepForms = (
             // swap labware/module slots from all manualIntervention steps
             // (or place compatible labware in dest slot onto module)
             const sourceLabwareId = getDeckItemIdInSlot(
-              savedForm.labwareLocationUpdate,
+              savedForm.labwareLocationUpdate as Record<string, string>,
               sourceSlot
             )
             const destLabwareId = getDeckItemIdInSlot(
-              savedForm.labwareLocationUpdate,
+              savedForm.labwareLocationUpdate as Record<string, string>,
               destSlot
             )
             const sourceModuleId = getDeckItemIdInSlot(
-              savedForm.moduleLocationUpdate,
+              savedForm.moduleLocationUpdate as Record<string, string>,
               sourceSlot
             )
             const destModuleId = getDeckItemIdInSlot(
-              savedForm.moduleLocationUpdate,
+              savedForm.moduleLocationUpdate as Record<string, string>,
               destSlot
             )
 
@@ -745,7 +756,7 @@ export const savedStepForms = (
               )
               const moduleIsOccupied =
                 getDeckItemIdInSlot(
-                  savedForm.labwareLocationUpdate,
+                  savedForm.labwareLocationUpdate as Record<string, string>,
                   sourceModuleId
                 ) != null
 
@@ -852,7 +863,7 @@ export const savedStepForms = (
                 deletedPipetteIds
               ),
             }
-          } else if (deletedPipetteIds.includes(form.pipette)) {
+          } else if (deletedPipetteIds.includes(form.pipette as string)) {
             // TODO(IL, 2020-02-24): address in #3161, underspecified form fields may be overwritten in type-unsafe manner
             return {
               ...form,
@@ -1034,14 +1045,22 @@ export const savedStepForms = (
           let fieldsToUpdate = {}
 
           if (prevStepForm.stepType === 'moveLiquid') {
-            if (labwareIdsToDeselect.includes(prevStepForm.aspirate_labware)) {
+            if (
+              labwareIdsToDeselect.includes(
+                prevStepForm.aspirate_labware as string
+              )
+            ) {
               fieldsToUpdate = {
                 ...fieldsToUpdate,
                 aspirate_wells: defaults.aspirate_wells,
               }
             }
 
-            if (labwareIdsToDeselect.includes(prevStepForm.dispense_labware)) {
+            if (
+              labwareIdsToDeselect.includes(
+                prevStepForm.dispense_labware as string
+              )
+            ) {
               fieldsToUpdate = {
                 ...fieldsToUpdate,
                 dispense_wells: defaults.dispense_wells,
@@ -1049,7 +1068,7 @@ export const savedStepForms = (
             }
           } else if (
             prevStepForm.stepType === 'mix' &&
-            labwareIdsToDeselect.includes(prevStepForm.labware)
+            labwareIdsToDeselect.includes(prevStepForm.labware as string)
           ) {
             fieldsToUpdate = {
               wells: defaults.wells,
@@ -1347,16 +1366,16 @@ export const additionalEquipmentInvariantProperties = handleActions<NormalizedAd
         command =>
           (command.commandType === 'moveToAddressableArea' &&
             WASTE_CHUTE_ADDRESSABLE_AREAS.includes(
-              command.params.addressableAreaName
+              command.params.addressableAreaName as AddressableAreaName
             )) ||
           (command.commandType === 'moveLabware' &&
             command.params.newLocation !== 'offDeck' &&
             'addressableAreaName' in command.params.newLocation &&
             WASTE_CHUTE_ADDRESSABLE_AREAS.includes(
-              command.params.addressableAreaName
+              command.params.newLocation
+                .addressableAreaName as AddressableAreaName
             ))
       )
-
       const getStagingAreaSlotNames = (
         commandType: 'moveLabware' | 'loadLabware',
         locationKey: 'newLocation' | 'location'
@@ -1368,7 +1387,8 @@ export const additionalEquipmentInvariantProperties = handleActions<NormalizedAd
               command.params[locationKey] !== 'offDeck' &&
               'addressableAreaName' in command.params[locationKey] &&
               COLUMN_4_SLOTS.includes(
-                command.params[locationKey].addressableAreaName
+                command.params[locationKey]
+                  .addressableAreaName as AddressableAreaName
               )
           )
           .map(command => command.params[locationKey].addressableAreaName)
@@ -1381,11 +1401,13 @@ export const additionalEquipmentInvariantProperties = handleActions<NormalizedAd
         ]),
       ]
 
-      const unoccupiedSlotForMovableTrash = getUnoccupiedSlotForMoveableTrash(
-        file,
-        hasWasteChuteCommands,
-        stagingAreaSlotNames
-      )
+      const unoccupiedSlotForMovableTrash = hasWasteChuteCommands
+        ? ''
+        : getUnoccupiedSlotForMoveableTrash(
+            file,
+            hasWasteChuteCommands,
+            stagingAreaSlotNames
+          )
 
       const stagingAreas = stagingAreaSlotNames.reduce((acc, slot) => {
         const stagingAreaId = `${uuid()}:stagingArea`
@@ -1412,7 +1434,7 @@ export const additionalEquipmentInvariantProperties = handleActions<NormalizedAd
           | MoveToAddressableAreaForDropTipCreateCommand =>
           (command.commandType === 'moveToAddressableArea' &&
             (MOVABLE_TRASH_ADDRESSABLE_AREAS.includes(
-              command.params.addressableAreaName
+              command.params.addressableAreaName as AddressableAreaName
             ) ||
               command.params.addressableAreaName === 'fixedTrash')) ||
           command.commandType === 'moveToAddressableAreaForDropTip'
@@ -1460,7 +1482,6 @@ export const additionalEquipmentInvariantProperties = handleActions<NormalizedAd
       } else if (mixStepTrashBin != null) {
         trashBinId = mixStepTrashBin.dropTip_location
       }
-
       const trashCutoutId =
         trashAddressableAreaName != null
           ? getCutoutIdByAddressableArea(
@@ -1516,6 +1537,9 @@ export const additionalEquipmentInvariantProperties = handleActions<NormalizedAd
         ) {
           wasteChuteId = moveLiquidStepWasteChute.blowOut_location
         }
+        //  new wasteChuteId generated for if there are only moveLabware commands
+      } else if (hasWasteChuteCommands && moveLiquidStepWasteChute == null) {
+        wasteChuteId = `${uuid()}:wasteChute`
       }
 
       const wasteChute =
@@ -1557,14 +1581,15 @@ export const additionalEquipmentInvariantProperties = handleActions<NormalizedAd
         [hardcodedTrashBinIdFlex]: {
           name: 'trashBin' as const,
           id: hardcodedTrashBinIdFlex,
-          location: getCutoutIdByAddressableArea(
-            hardcodedTrashAddressableAreaName as AddressableAreaName,
-            'trashBinAdapter',
-            FLEX_ROBOT_TYPE
-          ),
+          location: hasWasteChuteCommands
+            ? ''
+            : getCutoutIdByAddressableArea(
+                hardcodedTrashAddressableAreaName as AddressableAreaName,
+                'trashBinAdapter',
+                FLEX_ROBOT_TYPE
+              ),
         },
       }
-
       if (isFlex) {
         if (trashBin != null) {
           return {
@@ -1796,19 +1821,22 @@ export const rootReducer: Reducer<RootState, any> = nestedCombineReducers(
     ),
     additionalEquipmentInvariantProperties: additionalEquipmentInvariantProperties(
       prevStateFallback.additionalEquipmentInvariantProperties,
-      action
+      action as ReduxActionsAction<NormalizedAdditionalEquipmentById>
     ),
-    labwareDefs: labwareDefsRootReducer(prevStateFallback.labwareDefs, action),
+    labwareDefs: labwareDefsRootReducer(
+      prevStateFallback.labwareDefs,
+      action as Action
+    ),
     // 'forms' reducers get full rootReducer state
-    savedStepForms: savedStepForms(state, action),
-    unsavedForm: unsavedForm(state, action),
+    savedStepForms: savedStepForms(state, action as SavedStepFormsActions),
+    unsavedForm: unsavedForm(state, action as UnsavedFormActions),
     presavedStepForm: presavedStepForm(
       prevStateFallback.presavedStepForm,
-      action
+      action as PresavedStepFormAction
     ),
     batchEditFormChanges: batchEditFormChanges(
       prevStateFallback.batchEditFormChanges,
-      action
+      action as BatchEditFormActions
     ),
   })
 )

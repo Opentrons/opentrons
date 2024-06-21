@@ -2,7 +2,7 @@ import isEqual from 'lodash/isEqual'
 import mapValues from 'lodash/mapValues'
 import reduce from 'lodash/reduce'
 import isEmpty from 'lodash/isEmpty'
-import { createSelector, Selector } from 'reselect'
+import { createSelector } from 'reselect'
 import {
   getLabwareDisplayName,
   getLabwareDefURI,
@@ -10,53 +10,52 @@ import {
   TEMPERATURE_MODULE_TYPE,
   THERMOCYCLER_MODULE_TYPE,
   HEATERSHAKER_MODULE_TYPE,
-  PipetteName,
   MAGNETIC_BLOCK_TYPE,
+  ABSORBANCE_READER_TYPE,
   getPipetteSpecsV2,
-  LabwareDefinition2,
 } from '@opentrons/shared-data'
-import {
-  AdditionalEquipmentEntities,
-  NormalizedAdditionalEquipmentById,
-  TEMPERATURE_DEACTIVATED,
-} from '@opentrons/step-generation'
+import { TEMPERATURE_DEACTIVATED } from '@opentrons/step-generation'
+
 import { INITIAL_DECK_SETUP_STEP_ID } from '../../constants'
 import {
   getFormWarnings,
   getFormErrors,
   stepFormToArgs,
 } from '../../steplist/formLevel'
-import {
-  ProfileFormError,
-  getProfileFormErrors,
-} from '../../steplist/formLevel/profileErrors'
+import { getProfileFormErrors } from '../../steplist/formLevel/profileErrors'
 import { getMoveLabwareFormErrors } from '../../steplist/formLevel/moveLabwareFormErrors'
 import { getFieldErrors } from '../../steplist/fieldLevel'
 import { getProfileItemsHaveErrors } from '../utils/getProfileItemsHaveErrors'
 import * as featureFlagSelectors from '../../feature-flags/selectors'
 import { denormalizePipetteEntities, getHydratedForm } from '../utils'
-import {
-  selectors as labwareDefSelectors,
-  LabwareDefByDefURI,
-} from '../../labware-defs'
-import { InstrumentGroup } from '@opentrons/components'
+import { selectors as labwareDefSelectors } from '../../labware-defs'
+import type { Selector } from 'reselect'
 import type {
-  DropdownOption,
-  Mount,
-  InstrumentInfoProps,
-} from '@opentrons/components'
-import type {
+  AdditionalEquipmentEntities,
+  NormalizedAdditionalEquipmentById,
   InvariantContext,
   LabwareEntity,
   LabwareEntities,
   ModuleEntities,
   PipetteEntities,
 } from '@opentrons/step-generation'
+import type { PipetteName, LabwareDefinition2 } from '@opentrons/shared-data'
+import type {
+  InstrumentGroup,
+  DropdownOption,
+  Mount,
+  InstrumentInfoProps,
+} from '@opentrons/components'
+import type { ProfileFormError } from '../../steplist/formLevel/profileErrors'
+import type { LabwareDefByDefURI } from '../../labware-defs'
 import type { FormWarning } from '../../steplist/formLevel'
-import { BaseState, DeckSlot } from '../../types'
-import { FormData, StepIdType } from '../../form-types'
-import { StepArgsAndErrorsById, StepFormErrors } from '../../steplist/types'
-import {
+import type { BaseState, DeckSlot } from '../../types'
+import type { FormData, ProfileItem, StepIdType } from '../../form-types'
+import type {
+  StepArgsAndErrorsById,
+  StepFormErrors,
+} from '../../steplist/types'
+import type {
   InitialDeckSetup,
   NormalizedLabwareById,
   NormalizedLabware,
@@ -70,8 +69,9 @@ import {
   ThermocyclerModuleState,
   HeaterShakerModuleState,
   MagneticBlockState,
+  AbsorbanceReaderState,
 } from '../types'
-import {
+import type {
   PresavedStepFormState,
   RootState,
   SavedStepFormState,
@@ -207,6 +207,9 @@ const HEATERSHAKER_MODULE_INITIAL_STATE: HeaterShakerModuleState = {
 const MAGNETIC_BLOCK_INITIAL_STATE: MagneticBlockState = {
   type: MAGNETIC_BLOCK_TYPE,
 }
+const ABSORBANCE_READER_INITIAL_STATE: AbsorbanceReaderState = {
+  type: ABSORBANCE_READER_TYPE,
+}
 
 const _getInitialDeckSetup = (
   initialSetupStep: FormData,
@@ -243,8 +246,8 @@ const _getInitialDeckSetup = (
   }, {})
 
   return {
-    labware: mapValues<{}, LabwareOnDeck>(
-      labwareLocations,
+    labware: mapValues<Record<DeckSlot, string>, LabwareOnDeck>(
+      labwareLocations as Record<DeckSlot, string>,
       (slot: DeckSlot, labwareId: string): LabwareOnDeck => {
         return {
           slot,
@@ -252,8 +255,8 @@ const _getInitialDeckSetup = (
         }
       }
     ),
-    modules: mapValues<{}, ModuleOnDeck>(
-      moduleLocations,
+    modules: mapValues<Record<DeckSlot, string>, ModuleOnDeck>(
+      moduleLocations as Record<DeckSlot, string>,
       (slot: DeckSlot, moduleId: string): ModuleOnDeck => {
         const moduleEntity = moduleEntities[moduleId]
 
@@ -298,11 +301,19 @@ const _getInitialDeckSetup = (
               slot,
               moduleState: MAGNETIC_BLOCK_INITIAL_STATE,
             }
+          case ABSORBANCE_READER_TYPE:
+            return {
+              id: moduleEntity.id,
+              model: moduleEntity.model,
+              type: ABSORBANCE_READER_TYPE,
+              slot,
+              moduleState: ABSORBANCE_READER_INITIAL_STATE,
+            }
         }
       }
     ),
     pipettes: mapValues<{}, PipetteOnDeck>(
-      pipetteLocations,
+      pipetteLocations as Record<Mount, string>,
       (mount: Mount, pipetteId: string): PipetteOnDeck => {
         return { mount, ...pipetteEntities[pipetteId] }
       }
@@ -543,7 +554,7 @@ export const _hasFieldLevelErrors = (hydratedForm: FormData): boolean => {
       hydratedForm.stepType === 'thermocycler' &&
       fieldName === 'profileItemsById'
     ) {
-      if (getProfileItemsHaveErrors(value)) {
+      if (getProfileItemsHaveErrors(value as Record<string, ProfileItem>)) {
         return true
       }
     } else {
@@ -601,13 +612,15 @@ export const getInvariantContext: Selector<
   getAdditionalEquipmentEntities,
   featureFlagSelectors.getDisableModuleRestrictions,
   featureFlagSelectors.getAllowAllTipracks,
+  featureFlagSelectors.getEnableAbsorbanceReader,
   (
     labwareEntities,
     moduleEntities,
     pipetteEntities,
     additionalEquipmentEntities,
     disableModuleRestrictions,
-    allowAllTipracks
+    allowAllTipracks,
+    enableAbsorbanceReader
   ) => ({
     labwareEntities,
     moduleEntities,
@@ -616,6 +629,7 @@ export const getInvariantContext: Selector<
     config: {
       OT_PD_ALLOW_ALL_TIPRACKS: Boolean(allowAllTipracks),
       OT_PD_DISABLE_MODULE_RESTRICTIONS: Boolean(disableModuleRestrictions),
+      OT_PD_ENABLE_ABSORBANCE_READER: Boolean(enableAbsorbanceReader),
     },
   })
 )

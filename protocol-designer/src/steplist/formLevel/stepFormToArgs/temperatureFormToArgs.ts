@@ -1,8 +1,8 @@
-import {
+import type {
   SetTemperatureArgs,
   DeactivateTemperatureArgs,
 } from '@opentrons/step-generation'
-import { HydratedTemperatureFormData } from '../../../form-types'
+import type { HydratedTemperatureFormData } from '../../../form-types'
 type TemperatureArgs = SetTemperatureArgs | DeactivateTemperatureArgs
 export const temperatureFormToArgs = (
   hydratedFormData: HydratedTemperatureFormData

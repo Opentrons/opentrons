@@ -25,7 +25,7 @@ import {
 } from './constants'
 
 import type { State } from '../types'
-import {
+import type {
   DiscoveredRobot,
   DiscoveryClientRobotAddress,
   Robot,

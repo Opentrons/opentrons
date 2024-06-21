@@ -120,10 +120,10 @@ async def test_protocol_labware_files_persist() -> None:
             assert restarted_protocol_detail == protocol_detail
 
             four_tuberack = Path(
-                f"{server.persistence_directory}/4/protocols/{protocol_id}/cpx_4_tuberack_100ul.json"
+                f"{server.persistence_directory}/5/protocols/{protocol_id}/cpx_4_tuberack_100ul.json"
             )
             six_tuberack = Path(
-                f"{server.persistence_directory}/4/protocols/{protocol_id}/cpx_6_tuberack_100ul.json"
+                f"{server.persistence_directory}/5/protocols/{protocol_id}/cpx_6_tuberack_100ul.json"
             )
             assert four_tuberack.is_file()
             assert six_tuberack.is_file()

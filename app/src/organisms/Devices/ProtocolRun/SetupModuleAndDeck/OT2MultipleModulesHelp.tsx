@@ -11,7 +11,7 @@ import {
   Link,
   PrimaryButton,
   SPACING,
-  StyledText,
+  LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { getTopPortalEl } from '../../../../App/portal'
@@ -40,22 +40,24 @@ export function OT2MultipleModulesHelp(): JSX.Element {
           iconMarginLeft={SPACING.spacing8}
           size={SPACING.spacing20}
           type="informing"
-          onCloseClick={() => setShowMultipleModulesModal(true)}
+          onCloseClick={() => {
+            setShowMultipleModulesModal(true)
+          }}
           closeButton={
-            <StyledText
+            <LegacyStyledText
               as="p"
               textDecoration={TYPOGRAPHY.textDecorationUnderline}
               marginRight={SPACING.spacing8}
             >
               {t('learn_more')}
-            </StyledText>
+            </LegacyStyledText>
           }
         >
           <Flex flexDirection={DIRECTION_COLUMN}>
-            <StyledText css={TYPOGRAPHY.pSemiBold}>
+            <LegacyStyledText css={TYPOGRAPHY.pSemiBold}>
               {t('multiple_modules')}
-            </StyledText>
-            <StyledText as="p">{t('view_moam')}</StyledText>
+            </LegacyStyledText>
+            <LegacyStyledText as="p">{t('view_moam')}</LegacyStyledText>
           </Flex>
         </Banner>
       </Box>
@@ -69,9 +71,9 @@ export function OT2MultipleModulesHelp(): JSX.Element {
               <Flex flexDirection={DIRECTION_COLUMN}>
                 <Flex flexDirection={DIRECTION_ROW}>
                   <Flex flexDirection={DIRECTION_COLUMN} marginRight="3.625rem">
-                    <StyledText as="p" marginBottom={SPACING.spacing16}>
+                    <LegacyStyledText as="p" marginBottom={SPACING.spacing16}>
                       {t('multiple_modules_explanation')}
-                    </StyledText>
+                    </LegacyStyledText>
                     <Link
                       external
                       css={TYPOGRAPHY.linkPSemiBold}
@@ -87,16 +89,16 @@ export function OT2MultipleModulesHelp(): JSX.Element {
                         size="0.625rem"
                       />
                     </Link>
-                    <StyledText
+                    <LegacyStyledText
                       css={TYPOGRAPHY.pSemiBold}
                       marginBottom={SPACING.spacing4}
                     >
                       {t('example')}
-                    </StyledText>
+                    </LegacyStyledText>
 
-                    <StyledText as="p">
+                    <LegacyStyledText as="p">
                       {t('multiple_modules_example')}
-                    </StyledText>
+                    </LegacyStyledText>
                   </Flex>
                   <img
                     height="100%"

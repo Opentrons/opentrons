@@ -140,6 +140,7 @@ export interface ProtocolAnalysisOutput {
   runTimeParameters: RunTimeParameter[]
   robotType?: RobotType
   commandAnnotations?: CommandAnnotation[]
+  result: 'ok' | 'not-ok' | 'error' | 'parameter-value-required'
 }
 
 interface AnalysisSourceFile {

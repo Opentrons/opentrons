@@ -17,17 +17,12 @@ import {
   MoveLabwareOnDeck,
   RESPONSIVENESS,
   SPACING,
-  StyledText,
+  LegacyStyledText,
   TEXT_TRANSFORM_UPPERCASE,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import {
-  CompletedProtocolAnalysis,
-  LabwareDefinitionsByUri,
-  LabwareLocation,
-  MoveLabwareRunTimeCommand,
   OT2_ROBOT_TYPE,
-  RobotType,
   getDeckDefFromRobotType,
   getLabwareDisplayName,
   getLoadedLabwareDefinitionsByUri,
@@ -47,9 +42,16 @@ import { Divider } from '../../atoms/structure'
 import {
   getLoadedLabware,
   getLoadedModule,
-} from '../CommandText/utils/accessors'
+} from '../../molecules/Command/utils/accessors'
 import { useNotifyDeckConfigurationQuery } from '../../resources/deck_configuration'
 
+import type {
+  CompletedProtocolAnalysis,
+  LabwareDefinitionsByUri,
+  LabwareLocation,
+  MoveLabwareRunTimeCommand,
+  RobotType,
+} from '@opentrons/shared-data'
 import type { RunData } from '@opentrons/api-client'
 
 const LABWARE_DESCRIPTION_STYLE = css`
@@ -163,12 +165,12 @@ export function MoveLabwareInterventionContent({
         >
           <Flex css={LABWARE_DESCRIPTION_STYLE}>
             <Flex flexDirection={DIRECTION_COLUMN}>
-              <StyledText as="h2" css={LABWARE_NAME_TITLE_STYLE}>
+              <LegacyStyledText as="h2" css={LABWARE_NAME_TITLE_STYLE}>
                 {t('labware_name')}
-              </StyledText>
-              <StyledText as="p" css={LABWARE_NAME_STYLE}>
+              </LegacyStyledText>
+              <LegacyStyledText as="p" css={LABWARE_NAME_STYLE}>
                 {labwareName}
-              </StyledText>
+              </LegacyStyledText>
             </Flex>
             <Divider css={DIVIDER_STYLE} />
             <Flex css={LABWARE_DIRECTION_STYLE}>

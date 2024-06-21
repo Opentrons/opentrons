@@ -8,7 +8,7 @@ import {
   Link,
   PrimaryButton,
   SPACING,
-  StyledText,
+  LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
@@ -30,7 +30,9 @@ export function NewRobotSetupHelp(): JSX.Element {
       <Link
         css={TYPOGRAPHY.darkLinkLabelSemiBold}
         role="button"
-        onClick={() => setShowNewRobotHelpModal(true)}
+        onClick={() => {
+          setShowNewRobotHelpModal(true)
+        }}
       >
         {t('see_how_to_setup_new_robot')}
       </Link>
@@ -38,17 +40,21 @@ export function NewRobotSetupHelp(): JSX.Element {
         ? createPortal(
             <LegacyModal
               title={t('how_to_setup_a_robot')}
-              onClose={() => setShowNewRobotHelpModal(false)}
+              onClose={() => {
+                setShowNewRobotHelpModal(false)
+              }}
             >
               <Flex flexDirection={DIRECTION_COLUMN}>
-                <StyledText as="p" marginBottom={SPACING.spacing16}>
+                <LegacyStyledText as="p" marginBottom={SPACING.spacing16}>
                   {t('use_usb_cable_for_new_robot')}
-                </StyledText>
+                </LegacyStyledText>
                 <ExternalLink href={NEW_ROBOT_SETUP_SUPPORT_ARTICLE_HREF}>
                   {t('learn_more_about_new_robot_setup')}
                 </ExternalLink>
                 <PrimaryButton
-                  onClick={() => setShowNewRobotHelpModal(false)}
+                  onClick={() => {
+                    setShowNewRobotHelpModal(false)
+                  }}
                   alignSelf={ALIGN_FLEX_END}
                   textTransform={TYPOGRAPHY.textTransformCapitalize}
                 >

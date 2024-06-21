@@ -5,7 +5,7 @@ import {
   DIRECTION_COLUMN,
   Flex,
   SPACING,
-  StyledText,
+  LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { InputField } from '../../atoms/InputField'
@@ -45,12 +45,12 @@ export function ChooseNumber({
   }, [])
 
   if (parameter.type !== 'int' && parameter.type !== 'float') {
-    console.log(`Incorrect parameter type: ${parameter.type}`)
+    console.log(`Incorrect parameter type: ${parameter.type as string}`)
     return null
   }
-  const handleClickGoBack = (newValue: number): void => {
-    if (error != null) {
-      makeSnackbar(t('value_out_of_range_generic'))
+  const handleClickGoBack = (newValue: number | null): void => {
+    if (error != null || newValue === null) {
+      makeSnackbar(t('value_out_of_range_generic') as string)
     } else {
       setParameter(newValue, parameter.variableName)
       handleGoBack()
@@ -73,20 +73,18 @@ export function ChooseNumber({
     setPrevKeyboardValue(e)
   }
 
-  const paramValueAsNumber = Number(paramValue)
+  const paramValueAsNumber = paramValue !== '' ? Number(paramValue) : null
   const resetValueDisabled = parameter.default === paramValueAsNumber
   const { min, max } = parameter
   const error =
-    paramValue === '' ||
     Number.isNaN(paramValueAsNumber) ||
-    paramValueAsNumber < min ||
-    paramValueAsNumber > max
+    (paramValueAsNumber != null && paramValueAsNumber < min) ||
+    (paramValueAsNumber != null && paramValueAsNumber > max)
       ? t(`value_out_of_range`, {
           min: parameter.type === 'int' ? min : min.toFixed(1),
           max: parameter.type === 'int' ? max : max.toFixed(1),
         })
       : null
-
   return (
     <>
       <ChildNavigation
@@ -96,11 +94,11 @@ export function ChooseNumber({
         }}
         buttonType="tertiaryLowLight"
         buttonText={t('restore_default')}
-        onClickButton={() =>
+        onClickButton={() => {
           resetValueDisabled
-            ? makeSnackbar(t('no_custom_values'))
+            ? makeSnackbar(t('no_custom_values') as string)
             : setParamValue(String(parameter.default))
-        }
+        }}
       />
       <Flex
         alignSelf={ALIGN_CENTER}
@@ -118,10 +116,11 @@ export function ChooseNumber({
           flexDirection={DIRECTION_COLUMN}
           marginTop="7.75rem"
         >
-          <StyledText as="h4" textAlign={TYPOGRAPHY.textAlignLeft}>
+          <LegacyStyledText as="h4" textAlign={TYPOGRAPHY.textAlignLeft}>
             {parameter.description}
-          </StyledText>
+          </LegacyStyledText>
           <InputField
+            autoFocus
             type="text"
             units={parameter.suffix}
             placeholder={parameter.default.toString()}
@@ -133,6 +132,9 @@ export function ChooseNumber({
                 : `${parameter.min.toFixed(1)}-${parameter.max.toFixed(1)}`
             }
             error={error}
+            onBlur={e => {
+              e.target.focus()
+            }}
             onChange={e => {
               const updatedValue =
                 parameter.type === 'int'

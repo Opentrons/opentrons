@@ -12,10 +12,10 @@ import {
   Flex,
   JUSTIFY_SPACE_AROUND,
   JUSTIFY_SPACE_BETWEEN,
-  NewPrimaryBtn,
-  NewSecondaryBtn,
+  PrimaryButton,
+  SecondaryButton,
   SPACING,
-  StyledText,
+  LegacyStyledText,
 } from '@opentrons/components'
 
 import {
@@ -62,18 +62,7 @@ const PlaceholderError = ({
 export const RELEASE_NOTES_URL_BASE =
   'https://github.com/Opentrons/opentrons/releases/tag/v'
 const UPDATE_ERROR = 'Update Error'
-const FOOTER_BUTTON_STYLE = css`
-  text-transform: lowercase;
-  padding-left: ${SPACING.spacing16};
-  padding-right: ${SPACING.spacing16};
-  border-radius: ${BORDERS.borderRadius8};
-  margin-top: ${SPACING.spacing16};
-  margin-bottom: ${SPACING.spacing16};
 
-  &:first-letter {
-    text-transform: uppercase;
-  }
-`
 const UpdateAppBanner = styled(Banner)`
   border: none;
 `
@@ -122,7 +111,13 @@ export function UpdateAppModal(props: UpdateAppModalProps): JSX.Element {
   removeActiveAppUpdateToast()
 
   const appUpdateFooter = (
-    <Flex alignItems={ALIGN_CENTER} justifyContent={JUSTIFY_SPACE_BETWEEN}>
+    <Flex
+      alignItems={ALIGN_CENTER}
+      justifyContent={JUSTIFY_SPACE_BETWEEN}
+      paddingY={SPACING.spacing16}
+      borderTop={BORDERS.lineBorder}
+      borderColor={COLORS.grey30}
+    >
       <ExternalLink
         href={`${RELEASE_NOTES_URL_BASE}${availableAppUpdateVersion}`}
         css={css`
@@ -134,20 +129,18 @@ export function UpdateAppModal(props: UpdateAppModalProps): JSX.Element {
         {t('release_notes')}
       </ExternalLink>
       <Flex alignItems={ALIGN_CENTER} justifyContent={JUSTIFY_SPACE_AROUND}>
-        <NewSecondaryBtn
+        <SecondaryButton
           onClick={handleRemindMeLaterClick}
           marginRight={SPACING.spacing8}
-          css={FOOTER_BUTTON_STYLE}
         >
           {t('remind_later')}
-        </NewSecondaryBtn>
-        <NewPrimaryBtn
+        </SecondaryButton>
+        <PrimaryButton
           onClick={() => dispatch(downloadShellUpdate())}
           marginRight={SPACING.spacing12}
-          css={FOOTER_BUTTON_STYLE}
         >
           {t('update_app_now')}
-        </NewPrimaryBtn>
+        </PrimaryButton>
       </Flex>
     </Flex>
   )
@@ -157,7 +150,9 @@ export function UpdateAppModal(props: UpdateAppModalProps): JSX.Element {
       {error != null ? (
         <LegacyModal
           title={UPDATE_ERROR}
-          onClose={() => closeModal(true)}
+          onClose={() => {
+            closeModal(true)
+          }}
           css={LEGACY_MODAL_STYLE}
         >
           <PlaceholderError errorMessage={error.message} />
@@ -173,9 +168,9 @@ export function UpdateAppModal(props: UpdateAppModalProps): JSX.Element {
             alignItems={ALIGN_CENTER}
             padding={SPACING.spacing48}
           >
-            <StyledText>
+            <LegacyStyledText>
               {downloading ? t('download_update') : t('restarting_app')}
-            </StyledText>
+            </LegacyStyledText>
             <ProgressBar
               percentComplete={downloaded ? 100 : downloadPercentage}
               outerStyles={UPDATE_PROGRESS_BAR_STYLE}
@@ -186,7 +181,9 @@ export function UpdateAppModal(props: UpdateAppModalProps): JSX.Element {
       {!downloading && !downloaded && error == null ? (
         <LegacyModal
           title={t('branded:opentrons_app_update_available')}
-          onClose={() => closeModal(true)}
+          onClose={() => {
+            closeModal(true)
+          }}
           closeOnOutsideClick={true}
           footer={appUpdateFooter}
           maxHeight="80%"

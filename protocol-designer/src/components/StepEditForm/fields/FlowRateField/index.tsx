@@ -42,6 +42,9 @@ export function FlowRateField(props: FlowRateFieldProps): JSX.Element {
     } else if (flowRateType === 'dispense') {
       defaultFlowRate =
         matchingTipLiquidSpecs?.defaultDispenseFlowRate.default ?? 0
+    } else if (flowRateType === 'blowout') {
+      defaultFlowRate =
+        matchingTipLiquidSpecs?.defaultBlowOutFlowRate.default ?? 0
     }
   }
   return (

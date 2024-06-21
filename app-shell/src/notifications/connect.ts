@@ -68,6 +68,7 @@ export function establishConnections(
 ): Promise<RobotData[]> {
   return new Promise((resolve, reject) => {
     const newConnections = healthyRobots.filter(({ ip, robotName }) => {
+      // Only attempt a new connection if the current broker connection is bad.
       if (connectionStore.isConnectedToBroker(robotName)) {
         return false
       } else {
@@ -89,7 +90,9 @@ export function establishConnections(
               notifyLog.debug(`Successfully connected to ${robotName} on ${ip}`)
               void connectionStore
                 .setConnected(robotName, client)
-                .then(() => establishListeners(client, ip, robotName))
+                .then(() => {
+                  establishListeners(client, ip, robotName)
+                })
                 .catch((error: Error) => notifyLog.debug(error.message))
             })
             .catch((error: Error) => {
@@ -115,17 +118,23 @@ function connectAsync(brokerURL: string): Promise<mqtt.Client> {
     } = {
       connect: () => {
         removePromiseListeners()
-        return resolve(client)
+        resolve(client)
       },
       // A connection error event will close the connection without a retry.
       error: (error: Error | string) => {
         removePromiseListeners()
         const clientEndPromise = new Promise((resolve, reject) =>
-          client.end(true, {}, () => resolve(error))
+          client.end(true, {}, () => {
+            resolve(error)
+          })
         )
-        return clientEndPromise.then(() => reject(error))
+        return clientEndPromise.then(() => {
+          reject(error)
+        })
       },
-      end: () => promiseListeners.error(`Couldn't connect to ${brokerURL}`),
+      end: () => {
+        promiseListeners.error(`Couldn't connect to ${brokerURL}`)
+      },
     }
 
     function removePromiseListeners(): void {
@@ -171,7 +180,7 @@ function establishListeners(
   client.on('reconnect', () => {
     notifyLog.debug(`Attempting to reconnect to ${robotName} on ${ip}`)
   })
-  // handles transport layer errors only
+  // Handles transport layer errors only
   client.on('error', error => {
     notifyLog.warn(`Error - ${error.name}: ${error.message}`)
     sendDeserializedGenericError(ip, 'ALL_TOPICS')
@@ -193,6 +202,15 @@ function establishListeners(
     )
     sendDeserializedGenericError(ip, 'ALL_TOPICS')
   })
+
+  // Some network interfaces (such as link-local) will *sometimes* fire the 'offline' event when physically disconnected.
+  // While the keepalive packet will eventually result in an 'error' event and close the client, we can proactively
+  // close the client when possible, allowing for the connection store to connect to the robot on an alternative IP
+  // if one is available.
+  client.on('offline', () => {
+    sendDeserializedGenericError(ip, 'ALL_TOPICS')
+    client.end()
+  })
 }
 
 export function closeConnectionsForcefullyFor(
@@ -202,7 +220,9 @@ export function closeConnectionsForcefullyFor(
     const client = connectionStore.getClient(ip)
     return new Promise<void>((resolve, reject) => {
       if (client != null) {
-        client.end(true, {}, () => resolve())
+        client.end(true, {}, () => {
+          resolve()
+        })
       }
     })
   })

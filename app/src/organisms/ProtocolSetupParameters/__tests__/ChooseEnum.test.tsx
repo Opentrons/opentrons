@@ -73,7 +73,7 @@ describe('ChooseEnum', () => {
     const selectedOption = screen.getByRole('label', {
       name: 'temp offset',
     })
-    expect(notSelectedOption).toHaveStyle(`background-color: ${COLORS.blue40}`)
-    expect(selectedOption).toHaveStyle(`background-color: ${COLORS.blue60}`)
+    expect(notSelectedOption).toHaveStyle(`background: ${COLORS.blue35}`)
+    expect(selectedOption).toHaveStyle(`background: ${COLORS.blue50}`)
   })
 })

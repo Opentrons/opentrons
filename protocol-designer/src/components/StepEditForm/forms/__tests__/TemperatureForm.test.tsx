@@ -8,11 +8,10 @@ import {
   getTemperatureModuleIds,
 } from '../../../../ui/modules/selectors'
 import { TemperatureForm } from '../TemperatureForm'
+import type * as ModulesSelectors from '../../../../ui/modules/selectors'
 
 vi.mock('../../../../ui/modules/selectors', async importOriginal => {
-  const actualFields = await importOriginal<
-    typeof import('../../../../ui/modules/selectors')
-  >()
+  const actualFields = await importOriginal<typeof ModulesSelectors>()
   return {
     ...actualFields,
     getTemperatureLabwareOptions: vi.fn(),

@@ -82,7 +82,7 @@ export function SetupLiquidsMap(
       labwareInAdapterInMod?.params.displayName ??
       module.nestedLabwareDisplayName
     const nestedLabwareWellFill = getWellFillFromLabwareId(
-      module.nestedLabwareId ?? '',
+      topLabwareId ?? '',
       liquids,
       labwareByLiquidId
     )
@@ -101,11 +101,15 @@ export function SetupLiquidsMap(
       moduleChildren:
         topLabwareDefinition != null && topLabwareId != null ? (
           <g
-            onMouseEnter={() => setHoverLabwareId(topLabwareId)}
-            onMouseLeave={() => setHoverLabwareId('')}
-            onClick={() =>
-              labwareHasLiquid ? setLiquidDetailsLabwareId(topLabwareId) : null
-            }
+            onMouseEnter={() => {
+              setHoverLabwareId(topLabwareId)
+            }}
+            onMouseLeave={() => {
+              setHoverLabwareId('')
+            }}
+            onClick={() => {
+              if (labwareHasLiquid) setLiquidDetailsLabwareId(topLabwareId)
+            }}
             cursor={labwareHasLiquid ? 'pointer' : ''}
           >
             <LabwareInfoOverlay
@@ -158,13 +162,16 @@ export function SetupLiquidsMap(
               >
                 <g
                   transform={`translate(${x},${y})`}
-                  onMouseEnter={() => setHoverLabwareId(topLabwareId)}
-                  onMouseLeave={() => setHoverLabwareId('')}
-                  onClick={() =>
-                    labwareHasLiquid
-                      ? setLiquidDetailsLabwareId(topLabwareId)
-                      : null
-                  }
+                  onMouseEnter={() => {
+                    setHoverLabwareId(topLabwareId)
+                  }}
+                  onMouseLeave={() => {
+                    setHoverLabwareId('')
+                  }}
+                  onClick={() => {
+                    if (labwareHasLiquid)
+                      setLiquidDetailsLabwareId(topLabwareId)
+                  }}
                   cursor={labwareHasLiquid ? 'pointer' : ''}
                 >
                   <LabwareRender
@@ -190,7 +197,9 @@ export function SetupLiquidsMap(
         <LiquidsLabwareDetailsModal
           labwareId={liquidDetailsLabwareId}
           runId={runId}
-          closeModal={() => setLiquidDetailsLabwareId(null)}
+          closeModal={() => {
+            setLiquidDetailsLabwareId(null)
+          }}
         />
       )}
     </Flex>

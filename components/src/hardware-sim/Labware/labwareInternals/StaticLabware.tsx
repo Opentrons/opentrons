@@ -49,34 +49,39 @@ const LabwareDetailGroup = styled.g`
 `
 
 export function StaticLabwareComponent(props: StaticLabwareProps): JSX.Element {
-  const { isTiprack } = props.definition.parameters
+  const {
+    definition,
+    highlight,
+    onLabwareClick,
+    onMouseEnterWell,
+    onMouseLeaveWell,
+  } = props
+
+  const { isTiprack } = definition.parameters
   return (
-    <g onClick={props.onLabwareClick}>
+    <g onClick={onLabwareClick}>
       <LabwareDetailGroup>
-        <LabwareOutline
-          definition={props.definition}
-          highlight={props.highlight}
-        />
+        <LabwareOutline definition={definition} highlight={highlight} />
       </LabwareDetailGroup>
       <g>
         {flatMap(
-          props.definition.ordering,
+          definition.ordering,
           (row: string[], i: number, c: string[][]) => {
             return row.map(wellName => {
               return (
                 <React.Fragment key={wellName}>
                   <Well
                     wellName={wellName}
-                    well={props.definition.wells[wellName]}
-                    onMouseEnterWell={props.onMouseEnterWell}
-                    onMouseLeaveWell={props.onMouseLeaveWell}
+                    well={definition.wells[wellName]}
+                    onMouseEnterWell={onMouseEnterWell}
+                    onMouseLeaveWell={onMouseLeaveWell}
                     {...(isTiprack
                       ? STYLE_BY_WELL_CONTENTS.tipPresent
                       : STYLE_BY_WELL_CONTENTS.defaultWell)}
                   />
 
                   {isTiprack ? (
-                    <TipDecoration well={props.definition.wells[wellName]} />
+                    <TipDecoration well={definition.wells[wellName]} />
                   ) : null}
                 </React.Fragment>
               )

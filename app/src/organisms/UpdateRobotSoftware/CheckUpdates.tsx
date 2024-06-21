@@ -10,7 +10,7 @@ import {
   Icon,
   JUSTIFY_CENTER,
   SPACING,
-  StyledText,
+  LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
@@ -28,9 +28,9 @@ export function CheckUpdates(): JSX.Element {
       borderRadius={BORDERS.borderRadius12}
     >
       <Icon name="ot-spinner" size="5rem" spin color={COLORS.grey60} />
-      <StyledText as="h2" fontWeight={TYPOGRAPHY.fontWeightBold}>
+      <LegacyStyledText as="h2" fontWeight={TYPOGRAPHY.fontWeightBold}>
         {t('checking_for_updates')}
-      </StyledText>
+      </LegacyStyledText>
     </Flex>
   )
 }

@@ -41,6 +41,7 @@ export const mockPausedRun: RunData = {
   pipettes: [],
   labware: [],
   modules: [],
+  liquids: [],
   runTimeParameters: [],
 }
 
@@ -66,6 +67,7 @@ export const mockPauseRequestedRun: RunData = {
   pipettes: [],
   labware: [],
   modules: [],
+  liquids: [],
   runTimeParameters: [],
 }
 
@@ -96,6 +98,7 @@ export const mockRunningRun: RunData = {
   pipettes: [],
   labware: [],
   modules: [],
+  liquids: [],
   runTimeParameters: [],
 }
 
@@ -126,6 +129,7 @@ export const mockFailedRun: RunData = {
     {
       id: '5',
       errorType: 'RuntimeError',
+      isDefined: false,
       createdAt: 'noon forty-five',
       detail: 'this run failed',
       errorInfo: {},
@@ -136,6 +140,7 @@ export const mockFailedRun: RunData = {
   pipettes: [],
   labware: [],
   modules: [],
+  liquids: [],
   runTimeParameters: [],
 }
 
@@ -171,6 +176,7 @@ export const mockStopRequestedRun: RunData = {
   pipettes: [],
   labware: [],
   modules: [],
+  liquids: [],
   runTimeParameters: [],
 }
 
@@ -206,6 +212,7 @@ export const mockStoppedRun: RunData = {
   pipettes: [],
   labware: [],
   modules: [],
+  liquids: [],
   runTimeParameters: [],
 }
 
@@ -236,6 +243,7 @@ export const mockSucceededRun: RunData = {
   pipettes: [],
   labware: [],
   modules: [],
+  liquids: [],
   runTimeParameters: [],
 }
 
@@ -250,6 +258,7 @@ export const mockIdleUnstartedRun: RunData = {
   pipettes: [],
   labware: [],
   modules: [],
+  liquids: [],
   runTimeParameters: [],
 }
 
@@ -280,6 +289,7 @@ export const mockIdleStartedRun: RunData = {
   pipettes: [],
   labware: [],
   modules: [],
+  liquids: [],
   runTimeParameters: [],
 }
 

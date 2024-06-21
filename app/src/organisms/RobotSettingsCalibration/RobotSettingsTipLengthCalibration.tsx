@@ -1,22 +1,23 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 
+import { getLabwareDefURI } from '@opentrons/shared-data'
 import {
   DIRECTION_COLUMN,
   Flex,
   SPACING,
-  StyledText,
+  LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { useAllTipLengthCalibrationsQuery } from '@opentrons/react-api-client'
 
 import { useAttachedPipettes } from '../../organisms/Devices/hooks'
+import { getDefaultTiprackDefForPipetteName } from '../Devices/constants'
 import { TipLengthCalibrationItems } from './CalibrationDetails/TipLengthCalibrationItems'
 
+import type { PipetteName } from '@opentrons/shared-data'
 import type { FormattedPipetteOffsetCalibration } from '.'
-import { TipLengthCalibration } from '../../redux/calibration/api-types'
-import { getDefaultTiprackDefForPipetteName } from '../Devices/constants'
-import { getLabwareDefURI, PipetteName } from '@opentrons/shared-data'
+import type { TipLengthCalibration } from '../../redux/calibration/api-types'
 
 interface RobotSettingsTipLengthCalibrationProps {
   formattedPipetteOffsetCalibrations: FormattedPipetteOffsetCalibration[]
@@ -83,9 +84,9 @@ export function RobotSettingsTipLengthCalibration({
       paddingY={SPACING.spacing24}
       gridGap={SPACING.spacing8}
     >
-      <StyledText as="h3" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
+      <LegacyStyledText as="h3" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
         {t('tip_length_calibrations_title')}
-      </StyledText>
+      </LegacyStyledText>
       <TipLengthCalibrationItems
         robotName={robotName}
         formattedPipetteOffsetCalibrations={formattedPipetteOffsetCalibrations}

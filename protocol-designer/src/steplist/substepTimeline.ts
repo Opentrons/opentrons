@@ -5,16 +5,18 @@ import {
   getNextRobotStateAndWarningsSingleCommand,
 } from '@opentrons/step-generation'
 import {
-  AddressableAreaName,
   FLEX_ROBOT_TYPE,
   ALL,
   COLUMN,
-  CreateCommand,
   OT2_ROBOT_TYPE,
+} from '@opentrons/shared-data'
+import { getCutoutIdByAddressableArea } from '../utils'
+import type { Channels } from '@opentrons/components'
+import type {
+  AddressableAreaName,
+  CreateCommand,
   NozzleConfigurationStyle,
 } from '@opentrons/shared-data'
-import { Channels } from '@opentrons/components'
-import { getCutoutIdByAddressableArea } from '../utils'
 import type {
   CommandCreatorError,
   CommandsAndWarnings,
@@ -64,11 +66,23 @@ const _createNextTimelineFrame = (args: {
     volume: args.volume,
     activeTips: _getNewActiveTips(args.nextFrame.commands.slice(0, args.index)),
   }
+  const command = args.command
+  const isAirGapCommand =
+    'meta' in command && command.meta != null && 'isAirGap' in command.meta
+
   const newTimelineFrame =
     args.command.commandType === 'aspirate' ||
     args.command.commandType === 'aspirateInPlace'
-      ? { ..._newTimelineFrameKeys, source: args.wellInfo }
-      : { ..._newTimelineFrameKeys, dest: args.wellInfo }
+      ? {
+          ..._newTimelineFrameKeys,
+          source: args.wellInfo,
+          isAirGap: isAirGapCommand,
+        }
+      : {
+          ..._newTimelineFrameKeys,
+          dest: args.wellInfo,
+          isAirGap: isAirGapCommand,
+        }
   return newTimelineFrame
 }
 

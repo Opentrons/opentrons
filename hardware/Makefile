@@ -53,7 +53,8 @@ ot_sources := $(ot_py_sources)
 
 # Defined separately than the clean target so the wheel file doesn’t have to
 # depend on a PHONY target
-clean_cmd = $(SHX) rm -rf build dist .coverage coverage.xml '*.egg-info' '**/__pycache__' '**/*.pyc' '**/.mypy_cache'
+clean_cmd = $(SHX) rm -rf build dist .coverage coverage.xml '*.egg-info'
+clean_cache_cmd = $(SHX) rm -rf '**/__pycache__' '**/*.pyc' '**/.mypy_cache'
 
 .PHONY: all
 all: clean wheel
@@ -69,7 +70,8 @@ teardown:
 
 .PHONY: clean
 clean:
-	-$(clean_cmd)
+	$(clean_cmd)
+	$(clean_cache_cmd)
 
 dist/opentrons_hardware-%-py2.py3-none-any.whl: export OPENTRONS_PROJECT=$(project_rs_default)
 dist/opentrons_hardware-%-py2.py3-none-any.whl: setup.py $(ot_sources)

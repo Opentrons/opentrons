@@ -9,7 +9,7 @@ import {
   ALIGN_CENTER,
   PrimaryButton,
   SecondaryButton,
-  StyledText,
+  LegacyStyledText,
 } from '@opentrons/components'
 
 import * as Sessions from '../../../redux/sessions'
@@ -121,7 +121,9 @@ export function Introduction(props: CalibrationPanelProps): JSX.Element {
       mount={props.mount}
       chosenTipRack={chosenTipRack}
       handleChosenTipRack={handleChosenTipRack}
-      closeModal={() => setShowChooseTipRack(false)}
+      closeModal={() => {
+        setShowChooseTipRack(false)
+      }}
       robotName={props.robotName}
       defaultTipracks={props.defaultTipracks}
     />
@@ -138,9 +140,9 @@ export function Introduction(props: CalibrationPanelProps): JSX.Element {
           flexDirection={DIRECTION_COLUMN}
           gridGap={SPACING.spacing8}
         >
-          <StyledText as="h1" marginBottom={SPACING.spacing16}>
+          <LegacyStyledText as="h1" marginBottom={SPACING.spacing16}>
             {t('before_you_begin')}
-          </StyledText>
+          </LegacyStyledText>
 
           {(sessionType === Sessions.SESSION_TYPE_DECK_CALIBRATION ||
             sessionType === Sessions.SESSION_TYPE_TIP_LENGTH_CALIBRATION) &&
@@ -169,7 +171,11 @@ export function Introduction(props: CalibrationPanelProps): JSX.Element {
         <NeedHelpLink />
         <Flex alignItems={ALIGN_CENTER} gridGap={SPACING.spacing8}>
           {allowChangeTipRack ? (
-            <SecondaryButton onClick={() => setShowChooseTipRack(true)}>
+            <SecondaryButton
+              onClick={() => {
+                setShowChooseTipRack(true)
+              }}
+            >
               {t('change_tip_rack')}
             </SecondaryButton>
           ) : null}

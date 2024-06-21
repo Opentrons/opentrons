@@ -24,13 +24,16 @@ import {
   ProtocolDeck,
   SPACING,
   SecondaryButton,
-  StyledText,
+  LegacyStyledText,
   TYPOGRAPHY,
+  useTooltip,
   useHoverTooltip,
 } from '@opentrons/components'
 import { ApiHostProvider } from '@opentrons/react-api-client'
+import { sortRuntimeParameters } from '@opentrons/shared-data'
 
 import { useLogger } from '../../logger'
+import { useFeatureFlag } from '../../redux/config'
 import { OPENTRONS_USB } from '../../redux/discovery'
 import { getStoredProtocols } from '../../redux/protocol-storage'
 import { appShellRequestor } from '../../redux/shell/remote'
@@ -40,15 +43,17 @@ import { ToggleButton } from '../../atoms/buttons'
 import { InputField } from '../../atoms/InputField'
 import { DropdownMenu } from '../../atoms/MenuList/DropdownMenu'
 import { MiniCard } from '../../molecules/MiniCard'
+import { UploadInput } from '../../molecules/UploadInput'
 import { useTrackCreateProtocolRunEvent } from '../Devices/hooks'
 import { useCreateRunFromProtocol } from '../ChooseRobotToRunProtocolSlideout/useCreateRunFromProtocol'
 import { ApplyHistoricOffsets } from '../ApplyHistoricOffsets'
 import { useOffsetCandidatesForAnalysis } from '../ApplyHistoricOffsets/hooks/useOffsetCandidatesForAnalysis'
+import { FileCard } from '../ChooseRobotSlideout/FileCard'
+import { getRunTimeParameterValuesForRun } from '../Devices/utils'
 import { getAnalysisStatus } from '../ProtocolsLanding/utils'
 
-import type { RunTimeParameterCreateData } from '@opentrons/api-client'
-import type { RunTimeParameter } from '@opentrons/shared-data'
 import type { DropdownOption } from '@opentrons/components'
+import type { RunTimeParameter } from '@opentrons/shared-data'
 import type { Robot } from '../../redux/discovery/types'
 import type { StoredProtocolData } from '../../redux/protocol-storage'
 import type { State } from '../../redux/types'
@@ -62,6 +67,8 @@ export const CARD_OUTLINE_BORDER_STYLE = css`
     border-color: ${COLORS.grey55};
   }
 `
+
+const TOOLTIP_DELAY_MS = 2000
 
 const _getFileBaseName = (filePath: string): string => {
   return filePath.split('/').reverse()[0]
@@ -78,7 +85,12 @@ export function ChooseProtocolSlideoutComponent(
   const { t } = useTranslation(['device_details', 'shared'])
   const history = useHistory()
   const logger = useLogger(new URL('', import.meta.url).pathname)
-  const [targetProps, tooltipProps] = useHoverTooltip()
+  const [targetProps, tooltipProps] = useTooltip()
+  const [targetPropsHover, tooltipPropsHover] = useHoverTooltip()
+  const [
+    showRestoreValuesTooltip,
+    setShowRestoreValuesTooltip,
+  ] = React.useState<boolean>(false)
 
   const { robot, showSlideout, onCloseClick } = props
   const { name } = robot
@@ -93,6 +105,13 @@ export function ChooseProtocolSlideoutComponent(
   ] = React.useState<RunTimeParameter[]>([])
   const [currentPage, setCurrentPage] = React.useState<number>(1)
   const [hasParamError, setHasParamError] = React.useState<boolean>(false)
+  const [hasMissingFileParam, setHasMissingFileParam] = React.useState<boolean>(
+    runTimeParametersOverrides?.some(
+      parameter => parameter.type === 'csv_file'
+    ) ?? false
+  )
+  const [isInputFocused, setIsInputFocused] = React.useState<boolean>(false)
+  const enableCsvFile = useFeatureFlag('enableCsvFile')
 
   React.useEffect(() => {
     setRunTimeParametersOverrides(
@@ -101,6 +120,12 @@ export function ChooseProtocolSlideoutComponent(
   }, [selectedProtocol])
   React.useEffect(() => {
     setHasParamError(errors.length > 0)
+    setHasMissingFileParam(
+      runTimeParametersOverrides.some(
+        parameter =>
+          parameter.type === 'csv_file' && parameter.file?.file == null
+      )
+    )
   }, [runTimeParametersOverrides])
 
   const runTimeParametersFromAnalysis =
@@ -165,13 +190,7 @@ export function ChooseProtocolSlideoutComponent(
           definitionUri,
         }))
       : [],
-    runTimeParametersOverrides.reduce<RunTimeParameterCreateData>(
-      (acc, param) =>
-        param.value !== param.default
-          ? { ...acc, [param.variableName]: param.value }
-          : acc,
-      {}
-    )
+    getRunTimeParameterValuesForRun(runTimeParametersOverrides)
   )
   const handleProceed: React.MouseEventHandler<HTMLButtonElement> = () => {
     if (selectedProtocol != null) {
@@ -186,179 +205,309 @@ export function ChooseProtocolSlideoutComponent(
   }
 
   const isRestoreDefaultsLinkEnabled =
-    runTimeParametersOverrides?.some(
-      parameter => parameter.value !== parameter.default
+    runTimeParametersOverrides?.some(parameter =>
+      parameter.type === 'csv_file'
+        ? parameter.file != null
+        : parameter.value !== parameter.default
     ) ?? false
 
   const errors: string[] = []
   const runTimeParametersInputs =
-    runTimeParametersOverrides?.map((runtimeParam, index) => {
-      if ('choices' in runtimeParam) {
-        const dropdownOptions = runtimeParam.choices.map(choice => {
-          return { name: choice.displayName, value: choice.value }
-        }) as DropdownOption[]
-        return (
-          <DropdownMenu
-            key={runtimeParam.variableName}
-            filterOptions={dropdownOptions}
-            currentOption={
-              dropdownOptions.find(choice => {
-                return choice.value === runtimeParam.value
-              }) ?? dropdownOptions[0]
-            }
-            onClick={choice => {
-              const clone = runTimeParametersOverrides.map((parameter, i) => {
-                if (i === index) {
-                  return {
-                    ...parameter,
-                    value:
-                      dropdownOptions.find(option => option.value === choice)
-                        ?.value ?? parameter.default,
+    runTimeParametersOverrides != null
+      ? sortRuntimeParameters(runTimeParametersOverrides).map(
+          (runtimeParam, index) => {
+            if ('choices' in runtimeParam) {
+              const dropdownOptions = runtimeParam.choices.map(choice => {
+                return { name: choice.displayName, value: choice.value }
+              }) as DropdownOption[]
+              return (
+                <DropdownMenu
+                  key={runtimeParam.variableName}
+                  filterOptions={dropdownOptions}
+                  currentOption={
+                    dropdownOptions.find(choice => {
+                      return choice.value === runtimeParam.value
+                    }) ?? dropdownOptions[0]
                   }
-                }
-                return parameter
-              })
-              setRunTimeParametersOverrides(clone)
-            }}
-            title={runtimeParam.displayName}
-            width="100%"
-            dropdownType="neutral"
-          />
-        )
-      } else if (runtimeParam.type === 'int' || runtimeParam.type === 'float') {
-        const value = runtimeParam.value as number
-        const id = `InputField_${runtimeParam.variableName}_${index.toString()}`
-        const error =
-          Number.isNaN(value) ||
-          value < runtimeParam.min ||
-          value > runtimeParam.max
-            ? t(`protocol_details:value_out_of_range`, {
-                min:
-                  runtimeParam.type === 'int'
-                    ? runtimeParam.min
-                    : runtimeParam.min.toFixed(1),
-                max:
-                  runtimeParam.type === 'int'
-                    ? runtimeParam.max
-                    : runtimeParam.max.toFixed(1),
-              })
-            : null
-        if (error != null) {
-          errors.push(error)
-        }
-        return (
-          <InputField
-            key={runtimeParam.variableName}
-            type="number"
-            units={runtimeParam.suffix}
-            placeholder={runtimeParam.default.toString()}
-            value={value}
-            title={runtimeParam.displayName}
-            tooltipText={runtimeParam.description}
-            caption={`${runtimeParam.min}-${runtimeParam.max}`}
-            id={id}
-            error={error}
-            onChange={e => {
-              const clone = runTimeParametersOverrides.map((parameter, i) => {
-                if (i === index) {
-                  return {
-                    ...parameter,
-                    value:
-                      runtimeParam.type === 'int'
-                        ? Math.round(e.target.valueAsNumber)
-                        : e.target.valueAsNumber,
-                  }
-                }
-                return parameter
-              })
-              setRunTimeParametersOverrides(clone)
-            }}
-          />
-        )
-      } else if (runtimeParam.type === 'bool') {
-        return (
-          <Flex
-            flexDirection={DIRECTION_COLUMN}
-            key={runtimeParam.variableName}
-          >
-            <StyledText
-              as="label"
-              fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-              paddingBottom={SPACING.spacing8}
-            >
-              {runtimeParam.displayName}
-            </StyledText>
-            <Flex
-              gridGap={SPACING.spacing8}
-              justifyContent={JUSTIFY_FLEX_START}
-              width="max-content"
-            >
-              <ToggleButton
-                toggledOn={runtimeParam.value as boolean}
-                onClick={() => {
-                  const clone = runTimeParametersOverrides.map(
-                    (parameter, i) => {
-                      if (i === index) {
+                  onClick={choice => {
+                    const clone = runTimeParametersOverrides.map(parameter => {
+                      if (
+                        runtimeParam.variableName === parameter.variableName &&
+                        'choices' in parameter
+                      ) {
                         return {
                           ...parameter,
-                          value: !parameter.value,
+                          value:
+                            dropdownOptions.find(
+                              option => option.value === choice
+                            )?.value ?? parameter.default,
                         }
                       }
                       return parameter
-                    }
-                  )
-                  setRunTimeParametersOverrides(clone)
-                }}
-                height="0.813rem"
-                label={
-                  Boolean(runtimeParam.value)
-                    ? t('protocol_details:on')
-                    : t('protocol_details:off')
-                }
-                paddingTop={SPACING.spacing2} // manual alignment of SVG with value label
-              />
-              <StyledText as="p">
-                {Boolean(runtimeParam.value)
-                  ? t('protocol_details:on')
-                  : t('protocol_details:off')}
-              </StyledText>
-            </Flex>
-            <StyledText as="label" paddingTop={SPACING.spacing8}>
-              {runtimeParam.description}
-            </StyledText>
-          </Flex>
+                    })
+                    setRunTimeParametersOverrides?.(clone)
+                  }}
+                  title={runtimeParam.displayName}
+                  width="100%"
+                  dropdownType="neutral"
+                  tooltipText={runtimeParam.description}
+                />
+              )
+            } else if (
+              runtimeParam.type === 'int' ||
+              runtimeParam.type === 'float'
+            ) {
+              const value = runtimeParam.value as number
+              const id = `InputField_${runtimeParam.variableName}_${index}`
+              const error =
+                (Number.isNaN(value) && !isInputFocused) ||
+                value < runtimeParam.min ||
+                value > runtimeParam.max
+                  ? t(`value_out_of_range`, {
+                      min:
+                        runtimeParam.type === 'int'
+                          ? runtimeParam.min
+                          : runtimeParam.min.toFixed(1),
+                      max:
+                        runtimeParam.type === 'int'
+                          ? runtimeParam.max
+                          : runtimeParam.max.toFixed(1),
+                    })
+                  : null
+              if (error != null) {
+                errors.push(error as string)
+              }
+              return (
+                <InputField
+                  key={runtimeParam.variableName}
+                  type="number"
+                  units={runtimeParam.suffix}
+                  placeholder={runtimeParam.default.toString()}
+                  value={value}
+                  title={runtimeParam.displayName}
+                  tooltipText={runtimeParam.description}
+                  caption={
+                    runtimeParam.type === 'int'
+                      ? `${runtimeParam.min}-${runtimeParam.max}`
+                      : `${runtimeParam.min.toFixed(
+                          1
+                        )}-${runtimeParam.max.toFixed(1)}`
+                  }
+                  id={id}
+                  error={error}
+                  onBlur={() => {
+                    setIsInputFocused(false)
+                  }}
+                  onFocus={() => {
+                    setIsInputFocused(true)
+                  }}
+                  onChange={e => {
+                    const clone = runTimeParametersOverrides.map(parameter => {
+                      if (
+                        runtimeParam.variableName === parameter.variableName &&
+                        (parameter.type === 'int' || parameter.type === 'float')
+                      ) {
+                        return {
+                          ...parameter,
+                          value:
+                            runtimeParam.type === 'int'
+                              ? Math.round(e.target.valueAsNumber)
+                              : e.target.valueAsNumber,
+                        }
+                      }
+                      return parameter
+                    })
+                    setRunTimeParametersOverrides?.(clone)
+                  }}
+                />
+              )
+            } else if (runtimeParam.type === 'bool') {
+              return (
+                <Flex
+                  flexDirection={DIRECTION_COLUMN}
+                  key={runtimeParam.variableName}
+                >
+                  <LegacyStyledText
+                    as="label"
+                    fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+                    paddingBottom={SPACING.spacing8}
+                  >
+                    {runtimeParam.displayName}
+                  </LegacyStyledText>
+                  <Flex
+                    gridGap={SPACING.spacing8}
+                    justifyContent={JUSTIFY_FLEX_START}
+                    width="max-content"
+                  >
+                    <ToggleButton
+                      toggledOn={runtimeParam.value as boolean}
+                      onClick={() => {
+                        const clone = runTimeParametersOverrides.map(
+                          parameter => {
+                            if (
+                              runtimeParam.variableName ===
+                                parameter.variableName &&
+                              parameter.type === 'bool'
+                            ) {
+                              return {
+                                ...parameter,
+                                value: !Boolean(parameter.value),
+                              }
+                            }
+                            return parameter
+                          }
+                        )
+                        setRunTimeParametersOverrides?.(clone)
+                      }}
+                      height="0.813rem"
+                      label={
+                        Boolean(runtimeParam.value)
+                          ? t('protocol_details:on')
+                          : t('protocol_details:off')
+                      }
+                      paddingTop={SPACING.spacing2} // manual alignment of SVG with value label
+                    />
+                    <LegacyStyledText as="p">
+                      {Boolean(runtimeParam.value)
+                        ? t('protocol_details:on')
+                        : t('protocol_details:off')}
+                    </LegacyStyledText>
+                  </Flex>
+                  <LegacyStyledText as="label" paddingTop={SPACING.spacing8}>
+                    {runtimeParam.description}
+                  </LegacyStyledText>
+                </Flex>
+              )
+            } else if (runtimeParam.type === 'csv_file') {
+              const error =
+                runtimeParam.file?.file?.type === 'text/csv'
+                  ? null
+                  : t('protocol_details:csv_file_type_required')
+              if (error != null) {
+                errors.push(error as string)
+              }
+              return !enableCsvFile ? null : (
+                <Flex
+                  flexDirection={DIRECTION_COLUMN}
+                  alignItems={ALIGN_CENTER}
+                  gridgap={SPACING.spacing8}
+                >
+                  <Flex
+                    flexDirection={DIRECTION_COLUMN}
+                    gridGap={SPACING.spacing8}
+                    width="100%"
+                    marginBottom={SPACING.spacing16}
+                  >
+                    <LegacyStyledText
+                      as="h3"
+                      fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+                    >
+                      {t('protocol_details:csv_file')}
+                    </LegacyStyledText>
+                    <LegacyStyledText as="p">
+                      {t('protocol_details:csv_required')}
+                    </LegacyStyledText>
+                  </Flex>
+                  {runtimeParam.file == null ? (
+                    <UploadInput
+                      uploadButtonText={t('protocol_details:choose_file')}
+                      onUpload={(file: File) => {
+                        const clone = runTimeParametersOverrides.map(
+                          parameter => {
+                            if (
+                              runtimeParam.variableName ===
+                              parameter.variableName
+                            ) {
+                              return {
+                                ...parameter,
+                                file: { file },
+                              }
+                            }
+                            return parameter
+                          }
+                        )
+                        setRunTimeParametersOverrides?.(clone)
+                      }}
+                      dragAndDropText={
+                        <LegacyStyledText as="p">
+                          <Trans
+                            t={t}
+                            i18nKey="shared:drag_and_drop"
+                            components={{
+                              a: (
+                                <LinkComponent
+                                  color={COLORS.blue55}
+                                  role="button"
+                                  to={''}
+                                />
+                              ),
+                            }}
+                          />
+                        </LegacyStyledText>
+                      }
+                    />
+                  ) : (
+                    <FileCard
+                      error={error}
+                      fileRunTimeParameter={runtimeParam}
+                      runTimeParametersOverrides={runTimeParametersOverrides}
+                      setRunTimeParametersOverrides={
+                        setRunTimeParametersOverrides
+                      }
+                    />
+                  )}
+                </Flex>
+              )
+            }
+          }
         )
-      }
-    }) ?? null
+      : null
 
   const resetRunTimeParameters = (): void => {
-    setRunTimeParametersOverrides(
-      runTimeParametersOverrides?.map(parameter => ({
-        ...parameter,
-        value: parameter.default,
-      }))
+    const clone = runTimeParametersOverrides.map(parameter =>
+      parameter.type === 'csv_file'
+        ? { ...parameter, file: null }
+        : { ...parameter, value: parameter.default }
     )
+    setRunTimeParametersOverrides(clone as RunTimeParameter[])
   }
 
   const pageTwoBody = (
-    <Flex flexDirection={DIRECTION_COLUMN}>
+    <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing10}>
       <Flex justifyContent={JUSTIFY_END}>
         <LinkComponent
           textAlign={TYPOGRAPHY.textAlignRight}
           css={
             isRestoreDefaultsLinkEnabled ? ENABLED_LINK_CSS : DISABLED_LINK_CSS
           }
-          onClick={resetRunTimeParameters}
+          onClick={() => {
+            if (isRestoreDefaultsLinkEnabled) {
+              resetRunTimeParameters?.()
+            } else {
+              setShowRestoreValuesTooltip(true)
+              setTimeout(() => {
+                setShowRestoreValuesTooltip(false)
+              }, TOOLTIP_DELAY_MS)
+            }
+          }}
           paddingBottom={SPACING.spacing10}
           {...targetProps}
         >
           {t('protocol_details:restore_defaults')}
         </LinkComponent>
-        {!isRestoreDefaultsLinkEnabled && (
-          <Tooltip tooltipProps={tooltipProps}>
-            {t('protocol_details:no_custom_values')}
-          </Tooltip>
-        )}
+        <Tooltip
+          tooltipProps={{
+            ...tooltipProps,
+            visible: showRestoreValuesTooltip,
+          }}
+          css={css`
+            &:hover {
+              cursor: auto;
+            }
+          `}
+        >
+          {t('protocol_details:no_custom_values')}
+        </Tooltip>{' '}
       </Flex>
       <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing16}>
         {runTimeParametersInputs}
@@ -383,7 +532,9 @@ export function ChooseProtocolSlideoutComponent(
   const multiPageFooter =
     currentPage === 1 ? (
       <PrimaryButton
-        onClick={() => setCurrentPage(2)}
+        onClick={() => {
+          setCurrentPage(2)
+        }}
         width="100%"
         disabled={isCreatingRun || selectedProtocol == null}
       >
@@ -391,13 +542,19 @@ export function ChooseProtocolSlideoutComponent(
       </PrimaryButton>
     ) : (
       <Flex gridGap={SPACING.spacing8} flexDirection={DIRECTION_ROW}>
-        <SecondaryButton onClick={() => setCurrentPage(1)} width="51%">
+        <SecondaryButton
+          onClick={() => {
+            setCurrentPage(1)
+          }}
+          width="51%"
+        >
           {t('shared:change_protocol')}
         </SecondaryButton>
         <PrimaryButton
           width="49%"
           onClick={handleProceed}
           disabled={hasParamError}
+          {...targetPropsHover}
         >
           {isCreatingRun ? (
             <Icon name="ot-spinner" spin size="1rem" />
@@ -405,6 +562,11 @@ export function ChooseProtocolSlideoutComponent(
             t('shared:confirm_values')
           )}
         </PrimaryButton>
+        {hasMissingFileParam ? (
+          <Tooltip tooltipProps={tooltipPropsHover}>
+            {t('protocol_details:add_required_csv_file')}
+          </Tooltip>
+        ) : null}
       </Flex>
     )
 
@@ -516,17 +678,26 @@ function StoredProtocolList(props: StoredProtocolListProps): JSX.Element {
         )
         const missingAnalysisData =
           analysisStatus === 'error' || analysisStatus === 'stale'
+        const requiresCsvRunTimeParameter =
+          storedProtocol.mostRecentAnalysis?.result ===
+          'parameter-value-required'
         return (
           <React.Fragment key={storedProtocol.protocolKey}>
             <Flex flexDirection={DIRECTION_COLUMN}>
               <MiniCard
                 isSelected={isSelected}
                 isError={runCreationError != null}
-                isWarning={missingAnalysisData}
-                onClick={() => handleSelectProtocol(storedProtocol)}
+                isWarning={missingAnalysisData || requiresCsvRunTimeParameter}
+                onClick={() => {
+                  handleSelectProtocol(storedProtocol)
+                }}
               >
-                <Box display="grid" gridTemplateColumns="1fr 3fr">
-                  {!missingAnalysisData ? (
+                <Box
+                  display="grid"
+                  gridTemplateColumns="1fr 3fr"
+                  marginRight={SPACING.spacing16}
+                >
+                  {!missingAnalysisData && !requiresCsvRunTimeParameter ? (
                     <Box
                       marginY={SPACING.spacingAuto}
                       backgroundColor={isSelected ? COLORS.white : 'inherit'}
@@ -547,7 +718,7 @@ function StoredProtocolList(props: StoredProtocolListProps): JSX.Element {
                       borderRadius={SPACING.spacing8}
                     />
                   )}
-                  <StyledText
+                  <LegacyStyledText
                     as="p"
                     fontWeight={TYPOGRAPHY.fontWeightSemiBold}
                     overflowWrap={OVERFLOW_WRAP_ANYWHERE}
@@ -556,9 +727,11 @@ function StoredProtocolList(props: StoredProtocolListProps): JSX.Element {
                       ?.protocolName ??
                       first(storedProtocol.srcFileNames) ??
                       storedProtocol.protocolKey}
-                  </StyledText>
+                  </LegacyStyledText>
                 </Box>
-                {(runCreationError != null || missingAnalysisData) &&
+                {(runCreationError != null ||
+                  missingAnalysisData ||
+                  requiresCsvRunTimeParameter) &&
                 isSelected ? (
                   <>
                     <Box flex="1 1 auto" />
@@ -576,7 +749,7 @@ function StoredProtocolList(props: StoredProtocolListProps): JSX.Element {
               </MiniCard>
             </Flex>
             {runCreationError != null && isSelected ? (
-              <StyledText
+              <LegacyStyledText
                 as="label"
                 color={COLORS.red60}
                 overflowWrap={OVERFLOW_WRAP_ANYWHERE}
@@ -603,10 +776,22 @@ function StoredProtocolList(props: StoredProtocolListProps): JSX.Element {
                 ) : (
                   runCreationError
                 )}
-              </StyledText>
+              </LegacyStyledText>
+            ) : null}
+            {requiresCsvRunTimeParameter && isSelected ? (
+              <LegacyStyledText
+                as="label"
+                color={COLORS.yellow60}
+                overflowWrap="anywhere"
+                display={DISPLAY_BLOCK}
+                marginTop={`-${SPACING.spacing8}`}
+                marginBottom={SPACING.spacing8}
+              >
+                {t('csv_required_for_analysis')}
+              </LegacyStyledText>
             ) : null}
             {missingAnalysisData && isSelected ? (
-              <StyledText
+              <LegacyStyledText
                 as="label"
                 color={COLORS.yellow60}
                 overflowWrap="anywhere"
@@ -634,7 +819,7 @@ function StoredProtocolList(props: StoredProtocolListProps): JSX.Element {
                     }}
                   />
                 }
-              </StyledText>
+              </LegacyStyledText>
             ) : null}
           </React.Fragment>
         )
@@ -656,15 +841,15 @@ function StoredProtocolList(props: StoredProtocolListProps): JSX.Element {
       `}
     >
       <Icon size="1.25rem" name="alert-circle" color={COLORS.grey30} />
-      <StyledText
+      <LegacyStyledText
         as="p"
         fontWeight={TYPOGRAPHY.fontWeightSemiBold}
         marginTop={SPACING.spacing8}
         role="heading"
       >
         {t('no_protocols_found')}
-      </StyledText>
-      <StyledText
+      </LegacyStyledText>
+      <LegacyStyledText
         as="p"
         marginTop={SPACING.spacing8}
         textAlign={TYPOGRAPHY.textAlignCenter}
@@ -676,7 +861,7 @@ function StoredProtocolList(props: StoredProtocolListProps): JSX.Element {
             navlink: <Link to="/protocols" css={TYPOGRAPHY.linkPSemiBold} />,
           }}
         />
-      </StyledText>
+      </LegacyStyledText>
     </Flex>
   )
 }

@@ -1,7 +1,7 @@
 import { writeFile } from 'fs/promises'
 import uuid from 'uuid/v4'
 
-import { ProtocolAnalysisOutput } from '@opentrons/shared-data'
+import type { ProtocolAnalysisOutput } from '@opentrons/shared-data'
 
 const UNEXPECTED_ERROR_TYPE = 'UnexpectedAnalysisError'
 
@@ -32,6 +32,7 @@ export function createFailedAnalysis(
     // analysis that was unable to complete, but is required by
     // ProtocolAnalysisOutput
     config: {} as any,
+    result: 'not-ok',
   }
 }
 

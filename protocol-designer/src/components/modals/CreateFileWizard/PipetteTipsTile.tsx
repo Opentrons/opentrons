@@ -7,7 +7,6 @@ import {
   Flex,
   Text,
   SPACING,
-  Mount,
   ALIGN_CENTER,
   PrimaryButton,
   JUSTIFY_SPACE_BETWEEN,
@@ -32,6 +31,7 @@ import { GoBack } from './GoBack'
 import { EquipmentOption } from './EquipmentOption'
 import { HandleEnter } from './HandleEnter'
 
+import type { Mount } from '@opentrons/components'
 import type { PipetteName } from '@opentrons/shared-data'
 import type { FormState, WizardTileProps } from './types'
 import type { ThunkDispatch } from 'redux-thunk'
@@ -93,8 +93,16 @@ export function PipetteTipsTile(props: PipetteTipsTileProps): JSX.Element {
           width="100%"
           paddingTop={SPACING.spacing8}
         >
-          <GoBack onClick={() => goBack()} />
-          <PrimaryButton onClick={() => proceed()}>
+          <GoBack
+            onClick={() => {
+              goBack()
+            }}
+          />
+          <PrimaryButton
+            onClick={() => {
+              proceed()
+            }}
+          >
             {t('application:next')}
           </PrimaryButton>
         </Flex>
@@ -182,12 +190,10 @@ function PipetteTipsField(props: PipetteTipsFieldProps): JSX.Element | null {
   const selectedValues = pipettesByMount[mount].tiprackDefURI ?? []
 
   React.useEffect(() => {
-    if (selectedValues.length === 0) {
-      setValue(`pipettesByMount.${mount}.tiprackDefURI`, [
-        tiprackOptions[0]?.value ?? '',
-      ])
-    }
-  }, [selectedValues, setValue, tiprackOptions])
+    setValue(`pipettesByMount.${mount}.tiprackDefURI`, [
+      tiprackOptions[0]?.value ?? '',
+    ])
+  }, [])
 
   return (
     <Flex
@@ -212,7 +218,11 @@ function PipetteTipsField(props: PipetteTipsFieldProps): JSX.Element | null {
               )
             }}
             width="21.75rem"
+            disabled={
+              selectedValues.length === 3 && !selectedValues.includes(o.value)
+            }
             minHeight="4rem"
+            type="pipetteTip"
             showCheckbox
           />
         ))}
@@ -220,7 +230,9 @@ function PipetteTipsField(props: PipetteTipsFieldProps): JSX.Element | null {
       <Flex justifyContent={JUSTIFY_END} alignItems={ALIGN_CENTER}>
         <Btn
           aria-label="PipetteTipsTile_customTipButton"
-          onClick={() => setShowCustomTipracks(!showCustomTipracks)}
+          onClick={() => {
+            setShowCustomTipracks(!showCustomTipracks)
+          }}
         >
           <Icon
             css={ACCORDION_STYLE}
@@ -278,6 +290,11 @@ function PipetteTipsField(props: PipetteTipsFieldProps): JSX.Element | null {
                   }}
                   width="21.75rem"
                   minHeight="4rem"
+                  type="pipetteTip"
+                  disabled={
+                    selectedValues.length === 3 &&
+                    !selectedValues.includes(o.value)
+                  }
                   showCheckbox
                 />
               ))}

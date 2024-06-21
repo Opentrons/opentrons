@@ -13,7 +13,7 @@ import {
   JUSTIFY_SPACE_BETWEEN,
   Link,
   SPACING,
-  StyledText,
+  LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
@@ -73,9 +73,9 @@ export function CalibrationStatusCard({
         marginRight={SPACING.spacing40}
       >
         <Flex alignItems={ALIGN_CENTER} gridGap={SPACING.spacing8}>
-          <StyledText css={TYPOGRAPHY.h2SemiBold}>
+          <LegacyStyledText css={TYPOGRAPHY.h2SemiBold}>
             {t('calibration_status')}
-          </StyledText>
+          </LegacyStyledText>
           <StatusLabel
             status={statusLabelText}
             backgroundColor={statusLabelBackgroundColor}
@@ -85,11 +85,15 @@ export function CalibrationStatusCard({
             iconSize="0.313rem"
           />
         </Flex>
-        <StyledText as="p">{t('calibration_status_description')}</StyledText>
+        <LegacyStyledText as="p">
+          {t('calibration_status_description')}
+        </LegacyStyledText>
         <Link
           role="button"
           css={TYPOGRAPHY.darkLinkLabelSemiBold}
-          onClick={() => setShowHowCalibrationWorksModal(true)}
+          onClick={() => {
+            setShowHowCalibrationWorksModal(true)
+          }}
         >
           {t('see_how_robot_calibration_works')}
         </Link>

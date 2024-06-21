@@ -3,7 +3,11 @@ import type {
   LoadedPipette,
   ProtocolAnalysisOutput,
 } from '@opentrons/shared-data'
-import { GripperData, Instruments, PipetteData } from '@opentrons/api-client'
+import type {
+  GripperData,
+  Instruments,
+  PipetteData,
+} from '@opentrons/api-client'
 
 export function getProtocolUsesGripper(
   analysis: CompletedProtocolAnalysis | ProtocolAnalysisOutput

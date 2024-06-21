@@ -5,6 +5,7 @@ from opentrons.protocol_engine.types import DeckPoint, MovementAxis
 from opentrons.protocol_engine.execution import MovementHandler
 from opentrons.types import Point
 
+from opentrons.protocol_engine.commands.command import SuccessData
 from opentrons.protocol_engine.commands.move_relative import (
     MoveRelativeParams,
     MoveRelativeResult,
@@ -34,4 +35,6 @@ async def test_move_relative_implementation(
 
     result = await subject.execute(data)
 
-    assert result == MoveRelativeResult(position=DeckPoint(x=1, y=2, z=3))
+    assert result == SuccessData(
+        public=MoveRelativeResult(position=DeckPoint(x=1, y=2, z=3)), private=None
+    )

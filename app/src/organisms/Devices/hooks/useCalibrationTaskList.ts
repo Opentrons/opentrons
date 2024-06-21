@@ -5,12 +5,14 @@ import {
   useCalibrationStatusQuery,
   useDeleteCalibrationMutation,
 } from '@opentrons/react-api-client'
+import { getLabwareDefURI } from '@opentrons/shared-data'
 
 import { useAttachedPipettes } from '.'
 import { getDefaultTiprackDefForPipetteName } from '../constants'
 import { DECK_CAL_STATUS_OK } from '../../../redux/calibration/constants'
 import { formatTimestamp } from '../utils'
 
+import type { PipetteName } from '@opentrons/shared-data'
 import type {
   SubTaskProps,
   TaskListProps,
@@ -20,7 +22,6 @@ import type { AttachedPipette } from '../../../redux/pipettes/types'
 import type { DashboardCalOffsetInvoker } from '../../../pages/Devices/CalibrationDashboard/hooks/useDashboardCalibratePipOffset'
 import type { DashboardCalTipLengthInvoker } from '../../../pages/Devices/CalibrationDashboard/hooks/useDashboardCalibrateTipLength'
 import type { DashboardCalDeckInvoker } from '../../../pages/Devices/CalibrationDashboard/hooks/useDashboardCalibrateDeck'
-import { getLabwareDefURI, PipetteName } from '@opentrons/shared-data'
 
 const CALIBRATION_DATA_POLL_MS = 5000
 
@@ -173,11 +174,12 @@ export function useCalibrationTaskList(
         })
         tipLengthSubTask.cta = {
           label: t('robot_calibration:recalibrate'),
-          onClick: () =>
+          onClick: () => {
             tipLengthCalLauncher({
               params: { mount },
               hasBlockModalResponse: null,
-            }),
+            })
+          },
         }
         tipLengthSubTask.isComplete = true
 
@@ -186,7 +188,9 @@ export function useCalibrationTaskList(
         })
         offsetSubTask.cta = {
           label: t('robot_calibration:recalibrate'),
-          onClick: () => pipOffsetCalLauncher({ params: { mount } }),
+          onClick: () => {
+            pipOffsetCalLauncher({ params: { mount } })
+          },
         }
         offsetSubTask.isComplete = true
 
@@ -222,11 +226,12 @@ export function useCalibrationTaskList(
           )
           tipLengthSubTask.cta = {
             label: t('robot_calibration:calibrate'),
-            onClick: () =>
+            onClick: () => {
               tipLengthCalLauncher({
                 params: { mount },
                 hasBlockModalResponse: null,
-              }),
+              })
+            },
           }
 
           if (tipLengthCalForPipette?.status.markedBad === true) {
@@ -240,11 +245,12 @@ export function useCalibrationTaskList(
           })
           tipLengthSubTask.cta = {
             label: t('robot_calibration:recalibrate'),
-            onClick: () =>
+            onClick: () => {
               tipLengthCalLauncher({
                 params: { mount },
                 hasBlockModalResponse: null,
-              }),
+              })
+            },
           }
           tipLengthSubTask.isComplete = true
         }
@@ -265,7 +271,9 @@ export function useCalibrationTaskList(
           )
           offsetSubTask.cta = {
             label: t('robot_calibration:calibrate'),
-            onClick: () => pipOffsetCalLauncher({ params: { mount } }),
+            onClick: () => {
+              pipOffsetCalLauncher({ params: { mount } })
+            },
           }
 
           if (offsetCalForPipette?.status.markedBad === true) {
@@ -279,7 +287,9 @@ export function useCalibrationTaskList(
           })
           offsetSubTask.cta = {
             label: t('robot_calibration:recalibrate'),
-            onClick: () => pipOffsetCalLauncher({ params: { mount } }),
+            onClick: () => {
+              pipOffsetCalLauncher({ params: { mount } })
+            },
           }
           offsetSubTask.isComplete = true
         }
@@ -337,8 +347,9 @@ export function useCalibrationTaskList(
       }
     }
     if (taskList.taskList[0].cta != null) {
-      taskList.taskList[0].cta.onClick = () =>
+      taskList.taskList[0].cta.onClick = () => {
         deckCalLauncher({ invalidateHandler })
+      }
     }
   }
 
@@ -374,12 +385,13 @@ export function useCalibrationTaskList(
       }
     }
     if (taskList.taskList[1].subTasks[0].cta != null) {
-      taskList.taskList[1].subTasks[0].cta.onClick = () =>
+      taskList.taskList[1].subTasks[0].cta.onClick = () => {
         tipLengthCalLauncher({
           params: { mount: 'left' },
           hasBlockModalResponse: null,
           invalidateHandler,
         })
+      }
     }
   }
 
@@ -414,12 +426,13 @@ export function useCalibrationTaskList(
       }
     }
     if (taskList.taskList[2].subTasks[0].cta != null) {
-      taskList.taskList[2].subTasks[0].cta.onClick = () =>
+      taskList.taskList[2].subTasks[0].cta.onClick = () => {
         tipLengthCalLauncher({
           params: { mount: 'right' },
           hasBlockModalResponse: null,
           invalidateHandler,
         })
+      }
     }
   }
 

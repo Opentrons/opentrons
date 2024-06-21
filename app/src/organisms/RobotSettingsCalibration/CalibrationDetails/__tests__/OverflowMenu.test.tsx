@@ -4,7 +4,6 @@ import { when } from 'vitest-when'
 import '@testing-library/jest-dom/vitest'
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { OT3_PIPETTES } from '@opentrons/shared-data'
-import { Mount } from '@opentrons/components'
 import {
   useDeleteCalibrationMutation,
   useAllPipetteOffsetCalibrationsQuery,
@@ -28,6 +27,7 @@ import {
 import { renderWithProviders } from '../../../../__testing-utils__'
 import { useIsEstopNotDisengaged } from '../../../../resources/devices/hooks/useIsEstopNotDisengaged'
 import { OverflowMenu } from '../OverflowMenu'
+import type { Mount } from '@opentrons/components'
 
 const render = (
   props: React.ComponentProps<typeof OverflowMenu>

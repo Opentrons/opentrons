@@ -5,6 +5,7 @@ import pytest
 from opentrons.protocol_engine.execution import TipHandler
 from opentrons.protocol_engine.types import TipPresenceStatus
 
+from opentrons.protocol_engine.commands.command import SuccessData
 from opentrons.protocol_engine.commands.get_tip_presence import (
     GetTipPresenceParams,
     GetTipPresenceResult,
@@ -39,4 +40,6 @@ async def test_get_tip_presence_implementation(
 
     result = await subject.execute(data)
 
-    assert result == GetTipPresenceResult(status=status)
+    assert result == SuccessData(
+        public=GetTipPresenceResult(status=status), private=None
+    )

@@ -7,7 +7,16 @@ vi.mock('electron-store')
 vi.mock('electron-updater')
 vi.mock('electron')
 vi.mock('./app/src/redux/shell/remote')
-vi.mock('./app/src/resources/useNotifyService')
+vi.mock('./app/src/resources/useNotifyDataReady', async () => {
+  const actual = await vi.importActual('./app/src/resources/useNotifyDataReady')
+  return {
+    ...actual,
+    useNotifyDataReady: () => ({
+      notifyOnSettled: vi.fn(),
+      isNotifyEnabled: true,
+    }),
+  }
+})
 
 process.env.OT_PD_VERSION = 'fake_PD_version'
 global._PKG_VERSION_ = 'test environment'

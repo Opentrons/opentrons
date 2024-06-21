@@ -1,23 +1,23 @@
 import * as React from 'react'
 import { describe, it, beforeEach, afterEach, vi } from 'vitest'
-import { screen, cleanup } from '@testing-library/react'
+import { screen } from '@testing-library/react'
 import { renderWithProviders } from '../../../../__testing-utils__'
 import { getHeaterShakerLabwareOptions } from '../../../../ui/modules/selectors'
 import { i18n } from '../../../../localization'
 import { HeaterShakerForm } from '../HeaterShakerForm'
+import type * as ModulesSelectors from '../../../../ui/modules/selectors'
+import type * as Fields from '../../fields'
 import type { DropdownOption } from '@opentrons/components'
 
 vi.mock('../../../../ui/modules/selectors', async importOriginal => {
-  const actualFields = await importOriginal<
-    typeof import('../../../../ui/modules/selectors')
-  >()
+  const actualFields = await importOriginal<typeof ModulesSelectors>()
   return {
     ...actualFields,
     getHeaterShakerLabwareOptions: vi.fn(),
   }
 })
 vi.mock('../../fields', async importOriginal => {
-  const actualFields = await importOriginal<typeof import('../../fields')>()
+  const actualFields = await importOriginal<typeof Fields>()
 
   return {
     ...actualFields,
@@ -111,7 +111,6 @@ describe('HeaterShakerForm', () => {
   })
   afterEach(() => {
     vi.restoreAllMocks()
-    cleanup()
   })
   it('should render a title', () => {
     render(props)

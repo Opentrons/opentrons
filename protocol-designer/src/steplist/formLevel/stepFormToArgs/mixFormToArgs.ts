@@ -8,9 +8,9 @@ import {
 } from '../../../constants'
 import { getOrderedWells } from '../../utils'
 import { getMixDelayData } from './getDelayData'
-import { HydratedMixFormDataLegacy } from '../../../form-types'
-import { MixArgs } from '@opentrons/step-generation'
 import { getMatchingTipLiquidSpecs } from '../../../utils'
+import type { HydratedMixFormDataLegacy } from '../../../form-types'
+import type { MixArgs } from '@opentrons/step-generation'
 type MixStepArgs = MixArgs
 export const mixFormToArgs = (
   hydratedFormData: HydratedMixFormDataLegacy
@@ -70,7 +70,7 @@ export const mixFormToArgs = (
     : null
   // Blowout settings
   const blowoutFlowRateUlSec =
-    hydratedFormData.dispense_flowRate ??
+    hydratedFormData.blowout_flowRate ??
     matchingTipLiquidSpecs?.defaultBlowOutFlowRate.default
 
   const blowoutOffsetFromTopMm = blowoutLocation

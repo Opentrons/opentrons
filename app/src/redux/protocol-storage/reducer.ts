@@ -5,7 +5,7 @@ import * as Actions from './actions'
 
 import type { Action } from '../types'
 import type { ProtocolStorageState } from './types'
-import { Reducer } from 'redux'
+import type { Reducer } from 'redux'
 
 export const INITIAL_STATE: ProtocolStorageState = {
   protocolKeys: [],

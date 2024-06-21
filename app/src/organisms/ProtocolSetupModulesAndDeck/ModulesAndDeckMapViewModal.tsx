@@ -57,7 +57,9 @@ export function ModulesAndDeckMapViewModal({
     <Modal
       header={modalHeader}
       modalSize="large"
-      onOutsideClick={() => setShowDeckMapModal(false)}
+      onOutsideClick={() => {
+        setShowDeckMapModal(false)
+      }}
     >
       <BaseDeck
         deckConfig={deckConfig}

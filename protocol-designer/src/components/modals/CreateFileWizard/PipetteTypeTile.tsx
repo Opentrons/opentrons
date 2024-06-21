@@ -6,14 +6,12 @@ import {
   Flex,
   Text,
   SPACING,
-  Mount,
   ALIGN_CENTER,
   PrimaryButton,
   JUSTIFY_SPACE_BETWEEN,
   InstrumentDiagram,
 } from '@opentrons/components'
 import {
-  PipetteName,
   OT2_PIPETTES,
   OT2_ROBOT_TYPE,
   OT3_PIPETTES,
@@ -27,6 +25,8 @@ import { GoBack } from './GoBack'
 import { EquipmentOption } from './EquipmentOption'
 import { HandleEnter } from './HandleEnter'
 
+import type { PipetteName } from '@opentrons/shared-data'
+import type { Mount } from '@opentrons/components'
 import type { FormState, WizardTileProps } from './types'
 import type { UseFormReturn } from 'react-hook-form'
 
@@ -112,8 +112,18 @@ export function PipetteTypeTile(props: PipetteTypeTileProps): JSX.Element {
           justifyContent={JUSTIFY_SPACE_BETWEEN}
           width="100%"
         >
-          <GoBack onClick={() => goBack()} />
-          <PrimaryButton onClick={() => proceed()}>{t('next')}</PrimaryButton>
+          <GoBack
+            onClick={() => {
+              goBack()
+            }}
+          />
+          <PrimaryButton
+            onClick={() => {
+              proceed()
+            }}
+          >
+            {t('next')}
+          </PrimaryButton>
         </Flex>
       </Flex>
     </HandleEnter>

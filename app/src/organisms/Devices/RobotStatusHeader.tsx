@@ -16,7 +16,7 @@ import {
   JUSTIFY_SPACE_BETWEEN,
   OVERFLOW_WRAP_ANYWHERE,
   SPACING,
-  StyledText,
+  LegacyStyledText,
   truncateString,
   TYPOGRAPHY,
   useHoverTooltip,
@@ -80,9 +80,11 @@ export function RobotStatusHeader(props: RobotStatusHeaderProps): JSX.Element {
     currentRunId != null && currentRunStatus != null && displayName != null ? (
       <Flex
         alignItems={ALIGN_CENTER}
-        onClick={(e: React.MouseEvent) => e.stopPropagation()}
+        onClick={(e: React.MouseEvent) => {
+          e.stopPropagation()
+        }}
       >
-        <StyledText
+        <LegacyStyledText
           as="label"
           paddingRight={SPACING.spacing8}
           overflowWrap={OVERFLOW_WRAP_ANYWHERE}
@@ -91,7 +93,7 @@ export function RobotStatusHeader(props: RobotStatusHeaderProps): JSX.Element {
             t(`run_details:status_${currentRunStatus}`),
             'lowerCase'
           )}`}
-        </StyledText>
+        </LegacyStyledText>
         <Link
           to={`/devices/${name}/protocol-runs/${currentRunId}/${
             currentRunStatus === RUN_STATUS_IDLE ? 'setup' : 'run-preview'
@@ -158,7 +160,7 @@ export function RobotStatusHeader(props: RobotStatusHeaderProps): JSX.Element {
   return (
     <Flex justifyContent={JUSTIFY_SPACE_BETWEEN} {...styleProps}>
       <Flex flexDirection={DIRECTION_COLUMN}>
-        <StyledText
+        <LegacyStyledText
           as="h6"
           color={COLORS.grey60}
           fontWeight={TYPOGRAPHY.fontWeightSemiBold}
@@ -167,26 +169,26 @@ export function RobotStatusHeader(props: RobotStatusHeaderProps): JSX.Element {
           id={`RobotStatusHeader_${String(name)}_robotModel`}
         >
           {robotModel}
-        </StyledText>
+        </LegacyStyledText>
         <Flex alignItems={ALIGN_CENTER}>
           <Flex alignItems={ALIGN_CENTER} gridGap={SPACING.spacing8}>
             <RobotNameContainer isGoToRun={isGoToRun}>
-              <StyledText
+              <LegacyStyledText
                 as="h3"
                 id={`RobotStatusHeader_${String(name)}_robotName`}
                 overflow="hidden"
                 textOverflow="ellipsis"
               >
                 {name}
-              </StyledText>
+              </LegacyStyledText>
             </RobotNameContainer>
             {iconName != null ? (
               <Btn
                 {...targetProps}
                 marginRight={SPACING.spacing8}
-                onClick={() =>
+                onClick={() => {
                   history.push(`/devices/${name}/robot-settings/networking`)
-                }
+                }}
               >
                 <Icon
                   aria-label={iconName}

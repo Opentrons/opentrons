@@ -1,5 +1,4 @@
 import * as React from 'react'
-import { UseQueryResult } from 'react-query'
 import { MemoryRouter } from 'react-router-dom'
 import { screen, fireEvent } from '@testing-library/react'
 import '@testing-library/jest-dom/vitest'
@@ -22,6 +21,7 @@ import { useCloseCurrentRun } from '../../../../ProtocolUpload/hooks'
 import { LocationConflictModal } from '../LocationConflictModal'
 import { useNotifyDeckConfigurationQuery } from '../../../../../resources/deck_configuration'
 
+import type { UseQueryResult } from 'react-query'
 import type { DeckConfiguration } from '@opentrons/shared-data'
 
 vi.mock('@opentrons/react-api-client')
@@ -100,7 +100,7 @@ describe('LocationConflictModal', () => {
     expect(props.onCloseClick).toHaveBeenCalled()
     fireEvent.click(screen.getByRole('button', { name: 'Update deck' }))
     screen.getByText('Heater-Shaker Module GEN1 in USB-1')
-    fireEvent.click(screen.getByRole('button', { name: 'add' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Add' }))
     expect(mockUpdate).toHaveBeenCalled()
   })
   it('should render the modal information for a single slot fixture conflict', () => {

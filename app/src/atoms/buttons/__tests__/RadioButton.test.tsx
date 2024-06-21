@@ -27,7 +27,7 @@ describe('RadioButton', () => {
     }
     render(props)
     const label = screen.getByRole('label')
-    expect(label).toHaveStyle(`background-color: ${COLORS.blue40}`)
+    expect(label).toHaveStyle(`background-color: ${COLORS.blue35}`)
     expect(label).toHaveStyle(`padding: ${SPACING.spacing24}`)
   })
   it('renders the large selected button', () => {
@@ -38,7 +38,7 @@ describe('RadioButton', () => {
     }
     render(props)
     const label = screen.getByRole('label')
-    expect(label).toHaveStyle(`background-color: ${COLORS.blue60}`)
+    expect(label).toHaveStyle(`background-color: ${COLORS.blue50}`)
     expect(label).toHaveStyle(`padding: ${SPACING.spacing24}`)
   })
   it('renders the small button', () => {
@@ -48,7 +48,7 @@ describe('RadioButton', () => {
     }
     render(props)
     const label = screen.getByRole('label')
-    expect(label).toHaveStyle(`background-color: ${COLORS.blue40}`)
+    expect(label).toHaveStyle(`background-color: ${COLORS.blue35}`)
     expect(label).toHaveStyle(`padding: ${SPACING.spacing20}`)
   })
   it('renders the small selected button', () => {
@@ -59,7 +59,7 @@ describe('RadioButton', () => {
     }
     render(props)
     const label = screen.getByRole('label')
-    expect(label).toHaveStyle(`background-color: ${COLORS.blue60}`)
+    expect(label).toHaveStyle(`background-color: ${COLORS.blue50}`)
     expect(label).toHaveStyle(`padding: ${SPACING.spacing20}`)
   })
 })

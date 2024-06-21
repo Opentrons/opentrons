@@ -5,13 +5,14 @@ import {
   formatRunTimeParameterDefaultValue,
   formatRunTimeParameterMinMax,
   orderRuntimeParameterRangeOptions,
+  sortRuntimeParameters,
 } from '@opentrons/shared-data'
 import {
   BORDERS,
   COLORS,
   Flex,
   SPACING,
-  StyledText,
+  LegacyStyledText,
   TYPOGRAPHY,
   WRAP,
 } from '@opentrons/components'
@@ -24,13 +25,12 @@ const Table = styled('table')`
   font-size: ${TYPOGRAPHY.fontSize22};
   width: 100%;
   border-spacing: 0 ${SPACING.spacing8};
-  margin: ${SPACING.spacing16} 0;
   text-align: ${TYPOGRAPHY.textAlignLeft};
 `
 const TableHeader = styled('th')`
   font-size: ${TYPOGRAPHY.fontSize20};
   font-weight: ${TYPOGRAPHY.fontWeightSemiBold};
-  padding: ${SPACING.spacing4};
+  padding: 0 ${SPACING.spacing4} 0 ${SPACING.spacing4};
   color: ${COLORS.grey60};
 `
 
@@ -60,7 +60,7 @@ export const Parameters = (props: { protocolId: string }): JSX.Element => {
   const { t, i18n } = useTranslation('protocol_details')
 
   const makeSnack = (): void => {
-    makeSnackbar(t('start_setup_customize_values'))
+    makeSnackbar(t('start_setup_customize_values') as string)
   }
 
   const formatRange = (parameter: RunTimeParameter): string => {
@@ -83,6 +83,9 @@ export const Parameters = (props: { protocolId: string }): JSX.Element => {
       case 'str': {
         return range ?? t('num_choices', { num: numChoices })
       }
+      case 'csv_file': {
+        return t('n_a')
+      }
       default:
         //  Should never hit this case
         return ''
@@ -94,24 +97,24 @@ export const Parameters = (props: { protocolId: string }): JSX.Element => {
       <thead>
         <tr>
           <TableHeader>
-            <StyledText paddingLeft={SPACING.spacing24}>
+            <LegacyStyledText paddingLeft={SPACING.spacing24}>
               {i18n.format(t('name'), 'capitalize')}
-            </StyledText>
+            </LegacyStyledText>
           </TableHeader>
           <TableHeader>
-            <StyledText paddingLeft={SPACING.spacing24}>
+            <LegacyStyledText paddingLeft={SPACING.spacing24}>
               {i18n.format(t('default_value'), 'capitalize')}
-            </StyledText>
+            </LegacyStyledText>
           </TableHeader>
           <TableHeader>
-            <StyledText paddingLeft={SPACING.spacing24}>
+            <LegacyStyledText paddingLeft={SPACING.spacing24}>
               {i18n.format(t('range'), 'capitalize')}
-            </StyledText>
+            </LegacyStyledText>
           </TableHeader>
         </tr>
       </thead>
       <tbody>
-        {runTimeParameters.map((parameter, index) => {
+        {sortRuntimeParameters(runTimeParameters).map((parameter, index) => {
           return (
             <TableRow key={index}>
               <TableDatum>
@@ -121,7 +124,9 @@ export const Parameters = (props: { protocolId: string }): JSX.Element => {
               </TableDatum>
               <TableDatum>
                 <Flex paddingLeft={SPACING.spacing24} color={COLORS.grey60}>
-                  {formatRunTimeParameterDefaultValue(parameter, t)}
+                  {parameter.type === 'csv_file'
+                    ? t('file_required')
+                    : formatRunTimeParameterDefaultValue(parameter, t)}
                 </Flex>
               </TableDatum>
               <TableDatum>

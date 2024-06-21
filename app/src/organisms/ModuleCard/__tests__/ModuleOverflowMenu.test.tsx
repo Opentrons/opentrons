@@ -19,6 +19,8 @@ import {
 import { useCurrentRunId } from '../../ProtocolUpload/hooks'
 import { ModuleOverflowMenu } from '../ModuleOverflowMenu'
 
+import type { TemperatureStatus } from '@opentrons/api-client'
+
 vi.mock('../../Devices/hooks')
 vi.mock('../../RunTimeControl/hooks')
 vi.mock('../../ProtocolUpload/hooks')
@@ -528,6 +530,44 @@ describe('ModuleOverflowMenu', () => {
       ...props,
       module: mockHeaterShaker,
       isTooHot: true,
+    }
+    render(props)
+
+    const calibrate = screen.getByRole('button', { name: 'Calibrate' })
+    expect(calibrate).toBeDisabled()
+  })
+
+  it('renders a disabled calibrate button if module is heating or cooling', () => {
+    vi.mocked(useIsFlex).mockReturnValue(true)
+    const mockHeatingModule = {
+      ...mockHeaterShaker,
+      data: {
+        ...mockHeaterShaker.data,
+        temperatureStatus: 'heating' as TemperatureStatus,
+      },
+    }
+    props = {
+      ...props,
+      module: mockHeatingModule,
+    }
+    render(props)
+
+    const calibrate = screen.getByRole('button', { name: 'Calibrate' })
+    expect(calibrate).toBeDisabled()
+  })
+
+  it('renders a disabled calibrate button if module temperature status errors', () => {
+    vi.mocked(useIsFlex).mockReturnValue(true)
+    const mockHeatingModule = {
+      ...mockHeaterShaker,
+      data: {
+        ...mockHeaterShaker.data,
+        temperatureStatus: 'error' as TemperatureStatus,
+      },
+    }
+    props = {
+      ...props,
+      module: mockHeatingModule,
     }
     render(props)
 

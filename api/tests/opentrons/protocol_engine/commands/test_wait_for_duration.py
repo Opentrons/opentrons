@@ -3,6 +3,7 @@ from decoy import Decoy
 
 from opentrons.protocol_engine.execution import RunControlHandler
 
+from opentrons.protocol_engine.commands.command import SuccessData
 from opentrons.protocol_engine.commands.wait_for_duration import (
     WaitForDurationParams,
     WaitForDurationResult,
@@ -21,5 +22,5 @@ async def test_pause_implementation(
 
     result = await subject.execute(data)
 
-    assert result == WaitForDurationResult()
+    assert result == SuccessData(public=WaitForDurationResult(), private=None)
     decoy.verify(await run_control.wait_for_duration(42.0), times=1)

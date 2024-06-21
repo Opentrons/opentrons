@@ -9,7 +9,7 @@ import {
   LocationIcon,
   ModuleIcon,
   SPACING,
-  StyledText,
+  LegacyStyledText,
   TYPOGRAPHY,
   WRAP,
 } from '@opentrons/components'
@@ -19,6 +19,8 @@ import {
   getModuleType,
   getFixtureDisplayName,
   GRIPPER_V1_2,
+  MAGNETIC_BLOCK_FIXTURES,
+  MAGNETIC_BLOCK_TYPE,
 } from '@opentrons/shared-data'
 
 import {
@@ -108,9 +110,9 @@ function HardwareItem({
   const hardwareName = useHardwareName(hardware)
 
   let location: JSX.Element = (
-    <StyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
-      {i18n.format(getHardwareLocation(hardware, t), 'titleCase')}
-    </StyledText>
+    <LegacyStyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
+      {i18n.format(getHardwareLocation(hardware, t as TFunction), 'titleCase')}
+    </LegacyStyledText>
   )
   if (hardware.hardwareType === 'module') {
     location = <LocationIcon slotName={hardware.slot} />
@@ -119,6 +121,16 @@ function HardwareItem({
       <LocationIcon slotName={getCutoutDisplayName(hardware.location.cutout)} />
     )
   }
+  const isMagneticBlockFixture =
+    hardware.hardwareType === 'fixture' &&
+    hardware.cutoutFixtureId != null &&
+    MAGNETIC_BLOCK_FIXTURES.includes(hardware.cutoutFixtureId)
+  let iconModuleType = null
+  if (hardware.hardwareType === 'module') {
+    iconModuleType = getModuleType(hardware.moduleModel)
+  } else if (isMagneticBlockFixture) {
+    iconModuleType = MAGNETIC_BLOCK_TYPE
+  }
   return (
     <TableRow>
       <TableDatum>
@@ -126,20 +138,17 @@ function HardwareItem({
       </TableDatum>
       <TableDatum>
         <Flex paddingLeft={SPACING.spacing24}>
-          {hardware.hardwareType === 'module' && (
+          {iconModuleType != null ? (
             <Flex
               alignItems={ALIGN_CENTER}
               height="2rem"
               paddingBottom={SPACING.spacing4}
               paddingRight={SPACING.spacing8}
             >
-              <ModuleIcon
-                moduleType={getModuleType(hardware.moduleModel)}
-                size="1.75rem"
-              />
+              <ModuleIcon moduleType={iconModuleType} size="1.75rem" />
             </Flex>
-          )}
-          <StyledText as="p">{hardwareName}</StyledText>
+          ) : null}
+          <LegacyStyledText as="p">{hardwareName}</LegacyStyledText>
         </Flex>
       </TableDatum>
     </TableRow>
@@ -159,24 +168,24 @@ export const Hardware = (props: { protocolId: string }): JSX.Element => {
       <thead>
         <tr>
           <TableHeader>
-            <StyledText
+            <LegacyStyledText
               fontSize={TYPOGRAPHY.fontSize20}
               color={COLORS.grey60}
               fontWeight={TYPOGRAPHY.fontWeightSemiBold}
               paddingLeft={SPACING.spacing24}
             >
               {i18n.format(t('location'), 'capitalize')}
-            </StyledText>
+            </LegacyStyledText>
           </TableHeader>
           <TableHeader>
-            <StyledText
+            <LegacyStyledText
               fontSize={TYPOGRAPHY.fontSize20}
               color={COLORS.grey60}
               fontWeight={TYPOGRAPHY.fontWeightSemiBold}
               paddingLeft={SPACING.spacing24}
             >
               {i18n.format(t('hardware'), 'capitalize')}
-            </StyledText>
+            </LegacyStyledText>
           </TableHeader>
         </tr>
       </thead>

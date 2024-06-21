@@ -11,7 +11,7 @@ import {
   Link,
   PrimaryButton,
   SPACING,
-  StyledText,
+  LegacyStyledText,
   TEXT_ALIGN_CENTER,
   TYPOGRAPHY,
 } from '@opentrons/components'
@@ -61,14 +61,16 @@ export const ConfirmAttachmentModal = (
         flexDirection={DIRECTION_COLUMN}
         fontSize={TYPOGRAPHY.fontSizeP}
       >
-        <StyledText paddingBottom={SPACING.spacing4}>
+        <LegacyStyledText paddingBottom={SPACING.spacing4}>
           {t(
             isProceedToRunModal
               ? 'module_anchors_extended'
               : 'module_should_have_anchors'
           )}
-        </StyledText>
-        <StyledText>{t('thermal_adapter_attached_to_module')}</StyledText>
+        </LegacyStyledText>
+        <LegacyStyledText>
+          {t('thermal_adapter_attached_to_module')}
+        </LegacyStyledText>
       </Flex>
       <Flex
         flexDirection={DIRECTION_ROW}
@@ -79,18 +81,18 @@ export const ConfirmAttachmentModal = (
         }`}
       >
         <CheckboxField
-          onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+          onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
             setIsDismissed(e.currentTarget.checked)
-          }
+          }}
           value={isDismissed}
         />
-        <StyledText
+        <LegacyStyledText
           paddingTop="1px"
           paddingLeft={SPACING.spacing8}
           fontSize={TYPOGRAPHY.fontSizeP}
         >
           {t('dont_show_me_again', { ns: 'shared' })}
-        </StyledText>
+        </LegacyStyledText>
       </Flex>
       <Flex
         flexDirection={DIRECTION_ROW}

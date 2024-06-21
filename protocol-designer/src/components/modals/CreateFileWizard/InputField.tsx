@@ -1,6 +1,5 @@
 import * as React from 'react'
 import { css } from 'styled-components'
-import { UseFormRegister } from 'react-hook-form'
 import {
   ALIGN_CENTER,
   BORDERS,
@@ -13,6 +12,7 @@ import {
   DISPLAY_INLINE_BLOCK,
   TEXT_ALIGN_RIGHT,
 } from '@opentrons/components'
+import type { UseFormRegister } from 'react-hook-form'
 
 export interface InputFieldProps {
   register: UseFormRegister<any>

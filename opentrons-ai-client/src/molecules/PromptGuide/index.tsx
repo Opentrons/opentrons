@@ -8,7 +8,7 @@ import {
   Flex,
   Link,
   SPACING,
-  StyledText,
+  LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
@@ -25,70 +25,69 @@ export function PromptGuide(): JSX.Element {
       borderRadius={BORDERS.borderRadius12}
       gridGap={SPACING.spacing32}
     >
-      <StyledText css={HEADER_TEXT_STYLE}>
+      <LegacyStyledText css={HEADER_TEXT_STYLE}>
         {t('what_typeof_protocol')}
-      </StyledText>
+      </LegacyStyledText>
 
       <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing16}>
-        <StyledText css={BODY_TEXT_STYLE}>
+        <LegacyStyledText css={BODY_TEXT_STYLE}>
           {t('make_sure_your_prompt')}
-        </StyledText>
+        </LegacyStyledText>
+        <LegacyStyledText css={BODY_TEXT_STYLE}>
+          {t('key_info')}
+        </LegacyStyledText>
         <Flex
           css={BODY_TEXT_STYLE}
           flexDirection={DIRECTION_COLUMN}
           paddingLeft={SPACING.spacing32}
         >
-          <ul>
+          <StyledUl>
             <li>
-              <StyledText>{t('metadata')}</StyledText>
-              <StyledUl>
-                <li>
-                  <StyledText>{t('application')}</StyledText>
-                </li>
-                <li>
-                  <StyledText>{t('robot')}</StyledText>
-                </li>
-                <li>
-                  <StyledText>{t('api')}</StyledText>
-                </li>
-              </StyledUl>
+              <LegacyStyledText>{t('robot_type')}</LegacyStyledText>
             </li>
             <li>
-              <StyledText>{t('ot2_pipettes')}</StyledText>
-            </li>
-            <li>
-              <StyledText>{t('modules')}</StyledText>
-            </li>
-            <li>
-              <StyledText>{t('well_allocations')}</StyledText>
+              <LegacyStyledText>{t('modules_and_adapters')}</LegacyStyledText>
             </li>
             <li>
               <Trans
                 t={t}
-                i18nKey="tipracks_and_labware"
+                i18nKey="labware_and_tipracks"
                 components={{
                   a: <ExternalLink external href={LABWARE_LIBRARY_URL} />,
-                  span: <StyledText css={BODY_TEXT_STYLE} />,
+                  span: <LegacyStyledText css={BODY_TEXT_STYLE} />,
                 }}
               />
             </li>
             <li>
-              <StyledText>{t('commands')}</StyledText>
+              <LegacyStyledText>{t('pipettes')}</LegacyStyledText>
             </li>
-          </ul>
+            <li>
+              <LegacyStyledText>{t('liquid_locations')}</LegacyStyledText>
+            </li>
+            <li>
+              <LegacyStyledText>{t('commands')}</LegacyStyledText>
+            </li>
+          </StyledUl>
+        </Flex>
+        <LegacyStyledText css={BODY_TEXT_STYLE}>{t('notes')}</LegacyStyledText>
+        <Flex
+          css={BODY_TEXT_STYLE}
+          flexDirection={DIRECTION_COLUMN}
+          paddingLeft={SPACING.spacing32}
+        >
+          <StyledUl>
+            <li>
+              <LegacyStyledText>{t('example')}</LegacyStyledText>
+            </li>
+            <li>
+              <LegacyStyledText>{t('simulate_description')}</LegacyStyledText>
+            </li>
+            <li>
+              <LegacyStyledText>{t('reload_page')}</LegacyStyledText>
+            </li>
+          </StyledUl>
         </Flex>
       </Flex>
-      <Trans
-        t={t}
-        i18nKey="what_if_you"
-        components={{
-          bold: <strong />,
-          span: <StyledText css={BODY_TEXT_STYLE} />,
-        }}
-      />
-      <StyledText css={BODY_TEXT_STYLE}>
-        {t('simulator_description')}
-      </StyledText>
     </Flex>
   )
 }

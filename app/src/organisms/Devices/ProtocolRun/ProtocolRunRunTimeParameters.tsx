@@ -6,7 +6,10 @@ import {
   RUN_STATUS_STOPPED,
   RUN_STATUSES_TERMINAL,
 } from '@opentrons/api-client'
-import { formatRunTimeParameterValue } from '@opentrons/shared-data'
+import {
+  formatRunTimeParameterValue,
+  sortRuntimeParameters,
+} from '@opentrons/shared-data'
 import {
   ALIGN_CENTER,
   BORDERS,
@@ -19,7 +22,7 @@ import {
   Icon,
   InfoScreen,
   SPACING,
-  StyledText,
+  LegacyStyledText,
   TYPOGRAPHY,
   useHoverTooltip,
 } from '@opentrons/components'
@@ -56,8 +59,8 @@ export function ProtocolRunRuntimeParameters({
       ? run?.data?.runTimeParameters
       : mostRecentAnalysis?.runTimeParameters) ?? []
   const hasRunTimeParameters = runTimeParameters.length > 0
-  const hasCustomRunTimeParameterValues = runTimeParameters.some(
-    parameter => parameter.value !== parameter.default
+  const hasCustomRunTimeParameterValues = runTimeParameters.some(parameter =>
+    parameter.type !== 'csv_file' ? parameter.value !== parameter.default : true
   )
 
   const runActions = run?.data.actions
@@ -66,6 +69,8 @@ export function ProtocolRunRuntimeParameters({
   )
   const isRunCancelledWithoutStarting =
     !hasRunStarted && runStatus === RUN_STATUS_STOPPED
+
+  const sortedRunTimeParameters = sortRuntimeParameters(runTimeParameters)
 
   return (
     <>
@@ -80,16 +85,19 @@ export function ProtocolRunRuntimeParameters({
           alignItems={ALIGN_CENTER}
         >
           {hasRunTimeParameters ? (
-            <StyledText as="h3" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
+            <LegacyStyledText
+              as="h3"
+              fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+            >
               {t('parameters')}
-            </StyledText>
+            </LegacyStyledText>
           ) : null}
           {hasRunTimeParameters ? (
-            <StyledText as="label" color={COLORS.grey60}>
+            <LegacyStyledText as="label" color={COLORS.grey60}>
               {hasCustomRunTimeParameterValues
                 ? t('custom_values')
                 : t('default_values')}
-            </StyledText>
+            </LegacyStyledText>
           ) : null}
         </Flex>
         {hasRunTimeParameters ? (
@@ -99,10 +107,15 @@ export function ProtocolRunRuntimeParameters({
             iconMarginLeft={SPACING.spacing4}
           >
             <Flex flexDirection={DIRECTION_COLUMN}>
-              <StyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
+              <LegacyStyledText
+                as="p"
+                fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+              >
                 {t('values_are_view_only')}
-              </StyledText>
-              <StyledText as="p">{t('cancel_and_restart_to_edit')}</StyledText>
+              </LegacyStyledText>
+              <LegacyStyledText as="p">
+                {t('cancel_and_restart_to_edit')}
+              </LegacyStyledText>
             </Flex>
           </Banner>
         ) : null}
@@ -126,7 +139,7 @@ export function ProtocolRunRuntimeParameters({
                 <StyledTableHeader>{t('value')}</StyledTableHeader>
               </StyledTableHeaderContainer>
               <tbody>
-                {runTimeParameters.map(
+                {sortedRunTimeParameters.map(
                   (parameter: RunTimeParameter, index: number) => (
                     <StyledTableRowComponent
                       key={`${index}_${parameter.variableName}`}
@@ -161,15 +174,17 @@ const StyledTableRowComponent = (
   return (
     <StyledTableRow isLast={isLast} key={`runTimeParameter-${index}`}>
       <StyledTableCell display="span">
-        <StyledText
+        <LegacyStyledText
           as="p"
           css={css`
             display: inline;
             padding-right: 8px;
           `}
         >
-          {parameter.displayName}
-        </StyledText>
+          {parameter.type === 'csv_file'
+            ? t('csv_file')
+            : parameter.displayName}
+        </LegacyStyledText>
         {parameter.description != null ? (
           <>
             <Flex
@@ -192,10 +207,13 @@ const StyledTableRowComponent = (
       </StyledTableCell>
       <StyledTableCell>
         <Flex flexDirection={DIRECTION_ROW} gridGap={SPACING.spacing16}>
-          <StyledText as="p">
-            {formatRunTimeParameterValue(parameter, t)}
-          </StyledText>
-          {parameter.value !== parameter.default ? (
+          <LegacyStyledText as="p">
+            {parameter.type === 'csv_file'
+              ? parameter.file?.file?.name ?? ''
+              : formatRunTimeParameterValue(parameter, t)}
+          </LegacyStyledText>
+          {parameter.type === 'csv_file' ||
+          parameter.default !== parameter.value ? (
             <Chip
               text={t('updated')}
               type="success"

@@ -17,7 +17,7 @@ import {
   LabwareRender,
   SIZE_AUTO,
   SPACING,
-  StyledText,
+  LegacyStyledText,
   TYPOGRAPHY,
   WELL_LABEL_OPTIONS,
 } from '@opentrons/components'
@@ -167,7 +167,9 @@ export function LabwareListItem(
                   color: ${COLORS.black90};
                 }
               `}
-              onClick={() => setSecureLabwareModalType(moduleType)}
+              onClick={() => {
+                setSecureLabwareModalType(moduleType)
+              }}
             >
               <Flex flexDirection={DIRECTION_ROW}>
                 <Icon
@@ -175,13 +177,13 @@ export function LabwareListItem(
                   size="0.75rem"
                   marginTop={SPACING.spacing4}
                 />
-                <StyledText
+                <LegacyStyledText
                   marginLeft={SPACING.spacing4}
                   as="p"
                   textDecoration={TYPOGRAPHY.textDecorationUnderline}
                 >
                   {t('secure_labware_instructions')}
-                </StyledText>
+                </LegacyStyledText>
               </Flex>
             </Btn>
           )
@@ -190,9 +192,9 @@ export function LabwareListItem(
       case HEATERSHAKER_MODULE_TYPE:
         isHeaterShakerInProtocol = true
         extraAttentionText = (
-          <StyledText as="p" color={COLORS.grey50} maxWidth="15.25rem">
+          <LegacyStyledText as="p" color={COLORS.grey50} maxWidth="15.25rem">
             {t('heater_shaker_labware_list_view')}
-          </StyledText>
+          </LegacyStyledText>
         )
         const matchingHeaterShaker =
           attachedModuleInfo != null &&
@@ -255,9 +257,9 @@ export function LabwareListItem(
   return (
     <LabwareRow>
       <Flex alignItems={ALIGN_CENTER}>
-        <StyledText as="p" data-testid={`slot_info_${slotInfo}`}>
+        <LegacyStyledText as="p" data-testid={`slot_info_${slotInfo}`}>
           {slotInfo}
-        </StyledText>
+        </LegacyStyledText>
       </Flex>
       <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing16}>
         <Flex>
@@ -268,12 +270,12 @@ export function LabwareListItem(
             marginLeft={SPACING.spacing16}
             marginRight={SPACING.spacing24}
           >
-            <StyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
+            <LegacyStyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
               {labwareDisplayName}
-            </StyledText>
-            <StyledText as="p" color={COLORS.grey50}>
+            </LegacyStyledText>
+            <LegacyStyledText as="p" color={COLORS.grey50}>
               {nickName}
-            </StyledText>
+            </LegacyStyledText>
           </Flex>
         </Flex>
         {nestedLabwareInfo != null &&
@@ -290,12 +292,15 @@ export function LabwareListItem(
               marginLeft={SPACING.spacing16}
               marginRight={SPACING.spacing24}
             >
-              <StyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
+              <LegacyStyledText
+                as="p"
+                fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+              >
                 {nestedLabwareInfo.nestedLabwareDisplayName}
-              </StyledText>
-              <StyledText as="p" color={COLORS.grey50}>
+              </LegacyStyledText>
+              <LegacyStyledText as="p" color={COLORS.grey50}>
                 {nestedLabwareInfo.nestedLabwareNickName}
-              </StyledText>
+              </LegacyStyledText>
             </Flex>
           </Flex>
         ) : null}
@@ -306,19 +311,19 @@ export function LabwareListItem(
         gridGap={SPACING.spacing8}
       >
         <Flex flexDirection={DIRECTION_COLUMN} justifyContent={JUSTIFY_CENTER}>
-          <StyledText as="p">
+          <LegacyStyledText as="p">
             {moduleDisplayName != null
               ? moduleDisplayName
               : t(initialLocation === 'offDeck' ? 'off_deck' : 'on_deck')}
-          </StyledText>
+          </LegacyStyledText>
           {extraAttentionText != null ? extraAttentionText : null}
         </Flex>
 
         {isHeaterShakerInProtocol ? (
           <Flex flexDirection={DIRECTION_COLUMN}>
-            <StyledText as="h6" minWidth="6.2rem">
+            <LegacyStyledText as="h6" minWidth="6.2rem">
               {t('labware_latch')}
-            </StyledText>
+            </LegacyStyledText>
             <Flex
               flexDirection={DIRECTION_ROW}
               alignItems={ALIGN_CENTER}
@@ -336,9 +341,9 @@ export function LabwareListItem(
                 display={DISPLAY_FLEX}
                 alignItems={ALIGN_CENTER}
               />
-              <StyledText as="p" width="4rem">
+              <LegacyStyledText as="p" width="4rem">
                 {hsLatchText}
-              </StyledText>
+              </LegacyStyledText>
             </Flex>
           </Flex>
         ) : null}
@@ -346,7 +351,9 @@ export function LabwareListItem(
       {secureLabwareModalType != null && (
         <SecureLabwareModal
           type={secureLabwareModalType as ModuleTypesThatRequireExtraAttention}
-          onCloseClick={() => setSecureLabwareModalType(null)}
+          onCloseClick={() => {
+            setSecureLabwareModalType(null)
+          }}
         />
       )}
     </LabwareRow>

@@ -3,7 +3,7 @@ import * as React from 'react'
 import { when } from 'vitest-when'
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { Provider } from 'react-redux'
-import { createStore, Store } from 'redux'
+import { createStore } from 'redux'
 import { renderHook } from '@testing-library/react'
 import { I18nextProvider } from 'react-i18next'
 
@@ -14,6 +14,7 @@ import * as Fixtures from '../../../redux/networking/__fixtures__'
 import { getNetworkInterfaces } from '../../../redux/networking'
 
 import { useNetworkConnection } from '../hooks/useNetworkConnection'
+import type { Store } from 'redux'
 
 vi.mock('../../../resources/networking/hooks')
 vi.mock('../../../redux/networking/selectors')

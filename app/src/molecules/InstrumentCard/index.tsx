@@ -13,7 +13,7 @@ import {
   POSITION_ABSOLUTE,
   POSITION_RELATIVE,
   SPACING,
-  StyledText,
+  LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import flexGripper from '../../assets/images/flex_gripper.png'
@@ -103,15 +103,15 @@ export function InstrumentCard(props: InstrumentCardProps): JSX.Element {
         width="100%"
       >
         {banner}
-        <StyledText
+        <LegacyStyledText
           textTransform={TYPOGRAPHY.textTransformUppercase}
           color={COLORS.grey50}
           fontWeight={TYPOGRAPHY.fontWeightSemiBold}
           fontSize={TYPOGRAPHY.fontSizeH6}
         >
           {label}
-        </StyledText>
-        <StyledText as="p">{description}</StyledText>
+        </LegacyStyledText>
+        <LegacyStyledText as="p">{description}</LegacyStyledText>
       </Flex>
       {menuOverlayItems != null && (
         <Box

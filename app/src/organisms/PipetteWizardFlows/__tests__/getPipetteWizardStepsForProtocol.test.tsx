@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { LEFT, RIGHT, LoadedPipette } from '@opentrons/shared-data'
+import { LEFT, RIGHT } from '@opentrons/shared-data'
 import {
   mock96ChannelAttachedPipetteInformation,
   mockAttachedPipetteInformation,
@@ -7,6 +7,7 @@ import {
 import { FLOWS, SECTIONS } from '../constants'
 import { getPipetteWizardStepsForProtocol } from '../getPipetteWizardStepsForProtocol'
 
+import type { LoadedPipette } from '@opentrons/shared-data'
 import type { PipetteWizardStep } from '../types'
 
 const mockPipetteInfo = [

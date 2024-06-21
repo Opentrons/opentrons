@@ -30,13 +30,20 @@ export function TiprackField(props: TiprackFieldProps): JSX.Element {
   const [targetProps, tooltipProps] = useHoverTooltip()
   const pipetteEntities = useSelector(getPipetteEntities)
   const options = useSelector(uiLabwareSelectors.getTiprackOptions)
-  const defaultTipracks =
+  const defaultTiprackUris =
     pipetteId != null ? pipetteEntities[pipetteId as string].tiprackDefURI : []
-  const pipetteOptions = options.filter(option =>
-    defaultTipracks.includes(option.defURI)
+  const tiprackOptions = options.filter(option =>
+    defaultTiprackUris.includes(option.value)
   )
-  const hasMissingTiprack = defaultTipracks.length > pipetteOptions.length
 
+  React.useEffect(() => {
+    //  if default value is not included in the pipette's tiprack uris then
+    //  change it so it is
+    if (!defaultTiprackUris.includes(value as string)) {
+      updateValue(defaultTiprackUris[0])
+    }
+  }, [defaultTiprackUris, value, updateValue])
+  const hasMissingTiprack = defaultTiprackUris.length > tiprackOptions.length
   return (
     <Box {...targetProps}>
       <FormGroup
@@ -44,7 +51,7 @@ export function TiprackField(props: TiprackFieldProps): JSX.Element {
         className={styles.large_field}
       >
         <DropdownField
-          options={pipetteOptions}
+          options={tiprackOptions}
           name={name}
           value={String(value) != null ? String(value) : null}
           onBlur={onFieldBlur}

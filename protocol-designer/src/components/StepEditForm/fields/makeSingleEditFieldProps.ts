@@ -7,8 +7,8 @@ import {
   getFieldDefaultTooltip,
   getSingleSelectDisabledTooltip,
 } from '../utils'
-import { StepFieldName, FormData } from '../../../form-types'
-import { FieldProps, FieldPropsByName, FocusHandlers } from '../types'
+import type { StepFieldName, FormData } from '../../../form-types'
+import type { FieldProps, FieldPropsByName, FocusHandlers } from '../types'
 interface ShowFieldErrorParams {
   name: StepFieldName
   focusedField: StepFieldName | null

@@ -1,23 +1,18 @@
 """Router for /runs commands endpoints."""
 import textwrap
-from datetime import datetime
 from typing import Optional, Union
 from typing_extensions import Final, Literal
 
-from anyio import move_on_after
 from fastapi import APIRouter, Depends, Query, status
 
-from pydantic import BaseModel, Field
-
 from opentrons.protocol_engine import (
-    ProtocolEngine,
+    CommandPointer,
     commands as pe_commands,
     errors as pe_errors,
 )
 
 from robot_server.errors.error_responses import ErrorDetails, ErrorBody
 from robot_server.service.json_api import (
-    RequestModel,
     SimpleBody,
     MultiBody,
     MultiBodyMeta,
@@ -26,10 +21,16 @@ from robot_server.service.json_api import (
 )
 from robot_server.robot.control.dependencies import require_estop_in_good_state
 
+from ..command_models import (
+    RequestModelWithCommandCreate,
+    CommandCollectionLinks,
+    CommandLink,
+    CommandLinkMeta,
+)
 from ..run_models import RunCommandSummary
 from ..run_data_manager import RunDataManager, PreSerializedCommandsNotAvailableError
 from ..engine_store import EngineStore
-from ..run_store import RunStore, CommandNotFoundError
+from ..run_store import CommandNotFoundError, RunStore
 from ..run_models import RunNotFoundError
 from ..dependencies import get_engine_store, get_run_data_manager, get_run_store
 from .base_router import RunNotFound, RunStopped
@@ -38,17 +39,6 @@ from .base_router import RunNotFound, RunStopped
 _DEFAULT_COMMAND_LIST_LENGTH: Final = 20
 
 commands_router = APIRouter()
-
-
-class RequestModelWithCommandCreate(RequestModel[pe_commands.CommandCreate]):
-    """Equivalent to RequestModel[CommandCreate].
-
-    This works around a Pydantic v<2 bug where RequestModel[CommandCreate]
-    doesn't parse using the CommandCreate union discriminator.
-    https://github.com/pydantic/pydantic/issues/3782
-    """
-
-    data: pe_commands.CommandCreate
 
 
 class CommandNotFound(ErrorDetails):
@@ -84,41 +74,12 @@ class PreSerializedCommandsNotAvailable(ErrorDetails):
     )
 
 
-class CommandLinkMeta(BaseModel):
-    """Metadata about a command resource referenced in `links`."""
-
-    runId: str = Field(..., description="The ID of the command's run.")
-    commandId: str = Field(..., description="The ID of the command.")
-    index: int = Field(..., description="Index of the command in the overall list.")
-    key: str = Field(..., description="Value of the current command's `key` field.")
-    createdAt: datetime = Field(
-        ...,
-        description="When the current command was created.",
-    )
-
-
-class CommandLink(BaseModel):
-    """A link to a command resource."""
-
-    href: str = Field(..., description="The path to a command")
-    meta: CommandLinkMeta = Field(..., description="Information about the command.")
-
-
-class CommandCollectionLinks(BaseModel):
-    """Links returned along with a collection of commands."""
-
-    current: Optional[CommandLink] = Field(
-        None,
-        description="Path to the currently running or next queued command.",
-    )
-
-
-async def get_current_run_engine_from_url(
+async def get_current_run_from_url(
     runId: str,
     engine_store: EngineStore = Depends(get_engine_store),
     run_store: RunStore = Depends(get_run_store),
-) -> ProtocolEngine:
-    """Get run protocol engine.
+) -> str:
+    """Get run from url.
 
     Args:
         runId: Run ID to associate the command with.
@@ -135,7 +96,7 @@ async def get_current_run_engine_from_url(
             status.HTTP_409_CONFLICT
         )
 
-    return engine_store.engine
+    return runId
 
 
 @PydanticResponse.wrap_route(
@@ -145,7 +106,7 @@ async def get_current_run_engine_from_url(
     description=textwrap.dedent(
         """
         Add a single command to the run. You can add commands to a run
-        for two reasons:
+        for three reasons:
 
         - Setup commands (`data.source == "setup"`)
         - Protocol commands (`data.source == "protocol"`)
@@ -221,8 +182,9 @@ async def create_run_command(
             "FIXIT command use only. Reference of the failed command id we are trying to fix."
         ),
     ),
-    protocol_engine: ProtocolEngine = Depends(get_current_run_engine_from_url),
+    engine_store: EngineStore = Depends(get_engine_store),
     check_estop: bool = Depends(require_estop_in_good_state),
+    run_id: str = Depends(get_current_run_from_url),
 ) -> PydanticResponse[SimpleBody[pe_commands.Command]]:
     """Enqueue a protocol command.
 
@@ -235,17 +197,22 @@ async def create_run_command(
             Comes from a query parameter in the URL.
         failedCommandId: FIXIT command use only.
             Reference of the failed command id we are trying to fix.
-        protocol_engine: The run's `ProtocolEngine` on which the new
+        engine_store: The run's `EngineStore` on which the new
             command will be enqueued.
         check_estop: Dependency to verify the estop is in a valid state.
+        run_id: Run identification to attach command to.
     """
     # TODO(mc, 2022-05-26): increment the HTTP API version so that default
     # behavior is to pass through `command_intent` without overriding it
     command_intent = request_body.data.intent or pe_commands.CommandIntent.SETUP
     command_create = request_body.data.copy(update={"intent": command_intent})
+
     try:
-        command = protocol_engine.add_command(
-            request=command_create, failed_command_id=failedCommandId
+        command = await engine_store.add_command_and_wait_for_interval(
+            request=command_create,
+            failed_command_id=failedCommandId,
+            wait_until_complete=waitUntilComplete,
+            timeout=timeout,
         )
 
     except pe_errors.SetupCommandNotAllowedError as e:
@@ -255,12 +222,7 @@ async def create_run_command(
     except pe_errors.CommandNotAllowedError as e:
         raise CommandNotAllowed.from_exc(e).as_error(status.HTTP_400_BAD_REQUEST)
 
-    if waitUntilComplete:
-        timeout_sec = None if timeout is None else timeout / 1000.0
-        with move_on_after(timeout_sec):
-            await protocol_engine.wait_for_command(command.id)
-
-    response_data = protocol_engine.state_view.commands.get(command.id)
+    response_data = engine_store.get_command(command.id)
 
     return await PydanticResponse.create(
         content=SimpleBody.construct(data=response_data),
@@ -322,6 +284,7 @@ async def get_run_commands(
         raise RunNotFound.from_exc(e).as_error(status.HTTP_404_NOT_FOUND) from e
 
     current_command = run_data_manager.get_current_command(run_id=runId)
+    recovery_target_command = run_data_manager.get_recovery_target_command(run_id=runId)
 
     data = [
         RunCommandSummary.construct(
@@ -336,6 +299,7 @@ async def get_run_commands(
             params=c.params,
             error=c.error,
             notes=c.notes,
+            failedCommandId=c.failedCommandId,
         )
         for c in command_slice.commands
     ]
@@ -345,19 +309,10 @@ async def get_run_commands(
         totalLength=command_slice.total_length,
     )
 
-    links = CommandCollectionLinks()
-
-    if current_command is not None:
-        links.current = CommandLink(
-            href=f"/runs/{runId}/commands/{current_command.command_id}",
-            meta=CommandLinkMeta(
-                runId=runId,
-                commandId=current_command.command_id,
-                index=current_command.index,
-                key=current_command.command_key,
-                createdAt=current_command.created_at,
-            ),
-        )
+    links = CommandCollectionLinks.construct(
+        current=_make_command_link(runId, current_command),
+        currentlyRecoveringFrom=_make_command_link(runId, recovery_target_command),
+    )
 
     return await PydanticResponse.create(
         content=MultiBody.construct(data=data, meta=meta, links=links),
@@ -452,4 +407,23 @@ async def get_run_command(
     return await PydanticResponse.create(
         content=SimpleBody.construct(data=command),
         status_code=status.HTTP_200_OK,
+    )
+
+
+def _make_command_link(
+    run_id: str, command_pointer: Optional[CommandPointer]
+) -> Optional[CommandLink]:
+    return (
+        CommandLink.construct(
+            href=f"/runs/{run_id}/commands/{command_pointer.command_id}",
+            meta=CommandLinkMeta(
+                runId=run_id,
+                commandId=command_pointer.command_id,
+                index=command_pointer.index,
+                key=command_pointer.command_key,
+                createdAt=command_pointer.created_at,
+            ),
+        )
+        if command_pointer is not None
+        else None
     )
