@@ -5,7 +5,7 @@ import {
   DIRECTION_COLUMN,
   Flex,
   SPACING,
-  StyledText,
+  LegacyStyledText,
 } from '@opentrons/components'
 
 import { RECOVERY_MAP } from '../constants'
@@ -119,7 +119,7 @@ export function SkipToNextStep(
         t={t}
         i18nKey="robot_will_not_check_for_liquid"
         components={{
-          block: <StyledText as="p" />,
+          block: <LegacyStyledText as="p" />,
         }}
       />
     )
