@@ -11,7 +11,7 @@ import {
   JUSTIFY_SPACE_BETWEEN,
   OVERFLOW_HIDDEN,
   SPACING,
-  StyledText,
+  LegacyStyledText,
 } from '@opentrons/components'
 import { useAllCsvFilesQuery } from '@opentrons/react-api-client'
 import { useFeatureFlag } from '../../redux/config'
@@ -74,31 +74,31 @@ export function HistoricalProtocolRun(
         cursor="pointer"
       >
         <Flex width="88%" gridGap={SPACING.spacing20}>
-          <StyledText
+          <LegacyStyledText
             as="p"
             width="25%"
             data-testid={`RecentProtocolRuns_Run_${protocolKey}`}
           >
             {runDisplayName}
-          </StyledText>
-          <StyledText
+          </LegacyStyledText>
+          <LegacyStyledText
             as="p"
             width="27%"
             data-testid={`RecentProtocolRuns_Protocol_${protocolKey}`}
             css={PROTOCOL_NAME_STYLE}
           >
             {protocolName}
-          </StyledText>
+          </LegacyStyledText>
           {enableCsvFile ? (
-            <StyledText
+            <LegacyStyledText
               as="p"
               width="5%"
               data-testid={`RecentProtocolRuns_Files_${protocolKey}`}
             >
               {allProtocolDataFiles.length}
-            </StyledText>
+            </LegacyStyledText>
           ) : null}
-          <StyledText
+          <LegacyStyledText
             as="p"
             width="14%"
             data-testid={`RecentProtocolRuns_Status_${protocolKey}`}
@@ -113,14 +113,14 @@ export function HistoricalProtocolRun(
               />
             ) : null}
             {runStatus != null ? t(`status_${runStatus}`) : ''}
-          </StyledText>
-          <StyledText
+          </LegacyStyledText>
+          <LegacyStyledText
             as="p"
             width="14%"
             data-testid="RecentProtocolRuns_Duration"
           >
             {duration}
-          </StyledText>
+          </LegacyStyledText>
         </Flex>
         <Flex alignItems={ALIGN_CENTER} gridGap={SPACING.spacing8}>
           <Box>

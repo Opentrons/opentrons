@@ -20,7 +20,7 @@ import {
   OVERFLOW_WRAP_ANYWHERE,
   POSITION_STICKY,
   SPACING,
-  StyledText,
+  LegacyStyledText,
   TEXT_ALIGN_RIGHT,
   truncateString,
   TYPOGRAPHY,
@@ -208,21 +208,21 @@ export function ProtocolSetupStep({
           flexDirection={DIRECTION_COLUMN}
           textAlign={TYPOGRAPHY.textAlignLeft}
         >
-          <StyledText
+          <LegacyStyledText
             as="h4"
             fontWeight={TYPOGRAPHY.fontWeightSemiBold}
             color={disabled ? COLORS.grey50 : COLORS.black90}
           >
             {title}
-          </StyledText>
+          </LegacyStyledText>
           {description != null ? (
-            <StyledText
+            <LegacyStyledText
               as="h4"
               color={disabled ? COLORS.grey50 : COLORS.grey60}
               maxWidth="35rem"
             >
               {description}
-            </StyledText>
+            </LegacyStyledText>
           ) : null}
         </Flex>
         <Flex
@@ -232,7 +232,7 @@ export function ProtocolSetupStep({
             isToggle ? `${SPACING.spacing12} ${SPACING.spacing10}` : 'undefined'
           }
         >
-          <StyledText
+          <LegacyStyledText
             as={fontSize}
             textAlign={TEXT_ALIGN_RIGHT}
             color={disabled ? COLORS.grey50 : COLORS.black90}
@@ -241,7 +241,7 @@ export function ProtocolSetupStep({
             {detail}
             {subDetail != null && detail != null ? <br /> : null}
             {subDetail}
-          </StyledText>
+          </LegacyStyledText>
         </Flex>
         {disabled || !hasRightIcon ? null : (
           <Icon
@@ -502,7 +502,7 @@ function PrepareToRun({
     incompleteInstrumentCount === 0 && areModulesReady && areFixturesReady
   const onPlay = (): void => {
     if (isDoorOpen) {
-      makeSnackbar(t('shared:close_robot_door'))
+      makeSnackbar(t('shared:close_robot_door') as string)
     } else {
       if (
         isHeaterShakerInProtocol &&
@@ -515,7 +515,7 @@ function PrepareToRun({
           play()
           trackProtocolRunEvent({
             name: ANALYTICS_PROTOCOL_RUN_ACTION.START,
-            properties: robotAnalyticsData != null ? robotAnalyticsData : {},
+            properties: robotAnalyticsData ?? {},
           })
         } else {
           makeSnackbar(
@@ -677,17 +677,20 @@ function PrepareToRun({
           >
             {!isLoading ? (
               <>
-                <StyledText as="h4" fontWeight={TYPOGRAPHY.fontWeightBold}>
+                <LegacyStyledText
+                  as="h4"
+                  fontWeight={TYPOGRAPHY.fontWeightBold}
+                >
                   {t('prepare_to_run')}
-                </StyledText>
-                <StyledText
+                </LegacyStyledText>
+                <LegacyStyledText
                   as="h4"
                   color={COLORS.grey50}
                   fontWeight={TYPOGRAPHY.fontWeightSemiBold}
                   overflowWrap={OVERFLOW_WRAP_ANYWHERE}
                 >
                   {truncateString(protocolName, 100)}
-                </StyledText>
+                </LegacyStyledText>
               </>
             ) : (
               <ProtocolSetupTitleSkeleton />

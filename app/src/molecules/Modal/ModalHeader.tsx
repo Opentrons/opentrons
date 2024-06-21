@@ -8,7 +8,7 @@ import {
   Icon,
   JUSTIFY_SPACE_BETWEEN,
   SPACING,
-  StyledText,
+  LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import type { ModalHeaderBaseProps } from '../Modal/types'
@@ -46,13 +46,13 @@ export function ModalHeader(props: ModalHeaderBaseProps): JSX.Element {
             marginRight={SPACING.spacing16}
           />
         ) : null}
-        <StyledText
+        <LegacyStyledText
           fontWeight={TYPOGRAPHY.fontWeightBold}
           fontSize={TYPOGRAPHY.fontSize28}
           lineHeight={TYPOGRAPHY.lineHeight36}
         >
           {title}
-        </StyledText>
+        </LegacyStyledText>
       </Flex>
       {hasExitIcon && onClick != null ? (
         <Flex

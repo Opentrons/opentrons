@@ -2386,6 +2386,20 @@
               ]
             }
           ],
+          "liquidProbeParameters": {
+            "minimumHeight": [
+              {
+                "applicableWells": [],
+                "value": 0.5
+              }
+            ],
+            "minimumWellVolume": [
+              {
+                "applicableWells": [],
+                "value": 0.0
+              }
+            ]
+          },
           "metadata": {
             "displayCategory": "reservoir",
             "displayName": "NEST 12 Well Reservoir 15 mL",
@@ -2848,6 +2862,7 @@
       "pipetteName": "p20_single_gen2"
     }
   ],
+  "result": "ok",
   "robotType": "OT-2 Standard",
   "runTimeParameters": []
 }

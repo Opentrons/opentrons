@@ -17,7 +17,7 @@ import {
   Link,
   OVERFLOW_HIDDEN,
   SPACING,
-  StyledText,
+  LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import {
@@ -85,10 +85,12 @@ export function HistoricalProtocolRunDrawer(
       iconMarginLeft={SPACING.spacing4}
     >
       <Flex flexDirection={DIRECTION_COLUMN}>
-        <StyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
+        <LegacyStyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
           {t('data_out_of_date')}
-        </StyledText>
-        <StyledText as="p">{t('robot_was_recalibrated')}</StyledText>
+        </LegacyStyledText>
+        <LegacyStyledText as="p">
+          {t('robot_was_recalibrated')}
+        </LegacyStyledText>
       </Flex>
     </Banner>
   ) : null
@@ -98,7 +100,7 @@ export function HistoricalProtocolRunDrawer(
       <InfoScreen contentType="noFiles" t={t} backgroundColor={COLORS.grey35} />
     ) : (
       <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
-        <StyledText>{t('protocol_files')}</StyledText>
+        <LegacyStyledText>{t('protocol_files')}</LegacyStyledText>
         <Flex
           direction={DIRECTION_COLUMN}
           justifyContent={JUSTIFY_FLEX_START}
@@ -108,28 +110,28 @@ export function HistoricalProtocolRunDrawer(
           padding={`${SPACING.spacing4} ${SPACING.spacing12}`}
         >
           <Box width="33%">
-            <StyledText
+            <LegacyStyledText
               as="p"
               datatest-id="RecentProtocolRun_Drawer_fileNameTitle"
             >
               {t('name')}
-            </StyledText>
+            </LegacyStyledText>
           </Box>
           <Box width="33%">
-            <StyledText
+            <LegacyStyledText
               as="p"
               datatest-id="RecentProtocolRun_Drawer_fileDateTitle"
             >
               {t('date')}
-            </StyledText>
+            </LegacyStyledText>
           </Box>
           <Box width="34%">
-            <StyledText
+            <LegacyStyledText
               as="p"
               datatest-id="RecentProtocolRun_Drawer_fileDownloadTitle"
             >
               {t('download')}
-            </StyledText>
+            </LegacyStyledText>
           </Box>
         </Flex>
         <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
@@ -150,7 +152,7 @@ export function HistoricalProtocolRunDrawer(
                   gridGap={SPACING.spacing4}
                   alignItems={ALIGN_CENTER}
                 >
-                  <StyledText
+                  <LegacyStyledText
                     as="p"
                     css={css`
                       overflow: ${OVERFLOW_HIDDEN};
@@ -158,12 +160,12 @@ export function HistoricalProtocolRunDrawer(
                     `}
                   >
                     {name}
-                  </StyledText>
+                  </LegacyStyledText>
                 </Flex>
                 <Box width="33%">
-                  <StyledText as="p">
+                  <LegacyStyledText as="p">
                     {format(new Date(createdAt), 'M/d/yy HH:mm:ss')}
-                  </StyledText>
+                  </LegacyStyledText>
                 </Box>
                 <Box width="34%">
                   <Link
@@ -172,7 +174,9 @@ export function HistoricalProtocolRunDrawer(
                     onClick={() => {}} // TODO (nd: 06/18/2024) get file and download
                   >
                     <Flex alignItems={ALIGN_CENTER}>
-                      <StyledText as="p">{t('download')}</StyledText>
+                      <LegacyStyledText as="p">
+                        {t('download')}
+                      </LegacyStyledText>
                       <Icon
                         name="download"
                         size="1rem"
@@ -199,9 +203,9 @@ export function HistoricalProtocolRunDrawer(
       // <InfoScreen contentType="noLabwareOffsetData" />
       <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
         {outOfDateBanner}
-        <StyledText>
+        <LegacyStyledText>
           {i18n.format(t('labware_offset_data'), 'capitalize')}
-        </StyledText>
+        </LegacyStyledText>
         <Flex
           direction={DIRECTION_COLUMN}
           justifyContent={JUSTIFY_FLEX_START}
@@ -214,28 +218,28 @@ export function HistoricalProtocolRunDrawer(
             width="33%"
             paddingY={`${SPACING.spacing4} ${SPACING.spacing8} ${SPACING.spacing4} ${SPACING.spacing4}`}
           >
-            <StyledText
+            <LegacyStyledText
               as="p"
               datatest-id="RecentProtocolRun_Drawer_locationTitle"
             >
               {i18n.format(t('location'), 'capitalize')}
-            </StyledText>
+            </LegacyStyledText>
           </Box>
           <Box width="33%" padding={`${SPACING.spacing4} ${SPACING.spacing8}`}>
-            <StyledText
+            <LegacyStyledText
               as="p"
               datatest-id="RecentProtocolRun_Drawer_labwareTitle"
             >
               {i18n.format(t('labware'), 'capitalize')}
-            </StyledText>
+            </LegacyStyledText>
           </Box>
           <Box width="34%" padding={`${SPACING.spacing4} ${SPACING.spacing8}`}>
-            <StyledText
+            <LegacyStyledText
               as="p"
               datatest-id="RecentProtocolRun_Drawer_labwareOffsetDataTitle"
             >
               {i18n.format(t('labware_offset_data'), 'sentenceCase')}
-            </StyledText>
+            </LegacyStyledText>
           </Box>
         </Flex>
         <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
@@ -268,7 +272,7 @@ export function HistoricalProtocolRunDrawer(
                   alignItems={ALIGN_CENTER}
                 >
                   {/* TODO (nd: 06/20/2024) finalize small version of LocationIcon w/ Design and implement below */}
-                  <StyledText
+                  <LegacyStyledText
                     as="label"
                     fontWeight={TYPOGRAPHY.fontWeightSemiBold}
                     borderRadius="6px"
@@ -279,17 +283,17 @@ export function HistoricalProtocolRunDrawer(
                     `}
                   >
                     {offset.location.slotName}
-                  </StyledText>
-                  <StyledText as="p">
+                  </LegacyStyledText>
+                  <LegacyStyledText as="p">
                     {offset.location.moduleModel != null
                       ? getModuleDisplayName(offset.location.moduleModel)
                       : null}
-                  </StyledText>
+                  </LegacyStyledText>
                 </Flex>
                 <Box width="33%">
-                  <StyledText as="p" title={labwareName}>
+                  <LegacyStyledText as="p" title={labwareName}>
                     {labwareName}
-                  </StyledText>
+                  </LegacyStyledText>
                 </Box>
                 <Box width="34%">
                   <OffsetVector

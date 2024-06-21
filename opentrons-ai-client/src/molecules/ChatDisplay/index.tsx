@@ -16,7 +16,7 @@ import {
   POSITION_RELATIVE,
   PrimaryButton,
   SPACING,
-  StyledText,
+  LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
@@ -52,7 +52,9 @@ export function ChatDisplay({ chat, chatId }: ChatDisplayProps): JSX.Element {
       paddingRight={isUser ? undefined : SPACING.spacing40}
     >
       <Flex justifyContent={isUser ? JUSTIFY_FLEX_END : JUSTIFY_FLEX_START}>
-        <StyledText>{isUser ? t('you') : t('opentronsai')}</StyledText>
+        <LegacyStyledText>
+          {isUser ? t('you') : t('opentronsai')}
+        </LegacyStyledText>
       </Flex>
       {/* text should be markdown so this component will have a package or function to parse markdown */}
       <Flex
@@ -108,7 +110,7 @@ function ExternalLink(props: JSX.IntrinsicAttributes): JSX.Element {
 
 function ParagraphText(props: JSX.IntrinsicAttributes): JSX.Element {
   return (
-    <StyledText
+    <LegacyStyledText
       {...props}
       fontSize={TYPOGRAPHY.fontSize20}
       lineHeight={TYPOGRAPHY.lineHeight24}
@@ -117,15 +119,15 @@ function ParagraphText(props: JSX.IntrinsicAttributes): JSX.Element {
 }
 
 function HeaderText(props: JSX.IntrinsicAttributes): JSX.Element {
-  return <StyledText {...props} as="h3" />
+  return <LegacyStyledText {...props} as="h3" />
 }
 
 function ListItemText(props: JSX.IntrinsicAttributes): JSX.Element {
-  return <StyledText {...props} as="li" marginLeft={SPACING.spacing16} />
+  return <LegacyStyledText {...props} as="li" marginLeft={SPACING.spacing16} />
 }
 
 function UnnumberedListText(props: JSX.IntrinsicAttributes): JSX.Element {
-  return <StyledText {...props} as="ul" />
+  return <LegacyStyledText {...props} as="ul" />
 }
 
 const CodeWrapper = styled(Flex)`

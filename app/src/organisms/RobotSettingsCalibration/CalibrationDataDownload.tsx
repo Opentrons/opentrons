@@ -10,7 +10,7 @@ import {
   JUSTIFY_SPACE_BETWEEN,
   Link,
   SPACING,
-  StyledText,
+  LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import {
@@ -99,18 +99,18 @@ export function CalibrationDataDownload({
       gridGap={SPACING.spacing40}
     >
       <Flex gridGap={SPACING.spacing8} flexDirection={DIRECTION_COLUMN}>
-        <StyledText as="h3" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
+        <LegacyStyledText as="h3" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
           {isFlex
             ? t('about_calibration_title')
             : t('robot_calibration:download_calibration_title')}
-        </StyledText>
+        </LegacyStyledText>
         {isFlex ? (
           <>
             <Trans
               t={t}
               i18nKey="about_calibration_description_ot3"
               components={{
-                block: <StyledText as="p" />,
+                block: <LegacyStyledText as="p" />,
               }}
             />
             <Link
@@ -122,13 +122,13 @@ export function CalibrationDataDownload({
             </Link>
           </>
         ) : (
-          <StyledText as="p">
+          <LegacyStyledText as="p">
             {t(
               ot2DownloadIsPossible
                 ? 'robot_calibration:download_calibration_data_available'
                 : 'robot_calibration:download_calibration_data_unavailable'
             )}
-          </StyledText>
+          </LegacyStyledText>
         )}
       </Flex>
       <TertiaryButton

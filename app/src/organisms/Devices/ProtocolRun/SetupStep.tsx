@@ -12,7 +12,7 @@ import {
   Icon,
   JUSTIFY_SPACE_BETWEEN,
   SPACING,
-  StyledText,
+  LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
@@ -78,29 +78,29 @@ export function SetupStep({
             gridGap={SPACING.spacing40}
           >
             <Flex flexDirection={DIRECTION_COLUMN}>
-              <StyledText
+              <LegacyStyledText
                 color={COLORS.grey50}
                 css={TYPOGRAPHY.h6SemiBold}
                 marginBottom={SPACING.spacing2}
                 id={`CollapsibleStep_${label}`}
               >
                 {label}
-              </StyledText>
-              <StyledText
+              </LegacyStyledText>
+              <LegacyStyledText
                 color={COLORS.black90}
                 css={TYPOGRAPHY.h3SemiBold}
                 marginBottom={SPACING.spacing4}
                 id={`CollapsibleStep_${String(title)}`}
               >
                 {title}
-              </StyledText>
-              <StyledText
+              </LegacyStyledText>
+              <LegacyStyledText
                 as="p"
                 color={COLORS.black90}
                 id={`CollapsibleStep_${description}`}
               >
                 {description}
-              </StyledText>
+              </LegacyStyledText>
             </Flex>
             <Flex alignItems={ALIGN_CENTER} flexDirection={DIRECTION_ROW}>
               {rightElement}

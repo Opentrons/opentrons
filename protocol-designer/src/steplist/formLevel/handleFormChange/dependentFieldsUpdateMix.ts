@@ -50,7 +50,7 @@ const updatePatchOnPipetteChannelChange = (
 ): FormPatch => {
   if (patch.pipette === undefined) return patch
   let update = {}
-  const prevChannels = getChannels(rawForm.pipette, pipetteEntities)
+  const prevChannels = getChannels(rawForm.pipette as string, pipetteEntities)
   const nChannels =
     typeof patch.pipette === 'string'
       ? getChannels(patch.pipette, pipetteEntities)
@@ -112,7 +112,7 @@ const updatePatchOnPipetteChannelChange = (
     const labwareDef = labwareEntities[labwareId].def
     update = {
       wells: getAllWellsFromPrimaryWells(
-        appliedPatch.wells,
+        appliedPatch.wells as string[],
         labwareDef,
         channels
       ),

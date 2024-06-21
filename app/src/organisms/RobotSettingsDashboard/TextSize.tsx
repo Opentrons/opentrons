@@ -14,7 +14,7 @@ import {
   Icon,
   JUSTIFY_CENTER,
   JUSTIFY_FLEX_START,
-  StyledText,
+  LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
@@ -54,12 +54,15 @@ export function TextSize({ setCurrentOption }: TextSizeProps): JSX.Element {
         >
           <Icon name="chevron-left" size="2.5rem" />
         </Btn>
-        <StyledText fontSize="2rem" textAlign={TYPOGRAPHY.textAlignCenter}>
+        <LegacyStyledText
+          fontSize="2rem"
+          textAlign={TYPOGRAPHY.textAlignCenter}
+        >
           {t('text_size')}
-        </StyledText>
+        </LegacyStyledText>
       </Flex>
       <Flex flexDirection={DIRECTION_COLUMN} marginTop="8.125rem">
-        <StyledText
+        <LegacyStyledText
           textSize="1.375rem"
           lineHeight="1.75rem"
           fontWeight={TYPOGRAPHY.fontWeightRegular}
@@ -67,7 +70,7 @@ export function TextSize({ setCurrentOption }: TextSizeProps): JSX.Element {
           textAlign={TYPOGRAPHY.textAlignCenter}
         >
           {t('text_size_description')}
-        </StyledText>
+        </LegacyStyledText>
         <Flex
           flexDirection={DIRECTION_ROW}
           width="56.5rem"

@@ -4,7 +4,7 @@ import isEqual from 'lodash/isEqual'
 import {
   DIRECTION_COLUMN,
   Flex,
-  StyledText,
+  LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import {
@@ -24,6 +24,8 @@ import { TipConfirmation } from './TipConfirmation'
 import { getLabwareDef } from './utils/labware'
 import { getLabwareDefinitionsFromCommands } from '../../molecules/Command/utils/getLabwareDefinitionsFromCommands'
 import { getDisplayLocation } from './utils/getDisplayLocation'
+import { useSelector } from 'react-redux'
+import { getIsOnDevice } from '../../redux/config'
 
 import type {
   CompletedProtocolAnalysis,
@@ -39,8 +41,7 @@ import type {
   WorkingOffset,
 } from './types'
 import type { LabwareOffset } from '@opentrons/api-client'
-import { useSelector } from 'react-redux'
-import { getIsOnDevice } from '../../redux/config'
+import type { TFunction } from 'i18next'
 
 interface PickUpTipProps extends PickUpTipStep {
   protocolData: CompletedProtocolAnalysis
@@ -90,7 +91,7 @@ export const PickUpTip = (props: PickUpTipProps): JSX.Element | null => {
   const displayLocation = getDisplayLocation(
     location,
     getLabwareDefinitionsFromCommands(protocolData.commands),
-    t,
+    t as TFunction,
     i18n
   )
   const labwareDisplayName = getLabwareDisplayName(labwareDef)
@@ -106,7 +107,10 @@ export const PickUpTip = (props: PickUpTipProps): JSX.Element | null => {
       tOptions={{ tip_rack: labwareDisplayName, location: displayLocation }}
       components={{
         bold: (
-          <StyledText as="span" fontWeight={TYPOGRAPHY.fontWeightSemiBold} />
+          <LegacyStyledText
+            as="span"
+            fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+          />
         ),
       }}
     />,
@@ -178,8 +182,8 @@ export const PickUpTip = (props: PickUpTipProps): JSX.Element | null => {
         {
           commandType: 'moveToWell' as const,
           params: {
-            pipetteId: pipetteId,
-            labwareId: labwareId,
+            pipetteId,
+            labwareId,
             wellName: 'A1',
             wellLocation: { origin: 'top' as const },
           },
@@ -266,7 +270,7 @@ export const PickUpTip = (props: PickUpTipProps): JSX.Element | null => {
           {
             commandType: 'moveLabware' as const,
             params: {
-              labwareId: labwareId,
+              labwareId,
               newLocation: 'offDeck',
               strategy: 'manualMoveWithoutPause',
             },
@@ -284,7 +288,7 @@ export const PickUpTip = (props: PickUpTipProps): JSX.Element | null => {
           {
             commandType: 'moveLabware' as const,
             params: {
-              labwareId: labwareId,
+              labwareId,
               newLocation: 'offDeck',
               strategy: 'manualMoveWithoutPause',
             },
@@ -335,8 +339,8 @@ export const PickUpTip = (props: PickUpTipProps): JSX.Element | null => {
         {
           commandType: 'moveToWell' as const,
           params: {
-            pipetteId: pipetteId,
-            labwareId: labwareId,
+            pipetteId,
+            labwareId,
             wellName: 'A1',
             wellLocation: { origin: 'top' as const },
           },
@@ -364,7 +368,7 @@ export const PickUpTip = (props: PickUpTipProps): JSX.Element | null => {
         {
           commandType: 'moveLabware' as const,
           params: {
-            labwareId: labwareId,
+            labwareId,
             newLocation: 'offDeck',
             strategy: 'manualMoveWithoutPause',
           },
@@ -418,7 +422,10 @@ export const PickUpTip = (props: PickUpTipProps): JSX.Element | null => {
                   ? 'ensure_nozzle_position_odd'
                   : 'ensure_nozzle_position_desktop'
               }
-              components={{ block: <StyledText as="p" />, bold: <strong /> }}
+              components={{
+                block: <LegacyStyledText as="p" />,
+                bold: <strong />,
+              }}
               values={{
                 tip_type: t('pipette_nozzle'),
                 item_location: t('check_tip_location'),

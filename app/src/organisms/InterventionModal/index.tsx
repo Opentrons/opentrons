@@ -17,7 +17,7 @@ import {
   PrimaryButton,
   SPACING,
   TYPOGRAPHY,
-  StyledText,
+  LegacyStyledText,
 } from '@opentrons/components'
 
 import { SmallButton } from '../../atoms/buttons'
@@ -144,7 +144,7 @@ export function InterventionModal({
     </Modal>
   ) : (
     <InterventionModalMolecule
-      iconHeading={<StyledText as="h1">{headerTitle}</StyledText>}
+      iconHeading={<LegacyStyledText as="h1">{headerTitle}</LegacyStyledText>}
       iconName={iconName}
       type="intervention-required"
     >

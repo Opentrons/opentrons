@@ -7,7 +7,7 @@ import {
   Flex,
   POSITION_FIXED,
   SPACING,
-  StyledText,
+  LegacyStyledText,
 } from '@opentrons/components'
 
 import { getTopPortalEl } from '../../App/portal'
@@ -83,7 +83,7 @@ export function SelectDestWells(props: SelectDestWellsProps): JSX.Element {
         t('number_wells_selected_error_message', {
           wellCount: sourceWellCount,
           selectionUnits,
-        }),
+        }) as string,
         'error',
         {
           closeButton: true,
@@ -207,13 +207,13 @@ function NumberWellsSelectedErrorModal({
         setShowNumberWellsSelectedErrorModal(false)
       }}
     >
-      <StyledText as="p">
+      <LegacyStyledText as="p">
         {t('number_wells_selected_error_learn_more', {
           wellCount,
           selectionUnit,
           selectionUnits,
         })}
-      </StyledText>
+      </LegacyStyledText>
     </Modal>
   )
 }

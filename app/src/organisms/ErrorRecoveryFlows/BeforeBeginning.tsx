@@ -5,15 +5,11 @@ import {
   DIRECTION_COLUMN,
   Flex,
   JUSTIFY_CENTER,
-  StyledText,
+  LegacyStyledText,
 } from '@opentrons/components'
 
 import { SmallButton } from '../../atoms/buttons'
-import {
-  NON_SANCTIONED_RECOVERY_COLOR_STYLE_PRIMARY,
-  BODY_TEXT_STYLE,
-  ODD_SECTION_TITLE_STYLE,
-} from './constants'
+import { BODY_TEXT_STYLE, ODD_SECTION_TITLE_STYLE } from './constants'
 import { RecoverySingleColumnContent } from './shared'
 
 import type { RecoveryContentProps } from './types'
@@ -29,17 +25,18 @@ export function BeforeBeginning({
     return (
       <RecoverySingleColumnContent>
         <Flex flexDirection={DIRECTION_COLUMN} height="100%">
-          <StyledText css={ODD_SECTION_TITLE_STYLE} as="h4SemiBold">
+          <LegacyStyledText css={ODD_SECTION_TITLE_STYLE} as="h4SemiBold">
             {t('before_you_begin')}
-          </StyledText>
+          </LegacyStyledText>
           <Trans
             t={t}
             i18nKey={'error_recovery:recovery_mode_explanation'}
-            components={{ block: <StyledText as="p" css={BODY_TEXT_STYLE} /> }}
+            components={{
+              block: <LegacyStyledText as="p" css={BODY_TEXT_STYLE} />,
+            }}
           />
           <SmallButton
             buttonType="primary"
-            css={NON_SANCTIONED_RECOVERY_COLOR_STYLE_PRIMARY}
             buttonText={t('view_recovery_options')}
             justifyContent={JUSTIFY_CENTER}
             onClick={proceedNextStep}

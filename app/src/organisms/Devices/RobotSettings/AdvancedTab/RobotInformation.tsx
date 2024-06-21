@@ -6,7 +6,7 @@ import {
   Flex,
   JUSTIFY_FLEX_START,
   SPACING,
-  StyledText,
+  LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { useRobot } from '../../../../organisms/Devices/hooks'
@@ -52,30 +52,30 @@ export function RobotInformation({
         marginTop={SPACING.spacing16}
       >
         <Flex flexDirection={DIRECTION_COLUMN}>
-          <StyledText css={TYPOGRAPHY.pSemiBold}>
+          <LegacyStyledText css={TYPOGRAPHY.pSemiBold}>
             {t('robot_serial_number')}
-          </StyledText>
-          <StyledText as="p">
+          </LegacyStyledText>
+          <LegacyStyledText as="p">
             {serialNumber != null
               ? serialNumber
               : t('robot_settings_advanced_unknown')}
-          </StyledText>
+          </LegacyStyledText>
         </Flex>
         <Flex flexDirection={DIRECTION_COLUMN}>
-          <StyledText css={TYPOGRAPHY.pSemiBold}>
+          <LegacyStyledText css={TYPOGRAPHY.pSemiBold}>
             {t('firmware_version')}
-          </StyledText>
-          <StyledText as="p">
+          </LegacyStyledText>
+          <LegacyStyledText as="p">
             {firmwareVersion != null
               ? firmwareVersion
               : t('robot_settings_advanced_unknown')}
-          </StyledText>
+          </LegacyStyledText>
         </Flex>
         <Flex flexDirection={DIRECTION_COLUMN}>
-          <StyledText css={TYPOGRAPHY.pSemiBold}>
+          <LegacyStyledText css={TYPOGRAPHY.pSemiBold}>
             {t('supported_protocol_api_versions')}
-          </StyledText>
-          <StyledText as="p">{formatApiVersionMinMax()}</StyledText>
+          </LegacyStyledText>
+          <LegacyStyledText as="p">{formatApiVersionMinMax()}</LegacyStyledText>
         </Flex>
       </Flex>
     </Box>

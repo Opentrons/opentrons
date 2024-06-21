@@ -9,7 +9,7 @@ import {
   InputField,
   RadioGroup,
   SPACING,
-  StyledText,
+  LegacyStyledText,
   Tooltip,
   useHoverTooltip,
 } from '@opentrons/components'
@@ -242,9 +242,9 @@ export const TipPositionModal = (
   const TipPositionInputField = !isDefault ? (
     <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing8}>
       <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
-        <StyledText as="label" paddingLeft={SPACING.spacing24}>
+        <LegacyStyledText as="label" paddingLeft={SPACING.spacing24}>
           {t('tip_position.field_titles.x_position')}
-        </StyledText>
+        </LegacyStyledText>
         <InputField
           caption={t('tip_position.caption', {
             min: roundedXMin,
@@ -264,9 +264,9 @@ export const TipPositionModal = (
         width="max-content"
         {...targetProps}
       >
-        <StyledText as="label" paddingLeft={SPACING.spacing24}>
+        <LegacyStyledText as="label" paddingLeft={SPACING.spacing24}>
           {t('tip_position.field_titles.y_position')}
-        </StyledText>
+        </LegacyStyledText>
         <InputField
           caption={t('tip_position.caption', {
             min: roundedYMin,
@@ -282,9 +282,9 @@ export const TipPositionModal = (
         <Tooltip {...tooltipProps}>{t('tooltip:y_position_value')}</Tooltip>
       </Flex>
       <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
-        <StyledText as="label" paddingLeft={SPACING.spacing24}>
+        <LegacyStyledText as="label" paddingLeft={SPACING.spacing24}>
           {t('tip_position.field_titles.z_position')}
-        </StyledText>
+        </LegacyStyledText>
         <InputField
           caption={t('tip_position.caption', {
             min: minMmFromBottom,

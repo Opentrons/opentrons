@@ -17,7 +17,7 @@ import {
   RobotWorkSpace,
   SecondaryButton,
   SPACING,
-  StyledText,
+  LegacyStyledText,
   TYPOGRAPHY,
   WELL_LABEL_OPTIONS,
 } from '@opentrons/components'
@@ -201,7 +201,7 @@ export const JogToWell = (props: JogToWellProps): JSX.Element | null => {
                   flexDirection={DIRECTION_COLUMN}
                   justifyContent={JUSTIFY_SPACE_BETWEEN}
                   header={
-                    <StyledText
+                    <LegacyStyledText
                       as="h4"
                       css={css`
                         font-weight: ${TYPOGRAPHY.fontWeightBold};
@@ -210,7 +210,7 @@ export const JogToWell = (props: JogToWellProps): JSX.Element | null => {
                       `}
                     >
                       {t('move_to_a1_position')}
-                    </StyledText>
+                    </LegacyStyledText>
                   }
                   footer={
                     <SmallButton

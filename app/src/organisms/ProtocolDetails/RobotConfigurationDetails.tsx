@@ -10,7 +10,7 @@ import {
   ModuleIcon,
   SIZE_1,
   SPACING,
-  StyledText,
+  LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import {
@@ -63,11 +63,13 @@ export const RobotConfigurationDetails = (
   } = props
   const { t } = useTranslation(['protocol_details', 'shared'])
 
-  const loadingText = <StyledText as="p">{t('shared:loading')}</StyledText>
+  const loadingText = (
+    <LegacyStyledText as="p">{t('shared:loading')}</LegacyStyledText>
+  )
   const emptyText = (
-    <StyledText as="p" textTransform={TYPOGRAPHY.textTransformCapitalize}>
+    <LegacyStyledText as="p" textTransform={TYPOGRAPHY.textTransformCapitalize}>
       {t('shared:empty')}
-    </StyledText>
+    </LegacyStyledText>
   )
 
   const is96PipetteUsed = leftMountPipetteName === 'p1000_96'
@@ -115,7 +117,9 @@ export const RobotConfigurationDetails = (
           isLoading ? (
             loadingText
           ) : (
-            <StyledText as="p">{getRobotTypeDisplayName(robotType)}</StyledText>
+            <LegacyStyledText as="p">
+              {getRobotTypeDisplayName(robotType)}
+            </LegacyStyledText>
           )
         }
       />
@@ -164,9 +168,9 @@ export const RobotConfigurationDetails = (
                     minWidth={SIZE_1}
                     minHeight={SIZE_1}
                   />
-                  <StyledText as="p">
+                  <LegacyStyledText as="p">
                     {getModuleDisplayName(module.params.model)}
-                  </StyledText>
+                  </LegacyStyledText>
                 </>
               }
             />
@@ -193,9 +197,9 @@ export const RobotConfigurationDetails = (
                       minHeight={SIZE_1}
                     />
                   ) : null}
-                  <StyledText as="p">
+                  <LegacyStyledText as="p">
                     {getFixtureDisplayName(fixture.cutoutFixtureId)}
-                  </StyledText>
+                  </LegacyStyledText>
                 </>
               }
             />
@@ -221,7 +225,7 @@ export const RobotConfigurationDetailsItem = (
       flexDirection={DIRECTION_ROW}
       alignItems={ALIGN_CENTER}
     >
-      <StyledText
+      <LegacyStyledText
         as="label"
         flex="0 0 auto"
         fontWeight={TYPOGRAPHY.fontWeightSemiBold}
@@ -231,7 +235,7 @@ export const RobotConfigurationDetailsItem = (
         width="4.625rem"
       >
         {label}
-      </StyledText>
+      </LegacyStyledText>
       <Flex data-testid={`RobotConfigurationDetails_${label}`}>{item}</Flex>
     </Flex>
   )

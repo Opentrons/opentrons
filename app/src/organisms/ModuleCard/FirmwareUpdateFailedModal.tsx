@@ -10,7 +10,7 @@ import {
   JUSTIFY_FLEX_END,
   PrimaryButton,
   SPACING,
-  StyledText,
+  LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { LegacyModal } from '../../molecules/LegacyModal'
@@ -36,9 +36,9 @@ export const FirmwareUpdateFailedModal = (
         name="information"
         aria-label="information"
       />
-      <StyledText marginLeft={SPACING.spacing8}>
+      <LegacyStyledText marginLeft={SPACING.spacing8}>
         {t('firmware_update_failed')}
-      </StyledText>
+      </LegacyStyledText>
     </Flex>
   )
 
@@ -48,12 +48,12 @@ export const FirmwareUpdateFailedModal = (
         flexDirection={DIRECTION_COLUMN}
         data-testid={`FirmwareUpdateFailedModal_body_text_${module.serialNumber}`}
       >
-        <StyledText paddingBottom={SPACING.spacing4}>
+        <LegacyStyledText paddingBottom={SPACING.spacing4}>
           {t('an_error_occurred_while_updating_module', {
             moduleName: getModuleDisplayName(module.moduleModel),
           })}
-        </StyledText>
-        <StyledText>{errorMessage}</StyledText>
+        </LegacyStyledText>
+        <LegacyStyledText>{errorMessage}</LegacyStyledText>
       </Flex>
       <Flex
         flexDirection={DIRECTION_ROW}

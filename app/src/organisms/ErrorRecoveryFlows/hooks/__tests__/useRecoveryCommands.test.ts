@@ -176,17 +176,24 @@ describe('useRecoveryCommands', () => {
       params: { ...mockFailedCommand.params, pipetteId: 'MOCK_ID' },
     }
 
+    const mockFailedLabware = {
+      id: 'MOCK_LW_ID',
+    } as any
+
     const buildPickUpTipsCmd = buildPickUpTips(
       mockFailedLabwareUtils.selectedTipLocations,
       mockFailedCmdWithPipetteId,
-      mockFailedLabwareUtils.pickUpTipLabware
+      mockFailedLabware
     )
 
     const { result } = renderHook(() =>
       useRecoveryCommands({
         runId: mockRunId,
         failedCommand: mockFailedCmdWithPipetteId,
-        failedLabwareUtils: mockFailedLabwareUtils,
+        failedLabwareUtils: {
+          ...mockFailedLabwareUtils,
+          failedLabware: mockFailedLabware,
+        },
         routeUpdateActions: mockRouteUpdateActions,
       })
     )
@@ -199,5 +206,47 @@ describe('useRecoveryCommands', () => {
       [buildPickUpTipsCmd],
       true
     )
+  })
+
+  it('should call skipFailedCommand and resolve after a timeout', async () => {
+    const { result } = renderHook(() =>
+      useRecoveryCommands({
+        runId: mockRunId,
+        failedCommand: mockFailedCommand,
+        failedLabwareUtils: mockFailedLabwareUtils,
+        routeUpdateActions: mockRouteUpdateActions,
+      })
+    )
+
+    const consoleSpy = vi.spyOn(console, 'log')
+
+    await act(async () => {
+      await result.current.skipFailedCommand()
+    })
+
+    expect(consoleSpy).toHaveBeenCalledWith('SKIPPING TO NEXT STEP')
+    expect(result.current.skipFailedCommand()).resolves.toBeUndefined()
+  })
+
+  it('should call ignoreErrorKindThisRun and resolve immediately', async () => {
+    const { result } = renderHook(() =>
+      useRecoveryCommands({
+        runId: mockRunId,
+        failedCommand: mockFailedCommand,
+        failedLabwareUtils: mockFailedLabwareUtils,
+        routeUpdateActions: mockRouteUpdateActions,
+      })
+    )
+
+    const consoleSpy = vi.spyOn(console, 'log')
+
+    await act(async () => {
+      await result.current.ignoreErrorKindThisRun()
+    })
+
+    expect(consoleSpy).toHaveBeenCalledWith(
+      'IGNORING ALL ERRORS OF THIS KIND THIS RUN'
+    )
+    expect(result.current.ignoreErrorKindThisRun()).resolves.toBeUndefined()
   })
 })

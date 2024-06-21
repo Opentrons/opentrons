@@ -9,7 +9,7 @@ import {
   BORDERS,
   SPACING,
   DIRECTION_COLUMN,
-  StyledText,
+  LegacyStyledText,
   ALIGN_CENTER,
 } from '@opentrons/components'
 
@@ -27,7 +27,7 @@ export function Move(props: MoveProps): JSX.Element {
 
   return (
     <Flex css={CARD_STYLE}>
-      <StyledText as="pBold">{props.labwareName}</StyledText>
+      <LegacyStyledText as="pBold">{props.labwareName}</LegacyStyledText>
       {content}
     </Flex>
   )

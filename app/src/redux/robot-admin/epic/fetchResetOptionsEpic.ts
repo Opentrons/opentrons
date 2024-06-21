@@ -27,7 +27,11 @@ const mapResponseToAction: ResponseToActionMapper<FetchResetConfigOptionsAction>
 
   return response.ok
     ? Actions.fetchResetConfigOptionsSuccess(host.name, options, meta)
-    : Actions.fetchResetConfigOptionsFailure(host.name, body, meta)
+    : Actions.fetchResetConfigOptionsFailure(
+        host.name,
+        body as Record<string, unknown>,
+        meta
+      )
 }
 
 export const fetchResetOptionsEpic: Epic = (action$, state$) => {

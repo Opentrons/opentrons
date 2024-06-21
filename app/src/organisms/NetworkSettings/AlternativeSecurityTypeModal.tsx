@@ -8,7 +8,7 @@ import {
   Flex,
   JUSTIFY_CENTER,
   SPACING,
-  StyledText,
+  LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
@@ -53,13 +53,13 @@ export function AlternativeSecurityTypeModal({
         width="100%"
       >
         <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing8}>
-          <StyledText
+          <LegacyStyledText
             as="p"
             fontWeight={TYPOGRAPHY.fontWeightRegular}
             color={COLORS.grey60}
           >
             {t('branded:alternative_security_types_description')}
-          </StyledText>
+          </LegacyStyledText>
         </Flex>
         <SmallButton
           buttonText={t('connect_via', { type: t('usb') })}

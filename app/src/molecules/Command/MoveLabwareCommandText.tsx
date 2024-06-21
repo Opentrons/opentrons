@@ -8,6 +8,7 @@ import type {
   RobotType,
 } from '@opentrons/shared-data'
 import type { CommandTextData } from './types'
+import type { TFunction } from 'i18next'
 
 interface MoveLabwareCommandTextProps {
   command: MoveLabwareRunTimeCommand
@@ -29,7 +30,7 @@ export function MoveLabwareCommandText(
   const newDisplayLocation = getLabwareDisplayLocation(
     commandTextData,
     newLocation,
-    t,
+    t as TFunction,
     robotType
   )
 
@@ -47,7 +48,7 @@ export function MoveLabwareCommandText(
             ? getLabwareDisplayLocation(
                 commandTextData,
                 oldLocation,
-                t,
+                t as TFunction,
                 robotType
               )
             : '',
@@ -60,7 +61,7 @@ export function MoveLabwareCommandText(
             ? getLabwareDisplayLocation(
                 commandTextData,
                 oldLocation,
-                t,
+                t as TFunction,
                 robotType
               )
             : '',

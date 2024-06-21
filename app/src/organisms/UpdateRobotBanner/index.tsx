@@ -6,7 +6,7 @@ import {
   DIRECTION_COLUMN,
   Flex,
   SPACING,
-  StyledText,
+  LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { Banner } from '../../atoms/Banner'
@@ -41,9 +41,9 @@ export function UpdateRobotBanner(
       flexDirection={DIRECTION_COLUMN}
     >
       <Banner type="error" {...styleProps} iconMarginLeft={SPACING.spacing4}>
-        <StyledText as="p" marginRight={SPACING.spacing4}>
+        <LegacyStyledText as="p" marginRight={SPACING.spacing4}>
           {t('branded:robot_software_update_required')}
-        </StyledText>
+        </LegacyStyledText>
         <Btn
           onClick={() => {
             handleUpdateBuildroot(robot)

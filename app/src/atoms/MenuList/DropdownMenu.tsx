@@ -11,7 +11,7 @@ import {
   JUSTIFY_SPACE_BETWEEN,
   POSITION_ABSOLUTE,
   SPACING,
-  StyledText,
+  LegacyStyledText,
   TYPOGRAPHY,
   useOnClickOutside,
   POSITION_RELATIVE,
@@ -170,13 +170,13 @@ export function DropdownMenu(props: DropdownMenuProps): JSX.Element {
     <Flex flexDirection={DIRECTION_COLUMN} ref={dropDownMenuWrapperRef}>
       {title !== null ? (
         <Flex gridGap={SPACING.spacing8}>
-          <StyledText
+          <LegacyStyledText
             as="label"
             fontWeight={TYPOGRAPHY.fontWeightSemiBold}
             paddingBottom={SPACING.spacing8}
           >
             {title}
-          </StyledText>
+          </LegacyStyledText>
           {tooltipText != null ? (
             <>
               <Flex {...targetProps}>
@@ -200,7 +200,7 @@ export function DropdownMenu(props: DropdownMenuProps): JSX.Element {
           css={DROPDOWN_STYLE}
           tabIndex={tabIndex}
         >
-          <StyledText
+          <LegacyStyledText
             css={css`
               ${dropdownType === 'rounded'
                 ? TYPOGRAPHY.pSemiBold
@@ -211,7 +211,7 @@ export function DropdownMenu(props: DropdownMenuProps): JSX.Element {
             `}
           >
             {currentOption.name}
-          </StyledText>
+          </LegacyStyledText>
           {showDropdownMenu ? (
             <Icon size="0.75rem" name="menu-down" transform="rotate(180deg)" />
           ) : (
@@ -234,7 +234,7 @@ export function DropdownMenu(props: DropdownMenuProps): JSX.Element {
           >
             {filterOptions.map((option, index) => (
               <MenuItem
-                zIndex="3"
+                zIndex={3}
                 key={`${option.name}-${index}`}
                 onClick={() => {
                   onClick(option.value)
@@ -248,13 +248,13 @@ export function DropdownMenu(props: DropdownMenuProps): JSX.Element {
         )}
       </Flex>
       {caption != null ? (
-        <StyledText
+        <LegacyStyledText
           as="label"
           paddingTop={SPACING.spacing4}
           color={COLORS.grey60}
         >
           {caption}
-        </StyledText>
+        </LegacyStyledText>
       ) : null}
     </Flex>
   )

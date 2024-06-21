@@ -12,7 +12,7 @@ import {
   JUSTIFY_FLEX_START,
   SIZE_4,
   SPACING,
-  StyledText,
+  LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
@@ -50,7 +50,7 @@ export function RecentProtocolRuns({
       width="100%"
       marginBottom="6rem"
     >
-      <StyledText
+      <LegacyStyledText
         as="h3"
         fontWeight={TYPOGRAPHY.fontWeightSemiBold}
         borderBottom={BORDERS.lineBorder}
@@ -59,7 +59,7 @@ export function RecentProtocolRuns({
         id="RecentProtocolRuns_title"
       >
         {t('recent_protocol_runs')}
-      </StyledText>
+      </LegacyStyledText>
       <Flex
         alignItems={ALIGN_CENTER}
         flexDirection={DIRECTION_COLUMN}
@@ -77,43 +77,43 @@ export function RecentProtocolRuns({
               gridGap={SPACING.spacing20}
               color={COLORS.grey60}
             >
-              <StyledText
+              <LegacyStyledText
                 as="p"
                 width="25%"
                 data-testid="RecentProtocolRuns_RunTitle"
               >
                 {t('run')}
-              </StyledText>
-              <StyledText
+              </LegacyStyledText>
+              <LegacyStyledText
                 as="p"
                 width="27%"
                 data-testid="RecentProtocolRuns_ProtocolTitle"
               >
                 {t('protocol')}
-              </StyledText>
+              </LegacyStyledText>
               {enableCsvFile ? (
-                <StyledText
+                <LegacyStyledText
                   as="p"
                   width="5%"
                   data-testid="RecentProtocolRuns_FilesTitle"
                 >
                   {t('files')}
-                </StyledText>
+                </LegacyStyledText>
               ) : null}
-              <StyledText
+              <LegacyStyledText
                 as="p"
                 width="14%"
                 data-testid="RecentProtocolRuns_StatusTitle"
               >
                 {t('status')}
-              </StyledText>
-              <StyledText
+              </LegacyStyledText>
+              <LegacyStyledText
                 as="p"
                 width="14%"
                 data-testid="RecentProtocolRuns_DurationTitle"
               >
                 {t('run_duration')}
-              </StyledText>
+              </LegacyStyledText>
             </Flex>
             {runs
               .sort(
@@ -146,7 +146,7 @@ export function RecentProtocolRuns({
           </>
         )}
         {!isRobotViewable && (
-          <StyledText
+          <LegacyStyledText
             as="p"
             alignItems={ALIGN_CENTER}
             color={COLORS.grey50}
@@ -155,10 +155,10 @@ export function RecentProtocolRuns({
             id="RecentProtocolRuns_offline"
           >
             {t('offline_recent_protocol_runs')}
-          </StyledText>
+          </LegacyStyledText>
         )}
         {isRobotViewable && (runs == null || runs.length === 0) && (
-          <StyledText
+          <LegacyStyledText
             as="p"
             alignItems={ALIGN_CENTER}
             display={DISPLAY_FLEX}
@@ -166,7 +166,7 @@ export function RecentProtocolRuns({
             id="RecentProtocolRuns_no_runs"
           >
             {t('no_protocol_runs')}
-          </StyledText>
+          </LegacyStyledText>
         )}
       </Flex>
     </Flex>

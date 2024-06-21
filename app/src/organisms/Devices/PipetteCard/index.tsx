@@ -12,7 +12,7 @@ import {
   Flex,
   InstrumentDiagram,
   SPACING,
-  StyledText,
+  LegacyStyledText,
   TYPOGRAPHY,
   useOnClickOutside,
 } from '@opentrons/components'
@@ -157,7 +157,7 @@ export const PipetteCard = (props: PipetteCardProps): JSX.Element => {
               </Flex>
             ) : null}
             <Flex flexDirection={DIRECTION_COLUMN} flex="100%">
-              <StyledText
+              <LegacyStyledText
                 textTransform={TYPOGRAPHY.textTransformUppercase}
                 color={COLORS.grey60}
                 fontWeight={TYPOGRAPHY.fontWeightSemiBold}
@@ -168,16 +168,16 @@ export const PipetteCard = (props: PipetteCardProps): JSX.Element => {
                 {t('mount', {
                   side: mount === LEFT ? t('left') : t('right'),
                 })}
-              </StyledText>
+              </LegacyStyledText>
               <Flex
                 paddingBottom={SPACING.spacing4}
                 data-testid={`PipetteCard_display_name_${String(
                   pipetteDisplayName
                 )}`}
               >
-                <StyledText fontSize={TYPOGRAPHY.fontSizeP}>
+                <LegacyStyledText fontSize={TYPOGRAPHY.fontSizeP}>
                   {pipetteDisplayName ?? t('empty')}
-                </StyledText>
+                </LegacyStyledText>
               </Flex>
             </Flex>
           </Flex>

@@ -6,7 +6,7 @@ import {
   DIRECTION_COLUMN,
   Flex,
   Icon,
-  StyledText,
+  LegacyStyledText,
   SPACING,
   ALIGN_CENTER,
   JUSTIFY_END,
@@ -18,12 +18,12 @@ import { RecoverySingleColumnContent } from './shared'
 import type { RecoveryContentProps } from './types'
 import { SmallButton } from '../../atoms/buttons'
 
-export function RecoveryError(props: RecoveryContentProps): JSX.Element | null {
+export function RecoveryError(props: RecoveryContentProps): JSX.Element {
   const { recoveryMap } = props
   const { step } = recoveryMap
   const { ERROR_WHILE_RECOVERING } = RECOVERY_MAP
 
-  const buildContent = (): JSX.Element | null => {
+  const buildContent = (): JSX.Element => {
     switch (step) {
       case ERROR_WHILE_RECOVERING.STEPS.RECOVERY_ACTION_FAILED:
         return <ErrorRecoveryFlowError {...props} />
@@ -45,7 +45,7 @@ export function ErrorRecoveryFlowError({
   getRecoveryOptionCopy,
   currentRecoveryOptionUtils,
   routeUpdateActions,
-}: RecoveryContentProps): JSX.Element | null {
+}: RecoveryContentProps): JSX.Element {
   const { OPTION_SELECTION } = RECOVERY_MAP
   const { t } = useTranslation('error_recovery')
   const { selectedRecoveryOption } = currentRecoveryOptionUtils
@@ -74,7 +74,7 @@ export function RecoveryDropTipFlowErrors({
   currentRecoveryOptionUtils,
   routeUpdateActions,
   getRecoveryOptionCopy,
-}: RecoveryContentProps): JSX.Element | null {
+}: RecoveryContentProps): JSX.Element {
   const { t } = useTranslation('error_recovery')
   const { step } = recoveryMap
   const {
@@ -190,8 +190,8 @@ export function ErrorContent({
             alignItems={ALIGN_CENTER}
             textAlign={ALIGN_CENTER}
           >
-            <StyledText as="h3Bold">{title}</StyledText>
-            <StyledText as="h4">{subTitle}</StyledText>
+            <LegacyStyledText as="h3Bold">{title}</LegacyStyledText>
+            <LegacyStyledText as="h4">{subTitle}</LegacyStyledText>
           </Flex>
         </Flex>
         <Flex justifyContent={JUSTIFY_END}>

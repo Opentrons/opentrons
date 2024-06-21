@@ -6,7 +6,7 @@ import {
   Flex,
   RESPONSIVENESS,
   SPACING,
-  StyledText,
+  LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
@@ -89,7 +89,7 @@ export function RadioButton(props: RadioButtonProps): JSX.Element {
         value={buttonValue}
       />
       <SettingButtonLabel role="label" htmlFor={buttonLabel}>
-        <StyledText
+        <LegacyStyledText
           fontSize={isLarge ? TYPOGRAPHY.fontSize28 : TYPOGRAPHY.fontSize22}
           fontWeight={TYPOGRAPHY.fontWeightSemiBold}
           lineHeight={
@@ -97,11 +97,11 @@ export function RadioButton(props: RadioButtonProps): JSX.Element {
           }
         >
           {buttonLabel}
-        </StyledText>
+        </LegacyStyledText>
         {subButtonLabel != null ? (
-          <StyledText as="h4" fontWeight={TYPOGRAPHY.fontWeightRegular}>
+          <LegacyStyledText as="h4" fontWeight={TYPOGRAPHY.fontWeightRegular}>
             {subButtonLabel}
-          </StyledText>
+          </LegacyStyledText>
         ) : null}
       </SettingButtonLabel>
     </Flex>

@@ -8,7 +8,7 @@ import {
   DIRECTION_ROW,
   Flex,
   SPACING,
-  StyledText,
+  LegacyStyledText,
 } from '@opentrons/components'
 
 import { SmallButton } from '../../atoms/buttons'
@@ -64,9 +64,9 @@ export function AnalyticsOptInModal({
           gridGap={SPACING.spacing12}
           paddingBottom={SPACING.spacing32}
         >
-          <StyledText as="p" color={COLORS.grey60}>
+          <LegacyStyledText as="p" color={COLORS.grey60}>
             {t('opt_in_description')}
-          </StyledText>
+          </LegacyStyledText>
         </Flex>
         <Flex
           flexDirection={DIRECTION_ROW}

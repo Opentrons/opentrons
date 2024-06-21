@@ -18,7 +18,7 @@ export interface StepCounts {
  * that has the same commandKey as the most recent
  * command from the run record.
  * In the case of a non-deterministic protocol,
- * source from the run rather than the analysis.
+ * return null for the current and total steps.
  * NOTE: The most recent
  * command may not always be "current", for instance if
  * the run has completed/failed.
@@ -41,19 +41,14 @@ export function useRunningStepCounts(
 
   const currentStepNumberByAnalysis =
     lastRunAnalysisCommandIndex === -1 ? null : lastRunAnalysisCommandIndex + 1
-  const currentStepNumberByRun = commandsData?.meta.totalLength ?? null
 
   const hasRunDiverged =
     lastRunCommandNoFixit?.key == null || currentStepNumberByAnalysis == null
 
-  const currentStepNumber = !hasRunDiverged
-    ? currentStepNumberByAnalysis
-    : currentStepNumberByRun
-
   const totalStepCount = !hasRunDiverged ? analysisCommands.length : null
 
   return {
-    currentStepNumber,
+    currentStepNumber: currentStepNumberByAnalysis,
     totalStepCount,
     hasRunDiverged,
   }
