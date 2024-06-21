@@ -189,7 +189,7 @@ def run(
     liquid_height: float = 0.0
     liquid_height_from_deck: float = 0.0
     hw_api = get_sync_hw_api(run_args.ctx)
-    test_well: Well = test_labware["A1"]
+    test_well: Well = test_labware[run_args.test_well]
     _load_tipracks(run_args.ctx, run_args.pipette_channels, run_args.protocol_cfg, tip)
     tips: List[Well] = get_unused_tips(
         ctx=run_args.ctx, tip_volume=tip, pipette_mount=""
