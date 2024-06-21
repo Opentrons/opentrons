@@ -1,5 +1,8 @@
 export { RecoveryFooterButtons } from './RecoveryFooterButtons'
-export { RecoverySingleColumnContent } from './RecoverySingleColumnContent'
+export {
+  RecoverySingleColumnContent,
+  RecoverySingleColumnContentDesktop,
+} from './RecoverySingleColumnContent'
 export { ReplaceTips } from './ReplaceTips'
 export { SelectTips } from './SelectTips'
 export { TwoColTextAndFailedStepNextStep } from './TwoColTextAndFailedStepNextStep'
@@ -10,3 +13,6 @@ export { TipSelectionModal } from './TipSelectionModal'
 export { StepInfo } from './StepInfo'
 export { FailedStepNextStep } from './FailedStepNextStep'
 export { useErrorDetailsModal, ErrorDetailsModal } from './ErrorDetailsModal'
+export { RecoveryInterventionModal } from './RecoveryInterventionModal'
+
+export type { RecoveryInterventionModalProps } from './RecoveryInterventionModal'
