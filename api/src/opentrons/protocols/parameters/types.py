@@ -18,7 +18,7 @@ class CSVParameter:
                 self._file.seek(0)
                 # Weird spacing with commas can sometimes produce a false positive for a non-comma delimiter,
                 # so overwrite that and enforce comma as separator for automatic row detection.
-                reader = csv.reader(self._file, dialect, delimiter=',')
+                reader = csv.reader(self._file, dialect, delimiter=",")
             except UnicodeDecodeError:
                 raise ParameterValueError("Cannot parse provided CSV file.")
             except csv.Error:
