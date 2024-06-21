@@ -46,7 +46,7 @@ make -C robot-server push-ot3 host=<flex-ip>
 
 ### Extra step when running against real robots
 
-Once this is done you will need to hack getting your robot and app to think they are on the same version.
+Once this is done you might need to hack getting your robot and app to think they are on the same version.
 Go to your app -> Settings -> General and find your app version
 
 Then run 
