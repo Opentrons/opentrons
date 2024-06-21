@@ -3,8 +3,7 @@ from __future__ import annotations
 
 import sqlalchemy
 from logging import getLogger
-from typing import Any, Dict, List, Optional
-
+from typing import Dict, List, Optional
 from typing_extensions import Final
 
 from opentrons_shared_data.robot.dev_types import RobotType
@@ -153,7 +152,6 @@ class AnalysisStore:
         pipettes: List[LoadedPipette],
         errors: List[ErrorOccurrence],
         liquids: List[Liquid],
-        command_annotations: List[Any],
     ) -> None:
         """Promote a pending analysis to completed, adding details of its results.
 
@@ -203,7 +201,6 @@ class AnalysisStore:
             pipettes=pipettes,
             errors=errors,
             liquids=liquids,
-            commandAnnotations=command_annotations,
         )
         completed_analysis_resource = CompletedAnalysisResource(
             id=completed_analysis.id,
