@@ -9,7 +9,4 @@ export interface Remote {
   }
 }
 
-export type IpcListener = (
-  event: IpcMainEvent,
-  ...args: unknown[]
-) => void
+export type IpcListener = (event: IpcMainEvent, ...args: unknown[]) => void
