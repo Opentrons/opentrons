@@ -16,34 +16,38 @@ import {
   OVERFLOW_WRAP_BREAK_WORD,
   DISPLAY_FLEX,
   JUSTIFY_SPACE_BETWEEN,
+  TEXT_ALIGN_CENTER,
 } from '@opentrons/components'
 
 import { getIsOnDevice } from '../../redux/config'
-import { getErrorKind, useErrorMessage, useErrorName } from './hooks'
+import { useErrorName } from './hooks'
+import { getErrorKind } from './utils'
 import { LargeButton } from '../../atoms/buttons'
 import { RECOVERY_MAP } from './constants'
+import { StepInfo } from './shared'
 
-import type { FailedCommand } from './types'
-import type { UseRouteUpdateActionsResult } from './hooks'
+import type { RobotType } from '@opentrons/shared-data'
+import type { ErrorRecoveryFlowsProps } from '.'
+import type { ERUtilsResults } from './hooks'
 
 export function useRunPausedSplash(): boolean {
   return useSelector(getIsOnDevice)
 }
 
-interface RunPausedSplashProps {
+type RunPausedSplashProps = ERUtilsResults & {
+  isOnDevice: boolean
+  failedCommand: ErrorRecoveryFlowsProps['failedCommand']
+  protocolAnalysis: ErrorRecoveryFlowsProps['protocolAnalysis']
+  robotType: RobotType
   toggleERWiz: (launchER: boolean) => Promise<void>
-  routeUpdateActions: UseRouteUpdateActionsResult
-  failedCommand: FailedCommand | null
 }
-export function RunPausedSplash({
-  toggleERWiz,
-  routeUpdateActions,
-  failedCommand,
-}: RunPausedSplashProps): JSX.Element {
+export function RunPausedSplash(
+  props: RunPausedSplashProps
+): JSX.Element | null {
+  const { toggleERWiz, routeUpdateActions, failedCommand } = props
   const { t } = useTranslation('error_recovery')
   const errorKind = getErrorKind(failedCommand?.error?.errorType)
   const title = useErrorName(errorKind)
-  const subText = useErrorMessage(errorKind)
 
   const { proceedToRouteAndStep } = routeUpdateActions
 
@@ -62,67 +66,71 @@ export function RunPausedSplash({
 
   // TODO(jh 06-07-24): Although unlikely, it's possible that the server doesn't return a failedCommand. Need to handle
   // this here or within ER flows.
-  return (
-    <Flex
-      display={DISPLAY_FLEX}
-      height="100vh"
-      width="100%"
-      justifyContent={JUSTIFY_CENTER}
-      alignItems={ALIGN_CENTER}
-      position={POSITION_ABSOLUTE}
-      flexDirection={DIRECTION_COLUMN}
-      gridGap={SPACING.spacing60}
-      padding={SPACING.spacing40}
-      backgroundColor={COLORS.red50}
-      zIndex={5}
-    >
-      <SplashFrame>
-        <Flex gridGap={SPACING.spacing32} alignItems={ALIGN_CENTER}>
-          <Icon name="ot-alert" size="4.5rem" color={COLORS.white} />
-          <SplashHeader>{title}</SplashHeader>
+
+  // TODO(jh 06-18-24): Instead of passing stepCount internally, we probably want to
+  // pass it in as a prop to ErrorRecoveryFlows to ameliorate blippy "step = ? -> step = 24" behavior.
+  if (props.isOnDevice) {
+    return (
+      <Flex
+        display={DISPLAY_FLEX}
+        height="100vh"
+        width="100%"
+        justifyContent={JUSTIFY_CENTER}
+        alignItems={ALIGN_CENTER}
+        position={POSITION_ABSOLUTE}
+        flexDirection={DIRECTION_COLUMN}
+        gridGap={SPACING.spacing60}
+        paddingY={SPACING.spacing40}
+        backgroundColor={COLORS.red50}
+        zIndex={5}
+      >
+        <SplashFrame>
+          <Flex gridGap={SPACING.spacing32} alignItems={ALIGN_CENTER}>
+            <Icon name="ot-alert" size="4.5rem" color={COLORS.white} />
+            <SplashHeader>{title}</SplashHeader>
+          </Flex>
+          <Flex width="49rem" justifyContent={JUSTIFY_CENTER}>
+            <StepInfo
+              {...props}
+              as="h3Bold"
+              overflow="hidden"
+              overflowWrap={OVERFLOW_WRAP_BREAK_WORD}
+              color={COLORS.white}
+              textAlign={TEXT_ALIGN_CENTER}
+            />
+          </Flex>
+        </SplashFrame>
+        <Flex
+          justifyContent={JUSTIFY_SPACE_BETWEEN}
+          gridGap={SPACING.spacing16}
+        >
+          <LargeButton
+            onClick={onCancelClick}
+            buttonText={t('cancel_run')}
+            css={SHARED_BUTTON_STYLE}
+            iconName={'remove'}
+            buttonType="alertAlt"
+          />
+          <LargeButton
+            onClick={onLaunchERClick}
+            buttonText={t('launch_recovery_mode')}
+            css={SHARED_BUTTON_STYLE}
+            iconName={'recovery'}
+            buttonType="onColor"
+          />
         </Flex>
-        <Flex width="49rem" justifyContent={JUSTIFY_CENTER}>
-          <SplashBody>{subText}</SplashBody>
-        </Flex>
-      </SplashFrame>
-      <Flex justifyContent={JUSTIFY_SPACE_BETWEEN} gridGap={SPACING.spacing16}>
-        <LargeButton
-          onClick={onCancelClick}
-          buttonText={t('cancel_run')}
-          css={SHARED_BUTTON_STYLE}
-          iconName={'remove'}
-          buttonType="alertAlt"
-        />
-        <LargeButton
-          onClick={onLaunchERClick}
-          buttonText={t('launch_recovery_mode')}
-          css={SHARED_BUTTON_STYLE}
-          iconName={'recovery'}
-          buttonType="onColor"
-        />
       </Flex>
-    </Flex>
-  )
+    )
+  } else {
+    return null
+  }
 }
 
 const SplashHeader = styled.h1`
   font-weight: ${TYPOGRAPHY.fontWeightBold};
-  text-align: ${TYPOGRAPHY.textAlignLeft};
+  text-align: ${TYPOGRAPHY.textAlignCenter};
   font-size: ${TYPOGRAPHY.fontSize80};
   line-height: ${TYPOGRAPHY.lineHeight96};
-  color: ${COLORS.white};
-`
-const SplashBody = styled.h4`
-  display: -webkit-box;
-  -webkit-box-orient: vertical;
-  -webkit-line-clamp: 4;
-  overflow: hidden;
-  overflow-wrap: ${OVERFLOW_WRAP_BREAK_WORD};
-  font-weight: ${TYPOGRAPHY.fontWeightSemiBold};
-  text-align: ${TYPOGRAPHY.textAlignCenter};
-  text-transform: ${TYPOGRAPHY.textTransformCapitalize};
-  font-size: ${TYPOGRAPHY.fontSize32};
-  line-height: ${TYPOGRAPHY.lineHeight42};
   color: ${COLORS.white};
 `
 

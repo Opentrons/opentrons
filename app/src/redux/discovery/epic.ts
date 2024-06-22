@@ -23,11 +23,10 @@ export const startDiscoveryEpic: Epic = action$ =>
       StartDiscoveryAction | UiInitializedAction,
       Observable<DiscoveryAction>
     >(startAction => {
-      // @ts-expect-error TODO: use in operator to protect against accessing timeout when it doesn't exist
-      const timeout = startAction.payload
-        ? // @ts-expect-error TODO: use in operator to protect against accessing timeout when it doesn't exist
-          startAction.payload.timeout ?? DISCOVERY_TIMEOUT_MS
-        : DISCOVERY_TIMEOUT_MS
+      const timeout =
+        'payload' in startAction && startAction.payload != null
+          ? startAction.payload.timeout ?? DISCOVERY_TIMEOUT_MS
+          : DISCOVERY_TIMEOUT_MS
 
       return of(finishDiscovery()).pipe(delay(timeout))
     })

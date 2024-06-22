@@ -5,7 +5,7 @@ import {
   DIRECTION_COLUMN,
   Flex,
   SPACING,
-  StyledText,
+  LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
@@ -35,10 +35,12 @@ export function RobotSettingsModuleCalibration({
       paddingY={SPACING.spacing24}
       gridGap={SPACING.spacing8}
     >
-      <StyledText as="h3" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
+      <LegacyStyledText as="h3" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
         {t('module_calibration')}
-      </StyledText>
-      <StyledText as="p">{t('module_calibration_description')}</StyledText>
+      </LegacyStyledText>
+      <LegacyStyledText as="p">
+        {t('module_calibration_description')}
+      </LegacyStyledText>
       {attachedModules.length > 0 ? (
         <ModuleCalibrationItems
           attachedModules={attachedModules}
@@ -49,9 +51,9 @@ export function RobotSettingsModuleCalibration({
           robotName={robotName}
         />
       ) : (
-        <StyledText as="label" marginTop={SPACING.spacing8}>
+        <LegacyStyledText as="label" marginTop={SPACING.spacing8}>
           {t('no_modules_attached')}
-        </StyledText>
+        </LegacyStyledText>
       )}
     </Flex>
   )

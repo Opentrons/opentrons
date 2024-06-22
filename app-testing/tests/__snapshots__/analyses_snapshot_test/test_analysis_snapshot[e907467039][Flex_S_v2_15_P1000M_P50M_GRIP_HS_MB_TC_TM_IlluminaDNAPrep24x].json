@@ -8,11 +8,10 @@
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "THIS IS A REACTION RUN",
-        "legacyCommandType": "command.COMMENT"
+        "message": "THIS IS A REACTION RUN"
       },
       "result": {},
       "status": "succeeded"
@@ -606,6 +605,20 @@
               ]
             }
           ],
+          "liquidProbeParameters": {
+            "minimumHeight": [
+              {
+                "applicableWells": [],
+                "value": 0.5
+              }
+            ],
+            "minimumWellVolume": [
+              {
+                "applicableWells": [],
+                "value": 0.0
+              }
+            ]
+          },
           "metadata": {
             "displayCategory": "wellPlate",
             "displayName": "NEST 96 Well Plate 100 µL PCR Full Skirt",
@@ -3376,6 +3389,20 @@
               ]
             }
           ],
+          "liquidProbeParameters": {
+            "minimumHeight": [
+              {
+                "applicableWells": [],
+                "value": 0.5
+              }
+            ],
+            "minimumWellVolume": [
+              {
+                "applicableWells": [],
+                "value": 0.0
+              }
+            ]
+          },
           "metadata": {
             "displayCategory": "wellPlate",
             "displayName": "NEST 96 Well Plate 100 µL PCR Full Skirt",
@@ -4606,6 +4633,20 @@
               ]
             }
           ],
+          "liquidProbeParameters": {
+            "minimumHeight": [
+              {
+                "applicableWells": [],
+                "value": 0.5
+              }
+            ],
+            "minimumWellVolume": [
+              {
+                "applicableWells": [],
+                "value": 0.0
+              }
+            ]
+          },
           "metadata": {
             "displayCategory": "wellPlate",
             "displayName": "NEST 96 Deep Well Plate 2mL",
@@ -8173,11 +8214,10 @@
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "SETTING THERMO and TEMP BLOCK Temperature",
-        "legacyCommandType": "command.COMMENT"
+        "message": "SETTING THERMO and TEMP BLOCK Temperature"
       },
       "result": {},
       "status": "succeeded"
@@ -8261,41 +8301,37 @@
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "==============================================",
-        "legacyCommandType": "command.COMMENT"
+        "message": "=============================================="
       },
       "result": {},
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "--> Tagment",
-        "legacyCommandType": "command.COMMENT"
+        "message": "--> Tagment"
       },
       "result": {},
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "==============================================",
-        "legacyCommandType": "command.COMMENT"
+        "message": "=============================================="
       },
       "result": {},
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "--> ADDING TAGMIX",
-        "legacyCommandType": "command.COMMENT"
+        "message": "--> ADDING TAGMIX"
       },
       "result": {},
       "status": "succeeded"
@@ -10458,11 +10494,10 @@
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "--> Adding TAGSTOP",
-        "legacyCommandType": "command.COMMENT"
+        "message": "--> Adding TAGSTOP"
       },
       "result": {},
       "status": "succeeded"
@@ -12483,41 +12518,37 @@
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "==============================================",
-        "legacyCommandType": "command.COMMENT"
+        "message": "=============================================="
       },
       "result": {},
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "--> Cleanup",
-        "legacyCommandType": "command.COMMENT"
+        "message": "--> Cleanup"
       },
       "result": {},
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "==============================================",
-        "legacyCommandType": "command.COMMENT"
+        "message": "=============================================="
       },
       "result": {},
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "--> Removing Supernatant",
-        "legacyCommandType": "command.COMMENT"
+        "message": "--> Removing Supernatant"
       },
       "result": {},
       "status": "succeeded"
@@ -13363,11 +13394,10 @@
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "--> Wash ",
-        "legacyCommandType": "command.COMMENT"
+        "message": "--> Wash "
       },
       "result": {},
       "status": "succeeded"
@@ -14400,11 +14430,10 @@
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "--> Remove Wash",
-        "legacyCommandType": "command.COMMENT"
+        "message": "--> Remove Wash"
       },
       "result": {},
       "status": "succeeded"
@@ -15250,11 +15279,10 @@
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "--> Wash ",
-        "legacyCommandType": "command.COMMENT"
+        "message": "--> Wash "
       },
       "result": {},
       "status": "succeeded"
@@ -16287,11 +16315,10 @@
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "--> Remove Wash",
-        "legacyCommandType": "command.COMMENT"
+        "message": "--> Remove Wash"
       },
       "result": {},
       "status": "succeeded"
@@ -17137,11 +17164,10 @@
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "--> Wash ",
-        "legacyCommandType": "command.COMMENT"
+        "message": "--> Wash "
       },
       "result": {},
       "status": "succeeded"
@@ -18174,11 +18200,10 @@
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "--> Remove Wash",
-        "legacyCommandType": "command.COMMENT"
+        "message": "--> Remove Wash"
       },
       "result": {},
       "status": "succeeded"
@@ -18997,11 +19022,10 @@
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "--> Removing Residual Wash",
-        "legacyCommandType": "command.COMMENT"
+        "message": "--> Removing Residual Wash"
       },
       "result": {},
       "status": "succeeded"
@@ -19352,11 +19376,10 @@
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "--> Adding EPM",
-        "legacyCommandType": "command.COMMENT"
+        "message": "--> Adding EPM"
       },
       "result": {},
       "status": "succeeded"
@@ -21235,11 +21258,10 @@
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "--> Adding Barcodes",
-        "legacyCommandType": "command.COMMENT"
+        "message": "--> Adding Barcodes"
       },
       "result": {},
       "status": "succeeded"
@@ -22175,31 +22197,28 @@
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "==============================================",
-        "legacyCommandType": "command.COMMENT"
+        "message": "=============================================="
       },
       "result": {},
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "--> Cleanup",
-        "legacyCommandType": "command.COMMENT"
+        "message": "--> Cleanup"
       },
       "result": {},
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "==============================================",
-        "legacyCommandType": "command.COMMENT"
+        "message": "=============================================="
       },
       "result": {},
       "status": "succeeded"
@@ -22241,11 +22260,10 @@
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "--> Adding H20 and SAMPLE",
-        "legacyCommandType": "command.COMMENT"
+        "message": "--> Adding H20 and SAMPLE"
       },
       "result": {},
       "status": "succeeded"
@@ -22713,11 +22731,10 @@
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "--> ADDING AMPure (0.8x)",
-        "legacyCommandType": "command.COMMENT"
+        "message": "--> ADDING AMPure (0.8x)"
       },
       "result": {},
       "status": "succeeded"
@@ -24841,11 +24858,10 @@
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "--> Removing Supernatant",
-        "legacyCommandType": "command.COMMENT"
+        "message": "--> Removing Supernatant"
       },
       "result": {},
       "status": "succeeded"
@@ -25721,11 +25737,10 @@
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "--> ETOH Wash",
-        "legacyCommandType": "command.COMMENT"
+        "message": "--> ETOH Wash"
       },
       "result": {},
       "status": "succeeded"
@@ -26549,11 +26564,10 @@
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "--> Remove ETOH Wash",
-        "legacyCommandType": "command.COMMENT"
+        "message": "--> Remove ETOH Wash"
       },
       "result": {},
       "status": "succeeded"
@@ -27429,11 +27443,10 @@
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "--> ETOH Wash",
-        "legacyCommandType": "command.COMMENT"
+        "message": "--> ETOH Wash"
       },
       "result": {},
       "status": "succeeded"
@@ -28257,11 +28270,10 @@
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "--> Remove ETOH Wash",
-        "legacyCommandType": "command.COMMENT"
+        "message": "--> Remove ETOH Wash"
       },
       "result": {},
       "status": "succeeded"
@@ -29146,11 +29158,10 @@
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "--> Removing Residual ETOH",
-        "legacyCommandType": "command.COMMENT"
+        "message": "--> Removing Residual ETOH"
       },
       "result": {},
       "status": "succeeded"
@@ -29822,11 +29833,10 @@
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "--> Adding RSB",
-        "legacyCommandType": "command.COMMENT"
+        "message": "--> Adding RSB"
       },
       "result": {},
       "status": "succeeded"
@@ -31698,11 +31708,10 @@
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "--> Transferring Supernatant",
-        "legacyCommandType": "command.COMMENT"
+        "message": "--> Transferring Supernatant"
       },
       "result": {},
       "status": "succeeded"
@@ -32209,6 +32218,7 @@
       "pipetteName": "p50_multi_flex"
     }
   ],
+  "result": "ok",
   "robotType": "OT-3 Standard",
   "runTimeParameters": []
 }

@@ -13,6 +13,7 @@ they are part of the public input / output of the engine, and need validation
 and/or schema generation.
 """
 
+from . import absorbance_reader
 from . import heater_shaker
 from . import magnetic_module
 from . import temperature_module
@@ -324,6 +325,14 @@ from .verify_tip_presence import (
     VerifyTipPresenceCommandType,
 )
 
+from .liquid_probe import (
+    LiquidProbe,
+    LiquidProbeParams,
+    LiquidProbeCreate,
+    LiquidProbeResult,
+    LiquidProbeCommandType,
+)
+
 __all__ = [
     # command type unions
     "Command",
@@ -527,6 +536,7 @@ __all__ = [
     "LoadLiquidResult",
     "LoadLiquidCommandType",
     # hardware module command bundles
+    "absorbance_reader",
     "heater_shaker",
     "magnetic_module",
     "temperature_module",
@@ -564,4 +574,10 @@ __all__ = [
     "VerifyTipPresenceParams",
     "VerifyTipPresenceResult",
     "VerifyTipPresenceCommandType",
+    # liquid probe command bundle
+    "LiquidProbe",
+    "LiquidProbeParams",
+    "LiquidProbeCreate",
+    "LiquidProbeResult",
+    "LiquidProbeCommandType",
 ]

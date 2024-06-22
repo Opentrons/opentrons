@@ -13,7 +13,7 @@ import {
   DIRECTION_COLUMN,
   Flex,
   SPACING,
-  StyledText,
+  LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
@@ -34,7 +34,7 @@ export function DesktopAppFallback({ error }: FallbackProps): JSX.Element {
     })
     // route to the root page and initiate an electron browser window reload via app-shell
     history.push('/')
-    dispatch(reloadUi(error.message))
+    dispatch(reloadUi(error.message as string))
   }
 
   return (
@@ -45,12 +45,12 @@ export function DesktopAppFallback({ error }: FallbackProps): JSX.Element {
     >
       <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing32}>
         <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing8}>
-          <StyledText as="p">
+          <LegacyStyledText as="p">
             {t('error_boundary_desktop_app_description')}
-          </StyledText>
-          <StyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
+          </LegacyStyledText>
+          <LegacyStyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
             {error.message}
-          </StyledText>
+          </LegacyStyledText>
         </Flex>
         <AlertPrimaryButton
           alignSelf={ALIGN_FLEX_END}

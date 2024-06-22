@@ -2,17 +2,28 @@ import * as React from 'react'
 
 import { BORDERS, COLORS } from '../../helix-design-system'
 import { SPACING, TYPOGRAPHY } from '../../ui-style-constants/index'
-import { StyledText } from '../../atoms/StyledText'
+import { LegacyStyledText } from '../../atoms/StyledText'
 import { Icon } from '../../icons'
 import { Flex } from '../../primitives'
 import { ALIGN_CENTER, DIRECTION_COLUMN } from '../../styles'
 
 interface InfoScreenProps {
-  contentType: 'parameters' | 'moduleControls' | 'runNotStarted' | 'labware'
+  contentType:
+    | 'parameters'
+    | 'moduleControls'
+    | 'runNotStarted'
+    | 'labware'
+    | 'noFiles'
+    | 'noLabwareOffsetData'
   t?: any
+  backgroundColor?: string
 }
 
-export function InfoScreen({ contentType, t }: InfoScreenProps): JSX.Element {
+export function InfoScreen({
+  contentType,
+  t,
+  backgroundColor,
+}: InfoScreenProps): JSX.Element {
   let bodyText: string = ''
   switch (contentType) {
     case 'parameters':
@@ -33,6 +44,16 @@ export function InfoScreen({ contentType, t }: InfoScreenProps): JSX.Element {
     case 'labware':
       bodyText = 'No labware specified in this protocol'
       break
+    case 'noFiles':
+      bodyText =
+        t != null ? t('no_files_included') : 'No protocol files included'
+      break
+    case 'noLabwareOffsetData':
+      bodyText =
+        t != null
+          ? t('no_offsets_available')
+          : 'No Labware Offset data available'
+      break
     default:
       bodyText = contentType
   }
@@ -43,7 +64,7 @@ export function InfoScreen({ contentType, t }: InfoScreenProps): JSX.Element {
       width="100%"
       flexDirection={DIRECTION_COLUMN}
       gridGap={SPACING.spacing12}
-      backgroundColor={COLORS.grey30}
+      backgroundColor={backgroundColor ?? COLORS.grey30}
       borderRadius={BORDERS.borderRadius8}
       padding={`${SPACING.spacing40} ${SPACING.spacing16}`}
       data-testid={`InfoScreen_${contentType}`}
@@ -54,9 +75,9 @@ export function InfoScreen({ contentType, t }: InfoScreenProps): JSX.Element {
         color={COLORS.grey60}
         aria-label="alert"
       />
-      <StyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
+      <LegacyStyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
         {bodyText}
-      </StyledText>
+      </LegacyStyledText>
     </Flex>
   )
 }

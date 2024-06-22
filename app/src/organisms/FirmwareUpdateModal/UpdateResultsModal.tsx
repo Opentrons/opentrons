@@ -8,7 +8,7 @@ import {
   Flex,
   Icon,
   SPACING,
-  StyledText,
+  LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { SmallButton } from '../../atoms/buttons'
@@ -53,9 +53,9 @@ export function UpdateResultsModal(
       {!isSuccess ? (
         <Modal header={updateFailedHeader}>
           <Flex flexDirection={DIRECTION_COLUMN}>
-            <StyledText as="p" marginBottom={SPACING.spacing32}>
+            <LegacyStyledText as="p" marginBottom={SPACING.spacing32}>
               {t('branded:firmware_update_download_logs')}
-            </StyledText>
+            </LegacyStyledText>
             <SmallButton
               onClick={onClose}
               buttonText={
@@ -92,14 +92,14 @@ export function UpdateResultsModal(
                 size="2.5rem"
                 marginBottom={SPACING.spacing16}
               />
-              <StyledText
+              <LegacyStyledText
                 as="h4"
                 marginBottom={SPACING.spacing4}
                 fontWeight={TYPOGRAPHY.fontWeightBold}
               >
                 {t('successful_update')}
-              </StyledText>
-              <StyledText as="p" textAlign={TYPOGRAPHY.textAlignCenter}>
+              </LegacyStyledText>
+              <LegacyStyledText as="p" textAlign={TYPOGRAPHY.textAlignCenter}>
                 <Trans
                   t={t}
                   i18nKey="ready_to_use"
@@ -110,7 +110,7 @@ export function UpdateResultsModal(
                     bold: <strong />,
                   }}
                 />
-              </StyledText>
+              </LegacyStyledText>
             </Flex>
             <SmallButton
               onClick={onClose}

@@ -216,7 +216,9 @@ def test_get_next_to_execute_returns_no_commands_if_paused() -> None:
     assert result is None
 
 
-def test_get_next_to_execute_returns_no_commands_if_awaiting_recovery_no_fixit() -> None:
+def test_get_next_to_execute_returns_no_commands_if_awaiting_recovery_no_fixit() -> (
+    None
+):
     """It should not return any type of command if the engine is awaiting-recovery."""
     subject = get_command_view(
         queue_status=QueueStatus.AWAITING_RECOVERY,
@@ -1020,9 +1022,3 @@ def test_get_slice_default_cursor_queued() -> None:
         cursor=2,
         total_length=5,
     )
-
-
-def test_get_latest_command_hash() -> None:
-    """It should get the latest command hash from state, if set."""
-    subject = get_command_view(latest_command_hash="abc123")
-    assert subject.get_latest_protocol_command_hash() == "abc123"

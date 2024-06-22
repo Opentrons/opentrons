@@ -9,7 +9,7 @@ import {
   Icon,
   Link,
   SPACING,
-  StyledText,
+  LegacyStyledText,
 } from '@opentrons/components'
 import { UploadInput as UploadInputComponent } from './index'
 import type { Meta, StoryObj } from '@storybook/react'
@@ -42,19 +42,19 @@ const uploadText = (
     gridGap={SPACING.spacing8}
     alignItems={ALIGN_CENTER}
   >
-    <StyledText>{'CSV file'}</StyledText>
+    <LegacyStyledText>{'CSV file'}</LegacyStyledText>
     <Icon name="information" size="0.75rem" />
   </Flex>
 )
 
 const dragAndDropText = (
-  <StyledText as="p">
+  <LegacyStyledText as="p">
     {'Drag and drop or '}
     <Link color={COLORS.blue55} role="button">
       browse
     </Link>{' '}
     {' your files'}
-  </StyledText>
+  </LegacyStyledText>
 )
 
 export const CSVFile: Story = {

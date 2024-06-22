@@ -117,6 +117,16 @@ class WellGroup(TypedDict, total=False):
     brand: LabwareBrandData
 
 
+class singleProbeParameter(TypedDict, total=True):
+    value: float
+    applicableWells: List[str]
+
+
+class LiquidProbeParameters(TypedDict, total=True):
+    minimumHeight: List[singleProbeParameter]
+    minimumWellVolume: List[singleProbeParameter]
+
+
 class _RequiredLabwareDefinition(TypedDict):
     schemaVersion: Literal[2]
     version: int
@@ -138,3 +148,4 @@ class LabwareDefinition(_RequiredLabwareDefinition, total=False):
     gripperOffsets: Dict[str, GripperOffsets]
     gripForce: float
     gripHeightFromLabwareBottom: float
+    liquidProbeParameters: LiquidProbeParameters

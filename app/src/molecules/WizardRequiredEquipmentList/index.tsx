@@ -14,7 +14,7 @@ import {
   JUSTIFY_SPACE_BETWEEN,
   OVERFLOW_WRAP_ANYWHERE,
   SPACING,
-  StyledText,
+  LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
@@ -42,14 +42,14 @@ export function WizardRequiredEquipmentList(
     >
       {isOnDevice ? (
         <>
-          <StyledText
+          <LegacyStyledText
             fontSize="1.25rem"
             fontWeight={TYPOGRAPHY.fontWeightSemiBold}
             lineHeight="1.5rem"
             marginBottom={SPACING.spacing8}
           >
             {t('you_will_need')}
-          </StyledText>
+          </LegacyStyledText>
           <Flex
             backgroundColor="#16212D33"
             flexDirection={DIRECTION_COLUMN}
@@ -62,13 +62,13 @@ export function WizardRequiredEquipmentList(
                 paddingY={SPACING.spacing4}
                 key={`${index}_${requiredEquipmentProps.loadName}`}
               >
-                <StyledText
+                <LegacyStyledText
                   fontSize={TYPOGRAPHY.fontSize20}
                   paddingY={SPACING.spacing12}
                   overflowWrap={OVERFLOW_WRAP_ANYWHERE}
                 >
                   {requiredEquipmentProps.displayName}
-                </StyledText>
+                </LegacyStyledText>
                 {/* do not show divider after the last equipment in the list */}
                 {index + 1 === Object.keys(equipmentList).length ? null : (
                   <Box
@@ -81,13 +81,13 @@ export function WizardRequiredEquipmentList(
         </>
       ) : (
         <>
-          <StyledText
+          <LegacyStyledText
             as="h3"
             fontWeight={TYPOGRAPHY.fontWeightSemiBold}
             marginBottom={SPACING.spacing8}
           >
             {t('you_will_need')}
-          </StyledText>
+          </LegacyStyledText>
           <Divider />
           {equipmentList.map(requiredEquipmentProps => (
             <RequiredEquipmentCard
@@ -96,13 +96,13 @@ export function WizardRequiredEquipmentList(
             />
           ))}
           {footer != null ? (
-            <StyledText
+            <LegacyStyledText
               marginTop={SPACING.spacing8}
               as="label"
               color={COLORS.grey60}
             >
               {footer}
-            </StyledText>
+            </LegacyStyledText>
           ) : null}
         </>
       )}
@@ -159,11 +159,11 @@ function RequiredEquipmentCard(props: RequiredEquipmentCardProps): JSX.Element {
           flexDirection={DIRECTION_COLUMN}
           justifyContent={JUSTIFY_SPACE_AROUND}
         >
-          <StyledText as="p">{displayName}</StyledText>
+          <LegacyStyledText as="p">{displayName}</LegacyStyledText>
           {subtitle != null ? (
-            <StyledText as="p" color={COLORS.grey50}>
+            <LegacyStyledText as="p" color={COLORS.grey50}>
               {subtitle}
-            </StyledText>
+            </LegacyStyledText>
           ) : null}
         </Flex>
       </Flex>

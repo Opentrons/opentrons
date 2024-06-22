@@ -309,6 +309,7 @@ async def test_get_run_commands(
             detail="Things are not looking good.",
         ),
         notes=[long_note, unenumed_note],
+        failedCommandId="failed-command-id",
     )
 
     decoy.when(mock_run_data_manager.get_current_command("run-id")).then_return(
@@ -360,6 +361,7 @@ async def test_get_run_commands(
                 detail="Things are not looking good.",
             ),
             notes=[long_note, unenumed_note],
+            failedCommandId="failed-command-id",
         )
     ]
     assert result.content.meta == MultiBodyMeta(cursor=1, totalLength=3)

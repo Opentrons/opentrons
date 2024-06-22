@@ -8,7 +8,7 @@ import {
   Flex,
   JUSTIFY_SPACE_BETWEEN,
   SPACING,
-  StyledText,
+  LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
@@ -36,13 +36,13 @@ export function UpdatedChannel(): JSX.Element {
   >['formatOptionLabel'] = (option, index): JSX.Element => {
     const { label, value } = option
     return (
-      <StyledText
+      <LegacyStyledText
         as="p"
         textTransform={TYPOGRAPHY.textTransformCapitalize}
         id={index}
       >
         {value === 'latest' ? label : value}
-      </StyledText>
+      </LegacyStyledText>
     )
   }
 
@@ -53,19 +53,21 @@ export function UpdatedChannel(): JSX.Element {
       gridGap={SPACING.spacing40}
     >
       <Flex flexDirection={DIRECTION_COLUMN}>
-        <StyledText
+        <LegacyStyledText
           css={TYPOGRAPHY.h3SemiBold}
           paddingBottom={SPACING.spacing8}
           id="AdvancedSettings_updatedChannel"
         >
           {t('update_channel')}
-        </StyledText>
-        <StyledText as="p" paddingBottom={SPACING.spacing8}>
+        </LegacyStyledText>
+        <LegacyStyledText as="p" paddingBottom={SPACING.spacing8}>
           {t('update_description')}
-        </StyledText>
+        </LegacyStyledText>
       </Flex>
       <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing8}>
-        <StyledText css={TYPOGRAPHY.labelSemiBold}>{t('channel')}</StyledText>
+        <LegacyStyledText css={TYPOGRAPHY.labelSemiBold}>
+          {t('channel')}
+        </LegacyStyledText>
         <SelectField
           name={'__UpdateChannel__'}
           options={channelOptions}

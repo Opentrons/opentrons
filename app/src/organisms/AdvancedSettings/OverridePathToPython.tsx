@@ -12,7 +12,7 @@ import {
   Link,
   SPACING_AUTO,
   SPACING,
-  StyledText,
+  LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
@@ -46,24 +46,24 @@ export function OverridePathToPython(): JSX.Element {
   return (
     <Flex alignItems={ALIGN_CENTER} justifyContent={JUSTIFY_SPACE_BETWEEN}>
       <Box width="70%">
-        <StyledText
+        <LegacyStyledText
           css={TYPOGRAPHY.h3SemiBold}
           paddingBottom={SPACING.spacing8}
           id="AdvancedSettings_overridePathToPython"
         >
           {t('override_path_to_python')}
-        </StyledText>
-        <StyledText as="p" paddingBottom={SPACING.spacing8}>
+        </LegacyStyledText>
+        <LegacyStyledText as="p" paddingBottom={SPACING.spacing8}>
           {t('branded:opentrons_app_will_use_interpreter')}
-        </StyledText>
-        <StyledText
+        </LegacyStyledText>
+        <LegacyStyledText
           as="h6"
           textTransform={TYPOGRAPHY.textTransformUppercase}
           color={COLORS.grey50}
           paddingBottom={SPACING.spacing4}
         >
           {t('override_path')}
-        </StyledText>
+        </LegacyStyledText>
         {pathToPythonInterpreter !== null ? (
           <Link
             role="button"
@@ -80,7 +80,7 @@ export function OverridePathToPython(): JSX.Element {
             />
           </Link>
         ) : (
-          <StyledText as="p">{t('no_specified_folder')}</StyledText>
+          <LegacyStyledText as="p">{t('no_specified_folder')}</LegacyStyledText>
         )}
       </Box>
       {pathToPythonInterpreter !== null ? (

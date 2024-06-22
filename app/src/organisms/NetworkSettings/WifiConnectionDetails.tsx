@@ -13,7 +13,7 @@ import {
   Icon,
   JUSTIFY_CENTER,
   SPACING,
-  StyledText,
+  LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
@@ -124,9 +124,9 @@ const DisplayConnectionStatus = ({
       justifyContent={JUSTIFY_CENTER}
     >
       <Icon size="3rem" name="ot-check" color={COLORS.green50} />
-      <StyledText as="h3" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
+      <LegacyStyledText as="h3" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
         {t('successfully_connected_to_network', { ssid })}
-      </StyledText>
+      </LegacyStyledText>
     </Flex>
   )
 }

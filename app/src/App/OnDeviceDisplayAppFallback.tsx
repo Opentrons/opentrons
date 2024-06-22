@@ -14,7 +14,7 @@ import {
   Flex,
   JUSTIFY_CENTER,
   SPACING,
-  StyledText,
+  LegacyStyledText,
 } from '@opentrons/components'
 
 import { MediumButton } from '../atoms/buttons'
@@ -38,7 +38,7 @@ export function OnDeviceDisplayAppFallback({
       name: ANALYTICS_ODD_APP_ERROR,
       properties: { errorMessage: error.message, robotSerialNumber },
     })
-    dispatch(appRestart(error.message))
+    dispatch(appRestart(error.message as string))
   }
   const modalHeader: ModalHeaderBaseProps = {
     title: t('error_boundary_title'),
@@ -59,9 +59,9 @@ export function OnDeviceDisplayAppFallback({
         alignItems={ALIGN_CENTER}
         justifyContent={JUSTIFY_CENTER}
       >
-        <StyledText as="p">
+        <LegacyStyledText as="p">
           {t('branded:error_boundary_description')}
-        </StyledText>
+        </LegacyStyledText>
         <MediumButton
           width="100%"
           buttonType="alert"

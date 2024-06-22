@@ -37,8 +37,8 @@ export function SetupLabware(props: SetupLabwareProps): JSX.Element {
   const storedProtocolAnalysis = useStoredProtocolAnalysis(runId)
   const protocolAnalysis = robotProtocolAnalysis ?? storedProtocolAnalysis
   const [selectedValue, toggleGroup] = useToggleGroup(
-    t('list_view'),
-    t('map_view')
+    t('list_view') as string,
+    t('map_view') as string
   )
   const isFlex = useIsFlex(robotName)
 

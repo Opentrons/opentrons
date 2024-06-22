@@ -23,6 +23,7 @@ describe('ChangeTip', () => {
         sourceWells: ['A1'],
         destinationWells: ['A1'],
         path: 'single',
+        pipette: { channels: 1 },
         transferType: 'transfer',
       } as any,
       dispatch: vi.fn(),

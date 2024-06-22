@@ -6,7 +6,7 @@ import {
   DIRECTION_COLUMN,
   Flex,
   SPACING,
-  StyledText,
+  LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
@@ -28,13 +28,13 @@ export function SetupTipLengthCalibration({
 
   return (
     <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing8}>
-      <StyledText
+      <LegacyStyledText
         color={COLORS.black90}
         css={TYPOGRAPHY.pSemiBold}
         id="TipRackCalibration_requiredTipLengthTitle"
       >
         {t('required_tip_racks_title')}
-      </StyledText>
+      </LegacyStyledText>
       {PipetteConstants.PIPETTE_MOUNTS.map(mount => {
         const pipetteInfo = runPipetteInfoByMount[mount]
         if (pipetteInfo == null) {

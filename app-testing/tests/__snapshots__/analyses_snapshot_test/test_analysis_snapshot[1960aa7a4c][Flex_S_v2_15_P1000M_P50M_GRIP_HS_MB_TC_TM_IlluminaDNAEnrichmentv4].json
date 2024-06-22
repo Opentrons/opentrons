@@ -8,31 +8,28 @@
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "THIS IS A ABR RUN WITH 3 REPEATS",
-        "legacyCommandType": "command.COMMENT"
+        "message": "THIS IS A ABR RUN WITH 3 REPEATS"
       },
       "result": {},
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "THIS IS A DRY RUN",
-        "legacyCommandType": "command.COMMENT"
+        "message": "THIS IS A DRY RUN"
       },
       "result": {},
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "USED TIPS WILL BE RE-RACKED",
-        "legacyCommandType": "command.COMMENT"
+        "message": "USED TIPS WILL BE RE-RACKED"
       },
       "result": {},
       "status": "succeeded"
@@ -633,6 +630,20 @@
               ]
             }
           ],
+          "liquidProbeParameters": {
+            "minimumHeight": [
+              {
+                "applicableWells": [],
+                "value": 0.5
+              }
+            ],
+            "minimumWellVolume": [
+              {
+                "applicableWells": [],
+                "value": 0.0
+              }
+            ]
+          },
           "metadata": {
             "displayCategory": "wellPlate",
             "displayName": "NEST 96 Deep Well Plate 2mL",
@@ -1905,6 +1916,20 @@
               ]
             }
           ],
+          "liquidProbeParameters": {
+            "minimumHeight": [
+              {
+                "applicableWells": [],
+                "value": 0.5
+              }
+            ],
+            "minimumWellVolume": [
+              {
+                "applicableWells": [],
+                "value": 0.0
+              }
+            ]
+          },
           "metadata": {
             "displayCategory": "wellPlate",
             "displayName": "NEST 96 Deep Well Plate 2mL",
@@ -3620,6 +3645,20 @@
               ]
             }
           ],
+          "liquidProbeParameters": {
+            "minimumHeight": [
+              {
+                "applicableWells": [],
+                "value": 0.5
+              }
+            ],
+            "minimumWellVolume": [
+              {
+                "applicableWells": [],
+                "value": 0.0
+              }
+            ]
+          },
           "metadata": {
             "displayCategory": "wellPlate",
             "displayName": "NEST 96 Well Plate 100 µL PCR Full Skirt",
@@ -7199,6 +7238,20 @@
               ]
             }
           ],
+          "liquidProbeParameters": {
+            "minimumHeight": [
+              {
+                "applicableWells": [],
+                "value": 0.5
+              }
+            ],
+            "minimumWellVolume": [
+              {
+                "applicableWells": [],
+                "value": 0.0
+              }
+            ]
+          },
           "metadata": {
             "displayCategory": "wellPlate",
             "displayName": "NEST 96 Well Plate 100 µL PCR Full Skirt",
@@ -11735,41 +11788,37 @@
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "==============================================",
-        "legacyCommandType": "command.COMMENT"
+        "message": "=============================================="
       },
       "result": {},
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "--> Capture",
-        "legacyCommandType": "command.COMMENT"
+        "message": "--> Capture"
       },
       "result": {},
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "==============================================",
-        "legacyCommandType": "command.COMMENT"
+        "message": "=============================================="
       },
       "result": {},
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "--> Transfer Hybridization",
-        "legacyCommandType": "command.COMMENT"
+        "message": "--> Transfer Hybridization"
       },
       "result": {},
       "status": "succeeded"
@@ -12160,11 +12209,10 @@
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "--> ADDING SMB",
-        "legacyCommandType": "command.COMMENT"
+        "message": "--> ADDING SMB"
       },
       "result": {},
       "status": "succeeded"
@@ -14132,41 +14180,37 @@
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "==============================================",
-        "legacyCommandType": "command.COMMENT"
+        "message": "=============================================="
       },
       "result": {},
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "--> WASH",
-        "legacyCommandType": "command.COMMENT"
+        "message": "--> WASH"
       },
       "result": {},
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "==============================================",
-        "legacyCommandType": "command.COMMENT"
+        "message": "=============================================="
       },
       "result": {},
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "--> Remove SUPERNATANT",
-        "legacyCommandType": "command.COMMENT"
+        "message": "--> Remove SUPERNATANT"
       },
       "result": {},
       "status": "succeeded"
@@ -15063,21 +15107,19 @@
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "--> Repeating 3 washes",
-        "legacyCommandType": "command.COMMENT"
+        "message": "--> Repeating 3 washes"
       },
       "result": {},
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "--> Adding EEW",
-        "legacyCommandType": "command.COMMENT"
+        "message": "--> Adding EEW"
       },
       "result": {},
       "status": "succeeded"
@@ -15461,11 +15503,10 @@
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "--> Removing Supernatant",
-        "legacyCommandType": "command.COMMENT"
+        "message": "--> Removing Supernatant"
       },
       "result": {},
       "status": "succeeded"
@@ -16311,11 +16352,10 @@
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "--> Adding EEW",
-        "legacyCommandType": "command.COMMENT"
+        "message": "--> Adding EEW"
       },
       "result": {},
       "status": "succeeded"
@@ -16699,11 +16739,10 @@
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "--> Removing Supernatant",
-        "legacyCommandType": "command.COMMENT"
+        "message": "--> Removing Supernatant"
       },
       "result": {},
       "status": "succeeded"
@@ -17549,11 +17588,10 @@
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "--> Adding EEW",
-        "legacyCommandType": "command.COMMENT"
+        "message": "--> Adding EEW"
       },
       "result": {},
       "status": "succeeded"
@@ -17937,11 +17975,10 @@
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "--> Removing Supernatant",
-        "legacyCommandType": "command.COMMENT"
+        "message": "--> Removing Supernatant"
       },
       "result": {},
       "status": "succeeded"
@@ -18787,11 +18824,10 @@
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "--> Adding EEW",
-        "legacyCommandType": "command.COMMENT"
+        "message": "--> Adding EEW"
       },
       "result": {},
       "status": "succeeded"
@@ -19121,11 +19157,10 @@
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "--> Transfer Hybridization",
-        "legacyCommandType": "command.COMMENT"
+        "message": "--> Transfer Hybridization"
       },
       "result": {},
       "status": "succeeded"
@@ -19547,11 +19582,10 @@
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "--> Removing Supernatant",
-        "legacyCommandType": "command.COMMENT"
+        "message": "--> Removing Supernatant"
       },
       "result": {},
       "status": "succeeded"
@@ -20361,11 +20395,10 @@
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "--> Removing Residual",
-        "legacyCommandType": "command.COMMENT"
+        "message": "--> Removing Residual"
       },
       "result": {},
       "status": "succeeded"
@@ -20992,41 +21025,37 @@
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "==============================================",
-        "legacyCommandType": "command.COMMENT"
+        "message": "=============================================="
       },
       "result": {},
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "--> ELUTE",
-        "legacyCommandType": "command.COMMENT"
+        "message": "--> ELUTE"
       },
       "result": {},
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "==============================================",
-        "legacyCommandType": "command.COMMENT"
+        "message": "=============================================="
       },
       "result": {},
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "--> Adding Elute",
-        "legacyCommandType": "command.COMMENT"
+        "message": "--> Adding Elute"
       },
       "result": {},
       "status": "succeeded"
@@ -21446,11 +21475,10 @@
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "--> Transfer Elution",
-        "legacyCommandType": "command.COMMENT"
+        "message": "--> Transfer Elution"
       },
       "result": {},
       "status": "succeeded"
@@ -21834,11 +21862,10 @@
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "--> Adding ET2",
-        "legacyCommandType": "command.COMMENT"
+        "message": "--> Adding ET2"
       },
       "result": {},
       "status": "succeeded"
@@ -22378,41 +22405,37 @@
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "==============================================",
-        "legacyCommandType": "command.COMMENT"
+        "message": "=============================================="
       },
       "result": {},
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "--> AMPLIFICATION",
-        "legacyCommandType": "command.COMMENT"
+        "message": "--> AMPLIFICATION"
       },
       "result": {},
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "==============================================",
-        "legacyCommandType": "command.COMMENT"
+        "message": "=============================================="
       },
       "result": {},
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "--> Adding PPC",
-        "legacyCommandType": "command.COMMENT"
+        "message": "--> Adding PPC"
       },
       "result": {},
       "status": "succeeded"
@@ -22724,11 +22747,10 @@
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "--> Adding EPM",
-        "legacyCommandType": "command.COMMENT"
+        "message": "--> Adding EPM"
       },
       "result": {},
       "status": "succeeded"
@@ -23268,31 +23290,28 @@
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "==============================================",
-        "legacyCommandType": "command.COMMENT"
+        "message": "=============================================="
       },
       "result": {},
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "--> Cleanup",
-        "legacyCommandType": "command.COMMENT"
+        "message": "--> Cleanup"
       },
       "result": {},
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "==============================================",
-        "legacyCommandType": "command.COMMENT"
+        "message": "=============================================="
       },
       "result": {},
       "status": "succeeded"
@@ -23334,11 +23353,10 @@
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "--> Transfer Elution",
-        "legacyCommandType": "command.COMMENT"
+        "message": "--> Transfer Elution"
       },
       "result": {},
       "status": "succeeded"
@@ -23722,11 +23740,10 @@
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "--> ADDING AMPure (0.8x)",
-        "legacyCommandType": "command.COMMENT"
+        "message": "--> ADDING AMPure (0.8x)"
       },
       "result": {},
       "status": "succeeded"
@@ -25531,11 +25548,10 @@
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "--> Removing Supernatant",
-        "legacyCommandType": "command.COMMENT"
+        "message": "--> Removing Supernatant"
       },
       "result": {},
       "status": "succeeded"
@@ -26411,11 +26427,10 @@
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "--> ETOH Wash",
-        "legacyCommandType": "command.COMMENT"
+        "message": "--> ETOH Wash"
       },
       "result": {},
       "status": "succeeded"
@@ -27330,11 +27345,10 @@
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "--> Remove ETOH Wash",
-        "legacyCommandType": "command.COMMENT"
+        "message": "--> Remove ETOH Wash"
       },
       "result": {},
       "status": "succeeded"
@@ -28210,11 +28224,10 @@
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "--> ETOH Wash",
-        "legacyCommandType": "command.COMMENT"
+        "message": "--> ETOH Wash"
       },
       "result": {},
       "status": "succeeded"
@@ -29129,11 +29142,10 @@
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "--> Remove ETOH Wash",
-        "legacyCommandType": "command.COMMENT"
+        "message": "--> Remove ETOH Wash"
       },
       "result": {},
       "status": "succeeded"
@@ -30009,11 +30021,10 @@
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "--> Removing Residual ETOH",
-        "legacyCommandType": "command.COMMENT"
+        "message": "--> Removing Residual ETOH"
       },
       "result": {},
       "status": "succeeded"
@@ -30676,11 +30687,10 @@
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "--> Adding RSB",
-        "legacyCommandType": "command.COMMENT"
+        "message": "--> Adding RSB"
       },
       "result": {},
       "status": "succeeded"
@@ -32518,11 +32528,10 @@
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "--> Transferring Supernatant",
-        "legacyCommandType": "command.COMMENT"
+        "message": "--> Transferring Supernatant"
       },
       "result": {},
       "status": "succeeded"
@@ -32906,31 +32915,28 @@
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "==============================================",
-        "legacyCommandType": "command.COMMENT"
+        "message": "=============================================="
       },
       "result": {},
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "--> Resetting Run",
-        "legacyCommandType": "command.COMMENT"
+        "message": "--> Resetting Run"
       },
       "result": {},
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "==============================================",
-        "legacyCommandType": "command.COMMENT"
+        "message": "=============================================="
       },
       "result": {},
       "status": "succeeded"
@@ -36432,41 +36438,37 @@
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "==============================================",
-        "legacyCommandType": "command.COMMENT"
+        "message": "=============================================="
       },
       "result": {},
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "--> Capture",
-        "legacyCommandType": "command.COMMENT"
+        "message": "--> Capture"
       },
       "result": {},
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "==============================================",
-        "legacyCommandType": "command.COMMENT"
+        "message": "=============================================="
       },
       "result": {},
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "--> Transfer Hybridization",
-        "legacyCommandType": "command.COMMENT"
+        "message": "--> Transfer Hybridization"
       },
       "result": {},
       "status": "succeeded"
@@ -36857,11 +36859,10 @@
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "--> ADDING SMB",
-        "legacyCommandType": "command.COMMENT"
+        "message": "--> ADDING SMB"
       },
       "result": {},
       "status": "succeeded"
@@ -38829,41 +38830,37 @@
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "==============================================",
-        "legacyCommandType": "command.COMMENT"
+        "message": "=============================================="
       },
       "result": {},
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "--> WASH",
-        "legacyCommandType": "command.COMMENT"
+        "message": "--> WASH"
       },
       "result": {},
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "==============================================",
-        "legacyCommandType": "command.COMMENT"
+        "message": "=============================================="
       },
       "result": {},
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "--> Remove SUPERNATANT",
-        "legacyCommandType": "command.COMMENT"
+        "message": "--> Remove SUPERNATANT"
       },
       "result": {},
       "status": "succeeded"
@@ -39760,21 +39757,19 @@
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "--> Repeating 3 washes",
-        "legacyCommandType": "command.COMMENT"
+        "message": "--> Repeating 3 washes"
       },
       "result": {},
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "--> Adding EEW",
-        "legacyCommandType": "command.COMMENT"
+        "message": "--> Adding EEW"
       },
       "result": {},
       "status": "succeeded"
@@ -40158,11 +40153,10 @@
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "--> Removing Supernatant",
-        "legacyCommandType": "command.COMMENT"
+        "message": "--> Removing Supernatant"
       },
       "result": {},
       "status": "succeeded"
@@ -41008,11 +41002,10 @@
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "--> Adding EEW",
-        "legacyCommandType": "command.COMMENT"
+        "message": "--> Adding EEW"
       },
       "result": {},
       "status": "succeeded"
@@ -41396,11 +41389,10 @@
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "--> Removing Supernatant",
-        "legacyCommandType": "command.COMMENT"
+        "message": "--> Removing Supernatant"
       },
       "result": {},
       "status": "succeeded"
@@ -42246,11 +42238,10 @@
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "--> Adding EEW",
-        "legacyCommandType": "command.COMMENT"
+        "message": "--> Adding EEW"
       },
       "result": {},
       "status": "succeeded"
@@ -42634,11 +42625,10 @@
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "--> Removing Supernatant",
-        "legacyCommandType": "command.COMMENT"
+        "message": "--> Removing Supernatant"
       },
       "result": {},
       "status": "succeeded"
@@ -43484,11 +43474,10 @@
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "--> Adding EEW",
-        "legacyCommandType": "command.COMMENT"
+        "message": "--> Adding EEW"
       },
       "result": {},
       "status": "succeeded"
@@ -43818,11 +43807,10 @@
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "--> Transfer Hybridization",
-        "legacyCommandType": "command.COMMENT"
+        "message": "--> Transfer Hybridization"
       },
       "result": {},
       "status": "succeeded"
@@ -44244,11 +44232,10 @@
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "--> Removing Supernatant",
-        "legacyCommandType": "command.COMMENT"
+        "message": "--> Removing Supernatant"
       },
       "result": {},
       "status": "succeeded"
@@ -45058,11 +45045,10 @@
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "--> Removing Residual",
-        "legacyCommandType": "command.COMMENT"
+        "message": "--> Removing Residual"
       },
       "result": {},
       "status": "succeeded"
@@ -45689,41 +45675,37 @@
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "==============================================",
-        "legacyCommandType": "command.COMMENT"
+        "message": "=============================================="
       },
       "result": {},
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "--> ELUTE",
-        "legacyCommandType": "command.COMMENT"
+        "message": "--> ELUTE"
       },
       "result": {},
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "==============================================",
-        "legacyCommandType": "command.COMMENT"
+        "message": "=============================================="
       },
       "result": {},
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "--> Adding Elute",
-        "legacyCommandType": "command.COMMENT"
+        "message": "--> Adding Elute"
       },
       "result": {},
       "status": "succeeded"
@@ -46143,11 +46125,10 @@
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "--> Transfer Elution",
-        "legacyCommandType": "command.COMMENT"
+        "message": "--> Transfer Elution"
       },
       "result": {},
       "status": "succeeded"
@@ -46531,11 +46512,10 @@
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "--> Adding ET2",
-        "legacyCommandType": "command.COMMENT"
+        "message": "--> Adding ET2"
       },
       "result": {},
       "status": "succeeded"
@@ -47075,41 +47055,37 @@
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "==============================================",
-        "legacyCommandType": "command.COMMENT"
+        "message": "=============================================="
       },
       "result": {},
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "--> AMPLIFICATION",
-        "legacyCommandType": "command.COMMENT"
+        "message": "--> AMPLIFICATION"
       },
       "result": {},
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "==============================================",
-        "legacyCommandType": "command.COMMENT"
+        "message": "=============================================="
       },
       "result": {},
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "--> Adding PPC",
-        "legacyCommandType": "command.COMMENT"
+        "message": "--> Adding PPC"
       },
       "result": {},
       "status": "succeeded"
@@ -47421,11 +47397,10 @@
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "--> Adding EPM",
-        "legacyCommandType": "command.COMMENT"
+        "message": "--> Adding EPM"
       },
       "result": {},
       "status": "succeeded"
@@ -47965,31 +47940,28 @@
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "==============================================",
-        "legacyCommandType": "command.COMMENT"
+        "message": "=============================================="
       },
       "result": {},
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "--> Cleanup",
-        "legacyCommandType": "command.COMMENT"
+        "message": "--> Cleanup"
       },
       "result": {},
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "==============================================",
-        "legacyCommandType": "command.COMMENT"
+        "message": "=============================================="
       },
       "result": {},
       "status": "succeeded"
@@ -48031,11 +48003,10 @@
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "--> Transfer Elution",
-        "legacyCommandType": "command.COMMENT"
+        "message": "--> Transfer Elution"
       },
       "result": {},
       "status": "succeeded"
@@ -48419,11 +48390,10 @@
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "--> ADDING AMPure (0.8x)",
-        "legacyCommandType": "command.COMMENT"
+        "message": "--> ADDING AMPure (0.8x)"
       },
       "result": {},
       "status": "succeeded"
@@ -50228,11 +50198,10 @@
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "--> Removing Supernatant",
-        "legacyCommandType": "command.COMMENT"
+        "message": "--> Removing Supernatant"
       },
       "result": {},
       "status": "succeeded"
@@ -51108,11 +51077,10 @@
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "--> ETOH Wash",
-        "legacyCommandType": "command.COMMENT"
+        "message": "--> ETOH Wash"
       },
       "result": {},
       "status": "succeeded"
@@ -52027,11 +51995,10 @@
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "--> Remove ETOH Wash",
-        "legacyCommandType": "command.COMMENT"
+        "message": "--> Remove ETOH Wash"
       },
       "result": {},
       "status": "succeeded"
@@ -52907,11 +52874,10 @@
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "--> ETOH Wash",
-        "legacyCommandType": "command.COMMENT"
+        "message": "--> ETOH Wash"
       },
       "result": {},
       "status": "succeeded"
@@ -53826,11 +53792,10 @@
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "--> Remove ETOH Wash",
-        "legacyCommandType": "command.COMMENT"
+        "message": "--> Remove ETOH Wash"
       },
       "result": {},
       "status": "succeeded"
@@ -54706,11 +54671,10 @@
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "--> Removing Residual ETOH",
-        "legacyCommandType": "command.COMMENT"
+        "message": "--> Removing Residual ETOH"
       },
       "result": {},
       "status": "succeeded"
@@ -55373,11 +55337,10 @@
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "--> Adding RSB",
-        "legacyCommandType": "command.COMMENT"
+        "message": "--> Adding RSB"
       },
       "result": {},
       "status": "succeeded"
@@ -57215,11 +57178,10 @@
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "--> Transferring Supernatant",
-        "legacyCommandType": "command.COMMENT"
+        "message": "--> Transferring Supernatant"
       },
       "result": {},
       "status": "succeeded"
@@ -57603,31 +57565,28 @@
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "==============================================",
-        "legacyCommandType": "command.COMMENT"
+        "message": "=============================================="
       },
       "result": {},
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "--> Resetting Run",
-        "legacyCommandType": "command.COMMENT"
+        "message": "--> Resetting Run"
       },
       "result": {},
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "==============================================",
-        "legacyCommandType": "command.COMMENT"
+        "message": "=============================================="
       },
       "result": {},
       "status": "succeeded"
@@ -61129,41 +61088,37 @@
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "==============================================",
-        "legacyCommandType": "command.COMMENT"
+        "message": "=============================================="
       },
       "result": {},
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "--> Capture",
-        "legacyCommandType": "command.COMMENT"
+        "message": "--> Capture"
       },
       "result": {},
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "==============================================",
-        "legacyCommandType": "command.COMMENT"
+        "message": "=============================================="
       },
       "result": {},
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "--> Transfer Hybridization",
-        "legacyCommandType": "command.COMMENT"
+        "message": "--> Transfer Hybridization"
       },
       "result": {},
       "status": "succeeded"
@@ -61554,11 +61509,10 @@
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "--> ADDING SMB",
-        "legacyCommandType": "command.COMMENT"
+        "message": "--> ADDING SMB"
       },
       "result": {},
       "status": "succeeded"
@@ -63526,41 +63480,37 @@
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "==============================================",
-        "legacyCommandType": "command.COMMENT"
+        "message": "=============================================="
       },
       "result": {},
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "--> WASH",
-        "legacyCommandType": "command.COMMENT"
+        "message": "--> WASH"
       },
       "result": {},
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "==============================================",
-        "legacyCommandType": "command.COMMENT"
+        "message": "=============================================="
       },
       "result": {},
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "--> Remove SUPERNATANT",
-        "legacyCommandType": "command.COMMENT"
+        "message": "--> Remove SUPERNATANT"
       },
       "result": {},
       "status": "succeeded"
@@ -64457,21 +64407,19 @@
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "--> Repeating 3 washes",
-        "legacyCommandType": "command.COMMENT"
+        "message": "--> Repeating 3 washes"
       },
       "result": {},
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "--> Adding EEW",
-        "legacyCommandType": "command.COMMENT"
+        "message": "--> Adding EEW"
       },
       "result": {},
       "status": "succeeded"
@@ -64855,11 +64803,10 @@
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "--> Removing Supernatant",
-        "legacyCommandType": "command.COMMENT"
+        "message": "--> Removing Supernatant"
       },
       "result": {},
       "status": "succeeded"
@@ -65705,11 +65652,10 @@
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "--> Adding EEW",
-        "legacyCommandType": "command.COMMENT"
+        "message": "--> Adding EEW"
       },
       "result": {},
       "status": "succeeded"
@@ -66093,11 +66039,10 @@
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "--> Removing Supernatant",
-        "legacyCommandType": "command.COMMENT"
+        "message": "--> Removing Supernatant"
       },
       "result": {},
       "status": "succeeded"
@@ -66943,11 +66888,10 @@
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "--> Adding EEW",
-        "legacyCommandType": "command.COMMENT"
+        "message": "--> Adding EEW"
       },
       "result": {},
       "status": "succeeded"
@@ -67331,11 +67275,10 @@
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "--> Removing Supernatant",
-        "legacyCommandType": "command.COMMENT"
+        "message": "--> Removing Supernatant"
       },
       "result": {},
       "status": "succeeded"
@@ -68181,11 +68124,10 @@
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "--> Adding EEW",
-        "legacyCommandType": "command.COMMENT"
+        "message": "--> Adding EEW"
       },
       "result": {},
       "status": "succeeded"
@@ -68515,11 +68457,10 @@
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "--> Transfer Hybridization",
-        "legacyCommandType": "command.COMMENT"
+        "message": "--> Transfer Hybridization"
       },
       "result": {},
       "status": "succeeded"
@@ -68941,11 +68882,10 @@
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "--> Removing Supernatant",
-        "legacyCommandType": "command.COMMENT"
+        "message": "--> Removing Supernatant"
       },
       "result": {},
       "status": "succeeded"
@@ -69755,11 +69695,10 @@
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "--> Removing Residual",
-        "legacyCommandType": "command.COMMENT"
+        "message": "--> Removing Residual"
       },
       "result": {},
       "status": "succeeded"
@@ -70386,41 +70325,37 @@
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "==============================================",
-        "legacyCommandType": "command.COMMENT"
+        "message": "=============================================="
       },
       "result": {},
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "--> ELUTE",
-        "legacyCommandType": "command.COMMENT"
+        "message": "--> ELUTE"
       },
       "result": {},
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "==============================================",
-        "legacyCommandType": "command.COMMENT"
+        "message": "=============================================="
       },
       "result": {},
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "--> Adding Elute",
-        "legacyCommandType": "command.COMMENT"
+        "message": "--> Adding Elute"
       },
       "result": {},
       "status": "succeeded"
@@ -70840,11 +70775,10 @@
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "--> Transfer Elution",
-        "legacyCommandType": "command.COMMENT"
+        "message": "--> Transfer Elution"
       },
       "result": {},
       "status": "succeeded"
@@ -71228,11 +71162,10 @@
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "--> Adding ET2",
-        "legacyCommandType": "command.COMMENT"
+        "message": "--> Adding ET2"
       },
       "result": {},
       "status": "succeeded"
@@ -71772,41 +71705,37 @@
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "==============================================",
-        "legacyCommandType": "command.COMMENT"
+        "message": "=============================================="
       },
       "result": {},
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "--> AMPLIFICATION",
-        "legacyCommandType": "command.COMMENT"
+        "message": "--> AMPLIFICATION"
       },
       "result": {},
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "==============================================",
-        "legacyCommandType": "command.COMMENT"
+        "message": "=============================================="
       },
       "result": {},
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "--> Adding PPC",
-        "legacyCommandType": "command.COMMENT"
+        "message": "--> Adding PPC"
       },
       "result": {},
       "status": "succeeded"
@@ -72118,11 +72047,10 @@
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "--> Adding EPM",
-        "legacyCommandType": "command.COMMENT"
+        "message": "--> Adding EPM"
       },
       "result": {},
       "status": "succeeded"
@@ -72662,31 +72590,28 @@
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "==============================================",
-        "legacyCommandType": "command.COMMENT"
+        "message": "=============================================="
       },
       "result": {},
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "--> Cleanup",
-        "legacyCommandType": "command.COMMENT"
+        "message": "--> Cleanup"
       },
       "result": {},
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "==============================================",
-        "legacyCommandType": "command.COMMENT"
+        "message": "=============================================="
       },
       "result": {},
       "status": "succeeded"
@@ -72728,11 +72653,10 @@
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "--> Transfer Elution",
-        "legacyCommandType": "command.COMMENT"
+        "message": "--> Transfer Elution"
       },
       "result": {},
       "status": "succeeded"
@@ -73116,11 +73040,10 @@
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "--> ADDING AMPure (0.8x)",
-        "legacyCommandType": "command.COMMENT"
+        "message": "--> ADDING AMPure (0.8x)"
       },
       "result": {},
       "status": "succeeded"
@@ -74925,11 +74848,10 @@
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "--> Removing Supernatant",
-        "legacyCommandType": "command.COMMENT"
+        "message": "--> Removing Supernatant"
       },
       "result": {},
       "status": "succeeded"
@@ -75805,11 +75727,10 @@
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "--> ETOH Wash",
-        "legacyCommandType": "command.COMMENT"
+        "message": "--> ETOH Wash"
       },
       "result": {},
       "status": "succeeded"
@@ -76724,11 +76645,10 @@
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "--> Remove ETOH Wash",
-        "legacyCommandType": "command.COMMENT"
+        "message": "--> Remove ETOH Wash"
       },
       "result": {},
       "status": "succeeded"
@@ -77604,11 +77524,10 @@
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "--> ETOH Wash",
-        "legacyCommandType": "command.COMMENT"
+        "message": "--> ETOH Wash"
       },
       "result": {},
       "status": "succeeded"
@@ -78523,11 +78442,10 @@
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "--> Remove ETOH Wash",
-        "legacyCommandType": "command.COMMENT"
+        "message": "--> Remove ETOH Wash"
       },
       "result": {},
       "status": "succeeded"
@@ -79403,11 +79321,10 @@
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "--> Removing Residual ETOH",
-        "legacyCommandType": "command.COMMENT"
+        "message": "--> Removing Residual ETOH"
       },
       "result": {},
       "status": "succeeded"
@@ -80070,11 +79987,10 @@
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "--> Adding RSB",
-        "legacyCommandType": "command.COMMENT"
+        "message": "--> Adding RSB"
       },
       "result": {},
       "status": "succeeded"
@@ -81912,11 +81828,10 @@
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "--> Transferring Supernatant",
-        "legacyCommandType": "command.COMMENT"
+        "message": "--> Transferring Supernatant"
       },
       "result": {},
       "status": "succeeded"
@@ -82300,31 +82215,28 @@
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "==============================================",
-        "legacyCommandType": "command.COMMENT"
+        "message": "=============================================="
       },
       "result": {},
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "--> Resetting Run",
-        "legacyCommandType": "command.COMMENT"
+        "message": "--> Resetting Run"
       },
       "result": {},
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "==============================================",
-        "legacyCommandType": "command.COMMENT"
+        "message": "=============================================="
       },
       "result": {},
       "status": "succeeded"
@@ -85930,6 +85842,7 @@
       "pipetteName": "p50_multi_flex"
     }
   ],
+  "result": "ok",
   "robotType": "OT-3 Standard",
   "runTimeParameters": []
 }

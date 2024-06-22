@@ -16,12 +16,12 @@
       "isDefined": false,
       "wrappedErrors": [
         {
-          "detail": "opentrons.protocols.parameters.types.ParameterNameError: Description must be a string and at most 100 characters.",
+          "detail": "opentrons.protocols.parameters.exceptions.ParameterNameError: Description must be a string and at most 100 characters.",
           "errorCode": "4000",
           "errorInfo": {
             "args": "('Description must be a string and at most 100 characters.',)",
             "class": "ParameterNameError",
-            "traceback": "  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocols/execution/execute_python.py\", line 80, in _parse_and_set_parameters\n    exec(\"add_parameters(__param_context)\", new_globs)\n\n  File \"<string>\", line 1, in <module>\n\n  File \"Flex_X_v2_18_NO_PIPETTES_Overrides_BadTypesInRTP_Override_wrong_type_in_description.py\", line 84, in add_parameters\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocol_api/_parameter_context.py\", line 157, in add_str\n    parameter = parameter_definition.create_str_parameter(\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocols/parameters/parameter_definition.py\", line 262, in create_str_parameter\n    return ParameterDefinition(\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocols/parameters/parameter_definition.py\", line 79, in __init__\n    self._description = validation.ensure_description(description)\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocols/parameters/validation.py\", line 60, in ensure_description\n    raise ParameterNameError(\n"
+            "traceback": "  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocols/execution/execute_python.py\", line 80, in _parse_and_set_parameters\n    exec(\"add_parameters(__param_context)\", new_globs)\n\n  File \"<string>\", line 1, in <module>\n\n  File \"Flex_X_v2_18_NO_PIPETTES_Overrides_BadTypesInRTP_Override_wrong_type_in_description.py\", line 84, in add_parameters\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocol_api/_parameter_context.py\", line 158, in add_str\n    parameter = parameter_definition.create_str_parameter(\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocols/parameters/parameter_definition.py\", line 265, in create_str_parameter\n    return ParameterDefinition(\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocols/parameters/parameter_definition.py\", line 82, in __init__\n    self._description = validation.ensure_description(description)\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocols/parameters/validation.py\", line 61, in ensure_description\n    raise ParameterNameError(\n"
           },
           "errorType": "PythonException",
           "isDefined": false,
@@ -63,6 +63,7 @@
   },
   "modules": [],
   "pipettes": [],
+  "result": "not-ok",
   "robotType": "OT-3 Standard",
   "runTimeParameters": []
 }

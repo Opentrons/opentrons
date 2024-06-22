@@ -12,7 +12,7 @@ import {
   SPACING,
   TYPOGRAPHY,
   useInterval,
-  StyledText,
+  LegacyStyledText,
 } from '@opentrons/components'
 
 import { EMPTY_TIMESTAMP } from '../Devices/constants'
@@ -95,10 +95,10 @@ function PauseHeader({ startedAt }: PauseHeaderProps): JSX.Element {
 
   return (
     <Flex css={PAUSE_HEADER_STYLE}>
-      <StyledText css={PAUSE_TEXT_STYLE}>
+      <LegacyStyledText css={PAUSE_TEXT_STYLE}>
         {i18n.format(t('paused_for'), 'capitalize')}
-      </StyledText>
-      <StyledText css={PAUSE_TIME_STYLE}>{runTime}</StyledText>
+      </LegacyStyledText>
+      <LegacyStyledText css={PAUSE_TIME_STYLE}>{runTime}</LegacyStyledText>
     </Flex>
   )
 }

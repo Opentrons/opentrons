@@ -7,7 +7,8 @@ import {
   Flex,
   POSITION_FIXED,
   SPACING,
-  StyledText,
+  LegacyStyledText,
+  JUSTIFY_CENTER,
 } from '@opentrons/components'
 
 import { getTopPortalEl } from '../../App/portal'
@@ -83,7 +84,7 @@ export function SelectDestWells(props: SelectDestWellsProps): JSX.Element {
         t('number_wells_selected_error_message', {
           wellCount: sourceWellCount,
           selectionUnits,
-        }),
+        }) as string,
         'error',
         {
           closeButton: true,
@@ -106,6 +107,8 @@ export function SelectDestWells(props: SelectDestWellsProps): JSX.Element {
       setSelectedWells({})
     },
   }
+  const labwareDefinition =
+    state.destination === 'source' ? state.source : state.destination
 
   return (
     <>
@@ -132,6 +135,7 @@ export function SelectDestWells(props: SelectDestWellsProps): JSX.Element {
         top={SPACING.spacing8}
       />
       <Flex
+        justifyContent={JUSTIFY_CENTER}
         marginTop={SPACING.spacing120}
         padding={`${SPACING.spacing16} ${SPACING.spacing60} ${SPACING.spacing40} ${SPACING.spacing60}`}
         position={POSITION_FIXED}
@@ -140,29 +144,42 @@ export function SelectDestWells(props: SelectDestWellsProps): JSX.Element {
         width="100%"
       >
         {state.destination != null && state.source != null ? (
-          <WellSelection
-            definition={
-              state.destination === 'source' ? state.source : state.destination
+          <Flex
+            width={
+              labwareDefinition?.parameters.format === '384Standard'
+                ? '100%'
+                : '75%'
             }
-            deselectWells={(wells: string[]) => {
-              setSelectedWells(prevWells =>
-                without(Object.keys(prevWells), ...wells).reduce(
-                  (acc, well) => {
-                    return { ...acc, [well]: null }
-                  },
-                  {}
-                )
-              )
-            }}
-            selectedPrimaryWells={selectedWells}
-            selectWells={wellGroup => {
-              if (Object.keys(wellGroup).length > 0) {
-                setIsNumberWellsSelectedError(false)
-                setSelectedWells(prevWells => ({ ...prevWells, ...wellGroup }))
+          >
+            <WellSelection
+              definition={
+                state.destination === 'source'
+                  ? state.source
+                  : state.destination
               }
-            }}
-            channels={channels}
-          />
+              deselectWells={(wells: string[]) => {
+                setSelectedWells(prevWells =>
+                  without(Object.keys(prevWells), ...wells).reduce(
+                    (acc, well) => {
+                      return { ...acc, [well]: null }
+                    },
+                    {}
+                  )
+                )
+              }}
+              selectedPrimaryWells={selectedWells}
+              selectWells={wellGroup => {
+                if (Object.keys(wellGroup).length > 0) {
+                  setIsNumberWellsSelectedError(false)
+                  setSelectedWells(prevWells => ({
+                    ...prevWells,
+                    ...wellGroup,
+                  }))
+                }
+              }}
+              channels={channels}
+            />
+          </Flex>
         ) : null}
       </Flex>
     </>
@@ -200,13 +217,13 @@ function NumberWellsSelectedErrorModal({
         setShowNumberWellsSelectedErrorModal(false)
       }}
     >
-      <StyledText as="p">
+      <LegacyStyledText as="p">
         {t('number_wells_selected_error_learn_more', {
           wellCount,
           selectionUnit,
           selectionUnits,
         })}
-      </StyledText>
+      </LegacyStyledText>
     </Modal>
   )
 }

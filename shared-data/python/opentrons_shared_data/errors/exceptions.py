@@ -611,7 +611,7 @@ class MotorDriverError(RoboticsControlError):
         super().__init__(ErrorCodes.MOTOR_DRIVER_ERROR, message, detail, wrapping)
 
 
-class LiquidNotFoundError(RoboticsControlError):
+class PipetteLiquidNotFoundError(RoboticsControlError):
     """Error raised if liquid sensing move completes without detecting liquid."""
 
     def __init__(
@@ -620,9 +620,9 @@ class LiquidNotFoundError(RoboticsControlError):
         detail: Optional[Dict[str, str]] = None,
         wrapping: Optional[Sequence[EnumeratedError]] = None,
     ) -> None:
-        """Initialize LiquidNotFoundError."""
+        """Initialize PipetteLiquidNotFoundError."""
         super().__init__(
-            ErrorCodes.LIQUID_NOT_FOUND,
+            ErrorCodes.PIPETTE_LIQUID_NOT_FOUND,
             message,
             detail,
             wrapping,

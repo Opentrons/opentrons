@@ -6,7 +6,7 @@ import {
   Flex,
   JUSTIFY_SPACE_BETWEEN,
   SPACING,
-  StyledText,
+  LegacyStyledText,
 } from '@opentrons/components'
 
 export interface LabeledValueProps {
@@ -22,10 +22,10 @@ export function LabeledValue({ label, value }: LabeledValueProps): JSX.Element {
       alignItems={ALIGN_CENTER}
       paddingY={SPACING.spacing8}
     >
-      <StyledText as="h6" color={COLORS.grey60}>
+      <LegacyStyledText as="h6" color={COLORS.grey60}>
         {label}
-      </StyledText>
-      <StyledText as="p">{value}</StyledText>
+      </LegacyStyledText>
+      <LegacyStyledText as="p">{value}</LegacyStyledText>
     </Flex>
   )
 }
