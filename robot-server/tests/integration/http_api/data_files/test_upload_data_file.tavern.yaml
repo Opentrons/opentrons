@@ -37,7 +37,7 @@ stages:
       url: '{ot2_server_base_url}/dataFiles'
       method: POST
       data:
-        filePath: 'tests/integration/data_files/sample.csv'
+        filePath: 'tests/integration/data_files/sample_record.csv'
     response:
       save:
         json:
@@ -46,5 +46,5 @@ stages:
       json:
         data:
           id: !anystr
-          name: "sample.csv"
+          name: "sample_record.csv"
           createdAt: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"
