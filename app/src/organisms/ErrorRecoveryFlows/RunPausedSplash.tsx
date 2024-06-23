@@ -146,7 +146,7 @@ export function RunPausedSplash(
   } else {
     return (
       <RecoveryInterventionModal
-        modalType="desktop-small"
+        desktopType="desktop-small"
         titleHeading={buildTitleHeadingDesktop()}
       >
         <RecoverySingleColumnContentDesktop>

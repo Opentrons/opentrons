@@ -13,16 +13,16 @@ export type RecoveryInterventionModalProps = Omit<
   React.ComponentProps<typeof InterventionModal>,
   'type'
 > & {
-  modalType: 'odd' | 'desktop-small' | 'desktop-large'
+  /* If on desktop, specifies the hard-coded dimensions height of the modal. */
+  desktopType: 'desktop-small' | 'desktop-large'
 }
 
 // A wrapper around InterventionModal with Error-Recovery specific props and styling.
 export function RecoveryInterventionModal({
   children,
-  modalType,
+  desktopType,
   ...rest
 }: RecoveryInterventionModalProps): JSX.Element {
-  const height = getHeight(modalType)
   const restProps = {
     ...rest,
     type: 'error' as ModalType,
@@ -30,21 +30,33 @@ export function RecoveryInterventionModal({
 
   return createPortal(
     <InterventionModal {...restProps}>
-      <Flex height={height}>{children}</Flex>
+      <Flex
+        css={
+          desktopType === 'desktop-small'
+            ? SMALL_MODAL_STYLE
+            : LARGE_MODAL_STYLE
+        }
+      >
+        {children}
+      </Flex>
     </InterventionModal>,
     getModalPortalEl()
   )
 }
 
-// TODO DO CSS.
-function getHeight(
-  modalType: RecoveryInterventionModalProps['modalType']
-): string {
-  if (modalType === 'odd') {
-    return '100%'
-  } else if (modalType === 'desktop-small') {
-    return '25.25rem'
-  } else {
-    return '30rem'
+const ODD_STYLE = `
+@media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
+    height: 100%;
   }
-}
+`
+
+const SMALL_MODAL_STYLE = css`
+  height: 25.25rem;
+
+  ${ODD_STYLE}
+`
+const LARGE_MODAL_STYLE = css`
+  height: 30rem;
+
+  ${ODD_STYLE}
+`

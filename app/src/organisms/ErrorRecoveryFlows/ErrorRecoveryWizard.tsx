@@ -86,6 +86,7 @@ export function ErrorRecoveryWizard(
 export function ErrorRecoveryComponent(
   props: RecoveryContentProps
 ): JSX.Element {
+  const { route, step } = props.recoveryMap
   const { t } = useTranslation('error_recovery')
   const { showModal, toggleModal } = useErrorDetailsModal()
 
@@ -102,13 +103,17 @@ export function ErrorRecoveryComponent(
     </LegacyStyledText>
   )
 
-  // TODO: HERE AS WELL!
+  const isLargeDesktopStyle =
+    route === RECOVERY_MAP.DROP_TIP_FLOWS.ROUTE &&
+    step !== RECOVERY_MAP.DROP_TIP_FLOWS.STEPS.BEGIN_REMOVAL
+
   return (
     <RecoveryInterventionModal
       iconHeading={buildIconHeading()}
       titleHeading={buildTitleHeading()}
       iconHeadingOnClick={toggleModal}
       iconName="information"
+      desktopType={isLargeDesktopStyle ? 'desktop-large' : 'desktop-small'}
     >
       {showModal ? (
         <ErrorDetailsModal {...props} toggleModal={toggleModal} />
