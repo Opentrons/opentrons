@@ -1357,12 +1357,14 @@
       "errorCode": "4000",
       "errorInfo": {},
       "errorType": "ExceptionInProtocolError",
+      "isDefined": false,
       "wrappedErrors": [
         {
           "detail": "No trash container has been defined in this protocol.",
           "errorCode": "4000",
           "errorInfo": {},
           "errorType": "NoTrashDefinedError",
+          "isDefined": false,
           "wrappedErrors": []
         }
       ]

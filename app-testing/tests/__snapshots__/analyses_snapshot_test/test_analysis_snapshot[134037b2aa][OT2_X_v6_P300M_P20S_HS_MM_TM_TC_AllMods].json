@@ -7275,6 +7275,7 @@
         "errorCode": "4000",
         "errorInfo": {},
         "errorType": "CannotPerformModuleAction",
+        "isDefined": false,
         "wrappedErrors": []
       },
       "notes": [],
@@ -7292,6 +7293,7 @@
       "errorCode": "4000",
       "errorInfo": {},
       "errorType": "CannotPerformModuleAction",
+      "isDefined": false,
       "wrappedErrors": []
     }
   ],
