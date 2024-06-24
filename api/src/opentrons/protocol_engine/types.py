@@ -33,6 +33,8 @@ from opentrons_shared_data.pipette.dev_types import (  # noqa: F401
 from opentrons_shared_data.module.dev_types import ModuleType as SharedDataModuleType
 
 
+# todo(mm, 2024-06-24): This monolithic status field is getting to be a bit much.
+# We should consider splitting this up into multiple fields.
 class EngineStatus(str, Enum):
     """Current execution status of a ProtocolEngine.
 
