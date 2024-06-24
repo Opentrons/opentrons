@@ -3,6 +3,8 @@ import { useSelector } from 'react-redux'
 
 import {
   RUN_STATUS_AWAITING_RECOVERY,
+  RUN_STATUS_AWAITING_RECOVERY_BLOCKED_BY_OPEN_DOOR,
+  RUN_STATUS_AWAITING_RECOVERY_PAUSED,
   RUN_STATUS_BLOCKED_BY_OPEN_DOOR,
   RUN_STATUS_FAILED,
   RUN_STATUS_IDLE,
@@ -24,13 +26,15 @@ import type { FailedCommand } from './types'
 
 const VALID_ER_RUN_STATUSES: RunStatus[] = [
   RUN_STATUS_AWAITING_RECOVERY,
+  RUN_STATUS_AWAITING_RECOVERY_BLOCKED_BY_OPEN_DOOR,
+  RUN_STATUS_AWAITING_RECOVERY_PAUSED,
   RUN_STATUS_STOP_REQUESTED,
-  RUN_STATUS_BLOCKED_BY_OPEN_DOOR,
 ]
 
 const INVALID_ER_RUN_STATUSES: RunStatus[] = [
   RUN_STATUS_RUNNING,
   RUN_STATUS_PAUSED,
+  RUN_STATUS_BLOCKED_BY_OPEN_DOOR,
   RUN_STATUS_FAILED,
   RUN_STATUS_SUCCEEDED,
   RUN_STATUS_IDLE,
@@ -53,7 +57,14 @@ export function useErrorRecoveryFlows(
   )
   const failedCommand = useCurrentlyRecoveringFrom(runId, runStatus)
 
-  if (!hasSeenAwaitingRecovery && runStatus === RUN_STATUS_AWAITING_RECOVERY) {
+  if (
+    !hasSeenAwaitingRecovery &&
+    ([
+      RUN_STATUS_AWAITING_RECOVERY,
+      RUN_STATUS_AWAITING_RECOVERY_BLOCKED_BY_OPEN_DOOR,
+      RUN_STATUS_AWAITING_RECOVERY_PAUSED,
+    ] as Array<RunStatus | null>).includes(runStatus)
+  ) {
     setHasSeenAwaitingRecovery(true)
   }
   // Reset recovery mode after the client has exited recovery, otherwise "cancel run" will trigger ER after the first recovery.
