@@ -976,6 +976,16 @@ class AbsorbanceReaderContext(ModuleContext):
         return self._core.get_serial_number()
 
     @requires_version(2, 21)
+    def close_lid(self) -> None:
+        """Close the lid of the Absorbance Reader."""
+        self._core.close_lid()
+
+    @requires_version(2, 21)
+    def open_lid(self) -> None:
+        """Close the lid of the Absorbance Reader."""
+        self._core.open_lid()
+
+    @requires_version(2, 21)
     def initialize(self, wavelength: int) -> None:
         """Initialize the Absorbance Reader by taking zero reading."""
         self._core.initialize(wavelength)

@@ -16,8 +16,9 @@ from opentrons.drivers.types import (
     HeaterShakerLabwareLatchStatus,
     ThermocyclerLidStatus,
 )
-from opentrons.types import DeckSlotName
+
 from opentrons.protocol_engine import commands as cmd
+from opentrons.types import DeckSlotName, StagingSlotName
 from opentrons.protocol_engine.clients import SyncClient as ProtocolEngineClient
 from opentrons.protocol_engine.errors.exceptions import (
     LabwareNotLoadedOnModuleError,
@@ -525,6 +526,16 @@ class AbsorbanceReaderCore(ModuleCore, AbstractAbsorbanceReaderCore):
     _sync_module_hardware: SynchronousAdapter[hw_modules.AbsorbanceReader]
     _initialized_value: Optional[int] = None
 
+    def get_lid_dock_slot(self) -> StagingSlotName:
+        """Get the Absorbance Reader's lid dock status."""
+        return self._engine_client.state.modules.get_lid_dock_slot(self.module_id)
+
+    def get_lid_dock_slot_id(self) -> str:
+        slot_name = self.get_lid_dock_slot()
+        return validation.internal_slot_to_public_string(
+            slot_name, robot_type=self._engine_client.state.config.robot_type
+        )
+
     def initialize(self, wavelength: int) -> None:
         """Initialize the Absorbance Reader by taking zero reading."""
         self._engine_client.execute_command(
@@ -543,3 +554,21 @@ class AbsorbanceReaderCore(ModuleCore, AbstractAbsorbanceReaderCore):
                     moduleId=self.module_id, sampleWavelength=self._initialized_value
                 )
             )
+
+    def close_lid(self, ) -> None:
+        """Close the Absorbance Reader's lid."""
+        self._engine_client.execute_command(
+            cmd.absorbance_reader.CloseLidParams(
+                moduleId=self.module_id,
+                pickUpOffset=None,
+                dropOffset=None)
+        )
+
+    def open_lid(self) -> None:
+        """Close the Absorbance Reader's lid."""
+        self._engine_client.execute_command(
+            cmd.absorbance_reader.OpenLidParams(
+                moduleId=self.module_id,
+                pickUpOffset=None,
+                dropOffset=None)
+        )

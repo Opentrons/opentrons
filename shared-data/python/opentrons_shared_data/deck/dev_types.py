@@ -126,6 +126,7 @@ class _RequiredCutoutFixture(TypedDict):
     fixtureGroup: Dict[str, List[Dict[str, str]]]
     height: float
 
+
 class CutoutFixture(_RequiredCutoutFixture, total=False):
     peripherals: Dict[str, List[CutoutFixturePeripheral]]
 

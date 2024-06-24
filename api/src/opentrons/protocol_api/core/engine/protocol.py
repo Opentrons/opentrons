@@ -441,23 +441,28 @@ class ProtocolCore(
             existing_labware_ids=list(self._labware_cores_by_id.keys()),
             existing_module_ids=list(self._module_cores_by_id.keys()),
         )
-        self._load_module_peripherals(module_core)
+        self._load_module_lid(module_core)
 
         self._module_cores_by_id[module_core.module_id] = module_core
 
         return module_core
 
-    def _load_module_peripherals(
+    def _load_module_lid(
         self, module_core: Union[ModuleCore, NonConnectedModuleCore]
     ) -> None:
         if isinstance(module_core, AbsorbanceReaderCore):
+            lid_dock_slot = module_core.get_lid_dock_slot()
             self.load_labware(
                 load_name="opentrons_flex_lid_absorbance_plate_reader_module",
-                location=module_core,
+                location=lid_dock_slot,
                 label="Absorbance Reader Lid",
                 namespace="opentrons",
                 version=1,
             )
+            lid_dock_area = validation.get_abs_reader_lid_dock_addressable_area(
+                lid_dock_slot
+            )
+            self._engine_client.add_addressable_area(lid_dock_area)
 
     def _create_non_connected_module_core(
         self, load_module_result: LoadModuleResult

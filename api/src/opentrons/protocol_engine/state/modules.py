@@ -24,11 +24,12 @@ from opentrons.hardware_control.modules.types import LiveData
 from opentrons.motion_planning.adjacent_slots_getters import (
     get_east_slot,
     get_west_slot,
+    get_adjacent_staging_slot,
 )
 from opentrons.protocol_engine.commands.calibration.calibrate_module import (
     CalibrateModuleResult,
 )
-from opentrons.types import DeckSlotName, MountType
+from opentrons.types import DeckSlotName, MountType, StagingSlotName
 from ..errors import ModuleNotConnectedError
 
 from ..types import (
@@ -39,6 +40,7 @@ from ..types import (
     ModuleType,
     ModuleDefinition,
     DeckSlotLocation,
+    StagingSlotLocation,
     ModuleDimensions,
     LabwareOffsetVector,
     HeaterShakerLatchStatus,
@@ -269,6 +271,8 @@ class ModuleStore(HasState[ModuleState], HandlesActions):
         if isinstance(
             command.result,
             (
+                absorbance_reader.CloseLidResult,
+                absorbance_reader.OpenLidResult,
                 absorbance_reader.InitializeResult,
                 absorbance_reader.MeasureAbsorbanceResult,
             ),
@@ -338,6 +342,7 @@ class ModuleStore(HasState[ModuleState], HandlesActions):
                 module_id=AbsorbanceReaderId(module_id),
                 configured=False,
                 measured=False,
+                is_lid_on=False,
                 data=None,
                 configured_wavelength=None,
             )
@@ -545,12 +550,14 @@ class ModuleStore(HasState[ModuleState], HandlesActions):
         # Get current values
         configured = absorbance_reader_substate.configured
         configured_wavelength = absorbance_reader_substate.configured_wavelength
+        is_lid_on = absorbance_reader_substate.is_lid_on
 
         if isinstance(command.result, absorbance_reader.InitializeResult):
             self._state.substate_by_module_id[module_id] = AbsorbanceReaderSubState(
                 module_id=AbsorbanceReaderId(module_id),
                 configured=True,
                 measured=False,
+                is_lid_on=is_lid_on,
                 data=None,
                 configured_wavelength=command.params.sampleWavelength,
             )
@@ -559,6 +566,28 @@ class ModuleStore(HasState[ModuleState], HandlesActions):
                 module_id=AbsorbanceReaderId(module_id),
                 configured=configured,
                 configured_wavelength=configured_wavelength,
+                is_lid_on=is_lid_on,
+                measured=True,
+                data=command.result.data,
+            )
+
+        elif isinstance(command.result, absorbance_reader.OpenLidResult):
+            self._state.substate_by_module_id[module_id] = AbsorbanceReaderSubState(
+                module_id=AbsorbanceReaderId(module_id),
+                configured=configured,
+                configured_wavelength=configured_wavelength,
+                is_lid_on=False,
+                measured=True,
+                data=command.result.data,
+            )
+
+        elif isinstance(command.result, absorbance_reader.CloseLidResult):
+            breakpoint()
+            self._state.substate_by_module_id[module_id] = AbsorbanceReaderSubState(
+                module_id=AbsorbanceReaderId(module_id),
+                configured=configured,
+                configured_wavelength=configured_wavelength,
+                is_lid_on=True,
                 measured=True,
                 data=command.result.data,
             )
@@ -711,7 +740,7 @@ class ModuleView(HasState[ModuleState]):
         return self._get_module_substate(
             module_id=module_id,
             expected_type=AbsorbanceReaderSubState,
-            expected_name="Thermocycler Module",
+            expected_name="Absorbance Reader",
         )
 
     def get_location(self, module_id: str) -> DeckSlotLocation:
@@ -1275,3 +1304,18 @@ class ModuleView(HasState[ModuleState]):
             for slot, addressable_area in zip(valid_slots, addressable_areas)
         }
         return map_addressable_area[deck_slot.value]
+
+    def get_lid_dock_slot(self, module_id: str) -> StagingSlotName:
+        """Get the slot where the lid of a module is docked, if available."""
+        module_model = self.get_requested_model(module_id)
+        if module_model == ModuleModel.ABSORBANCE_READER_V1:
+            module_location = self.get_location(module_id)
+            lid_slot = get_adjacent_staging_slot(module_location.slotName)
+            assert lid_slot is not None
+            return lid_slot
+        raise ValueError(f"Module {module_model} does not have a lid dock slot.")
+
+    def get_lid_dock_location(self, module_id: str) -> StagingSlotLocation:
+        """Get the location where the lid of a module is docked, if available."""
+        lid_slot = self.get_lid_dock_slot(module_id)
+        return StagingSlotLocation(slotName=lid_slot)

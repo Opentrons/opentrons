@@ -478,3 +478,14 @@ def validate_location(
         if well is not None
         else PointTarget(location=target_location, in_place=in_place)
     )
+
+
+def get_abs_reader_lid_dock_addressable_area(slot_name: StagingSlotName) -> str:
+    """Convert absorbance reader lid deck location to addressable area."""
+    _map = {
+        StagingSlotName.SLOT_A4: "absorbanceReaderV1LidDockA4",
+        StagingSlotName.SLOT_B4: "absorbanceReaderV1LidDockB4",
+        StagingSlotName.SLOT_C4: "absorbanceReaderV1LidDockC4",
+        StagingSlotName.SLOT_D4: "absorbanceReaderV1LidDockD4",
+    }
+    return _map[slot_name]

@@ -142,7 +142,7 @@ async def test_get_fixture_peripheral_labware_ot3_standard(
     ot3_standard_deck_def: DeckDefinitionV5,
     mock_labware_data_provider: LabwareDataProvider,
     ot3_absorbance_reader_lid: LabwareDefinition,
-):
+) -> None:
     """It should be able to get a list of prepopulated labware on the deck."""
     subject = DeckDataProvider(
         deck_type=DeckType.OT3_STANDARD, labware_data=mock_labware_data_provider
