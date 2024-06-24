@@ -380,15 +380,22 @@ class CommandStore(HasState[CommandState], HandlesActions):
 
         elif isinstance(action, StopAction):
             if not self._state.run_result:
-                if self._state.queue_status == QueueStatus.AWAITING_RECOVERY:
-                    self._state.recovery_target_command_id = None
+                self._state.recovery_target_command_id = None
 
-                self._state.queue_status = QueueStatus.PAUSED
                 if action.from_estop:
                     self._state.stopped_by_estop = True
                     self._state.run_result = RunResult.FAILED
+                elif self._state.queue_status in (
+                    QueueStatus.AWAITING_RECOVERY,
+                    QueueStatus.AWAITING_RECOVERY_PAUSED,
+                ):
+                    # If someone aborts error recovery (by stopping the run), treat it
+                    # as a run failure, not a normal run stop.
+                    self._state.run_result = RunResult.FAILED
                 else:
                     self._state.run_result = RunResult.STOPPED
+
+                self._state.queue_status = QueueStatus.PAUSED
 
         elif isinstance(action, FinishAction):
             if not self._state.run_result:
