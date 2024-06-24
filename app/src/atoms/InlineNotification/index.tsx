@@ -107,7 +107,7 @@ export function InlineNotification(
             {fullHeading}
           </span>
           {/* this break is because the desktop wants this on two lines, but also wants/
-            inline text layout on ODD. Soooo here you go*/}
+            inline text layout on ODD. Soooo here you go */}
           <br
             css={`
               @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
