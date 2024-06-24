@@ -414,8 +414,7 @@ class LabwareView(HasState[LabwareState]):
         )
 
     def get_well_min_height(self, labware_id: str, well_name: str) -> float:
-        """Get's the minimum distance that a liquid probe must stop
-        away from the bottom of a well.
+        """Get's the minimum distance that a liquid probe must stop away from the bottom of a well.
 
         Args:
             labware_id: Labware identifier.
