@@ -413,37 +413,6 @@ class LabwareView(HasState[LabwareState]):
             or len(self.get_definition(labware_id).wells) >= 96
         )
 
-    def get_well_min_height(self, labware_id: str, well_name: str) -> float:
-        """Get's the minimum distance that a liquid probe must stop away from the bottom of a well.
-
-        Args:
-            labware_id: Labware identifier.
-            well_name: Name of well in labware.
-
-        Returns:
-            A single float representing the distance, in millimeters.
-        """
-        labware_definition = self.get_definition(labware_id)
-        default_val = 0.0
-        if (
-            labware_definition.liquidProbeParameters is None
-            or labware_definition.liquidProbeParameters.minimumHeight is None
-        ):
-            return default_val
-        height_reqs = labware_definition.liquidProbeParameters.minimumHeight
-        if len(height_reqs) == 0:
-            return default_val
-        if len(height_reqs) == 1:
-            return float(height_reqs[0]["value"])
-        for entry in height_reqs:
-            if well_name in entry["applicableWells"]:
-                return float(entry["value"])
-            if (
-                entry["applicableWells"] == []
-            ):  # A "custom" default value will have "applicableWells" set to []
-                default_val = float(entry["value"])
-        return default_val
-
     def get_well_definition(
         self,
         labware_id: str,
