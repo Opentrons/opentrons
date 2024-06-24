@@ -364,10 +364,10 @@ class CommandStore(HasState[CommandState], HandlesActions):
                         )
                     case QueueStatus.AWAITING_RECOVERY_PAUSED:
                         self._state.queue_status = QueueStatus.AWAITING_RECOVERY
-                    case QueueStatus.PAUSED | QueueStatus.RUNNING:
+                    case QueueStatus.PAUSED:
                         self._state.queue_status = QueueStatus.RUNNING
-                    case QueueStatus.AWAITING_RECOVERY:
-                        # Should not be possible. See validate_action_allowed().
+                    case QueueStatus.RUNNING | QueueStatus.AWAITING_RECOVERY:
+                        # Nothing for the play action to do. No-op.
                         pass
 
         elif isinstance(action, PauseAction):
@@ -864,15 +864,12 @@ class CommandView(HasState[CommandState]):
         if self._state.run_result is not None:
             raise RunStoppedError("The run has already stopped.")
 
-        # todo(mm, 2024-06-20): Address all NotImplementedErrors in this method.
         elif isinstance(action, PlayAction):
             if self.get_status() in (
                 EngineStatus.BLOCKED_BY_OPEN_DOOR,
                 EngineStatus.AWAITING_RECOVERY_BLOCKED_BY_OPEN_DOOR,
             ):
                 raise RobotDoorOpenError("Front door or top window is currently open.")
-            elif self.get_status() == EngineStatus.AWAITING_RECOVERY:
-                raise NotImplementedError()
             else:
                 return action
 
@@ -880,7 +877,7 @@ class CommandView(HasState[CommandState]):
             if not self.get_is_running():
                 raise PauseNotAllowedError("Cannot pause a run that is not running.")
             elif self.get_status() == EngineStatus.AWAITING_RECOVERY:
-                raise NotImplementedError()
+                raise PauseNotAllowedError("Cannot pause a run in recovery mode.")
             else:
                 return action
 
