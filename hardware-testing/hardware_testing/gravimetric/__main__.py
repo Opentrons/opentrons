@@ -582,7 +582,7 @@ if __name__ == "__main__":
     parser.add_argument(
         "--liquid",
         type=str,
-        choices=["water", "water", "glycerol", "hexane"],
+        choices=["water", "ethanol", "glycerol", "hexane"],
         default="water",
     )
     args = parser.parse_args()

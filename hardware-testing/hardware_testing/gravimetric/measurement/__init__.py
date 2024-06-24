@@ -20,14 +20,10 @@ class SupportedLiquid(Enum):
 
     @classmethod
     def from_string(cls, s: str) -> "SupportedLiquid":
-        if s.lower() == "water":
-            return SupportedLiquid.WATER
-        if s.lower() == "ethanol":
-            return SupportedLiquid.ETHANOL
-        if s.lower() == "glycerol":
-            return SupportedLiquid.GLYCEROL
-        if s.lower() == "hexane":
-            return SupportedLiquid.HEXANE
+        for liq in cls:
+            if s.lower() == liq.value.lower():
+                return liq
+        raise ValueError(f"no supported liquid matching {s}")
 
 
 RELATIVE_DENSITY: Dict[SupportedLiquid, float] = {
