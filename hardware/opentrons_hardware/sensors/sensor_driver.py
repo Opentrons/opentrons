@@ -4,7 +4,8 @@ import asyncio
 import csv
 
 from typing import Optional, AsyncIterator, Any, Sequence
-from contextlib import asynccontextmanager
+from contextlib import asynccontextmanager, suppress
+from logging import getLogger
 
 from opentrons_hardware.drivers.can_bus.can_messenger import (
     CanMessenger,
@@ -45,6 +46,8 @@ from opentrons_hardware.firmware_bindings.messages.message_definitions import (
 )
 from .sensor_abc import AbstractSensorDriver
 from .scheduler import SensorScheduler
+
+LOG = getLogger(__name__)
 
 
 class SensorDriver(AbstractSensorDriver):
@@ -256,14 +259,10 @@ class LogListener:
         """Wait for the data to stop, only use this with a send_accumulated_data_request."""
         self.event = asyncio.Event()
         self.expected_ack = message_index
-        start = time.time()
-        while True:
-            await asyncio.sleep(0.2)
-            if self.event.is_set():
-                self.event.clear()
-                break
-            if time.time() - start > wait_time:
-                break
+        with suppress(asyncio.TimeoutError):
+            await asyncio.wait_for(self.event.wait(), wait_time)
+        if not self.event.is_set():
+            LOG.error("Did not receive the full data set from the sensor")
         self.event = None
 
     def __call__(
