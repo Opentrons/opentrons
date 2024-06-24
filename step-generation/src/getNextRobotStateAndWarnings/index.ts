@@ -123,6 +123,7 @@ function _getNextRobotStateAndWarningsSingleCommand(
 
     case 'loadLiquid':
       forLoadLiquid(command.params, invariantContext, robotStateAndWarnings)
+      break
 
     case 'aspirateInPlace':
       forAspirateInPlace(

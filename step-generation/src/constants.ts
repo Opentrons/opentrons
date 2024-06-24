@@ -5,6 +5,8 @@ import {
   TEMPERATURE_MODULE_TYPE,
   THERMOCYCLER_MODULE_TYPE,
   HEATERSHAKER_MODULE_TYPE,
+  ABSORBANCE_READER_TYPE,
+  MAGNETIC_BLOCK_TYPE,
 } from '@opentrons/shared-data'
 
 import type { ModuleType } from '@opentrons/shared-data'
@@ -14,6 +16,8 @@ import type {
   ThermocyclerModuleState,
   HeaterShakerModuleState,
   ModuleState,
+  AbsorbanceReaderState,
+  MagneticBlockState,
 } from './types'
 import type { ModuleModel } from '@opentrons/shared-data'
 
@@ -60,6 +64,9 @@ export const MODULE_INITIAL_STATE_BY_TYPE: {
   [TEMPERATURE_MODULE_TYPE]: TEMPERATURE_MODULE_INITIAL_STATE,
   [THERMOCYCLER_MODULE_TYPE]: THERMOCYCLER_MODULE_INITIAL_STATE,
   [HEATERSHAKER_MODULE_TYPE]: HEATERSHAKER_MODULE_INITIAL_STATE,
+  //  TODO(jr, 6/24/24): add the initial state for absorabance reader
+  [ABSORBANCE_READER_TYPE]: {} as AbsorbanceReaderState,
+  [MAGNETIC_BLOCK_TYPE]: {} as MagneticBlockState,
 }
 export const OT_2_TRASH_DEF_URI = 'opentrons/opentrons_1_trash_1100ml_fixed/1'
 export const FLEX_TRASH_DEF_URI = 'opentrons/opentrons_1_trash_3200ml_fixed/1'

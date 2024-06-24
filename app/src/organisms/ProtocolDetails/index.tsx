@@ -344,9 +344,10 @@ export function ProtocolDetails(
     stats: enableProtocolStats ? (
       <ProtocolStats analysis={mostRecentAnalysis} />
     ) : null,
-    timeline: enableProtocolTimeline ? (
-      <AnnotatedSteps analysis={mostRecentAnalysis} />
-    ) : null,
+    timeline:
+      enableProtocolTimeline && mostRecentAnalysis != null ? (
+        <AnnotatedSteps analysis={mostRecentAnalysis} />
+      ) : null,
     parameters: <ProtocolParameters runTimeParameters={runTimeParameters} />,
   }
 
@@ -696,9 +697,9 @@ export function ProtocolDetails(
                       setCurrentTab('timeline')
                     }}
                   >
-                    <StyledText>
+                    <LegacyStyledText>
                       {i18n.format(t('timeline'), 'capitalize')}
-                    </StyledText>
+                    </LegacyStyledText>
                   </RoundTab>
                 )}
               </Flex>

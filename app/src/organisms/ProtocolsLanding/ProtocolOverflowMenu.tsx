@@ -27,7 +27,6 @@ import {
 } from '../../redux/analytics'
 import {
   analyzeProtocol,
-  editProtocol,
   removeProtocol,
   viewProtocolSourceFolder,
 } from '../../redux/protocol-storage'
@@ -86,7 +85,6 @@ export function ProtocolOverflowMenu(
   const handleClickEdit: React.MouseEventHandler<HTMLButtonElement> = e => {
     e.preventDefault()
     e.stopPropagation()
-    dispatch(editProtocol(protocolKey))
     setShowOverflowMenu(currentShowOverflowMenu => !currentShowOverflowMenu)
   }
   const handleClickRun: React.MouseEventHandler<HTMLButtonElement> = e => {

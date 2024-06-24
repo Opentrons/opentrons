@@ -10,7 +10,7 @@ import {
   Flex,
   Icon,
   SPACING,
-  StyledText,
+  LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { CommandIcon, CommandText } from '../../molecules/Command'
@@ -149,12 +149,12 @@ function AnnotatedGroup(props: AnnotatedGroupProps): JSX.Element {
             alignSelf={ALIGN_FLEX_START}
             gridGap={SPACING.spacing8}
           >
-            <StyledText
+            <LegacyStyledText
               minWidth={SPACING.spacing16}
               fontSize={TYPOGRAPHY.fontSizeCaption}
             >
               {stepNumber}
-            </StyledText>
+            </LegacyStyledText>
             <Flex
               alignItems={ALIGN_CENTER}
               backgroundColor={backgroundColor}
@@ -162,13 +162,13 @@ function AnnotatedGroup(props: AnnotatedGroupProps): JSX.Element {
               borderRadius={BORDERS.borderRadius4}
               padding={SPACING.spacing8}
             >
-              <StyledText
+              <LegacyStyledText
                 as="h3"
                 fontWeight={TYPOGRAPHY.fontWeightSemiBold}
                 marginLeft={SPACING.spacing8}
               >
                 {annotationType}
-              </StyledText>
+              </LegacyStyledText>
               <Icon name="chevron-up" size="2rem" />
             </Flex>
           </Flex>
@@ -191,12 +191,12 @@ function AnnotatedGroup(props: AnnotatedGroupProps): JSX.Element {
         </Flex>
       ) : (
         <Flex alignItems={ALIGN_CENTER} gridGap={SPACING.spacing8}>
-          <StyledText
+          <LegacyStyledText
             minWidth={SPACING.spacing16}
             fontSize={TYPOGRAPHY.fontSizeCaption}
           >
             {stepNumber}
-          </StyledText>
+          </LegacyStyledText>
           <Flex
             alignItems={ALIGN_CENTER}
             backgroundColor={backgroundColor}
@@ -204,13 +204,13 @@ function AnnotatedGroup(props: AnnotatedGroupProps): JSX.Element {
             borderRadius={BORDERS.borderRadius4}
             padding={SPACING.spacing8}
           >
-            <StyledText
+            <LegacyStyledText
               as="h3"
               fontWeight={TYPOGRAPHY.fontWeightSemiBold}
               marginLeft={SPACING.spacing8}
             >
               {annotationType}
-            </StyledText>
+            </LegacyStyledText>
             <Icon name="chevron-down" size="2rem" />
           </Flex>
         </Flex>
@@ -231,12 +231,12 @@ function IndividualCommand(props: IndividualCommandProps): JSX.Element {
   const iconColor = isHighlighted ? COLORS.blue60 : COLORS.grey50
   return (
     <Flex alignItems={ALIGN_CENTER} gridGap={SPACING.spacing8}>
-      <StyledText
+      <LegacyStyledText
         minWidth={SPACING.spacing16}
         fontSize={TYPOGRAPHY.fontSizeCaption}
       >
         {stepNumber}
-      </StyledText>
+      </LegacyStyledText>
       <Flex
         flexDirection={DIRECTION_COLUMN}
         gridGap={SPACING.spacing4}

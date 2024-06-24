@@ -1,8 +1,7 @@
 import * as React from 'react'
 import map from 'lodash/map'
 import reduce from 'lodash/reduce'
-import isEmpty from 'lodash/isEmpty'
-
+import ViewportList from 'react-viewport-list'
 import {
   Flex,
   Box,
@@ -16,19 +15,22 @@ import {
   JUSTIFY_SPACE_BETWEEN,
   ALIGN_STRETCH,
   TYPOGRAPHY,
-  StyledText,
+  LegacyStyledText,
   BaseDeck,
   getLabwareInfoByLiquidId,
-  BORDERS,
 } from '@opentrons/components'
 import { getResultingTimelineFrameFromRunCommands } from '@opentrons/step-generation'
 import {
   FLEX_ROBOT_TYPE,
   getSimplestDeckConfigForProtocol,
 } from '@opentrons/shared-data'
+import { getCommandTextData } from '../../molecules/Command/utils/getCommandTextData'
+import { getWellFillFromLabwareId } from '../Devices/ProtocolRun/SetupLiquids/utils'
+import { CommandText } from '../../molecules/Command'
 
 import type {
   CompletedProtocolAnalysis,
+  LabwareLocation,
   ProtocolAnalysisOutput,
   RobotType,
   RunTimeCommand,
@@ -39,14 +41,8 @@ import type {
   PipetteEntity,
   TimelineFrame,
 } from '@opentrons/step-generation'
-import ViewportList from 'react-viewport-list'
-import { AnnotatedSteps } from '../ProtocolDetails/AnnotatedSteps'
-import { getWellFillFromLabwareId } from '../Devices/ProtocolRun/SetupLiquids/utils'
-import { CommandText } from '../../molecules/Command'
-
 import type { ViewportListRef } from 'react-viewport-list'
 import type { LabwareOnDeck } from '@opentrons/components'
-import { getCommandTextData } from '../../molecules/Command/utils/getCommandTextData'
 
 const COMMAND_WIDTH_PX = 240
 
@@ -84,7 +80,7 @@ export function ProtocolTimelineScrubber(
   const { frame, invariantContext } = getResultingTimelineFrameFromRunCommands(
     currentCommandsSlice
   )
-  const { robotState, command } = frame
+  const { robotState } = frame
 
   const [leftPipetteId] = Object.entries(robotState.pipettes).find(
     ([_pipetteId, pipette]) => pipette?.mount === 'left'
@@ -123,7 +119,9 @@ export function ProtocolTimelineScrubber(
                 moduleModel: invariantContext.moduleEntities[moduleId].model,
                 moduleLocation: { slotName: module.slot },
                 nestedLabwareDef:
-                  invariantContext.labwareEntities[labwareInModuleId]?.def,
+                  labwareInModuleId != null
+                    ? invariantContext.labwareEntities[labwareInModuleId]?.def
+                    : null,
                 nestedLabwareWellFill:
                   labwareInModuleId != null
                     ? getWellFillFromLabwareId(
@@ -139,8 +137,9 @@ export function ProtocolTimelineScrubber(
               if (
                 labware.slot in robotState.modules ||
                 labwareId === 'fixedTrash'
-              )
-                return null
+              ) {
+                return []
+              }
               const definition = invariantContext.labwareEntities[labwareId].def
 
               const missingTips = definition.parameters.isTiprack
@@ -154,8 +153,8 @@ export function ProtocolTimelineScrubber(
                   )
                 : {}
 
-              return {
-                labwareLocation: { slotName: labware.slot },
+              const labwareOnDeck: LabwareOnDeck = {
+                labwareLocation: { slotName: labware.slot } as LabwareLocation,
                 definition,
                 wellFill: getWellFillFromLabwareId(
                   labwareId,
@@ -164,6 +163,8 @@ export function ProtocolTimelineScrubber(
                 ),
                 missingTips,
               }
+
+              return labwareOnDeck
             }).filter((i): i is LabwareOnDeck => i != null)}
           />
         </Flex>
@@ -171,7 +172,7 @@ export function ProtocolTimelineScrubber(
           mount="left"
           pipetteId={leftPipetteId}
           pipetteEntity={leftPipetteEntity}
-          timelineFrame={frame}
+          timelineFrame={frame.robotState}
           invariantContext={invariantContext}
           analysis={analysis}
         />
@@ -179,19 +180,10 @@ export function ProtocolTimelineScrubber(
           mount="right"
           pipetteId={rightPipetteId}
           pipetteEntity={rightPipetteEntity}
-          timelineFrame={frame}
+          timelineFrame={frame.robotState}
           invariantContext={invariantContext}
           analysis={analysis}
         />
-        {/* <Flex
-          backgroundColor={COLORS.white}
-          paddingX={SPACING.spacing4}
-          flex="1 1 0"
-          css={BORDERS.lineBorder}>
-          <AnnotatedSteps
-            analysis={analysis}
-            currentCommandIndex={currentCommandIndex} />
-        </Flex> */}
       </Flex>
       <Flex
         ref={wrapperRef}
@@ -217,9 +209,9 @@ export function ProtocolTimelineScrubber(
           )}
         </ViewportList>
       </Flex>
-      <StyledText as="label" marginY={SPACING.spacing8}>
+      <LegacyStyledText as="label" marginY={SPACING.spacing8}>
         Jump to command
-      </StyledText>
+      </LegacyStyledText>
       <input
         type="range"
         min={1}
@@ -272,45 +264,41 @@ function PipetteMountViz(props: PipetteMountVizProps): JSX.Element | null {
     invariantContext,
     analysis,
   } = props
-  const { robotState } = timelineFrame
   const [showPipetteDetails, setShowPipetteDetails] = React.useState(false)
 
-  const maxVolume = (Object.entries(
-    invariantContext.pipetteEntities[pipetteId]?.tiprackLabwareDef?.wells ?? {}
-  ).find(([_wellName, { totalLiquidVolume }]) => totalLiquidVolume != null) ?? [
-    null,
-    { totalLiquidVolume: 0 },
-  ])[1].totalLiquidVolume
-
-  return (
+  return pipetteEntity == null ? null : (
     <Flex
       alignItems={ALIGN_CENTER}
       flexDirection={DIRECTION_COLUMN}
       maxWidth="4rem"
     >
-      <StyledText
+      <LegacyStyledText
         as="h1"
         textTransform={TEXT_TRANSFORM_UPPERCASE}
         cursor="pointer"
         onClick={() => setShowPipetteDetails(!showPipetteDetails)}
       >
         {mount}
-      </StyledText>
+      </LegacyStyledText>
       {showPipetteDetails ? (
-        <StyledText
+        <LegacyStyledText
           as="p"
           fontSize={TYPOGRAPHY.fontSizeCaption}
           marginY={SPACING.spacing8}
         >
           {pipetteEntity?.spec?.displayName ?? 'none'}
-        </StyledText>
+        </LegacyStyledText>
       ) : null}
       {pipetteEntity != null && pipetteId != null ? (
         <PipetteSideView
-          allNozzlesHaveTips={robotState.tipState.pipettes[pipetteId]}
-          allNozzleTipContents={robotState.liquidState.pipettes[pipetteId]}
+          allNozzlesHaveTips={timelineFrame.tipState.pipettes[pipetteId]}
+          allNozzleTipContents={Object.values(
+            timelineFrame.liquidState.pipettes[pipetteId]
+          )}
           liquidEntities={invariantContext.liquidEntities}
-          maxVolume={maxVolume}
+          //  TODO, figure out this max volume thing
+          maxVolume={1000}
+          // maxVolume={pipetteEntity.spec.liquids[0].maxVolume ?? 0}
           analysis={analysis}
         />
       ) : (
@@ -348,6 +336,7 @@ function PipetteSideView({
               tipContents={allNozzleTipContents[0]}
               liquidEntities={liquidEntities}
               maxVolume={maxVolume}
+              analysis={analysis}
             />
           ) : (
             <path

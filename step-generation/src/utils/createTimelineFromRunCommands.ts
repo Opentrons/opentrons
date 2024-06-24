@@ -1,4 +1,4 @@
-import { RunTimeCommand } from '@opentrons/shared-data'
+import { RunTimeCommand, getModuleDef2 } from '@opentrons/shared-data'
 
 import { getNextRobotStateAndWarnings } from '../getNextRobotStateAndWarnings'
 import { MODULE_INITIAL_STATE_BY_TYPE } from '../constants'
@@ -25,7 +25,7 @@ export function createTimelineFromRunCommands(
   const invariantContext = constructInvariantContextFromRunCommands(commands)
   const pipetteLocations = commands.reduce<RobotState['pipettes']>(
     (acc, command) => {
-      if (command.commandType === 'loadPipette') {
+      if (command.commandType === 'loadPipette' && command.result != null) {
         return {
           ...acc,
           [command.result.pipetteId]: {
@@ -40,14 +40,23 @@ export function createTimelineFromRunCommands(
 
   const labwareLocations = commands.reduce<RobotState['labware']>(
     (acc, command) => {
-      if (command.commandType === 'loadLabware') {
+      if (command.commandType === 'loadLabware' && command.result != null) {
+        let slot
+        if (command.params.location === 'offDeck') {
+          slot = command.params.location
+        } else if ('slotName' in command.params.location) {
+          slot = command.params.location.slotName
+        } else if ('moduleId' in command.params.location) {
+          slot = command.params.location.moduleId
+        } else if ('labwareId' in command.params.location) {
+          slot = command.params.location.labwareId
+        } else {
+          slot = command.params.location.addressableAreaName
+        }
         return {
           ...acc,
           [command.result.labwareId]: {
-            slot:
-              'slotName' in command.params.location
-                ? command.params.location.slotName
-                : command.params.location.moduleId,
+            slot: slot,
           },
         }
       }
@@ -58,15 +67,13 @@ export function createTimelineFromRunCommands(
 
   const moduleLocations = commands.reduce<RobotState['modules']>(
     (acc, command) => {
-      if (command.commandType === 'loadModule') {
+      if (command.commandType === 'loadModule' && command.result != null) {
+        const moduleType = getModuleDef2(command.params.model).moduleType
         return {
           ...acc,
           [command.result.moduleId]: {
             slot: command.params.location.slotName,
-            moduleState:
-              MODULE_INITIAL_STATE_BY_TYPE[
-                command.result.definition.moduleType
-              ],
+            moduleState: MODULE_INITIAL_STATE_BY_TYPE[moduleType],
           },
         }
       }
@@ -103,7 +110,7 @@ export function getResultingTimelineFrameFromRunCommands(
   const invariantContext = constructInvariantContextFromRunCommands(commands)
   const pipetteLocations = commands.reduce<RobotState['pipettes']>(
     (acc, command) => {
-      if (command.commandType === 'loadPipette') {
+      if (command.commandType === 'loadPipette' && command.result != null) {
         return {
           ...acc,
           [command.result.pipetteId]: {
@@ -118,14 +125,23 @@ export function getResultingTimelineFrameFromRunCommands(
 
   const labwareLocations = commands.reduce<RobotState['labware']>(
     (acc, command) => {
-      if (command.commandType === 'loadLabware') {
+      if (command.commandType === 'loadLabware' && command.result != null) {
+        let slot
+        if (command.params.location === 'offDeck') {
+          slot = command.params.location
+        } else if ('slotName' in command.params.location) {
+          slot = command.params.location.slotName
+        } else if ('moduleId' in command.params.location) {
+          slot = command.params.location.moduleId
+        } else if ('labwareId' in command.params.location) {
+          slot = command.params.location.labwareId
+        } else {
+          slot = command.params.location.addressableAreaName
+        }
         return {
           ...acc,
           [command.result.labwareId]: {
-            slot:
-              'slotName' in command.params.location
-                ? command.params.location.slotName
-                : command.params.location.moduleId,
+            slot: slot,
           },
         }
       }
@@ -136,15 +152,13 @@ export function getResultingTimelineFrameFromRunCommands(
 
   const moduleLocations = commands.reduce<RobotState['modules']>(
     (acc, command) => {
-      if (command.commandType === 'loadModule') {
+      if (command.commandType === 'loadModule' && command.result != null) {
+        const moduleType = getModuleDef2(command.params.model).moduleType
         return {
           ...acc,
           [command.result.moduleId]: {
             slot: command.params.location.slotName,
-            moduleState:
-              MODULE_INITIAL_STATE_BY_TYPE[
-                command.result.definition.moduleType
-              ],
+            moduleState: MODULE_INITIAL_STATE_BY_TYPE[moduleType],
           },
         }
       }
