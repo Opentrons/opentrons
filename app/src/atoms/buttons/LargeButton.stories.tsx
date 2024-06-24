@@ -1,5 +1,7 @@
+import * as React from 'react'
 import { ICON_DATA_BY_NAME, VIEWPORT } from '@opentrons/components'
 import { LargeButton } from './'
+import { Box, COLORS, SPACING } from '@opentrons/components'
 
 import type { Meta, StoryObj } from '@storybook/react'
 
@@ -15,7 +17,22 @@ const meta: Meta<typeof LargeButton> = {
       options: Object.keys(ICON_DATA_BY_NAME),
     },
   },
-  parameters: VIEWPORT.touchScreenViewport,
+  parameters: {
+    viewport: {
+      defaultViewport: 'Touchscreen'
+    },
+    pseudo: {
+      rootSelector: '#content'
+    },
+  },
+  decorators: [
+    (Story, context) => (
+      <Box width={'fit-content'} padding={SPACING.spacing32} backgroundColor={['alertStroke', 'alertAlt'].includes(context.args.buttonType) ? COLORS.black90 : COLORS.white }>
+        <Story id={'content'} />
+      </Box>
+    )
+  ],
+
 }
 
 export default meta
@@ -45,26 +62,13 @@ export const Alert: Story = {
     iconName: 'reset',
   },
 }
-export const PrimaryNoIcon: Story = {
-  args: {
-    buttonText: 'Button text',
-    disabled: false,
-  },
-}
-export const PrimaryWithSubtext: Story = {
-  args: {
-    buttonText: 'Button text',
-    disabled: false,
-    subtext: 'Button subtext',
-  },
-}
 
-export const OnColor: Story = {
+export const AlertStroke: Story = {
   args: {
-    buttonType: 'onColor',
+    buttonType: 'alertStroke',
     buttonText: 'Button text',
     disabled: false,
-    subtext: 'Button subtext',
+    iconName: 'ot-alert'
   },
 }
 
@@ -73,6 +77,6 @@ export const AlertAlt: Story = {
     buttonType: 'alertAlt',
     buttonText: 'Button text',
     disabled: false,
-    subtext: 'Button subtext',
+    iconName: 'ot-check'
   },
 }
