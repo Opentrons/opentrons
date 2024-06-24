@@ -1,0 +1,43 @@
+{
+  "metadata": {
+    "name": "Example Labware Repository",
+    "owner": "Opentrons Example App",
+    "lastModifiedDate": "2024-06-11T15:00:00Z"
+  },
+  "123e4567-e89b-12d3-a456-426614174000": {
+    "labwareUri": "http://example.com/labware/123e4567-e89b-12d3-a456-426614174000",
+    "definitionPath": "definitions/labware1.json",
+    "additionalContent": [
+      {
+        "contentMimeType": "image/png",
+        "semanticType": "topViewImage",
+        "contentPath": "images/labware1_top.png"
+      },
+      {
+        "contentMimeType": "image/png",
+        "semanticType": "orthographicViewImage",
+        "contentPath": "images/labware1_ortho.png"
+      }
+    ],
+    "lastEditTimestamp": "2024-06-10T12:00:00Z",
+    "valid": true
+  },
+  "223e4567-e89b-12d3-a456-426614174001": {
+    "labwareUri": "http://example.com/labware/223e4567-e89b-12d3-a456-426614174001",
+    "definitionPath": "definitions/labware2.json",
+    "additionalContent": [
+      {
+        "contentMimeType": "image/jpeg",
+        "semanticType": "longSideViewImage",
+        "contentPath": "images/labware2_long.jpg"
+      },
+      {
+        "contentMimeType": "image/jpeg",
+        "semanticType": "shortSideViewImage",
+        "contentPath": "images/labware2_short.jpg"
+      }
+    ],
+    "lastEditTimestamp": "2024-06-10T13:00:00Z",
+    "valid": false
+  }
+}
