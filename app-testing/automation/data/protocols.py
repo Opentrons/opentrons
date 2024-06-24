@@ -763,14 +763,6 @@ class Protocols:
     ##########################################################################################################
     # Begin Protocol Library Protocols #######################################################################
     ##########################################################################################################
-
-    pl_BCAproteinassay_analysis: Protocol = Protocol(
-        file_stem="pl_BCAproteinassay_analysis",
-        file_extension="json",
-        robot="Flex",
-        app_error=False,
-        robot_error=False
-    )
     pl_96_ch_demo_rtp_with_hs: Protocol = Protocol(
         file_stem="pl_96_ch_demo_rtp_with_hs",
         file_extension="py",
@@ -1063,13 +1055,7 @@ class Protocols:
         app_error=False,
         robot_error=False
     )
-    pl_Uni_of_Montana_Cherrypicking_Flex_for_library_upload: Protocol = Protocol(
-        file_stem="pl_Uni_of_Montana_Cherrypicking_Flex_for_library_upload",
-        file_extension="py",
-        robot="Flex",
-        app_error=False,
-        robot_error=False
-    )
+
     pl_upload_Uni_of_Montana_Normalization_Flex_Final_052324: Protocol = Protocol(
         file_stem="pl_upload_Uni_of_Montana_Normalization_Flex_Final_052324",
         file_extension="py",
