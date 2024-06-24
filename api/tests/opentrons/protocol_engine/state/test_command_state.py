@@ -835,4 +835,5 @@ def test_final_state_after_error_recovery_stop() -> None:
         )
     )
     assert subject_view.get_status() == EngineStatus.FAILED
+    assert subject_view.get_recovery_target() is None
     assert subject_view.get_error() is None
