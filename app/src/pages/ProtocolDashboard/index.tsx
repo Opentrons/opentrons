@@ -15,7 +15,9 @@ import {
   SPACING,
   LegacyStyledText,
 } from '@opentrons/components'
-import { useAllProtocolsQuery } from '@opentrons/react-api-client'
+import {
+  useAllProtocolsQuery,
+} from '@opentrons/react-api-client'
 
 import { SmallButton, FloatingActionButton } from '../../atoms/buttons'
 import { Navigation } from '../../organisms/Navigation'
@@ -42,6 +44,7 @@ export function ProtocolDashboard(): JSX.Element {
   const history = useHistory()
   const { t } = useTranslation('protocol_info')
   const dispatch = useDispatch<Dispatch>()
+
   const [navMenuIsOpened, setNavMenuIsOpened] = React.useState<boolean>(false)
   const [
     longPressModalIsOpened,

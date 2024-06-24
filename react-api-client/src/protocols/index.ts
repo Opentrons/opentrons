@@ -8,3 +8,7 @@ export { useMostRecentSuccessfulAnalysisAsDocumentQuery } from './useMostRecentS
 export { useProtocolAnalysesQuery } from './useProtocolAnalysesQuery'
 export { useProtocolAnalysisAsDocumentQuery } from './useProtocolAnalysisAsDocumentQuery'
 export { useProtocolQuery } from './useProtocolQuery'
+export {
+  useFetchProtocolLibrary,
+  useFetchProtocolFromLibrary,
+} from './useFetchProtocolLibrary'
