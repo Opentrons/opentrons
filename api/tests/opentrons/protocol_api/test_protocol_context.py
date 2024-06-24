@@ -178,6 +178,63 @@ def test_deck(subject: ProtocolContext) -> None:
     assert isinstance(result, Deck)
 
 
+def test_load_instrument_robot_type(
+    decoy: Decoy,
+    mock_core: ProtocolCore,
+    subject: ProtocolContext,
+) -> None:
+    """Non-Flex robot type should raise a ValueError."""
+    mock_tip_racks = [decoy.mock(cls=Labware), decoy.mock(cls=Labware)]
+
+    decoy.when(mock_validation.ensure_lowercase_name("Gandalf")).then_return("gandalf")
+    decoy.when(mock_validation.ensure_pipette_name("gandalf")).then_return(
+        PipetteNameType.P300_SINGLE
+    )
+    decoy.when(
+        mock_validation.ensure_mount_for_pipette(
+            "shadowfax", PipetteNameType.P300_SINGLE
+        )
+    ).then_return(Mount.LEFT)
+    decoy.when(mock_core.robot_type).then_return("OT-2 Standard")
+
+    with pytest.raises(ValueError):
+        subject.load_instrument(
+            instrument_name="Gandalf",
+            mount="shadowfax",
+            tip_racks=mock_tip_racks,
+            liquid_presence_detection=False,
+        )
+
+
+@pytest.mark.parametrize("api_version", [APIVersion(2, 14)])
+def test_load_instrument_api_version(
+    decoy: Decoy,
+    mock_core: ProtocolCore,
+    subject: ProtocolContext,
+) -> None:
+    """Using an API Version prior to 2.19 should raise a APIVersionError."""
+    mock_tip_racks = [decoy.mock(cls=Labware), decoy.mock(cls=Labware)]
+
+    decoy.when(mock_validation.ensure_lowercase_name("Gandalf")).then_return("gandalf")
+    decoy.when(mock_validation.ensure_pipette_name("gandalf")).then_return(
+        PipetteNameType.P300_SINGLE
+    )
+    decoy.when(
+        mock_validation.ensure_mount_for_pipette(
+            "shadowfax", PipetteNameType.P300_SINGLE
+        )
+    ).then_return(Mount.LEFT)
+    decoy.when(mock_core.robot_type).then_return("OT-3 Standard")
+
+    with pytest.raises(APIVersionError):
+        subject.load_instrument(
+            instrument_name="Gandalf",
+            mount="shadowfax",
+            tip_racks=mock_tip_racks,
+            liquid_presence_detection=False,
+        )
+
+
 def test_load_instrument(
     decoy: Decoy,
     mock_core: ProtocolCore,
