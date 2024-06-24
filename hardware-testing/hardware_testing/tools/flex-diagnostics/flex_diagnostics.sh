@@ -47,6 +47,18 @@ gather() {
         ssh -q -o stricthostkeychecking=no -o userknownhostsfile=/dev/null \
             root@$ip 'bash -s' <<- 'EOF'
 
+            serial=$(cat /var/serial || echo "unknown")
+            today=$(date '+%Y_%m_%d_%H_%M_%S')
+            diag_dir="./diag/${serial}_${today}"
+
+            mkdir -p "${diag_dir}"
+            mkdir -p "${diag_dir}/logs"
+            mkdir -p "${diag_dir}/data"
+            mkdir -p "${diag_dir}/system"
+            mkdir -p "${diag_dir}/network"
+
+            echo "Created $diag_dir to hold data"
+
             cleanup() {
                 echo "Cleaning up"
                 rm -rf $diag_dir
@@ -55,18 +67,10 @@ gather() {
             set -eE -o pipefail
             trap cleanup ERR
 
-            serial=$(cat /var/serial || echo "unknown")
-            today=$(date '+%Y_%m_%d_%H_%M_%S')
-            diag_dir="./diag/${serial}_${today}"
-            echo "Created $diag_dir to hold data"
-
-            mkdir -p "${diag_dir}"
-            mkdir -p "${diag_dir}/logs"
-            mkdir -p "${diag_dir}/data"
-            mkdir -p "${diag_dir}/system"
-
             echo "Gathering /data files"
             cp -r /data/* $diag_dir/data/
+            cp -r /etc/VERSION.json $diag_dir/data/
+            cp -r /var/serial $diag_dir/data/
             
             echo "Gathering logs"
             shopt -s extglob
@@ -74,19 +78,33 @@ gather() {
             journalctl --boot > $diag_dir/logs/journal.log
             dmesg > $diag_dir/logs/dmesg.log
 
-            echo "Gathering system memory state"
-            top -b -n 10 > $diag_dir/system/top.txt
+            echo "Gathering system state"
+            uname -a > $diag_dir/system/uname.txt
+            ps aux > $diag_dir/system/psaux.txt
+            top -c -b -n 10 > $diag_dir/system/top.txt
             free -wl -c 10 -s 10 > $diag_dir/system/free.txt
+            date > $diag_dir/system/datetime.txt
+            uptime > $diag_dir/system/uptime.txt
+
+            echo "Gathering network info"
+            /sbin/ifconfig > $diag_dir/network/network.txt
+            echo -e "\n\n" >> $diag_dir/network/network.txt
+            /sbin/ip --details link show >> $diag_dir/network/network.txt
+            echo -e "\n\n" >> $diag_dir/network/network.txt
+            ( nmcli dev list || nmcli dev show ) 2>/dev/null |
+                grep DNS >> $diag_dir/network/network.txt
+
+            echo "Downloading releases.json"
+            wget https://builds.opentrons.com/ot3-oe/releases.json -P $diag_dir/network/
 
             echo "Gathering systemd service state"
             systemctl status > $diag_dir/system/services_overview.txt
             systemctl status opentrons* >> $diag_dir/system/opentrons_services.txt
 
             if [  -d "$diag_dir" ]; then
-                tarfile="./diag/${serial}_${today}_diag.tar.gz"
+                tarfile="${serial}_${today}_diag.tar.gz"
                 echo "Creating Tarball ${tarfile}"
-                tar -zcvf $tarfile $diag_dir
-                mv $tarfile ~/
+                tar -zcvf $tarfile -C ./diag .
             fi
 
             cleanup
@@ -97,8 +115,8 @@ EOF
             root@$ip:*diag.tar.gz .
 
         # clean up
-         ssh -q -o stricthostkeychecking=no -o userknownhostsfile=/dev/null \
-             root@$ip 'rm -rf *diag*'
+        ssh -q -o stricthostkeychecking=no -o userknownhostsfile=/dev/null \
+            root@$ip 'rm -rf *diag*'
     done
 }
 
