@@ -183,7 +183,6 @@ class HardwareTipHandler(TipHandler):
             except TipNotAttachedError:
                 raise
             else:
-                # breakpoint()
                 self._hardware_api.cache_tip(hw_mount, actual_tip_length)
 
             await self._hardware_api.prepare_for_aspirate(hw_mount)
