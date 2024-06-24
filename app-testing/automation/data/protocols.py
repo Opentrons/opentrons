@@ -899,7 +899,6 @@ class Protocols:
         robot="Flex",
         app_error=False,
         robot_error=False,
-        custom_labware=["Eppendorf_96_Well_Plate_150_uL"]
     )
     pl_KAPA_Library_Quant_48_v8: Protocol = Protocol(
         file_stem="pl_KAPA_Library_Quant_48_v8",
