@@ -9,7 +9,9 @@ from pathlib import Path
 from opentrons.protocol_engine import ModuleModel, commands
 
 from opentrons.protocol_reader import ProtocolReader
-from opentrons.protocol_runner import create_simulating_orchestrator
+from opentrons.protocol_runner.create_simulating_orchestrator import (
+    create_simulating_orchestrator,
+)
 
 
 @pytest.fixture()

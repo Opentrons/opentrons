@@ -33,7 +33,11 @@ from opentrons.protocol_reader import (
     ProtocolFilesInvalidError,
     ProtocolSource,
 )
-from opentrons.protocol_runner import create_simulating_orchestrator, RunResult
+from opentrons.protocol_runner.create_simulating_orchestrator import (
+    create_simulating_orchestrator,
+)
+from opentrons.protocol_runner import RunResult
+
 from opentrons.protocol_engine import (
     Command,
     ErrorOccurrence,

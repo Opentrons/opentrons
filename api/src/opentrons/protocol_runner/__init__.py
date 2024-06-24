@@ -12,13 +12,11 @@ from .protocol_runner import (
     LiveRunner,
     AnyRunner,
 )
-from .create_simulating_orchestrator import create_simulating_orchestrator
 from .run_orchestrator import RunOrchestrator
 
 __all__ = [
     "AbstractRunner",
     "RunResult",
-    "create_simulating_orchestrator",
     "create_protocol_runner",
     "JsonRunner",
     "PythonAndLegacyRunner",
