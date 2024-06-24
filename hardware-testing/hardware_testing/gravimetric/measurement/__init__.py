@@ -13,6 +13,8 @@ from hardware_testing.drivers import asair_sensor
 
 
 class SupportedLiquid(Enum):
+    """Liquids supported by gravimetric calculations."""
+
     WATER = "water"
     ETHANOL = "ethanol"
     GLYCEROL = "glycerol"
@@ -20,6 +22,7 @@ class SupportedLiquid(Enum):
 
     @classmethod
     def from_string(cls, s: str) -> "SupportedLiquid":
+        """Get SupportedLiquid enum from string."""
         for liq in cls:
             if s.lower() == liq.value.lower():
                 return liq
