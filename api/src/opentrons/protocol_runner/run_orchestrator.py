@@ -1,6 +1,6 @@
 """Engine/Runner provider."""
 from __future__ import annotations
-from typing import Optional, Union, List, Dict, AsyncGenerator, Callable
+from typing import Optional, Union, List, Dict, AsyncGenerator
 
 from anyio import move_on_after
 

@@ -10,7 +10,7 @@ from typing import Union
 
 from opentrons.protocols.api_support.types import APIVersion
 from opentrons.protocol_engine import ProtocolEngine
-from opentrons.protocol_engine.types import PostRunHardwareState, DeckType
+from opentrons.protocol_engine.types import PostRunHardwareState
 from opentrons.protocol_engine import commands as pe_commands
 from opentrons.hardware_control import API as HardwareAPI
 from opentrons.protocol_reader import (
@@ -26,7 +26,6 @@ from opentrons.protocol_runner.protocol_runner import (
     LiveRunner,
 )
 from opentrons.protocols.parse import PythonParseMode
-from opentrons_shared_data.robot.dev_types import RobotType
 
 
 @pytest.fixture
