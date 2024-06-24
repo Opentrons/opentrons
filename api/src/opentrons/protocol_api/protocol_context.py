@@ -930,11 +930,17 @@ class ProtocolContext(CommandPublisher):
             f"Loading {checked_instrument_name} on {checked_mount.name.lower()} mount"
         )
 
-        if self._core.robot_type != "OT-3 Standard" or self._api_version < APIVersion(2, 19) and liquid_presence_detection != None:
+        if (
+            self._core.robot_type is not "OT-3 Standard"
+            or self._api_version < APIVersion(2, 19)
+            and liquid_presence_detection is not None
+        ):
             raise APIVersionError(
                 "Liquid Presence Detection is only supported on Flex protocols in API Version 2.19 and above."
             )
-        elif self._api_version >= APIVersion(2, 19) and liquid_presence_detection == None:
+        elif (
+            self._api_version >= APIVersion(2, 19) and liquid_presence_detection is None
+        ):
             instrument_core = self._core.load_instrument(
                 instrument_name=checked_instrument_name,
                 mount=checked_mount,
