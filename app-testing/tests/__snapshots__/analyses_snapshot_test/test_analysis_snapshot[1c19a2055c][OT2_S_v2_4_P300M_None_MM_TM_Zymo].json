@@ -373,20 +373,6 @@
               ]
             }
           ],
-          "liquidProbeParameters": {
-            "minimumHeight": [
-              {
-                "applicableWells": [],
-                "value": 0.5
-              }
-            ],
-            "minimumWellVolume": [
-              {
-                "applicableWells": [],
-                "value": 0.0
-              }
-            ]
-          },
           "metadata": {
             "displayCategory": "wellPlate",
             "displayName": "NEST 96 Deep Well Plate 2mL",
@@ -2092,20 +2078,6 @@
               ]
             }
           ],
-          "liquidProbeParameters": {
-            "minimumHeight": [
-              {
-                "applicableWells": [],
-                "value": 0.5
-              }
-            ],
-            "minimumWellVolume": [
-              {
-                "applicableWells": [],
-                "value": 0.0
-              }
-            ]
-          },
           "metadata": {
             "displayCategory": "aluminumBlock",
             "displayName": "Opentrons 96 Well Aluminum Block with NEST Well Plate 100 µL",
@@ -3163,20 +3135,6 @@
               ]
             }
           ],
-          "liquidProbeParameters": {
-            "minimumHeight": [
-              {
-                "applicableWells": [],
-                "value": 0.5
-              }
-            ],
-            "minimumWellVolume": [
-              {
-                "applicableWells": [],
-                "value": 0.0
-              }
-            ]
-          },
           "metadata": {
             "displayCategory": "reservoir",
             "displayName": "NEST 1 Well Reservoir 195 mL",
@@ -3275,20 +3233,6 @@
               ]
             }
           ],
-          "liquidProbeParameters": {
-            "minimumHeight": [
-              {
-                "applicableWells": [],
-                "value": 0.5
-              }
-            ],
-            "minimumWellVolume": [
-              {
-                "applicableWells": [],
-                "value": 0.0
-              }
-            ]
-          },
           "metadata": {
             "displayCategory": "reservoir",
             "displayName": "NEST 12 Well Reservoir 15 mL",
@@ -3530,20 +3474,6 @@
               ]
             }
           ],
-          "liquidProbeParameters": {
-            "minimumHeight": [
-              {
-                "applicableWells": [],
-                "value": 0.5
-              }
-            ],
-            "minimumWellVolume": [
-              {
-                "applicableWells": [],
-                "value": 0.0
-              }
-            ]
-          },
           "metadata": {
             "displayCategory": "reservoir",
             "displayName": "NEST 12 Well Reservoir 15 mL",
