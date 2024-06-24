@@ -38,7 +38,7 @@ from .config import (
     get_tip_volumes_for_qc,
 )
 from .measurement.record import GravimetricRecorder
-from .measurement import DELAY_FOR_MEASUREMENT
+from .measurement import DELAY_FOR_MEASUREMENT, SupportedLiquid
 from .measurement.scale import Scale
 from .trial import TestResources, _change_pipettes
 from .tips import get_tips
@@ -582,7 +582,7 @@ if __name__ == "__main__":
     parser.add_argument(
         "--liquid",
         type=str,
-        choices=["water", "ethanol", "glycerol", "hexane"],
+        choices=[liq.value.lower() for liq in SupportedLiquid],
         default="water",
     )
     args = parser.parse_args()
