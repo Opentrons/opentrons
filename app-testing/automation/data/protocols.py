@@ -848,7 +848,7 @@ class Protocols:
         robot="Flex",
         app_error=False,
         robot_error=False,
-        custom_labware=["BioRad_96_Well_Plate_200 µL"]
+        custom_labware=["BioRad_96_Well_Plate_200_uL"]
     )
     pl_ExpressPlex_Pooling_Final: Protocol = Protocol(
         file_stem="pl_ExpressPlex_Pooling_Final",
@@ -870,7 +870,7 @@ class Protocols:
         robot="Flex",
         app_error=False,
         robot_error=False,
-        custom_labware=["Thermo_96_Well_Plate_2200_µL"]
+        custom_labware=["Thermo_96_Well_Plate_2200_uL"]
     )
     pl_Hyperplus_tiptracking_V4_final: Protocol = Protocol(
         file_stem="pl_Hyperplus_tiptracking_V4_final",
@@ -899,7 +899,7 @@ class Protocols:
         robot="Flex",
         app_error=False,
         robot_error=False,
-        custom_labware=["Eppendorf_96_Well_Plate_150_µL"]
+        custom_labware=["Eppendorf_96_Well_Plate_150_uL"]
     )
     pl_KAPA_Library_Quant_48_v8: Protocol = Protocol(
         file_stem="pl_KAPA_Library_Quant_48_v8",
@@ -978,7 +978,7 @@ class Protocols:
         robot="Flex",
         app_error=False,
         robot_error=False,
-        custom_labware=["Axygen_96_Well_Plate_200_µL"]
+        custom_labware=["Axygen_96_Well_Plate_200_uL"]
     )
     pl_Omega_HDQ_DNA_Bacteria_Flex_96_channel: Protocol = Protocol(
         file_stem="pl_Omega_HDQ_DNA_Bacteria_Flex_96_channel",
