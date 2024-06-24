@@ -15,7 +15,7 @@ from .types import PostRunHardwareState, DeckConfigurationType
 
 # TODO(mm, 2023-06-16): Arguably, this not being a context manager makes us prone to forgetting to
 # clean it up properly, especially in tests. See e.g. https://opentrons.atlassian.net/browse/RSS-222
-from ..protocol_runner import RunOrchestrator, LiveRunner
+from .engine_support import create_run_orchestrator
 
 
 async def create_protocol_engine(
@@ -116,21 +116,9 @@ async def _protocol_engine(
     )
 
     # TODO(tz, 6-20-2024): This feels like a hack, we should probably return the orchestrator instead of pe.
-    orchestrator = RunOrchestrator(
+    orchestrator = create_run_orchestrator(
         hardware_api=hardware_api,
         protocol_engine=protocol_engine,
-        setup_runner=LiveRunner(
-            protocol_engine=protocol_engine,
-            hardware_api=hardware_api,
-        ),
-        fixit_runner=LiveRunner(
-            protocol_engine=protocol_engine,
-            hardware_api=hardware_api,
-        ),
-        protocol_live_runner=LiveRunner(
-            protocol_engine=protocol_engine,
-            hardware_api=hardware_api,
-        ),
     )
     try:
         # TODO(mm, 2023-11-21): Callers like opentrons.execute need to be able to pass in

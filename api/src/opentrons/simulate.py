@@ -41,9 +41,9 @@ from opentrons.hardware_control.types import HardwareFeatureFlags
 from opentrons.hardware_control.simulator_setup import load_simulator
 from opentrons.protocol_api.core.engine import ENGINE_CORE_API_VERSION
 from opentrons.protocol_api.protocol_context import ProtocolContext
-from opentrons.protocol_engine import create_protocol_engine
 from opentrons.protocol_engine.create_protocol_engine import (
     create_protocol_engine_in_thread,
+    create_protocol_engine,
 )
 from opentrons.protocol_engine.state.config import Config
 from opentrons.protocol_engine.types import DeckType, EngineStatus, PostRunHardwareState

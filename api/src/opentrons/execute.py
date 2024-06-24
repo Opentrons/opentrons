@@ -58,8 +58,10 @@ from opentrons.protocol_engine import (
     Config,
     DeckType,
     EngineStatus,
-    create_protocol_engine,
+)
+from opentrons.protocol_engine.create_protocol_engine import (
     create_protocol_engine_in_thread,
+    create_protocol_engine,
 )
 from opentrons.protocol_engine.types import PostRunHardwareState
 
