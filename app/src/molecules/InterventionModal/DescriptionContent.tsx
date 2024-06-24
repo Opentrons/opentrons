@@ -25,8 +25,6 @@ export function DescriptionContent(
     <Flex
       flexDirection={DIRECTION_COLUMN}
       gap={SPACING.spacing24}
-      paddingX={SPACING.spacing12}
-      paddingY={SPACING.spacing4}
       css={`
         gap: ${SPACING.spacing16} @media:
           ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {

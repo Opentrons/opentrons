@@ -79,8 +79,13 @@ export function InlineNotification(
       flexDirection={DIRECTION_ROW}
       gridGap={SPACING.spacing12}
       justifyContent={JUSTIFY_SPACE_BETWEEN}
-      padding={`${SPACING.spacing12} ${SPACING.spacing16}`}
       width={hug ? 'max-content' : '100%'}
+      css={css`
+        padding: ${SPACING.spacing4} ${SPACING.spacing12};
+        @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
+          padding: ${SPACING.spacing12} ${SPACING.spacing16};
+        }
+      `}
     >
       <Box
         css={css`
@@ -107,7 +112,7 @@ export function InlineNotification(
             {fullHeading}
           </span>
           {/* this break is because the desktop wants this on two lines, but also wants/
-            inline text layout on ODD. Soooo here you go */}
+              inline text layout on ODD. Soooo here you go */}
           <br
             css={`
               @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
