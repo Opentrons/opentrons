@@ -181,15 +181,16 @@ export function ProtocolCard(props: ProtocolCardProps): JSX.Element {
     }
   }
 
+  let pushedBackgroundColor = 'COLORS.grey50'
+  if (isFailedAnalysis) {
+    pushedBackgroundColor = COLORS.red40
+  } else if (isRequiredCSV) {
+    pushedBackgroundColor = COLORS.yellow40
+  }
+
   const PUSHED_STATE_STYLE = css`
     &:active {
-      background-color: ${longpress.isLongPressed
-        ? ''
-        : isFailedAnalysis
-        ? COLORS.red40
-        : isRequiredCSV
-        ? COLORS.yellow40
-        : COLORS.grey50};
+      background-color: ${longpress.isLongPressed ? '' : pushedBackgroundColor};
     }
   `
 
