@@ -8,6 +8,7 @@ import {
   POSITION_FIXED,
   SPACING,
   LegacyStyledText,
+  JUSTIFY_CENTER,
 } from '@opentrons/components'
 
 import { getTopPortalEl } from '../../App/portal'
@@ -106,6 +107,8 @@ export function SelectDestWells(props: SelectDestWellsProps): JSX.Element {
       setSelectedWells({})
     },
   }
+  const labwareDefinition =
+    state.destination === 'source' ? state.source : state.destination
 
   return (
     <>
@@ -132,6 +135,7 @@ export function SelectDestWells(props: SelectDestWellsProps): JSX.Element {
         top={SPACING.spacing8}
       />
       <Flex
+        justifyContent={JUSTIFY_CENTER}
         marginTop={SPACING.spacing120}
         padding={`${SPACING.spacing16} ${SPACING.spacing60} ${SPACING.spacing40} ${SPACING.spacing60}`}
         position={POSITION_FIXED}
@@ -140,7 +144,13 @@ export function SelectDestWells(props: SelectDestWellsProps): JSX.Element {
         width="100%"
       >
         {state.destination != null && state.source != null ? (
-          <Flex width="75%">
+          <Flex
+            width={
+              labwareDefinition?.parameters.format === '384Standard'
+                ? '100%'
+                : '75%'
+            }
+          >
             <WellSelection
               definition={
                 state.destination === 'source'
