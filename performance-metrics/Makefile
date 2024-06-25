@@ -87,8 +87,8 @@ push-no-restart-ot3: sdist
 push-ot3: push-no-restart-ot3
 	$(call restart-service,$(host),$(ssh_key),$(ssh_opts),"opentrons-robot-server")
 
-.PHONY: update-robot-version
-update-robot-version:
+.PHONY: override-robot-version
+override-robot-version:
 	$(eval update_dict := '{"opentrons_api_version": "$(version)", "update_server_version": "$(version)", "robot_server_version": "$(version)", "server_utils_version": "$(version)", "opentrons_hardware_version": "$(version)"}')
 	$(call sync-version-file,$(host),$(ssh_key),$(ssh_opts),'$(update_dict)')
 	$(call restart-service,$(host),$(ssh_key),$(ssh_opts),"opentrons-robot-server")

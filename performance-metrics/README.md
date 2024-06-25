@@ -21,7 +21,7 @@ make -C robot-server dev-ot2
 
 ### Testing against real OT-2
 
-To push development packages to OT-2 run the following command from the root directory of this repo (assumes you have the `host` environment variable set)
+To push development packages to OT-2 run the following commands from the root directory of this repo:
 
 ```bash
 make -C performance-metrics push-no-restart host=<ot2-ip>
@@ -51,12 +51,13 @@ Go to your app -> Settings -> General and find your app version
 Then run
 
 ```bash
-make -C performance-metrics update-robot-version version=<app-version> host=<robot-ip>
+make -C performance-metrics override-robot-version version=<app-version> host=<robot-ip>
 ```
+this will make the app think that the robot is on the same version
 
 ### Enabling performance-metrics feature flag
 
-Performance metrics usage is hidden behind a feature flag. To enable it run the following command (assumes you have the `host` environment variable set):
+Performance metrics usage is hidden behind a feature flag. To enable it run the following command:
 
 ```bash
 make set-performance-metrics-ff host=<ip>
