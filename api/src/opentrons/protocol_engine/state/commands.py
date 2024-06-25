@@ -438,12 +438,15 @@ class CommandStore(HasState[CommandState], HandlesActions):
             if self._config.block_on_door_open:
                 if action.door_state == DoorState.OPEN:
                     self._state.is_door_blocking = True
-                    if self._state.queue_status != QueueStatus.SETUP:
-                        self._state.queue_status = (
-                            QueueStatus.AWAITING_RECOVERY_PAUSED
-                            if self._state.queue_status == QueueStatus.AWAITING_RECOVERY
-                            else QueueStatus.PAUSED
-                        )
+                    match self._state.queue_status:
+                        case QueueStatus.SETUP:
+                            pass
+                        case QueueStatus.RUNNING | QueueStatus.PAUSED:
+                            self._state.queue_status = QueueStatus.PAUSED
+                        case QueueStatus.AWAITING_RECOVERY | QueueStatus.AWAITING_RECOVERY_PAUSED:
+                            self._state.queue_status = (
+                                QueueStatus.AWAITING_RECOVERY_PAUSED
+                            )
                 elif action.door_state == DoorState.CLOSED:
                     self._state.is_door_blocking = False
 

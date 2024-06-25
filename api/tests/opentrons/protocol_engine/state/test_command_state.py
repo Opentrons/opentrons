@@ -436,7 +436,9 @@ def test_door_during_protocol_phase() -> None:
     with pytest.raises(RobotDoorOpenError):
         subject_view.validate_action_allowed(play)
 
-    # Test state after we close the door:
+    # Test state after we close the door (with an extra open-close for good measure)
+    subject.handle_action(actions.DoorChangeAction(DoorState.CLOSED))
+    subject.handle_action(actions.DoorChangeAction(DoorState.OPEN))
     subject.handle_action(actions.DoorChangeAction(DoorState.CLOSED))
     assert subject_view.get_status() == EngineStatus.PAUSED
     assert subject_view.get_next_to_execute() is None
@@ -518,7 +520,9 @@ def test_door_during_error_recovery() -> None:
     with pytest.raises(RobotDoorOpenError):
         subject_view.validate_action_allowed(play)
 
-    # Test state after we close the door:
+    # Test state after we close the door (with an extra open-close for good measure)
+    subject.handle_action(actions.DoorChangeAction(DoorState.CLOSED))
+    subject.handle_action(actions.DoorChangeAction(DoorState.OPEN))
     subject.handle_action(actions.DoorChangeAction(DoorState.CLOSED))
     assert subject_view.get_status() == EngineStatus.AWAITING_RECOVERY_PAUSED
     assert subject_view.get_next_to_execute() is None
