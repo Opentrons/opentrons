@@ -541,6 +541,7 @@ __all__ = [
     "magnetic_module",
     "temperature_module",
     "thermocycler",
+    "absorbance_reader",
     # calibration command bundle
     "calibration",
     # configure pipette volume command bundle

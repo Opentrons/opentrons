@@ -523,6 +523,7 @@ class MagneticBlockCore(NonConnectedModuleCore, AbstractMagneticBlockCore):
 class AbsorbanceReaderCore(ModuleCore, AbstractAbsorbanceReaderCore):
     """Absorbance Reader core logic implementation for Python protocols."""
 
+    _lid_id: str
     _sync_module_hardware: SynchronousAdapter[hw_modules.AbsorbanceReader]
     _initialized_value: Optional[int] = None
 

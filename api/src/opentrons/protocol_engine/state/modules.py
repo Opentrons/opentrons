@@ -578,18 +578,17 @@ class ModuleStore(HasState[ModuleState], HandlesActions):
                 configured_wavelength=configured_wavelength,
                 is_lid_on=False,
                 measured=True,
-                data=command.result.data,
+                data=None,
             )
 
         elif isinstance(command.result, absorbance_reader.CloseLidResult):
-            breakpoint()
             self._state.substate_by_module_id[module_id] = AbsorbanceReaderSubState(
                 module_id=AbsorbanceReaderId(module_id),
                 configured=configured,
                 configured_wavelength=configured_wavelength,
                 is_lid_on=True,
                 measured=True,
-                data=command.result.data,
+                data=None,
             )
 
 

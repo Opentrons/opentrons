@@ -6,7 +6,6 @@ from typing_extensions import Type
 from pydantic import BaseModel, Field
 
 from ..command import AbstractCommandImpl, BaseCommand, BaseCommandCreate, SuccessData
-from ..move_labware import MoveLabwareResult
 from ...errors.error_occurrence import ErrorOccurrence
 from opentrons.protocol_engine.types import (
     LabwareOffsetVector,
@@ -42,9 +41,22 @@ class OpenLidParams(BaseModel):
     )
 
 
-class OpenLidResult(MoveLabwareResult):
+class OpenLidResult(BaseModel):
     """Result data from opening the lid on an aborbance reading."""
 
+    offsetId: Optional[str] = Field(
+        # Default `None` instead of `...` so this field shows up as non-required in
+        # OpenAPI. The server is allowed to omit it or make it null.
+        None,
+        description=(
+            "An ID referencing the labware offset that will apply to this labware"
+            " now that it's in the new location."
+            " This offset will be in effect until the labware is moved"
+            " with another `moveLabware` command."
+            " Null or undefined means no offset applies,"
+            " so the default of (0, 0, 0) will be used."
+        ),
+    )
 
 class OpenLidImpl(AbstractCommandImpl[OpenLidParams, SuccessData[OpenLidResult, None]]):
     """Execution implementation of opening the lid on an Absorbance Reader."""
@@ -62,57 +74,51 @@ class OpenLidImpl(AbstractCommandImpl[OpenLidParams, SuccessData[OpenLidResult, 
 
     async def execute(self, params: OpenLidParams) -> SuccessData[OpenLidResult, None]:
         """Move the absorbance reader lid from the module to the lid dock."""
-        abs_reader_substate = self._state_view.modules.get_absorbance_reader_substate(
+        mod_substate = self._state_view.modules.get_absorbance_reader_substate(
             module_id=params.moduleId
         )
-        abs_reader_substate.raise_if_lid_status_not_expected(lid_on_expected=True)
+        # Make sure the lid is closed
+        mod_substate.raise_if_lid_status_not_expected(lid_on_expected=True)
 
-        # lid is on the module
+         # Allow propagation of ModuleNotAttachedError.
+        mod_hw = self._equipment.get_module_hardware_api(
+            mod_substate.module_id
+        )
+
+        # lid should currently be on the module
         lid_id = self._state_view.labware.get_id_by_module(
-            abs_reader_substate.module_id
+            mod_substate.module_id
         )
-        current_lid = self._state_view.labware.get(lid_id)
-        assert labware_validation.is_absorbance_reader_lid(current_lid.loadName)
+        loaded_lid = self._state_view.labware.get(lid_id)
+        assert labware_validation.is_absorbance_reader_lid(loaded_lid.loadName)
 
-        # lid_dock_loc = self._state_view.modules.get_lid_dock_slot(abs_reader_substate.module_id)
-        lid_dock_loc = AddressableAreaLocation(
-            addressableAreaName="absorbanceReaderV1LidDockD4"
+        current_location = loaded_lid.location
+        validated_current_location = self._state_view.geometry.ensure_valid_gripper_location(
+            current_location
         )
 
-        new_offset_id = None
-        # new_offset_id = self._equipment.find_applicable_labware_offset_id(
-        #     labware_definition_uri=current_lid.definitionUri,
-        #     labware_location=lid_dock_loc,
-        # )
-
-        validated_current_loc = self._state_view.geometry.ensure_valid_gripper_location(
-            current_lid.location
-        )
-        validated_new_loc = self._state_view.geometry.ensure_valid_gripper_location(
-            lid_dock_loc
+        # we need to move the lid to the lid dock
+        new_location = self._state_view.modules.get_lid_dock_location(mod_substate.module_id)
+        validated_new_location = self._state_view.geometry.ensure_valid_gripper_location(
+            new_location
         )
         # TODO (AA): we probably don't need this, but let's keep it until we're sure
         user_offset_data = LabwareMovementOffsetData(
             pickUpOffset=params.pickUpOffset or LabwareOffsetVector(x=0, y=0, z=0),
             dropOffset=params.dropOffset or LabwareOffsetVector(x=0, y=0, z=0),
         )
-
-        # Allow propagation of ModuleNotAttachedError.
-        abs_reader = self._equipment.get_module_hardware_api(
-            abs_reader_substate.module_id
+        # Skips gripper moves when using virtual gripper
+        await self._labware_movement.move_labware_with_gripper(
+            labware_id=loaded_lid.id,
+            current_location=validated_current_location,
+            new_location=validated_new_location,
+            user_offset_data=user_offset_data,
+            post_drop_slide_offset=None,
         )
-
-        new_offset_id = None
-        if abs_reader is not None:
-
-            # Skips gripper moves when using virtual gripper
-            await self._labware_movement.move_labware_with_gripper(
-                labware_id=current_lid.id,
-                current_location=validated_current_loc,
-                new_location=validated_new_loc,
-                user_offset_data=user_offset_data,
-                post_drop_slide_offset=None,
-            )
+        new_offset_id = self._equipment.find_applicable_labware_offset_id(
+            labware_definition_uri=loaded_lid.definitionUri,
+            labware_location=new_location,
+        )
         return SuccessData(
             public=OpenLidResult(offsetId=new_offset_id),
             private=None,

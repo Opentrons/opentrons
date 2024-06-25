@@ -174,6 +174,7 @@ LabwareLocation = Union[
     OnLabwareLocation,
     _OffDeckLocationType,
     AddressableAreaLocation,
+    StagingSlotLocation,
 ]
 """Union of all locations where it's legal to keep a labware."""
 
