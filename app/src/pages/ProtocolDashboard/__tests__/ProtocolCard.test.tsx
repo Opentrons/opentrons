@@ -196,6 +196,12 @@ describe('ProtocolCard', () => {
   // ToDO (kk:06/18/2024)this test case will be updated
   it('should render text, yellow background color, and icon when a protocol requires a csv file', () => {
     vi.mocked(useFeatureFlag).mockReturnValue(true)
+    vi.mocked(useProtocolAnalysisAsDocumentQuery).mockReturnValue({
+      data: { result: 'parameter-value-required' } as any,
+    } as UseQueryResult<CompletedProtocolAnalysis>)
+    vi.mocked(useMostRecentSuccessfulAnalysisAsDocumentQuery).mockReturnValue({
+      data: { result: 'parameter-value-required' } as any,
+    } as UseQueryResult<CompletedProtocolAnalysis>)
     render({ ...props, protocol: mockProtocolWithCSV })
     screen.getByLabelText('requiresCsv_file_icon')
     screen.getByText('Requires CSV')
