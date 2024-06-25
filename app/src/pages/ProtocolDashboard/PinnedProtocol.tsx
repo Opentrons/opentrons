@@ -105,13 +105,11 @@ export function PinnedProtocol(props: PinnedProtocolProps): JSX.Element {
     }
   }, [longpress.isLongPressed, longPress])
 
+  const pushedBackgroundColor =
+    enableCsvFile && isRequiredCSV ? COLORS.yellow40 : COLORS.grey50
   const PUSHED_STATE_STYLE = css`
     &:active {
-      background-color: ${longpress.isLongPressed
-        ? ''
-        : enableCsvFile && isRequiredCSV
-        ? COLORS.yellow40
-        : COLORS.grey50};
+      background-color: ${longpress.isLongPressed ? '' : pushedBackgroundColor};
     }
   `
 
