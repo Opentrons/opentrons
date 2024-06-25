@@ -212,6 +212,7 @@ class PipetteHandlerProvider(Generic[MountType]):
                 "blow_out_flow_rate",
                 "working_volume",
                 "tip_overlap",
+                "versioned_tip_overlap",
                 "available_volume",
                 "return_tip_height",
                 "default_aspirate_flow_rates",

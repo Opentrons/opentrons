@@ -48,6 +48,8 @@ from opentrons.protocols.api_support.definitions import MAX_SUPPORTED_VERSION
 from opentrons.protocols.api_support.types import APIVersion
 from opentrons.types import Location, Mount, MountType, Point
 
+from ... import versions_below, versions_at_or_above
+
 
 @pytest.fixture
 def mock_engine_client(decoy: Decoy) -> EngineClient:
@@ -1228,3 +1230,47 @@ def test_is_tip_tracking_available(
         mock_engine_client.state.pipettes.get_primary_nozzle(subject.pipette_id)
     ).then_return(primary_nozzle)
     assert subject.is_tip_tracking_available() == expected_result
+
+
+@pytest.mark.parametrize("version", versions_below(APIVersion(2, 19), flex_only=False))
+def test_configure_for_volume_pre_219(
+    decoy: Decoy,
+    mock_engine_client: EngineClient,
+    mock_protocol_core: ProtocolCore,
+    subject: InstrumentCore,
+    version: APIVersion,
+) -> None:
+    """Configure_for_volume should specify overlap version."""
+    decoy.when(mock_protocol_core.api_version).then_return(version)
+    subject.configure_for_volume(123.0)
+    decoy.verify(
+        mock_engine_client.execute_command(
+            cmd.ConfigureForVolumeParams(
+                pipetteId=subject.pipette_id,
+                volume=123.0,
+                tipOverlapNotAfterVersion="v0",
+            )
+        )
+    )
+
+
+@pytest.mark.parametrize("version", versions_at_or_above(APIVersion(2, 19)))
+def test_configure_for_volume_post_219(
+    decoy: Decoy,
+    mock_engine_client: EngineClient,
+    mock_protocol_core: ProtocolCore,
+    subject: InstrumentCore,
+    version: APIVersion,
+) -> None:
+    """Configure_for_volume should specify overlap version."""
+    decoy.when(mock_protocol_core.api_version).then_return(version)
+    subject.configure_for_volume(123.0)
+    decoy.verify(
+        mock_engine_client.execute_command(
+            cmd.ConfigureForVolumeParams(
+                pipetteId=subject.pipette_id,
+                volume=123.0,
+                tipOverlapNotAfterVersion="v1",
+            )
+        )
+    )
