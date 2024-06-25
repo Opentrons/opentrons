@@ -6,8 +6,10 @@ from datetime import datetime
 
 from pytest_lazyfixture import lazy_fixture  # type: ignore[import-untyped]
 from decoy import Decoy
-from typing import Union, Generator
+from typing import Union, AsyncGenerator
 
+from opentrons.protocol_engine.errors import RunStoppedError
+from opentrons.protocol_engine.state import StateStore
 from opentrons.protocols.api_support.types import APIVersion
 from opentrons.protocol_engine import ProtocolEngine
 from opentrons.protocol_engine.types import PostRunHardwareState
@@ -507,16 +509,23 @@ async def test_command_generator(
 ) -> None:
     """Should get the next command to execute."""
 
-    def get_next_to_execute() -> Generator[str, None, None]:
+    def get_next_to_execute() -> AsyncGenerator[str, None]:
         yield "command-id-1"
         yield "command-id-2"
+        raise RunStoppedError()
 
     get_next_to_execute_results = get_next_to_execute()
 
+    mock_state_store = decoy.mock(cls=StateStore)
+    decoy.when(mock_protocol_engine._state_store).then_return(mock_state_store)
+
     decoy.when(
-        await mock_protocol_engine._state_store.wait_for(condition=mock_protocol_engine._state_store.commands.get_next_to_execute)
+        await mock_protocol_engine._state_store.wait_for(
+            condition=mock_protocol_engine.state_view.commands.get_next_to_execute
+        )
     ).then_do(lambda *args, **kwargs: next(get_next_to_execute_results))
 
+    index = 1
     async for command in live_protocol_subject.command_generator():
-        print(command)
-        # assert command == "command-id"
+        assert command == f"command-id-{index}"
+        index = index + 1
