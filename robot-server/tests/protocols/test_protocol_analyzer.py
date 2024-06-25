@@ -18,6 +18,7 @@ from opentrons.protocol_engine import (
     types as pe_types,
 )
 import opentrons.protocol_runner as protocol_runner
+import opentrons.protocol_runner.create_simulating_orchestrator as simulating_runner
 from opentrons.protocol_reader import (
     ProtocolSource,
     JsonProtocolConfig,
@@ -55,8 +56,8 @@ def patch_mock_create_simulating_orchestrator(
     decoy: Decoy, monkeypatch: pytest.MonkeyPatch
 ) -> None:
     """Replace protocol_runner.check() with a mock."""
-    mock = decoy.mock(func=protocol_runner.create_simulating_orchestrator)
-    monkeypatch.setattr(protocol_runner, "create_simulating_orchestrator", mock)
+    mock = decoy.mock(func=simulating_runner.create_simulating_orchestrator)
+    monkeypatch.setattr(simulating_runner, "create_simulating_orchestrator", mock)
 
 
 @pytest.fixture
@@ -96,7 +97,7 @@ async def test_load_runner(
     python_runner = decoy.mock(cls=protocol_runner.PythonAndLegacyRunner)
     decoy.when(run_orchestrator.get_protocol_runner()).then_return(python_runner)
     decoy.when(
-        await protocol_runner.create_simulating_orchestrator(
+        await simulating_runner.create_simulating_orchestrator(
             robot_type=robot_type,
             protocol_config=PythonProtocolConfig(api_version=APIVersion(100, 200)),
         )

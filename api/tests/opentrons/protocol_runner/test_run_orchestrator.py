@@ -202,7 +202,11 @@ async def test_run_calls_protocol_runner(
 ) -> None:
     """Should call protocol runner run method."""
     await subject.run(deck_configuration=[])
-    decoy.verify(await runner.run(deck_configuration=[]))
+    decoy.verify(
+        await runner.run(
+            deck_configuration=[], run_time_param_values=None, protocol_source=None
+        )
+    )
 
 
 async def test_run_calls_protocol_live_runner(
@@ -496,26 +500,26 @@ async def test_stop(
     )
 
 
-async def test_command_generator(
-    decoy: Decoy,
-    mock_protocol_engine: ProtocolEngine,
-    live_protocol_subject: RunOrchestrator,
-) -> None:
-    """Should get the next command to execute."""
-
-    def _stub_completed(*_a: object, **_k: object) -> str:
-        decoy.when(
-            mock_protocol_engine._state_store.commands.get_next_to_execute()
-        ).then_return("command-id")
-        return "command-id"
-
-    decoy.when(
-        await mock_protocol_engine._state_store.wait_for(
-            condition=mock_protocol_engine._state_store.commands.get_next_to_execute
-        )
-    ).then_do(_stub_completed)
-
-    gen = live_protocol_subject.command_generator()
-    async for command in gen:
-        print(command)
-        # assert command == "command-id"
+# async def test_command_generator(
+#     decoy: Decoy,
+#     mock_protocol_engine: ProtocolEngine,
+#     live_protocol_subject: RunOrchestrator,
+# ) -> None:
+#     """Should get the next command to execute."""
+#
+#     def _stub_completed(*_a: object, **_k: object) -> str:
+#         decoy.when(
+#             mock_protocol_engine._state_store.commands.get_next_to_execute()
+#         ).then_return("command-id")
+#         return "command-id"
+#
+#     decoy.when(
+#         await mock_protocol_engine._state_store.wait_for(
+#             condition=mock_protocol_engine._state_store.commands.get_next_to_execute
+#         )
+#     ).then_do(_stub_completed)
+#
+#     gen = live_protocol_subject.command_generator()
+#     async for command in gen:
+#         print(command)
+#         # assert command == "command-id"

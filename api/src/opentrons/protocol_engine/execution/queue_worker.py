@@ -24,6 +24,7 @@ class QueueWorker:
             state_store: The source of truth for protocol state, including
                 all queued commands.
             command_executor: Interface used to execute and update commands.
+            command_generator: Command generator to get the next command to execute.
         """
         self._state_store: StateStore = state_store
         self._command_executor: CommandExecutor = command_executor

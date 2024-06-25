@@ -626,6 +626,7 @@ class ProtocolEngine:
     def set_queue_worker_command_generator(
         self, command_generator: Callable[[], AsyncGenerator[str, None]]
     ) -> None:
+        """Set QueueWorker and start it."""
         self._queue_worker = create_queue_worker(
             hardware_api=self._hardware_api,
             state_store=self._state_store,

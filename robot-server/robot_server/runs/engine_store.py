@@ -36,9 +36,9 @@ from opentrons.protocol_engine import (
     Command,
     CommandCreate,
     LabwareOffset,
-    create_protocol_engine,
     Config as ProtocolEngineConfig,
 )
+from opentrons.protocol_engine.create_protocol_engine import create_protocol_engine
 
 from robot_server.protocols.protocol_store import ProtocolResource
 from opentrons.protocol_engine.types import (

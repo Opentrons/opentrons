@@ -33,6 +33,7 @@ def create_queue_worker(
         state_store: StateStore to pass down to dependencies.
         action_dispatcher: ActionDispatcher to pass down to dependencies.
         error_recovery_policy: ErrorRecoveryPolicy to pass down to dependencies.
+        command_generator: Command generator to get the next command to execute.
     """
     gantry_mover = create_gantry_mover(
         hardware_api=hardware_api,

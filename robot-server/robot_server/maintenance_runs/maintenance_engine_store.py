@@ -15,9 +15,9 @@ from opentrons.protocol_engine import (
     Command,
     CommandCreate,
     LabwareOffset,
-    create_protocol_engine,
     Config as ProtocolEngineConfig,
 )
+from opentrons.protocol_engine.create_protocol_engine import create_protocol_engine
 from opentrons.protocol_runner import RunResult, RunOrchestrator
 
 from opentrons.config import feature_flags

@@ -4,7 +4,8 @@ from decoy import Decoy
 from datetime import datetime
 from pathlib import Path
 
-from opentrons import protocol_runner
+from opentrons.protocol_runner import RunOrchestrator
+import opentrons.protocol_runner.create_simulating_orchestrator as simulating_runner
 from opentrons.protocol_engine.types import BooleanParameter
 from opentrons.protocol_reader import ProtocolSource, JsonProtocolConfig
 from opentrons_shared_data.robot.dev_types import RobotType
@@ -48,8 +49,8 @@ def patch_mock_create_simulating_orchestrator(
     decoy: Decoy, monkeypatch: pytest.MonkeyPatch
 ) -> None:
     """Replace protocol_runner.check() with a mock."""
-    mock = decoy.mock(func=protocol_runner.create_simulating_orchestrator)
-    monkeypatch.setattr(protocol_runner, "create_simulating_orchestrator", mock)
+    mock = decoy.mock(func=simulating_runner.create_simulating_orchestrator)
+    monkeypatch.setattr(simulating_runner, "create_simulating_orchestrator", mock)
 
 
 @pytest.fixture
@@ -86,7 +87,7 @@ async def test_start_analysis(
     )
     pending_analysis = PendingAnalysis(id="analysis-id")
     analyzer = decoy.mock(cls=protocol_analyzer.ProtocolAnalyzer)
-    orchestrator = decoy.mock(cls=protocol_runner.RunOrchestrator)
+    orchestrator = decoy.mock(cls=RunOrchestrator)
     decoy.when(
         protocol_analyzer.create_protocol_analyzer(
             analysis_store=analysis_store,

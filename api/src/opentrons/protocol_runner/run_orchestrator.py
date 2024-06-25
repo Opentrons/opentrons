@@ -344,6 +344,7 @@ class RunOrchestrator:
         return self._protocol_engine.state_view.config.deck_type
 
     async def command_generator(self) -> AsyncGenerator[str, None]:
+        """Yield next command to execute."""
         while True:
             try:
                 command_id = await self._protocol_engine._state_store.wait_for(

@@ -4,7 +4,7 @@ from typing import Optional, List
 
 from opentrons_shared_data.robot.dev_types import RobotType
 
-from opentrons import protocol_runner
+import opentrons.protocol_runner.create_simulating_orchestrator as simulating_runner
 from opentrons.protocol_engine.errors import ErrorOccurrence
 from opentrons.protocol_engine.types import RunTimeParamValuesType, RunTimeParameter
 import opentrons.util.helpers as datetime_helper
@@ -43,7 +43,7 @@ class ProtocolAnalyzer:
 
         Returns: The RunOrchestrator instance.
         """
-        orchestrator = await protocol_runner.create_simulating_orchestrator(
+        orchestrator = await simulating_runner.create_simulating_orchestrator(
             robot_type=self._protocol_resource.source.robot_type,
             protocol_config=self._protocol_resource.source.config,
         )
