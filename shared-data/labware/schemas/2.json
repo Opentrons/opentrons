@@ -64,21 +64,6 @@
           "type": "number"
         }
       }
-    },
-    "minRequirements": {
-      "type": "object",
-      "additionalProperties": false,
-      "properties": {
-        "value": {
-          "type": "number"
-        },
-        "applicableWells": {
-          "type": "array",
-          "items": {
-            "type": "string"
-          }
-        }
-      }
     }
   },
   "type": "object",
@@ -382,25 +367,6 @@
     "gripHeightFromLabwareBottom": {
       "type": "number",
       "description": "Recommended Z-height, from labware bottom to the center of gripper pads, when gripping the labware."
-    },
-    "liquidProbeParameters": {
-      "type": "object",
-      "description": "Minimum measurements for a liquid probe to work properly",
-      "additionalProperties": false,
-      "properties": {
-        "minimumHeight": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/minRequirements"
-          }
-        },
-        "minimumWellVolume": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/minRequirements"
-          }
-        }
-      }
     }
   }
 }

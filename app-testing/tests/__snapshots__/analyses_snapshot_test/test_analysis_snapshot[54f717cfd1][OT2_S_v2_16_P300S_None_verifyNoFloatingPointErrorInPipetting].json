@@ -1237,20 +1237,6 @@
               ]
             }
           ],
-          "liquidProbeParameters": {
-            "minimumHeight": [
-              {
-                "applicableWells": [],
-                "value": 0.5
-              }
-            ],
-            "minimumWellVolume": [
-              {
-                "applicableWells": [],
-                "value": 0.0
-              }
-            ]
-          },
           "metadata": {
             "displayCategory": "tubeRack",
             "displayName": "Opentrons 24 Tube Rack with Eppendorf 1.5 mL Safe-Lock Snapcap",
