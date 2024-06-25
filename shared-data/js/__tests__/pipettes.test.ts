@@ -82,26 +82,6 @@ describe('pipette data accessors', () => {
           default: {
             $otSharedSchema:
               '#/pipette/schemas/2/pipetteLiquidPropertiesSchema.json',
-            versionedTipOverlapDictionary: {
-              v0: {
-                default: 10.5,
-                'opentrons/opentrons_flex_96_tiprack_1000ul/1': 10.5,
-                'opentrons/opentrons_flex_96_tiprack_200ul/1': 10.5,
-                'opentrons/opentrons_flex_96_tiprack_50ul/1': 10.5,
-                'opentrons/opentrons_flex_96_filtertiprack_1000ul/1': 10.5,
-                'opentrons/opentrons_flex_96_filtertiprack_200ul/1': 10.5,
-                'opentrons/opentrons_flex_96_filtertiprack_50ul/1': 10.5,
-              },
-              v1: {
-                default: 10.5,
-                'opentrons/opentrons_flex_96_tiprack_1000ul/1': 9.65,
-                'opentrons/opentrons_flex_96_tiprack_200ul/1': 9.76,
-                'opentrons/opentrons_flex_96_tiprack_50ul/1': 10.09,
-                'opentrons/opentrons_flex_96_filtertiprack_1000ul/1': 9.65,
-                'opentrons/opentrons_flex_96_filtertiprack_200ul/1': 9.76,
-                'opentrons/opentrons_flex_96_filtertiprack_50ul/1': 10.09,
-              },
-            },
             defaultTipracks: [
               'opentrons/opentrons_flex_96_tiprack_1000ul/1',
               'opentrons/opentrons_flex_96_tiprack_200ul/1',
@@ -181,18 +161,6 @@ describe('pipette data accessors', () => {
 
     const mockLiquidDefault = {
       $otSharedSchema: '#/pipette/schemas/2/pipetteLiquidPropertiesSchema.json',
-      versionedTipOverlapDictionary: {
-        v0: {
-          default: 10.5,
-          [tiprackFilter50uL]: 10.5,
-          [tiprack50uL]: 10.5,
-        },
-        v1: {
-          default: 10.5,
-          [tiprackFilter50uL]: 10.09,
-          [tiprack50uL]: 10.09,
-        },
-      },
       defaultTipracks: [tiprack50uL, tiprackFilter50uL],
       maxVolume: 50,
       minVolume: 5,
@@ -236,18 +204,6 @@ describe('pipette data accessors', () => {
     } as PipetteV2LiquidSpecs
     const mockLiquidLowVolume = {
       $otSharedSchema: '#/pipette/schemas/2/pipetteLiquidPropertiesSchema.json',
-      versionedTipOverlapDictionary: {
-        v0: {
-          default: 10.5,
-          [tiprackFilter50uL]: 10.5,
-          [tiprack50uL]: 10.5,
-        },
-        v1: {
-          default: 10.5,
-          [tiprackFilter50uL]: 10.09,
-          [tiprack50uL]: 10.09,
-        },
-      },
       defaultTipracks: [tiprack50uL, tiprackFilter50uL],
       maxVolume: 30,
       minVolume: 1,

@@ -521,7 +521,6 @@ export interface SupportedTips {
 export interface PipetteV2LiquidSpecs {
   $otSharedSchema: string
   supportedTips: SupportedTips
-  versionedTipOverlapDictionary: Record<string, Record<string, number>>
   maxVolume: number
   minVolume: number
   defaultTipracks: string[]
