@@ -13,7 +13,8 @@ from opentrons_hardware.hardware_control.gripper_settings import (
     set_error_tolerance,
 )
 from hardware_testing import data
-from hardware_testing.opentrons_api.types import OT3Mount, OT3Axis, Point
+from hardware_testing.opentrons_api.types import OT3Mount, Point
+from hardware_testing.opentrons_api.types import Axis as OT3Axis
 from hardware_testing.opentrons_api.helpers_ot3 import (
     build_async_ot3_hardware_api,
 )
@@ -23,6 +24,7 @@ from opentrons.hardware_control.motion_utilities import (
 from hardware_testing.drivers import (
     mark10,
 )
+from hardware_testing.opentrons_api import helpers_ot3
 
 def build_arg_parser():
     arg_parser = argparse.ArgumentParser(description='OT-3 Gripper Lifetime Test')
@@ -83,7 +85,7 @@ class Gripper_Force_Check:
         self.test_id = data.create_run_id()
         self.test_path = data.create_folder_for_test_data(self.test_name)
         self.test_file = data.create_file_name(self.test_name, self.test_id, self.test_tag)
-        data.append_data_to_file(self.test_name, self.test_file, self.test_header)
+        data.append_data_to_file(self.test_name, self.test_id, self.test_file, self.test_header)
         print("FILE PATH = ", self.test_path)
         print("FILE NAME = ", self.test_file)
 
@@ -121,7 +123,8 @@ class Gripper_Force_Check:
         self.test_data["Time"] = str(round(elapsed_time, 3))
         self.test_data["Cycle"] = str(self.cycle)
         test_data = self.dict_values_to_line(self.test_data)
-        data.append_data_to_file(self.test_name, self.test_file, test_data)
+        self.test_id = data.create_run_id()
+        data.append_data_to_file(self.test_name, self.test_id, self.test_file, test_data)
 
     async def _read_gripper(
         self, api: OT3API
@@ -155,7 +158,13 @@ class Gripper_Force_Check:
             await self.test_setup()
             if self.api and self.mount:
                 await self._home_gripper(self.api, self.mount)
-                await self._move_gripper(self.api, self.mount)
+                # move to slot5 where gauge location
+                grip_pos = helpers_ot3.get_slot_calibration_square_position_ot3(5)
+                grip_pos = grip_pos + Point(x=2, y=-42, z=75+50) # apply offset
+                await helpers_ot3.move_to_arched_ot3(self.api, self.mount, grip_pos)
+                await helpers_ot3.jog_mount_ot3(self.api, OT3Mount.GRIPPER)
+
+                # await self._move_gripper(self.api, self.mount)
                 for i in range(self.cycles):
                     self.cycle = i + 1
                     print(f"\n-> Starting Test Cycle {self.cycle}/{self.cycles}")
