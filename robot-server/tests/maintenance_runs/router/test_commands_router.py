@@ -22,7 +22,6 @@ from robot_server.maintenance_runs.maintenance_run_data_manager import (
     MaintenanceRunDataManager,
 )
 from robot_server.maintenance_runs.maintenance_run_models import (
-    MaintenanceRunCommandSummary,
     MaintenanceRunNotFoundError,
 )
 from robot_server.maintenance_runs.router.commands_router import (
@@ -37,6 +36,7 @@ from robot_server.runs.command_models import (
     CommandLink,
     CommandLinkMeta,
 )
+from robot_server.runs.run_models import RunCommandSummary
 
 
 async def test_get_current_run_from_url(
@@ -175,6 +175,7 @@ async def test_get_run_commands(
             createdAt=datetime(year=2024, month=4, day=4),
             detail="Things are not looking good.",
         ),
+        failedCommandId="failed-command-id",
     )
 
     decoy.when(
@@ -214,7 +215,7 @@ async def test_get_run_commands(
     )
 
     assert result.content.data == [
-        MaintenanceRunCommandSummary(
+        RunCommandSummary(
             id="command-id",
             key="command-key",
             commandType="waitForResume",
@@ -230,6 +231,7 @@ async def test_get_run_commands(
                 createdAt=datetime(year=2024, month=4, day=4),
                 detail="Things are not looking good.",
             ),
+            failedCommandId="failed-command-id",
         )
     ]
     assert result.content.meta == MultiBodyMeta(cursor=1, totalLength=3)

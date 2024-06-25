@@ -5,7 +5,7 @@ import {
   DIRECTION_COLUMN,
   Flex,
   SPACING,
-  StyledText,
+  LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { InputField } from '../../atoms/InputField'
@@ -45,12 +45,12 @@ export function ChooseNumber({
   }, [])
 
   if (parameter.type !== 'int' && parameter.type !== 'float') {
-    console.log(`Incorrect parameter type: ${parameter.type}`)
+    console.log(`Incorrect parameter type: ${parameter.type as string}`)
     return null
   }
   const handleClickGoBack = (newValue: number | null): void => {
     if (error != null || newValue === null) {
-      makeSnackbar(t('value_out_of_range_generic'))
+      makeSnackbar(t('value_out_of_range_generic') as string)
     } else {
       setParameter(newValue, parameter.variableName)
       handleGoBack()
@@ -96,7 +96,7 @@ export function ChooseNumber({
         buttonText={t('restore_default')}
         onClickButton={() => {
           resetValueDisabled
-            ? makeSnackbar(t('no_custom_values'))
+            ? makeSnackbar(t('no_custom_values') as string)
             : setParamValue(String(parameter.default))
         }}
       />
@@ -116,9 +116,9 @@ export function ChooseNumber({
           flexDirection={DIRECTION_COLUMN}
           marginTop="7.75rem"
         >
-          <StyledText as="h4" textAlign={TYPOGRAPHY.textAlignLeft}>
+          <LegacyStyledText as="h4" textAlign={TYPOGRAPHY.textAlignLeft}>
             {parameter.description}
-          </StyledText>
+          </LegacyStyledText>
           <InputField
             autoFocus
             type="text"

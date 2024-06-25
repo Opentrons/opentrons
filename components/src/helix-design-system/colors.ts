@@ -77,6 +77,12 @@ export const white = '#FFFFFF'
 export const blue50 = '#006CFA'
 
 /**
+ * flex
+ */
+export const flex55 = '#0297CC'
+export const flex50 = '#00BDFF'
+
+/**
  * extras
  */
 export const transparent = 'transparent'

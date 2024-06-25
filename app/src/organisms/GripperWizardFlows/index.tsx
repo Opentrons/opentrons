@@ -150,7 +150,7 @@ export function GripperWizardFlows(
         })
         .catch(error => {
           setIsExiting(true)
-          setErrorMessage(error.message)
+          setErrorMessage(error.message as string)
         })
     }
   }

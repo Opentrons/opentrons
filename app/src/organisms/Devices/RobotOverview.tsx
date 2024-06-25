@@ -15,7 +15,7 @@ import {
   POSITION_ABSOLUTE,
   POSITION_RELATIVE,
   SPACING,
-  StyledText,
+  LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { useAuthorization } from '@opentrons/react-api-client'
@@ -124,7 +124,7 @@ export function RobotOverview({
                   flexDirection={DIRECTION_COLUMN}
                   paddingRight={SPACING.spacing16}
                 >
-                  <StyledText
+                  <LegacyStyledText
                     as="h6"
                     color={COLORS.grey60}
                     fontWeight={TYPOGRAPHY.fontWeightSemiBold}
@@ -132,7 +132,7 @@ export function RobotOverview({
                     textTransform={TYPOGRAPHY.textTransformUppercase}
                   >
                     {t('controls')}
-                  </StyledText>
+                  </LegacyStyledText>
                   <Flex alignItems={ALIGN_CENTER} gridGap={SPACING.spacing8}>
                     <Flex paddingBottom={SPACING.spacing4}>
                       <ToggleButton
@@ -146,12 +146,12 @@ export function RobotOverview({
                         id="RobotOverview_lightsToggle"
                       />
                     </Flex>
-                    <StyledText
+                    <LegacyStyledText
                       as="p"
                       color={isRobotViewable ? COLORS.black90 : COLORS.grey40}
                     >
                       {t('lights')}
-                    </StyledText>
+                    </LegacyStyledText>
                   </Flex>
                 </Flex>
               </Flex>

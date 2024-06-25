@@ -8,7 +8,7 @@ import {
   DIRECTION_COLUMN,
   Flex,
   SPACING,
-  StyledText,
+  LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
@@ -78,12 +78,12 @@ function TouchscreenModal({
   return (
     <Modal {...modalProps}>
       <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing16}>
-        <StyledText as="p" fontWeight={TYPOGRAPHY.fontWeightBold}>
+        <LegacyStyledText as="p" fontWeight={TYPOGRAPHY.fontWeightBold}>
           {t('connect_the_estop_to_continue')}
-        </StyledText>
-        <StyledText as="p">
+        </LegacyStyledText>
+        <LegacyStyledText as="p">
           {t('estop_missing_description', { robotName: robotName })}
-        </StyledText>
+        </LegacyStyledText>
       </Flex>
     </Modal>
   )
@@ -118,10 +118,12 @@ function DesktopModal({
   return (
     <LegacyModal {...modalProps}>
       <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing24}>
-        <StyledText as="h1">{t('connect_the_estop_to_continue')}</StyledText>
-        <StyledText>
+        <LegacyStyledText as="h1">
+          {t('connect_the_estop_to_continue')}
+        </LegacyStyledText>
+        <LegacyStyledText>
           {t('estop_missing_description', { robotName: robotName })}
-        </StyledText>
+        </LegacyStyledText>
       </Flex>
     </LegacyModal>
   )

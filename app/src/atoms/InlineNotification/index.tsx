@@ -9,7 +9,7 @@ import {
   Icon,
   JUSTIFY_SPACE_BETWEEN,
   SPACING,
-  StyledText,
+  LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
@@ -81,7 +81,7 @@ export function InlineNotification(
     >
       <Icon {...iconProps} aria-label={`icon_${type}`} />
       <Flex flex="1" alignItems={ALIGN_CENTER}>
-        <StyledText
+        <LegacyStyledText
           fontSize={TYPOGRAPHY.fontSize22}
           fontWeight={TYPOGRAPHY.fontWeightRegular}
           lineHeight={TYPOGRAPHY.lineHeight28}
@@ -94,7 +94,7 @@ export function InlineNotification(
             {fullHeading}
           </span>
           {message != null && fullmessage}
-        </StyledText>
+        </LegacyStyledText>
       </Flex>
       {onCloseClick && (
         <Btn

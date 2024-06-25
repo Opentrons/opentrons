@@ -6,6 +6,7 @@ from opentrons_shared_data.robot.dev_types import RobotType
 
 from opentrons import protocol_runner
 from opentrons.protocol_engine.errors import ErrorOccurrence
+from opentrons.util.performance_helpers import TrackingFunctions
 from opentrons.protocol_engine.types import RunTimeParamValuesType, RunTimeParameter
 import opentrons.util.helpers as datetime_helper
 from opentrons.protocol_runner import AbstractRunner, PythonAndLegacyRunner, JsonRunner
@@ -55,6 +56,7 @@ class ProtocolAnalyzer:
 
         return runner
 
+    @TrackingFunctions.track_analysis
     async def analyze(
         self,
         runner: AbstractRunner,

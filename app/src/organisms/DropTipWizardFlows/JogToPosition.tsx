@@ -17,7 +17,7 @@ import {
   RESPONSIVENESS,
   SecondaryButton,
   SPACING,
-  StyledText,
+  LegacyStyledText,
   TEXT_ALIGN_CENTER,
   TYPOGRAPHY,
 } from '@opentrons/components'
@@ -72,14 +72,14 @@ const ConfirmPosition = (props: ConfirmPositionProps): JSX.Element | null => {
                 aria-label="ot-alert"
               />
             </Flex>
-            <StyledText
+            <LegacyStyledText
               fontSize={TYPOGRAPHY.fontSize32}
               fontWeight={TYPOGRAPHY.fontWeightBold}
             >
               {currentStep === POSITION_AND_BLOWOUT
                 ? t('confirm_blowout_location', { flow: flowTitle })
                 : t('confirm_drop_tip_location', { flow: flowTitle })}
-            </StyledText>
+            </LegacyStyledText>
           </Flex>
           <Flex width="100%" justifyContent={JUSTIFY_SPACE_BETWEEN}>
             <Flex width="100%">
@@ -243,7 +243,7 @@ export const JogToPosition = (
             <Header>
               {i18n.format(t('position_the_pipette'), 'capitalize')}
             </Header>
-            <StyledText as="p">{body}</StyledText>
+            <LegacyStyledText as="p">{body}</LegacyStyledText>
           </Flex>
           {/* no animations */}
           <Flex

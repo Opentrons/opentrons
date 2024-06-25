@@ -5,7 +5,7 @@ import { useRecoveryCommands } from './useRecoveryCommands'
 import { useRecoveryTipStatus } from './useRecoveryTipStatus'
 import { useRecoveryRouting } from './useRecoveryRouting'
 import { useFailedLabwareUtils } from './useFailedLabwareUtils'
-import { getFailedCommandPipetteInfo } from '../utils'
+import { getFailedCommandPipetteInfo, getNextStep } from '../utils'
 import { useRecoveryMapUtils } from './useRecoveryMapUtils'
 import {
   useNotifyAllCommandsQuery,
@@ -13,6 +13,7 @@ import {
 } from '../../../resources/runs'
 import { useRecoveryOptionCopy } from './useRecoveryOptionCopy'
 import { useRunningStepCounts } from '../../../resources/protocols/hooks'
+import { useRecoveryToasts } from './useRecoveryToasts'
 
 import type { PipetteData } from '@opentrons/api-client'
 import type { IRecoveryMap } from '../types'
@@ -28,6 +29,7 @@ import type { StepCounts } from '../../../resources/protocols/hooks'
 type ERUtilsProps = ErrorRecoveryFlowsProps & {
   toggleERWizard: (launchER: boolean) => Promise<void>
   hasLaunchedRecovery: boolean
+  isOnDevice: boolean
 }
 
 export interface ERUtilsResults {
@@ -43,6 +45,7 @@ export interface ERUtilsResults {
   hasLaunchedRecovery: boolean
   trackExternalMap: (map: Record<string, any>) => void
   stepCounts: StepCounts
+  commandAfterFailedCommand: ReturnType<typeof getNextStep>
 }
 
 // Builds various Error Recovery utilities.
@@ -53,6 +56,7 @@ export function useERUtils({
   toggleERWizard,
   hasLaunchedRecovery,
   protocolAnalysis,
+  isOnDevice,
 }: ERUtilsProps): ERUtilsResults {
   const { data: attachedInstruments } = useInstrumentsQuery()
   const { data: runRecord } = useNotifyRunQuery(runId)
@@ -66,12 +70,21 @@ export function useERUtils({
     pageLength: 999,
   })
 
+  const stepCounts = useRunningStepCounts(runId, runCommands)
+  const commandAfterFailedCommand = getNextStep(failedCommand, protocolAnalysis)
+
   const {
     recoveryMap,
     setRM,
     trackExternalMap,
     currentRecoveryOptionUtils,
   } = useRecoveryRouting()
+
+  const recoveryToastUtils = useRecoveryToasts({
+    currentStepCount: stepCounts.currentStepNumber,
+    selectedRecoveryOption: currentRecoveryOptionUtils.selectedRecoveryOption,
+    isOnDevice,
+  })
 
   const tipStatusUtils = useRecoveryTipStatus({
     runId,
@@ -106,6 +119,7 @@ export function useERUtils({
     failedCommand,
     failedLabwareUtils,
     routeUpdateActions,
+    recoveryToastUtils,
   })
 
   const recoveryMapUtils = useRecoveryMapUtils({
@@ -114,8 +128,6 @@ export function useERUtils({
     protocolAnalysis,
     failedLabwareUtils,
   })
-
-  const stepCounts = useRunningStepCounts(runId, runCommands)
 
   // TODO(jh, 06-14-24): Ensure other string build utilities that are internal to ErrorRecoveryFlows are exported under
   // one utility object in useERUtils.
@@ -134,5 +146,6 @@ export function useERUtils({
     recoveryMapUtils,
     getRecoveryOptionCopy,
     stepCounts,
+    commandAfterFailedCommand,
   }
 }

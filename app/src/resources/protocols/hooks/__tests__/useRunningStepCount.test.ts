@@ -20,7 +20,7 @@ const mockCommandsData = {
 } as any
 
 describe('useRunningStepCounts', () => {
-  it('returns current step number and total step count for a deterministic run', () => {
+  it('returns current step number and total step count for a non-diverged run', () => {
     const mockAnalysis = {
       commands: [{ key: 'key1' }, { key: 'key2' }, { key: 'key3' }],
     } as any
@@ -38,16 +38,20 @@ describe('useRunningStepCounts', () => {
     })
   })
 
-  it('returns current step number and null total step count for a non-deterministic run', () => {
-    vi.mocked(useMostRecentCompletedAnalysis).mockReturnValue(null)
-    vi.mocked(useLastRunProtocolCommand).mockReturnValue(null)
+  it('returns null current step number and null total step count for a diverged run', () => {
+    vi.mocked(useMostRecentCompletedAnalysis).mockReturnValue({
+      commands: [{ key: 'key1' }, { key: 'key2' }, { key: 'key3' }],
+    } as any)
+    vi.mocked(useLastRunProtocolCommand).mockReturnValue({
+      key: 'different_key',
+    } as any)
 
     const { result } = renderHook(() =>
       useRunningStepCounts(mockRunId, mockCommandsData)
     )
 
     expect(result.current).toEqual({
-      currentStepNumber: 2,
+      currentStepNumber: null,
       totalStepCount: null,
       hasRunDiverged: true,
     })

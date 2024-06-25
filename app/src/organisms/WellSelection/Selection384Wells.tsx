@@ -9,7 +9,7 @@ import {
   Flex,
   JUSTIFY_SPACE_BETWEEN,
   SPACING,
-  StyledText,
+  LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
@@ -74,25 +74,6 @@ export function Selection384Wells({
   const columns = definition.ordering
   const wells = flatten(columns)
 
-  // for 8-channel, filter members of columns for odd/even depending on starting well
-  const oddRowColumns = columns.map(column =>
-    column.filter((_row, i) => i % 2 === 0)
-  )
-
-  const evenRowColumns = columns.map(column =>
-    column.filter((_row, i) => i % 2 !== 0)
-  )
-
-  const multichannelColumns = startingWellState.A1
-    ? oddRowColumns
-    : evenRowColumns
-
-  const selectableColumns =
-    // for 8-channel, use all rows unless only one starting well option is selected
-    channels === 8 && startingWellState.A1 !== startingWellState.B1
-      ? multichannelColumns
-      : columns
-
   const handleMinus = (): void => {
     if (lastSelectedIndex == null) {
       return
@@ -116,11 +97,30 @@ export function Selection384Wells({
     const nextIndex = lastSelectedIndex == null ? 0 : lastSelectedIndex + 1
 
     if (selectBy === 'columns') {
-      selectWells(
-        selectableColumns[nextIndex].reduce((acc, well) => {
-          return { ...acc, [well]: null }
-        }, {})
-      )
+      if (channels === 8) {
+        // for 8-channel, select first and second member of column (all rows) unless only one starting well option is selected
+        if (startingWellState.A1 === startingWellState.B1) {
+          selectWells({
+            [columns[nextIndex][0]]: null,
+            [columns[nextIndex][1]]: null,
+          })
+        } else if (startingWellState.A1) {
+          selectWells({
+            [columns[nextIndex][0]]: null,
+          })
+        } else if (startingWellState.B1) {
+          selectWells({
+            [columns[nextIndex][1]]: null,
+          })
+        }
+      } else {
+        // for single channel, select all members of column
+        selectWells(
+          columns[nextIndex].reduce((acc, well) => {
+            return { ...acc, [well]: null }
+          }, {})
+        )
+      }
     } else if (selectBy === 'wells') {
       selectWells({
         [wells[nextIndex]]: null,
@@ -186,9 +186,9 @@ function SelectBy({
 
   return (
     <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing16}>
-      <StyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
+      <LegacyStyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
         {i18n.format(t('select_by'), 'capitalize')}
-      </StyledText>
+      </LegacyStyledText>
       <RadioButton
         buttonLabel={i18n.format(t('columns'), 'capitalize')}
         buttonValue="columns"
@@ -245,49 +245,10 @@ function StartingWell({
   const checkboxWellOptions: StartingWellOption[] =
     channels === 8 ? ['A1', 'B1'] : ['A1', 'A2', 'B1', 'B2']
 
-  // for 96-channel: even/odd columns to be used based on labware column label, not index
-  const oddColumns = columns.filter((_column, i) => i % 2 === 0)
-  const oddColumnWells = flatten(oddColumns)
-
-  const evenColumns = columns.filter((_column, i) => i % 2 !== 0)
-  const evenColumnWells = flatten(evenColumns)
-
-  // select even/odd members of even/odd columns based on starting well
-  const A1WellGroup = oddColumnWells.reduce((acc, well, i) => {
-    if (i % 2 === 0) {
-      return { ...acc, [well]: null }
-    } else return acc
-  }, {})
-
-  const B1WellGroup = oddColumnWells.reduce((acc, well, i) => {
-    if (i % 2 !== 0) {
-      return { ...acc, [well]: null }
-    } else return acc
-  }, {})
-
-  const A2WellGroup = evenColumnWells.reduce((acc, well, i) => {
-    if (i % 2 === 0) {
-      return { ...acc, [well]: null }
-    } else return acc
-  }, {})
-
-  const B2WellGroup = evenColumnWells.reduce((acc, well, i) => {
-    if (i % 2 !== 0) {
-      return { ...acc, [well]: null }
-    } else return acc
-  }, {})
-
-  const wellGroupByStartingWell: Record<StartingWellOption, WellGroup> = {
-    A1: A1WellGroup,
-    B1: B1WellGroup,
-    A2: A2WellGroup,
-    B2: B2WellGroup,
-  }
-
   // on mount, select A1 well group for 96-channel
   React.useEffect(() => {
     if (channels === 96) {
-      selectWells(wellGroupByStartingWell.A1)
+      selectWells({ A1: null })
     }
     setStartingWellState({ A1: true, A2: false, B1: false, B2: false })
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -295,9 +256,9 @@ function StartingWell({
 
   return (
     <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing16}>
-      <StyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
+      <LegacyStyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
         {i18n.format(t('starting_well'), 'capitalize')}
-      </StyledText>
+      </LegacyStyledText>
       {checkboxWellOptions.map(well => (
         <Checkbox
           key={well}
@@ -306,9 +267,9 @@ function StartingWell({
           onClick={() => {
             if (channels === 96) {
               if (startingWellState[well]) {
-                deselectWells(Object.keys(wellGroupByStartingWell[well]))
+                deselectWells([well])
               } else {
-                selectWells(wellGroupByStartingWell[well])
+                selectWells({ [well]: null })
               }
             }
 
@@ -344,12 +305,12 @@ function ButtonControls(props: ButtonControlsProps): JSX.Element {
   const addOrRemoveButtons =
     channels !== 96 ? (
       <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing16}>
-        <StyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
+        <LegacyStyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
           {i18n.format(
             t(channels === 8 ? 'add_or_remove_columns' : 'add_or_remove'),
             'capitalize'
           )}
-        </StyledText>
+        </LegacyStyledText>
         <Flex gridGap={SPACING.spacing16}>
           <IconButton
             disabled={lastSelectedIndex == null}

@@ -9,7 +9,7 @@ import {
   Icon,
   JUSTIFY_FLEX_END,
   SPACING,
-  StyledText,
+  LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import {
@@ -114,9 +114,9 @@ export function LiquidsList(props: LiquidsListProps): JSX.Element {
           flexDirection={DIRECTION_COLUMN}
           alignItems={TYPOGRAPHY.textAlignCenter}
         >
-          <StyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
+          <LegacyStyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
             {liquid.displayName}
-          </StyledText>
+          </LegacyStyledText>
         </Flex>
         <Flex justifyContent={JUSTIFY_FLEX_END} flex="1">
           <Flex

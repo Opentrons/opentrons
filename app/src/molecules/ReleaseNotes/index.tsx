@@ -1,7 +1,7 @@
 import * as React from 'react'
 import Markdown from 'react-markdown'
 
-import { Box, COLORS, SPACING, StyledText } from '@opentrons/components'
+import { Box, COLORS, SPACING, LegacyStyledText } from '@opentrons/components'
 
 import { useIsOEMMode } from '../../resources/robot-settings/hooks'
 
@@ -46,19 +46,19 @@ function ExternalLink(props: JSX.IntrinsicAttributes): JSX.Element {
 }
 
 function ParagraphText(props: JSX.IntrinsicAttributes): JSX.Element {
-  return <StyledText {...props} as="p" />
+  return <LegacyStyledText {...props} as="p" />
 }
 
 function HeaderText(props: JSX.IntrinsicAttributes): JSX.Element {
-  return <StyledText {...props} as="h3" />
+  return <LegacyStyledText {...props} as="h3" />
 }
 
 function ListItemText(props: JSX.IntrinsicAttributes): JSX.Element {
-  return <StyledText {...props} as="li" />
+  return <LegacyStyledText {...props} as="li" />
 }
 
 function UnnumberedListText(props: JSX.IntrinsicAttributes): JSX.Element {
-  return <StyledText {...props} as="ul" />
+  return <LegacyStyledText {...props} as="ul" />
 }
 
 function HorizontalRule(): JSX.Element {

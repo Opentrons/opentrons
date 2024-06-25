@@ -12863,6 +12863,7 @@
       "pipetteName": "p20_single_gen2"
     }
   ],
+  "result": "ok",
   "robotType": "OT-2 Standard",
   "runTimeParameters": []
 }

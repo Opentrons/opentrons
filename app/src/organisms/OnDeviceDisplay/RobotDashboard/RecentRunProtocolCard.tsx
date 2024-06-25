@@ -15,7 +15,7 @@ import {
   JUSTIFY_SPACE_BETWEEN,
   OVERFLOW_WRAP_BREAK_WORD,
   SPACING,
-  StyledText,
+  LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import {
@@ -217,16 +217,16 @@ export function ProtocolWithLastRun({
         )}
       </Flex>
       <Flex width="100%" height="14rem">
-        <StyledText
+        <LegacyStyledText
           fontSize={TYPOGRAPHY.fontSize32}
           fontWeight={TYPOGRAPHY.fontWeightBold}
           lineHeight={TYPOGRAPHY.lineHeight42}
           css={PROTOCOL_TEXT_STYLE}
         >
           {protocolName}
-        </StyledText>
+        </LegacyStyledText>
       </Flex>
-      <StyledText
+      <LegacyStyledText
         fontSize={TYPOGRAPHY.fontSize22}
         fontWeight={TYPOGRAPHY.fontWeightRegular}
         lineHeight={TYPOGRAPHY.lineHeight28}
@@ -236,7 +236,7 @@ export function ProtocolWithLastRun({
           `${terminationTypeMap[runData.status] ?? ''} ${formattedLastRunTime}`,
           'capitalize'
         )}
-      </StyledText>
+      </LegacyStyledText>
     </Flex>
   )
 }

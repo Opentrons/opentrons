@@ -1799,7 +1799,7 @@ class OT3API(
 
     async def tip_pickup_moves(
         self,
-        mount: OT3Mount,
+        mount: Union[top_types.Mount, OT3Mount],
         presses: Optional[int] = None,
         increment: Optional[float] = None,
     ) -> None:
@@ -2191,6 +2191,15 @@ class OT3API(
             )
             await self.home_gear_motors()
 
+    def cache_tip(
+        self, mount: Union[top_types.Mount, OT3Mount], tip_length: float
+    ) -> None:
+        realmount = OT3Mount.from_mount(mount)
+        instrument = self._pipette_handler.get_pipette(realmount)
+
+        instrument.add_tip(tip_length=tip_length)
+        instrument.set_current_volume(0)
+
     async def pick_up_tip(
         self,
         mount: Union[top_types.Mount, OT3Mount],
@@ -2209,7 +2218,7 @@ class OT3API(
 
         await self._move_to_plunger_bottom(realmount, rate=1.0)
 
-        await self.tip_pickup_moves(realmount, presses, increment)
+        await self.tip_pickup_moves(mount, presses, increment)
 
         add_tip_to_instr()
 

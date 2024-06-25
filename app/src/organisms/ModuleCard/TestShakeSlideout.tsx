@@ -16,7 +16,7 @@ import {
   PrimaryButton,
   SIZE_AUTO,
   SPACING,
-  StyledText,
+  LegacyStyledText,
   TYPOGRAPHY,
   useConditionalConfirm,
   useHoverTooltip,
@@ -186,9 +186,9 @@ export const TestShakeSlideout = (
           />
         </Flex>
         <Flex flexDirection={DIRECTION_COLUMN} fontSize={TYPOGRAPHY.fontSizeP}>
-          <StyledText fontWeight={TYPOGRAPHY.fontWeightRegular}>
+          <LegacyStyledText fontWeight={TYPOGRAPHY.fontWeightRegular}>
             {t('heater_shaker:test_shake_slideout_banner_info')}
-          </StyledText>
+          </LegacyStyledText>
         </Flex>
       </Flex>
       <Flex
@@ -203,21 +203,21 @@ export const TestShakeSlideout = (
           alignItems={ALIGN_CENTER}
         >
           <Flex flexDirection={DIRECTION_COLUMN} marginTop={SPACING.spacing8}>
-            <StyledText
+            <LegacyStyledText
               textTransform={TYPOGRAPHY.textTransformCapitalize}
               fontSize={TYPOGRAPHY.fontSizeLabel}
               fontWeight={TYPOGRAPHY.fontWeightSemiBold}
             >
               {t('labware_latch')}
-            </StyledText>
-            <StyledText
+            </LegacyStyledText>
+            <LegacyStyledText
               textTransform={TYPOGRAPHY.textTransformCapitalize}
               fontSize={TYPOGRAPHY.fontSizeLabel}
               marginTop={SPACING.spacing8}
               data-testid="TestShake_Slideout_latch_status"
             >
               {getLatchStatus(module.data.labwareLatchStatus)}
-            </StyledText>
+            </LegacyStyledText>
           </Flex>
           <TertiaryButton
             marginTop={SPACING.spacing4}
@@ -238,13 +238,13 @@ export const TestShakeSlideout = (
           ) : null}
         </Flex>
         <Divider color={COLORS.grey30} />
-        <StyledText
+        <LegacyStyledText
           fontSize={TYPOGRAPHY.fontSizeLabel}
           fontWeight={TYPOGRAPHY.fontWeightSemiBold}
           marginTop={SPACING.spacing16}
         >
           {t('shake_speed')}
-        </StyledText>
+        </LegacyStyledText>
         <Flex flexDirection={DIRECTION_ROW} alignItems={ALIGN_FLEX_START}>
           <Flex
             flexDirection={DIRECTION_COLUMN}
@@ -267,10 +267,10 @@ export const TestShakeSlideout = (
               error={errorMessage}
               disabled={isShaking}
             />
-            <StyledText
+            <LegacyStyledText
               color={COLORS.grey50}
               fontSize={TYPOGRAPHY.fontSizeCaption}
-            ></StyledText>
+            ></LegacyStyledText>
           </Flex>
           <TertiaryButton
             textTransform={TYPOGRAPHY.textTransformCapitalize}

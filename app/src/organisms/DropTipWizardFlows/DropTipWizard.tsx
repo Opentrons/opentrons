@@ -12,7 +12,7 @@ import {
   JUSTIFY_SPACE_BETWEEN,
   POSITION_ABSOLUTE,
   SPACING,
-  StyledText,
+  LegacyStyledText,
   useConditionalConfirm,
 } from '@opentrons/components'
 
@@ -283,7 +283,7 @@ export const DropTipWizardContent = (
           <Trans
             t={t}
             i18nKey={bodyTextKey}
-            components={{ block: <StyledText as="p" /> }}
+            components={{ block: <LegacyStyledText as="p" /> }}
           />
         }
         moveToAddressableArea={moveToAddressableArea}

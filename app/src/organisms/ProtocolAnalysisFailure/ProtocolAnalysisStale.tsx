@@ -8,7 +8,7 @@ import {
   Flex,
   JUSTIFY_SPACE_BETWEEN,
   SPACING,
-  StyledText,
+  LegacyStyledText,
   TYPOGRAPHY,
   WRAP_REVERSE,
 } from '@opentrons/components'
@@ -43,8 +43,10 @@ export function ProtocolAnalysisStale(
         alignItems={ALIGN_CENTER}
         width="100%"
       >
-        <StyledText as="p">{t('protocol_analysis_outdated')}</StyledText>
-        <StyledText as="p">
+        <LegacyStyledText as="p">
+          {t('protocol_analysis_outdated')}
+        </LegacyStyledText>
+        <LegacyStyledText as="p">
           <Trans
             t={t}
             i18nKey="reanalyze_to_view"
@@ -59,7 +61,7 @@ export function ProtocolAnalysisStale(
               ),
             }}
           />
-        </StyledText>
+        </LegacyStyledText>
       </Flex>
     </Banner>
   )
