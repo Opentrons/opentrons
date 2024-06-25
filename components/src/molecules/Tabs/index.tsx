@@ -75,6 +75,7 @@ export function Tabs(props: TabsProps): JSX.Element {
     <Flex flexDirection={DIRECTION_ROW} css={INNER_CONTAINER_STYLE}>
       {tabs.map((tab, index) => (
         <Btn
+          data-testid={`tab_${index}_${tab.text}`}
           key={index}
           onClick={() => {
             tab.onClick()
