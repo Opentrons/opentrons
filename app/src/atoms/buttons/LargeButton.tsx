@@ -49,9 +49,10 @@ export function LargeButton(props: LargeButtonProps): JSX.Element {
       iconColor: string
       disabledIconColor: string
       focusVisibleOutlineColor: string
+      focusVisibleBackgroundColor: string
+      activeIconColor?: string
       isInverse?: boolean
       activeColor?: string
-      activeIconColor?: string
     }
   > = {
     secondary: {
@@ -63,6 +64,7 @@ export function LargeButton(props: LargeButtonProps): JSX.Element {
       iconColor: COLORS.blue50,
       disabledIconColor: COLORS.grey50,
       focusVisibleOutlineColor: COLORS.blue50,
+      focusVisibleBackgroundColor: COLORS.blue40,
     },
     alert: {
       defaultColor: COLORS.red60,
@@ -73,6 +75,7 @@ export function LargeButton(props: LargeButtonProps): JSX.Element {
       iconColor: COLORS.red60,
       disabledIconColor: COLORS.grey50,
       focusVisibleOutlineColor: COLORS.blue50,
+      focusVisibleBackgroundColor: COLORS.red40,
     },
     primary: {
       defaultColor: COLORS.white,
@@ -83,6 +86,7 @@ export function LargeButton(props: LargeButtonProps): JSX.Element {
       iconColor: COLORS.white,
       disabledIconColor: COLORS.grey50,
       focusVisibleOutlineColor: COLORS.blue55,
+      focusVisibleBackgroundColor: COLORS.blue55,
     },
     alertStroke: {
       defaultColor: COLORS.white,
@@ -96,6 +100,7 @@ export function LargeButton(props: LargeButtonProps): JSX.Element {
       isInverse: true,
       activeIconColor: COLORS.red60,
       focusVisibleOutlineColor: COLORS.blue50,
+      focusVisibleBackgroundColor: COLORS.red40,
     },
     alertAlt: {
       defaultColor: COLORS.red50,
@@ -108,6 +113,7 @@ export function LargeButton(props: LargeButtonProps): JSX.Element {
       activeIconColor: COLORS.red60,
       activeColor: COLORS.red60,
       focusVisibleOutlineColor: COLORS.blue50,
+      focusVisibleBackgroundColor: COLORS.red40,
     },
   }
   const activeColorFor = (
@@ -158,7 +164,7 @@ export function LargeButton(props: LargeButtonProps): JSX.Element {
 
     &:focus-visible {
       background-color: ${LARGE_BUTTON_PROPS_BY_TYPE[buttonType]
-        .activeBackgroundColor};
+        .focusVisibleBackgroundColor};
       ${activeColorFor(buttonType)};
       padding: calc(${SPACING.spacing24} + ${SPACING.spacing2});
       border: ${SPACING.spacing2} solid ${COLORS.transparent};
