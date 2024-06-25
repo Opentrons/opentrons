@@ -868,7 +868,7 @@ async def _test_diagnostics_environment(
         env_sensor = ENVIRONMENT_SENSOR.get_reading()
         
         #print("Air temperature and humidity",env_sensor)
-        LOG_GING.info("Air temperature and humidity",env_sensor)    
+        LOG_GING.info("Air temperature and humidity={}".format(env_sensor))    
         room_celsius = env_sensor.temperature#_get_room_celsius()
         room_humidity =env_sensor.relative_humidity #_get_room_humidity()
     else:
@@ -1196,7 +1196,7 @@ async def _test_diagnostics_pressure(
             
     elif "p1000" in pipptype[OT3Mount.LEFT]['name']:
         CHTYPE_PIPPETE = 1000
-        movez = -117.86
+        movez = -117
 
         # if "single" in pipptype[OT3Mount.LEFT]['name']:  
         #     current_val = PRESSURE_THRESH_current[pip_channels][CHTYPE_PIPPETE][1]
@@ -1252,12 +1252,14 @@ async def _test_diagnostics_pressure(
         slot_5_pos = helpers_ot3.get_slot_calibration_square_position_ot3(11)
         current_pos = await api.gantry_position(mount)
         await api.move_to(mount, slot_5_pos._replace(z=current_pos.z))
-        await api.move_rel(mount, Point(z=movez))
+        await api.move_rel(mount, Point(z=movez+10))
+        await api.move_rel(mount, Point(z=-10),speed=5)
     elif "multi" in pipptype[OT3Mount.LEFT]['name']:
         slot_5_pos = helpers_ot3.get_slot_calibration_square_position_ot3(11)
         current_pos = await api.gantry_position(mount)
         await api.move_to(mount, slot_5_pos._replace(y=slot_5_pos.y+29,z=current_pos.z))
-        await api.move_rel(mount, Point(z=movez))
+        await api.move_rel(mount, Point(z=movez+10))
+        await api.move_rel(mount, Point(z=-10),speed=5)
     await asyncio.sleep(0.2)
     for sensor_id in sensor_ids:
         pressure = await _read_pressure(sensor_id)
@@ -1320,6 +1322,7 @@ async def _test_diagnostics_pressure(
             ]
         )
     #print("moving plunger back down to BOTTOM position")
+    await asyncio.sleep(1)
     LOG_GING.info("moving plunger back down to BOTTOM position")
     await api.dispense(mount)
     await api.prepare_for_aspirate(mount)
