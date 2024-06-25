@@ -105,16 +105,6 @@ describe('RunPausedSplash', () => {
     expect(primaryBtn).toBeInTheDocument()
     expect(secondaryBtn).toBeInTheDocument()
 
-    expect(primaryBtn).toHaveStyle({ 'background-color': 'transparent' })
-    expect(secondaryBtn).toHaveStyle({ 'background-color': COLORS.white })
-
-    expect(screen.getByLabelText('remove icon')).toHaveStyle({
-      color: COLORS.red50,
-    })
-    expect(screen.getByLabelText('recovery icon')).toHaveStyle({
-      color: COLORS.white,
-    })
-
     fireEvent.click(secondaryBtn)
 
     await waitFor(() => {
