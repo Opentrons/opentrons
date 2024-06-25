@@ -93,22 +93,22 @@
         "t50": {
           "type": "object",
           "properties": {
-            "height": { "type": "number" },
-            "volume": { "type": "number" }
+            "minHeight": { "type": "number" },
+            "minVolume": { "type": "number" }
           }
         },
         "t200": {
           "type": "object",
           "properties": {
-            "height": { "type": "number" },
-            "volume": { "type": "number" }
+            "minHeight": { "type": "number" },
+            "minVolume": { "type": "number" }
           }
         },
         "t1000": {
           "type": "object",
           "properties": {
-            "height": { "type": "number" },
-            "volume": { "type": "number" }
+            "minHeight": { "type": "number" },
+            "minVolume": { "type": "number" }
           }
         }
       }

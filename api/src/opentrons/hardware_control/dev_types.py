@@ -98,6 +98,7 @@ class PipetteDict(InstrumentDict):
     supported_tips: Dict[PipetteTipType, SupportedTipsDefinition]
     pipette_bounding_box_offsets: PipetteBoundingBoxOffsetDefinition
     current_nozzle_map: NozzleMap
+    lld_settings: Dict[str, Dict[str, float]]
 
 
 class PipetteStateDict(TypedDict):

@@ -177,11 +177,9 @@ class HardwarePipettingHandler(PipettingHandler):
         )
         well_def = self._state_view.labware.get_well_definition(labware_id, well_name)
         well_depth = well_def.depth
-        well_min_height = self._state_view.labware.get_well_min_height(
-            labware_id, well_name
-        )
+        lld_min_height = self._state_view.pipettes.get_current_tip_lld_settings(pipette_id=pipette_id)
         z_pos = await self._hardware_api.liquid_probe(
-            mount=hw_pipette.mount, max_z_dist=well_depth - well_min_height
+            mount=hw_pipette.mount, max_z_dist=well_depth - lld_min_height
         )
         return float(z_pos)
 
