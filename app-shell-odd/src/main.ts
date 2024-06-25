@@ -74,13 +74,13 @@ function quitApplication(): void {
 }
 
 app.once('window-all-closed', () => {
-    log.debug('all windows closed, quitting the app')
-    quitApplication()
+  log.debug('all windows closed, quitting the app')
+  quitApplication()
 })
 
 app.once('render-process-gone', () => {
-    log.debug('Renderer process has died, quitting the app')
-    quitApplication()
+  log.debug('Renderer process has died, quitting the app')
+  quitApplication()
 })
 
 function startUp(): void {
