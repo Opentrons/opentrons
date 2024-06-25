@@ -47,7 +47,10 @@ gather() {
         ssh -q -o stricthostkeychecking=no -o userknownhostsfile=/dev/null \
             root@$ip 'bash -s' <<- 'EOF'
 
-            serial=$(cat /var/serial || echo "unknown")
+            serial="unknown"
+            if [ -f "/var/serial" ]; then
+                serial=$(cat /var/serial)
+            fi
             today=$(date '+%Y_%m_%d_%H_%M_%S')
             diag_dir="./diag/${serial}_${today}"
 
@@ -70,7 +73,7 @@ gather() {
             echo "Gathering /data files"
             cp -r /data/* $diag_dir/data/
             cp -r /etc/VERSION.json $diag_dir/data/
-            cp -r /var/serial $diag_dir/data/
+            echo $serial > $diag_dir/data/serial.txt
             
             echo "Gathering logs"
             shopt -s extglob
