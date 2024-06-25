@@ -936,7 +936,7 @@ class ProtocolContext(CommandPublisher):
             and liquid_presence_detection is not None
         ):
             raise APIVersionError(
-                "Liquid Presence Detection is only supported on Flex protocols in API Version 2.20 and above."
+                "Liquid Presence Detection is only supported in API Version 2.20 and above."
             )
         if (
             self._core.robot_type != "OT-3 Standard"
