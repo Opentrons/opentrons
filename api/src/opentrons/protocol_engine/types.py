@@ -81,8 +81,8 @@ class EngineStatus(str, Enum):
     AWAITING_RECOVERY_PAUSED = "awaiting-recovery-paused"
     """The engine is paused while in error recovery mode. Activity is paused, or will pause soon.
 
-    This state is not possible to enter manually. It happens when you open the door
-    during error recovery and then close it again.
+    This state is not possible to enter manually. It happens when an open door
+    gets closed during error recovery.
     """
 
     AWAITING_RECOVERY_BLOCKED_BY_OPEN_DOOR = "awaiting-recovery-blocked-by-open-door"
