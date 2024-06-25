@@ -60,6 +60,7 @@ class Gripper_Force_Check:
         self.force_gauge = None
         self.force_gauge_port = "/dev/ttyUSB0"
         self.class_name = self.__class__.__name__
+        self.run_id = None
 
     async def test_setup(self):
         self.file_setup()
@@ -74,6 +75,7 @@ class Gripper_Force_Check:
         self.test_data["Gripper"] = str(self.gripper_id)
         self.test_data["Input Force"] = str(self.grip_force)
         self.deck_definition = load("ot3_standard", version=3)
+        await self.api.home()
         print(f"\nStarting Gripper Lifetime Force Check!\n")
         self.start_time = time.time()
 
@@ -82,10 +84,10 @@ class Gripper_Force_Check:
         self.test_name = class_name.lower()
         self.test_tag = f"force_{self.grip_force}"
         self.test_header = self.dict_keys_to_line(self.test_data)
-        self.test_id = data.create_run_id()
+        self.run_id = data.create_run_id()
         self.test_path = data.create_folder_for_test_data(self.test_name)
-        self.test_file = data.create_file_name(self.test_name, self.test_id, self.test_tag)
-        data.append_data_to_file(self.test_name, self.test_id, self.test_file, self.test_header)
+        self.test_file = data.create_file_name(self.test_name, self.run_id, self.test_tag)
+        data.append_data_to_file(self.test_name, self.run_id, self.test_file, self.test_header)
         print("FILE PATH = ", self.test_path)
         print("FILE NAME = ", self.test_file)
 
@@ -123,8 +125,7 @@ class Gripper_Force_Check:
         self.test_data["Time"] = str(round(elapsed_time, 3))
         self.test_data["Cycle"] = str(self.cycle)
         test_data = self.dict_values_to_line(self.test_data)
-        self.test_id = data.create_run_id()
-        data.append_data_to_file(self.test_name, self.test_id, self.test_file, test_data)
+        data.append_data_to_file(self.test_name, self.run_id, self.test_file, test_data)
 
     async def _read_gripper(
         self, api: OT3API
