@@ -142,7 +142,7 @@ class google_sheet:
                 try:
                     float_value = float(value)
                     user_entered_value = {"numberValue": float_value}
-                except ValueError:
+                except (ValueError, TypeError):
                     user_entered_value = {"stringValue": str(value)}
                 requests.append(
                     {
@@ -172,13 +172,19 @@ class google_sheet:
         self.spread_sheet.worksheet(sheet_title).update_cell(row, column, single_data)
         return row, column, single_data
 
-    def get_all_data(self) -> List[Dict[str, Any]]:
+    def get_all_data(
+        self, expected_headers: Optional[Set[str]]
+    ) -> List[Dict[str, Any]]:
         """Get all the Data recorded from worksheet."""
-        return self.worksheet.get_all_records()
+        return self.worksheet.get_all_records(expected_headers=expected_headers)
 
     def get_column(self, column_number: int) -> Set[str]:
         """Get all values in column."""
         return self.worksheet.col_values(column_number)
+
+    def get_row(self, row_number: int) -> Set[str]:
+        """Get all values in row."""
+        return self.worksheet.row_values(row_number)
 
     def get_cell(self, sheet_title: str, cell: str) -> Any:
         """Get cell value with location ex: 'A1'."""

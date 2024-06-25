@@ -100,16 +100,17 @@ export function ErrorRecoveryFlows(
   const enableRunNotes = useFeatureFlag('enableRunNotes')
   const { hasLaunchedRecovery, toggleERWizard, showERWizard } = useERWizard()
   const showSplash = useRunPausedSplash()
+  const isOnDevice = useSelector(getIsOnDevice)
 
   const recoveryUtils = useERUtils({
     ...props,
     hasLaunchedRecovery,
     toggleERWizard,
+    isOnDevice,
   })
 
   const { protocolAnalysis } = props
   const robotType = protocolAnalysis?.robotType ?? OT2_ROBOT_TYPE
-  const isOnDevice = useSelector(getIsOnDevice)
 
   if (!enableRunNotes) {
     return null
