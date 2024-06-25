@@ -13,7 +13,6 @@ import {
   LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
-import { ODD_FOCUS_VISIBLE } from './constants'
 import type { IconName, StyleProps } from '@opentrons/components'
 
 type LargeButtonTypes =
@@ -49,10 +48,9 @@ export function LargeButton(props: LargeButtonProps): JSX.Element {
       disabledColor: string
       iconColor: string
       disabledIconColor: string
-      border?: string
-      disabledBorder?: string
+      focusVisibleOutlineColor: string
+      isInverse?: boolean
       activeColor?: string
-      activeBorder?: string
       activeIconColor?: string
     }
   > = {
@@ -64,6 +62,7 @@ export function LargeButton(props: LargeButtonProps): JSX.Element {
       disabledBackgroundColor: COLORS.grey35,
       iconColor: COLORS.blue50,
       disabledIconColor: COLORS.grey50,
+      focusVisibleOutlineColor: COLORS.blue50,
     },
     alert: {
       defaultColor: COLORS.red60,
@@ -73,6 +72,7 @@ export function LargeButton(props: LargeButtonProps): JSX.Element {
       disabledBackgroundColor: COLORS.grey35,
       iconColor: COLORS.red60,
       disabledIconColor: COLORS.grey50,
+      focusVisibleOutlineColor: COLORS.blue50,
     },
     primary: {
       defaultColor: COLORS.white,
@@ -82,6 +82,7 @@ export function LargeButton(props: LargeButtonProps): JSX.Element {
       disabledBackgroundColor: COLORS.grey35,
       iconColor: COLORS.white,
       disabledIconColor: COLORS.grey50,
+      focusVisibleOutlineColor: COLORS.blue55,
     },
     alertStroke: {
       defaultColor: COLORS.white,
@@ -92,10 +93,9 @@ export function LargeButton(props: LargeButtonProps): JSX.Element {
       disabledBackgroundColor: COLORS.transparent,
       iconColor: COLORS.white,
       disabledIconColor: COLORS.grey40,
-      border: `${BORDERS.borderRadius4} solid ${COLORS.white}`,
-      disabledBorder: `${BORDERS.borderRadius4} solid ${COLORS.grey35}`,
-      activeBorder: 'none',
+      isInverse: true,
       activeIconColor: COLORS.red60,
+      focusVisibleOutlineColor: COLORS.blue50,
     },
     alertAlt: {
       defaultColor: COLORS.red50,
@@ -107,54 +107,77 @@ export function LargeButton(props: LargeButtonProps): JSX.Element {
       disabledIconColor: COLORS.grey50,
       activeIconColor: COLORS.red60,
       activeColor: COLORS.red60,
+      focusVisibleOutlineColor: COLORS.blue50,
     },
   }
-  const activeColorFor = (style: keyof typeof LARGE_BUTTON_PROPS_BY_TYPE): string =>
-    LARGE_BUTTON_PROPS_BY_TYPE[style].activeColor ? `color: ${LARGE_BUTTON_PROPS_BY_TYPE[style].activeColor}` : ''
-  const activeIconStyle = (style: keyof typeof LARGE_BUTTON_PROPS_BY_TYPE): string =>
-    LARGE_BUTTON_PROPS_BY_TYPE[style].activeIconColor ? `color: ${LARGE_BUTTON_PROPS_BY_TYPE[style].activeIconColor}` : ''
-
+  const activeColorFor = (
+    style: keyof typeof LARGE_BUTTON_PROPS_BY_TYPE
+  ): string =>
+    LARGE_BUTTON_PROPS_BY_TYPE[style].activeColor
+      ? `color: ${LARGE_BUTTON_PROPS_BY_TYPE[style].activeColor}`
+      : ''
+  const activeIconStyle = (
+    style: keyof typeof LARGE_BUTTON_PROPS_BY_TYPE
+  ): string =>
+    LARGE_BUTTON_PROPS_BY_TYPE[style].activeIconColor
+      ? `color: ${LARGE_BUTTON_PROPS_BY_TYPE[style].activeIconColor}`
+      : ''
   const LARGE_BUTTON_STYLE = css`
     text-align: ${TYPOGRAPHY.textAlignLeft};
     color: ${LARGE_BUTTON_PROPS_BY_TYPE[buttonType].defaultColor};
     background-color: ${LARGE_BUTTON_PROPS_BY_TYPE[buttonType]
-    .defaultBackgroundColor};
+      .defaultBackgroundColor};
     cursor: default;
     border-radius: ${BORDERS.borderRadius16};
     box-shadow: none;
     padding: ${SPACING.spacing24};
     line-height: ${TYPOGRAPHY.lineHeight20};
-    border: ${LARGE_BUTTON_PROPS_BY_TYPE[buttonType].border};
+    border: ${BORDERS.borderRadius4} solid
+      ${!!LARGE_BUTTON_PROPS_BY_TYPE[buttonType].isInverse
+        ? LARGE_BUTTON_PROPS_BY_TYPE[buttonType].color
+        : LARGE_BUTTON_PROPS_BY_TYPE[buttonType].defaultBackgroundColor};
+
     ${TYPOGRAPHY.pSemiBold}
 
     #btn-icon: {
-       color: ${disabled ? LARGE_BUTTON_PROPS_BY_TYPE[buttonType].disabledIconColor : LARGE_BUTTON_PROPS_BY_TYPE[buttonType].iconColor};
+      color: ${disabled
+        ? LARGE_BUTTON_PROPS_BY_TYPE[buttonType].disabledIconColor
+        : LARGE_BUTTON_PROPS_BY_TYPE[buttonType].iconColor};
+    }
+
+    &:active {
+      background-color: ${LARGE_BUTTON_PROPS_BY_TYPE[buttonType]
+        .activeBackgroundColor};
+      ${activeColorFor(buttonType)};
+      border: ${BORDERS.borderRadius4} solid
+        ${LARGE_BUTTON_PROPS_BY_TYPE[buttonType].activeBackgroundColor};
+    }
+    &:active #btn-icon {
+      ${activeIconStyle(buttonType)};
     }
 
     &:focus-visible {
-    box-shadow: ${ODD_FOCUS_VISIBLE};
-    background-color: ${LARGE_BUTTON_PROPS_BY_TYPE[buttonType]
-    .defaultBackgroundColor};
-    }
-    &:active {
-    background-color: ${LARGE_BUTTON_PROPS_BY_TYPE[buttonType].activeBackgroundColor};
-    ${activeColorFor(buttonType)};
-    border: ${LARGE_BUTTON_PROPS_BY_TYPE[buttonType].activeBorder ?? 0}
-    }
-    &:active #btn-icon: {
-    ${activeIconStyle(buttonType)};
+      background-color: ${LARGE_BUTTON_PROPS_BY_TYPE[buttonType]
+        .activeBackgroundColor};
+      ${activeColorFor(buttonType)};
+      padding: calc(${SPACING.spacing24} + ${SPACING.spacing2});
+      border: ${SPACING.spacing2} solid ${COLORS.transparent};
+      outline: 3px solid
+        ${LARGE_BUTTON_PROPS_BY_TYPE[buttonType].focusVisibleOutlineColor};
+      background-clip: padding-box;
+      box-shadow: none;
     }
 
     &:disabled {
-    color: ${LARGE_BUTTON_PROPS_BY_TYPE[buttonType].disabledColor};
-    background-color: ${LARGE_BUTTON_PROPS_BY_TYPE[buttonType]
-    .disabledBackgroundColor};
+      color: ${LARGE_BUTTON_PROPS_BY_TYPE[buttonType].disabledColor};
+      background-color: ${LARGE_BUTTON_PROPS_BY_TYPE[buttonType]
+        .disabledBackgroundColor};
     }
   `
   return (
     <Btn
-    display={DISPLAY_FLEX}
-    css={LARGE_BUTTON_STYLE}
+      display={DISPLAY_FLEX}
+      css={LARGE_BUTTON_STYLE}
       flexDirection={DIRECTION_COLUMN}
       justifyContent={JUSTIFY_SPACE_BETWEEN}
       disabled={disabled}

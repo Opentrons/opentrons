@@ -19,20 +19,27 @@ const meta: Meta<typeof LargeButton> = {
   },
   parameters: {
     viewport: {
-      defaultViewport: 'Touchscreen'
+      defaultViewport: 'Touchscreen',
     },
     pseudo: {
-      rootSelector: '#content'
+      rootSelector: '#content',
     },
   },
   decorators: [
     (Story, context) => (
-      <Box width={'fit-content'} padding={SPACING.spacing32} backgroundColor={['alertStroke', 'alertAlt'].includes(context.args.buttonType) ? COLORS.black90 : COLORS.white }>
+      <Box
+        width={'fit-content'}
+        padding={SPACING.spacing32}
+        backgroundColor={
+          ['alertStroke', 'alertAlt'].includes(context.args.buttonType)
+            ? COLORS.black90
+            : COLORS.white
+        }
+      >
         <Story id={'content'} />
       </Box>
-    )
+    ),
   ],
-
 }
 
 export default meta
@@ -68,7 +75,7 @@ export const AlertStroke: Story = {
     buttonType: 'alertStroke',
     buttonText: 'Button text',
     disabled: false,
-    iconName: 'ot-alert'
+    iconName: 'ot-alert',
   },
 }
 
@@ -77,6 +84,6 @@ export const AlertAlt: Story = {
     buttonType: 'alertAlt',
     buttonText: 'Button text',
     disabled: false,
-    iconName: 'ot-check'
+    iconName: 'ot-check',
   },
 }
