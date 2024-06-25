@@ -144,6 +144,7 @@ def loaded_static_pipette_data(
         nozzle_map=get_default_nozzle_map(PipetteNameType.P300_SINGLE),
         back_left_corner_offset=Point(x=1, y=2, z=3),
         front_right_corner_offset=Point(x=4, y=5, z=6),
+        pipette_lld_settings={},
     )
 
 

@@ -241,7 +241,7 @@ class VirtualPipetteDataProvider:
             front_right_corner_offset=Point(
                 pip_front_right[0], pip_front_right[1], pip_front_right[2]
             ),
-            pipette_lld_settings=config.pipette_lld_settings
+            pipette_lld_settings=config.lld_settings,
         )
 
     def get_virtual_pipette_static_config(
@@ -284,6 +284,5 @@ def get_pipette_static_config(pipette_dict: PipetteDict) -> LoadedStaticPipetteD
         front_right_corner_offset=Point(
             front_right_offset[0], front_right_offset[1], front_right_offset[2]
         ),
-        pipette_lld_settings=pipette_dict["lld_settings"]
-        
+        pipette_lld_settings=pipette_dict["lld_settings"],
     )

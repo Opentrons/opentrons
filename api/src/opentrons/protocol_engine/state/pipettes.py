@@ -97,13 +97,6 @@ class PipetteBoundingBoxOffsets:
 
     back_left_corner: Point
     front_right_corner: Point
-    
-@dataclass(frozen=True)
-class PipetteLldSettings:
-    """Minimum liquid requirements for Liquid Level Detection to work properly."""
-    t50: Optional[Dict[str, float]]
-    t200: Optional[Dict[str, float]]
-    t1000: Optional[Dict[str, float]]
 
 
 @dataclass(frozen=True)
@@ -125,7 +118,7 @@ class StaticPipetteConfig:
     pipette_bounding_box_offsets: PipetteBoundingBoxOffsets
     bounding_nozzle_offsets: BoundingNozzlesOffsets
     default_nozzle_map: NozzleMap
-    lld_settings: PipetteLldSettings
+    lld_settings: Dict[str, Dict[str, float]]
 
 
 @dataclass
@@ -159,7 +152,7 @@ class PipetteStore(HasState[PipetteState], HandlesActions):
             movement_speed_by_id={},
             static_config_by_id={},
             flow_rates_by_id={},
-            nozzle_configuration_by_id={}
+            nozzle_configuration_by_id={},
         )
 
     def handle_action(self, action: Action) -> None:
@@ -205,7 +198,7 @@ class PipetteStore(HasState[PipetteState], HandlesActions):
                     front_right_offset=config.nozzle_map.front_right_nozzle_offset,
                 ),
                 default_nozzle_map=config.nozzle_map,
-                lld_settings=config.lld_settings
+                lld_settings=config.pipette_lld_settings,
             )
             self._state.flow_rates_by_id[private_result.pipette_id] = config.flow_rates
             self._state.nozzle_configuration_by_id[
@@ -626,19 +619,25 @@ class PipetteView(HasState[PipetteState]):
         current_volume = self.get_aspirated_volume(pipette_id)
 
         return max(0.0, working_volume - current_volume) if current_volume else None
-    
-    
-    def get_pipette_lld_settings(self, pipette_id: str) -> Dict[str, float]:
+
+    def get_pipette_lld_settings(self, pipette_id: str) -> Dict[str, Dict[str, float]]:
+        """Get the liquid level settings for all possible tips for a single pipette."""
         return self.get_config(pipette_id).lld_settings
-    
+
     def get_current_tip_lld_settings(self, pipette_id: str) -> float:
-        """Get the liquid level settings for the current pipette and tip"""
+        """Get the liquid level settings for pipette and its current tip."""
         attached_tip = self.get_attached_tip(pipette_id)
-        lld_settings = self.get_lld_settings(pipette_id)
-        if None in {attached_tip, lld_settings, lld_settings[attached_tip], lld_settings[attached_tip]['minHeight']}:
+        if attached_tip is None or attached_tip.volume is None:
             return 0
-        return lld_settings[attached_tip]['minHeight']
-            
+        lld_settings = self.get_pipette_lld_settings(pipette_id)
+        tipVolume = str(attached_tip.volume)
+        if None in {
+            lld_settings,
+            lld_settings[tipVolume],
+            lld_settings[tipVolume]["minHeight"],
+        }:
+            return 0
+        return float(lld_settings[tipVolume]["minHeight"])
 
     def validate_tip_state(self, pipette_id: str, expected_has_tip: bool) -> None:
         """Validate that a pipette's tip state matches expectations."""
