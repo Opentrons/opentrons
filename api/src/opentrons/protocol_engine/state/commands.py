@@ -96,12 +96,12 @@ class QueueStatus(enum.Enum):
     """
 
 
-class RunResult(str, enum.Enum):
+class RunResult(enum.Enum):
     """Result of the run."""
 
-    SUCCEEDED = "succeeded"
-    FAILED = "failed"
-    STOPPED = "stopped"
+    SUCCEEDED = enum.auto()
+    FAILED = enum.auto()
+    STOPPED = enum.auto()
 
 
 @dataclass(frozen=True)
