@@ -213,7 +213,7 @@ push: push-no-restart restart
 
 .PHONY: restart-ot3
 restart-ot3:
-	$(call restart-server,$(host),$(ssh_key),$(ssh_opts),"opentrons-robot-server")
+	$(call restart-service,$(host),$(ssh_key),$(ssh_opts),"opentrons-robot-server")
 
 .PHONY: push-no-restart-ot3
 push-no-restart-ot3: sdist Pipfile.lock

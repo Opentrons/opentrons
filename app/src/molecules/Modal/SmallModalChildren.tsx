@@ -4,7 +4,7 @@ import {
   DIRECTION_COLUMN,
   Flex,
   SPACING,
-  StyledText,
+  LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
@@ -30,7 +30,7 @@ export function SmallModalChildren(
         width="100%"
         whiteSpace="break-spaces"
       >
-        <StyledText
+        <LegacyStyledText
           color={COLORS.black90}
           fontSize={TYPOGRAPHY.fontSize28}
           fontWeight={TYPOGRAPHY.fontWeightBold}
@@ -38,8 +38,8 @@ export function SmallModalChildren(
           textAlign={TYPOGRAPHY.textAlignCenter}
         >
           {header}
-        </StyledText>
-        <StyledText
+        </LegacyStyledText>
+        <LegacyStyledText
           color={COLORS.grey60}
           fontSize={TYPOGRAPHY.fontSize22}
           fontWeight={TYPOGRAPHY.fontWeightRegular}
@@ -47,7 +47,7 @@ export function SmallModalChildren(
           textAlign={TYPOGRAPHY.textAlignCenter}
         >
           {subText}
-        </StyledText>
+        </LegacyStyledText>
 
         <Flex marginTop={SPACING.spacing32}>
           <SmallButton

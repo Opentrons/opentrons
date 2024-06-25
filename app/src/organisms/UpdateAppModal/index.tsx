@@ -15,7 +15,7 @@ import {
   PrimaryButton,
   SecondaryButton,
   SPACING,
-  StyledText,
+  LegacyStyledText,
 } from '@opentrons/components'
 
 import {
@@ -168,9 +168,9 @@ export function UpdateAppModal(props: UpdateAppModalProps): JSX.Element {
             alignItems={ALIGN_CENTER}
             padding={SPACING.spacing48}
           >
-            <StyledText>
+            <LegacyStyledText>
               {downloading ? t('download_update') : t('restarting_app')}
-            </StyledText>
+            </LegacyStyledText>
             <ProgressBar
               percentComplete={downloaded ? 100 : downloadPercentage}
               outerStyles={UPDATE_PROGRESS_BAR_STYLE}

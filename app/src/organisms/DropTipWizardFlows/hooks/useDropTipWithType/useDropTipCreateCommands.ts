@@ -25,7 +25,7 @@ interface UseDropTipCreateCommandsParams {
   setErrorDetails: (errorDetails: SetRobotErrorDetailsParams) => void
 }
 
-interface UseDropTipCreateCommandsResult {
+export interface UseDropTipCreateCommandsResult {
   chainRunCommands: (
     commands: CreateCommand[],
     continuePastFailure: boolean

@@ -8,7 +8,7 @@ import {
   OVERFLOW_WRAP_ANYWHERE,
   PrimaryButton,
   SPACING,
-  StyledText,
+  LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
@@ -39,16 +39,16 @@ export function ProtocolAnalysisErrorModal({
       title="Protocol analysis failure"
       onClose={onClose}
     >
-      <StyledText as="p" overflowWrap={OVERFLOW_WRAP_ANYWHERE}>
+      <LegacyStyledText as="p" overflowWrap={OVERFLOW_WRAP_ANYWHERE}>
         {t('analysis_failure_on_robot', {
           protocolName: displayName,
           robotName,
         })}
-      </StyledText>
+      </LegacyStyledText>
       {errors?.map((error, index) => (
-        <StyledText as="p" key={index} marginTop={SPACING.spacing16}>
+        <LegacyStyledText as="p" key={index} marginTop={SPACING.spacing16}>
           {error?.detail}
-        </StyledText>
+        </LegacyStyledText>
       ))}
       <Flex justifyContent={JUSTIFY_FLEX_END}>
         <PrimaryButton
@@ -58,12 +58,12 @@ export function ProtocolAnalysisErrorModal({
           padding={`${SPACING.spacing8} ${SPACING.spacing48}`}
           onClick={onClose}
         >
-          <StyledText
+          <LegacyStyledText
             css={TYPOGRAPHY.pSemiBold}
             textTransform={TYPOGRAPHY.textTransformCapitalize}
           >
             {t('shared:close')}
-          </StyledText>
+          </LegacyStyledText>
         </PrimaryButton>
       </Flex>
     </LegacyModal>,

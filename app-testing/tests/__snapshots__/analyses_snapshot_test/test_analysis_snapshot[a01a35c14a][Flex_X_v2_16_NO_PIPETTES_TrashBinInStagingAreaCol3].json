@@ -52,6 +52,20 @@
               ]
             }
           ],
+          "liquidProbeParameters": {
+            "minimumHeight": [
+              {
+                "applicableWells": [],
+                "value": 0.5
+              }
+            ],
+            "minimumWellVolume": [
+              {
+                "applicableWells": [],
+                "value": 0.0
+              }
+            ]
+          },
           "metadata": {
             "displayCategory": "reservoir",
             "displayName": "NEST 1 Well Reservoir 290 mL",
@@ -108,12 +122,14 @@
       "errorCode": "4000",
       "errorInfo": {},
       "errorType": "ExceptionInProtocolError",
+      "isDefined": false,
       "wrappedErrors": [
         {
           "detail": "Cannot use Trash Bin in C3, not compatible with one or more of the following fixtures: Slot C4",
           "errorCode": "4000",
           "errorInfo": {},
           "errorType": "IncompatibleAddressableAreaError",
+          "isDefined": false,
           "wrappedErrors": []
         }
       ]
@@ -161,6 +177,7 @@
   },
   "modules": [],
   "pipettes": [],
+  "result": "not-ok",
   "robotType": "OT-3 Standard",
   "runTimeParameters": []
 }

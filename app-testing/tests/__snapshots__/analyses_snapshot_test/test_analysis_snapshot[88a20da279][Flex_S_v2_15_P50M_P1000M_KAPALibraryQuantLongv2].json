@@ -8,11 +8,10 @@
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "THIS IS A DRY RUN",
-        "legacyCommandType": "command.COMMENT"
+        "message": "THIS IS A DRY RUN"
       },
       "result": {},
       "status": "succeeded"
@@ -158,6 +157,20 @@
               ]
             }
           ],
+          "liquidProbeParameters": {
+            "minimumHeight": [
+              {
+                "applicableWells": [],
+                "value": 0.5
+              }
+            ],
+            "minimumWellVolume": [
+              {
+                "applicableWells": [],
+                "value": 0.0
+              }
+            ]
+          },
           "metadata": {
             "displayCategory": "wellPlate",
             "displayName": "NEST 96 Well Plate 100 µL PCR Full Skirt",
@@ -1240,6 +1253,20 @@
               ]
             }
           ],
+          "liquidProbeParameters": {
+            "minimumHeight": [
+              {
+                "applicableWells": [],
+                "value": 0.5
+              }
+            ],
+            "minimumWellVolume": [
+              {
+                "applicableWells": [],
+                "value": 0.0
+              }
+            ]
+          },
           "metadata": {
             "displayCategory": "reservoir",
             "displayName": "NEST 12 Well Reservoir 15 mL",
@@ -1573,6 +1600,20 @@
               ]
             }
           ],
+          "liquidProbeParameters": {
+            "minimumHeight": [
+              {
+                "applicableWells": [],
+                "value": 0.5
+              }
+            ],
+            "minimumWellVolume": [
+              {
+                "applicableWells": [],
+                "value": 0.0
+              }
+            ]
+          },
           "metadata": {
             "displayCategory": "aluminumBlock",
             "displayName": "Opentrons 96 Well Aluminum Block with Bio-Rad Well Plate 200 µL",
@@ -6182,6 +6223,20 @@
               ]
             }
           ],
+          "liquidProbeParameters": {
+            "minimumHeight": [
+              {
+                "applicableWells": [],
+                "value": 0.5
+              }
+            ],
+            "minimumWellVolume": [
+              {
+                "applicableWells": [],
+                "value": 0.0
+              }
+            ]
+          },
           "metadata": {
             "displayCategory": "wellPlate",
             "displayName": "NEST 96 Well Plate 100 µL PCR Full Skirt",
@@ -7357,6 +7412,20 @@
               ]
             }
           ],
+          "liquidProbeParameters": {
+            "minimumHeight": [
+              {
+                "applicableWells": [],
+                "value": 0.5
+              }
+            ],
+            "minimumWellVolume": [
+              {
+                "applicableWells": [],
+                "value": 0.0
+              }
+            ]
+          },
           "metadata": {
             "displayCategory": "aluminumBlock",
             "displayName": "Opentrons 96 Well Aluminum Block with Bio-Rad Well Plate 200 µL",
@@ -8803,6 +8872,20 @@
               ]
             }
           ],
+          "liquidProbeParameters": {
+            "minimumHeight": [
+              {
+                "applicableWells": [],
+                "value": 0.5
+              }
+            ],
+            "minimumWellVolume": [
+              {
+                "applicableWells": [],
+                "value": 0.0
+              }
+            ]
+          },
           "metadata": {
             "displayCategory": "wellPlate",
             "displayName": "Corning 384 Well Plate 112 µL Flat",
@@ -13545,6 +13628,20 @@
               ]
             }
           ],
+          "liquidProbeParameters": {
+            "minimumHeight": [
+              {
+                "applicableWells": [],
+                "value": 0.5
+              }
+            ],
+            "minimumWellVolume": [
+              {
+                "applicableWells": [],
+                "value": 0.0
+              }
+            ]
+          },
           "metadata": {
             "displayCategory": "wellPlate",
             "displayName": "Corning 384 Well Plate 112 µL Flat",
@@ -17874,51 +17971,46 @@
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "Flex_S_v2_15_P50M_P1000M_KAPALibraryQuantLongv2.py",
-        "legacyCommandType": "command.COMMENT"
+        "message": "Flex_S_v2_15_P50M_P1000M_KAPALibraryQuantLongv2.py"
       },
       "result": {},
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "There are 24 Samples",
-        "legacyCommandType": "command.COMMENT"
+        "message": "There are 24 Samples"
       },
       "result": {},
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "==============================================",
-        "legacyCommandType": "command.COMMENT"
+        "message": "=============================================="
       },
       "result": {},
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "--> Dispensing Diluent Part 1 and Part 2",
-        "legacyCommandType": "command.COMMENT"
+        "message": "--> Dispensing Diluent Part 1 and Part 2"
       },
       "result": {},
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "==============================================",
-        "legacyCommandType": "command.COMMENT"
+        "message": "=============================================="
       },
       "result": {},
       "status": "succeeded"
@@ -19189,31 +19281,28 @@
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "==============================================",
-        "legacyCommandType": "command.COMMENT"
+        "message": "=============================================="
       },
       "result": {},
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "--> Adding Sample to Diluent Part 1",
-        "legacyCommandType": "command.COMMENT"
+        "message": "--> Adding Sample to Diluent Part 1"
       },
       "result": {},
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "==============================================",
-        "legacyCommandType": "command.COMMENT"
+        "message": "=============================================="
       },
       "result": {},
       "status": "succeeded"
@@ -19525,11 +19614,10 @@
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "--> Mixing",
-        "legacyCommandType": "command.COMMENT"
+        "message": "--> Mixing"
       },
       "result": {},
       "status": "succeeded"
@@ -27656,31 +27744,28 @@
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "==============================================",
-        "legacyCommandType": "command.COMMENT"
+        "message": "=============================================="
       },
       "result": {},
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "--> Adding Diluted Sample to Diluent Part 2",
-        "legacyCommandType": "command.COMMENT"
+        "message": "--> Adding Diluted Sample to Diluent Part 2"
       },
       "result": {},
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "==============================================",
-        "legacyCommandType": "command.COMMENT"
+        "message": "=============================================="
       },
       "result": {},
       "status": "succeeded"
@@ -27992,11 +28077,10 @@
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "--> Mixing",
-        "legacyCommandType": "command.COMMENT"
+        "message": "--> Mixing"
       },
       "result": {},
       "status": "succeeded"
@@ -36123,31 +36207,28 @@
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "==============================================",
-        "legacyCommandType": "command.COMMENT"
+        "message": "=============================================="
       },
       "result": {},
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "--> Adding qPCR Mix",
-        "legacyCommandType": "command.COMMENT"
+        "message": "--> Adding qPCR Mix"
       },
       "result": {},
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "==============================================",
-        "legacyCommandType": "command.COMMENT"
+        "message": "=============================================="
       },
       "result": {},
       "status": "succeeded"
@@ -36669,31 +36750,28 @@
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "==============================================",
-        "legacyCommandType": "command.COMMENT"
+        "message": "=============================================="
       },
       "result": {},
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "--> Adding Standards to Mix",
-        "legacyCommandType": "command.COMMENT"
+        "message": "--> Adding Standards to Mix"
       },
       "result": {},
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "==============================================",
-        "legacyCommandType": "command.COMMENT"
+        "message": "=============================================="
       },
       "result": {},
       "status": "succeeded"
@@ -36969,31 +37047,28 @@
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "==============================================",
-        "legacyCommandType": "command.COMMENT"
+        "message": "=============================================="
       },
       "result": {},
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "--> Adding Diluted Sample to Mix",
-        "legacyCommandType": "command.COMMENT"
+        "message": "--> Adding Diluted Sample to Mix"
       },
       "result": {},
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "==============================================",
-        "legacyCommandType": "command.COMMENT"
+        "message": "=============================================="
       },
       "result": {},
       "status": "succeeded"
@@ -37809,31 +37884,28 @@
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "==============================================",
-        "legacyCommandType": "command.COMMENT"
+        "message": "=============================================="
       },
       "result": {},
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "--> Dispensing 384 well",
-        "legacyCommandType": "command.COMMENT"
+        "message": "--> Dispensing 384 well"
       },
       "result": {},
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "==============================================",
-        "legacyCommandType": "command.COMMENT"
+        "message": "=============================================="
       },
       "result": {},
       "status": "succeeded"
@@ -54455,31 +54527,28 @@
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "==============================================",
-        "legacyCommandType": "command.COMMENT"
+        "message": "=============================================="
       },
       "result": {},
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "--> Adding qPCR Mix",
-        "legacyCommandType": "command.COMMENT"
+        "message": "--> Adding qPCR Mix"
       },
       "result": {},
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "==============================================",
-        "legacyCommandType": "command.COMMENT"
+        "message": "=============================================="
       },
       "result": {},
       "status": "succeeded"
@@ -55001,31 +55070,28 @@
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "==============================================",
-        "legacyCommandType": "command.COMMENT"
+        "message": "=============================================="
       },
       "result": {},
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "--> Adding Standards to Mix",
-        "legacyCommandType": "command.COMMENT"
+        "message": "--> Adding Standards to Mix"
       },
       "result": {},
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "==============================================",
-        "legacyCommandType": "command.COMMENT"
+        "message": "=============================================="
       },
       "result": {},
       "status": "succeeded"
@@ -55301,31 +55367,28 @@
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "==============================================",
-        "legacyCommandType": "command.COMMENT"
+        "message": "=============================================="
       },
       "result": {},
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "--> Adding Diluted Sample to Mix",
-        "legacyCommandType": "command.COMMENT"
+        "message": "--> Adding Diluted Sample to Mix"
       },
       "result": {},
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "==============================================",
-        "legacyCommandType": "command.COMMENT"
+        "message": "=============================================="
       },
       "result": {},
       "status": "succeeded"
@@ -56141,31 +56204,28 @@
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "==============================================",
-        "legacyCommandType": "command.COMMENT"
+        "message": "=============================================="
       },
       "result": {},
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "--> Dispensing 384 well",
-        "legacyCommandType": "command.COMMENT"
+        "message": "--> Dispensing 384 well"
       },
       "result": {},
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "==============================================",
-        "legacyCommandType": "command.COMMENT"
+        "message": "=============================================="
       },
       "result": {},
       "status": "succeeded"
@@ -72787,31 +72847,28 @@
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "==============================================",
-        "legacyCommandType": "command.COMMENT"
+        "message": "=============================================="
       },
       "result": {},
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "--> Adding qPCR Mix",
-        "legacyCommandType": "command.COMMENT"
+        "message": "--> Adding qPCR Mix"
       },
       "result": {},
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "==============================================",
-        "legacyCommandType": "command.COMMENT"
+        "message": "=============================================="
       },
       "result": {},
       "status": "succeeded"
@@ -73333,31 +73390,28 @@
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "==============================================",
-        "legacyCommandType": "command.COMMENT"
+        "message": "=============================================="
       },
       "result": {},
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "--> Adding Standards to Mix",
-        "legacyCommandType": "command.COMMENT"
+        "message": "--> Adding Standards to Mix"
       },
       "result": {},
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "==============================================",
-        "legacyCommandType": "command.COMMENT"
+        "message": "=============================================="
       },
       "result": {},
       "status": "succeeded"
@@ -73633,31 +73687,28 @@
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "==============================================",
-        "legacyCommandType": "command.COMMENT"
+        "message": "=============================================="
       },
       "result": {},
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "--> Adding Diluted Sample to Mix",
-        "legacyCommandType": "command.COMMENT"
+        "message": "--> Adding Diluted Sample to Mix"
       },
       "result": {},
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "==============================================",
-        "legacyCommandType": "command.COMMENT"
+        "message": "=============================================="
       },
       "result": {},
       "status": "succeeded"
@@ -74473,31 +74524,28 @@
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "==============================================",
-        "legacyCommandType": "command.COMMENT"
+        "message": "=============================================="
       },
       "result": {},
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "--> Dispensing 384 well",
-        "legacyCommandType": "command.COMMENT"
+        "message": "--> Dispensing 384 well"
       },
       "result": {},
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "==============================================",
-        "legacyCommandType": "command.COMMENT"
+        "message": "=============================================="
       },
       "result": {},
       "status": "succeeded"
@@ -91119,31 +91167,28 @@
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "==============================================",
-        "legacyCommandType": "command.COMMENT"
+        "message": "=============================================="
       },
       "result": {},
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "--> Adding qPCR Mix",
-        "legacyCommandType": "command.COMMENT"
+        "message": "--> Adding qPCR Mix"
       },
       "result": {},
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "==============================================",
-        "legacyCommandType": "command.COMMENT"
+        "message": "=============================================="
       },
       "result": {},
       "status": "succeeded"
@@ -91665,31 +91710,28 @@
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "==============================================",
-        "legacyCommandType": "command.COMMENT"
+        "message": "=============================================="
       },
       "result": {},
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "--> Adding Standards to Mix",
-        "legacyCommandType": "command.COMMENT"
+        "message": "--> Adding Standards to Mix"
       },
       "result": {},
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "==============================================",
-        "legacyCommandType": "command.COMMENT"
+        "message": "=============================================="
       },
       "result": {},
       "status": "succeeded"
@@ -91965,31 +92007,28 @@
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "==============================================",
-        "legacyCommandType": "command.COMMENT"
+        "message": "=============================================="
       },
       "result": {},
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "--> Adding Diluted Sample to Mix",
-        "legacyCommandType": "command.COMMENT"
+        "message": "--> Adding Diluted Sample to Mix"
       },
       "result": {},
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "==============================================",
-        "legacyCommandType": "command.COMMENT"
+        "message": "=============================================="
       },
       "result": {},
       "status": "succeeded"
@@ -92805,31 +92844,28 @@
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "==============================================",
-        "legacyCommandType": "command.COMMENT"
+        "message": "=============================================="
       },
       "result": {},
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "--> Dispensing 384 well",
-        "legacyCommandType": "command.COMMENT"
+        "message": "--> Dispensing 384 well"
       },
       "result": {},
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "==============================================",
-        "legacyCommandType": "command.COMMENT"
+        "message": "=============================================="
       },
       "result": {},
       "status": "succeeded"
@@ -109451,31 +109487,28 @@
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "==============================================",
-        "legacyCommandType": "command.COMMENT"
+        "message": "=============================================="
       },
       "result": {},
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "--> Adding qPCR Mix",
-        "legacyCommandType": "command.COMMENT"
+        "message": "--> Adding qPCR Mix"
       },
       "result": {},
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "==============================================",
-        "legacyCommandType": "command.COMMENT"
+        "message": "=============================================="
       },
       "result": {},
       "status": "succeeded"
@@ -109997,31 +110030,28 @@
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "==============================================",
-        "legacyCommandType": "command.COMMENT"
+        "message": "=============================================="
       },
       "result": {},
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "--> Adding Standards to Mix",
-        "legacyCommandType": "command.COMMENT"
+        "message": "--> Adding Standards to Mix"
       },
       "result": {},
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "==============================================",
-        "legacyCommandType": "command.COMMENT"
+        "message": "=============================================="
       },
       "result": {},
       "status": "succeeded"
@@ -110297,31 +110327,28 @@
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "==============================================",
-        "legacyCommandType": "command.COMMENT"
+        "message": "=============================================="
       },
       "result": {},
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "--> Adding Diluted Sample to Mix",
-        "legacyCommandType": "command.COMMENT"
+        "message": "--> Adding Diluted Sample to Mix"
       },
       "result": {},
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "==============================================",
-        "legacyCommandType": "command.COMMENT"
+        "message": "=============================================="
       },
       "result": {},
       "status": "succeeded"
@@ -111137,31 +111164,28 @@
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "==============================================",
-        "legacyCommandType": "command.COMMENT"
+        "message": "=============================================="
       },
       "result": {},
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "--> Dispensing 384 well",
-        "legacyCommandType": "command.COMMENT"
+        "message": "--> Dispensing 384 well"
       },
       "result": {},
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "==============================================",
-        "legacyCommandType": "command.COMMENT"
+        "message": "=============================================="
       },
       "result": {},
       "status": "succeeded"
@@ -127783,31 +127807,28 @@
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "==============================================",
-        "legacyCommandType": "command.COMMENT"
+        "message": "=============================================="
       },
       "result": {},
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "--> Adding qPCR Mix",
-        "legacyCommandType": "command.COMMENT"
+        "message": "--> Adding qPCR Mix"
       },
       "result": {},
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "==============================================",
-        "legacyCommandType": "command.COMMENT"
+        "message": "=============================================="
       },
       "result": {},
       "status": "succeeded"
@@ -128329,31 +128350,28 @@
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "==============================================",
-        "legacyCommandType": "command.COMMENT"
+        "message": "=============================================="
       },
       "result": {},
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "--> Adding Standards to Mix",
-        "legacyCommandType": "command.COMMENT"
+        "message": "--> Adding Standards to Mix"
       },
       "result": {},
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "==============================================",
-        "legacyCommandType": "command.COMMENT"
+        "message": "=============================================="
       },
       "result": {},
       "status": "succeeded"
@@ -128629,31 +128647,28 @@
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "==============================================",
-        "legacyCommandType": "command.COMMENT"
+        "message": "=============================================="
       },
       "result": {},
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "--> Adding Diluted Sample to Mix",
-        "legacyCommandType": "command.COMMENT"
+        "message": "--> Adding Diluted Sample to Mix"
       },
       "result": {},
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "==============================================",
-        "legacyCommandType": "command.COMMENT"
+        "message": "=============================================="
       },
       "result": {},
       "status": "succeeded"
@@ -129469,31 +129484,28 @@
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "==============================================",
-        "legacyCommandType": "command.COMMENT"
+        "message": "=============================================="
       },
       "result": {},
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "--> Dispensing 384 well",
-        "legacyCommandType": "command.COMMENT"
+        "message": "--> Dispensing 384 well"
       },
       "result": {},
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
+      "commandType": "comment",
       "notes": [],
       "params": {
-        "legacyCommandText": "==============================================",
-        "legacyCommandType": "command.COMMENT"
+        "message": "=============================================="
       },
       "result": {},
       "status": "succeeded"
@@ -146246,6 +146258,7 @@
       "pipetteName": "p1000_multi_flex"
     }
   ],
+  "result": "ok",
   "robotType": "OT-3 Standard",
   "runTimeParameters": []
 }

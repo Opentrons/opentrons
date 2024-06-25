@@ -11,7 +11,7 @@ import {
   POSITION_ABSOLUTE,
   POSITION_RELATIVE,
   SPACING,
-  StyledText,
+  LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
@@ -46,9 +46,9 @@ export function TitleHeader({ title }: TitleHeaderProps): JSX.Element {
           <Icon name="back" size="3rem" />
         </Flex>
       </Btn>
-      <StyledText as="h2" fontWeight={TYPOGRAPHY.fontWeightBold}>
+      <LegacyStyledText as="h2" fontWeight={TYPOGRAPHY.fontWeightBold}>
         {title}
-      </StyledText>
+      </LegacyStyledText>
     </Flex>
   )
 }

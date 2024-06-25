@@ -24,7 +24,7 @@ import {
 
 import { i18n } from '../../../i18n'
 import { useToaster } from '../../../organisms/ToasterOven'
-import { mockRobotSideAnalysis } from '../../../organisms/CommandText/__fixtures__'
+import { mockRobotSideAnalysis } from '../../../molecules/Command/__fixtures__'
 import {
   useAttachedModules,
   useLPCDisabledReason,
@@ -53,7 +53,6 @@ import { useDeckConfigurationCompatibility } from '../../../resources/deck_confi
 import { ConfirmAttachedModal } from '../../../pages/ProtocolSetup/ConfirmAttachedModal'
 import { ProtocolSetup } from '../../../pages/ProtocolSetup'
 import { useNotifyRunQuery } from '../../../resources/runs'
-import { useFeatureFlag } from '../../../redux/config'
 import { ViewOnlyParameters } from '../../../organisms/ProtocolSetupParameters/ViewOnlyParameters'
 import { mockConnectableRobot } from '../../../redux/discovery/__fixtures__'
 import { mockRunTimeParameterData } from '../../ProtocolDetails/fixtures'
@@ -98,7 +97,6 @@ vi.mock('react-router-dom', async importOriginal => {
 vi.mock('@opentrons/react-api-client')
 vi.mock('../../../organisms/LabwarePositionCheck/useLaunchLPC')
 vi.mock('../../../organisms/Devices/hooks')
-vi.mock('../../../redux/config')
 vi.mock('../../../organisms/ProtocolSetupParameters/ViewOnlyParameters')
 vi.mock(
   '../../../organisms/LabwarePositionCheck/useMostRecentCompletedAnalysis'
@@ -196,7 +194,6 @@ describe('ProtocolSetup', () => {
   beforeEach(() => {
     mockLaunchLPC = vi.fn()
     mockHistoryPush = vi.fn()
-    vi.mocked(useFeatureFlag).mockReturnValue(false)
     vi.mocked(useLPCDisabledReason).mockReturnValue(null)
     vi.mocked(useAttachedModules).mockReturnValue([])
     vi.mocked(useModuleCalibrationStatus).mockReturnValue({ complete: true })
@@ -357,7 +354,6 @@ describe('ProtocolSetup', () => {
   })
 
   it('should launch view only parameters screen when click parameters', () => {
-    vi.mocked(useFeatureFlag).mockReturnValue(true)
     vi.mocked(useProtocolHasRunTimeParameters).mockReturnValue(true)
     vi.mocked(useProtocolAnalysisAsDocumentQuery).mockReturnValue({
       data: {

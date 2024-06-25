@@ -8,7 +8,7 @@ import {
   Flex,
   RESPONSIVENESS,
   SPACING,
-  StyledText,
+  LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { GenericWizardTile } from '../../molecules/GenericWizardTile'
@@ -61,7 +61,9 @@ export const DetachProbe = (
   )
 
   const bodyText = (
-    <StyledText css={BODY_STYLE}>{t('detach_probe_description')}</StyledText>
+    <LegacyStyledText css={BODY_STYLE}>
+      {t('detach_probe_description')}
+    </LegacyStyledText>
   )
 
   return (

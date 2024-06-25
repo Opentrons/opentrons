@@ -8,7 +8,7 @@ import {
   Flex,
   JUSTIFY_SPACE_BETWEEN,
   SPACING,
-  StyledText,
+  LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
@@ -39,16 +39,16 @@ export function ShowLabwareOffsetSnippets(): JSX.Element {
   return (
     <Flex alignItems={ALIGN_CENTER} justifyContent={JUSTIFY_SPACE_BETWEEN}>
       <Box width="70%">
-        <StyledText
+        <LegacyStyledText
           css={TYPOGRAPHY.h3SemiBold}
           paddingBottom={SPACING.spacing8}
           id="AdvancedSettings_showLink"
         >
           {t('show_labware_offset_snippets')}
-        </StyledText>
-        <StyledText as="p">
+        </LegacyStyledText>
+        <LegacyStyledText as="p">
           {t('branded:show_labware_offset_snippets_description')}
-        </StyledText>
+        </LegacyStyledText>
       </Box>
       <ToggleButton
         label="show_link_to_get_labware_offset_data"

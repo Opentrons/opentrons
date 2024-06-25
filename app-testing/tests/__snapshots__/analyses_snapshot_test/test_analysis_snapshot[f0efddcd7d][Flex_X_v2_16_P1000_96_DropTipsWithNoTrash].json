@@ -52,6 +52,20 @@
               ]
             }
           ],
+          "liquidProbeParameters": {
+            "minimumHeight": [
+              {
+                "applicableWells": [],
+                "value": 0.5
+              }
+            ],
+            "minimumWellVolume": [
+              {
+                "applicableWells": [],
+                "value": 0.0
+              }
+            ]
+          },
           "metadata": {
             "displayCategory": "reservoir",
             "displayName": "NEST 1 Well Reservoir 290 mL",
@@ -131,6 +145,20 @@
               "wells": []
             }
           ],
+          "liquidProbeParameters": {
+            "minimumHeight": [
+              {
+                "applicableWells": [],
+                "value": 0.5
+              }
+            ],
+            "minimumWellVolume": [
+              {
+                "applicableWells": [],
+                "value": 0.0
+              }
+            ]
+          },
           "metadata": {
             "displayCategory": "adapter",
             "displayName": "Opentrons Flex 96 Tip Rack Adapter",
@@ -1357,12 +1385,14 @@
       "errorCode": "4000",
       "errorInfo": {},
       "errorType": "ExceptionInProtocolError",
+      "isDefined": false,
       "wrappedErrors": [
         {
           "detail": "No trash container has been defined in this protocol.",
           "errorCode": "4000",
           "errorInfo": {},
           "errorType": "NoTrashDefinedError",
+          "isDefined": false,
           "wrappedErrors": []
         }
       ]
@@ -1427,6 +1457,7 @@
       "pipetteName": "p1000_96"
     }
   ],
+  "result": "not-ok",
   "robotType": "OT-3 Standard",
   "runTimeParameters": []
 }

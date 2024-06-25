@@ -8,7 +8,7 @@ import {
   Icon,
   JUSTIFY_CENTER,
   SPACING,
-  StyledText,
+  LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { useTranslation } from 'react-i18next'
@@ -45,9 +45,9 @@ export const EmptySection = (props: EmptySectionProps): JSX.Element => {
         marginBottom={SPACING.spacing32}
         aria-label="EmptySection_ot-alert"
       />
-      <StyledText as="h3" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
+      <LegacyStyledText as="h3" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
         {i18n.format(sectionText, 'capitalize')}
-      </StyledText>
+      </LegacyStyledText>
     </Flex>
   )
 }

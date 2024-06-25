@@ -1,10 +1,11 @@
 """Tests for the /protocols router."""
+
 import io
 
 import pytest
 from datetime import datetime
 from decoy import Decoy, matchers
-from fastapi import UploadFile
+from fastapi import HTTPException, UploadFile
 from pathlib import Path
 
 from opentrons.protocol_engine.types import RunTimeParamValuesType, NumberParameter
@@ -45,6 +46,7 @@ from robot_server.protocols.protocol_models import (
     Metadata,
     Protocol,
     ProtocolFile,
+    ProtocolKind,
     ProtocolType,
 )
 from robot_server.protocols.protocol_store import (
@@ -146,6 +148,7 @@ async def test_get_protocols(
             content_hash="a_b_c",
         ),
         protocol_key="dummy-key-111",
+        protocol_kind=ProtocolKind.STANDARD.value,
     )
     resource_2 = ProtocolResource(
         protocol_id="123",
@@ -160,6 +163,7 @@ async def test_get_protocols(
             content_hash="1_2_3",
         ),
         protocol_key="dummy-key-222",
+        protocol_kind=ProtocolKind.STANDARD.value,
     )
 
     analysis_1 = AnalysisSummary(id="analysis-id-abc", status=AnalysisStatus.PENDING)
@@ -168,6 +172,7 @@ async def test_get_protocols(
     expected_protocol_1 = Protocol(
         id="abc",
         createdAt=created_at_1,
+        protocolKind=ProtocolKind.STANDARD,
         protocolType=ProtocolType.PYTHON,
         metadata=Metadata(),
         robotType="OT-2 Standard",
@@ -178,6 +183,7 @@ async def test_get_protocols(
     expected_protocol_2 = Protocol(
         id="123",
         createdAt=created_at_2,
+        protocolKind=ProtocolKind.STANDARD,
         protocolType=ProtocolType.JSON,
         metadata=Metadata(),
         robotType="OT-3 Standard",
@@ -255,6 +261,7 @@ async def test_get_protocol_by_id(
             content_hash="a_b_c",
         ),
         protocol_key="dummy-key-111",
+        protocol_kind=ProtocolKind.STANDARD.value,
     )
 
     analysis_summary = AnalysisSummary(
@@ -279,6 +286,7 @@ async def test_get_protocol_by_id(
     assert result.content.data == Protocol(
         id="protocol-id",
         createdAt=datetime(year=2021, month=1, day=1),
+        protocolKind=ProtocolKind.STANDARD,
         protocolType=ProtocolType.PYTHON,
         metadata=Metadata(),
         robotType="OT-2 Standard",
@@ -349,6 +357,7 @@ async def test_create_existing_protocol(
         created_at=datetime(year=2020, month=1, day=1),
         source=protocol_source,
         protocol_key="dummy-key-222",
+        protocol_kind=ProtocolKind.STANDARD.value,
     )
 
     completed_analysis = AnalysisSummary(
@@ -399,6 +408,7 @@ async def test_create_existing_protocol(
     assert result.content.data == Protocol(
         id="the-og-proto-id",
         createdAt=datetime(year=2020, month=1, day=1),
+        protocolKind=ProtocolKind.STANDARD,
         protocolType=ProtocolType.JSON,
         metadata=Metadata(this_is_fake_metadata=True),  # type: ignore[call-arg]
         robotType="OT-2 Standard",
@@ -447,6 +457,7 @@ async def test_create_protocol(
         created_at=datetime(year=2021, month=1, day=1),
         source=protocol_source,
         protocol_key="dummy-key-111",
+        protocol_kind=ProtocolKind.STANDARD.value,
     )
 
     pending_analysis = AnalysisSummary(
@@ -501,6 +512,7 @@ async def test_create_protocol(
     assert result.content.data == Protocol(
         id="protocol-id",
         createdAt=datetime(year=2021, month=1, day=1),
+        protocolKind=ProtocolKind.STANDARD,
         protocolType=ProtocolType.JSON,
         metadata=Metadata(this_is_fake_metadata=True),  # type: ignore[call-arg]
         robotType="OT-2 Standard",
@@ -554,6 +566,7 @@ async def test_create_new_protocol_with_run_time_params(
         created_at=datetime(year=2021, month=1, day=1),
         source=protocol_source,
         protocol_key="dummy-key-111",
+        protocol_kind=ProtocolKind.STANDARD.value,
     )
     run_time_parameter = NumberParameter(
         displayName="My parameter",
@@ -658,6 +671,7 @@ async def test_create_existing_protocol_with_no_previous_analysis(
         created_at=datetime(year=2020, month=1, day=1),
         source=protocol_source,
         protocol_key="dummy-key-222",
+        protocol_kind=ProtocolKind.STANDARD.value,
     )
     run_time_parameter = NumberParameter(
         displayName="My parameter",
@@ -720,6 +734,7 @@ async def test_create_existing_protocol_with_no_previous_analysis(
     assert result.content.data == Protocol(
         id="the-og-proto-id",
         createdAt=datetime(year=2020, month=1, day=1),
+        protocolKind=ProtocolKind.STANDARD,
         protocolType=ProtocolType.JSON,
         metadata=Metadata(this_is_fake_metadata=True),  # type: ignore[call-arg]
         robotType="OT-2 Standard",
@@ -768,6 +783,7 @@ async def test_create_existing_protocol_with_different_run_time_params(
         created_at=datetime(year=2020, month=1, day=1),
         source=protocol_source,
         protocol_key="dummy-key-222",
+        protocol_kind=ProtocolKind.STANDARD.value,
     )
 
     completed_summary = AnalysisSummary(
@@ -839,6 +855,7 @@ async def test_create_existing_protocol_with_different_run_time_params(
     assert result.content.data == Protocol(
         id="the-og-proto-id",
         createdAt=datetime(year=2020, month=1, day=1),
+        protocolKind=ProtocolKind.STANDARD,
         protocolType=ProtocolType.JSON,
         metadata=Metadata(this_is_fake_metadata=True),  # type: ignore[call-arg]
         robotType="OT-2 Standard",
@@ -887,6 +904,7 @@ async def test_create_existing_protocol_with_same_run_time_params(
         created_at=datetime(year=2020, month=1, day=1),
         source=protocol_source,
         protocol_key="dummy-key-222",
+        protocol_kind=ProtocolKind.STANDARD.value,
     )
 
     analysis_summaries = [
@@ -940,6 +958,7 @@ async def test_create_existing_protocol_with_same_run_time_params(
     assert result.content.data == Protocol(
         id="the-og-proto-id",
         createdAt=datetime(year=2020, month=1, day=1),
+        protocolKind=ProtocolKind.STANDARD,
         protocolType=ProtocolType.JSON,
         metadata=Metadata(this_is_fake_metadata=True),  # type: ignore[call-arg]
         robotType="OT-2 Standard",
@@ -988,6 +1007,7 @@ async def test_create_existing_protocol_with_pending_analysis_raises(
         created_at=datetime(year=2020, month=1, day=1),
         source=protocol_source,
         protocol_key="dummy-key-222",
+        protocol_kind=ProtocolKind.STANDARD.value,
     )
 
     analysis_summaries = [
@@ -1427,6 +1447,7 @@ async def test_update_protocol_analyses_with_new_rtp_values(
         created_at=datetime(year=2020, month=1, day=1),
         source=protocol_source,
         protocol_key="dummy-key-222",
+        protocol_kind=ProtocolKind.STANDARD.value,
     )
     analysis_summaries = [
         AnalysisSummary(
@@ -1523,6 +1544,7 @@ async def test_update_protocol_analyses_with_forced_reanalysis(
         created_at=datetime(year=2020, month=1, day=1),
         source=protocol_source,
         protocol_key="dummy-key-222",
+        protocol_kind=ProtocolKind.STANDARD.value,
     )
     decoy.when(protocol_store.has(protocol_id="protocol-id")).then_return(True)
     decoy.when(
@@ -1552,3 +1574,157 @@ async def test_update_protocol_analyses_with_forced_reanalysis(
         AnalysisSummary(id="analysis-id-2", status=AnalysisStatus.PENDING),
     ]
     assert result.status_code == 201
+
+
+async def test_create_protocol_kind_quick_transfer(
+    decoy: Decoy,
+    protocol_store: ProtocolStore,
+    analysis_store: AnalysisStore,
+    protocol_reader: ProtocolReader,
+    file_reader_writer: FileReaderWriter,
+    file_hasher: FileHasher,
+    analyses_manager: AnalysesManager,
+    protocol_auto_deleter: ProtocolAutoDeleter,
+) -> None:
+    """It should store an uploaded protocol file marked as quick-transfer."""
+    protocol_directory = Path("/dev/null")
+    content = bytes("some_content", encoding="utf-8")
+    uploaded_file = io.BytesIO(content)
+
+    protocol_file = UploadFile(filename="foo.json", file=uploaded_file)
+    buffered_file = BufferedFile(name="blah", contents=content, path=None)
+
+    protocol_source = ProtocolSource(
+        directory=Path("/dev/null"),
+        main_file=Path("/dev/null/foo.json"),
+        files=[
+            ProtocolSourceFile(
+                path=Path("/dev/null/foo.json"),
+                role=ProtocolFileRole.MAIN,
+            )
+        ],
+        metadata={"this_is_fake_metadata": True},
+        robot_type="OT-3 Standard",
+        config=JsonProtocolConfig(schema_version=123),
+        content_hash="a_b_c",
+    )
+
+    protocol_resource = ProtocolResource(
+        protocol_id="protocol-id",
+        created_at=datetime(year=2021, month=1, day=1),
+        source=protocol_source,
+        protocol_key="dummy-key-111",
+        protocol_kind=ProtocolKind.QUICK_TRANSFER.value,
+    )
+    run_time_parameter = NumberParameter(
+        displayName="My parameter",
+        variableName="cool_param",
+        type="int",
+        min=1,
+        max=5,
+        value=2.0,
+        default=3.0,
+    )
+    pending_analysis = AnalysisSummary(
+        id="analysis-id",
+        status=AnalysisStatus.PENDING,
+        runTimeParameters=[run_time_parameter],
+    )
+    decoy.when(
+        await file_reader_writer.read(
+            # TODO(mm, 2024-02-07): Recent FastAPI upgrades mean protocol_file.filename
+            # is typed as possibly None. Investigate whether that can actually happen in
+            # practice and whether we need to account for it.
+            files=[protocol_file]  # type: ignore[list-item]
+        )
+    ).then_return([buffered_file])
+
+    decoy.when(await file_hasher.hash(files=[buffered_file])).then_return("abc123")
+
+    decoy.when(
+        await protocol_reader.save(
+            files=[buffered_file],
+            directory=protocol_directory / "protocol-id",
+            content_hash="abc123",
+        )
+    ).then_return(protocol_source)
+    decoy.when(
+        await analyses_manager.start_analysis(
+            analysis_id="analysis-id",
+            protocol_resource=protocol_resource,
+            run_time_param_values={},
+        )
+    ).then_return(pending_analysis)
+    decoy.when(protocol_store.get_all()).then_return([])
+
+    result = await create_protocol(
+        files=[protocol_file],
+        key="dummy-key-111",
+        run_time_parameter_values="{}",
+        protocol_directory=protocol_directory,
+        protocol_store=protocol_store,
+        analysis_store=analysis_store,
+        file_reader_writer=file_reader_writer,
+        protocol_reader=protocol_reader,
+        file_hasher=file_hasher,
+        analyses_manager=analyses_manager,
+        protocol_auto_deleter=protocol_auto_deleter,
+        robot_type="OT-3 Standard",
+        protocol_kind=ProtocolKind.QUICK_TRANSFER.value,
+        protocol_id="protocol-id",
+        analysis_id="analysis-id",
+        created_at=datetime(year=2021, month=1, day=1),
+    )
+
+    decoy.verify(
+        protocol_auto_deleter.make_room_for_new_protocol(),
+        protocol_store.insert(protocol_resource),
+    )
+
+    assert result.content.data == Protocol(
+        id="protocol-id",
+        createdAt=datetime(year=2021, month=1, day=1),
+        protocolKind=ProtocolKind.QUICK_TRANSFER,
+        protocolType=ProtocolType.JSON,
+        metadata=Metadata(this_is_fake_metadata=True),  # type: ignore[call-arg]
+        robotType="OT-3 Standard",
+        analysisSummaries=[pending_analysis],
+        files=[ProtocolFile(name="foo.json", role=ProtocolFileRole.MAIN)],
+        key="dummy-key-111",
+    )
+    assert result.status_code == 201
+
+
+async def test_create_protocol_kind_invalid(
+    protocol_store: ProtocolStore,
+    analysis_store: AnalysisStore,
+    protocol_reader: ProtocolReader,
+    file_reader_writer: FileReaderWriter,
+    file_hasher: FileHasher,
+    protocol_auto_deleter: ProtocolAutoDeleter,
+) -> None:
+    """It should throw a 400 error if the protocol kind is invalid."""
+    protocol_directory = Path("/dev/null")
+    content = bytes("some_content", encoding="utf-8")
+    uploaded_file = io.BytesIO(content)
+    protocol_file = UploadFile(filename="foo.json", file=uploaded_file)
+
+    with pytest.raises(HTTPException) as exc_info:
+        await create_protocol(
+            files=[protocol_file],
+            key="dummy-key-111",
+            protocol_directory=protocol_directory,
+            protocol_store=protocol_store,
+            analysis_store=analysis_store,
+            file_reader_writer=file_reader_writer,
+            protocol_reader=protocol_reader,
+            file_hasher=file_hasher,
+            protocol_auto_deleter=protocol_auto_deleter,
+            robot_type="OT-3 Standard",
+            protocol_id="protocol-id",
+            analysis_id="analysis-id",
+            protocol_kind="invalid",
+            created_at=datetime(year=2021, month=1, day=1),
+        )
+
+        assert exc_info.value.status_code == 400

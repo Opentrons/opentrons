@@ -34,10 +34,15 @@ class AnalysisResult(str, Enum):
         OK: No problems were found during protocol analysis.
         NOT_OK: Problems were found during protocol analysis. Inspect
             `analysis.errors` for error occurrences.
+        PARAMETER_VALUE_REQUIRED: A value is required to be set for a parameter
+            in order for the protocol to be analyzed/run. The absence of this does not
+            inherently mean there are no parameters, as there may be defaults for all
+            or unset parameters are not referenced or handled via try/except clauses.
     """
 
     OK = "ok"
     NOT_OK = "not-ok"
+    PARAMETER_VALUE_REQUIRED = "parameter-value-required"
 
 
 class AnalysisRequest(BaseModel):
@@ -182,11 +187,14 @@ class CompletedAnalysis(BaseModel):
     )
 
 
+AnalysisParameterType = Union[float, bool, str, None]
+
+
 class RunTimeParameterAnalysisData(NamedTuple):
     """Data from analysis of a run-time parameter."""
 
-    value: Union[float, bool, str]
-    default: Union[float, bool, str]
+    value: AnalysisParameterType
+    default: AnalysisParameterType
 
 
 ProtocolAnalysis = Union[PendingAnalysis, CompletedAnalysis]

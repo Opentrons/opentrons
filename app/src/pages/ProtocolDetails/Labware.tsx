@@ -9,7 +9,7 @@ import {
   Flex,
   Icon,
   SPACING,
-  StyledText,
+  LegacyStyledText,
   TYPOGRAPHY,
   WRAP,
 } from '@opentrons/components'
@@ -76,17 +76,17 @@ export const Labware = (props: { protocolId: string }): JSX.Element => {
       <thead>
         <tr>
           <TableHeader>
-            <StyledText
+            <LegacyStyledText
               color={COLORS.grey60}
               fontSize={TYPOGRAPHY.fontSize20}
               fontWeight={TYPOGRAPHY.fontWeightSemiBold}
               paddingLeft={SPACING.spacing24}
             >
               {i18n.format(t('labware_name'), 'titleCase')}
-            </StyledText>
+            </LegacyStyledText>
           </TableHeader>
           <TableHeader>
-            <StyledText
+            <LegacyStyledText
               alignItems={ALIGN_CENTER}
               color={COLORS.grey60}
               fontSize={TYPOGRAPHY.fontSize20}
@@ -95,7 +95,7 @@ export const Labware = (props: { protocolId: string }): JSX.Element => {
               textAlign={TYPOGRAPHY.textAlignCenter}
             >
               {i18n.format(t('quantity'), 'sentenceCase')}
-            </StyledText>
+            </LegacyStyledText>
           </TableHeader>
         </tr>
       </thead>
@@ -123,19 +123,19 @@ export const Labware = (props: { protocolId: string }): JSX.Element => {
                   ) : (
                     <Flex marginLeft={SPACING.spacing20} />
                   )}
-                  <StyledText as="p" alignItems={ALIGN_CENTER}>
+                  <LegacyStyledText as="p" alignItems={ALIGN_CENTER}>
                     {name}
-                  </StyledText>
+                  </LegacyStyledText>
                 </Flex>
               </TableDatum>
               <TableDatum>
-                <StyledText
+                <LegacyStyledText
                   as="p"
                   alignItems={ALIGN_CENTER}
                   textAlign={TYPOGRAPHY.textAlignCenter}
                 >
                   {count}
-                </StyledText>
+                </LegacyStyledText>
               </TableDatum>
             </TableRow>
           )

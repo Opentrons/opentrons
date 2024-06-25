@@ -9,11 +9,13 @@ import type {
   THERMOCYCLER_MODULE_V1,
   THERMOCYCLER_MODULE_V2,
   HEATERSHAKER_MODULE_V1,
+  ABSORBANCE_READER_V1,
   MAGNETIC_MODULE_TYPE,
   TEMPERATURE_MODULE_TYPE,
   THERMOCYCLER_MODULE_TYPE,
   HEATERSHAKER_MODULE_TYPE,
   MAGNETIC_BLOCK_TYPE,
+  ABSORBANCE_READER_TYPE,
   GEN1,
   GEN2,
   FLEX,
@@ -170,6 +172,11 @@ export interface LabwareWellGroup {
   brand?: LabwareBrand
 }
 
+export interface LiquidProbeParameters {
+  minimumHeight: Array<{ value: number; applicableWells: string[] }>
+  minimumWellVolume: Array<{ value: number; applicableWells: string[] }>
+}
+
 export type LabwareRoles = 'labware' | 'adapter' | 'fixture' | 'maintenance'
 
 // NOTE: must be synced with shared-data/labware/schemas/2.json
@@ -188,6 +195,7 @@ export interface LabwareDefinition2 {
   allowedRoles?: LabwareRoles[]
   stackingOffsetWithLabware?: Record<string, LabwareOffset>
   stackingOffsetWithModule?: Record<string, LabwareOffset>
+  liquidProbeParameters?: LiquidProbeParameters
 }
 
 export interface LabwareDefByDefURI {
@@ -203,6 +211,7 @@ export type ModuleType =
   | typeof THERMOCYCLER_MODULE_TYPE
   | typeof HEATERSHAKER_MODULE_TYPE
   | typeof MAGNETIC_BLOCK_TYPE
+  | typeof ABSORBANCE_READER_TYPE
 
 // ModuleModel corresponds to top-level keys in shared-data/module/definitions/2
 export type MagneticModuleModel =
@@ -221,12 +230,15 @@ export type HeaterShakerModuleModel = typeof HEATERSHAKER_MODULE_V1
 
 export type MagneticBlockModel = typeof MAGNETIC_BLOCK_V1
 
+export type AbsorbanceReaderModel = typeof ABSORBANCE_READER_V1
+
 export type ModuleModel =
   | MagneticModuleModel
   | TemperatureModuleModel
   | ThermocyclerModuleModel
   | HeaterShakerModuleModel
   | MagneticBlockModel
+  | AbsorbanceReaderModel
 
 export type GripperModel =
   | typeof GRIPPER_V1
@@ -402,17 +414,28 @@ export interface FlowRateSpec {
   max: number
 }
 
+interface pressAndCamConfigurationValues {
+  speed: number
+  distance: number
+  current: number
+  tipOverlaps: { [version: string]: { [labwareURI: string]: number } }
+}
 export interface PipetteV2GeneralSpecs {
   displayName: string
   model: string
   displayCategory: PipetteDisplayCategory
+  validNozzleMaps: {
+    maps: { [nozzleMapKey: string]: string[] }
+  }
   pickUpTipConfigurations: {
     pressFit: {
-      speedByTipCount: Record<string, number>
       presses: number
       increment: number
-      distanceByTipCount: Record<string, number>
-      currentByTipCount: Record<string, number>
+      configurationsByNozzleMap: {
+        [nozzleMapKey: string]: {
+          [tipType: string]: pressAndCamConfigurationValues
+        }
+      }
     }
   }
   dropTipConfigurations: {
@@ -604,6 +627,7 @@ export interface NumberParameter extends BaseRunTimeParameter {
   min: number
   max: number
   default: number
+  value: number
 }
 
 export interface Choice {
@@ -611,39 +635,37 @@ export interface Choice {
   value: number | boolean | string
 }
 
-interface ChoiceParameter extends BaseRunTimeParameter {
-  type: RunTimeParameterType
+export interface ChoiceParameter extends BaseRunTimeParameter {
+  type: NumberParameterType | BooleanParameterType | StringParameterType
   choices: Choice[]
   default: number | boolean | string
+  value: number | boolean | string
 }
 
 interface BooleanParameter extends BaseRunTimeParameter {
   type: BooleanParameterType
   default: boolean
+  value: boolean
 }
 
-interface CsvFileParameter extends BaseRunTimeParameter {
+export interface CsvFileParameter extends BaseRunTimeParameter {
   type: CsvFileParameterType
-  default: string
+  file?: { id?: string; file?: File | null } | null
 }
 
 type NumberParameterType = 'int' | 'float'
 type BooleanParameterType = 'bool'
 type StringParameterType = 'str'
 type CsvFileParameterType = 'csv_file'
-type RunTimeParameterType =
-  | NumberParameter
-  | BooleanParameterType
-  | StringParameterType
-  | CsvFileParameterType
 
 interface BaseRunTimeParameter {
   displayName: string
   variableName: string
   description: string
-  value: number | boolean | string
   suffix?: string
 }
+
+export type ValueRunTimeParameter = Exclude<RunTimeParameter, CsvFileParameter>
 
 export type RunTimeParameter =
   | BooleanParameter
@@ -655,7 +677,7 @@ export type RunTimeParameter =
 export interface CompletedProtocolAnalysis {
   id: string
   status?: 'completed'
-  result: 'ok' | 'not-ok' | 'error'
+  result: 'ok' | 'not-ok' | 'error' | 'parameter-value-required'
   pipettes: LoadedPipette[]
   labware: LoadedLabware[]
   modules: LoadedModule[]

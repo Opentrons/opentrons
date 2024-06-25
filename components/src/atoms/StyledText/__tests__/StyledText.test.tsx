@@ -4,14 +4,14 @@ import '@testing-library/jest-dom/vitest'
 import { screen } from '@testing-library/react'
 import { TYPOGRAPHY } from '../../../ui-style-constants'
 import { renderWithProviders } from '../../../testing/utils'
-import { StyledText } from '..'
+import { LegacyStyledText } from '..'
 
-const render = (props: React.ComponentProps<typeof StyledText>) => {
-  return renderWithProviders(<StyledText {...props} />)[0]
+const render = (props: React.ComponentProps<typeof LegacyStyledText>) => {
+  return renderWithProviders(<LegacyStyledText {...props} />)[0]
 }
 
 describe('StyledText', () => {
-  let props: React.ComponentProps<typeof StyledText>
+  let props: React.ComponentProps<typeof LegacyStyledText>
   // testing styles (font size, font weight, and line height)
   it('should render h1 default style', () => {
     props = {

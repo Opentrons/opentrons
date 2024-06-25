@@ -3,7 +3,7 @@ import * as React from 'react'
 import cx from 'classnames'
 
 import { Icon } from '../icons'
-import { StyledText } from '../atoms'
+import { LegacyStyledText } from '../atoms'
 import { COLORS } from '../helix-design-system'
 import type { IconName, IconProps } from '../icons'
 
@@ -121,9 +121,13 @@ export function TitledList(props: TitledListProps): JSX.Element {
         {iconName && (
           <Icon {...iconProps} className={iconClass} name={iconName} />
         )}
-        <StyledText as="h3" backgroundColor={COLORS.white} color={textColor}>
+        <LegacyStyledText
+          as="h3"
+          backgroundColor={COLORS.white}
+          color={textColor}
+        >
           {props.title}
-        </StyledText>
+        </LegacyStyledText>
         {collapsible && (
           <div
             onClick={handleCollapseToggle}

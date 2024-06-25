@@ -292,6 +292,7 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
             pipette: args.pipette,
             dropTipLocation,
             tipRack: args.tipRack,
+            nozzles: args.nozzles ?? undefined,
           }),
         ]
       }

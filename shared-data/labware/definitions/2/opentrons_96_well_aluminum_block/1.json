@@ -19,7 +19,7 @@
   },
   "metadata": {
     "displayName": "Opentrons 96 Well Aluminum Block",
-    "displayCategory": "adapter",
+    "displayCategory": "aluminumBlock",
     "displayVolumeUnits": "\u00b5L",
     "tags": []
   },
@@ -1028,5 +1028,19 @@
         "z": 1.0
       }
     }
+  },
+  "liquidProbeParameters": {
+    "minimumHeight": [
+      {
+        "value": 0.5,
+        "applicableWells": []
+      }
+    ],
+    "minimumWellVolume": [
+      {
+        "value": 0,
+        "applicableWells": []
+      }
+    ]
   }
 }

@@ -14,20 +14,20 @@ const inputElForButtonFromButtonText = (text: string): HTMLInputElement =>
 /* eslint-enable testing-library/no-node-access */
 
 describe('InterventionModal', () => {
-  it('renders top text', () => {
+  it('renders headline', () => {
     render(
       <ModalContentOneColSimpleButtons
-        topText={'top text'}
+        headline={'headline'}
         firstButton={{ label: 'first button', value: 'first' }}
         secondButton={{ label: 'second button', value: 'second' }}
       />
     )
-    expect(screen.getByText('top text')).not.toBeNull()
+    expect(screen.getByText('headline')).not.toBeNull()
   })
   it('renders buttons', () => {
     render(
       <ModalContentOneColSimpleButtons
-        topText={'top text'}
+        headline={'headline'}
         firstButton={{ label: 'first button', value: 'first' }}
         secondButton={{ label: 'second button', value: 'second' }}
         furtherButtons={[
@@ -44,7 +44,7 @@ describe('InterventionModal', () => {
   it('enforces single-item selection', () => {
     render(
       <ModalContentOneColSimpleButtons
-        topText={'top text'}
+        headline={'headline'}
         firstButton={{ label: 'first button', value: 'first' }}
         secondButton={{ label: 'second button', value: 'second' }}
         furtherButtons={[{ label: 'third button', value: 'third' }]}
@@ -65,11 +65,26 @@ describe('InterventionModal', () => {
     expect(inputElForButtonFromButtonText('third button').checked).toBeTruthy()
   })
 
+  it('can start with a button selected', () => {
+    render(
+      <ModalContentOneColSimpleButtons
+        headline={'headline'}
+        firstButton={{ label: 'first button', value: 'first' }}
+        secondButton={{ label: 'second button', value: 'second' }}
+        furtherButtons={[{ label: 'third button', value: 'third' }]}
+        initialSelected={'second'}
+      />
+    )
+    expect(inputElForButtonFromButtonText('first button').checked).toBeFalsy()
+    expect(inputElForButtonFromButtonText('second button').checked).toBeTruthy()
+    expect(inputElForButtonFromButtonText('third button').checked).toBeFalsy()
+  })
+
   it('propagates individual button onChange', () => {
     const onChange = vi.fn()
     render(
       <ModalContentOneColSimpleButtons
-        topText={'top text'}
+        headline={'headline'}
         firstButton={{
           label: 'first button',
           value: 'first',
@@ -95,7 +110,7 @@ describe('InterventionModal', () => {
     const onSelect = vi.fn()
     render(
       <ModalContentOneColSimpleButtons
-        topText={'top text'}
+        headline={'headline'}
         firstButton={{ label: 'first button', value: 'first' }}
         secondButton={{ label: 'second button', value: 'second' }}
         furtherButtons={[{ label: 'third button', value: 'third' }]}
