@@ -74,15 +74,16 @@ export function InlineNotification(
     <Flex
       alignItems={ALIGN_CENTER}
       backgroundColor={INLINE_NOTIFICATION_PROPS_BY_TYPE[type].backgroundColor}
-      borderRadius={BORDERS.borderRadius12}
       data-testid={`InlineNotification_${type}`}
       flexDirection={DIRECTION_ROW}
       gridGap={SPACING.spacing12}
       justifyContent={JUSTIFY_SPACE_BETWEEN}
       width={hug ? 'max-content' : '100%'}
       css={css`
+        border-radius: ${BORDERS.borderRadius4};
         padding: ${SPACING.spacing4} ${SPACING.spacing12};
         @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
+          border-radius: ${BORDERS.borderRadius8};
           padding: ${SPACING.spacing12} ${SPACING.spacing16};
         }
       `}
