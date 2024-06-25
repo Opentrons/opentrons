@@ -178,6 +178,7 @@ def test_deck(subject: ProtocolContext) -> None:
     assert isinstance(result, Deck)
 
 
+@pytest.mark.parametrize("api_version", [APIVersion(2, 20)])
 def test_load_instrument_robot_type(
     decoy: Decoy,
     mock_core: ProtocolCore,
@@ -212,7 +213,7 @@ def test_load_instrument_api_version(
     mock_core: ProtocolCore,
     subject: ProtocolContext,
 ) -> None:
-    """Using an API Version prior to 2.19 should raise a APIVersionError."""
+    """Using an API Version prior to 2.20 should raise a APIVersionError."""
     mock_tip_racks = [decoy.mock(cls=Labware), decoy.mock(cls=Labware)]
 
     decoy.when(mock_validation.ensure_lowercase_name("Gandalf")).then_return("gandalf")
