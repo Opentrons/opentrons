@@ -134,7 +134,7 @@ export function LargeButton(props: LargeButtonProps): JSX.Element {
     line-height: ${TYPOGRAPHY.lineHeight20};
     border: ${BORDERS.borderRadius4} solid
       ${!!LARGE_BUTTON_PROPS_BY_TYPE[buttonType].isInverse
-        ? LARGE_BUTTON_PROPS_BY_TYPE[buttonType].color
+        ? LARGE_BUTTON_PROPS_BY_TYPE[buttonType].defaultColor
         : LARGE_BUTTON_PROPS_BY_TYPE[buttonType].defaultBackgroundColor};
 
     ${TYPOGRAPHY.pSemiBold}
