@@ -115,8 +115,8 @@ def create_data_dictionary(
                 plate_measure = {
                     "Plate Measured": plate,
                     "End Volume Accuracy (%)": accuracy,
-                    "Average Temp (oC)": None,
-                    "Average RH(%)": None,
+                    "Average Temp (oC)": "",
+                    "Average RH(%)": "",
                 }
                 row_for_lpc = {**row, **all_modules, **notes}
                 row_2 = {

@@ -10,6 +10,11 @@ from typing import Dict, Tuple, Any, List
 from statistics import mean, StatisticsError
 
 
+def add_robot_lifetime(abr_data: List[Dict[str, Any]]) -> None:
+    """Add % Robot Lifetime to each run."""
+    # TODO: add robot lifetime to each run.
+
+
 def compare_run_to_temp_data(
     abr_data: List[Dict[str, Any]], temp_data: List[Dict[str, Any]], google_sheet: Any
 ) -> None:
@@ -17,7 +22,6 @@ def compare_run_to_temp_data(
     row_update = 0
     for run in abr_data:
         run_id = run["Run_ID"]
-        print(type(run["Average Temp (oC)"]))
         try:
             average_temp = float(run["Average Temp (oC)"])
         except ValueError:
@@ -79,18 +83,13 @@ def connect_and_download(
         print(f"Add credentials.json file to: {storage_directory}.")
         sys.exit()
     file_paths = []
-    try:
-        for sheet in sheets.items():
-            file_name, file_id = sheet[0], sheet[1]
-            print(file_name)
-            file_path = google_drive.download_single_file(
-                storage_directory, file_id, file_name, "text/csv"
-            )
-            file_paths.append(file_path)
-    except AttributeError:
-        file_paths = google_drive.download_single_file(
-                storage_directory, sheets[0], sheet[1], "text/csv"
-            )
+    for sheet in sheets.items():
+        file_name, file_id = sheet[0], sheet[1]
+        print(file_name)
+        file_path = google_drive.download_single_file(
+            storage_directory, file_id, file_name, "text/csv"
+        )
+        file_paths.append(file_path)
     return file_paths, credentials_path
 
 
