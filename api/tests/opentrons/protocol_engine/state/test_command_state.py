@@ -208,14 +208,7 @@ def test_command_failure_clears_queues() -> None:
         error_id="error-id",
         failed_at=datetime(year=2023, month=3, day=3),
         error=errors.ProtocolEngineError(message="oh no"),
-        notes=[
-            CommandNote(
-                noteKind="noteKind",
-                shortMessage="shortMessage",
-                longMessage="longMessage",
-                source="source",
-            )
-        ],
+        notes=[],
         type=ErrorRecoveryType.FAIL_RUN,
     )
     subject.handle_action(fail_1)
@@ -281,14 +274,7 @@ def test_setup_command_failure_only_clears_setup_command_queue() -> None:
         error_id="error-id",
         failed_at=datetime(year=2023, month=3, day=3),
         error=errors.ProtocolEngineError(message="oh no"),
-        notes=[
-            CommandNote(
-                noteKind="noteKind",
-                shortMessage="shortMessage",
-                longMessage="longMessage",
-                source="source",
-            )
-        ],
+        notes=[],
         type=ErrorRecoveryType.FAIL_RUN,
     )
     subject.handle_action(fail_2_setup)
@@ -347,14 +333,7 @@ def test_nonfatal_command_failure() -> None:
         error_id="error-id",
         failed_at=datetime(year=2023, month=3, day=3),
         error=errors.ProtocolEngineError(message="oh no"),
-        notes=[
-            CommandNote(
-                noteKind="noteKind",
-                shortMessage="shortMessage",
-                longMessage="longMessage",
-                source="source",
-            )
-        ],
+        notes=[],
         type=ErrorRecoveryType.WAIT_FOR_RECOVERY,
     )
     subject.handle_action(fail_1)
@@ -482,14 +461,7 @@ def test_door_during_error_recovery() -> None:
         error_id="error-id",
         failed_at=datetime(year=2023, month=3, day=3),
         error=errors.ProtocolEngineError(message="oh no"),
-        notes=[
-            CommandNote(
-                noteKind="noteKind",
-                shortMessage="shortMessage",
-                longMessage="longMessage",
-                source="source",
-            )
-        ],
+        notes=[],
         type=ErrorRecoveryType.WAIT_FOR_RECOVERY,
     )
     subject.handle_action(fail_1)
@@ -801,14 +773,7 @@ def test_final_state_after_error_recovery_stop() -> None:
         error_id="error-id",
         failed_at=datetime(year=2023, month=3, day=3),
         error=errors.ProtocolEngineError(message="oh no"),
-        notes=[
-            CommandNote(
-                noteKind="noteKind",
-                shortMessage="shortMessage",
-                longMessage="longMessage",
-                source="source",
-            )
-        ],
+        notes=[],
         type=ErrorRecoveryType.WAIT_FOR_RECOVERY,
     )
     subject.handle_action(fail_1)
