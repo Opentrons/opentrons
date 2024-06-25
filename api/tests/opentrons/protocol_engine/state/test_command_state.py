@@ -208,14 +208,7 @@ def test_command_failure_clears_queues() -> None:
         error_id="error-id",
         failed_at=datetime(year=2023, month=3, day=3),
         error=errors.ProtocolEngineError(message="oh no"),
-        notes=[
-            CommandNote(
-                noteKind="noteKind",
-                shortMessage="shortMessage",
-                longMessage="longMessage",
-                source="source",
-            )
-        ],
+        notes=[],
         type=ErrorRecoveryType.FAIL_RUN,
     )
     subject.handle_action(fail_1)
@@ -281,14 +274,7 @@ def test_setup_command_failure_only_clears_setup_command_queue() -> None:
         error_id="error-id",
         failed_at=datetime(year=2023, month=3, day=3),
         error=errors.ProtocolEngineError(message="oh no"),
-        notes=[
-            CommandNote(
-                noteKind="noteKind",
-                shortMessage="shortMessage",
-                longMessage="longMessage",
-                source="source",
-            )
-        ],
+        notes=[],
         type=ErrorRecoveryType.FAIL_RUN,
     )
     subject.handle_action(fail_2_setup)
@@ -347,14 +333,7 @@ def test_nonfatal_command_failure() -> None:
         error_id="error-id",
         failed_at=datetime(year=2023, month=3, day=3),
         error=errors.ProtocolEngineError(message="oh no"),
-        notes=[
-            CommandNote(
-                noteKind="noteKind",
-                shortMessage="shortMessage",
-                longMessage="longMessage",
-                source="source",
-            )
-        ],
+        notes=[],
         type=ErrorRecoveryType.WAIT_FOR_RECOVERY,
     )
     subject.handle_action(fail_1)
@@ -482,14 +461,7 @@ def test_door_during_error_recovery() -> None:
         error_id="error-id",
         failed_at=datetime(year=2023, month=3, day=3),
         error=errors.ProtocolEngineError(message="oh no"),
-        notes=[
-            CommandNote(
-                noteKind="noteKind",
-                shortMessage="shortMessage",
-                longMessage="longMessage",
-                source="source",
-            )
-        ],
+        notes=[],
         type=ErrorRecoveryType.WAIT_FOR_RECOVERY,
     )
     subject.handle_action(fail_1)
@@ -769,4 +741,64 @@ def test_final_state_after_stop() -> None:
     )
 
     assert subject_view.get_status() == EngineStatus.STOPPED
+    assert subject_view.get_error() is None
+
+
+def test_final_state_after_error_recovery_stop() -> None:
+    """Test the final state of the run after it's stopped during error recovery.
+
+    We still want to count this as "stopped," not "failed."
+    """
+    subject = CommandStore(config=_make_config(), is_door_open=False)
+    subject_view = CommandView(subject.state)
+
+    # Fail a command to put the subject in recovery mode.
+    queue_1 = actions.QueueCommandAction(
+        request=commands.CommentCreate(
+            params=commands.CommentParams(message=""), key="command-key-1"
+        ),
+        request_hash=None,
+        created_at=datetime(year=2021, month=1, day=1),
+        command_id="command-id-1",
+    )
+    subject.handle_action(queue_1)
+    run_1 = actions.RunCommandAction(
+        command_id="command-id-1",
+        started_at=datetime(year=2022, month=2, day=2),
+    )
+    subject.handle_action(run_1)
+    fail_1 = actions.FailCommandAction(
+        command_id="command-id-1",
+        running_command=subject_view.get("command-id-1"),
+        error_id="error-id",
+        failed_at=datetime(year=2023, month=3, day=3),
+        error=errors.ProtocolEngineError(message="oh no"),
+        notes=[],
+        type=ErrorRecoveryType.WAIT_FOR_RECOVERY,
+    )
+    subject.handle_action(fail_1)
+    assert subject_view.get_status() == EngineStatus.AWAITING_RECOVERY
+
+    subject.handle_action(actions.StopAction())
+    subject.handle_action(
+        actions.FinishAction(
+            error_details=actions.FinishErrorDetails(
+                error=RuntimeError(
+                    "uh oh I was a command and then I got cancelled because someone"
+                    " stopped the run, and now I'm raising this exception because"
+                    " of that. Woe is me"
+                ),
+                error_id="error-id",
+                created_at=datetime.now(),
+            )
+        )
+    )
+    subject.handle_action(
+        actions.HardwareStoppedAction(
+            completed_at=sentinel.hardware_stopped_action_completed_at,
+            finish_error_details=None,
+        )
+    )
+    assert subject_view.get_status() == EngineStatus.STOPPED
+    assert subject_view.get_recovery_target() is None
     assert subject_view.get_error() is None
