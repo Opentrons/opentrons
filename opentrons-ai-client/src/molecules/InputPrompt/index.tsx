@@ -74,7 +74,7 @@ export function InputPrompt(): JSX.Element {
 
   React.useEffect(() => {
     if (submitted && data != null && !isLoading) {
-      const { role, reply } = data
+      const { role, reply } = data as ChatData
       const assistantResponse: ChatData = {
         role,
         reply,
@@ -91,15 +91,17 @@ export function InputPrompt(): JSX.Element {
   return (
     <StyledForm id="User_Prompt">
       <Flex css={CONTAINER_STYLE}>
-        <StyledTextarea
-          rows={calcTextAreaHeight(userPrompt)}
+        <LegacyStyledTextarea
+          rows={calcTextAreaHeight(userPrompt as string)}
           placeholder={t('type_your_prompt')}
           {...register('userPrompt')}
         />
         <SendButton
           disabled={userPrompt.length === 0}
           isLoading={isLoading}
-          handleClick={handleClick}
+          handleClick={() => {
+            handleClick()
+          }}
         />
       </Flex>
     </StyledForm>
@@ -125,7 +127,7 @@ const CONTAINER_STYLE = css`
   }
 `
 
-const StyledTextarea = styled.textarea`
+const LegacyStyledTextarea = styled.textarea`
   resize: none;
   min-height: 3.75rem;
   max-height: 17.25rem;

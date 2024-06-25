@@ -116,7 +116,7 @@ export function fieldsToLabware(
         x: 0,
         y: 0,
         //  ensure that z is a number!
-        z: fields.labwareZDimension + adapterHeight - parseFloat(z as any),
+        z: fields.labwareZDimension + adapterHeight - parseFloat(String(z)),
       })
     })
     const stackingOffsetWithModule: Record<string, LabwareOffset> = {}
@@ -125,7 +125,7 @@ export function fieldsToLabware(
         x: 0,
         y: 0,
         //  ensure that z is a number!
-        z: fields.labwareZDimension - parseFloat(z as any),
+        z: fields.labwareZDimension - parseFloat(String(z)),
       })
     })
 

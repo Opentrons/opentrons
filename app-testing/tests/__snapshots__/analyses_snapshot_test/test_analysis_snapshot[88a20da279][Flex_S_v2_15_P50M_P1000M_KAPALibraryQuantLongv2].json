@@ -17857,7 +17857,8 @@
       "notes": [],
       "params": {
         "mount": "left",
-        "pipetteName": "p50_multi_flex"
+        "pipetteName": "p50_multi_flex",
+        "tipOverlapNotAfterVersion": "v0"
       },
       "result": {},
       "status": "succeeded"
@@ -17867,7 +17868,8 @@
       "notes": [],
       "params": {
         "mount": "right",
-        "pipetteName": "p1000_multi_flex"
+        "pipetteName": "p1000_multi_flex",
+        "tipOverlapNotAfterVersion": "v0"
       },
       "result": {},
       "status": "succeeded"
@@ -146160,6 +146162,7 @@
       "pipetteName": "p1000_multi_flex"
     }
   ],
+  "result": "ok",
   "robotType": "OT-3 Standard",
   "runTimeParameters": []
 }

@@ -6,7 +6,7 @@ import {
   JUSTIFY_FLEX_END,
   PrimaryButton,
   SPACING,
-  StyledText,
+  LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
@@ -31,12 +31,12 @@ export function ClearDeckModal(props: ClearDeckModalProps): JSX.Element {
           i18nKey="remove_labware_before_start"
           components={{
             h1: (
-              <StyledText
+              <LegacyStyledText
                 css={TYPOGRAPHY.h1Default}
                 marginBottom={SPACING.spacing16}
               />
             ),
-            block: <StyledText as="p" />,
+            block: <LegacyStyledText as="p" />,
           }}
         />
       </Flex>

@@ -8,7 +8,7 @@ import {
   Flex,
   JUSTIFY_SPACE_BETWEEN,
   SPACING,
-  StyledText,
+  LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
@@ -26,14 +26,16 @@ export function EnableDevTools(): JSX.Element {
   return (
     <Flex alignItems={ALIGN_CENTER} justifyContent={JUSTIFY_SPACE_BETWEEN}>
       <Box width="70%">
-        <StyledText
+        <LegacyStyledText
           css={TYPOGRAPHY.h3SemiBold}
           paddingBottom={SPACING.spacing8}
           id="AdvancedSettings_devTools"
         >
           {t('enable_dev_tools')}
-        </StyledText>
-        <StyledText as="p">{t('enable_dev_tools_description')}</StyledText>
+        </LegacyStyledText>
+        <LegacyStyledText as="p">
+          {t('enable_dev_tools_description')}
+        </LegacyStyledText>
       </Box>
       <ToggleButton
         label="enable_dev_tools"

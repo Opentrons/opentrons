@@ -12,7 +12,7 @@ import {
   POSITION_ABSOLUTE,
   POSITION_RELATIVE,
   SPACING,
-  StyledText,
+  LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { getLabwareDefURI } from '@opentrons/shared-data'
@@ -60,7 +60,7 @@ export const ProtocolLabwareDetails = (
       {labwareDetails.length > 0 ? (
         <Flex flexDirection={DIRECTION_COLUMN} width="100%">
           <Flex flexDirection={DIRECTION_ROW}>
-            <StyledText
+            <LegacyStyledText
               as="label"
               fontWeight={TYPOGRAPHY.fontWeightSemiBold}
               marginBottom={SPACING.spacing8}
@@ -68,14 +68,14 @@ export const ProtocolLabwareDetails = (
               width="66%"
             >
               {t('labware_name')}
-            </StyledText>
-            <StyledText
+            </LegacyStyledText>
+            <LegacyStyledText
               as="label"
               fontWeight={TYPOGRAPHY.fontWeightSemiBold}
               data-testid="ProtocolLabwareDetails_quantity"
             >
               {t('quantity')}
-            </StyledText>
+            </LegacyStyledText>
           </Flex>
           {labwareDetails?.map((labware, index) => (
             <ProtocolLabwareDetailItem
@@ -132,11 +132,11 @@ export const ProtocolLabwareDetailItem = (
           ) : (
             <Flex marginLeft={SPACING.spacing20} />
           )}
-          <StyledText as="p" paddingRight={SPACING.spacing32}>
+          <LegacyStyledText as="p" paddingRight={SPACING.spacing32}>
             {displayName}
-          </StyledText>
+          </LegacyStyledText>
         </Flex>
-        <StyledText as="p">{quantity}</StyledText>
+        <LegacyStyledText as="p">{quantity}</LegacyStyledText>
         <LabwareDetailOverflowMenu labware={labware} />
       </Flex>
     </>

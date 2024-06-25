@@ -60,6 +60,14 @@ class PipettingHandler(TypingProtocol):
     ) -> None:
         """Set flow rate and blow-out."""
 
+    async def liquid_probe_in_place(
+        self,
+        pipette_id: str,
+        labware_id: str,
+        well_name: str,
+    ) -> float:
+        """Detect liquid level."""
+
 
 class HardwarePipettingHandler(PipettingHandler):
     """Liquid handling, using the Hardware API.""" ""
@@ -156,6 +164,24 @@ class HardwarePipettingHandler(PipettingHandler):
         with self._set_flow_rate(pipette=hw_pipette, blow_out_flow_rate=flow_rate):
             await self._hardware_api.blow_out(mount=hw_pipette.mount)
 
+    async def liquid_probe_in_place(
+        self,
+        pipette_id: str,
+        labware_id: str,
+        well_name: str,
+    ) -> float:
+        """Detect liquid level."""
+        hw_pipette = self._state_view.pipettes.get_hardware_pipette(
+            pipette_id=pipette_id,
+            attached_pipettes=self._hardware_api.attached_instruments,
+        )
+        well_def = self._state_view.labware.get_well_definition(labware_id, well_name)
+        well_depth = well_def.depth
+        z_pos = await self._hardware_api.liquid_probe(
+            mount=hw_pipette.mount, max_z_dist=well_depth
+        )
+        return float(z_pos)
+
     @contextmanager
     def _set_flow_rate(
         self,
@@ -244,6 +270,16 @@ class VirtualPipettingHandler(PipettingHandler):
         flow_rate: float,
     ) -> None:
         """Virtually blow out (no-op)."""
+
+    async def liquid_probe_in_place(
+        self,
+        pipette_id: str,
+        labware_id: str,
+        well_name: str,
+    ) -> float:
+        """Detect liquid level."""
+        # TODO (pm, 6-18-24): return a value of worth if needed
+        return 0.0
 
     def _validate_tip_attached(self, pipette_id: str, command_name: str) -> None:
         """Validate if there is a tip attached."""

@@ -22,7 +22,14 @@ import { getIsOnDevice } from '../../redux/config'
 import type { IconName } from '@opentrons/components'
 import { ModalContentOneColSimpleButtons } from './ModalContentOneColSimpleButtons'
 import { TwoColumn } from './TwoColumn'
-export { ModalContentOneColSimpleButtons, TwoColumn }
+import { OneColumn } from './OneColumn'
+import { ModalContentMixed } from './ModalContentMixed'
+export {
+  ModalContentOneColSimpleButtons,
+  TwoColumn,
+  OneColumn,
+  ModalContentMixed,
+}
 
 export type ModalType = 'intervention-required' | 'error'
 

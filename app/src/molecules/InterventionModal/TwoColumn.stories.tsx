@@ -3,7 +3,7 @@ import * as React from 'react'
 import SuccessIcon from '../../assets/images/icon_success.png'
 
 import {
-  StyledText,
+  LegacyStyledText,
   Flex,
   DIRECTION_COLUMN,
   Box,
@@ -28,8 +28,6 @@ interface StorybookArgs {
   rightNotificationType: 'alert' | 'error' | 'neutral'
   leftText?: string
   rightText?: string
-  containerWidth: number
-  containerHeight: number
 }
 
 function StandInContent(): JSX.Element {
@@ -37,7 +35,7 @@ function StandInContent(): JSX.Element {
     <Box
       border={'4px dashed #A864FFFF'}
       borderRadius={BORDERS.borderRadius8}
-      width="207px"
+      margin={SPACING.spacing16}
       height="104px"
       backgroundColor="#A864FF19"
     />
@@ -67,7 +65,7 @@ interface TextProps {
 }
 function Text({ text }: TextProps): JSX.Element | null {
   const hasComponent = text != null && text.length > 0
-  return hasComponent ? <StyledText>{text}</StyledText> : null
+  return hasComponent ? <LegacyStyledText>{text}</LegacyStyledText> : null
 }
 
 interface ImageProps {
@@ -118,11 +116,7 @@ const meta: Meta<React.ComponentProps<TwoColumnComponent> & StorybookArgs> = {
   title: 'App/Molecules/InterventionModal/TwoColumn',
   component: TwoColumnComponent,
   render: args => (
-    <Box
-      width={`${args.containerWidth}px`}
-      height={`${args.containerHeight}px`}
-      borderWidth={'8px'}
-    >
+    <Box width="100%" height="100%" borderWidth="8px">
       <TwoColumnComponent>
         <SectionBodyOrStandIn
           standIn={args.leftStandIn}
@@ -155,18 +149,6 @@ const meta: Meta<React.ComponentProps<TwoColumnComponent> & StorybookArgs> = {
         type: 'boolean',
       },
       defaultValue: true,
-    },
-    containerHeight: {
-      control: {
-        type: 'number',
-      },
-      defaultValue: 104,
-    },
-    containerWidth: {
-      control: {
-        type: 'number',
-      },
-      defaultValue: 454,
     },
     leftText: {
       control: {
@@ -262,8 +244,6 @@ export const TwoColumnWithStandins: Story = {
     rightNotificationHeading: undefined,
     rightNotificationMessage: undefined,
     rightNotificationType: 'alert',
-    containerWidth: 452,
-    containerHeight: 104,
   },
 }
 
@@ -281,7 +261,5 @@ export const ExampleTwoColumn: Story = {
     rightNotificationHeading: undefined,
     rightNotificationMessage: undefined,
     rightNotificationType: 'neutral',
-    containerWidth: 452,
-    containerHeight: 104,
   },
 }

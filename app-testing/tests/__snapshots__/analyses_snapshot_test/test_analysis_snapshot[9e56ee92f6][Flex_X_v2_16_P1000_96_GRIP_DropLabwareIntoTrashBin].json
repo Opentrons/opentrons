@@ -1225,7 +1225,8 @@
       "notes": [],
       "params": {
         "mount": "left",
-        "pipetteName": "p1000_96"
+        "pipetteName": "p1000_96",
+        "tipOverlapNotAfterVersion": "v0"
       },
       "result": {},
       "status": "succeeded"
@@ -1393,6 +1394,7 @@
       "pipetteName": "p1000_96"
     }
   ],
+  "result": "not-ok",
   "robotType": "OT-3 Standard",
   "runTimeParameters": []
 }

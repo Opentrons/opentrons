@@ -9,7 +9,7 @@ import {
   PrimaryButton,
   SecondaryButton,
   SPACING,
-  StyledText,
+  LegacyStyledText,
 } from '@opentrons/components'
 import { useTranslation } from 'react-i18next'
 
@@ -62,9 +62,9 @@ export function TipConfirmation(props: TipConfirmationProps): JSX.Element {
       padding={SPACING.spacing32}
       minHeight="29.5rem"
     >
-      <StyledText as="h1" marginBottom={SPACING.spacing16}>
+      <LegacyStyledText as="h1" marginBottom={SPACING.spacing16}>
         {t('did_pipette_pick_up_tip')}
-      </StyledText>
+      </LegacyStyledText>
       <Flex
         width="100%"
         justifyContent={JUSTIFY_SPACE_BETWEEN}

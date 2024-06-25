@@ -12,7 +12,7 @@ import {
   Icon,
   JUSTIFY_CENTER,
   SPACING,
-  StyledText,
+  LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
@@ -60,11 +60,11 @@ export function DisplayConnectionStatus({
           gridGap={isConnected ? '0' : SPACING.spacing4}
           alignItems={ALIGN_CENTER}
         >
-          <StyledText as="h3" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
+          <LegacyStyledText as="h3" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
             {isConnected ? t('successfully_connected') : t('no_network_found')}
-          </StyledText>
+          </LegacyStyledText>
           {isConnected ? null : (
-            <StyledText
+            <LegacyStyledText
               as="h4"
               fontWeight={TYPOGRAPHY.fontWeightRegular}
               textAlign={TYPOGRAPHY.textAlignCenter}
@@ -72,7 +72,7 @@ export function DisplayConnectionStatus({
               margin="0 2rem"
             >
               {t('ethernet_connection_description')}
-            </StyledText>
+            </LegacyStyledText>
           )}
         </Flex>
       </Flex>

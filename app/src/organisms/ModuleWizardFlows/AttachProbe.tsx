@@ -5,7 +5,7 @@ import {
   Flex,
   RESPONSIVENESS,
   SPACING,
-  StyledText,
+  LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { LEFT, WASTE_CHUTE_FIXTURES } from '@opentrons/shared-data'
@@ -97,7 +97,7 @@ export const AttachProbe = (props: AttachProbeProps): JSX.Element | null => {
 
   const bodyText = (
     <>
-      <StyledText css={BODY_STYLE}>
+      <LegacyStyledText css={BODY_STYLE}>
         <Trans
           t={t}
           i18nKey={'pipette_wizard_flows:install_probe'}
@@ -106,7 +106,7 @@ export const AttachProbe = (props: AttachProbeProps): JSX.Element | null => {
             bold: <strong />,
           }}
         />
-      </StyledText>
+      </LegacyStyledText>
 
       {wasteChuteConflictWith96Channel && (
         <Banner

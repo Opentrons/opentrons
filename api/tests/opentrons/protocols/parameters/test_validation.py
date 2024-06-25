@@ -4,9 +4,11 @@ from typing import Optional, List, Union
 from opentrons.protocols.parameters.types import (
     PrimitiveAllowedTypes,
     ParameterChoice,
-    ParameterNameError,
+)
+from opentrons.protocols.parameters.exceptions import (
     ParameterValueError,
     ParameterDefinitionError,
+    ParameterNameError,
 )
 
 from opentrons.protocols.parameters import validation as subject

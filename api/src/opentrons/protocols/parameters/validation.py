@@ -1,15 +1,16 @@
 import keyword
 from typing import List, Set, Optional, Union, Literal
 
+from .exceptions import (
+    ParameterValueError,
+    ParameterDefinitionError,
+    ParameterNameError,
+)
 from .types import (
     PrimitiveAllowedTypes,
     ParamType,
     ParameterChoice,
-    ParameterNameError,
-    ParameterValueError,
-    ParameterDefinitionError,
 )
-
 
 UNIT_MAX_LEN = 10
 DISPLAY_NAME_MAX_LEN = 30

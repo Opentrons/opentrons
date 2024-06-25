@@ -9,6 +9,7 @@ from typing import List, Optional, Union, Tuple
 
 from opentrons.protocol_engine.types import RunTimeParamValuesType
 from opentrons_shared_data.robot import user_facing_robot_type
+from opentrons.util.performance_helpers import TrackingFunctions
 from typing_extensions import Literal
 
 from fastapi import (
@@ -273,48 +274,54 @@ async def create_protocol(  # noqa: C901
     cached_protocol_id = protocol_store.get_id_by_hash(content_hash)
 
     if cached_protocol_id is not None:
-        resource = protocol_store.get(protocol_id=cached_protocol_id)
 
-        try:
-            analysis_summaries, _ = await _start_new_analysis_if_necessary(
-                protocol_id=cached_protocol_id,
-                analysis_id=analysis_id,
-                rtp_values=parsed_rtp,
-                force_reanalyze=False,
-                protocol_store=protocol_store,
-                analysis_store=analysis_store,
-                analyses_manager=analyses_manager,
+        @TrackingFunctions.track_getting_cached_protocol_analysis
+        async def _get_cached_protocol_analysis() -> PydanticResponse[
+            SimpleBody[Protocol]
+        ]:
+            resource = protocol_store.get(protocol_id=cached_protocol_id)
+            try:
+                analysis_summaries, _ = await _start_new_analysis_if_necessary(
+                    protocol_id=cached_protocol_id,
+                    analysis_id=analysis_id,
+                    rtp_values=parsed_rtp,
+                    force_reanalyze=False,
+                    protocol_store=protocol_store,
+                    analysis_store=analysis_store,
+                    analyses_manager=analyses_manager,
+                )
+            except AnalysisIsPendingError as error:
+                raise LastAnalysisPending(detail=str(error)).as_error(
+                    status.HTTP_503_SERVICE_UNAVAILABLE
+                ) from error
+
+            data = Protocol.construct(
+                id=cached_protocol_id,
+                createdAt=resource.created_at,
+                protocolKind=ProtocolKind.from_string(resource.protocol_kind),
+                protocolType=resource.source.config.protocol_type,
+                robotType=resource.source.robot_type,
+                metadata=Metadata.parse_obj(resource.source.metadata),
+                analysisSummaries=analysis_summaries,
+                key=resource.protocol_key,
+                files=[
+                    ProtocolFile(name=f.path.name, role=f.role)
+                    for f in resource.source.files
+                ],
             )
-        except AnalysisIsPendingError as error:
-            raise LastAnalysisPending(detail=str(error)).as_error(
-                status.HTTP_503_SERVICE_UNAVAILABLE
-            ) from error
 
-        data = Protocol.construct(
-            id=cached_protocol_id,
-            createdAt=resource.created_at,
-            protocolKind=ProtocolKind.from_string(resource.protocol_kind),
-            protocolType=resource.source.config.protocol_type,
-            robotType=resource.source.robot_type,
-            metadata=Metadata.parse_obj(resource.source.metadata),
-            analysisSummaries=analysis_summaries,
-            key=resource.protocol_key,
-            files=[
-                ProtocolFile(name=f.path.name, role=f.role)
-                for f in resource.source.files
-            ],
-        )
+            log.info(
+                f'Protocol with id "{cached_protocol_id}" with same contents already exists.'
+                f" Returning existing protocol data in response payload."
+            )
 
-        log.info(
-            f'Protocol with id "{cached_protocol_id}" with same contents already exists.'
-            f" Returning existing protocol data in response payload."
-        )
+            return await PydanticResponse.create(
+                content=SimpleBody.construct(data=data),
+                # not returning a 201 because we're not actually creating a new resource
+                status_code=status.HTTP_200_OK,
+            )
 
-        return await PydanticResponse.create(
-            content=SimpleBody.construct(data=data),
-            # not returning a 201 because we're not actually creating a new resource
-            status_code=status.HTTP_200_OK,
-        )
+        return await _get_cached_protocol_analysis()
 
     try:
         source = await protocol_reader.save(

@@ -11,7 +11,7 @@ import {
   Flex,
   JUSTIFY_SPACE_BETWEEN,
   SPACING,
-  StyledText,
+  LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
@@ -81,7 +81,7 @@ export function EthernetConnectionDetails(
         />
         {ethernet?.ipAddress === null || ethernet?.macAddress === null ? (
           <Flex marginTop="9rem">
-            <StyledText
+            <LegacyStyledText
               color={COLORS.grey60}
               fontSize={TYPOGRAPHY.fontSize28}
               lineHeight={TYPOGRAPHY.lineHeight36}
@@ -89,7 +89,7 @@ export function EthernetConnectionDetails(
               textAlign={TYPOGRAPHY.textAlignCenter}
             >
               {t('ethernet_connection_description')}
-            </StyledText>
+            </LegacyStyledText>
           </Flex>
         ) : null}
       </Flex>
@@ -112,21 +112,21 @@ const EthernetDetailsRow = ({
       flexDirection={DIRECTION_ROW}
       justifyContent={JUSTIFY_SPACE_BETWEEN}
     >
-      <StyledText
+      <LegacyStyledText
         fontSize={TYPOGRAPHY.fontSize22}
         lineHeight={TYPOGRAPHY.lineHeight28}
         fontWeight={TYPOGRAPHY.fontWeightSemiBold}
       >
         {title}
-      </StyledText>
-      <StyledText
+      </LegacyStyledText>
+      <LegacyStyledText
         color={COLORS.grey60}
         fontSize={TYPOGRAPHY.fontSize22}
         lineHeight={TYPOGRAPHY.lineHeight28}
         fontWeight={TYPOGRAPHY.fontWeightRegular}
       >
         {detail}
-      </StyledText>
+      </LegacyStyledText>
     </Flex>
   )
 }

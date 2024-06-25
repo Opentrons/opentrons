@@ -11,6 +11,7 @@ _UnderlyingFunction = typing.Callable[
 
 RobotContextState = typing.Literal[
     "ANALYZING_PROTOCOL",
+    "GETTING_CACHED_ANALYSIS",
     "RUNNING_PROTOCOL",
     "CALIBRATING",
     "ROBOT_STARTING_UP",

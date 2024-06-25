@@ -25,11 +25,9 @@ from robot_server.runs.command_models import (
     CommandLink,
     CommandLinkMeta,
 )
+from robot_server.runs.run_models import RunCommandSummary
 
-from ..maintenance_run_models import (
-    MaintenanceRunCommandSummary,
-    MaintenanceRunNotFoundError,
-)
+from ..maintenance_run_models import MaintenanceRunNotFoundError
 from ..maintenance_run_data_manager import MaintenanceRunDataManager
 from ..maintenance_engine_store import MaintenanceEngineStore
 from ..dependencies import (
@@ -177,7 +175,7 @@ async def create_run_command(
     ),
     responses={
         status.HTTP_200_OK: {
-            "model": MultiBody[MaintenanceRunCommandSummary, CommandCollectionLinks]
+            "model": MultiBody[RunCommandSummary, CommandCollectionLinks]
         },
         status.HTTP_404_NOT_FOUND: {"model": ErrorBody[RunNotFound]},
     },
@@ -199,7 +197,7 @@ async def get_run_commands(
     run_data_manager: MaintenanceRunDataManager = Depends(
         get_maintenance_run_data_manager
     ),
-) -> PydanticResponse[MultiBody[MaintenanceRunCommandSummary, CommandCollectionLinks]]:
+) -> PydanticResponse[MultiBody[RunCommandSummary, CommandCollectionLinks]]:
     """Get a summary of a set of commands in a run.
 
     Arguments:
@@ -221,7 +219,7 @@ async def get_run_commands(
     recovery_target_command = run_data_manager.get_recovery_target_command(run_id=runId)
 
     data = [
-        MaintenanceRunCommandSummary.construct(
+        RunCommandSummary.construct(
             id=c.id,
             key=c.key,
             commandType=c.commandType,
@@ -232,6 +230,7 @@ async def get_run_commands(
             completedAt=c.completedAt,
             params=c.params,
             error=c.error,
+            failedCommandId=c.failedCommandId,
         )
         for c in command_slice.commands
     ]

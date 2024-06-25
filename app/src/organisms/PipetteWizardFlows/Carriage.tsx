@@ -5,7 +5,7 @@ import {
   COLORS,
   PrimaryButton,
   SPACING,
-  StyledText,
+  LegacyStyledText,
 } from '@opentrons/components'
 import { SmallButton } from '../../atoms/buttons'
 import { GenericWizardTile } from '../../molecules/GenericWizardTile'
@@ -43,7 +43,7 @@ export const Carriage = (props: PipetteWizardStepProps): JSX.Element | null => {
         proceed()
       })
       .catch(error => {
-        setShowErrorMessage(error.message)
+        setShowErrorMessage(error.message as string)
       })
   }
 
@@ -62,7 +62,7 @@ export const Carriage = (props: PipetteWizardStepProps): JSX.Element | null => {
       )}
       rightHandBody={getPipetteAnimations96({
         section: SECTIONS.CARRIAGE,
-        flowType: flowType,
+        flowType,
       })}
       bodyText={
         <Trans
@@ -72,21 +72,24 @@ export const Carriage = (props: PipetteWizardStepProps): JSX.Element | null => {
           }
           components={{
             block: (
-              <StyledText css={BODY_STYLE} marginBottom={SPACING.spacing16} />
+              <LegacyStyledText
+                css={BODY_STYLE}
+                marginBottom={SPACING.spacing16}
+              />
             ),
           }}
         />
       }
       back={flowType === FLOWS.ATTACH ? undefined : goBack}
       proceedButton={
-        isOnDevice ? (
+        Boolean(isOnDevice) ? (
           <SmallButton
             onClick={
               flowType === FLOWS.ATTACH
                 ? proceed
                 : handleReattachCarriageProceed
             }
-            buttonText={capitalize(t('shared:continue'))}
+            buttonText={capitalize(t('shared:continue') as string)}
           />
         ) : (
           <PrimaryButton
@@ -96,7 +99,7 @@ export const Carriage = (props: PipetteWizardStepProps): JSX.Element | null => {
                 : handleReattachCarriageProceed
             }
           >
-            {capitalize(t('shared:continue'))}
+            {capitalize(t('shared:continue') as string)}
           </PrimaryButton>
         )
       }

@@ -397,7 +397,7 @@ Opentrons electronic pipettes can do some things that a human cannot do with a p
 
                 p300.return_tip()
 
-Notice here how Python's :py:class:`slice` functionality (in the code sample as ``[:4]``) lets us select the first five wells of the well plate only. Also, in Python, a range of numbers is *exclusive* of the end value and counting starts at 0, not 1. For the Corning 96-well plate used here, this means well A1=0, B1=1, C1=2, and so on to the last well used, which is E1=4. See also, the :ref:`tutorial-commands` section of the Tutorial.
+Notice here how Python's :py:class:`slice` functionality (in the code sample as ``[:5]``) lets us select the first five wells of the well plate only. Also, in Python, a range of numbers is *exclusive* of the end value and counting starts at 0, not 1. For the USA Scientific 12-well reservoir used here, this means well A1=0, A2=1, A3=2, and so on to the last well used, which is A5=4. See also, the :ref:`tutorial-commands` section of the Tutorial.
 
 Dilution
 ========

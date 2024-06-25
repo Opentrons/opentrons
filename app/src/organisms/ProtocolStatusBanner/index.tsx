@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
-import { SPACING, StyledText } from '@opentrons/components'
+import { SPACING, LegacyStyledText } from '@opentrons/components'
 import { Banner } from '../../atoms/Banner'
 
 import type { IconProps } from '@opentrons/components'
@@ -13,10 +13,10 @@ export function ProtocolStatusBanner(): JSX.Element {
     <Banner
       type="warning"
       icon={alertIcon}
-      width="100%"
       iconMarginLeft={SPACING.spacing4}
+      marginRight={SPACING.spacing24}
     >
-      <StyledText>{t('csv_file_required')}</StyledText>
+      <LegacyStyledText>{t('csv_file_required')}</LegacyStyledText>
     </Banner>
   )
 }

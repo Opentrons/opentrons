@@ -60,7 +60,7 @@ export function deserializeExpectedMessages(
     if (!isValidNotifyResponse) {
       reject(error)
     } else {
-      resolve(JSON.parse(message))
+      resolve(JSON.parse(message) as NotifyBrokerResponses)
     }
   })
 }

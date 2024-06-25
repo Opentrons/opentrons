@@ -14,7 +14,7 @@ import {
   Icon,
   Link,
   SPACING,
-  StyledText,
+  LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { FLEX_ROBOT_TYPE, OT2_ROBOT_TYPE } from '@opentrons/shared-data'
@@ -265,9 +265,9 @@ export function ProtocolRunSetup({
             <InfoMessage title={t('setup_is_view_only')} />
           ) : null}
           {analysisErrors != null && analysisErrors?.length > 0 ? (
-            <StyledText alignSelf={ALIGN_CENTER} color={COLORS.grey50}>
+            <LegacyStyledText alignSelf={ALIGN_CENTER} color={COLORS.grey50}>
               {t('protocol_analysis_failed')}
-            </StyledText>
+            </LegacyStyledText>
           ) : (
             stepsKeysInOrder.map((stepKey, index) => {
               const setupStepTitle = t(`${stepKey}_title`)
@@ -323,9 +323,9 @@ export function ProtocolRunSetup({
           )}
         </>
       ) : (
-        <StyledText alignSelf={ALIGN_CENTER} color={COLORS.grey50}>
+        <LegacyStyledText alignSelf={ALIGN_CENTER} color={COLORS.grey50}>
           {t('loading_data')}
-        </StyledText>
+        </LegacyStyledText>
       )}
     </Flex>
   )
@@ -392,7 +392,7 @@ function StepRightElement(props: StepRightElementProps): JSX.Element | null {
           name={calibrationStatus?.complete ? 'ot-check' : 'alert-circle'}
           id="RunSetupCard_calibrationIcon"
         />
-        <StyledText
+        <LegacyStyledText
           color={COLORS.black90}
           css={TYPOGRAPHY.pSemiBold}
           marginRight={SPACING.spacing16}
@@ -401,7 +401,7 @@ function StepRightElement(props: StepRightElementProps): JSX.Element | null {
           whiteSpace="nowrap"
         >
           {statusText}
-        </StyledText>
+        </LegacyStyledText>
       </Flex>
     ) : null
   } else if (stepKey === LPC_KEY) {

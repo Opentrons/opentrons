@@ -1167,7 +1167,8 @@
       "notes": [],
       "params": {
         "mount": "left",
-        "pipetteName": "p300_multi_gen2"
+        "pipetteName": "p300_multi_gen2",
+        "tipOverlapNotAfterVersion": "v0"
       },
       "status": "failed"
     }
@@ -1250,6 +1251,7 @@
   },
   "modules": [],
   "pipettes": [],
+  "result": "not-ok",
   "robotType": "OT-3 Standard",
   "runTimeParameters": []
 }

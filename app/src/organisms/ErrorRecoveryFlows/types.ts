@@ -8,9 +8,11 @@ export type RecoveryRoute = typeof RECOVERY_MAP[keyof typeof RECOVERY_MAP]['ROUT
 export type RobotMovingRoute =
   | typeof RECOVERY_MAP['ROBOT_IN_MOTION']['ROUTE']
   | typeof RECOVERY_MAP['ROBOT_RESUMING']['ROUTE']
-  | typeof RECOVERY_MAP['ROBOT_RETRYING_COMMAND']['ROUTE']
+  | typeof RECOVERY_MAP['ROBOT_RETRYING_STEP']['ROUTE']
   | typeof RECOVERY_MAP['ROBOT_CANCELING']['ROUTE']
-export type ErrorKind = keyof typeof ERROR_KINDS
+  | typeof RECOVERY_MAP['ROBOT_PICKING_UP_TIPS']['ROUTE']
+  | typeof RECOVERY_MAP['ROBOT_SKIPPING_STEP']['ROUTE']
+export type ErrorKind = typeof ERROR_KINDS[keyof typeof ERROR_KINDS]
 
 interface RecoveryMapDetails {
   ROUTE: string

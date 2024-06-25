@@ -13,7 +13,7 @@ import {
   Link,
   SIZE_1,
   SPACING,
-  StyledText,
+  LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { getTopPortalEl } from '../../App/portal'
@@ -24,7 +24,7 @@ import {
 } from '../../molecules/LegacyModal'
 import { PythonLabwareOffsetSnippet } from '../../molecules/PythonLabwareOffsetSnippet'
 import { LabwareOffsetTabs } from '../LabwareOffsetTabs'
-import { getLabwareDefinitionsFromCommands } from '../LabwarePositionCheck/utils/labware'
+import { getLabwareDefinitionsFromCommands } from '../../molecules/Command/utils/getLabwareDefinitionsFromCommands'
 import { LabwareOffsetTable } from './LabwareOffsetTable'
 import { getIsLabwareOffsetCodeSnippetsOn } from '../../redux/config'
 import type { LabwareOffset } from '@opentrons/api-client'
@@ -96,9 +96,9 @@ export function ApplyHistoricOffsets(
         label={
           <Flex alignItems={ALIGN_CENTER} gridGap={SPACING.spacing4}>
             <Icon size={SIZE_1} name="reticle" />
-            <StyledText as="p">
+            <LegacyStyledText as="p">
               {t(noOffsetData ? 'no_offset_data' : 'apply_offset_data')}
-            </StyledText>
+            </LegacyStyledText>
           </Flex>
         }
       />
@@ -141,14 +141,17 @@ export function ApplyHistoricOffsets(
                     i18nKey={'robot_has_no_offsets_from_previous_runs'}
                     components={{
                       block: (
-                        <StyledText as="p" marginBottom={SPACING.spacing8} />
+                        <LegacyStyledText
+                          as="p"
+                          marginBottom={SPACING.spacing8}
+                        />
                       ),
                     }}
                   />
                 ) : (
-                  <StyledText as="p">
+                  <LegacyStyledText as="p">
                     {t('robot_has_offsets_from_previous_runs')}
-                  </StyledText>
+                  </LegacyStyledText>
                 )}
                 <ExternalLink
                   marginTop={noOffsetData ? '0px' : SPACING.spacing8}

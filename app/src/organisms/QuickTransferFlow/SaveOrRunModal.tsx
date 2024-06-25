@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next'
 import {
   SPACING,
   COLORS,
-  StyledText,
+  LegacyStyledText,
   Flex,
   DIRECTION_COLUMN,
   TYPOGRAPHY,
@@ -36,12 +36,12 @@ export const SaveOrRunModal = (props: SaveOrRunModalProps): JSX.Element => {
         gridGap={SPACING.spacing10}
         width="100%"
       >
-        <StyledText
+        <LegacyStyledText
           css={TYPOGRAPHY.bodyTextRegular}
           paddingBottom={SPACING.spacing24}
         >
           {t('save_to_run_later')}
-        </StyledText>
+        </LegacyStyledText>
         <Flex gridGap={SPACING.spacing8}>
           <SmallButton
             width="50%"

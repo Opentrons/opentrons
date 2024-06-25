@@ -15,7 +15,7 @@ import {
   JUSTIFY_SPACE_BETWEEN,
   SPACING,
   TYPOGRAPHY,
-  StyledText,
+  LegacyStyledText,
   AlertItem,
   Box,
 } from '@opentrons/components'
@@ -180,9 +180,12 @@ export function StackingOffsets(): JSX.Element | null {
             </div>
             {modifiedAdapterDefinitions.length === 0 ? null : (
               <Flex gridGap={SPACING.spacing4} flexDirection={DIRECTION_COLUMN}>
-                <StyledText as="h3" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
+                <LegacyStyledText
+                  as="h3"
+                  fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+                >
                   Adapters
-                </StyledText>
+                </LegacyStyledText>
                 {modifiedAdapterDefinitions.map((definition, index) => {
                   const key = definition.parameters.loadName
                   const fieldName = `compatibleAdapters.${key}`
@@ -241,8 +244,8 @@ export function StackingOffsets(): JSX.Element | null {
                       isChecked ? (
                         <div
                           style={{
-                            marginTop: '-1.4rem',
-                            height: '2.2rem',
+                            marginTop: '-1.2rem',
+                            height: '2.0rem',
                             fontSize: '0.75rem',
                           }}
                         >
@@ -261,10 +264,14 @@ export function StackingOffsets(): JSX.Element | null {
               <Flex
                 flexDirection={DIRECTION_COLUMN}
                 marginTop={SPACING.spacing4}
+                gridGap={SPACING.spacing4}
               >
-                <StyledText as="h3" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
+                <LegacyStyledText
+                  as="h3"
+                  fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+                >
                   Modules
-                </StyledText>
+                </LegacyStyledText>
                 {modifiedModuleModels.map((model, index) => {
                   const fieldName = `compatibleModules.${model}`
                   const isChecked =
@@ -322,8 +329,8 @@ export function StackingOffsets(): JSX.Element | null {
                       {isChecked ? (
                         <div
                           style={{
-                            marginTop: '-1.4rem',
-                            height: '2.2rem',
+                            marginTop: '-1.2rem',
+                            height: '2.0rem',
                             fontSize: '0.75rem',
                           }}
                         >
