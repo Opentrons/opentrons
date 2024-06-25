@@ -96,12 +96,12 @@ class QueueStatus(enum.Enum):
     """
 
 
-class RunResult(str, enum.Enum):
+class RunResult(enum.Enum):
     """Result of the run."""
 
-    SUCCEEDED = "succeeded"
-    FAILED = "failed"
-    STOPPED = "stopped"
+    SUCCEEDED = enum.auto()
+    FAILED = enum.auto()
+    STOPPED = enum.auto()
 
 
 @dataclass(frozen=True)
@@ -380,8 +380,7 @@ class CommandStore(HasState[CommandState], HandlesActions):
 
         elif isinstance(action, StopAction):
             if not self._state.run_result:
-                if self._state.queue_status == QueueStatus.AWAITING_RECOVERY:
-                    self._state.recovery_target_command_id = None
+                self._state.recovery_target_command_id = None
 
                 self._state.queue_status = QueueStatus.PAUSED
                 if action.from_estop:
