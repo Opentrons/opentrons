@@ -1585,7 +1585,7 @@ export const additionalEquipmentInvariantProperties = handleActions<NormalizedAd
               ),
         },
       }
-      console.log('trashBin', trashBin)
+
       if (isFlex) {
         if (trashBin != null) {
           return {
