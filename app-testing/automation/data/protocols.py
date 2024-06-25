@@ -211,6 +211,7 @@ class Protocols:
         robot="OT2",
         app_error=False,
         robot_error=False,
+        custom_labware=["cpx_4_tuberack_100ul"],
     )
 
     OT2_S_v2_13_P300M_P20S_MM_TC_TM_Smoke620Release: Protocol = Protocol(
