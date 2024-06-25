@@ -138,6 +138,7 @@ export function LargeButton(props: LargeButtonProps): JSX.Element {
     box-shadow: none;
     padding: ${SPACING.spacing24};
     line-height: ${TYPOGRAPHY.lineHeight20};
+    grid-gap: ${SPACING.spacing60}
     border: ${BORDERS.borderRadius4} solid
       ${!!LARGE_BUTTON_PROPS_BY_TYPE[buttonType].isInverse
         ? LARGE_BUTTON_PROPS_BY_TYPE[buttonType].defaultColor
