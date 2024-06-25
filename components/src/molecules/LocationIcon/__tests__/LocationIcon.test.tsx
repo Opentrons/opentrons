@@ -3,7 +3,7 @@ import { describe, it, beforeEach, expect } from 'vitest'
 import { renderWithProviders } from '../../../testing/utils'
 import { screen } from '@testing-library/react'
 import { SPACING } from '../../../ui-style-constants'
-import { BORDERS, COLORS } from '../../../helix-design-system'
+import { COLORS } from '../../../helix-design-system'
 
 import { LocationIcon } from '..'
 
