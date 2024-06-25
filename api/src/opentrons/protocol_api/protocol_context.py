@@ -38,6 +38,7 @@ from opentrons.protocols.api_support.util import (
     AxisMaxSpeeds,
     requires_version,
     APIVersionError,
+    RobotTypeError,
 )
 
 from ._types import OffDeckType
@@ -898,7 +899,7 @@ class ProtocolContext(CommandPublisher):
                              control <advanced-control>` applications. You cannot
                              replace an instrument in the middle of a protocol being run
                              from the Opentrons App or touchscreen.
-        :param bool liquid_presence_detection: If ``True``, enable liquid presence detection for instrument. Only available on Flex robots in API Version 2.19 and above.
+        :param bool liquid_presence_detection: If ``True``, enable liquid presence detection for instrument. Only available on Flex robots in API Version 2.20 and above.
         """
         instrument_name = validation.ensure_lowercase_name(instrument_name)
         checked_instrument_name = validation.ensure_pipette_name(instrument_name)
@@ -931,16 +932,18 @@ class ProtocolContext(CommandPublisher):
         )
 
         if (
-            self._core.robot_type != "OT-3 Standard"
-            and liquid_presence_detection is not None
-        ):
-            raise ValueError("Liquid presence detection only available on Flex robot.")
-        if (
-            self._api_version < APIVersion(2, 19)
+            self._api_version < APIVersion(2, 20)
             and liquid_presence_detection is not None
         ):
             raise APIVersionError(
                 "Liquid Presence Detection is only supported on Flex protocols in API Version 2.19 and above."
+            )
+        if (
+            self._core.robot_type != "OT-3 Standard"
+            and liquid_presence_detection is not None
+        ):
+            raise RobotTypeError(
+                "Liquid presence detection only available on Flex robot."
             )
         instrument_core = self._core.load_instrument(
             instrument_name=checked_instrument_name,

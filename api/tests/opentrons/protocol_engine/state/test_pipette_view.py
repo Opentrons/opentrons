@@ -62,7 +62,7 @@ def get_pipette_view(
     static_config_by_id: Optional[Dict[str, StaticPipetteConfig]] = None,
     flow_rates_by_id: Optional[Dict[str, FlowRates]] = None,
     nozzle_layout_by_id: Optional[Dict[str, Optional[NozzleMap]]] = None,
-    liquid_presence_detection_by_id: Optional[Dict[str, Optional[bool]]] = None,
+    liquid_presence_detection_by_id: Optional[Dict[str, bool]] = None,
 ) -> PipetteView:
     """Get a pipette view test subject with the specified state."""
     state = PipetteState(

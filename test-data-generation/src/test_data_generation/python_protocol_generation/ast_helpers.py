@@ -123,13 +123,13 @@ class CallFunction(BaseCall):
 
     @classmethod
     def load_instrument(
-        cls, instrument_name: str, mount: typing.Literal["left", "right"], liquid_presence_detection: bool = False,
+        cls, instrument_name: str, mount: typing.Literal["left", "right"],
     ) -> "CallFunction":
         """Create a CallFunction for loading an instrument."""
         return cls(
             call_on=PROTOCOL_CONTEXT_VAR_NAME,
             what_to_call="load_instrument",
-            args=[instrument_name, mount, liquid_presence_detection],
+            args=[instrument_name, mount],
         )
 
 

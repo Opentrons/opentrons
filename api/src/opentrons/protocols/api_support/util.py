@@ -37,6 +37,12 @@ if TYPE_CHECKING:
 MODULE_LOG = logging.getLogger(__name__)
 
 
+class RobotTypeError(Exception):
+    """Error raised when a protocol attempts to access behavior not available to the robot type in use."""
+
+    pass
+
+
 class APIVersionError(Exception):
     """
     Error raised when a protocol attempts to access behavior not implemented

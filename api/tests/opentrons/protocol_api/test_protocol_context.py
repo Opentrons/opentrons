@@ -14,7 +14,7 @@ from opentrons.legacy_broker import LegacyBroker
 from opentrons.hardware_control.modules.types import ModuleType, TemperatureModuleModel
 from opentrons.protocols.api_support import instrument as mock_instrument_support
 from opentrons.protocols.api_support.types import APIVersion
-from opentrons.protocols.api_support.util import APIVersionError
+from opentrons.protocols.api_support.util import APIVersionError, RobotTypeError
 from opentrons.protocol_api import (
     MAX_SUPPORTED_VERSION,
     ProtocolContext,
@@ -197,7 +197,7 @@ def test_load_instrument_robot_type(
     ).then_return(Mount.LEFT)
     decoy.when(mock_core.robot_type).then_return("OT-2 Standard")
 
-    with pytest.raises(ValueError):
+    with pytest.raises(RobotTypeError):
         subject.load_instrument(
             instrument_name="Gandalf",
             mount="shadowfax",
