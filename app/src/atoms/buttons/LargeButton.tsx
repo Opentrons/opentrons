@@ -131,8 +131,9 @@ export function LargeButton(props: LargeButtonProps): JSX.Element {
   const LARGE_BUTTON_STYLE = css`
     text-align: ${TYPOGRAPHY.textAlignLeft};
     color: ${LARGE_BUTTON_PROPS_BY_TYPE[buttonType].defaultColor};
-    background-color: ${LARGE_BUTTON_PROPS_BY_TYPE[buttonType]
-      .defaultBackgroundColor};
+    background-color: ${
+      LARGE_BUTTON_PROPS_BY_TYPE[buttonType].defaultBackgroundColor
+    };
     cursor: default;
     border-radius: ${BORDERS.borderRadius16};
     box-shadow: none;
@@ -140,21 +141,26 @@ export function LargeButton(props: LargeButtonProps): JSX.Element {
     line-height: ${TYPOGRAPHY.lineHeight20};
     grid-gap: ${SPACING.spacing60}
     border: ${BORDERS.borderRadius4} solid
-      ${!!LARGE_BUTTON_PROPS_BY_TYPE[buttonType].isInverse
-        ? LARGE_BUTTON_PROPS_BY_TYPE[buttonType].defaultColor
-        : LARGE_BUTTON_PROPS_BY_TYPE[buttonType].defaultBackgroundColor};
+      ${
+        !!LARGE_BUTTON_PROPS_BY_TYPE[buttonType].isInverse
+          ? LARGE_BUTTON_PROPS_BY_TYPE[buttonType].defaultColor
+          : LARGE_BUTTON_PROPS_BY_TYPE[buttonType].defaultBackgroundColor
+      };
 
     ${TYPOGRAPHY.pSemiBold}
 
     #btn-icon: {
-      color: ${disabled
-        ? LARGE_BUTTON_PROPS_BY_TYPE[buttonType].disabledIconColor
-        : LARGE_BUTTON_PROPS_BY_TYPE[buttonType].iconColor};
+      color: ${
+        disabled
+          ? LARGE_BUTTON_PROPS_BY_TYPE[buttonType].disabledIconColor
+          : LARGE_BUTTON_PROPS_BY_TYPE[buttonType].iconColor
+      };
     }
 
     &:active {
-      background-color: ${LARGE_BUTTON_PROPS_BY_TYPE[buttonType]
-        .activeBackgroundColor};
+      background-color: ${
+        LARGE_BUTTON_PROPS_BY_TYPE[buttonType].activeBackgroundColor
+      };
       ${activeColorFor(buttonType)};
       border: ${BORDERS.borderRadius4} solid
         ${LARGE_BUTTON_PROPS_BY_TYPE[buttonType].activeBackgroundColor};
@@ -164,8 +170,9 @@ export function LargeButton(props: LargeButtonProps): JSX.Element {
     }
 
     &:focus-visible {
-      background-color: ${LARGE_BUTTON_PROPS_BY_TYPE[buttonType]
-        .focusVisibleBackgroundColor};
+      background-color: ${
+        LARGE_BUTTON_PROPS_BY_TYPE[buttonType].focusVisibleBackgroundColor
+      };
       ${activeColorFor(buttonType)};
       padding: calc(${SPACING.spacing24} + ${SPACING.spacing2});
       border: ${SPACING.spacing2} solid ${COLORS.transparent};
@@ -177,8 +184,9 @@ export function LargeButton(props: LargeButtonProps): JSX.Element {
 
     &:disabled {
       color: ${LARGE_BUTTON_PROPS_BY_TYPE[buttonType].disabledColor};
-      background-color: ${LARGE_BUTTON_PROPS_BY_TYPE[buttonType]
-        .disabledBackgroundColor};
+      background-color: ${
+        LARGE_BUTTON_PROPS_BY_TYPE[buttonType].disabledBackgroundColor
+      };
     }
   `
   return (
