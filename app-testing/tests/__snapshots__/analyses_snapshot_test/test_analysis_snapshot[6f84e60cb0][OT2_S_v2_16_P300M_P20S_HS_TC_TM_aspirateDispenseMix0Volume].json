@@ -2314,6 +2314,7 @@
       "commandType": "loadPipette",
       "notes": [],
       "params": {
+        "liquidPresenceDetection": false,
         "mount": "left",
         "pipetteName": "p300_multi_gen2"
       },
@@ -2324,6 +2325,7 @@
       "commandType": "loadPipette",
       "notes": [],
       "params": {
+        "liquidPresenceDetection": false,
         "mount": "right",
         "pipetteName": "p20_single_gen2"
       },
