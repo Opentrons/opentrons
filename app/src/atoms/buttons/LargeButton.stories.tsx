@@ -1,7 +1,6 @@
 import * as React from 'react'
-import { ICON_DATA_BY_NAME, VIEWPORT } from '@opentrons/components'
+import { Box, COLORS, SPACING, ICON_DATA_BY_NAME } from '@opentrons/components'
 import { LargeButton } from './'
-import { Box, COLORS, SPACING } from '@opentrons/components'
 
 import type { Meta, StoryObj } from '@storybook/react'
 
