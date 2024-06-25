@@ -257,10 +257,10 @@ function IndividualCommand(props: IndividualCommandProps): JSX.Element {
         >
           <CommandIcon command={command} color={iconColor} />
           <CommandText
-            analysis={analysis}
             command={command}
             robotType={analysis?.robotType ?? FLEX_ROBOT_TYPE}
             color={COLORS.black90}
+            commandTextData={analysis}
           />
         </Flex>
       </Flex>

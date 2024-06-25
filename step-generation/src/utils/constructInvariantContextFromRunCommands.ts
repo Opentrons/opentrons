@@ -3,20 +3,22 @@ import {
   getLabwareDefURI,
   RunTimeCommand,
   getPipetteNameSpecs,
-  FIXED_TRASH_ID,
   LabwareDefinition2,
   getAllDefinitions,
 } from '@opentrons/shared-data'
 import { PickUpTipRunTimeCommand } from '@opentrons/shared-data'
 import { LoadLabwareRunTimeCommand } from '@opentrons/shared-data'
-import { InvariantContext } from '../types'
-
-const FIXED_TRASH_LOADNAME = 'opentrons_1_trash_3200ml_fixed'
+import {
+  InvariantContext,
+  LabwareEntities,
+  LiquidEntities,
+  ModuleEntities,
+  PipetteEntities,
+} from '../types'
 
 export function constructInvariantContextFromRunCommands(
   commands: RunTimeCommand[]
 ): InvariantContext {
-  const fixedTrashDef = getLatestLabwareDef(FIXED_TRASH_LOADNAME)
   return commands.reduce(
     (acc: InvariantContext, command: RunTimeCommand) => {
       const result = command.result
@@ -30,7 +32,7 @@ export function constructInvariantContextFromRunCommands(
               labwareDefURI: getLabwareDefURI(result.definition),
               def: result.definition,
             },
-          },
+          } as LabwareEntities,
         }
       } else if (command.commandType === 'loadModule' && result != null) {
         return {
@@ -42,7 +44,7 @@ export function constructInvariantContextFromRunCommands(
               type: getModuleType(command.params.model),
               model: command.params.model,
             },
-          },
+          } as ModuleEntities,
         }
       } else if (command.commandType === 'loadPipette' && result != null) {
         const labwareId =
@@ -51,24 +53,28 @@ export function constructInvariantContextFromRunCommands(
               c.commandType === 'pickUpTip' &&
               c.params.pipetteId === result.pipetteId
           )?.params.labwareId ?? null
+        const matchingCommand =
+          commands.find(
+            (c): c is LoadLabwareRunTimeCommand =>
+              c.commandType === 'loadLabware' &&
+              c.result != null &&
+              c.result.labwareId === labwareId
+          ) ?? null
+
         const tiprackLabwareDef =
-          labwareId != null
-            ? commands.find(
-                (c): c is LoadLabwareRunTimeCommand =>
-                  c.commandType === 'loadLabware' &&
-                  c.result.labwareId === labwareId
-              )?.result.definition ?? null
+          matchingCommand != null && matchingCommand.result != null
+            ? matchingCommand.result.definition ?? null
             : null
 
         return {
           ...acc,
           pipetteEntities: {
             ...acc.pipetteEntities,
-            [command.result.pipetteId]: {
+            [result.pipetteId]: {
               tiprackLabwareDef,
               spec: getPipetteNameSpecs(command.params.pipetteName),
             },
-          },
+          } as PipetteEntities,
         }
       } else if (command.commandType === 'loadLiquid' && result != null) {
         const { displayColor } = command.params
@@ -76,12 +82,12 @@ export function constructInvariantContextFromRunCommands(
           ...acc,
           liquidEntities: {
             ...acc.liquidEntities,
-            [result.liquidId]: {
+            [command.params.labwareId]: {
               description: 'stub liquid description',
-              displayName: result.liquidId,
-              displayColor,
+              displayName: command.params.labwareId,
+              displayColor: '#ffd600'
             },
-          },
+          } as LiquidEntities,
         }
       }
 

@@ -152,6 +152,7 @@ getNextRobotStateAndWarnings.mockImplementation(mockNextRobotStateAndWarnings)
 beforeEach(() => {
   invariantContext = {
     labwareEntities: {},
+    liquidEntities: {},
     moduleEntities: {},
     pipetteEntities: {},
     additionalEquipmentEntities: {},

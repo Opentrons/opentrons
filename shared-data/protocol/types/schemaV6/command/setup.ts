@@ -117,12 +117,8 @@ interface LoadModuleParams {
 }
 interface LoadModuleResult {
   moduleId: string
-  definition: ModuleDefinition
-  model: ModuleModel
-  serialNumber: string
 }
 interface LoadLiquidParams {
-  displayColor: string
   liquidId: string
   labwareId: string
   volumeByWell: { [wellName: string]: number }

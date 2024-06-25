@@ -172,6 +172,7 @@ export function getResultingTimelineFrameFromRunCommands(
     moduleLocations,
     pipetteLocations,
   })
+  console.log('invariantContext', invariantContext)
   return {
     frame: {
       ...getNextRobotStateAndWarnings(

@@ -91,13 +91,6 @@ export const PipettingCommandText = ({
         flow_rate: flowRate,
       })
     }
-    case 'moveToWell': {
-      return t('move_to_well', {
-        well_name: wellName,
-        labware: getLabwareName(analysis, labwareId),
-        labware_location: displayLocation,
-      })
-    }
     case 'dropTip': {
       const loadedLabware = getLoadedLabware(commandTextData, labwareId)
       const labwareDefinitions = getLabwareDefinitionsFromCommands(

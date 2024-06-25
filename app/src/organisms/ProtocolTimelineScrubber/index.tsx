@@ -136,7 +136,7 @@ export function ProtocolTimelineScrubber(
             labwareOnDeck={map(robotState.labware, (labware, labwareId) => {
               if (
                 labware.slot in robotState.modules ||
-                labwareId === 'fixedTrash'
+                labwareId === 'fixedTrash' 
               ) {
                 return []
               }
@@ -323,6 +323,7 @@ function PipetteSideView({
   analysis,
 }: SideViewProps): JSX.Element {
   const channelCount = Math.min(Object.keys(allNozzleTipContents).length, 8)
+  console.log(liquidEntities)
   return (
     <svg width="4rem" height="16rem" viewBox="0 0 100 200">
       {channelCount <= 1 ? (
