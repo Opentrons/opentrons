@@ -213,7 +213,6 @@ Random, persistent ID to use for anonymous analytics tracking if opted in.
 
 Whether or not the user has opted into anonymous analytics tracking.
 
-
 ##### support.userId
 
 - CLI argument: `--support.userId`
