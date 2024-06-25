@@ -556,7 +556,7 @@ async def test_tip_pickup_moves(sim_and_instr):
         spec, _ = hw_api.plan_check_pick_up_tip(
             mount=mount, tip_length=40.0, presses=None, increment=None
         )
-        await hw_api.tip_pickup_moves(mount, spec)
+        await hw_api.tip_pickup_moves(mount=mount)
     else:
         await hw_api.tip_pickup_moves(mount)
 
