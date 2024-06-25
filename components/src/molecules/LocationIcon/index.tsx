@@ -4,7 +4,7 @@ import { css } from 'styled-components'
 import { Icon } from '../../icons'
 import { Flex, Text } from '../../primitives'
 import { ALIGN_CENTER } from '../../styles'
-import { SPACING, TYPOGRAPHY } from '../../ui-style-constants'
+import { RESPONSIVENESS, SPACING, TYPOGRAPHY } from '../../ui-style-constants'
 import { BORDERS, COLORS } from '../../helix-design-system'
 
 import type { IconName } from '../../icons'
@@ -32,16 +32,29 @@ const LOCATION_ICON_STYLE = css<{
   width?: string
 }>`
   align-items: ${ALIGN_CENTER};
-  border: 2px solid ${props => props.color ?? COLORS.black90};
-  border-radius: ${BORDERS.borderRadius12};
-  height: ${props => props.height ?? SPACING.spacing32};
+  border: 1px solid ${props => props.color ?? COLORS.black90};
   width: ${props => props.width ?? 'max-content'};
-  padding: ${SPACING.spacing4}
-    ${props => (props.slotName != null ? SPACING.spacing8 : SPACING.spacing6)};
+  padding: ${SPACING.spacing2} ${SPACING.spacing4};
+  border-radius: 6px;
+  height: max-content;
+
+  @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
+    border: 2px solid ${props => props.color ?? COLORS.black90};
+    border-radius: ${BORDERS.borderRadius12};
+    height: ${props => props.height ?? SPACING.spacing32};
+    padding: ${SPACING.spacing4}
+      ${props => (props.slotName != null ? SPACING.spacing8 : SPACING.spacing6)};
+  }
 `
 
 const SLOT_NAME_TEXT_STYLE = css`
-  ${TYPOGRAPHY.smallBodyTextBold}
+  font-size: ${TYPOGRAPHY.fontSizeCaption};
+  line-height: ${TYPOGRAPHY.lineHeightNormal};
+  font-weight: ${TYPOGRAPHY.fontWeightBold};
+
+  @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
+    ${TYPOGRAPHY.smallBodyTextBold}
+  }
 `
 
 export function LocationIcon({
