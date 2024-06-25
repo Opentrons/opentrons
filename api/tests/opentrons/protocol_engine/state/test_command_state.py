@@ -747,7 +747,7 @@ def test_final_state_after_stop() -> None:
 def test_final_state_after_error_recovery_stop() -> None:
     """Test the final state of the run after it's stopped during error recovery.
 
-    Unlike a stop outside of error recovery, we count this as a run failure.
+    We still want to count this as "stopped," not "failed."
     """
     subject = CommandStore(config=_make_config(), is_door_open=False)
     subject_view = CommandView(subject.state)
@@ -799,6 +799,6 @@ def test_final_state_after_error_recovery_stop() -> None:
             finish_error_details=None,
         )
     )
-    assert subject_view.get_status() == EngineStatus.FAILED
+    assert subject_view.get_status() == EngineStatus.STOPPED
     assert subject_view.get_recovery_target() is None
     assert subject_view.get_error() is None
