@@ -14,45 +14,53 @@ import { InputField } from '../../../atoms/InputField'
 import { NumericalKeyboard } from '../../../atoms/SoftwareKeyboard'
 import { getFlowRateRange } from '../utils'
 
-import type { SmallButton } from '../../../atoms/buttons'
 import type {
   QuickTransferSummaryState,
   QuickTransferSummaryAction,
+  FlowRateKind,
 } from '../types'
+
+import { ACTIONS } from '../constants'
 import { createPortal } from 'react-dom'
 
 
 interface FlowRateEntryProps {
-  onNext: () => void
   onBack: () => void
-  exitButtonProps: React.ComponentProps<typeof SmallButton>
   state: QuickTransferSummaryState
   dispatch: React.Dispatch<QuickTransferSummaryAction>
+  kind: FlowRateKind
 }
 
 export function FlowRateEntry(props: FlowRateEntryProps): JSX.Element {
-  const { onNext, onBack, exitButtonProps, state, dispatch } = props
+  const { onBack, state, dispatch, kind } = props
   const { i18n, t } = useTranslation(['quick_transfer', 'shared'])
   const keyboardRef = React.useRef(null)
 
   const [flowRate, setFlowRate] = React.useState<string>(
     state.aspirateFlowRate ? state.aspirateFlowRate.toString() : ''
-    // TODO: need to take into account aspirate and dispense
   )
   const flowRateRange = getFlowRateRange(state)
-  let headerCopy = t('aspirate_flow_rate')
-  let textEntryCopy = t('aspirate_flow_rate_µL')
   const rateAsNumber = Number(flowRate)
+  let headerCopy: string, textEntryCopy: string = ''
+  let flowRateAction: typeof ACTIONS.SET_ASPIRATE_FLOW_RATE | typeof ACTIONS.SET_DISPENSE_FLOW_RATE | null = null
+  if (kind === 'aspirate') {
+    headerCopy = t('aspirate_flow_rate')
+    textEntryCopy = t('aspirate_flow_rate_µL')
+    flowRateAction = ACTIONS.SET_ASPIRATE_FLOW_RATE
+  } else if (kind === 'dispense') {
+    headerCopy = t('dispense_flow_rate')
+    textEntryCopy = t('dispense_flow_rate_µL')
+    flowRateAction = ACTIONS.SET_DISPENSE_FLOW_RATE
+  }
 
   const handleClickSave = (): void => {
     // the button will be disabled if this values is null
-    if (rateAsNumber != null) {
+    if (rateAsNumber != null && flowRateAction != null) {
       dispatch({
         // set the type based on aspirate or dispense component.
-        type: 'SET_ASPIRATE_FLOW_RATE',
+        type: flowRateAction,
         rate: rateAsNumber,
       })
-      onNext()
     }
   }
 
@@ -72,7 +80,6 @@ export function FlowRateEntry(props: FlowRateEntryProps): JSX.Element {
         buttonText={i18n.format(t('shared:save'), 'capitalize')}
         onClickBack={onBack}
         onClickButton={handleClickSave}
-        secondaryButtonProps={exitButtonProps}
         top={SPACING.spacing8}
         buttonIsDisabled={error != null || flowRate === ''}
       />

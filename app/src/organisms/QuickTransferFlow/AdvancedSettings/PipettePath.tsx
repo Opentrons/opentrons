@@ -39,6 +39,7 @@ export function PipettePath(props: PipettePathProps): JSX.Element {
     setSelectedPipettePathOption,
   ] = React.useState<PathOption>(state.path)
 
+  // TODO: set the user facing option here
   const handleClickSave = (): void => {
     if (selectedPipettePathOption !== state.path) {
       dispatch({

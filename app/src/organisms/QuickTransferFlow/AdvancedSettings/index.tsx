@@ -13,7 +13,6 @@ import {
   SIZE_2,
   ALIGN_CENTER,
 } from '@opentrons/components'
-import { TRASH_BIN_ADAPTER_FIXTURE } from '@opentrons/shared-data'
 import { ListItem } from '../../../atoms/ListItem'
 import { FlowRateEntry } from './FlowRate'
 import { PipettePath } from './PipettePath'
@@ -21,7 +20,9 @@ import { PipettePath } from './PipettePath'
 import type {
   QuickTransferSummaryAction,
   QuickTransferSummaryState,
+  PathOption,
 } from '../types'
+import { single } from 'rxjs/operators'
 
 interface AdvancedSettingsProps {
   state: QuickTransferSummaryState
@@ -35,28 +36,38 @@ export function AdvancedSettings(props: AdvancedSettingsProps): JSX.Element | nu
     null
   )
 
+  let pipettePath: string = ''
+  if (state.path === 'single') {
+      pipettePath = t('pipette_path_single')
+  } else if (state.path === 'multiAspirate') {
+      pipettePath = t('pipette_path_multi_aspirate')
+  } else if (state.path === 'multiDispense') {
+      pipettePath = t('pipette_path_multi_dispense')
+  }
 
   const displayItems = [
     {
       option: t('aspirate_flow_rate'),
-      value: t(`${state.aspirateFlowRate} µL/s`),
+      value: t('flow_rate_value', { flow_rate: state.aspirateFlowRate}),
+      enabled: true,
       onClick: () => {
         setSelectedSetting('aspirate_flow_rate')
       },
     },
     {
       option: t('dispense_flow_rate'),
-      value: t(`${state.dispenseFlowRate} µL/s`
-      ),
+      value: t('flow_rate_value', { flow_rate: state.dispenseFlowRate}),
+      enabled: true,
       onClick: () => {
         setSelectedSetting('dispense_flow_rate')
       },
     },{
       option: t('pipette_path'),
-      value: t(`${state.path}` // TODO: set user facing options here.
-      ),
+      value: pipettePath,
+      enabled: state.transferType === 'transfer',
       onClick: () => {
-        setSelectedSetting('pipette_path')
+        state.transferType === 'transfer' 
+        ? setSelectedSetting('pipette_path') : null
       },
     },
   ]
@@ -86,7 +97,7 @@ export function AdvancedSettings(props: AdvancedSettingsProps): JSX.Element | nu
                   >
                     {displayItem.value}
                   </StyledText>
-                  <Icon name="more" size={SIZE_2} />
+                  {displayItem.enabled ? (<Icon name="more" size={SIZE_2} />) : null}
                 </Flex>
               </Flex>
             </ListItem>
@@ -94,6 +105,7 @@ export function AdvancedSettings(props: AdvancedSettingsProps): JSX.Element | nu
         : null}
       {selectedSetting === 'aspirate_flow_rate' ? (
         <FlowRateEntry
+          kind={'aspirate'}
           state={state}
           dispatch={dispatch}
           onBack={() => {
@@ -103,6 +115,7 @@ export function AdvancedSettings(props: AdvancedSettingsProps): JSX.Element | nu
       ) : null}
       {selectedSetting === 'dispense_flow_rate' ? (
         <FlowRateEntry
+          kind={'dispense'}
           state={state}
           dispatch={dispatch}
           onBack={() => {
@@ -112,7 +125,7 @@ export function AdvancedSettings(props: AdvancedSettingsProps): JSX.Element | nu
       ) : null}
       {selectedSetting === 'pipette_path' ? (
         <PipettePath
-        state={state}
+          state={state}
           dispatch={dispatch}
           onBack={() => {
             setSelectedSetting(null)
