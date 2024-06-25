@@ -921,6 +921,30 @@ class APIRemoved(GeneralError):
         )
 
 
+class IncorrectAPIVersion(GeneralError):
+    """An error indicating that a command was issued that is not supported by the API version in use."""
+
+    def __init(
+        self,
+        api_element: str,
+        until_version: str,
+        message: Optional[str] = None,
+        detail: Optional[Dict[str, str]] = None,
+        wrapping: Optional[Sequence[EnumeratedError]] = None,
+    ) -> None:
+        """Build an IncorrectAPIVersion error."""
+        checked_detail: Dict[str, Any] = detail or {}
+        checked_detail["identifier"] = api_element
+        checked_detail["until_version"] = until_version
+        checked_message = (
+            message
+            or f"{api_element} is not available until version {until_version}."
+        )
+        super().__init__(
+            ErrorCodes.INCORRECT_API_VERSION, checked_message, checked_detail, wrapping
+        )
+
+
 class CommandPreconditionViolated(GeneralError):
     """An error indicating that a command was issued in a robot state incompatible with it."""
 

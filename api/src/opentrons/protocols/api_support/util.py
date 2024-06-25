@@ -22,6 +22,10 @@ from opentrons.protocols.api_support.types import APIVersion
 from opentrons.hardware_control.types import Axis
 from opentrons.hardware_control.util import ot2_axis_to_string
 from opentrons_shared_data.robot.dev_types import RobotType
+from opentrons_shared_data.errors.exceptions import (
+    APIRemoved,
+    IncorrectAPIVersion,
+)
 
 if TYPE_CHECKING:
     from opentrons.protocol_api.labware import Well, Labware
@@ -37,7 +41,7 @@ if TYPE_CHECKING:
 MODULE_LOG = logging.getLogger(__name__)
 
 
-class APIVersionError(Exception):
+class APIVersionError(IncorrectAPIVersion):
     """
     Error raised when a protocol attempts to access behavior not implemented
     """
@@ -45,7 +49,7 @@ class APIVersionError(Exception):
     pass
 
 
-class UnsupportedAPIError(Exception):
+class UnsupportedAPIError(APIRemoved):
     """Error raised when a protocol attempts to use unsupported API."""
 
 
