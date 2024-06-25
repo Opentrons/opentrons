@@ -296,7 +296,6 @@ async def test_tip_pickup_routine(hardware_api, monkeypatch):
     # moves for each press
     tip_motor_routine_num_moves = 2 * presses + 1
 
-    # the tip motor routine should only make the immediate 'press' moves happen
     assert len(_move.call_args_list) == tip_motor_routine_num_moves
     _move.reset_mock()
 
