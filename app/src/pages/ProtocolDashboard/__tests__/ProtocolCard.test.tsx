@@ -193,7 +193,6 @@ describe('ProtocolCard', () => {
     fireEvent.click(screen.getByText('yay mock protocol'))
   })
 
-  // ToDO (kk:06/18/2024)this test case will be updated
   it('should render text, yellow background color, and icon when a protocol requires a csv file', () => {
     vi.mocked(useFeatureFlag).mockReturnValue(true)
     vi.mocked(useProtocolAnalysisAsDocumentQuery).mockReturnValue({
