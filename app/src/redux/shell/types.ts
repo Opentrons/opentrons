@@ -156,7 +156,7 @@ export interface NotifySubscribeAction {
   meta: { shell: true }
 }
 
-export interface SendFilePathAction {
+export interface SendFilePathsAction {
   type: 'shell:SEND_FILE_PATHS'
   payload: {
     filePaths: string[]
@@ -177,7 +177,7 @@ export type ShellAction =
   | RobotMassStorageDeviceEnumerated
   | RobotMassStorageDeviceRemoved
   | NotifySubscribeAction
-  | SendFilePathAction
+  | SendFilePathsAction
 
 export type IPCSafeFormDataEntry =
   | {

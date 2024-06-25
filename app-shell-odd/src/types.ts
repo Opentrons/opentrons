@@ -136,7 +136,7 @@ export interface RobotSystemAction {
   meta: { shell: true }
 }
 
-export interface SendFilePathAction {
+export interface SendFilePathsAction {
   type: 'shell:SEND_FILE_PATHS'
   payload: { filePaths: string[] }
   meta: { shell: true }

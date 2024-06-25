@@ -100,7 +100,7 @@ import type {
   StartDiscoveryAction,
   FinishDiscoveryAction,
   RobotSystemAction,
-  SendFilePathAction,
+  SendFilePathsAction,
 } from './types'
 import type {
   AppRestartAction,
@@ -448,7 +448,7 @@ export const sendReadyStatus = (status: boolean): RobotSystemAction => ({
   meta: { shell: true },
 })
 
-export const sendFilePaths = (filePaths: string[]): SendFilePathAction => ({
+export const sendFilePaths = (filePaths: string[]): SendFilePathsAction => ({
   type: SEND_FILE_PATHS,
   payload: { filePaths },
   meta: { shell: true },

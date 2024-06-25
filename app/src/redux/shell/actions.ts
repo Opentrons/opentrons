@@ -10,7 +10,7 @@ import type {
   RobotMassStorageDeviceRemoved,
   NotifySubscribeAction,
   NotifyTopic,
-  SendFilePathAction,
+  SendFilePathsAction,
 } from './types'
 
 import type { State } from '../types'
@@ -126,7 +126,7 @@ export const notifySubscribeAction = (
   meta: { shell: true },
 })
 
-export const getFilePaths = (state: State): SendFilePathAction => ({
+export const getFilePaths = (state: State): SendFilePathsAction => ({
   type: SEND_FILE_PATHS,
   payload: { filePaths: state.shell.filePaths },
   meta: { shell: true },
