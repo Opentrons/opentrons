@@ -118,7 +118,7 @@ async def test_start_analysis(
     decoy.verify(
         task_runner.run(
             analyzer.analyze,
-            runner=orchestrator.get_protocol_runner(),
+            orchestrator=orchestrator,
             analysis_id="analysis-id",
             run_time_parameters=[bool_parameter],
         )

@@ -53,7 +53,7 @@ class AnalysesManager:
 
         self._task_runner.run(
             analyzer.analyze,
-            runner=orchestrator.get_protocol_runner(),
+            orchestrator=orchestrator,
             analysis_id=analysis_id,
             run_time_parameters=orchestrator.get_run_time_parameters(),
         )

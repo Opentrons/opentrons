@@ -6,7 +6,7 @@ from datetime import datetime
 
 from pytest_lazyfixture import lazy_fixture  # type: ignore[import-untyped]
 from decoy import Decoy
-from typing import Union
+from typing import Union, Generator
 
 from opentrons.protocols.api_support.types import APIVersion
 from opentrons.protocol_engine import ProtocolEngine
@@ -500,26 +500,23 @@ async def test_stop(
     )
 
 
-# async def test_command_generator(
-#     decoy: Decoy,
-#     mock_protocol_engine: ProtocolEngine,
-#     live_protocol_subject: RunOrchestrator,
-# ) -> None:
-#     """Should get the next command to execute."""
-#
-#     def _stub_completed(*_a: object, **_k: object) -> str:
-#         decoy.when(
-#             mock_protocol_engine._state_store.commands.get_next_to_execute()
-#         ).then_return("command-id")
-#         return "command-id"
-#
-#     decoy.when(
-#         await mock_protocol_engine._state_store.wait_for(
-#             condition=mock_protocol_engine._state_store.commands.get_next_to_execute
-#         )
-#     ).then_do(_stub_completed)
-#
-#     gen = live_protocol_subject.command_generator()
-#     async for command in gen:
-#         print(command)
-#         # assert command == "command-id"
+async def test_command_generator(
+    decoy: Decoy,
+    mock_protocol_engine: ProtocolEngine,
+    live_protocol_subject: RunOrchestrator,
+) -> None:
+    """Should get the next command to execute."""
+
+    def get_next_to_execute() -> Generator[str, None, None]:
+        yield "command-id-1"
+        yield "command-id-2"
+
+    get_next_to_execute_results = get_next_to_execute()
+
+    decoy.when(
+        await mock_protocol_engine._state_store.wait_for(condition=mock_protocol_engine._state_store.commands.get_next_to_execute)
+    ).then_do(lambda *args, **kwargs: next(get_next_to_execute_results))
+
+    async for command in live_protocol_subject.command_generator():
+        print(command)
+        # assert command == "command-id"
